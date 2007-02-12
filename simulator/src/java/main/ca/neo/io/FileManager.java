@@ -30,7 +30,10 @@ public class FileManager {
 	public static final String ENSEMBLE_EXTENSION = "neoensemble";
 	public static final String NEURON_EXTENSION = "neoneuron";	
 	
-	private static File ourDefaultLocation;
+	private static File ourDefaultLocation = new File("./work");
+	static {
+		ourDefaultLocation.mkdirs();
+	}
 	
 	public static File getDefaultLocation() {
 		return ourDefaultLocation;

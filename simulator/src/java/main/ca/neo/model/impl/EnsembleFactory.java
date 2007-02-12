@@ -45,7 +45,7 @@ public class EnsembleFactory {
 			= new LIFNeuronFactory(.02f, .002f, new IndicatorPDF(200f, 400f), new IndicatorPDF(-.9f, .9f));
 		
 		setVectorGenerator(new RandomHypersphereVG(true, 1f, 0f));
-		setDatabase(new File("."));
+		setDatabase(FileManager.getDefaultLocation()); 
 	}
 	
 	/**
