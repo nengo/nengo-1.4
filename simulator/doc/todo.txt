@@ -1,0 +1,105 @@
+TODO NOW: 
+- DONE model activities and direct simulation 
+- DONE review model
+- DONE clean up reference model 
+- DONE exception model
+- DONE make everything serializable
+- NO (not sure this is supported by matlab interface) switch to generics as appropriate 
+- DONE impls for simple classes
+- DONE tests for simple classes
+- DONE SpikeGenerator and Probeable-based Origins
+- DONE LinearExponentialTermination
+- DONE basic plotting
+- DONE CompositeNeuron (or SpikingNeuron or DefaultSpikingNeuron)
+- DONE fix LIF impl
+- DONE write DefaultEnsemble (expandable?) 
+- DONE write DefaultNEFEnsemble
+- DONE write encoder factories: even, random, function-based, axis-clustered (use tanh)
+- DONE function generator
+- DONE (in NEFEnsembleImpl) write constant-rate decoder factory 
+- DONE write and use diagonal linear system 
+- DONE write LocalSimulator 
+- DONE file serialization of Networks (add serializable Node interface) 
+- DONE function interpreter
+- DONE change package names
+- DONE matlab interface
+- DONE ensemble factory
+- DONE improved plotting
+- DONE scale linear system output
+- DONE clean up termination properties (tauPSC maybe not universal)
+- decoding plots
+
+TODO LATER: 
+- SequentialQuadraticApproximator (to support constraints) 
+- DensityCostApproximator (for greater accuracy with greater cost; user specifies baseline number of samples at uniform density)
+- TODO: OriginWrapper to perform functions on values (eg unit conversion) (should model some biological process -- not a valid way to get function outputs of ensembles)
+- clean up LinearSynapticIntegrator 
+- script facade 
+- write simulation-based decoder factory
+- NEURON interface
+- adapting LIF SpikeGenerator 
+- Izhikevich SpikeGenerator (any CONSTANT_RATE parameter ranges?)
+- Poisson and exponential PDFs (see references in Deak, 1977)
+- Poisson process SpikeGenerator
+- Hodgkin-Huxley SpikeGenerator
+- Conductance delays 
+- Hopfield temporal coding 
+- Associative memory network
+- STDP
+- TD learning
+- DistributedSimulator
+- standard ensemble plots
+- negative weights
+- user interface 
+
+
+NOTES:
+- If Eclipse tasks list doesn't populate, delete the project, remove .classpath and 
+	.project, and make new project
+- The matlab-java interface prefers to convert an nX1 matrix to a 1-d array rather than a 2-d array, so 
+	if a class has methods of the same name but one with float[] arg and the other with float[][] arg, there 
+	doesn't seem to be a way call the latter with a float[n][1]. No remaining cases of this in neo presently, 
+	Possible future case if MU.clone() is implemented for vectors as well as matrices. 
+- Plotting: JFreeChart produces nice graphs and supports a variety of export formats, but doesn't support 3D 
+	plots. JMathPlot does support 3D, but doesn't seem to support export at all, and needs JDK 1.5 (although 
+	the latter could probably be changed with little work). Will use JFreeChart for now. 3D plots would be handy, 
+	but the need would probably will arise during non-standard analytical work, where it might be better to 
+	export to Matlab or some other plotting package anyway. We don't have to support every plotting possibility 
+	here.
+
+OLD CODE:
+
+LIFSpikeGenerator
+
+	 * @param stochasticSpikes If true, spikes will sometimes appear in the time step before they are due. 
+	 * 		This is a way to improve the accuracy of the mean spike rate at high rates. (Otherwise with  
+	 * 		constant input we can only have spikes every n steps, where n is an integer -- this works 
+	 * 		badly when we want spikes every 5 steps or less). This calculation takes a little extra time, 
+	 * 		so the default is false. False should be fine if low spike rates are expected, or if the input
+	 * 		contains high-frequency noise, as is usually the case in spiking simulations.  
+
+
+	private static boolean spike(boolean stochastic, float voltage, float increment, float threshold) {
+		boolean result = false;
+		
+		if (stochastic) {
+
+			if (voltage > threshold) {
+				if (Math.random() < (voltage - threshold) / (increment)) {
+					result = true;
+				}
+			} else if (voltage + increment > threshold) {
+				if (Math.random() < (voltage + increment - threshold) / (increment)) {
+					result = true;
+				}
+			}
+
+		} else if (voltage > threshold) { //deterministic
+			result = true;
+		}
+		
+		return result;
+	}
+
+
+	

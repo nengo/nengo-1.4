@@ -1,0 +1,99 @@
+/*
+ * Created on 6-Jun-2006
+ */
+package ca.neo.dynamics.impl;
+
+import ca.neo.model.Units;
+import ca.neo.util.MU;
+
+/**
+ * <p>A linear time-invariant system with the following properties:
+ *   
+ * <ul>
+ * <li>A diagonal dynamics matrix</li>
+ * <li>A zero passthrough matrix</li>
+ * </ul>
+ * 
+ * This implementation will run faster than an instance of the superclass that 
+ * has these properties.</p> 
+ * 
+ * @author Bryan Tripp
+ */
+public class SimpleLTISystem extends LTISystem {
+
+	private static final long serialVersionUID = 1L;
+	
+	private float[] A;
+	private float[][] B; 
+	private float[][] C;
+
+	/**
+	 * See also LTISystem. 
+	 * 
+	 * @param A Diagonal entries of dynamics matrix
+	 * @param B Input matrix
+	 * @param C Output matrix
+	 * @param x0 Initial state
+	 * @param outputUnits Units in which each dimension of the output are expressed 
+	 */
+	public SimpleLTISystem(float[] A, float[][] B, float[][] C, float[] x0, Units[] outputUnits) {
+		super(diagonalMatrix(A), B, C, zeroMatrix(C.length, B[0].length), x0, outputUnits);
+		
+		this.A = A;
+		this.B = B;
+		this.C = C;
+	}
+	
+	/**
+	 * @see ca.neo.dynamics.DynamicalSystem#f(float, float[])
+	 */
+	public float[] f(float t, float[] u) {
+		assert u.length == getInputDimension();
+		
+		float[] x = getState();
+		float[] result = new float[x.length];
+		
+		for (int i = 0; i < result.length; i++) {
+			result[i] = A[i] * x[i];
+			
+			for (int j = 0; j < u.length; j++) {
+				result[i] += B[i][j] * u[j]; 
+			}
+		}
+		
+		return result;
+	}
+
+	/**
+	 * @see ca.neo.dynamics.DynamicalSystem#g(float, float[])
+	 */
+	public float[] g(float t, float[] u) {
+		assert u.length == getInputDimension();
+		
+		return MU.prod(C, getState());
+	}
+	
+	//creates dummy matrix for superclass
+	private static float[][] diagonalMatrix(float[] entries) {
+		float[][] result = new float[entries.length][];
+		
+		for (int i = 0; i < entries.length; i++) {
+			result[i] = new float[entries.length];
+			result[i][i] = entries[i];
+		}
+		
+		return result;		
+	}
+	
+	//creates dummy matrix for superclass
+	private static float[][] zeroMatrix(int rows, int cols) {
+		float[][] result = new float[rows][];
+		
+		for (int i = 0; i < rows; i++) {
+			result[i] = new float[cols];
+		}
+		
+		return result;
+	}
+
+}

@@ -1,0 +1,97 @@
+/*
+ * Created on 26-May-2006
+ */
+package ca.neo.model.impl;
+
+import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.SimulationException;
+import ca.neo.model.StructuralException;
+import ca.neo.model.Termination;
+import ca.neo.model.Units;
+import ca.neo.model.neuron.ExpandableSynapticIntegrator;
+import ca.neo.model.neuron.impl.LinearSynapticIntegrator;
+import ca.neo.model.neuron.impl.SpikeOutputImpl;
+import ca.neo.util.TimeSeries1D;
+import junit.framework.TestCase;
+
+/**
+ * Unit tests for LinearSynapticIntegrator. 
+ * 
+ * @author Bryan Tripp
+ */
+public class LinearSynapticIntegratorTest extends TestCase {
+
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	/*
+	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.getTerminations()'
+	 */
+	public void testGetTerminations() throws StructuralException {
+		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1, 1, 1, Units.ACU);
+		assertEquals(0, si.getTerminations().length);
+		
+		si.addTermination("test1", new float[]{1f, 1f}, 1f);
+		assertEquals(1, si.getTerminations().length);
+		assertEquals("test1", si.getTerminations()[0].getName());
+		assertEquals(2, si.getTerminations()[0].getDimensions());
+		assertEquals("1.0", si.getTerminations()[0].getProperty(Termination.TAU_PSC));
+		
+		si.addTermination("test2", new float[0], 1f);
+		assertEquals(2, si.getTerminations().length);
+		
+		si.removeTermination("test2");
+		assertEquals(1, si.getTerminations().length);		
+		
+		try {
+			si.addTermination("test1", new float[0], 1f);
+			fail("Should have thrown exception due to duplicate termination name");
+		} catch (StructuralException e) {} //exception is expected
+	}
+
+	/*
+	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.run(float, float)'
+	 */
+	public void testRun() throws StructuralException, SimulationException {
+		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1f, 0f, .001f, Units.ACU);
+		si.addTermination("one", new float[]{1f}, 1f);
+		si.addTermination("two", new float[]{1f}, 1f);
+
+		Termination[] t = si.getTerminations();
+		
+		InstantaneousOutput spike = new SpikeOutputImpl(new boolean[]{true}, Units.SPIKES);
+		
+		t[0].setValues(spike);
+		t[1].setValues(spike);
+		
+		TimeSeries1D current = si.run(0f, .01f); 
+		assertEquals(11, current.getTimes().length);
+		assertTrue(current.getValues1D()[0] > 1.99f && current.getValues1D()[0] < 2.01f);
+		for (int i = 1; i < current.getTimes().length; i++) {
+			assertTrue(current.getValues1D()[i] < current.getValues1D()[i-1]); //decaying
+		}
+	}
+
+	/*
+	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.reset(boolean)'
+	 */
+	public void testReset() throws StructuralException, SimulationException {
+		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1f, 0f, .001f, Units.ACU);
+		si.addTermination("test", new float[]{1f}, 1f);
+		
+		Termination t = si.getTerminations()[0];
+		t.setValues(new SpikeOutputImpl(new boolean[]{true}, Units.SPIKES));		
+		for (int i = 0; i < 10; i++) {
+			si.run(.001f * ((float) i), .001f * ((float) i+1));			
+			t.setValues(new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES));
+		}
+		TimeSeries1D current = si.run(.010f, .011f);
+		assertTrue(current.getValues()[1][0] > .9f);
+		
+		si.reset(false); //there is no random setting to test
+		current = si.run(.011f, .012f);
+		assertTrue(current.getValues1D()[1] < .01f);
+	}
+
+}

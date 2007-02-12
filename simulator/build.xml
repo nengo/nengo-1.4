@@ -1,0 +1,76 @@
+<project name="NEO" default="dist" basedir=".">
+
+	<property name="releasename" value="neo-0.1" />
+	<property name="src" value="${basedir}/src" />
+	<property name="build" value="${basedir}/build" />
+	<property name="classes" value="${build}/classes" />
+	<property name="docs" value="${build}/docs" />
+	<property name="dist" value="${basedir}/dist" />
+	<property name="lib" value="${basedir}/lib" />
+
+	<path id="classpath">
+		<pathelement path="${src}" />
+		<pathelement location="${lib}/commons-lang-2.1.jar" /> 
+		<pathelement location="${lib}/commons-math-1.1.jar" /> 
+		<pathelement location="${lib}/jfig3-itext.jar" /> 
+		<pathelement location="${lib}/Jama-1.0.2.jar" /> 		
+	</path>
+	
+	
+	<!-- Creates JavaDoc documentation -->
+	<target name="doc">
+		<mkdir dir="${docs}"/>
+		
+	    <!-- Note: if this fails because of the source attribute, you need ant 1.4 -->
+	    <javadoc packagenames="ca.neo.*"
+	        source="1.4"
+	        classpathref="classpath"
+	        sourcepath="${src}/java/main"
+	        destdir="${docs}"
+	        windowtitle="NEO Documentation"/>  
+	</target>
+	
+	
+	<!-- Compile main and test classes --> 
+	<target name="compile">
+		<mkdir dir="${classes}/main"/>
+		<mkdir dir="${classes}/test"/>
+		
+	 	<javac source="1.4" srcdir="${src}/java/main" destdir="${classes}/main" includes="ca/neo/**" debug="true">
+	        <classpath refid="classpath" />
+	    </javac>
+
+	 	<javac source="1.4" srcdir="${src}/java/test" destdir="${classes}/test" includes="ca/neo/**" debug="true">
+	        <classpath refid="classpath" />
+	    </javac>
+	</target>
+	
+	
+	<!-- Creates JAR --> 
+	<target name="jar" depends="compile">
+		<jar jarfile="${dist}/${releasename}.jar" basedir="${classes}/main" />
+	</target>
+
+	
+	<!-- Creates source, doc, and release zip files -->
+	<target name="dist" depends="doc,jar">
+		<mkdir dir="${dist}"/>
+
+	    <!-- Make source zip file -->
+	    <zip zipfile="${dist}/${releasename}_source.zip" basedir="${src}/java/main" includes="ca/neo/**/*.java"/>
+
+		<!-- Make doc zip file --> 
+		<zip zipfile="${dist}/${releasename}_docs.zip" basedir="${docs}"/>	
+		
+		<zip zipfile="${dist}/${releasename}.zip" basedir="${lib}" />
+		<zip update="true" zipfile="${dist}/${releasename}.zip" basedir="${dist}" includes="${releasename}.jar"/> 
+	</target>
+	
+	
+	<!-- Deletes all build products --> 
+	<target name="clean">
+		<delete><fileset dir="${build}" /></delete>
+	</target>
+	
+	
+</project>
