@@ -31,7 +31,10 @@ import java.io.Serializable;
  * which transform inputs into dimensions that the receiving Ensemble can use.</p>
  * 
  * <p>Note also that the second method is more efficient when the number of neurons in each ensemble 
- * is much larger than the number of dimensions in represented variables, as is typical.</p> 
+ * is much larger than the number of dimensions in represented variables, as is typical.</p>
+ * 
+ * TODO: should probably extract properties-related methods into another interface (Configurable?)
+ *   possibly supporting types 
  *   
  * @author Bryan Tripp
  */
