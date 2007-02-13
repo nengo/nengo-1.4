@@ -5,7 +5,6 @@ import ca.neo.math.FunctionInterpreter;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.DefaultFunctionInterpreter;
-import ca.neo.model.ExternalInput;
 import ca.neo.model.Network;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
@@ -43,7 +42,7 @@ public class FuzzyLogicExample {
 				new ConstantFunction(1, .2f),
 				new ConstantFunction(1, .3f)
 		};
-		ExternalInput in = new FunctionInput("input", functions, Units.UNK);
+		FunctionInput in = new FunctionInput("input", functions, Units.UNK);
 		
 		EnsembleFactory ef = new EnsembleFactory();
 		

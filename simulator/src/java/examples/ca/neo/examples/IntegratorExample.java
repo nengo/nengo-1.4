@@ -10,7 +10,6 @@ import ca.neo.io.MatlabExporter;
 import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.model.Ensemble;
-import ca.neo.model.ExternalInput;
 import ca.neo.model.Network;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
@@ -34,7 +33,7 @@ public class IntegratorExample {
 		
 		Function f = new ConstantFunction(1, 1f);
 //		Function f = new SineFunction();
-		ExternalInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
+		FunctionInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
 		network.addNode(input);
 		
 		EnsembleFactory ef = new EnsembleFactory();

@@ -11,8 +11,9 @@ package ca.neo.model.impl;
 import java.util.Properties;
 
 import ca.neo.math.Function;
-import ca.neo.model.ExternalInput;
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
+import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
@@ -21,7 +22,7 @@ import ca.neo.model.Units;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.TimeSeriesImpl;
 
-public class FunctionInput implements ExternalInput, Probeable {
+public class FunctionInput implements Node, Origin, Probeable {
 
 	private static final long serialVersionUID = 1L;	
 	private static final String ourStateName = "input";
