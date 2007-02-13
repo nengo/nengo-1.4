@@ -3,8 +3,6 @@
  */
 package ca.neo.model;
 
-import java.io.Serializable;
-
 /**
  * <p>A neural circuit, consisting of Nodes such as Ensembles and ExternalInputs. A Network is the 
  * usual object of a simulation. If you are new to this code, what you probably want to 
@@ -24,7 +22,7 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public interface Network extends Serializable {
+public interface Network extends Node, Probeable {
 
 	/**
 	 * @param node Node to add to the Network 
@@ -74,5 +72,80 @@ public interface Network extends Serializable {
 	 * 		Origin and Termination 
 	 */
 	public void removeProjection(Termination termination) throws StructuralException;
+
+	/**
+	 * Declares the given Origin as available for connection outside the Network
+	 * via getOrigins(). This Origin should not be connected within	this Network.
+	 * 
+	 * @param origin An Origin within this Network that is to connect to something 
+	 * 		outside this Network  
+	 * @param name Name of the Origin as it will appear outside this Network 
+	 */
+	public void exposeOrigin(Origin origin, String name);
+	
+	/**
+	 * Undoes exposeOrigin(x, x, name). 
+	 * 
+	 * @param name Name of Origin to unexpose. 
+	 */
+	public void hideOrigin(String name);
+
+	/**
+	 * @param name Name of an exposed Origin
+	 * @return Named Origin
+	 * @throws StructuralException if the named Origin does not exist
+	 */
+	public Origin getOrigin(String name) throws StructuralException;
+	
+	/**
+	 * @return All exposed Origins
+	 */
+	public Origin[] getOrigins();
+	
+	/**
+	 * Declares the given Termination as available for connection from outside the Network
+	 * via getTerminations(). This Termination should not be connected within this Network.
+	 * 
+	 * @param termination A Termination within this Network that is to connect to something 
+	 * 		outside this Network  
+	 * @param name Name of the Termination as it will appear outside this Network 
+	 */
+	public void exposeTermination(Termination termination, String name);
+
+	/**
+	 * Undoes exposeTermination(x, x, name). 
+	 * 
+	 * @param name Name of Termination to unexpose. 
+	 */
+	public void hideTermination(String name);
+
+	/**
+	 * @param name Name of an exposed Termination
+	 * @return Named Termination
+	 * @throws StructuralException if the named Termination does not exist
+	 */
+	public Termination getTermination(String name) throws StructuralException;
+	
+	/**
+	 * @return All exposed Terminations
+	 */
+	public Termination[] getTerminations();
+	
+	/**
+	 * Declares the given Probeable state as being available for Probing from outside this 
+	 * Network. 
+	 * 
+	 * @param probeable A Probeable within this Network. 
+	 * @param stateName A state of the given Probeable
+	 * @param name A new name with which to access this state via Network.getHistory
+	 */
+	public void exposeState(Probeable probeable, String stateName, String name);
+	
+	/**
+	 * Undoes exposeState(x, x, name). 
+	 * 
+	 * @param name Name of state to unexpose. 
+	 */
+	public void hideState(String name);
 	
 }
