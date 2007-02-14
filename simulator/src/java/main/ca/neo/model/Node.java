@@ -42,4 +42,30 @@ public interface Node extends Serializable, Resettable {
 	 */
 	public void run(float startTime, float endTime) throws SimulationException; 
 	
+	/**
+	 * @return Sets of ouput channels (eg spiking outputs, gap junctional outputs, etc.)
+	 */
+	public Origin[] getOrigins();
+	
+	/**
+	 * @param name Name of an Origin on this Node
+	 * @return The named Origin if it exists
+	 * @throws StructuralException if the named Origin does not exist
+	 */
+	public Origin getOrigin(String name) throws StructuralException;
+	
+	/**
+	 * @return Sets of input channels (these have the same dimension as corresponding Origins 
+	 * 		to which they are connected).  
+	 */
+	public Termination[] getTerminations();
+	
+	/**
+	 * @param name Name of a Termination onto this Node
+	 * @return The named Termination if it exists 
+	 * @throws StructuralException if the named Termination does not exist
+	 */
+	public Termination getTermination(String name) throws StructuralException;
+	
+	
 }

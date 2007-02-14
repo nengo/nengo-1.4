@@ -92,7 +92,7 @@ public class InferenceExample {
 		net.addNode(in);
 		net.addNode(observation);
 //		net.addNode(inference);
-		net.addProjection(in, observation.getTermination("pdf"));
+		net.addProjection(in.getOrigin(FunctionInput.ORIGIN_NAME), observation.getTermination("pdf"));
 //		net.addProjection(observation.getOrigin(NEFEnsemble.X), inference.getTermination("conditional"));
 		
 		return net;

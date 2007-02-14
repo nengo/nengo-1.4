@@ -5,6 +5,7 @@ package ca.neo.model.impl;
 
 import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
+import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
@@ -28,10 +29,10 @@ public class FunctionInputTest extends TestCase {
 	 */
 	public void testGetDimensions() throws StructuralException {
 		FunctionInput input = new FunctionInput("test", new Function[]{new ConstantFunction(1, 1f)}, Units.UNK);
-		assertEquals(1, input.getDimensions());
+		assertEquals(1, input.getOrigin(FunctionInput.ORIGIN_NAME).getDimensions());
 
 		input = new FunctionInput("test", new Function[]{new ConstantFunction(1, 1f), new ConstantFunction(1, 1f)}, Units.UNK);
-		assertEquals(2, input.getDimensions());		
+		assertEquals(2, input.getOrigin(FunctionInput.ORIGIN_NAME).getDimensions());		
 		
 		try {
 			input = new FunctionInput("test", new Function[]{new ConstantFunction(2, 1f)}, Units.UNK);
@@ -44,15 +45,16 @@ public class FunctionInputTest extends TestCase {
 	 */
 	public void testGetValues() throws StructuralException, SimulationException {
 		FunctionInput input = new FunctionInput("test", new Function[]{new ConstantFunction(1, 1f), new ConstantFunction(1, 2f)}, Units.UNK);
-		assertEquals(2, input.getValues().getDimension());
-		assertEquals(2, ((RealOutput) input.getValues()).getValues().length);
+		Origin origin = input.getOrigin(FunctionInput.ORIGIN_NAME);
+		assertEquals(2, origin.getValues().getDimension());
+		assertEquals(2, ((RealOutput) origin.getValues()).getValues().length);
 		
 		input.run(0f, 1f);
-		assertEquals(2, input.getValues().getDimension());
-		assertEquals(2, ((RealOutput) input.getValues()).getValues().length);
-		float value = ((RealOutput) input.getValues()).getValues()[0];
+		assertEquals(2, origin.getValues().getDimension());
+		assertEquals(2, ((RealOutput) origin.getValues()).getValues().length);
+		float value = ((RealOutput) origin.getValues()).getValues()[0];
 		assertTrue(value > .9f);
-		value = ((RealOutput) input.getValues()).getValues()[1];
+		value = ((RealOutput) origin.getValues()).getValues()[1];
 		assertTrue(value > 1.9f);
 	}
 
@@ -70,15 +72,15 @@ public class FunctionInputTest extends TestCase {
 	public void testGetHistory() throws StructuralException, SimulationException {
 		FunctionInput input = new FunctionInput("test", new Function[]{new ConstantFunction(1, 1f), new ConstantFunction(1, 2f)}, Units.UNK);
 		assertEquals(1, input.listStates().size());
-		assertTrue(input.listStates().get("input") != null);
+		assertTrue(input.listStates().get(FunctionInput.STATE_NAME) != null);
 		
-		assertEquals(1, input.getHistory("input").getValues().length);
-		assertTrue(input.getHistory("input").getValues()[0][0] < .5f);
+		assertEquals(1, input.getHistory(FunctionInput.STATE_NAME).getValues().length);
+		assertTrue(input.getHistory(FunctionInput.STATE_NAME).getValues()[0][0] > .5f);
 		
 		input.run(0f, 1f);
 		
-		assertEquals(1, input.getHistory("input").getValues().length);
-		assertTrue(input.getHistory("input").getValues()[0][0] > .5f);
+		assertEquals(1, input.getHistory(FunctionInput.STATE_NAME).getValues().length);
+		assertTrue(input.getHistory(FunctionInput.STATE_NAME).getValues()[0][0] > .5f);
 	}
 
 }

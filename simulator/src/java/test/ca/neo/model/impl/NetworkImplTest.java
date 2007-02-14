@@ -6,9 +6,7 @@ package ca.neo.model.impl;
 import org.apache.commons.lang.NotImplementedException;
 
 import ca.neo.model.Ensemble;
-import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
-import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
@@ -35,7 +33,7 @@ public class NetworkImplTest extends TestCase {
 	public void testGetNodes() throws StructuralException {
 		Ensemble a = new MockEnsemble("a");
 		myNetwork.addNode(a);
-		myNetwork.addNode(new MockExternalInput("b"));
+		myNetwork.addNode(new MockEnsemble("b"));
 		
 		assertEquals(2, myNetwork.getNodes().length);
 		
@@ -151,44 +149,4 @@ public class NetworkImplTest extends TestCase {
 		
 	}
 	
-	private static class MockExternalInput implements Node, Origin {
-
-		private static final long serialVersionUID = 1L;
-		
-		private String myName;
-		
-		public MockExternalInput(String name) {
-			myName = name;
-		}
-		
-		public void run(float startTime, float endTime) {
-			throw new NotImplementedException("not implemented");
-		}
-
-		public String getName() {
-			return myName;
-		}
-
-		public int getDimensions() {
-			throw new NotImplementedException("not implemented");
-		}
-
-		public InstantaneousOutput getValues() {
-			throw new NotImplementedException("not implemented");
-		}
-
-		public void reset(boolean randomize) {
-			throw new NotImplementedException("not implemented");
-		}
-
-		public void setMode(SimulationMode mode) {
-			throw new NotImplementedException("not implemented");
-		}
-
-		public SimulationMode getMode() {
-			throw new NotImplementedException("not implemented");
-		}
-		
-	}
-
 }

@@ -48,11 +48,6 @@ public interface Ensemble extends Node {
 	public Neuron[] getNeurons();
 	
 	/**
-	 * @return Sets of ouput channels (eg spiking outputs, gap junctional outputs, etc.)
-	 */
-	public Origin[] getOrigins();
-	
-	/**
 	 * @return A SpikePattern containing a record of spikes, provided collectSpikes(boolean) 
 	 * 		has been set to true 
 	 */
@@ -63,25 +58,5 @@ public interface Ensemble extends Node {
  	 * 		through getSpikePattern() (defaults to false)
 	 */
 	public void collectSpikes(boolean collect);
-	
-	/**
-	 * @param name Name of an Origin on this Ensemble
-	 * @return The named Origin if it exists
-	 * @throws StructuralException if the named Origin does not exist
-	 */
-	public Origin getOrigin(String name) throws StructuralException;
-	
-	/**
-	 * @return Sets of input channels (these have the same dimension as corresponding outputs 
-	 * 		to which they are connected).  
-	 */
-	public Termination[] getTerminations();
-	
-	/**
-	 * @param name Name of a Termination onto this Ensemble
-	 * @return The named Termination if it exists 
-	 * @throws StructuralException if the named Termination does not exist
-	 */
-	public Termination getTermination(String name) throws StructuralException;
 	
 }

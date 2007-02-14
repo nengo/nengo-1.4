@@ -10,7 +10,7 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.Units;
 import ca.neo.util.Probe;
 import ca.neo.util.TimeSeries;
-import ca.neo.util.impl.RecorderImpl;
+import ca.neo.util.impl.ProbeImpl;
 import ca.neo.util.impl.TimeSeries1DImpl;
 import junit.framework.TestCase;
 
@@ -26,7 +26,7 @@ public class RecorderImplTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		myRecorder = new RecorderImpl();
+		myRecorder = new ProbeImpl();
 	}
 
 	/*

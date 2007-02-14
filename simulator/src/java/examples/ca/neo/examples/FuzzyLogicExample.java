@@ -77,10 +77,10 @@ public class FuzzyLogicExample {
 		C.addDecodedTermination("in", new float[][]{new float[]{0f, 0f, 1f, 0f}}, .005f, false);
 		D.addDecodedTermination("in", new float[][]{new float[]{0f, 0f, 0f, 1f}}, .005f, false);
 		
-		net.addProjection(in, A.getTermination("in"));
-		net.addProjection(in, B.getTermination("in"));
-		net.addProjection(in, C.getTermination("in"));
-		net.addProjection(in, D.getTermination("in"));
+		net.addProjection(in.getOrigin(FunctionInput.ORIGIN_NAME), A.getTermination("in"));
+		net.addProjection(in.getOrigin(FunctionInput.ORIGIN_NAME), B.getTermination("in"));
+		net.addProjection(in.getOrigin(FunctionInput.ORIGIN_NAME), C.getTermination("in"));
+		net.addProjection(in.getOrigin(FunctionInput.ORIGIN_NAME), D.getTermination("in"));
 		
 		rule1a.addDecodedTermination("B", new float[][]{new float[]{1f}, new float[]{0f}}, .005f, false);
 		rule1a.addDecodedTermination("C", new float[][]{new float[]{0f}, new float[]{1f}}, .005f, false);

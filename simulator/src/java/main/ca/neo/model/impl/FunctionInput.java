@@ -4,7 +4,7 @@
 package ca.neo.model.impl;
 
 /**
- * An Origin that produces real-valued output based on functions of time. 
+ * An Node that produces real-valued output based on functions of time. 
  * 
  * @author Bryan Tripp
  */
@@ -18,25 +18,29 @@ import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
+import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.TimeSeriesImpl;
 
-public class FunctionInput implements Node, Origin, Probeable {
+public class FunctionInput implements Node, Probeable {
 
-	private static final long serialVersionUID = 1L;	
-	private static final String ourStateName = "input";
+	public static final String ORIGIN_NAME = "origin";
+	public static final String STATE_NAME = "input";
+	
+	private static final long serialVersionUID = 1L;
 	
 	private String myName;
 	private Function[] myFunctions;
 	private Units[] myUnits;
 	private float myTime;
 	private float[] myValues;
+	private FunctionOrigin myOrigin;
 	
 	/**
-	 * @param name The name of this Origin
+	 * @param name The name of this Node
 	 * @param function Functions of time (simulation time) that produce the values
-	 * 		that will be output by this Origin. Each given function corresponds to 
+	 * 		that will be output by this Node. Each given function corresponds to 
 	 * 		a dimension in the output vectors. Each function must have input dimension 1.
 	 * @param units The units in which the output values are to be interpreted 
 	 * @throws StructuralException 
@@ -52,6 +56,8 @@ public class FunctionInput implements Node, Origin, Probeable {
 		for (int i = 0; i < myUnits.length; i++) {
 			myUnits[i] = units;
 		}
+		
+		myOrigin = new FunctionOrigin(functions.length, units);
 		
 		run(0f, 0f); //set initial state to f(0)
 	}
@@ -72,21 +78,6 @@ public class FunctionInput implements Node, Origin, Probeable {
 	}
 
 	/**
-	 * 
-	 * @see ca.neo.model.Origin#getDimensions()
-	 */
-	public int getDimensions() {
-		return myFunctions.length;
-	}
-	
-	/**
-	 * @see ca.neo.model.Origin#getValues()
-	 */
-	public InstantaneousOutput getValues() throws SimulationException {
-		return new RealOutputImpl(myValues, myUnits[0]);
-	}
-
-	/**
 	 * @see ca.neo.model.ExternalInput#run(float, float)
 	 */
 	public void run(float startTime, float endTime) {
@@ -96,6 +87,8 @@ public class FunctionInput implements Node, Origin, Probeable {
 		for (int i = 0; i < myValues.length; i++) {
 			myValues[i] = myFunctions[i].map(new float[]{myTime});
 		}
+		
+		myOrigin.setValues(myValues);
 	}
 
 	/**
@@ -129,14 +122,14 @@ public class FunctionInput implements Node, Origin, Probeable {
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		TimeSeries result = null;
 		
-		if (ourStateName.equals(stateName)) {
-			if (myValues == null) {
-				result = new TimeSeriesImpl(new float[0], new float[0][], myUnits);				
-			} else {
-				result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{myValues}, myUnits);				
-			}
-		} else {
+		if (!STATE_NAME.equals(stateName)) {
 			throw new SimulationException("State " + stateName + " is unknown");
+		}
+
+		if (myValues == null) {
+			result = new TimeSeriesImpl(new float[0], new float[0][], myUnits);				
+		} else {
+			result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{myValues}, myUnits);				
 		}
 		
 		return result;
@@ -147,8 +140,72 @@ public class FunctionInput implements Node, Origin, Probeable {
 	 */
 	public Properties listStates() {
 		Properties result = new Properties();
-		result.setProperty(ourStateName, "Function of time");
+		result.setProperty(STATE_NAME, "Function of time");
 		return result;
 	}
 	
+	/** 
+	 * @see ca.neo.model.Node#getOrigin(java.lang.String)
+	 */
+	public Origin getOrigin(String name) throws StructuralException {
+		if (!ORIGIN_NAME.equals(name)) {
+			throw new StructuralException("This Node only has origin FunctionInput.ORIGIN_NAME");
+		}
+		
+		return myOrigin;
+	}
+
+	/** 
+	 * @see ca.neo.model.Node#getOrigins()
+	 */
+	public Origin[] getOrigins() {
+		return new Origin[]{myOrigin};
+	}
+
+	/**
+	 * @see ca.neo.model.Node#getTermination(java.lang.String)
+	 */
+	public Termination getTermination(String name) throws StructuralException {
+		throw new StructuralException("This node has no Terminations");		
+	}
+
+	/**
+	 * @see ca.neo.model.Node#getTerminations()
+	 */
+	public Termination[] getTerminations() {
+		return new Termination[0];
+	}
+	
+	private static class FunctionOrigin implements Origin {
+
+		private static final long serialVersionUID = 1L;
+		
+		private int myDimension;
+		private Units myUnits;
+		private float[] myValues;
+		
+		public FunctionOrigin(int dimension, Units units) {
+			myDimension = dimension;
+			myUnits = units;
+			myValues = new float[dimension];
+		}
+		
+		public void setValues(float[] values) {
+			myValues = values;
+		}
+		
+		public int getDimensions() {
+			return myDimension;
+		}
+
+		public String getName() {
+			return FunctionInput.ORIGIN_NAME;
+		}
+
+		public InstantaneousOutput getValues() throws SimulationException {
+			return new RealOutputImpl(myValues, myUnits);
+		}
+		
+	}
+
 }

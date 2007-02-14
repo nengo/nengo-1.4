@@ -49,7 +49,7 @@ public class IntegratorExample {
 		
 		Termination interm = integrator.addDecodedTermination("input", new float[][]{new float[]{tau}}, tau, false);
 //		Termination interm = integrator.addDecodedTermination("input", new float[][]{new float[]{1f}}, tau);
-		network.addProjection(input, interm);
+		network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), interm);
 		
 		Termination fbterm = integrator.addDecodedTermination("feedback", new float[][]{new float[]{1f}}, tau, false);
 		network.addProjection(integrator.getOrigin(NEFEnsemble.X), fbterm);
