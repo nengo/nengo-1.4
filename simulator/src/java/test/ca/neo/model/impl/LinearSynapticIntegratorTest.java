@@ -36,7 +36,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		assertEquals(1, si.getTerminations().length);
 		assertEquals("test1", si.getTerminations()[0].getName());
 		assertEquals(2, si.getTerminations()[0].getDimensions());
-		assertEquals("1.0", si.getTerminations()[0].getProperty(Termination.TAU_PSC));
+		assertEquals(new Float(1), si.getTerminations()[0].getConfiguration().getProperty(Termination.TAU_PSC));
 		
 		si.addTermination("test2", new float[0], 1f);
 		assertEquals(2, si.getTerminations().length);

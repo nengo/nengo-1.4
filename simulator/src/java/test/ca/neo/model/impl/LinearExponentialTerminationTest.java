@@ -48,27 +48,25 @@ public class LinearExponentialTerminationTest extends TestCase {
 	public void testGetProperty() throws StructuralException {
 		LinearExponentialTermination let = new LinearExponentialTermination("test", new float[1], 1.5f);
 		
-		assertEquals(1, let.listPropertyNames().length);
-		assertEquals(Termination.TAU_PSC, let.listPropertyNames()[0]);
+		assertEquals(1, let.getConfiguration().listPropertyNames().length);
+		assertEquals(Termination.TAU_PSC, let.getConfiguration().listPropertyNames()[0]);
 		
-		String tauString = let.getProperty(Termination.TAU_PSC);
-		float tau = Float.parseFloat(tauString);
-		assertTrue(tau > 1.49 && tau < 1.51);
+		Float tau = (Float) let.getConfiguration().getProperty(Termination.TAU_PSC);
+		assertTrue(tau.floatValue() > 1.49 && tau.floatValue() < 1.51);
 		
 		try {
-			let.setProperty("unknown_property", "1");
+			let.getConfiguration().setProperty("unknown_property", "1");
 			fail("Should have thrown exception due to unknown property name");
 		} catch (StructuralException e) {} //exception is expected
 
 		try {
-			let.setProperty(Termination.TAU_PSC, "not a float");
+			let.getConfiguration().setProperty(Termination.TAU_PSC, "not a float");
 			fail("Should have thrown exception due to bad property value");
 		} catch (StructuralException e) {} //exception is expected
 		
-		let.setProperty(Termination.TAU_PSC, "2.5");
-		tauString = let.getProperty(Termination.TAU_PSC);
-		tau = Float.parseFloat(tauString);
-		assertTrue(tau > 2.49 && tau < 2.51);
+		let.getConfiguration().setProperty(Termination.TAU_PSC, new Float(2.5f));
+		tau = (Float) let.getConfiguration().getProperty(Termination.TAU_PSC);
+		assertTrue(tau.floatValue() > 2.49 && tau.floatValue() < 2.51);
 	}
 
 	/*
