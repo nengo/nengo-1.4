@@ -14,7 +14,7 @@ import ca.neo.util.TimeSeries;
  * 
  * @author Bryan Tripp
  */
-public class RecorderImpl implements Probe {
+public class ProbeImpl implements Probe {
 	
 	private Probeable myTarget;
 	private String myStateName;

@@ -24,7 +24,7 @@ import ca.neo.plot.Plotter;
 import ca.neo.sim.Simulator;
 import ca.neo.util.MU;
 import ca.neo.util.Probe;
-import ca.neo.util.impl.RecorderImpl;
+import ca.neo.util.impl.ProbeImpl;
 
 /**
  * A Simulator that runs locally (ie in the Java Virtual Machine in which it is called).
@@ -115,7 +115,7 @@ public class LocalSimulator implements Simulator {
 	public Probe addProbe(String nodeName, String state, boolean record) throws SimulationException {
 		Probeable p = getNode(nodeName);
 		
-		Probe result = new RecorderImpl();
+		Probe result = new ProbeImpl();
 		result.connect(p, state, record);
 		
 		myProbes.add(result);
@@ -129,7 +129,7 @@ public class LocalSimulator implements Simulator {
 	public Probe addProbe(String ensembleName, int neuronIndex, String state, boolean record) throws SimulationException {
 		Probeable p = getNeuron(ensembleName, neuronIndex);
 		
-		Probe result = new RecorderImpl();
+		Probe result = new ProbeImpl();
 		result.connect(p, state, record);
 		
 		myProbes.add(result);
