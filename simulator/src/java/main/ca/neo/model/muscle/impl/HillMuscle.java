@@ -1,7 +1,7 @@
 /*
  * Created on 25-Nov-2006
  */
-package ca.neo.model.ms.impl;
+package ca.neo.model.muscle.impl;
 
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
@@ -13,7 +13,7 @@ import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.NewtonRootFinder;
 import ca.neo.model.SimulationException;
 import ca.neo.model.Units;
-import ca.neo.model.ms.TorqueMuscle;
+import ca.neo.model.muscle.TorqueMuscle;
 import ca.neo.plot.Plotter;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.TimeSeries1DImpl;

@@ -1,13 +1,13 @@
 /*
  * Created on 30-Nov-2006
  */
-package ca.neo.model.ms.impl;
+package ca.neo.model.muscle.impl;
 
 import ca.neo.math.DifferentiableFunction;
 import ca.neo.math.Function;
 import ca.neo.model.SimulationException;
-import ca.neo.model.ms.TensionMuscle;
-import ca.neo.model.ms.TorqueMuscle;
+import ca.neo.model.muscle.TensionMuscle;
+import ca.neo.model.muscle.TorqueMuscle;
 
 /**
  * A TorqueMuscle that is based on an underlying TensionMuscle. 
@@ -34,14 +34,14 @@ public class TensionTorqueWrapper implements TorqueMuscle {
 	}
 
 	/**
-	 * @see ca.neo.model.ms.SkeletalMuscle#run(float, float)
+	 * @see ca.neo.model.muscle.SkeletalMuscle#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
 		myMuscle.run(startTime, endTime);
 	}
 
 	/**
-	 * @see ca.neo.model.ms.SkeletalMuscle#setExcitation(float)
+	 * @see ca.neo.model.muscle.SkeletalMuscle#setExcitation(float)
 	 */
 	public void setExcitation(float excitation) {
 		myMuscle.setExcitation(excitation);
@@ -56,7 +56,7 @@ public class TensionTorqueWrapper implements TorqueMuscle {
 	}
 
 	/**
-	 * @see ca.neo.model.ms.TorqueMuscle#getTorque()
+	 * @see ca.neo.model.muscle.TorqueMuscle#getTorque()
 	 */
 	public float getTorque() {
 		float tension = myMuscle.getTension();

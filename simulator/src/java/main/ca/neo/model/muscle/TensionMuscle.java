@@ -1,7 +1,7 @@
 /*
  * Created on 30-Nov-2006
  */
-package ca.neo.model.ms;
+package ca.neo.model.muscle;
 
 /**
  * <p>A linear muscle that produces tension. Inputs to the muscle are length (m) and lengthening 

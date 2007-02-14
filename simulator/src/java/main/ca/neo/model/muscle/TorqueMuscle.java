@@ -1,7 +1,7 @@
 /*
  * Created on 30-Nov-2006
  */
-package ca.neo.model.ms;
+package ca.neo.model.muscle;
 
 /**
  * <p>An abstraction of a muscle/group that produces torque at a hinge joint instead of tension 

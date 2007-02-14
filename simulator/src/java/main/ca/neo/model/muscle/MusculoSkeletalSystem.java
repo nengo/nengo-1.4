@@ -1,7 +1,7 @@
 /*
  * Created on 25-Nov-2006
  */
-package ca.neo.model.ms;
+package ca.neo.model.muscle;
 
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
