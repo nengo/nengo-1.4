@@ -6,8 +6,7 @@ package ca.neo.sim;
 import ca.neo.model.Network;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
-import ca.neo.util.Recorder;
-import ca.neo.util.Scope;
+import ca.neo.util.Probe;
 
 /**
  * Runs simulations of a Network. 
@@ -42,42 +41,25 @@ public interface Simulator {
 	public void resetNetwork(boolean randomize);
 
 	/**
-	 * @param nodeName Name of a Probeable Node from which state is to be collected
-	 * @param state The name of the state variable that is to be displayed
-	 * @return A Scope connected to the specified Node
+	 * @param nodeName Name of a Probeable Node from which state is to be probed
+	 * @param state The name of the state variable to probe
+	 * @param record Probe retains history if true
+	 * @return A Probe connected to the specified Node
 	 * @throws SimulationException if the referenced Node can not be found, or is not Probeable, or does 
 	 * 		not have the specified state variable
 	 */
-	public Scope addScope(String nodeName, String state) throws SimulationException; 
+	public Probe addProbe(String nodeName, String state, boolean record) throws SimulationException; 
 
 	/**
-	 * @param ensembleName Name of Ensemble containing a Probeable Neuron from which state is to be collected 
+	 * @param ensembleName Name of Ensemble containing a Probeable Neuron from which state is to be probed 
 	 * @param neuronIndex Index of the Neuron (from 0) within the specified Ensemble
-	 * @param state The name of the state variable that is to be displayed
-	 * @return A Scope connected to the specified Neuron
+	 * @param state The name of the state variable to probe
+	 * @param record Probe retains history if true
+	 * @return A Probe connected to the specified Neuron
 	 * @throws SimulationException if the referenced Neuron can not be found, or is not Probeable, or does 
 	 * 		not have the specified state variable
 	 */
-	public Scope addScope(String ensembleName, int neuronIndex, String state) throws SimulationException;
-	
-	/**
-	 * @param nodeName Name of a Probeable Node from which state is to be recorded
-	 * @param state The name of the state variable to record
-	 * @return A Recorder connected to the specified Node
-	 * @throws SimulationException if the referenced Node can not be found, or is not Probeable, or does 
-	 * 		not have the specified state variable
-	 */
-	public Recorder addRecorder(String nodeName, String state) throws SimulationException; 
-
-	/**
-	 * @param ensembleName Name of Ensemble containing a Probeable Neuron from which state is to be recorded 
-	 * @param neuronIndex Index of the Neuron (from 0) within the specified Ensemble
-	 * @param state The name of the state variable to record
-	 * @return A Recorder connected to the specified Neuron
-	 * @throws SimulationException if the referenced Neuron can not be found, or is not Probeable, or does 
-	 * 		not have the specified state variable
-	 */
-	public Recorder addRecorder(String ensembleName, int neuronIndex, String state) throws SimulationException;
+	public Probe addProbe(String ensembleName, int neuronIndex, String state, boolean record) throws SimulationException;
 	
 	/**
 	 * Runs the Network for the given time range. The states of all components of the 

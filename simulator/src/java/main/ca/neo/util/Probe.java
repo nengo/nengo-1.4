@@ -8,9 +8,7 @@ import ca.neo.model.SimulationException;
 
 /**
  * Reads state variables from Probeable objects (eg membrane potential from a Neuron).
- * Different types of Probe will do different things with collected data. For example 
- * a Recorder will collect data until the end of a simulation, and a Scope will display
- * data during a simulation. 
+ * Collected data can be displayed during a simluation or kept for plotting afterwards.   
  * 
  * @author Bryan Tripp
  */
@@ -19,9 +17,11 @@ public interface Probe {
 	/**
 	 * @param target The object about which state history is to be collected 
 	 * @param stateName The name of the state variable to collect 
+	 * @param record If true, getData() returns history since last connect() or reset(),
+	 * 		otherwise getData() returns most recent sample 
 	 * @throws SimulationException if the given target does not have the given state
 	 */
-	public void connect(Probeable target, String stateName) throws SimulationException;
+	public void connect(Probeable target, String stateName, boolean record) throws SimulationException;
 	
 	/**
 	 * Clears collected data. 
@@ -39,4 +39,9 @@ public interface Probe {
 	 */
 	public void setSamplingRate(float rate);
 
+	/**
+	 * @return All collected data since last reset()
+	 */
+	public TimeSeries getData();
+	
 }

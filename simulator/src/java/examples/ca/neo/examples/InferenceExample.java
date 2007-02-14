@@ -28,7 +28,7 @@ import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
 import ca.neo.util.MU;
 import ca.neo.util.Memory;
-import ca.neo.util.Recorder;
+import ca.neo.util.Probe;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.VectorGenerator;
 import ca.neo.util.impl.RandomHypersphereVG;
@@ -153,10 +153,10 @@ public class InferenceExample {
 			Simulator sim = new LocalSimulator();
 			sim.initialize(net);
 			
-			Recorder obsRecorder = sim.addRecorder("observation", NEFEnsemble.X);
+			Probe obsRecorder = sim.addProbe("observation", NEFEnsemble.X, true);
 //			Recorder infRecorder = sim.addRecorder("inference", NEFEnsemble.X);
 //
-			runAndShow(sim, 0f, 1f, .001f, SimulationMode.CONSTANT_RATE, new Recorder[]{obsRecorder}, new String[]{"Observation"});
+			runAndShow(sim, 0f, 1f, .001f, SimulationMode.CONSTANT_RATE, new Probe[]{obsRecorder}, new String[]{"Observation"});
 
 			//			Plotter.plot(ideal);
 //			Plotter.plot(actual);
@@ -173,7 +173,7 @@ public class InferenceExample {
 	//TODO: why are twice-direct results different?
 	//TODO: colours aren't consistently ordered
 	public static void runAndShow(Simulator sim, float startTime, float endTime, float timeStep, SimulationMode mode, 
-			Recorder[] recorders, String[] titles) throws SimulationException {
+			Probe[] recorders, String[] titles) throws SimulationException {
 		
 		float tauFilter = .005f;
 		

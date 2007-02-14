@@ -24,8 +24,6 @@ import ca.neo.plot.Plotter;
 import ca.neo.sim.Simulator;
 import ca.neo.util.MU;
 import ca.neo.util.Probe;
-import ca.neo.util.Recorder;
-import ca.neo.util.Scope;
 import ca.neo.util.impl.RecorderImpl;
 
 /**
@@ -112,27 +110,13 @@ public class LocalSimulator implements Simulator {
 	}
 
 	/**
-	 * @see ca.neo.sim.Simulator#addScope(java.lang.String, java.lang.String)
+	 * @see ca.neo.sim.Simulator#addRecorder(java.lang.String, java.lang.String, boolean)
 	 */
-	public Scope addScope(String nodeName, String state) throws SimulationException {
-		throw new NotImplementedException("We have no scope implementations at present");
-	}
-
-	/**
-	 * @see ca.neo.sim.Simulator#addScope(java.lang.String, int, java.lang.String)
-	 */
-	public Scope addScope(String ensembleName, int neuronIndex, String state) throws SimulationException {
-		throw new NotImplementedException("We have no scope implementations at present");
-	}
-
-	/**
-	 * @see ca.neo.sim.Simulator#addRecorder(java.lang.String, java.lang.String)
-	 */
-	public Recorder addRecorder(String nodeName, String state) throws SimulationException {
+	public Probe addProbe(String nodeName, String state, boolean record) throws SimulationException {
 		Probeable p = getNode(nodeName);
 		
-		Recorder result = new RecorderImpl();
-		result.connect(p, state);
+		Probe result = new RecorderImpl();
+		result.connect(p, state, record);
 		
 		myProbes.add(result);
 		
@@ -140,13 +124,13 @@ public class LocalSimulator implements Simulator {
 	}
 
 	/**
-	 * @see ca.neo.sim.Simulator#addRecorder(java.lang.String, int, java.lang.String)
+	 * @see ca.neo.sim.Simulator#addRecorder(java.lang.String, int, java.lang.String, boolean)
 	 */
-	public Recorder addRecorder(String ensembleName, int neuronIndex, String state) throws SimulationException {
+	public Probe addProbe(String ensembleName, int neuronIndex, String state, boolean record) throws SimulationException {
 		Probeable p = getNeuron(ensembleName, neuronIndex);
 		
-		Recorder result = new RecorderImpl();
-		result.connect(p, state);
+		Probe result = new RecorderImpl();
+		result.connect(p, state, record);
 		
 		myProbes.add(result);
 		

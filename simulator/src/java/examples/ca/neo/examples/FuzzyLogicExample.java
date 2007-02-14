@@ -16,7 +16,7 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
-import ca.neo.util.Recorder;
+import ca.neo.util.Probe;
 
 /**
  * Fuzzification is implemented as a function transformation. Inference is done with 
@@ -197,13 +197,13 @@ public class FuzzyLogicExample {
 			sim.initialize(net);
 			
 			//Recorder B = sim.addRecorder("B", NEFEnsemble.X);
-			Recorder rule1a = sim.addRecorder("rule1a", "OR");
-			Recorder rule1b = sim.addRecorder("rule1b", "AND");
-			Recorder rule2 = sim.addRecorder("rule2", NEFEnsemble.X);
-			Recorder output = sim.addRecorder("output", "recurrent");
+			Probe rule1a = sim.addProbe("rule1a", "OR", false);
+			Probe rule1b = sim.addProbe("rule1b", "AND", false);
+			Probe rule2 = sim.addProbe("rule2", NEFEnsemble.X, false);
+			Probe output = sim.addProbe("output", "recurrent", false);
 			
 			InferenceExample.runAndShow(sim, 0f, .5f, .001f, SimulationMode.DEFAULT, 
-					new Recorder[]{rule1a, rule1b, rule2, output}, new String[]{"Rule 1a", "Rule 1b", "Rule 2", "Output"});
+					new Probe[]{rule1a, rule1b, rule2, output}, new String[]{"Rule 1a", "Rule 1b", "Rule 2", "Output"});
 			
 		} catch (StructuralException e) {
 			e.printStackTrace();

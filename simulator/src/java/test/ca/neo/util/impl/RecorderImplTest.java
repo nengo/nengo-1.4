@@ -8,8 +8,7 @@ import java.util.Properties;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.Units;
-import ca.neo.util.MU;
-import ca.neo.util.Recorder;
+import ca.neo.util.Probe;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.RecorderImpl;
 import ca.neo.util.impl.TimeSeries1DImpl;
@@ -22,7 +21,7 @@ import junit.framework.TestCase;
  */
 public class RecorderImplTest extends TestCase {
 
-	private Recorder myRecorder;
+	private Probe myRecorder;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -35,11 +34,11 @@ public class RecorderImplTest extends TestCase {
 	 */
 	public void testGetData() throws SimulationException {
 		try {
-			myRecorder.connect(new MockProbeable(1f), "y");
+			myRecorder.connect(new MockProbeable(1f), "y", true);
 			fail("Should have thrown exception because state y does not exist");
 		} catch (SimulationException e) {} //exception is expected
 		
-		myRecorder.connect(new MockProbeable(1f), "x");
+		myRecorder.connect(new MockProbeable(1f), "x", true);
 		myRecorder.collect(1);
 		
 		TimeSeries ts = myRecorder.getData();
@@ -55,7 +54,7 @@ public class RecorderImplTest extends TestCase {
 	}
 	
 	public void testSamplingRate() throws SimulationException {
-		myRecorder.connect(new MockProbeable(1f), "x");
+		myRecorder.connect(new MockProbeable(1f), "x", true);
 		myRecorder.setSamplingRate(100);
 		
 		myRecorder.collect(0f);
@@ -65,6 +64,22 @@ public class RecorderImplTest extends TestCase {
 		
 		TimeSeries ts = myRecorder.getData();
 		assertEquals(2, ts.getValues().length);		
+	}
+	
+	public void testRetention() throws SimulationException {
+		myRecorder.connect(new MockProbeable(1f), "x", true);
+		myRecorder.collect(1);
+		myRecorder.collect(2);
+		
+		TimeSeries ts = myRecorder.getData();
+		assertEquals(2, ts.getValues().length);
+
+		myRecorder.connect(new MockProbeable(1f), "x", false);
+		myRecorder.collect(1);
+		myRecorder.collect(2);
+		
+		ts = myRecorder.getData();
+		assertEquals(1, ts.getValues().length);
 	}
  
 	private static class MockProbeable implements Probeable {

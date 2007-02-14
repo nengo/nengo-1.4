@@ -23,7 +23,7 @@ import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.plot.Plotter;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
-import ca.neo.util.Recorder;
+import ca.neo.util.Probe;
 
 public class IntegratorExample {
 
@@ -66,9 +66,9 @@ public class IntegratorExample {
 			Simulator simulator = new LocalSimulator();
 			simulator.initialize(network); 
 			
-			Recorder inputRecorder = simulator.addRecorder("input", "input");
-			Recorder integratorRecorder = simulator.addRecorder("integrator", NEFEnsemble.X);
-			Recorder neuronRecorder = simulator.addRecorder("integrator", 0, "V");
+			Probe inputRecorder = simulator.addProbe("input", "input", true);
+			Probe integratorRecorder = simulator.addProbe("integrator", NEFEnsemble.X, true);
+			Probe neuronRecorder = simulator.addProbe("integrator", 0, "V", true);
 
 			long startTime = System.currentTimeMillis();
 			simulator.run(0f, 1f, .0002f, SimulationMode.DEFAULT);
