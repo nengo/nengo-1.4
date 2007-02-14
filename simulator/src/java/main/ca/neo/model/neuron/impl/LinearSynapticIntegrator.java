@@ -107,8 +107,8 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, N
 		
 		for (int i = 0; i < terminations.length; i++) {
 			float current = terminations[i].updateCurrent(spikes, intTime, decayTime);
-			String isModulatory = terminations[i].getProperty(Termination.MODULATORY);
-			if (!"true".equalsIgnoreCase(isModulatory)) result += current;
+			Boolean isModulatory = (Boolean) terminations[i].getConfiguration().getProperty(Termination.MODULATORY);
+			if (!isModulatory.booleanValue()) result += current;
 		}
 		
 		return result;

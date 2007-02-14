@@ -5,6 +5,8 @@ package ca.neo.model;
 
 import java.io.Serializable;
 
+import ca.neo.util.Configurable;
+
 /**
  * <p>An destination for information in a circuit model. A Termination is normally associated 
  * with a neural Ensemble or an individual Neuron, although other terminations could be modelled 
@@ -38,7 +40,7 @@ import java.io.Serializable;
  *   
  * @author Bryan Tripp
  */
-public interface Termination extends Serializable {
+public interface Termination extends Configurable, Serializable {
 
 	/**
 	 * Standard name of the post-synaptic current time constant property (most Terminations  
@@ -48,7 +50,7 @@ public interface Termination extends Serializable {
 	
 	/**
 	 * A modulatory termination does not induce current directly but may influence membrane properties or 
-	 * excitability ("true" means modulatory; "false" means not modulatory).  
+	 * excitability: Boolean(true) means modulatory; Boolean(false) means not modulatory.  
 	 */
 	public static final String MODULATORY = "MODULATORY";
 	
@@ -78,37 +80,4 @@ public interface Termination extends Serializable {
 	 */
 	public void setValues(InstantaneousOutput values) throws SimulationException;
 	
-	/**
-	 * @return List of property names for optional custom details of this Termination.
-	 * 		The optional properties available depend on the Termination, but may 
-	 * 		include things synaptic rise time, probability of vescicle release, etc.      
-	 */	
-	public String[] listPropertyNames();
-	
-	/**
-	 * @param name Name of property from listPropertyNames()
-	 * @return Value of corresponding property (the Termination is responsible for providing 
-	 * 		appropriate defaults for properties that have not been set by the user). 
-	 */
-	public String getProperty(String name);
-
-	/**
-	 * Note that if a property is set on a Termination onto an Ensemble, then it is also 
-	 * applied to the correponding Terminations onto each Neuron in the Ensemble. The same 
-	 * property may be changed subsequently for individual Neurons. When a property is set 
-	 * for an Ensemble Termination, all the Ensemble's Neurons must accept the property, 
-	 * otherwise the change is rolled back, and an exception is thrown.
-	 * 
-	 * Note also that the above doesn't apply to <strong>decoded</strong> Terminations onto 
-	 * NEFEnsembles. In this case the NEFEnsemble handles all details of the Termination 
-	 * (including filtering inputs, etc.) so there is nothing to coordinate with member Neurons.  
-	 * 
-	 * @param name Name of property from listPropertyNames()
-	 * @param value New property value (an exception may be thrown if the given 
-	 * 		value does not make sense in the context of the specified property).
-	 * @throws StructuralException if the named property is unknown or the given value can not be 
-	 * 		interpreted in relation to the property  
-	 */
-	public void setProperty(String name, String value) throws StructuralException;		
-
 }

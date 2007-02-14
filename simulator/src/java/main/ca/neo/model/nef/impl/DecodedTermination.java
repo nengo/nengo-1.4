@@ -13,8 +13,10 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
+import ca.neo.util.Configuration;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
+import ca.neo.util.impl.ConfigurationImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
 /**
@@ -33,7 +35,7 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * because all inputs to a non-linear dynamical process must be taken into account before
  * the effect of any single input is known.</p>
  * 
- * TODO: test
+ * TODO: test; can this be merged with LinearExponentialTermination?
  * 
  * @author Bryan Tripp
  */
@@ -49,8 +51,7 @@ public class DecodedTermination implements Termination, Resettable {
 	private float[] myInputValues; 
 	private float[] myOutputValues;
 	private boolean myTauMutable;
-	private float myTau;
-	private boolean myModulatory;
+	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param name The name of this Termination
@@ -84,6 +85,9 @@ public class DecodedTermination implements Termination, Resettable {
 		
 		//PSC time constant can be changed online if dynamics are LTI in controllable-canonical form 
 		myTauMutable = (dynamics instanceof LTISystem && CanonicalModel.isControllableCanonical((LTISystem) dynamics)); 
+
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
 		
 		//find PSC time constant (slowest dynamic mode) if applicable 
 		if (myTauMutable) {
@@ -94,10 +98,8 @@ public class DecodedTermination implements Termination, Resettable {
 				if (Math.abs(eig[i]) < Math.abs(slowest)) slowest = eig[i];
 			}
 			
-			myTau = -1f / (float) slowest;
+			myConfiguration.addProperty(Termination.TAU_PSC, Float.class, new Float(-1f / (float) slowest));
 		}
-		
-		myModulatory = false;
 	}
 
 	//copies dynamics for to each dimension
@@ -200,60 +202,34 @@ public class DecodedTermination implements Termination, Resettable {
 	}
 
 	/**
-	 * @see ca.neo.model.Termination#listPropertyNames()
-	 */
-	public String[] listPropertyNames() {
-		if (myTauMutable) {
-			return new String[]{Termination.TAU_PSC}; 
-		} else {
-			return new String[0];
-		}
-	}
-
-	/**
-	 * @see ca.neo.model.Termination#getProperty(java.lang.String)
-	 */
-	public String getProperty(String name) {
-		if (myTauMutable && name.equals(Termination.TAU_PSC)) {
-			return String.valueOf(myTau);
-		} else if (name.equals(Termination.MODULATORY)) {
-			return String.valueOf(myModulatory);
-		} else {
-			return new String();			
-		}
-	}
-
-	/**
-	 * @see ca.neo.model.Termination#setProperty(java.lang.String, java.lang.String)
-	 */
-	public void setProperty(String name, String value) throws StructuralException {
-		if (name.equals(Termination.TAU_PSC)) {
-			if (!myTauMutable) {
-				throw new StructuralException("This Termination has immutable dynamics "
-					+ "(must be LTI in controllable-canonical form to change time constant online");
-			}
-
-			try {
-				float tau = Float.parseFloat(value);
-				LTISystem dynamics = CanonicalModel.changeTimeConstant((LTISystem) myDynamics[0], tau);
-				setDynamics(dynamics, myTransform.length);
-			} catch (NumberFormatException e) {
-				throw new StructuralException("Error setting property value", e);
-			} 				
-		} else if (name.equals(Termination.MODULATORY)) {
-			myModulatory = (value.equalsIgnoreCase("true"));
-		} else {
-			throw new StructuralException("Property " + name + " is unknown");			
-		}
-
-	}
-	
-	/**
 	 * @return The matrix that maps input (which has the dimension of this Termination)  
 	 * 		onto the state space represented by the NEFEnsemble to which the Termination belongs
 	 */
 	public float[][] getTransform() {
 		return myTransform;
+	}
+
+	/** 
+	 * @see ca.neo.util.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	/** 
+	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
+	 */
+	public void propertyChange(String propertyName, Object newValue) throws StructuralException {
+		if (propertyName.equals(Termination.TAU_PSC)) {
+			if (!myTauMutable) {
+				throw new StructuralException("This Termination has immutable dynamics "
+					+ "(must be LTI in controllable-canonical form to change time constant online");
+			}
+	
+			float tau = ((Float) newValue).floatValue();
+			LTISystem dynamics = CanonicalModel.changeTimeConstant((LTISystem) myDynamics[0], tau);
+			setDynamics(dynamics, myTransform.length);
+		}
 	}
 
 }

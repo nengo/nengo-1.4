@@ -20,6 +20,7 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
+import ca.neo.util.Configuration;
 import ca.neo.util.TimeSeries;
 
 /**
@@ -323,6 +324,8 @@ public class NetworkImpl implements Network {
 	 */
 	private class OriginWrapper implements Origin {
 		
+		private static final long serialVersionUID = 1L;
+		
 		private Origin myWrapped;
 		private String myName;
 		
@@ -352,6 +355,8 @@ public class NetworkImpl implements Network {
 	 */
 	private class TerminationWrapper implements Termination {
 
+		private static final long serialVersionUID = 1L;
+		
 		private Termination myWrapped;
 		private String myName;
 		
@@ -372,16 +377,12 @@ public class NetworkImpl implements Network {
 			myWrapped.setValues(values);
 		}
 
-		public String[] listPropertyNames() {
-			return myWrapped.listPropertyNames();
+		public Configuration getConfiguration() {
+			return myWrapped.getConfiguration();
 		}
 
-		public String getProperty(String name) {
-			return myWrapped.getProperty(name);
-		}
-
-		public void setProperty(String name, String value) throws StructuralException {
-			myWrapped.setProperty(name, value);
+		public void propertyChange(String propertyName, Object newValue) throws StructuralException {
+			myWrapped.propertyChange(propertyName, newValue);
 		}
 		
 	}

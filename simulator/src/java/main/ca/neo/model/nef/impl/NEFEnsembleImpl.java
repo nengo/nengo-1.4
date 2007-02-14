@@ -278,7 +278,7 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 		
 		Termination result = new DecodedTermination(name, matrix, dynamics, integrator);
 		if (isModulatory) {
-			result.setProperty(Termination.MODULATORY, "true");
+			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
 		} else if (matrix.length != myDimension) {
 			throw new StructuralException("Output dimension " + matrix.length + " doesn't equal ensemble dimension " + myDimension);
 		}
@@ -306,7 +306,7 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 		
 		Termination result = new DecodedTermination(name, matrix, dynamics, integrator);
 		if (isModulatory) {
-			result.setProperty(Termination.MODULATORY, "true");
+			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
 		} else if (matrix.length != myDimension) {
 			throw new StructuralException("Output dimension " + matrix.length + " doesn't equal ensemble dimension " + myDimension);
 		}
@@ -363,8 +363,8 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 				t.run(startTime, endTime);
 				float[] output = t.getOutput();
 				
-				String isModulatory = t.getProperty(Termination.MODULATORY);
-				if (!"true".equalsIgnoreCase(isModulatory)) state = MU.sum(state, output);
+				Boolean isModulatory = (Boolean) t.getConfiguration().getProperty(Termination.MODULATORY);
+				if (!isModulatory.booleanValue()) state = MU.sum(state, output);
 			}
 
 			//run neurons ... 

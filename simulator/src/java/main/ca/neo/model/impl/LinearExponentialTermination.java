@@ -7,6 +7,8 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.neuron.SpikeOutput;
+import ca.neo.util.Configuration;
+import ca.neo.util.impl.ConfigurationImpl;
 
 /**
  * <p>A Termination at which incoming spikes induce exponentially decaying post-synaptic 
@@ -33,6 +35,8 @@ public class LinearExponentialTermination implements Termination, Resettable {
 	private float myNetSpikeInput;
 	private float myNetRealInput;
 	
+	private ConfigurationImpl myConfiguration;
+	
 	/**
 	 * @param name Name of the Termination (must be unique within the Neuron or Ensemble to 
 	 * 		which it is attached)
@@ -43,6 +47,10 @@ public class LinearExponentialTermination implements Termination, Resettable {
 		myName = name;
 		myWeights = weights;
 		myTauPSC = tauPSC;
+		
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.addProperty(Termination.TAU_PSC, Float.class, new Float(tauPSC));
+		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
 	}
 	
 	/**
@@ -129,33 +137,20 @@ public class LinearExponentialTermination implements Termination, Resettable {
 		return myCurrent;
 	}
 
-	/**
-	 * @see ca.neo.model.Termination#listPropertyNames()
+	/** 
+	 * @see ca.neo.util.Configurable#getConfiguration()
 	 */
-	public String[] listPropertyNames() {
-		return new String[] {Termination.TAU_PSC};
+	public Configuration getConfiguration() {
+		return myConfiguration;
 	}
 
-	/**
-	 * @see ca.neo.model.Termination#getProperty(java.lang.String)
+	/** 
+	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
 	 */
-	public String getProperty(String name) {
-		return name.equals(Termination.TAU_PSC) ? Float.toString(myTauPSC) : null;
-	}
-
-	/**
-	 * @see ca.neo.model.Termination#setProperty(java.lang.String, java.lang.String)
-	 */
-	public void setProperty(String name, String value) throws StructuralException {
-		if (name.equals(Termination.TAU_PSC)) {
-			try {
-				myTauPSC = Float.parseFloat(value);
-			} catch (NumberFormatException e) {
-				throw new StructuralException("The given time constant (" + value + ") appears not to be a number", e);				
-			}
-		} else {
-			throw new StructuralException("Property " + name + " is not recognized");
-		}
+	public void propertyChange(String propertyName, Object newValue) {
+		if (propertyName.equals(Termination.TAU_PSC)) {
+			myTauPSC = ((Float) newValue).floatValue();
+		} 		
 	}
 	
 	private static float combineSpikes(SpikeOutput input, float[] weights) {
@@ -181,5 +176,5 @@ public class LinearExponentialTermination implements Termination, Resettable {
 		
 		return result;		
 	}
-	
+
 }

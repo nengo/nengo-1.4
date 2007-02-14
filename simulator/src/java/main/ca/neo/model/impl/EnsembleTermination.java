@@ -10,6 +10,8 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.util.Configuration;
+import ca.neo.util.impl.ConfigurationImpl;
 
 /**
  * A Termination that is composed of Terminations onto multiple Neurons. 
@@ -21,6 +23,8 @@ import ca.neo.model.Termination;
  * of the branches they send to one specific Neuron (a Neuron-level Termination)
  * but here we deal with all branches (an Emsemble-level Termination). 
  * In either case the spikes transmitted by the axons are the same.  
+ * 
+ * TODO: test
  *  
  * @author Bryan Tripp
  */
@@ -30,14 +34,20 @@ public class EnsembleTermination implements Termination {
 	
 	private String myName;
 	private Termination[] myNeuronTerminations;
-	private String[] myPropertyNames;
+	private ConfigurationImpl myConfiguration;
 	
 	public EnsembleTermination(String name, Termination[] neuronTerminations) throws StructuralException {
 		checkSameDimension(neuronTerminations, name);
 		
 		myName = name;
 		myNeuronTerminations = neuronTerminations;
-		myPropertyNames = findSharedProperties(neuronTerminations);
+		
+		myConfiguration = new ConfigurationImpl(this);
+		String[] propertyNames = findSharedProperties(neuronTerminations);
+		for (int i = 0; i < propertyNames.length; i++) {
+			//not strict on type at this level (may be different types in components)
+			myConfiguration.addProperty(propertyNames[i], Object.class, getProperty(propertyNames[i]));
+		}		
 	}
 	
 	private static void checkSameDimension(Termination[] terminations, String name) throws StructuralException {
@@ -51,25 +61,41 @@ public class EnsembleTermination implements Termination {
 	
 	//return property names shared by all given terminations
 	private static String[] findSharedProperties(Termination[] terminations) {
-		Set result = copyIntoSet(terminations[0].listPropertyNames());		
+		Set<String> result = copyIntoSet(terminations[0].getConfiguration().listPropertyNames());		
 		
 		for (int i = 1; i < terminations.length; i++) {
-			Set comparison = copyIntoSet(terminations[i].listPropertyNames());
+			Set comparison = copyIntoSet(terminations[i].getConfiguration().listPropertyNames());
 			result.retainAll(comparison);
 		}
 		
-		return (String[]) result.toArray(new String[0]);
+		return result.toArray(new String[0]);
 	}
 	
 	//used above
-	private static Set copyIntoSet(Object[] things) {
-		Set result = new HashSet(things.length * 2);
+	private static Set<String> copyIntoSet(String[] things) {
+		Set<String> result = new HashSet<String>(things.length * 2);
 		for (int i = 0; i < things.length; i++) {
 			result.add(things[i]);
 		}
 		return result;
 	}
 
+	private Object getProperty(String name) {
+		Object result = myNeuronTerminations[0].getConfiguration().getProperty(name);
+		
+		boolean mixed = false;
+		for (int i = 1; i < myNeuronTerminations.length && !mixed; i++) {
+			if ( !myNeuronTerminations[i].getConfiguration().getProperty(name).equals(result) ) {
+				mixed = true;
+			}
+		}
+		
+		if (mixed) {
+			result = Termination.MIXED_VALUE;
+		}
+		
+		return result;
+	}
 
 	/**
 	 * @see ca.neo.model.Termination#getName()
@@ -98,73 +124,31 @@ public class EnsembleTermination implements Termination {
 		}
 	}
 
-	/**
-	 * @return Properties that are shared by all Neuron Terminations that underlie 
-	 * 		this Termination 
-	 * 
-	 * @see ca.neo.model.Termination#listPropertyNames()
+	/** 
+	 * @see ca.neo.util.Configurable#getConfiguration()
 	 */
-	public String[] listPropertyNames() {
-		return myPropertyNames;
+	public Configuration getConfiguration() {
+		return myConfiguration;
 	}
 
-	/**
-	 * @return Value of given property, if value is the same for all underlying Neuron 
-	 * 		Terminations, or Termination.MIXED_VALUE if underlying Terminations report
-	 * 		differing values, or null if the property is not shared by all underlying 
-	 * 		Terminations. 
-	 * @see ca.neo.model.Termination#getProperty(java.lang.String)
+	/** 
+	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
 	 */
-	public String getProperty(String name) {
-		String result = null;
+	public void propertyChange(String propertyName, Object newValue) throws StructuralException {
+		Object[] oldValues = new String[myNeuronTerminations.length];
 		
-		if (knownProperty(name)) {
-			result = myNeuronTerminations[0].getProperty(name);
-			boolean mixed = false;
-			for (int i = 1; i < myNeuronTerminations.length && !mixed; i++) {
-				if ( !myNeuronTerminations[i].getProperty(name).equals(result) ) {
-					mixed = true;
+		for (int i = 0; i < myNeuronTerminations.length; i++) {
+			oldValues[i] = myNeuronTerminations[i].getConfiguration().getProperty(propertyName);
+			try {
+				myNeuronTerminations[i].getConfiguration().setProperty(propertyName, newValue);
+			} catch (StructuralException e) {
+				//roll back changes
+				for (int j = 0; j < i; j++) {
+					myNeuronTerminations[j].getConfiguration().setProperty(propertyName, oldValues[j]); 
 				}
-			}
-			if (mixed) {
-				result = Termination.MIXED_VALUE;
+				throw new StructuralException(e);
 			}
 		}
-		
-		return result;
-	}
-
-	/**
-	 * @see ca.neo.model.Termination#setProperty(java.lang.String, java.lang.String)
-	 */
-	public void setProperty(String name, String value) throws StructuralException {
-		if (knownProperty(name)) {
-			String[] oldValues = new String[myNeuronTerminations.length];
-			
-			for (int i = 0; i < myNeuronTerminations.length; i++) {
-				oldValues[i] = myNeuronTerminations[i].getProperty(name);
-				try {
-					myNeuronTerminations[i].setProperty(name, value);
-				} catch (StructuralException e) {
-					//roll back changes
-					for (int j = 0; j < i; j++) {
-						myNeuronTerminations[j].setProperty(name, oldValues[j]); 
-					}
-					throw new StructuralException(e);
-				}
-			}
-		}
-	}
-	
-	//true if given property is in myPropertyNames list 
-	private boolean knownProperty(String propertyName) {
-		boolean known = false;
-		for (int i = 0; i < myPropertyNames.length && !known; i++) {
-			if (myPropertyNames[i].equals(propertyName)) {
-				known = true;
-			}
-		}
-		return known;
 	}
 
 }
