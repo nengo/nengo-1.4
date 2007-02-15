@@ -91,18 +91,6 @@ public interface Network extends Node, Probeable {
 	public void hideOrigin(String name);
 
 	/**
-	 * @param name Name of an exposed Origin
-	 * @return Named Origin
-	 * @throws StructuralException if the named Origin does not exist
-	 */
-	public Origin getOrigin(String name) throws StructuralException;
-	
-	/**
-	 * @return All exposed Origins
-	 */
-	public Origin[] getOrigins();
-	
-	/**
 	 * Declares the given Termination as available for connection from outside the Network
 	 * via getTerminations(). This Termination should not be connected within this Network.
 	 * 
@@ -119,18 +107,6 @@ public interface Network extends Node, Probeable {
 	 */
 	public void hideTermination(String name);
 
-	/**
-	 * @param name Name of an exposed Termination
-	 * @return Named Termination
-	 * @throws StructuralException if the named Termination does not exist
-	 */
-	public Termination getTermination(String name) throws StructuralException;
-	
-	/**
-	 * @return All exposed Terminations
-	 */
-	public Termination[] getTerminations();
-	
 	/**
 	 * Declares the given Probeable state as being available for Probing from outside this 
 	 * Network. 
