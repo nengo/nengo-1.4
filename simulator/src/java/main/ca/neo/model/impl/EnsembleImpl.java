@@ -6,7 +6,7 @@ package ca.neo.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.neo.model.ExpandableEnsemble;
+import ca.neo.model.ExpandableNode;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
@@ -27,7 +27,7 @@ import ca.neo.model.neuron.Neuron;
  * 
  * @author Bryan Tripp
  */
-public class EnsembleImpl extends AbstractEnsemble implements ExpandableEnsemble {
+public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -87,9 +87,9 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableEnsemble
 	}
 
 	/**
-	 * @see ca.neo.model.ExpandableEnsemble#addTermination(java.lang.String, float[][], float)
+	 * @see ca.neo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
-	public synchronized Termination addTermination(String name, float[][] weights, float tauPSC) throws StructuralException {
+	public synchronized Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
 		if (myExpandableNeurons.length != weights.length) {
 			throw new StructuralException(weights.length + " sets of weights given for " 
 					+ myExpandableNeurons.length + " expandable neurons");
@@ -108,6 +108,9 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableEnsemble
 		}
 		
 		Termination result = new EnsembleTermination(name, components);
+		if (modulatory) {
+			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
+		}
 		
 		Termination[] newTerminations = new Termination[myTerminations.length + 1];
 		System.arraycopy(myTerminations, 0, newTerminations, 0, myTerminations.length);
@@ -118,7 +121,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableEnsemble
 	}
 
 	/**
-	 * @see ca.neo.model.ExpandableEnsemble#removeTermination(java.lang.String)
+	 * @see ca.neo.model.ExpandableNode#removeTermination(java.lang.String)
 	 */
 	public synchronized void removeTermination(String name) {
 		List newTerminations = new ArrayList(myTerminations.length * 2);
@@ -132,11 +135,11 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableEnsemble
 		myTerminations = (Termination[]) newTerminations.toArray(new Termination[0]);
 	}
 
-	/**
-	 * @see ca.neo.model.ExpandableEnsemble#getExpandableNeurons()
+	/** 
+	 * @see ca.neo.model.ExpandableNode#getDimension()
 	 */
-	public Neuron[] getExpandableNeurons() {
-		return myExpandableNeurons;
+	public int getDimension() {
+		return myExpandableNeurons.length;
 	}
 
 	/**
