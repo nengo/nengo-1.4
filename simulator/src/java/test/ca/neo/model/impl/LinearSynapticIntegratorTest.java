@@ -29,7 +29,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.getTerminations()'
 	 */
 	public void testGetTerminations() throws StructuralException {
-		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1, 1, 1, Units.ACU);
+		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1, Units.ACU);
 		assertEquals(0, si.getTerminations().length);
 		
 		si.addTermination("test1", new float[]{1f, 1f}, 1f);
@@ -54,7 +54,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.run(float, float)'
 	 */
 	public void testRun() throws StructuralException, SimulationException {
-		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1f, 0f, .001f, Units.ACU);
+		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(.001f, Units.ACU);
 		si.addTermination("one", new float[]{1f}, 1f);
 		si.addTermination("two", new float[]{1f}, 1f);
 
@@ -77,7 +77,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.reset(boolean)'
 	 */
 	public void testReset() throws StructuralException, SimulationException {
-		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1f, 0f, .001f, Units.ACU);
+		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(.001f, Units.ACU);
 		si.addTermination("test", new float[]{1f}, 1f);
 		
 		Termination t = si.getTerminations()[0];

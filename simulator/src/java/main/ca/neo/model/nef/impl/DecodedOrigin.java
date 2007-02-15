@@ -198,22 +198,26 @@ public class DecodedOrigin implements Origin, Resettable {
 			}
 		} else {
 			for (int i = 0; i < myNeurons.length; i++) {
-				InstantaneousOutput o = myNeurons[i].getOrigin(Neuron.AXON).getValues();
-				
-				float val = 0; 
-				if (o instanceof SpikeOutput) {
-					val = ((SpikeOutput) o).getValues()[0] ? 1f / stepSize : 0f;
-				} else if (o instanceof RealOutput) {
-					val = ((RealOutput) o).getValues()[0];
-				} else {
-					throw new Error("Neuron output is of type " + o.getClass().getName() 
-						+ ". DecodedOrigin can only deal with RealOutput and SpikeOutput, so it apparently has to be updated");
-				}
-				
-				float[] decoder = myDecoders[i];
-				for (int j = 0; j < values.length; j++) {
-					values[j] += val * decoder[j];
-				}
+				try {
+					InstantaneousOutput o = myNeurons[i].getOrigin(Neuron.AXON).getValues();
+
+					float val = 0; 
+					if (o instanceof SpikeOutput) {
+						val = ((SpikeOutput) o).getValues()[0] ? 1f / stepSize : 0f;
+					} else if (o instanceof RealOutput) {
+						val = ((RealOutput) o).getValues()[0];
+					} else {
+						throw new Error("Neuron output is of type " + o.getClass().getName() 
+							+ ". DecodedOrigin can only deal with RealOutput and SpikeOutput, so it apparently has to be updated");
+					}
+					
+					float[] decoder = myDecoders[i];
+					for (int j = 0; j < values.length; j++) {
+						values[j] += val * decoder[j];
+					}
+				} catch (StructuralException e) {
+					throw new SimulationException(e);
+				}				
 			}		
 		}
 		

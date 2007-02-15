@@ -97,10 +97,14 @@ public abstract class AbstractEnsemble implements Ensemble {
 			myNeurons[i].run(startTime, endTime);
 
 			if (myCollectSpikesFlag) {
-				InstantaneousOutput output = myNeurons[i].getOrigin(Neuron.AXON).getValues();
-				if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
-					mySpikePattern.addSpike(i, endTime);
-				}				
+				try {
+					InstantaneousOutput output = myNeurons[i].getOrigin(Neuron.AXON).getValues();
+					if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
+						mySpikePattern.addSpike(i, endTime);
+					}				
+				} catch (StructuralException e) {
+					throw new SimulationException(e);
+				}
 			}
 		}		
 	}
@@ -162,7 +166,7 @@ public abstract class AbstractEnsemble implements Ensemble {
 		Map groups = new HashMap(10);
 		
 		for (int i = 0; i < neurons.length; i++) {
-			Termination[] terminations = neurons[i].getIntegrator().getTerminations();
+			Termination[] terminations = neurons[i].getTerminations();
 			for (int j = 0; j < terminations.length; j++) {
 				List group = (List) groups.get(terminations[j].getName());
 				if (group == null) {

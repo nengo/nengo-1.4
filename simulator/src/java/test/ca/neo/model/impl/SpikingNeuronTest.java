@@ -32,9 +32,9 @@ public class SpikingNeuronTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		myIntegrator = new LinearSynapticIntegrator(1, 0, .001f, Units.ACU);
+		myIntegrator = new LinearSynapticIntegrator(.001f, Units.ACU);
 		myGenerator = new LIFSpikeGenerator(.001f, .01f, .001f);
-		myNeuron = new SpikingNeuron(myIntegrator, myGenerator);		
+		myNeuron = new SpikingNeuron(myIntegrator, myGenerator, 1, 0, "test");		
 	}
 	
 	/*
@@ -50,12 +50,12 @@ public class SpikingNeuronTest extends TestCase {
 		} catch (SimulationException e) {} //exception is expected
 	}	
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.getIntegrator()'
-	 */
-	public void testGetIntegrator() {
-		assertEquals(myIntegrator, myNeuron.getIntegrator());
-	}
+//	/*
+//	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.getIntegrator()'
+//	 */
+//	public void testGetIntegrator() {
+//		assertEquals(myIntegrator, myNeuron.getIntegrator());
+//	}
 
 	/*
 	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.getOrigins()'

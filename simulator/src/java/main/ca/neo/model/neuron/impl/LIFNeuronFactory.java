@@ -39,9 +39,9 @@ public class LIFNeuronFactory implements NeuronFactory {
 	}
 
 	/**
-	 * @see ca.neo.model.neuron.impl.NeuronFactory#make()
+	 * @see ca.neo.model.neuron.impl.NeuronFactory#make(String)
 	 */
-	public Neuron make() throws StructuralException {
+	public Neuron make(String name) throws StructuralException {
 		float maxRate = myMaxRate.sample()[0];
 		float intercept = myIntercept.sample()[0];
 		
@@ -54,10 +54,10 @@ public class LIFNeuronFactory implements NeuronFactory {
 		
 		float bias = 1f - scale * intercept;
 
-		SynapticIntegrator integrator = new LinearSynapticIntegrator(scale, bias, ourMaxTimeStep, ourCurrentUnits);
+		SynapticIntegrator integrator = new LinearSynapticIntegrator(ourMaxTimeStep, ourCurrentUnits);
 		SpikeGenerator generator = new LIFSpikeGenerator(ourMaxTimeStep, myTauRC, myTauRef);
 		
-		return new SpikingNeuron(integrator, generator);		
+		return new SpikingNeuron(integrator, generator, scale, bias, name);		
 	}
 
 }

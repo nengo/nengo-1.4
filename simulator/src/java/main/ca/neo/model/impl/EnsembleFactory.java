@@ -172,7 +172,7 @@ public class EnsembleFactory {
 		Neuron[] neurons = new Neuron[n];
 		
 		for (int i = 0; i < n; i++) {
-			neurons[i] = factory.make();
+			neurons[i] = factory.make("neuron" + i);
 			
 			neurons[i].setMode(SimulationMode.CONSTANT_RATE);
 			if ( !neurons[i].getMode().equals(SimulationMode.CONSTANT_RATE) ) {

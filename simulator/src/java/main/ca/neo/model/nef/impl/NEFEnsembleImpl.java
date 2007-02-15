@@ -29,7 +29,7 @@ import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.model.nef.NEFEnsemble;
-import ca.neo.model.nef.NEFSynapticIntegrator;
+import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeOutput;
 import ca.neo.model.neuron.impl.SpikePatternImpl;
@@ -93,7 +93,7 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 	
 	private void init(String name, Neuron[] neurons, float[][] encoders) throws StructuralException {
 		for (int i = 0; i < neurons.length; i++) {
-			if ( !(neurons[i].getIntegrator() instanceof NEFSynapticIntegrator) ) {
+			if ( !(neurons[i] instanceof NEFNode) ) {
 				throw new StructuralException("All Neurons in an NEFEnsemble must have an NEFSynapticIntegrator");
 			}
 		}
@@ -193,7 +193,7 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 			
 			for (int i = 0; i < result.length; i++) {
 //				float radialInput = MU.prod(encoder, evalPoints[i]);
-				((NEFSynapticIntegrator) neuron.getIntegrator()).setRadialInput(getRadialInput(evalPoints[i], neuronIndex));
+				((NEFNode) neuron).setRadialInput(getRadialInput(evalPoints[i], neuronIndex));
 				
 				neuron.run(0f, 0f);
 				
@@ -375,15 +375,19 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 				//multiply state by encoders (cosine tuning), set radial input of each Neuron and run ...
 				Neuron[] neurons = getNeurons();
 				for (int i = 0; i < neurons.length; i++) {
-					((NEFSynapticIntegrator) neurons[i].getIntegrator()).setRadialInput(getRadialInput(state, i));
+					((NEFNode) neurons[i]).setRadialInput(getRadialInput(state, i));
 					
 					neurons[i].run(startTime, endTime);
 
 					if (myCollectSpikesFlag) {
-						InstantaneousOutput output = neurons[i].getOrigin(Neuron.AXON).getValues();
-						if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
-							pattern.addSpike(i, endTime);
-						}				
+						try {
+							InstantaneousOutput output = neurons[i].getOrigin(Neuron.AXON).getValues();
+							if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
+								pattern.addSpike(i, endTime);
+							}											
+						} catch (StructuralException e) {
+							throw new SimulationException(e);
+						}
 					}				
 				}
 			}

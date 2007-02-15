@@ -54,7 +54,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 		ArrayList result = new ArrayList(neurons.length * 2);
 		
 		for (int i = 0; i < neurons.length; i++) {
-			if (neurons[i].getIntegrator() instanceof ExpandableSynapticIntegrator) {
+			if (neurons[i] instanceof ExpandableNode) {
 				result.add(neurons[i]);
 			}
 		}
@@ -103,8 +103,8 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 				throw new StructuralException("Equal numbers of weights are needed for termination onto each neuron");
 			}
 			
-			ExpandableSynapticIntegrator integrator = (ExpandableSynapticIntegrator) myExpandableNeurons[i].getIntegrator();
-			components[i] = integrator.addTermination(name, weights[i], tauPSC);
+			ExpandableNode expandable = (ExpandableNode) myExpandableNeurons[i];
+			components[i] = expandable.addTermination(name, new float[][]{weights[i]}, tauPSC, modulatory);
 		}
 		
 		Termination result = new EnsembleTermination(name, components);

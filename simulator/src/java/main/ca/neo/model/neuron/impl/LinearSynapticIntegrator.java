@@ -3,15 +3,15 @@
  */
 package ca.neo.model.neuron.impl;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.LinearExponentialTermination;
-import ca.neo.model.nef.NEFSynapticIntegrator;
 import ca.neo.model.neuron.ExpandableSynapticIntegrator;
 import ca.neo.util.TimeSeries1D;
 import ca.neo.util.impl.TimeSeries1DImpl;
@@ -20,9 +20,7 @@ import ca.neo.util.impl.TimeSeries1DImpl;
  * <p>A basic linear <code>SynapticIntegrator</code> model.</p>
  * 
  * <p>Synaptic inputs are individually weighted, passed through decaying 
- * exponential dynamics, and summed. The combined input is then scaled and 
- * biased. This means that two synaptic integrators receiving the same inputs with 
- * the same weights could produce different (linearly related) currents.</p> 
+ * exponential dynamics, and summed.</p> 
  *
  * <p>A synaptic weight corresponds to the time integral of the current induced by 
  * one spike, or to the time integral of current induced by a real-valued input of 
@@ -33,33 +31,23 @@ import ca.neo.util.impl.TimeSeries1DImpl;
  *  
  * @author Bryan Tripp
  */
-public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, NEFSynapticIntegrator {
+public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 
 	private static final long serialVersionUID = 1L;
 	
-	private float myScale;
-	private float myBias;	
 	private float myMaxTimeStep;
 	private Units myCurrentUnits;
-	private List myTerminations;	
-	private float myRadialInput;
+	private Map<String, LinearExponentialTermination> myTerminations;	
 
 	/**
-	 * Note: current = scale * (weighted sum of inputs at each termination) + bias.   
-	 * 
-	 * @param scale Coefficient that scales summed input globally   
-	 * @param bias Global bias current that models other current sources, eg intrinsic currents or unaccounted-for inputs 
 	 * @param maxTimeStep Maximum length of integration time step. Shorter steps may be used to better match
 	 * 		length of run(...) 
 	 * @param currentUnits Units of current in input weights, scale, bias, and result of run(...)  
 	 */	
-	public LinearSynapticIntegrator(float scale, float bias, float maxTimeStep, Units currentUnits) {
-		myScale = scale;
-		myBias = bias;
+	public LinearSynapticIntegrator(float maxTimeStep, Units currentUnits) {
 		myMaxTimeStep = maxTimeStep * 1.01f; //increased slightly because float/float != integer 
 		myCurrentUnits = currentUnits;
-		myTerminations = new ArrayList();
-		myRadialInput = 0f;
+		myTerminations = new HashMap<String, LinearExponentialTermination>(10);
 	}
 	
 	/**
@@ -73,28 +61,25 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, N
 		float[] times = new float[steps+1];
 		float[] currents = new float[steps+1];
 		
+		times[0] = startTime;
 		if (myTerminations.size() == 0) {
-			times[0] = startTime;
-			currents[0] = myBias + myScale * myRadialInput; 
-			
 			for (int i = 1; i <= steps; i++) {
 				times[i] = startTime + (float)i * dt;
-				currents[i] = currents[0]; 
 			}			
 		} else {
-			LinearExponentialTermination[] terminations 
-				= (LinearExponentialTermination[]) myTerminations.toArray(new LinearExponentialTermination[0]);
+//			LinearExponentialTermination[] terminations 
+//				= (LinearExponentialTermination[]) myTerminations.toArray(new LinearExponentialTermination[0]);
 		
 			//Note: we leave out decay at start time and real input integration at end time, to make total  
 			//decay and integration times equal to simulation time
 		
 			times[0] = startTime;
-			currents[0] = myBias + myScale * (update(terminations, true, dt, 0) + myRadialInput); 
+			currents[0] = update(myTerminations.values(), true, dt, 0); 
 		
 			for (int i = 1; i <= steps; i++) {
 				times[i] = startTime + (float)i * dt;
 				//Note (cont'd): real-valued input not applied in last step (we quit at end time - delta)
-				currents[i] = myBias + myScale * (update(terminations, false, i < steps ? dt : 0, dt) + myRadialInput); 
+				currents[i] = update(myTerminations.values(), false, i < steps ? dt : 0, dt); 
 			}			
 		}
 				
@@ -102,12 +87,14 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, N
 	}
 
 	//update current in all Terminations 
-	private static float update(LinearExponentialTermination[] terminations, boolean spikes, float intTime, float decayTime) {
+	private static float update(Collection<LinearExponentialTermination> terminations, boolean spikes, float intTime, float decayTime) {
 		float result = 0f;
 		
-		for (int i = 0; i < terminations.length; i++) {
-			float current = terminations[i].updateCurrent(spikes, intTime, decayTime);
-			Boolean isModulatory = (Boolean) terminations[i].getConfiguration().getProperty(Termination.MODULATORY);
+		Iterator<LinearExponentialTermination> it = terminations.iterator();
+		while (it.hasNext()) {
+			LinearExponentialTermination t = it.next();
+			float current = t.updateCurrent(spikes, intTime, decayTime);
+			Boolean isModulatory = (Boolean) t.getConfiguration().getProperty(Termination.MODULATORY);
 			if (!isModulatory.booleanValue()) result += current;
 		}
 		
@@ -118,9 +105,9 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, N
 	 * @see ca.neo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
-		Iterator it = myTerminations.iterator();
+		Iterator<LinearExponentialTermination> it = myTerminations.values().iterator();
 		while (it.hasNext()) {
-			((LinearExponentialTermination) it.next()).reset(false);
+			it.next().reset(false);
 		}
 	}
 
@@ -128,21 +115,19 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, N
 	 * @see ca.neo.model.neuron.SynapticIntegrator#getTerminations()
 	 */
 	public Termination[] getTerminations() {
-		return (Termination[]) myTerminations.toArray(new Termination[0]);
+		return myTerminations.values().toArray(new Termination[0]);
 	}
 
 	/**
 	 * @see ca.neo.model.neuron.ExpandableSynapticIntegrator#addTermination(java.lang.String, float[], float)
 	 */
 	public Termination addTermination(String name, float[] weights, float tauPSC) throws StructuralException {
-		Termination t = findTermination(name);
-		
-		if (t != null) {
+		if (myTerminations.containsKey(name)) {
 			throw new StructuralException("This SynapticIntegrator already has a Termination named " + name);
 		}
 		
-		Termination result = new LinearExponentialTermination(name, weights, tauPSC); 
-		myTerminations.add(result);
+		LinearExponentialTermination result = new LinearExponentialTermination(name, weights, tauPSC); 
+		myTerminations.put(name, result);
 		return result;
 	}
 
@@ -150,36 +135,14 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, N
 	 * @see ca.neo.model.neuron.ExpandableSynapticIntegrator#removeTermination(java.lang.String)
 	 */
 	public void removeTermination(String name) throws StructuralException {
-		Termination t = findTermination(name);
-		
-		if (t != null) {
-			myTerminations.remove(t);
-		} else {
-			throw new StructuralException("There is no Termination named " + name + " on this SynapticIntegrator");
-		}
-	}
-
-	//find in list by name 
-	private Termination findTermination(String name) {
-		Termination result = null;
-		Iterator it = myTerminations.iterator();
-		while (result == null && it.hasNext()) {
-			Termination t = (Termination) it.next();
-			if ( t.getName().equals(name) ) {
-				result = t;
-			}
-		}		
-		return result;
+		myTerminations.remove(name);
 	}
 
 	/**
-	 * Sets direct NEF input. This is summed with the input at each Termination, and 
-	 * the sum is scaled and biased. 
-	 *   
-	 * @see ca.neo.model.nef.NEFSynapticIntegrator#setRadialInput(float)
+	 * @see ca.neo.model.neuron.SynapticIntegrator#getTermination(java.lang.String)
 	 */
-	public void setRadialInput(float value) {
-		myRadialInput = value;
+	public Termination getTermination(String name) throws StructuralException {
+		return myTerminations.get(name);
 	}
 
 }

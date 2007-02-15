@@ -6,6 +6,7 @@ package ca.neo.model.neuron;
 import java.io.Serializable;
 
 import ca.neo.model.Resettable;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.util.TimeSeries1D;
 
@@ -24,6 +25,13 @@ public interface SynapticIntegrator extends Resettable, Serializable {
 	 * @return List of distinct inputs (eg sets of synapses from different ensembles).    
 	 */
 	public Termination[] getTerminations();
+	
+	/**
+	 * @param name Name of a Termination onto this SynapticIntegrator
+	 * @return The named Termination if it exists 
+	 * @throws StructuralException if the named Termination does not exist
+	 */
+	public Termination getTermination(String name) throws StructuralException;	
 	
 	/**
 	 * <p>Runs the model for a given time interval. Input to each Termination

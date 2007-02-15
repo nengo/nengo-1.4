@@ -32,7 +32,7 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
-import ca.neo.model.nef.NEFSynapticIntegrator;
+import ca.neo.model.nef.NEFNode;
 import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikePattern;
@@ -161,7 +161,7 @@ public class DefaultPlotter extends Plotter {
 								
 				ensemble.setMode(SimulationMode.CONSTANT_RATE);
 				for (int j = 0; j < neurons.length; j++) {
-					((NEFSynapticIntegrator) neurons[j].getIntegrator()).setRadialInput(x[i]*encoders[j][0]);
+					((NEFNode) neurons[j]).setRadialInput(x[i]*encoders[j][0]);
 					neurons[j].run(0f, 0f);					
 				}
 				origin.run(null, 1f);
@@ -252,7 +252,7 @@ public class DefaultPlotter extends Plotter {
 				//plot along preferred direction for multi-dimensional ensembles
 				float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j]; 
 				
-				((NEFSynapticIntegrator) neurons[i].getIntegrator()).setRadialInput(radialInput);
+				((NEFNode) neurons[i]).setRadialInput(radialInput);
 				try {
 					neurons[i].run(0f, 0f);
 					RealOutput output = (RealOutput) neurons[i].getOrigin(Neuron.AXON).getValues();
@@ -261,6 +261,8 @@ public class DefaultPlotter extends Plotter {
 					throw new RuntimeException("Can't plot activities: error running neurons", e);
 				} catch (ClassCastException e) {
 					throw new RuntimeException("Can't plot activities: neurons producing spike output", e);					
+				} catch (StructuralException e) {
+					throw new RuntimeException("Can't plot activities: error running neurons", e);
 				}
 			}
 			
