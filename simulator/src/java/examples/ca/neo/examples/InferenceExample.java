@@ -12,6 +12,7 @@ import ca.neo.math.impl.GaussianPDF;
 import ca.neo.math.impl.IndependentDimensionApproximator;
 import ca.neo.math.impl.WeightedCostApproximator;
 import ca.neo.model.Network;
+import ca.neo.model.Node;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
@@ -20,6 +21,7 @@ import ca.neo.model.impl.EnsembleFactory;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.NEFNode;
 import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.nef.impl.NEFEnsembleImpl;
 import ca.neo.model.neuron.Neuron;
@@ -204,7 +206,7 @@ public class InferenceExample {
 	public static class PDFEnsemble extends NEFEnsembleImpl {
 
 		public PDFEnsemble(String name, Neuron[] neurons, float[][] encoders) throws StructuralException {
-			super(name, neurons, encoders);
+			super(name, (NEFNode[]) neurons, encoders);
 		}
 
 		public LinearApproximator getApproximator() throws StructuralException {
@@ -217,7 +219,7 @@ public class InferenceExample {
 			float[][] evalPoints = vg.genVectors(numEvalPoints, 1);
 //			float[][] evalPoints = vg.genVectors(numEvalPoints, getDimension());
 			
-			Neuron[] neurons = getNeurons();	
+			Neuron[] neurons = (Neuron[]) getNodes();	
 			
 //			//copy eval points to every dimension, so each neuron sees them on its own dimension
 //			int dim = getDimension();

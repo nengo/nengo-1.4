@@ -153,16 +153,16 @@ public class DefaultPlotter extends Plotter {
 			float[][] idealOutput = new float[x.length][];
 			float[][] actualOutput = new float[x.length][];
 
-			Neuron[] neurons = ensemble.getNeurons();
+			NEFNode[] nodes = (NEFNode[]) ensemble.getNodes();
 			
 			SimulationMode mode = ensemble.getMode();
 			for (int i = 0; i < x.length; i++) {
 				x[i] = -1f + (float) i * (2f / (float) x.length);
 								
 				ensemble.setMode(SimulationMode.CONSTANT_RATE);
-				for (int j = 0; j < neurons.length; j++) {
-					((NEFNode) neurons[j]).setRadialInput(x[i]*encoders[j][0]);
-					neurons[j].run(0f, 0f);					
+				for (int j = 0; j < nodes.length; j++) {
+					((NEFNode) nodes[j]).setRadialInput(x[i]*encoders[j][0]);
+					nodes[j].run(0f, 0f);					
 				}
 				origin.run(null, 1f);
 				actualOutput[i] = ((RealOutput) origin.getValues()).getValues();
@@ -233,7 +233,7 @@ public class DefaultPlotter extends Plotter {
 	 */
 	public void doPlot(NEFEnsemble ensemble) {
 		float[][] encoders = ensemble.getEncoders();
-		Neuron[] neurons = ensemble.getNeurons();
+		NEFNode[] nodes = (NEFNode[]) ensemble.getNodes();
 
 		float[] x = new float[101];
 		for (int i = 0; i < x.length; i++) {
@@ -245,17 +245,17 @@ public class DefaultPlotter extends Plotter {
 		
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		
-		for (int i = 0; i < neurons.length; i++) {
+		for (int i = 0; i < nodes.length; i++) {
 			XYSeries series = new XYSeries("Neuron " + i);
 			
 			for (int j = 0; j < x.length; j++) {
 				//plot along preferred direction for multi-dimensional ensembles
 				float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j]; 
 				
-				((NEFNode) neurons[i]).setRadialInput(radialInput);
+				((NEFNode) nodes[i]).setRadialInput(radialInput);
 				try {
-					neurons[i].run(0f, 0f);
-					RealOutput output = (RealOutput) neurons[i].getOrigin(Neuron.AXON).getValues();
+					nodes[i].run(0f, 0f);
+					RealOutput output = (RealOutput) nodes[i].getOrigin(Neuron.AXON).getValues();
 					series.add(x[j], output.getValues()[0]);
 				} catch (SimulationException e) {
 					throw new RuntimeException("Can't plot activities: error running neurons", e);

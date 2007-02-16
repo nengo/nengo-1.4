@@ -162,17 +162,17 @@ public class LocalSimulator implements Simulator {
 			throw new SimulationException("The named Node is not an Ensemble");
 		}
 		
-		Neuron[] neurons = ((Ensemble) ensemble).getNeurons();
-		if (index < 0 || index >= neurons.length) {
-			throw new SimulationException("The neuron index " + index 
-					+ " is out of range for Ensemble size " + neurons.length);
+		Node[] nodes = ((Ensemble) ensemble).getNodes();
+		if (index < 0 || index >= nodes.length) {
+			throw new SimulationException("The Node index " + index 
+					+ " is out of range for Ensemble size " + nodes.length);
 		}
 		
-		if ( !(neurons[index] instanceof Probeable) ) {
-			throw new SimulationException("The specified Neuron is not Probeable");
+		if ( !(nodes[index] instanceof Probeable) ) {
+			throw new SimulationException("The specified Node is not Probeable");
 		}
 		
-		return (Probeable) neurons[index];
+		return (Probeable) nodes[index];
 	}
 
 }

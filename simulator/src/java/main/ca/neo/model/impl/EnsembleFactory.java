@@ -11,11 +11,12 @@ import ca.neo.io.FileManager;
 import ca.neo.math.Function;
 import ca.neo.math.impl.IdentityFunction;
 import ca.neo.math.impl.IndicatorPDF;
+import ca.neo.model.Node;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.NEFNode;
 import ca.neo.model.nef.impl.NEFEnsembleImpl;
-import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.impl.LIFNeuronFactory;
 import ca.neo.model.neuron.impl.NeuronFactory;
 import ca.neo.util.VectorGenerator;
@@ -26,6 +27,7 @@ import ca.neo.util.impl.RandomHypersphereVG;
  * parameters.  
  * 
  * TODO: test
+ * TODO: clean up 
  * 
  * @author Bryan Tripp
  */
@@ -169,22 +171,26 @@ public class EnsembleFactory {
 	private NEFEnsemble doMake(String name, int n, int dim, NeuronFactory factory, VectorGenerator generator) 
 			throws StructuralException {
 		
-		Neuron[] neurons = new Neuron[n];
+		NEFNode[] nodes = new NEFNode[n];
 		
 		for (int i = 0; i < n; i++) {
-			neurons[i] = factory.make("neuron" + i);
+			Node node = factory.make("neuron" + i);
+			if ( !(node instanceof NEFNode) ) {
+				throw new StructuralException("Nodes must be NEFNodes");
+			}
+			nodes[i] = (NEFNode) node;
 			
-			neurons[i].setMode(SimulationMode.CONSTANT_RATE);
-			if ( !neurons[i].getMode().equals(SimulationMode.CONSTANT_RATE) ) {
+			nodes[i].setMode(SimulationMode.CONSTANT_RATE);
+			if ( !nodes[i].getMode().equals(SimulationMode.CONSTANT_RATE) ) {
 				throw new StructuralException("Neurons in an NEFEnsemble must support CONSTANT_RATE mode");
 			}
 			
-			neurons[i].setMode(SimulationMode.DEFAULT);
+			nodes[i].setMode(SimulationMode.DEFAULT);
 		}
 
 		float[][] encoders = generator.genVectors(n, dim);
 		
-		NEFEnsemble result = construct(name, neurons, encoders);
+		NEFEnsemble result = construct(name, nodes, encoders);
 		
 		addDefaultOrigins(result);
 		
@@ -205,8 +211,8 @@ public class EnsembleFactory {
 	}
 	
 	//TODO: document as strategy
-	public NEFEnsemble construct(String name, Neuron[] neurons, float[][] encoders) throws StructuralException {
-		return new NEFEnsembleImpl(name, neurons, encoders);
+	public NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders) throws StructuralException {
+		return new NEFEnsembleImpl(name, nodes, encoders);
 	}
 	
 	//TODO: document as strategy

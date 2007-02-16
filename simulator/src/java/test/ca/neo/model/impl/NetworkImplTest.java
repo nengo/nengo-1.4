@@ -7,6 +7,7 @@ import org.apache.commons.lang.NotImplementedException;
 
 import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
@@ -95,10 +96,10 @@ public class NetworkImplTest extends TestCase {
 			return myName;
 		}
 
-		public Neuron[] getNeurons() {
+		public Node[] getNodes() {
 			throw new NotImplementedException("not implemented");
 		}
-
+		
 		public void addNeuron(Neuron neuron) {
 			throw new NotImplementedException("not implemented");
 		}
@@ -146,7 +147,7 @@ public class NetworkImplTest extends TestCase {
 		public void collectSpikes(boolean collect) {
 			throw new NotImplementedException("not implemented");
 		}
-		
+
 	}
 	
 }

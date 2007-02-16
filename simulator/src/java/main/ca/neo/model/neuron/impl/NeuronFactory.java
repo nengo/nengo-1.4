@@ -12,6 +12,7 @@ import ca.neo.model.neuron.Neuron;
  * from a PDF, or selected from a database, etc.
  * 
  * TODO: this should be NodeFactory
+ * TODO: should make many at once? - to allow dependencies between parameters of results in a group 
  * 
  * @author Bryan Tripp
  */
