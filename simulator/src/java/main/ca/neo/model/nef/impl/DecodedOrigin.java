@@ -14,6 +14,7 @@ import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
+import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeOutput;
 import ca.neo.util.MU;
@@ -30,7 +31,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	private static final long serialVersionUID = 1L;
 	
 	private String myName;
-	private Neuron[] myNeurons;
+	private NEFNode[] myNodes;
 	private Function[] myFunctions;
 	private float[][] myDecoders;
 	private SimulationMode myMode;
@@ -40,7 +41,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	 * With this constructor, decoding vectors are generated using default settings. 
 	 *  
 	 * @param name Name of this Origin
-	 * @param neurons Neurons that belong to the NEFEnsemble from which this Origin arises
+	 * @param nodes Nodes that belong to the NEFEnsemble from which this Origin arises
 	 * @param functions Output Functions on the vector that is represented by the NEFEnsemble 
 	 * 		(one Function per dimension of output). For example if the Origin is to output 
 	 * 		x1*x2, where the ensemble represents [x1 x1], then one 2D function would be 
@@ -49,15 +50,15 @@ public class DecodedOrigin implements Origin, Resettable {
 	 * @throws StructuralException if functions do not all have the same input dimension (we 
 	 * 		don't check against the state dimension at this point)
 	 */
-	public DecodedOrigin(String name, Neuron[] neurons, Function[] functions, LinearApproximator approximator) 
+	public DecodedOrigin(String name, NEFNode[] nodes, Function[] functions, LinearApproximator approximator) 
 			throws StructuralException {
 		
 		checkFunctionDimensions(functions);
 		
 		myName = name;
-		myNeurons = neurons;
+		myNodes = nodes;
 		myFunctions = functions; 
-		myDecoders = findDecoders(neurons, functions, approximator);  
+		myDecoders = findDecoders(nodes, functions, approximator);  
 		myMode = SimulationMode.DEFAULT;
 		
 		reset(false);
@@ -67,20 +68,20 @@ public class DecodedOrigin implements Origin, Resettable {
 	 * With this constructor decoding vectors are specified by the caller. 
 	 * 
 	 * @param name As in other constructor
-	 * @param neurons As in other constructor
+	 * @param nodes As in other constructor
 	 * @param functions As in other constructor
-	 * @param decoders Decoding vectors which are scaled by the main output of each neuron, and 
+	 * @param decoders Decoding vectors which are scaled by the main output of each Node, and 
 	 * 		then summed, to estimate the same function of the ensembles state vector that is 
 	 * 		defined by the 'functions' arg. The 'functions' arg is still needed, because in DIRECT 
 	 * 		SimulationMode, these functions are used directly. The 'decoders' arg allows the caller 
 	 * 		to provide decoders that are generated with non-default methods or parameters (eg an 
-	 * 		unusual number of singular values). Must be a matrix with one row per Neuron and one 
+	 * 		unusual number of singular values). Must be a matrix with one row per Node and one 
 	 * 		column per function.   
 	 * @throws StructuralException If dimensions.length != neurons.length, decoders is not a matrix 
 	 * 		(ie all elements with same length), or if the number of columns in decoders is not equal 
 	 * 		to the number of functions 
 	 */
-	public DecodedOrigin(String name, Neuron[] neurons, Function[] functions, float[][] decoders) throws StructuralException {
+	public DecodedOrigin(String name, NEFNode[] nodes, Function[] functions, float[][] decoders) throws StructuralException {
 		checkFunctionDimensions(functions);
 		
 		if (!MU.isMatrix(decoders)) {
@@ -91,12 +92,12 @@ public class DecodedOrigin implements Origin, Resettable {
 			throw new StructuralException("Number of decoding functions and dimension of decoding vectors must be the same");
 		}
 		
-		if (decoders.length != neurons.length) {
+		if (decoders.length != nodes.length) {
 			throw new StructuralException("Number of decoding vectors and Neurons must be the same");
 		}
 			
 		myName = name;
-		myNeurons = neurons;
+		myNodes = nodes;
 		myFunctions = functions;
 		myDecoders = decoders;
 		myMode = SimulationMode.DEFAULT;
@@ -111,15 +112,15 @@ public class DecodedOrigin implements Origin, Resettable {
 		myOutput = new RealOutputImpl(new float[myFunctions.length], Units.UNK);
 	}
 
-	private static float[][] findDecoders(Neuron[] neurons, Function[] functions, LinearApproximator approximator)  {
-		float[][] result = new float[neurons.length][];
+	private static float[][] findDecoders(NEFNode[] nodes, Function[] functions, LinearApproximator approximator)  {
+		float[][] result = new float[nodes.length][];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = new float[functions.length];
 		}
 		
 		for (int j = 0; j < functions.length; j++) {
 			float[] coeffs = approximator.findCoefficients(functions[j]);
-			for (int i = 0; i < neurons.length; i++) {
+			for (int i = 0; i < nodes.length; i++) {
 				result[i][j] = coeffs[i];
 			}
 		}
@@ -151,17 +152,13 @@ public class DecodedOrigin implements Origin, Resettable {
 	}
 	
 	/**
-	 * @return Decoding vectors for each Neuron
+	 * @return Decoding vectors for each Node
 	 */
 	public float[][] getDecoders() {
 		return myDecoders;
 	}
 	
 	/**
-	 * If DIRECT, setDirectState(...) must be called at each time step, prior to getValues(), and 
-	 * output is calculated from functions operating on this state. In other modes, output is 
-	 * calculated from decoding vectors and neuron activity. 
-	 * 
 	 * @param mode Requested simulation mode 
 	 */
 	public void setMode(SimulationMode mode) {
@@ -176,7 +173,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	}
 	
 	/**
-	 * Must be called at each time step after neurons are run and before getValues().  
+	 * Must be called at each time step after Nodes are run and before getValues().  
 	 *  
 	 * @param state Idealized state (as defined by inputs) which can be fed into (idealized) functions 
 	 * 		that make up the Origin, when it is running in DIRECT mode. This is not used in other modes, 
@@ -197,9 +194,9 @@ public class DecodedOrigin implements Origin, Resettable {
 				values[i] = myFunctions[i].map(state);
 			}
 		} else {
-			for (int i = 0; i < myNeurons.length; i++) {
+			for (int i = 0; i < myNodes.length; i++) {
 				try {
-					InstantaneousOutput o = myNeurons[i].getOrigin(Neuron.AXON).getValues();
+					InstantaneousOutput o = myNodes[i].getOrigin(Neuron.AXON).getValues();
 
 					float val = 0; 
 					if (o instanceof SpikeOutput) {

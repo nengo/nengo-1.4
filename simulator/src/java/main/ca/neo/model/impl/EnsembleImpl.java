@@ -4,23 +4,23 @@
 package ca.neo.model.impl;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import ca.neo.model.ExpandableNode;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.model.neuron.ExpandableSynapticIntegrator;
-import ca.neo.model.neuron.Neuron;
 
 /**
  * <p>Default implementation of Ensemble.</p>
  * 
- * <p>Origins or Terminations can be set up on Neurons before they are grouped into an 
- * Ensemble. After Neurons are added to an Ensemble, no Origins or Terminations should 
+ * <p>Origins or Terminations can be set up on Nodes before they are grouped into an 
+ * Ensemble. After Nodes are added to an Ensemble, no Origins or Terminations should 
  * be added to them directly. Terminations can be added with EnsembleImpl.addTermination(...) 
- * If a Termination is added directly to a Neuron after the Neuron is added to the 
+ * If a Termination is added directly to a Node after the Node is added to the 
  * Ensemble, the Termination will not appear in Ensemble.getTerminations()</p>  
  * 
  * TODO: test
@@ -31,46 +31,59 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Neuron[] myExpandableNeurons;
-	private Origin[] myOrigins;
-	private Termination[] myTerminations;
+	private ExpandableNode[] myExpandableNodes;
+	private Map<String, Origin> myOrigins;
+	private Map<String, Termination> myTerminations;
 	
 	/**
 	 * @param name Name of Ensemble
-	 * @param neurons Neurons that make up the Ensemble
-	 * @throws StructuralException if the given Neurons contain Terminations with the same 
+	 * @param nodes Nodes that make up the Ensemble
+	 * @throws StructuralException if the given Nodes contain Terminations with the same 
 	 * 		name but different dimensions
 	 */
-	public EnsembleImpl(String name, Neuron[] neurons) throws StructuralException {
-		super(name, neurons);
+	public EnsembleImpl(String name, Node[] nodes) throws StructuralException {
+		super(name, nodes);
 		
-		myExpandableNeurons = findExpandable(neurons);
-		myOrigins = findOrigins(neurons);
-		myTerminations = findTerminations(neurons);
+		myExpandableNodes = findExpandable(nodes);
+		
+		myOrigins = new HashMap<String, Origin>(10);
+		Origin[] origins = findOrigins(nodes);
+		for (int i = 0; i < origins.length; i++) {
+			myOrigins.put(origins[i].getName(), origins[i]);
+		}
+		
+		myTerminations = new HashMap<String, Termination>(10);
+		Termination[] terminations = findTerminations(nodes);
+		for (int i = 0; i < terminations.length; i++) {
+			myTerminations.put(terminations[i].getName(), terminations[i]);
+		}
 	}
 
 	//finds neurons with expandable synaptic integrators 
-	private static Neuron[] findExpandable(Neuron[] neurons) {
-		ArrayList result = new ArrayList(neurons.length * 2);
+	private static ExpandableNode[] findExpandable(Node[] nodes) {
+		ArrayList<ExpandableNode> result = new ArrayList<ExpandableNode>(nodes.length * 2);
 		
-		for (int i = 0; i < neurons.length; i++) {
-			if (neurons[i] instanceof ExpandableNode) {
-				result.add(neurons[i]);
+		for (int i = 0; i < nodes.length; i++) {
+			if (nodes[i] instanceof ExpandableNode) {
+				result.add((ExpandableNode) nodes[i]);
 			}
 		}
 		
-		return (Neuron[]) result.toArray(new Neuron[0]);
+		return result.toArray(new ExpandableNode[0]);
 	}
-	
+
+	/**
+	 * @see ca.neo.model.Node#getOrigins()
+	 */
 	public Origin[] getOrigins() {
-		return myOrigins;
+		return myOrigins.values().toArray(new Origin[0]);
 	}
 
 	/**
 	 * @see ca.neo.model.Ensemble#getTerminations()
 	 */
 	public Termination[] getTerminations() {
-		return myTerminations;
+		return myTerminations.values().toArray(new Termination[0]);
 	}
 
 	/**
@@ -90,21 +103,20 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 * @see ca.neo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
 	public synchronized Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		if (myExpandableNeurons.length != weights.length) {
+		if (myExpandableNodes.length != weights.length) {
 			throw new StructuralException(weights.length + " sets of weights given for " 
-					+ myExpandableNeurons.length + " expandable neurons");
+					+ myExpandableNodes.length + " expandable nodes");
 		}
 		
 		int dimension = weights[0].length;
 		
-		Termination[] components = new Termination[myExpandableNeurons.length];
-		for (int i = 0; i < myExpandableNeurons.length; i++) {
+		Termination[] components = new Termination[myExpandableNodes.length];
+		for (int i = 0; i < myExpandableNodes.length; i++) {
 			if (weights[i].length != dimension) {
-				throw new StructuralException("Equal numbers of weights are needed for termination onto each neuron");
+				throw new StructuralException("Equal numbers of weights are needed for termination onto each node");
 			}
 			
-			ExpandableNode expandable = (ExpandableNode) myExpandableNeurons[i];
-			components[i] = expandable.addTermination(name, new float[][]{weights[i]}, tauPSC, modulatory);
+			components[i] = myExpandableNodes[i].addTermination(name, new float[][]{weights[i]}, tauPSC, modulatory);
 		}
 		
 		Termination result = new EnsembleTermination(name, components);
@@ -112,10 +124,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
 		}
 		
-		Termination[] newTerminations = new Termination[myTerminations.length + 1];
-		System.arraycopy(myTerminations, 0, newTerminations, 0, myTerminations.length);
-		newTerminations[myTerminations.length] = result;
-		myTerminations = newTerminations;
+		myTerminations.put(name, result);
 		
 		return result;
 	}
@@ -124,52 +133,28 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 * @see ca.neo.model.ExpandableNode#removeTermination(java.lang.String)
 	 */
 	public synchronized void removeTermination(String name) {
-		List newTerminations = new ArrayList(myTerminations.length * 2);
-		
-		for (int i = 0; i < myTerminations.length; i++) {
-			if (!myTerminations[i].getName().equals(name)) {
-				newTerminations.add(myTerminations[i]);
-			}
-		}
-		
-		myTerminations = (Termination[]) newTerminations.toArray(new Termination[0]);
+		myTerminations.remove(name);
 	}
 
 	/** 
 	 * @see ca.neo.model.ExpandableNode#getDimension()
 	 */
 	public int getDimension() {
-		return myExpandableNeurons.length;
+		return myExpandableNodes.length;
 	}
 
 	/**
 	 * @see ca.neo.model.Ensemble#getOrigin(java.lang.String)
 	 */
 	public Origin getOrigin(String name) throws StructuralException {
-		Origin result = null;
-		
-		for (int i = 0; i < myOrigins.length && result == null; i++) {
-			if (myOrigins[i].getName().equals(name)) {
-				result = myOrigins[i];
-			}
-		}
-		
-		return result;
+		return myOrigins.get(name);
 	}
 
 	/**
 	 * @see ca.neo.model.Ensemble#getTermination(java.lang.String)
 	 */
 	public Termination getTermination(String name) throws StructuralException {
-		Termination result = null;
-		
-		for (int i = 0; i < myTerminations.length && result == null; i++) {
-			if (myTerminations[i].getName().equals(name)) {
-				result = myTerminations[i];
-			}
-		}
-		
-		return result;
+		return myTerminations.get(name);
 	}
 
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 
 import ca.neo.model.Ensemble;
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
@@ -29,7 +30,7 @@ import ca.neo.model.neuron.impl.SpikePatternImpl;
 public abstract class AbstractEnsemble implements Ensemble {
 
 	private String myName;
-	private Neuron[] myNeurons;
+	private Node[] myNodes;
 	private SimulationMode myMode;
 	private SpikePatternImpl mySpikePattern;
 	protected boolean myCollectSpikesFlag;
@@ -38,12 +39,12 @@ public abstract class AbstractEnsemble implements Ensemble {
 	 * Note that setMode(SimulationMode.DEFAULT) is called at construction time. 
 	 * 
 	 * @param name Unique name of Ensemble 
-	 * @param neurons Neurons that Ensemble contains
+	 * @param nodes Nodes that Ensemble contains
 	 */
-	public AbstractEnsemble(String name, Neuron[] neurons) {
+	public AbstractEnsemble(String name, Node[] nodes) {
 		myName = name;
-		myNeurons = neurons; 
-		mySpikePattern = new SpikePatternImpl(neurons.length);
+		myNodes = nodes; 
+		mySpikePattern = new SpikePatternImpl(nodes.length);
 		myCollectSpikesFlag = false;
 		
 		setMode(SimulationMode.DEFAULT);
@@ -56,14 +57,17 @@ public abstract class AbstractEnsemble implements Ensemble {
 		return myName;
 	}
 
-	public Neuron[] getNeurons() {
-		return myNeurons;
+	/**
+	 * @see ca.neo.model.Ensemble#getNodes()
+	 */
+	public Node[] getNodes() {
+		return myNodes;
 	}
 
 	/**
-	 * When this method is called, setMode(...) is called on each Neuron in the Ensemble. 
-	 * Each Neuron will then run in the mode that is closest to the requested mode (this 
-	 * could be different for different Neurons). Note that at Ensemble construction time, 
+	 * When this method is called, setMode(...) is called on each Node in the Ensemble. 
+	 * Each Node will then run in the mode that is closest to the requested mode (this 
+	 * could be different for different Node). Note that at Ensemble construction time, 
 	 * setMode(SimulationMode.DEFAULT) is called.
 	 * 
 	 * @see ca.neo.model.Ensemble#setMode(ca.neo.model.SimulationMode)
@@ -71,8 +75,8 @@ public abstract class AbstractEnsemble implements Ensemble {
 	public void setMode(SimulationMode mode) {
 		myMode = mode;
 		
-		for (int i = 0; i < myNeurons.length; i++) {
-			myNeurons[i].setMode(mode);
+		for (int i = 0; i < myNodes.length; i++) {
+			myNodes[i].setMode(mode);
 		}
 	}
 
@@ -93,99 +97,104 @@ public abstract class AbstractEnsemble implements Ensemble {
 	 * @see ca.neo.model.Ensemble#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
-		for (int i = 0; i < myNeurons.length; i++) {
-			myNeurons[i].run(startTime, endTime);
+		for (int i = 0; i < myNodes.length; i++) {
+			myNodes[i].run(startTime, endTime);
 
 			if (myCollectSpikesFlag) {
 				try {
-					InstantaneousOutput output = myNeurons[i].getOrigin(Neuron.AXON).getValues();
+					InstantaneousOutput output = myNodes[i].getOrigin(Neuron.AXON).getValues();
 					if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
 						mySpikePattern.addSpike(i, endTime);
 					}				
 				} catch (StructuralException e) {
-					throw new SimulationException(e);
+					//TODO: does this have to be an exception? ignore? log? 
+					throw new SimulationException("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
 				}
 			}
 		}		
 	}
 
 	/**
-	 * Resets each Neuron in this Ensemble. 
+	 * Resets each Node in this Ensemble. 
 	 * 
 	 * @see ca.neo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
-		for (int i = 0; i < myNeurons.length; i++) {
-			myNeurons[i].reset(randomize);
+		for (int i = 0; i < myNodes.length; i++) {
+			myNodes[i].reset(randomize);
 		}
 		
-		mySpikePattern = new SpikePatternImpl(myNeurons.length);
+		mySpikePattern = new SpikePatternImpl(myNodes.length);
 	}
 
 	/**
-	 * Finds existing Origins by same name on the given neurons, and groups them into 
-	 * EnsembleOrigins.
+	 * Finds existing one-dimensional Origins by same name on the given Nodes, and groups 
+	 * them into EnsembleOrigins.
 	 * 
-	 * @param neurons Neurons on which to look for Origins
+	 * @param nodes Nodes on which to look for Origins
 	 * @return Ensemble Origins encompassing Neuron Origins
 	 */
-	public static Origin[] findOrigins(Neuron[] neurons) {
-		Map groups = new HashMap(10);
+	public static Origin[] findOrigins(Node[] nodes) {
+		Map<String, List<Origin>> groups = new HashMap<String, List<Origin>>(10);
 		
-		for (int i = 0; i < neurons.length; i++) {
-			Origin[] origins = neurons[i].getOrigins();;
+		for (int i = 0; i < nodes.length; i++) {
+			Origin[] origins = nodes[i].getOrigins();;
 			for (int j = 0; j < origins.length; j++) {
-				List group = (List) groups.get(origins[j].getName());
-				if (group == null) {
-					group = new ArrayList(neurons.length * 2);
-					groups.put(origins[j].getName(), group);
+				if (origins[j].getDimensions() == 1) {
+					List<Origin> group = groups.get(origins[j].getName());
+					if (group == null) {
+						group = new ArrayList<Origin>(nodes.length * 2);
+						groups.put(origins[j].getName(), group);
+					}
+					group.add(origins[j]);					
 				}
-				group.add(origins[j]);
 			}
 		}
 		
-		Iterator it = groups.keySet().iterator();
-		List result = new ArrayList(10);
+		Iterator<String> it = groups.keySet().iterator();
+		List<Origin> result = new ArrayList<Origin>(10);
 		while (it.hasNext()) {
-			String name = (String) it.next();
-			List group = (List) groups.get(name);
+			String name = it.next();
+			List<Origin> group = groups.get(name);
 			result.add(new EnsembleOrigin(name, (Origin[]) group.toArray(new Origin[0])));
 		}
 		
-		return (Origin[]) result.toArray(new Origin[0]);
+		return result.toArray(new Origin[0]);
 	}
 	
 	/**
-	 * Finds existing Terminations by the same name on different neurons, and groups them
-	 * into EnsembleTerminations. 
+	 * Finds existing one-dimensional Terminations by the same name on different nodes, and 
+	 * groups them into EnsembleTerminations. 
 	 * 
-	 * @param neurons Neurons on which to look for Terminations
+	 * @param nodes Nodes on which to look for Terminations
 	 * @return Ensemble Terminations encompassing Neuron Terminations 
 	 */
-	public static Termination[] findTerminations(Neuron[] neurons) throws StructuralException {
-		Map groups = new HashMap(10);
+	public static Termination[] findTerminations(Node[] nodes) throws StructuralException {
+		Map<String, List<Termination>> groups = new HashMap<String, List<Termination>>(10);
 		
-		for (int i = 0; i < neurons.length; i++) {
-			Termination[] terminations = neurons[i].getTerminations();
+		for (int i = 0; i < nodes.length; i++) {
+			Termination[] terminations = nodes[i].getTerminations();
 			for (int j = 0; j < terminations.length; j++) {
-				List group = (List) groups.get(terminations[j].getName());
-				if (group == null) {
-					group = new ArrayList(neurons.length * 2);
-					groups.put(terminations[j].getName(), group);
+				if (terminations[j].getDimensions() == 1) {
+					List<Termination> group = groups.get(terminations[j].getName());
+					if (group == null) {
+						group = new ArrayList<Termination>(nodes.length * 2);
+						groups.put(terminations[j].getName(), group);
+					}
+					group.add(terminations[j]);					
 				}
-				group.add(terminations[j]);
 			}
 		}
 		
-		Iterator it = groups.keySet().iterator();
-		List result = new ArrayList(10);
+		Iterator<String> it = groups.keySet().iterator();
+		List<Termination> result = new ArrayList<Termination>(10);
 		while (it.hasNext()) {
-			String name = (String) it.next();
-			List group = (List) groups.get(name);
-			result.add(new EnsembleTermination(name, (Termination[]) group.toArray(new Termination[0])));
+			String name = it.next();
+			List<Termination> group = groups.get(name);
+			result.add(new EnsembleTermination(name, group.toArray(new Termination[0])));
 		}
 		
-		return (Termination[]) result.toArray(new Termination[0]);
+		return result.toArray(new Termination[0]);
 	}
 
 	/**

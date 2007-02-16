@@ -12,10 +12,10 @@ import ca.neo.model.Termination;
 import ca.neo.model.plasticity.EnsemblePlasticityRule;
 
 /**
- * <p>A group of neurons that represent a scalar, vector, or function, as 
+ * <p>A group of Nodes that represent a scalar, vector, or function, as 
  * characterized in Eliasmith & Anderson's Neural Engineering Framework.</p>
  * 
- * <p>All Neurons in an NEFEnsemble must have an NEFSynapticIntegrator.</p>
+ * <p>All Nodes in an NEFEnsemble must be NEFNodes.</p>
  * 
  * @author Bryan Tripp
  */
@@ -33,12 +33,12 @@ public interface NEFEnsemble extends Ensemble, Probeable {
 	public int getDimension();
 
 	/**
-	 * @return List of encoders for each neuron (each item is the encoding vector for a neuron).
+	 * @return List of encoders for each Node (each item is the encoding vector for a Node).
 	 */
 	public float[][] getEncoders();
 
 	/**
-	 * Adds an Origin that corresponds to a decoding of the activities of neurons in this Ensemble. 
+	 * Adds an Origin that corresponds to a decoding of the activities of Nodes in this Ensemble. 
 	 *   
 	 * @param name Name of decoding 
 	 * @param functions Functions that define the decoding (one function for each dimension of output).  
@@ -63,7 +63,7 @@ public interface NEFEnsemble extends Ensemble, Probeable {
 	/**
 	 * @param name Name of an existing decoding
 	 * @return List of decoding vectors for the named decoding that are associated with 
-	 * 		each Neuron in the ensemble (in a simulation, these are only used internally to the 
+	 * 		each Node in the ensemble (in a simulation, these are only used internally to the 
 	 * 		Ensemble, but this method is provided because there may be other reasons for the user 
 	 * 		to examine them).  
 	 */
@@ -78,11 +78,11 @@ public interface NEFEnsemble extends Ensemble, Probeable {
 	 * 		onto the space of vectors that can be represented by this NEFEnsemble. The first dimension 
 	 * 		is taken as matrix rows, and must have the same length as the Origin that will be connected 
 	 * 		to this Termination. The second dimension is taken as matrix columns, and must have the same 
-	 * 		length as the encoders of this NEFEnsemble. 
+	 * 		length as the encoders of this NEFEnsemble. TODO: this is transposed?  
 	 * @param tauPSC Time constant of post-synaptic current decay (all Terminations have    
 	 * 		this property but it may have slightly different interpretations depending other properties
-	 * 		of the Termination -- see also getTerminationProperties())
-	 * @param isModulatory If true, inputs to this Termination do not drive neurons in the Ensemble directly 
+	 * 		of the Termination). 
+	 * @param isModulatory If true, inputs to this Termination do not drive Nodes in the Ensemble directly 
 	 * 		but may have modulatory influences (eg related to plasticity). If false, the transformation matrix
 	 * 		output dimension must match the dimension of this Ensemble.   
 	 * @return The resulting Termination
@@ -99,7 +99,7 @@ public interface NEFEnsemble extends Ensemble, Probeable {
 	 * @param tfNumerator Coefficients of transfer function numerator (see CanonicalModel.getRealization(...) 
 	 * 		for details) 
 	 * @param tfDenominator Coefficients of transfer function denominator
-	 * @param isModulatory If true, inputs to this Termination do not drive neurons in the Ensemble directly 
+	 * @param isModulatory If true, inputs to this Termination do not drive Nodes in the Ensemble directly 
 	 * 		but may have modulatory influences (eg related to plasticity). If false, the transformation matrix
 	 * 		output dimension must match the dimension of this Ensemble.   
 	 * @return The resulting Termination
@@ -115,9 +115,6 @@ public interface NEFEnsemble extends Ensemble, Probeable {
 	public void removeDecodedTermination(String name);
 	
 	/**
-	 * TODO: do we need distinct rules per element or can potential differences be managed by breaking into separate 
-	 *  terminations? 
-	 *  
 	 * @param name Name of termination to which plasticity rule applies.  
 	 * @param rule A rule that defines how the termination's transformation matrix elements change during simulation
 	 * @throws StructuralException if the named Termination does not exist or is not a DecodedTermination
