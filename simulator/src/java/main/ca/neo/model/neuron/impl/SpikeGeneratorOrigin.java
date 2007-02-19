@@ -104,7 +104,7 @@ public class SpikeGeneratorOrigin implements Origin {
 	 * Returns spike values or real-valued spike rate values, depending on whether the mode
 	 * is SimulationMode.DEFAULT or SimulationMode.CONSTANT_RATE.  
 	 * 
-	 * @see ca.neo.mode.Origin#getValues()
+	 * @see ca.neo.model.Origin#getValues()
 	 */
 	public InstantaneousOutput getValues() {
 		return myOutput;

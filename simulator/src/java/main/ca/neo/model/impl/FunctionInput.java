@@ -39,7 +39,7 @@ public class FunctionInput implements Node, Probeable {
 	
 	/**
 	 * @param name The name of this Node
-	 * @param function Functions of time (simulation time) that produce the values
+	 * @param functions Functions of time (simulation time) that produce the values
 	 * 		that will be output by this Node. Each given function corresponds to 
 	 * 		a dimension in the output vectors. Each function must have input dimension 1.
 	 * @param units The units in which the output values are to be interpreted 
@@ -78,7 +78,7 @@ public class FunctionInput implements Node, Probeable {
 	}
 
 	/**
-	 * @see ca.neo.model.ExternalInput#run(float, float)
+	 * @see ca.neo.model.Node#run(float, float)
 	 */
 	public void run(float startTime, float endTime) {
 		myTime = endTime;

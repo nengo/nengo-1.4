@@ -23,7 +23,7 @@ public class LinearInterpolatorND implements InterpolatorND {
 	private float[] myTimes;
 	
 	/**
-	 * @param timeSeries Series to interpolate
+	 * @param series Series to interpolate
 	 */
 	public LinearInterpolatorND(TimeSeries series) {
 		setTimeSeries(series);

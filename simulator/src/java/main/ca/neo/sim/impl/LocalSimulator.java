@@ -110,7 +110,7 @@ public class LocalSimulator implements Simulator {
 	}
 
 	/**
-	 * @see ca.neo.sim.Simulator#addRecorder(java.lang.String, java.lang.String, boolean)
+	 * @see ca.neo.sim.Simulator#addProbe(java.lang.String, java.lang.String, boolean)
 	 */
 	public Probe addProbe(String nodeName, String state, boolean record) throws SimulationException {
 		Probeable p = getNode(nodeName);
@@ -124,7 +124,7 @@ public class LocalSimulator implements Simulator {
 	}
 
 	/**
-	 * @see ca.neo.sim.Simulator#addRecorder(java.lang.String, int, java.lang.String, boolean)
+	 * @see ca.neo.sim.Simulator#addProbe(java.lang.String, int, java.lang.String, boolean)
 	 */
 	public Probe addProbe(String ensembleName, int neuronIndex, String state, boolean record) throws SimulationException {
 		Probeable p = getNeuron(ensembleName, neuronIndex);

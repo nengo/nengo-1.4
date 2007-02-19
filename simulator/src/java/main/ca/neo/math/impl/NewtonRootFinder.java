@@ -30,7 +30,7 @@ public class NewtonRootFinder implements RootFinder {
 	}
 
 	/**
-	 * @see ca.neo.math.RootFinder#findRoot(ca.neo.math.RootFinder.Function, float, float, float)
+	 * @see ca.neo.math.RootFinder#findRoot(ca.neo.math.Function, float, float, float)
 	 */
 	public float findRoot(Function function, float startLow, float startHigh, float tolerance) {
 		if (startLow >= startHigh) {

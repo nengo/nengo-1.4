@@ -105,7 +105,7 @@ public class ProbeImpl implements Probe {
 	}
 	
 	/**
-	 * @see ca.neo.util.Recorder#getData()
+	 * @see ca.neo.util.Probe#getData()
 	 */
 	public TimeSeries getData() {
 		float[] times = new float[myValues.size()];

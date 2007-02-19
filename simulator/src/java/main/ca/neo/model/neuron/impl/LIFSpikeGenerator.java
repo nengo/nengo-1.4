@@ -160,7 +160,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	}
 
 	/**
-	 * @see Probeable.getHistory(String) 
+	 * @see Probeable#getHistory(String) 
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		TimeSeries1D result = null;
@@ -183,7 +183,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	}
 
 	/**
-	 * @see Probeable.listStates()
+	 * @see Probeable#listStates()
 	 */
 	public Properties listStates() {
 		Properties p = new Properties();

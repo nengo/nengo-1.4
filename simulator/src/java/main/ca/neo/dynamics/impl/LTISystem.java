@@ -85,7 +85,7 @@ public class LTISystem implements LinearSystem {
 	/**
 	 * @return Ax + Bu
 	 * 
-	 * @see ca.neo.dynamics.DynamicalSystem#f(float[], float, float[])
+	 * @see ca.neo.dynamics.DynamicalSystem#f(float, float[])
 	 */
 	public float[] f(float t, float[] u) {
 		assert u.length == getInputDimension();		
@@ -96,7 +96,7 @@ public class LTISystem implements LinearSystem {
 	/**
 	 * @return Cx + Du
 	 * 
-	 * @see ca.neo.dynamics.DynamicalSystem#g(float[], float, float[])
+	 * @see ca.neo.dynamics.DynamicalSystem#g(float, float[])
 	 */
 	public float[] g(float t, float[] u) {
 		assert u.length == getInputDimension(); 
