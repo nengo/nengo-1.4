@@ -3,6 +3,8 @@
  */
 package ca.neo.model.impl;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
@@ -19,6 +21,8 @@ import junit.framework.TestCase;
  */
 public class LinearExponentialTerminationTest extends TestCase {
 
+	private static Logger ourLogger = Logger.getLogger(LinearExponentialTerminationTest.class);
+	
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
@@ -134,7 +138,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 		for (int i = 0; i < 150; i++) {
 			current = let.updateCurrent(false, 0, tauPSC/10f);
 		}
-		System.out.println(current);
+		ourLogger.debug("current: " + current);
 		assertClose(0f, current, tol);
 		
 		//low-pass filter constant rate input
@@ -147,7 +151,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 				assertTrue(current > lastCurrent);
 			}
 		}
-		System.out.println(current);
+		ourLogger.debug("current: " + current);
 		assertClose(10f, current, tol);		
 	}
 

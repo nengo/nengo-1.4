@@ -3,6 +3,8 @@
  */
 package ca.neo.model.muscle.impl;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
@@ -33,6 +35,8 @@ import ca.neo.util.impl.TimeSeriesImpl;
  */
 public class HillMuscle implements TorqueMuscle {
 
+	private static Logger ourLogger = Logger.getLogger(HillMuscle.class); 
+	
 	private Function myCEForceLength;
 	private Function myCEForceVelocity;
 	private Function mySEForceLength;
@@ -102,7 +106,7 @@ public class HillMuscle implements TorqueMuscle {
 		
 		long startTime = System.currentTimeMillis();
 		TimeSeries output = i.integrate(d, input);
-		System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime));
+		ourLogger.info("Elapsed time: " + (System.currentTimeMillis() - startTime));
 		
 		Plotter.plot(output, "Force");
 	}
@@ -162,7 +166,7 @@ public class HillMuscle implements TorqueMuscle {
 			final float vm = Math.min(1.3f, force / (myMaxIsometricForce * a * lm)); //TODO: fix this
 						
 			
-			System.out.println("force: " + force + " lm: " + lm + " vm: " + vm + " a: " + a + " dadt: " + dadt);
+			ourLogger.info("force: " + force + " lm: " + lm + " vm: " + vm + " a: " + a + " dadt: " + dadt);
 			
 			//find velocity corresponding to this multiplier
 			final Function fv = myCEForceVelocity;

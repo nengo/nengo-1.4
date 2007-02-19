@@ -3,6 +3,8 @@
  */
 package ca.neo.math.impl;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.TestUtil;
 import ca.neo.plot.Plotter;
 import junit.framework.TestCase;
@@ -16,6 +18,7 @@ import junit.framework.TestCase;
  */
 public class GaussianPDFTest extends TestCase {
 
+	private static Logger ourLogger = Logger.getLogger(GaussianPDFTest.class);
 	/*
 	 * Test method for 'ca.neo.math.impl.GaussianPDF.sample()'
 	 */
@@ -30,7 +33,7 @@ public class GaussianPDFTest extends TestCase {
 			float sample = pdf.sample()[0];
 			if (sample > -1f && sample < 1f) c++;
 		}
-		System.out.println("c: " + c);
+		ourLogger.info("GaussianPDFTest c: " + c);
 		assertTrue(c > 620 && c < 740); //should be about 682 but will vary randomly
 
 		pdf = new GaussianPDF(-10f, 4f);
@@ -41,7 +44,7 @@ public class GaussianPDFTest extends TestCase {
 			float sample = pdf.sample()[0];
 			if (sample > -12f && sample < -8f) c++;
 		}
-		System.out.println("c: " + c);
+		ourLogger.info("GaussianPDFTest c: " + c);
 		assertTrue(c > 620 && c < 740); 
 	}
 

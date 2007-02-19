@@ -3,6 +3,8 @@
  */
 package ca.neo.util;
 
+import org.apache.log4j.Logger;
+
 /**
  * "Matrix Utilities". Utility methods related to matrices and vectors of floats.
  * 
@@ -11,6 +13,8 @@ package ca.neo.util;
  * @author Bryan Tripp
  */
 public class MU {
+	
+	private static Logger ourLogger = Logger.getLogger(MU.class);
 
 	/**
 	 * @param matrix An array of arrays that is expected to be in matrix form
@@ -286,8 +290,8 @@ public class MU {
 		int fromRow = 0;
 		int fromCol = -1;
 		
-		System.out.println(matrix.length + " rows");
-		System.out.println(matrix[0].length + " cols");
+		ourLogger.debug(matrix.length + " rows");
+		ourLogger.debug(matrix[0].length + " cols");
 		
 		for (int i = 0; i < rows; i++) {
 			result[i] = new float[cols];

@@ -7,6 +7,8 @@ package ca.neo.model.impl;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.io.FileManager;
 import ca.neo.math.Function;
 import ca.neo.math.impl.IdentityFunction;
@@ -32,6 +34,8 @@ import ca.neo.util.impl.RandomHypersphereVG;
  * @author Bryan Tripp
  */
 public class EnsembleFactory {
+	
+	private static Logger ourLogger = Logger.getLogger(EnsembleFactory.class);
 	
 	private NeuronFactory myDefaultNeuronFactory;
 	private VectorGenerator myVectorGenerator;
@@ -134,8 +138,7 @@ public class EnsembleFactory {
 			try {
 				result = (NEFEnsemble) fm.load(ensembleFile);
 			} catch (Exception e) {
-				System.err.println("Failed to load file " + ensembleFile.getAbsolutePath() + ". New ensemble will be created.");
-				e.printStackTrace();
+				ourLogger.error("Failed to load file " + ensembleFile.getAbsolutePath() + ". New ensemble will be created.", e);
 			}
 		}
 		
@@ -145,8 +148,7 @@ public class EnsembleFactory {
 			try {
 				fm.save(result, ensembleFile);
 			} catch (IOException e) {
-				System.err.println("Failed to save file " + ensembleFile.getAbsolutePath());
-				e.printStackTrace();
+				ourLogger.error("Failed to save file " + ensembleFile.getAbsolutePath(), e);
 			}
 		}
 		

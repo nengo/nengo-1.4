@@ -15,6 +15,8 @@ package ca.neo.math.impl;
 //import org.jfree.data.xy.XYSeries;
 //import org.jfree.data.xy.XYSeriesCollection;
 
+import org.apache.log4j.Logger;
+
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
 import ca.neo.math.Function;
@@ -35,6 +37,7 @@ import ca.neo.util.Memory;
  */
 public class WeightedCostApproximator implements LinearApproximator {
 
+	private static Logger ourLogger = Logger.getLogger(WeightedCostApproximator.class);
 	private static final long serialVersionUID = 1L;
 	
 	private float[][] myEvalPoints;
@@ -140,7 +143,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		int i = 0; 
 		while (svd.getS().get(i, i) > minSV) i++;
 
-		System.out.println("Using " + i + " singular values");
+		ourLogger.info("Using " + i + " singular values for pseudo-inverse");
 		
 		for (int j = i; j < matrix.length; j++) {
 			sInv.set(j, j, 0d);

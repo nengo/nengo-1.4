@@ -3,6 +3,8 @@
  */
 package ca.neo.model.impl;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
@@ -26,6 +28,8 @@ import junit.framework.TestCase;
  */
 public class SpikingNeuronTest extends TestCase {
 
+	private static Logger ourLogger = Logger.getLogger(SpikingNeuronTest.class);
+	
 	private ExpandableSynapticIntegrator myIntegrator;
 	private SpikeGenerator myGenerator;
 	private SpikingNeuron myNeuron;
@@ -99,7 +103,7 @@ public class SpikingNeuronTest extends TestCase {
 		output = myNeuron.getOrigins()[0].getValues();
 		assertTrue(output instanceof RealOutput);
 		assertTrue(((RealOutput) output).getValues()[0] > 100);
-		System.out.println(((RealOutput) output).getValues()[0]);
+		ourLogger.info(((RealOutput) output).getValues()[0]);
 	}
 
 }

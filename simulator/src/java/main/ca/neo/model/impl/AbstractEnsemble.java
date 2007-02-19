@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.model.Ensemble;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
@@ -29,6 +31,8 @@ import ca.neo.model.neuron.impl.SpikePatternImpl;
  */
 public abstract class AbstractEnsemble implements Ensemble {
 
+	private static Logger ourLogger = Logger.getLogger(AbstractEnsemble.class);
+	
 	private String myName;
 	private Node[] myNodes;
 	private SimulationMode myMode;
@@ -208,7 +212,7 @@ public abstract class AbstractEnsemble implements Ensemble {
 	 * @see ca.neo.model.Ensemble#getSpikePattern()
 	 */
 	public SpikePattern getSpikePattern() {
-		if (!myCollectSpikesFlag) System.err.println("Warning: collect spikes flag is off"); //TODO: logging
+		if (!myCollectSpikesFlag) ourLogger.warn("Warning: collect spikes flag is off"); 
 		return mySpikePattern;
 	}
 	

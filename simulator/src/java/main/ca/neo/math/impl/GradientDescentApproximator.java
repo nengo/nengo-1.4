@@ -2,6 +2,8 @@ package ca.neo.math.impl;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.util.MU;
@@ -15,6 +17,7 @@ import ca.neo.util.MU;
  */
 public class GradientDescentApproximator implements LinearApproximator {
 
+	private static Logger ourLogger = Logger.getLogger(GradientDescentApproximator.class);
 	private static final long serialVersionUID = 1L;
 
 	private float[][] myEvalPoints;
@@ -112,7 +115,7 @@ public class GradientDescentApproximator implements LinearApproximator {
 			error = findError(targetValues, result);
 			float mse = MU.prod(error, error) / (float) error.length;
 			done = mse < myTolerance;
-			System.out.println("Iteration: " + i + "  MSE: " + mse + " Stuck: " + stuck);
+			ourLogger.debug("Iteration: " + i + "  MSE: " + mse + " Stuck: " + stuck);
 		}
 		
 		return result;
