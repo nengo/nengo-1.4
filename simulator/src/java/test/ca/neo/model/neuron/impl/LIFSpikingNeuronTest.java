@@ -1,4 +1,4 @@
-package ca.neo.model.impl;
+package ca.neo.model.neuron.impl;
 
 //import ca.neo.model.Projection;
 //import ca.neo.util.impl.RecorderImpl;

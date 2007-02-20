@@ -1,7 +1,7 @@
 /*
  * Created on 29-May-2006
  */
-package ca.neo.model.impl;
+package ca.neo.model.neuron.impl;
 
 import org.apache.log4j.Logger;
 

@@ -1,13 +1,14 @@
 /*
  * Created on 26-May-2006
  */
-package ca.neo.model.impl;
+package ca.neo.model.neuron.impl;
 
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
+import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.ExpandableSynapticIntegrator;
 import ca.neo.model.neuron.impl.LinearSynapticIntegrator;
 import ca.neo.util.TimeSeries1D;

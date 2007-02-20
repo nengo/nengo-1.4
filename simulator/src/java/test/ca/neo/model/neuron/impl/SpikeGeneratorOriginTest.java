@@ -1,4 +1,4 @@
-package ca.neo.model.impl;
+package ca.neo.model.neuron.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 

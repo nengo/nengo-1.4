@@ -1,7 +1,7 @@
 /*
  * Created on 22-Jun-2006
  */
-package ca.neo.model.impl;
+package ca.neo.util.impl;
 
 import ca.neo.util.impl.SpikePatternImpl;
 import junit.framework.TestCase;
