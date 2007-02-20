@@ -3,9 +3,8 @@
  */
 package ca.neo.model.impl;
 
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.Units;
-import ca.neo.model.neuron.SpikeOutput;
-import ca.neo.model.neuron.impl.SpikeOutputImpl;
 import junit.framework.TestCase;
 
 /**

@@ -35,8 +35,8 @@ import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.neuron.Neuron;
-import ca.neo.model.neuron.SpikePattern;
 import ca.neo.plot.Plotter;
+import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.TimeSeries1D;
 
@@ -284,7 +284,7 @@ public class DefaultPlotter extends Plotter {
 	}
 
 	/**
-	 * @see ca.neo.plot.Plotter#doPlot(ca.neo.model.neuron.SpikePattern)
+	 * @see ca.neo.plot.Plotter#doPlot(ca.neo.util.SpikePattern)
 	 */
 	public void doPlot(SpikePattern pattern) {
 		XYSeriesCollection dataset = new XYSeriesCollection();

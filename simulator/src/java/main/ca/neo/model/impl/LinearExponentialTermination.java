@@ -4,9 +4,9 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.model.neuron.SpikeOutput;
 import ca.neo.util.Configuration;
 import ca.neo.util.impl.ConfigurationImpl;
 

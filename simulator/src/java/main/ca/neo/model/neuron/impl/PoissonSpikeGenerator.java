@@ -6,8 +6,8 @@ import ca.neo.math.impl.GaussianPDF;
 import ca.neo.math.impl.SigmoidFunction;
 import ca.neo.model.SimulationException;
 import ca.neo.model.neuron.SpikeGenerator;
-import ca.neo.model.neuron.SpikePattern;
 import ca.neo.plot.Plotter;
+import ca.neo.util.SpikePattern;
 
 /**
  * A phenomenological SpikeGenerator that produces spikes according to a Poisson 

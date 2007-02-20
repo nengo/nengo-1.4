@@ -15,7 +15,7 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.neuron.Neuron;
-import ca.neo.model.neuron.SpikePattern;
+import ca.neo.util.SpikePattern;
 import junit.framework.TestCase;
 
 public class NetworkImplTest extends TestCase {

@@ -1,10 +1,10 @@
 /*
  * Created on 23-May-2006
  */
-package ca.neo.model.neuron.impl;
+package ca.neo.model.impl;
 
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.Units;
-import ca.neo.model.neuron.SpikeOutput;
 
 /**
  * Default implementation of SpikeOutput. 
@@ -28,7 +28,7 @@ public class SpikeOutputImpl implements SpikeOutput {
 	}
 
 	/**
-	 * @see ca.neo.model.neuron.SpikeOutput#getValues()
+	 * @see ca.neo.model.SpikeOutput#getValues()
 	 */
 	public boolean[] getValues() {
 		return myValues;

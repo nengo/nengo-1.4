@@ -3,7 +3,7 @@
  */
 package ca.neo.model.impl;
 
-import ca.neo.model.neuron.impl.SpikePatternImpl;
+import ca.neo.util.impl.SpikePatternImpl;
 import junit.framework.TestCase;
 
 /**

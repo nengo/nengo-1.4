@@ -9,8 +9,8 @@ import ca.neo.dynamics.impl.LTISystem;
 import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.Function;
 import ca.neo.model.nef.NEFEnsemble;
-import ca.neo.model.neuron.SpikePattern;
 import ca.neo.plot.impl.DefaultPlotter;
+import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 
 /** 

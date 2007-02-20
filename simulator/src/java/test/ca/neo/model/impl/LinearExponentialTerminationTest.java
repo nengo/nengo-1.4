@@ -11,7 +11,6 @@ import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.LinearExponentialTermination;
 import ca.neo.model.impl.RealOutputImpl;
-import ca.neo.model.neuron.impl.SpikeOutputImpl;
 import junit.framework.TestCase;
 
 /**

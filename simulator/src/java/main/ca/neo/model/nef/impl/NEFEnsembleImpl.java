@@ -24,6 +24,7 @@ import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
@@ -31,13 +32,12 @@ import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
-import ca.neo.model.neuron.SpikeOutput;
-import ca.neo.model.neuron.impl.SpikePatternImpl;
 import ca.neo.model.plasticity.EnsemblePlasticityRule;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.VectorGenerator;
 import ca.neo.util.impl.RandomHypersphereVG;
+import ca.neo.util.impl.SpikePatternImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Created on 22-Jun-2006
  */
-package ca.neo.model.neuron;
+package ca.neo.util;
 
 import java.io.Serializable;
 

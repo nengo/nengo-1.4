@@ -17,12 +17,12 @@ import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.neuron.Neuron;
-import ca.neo.model.neuron.SpikeOutput;
-import ca.neo.model.neuron.SpikePattern;
-import ca.neo.model.neuron.impl.SpikePatternImpl;
+import ca.neo.util.SpikePattern;
+import ca.neo.util.impl.SpikePatternImpl;
 
 /**
  * Abstract class that can be used as a basis for Ensemble implementations. 

@@ -1,9 +1,9 @@
 /*
  * Created on 22-Jun-2006
  */
-package ca.neo.model.neuron.impl;
+package ca.neo.util.impl;
 
-import ca.neo.model.neuron.SpikePattern;
+import ca.neo.util.SpikePattern;
 
 /**
  * Default implementation of SpikePattern. 
@@ -42,14 +42,14 @@ public class SpikePatternImpl implements SpikePattern {
 	}
 
 	/**
-	 * @see ca.neo.model.neuron.SpikePattern#getNumNeurons()
+	 * @see ca.neo.util.SpikePattern#getNumNeurons()
 	 */
 	public int getNumNeurons() {
 		return myIndices.length;
 	}
 
 	/**
-	 * @see ca.neo.model.neuron.SpikePattern#getSpikeTimes(int)
+	 * @see ca.neo.util.SpikePattern#getSpikeTimes(int)
 	 */
 	public float[] getSpikeTimes(int neuron) {
 		return contract(mySpikeTimes[neuron], myIndices[neuron]);

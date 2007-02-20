@@ -3,7 +3,7 @@
  */
 package ca.neo.model;
 
-import ca.neo.model.neuron.SpikePattern;
+import ca.neo.util.SpikePattern;
 
 /**
  * <p>A group of Nodes with largely overlapping inputs and outputs.</p>

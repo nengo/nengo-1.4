@@ -1,9 +1,8 @@
 /*
  * Created on May 18, 2006
  */
-package ca.neo.model.neuron;
+package ca.neo.model;
 
-import ca.neo.model.InstantaneousOutput;
 
 /**
  * InstantaneousOutput consisting of spikes. 

@@ -10,7 +10,6 @@ import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.neuron.ExpandableSynapticIntegrator;
 import ca.neo.model.neuron.impl.LinearSynapticIntegrator;
-import ca.neo.model.neuron.impl.SpikeOutputImpl;
 import ca.neo.util.TimeSeries1D;
 import junit.framework.TestCase;
 

@@ -7,9 +7,8 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.Units;
-import ca.neo.model.neuron.SpikeOutput;
-import ca.neo.model.neuron.impl.SpikeOutputImpl;
 
 /**
  * An Origin that is composed of the Origins of multiple Neurons. The dimension 

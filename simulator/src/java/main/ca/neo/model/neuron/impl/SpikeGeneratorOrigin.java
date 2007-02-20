@@ -9,6 +9,7 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
+import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
 

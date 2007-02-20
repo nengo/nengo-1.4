@@ -11,12 +11,12 @@ import ca.neo.model.RealOutput;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
-import ca.neo.model.neuron.SpikeOutput;
 import ca.neo.util.MU;
 
 /**
