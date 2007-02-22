@@ -6,7 +6,6 @@ package ca.neo.model.nef.impl;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 
 import Jama.Matrix;
 
@@ -15,30 +14,21 @@ import ca.neo.dynamics.impl.CanonicalModel;
 import ca.neo.dynamics.impl.EulerIntegrator;
 import ca.neo.dynamics.impl.LTISystem;
 import ca.neo.dynamics.impl.SimpleLTISystem;
+import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
-import ca.neo.math.impl.ConstantFunction;
-import ca.neo.math.impl.WeightedCostApproximator;
-import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
-import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
-import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.plasticity.EnsemblePlasticityRule;
 import ca.neo.util.MU;
-import ca.neo.util.TimeSeries;
-import ca.neo.util.VectorGenerator;
-import ca.neo.util.impl.RandomHypersphereVG;
-import ca.neo.util.impl.SpikePatternImpl;
-import ca.neo.util.impl.TimeSeriesImpl;
 
 /**
  * Default implementation of NEFEnsemble. 
@@ -49,54 +39,34 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * 
  * @author Bryan Tripp
  */
-public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
+public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsemble {
 
 	private static final long serialVersionUID = 1L;
 	
 	private int myDimension;
 	private float[][] myEncoders;
-	private Map myDecodedOrigins;
-	private Map myDecodedTerminations;
-	private Map myPlasticityRules;
-	private Origin[] myNodeOrigins;
-	private Termination[] myNodeTerminations;
-	private LinearApproximator myDecodingApproximator;
-	private float myTime; //used to support Probeable
-	
-	/**
-	 * @param name Unique name of Ensemble
-	 * @param nodes Nodess that make up the Ensemble
-	 * @param encoders List of encoding vectors (one for each node). All must have same length 
-	 * @throws StructuralException if there	are a different number of Nodes than encoding vectors, if not 
-	 * 		all encoders have the same length, or if there is a problem setting up the LinearApproximator 
-	 */
-	public NEFEnsembleImpl(String name, NEFNode[] nodes, float[][] encoders) throws StructuralException {
-		super(name, nodes);
-		init(name, nodes, encoders);
-		setApproximator();
-	}
-	
+	private Map<String, DecodedTermination> myDecodedTerminations;
+	private Map<String, EnsemblePlasticityRule> myPlasticityRules;
+	private Map<String, LinearApproximator> myDecodingApproximators;
+	private ApproximatorFactory myApproximatorFactory;
+	private float[][] myEvalPoints;
+
 	/**
 	 * @param name Unique name of Ensemble
 	 * @param nodes Nodes that make up the Ensemble
-	 * @param encoders List of encoding vectors (one for each Node). All must have same length
-	 * @param setApproximator 
-	 * @throws StructuralException if there	are a different number of Nodes than encoding vectors, if not 
-	 * 		all encoders have the same length, or if there is a problem setting up the LinearApproximator 
+	 * @param encoders List of encoding vectors (one for each node). All must have same length 
+	 * @param factory Source of LinearApproximators to use in decoding output
+	 * @param evalPoints Vector inputs at which output is found to produce DecodedOrigins   
+	 * @throws StructuralException if there	are a different number of Nodes than encoding vectors or if not 
+	 * 		all encoders have the same length
 	 */
-	public NEFEnsembleImpl(String name, NEFNode[] nodes, float[][] encoders, boolean setApproximator) throws StructuralException {
-		super(name, nodes);
-		init(name, nodes, encoders);
-		if (setApproximator) setApproximator();
-	}
-	
-	private void init(String name, NEFNode[] nodes, float[][] encoders) throws StructuralException {
+	public NEFEnsembleImpl(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory factory, float[][] evalPoints) throws StructuralException {
+		super(name, nodes, factory);
+		
 		if (nodes.length != encoders.length) {
 			throw new StructuralException("There are " + nodes.length + " Nodes but " 
 					+ encoders.length + " encoding vectors");
 		}
-		
-		myDimension = encoders[0].length;
 		
 		for (int i = 1; i < encoders.length; i++) {
 			if (encoders[i].length != myDimension) {
@@ -104,43 +74,17 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 			}
 		}
 		
+		myDimension = encoders[0].length;
 		myEncoders = encoders;
-		
-		myDecodedOrigins = new HashMap(10);
-		myDecodedTerminations = new HashMap(10);
-		myPlasticityRules = new HashMap(10);
-		
-		myNodeOrigins = findOrigins(nodes);
-		myNodeTerminations = findTerminations(nodes);
-		
-		myTime = 0f;		
-	}
-		
-	protected void setApproximator() throws StructuralException {
-		myDecodingApproximator = getApproximator();		
+		myDecodedTerminations = new HashMap<String, DecodedTermination>(10);
+		myPlasticityRules = new HashMap<String, EnsemblePlasticityRule>(10);
+		myApproximatorFactory = factory;
+		myDecodingApproximators = new HashMap<String, LinearApproximator>(10);
+		myEvalPoints = evalPoints;
 	}
 	
 	/**
-	 * Uses a WeightedCostApproximator with flat cost function by default -- override to 
-	 * change this.  
-	 * 
-	 * @return LinearApproximator used for finding decoders  
-	 * @throws StructuralException if not all Neurons support CONSTANT_RATE SimulationMode
-	 */
-	public LinearApproximator getApproximator() throws StructuralException {
-
-		//TODO: what is a good rule here? do we need to stick to axes for higher dimensions? 
-		int[] evalPointsByDimension = new int[] {0, 300, 1000, 5000}; 	
-		int numEvalPoints = myDimension <= 3 ? evalPointsByDimension[myDimension] : 300 * myDimension;
-		
-		VectorGenerator vg = new RandomHypersphereVG(false, 1f, 0f);
-		float[][] evalPoints = vg.genVectors(numEvalPoints, myDimension);		
-		float[][] values = getAllFiringRates(evalPoints);
-		
-		return new WeightedCostApproximator(evalPoints, values, new ConstantFunction(evalPoints[0].length, 1), .1f); 
-	}
-	
-	/**
+	 * TODO: fix
 	 * @param evalPoints Vector points at which to find output (each one must have same dimension as
 	 * 		encoder)
 	 * @return Output of each Node at each evaluation point (1st dimension corresponds to Node) 
@@ -185,7 +129,6 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 			}
 			
 			for (int i = 0; i < result.length; i++) {
-//				float radialInput = MU.prod(encoder, evalPoints[i]);
 				node.setRadialInput(getRadialInput(evalPoints[i], neuronIndex));
 				
 				node.run(0f, 0f);
@@ -215,34 +158,19 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 	}
 
 	/**
-	 * @see ca.neo.model.nef.NEFEnsemble#addDecodedOrigin(java.lang.String, Function[])
+	 * @see ca.neo.model.nef.NEFEnsemble#addDecodedOrigin(java.lang.String, Function[], String)
 	 */
-	public Origin addDecodedOrigin(String name, Function[] functions) throws StructuralException {
-		Origin result = new DecodedOrigin(name, (NEFNode[]) getNodes(), functions, myDecodingApproximator);
-		myDecodedOrigins.put(name, result);
+	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {		
+		if (!myDecodingApproximators.containsKey(nodeOrigin)) {
+			float[][] outputs = getAllFiringRates(myEvalPoints);
+			LinearApproximator approximator = myApproximatorFactory.getApproximator(myEvalPoints, outputs);
+			myDecodingApproximators.put(nodeOrigin, approximator);
+		}		
+		
+		DecodedOrigin result = new DecodedOrigin(name, (NEFNode[]) getNodes(), functions, myDecodingApproximators.get(nodeOrigin));
+		super.addDecodedOrigin(name, result);
 		
 		return result;
-	}
-
-	/**
-	 * @see ca.neo.model.nef.NEFEnsemble#doneOrigins()
-	 */
-	public void doneOrigins() {
-		myDecodingApproximator = null;
-	}
-	
-	/**
-	 * @see ca.neo.model.nef.NEFEnsemble#removeDecodedOrigin(java.lang.String)
-	 */
-	public void removeDecodedOrigin(String name) {
-		myDecodedOrigins.remove(name);
-	}
-
-	/**
-	 * @see ca.neo.model.nef.NEFEnsemble#getDecoders(java.lang.String)
-	 */
-	public float[][] getDecoders(String name) {
-		return ((DecodedOrigin) myDecodedOrigins.get(name)).getDecoders();
 	}
 
 	/**
@@ -263,7 +191,7 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 		
 		EulerIntegrator integrator = new EulerIntegrator(tauPSC / 10f);
 		
-		Termination result = new DecodedTermination(name, matrix, dynamics, integrator);
+		DecodedTermination result = new DecodedTermination(name, matrix, dynamics, integrator);
 		if (isModulatory) {
 			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
 		} else if (matrix.length != myDimension) {
@@ -291,7 +219,7 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 		
 		EulerIntegrator integrator = new EulerIntegrator(1f / (10f * (float) fastest));
 		
-		Termination result = new DecodedTermination(name, matrix, dynamics, integrator);
+		DecodedTermination result = new DecodedTermination(name, matrix, dynamics, integrator);
 		if (isModulatory) {
 			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
 		} else if (matrix.length != myDimension) {
@@ -310,27 +238,15 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 	}
 
 	/**
-	 * @see ca.neo.model.Ensemble#getOrigins()
-	 */
-	public Origin[] getOrigins() {
-		Origin[] decoded = (Origin[]) myDecodedOrigins.values().toArray(new Origin[0]);
-		
-		Origin[] all = new Origin[decoded.length + myNodeOrigins.length];
-		System.arraycopy(decoded, 0, all, 0, all.length);
-		System.arraycopy(myNodeOrigins, 0, all, decoded.length, myNodeOrigins.length);
-		
-		return all;
-	}
-
-	/**
 	 * @see ca.neo.model.Ensemble#getTerminations()
 	 */
 	public Termination[] getTerminations() {
-		Termination[] decoded = (Termination[]) myDecodedTerminations.values().toArray(new Termination[0]);
+		Termination[] decoded = myDecodedTerminations.values().toArray(new Termination[0]);
+		Termination[] composites = super.getTerminations();
 		
-		Termination[] all = new Termination[decoded.length + myNodeTerminations.length];
-		System.arraycopy(decoded, 0, all, 0, all.length);
-		System.arraycopy(myNodeTerminations, 0, all, decoded.length, myNodeTerminations.length);
+		Termination[] all = new Termination[decoded.length + composites.length];
+		System.arraycopy(decoded, 0, all, 0, decoded.length);
+		System.arraycopy(composites, 0, all, decoded.length, composites.length);
 		
 		return all;
 	}
@@ -339,7 +255,6 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 	 * @see ca.neo.model.Ensemble#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
-
 		try {
 			float[] state = new float[myDimension];
 
@@ -354,41 +269,24 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 				if (!isModulatory.booleanValue()) state = MU.sum(state, output);
 			}
 
-			//run nodes ... 
-			SpikePatternImpl pattern = (myCollectSpikesFlag) ? (SpikePatternImpl) getSpikePattern() : null;
-			
-			if ( !getMode().equals(SimulationMode.DIRECT) ) {
+			if ( getMode().equals(SimulationMode.DIRECT) ) {
+				Origin[] origins = getOrigins();
+				for (int i = 0; i < origins.length; i++) {
+					if (origins[i] instanceof DecodedOrigin) {
+						((DecodedOrigin) origins[i]).run(state, endTime - startTime);
+					}
+				}
+				setTime(endTime);
+			} else {
 				//multiply state by encoders (cosine tuning), set radial input of each Neuron and run ...
 				NEFNode[] nodes = (NEFNode[]) getNodes();
 				for (int i = 0; i < nodes.length; i++) {
 					nodes[i].setRadialInput(getRadialInput(state, i));
-					
-					nodes[i].run(startTime, endTime);
-
-					if (myCollectSpikesFlag) {
-						try {
-							InstantaneousOutput output = nodes[i].getOrigin(Neuron.AXON).getValues();
-							if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
-								pattern.addSpike(i, endTime);
-							}											
-						} catch (StructuralException e) {
-							throw new SimulationException("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
-						}
-					}				
 				}
+				super.run(startTime, endTime);
 			}
-			
-			//run origins ...
-			it = myDecodedOrigins.values().iterator();
-			while (it.hasNext()) {
-				DecodedOrigin o = (DecodedOrigin) it.next();
-				o.run(state, endTime - startTime);
-			}
-			
 			learn(endTime - startTime);
 
-			myTime = endTime;
-			
 		} catch (SimulationException e) {
 			e.setEnsemble(getName());
 			throw e;
@@ -409,10 +307,11 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 				rule.setTerminationState(t.getName(), t.getOutput());
 			}
 			
-			Iterator originIter = myDecodedOrigins.keySet().iterator();
-			while (originIter.hasNext()) {
-				DecodedOrigin o = (DecodedOrigin) myDecodedOrigins.get(originIter.next());
-				rule.setOriginState(o.getName(), ((RealOutput) o.getValues()).getValues());
+			Origin[] origins = getOrigins();
+			for (int i = 0; i < origins.length; i++) {
+				if (origins[i] instanceof DecodedOrigin) {
+					rule.setOriginState(origins[i].getName(), ((RealOutput) origins[i].getValues()).getValues());
+				}
 			}
 			
 			float[][] transform = termination.getTransform();
@@ -430,79 +329,15 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 	 * @param node Node number 
 	 * @return Radial input to the given node 
 	 */
-	protected float getRadialInput(float[] state, int node) {
+	private float getRadialInput(float[] state, int node) {
 		return MU.prod(state, myEncoders[node]);
 	}
 
 	/**
-	 * @see ca.neo.model.Probeable#getHistory(java.lang.String)
-	 */
-	public TimeSeries getHistory(String stateName) throws SimulationException {
-		TimeSeries result = null;
-		
-		Origin origin = (Origin) myDecodedOrigins.get(stateName);
-		
-		if (origin != null) {
-			float[] vals = ((RealOutput) origin.getValues()).getValues();
-			Units[] units = new Units[vals.length];
-			for (int i = 0; i < vals.length; i++) {
-				units[i] = origin.getValues().getUnits();
-			}
-			result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{vals}, units);
-		} else {
-			throw new SimulationException("Output function " + stateName + " is unknown");
-		}
-		
-		return result;
-	}
-
-	/**
-	 * @see ca.neo.model.Probeable#listStates()
-	 */
-	public Properties listStates() {
-		Properties result = new Properties();
-		
-		Iterator it = myDecodedOrigins.keySet().iterator();
-		while (it.hasNext()) {
-			String name = it.next().toString();
-			result.setProperty(name, "Function of NEFEnsemble state"); //TODO: could put function.toString() here
-		}
-		
-		return result;
-	}
-
-	/**
-	 * @see ca.neo.model.Ensemble#getOrigin(java.lang.String)
-	 */
-	public Origin getOrigin(String name) throws StructuralException {
-		Origin result = null;
-		
-		result = (Origin) myDecodedOrigins.get(name);
-		
-		for (int i = 0; i < myNodeOrigins.length && result == null; i++) {
-			if (myNodeOrigins[i].getName().equals(name)) {
-				result = myNodeOrigins[i];
-			}
-		}
-		
-		return result;
-	}
-
-	/**
-	 * @see ca.neo.model.Ensemble#getTermination(java.lang.String)
+	 * @see ca.neo.model.Node#getTermination(java.lang.String)
 	 */
 	public Termination getTermination(String name) throws StructuralException {
-		Termination result = null;
-		
-		result = (Termination) myDecodedTerminations.get(name);
-		
-		for (int i = 0; i < myNodeTerminations.length && result == null; i++) {
-			if (myNodeTerminations[i].getName().equals(name)) {
-				result = myNodeTerminations[i];
-			}
-		}
-		
-		return result;
+		return myDecodedTerminations.containsKey(name) ? myDecodedTerminations.get(name) : super.getTermination(name);
 	}
 	
 	/**
@@ -511,12 +346,11 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 	public void setMode(SimulationMode mode) {
 		super.setMode(mode);
 		
-		if (myDecodedOrigins != null) {
-			Iterator it = myDecodedOrigins.values().iterator();
-			while (it.hasNext()) {
-				DecodedOrigin o = (DecodedOrigin) it.next();
-				o.setMode(mode);
-			}			
+		Origin[] origins = getOrigins();
+		for (int i = 0; i < origins.length; i++) {
+			if (origins[i] instanceof DecodedOrigin) {
+				((DecodedOrigin) origins[i]).setMode(mode);
+			}
 		}
 	}
 
@@ -532,10 +366,11 @@ public class NEFEnsembleImpl extends AbstractEnsemble implements NEFEnsemble {
 			t.reset(randomize);
 		}
 
-		it = myDecodedOrigins.keySet().iterator();		
-		while (it.hasNext()) {
-			DecodedOrigin o = (DecodedOrigin) myDecodedOrigins.get(it.next());
-			o.reset(randomize);
+		Origin[] origins = getOrigins();
+		for (int i = 0; i < origins.length; i++) {
+			if (origins[i] instanceof DecodedOrigin) {
+				((DecodedOrigin) origins[i]).reset(randomize);
+			}
 		}
 	}
 

@@ -6,6 +6,7 @@ package ca.neo.model.nef.impl;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.Resettable;
@@ -23,6 +24,7 @@ import ca.neo.util.MU;
  * An Origin of functions of the state variables of an NEFEnsemble. 
  * 
  * TODO: how do units fit in. define in constructor? ignore?
+ * TODO: user-specified node origin, select nodes make up decoded origin 
  * 
  * @author Bryan Tripp
  */
@@ -31,7 +33,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	private static final long serialVersionUID = 1L;
 	
 	private String myName;
-	private NEFNode[] myNodes;
+	private Node[] myNodes;
 	private Function[] myFunctions;
 	private float[][] myDecoders;
 	private SimulationMode myMode;
@@ -50,7 +52,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	 * @throws StructuralException if functions do not all have the same input dimension (we 
 	 * 		don't check against the state dimension at this point)
 	 */
-	public DecodedOrigin(String name, NEFNode[] nodes, Function[] functions, LinearApproximator approximator) 
+	public DecodedOrigin(String name, Node[] nodes, Function[] functions, LinearApproximator approximator) 
 			throws StructuralException {
 		
 		checkFunctionDimensions(functions);
@@ -112,7 +114,7 @@ public class DecodedOrigin implements Origin, Resettable {
 		myOutput = new RealOutputImpl(new float[myFunctions.length], Units.UNK);
 	}
 
-	private static float[][] findDecoders(NEFNode[] nodes, Function[] functions, LinearApproximator approximator)  {
+	private static float[][] findDecoders(Node[] nodes, Function[] functions, LinearApproximator approximator)  {
 		float[][] result = new float[nodes.length][];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = new float[functions.length];

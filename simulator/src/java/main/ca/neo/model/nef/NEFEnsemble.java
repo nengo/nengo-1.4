@@ -4,9 +4,7 @@
 package ca.neo.model.nef;
 
 import ca.neo.math.Function;
-import ca.neo.model.Ensemble;
 import ca.neo.model.Origin;
-import ca.neo.model.Probeable;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.plasticity.EnsemblePlasticityRule;
@@ -19,7 +17,7 @@ import ca.neo.model.plasticity.EnsemblePlasticityRule;
  * 
  * @author Bryan Tripp
  */
-public interface NEFEnsemble extends Ensemble, Probeable {
+public interface NEFEnsemble extends DecodableEnsemble {
 	
 	/**
 	 * Standard name for the Origin corresponding to the decoded estimate of the state variables 
@@ -43,31 +41,12 @@ public interface NEFEnsemble extends Ensemble, Probeable {
 	 * @param name Name of decoding 
 	 * @param functions Functions that define the decoding (one function for each dimension of output).  
 	 * 		All functions must have an input dimension equal to the dimension of this NEFEnsemble.
+	 * @param nodeOrigin Name of the Node-level Origins from which this Ensemble-level Origin is derived
+	 * 		(often Neuron.AXON)
 	 * @throws StructuralException if functions do not all have the same input dimension as the 
 	 * 		dimension of this ensemble   
 	 */
-	public Origin addDecodedOrigin(String name, Function[] functions) throws StructuralException;
-	
-	/**
-	 * This method can optionally be called after all decoded Origins have been added, in order to free 
-	 * resources that are needed for adding new decodings. Calling addDecodedOrigin() after this method 
-	 * will cause an exception.    
-	 */
-	public void doneOrigins();
-	
-	/**
-	 * @param name Name of an existing decoding to remove
-	 */
-	public void removeDecodedOrigin(String name);
-	
-	/**
-	 * @param name Name of an existing decoding
-	 * @return List of decoding vectors for the named decoding that are associated with 
-	 * 		each Node in the ensemble (in a simulation, these are only used internally to the 
-	 * 		Ensemble, but this method is provided because there may be other reasons for the user 
-	 * 		to examine them).  
-	 */
-	public float[][] getDecoders(String name);  
+	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException;
 	
 	/**
 	 * Adds a new Termination into this Ensemble, at which information is to be received 

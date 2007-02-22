@@ -10,15 +10,20 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import ca.neo.io.FileManager;
+import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
+import ca.neo.math.LinearApproximator;
+import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.IdentityFunction;
 import ca.neo.math.impl.IndicatorPDF;
+import ca.neo.math.impl.WeightedCostApproximator;
 import ca.neo.model.Node;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.nef.impl.NEFEnsembleImpl;
+import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.impl.LIFNeuronFactory;
 import ca.neo.model.neuron.impl.NeuronFactory;
 import ca.neo.util.VectorGenerator;
@@ -196,25 +201,15 @@ public class EnsembleFactory {
 		
 		addDefaultOrigins(result);
 		
-//		NEFEnsemble result = new NEFEnsembleImpl(name, neurons, encoders);
-		
-//		Function[] functions = new Function[dim];
-//		for (int i = 0; i < functions.length; i++) {
-//			functions[i] = new IdentityFunction(dim, i);
-//		}		
-//
-//		Memory.report("before adding origin");
-//		
-//		result.addDecodedOrigin(NEFEnsemble.X, functions);
-//
-//		Memory.report("after adding origin");
-		
 		return result;
 	}
 	
 	//TODO: document as strategy
 	public NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders) throws StructuralException {
-		return new NEFEnsembleImpl(name, nodes, encoders);
+		VectorGenerator vg = new RandomHypersphereVG(false, 1, 0);
+		int dim = encoders[0].length;
+		ApproximatorFactory af = new WeightedCostApproximator.Factory(0.1f);
+		return new NEFEnsembleImpl(name, nodes, encoders, af, vg.genVectors(dim*300, dim));
 	}
 	
 	//TODO: document as strategy
@@ -224,38 +219,7 @@ public class EnsembleFactory {
 			functions[i] = new IdentityFunction(ensemble.getDimension(), i);
 		}		
 
-		ensemble.addDecodedOrigin(NEFEnsemble.X, functions);
+		ensemble.addDecodedOrigin(NEFEnsemble.X, functions, Neuron.AXON);
 	}
 
-//	//construct an object from a specification
-//	private static Object make(ConstructorSpec spec) throws StructuralException {
-//		Object result = null;
-//		
-//		Constructor[] constructors = spec.getClassOfProduct().getConstructors();
-//		for (int i = 0; i < constructors.length && result == null; i++) {
-//			Class[] paramClasses = constructors[i].getParameterTypes();
-//			
-//			if (paramClasses.length == spec.getNumConstructorArgs()) {
-//				Object[] params = new Object[paramClasses.length];
-//				for (int j = 0; j < paramClasses.length; j++) {
-//					if (paramClasses[j].equals(boolean.class)) {
-//						params[j] = new Boolean(spec.getBooleanArg(j));
-//					} else if (paramClasses[j].equals(float.class)) {
-//						params[j] = new Float(spec.getFloatArg(j));
-//					} else {
-//						params[j] = spec.getObjectArg(j);
-//					}
-//				}
-//				
-//				try {
-//					result = constructors[i].newInstance(params);
-//				} catch (Exception e) {
-//					throw new StructuralException("Problem instantiating from ConstructorSpec", e);
-//				}
-//			}
-//		}
-//		
-//		return result;
-//	}
-	
 }

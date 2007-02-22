@@ -5,6 +5,7 @@ package ca.neo.examples;
 
 import java.util.ArrayList;
 
+import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.math.impl.ConstantFunction;
@@ -44,7 +45,14 @@ public class InferenceExample {
 	public static Network createNetwork() throws StructuralException {
 		EnsembleFactory ef = new EnsembleFactory() {
 			public NEFEnsemble construct(String name, Neuron[] neurons, float[][] encoders) throws StructuralException {
-				return new PDFEnsemble(name, neurons, encoders);
+				VectorGenerator vg = new RandomHypersphereVG(true, 1, 0);
+				int dim = encoders[0].length;
+				ApproximatorFactory af = new ApproximatorFactory() {
+					public LinearApproximator getApproximator(float[][] evalPoints,	float[][] values) {
+						return new WeightedCostApproximator(evalPoints, values, new ConstantFunction(evalPoints[0].length, 1), .1f);
+					}
+				};				
+				return new PDFEnsemble(name, neurons, encoders, af, vg.genVectors(300*dim, dim));
 			}			
 		};
 		ef.setVectorGenerator(new RandomHypersphereVG(true, 1f, 1f));
@@ -205,8 +213,8 @@ public class InferenceExample {
 	 */
 	public static class PDFEnsemble extends NEFEnsembleImpl {
 
-		public PDFEnsemble(String name, Neuron[] neurons, float[][] encoders) throws StructuralException {
-			super(name, (NEFNode[]) neurons, encoders);
+		public PDFEnsemble(String name, Neuron[] neurons, float[][] encoders, ApproximatorFactory af, float[][] evalPoints) throws StructuralException {			
+			super(name, (NEFNode[]) neurons, encoders, af, evalPoints);
 		}
 
 		public LinearApproximator getApproximator() throws StructuralException {

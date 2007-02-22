@@ -14,6 +14,7 @@ import ca.neo.model.impl.EnsembleFactory;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.neuron.Neuron;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
 import ca.neo.util.Probe;
@@ -54,8 +55,8 @@ public class FuzzyLogicExample {
 		NEFEnsemble rule1a = ef.make("rule1a", 500, 2, "rule1a", false);
 		NEFEnsemble rule1b = ef.make("rule1b", 500, 2, "rule1b", false);
 		NEFEnsemble rule2 = ef.make("rule2", 200, 1, "rule2", false);
-		rule1a.addDecodedOrigin("OR", new Function[]{new MAX(2)});
-		rule1b.addDecodedOrigin("AND", new Function[]{new MIN(2)});
+		rule1a.addDecodedOrigin("OR", new Function[]{new MAX(2)}, Neuron.AXON);
+		rule1b.addDecodedOrigin("AND", new Function[]{new MIN(2)}, Neuron.AXON);
 		rule1a.doneOrigins();
 		rule1b.doneOrigins();
 		rule2.doneOrigins();
@@ -118,7 +119,7 @@ public class FuzzyLogicExample {
 				new Clip(5, 3, 0f, 1f), 
 				new Clip(5, 4, 0f, 1f) 
 		};
-		output.addDecodedOrigin("recurrent", clipped);
+		output.addDecodedOrigin("recurrent", clipped, Neuron.AXON);
 		
 		net.addProjection(output.getOrigin("recurrent"), output.getTermination("recurrent"));
 		

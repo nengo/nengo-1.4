@@ -35,6 +35,8 @@ public abstract class AbstractEnsemble implements Ensemble {
 	
 	private String myName;
 	private Node[] myNodes;
+	private Map<String, Origin> myOrigins;
+	private Map<String, Termination> myTerminations;	
 	private SimulationMode myMode;
 	private SpikePatternImpl mySpikePattern;
 	protected boolean myCollectSpikesFlag;
@@ -51,7 +53,19 @@ public abstract class AbstractEnsemble implements Ensemble {
 		mySpikePattern = new SpikePatternImpl(nodes.length);
 		myCollectSpikesFlag = false;
 		
-		setMode(SimulationMode.DEFAULT);
+		myOrigins = new HashMap<String, Origin>(10);
+		Origin[] origins = findOrigins(nodes);
+		for (int i = 0; i < origins.length; i++) {
+			myOrigins.put(origins[i].getName(), origins[i]);
+		}
+		
+		myTerminations = new HashMap<String, Termination>(10);
+		Termination[] terminations = findTerminations(nodes);
+		for (int i = 0; i < terminations.length; i++) {
+			myTerminations.put(terminations[i].getName(), terminations[i]);
+		}		
+		
+		setMode(SimulationMode.DEFAULT);		
 	}
 
 	/**
@@ -111,8 +125,7 @@ public abstract class AbstractEnsemble implements Ensemble {
 						mySpikePattern.addSpike(i, endTime);
 					}				
 				} catch (StructuralException e) {
-					//TODO: does this have to be an exception? ignore? log? 
-					throw new SimulationException("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
+					ourLogger.warn("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
 				}
 			}
 		}		
@@ -132,13 +145,56 @@ public abstract class AbstractEnsemble implements Ensemble {
 	}
 
 	/**
+	 * @see ca.neo.model.Ensemble#getOrigin(java.lang.String)
+	 */
+	public Origin getOrigin(String name) throws StructuralException {
+		return myOrigins.get(name);
+	}
+
+	/**
+	 * @see ca.neo.model.Ensemble#getTermination(java.lang.String)
+	 */
+	public Termination getTermination(String name) throws StructuralException {
+		return myTerminations.get(name);
+	}
+	
+	/**
+	 * @see ca.neo.model.Node#getOrigins()
+	 */
+	public Origin[] getOrigins() {
+		return myOrigins.values().toArray(new Origin[0]);
+	}
+
+	/**
+	 * @see ca.neo.model.Ensemble#getTerminations()
+	 */
+	public Termination[] getTerminations() {
+		return myTerminations.values().toArray(new Termination[0]);
+	}
+
+	/**
+	 * @see ca.neo.model.Ensemble#collectSpikes(boolean)
+	 */
+	public void collectSpikes(boolean collect) {
+		myCollectSpikesFlag = collect;
+	}
+
+	/**
+	 * @see ca.neo.model.Ensemble#getSpikePattern()
+	 */
+	public SpikePattern getSpikePattern() {
+		if (!myCollectSpikesFlag) ourLogger.warn("Warning: collect spikes flag is off"); 
+		return mySpikePattern;
+	}
+	
+	/**
 	 * Finds existing one-dimensional Origins by same name on the given Nodes, and groups 
 	 * them into EnsembleOrigins.
 	 * 
 	 * @param nodes Nodes on which to look for Origins
 	 * @return Ensemble Origins encompassing Neuron Origins
 	 */
-	public static Origin[] findOrigins(Node[] nodes) {
+	private static Origin[] findOrigins(Node[] nodes) {
 		Map<String, List<Origin>> groups = new HashMap<String, List<Origin>>(10);
 		
 		for (int i = 0; i < nodes.length; i++) {
@@ -173,7 +229,7 @@ public abstract class AbstractEnsemble implements Ensemble {
 	 * @param nodes Nodes on which to look for Terminations
 	 * @return Ensemble Terminations encompassing Neuron Terminations 
 	 */
-	public static Termination[] findTerminations(Node[] nodes) throws StructuralException {
+	private static Termination[] findTerminations(Node[] nodes) {
 		Map<String, List<Termination>> groups = new HashMap<String, List<Termination>>(10);
 		
 		for (int i = 0; i < nodes.length; i++) {
@@ -195,26 +251,14 @@ public abstract class AbstractEnsemble implements Ensemble {
 		while (it.hasNext()) {
 			String name = it.next();
 			List<Termination> group = groups.get(name);
-			result.add(new EnsembleTermination(name, group.toArray(new Termination[0])));
+			try {
+				result.add(new EnsembleTermination(name, group.toArray(new Termination[0])));
+			} catch (StructuralException e) {
+				throw new Error("Composite Termination should consist only of 1D Terminations, but apparently does not", e);
+			}
 		}
 		
 		return result.toArray(new Termination[0]);
 	}
-
-	/**
-	 * @see ca.neo.model.Ensemble#collectSpikes(boolean)
-	 */
-	public void collectSpikes(boolean collect) {
-		myCollectSpikesFlag = collect;
-	}
-
-	/**
-	 * @see ca.neo.model.Ensemble#getSpikePattern()
-	 */
-	public SpikePattern getSpikePattern() {
-		if (!myCollectSpikesFlag) ourLogger.warn("Warning: collect spikes flag is off"); 
-		return mySpikePattern;
-	}
-	
 	
 }

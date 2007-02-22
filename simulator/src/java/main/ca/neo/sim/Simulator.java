@@ -26,8 +26,6 @@ public interface Simulator {
 	 * changes should be performed by the Ensembles or Neurons themselves, i.e. they 
 	 * should be an explicit part of the model.   
 	 * 
-	 * //TODO: should this just be done in simulator constructor?
-	 * 
 	 * @param network Network to set up for simulation 
 	 */
 	public void initialize(Network network);

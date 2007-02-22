@@ -9,7 +9,6 @@ import java.util.Map;
 
 import ca.neo.model.ExpandableNode;
 import ca.neo.model.Node;
-import ca.neo.model.Origin;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
@@ -32,8 +31,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	private static final long serialVersionUID = 1L;
 	
 	private ExpandableNode[] myExpandableNodes;
-	private Map<String, Origin> myOrigins;
-	private Map<String, Termination> myTerminations;
+	private Map<String, Termination> myExpandedTerminations;
 	
 	/**
 	 * @param name Name of Ensemble
@@ -45,18 +43,8 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 		super(name, nodes);
 		
 		myExpandableNodes = findExpandable(nodes);
+		myExpandedTerminations = new HashMap<String, Termination>(10);
 		
-		myOrigins = new HashMap<String, Origin>(10);
-		Origin[] origins = findOrigins(nodes);
-		for (int i = 0; i < origins.length; i++) {
-			myOrigins.put(origins[i].getName(), origins[i]);
-		}
-		
-		myTerminations = new HashMap<String, Termination>(10);
-		Termination[] terminations = findTerminations(nodes);
-		for (int i = 0; i < terminations.length; i++) {
-			myTerminations.put(terminations[i].getName(), terminations[i]);
-		}
 	}
 
 	//finds neurons with expandable synaptic integrators 
@@ -73,17 +61,18 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	}
 
 	/**
-	 * @see ca.neo.model.Node#getOrigins()
-	 */
-	public Origin[] getOrigins() {
-		return myOrigins.values().toArray(new Origin[0]);
-	}
-
-	/**
 	 * @see ca.neo.model.Ensemble#getTerminations()
 	 */
 	public Termination[] getTerminations() {
-		return myTerminations.values().toArray(new Termination[0]);
+		ArrayList<Termination> result = new ArrayList<Termination>(10);
+		result.addAll(myExpandedTerminations.values());
+
+		Termination[] composites = super.getTerminations();
+		for (int i = 0; i < composites.length; i++) {
+			result.add(composites[i]);
+		}
+		
+		return result.toArray(new Termination[0]);
 	}
 
 	/**
@@ -103,6 +92,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 * @see ca.neo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
 	public synchronized Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+		//TODO: check name for duplicate
 		if (myExpandableNodes.length != weights.length) {
 			throw new StructuralException(weights.length + " sets of weights given for " 
 					+ myExpandableNodes.length + " expandable nodes");
@@ -124,7 +114,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
 		}
 		
-		myTerminations.put(name, result);
+		myExpandedTerminations.put(name, result);
 		
 		return result;
 	}
@@ -133,7 +123,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 * @see ca.neo.model.ExpandableNode#removeTermination(java.lang.String)
 	 */
 	public synchronized void removeTermination(String name) {
-		myTerminations.remove(name);
+		myExpandedTerminations.remove(name);
 	}
 
 	/** 
@@ -144,17 +134,10 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	}
 
 	/**
-	 * @see ca.neo.model.Ensemble#getOrigin(java.lang.String)
-	 */
-	public Origin getOrigin(String name) throws StructuralException {
-		return myOrigins.get(name);
-	}
-
-	/**
 	 * @see ca.neo.model.Ensemble#getTermination(java.lang.String)
 	 */
 	public Termination getTermination(String name) throws StructuralException {
-		return myTerminations.get(name);
+		return myExpandedTerminations.containsKey(name) ? myExpandedTerminations.get(name) : super.getTermination(name);
 	}
 
 }

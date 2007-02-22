@@ -3,6 +3,8 @@
  */
 package ca.neo.model;
 
+import ca.neo.sim.Simulator;
+
 /**
  * <p>A neural circuit, consisting of Nodes such as Ensembles and ExternalInputs. A Network is the 
  * usual object of a simulation. If you are new to this code, what you probably want to 
@@ -123,5 +125,15 @@ public interface Network extends Node, Probeable {
 	 * @param name Name of state to unexpose. 
 	 */
 	public void hideState(String name);
+	
+	/**
+	 * @param simulator The Simulator used to run this Network
+	 */
+	public void setSimulator(Simulator simulator);
+
+	/**
+	 * @return The Simulator used to run this Network
+	 */
+	public Simulator getSimulator();
 	
 }

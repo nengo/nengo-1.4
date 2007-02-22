@@ -436,6 +436,20 @@ public class MU {
 
 	/**
 	 * @param vector Any vector
+	 * @return Mean of vector elements
+	 */
+	public static float mean(float[] vector) {
+		float sum = 0f;
+		
+		for (int i = 0; i < vector.length; i++) {
+			sum += vector[i];
+		}
+		
+		return sum / (float) vector.length;
+	}
+
+	/**
+	 * @param vector Any vector
 	 * @return The vector normalized to 2-norm of 1
 	 */
 	public static float[] normalize(float[] vector) {

@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
+import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.util.MU;
@@ -30,7 +31,6 @@ import ca.neo.util.Memory;
  * 
  * <p>Uses the Moore-Penrose pseudoinverse.</p>
  *  
- * TODO: uniform function as default (additional constructor)  
  * TODO: test
  * 
  * @author Bryan Tripp
@@ -195,6 +195,42 @@ public class WeightedCostApproximator implements LinearApproximator {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * An ApproximatorFactory that produces WeightedCostApproximators. 
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class Factory implements ApproximatorFactory {
+
+		private float myNoise;
+		
+		/**
+		 * @param noise Random noise to add to component functions (proportion of largest value over all functions) 
+		 */
+		public Factory(float noise) {
+			myNoise = noise;
+		}
+
+		/**
+		 * @see ca.neo.math.ApproximatorFactory#getApproximator(float[][], float[][])
+		 */
+		public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
+			return new WeightedCostApproximator(evalPoints, values, getCostFunction(evalPoints[0].length), myNoise);
+		}
+
+		/**
+		 * Note: override to use non-uniform error weighting. 
+		 * 
+		 * @param dimension Dimension of the function to be approximated
+		 * @return A function over the input space that defines relative importance of error at each point (defaults 
+		 * 		to a ConstantFunction) 
+		 */
+		public Function getCostFunction(int dimension) {
+			return new ConstantFunction(dimension, 1);
+		}
+		
 	}
 	
 }
