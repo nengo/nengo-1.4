@@ -6,6 +6,7 @@ package ca.neo.model.neuron.impl;
 import ca.neo.math.PDF;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
+import ca.neo.model.impl.NodeFactory;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.model.neuron.SynapticIntegrator;
@@ -15,7 +16,7 @@ import ca.neo.model.neuron.SynapticIntegrator;
  * 
  * @author Bryan Tripp
  */
-public class LIFNeuronFactory implements NeuronFactory {
+public class LIFNeuronFactory implements NodeFactory {
 
 	private float myTauRC;
 	private float myTauRef;
@@ -39,7 +40,7 @@ public class LIFNeuronFactory implements NeuronFactory {
 	}
 
 	/**
-	 * @see ca.neo.model.neuron.impl.NeuronFactory#make(String)
+	 * @see ca.neo.model.impl.NodeFactory#make(String)
 	 */
 	public Neuron make(String name) throws StructuralException {
 		float maxRate = myMaxRate.sample()[0];

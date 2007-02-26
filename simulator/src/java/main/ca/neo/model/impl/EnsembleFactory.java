@@ -25,7 +25,6 @@ import ca.neo.model.nef.NEFNode;
 import ca.neo.model.nef.impl.NEFEnsembleImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.impl.LIFNeuronFactory;
-import ca.neo.model.neuron.impl.NeuronFactory;
 import ca.neo.util.VectorGenerator;
 import ca.neo.util.impl.RandomHypersphereVG;
 
@@ -42,7 +41,7 @@ public class EnsembleFactory {
 	
 	private static Logger ourLogger = Logger.getLogger(EnsembleFactory.class);
 	
-	private NeuronFactory myDefaultNeuronFactory;
+	private NodeFactory myDefaultNeuronFactory;
 	private VectorGenerator myVectorGenerator;
 	private File myDatabase;
 	
@@ -80,7 +79,7 @@ public class EnsembleFactory {
 	/**
 	 * @param factory NeuronFactory to set as default 
 	 */
-	public void setDefaultNeuronFactory(NeuronFactory factory) {
+	public void setDefaultNeuronFactory(NodeFactory factory) {
 		myDefaultNeuronFactory = factory;
 	}
 	
@@ -88,7 +87,7 @@ public class EnsembleFactory {
 	 * 
 	 * @return The NeuronFactory that is used by default, ie unless a factory is specified in the call to make() 
 	 */
-	public NeuronFactory getDefaultNeuronFactory() {
+	public NodeFactory getDefaultNeuronFactory() {
 		return myDefaultNeuronFactory;
 	}
 	
@@ -170,12 +169,12 @@ public class EnsembleFactory {
 	 * @return NEFEnsemble containing Neurons generated with the given NeuronFactory   
 	 * @throws StructuralException if there is any error attempting to create the ensemble
 	 */
-	public NEFEnsemble make(String name, int n, int dim, NeuronFactory factory) throws StructuralException {
+	public NEFEnsemble make(String name, int n, int dim, NodeFactory factory) throws StructuralException {
 		return doMake(name, n, dim, factory, myVectorGenerator);
 	}
 	
 	//common make(...) implementation 
-	private NEFEnsemble doMake(String name, int n, int dim, NeuronFactory factory, VectorGenerator generator) 
+	private NEFEnsemble doMake(String name, int n, int dim, NodeFactory factory, VectorGenerator generator) 
 			throws StructuralException {
 		
 		NEFNode[] nodes = new NEFNode[n];

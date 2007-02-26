@@ -4,14 +4,14 @@
 package ca.neo.model.nef;
 
 import ca.neo.math.ApproximatorFactory;
-import ca.neo.model.neuron.impl.NeuronFactory;
+import ca.neo.model.impl.NodeFactory;
 import ca.neo.util.VectorGenerator;
 
 public interface NEFEnsembleFactory {
 
-	public NeuronFactory getNeuronFactory();
+	public NodeFactory getNodeFactory();
 	
-	public void setNeuronFactory(NeuronFactory factory);
+	public void setNodeFactory(NodeFactory factory);
 	
 	public VectorGenerator getEncoderFactory();
 	
