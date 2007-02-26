@@ -192,7 +192,7 @@ public abstract class AbstractEnsemble implements Ensemble {
 	 * them into EnsembleOrigins.
 	 * 
 	 * @param nodes Nodes on which to look for Origins
-	 * @return Ensemble Origins encompassing Neuron Origins
+	 * @return Ensemble Origins encompassing Node-level Origins
 	 */
 	private static Origin[] findOrigins(Node[] nodes) {
 		Map<String, List<Origin>> groups = new HashMap<String, List<Origin>>(10);
@@ -227,7 +227,7 @@ public abstract class AbstractEnsemble implements Ensemble {
 	 * groups them into EnsembleTerminations. 
 	 * 
 	 * @param nodes Nodes on which to look for Terminations
-	 * @return Ensemble Terminations encompassing Neuron Terminations 
+	 * @return Ensemble Terminations encompassing Node-level Terminations 
 	 */
 	private static Termination[] findTerminations(Node[] nodes) {
 		Map<String, List<Termination>> groups = new HashMap<String, List<Termination>>(10);

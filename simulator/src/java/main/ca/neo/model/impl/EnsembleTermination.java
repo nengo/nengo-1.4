@@ -14,15 +14,16 @@ import ca.neo.util.Configuration;
 import ca.neo.util.impl.ConfigurationImpl;
 
 /**
- * A Termination that is composed of Terminations onto multiple Neurons. 
- * The dimensions of the Terminations onto each Neuron must be the same.
- * Physically, this corresponds roughly to a set of n axons passing into 
- * a neuron pool. Each Neuron in the pool receives synaptic connections 
- * from as many as n of these neurons (zero weight is equivalent to no 
+ * <p>A Termination that is composed of Terminations onto multiple Nodes. 
+ * The dimensions of the Terminations onto each Node must be the same.</p>
+ * 
+ * <p>Physiologically, this might correspond to a set of n axons passing into 
+ * a neuron pool. Each neuron in the pool receives synaptic connections 
+ * from as many as n of these axons (zero weight is equivalent to no 
  * connection). Sometimes we deal with this set of axons only in terms 
- * of the branches they send to one specific Neuron (a Neuron-level Termination)
+ * of the branches they send to one specific Neuron (a Node-level Termination)
  * but here we deal with all branches (an Emsemble-level Termination). 
- * In either case the spikes transmitted by the axons are the same.  
+ * In either case the spikes transmitted by the axons are the same.</p>  
  * 
  * TODO: test
  *  
@@ -33,17 +34,22 @@ public class EnsembleTermination implements Termination {
 	private static final long serialVersionUID = 1L;
 	
 	private String myName;
-	private Termination[] myNeuronTerminations;
+	private Termination[] myNodeTerminations;
 	private ConfigurationImpl myConfiguration;
 	
-	public EnsembleTermination(String name, Termination[] neuronTerminations) throws StructuralException {
-		checkSameDimension(neuronTerminations, name);
+	/**
+	 * @param name Name of this Termination
+	 * @param nodeTerminations Node-level Terminations that make up this Termination
+	 * @throws StructuralException If dimensions of different terminations are not all the same
+	 */
+	public EnsembleTermination(String name, Termination[] nodeTerminations) throws StructuralException {
+		checkSameDimension(nodeTerminations, name);
 		
 		myName = name;
-		myNeuronTerminations = neuronTerminations;
+		myNodeTerminations = nodeTerminations;
 		
 		myConfiguration = new ConfigurationImpl(this);
-		String[] propertyNames = findSharedProperties(neuronTerminations);
+		String[] propertyNames = findSharedProperties(nodeTerminations);
 		for (int i = 0; i < propertyNames.length; i++) {
 			//not strict on type at this level (may be different types in components)
 			myConfiguration.addProperty(propertyNames[i], Object.class, getProperty(propertyNames[i]));
@@ -81,11 +87,11 @@ public class EnsembleTermination implements Termination {
 	}
 
 	private Object getProperty(String name) {
-		Object result = myNeuronTerminations[0].getConfiguration().getProperty(name);
+		Object result = myNodeTerminations[0].getConfiguration().getProperty(name);
 		
 		boolean mixed = false;
-		for (int i = 1; i < myNeuronTerminations.length && !mixed; i++) {
-			if ( !myNeuronTerminations[i].getConfiguration().getProperty(name).equals(result) ) {
+		for (int i = 1; i < myNodeTerminations.length && !mixed; i++) {
+			if ( !myNodeTerminations[i].getConfiguration().getProperty(name).equals(result) ) {
 				mixed = true;
 			}
 		}
@@ -108,7 +114,7 @@ public class EnsembleTermination implements Termination {
 	 * @see ca.neo.model.Termination#getDimensions()
 	 */
 	public int getDimensions() {
-		return myNeuronTerminations[0].getDimensions();
+		return myNodeTerminations[0].getDimensions();
 	}
 
 	/**
@@ -119,8 +125,8 @@ public class EnsembleTermination implements Termination {
 			throw new SimulationException("Input to this Termination must have dimension " + getDimensions());
 		}
 		
-		for (int i = 0; i < myNeuronTerminations.length; i++) {
-			myNeuronTerminations[i].setValues(values);
+		for (int i = 0; i < myNodeTerminations.length; i++) {
+			myNodeTerminations[i].setValues(values);
 		}
 	}
 
@@ -135,16 +141,16 @@ public class EnsembleTermination implements Termination {
 	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
 	 */
 	public void propertyChange(String propertyName, Object newValue) throws StructuralException {
-		Object[] oldValues = new String[myNeuronTerminations.length];
+		Object[] oldValues = new String[myNodeTerminations.length];
 		
-		for (int i = 0; i < myNeuronTerminations.length; i++) {
-			oldValues[i] = myNeuronTerminations[i].getConfiguration().getProperty(propertyName);
+		for (int i = 0; i < myNodeTerminations.length; i++) {
+			oldValues[i] = myNodeTerminations[i].getConfiguration().getProperty(propertyName);
 			try {
-				myNeuronTerminations[i].getConfiguration().setProperty(propertyName, newValue);
+				myNodeTerminations[i].getConfiguration().setProperty(propertyName, newValue);
 			} catch (StructuralException e) {
 				//roll back changes
 				for (int j = 0; j < i; j++) {
-					myNeuronTerminations[j].getConfiguration().setProperty(propertyName, oldValues[j]); 
+					myNodeTerminations[j].getConfiguration().setProperty(propertyName, oldValues[j]); 
 				}
 				throw new StructuralException(e);
 			}

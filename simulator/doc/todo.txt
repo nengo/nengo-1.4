@@ -1,13 +1,13 @@
 TODO NOW: 
+- DONE use cases for Shu
 - allow decoding of arbitrary outputs in NEFEnsembleImpl and DecodedOrigin
-- make composite Origin (EnsembleOrigin)? 
 - document and implement NEFEnsembleFactory, remove old EnsembleFactory
 - fix bug in LIFSpikeGenerator
+
 - do something about units in relationship between synapticintegrator output and spikegenerator input
 - unify linear terminations at SynapticIntegrator and NEFEnsemble levels 
 - learning at neuron level
 - spike-based learning 
-- use cases for Shu
 - clean up musculoskeletal code
 - RK45 integrator
 
