@@ -30,6 +30,9 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static final float R = 1;
+	private static final float Vth = 1;
+	
 	private float myMaxTimeStep;
 	private float myTauRC;
 	private float myTauRef;
@@ -107,8 +110,6 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		
 		int inputIndex = 0;
 
-		float R = 1;
-		float Vth = 1;
 		boolean spiking = false;
 		for (int i = 0; i < steps; i++) {
 			myTime[i] = time[0] + i*dt;
@@ -130,7 +131,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 				spiking = true;
 				myTimeSinceLastSpike = 0;
 				myVoltage = 0;		
-				myTauRefNext = myTauRef - (float) Math.random() * myMaxTimeStep;
+				myTauRefNext = myTauRef + myMaxTimeStep - 2 * (float) Math.random() * myMaxTimeStep;
 				mySpikeTimes.add(new Float(myTime[i]));
 			}
 		}

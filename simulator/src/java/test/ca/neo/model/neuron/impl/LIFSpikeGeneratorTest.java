@@ -107,12 +107,12 @@ public class LIFSpikeGeneratorTest extends TestCase {
 		LIFSpikeGenerator sg = new LIFSpikeGenerator(maxTimeStep, tauRC[0], tauRef[0]);
 		assertSpikesCloseToRate(sg, current[0], 1);
 		assertSpikesCloseToRate(sg, current[1], 3);
-		assertSpikesCloseToRate(sg, current[2], 3);
+		assertSpikesCloseToRate(sg, current[2], 5);
 				
 		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[0], tauRef[1]);
 		assertSpikesCloseToRate(sg, current[0], 1);
 		assertSpikesCloseToRate(sg, current[1], 4);
-		assertSpikesCloseToRate(sg, current[2], 1);
+		assertSpikesCloseToRate(sg, current[2], 3);
 				
 		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[1], tauRef[0]);
 		assertSpikesCloseToRate(sg, current[0], 1);
