@@ -79,39 +79,4 @@ NOTES:
 	export to Matlab or some other plotting package anyway. We don't have to support every plotting possibility 
 	here.
 
-OLD CODE:
-
-LIFSpikeGenerator
-
-	 * @param stochasticSpikes If true, spikes will sometimes appear in the time step before they are due. 
-	 * 		This is a way to improve the accuracy of the mean spike rate at high rates. (Otherwise with  
-	 * 		constant input we can only have spikes every n steps, where n is an integer -- this works 
-	 * 		badly when we want spikes every 5 steps or less). This calculation takes a little extra time, 
-	 * 		so the default is false. False should be fine if low spike rates are expected, or if the input
-	 * 		contains high-frequency noise, as is usually the case in spiking simulations.  
-
-
-	private static boolean spike(boolean stochastic, float voltage, float increment, float threshold) {
-		boolean result = false;
-		
-		if (stochastic) {
-
-			if (voltage > threshold) {
-				if (Math.random() < (voltage - threshold) / (increment)) {
-					result = true;
-				}
-			} else if (voltage + increment > threshold) {
-				if (Math.random() < (voltage + increment - threshold) / (increment)) {
-					result = true;
-				}
-			}
-
-		} else if (voltage > threshold) { //deterministic
-			result = true;
-		}
-		
-		return result;
-	}
-
-
 	
