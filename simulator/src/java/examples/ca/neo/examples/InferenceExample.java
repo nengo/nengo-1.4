@@ -18,12 +18,13 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.impl.EnsembleFactory;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.nef.impl.DecodedOrigin;
+import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.model.nef.impl.NEFEnsembleImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.plot.Plotter;
@@ -43,19 +44,12 @@ public class InferenceExample {
 	}
 	
 	public static Network createNetwork() throws StructuralException {
-		EnsembleFactory ef = new EnsembleFactory() {
-			public NEFEnsemble construct(String name, Neuron[] neurons, float[][] encoders) throws StructuralException {
-				VectorGenerator vg = new RandomHypersphereVG(true, 1, 0);
-				int dim = encoders[0].length;
-				ApproximatorFactory af = new ApproximatorFactory() {
-					public LinearApproximator getApproximator(float[][] evalPoints,	float[][] values) {
-						return new WeightedCostApproximator(evalPoints, values, new ConstantFunction(evalPoints[0].length, 1), .1f);
-					}
-				};				
-				return new PDFEnsemble(name, neurons, encoders, af, vg.genVectors(300*dim, dim));
-			}			
+		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl() {
+			protected NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory af, float[][] evalPoints) throws StructuralException {
+				return new PDFEnsemble(name, (Neuron[]) nodes, encoders, af, evalPoints);
+			}
 		};
-		ef.setVectorGenerator(new RandomHypersphereVG(true, 1f, 1f));
+		ef.setEncoderFactory(new RandomHypersphereVG(true, 1f, 1f));
 		
 		int dimension = 2; //dimension of each PDF
 		

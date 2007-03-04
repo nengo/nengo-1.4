@@ -10,10 +10,11 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.impl.EnsembleFactory;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.NEFEnsembleFactory;
+import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
@@ -45,7 +46,7 @@ public class FuzzyLogicExample {
 		};
 		FunctionInput in = new FunctionInput("input", functions, Units.UNK);
 		
-		EnsembleFactory ef = new EnsembleFactory();
+		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 		
 		NEFEnsemble A = ef.make("A", 100, 1, "A", false); 
 		NEFEnsemble B = ef.make("B", 100, 1, "B", false); 

@@ -16,10 +16,11 @@ import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
-import ca.neo.model.impl.EnsembleFactory;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.NEFEnsembleFactory;
+import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
@@ -36,7 +37,7 @@ public class IntegratorExample {
 		FunctionInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
 		network.addNode(input);
 		
-		EnsembleFactory ef = new EnsembleFactory();
+		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 		
 		NEFEnsemble integrator = ef.make("integrator", 500, 1, "integrator1", false);  
 		network.addNode(integrator);

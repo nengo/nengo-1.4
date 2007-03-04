@@ -67,14 +67,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 					+ encoders.length + " encoding vectors");
 		}
 		
+		myDimension = encoders[0].length;
 		for (int i = 1; i < encoders.length; i++) {
 			if (encoders[i].length != myDimension) {
 				throw new StructuralException("Encoders have different lengths");
 			}
-		}
-		
-		myDimension = encoders[0].length;
+		}		
 		myEncoders = encoders;
+		
 		myDecodedTerminations = new HashMap<String, DecodedTermination>(10);
 		myPlasticityRules = new HashMap<String, EnsemblePlasticityRule>(10);
 		myApproximatorFactory = factory;

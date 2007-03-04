@@ -1,7 +1,7 @@
 TODO NOW: 
 - DONE use cases for Shu
 - DONE allow decoding of arbitrary outputs in NEFEnsembleImpl and DecodedOrigin
-- document and implement NEFEnsembleFactory, remove old EnsembleFactory
+- DONE document and implement NEFEnsembleFactory, remove old EnsembleFactory
 - fix bug in LIFSpikeGenerator
 
 - do something about units in relationship between synapticintegrator output and spikegenerator input
