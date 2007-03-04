@@ -1,6 +1,6 @@
 TODO NOW: 
 - DONE use cases for Shu
-- allow decoding of arbitrary outputs in NEFEnsembleImpl and DecodedOrigin
+- DONE allow decoding of arbitrary outputs in NEFEnsembleImpl and DecodedOrigin
 - document and implement NEFEnsembleFactory, remove old EnsembleFactory
 - fix bug in LIFSpikeGenerator
 

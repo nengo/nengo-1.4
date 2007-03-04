@@ -71,7 +71,7 @@ public class DecodableEnsembleImpl extends AbstractEnsemble implements Decodable
 		float[][] values = probe.getData().getValues();
 		
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, values);
-		return new DecodedOrigin(name, getNodes(), functions, approximator);
+		return new DecodedOrigin(name, getNodes(), nodeOrigin, functions, approximator);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class DecodableEnsembleImpl extends AbstractEnsemble implements Decodable
 		}
 		
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, values);
-		return new DecodedOrigin(name, getNodes(), functions, approximator);
+		return new DecodedOrigin(name, getNodes(), nodeOrigin, functions, approximator);
 	}
 
 	/**

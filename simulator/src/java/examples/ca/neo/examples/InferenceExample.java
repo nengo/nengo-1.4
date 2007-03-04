@@ -274,7 +274,7 @@ public class InferenceExample {
 					evalPointsND[j][dim] = evalPoints[j];
 				}
 				try {
-					result[i] = getFiringRates(i, evalPointsND);
+					result[i] = getConstantOutput(i, evalPointsND, Neuron.AXON);
 				} catch (SimulationException e) {
 					throw new Error("Neuron " + i + " does not have the standard 'AXON' Origin");
 				}

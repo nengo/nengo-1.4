@@ -17,7 +17,6 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.nef.NEFNode;
-import ca.neo.model.neuron.Neuron;
 import ca.neo.util.MU;
 
 /**
@@ -34,6 +33,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	
 	private String myName;
 	private Node[] myNodes;
+	private String myNodeOrigin;
 	private Function[] myFunctions;
 	private float[][] myDecoders;
 	private SimulationMode myMode;
@@ -44,6 +44,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	 *  
 	 * @param name Name of this Origin
 	 * @param nodes Nodes that belong to the NEFEnsemble from which this Origin arises
+	 * @param nodeOrigin Name of the Origin on each given node from which output is to be decoded  
 	 * @param functions Output Functions on the vector that is represented by the NEFEnsemble 
 	 * 		(one Function per dimension of output). For example if the Origin is to output 
 	 * 		x1*x2, where the ensemble represents [x1 x1], then one 2D function would be 
@@ -52,13 +53,14 @@ public class DecodedOrigin implements Origin, Resettable {
 	 * @throws StructuralException if functions do not all have the same input dimension (we 
 	 * 		don't check against the state dimension at this point)
 	 */
-	public DecodedOrigin(String name, Node[] nodes, Function[] functions, LinearApproximator approximator) 
+	public DecodedOrigin(String name, Node[] nodes, String nodeOrigin, Function[] functions, LinearApproximator approximator) 
 			throws StructuralException {
 		
 		checkFunctionDimensions(functions);
 		
 		myName = name;
 		myNodes = nodes;
+		myNodeOrigin = nodeOrigin;
 		myFunctions = functions; 
 		myDecoders = findDecoders(nodes, functions, approximator);  
 		myMode = SimulationMode.DEFAULT;
@@ -71,6 +73,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	 * 
 	 * @param name As in other constructor
 	 * @param nodes As in other constructor
+	 * @param nodeOrigin Name of the Origin on each given node from which output is to be decoded  
 	 * @param functions As in other constructor
 	 * @param decoders Decoding vectors which are scaled by the main output of each Node, and 
 	 * 		then summed, to estimate the same function of the ensembles state vector that is 
@@ -83,7 +86,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	 * 		(ie all elements with same length), or if the number of columns in decoders is not equal 
 	 * 		to the number of functions 
 	 */
-	public DecodedOrigin(String name, NEFNode[] nodes, Function[] functions, float[][] decoders) throws StructuralException {
+	public DecodedOrigin(String name, NEFNode[] nodes, String nodeOrigin, Function[] functions, float[][] decoders) throws StructuralException {
 		checkFunctionDimensions(functions);
 		
 		if (!MU.isMatrix(decoders)) {
@@ -100,6 +103,7 @@ public class DecodedOrigin implements Origin, Resettable {
 			
 		myName = name;
 		myNodes = nodes;
+		myNodeOrigin = nodeOrigin;
 		myFunctions = functions;
 		myDecoders = decoders;
 		myMode = SimulationMode.DEFAULT;
@@ -198,7 +202,7 @@ public class DecodedOrigin implements Origin, Resettable {
 		} else {
 			for (int i = 0; i < myNodes.length; i++) {
 				try {
-					InstantaneousOutput o = myNodes[i].getOrigin(Neuron.AXON).getValues();
+					InstantaneousOutput o = myNodes[i].getOrigin(myNodeOrigin).getValues();
 
 					float val = 0; 
 					if (o instanceof SpikeOutput) {
@@ -206,7 +210,7 @@ public class DecodedOrigin implements Origin, Resettable {
 					} else if (o instanceof RealOutput) {
 						val = ((RealOutput) o).getValues()[0];
 					} else {
-						throw new Error("Neuron output is of type " + o.getClass().getName() 
+						throw new Error("Node output is of type " + o.getClass().getName() 
 							+ ". DecodedOrigin can only deal with RealOutput and SpikeOutput, so it apparently has to be updated");
 					}
 					

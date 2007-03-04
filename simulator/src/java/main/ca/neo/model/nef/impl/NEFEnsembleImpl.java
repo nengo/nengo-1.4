@@ -26,7 +26,6 @@ import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
-import ca.neo.model.neuron.Neuron;
 import ca.neo.model.plasticity.EnsemblePlasticityRule;
 import ca.neo.util.MU;
 
@@ -84,21 +83,21 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	}
 	
 	/**
-	 * TODO: fix
 	 * @param evalPoints Vector points at which to find output (each one must have same dimension as
 	 * 		encoder)
+	 * @param origin Name of Origin from which to collect output for each Node
 	 * @return Output of each Node at each evaluation point (1st dimension corresponds to Node) 
 	 * @throws StructuralException If CONSTANT_RATE is not supported by any Node
 	 */
-	protected float[][] getAllFiringRates(float[][] evalPoints) throws StructuralException {
+	protected float[][] getConstantOutputs(float[][] evalPoints, String origin) throws StructuralException {
 		NEFNode[] nodes = (NEFNode[]) getNodes();		
 		float[][] result = new float[nodes.length][];
 		
 		for (int i = 0; i < nodes.length; i++) {			
 			try {
-				result[i] = getFiringRates(i, evalPoints);
+				result[i] = getConstantOutput(i, evalPoints, origin);
 			} catch (SimulationException e) {
-				throw new Error("Node " + i + " does not have the standard 'AXON' Origin");
+				throw new StructuralException("Node " + i + " does not have the Origin " + origin);
 			}
 		}
 
@@ -109,11 +108,12 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @param nodeIndex Index of Node for which to find output at various inputs
 	 * @param evalPoints Vector points at which to find output (each one must have same dimension as
 	 * 		encoder)
+	 * @param origin Name of Origin from which to collect output
 	 * @return Output of indexed Node at each evaluation point 
 	 * @throws StructuralException If CONSTANT_RATE is not supported by the given Node
-	 * @throws SimulationException If the Node does not have an Origin with the standard name Neuron.AXON 
+	 * @throws SimulationException If the Node does not have an Origin with the given name  
 	 */
-	protected float[] getFiringRates(int neuronIndex, float[][] evalPoints) 
+	protected float[] getConstantOutput(int neuronIndex, float[][] evalPoints, String origin) 
 			throws StructuralException, SimulationException {
 		
 		float[] result = new float[evalPoints.length];
@@ -125,7 +125,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			node.setMode(SimulationMode.CONSTANT_RATE);
 			if ( !node.getMode().equals(SimulationMode.CONSTANT_RATE) ) {
 				throw new StructuralException(
-					"To find decoders using default methods, all Nodes must support CONSTANT_RATE simulation mode");
+					"To find decoders using this method, all Nodes must support CONSTANT_RATE simulation mode");
 			}
 			
 			for (int i = 0; i < result.length; i++) {
@@ -133,7 +133,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				
 				node.run(0f, 0f);
 				
-				RealOutput output = (RealOutput) node.getOrigin(Neuron.AXON).getValues();
+				RealOutput output = (RealOutput) node.getOrigin(origin).getValues();
 				result[i] = output.getValues()[0];
 			}
 			
@@ -162,12 +162,12 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {		
 		if (!myDecodingApproximators.containsKey(nodeOrigin)) {
-			float[][] outputs = getAllFiringRates(myEvalPoints);
+			float[][] outputs = getConstantOutputs(myEvalPoints, nodeOrigin);
 			LinearApproximator approximator = myApproximatorFactory.getApproximator(myEvalPoints, outputs);
 			myDecodingApproximators.put(nodeOrigin, approximator);
 		}		
 		
-		DecodedOrigin result = new DecodedOrigin(name, (NEFNode[]) getNodes(), functions, myDecodingApproximators.get(nodeOrigin));
+		DecodedOrigin result = new DecodedOrigin(name, (NEFNode[]) getNodes(), nodeOrigin, functions, myDecodingApproximators.get(nodeOrigin));
 		super.addDecodedOrigin(name, result);
 		
 		return result;
