@@ -55,6 +55,7 @@ public class NetworkImpl implements Network {
 		myProbeableStates = new HashMap(30);
 		myExposedOrigins = new HashMap(10);
 		myExposedTerminations = new HashMap(10);
+		myMode = SimulationMode.DEFAULT;
 	}
 	
 	/**
