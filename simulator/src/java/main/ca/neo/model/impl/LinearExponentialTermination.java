@@ -5,7 +5,6 @@ import ca.neo.model.RealOutput;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SpikeOutput;
-import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.util.Configuration;
 import ca.neo.util.impl.ConfigurationImpl;
@@ -34,6 +33,7 @@ public class LinearExponentialTermination implements Termination, Resettable {
 	private float myCurrent = 0;
 	private float myNetSpikeInput;
 	private float myNetRealInput;
+	private InstantaneousOutput myRawInput;
 	
 	private ConfigurationImpl myConfiguration;
 	
@@ -75,6 +75,20 @@ public class LinearExponentialTermination implements Termination, Resettable {
 	public int getDimensions() {
 		return myWeights.length;
 	}
+	
+	/**
+	 * @return List of synaptic weights for each input channel
+	 */
+	public float[] getWeights() {
+		return myWeights;
+	}
+	
+	/**
+	 * @return The most recent input to the Termination
+	 */
+	public InstantaneousOutput getInput() {
+		return myRawInput;
+	}
 
 	/**
 	 * @param values Can be either SpikeOutput or RealOutput 
@@ -84,6 +98,8 @@ public class LinearExponentialTermination implements Termination, Resettable {
 		if (values.getDimension() != getDimensions()) {
 			throw new SimulationException("Input must have dimension " + getDimensions());
 		}
+		
+		myRawInput = values;
 
 		myNetSpikeInput = (values instanceof SpikeOutput) ? combineSpikes((SpikeOutput) values, myWeights) : 0;
 		myNetRealInput = (values instanceof RealOutput) ? combineReals((RealOutput) values, myWeights) : 0;

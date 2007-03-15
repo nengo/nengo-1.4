@@ -6,6 +6,7 @@ package ca.neo.model.neuron;
 import java.io.Serializable;
 
 import ca.neo.model.Resettable;
+import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.util.TimeSeries1D;
@@ -56,7 +57,8 @@ public interface SynapticIntegrator extends Resettable, Serializable {
 	 * 		optionally other times. Generally speaking additional values should be 
 	 * 		provided if the current varies substantially during the interval, but it is 
 	 * 		left to the implementation to interpret 'substantially'.  
+	 * @throws SimulationException
 	 */
-	public TimeSeries1D run(float startTime, float endTime);
+	public TimeSeries1D run(float startTime, float endTime) throws SimulationException;
 	
 }

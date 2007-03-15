@@ -7,7 +7,7 @@ import ca.neo.math.Function;
 import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.model.plasticity.EnsemblePlasticityRule;
+import ca.neo.model.plasticity.Plastic;
 
 /**
  * <p>A group of Nodes that represent a scalar, vector, or function, as 
@@ -17,7 +17,7 @@ import ca.neo.model.plasticity.EnsemblePlasticityRule;
  * 
  * @author Bryan Tripp
  */
-public interface NEFEnsemble extends DecodableEnsemble {
+public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	
 	/**
 	 * Standard name for the Origin corresponding to the decoded estimate of the state variables 
@@ -92,13 +92,5 @@ public interface NEFEnsemble extends DecodableEnsemble {
 	 * @param name Name of Termination to remove. 
 	 */
 	public void removeDecodedTermination(String name);
-	
-	/**
-	 * @param name Name of termination to which plasticity rule applies.  
-	 * @param rule A rule that defines how the termination's transformation matrix elements change during simulation
-	 * @throws StructuralException if the named Termination does not exist or is not a DecodedTermination
-	 */
-	public void setTerminationPlasticityRule(String name, EnsemblePlasticityRule rule) throws StructuralException;
-	
 	
 }

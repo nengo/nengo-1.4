@@ -8,11 +8,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.RealOutput;
+import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.LinearExponentialTermination;
 import ca.neo.model.neuron.ExpandableSynapticIntegrator;
+import ca.neo.model.plasticity.Plastic;
+import ca.neo.model.plasticity.PlasticityRule;
 import ca.neo.util.TimeSeries1D;
 import ca.neo.util.impl.TimeSeries1DImpl;
 
@@ -31,13 +36,14 @@ import ca.neo.util.impl.TimeSeries1DImpl;
  *  
  * @author Bryan Tripp
  */
-public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
+public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, Plastic {
 
 	private static final long serialVersionUID = 1L;
 	
 	private float myMaxTimeStep;
 	private Units myCurrentUnits;
 	private Map<String, LinearExponentialTermination> myTerminations;	
+	private Map<String, PlasticityRule> myPlasticityRules;
 
 	/**
 	 * @param maxTimeStep Maximum length of integration time step. Shorter steps may be used to better match
@@ -53,7 +59,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 	/**
 	 * @see ca.neo.model.neuron.SynapticIntegrator#run(float, float)
 	 */
-	public TimeSeries1D run(float startTime, float endTime) {
+	public TimeSeries1D run(float startTime, float endTime) throws SimulationException {
 		float len = endTime - startTime;
 		int steps = (int) Math.ceil(len / myMaxTimeStep);
 		float dt = len / steps;
@@ -82,8 +88,40 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 				currents[i] = update(myTerminations.values(), false, i < steps ? dt : 0, dt); 
 			}			
 		}
+		
+		learn(endTime - startTime);
 				
 		return new TimeSeries1DImpl(times, currents, myCurrentUnits);
+	}
+	
+	//run plasticity rules (assume constant input/state over given elapsed time)
+	private void learn(float elapsedTime) throws SimulationException {
+		Iterator ruleIter = myPlasticityRules.keySet().iterator();
+		while (ruleIter.hasNext()) {
+			String name = (String) ruleIter.next();
+			LinearExponentialTermination termination = myTerminations.get(name);
+			PlasticityRule rule = myPlasticityRules.get(name);
+			
+			Iterator termIter = myTerminations.keySet().iterator();
+			while (termIter.hasNext()) {
+				LinearExponentialTermination t = myTerminations.get(termIter.next());
+				InstantaneousOutput input = t.getInput();
+				//TODO: allow spikes when rules support spikes
+				if (input instanceof RealOutput) {
+					rule.setTerminationState(t.getName(), ((RealOutput) input).getValues());					
+				}
+			}
+			
+			//TODO: allow spikes when rules support spikes
+			InstantaneousOutput input = termination.getInput();
+			if (input instanceof RealOutput) {
+				float[] weights = termination.getWeights();
+				float[][] derivative = rule.getDerivative(new float[][]{weights}, ((RealOutput) termination.getInput()).getValues());
+				for (int i = 0; i < weights.length; i++) {
+					weights[i] += derivative[0][i] * elapsedTime;
+				}					
+			}
+		}
 	}
 
 	//update current in all Terminations 
@@ -143,6 +181,13 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 	 */
 	public Termination getTermination(String name) throws StructuralException {
 		return myTerminations.get(name);
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.neo.model.plasticity.PlasticityRule)
+	 */
+	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
+		myPlasticityRules.put(terminationName, rule);
 	}
 
 }

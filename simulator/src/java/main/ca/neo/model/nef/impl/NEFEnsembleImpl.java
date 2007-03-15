@@ -26,7 +26,7 @@ import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
-import ca.neo.model.plasticity.EnsemblePlasticityRule;
+import ca.neo.model.plasticity.PlasticityRule;
 import ca.neo.util.MU;
 
 /**
@@ -45,7 +45,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private int myDimension;
 	private float[][] myEncoders;
 	private Map<String, DecodedTermination> myDecodedTerminations;
-	private Map<String, EnsemblePlasticityRule> myPlasticityRules;
+	private Map<String, PlasticityRule> myPlasticityRules;
 	private Map<String, LinearApproximator> myDecodingApproximators;
 	private ApproximatorFactory myApproximatorFactory;
 	private float[][] myEvalPoints;
@@ -76,7 +76,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myEncoders = encoders;
 		
 		myDecodedTerminations = new HashMap<String, DecodedTermination>(10);
-		myPlasticityRules = new HashMap<String, EnsemblePlasticityRule>(10);
+		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 		myApproximatorFactory = factory;
 		myDecodingApproximators = new HashMap<String, LinearApproximator>(10);
 		myEvalPoints = evalPoints;
@@ -298,12 +298,12 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		Iterator ruleIter = myPlasticityRules.keySet().iterator();
 		while (ruleIter.hasNext()) {
 			String name = (String) ruleIter.next();
-			DecodedTermination termination = (DecodedTermination) myDecodedTerminations.get(name);
-			EnsemblePlasticityRule rule = (EnsemblePlasticityRule) myPlasticityRules.get(name);
+			DecodedTermination termination = myDecodedTerminations.get(name);
+			PlasticityRule rule = myPlasticityRules.get(name);
 			
 			Iterator termIter = myDecodedTerminations.keySet().iterator();
 			while (termIter.hasNext()) {
-				DecodedTermination t = (DecodedTermination) myDecodedTerminations.get(termIter.next());
+				DecodedTermination t = myDecodedTerminations.get(termIter.next());
 				rule.setTerminationState(t.getName(), t.getOutput());
 			}
 			
@@ -375,14 +375,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	}
 
 	/**
-	 * @see ca.neo.model.nef.NEFEnsemble#setTerminationPlasticityRule(java.lang.String, ca.neo.model.plasticity.EnsemblePlasticityRule)
+	 * @see ca.neo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.neo.model.plasticity.PlasticityRule)
 	 */
-	public void setTerminationPlasticityRule(String name, EnsemblePlasticityRule rule) throws StructuralException {
-		if (!myDecodedTerminations.containsKey(name)) {
-			throw new StructuralException("The DecodedTermination " + name + " does not exist");
+	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
+		if (!myDecodedTerminations.containsKey(terminationName)) {
+			throw new StructuralException("The DecodedTermination " + terminationName + " does not exist");
 		}
 		
-		myPlasticityRules.put(name, rule);
+		myPlasticityRules.put(terminationName, rule);
 	}
 
 }

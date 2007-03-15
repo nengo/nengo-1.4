@@ -5,7 +5,7 @@ package ca.neo.model.plasticity.impl;
 
 import ca.neo.math.Function;
 import ca.neo.model.nef.NEFEnsemble;
-import ca.neo.model.plasticity.EnsemblePlasticityRule;
+import ca.neo.model.plasticity.PlasticityRule;
 
 /**
  * A basic implementation of EnsemblePlasticityRule. The learning rate is defined by a function of four inputs: 
@@ -20,7 +20,7 @@ import ca.neo.model.plasticity.EnsemblePlasticityRule;
  * 
  * @author Bryan Tripp
  */
-public class BasicEnsemblePlasticityRule implements EnsemblePlasticityRule {
+public class BasicEnsemblePlasticityRule implements PlasticityRule {
 
 	private static final String ourOriginName = NEFEnsemble.X;
 	
@@ -51,7 +51,7 @@ public class BasicEnsemblePlasticityRule implements EnsemblePlasticityRule {
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.EnsemblePlasticityRule#setTerminationState(java.lang.String, float[])
+	 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, float[])
 	 */
 	public void setTerminationState(String name, float[] state) {
 		if (name.equals(myModTermName)) {
@@ -60,7 +60,7 @@ public class BasicEnsemblePlasticityRule implements EnsemblePlasticityRule {
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.EnsemblePlasticityRule#setOriginState(java.lang.String, float[])
+	 * @see ca.neo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, float[])
 	 */
 	public void setOriginState(String name, float[] state) {
 		if (name.equals(ourOriginName)) {
@@ -69,7 +69,7 @@ public class BasicEnsemblePlasticityRule implements EnsemblePlasticityRule {
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.EnsemblePlasticityRule#getDerivative(float[][], float[])
+	 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], float[])
 	 */
 	public float[][] getDerivative(float[][] transform, float[] input) {
 		float[][] result = new float[transform.length][];

@@ -7,9 +7,13 @@ package ca.neo.model.plasticity;
  * Specifies how the termination weights of an NEFEnsemble are modified depending 
  * on presynaptic and postsynaptic state.
  * 
+ * TODO: change to use InstantaneousOutputs to allow spiking 
+ * TODO: write basic spiking rule 
+ * TODO: write composite that delegates to spiking and rate rules
+ * 
  * @author Bryan Tripp
  */
-public interface EnsemblePlasticityRule {
+public interface PlasticityRule {
 	
 	/**
 	 * Provides potentially modulatory input to the rule.
