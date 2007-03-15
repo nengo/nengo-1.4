@@ -25,6 +25,7 @@ import ca.neo.plot.Plotter;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
 import ca.neo.util.Probe;
+import ca.neo.util.TimeSeries;
 
 public class IntegratorExample {
 
@@ -75,8 +76,11 @@ public class IntegratorExample {
 			simulator.run(0f, 1f, .0002f, SimulationMode.DEFAULT);
 			System.out.println("Run time: " + ((System.currentTimeMillis() - startTime)/1000f) );
 		
+			TimeSeries integratorData = integratorRecorder.getData();
+			integratorData.getLabels()[0] = "decoded output";
+			
 			Plotter.plot(inputRecorder.getData(), "Input");
-			Plotter.plot(integratorRecorder.getData(), .005f, "Integrator");
+			Plotter.plot(integratorData, .005f, "Integrator");
 			Plotter.plot(neuronRecorder.getData(), "Neuron #0");
 			
 			Plotter.plot(((Ensemble) network.getNode("integrator")).getSpikePattern());
