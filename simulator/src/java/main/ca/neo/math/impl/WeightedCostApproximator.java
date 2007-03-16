@@ -141,7 +141,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		Matrix sInv = svd.getS().inverse();
 
 		int i = 0; 
-		while (svd.getS().get(i, i) > minSV) i++;
+		while (i < svd.getS().getRowDimension() && svd.getS().get(i, i) > minSV) i++;
 
 		ourLogger.info("Using " + i + " singular values for pseudo-inverse");
 		
