@@ -141,7 +141,7 @@ public class EnsembleTermination implements Termination {
 	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
 	 */
 	public void propertyChange(String propertyName, Object newValue) throws StructuralException {
-		Object[] oldValues = new String[myNodeTerminations.length];
+		Object[] oldValues = new Object[myNodeTerminations.length];
 		
 		for (int i = 0; i < myNodeTerminations.length; i++) {
 			oldValues[i] = myNodeTerminations[i].getConfiguration().getProperty(propertyName);
