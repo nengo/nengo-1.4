@@ -71,7 +71,7 @@ public class FunctionInput implements Node, Probeable {
 	}
 
 	/**
-	 * @see ca.neo.model.Origin#getName()
+	 * @see ca.neo.model.Node#getName()
 	 */
 	public String getName() {
 		return myName;

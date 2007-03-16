@@ -375,6 +375,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	}
 
 	/**
+	 * TODO: should there be a pass-through option as in EnsembleImpl? 
+	 * 
 	 * @see ca.neo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.neo.model.plasticity.PlasticityRule)
 	 */
 	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
