@@ -32,20 +32,20 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1, Units.ACU);
 		assertEquals(0, si.getTerminations().length);
 		
-		si.addTermination("test1", new float[]{1f, 1f}, 1f);
+		si.addTermination("test1", new float[]{1f, 1f}, 1f, false);
 		assertEquals(1, si.getTerminations().length);
 		assertEquals("test1", si.getTerminations()[0].getName());
 		assertEquals(2, si.getTerminations()[0].getDimensions());
 		assertEquals(new Float(1), si.getTerminations()[0].getConfiguration().getProperty(Termination.TAU_PSC));
 		
-		si.addTermination("test2", new float[0], 1f);
+		si.addTermination("test2", new float[0], 1f, false);
 		assertEquals(2, si.getTerminations().length);
 		
 		si.removeTermination("test2");
 		assertEquals(1, si.getTerminations().length);		
 		
 		try {
-			si.addTermination("test1", new float[0], 1f);
+			si.addTermination("test1", new float[0], 1f, false);
 			fail("Should have thrown exception due to duplicate termination name");
 		} catch (StructuralException e) {} //exception is expected
 	}
@@ -55,8 +55,8 @@ public class LinearSynapticIntegratorTest extends TestCase {
 	 */
 	public void testRun() throws StructuralException, SimulationException {
 		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(.001f, Units.ACU);
-		si.addTermination("one", new float[]{1f}, 1f);
-		si.addTermination("two", new float[]{1f}, 1f);
+		si.addTermination("one", new float[]{1f}, 1f, false);
+		si.addTermination("two", new float[]{1f}, 1f, false);
 
 		Termination[] t = si.getTerminations();
 		
@@ -78,7 +78,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 	 */
 	public void testReset() throws StructuralException, SimulationException {
 		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(.001f, Units.ACU);
-		si.addTermination("test", new float[]{1f}, 1f);
+		si.addTermination("test", new float[]{1f}, 1f, false);
 		
 		Termination t = si.getTerminations()[0];
 		t.setValues(new SpikeOutputImpl(new boolean[]{true}, Units.SPIKES));		

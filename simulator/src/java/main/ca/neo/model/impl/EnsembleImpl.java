@@ -12,6 +12,8 @@ import ca.neo.model.Node;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.model.plasticity.Plastic;
+import ca.neo.model.plasticity.PlasticityRule;
 
 /**
  * <p>Default implementation of Ensemble.</p>
@@ -26,7 +28,7 @@ import ca.neo.model.Termination;
  * 
  * @author Bryan Tripp
  */
-public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
+public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Plastic {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -43,8 +45,24 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 		super(name, nodes);
 		
 		myExpandableNodes = findExpandable(nodes);
-		myExpandedTerminations = new HashMap<String, Termination>(10);
+		myExpandedTerminations = new HashMap<String, Termination>(10);		
+	}
+	
+	public EnsembleImpl(String name, NodeFactory factory, int n) throws StructuralException {
+		super(name, make(factory, n));
 		
+		myExpandableNodes = findExpandable(getNodes());
+		myExpandedTerminations = new HashMap<String, Termination>(10);				
+	}
+	
+	private static Node[] make(NodeFactory factory, int n) throws StructuralException {
+		Node[] result = new Node[n];
+		
+		for (int i = 0; i < n; i++) {
+			result[i] = factory.make("node " + i);
+		}
+		
+		return result;
 	}
 
 	//finds neurons with expandable synaptic integrators 
@@ -138,6 +156,19 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 */
 	public Termination getTermination(String name) throws StructuralException {
 		return myExpandedTerminations.containsKey(name) ? myExpandedTerminations.get(name) : super.getTermination(name);
+	}
+
+	/**
+	 * Sets the given plasticity rule for all Plastic Nodes in the Ensemble.
+	 *  
+	 * @see ca.neo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.neo.model.plasticity.PlasticityRule)
+	 */
+	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
+		for (int i = 0; i < myExpandableNodes.length; i++) {
+			if (myExpandableNodes[i] instanceof Plastic) {
+				((Plastic) myExpandableNodes[i]).setPlasticityRule(terminationName, rule);				
+			}
+		}
 	}
 
 }

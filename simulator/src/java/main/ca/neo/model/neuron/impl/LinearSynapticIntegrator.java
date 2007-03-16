@@ -54,6 +54,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		myMaxTimeStep = maxTimeStep * 1.01f; //increased slightly because float/float != integer 
 		myCurrentUnits = currentUnits;
 		myTerminations = new HashMap<String, LinearExponentialTermination>(10);
+		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 	}
 	
 	/**
@@ -157,15 +158,17 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	}
 
 	/**
-	 * @see ca.neo.model.neuron.ExpandableSynapticIntegrator#addTermination(java.lang.String, float[], float)
+	 * @see ca.neo.model.neuron.ExpandableSynapticIntegrator#addTermination(java.lang.String, float[], float, boolean)
 	 */
-	public Termination addTermination(String name, float[] weights, float tauPSC) throws StructuralException {
+	public Termination addTermination(String name, float[] weights, float tauPSC, boolean modulatory) throws StructuralException {
 		if (myTerminations.containsKey(name)) {
 			throw new StructuralException("This SynapticIntegrator already has a Termination named " + name);
 		}
 		
 		LinearExponentialTermination result = new LinearExponentialTermination(name, weights, tauPSC); 
+		result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(modulatory));
 		myTerminations.put(name, result);
+		
 		return result;
 	}
 

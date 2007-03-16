@@ -34,8 +34,9 @@ public interface ExpandableNode extends Node {
 	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException;
 	
 	/**
-	 * @param name Name of Termination to remove. 
+	 * @param name Name of Termination to remove.
+	 * @throws StructuralException 
 	 */
-	public void removeTermination(String name);
+	public void removeTermination(String name) throws StructuralException;
 	
 }

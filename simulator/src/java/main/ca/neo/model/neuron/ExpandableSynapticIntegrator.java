@@ -26,11 +26,13 @@ public interface ExpandableSynapticIntegrator extends SynapticIntegrator {
 	 * @param tauPSC Time constant of post-synaptic current decay (all Terminations have  
 	 * 		this property but it may have slightly different interpretations depending on 
 	 * 		the SynapticIntegrator or other properties of the Termination).
+	 * @param modulatory If true, inputs to the Termination are not summed with other inputs (they 
+	 * 		only have modulatory effects, eg on plasticity, which must be defined elsewhere).   
 	 * @return resulting Termination
 	 * @throws SimulationException if there is already a Termination of the same name on this 
 	 * 		SynapticIntegrator  
 	 */
-	public Termination addTermination(String name, float[] weights, float tauPSC) throws StructuralException;
+	public Termination addTermination(String name, float[] weights, float tauPSC, boolean modulatory) throws StructuralException;
 	
 	/**
 	 * @param name Name of Termination to remove. 

@@ -86,7 +86,7 @@ public class SpikingNeuronTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.run(float, float)'
 	 */
 	public void testRun() throws StructuralException, SimulationException {
-		myIntegrator.addTermination("test", new float[]{1}, .005f);
+		myIntegrator.addTermination("test", new float[]{1}, .005f, false);
 		myIntegrator.getTerminations()[0].setValues(new RealOutputImpl(new float[]{5}, Units.SPIKES_PER_S));
 		
 		myNeuron.run(0, .005f);

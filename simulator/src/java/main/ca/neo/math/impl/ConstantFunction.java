@@ -25,6 +25,13 @@ public class ConstantFunction implements Function {
 		myDimension = dimension;
 		myValue = value;
 	}
+	
+	/**
+	 * @param value The new constant result of the function
+	 */
+	public void setValue(float value) {
+		myValue = value;
+	}
 
 	/**
 	 * @see ca.neo.math.Function#getDimension()

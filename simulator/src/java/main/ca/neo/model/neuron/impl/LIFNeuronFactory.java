@@ -3,6 +3,8 @@
  */
 package ca.neo.model.neuron.impl;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.math.PDF;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
@@ -18,6 +20,8 @@ import ca.neo.model.neuron.SynapticIntegrator;
  */
 public class LIFNeuronFactory implements NodeFactory {
 
+	private static Logger ourLogger = Logger.getLogger(LIFNeuronFactory.class);
+	
 	private float myTauRC;
 	private float myTauRef;
 	private PDF myMaxRate;
@@ -43,22 +47,26 @@ public class LIFNeuronFactory implements NodeFactory {
 	 * @see ca.neo.model.impl.NodeFactory#make(String)
 	 */
 	public Neuron make(String name) throws StructuralException {
-		float maxRate = myMaxRate.sample()[0];
+		float maxRate = myMaxRate.sample()[0];		
 		float intercept = myIntercept.sample()[0];
 		
 		if (maxRate < 0) {
 			throw new StructuralException("Max firing rate must be > 0");
+		}
+		if (maxRate > 1f / myTauRef) {
+			ourLogger.warn("Decreasing maximum firing rate which was greater than inverse of refractory period");
+			maxRate = (1f / myTauRef) - .001f;
 		}
 		
 		float x = 1f / (1f - (float) Math.exp( (myTauRef - (1f / maxRate)) / myTauRC));
 		float scale = (x - 1f) / (1f - intercept);
 		
 		float bias = 1f - scale * intercept;
-
+		
 		SynapticIntegrator integrator = new LinearSynapticIntegrator(ourMaxTimeStep, ourCurrentUnits);
 		SpikeGenerator generator = new LIFSpikeGenerator(ourMaxTimeStep, myTauRC, myTauRef);
 		
-		return new SpikingNeuron(integrator, generator, scale, bias, name);		
+		return new PlasticExpandableSpikingNeuron(integrator, generator, scale, bias, name);		
 	}
 
 }
