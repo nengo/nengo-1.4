@@ -146,6 +146,8 @@ public class NetworkImpl implements Network {
 		}
 		
 		myProjectionMap.put(termination, new ProjectionImpl(origin, termination));
+
+		mySimulator.initialize(this);
 	}
 
 	/**
@@ -164,6 +166,8 @@ public class NetworkImpl implements Network {
 		} else {
 			throw new StructuralException("The Network contains no Projection ending on the specified Termination");
 		}
+		
+		mySimulator.initialize(this);
 	}
 
 	/**
