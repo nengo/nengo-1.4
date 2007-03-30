@@ -65,7 +65,7 @@ public class EulerIntegrator implements Integrator {
 			units[i] = system.getOutputUnits(i);
 		}
 		
-		return new TimeSeriesImpl(times, values, units, input.getLabels());
+		return new TimeSeriesImpl(times, values, units);
 	}
 	
 }
