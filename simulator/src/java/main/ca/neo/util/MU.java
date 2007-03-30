@@ -404,6 +404,20 @@ public class MU {
 	}
 	
 	/**
+	 * @param vector Any float vector
+	 * @return Duplicate with each element cast to double
+	 */
+	public static double[] convert(float[] vector) {
+		double[] result = new double[vector.length];
+		
+		for (int i = 0; i < vector.length; i++) {
+			result[i] = (double) vector[i];
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * @param matrix Any double matrix
 	 * @return Duplicate with each element cast to float 
 	 */
@@ -418,6 +432,20 @@ public class MU {
 		}
 		
 		return result;		
+	}
+	
+	/**
+	 * @param vector Any double vector
+	 * @return Duplicate with each element cast to float
+	 */
+	public static float[] convert(double[] vector) {
+		float[] result = new float[vector.length];
+		
+		for (int i = 0; i < vector.length; i++) {
+			result[i] = (float) vector[i];
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -541,4 +569,85 @@ public class MU {
 		
 		return buf.toString();
 	}
+	
+	/**
+	 * A tool for growing vectors (similar to java.util.List). 
+	 *    
+	 * @author Bryan Tripp
+	 */
+	public static class VectorExpander {
+		
+		private static final int ourIncrement = 1000;
+		
+		private int myIndex;
+		private float[] myValues;
+		
+		public VectorExpander() {
+			myIndex = 0;
+			myValues = new float[ourIncrement];
+		}
+		
+		/**
+		 * @param value New element to append
+		 */
+		public void add(float value) {
+			if (myIndex == myValues.length) {
+				float[] newValues = new float[myValues.length + ourIncrement];
+				System.arraycopy(myValues, 0, newValues, 0, myValues.length);
+				myValues = newValues;
+			}
+			
+			myValues[myIndex++] = value;
+		}
+		
+		/**
+		 * @return Array of elements in order appended
+		 */
+		public float[] toArray() {
+			float[] result = new float[myIndex];
+			System.arraycopy(myValues, 0, result, 0, myIndex);
+			return result;
+		}
+	}	
+	
+	/**
+	 * A tool for growing matrices (similar to java.util.List). 
+	 *    
+	 * @author Bryan Tripp
+	 */
+	public static class MatrixExpander {
+		
+		private static final int ourIncrement = 1000;
+		
+		private int myIndex;
+		private float[][] myValues;
+		
+		public MatrixExpander() {
+			myIndex = 0;
+			myValues = new float[ourIncrement][];
+		}
+		
+		/**
+		 * @param value New row to append
+		 */
+		public void add(float[] value) {
+			if (myIndex == myValues.length) {
+				float[][] newValues = new float[myValues.length + ourIncrement][];
+				System.arraycopy(myValues, 0, newValues, 0, myValues.length);
+				myValues = newValues;
+			}
+			
+			myValues[myIndex++] = value;
+		}
+
+		/**
+		 * @return Array of rows in order appended
+		 */
+		public float[][] toArray() {
+			float[][] result = new float[myIndex][];
+			System.arraycopy(myValues, 0, result, 0, myIndex);
+			return result;
+		}
+	}	
+	
 }
