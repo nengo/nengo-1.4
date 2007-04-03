@@ -20,6 +20,7 @@ public class Units extends Enum {
 	//Neural 
 	public static final Units mV = new Units("mV"); //millivolts
 	public static final Units uA = new Units("uA"); //micro-amps
+	public static final Units uAcm2 = new Units("uA/cm^2"); //micro-amps per cm^2
 	public static final Units ACU = new Units("ACU"); //arbitrary current units 
 	public static final Units AVU = new Units("AVU"); //arbitrary voltage units
 	public static final Units UNK = new Units("UNK"); //unknown units
