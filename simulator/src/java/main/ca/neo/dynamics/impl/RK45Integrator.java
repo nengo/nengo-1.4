@@ -22,8 +22,8 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * 
  * <p>See also Dormand & Prince, 1980, J Computational and Applied Mathematics 6(1), 19-26.</p>
  * 
- * TODO: test
- *  
+ * TODO: should re-use initial time step estimate from last integration if available
+ * 
  * @author Bryan Tripp
  */
 public class RK45Integrator implements Integrator {
@@ -127,15 +127,18 @@ public class RK45Integrator implements Integrator {
 				times.add(t);
 				system.setState(x);
 				values.add(system.g(t, u));
+				k[0] = k[6]; //re-use last stage as first stage of next step
 			}
 			
 			//Update step size
 			if (delta == 0f) delta = 1e-16f;
-			h = Math.min(hmax, 0.8f * h * (float) Math.pow(tau/delta, myPow));
-			
-//			System.out.println("tau: " + tau + "  delta: " + delta + "  h: " + h + " d/t: " + delta/tau + " (d/t)^p: " + Math.pow(delta / tau, myPow));
-			
-			k[0] = k[6]; //re-use last stage as first stage of next step
+			if ( !(delta >= 0) && !(delta < 0) ) {
+				h = h / 2f;
+			} else {
+				boolean hWasAlreadyMinimum = (h == hmin); 
+				h = Math.min(hmax, 0.8f * h * (float) Math.pow(tau/delta, myPow));
+				if (h < hmin && !hWasAlreadyMinimum) h = hmin; //give it one more chance at hmin
+			}
 		}
 		
 		if (t < tfinal) {
