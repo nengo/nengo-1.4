@@ -17,14 +17,13 @@ import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.muscle.LinkSegmentModel;
 import ca.neo.model.muscle.SkeletalMuscle;
+import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
+import ca.neo.util.impl.TimeSeries1DImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
 /**
  * Default implementation of LinkSegmentModel. 
- * 
- * TODO: origins and terminations
- * TODO: step implementation
  * 
  * @author Bryan Tripp
  */
@@ -36,13 +35,17 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	private DynamicalSystem myDynamics;
 	private Map<String, Function[]> myJointDefinitions;
 	private SkeletalMuscle[] myMuscles;
+	private Function[] myLengths;
+	private Function[] myMomentArms;
 	private Properties myStates;
 	private float myTimeStep;
 	private float myTime;
 	
-	public LinkSegmentModelImpl(String name, DynamicalSystem dynamics, SkeletalMuscle[] muscles, float timeStep) {
+	public LinkSegmentModelImpl(String name, DynamicalSystem dynamics, float timeStep) {
 		myDynamics = dynamics;
-		myMuscles = muscles;
+		myMuscles = new SkeletalMuscle[dynamics.getInputDimension()];
+		myLengths = new Function[dynamics.getInputDimension()];
+		myMomentArms = new Function[dynamics.getInputDimension()];
 		myJointDefinitions = new HashMap<String, Function[]>(10);
 		
 		myStates = new Properties();
@@ -64,6 +67,12 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 		
 		myJointDefinitions.put(name, definition);
 		myStates.setProperty(name, "Joint coordinates for " + name);
+	}
+	
+	public void defineMuscle(int input, SkeletalMuscle muscle, Function length, Function momentArm) {
+		myMuscles[input] = muscle;
+		myLengths[input] = length;
+		myMomentArms[input] = momentArm;
 	}
 	
 	/** 
@@ -98,28 +107,28 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	 * @see ca.neo.model.Node#getOrigin(java.lang.String)
 	 */
 	public Origin getOrigin(String name) throws StructuralException {
-		return null;
+		throw new StructuralException("A LinkSegmentModel itself has no Origins (neural output arises from component SkeletalMuscles)");
 	}
 
 	/** 
 	 * @see ca.neo.model.Node#getOrigins()
 	 */
 	public Origin[] getOrigins() {
-		return null;
+		return new Origin[0];
 	}
 
 	/** 
 	 * @see ca.neo.model.Node#getTermination(java.lang.String)
 	 */
 	public Termination getTermination(String name) throws StructuralException {
-		return null;
+		throw new StructuralException("A LinkSegmentModel itself has no Terminations (neural input is to component SkeletalMuscles)");
 	}
 
 	/** 
 	 * @see ca.neo.model.Node#getTerminations()
 	 */
 	public Termination[] getTerminations() {
-		return null;
+		return new Termination[0];
 	}
 
 	/** 
@@ -130,14 +139,24 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 		
 		while (myTime < endTime) {
 			float stepLength = (myTime + myTimeStep * 1.1 >= endTime) ? endTime - myTime : myTimeStep;
-			step(stepLength);
+			step(myTime, stepLength);
 		}
 		
 		myTime = endTime;
 	}
 	
-	private void step(float stepLength) {
-		//TODO: run muscles, run dynamics
+	private void step(float startTime, float stepLength) throws SimulationException {
+		float[] state = myDynamics.getState();
+		float[] muscleTorques = new float[myDynamics.getInputDimension()];
+		for (int i = 0; i < muscleTorques.length; i++) {
+			myMuscles[i].setLength(myLengths[i].map(state));
+			myMuscles[i].run(startTime, startTime + stepLength);
+			muscleTorques[i] = myMuscles[i].getForce() * myMomentArms[i].map(state);
+		}
+				
+		float[] dxdt = myDynamics.f(startTime, muscleTorques);
+		myDynamics.setState(MU.sum(state, MU.prod(dxdt, stepLength)));
+		myTime += stepLength;
 	}
 
 	/** 
@@ -169,7 +188,8 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 			result = new TimeSeriesImpl(new float[]{myTime}, 
 					new float[][]{jointCoordinates}, Units.uniform(Units.M, definition.length));
 		} else if (stateName.matches("p\\d+")) {
-			//TODO
+			int coord = Integer.parseInt(stateName.substring(1));
+			result = new TimeSeries1DImpl(new float[]{myTime}, new float[]{myDynamics.getState()[coord]}, Units.UNK);
 		} else {
 			throw new SimulationException("The state " + stateName + " is unknown");
 		}
@@ -183,5 +203,5 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	public Properties listStates() {
 		return myStates;
 	}
-
+	
 }
