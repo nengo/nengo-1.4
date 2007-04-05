@@ -18,7 +18,7 @@ public interface Configurable {
 	public Configuration getConfiguration();
 	
 	/**
-	 * Notifies the Configurable that its configuration has changed. 
+	 * Called by Configuration to notify the Configurable that its configuration has changed. 
 	 * 
 	 * @param propertyName Name of changed property
 	 * @param newValue New value of changed property
