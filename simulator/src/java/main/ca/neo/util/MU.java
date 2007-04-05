@@ -510,6 +510,7 @@ public class MU {
 			float max = 0;
 			for (int i = 0; i < vector.length; i++) {
 				if (Math.abs(vector[i]) > max) max = Math.abs(vector[i]); 
+				if ( !(Math.abs(vector[i]) >= 0) ) max = Float.NaN;
 			}
 			result = max;
 		} else {
