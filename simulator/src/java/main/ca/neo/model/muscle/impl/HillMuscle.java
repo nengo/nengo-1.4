@@ -14,11 +14,10 @@ import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.NewtonRootFinder;
 import ca.neo.model.SimulationException;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.muscle.TorqueMuscle;
 import ca.neo.plot.Plotter;
 import ca.neo.util.TimeSeries;
-import ca.neo.util.impl.TimeSeries1DImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
 /**
@@ -29,21 +28,17 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * state variables l_CE and activation? 
  * 
  * TODO: ref Keener & Sneyd
- * TODO: test
+ * TODO: review -- this has been made to compile after model change but it might not make sense  
  * 
  * @author Bryan Tripp
  */
-public class HillMuscle implements TorqueMuscle {
+public class HillMuscle extends SkeletalMuscleImpl {
 
 	private static Logger ourLogger = Logger.getLogger(HillMuscle.class); 
+	private static final long serialVersionUID = 1L;
 	
-	private Function myCEForceLength;
-	private Function myCEForceVelocity;
-	private Function mySEForceLength;
-	
-	private float myLengthCE;
-	
-	public HillMuscle() {
+	public HillMuscle(String name, float tauEA, float maxIsometricForce, Function CEForceLength, Function CEForceVelocity, Function SEForceLength) throws StructuralException {
+		super(name, new Dynamics(tauEA, maxIsometricForce, CEForceLength, CEForceVelocity, SEForceLength, false));
 	}
 	
 	public void setInputs(float angle, float velocity) {
