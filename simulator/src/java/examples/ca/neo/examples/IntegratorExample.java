@@ -65,8 +65,7 @@ public class IntegratorExample {
 				
 		try {
 			Network network = createNetwork();
-			Simulator simulator = new LocalSimulator();
-			simulator.initialize(network); 
+			Simulator simulator = network.getSimulator();
 			
 			Probe inputRecorder = simulator.addProbe("input", "input", true);
 			Probe integratorRecorder = simulator.addProbe("integrator", NEFEnsemble.X, true);
