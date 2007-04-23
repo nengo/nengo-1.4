@@ -8,28 +8,32 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import ca.neo.model.Ensemble;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
+import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.model.Units;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.util.SpikePattern;
+import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.SpikePatternImpl;
+import ca.neo.util.impl.TimeSeriesImpl;
 
 /**
  * Abstract class that can be used as a basis for Ensemble implementations. 
  * 
  * @author Bryan Tripp
  */
-public abstract class AbstractEnsemble implements Ensemble {
+public abstract class AbstractEnsemble implements Ensemble, Probeable {
 
 	private static Logger ourLogger = Logger.getLogger(AbstractEnsemble.class);
 	
@@ -37,6 +41,7 @@ public abstract class AbstractEnsemble implements Ensemble {
 	private Node[] myNodes;
 	private Map<String, Origin> myOrigins;
 	private Map<String, Termination> myTerminations;	
+	private Map<String, List<Integer>> myStateNames; //for Probeable
 	private SimulationMode myMode;
 	private SpikePatternImpl mySpikePattern;
 	protected boolean myCollectSpikesFlag;
@@ -64,6 +69,8 @@ public abstract class AbstractEnsemble implements Ensemble {
 		for (int i = 0; i < terminations.length; i++) {
 			myTerminations.put(terminations[i].getName(), terminations[i]);
 		}		
+		
+		myStateNames = findStateNames(nodes);
 		
 		setMode(SimulationMode.DEFAULT);		
 	}
@@ -186,7 +193,50 @@ public abstract class AbstractEnsemble implements Ensemble {
 		if (!myCollectSpikesFlag) ourLogger.warn("Warning: collect spikes flag is off"); 
 		return mySpikePattern;
 	}
-	
+		
+	/**
+	 * @return Composite of Node states by given name. States of different nodes may be defined at different 
+	 * 		times, so only the states at the start and end of the most recent step are given. Only the first 
+	 * 		dimension of each Node state is included in the composite. 
+	 * @see ca.neo.model.Probeable#getHistory(java.lang.String)
+	 */
+	public TimeSeries getHistory(String stateName) throws SimulationException {
+		if (!myStateNames.containsKey(stateName)) {
+			throw new SimulationException("The state " + stateName + " is unknown");
+		}
+		
+		List<Integer> nodeNumbers = myStateNames.get(stateName);
+		float[] firstNodeTimes = ((Probeable) myNodes[nodeNumbers.get(0).intValue()]).getHistory(stateName).getTimes();		
+		float[] times = new float[]{firstNodeTimes[0], firstNodeTimes[firstNodeTimes.length - 1]};
+
+		float[][] values = new float[2][];
+		Units[] units = Units.uniform(Units.UNK, myNodes.length);
+		for (int i = 0; i < values.length; i++) {
+			values[i] = new float[myNodes.length];
+			for (int j = 0; j < myNodes.length; j++) {
+				if (nodeNumbers.contains(new Integer(j))) {
+					TimeSeries history = ((Probeable) myNodes[j]).getHistory(stateName);
+					int index = (i == 0) ? 0 : history.getTimes().length - 1;
+					values[i][j] = history.getValues()[index][0];
+					if (j == 0) units[j] = history.getUnits()[0]; 
+				}
+			}
+		}
+		return new TimeSeriesImpl(times, values, units);
+	}
+
+	/**
+	 * @see ca.neo.model.Probeable#listStates()
+	 */
+	public Properties listStates() {
+		Properties result = new Properties();
+		Iterator<String> keys = myStateNames.keySet().iterator();
+		while (keys.hasNext()) {
+			result.setProperty(keys.next(), "Composite of Node states by the same name");
+		}
+		return result;
+	}
+
 	/**
 	 * Finds existing one-dimensional Origins by same name on the given Nodes, and groups 
 	 * them into EnsembleOrigins.
@@ -259,6 +309,26 @@ public abstract class AbstractEnsemble implements Ensemble {
 		}
 		
 		return result.toArray(new Termination[0]);
+	}
+	
+	private static Map<String, List<Integer>> findStateNames(Node[] nodes) {
+		Map<String, List<Integer>> result = new HashMap<String, List<Integer>>(10);
+		
+		for (int i = 0; i < nodes.length; i++) {
+			if (nodes[i] instanceof Probeable) {
+				Properties p = ((Probeable) nodes[i]).listStates();
+				Iterator keys = p.keySet().iterator();
+				while (keys.hasNext()) {
+					String key = keys.next().toString();
+					if (!result.containsKey(key)) {
+						result.put(key, new ArrayList<Integer>(10));
+					}
+					result.get(key).add(new Integer(i));
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 }
