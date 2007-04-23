@@ -7,9 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
+import ca.neo.model.SimulationMode;
 import ca.neo.model.Units;
+import ca.neo.model.impl.RealOutputImpl;
+import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.TimeSeries1D;
@@ -46,6 +50,9 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	private float[] myVoltageHistory;
 	private List mySpikeTimes;
 	
+	private SimulationMode myMode;
+	private SimulationMode[] mySupportedModes;
+	
 	private static final float[] ourNullTime = new float[0]; 
 	private static final float[] ourNullVoltageHistory = new float[0];
 	
@@ -61,6 +68,9 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myTauRef = tauRef;
 		myTauRefNext = tauRef;
 		myInitialVoltage = 0;
+		
+		myMode = SimulationMode.DEFAULT;
+		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
 		
 		reset(false);
 	}
@@ -78,6 +88,9 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myTauRef = tauRef;
 		myInitialVoltage = initialVoltage;
 		
+		myMode = SimulationMode.DEFAULT;
+		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
+		
 		reset(false);
 	}
 	
@@ -92,7 +105,19 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	/**
 	 * @see ca.neo.model.neuron.SpikeGenerator#run(float[], float[])
 	 */
-	public boolean run(float[] time, float[] current) {
+	public InstantaneousOutput run(float[] time, float[] current) {
+		InstantaneousOutput result = null;
+		
+		if (myMode.equals(SimulationMode.CONSTANT_RATE)) {
+			result = new RealOutputImpl(new float[]{doConstantRateRun(time[0], current[0])}, Units.SPIKES_PER_S);
+		} else {
+			result = new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES);
+		}
+		
+		return result;
+	}
+	
+	private boolean doSpikingRun(float[] time, float[] current) {
 		if (time.length < 2) {
 			throw new IllegalArgumentException("Arg time must have length at least 2");
 		}
@@ -139,20 +164,8 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		return spiking;	
 	}
 	
-	/**
-	 * @return true
-	 * @see ca.neo.model.neuron.SpikeGenerator#knownConstantRate()
-	 */
-	public boolean knownConstantRate() {
-		return true;
-	}
-
-	/**
-	 * Note that no voltage history is available after a constant-rate run. 
-	 *  
-	 * @see ca.neo.model.neuron.SpikeGenerator#runConstantRate(float, float)
-	 */
-	public float runConstantRate(float time, float current) {
+	//Note that no voltage history is available after a constant-rate run.
+	private float doConstantRateRun(float time, float current) {
 		myTime = ourNullTime;
 		myVoltageHistory = ourNullVoltageHistory;
 		
@@ -190,6 +203,20 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		Properties p = new Properties();
 		p.setProperty("V", "membrane potential (arbitrary units)");
 		return p;
+	}
+
+	/**
+	 * @see ca.neo.model.SimulationMode.ModeConfigurable#getMode()
+	 */
+	public SimulationMode getMode() {
+		return myMode;
+	}
+
+	/**
+	 * @see ca.neo.model.SimulationMode.ModeConfigurable#setMode(ca.neo.model.SimulationMode)
+	 */
+	public void setMode(SimulationMode mode) {
+		myMode = SimulationMode.getClosestMode(mode, mySupportedModes);
 	}
 
 }

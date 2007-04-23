@@ -5,8 +5,9 @@ package ca.neo.model.neuron;
 
 import java.io.Serializable;
 
+import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Resettable;
-import ca.neo.model.SimulationException;
+import ca.neo.model.SimulationMode;
 
 /**
  * Spike generation model, ie a component of a neuron model that receives driving current 
@@ -14,24 +15,8 @@ import ca.neo.model.SimulationException;
  * 
  * @author Bryan Tripp
  */
-public interface SpikeGenerator extends Resettable, Serializable {
+public interface SpikeGenerator extends Resettable, Serializable, SimulationMode.ModeConfigurable {
 
-	/**
-	 * @return True iff this SpikeGenerator has a known steady-state output for a given 
-	 * 		input, ie if getConstantRate() can be called. Some SpikeGenerator models may have 
-	 * 		have known constant rate outputs for some parameter ranges but not others.    
-	 */
-	public boolean knownConstantRate();
-	
-	/**
-	 * @param time Simulation time of run (since constant-rate output is needed, time does not  
-	 * 		factor into the result, but Probeable SpikeGenerators will need it).  
-	 * @param current Constant driving current 
-	 * @return Corresponding steady-state firing rate 
-	 * @throws SimulationException if !knownConstantRate()
-	 */
-	public float runConstantRate(float time, float current) throws SimulationException;
-	
 	/**
 	 * Runs the model for a given time segment. The total time is meant to be 
 	 * short (eg 1/2ms), in that the output of the model is either a spike 
@@ -51,6 +36,6 @@ public interface SpikeGenerator extends Resettable, Serializable {
 	 * 		until next time point) 
 	 * @return true If there is a spike between the first and last times, false otherwise
 	 */
-	public boolean run(float[] time, float[] current); 
+	public InstantaneousOutput run(float[] time, float[] current); 
 	
 }

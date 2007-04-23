@@ -11,25 +11,12 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public interface Node extends Serializable, Resettable {
+public interface Node extends Serializable, Resettable, SimulationMode.ModeConfigurable {
 
 	/**
 	 * @return Name of Node (must be unique in a Network) 
 	 */
 	public String getName();
-	
-	/**
-	 * Sets the Node to run in either the given mode or the closest mode that the Node supports 
-	 * (all Nodes must support SimulationMode.DEFAULT, and must default to this mode).
-	 * 
-	 * @param mode Requested simulation mode 
-	 */
-	public void setMode(SimulationMode mode);
-	
-	/**
-	 * @return The mode in which the Node is currently running. 
-	 */
-	public SimulationMode getMode();
 	
 	/**
 	 * Runs the Node (including all its components), updating internal state and outputs as needed.  
@@ -66,6 +53,5 @@ public interface Node extends Serializable, Resettable {
 	 * @throws StructuralException if the named Termination does not exist
 	 */
 	public Termination getTermination(String name) throws StructuralException;
-	
 	
 }

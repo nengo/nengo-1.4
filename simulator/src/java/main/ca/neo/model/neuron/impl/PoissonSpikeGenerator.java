@@ -2,9 +2,14 @@ package ca.neo.model.neuron.impl;
 
 import ca.neo.math.Function;
 import ca.neo.math.impl.FourierFunction;
-import ca.neo.math.impl.GaussianPDF;
 import ca.neo.math.impl.SigmoidFunction;
+import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.SimulationException;
+import ca.neo.model.SimulationMode;
+import ca.neo.model.SpikeOutput;
+import ca.neo.model.Units;
+import ca.neo.model.impl.RealOutputImpl;
+import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.plot.Plotter;
 import ca.neo.util.SpikePattern;
@@ -22,6 +27,8 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	private static final long serialVersionUID = 1L;
 	
 	private Function myRateFunction;
+	private SimulationMode myMode;
+	private SimulationMode[] mySupportedModes;
 //	private float myRefractoryPeriod;
 //	private float myLastSpikeTime;
 
@@ -32,40 +39,41 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		assert rateFunction.getDimension() == 1;
 		
 		myRateFunction = rateFunction;
+		myMode = SimulationMode.DEFAULT;
+		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
 //		myRefractoryPeriod = refractoryPeriod;
 //		myLastSpikeTime = -myRefractoryPeriod;
 	}
 	
 	/**
-	 * @return true
-	 * 
-	 * @see ca.neo.model.neuron.SpikeGenerator#knownConstantRate()
-	 */
-	public boolean knownConstantRate() {
-		return true;
-	}
-
-	/**
 	 * @see ca.neo.model.neuron.SpikeGenerator#run(float[], float[]) 
 	 */
-	public boolean run(float[] time, float[] current) {
-		boolean spike = false;
-		for (int i = 0; i < time.length - 1 && !spike; i++) {
-			float timeSpan = time[i+1] - time[i];
+	public InstantaneousOutput run(float[] time, float[] current) {
+		InstantaneousOutput result = null;
+		
+		if (myMode.equals(SimulationMode.CONSTANT_RATE)) {
+			result = new RealOutputImpl(new float[]{myRateFunction.map(new float[]{current[0]})}, Units.SPIKES_PER_S);
+		} else {
+			boolean spike = false;
+			for (int i = 0; i < time.length - 1 && !spike; i++) {
+				float timeSpan = time[i+1] - time[i];
+				
+				//TODO: reconsider refractory period
+//				float netRate = myRateFunction.map(new float[]{current[i]});			
+//				float poissonPeriod = 1 / netRate - myRefractoryPeriod; 
+//				if (poissonPeriod <= 0) {
+//					throw new RuntimeException("Spike rate of " + netRate + " is not achievable with refractory period " + myRefractoryPeriod);
+//				}
+				
+				float rate = myRateFunction.map(new float[]{current[i]});						
+				double probNoSpikes = Math.exp(-rate*timeSpan);
+				spike = (Math.random() > probNoSpikes);
+			}
 			
-			//TODO: reconsider refractory period
-//			float netRate = myRateFunction.map(new float[]{current[i]});			
-//			float poissonPeriod = 1 / netRate - myRefractoryPeriod; 
-//			if (poissonPeriod <= 0) {
-//				throw new RuntimeException("Spike rate of " + netRate + " is not achievable with refractory period " + myRefractoryPeriod);
-//			}
-			
-			float rate = myRateFunction.map(new float[]{current[i]});						
-			double probNoSpikes = Math.exp(-rate*timeSpan);
-			spike = (Math.random() > probNoSpikes);
+			result = new SpikeOutputImpl(new boolean[]{spike}, Units.SPIKES); 
 		}
 		
-		return spike;
+		return result;
 	}
 
 	/**
@@ -98,7 +106,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 			float time = dt * (float) i;
 			float c1 = current.map(new float[]{time});
 			float c2 = current.map(new float[]{time+dt});
-			boolean spike = generator.run(new float[]{time, time+dt}, new float[]{c1, c2});
+			boolean spike = ((SpikeOutput) generator.run(new float[]{time, time+dt}, new float[]{c1, c2})).getValues()[0];
 			
 			if (spike) {
 				spikeTimes[spikes] = time+dt;
@@ -110,6 +118,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		System.arraycopy(spikeTimes, 0, spikeTimesTrimmed, 0, spikes);
 		
 		SpikePattern pattern = new SpikePattern() {
+			private static final long serialVersionUID = 1L;
 			public int getNumNeurons() {
 				return 1;
 			}
@@ -121,6 +130,20 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		Plotter.plot(rate, -1, .001f, 1, "rate");
 		Plotter.plot(current, 0, dt, T, "current");
 		Plotter.plot(pattern);
+	}
+
+	/**
+	 * @see ca.neo.model.SimulationMode.ModeConfigurable#getMode()
+	 */
+	public SimulationMode getMode() {
+		return myMode;
+	}
+
+	/**
+	 * @see ca.neo.model.SimulationMode.ModeConfigurable#setMode(ca.neo.model.SimulationMode)
+	 */
+	public void setMode(SimulationMode mode) {
+		myMode = SimulationMode.getClosestMode(mode, mySupportedModes);
 	}
 
 }

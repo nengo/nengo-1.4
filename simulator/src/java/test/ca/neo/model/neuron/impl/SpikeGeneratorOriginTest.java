@@ -8,6 +8,8 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.Units;
+import ca.neo.model.impl.RealOutputImpl;
+import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.model.neuron.impl.SpikeGeneratorOrigin;
@@ -28,17 +30,6 @@ public class SpikeGeneratorOriginTest extends TestCase {
 		
 		myGenerator = new MockSpikeGenerator();
 		myOrigin = new SpikeGeneratorOrigin(myGenerator);
-	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikeGeneratorOrigin.getMode()'
-	 */
-	public void testGetMode() {
-		assertEquals(SimulationMode.DEFAULT, myOrigin.getMode());
-		myOrigin.setMode(SimulationMode.CONSTANT_RATE);
-		assertEquals(SimulationMode.CONSTANT_RATE, myOrigin.getMode());
-		myOrigin.setMode(SimulationMode.PRECISE);
-		assertEquals(SimulationMode.DEFAULT, myOrigin.getMode());	
 	}
 
 	/*
@@ -69,7 +60,7 @@ public class SpikeGeneratorOriginTest extends TestCase {
 		assertEquals(1, ((SpikeOutput) output).getValues().length);
 		assertEquals(true, ((SpikeOutput) output).getValues()[0]);
 		
-		myOrigin.setMode(SimulationMode.CONSTANT_RATE);
+		myGenerator.setMode(SimulationMode.CONSTANT_RATE);
 		
 		myOrigin.run(new float[]{0f}, new float[]{0f});
 		output = myOrigin.getValues();
@@ -86,26 +77,31 @@ public class SpikeGeneratorOriginTest extends TestCase {
 		
 		private boolean myNextSpikeOutput;
 		private float myNextRateOutput;
+		private SimulationMode myMode = SimulationMode.DEFAULT;
 		
 		public void setNextOutput(boolean nextSpikeOutput, float nextRateOutput) {
 			myNextSpikeOutput = nextSpikeOutput;
 			myNextRateOutput = nextRateOutput;
 		}
 		
-		public boolean knownConstantRate() {
-			return true;
-		}
-
-		public float runConstantRate(float time, float current) throws SimulationException {
-			return myNextRateOutput;
-		}
-
-		public boolean run(float[] time, float[] current) {
-			return myNextSpikeOutput;
+		public InstantaneousOutput run(float[] time, float[] current) {
+			if (myMode.equals(SimulationMode.DEFAULT)) {
+				return new SpikeOutputImpl(new boolean[]{myNextSpikeOutput}, Units.SPIKES);
+			} else {
+				return new RealOutputImpl(new float[]{myNextRateOutput}, Units.SPIKES_PER_S);
+			}
 		}
 
 		public void reset(boolean randomize) {
 			throw new NotImplementedException("not implemented");
+		}
+
+		public SimulationMode getMode() {
+			return myMode;
+		}
+
+		public void setMode(SimulationMode mode) {
+			myMode = mode;
 		}
 		
 	}

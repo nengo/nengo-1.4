@@ -120,4 +120,26 @@ public class SimulationMode implements Serializable {
 		return is;
 	}
 	
+	/**
+	 * Something that has runs in different SimulationModes. 
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static interface ModeConfigurable {
+
+		/**
+		 * Sets the object to run in either the given mode or the closest mode that it supports 
+		 * (all ModeConfigurables must support SimulationMode.DEFAULT, and must default to this mode).
+		 * 
+		 * @param mode SimulationMode in which it is desired that the object runs. 
+		 */
+		public void setMode(SimulationMode mode);
+
+		/**
+		 * @return The SimulationMode in which the object is running  
+		 */
+		public SimulationMode getMode();
+		
+	}
+	
 }

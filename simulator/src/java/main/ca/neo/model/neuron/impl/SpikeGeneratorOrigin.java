@@ -6,9 +6,7 @@ package ca.neo.model.neuron.impl;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
-import ca.neo.model.SimulationMode;
 import ca.neo.model.Units;
-import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
@@ -24,12 +22,7 @@ public class SpikeGeneratorOrigin implements Origin {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final Units ourSpikeUnit = Units.SPIKES;
-	private static final Units ourRealUnit = Units.SPIKES_PER_S;
-	
-	private SimulationMode[] mySupportedModes; //TODO: fix test for generator-dependent modes	
 	private SpikeGenerator myGenerator;
-	private SimulationMode myMode;
 	private InstantaneousOutput myOutput;
 	
 	/**
@@ -37,32 +30,9 @@ public class SpikeGeneratorOrigin implements Origin {
 	 */
 	public SpikeGeneratorOrigin(SpikeGenerator generator) {
 		myGenerator = generator;
-		myMode = SimulationMode.DEFAULT;
-		myOutput = new SpikeOutputImpl(new boolean[]{false}, ourSpikeUnit);
-		
-		if (generator.knownConstantRate()) {
-			mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
-		} else {
-			mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT};
-		}
+		myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES);
 	}
 	
-	/**
-	 * @param mode SimulationMode in which it is desired that the Origin runs. CONSTANT_RATE is 
-	 * 		supported. If any other mode is requested, then DEFAULT is used. 
-	 */
-	public void setMode(SimulationMode mode) {
-		myMode = SimulationMode.getClosestMode(mode, mySupportedModes);
-	}
-
-	/**
-	 * @return The SimulationMode in which this Origin is running (can be CONSTANT_RATE or 
-	 * 		DEFAULT; defaults to DEFAULT).  
-	 */
-	public SimulationMode getMode() {
-		return myMode;
-	}
-
 	/**
 	 * @return Neuron.AXON
 	 * @see ca.neo.model.Origin#getName()
@@ -89,16 +59,7 @@ public class SpikeGeneratorOrigin implements Origin {
 	 * 		entries must be extracted). 
 	 */
 	public void run(float[] times, float[] current) throws SimulationException {
-		if (myMode == SimulationMode.DEFAULT) {
-			boolean spike = myGenerator.run(times, current);
-			myOutput = new SpikeOutputImpl(new boolean[]{spike}, ourSpikeUnit);
-		} else {
-			if (times.length == 0 || current.length == 0) {
-				throw new SimulationException("Args time and current must have length >0 in CONSTANT_RATE mode");
-			}
-			float rate = myGenerator.runConstantRate(times[0], current[0]);
-			myOutput = new RealOutputImpl(new float[]{rate}, ourRealUnit); 
-		}
+		myOutput = myGenerator.run(times, current);
 	}
 
 	/**

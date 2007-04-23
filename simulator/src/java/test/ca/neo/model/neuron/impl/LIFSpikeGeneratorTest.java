@@ -3,7 +3,10 @@
  */
 package ca.neo.model.neuron.impl;
 
+import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
+import ca.neo.model.SimulationMode;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.neuron.impl.LIFSpikeGenerator;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.TimeSeries1D;
@@ -75,24 +78,28 @@ public class LIFSpikeGeneratorTest extends TestCase {
 		float[] tauRef = new float[]{.001f, .002f};
 
 		LIFSpikeGenerator sg = new LIFSpikeGenerator(maxTimeStep, tauRC[0], tauRef[0]);
-		assertBetween(sg.runConstantRate(0f, current[0]), -.001f, .001f);
-		assertBetween(sg.runConstantRate(0f, current[1]), 126f, 127f);
-		assertBetween(sg.runConstantRate(0f, current[2]), 309f, 310f);
+		sg.setMode(SimulationMode.CONSTANT_RATE);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[0]})).getValues()[0], -.001f, .001f);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[1]})).getValues()[0], 126f, 127f);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[2]})).getValues()[0], 309f, 310f);
 				
 		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[0], tauRef[1]);
-		assertBetween(sg.runConstantRate(0f, current[0]), -.001f, .001f);
-		assertBetween(sg.runConstantRate(0f, current[1]), 111f, 112f);
-		assertBetween(sg.runConstantRate(0f, current[2]), 236f, 237f);
+		sg.setMode(SimulationMode.CONSTANT_RATE);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[0]})).getValues()[0], -.001f, .001f);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[1]})).getValues()[0], 111f, 112f);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[2]})).getValues()[0], 236f, 237f);
 				
 		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[1], tauRef[0]);
-		assertBetween(sg.runConstantRate(0f, current[0]), -.001f, .001f);
-		assertBetween(sg.runConstantRate(0f, current[1]), 67f, 68f);
-		assertBetween(sg.runConstantRate(0f, current[2]), 183f, 184f);				
+		sg.setMode(SimulationMode.CONSTANT_RATE);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[0]})).getValues()[0], -.001f, .001f);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[1]})).getValues()[0], 67f, 68f);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[2]})).getValues()[0], 183f, 184f);
 
 		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[1], tauRef[1]);
-		assertBetween(sg.runConstantRate(0f, current[0]), -.001f, .001f);
-		assertBetween(sg.runConstantRate(0f, current[1]), 63f, 64f);
-		assertBetween(sg.runConstantRate(0f, current[2]), 154f, 155f);
+		sg.setMode(SimulationMode.CONSTANT_RATE);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[0]})).getValues()[0], -.001f, .001f);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[1]})).getValues()[0], 63f, 64f);
+		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[2]})).getValues()[0], 154f, 155f);
 	}
 	
 	/*
@@ -132,12 +139,14 @@ public class LIFSpikeGeneratorTest extends TestCase {
 	private static void assertSpikesCloseToRate(LIFSpikeGenerator sg, float current, float tolerance) throws SimulationException {
 		float stepSize = .001f;
 		int steps = 1000;
-		float rate = sg.runConstantRate(0f, current);
+		sg.setMode(SimulationMode.CONSTANT_RATE);
+		float rate = ((RealOutput) sg.run(new float[1], new float[]{current})).getValues()[0];
 		
 		int spikeCount = 0;
+		sg.setMode(SimulationMode.DEFAULT);
 		for (int i = 0; i < steps; i++) {
-			boolean spike = sg.run(new float[]{stepSize * (float) i, stepSize * (float) (i+1)}, 
-					new float[]{current, current});
+			boolean spike = ((SpikeOutput) sg.run(new float[]{stepSize * (float) i, stepSize * (float) (i+1)}, 
+					new float[]{current, current})).getValues()[0];
 			
 			if (spike) {
 				spikeCount++;

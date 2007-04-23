@@ -5,8 +5,10 @@ package ca.neo.model.neuron.impl;
 
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
-import ca.neo.model.SimulationException;
+import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.SimulationMode;
 import ca.neo.model.Units;
+import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.TimeSeries1DImpl;
@@ -47,20 +49,11 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator {
 	}
 	
 	/**
-	 * Defaults is false.
-	 * 
-	 * @see ca.neo.model.neuron.SpikeGenerator#knownConstantRate()
-	 */
-	public boolean knownConstantRate() {
-		return false;
-	}
-
-	/**
-	 * Runs the spike generation dynamics and returns true if membrane potential rises above spike threshold. 
+	 * Runs the spike generation dynamics and returns a spike if membrane potential rises above spike threshold. 
 	 * 
 	 * @see ca.neo.model.neuron.SpikeGenerator#run(float[], float[])
 	 */
-	public boolean run(float[] time, float[] current) {
+	public InstantaneousOutput run(float[] time, float[] current) {
 		boolean spike = false;
 		
 		TimeSeries result = myIntegrator.integrate(myDynamics, new TimeSeries1DImpl(time, current, Units.uAcm2));
@@ -79,23 +72,27 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator {
 			}
 		}
 		
-		return spike;
+		return new SpikeOutputImpl(new boolean[]{spike}, Units.SPIKES);
 	}
 	
-	/**
-	 * Default is to throw an exception. 
-	 * 
-	 * @see ca.neo.model.neuron.SpikeGenerator#runConstantRate(float, float)
-	 */
-	public float runConstantRate(float time, float current) throws SimulationException {
-		throw new SimulationException("This SpikeGenerator cannot be used in firing-rate simulations.");
-	}
-
 	/**
 	 * @see ca.neo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
 		myDynamics.setState(new float[myDynamics.getState().length]);
+	}
+
+	/**
+	 * @see ca.neo.model.SimulationMode.ModeConfigurable#getMode()
+	 */
+	public SimulationMode getMode() {
+		return SimulationMode.DEFAULT;
+	}
+
+	/**
+	 * @see ca.neo.model.SimulationMode.ModeConfigurable#setMode(ca.neo.model.SimulationMode)
+	 */
+	public void setMode(SimulationMode mode) {
 	}
 	
 }

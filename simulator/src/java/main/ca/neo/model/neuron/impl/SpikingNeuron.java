@@ -58,6 +58,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		myScale = scale;
 		myBias = bias;
 		myRadialInput = 0;
+		myCurrent = new TimeSeries1DImpl(new float[]{0}, new float[]{0}, Units.UNK);
 	}
 
 	/**
@@ -96,14 +97,14 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	 * @see ca.neo.model.neuron.Neuron#setMode(ca.neo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		myOrigin.setMode(mode);
+		myGenerator.setMode(mode);
 	}
 
 	/**
 	 * @see ca.neo.model.neuron.Neuron#getMode()
 	 */
 	public SimulationMode getMode() {
-		return myOrigin.getMode();
+		return myGenerator.getMode();
 	}
 
 	/**
