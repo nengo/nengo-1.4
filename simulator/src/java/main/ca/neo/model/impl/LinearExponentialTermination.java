@@ -89,6 +89,13 @@ public class LinearExponentialTermination implements Termination, Resettable {
 	public InstantaneousOutput getInput() {
 		return myRawInput;
 	}
+	
+	/**
+	 * @return The most recent output of the Termination (after summation and dynamics)
+	 */
+	public float getOutput() {
+		return myCurrent;
+	}
 
 	/**
 	 * @param values Can be either SpikeOutput or RealOutput 
