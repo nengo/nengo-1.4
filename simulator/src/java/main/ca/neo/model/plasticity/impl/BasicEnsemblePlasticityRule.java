@@ -22,11 +22,10 @@ import ca.neo.model.plasticity.PlasticityRule;
  */
 public class BasicEnsemblePlasticityRule implements PlasticityRule {
 
-	private static final String ourOriginName = NEFEnsemble.X;
-	
 	private final String myModTermName;
 	private final int myModTermDim;
 	private final Function myFunction;
+	private final String myOriginName;
 	
 	private float myModInput;
 	private float[] myOriginState;	
@@ -39,10 +38,11 @@ public class BasicEnsemblePlasticityRule implements PlasticityRule {
 	 * 		applied to each element of the transformation matrix on the Termination to which this EnsemblePlastityRule applies.
 	 * 		See class documentation for more details.     
 	 */
-	public BasicEnsemblePlasticityRule(String modTermName, int modTermDim, Function function) {
+	public BasicEnsemblePlasticityRule(String modTermName, int modTermDim, Function function, String originName) {
 		myModTermName = modTermName;
 		myModTermDim = modTermDim;
 		myFunction = function;
+		myOriginName = originName;
 		
 		if (function.getDimension() != 4) {
 			throw new IllegalArgumentException("Learning rate function has dimension " 
@@ -63,7 +63,7 @@ public class BasicEnsemblePlasticityRule implements PlasticityRule {
 	 * @see ca.neo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, float[])
 	 */
 	public void setOriginState(String name, float[] state) {
-		if (name.equals(ourOriginName)) {
+		if (name.equals(myOriginName)) {
 			myOriginState = state;
 		}
 	}
