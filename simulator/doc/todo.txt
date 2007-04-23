@@ -1,10 +1,11 @@
 TODO NOW: 
 - do something about units in relationship between synapticintegrator output and spikegenerator input
 - unify linear terminations at SynapticIntegrator and NEFEnsemble levels 
-- learning at neuron level
 - spike-based learning 
 - clean up musculoskeletal code
-- RK45 integrator
+- revisit LinearSynapticIntegrator (particularly network timestep-period cycles with rate input)
+- DONE learning at neuron level
+- DONE RK45 integrator
 
 TODO OLD: 
 - DONE use cases for Shu
@@ -47,22 +48,22 @@ TODO LATER:
 - TODO: OriginWrapper to perform functions on values (eg unit conversion) (should model some biological process -- not a valid way to get function outputs of ensembles)
 - clean up LinearSynapticIntegrator 
 - script facade 
-- write simulation-based decoder factory
 - NEURON interface
 - adapting LIF SpikeGenerator 
 - Izhikevich SpikeGenerator (any CONSTANT_RATE parameter ranges?)
 - Poisson and exponential PDFs (see references in Deak, 1977)
-- Poisson process SpikeGenerator
-- Hodgkin-Huxley SpikeGenerator
 - Conductance delays 
 - Hopfield temporal coding 
 - Associative memory network
 - STDP
 - TD learning
 - DistributedSimulator
-- standard ensemble plots
 - negative weights
 - user interface 
+- DONE write simulation-based decoder factory
+- DONE standard ensemble plots
+- DONE Poisson process SpikeGenerator
+- DONE Hodgkin-Huxley SpikeGenerator
 
 
 NOTES:
