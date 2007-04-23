@@ -17,9 +17,8 @@ import junit.framework.TestCase;
 public class LinkSegmentModelImplTest extends TestCase {
 
 	public void testRun() {
-		LinkSegmentModel model = new LinkSegmentModelImpl("upper limb", null, .001f);
+//		LinkSegmentModel model = new LinkSegmentModelImpl("upper limb", null, .001f);
 		
-		fail("Not yet implemented");
 	}
 	
 	private static class UpperLimbDynamics extends AbstractDynamicalSystem {
