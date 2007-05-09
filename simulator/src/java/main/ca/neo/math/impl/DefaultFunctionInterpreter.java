@@ -30,7 +30,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 	
 	public DefaultFunctionInterpreter() {
 		myFunctions = new HashMap(20);
-		myFunctions.put("sin", new SineFunction());
+		myFunctions.put("sin", new SineFunction(1));
 		//TODO: other standard functions
 
 		myOperators = new HashMap(20);
