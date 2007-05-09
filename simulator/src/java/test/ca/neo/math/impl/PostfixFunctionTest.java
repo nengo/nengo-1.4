@@ -45,7 +45,7 @@ public class PostfixFunctionTest extends TestCase {
 
 		l.clear();
 		l.add(new Integer(0));
-		l.add(new SineFunction());
+		l.add(new SineFunction(1));
 		f = new PostfixFunction(l, 1);
 		TestUtil.assertClose(0f, f.map(new float[]{(float) Math.PI}), .0001f);
 	}
