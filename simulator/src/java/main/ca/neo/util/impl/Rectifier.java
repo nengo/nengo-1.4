@@ -14,12 +14,22 @@ import ca.neo.util.VectorGenerator;
 public class Rectifier implements VectorGenerator {
 
 	private VectorGenerator myVG;
+	private boolean myPositiveFlag = true;
 	
 	/**
 	 * @param vg A VectorGenerator to underlie this one (ie to produce non-rectified vectors)
 	 */
 	public Rectifier(VectorGenerator vg) {
 		myVG = vg;
+	}
+	
+	/**
+	 * @param vg A VectorGenerator to underlie this one (ie to produce non-rectified vectors)
+	 * @param positive True: vectors are rectified; false: vectors are anti-rectified
+	 */
+	public Rectifier(VectorGenerator vg, boolean positive) {
+		myVG = vg;
+		myPositiveFlag = positive; 
 	}
 
 	/**
@@ -35,7 +45,7 @@ public class Rectifier implements VectorGenerator {
 		for (int i = 0; i < raw.length; i++) {
 			result[i] = new float[raw[i].length];
 			for (int j = 0; j < raw[i].length; j++) {
-				result[i][j] = Math.abs(raw[i][j]);
+				result[i][j] = myPositiveFlag ? Math.abs(raw[i][j]) : - Math.abs(raw[i][j]);
 			}
 		}
 		
