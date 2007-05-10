@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
+import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.util.MU;
@@ -178,5 +179,35 @@ public class GradientDescentApproximator implements LinearApproximator {
 		 * 		is possible in the attempted direction)
 		 */
 		boolean correct(float[] coefficients);
+	}
+	
+	/**
+	 * An ApproximatorFactory that produces GradientDescentApproximators. 
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class Factory implements ApproximatorFactory {
+
+		private static final long serialVersionUID = 1L;
+		
+		private Constraints myConstraints;
+		private boolean myIgnoreBiasFlag;
+
+		/**
+		 * @param constraints As in GradientDescentApproximator constructor
+		 * @param ignoreBias As in GradientDescentApproximator constructor
+		 */
+		public Factory(Constraints constraints, boolean ignoreBias) {
+			myConstraints = constraints;
+			myIgnoreBiasFlag = ignoreBias;
+		}
+		
+		/**
+		 * @see ca.neo.math.ApproximatorFactory#getApproximator(float[][], float[][])
+		 */
+		public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
+			return new GradientDescentApproximator(evalPoints, values, myConstraints, myIgnoreBiasFlag);
+		}
+		
 	}
 }
