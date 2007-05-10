@@ -349,6 +349,33 @@ public class DefaultPlotter extends Plotter {
 		showChart(chart, title);
 		
 	}
+
+	/**
+	 * @see ca.neo.plot.Plotter#doPlot(float[], String)
+	 */
+	public void doPlot(float[] vector, String title) {
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		XYSeries series = new XYSeries("Vector");
+
+		for (int i = 0; i < vector.length; i++) {
+			series.add(i, vector[i]); 
+		}
+
+		dataset.addSeries(series);
+
+		JFreeChart chart = ChartFactory.createXYLineChart(
+				"Vector",
+				"Index", 
+				"Value", 
+				dataset, 
+				PlotOrientation.VERTICAL, 
+				false, false, false
+		);
+		
+		showChart(chart, title);
+	}
+
+	
 	
 	//shows a chart in a new window 
 	private void showChart(JFreeChart chart, String title) {

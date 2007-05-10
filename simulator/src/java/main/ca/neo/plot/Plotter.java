@@ -208,4 +208,19 @@ public abstract class Plotter {
 	 */
 	public abstract void doPlot(Function function, float start, float increment, float end, String title);
 	
+	/**
+	 * Static convenience method for plotting a vector. 
+	 * 
+	 * @param vector Vector of points to plot
+	 * @param title Display title of plot
+	 */
+	public static void plot(float[] vector, String title) {
+		getInstance().doPlot(vector, title);
+	}
+	
+	/**
+	 * @param vector Vector of points to plot
+	 * @param title Display title of plot
+	 */
+	public abstract void doPlot(float[] vector, String title);
 }
