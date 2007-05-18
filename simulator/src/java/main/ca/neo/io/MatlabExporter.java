@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.jmatio.io.MatFileWriter;
+import com.jmatio.types.MLArray;
 import com.jmatio.types.MLDouble;
 
 import ca.neo.plot.Plotter;
 import ca.neo.util.MU;
+import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 
 /**
@@ -27,10 +29,10 @@ import ca.neo.util.TimeSeries;
  */
 public class MatlabExporter {
 
-	private Map myData;
+	private Map<String, MLArray> myData;
 	
 	public MatlabExporter() {
-		myData = new HashMap(10);
+		myData = new HashMap<String, MLArray>(10);
 	}
 	
 	/**
@@ -38,8 +40,8 @@ public class MatlabExporter {
 	 * @param data Data to be stored in Matlab variable 
 	 */
 	public void add(String name, TimeSeries data) {
-		doAdd(name+"_time", new float[][]{data.getTimes()});
-		doAdd(name, data.getValues());
+		add(name+"_time", new float[][]{data.getTimes()});
+		add(name, data.getValues());
 	}
 	
 	/**
@@ -54,11 +56,38 @@ public class MatlabExporter {
 	 */
 	public void add(String name, TimeSeries data, float tau) {
 		TimeSeries filtered = Plotter.filter(data, tau);
-		doAdd(name+"_time", new float[][]{filtered.getTimes()});
-		doAdd(name+"_data", filtered.getValues());		
+		add(name+"_time", new float[][]{filtered.getTimes()});
+		add(name+"_data", filtered.getValues());		
 	}
 	
-	private void doAdd(String name, float[][] data) {
+	/**
+	 * @param name Matlab variable name
+	 * @param pattern Spike times for a group of neurons
+	 */
+	public void add(String name, SpikePattern pattern) {
+		int n = pattern.getNumNeurons();
+		int maxSpikes = 0;
+		for (int i = 0; i < n; i++) {
+			float[] times = pattern.getSpikeTimes(i);
+			if (times.length > maxSpikes) maxSpikes = times.length;
+		}
+		float[][] timesMatrix = new float[n][]; 
+		for (int i = 0; i < n; i++) {
+			timesMatrix[i] = new float[maxSpikes];
+			float[] times = pattern.getSpikeTimes(i);
+			System.arraycopy(times, 0, timesMatrix[i], 0, times.length);
+		}
+		add(name, timesMatrix);
+	}
+	
+	/**
+	 * @param name Matlab variable name
+	 * @param data A matrix
+	 */
+	public void add(String name, float[][] data) {
+		if (!MU.isMatrix(data)) {
+			throw new IllegalArgumentException("Data must be a matrix (same number of columns in each row)");
+		}
 		MLDouble mld = new MLDouble(name, MU.convert(data));	
 		myData.put(name, mld);
 	}
