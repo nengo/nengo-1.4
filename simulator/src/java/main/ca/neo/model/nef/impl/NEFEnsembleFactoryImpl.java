@@ -164,10 +164,9 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 
 		float[][] encoders = myEncoderFactory.genVectors(n, dim);
 		
-		ApproximatorFactory af = new WeightedCostApproximator.Factory(0.1f);
 		float[][] evalPoints = getEvalPointFactory().genVectors(getNumEvalPoints(dim), dim);
 		
-		NEFEnsemble result = construct(name, nodes, encoders, af, evalPoints);
+		NEFEnsemble result = construct(name, nodes, encoders, myApproximatorFactory, evalPoints);
 		
 		addDefaultOrigins(result);
 		
@@ -181,7 +180,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 	 * @return The number of points at which to approximate decoded functions  
 	 */
 	protected int getNumEvalPoints(int dim) {
-		int[] pointsPerDim = new int[]{300, 1000}; 
+		int[] pointsPerDim = new int[]{0, 300, 1000}; 
 		return (dim < pointsPerDim.length) ? pointsPerDim[dim] : dim*500;		
 	}
 	
