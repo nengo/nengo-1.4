@@ -20,11 +20,19 @@ import ca.neo.util.impl.RandomHypersphereVG;
 import ca.neo.util.impl.Rectifier;
 
 /**
- * Part of an Origin-Termination pair that has only excitatory or inhibitory weights in the main
- * projection, and which achieves oppositely signed weights with a parallel projection through 
- * an ensemble of inhibitory interneurons. 
+ * <p>Part of a projection in which each of the Nodes making up an Ensemble is a source of only excitatory or inhibitory 
+ * connections.</p> 
  * 
- * The theory is presented in Parisien, Anderson & Eliasmith (2007) 
+ * <p>The theory is presented in Parisien, Anderson & Eliasmith (2007).</p>
+ *  
+ * <p>Such a projection includes a "base" DecodedOrigin and DecodedTermination (a projection between these may have weights
+ * of mixed sign). The projection is expanded with a BiasOrigin a pair of BiasTerminations, and a new NEFEnsemble of 
+ * interneurons. The make weight signs uniform, a projection is established between the BiasOrigin and BiasTermination, 
+ * in parallel with the original projection. The effective synaptic weights that arise from the combination of these two 
+ * projections are of uniform sign. However, the post-synaptic Ensemble receives extra bias current as a result. This bias 
+ * current is cancelled by a projection from the BiasOrigin through the interneurons, to a second BiasTermination.</p> 
+ *    
+ * TODO: account for transformations in the Termination, which can change sign and magnitude of weights
  * 
  * @author Bryan Tripp
  */
@@ -34,47 +42,12 @@ public class BiasOrigin extends DecodedOrigin {
 	
 	private NEFEnsemble myInterneurons;
 	
-	public BiasOrigin(String name, Node[] nodes, String nodeOrigin, /*DecodedOrigin abstractOrigin,*/ float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
+	public BiasOrigin(String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
 		super(name, nodes, nodeOrigin, new Function[]{new ConstantFunction(0, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));
 		//note above ConstantFunction has dimension 0, but the input dimension isn't checked
 		
-//				expandFunctions(abstractOrigin.getFunctions()), 
-//				expandDecoders(abstractOrigin.getDecoders(), constantOutputs));
-		
 		myInterneurons = createInterneurons(name + "_interneurons", numInterneurons, excitatory);
 	}
-	
-//	//adds an extra dimension with a constant zero function
-//	private static Function[] expandFunctions(Function[] functions) {
-//		Function[] result = new Function[functions.length + 1];
-//		System.arraycopy(functions, 0, result, 0, functions.length);
-//		result[result.length - 1] = new ConstantFunction(functions[0].getDimension(), 0f);		
-//		return result;
-//	}
-	
-	//adds a dimension with uniform decoders
-//	private static float[][] expandDecoders(float[][] decoders, float[][] constantOutputs) {		
-//		//iterate over evaluation points to find max of sum(constantOutputs)
-//		float max = 0;
-//		for (int i = 0; i < constantOutputs[0].length; i++) { 
-//			float sum = 0;
-//			for (int j = 0; j < constantOutputs.length; j++) {
-//				sum += constantOutputs[j][i];
-//			}
-//			if (sum > max) max = sum;
-//		}
-//		
-//		float uniformBiasDecoder = 1f / max; //this makes the bias function peak at 1 
-//		
-//		float[][] result = new float[decoders.length][];
-//		for (int i = 0; i < decoders.length; i++) {
-//			result[i] = new float[decoders[i].length + 1];
-//			System.arraycopy(decoders[i], 0, result[i], 0, decoders[i].length);
-//			result[i][result[i].length - 1] = uniformBiasDecoder;
-//		}
-//		
-//		return result;
-//	}
 	
 	private static float[][] getUniformBiasDecoders(float[][] constantOutputs, boolean excitatory) {
 		float[][] result = new float[constantOutputs.length][];
@@ -119,7 +92,6 @@ public class BiasOrigin extends DecodedOrigin {
 		//TODO: handle additional bias in inhibitory case 
 		
 		new NEFEnsembleFactoryImpl();
-//		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory(), excitatoryProjection));
 		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory()));
 		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? 1f : -1f));
 		

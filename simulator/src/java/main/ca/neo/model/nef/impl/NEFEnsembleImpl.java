@@ -410,16 +410,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @return Radial input to the given node 
 	 */
 	protected float getRadialInput(float[] state, int node) {
-//		float sumBias = 0;
-//		Iterator<String> it = bias.keySet().iterator();
-//		while (it.hasNext()) {
-//			String baseName = it.next();
-//			float netBias = bias.get(baseName).floatValue();
-//			float biasEncoder = ((BiasTermination) myDecodedTerminations.get(baseName+BIAS_SUFFIX)).getBiasEncoders()[node];
-//			sumBias += netBias * biasEncoder;
-//		}
-//		
-		return MU.prod(state, myEncoders[node]) /*+ sumBias*/;
+		return MU.prod(state, myEncoders[node]);
 	}
 	
 	/**

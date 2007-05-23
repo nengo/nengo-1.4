@@ -50,8 +50,19 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	 * 		dimension of this ensemble   
 	 */
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException;
-	
-	//TODO: with a little work this could be pushed up to DecodableEnsemble (have to generalize constant-rate responses)
+
+	/**
+	 * Adds a BiasOrigin, which operates in parallel with an existing Origin, such that the effective weights of the 
+	 * two origins together are all of the same sign (as is normally the case with synaptic weights in the brain). 
+	 *   
+	 * TODO: with a little work this could be pushed up to DecodableEnsemble (have to generalize constant-rate responses)
+	 * 
+	 * @param existing An existing Origin on this NEFEnsemble
+	 * @param numInterneurons Number of neurons 
+	 * @param excitatory If true, effective weights will be positive; if false they will be negative (inhibitory)
+	 * @return Resulting BiasOrigin
+	 * @throws StructuralException if given Origin is not a DecodedOrigin or if there is a construction problem 
+	 */
 	public BiasOrigin addBiasOrigin(Origin existing, int numInterneurons, boolean excitatory) throws StructuralException;
 		
 	/**
@@ -94,7 +105,22 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	public Termination addDecodedTermination(String name, float[][] matrix, float[] tfNumerator, float[] tfDenominator, 
 			boolean isModulatory) throws StructuralException;
 	
-	public BiasTermination[] addBiasTerminations(DecodedTermination baseTermination, float interneuronTauPSC, float biasDecoder, float[][] functionDecoders) throws StructuralException;
+	/**
+	 * Adds BiasTerminations, which are meant to receive projections from BiasOrigins. A pair of BiasTerminations is returned, 
+	 * one to receive a projection directly from a BiasOrigin, and the other to receive a projection indirectly through an 
+	 * ensemble of interneurons that is associated with the BiasOrigin. 
+	 *   
+	 * @param baseTermination The Termination that is to be biased (so that projections to it consist of weights of a single sign) 
+	 * @param interneuronTauPSC Time constant of post-synaptic current decay  of inhibitory termination from interneurons onto this ensemble 
+	 * @param biasDecoder The decoding weight of the associated BiasOrigin (decoders are uniform in BiasOrigin, so this can be obtained from 
+	 * 		BiasOrigin.getDecoders()[0][0]). 
+	 * @param functionDecoders The decoding vectors of the BiasOrigin's associated base origin
+	 * @return A pair of BiasTerminations: the first is to receive direct input from a BiasOrigin and the second is to receive input from 
+	 * 		the interneuron ensemble associated with the BiasOrigin (see BiasOrigin.getInterneurons()) 
+	 * @throws StructuralException
+	 */
+	public BiasTermination[] addBiasTerminations(DecodedTermination baseTermination, 
+			float interneuronTauPSC, float biasDecoder, float[][] functionDecoders) throws StructuralException;
 	
 	/**
 	 * @param name Name of Termination to remove. 
