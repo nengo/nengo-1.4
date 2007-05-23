@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
 import ca.neo.model.neuron.Neuron;
+import ca.neo.util.TimeSeries;
 
 /**
  * Handles saving and loading of Networks, Ensembles, and individual Neurons.   
@@ -54,6 +55,10 @@ public class FileManager {
 	public void save(Neuron neuron, File destination) throws IOException {
 		saveObject(neuron, destination);
 	}	
+	
+	public void save(TimeSeries timeSeries, File destination) throws IOException {
+		saveObject(timeSeries, destination);
+	}
 	
 	private static void saveObject(Object object, File destination) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
