@@ -77,4 +77,9 @@ public interface Simulator {
 	 */
 	public void run(float startTime, float endTime, float stepSize, SimulationMode mode) throws SimulationException;
 	
+	/**
+	 * @return List of Probes that have been added to this Simulator.  
+	 */
+	public Probe[] getProbes();
+	
 }

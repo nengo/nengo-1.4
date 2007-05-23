@@ -38,7 +38,7 @@ public class LocalSimulator implements Simulator {
 	private Projection[] myProjections;
 	private Node[] myNodes;
 	private Map myNodeMap;
-	private List myProbes;
+	private List<Probe> myProbes;
 	
 	/**
 	 * @see ca.neo.sim.Simulator#initialize(ca.neo.model.Network)
@@ -52,7 +52,7 @@ public class LocalSimulator implements Simulator {
 		}
 		
 		myProjections = network.getProjections();
-		myProbes = new ArrayList(20);
+		if (myProbes == null) myProbes = new ArrayList<Probe>(20);
 	}
 
 	/**
@@ -73,8 +73,8 @@ public class LocalSimulator implements Simulator {
 		float time = startTime;
 
 		int c = 0;
-		while (time < endTime) {
-			//if (c++ % 100 == 0) System.out.println("Step " + c); //TODO: change this to listener/progress bar
+		while (time < endTime - stepSize/10000f) { //in case we're very close with floating point comparison
+//			if (c++ % 100 == 0) System.out.println("Step " + c); //TODO: change this to listener/progress bar
 			step(time, Math.min(endTime, time+stepSize));
 			time += stepSize;
 		}
@@ -173,6 +173,13 @@ public class LocalSimulator implements Simulator {
 		}
 		
 		return (Probeable) nodes[index];
+	}
+
+	/**
+	 * @see ca.neo.sim.Simulator#getProbes()
+	 */
+	public Probe[] getProbes() {
+		return myProbes.toArray(new Probe[0]);
 	}
 
 }
