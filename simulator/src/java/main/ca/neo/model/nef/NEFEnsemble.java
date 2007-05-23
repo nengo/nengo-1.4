@@ -7,6 +7,9 @@ import ca.neo.math.Function;
 import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.model.nef.impl.BiasOrigin;
+import ca.neo.model.nef.impl.BiasTermination;
+import ca.neo.model.nef.impl.DecodedTermination;
 import ca.neo.model.plasticity.Plastic;
 
 /**
@@ -48,6 +51,9 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	 */
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException;
 	
+	//TODO: with a little work this could be pushed up to DecodableEnsemble (have to generalize constant-rate responses)
+	public BiasOrigin addBiasOrigin(Origin existing, int numInterneurons, boolean excitatory) throws StructuralException;
+		
 	/**
 	 * Adds a new Termination into this Ensemble, at which information is to be received 
 	 * in the form of decoded state variables rather than spikes, etc.  
@@ -87,6 +93,8 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	 */
 	public Termination addDecodedTermination(String name, float[][] matrix, float[] tfNumerator, float[] tfDenominator, 
 			boolean isModulatory) throws StructuralException;
+	
+	public BiasTermination[] addBiasTerminations(DecodedTermination baseTermination, float interneuronTauPSC, float biasDecoder, float[][] functionDecoders) throws StructuralException;
 	
 	/**
 	 * @param name Name of Termination to remove. 

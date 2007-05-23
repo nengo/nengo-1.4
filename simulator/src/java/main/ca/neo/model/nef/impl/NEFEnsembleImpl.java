@@ -42,6 +42,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 	private static final long serialVersionUID = 1L;
 	
+	public static String BIAS_SUFFIX = "_bias";
+	public static String INTERNEURON_SUFFIX = "_interneuron";
+	
 	private int myDimension;
 	private float[][] myEncoders;
 	private Map<String, DecodedTermination> myDecodedTerminations;
@@ -113,12 +116,12 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @throws StructuralException If CONSTANT_RATE is not supported by the given Node
 	 * @throws SimulationException If the Node does not have an Origin with the given name  
 	 */
-	protected float[] getConstantOutput(int neuronIndex, float[][] evalPoints, String origin) 
+	protected float[] getConstantOutput(int nodeIndex, float[][] evalPoints, String origin) 
 			throws StructuralException, SimulationException {
 		
 		float[] result = new float[evalPoints.length];
 		
-		NEFNode node = (NEFNode) getNodes()[neuronIndex];
+		NEFNode node = (NEFNode) getNodes()[nodeIndex];
 		synchronized (node) {
 			SimulationMode mode = node.getMode();
 			
@@ -129,7 +132,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			}
 			
 			for (int i = 0; i < result.length; i++) {
-				node.setRadialInput(getRadialInput(evalPoints[i], neuronIndex));
+				node.setRadialInput(getRadialInput(evalPoints[i], nodeIndex));
 				
 				node.run(0f, 0f);
 				
@@ -171,8 +174,24 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		super.addDecodedOrigin(name, result);
 		
 		return result;
-	}
+	}	
 
+	/**
+	 * @see ca.neo.model.nef.NEFEnsemble#addSignedDecodedOrigin(java.lang.String, ca.neo.model.Origin, int, boolean)
+	 */
+	public BiasOrigin addBiasOrigin(Origin existing, int numInterneurons, boolean excitatory) throws StructuralException {
+		if ( !(existing instanceof DecodedOrigin) ) {
+			throw new StructuralException("A DecodedOrigin is needed to make a SignedDecodedOrigin");
+		}
+		
+		DecodedOrigin o = (DecodedOrigin) existing;
+		BiasOrigin result = new BiasOrigin(getName()+"_"+existing.getName()+BIAS_SUFFIX, getNodes(), o.getNodeOrigin(), 
+				getConstantOutputs(myEvalPoints, o.getNodeOrigin()), numInterneurons, excitatory);
+		
+		addDecodedOrigin(result.getName(), result);
+		return result;
+	}
+	
 	/**
 	 * @see ca.neo.model.nef.NEFEnsemble#addDecodedTermination(java.lang.String, float[][], float, boolean)
 	 */
@@ -229,6 +248,45 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		return result;
 	}
+		
+	public BiasTermination[] addBiasTerminations(DecodedTermination baseTermination, float interneuronTauPSC, float biasDecoder, float[][] functionDecoders) throws StructuralException {
+		float[][] transform = baseTermination.getTransform();
+		
+		float[] biasEncoders = new float[myEncoders.length];
+		for (int j = 0; j < biasEncoders.length; j++) {
+			float max = 0;
+			for (int i = 0; i < functionDecoders.length; i++) {
+				float x = - MU.prod(myEncoders[j], MU.prod(transform, functionDecoders[i])) / biasDecoder;
+				if (x > max) max = x;
+			}			
+			biasEncoders[j] = max;
+		}
+		
+		EulerIntegrator integrator = new EulerIntegrator(interneuronTauPSC / 10f); //assume this is fast enough for bias as well (interneurons termination probably faster)
+		
+		float scale = 1 / interneuronTauPSC; //output scaling to make impulse integral = 1		
+		LinearSystem interneuronDynamics = new SimpleLTISystem(
+				new float[]{-1f/interneuronTauPSC}, 
+				new float[][]{new float[]{1f}}, 
+				new float[][]{new float[]{scale}}, 
+				new float[]{0f}, 
+				new Units[]{Units.UNK}
+		);
+		
+		String biasName = baseTermination.getName()+BIAS_SUFFIX;
+		String interName = baseTermination.getName()+INTERNEURON_SUFFIX;
+		BiasTermination biasTermination = new BiasTermination(biasName, baseTermination.getName(), baseTermination.getDynamics(), integrator, biasEncoders, false);
+		BiasTermination interneuronTermination = new BiasTermination(interName, baseTermination.getName(), interneuronDynamics, integrator, biasEncoders, true);
+		
+		Boolean modulatory = (Boolean) baseTermination.getConfiguration().getProperty(Termination.MODULATORY);
+		biasTermination.getConfiguration().setProperty(Termination.MODULATORY, modulatory);
+		interneuronTermination.getConfiguration().setProperty(Termination.MODULATORY, modulatory);
+		
+		myDecodedTerminations.put(biasName, biasTermination);
+		myDecodedTerminations.put(interName, interneuronTermination);
+		
+		return new BiasTermination[]{biasTermination, interneuronTermination};
+	}
 
 	/**
 	 * @see ca.neo.model.nef.NEFEnsemble#removeDecodedTermination(java.lang.String)
@@ -257,6 +315,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public void run(float startTime, float endTime) throws SimulationException {
 		try {
 			float[] state = new float[myDimension];
+			Map<String, Float> bias = new HashMap<String, Float>(5);
 
 			//run terminations and sum state ...
 			Iterator it = myDecodedTerminations.values().iterator();
@@ -265,8 +324,16 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				t.run(startTime, endTime);
 				float[] output = t.getOutput();
 				
-				Boolean isModulatory = (Boolean) t.getConfiguration().getProperty(Termination.MODULATORY);
-				if (!isModulatory.booleanValue()) state = MU.sum(state, output);
+				boolean isModulatory = ((Boolean) t.getConfiguration().getProperty(Termination.MODULATORY)).booleanValue();
+				//TODO: handle modulatory bias input
+				if (t instanceof BiasTermination) {
+					String baseName = ((BiasTermination) t).getBaseTerminationName();
+					if (!bias.containsKey(baseName)) bias.put(baseName, new Float(0));					
+					if (!isModulatory) bias.put(baseName, new Float(bias.get(baseName).floatValue() + output[0]));
+				} else {
+					if (!isModulatory) state = MU.sum(state, output);					
+				}
+				
 			}
 
 			if ( getMode().equals(SimulationMode.DIRECT) ) {
@@ -281,7 +348,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				//multiply state by encoders (cosine tuning), set radial input of each Neuron and run ...
 				NEFNode[] nodes = (NEFNode[]) getNodes();
 				for (int i = 0; i < nodes.length; i++) {
-					nodes[i].setRadialInput(getRadialInput(state, i));
+					nodes[i].setRadialInput(getRadialInput(state, i) + getBiasInput(bias, myDecodedTerminations, i));
 				}
 				super.run(startTime, endTime);
 			}
@@ -291,6 +358,19 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			e.setEnsemble(getName());
 			throw e;
 		}
+	}
+	
+	// @param bias Bias input (related to avoidance of negative weights with interneurons) 
+	private static float getBiasInput(Map<String, Float> bias, Map<String, DecodedTermination> dt, int node) {
+		float sumBias = 0;
+		Iterator<String> it = bias.keySet().iterator();
+		while (it.hasNext()) {
+			String baseName = it.next();
+			float netBias = bias.get(baseName).floatValue();
+			float biasEncoder = ((BiasTermination) dt.get(baseName+BIAS_SUFFIX)).getBiasEncoders()[node];
+			sumBias += netBias * biasEncoder;
+		}
+		return sumBias;
 	}
 	
 	//run ensemble plasticity rules (assume constant input/state over given elapsed time)
@@ -329,10 +409,19 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @param node Node number 
 	 * @return Radial input to the given node 
 	 */
-	private float getRadialInput(float[] state, int node) {
-		return MU.prod(state, myEncoders[node]);
+	protected float getRadialInput(float[] state, int node) {
+//		float sumBias = 0;
+//		Iterator<String> it = bias.keySet().iterator();
+//		while (it.hasNext()) {
+//			String baseName = it.next();
+//			float netBias = bias.get(baseName).floatValue();
+//			float biasEncoder = ((BiasTermination) myDecodedTerminations.get(baseName+BIAS_SUFFIX)).getBiasEncoders()[node];
+//			sumBias += netBias * biasEncoder;
+//		}
+//		
+		return MU.prod(state, myEncoders[node]) /*+ sumBias*/;
 	}
-
+	
 	/**
 	 * @see ca.neo.model.Node#getTermination(java.lang.String)
 	 */

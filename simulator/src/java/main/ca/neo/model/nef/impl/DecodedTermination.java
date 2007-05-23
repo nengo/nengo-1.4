@@ -215,6 +215,17 @@ public class DecodedTermination implements Termination, Resettable {
 	public Configuration getConfiguration() {
 		return myConfiguration;
 	}
+	
+	/**
+	 * @return A copy of the dynamics that govern each dimension of this Termination 
+	 */
+	protected LinearSystem getDynamics() {
+		try {
+			return (LinearSystem) myDynamics[0].clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException("Termination dynamics don't support clone()", e);
+		}
+	}
 
 	/** 
 	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
