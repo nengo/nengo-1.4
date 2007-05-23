@@ -196,7 +196,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		
 	/**
 	 * @return Composite of Node states by given name. States of different nodes may be defined at different 
-	 * 		times, so only the states at the start and end of the most recent step are given. Only the first 
+	 * 		times, so only the states at the end of the most recent step are given. Only the first 
 	 * 		dimension of each Node state is included in the composite. 
 	 * @see ca.neo.model.Probeable#getHistory(java.lang.String)
 	 */
@@ -207,21 +207,25 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		
 		List<Integer> nodeNumbers = myStateNames.get(stateName);
 		float[] firstNodeTimes = ((Probeable) myNodes[nodeNumbers.get(0).intValue()]).getHistory(stateName).getTimes();		
-		float[] times = new float[]{firstNodeTimes[0], firstNodeTimes[firstNodeTimes.length - 1]};
 
-		float[][] values = new float[2][];
+		float[] times = new float[0];
+		float[][] values = new float[0][];
 		Units[] units = Units.uniform(Units.UNK, myNodes.length);
-		for (int i = 0; i < values.length; i++) {
-			values[i] = new float[myNodes.length];
-			for (int j = 0; j < myNodes.length; j++) {
-				if (nodeNumbers.contains(new Integer(j))) {
-					TimeSeries history = ((Probeable) myNodes[j]).getHistory(stateName);
-					int index = (i == 0) ? 0 : history.getTimes().length - 1;
-					values[i][j] = history.getValues()[index][0];
-					if (j == 0) units[j] = history.getUnits()[0]; 
+		
+		if (firstNodeTimes.length >= 1) {
+			times = new float[]{firstNodeTimes[firstNodeTimes.length - 1]};
+
+			values = new float[][]{new float[myNodes.length]};
+			for (int i = 0; i < myNodes.length; i++) {
+				if (nodeNumbers.contains(new Integer(i))) {
+					TimeSeries history = ((Probeable) myNodes[i]).getHistory(stateName);
+					int index = history.getTimes().length - 1;
+					values[0][i] = history.getValues()[index][0];
+					if (i == 0) units[i] = history.getUnits()[0]; 
 				}
 			}
 		}
+		
 		return new TimeSeriesImpl(times, values, units);
 	}
 
