@@ -46,10 +46,9 @@ public class FunctionInput implements Node, Probeable {
 	 * @throws StructuralException 
 	 */
 	public FunctionInput(String name, Function[] functions, Units units) throws StructuralException {
-		checkFunctionDimension(functions);
+		setFunctions(functions);
 		
 		myName = name;
-		myFunctions = functions;
 		
 		//TODO: resolve conflict between single Units in InstantaneousOutput and multiple Units in TimeSeries 
 		myUnits = new Units[functions.length];
@@ -68,6 +67,19 @@ public class FunctionInput implements Node, Probeable {
 				throw new StructuralException("All functions in a FunctionOrigin must be 1-D functions of time");
 			}
 		}
+	}
+	
+	/**
+	 * @param functions New list of functions (of simulation time) that define the output of this Node. 
+	 * 		(Must have the same length as existing Function list.)  
+	 * @throws StructuralException 
+	 */
+	public void setFunctions(Function[] functions) throws StructuralException {
+		checkFunctionDimension(functions);
+		if (myFunctions != null && myFunctions.length != functions.length) {
+			throw new StructuralException("Can't change dimension of this Node from " + myFunctions.length + " to " + functions.length);
+		}
+		myFunctions = functions;
 	}
 
 	/**
