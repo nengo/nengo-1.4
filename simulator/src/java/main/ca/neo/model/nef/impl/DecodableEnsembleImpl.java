@@ -23,6 +23,8 @@ import ca.neo.model.Units;
 import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.nef.DecodableEnsemble;
+import ca.neo.plot.Plotter;
+import ca.neo.util.MU;
 import ca.neo.util.Probe;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.TimeSeriesImpl;
@@ -69,9 +71,13 @@ public class DecodableEnsembleImpl extends AbstractEnsemble implements Decodable
 			evalPoints[i] = new float[]{times[i]};
 		}
 		float[][] values = probe.getData().getValues();
+		float[][] valuesT = MU.transpose(values);
 		
-		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, values);
-		return new DecodedOrigin(name, getNodes(), nodeOrigin, functions, approximator);
+		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, valuesT);
+		DecodedOrigin result = new DecodedOrigin(name, getNodes(), nodeOrigin, functions, approximator);
+
+		addDecodedOrigin(name, result);
+		return result;
 	}
 
 	/**
@@ -107,9 +113,11 @@ public class DecodableEnsembleImpl extends AbstractEnsemble implements Decodable
 		}
 		
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, values);
-		return new DecodedOrigin(name, getNodes(), nodeOrigin, functions, approximator);
+		DecodedOrigin result = new DecodedOrigin(name, getNodes(), nodeOrigin, functions, approximator);
+		addDecodedOrigin(name, result);
+		return result;		
 	}
-
+	
 	/**
 	 * @param name The name of a new DecodedOrigin
 	 * @param origin The new Origin
@@ -194,7 +202,7 @@ public class DecodableEnsembleImpl extends AbstractEnsemble implements Decodable
 			}
 			result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{vals}, units);
 		} else {
-			throw new SimulationException("Output function " + stateName + " is unknown");
+			return super.getHistory(stateName);
 		}
 		
 		return result;
