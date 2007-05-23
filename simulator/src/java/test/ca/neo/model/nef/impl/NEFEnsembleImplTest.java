@@ -23,6 +23,8 @@ import junit.framework.TestCase;
 /**
  * Unit tests for NEFEnsembleImpl. 
  * 
+ * TODO: this is a functional test with no failures ... convert to unit test
+ * 
  * @author Bryan Tripp
  */
 public class NEFEnsembleImplTest extends TestCase {
@@ -57,8 +59,8 @@ public class NEFEnsembleImplTest extends TestCase {
 		network.addNode(bo.getInterneurons()); //should be backwards response functions
 //**		bo.getInterneurons().addDecodedTermination("source", MU.I(1), .005f, false);
 		
-		Plotter.plot(bo.getInterneurons());
-		Plotter.plot(bo.getInterneurons(), NEFEnsemble.X);
+//		Plotter.plot(bo.getInterneurons());
+//		Plotter.plot(bo.getInterneurons(), NEFEnsemble.X);
 		
 		DecodedTermination t = (DecodedTermination) dest.addDecodedTermination("source", MU.I(1), .005f, false);
 //**		BiasTermination[] bt = dest.addBiasTerminations(t, .002f, bo.getDecoders()[0][0], ((DecodedOrigin) source.getOrigin(NEFEnsemble.X)).getDecoders());
@@ -88,9 +90,9 @@ public class NEFEnsembleImplTest extends TestCase {
 		
 		network.run(0, 2);
 		
-		Plotter.plot(sourceProbe.getData(), "source");
-		Plotter.plot(destProbe.getData(), "dest");
-		Plotter.plot(interProbe.getData(), "interneurons");
+//		Plotter.plot(sourceProbe.getData(), "source");
+//		Plotter.plot(destProbe.getData(), "dest");
+//		Plotter.plot(interProbe.getData(), "interneurons");
 	}
 	
 	
