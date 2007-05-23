@@ -572,6 +572,23 @@ public class MU {
 	}
 	
 	/**
+	 * @param start Value of first element in vector
+	 * @param increment Increment between adjacent elements
+	 * @param end Value of last element in vector
+	 * @return A vector with elements evenly incremented from <code>start</code> to <code>end</code> 
+	 */
+	public static float[] makeVector(float start, float increment, float end) {
+		int len = 1 + (int) Math.round((end - start) / increment);
+		
+		float[] result = new float[len];
+		for (int i = 0; i < len-1; i++) {
+			result[i] = start + (float) i * increment; 
+		}
+		result[len-1] = end;
+		return result;
+	}
+	
+	/**
 	 * A tool for growing vectors (similar to java.util.List). 
 	 *    
 	 * @author Bryan Tripp
