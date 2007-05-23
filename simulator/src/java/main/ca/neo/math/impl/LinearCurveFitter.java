@@ -9,8 +9,10 @@ import ca.neo.math.CurveFitter;
 import ca.neo.math.Function;
 
 /**
- * Interpolates linearly between example points. Outside the range of examples, 
- * the last interval is extrapolated.
+ * <p>Interpolates linearly between example points. Outside the range of examples, 
+ * the last interval is extrapolated.</p>
+ * 
+ * <p>Inputs x must be sorted from lowest to highest.<p>  
  * 
  * TODO: sort inputs
  * 
@@ -19,6 +21,8 @@ import ca.neo.math.Function;
 public class LinearCurveFitter implements CurveFitter {
 
 	/**
+	 * Note that inputs x must be sorted from lowest to highest.
+	 * 
 	 * @see ca.neo.math.CurveFitter#fit(float[], float[])
 	 */
 	public Function fit(float[] x, float[] y) {

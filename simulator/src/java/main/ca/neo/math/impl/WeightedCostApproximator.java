@@ -163,10 +163,15 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 * @see ca.neo.math.LinearApproximator#findCoefficients(ca.neo.math.Function)
 	 */
 	public float[] findCoefficients(Function target) {
+		float[] targetValues = new float[myEvalPoints.length];
+		for (int i = 0; i < targetValues.length; i++) {
+			targetValues[i] = target.map(myEvalPoints[i]);
+		}
+		
 		float[] upsilon = new float[myValues.length];
 		for (int i = 0; i < myValues.length; i++) {
 			for (int j = 0; j < myEvalPoints.length; j++) {
-				upsilon[i] += myValues[i][j] * target.map(myEvalPoints[j]) * myCostFunction.map(myEvalPoints[j]);
+				upsilon[i] += myValues[i][j] * targetValues[j] * myCostFunction.map(myEvalPoints[j]);
 			}
 			upsilon[i] = upsilon[i] / myEvalPoints.length;
 		}
@@ -188,7 +193,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 			result[i] = new double[myValues.length];
 			for (int j = 0; j < result[i].length; j++) {
 				for (int k = 0; k < myEvalPoints.length; k++) {
-					result[i][j] += myValues[i][k] * myValues[j][k] * myCostFunction.map(myEvalPoints[k]);
+					result[i][j] += myValues[i][k] * myValues[j][k] * myCostFunction.map(myEvalPoints[k]);						
 				}
 				result[i][j] = result[i][j] / myEvalPoints.length;
 			}
@@ -228,7 +233,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		 * 		to a ConstantFunction) 
 		 */
 		public Function getCostFunction(int dimension) {
-			return new ConstantFunction(dimension, 1);
+			return new ConstantFunction(dimension, 1); 
 		}
 		
 	}
