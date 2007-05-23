@@ -16,7 +16,6 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
-import ca.neo.model.nef.NEFNode;
 import ca.neo.util.MU;
 
 /**
@@ -27,7 +26,7 @@ import ca.neo.util.MU;
  * 
  * @author Bryan Tripp
  */
-public class DecodedOrigin implements Origin, Resettable {
+public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeConfigurable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -86,7 +85,7 @@ public class DecodedOrigin implements Origin, Resettable {
 	 * 		(ie all elements with same length), or if the number of columns in decoders is not equal 
 	 * 		to the number of functions 
 	 */
-	public DecodedOrigin(String name, NEFNode[] nodes, String nodeOrigin, Function[] functions, float[][] decoders) throws StructuralException {
+	public DecodedOrigin(String name, Node[] nodes, String nodeOrigin, Function[] functions, float[][] decoders) throws StructuralException {
 		checkFunctionDimensions(functions);
 		
 		if (!MU.isMatrix(decoders)) {
@@ -226,12 +225,26 @@ public class DecodedOrigin implements Origin, Resettable {
 		
 		myOutput = new RealOutputImpl(values, Units.UNK);
 	}
-
+	
 	/**
 	 * @see ca.neo.model.Origin#getValues()
 	 */
 	public InstantaneousOutput getValues() throws SimulationException {
 		return myOutput;
+	}
+	
+	/**
+	 * @return List of Functions approximated by this DecodedOrigin
+	 */
+	protected Function[] getFunctions() {
+		return myFunctions;
+	}
+
+	/**
+	 * @return Name of Node-level Origin on which this DecodedOrigin is based
+	 */
+	protected String getNodeOrigin() {
+		return myNodeOrigin;
 	}
 
 }
