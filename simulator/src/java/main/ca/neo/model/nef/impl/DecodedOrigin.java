@@ -7,6 +7,7 @@ import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
+import ca.neo.model.Noise;
 import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.Resettable;
@@ -26,7 +27,7 @@ import ca.neo.util.MU;
  * 
  * @author Bryan Tripp
  */
-public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeConfigurable {
+public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeConfigurable, Noise.Noisy {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -37,6 +38,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private float[][] myDecoders;
 	private SimulationMode myMode;
 	private RealOutput myOutput;
+	private Noise myNoise = null;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings. 
@@ -108,6 +110,20 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myMode = SimulationMode.DEFAULT;
 		
 		reset(false);
+	}
+	
+	/**
+	 * @param noise New output noise model (defaults to no noise)
+	 */
+	public void setNoise(Noise noise) {
+		myNoise = noise;
+	}
+	
+	/**
+	 * @return Noise with which output of this Origin is corrupted
+	 */
+	public Noise getNoise() {
+		return myNoise;
 	}
 
 	/**
@@ -223,6 +239,9 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 			}		
 		}
 		
+		if (myNoise != null) {
+			values = MU.sum(values, myNoise.getValues(stepSize, values));
+		}
 		myOutput = new RealOutputImpl(values, Units.UNK);
 	}
 	

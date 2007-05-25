@@ -13,13 +13,16 @@ import java.util.Properties;
 import ca.neo.math.Function;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
+import ca.neo.model.Noise;
 import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
+import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
+import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.TimeSeriesImpl;
 
@@ -34,7 +37,7 @@ public class FunctionInput implements Node, Probeable {
 	private Function[] myFunctions;
 	private Units[] myUnits;
 	private float myTime;
-	private float[] myValues;
+//	private float[] myValues;
 	private FunctionOrigin myOrigin;
 	
 	/**
@@ -95,12 +98,12 @@ public class FunctionInput implements Node, Probeable {
 	public void run(float startTime, float endTime) {
 		myTime = endTime;
 		
-		myValues = new float[myFunctions.length];		
-		for (int i = 0; i < myValues.length; i++) {
-			myValues[i] = myFunctions[i].map(new float[]{myTime});
+		float[] values = new float[myFunctions.length];		
+		for (int i = 0; i < values.length; i++) {
+			values[i] = myFunctions[i].map(new float[]{myTime});
 		}
 		
-		myOrigin.setValues(myValues);
+		myOrigin.setValues(endTime - startTime, values);
 	}
 
 	/**
@@ -138,11 +141,8 @@ public class FunctionInput implements Node, Probeable {
 			throw new SimulationException("State " + stateName + " is unknown");
 		}
 
-		if (myValues == null) {
-			result = new TimeSeriesImpl(new float[0], new float[0][], myUnits);				
-		} else {
-			result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{myValues}, myUnits);				
-		}
+		float[] values = ((RealOutput) myOrigin.getValues()).getValues(); 
+		result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{values}, myUnits);
 		
 		return result;
 	}
@@ -187,14 +187,15 @@ public class FunctionInput implements Node, Probeable {
 	public Termination[] getTerminations() {
 		return new Termination[0];
 	}
-	
-	private static class FunctionOrigin implements Origin {
+
+	public static class FunctionOrigin implements Origin, Noise.Noisy {
 
 		private static final long serialVersionUID = 1L;
 		
 		private int myDimension;
 		private Units myUnits;
 		private float[] myValues;
+		private Noise myNoise;
 		
 		public FunctionOrigin(int dimension, Units units) {
 			myDimension = dimension;
@@ -202,8 +203,12 @@ public class FunctionInput implements Node, Probeable {
 			myValues = new float[dimension];
 		}
 		
-		public void setValues(float[] values) {
-			myValues = values;
+		public void setValues(float elapsedTime, float[] values) {
+			if (myNoise == null) {
+				myValues = values;				
+			} else {
+				myValues = MU.sum(values, myNoise.getValues(elapsedTime, values));
+			}
 		}
 		
 		public int getDimensions() {
@@ -216,6 +221,14 @@ public class FunctionInput implements Node, Probeable {
 
 		public InstantaneousOutput getValues() throws SimulationException {
 			return new RealOutputImpl(myValues, myUnits);
+		}
+
+		public Noise getNoise() {
+			return myNoise;
+		}
+
+		public void setNoise(Noise noise) {
+			myNoise = noise;
 		}
 		
 	}
