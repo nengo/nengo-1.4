@@ -475,6 +475,22 @@ public class MU {
 		
 		return sum / (float) vector.length;
 	}
+	
+	/**
+	 * @param vector Any vector
+	 * @return Bias-corrected variance of vector elements
+	 */
+	public static float variance(float[] vector) {
+		float mean = mean(vector);
+		
+		float sum = 0f;		
+		for (int i = 0; i < vector.length; i++) {
+			float deviation = vector[i] - mean;
+			sum += deviation*deviation;
+		}
+				
+		return sum / ((float) vector.length - 1);
+	}
 
 	/**
 	 * @param vector Any vector
