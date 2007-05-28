@@ -20,7 +20,7 @@ import ca.neo.model.plasticity.PlasticityRule;
  * 
  * @author Bryan Tripp
  */
-public class BasicEnsemblePlasticityRule implements PlasticityRule {
+public class RealPlasticityRule implements PlasticityRule {
 
 	private final String myModTermName;
 	private final int myModTermDim;
@@ -35,10 +35,10 @@ public class BasicEnsemblePlasticityRule implements PlasticityRule {
 	 * @param modTermDim Dimension index of the modulatory input within above Termination 
 	 * @param function Four-dimensional function defining the rate of change of transformation matrix weights. The (scalar) 
 	 * 		inputs are presynaptic state, postsynaptic state, existing weight, and modulatory input. This function is 
-	 * 		applied to each element of the transformation matrix on the Termination to which this EnsemblePlastityRule applies.
+	 * 		applied to each element of the transformation matrix on the Termination to which this PlastityRule applies.
 	 * 		See class documentation for more details.     
 	 */
-	public BasicEnsemblePlasticityRule(String modTermName, int modTermDim, Function function, String originName) {
+	public RealPlasticityRule(String modTermName, int modTermDim, Function function, String originName) {
 		myModTermName = modTermName;
 		myModTermDim = modTermDim;
 		myFunction = function;
