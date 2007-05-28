@@ -52,7 +52,7 @@ public class PolynomialCurveFitter implements CurveFitter {
 			}
 		}
 		
-		//TODO: this is the form given on Mathworld but I'm not clueing in to the advantage
+		//Note: this is the form given on Mathworld but don't see the advantage
 		//Matrix XTX = X.transpose().times(X);
 		//Matrix A = XTX.inverse().times(X.transpose()).times(Y);
 		
