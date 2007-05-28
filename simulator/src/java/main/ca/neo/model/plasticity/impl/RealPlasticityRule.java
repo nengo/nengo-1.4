@@ -38,6 +38,7 @@ public class RealPlasticityRule implements PlasticityRule {
 	 * 		inputs are presynaptic state, postsynaptic state, existing weight, and modulatory input. This function is 
 	 * 		applied to each element of the transformation matrix on the Termination to which this PlastityRule applies.
 	 * 		See class documentation for more details.     
+	 * @param originName Name of Origin from which post-synaptic activity is drawn
 	 */
 	public RealPlasticityRule(String modTermName, int modTermDim, Function function, String originName) {
 		myModTermName = modTermName;
@@ -88,7 +89,7 @@ public class RealPlasticityRule implements PlasticityRule {
 		return result;
 	}
 	
-	private void checkType(InstantaneousOutput state) {
+	private static void checkType(InstantaneousOutput state) {
 		if (!(state instanceof RealOutput)) {
 			throw new IllegalArgumentException("This rule does not support input of type " + state.getClass().getName());
 		}
