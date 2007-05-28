@@ -48,7 +48,7 @@ public class DecodedTermination implements Termination, Resettable {
 	private LinearSystem[] myDynamics;
 	private Integrator myIntegrator;
 	private Units[] myNullUnits;
-	private float[] myInputValues; 
+	private RealOutput myInputValues; 
 	private float[] myOutputValues;
 	private boolean myTauMutable;
 	private ConfigurationImpl myConfiguration;
@@ -136,7 +136,7 @@ public class DecodedTermination implements Termination, Resettable {
 			throw new SimulationException("Only real-valued input is accepted at a DecodedTermination");
 		}
 
-		myInputValues = ((RealOutput) values).getValues();
+		myInputValues = (RealOutput) values;
 	}
 	
 	/**
@@ -149,7 +149,7 @@ public class DecodedTermination implements Termination, Resettable {
 			throw new SimulationException("Null input values on termination " + myName);
 		}
 		
-		float[] dynamicsInputs = MU.prod(myTransform, myInputValues);
+		float[] dynamicsInputs = MU.prod(myTransform, myInputValues.getValues());
 		float[] result = new float[dynamicsInputs.length];
 		
 		for (int i = 0; i < myDynamics.length; i++) {
@@ -174,7 +174,7 @@ public class DecodedTermination implements Termination, Resettable {
 	/**
 	 * @return Latest input to Termination (pre transform and dynamics)
 	 */
-	public float[] getInput() {
+	public RealOutput getInput() {
 		return myInputValues;
 	}
 

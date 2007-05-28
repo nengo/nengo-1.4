@@ -109,7 +109,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 				InstantaneousOutput input = t.getInput();
 				//TODO: allow spikes when rules support spikes
 				if (input instanceof RealOutput) {
-					rule.setTerminationState(t.getName(), ((RealOutput) input).getValues());					
+					rule.setTerminationState(t.getName(), input);					
 				}
 			}
 			
@@ -117,7 +117,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 			InstantaneousOutput input = termination.getInput();
 			if (input instanceof RealOutput) {
 				float[] weights = termination.getWeights();
-				float[][] derivative = rule.getDerivative(new float[][]{weights}, ((RealOutput) termination.getInput()).getValues());
+				float[][] derivative = rule.getDerivative(new float[][]{weights}, termination.getInput());
 				for (int i = 0; i < weights.length; i++) {
 					weights[i] += derivative[0][i] * elapsedTime;
 				}					

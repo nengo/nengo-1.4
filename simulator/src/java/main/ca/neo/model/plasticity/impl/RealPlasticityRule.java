@@ -4,7 +4,8 @@
 package ca.neo.model.plasticity.impl;
 
 import ca.neo.math.Function;
-import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.RealOutput;
 import ca.neo.model.plasticity.PlasticityRule;
 
 /**
@@ -51,36 +52,46 @@ public class RealPlasticityRule implements PlasticityRule {
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, float[])
+	 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.neo.model.InstantaneousOutput)
 	 */
-	public void setTerminationState(String name, float[] state) {
+	public void setTerminationState(String name, InstantaneousOutput state) {
 		if (name.equals(myModTermName)) {
-			myModInput = state[myModTermDim];
+			checkType(state);
+			myModInput = ((RealOutput) state).getValues()[myModTermDim];
 		}
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, float[])
+	 * @see ca.neo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.neo.model.InstantaneousOutput)
 	 */
-	public void setOriginState(String name, float[] state) {
+	public void setOriginState(String name, InstantaneousOutput state) {
 		if (name.equals(myOriginName)) {
-			myOriginState = state;
+			checkType(state);
+			myOriginState = ((RealOutput) state).getValues();
 		}
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], float[])
+	 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.neo.model.InstantaneousOutput)
 	 */
-	public float[][] getDerivative(float[][] transform, float[] input) {
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input) {
+		checkType(input);
+		float[] values = ((RealOutput) input).getValues();
 		float[][] result = new float[transform.length][];
 		for (int i = 0; i < transform.length; i++) {
 			result[i] = new float[transform[i].length];
 			for (int j = 0; j < transform[i].length; j++) {
-				result[i][j] = myFunction.map(new float[]{input[j], myOriginState[i], transform[i][j], myModInput});
+				result[i][j] = myFunction.map(new float[]{values[j], myOriginState[i], transform[i][j], myModInput});
 			}
 		}
 		
 		return result;
+	}
+	
+	private void checkType(InstantaneousOutput state) {
+		if (!(state instanceof RealOutput)) {
+			throw new IllegalArgumentException("This rule does not support input of type " + state.getClass().getName());
+		}
 	}
 
 }

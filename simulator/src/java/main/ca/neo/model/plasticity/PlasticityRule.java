@@ -3,6 +3,8 @@
  */
 package ca.neo.model.plasticity;
 
+import ca.neo.model.InstantaneousOutput;
+
 /**
  * Specifies how the termination weights of an NEFEnsemble are modified depending 
  * on presynaptic and postsynaptic state.
@@ -25,7 +27,7 @@ public interface PlasticityRule {
 	 * @param state The present value of output from the named Termination (may differ 
 	 * 		from its input in terms of dynamics and dimension)
 	 */
-	public void setTerminationState(String name, float[] state);
+	public void setTerminationState(String name, InstantaneousOutput state);
 	
 	/**
 	 * Provides state or functional output, which may serve as an indication of 
@@ -34,13 +36,13 @@ public interface PlasticityRule {
 	 * @param name The name of a DecodedOrigin from the ensemble 
 	 * @param state The present value of output from the named Origin 
 	 */
-	public void setOriginState(String name, float[] state);
+	public void setOriginState(String name, InstantaneousOutput state);
 	
 	/**
 	 * @param transform The present transformation matrix of a Termination
 	 * @param input The present input to the Termination 
 	 * @return The rate of change of each element in the transform (units per second)
 	 */
-	public float[][] getDerivative(float[][] transform, float[] input); 
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input); 
 	
 }

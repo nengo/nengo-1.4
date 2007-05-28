@@ -384,13 +384,13 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			Iterator termIter = myDecodedTerminations.keySet().iterator();
 			while (termIter.hasNext()) {
 				DecodedTermination t = myDecodedTerminations.get(termIter.next());
-				rule.setTerminationState(t.getName(), t.getOutput());
+				rule.setTerminationState(t.getName(), t.getInput());
 			}
 			
 			Origin[] origins = getOrigins();
 			for (int i = 0; i < origins.length; i++) {
 				if (origins[i] instanceof DecodedOrigin) {
-					rule.setOriginState(origins[i].getName(), ((RealOutput) origins[i].getValues()).getValues());
+					rule.setOriginState(origins[i].getName(), origins[i].getValues());
 				}
 			}
 			

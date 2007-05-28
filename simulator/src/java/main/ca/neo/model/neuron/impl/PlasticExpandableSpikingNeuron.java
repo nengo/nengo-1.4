@@ -77,7 +77,7 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 				InstantaneousOutput output = origins[i].getValues();
 				//TODO: spikes should be allowed once spiking rules are supported
 				if (output instanceof RealOutput) {
-					rule.setOriginState(origins[i].getName(), ((RealOutput) origins[i].getValues()).getValues());									
+					rule.setOriginState(origins[i].getName(), output);									
 				}
 			}
 		}
