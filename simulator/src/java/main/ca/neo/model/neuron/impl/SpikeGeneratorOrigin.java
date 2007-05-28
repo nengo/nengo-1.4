@@ -30,7 +30,7 @@ public class SpikeGeneratorOrigin implements Origin {
 	 */
 	public SpikeGeneratorOrigin(SpikeGenerator generator) {
 		myGenerator = generator;
-		myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES);
+		myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES, 0);
 	}
 	
 	/**

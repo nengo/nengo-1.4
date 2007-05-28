@@ -118,18 +118,18 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 			}
 			
 			myRateHistory = new float[]{spiking ? 1f/dt : 0};
-			result = new SpikeOutputImpl(new boolean[]{spiking}, Units.SPIKES);
+			result = new SpikeOutputImpl(new boolean[]{spiking}, Units.SPIKES, time[time.length-1]);
 		} else if (myMode.equals(SimulationMode.RATE)) {
 			float rate = I > 1 ? 1f / ( myTauRef - myTauRC * ((float) Math.log(1f - 1f/I)) ) : 0;
 			myN += (rate * dt) * myIncN; //analog of # spikes X increment 
 			
 			myRateHistory = new float[]{rate};
-			result = new RealOutputImpl(new float[]{rate}, Units.SPIKES_PER_S);
+			result = new RealOutputImpl(new float[]{rate}, Units.SPIKES_PER_S, time[time.length-1]);
 		} else {
 			float rate = I_in > 1 ? 1f / ( myTauRef - myTauRC * ((float) Math.log(1f - 1f/I_in)) ) : 0;
 
 			myRateHistory = new float[]{rate};
-			result = new RealOutputImpl(new float[]{rate}, Units.SPIKES_PER_S);
+			result = new RealOutputImpl(new float[]{rate}, Units.SPIKES_PER_S, time[time.length-1]);
 		}
 		
 		myTime = new float[]{time[time.length-1]};

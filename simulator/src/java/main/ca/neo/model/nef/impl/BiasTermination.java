@@ -39,7 +39,7 @@ public class BiasTermination extends DecodedTermination {
 
 	public void setValues(InstantaneousOutput values) throws SimulationException {
 		RealOutput ro = (RealOutput) values;		
-		super.setValues(new RealOutputImpl(new float[]{ro.getValues()[0]+myStaticBias}, ro.getUnits()));
+		super.setValues(new RealOutputImpl(new float[]{ro.getValues()[0]+myStaticBias}, ro.getUnits(), ro.getTime()));
 	}
 
 }

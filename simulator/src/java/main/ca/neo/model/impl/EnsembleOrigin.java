@@ -88,7 +88,7 @@ public class EnsembleOrigin implements Origin {
 			values[i] = ((RealOutput) o).getValues()[0];
 		}
 		
-		return new RealOutputImpl(values, units);
+		return new RealOutputImpl(values, units, origins[0].getValues().getTime());
 	}
 	
 	private static SpikeOutput composeSpikeOutput(Origin[] origins, Units units) throws SimulationException {
@@ -106,7 +106,7 @@ public class EnsembleOrigin implements Origin {
 			values[i] = ((SpikeOutput) o).getValues()[0];
 		}
 		
-		return new SpikeOutputImpl(values, units);
+		return new SpikeOutputImpl(values, units, origins[0].getValues().getTime());
 	}
 
 }

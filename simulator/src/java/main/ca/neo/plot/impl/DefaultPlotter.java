@@ -59,7 +59,7 @@ public class DefaultPlotter extends Plotter {
 				"", 
 				dataset, 
 				PlotOrientation.VERTICAL, 
-				true, false, false
+				(series.getDimension() < 10), false, false
 		);
 		
 		showChart(chart, "Time Series Plot");
@@ -149,7 +149,7 @@ public class DefaultPlotter extends Plotter {
 			
 			float[][] encoders = ensemble.getEncoders();
 
-			float[] x = new float[101];
+			float[] x = new float[101]; 
 			float[][] idealOutput = new float[x.length][];
 			float[][] actualOutput = new float[x.length][];
 
@@ -164,11 +164,11 @@ public class DefaultPlotter extends Plotter {
 					((NEFNode) nodes[j]).setRadialInput(x[i]*encoders[j][0]);
 					nodes[j].run(0f, 0f);					
 				}
-				origin.run(null, 1f);
+				origin.run(null, 0f, 1f);
 				actualOutput[i] = ((RealOutput) origin.getValues()).getValues();
 				
 				ensemble.setMode(SimulationMode.DIRECT);
-				origin.run(new float[]{x[i]}, 1f);
+				origin.run(new float[]{x[i]}, 0f, 1f);
 				idealOutput[i] = ((RealOutput) origin.getValues()).getValues();
 			}
 			ensemble.setMode(mode);
@@ -375,7 +375,34 @@ public class DefaultPlotter extends Plotter {
 		showChart(chart, title);
 	}
 
-	
+	/**
+	 * @see ca.neo.plot.Plotter#doPlot(float[], float[], java.lang.String)
+	 */
+	public void doPlot(float[] domain, float[] vector, String title) {
+		if (domain.length < vector.length) {
+			throw new IllegalArgumentException("Not enough domain points (" + domain.length + "given; " + vector.length + "needed)");
+		}
+		
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		XYSeries series = new XYSeries("Vector");
+
+		for (int i = 0; i < vector.length; i++) {
+			series.add(domain[i], vector[i]); 
+		}
+
+		dataset.addSeries(series);
+
+		JFreeChart chart = ChartFactory.createXYLineChart(
+				"Vector",
+				"Index", 
+				"Value", 
+				dataset, 
+				PlotOrientation.VERTICAL, 
+				false, false, false
+		);
+		
+		showChart(chart, title);
+	}
 	
 	//shows a chart in a new window 
 	private void showChart(JFreeChart chart, String title) {

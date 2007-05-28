@@ -340,7 +340,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				Origin[] origins = getOrigins();
 				for (int i = 0; i < origins.length; i++) {
 					if (origins[i] instanceof DecodedOrigin) {
-						((DecodedOrigin) origins[i]).run(state, endTime - startTime);
+						((DecodedOrigin) origins[i]).run(state, startTime, endTime);
 					}
 				}
 				setTime(endTime);

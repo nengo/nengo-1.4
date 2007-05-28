@@ -103,7 +103,7 @@ public class FunctionInput implements Node, Probeable {
 			values[i] = myFunctions[i].map(new float[]{myTime});
 		}
 		
-		myOrigin.setValues(endTime - startTime, values);
+		myOrigin.setValues(startTime, endTime, values);
 	}
 
 	/**
@@ -195,6 +195,7 @@ public class FunctionInput implements Node, Probeable {
 		private int myDimension;
 		private Units myUnits;
 		private float[] myValues;
+		private float myTime;
 		private Noise myNoise;
 		
 		public FunctionOrigin(int dimension, Units units) {
@@ -203,11 +204,12 @@ public class FunctionInput implements Node, Probeable {
 			myValues = new float[dimension];
 		}
 		
-		public void setValues(float elapsedTime, float[] values) {
+		public void setValues(float startTime, float endTime, float[] values) {
+			myTime = endTime;
 			if (myNoise == null) {
 				myValues = values;				
 			} else {
-				myValues = MU.sum(values, myNoise.getValues(elapsedTime, values));
+				myValues = MU.sum(values, myNoise.getValues(endTime-startTime, values));
 			}
 		}
 		
@@ -220,7 +222,7 @@ public class FunctionInput implements Node, Probeable {
 		}
 
 		public InstantaneousOutput getValues() throws SimulationException {
-			return new RealOutputImpl(myValues, myUnits);
+			return new RealOutputImpl(myValues, myUnits, myTime);
 		}
 
 		public Noise getNoise() {

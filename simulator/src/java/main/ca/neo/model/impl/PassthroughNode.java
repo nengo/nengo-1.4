@@ -3,6 +3,8 @@
  */
 package ca.neo.model.impl;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
@@ -26,6 +28,8 @@ import ca.neo.util.impl.ConfigurationImpl;
  * @author Bryan Tripp
  */
 public class PassthroughNode implements Node {
+	
+	private static Logger ourLogger = Logger.getLogger(PassthroughNode.class);
 
 	public static final String TERMINATION = "termination";
 	public static final String ORIGIN = "origin";
@@ -97,7 +101,13 @@ public class PassthroughNode implements Node {
 	 * @see ca.neo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
-		myOrigin.setValues(new RealOutputImpl(new float[myOrigin.getDimensions()], Units.UNK));
+		float time = 0; 
+		try {
+			if (myOrigin.getValues() != null) myOrigin.getValues().getTime();
+		} catch (SimulationException e) {
+			ourLogger.warn("Exception getting time from existing output during reset", e);
+		}
+		myOrigin.setValues(new RealOutputImpl(new float[myOrigin.getDimensions()], Units.UNK, time));
 	}
 
 	/**

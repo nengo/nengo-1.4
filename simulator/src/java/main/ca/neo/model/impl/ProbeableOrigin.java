@@ -96,6 +96,7 @@ public class ProbeableOrigin implements Origin {
 	 * 		from the underlying Probeable   
 	 */
 	public InstantaneousOutput getValues() throws SimulationException {
+		float[] times = myProbeable.getHistory(myStateVariable).getTimes();
 		float[][] series = myProbeable.getHistory(myStateVariable).getValues();
 		
 		float result = 0;
@@ -104,7 +105,7 @@ public class ProbeableOrigin implements Origin {
 			result = series[series.length - 1][myDimension];
 		}
 
-		return new RealOutputImpl(new float[]{result}, myUnits);
+		return new RealOutputImpl(new float[]{result}, myUnits, times[times.length-1]);
 	}
 	
 }

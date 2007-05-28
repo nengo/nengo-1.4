@@ -17,14 +17,17 @@ public class SpikeOutputImpl implements SpikeOutput {
 	
 	private boolean[] myValues;
 	private Units myUnits;
+	private float myTime;
 
 	/**
 	 * @param values @see #getValues()
 	 * @param units @see #getUnits()
+	 * @param time @see #getTime()
 	 */
-	public SpikeOutputImpl(boolean[] values, Units units) {
+	public SpikeOutputImpl(boolean[] values, Units units, float time) {
 		myValues = values;
 		myUnits = units;
+		myTime = time;
 	}
 
 	/**
@@ -46,6 +49,13 @@ public class SpikeOutputImpl implements SpikeOutput {
 	 */
 	public int getDimension() {
 		return myValues.length;
+	}
+
+	/**
+	 * @see ca.neo.model.InstantaneousOutput#getTime()
+	 */
+	public float getTime() {
+		return myTime;
 	}
 
 }

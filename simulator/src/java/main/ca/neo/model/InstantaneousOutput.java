@@ -31,5 +31,10 @@ public interface InstantaneousOutput extends Serializable {
 	 */
 	public int getDimension();
 	
+	/**
+	 * @return Time at which output is produced. 
+	 */
+	public float getTime();
+	
 }
 

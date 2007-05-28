@@ -72,7 +72,7 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator {
 			}
 		}
 		
-		return new SpikeOutputImpl(new boolean[]{spike}, Units.SPIKES);
+		return new SpikeOutputImpl(new boolean[]{spike}, Units.SPIKES, time[time.length-1]);
 	}
 	
 	/**

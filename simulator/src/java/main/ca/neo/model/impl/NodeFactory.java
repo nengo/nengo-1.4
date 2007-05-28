@@ -11,8 +11,6 @@ import ca.neo.model.StructuralException;
  * but a given implementation might use parameters that are constant across nodes, drawn 
  * from a PDF, selected from a database, etc.
  * 
- * TODO: should make many at once? - to allow dependencies between parameters of results in a group 
- * 
  * @author Bryan Tripp
  */
 public interface NodeFactory {

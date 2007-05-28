@@ -169,7 +169,7 @@ public class DecodableEnsembleImpl extends AbstractEnsemble implements Decodable
 		
 		Iterator<DecodedOrigin> it = myDecodedOrigins.values().iterator();
 		while (it.hasNext()) {
-			it.next().run(null, endTime - startTime);;
+			it.next().run(null, startTime, endTime);
 		}
 
 		setTime(endTime);

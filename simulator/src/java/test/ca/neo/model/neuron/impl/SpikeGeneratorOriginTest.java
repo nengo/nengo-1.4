@@ -86,9 +86,9 @@ public class SpikeGeneratorOriginTest extends TestCase {
 		
 		public InstantaneousOutput run(float[] time, float[] current) {
 			if (myMode.equals(SimulationMode.DEFAULT)) {
-				return new SpikeOutputImpl(new boolean[]{myNextSpikeOutput}, Units.SPIKES);
+				return new SpikeOutputImpl(new boolean[]{myNextSpikeOutput}, Units.SPIKES, 0);
 			} else {
-				return new RealOutputImpl(new float[]{myNextRateOutput}, Units.SPIKES_PER_S);
+				return new RealOutputImpl(new float[]{myNextRateOutput}, Units.SPIKES_PER_S, 0);
 			}
 		}
 

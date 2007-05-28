@@ -20,7 +20,7 @@ public class RealOutputImplTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		myRealOutput = new RealOutputImpl(new float[]{1f}, Units.SPIKES_PER_S);
+		myRealOutput = new RealOutputImpl(new float[]{1f}, Units.SPIKES_PER_S, 0);
 	}
 
 	/*

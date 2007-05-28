@@ -18,7 +18,7 @@ public class SpikeOutputImplTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();		
-		mySpikeOutput = new SpikeOutputImpl(new boolean[]{true}, Units.SPIKES);
+		mySpikeOutput = new SpikeOutputImpl(new boolean[]{true}, Units.SPIKES, 0);
 	}
 
 	/*

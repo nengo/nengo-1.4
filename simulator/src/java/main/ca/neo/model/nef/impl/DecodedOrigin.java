@@ -130,7 +130,8 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 * @see ca.neo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
-		myOutput = new RealOutputImpl(new float[myFunctions.length], Units.UNK);
+		float time = (myOutput == null) ? 0 : myOutput.getTime();
+		myOutput = new RealOutputImpl(new float[myFunctions.length], Units.UNK, time);
 	}
 
 	private static float[][] findDecoders(Node[] nodes, Function[] functions, LinearApproximator approximator)  {
@@ -198,17 +199,19 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 *  
 	 * @param state Idealized state (as defined by inputs) which can be fed into (idealized) functions 
 	 * 		that make up the Origin, when it is running in DIRECT mode. This is not used in other modes, 
-	 * 		and can be null.  
-	 * @param stepSize Length of time step, used to calculate magnitude of spike "impulses".  
+	 * 		and can be null.
+	 * @param startTime simulation time of timestep onset  
+	 * @param endTime simulation time of timestep end  
 	 * @throws SimulationException If the given state is not of the expected dimension (ie the input 
 	 * 		dimension of the functions provided in the constructor)
 	 */
-	public void run(float[] state, float stepSize) throws SimulationException {
+	public void run(float[] state, float startTime, float endTime) throws SimulationException {
 		if (state != null && state.length != myFunctions[0].getDimension()) {
 			throw new SimulationException("A state of dimension " + myFunctions[0].getDimension() + " was expected");
 		}		
 		
 		float[] values = new float[myFunctions.length];
+		float stepSize = endTime - startTime;
 		
 		if (myMode == SimulationMode.DIRECT) {
 			for (int i = 0; i < values.length; i++) {
@@ -242,7 +245,8 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		if (myNoise != null) {
 			values = MU.sum(values, myNoise.getValues(stepSize, values));
 		}
-		myOutput = new RealOutputImpl(values, Units.UNK);
+		
+		myOutput = new RealOutputImpl(values, Units.UNK, endTime);
 	}
 	
 	/**

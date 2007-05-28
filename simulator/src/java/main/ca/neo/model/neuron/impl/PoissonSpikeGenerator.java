@@ -52,7 +52,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		InstantaneousOutput result = null;
 		
 		if (myMode.equals(SimulationMode.CONSTANT_RATE)) {
-			result = new RealOutputImpl(new float[]{myRateFunction.map(new float[]{current[0]})}, Units.SPIKES_PER_S);
+			result = new RealOutputImpl(new float[]{myRateFunction.map(new float[]{current[0]})}, Units.SPIKES_PER_S, time[time.length-1]);
 		} else {
 			boolean spike = false;
 			for (int i = 0; i < time.length - 1 && !spike; i++) {
@@ -70,7 +70,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 				spike = (Math.random() > probNoSpikes);
 			}
 			
-			result = new SpikeOutputImpl(new boolean[]{spike}, Units.SPIKES); 
+			result = new SpikeOutputImpl(new boolean[]{spike}, Units.SPIKES, time[time.length-1]); 
 		}
 		
 		return result;

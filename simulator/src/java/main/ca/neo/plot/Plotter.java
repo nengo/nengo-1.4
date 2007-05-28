@@ -223,4 +223,23 @@ public abstract class Plotter {
 	 * @param title Display title of plot
 	 */
 	public abstract void doPlot(float[] vector, String title);
+	
+	/**
+	 * Static convenience method for plotting a vector. 
+	 *
+	 * @param domain Vector of domain values 
+	 * @param vector Vector of range values
+	 * @param title Display title of plot
+	 */
+	public static void plot(float[] domain, float[] vector, String title) {
+		getInstance().doPlot(domain, vector, title);
+	}
+	
+	/**
+	 * @param domain Vector of domain values 
+	 * @param vector Vector of range values
+	 * @param title Display title of plot
+	 */
+	public abstract void doPlot(float[] domain, float[] vector, String title);
+	
 }

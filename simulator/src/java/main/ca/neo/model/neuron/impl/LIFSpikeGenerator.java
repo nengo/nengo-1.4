@@ -109,9 +109,9 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		InstantaneousOutput result = null;
 		
 		if (myMode.equals(SimulationMode.CONSTANT_RATE)) {
-			result = new RealOutputImpl(new float[]{doConstantRateRun(time[0], current[0])}, Units.SPIKES_PER_S);
+			result = new RealOutputImpl(new float[]{doConstantRateRun(time[0], current[0])}, Units.SPIKES_PER_S, time[time.length-1]);
 		} else {
-			result = new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES);
+			result = new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES, time[time.length-1]);
 		}
 		
 		return result;
