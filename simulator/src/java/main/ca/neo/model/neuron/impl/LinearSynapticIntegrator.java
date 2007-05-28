@@ -15,6 +15,7 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.LinearExponentialTermination;
+import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.neuron.ExpandableSynapticIntegrator;
 import ca.neo.model.plasticity.Plastic;
 import ca.neo.model.plasticity.PlasticityRule;
@@ -90,13 +91,13 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 			}			
 		}
 		
-		learn(endTime - startTime);
+		learn(startTime, endTime);
 				
 		return new TimeSeries1DImpl(times, currents, myCurrentUnits);
 	}
 	
 	//run plasticity rules (assume constant input/state over given elapsed time)
-	private void learn(float elapsedTime) throws SimulationException {
+	private void learn(float startTime, float endTime) throws SimulationException {
 		Iterator ruleIter = myPlasticityRules.keySet().iterator();
 		while (ruleIter.hasNext()) {
 			String name = (String) ruleIter.next();
@@ -106,20 +107,16 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 			Iterator termIter = myTerminations.keySet().iterator();
 			while (termIter.hasNext()) {
 				LinearExponentialTermination t = myTerminations.get(termIter.next());
-				InstantaneousOutput input = t.getInput();
-				//TODO: allow spikes when rules support spikes
-				if (input instanceof RealOutput) {
-					rule.setTerminationState(t.getName(), input);					
-				}
+				InstantaneousOutput input = new RealOutputImpl(new float[]{t.getOutput()}, Units.UNK, endTime);
+				rule.setTerminationState(t.getName(), input);					
 			}
 			
-			//TODO: allow spikes when rules support spikes
 			InstantaneousOutput input = termination.getInput();
 			if (input instanceof RealOutput) {
 				float[] weights = termination.getWeights();
 				float[][] derivative = rule.getDerivative(new float[][]{weights}, termination.getInput());
 				for (int i = 0; i < weights.length; i++) {
-					weights[i] += derivative[0][i] * elapsedTime;
+					weights[i] += derivative[0][i] * (endTime - startTime);
 				}					
 			}
 		}

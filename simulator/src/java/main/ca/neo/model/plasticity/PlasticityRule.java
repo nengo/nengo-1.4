@@ -20,8 +20,9 @@ public interface PlasticityRule {
 	/**
 	 * Provides potentially modulatory input to the rule.
 	 *   
-	 * Note that an NEFEnsemble will provide outputs of all Terminations via this method 
-	 * regardless of whether a Termination has property Termination.MODULATORY=="true". 
+	 * Note that although modulatory input will most commonly be used here, an NEFEnsemble 
+	 * will provide outputs of all Terminations via this method regardless of whether a 
+	 * Termination has property Termination.MODULATORY=="true". 
 	 * 
 	 * @param name The name of a DecodedTermination onto the ensemble
 	 * @param state The present value of output from the named Termination (may differ 

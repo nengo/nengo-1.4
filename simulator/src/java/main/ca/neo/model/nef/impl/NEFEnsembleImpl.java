@@ -24,6 +24,7 @@ import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
+import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.plasticity.PlasticityRule;
@@ -352,7 +353,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				}
 				super.run(startTime, endTime);
 			}
-			learn(endTime - startTime);
+			learn(startTime, endTime);
 
 		} catch (SimulationException e) {
 			e.setEnsemble(getName());
@@ -374,7 +375,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	}
 	
 	//run ensemble plasticity rules (assume constant input/state over given elapsed time)
-	private void learn(float elapsedTime) throws SimulationException {
+	private void learn(float startTime, float endTime) throws SimulationException {
 		Iterator ruleIter = myPlasticityRules.keySet().iterator();
 		while (ruleIter.hasNext()) {
 			String name = (String) ruleIter.next();
@@ -384,7 +385,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			Iterator termIter = myDecodedTerminations.keySet().iterator();
 			while (termIter.hasNext()) {
 				DecodedTermination t = myDecodedTerminations.get(termIter.next());
-				rule.setTerminationState(t.getName(), t.getInput());
+				rule.setTerminationState(t.getName(), new RealOutputImpl(t.getOutput(), Units.UNK, endTime));
 			}
 			
 			Origin[] origins = getOrigins();
@@ -398,7 +399,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			float[][] derivative = rule.getDerivative(transform, termination.getInput());
 			for (int i = 0; i < transform.length; i++) {
 				for (int j = 0; j < transform[i].length; j++) {
-					transform[i][j] += derivative[i][j] * elapsedTime;
+					transform[i][j] += derivative[i][j] * (endTime - startTime);
 				}
 			}	
 		}
