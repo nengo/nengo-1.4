@@ -8,6 +8,7 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.plasticity.PlasticityRule;
+import ca.neo.util.MU;
 
 /**
  * <p>A PlasticityRule that accepts spiking input.</p>
@@ -52,56 +53,79 @@ public class SpikePlasticityRule implements PlasticityRule {
 		myOnInSpikeFunction = onInSpike;
 		myOnOutSpikeFunction = onOutSpike;
 		
-		myLastInSpike = new float[termDim];
-		myLastOutSpike = new float[originDim];		
+		myLastInSpike = initialize(termDim);
+		myLastOutSpike = initialize(originDim);		
+		myInSpiking = new boolean[termDim];
+		myOutSpiking = new boolean[originDim];
 	}
 	
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.neo.model.InstantaneousOutput)
+	 * @see ca.neo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.neo.model.InstantaneousOutput, float)
 	 */
-	public void setOriginState(String name, InstantaneousOutput state) {
+	public void setOriginState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myOriginName)) {
-			update(myLastOutSpike, state);
+			update(myLastOutSpike, myOutSpiking, state, time);
 		}
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.neo.model.InstantaneousOutput)
+	 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.neo.model.InstantaneousOutput, float)
 	 */
-	public void setTerminationState(String name, InstantaneousOutput state) {
+	public void setTerminationState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myModTermName)) {
 			myModInput = ((RealOutput) state).getValues()[myModTermDim];
 		}
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.neo.model.InstantaneousOutput)
+	 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.neo.model.InstantaneousOutput, float)
 	 */
-	public float[][] getDerivative(float[][] transform, InstantaneousOutput input) {
-		update(myLastInSpike, input);
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) {
+		update(myLastInSpike, myInSpiking, input, time);
 		
 		float[][] result = new float[transform.length][];
 		for (int i = 0; i < transform.length; i++) {
 			result[i] = new float[transform[i].length];
 			for (int j = 0; j < transform[i].length; j++) {
-				if (myInSpiking[i]) result[i][j] += myOnInSpikeFunction.map(new float[]{myLastOutSpike[j], transform[i][j], myModInput});
-				if (myOutSpiking[j]) result[i][j] += myOnOutSpikeFunction.map(new float[]{myLastInSpike[j], transform[i][j], myModInput});
+				if (myInSpiking[j] && myLastOutSpike[i] >= 0) {
+					result[i][j] += myOnInSpikeFunction.map(new float[]{time - myLastOutSpike[i], transform[i][j], myModInput});					
+				}
+				if (myOutSpiking[i] && myLastInSpike[j] >= 0) {
+					result[i][j] += myOnOutSpikeFunction.map(new float[]{time - myLastInSpike[j], transform[i][j], myModInput});
+				}
 			}
 		}
 		return result;
 	}
 	
 	//updates last spike times if there are any spikes
-	private static void update(float[] lastSpikeTimes, InstantaneousOutput state) {
+	private static void update(float[] lastSpikeTimes, boolean[] spiking, InstantaneousOutput state, float time) {
 		if (!(state instanceof SpikeOutput)) {
 			throw new IllegalArgumentException("This rule does not support input of type " + state.getClass().getName());
+		}
+		if (lastSpikeTimes.length != state.getDimension()) {
+			throw new IllegalArgumentException("Expected activity of dimension " + lastSpikeTimes.length 
+					+ ", got dimension " + state.getDimension());
 		}
 				
 		SpikeOutput so = (SpikeOutput) state;
 		boolean[] spikes = so.getValues();
 		for (int i = 0; i < spikes.length; i++) {
-			if (spikes[i]) lastSpikeTimes[i] = state.getTime();
+			if (spikes[i]) {
+				lastSpikeTimes[i] = time;
+				spiking[i] = true;
+			} else {
+				spiking[i] = false;
+			}
 		}
+	}
+	
+	private static float[] initialize(int dim) {
+		float[] result = new float[dim];
+		for (int i = 0; i < dim; i++) {
+			result[i] = -1f;
+		}
+		return result;
 	}
 	
 }

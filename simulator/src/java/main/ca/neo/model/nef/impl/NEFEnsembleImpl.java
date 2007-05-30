@@ -21,6 +21,7 @@ import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
@@ -385,21 +386,22 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			Iterator termIter = myDecodedTerminations.keySet().iterator();
 			while (termIter.hasNext()) {
 				DecodedTermination t = myDecodedTerminations.get(termIter.next());
-				rule.setTerminationState(t.getName(), new RealOutputImpl(t.getOutput(), Units.UNK, endTime));
+				rule.setTerminationState(t.getName(), new RealOutputImpl(t.getOutput(), Units.UNK, endTime), endTime);
 			}
 			
 			Origin[] origins = getOrigins();
 			for (int i = 0; i < origins.length; i++) {
 				if (origins[i] instanceof DecodedOrigin) {
-					rule.setOriginState(origins[i].getName(), origins[i].getValues());
+					rule.setOriginState(origins[i].getName(), origins[i].getValues(), endTime);
 				}
 			}
 			
 			float[][] transform = termination.getTransform();
-			float[][] derivative = rule.getDerivative(transform, termination.getInput());
+			float[][] derivative = rule.getDerivative(transform, termination.getInput(), endTime);
+			float scale = (termination.getInput() instanceof SpikeOutput) ? 1 : (endTime - startTime); 
 			for (int i = 0; i < transform.length; i++) {
 				for (int j = 0; j < transform[i].length; j++) {
-					transform[i][j] += derivative[i][j] * (endTime - startTime);
+					transform[i][j] += derivative[i][j] * scale;
 				}
 			}	
 		}

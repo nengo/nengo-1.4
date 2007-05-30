@@ -53,9 +53,9 @@ public class RealPlasticityRule implements PlasticityRule {
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.neo.model.InstantaneousOutput)
+	 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.neo.model.InstantaneousOutput, float)
 	 */
-	public void setTerminationState(String name, InstantaneousOutput state) {
+	public void setTerminationState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myModTermName)) {
 			checkType(state);
 			myModInput = ((RealOutput) state).getValues()[myModTermDim];
@@ -63,9 +63,9 @@ public class RealPlasticityRule implements PlasticityRule {
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.neo.model.InstantaneousOutput)
+	 * @see ca.neo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.neo.model.InstantaneousOutput, float)
 	 */
-	public void setOriginState(String name, InstantaneousOutput state) {
+	public void setOriginState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myOriginName)) {
 			checkType(state);
 			myOriginState = ((RealOutput) state).getValues();
@@ -73,9 +73,9 @@ public class RealPlasticityRule implements PlasticityRule {
 	}
 
 	/**
-	 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.neo.model.InstantaneousOutput)
+	 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.neo.model.InstantaneousOutput, float)
 	 */
-	public float[][] getDerivative(float[][] transform, InstantaneousOutput input) {
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) {
 		checkType(input);
 		float[] values = ((RealOutput) input).getValues();
 		float[][] result = new float[transform.length][];

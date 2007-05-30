@@ -9,8 +9,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import ca.neo.model.InstantaneousOutput;
-import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
@@ -108,17 +108,15 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 			while (termIter.hasNext()) {
 				LinearExponentialTermination t = myTerminations.get(termIter.next());
 				InstantaneousOutput input = new RealOutputImpl(new float[]{t.getOutput()}, Units.UNK, endTime);
-				rule.setTerminationState(t.getName(), input);					
+				rule.setTerminationState(t.getName(), input, endTime);					
 			}
 			
-			InstantaneousOutput input = termination.getInput();
-			if (input instanceof RealOutput) {
-				float[] weights = termination.getWeights();
-				float[][] derivative = rule.getDerivative(new float[][]{weights}, termination.getInput());
-				for (int i = 0; i < weights.length; i++) {
-					weights[i] += derivative[0][i] * (endTime - startTime);
-				}					
-			}
+			float[] weights = termination.getWeights();
+			float[][] derivative = rule.getDerivative(new float[][]{weights}, termination.getInput(), endTime);
+			float scale = (termination.getInput() instanceof SpikeOutput) ? 1 : (endTime - startTime); 			
+			for (int i = 0; i < weights.length; i++) {
+				weights[i] += derivative[0][i] * scale;
+			}			
 		}
 	}
 

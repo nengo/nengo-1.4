@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import ca.neo.model.ExpandableNode;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
-import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
@@ -75,10 +74,7 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 
 			for (int i = 0; i < origins.length; i++) {
 				InstantaneousOutput output = origins[i].getValues();
-				//TODO: spikes should be allowed once spiking rules are supported
-				if (output instanceof RealOutput) {
-					rule.setOriginState(origins[i].getName(), output);									
-				}
+				rule.setOriginState(origins[i].getName(), output, endTime);									
 			}
 		}
 		
