@@ -11,6 +11,7 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.util.Configuration;
+import ca.neo.util.MU;
 import ca.neo.util.impl.ConfigurationImpl;
 
 /**
@@ -49,11 +50,22 @@ public class EnsembleTermination implements Termination {
 		myNodeTerminations = nodeTerminations;
 		
 		myConfiguration = new ConfigurationImpl(this);
-		String[] propertyNames = findSharedProperties(nodeTerminations);
+		refreshProperties();
+	}
+	
+	public void refreshProperties() {
+		String[] propertyNames = findSharedProperties(myNodeTerminations);
 		for (int i = 0; i < propertyNames.length; i++) {
 			//not strict on type at this level (may be different types in components)
 			myConfiguration.addProperty(propertyNames[i], Object.class, getProperty(propertyNames[i]));
-		}		
+		}	
+		
+		float[][] weights = new float[myNodeTerminations.length][];
+		for (int i = 0; i < weights.length; i++) {
+			Object o = myNodeTerminations[i].getConfiguration().getProperty(Termination.WEIGHTS);
+			weights[i] = (o != null && o instanceof float[][]) ? ((float[][]) o)[0] : new float[myNodeTerminations[i].getDimensions()]; 
+		}
+		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, MU.transpose(weights));
 	}
 	
 	private static void checkSameDimension(Termination[] terminations, String name) throws StructuralException {

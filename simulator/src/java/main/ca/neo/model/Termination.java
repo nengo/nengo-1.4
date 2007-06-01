@@ -55,6 +55,11 @@ public interface Termination extends Configurable, Serializable {
 	public static final String MODULATORY = "MODULATORY";
 	
 	/**
+	 * Standard name of synaptic weights property (a float[][]) 
+	 */
+	public static final String WEIGHTS = "WEIGHTS";
+	
+	/**
 	 * A property value for Terminations that are composed of multiple underlying 
 	 * Terminations. This property value indicates that different underlying Terminations 
 	 * report different values for the requested property.  

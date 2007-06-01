@@ -51,6 +51,7 @@ public class LinearExponentialTermination implements Termination, Resettable {
 		myConfiguration = new ConfigurationImpl(this);
 		myConfiguration.addProperty(Termination.TAU_PSC, Float.class, new Float(tauPSC));
 		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
+		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, new float[][]{myWeights});
 	}
 	
 	/**
@@ -146,6 +147,7 @@ public class LinearExponentialTermination implements Termination, Resettable {
 	 */
 	public float updateCurrent(boolean applySpikes, float integrationTime, float decayTime) {
 		if (decayTime > 0) {
+			//TODO: is there a correction we can do here when tau isn't much larger than the timestep? (will decay to zero if tau=step)   
 			myCurrent = myCurrent - myCurrent * ( 1f/myTauPSC ) * decayTime;
 		}
 		
