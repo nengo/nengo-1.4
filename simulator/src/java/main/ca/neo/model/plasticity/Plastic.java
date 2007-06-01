@@ -20,4 +20,9 @@ public interface Plastic {
 	 */
 	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException;
 	
+	/**
+	 * @param time Period after which plasticity rules are evaluated (defaults to every time step).  
+	 */
+	public void setPlasticityInterval(float time);
+	
 }

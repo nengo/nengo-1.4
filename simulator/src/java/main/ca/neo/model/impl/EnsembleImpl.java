@@ -171,4 +171,15 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		}
 	}
 
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#setPlasticityInterval(float)
+	 */
+	public void setPlasticityInterval(float time) {
+		for (int i = 0; i < myExpandableNodes.length; i++) {
+			if (myExpandableNodes[i] instanceof Plastic) {
+				((Plastic) myExpandableNodes[i]).setPlasticityInterval(time);				
+			}
+		}
+	}
+
 }

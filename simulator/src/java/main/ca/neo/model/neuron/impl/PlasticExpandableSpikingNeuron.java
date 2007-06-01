@@ -90,6 +90,13 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 	}
 
 	/**
+	 * @see ca.neo.model.plasticity.Plastic#setPlasticityInterval(float)
+	 */
+	public void setPlasticityInterval(float time) {
+		mySynapticIntegrator.setPlasticityInterval(time);
+	}
+
+	/**
 	 * @see ca.neo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
 	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {

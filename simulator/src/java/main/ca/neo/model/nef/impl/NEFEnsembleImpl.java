@@ -51,9 +51,11 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private float[][] myEncoders;
 	private Map<String, DecodedTermination> myDecodedTerminations;
 	private Map<String, PlasticityRule> myPlasticityRules;
+	private float myPlasticityInterval;
+	private float myLastPlasticityTime;	
 	private Map<String, LinearApproximator> myDecodingApproximators;
 	private ApproximatorFactory myApproximatorFactory;
-	private float[][] myEvalPoints;
+	private float[][] myEvalPoints;	
 
 	/**
 	 * @param name Unique name of Ensemble
@@ -82,6 +84,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		myDecodedTerminations = new HashMap<String, DecodedTermination>(10);
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
+		myPlasticityInterval = -1;
+		myLastPlasticityTime = 0;		
 		myApproximatorFactory = factory;
 		myDecodingApproximators = new HashMap<String, LinearApproximator>(10);
 		myEvalPoints = evalPoints;
@@ -354,7 +358,12 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				}
 				super.run(startTime, endTime);
 			}
-			learn(startTime, endTime);
+			if (myPlasticityInterval <= 0) {
+				learn(startTime, endTime);				
+			} else if (endTime >= myLastPlasticityTime + myPlasticityInterval) {
+				learn(myLastPlasticityTime, endTime);
+				myLastPlasticityTime = endTime;
+			}
 
 		} catch (SimulationException e) {
 			e.setEnsemble(getName());
@@ -468,6 +477,13 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		}
 		
 		myPlasticityRules.put(terminationName, rule);
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#setPlasticityInterval(float)
+	 */
+	public void setPlasticityInterval(float time) {
+		myPlasticityInterval = time;
 	}
 
 }

@@ -45,6 +45,8 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	private Units myCurrentUnits;
 	private Map<String, LinearExponentialTermination> myTerminations;	
 	private Map<String, PlasticityRule> myPlasticityRules;
+	private float myPlasticityInterval;
+	private float myLastPlasticityTime;
 
 	/**
 	 * @param maxTimeStep Maximum length of integration time step. Shorter steps may be used to better match
@@ -56,6 +58,8 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		myCurrentUnits = currentUnits;
 		myTerminations = new HashMap<String, LinearExponentialTermination>(10);
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
+		myPlasticityInterval = -1;
+		myLastPlasticityTime = 0;
 	}
 	
 	/**
@@ -75,23 +79,25 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 				times[i] = startTime + (float)i * dt;
 			}			
 		} else {
-//			LinearExponentialTermination[] terminations 
-//				= (LinearExponentialTermination[]) myTerminations.toArray(new LinearExponentialTermination[0]);
-		
-			//Note: we leave out decay at start time and real input integration at end time, to make total  
-			//decay and integration times equal to simulation time
+			//Note: we leave out decay and real input integration at start time, to make total  
+			//decay and integration times equal to simulation time (previously left integration out of 
+			//end step, but some spike generators need accurate value at end time)
 		
 			times[0] = startTime;
-			currents[0] = update(myTerminations.values(), true, dt, 0); 
+			currents[0] = update(myTerminations.values(), true, 0, 0); 
 		
 			for (int i = 1; i <= steps; i++) {
 				times[i] = startTime + (float)i * dt;
-				//Note (cont'd): real-valued input not applied in last step (we quit at end time - delta)
-				currents[i] = update(myTerminations.values(), false, i < steps ? dt : 0, dt); 
+				currents[i] = update(myTerminations.values(), false, dt, dt); 
 			}			
 		}
 		
-		learn(startTime, endTime);
+		if (myPlasticityInterval <= 0) {
+			learn(startTime, endTime);			
+		} else if (endTime >= myLastPlasticityTime + myPlasticityInterval) {
+			learn(myLastPlasticityTime, endTime);
+			myLastPlasticityTime = endTime;
+		}
 				
 		return new TimeSeries1DImpl(times, currents, myCurrentUnits);
 	}
@@ -186,6 +192,13 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	 */
 	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
 		myPlasticityRules.put(terminationName, rule);
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#setPlasticityInterval(float)
+	 */
+	public void setPlasticityInterval(float time) {
+		myPlasticityInterval = time;
 	}
 
 }
