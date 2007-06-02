@@ -3,6 +3,7 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.util.MU;
@@ -83,6 +84,61 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		}
 		
 		return result;
+	}
+
+	/**
+	 * Factory for IndependentDimensionApproximators. 
+	 *  
+	 * @author Bryan Tripp
+	 */
+	public static class Factory implements ApproximatorFactory {
+		
+		private static final long serialVersionUID = 1L;
+		
+////		private int myDimensions; 
+//		private int myNeuronsPerDim;
+//		
+//		public Factory(int dimensions, int neurons) {
+//			myDimensions = dimensions;
+//			myNeuronsPerDim = neurons / dimensions;
+//			if (neurons % dimensions != 0) {
+//				throw new IllegalArgumentException("Expected # neurons to be evenly divisible by # dimensions");
+//			}
+//		}
+
+		/**
+		 * @see ca.neo.math.ApproximatorFactory#getApproximator(float[][], float[][])
+		 */
+		public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
+			int dimensions = evalPoints[0].length;
+			int nodes = values[0].length;
+			int nodesPerDim = nodes / dimensions;
+			if (nodes % dimensions != 0) {
+				throw new IllegalArgumentException("Expected # nodes (" + nodes + ") to be evenly divisible by # dimensions (" + dimensions + ")");
+			}
+
+			//TODO: this only work with axis-clustered ... is this enforced anywhere? 
+			//duplicate point along axis to all dimensions (shouldn't matter because 
+			//preferred directions are clustered on axes) 
+			float[][] allDimEvalPoints = new float[evalPoints.length][];
+			float[] oneDimEvalPoints = new float[evalPoints.length];
+			for (int i = 0; i < evalPoints.length; i++) {
+				allDimEvalPoints[i] = new float[dimensions];
+				for (int j = 0; j < dimensions; j++) {
+					allDimEvalPoints[i][j] = evalPoints[i][0];
+				}
+				oneDimEvalPoints[i] = evalPoints[i][0];
+			}
+			
+			int[] indepDims = new int[values.length];
+			for (int i = 0; i < indepDims.length; i++) {
+				indepDims[i] = (int) Math.floor((double) i / (double) nodesPerDim);
+			}
+
+			Function costWeight = new ConstantFunction(1, 1);
+			return new IndependentDimensionApproximator(oneDimEvalPoints, values, indepDims, dimensions, costWeight, .1f);
+		}
+		
 	}
 	
 
