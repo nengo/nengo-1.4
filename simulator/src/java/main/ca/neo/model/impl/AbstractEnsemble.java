@@ -3,12 +3,14 @@
  */
 package ca.neo.model.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import org.apache.log4j.Logger;
 
 import ca.neo.model.Ensemble;
@@ -39,6 +41,8 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	
 	private String myName;
 	private Node[] myNodes;
+//	private NodeRunner[] myNodeRunners;
+//	private Thread[] myThreads;
 	private Map<String, Origin> myOrigins;
 	private Map<String, Termination> myTerminations;	
 	private Map<String, List<Integer>> myStateNames; //for Probeable
@@ -58,6 +62,8 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		mySpikePattern = new SpikePatternImpl(nodes.length);
 		myCollectSpikesFlag = false;
 		
+//		setupNodeRunners(2);
+		
 		myOrigins = new HashMap<String, Origin>(10);
 		Origin[] origins = findOrigins(nodes);
 		for (int i = 0; i < origins.length; i++) {
@@ -74,6 +80,26 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		
 		setMode(SimulationMode.DEFAULT);		
 	}
+	
+//	private void setupNodeRunners(int n) {
+//		myNodeRunners = new NodeRunner[n];
+//		myThreads = new Thread[n];
+//			
+//		List[] nodeLists = new ArrayList[n];
+//		for (int i = 0; i < n; i++) {
+//			nodeLists[i] = new ArrayList<Node>(50);
+//		}
+//		
+//		for (int i = 0; i < myNodes.length; i++) {
+//			int runner = i % myNodeRunners.length;	
+//			nodeLists[runner].add(myNodes[i]);
+//		}
+//		
+//		for (int i = 0; i < n; i++) {
+//			myNodeRunners[i] = new NodeRunner((Node[]) nodeLists[i].toArray(new Node[0]));
+//			myThreads[i] = new Thread(myNodeRunners[i]);
+//		}
+//	}
 
 	/**
 	 * @see ca.neo.model.Ensemble#getName()
@@ -135,9 +161,37 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 					ourLogger.warn("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
 				}
 			}
-		}		
-	}
+		}
 
+//		for (int i = 0; i < myNodeRunners.length; i++) {
+//			myNodeRunners[i].setTime(startTime, endTime);
+//			myThreads[i].run();
+//		}
+//		
+//		for (int i = 0; i < myThreads.length; i++) {
+//			try {
+//				myThreads[i].join();
+//			} catch (InterruptedException e) {
+//				throw new SimulationException(e);
+//			}
+//			
+//			if (myNodeRunners[i].getException() != null) throw myNodeRunners[i].getException();			
+//		}
+//		
+//		for (int i = 0; i < myNodes.length; i++) {
+//			if (myCollectSpikesFlag) {
+//				try {
+//					InstantaneousOutput output = myNodes[i].getOrigin(Neuron.AXON).getValues();
+//					if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
+//						mySpikePattern.addSpike(i, endTime);
+//					}				
+//				} catch (StructuralException e) {
+//					ourLogger.warn("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
+//				}
+//			}
+//		}				
+	}	
+	
 	/**
 	 * Resets each Node in this Ensemble. 
 	 * 
@@ -333,6 +387,57 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Allows us to run a node in a separate thread. 
+	 *  
+	 * @author Bryan Tripp
+	 */
+	private static class NodeRunner implements Runnable, Serializable {
+
+		private Node[] myNodes;
+		private float myStartTime;
+		private float myEndTime;
+		private SimulationException myException;
+
+		/**
+		 * @param nodes The Nodes that will be run by this runner. 
+		 */
+		public NodeRunner(Node[] nodes) {
+			myNodes = nodes;
+		}
+
+		/**
+		 * @param start Simulation time at next run is to start
+		 * @param end Simulation time at which next run is to end
+		 */
+		public void setTime(float start, float end) {
+			myStartTime = start;
+			myEndTime = end;
+		}
+
+		/**
+		 * @return The exception thrown in the last run, if any, otherwise null.   
+		 */
+		public SimulationException getException() {
+			return myException;
+		}
+
+		/**
+		 * @see java.lang.Runnable#run()
+		 */
+		public void run() {
+			myException = null;
+			try {
+				for (int i = 0; i < myNodes.length; i++) {
+					myNodes[i].run(myStartTime, myEndTime);					
+				}
+			} catch (SimulationException e) {
+				myException = e;
+			}
+		}
+		
 	}
 	
 }
