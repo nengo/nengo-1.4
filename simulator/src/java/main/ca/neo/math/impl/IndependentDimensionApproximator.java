@@ -7,6 +7,8 @@ import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.util.MU;
+import ca.neo.util.VectorGenerator;
+import ca.neo.util.impl.RandomHypersphereVG;
 
 /**
  * A LinearApproximator for functions with no multidimensional nonlinearities. Each of the source functions 
@@ -110,7 +112,7 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		 * @see ca.neo.math.ApproximatorFactory#getApproximator(float[][], float[][])
 		 */
 		public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
-			int dimensions = evalPoints[0].length;
+			int dimensions = evalPoints[0].length; //OK
 			int nodes = values[0].length;
 			int nodesPerDim = nodes / dimensions;
 			if (nodes % dimensions != 0) {
@@ -139,6 +141,88 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 			return new IndependentDimensionApproximator(oneDimEvalPoints, values, indepDims, dimensions, costWeight, .1f);
 		}
 		
+	}
+
+	/**
+	 * A VectorGenerator for use with IndependentDimensionApproximator as an evaluation point factory. 
+	 * It returns a constant number of vectors regardless of the number requested. In each vector, all 
+	 * the elements are the same. The element is drawn from an underlying one-dimensional VectorGenerator. 
+	 * This allows creation of high dimensional ensembles where all encoders are on an axis, without 
+	 * evaluation responses at a number of evaluation points that grows with the number of dimensions 
+	 * (as would normally be required).  
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class EvalPointFactory implements VectorGenerator {
+		
+		private VectorGenerator myVG;		
+		private int myPoints;
+		
+		/**
+		 * @param radius As RandomHypersphereGenerator arg
+		 * @param points Number of vectors produced, regardless of number requested 
+		 */
+		public EvalPointFactory(float radius, int points) {
+			myVG = new RandomHypersphereVG(false, radius, 1);
+			myPoints = points;
+		}
+
+		/**
+		 * @see ca.neo.util.VectorGenerator#genVectors(int, int)
+		 */
+		public float[][] genVectors(int number, int dimension) {
+			float[][] oneDimensional = myVG.genVectors(myPoints, 1);
+			float[][] result = new float[myPoints][];
+			for (int i = 0; i < result.length; i++) {
+				result[i] = new float[dimension];
+				for (int j = 0; j < dimension; j++) {
+					result[i][j] = oneDimensional[i][0];
+				}
+			}
+			return result;
+		}		
+	}
+	
+	/**
+	 * A VectorGenerator for use with IndependentDimensionApproximator as an encoder factory. Encoders 
+	 * are derived from 1D encoders, and distributed to different dimensions in a round-robin manner. 
+	 * This convention is needed so that the ApproximatorFactory knows which response is associated with 
+	 * which dimension. 
+	 *  
+	 * @author Bryan Tripp
+	 */
+	public static class EncoderFactory implements VectorGenerator {
+
+		private VectorGenerator myVG;
+		
+		/**
+		 * @param radius As RandomHypersphereGenerator arg
+		 */
+		public EncoderFactory(float radius) {
+			myVG = new RandomHypersphereVG(true, radius, 1);
+		}
+
+		/**
+		 * @see ca.neo.util.VectorGenerator#genVectors(int, int)
+		 */
+		public float[][] genVectors(int number, int dimension) {
+			float[][] oneDimensional = myVG.genVectors(number, 1);
+			float[][] result = new float[number][];
+			for (int i = 0; i < number; i++) {
+				result[i] = new float[dimension];
+				result[i][i % dimension] = oneDimensional[i][0];
+			}
+			return result;
+		}
+		
+	}
+	
+	public static void main(String[] args) {
+//		EvalPointFactory epf = new EvalPointFactory(1, 10);
+//		float[][] foo = epf.genVectors(100, 3);
+		EncoderFactory ef = new EncoderFactory(1);
+		float[][] foo = ef.genVectors(10, 3);
+		System.out.println(MU.toString(foo, 10));				
 	}
 	
 
