@@ -88,6 +88,7 @@ public class DecodedTermination implements Termination, Resettable {
 
 		myConfiguration = new ConfigurationImpl(this);
 		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
+		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, myTransform);
 		
 		//find PSC time constant (slowest dynamic mode) if applicable 
 		if (myTauMutable) {

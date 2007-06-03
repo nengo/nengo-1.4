@@ -36,6 +36,8 @@ public class ConfigurationImpl implements Configuration {
 	 * Note: this method is called by corresponding Configurable. To set properties as a user,  
 	 * call setProperty(...). 
 	 * 
+	 * TODO: parameter for read-only protection?
+	 * 
 	 * @param name Name of new property
 	 * @param type Class to which values must belong
 	 * @param defaultValue Default value of the property
