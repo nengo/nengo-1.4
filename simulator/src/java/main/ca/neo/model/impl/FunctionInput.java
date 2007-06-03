@@ -11,9 +11,7 @@ package ca.neo.model.impl;
 import java.util.Properties;
 
 import ca.neo.math.Function;
-import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
-import ca.neo.model.Noise;
 import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
 import ca.neo.model.RealOutput;
@@ -22,7 +20,6 @@ import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
-import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.TimeSeriesImpl;
 
@@ -38,7 +35,7 @@ public class FunctionInput implements Node, Probeable {
 	private Units[] myUnits;
 	private float myTime;
 //	private float[] myValues;
-	private FunctionOrigin myOrigin;
+	private BasicOrigin myOrigin;
 	
 	/**
 	 * @param name The name of this Node
@@ -59,7 +56,7 @@ public class FunctionInput implements Node, Probeable {
 			myUnits[i] = units;
 		}
 		
-		myOrigin = new FunctionOrigin(functions.length, units);
+		myOrigin = new BasicOrigin(functions.length, units);
 		
 		run(0f, 0f); //set initial state to f(0)
 	}
@@ -186,53 +183,6 @@ public class FunctionInput implements Node, Probeable {
 	 */
 	public Termination[] getTerminations() {
 		return new Termination[0];
-	}
-
-	public static class FunctionOrigin implements Origin, Noise.Noisy {
-
-		private static final long serialVersionUID = 1L;
-		
-		private int myDimension;
-		private Units myUnits;
-		private float[] myValues;
-		private float myTime;
-		private Noise myNoise;
-		
-		public FunctionOrigin(int dimension, Units units) {
-			myDimension = dimension;
-			myUnits = units;
-			myValues = new float[dimension];
-		}
-		
-		public void setValues(float startTime, float endTime, float[] values) {
-			myTime = endTime;
-			if (myNoise == null) {
-				myValues = values;				
-			} else {
-				myValues = MU.sum(values, myNoise.getValues(endTime-startTime, values));
-			}
-		}
-		
-		public int getDimensions() {
-			return myDimension;
-		}
-
-		public String getName() {
-			return FunctionInput.ORIGIN_NAME;
-		}
-
-		public InstantaneousOutput getValues() throws SimulationException {
-			return new RealOutputImpl(myValues, myUnits, myTime);
-		}
-
-		public Noise getNoise() {
-			return myNoise;
-		}
-
-		public void setNoise(Noise noise) {
-			myNoise = noise;
-		}
-		
 	}
 
 }

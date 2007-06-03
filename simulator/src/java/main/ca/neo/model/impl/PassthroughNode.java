@@ -38,12 +38,12 @@ public class PassthroughNode implements Node {
 	
 	private String myName;
 	private PassthroughTermination myTermination;
-	private PassthroughOrigin myOrigin;
+	private BasicOrigin myOrigin;
 
 	public PassthroughNode(String name, int dimension) {
 		myName = name;
 		myTermination = new PassthroughTermination(dimension);
-		myOrigin = new PassthroughOrigin(dimension);
+		myOrigin = new BasicOrigin(dimension, Units.UNK);
 		reset(false);
 	}
 	
@@ -123,35 +123,6 @@ public class PassthroughNode implements Node {
 	 * @see ca.neo.model.SimulationMode.ModeConfigurable#setMode(ca.neo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-	}
-	
-	private static class PassthroughOrigin implements Origin {
-		
-		private static final long serialVersionUID = 1L;
-		
-		private int myDimension;
-		private InstantaneousOutput myValues;
-		
-		public PassthroughOrigin(int dimension) {
-			myDimension = dimension;
-		}
-
-		public int getDimensions() {
-			return myDimension;
-		}
-
-		public String getName() {
-			return ORIGIN;
-		}
-
-		public InstantaneousOutput getValues() throws SimulationException {
-			return myValues;
-		}
-		
-		public void setValues(InstantaneousOutput values) {
-			myValues = values;
-		}
-		
 	}
 	
 	private static class PassthroughTermination implements Termination {
