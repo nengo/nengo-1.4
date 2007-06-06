@@ -70,12 +70,9 @@ public interface Simulator {
 	 * @param stepSize Length of time step at which the Network is run. This determines the 
 	 * 		frequency with which outputs are passed between Ensembles, but individual 
 	 * 		Neurons may run with different and/or variable time steps.
-	 * @param mode SimulationMode in which to run (individual Neurons/Ensembles may not be able 
-	 * 		to support the requested mode, but they will run in the most similar mode that they
-	 * 		do support.  
 	 * @throws SimulationException if a problem is encountered while trying to run
 	 */
-	public void run(float startTime, float endTime, float stepSize, SimulationMode mode) throws SimulationException;
+	public void run(float startTime, float endTime, float stepSize) throws SimulationException;
 	
 	/**
 	 * @return List of Probes that have been added to this Simulator.  

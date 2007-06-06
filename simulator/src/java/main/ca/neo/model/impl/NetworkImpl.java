@@ -34,7 +34,7 @@ public class NetworkImpl implements Network {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Map myNodeMap; //keyed on name
+	private Map<String, Node> myNodeMap; //keyed on name
 	private Map myProjectionMap; //keyed on Termination
 	private String myName;
 	private SimulationMode myMode;
@@ -46,7 +46,7 @@ public class NetworkImpl implements Network {
 	private Map myExposedTerminations;
 
 	public NetworkImpl() {
-		myNodeMap = new HashMap(20);
+		myNodeMap = new HashMap<String, Node>(20);
 		myProjectionMap	= new HashMap(50);
 		myName = DEFAULT_NAME;
 		mySimulator = new LocalSimulator();
@@ -106,7 +106,7 @@ public class NetworkImpl implements Network {
 	 * @see ca.neo.model.Network#getNodes()
 	 */
 	public Node[] getNodes() {
-		return (Node[]) myNodeMap.values().toArray(new Node[0]);
+		return myNodeMap.values().toArray(new Node[0]);
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class NetworkImpl implements Network {
 		if (!myNodeMap.containsKey(name)) {
 			throw new StructuralException("No Node named " + name + " in this Network");			
 		}
-		return (Node) myNodeMap.get(name);
+		return myNodeMap.get(name);
 	}
 
 	/**
@@ -190,6 +190,11 @@ public class NetworkImpl implements Network {
 	 */
 	public void setMode(SimulationMode mode) {
 		myMode = mode;
+
+		Iterator<Node> it = myNodeMap.values().iterator();
+		while (it.hasNext()) {
+			it.next().setMode(mode);
+		}
 	}
 
 	/**
@@ -203,7 +208,7 @@ public class NetworkImpl implements Network {
 	 * @see ca.neo.model.Node#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
-		mySimulator.run(startTime, endTime, myStepSize, myMode);
+		mySimulator.run(startTime, endTime, myStepSize);
 	}
 
 	/**

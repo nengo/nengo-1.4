@@ -72,7 +72,7 @@ public class IntegratorExample {
 			Probe neuronRecorder = simulator.addProbe("integrator", 0, "V", true);
 
 			long startTime = System.currentTimeMillis();
-			simulator.run(0f, 1f, .0002f, SimulationMode.DEFAULT);
+			simulator.run(0f, 1f, .0002f);
 			System.out.println("Run time: " + ((System.currentTimeMillis() - startTime)/1000f) );
 		
 			TimeSeries integratorData = integratorRecorder.getData();

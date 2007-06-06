@@ -182,7 +182,7 @@ public class InferenceExample {
 		float tauFilter = .005f;
 		
 		sim.resetNetwork(false);
-		sim.run(startTime, endTime, timeStep, SimulationMode.DIRECT);
+		sim.run(startTime, endTime, timeStep);
 		
 		TimeSeries[] directResults = new TimeSeries[recorders.length];
 		for (int i = 0; i < recorders.length; i++) {
@@ -191,7 +191,7 @@ public class InferenceExample {
 		}
 		
 		sim.resetNetwork(false);
-		sim.run(startTime, endTime, timeStep, mode);
+		sim.run(startTime, endTime, timeStep);
 		for (int i = 0; i < recorders.length; i++) {
 //			Plotter.plot(directResults[i], recorders[i].getData(), tauFilter, titles[i]);
 			Plotter.plot(directResults[i], recorders[i].getData(), titles[i]);

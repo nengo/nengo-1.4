@@ -56,14 +56,13 @@ public class LocalSimulator implements Simulator {
 	}
 
 	/**
-	 * @see ca.neo.sim.Simulator#run(float, float, float, ca.neo.model.SimulationMode)
+	 * @see ca.neo.sim.Simulator#run(float, float, float)
 	 */
-	public synchronized void run(float startTime, float endTime, float stepSize, SimulationMode mode) 
-			throws SimulationException {
+	public synchronized void run(float startTime, float endTime, float stepSize) throws SimulationException {
 		
-		for (int i = 0; i < myNodes.length; i++) {
-			myNodes[i].setMode(mode);
-		}
+//		for (int i = 0; i < myNodes.length; i++) {
+//			myNodes[i].setMode(mode);
+//		}
 
 //		//make each node produce its initial output
 //		for (int i = 0; i < myNodes.length; i++) {
