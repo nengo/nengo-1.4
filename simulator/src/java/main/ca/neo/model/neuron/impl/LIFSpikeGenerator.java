@@ -70,7 +70,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myInitialVoltage = 0;
 		
 		myMode = SimulationMode.DEFAULT;
-		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
+		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
 		
 		reset(false);
 	}
@@ -108,7 +108,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	public InstantaneousOutput run(float[] time, float[] current) {
 		InstantaneousOutput result = null;
 		
-		if (myMode.equals(SimulationMode.CONSTANT_RATE)) {
+		if (myMode.equals(SimulationMode.CONSTANT_RATE) || myMode.equals(SimulationMode.RATE)) {
 			result = new RealOutputImpl(new float[]{doConstantRateRun(time[0], current[0])}, Units.SPIKES_PER_S, time[time.length-1]);
 		} else {
 			result = new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES, time[time.length-1]);
