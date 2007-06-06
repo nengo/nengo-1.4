@@ -29,7 +29,7 @@ public class ExponentialPDF extends AbstractFunction implements PDF {
 	 * @see ca.neo.math.impl.AbstractFunction#map(float[])
 	 */
 	public float map(float[] from) {
-		return (float) Math.exp(-from[0]/myTau);
+		return from[0] >= 0 ? (1f/myTau) * (float) Math.exp(-from[0]/myTau) : 0;
 	}
 
 	/**
