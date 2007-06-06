@@ -89,7 +89,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myInitialVoltage = initialVoltage;
 		
 		myMode = SimulationMode.DEFAULT;
-		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
+		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
 		
 		reset(false);
 	}
