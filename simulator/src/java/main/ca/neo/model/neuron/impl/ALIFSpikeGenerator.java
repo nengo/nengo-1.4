@@ -85,7 +85,7 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myTauRef = tauRef;
 		myTauRC = tauRC;
 		myTauN = tauN;
-		myIncN = incN;
+		myIncN = Math.max(0, incN); //TODO: rethink this (prevents potentiation)
 		
 		reset(false);
 	}
@@ -210,8 +210,8 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 //			SynapticIntegrator integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
 //			PlasticExpandableSpikingNeuron neuron = new PlasticExpandableSpikingNeuron(integrator, generator, 15f, 0f, "alif");
 			
-			ALIFNeuronFactory factory = new ALIFNeuronFactory(new IndicatorPDF(200, 400), new IndicatorPDF(-.9f, .9f), 
-					new IndicatorPDF(.005f, .25f), .002f, .02f, .2f);
+			ALIFNeuronFactory factory = new ALIFNeuronFactory(new IndicatorPDF(200, 400), new IndicatorPDF(-2.5f, -1.5f), 
+					new IndicatorPDF(.1f, .1001f), .0005f, .02f, .2f);
 
 //			VectorGenerator vg = new RandomHypersphereVG(false, 1, 0);
 //			ApproximatorFactory factory = new WeightedCostApproximator.Factory(.1f);
@@ -228,7 +228,7 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 			ensemble.collectSpikes(true);
 			network.addNode(ensemble);
 			
-			FunctionInput input = new FunctionInput("input", new Function[]{new PiecewiseConstantFunction(new float[]{0.1f}, new float[]{0, 0.5f})}, Units.UNK);
+			FunctionInput input = new FunctionInput("input", new Function[]{new PiecewiseConstantFunction(new float[]{0.2f}, new float[]{0, 0.5f})}, Units.UNK);
 			network.addNode(input);
 			
 			network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), ensemble.getTermination("input"));
