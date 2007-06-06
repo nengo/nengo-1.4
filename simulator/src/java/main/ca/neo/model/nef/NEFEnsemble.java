@@ -103,7 +103,7 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	 * 		with the transfer function
 	 */
 	public Termination addDecodedTermination(String name, float[][] matrix, float[] tfNumerator, float[] tfDenominator, 
-			boolean isModulatory) throws StructuralException;
+			float passthrough, boolean isModulatory) throws StructuralException;
 	
 	/**
 	 * Adds BiasTerminations, which are meant to receive projections from BiasOrigins. A pair of BiasTerminations is returned, 

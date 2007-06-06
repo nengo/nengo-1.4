@@ -231,9 +231,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @see ca.neo.model.nef.NEFEnsemble#addDecodedTermination(java.lang.String, float[][], float[], float[], boolean)
 	 */
 	public Termination addDecodedTermination(String name, float[][] matrix, float[] tfNumerator, float[] tfDenominator, 
-			boolean isModulatory) throws StructuralException {
+			float passthrough, boolean isModulatory) throws StructuralException {
 		
-		LTISystem dynamics = CanonicalModel.getRealization(tfNumerator, tfDenominator, 0f);
+		LTISystem dynamics = CanonicalModel.getRealization(tfNumerator, tfDenominator, passthrough);
 	
 		Matrix A = new Matrix(MU.convert(dynamics.getA(0f)));
 		double[] eigenvalues = A.eig().getRealEigenvalues();
