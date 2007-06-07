@@ -478,11 +478,10 @@ public class MU {
 	
 	/**
 	 * @param vector Any vector
-	 * @return Bias-corrected variance of vector elements
+	 * @param mean Value around which to take variance, eg MU.mean(vector) or some pre-defined value
+	 * @return Bias-corrected variance of vector elements around the given values
 	 */
-	public static float variance(float[] vector) {
-		float mean = mean(vector);
-		
+	public static float variance(float[] vector, float mean) {
 		float sum = 0f;		
 		for (int i = 0; i < vector.length; i++) {
 			float deviation = vector[i] - mean;
