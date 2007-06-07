@@ -8,7 +8,6 @@ import ca.neo.model.Noise;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.Units;
-import ca.neo.util.MU;
 
 /**
  * A generic implementation of Origin. Nodes that contain an Origin of this type should call one 
@@ -50,7 +49,7 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 
 		float[] v = values;
 		if (myNoise != null) {
-			v = MU.sum(values, myNoise.getValues(endTime-startTime, values));
+			v = myNoise.getValues(endTime-startTime, values);
 		}
 		
 		myValues = new RealOutputImpl(v, myUnits, endTime);
