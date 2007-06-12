@@ -1,23 +1,36 @@
-package ca.neo.ui.views.symbols;
+package ca.neo.ui.views.symbol;
 
+import ca.neo.ui.views.factories.GNodeCreator;
+import ca.neo.ui.views.icons.Icon;
+import ca.neo.ui.views.objects.ProxyObject;
 import ca.sw.graphics.nodes.WorldObject;
-import edu.umd.cs.piccolo.PNode;
 
-public class Symbol extends WorldObject implements ISymbol  {
+public class Symbol extends WorldObject  {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public Symbol() {
+	Icon icon;
+	
+	ProxyObject representation;
+	GNodeCreator neoObject;
+	
+	public Symbol(Icon icon, GNodeCreator neoObject) {
 		super();
+		this.icon = icon;
+		this.neoObject = neoObject;
+
+		addChild(icon);
+		setBounds(getFullBounds());
+		
 		this.setFrameVisible(false);
 	}
 
-	public PNode createNode() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	protected ProxyObject createRepresentation() {
+		return neoObject.createNode();
 	}
 
 }

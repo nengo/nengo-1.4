@@ -1,11 +1,11 @@
 package ca.neo.ui.views;
 
-import ca.neo.ui.views.symbols.EnsembleSym;
-import ca.neo.ui.views.symbols.NetworkSym;
-import ca.neo.ui.views.symbols.SymbolDragHandler;
+import ca.neo.ui.views.symbol.SymbolDragHandler;
+import ca.sw.graphics.basics.GButton;
 import ca.sw.graphics.nodes.WorldObject;
+import ca.sw.graphics.objects.controls.GControlBar;
+import ca.sw.util.Util;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
 
 public class NeoCanvas extends WorldObject {
 
@@ -14,23 +14,43 @@ public class NeoCanvas extends WorldObject {
 	 */
 	private static final long serialVersionUID = 2580524986395972714L;
 
-	public NeoCanvas() {
-		super();
+	WorldObject canvasConfig;
 
+	public NeoCanvas() {
+		super("Canvas");
+
+		// this.setWidth(500);
 		// setBounds(0,0,200,20000);
 
-		this.addItem(new NetworkSym());
-		this.addItem(new EnsembleSym());
-		this.addItem(PPath.createRectangle(0, 0, 50, 50));
+		// this.addItem(GNodeFactory.network.createIcon());
+		// this.addItem(GNodeFactory.ensemble.createIcon());
+		// this.addItem(PPath.createRectangle(0, 0, 50, 50));
+
+		canvasConfig = (WorldObject) Util.loadObject("CanvasConfig");
+
+		if (canvasConfig == null) {
+			clearCanvas();
+		} else {
+			addToLayout(canvasConfig);
+		}
+
+		
 
 		this.setFrameVisible(true);
 		// addItem();
 
 	}
 
+	// public String getName() {
+	// return "DefaultCanvas";
+	// }
+
 	public void addItem(PNode item) {
 
-		this.addToLayout(item);
+		canvasConfig.addToLayout(item);
+		this.setBounds(this.getFullBounds());
+
+		Util.saveObject(canvasConfig, "CanvasConfig");
 
 	}
 
@@ -40,6 +60,47 @@ public class NeoCanvas extends WorldObject {
 		super.initialize();
 
 		addInputEventListener(new SymbolDragHandler(this));
+	}
+
+	@Override
+	public WorldObject getControls() {
+		// TODO Auto-generated method stub
+		return new CanvasControls(this);
+		
+	}
+
+	
+	public void clearCanvas() {
+		if (canvasConfig != null)
+			canvasConfig.removeFromParent();
+		
+		canvasConfig = new WorldObject();
+		canvasConfig.getLayoutManager().setLeftPadding(0);
+		canvasConfig.getLayoutManager().setVerticalPadding(0);
+		addToLayout(canvasConfig);
+	}
+}
+
+class CanvasControls extends GControlBar {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	NeoCanvas canvas;
+
+	CanvasControls(NeoCanvas canvas) {
+		super();
+		this.canvas = canvas;
+	}
+
+	@Override
+	protected void initButtons() {
+		addButton(new GButton("Clear Canvas", new Runnable() {
+			public void run() {
+				canvas.clearCanvas();
+			}
+		}));
+
 	}
 
 }

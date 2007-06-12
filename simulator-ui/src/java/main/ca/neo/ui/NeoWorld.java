@@ -8,16 +8,21 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+
 import ca.neo.ui.views.NeoCanvas;
+import ca.neo.ui.views.factories.GNodeFactory;
+import ca.sw.graphics.world.World;
 import ca.sw.graphics.world.WorldFrame;
+import ca.sw.util.Util;
 import edu.umd.cs.piccolo.PNode;
 
-public class NeoGraphics extends WorldFrame {
-	public NeoGraphics(String title) {
+public class NeoWorld extends WorldFrame {
+	public NeoWorld(String title) {
 		super(title);
-		
-	}
 
+	}
+	static NeoWorld instance;
+	
 	/**
 	 * 
 	 */
@@ -27,17 +32,15 @@ public class NeoGraphics extends WorldFrame {
 		// TODO Auto-generated method stub
 
 		// (new FlickrScraper()).start();
-		new NeoGraphics("NEOWorld");
+		instance = new NeoWorld("NEOWorld");
 
 	}
 
-
-	
 	@Override
 	public void createMenu(JMenuBar menuBar) {
 		JMenu menu;
-		
-//		 menu = new JMenu("File");
+
+		// menu = new JMenu("File");
 		// menuBar.add(menu);
 		// menu.setMnemonic(KeyEvent.VK_V);
 		//		
@@ -46,16 +49,16 @@ public class NeoGraphics extends WorldFrame {
 		// menu.setMnemonic(KeyEvent.VK_V);
 
 		// Build the first menu.
-		menu = addMenu(menuBar, "Create Object");		
-				
-		menu = addMenu(menuBar, "View");		
-		menu.setMnemonic(KeyEvent.VK_V);
-		addActionToMenu(menu, new CanvasAction());
+//		menu = addMenu(menuBar, "Create Object");
 
-		
+		menu = addMenu(menuBar, "View");
+		menu.setMnemonic(KeyEvent.VK_V);
+		Util.addActionToMenu(menu, new CanvasAction());
+
+		menuBar.add( GNodeFactory.createNodeMenu());
 	}
 
-	PNode canvasView;
+	NeoCanvas canvasView;
 
 	public void showCanvas() {
 		if (canvasView == null) {
@@ -64,12 +67,17 @@ public class NeoGraphics extends WorldFrame {
 		}
 	}
 
+	
+	
+	
+	
 	@Override
 	public void initialize() {
 		showCanvas();
 	}
 
 	class CanvasAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
 
 		public CanvasAction() {
 			super("Show Canvas");
@@ -82,6 +90,7 @@ public class NeoGraphics extends WorldFrame {
 	}
 
 	class CustomMenu extends JMenu {
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public Component add(Component c) {
@@ -89,5 +98,17 @@ public class NeoGraphics extends WorldFrame {
 			return super.add(c);
 		}
 
+	}
+
+	public NeoCanvas getCanvasView() {
+		return canvasView;
+	}
+	
+	public static NeoWorld getInstance() {
+		return instance;
+	}
+	
+	public static World getWorldInstance() {
+		return instance.getWorld();
 	}
 }
