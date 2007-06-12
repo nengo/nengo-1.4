@@ -1,0 +1,18 @@
+Question: 
+Does the UI have to reproduce all the 
+possible abilities and configurations of the simulator?
+
+Is there a way to combine the ease-of-use of the UI with the flexibility of java code?
+
+~~~~~
+
+add a finalize function to all objects, replace removeFromParent with finalize
+
+Use reflection to get the constructors for various nodes and automatically construct them
+
+Create popupMenu to worldObjects
+
+Change zoomHandler To UseMouseScroller
+
+Create a UITangible and UIRepresentable interface for objects
+	create UI symbols and representations by reflection
