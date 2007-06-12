@@ -5,6 +5,7 @@ import ca.neo.model.Units;
 import ca.neo.plot.Plotter;
 import ca.neo.util.MU;
 import ca.neo.util.impl.TimeSeries1DImpl;
+import ca.neo.TestUtil;
 import junit.framework.TestCase;
 
 /**
@@ -16,13 +17,13 @@ import junit.framework.TestCase;
  */
 public class GradientDescentApproximatorTest extends TestCase {
 
-	public GradientDescentApproximatorTest(String arg0) {
-		super(arg0);
-	}
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+//	public GradientDescentApproximatorTest(String arg0) {
+//		super(arg0);
+//	}
+//
+//	protected void setUp() throws Exception {
+//		super.setUp();
+//	}
 
 	public void testFindCoefficients() {
 		float[] frequencies = new float[]{1, 5, 8};
@@ -61,6 +62,15 @@ public class GradientDescentApproximatorTest extends TestCase {
 		GradientDescentApproximator approximator = new GradientDescentApproximator(evalPoints, values, constraints, true);
 		float[] coefficients = approximator.findCoefficients(target);
 		
+		float approx;
+		for (int j = 0; j < evalPoints.length; j++) {
+			approx = 0f;
+			for (int i = 0; i < frequencies.length; i++) {
+				approx += coefficients[i] * values[i][j];
+			}
+			TestUtil.assertClose(approx, target.map(evalPoints[j]), 0.0001f);
+		}
+		
 //		float[] estimate = MU.prod(MU.transpose(values), coefficients);
 //		Plotter.plot(target, 0, .01f, .99f, "Ideal");
 //		Plotter.plot(new TimeSeries1DImpl(MU.prod(evalPoints, new float[]{1}), estimate, Units.UNK), "Estimate");
@@ -69,5 +79,41 @@ public class GradientDescentApproximatorTest extends TestCase {
 //			Thread.sleep(1000*15);
 //		} catch (InterruptedException e) {}
 	}
-
+	
+	/*
+	 * Test method for get- and setMaxIterations
+	 */
+	public void testMaxIterations() {
+		
+		GradientDescentApproximator.Constraints constraints = new GradientDescentApproximator.Constraints() {
+			public boolean correct(float[] coefficients) {
+				return true;
+			}
+		};
+		
+		GradientDescentApproximator approximator = new GradientDescentApproximator(new float[][]{{1f},{2f},{3f}}, new float[][]{{1f},{2f},{3f}}, constraints, true);
+		assertEquals(1000, approximator.getMaxIterations());
+		approximator.setMaxIterations(500);
+		assertEquals(500, approximator.getMaxIterations());
+		
+	}
+	
+	/*
+	 * Test method for get- and setTolerance
+	 */
+	public void testTolerance() {
+		
+		GradientDescentApproximator.Constraints constraints = new GradientDescentApproximator.Constraints() {
+			public boolean correct(float[] coefficients) {
+				return true;
+			}
+		};
+		
+		GradientDescentApproximator approximator = new GradientDescentApproximator(new float[][]{{1f},{2f},{3f}}, new float[][]{{1f},{2f},{3f}}, constraints, true);
+		assertEquals(.000000001f, approximator.getTolerance());
+		approximator.setTolerance(.000001f);
+		assertEquals(.000001f, approximator.getTolerance());
+		
+	}
+	
 }
