@@ -8,9 +8,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-
 import ca.neo.ui.views.NeoCanvas;
-import ca.neo.ui.views.factories.GNodeFactory;
+import ca.neo.ui.views.factories.NodeFactory;
 import ca.sw.graphics.world.World;
 import ca.sw.graphics.world.WorldFrame;
 import ca.sw.util.Util;
@@ -21,58 +20,43 @@ public class NeoWorld extends WorldFrame {
 		super(title);
 
 	}
+
 	static NeoWorld instance;
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-		// (new FlickrScraper()).start();
 		instance = new NeoWorld("NEOWorld");
-
 	}
 
 	@Override
 	public void createMenu(JMenuBar menuBar) {
 		JMenu menu;
 
-		// menu = new JMenu("File");
-		// menuBar.add(menu);
-		// menu.setMnemonic(KeyEvent.VK_V);
-		//		
-		// menu = new JMenu("Help");
-		// menuBar.add(menu);
-		// menu.setMnemonic(KeyEvent.VK_V);
-
-		// Build the first menu.
-//		menu = addMenu(menuBar, "Create Object");
-
 		menu = addMenu(menuBar, "View");
 		menu.setMnemonic(KeyEvent.VK_V);
 		Util.addActionToMenu(menu, new CanvasAction());
 
-		menuBar.add( GNodeFactory.createNodeMenu());
+		menuBar.add(NodeFactory.createNodeMenu());
 	}
 
 	NeoCanvas canvasView;
 
 	public void showCanvas() {
 		if (canvasView == null) {
+//			System.out.println("Creating canvas");
 			canvasView = new NeoCanvas();
+//			System.out.println("Finished Creating canvas");
 			getWorld().addToSky(canvasView);
 		}
 	}
 
-	
-	
-	
-	
 	@Override
 	public void initialize() {
+//		int i= 0;
 		showCanvas();
 	}
 
@@ -103,11 +87,11 @@ public class NeoWorld extends WorldFrame {
 	public NeoCanvas getCanvasView() {
 		return canvasView;
 	}
-	
+
 	public static NeoWorld getInstance() {
 		return instance;
 	}
-	
+
 	public static World getWorldInstance() {
 		return instance.getWorld();
 	}

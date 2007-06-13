@@ -1,13 +1,13 @@
 package ca.neo.ui.views.icons;
 
+import ca.neo.ui.views.objects.properties.INamedObject;
 import ca.sw.graphics.basics.GDefaults;
 import ca.sw.graphics.basics.GText;
 import ca.sw.graphics.nodes.WorldObject;
-import ca.sw.graphics.objects.controls.GControlBar;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PText;
 
-public class Icon extends WorldObject {
+public class Icon extends WorldObject implements INamedObject {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,6 +27,8 @@ public class Icon extends WorldObject {
 		
 		
 		setBounds(getFullBounds());
+		
+		this.setChildrenPickable(false);
 	}
 
 	
@@ -48,7 +50,7 @@ class TextTag extends WorldObject {
 
 	public TextTag(Icon icon) {
 		super();
-		PText tag = new PText(icon.getName());
+		PText tag = new PText(icon.getName() + " Icon");
 		tag.setTextPaint(GDefaults.FOREGROUND_COLOR);
 		tag.setFont(GDefaults.LARGE_FONT);
 		

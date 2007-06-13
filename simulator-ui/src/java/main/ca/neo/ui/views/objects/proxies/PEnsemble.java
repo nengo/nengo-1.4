@@ -1,11 +1,14 @@
-package ca.neo.ui.views.objects;
+package ca.neo.ui.views.objects.proxies;
 
-import ca.neo.model.Ensemble;
+import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.neo.ui.views.objects.properties.PTInt;
+import ca.neo.ui.views.objects.properties.PTString;
+import ca.neo.ui.views.objects.properties.PropertySchema;
 
-public class EnsembleProxy extends ProxyObject<Ensemble> {
+public class PEnsemble extends ProxyNode {
 
 	/**
 	 * 
@@ -24,16 +27,16 @@ public class EnsembleProxy extends ProxyObject<Ensemble> {
 
 	static String pStorageName = "Storage Name";
 
-	static MetaProperty[] metaProperties = {
-			new MetaProperty(pName, String.class),
-			new MetaProperty(pNumOfNeurons, Integer.class),
-			new MetaProperty(pDim, Integer.class),
-			new MetaProperty(pStorageName, String.class)
+	static PropertySchema[] metaProperties = {
+			new PTString(pName),
+			new PTInt(pNumOfNeurons),
+			new PTInt(pDim),
+			new PTString(pStorageName)
 
 	};
 
 	@Override
-	protected Ensemble createProxy() {
+	protected Node createProxy() {
 		// TODO Auto-generated method stub
 		try {
 			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
@@ -53,17 +56,17 @@ public class EnsembleProxy extends ProxyObject<Ensemble> {
 
 
 
+//	@Override
+//	public void initProxy0() {
+//		// TODO Auto-generated method stub
+//		super.initProxy0();
+//
+//		proxy.getOrigins();
+//
+//	}
+
 	@Override
-	public void initProxy0() {
-		// TODO Auto-generated method stub
-		super.initProxy0();
-
-		proxy.getOrigins();
-
-	}
-
-	@Override
-	protected MetaProperty[] getMetaProperties() {
+	public PropertySchema[] getMetaProperties() {
 		// TODO Auto-generated method stub
 		return metaProperties;
 	}

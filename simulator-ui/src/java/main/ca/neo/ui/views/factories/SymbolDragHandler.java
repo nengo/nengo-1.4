@@ -1,10 +1,10 @@
-package ca.neo.ui.views.symbol;
+package ca.neo.ui.views.factories;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 import ca.neo.ui.util.StyleConstants;
-import ca.neo.ui.views.objects.ProxyObject;
+import ca.neo.ui.views.objects.proxies.ProxyGeneric;
 import ca.sw.graphics.nodes.WorldObject;
 import ca.sw.graphics.world.World;
 import edu.umd.cs.piccolo.activities.PActivity;
@@ -96,7 +96,7 @@ class SymbolDropActivity extends PActivity {
 		super.activityFinished();
 		Point2D position = symbol.getWorld().getPositionInGround(symbol);
 
-		ProxyObject repNode = symbol.createRepresentation();
+		ProxyGeneric repNode = symbol.createRepresentation();
 
 		symbol.removeFromParent();
 		repNode.setOffset(position);

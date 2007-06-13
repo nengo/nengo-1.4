@@ -1,4 +1,4 @@
-package ca.neo.ui.views.objects;
+package ca.neo.ui.views.objects.properties;
 
 import java.io.Serializable;
 
@@ -10,16 +10,16 @@ public class PropertyWrapper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	MetaProperty metaProperty;
+	PropertySchema metaProperty;
 
 	Object value;
 
-	public PropertyWrapper(MetaProperty metaProperty) {
+	public PropertyWrapper(PropertySchema metaProperty) {
 		this(metaProperty, null);
 
 	}
 
-	public PropertyWrapper(MetaProperty metaProperty, Object value) {
+	public PropertyWrapper(PropertySchema metaProperty, Object value) {
 		super();
 
 		this.metaProperty = metaProperty;
@@ -40,13 +40,10 @@ public class PropertyWrapper implements Serializable {
 		return metaProperty.getName();
 	}
 
-	public Class getPropertyType() {
-		return metaProperty.getType();
-	}
-	
+
 	public void setValue(Object value) {
 		if (value != null) {
-			if (metaProperty.getType().isInstance(value)) {
+			if (metaProperty.getTypeClass().isInstance(value)) {
 				this.value = value;
 			} else {
 				Util.Error("invalid property type");

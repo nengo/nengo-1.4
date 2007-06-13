@@ -1,9 +1,10 @@
-package ca.neo.ui.views.objects;
+package ca.neo.ui.views.objects.proxies;
 
-import ca.neo.model.Network;
+import ca.neo.model.Node;
 import ca.neo.model.impl.NetworkImpl;
+import ca.neo.ui.views.objects.properties.PropertySchema;
 
-public class NetworkProxy extends ProxyObject<Network> {
+public class PNetwork extends ProxyNode {
 
 	/**
 	 * 
@@ -21,15 +22,16 @@ public class NetworkProxy extends ProxyObject<Network> {
 	public int i = 4;
 
 	@Override
-	protected Network createProxy() {
+	protected Node createProxy() {
 		// TODO Auto-generated method stub
 		return new NetworkImpl();
 	}
 
 	@Override
-	protected MetaProperty[] getMetaProperties() {
+	public PropertySchema[] getMetaProperties() {
 		return null;
 	}
+
 
 	
 	

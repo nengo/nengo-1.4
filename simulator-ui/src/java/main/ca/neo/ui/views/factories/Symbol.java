@@ -1,8 +1,7 @@
-package ca.neo.ui.views.symbol;
+package ca.neo.ui.views.factories;
 
-import ca.neo.ui.views.factories.GNodeCreator;
 import ca.neo.ui.views.icons.Icon;
-import ca.neo.ui.views.objects.ProxyObject;
+import ca.neo.ui.views.objects.proxies.ProxyGeneric;
 import ca.sw.graphics.nodes.WorldObject;
 
 public class Symbol extends WorldObject  {
@@ -14,10 +13,10 @@ public class Symbol extends WorldObject  {
 
 	Icon icon;
 	
-	ProxyObject representation;
-	GNodeCreator neoObject;
+	ProxyGeneric representation;
+	NodeType neoObject;
 	
-	public Symbol(Icon icon, GNodeCreator neoObject) {
+	public Symbol(Icon icon, NodeType neoObject) {
 		super();
 		this.icon = icon;
 		this.neoObject = neoObject;
@@ -29,7 +28,7 @@ public class Symbol extends WorldObject  {
 	}
 
 	
-	protected ProxyObject createRepresentation() {
+	protected ProxyGeneric createRepresentation() {
 		return neoObject.createNode();
 	}
 
