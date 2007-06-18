@@ -41,7 +41,6 @@ public class PropertiesDialog extends JDialog {
 	public void init(Component c, IPropertiesConfigurable proxyObj) {
 		this.proxyObj = proxyObj;
 		setLocationRelativeTo(c);
-		
 
 		PropertySchema[] properties = proxyObj.getMetaProperties();
 		// Iterator<MetaProperty> propertyIt = properties.iterator();
@@ -130,7 +129,7 @@ public class PropertiesDialog extends JDialog {
 		panel.add(closePanel);
 		add(panel);
 		pack();
-		
+
 		this.setVisible(true);
 	}
 
@@ -164,39 +163,6 @@ public class PropertiesDialog extends JDialog {
 						+ " is not set or is incomplete");
 				return false;
 			}
-			//			
-			//			
-			// Class propertyType = property.getType();
-			//
-			// Object objValue = null;
-			//
-			// if (strValue.compareTo("") == 0 || strValue == null) {
-			// Util.Warning(property.getName() + " is not set");
-			// return false;
-			//
-			// }
-			//
-			// try {
-			// if (propertyType == Integer.class) {
-			// objValue = new Integer(strValue);
-			//
-			// } else if (propertyType == String.class) {
-			// objValue = strValue;
-			// } else {
-			// Util.Error("unrecognized property type");
-			// return false;
-			// }
-			//
-			// } catch (NumberFormatException e) {
-			//
-			// Util.Warning(property.getName() + " must be a "
-			// + propertyType.getName());
-			// return false;
-			// }
-			//
-			// if (setPropertyFields) {
-			// proxyObj.setProperty(property.getName(), objValue);
-			// }
 
 		}
 
