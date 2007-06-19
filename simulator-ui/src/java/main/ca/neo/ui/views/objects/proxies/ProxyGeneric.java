@@ -1,30 +1,34 @@
 package ca.neo.ui.views.objects.proxies;
 
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.text.SimpleAttributeSet;
 
-import ca.neo.model.Node;
 import ca.neo.ui.views.icons.Icon;
 import ca.neo.ui.views.objects.properties.IPropertiesConfigurable;
 import ca.neo.ui.views.objects.properties.PropertiesDialog;
 import ca.neo.ui.views.objects.properties.PropertySchema;
 import ca.sw.graphics.basics.GDefaults;
 import ca.sw.graphics.basics.GText;
-import ca.sw.graphics.nodes.WorldObject;
 import ca.sw.graphics.nodes.lines.ILineAcceptor;
 import ca.sw.graphics.nodes.lines.LineEnd;
 import ca.sw.graphics.nodes.lines.LineEndWell;
 import ca.sw.graphics.nodes.lines.LineIn;
+import ca.sw.graphics.objects.controls.Tooltip;
 import ca.sw.graphics.world.WorldFrame;
-import ca.sw.util.Util;
+import ca.sw.graphics.world.WorldObjectImpl;
+import ca.sw.handlers.IContextMenuCreator;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PText;
 
-public abstract class ProxyGeneric<E> extends WorldObject implements
-		ILineAcceptor, IPropertiesConfigurable {
+public abstract class ProxyGeneric<E> extends WorldObjectImpl implements
+		ILineAcceptor, IPropertiesConfigurable, IContextMenuCreator {
 	/**
 	 * 
 	 */
@@ -47,7 +51,7 @@ public abstract class ProxyGeneric<E> extends WorldObject implements
 
 		initProperties();
 
-		this.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
+		addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
 				new PropertyChangeListener() {
 					public void propertyChange(PropertyChangeEvent arg0) {
 						if (lineEndWell != null)
@@ -58,6 +62,42 @@ public abstract class ProxyGeneric<E> extends WorldObject implements
 						}
 					}
 				});
+
+		// addInputEventListener(new ContextMenuHandler(this, this));
+	}
+
+	public void configurationCancelled() {
+		this.removeFromParent();
+
+	}
+
+	public void configurationComplete() {
+		proxy = createProxy();
+
+		updateSymbol();
+
+		saveStatic(properties, "defaultProperties");
+	}
+
+	public boolean connect(LineEnd lineEnd) {
+		if (lineIn != null) {
+			return lineIn.connect(lineEnd);
+		} else
+			return false;
+
+	}
+
+	public void disconnect() {
+		if (lineIn != null) {
+			lineIn.disconnect();
+		}
+
+	}
+
+	@Override
+	public WorldObjectImpl getTooltipObject() {
+		// TODO Auto-generated method stub
+		return new NodeControls(this);
 	}
 
 	public Icon getIcon() {
@@ -65,6 +105,11 @@ public abstract class ProxyGeneric<E> extends WorldObject implements
 	}
 
 	public abstract PropertySchema[] getMetaProperties();
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return getIcon().getName();
+	}
 
 	public Object getProperty(String name) {
 		return properties.getAttribute(name);
@@ -85,12 +130,8 @@ public abstract class ProxyGeneric<E> extends WorldObject implements
 			dialog = new PropertiesDialog(frame, this);
 
 			// dialog.pack();
-			
-		}
-	}
 
-	public void saveProperties() {
-		Util.saveObject(properties, getDefaultPropertiesName());
+		}
 	}
 
 	public void setIcon(Icon icon) {
@@ -113,14 +154,13 @@ public abstract class ProxyGeneric<E> extends WorldObject implements
 		properties.addAttribute(name, value);
 	}
 
-	private String getDefaultPropertiesName() {
-		return this.getClass() + "_" + "defaults";
-	}
+	// public Vector<PropertyWrapper> getProperties() {
+	// return properties;
+	// }
 
 	private void initProperties() {
 		// MetaProperty[] metaProperties = getMetaProperties();
-		properties = (SimpleAttributeSet) Util
-				.loadObject(getDefaultPropertiesName());
+		properties = (SimpleAttributeSet) loadStatic("defaultProperties");
 
 		if (properties == null) {
 			properties = new SimpleAttributeSet();
@@ -130,54 +170,37 @@ public abstract class ProxyGeneric<E> extends WorldObject implements
 
 	protected abstract E createProxy();
 
-	
 	/*
-	 * Updates the drawing of the proxyObject 
+	 * Updates the drawing of the proxyObject
 	 */
 	protected void updateSymbol() {
-	
 
 	}
 
-	public boolean accept(LineEnd lineEnd) {
-		if (lineIn != null) {
-			return lineIn.accept(lineEnd);
-		} else
-			return false;
+	public JPopupMenu createPopupMenu() {
+		JPopupMenu menu = new JPopupMenu(getName());
 
-	}
+		JMenuItem item;
+		item = new JMenuItem(new AbstractAction("Remove from world") {
+			private static final long serialVersionUID = 1L;
 
-	// public Vector<PropertyWrapper> getProperties() {
-	// return properties;
-	// }
+			public void actionPerformed(ActionEvent e) {
+				removeFromParent();
+			}
+		});
+		menu.add(item);
 
-	@Override
-	public WorldObject getControls() {
-		// TODO Auto-generated method stub
-		return new NodeControls(this);
-	}
-
-	public void configurationCancelled() {
-		this.removeFromParent();
-
-	}
-
-	public void configurationComplete() {
-		proxy = createProxy();
-
-		updateSymbol();
-
-		saveProperties();
-	}
-
-	public String getName() {
-		// TODO Auto-generated method stub
-		return getIcon().getName();
+		return menu;
 	}
 
 }
 
-class NodeControls extends WorldObject {
+class NodeControls extends WorldObjectImpl {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	ProxyGeneric proxyNode;
 
 	public NodeControls(ProxyGeneric proxyNode) {
@@ -193,13 +216,13 @@ class NodeControls extends WorldObject {
 	}
 
 	public void init() {
-		PText tag = new PText(proxyNode.getIcon().getName() + " Proxy");
+		PText tag = new PText(proxyNode.getIcon().getName());
 		tag.setTextPaint(GDefaults.FOREGROUND_COLOR);
 		tag.setFont(GDefaults.LARGE_FONT);
 
-		this.setDraggable(false);
+//		this.setDraggable(false);
 		addToLayout(tag);
-		this.setChildrenPickable(false);
+//		this.setChildrenPickable(false);
 
 		PropertySchema[] propertyTypes = proxyNode.getMetaProperties();
 		if (propertyTypes != null) {
@@ -223,9 +246,6 @@ class NodeControls extends WorldObject {
 
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
 
 }

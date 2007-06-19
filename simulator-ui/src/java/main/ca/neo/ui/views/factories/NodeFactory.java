@@ -17,8 +17,8 @@ import ca.neo.ui.views.objects.proxies.PFunctionInput;
 import ca.neo.ui.views.objects.proxies.PNetwork;
 import ca.neo.ui.views.objects.proxies.ProxyGeneric;
 import ca.sw.graphics.basics.GDefaults;
-import ca.sw.graphics.nodes.WorldObject;
-import ca.sw.graphics.world.World;
+import ca.sw.graphics.world.WorldImpl;
+import ca.sw.graphics.world.WorldObjectImpl;
 import ca.sw.util.Util;
 
 public class NodeFactory {
@@ -43,7 +43,7 @@ public class NodeFactory {
 
 	public static JMenu createNodeMenu() {
 
-		JMenu menu = new JMenu("Add Object");
+		JMenu menu = new JMenu("Objects");
 		GDefaults.styleComponent(menu);
 
 		
@@ -90,12 +90,12 @@ class AddToCanvasAction extends AbstractAction {
 	NodeType nc;
 
 	public AddToCanvasAction(NodeType nc) {
-		super("Add to canvas");
+		super("Add to toolbox");
 		this.nc = nc;
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		NeoWorld.getInstance().getCanvasView().addItem(nc.createIcon());
+		NeoWorld.getInstance().getCanvasView().addItem(nc.createSymbol());
 	}
 
 }
@@ -114,7 +114,7 @@ class AddToWorldAction extends AbstractAction {
 	public void actionPerformed(ActionEvent e) {
 		ProxyGeneric obj = nc.createNode();
 
-		World world = NeoWorld.getInstance().getWorld();
+		WorldImpl world = NeoWorld.getInstance().getWorld();
 		world.getGround().dropOnto(obj);
 
 		obj.initProxy();
@@ -140,7 +140,7 @@ class NodeType implements Serializable {
 		this.repClass = repClass;
 	}
 
-	public WorldObject createIcon() {
+	public Symbol createSymbol() {
 		try {
 			// Symbol symbol = new Symbol(this);
 
