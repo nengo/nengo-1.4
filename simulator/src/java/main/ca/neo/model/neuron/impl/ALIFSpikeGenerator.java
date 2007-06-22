@@ -50,7 +50,8 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 	private static final SimulationMode[] mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.RATE, SimulationMode.CONSTANT_RATE};
 	private static final float R = 1;
 	private static final float Vth = 1;
-	private static final float G_N = 10;	
+//	private static final float G_N = 10;	
+	private static final float G_N = 1;	
 	
 	private SimulationMode myMode = SimulationMode.DEFAULT;
 	
