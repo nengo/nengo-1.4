@@ -71,8 +71,15 @@ public class FourierFunctionTest extends TestCase {
 	}
 	
 	public static void main(String[] args) {
-		FourierFunctionTest test = new FourierFunctionTest();
-		test.testFourierFunctionFloatFloatFloat();
+//		FourierFunctionTest test = new FourierFunctionTest();
+//		test.testFourierFunctionFloatFloatFloat();
+		
+		float[][] frequencies = new float[][]{new float[]{1, 1}, new float[]{1, 3.5f}};
+		float[] amplitudes = new float[]{1, 1};
+		float[][] phases = new float[][]{new float[]{0, 0}, new float[]{0, 0}};
+		FourierFunction f = new FourierFunction(frequencies, amplitudes, phases);
+		
+		Plotter.plot(f, 0, .01f, 1, "foo");
 	}
 
 }
