@@ -18,7 +18,8 @@ import ca.neo.model.Units;
 public class BasicOrigin implements Origin, Noise.Noisy {
 
 	private static final long serialVersionUID = 1L;
-	
+
+	private String myName;
 	private int myDimension;
 	private Units myUnits;
 	private InstantaneousOutput myValues;
@@ -28,7 +29,8 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	 * @param dimension Dimension of output of this Origin
 	 * @param units The output units  
 	 */
-	public BasicOrigin(int dimension, Units units) {
+	public BasicOrigin(String name, int dimension, Units units) {
+		myName = name;
 		myDimension = dimension;
 		myUnits = units;
 		myValues = new RealOutputImpl(new float[dimension], units, 0);
@@ -78,7 +80,7 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	 * @see ca.neo.model.Origin#getName()
 	 */
 	public String getName() {
-		return FunctionInput.ORIGIN_NAME;
+		return myName;
 	}
 
 	/**

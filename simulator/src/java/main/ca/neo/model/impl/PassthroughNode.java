@@ -43,7 +43,7 @@ public class PassthroughNode implements Node {
 	public PassthroughNode(String name, int dimension) {
 		myName = name;
 		myTermination = new PassthroughTermination(dimension);
-		myOrigin = new BasicOrigin(dimension, Units.UNK);
+		myOrigin = new BasicOrigin(ORIGIN, dimension, Units.UNK);
 		reset(false);
 	}
 	
