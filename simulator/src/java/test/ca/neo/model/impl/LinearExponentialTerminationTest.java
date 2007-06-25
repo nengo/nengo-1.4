@@ -51,7 +51,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 	public void testGetProperty() throws StructuralException {
 		LinearExponentialTermination let = new LinearExponentialTermination("test", new float[1], 1.5f);
 		
-		assertEquals(2, let.getConfiguration().listPropertyNames().length);
+		assertEquals(3, let.getConfiguration().listPropertyNames().length);
 		assertEquals(Termination.TAU_PSC, let.getConfiguration().listPropertyNames()[0]);
 		
 		Float tau = (Float) let.getConfiguration().getProperty(Termination.TAU_PSC);
