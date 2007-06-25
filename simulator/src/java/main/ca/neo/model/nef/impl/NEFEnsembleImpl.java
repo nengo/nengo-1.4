@@ -6,6 +6,7 @@ package ca.neo.model.nef.impl;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import Jama.Matrix;
 
@@ -30,6 +31,7 @@ import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.plasticity.PlasticityRule;
 import ca.neo.util.MU;
+import ca.neo.util.TimeSeries;
 
 /**
  * Default implementation of NEFEnsemble. 
@@ -485,5 +487,28 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public void setPlasticityInterval(float time) {
 		myPlasticityInterval = time;
 	}
+
+	@Override
+	public TimeSeries getHistory(String stateName) throws SimulationException {
+		DecodedTermination t = myDecodedTerminations.get(stateName);
+		if (t == null) {
+			return super.getHistory(stateName);			
+		} else {
+			return t.getHistory(DecodedTermination.OUTPUT);
+		}
+	}
+
+	@Override
+	public Properties listStates() {
+		Properties p = super.listStates();
+		Iterator<String> it = myDecodedTerminations.keySet().iterator();
+		while (it.hasNext()) {
+			String termName = it.next();
+			p.setProperty(termName, "Output of Termination " + termName);
+		}
+		return p;
+	}
+	
+	
 
 }

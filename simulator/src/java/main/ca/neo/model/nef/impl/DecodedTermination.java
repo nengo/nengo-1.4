@@ -1,5 +1,7 @@
 package ca.neo.model.nef.impl;
 
+import java.util.Properties;
+
 import Jama.Matrix;
 
 import ca.neo.dynamics.Integrator;
@@ -7,6 +9,7 @@ import ca.neo.dynamics.LinearSystem;
 import ca.neo.dynamics.impl.CanonicalModel;
 import ca.neo.dynamics.impl.LTISystem;
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Probeable;
 import ca.neo.model.RealOutput;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
@@ -39,9 +42,14 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * 
  * @author Bryan Tripp
  */
-public class DecodedTermination implements Termination, Resettable {
+public class DecodedTermination implements Termination, Resettable, Probeable {
 
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Name of Probeable output state. 
+	 */
+	public static final String OUTPUT = "output";
 	
 	private String myName;
 	private float[][] myTransform;
@@ -49,9 +57,11 @@ public class DecodedTermination implements Termination, Resettable {
 	private Integrator myIntegrator;
 	private Units[] myNullUnits;
 	private RealOutput myInputValues; 
+	private float myTime;
 	private float[] myOutputValues;
 	private boolean myTauMutable;
 	private ConfigurationImpl myConfiguration;
+	private DecodedTermination myScalingTermination;
 	
 	/**
 	 * @param name The name of this Termination
@@ -82,6 +92,7 @@ public class DecodedTermination implements Termination, Resettable {
 
 		//we save a little time by not reporting units to the dynamical system at each step
 		myNullUnits = new Units[dynamics.getInputDimension()];
+		myOutputValues = new float[transform.length];
 		
 		//PSC time constant can be changed online if dynamics are LTI in controllable-canonical form 
 		myTauMutable = (dynamics instanceof LTISystem && CanonicalModel.isControllableCanonical((LTISystem) dynamics)); 
@@ -101,6 +112,8 @@ public class DecodedTermination implements Termination, Resettable {
 			
 			myConfiguration.addProperty(Termination.TAU_PSC, Float.class, new Float(-1f / (float) slowest));
 		}
+		
+		myScalingTermination = null;
 	}
 
 	//copies dynamics for to each dimension
@@ -150,7 +163,7 @@ public class DecodedTermination implements Termination, Resettable {
 			throw new SimulationException("Null input values on termination " + myName);
 		}
 		
-		float[] dynamicsInputs = MU.prod(myTransform, myInputValues.getValues());
+		float[] dynamicsInputs = MU.prod(getTransform(), myInputValues.getValues());
 		float[] result = new float[dynamicsInputs.length];
 		
 		for (int i = 0; i < myDynamics.length; i++) {
@@ -160,6 +173,7 @@ public class DecodedTermination implements Termination, Resettable {
 			result[i] = outSeries.getValues()[outSeries.getValues().length-1][0];
 		}
 		
+		myTime = endTime;
 		myOutputValues = result;
 	}
 	
@@ -207,7 +221,16 @@ public class DecodedTermination implements Termination, Resettable {
 	 * 		onto the state space represented by the NEFEnsemble to which the Termination belongs
 	 */
 	public float[][] getTransform() {
-		return myTransform;
+		if (myScalingTermination != null) {
+			float scale = myScalingTermination.getOutput()[0];
+			return MU.prod(myTransform, scale);
+		} else {
+			return myTransform;			
+		}
+	}
+	
+	public void setScaling(DecodedTermination t) {
+		myScalingTermination = t;
 	}
 
 	/** 
@@ -242,6 +265,26 @@ public class DecodedTermination implements Termination, Resettable {
 			LTISystem dynamics = CanonicalModel.changeTimeConstant((LTISystem) myDynamics[0], tau);
 			setDynamics(dynamics, myTransform.length);
 		}
+	}
+
+	/** 
+	 * @see ca.neo.model.Probeable#getHistory(java.lang.String)
+	 */
+	public TimeSeries getHistory(String stateName) throws SimulationException {
+		if (stateName.equals(OUTPUT)) {
+			return new TimeSeriesImpl(new float[]{myTime}, new float[][]{myOutputValues}, Units.uniform(Units.UNK, myOutputValues.length));			
+		} else {
+			throw new SimulationException("The state '" + stateName + "' is unknown");
+		}
+	}
+
+	/** 
+	 * @see ca.neo.model.Probeable#listStates()
+	 */
+	public Properties listStates() {
+		Properties p = new Properties();
+		p.setProperty(OUTPUT, "Output of the termination, after static transform and dynamics");
+		return p;
 	}
 
 }
