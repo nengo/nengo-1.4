@@ -21,6 +21,7 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.AbstractEnsemble;
+import ca.neo.model.impl.EnsembleImpl;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.nef.DecodableEnsemble;
 import ca.neo.plot.Plotter;
@@ -34,7 +35,7 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * 
  * @author Bryan Tripp
  */
-public class DecodableEnsembleImpl extends AbstractEnsemble implements DecodableEnsemble {
+public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnsemble {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -47,8 +48,9 @@ public class DecodableEnsembleImpl extends AbstractEnsemble implements Decodable
 	 * @param name Name of the Ensemble
 	 * @param nodes Nodes that make up the Ensemble
 	 * @param factory Source of LinearApproximators to use in decoding output
+	 * @throws StructuralException 
 	 */
-	public DecodableEnsembleImpl(String name, Node[] nodes, ApproximatorFactory factory) {
+	public DecodableEnsembleImpl(String name, Node[] nodes, ApproximatorFactory factory) throws StructuralException {
 		super(name, nodes);
 		
 		myDecodedOrigins = new HashMap<String, DecodedOrigin>(10);

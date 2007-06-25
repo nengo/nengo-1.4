@@ -26,6 +26,7 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
+import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
@@ -474,11 +475,11 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @see ca.neo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.neo.model.plasticity.PlasticityRule)
 	 */
 	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
-		if (!myDecodedTerminations.containsKey(terminationName)) {
-			throw new StructuralException("The DecodedTermination " + terminationName + " does not exist");
-		}
-		
-		myPlasticityRules.put(terminationName, rule);
+		if (myDecodedTerminations.containsKey(terminationName)) {
+			myPlasticityRules.put(terminationName, rule);
+		} else {
+			super.setPlasticityRule(terminationName, rule);
+		} 
 	}
 
 	/**

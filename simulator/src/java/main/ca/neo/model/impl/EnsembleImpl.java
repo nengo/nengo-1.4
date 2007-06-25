@@ -99,9 +99,9 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	 * @see ca.neo.model.Ensemble#setMode(ca.neo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		if (mode.equals(SimulationMode.DIRECT)) {
-			mode = mode.getFallbackMode();
-		}
+//		if (mode.equals(SimulationMode.DIRECT)) {
+//			mode = mode.getFallbackMode();
+//		}
 		
 		super.setMode(mode);
 	}
