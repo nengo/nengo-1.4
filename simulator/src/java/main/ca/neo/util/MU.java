@@ -371,7 +371,6 @@ public class MU {
 	}
 
 	/**
-	 * 
 	 * @param rows Number of rows in the requested matrix 
 	 * @param cols Number of columns in the requested matrix
 	 * @return Matrix of zeroes with the given dimensions
@@ -381,6 +380,25 @@ public class MU {
 		
 		for (int i = 0; i < result.length; i++) {
 			result[i] = new float[cols];
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * @param rows Number of rows in the requested matrix 
+	 * @param cols Number of columns in the requested matrix
+	 * @param value Value of each element
+	 * @return Matrix with the given dimensions where each entry is the given value
+	 */
+	public static float[][] uniform(int rows, int cols, float value) {
+		float[][] result = new float[rows][];
+		
+		for (int i = 0; i < result.length; i++) {
+			result[i] = new float[cols];
+			for (int j = 0; j < cols; j++) {
+				result[i][j] = value;
+			}
 		}
 		
 		return result;
