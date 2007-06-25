@@ -5,6 +5,8 @@ package ca.neo.util;
 
 import org.apache.log4j.Logger;
 
+import ca.neo.math.PDF;
+
 /**
  * "Matrix Utilities". Utility methods related to matrices and vectors of floats.
  * 
@@ -402,6 +404,26 @@ public class MU {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * @param rows Number of rows in the requested matrix 
+	 * @param cols Number of columns in the requested matrix
+	 * @param pdf One-dimensional PDF from which each element is drawn
+	 * @return Matrix with the given dimensions where each entry is randomly drawn 
+	 * 		from the given PDF
+	 */
+	public static float[][] random(int rows, int cols, PDF pdf) {
+		float[][] result = new float[rows][];
+		
+		for (int i = 0; i < result.length; i++) {
+			result[i] = new float[cols];
+			for (int j = 0; j < cols; j++) {
+				result[i][j] = pdf.sample()[0];
+			}
+		}
+		
+		return result;		
 	}
 
 	/**
