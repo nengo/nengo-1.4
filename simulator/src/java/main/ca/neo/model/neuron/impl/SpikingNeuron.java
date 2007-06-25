@@ -12,6 +12,7 @@ import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
+import ca.neo.model.impl.BasicOrigin;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
@@ -26,12 +27,19 @@ import ca.neo.util.impl.TimeSeries1DImpl;
  * @author Bryan Tripp
  */
 public class SpikingNeuron implements Neuron, Probeable, NEFNode {
-
+	
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Name of Origin representing unscaled and unbiased current entering the soma.   
+	 */
+	public static final String CURRENT = "current";
 	
 	private SynapticIntegrator myIntegrator;
 	private SpikeGenerator myGenerator;
-	private SpikeGeneratorOrigin myOrigin;
+	private SpikeGeneratorOrigin mySpikeOrigin;
+	private BasicOrigin myCurrentOrigin;
+	private float myUnscaledCurrent;
 	private TimeSeries1D myCurrent;
 	private String myName;
 	private float myScale;
@@ -53,7 +61,9 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public SpikingNeuron(SynapticIntegrator integrator, SpikeGenerator generator, float scale, float bias, String name) {
 		myIntegrator = integrator;
 		myGenerator = generator;
-		myOrigin = new SpikeGeneratorOrigin(generator);
+		mySpikeOrigin = new SpikeGeneratorOrigin(generator);
+		myCurrentOrigin = new BasicOrigin(CURRENT, 1, Units.ACU);
+		myCurrentOrigin.setValues(0, 0, new float[]{0});
 		myName = name;
 		myScale = scale;
 		myBias = bias;
@@ -71,26 +81,32 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		float[] integratorOutput = current.getValues1D();
 		float[] generatorInput = new float[integratorOutput.length];
 		for (int i = 0; i < integratorOutput.length; i++) {
-			generatorInput[i] = myBias + myScale * (myRadialInput + integratorOutput[i]);
+			myUnscaledCurrent = (myRadialInput + integratorOutput[i]);
+			generatorInput[i] = myBias + myScale * myUnscaledCurrent;
 		}
 		myCurrent = new TimeSeries1DImpl(current.getTimes(), generatorInput, Units.UNK);
 		
-		myOrigin.run(myCurrent.getTimes(), generatorInput);
+		mySpikeOrigin.run(myCurrent.getTimes(), generatorInput);
+		myCurrentOrigin.setValues(startTime, endTime, new float[]{myUnscaledCurrent});
 	}
 
 	/**
 	 * @see ca.neo.model.neuron.Neuron#getOrigins()
 	 */
 	public Origin[] getOrigins() {
-		return new Origin[]{myOrigin};
+		return new Origin[]{mySpikeOrigin, myCurrentOrigin};
 	}
 
 	/**
 	 * @see ca.neo.model.neuron.Neuron#getOrigin(java.lang.String)
 	 */
 	public Origin getOrigin(String name) throws StructuralException {
-		assert name.equals(Neuron.AXON); //this is going to be called a lot, so let's skip the exception		
-		return myOrigin;
+		assert (name.equals(Neuron.AXON) || name.equals(CURRENT)); //this is going to be called a lot, so let's skip the exception
+		if (name.equals(Neuron.AXON)) {
+			return mySpikeOrigin;			
+		} else {
+			return myCurrentOrigin;
+		}
 	}
 
 	/**
@@ -125,6 +141,9 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		TimeSeries result = null;
 		if (stateName.equals("I")) {
 			result = myCurrent; 
+		} else if (stateName.equals(CURRENT)) {
+			float[] times = myCurrent.getTimes();
+			result = new TimeSeries1DImpl(new float[]{times[times.length-1]}, new float[]{myUnscaledCurrent}, Units.ACU);
 		} else if (myGenerator instanceof Probeable) {
 			result = ((Probeable) myGenerator).getHistory(stateName);
 		} else {
