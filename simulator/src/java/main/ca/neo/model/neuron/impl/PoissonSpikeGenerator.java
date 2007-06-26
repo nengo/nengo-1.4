@@ -93,7 +93,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	
 	//functional test
 	public static void main(String[] args) {
-		Function current = new FourierFunction(1f, 5f, 1f);
+		Function current = new FourierFunction(1f, 5f, 1f, (long) Math.random());
 		Function rate = new SigmoidFunction(0, 5, 0, 40);
 		PoissonSpikeGenerator generator = new PoissonSpikeGenerator(rate);
 		

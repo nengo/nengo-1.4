@@ -3,6 +3,8 @@
  */
 package ca.neo.math.impl;
 
+import java.util.Random;
+
 import ca.neo.math.Function;
 
 /**
@@ -64,18 +66,19 @@ public class FourierFunction implements Function {
 	 * @param cutoff The high-frequency limit (Hz)
 	 * @param rms The root-mean-squared function amplitude
 	 */
-	public FourierFunction(float fundamental, float cutoff, float rms) {
+	public FourierFunction(float fundamental, float cutoff, float rms, long seed) {
 		int n = (int) Math.floor(cutoff / fundamental);
 		
 		myFrequencies = new float[][]{new float[n]};
 		myAmplitudes = new float[n];
 		myPhases = new float[][]{new float[n]};
+		Random random = new Random(seed); 
 		
 		for (int i = 0; i < n; i++) {
 			myFrequencies[0][i] = fundamental * (i+1);
-			myAmplitudes[i] = (float) Math.random() * fundamental / myFrequencies[0][i]; //decreasing amplitude = pink noise
+			myAmplitudes[i] = (float) random.nextFloat() * fundamental / myFrequencies[0][i]; //decreasing amplitude = pink noise
 //			myPhases[i] = (float) ( -Math.PI + (2d *  Math.PI * Math.random()) ) ;
-			myPhases[0][i] = -.5f + 2f * (float) Math.random();
+			myPhases[0][i] = -.5f + 2f * (float) random.nextFloat();
 		}
 		
 		//find amplitude over one period and rescale to specified amplitude 

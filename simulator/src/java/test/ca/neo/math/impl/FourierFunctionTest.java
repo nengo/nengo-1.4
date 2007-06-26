@@ -24,7 +24,7 @@ public class FourierFunctionTest extends TestCase {
 	 * TODO: make this self-verifying 
 	 */
 	public void testFourierFunctionFloatFloatFloat() {
-		FourierFunction f = new FourierFunction(1, 20, 1);
+		FourierFunction f = new FourierFunction(1, 20, 1, (long) Math.random());
 		
 		int n = 100;
 		float[][] from = new float[n][];
