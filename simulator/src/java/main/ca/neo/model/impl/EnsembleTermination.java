@@ -65,7 +65,8 @@ public class EnsembleTermination implements Termination {
 			Object o = myNodeTerminations[i].getConfiguration().getProperty(Termination.WEIGHTS);
 			weights[i] = (o != null && o instanceof float[][]) ? ((float[][]) o)[0] : new float[myNodeTerminations[i].getDimensions()]; 
 		}
-		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, MU.transpose(weights));
+//		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, MU.transpose(weights));
+		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, weights);
 	}
 	
 	private static void checkSameDimension(Termination[] terminations, String name) throws StructuralException {
