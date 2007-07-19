@@ -321,21 +321,39 @@ public class DefaultPlotter extends Plotter {
 	 * @see ca.neo.plot.Plotter#doPlot(ca.neo.math.Function, float, float, float, String)
 	 */
 	public void doPlot(Function function, float start, float increment, float end, String title) {
-		if (function.getDimension() != 1) {
-			throw new IllegalArgumentException("Only 1-D functions can be plotted with this method");
+		if (function.getDimension() > 2) {
+			throw new IllegalArgumentException("Only 1-D and 2-D functions can be plotted with this method");
 		}
 		
 		XYSeriesCollection dataset = new XYSeriesCollection();
-		XYSeries series = new XYSeries("Function");
-
-		float x = start;
-		while (x <= end) {
-			float y = function.map(new float[]{x});
-			series.add(x, y);
-			x += increment;
-		}
 		
-		dataset.addSeries(series);
+		if (function.getDimension() == 1) {
+			XYSeries series = new XYSeries("Function");
+
+			float x = start;
+			while (x <= end) {
+				float y = function.map(new float[]{x});
+				series.add(x, y);
+				x += increment;
+			}
+			
+			dataset.addSeries(series);
+		} else if (function.getDimension() == 2) {
+			float increment2 = increment * 10f;
+			
+			float x2 = start;
+			while (x2 <= end) {
+				XYSeries series = new XYSeries(""+x2);
+				float x = start;
+				while (x <= end) {
+					float y = function.map(new float[]{x, x2});
+					series.add(x, y);
+					x += increment;
+				}				
+				dataset.addSeries(series);
+				x2 += increment2;
+			}
+		}
 
 		JFreeChart chart = ChartFactory.createXYLineChart(
 				"Function",
