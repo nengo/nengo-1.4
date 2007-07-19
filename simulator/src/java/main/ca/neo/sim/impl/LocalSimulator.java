@@ -73,7 +73,7 @@ public class LocalSimulator implements Simulator {
 
 		int c = 0;
 		while (time < endTime - stepSize/10000f) { //in case we're very close with floating point comparison
-//			if (c++ % 100 == 0) System.out.println("Step " + c); //TODO: change this to listener/progress bar
+			if (c++ % 100 == 99) System.out.println("Step " + c); //TODO: change this to listener/progress bar
 			step(time, Math.min(endTime, time+stepSize));
 			time += stepSize;
 		}
