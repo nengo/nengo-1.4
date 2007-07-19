@@ -10,6 +10,7 @@ import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.Function;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.plot.impl.DefaultPlotter;
+import ca.neo.util.Environment;
 import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 
@@ -47,8 +48,8 @@ public abstract class Plotter {
 	public void closingPlot() {
 		myOpenPlots--;
 		
-		if (myOpenPlots <= 0) {
-			System.exit(0); //we'll want to turn this off if running in a UI
+		if (myOpenPlots <= 0 && !Environment.inUserInterface()) {
+			System.exit(0); 
 		}
 	}
 	
