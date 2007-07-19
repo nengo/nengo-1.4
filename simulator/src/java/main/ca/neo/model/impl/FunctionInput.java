@@ -36,6 +36,7 @@ public class FunctionInput implements Node, Probeable {
 	private float myTime;
 //	private float[] myValues;
 	private BasicOrigin myOrigin;
+	private String myDocumentation;
 	
 	/**
 	 * @param name The name of this Node
@@ -183,6 +184,20 @@ public class FunctionInput implements Node, Probeable {
 	 */
 	public Termination[] getTerminations() {
 		return new Termination[0];
+	}
+
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
 	}
 
 }

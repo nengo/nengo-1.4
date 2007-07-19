@@ -49,6 +49,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	private SimulationMode myMode;
 	private SpikePatternImpl mySpikePattern;
 	protected boolean myCollectSpikesFlag;
+	private String myDocumentation;
 	
 	/**
 	 * Note that setMode(SimulationMode.DEFAULT) is called at construction time. 
@@ -387,6 +388,20 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
 	}
 	
 	/**

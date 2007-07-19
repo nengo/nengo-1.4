@@ -39,6 +39,7 @@ public class PassthroughNode implements Node {
 	private String myName;
 	private PassthroughTermination myTermination;
 	private BasicOrigin myOrigin;
+	private String myDocumentation;
 
 	public PassthroughNode(String name, int dimension) {
 		myName = name;
@@ -161,6 +162,20 @@ public class PassthroughNode implements Node {
 		public void propertyChange(String propertyName, Object newValue) throws StructuralException {
 		}
 		
+	}
+
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
 	}
 
 }

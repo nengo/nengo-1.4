@@ -148,6 +148,14 @@ public class NetworkImplTest extends TestCase {
 			throw new NotImplementedException("not implemented");
 		}
 
+		public String getDocumentation() {
+			throw new NotImplementedException("not implemented");
+		}
+
+		public void setDocumentation(String text) {
+			throw new NotImplementedException("not implemented");
+		}
+
 	}
 	
 }

@@ -54,4 +54,14 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	 */
 	public Termination getTermination(String name) throws StructuralException;
 	
+	/**
+	 * @return User-specified documentation for the Node, if any
+	 */
+	public String getDocumentation();
+	
+	/**
+	 * @param text New user-specified documentation for the Node
+	 */
+	public void setDocumentation(String text);
+	
 }

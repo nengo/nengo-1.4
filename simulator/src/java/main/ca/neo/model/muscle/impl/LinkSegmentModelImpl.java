@@ -40,6 +40,7 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	private Properties myStates;
 	private float myTimeStep;
 	private float myTime;
+	private String myDocumentation;
 	
 	public LinkSegmentModelImpl(String name, DynamicalSystem dynamics, float timeStep) {
 		myDynamics = dynamics;
@@ -202,6 +203,20 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	 */
 	public Properties listStates() {
 		return myStates;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
 	}
 	
 }

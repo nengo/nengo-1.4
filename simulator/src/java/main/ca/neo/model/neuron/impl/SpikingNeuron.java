@@ -45,6 +45,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	private float myScale;
 	private float myBias;
 	private float myRadialInput;
+	private String myDocumentation;
 
 	/**
 	 * Note: current = scale * (weighted sum of inputs at each termination) * (radial input) + bias.
@@ -187,6 +188,20 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	 */
 	public void setRadialInput(float value) {
 		myRadialInput = value;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
 	}
 
 }

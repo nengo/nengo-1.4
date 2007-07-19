@@ -44,6 +44,7 @@ public class NetworkImpl implements Network {
 	private Map myProbeableStates;
 	private Map myExposedOrigins;
 	private Map myExposedTerminations;
+	private String myDocumentation;
 
 	public NetworkImpl() {
 		myNodeMap = new HashMap<String, Node>(20);
@@ -395,5 +396,19 @@ public class NetworkImpl implements Network {
 			myWrapped.propertyChange(propertyName, newValue);
 		}
 		
+	}
+
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
 	}
 }

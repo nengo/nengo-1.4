@@ -40,6 +40,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	private DynamicalSystem myAFDynamics; //activation-force dynamics
 	private Integrator myIntegrator;
 	private float myLength;
+	private String myDocumentation;
 	
 	private TimeSeries myActivationHistory; //saved for single timestep to support Probeable
 	private TimeSeries myForceHistory;
@@ -192,6 +193,20 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 		result.setProperty(SkeletalMuscle.LENGTH, "Muscle length (m)");
 		
 		return result;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
 	}
 
 }
