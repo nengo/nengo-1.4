@@ -3,6 +3,7 @@
  */
 package ca.neo.model.impl;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class NetworkImpl implements Network {
 	private Map myExposedOrigins;
 	private Map myExposedTerminations;
 	private String myDocumentation;
+	private Map<String, Object> myMetaData;
 
 	public NetworkImpl() {
 		myNodeMap = new HashMap<String, Node>(20);
@@ -57,6 +59,7 @@ public class NetworkImpl implements Network {
 		myExposedOrigins = new HashMap(10);
 		myExposedTerminations = new HashMap(10);
 		myMode = SimulationMode.DEFAULT;
+		myMetaData = new HashMap<String, Object>(20);
 	}
 	
 	/**
@@ -411,4 +414,22 @@ public class NetworkImpl implements Network {
 	public void setDocumentation(String text) {
 		myDocumentation = text;
 	}
+
+	/**
+	 * @see ca.neo.model.Network#getMetaData(java.lang.String)
+	 */
+	public Object getMetaData(String key) {
+		return myMetaData.get(key);
+	}
+
+	/**
+	 * @see ca.neo.model.Network#setMetaData(java.lang.String, java.lang.Object)
+	 */
+	public void setMetaData(String key, Object value) {
+		if ( !(value instanceof Serializable) ) {
+			throw new RuntimeException("Metadata must be serializable");
+		}
+		myMetaData.put(key, value);
+	}
+	
 }

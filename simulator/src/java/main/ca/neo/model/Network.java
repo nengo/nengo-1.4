@@ -135,5 +135,23 @@ public interface Network extends Node, Probeable {
 	 * @return The Simulator used to run this Network
 	 */
 	public Simulator getSimulator();
+
+	/**
+	 * Metadata is non-critical information about the Network (eg UI layout) that the user doesn't  
+	 * access directly. 
+	 * 
+	 * (Note: if there is a need for user-accessible metadata, Network could extend Configurable, but this doesn't 
+	 * seem to be necessary.)
+	 *  
+	 * @param key Name of a metadata item
+	 * @return Value of a metadata item 
+	 */
+	public Object getMetaData(String key);
+	
+	/**
+	 * @param key Name of a metadata item
+	 * @param value Value of the named metadata item
+	 */
+	public void setMetaData(String key, Object value);
 	
 }
