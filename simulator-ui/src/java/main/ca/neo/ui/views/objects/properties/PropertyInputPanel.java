@@ -1,13 +1,11 @@
 package ca.neo.ui.views.objects.properties;
 
-import java.awt.Color;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import ca.sw.graphics.basics.GDefaults;
+import ca.neo.ui.style.Style;
 
 public abstract class PropertyInputPanel extends JPanel {
 	PropertySchema type;
@@ -34,7 +32,7 @@ public abstract class PropertyInputPanel extends JPanel {
 		init(panel);
 
 		statusMessage = new JLabel("");
-		statusMessage.setForeground(GDefaults.WARNING_COLOR);
+		statusMessage.setForeground(Style.WARNING_COLOR);
 		
 		add(statusMessage);
 	}

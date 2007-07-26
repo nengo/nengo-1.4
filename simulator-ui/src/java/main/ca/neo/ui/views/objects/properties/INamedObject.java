@@ -1,5 +1,7 @@
 package ca.neo.ui.views.objects.properties;
 
-public interface INamedObject {
+import ca.shu.ui.lib.world.IWorldObject;
+
+public interface INamedObject extends IWorldObject {
 	public String getName();
 }

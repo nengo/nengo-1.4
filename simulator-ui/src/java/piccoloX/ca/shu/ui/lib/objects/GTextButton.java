@@ -1,0 +1,90 @@
+package ca.shu.ui.lib.objects;
+
+import java.awt.Font;
+
+import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.nodes.PText;
+
+public class GTextButton extends Button {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8982670127440624596L;
+
+	private PText pText;
+
+	private PPath frame;
+
+	private static final int BORDER_WIDTH = 5;
+
+	private static final int BORDER_HEIGHT = 3;
+
+	@Override
+	public void setState(State pState) {
+		// TODO Auto-generated method stub
+		super.setState(pState);
+
+		switch (state) {
+		case DEFAULT:
+			frame.setPaint(defaultColor);
+
+			break;
+		case HIGHLIGHT:
+			frame.setPaint(highlightColor);
+			break;
+		case SELECTED:
+			frame.setPaint(selectedColor);
+			break;
+		}
+	}
+
+	public GTextButton(String value, Runnable action) {
+		super(action);
+
+		pText = new PText("");
+		pText.setOffset(BORDER_WIDTH, BORDER_HEIGHT);
+
+		frame = PPath.createRectangle(0, 0, 100, 100);
+
+		// pBorder.setBounds(0f, 0f,
+		// (float) (pText.getWidth() + 2 * BORDER_WIDTH), (float) (pText
+		// .getHeight() + 2 * BORDER_HEIGHT));
+
+		addChild(frame);
+		addChild(pText);
+
+		this.setText(value);
+	}
+
+	public void recomputeBounds() {
+
+		frame.setBounds(0f, 0f,
+				(float) (pText.getWidth() + 2 * BORDER_WIDTH), (float) (pText
+						.getHeight() + 2 * BORDER_HEIGHT));
+		this.setBounds(frame.getBounds());
+
+		
+//		setBounds(getFullBounds());
+	}
+
+	public void setText(String str) {
+		pText.setText(str);
+
+		recomputeBounds();
+
+	}
+
+	public void setFont(Font font) {
+		pText.setFont(font);
+	}
+
+	public PText getText() {
+		return pText;
+	}
+
+
+
+	public PPath getFrame() {
+		return frame;
+	}
+}

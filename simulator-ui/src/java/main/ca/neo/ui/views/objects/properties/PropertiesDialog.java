@@ -15,7 +15,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import ca.sw.util.Util;
+import ca.shu.ui.lib.util.Util;
 
 public class PropertiesDialog extends JDialog {
 
@@ -23,27 +23,29 @@ public class PropertiesDialog extends JDialog {
 
 	private Vector<PropertyInputPanel> propertyInputPanels;
 
-	IPropertiesConfigurable proxyObj;
+	IConfigurable proxyObj;
 
-	public PropertiesDialog(JDialog dialog, IPropertiesConfigurable proxyObj) {
+	public PropertiesDialog(JDialog dialog, IConfigurable proxyObj) {
 		super(dialog, "New " + proxyObj.getName());
+		proxyObj.loadPropertiesFromFile("defaultProperties");
 		init(dialog, proxyObj);
 
 	}
 
-	public PropertiesDialog(Frame owner, IPropertiesConfigurable proxyObj) {
+	public PropertiesDialog(Frame owner, IConfigurable proxyObj) {
 		super(owner, "New " + proxyObj.getName());
-
+		proxyObj.loadPropertiesFromFile("defaultProperties");
 		init(owner, proxyObj);
-		// this.setVisible(true);
+
+		
+
 	}
 
-	public void init(Component c, IPropertiesConfigurable proxyObj) {
+	public void init(Component c, IConfigurable proxyObj) {
 		this.proxyObj = proxyObj;
 		setLocationRelativeTo(c);
 
-		PropertySchema[] properties = proxyObj.getMetaProperties();
-		// Iterator<MetaProperty> propertyIt = properties.iterator();
+		PropertySchema[] properties = proxyObj.getPropertiesSchema();
 
 		JPanel panel = new JPanel();
 		panel.setVisible(true);
@@ -51,13 +53,6 @@ public class PropertiesDialog extends JDialog {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-		// panel.setPreferredSize(new Dimension(800,400));
-
-		// setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-		// panel.setPreferredSize(new Dimension(500, 0));
-		// this.pack();
 
 		setResizable(false);
 		setModal(true);
@@ -77,21 +72,6 @@ public class PropertiesDialog extends JDialog {
 			}
 			propertyInputPanels.add(inputPanel);
 
-			// JLabel label = new JLabel(property.getName() + " ("
-			// + property.getType().getSimpleName() + ")");
-			//
-			// PropertyField tf = new PropertyField(property);
-			// Object currentValue = proxyObj.getProperty(property.getName());
-			// if (currentValue != null) {
-			// tf.setText(currentValue.toString());
-			// }
-			//
-			//			
-			//			
-
-			// panel.add(label);
-			// panel.add(tf);
-
 		}
 
 		JPanel closePanel = new JPanel();
@@ -105,12 +85,20 @@ public class PropertiesDialog extends JDialog {
 		addToWorldButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (checkPropertyFields()) {
-					PropertiesDialog.this.proxyObj.configurationComplete();
 					setVisible(false);
 					dispose();
+
+					(new Thread() {
+						public void run() {
+							PropertiesDialog.this.proxyObj
+									.completeConfiguration();
+							PropertiesDialog.this.proxyObj
+									.savePropertiesToFile("defaultProperties");
+						}
+					}).start();
+
 				} else {
 
-					// JOptionPane.showMessageDialog(null, "Error");
 				}
 			}
 		});
@@ -121,7 +109,7 @@ public class PropertiesDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
 				dispose();
-				PropertiesDialog.this.proxyObj.configurationCancelled();
+				PropertiesDialog.this.proxyObj.cancelConfiguration();
 			}
 		});
 		closePanel.add(cancelButton);

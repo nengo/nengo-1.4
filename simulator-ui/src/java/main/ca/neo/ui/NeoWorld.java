@@ -1,76 +1,62 @@
 package ca.neo.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
 
-import ca.neo.ui.views.NeoToolbox;
-import ca.neo.ui.views.factories.NodeFactory;
-import ca.sw.graphics.world.WorldImpl;
-import ca.sw.graphics.world.WorldFrame;
-import ca.sw.util.Util;
-import edu.umd.cs.piccolo.PNode;
+import ca.neo.ui.models.proxies.PNetwork;
+import ca.neo.ui.widgets.Toolbox;
+import ca.shu.ui.lib.world.impl.Frame;
 
-public class NeoWorld extends WorldFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	static NeoWorld instance;
-
-	public static NeoWorld getInstance() {
-		return instance;
-	}
-
-	public static WorldImpl getWorldInstance() {
-		return instance.getWorld();
-	}
-
-	public static void main(String[] args) {
-		instance = new NeoWorld("NEOWorld");
-	}
-
-	NeoToolbox canvasView;
+public class NeoWorld extends Frame {
 
 	public NeoWorld(String title) {
 		super(title);
 
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				PNetwork network = new PNetwork();
+				if (network.isModelCreated()) {
+					getWorld().getGround().catchObject(network);
+					network.openNetwork();
+
+				}
+			}
+		});
+
 	}
+
+	private static final long serialVersionUID = 1L;
+
+	public static NeoWorld getInstance() {
+		return (NeoWorld) (Frame.getInstance());
+	}
+
+	public static void main(String[] args) {
+		Frame.setInstance(new NeoWorld("NEOWorld"));
+	}
+
+	Toolbox canvasView;
 
 	@Override
 	public void createMenu(JMenuBar menuBar) {
 		JMenu menu;
-
-		menu = addMenu(menuBar, "View");
-		menu.setMnemonic(KeyEvent.VK_V);
-		Util.addActionToMenu(menu, new CanvasAction());
-		
-		
-
-		menuBar.add(NodeFactory.createNodeMenu());
+		menu = addMenu(menuBar, "Start");
+		Frame.addActionToMenu(menu, new CreateNetworkAction());
 	}
 
-	public NeoToolbox getCanvasView() {
+	public Toolbox getCanvasView() {
 		return canvasView;
-	}
-
-	@Override
-	public void initialize() {
-		// int i= 0;
-		showCanvas();
 	}
 
 	public void showCanvas() {
 		if (canvasView == null) {
-			 System.out.println("Creating canvas");
-			canvasView = new NeoToolbox();
-			// System.out.println("Finished Creating canvas");
-			getWorld().addToSky(canvasView);
+			System.out.println("Creating canvas");
+			canvasView = new Toolbox();
+			getWorld().getSky().addChild(canvasView);
 		}
 	}
 
@@ -87,14 +73,24 @@ public class NeoWorld extends WorldFrame {
 
 	}
 
-	class CustomMenu extends JMenu {
+	class CreateNetworkAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
-		@Override
-		public Component add(Component c) {
-			// TODO Auto-generated method stub
-			return super.add(c);
+		public CreateNetworkAction() {
+			super("New Network");
 		}
 
+		public void actionPerformed(ActionEvent e) {
+			(new Thread() {
+				public void run() {
+					PNetwork network;
+					network = new PNetwork();
+					if (network.isModelCreated())
+						getWorld().getGround().catchObject(network);
+				}
+			}).start();
+
+		}
 	}
+
 }

@@ -16,30 +16,26 @@ import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
-import ca.sw.util.Util;
+import ca.shu.ui.lib.util.Util;
 
 public class PTFunction extends PropertySchema {
 
 	public PTFunction(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public PropertyInputPanel createInputPanel() {
-		// TODO Auto-generated method stub
 		return new FunctionInputPanel(this);
 	}
 
 	@Override
 	public Class<Function> getTypeClass() {
-		// TODO Auto-generated method stub
 		return Function.class;
 	}
 
 	@Override
 	public String getTypeName() {
-		// TODO Auto-generated method stub
 		return "Function";
 	}
 
@@ -118,7 +114,7 @@ class FunctionInputPanel extends PropertyInputPanel {
 		if (fnDescriptor == null)
 			return;
 
-		FnProxy functionProxy = new FnProxy(this, fnDescriptor
+		FunctionConfiguration functionProxy = new FunctionConfiguration(this, fnDescriptor
 				.getFunctionClass(), fnDescriptor.getMetaProperties());
 
 		//		
@@ -181,12 +177,10 @@ class FnSchema {
 	public String toString() {
 		return functionClass.getSimpleName();
 	}
-	
-	
 
 }
 
-class FnProxy implements IPropertiesConfigurable {
+class FunctionConfiguration implements IConfigurable {
 	Class functionType;
 
 	PropertySchema[] metaProperties;
@@ -199,7 +193,7 @@ class FnProxy implements IPropertiesConfigurable {
 
 	FunctionInputPanel inputPanel;
 
-	public FnProxy(FunctionInputPanel inputPanel, Class functionType,
+	public FunctionConfiguration(FunctionInputPanel inputPanel, Class functionType,
 			PropertySchema[] propertyTypes) {
 		super();
 		this.metaProperties = propertyTypes;
@@ -208,16 +202,15 @@ class FnProxy implements IPropertiesConfigurable {
 		this.inputPanel = inputPanel;
 		this.functionType = functionType;
 		this.name = functionType.getSimpleName();
-		
 
 	}
 
-	public void configurationCancelled() {
+	public void cancelConfiguration() {
 		// TODO Auto-generated method stub
 
 	}
 
-	public void configurationComplete() {
+	public void completeConfiguration() {
 
 		/*
 		 * Create function using Java reflection
@@ -270,7 +263,7 @@ class FnProxy implements IPropertiesConfigurable {
 		}
 	}
 
-	public PropertySchema[] getMetaProperties() {
+	public PropertySchema[] getPropertiesSchema() {
 		return metaProperties;
 	}
 
@@ -301,6 +294,21 @@ class FnProxy implements IPropertiesConfigurable {
 
 	public Function getFunction() {
 		return function;
+	}
+
+	public void loadPropertiesFromFile(String fileName) {
+		SimpleAttributeSet prop = (SimpleAttributeSet)Util.loadObject(getClass().getName() + "_"
+				+ functionType.getSimpleName() + "_" + fileName);
+		if (prop != null) {
+			properties = prop;
+		}
+
+	}
+
+	public void savePropertiesToFile(String fileName) {
+		Util.saveObject(properties, getClass().getName() + "_"
+				+ functionType.getSimpleName() + "_" + fileName);
+
 	}
 
 }

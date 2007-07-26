@@ -2,7 +2,7 @@ package ca.neo.ui.views.objects.properties;
 
 import java.io.Serializable;
 
-import ca.sw.util.Util;
+import ca.shu.ui.lib.util.Util;
 
 public class PropertyWrapper implements Serializable {
 	/**
