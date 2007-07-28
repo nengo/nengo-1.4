@@ -1,25 +1,21 @@
 package ca.shu.ui.lib.util;
 
 import java.awt.Color;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ListIterator;
 
-import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 
-import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.handlers.IContextMenu;
+import ca.shu.ui.lib.world.IWorld;
+import ca.shu.ui.lib.world.impl.Frame;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PObjectOutputStream;
@@ -30,7 +26,6 @@ public class Util {
 
 	static final String BLANKS = "            ";
 
-	
 	static public Color colorTimes(Color c1, double f) {
 		int r = (int) Math.min(c1.getRed() * f, 255);
 		int g = (int) Math.min(c1.getGreen() * f, 255);
@@ -55,7 +50,7 @@ public class Util {
 	}
 
 	public static void showMsg(String msg) {
-		JOptionPane.showMessageDialog(null, msg);
+		JOptionPane.showMessageDialog(Frame.getInstance(), msg);
 	}
 
 	public static void Assert(boolean bool, String msg) {
@@ -106,8 +101,13 @@ public class Util {
 
 	}
 
-	/*
-	 * Returns the first node on the pick path that matches the type
+	/**
+	 * @return The first node on the pick path that matches the parameter type
+	 * 
+	 * @param event
+	 *            Event sent from Piccolo
+	 * @param type
+	 *            The type of node to be picked from the pick tree
 	 */
 	public static Object getNodeFromPickPath(PInputEvent event, Class type) {
 		PStack nodeStack = event.getPath().getNodeStackReference();
@@ -119,16 +119,32 @@ public class Util {
 			if (type.isInstance(node)) {
 				return node;
 			}
+
+			/*
+			 * Stop picking objects at the boundary of the worlds
+			 */
+			if (node instanceof IWorld) {
+				return null;
+			}
+
 		}
 		return null;
 	}
 
-	public static Object loadObject(String name) {
+	/**
+	 * @param parent
+	 *            The object holding the property
+	 * @param name
+	 *            Name of the property to be loaded
+	 * 
+	 */
+	public static Object loadProperty(Object parent, String name) {
 
 		FileInputStream f_in;
 
 		try {
-			f_in = new FileInputStream("SavedObjects/" + name);
+			f_in = new FileInputStream(FILE_SAVED_OBJECTS_DIR + "/"
+					+ getFileNamePrefix(parent) + name);
 
 			ObjectInputStream obj_in = new ObjectInputStream(f_in);
 
@@ -151,29 +167,98 @@ public class Util {
 		return null;
 	}
 
-	public static void saveObject(Object obj, String name) {
+	static Object parentStatic;
+
+	public static String[] getPropertyFiles(Object parent) {
+		File file = new File("SavedObjects");
+		/*
+		 * Gets a list of property files
+		 */
+		String[] files = file.list(new CustomFileNameFilter(parent));
+		/*
+		 * Return the file names without the prefix
+		 */
+		String[] files0 = new String[files.length];
+		for (int i = 0; i < files.length; i++) {
+			files0[i] = files[i].replaceFirst(getFileNamePrefix(parent), "");
+		}
+		return files0;
+
+	}
+
+	static final String FILE_SAVED_OBJECTS_DIR = "SavedObjects";
+
+	/**
+	 * Returns the file name prefix given per class
+	 */
+	@SuppressWarnings("unchecked")
+	protected static String getFileNamePrefix(Object obj) {
+		if (obj instanceof Class) {
+			return ((Class) obj).getName() + "_";
+		} else {
+			return obj.getClass().getName() + "_";
+		}
+
+	}
+
+	/**
+	 * @param parent
+	 *            The Parent class holding the saved object
+	 * @param name
+	 *            Name of the saved object to be removed
+	 * 
+	 */
+	public static void deleteProperty(Object parent, String name) {
+		String fileName = FILE_SAVED_OBJECTS_DIR + "/"
+				+ getFileNamePrefix(parent) + name;
+
+		File file = new File(fileName);
+
+		System.gc();
+		if (file.exists()) {
+			boolean val = file.delete();
+			if (val == false) {
+				Util.Error("Could not delete file");
+			}
+			
+		}
+	}
+
+	/**
+	 * @param parent
+	 *            The Parent object holding the property
+	 * @param property
+	 *            Property to be saved
+	 * @param name
+	 *            Filename given to instance of this property
+	 * 
+	 */
+	public static void saveProperty(Object parent, Object property, String name) {
+
 		// Write to disk with FileOutputStream
 		FileOutputStream f_out;
 		try {
-			File file = new File("SavedObjects");
+			File file = new File(FILE_SAVED_OBJECTS_DIR);
 			if (!file.exists())
 				file.mkdir();
 
-			String fileName = "SavedObjects/" + name;
+			String fileName = FILE_SAVED_OBJECTS_DIR + "/"
+					+ getFileNamePrefix(parent) + name;
+			// String fileName = "SavedObjects/" + name;
 
 			if ((new File(fileName)).exists()) {
-				System.out.println("Replaced existing file: " + name);
+				System.out.println("Replaced existing file: " + fileName);
 			}
 			f_out = new FileOutputStream(fileName);
 
-			if (obj instanceof PNode) {
+			if (property instanceof PNode) {
 				PObjectOutputStream obj_out = new PObjectOutputStream(f_out);
-				obj_out.writeObjectTree(obj);
+				obj_out.writeObjectTree(property);
 			} else {
 				ObjectOutputStream obj_out = new ObjectOutputStream(f_out);
-				obj_out.writeObject(obj);
+				obj_out.writeObject(property);
 			}
-
+			f_out.close();
 			// System.out.println("Saved: " + fileName);
 
 		} catch (FileNotFoundException e) {
@@ -183,6 +268,31 @@ public class Util {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+	}
+}
+
+/**
+ * A FilenameFilter that can be used statically to filter files related to a
+ * object
+ * 
+ * @author Shu
+ * 
+ */
+class CustomFileNameFilter implements FilenameFilter {
+	Object parent;
+
+	public CustomFileNameFilter(Object parent) {
+		super();
+		this.parent = parent;
+	}
+
+	public boolean accept(File file, String name) {
+
+		if (name.startsWith(Util.getFileNamePrefix(parent))) {
+			return true;
+		} else
+			return false;
 
 	}
 }

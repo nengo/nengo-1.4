@@ -1,7 +1,6 @@
 package ca.shu.ui.lib.world.impl;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -28,11 +27,18 @@ import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
 import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.world.IWorld;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
+import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PUtil;
 
+/**
+ * This class is based on PFrame by Jesse Grosjean
+ * 
+ * @author Shu Wu
+ */
 public class Frame extends JFrame {
 
 	/**
@@ -94,8 +100,9 @@ public class Frame extends JFrame {
 
 	String statusStr = "";
 
-	/*
-	 * @param text Sets the text of the status bar in the UI
+	/**
+	 * @param text
+	 *            Sets the text of the status bar in the UI
 	 */
 	public void setStatusStr(String text) {
 		statusStr = text;
@@ -139,14 +146,20 @@ public class Frame extends JFrame {
 		canvas.addKeyListener((KeyListener) escapeFullScreenModeListener);
 	}
 
-	public void createMenu(JMenuBar menuBar) {
+	/**
+	 * Use this function to add menu items to the frame menu bar
+	 * 
+	 * @param menuBar
+	 *            is attached to the frame
+	 */
+	public void constructMenuBar(JMenuBar menuBar) {
 
 	}
 
-	/*
+	/**
 	 * @return the top-most World associated with this frame
 	 */
-	public IWorld getWorld() {
+	public World getWorld() {
 		return canvas.getWorld();
 	}
 
@@ -205,10 +218,10 @@ public class Frame extends JFrame {
 	private void initStatusBar() {
 
 		statusBar = new JLabel("welcome to NeoWorld");
-
-		statusBar.setBackground(Color.black);
+		statusBar.setOpaque(true);
+		statusBar.setBackground(Style.BACKGROUND_COLOR);
+		statusBar.setForeground(Style.FOREGROUND_COLOR);
 		statusBar.setBorder(new EtchedBorder());
-		Style.styleComponent(statusBar);
 
 		Container c = super.getContentPane();
 
@@ -229,22 +242,31 @@ public class Frame extends JFrame {
 		updateStatusBar();
 	}
 
-	/*
-	 * Initializes the Menu
+	/**
+	 * Initializes the menu
 	 */
 	private void initMenu() {
-		// Where the GUI is created:
+
 		JMenuBar menuBar = new JMenuBar();
-		Style.styleComponent(menuBar);
+		Style.applyStyleToComponent(menuBar);
 
-		createMenu(menuBar);
+		constructMenuBar(menuBar);
 
-		JMenu menu = addMenu(menuBar, "World");
-		menu.setMnemonic(KeyEvent.VK_V);
+		// menu.setMnemonic(KeyEvent.VK_V);
 
-		addActionToMenu(menu, new ZoomOutAction());
-		addActionToMenu(menu, new FullScreenAction());
-		addActionToMenu(menu, new TooltipAction());
+		MenuBuilder menu = new MenuBuilder("World");
+		menuBar.add(menu.getJMenu());
+
+		menu.addAction(new ZoomOutAction());
+		menu.addAction(new FullScreenAction());
+		menu.addAction(new TooltipAction());
+		
+		MenuBuilder qualityMenu = menu.createSubMenu("Rendering Quality");
+		qualityMenu.addAction(new LowQualityAction());
+		qualityMenu.addAction(new MediumQualityAction());
+		qualityMenu.addAction(new HighQualityAction());
+		
+		
 
 		menuBar.setVisible(true);
 		this.setJMenuBar(menuBar);
@@ -255,7 +277,7 @@ public class Frame extends JFrame {
 	public static JMenuItem addActionToMenu(JPopupMenu menu,
 			AbstractAction action) {
 		JMenuItem menuItem = new JMenuItem(action);
-//		GDefaults.styleComponent(menuItem);
+		// GDefaults.styleComponent(menuItem);
 		menu.add(menuItem);
 
 		return menuItem;
@@ -263,18 +285,18 @@ public class Frame extends JFrame {
 
 	public static JMenuItem addActionToMenu(JMenu menu, AbstractAction action) {
 		JMenuItem menuItem = new JMenuItem(action);
-//		GDefaults.styleComponent(menuItem);
+		// GDefaults.styleComponent(menuItem);
 		menu.add(menuItem);
 
 		return menuItem;
 	}
 
-	protected JMenu addMenu(JMenuBar menuBar, String name) {
-		JMenu menu = new JMenu(name);
-		Style.styleComponent(menu);
-		menuBar.add(menu);
-		return menu;
-	}
+	// protected JMenu addMenu(JMenuBar menuBar, String name) {
+	// JMenu menu = new JMenu(name);
+	// Style.styleComponent(menu);
+	// menuBar.add(menu);
+	// return menu;
+	// }
 
 	protected void chooseBestDisplayMode(GraphicsDevice device) {
 		DisplayMode best = getBestDisplayMode(device);
@@ -377,6 +399,63 @@ public class Frame extends JFrame {
 
 		public void actionPerformed(ActionEvent e) {
 			getWorld().zoomToWorld();
+		}
+
+	}
+
+	class LowQualityAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public LowQualityAction() {
+			super("Low Quality");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			getCanvas().setDefaultRenderQuality(
+					PPaintContext.LOW_QUALITY_RENDERING);
+			getCanvas().setAnimatingRenderQuality(
+					PPaintContext.LOW_QUALITY_RENDERING);
+			getCanvas().setInteractingRenderQuality(
+					PPaintContext.LOW_QUALITY_RENDERING);
+		}
+
+	}
+
+	class MediumQualityAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public MediumQualityAction() {
+			super("Medium Quality");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			getCanvas().setDefaultRenderQuality(
+					PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setAnimatingRenderQuality(
+					PPaintContext.LOW_QUALITY_RENDERING);
+			getCanvas().setInteractingRenderQuality(
+					PPaintContext.LOW_QUALITY_RENDERING);
+		}
+
+	}
+
+	class HighQualityAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public HighQualityAction() {
+			super("High Quality");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			getCanvas().setDefaultRenderQuality(
+					PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setAnimatingRenderQuality(
+					PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setInteractingRenderQuality(
+					PPaintContext.HIGH_QUALITY_RENDERING);
 		}
 
 	}

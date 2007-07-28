@@ -1,11 +1,11 @@
-package ca.neo.ui.views.objects.properties;
+package ca.neo.ui.views.objects.configurable;
 
 import java.io.Serializable;
 
 import javax.swing.JLabel;
 
-/*
- * Enables type checking and adds styling meta data to a Property
+/**
+ * Statically describes a property 
  */
 public abstract class PropertySchema implements Serializable {
 

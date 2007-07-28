@@ -1,4 +1,4 @@
-package ca.neo.ui.views.objects.properties;
+package ca.neo.ui.views.objects.configurable;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;

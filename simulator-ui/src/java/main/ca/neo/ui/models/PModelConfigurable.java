@@ -1,50 +1,79 @@
 package ca.neo.ui.models;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.text.SimpleAttributeSet;
 
-import ca.neo.model.Node;
-import ca.neo.model.Origin;
 import ca.neo.ui.NeoWorld;
 import ca.neo.ui.style.Style;
-import ca.neo.ui.views.objects.properties.IConfigurable;
-import ca.neo.ui.views.objects.properties.PropertiesDialog;
-import ca.neo.ui.views.objects.properties.PropertySchema;
+import ca.neo.ui.views.objects.configurable.IConfigurable;
+import ca.neo.ui.views.objects.configurable.PropertiesDialog;
+import ca.neo.ui.views.objects.configurable.PropertySchema;
+import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
 import ca.shu.ui.lib.objects.GText;
-import ca.shu.ui.lib.objects.lines.LineEnd;
-import ca.shu.ui.lib.objects.lines.LineEndWell;
-import ca.shu.ui.lib.objects.lines.LineIn;
-import ca.shu.ui.lib.world.impl.Frame;
-import ca.shu.ui.lib.world.impl.WorldObject;
-import edu.umd.cs.piccolo.PNode;
+import ca.shu.ui.lib.objects.widgets.TrackedTask;
+import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PText;
 
 public abstract class PModelConfigurable extends PModel implements
 		IConfigurable {
+	public PModelConfigurable() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	private JDialog dialog;
 	SimpleAttributeSet properties = new SimpleAttributeSet();
 
-	public PModelConfigurable() {
-		super();
-		// addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS,
-		// new PropertyChangeListener() {
-		// public void propertyChange(PropertyChangeEvent arg0) {
-		// if (lineEndWell != null)
-		// lineEndWell.layoutEdges();
-		//
-		// if (lineIn != null) {
-		// lineIn.layoutEdges();
-		// }
-		// }
-		// });
+	/**
+	 * @param useDefaultConfigManager
+	 *            uses the default configuration manager
+	 */
+	public PModelConfigurable(boolean useDefaultConfigManager) {
+		if (useDefaultConfigManager) {
+			startConfigManager(getDefaultConfigManager());
+		}
 
-		configureModel();
+	}
+
+	/**
+	 * @return The default configuration manager
+	 */
+	protected IConfigurationManager getDefaultConfigManager() {
+		return new PropertiesDialog(NeoWorld.getInstance());
+	}
+
+	/**
+	 * Create a model using any IConfigurationManager
+	 * 
+	 * @param configManager
+	 */
+	public PModelConfigurable(IConfigurationManager configManager) {
+		super();
+
+		startConfigManager(configManager);
+	}
+
+	/**
+	 * Starts the configuration manager
+	 * 
+	 * @param configManager
+	 *            The configuration manager used to configure this model
+	 */
+	protected void startConfigManager(IConfigurationManager configManager) {
+		if (getPropertiesSchema() == null || getPropertiesSchema().length == 0) {
+			Util.Error("No properties to configure");
+		}
+		configManager.configure(this);
+
+		// configureModel();
 
 		/*
-		 * Wait until a change has been made to the model
+		 * Wait to see if the model has been created
 		 */
 		if (model == null && !configCancelled) {
 			synchronized (modelConfigurationLock) {
@@ -56,11 +85,16 @@ public abstract class PModelConfigurable extends PModel implements
 			}
 		}
 
+		// if (model == null) {
+		// Util.Error("Error creating model");
+		// }
+
 	}
 
 	protected Object modelConfigurationLock = new Object();
 
 	boolean configCancelled = false;
+
 	public void cancelConfiguration() {
 		removeFromParent();
 		configCancelled = true;
@@ -76,50 +110,63 @@ public abstract class PModelConfigurable extends PModel implements
 		}
 	}
 
-	public void configureModel() {
-
-		if (getPropertiesSchema() == null || getPropertiesSchema().length == 0) {
-			completeConfiguration();
-			return;
-		}
-
-		if (dialog == null) {
-
-			Frame frame = NeoWorld.getInstance();
-			dialog = new PropertiesDialog(frame, PModelConfigurable.this);
-
-		}
-	}
-
-	// LineIn lineIn;
+	// public void configureModel() {
 	//
-	// LineEndWell lineEndWell;
+	// if (dialog == null) {
+	//
+	// Frame frame = NeoWorld.getInstance();
+	// dialog = new UserConfigManager(frame, PModelConfigurable.this);
+	//
+	// }
+	// }
+
 	public abstract PropertySchema[] getPropertiesSchema();
 
 	public Object getProperty(String name) {
 		return properties.getAttribute(name);
 	}
 
+	public Object getProperty(PropertySchema prop) {
+		return properties.getAttribute(prop.getName());
+	}
+
 	@Override
-	public WorldObject getTooltipObject() {
+	public WorldObjectImpl getTooltipObject() {
 		// TODO Auto-generated method stub
 		return new NodeTooltip(this);
 	}
 
 	public void loadPropertiesFromFile(String fileName) {
-		SimpleAttributeSet loadedProperties = (SimpleAttributeSet) loadStatic(fileName);
+		SimpleAttributeSet loadedProperties = (SimpleAttributeSet) Util
+				.loadProperty(this, fileName);
 
 		if (loadedProperties != null) {
 			properties = loadedProperties;
+		} else {
+			Util.Error("Could not load file: " + fileName);
 		}
 	}
 
+	// public String[] getPropertyFiles() {
+	//		
+	// }
+
 	public void savePropertiesToFile(String fileName) {
-		saveStatic(properties, "defaultProperties");
+		Util.saveProperty(this, properties, fileName);
+
+		// saveStatic(properties, fileName);
+	}
+
+	public void deletePropretiesFile(String fileName) {
+		Util.deleteProperty(this, fileName);
 	}
 
 	public void setProperty(String name, Object value) {
 		properties.addAttribute(name, value);
+	}
+
+	public void setProperty(PropertySchema propertySchema, Object value) {
+		setProperty(propertySchema.getName(), value);
 	}
 
 	protected abstract Object createModel();
@@ -175,15 +222,49 @@ public abstract class PModelConfigurable extends PModel implements
 	// }
 
 	protected void initModel() {
+		TrackedTask task = new TrackedTask("Creating " + getName() + " ("
+				+ getTypeName() + ")");
+
 		setModel(createModel());
+		task.finished();
+	}
 
-		updateSymbol();
+	// @Override
+	// public PopupMenuBuilder constructMenu() {
+	//
+	// PopupMenuBuilder menu = super.constructMenu();
+	//
+	// menu.addSection("Configuration");
+	// menu.addAction(new SaveAction());
+	//
+	// return menu;
+	// }
 
+	class SaveAction extends AbstractAction {
+
+		public SaveAction() {
+			super("Save");
+			// TODO Auto-generated constructor stub
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		public void actionPerformed(ActionEvent arg0) {
+			String name = JOptionPane.showInputDialog("Name:");
+
+			savePropertiesToFile(name);
+		}
+
+	}
+
+	public String[] getPropertyFiles() {
+		// TODO Auto-generated method stub
+		return Util.getPropertyFiles(this);
 	}
 
 }
 
-class NodeTooltip extends WorldObject {
+class NodeTooltip extends WorldObjectImpl {
 	private static final long serialVersionUID = 1L;
 
 	PModelConfigurable proxyNode;

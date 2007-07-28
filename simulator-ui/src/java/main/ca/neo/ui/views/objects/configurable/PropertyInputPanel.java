@@ -1,4 +1,4 @@
-package ca.neo.ui.views.objects.properties;
+package ca.neo.ui.views.objects.configurable;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -19,22 +19,25 @@ public abstract class PropertyInputPanel extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setAlignmentY(TOP_ALIGNMENT);
 
-		setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));		
-		
+		setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+
 		add(property.getLabel());
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setAlignmentX(LEFT_ALIGNMENT);
-		
-		
-		add(panel);
-		init(panel);
+		JPanel innerPanel = new JPanel();
+		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
+		innerPanel.setAlignmentX(LEFT_ALIGNMENT);
+
+		add(innerPanel);
+		init(innerPanel);
 
 		statusMessage = new JLabel("");
 		statusMessage.setForeground(Style.WARNING_COLOR);
-		
+
 		add(statusMessage);
+	}
+
+	public String getName() {
+		return type.getName();
 	}
 
 	protected void setStatusMsg(String msg) {

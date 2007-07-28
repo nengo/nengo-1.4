@@ -4,7 +4,8 @@ import java.awt.event.InputEvent;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.widgets.AffinityHalo;
-import ca.shu.ui.lib.world.impl.WorldObject;
+import ca.shu.ui.lib.objects.widgets.BoundsHandle;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -13,9 +14,8 @@ import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
-import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
-public class Window extends WorldObject {
+public class Window extends WorldObjectImpl {
 	private static final int DEFAULT_HEIGHT = 300;
 
 	private static final int DEFAULT_WIDTH = 400;
@@ -29,15 +29,15 @@ public class Window extends WorldObject {
 
 	private PPath menubar;
 
-	WorldObject contentNode;
+	WorldObjectImpl contentNode;
 
 	final int MENU_BAR_HEIGHT = 33;
 
 	GText title;
 
-	WorldObject attachTo;
+	WorldObjectImpl attachTo;
 
-	public Window(WorldObject attachTo, WorldObject innerNode) {
+	public Window(WorldObjectImpl attachTo, WorldObjectImpl innerNode) {
 		super();
 		this.attachTo = attachTo;
 
@@ -60,11 +60,11 @@ public class Window extends WorldObject {
 
 		// addChild(border);
 		addChild(menubar);
-		addChildWorldObject(innerNode);
+		addChildW(innerNode);
 		// PBoundsHandle.addBoundsHandlesTo(innerNode);
 
 		menubar.addInputEventListener(new FrameDragHandler(this));
-		PBoundsHandle.addBoundsHandlesTo(this);
+		BoundsHandle.addBoundsHandlesTo(this);
 
 		addInputEventListener(new PInputEventListener() {
 			public void processEvent(PInputEvent aEvent, int type) {
@@ -84,7 +84,7 @@ public class Window extends WorldObject {
 		removeFromParent();
 		windowState = WindowState.MINIMIZED;
 		affinityHalo.removeFromParent();
-//		affinityHalo.setVisible(false);
+		// affinityHalo.setVisible(false);
 	}
 
 	AffinityHalo affinityHalo = null;
@@ -92,9 +92,12 @@ public class Window extends WorldObject {
 	public void restore() {
 		attachTo.addChild(this);
 		windowState = WindowState.RESTORED;
+
+		if (affinityHalo != null) {
+			affinityHalo.removeFromParent();
+		}
 		affinityHalo = new AffinityHalo(attachTo, this);
-		
-		attachTo.addChild(1,affinityHalo);
+
 	}
 
 	@Override

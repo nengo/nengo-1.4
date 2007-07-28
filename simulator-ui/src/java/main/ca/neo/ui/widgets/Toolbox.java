@@ -10,12 +10,12 @@ import ca.neo.ui.models.PModel;
 import ca.shu.ui.lib.objects.GButton;
 import ca.shu.ui.lib.objects.Tooltip;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.impl.WorldObject;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public class Toolbox extends WorldObject {
+public class Toolbox extends WorldObjectImpl {
 
 	/**
 	 * 
@@ -28,7 +28,7 @@ public class Toolbox extends WorldObject {
 		super("Toolbox");
 
 		System.out.println("loading SymbolHolder");
-		symbolHolder = (SymbolHolder) loadStatic("defaultSymbols");
+		symbolHolder = (SymbolHolder) Util.loadProperty(this, "defaultSymbols");
 		System.out.println("finished loading SymbolHolder");
 
 		if (symbolHolder == null) {
@@ -52,7 +52,7 @@ public class Toolbox extends WorldObject {
 
 		pack();
 
-		saveStatic(symbolHolder, "defaultSymbols");
+		Util.saveProperty(this, symbolHolder, "defaultSymbols");
 	}
 
 	public void initSymbolHolder() {
@@ -66,12 +66,11 @@ public class Toolbox extends WorldObject {
 	}
 
 	@Override
-	public WorldObject getTooltipObject() {
+	public WorldObjectImpl getTooltipObject() {
 		// TODO Auto-generated method stub
 		return new ToolBoxControls(this);
 
 	}
-
 
 	@Override
 	protected void layoutChildren() {
@@ -83,7 +82,7 @@ public class Toolbox extends WorldObject {
 	}
 }
 
-class SymbolHolder extends WorldObject {
+class SymbolHolder extends WorldObjectImpl {
 	private static final long serialVersionUID = -776911995031604664L;
 
 	// Vector<Symbol> symbols = new Vector<Symbol>();
@@ -134,17 +133,17 @@ class SymbolHolder extends WorldObject {
 }
 
 class SymbolCloner implements PropertyChangeListener {
-	WorldObject symbol;
+	WorldObjectImpl symbol;
 
-	public SymbolCloner(WorldObject symbol) {
+	public SymbolCloner(WorldObjectImpl symbol) {
 		super();
 		this.symbol = symbol;
 	}
 
 	public void propertyChange(PropertyChangeEvent arg0) {
-		WorldObject clonedSymbol = (WorldObject) (symbol.clone());
-		clonedSymbol.getParent().addChild(0,clonedSymbol);
-		
+		WorldObjectImpl clonedSymbol = (WorldObjectImpl) (symbol.clone());
+		clonedSymbol.getParent().addChild(0, clonedSymbol);
+
 	}
 }
 

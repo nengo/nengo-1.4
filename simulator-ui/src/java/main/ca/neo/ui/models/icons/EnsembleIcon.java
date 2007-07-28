@@ -1,11 +1,11 @@
 package ca.neo.ui.models.icons;
 
+import ca.neo.ui.models.PModel;
 import edu.umd.cs.piccolo.nodes.PImage;
-import edu.umd.cs.piccolo.nodes.PPath;
 
-public class EnsembleIcon extends Icon {
-	public EnsembleIcon() {
-		super(new PImage("images/EnsembleIcon.gif"), "Ensemble", 0.7f);
+public class EnsembleIcon extends IconWrapper {
+	public EnsembleIcon(PModel parent) {
+		super(parent, new PImage("images/EnsembleIcon.gif"), 0.7f);
 		// TODO Auto-generated constructor stub
 	}
 

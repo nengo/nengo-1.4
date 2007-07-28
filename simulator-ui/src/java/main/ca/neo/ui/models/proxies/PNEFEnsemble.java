@@ -3,9 +3,6 @@ package ca.neo.ui.models.proxies;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
@@ -16,31 +13,35 @@ import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PModelNode;
 import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.style.Style;
-import ca.neo.ui.views.objects.properties.PTInt;
-import ca.neo.ui.views.objects.properties.PTString;
-import ca.neo.ui.views.objects.properties.PropertySchema;
+import ca.neo.ui.views.objects.configurable.PTInt;
+import ca.neo.ui.views.objects.configurable.PTString;
+import ca.neo.ui.views.objects.configurable.PropertySchema;
+import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
 import ca.shu.ui.lib.objects.GText;
-import ca.shu.ui.lib.objects.widgets.TrackedTask;
+import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
-import ca.shu.ui.lib.world.impl.Frame;
-import ca.shu.ui.lib.world.impl.WorldObject;
 
-public class PNEFENsemble extends PModelNode {
+/**
+ * A UI object for NEFEnsemble
+ * 
+ * @author Shu Wu
+ * 
+ */
+public class PNEFEnsemble extends PModelNode {
 	private static final long serialVersionUID = 1L;
 
-	static String pDim = "Dimensions";
+	static final PropertySchema pDim = new PTInt("Dimensions");
 
-	static String pName = "Name";
+	static final PropertySchema pName = new PTString("Name");
 
-	static String pNumOfNeurons = "Number of Neurons";
+	static final PropertySchema pNumOfNeurons = new PTInt("Number of Neurons");
 
-	static String pStorageName = "Storage Name";
+	static final PropertySchema pStorageName = new PTString("Storage Name");
 
-	static PropertySchema[] zMetaProperties = { new PTString(pName),
-			new PTInt(pNumOfNeurons), new PTInt(pDim),
-			new PTString(pStorageName)
+	static final String typeName = "NEFEnsemble";
 
-	};
+	static final PropertySchema[] zProperties = { pName, pNumOfNeurons, pDim,
+			pStorageName };
 
 	boolean isCollectingSpikes = false;
 
@@ -48,9 +49,28 @@ public class PNEFENsemble extends PModelNode {
 
 	String storageName = "Unamed Ensemble";
 
-	public PNEFENsemble() {
-		super();
-		// TODO Auto-generated constructor stub
+	public PNEFEnsemble(String name, int numOfNeurons, int dimensions,
+			String storageName) {
+		setProperty(pName, name);
+		setProperty(pNumOfNeurons, numOfNeurons);
+		setProperty(pDim, dimensions);
+		setProperty(pStorageName, storageName);
+		setModel(createModel());
+		init();
+	}
+
+	public PNEFEnsemble(boolean useDefaultConfigManager) {
+		super(useDefaultConfigManager);
+		init();
+	}
+
+	public PNEFEnsemble(IConfigurationManager configManager) {
+		super(configManager);
+		init();
+	}
+
+	private void init() {
+		setIcon(new EnsembleIcon(this));
 	}
 
 	/*
@@ -60,18 +80,23 @@ public class PNEFENsemble extends PModelNode {
 		PDecodedTermination term;
 
 		term = new PDecodedTermination(this);
+		term.setScale(0.5);
 		if (term.isModelCreated())
-			addChild(term);
+			addWidget(term);
+
 		// term.initModel();
 
 	}
 
 	@Override
-	public PopupMenuBuilder constructPopup() {
+	public PopupMenuBuilder constructMenu() {
 		// TODO Auto-generated method stub
-		PopupMenuBuilder menu = super.constructPopup();
+		PopupMenuBuilder menu = super.constructMenu();
+		menu.addSection("NEFEnsemble");
 
-		menu.addAction(new AbstractAction("Plot") {
+		MenuBuilder plotMenu = menu.createSubMenu("Plot");
+
+		plotMenu.addAction(new AbstractAction("Ensemble") {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
@@ -79,7 +104,7 @@ public class PNEFENsemble extends PModelNode {
 			}
 		});
 
-		menu.addAction(new AbstractAction("Plot X") {
+		plotMenu.addAction(new AbstractAction("Origin X") {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
@@ -109,7 +134,6 @@ public class PNEFENsemble extends PModelNode {
 		});
 
 		// Termination
-		menu.addSection("Connections");
 
 		menu.addAction(new AbstractAction("Add decoded termination") {
 			private static final long serialVersionUID = 1L;
@@ -118,7 +142,6 @@ public class PNEFENsemble extends PModelNode {
 				addDecodedTermintation();
 			}
 		});
-
 
 		return menu;
 	}
@@ -131,14 +154,15 @@ public class PNEFENsemble extends PModelNode {
 	}
 
 	@Override
-	protected WorldObject createIcon() {
-		return new EnsembleIcon();
+	public PropertySchema[] getPropertiesSchema() {
+		// TODO Auto-generated method stub
+		return zProperties;
 	}
 
 	@Override
-	public PropertySchema[] getPropertiesSchema() {
+	public String getTypeName() {
 		// TODO Auto-generated method stub
-		return zMetaProperties;
+		return typeName;
 	}
 
 	@Override
@@ -152,18 +176,15 @@ public class PNEFENsemble extends PModelNode {
 			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 
 			String name = (String) getProperty(pName);
+
 			Integer numOfNeurons = (Integer) getProperty(pNumOfNeurons);
 			Integer dimensions = (Integer) getProperty(pDim);
 			String storageName = (String) getProperty(pStorageName);
 
 			setName(name);
 
-			TrackedTask task = new TrackedTask("Creating ensemble: " + name);
-
 			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions,
 					storageName, false);
-
-			task.finished();
 
 			loadingText.removeFromParent();
 			return ensemble;

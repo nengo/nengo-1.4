@@ -1,31 +1,28 @@
 package ca.neo.ui.models.views;
 
 import java.awt.event.ActionEvent;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.AbstractAction;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JPopupMenu;
 
 import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PModelNode;
-import ca.neo.ui.models.icons.Icon;
+import ca.neo.ui.models.icons.IconWrapper;
 import ca.neo.ui.models.proxies.PFunctionInput;
-import ca.neo.ui.models.proxies.PNEFENsemble;
+import ca.neo.ui.models.proxies.PNEFEnsemble;
 import ca.neo.ui.models.proxies.PNetwork;
-import ca.neo.ui.style.Style;
-import ca.neo.ui.views.objects.properties.INamedObject;
 import ca.shu.ui.lib.handlers.IContextMenu;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.INamedObject;
 import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.impl.Frame;
 import ca.shu.ui.lib.world.impl.World;
 import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -33,7 +30,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 public class NetworkView extends World implements INamedObject, IContextMenu {
 	private static final long serialVersionUID = -3018937112672942653L;
 
-	Icon icon;
+	IconWrapper icon;
 
 	Network network;
 
@@ -73,7 +70,7 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 
 	public String getName() {
 		// TODO Auto-generated method stub
-		return pNetwork.getName();
+		return "Network Viewer: " + pNetwork.getName();
 	}
 
 	@Override
@@ -97,14 +94,14 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 		}
 		menu.addSection("Create new model");
 
-		MenuBuilder nodesMenu = menu.addSubMenu("Nodes");
-		MenuBuilder functionsMenu = menu.addSubMenu("Functions");
+		MenuBuilder nodesMenu = menu.createSubMenu("Nodes");
+		MenuBuilder functionsMenu = menu.createSubMenu("Functions");
 
 		/*
 		 * Nodes
 		 */
 		nodesMenu.addAction(new AddModelAction(PNetwork.class));
-		nodesMenu.addAction(new AddModelAction(PNEFENsemble.class));
+		nodesMenu.addAction(new AddModelAction(PNEFEnsemble.class));
 
 		/*
 		 * Functions
@@ -132,7 +129,16 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 				public void run() {
 					PModelNode nodeProxy;
 					try {
-						nodeProxy = (PModelNode) nc.newInstance();
+
+						Class partypes[] = new Class[1];
+						partypes[0] = Boolean.TYPE;
+
+						Constructor ct = nc.getConstructor(partypes);
+						Object arglist[] = new Object[1];
+						arglist[0] = new Boolean(true);
+
+						nodeProxy = (PModelNode) ct.newInstance(arglist);
+
 						if (nodeProxy.isModelCreated())
 							addNode(nodeProxy);
 					} catch (InstantiationException e) {
@@ -141,7 +147,20 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 					} catch (IllegalAccessException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+					} catch (SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoSuchMethodException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
+
 				}
 			}).start();
 
@@ -173,15 +192,14 @@ class ModelStatusBarHandler extends StatusBarHandler {
 	public String getStatusStr(PInputEvent event) {
 		PModel wo = (PModel) Util.getNodeFromPickPath(event, PModel.class);
 
-		StringBuilder statuStr = new StringBuilder("Network View (Container) "
-				+ getWorld().getName() + " | ");
+		StringBuilder statuStr = new StringBuilder(getWorld().getName() + " | ");
 
 		if (wo != null) {
-			statuStr.append("(Model) " + wo.getName());
+			statuStr.append("Model name: " + wo.getName() + " ("
+					+ wo.getTypeName() + ")");
 		} else {
 			statuStr.append("No Model Selected");
 		}
 		return statuStr.toString();
 	}
-
 }

@@ -2,6 +2,7 @@ package ca.shu.ui.lib.world.impl;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
@@ -28,7 +29,7 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
 /*
  * TODO: Clean up class, move non-core functionality to child objects
  */
-public class WorldObject extends PNode implements IWorldObject {
+public class WorldObjectImpl extends PNode implements IWorldObject {
 	private static final long serialVersionUID = 1L;
 
 	private PPath frame = null;
@@ -41,7 +42,7 @@ public class WorldObject extends PNode implements IWorldObject {
 
 	boolean autoPositionCloseButton = true;
 
-	PPath border = null;
+	PPath tempFrame = null;
 
 	GContextButton closeButton = null;
 
@@ -61,14 +62,16 @@ public class WorldObject extends PNode implements IWorldObject {
 
 	boolean tangible = true;
 
-	PText titleBar;
+	GText titleBar;
 
-	public WorldObject() {
+	public static final String PROPERTY_NAME = "objectName";
+
+	public WorldObjectImpl() {
 		this("");
 
 	}
 
-	public WorldObject(String name) {
+	public WorldObjectImpl(String name) {
 		super();
 
 		this.name = name;
@@ -107,7 +110,7 @@ public class WorldObject extends PNode implements IWorldObject {
 		addActivity(new Fader(node, duration, true));
 	}
 
-	public void addChildWorldObject(IWorldObject child) {
+	public void addChildW(IWorldObject child) {
 		addChild((PNode) child);
 	}
 
@@ -220,7 +223,10 @@ public class WorldObject extends PNode implements IWorldObject {
 	}
 
 	public String getName() {
-		return name;
+		if (name == null) {
+			return "";
+		} else
+			return name;
 	}
 
 	public State getState() {
@@ -244,7 +250,7 @@ public class WorldObject extends PNode implements IWorldObject {
 	 * 
 	 * @see ca.sw.graphics.nodes.WorldO#getControls()
 	 */
-	public WorldObject getTooltipObject() {
+	public WorldObjectImpl getTooltipObject() {
 		return null;
 	}
 
@@ -285,7 +291,7 @@ public class WorldObject extends PNode implements IWorldObject {
 		return isAlive;
 	}
 
-	public boolean isAncestorOf(WorldObject node) {
+	public boolean isAncestorOf(WorldObjectImpl node) {
 		return isAncestorOf((PNode) node);
 	}
 
@@ -337,9 +343,9 @@ public class WorldObject extends PNode implements IWorldObject {
 
 	}
 
-	public Object loadStatic(String name) {
-		return Util.loadObject(getClass().getName() + "_" + name);
-	}
+	// public Object loadStatic(String name) {
+	// return Util.loadProperty(getFileNamePrefix() + name);
+	// }
 
 	/*
 	 * TODO: Perhaps this is not needed
@@ -424,9 +430,9 @@ public class WorldObject extends PNode implements IWorldObject {
 
 	}
 
-	public void saveStatic(Object obj, String name) {
-		Util.saveObject(obj, getClass().getName() + "_" + name);
-	}
+	// public void saveStatic(Object obj, String name) {
+	// Util.saveProperty(obj, getFileNamePrefix() + name);
+	// }
 
 	/*
 	 * 
@@ -439,24 +445,24 @@ public class WorldObject extends PNode implements IWorldObject {
 
 	public void setBorder(Color borderColor) {
 		if (borderColor == null) {
-			if (border != null)
-				border.removeFromParent();
-			border = null;
+			if (tempFrame != null)
+				tempFrame.removeFromParent();
+			tempFrame = null;
 			return;
 		}
 
-		if (border == null) {
+		if (tempFrame == null) {
 
-			border = PPath.createRectangle((float) getX(), (float) getY(),
+			tempFrame = PPath.createRectangle((float) getX(), (float) getY(),
 					(float) getWidth(), (float) getHeight());
-			synchronized (border) {
-				border.setPaint(null);
+			synchronized (tempFrame) {
+				tempFrame.setPaint(null);
 
-				addChild(border);
+				addChild(tempFrame);
 			}
 		}
 
-		border.setStrokePaint(borderColor);
+		tempFrame.setStrokePaint(borderColor);
 
 	}
 
@@ -480,11 +486,7 @@ public class WorldObject extends PNode implements IWorldObject {
 				.getWidth(), bounds.getHeight(), padding);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#setDraggable(boolean)
-	 */
+	
 	public void setDraggable(boolean isDraggable) {
 		this.draggable = isDraggable;
 	}
@@ -646,11 +648,13 @@ public class WorldObject extends PNode implements IWorldObject {
 		animation = null;
 	}
 
-	private void setState(State state) {
-		this.state = state;
+	private void setState(State newState) {
+		State oldState = state;
+		state = newState;
+
+		firePropertyChange(0, PROPERTY_STATE, oldState, newState);
 
 		stateChanged();
-
 	}
 
 	protected void boundsChanged() {
@@ -675,16 +679,14 @@ public class WorldObject extends PNode implements IWorldObject {
 
 	@Override
 	protected void layoutChildren() {
-		// TODO Auto-generated method stub
 		super.layoutChildren();
 
-		Rectangle2D bounds = getBounds();
 		if (frame != null) {
-			frame.setBounds(bounds);
+			frame.setBounds(getBounds());
 		}
 
-		if (border != null) {
-			border.setBounds(bounds);
+		if (tempFrame != null) {
+			tempFrame.setBounds(getBounds());
 		}
 	}
 
@@ -692,7 +694,7 @@ public class WorldObject extends PNode implements IWorldObject {
 	 * Moves nodes which overlap
 	 * 
 	 */
-	protected void moveOverlappedNodes(WorldObject callingNode) {
+	protected void moveOverlappedNodes(WorldObjectImpl callingNode) {
 		if (!isTangible())
 			return;
 
@@ -717,9 +719,9 @@ public class WorldObject extends PNode implements IWorldObject {
 		while (it.hasNext()) {
 			PNode node = it.next();
 
-			if (node instanceof WorldObject && node != this
+			if (node instanceof WorldObjectImpl && node != this
 					&& node != callingNode) {
-				WorldObject gNode = (WorldObject) node;
+				WorldObjectImpl gNode = (WorldObjectImpl) node;
 
 				if (gNode.isDraggable() && gNode.isTangible()) {
 					Rectangle2D bounds = gNode.localToGlobal(gNode.getBounds());
@@ -753,13 +755,22 @@ public class WorldObject extends PNode implements IWorldObject {
 	}
 
 	protected void stateChanged() {
+
 		if (state == State.DEFAULT) {
 			setBorder(null);
-		} else if (state == State.HIGHLIGHT) {
+		} else if (state == State.IN_DRAG) {
 			setBorder(Style.COLOR_BORDER_DRAGGED);
 		} else if (state == State.SELECTED) {
 			setBorder(Style.SELECTED_BORDER_COLOR);
 		}
+	}
+
+	public void setName(String name) {
+		String oldName = this.name;
+		this.name = name;
+
+		firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
+
 	}
 
 	// /*

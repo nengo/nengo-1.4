@@ -1,40 +1,39 @@
-package ca.neo.ui.views.objects.properties;
+package ca.neo.ui.views.objects.configurable;
 
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class PTBoolean extends PropertySchema {
+public class PTString extends PropertySchema {
 
-	public PTBoolean(String name) {
+	public PTString(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public String getTypeName() {
 		// TODO Auto-generated method stub
-		return new BooleanInputPanel(this);
+		return "Text";
 	}
 
 	@Override
 	public Class getTypeClass() {
 		// TODO Auto-generated method stub
-		return boolean.class;
+		return String.class;
 	}
 
 	@Override
-	public String getTypeName() {
+	public PropertyInputPanel createInputPanel() {
 		// TODO Auto-generated method stub
-		return "Boolean";
+		return new StringInputPanel(this);
 	}
 
 }
 
-class BooleanInputPanel extends PropertyInputPanel {
-	JCheckBox checkBox;
+class StringInputPanel extends PropertyInputPanel {
+	JTextField tf;
 
-	public BooleanInputPanel(PropertySchema property) {
+	public StringInputPanel(PropertySchema property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}
@@ -47,27 +46,34 @@ class BooleanInputPanel extends PropertyInputPanel {
 	@Override
 	public void init(JPanel panel) {
 		// TODO Auto-generated method stub
-		checkBox = new JCheckBox();
-		checkBox.setSelected(false);
-		panel.add(checkBox);
+		tf = new JTextField(10);
+
+		panel.add(tf);
 
 	}
 
 	@Override
 	public Object getValue() {
-		Boolean bool = checkBox.isSelected();
-		return bool.booleanValue();
+		return tf.getText();
+
 	}
 
 	@Override
 	public void setValue(Object value) {
-		checkBox.setText(value.toString());
+		tf.setText((String) value);
 
 	}
 
 	@Override
 	public boolean isValueSet() {
-		return true;
+
+		String text = (String) getValue();
+
+		if (text != null && text.compareTo("") != 0)
+			return true;
+		else
+			return false;
+
 	}
 
 }

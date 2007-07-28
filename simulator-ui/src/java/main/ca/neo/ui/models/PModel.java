@@ -3,28 +3,15 @@ package ca.neo.ui.models;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
-import javax.swing.text.SimpleAttributeSet;
 
-import ca.neo.ui.NeoWorld;
-import ca.neo.ui.style.Style;
-import ca.neo.ui.views.objects.properties.IConfigurable;
-import ca.neo.ui.views.objects.properties.PropertiesDialog;
-import ca.neo.ui.views.objects.properties.PropertySchema;
 import ca.shu.ui.lib.handlers.IContextMenu;
-import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.impl.Frame;
-import ca.shu.ui.lib.world.impl.WorldObject;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.nodes.PText;
 
-public abstract class PModel extends WorldObject implements IContextMenu {
+public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 	/**
 	 * 
 	 */
@@ -32,39 +19,37 @@ public abstract class PModel extends WorldObject implements IContextMenu {
 
 	protected Object model;
 
-	WorldObject icon;
+	WorldObjectImpl icon;
+	
+	
 
 	// boolean modelCreationCancelled = false;
 
-	String name;
-
-	/*
+	/**
 	 * Default constructor, model is constructed internally
 	 */
 	public PModel() {
 		super();
-		WorldObject icon = createIcon();
-
-		setIcon(icon);
-		setName(icon.getName());
-
+		// setName(name);
 	}
 
-	/*
-	 * @param model Model is constructed externally
+	public abstract String getTypeName();
+
+	/**
+	 * @param model
+	 *            Model is constructed externally
 	 */
 	public PModel(Object model) {
-		this.model = model;
+
+		setModel(model);
 
 	}
 
-	public PopupMenuBuilder constructPopup() {
+	public PopupMenuBuilder constructMenu() {
 
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
 
-		JMenuItem item;
-
-		menu.addSection("Object Actions");
+		menu.addSection("Object");
 
 		menu.addAction(new AbstractAction("Remove from world") {
 			private static final long serialVersionUID = 1L;
@@ -77,7 +62,7 @@ public abstract class PModel extends WorldObject implements IContextMenu {
 		return menu;
 	}
 
-	public WorldObject getIcon() {
+	public WorldObjectImpl getIcon() {
 		return icon;
 	}
 
@@ -85,9 +70,6 @@ public abstract class PModel extends WorldObject implements IContextMenu {
 		return model;
 	}
 
-	public String getName() {
-		return name;
-	}
 
 	public boolean isModelCreated() {
 		return (model != null);
@@ -98,24 +80,19 @@ public abstract class PModel extends WorldObject implements IContextMenu {
 
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public JPopupMenu showPopupMenu(PInputEvent event) {
 		if (model == null) {
 			Util.Warning("Model is not configured yet");
 			return null;
 		} else {
-			JPopupMenu menu = constructPopup().getJPopupMenu();
+			JPopupMenu menu = constructMenu().getJPopupMenu();
 
 			return menu;
 		}
 	}
 
-	protected abstract WorldObject createIcon();
-
-	protected void setIcon(WorldObject icon) {
+	protected void setIcon(WorldObjectImpl icon) {
 		if (this.icon != null) {
 
 			this.icon.removeFromParent();
@@ -128,13 +105,6 @@ public abstract class PModel extends WorldObject implements IContextMenu {
 		// icon.setPickable(false);
 
 		setBounds(getFullBounds());
-
-	}
-
-	/*
-	 * Updates the drawing of the proxyObject
-	 */
-	protected void updateSymbol() {
 
 	}
 

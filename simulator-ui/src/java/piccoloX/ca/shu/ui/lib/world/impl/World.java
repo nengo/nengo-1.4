@@ -11,6 +11,7 @@ import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.activities.Fader;
 import ca.shu.ui.lib.handlers.ContextMenuHandler;
 import ca.shu.ui.lib.handlers.DragHandler;
+import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
@@ -29,7 +30,7 @@ import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 
-public class World extends WorldObject implements IWorld,
+public class World extends WorldObjectImpl implements IWorld,
 		PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
 
@@ -45,9 +46,9 @@ public class World extends WorldObject implements IWorld,
 		World.contexualTipsVisible = contexualTipsVisible;
 	}
 
-	WorldObject controls;
+	WorldObjectImpl controls;
 
-	WorldObject controlsHolder;
+	WorldObjectImpl controlsHolder;
 
 	PNode gridLayer = null;
 
@@ -67,9 +68,7 @@ public class World extends WorldObject implements IWorld,
 		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
 		addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
 
-		controlsHolder = new WorldObject();
-
-		PZoomEventHandler zoomHandler = new PZoomEventHandler();
+		controlsHolder = new WorldObjectImpl();
 
 		layer = new PLayer();
 		root.addChild(layer);
@@ -78,8 +77,14 @@ public class World extends WorldObject implements IWorld,
 		ground.setDraggable(false);
 		layer.addChild(ground);
 
+		PZoomEventHandler zoomHandler = new PZoomEventHandler();
+		zoomHandler.setMinDragStartDistance(20);
+		zoomHandler.setMinScale(0.02);
+		zoomHandler.setMaxScale(4);
+
 		skyCamera = new WorldSky(this);
 		skyCamera.addInputEventListener(zoomHandler);
+		skyCamera.addInputEventListener(new MouseHandler(this));
 		skyCamera.addInputEventListener(new PPanEventHandler());
 		skyCamera.addInputEventListener(new TooltipHandler(this));
 		skyCamera.addInputEventListener(new DragHandler());
@@ -102,10 +107,6 @@ public class World extends WorldObject implements IWorld,
 				aEvent.setHandled(true);
 			}
 		});
-
-		zoomHandler.setMinDragStartDistance(20);
-		zoomHandler.setMinScale(0.02);
-		zoomHandler.setMaxScale(2);
 
 		gridLayer = GridFactory.createGrid(getSky(), root,
 				Style.DARK_BORDER_COLOR, 1500);
@@ -144,7 +145,7 @@ public class World extends WorldObject implements IWorld,
 
 	}
 
-	public Point2D getPositionInSky(WorldObject wo) {
+	public Point2D getPositionInSky(WorldObjectImpl wo) {
 		IWorldLayer layer = wo.getWorldLayer();
 		Point2D position;
 
@@ -222,7 +223,8 @@ public class World extends WorldObject implements IWorld,
 
 	}
 
-	public void showTooltip(WorldObject pControls, WorldObject nodeAttacedTo) {
+	public void showTooltip(WorldObjectImpl pControls,
+			WorldObjectImpl nodeAttacedTo) {
 
 		hideControls();
 		if (nodeAttacedTo == null) {
@@ -245,7 +247,7 @@ public class World extends WorldObject implements IWorld,
 		double x = position.getX();
 		double y = position.getY();
 
-		this.controls = new WorldObject();
+		this.controls = new WorldObjectImpl();
 
 		pControls.setDraggable(false);
 		controls.addToLayout(pControls);
@@ -297,7 +299,7 @@ public class World extends WorldObject implements IWorld,
 	}
 
 	public void zoomToNode(IWorldObject node) {
-		Rectangle2D bounds = node.localToGlobal(node.getBounds());
+		Rectangle2D bounds = node.localToGlobal(node.getFullBounds());
 		zoomToBounds(bounds);
 	}
 
@@ -325,9 +327,9 @@ class CameraPropertyChangeListener implements PropertyChangeListener {
 }
 
 class RemoveControlsThread extends Thread {
-	WorldObject ctrlToRemove;
+	WorldObjectImpl ctrlToRemove;
 
-	public RemoveControlsThread(WorldObject controls) {
+	public RemoveControlsThread(WorldObjectImpl controls) {
 		super();
 		this.ctrlToRemove = controls;
 	}

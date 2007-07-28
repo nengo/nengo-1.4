@@ -1,4 +1,4 @@
-package ca.neo.ui.views.objects.properties;
+package ca.neo.ui.views.objects.configurable;
 
 import javax.swing.text.SimpleAttributeSet;
 
@@ -16,8 +16,14 @@ public interface IConfigurable extends INamedObject {
 	public void cancelConfiguration();
 
 	public void savePropertiesToFile(String fileName);
+	
+	public void deletePropretiesFile(String fileName);
+
+	public String[] getPropertyFiles();
 
 	public void loadPropertiesFromFile(String fileName);
+
+	public abstract String getTypeName();
 
 	// public String getTypeName();
 }

@@ -1,20 +1,20 @@
 package ca.shu.ui.lib.objects;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.world.impl.WorldObject;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PPath;
 
-public class GContextButton extends WorldObject {
+public class GContextButton extends WorldObjectImpl {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	WorldObject node;
+	WorldObjectImpl node;
 
 	PPath circle;
 
-	public GContextButton(WorldObject node) {
+	public GContextButton(WorldObjectImpl node) {
 		super();
 		this.node = node;
 		this.setDraggable(false);

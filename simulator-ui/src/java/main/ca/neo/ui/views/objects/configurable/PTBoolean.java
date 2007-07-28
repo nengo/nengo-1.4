@@ -1,11 +1,11 @@
-package ca.neo.ui.views.objects.properties;
+package ca.neo.ui.views.objects.configurable;
 
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
-public class PTFloat extends PropertySchema {
+public class PTBoolean extends PropertySchema {
 
-	public PTFloat(String name) {
+	public PTBoolean(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
@@ -13,27 +13,27 @@ public class PTFloat extends PropertySchema {
 	@Override
 	public PropertyInputPanel createInputPanel() {
 		// TODO Auto-generated method stub
-		return new FloatInputPanel(this);
+		return new BooleanInputPanel(this);
 	}
 
 	@Override
 	public Class getTypeClass() {
 		// TODO Auto-generated method stub
-		return float.class;
+		return boolean.class;
 	}
 
 	@Override
 	public String getTypeName() {
 		// TODO Auto-generated method stub
-		return "Float";
+		return "Boolean";
 	}
 
 }
 
-class FloatInputPanel extends PropertyInputPanel {
-	JTextField tf;
+class BooleanInputPanel extends PropertyInputPanel {
+	JCheckBox checkBox;
 
-	public FloatInputPanel(PropertySchema property) {
+	public BooleanInputPanel(PropertySchema property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}
@@ -46,40 +46,26 @@ class FloatInputPanel extends PropertyInputPanel {
 	@Override
 	public void init(JPanel panel) {
 		// TODO Auto-generated method stub
-		tf = new JTextField(10);
-
-		panel.add(tf);
+		checkBox = new JCheckBox();
+		checkBox.setSelected(false);
+		panel.add(checkBox);
 
 	}
 
 	@Override
 	public Object getValue() {
-
-		Float floatValue = new Float(tf.getText());
-		return floatValue.floatValue();
-
+		Boolean bool = checkBox.isSelected();
+		return bool.booleanValue();
 	}
 
 	@Override
 	public void setValue(Object value) {
-		tf.setText(value.toString());
+		checkBox.setText(value.toString());
 
 	}
 
 	@Override
 	public boolean isValueSet() {
-		String textValue = tf.getText();
-
-		if (textValue == null || textValue.compareTo("") == 0)
-			return false;
-
-		try {
-			getValue();
-
-		} catch (NumberFormatException e) {
-			return false;
-		}
-
 		return true;
 	}
 

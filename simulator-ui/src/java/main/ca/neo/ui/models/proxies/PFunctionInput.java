@@ -7,26 +7,23 @@ import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.ui.models.PModelNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
-import ca.neo.ui.views.objects.properties.PTFunction;
-import ca.neo.ui.views.objects.properties.PTString;
-import ca.neo.ui.views.objects.properties.PropertySchema;
+import ca.neo.ui.views.objects.configurable.PTFunction;
+import ca.neo.ui.views.objects.configurable.PTString;
+import ca.neo.ui.views.objects.configurable.PropertySchema;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.impl.WorldObject;
 
 public class PFunctionInput extends PModelNode {
-	public PFunctionInput() {
-		super();
-		// TODO Auto-generated constructor stub
+
+	public PFunctionInput(boolean useDefaultConfigManager) {
+		super(useDefaultConfigManager);
+		setIcon(new FunctionInputIcon(this));
 	}
 
-	String name = "Unamed Ensemble";
+	static PropertySchema pName = new PTString("Name");
 
-	static String pName = "Name";
+	static PropertySchema pFunction = new PTFunction("Function Type");
 
-	static String pFunction = "Function Type";
-
-	static PropertySchema[] metaProperties = { new PTString(pName),
-			new PTFunction(pFunction) };
+	static PropertySchema[] metaProperties = { pName, pFunction };
 
 	/**
 	 * 
@@ -62,10 +59,12 @@ public class PFunctionInput extends PModelNode {
 		return metaProperties;
 	}
 
-	@Override
-	protected WorldObject createIcon() {
+	static final String typeName = "Function Input";
 
-		return new FunctionInputIcon();
+	@Override
+	public String getTypeName() {
+		// TODO Auto-generated method stub
+		return typeName;
 	}
 
 }

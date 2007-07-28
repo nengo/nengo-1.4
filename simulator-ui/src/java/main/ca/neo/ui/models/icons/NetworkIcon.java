@@ -1,12 +1,13 @@
 package ca.neo.ui.models.icons;
 
+import ca.neo.ui.models.PModel;
 import edu.umd.cs.piccolo.nodes.PImage;
 
-public class NetworkIcon extends Icon {
+public class NetworkIcon extends IconWrapper {
 	private static final long serialVersionUID = 1L;
 
-	public NetworkIcon() {
-		super(new PImage("images/NetworkIcon.gif"), "Network", 0.7f);
+	public NetworkIcon(PModel parent) {
+		super(parent, new PImage("images/NetworkIcon.gif"), 0.7f);
 
 		// innerNode.setScale(0.7);
 		// System.out.println(innerNode.getFullBounds());
@@ -17,4 +18,3 @@ public class NetworkIcon extends Icon {
 	}
 
 }
-

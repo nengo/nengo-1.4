@@ -38,12 +38,13 @@ public class Style {
 	 * Fonts
 	 */
 
-	public static final Font FONT_BUTTONS = new Font("Arial", Font.PLAIN, 14);
-	public static final Font FONT_NORMAL = new Font("Arial", Font.PLAIN, 14);
-	public static final Font FONT_BIG = new Font("Arial", Font.BOLD, 16);
-	public static final Font FONT_LARGE = new Font("Arial", Font.BOLD, 18);
-	public static final Font FONT_XLARGE = new Font("Arial", Font.BOLD, 22);
-	public static final Font FONT_XXLARGE = new Font("Arial", Font.BOLD, 32);
+	public static final Font FONT_BUTTONS = new Font("Helvetica", Font.PLAIN, 14);
+	public static final Font FONT_SMALL = new Font("Helvetica", Font.PLAIN, 10);
+	public static final Font FONT_NORMAL = new Font("Helvetica", Font.PLAIN, 14);
+	public static final Font FONT_BIG = new Font("Helvetica", Font.BOLD, 16);
+	public static final Font FONT_LARGE = new Font("Helvetica", Font.BOLD, 18);
+	public static final Font FONT_XLARGE = new Font("Helvetica", Font.BOLD, 22);
+	public static final Font FONT_XXLARGE = new Font("Helvetica", Font.BOLD, 32);
 
 	public static Font createFont(int size) {
 		return createFont(size, false);
@@ -60,7 +61,7 @@ public class Style {
 	public static final Font GPHOTO_DETAILS_FONT = new Font("Arial", Font.BOLD,
 			14);
 
-	public static void styleComponent(JComponent item) {
+	public static void applyStyleToComponent(JComponent item) {
 		item.setOpaque(true);
 		item.setBackground(Style.BACKGROUND_COLOR);
 		item.setForeground(Style.FOREGROUND_COLOR);

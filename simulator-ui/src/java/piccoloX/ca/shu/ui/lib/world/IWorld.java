@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 
 import ca.shu.ui.lib.world.impl.WorldGround;
-import ca.shu.ui.lib.world.impl.WorldObject;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import ca.shu.ui.lib.world.impl.WorldSky;
 
 import edu.umd.cs.piccolo.PNode;
@@ -20,12 +20,12 @@ public interface IWorld {
 	
 	public void zoomToNode(IWorldObject node);
 	
-	public void showTooltip(WorldObject pControls,
-			WorldObject nodeAttacedTo);
+	public void showTooltip(WorldObjectImpl pControls,
+			WorldObjectImpl nodeAttacedTo);
 	public void hideControls();
 	public Point2D getPositionInGround(IWorldObject wo);
 
-	public Point2D getPositionInSky(WorldObject wo);
+	public Point2D getPositionInSky(WorldObjectImpl wo);
 
 	public WorldGround getGround();
 

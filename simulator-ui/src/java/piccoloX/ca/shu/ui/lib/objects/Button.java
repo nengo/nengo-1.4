@@ -3,11 +3,11 @@ package ca.shu.ui.lib.objects;
 import java.awt.Color;
 
 import ca.shu.ui.lib.handlers.HandCursorHandler;
-import ca.shu.ui.lib.world.impl.WorldObject;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public class Button extends WorldObject {
+public class Button extends WorldObjectImpl {
 
 	protected Color defaultColor = Color.white;
 

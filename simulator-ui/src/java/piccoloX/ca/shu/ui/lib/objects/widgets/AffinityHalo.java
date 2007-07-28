@@ -8,17 +8,17 @@ import java.awt.Stroke;
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.objects.GEdge;
-import ca.shu.ui.lib.world.impl.WorldObject;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class AffinityHalo extends GEdge {
 
-	public AffinityHalo(WorldObject startNode, WorldObject endNode) {
+	public AffinityHalo(WorldObjectImpl startNode, WorldObjectImpl endNode) {
 		super(startNode, endNode);
 		// TODO Set a thicker stroke for the affinity halo
-		
-//		this.setStroke(new Stroke( ))
+		startNode.addChild(1, this);
+		// this.setStroke(new Stroke( ))
 	}
 
 	/**
@@ -53,26 +53,31 @@ public class AffinityHalo extends GEdge {
 		// when
 		// determining their position.
 
-		WorldObject start = getStartNode();
-		WorldObject end = getEndNode();
+		WorldObjectImpl start = getStartNode();
+		WorldObjectImpl end = getEndNode();
 
-		double sH = start.getHeight();
-		double sW = start.getWidth();
-		double eH = end.getHeight();
-		double eW = end.getWidth();
+		double sX = start.getX();
+		double sY = start.getY();
+		double sHY = start.getHeight() + sY;
+		double sWX = start.getWidth() + sX;
 
-		Point2D s0 = toLocal(start, 0, 0);
-		Point2D s1 = toLocal(start, sW, 0);
-		Point2D s2 = toLocal(start, 0, sH);
-		Point2D s3 = toLocal(start, sW, sH);
+		double eX = end.getX();
+		double eY = end.getY();
+		double eHY = end.getHeight() + eY;
+		double eWX = end.getWidth() + eX;
 
-		Point2D e0 = toLocal(end, 0, 0);
-		Point2D e1 = toLocal(end, eW, 0);
-		Point2D e2 = toLocal(end, 0, eH);
-		Point2D e3 = toLocal(end, eW, eH);
+		Point2D s0 = toLocal(start, sX, sY);
+		Point2D s1 = toLocal(start, sWX, sY);
+		Point2D s2 = toLocal(start, sX, sHY);
+		Point2D s3 = toLocal(start, sWX, sHY);
 
-		Point2D[] path = { s0, e0, s0, 
-				s1, e1, s1, s3, e3, s3, s2, e2, s2, s0, e0, s0 };
+		Point2D e0 = toLocal(end, eX, eY);
+		Point2D e1 = toLocal(end, eWX, eY);
+		Point2D e2 = toLocal(end, eX, eHY);
+		Point2D e3 = toLocal(end, eWX, eHY);
+
+		Point2D[] path = { s0, e0, s0, s1, e1, s1, s3, e3, s3, s2, e2, s2, s0,
+				e0, s0 };
 
 		// double x1 = 0;
 		// double y1 = getStartNode().getHeight();

@@ -1,7 +1,5 @@
 package ca.shu.ui.lib.util;
 
-import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -10,7 +8,7 @@ import javax.swing.JSeparator;
 
 import ca.neo.ui.style.Style;
 
-public class PopupMenuBuilder {
+public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 	JPopupMenu menu;
 
@@ -22,13 +20,16 @@ public class PopupMenuBuilder {
 	}
 
 	public PopupMenuBuilder(String label) {
-		super();
-		this.menu = new JPopupMenu(label);
+		super(false);
+		menu = new JPopupMenu(label);
+		style(menu);
+		
 	}
 
 	public void addAction(AbstractAction action) {
 		JMenuItem item;
 		item = new JMenuItem(action);
+		style(item);
 		menu.add(item);
 
 	}
@@ -50,11 +51,12 @@ public class PopupMenuBuilder {
 		JLabel label = new JLabel(name);
 		label.setLocation(4, 4);
 		label.setFont(Style.FONT_BIG);
+		style(label);
 		menu.add(label);
 	}
 
-	public MenuBuilder addSubMenu(String label) {
-		MenuBuilder mb = new MenuBuilder(label);
+	public MenuBuilder createSubMenu(String label) {
+		MenuBuilder mb = new MenuBuilder(label, isApplyCustomStyle());
 		getJPopupMenu().add(mb.getJMenu());
 		return mb;
 

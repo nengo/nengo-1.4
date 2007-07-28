@@ -3,29 +3,27 @@ package ca.shu.ui.lib.objects.lines;
 import java.util.Collection;
 import java.util.Iterator;
 
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
-public class LineEnd extends LineHolder  {
+public class LineEnd extends WorldObjectImpl {
 	private static final long serialVersionUID = 1L;
-	
+
 	ILineAcceptor connectedTo;
 
 	public LineEnd() {
 		super();
 
-		this.addChild(new LineEndIcon());
-		this.setBounds(getFullBounds());
-		this.setChildrenPickable(false);
-		this.setTangible(false);
+		addChild(new LineEndIcon());
+		setBounds(getFullBounds());
+		setChildrenPickable(false);
+		setTangible(false);
 
-		this.setDraggable(true);
-
-		// this.addInputEventListener(new LineEndHandler(this));
-
+		setDraggable(true);
 	}
 
 	public void justDropped() {
-		// IWorldLayer worldLayer = getWorldLayer();
 
 		Collection<PNode> nodes = this.getWorldLayer().getChildrenAtBounds(
 				localToGlobal(getBounds()));
@@ -53,6 +51,5 @@ public class LineEnd extends LineHolder  {
 			connectedTo.disconnect();
 			connectedTo = null;
 		}
-
 	}
 }

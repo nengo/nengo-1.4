@@ -7,9 +7,10 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
 import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-public class LineIn extends LineHolder implements ILineAcceptor {
+public class LineIn extends WorldObjectImpl implements ILineAcceptor {
 
 	/**
 	 * 
@@ -60,15 +61,6 @@ public class LineIn extends LineHolder implements ILineAcceptor {
 
 	public Color getColor() {
 		return color;
-	}
-
-	@Override
-	public void layoutEdges() {
-		// TODO Auto-generated method stub
-		super.layoutEdges();
-
-		if (lineEnd != null)
-			lineEnd.layoutEdges();
 	}
 
 	public void setColor(Color color) {

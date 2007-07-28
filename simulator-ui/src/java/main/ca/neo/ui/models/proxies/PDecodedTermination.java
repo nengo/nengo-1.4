@@ -2,53 +2,58 @@ package ca.neo.ui.models.proxies;
 
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.model.nef.impl.DecodedTermination;
+import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PModelConfigurable;
-import ca.neo.ui.models.icons.Icon;
-import ca.neo.ui.views.objects.properties.PTBoolean;
-import ca.neo.ui.views.objects.properties.PTFloat;
-import ca.neo.ui.views.objects.properties.PTString;
-import ca.neo.ui.views.objects.properties.PropertySchema;
+import ca.neo.ui.models.icons.IconWrapper;
+import ca.neo.ui.views.objects.configurable.PTBoolean;
+import ca.neo.ui.views.objects.configurable.PTFloat;
+import ca.neo.ui.views.objects.configurable.PTString;
+import ca.neo.ui.views.objects.configurable.PropertySchema;
 import ca.shu.ui.lib.objects.lines.LineIn;
-import ca.shu.ui.lib.world.impl.WorldObject;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
-public class PDecodedTermination extends PModelConfigurable {
+public class PDecodedTermination extends PTermination {
 
 	private static final long serialVersionUID = 1L;
 
-	static String pIsModulatory = "Is Modulatory";
+	static PropertySchema pIsModulatory = new PTBoolean("Is Modulatory");
 
-	static String pName = "Name";
+	static PropertySchema pName = new PTString("Name");
 
-	static String pStorageName = "Storage Name";
+	static PropertySchema pTauPSC = new PTFloat("tau");
 
-	static String pTauPSC = "tau";
+	static PropertySchema[] zProperties = { pName, pTauPSC, pIsModulatory };
 
-	static PropertySchema[] zMetaProperties = { new PTString(pName),
-			new PTFloat(pTauPSC), new PTBoolean(pIsModulatory) };
+	PNEFEnsemble ensembleProxy;
 
-	PNEFENsemble ensembleProxy;
-
-	public PDecodedTermination(PNEFENsemble ensembleProxy) {
+	public PDecodedTermination(PNEFEnsemble ensembleProxy) {
 		super();
 		this.ensembleProxy = ensembleProxy;
-		// createModel();
+
+		startConfigManager(getDefaultConfigManager());
+		setIcon(new TermIcon(this));
+		this.setDraggable(false);
 	}
 
 	@Override
 	public String getName() {
-		return "Decoded termination";
+		if (getModelTermination() != null) {
+			return getModelTermination().getName();
+		} else
+			return "";
+	}
+
+	public DecodedTermination getModelTermination() {
+		return (DecodedTermination) getModel();
 	}
 
 	@Override
 	public PropertySchema[] getPropertiesSchema() {
 		// TODO Auto-generated method stub
-		return zMetaProperties;
+		return zProperties;
 
-	}
-
-	@Override
-	protected WorldObject createIcon() {
-		return new TermIcon();
 	}
 
 	protected Object createModel() {
@@ -68,13 +73,26 @@ public class PDecodedTermination extends PModelConfigurable {
 			e.printStackTrace();
 		}
 
-		setIcon(new Icon(new TermIcon(), (String) getProperty(pName)));
-		setModel(term);
 		return term;
+	}
+
+	static final String typeName = "Decoded Termination";
+
+	@Override
+	public String getTypeName() {
+		// TODO Auto-generated method stub
+		return typeName;
 	}
 
 }
 
-class TermIcon extends LineIn {
+class TermIcon extends IconWrapper {
+
+	public TermIcon(PModel parent) {
+		super(parent, new LineIn());
+		configureLabel(false);
+
+		// TODO Auto-generated constructor stub
+	}
 
 }

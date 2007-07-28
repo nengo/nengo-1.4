@@ -9,7 +9,7 @@ import ca.shu.ui.lib.world.IWorldObject;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 
-public class WorldSky extends PCamera implements IWorldLayer{
+public class WorldSky extends PCamera implements IWorldLayer {
 
 	/**
 	 * 
@@ -29,7 +29,6 @@ public class WorldSky extends PCamera implements IWorldLayer{
 	public WorldSky(IWorld world) {
 		super();
 		this.world = world;
-		
 
 	}
 
@@ -40,9 +39,68 @@ public class WorldSky extends PCamera implements IWorldLayer{
 	}
 
 	public void addToWorldLayer(IWorldObject wo) {
-		// TODO Auto-generated method stub
+		System.out.println("not implemented");
 		addChild((PNode) wo);
 	}
 
+	public void addChildW(IWorldObject child) {
+		System.out.println("not implemented");
+
+	}
+
+	public void endDrag() {
+		System.out.println("not implemented");
+
+	}
+
+	public IWorldLayer getWorldLayer() {
+		System.out.println("not implemented");
+		return null;
+	}
+
+	public boolean isDraggable() {
+		System.out.println("not implemented");
+		return false;
+	}
+
+	public void justDropped() {
+		System.out.println("not implemented");
+
+	}
+
+	public void justDroppedInWorld() {
+		System.out.println("not implemented");
+
+	}
+
+	public void popState(State state) {
+		System.out.println("not implemented");
+
+	}
+
+	public void pushState(State state) {
+		System.out.println("not implemented");
+
+	}
+
+	public void removedFromWorld() {
+		System.out.println("not implemented");
+
+	}
+
+	public void startDrag() {
+		System.out.println("not implemented");
+
+	}
+
+	public String getName() {
+		System.out.println("not implemented");
+		return null;
+	}
+
+	public void setDraggable(boolean isDraggable) {
+		System.out.println("not implemented");
+
+	}
 
 }

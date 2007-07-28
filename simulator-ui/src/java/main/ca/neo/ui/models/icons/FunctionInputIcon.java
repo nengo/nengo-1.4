@@ -1,14 +1,14 @@
 package ca.neo.ui.models.icons;
 
+import ca.neo.ui.models.PModel;
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.GText;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PImage;
 
-public class FunctionInputIcon extends Icon {
+public class FunctionInputIcon extends IconWrapper {
 
-	public FunctionInputIcon() {
-		super(new PImage("images/FunctionIcon.gif"), "FunctionInput", 0.7f);
+	public FunctionInputIcon(PModel parent) {
+		super(parent, new PImage("images/FunctionIcon.gif"), 0.7f);
 		// TODO Auto-generated constructor stub
 
 	}

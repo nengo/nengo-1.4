@@ -24,7 +24,7 @@ public class Canvas extends PCanvas {
 //		getLayer().addChild((MiniWorld) world);
 	}
 
-	public IWorld getWorld() {
+	public World getWorld() {
 		return world;
 	}
 

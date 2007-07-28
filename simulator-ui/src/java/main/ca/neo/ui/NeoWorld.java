@@ -3,12 +3,15 @@ package ca.neo.ui;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 
+import ca.neo.ui.models.proxies.PNEFEnsemble;
 import ca.neo.ui.models.proxies.PNetwork;
+import ca.neo.ui.models.views.NetworkView;
+import ca.neo.ui.views.objects.configurable.managers.SavedFileConfigManager;
 import ca.neo.ui.widgets.Toolbox;
+import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.world.impl.Frame;
 
 public class NeoWorld extends Frame {
@@ -18,14 +21,24 @@ public class NeoWorld extends Frame {
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				PNetwork network = new PNetwork();
-				if (network.isModelCreated()) {
-					getWorld().getGround().catchObject(network);
-					network.openNetwork();
-
-				}
+				runMacro();
 			}
 		});
+
+	}
+
+	public void runMacro() {
+		PNetwork network = new PNetwork("Top Network");
+		getWorld().getGround().catchObject(network);
+
+		NetworkView networkViewer = network.openNetwork();
+
+		PNEFEnsemble newEnsemble = new PNEFEnsemble("My Ensemble", 100, 1,
+				"ensemble1");
+
+		networkViewer.addNode(newEnsemble);
+
+		newEnsemble.showAllOrigins();
 
 	}
 
@@ -42,10 +55,10 @@ public class NeoWorld extends Frame {
 	Toolbox canvasView;
 
 	@Override
-	public void createMenu(JMenuBar menuBar) {
-		JMenu menu;
-		menu = addMenu(menuBar, "Start");
-		Frame.addActionToMenu(menu, new CreateNetworkAction());
+	public void constructMenuBar(JMenuBar menuBar) {
+		MenuBuilder menu = new MenuBuilder("Start");
+		menuBar.add(menu.getJMenu());
+		menu.addAction(new CreateNetworkAction());
 	}
 
 	public Toolbox getCanvasView() {
@@ -84,7 +97,7 @@ public class NeoWorld extends Frame {
 			(new Thread() {
 				public void run() {
 					PNetwork network;
-					network = new PNetwork();
+					network = new PNetwork(true);
 					if (network.isModelCreated())
 						getWorld().getGround().catchObject(network);
 				}
