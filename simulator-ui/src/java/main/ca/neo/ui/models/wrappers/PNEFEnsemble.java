@@ -1,4 +1,4 @@
-package ca.neo.ui.models.proxies;
+package ca.neo.ui.models.wrappers;
 
 import java.awt.event.ActionEvent;
 
@@ -13,10 +13,10 @@ import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PModelNode;
 import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.style.Style;
-import ca.neo.ui.views.objects.configurable.PTInt;
-import ca.neo.ui.views.objects.configurable.PTString;
-import ca.neo.ui.views.objects.configurable.PropertySchema;
 import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
+import ca.neo.ui.views.objects.configurable.struct.PTInt;
+import ca.neo.ui.views.objects.configurable.struct.PTString;
+import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
@@ -30,17 +30,17 @@ import ca.shu.ui.lib.util.PopupMenuBuilder;
 public class PNEFEnsemble extends PModelNode {
 	private static final long serialVersionUID = 1L;
 
-	static final PropertySchema pDim = new PTInt("Dimensions");
+	static final PropertyStructure pDim = new PTInt("Dimensions");
 
-	static final PropertySchema pName = new PTString("Name");
+	static final PropertyStructure pName = new PTString("Name");
 
-	static final PropertySchema pNumOfNeurons = new PTInt("Number of Neurons");
+	static final PropertyStructure pNumOfNeurons = new PTInt("Number of Neurons");
 
-	static final PropertySchema pStorageName = new PTString("Storage Name");
+	static final PropertyStructure pStorageName = new PTString("Storage Name");
 
 	static final String typeName = "NEFEnsemble";
 
-	static final PropertySchema[] zProperties = { pName, pNumOfNeurons, pDim,
+	static final PropertyStructure[] zProperties = { pName, pNumOfNeurons, pDim,
 			pStorageName };
 
 	boolean isCollectingSpikes = false;
@@ -55,7 +55,7 @@ public class PNEFEnsemble extends PModelNode {
 		setProperty(pNumOfNeurons, numOfNeurons);
 		setProperty(pDim, dimensions);
 		setProperty(pStorageName, storageName);
-		setModel(createModel());
+		initModel();
 		init();
 	}
 
@@ -75,17 +75,24 @@ public class PNEFEnsemble extends PModelNode {
 
 	/*
 	 * Adds a decoded termination to the UI and Ensemble Model
+	 * 
+	 * The UI is used to configure it
+	 * 
 	 */
 	public void addDecodedTermintation() {
-		PDecodedTermination term;
+		addDecodedTermination(new PDecodedTermination(this));
+	}
 
-		term = new PDecodedTermination(this);
+	public void addDecodedTermination(String name,
+			float tauPSC, boolean isModulatory) {
+		addDecodedTermination(new PDecodedTermination(this, name,
+				tauPSC, isModulatory));
+	}
+
+	protected void addDecodedTermination(PDecodedTermination term) {
 		term.setScale(0.5);
 		if (term.isModelCreated())
 			addWidget(term);
-
-		// term.initModel();
-
 	}
 
 	@Override
@@ -154,7 +161,7 @@ public class PNEFEnsemble extends PModelNode {
 	}
 
 	@Override
-	public PropertySchema[] getPropertiesSchema() {
+	public PropertyStructure[] getPropertiesSchema() {
 		// TODO Auto-generated method stub
 		return zProperties;
 	}

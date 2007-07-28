@@ -21,20 +21,21 @@ import javax.swing.border.EtchedBorder;
 
 import ca.neo.ui.style.Style;
 import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
+import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 import ca.shu.ui.lib.util.Util;
 
-public class PropertiesDialog implements IConfigurationManager {
+public class UIConfigManager implements IConfigurationManager {
 	JDialog parent0;
 	Frame parent1;
 
 	public static final String DEFAULT_PROPERTY_FILE_NAME = "last_used";
 	
-	public PropertiesDialog(Frame parent) {
+	public UIConfigManager(Frame parent) {
 		super();
 		this.parent1 = parent;
 	}
 
-	public PropertiesDialog(JDialog parent) {
+	public UIConfigManager(JDialog parent) {
 		super();
 		this.parent0 = parent;
 	}
@@ -100,12 +101,12 @@ class ConfigDialog extends JDialog {
 
 	public void createDialog() {
 
-		PropertySchema[] properties = proxyObj.getPropertiesSchema();
+		PropertyStructure[] properties = proxyObj.getPropertiesSchema();
 		propertyInputPanels = new Vector<PropertyInputPanel>(properties.length);
 
 		for (int i = 0; i < properties.length; i++) {
 
-			PropertySchema property = properties[i];
+			PropertyStructure property = properties[i];
 
 			PropertyInputPanel inputPanel = property.createInputPanel();
 			panel.add(inputPanel);
@@ -157,10 +158,10 @@ class ConfigDialog extends JDialog {
 		 */
 		boolean defaultFound = false;
 		for (int i = 0; i < files.length; i++) {
-			if (files[i].compareTo(PropertiesDialog.DEFAULT_PROPERTY_FILE_NAME) == 0) {
+			if (files[i].compareTo(UIConfigManager.DEFAULT_PROPERTY_FILE_NAME) == 0) {
 				defaultFound = true;
 				fileList.setSelectedIndex(i);
-				proxyObj.loadPropertiesFromFile(PropertiesDialog.DEFAULT_PROPERTY_FILE_NAME);
+				proxyObj.loadPropertiesFromFile(UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
 			}
 		}
 		if (!defaultFound && fileList.getSelectedItem() != null) {
@@ -256,7 +257,7 @@ class ConfigDialog extends JDialog {
 							ConfigDialog.this.proxyObj
 									.completeConfiguration();
 							ConfigDialog.this.proxyObj
-									.savePropertiesToFile(PropertiesDialog.DEFAULT_PROPERTY_FILE_NAME);
+									.savePropertiesToFile(UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
 						}
 					}).start();
 
@@ -297,7 +298,7 @@ class ConfigDialog extends JDialog {
 
 		while (it.hasNext()) {
 			PropertyInputPanel inputPanel = it.next();
-			PropertySchema property = inputPanel.getType();
+			PropertyStructure property = inputPanel.getType();
 
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
@@ -334,16 +335,16 @@ class Panel extends JPanel {
 class PropertyField extends JTextField {
 	private static final long serialVersionUID = 5108856120484394597L;
 
-	PropertySchema property;
+	PropertyStructure property;
 
-	public PropertyField(PropertySchema property) {
+	public PropertyField(PropertyStructure property) {
 		super(10);
 		this.property = property;
 
 		property.getClass();
 	}
 
-	public PropertySchema getProperty() {
+	public PropertyStructure getProperty() {
 		return property;
 	}
 

@@ -1,39 +1,41 @@
-package ca.neo.ui.views.objects.configurable;
+package ca.neo.ui.views.objects.configurable.struct;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class PTFloat extends PropertySchema {
+import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
-	public PTFloat(String name) {
+public class PTString extends PropertyStructure {
+
+	public PTString(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public String getTypeName() {
 		// TODO Auto-generated method stub
-		return new FloatInputPanel(this);
+		return "Text";
 	}
 
 	@Override
 	public Class getTypeClass() {
 		// TODO Auto-generated method stub
-		return float.class;
+		return String.class;
 	}
 
 	@Override
-	public String getTypeName() {
+	public PropertyInputPanel createInputPanel() {
 		// TODO Auto-generated method stub
-		return "Float";
+		return new StringInputPanel(this);
 	}
 
 }
 
-class FloatInputPanel extends PropertyInputPanel {
+class StringInputPanel extends PropertyInputPanel {
 	JTextField tf;
 
-	public FloatInputPanel(PropertySchema property) {
+	public StringInputPanel(PropertyStructure property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}
@@ -54,33 +56,26 @@ class FloatInputPanel extends PropertyInputPanel {
 
 	@Override
 	public Object getValue() {
-
-		Float floatValue = new Float(tf.getText());
-		return floatValue.floatValue();
+		return tf.getText();
 
 	}
 
 	@Override
 	public void setValue(Object value) {
-		tf.setText(value.toString());
+		tf.setText((String) value);
 
 	}
 
 	@Override
 	public boolean isValueSet() {
-		String textValue = tf.getText();
 
-		if (textValue == null || textValue.compareTo("") == 0)
+		String text = (String) getValue();
+
+		if (text != null && text.compareTo("") != 0)
+			return true;
+		else
 			return false;
 
-		try {
-			getValue();
-
-		} catch (NumberFormatException e) {
-			return false;
-		}
-
-		return true;
 	}
 
 }

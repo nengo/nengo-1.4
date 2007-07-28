@@ -11,6 +11,15 @@ import edu.umd.cs.piccolo.PNode;
 
 public class WorldSky extends PCamera implements IWorldLayer {
 
+	@Override
+	public void translateView(double arg0, double arg1) {
+		// TODO Auto-generated method stub
+		super.translateView(arg0, arg1);
+		
+		
+		
+	}
+
 	/**
 	 * 
 	 */

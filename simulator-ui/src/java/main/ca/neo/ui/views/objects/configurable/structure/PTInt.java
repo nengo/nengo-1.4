@@ -1,39 +1,41 @@
-package ca.neo.ui.views.objects.configurable;
+package ca.neo.ui.views.objects.configurable.struct;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class PTString extends PropertySchema {
+import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
-	public PTString(String name) {
+public class PTInt extends PropertyStructure {
+
+	public PTInt(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public String getTypeName() {
+	public PropertyInputPanel createInputPanel() {
 		// TODO Auto-generated method stub
-		return "Text";
+		return new IntegerInputPanel(this);
 	}
 
 	@Override
 	public Class getTypeClass() {
 		// TODO Auto-generated method stub
-		return String.class;
+		return int.class;
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public String getTypeName() {
 		// TODO Auto-generated method stub
-		return new StringInputPanel(this);
+		return "Integer";
 	}
 
 }
 
-class StringInputPanel extends PropertyInputPanel {
+class IntegerInputPanel extends PropertyInputPanel {
 	JTextField tf;
 
-	public StringInputPanel(PropertySchema property) {
+	public IntegerInputPanel(PropertyStructure property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}
@@ -54,26 +56,33 @@ class StringInputPanel extends PropertyInputPanel {
 
 	@Override
 	public Object getValue() {
-		return tf.getText();
+
+		Integer integerValue = new Integer(tf.getText());
+		return integerValue.intValue();
 
 	}
 
 	@Override
 	public void setValue(Object value) {
-		tf.setText((String) value);
+		tf.setText(value.toString());
 
 	}
 
 	@Override
 	public boolean isValueSet() {
+		String textValue = tf.getText();
 
-		String text = (String) getValue();
-
-		if (text != null && text.compareTo("") != 0)
-			return true;
-		else
+		if (textValue == null || textValue.compareTo("") == 0)
 			return false;
 
+		try {
+			getValue();
+
+		} catch (NumberFormatException e) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

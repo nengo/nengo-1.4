@@ -2,6 +2,7 @@ package ca.neo.ui.views.objects.configurable;
 
 import java.io.Serializable;
 
+import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 import ca.shu.ui.lib.util.Util;
 
 public class PropertyWrapper implements Serializable {
@@ -10,16 +11,16 @@ public class PropertyWrapper implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	PropertySchema metaProperty;
+	PropertyStructure metaProperty;
 
 	Object value;
 
-	public PropertyWrapper(PropertySchema metaProperty) {
+	public PropertyWrapper(PropertyStructure metaProperty) {
 		this(metaProperty, null);
 
 	}
 
-	public PropertyWrapper(PropertySchema metaProperty, Object value) {
+	public PropertyWrapper(PropertyStructure metaProperty, Object value) {
 		super();
 
 		this.metaProperty = metaProperty;

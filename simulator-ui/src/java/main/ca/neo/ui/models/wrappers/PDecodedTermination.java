@@ -1,4 +1,4 @@
-package ca.neo.ui.models.proxies;
+package ca.neo.ui.models.wrappers;
 
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
@@ -6,10 +6,10 @@ import ca.neo.model.nef.impl.DecodedTermination;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PModelConfigurable;
 import ca.neo.ui.models.icons.IconWrapper;
-import ca.neo.ui.views.objects.configurable.PTBoolean;
-import ca.neo.ui.views.objects.configurable.PTFloat;
-import ca.neo.ui.views.objects.configurable.PTString;
-import ca.neo.ui.views.objects.configurable.PropertySchema;
+import ca.neo.ui.views.objects.configurable.struct.PTBoolean;
+import ca.neo.ui.views.objects.configurable.struct.PTFloat;
+import ca.neo.ui.views.objects.configurable.struct.PTString;
+import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 import ca.shu.ui.lib.objects.lines.LineIn;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.handles.PBoundsHandle;
@@ -18,21 +18,37 @@ public class PDecodedTermination extends PTermination {
 
 	private static final long serialVersionUID = 1L;
 
-	static PropertySchema pIsModulatory = new PTBoolean("Is Modulatory");
+	static PropertyStructure pIsModulatory = new PTBoolean("Is Modulatory");
 
-	static PropertySchema pName = new PTString("Name");
+	static PropertyStructure pName = new PTString("Name");
 
-	static PropertySchema pTauPSC = new PTFloat("tau");
+	static PropertyStructure pTauPSC = new PTFloat("tau");
 
-	static PropertySchema[] zProperties = { pName, pTauPSC, pIsModulatory };
+	static PropertyStructure[] zProperties = { pName, pTauPSC, pIsModulatory };
 
 	PNEFEnsemble ensembleProxy;
 
+	public PDecodedTermination(PNEFEnsemble ensembleProxy, String name,
+			float tauPSC, boolean isModulatory) {
+		super();
+		setProperty(pName, name);
+		setProperty(pTauPSC, tauPSC);
+		setProperty(pIsModulatory, isModulatory);
+
+		init(ensembleProxy);
+		initModel();
+
+	}
+
 	public PDecodedTermination(PNEFEnsemble ensembleProxy) {
 		super();
-		this.ensembleProxy = ensembleProxy;
 
+		init(ensembleProxy);
 		startConfigManager(getDefaultConfigManager());
+	}
+
+	private void init(PNEFEnsemble ensembleProxy) {
+		this.ensembleProxy = ensembleProxy;
 		setIcon(new TermIcon(this));
 		this.setDraggable(false);
 	}
@@ -50,7 +66,7 @@ public class PDecodedTermination extends PTermination {
 	}
 
 	@Override
-	public PropertySchema[] getPropertiesSchema() {
+	public PropertyStructure[] getPropertiesSchema() {
 		// TODO Auto-generated method stub
 		return zProperties;
 

@@ -1,4 +1,4 @@
-package ca.neo.ui.models.proxies;
+package ca.neo.ui.models.wrappers;
 
 import ca.neo.model.Origin;
 import ca.neo.ui.models.PModel;

@@ -1,4 +1,4 @@
-package ca.neo.ui.views.objects.configurable;
+package ca.neo.ui.views.objects.configurable.struct;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -16,10 +16,13 @@ import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
+import ca.neo.ui.views.objects.configurable.IConfigurable;
+import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
+import ca.neo.ui.views.objects.configurable.UIConfigManager;
 import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
 import ca.shu.ui.lib.util.Util;
 
-public class PTFunction extends PropertySchema {
+public class PTFunction extends PropertyStructure {
 
 	private static final long serialVersionUID = 1L;
 
@@ -51,10 +54,10 @@ class FnSchema {
 	@SuppressWarnings("unchecked")
 	Class functionClass;
 
-	PropertySchema[] metaProperties;
+	PropertyStructure[] metaProperties;
 
 	@SuppressWarnings("unchecked")
-	public FnSchema(Class functionClass, PropertySchema[] metaProperties) {
+	public FnSchema(Class functionClass, PropertyStructure[] metaProperties) {
 		super();
 		this.functionClass = functionClass;
 		this.metaProperties = metaProperties;
@@ -65,7 +68,7 @@ class FnSchema {
 		return functionClass;
 	}
 
-	public PropertySchema[] getMetaProperties() {
+	public PropertyStructure[] getMetaProperties() {
 		return metaProperties;
 	}
 
@@ -84,7 +87,7 @@ class FunctionConfiguration implements IConfigurable {
 
 	FunctionInputPanel inputPanel;
 
-	PropertySchema[] metaProperties;
+	PropertyStructure[] metaProperties;
 
 	String name;
 
@@ -92,7 +95,7 @@ class FunctionConfiguration implements IConfigurable {
 
 	@SuppressWarnings("unchecked")
 	public FunctionConfiguration(FunctionInputPanel inputPanel,
-			Class functionType, PropertySchema[] propertyTypes) {
+			Class functionType, PropertyStructure[] propertyTypes) {
 		super();
 		this.metaProperties = propertyTypes;
 		properties = new SimpleAttributeSet();
@@ -175,7 +178,7 @@ class FunctionConfiguration implements IConfigurable {
 		return name;
 	}
 
-	public PropertySchema[] getPropertiesSchema() {
+	public PropertyStructure[] getPropertiesSchema() {
 		return metaProperties;
 	}
 
@@ -238,13 +241,13 @@ class FunctionInputPanel extends PropertyInputPanel {
 	 */
 	static final FnSchema[] functions = new FnSchema[] {
 
-			new FnSchema(ConstantFunction.class, new PropertySchema[] {
+			new FnSchema(ConstantFunction.class, new PropertyStructure[] {
 					new PTInt("Dimension"), new PTFloat("Value") }),
-			new FnSchema(FourierFunction.class, new PropertySchema[] {
+			new FnSchema(FourierFunction.class, new PropertyStructure[] {
 					new PTFloat("Fundamental"), new PTFloat("Cutoff"),
 					new PTFloat("RMS") }),
 
-			new FnSchema(GaussianPDF.class, new PropertySchema[] {
+			new FnSchema(GaussianPDF.class, new PropertyStructure[] {
 					new PTFloat("Mean"), new PTFloat("Variance"),
 					new PTFloat("Peak") }), };
 
@@ -252,7 +255,7 @@ class FunctionInputPanel extends PropertyInputPanel {
 
 	Function function = null;
 
-	public FunctionInputPanel(PropertySchema property) {
+	public FunctionInputPanel(PropertyStructure property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 		setValue(null);
@@ -318,7 +321,7 @@ class FunctionInputPanel extends PropertyInputPanel {
 			/*
 			 * Configure the function
 			 */
-			IConfigurationManager configManager = new PropertiesDialog(
+			IConfigurationManager configManager = new UIConfigManager(
 					(JDialog) parent);
 
 			configManager.configure(functionProxy);

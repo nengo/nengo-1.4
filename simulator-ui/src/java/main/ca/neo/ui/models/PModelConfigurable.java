@@ -7,12 +7,12 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.text.SimpleAttributeSet;
 
-import ca.neo.ui.NeoWorld;
+import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.style.Style;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
-import ca.neo.ui.views.objects.configurable.PropertiesDialog;
-import ca.neo.ui.views.objects.configurable.PropertySchema;
+import ca.neo.ui.views.objects.configurable.UIConfigManager;
 import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
+import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.widgets.TrackedTask;
 import ca.shu.ui.lib.util.Util;
@@ -44,7 +44,7 @@ public abstract class PModelConfigurable extends PModel implements
 	 * @return The default configuration manager
 	 */
 	protected IConfigurationManager getDefaultConfigManager() {
-		return new PropertiesDialog(NeoWorld.getInstance());
+		return new UIConfigManager(NeoGraphics.getInstance());
 	}
 
 	/**
@@ -120,13 +120,13 @@ public abstract class PModelConfigurable extends PModel implements
 	// }
 	// }
 
-	public abstract PropertySchema[] getPropertiesSchema();
+	public abstract PropertyStructure[] getPropertiesSchema();
 
 	public Object getProperty(String name) {
 		return properties.getAttribute(name);
 	}
 
-	public Object getProperty(PropertySchema prop) {
+	public Object getProperty(PropertyStructure prop) {
 		return properties.getAttribute(prop.getName());
 	}
 
@@ -165,7 +165,7 @@ public abstract class PModelConfigurable extends PModel implements
 		properties.addAttribute(name, value);
 	}
 
-	public void setProperty(PropertySchema propertySchema, Object value) {
+	public void setProperty(PropertyStructure propertySchema, Object value) {
 		setProperty(propertySchema.getName(), value);
 	}
 
@@ -292,13 +292,13 @@ class NodeTooltip extends WorldObjectImpl {
 
 		if (proxyNode.isModelCreated()) {
 
-			PropertySchema[] propertyTypes = proxyNode.getPropertiesSchema();
+			PropertyStructure[] propertyTypes = proxyNode.getPropertiesSchema();
 			if (propertyTypes != null) {
 
 				StringBuilder strBd = new StringBuilder(200);
 
 				for (int i = 0; i < propertyTypes.length; i++) {
-					PropertySchema type = propertyTypes[i];
+					PropertyStructure type = propertyTypes[i];
 					strBd.append(type.getName() + ": "
 							+ proxyNode.getProperty(type.getName()).toString()
 							+ "\n");

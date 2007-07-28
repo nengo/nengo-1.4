@@ -6,50 +6,36 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 
-import ca.neo.ui.models.proxies.PNEFEnsemble;
-import ca.neo.ui.models.proxies.PNetwork;
-import ca.neo.ui.models.views.NetworkView;
+import ca.neo.ui.models.viewers.NetworkView;
+import ca.neo.ui.models.wrappers.PNEFEnsemble;
+import ca.neo.ui.models.wrappers.PNetwork;
 import ca.neo.ui.views.objects.configurable.managers.SavedFileConfigManager;
 import ca.neo.ui.widgets.Toolbox;
 import ca.shu.ui.lib.util.MenuBuilder;
+import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.impl.Frame;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 
-public class NeoWorld extends Frame {
+public class NeoGraphics extends Frame {
 
-	public NeoWorld(String title) {
+	public NeoGraphics(String title) {
 		super(title);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				runMacro();
-			}
-		});
-
-	}
-
-	public void runMacro() {
-		PNetwork network = new PNetwork("Top Network");
-		getWorld().getGround().catchObject(network);
-
-		NetworkView networkViewer = network.openNetwork();
-
-		PNEFEnsemble newEnsemble = new PNEFEnsemble("My Ensemble", 100, 1,
-				"ensemble1");
-
-		networkViewer.addNode(newEnsemble);
-
-		newEnsemble.showAllOrigins();
+		/*
+		 * Only one instance of NeoWorld may be running at once
+		 */
+		Frame.setInstance(this);
 
 	}
 
 	private static final long serialVersionUID = 1L;
 
-	public static NeoWorld getInstance() {
-		return (NeoWorld) (Frame.getInstance());
+	public static NeoGraphics getInstance() {
+		return (NeoGraphics) (Frame.getInstance());
 	}
 
 	public static void main(String[] args) {
-		Frame.setInstance(new NeoWorld("NEOWorld"));
+		Frame.setInstance(new NeoGraphics("NEOWorld"));
 	}
 
 	Toolbox canvasView;
@@ -63,6 +49,10 @@ public class NeoWorld extends Frame {
 
 	public Toolbox getCanvasView() {
 		return canvasView;
+	}
+	
+	public void addObject(IWorldObject object) {
+		getWorld().getGround().catchObject(object);
 	}
 
 	public void showCanvas() {

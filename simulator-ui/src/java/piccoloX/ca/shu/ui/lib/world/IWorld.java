@@ -20,6 +20,8 @@ public interface IWorld {
 	
 	public void zoomToNode(IWorldObject node);
 	
+	public void setCameraPosition(double x, double y);
+	
 	public void showTooltip(WorldObjectImpl pControls,
 			WorldObjectImpl nodeAttacedTo);
 	public void hideControls();

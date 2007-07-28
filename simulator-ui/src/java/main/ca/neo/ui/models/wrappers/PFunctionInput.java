@@ -1,4 +1,4 @@
-package ca.neo.ui.models.proxies;
+package ca.neo.ui.models.wrappers;
 
 import ca.neo.math.Function;
 import ca.neo.model.Node;
@@ -7,23 +7,39 @@ import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.ui.models.PModelNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
-import ca.neo.ui.views.objects.configurable.PTFunction;
-import ca.neo.ui.views.objects.configurable.PTString;
-import ca.neo.ui.views.objects.configurable.PropertySchema;
+import ca.neo.ui.views.objects.configurable.struct.PTFunction;
+import ca.neo.ui.views.objects.configurable.struct.PTString;
+import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 import ca.shu.ui.lib.util.Util;
 
 public class PFunctionInput extends PModelNode {
 
-	public PFunctionInput(boolean useDefaultConfigManager) {
-		super(useDefaultConfigManager);
+	/**
+	 * Default constructor, uses the default configuration manager to set up
+	 * function input
+	 */
+	public PFunctionInput() {
+		super(true);
+		init();
+	}
+
+	public PFunctionInput(String name, Function function) {
+		super(false);
+		setProperty(pName, name);
+		setProperty(pFunction, function);
+		init();
+		initModel();
+	}
+
+	private void init() {
 		setIcon(new FunctionInputIcon(this));
 	}
 
-	static PropertySchema pName = new PTString("Name");
+	static PropertyStructure pName = new PTString("Name");
 
-	static PropertySchema pFunction = new PTFunction("Function Type");
+	static PropertyStructure pFunction = new PTFunction("Function Type");
 
-	static PropertySchema[] metaProperties = { pName, pFunction };
+	static PropertyStructure[] metaProperties = { pName, pFunction };
 
 	/**
 	 * 
@@ -43,6 +59,7 @@ public class PFunctionInput extends PModelNode {
 
 		// TODO Auto-generated method stub
 		try {
+			setName((String) getProperty(pName));
 			return new FunctionInput((String) getProperty(pName), functions,
 					Units.UNK);
 		} catch (StructuralException e) {
@@ -54,7 +71,7 @@ public class PFunctionInput extends PModelNode {
 	}
 
 	@Override
-	public PropertySchema[] getPropertiesSchema() {
+	public PropertyStructure[] getPropertiesSchema() {
 		// TODO Auto-generated method stub
 		return metaProperties;
 	}

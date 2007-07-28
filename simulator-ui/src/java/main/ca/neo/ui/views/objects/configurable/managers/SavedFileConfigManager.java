@@ -1,13 +1,13 @@
 package ca.neo.ui.views.objects.configurable.managers;
 
 import ca.neo.ui.views.objects.configurable.IConfigurable;
-import ca.neo.ui.views.objects.configurable.PropertiesDialog;
+import ca.neo.ui.views.objects.configurable.UIConfigManager;
 
 public class SavedFileConfigManager implements IConfigurationManager {
 	String configFileName;
 
 	public SavedFileConfigManager() {
-		this(PropertiesDialog.DEFAULT_PROPERTY_FILE_NAME);
+		this(UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
 
 	}
 

@@ -10,10 +10,10 @@ import javax.swing.AbstractAction;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
-import ca.neo.ui.models.proxies.PDecodedTermination;
-import ca.neo.ui.models.proxies.POrigin;
-import ca.neo.ui.views.objects.configurable.PropertySchema;
+import ca.neo.ui.models.wrappers.PDecodedTermination;
+import ca.neo.ui.models.wrappers.POrigin;
 import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
+import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
@@ -65,7 +65,7 @@ public abstract class PModelNode extends PModelConfigurable {
 	}
 
 	@Override
-	public PropertySchema[] getPropertiesSchema() {
+	public PropertyStructure[] getPropertiesSchema() {
 		// TODO Auto-generated method stub
 		return null;
 	}

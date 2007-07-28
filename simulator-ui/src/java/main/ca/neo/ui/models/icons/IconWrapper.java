@@ -113,7 +113,8 @@ public class IconWrapper extends WorldObjectImpl implements INamedObject,
 			if (parent.getName().compareTo("") == 0)
 				label.setText("unnamed " + parent.getTypeName());
 			else
-				label.setText(parent.getTypeName() + ": " + parent.getName());
+				label.setText(parent.getName() + " (" + parent.getTypeName()
+						+ ")");
 		} else {
 			if (parent.getName().compareTo("") == 0)
 				label.setText("unnamed");

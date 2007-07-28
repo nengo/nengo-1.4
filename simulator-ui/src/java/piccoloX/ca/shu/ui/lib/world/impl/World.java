@@ -16,6 +16,7 @@ import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
 import ca.shu.ui.lib.util.GridFactory;
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.IWorld;
 import ca.shu.ui.lib.world.IWorldLayer;
 import ca.shu.ui.lib.world.IWorldObject;
@@ -71,6 +72,12 @@ public class World extends WorldObjectImpl implements IWorld,
 		controlsHolder = new WorldObjectImpl();
 
 		layer = new PLayer();
+
+		if (root == null) {
+			Util
+					.Error("World can only be created when it is attached to a root");
+			return;
+		}
 		root.addChild(layer);
 
 		ground = new WorldGround(this);
@@ -92,7 +99,7 @@ public class World extends WorldObjectImpl implements IWorld,
 		skyCamera.addInputEventListener(new ScrollZoomHandler());
 		skyCamera.setPaint(Style.BACKGROUND_COLOR);
 		skyCamera.addChild(controlsHolder);
-		skyCamera.setViewOffset(50, 50);
+		setCameraPosition(0, 0);
 		setWorldScale(0.7f);
 		skyCamera.addLayer(layer);
 		setStatusBarHandler(new StatusBarHandler(this));
@@ -112,6 +119,22 @@ public class World extends WorldObjectImpl implements IWorld,
 				Style.DARK_BORDER_COLOR, 1500);
 
 		// System.out.println(this+"Finished Constructing MiniWorld");
+	}
+
+	protected void updateCameraPosition() {
+		double xOffset = (getWidth() / 2) / skyCamera.getViewScale();
+		double yOffset = (getHeight() / 2) / skyCamera.getViewScale();
+
+		skyCamera.setViewOffset(-cameraX + xOffset, -cameraY + yOffset);
+	}
+
+	double cameraX = 0;
+	double cameraY = 0;
+
+	public void setCameraPosition(double x, double y) {
+		this.cameraX = x;
+		this.cameraY = y;
+		updateCameraPosition();
 	}
 
 	public boolean containsNode(PNode node) {
@@ -190,7 +213,7 @@ public class World extends WorldObjectImpl implements IWorld,
 	public void propertyChange(PropertyChangeEvent arg0) {
 		getSky().setBounds(getBounds());
 		getGround().setBounds(getBounds());
-
+//		updateCameraPosition();
 	}
 
 	@Override

@@ -1,17 +1,19 @@
-package ca.neo.ui.views.objects.configurable;
+package ca.neo.ui.views.objects.configurable.struct;
 
 import java.io.Serializable;
 
 import javax.swing.JLabel;
 
+import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
+
 /**
  * Statically describes a property 
  */
-public abstract class PropertySchema implements Serializable {
+public abstract class PropertyStructure implements Serializable {
 
 	String name;
 
-	public PropertySchema(String name) {
+	public PropertyStructure(String name) {
 		super();
 		this.name = name;
 
@@ -29,7 +31,7 @@ public abstract class PropertySchema implements Serializable {
 	public abstract PropertyInputPanel createInputPanel();
 	
 
-	protected JLabel getLabel() {
+	public JLabel getLabel() {
 		JLabel label = new JLabel(getName() + " (" + getTypeName() + ")");
 		return label;
 	}

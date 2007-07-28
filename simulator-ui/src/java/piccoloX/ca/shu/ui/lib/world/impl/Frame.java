@@ -66,6 +66,10 @@ public class Frame extends JFrame {
 		return instance;
 	}
 
+	/**
+	 * 
+	 * @param instance Running instance of the frame
+	 */
 	public static void setInstance(Frame instance) {
 		Frame.instance = instance;
 	}

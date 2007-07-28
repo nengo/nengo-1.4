@@ -1,11 +1,13 @@
-package ca.neo.ui.views.objects.configurable;
+package ca.neo.ui.views.objects.configurable.struct;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class PTInt extends PropertySchema {
+import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
-	public PTInt(String name) {
+public class PTFloat extends PropertyStructure {
+
+	public PTFloat(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
@@ -13,27 +15,27 @@ public class PTInt extends PropertySchema {
 	@Override
 	public PropertyInputPanel createInputPanel() {
 		// TODO Auto-generated method stub
-		return new IntegerInputPanel(this);
+		return new FloatInputPanel(this);
 	}
 
 	@Override
 	public Class getTypeClass() {
 		// TODO Auto-generated method stub
-		return int.class;
+		return float.class;
 	}
 
 	@Override
 	public String getTypeName() {
 		// TODO Auto-generated method stub
-		return "Integer";
+		return "Float";
 	}
 
 }
 
-class IntegerInputPanel extends PropertyInputPanel {
+class FloatInputPanel extends PropertyInputPanel {
 	JTextField tf;
 
-	public IntegerInputPanel(PropertySchema property) {
+	public FloatInputPanel(PropertyStructure property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}
@@ -55,8 +57,8 @@ class IntegerInputPanel extends PropertyInputPanel {
 	@Override
 	public Object getValue() {
 
-		Integer integerValue = new Integer(tf.getText());
-		return integerValue.intValue();
+		Float floatValue = new Float(tf.getText());
+		return floatValue.floatValue();
 
 	}
 

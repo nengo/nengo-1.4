@@ -1,9 +1,11 @@
-package ca.neo.ui.views.objects.configurable;
+package ca.neo.ui.views.objects.configurable.struct;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-public class PTBoolean extends PropertySchema {
+import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
+
+public class PTBoolean extends PropertyStructure {
 
 	public PTBoolean(String name) {
 		super(name);
@@ -33,7 +35,7 @@ public class PTBoolean extends PropertySchema {
 class BooleanInputPanel extends PropertyInputPanel {
 	JCheckBox checkBox;
 
-	public BooleanInputPanel(PropertySchema property) {
+	public BooleanInputPanel(PropertyStructure property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}

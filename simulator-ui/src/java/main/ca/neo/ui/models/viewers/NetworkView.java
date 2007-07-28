@@ -1,4 +1,4 @@
-package ca.neo.ui.models.views;
+package ca.neo.ui.models.viewers;
 
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Constructor;
@@ -12,9 +12,9 @@ import ca.neo.model.StructuralException;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PModelNode;
 import ca.neo.ui.models.icons.IconWrapper;
-import ca.neo.ui.models.proxies.PFunctionInput;
-import ca.neo.ui.models.proxies.PNEFEnsemble;
-import ca.neo.ui.models.proxies.PNetwork;
+import ca.neo.ui.models.wrappers.PFunctionInput;
+import ca.neo.ui.models.wrappers.PNEFEnsemble;
+import ca.neo.ui.models.wrappers.PNetwork;
 import ca.shu.ui.lib.handlers.IContextMenu;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.objects.Window;
@@ -50,10 +50,16 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 	}
 
 	public void addNode(PModelNode nodeProxy) {
+		/**
+		 * Moves the camera to where the node is positioned
+		 */
+		setCameraPosition(nodeProxy.getOffset().getX(), nodeProxy.getOffset()
+				.getY());
+
 		try {
 			getModel().addNode(nodeProxy.getNode());
 
-			NetworkView.this.getGround().catchObject(nodeProxy);
+			getGround().catchObject(nodeProxy);
 
 		} catch (StructuralException e) {
 			Util.Warning(e.toString());
@@ -163,7 +169,6 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 
 				}
 			}).start();
-
 		}
 	}
 
