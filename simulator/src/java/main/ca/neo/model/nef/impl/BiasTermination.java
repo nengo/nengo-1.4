@@ -6,6 +6,7 @@ package ca.neo.model.nef.impl;
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.LinearSystem;
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
@@ -19,8 +20,8 @@ public class BiasTermination extends DecodedTermination {
 	private String myBaseName;
 	private float myStaticBias;
 	
-	public BiasTermination(String name, String baseName, LinearSystem dynamics, Integrator integrator, float[] biasEncoders, boolean interneurons) throws StructuralException {
-		super(name, new float[][]{new float[]{interneurons ? -1 : 1}}, dynamics, integrator);
+	public BiasTermination(Node node, String name, String baseName, LinearSystem dynamics, Integrator integrator, float[] biasEncoders, boolean interneurons) throws StructuralException {
+		super(node, name, new float[][]{new float[]{interneurons ? -1 : 1}}, dynamics, integrator);
 		myBiasEncoders = biasEncoders;
 		myBaseName = baseName;
 	}

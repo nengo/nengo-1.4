@@ -9,6 +9,7 @@ import ca.neo.dynamics.LinearSystem;
 import ca.neo.dynamics.impl.CanonicalModel;
 import ca.neo.dynamics.impl.LTISystem;
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.Probeable;
 import ca.neo.model.RealOutput;
 import ca.neo.model.Resettable;
@@ -51,6 +52,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 */
 	public static final String OUTPUT = "output";
 	
+	private Node myNode;
 	private String myName;
 	private float[][] myTransform;
 	private LinearSystem[] myDynamics;
@@ -64,6 +66,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private DecodedTermination myScalingTermination;
 	
 	/**
+	 * @param Node The parent Node
 	 * @param name The name of this Termination
 	 * @param transform A matrix that maps input (which has the dimension of this Termination)  
 	 * 		onto the state space represented by the NEFEnsemble to which the Termination belongs
@@ -73,7 +76,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 * @param integrator Numerical integrator with which to solve dynamics  
 	 * @throws StructuralException If dynamics are not SISO or given transform is not a matrix 
 	 */
-	public DecodedTermination(String name, float[][] transform, LinearSystem dynamics, Integrator integrator) 
+	public DecodedTermination(Node node, String name, float[][] transform, LinearSystem dynamics, Integrator integrator) 
 			throws StructuralException {
 		
 		if ( !MU.isMatrix(transform) ) {
@@ -84,6 +87,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			throw new StructuralException("Dynamics must be single-input single-output");
 		}
 		
+		myNode = node;
 		myName = name;
 		myTransform = transform;
 		myIntegrator = integrator;		
@@ -285,6 +289,13 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		Properties p = new Properties();
 		p.setProperty(OUTPUT, "Output of the termination, after static transform and dynamics");
 		return p;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 
 }

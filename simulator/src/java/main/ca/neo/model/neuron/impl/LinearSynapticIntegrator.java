@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
@@ -41,6 +42,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 
 	private static final long serialVersionUID = 1L;
 	
+	private Node myNode;  
 	private float myMaxTimeStep;
 	private Units myCurrentUnits;
 	private Map<String, LinearExponentialTermination> myTerminations;	
@@ -166,7 +168,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 			throw new StructuralException("This SynapticIntegrator already has a Termination named " + name);
 		}
 		
-		LinearExponentialTermination result = new LinearExponentialTermination(name, weights, tauPSC); 
+		LinearExponentialTermination result = new LinearExponentialTermination(myNode, name, weights, tauPSC); 
 		result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(modulatory));
 		myTerminations.put(name, result);
 		
@@ -199,6 +201,13 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	 */
 	public void setPlasticityInterval(float time) {
 		myPlasticityInterval = time;
+	}
+	
+	/**
+	 * @param node The parent node (Terminations need a reference to this)
+	 */
+	public void setNode(Node node) {
+		myNode = node;
 	}
 
 }

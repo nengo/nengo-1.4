@@ -68,7 +68,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 				return super.f(t, u);
 			}
 		};
-		return new BasicTermination(myEADynamics, new EulerIntegrator(.001f), SkeletalMuscle.EXCITATION_TERMINATION);
+		return new BasicTermination(this, myEADynamics, new EulerIntegrator(.001f), SkeletalMuscle.EXCITATION_TERMINATION);
 	}
 	
 	/**

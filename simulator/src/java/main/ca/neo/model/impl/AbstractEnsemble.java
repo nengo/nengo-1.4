@@ -72,7 +72,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		}
 		
 		myTerminations = new HashMap<String, Termination>(10);
-		Termination[] terminations = findTerminations(nodes);
+		Termination[] terminations = findTerminations(this, nodes);
 		for (int i = 0; i < terminations.length; i++) {
 			myTerminations.put(terminations[i].getName(), terminations[i]);
 		}		
@@ -335,10 +335,11 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	 * Finds existing one-dimensional Terminations by the same name on different nodes, and 
 	 * groups them into EnsembleTerminations. 
 	 * 
+	 * @param parent The ensemble to which new terminations will belong 
 	 * @param nodes Nodes on which to look for Terminations
 	 * @return Ensemble Terminations encompassing Node-level Terminations 
 	 */
-	private static Termination[] findTerminations(Node[] nodes) {
+	private static Termination[] findTerminations(Node parent, Node[] nodes) {
 		Map<String, List<Termination>> groups = new HashMap<String, List<Termination>>(10);
 		
 		for (int i = 0; i < nodes.length; i++) {
@@ -361,7 +362,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 			String name = it.next();
 			List<Termination> group = groups.get(name);
 			try {
-				result.add(new EnsembleTermination(name, group.toArray(new Termination[0])));
+				result.add(new EnsembleTermination(parent, name, group.toArray(new Termination[0])));
 			} catch (StructuralException e) {
 				throw new Error("Composite Termination should consist only of 1D Terminations, but apparently does not", e);
 			}

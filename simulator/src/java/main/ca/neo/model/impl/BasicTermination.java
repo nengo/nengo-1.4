@@ -6,6 +6,7 @@ package ca.neo.model.impl;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SpikeOutput;
@@ -27,6 +28,7 @@ public class BasicTermination implements Termination {
 
 	private static final long serialVersionUID = 1L;
 	
+	private Node myNode;
 	private DynamicalSystem myDynamics;
 	private Integrator myIntegrator;
 	private String myName;
@@ -34,7 +36,8 @@ public class BasicTermination implements Termination {
 	private InstantaneousOutput myInput;
 	public TimeSeries myOutput;
 	
-	public BasicTermination(DynamicalSystem dynamics, Integrator integrator, String name) {
+	public BasicTermination(Node node, DynamicalSystem dynamics, Integrator integrator, String name) {
+		myNode = node;
 		myDynamics = dynamics;
 		myIntegrator = integrator;
 		myName = name;
@@ -108,6 +111,13 @@ public class BasicTermination implements Termination {
 	 */
 	public void propertyChange(String propertyName, Object newValue) throws StructuralException {
 		//TODO: new dynamics on TAU_PSC property change? 
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 
 }

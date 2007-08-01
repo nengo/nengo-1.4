@@ -43,7 +43,7 @@ public class PassthroughNode implements Node {
 
 	public PassthroughNode(String name, int dimension) {
 		myName = name;
-		myTermination = new PassthroughTermination(dimension);
+		myTermination = new PassthroughTermination(this, dimension);
 		myOrigin = new BasicOrigin(this, ORIGIN, dimension, Units.UNK);
 		reset(false);
 	}
@@ -130,11 +130,13 @@ public class PassthroughNode implements Node {
 		
 		private static final long serialVersionUID = 1L;
 		
+		private Node myNode;
 		private int myDimension;
 		private Configuration myConfiguration;
 		private InstantaneousOutput myValues;
 		
-		public PassthroughTermination(int dimension) {
+		public PassthroughTermination(Node node, int dimension) {
+			myNode = node;
 			myDimension = dimension;
 			myConfiguration = new ConfigurationImpl(this);
 		}
@@ -160,6 +162,10 @@ public class PassthroughNode implements Node {
 		}
 
 		public void propertyChange(String propertyName, Object newValue) throws StructuralException {
+		}
+
+		public Node getNode() {
+			return myNode;
 		}
 		
 	}

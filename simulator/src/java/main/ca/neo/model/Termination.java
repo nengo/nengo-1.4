@@ -85,4 +85,9 @@ public interface Termination extends Configurable, Serializable {
 	 */
 	public void setValues(InstantaneousOutput values) throws SimulationException;
 	
+	/**
+	 * @return The Node to which this Termination belongs 
+	 */
+	public Node getNode();
+	
 }

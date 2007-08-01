@@ -1,6 +1,7 @@
 package ca.neo.model.impl;
 
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.RealOutput;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
@@ -26,6 +27,7 @@ public class LinearExponentialTermination implements Termination, Resettable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private Node myNode;
 	private String myName;
 	private float[] myWeights;
 	private float myTauPSC;
@@ -38,12 +40,14 @@ public class LinearExponentialTermination implements Termination, Resettable {
 	private ConfigurationImpl myConfiguration;
 	
 	/**
+	 * @param node The parent Node
 	 * @param name Name of the Termination (must be unique within the Neuron or Ensemble to 
 	 * 		which it is attached)
 	 * @param weights Ordered list of synaptic weights of each input channel 
 	 * @param tauPSC Time constant of exponential post-synaptic current decay  
 	 */
-	public LinearExponentialTermination(String name, float[] weights, float tauPSC) {
+	public LinearExponentialTermination(Node node, String name, float[] weights, float tauPSC) {
+		myNode = node;
 		myName = name;
 		myWeights = weights;
 		myTauPSC = tauPSC;
@@ -200,6 +204,13 @@ public class LinearExponentialTermination implements Termination, Resettable {
 		}			
 		
 		return result;		
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 
 }

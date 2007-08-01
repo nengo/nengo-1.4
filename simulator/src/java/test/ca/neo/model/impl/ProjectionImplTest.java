@@ -110,6 +110,10 @@ public class ProjectionImplTest extends TestCase {
 		public void propertyChange(String propertyName, Object newValue) {
 			throw new NotImplementedException("not implemented");
 		}
+
+		public Node getNode() {
+			return null;
+		}
 		
 	}
 

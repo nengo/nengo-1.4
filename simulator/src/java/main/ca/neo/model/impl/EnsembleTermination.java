@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
@@ -34,18 +35,21 @@ public class EnsembleTermination implements Termination {
 
 	private static final long serialVersionUID = 1L;
 	
+	private Node myNode;
 	private String myName;
 	private Termination[] myNodeTerminations;
 	private ConfigurationImpl myConfiguration;
 	
 	/**
+	 * @param node The parent Node
 	 * @param name Name of this Termination
 	 * @param nodeTerminations Node-level Terminations that make up this Termination
 	 * @throws StructuralException If dimensions of different terminations are not all the same
 	 */
-	public EnsembleTermination(String name, Termination[] nodeTerminations) throws StructuralException {
+	public EnsembleTermination(Node node, String name, Termination[] nodeTerminations) throws StructuralException {
 		checkSameDimension(nodeTerminations, name);
 		
+		myNode = node;
 		myName = name;
 		myNodeTerminations = nodeTerminations;
 		
@@ -168,6 +172,13 @@ public class EnsembleTermination implements Termination {
 				throw new StructuralException(e);
 			}
 		}
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 
 }

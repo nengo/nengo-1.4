@@ -288,7 +288,7 @@ public class NetworkImpl implements Network {
 	 * @see ca.neo.model.Network#exposeTermination(ca.neo.model.Termination, java.lang.String)
 	 */
 	public void exposeTermination(Termination termination, String name) {
-		myExposedTerminations.put(name, new TerminationWrapper(termination, name));
+		myExposedTerminations.put(name, new TerminationWrapper(this, termination, name));
 	}
 
 	/**
@@ -377,10 +377,12 @@ public class NetworkImpl implements Network {
 
 		private static final long serialVersionUID = 1L;
 		
+		private Node myNode;
 		private Termination myWrapped;
 		private String myName;
 		
-		public TerminationWrapper(Termination wrapped, String name) {
+		public TerminationWrapper(Node node, Termination wrapped, String name) {
+			myNode = node;
 			myWrapped = wrapped;
 			myName = name;
 		}
@@ -403,6 +405,10 @@ public class NetworkImpl implements Network {
 
 		public void propertyChange(String propertyName, Object newValue) throws StructuralException {
 			myWrapped.propertyChange(propertyName, newValue);
+		}
+
+		public Node getNode() {
+			return myNode;
 		}
 		
 	}

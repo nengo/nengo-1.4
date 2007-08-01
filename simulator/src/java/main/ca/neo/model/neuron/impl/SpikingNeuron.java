@@ -61,6 +61,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	 */
 	public SpikingNeuron(SynapticIntegrator integrator, SpikeGenerator generator, float scale, float bias, String name) {
 		myIntegrator = integrator;
+		myIntegrator.setNode(this);
 		myGenerator = generator;
 		mySpikeOrigin = new SpikeGeneratorOrigin(this, generator);
 		myCurrentOrigin = new BasicOrigin(this, CURRENT, 1, Units.ACU);

@@ -219,7 +219,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		EulerIntegrator integrator = new EulerIntegrator(tauPSC / 10f);
 		
-		DecodedTermination result = new DecodedTermination(name, matrix, dynamics, integrator);
+		DecodedTermination result = new DecodedTermination(this, name, matrix, dynamics, integrator);
 		if (isModulatory) {
 			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
 		} else if (matrix.length != myDimension) {
@@ -247,7 +247,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		EulerIntegrator integrator = new EulerIntegrator(1f / (10f * (float) fastest));
 		
-		DecodedTermination result = new DecodedTermination(name, matrix, dynamics, integrator);
+		DecodedTermination result = new DecodedTermination(this, name, matrix, dynamics, integrator);
 		if (isModulatory) {
 			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
 		} else if (matrix.length != myDimension) {
@@ -284,8 +284,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		String biasName = baseTermination.getName()+BIAS_SUFFIX;
 		String interName = baseTermination.getName()+INTERNEURON_SUFFIX;
-		BiasTermination biasTermination = new BiasTermination(biasName, baseTermination.getName(), baseTermination.getDynamics(), integrator, biasEncoders, false);
-		BiasTermination interneuronTermination = new BiasTermination(interName, baseTermination.getName(), interneuronDynamics, integrator, biasEncoders, true);
+		BiasTermination biasTermination = new BiasTermination(this, biasName, baseTermination.getName(), baseTermination.getDynamics(), integrator, biasEncoders, false);
+		BiasTermination interneuronTermination = new BiasTermination(this, interName, baseTermination.getName(), interneuronDynamics, integrator, biasEncoders, true);
 		
 		Boolean modulatory = (Boolean) baseTermination.getConfiguration().getProperty(Termination.MODULATORY);
 		biasTermination.getConfiguration().setProperty(Termination.MODULATORY, modulatory);

@@ -31,7 +31,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 	 */
 	public void testGetName() {
 		String name = "test";
-		LinearExponentialTermination let = new LinearExponentialTermination(name, new float[0], 0f);
+		LinearExponentialTermination let = new LinearExponentialTermination(null, name, new float[0], 0f);
 		assertEquals(name, let.getName());
 	}
 
@@ -39,9 +39,9 @@ public class LinearExponentialTerminationTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.LinearExponentialTermination.getDimensions()'
 	 */
 	public void testGetDimensions() {
-		LinearExponentialTermination let = new LinearExponentialTermination("test", new float[1], 0f);
+		LinearExponentialTermination let = new LinearExponentialTermination(null, "test", new float[1], 0f);
 		assertEquals(1, let.getDimensions());
-		let = new LinearExponentialTermination("test", new float[2], 0f);
+		let = new LinearExponentialTermination(null, "test", new float[2], 0f);
 		assertEquals(2, let.getDimensions());
 	}
 
@@ -49,7 +49,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.LinearExponentialTermination.getProperty(String)'
 	 */
 	public void testGetProperty() throws StructuralException {
-		LinearExponentialTermination let = new LinearExponentialTermination("test", new float[1], 1.5f);
+		LinearExponentialTermination let = new LinearExponentialTermination(null, "test", new float[1], 1.5f);
 		
 		assertEquals(3, let.getConfiguration().listPropertyNames().length);
 		assertEquals(Termination.TAU_PSC, let.getConfiguration().listPropertyNames()[0]);
@@ -76,7 +76,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.LinearExponentialTermination.reset(boolean)'
 	 */
 	public void testReset() throws SimulationException {
-		LinearExponentialTermination let = new LinearExponentialTermination("test", new float[]{2f}, 1f);
+		LinearExponentialTermination let = new LinearExponentialTermination(null, "test", new float[]{2f}, 1f);
 		let.setValues(new RealOutputImpl(new float[]{1f}, Units.ACU, 0));
 		
 		float current = let.updateCurrent(false, 1f, 0f);
@@ -92,7 +92,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.LinearExponentialTermination.setValues(InstantaneousOutput)'
 	 */
 	public void testSetValues() throws SimulationException {
-		LinearExponentialTermination let = new LinearExponentialTermination("test", new float[]{1f, 2f, 3f}, 1f);
+		LinearExponentialTermination let = new LinearExponentialTermination(null, "test", new float[]{1f, 2f, 3f}, 1f);
 		
 		try {
 			let.setValues(new SpikeOutputImpl(new boolean[]{true}, Units.SPIKES, 0));
@@ -116,7 +116,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 	public void testUpdateCurrent() throws SimulationException {
 		float tol = .0001f;
 		float tauPSC = .01f;
-		LinearExponentialTermination let = new LinearExponentialTermination("test", new float[]{1f}, tauPSC);		
+		LinearExponentialTermination let = new LinearExponentialTermination(null, "test", new float[]{1f}, tauPSC);		
 		assertClose(0, let.updateCurrent(false, 0, 0), tol);
 		
 		let.setValues(new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES, 0));

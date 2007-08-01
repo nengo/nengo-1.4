@@ -5,6 +5,7 @@ package ca.neo.model.neuron;
 
 import java.io.Serializable;
 
+import ca.neo.model.Node;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
@@ -33,6 +34,14 @@ public interface SynapticIntegrator extends Resettable, Serializable {
 	 * @throws StructuralException if the named Termination does not exist
 	 */
 	public Termination getTermination(String name) throws StructuralException;	
+	
+	/**
+	 * This method should be called by the neuron that incorporates this SynapticIntegrator
+	 * (Terminations need a reference to this). 
+ 	 * 
+	 * @param node The node to which the SynapticIntegrator belongs
+	 */
+	public void setNode(Node node); 
 	
 	/**
 	 * <p>Runs the model for a given time interval. Input to each Termination
