@@ -6,7 +6,10 @@ package ca.neo.model.neuron.impl;
 import java.util.Properties;
 
 import ca.neo.math.Function;
+import ca.neo.math.RootFinder;
+import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.IndicatorPDF;
+import ca.neo.math.impl.NewtonRootFinder;
 import ca.neo.math.impl.PiecewiseConstantFunction;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
@@ -138,6 +141,37 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myVHistory = new float[]{myV};
 		
 		return result;
+	}
+	
+	/**
+	 * @param I driving current
+	 * @return Unadapted firing rate given this current
+	 */
+	public float getOnsetRate(float I) {
+		return I > 1 ? 1f / ( myTauRef - myTauRC * ((float) Math.log(1f - 1f/I)) ) : 0;
+	}
+	
+	/**
+	 * @param I driving current
+	 * @return Adapted firing rate given this current
+	 */
+	public float getAdaptedRate(final float I) {
+		if (I > 1) {
+			RootFinder rf = new NewtonRootFinder(50, false);
+			
+			Function f = new AbstractFunction(1) {
+				private static final long serialVersionUID = 1L;
+				public float map(float[] from) {
+					float r = from[0];
+					return r - 1 / (myTauRef - myTauRC * (float) Math.log(1f - 1f/(I-G_N*myIncN*myTauN*r)));
+				}
+			};
+			
+			float max = (I-1) / (G_N * myIncN * myTauN); //will be NaN if current < 1
+			return rf.findRoot(f, 0, max, 0.1f);
+		} else {
+			return 0;
+		}
 	}
 	
 	/**

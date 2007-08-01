@@ -6,6 +6,7 @@ package ca.neo.model.impl;
 import org.apache.commons.lang.NotImplementedException;
 
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.Projection;
 import ca.neo.model.SimulationException;
@@ -70,6 +71,10 @@ public class ProjectionImplTest extends TestCase {
 
 		public InstantaneousOutput getValues() {
 			throw new NotImplementedException("not implemented");
+		}
+
+		public Node getNode() {
+			return null;
 		}
 		
 	}

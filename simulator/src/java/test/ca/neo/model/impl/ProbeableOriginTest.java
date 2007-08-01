@@ -24,7 +24,7 @@ public class ProbeableOriginTest extends TestCase {
 	 */
 	public void testGetName() throws StructuralException {
 		String name = "test";
-		ProbeableOrigin origin = new ProbeableOrigin(new MockProbeable(new float[0]), "x", 0, name);
+		ProbeableOrigin origin = new ProbeableOrigin(null, new MockProbeable(new float[0]), "x", 0, name);
 		assertEquals(name, origin.getName());
 	}
 
@@ -32,7 +32,7 @@ public class ProbeableOriginTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.ProbeableOrigin.getDimensions()'
 	 */
 	public void testGetDimensions() throws StructuralException {
-		ProbeableOrigin origin = new ProbeableOrigin(new MockProbeable(new float[0]), "x", 0, "test");
+		ProbeableOrigin origin = new ProbeableOrigin(null, new MockProbeable(new float[0]), "x", 0, "test");
 		assertEquals(1, origin.getDimensions());
 	}
 
@@ -50,7 +50,7 @@ public class ProbeableOriginTest extends TestCase {
 		
 		//test that last TimeSeries value is returned, etc.
 		MockProbeable p = new MockProbeable(new float[]{-1f, 1f});
-		ProbeableOrigin origin = new ProbeableOrigin(p, "x", 0, "test");
+		ProbeableOrigin origin = new ProbeableOrigin(null, p, "x", 0, "test");
 		
 		assertEquals(Units.UNK, origin.getValues().getUnits());
 		assertTrue(origin.getValues() instanceof RealOutput);
@@ -60,7 +60,7 @@ public class ProbeableOriginTest extends TestCase {
 	
 	public void testConstructor() {
 		try {
-			new ProbeableOrigin(new MockProbeable(new float[0]), "y", 0, "test");
+			new ProbeableOrigin(null, new MockProbeable(new float[0]), "y", 0, "test");
 			fail("Should have thrown exception because state y doesn't exist");
 		} catch (StructuralException e) {} //exception is expected
 	}

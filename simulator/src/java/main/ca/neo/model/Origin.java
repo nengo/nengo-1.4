@@ -43,4 +43,9 @@ public interface Origin extends Serializable {
 	 */
 	public InstantaneousOutput getValues() throws SimulationException;
 	
+	/**
+	 * @return The Node to which the Origin belongs
+	 */
+	public Node getNode();
+	
 }

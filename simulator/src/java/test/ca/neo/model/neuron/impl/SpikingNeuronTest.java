@@ -65,7 +65,7 @@ public class SpikingNeuronTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.getOrigins()'
 	 */
 	public void testGetOrigins() {
-		assertEquals(1, myNeuron.getOrigins().length);
+		assertEquals(2, myNeuron.getOrigins().length);
 		assertTrue(myNeuron.getOrigins()[0] instanceof SpikeGeneratorOrigin);
 	}
 

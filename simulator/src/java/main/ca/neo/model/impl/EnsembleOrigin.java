@@ -4,6 +4,7 @@
 package ca.neo.model.impl;
 
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
@@ -23,16 +24,19 @@ public class EnsembleOrigin implements Origin {
 
 	private static final long serialVersionUID = 1L;
 	
+	private Node myNode;
 	private Origin[] myNodeOrigins;
 	private String myName;
 	
 	/**
+	 * @param node The parent Node
 	 * @param name Name of this Origin 
 	 * @param nodeOrigins Origins on individual Nodes that are combined to make this 
 	 * 		Origin. Each of these is expected to have dimension 1, but this is not enforced. 
 	 * 		Other dimensions are ignored. 
 	 */
-	public EnsembleOrigin(String name, Origin[] nodeOrigins) {
+	public EnsembleOrigin(Node node, String name, Origin[] nodeOrigins) {
+		myNode = node;
 		myNodeOrigins = nodeOrigins;
 		myName = name;
 	}
@@ -107,6 +111,13 @@ public class EnsembleOrigin implements Origin {
 		}
 		
 		return new SpikeOutputImpl(values, units, origins[0].getValues().getTime());
+	}
+
+	/**
+	 * @see ca.neo.model.Origin#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 
 }

@@ -76,7 +76,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 		float[][] valuesT = MU.transpose(values);
 		
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, valuesT);
-		DecodedOrigin result = new DecodedOrigin(name, getNodes(), nodeOrigin, functions, approximator);
+		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, approximator);
 
 		addDecodedOrigin(name, result);
 		return result;
@@ -115,7 +115,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 		}
 		
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, values);
-		DecodedOrigin result = new DecodedOrigin(name, getNodes(), nodeOrigin, functions, approximator);
+		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, approximator);
 		addDecodedOrigin(name, result);
 		return result;		
 	}

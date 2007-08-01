@@ -57,7 +57,7 @@ public class FunctionInput implements Node, Probeable {
 			myUnits[i] = units;
 		}
 		
-		myOrigin = new BasicOrigin(FunctionInput.ORIGIN_NAME, functions.length, units);
+		myOrigin = new BasicOrigin(this, FunctionInput.ORIGIN_NAME, functions.length, units);
 		
 		run(0f, 0f); //set initial state to f(0)
 	}

@@ -257,7 +257,7 @@ public class NetworkImpl implements Network {
 	 * @see ca.neo.model.Network#exposeOrigin(ca.neo.model.Origin, java.lang.String)
 	 */
 	public void exposeOrigin(Origin origin, String name) {
-		myExposedOrigins.put(name, new OriginWrapper(origin, name));
+		myExposedOrigins.put(name, new OriginWrapper(this, origin, name));
 	}
 
 	/**
@@ -340,10 +340,12 @@ public class NetworkImpl implements Network {
 		
 		private static final long serialVersionUID = 1L;
 		
+		private Node myNode;
 		private Origin myWrapped;
 		private String myName;
 		
-		public OriginWrapper(Origin wrapped, String name) {
+		public OriginWrapper(Node node, Origin wrapped, String name) {
+			myNode = node;
 			myWrapped = wrapped;
 			myName = name;
 		}
@@ -358,6 +360,10 @@ public class NetworkImpl implements Network {
 
 		public InstantaneousOutput getValues() throws SimulationException {
 			return myWrapped.getValues();
+		}
+
+		public Node getNode() {
+			return myNode;
 		}
 		
 	}

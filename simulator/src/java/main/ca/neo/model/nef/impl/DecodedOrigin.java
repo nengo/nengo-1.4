@@ -31,6 +31,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 
 	private static final long serialVersionUID = 1L;
 	
+	private Node myNode; //parent node
 	private String myName;
 	private Node[] myNodes;
 	private String myNodeOrigin;
@@ -43,6 +44,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	/**
 	 * With this constructor, decoding vectors are generated using default settings. 
 	 *  
+	 * @param Node The parent Node
 	 * @param name Name of this Origin
 	 * @param nodes Nodes that belong to the NEFEnsemble from which this Origin arises
 	 * @param nodeOrigin Name of the Origin on each given node from which output is to be decoded  
@@ -54,11 +56,12 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 * @throws StructuralException if functions do not all have the same input dimension (we 
 	 * 		don't check against the state dimension at this point)
 	 */
-	public DecodedOrigin(String name, Node[] nodes, String nodeOrigin, Function[] functions, LinearApproximator approximator) 
+	public DecodedOrigin(Node node, String name, Node[] nodes, String nodeOrigin, Function[] functions, LinearApproximator approximator) 
 			throws StructuralException {
 		
 		checkFunctionDimensions(functions);
 		
+		myNode = node;
 		myName = name;
 		myNodes = nodes;
 		myNodeOrigin = nodeOrigin;
@@ -72,6 +75,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	/**
 	 * With this constructor decoding vectors are specified by the caller. 
 	 * 
+	 * @param Node The parent Node
 	 * @param name As in other constructor
 	 * @param nodes As in other constructor
 	 * @param nodeOrigin Name of the Origin on each given node from which output is to be decoded  
@@ -87,7 +91,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 * 		(ie all elements with same length), or if the number of columns in decoders is not equal 
 	 * 		to the number of functions 
 	 */
-	public DecodedOrigin(String name, Node[] nodes, String nodeOrigin, Function[] functions, float[][] decoders) throws StructuralException {
+	public DecodedOrigin(Node node, String name, Node[] nodes, String nodeOrigin, Function[] functions, float[][] decoders) throws StructuralException {
 		checkFunctionDimensions(functions);
 		
 		if (!MU.isMatrix(decoders)) {
@@ -102,6 +106,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 			throw new StructuralException("Number of decoding vectors and Neurons must be the same");
 		}
 			
+		myNode = node;
 		myName = name;
 		myNodes = nodes;
 		myNodeOrigin = nodeOrigin;
@@ -269,6 +274,13 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 */
 	protected String getNodeOrigin() {
 		return myNodeOrigin;
+	}
+
+	/**
+	 * @see ca.neo.model.Origin#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 
 }

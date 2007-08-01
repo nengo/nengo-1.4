@@ -1,6 +1,7 @@
 package ca.neo.model.impl;
 
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
@@ -49,6 +50,7 @@ public class ProbeableOrigin implements Origin {
 
 	private static final long serialVersionUID = 1L;
 	
+	private Node myNode;
 	private Probeable myProbeable;
 	private String myStateVariable;
 	private int myDimension;
@@ -56,6 +58,7 @@ public class ProbeableOrigin implements Origin {
 	private Units myUnits;
 	
 	/**
+	 * @param node The parent node
 	 * @param probeable The Probeable from which to obtain state variables to output
 	 * @param state State variable to output 
 	 * @param dimension Index of the dimension of the specified state variable that is to be output
@@ -63,7 +66,8 @@ public class ProbeableOrigin implements Origin {
 	 * @throws StructuralException if there is a problem running an initial Probeable.getHistory() to 
 	 * 		ascertain the units.  
 	 */
-	public ProbeableOrigin(Probeable probeable, String state, int dimension, String name) throws StructuralException {
+	public ProbeableOrigin(Node node, Probeable probeable, String state, int dimension, String name) throws StructuralException {
+		myNode = node;
 		myProbeable = probeable;
 		myStateVariable = state;
 		myDimension = dimension;
@@ -106,6 +110,13 @@ public class ProbeableOrigin implements Origin {
 		}
 
 		return new RealOutputImpl(new float[]{result}, myUnits, times[times.length-1]);
+	}
+
+	/**
+	 * @see ca.neo.model.Origin#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 	
 }

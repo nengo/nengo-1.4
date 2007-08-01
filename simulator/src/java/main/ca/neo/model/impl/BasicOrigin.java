@@ -4,6 +4,7 @@
 package ca.neo.model.impl;
 
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.Noise;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
@@ -19,6 +20,7 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 
 	private static final long serialVersionUID = 1L;
 
+	private Node myNode;
 	private String myName;
 	private int myDimension;
 	private Units myUnits;
@@ -26,10 +28,12 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	private Noise myNoise;
 
 	/**
+	 * @param node The parent Node
 	 * @param dimension Dimension of output of this Origin
 	 * @param units The output units  
 	 */
-	public BasicOrigin(String name, int dimension, Units units) {
+	public BasicOrigin(Node node, String name, int dimension, Units units) {
+		myNode = node; 
 		myName = name;
 		myDimension = dimension;
 		myUnits = units;
@@ -104,6 +108,13 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	 */
 	public void setNoise(Noise noise) {
 		myNoise = noise;
+	}
+
+	/**
+	 * @see ca.neo.model.Origin#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 	
 }

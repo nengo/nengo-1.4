@@ -66,7 +66,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 //		setupNodeRunners(2);
 		
 		myOrigins = new HashMap<String, Origin>(10);
-		Origin[] origins = findOrigins(nodes);
+		Origin[] origins = findOrigins(this, nodes);
 		for (int i = 0; i < origins.length; i++) {
 			myOrigins.put(origins[i].getName(), origins[i]);
 		}
@@ -303,7 +303,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	 * @param nodes Nodes on which to look for Origins
 	 * @return Ensemble Origins encompassing Node-level Origins
 	 */
-	private static Origin[] findOrigins(Node[] nodes) {
+	private static Origin[] findOrigins(Node parent, Node[] nodes) {
 		Map<String, List<Origin>> groups = new HashMap<String, List<Origin>>(10);
 		
 		for (int i = 0; i < nodes.length; i++) {
@@ -325,7 +325,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		while (it.hasNext()) {
 			String name = it.next();
 			List<Origin> group = groups.get(name);
-			result.add(new EnsembleOrigin(name, (Origin[]) group.toArray(new Origin[0])));
+			result.add(new EnsembleOrigin(parent, name, (Origin[]) group.toArray(new Origin[0])));
 		}
 		
 		return result.toArray(new Origin[0]);

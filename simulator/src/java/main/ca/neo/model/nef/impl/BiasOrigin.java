@@ -42,8 +42,8 @@ public class BiasOrigin extends DecodedOrigin {
 	
 	private NEFEnsemble myInterneurons;
 	
-	public BiasOrigin(String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
-		super(name, nodes, nodeOrigin, new Function[]{new ConstantFunction(0, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));
+	public BiasOrigin(Node node, String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
+		super(node, name, nodes, nodeOrigin, new Function[]{new ConstantFunction(0, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));
 		//note above ConstantFunction has dimension 0, but the input dimension isn't checked
 		
 		myInterneurons = createInterneurons(name + "_interneurons", numInterneurons, excitatory);

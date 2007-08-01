@@ -29,7 +29,7 @@ public class SpikeGeneratorOriginTest extends TestCase {
 		super.setUp();
 		
 		myGenerator = new MockSpikeGenerator();
-		myOrigin = new SpikeGeneratorOrigin(myGenerator);
+		myOrigin = new SpikeGeneratorOrigin(null, myGenerator);
 	}
 
 	/*

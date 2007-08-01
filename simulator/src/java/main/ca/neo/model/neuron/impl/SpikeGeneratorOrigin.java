@@ -4,6 +4,7 @@
 package ca.neo.model.neuron.impl;
 
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.Units;
@@ -22,13 +23,16 @@ public class SpikeGeneratorOrigin implements Origin {
 
 	private static final long serialVersionUID = 1L;
 	
+	private Node myNode;
 	private SpikeGenerator myGenerator;
 	private InstantaneousOutput myOutput;
 	
 	/**
+	 * @param node The parent Node
 	 * @param generator The SpikeGenerator from which this Origin is to obtain output.  
 	 */
-	public SpikeGeneratorOrigin(SpikeGenerator generator) {
+	public SpikeGeneratorOrigin(Node node, SpikeGenerator generator) {
+		myNode = node;
 		myGenerator = generator;
 		myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES, 0);
 	}
@@ -70,6 +74,13 @@ public class SpikeGeneratorOrigin implements Origin {
 	 */
 	public InstantaneousOutput getValues() {
 		return myOutput;
+	}
+
+	/**
+	 * @see ca.neo.model.Origin#getNode()
+	 */
+	public Node getNode() {
+		return myNode;
 	}
 
 }
