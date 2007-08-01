@@ -7,14 +7,15 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.text.SimpleAttributeSet;
 
-import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.style.Style;
+import ca.neo.ui.views.objects.configurable.ConfigUtil;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.UIConfigManager;
 import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
 import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.widgets.TrackedTask;
+import ca.shu.ui.lib.util.GraphicsEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PText;
@@ -24,6 +25,14 @@ public abstract class PModelConfigurable extends PModel implements
 	public PModelConfigurable() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+	
+	public boolean isConfigured() {
+		if (getModel() != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private JDialog dialog;
@@ -44,7 +53,7 @@ public abstract class PModelConfigurable extends PModel implements
 	 * @return The default configuration manager
 	 */
 	protected IConfigurationManager getDefaultConfigManager() {
-		return new UIConfigManager(NeoGraphics.getInstance());
+		return new UIConfigManager(GraphicsEnvironment.getInstance());
 	}
 
 	/**
@@ -72,18 +81,18 @@ public abstract class PModelConfigurable extends PModel implements
 
 		// configureModel();
 
-		/*
-		 * Wait to see if the model has been created
-		 */
-		if (model == null && !configCancelled) {
-			synchronized (modelConfigurationLock) {
-				try {
-					modelConfigurationLock.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+//		/*
+//		 * Wait to see if the model has been created
+//		 */
+//		if (model == null && !configCancelled) {
+//			synchronized (modelConfigurationLock) {
+//				try {
+//					modelConfigurationLock.wait();
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
 
 		// if (model == null) {
 		// Util.Error("Error creating model");
@@ -136,27 +145,22 @@ public abstract class PModelConfigurable extends PModel implements
 		return new NodeTooltip(this);
 	}
 
-	public void loadPropertiesFromFile(String fileName) {
-		SimpleAttributeSet loadedProperties = (SimpleAttributeSet) Util
-				.loadProperty(this, fileName);
-
-		if (loadedProperties != null) {
-			properties = loadedProperties;
-		} else {
-			Util.Error("Could not load file: " + fileName);
-		}
-	}
+//	public void loadPropertiesFromFile(String fileName) {
+//		SimpleAttributeSet loadedProperties = (SimpleAttributeSet) Util
+//				.loadProperty(this, fileName);
+//
+//		if (loadedProperties != null) {
+//			properties = loadedProperties;
+//		} else {
+//			Util.Error("Could not load file: " + fileName);
+//		}
+//	}
 
 	// public String[] getPropertyFiles() {
 	//		
 	// }
 
-	public void savePropertiesToFile(String fileName) {
-		Util.saveProperty(this, properties, fileName);
-
-		// saveStatic(properties, fileName);
-	}
-
+	
 	public void deletePropretiesFile(String fileName) {
 		Util.deleteProperty(this, fileName);
 	}
@@ -226,8 +230,17 @@ public abstract class PModelConfigurable extends PModel implements
 				+ getTypeName() + ")");
 
 		setModel(createModel());
+		afterModelCreated();
 		task.finished();
 	}
+	
+	/**
+	 * This function is called after the model has been created
+	 * Some parts of the UI may be constructed here
+	 */
+	 protected void afterModelCreated() {
+		 
+	 }
 
 	// @Override
 	// public PopupMenuBuilder constructMenu() {
@@ -252,14 +265,18 @@ public abstract class PModelConfigurable extends PModel implements
 		public void actionPerformed(ActionEvent arg0) {
 			String name = JOptionPane.showInputDialog("Name:");
 
-			savePropertiesToFile(name);
+			ConfigUtil.savePropertiesToFile(PModelConfigurable.this,name);
 		}
 
 	}
 
-	public String[] getPropertyFiles() {
-		// TODO Auto-generated method stub
-		return Util.getPropertyFiles(this);
+	
+	public SimpleAttributeSet getPropertiesReference() {
+		return properties;
+	}
+
+	public void setProperties(SimpleAttributeSet properties) {
+		this.properties = properties;
 	}
 
 }
@@ -283,7 +300,7 @@ class NodeTooltip extends WorldObjectImpl {
 
 	public void init() {
 		PText tag = new PText(proxyNode.getIcon().getName());
-		tag.setTextPaint(Style.FOREGROUND_COLOR);
+		tag.setTextPaint(Style.COLOR_FOREGROUND);
 		tag.setFont(Style.FONT_LARGE);
 
 		// this.setDraggable(false);

@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.world.impl;
 
-import ca.shu.ui.lib.world.IWorld;
+import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.PCanvas;
 
 public class Canvas extends PCanvas {
@@ -9,22 +9,22 @@ public class Canvas extends PCanvas {
 
 	static final double CLICK_ZOOM_PADDING = 100;
 
-	World world;
+	WorldImpl world;
 
-	public Canvas(Frame frame) {
+	public Canvas(GFrame frame) {
 		super();
 
 		setZoomEventHandler(null);
 		setPanEventHandler(null);
 
-		world = new World("Top Layer", getRoot());
+		world = new WorldImpl("Top Layer", getRoot());
 		
 		getLayer().addChild(world);
 		world.setBounds(0,0,500,500);
 //		getLayer().addChild((MiniWorld) world);
 	}
 
-	public World getWorld() {
+	public WorldImpl getWorld() {
 		return world;
 	}
 

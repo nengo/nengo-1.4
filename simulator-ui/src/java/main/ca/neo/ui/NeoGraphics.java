@@ -4,19 +4,16 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenuBar;
-import javax.swing.SwingUtilities;
 
-import ca.neo.ui.models.viewers.NetworkView;
-import ca.neo.ui.models.wrappers.PNEFEnsemble;
 import ca.neo.ui.models.wrappers.PNetwork;
-import ca.neo.ui.views.objects.configurable.managers.SavedFileConfigManager;
 import ca.neo.ui.widgets.Toolbox;
+import ca.neo.util.Environment;
+import ca.shu.ui.lib.util.GraphicsEnvironment;
 import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.world.IWorldObject;
-import ca.shu.ui.lib.world.impl.Frame;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.impl.GFrame;
 
-public class NeoGraphics extends Frame {
+public class NeoGraphics extends GFrame {
 
 	public NeoGraphics(String title) {
 		super(title);
@@ -24,18 +21,18 @@ public class NeoGraphics extends Frame {
 		/*
 		 * Only one instance of NeoWorld may be running at once
 		 */
-		Frame.setInstance(this);
+		GraphicsEnvironment.setInstance(this);
+
+		Environment.setUserInterface(true);
 
 	}
 
 	private static final long serialVersionUID = 1L;
 
-	public static NeoGraphics getInstance() {
-		return (NeoGraphics) (Frame.getInstance());
-	}
+
 
 	public static void main(String[] args) {
-		Frame.setInstance(new NeoGraphics("NEOWorld"));
+		GraphicsEnvironment.setInstance(new NeoGraphics("NEOWorld"));
 	}
 
 	Toolbox canvasView;
@@ -50,8 +47,8 @@ public class NeoGraphics extends Frame {
 	public Toolbox getCanvasView() {
 		return canvasView;
 	}
-	
-	public void addObject(IWorldObject object) {
+
+	public void addObject(WorldObject object) {
 		getWorld().getGround().catchObject(object);
 	}
 

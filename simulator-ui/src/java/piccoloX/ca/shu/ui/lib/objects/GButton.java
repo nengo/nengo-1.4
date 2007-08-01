@@ -17,15 +17,15 @@ public class GButton extends GTextButton {
 		
 		switch (state) {
 		case DEFAULT:
-			getFrame().setPaint(Style.BACKGROUND_COLOR);
+			getFrame().setPaint(Style.COLOR_BACKGROUND);
 			
 
 			break;
 		case HIGHLIGHT:
-			getFrame().setPaint(Style.BUTTON_HIGHLIGHT_COLOR);
+			getFrame().setPaint(Style.COLOR_BUTTON_HIGHLIGHT);
 			break;
 		case SELECTED:
-			getFrame().setPaint(Style.BUTTON_SELECTED_COLOR);
+			getFrame().setPaint(Style.COLOR_BUTTON_SELECTED);
 			break;
 		}
 	}
@@ -35,9 +35,9 @@ public class GButton extends GTextButton {
 		
 		
 		getText().setFont(Style.FONT_BUTTONS);
-		getText().setTextPaint(Style.FOREGROUND_COLOR);
-		getFrame().setPaint(Style.BACKGROUND_COLOR);
-		getFrame().setStrokePaint(Style.BUTTON_BORDER_COLOR);
+		getText().setTextPaint(Style.COLOR_FOREGROUND);
+		getFrame().setPaint(Style.COLOR_BACKGROUND);
+		getFrame().setStrokePaint(Style.COLOR_BUTTON_BORDER);
 
 		recomputeBounds();
 	}

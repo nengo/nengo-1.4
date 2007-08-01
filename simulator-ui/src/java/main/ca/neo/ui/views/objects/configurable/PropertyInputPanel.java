@@ -32,7 +32,7 @@ public abstract class PropertyInputPanel extends JPanel {
 		init(innerPanel);
 
 		statusMessage = new JLabel("");
-		statusMessage.setForeground(Style.WARNING_COLOR);
+		statusMessage.setForeground(Style.COLOR_WARNING);
 
 		add(statusMessage);
 	}

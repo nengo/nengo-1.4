@@ -5,7 +5,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -38,11 +38,11 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		// arrow = PPath.createRectangle(0, 0, 100, 100);
 		// addChild(arrow);
 
-		startNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
-		startNode.addPropertyChangeListener(IWorldObject.PROPERTY_STATE, this);
+		startNode.addPropertyChangeListener(WorldObject.PROPERTY_EDGES, this);
+		startNode.addPropertyChangeListener(WorldObject.PROPERTY_STATE, this);
 
-		endNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
-		endNode.addPropertyChangeListener(IWorldObject.PROPERTY_STATE, this);
+		endNode.addPropertyChangeListener(WorldObject.PROPERTY_EDGES, this);
+		endNode.addPropertyChangeListener(WorldObject.PROPERTY_STATE, this);
 
 		setState(State.DEFAULT);
 	}
@@ -150,8 +150,10 @@ public class GEdge extends PPath implements PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent arg0) {
 		updateEdge();
 
-		if (startNode.getState() != IWorldObject.State.DEFAULT
-				|| endNode.getState() != IWorldObject.State.DEFAULT) {
+	
+
+		if (startNode.getState() != WorldObject.State.DEFAULT
+				|| endNode.getState() != WorldObject.State.DEFAULT) {
 			setState(State.HIGHLIGHT);
 		} else {
 			setState(State.DEFAULT);

@@ -20,8 +20,6 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 	protected Object model;
 
 	WorldObjectImpl icon;
-	
-	
 
 	// boolean modelCreationCancelled = false;
 
@@ -51,15 +49,22 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 
 		menu.addSection("Object");
 
-		menu.addAction(new AbstractAction("Remove from world") {
+		menu.addAction(new AbstractAction("Remove model") {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
-				removeFromParent();
+				removeModel();
 			}
 		});
 
 		return menu;
+	}
+
+	/**
+	 * Called when the user wants to remove the Model
+	 */
+	public void removeModel() {
+		removeFromParent();
 	}
 
 	public WorldObjectImpl getIcon() {
@@ -70,7 +75,6 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 		return model;
 	}
 
-
 	public boolean isModelCreated() {
 		return (model != null);
 	}
@@ -79,7 +83,6 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 		this.model = model;
 
 	}
-
 
 	public JPopupMenu showPopupMenu(PInputEvent event) {
 		if (model == null) {
@@ -107,5 +110,7 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 		setBounds(getFullBounds());
 
 	}
+
+
 
 }

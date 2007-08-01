@@ -9,6 +9,7 @@ import javax.swing.JPopupMenu;
 
 import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
+import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PModelNode;
 import ca.neo.ui.models.icons.IconWrapper;
@@ -21,13 +22,14 @@ import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.INamedObject;
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.impl.World;
+import ca.shu.ui.lib.world.NamedObject;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.impl.WorldImpl;
 import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public class NetworkView extends World implements INamedObject, IContextMenu {
+public class NetworkViewer extends WorldImpl implements NamedObject,
+		IContextMenu {
 	private static final long serialVersionUID = -3018937112672942653L;
 
 	IconWrapper icon;
@@ -36,7 +38,7 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 
 	PNetwork pNetwork;
 
-	public NetworkView(PNetwork pNetwork, PRoot root) {
+	public NetworkViewer(PNetwork pNetwork, PRoot root) {
 		super("", root);
 		this.pNetwork = pNetwork;
 		this.network = pNetwork.getModelNetwork();
@@ -80,9 +82,9 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 	}
 
 	@Override
-	public void justDroppedInWorld() {
+	public void addedToWorld() {
 		// TODO Auto-generated method stub
-		super.justDroppedInWorld();
+		super.addedToWorld();
 
 		// this.animateToBounds(0, 0, 400, 300, 1000);
 	}
@@ -93,6 +95,9 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 
 	public JPopupMenu showPopupMenu(PInputEvent event) {
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
+
+		menu.addSection("Simulator");
+		menu.addAction(new RunSimulatorAction(network.getSimulator()));
 
 		if (getParent() instanceof Window) {
 			menu.addSection("View");
@@ -187,7 +192,7 @@ public class NetworkView extends World implements INamedObject, IContextMenu {
 
 class ModelStatusBarHandler extends StatusBarHandler {
 
-	public ModelStatusBarHandler(IWorld world) {
+	public ModelStatusBarHandler(World world) {
 		super(world);
 		// TODO Auto-generated constructor stub
 	}

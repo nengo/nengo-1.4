@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.handlers;
 
-import ca.shu.ui.lib.world.impl.World;
+import ca.shu.ui.lib.world.impl.WorldImpl;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -8,10 +8,10 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 
 public class MouseHandler extends PBasicInputEventHandler {
-	World world;
+	WorldImpl world;
 	
 	
-	public MouseHandler(World world) {
+	public MouseHandler(WorldImpl world) {
 		super();
 		this.world = world;
 	}

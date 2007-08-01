@@ -58,7 +58,7 @@ public class GText extends PNode {
 		setTextPaint(Color.BLACK);
 
 		this.setFont(Style.FONT_NORMAL);
-		this.setTextPaint(Style.FOREGROUND_COLOR);
+		this.setTextPaint(Style.COLOR_FOREGROUND);
 	}
 
 	public GText(String aText) {

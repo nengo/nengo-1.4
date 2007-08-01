@@ -29,7 +29,7 @@ public class UIConfigManager implements IConfigurationManager {
 	Frame parent1;
 
 	public static final String DEFAULT_PROPERTY_FILE_NAME = "last_used";
-	
+
 	public UIConfigManager(Frame parent) {
 		super();
 		this.parent1 = parent;
@@ -40,12 +40,38 @@ public class UIConfigManager implements IConfigurationManager {
 		this.parent0 = parent;
 	}
 
+	Object configLock = new Object();
+
+	protected void finishedConfiguring() {
+
+		synchronized (configLock) {
+			configLock.notifyAll();
+			System.out.println("dialog closed");
+			configLock = null;
+		}
+	}
+
 	public void configure(IConfigurable configurable) {
 		if (parent0 != null) {
-			new ConfigDialog(parent0, configurable);
+			new ConfigDialog(this, parent0, configurable);
 		} else {
-			new ConfigDialog(parent1, configurable);
+			new ConfigDialog(this, parent1, configurable);
 		}
+
+		/*
+		 * Block until configuration has completed
+		 */
+		if (configLock != null) {
+			synchronized (configLock) {
+				try {
+					configLock.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		// }
+
 	}
 
 }
@@ -58,27 +84,31 @@ class ConfigDialog extends JDialog {
 
 	IConfigurable proxyObj;
 
-	public ConfigDialog(JDialog owner, IConfigurable proxyObj) {
+	UIConfigManager configManager;
+
+	public ConfigDialog(UIConfigManager configManager, JDialog owner,
+			IConfigurable proxyObj) {
 		super(owner, "New " + proxyObj.getTypeName() + " properties");
 
-		init(owner, proxyObj);
+		init(configManager, owner, proxyObj);
 
 	}
 
-	public ConfigDialog(Frame owner, IConfigurable proxyObj) {
+	public ConfigDialog(UIConfigManager configManager, Frame owner,
+			IConfigurable proxyObj) {
 		super(owner, "New " + proxyObj.getTypeName() + " Properties");
 
-		init(owner, proxyObj);
+		init(configManager, owner, proxyObj);
 
 	}
-
-
 
 	JComboBox fileList;
 
 	JPanel panel;
 
-	public void init(Component c, IConfigurable proxy) {
+	public void init(UIConfigManager configManager, Component c,
+			IConfigurable proxy) {
+		this.configManager = configManager;
 		proxyObj = proxy;
 		setResizable(false);
 		setModal(true);
@@ -123,13 +153,14 @@ class ConfigDialog extends JDialog {
 	 */
 	public void updateDialog() {
 		if (fileList.getSelectedItem() != null) {
-			proxyObj
-					.loadPropertiesFromFile((String) fileList.getSelectedItem());
+			ConfigUtil.loadPropertiesFromFile(proxyObj, (String) fileList
+					.getSelectedItem());
 			Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 			while (it.hasNext()) {
 				PropertyInputPanel panel = it.next();
 
-				Object currentValue = proxyObj.getProperty(panel.getName());
+				Object currentValue = ConfigUtil.getProperty(proxyObj, panel
+						.getName());
 				if (currentValue != null) {
 					panel.setValue(currentValue);
 				}
@@ -142,7 +173,7 @@ class ConfigDialog extends JDialog {
 		/*
 		 * construct existing properties
 		 */
-		String[] files = proxyObj.getPropertyFiles();
+		String[] files = ConfigUtil.getPropertyFiles(proxyObj);
 
 		fileList = new JComboBox(files);
 
@@ -161,12 +192,14 @@ class ConfigDialog extends JDialog {
 			if (files[i].compareTo(UIConfigManager.DEFAULT_PROPERTY_FILE_NAME) == 0) {
 				defaultFound = true;
 				fileList.setSelectedIndex(i);
-				proxyObj.loadPropertiesFromFile(UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
+
+				ConfigUtil.loadPropertiesFromFile(proxyObj,
+						UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
 			}
 		}
 		if (!defaultFound && fileList.getSelectedItem() != null) {
-			proxyObj.loadPropertiesFromFile(fileList.getSelectedItem()
-					.toString());
+			ConfigUtil.loadPropertiesFromFile(proxyObj, fileList
+					.getSelectedItem().toString());
 		}
 
 		fileList.addActionListener(new ActionListener() {
@@ -196,7 +229,7 @@ class ConfigDialog extends JDialog {
 					String name = JOptionPane.showInputDialog("Name:");
 
 					if (name != null && name.compareTo("") != 0) {
-						proxyObj.savePropertiesToFile(name);
+						ConfigUtil.savePropertiesToFile(proxyObj, name);
 						fileList.addItem(name);
 						fileList.setSelectedIndex(fileList.getItemCount() - 1);
 					}
@@ -214,7 +247,8 @@ class ConfigDialog extends JDialog {
 				String selectedFile = (String) fileList.getSelectedItem();
 
 				fileList.removeItem(selectedFile);
-				proxyObj.deletePropretiesFile(selectedFile);
+
+				ConfigUtil.deletePropretiesFile(proxyObj, selectedFile);
 
 				updateDialog();
 			}
@@ -254,10 +288,10 @@ class ConfigDialog extends JDialog {
 
 					(new Thread() {
 						public void run() {
-							ConfigDialog.this.proxyObj
-									.completeConfiguration();
-							ConfigDialog.this.proxyObj
-									.savePropertiesToFile(UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
+							proxyObj.completeConfiguration();
+							configManager.finishedConfiguring();
+							ConfigUtil.savePropertiesToFile(proxyObj,
+									UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
 						}
 					}).start();
 
@@ -271,6 +305,8 @@ class ConfigDialog extends JDialog {
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
+				configManager.finishedConfiguring();
 				setVisible(false);
 				dispose();
 				ConfigDialog.this.proxyObj.cancelConfiguration();
@@ -302,8 +338,9 @@ class ConfigDialog extends JDialog {
 
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
-					proxyObj.setProperty(property.getName(), inputPanel
-							.getValue());
+
+					ConfigUtil.setProperty(proxyObj, property.getName(),
+							inputPanel.getValue());
 				}
 			} else {
 				Util.Warning(property.getName()

@@ -3,6 +3,7 @@ package ca.neo.ui.models.wrappers;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
@@ -34,16 +35,17 @@ public class PNEFEnsemble extends PModelNode {
 
 	static final PropertyStructure pName = new PTString("Name");
 
-	static final PropertyStructure pNumOfNeurons = new PTInt("Number of Neurons");
+	static final PropertyStructure pNumOfNeurons = new PTInt(
+			"Number of Neurons");
 
 	static final PropertyStructure pStorageName = new PTString("Storage Name");
 
 	static final String typeName = "NEFEnsemble";
 
-	static final PropertyStructure[] zProperties = { pName, pNumOfNeurons, pDim,
-			pStorageName };
+	static final PropertyStructure[] zProperties = { pName, pNumOfNeurons,
+			pDim, pStorageName };
 
-	boolean isCollectingSpikes = false;
+	boolean collectingSpikes = false;
 
 	String name = "Unamed Ensemble";
 
@@ -80,19 +82,46 @@ public class PNEFEnsemble extends PModelNode {
 	 * 
 	 */
 	public void addDecodedTermintation() {
-		addDecodedTermination(new PDecodedTermination(this));
+		attachTermination(new PDecodedTermination(this));
 	}
 
-	public void addDecodedTermination(String name,
-			float tauPSC, boolean isModulatory) {
-		addDecodedTermination(new PDecodedTermination(this, name,
-				tauPSC, isModulatory));
+	public PDecodedTermination  addDecodedTermination(String name, float tauPSC,
+			boolean isModulatory) {
+		PDecodedTermination term = new PDecodedTermination(this, name, tauPSC,
+				isModulatory);
+		attachTermination(term);
+
+		return term;
 	}
 
-	protected void addDecodedTermination(PDecodedTermination term) {
+	protected void attachTermination(PTermination term) {
 		term.setScale(0.5);
 		if (term.isModelCreated())
 			addWidget(term);
+	}
+
+	class CollectSpikesAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public CollectSpikesAction() {
+			super();
+			updateState();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setCollectingSpikes(!isCollectingSpikes());
+			updateState();
+		}
+
+		public void updateState() {
+			if (isCollectingSpikes()) {
+				putValue(Action.NAME, "Stop collecting spikes");
+			} else {
+				putValue(Action.NAME, "Collect spikes");
+			}
+			repaint();
+		}
 	}
 
 	@Override
@@ -119,26 +148,7 @@ public class PNEFEnsemble extends PModelNode {
 			}
 		});
 
-		String menuName;
-		if (isCollectingSpikes) {
-			menuName = "Stop Collecting Spikes";
-		} else {
-			menuName = "Collect Spikes";
-		}
-
-		menu.addAction(new AbstractAction(menuName) {
-			private static final long serialVersionUID = 1L;
-
-			public void actionPerformed(ActionEvent e) {
-				if (isCollectingSpikes) {
-					getNEFEnsemble().collectSpikes(false);
-					isCollectingSpikes = false;
-				} else {
-					getNEFEnsemble().collectSpikes(true);
-					isCollectingSpikes = true;
-				}
-			}
-		});
+		menu.addAction(new CollectSpikesAction());
 
 		// Termination
 
@@ -200,6 +210,16 @@ public class PNEFEnsemble extends PModelNode {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public boolean isCollectingSpikes() {
+		return collectingSpikes;
+	}
+
+	public void setCollectingSpikes(boolean isCollectingSpikes) {
+		this.collectingSpikes = isCollectingSpikes;
+
+		getNEFEnsemble().collectSpikes(collectingSpikes);
 	}
 
 }

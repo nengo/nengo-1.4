@@ -5,9 +5,12 @@ import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PPickPath;
+import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 public class LineEndWell extends WorldObjectImpl {
 
+	
+	
 	public LineEndWell() {
 		super();
 
@@ -15,13 +18,17 @@ public class LineEndWell extends WorldObjectImpl {
 		// icon.setPaint(GDefaults.FOREGROUND_COLOR);
 		// addChild(icon);
 
-		addChild(new LineEndIcon());
+		WorldObjectImpl icon = new LineEndIcon();
+		
+		addChild(icon);
 		setBounds(getFullBounds());
-		setChildrenPickable(false);
+//		setChildrenPickable(false);
 
+		
 		setDraggable(false);
 
-		addInputEventListener(new MouseHandler(this));
+		icon.setDraggable(false);
+		icon.addInputEventListener(new MouseHandler(this));
 
 	}
 
@@ -42,15 +49,31 @@ public class LineEndWell extends WorldObjectImpl {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public LineEnd createEnd() {
-		LineEnd newLineEnd = new LineEnd();
+	/**
+	 * 
+	 * @return The new LineEnd which has been created and added to the
+	 *         LineEndWell
+	 */
+	public LineEnd createAndAddLineEnd() {
+		LineEnd newLineEnd = null;
 
+		newLineEnd = constructLineEnd();
 		getParent().addChild(newLineEnd);
 
 		GEdge edge = new GEdge(this, newLineEnd);
-		getParent().addChild(edge);
+		newLineEnd.addChild(edge);
+		
+//		PBoundsHandle.addBoundsHandlesTo(this);
 
 		return newLineEnd;
+	}
+
+	/**
+	 * 
+	 * @return new LineEnd
+	 */
+	protected LineEnd constructLineEnd() {
+		return new LineEnd(this);
 	}
 
 	@Override
@@ -72,22 +95,16 @@ class MouseHandler extends PBasicInputEventHandler {
 		this.lineEndWell = lineEndWell;
 	}
 
-	@Override
-	public void mouseDragged(PInputEvent event) {
-		// TODO Auto-generated method stub
-		super.mouseDragged(event);
-
-		if (newLineEnd != null) {
-
-		}
-	}
+	
 
 	@Override
 	public void mousePressed(PInputEvent event) {
 		// TODO Auto-generated method stub
 		super.mousePressed(event);
+		
+//		if (event.getPickedNode() == )
 
-		newLineEnd = lineEndWell.createEnd();
+		newLineEnd = lineEndWell.createAndAddLineEnd();
 
 		PPickPath path = event.getPath();
 

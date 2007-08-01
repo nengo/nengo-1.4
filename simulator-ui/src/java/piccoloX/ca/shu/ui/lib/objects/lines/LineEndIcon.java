@@ -18,7 +18,7 @@ public class LineEndIcon extends WorldObjectImpl {
 	static final int LINE_END_WIDTH = 30;
 	static final int LINE_END_HEIGHT = 30;
 
-	static Color color = Style.LINEEND_COLOR;
+	static Color color = Style.COLOR_LINEEND;
 
 	@Override
 	protected void paint(PPaintContext paintContext) {

@@ -10,7 +10,7 @@ import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-public class LineIn extends WorldObjectImpl implements ILineAcceptor {
+public class LineIn extends WorldObjectImpl {
 
 	/**
 	 * 
@@ -21,7 +21,7 @@ public class LineIn extends WorldObjectImpl implements ILineAcceptor {
 
 	static final int LINE_IN_WIDTH = 30;
 
-	Color color = Style.LINEIN_COLOR;
+	Color color = Style.COLOR_LINEIN;
 
 	LineEnd lineEnd;
 

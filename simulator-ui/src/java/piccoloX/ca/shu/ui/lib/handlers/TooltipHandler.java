@@ -1,9 +1,9 @@
 package ca.shu.ui.lib.handlers;
 
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.Canvas;
-import ca.shu.ui.lib.world.impl.World;
+import ca.shu.ui.lib.world.impl.WorldImpl;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -20,13 +20,13 @@ public class TooltipHandler extends PBasicInputEventHandler {
 
 	Object mouseEventLock = new Object();
 
-	IWorld world;
+	World world;
 
 	WorldObjectImpl pickedNode;
 
 	WorldObjectImpl selectedNode;
 
-	public TooltipHandler(IWorld parent) {
+	public TooltipHandler(World parent) {
 		super();
 		this.world = parent;
 		controlTimer = new ControlTimer();
@@ -46,7 +46,7 @@ public class TooltipHandler extends PBasicInputEventHandler {
 	public void updateMouse(PInputEvent event) {
 		PNode node = event.getPickedNode();
 
-		if (!World.isContexualTipsVisible()) {
+		if (!WorldImpl.isContexualTipsVisible()) {
 			selectedNode = null;
 			synchronized (mouseEventLock) {
 				mouseEventLock.notifyAll();
@@ -107,7 +107,7 @@ public class TooltipHandler extends PBasicInputEventHandler {
 
 						if ((currNode == selectedNode)
 								&& (selectedNode != null)) {
-							currNode.pushState(IWorldObject.State.SELECTED);
+							currNode.pushState(WorldObject.State.SELECTED);
 							controls = selectedNode.getTooltipObject();
 
 							world.showTooltip(controls, selectedNode);
@@ -125,7 +125,7 @@ public class TooltipHandler extends PBasicInputEventHandler {
 								}
 							}
 
-							currNode.popState(IWorldObject.State.SELECTED);
+							currNode.popState(WorldObject.State.SELECTED);
 							world.hideControls();
 						}
 					} else {

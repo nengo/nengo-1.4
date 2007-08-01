@@ -4,17 +4,17 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
 public class AutomaticFrame implements PropertyChangeListener {
 	PPath frame = PPath.createRectangle(0f, 0f, 1f, 1f);
-	IWorldObject currentlySelected;
-	IWorldObject prevObj = null;
+	WorldObject currentlySelected;
+	WorldObject prevObj = null;
 
-	public IWorldObject getObjToFollow() {
+	public WorldObject getObjToFollow() {
 		return currentlySelected;
 	}
 
@@ -22,7 +22,7 @@ public class AutomaticFrame implements PropertyChangeListener {
 		updateBounds();
 	}
 
-	public void setObjToFollow(IWorldObject obj) {
+	public void setObjToFollow(WorldObject obj) {
 		if (obj == prevObj) {
 			return;
 		}

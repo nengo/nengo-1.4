@@ -46,7 +46,7 @@ public class Window extends WorldObjectImpl {
 		this.setHeight(DEFAULT_HEIGHT);
 
 		menubar = PPath.createRectangle(0, 0, 1, 1);
-		menubar.setPaint(Style.BACKGROUND2_COLOR);
+		menubar.setPaint(Style.COLOR_BACKGROUND2);
 
 		title = new GText(innerNode.getName());
 		title.setFont(Style.FONT_XLARGE);

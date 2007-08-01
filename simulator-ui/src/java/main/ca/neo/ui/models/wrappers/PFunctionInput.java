@@ -18,8 +18,8 @@ public class PFunctionInput extends PModelNode {
 	 * Default constructor, uses the default configuration manager to set up
 	 * function input
 	 */
-	public PFunctionInput() {
-		super(true);
+	public PFunctionInput(boolean useDefaultConfigManager) {
+		super(useDefaultConfigManager);
 		init();
 	}
 
@@ -80,8 +80,13 @@ public class PFunctionInput extends PModelNode {
 
 	@Override
 	public String getTypeName() {
-		// TODO Auto-generated method stub
 		return typeName;
+	}
+
+	@Override
+	protected void afterModelCreated() {
+		super.afterModelCreated();
+		showAllOrigins();
 	}
 
 }

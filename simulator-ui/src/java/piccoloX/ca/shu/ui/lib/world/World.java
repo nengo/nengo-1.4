@@ -10,7 +10,7 @@ import ca.shu.ui.lib.world.impl.WorldSky;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 
-public interface IWorld {
+public interface World {
 	public boolean containsNode(PNode node);
 	
 	public void zoomToWorld();
@@ -18,14 +18,14 @@ public interface IWorld {
 	public void addPropertyChangeListener(String propertyName,
 			PropertyChangeListener listener);
 	
-	public void zoomToNode(IWorldObject node);
+	public void zoomToNode(WorldObject node);
 	
 	public void setCameraPosition(double x, double y);
 	
 	public void showTooltip(WorldObjectImpl pControls,
 			WorldObjectImpl nodeAttacedTo);
 	public void hideControls();
-	public Point2D getPositionInGround(IWorldObject wo);
+	public Point2D getPositionInGround(WorldObject wo);
 
 	public Point2D getPositionInSky(WorldObjectImpl wo);
 

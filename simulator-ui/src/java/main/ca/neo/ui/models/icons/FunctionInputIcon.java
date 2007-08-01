@@ -19,18 +19,3 @@ public class FunctionInputIcon extends IconWrapper {
 	private static final long serialVersionUID = 1L;
 
 }
-
-class IconNode extends GText {
-
-	public IconNode() {
-		super("F");
-		// TODO Auto-generated constructor stub
-		setFont(Style.createFont(30, true));
-	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-}

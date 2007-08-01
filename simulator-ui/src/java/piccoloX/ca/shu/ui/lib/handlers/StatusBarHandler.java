@@ -2,15 +2,15 @@ package ca.shu.ui.lib.handlers;
 
 import java.text.NumberFormat;
 
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.impl.Frame;
+import ca.shu.ui.lib.util.GraphicsEnvironment;
+import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 public class StatusBarHandler extends PBasicInputEventHandler {
-	IWorld world;
+	World world;
 
-	public StatusBarHandler(IWorld world) {
+	public StatusBarHandler(World world) {
 		super();
 		this.world = world;
 	}
@@ -20,7 +20,7 @@ public class StatusBarHandler extends PBasicInputEventHandler {
 		// TODO Auto-generated method stub
 		super.mouseMoved(event);
 
-		Frame.getInstance().setStatusStr(getStatusStr(event));
+		GraphicsEnvironment.getInstance().setStatusStr(getStatusStr(event));
 
 	}
 
@@ -33,7 +33,7 @@ public class StatusBarHandler extends PBasicInputEventHandler {
 				+ formatter.format(event.getPosition().getY());
 	}
 
-	public IWorld getWorld() {
+	public World getWorld() {
 		return world;
 	}
 }

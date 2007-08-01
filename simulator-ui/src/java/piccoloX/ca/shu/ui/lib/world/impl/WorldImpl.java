@@ -15,11 +15,11 @@ import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
-import ca.shu.ui.lib.util.GridFactory;
+import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.IWorldLayer;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -31,7 +31,7 @@ import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 
-public class World extends WorldObjectImpl implements IWorld,
+public class WorldImpl extends WorldObjectImpl implements World,
 		PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
 
@@ -44,7 +44,8 @@ public class World extends WorldObjectImpl implements IWorld,
 	}
 
 	public static void setContexualTipsVisible(boolean contexualTipsVisible) {
-		World.contexualTipsVisible = contexualTipsVisible;
+		WorldImpl.contexualTipsVisible = contexualTipsVisible;
+
 	}
 
 	WorldObjectImpl controls;
@@ -63,7 +64,7 @@ public class World extends WorldObjectImpl implements IWorld,
 
 	PBasicInputEventHandler statusBarHandler;
 
-	public World(String titleStr, PRoot root) {
+	public WorldImpl(String titleStr, PRoot root) {
 		super(titleStr);
 
 		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
@@ -97,7 +98,7 @@ public class World extends WorldObjectImpl implements IWorld,
 		skyCamera.addInputEventListener(new DragHandler());
 		skyCamera.addInputEventListener(new ContextMenuHandler(this));
 		skyCamera.addInputEventListener(new ScrollZoomHandler());
-		skyCamera.setPaint(Style.BACKGROUND_COLOR);
+		skyCamera.setPaint(Style.COLOR_BACKGROUND);
 		skyCamera.addChild(controlsHolder);
 		setCameraPosition(0, 0);
 		setWorldScale(0.7f);
@@ -115,8 +116,8 @@ public class World extends WorldObjectImpl implements IWorld,
 			}
 		});
 
-		gridLayer = GridFactory.createGrid(getSky(), root,
-				Style.DARK_BORDER_COLOR, 1500);
+		gridLayer = Grid.createGrid(getSky(), root, Style.COLOR_DARKBORDER,
+				1500);
 
 		// System.out.println(this+"Finished Constructing MiniWorld");
 	}
@@ -152,8 +153,8 @@ public class World extends WorldObjectImpl implements IWorld,
 		return getSky().getViewScale();
 	}
 
-	public Point2D getPositionInGround(IWorldObject wo) {
-		IWorldLayer layer = wo.getWorldLayer();
+	public Point2D getPositionInGround(WorldObject wo) {
+		WorldLayer layer = wo.getWorldLayer();
 		Point2D position;
 
 		position = wo.localToGlobal(new Point2D.Double(0, 0));
@@ -169,7 +170,7 @@ public class World extends WorldObjectImpl implements IWorld,
 	}
 
 	public Point2D getPositionInSky(WorldObjectImpl wo) {
-		IWorldLayer layer = wo.getWorldLayer();
+		WorldLayer layer = wo.getWorldLayer();
 		Point2D position;
 
 		position = wo.localToGlobal(new Point2D.Double(0, 0));
@@ -213,7 +214,7 @@ public class World extends WorldObjectImpl implements IWorld,
 	public void propertyChange(PropertyChangeEvent arg0) {
 		getSky().setBounds(getBounds());
 		getGround().setBounds(getBounds());
-//		updateCameraPosition();
+		// updateCameraPosition();
 	}
 
 	@Override
@@ -246,6 +247,64 @@ public class World extends WorldObjectImpl implements IWorld,
 
 	}
 
+	
+//	public void showHelperMsg(String msg,
+//			WorldObjectImpl nodeAttacedTo) {
+//		hideControls();
+//		if (nodeAttacedTo == null) {
+//			return;
+//		}
+//		PCamera camera = getSky();
+//
+//		position = nodeAttacedTo.getOffset();
+//		if (camera.isAncestorOf(nodeAttacedTo)) {
+//
+//			position = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
+//					nodeAttacedTo.getHeight()));
+//		} else {
+//
+//			position = nodeAttacedTo.getOffset();
+//			position = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
+//					nodeAttacedTo.getHeight()));
+//			position = camera.viewToLocal(position);
+//		}
+//		double x = position.getX();
+//		double y = position.getY();
+//
+//		this.controls = new WorldObjectImpl();
+//
+////		pControls.setDraggable(false);
+//		controls.addToLayout(pControls);
+//
+//		controls.pushState(WorldObject.State.SELECTED);
+//
+//		if (x + controls.getWidth() > camera.getBounds().getWidth()) {
+//			x = camera.getBounds().getWidth() - controls.getWidth();
+//
+//			// leave some room at the top of the screen
+//			if (x < 100) {
+//				x = 100;
+//			}
+//		}
+//		if (y + controls.getHeight() > camera.getBounds().getHeight()) {
+//			y = camera.getBounds().getHeight() - controls.getHeight();
+//		}
+//
+//		position = new Point2D.Double(x, y);
+//
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				if (controls != null) {
+//					controlsHolder.bringToFront();
+//					controlsHolder.addChildFancy(controls);
+//					controlsHolder.setTransparency(0.5f);
+//
+//					controls.setOffset(position);
+//				}
+//			}
+//		});
+//	}
+	
 	public void showTooltip(WorldObjectImpl pControls,
 			WorldObjectImpl nodeAttacedTo) {
 
@@ -275,7 +334,7 @@ public class World extends WorldObjectImpl implements IWorld,
 		pControls.setDraggable(false);
 		controls.addToLayout(pControls);
 
-		controls.pushState(IWorldObject.State.SELECTED);
+		controls.pushState(WorldObject.State.SELECTED);
 
 		if (x + controls.getWidth() > camera.getBounds().getWidth()) {
 			x = camera.getBounds().getWidth() - controls.getWidth();
@@ -321,7 +380,7 @@ public class World extends WorldObjectImpl implements IWorld,
 
 	}
 
-	public void zoomToNode(IWorldObject node) {
+	public void zoomToNode(WorldObject node) {
 		Rectangle2D bounds = node.localToGlobal(node.getFullBounds());
 		zoomToBounds(bounds);
 	}

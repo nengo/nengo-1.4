@@ -14,8 +14,8 @@ import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.impl.Frame;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.impl.GFrame;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PObjectOutputStream;
@@ -50,7 +50,7 @@ public class Util {
 	}
 
 	public static void showMsg(String msg) {
-		JOptionPane.showMessageDialog(Frame.getInstance(), msg);
+		JOptionPane.showMessageDialog(GraphicsEnvironment.getInstance(), msg);
 	}
 
 	public static void Assert(boolean bool, String msg) {
@@ -123,7 +123,7 @@ public class Util {
 			/*
 			 * Stop picking objects at the boundary of the worlds
 			 */
-			if (node instanceof IWorld) {
+			if (node instanceof World) {
 				return null;
 			}
 
@@ -169,8 +169,14 @@ public class Util {
 
 	static Object parentStatic;
 
+	/**
+	 * 
+	 * @param parent
+	 *            of the files
+	 * @return the list of files for the parent
+	 */
 	public static String[] getPropertyFiles(Object parent) {
-		File file = new File("SavedObjects");
+		File file = getSavedObjectsFolder();
 		/*
 		 * Gets a list of property files
 		 */
@@ -189,7 +195,7 @@ public class Util {
 	static final String FILE_SAVED_OBJECTS_DIR = "SavedObjects";
 
 	/**
-	 * Returns the file name prefix given per class
+	 * @returns the file name prefix given per class
 	 */
 	@SuppressWarnings("unchecked")
 	protected static String getFileNamePrefix(Object obj) {
@@ -209,6 +215,7 @@ public class Util {
 	 * 
 	 */
 	public static void deleteProperty(Object parent, String name) {
+		getSavedObjectsFolder();
 		String fileName = FILE_SAVED_OBJECTS_DIR + "/"
 				+ getFileNamePrefix(parent) + name;
 
@@ -220,8 +227,20 @@ public class Util {
 			if (val == false) {
 				Util.Error("Could not delete file");
 			}
-			
+
 		}
+	}
+
+	/**
+	 * Creates a saved objects folder if it isn't already there
+	 * 
+	 * @return The Saved Objects folter
+	 */
+	public static File getSavedObjectsFolder() {
+		File file = new File(FILE_SAVED_OBJECTS_DIR);
+		if (!file.exists())
+			file.mkdir();
+		return file;
 	}
 
 	/**
@@ -238,9 +257,7 @@ public class Util {
 		// Write to disk with FileOutputStream
 		FileOutputStream f_out;
 		try {
-			File file = new File(FILE_SAVED_OBJECTS_DIR);
-			if (!file.exists())
-				file.mkdir();
+			getSavedObjectsFolder();
 
 			String fileName = FILE_SAVED_OBJECTS_DIR + "/"
 					+ getFileNamePrefix(parent) + name;

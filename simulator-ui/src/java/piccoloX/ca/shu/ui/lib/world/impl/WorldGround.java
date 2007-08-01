@@ -2,21 +2,21 @@ package ca.shu.ui.lib.world.impl;
 
 import java.awt.geom.Point2D;
 
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.IWorldLayer;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PBounds;
 
-public class WorldGround extends WorldObjectImpl implements IWorldLayer {
+public class WorldGround extends WorldObjectImpl implements WorldLayer {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	IWorld world;
+	World world;
 
-	public WorldGround(IWorld world) {
+	public WorldGround(World world) {
 		super();
 		this.world = world;
 
@@ -26,11 +26,11 @@ public class WorldGround extends WorldObjectImpl implements IWorldLayer {
 
 	}
 
-	public IWorld getWorld() {
+	public World getWorld() {
 		return world;
 	}
 
-	public void addWorldObject(IWorldObject node) {
+	public void addWorldObject(WorldObject node) {
 
 		// PBounds bounds = this.getFullBounds();
 
@@ -42,11 +42,7 @@ public class WorldGround extends WorldObjectImpl implements IWorldLayer {
 
 
 
-	public void addToWorldLayer(IWorldObject wo) {
-		addChildW(wo);
-
-	}
-
+	
 	public double getGroundScale() {
 		return world.getSky().getViewScale();
 	}
@@ -54,7 +50,7 @@ public class WorldGround extends WorldObjectImpl implements IWorldLayer {
 	/*
 	 * Adds a little pizzaz while accepting new objects
 	 */
-	public void catchObject(IWorldObject wo) {
+	public void catchObject(WorldObject wo) {
 		addChildW(wo);
 
 		Point2D finalPosition = world.skyToGround(new Point2D.Double(world

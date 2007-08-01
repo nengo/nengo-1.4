@@ -9,7 +9,7 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.ui.models.PModelNode;
 import ca.neo.ui.models.icons.NetworkIcon;
-import ca.neo.ui.models.viewers.NetworkView;
+import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
 import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
@@ -33,7 +33,7 @@ public class PNetwork extends PModelNode {
 
 	static final PropertyStructure[] zProperties = { pName };
 
-	NetworkView networkViewer;
+	NetworkViewer networkViewer;
 
 	Window networkWindow;
 
@@ -103,7 +103,7 @@ public class PNetwork extends PModelNode {
 	 * Creates the Network Viewer
 	 */
 	public void constructNetworkViewer() {
-		networkViewer = new NetworkView(this, getRoot());
+		networkViewer = new NetworkViewer(this, getRoot());
 		networkWindow = new Window(this, networkViewer);
 		networkWindow.translate(0, this.getHeight());
 	}
@@ -129,7 +129,7 @@ public class PNetwork extends PModelNode {
 	 * 
 	 * @return The Network Viewer
 	 */
-	public NetworkView getNetworkViewer() {
+	public NetworkViewer getNetworkViewer() {
 		if (networkViewer == null) {
 			constructNetworkViewer();
 		}
@@ -164,7 +164,7 @@ public class PNetwork extends PModelNode {
 	 * @return opens the network viewer which contains the nodes of the Network
 	 *         model
 	 */
-	public NetworkView showNodes() {
+	public NetworkViewer showNodes() {
 		if (networkViewer == null) {
 			constructNetworkViewer();
 		}

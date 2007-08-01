@@ -27,8 +27,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
 import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.world.IWorld;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -39,12 +39,35 @@ import edu.umd.cs.piccolo.util.PUtil;
  * 
  * @author Shu Wu
  */
-public class Frame extends JFrame {
+public class GFrame extends JFrame {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2769082313231407201L;
+
+	
+
+	public static JMenuItem addActionToMenu(JMenu menu, AbstractAction action) {
+		JMenuItem menuItem = new JMenuItem(action);
+		// GDefaults.styleComponent(menuItem);
+		menu.add(menuItem);
+
+		return menuItem;
+	}
+
+	public static JMenuItem addActionToMenu(JPopupMenu menu,
+			AbstractAction action) {
+		JMenuItem menuItem = new JMenuItem(action);
+		// GDefaults.styleComponent(menuItem);
+		menu.add(menuItem);
+
+		return menuItem;
+	}
+
+	
+
+
 
 	private EventListener escapeFullScreenModeListener;
 
@@ -52,29 +75,19 @@ public class Frame extends JFrame {
 
 	private boolean isFullScreenMode;
 
-	PCamera camera;
+	private JLabel statusBar;
 
-	PLayer topLayer;
+	PCamera camera;
 
 	Canvas canvas;
 
-	private JLabel statusBar;
+	String statusStr = "";
 
-	static Frame instance;
+	Vector<String> taskStatusStrings = new Vector<String>();
 
-	public static Frame getInstance() {
-		return instance;
-	}
+	PLayer topLayer;
 
-	/**
-	 * 
-	 * @param instance Running instance of the frame
-	 */
-	public static void setInstance(Frame instance) {
-		Frame.instance = instance;
-	}
-
-	public Frame(String title) {
+	public GFrame(String title) {
 		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
 		getContentPane().setLayout(new BorderLayout());
@@ -101,37 +114,6 @@ public class Frame extends JFrame {
 		setFullScreenMode(false);
 
 	}
-
-	String statusStr = "";
-
-	/**
-	 * @param text
-	 *            Sets the text of the status bar in the UI
-	 */
-	public void setStatusStr(String text) {
-		statusStr = text;
-		updateStatusBar();
-	}
-
-	protected void updateStatusBar() {
-		StringBuilder strBuff = new StringBuilder("<HTML>");
-		if (taskStatusStrings.size() > 0) {
-			strBuff.append("*** Tasks ***<BR>");
-
-			Iterator<String> taskIt = taskStatusStrings.iterator();
-			while (taskIt.hasNext()) {
-				strBuff.append(taskIt.next() + "<BR>");
-			}
-			strBuff.append("<BR>");
-
-		}
-		strBuff.append(statusStr);
-		strBuff.append("</HTML>");
-
-		statusBar.setText(strBuff.toString());
-	}
-
-	// private updateStatusBar()
 
 	/**
 	 * This method adds a key listener that will take this PFrame out of full
@@ -160,11 +142,26 @@ public class Frame extends JFrame {
 
 	}
 
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
 	/**
 	 * @return the top-most World associated with this frame
 	 */
-	public World getWorld() {
+	public WorldImpl getWorld() {
 		return canvas.getWorld();
+	}
+
+	public void popTaskStatusStr(String str) {
+		taskStatusStrings.remove(str);
+		updateStatusBar();
+	}
+
+	public String pushTaskStatusStr(String str) {
+		taskStatusStrings.add(str);
+		updateStatusBar();
+		return str;
 	}
 
 	/**
@@ -216,33 +213,12 @@ public class Frame extends JFrame {
 		}
 	}
 
-	/*
-	 * Initializes the status bar
+	/**
+	 * @param text
+	 *            Sets the text of the status bar in the UI
 	 */
-	private void initStatusBar() {
-
-		statusBar = new JLabel("welcome to NeoWorld");
-		statusBar.setOpaque(true);
-		statusBar.setBackground(Style.BACKGROUND_COLOR);
-		statusBar.setForeground(Style.FOREGROUND_COLOR);
-		statusBar.setBorder(new EtchedBorder());
-
-		Container c = super.getContentPane();
-
-		c.add(statusBar, BorderLayout.SOUTH);
-
-	}
-
-	Vector<String> taskStatusStrings = new Vector<String>();
-
-	public String pushTaskStatusStr(String str) {
-		taskStatusStrings.add(str);
-		updateStatusBar();
-		return str;
-	}
-
-	public void popTaskStatusStr(String str) {
-		taskStatusStrings.remove(str);
+	public void setStatusStr(String text) {
+		statusStr = text;
 		updateStatusBar();
 	}
 
@@ -264,13 +240,12 @@ public class Frame extends JFrame {
 		menu.addAction(new ZoomOutAction());
 		menu.addAction(new FullScreenAction());
 		menu.addAction(new TooltipAction());
-		
+		menu.addAction(new GridAction());
+
 		MenuBuilder qualityMenu = menu.createSubMenu("Rendering Quality");
 		qualityMenu.addAction(new LowQualityAction());
 		qualityMenu.addAction(new MediumQualityAction());
 		qualityMenu.addAction(new HighQualityAction());
-		
-		
 
 		menuBar.setVisible(true);
 		this.setJMenuBar(menuBar);
@@ -278,21 +253,21 @@ public class Frame extends JFrame {
 
 	}
 
-	public static JMenuItem addActionToMenu(JPopupMenu menu,
-			AbstractAction action) {
-		JMenuItem menuItem = new JMenuItem(action);
-		// GDefaults.styleComponent(menuItem);
-		menu.add(menuItem);
+	/*
+	 * Initializes the status bar
+	 */
+	private void initStatusBar() {
 
-		return menuItem;
-	}
+		statusBar = new JLabel("welcome to NeoWorld");
+		statusBar.setOpaque(true);
+		statusBar.setBackground(Style.COLOR_BACKGROUND);
+		statusBar.setForeground(Style.COLOR_FOREGROUND);
+		statusBar.setBorder(new EtchedBorder());
 
-	public static JMenuItem addActionToMenu(JMenu menu, AbstractAction action) {
-		JMenuItem menuItem = new JMenuItem(action);
-		// GDefaults.styleComponent(menuItem);
-		menu.add(menuItem);
+		Container c = super.getContentPane();
 
-		return menuItem;
+		c.add(statusBar, BorderLayout.SOUTH);
+
 	}
 
 	// protected JMenu addMenu(JMenuBar menuBar, String name) {
@@ -347,27 +322,22 @@ public class Frame extends JFrame {
 		return result;
 	}
 
-	class TooltipAction extends AbstractAction {
+	protected void updateStatusBar() {
+		StringBuilder strBuff = new StringBuilder("<HTML>");
+		if (taskStatusStrings.size() > 0) {
+			strBuff.append("*** Tasks ***<BR>");
 
-		private static final long serialVersionUID = 1L;
-
-		public TooltipAction() {
-			super();
-			updateState();
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			World.setContexualTipsVisible(!World.isContexualTipsVisible());
-			updateState();
-		}
-
-		public void updateState() {
-			if (World.isContexualTipsVisible()) {
-				putValue(Action.NAME, "Hide mouse-over popups");
-			} else {
-				putValue(Action.NAME, "Show mouse-over popups");
+			Iterator<String> taskIt = taskStatusStrings.iterator();
+			while (taskIt.hasNext()) {
+				strBuff.append(taskIt.next() + "<BR>");
 			}
+			strBuff.append("<BR>");
+
 		}
+		strBuff.append(statusStr);
+		strBuff.append("</HTML>");
+
+		statusBar.setText(strBuff.toString());
 	}
 
 	class FullScreenAction extends AbstractAction {
@@ -393,16 +363,45 @@ public class Frame extends JFrame {
 		}
 	}
 
-	class ZoomOutAction extends AbstractAction {
+	class GridAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public ZoomOutAction() {
-			super("Zoom Out");
+		public GridAction() {
+			super();
+			updateState();
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			getWorld().zoomToWorld();
+			Grid.setGridVisible(!Grid.isGridVisible());
+			updateState();
+		}
+
+		public void updateState() {
+			if (Grid.isGridVisible()) {
+				putValue(Action.NAME, "Hide grid");
+			} else {
+				putValue(Action.NAME, "Show grid");
+			}
+			repaint();
+		}
+	}
+
+	class HighQualityAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public HighQualityAction() {
+			super("High Quality");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			getCanvas().setDefaultRenderQuality(
+					PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setAnimatingRenderQuality(
+					PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setInteractingRenderQuality(
+					PPaintContext.HIGH_QUALITY_RENDERING);
 		}
 
 	}
@@ -445,27 +444,42 @@ public class Frame extends JFrame {
 
 	}
 
-	class HighQualityAction extends AbstractAction {
+	class TooltipAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public HighQualityAction() {
-			super("High Quality");
+		public TooltipAction() {
+			super();
+			updateState();
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			getCanvas().setDefaultRenderQuality(
-					PPaintContext.HIGH_QUALITY_RENDERING);
-			getCanvas().setAnimatingRenderQuality(
-					PPaintContext.HIGH_QUALITY_RENDERING);
-			getCanvas().setInteractingRenderQuality(
-					PPaintContext.HIGH_QUALITY_RENDERING);
+			WorldImpl.setContexualTipsVisible(!WorldImpl
+					.isContexualTipsVisible());
+			updateState();
 		}
 
+		public void updateState() {
+			if (WorldImpl.isContexualTipsVisible()) {
+				putValue(Action.NAME, "Hide mouse-over popups");
+			} else {
+				putValue(Action.NAME, "Show mouse-over popups");
+			}
+		}
 	}
 
-	public Canvas getCanvas() {
-		return canvas;
+	class ZoomOutAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ZoomOutAction() {
+			super("Fit on screen");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			getWorld().zoomToWorld();
+		}
+
 	}
 
 }

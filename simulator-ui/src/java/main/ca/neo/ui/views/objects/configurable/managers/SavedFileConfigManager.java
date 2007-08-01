@@ -1,7 +1,11 @@
 package ca.neo.ui.views.objects.configurable.managers;
 
+import javax.swing.text.SimpleAttributeSet;
+
+import ca.neo.ui.views.objects.configurable.ConfigUtil;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.UIConfigManager;
+import ca.shu.ui.lib.util.Util;
 
 public class SavedFileConfigManager implements IConfigurationManager {
 	String configFileName;
@@ -22,7 +26,10 @@ public class SavedFileConfigManager implements IConfigurationManager {
 	}
 
 	public void configure(IConfigurable configurable) {
-		configurable.loadPropertiesFromFile(configFileName);
+		ConfigUtil.loadPropertiesFromFile(configurable, configFileName);
 		configurable.completeConfiguration();
 	}
+
+	
+
 }

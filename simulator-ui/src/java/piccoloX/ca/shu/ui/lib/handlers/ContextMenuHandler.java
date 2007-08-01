@@ -7,8 +7,8 @@ import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.objects.widgets.AutomaticFrame;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.impl.World;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.impl.WorldImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
@@ -27,9 +27,9 @@ public class ContextMenuHandler extends PBasicInputEventHandler {
 	Point2D mouseCanvasPositionPressed;
 
 	IContextMenu objPressed;
-	IWorld world;
+	World world;
 
-	public ContextMenuHandler(IWorld world) {
+	public ContextMenuHandler(World world) {
 		super();
 		this.world = world;
 	}
@@ -42,7 +42,7 @@ public class ContextMenuHandler extends PBasicInputEventHandler {
 		IContextMenu obj = (IContextMenu) Util.getNodeFromPickPath(event,
 				IContextMenu.class);
 
-		if ((obj instanceof World)) {
+		if ((obj instanceof WorldImpl)) {
 			frame.setObjToFollow(null);
 		} else {
 			frame.setObjToFollow(obj);

@@ -20,7 +20,7 @@ public class GContextButton extends WorldObjectImpl {
 		this.setDraggable(false);
 
 		circle = PPath.createEllipse(0, 0, 25, 25);
-		circle.setPaint(Style.FOREGROUND_COLOR);
+		circle.setPaint(Style.COLOR_FOREGROUND);
 		// circle.setStrokePaint(Color.white);
 		this.setFrameVisible(false);
 		circle.setPickable(false);

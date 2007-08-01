@@ -2,7 +2,6 @@ package ca.shu.ui.lib.world.impl;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
@@ -14,22 +13,20 @@ import ca.shu.ui.lib.activities.Fader;
 import ca.shu.ui.lib.objects.GContextButton;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.LayoutManager;
-import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.IWorldLayer;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
 /*
  * TODO: Clean up class, move non-core functionality to child objects
  */
-public class WorldObjectImpl extends PNode implements IWorldObject {
+public class WorldObjectImpl extends PNode implements WorldObject {
 	private static final long serialVersionUID = 1L;
 
 	private PPath frame = null;
@@ -64,7 +61,34 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 
 	GText titleBar;
 
-	public static final String PROPERTY_NAME = "objectName";
+	@Override
+	public void signalBoundsChanged() {
+		// TODO Auto-generated method stub
+		super.signalBoundsChanged();
+		signalEdgesChanged();
+
+	}
+
+	// int i = 0;
+	public void signalEdgesChanged() {
+		// System.out.println("Signal edges changed " + i++);
+		firePropertyChange(0, PROPERTY_EDGES, null, null);
+
+		/*
+		 * Updates children edges
+		 */
+		int count = getChildrenCount();
+		for (int i = 0; i < count; i++) {
+			PNode each = (PNode) getChildrenReference().get(i);
+
+			if (each instanceof WorldObjectImpl) {
+				WorldObjectImpl wo = (WorldObjectImpl) each;
+
+				wo.signalEdgesChanged();
+			}
+		}
+
+	}
 
 	public WorldObjectImpl() {
 		this("");
@@ -110,7 +134,7 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 		addActivity(new Fader(node, duration, true));
 	}
 
-	public void addChildW(IWorldObject child) {
+	public void addChildW(WorldObject child) {
 		addChild((PNode) child);
 	}
 
@@ -192,8 +216,11 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 
 	}
 
-	public Collection<PNode> getChildrenAtBounds(Rectangle2D bounds) {
-		return getChildrenAtBounds(bounds, null);
+	@SuppressWarnings("unchecked")
+	public Collection<WorldObject> getChildrenAtBounds(Rectangle2D bounds) {
+		return (Collection<WorldObject>) (this.getAllNodes(new BoundsFilter(
+				this, this.localToGlobal(bounds), WorldObjectImpl.class), null));
+		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -259,19 +286,19 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 	 * 
 	 * @see ca.sw.graphics.nodes.WorldO#getWorld()
 	 */
-	public IWorld getWorld() {
+	public World getWorld() {
 		if (getWorldLayer() != null)
 			return getWorldLayer().getWorld();
 		else
 			return null;
 	}
 
-	public IWorldLayer getWorldLayer() {
+	public WorldLayer getWorldLayer() {
 		PNode node = this;
 
 		while (node != null) {
-			if (node instanceof IWorldLayer)
-				return ((IWorldLayer) node);
+			if (node instanceof WorldLayer)
+				return ((WorldLayer) node);
 
 			node = node.getParent();
 		}
@@ -331,16 +358,18 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 		return tangible;
 	}
 
+	/**
+	 * End of a drag and dorp operation
+	 */
 	public void justDropped() {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * Called when the object is dropped in a world
+	/**
+	 * Called when the World the object lives in has changed
 	 */
-	public void justDroppedInWorld() {
-
+	protected void addedToWorld() {
 	}
 
 	// public Object loadStatic(String name) {
@@ -351,7 +380,7 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 	 * TODO: Perhaps this is not needed
 	 */
 	public PBounds localToLayer(PBounds bounds) {
-		IWorldLayer worldLayer = getWorldLayer();
+		WorldLayer worldLayer = getWorldLayer();
 
 		this.localToGlobal(bounds);
 		worldLayer.globalToLocal(bounds);
@@ -413,7 +442,7 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 		setState(state);
 	}
 
-	public void removedFromWorld() {
+	protected void removedFromWorld() {
 		// TODO Auto-generated method stub
 
 	}
@@ -486,7 +515,6 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 				.getWidth(), bounds.getHeight(), padding);
 	}
 
-	
 	public void setDraggable(boolean isDraggable) {
 		this.draggable = isDraggable;
 	}
@@ -498,8 +526,8 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 			if (frame == null) {
 				frame = PPath.createRectangle(0, 0, 100, 100);
 
-				frame.setPaint(Style.BACKGROUND_COLOR);
-				frame.setStrokePaint(Style.FOREGROUND_COLOR);
+				frame.setPaint(Style.COLOR_BACKGROUND);
+				frame.setStrokePaint(Style.COLOR_FOREGROUND);
 
 				// frame.setPickable(true);
 
@@ -527,10 +555,10 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 	public void setParent(PNode newParent) {
 		boolean worldChanged = false;
 
-		IWorld newWorld = null;
+		World newWorld = null;
 
-		if (newParent instanceof IWorldObject) {
-			newWorld = ((IWorldObject) newParent).getWorld();
+		if (newParent instanceof WorldObject) {
+			newWorld = ((WorldObject) newParent).getWorld();
 		}
 
 		if (newWorld != getWorld()) {
@@ -541,26 +569,27 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 
 		if (worldChanged) {
 			// World has disappeared
-			if (newParent == null) {
+			if (newWorld == null) {
 
 				removedFromWorld();
 
 			}
 			// Is in a new world
 			else {
-				justDroppedInWorld();
+				addedToWorld();
 
 				ListIterator it = getChildrenIterator();
 
 				while (it.hasNext()) {
 					PNode node = (PNode) it.next();
 
-					if (node instanceof IWorldObject) {
-						((IWorldObject) node).justDroppedInWorld();
+					if (node instanceof WorldObjectImpl) {
+						((WorldObjectImpl) node).addedToWorld();
 					}
 				}
 			}
 		}
+		signalEdgesChanged();
 	}
 
 	/*
@@ -670,7 +699,7 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 		}
 	}
 
-	protected Collection<PNode> getChildrenAtBounds(double x, double y,
+	protected Collection<WorldObject> getChildrenAtBounds(double x, double y,
 			double width, double height) {
 
 		return getChildrenAtBounds(new PBounds(x, y, width, height));
@@ -705,22 +734,21 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 		 * 
 		 */
 
-		IWorldLayer world = getWorldLayer();
+		WorldLayer world = getWorldLayer();
 		if (world == null)
 			return;
 
 		world.globalToLocal(dBounds);
 
-		Collection<PNode> intersectingNodes = world
+		Collection<WorldObject> intersectingNodes = world
 				.getChildrenAtBounds(dBounds);
 
 		// find intersecting nodes
-		Iterator<PNode> it = intersectingNodes.iterator();
+		Iterator<WorldObject> it = intersectingNodes.iterator();
 		while (it.hasNext()) {
-			PNode node = it.next();
+			WorldObject node = it.next();
 
-			if (node instanceof WorldObjectImpl && node != this
-					&& node != callingNode) {
+			if (node != this && node != callingNode) {
 				WorldObjectImpl gNode = (WorldObjectImpl) node;
 
 				if (gNode.isDraggable() && gNode.isTangible()) {
@@ -761,7 +789,7 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 		} else if (state == State.IN_DRAG) {
 			setBorder(Style.COLOR_BORDER_DRAGGED);
 		} else if (state == State.SELECTED) {
-			setBorder(Style.SELECTED_BORDER_COLOR);
+			setBorder(Style.COLOR_SELECTED);
 		}
 	}
 
@@ -771,6 +799,13 @@ public class WorldObjectImpl extends PNode implements IWorldObject {
 
 		firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
 
+	}
+
+	@Override
+	public void setOffset(double x, double y) {
+		// TODO Auto-generated method stub
+		super.setOffset(x, y);
+		signalEdgesChanged();
 	}
 
 	// /*
@@ -815,7 +850,7 @@ class BoundsFilter implements PNodeFilter {
 			// children
 			return false;
 
-		if (classType != null && !node.getClass().equals(classType))
+		if (!classType.isInstance(node) || node instanceof WorldLayer)
 			return false;
 
 		localBounds.setRect(bounds);

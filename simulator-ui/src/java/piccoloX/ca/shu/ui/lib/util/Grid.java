@@ -9,24 +9,34 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import ca.shu.ui.lib.world.impl.WorldImpl;
+
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-public class GridFactory {
+public class Grid extends PLayer {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;;
 
-	public static PLayer createGrid(PCamera camera, PRoot root, Color gridPaint,
-			double gridSpacing) {
+	static protected Line2D gridLine = new Line2D.Double();
 
-		PLayer gridLayer = new GridLayer(gridPaint, gridSpacing);
+	static protected Stroke gridStroke = new BasicStroke(1);
+
+	static boolean gridVisible = true;
+
+	public static PLayer createGrid(PCamera camera, PRoot root,
+			Color gridPaint, double gridSpacing) {
+
+		PLayer gridLayer = new Grid(gridPaint, gridSpacing);
 		gridLayer.setBounds(camera.getViewBounds());
-		
-		
+
 		root.addChild(gridLayer);
-		
-		
+
 		camera.addLayer(0, gridLayer);
 
 		// add constrains so that grid layers bounds always match cameras view
@@ -37,34 +47,34 @@ public class GridFactory {
 
 		camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM,
 				new CameraPropertyChangeListener(camera, gridLayer));
-		
+
 		return gridLayer;
 	}
-}
 
-class GridLayer extends PLayer {
+	public static boolean isGridVisible() {
+		return gridVisible;
+	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	public static void setGridVisible(boolean gridVisible) {
+		Grid.gridVisible = gridVisible;
+
+	}
 
 	Color gridPaint;
 
 	double gridSpacing;
 
-	public GridLayer(Color gridPaint, double gridSpacing) {
+	public Grid(Color gridPaint, double gridSpacing) {
 		super();
 		this.gridPaint = gridPaint;
 		this.gridSpacing = gridSpacing;
 	}
 
-	static protected Line2D gridLine = new Line2D.Double();
-
-	static protected Stroke gridStroke = new BasicStroke(1);
-
 	@Override
 	protected void paint(PPaintContext paintContext) {
+		if (!isGridVisible())
+			return;
+
 		// make sure grid gets drawn on snap to grid boundaries. And
 		// expand a little to make sure that entire view is filled.
 		double bx = (getX() - (getX() % gridSpacing)) - gridSpacing;
@@ -92,7 +102,6 @@ class GridLayer extends PLayer {
 			}
 		}
 	}
-
 }
 
 class CameraPropertyChangeListener implements PropertyChangeListener {

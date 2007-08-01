@@ -3,13 +3,13 @@ package ca.shu.ui.lib.world.impl;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.IWorldLayer;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 
-public class WorldSky extends PCamera implements IWorldLayer {
+public class WorldSky extends PCamera implements WorldLayer {
 
 	@Override
 	public void translateView(double arg0, double arg1) {
@@ -25,34 +25,34 @@ public class WorldSky extends PCamera implements IWorldLayer {
 	 */
 	private static final long serialVersionUID = -7467076877836999849L;
 
-	IWorld world;
+	World world;
 
-	public void addWorldObject(IWorldObject node) {
+	public void addWorldObject(WorldObject node) {
 		addChild((PNode) node);
 	}
 
-	public IWorld getWorld() {
+	public World getWorld() {
 		return world;
 	}
 
-	public WorldSky(IWorld world) {
+	public WorldSky(World world) {
 		super();
 		this.world = world;
 
 	}
 
-	public Collection<PNode> getChildrenAtBounds(Rectangle2D bounds) {
+	public Collection<WorldObject> getChildrenAtBounds(Rectangle2D bounds) {
 		System.out.println("Unimplemented!!");
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void addToWorldLayer(IWorldObject wo) {
+	public void addToWorldLayer(WorldObject wo) {
 		System.out.println("not implemented");
 		addChild((PNode) wo);
 	}
 
-	public void addChildW(IWorldObject child) {
+	public void addChildW(WorldObject child) {
 		System.out.println("not implemented");
 
 	}
@@ -62,7 +62,7 @@ public class WorldSky extends PCamera implements IWorldLayer {
 
 	}
 
-	public IWorldLayer getWorldLayer() {
+	public WorldLayer getWorldLayer() {
 		System.out.println("not implemented");
 		return null;
 	}
@@ -77,7 +77,7 @@ public class WorldSky extends PCamera implements IWorldLayer {
 
 	}
 
-	public void justDroppedInWorld() {
+	public void addedToWorld() {
 		System.out.println("not implemented");
 
 	}
