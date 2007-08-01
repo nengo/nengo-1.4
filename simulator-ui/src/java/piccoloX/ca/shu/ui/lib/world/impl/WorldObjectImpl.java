@@ -801,6 +801,10 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
+	/**
+	 * @param x horizontal position of the object relative to the parent
+	 * @param y vertical position of the object relative to the parent
+	 */
 	@Override
 	public void setOffset(double x, double y) {
 		// TODO Auto-generated method stub

@@ -42,6 +42,7 @@ public class Style {
 			14);
 	public static final Font FONT_SMALL = new Font("Helvetica", Font.PLAIN, 10);
 	public static final Font FONT_NORMAL = new Font("Helvetica", Font.PLAIN, 14);
+	public static final Font FONT_BOLD = new Font("Helvetica", Font.BOLD, 14);
 	public static final Font FONT_BIG = new Font("Helvetica", Font.BOLD, 16);
 	public static final Font FONT_LARGE = new Font("Helvetica", Font.BOLD, 18);
 	public static final Font FONT_XLARGE = new Font("Helvetica", Font.BOLD, 22);

@@ -3,20 +3,25 @@ package ca.neo.ui.models;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import javax.swing.AbstractAction;
 
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
+import ca.neo.model.Probeable;
+import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.models.viewers.NetworkViewer;
-import ca.neo.ui.models.widgets.Probe;
+import ca.neo.ui.models.widgets.GProbe;
 import ca.neo.ui.models.wrappers.PDecodedTermination;
 import ca.neo.ui.models.wrappers.POrigin;
 import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
 import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.util.Probe;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
@@ -25,6 +30,11 @@ import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 
 public abstract class PModelNode extends PModelConfigurable {
+
+	/*
+	 * Probes can be attached to the node, or the node's widgets
+	 */
+	Vector<GProbe> probes;
 
 	/*
 	 * Widgets are attached objects which are not children.
@@ -60,59 +70,7 @@ public abstract class PModelNode extends PModelConfigurable {
 		widgets.add(widget);
 
 		updateWidgets();
-	}
-
-	/**
-	 * @return The Widget found matching parameters, null if not found
-	 * @param name
-	 *            of the widget
-	 * @param type
-	 *            of the widget
-	 */
-	@SuppressWarnings("unchecked")
-	public WorldObjectImpl getWidget(String name, Class type) {
-
-		if (widgets == null)
-			return null;
-		/*
-		 * Linear search used because there tends to be only a small number of
-		 * widets
-		 */
-		Iterator<WorldObjectImpl> it = widgets.iterator();
-
-		while (it.hasNext()) {
-			WorldObjectImpl wo = it.next();
-
-			if (type != null && type.isInstance(wo)) {
-				return wo;
-			}
-
-		}
-		return null;
-	}
-
-	class AddScopeAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1;
-
-		public AddScopeAction() {
-			super("Add probe");
-			// TODO Auto-generated constructor stub
-		}
-
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-			addProbe();
-		}
-
-	}
-
-	public void addProbe() {
-		addChild(new Probe(this));
-
+		assignProbes();
 	}
 
 	@Override
@@ -123,8 +81,30 @@ public abstract class PModelNode extends PModelConfigurable {
 		// menu.addSubMenu(label)
 		menu.addSection("Node");
 
-		menu.addAction(new AddScopeAction());
+		/*
+		 * Build the "add probe" menu
+		 */
+		if (getModel() instanceof Probeable) {
 
+			Probeable probeable = (Probeable) getModel();
+			Properties states = probeable.listStates();
+
+			// Enumeration e = states.elements();
+			Iterator it = states.entrySet().iterator();
+			MenuBuilder probesMenu = null;
+
+			while (it.hasNext()) {
+				if (probesMenu == null) {
+					probesMenu = menu.createSubMenu("Add probe");
+				}
+				Entry<String, String> el = (Entry<String, String>) it.next();
+				probesMenu.addAction(new AddProbeAction(el));
+			}
+		}
+
+		/*
+		 * Build the "show origins" menu
+		 */
 		Origin[] origins = getNode().getOrigins();
 		if (origins.length > 0) {
 
@@ -139,6 +119,22 @@ public abstract class PModelNode extends PModelConfigurable {
 		}
 
 		return menu;
+	}
+
+	/**
+	 * Creates a new probe and adds the UI object to the node
+	 * 
+	 * @param state
+	 *            The name of the state variable to probe
+	 */
+	public void createProbe(String state) {
+		if (probes == null)
+			probes = new Vector<GProbe>();
+
+		GProbe probe = new GProbe(this, state);
+		addChild(probe);
+		probes.add(probe);
+		assignProbes();
 	}
 
 	/**
@@ -172,47 +168,6 @@ public abstract class PModelNode extends PModelConfigurable {
 		return (Node) getModel();
 	}
 
-	@Override
-	public PropertyStructure[] getPropertiesSchema() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getTypeName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	// Vector<POrigin> origins;
-
-	@Override
-	public void moveToFront() {
-		// TODO Auto-generated method stub
-		super.moveToFront();
-		updateWidgets();
-	}
-
-	public void removeWidget(WorldObjectImpl widget) {
-		widgets.remove(widget);
-		widget.removeFromParent();
-
-		updateWidgets();
-	}
-
-	/**
-	 * Shows all the origins on the Node model
-	 */
-	public void showAllOrigins() {
-
-		Origin[] origins = getNode().getOrigins();
-
-		for (int i = 0; i < origins.length; i++) {
-			getOrigin(origins[i].getName());
-		}
-
-	}
-
 	/**
 	 * @param name
 	 *            Name of an Origin on the Node model
@@ -244,14 +199,136 @@ public abstract class PModelNode extends PModelConfigurable {
 		return null;
 	}
 
+	@Override
+	public PropertyStructure[] getPropertiesSchema() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getTypeName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public WorldObjectImpl getWidget(String name) {
+		return getWidget(name, null);
+	}
+
+	/**
+	 * @return The Widget found matching parameters, null if not found
+	 * @param name
+	 *            of the widget
+	 * @param type
+	 *            of the widget
+	 */
+	@SuppressWarnings("unchecked")
+	public WorldObjectImpl getWidget(String name, Class type) {
+
+		if (widgets == null)
+			return null;
+		/*
+		 * Linear search used because there tends to be only a small number of
+		 * widets
+		 */
+		Iterator<WorldObjectImpl> it = widgets.iterator();
+
+		while (it.hasNext()) {
+			WorldObjectImpl wo = it.next();
+
+			if (type != null && type.isInstance(wo)
+					&& (wo.getName().compareTo(name) == 0)) {
+				return wo;
+			} else if ((wo.getName().compareTo(name) == 0)) {
+				return wo;
+			}
+
+		}
+		return null;
+	}
+
+	@Override
+	public void moveToFront() {
+		// TODO Auto-generated method stub
+		super.moveToFront();
+		updateWidgets();
+	}
+
+	/**
+	 * Removes a Probe UI object from node
+	 * 
+	 * @param probe
+	 *            to be removed
+	 */
+	public void removeProbe(GProbe probe) {
+		probes.remove(probe);
+
+	}
+
+	// Vector<POrigin> origins;
+
+	public void removeWidget(WorldObjectImpl widget) {
+		widgets.remove(widget);
+		widget.removeFromParent();
+
+		updateWidgets();
+		assignProbes();
+	}
+
+	/**
+	 * Shows all the origins on the Node model
+	 */
+	public void showAllOrigins() {
+
+		Origin[] origins = getNode().getOrigins();
+
+		for (int i = 0; i < origins.length; i++) {
+			getOrigin(origins[i].getName());
+		}
+
+	}
+
 	private void init() {
 
+	}
+
+	/**
+	 * Assign Probe UI objects to the appropriate widget
+	 */
+	protected void assignProbes() {
+		if (probes == null)
+			return;
+		Iterator<GProbe> it = probes.iterator();
+
+		while (it.hasNext()) {
+			GProbe probe = it.next();
+
+			WorldObjectImpl widget = getWidget(probe.getName());
+			if (widget != null) {
+				probe.setOffset(0, widget.getHeight() / 2);
+				widget.addChild(probe);
+			} else {
+				addChild(probe);
+				probe.setOffset(0, getHeight() / 2);
+			}
+
+		}
 	}
 
 	@Override
 	protected Object createModel() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void layoutChildren() {
+		// TODO Auto-generated method stub
+		super.layoutChildren();
+
+		layoutWidgets();
+
 	}
 
 	// Vector<POrigin> origins;
@@ -265,16 +342,6 @@ public abstract class PModelNode extends PModelConfigurable {
 	// origins.add(e)
 	//		
 	// }
-
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void layoutChildren() {
-		// TODO Auto-generated method stub
-		super.layoutChildren();
-
-		layoutWidgets();
-
-	}
 
 	/**
 	 * layout widgets such as Origins and Terminations
@@ -314,8 +381,8 @@ public abstract class PModelNode extends PModelConfigurable {
 					}
 				}
 			}
-
 		}
+
 	}
 
 	protected void updateWidgets() {
@@ -337,6 +404,25 @@ public abstract class PModelNode extends PModelConfigurable {
 		}
 
 		layoutWidgets();
+	}
+
+	class AddProbeAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1;
+
+		Entry<String, String> state;
+
+		public AddProbeAction(Entry<String, String> state) {
+			super(state.getKey() + " - " + state.getValue());
+			this.state = state;
+
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+
+			createProbe(state.getKey());
+		}
+
 	}
 
 	class ShowAllOriginAction extends AbstractAction {

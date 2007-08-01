@@ -16,12 +16,12 @@ import ca.shu.ui.lib.util.Util;
 
 public class RunSimulatorAction extends AbstractAction {
 
-	Simulator simulator;
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	Simulator simulator;
 
 	public RunSimulatorAction(Simulator simulator) {
 		super("run");
@@ -66,30 +66,36 @@ public class RunSimulatorAction extends AbstractAction {
 	}
 }
 
+/**
+ * Configures the simulator run options
+ * 
+ * @author Shu Wu
+ * 
+ */
 class SimulatorConfig extends AbstractConfigurable {
-	static final PropertyStructure pStartTime = new PTFloat("Start time");
 	static final PropertyStructure pEndTime = new PTFloat("End time");
+	static final PropertyStructure pStartTime = new PTFloat("Start time");
 	static final PropertyStructure pStepSize = new PTFloat("Step size");
 
 	static final PropertyStructure[] zProperties = { pStartTime, pEndTime,
 			pStepSize };
 
-	public float getStartTime() {
-		return (Float) getProperty(pStartTime);
-	}
-
 	public float getEndTime() {
 		return (Float) getProperty(pEndTime);
-	}
-
-	public float getStepSize() {
-		return (Float) getProperty(pStepSize);
 	}
 
 	@Override
 	public PropertyStructure[] getPropertiesSchema() {
 		// TODO Auto-generated method stub
 		return zProperties;
+	}
+
+	public float getStartTime() {
+		return (Float) getProperty(pStartTime);
+	}
+
+	public float getStepSize() {
+		return (Float) getProperty(pStepSize);
 	}
 
 	@Override

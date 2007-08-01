@@ -64,7 +64,8 @@ public class UIConfigManager implements IConfigurationManager {
 		if (configLock != null) {
 			synchronized (configLock) {
 				try {
-					configLock.wait();
+					if (configLock != null)
+						configLock.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

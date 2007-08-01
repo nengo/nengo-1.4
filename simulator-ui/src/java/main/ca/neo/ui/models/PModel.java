@@ -6,6 +6,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.handlers.IContextMenu;
+import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
@@ -45,11 +46,11 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 
 	public PopupMenuBuilder constructMenu() {
 
-		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
+		PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
 
-		menu.addSection("Object");
+		MenuBuilder objectMenu = menu.createSubMenu("Object");
 
-		menu.addAction(new AbstractAction("Remove model") {
+		objectMenu.addAction(new AbstractAction("Remove") {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
@@ -85,7 +86,7 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 	}
 
 	public JPopupMenu showPopupMenu(PInputEvent event) {
-		if (model == null) {
+		if (!isModelCreated()) {
 			Util.Warning("Model is not configured yet");
 			return null;
 		} else {
@@ -110,7 +111,5 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 		setBounds(getFullBounds());
 
 	}
-
-
 
 }

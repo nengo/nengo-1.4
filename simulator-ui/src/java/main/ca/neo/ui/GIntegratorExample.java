@@ -30,7 +30,7 @@ public class GIntegratorExample {
 		/*
 		 * Adds the toplevel network into the Graphics workspace
 		 */
-		ui.addObject(network);
+		ui.addWorldObject(network);
 
 		/*
 		 * Creates function input
@@ -54,10 +54,9 @@ public class GIntegratorExample {
 		/*
 		 * Add the nodes to the network
 		 */
+		integrator.setOffset(150, 0); // change the position of the integrator
 
 		network.addNode(input);
-
-		integrator.setOffset(150, 0); // change the position of the integrator
 		network.addNode(integrator);
 
 		/*

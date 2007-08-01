@@ -74,12 +74,17 @@ public class IconWrapper extends WorldObjectImpl implements NamedObject,
 		updateLabel();
 	}
 
-	
-	
 	public void setLabelVisible(boolean isVisible) {
-		label.setVisible(isVisible);
+		if (isVisible) {
+			addChild(label);
+		} else {
+			if (label.getParent() != null)
+				label.removeFromParent();
+
+		}
+		// label.setVisible(isVisible);
 	}
-	
+
 	/**
 	 * @return the name of the label
 	 */

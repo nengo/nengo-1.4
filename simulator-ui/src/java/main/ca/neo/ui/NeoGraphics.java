@@ -48,8 +48,15 @@ public class NeoGraphics extends GFrame {
 		return canvasView;
 	}
 
-	public void addObject(WorldObject object) {
+	
+	/**
+	 * 
+	 * @param object Object to be added to the top-level world
+	 * @return the object being added
+	 */
+	public WorldObject addWorldObject(WorldObject object) {
 		getWorld().getGround().catchObject(object);
+		return object;
 	}
 
 	public void showCanvas() {

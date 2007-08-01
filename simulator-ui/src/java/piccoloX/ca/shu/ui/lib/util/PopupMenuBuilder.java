@@ -1,5 +1,7 @@
 package ca.shu.ui.lib.util;
 
+import java.awt.Font;
+
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -23,7 +25,9 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 		super(false);
 		menu = new JPopupMenu(label);
 		style(menu);
-		
+
+		addSection(label, Style.FONT_LARGE);
+
 	}
 
 	public void addAction(AbstractAction action) {
@@ -36,12 +40,19 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 	boolean isFirstSection = true;
 
-	/*
+	public void addSection(String name) {
+		addSection(name, Style.FONT_BOLD);
+	}
+
+	/**
 	 * Creates a new section in the Popup menu
 	 * 
-	 * @param name the name of the new section
+	 * @param name
+	 *            the name of the new section
+	 * @param fontStyle
+	 *            style of font for the subsection label
 	 */
-	public void addSection(String name) {
+	public void addSection(String name, Font fontStyle) {
 		if (isFirstSection) {
 			isFirstSection = false;
 		} else {
@@ -50,7 +61,7 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 		JLabel label = new JLabel(name);
 		label.setLocation(4, 4);
-		label.setFont(Style.FONT_BIG);
+		label.setFont(fontStyle);
 		style(label);
 		menu.add(label);
 	}
