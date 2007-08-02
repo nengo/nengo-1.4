@@ -4,10 +4,10 @@ import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PTInt;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 public class FGaussianPDF extends ConfigurableFunction {
-	static final PropertyStructure[] propStruct = new PropertyStructure[] {
+	static final PropDescriptor[] propStruct = new PropDescriptor[] {
 			new PTFloat("Mean"), new PTFloat("Variance"), new PTFloat("Peak") };
 
 
@@ -15,7 +15,7 @@ public class FGaussianPDF extends ConfigurableFunction {
 		return GaussianPDF.class;
 	}
 
-	public PropertyStructure[] getPropertiesSchema() {
+	public PropDescriptor[] getConfigSchema() {
 		return propStruct;
 	}
 

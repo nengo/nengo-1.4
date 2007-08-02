@@ -1,14 +1,15 @@
 package ca.neo.ui.views.objects.configurable;
 
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.managers.PropertySet;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 public abstract class AbstractConfigurable implements IConfigurable {
-	SimpleAttributeSet properties;
 
 	boolean isConfigured = false;
-	
+
 	public boolean isConfigured() {
 		return isConfigured;
 	}
@@ -20,43 +21,18 @@ public abstract class AbstractConfigurable implements IConfigurable {
 	public AbstractConfigurable() {
 		super();
 
-		properties = new SimpleAttributeSet();
 	}
 
-	public SimpleAttributeSet getPropertiesReference() {
-		return properties;
-	}
+	public void completeConfiguration(PropertySet properties) {
 
-	public Object getProperty(String name) {
-		return properties.getAttribute(name);
-	}
-
-	public Object getProperty(PropertyStructure prop) {
-		return properties.getAttribute(prop.getName());
-	}
-
-	
-	public void setProperties(SimpleAttributeSet properties) {
-		this.properties = properties;
-	}
-
-	public void setProperty(String name, Object value) {
-
-		getPropertiesReference().addAttribute(name, value);
-
-	}
-	
-	
-
-	public  void cancelConfiguration() {
-		
-	}
-
-	public void completeConfiguration() {
 		setConfigured(true);
 	}
 
-	public abstract PropertyStructure[] getPropertiesSchema();
+	public void cancelConfiguration() {
+
+	}
+
+	public abstract PropDescriptor[] getConfigSchema();
 
 	public abstract String getTypeName();
 }

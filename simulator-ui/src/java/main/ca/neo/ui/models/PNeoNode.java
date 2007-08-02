@@ -13,15 +13,15 @@ import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
-import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
+import ca.neo.model.Termination;
+import ca.neo.ui.models.nodes.connectors.PDecodedTermination;
+import ca.neo.ui.models.nodes.connectors.POrigin;
+import ca.neo.ui.models.nodes.connectors.PTermination;
+import ca.neo.ui.models.nodes.widgets.GProbe;
 import ca.neo.ui.models.viewers.NetworkViewer;
-import ca.neo.ui.models.widgets.GProbe;
-import ca.neo.ui.models.wrappers.PDecodedTermination;
-import ca.neo.ui.models.wrappers.POrigin;
-import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
-import ca.neo.util.Probe;
+import ca.neo.ui.views.objects.configurable.managers.PropertySet;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
@@ -29,7 +29,7 @@ import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 
-public abstract class PModelNode extends PModelConfigurable {
+public abstract class PNeoNode extends PModelConfigurable {
 
 	/*
 	 * Probes can be attached to the node, or the node's widgets
@@ -41,19 +41,74 @@ public abstract class PModelNode extends PModelConfigurable {
 	 */
 	Vector<WorldObjectImpl> widgets;
 
-	public PModelNode() {
+	public PNeoNode(Node model) {
+		super(model);
+		init();
+	}
+
+	@Override
+	public void update() {
+
+		super.update();
+
+		Origin[] origins = getNode().getOrigins();
+		Termination[] terminations = getNode().getTerminations();
+
+		for (int i = 0; i < origins.length; i++) {
+			Origin origin = origins[i];
+
+		}
+	}
+
+	/**
+	 * 
+	 * @param term
+	 *            Termination to be shown to the UI
+	 * @return
+	 */
+	public PTermination showTermination(String name) {
+		PTermination termUI;
+		try {
+			termUI = new PTermination(this, getNode().getTermination(name));
+			addWidget(termUI);
+			return termUI;
+		} catch (StructuralException e) {
+			Util.Error(e.toString());
+		}
+		return null;
+
+	}
+
+	/**
+	 * 
+	 * @param origin
+	 *            to be shown in the UI
+	 * @return the origin UI object
+	 */
+	public POrigin showOrigin(String name) {
+		POrigin originUI;
+		try {
+			originUI = new POrigin(this, getNode().getOrigin(name));
+			addWidget(originUI);
+
+			return originUI;
+
+		} catch (StructuralException e) {
+			Util.Error(e.toString());
+		}
+		return null;
+	}
+
+	public PNeoNode() {
 		super();
 		init();
 	}
 
-	public PModelNode(boolean useDefaultConfigManager) {
-		super(useDefaultConfigManager);
-		init();
-	}
-
-	public PModelNode(IConfigurationManager configManager) {
-		super(configManager);
-		init();
+	@Override
+	public void setModel(Object model) {
+		// TODO Auto-generated method stub
+		super.setModel(model);
+		setName(((Node) model).getName());
 	}
 
 	@Override
@@ -67,6 +122,7 @@ public abstract class PModelNode extends PModelConfigurable {
 		if (widgets == null) {
 			widgets = new Vector<WorldObjectImpl>(3);
 		}
+		widget.setScale(0.5);
 		widgets.add(widget);
 
 		updateWidgets();
@@ -177,30 +233,43 @@ public abstract class PModelNode extends PModelConfigurable {
 		/*
 		 * Try to find if the origin has already been created
 		 */
-		POrigin uiOrigin = (POrigin) getWidget(originName, POrigin.class);
-		if (uiOrigin != null) {
-			return uiOrigin;
+		Object origin = getWidget(originName, POrigin.class);
+		if (origin != null) {
+			return (POrigin) origin;
 		}
 
 		/*
 		 * Otherwise try to create it
 		 */
 
-		try {
-			uiOrigin = new POrigin(this, getNode().getOrigin(originName));
-			uiOrigin.setScale(0.5);
+		return showOrigin(originName);
 
-			addWidget(uiOrigin);
+	}
 
-			return uiOrigin;
-		} catch (StructuralException e) {
-			Util.Error(e.toString());
+	/**
+	 * @param name
+	 *            Name of an Termination on the Node model
+	 * @return the POrigin shown
+	 */
+	public PTermination getTermination(String terminationName) {
+		/*
+		 * Try to find if the origin has already been created
+		 */
+		Object term = getWidget(terminationName, PTermination.class);
+		if (term != null) {
+			return (PTermination) term;
 		}
-		return null;
+
+		/*
+		 * Otherwise try to create it
+		 */
+
+		return showTermination(terminationName);
+
 	}
 
 	@Override
-	public PropertyStructure[] getPropertiesSchema() {
+	public PropDescriptor[] getConfigSchema() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -236,9 +305,10 @@ public abstract class PModelNode extends PModelConfigurable {
 		while (it.hasNext()) {
 			WorldObjectImpl wo = it.next();
 
-			if (type != null && type.isInstance(wo)
-					&& (wo.getName().compareTo(name) == 0)) {
-				return wo;
+			if (type != null) {
+				if (type.isInstance(wo) && (wo.getName().compareTo(name) == 0)) {
+					return wo;
+				}
 			} else if ((wo.getName().compareTo(name) == 0)) {
 				return wo;
 			}
@@ -316,7 +386,7 @@ public abstract class PModelNode extends PModelConfigurable {
 	}
 
 	@Override
-	protected Object createModel() {
+	protected Object configureModel(PropertySet configuredProperties) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -375,7 +445,7 @@ public abstract class PModelNode extends PModelConfigurable {
 						originY -= widget.getScale() * widget.getHeight() + 5;
 						widget.setOffset(originX, originY);
 
-					} else if (widget instanceof PDecodedTermination) {
+					} else if (widget instanceof PTermination) {
 						termY -= widget.getScale() * widget.getHeight() + 5;
 						widget.setOffset(termX, termY);
 					}
@@ -451,6 +521,14 @@ public abstract class PModelNode extends PModelConfigurable {
 		public void actionPerformed(ActionEvent e) {
 			getOrigin(originName);
 		}
+	}
+
+	@Override
+	public void modelRemoved() {
+		super.modelRemoved();
+
+		((NetworkViewer) getParent()).removeNode(this);
+
 	}
 
 }

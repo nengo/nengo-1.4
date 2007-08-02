@@ -7,33 +7,31 @@ import javax.swing.JLabel;
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
 /**
- * Statically describes a property 
+ * Describes a property of a IConfigurable object
  */
-public abstract class PropertyStructure implements Serializable {
+public abstract class PropDescriptor implements Serializable {
 
 	String name;
 
-	public PropertyStructure(String name) {
+	public PropDescriptor(String name) {
 		super();
 		this.name = name;
 
-		
 	}
-
-	public String getName() {
-		return name;
-	}
-	
-	public abstract Class getTypeClass();
-
-	public abstract String getTypeName();
 
 	public abstract PropertyInputPanel createInputPanel();
-	
 
 	public JLabel getLabel() {
 		JLabel label = new JLabel(getName() + " (" + getTypeName() + ")");
 		return label;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public abstract Class getTypeClass();
+
+	public abstract String getTypeName();
 
 }

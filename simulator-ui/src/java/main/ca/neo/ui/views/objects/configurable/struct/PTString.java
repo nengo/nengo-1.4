@@ -5,7 +5,7 @@ import javax.swing.JTextField;
 
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
-public class PTString extends PropertyStructure {
+public class PTString extends PropDescriptor {
 
 	public PTString(String name) {
 		super(name);
@@ -35,7 +35,7 @@ public class PTString extends PropertyStructure {
 class StringInputPanel extends PropertyInputPanel {
 	JTextField tf;
 
-	public StringInputPanel(PropertyStructure property) {
+	public StringInputPanel(PropDescriptor property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}

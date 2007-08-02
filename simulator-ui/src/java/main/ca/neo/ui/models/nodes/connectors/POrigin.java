@@ -1,9 +1,9 @@
-package ca.neo.ui.models.wrappers;
+package ca.neo.ui.models.nodes.connectors;
 
 import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.models.PModel;
-import ca.neo.ui.models.PModelNode;
+import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.IconWrapper;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Tooltip;
@@ -25,11 +25,11 @@ public class POrigin extends PModel {
 
 	static final String typeName = "Origin";
 
-	PModelNode nodeParent;
+	PNeoNode nodeParent;
 
 	OriginWell lineWell;
 
-	public POrigin(PModelNode nodeParent, Origin origin) {
+	public POrigin(PNeoNode nodeParent, Origin origin) {
 		super();
 		this.nodeParent = nodeParent;
 
@@ -55,8 +55,21 @@ public class POrigin extends PModel {
 	}
 
 	public void connectTo(PTermination term) {
-		LineEnd lineEnd = lineWell.createAndAddLineEnd();
+		connectTo(term, false);
+	}
+
+	/**
+	 * 
+	 * @param term
+	 *            the termination to be connected to
+	 * @param modifyModel
+	 *            if true, the Network model will be updated to reflect this
+	 *            connection
+	 */
+	public void connectTo(PTermination term, boolean modifyModel) {
+		LineEnd lineEnd = lineWell.createConnection(modifyModel);
 		lineEnd.tryConnectTo(term);
+
 	}
 
 	/**
@@ -69,8 +82,8 @@ public class POrigin extends PModel {
 
 		try {
 
-			nodeParent.getNetworkViewer().getModel().addProjection(getModelOrigin(),
-					target.getModelTermination());
+			nodeParent.getNetworkViewer().getModel().addProjection(
+					getModelOrigin(), target.getModelTermination());
 
 			// getWorld().showTooltip(new ConnectedTooltip("Connected"),
 			// target);
@@ -99,8 +112,8 @@ public class POrigin extends PModel {
 	}
 
 	@Override
-	public void removeModel() {
-		super.removeModel();
+	public void modelRemoved() {
+		super.modelRemoved();
 
 		nodeParent.removeWidget(this);
 
@@ -108,8 +121,11 @@ public class POrigin extends PModel {
 
 	class OriginEnd extends LineEnd {
 
-		public OriginEnd(LineEndWell well) {
+		boolean modifyModel;
+
+		public OriginEnd(LineEndWell well, boolean modifyModel) {
 			super(well);
+			this.modifyModel = modifyModel;
 		}
 
 		private static final long serialVersionUID = 1L;
@@ -118,8 +134,11 @@ public class POrigin extends PModel {
 		protected boolean initConnection(WorldObject target) {
 			if (!(target instanceof PTermination))
 				return false;
+			if (modifyModel) {
+				return POrigin.this.connectModelTo((PTermination) target);
+			}
 
-			return POrigin.this.connectModelTo((PTermination) target);
+			return true;
 		}
 
 		@Override
@@ -151,7 +170,20 @@ public class POrigin extends PModel {
 
 		@Override
 		protected LineEnd constructLineEnd() {
-			return new OriginEnd(this);
+			return new OriginEnd(this, true);
+		}
+
+		/**
+		 * 
+		 * @param modifyModel
+		 *            whether this UI connection will modify the NEO model
+		 *            underneath
+		 * @return
+		 */
+		public LineEnd createConnection(boolean modifyModel) {
+			LineEnd lineEnd = new OriginEnd(this, modifyModel);
+			super.addLineEnd(lineEnd);
+			return lineEnd;
 		}
 
 	}

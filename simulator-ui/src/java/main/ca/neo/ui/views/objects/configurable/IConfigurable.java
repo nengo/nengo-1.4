@@ -1,36 +1,27 @@
 package ca.neo.ui.views.objects.configurable;
 
-import javax.swing.text.SimpleAttributeSet;
+import ca.neo.ui.views.objects.configurable.managers.PropertySet;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
-import ca.shu.ui.lib.world.NamedObject;
+/**
+ * Describes a object which can be configured programatically by a
+ * IConfigurationManager
+ * 
+ * @author Shu Wu
+ * 
+ */
+public interface IConfigurable {
+	public PropDescriptor[] getConfigSchema();
 
-public interface IConfigurable  {
-	public abstract PropertyStructure[] getPropertiesSchema();
-
-//	public void setProperty(String name, Object value);
-//
-//	public Object getProperty(String name);
-
-	public void completeConfiguration();
+	public void completeConfiguration(PropertySet properties);
 
 	public void cancelConfiguration();
-	
+
 	public boolean isConfigured();
 
-	// public void savePropertiesToFile(String fileName);
+	public String getTypeName();
 
-	// public void deletePropretiesFile(String fileName);
+	// public MutableAttributeSet getPropertiesReference();
 
-	// public String[] getPropertyFiles();
-
-	// public void loadPropertiesFromFile(String fileName);
-
-	public abstract String getTypeName();
-
-	public SimpleAttributeSet getPropertiesReference();
-
-	public void setProperties(SimpleAttributeSet properties);
-
-	// public String getTypeName();
+	// public void setProperties(MutableAttributeSet properties);
 }

@@ -7,9 +7,10 @@ import javax.swing.AbstractAction;
 import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
 import ca.neo.ui.views.objects.configurable.AbstractConfigurable;
-import ca.neo.ui.views.objects.configurable.UIConfigManager;
+import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
+import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.objects.widgets.TrackedTask;
 import ca.shu.ui.lib.util.GraphicsEnvironment;
 import ca.shu.ui.lib.util.Util;
@@ -29,12 +30,13 @@ public class RunSimulatorAction extends AbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		UIConfigManager configManager = new UIConfigManager(GraphicsEnvironment
-				.getInstance());
 
 		SimulatorConfig simulatorConfig = new SimulatorConfig();
 
-		configManager.configure(simulatorConfig);
+		/*
+		 * Configures the simulatorConfig
+		 */
+		new DialogConfig(simulatorConfig);
 
 		if (simulatorConfig.isConfigured()) {
 			(new RunSimulatorThread(simulatorConfig)).start();
@@ -73,35 +75,43 @@ public class RunSimulatorAction extends AbstractAction {
  * 
  */
 class SimulatorConfig extends AbstractConfigurable {
-	static final PropertyStructure pEndTime = new PTFloat("End time");
-	static final PropertyStructure pStartTime = new PTFloat("Start time");
-	static final PropertyStructure pStepSize = new PTFloat("Step size");
+	static final PropDescriptor pEndTime = new PTFloat("End time");
+	static final PropDescriptor pStartTime = new PTFloat("Start time");
+	static final PropDescriptor pStepSize = new PTFloat("Step size");
 
-	static final PropertyStructure[] zProperties = { pStartTime, pEndTime,
+	static final PropDescriptor[] zProperties = { pStartTime, pEndTime,
 			pStepSize };
 
 	public float getEndTime() {
-		return (Float) getProperty(pEndTime);
+		return (Float) configuredProperties.getProperty(pEndTime);
 	}
 
 	@Override
-	public PropertyStructure[] getPropertiesSchema() {
+	public PropDescriptor[] getConfigSchema() {
 		// TODO Auto-generated method stub
 		return zProperties;
 	}
 
 	public float getStartTime() {
-		return (Float) getProperty(pStartTime);
+		return (Float) configuredProperties.getProperty(pStartTime);
 	}
 
 	public float getStepSize() {
-		return (Float) getProperty(pStepSize);
+		return (Float) configuredProperties.getProperty(pStepSize);
 	}
 
 	@Override
 	public String getTypeName() {
 		// TODO Auto-generated method stub
 		return "Simulator Runtime Configuration";
+	}
+
+	PropertySet configuredProperties;
+
+	@Override
+	public void completeConfiguration(PropertySet properties) {
+		super.completeConfiguration(properties);
+		configuredProperties = properties;
 	}
 
 }

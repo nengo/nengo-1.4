@@ -3,10 +3,10 @@ package ca.neo.ui.models.functions;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PTInt;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 public class FConstantFunction extends ConfigurableFunction {
-	static final PropertyStructure[] propStruct = new PropertyStructure[] {
+	static final PropDescriptor[] propStruct = new PropDescriptor[] {
 			new PTInt("Dimension"), new PTFloat("Value") };
 
 
@@ -14,7 +14,7 @@ public class FConstantFunction extends ConfigurableFunction {
 		return ConstantFunction.class;
 	}
 
-	public PropertyStructure[] getPropertiesSchema() {
+	public PropDescriptor[] getConfigSchema() {
 		return propStruct;
 	}
 

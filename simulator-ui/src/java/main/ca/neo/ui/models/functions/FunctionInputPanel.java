@@ -10,15 +10,8 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import ca.neo.math.Function;
-import ca.neo.math.impl.ConstantFunction;
-import ca.neo.math.impl.FourierFunction;
-import ca.neo.math.impl.GaussianPDF;
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
-import ca.neo.ui.views.objects.configurable.UIConfigManager;
-import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
-import ca.neo.ui.views.objects.configurable.struct.PTFloat;
-import ca.neo.ui.views.objects.configurable.struct.PTInt;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.util.Util;
 
 public class FunctionInputPanel extends PropertyInputPanel {
@@ -39,7 +32,7 @@ public class FunctionInputPanel extends PropertyInputPanel {
 
 	Function function = null;
 
-	public FunctionInputPanel(PropertyStructure property) {
+	public FunctionInputPanel(PropDescriptor property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 		setValue(null);

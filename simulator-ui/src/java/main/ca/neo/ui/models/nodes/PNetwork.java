@@ -1,18 +1,26 @@
-package ca.neo.ui.models.wrappers;
+package ca.neo.ui.models.nodes;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.SwingUtilities;
 
+import ca.neo.model.Network;
 import ca.neo.model.Node;
-import ca.neo.model.StructuralException;
+import ca.neo.model.Origin;
+import ca.neo.model.Projection;
+import ca.neo.model.Termination;
+import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;
-import ca.neo.ui.models.PModelNode;
+import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.NetworkIcon;
+import ca.neo.ui.models.nodes.connectors.POrigin;
+import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.viewers.NetworkViewer;
-import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
+import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
@@ -23,40 +31,31 @@ import ca.shu.ui.lib.util.Util;
  * @author Shu
  * 
  */
-public class PNetwork extends PModelNode {
+public class PNetwork extends PNeoNode {
 
 	private static final long serialVersionUID = 1L;
 
-	static final PropertyStructure pName = new PTString("Name");
+	static final PropDescriptor pName = new PTString("Name");
 
 	static final String typeName = "Network";
 
-	static final PropertyStructure[] zProperties = { pName };
+	static final PropDescriptor[] zProperties = { pName };
 
 	NetworkViewer networkViewer;
 
 	Window networkWindow;
 
-	public PNetwork(boolean useDefaultConfigManager) {
-		super(useDefaultConfigManager);
-		init();
-	}
-
-	public PNetwork(IConfigurationManager configManager) {
-		super(configManager);
-		init();
-	}
-
-	/**
-	 * 
-	 * @param name
-	 *            Name of the network
-	 */
-	public PNetwork(String name) {
+	public PNetwork() {
 		super();
-		setProperty(pName, name);
-		initModel();
 		init();
+	}
+
+	public PNetwork(Network model) {
+		super(model);
+
+		setName(model.getName());
+		init();
+
 	}
 
 	/**
@@ -64,9 +63,9 @@ public class PNetwork extends PModelNode {
 	 * 
 	 * @param nodeProxy
 	 */
-	public void addNode(PModelNode nodeProxy) {
+	public void addNode(PNeoNode nodeProxy) {
 
-		getNetworkViewer().addNode(nodeProxy);
+		getNetworkViewer().addNodeToUI(nodeProxy);
 	}
 
 	@Override
@@ -81,7 +80,7 @@ public class PNetwork extends PModelNode {
 				private static final long serialVersionUID = 1L;
 
 				public void actionPerformed(ActionEvent e) {
-					showNodes();
+					openNetworkViewer();
 				}
 			});
 
@@ -106,6 +105,11 @@ public class PNetwork extends PModelNode {
 		networkViewer = new NetworkViewer(this, getRoot());
 		networkWindow = new Window(this, networkViewer);
 		networkWindow.translate(0, this.getHeight());
+	}
+
+	@Override
+	public PropDescriptor[] getConfigSchema() {
+		return zProperties;
 	}
 
 	/**
@@ -137,11 +141,6 @@ public class PNetwork extends PModelNode {
 	}
 
 	@Override
-	public PropertyStructure[] getPropertiesSchema() {
-		return zProperties;
-	}
-
-	@Override
 	public String getTypeName() {
 		// TODO Auto-generated method stub
 		return typeName;
@@ -164,7 +163,7 @@ public class PNetwork extends PModelNode {
 	 * @return opens the network viewer which contains the nodes of the Network
 	 *         model
 	 */
-	public NetworkViewer showNodes() {
+	public NetworkViewer openNetworkViewer() {
 		if (networkViewer == null) {
 			constructNetworkViewer();
 		}
@@ -182,9 +181,10 @@ public class PNetwork extends PModelNode {
 	}
 
 	@Override
-	protected Node createModel() {
+	protected Node configureModel(PropertySet configuredProperties) {
+
 		NetworkImpl network = new NetworkImpl();
-		network.setName((String) getProperty(pName));
+		network.setName((String) configuredProperties.getProperty(pName));
 
 		return network;
 	}

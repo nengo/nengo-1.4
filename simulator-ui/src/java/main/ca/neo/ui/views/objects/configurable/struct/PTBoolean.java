@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
-public class PTBoolean extends PropertyStructure {
+public class PTBoolean extends PropDescriptor {
 
 	public PTBoolean(String name) {
 		super(name);
@@ -35,7 +35,7 @@ public class PTBoolean extends PropertyStructure {
 class BooleanInputPanel extends PropertyInputPanel {
 	JCheckBox checkBox;
 
-	public BooleanInputPanel(PropertyStructure property) {
+	public BooleanInputPanel(PropDescriptor property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}

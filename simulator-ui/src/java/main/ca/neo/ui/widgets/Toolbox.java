@@ -28,7 +28,7 @@ public class Toolbox extends WorldObjectImpl {
 		super("Toolbox");
 
 		System.out.println("loading SymbolHolder");
-		symbolHolder = (SymbolHolder) Util.loadProperty(this, "defaultSymbols");
+//		symbolHolder = (SymbolHolder) Util.loadProperty(this, "defaultSymbols");
 		System.out.println("finished loading SymbolHolder");
 
 		if (symbolHolder == null) {
@@ -52,7 +52,7 @@ public class Toolbox extends WorldObjectImpl {
 
 		pack();
 
-		Util.saveProperty(this, symbolHolder, "defaultSymbols");
+//		Util.saveProperty(this, symbolHolder, "defaultSymbols");
 	}
 
 	public void initSymbolHolder() {

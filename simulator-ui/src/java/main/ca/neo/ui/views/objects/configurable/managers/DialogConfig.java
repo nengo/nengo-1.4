@@ -1,4 +1,4 @@
-package ca.neo.ui.views.objects.configurable;
+package ca.neo.ui.views.objects.configurable.managers;
 
 import java.awt.Component;
 import java.awt.Frame;
@@ -20,24 +20,38 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
 import ca.neo.ui.style.Style;
-import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.IConfigurable;
+import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.util.GraphicsEnvironment;
 import ca.shu.ui.lib.util.Util;
 
-public class UIConfigManager implements IConfigurationManager {
+public class DialogConfig extends ConfigManager {
 	JDialog parent0;
 	Frame parent1;
 
 	public static final String DEFAULT_PROPERTY_FILE_NAME = "last_used";
 
-	public UIConfigManager(Frame parent) {
-		super();
-		this.parent1 = parent;
+	public DialogConfig(IConfigurable configurable) {
+		super(configurable);
+		this.parent1 = GraphicsEnvironment.getInstance();
+		init();
 	}
 
-	public UIConfigManager(JDialog parent) {
-		super();
+	public DialogConfig(IConfigurable configurable, Frame parent) {
+		super(configurable);
+		this.parent1 = parent;
+		init();
+	}
+
+	public DialogConfig(IConfigurable configurable, JDialog parent) {
+		super(configurable);
 		this.parent0 = parent;
+		init();
+	}
+
+	private void init() {
+		configure();
 	}
 
 	Object configLock = new Object();
@@ -51,11 +65,11 @@ public class UIConfigManager implements IConfigurationManager {
 		}
 	}
 
-	public void configure(IConfigurable configurable) {
+	protected void configure() {
 		if (parent0 != null) {
-			new ConfigDialog(this, parent0, configurable);
+			new ConfigDialog(this, parent0);
 		} else {
-			new ConfigDialog(this, parent1, configurable);
+			new ConfigDialog(this, parent1);
 		}
 
 		/*
@@ -83,23 +97,21 @@ class ConfigDialog extends JDialog {
 
 	private Vector<PropertyInputPanel> propertyInputPanels;
 
-	IConfigurable proxyObj;
+	DialogConfig configManager;
 
-	UIConfigManager configManager;
+	public ConfigDialog(DialogConfig configManager, JDialog owner) {
+		super(owner, "New " + configManager.getConfigurable().getTypeName()
+				+ " properties");
 
-	public ConfigDialog(UIConfigManager configManager, JDialog owner,
-			IConfigurable proxyObj) {
-		super(owner, "New " + proxyObj.getTypeName() + " properties");
-
-		init(configManager, owner, proxyObj);
+		init(configManager, owner);
 
 	}
 
-	public ConfigDialog(UIConfigManager configManager, Frame owner,
-			IConfigurable proxyObj) {
-		super(owner, "New " + proxyObj.getTypeName() + " Properties");
+	public ConfigDialog(DialogConfig configManager, Frame owner) {
+		super(owner, "New " + configManager.getConfigurable().getTypeName()
+				+ " Properties");
 
-		init(configManager, owner, proxyObj);
+		init(configManager, owner);
 
 	}
 
@@ -107,10 +119,8 @@ class ConfigDialog extends JDialog {
 
 	JPanel panel;
 
-	public void init(UIConfigManager configManager, Component c,
-			IConfigurable proxy) {
+	public void init(DialogConfig configManager, Component c) {
 		this.configManager = configManager;
-		proxyObj = proxy;
 		setResizable(false);
 		setModal(true);
 		setLocationRelativeTo(c);
@@ -132,12 +142,13 @@ class ConfigDialog extends JDialog {
 
 	public void createDialog() {
 
-		PropertyStructure[] properties = proxyObj.getPropertiesSchema();
+		PropDescriptor[] properties = configManager.getConfigurable()
+				.getConfigSchema();
 		propertyInputPanels = new Vector<PropertyInputPanel>(properties.length);
 
 		for (int i = 0; i < properties.length; i++) {
 
-			PropertyStructure property = properties[i];
+			PropDescriptor property = properties[i];
 
 			PropertyInputPanel inputPanel = property.createInputPanel();
 			panel.add(inputPanel);
@@ -154,14 +165,14 @@ class ConfigDialog extends JDialog {
 	 */
 	public void updateDialog() {
 		if (fileList.getSelectedItem() != null) {
-			ConfigUtil.loadPropertiesFromFile(proxyObj, (String) fileList
+			configManager.loadPropertiesFromFile((String) fileList
 					.getSelectedItem());
 			Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 			while (it.hasNext()) {
 				PropertyInputPanel panel = it.next();
 
-				Object currentValue = ConfigUtil.getProperty(proxyObj, panel
-						.getName());
+				Object currentValue = configManager
+						.getProperty(panel.getName());
 				if (currentValue != null) {
 					panel.setValue(currentValue);
 				}
@@ -174,7 +185,7 @@ class ConfigDialog extends JDialog {
 		/*
 		 * construct existing properties
 		 */
-		String[] files = ConfigUtil.getPropertyFiles(proxyObj);
+		String[] files = configManager.getPropertyFiles();
 
 		fileList = new JComboBox(files);
 
@@ -190,17 +201,17 @@ class ConfigDialog extends JDialog {
 		 */
 		boolean defaultFound = false;
 		for (int i = 0; i < files.length; i++) {
-			if (files[i].compareTo(UIConfigManager.DEFAULT_PROPERTY_FILE_NAME) == 0) {
+			if (files[i].compareTo(DialogConfig.DEFAULT_PROPERTY_FILE_NAME) == 0) {
 				defaultFound = true;
 				fileList.setSelectedIndex(i);
 
-				ConfigUtil.loadPropertiesFromFile(proxyObj,
-						UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
+				configManager
+						.loadPropertiesFromFile(DialogConfig.DEFAULT_PROPERTY_FILE_NAME);
 			}
 		}
 		if (!defaultFound && fileList.getSelectedItem() != null) {
-			ConfigUtil.loadPropertiesFromFile(proxyObj, fileList
-					.getSelectedItem().toString());
+			configManager.loadPropertiesFromFile(fileList.getSelectedItem()
+					.toString());
 		}
 
 		fileList.addActionListener(new ActionListener() {
@@ -230,7 +241,7 @@ class ConfigDialog extends JDialog {
 					String name = JOptionPane.showInputDialog("Name:");
 
 					if (name != null && name.compareTo("") != 0) {
-						ConfigUtil.savePropertiesToFile(proxyObj, name);
+						configManager.savePropertiesFile(name);
 						fileList.addItem(name);
 						fileList.setSelectedIndex(fileList.getItemCount() - 1);
 					}
@@ -249,7 +260,7 @@ class ConfigDialog extends JDialog {
 
 				fileList.removeItem(selectedFile);
 
-				ConfigUtil.deletePropretiesFile(proxyObj, selectedFile);
+				configManager.deletePropertiesFile(selectedFile);
 
 				updateDialog();
 			}
@@ -289,10 +300,13 @@ class ConfigDialog extends JDialog {
 
 					(new Thread() {
 						public void run() {
-							proxyObj.completeConfiguration();
+							configManager.getConfigurable()
+									.completeConfiguration(
+											new PropertySet(configManager
+													.getProperties()));
 							configManager.finishedConfiguring();
-							ConfigUtil.savePropertiesToFile(proxyObj,
-									UIConfigManager.DEFAULT_PROPERTY_FILE_NAME);
+							configManager
+									.savePropertiesFile(DialogConfig.DEFAULT_PROPERTY_FILE_NAME);
 						}
 					}).start();
 
@@ -310,7 +324,7 @@ class ConfigDialog extends JDialog {
 				configManager.finishedConfiguring();
 				setVisible(false);
 				dispose();
-				ConfigDialog.this.proxyObj.cancelConfiguration();
+				configManager.getConfigurable().cancelConfiguration();
 			}
 		});
 		buttonsPanel.add(cancelButton);
@@ -335,13 +349,13 @@ class ConfigDialog extends JDialog {
 
 		while (it.hasNext()) {
 			PropertyInputPanel inputPanel = it.next();
-			PropertyStructure property = inputPanel.getType();
+			PropDescriptor property = inputPanel.getType();
 
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
 
-					ConfigUtil.setProperty(proxyObj, property.getName(),
-							inputPanel.getValue());
+					configManager.setProperty(property.getName(), inputPanel
+							.getValue());
 				}
 			} else {
 				Util.Warning(property.getName()
@@ -373,16 +387,16 @@ class Panel extends JPanel {
 class PropertyField extends JTextField {
 	private static final long serialVersionUID = 5108856120484394597L;
 
-	PropertyStructure property;
+	PropDescriptor property;
 
-	public PropertyField(PropertyStructure property) {
+	public PropertyField(PropDescriptor property) {
 		super(10);
 		this.property = property;
 
 		property.getClass();
 	}
 
-	public PropertyStructure getProperty() {
+	public PropDescriptor getProperty() {
 		return property;
 	}
 

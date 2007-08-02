@@ -7,9 +7,9 @@ import javax.swing.JDialog;
 
 import ca.neo.math.Function;
 import ca.neo.ui.views.objects.configurable.AbstractConfigurable;
-import ca.neo.ui.views.objects.configurable.UIConfigManager;
-import ca.neo.ui.views.objects.configurable.managers.IConfigurationManager;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
+import ca.neo.ui.views.objects.configurable.managers.PropertySet;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 /*
  * Schema for describing a function
@@ -17,7 +17,6 @@ import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
 public abstract class ConfigurableFunction extends AbstractConfigurable {
 
 	// FunctionInputPanel inputPanel;
-
 
 	public ConfigurableFunction() {
 		super();
@@ -30,9 +29,9 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void completeConfiguration() {
+	public void completeConfiguration(PropertySet props) {
 
-		PropertyStructure[] metaProperties = getPropertiesSchema();
+		PropDescriptor[] metaProperties = getConfigSchema();
 
 		/*
 		 * Create function using Java reflection
@@ -61,7 +60,7 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 
 		Object arglist[] = new Object[metaProperties.length];
 		for (int i = 0; i < metaProperties.length; i++) {
-			arglist[i] = getProperty(metaProperties[i].getName());
+			arglist[i] = props.getProperty(metaProperties[i].getName());
 		}
 		Object retobj = null;
 		try {
@@ -95,10 +94,7 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 	public void launchConfigDialog(JDialog parent) {
 		setFunction(null);
 
-		IConfigurationManager configManager = new UIConfigManager(
-				(JDialog) parent);
-
-		configManager.configure(this);
+		new DialogConfig(this, (JDialog) parent);
 
 	}
 
@@ -125,7 +121,6 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 	//		
 	// }
 
-	
 	@Override
 	public String toString() {
 

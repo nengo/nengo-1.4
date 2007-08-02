@@ -19,6 +19,7 @@ public class AffinityHalo extends GEdge {
 		// TODO Set a thicker stroke for the affinity halo
 		startNode.addChild(1, this);
 		// this.setStroke(new Stroke( ))
+		updateEdge();
 	}
 
 	/**

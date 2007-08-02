@@ -4,7 +4,7 @@ import ca.neo.math.Function;
 import ca.neo.ui.models.functions.FunctionInputPanel;
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
-public class PTFunction extends PropertyStructure {
+public class PTFunction extends PropDescriptor {
 
 	private static final long serialVersionUID = 1L;
 

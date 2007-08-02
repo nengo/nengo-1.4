@@ -1,4 +1,4 @@
-package ca.neo.ui.models.widgets;
+package ca.neo.ui.models.nodes.widgets;
 
 import java.awt.Color;
 

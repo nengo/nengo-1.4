@@ -25,6 +25,13 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 	// boolean modelCreationCancelled = false;
 
 	/**
+	 * Updates the UI representation based on the model
+	 */
+	public void update() {
+
+	}
+
+	/**
 	 * Default constructor, model is constructed internally
 	 */
 	public PModel() {
@@ -54,7 +61,7 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
-				removeModel();
+				modelRemoved();
 			}
 		});
 
@@ -64,7 +71,7 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 	/**
 	 * Called when the user wants to remove the Model
 	 */
-	public void removeModel() {
+	public void modelRemoved() {
 		removeFromParent();
 	}
 

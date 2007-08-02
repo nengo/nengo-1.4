@@ -5,7 +5,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuBar;
 
-import ca.neo.ui.models.wrappers.PNetwork;
+import ca.neo.model.Network;
+import ca.neo.ui.models.nodes.PNetwork;
+import ca.neo.ui.util.UIBuilder;
+import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.widgets.Toolbox;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.util.GraphicsEnvironment;
@@ -16,7 +19,7 @@ import ca.shu.ui.lib.world.impl.GFrame;
 public class NeoGraphics extends GFrame {
 
 	public NeoGraphics(String title) {
-		super(title);
+		super(title + " - NEO Workspace");
 
 		/*
 		 * Only one instance of NeoWorld may be running at once
@@ -28,8 +31,6 @@ public class NeoGraphics extends GFrame {
 	}
 
 	private static final long serialVersionUID = 1L;
-
-
 
 	public static void main(String[] args) {
 		GraphicsEnvironment.setInstance(new NeoGraphics("NEOWorld"));
@@ -48,10 +49,10 @@ public class NeoGraphics extends GFrame {
 		return canvasView;
 	}
 
-	
 	/**
 	 * 
-	 * @param object Object to be added to the top-level world
+	 * @param object
+	 *            Object to be added to the top-level world
 	 * @return the object being added
 	 */
 	public WorldObject addWorldObject(WorldObject object) {
@@ -91,7 +92,9 @@ public class NeoGraphics extends GFrame {
 			(new Thread() {
 				public void run() {
 					PNetwork network;
-					network = new PNetwork(true);
+					network = new PNetwork();
+					new DialogConfig(network);
+
 					if (network.isModelCreated())
 						getWorld().getGround().catchObject(network);
 				}

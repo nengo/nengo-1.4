@@ -5,7 +5,7 @@ import javax.swing.JTextField;
 
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
-public class PTFloat extends PropertyStructure {
+public class PTFloat extends PropDescriptor {
 
 	public PTFloat(String name) {
 		super(name);
@@ -35,7 +35,7 @@ public class PTFloat extends PropertyStructure {
 class FloatInputPanel extends PropertyInputPanel {
 	JTextField tf;
 
-	public FloatInputPanel(PropertyStructure property) {
+	public FloatInputPanel(PropDescriptor property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}

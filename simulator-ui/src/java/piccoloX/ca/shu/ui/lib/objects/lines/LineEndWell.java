@@ -9,8 +9,6 @@ import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 public class LineEndWell extends WorldObjectImpl {
 
-	
-	
 	public LineEndWell() {
 		super();
 
@@ -19,12 +17,11 @@ public class LineEndWell extends WorldObjectImpl {
 		// addChild(icon);
 
 		WorldObjectImpl icon = new LineEndIcon();
-		
+
 		addChild(icon);
 		setBounds(getFullBounds());
-//		setChildrenPickable(false);
+		// setChildrenPickable(false);
 
-		
 		setDraggable(false);
 
 		icon.setDraggable(false);
@@ -55,17 +52,19 @@ public class LineEndWell extends WorldObjectImpl {
 	 *         LineEndWell
 	 */
 	public LineEnd createAndAddLineEnd() {
-		LineEnd newLineEnd = null;
-
-		newLineEnd = constructLineEnd();
-		getParent().addChild(newLineEnd);
-
-		GEdge edge = new GEdge(this, newLineEnd);
-		newLineEnd.addChild(edge);
-		
-//		PBoundsHandle.addBoundsHandlesTo(this);
-
+		LineEnd newLineEnd = constructLineEnd();
+		addLineEnd(newLineEnd);
 		return newLineEnd;
+	}
+
+	protected void addLineEnd(LineEnd lineEnd) {
+		getParent().addChild(lineEnd);
+
+		GEdge edge = new GEdge(this, lineEnd);
+		lineEnd.addChild(edge);
+
+		// PBoundsHandle.addBoundsHandlesTo(this);
+
 	}
 
 	/**
@@ -95,14 +94,12 @@ class MouseHandler extends PBasicInputEventHandler {
 		this.lineEndWell = lineEndWell;
 	}
 
-	
-
 	@Override
 	public void mousePressed(PInputEvent event) {
 		// TODO Auto-generated method stub
 		super.mousePressed(event);
-		
-//		if (event.getPickedNode() == )
+
+		// if (event.getPickedNode() == )
 
 		newLineEnd = lineEndWell.createAndAddLineEnd();
 

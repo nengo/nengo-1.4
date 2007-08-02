@@ -6,14 +6,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import ca.neo.ui.style.Style;
-import ca.neo.ui.views.objects.configurable.struct.PropertyStructure;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 public abstract class PropertyInputPanel extends JPanel {
-	PropertyStructure type;
+	PropDescriptor type;
 
 	JLabel statusMessage;
 
-	public PropertyInputPanel(PropertyStructure property) {
+	public PropertyInputPanel(PropDescriptor property) {
 		super();
 		this.type = property;
 
@@ -53,11 +53,11 @@ public abstract class PropertyInputPanel extends JPanel {
 
 	public abstract void init(JPanel panel);
 
-	public PropertyStructure getType() {
+	public PropDescriptor getType() {
 		return type;
 	}
 
-	public void setType(PropertyStructure type) {
+	public void setType(PropDescriptor type) {
 		this.type = type;
 	}
 

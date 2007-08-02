@@ -1,4 +1,4 @@
-package ca.neo.ui.models.widgets;
+package ca.neo.ui.models.nodes.widgets;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -12,7 +12,7 @@ import ca.neo.model.Node;
 import ca.neo.model.SimulationException;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PModel;
-import ca.neo.ui.models.PModelNode;
+import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.IconWrapper;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.util.Probe;
@@ -24,9 +24,9 @@ import ca.shu.ui.lib.util.Util;
 public class GProbe extends PModel {
 
 	private static final long serialVersionUID = 1L;
-	PModelNode nodeProxy;
+	PNeoNode nodeProxy;
 
-	public GProbe(PModelNode nodeProxy, String state) {
+	public GProbe(PNeoNode nodeProxy, String state) {
 		super();
 		this.nodeProxy = nodeProxy;
 
@@ -52,7 +52,7 @@ public class GProbe extends PModel {
 
 			setModel(probe);
 		} catch (SimulationException e) {
-			removeModel();
+			modelRemoved();
 			Util.Error("Could not add probe: " + e.toString());
 		}
 
@@ -119,9 +119,9 @@ public class GProbe extends PModel {
 	}
 
 	@Override
-	public void removeModel() {
+	public void modelRemoved() {
 		// TODO Auto-generated method stub
-		super.removeModel();
+		super.modelRemoved();
 		nodeProxy.removeProbe(this);
 
 		Util.Error("Ability to remove probes functionality is not implemented");
