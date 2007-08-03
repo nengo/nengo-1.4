@@ -20,11 +20,10 @@ public class GTextButton extends Button {
 	private static final int BORDER_HEIGHT = 3;
 
 	@Override
-	public void setState(State pState) {
-		// TODO Auto-generated method stub
-		super.setState(pState);
+	public void buttonStateChanged() {
+		ButtonState buttonState = getButtonState();
 
-		switch (state) {
+		switch (buttonState) {
 		case DEFAULT:
 			frame.setPaint(defaultColor);
 
@@ -54,17 +53,16 @@ public class GTextButton extends Button {
 		addChild(pText);
 
 		this.setText(value);
+		buttonStateChanged();
 	}
 
 	public void recomputeBounds() {
 
-		frame.setBounds(0f, 0f,
-				(float) (pText.getWidth() + 2 * BORDER_WIDTH), (float) (pText
-						.getHeight() + 2 * BORDER_HEIGHT));
+		frame.setBounds(0f, 0f, (float) (pText.getWidth() + 2 * BORDER_WIDTH),
+				(float) (pText.getHeight() + 2 * BORDER_HEIGHT));
 		this.setBounds(frame.getBounds());
 
-		
-//		setBounds(getFullBounds());
+		// setBounds(getFullBounds());
 	}
 
 	public void setText(String str) {
@@ -81,8 +79,6 @@ public class GTextButton extends Button {
 	public PText getText() {
 		return pText;
 	}
-
-
 
 	public PPath getFrame() {
 		return frame;

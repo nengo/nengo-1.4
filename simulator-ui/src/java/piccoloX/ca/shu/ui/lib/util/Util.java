@@ -45,17 +45,24 @@ public class Util {
 
 	}
 
-	public static void Warning(String msg) {
-		showMsg("Warning: " + msg);
+	static final boolean DEBUG_ENABLED = true;
+
+	public static void debugMsg(String msg) {
+		if (DEBUG_ENABLED) {
+			System.out.println("DebugMSG: " + msg);
+		}
+
 	}
 
-	public static void showMsg(String msg) {
-		JOptionPane.showMessageDialog(GraphicsEnvironment.getInstance(), msg);
+	public static void Warning(String msg) {
+		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
+				"Warning", JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static void Assert(boolean bool, String msg) {
 		if (!bool) {
-			showMsg("Error: " + msg);
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
+					"Error", JOptionPane.ERROR_MESSAGE);
 			(new Exception(msg)).printStackTrace();
 		}
 	}
@@ -131,185 +138,4 @@ public class Util {
 		return null;
 	}
 
-	/**
-	 * @param parent
-	 *            The object holding the property
-	 * @param name
-	 *            Name of the property to be loaded
-	 * 
-	 */
-	public static Object loadProperty(Object parent, String name) {
-
-		FileInputStream f_in;
-
-		try {
-			f_in = new FileInputStream(FILE_SAVED_OBJECTS_DIR + "/"
-					+ getFileNamePrefix(parent) + name);
-
-			ObjectInputStream obj_in = new ObjectInputStream(f_in);
-
-			Object obj;
-
-			obj = obj_in.readObject();
-
-			return obj;
-		} catch (FileNotFoundException e) {
-			System.out.println(e);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Class not found exception");
-		} catch (InvalidClassException e) {
-			System.out.println("Invalid class exception");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	static Object parentStatic;
-
-	/**
-	 * 
-	 * @param parent
-	 *            of the files
-	 * @return the list of files for the parent
-	 */
-	public static String[] getPropertyFiles(Object parent) {
-		File file = getSavedObjectsFolder();
-		/*
-		 * Gets a list of property files
-		 */
-		String[] files = file.list(new CustomFileNameFilter(parent));
-		/*
-		 * Return the file names without the prefix
-		 */
-		String[] files0 = new String[files.length];
-		for (int i = 0; i < files.length; i++) {
-			files0[i] = files[i].replaceFirst(getFileNamePrefix(parent), "");
-		}
-		return files0;
-
-	}
-
-	static final String FILE_SAVED_OBJECTS_DIR = "SavedObjects";
-
-	/**
-	 * @returns the file name prefix given per class
-	 */
-	@SuppressWarnings("unchecked")
-	protected static String getFileNamePrefix(Object obj) {
-		if (obj instanceof Class) {
-			return ((Class) obj).getName() + "_";
-		} else {
-			return obj.getClass().getName() + "_";
-		}
-
-	}
-
-	/**
-	 * @param parent
-	 *            The Parent class holding the saved object
-	 * @param name
-	 *            Name of the saved object to be removed
-	 * 
-	 */
-	public static void deleteProperty(Object parent, String name) {
-		getSavedObjectsFolder();
-		String fileName = FILE_SAVED_OBJECTS_DIR + "/"
-				+ getFileNamePrefix(parent) + name;
-
-		File file = new File(fileName);
-
-		System.gc();
-		if (file.exists()) {
-			boolean val = file.delete();
-			if (val == false) {
-				Util.Error("Could not delete file");
-			}
-
-		}
-	}
-
-	/**
-	 * Creates a saved objects folder if it isn't already there
-	 * 
-	 * @return The Saved Objects folter
-	 */
-	public static File getSavedObjectsFolder() {
-		File file = new File(FILE_SAVED_OBJECTS_DIR);
-		if (!file.exists())
-			file.mkdir();
-		return file;
-	}
-
-	/**
-	 * @param parent
-	 *            The Parent object holding the property
-	 * @param property
-	 *            Property to be saved
-	 * @param name
-	 *            Filename given to instance of this property
-	 * 
-	 */
-	public static void saveProperty(Object parent, Object property, String name) {
-
-		// Write to disk with FileOutputStream
-		FileOutputStream f_out;
-		try {
-			getSavedObjectsFolder();
-
-			String fileName = FILE_SAVED_OBJECTS_DIR + "/"
-					+ getFileNamePrefix(parent) + name;
-			// String fileName = "SavedObjects/" + name;
-
-			if ((new File(fileName)).exists()) {
-				System.out.println("Replaced existing file: " + fileName);
-			}
-			f_out = new FileOutputStream(fileName);
-
-			if (property instanceof PNode) {
-				PObjectOutputStream obj_out = new PObjectOutputStream(f_out);
-				obj_out.writeObjectTree(property);
-			} else {
-				ObjectOutputStream obj_out = new ObjectOutputStream(f_out);
-				obj_out.writeObject(property);
-			}
-			f_out.close();
-			// System.out.println("Saved: " + fileName);
-
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-}
-
-/**
- * A FilenameFilter that can be used statically to filter files related to a
- * object
- * 
- * @author Shu
- * 
- */
-class CustomFileNameFilter implements FilenameFilter {
-	Object parent;
-
-	public CustomFileNameFilter(Object parent) {
-		super();
-		this.parent = parent;
-	}
-
-	public boolean accept(File file, String name) {
-
-		if (name.startsWith(Util.getFileNamePrefix(parent))) {
-			return true;
-		} else
-			return false;
-
-	}
 }

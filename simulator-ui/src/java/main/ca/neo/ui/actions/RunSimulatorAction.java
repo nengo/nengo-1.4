@@ -2,8 +2,6 @@ package ca.neo.ui.actions;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
-
 import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
 import ca.neo.ui.views.objects.configurable.AbstractConfigurable;
@@ -11,11 +9,12 @@ import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedTask;
-import ca.shu.ui.lib.util.GraphicsEnvironment;
 import ca.shu.ui.lib.util.Util;
 
-public class RunSimulatorAction extends AbstractAction {
+public class RunSimulatorAction extends StandardAction {
 
 	/**
 	 * 
@@ -27,22 +26,6 @@ public class RunSimulatorAction extends AbstractAction {
 	public RunSimulatorAction(Simulator simulator) {
 		super("run");
 		this.simulator = simulator;
-	}
-
-	public void actionPerformed(ActionEvent arg0) {
-
-		SimulatorConfig simulatorConfig = new SimulatorConfig();
-
-		/*
-		 * Configures the simulatorConfig
-		 */
-		new DialogConfig(simulatorConfig);
-
-		if (simulatorConfig.isConfigured()) {
-			(new RunSimulatorThread(simulatorConfig)).start();
-
-		}
-
 	}
 
 	class RunSimulatorThread extends Thread {
@@ -65,6 +48,25 @@ public class RunSimulatorAction extends AbstractAction {
 
 			trackedTask.finished();
 		}
+	}
+
+	@Override
+	protected void action() throws ActionException {
+		SimulatorConfig simulatorConfig = new SimulatorConfig();
+
+		/*
+		 * Configures the simulatorConfig
+		 */
+		new DialogConfig(simulatorConfig);
+
+		if (simulatorConfig.isConfigured()) {
+			(new RunSimulatorThread(simulatorConfig)).start();
+
+		} else {
+			throw new ActionException("Simulator configuration not complete",
+					false);
+		}
+
 	}
 }
 

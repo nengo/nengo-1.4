@@ -38,9 +38,9 @@ public class PTermination extends PModelConfigurable {
 	}
 
 	@Override
-	public void modelRemoved() {
+	public void destroy() {
 
-		super.modelRemoved();
+		super.destroy();
 		nodeParent.removeWidget(this);
 	}
 

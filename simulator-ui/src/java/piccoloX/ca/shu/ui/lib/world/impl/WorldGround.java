@@ -40,22 +40,34 @@ public class WorldGround extends WorldObjectImpl implements WorldLayer {
 
 	}
 
-
-
-	
 	public double getGroundScale() {
 		return world.getSky().getViewScale();
 	}
 
-	/*
-	 * Adds a little pizzaz while accepting new objects
-	 */
 	public void catchObject(WorldObject wo) {
+		catchObject(wo, true);
+
+	}
+
+	/**
+	 * Adds a little pizzaz while accepting new objects
+	 * 
+	 * @param wo
+	 *            Object to be added
+	 * @param dropInCenterOfCamera
+	 *            whether the object's position should be changed to appear at
+	 *            the center of the camera
+	 */
+	public void catchObject(WorldObject wo, boolean dropInCenterOfCamera) {
 		addChildW(wo);
 
-		Point2D finalPosition = world.skyToGround(new Point2D.Double(world
-				.getScreenWidth() / 2, world.getScreenHeight() / 2));
-
+		Point2D finalPosition;
+		if (dropInCenterOfCamera) {
+			finalPosition = world.skyToGround(new Point2D.Double(world
+					.getScreenWidth() / 2, world.getScreenHeight() / 2));
+		} else {
+			finalPosition = wo.getOffset();
+		}
 		wo.setScale(1 / getGroundScale());
 
 		wo.setOffset(finalPosition.getX(), finalPosition.getY()

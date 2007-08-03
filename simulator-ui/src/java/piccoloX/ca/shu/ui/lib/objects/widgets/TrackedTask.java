@@ -1,7 +1,7 @@
 package ca.shu.ui.lib.objects.widgets;
 
 import ca.neo.ui.models.PModel;
-import ca.shu.ui.lib.util.GraphicsEnvironment;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
 
 /*
@@ -23,7 +23,7 @@ public class TrackedTask {
 	}
 
 	private void init() {
-		GraphicsEnvironment.getInstance().pushTaskStatusStr(getTaskName());
+		UIEnvironment.getInstance().pushTaskStatusStr(getTaskName());
 
 	}
 
@@ -31,7 +31,7 @@ public class TrackedTask {
 	 * Stop tracking the task. ie. remove it from the User Interface
 	 */
 	public void finished() {
-		GraphicsEnvironment.getInstance().popTaskStatusStr(getTaskName());
+		UIEnvironment.getInstance().popTaskStatusStr(getTaskName());
 	}
 
 	protected void setTaskName(String taskName) {

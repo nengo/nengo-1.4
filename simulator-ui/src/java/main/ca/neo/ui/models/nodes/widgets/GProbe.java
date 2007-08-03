@@ -17,6 +17,9 @@ import ca.neo.ui.models.icons.IconWrapper;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.util.Probe;
 import ca.neo.util.TimeSeries;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.objects.widgets.TrackedTask;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
@@ -52,7 +55,7 @@ public class GProbe extends PModel {
 
 			setModel(probe);
 		} catch (SimulationException e) {
-			modelRemoved();
+			destroy();
 			Util.Error("Could not add probe: " + e.toString());
 		}
 
@@ -119,15 +122,15 @@ public class GProbe extends PModel {
 	}
 
 	@Override
-	public void modelRemoved() {
+	public void destroy() {
 		// TODO Auto-generated method stub
-		super.modelRemoved();
+		super.destroy();
 		nodeProxy.removeProbe(this);
 
 		Util.Error("Ability to remove probes functionality is not implemented");
 	}
 
-	class ExportToMatlabAction extends AbstractAction {
+	class ExportToMatlabAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -136,32 +139,42 @@ public class GProbe extends PModel {
 			// TODO Auto-generated constructor stub
 		}
 
-		public void actionPerformed(ActionEvent arg0) {
-			String name = JOptionPane
+		String name;
+
+		@Override
+		protected void action() throws ActionException {
+
+			name = JOptionPane
 					.showInputDialog("Enter name of file to export to: ");
 
-			exportToMatlab(name);
+			(new Thread() {
+				public void run() {
+					TrackedTask task = new TrackedTask(GProbe.this,
+							"Exporting to matlab");
+					exportToMatlab(name);
+					task.finished();
+				}
+			}).start();
 
 		}
 	}
 
-	class PlotAction extends AbstractAction {
+	class PlotAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public PlotAction() {
 			super("Plot");
-			// TODO Auto-generated constructor stub
 		}
 
-		public void actionPerformed(ActionEvent arg0) {
+		@Override
+		protected void action() throws ActionException {
 			plot();
-
 		}
 
 	}
 
-	class PlotTauFilterAction extends AbstractAction {
+	class PlotTauFilterAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -169,7 +182,8 @@ public class GProbe extends PModel {
 			super("Plot w/ filter");
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		@Override
+		protected void action() throws ActionException {
 			try {
 				float tauFilter = new Float(
 						JOptionPane

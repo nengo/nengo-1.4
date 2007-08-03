@@ -2,12 +2,14 @@ package ca.shu.ui.lib.objects;
 
 import java.awt.Color;
 
+import javax.swing.SwingUtilities;
+
 import ca.shu.ui.lib.handlers.HandCursorHandler;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public class Button extends WorldObjectImpl {
+public abstract class Button extends WorldObjectImpl {
 
 	protected Color defaultColor = Color.white;
 
@@ -30,23 +32,28 @@ public class Button extends WorldObjectImpl {
 
 		this.addInputEventListener(new HandCursorHandler());
 		this.addInputEventListener(new ButtonHandler(this));
+		// buttonStateChanged();
 	}
 
-	public State state = State.DEFAULT;
+	private ButtonState buttonState = ButtonState.DEFAULT;
 
-	public void setState(State pState) {
-		state = pState;
-
+	public void setButtonState(ButtonState pState) {
+		buttonState = pState;
+		buttonStateChanged();
 	}
+
+	public abstract void buttonStateChanged();
 
 	public void doAction() {
 		if (action != null) {
-			(new Thread(action)).start();
-			//SwingUtilities.invokeLater(action);
+			SwingUtilities.invokeLater(action);
+
+			// (new Thread(action)).start();
+			// SwingUtilities.invokeLater(action);
 		}
 	}
 
-	public static enum State {
+	public static enum ButtonState {
 		DEFAULT, HIGHLIGHT, SELECTED
 	}
 
@@ -56,7 +63,7 @@ public class Button extends WorldObjectImpl {
 
 	public void setDefaultColor(Color btnDefaultColor) {
 		this.defaultColor = btnDefaultColor;
-		setState(state);
+		setButtonState(buttonState);
 	}
 
 	public Color getHighlightColor() {
@@ -65,7 +72,7 @@ public class Button extends WorldObjectImpl {
 
 	public void setHighlightColor(Color btnHighlightColor) {
 		this.highlightColor = btnHighlightColor;
-		setState(state);
+		setButtonState(buttonState);
 	}
 
 	public Color getSelectedColor() {
@@ -74,7 +81,7 @@ public class Button extends WorldObjectImpl {
 
 	public void setSelectedColor(Color btnSelectedColor) {
 		this.selectedColor = btnSelectedColor;
-		setState(state);
+		setButtonState(buttonState);
 	}
 
 	public Runnable getAction() {
@@ -84,6 +91,11 @@ public class Button extends WorldObjectImpl {
 	public void setAction(Runnable action) {
 		this.action = action;
 	}
+
+	protected ButtonState getButtonState() {
+		return buttonState;
+	}
+
 }
 
 class ButtonHandler extends PBasicInputEventHandler {
@@ -98,7 +110,7 @@ class ButtonHandler extends PBasicInputEventHandler {
 	public void processEvent(PInputEvent event, int type) {
 		// TODO Auto-generated method stub
 		super.processEvent(event, type);
-//		event.setHandled(true);
+		// event.setHandled(true);
 	}
 
 	@Override
@@ -113,7 +125,7 @@ class ButtonHandler extends PBasicInputEventHandler {
 	public void mouseEntered(PInputEvent event) {
 		// TODO Auto-generated method stub
 		super.mouseEntered(event);
-		button.setState(GTextButton.State.HIGHLIGHT);
+		button.setButtonState(GTextButton.ButtonState.HIGHLIGHT);
 
 	}
 
@@ -121,7 +133,7 @@ class ButtonHandler extends PBasicInputEventHandler {
 	public void mouseExited(PInputEvent event) {
 		// TODO Auto-generated method stub
 		super.mouseExited(event);
-		button.setState(GTextButton.State.DEFAULT);
+		button.setButtonState(GTextButton.ButtonState.DEFAULT);
 
 	}
 
@@ -129,7 +141,7 @@ class ButtonHandler extends PBasicInputEventHandler {
 	public void mousePressed(PInputEvent event) {
 		// TODO Auto-generated method stub
 		super.mousePressed(event);
-		button.setState(GTextButton.State.SELECTED);
+		button.setButtonState(GTextButton.ButtonState.SELECTED);
 
 	}
 
@@ -137,6 +149,6 @@ class ButtonHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		// TODO Auto-generated method stub
 		super.mouseReleased(event);
-		button.setState(GTextButton.State.HIGHLIGHT);
+		button.setButtonState(GTextButton.ButtonState.HIGHLIGHT);
 	}
 }

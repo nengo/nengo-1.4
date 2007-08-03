@@ -96,7 +96,7 @@ public class GIntegratorExample {
 		/*
 		 * Opens up the network viewer
 		 */
-		networkUI.openNetworkViewer();
+		networkUI.openViewer();
 
 	}
 }

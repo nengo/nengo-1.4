@@ -1,75 +1,98 @@
 package ca.shu.ui.lib.objects.lines;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.objects.GEdge;
+
+import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-public class LineEndIcon extends WorldObjectImpl {
-	public LineEndIcon() {
+public class LineEndIcon extends LineEndWellIcon {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	LineEnd parent;
+
+	public LineEndIcon(LineEnd parent) {
 		super();
-		this.setBounds(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);
+		this.parent = parent;
+		addChild(new PointerTriangle(this));
 	}
 
-	static final int LINE_END_WIDTH = 30;
-	static final int LINE_END_HEIGHT = 30;
+}
 
-	static Color color = Style.COLOR_LINEEND;
+class PointerTriangle extends GEdge {
 
 	@Override
-	protected void paint(PPaintContext paintContext) {
-		// TODO Auto-generated method stub
-		super.paint(paintContext);
-		Graphics2D g2 = (Graphics2D) paintContext.getGraphics();
-		Color bright2 = Util.colorAdd(color, new Color(0.4f, 0.4f, 0.4f));
-		if (paintContext.getScale() < 0.5) {
-			g2.setColor(bright2);
-			g2.fillOval(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);
+	public void updateEdge() {
+		updatePointer();
+	}
+
+	static final double TRIANGLE_EDGE_LENGTH = 20;
+
+	private static final long serialVersionUID = 1L;
+
+	public PointerTriangle(LineEndIcon lineEndIcon) {
+		super(lineEndIcon.parent.getWell(), lineEndIcon.parent);
+		setPaint(Style.COLOR_FOREGROUND);
+
+		setOffset(lineEndIcon.getWidth() / 2, lineEndIcon.getHeight() / 2);
+		setBounds(-TRIANGLE_EDGE_LENGTH / 2, -TRIANGLE_EDGE_LENGTH / 2,
+				TRIANGLE_EDGE_LENGTH, TRIANGLE_EDGE_LENGTH);
+	}
+
+	protected void updatePointer() {
+
+		/*
+		 * Find the angle between well and end
+		 */
+		// LineEndWell well = getStartNode();
+		Point2D startPosition = getStartNode().localToGlobal(
+				getStartNode().getBounds().getOrigin());
+		Point2D endPosition = getEndNode().localToGlobal(
+				getEndNode().getBounds().getOrigin());
+
+		double deltaX = endPosition.getX() - startPosition.getX();
+		double deltaY = endPosition.getY() - startPosition.getY();
+
+		double angle = getAngle(deltaX, deltaY);
+
+		double x = Math.cos(angle + Math.PI) * LineEndWellIcon.ICON_RADIUS;
+		double y = Math.sin(angle + Math.PI) * LineEndWellIcon.ICON_RADIUS;
+		Point2D point0 = new Point2D.Double(x, y);
+
+		// System.out.println("angle: " + angle);
+		x += Math.cos(angle + Math.PI * (5d / 6d)) * TRIANGLE_EDGE_LENGTH;
+		y += Math.sin(angle + Math.PI * (5d / 6d)) * TRIANGLE_EDGE_LENGTH;
+		Point2D point1 = new Point2D.Double(x, y);
+
+		x += Math.cos(angle + Math.PI * (3d / 2d)) * TRIANGLE_EDGE_LENGTH;
+		y += Math.sin(angle + Math.PI * (3d / 2d)) * TRIANGLE_EDGE_LENGTH;
+		Point2D point2 = new Point2D.Double(x, y);
+
+		Point2D[] path = { point0, point1, point2 };
+
+		// this.setPaint(Color.black);
+		this.setPathToPolyline(path);
+		this.closePath();
+
+	}
+
+	public static double getAngle(double x, double y) {
+		if (x == 0) {
+			if (y < 0) {
+				return Math.PI / 4;
+			} else {
+				return -Math.PI / 4;
+			}
+		} else if (x < 0) {
+			return Math.atan(y / x) + Math.PI;
 		} else {
-
-//			AlphaComposite ac;
-
-			Color color = getColor();
-
-			Color dark = Util.colorAdd(Util.colorTimes(color, 0.65), new Color(
-					0.05f, 0.05f, 0.05f));
-			Color medium = color;
-			Color bright1 = Util
-					.colorAdd(color, new Color(0.15f, 0.15f, 0.15f));
-
-			Color hilite = Util.colorAdd(Util.colorTimes(color, 0.05),
-					new Color(0.8f, 0.8f, 0.8f));
-			// ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-			// g2.setComposite(ac);
-			g2.setColor(dark);
-			g2.fillOval(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);
-			g2.setColor(medium);
-			g2.fillOval(LINE_END_WIDTH / 4, 0, LINE_END_WIDTH / 2,
-					LINE_END_HEIGHT);
-			g2.setColor(bright1);
-			g2.fillOval(LINE_END_WIDTH / 6, LINE_END_HEIGHT / 2,
-					2 * LINE_END_WIDTH / 3, LINE_END_HEIGHT / 3);
-			g2.setColor(bright2);
-			g2.fillOval(LINE_END_WIDTH / 6 + 2, LINE_END_HEIGHT / 2 + 2,
-					2 * LINE_END_WIDTH / 3 - 4, LINE_END_HEIGHT / 3 - 2);
-			// ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f);
-			// g2.setComposite(ac);
-			g2.setColor(hilite);
-			g2.fillOval(LINE_END_WIDTH / 3 - 1, LINE_END_HEIGHT / 6,
-					LINE_END_WIDTH / 3 + 2, 3 * LINE_END_HEIGHT / 16);
+			return Math.atan(y / x);
 		}
 	}
-
-	public static Color getColor() {
-		return color;
-	}
-
-	public static void setColor(Color color) {
-		LineEndIcon.color = color;
-	}
-
 }

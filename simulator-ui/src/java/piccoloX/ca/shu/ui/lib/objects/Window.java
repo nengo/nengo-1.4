@@ -1,10 +1,13 @@
 package ca.shu.ui.lib.objects;
 
 import java.awt.event.InputEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.widgets.AffinityHalo;
 import ca.shu.ui.lib.objects.widgets.BoundsHandle;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
@@ -15,11 +18,62 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
 
+class MenuBar extends PPath {
+	Window window;
+	GText title;
+
+	public MenuBar(Window window) {
+		super(new Rectangle2D.Double(0, 0, 1, 1));
+		this.window = window;
+
+		init();
+	}
+
+	GButton maximizeButton, minimizeButton;
+
+	private void init() {
+		title = new GText(window.getName());
+		title.setFont(Style.FONT_XLARGE);
+		addChild(title);
+
+		maximizeButton = new GButton("+", new Runnable() {
+			public void run() {
+				window.increaseWindowSize();
+			}
+		});
+		maximizeButton.setFont(Style.FONT_BIG);
+
+		minimizeButton = new GButton("-", new Runnable() {
+			public void run() {
+				window.decreaseWindowSize();
+			}
+		});
+		minimizeButton.setFont(Style.FONT_BIG);
+
+		addChild(maximizeButton);
+		addChild(minimizeButton);
+		setPaint(Style.COLOR_BACKGROUND2);
+	}
+
+	@Override
+	protected void layoutChildren() {
+		// TODO Auto-generated method stub
+		super.layoutChildren();
+		title.setBounds(2, 2, getWidth(), getHeight());
+
+		double buttonX = getWidth() - maximizeButton.getWidth() - 2;
+		maximizeButton.setOffset(buttonX, 2);
+		buttonX -= minimizeButton.getWidth() - 2;
+		minimizeButton.setOffset(buttonX, 2);
+	}
+
+}
+
 public class Window extends WorldObjectImpl {
 	private static final int DEFAULT_HEIGHT = 300;
 
 	private static final int DEFAULT_WIDTH = 400;
-
+	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.WINDOW;
 	/**
 	 * 
 	 */
@@ -33,9 +87,9 @@ public class Window extends WorldObjectImpl {
 
 	final int MENU_BAR_HEIGHT = 33;
 
-	GText title;
-
 	WorldObjectImpl attachTo;
+
+	FrameDragHandler frameDragHandler;
 
 	public Window(WorldObjectImpl attachTo, WorldObjectImpl innerNode) {
 		super();
@@ -45,60 +99,146 @@ public class Window extends WorldObjectImpl {
 		this.setWidth(DEFAULT_WIDTH);
 		this.setHeight(DEFAULT_HEIGHT);
 
-		menubar = PPath.createRectangle(0, 0, 1, 1);
-		menubar.setPaint(Style.COLOR_BACKGROUND2);
-
-		title = new GText(innerNode.getName());
-		title.setFont(Style.FONT_XLARGE);
-		menubar.addChild(title);
-
-		// border = PPath.createRectangle(0, 0, 1, 1);
-		// border.setPaint(GDefaults.BACKGROUND_COLOR);
-		// border.setStrokePaint(GDefaults.FOREGROUND_COLOR);
+		menubar = new MenuBar(this);
 
 		setFrameVisible(true);
-
-		// addChild(border);
 		addChild(menubar);
 		addChildW(innerNode);
-		// PBoundsHandle.addBoundsHandlesTo(innerNode);
-
-		menubar.addInputEventListener(new FrameDragHandler(this));
-		BoundsHandle.addBoundsHandlesTo(this);
+		frameDragHandler = new FrameDragHandler(this);
+		menubar.addInputEventListener(frameDragHandler);
 
 		addInputEventListener(new PInputEventListener() {
 			public void processEvent(PInputEvent aEvent, int type) {
 				aEvent.setHandled(true);
 			}
 		});
-		restore();
+		windowStateChanged();
 	}
 
 	public static enum WindowState {
-		MINIMIZED, RESTORED, FULL_SCREEN
+		MINIMIZED, WINDOW, MAXIMIZED
 	};
 
-	WindowState windowState = WindowState.RESTORED;
+	WindowState windowState = WINDOW_STATE_DEFAULT;
 
-	public void minimize() {
-		removeFromParent();
-		windowState = WindowState.MINIMIZED;
-		affinityHalo.removeFromParent();
-		// affinityHalo.setVisible(false);
+	/**
+	 * TODO: Window state control
+	 */
+
+	/**
+	 * Decreases the size of the window through state transitions
+	 */
+	public void decreaseWindowSize() {
+		switch (windowState) {
+		case MAXIMIZED:
+			setWindowState(WindowState.WINDOW);
+
+			break;
+		case WINDOW:
+			setWindowState(WindowState.MINIMIZED);
+
+			break;
+
+		}
+
+	}
+
+	/**
+	 * Increases the size of the window through state transitions
+	 */
+	public void increaseWindowSize() {
+		switch (windowState) {
+
+		case WINDOW:
+			setWindowState(WindowState.MAXIMIZED);
+			break;
+		case MINIMIZED:
+			setWindowState(WindowState.WINDOW);
+		}
+
+	}
+
+	public void setWindowState(WindowState state) {
+		if (state != windowState) {
+
+			/*
+			 * Saves the window state
+			 */
+			if (windowState == WindowState.WINDOW) {
+				savedWindowBounds = getBounds();
+				savedWindowOffset = getOffset();
+			}
+
+			windowState = state;
+			windowStateChanged();
+		}
+	}
+
+	/**
+	 * 
+	 */
+
+	PBounds savedWindowBounds;
+	Point2D savedWindowOffset;
+
+	@Override
+	protected void parentBoundsChanged() {
+		// TODO Auto-generated method stub
+		super.parentBoundsChanged();
+
+		if (windowState == WindowState.MAXIMIZED) {
+			maximizeBounds();
+		}
+
+	}
+
+	protected void maximizeBounds() {
+		setBounds(parentToLocal(getParent().getBounds()));
+	}
+
+	protected void windowStateChanged() {
+		switch (windowState) {
+		case MAXIMIZED:
+
+			if (affinityHalo != null) {
+				affinityHalo.destroy();
+				affinityHalo = null;
+			}
+
+			frameDragHandler.setEnabled(false);
+			UIEnvironment.getInstance().addChild(this);
+
+			maximizeBounds();
+
+			BoundsHandle.removeBoundsHandlesFrom(this);
+			break;
+		case WINDOW:
+			if (savedWindowBounds != null) {
+				setBounds(savedWindowBounds);
+				setOffset(savedWindowOffset);
+			}
+			frameDragHandler.setEnabled(true);
+			attachTo.addChild(this);
+
+			BoundsHandle.addBoundsHandlesTo(this);
+			if (affinityHalo == null) {
+				affinityHalo = new AffinityHalo(attachTo, this);
+			}
+
+			break;
+		case MINIMIZED:
+
+			if (affinityHalo != null) {
+				affinityHalo.destroy();
+				affinityHalo = null;
+			}
+
+			removeFromParent();
+			windowState = WindowState.MINIMIZED;
+		}
 	}
 
 	AffinityHalo affinityHalo = null;
-
-	public void restore() {
-		attachTo.addChild(this);
-		windowState = WindowState.RESTORED;
-
-		if (affinityHalo != null) {
-			affinityHalo.removeFromParent();
-		}
-		affinityHalo = new AffinityHalo(attachTo, this);
-
-	}
 
 	@Override
 	public boolean setBounds(double x, double y, double width, double height) {
@@ -125,7 +265,6 @@ public class Window extends WorldObjectImpl {
 
 		// if (isInitialized) {
 		menubar.setBounds(1, 1, getWidth() - 2, MENU_BAR_HEIGHT);
-		title.setBounds(3, 3, getWidth(), MENU_BAR_HEIGHT);
 
 		// border.setBounds(-2, -2, getWidth() + 4, getHeight() + 4);
 		contentNode.setBounds(0, 0, getWidth() - 4, getHeight() - 4
@@ -138,6 +277,12 @@ public class Window extends WorldObjectImpl {
 		return windowState;
 	}
 
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return contentNode.getName();
+	}
+
 }
 
 class FrameDragHandler extends PDragSequenceEventHandler {
@@ -145,6 +290,15 @@ class FrameDragHandler extends PDragSequenceEventHandler {
 	private PNode draggedNode;
 
 	private boolean moveToFrontOnPress = false;
+	boolean enabled = true;
+
+	protected boolean isEnabled() {
+		return enabled;
+	}
+
+	protected void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
 	public FrameDragHandler(PNode draggedNode) {
 		super();
@@ -204,6 +358,9 @@ class FrameDragHandler extends PDragSequenceEventHandler {
 	// ****************************************************************
 
 	protected void startDrag(PInputEvent event) {
+		if (!enabled)
+			return;
+
 		super.startDrag(event);
 
 		if (moveToFrontOnPress) {

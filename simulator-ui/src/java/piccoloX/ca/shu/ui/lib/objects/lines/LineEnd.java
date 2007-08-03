@@ -19,7 +19,7 @@ public class LineEnd extends WorldObjectImpl {
 		super();
 		this.well = well;
 
-		addChild(new LineEndIcon());
+		addChild(new LineEndIcon(this));
 		setBounds(getFullBounds());
 		setChildrenPickable(false);
 		setTangible(false);
@@ -36,14 +36,9 @@ public class LineEnd extends WorldObjectImpl {
 		while (it.hasNext()) {
 			WorldObject node = it.next();
 
-			// if (canConnectTo(node)) {
-
-			// if (((ILineAcceptor) node).connect(this)) {
-
 			if (tryConnectTo(node))
 				return;
-			// }
-			// }
+
 		}
 
 		/*
@@ -80,17 +75,27 @@ public class LineEnd extends WorldObjectImpl {
 		return null;
 	}
 
+	public boolean tryConnectTo(WorldObject target) {
+		return tryConnectTo(target, true);
+	}
+
 	/**
 	 * 
 	 * @param target
 	 *            Target to be connected with
+	 * @param initializeConnection
+	 *            Whether to call the initialize the connection
+	 * 
 	 * @return true is sucessfully connected
+	 * 
+	 * 
 	 */
-	public boolean tryConnectTo(WorldObject target) {
+	public boolean tryConnectTo(WorldObject target, boolean initializeConnection) {
 		boolean connected = false;
 
 		WorldObjectImpl rootOfWell = getRootOfWell();
 
+		boolean recededIntoWell = false;
 		if (target == null) {
 			/*
 			 * attach to the well if there is no target
@@ -105,15 +110,23 @@ public class LineEnd extends WorldObjectImpl {
 			/*
 			 * remove the lineEnd if its put back in the well's parent
 			 */
-			removeFromParent();
-			connected = true;
-		} else if (initConnection(target)) {
-			// System.out.println("**Dropped into line in!");
-			target.addChild(this);
-			this.target = target;
-			this.setOffset(0, 0);
-			connected = true;
-
+			destroy();
+			recededIntoWell = true;
+			connected = false;
+		} else {
+			if (initializeConnection) {
+				if (initConnection(target)) {
+					target.addChild(this);
+					this.target = target;
+					this.setOffset(0, 0);
+					connected = true;
+				}
+			} else {
+				target.addChild(this);
+				this.target = target;
+				this.setOffset(0, 0);
+				connected = true;
+			}
 		}
 
 		/*
@@ -125,6 +138,9 @@ public class LineEnd extends WorldObjectImpl {
 			justDisconnected();
 		}
 		isConnected = connected;
+
+		if (recededIntoWell)
+			return true;
 		return isConnected;
 
 	}
@@ -146,5 +162,9 @@ public class LineEnd extends WorldObjectImpl {
 
 	public void setConnected(boolean isConnected) {
 		this.isConnected = isConnected;
+	}
+
+	public LineEndWell getWell() {
+		return well;
 	}
 }

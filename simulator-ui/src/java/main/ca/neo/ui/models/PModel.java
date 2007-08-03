@@ -3,13 +3,19 @@ package ca.neo.ui.models;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.handlers.IContextMenu;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 public abstract class PModel extends WorldObjectImpl implements IContextMenu {
@@ -57,22 +63,33 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 
 		MenuBuilder objectMenu = menu.createSubMenu("Object");
 
-		objectMenu.addAction(new AbstractAction("Remove") {
-			private static final long serialVersionUID = 1L;
-
-			public void actionPerformed(ActionEvent e) {
-				modelRemoved();
-			}
-		});
+		objectMenu.addAction(new RemoveModelAction());
 
 		return menu;
 	}
 
-	/**
-	 * Called when the user wants to remove the Model
-	 */
-	public void modelRemoved() {
-		removeFromParent();
+	class RemoveModelAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public RemoveModelAction() {
+			super("Remove model", "Remove");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			int response = JOptionPane
+					.showConfirmDialog(
+							UIEnvironment.getInstance(),
+							"Once an object has been removed, it cannot be undone.",
+							"Are you sure?", JOptionPane.YES_NO_OPTION);
+			if (response == 0) {
+				destroy();
+			} else {
+				throw new ActionException("Action cancelled by user", false);
+			}
+		}
+
 	}
 
 	public WorldObjectImpl getIcon() {

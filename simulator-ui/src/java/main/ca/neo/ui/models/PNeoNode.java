@@ -15,13 +15,15 @@ import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.ui.models.nodes.connectors.PDecodedTermination;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.nodes.widgets.GProbe;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
@@ -41,74 +43,14 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 */
 	Vector<WorldObjectImpl> widgets;
 
-	public PNeoNode(Node model) {
-		super(model);
-		init();
-	}
-
-	@Override
-	public void update() {
-
-		super.update();
-
-		Origin[] origins = getNode().getOrigins();
-		Termination[] terminations = getNode().getTerminations();
-
-		for (int i = 0; i < origins.length; i++) {
-			Origin origin = origins[i];
-
-		}
-	}
-
-	/**
-	 * 
-	 * @param term
-	 *            Termination to be shown to the UI
-	 * @return
-	 */
-	public PTermination showTermination(String name) {
-		PTermination termUI;
-		try {
-			termUI = new PTermination(this, getNode().getTermination(name));
-			addWidget(termUI);
-			return termUI;
-		} catch (StructuralException e) {
-			Util.Error(e.toString());
-		}
-		return null;
-
-	}
-
-	/**
-	 * 
-	 * @param origin
-	 *            to be shown in the UI
-	 * @return the origin UI object
-	 */
-	public POrigin showOrigin(String name) {
-		POrigin originUI;
-		try {
-			originUI = new POrigin(this, getNode().getOrigin(name));
-			addWidget(originUI);
-
-			return originUI;
-
-		} catch (StructuralException e) {
-			Util.Error(e.toString());
-		}
-		return null;
-	}
-
 	public PNeoNode() {
 		super();
 		init();
 	}
 
-	@Override
-	public void setModel(Object model) {
-		// TODO Auto-generated method stub
-		super.setModel(model);
-		setName(((Node) model).getName());
+	public PNeoNode(Node model) {
+		super(model);
+		init();
 	}
 
 	@Override
@@ -129,6 +71,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		assignProbes();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public PopupMenuBuilder constructMenu() {
 
@@ -180,17 +123,44 @@ public abstract class PNeoNode extends PModelConfigurable {
 	/**
 	 * Creates a new probe and adds the UI object to the node
 	 * 
-	 * @param state
+	 * @param stateName
 	 *            The name of the state variable to probe
 	 */
-	public void createProbe(String state) {
+	public GProbe createProbe(String stateName) {
 		if (probes == null)
 			probes = new Vector<GProbe>();
 
-		GProbe probe = new GProbe(this, state);
+		GProbe probe = new GProbe(this, stateName);
 		addChild(probe);
 		probes.add(probe);
 		assignProbes();
+
+		return probe;
+	}
+
+	@Override
+	public void destroy() {
+
+		
+		getNetworkViewer().removeNode(this);
+
+		/*
+		 * remove widgets... since they are not children, they have to be
+		 * removed explicitly
+		 */
+		Object[] widgetsAr = widgets.toArray();
+
+		for (int i = 0; i < widgetsAr.length; i++) {
+			((WorldObjectImpl) (widgetsAr[i])).destroy();
+		}
+
+		super.destroy();
+	}
+
+	@Override
+	public PropDescriptor[] getConfigSchema() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -269,12 +239,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String getTypeName() {
 		// TODO Auto-generated method stub
 		return null;
@@ -332,10 +296,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 */
 	public void removeProbe(GProbe probe) {
 		probes.remove(probe);
+		probe.destroy();
 
 	}
-
-	// Vector<POrigin> origins;
 
 	public void removeWidget(WorldObjectImpl widget) {
 		widgets.remove(widget);
@@ -343,6 +306,13 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		updateWidgets();
 		assignProbes();
+	}
+
+	@Override
+	public void setModel(Object model) {
+		// TODO Auto-generated method stub
+		super.setModel(model);
+		setName(((Node) model).getName());
 	}
 
 	/**
@@ -356,6 +326,61 @@ public abstract class PNeoNode extends PModelConfigurable {
 			getOrigin(origins[i].getName());
 		}
 
+	}
+
+	// Vector<POrigin> origins;
+
+	/**
+	 * 
+	 * @param origin
+	 *            to be shown in the UI
+	 * @return the origin UI object
+	 */
+	public POrigin showOrigin(String name) {
+		POrigin originUI;
+		try {
+			originUI = new POrigin(this, getNode().getOrigin(name));
+			addWidget(originUI);
+
+			return originUI;
+
+		} catch (StructuralException e) {
+			Util.Error(e.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param term
+	 *            Termination to be shown to the UI
+	 * @return
+	 */
+	public PTermination showTermination(String name) {
+		PTermination termUI;
+		try {
+			termUI = new PTermination(this, getNode().getTermination(name));
+			addWidget(termUI);
+			return termUI;
+		} catch (StructuralException e) {
+			Util.Error(e.toString());
+		}
+		return null;
+
+	}
+
+	@Override
+	public void update() {
+
+		super.update();
+
+		Origin[] origins = getNode().getOrigins();
+		Termination[] terminations = getNode().getTerminations();
+
+		for (int i = 0; i < origins.length; i++) {
+			Origin origin = origins[i];
+
+		}
 	}
 
 	private void init() {
@@ -391,16 +416,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void layoutChildren() {
-		// TODO Auto-generated method stub
-		super.layoutChildren();
-
-		layoutWidgets();
-
-	}
-
 	// Vector<POrigin> origins;
 	// public void showOrigin(Origin origin) {
 	// POrigin originObject = new POrigin(origin);
@@ -412,6 +427,16 @@ public abstract class PNeoNode extends PModelConfigurable {
 	// origins.add(e)
 	//		
 	// }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void layoutChildren() {
+		// TODO Auto-generated method stub
+		super.layoutChildren();
+
+		layoutWidgets();
+
+	}
 
 	/**
 	 * layout widgets such as Origins and Terminations
@@ -476,9 +501,11 @@ public abstract class PNeoNode extends PModelConfigurable {
 		layoutWidgets();
 	}
 
-	class AddProbeAction extends AbstractAction {
+	class AddProbeAction extends ReversableAction {
 
 		private static final long serialVersionUID = 1;
+
+		GProbe probeCreated;
 
 		Entry<String, String> state;
 
@@ -488,14 +515,22 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		}
 
-		public void actionPerformed(ActionEvent arg0) {
+		@Override
+		protected void action() throws ActionException {
 
-			createProbe(state.getKey());
+			probeCreated = createProbe(state.getKey());
+
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			removeProbe(probeCreated);
+
 		}
 
 	}
 
-	class ShowAllOriginAction extends AbstractAction {
+	class ShowAllOriginAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -503,12 +538,13 @@ public abstract class PNeoNode extends PModelConfigurable {
 			super("Show all");
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		@Override
+		protected void action() throws ActionException {
 			showAllOrigins();
 		}
 	}
 
-	class ShowOriginAction extends AbstractAction {
+	class ShowOriginAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 		String originName;
@@ -518,17 +554,14 @@ public abstract class PNeoNode extends PModelConfigurable {
 			this.originName = originName;
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		@Override
+		protected void action() throws ActionException {
 			getOrigin(originName);
 		}
 	}
 
-	@Override
-	public void modelRemoved() {
-		super.modelRemoved();
-
-		((NetworkViewer) getParent()).removeNode(this);
-
+	protected Vector<WorldObjectImpl> getWidgets() {
+		return widgets;
 	}
 
 }

@@ -2,13 +2,13 @@ package ca.shu.ui.lib.util;
 
 import java.awt.Font;
 
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
 import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.actions.StandardAction;
 
 public class PopupMenuBuilder extends AbstractMenuBuilder {
 
@@ -30,9 +30,9 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 	}
 
-	public void addAction(AbstractAction action) {
+	public void addAction(StandardAction standardAction) {
 		JMenuItem item;
-		item = new JMenuItem(action);
+		item = new JMenuItem(standardAction.getSwingAction());
 		style(item);
 		menu.add(item);
 

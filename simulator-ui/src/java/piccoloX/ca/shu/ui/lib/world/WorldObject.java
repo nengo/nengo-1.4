@@ -13,10 +13,16 @@ import edu.umd.cs.piccolo.util.PBounds;
 public interface WorldObject extends NamedObject {
 	public static final String PROPERTY_STATE = "state";
 
+	/**
+	 * Called when the user wants to remove the Model
+	 */
+	public void destroy();
+
 	public void addChild(PNode child);
 
 	public static final String PROPERTY_EDGES = "edges";
 	public static final String PROPERTY_NAME = "objectName";
+
 	public void addChildW(WorldObject child);
 
 	public void addPropertyChangeListener(String propertyName,
@@ -54,7 +60,7 @@ public interface WorldObject extends NamedObject {
 	 */
 	public void justDropped();
 
-//	public void addedToWorld();
+	// public void addedToWorld();
 
 	public Dimension2D localToGlobal(Dimension2D localDimension);
 
@@ -78,7 +84,7 @@ public interface WorldObject extends NamedObject {
 
 	public void pushState(State state);
 
-//	public void removedFromWorld();
+	// public void removedFromWorld();
 
 	public void removePropertyChangeListener(PropertyChangeListener listener);
 

@@ -13,14 +13,14 @@ import edu.umd.cs.piccolo.activities.PActivity;
 public interface World {
 	public boolean containsNode(PNode node);
 	
-	public void zoomToWorld();
+	public void fitOnScreen();
 
 	public void addPropertyChangeListener(String propertyName,
 			PropertyChangeListener listener);
 	
 	public void zoomToNode(WorldObject node);
 	
-	public void setCameraPosition(double x, double y);
+	public void setCameraCenterPosition(double x, double y);
 	
 	public void showTooltip(WorldObjectImpl pControls,
 			WorldObjectImpl nodeAttacedTo);

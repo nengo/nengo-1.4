@@ -2,7 +2,7 @@ package ca.shu.ui.lib.handlers;
 
 import java.text.NumberFormat;
 
-import ca.shu.ui.lib.util.GraphicsEnvironment;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -20,7 +20,7 @@ public class StatusBarHandler extends PBasicInputEventHandler {
 		// TODO Auto-generated method stub
 		super.mouseMoved(event);
 
-		GraphicsEnvironment.getInstance().setStatusStr(getStatusStr(event));
+		UIEnvironment.getInstance().setStatusStr(getStatusStr(event));
 
 	}
 

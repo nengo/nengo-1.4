@@ -21,7 +21,10 @@ import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.Window;
+import ca.shu.ui.lib.objects.Window.WindowState;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 
@@ -65,7 +68,7 @@ public class PNetwork extends PNeoNode {
 	 */
 	public void addNode(PNeoNode nodeProxy) {
 
-		getNetworkViewer().addNodeToUI(nodeProxy);
+		getViewer().addNodeToUI(nodeProxy);
 	}
 
 	@Override
@@ -76,19 +79,21 @@ public class PNetwork extends PNeoNode {
 		if (networkWindow == null
 				|| (networkWindow.getWindowState() == Window.WindowState.MINIMIZED)) {
 
-			menu.addAction(new AbstractAction("Expand Network") {
+			menu.addAction(new StandardAction("Expand Network") {
 				private static final long serialVersionUID = 1L;
 
-				public void actionPerformed(ActionEvent e) {
-					openNetworkViewer();
+				@Override
+				protected void action() throws ActionException {
+					openViewer();
 				}
 			});
 
 		} else {
-			menu.addAction(new AbstractAction("Minimize Network") {
+			menu.addAction(new StandardAction("Minimize Network") {
 				private static final long serialVersionUID = 1L;
 
-				public void actionPerformed(ActionEvent e) {
+				@Override
+				protected void action() throws ActionException {
 					minimizeNetwork();
 				}
 			});
@@ -133,10 +138,12 @@ public class PNetwork extends PNeoNode {
 	 * 
 	 * @return The Network Viewer
 	 */
-	public NetworkViewer getNetworkViewer() {
+	public NetworkViewer getViewer() {
+
 		if (networkViewer == null) {
 			constructNetworkViewer();
 		}
+
 		return networkViewer;
 	}
 
@@ -151,7 +158,7 @@ public class PNetwork extends PNeoNode {
 	 */
 	public void minimizeNetwork() {
 		if (networkWindow != null)
-			networkWindow.minimize();
+			networkWindow.setWindowState(WindowState.MINIMIZED);
 
 	}
 
@@ -163,13 +170,13 @@ public class PNetwork extends PNeoNode {
 	 * @return opens the network viewer which contains the nodes of the Network
 	 *         model
 	 */
-	public NetworkViewer openNetworkViewer() {
+	public NetworkViewer openViewer() {
 		if (networkViewer == null) {
 			constructNetworkViewer();
 		}
-		networkWindow.restore();
+		networkWindow.setWindowState(WindowState.WINDOW);
 
-		return getNetworkViewer();
+		return getViewer();
 
 	}
 

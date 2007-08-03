@@ -16,7 +16,7 @@ public class LineEndWell extends WorldObjectImpl {
 		// icon.setPaint(GDefaults.FOREGROUND_COLOR);
 		// addChild(icon);
 
-		WorldObjectImpl icon = new LineEndIcon();
+		WorldObjectImpl icon = new LineEndWellIcon();
 
 		addChild(icon);
 		setBounds(getFullBounds());

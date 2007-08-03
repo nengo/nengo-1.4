@@ -11,12 +11,22 @@ import ca.neo.ui.util.UIBuilder;
 import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.widgets.Toolbox;
 import ca.neo.util.Environment;
-import ca.shu.ui.lib.util.GraphicsEnvironment;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.GFrame;
 
 public class NeoGraphics extends GFrame {
+
+	private static final long serialVersionUID = 1L;
+
+	public static void main(String[] args) {
+		UIEnvironment.setInstance(new NeoGraphics("NEOWorld"));
+	}
+
+	Toolbox canvasView;
 
 	public NeoGraphics(String title) {
 		super(title + " - NEO Workspace");
@@ -24,29 +34,10 @@ public class NeoGraphics extends GFrame {
 		/*
 		 * Only one instance of NeoWorld may be running at once
 		 */
-		GraphicsEnvironment.setInstance(this);
+		UIEnvironment.setInstance(this);
 
 		Environment.setUserInterface(true);
 
-	}
-
-	private static final long serialVersionUID = 1L;
-
-	public static void main(String[] args) {
-		GraphicsEnvironment.setInstance(new NeoGraphics("NEOWorld"));
-	}
-
-	Toolbox canvasView;
-
-	@Override
-	public void constructMenuBar(JMenuBar menuBar) {
-		MenuBuilder menu = new MenuBuilder("Start");
-		menuBar.add(menu.getJMenu());
-		menu.addAction(new CreateNetworkAction());
-	}
-
-	public Toolbox getCanvasView() {
-		return canvasView;
 	}
 
 	/**
@@ -60,6 +51,17 @@ public class NeoGraphics extends GFrame {
 		return object;
 	}
 
+	@Override
+	public void constructMenuBar(JMenuBar menuBar) {
+		MenuBuilder menu = new MenuBuilder("Start");
+		menuBar.add(menu.getJMenu());
+		menu.addAction(new CreateNetworkAction());
+	}
+
+	public Toolbox getCanvasView() {
+		return canvasView;
+	}
+
 	public void showCanvas() {
 		if (canvasView == null) {
 			System.out.println("Creating canvas");
@@ -68,38 +70,32 @@ public class NeoGraphics extends GFrame {
 		}
 	}
 
-	class CanvasAction extends AbstractAction {
+	class CreateNetworkAction extends ReversableAction {
 		private static final long serialVersionUID = 1L;
 
-		public CanvasAction() {
-			super("Show Canvas");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			showCanvas();
-		}
-
-	}
-
-	class CreateNetworkAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
+		PNetwork network;
 
 		public CreateNetworkAction() {
-			super("New Network");
+			super("Create new network");
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			(new Thread() {
-				public void run() {
-					PNetwork network;
-					network = new PNetwork();
-					new DialogConfig(network);
+		@Override
+		protected void action() throws ActionException {
 
-					if (network.isModelCreated())
-						getWorld().getGround().catchObject(network);
-				}
-			}).start();
+			network = new PNetwork();
+			new DialogConfig(network);
 
+			if (network.isModelCreated()) {
+				getWorld().getGround().catchObject(network);
+			} else {
+				throw new ActionException("Could not configure network", false);
+			}
+
+		}
+
+		@Override
+		protected void undo() {
+			network.destroy();
 		}
 	}
 

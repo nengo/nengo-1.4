@@ -7,7 +7,6 @@ import java.beans.PropertyChangeListener;
 
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 public class GEdge extends PPath implements PropertyChangeListener {
@@ -34,7 +33,7 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		this.endNode = endNode;
 
 		setPickable(false);
-
+		
 		// arrow = PPath.createRectangle(0, 0, 100, 100);
 		// addChild(arrow);
 
@@ -45,6 +44,17 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		endNode.addPropertyChangeListener(WorldObject.PROPERTY_STATE, this);
 
 		setState(State.DEFAULT);
+	}
+
+	public void destroy() {
+		removeFromParent();
+		startNode
+				.removePropertyChangeListener(WorldObject.PROPERTY_EDGES, this);
+		startNode
+				.removePropertyChangeListener(WorldObject.PROPERTY_STATE, this);
+
+		endNode.removePropertyChangeListener(WorldObject.PROPERTY_EDGES, this);
+		endNode.removePropertyChangeListener(WorldObject.PROPERTY_STATE, this);
 	}
 
 	public Color getDefaultColor() {
@@ -101,6 +111,14 @@ public class GEdge extends PPath implements PropertyChangeListener {
 	public void updateEdge() {
 		reset();
 
+		/**
+		 * Remove this object if both start and endNodes are destroyed
+		 */
+		if (startNode.isDestroyed() || endNode.isDestroyed()) {
+			destroy();
+			return;
+		}
+
 		// Note that the node's "FullBounds" must be used (instead of just the
 		// "Bound")
 		// because the nodes have non-identity transforms which must be included
@@ -149,8 +167,6 @@ public class GEdge extends PPath implements PropertyChangeListener {
 
 	public void propertyChange(PropertyChangeEvent arg0) {
 		updateEdge();
-
-	
 
 		if (startNode.getState() != WorldObject.State.DEFAULT
 				|| endNode.getState() != WorldObject.State.DEFAULT) {

@@ -23,7 +23,7 @@ import ca.neo.ui.style.Style;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
-import ca.shu.ui.lib.util.GraphicsEnvironment;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 
 public class DialogConfig extends ConfigManager {
@@ -34,7 +34,7 @@ public class DialogConfig extends ConfigManager {
 
 	public DialogConfig(IConfigurable configurable) {
 		super(configurable);
-		this.parent1 = GraphicsEnvironment.getInstance();
+		this.parent1 = UIEnvironment.getInstance();
 		init();
 	}
 

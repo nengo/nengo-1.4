@@ -1,8 +1,9 @@
 package ca.shu.ui.lib.world.impl;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -10,8 +11,6 @@ import java.util.Stack;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.activities.Fader;
-import ca.shu.ui.lib.objects.GContextButton;
-import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.LayoutManager;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
@@ -33,17 +32,15 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	private String name;
 
-	protected State state = State.DEFAULT;
+	private State state = State.DEFAULT;
 
 	PActivity animation = null;
 
 	boolean autoPositionCloseButton = true;
 
-	PPath tempFrame = null;
-
-	GContextButton closeButton = null;
-
 	boolean draggable = true;
+
+	// GContextButton closeButton = null;
 
 	Stack<PNode> frames;
 
@@ -59,36 +56,9 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	boolean tangible = true;
 
-	GText titleBar;
+	PPath tempFrame = null;
 
-	@Override
-	public void signalBoundsChanged() {
-		// TODO Auto-generated method stub
-		super.signalBoundsChanged();
-		signalEdgesChanged();
-
-	}
-
-	// int i = 0;
-	public void signalEdgesChanged() {
-		// System.out.println("Signal edges changed " + i++);
-		firePropertyChange(0, PROPERTY_EDGES, null, null);
-
-		/*
-		 * Updates children edges
-		 */
-		int count = getChildrenCount();
-		for (int i = 0; i < count; i++) {
-			PNode each = (PNode) getChildrenReference().get(i);
-
-			if (each instanceof WorldObjectImpl) {
-				WorldObjectImpl wo = (WorldObjectImpl) each;
-
-				wo.signalEdgesChanged();
-			}
-		}
-
-	}
+	// GText titleBar;
 
 	public WorldObjectImpl() {
 		this("");
@@ -107,16 +77,30 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 		layoutManager = new LayoutManager();
 
-		if (name.compareTo("") != 0) {
+		// if (name.compareTo("") != 0) {
+		//
+		// titleBar = new GText(name);
+		// titleBar.setConstrainWidthToTextWidth(true);
+		// titleBar.setFont(new Font("Arial", Font.PLAIN, 20));
+		// titleBar.setOffset(3, 3);
+		//
+		// addChild(titleBar);
+		// getLayoutManager().translate(0, titleBar.getHeight() + 3);
+		// }
 
-			titleBar = new GText(name);
-			titleBar.setConstrainWidthToTextWidth(true);
-			titleBar.setFont(new Font("Arial", Font.PLAIN, 20));
-			titleBar.setOffset(3, 3);
+		addPropertyChangeListener(PROPERTY_TRANSFORM, transformChangeListener);
 
-			addChild(titleBar);
-			getLayoutManager().translate(0, titleBar.getHeight() + 3);
+	}
+
+	TransformChangeListener transformChangeListener = new TransformChangeListener();
+
+	class TransformChangeListener implements PropertyChangeListener {
+
+		public void propertyChange(PropertyChangeEvent evt) {
+			signalEdgesChanged();
+
 		}
+
 	}
 
 	public void addChildFancy(PNode node) {
@@ -220,7 +204,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	public Collection<WorldObject> getChildrenAtBounds(Rectangle2D bounds) {
 		return (Collection<WorldObject>) (this.getAllNodes(new BoundsFilter(
 				this, this.localToGlobal(bounds), WorldObjectImpl.class), null));
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -263,18 +247,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#getTitleBarText()
-	 */
-	public String getTitleBarText() {
-		if (titleBar == null) {
-			return "";
-		}
-		return titleBar.getText();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see ca.sw.graphics.nodes.WorldO#getControls()
 	 */
 	public WorldObjectImpl getTooltipObject() {
@@ -293,6 +265,18 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 			return null;
 	}
 
+	// /*
+	// * (non-Javadoc)
+	// *
+	// * @see ca.sw.graphics.nodes.WorldO#getTitleBarText()
+	// */
+	// public String getTitleBarText() {
+	// if (titleBar == null) {
+	// return "";
+	// }
+	// return titleBar.getText();
+	// }
+
 	public WorldLayer getWorldLayer() {
 		PNode node = this;
 
@@ -307,13 +291,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
-	public void hideContextButton() {
-		if (closeButton != null) {
-			closeButton.removeFromParent();
-			closeButton = null;
-		}
-	}
-
 	public boolean isAlive() {
 		return isAlive;
 	}
@@ -321,6 +298,13 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	public boolean isAncestorOf(WorldObjectImpl node) {
 		return isAncestorOf((PNode) node);
 	}
+
+	// public void hideContextButton() {
+	// if (closeButton != null) {
+	// closeButton.removeFromParent();
+	// closeButton = null;
+	// }
+	// }
 
 	public boolean isContained() {
 		PNode parentNode = getParent();
@@ -365,16 +349,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		// TODO Auto-generated method stub
 
 	}
-
-	/**
-	 * Called when the World the object lives in has changed
-	 */
-	protected void addedToWorld() {
-	}
-
-	// public Object loadStatic(String name) {
-	// return Util.loadProperty(getFileNamePrefix() + name);
-	// }
 
 	/*
 	 * TODO: Perhaps this is not needed
@@ -424,6 +398,10 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
+	// public Object loadStatic(String name) {
+	// return Util.loadProperty(getFileNamePrefix() + name);
+	// }
+
 	public void popState(State state) {
 		states.remove(state);
 		if (states.size() == 0)
@@ -442,11 +420,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		setState(state);
 	}
 
-	protected void removedFromWorld() {
-		// TODO Auto-generated method stub
-
-	}
-
 	/*
 	 * TODO: implement this
 	 */
@@ -458,10 +431,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	public void removeFromLayout(PNode node) {
 
 	}
-
-	// public void saveStatic(Object obj, String name) {
-	// Util.saveProperty(obj, getFileNamePrefix() + name);
-	// }
 
 	/*
 	 * 
@@ -495,15 +464,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
-	@Override
-	public boolean setBounds(double x, double y, double width, double height) {
-		boolean rtn = super.setBounds(x, y, width, height);
-
-		boundsChanged();
-		// TODO Auto-generated method stub
-		return rtn;
-	}
-
 	public void setBoundsWithPadding(double x, double y, double width,
 			double height, double padding) {
 		this.setBounds(x, y, width - (padding * 2), height - (padding * 2));
@@ -514,6 +474,10 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		this.setBoundsWithPadding(bounds.getX(), bounds.getY(), bounds
 				.getWidth(), bounds.getHeight(), padding);
 	}
+
+	// public void saveStatic(Object obj, String name) {
+	// Util.saveProperty(obj, getFileNamePrefix() + name);
+	// }
 
 	public void setDraggable(boolean isDraggable) {
 		this.draggable = isDraggable;
@@ -541,6 +505,16 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		}
 	}
 
+	// @Override
+	// public boolean setBounds(double x, double y, double width, double height)
+	// {
+	// boolean rtn = super.setBounds(x, y, width, height);
+	//
+	// boundsChanged();
+	// // TODO Auto-generated method stub
+	// return rtn;
+	// }
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -548,6 +522,14 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	 */
 	public void setLayoutManager(LayoutManager layoutManager) {
 		this.layoutManager = layoutManager;
+	}
+
+	public void setName(String name) {
+		String oldName = this.name;
+		this.name = name;
+
+		firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -599,18 +581,85 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		this.tangible = tangible;
 	}
 
+	@Override
+	public void signalBoundsChanged() {
+		// TODO Auto-generated method stub
+		super.signalBoundsChanged();
+		signalEdgesChanged();
+
+	}
+
+	boolean isDestroyed;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.WorldObject#destroy()
+	 */
+	public void destroy() {
+		isDestroyed = true;
+
+		/*
+		 * Notify edges that this object has changed (ie. destroyed)
+		 */
+		signalEdgesChanged();
+
+		/*
+		 * Remove listeners
+		 */
+		removePropertyChangeListener(PROPERTY_TRANSFORM,
+				transformChangeListener);
+
+		/*
+		 * Removes this object from the world and finish any tasks
+		 * 
+		 * Convert to array to allow for concurrent modification
+		 */
+		Object[] children = getChildrenReference().toArray();
+
+		for (int i = 0; i < children.length; i++) {
+			Object child = children[i];
+
+			if (child instanceof WorldObjectImpl) {
+				((WorldObjectImpl) child).destroy();
+			}
+		}
+		removeFromParent();
+
+	}
+
+	// int i = 0;
+	public void signalEdgesChanged() {
+		// System.out.println("Signal edges changed " + i++);
+		firePropertyChange(0, PROPERTY_EDGES, null, null);
+
+		/*
+		 * Updates children edges
+		 */
+		int count = getChildrenCount();
+		for (int i = 0; i < count; i++) {
+			PNode each = (PNode) getChildrenReference().get(i);
+
+			if (each instanceof WorldObjectImpl) {
+				WorldObjectImpl wo = (WorldObjectImpl) each;
+
+				wo.signalEdgesChanged();
+			}
+		}
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see ca.sw.graphics.nodes.WorldO#setTitleBarText(java.lang.String)
 	 */
-	public void setTitleBarText(String str) {
-
-		if (titleBar != null) {
-			titleBar.setText(str);
-		}
-	}
-
+	// public void setTitleBarText(String str) {
+	//
+	// if (titleBar != null) {
+	// titleBar.setText(str);
+	// }
+	// }
 	// /*
 	// * (non-Javadoc)
 	// *
@@ -639,33 +688,30 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	// translate(dx, dy);
 	//
 	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see ca.sw.graphics.nodes.WorldO#showContextButton()
 	 */
-	public PNode showContextButton() {
-		return showContextButton(autoPositionCloseButton);
-	}
-
+	// public PNode showContextButton() {
+	// return showContextButton(autoPositionCloseButton);
+	// }
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see ca.sw.graphics.nodes.WorldO#showContextButton(boolean)
 	 */
-	public PNode showContextButton(boolean autoPosition) {
-		autoPositionCloseButton = autoPosition;
-		if (closeButton == null) {
-			closeButton = new GContextButton(this);
-
-			this.addChildFancy(closeButton);
-
-		}
-		boundsChanged();
-		return closeButton;
-	}
-
+	// public PNode showContextButton(boolean autoPosition) {
+	// autoPositionCloseButton = autoPosition;
+	// if (closeButton == null) {
+	// closeButton = new GContextButton(this);
+	//
+	// this.addChildFancy(closeButton);
+	//
+	// }
+	// boundsChanged();
+	// return closeButton;
+	// }
 	public void startDrag() {
 
 	}
@@ -686,17 +732,23 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		stateChanged();
 	}
 
-	protected void boundsChanged() {
+	// protected void boundsChanged() {
+	//
+	// if (titleBar != null) {
+	// titleBar.setWidth(this.getWidth());
+	// // titleBar.recomputeLayout()
+	// }
+	//
+	// if ((closeButton != null) && autoPositionCloseButton) {
+	// closeButton.setOffset(getWidth() - closeButton.getWidth() - 10, 10);
+	//
+	// }
+	// }
 
-		if (titleBar != null) {
-			titleBar.setWidth(this.getWidth());
-			// titleBar.recomputeLayout()
-		}
-
-		if ((closeButton != null) && autoPositionCloseButton) {
-			closeButton.setOffset(getWidth() - closeButton.getWidth() - 10, 10);
-
-		}
+	/**
+	 * Called when the World the object lives in has changed
+	 */
+	protected void addedToWorld() {
 	}
 
 	protected Collection<WorldObject> getChildrenAtBounds(double x, double y,
@@ -782,6 +834,11 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
+	protected void removedFromWorld() {
+		// TODO Auto-generated method stub
+
+	}
+
 	protected void stateChanged() {
 
 		if (state == State.DEFAULT) {
@@ -793,23 +850,8 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		}
 	}
 
-	public void setName(String name) {
-		String oldName = this.name;
-		this.name = name;
-
-		firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
-
-	}
-
-	/**
-	 * @param x horizontal position of the object relative to the parent
-	 * @param y vertical position of the object relative to the parent
-	 */
-	@Override
-	public void setOffset(double x, double y) {
-		// TODO Auto-generated method stub
-		super.setOffset(x, y);
-		signalEdgesChanged();
+	public boolean isDestroyed() {
+		return isDestroyed;
 	}
 
 	// /*

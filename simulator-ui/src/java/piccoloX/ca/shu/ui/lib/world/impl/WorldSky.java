@@ -3,6 +3,8 @@ package ca.shu.ui.lib.world.impl;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
@@ -15,9 +17,7 @@ public class WorldSky extends PCamera implements WorldLayer {
 	public void translateView(double arg0, double arg1) {
 		// TODO Auto-generated method stub
 		super.translateView(arg0, arg1);
-		
-		
-		
+
 	}
 
 	/**
@@ -42,74 +42,65 @@ public class WorldSky extends PCamera implements WorldLayer {
 	}
 
 	public Collection<WorldObject> getChildrenAtBounds(Rectangle2D bounds) {
-		System.out.println("Unimplemented!!");
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException();
 	}
 
 	public void addToWorldLayer(WorldObject wo) {
-		System.out.println("not implemented");
+
 		addChild((PNode) wo);
 	}
 
 	public void addChildW(WorldObject child) {
-		System.out.println("not implemented");
-
+		throw new NotImplementedException();
 	}
 
 	public void endDrag() {
-		System.out.println("not implemented");
-
+		throw new NotImplementedException();
 	}
 
 	public WorldLayer getWorldLayer() {
-		System.out.println("not implemented");
-		return null;
+		throw new NotImplementedException();
 	}
 
 	public boolean isDraggable() {
-		System.out.println("not implemented");
-		return false;
+		throw new NotImplementedException();
 	}
 
 	public void justDropped() {
-		System.out.println("not implemented");
-
+		throw new NotImplementedException();
 	}
 
 	public void addedToWorld() {
-		System.out.println("not implemented");
-
+		throw new NotImplementedException();
 	}
 
 	public void popState(State state) {
-		System.out.println("not implemented");
-
+		throw new NotImplementedException();
 	}
 
 	public void pushState(State state) {
-		System.out.println("not implemented");
+		throw new NotImplementedException();
 
 	}
 
 	public void removedFromWorld() {
-		System.out.println("not implemented");
-
+		throw new NotImplementedException();
 	}
 
 	public void startDrag() {
-		System.out.println("not implemented");
-
+		throw new NotImplementedException();
 	}
 
 	public String getName() {
-		System.out.println("not implemented");
-		return null;
+		throw new NotImplementedException();
 	}
 
 	public void setDraggable(boolean isDraggable) {
-		System.out.println("not implemented");
+		throw new NotImplementedException();
+	}
 
+	public void destroy() {
+		throw new NotImplementedException();
 	}
 
 }

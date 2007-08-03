@@ -6,7 +6,6 @@ import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -16,19 +15,19 @@ import java.util.EventListener;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
 import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.ActionManager;
+import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
+import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -46,29 +45,6 @@ public class GFrame extends JFrame {
 	 */
 	private static final long serialVersionUID = 2769082313231407201L;
 
-	
-
-	public static JMenuItem addActionToMenu(JMenu menu, AbstractAction action) {
-		JMenuItem menuItem = new JMenuItem(action);
-		// GDefaults.styleComponent(menuItem);
-		menu.add(menuItem);
-
-		return menuItem;
-	}
-
-	public static JMenuItem addActionToMenu(JPopupMenu menu,
-			AbstractAction action) {
-		JMenuItem menuItem = new JMenuItem(action);
-		// GDefaults.styleComponent(menuItem);
-		menu.add(menuItem);
-
-		return menuItem;
-	}
-
-	
-
-
-
 	private EventListener escapeFullScreenModeListener;
 
 	private GraphicsDevice graphicsDevice;
@@ -79,7 +55,7 @@ public class GFrame extends JFrame {
 
 	PCamera camera;
 
-	Canvas canvas;
+	GCanvas canvas;
 
 	String statusStr = "";
 
@@ -87,9 +63,13 @@ public class GFrame extends JFrame {
 
 	PLayer topLayer;
 
+	ActionManager actionManager;
+
 	public GFrame(String title) {
 		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
+
+		actionManager = new ActionManager(this);
 		getContentPane().setLayout(new BorderLayout());
 		initMenu();
 		initStatusBar();
@@ -106,13 +86,18 @@ public class GFrame extends JFrame {
 		} catch (SecurityException e) {
 		} // expected from applets
 
-		canvas = new Canvas(this);
+		canvas = new GCanvas(this);
 
 		getContentPane().add(canvas);
 		canvas.requestFocus();
 		validate();
 		setFullScreenMode(false);
 
+	}
+
+	public void addChild(Window wo) {
+
+		canvas.addWindow(wo);
 	}
 
 	/**
@@ -142,14 +127,14 @@ public class GFrame extends JFrame {
 
 	}
 
-	public Canvas getCanvas() {
+	public GCanvas getCanvas() {
 		return canvas;
 	}
 
 	/**
 	 * @return the top-most World associated with this frame
 	 */
-	public WorldImpl getWorld() {
+	public World getWorld() {
 		return canvas.getWorld();
 	}
 
@@ -222,6 +207,9 @@ public class GFrame extends JFrame {
 		updateStatusBar();
 	}
 
+	MenuBuilder worldMenu;
+	MenuBuilder editMenu;
+
 	/**
 	 * Initializes the menu
 	 */
@@ -234,24 +222,102 @@ public class GFrame extends JFrame {
 
 		// menu.setMnemonic(KeyEvent.VK_V);
 
-		MenuBuilder menu = new MenuBuilder("World");
-		menuBar.add(menu.getJMenu());
+		editMenu = new MenuBuilder("Edit");
+		menuBar.add(editMenu.getJMenu());
 
-		menu.addAction(new ZoomOutAction());
-		menu.addAction(new FullScreenAction());
-		menu.addAction(new TooltipAction());
-		menu.addAction(new GridAction());
-
-		MenuBuilder qualityMenu = menu.createSubMenu("Rendering Quality");
-		qualityMenu.addAction(new LowQualityAction());
-		qualityMenu.addAction(new MediumQualityAction());
-		qualityMenu.addAction(new HighQualityAction());
+		worldMenu = new MenuBuilder("World");
+		menuBar.add(worldMenu.getJMenu());
 
 		menuBar.setVisible(true);
+		updateWorldMenu();
+		updateEditMenu();
 		this.setJMenuBar(menuBar);
 		this.repaint();
 
 	}
+
+	public void reversableActionsUpdated() {
+		updateEditMenu();
+	}
+
+	protected void updateEditMenu() {
+		editMenu.reset();
+
+		editMenu.addAction(new UndoAction());
+		editMenu.addAction(new RedoAction());
+
+	}
+
+	class UndoAction extends StandardAction {
+
+		public UndoAction() {
+			super("Undo: " + actionManager.getLastActionDescription());
+			if (!actionManager.hasReversableAction()) {
+				setEnabled(false);
+			}
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void action() throws ActionException {
+			actionManager.undoLastAction();
+		}
+	}
+
+	class RedoAction extends StandardAction {
+
+		public RedoAction() {
+			super("Redo: " + actionManager.getLastActionDescription());
+			if (!actionManager.hasReversableAction()) {
+				setEnabled(false);
+			}
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void action() throws ActionException {
+			actionManager.redoLastAction();
+
+		}
+
+	}
+
+	protected void updateWorldMenu() {
+		worldMenu.reset();
+
+		worldMenu.addAction(new ZoomOutAction());
+		if (!isFullScreenMode) {
+			worldMenu.addAction(new TurnOnFullScreen());
+		} else {
+			worldMenu.addAction(new TurnOffFullScreen());
+		}
+
+		if (!WorldImpl.isContexualTipsVisible()) {
+			worldMenu.addAction(new TurnOnTooltips());
+		} else {
+			worldMenu.addAction(new TurnOffTooltips());
+		}
+
+		if (!Grid.isGridVisible()) {
+			worldMenu.addAction(new TurnOnGrid());
+		} else {
+			worldMenu.addAction(new TurnOffGrid());
+		}
+
+		MenuBuilder qualityMenu = worldMenu.createSubMenu("Rendering Quality");
+		qualityMenu.addAction(new LowQualityAction());
+		qualityMenu.addAction(new MediumQualityAction());
+		qualityMenu.addAction(new HighQualityAction());
+	}
+
+	// protected JMenu addMenu(JMenuBar menuBar, String name) {
+	// JMenu menu = new JMenu(name);
+	// Style.styleComponent(menu);
+	// menuBar.add(menu);
+	// return menu;
+	// }
 
 	/*
 	 * Initializes the status bar
@@ -269,13 +335,6 @@ public class GFrame extends JFrame {
 		c.add(statusBar, BorderLayout.SOUTH);
 
 	}
-
-	// protected JMenu addMenu(JMenuBar menuBar, String name) {
-	// JMenu menu = new JMenu(name);
-	// Style.styleComponent(menu);
-	// menuBar.add(menu);
-	// return menu;
-	// }
 
 	protected void chooseBestDisplayMode(GraphicsDevice device) {
 		DisplayMode best = getBestDisplayMode(device);
@@ -340,54 +399,7 @@ public class GFrame extends JFrame {
 		statusBar.setText(strBuff.toString());
 	}
 
-	class FullScreenAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public FullScreenAction() {
-			super();
-			updateState();
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			setFullScreenMode(!isFullScreenMode);
-			updateState();
-		}
-
-		public void updateState() {
-			if (isFullScreenMode) {
-				putValue(Action.NAME, "Turn off to fullscreen");
-			} else {
-				putValue(Action.NAME, "Switch to fullscreen");
-			}
-		}
-	}
-
-	class GridAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public GridAction() {
-			super();
-			updateState();
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			Grid.setGridVisible(!Grid.isGridVisible());
-			updateState();
-		}
-
-		public void updateState() {
-			if (Grid.isGridVisible()) {
-				putValue(Action.NAME, "Hide grid");
-			} else {
-				putValue(Action.NAME, "Show grid");
-			}
-			repaint();
-		}
-	}
-
-	class HighQualityAction extends AbstractAction {
+	class HighQualityAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -395,18 +407,20 @@ public class GFrame extends JFrame {
 			super("High Quality");
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		@Override
+		protected void action() throws ActionException {
 			getCanvas().setDefaultRenderQuality(
 					PPaintContext.HIGH_QUALITY_RENDERING);
 			getCanvas().setAnimatingRenderQuality(
 					PPaintContext.HIGH_QUALITY_RENDERING);
 			getCanvas().setInteractingRenderQuality(
 					PPaintContext.HIGH_QUALITY_RENDERING);
+			updateWorldMenu();
 		}
 
 	}
 
-	class LowQualityAction extends AbstractAction {
+	class LowQualityAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -414,18 +428,20 @@ public class GFrame extends JFrame {
 			super("Low Quality");
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		@Override
+		protected void action() throws ActionException {
 			getCanvas().setDefaultRenderQuality(
 					PPaintContext.LOW_QUALITY_RENDERING);
 			getCanvas().setAnimatingRenderQuality(
 					PPaintContext.LOW_QUALITY_RENDERING);
 			getCanvas().setInteractingRenderQuality(
 					PPaintContext.LOW_QUALITY_RENDERING);
+			updateWorldMenu();
 		}
 
 	}
 
-	class MediumQualityAction extends AbstractAction {
+	class MediumQualityAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -433,42 +449,117 @@ public class GFrame extends JFrame {
 			super("Medium Quality");
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		@Override
+		protected void action() throws ActionException {
 			getCanvas().setDefaultRenderQuality(
 					PPaintContext.HIGH_QUALITY_RENDERING);
 			getCanvas().setAnimatingRenderQuality(
 					PPaintContext.LOW_QUALITY_RENDERING);
 			getCanvas().setInteractingRenderQuality(
 					PPaintContext.LOW_QUALITY_RENDERING);
+			updateWorldMenu();
 		}
 
 	}
 
-	class TooltipAction extends AbstractAction {
+	class TurnOffFullScreen extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public TooltipAction() {
-			super();
-			updateState();
+		public TurnOffFullScreen() {
+			super("Full screen off");
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			WorldImpl.setContexualTipsVisible(!WorldImpl
-					.isContexualTipsVisible());
-			updateState();
+		@Override
+		protected void action() throws ActionException {
+			setFullScreenMode(false);
+			updateWorldMenu();
 		}
 
-		public void updateState() {
-			if (WorldImpl.isContexualTipsVisible()) {
-				putValue(Action.NAME, "Hide mouse-over popups");
-			} else {
-				putValue(Action.NAME, "Show mouse-over popups");
-			}
-		}
 	}
 
-	class ZoomOutAction extends AbstractAction {
+	class TurnOffGrid extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public TurnOffGrid() {
+			super("Grid off");
+
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			Grid.setGridVisible(false);
+			updateWorldMenu();
+		}
+
+	}
+
+	class TurnOffTooltips extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public TurnOffTooltips() {
+			super("Tooltips off");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			WorldImpl.setContexualTipsVisible(false);
+			updateWorldMenu();
+		}
+
+	}
+
+	class TurnOnFullScreen extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public TurnOnFullScreen() {
+			super("Full screen on");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			setFullScreenMode(true);
+			updateWorldMenu();
+		}
+
+	}
+
+	class TurnOnGrid extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public TurnOnGrid() {
+			super("Grid on");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			Grid.setGridVisible(true);
+			updateWorldMenu();
+		}
+
+	}
+
+	class TurnOnTooltips extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public TurnOnTooltips() {
+			super("Tooltips on");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			WorldImpl.setContexualTipsVisible(true);
+			updateWorldMenu();
+		}
+
+	}
+
+	class ZoomOutAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -476,10 +567,15 @@ public class GFrame extends JFrame {
 			super("Fit on screen");
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			getWorld().zoomToWorld();
+		@Override
+		protected void action() throws ActionException {
+			getWorld().fitOnScreen();
+			updateWorldMenu();
 		}
 
 	}
 
+	public ActionManager getActionManager() {
+		return actionManager;
+	}
 }

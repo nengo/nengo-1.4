@@ -4,6 +4,9 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.actions.StandardAction;
+
 public class MenuBuilder extends AbstractMenuBuilder {
 	JMenu menu;
 
@@ -23,8 +26,8 @@ public class MenuBuilder extends AbstractMenuBuilder {
 		return menu;
 	}
 
-	public void addAction(AbstractAction action) {
-		JMenuItem item = new JMenuItem(action);
+	public void addAction(StandardAction action) {
+		JMenuItem item = new JMenuItem(action.getSwingAction());
 		style(item);
 		menu.add(item);
 	}
@@ -34,6 +37,13 @@ public class MenuBuilder extends AbstractMenuBuilder {
 		getJMenu().add(mb.getJMenu());
 		return mb;
 
+	}
+
+	/**
+	 * removes all elements to start over
+	 */
+	public void reset() {
+		menu.removeAll();
 	}
 
 }

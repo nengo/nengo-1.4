@@ -1,5 +1,7 @@
 package ca.neo.ui.models.nodes.connectors;
 
+import java.util.Vector;
+
 import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.models.PModel;
@@ -42,8 +44,8 @@ public class POrigin extends PModel {
 
 	}
 
-	public boolean disconnect(PTermination target) {
-
+	public boolean disconnectModelFrom(PTermination target) {
+		Util.debugMsg("Projection removed " + target.getName());
 		try {
 			nodeParent.getNetworkViewer().getModel().removeProjection(
 					target.getModelTermination());
@@ -67,8 +69,8 @@ public class POrigin extends PModel {
 	 *            connection
 	 */
 	public void connectTo(PTermination term, boolean modifyModel) {
-		LineEnd lineEnd = lineWell.createConnection(modifyModel);
-		lineEnd.tryConnectTo(term);
+		OriginEnd lineEnd = lineWell.createConnection(modifyModel);
+		lineEnd.tryConnectTo(term, modifyModel);
 
 	}
 
@@ -79,7 +81,7 @@ public class POrigin extends PModel {
 	 * @return true is successfully connected
 	 */
 	protected boolean connectModelTo(PTermination target) {
-
+		Util.debugMsg("Projection added " + target.getName());
 		try {
 
 			nodeParent.getNetworkViewer().getModel().addProjection(
@@ -111,21 +113,68 @@ public class POrigin extends PModel {
 		return typeName;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.impl.WorldObjectImpl#destroy()
+	 */
 	@Override
-	public void modelRemoved() {
-		super.modelRemoved();
+	public void destroy() {
+
+		/*
+		 * Removes line ends
+		 */
+		if (ends != null) {
+			Object[] endsAr = ends.toArray();
+			for (int i = 0; i < endsAr.length; i++) {
+				((WorldObjectImpl) (endsAr[i])).destroy();
+			}
+		}
 
 		nodeParent.removeWidget(this);
 
+		super.destroy();
+	}
+
+	private Vector<OriginEnd> ends;
+
+	protected void addOriginEnd(OriginEnd end) {
+		if (ends == null)
+			ends = new Vector<OriginEnd>();
+		ends.add(end);
+	}
+
+	protected void removeOriginEnd(OriginEnd end) {
+		ends.remove(end);
 	}
 
 	class OriginEnd extends LineEnd {
 
+		@Override
+		public void destroy() {
+			removeOriginEnd(this);
+			justDisconnected();
+			super.destroy();
+		}
+
+		/*
+		 * Whether NEO model is updated with projection on initialization. This
+		 * is set to false, when the model already has the projection (ie. a
+		 * preloaded NEO Model)
+		 */
 		boolean modifyModel;
 
-		public OriginEnd(LineEndWell well, boolean modifyModel) {
+		/**
+		 * 
+		 * @param well
+		 * @param modifyModelOnFirstConnection
+		 *            Whether to modify the NEO Model on the first connection
+		 */
+		public OriginEnd(LineEndWell well, boolean modifyModelOnFirstConnection) {
+
 			super(well);
-			this.modifyModel = modifyModel;
+			this.modifyModel = modifyModelOnFirstConnection;
+			addOriginEnd(this);
 		}
 
 		private static final long serialVersionUID = 1L;
@@ -137,14 +186,14 @@ public class POrigin extends PModel {
 			if (modifyModel) {
 				return POrigin.this.connectModelTo((PTermination) target);
 			}
-
+			modifyModel = true;
 			return true;
 		}
 
 		@Override
 		protected void justDisconnected() {
 			super.justDisconnected();
-			POrigin.this.disconnect((PTermination) getTarget());
+			POrigin.this.disconnectModelFrom((PTermination) getTarget());
 
 		}
 
@@ -180,8 +229,8 @@ public class POrigin extends PModel {
 		 *            underneath
 		 * @return
 		 */
-		public LineEnd createConnection(boolean modifyModel) {
-			LineEnd lineEnd = new OriginEnd(this, modifyModel);
+		public OriginEnd createConnection(boolean modifyModel) {
+			OriginEnd lineEnd = new OriginEnd(this, modifyModel);
 			super.addLineEnd(lineEnd);
 			return lineEnd;
 		}

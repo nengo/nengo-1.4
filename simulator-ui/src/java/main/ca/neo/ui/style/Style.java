@@ -24,7 +24,8 @@ public class Style {
 	/*
 	 * Button Colors
 	 */
-	public static final Color COLOR_BUTTON_HIGHLIGHT = Color.darkGray;
+	public static final Color COLOR_BUTTON_BACKGROUND = Color.darkGray;
+	public static final Color COLOR_BUTTON_HIGHLIGHT = Color.black;
 	public static final Color COLOR_BUTTON_SELECTED = Color.gray;
 	public static final Color COLOR_BUTTON_BORDER = Color.darkGray;
 

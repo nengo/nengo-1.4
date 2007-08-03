@@ -46,7 +46,7 @@ public class AffinityHalo extends GEdge {
 
 	public void updateEdge() {
 
-		reset();
+		// reset();
 
 		// Note that the node's "FullBounds" must be used (instead of just the
 		// "Bound")
@@ -96,7 +96,7 @@ public class AffinityHalo extends GEdge {
 		// toLocal(getEndNode(), x2, y2), toLocal(getEndNode(), x3, y3),
 		// toLocal(getStartNode(), x4, y4), };
 
-		this.setPaint(Color.black);
+		//		
 		this.setPathToPolyline(path);
 		this.closePath();
 

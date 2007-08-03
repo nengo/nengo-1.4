@@ -1,8 +1,10 @@
 package ca.neo.ui;
 
 import ca.neo.examples.FuzzyLogicExample;
+import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.models.nodes.PNetwork;
+import ca.shu.ui.lib.objects.widgets.TrackedTask;
 import ca.shu.ui.lib.util.Util;
 
 /**
@@ -13,15 +15,26 @@ import ca.shu.ui.lib.util.Util;
  * 
  */
 public class GFuzzyLogicExample {
+
+
 	public static void main(String[] args) {
+
+		
 		NeoGraphics neoGraphics = new NeoGraphics("FuzzyLogic Example");
 
 		try {
-			PNetwork networkUI = new PNetwork(FuzzyLogicExample.createNetwork());
+			TrackedTask task = new TrackedTask(
+					"Creating FuzzyLogic NEO Network model");
+			Network network = FuzzyLogicExample.createNetwork();
+			task.finished();
+
+			task = new TrackedTask("Constructing UI");
+			PNetwork networkUI = new PNetwork(network);
 
 			neoGraphics.addWorldObject(networkUI);
 
-			networkUI.openNetworkViewer();
+			networkUI.openViewer();
+			task.finished();
 
 		} catch (StructuralException e) {
 			Util.Error("Could not create network: " + e.toString());
