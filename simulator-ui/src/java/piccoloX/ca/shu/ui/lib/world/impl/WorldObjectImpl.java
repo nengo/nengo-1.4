@@ -233,6 +233,8 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		return layoutManager;
 	}
 
+
+	
 	public String getName() {
 		if (name == null) {
 			return "";

@@ -1,6 +1,7 @@
 package ca.shu.ui.lib.util;
 
 import javax.swing.AbstractAction;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
@@ -28,6 +29,12 @@ public class MenuBuilder extends AbstractMenuBuilder {
 
 	public void addAction(StandardAction action) {
 		JMenuItem item = new JMenuItem(action.getSwingAction());
+		style(item);
+		menu.add(item);
+	}
+
+	public void addLabel(String msg) {
+		JLabel item = new JLabel(msg);
 		style(item);
 		menu.add(item);
 	}

@@ -7,6 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import javax.swing.JOptionPane;
+
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
@@ -34,10 +36,10 @@ import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.handlers.IContextMenu;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
-import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.World;
@@ -67,6 +69,8 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 	private static final long serialVersionUID = -3018937112672942653L;
 
 	static final Dimension DEFAULT_BOUNDS = new Dimension(1000, 1000);
+
+	Class currentLayoutType = null;
 
 	IconWrapper icon;
 
@@ -152,8 +156,6 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		nodesUI.put(nodeProxy.getName(), nodeProxy);
 		getGround().catchObject(nodeProxy, dropInCenterOfCamera);
 	}
-
-	Class currentLayoutType = null;
 
 	@SuppressWarnings( { "unchecked" })
 	public void applyJungLayout(Class layoutType) {
@@ -256,19 +258,32 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		 */
 
 		menu.addSection("Organize");
-		
+
 		MenuBuilder layoutMenu = menu.createSubMenu("Apply layout");
 
 		MenuBuilder layoutSettings = layoutMenu.createSubMenu("Settings");
 		layoutSettings.addAction(new SetLayoutBoundsAction(this));
-		
+
 		layoutMenu.addAction(new SquareLayoutAction());
 		layoutMenu.addAction(new LayoutAction(FRLayout.class,
 				"Fruchterman-Reingold"));
-
 		layoutMenu.addAction(new LayoutAction(KKLayout.class, "Kamada-Kawai"));
-
 		layoutMenu.addAction(new LayoutAction(CircleLayout.class, "Circle"));
+
+		// MenuBuilder layoutFile = menu.createSubMenu("File");
+
+		menu.addAction(new SaveLayoutActivity());
+		MenuBuilder savedLayouts = menu.createSubMenu("Restore layout");
+		String[] layoutNames = getNodeLayoutManager().getLayoutNames();
+
+		if (layoutNames.length > 0) {
+			for (int i = 0; i < layoutNames.length; i++) {
+				savedLayouts
+						.addAction(new RestoreLayoutActivity(layoutNames[i]));
+			}
+		} else {
+			savedLayouts.addLabel("none");
+		}
 
 		/**
 		 * TODO: Enable spring layout & ISOM Layout which are continuous
@@ -276,10 +291,6 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		// layoutMenu.addAction(new LayoutAction(SpringLayout.class, "Spring"));
 		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
 		return menu;
-	}
-
-	public Window getFrame() {
-		return (Window) getParent();
 	}
 
 	/**
@@ -327,6 +338,11 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 	}
 
+	/**
+	 * TODO: Move these functions into a helper class
+	 * 
+	 * @return Layout bounds to be used by Layout algorithms
+	 */
 	public Dimension getLayoutBounds() {
 		return layoutBounds;
 	}
@@ -340,10 +356,15 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 	}
 
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Network Viewer: " + pNetwork.getName();
 	}
 
+	/**
+	 * 
+	 * @param name
+	 *            of Node
+	 * @return Node UI object
+	 */
 	public PNeoNode getNode(String name) {
 		return nodesUI.get(name);
 	}
@@ -496,67 +517,6 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		}
 	}
 
-	class LayoutAction extends ReversableAction {
-
-		private static final long serialVersionUID = 1L;
-
-		@SuppressWarnings("unchecked")
-		Class layoutClass;
-
-		public LayoutAction(String description, String actionName) {
-			super(description, actionName);
-		}
-
-		@SuppressWarnings("unchecked")
-		public LayoutAction(Class layoutClass, String name) {
-			super("Apply layout " + name, name);
-			this.layoutClass = layoutClass;
-		}
-
-		/**
-		 * TODO: Save node positions here, it's safer and won't get deleted by
-		 * other layouts
-		 */
-		Hashtable<PNeoNode, Point2D> savedPositions;
-
-		protected void saveNodePositions() {
-			savedPositions = new Hashtable<PNeoNode, Point2D>();
-
-			Enumeration<PNeoNode> en = nodesUI.elements();
-
-			while (en.hasMoreElements()) {
-				PNeoNode node = en.nextElement();
-				savedPositions.put(node, node.getOffset());
-
-			}
-
-		}
-
-		protected void restoreNodePositions() {
-			Enumeration<PNeoNode> en = nodesUI.elements();
-
-			while (en.hasMoreElements()) {
-				PNeoNode node = en.nextElement();
-
-				node.setOffset(savedPositions.get(node));
-				// node.addAttribute("lastOffset", node.getOffset());
-			}
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			saveNodePositions();
-			applyJungLayout(layoutClass);
-
-		}
-
-		@Override
-		protected void undo() throws ActionException {
-			restoreNodePositions();
-		}
-
-	}
-
 	class JungLayoutActivity extends TrackedActivity {
 		Layout layout;
 
@@ -607,6 +567,70 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		}
 	}
 
+	class LayoutAction extends ReversableAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@SuppressWarnings("unchecked")
+		Class layoutClass;
+
+		/**
+		 * TODO: Save node positions here, it's safer and won't get deleted by
+		 * other layouts
+		 */
+		Hashtable<String, Point2D> savedPositions;
+
+		@SuppressWarnings("unchecked")
+		public LayoutAction(Class layoutClass, String name) {
+			super("Apply layout " + name, name);
+			this.layoutClass = layoutClass;
+		}
+
+		public LayoutAction(String description, String actionName) {
+			super(description, actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			saveNodePositions();
+			applyJungLayout(layoutClass);
+
+		}
+
+		protected void restoreNodePositions() {
+			Enumeration<PNeoNode> en = nodesUI.elements();
+
+			while (en.hasMoreElements()) {
+				PNeoNode node = en.nextElement();
+
+				Point2D savedPosition = savedPositions.get(node.getName());
+				if (savedPosition != null) {
+					node.setOffset(savedPosition);
+				}
+				// node.addAttribute("lastOffset", node.getOffset());
+			}
+		}
+
+		protected void saveNodePositions() {
+			savedPositions = new Hashtable<String, Point2D>();
+
+			Enumeration<PNeoNode> en = nodesUI.elements();
+
+			while (en.hasMoreElements()) {
+				PNeoNode node = en.nextElement();
+				savedPositions.put(node.getName(), node.getOffset());
+
+			}
+
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			restoreNodePositions();
+		}
+
+	}
+
 	class SquareLayoutAction extends LayoutAction {
 
 		private static final long serialVersionUID = 1L;
@@ -637,17 +661,112 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 	}
 
-	// class MinimizeAction extends AbstractAction {
-	// private static final long serialVersionUID = 1L;
-	//
-	// public MinimizeAction() {
-	// super("Minimize");
-	// }
-	//
-	// public void actionPerformed(ActionEvent e) {
-	// minimize();
-	// }
-	// }
+	/**
+	 * Saves layout
+	 * 
+	 * @param name
+	 */
+	public void saveNodeLayout(String name) {
+
+		NodeLayoutManager layouts = getNodeLayoutManager();
+		NodeLayout nodeLayout = new NodeLayout(name);
+
+		Enumeration<PNeoNode> en = nodesUI.elements();
+
+		while (en.hasMoreElements()) {
+			PNeoNode node = en.nextElement();
+			nodeLayout.putPosition(node.getName(), node.getOffset());
+
+		}
+
+		layouts.addLayout(nodeLayout);
+	}
+
+	/**
+	 * 
+	 * @param name
+	 *            of layout to restore
+	 */
+	public void restoreNodeLayout(String name) {
+		NodeLayoutManager layouts = getNodeLayoutManager();
+		NodeLayout layout = layouts.getLayout(name);
+		if (layout == null) {
+			Util.Error("Could not restore layout");
+		}
+
+		Enumeration<PNeoNode> en = nodesUI.elements();
+
+		while (en.hasMoreElements()) {
+			PNeoNode node = en.nextElement();
+
+			Point2D savedPosition = layout.getPosition(node.getName());
+			if (savedPosition != null) {
+				node.animateToPositionScaleRotation(savedPosition.getX(),
+						savedPosition.getY(), node.getScale(), node
+								.getRotation(), 1000);
+			}
+		}
+
+	}
+
+	static final String LAYOUT_MANAGER_KEY = "layout/manager";
+
+	public NodeLayoutManager getNodeLayoutManager() {
+		NodeLayoutManager layoutManager = null;
+		try {
+			Object obj = getModel().getMetaData(LAYOUT_MANAGER_KEY);
+			if (obj != null)
+				layoutManager = (NodeLayoutManager) obj;
+		} catch (Throwable e) {
+			Util.Error("Could not access layout manager, creating a new one");
+			// catch all exceptions
+		}
+
+		if (layoutManager == null) {
+			layoutManager = new NodeLayoutManager();
+			getModel().setMetaData(LAYOUT_MANAGER_KEY, layoutManager);
+		}
+		return (NodeLayoutManager) layoutManager;
+
+	}
+
+	class RestoreLayoutActivity extends StandardAction {
+		private static final long serialVersionUID = 1L;
+
+		String layoutName;
+
+		public RestoreLayoutActivity(String name) {
+			super("Restore layout: " + name, name);
+			this.layoutName = name;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			restoreNodeLayout(layoutName);
+		}
+	}
+
+	class SaveLayoutActivity extends StandardAction {
+		private static final long serialVersionUID = 1L;
+
+		public SaveLayoutActivity() {
+			super("Save layout");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			String name = JOptionPane.showInputDialog(UIEnvironment
+					.getInstance(), "Name");
+
+			if (name != null) {
+				saveNodeLayout(name);
+			} else {
+				throw new ActionException("Could not get layout name", false);
+			}
+
+		}
+
+	}
 }
 
 class ModelStatusBarHandler extends StatusBarHandler {

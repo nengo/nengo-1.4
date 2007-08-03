@@ -199,7 +199,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	/**
-	 * @param name
+	 * @param layoutName
 	 *            Name of an Origin on the Node model
 	 * @return the POrigin shown
 	 */
@@ -221,7 +221,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	/**
-	 * @param name
+	 * @param layoutName
 	 *            Name of an Termination on the Node model
 	 * @return the POrigin shown
 	 */

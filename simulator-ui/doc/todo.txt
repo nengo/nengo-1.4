@@ -3,15 +3,14 @@ java docs
 bug: affinity window dosen't show upon launch
 bug: ensure threads are safety accessing the piccolo graph
 
-Bryan "
-done-Undo & redo would be a big help
-done - It would be nice to have an easy way to maximize the network viewer
-(controls in upper-right corner like windows would be good)
-done- When a node is deleted, its origins and terminations should also be deleted
-done- There should be either scrollbars or a fit-on-screen function (I
-lost a function in the infinite network viewer)
 
 
+
+*******************************************
+ Pri 1
+*******************************************
+
+Connection Weights
 - I think I know why it isn't acting as an integrator -- it looks like
 there is no way to set connection weights on a projection? (something
 like a spreadsheet-style matrix editor would be good)
@@ -20,45 +19,42 @@ like a spreadsheet-style matrix editor would be good)
 - There should be a plot option for function nodes (with user-defined domain)
 - When a projection is removed the corresponding origin and
 termination should remain
-"
 
-getInformation method for Nodes, for tooltips
-
-update configureModel functions to check if existing models exist, and configure them 
-
-
-	create a UIDelegateAction function
-
-constructUIObject function should be added to all nodes
-
-read in an existing network and draw it
-	need to get reference to Node parent from origin and termination
-	
-
-integrate graph layout algorithms
-
-
-add directions to edges
-units selection for UI Dialog
-
-
-
-create tooltips to show connection and disconnection events
-	probe added text
-
-garbage collection of removed objects
-
+done-Undo & redo would be a big help
+done - It would be nice to have an easy way to maximize the network viewer
+(controls in upper-right corner like windows would be good)
+done- When a node is deleted, its origins and terminations should also be deleted
+done- There should be either scrollbars or a fit-on-screen function (I
+lost a function in the infinite network viewer)
 
 
 *******************************************
  Pri 2
 *******************************************
-Physics model of UI objects
+
 fading popup texts
-animation
-paint nodes as shapes rather than icons at high zooms
 
 rectangle select option
+
+
+2) Methods getDocumentation() and setDocumentation() added to Node.
+(Although I think we were going to defer documentation until later.) I
+thought about using wrappers, but this would be a bit of a nuissance
+as we would have to wrap NodeFactory instances for the UI. Let me know
+if you have any thoughts on this.
+
+Contiunous updating layouts (ie SpringLayout).
+
+getInformation method for Nodes, for tooltips
+
+units selection for UI Dialog
+
+create tooltips to show connection and disconnection events
+	probe added text
+
+Ensure correct implementation of destroy() function for UI Objects
+
+paint nodes as shapes rather than icons at high zooms
 
 convert Iconfiguration's isConfigured option to a exception thrown and caught by ConfigManager
 
@@ -67,4 +63,5 @@ convert Iconfiguration's isConfigured option to a exception thrown and caught by
  Bryan requests
 *******************************************
 simulator does not have the ability to remove probes
-Networks do not have names
+
+more examples to try to draw using NetworkViewer
