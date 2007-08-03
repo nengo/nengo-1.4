@@ -22,7 +22,7 @@ import javax.swing.border.EtchedBorder;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ActionManager;
+import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.Grid;
@@ -63,13 +63,13 @@ public class GFrame extends JFrame {
 
 	PLayer topLayer;
 
-	ActionManager actionManager;
+	ReversableActionManager actionManager;
 
 	public GFrame(String title) {
 		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
 
-		actionManager = new ActionManager(this);
+		actionManager = new ReversableActionManager(this);
 		getContentPane().setLayout(new BorderLayout());
 		initMenu();
 		initStatusBar();
@@ -251,8 +251,8 @@ public class GFrame extends JFrame {
 	class UndoAction extends StandardAction {
 
 		public UndoAction() {
-			super("Undo: " + actionManager.getLastActionDescription());
-			if (!actionManager.hasReversableAction()) {
+			super("Undo: " + actionManager.getUndoActionDescription());
+			if (!actionManager.canUndo()) {
 				setEnabled(false);
 			}
 		}
@@ -261,15 +261,15 @@ public class GFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			actionManager.undoLastAction();
+			actionManager.undoAction();
 		}
 	}
 
 	class RedoAction extends StandardAction {
 
 		public RedoAction() {
-			super("Redo: " + actionManager.getLastActionDescription());
-			if (!actionManager.hasReversableAction()) {
+			super("Redo: " + actionManager.getRedoActionDescription());
+			if (!actionManager.canRedo()) {
 				setEnabled(false);
 			}
 		}
@@ -278,7 +278,7 @@ public class GFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			actionManager.redoLastAction();
+			actionManager.redoAction();
 
 		}
 
@@ -575,7 +575,7 @@ public class GFrame extends JFrame {
 
 	}
 
-	public ActionManager getActionManager() {
+	public ReversableActionManager getActionManager() {
 		return actionManager;
 	}
 }

@@ -65,7 +65,12 @@ public abstract class ReversableAction extends StandardAction {
 
 	@Override
 	protected void postAction() {
-		UIEnvironment.getActionManager().addReversableAction(this);
+		/*
+		 * Only add the action once to the Action manager
+		 */
+		if (!actionCompleted) {
+			UIEnvironment.getActionManager().addReversableAction(this);
+		}
 	}
 
 }

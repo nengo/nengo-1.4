@@ -407,7 +407,7 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		private static final long serialVersionUID = 1L;
 
 		public ZoomOutAction() {
-			super("fit on screen");
+			super("Fit on screen");
 		}
 
 		@Override

@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.util;
 
-import ca.shu.ui.lib.actions.ActionManager;
+import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.world.impl.GFrame;
 
 public class UIEnvironment {
@@ -23,7 +23,7 @@ public class UIEnvironment {
 		uiInstance = instance;
 	}
 
-	public static ActionManager getActionManager() {
+	public static ReversableActionManager getActionManager() {
 		return getInstance().getActionManager();
 	}
 

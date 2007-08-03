@@ -1,16 +1,11 @@
 package ca.neo.ui.models.viewers;
 
 import java.awt.Dimension;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
-
-import sun.swing.UIClientPropertyKey;
 
 import ca.neo.model.Network;
 import ca.neo.model.Node;
@@ -32,10 +27,7 @@ import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.managers.SavedConfig;
-import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PTInt;
-import ca.neo.ui.views.objects.configurable.struct.PTString;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -55,9 +47,7 @@ import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
 import edu.uci.ics.jung.visualization.FRLayout;
-import edu.uci.ics.jung.visualization.ISOMLayout;
 import edu.uci.ics.jung.visualization.Layout;
-import edu.uci.ics.jung.visualization.SpringLayout;
 import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.PRoot;
@@ -163,6 +153,8 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		getGround().catchObject(nodeProxy, dropInCenterOfCamera);
 	}
 
+	Class currentLayoutType = null;
+
 	@SuppressWarnings( { "unchecked" })
 	public void applyJungLayout(Class layoutType) {
 
@@ -196,6 +188,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 			return;
 		}
 
+		currentLayoutType = layoutType;
 		(new JungLayoutActivity(layout)).startThread(false);
 
 	}
@@ -263,9 +256,12 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		 */
 
 		menu.addSection("Organize");
-		menu.addAction(new SetLayoutBoundsAction(this));
+		
 		MenuBuilder layoutMenu = menu.createSubMenu("Apply layout");
 
+		MenuBuilder layoutSettings = layoutMenu.createSubMenu("Settings");
+		layoutSettings.addAction(new SetLayoutBoundsAction(this));
+		
 		layoutMenu.addAction(new SquareLayoutAction());
 		layoutMenu.addAction(new LayoutAction(FRLayout.class,
 				"Fruchterman-Reingold"));
@@ -500,23 +496,63 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		}
 	}
 
-	class LayoutAction extends StandardAction {
+	class LayoutAction extends ReversableAction {
 
 		private static final long serialVersionUID = 1L;
 
 		@SuppressWarnings("unchecked")
 		Class layoutClass;
 
+		public LayoutAction(String description, String actionName) {
+			super(description, actionName);
+		}
+
 		@SuppressWarnings("unchecked")
 		public LayoutAction(Class layoutClass, String name) {
-			super(name);
+			super("Apply layout " + name, name);
 			this.layoutClass = layoutClass;
+		}
+
+		/**
+		 * TODO: Save node positions here, it's safer and won't get deleted by
+		 * other layouts
+		 */
+		Hashtable<PNeoNode, Point2D> savedPositions;
+
+		protected void saveNodePositions() {
+			savedPositions = new Hashtable<PNeoNode, Point2D>();
+
+			Enumeration<PNeoNode> en = nodesUI.elements();
+
+			while (en.hasMoreElements()) {
+				PNeoNode node = en.nextElement();
+				savedPositions.put(node, node.getOffset());
+
+			}
+
+		}
+
+		protected void restoreNodePositions() {
+			Enumeration<PNeoNode> en = nodesUI.elements();
+
+			while (en.hasMoreElements()) {
+				PNeoNode node = en.nextElement();
+
+				node.setOffset(savedPositions.get(node));
+				// node.addAttribute("lastOffset", node.getOffset());
+			}
 		}
 
 		@Override
 		protected void action() throws ActionException {
+			saveNodePositions();
 			applyJungLayout(layoutClass);
 
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			restoreNodePositions();
 		}
 
 	}
@@ -571,16 +607,17 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		}
 	}
 
-	class SquareLayoutAction extends StandardAction {
+	class SquareLayoutAction extends LayoutAction {
 
 		private static final long serialVersionUID = 1L;
 
 		public SquareLayoutAction() {
-			super("Square");
+			super("Apply square layout", "Square");
 		}
 
 		@Override
 		protected void action() throws ActionException {
+			saveNodePositions();
 			applySquareLayout();
 		}
 

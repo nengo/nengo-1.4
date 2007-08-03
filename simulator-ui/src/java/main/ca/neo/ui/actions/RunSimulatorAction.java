@@ -24,7 +24,7 @@ public class RunSimulatorAction extends StandardAction {
 	Simulator simulator;
 
 	public RunSimulatorAction(Simulator simulator) {
-		super("run");
+		super("Run");
 		this.simulator = simulator;
 	}
 
