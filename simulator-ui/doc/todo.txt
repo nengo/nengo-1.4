@@ -1,15 +1,20 @@
-java docs
 
-bug: affinity window dosen't show upon launch
-bug: ensure threads are safety accessing the piccolo graph
+
 
 
 
 
 *******************************************
- Pri 1
+ Pri 0 - doing next
 *******************************************
+File menu, to load saved networks (Use Swing File Dialogs)
+Save network from NetworkViewer, or PNetwork
 
+
+
+*******************************************
+ Pri 1 - to do
+*******************************************
 Connection Weights
 - I think I know why it isn't acting as an integrator -- it looks like
 there is no way to set connection weights on a projection? (something
@@ -20,6 +25,8 @@ like a spreadsheet-style matrix editor would be good)
 - When a projection is removed the corresponding origin and
 termination should remain
 
+Ctrl-key to enable popups (even when autopops are turned off)
+
 done-Undo & redo would be a big help
 done - It would be nice to have an easy way to maximize the network viewer
 (controls in upper-right corner like windows would be good)
@@ -29,13 +36,13 @@ lost a function in the infinite network viewer)
 
 
 *******************************************
- Pri 2
+ Pri 2 - will do eventually
 *******************************************
 
-fading popup texts
+fading popup texts as a lightweight way to notify of 
+  events such as connections, changes, etc...
 
-rectangle select option
-
+Rectangular group select cursor
 
 2) Methods getDocumentation() and setDocumentation() added to Node.
 (Although I think we were going to defer documentation until later.) I
@@ -58,6 +65,12 @@ paint nodes as shapes rather than icons at high zooms
 
 convert Iconfiguration's isConfigured option to a exception thrown and caught by ConfigManager
 
+add java docs
+
+*******************************************
+ Bugs
+*******************************************
+bug: ensure threads are safety accessing the piccolo graph
 
 *******************************************
  Bryan requests
