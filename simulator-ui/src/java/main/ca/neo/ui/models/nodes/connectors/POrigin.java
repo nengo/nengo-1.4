@@ -57,7 +57,7 @@ public class POrigin extends PModel {
 	}
 
 	public void connectTo(PTermination term) {
-		connectTo(term, false);
+		connectTo(term, true);
 	}
 
 	/**

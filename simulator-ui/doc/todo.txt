@@ -1,16 +1,8 @@
-
-
-
-
-
-
 *******************************************
  Pri 0 - doing next
 *******************************************
 File menu, to load saved networks (Use Swing File Dialogs)
 Save network from NetworkViewer, or PNetwork
-
-
 
 *******************************************
  Pri 1 - to do
