@@ -1,12 +1,10 @@
 package ca.shu.ui.lib.world.impl;
 
-import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
@@ -31,13 +29,13 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PRoot;
+import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		PropertyChangeListener {
@@ -106,7 +104,7 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		skyCamera.addInputEventListener(zoomHandler);
 
 		PPanEventHandler panHandler = new PPanEventHandler();
-//		panHandler.setAutopan(true);
+		// panHandler.setAutopan(true);
 		skyCamera.addInputEventListener(panHandler);
 
 		skyCamera.addInputEventListener(new MouseHandler(this));
@@ -232,16 +230,16 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 	}
 
 	public void setCameraCenterPosition(double x, double y) {
-//		Point2D position = skyCamera.viewToLocal(new Point2D.Double(x, y));
-//
-//		double xOffset = (getWidth() / 2);
-//		double yOffset = (getHeight() / 2);
+		// Point2D position = skyCamera.viewToLocal(new Point2D.Double(x, y));
+		//
+		// double xOffset = (getWidth() / 2);
+		// double yOffset = (getHeight() / 2);
 
-		Rectangle2D newBounds = new Rectangle2D.Double(x,y, 0,0);
-		
+		Rectangle2D newBounds = new Rectangle2D.Double(x, y, 0, 0);
+
 		skyCamera.animateViewToCenterBounds(newBounds, false, 600);
-//		skyCamera.setViewOffset(position.getX() + xOffset, position.getY()
-//				+ yOffset);
+		// skyCamera.setViewOffset(position.getX() + xOffset, position.getY()
+		// + yOffset);
 
 	}
 
@@ -384,23 +382,23 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		return position;
 	}
 
-	public void zoomToBounds(Rectangle2D bounds) {
+	public PTransformActivity zoomToBounds(Rectangle2D bounds) {
 		PBounds biggerBounds = new PBounds(bounds.getX() - CLICK_ZOOM_PADDING,
 				bounds.getY() - CLICK_ZOOM_PADDING, bounds.getWidth()
 						+ CLICK_ZOOM_PADDING * 2, bounds.getHeight()
 						+ CLICK_ZOOM_PADDING * 2);
 
-		getSky().animateViewToCenterBounds(biggerBounds, true, 1000);
+		return getSky().animateViewToCenterBounds(biggerBounds, true, 1000);
 
 	}
 
-	public void zoomToNode(WorldObject node) {
+	public PTransformActivity zoomToNode(WorldObject node) {
 		Rectangle2D bounds = node.localToGlobal(node.getFullBounds());
-		zoomToBounds(bounds);
+		return zoomToBounds(bounds);
 	}
 
-	public void fitOnScreen() {
-		zoomToBounds(getGround().getFullBounds());
+	public PTransformActivity zoomToFit() {
+		return zoomToBounds(getGround().getFullBounds());
 
 	}
 
@@ -414,7 +412,7 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 		@Override
 		protected void action() throws ActionException {
-			fitOnScreen();
+			zoomToFit();
 		}
 
 	}

@@ -4,8 +4,9 @@ import ca.neo.examples.FuzzyLogicExample;
 import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.models.nodes.PNetwork;
-import ca.shu.ui.lib.objects.widgets.TrackedTask;
+import ca.shu.ui.lib.objects.widgets.TrackedMsg;
 import ca.shu.ui.lib.util.Util;
+import edu.uci.ics.jung.visualization.FRLayout;
 
 /**
  * In this example, the FuzzyLogic network is constructed from an existing
@@ -16,24 +17,23 @@ import ca.shu.ui.lib.util.Util;
  */
 public class GFuzzyLogicExample {
 
-
 	public static void main(String[] args) {
 
-		
 		NeoGraphics neoGraphics = new NeoGraphics("FuzzyLogic Example");
 
 		try {
-			TrackedTask task = new TrackedTask(
+			TrackedMsg task = new TrackedMsg(
 					"Creating FuzzyLogic NEO Network model");
 			Network network = FuzzyLogicExample.createNetwork();
 			task.finished();
 
-			task = new TrackedTask("Constructing UI");
+			task = new TrackedMsg("Executing FuzzyLogic Example");
 			PNetwork networkUI = new PNetwork(network);
 
 			neoGraphics.addWorldObject(networkUI);
 
 			networkUI.openViewer();
+			networkUI.getViewer().applyJungLayout(FRLayout.class);
 			task.finished();
 
 		} catch (StructuralException e) {

@@ -1,10 +1,8 @@
 package ca.neo.ui.models.nodes.widgets;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import ca.neo.io.MatlabExporter;
@@ -14,12 +12,10 @@ import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.IconWrapper;
-import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.util.Probe;
-import ca.neo.util.TimeSeries;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.widgets.TrackedTask;
+import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
@@ -147,14 +143,13 @@ public class GProbe extends PModel {
 			name = JOptionPane
 					.showInputDialog("Enter name of file to export to: ");
 
-			(new Thread() {
-				public void run() {
-					TrackedTask task = new TrackedTask(GProbe.this,
-							"Exporting to matlab");
+			(new TrackedActivity("Exporting to matlab") {
+				@Override
+				public void doActivity() {
 					exportToMatlab(name);
-					task.finished();
 				}
-			}).start();
+
+			}).startAsThread();
 
 		}
 	}

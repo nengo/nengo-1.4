@@ -60,6 +60,9 @@ paint nodes as shapes rather than icons at high zooms
 
 rectangle select option
 
+convert Iconfiguration's isConfigured option to a exception thrown and caught by ConfigManager
+
+
 *******************************************
  Bryan requests
 *******************************************

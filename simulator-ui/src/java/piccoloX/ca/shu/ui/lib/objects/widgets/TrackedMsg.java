@@ -1,24 +1,25 @@
 package ca.shu.ui.lib.objects.widgets;
 
-import ca.neo.ui.models.PModel;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
 
 /*
- * Tracks CPU Intensive tasks and displays it in the User Interfaace
+ * Tracks CPU Intensive tasks and displays it in the User Interface
  */
-public class TrackedTask {
+public class TrackedMsg {
 	String taskName;
 
-	public TrackedTask(String taskName) {
-		super();
-		setTaskName(taskName);
-		init();
+	public TrackedMsg(String taskName) {
+		this(taskName, null);
 	}
 
-	public TrackedTask(WorldObject wo, String taskName) {
+	public TrackedMsg(String taskName, WorldObject wo) {
 		super();
-		setTaskName(wo.getName() + ": " + taskName);
+		if (wo != null) {
+			setTaskName(wo.getName() + ": " + taskName);
+		} else {
+			setTaskName(taskName);
+		}
 		init();
 	}
 

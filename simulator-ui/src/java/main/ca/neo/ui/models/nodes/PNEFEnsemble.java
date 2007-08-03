@@ -93,7 +93,7 @@ public class PNEFEnsemble extends PNeoNode {
 			}
 		});
 
-		if (getNEFEnsemble().isCollectingSpikes())
+		if (getModel().isCollectingSpikes())
 			menu.addAction(new StopCollectSpikes());
 		else
 			menu.addAction(new StartCollectSpikes());
@@ -131,8 +131,8 @@ public class PNEFEnsemble extends PNeoNode {
 	/*
 	 * @return Ensemble Model
 	 */
-	public NEFEnsemble getNEFEnsemble() {
-		return (NEFEnsemble) getModel();
+	public NEFEnsemble getModel() {
+		return (NEFEnsemble) super.getModel();
 	}
 
 	@Override
@@ -148,7 +148,7 @@ public class PNEFEnsemble extends PNeoNode {
 	public void setCollectingSpikes(boolean isCollectingSpikes) {
 		this.collectingSpikes = isCollectingSpikes;
 
-		getNEFEnsemble().collectSpikes(collectingSpikes);
+		getModel().collectSpikes(collectingSpikes);
 	}
 
 	private void init() {
@@ -224,15 +224,15 @@ public class PNEFEnsemble extends PNeoNode {
 
 		@Override
 		protected void action() throws ActionException {
-			if (getNEFEnsemble().isCollectingSpikes())
+			if (getModel().isCollectingSpikes())
 				throw new ActionException("Already collecting spikes");
 			else
-				getNEFEnsemble().collectSpikes(true);
+				getModel().collectSpikes(true);
 		}
 
 		@Override
 		protected void undo() {
-			getNEFEnsemble().collectSpikes(false);
+			getModel().collectSpikes(false);
 
 		}
 
@@ -248,16 +248,16 @@ public class PNEFEnsemble extends PNeoNode {
 
 		@Override
 		protected void action() throws ActionException {
-			if (!getNEFEnsemble().isCollectingSpikes())
+			if (!getModel().isCollectingSpikes())
 				throw new ActionException("Already not collecting spikes");
 			else
-				getNEFEnsemble().collectSpikes(false);
+				getModel().collectSpikes(false);
 
 		}
 
 		@Override
 		protected void undo() throws ActionException {
-			getNEFEnsemble().collectSpikes(true);
+			getModel().collectSpikes(true);
 
 		}
 

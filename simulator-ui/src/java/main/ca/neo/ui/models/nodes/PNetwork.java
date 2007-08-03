@@ -68,7 +68,7 @@ public class PNetwork extends PNeoNode {
 	 */
 	public void addNode(PNeoNode nodeProxy) {
 
-		getViewer().addNodeToUI(nodeProxy);
+		getViewer().addNodeToUI(nodeProxy, true, false);
 	}
 
 	@Override

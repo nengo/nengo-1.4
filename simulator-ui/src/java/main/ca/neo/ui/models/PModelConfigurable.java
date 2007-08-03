@@ -1,12 +1,10 @@
 package ca.neo.ui.models;
 
-import javax.swing.JDialog;
-
 import ca.neo.ui.style.Style;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
-import ca.shu.ui.lib.objects.widgets.TrackedTask;
+import ca.shu.ui.lib.objects.widgets.TrackedMsg;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PText;
 
@@ -41,7 +39,7 @@ public abstract class PModelConfigurable extends PModel implements
 
 	
 	public void completeConfiguration(PropertySet properties) {
-		TrackedTask task = new TrackedTask("Creating " + getName() + " ("
+		TrackedMsg task = new TrackedMsg("Creating " + getName() + " ("
 				+ getTypeName() + ")");
 
 		setModel(configureModel(properties));

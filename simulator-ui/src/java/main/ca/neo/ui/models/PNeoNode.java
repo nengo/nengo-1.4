@@ -30,6 +30,9 @@ import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
 
 public abstract class PNeoNode extends PModelConfigurable {
 
@@ -47,6 +50,8 @@ public abstract class PNeoNode extends PModelConfigurable {
 		super();
 		init();
 	}
+
+	Vertex vertex;
 
 	public PNeoNode(Node model) {
 		super(model);
@@ -141,7 +146,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 	@Override
 	public void destroy() {
 
-		
 		getNetworkViewer().removeNode(this);
 
 		/*
@@ -384,7 +388,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	private void init() {
-
+//		vertex = new DirectedSparseVertex();
 	}
 
 	/**
@@ -415,18 +419,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	// Vector<POrigin> origins;
-	// public void showOrigin(Origin origin) {
-	// POrigin originObject = new POrigin(origin);
-	// addChild(originObject);
-	//		
-	// if (origins == null) {
-	// origins = new Vector<POrigin>();
-	// }
-	// origins.add(e)
-	//		
-	// }
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -562,6 +554,18 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	protected Vector<WorldObjectImpl> getWidgets() {
 		return widgets;
+	}
+
+	/**
+	 * 
+	 * @return Vertex to be used by Jung Graph visualization library
+	 */
+	public Vertex getVertex() {
+		return vertex;
+	}
+
+	public void setVertex(Vertex vertex) {
+		this.vertex = vertex;
 	}
 
 }

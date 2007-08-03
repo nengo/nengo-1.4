@@ -71,7 +71,7 @@ public class PDecodedTermination extends PTermination {
 		Termination term = null;
 
 		try {
-			term = ensembleProxy.getNEFEnsemble().addDecodedTermination(
+			term = ensembleProxy.getModel().addDecodedTermination(
 					(String) configuredProperties.getProperty(pName),
 					new float[][] { new float[] { (Float) configuredProperties
 							.getProperty(pTauPSC) } },

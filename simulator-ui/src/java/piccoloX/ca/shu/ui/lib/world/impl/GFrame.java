@@ -569,7 +569,7 @@ public class GFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			getWorld().fitOnScreen();
+			getWorld().zoomToFit();
 			updateWorldMenu();
 		}
 
