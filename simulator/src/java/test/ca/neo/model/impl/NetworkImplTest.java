@@ -21,11 +21,11 @@ import junit.framework.TestCase;
 public class NetworkImplTest extends TestCase {
 
 	private Network myNetwork;
-	
+
 	protected void setUp() throws Exception {
 		super.setUp();
-		
-		myNetwork = new NetworkImpl();		
+
+		myNetwork = new NetworkImpl();
 	}
 
 	/*
@@ -35,18 +35,20 @@ public class NetworkImplTest extends TestCase {
 		Ensemble a = new MockEnsemble("a");
 		myNetwork.addNode(a);
 		myNetwork.addNode(new MockEnsemble("b"));
-		
+
 		assertEquals(2, myNetwork.getNodes().length);
-		
+
 		try {
 			myNetwork.addNode(new MockEnsemble("a"));
 			fail("Should have thrown exception due to duplicate ensemble name");
-		} catch (StructuralException e) {} //exception is expected
-		
+		} catch (StructuralException e) {
+		} // exception is expected
+
 		try {
 			myNetwork.removeNode("c");
 			fail("Should have thrown exception because named ensemble doesn't exist");
-		} catch (StructuralException e) {} //exception is expected
+		} catch (StructuralException e) {
+		} // exception is expected
 
 		myNetwork.removeNode("b");
 		assertEquals(1, myNetwork.getNodes().length);
@@ -62,36 +64,38 @@ public class NetworkImplTest extends TestCase {
 		Termination t1 = new ProjectionImplTest.MockTermination("t1", 1);
 		Termination t2 = new ProjectionImplTest.MockTermination("t2", 1);
 		Termination t3 = new ProjectionImplTest.MockTermination("t3", 2);
-		
+
 		myNetwork.addProjection(o1, t1);
 		myNetwork.addProjection(o1, t2);
-		
+
 		assertEquals(2, myNetwork.getProjections().length);
-		
+
 		try {
 			myNetwork.addProjection(o2, t1);
 			fail("Should have thrown exception because termination t1 already filled");
-		} catch (StructuralException e) {} //exception is expected
-		
+		} catch (StructuralException e) {
+		} // exception is expected
+
 		try {
 			myNetwork.addProjection(o1, t3);
 			fail("Should have thrown exception because origin and termination have different dimensions");
-		} catch (StructuralException e) {} //exception is expected
-		
+		} catch (StructuralException e) {
+		} // exception is expected
+
 		myNetwork.removeProjection(t2);
 		assertEquals(t1, myNetwork.getProjections()[0].getTermination());
 	}
-	
+
 	private static class MockEnsemble implements Ensemble {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		private String myName;
-		
+
 		public MockEnsemble(String name) {
 			myName = name;
 		}
-		
+
 		public String getName() {
 			return myName;
 		}
@@ -99,7 +103,7 @@ public class NetworkImplTest extends TestCase {
 		public Node[] getNodes() {
 			throw new NotImplementedException("not implemented");
 		}
-		
+
 		public void addNeuron(Neuron neuron) {
 			throw new NotImplementedException("not implemented");
 		}
@@ -124,7 +128,8 @@ public class NetworkImplTest extends TestCase {
 			throw new NotImplementedException("not implemented");
 		}
 
-		public void run(float startTime, float endTime) throws SimulationException {
+		public void run(float startTime, float endTime)
+				throws SimulationException {
 			throw new NotImplementedException("not implemented");
 		}
 
@@ -136,7 +141,8 @@ public class NetworkImplTest extends TestCase {
 			throw new NotImplementedException("not implemented");
 		}
 
-		public Termination getTermination(String name) throws StructuralException {
+		public Termination getTermination(String name)
+				throws StructuralException {
 			throw new NotImplementedException("not implemented");
 		}
 
@@ -156,6 +162,10 @@ public class NetworkImplTest extends TestCase {
 			throw new NotImplementedException("not implemented");
 		}
 
+		public boolean isCollectingSpikes() {
+			throw new NotImplementedException("not implemented");
+		}
+
 	}
-	
+
 }
