@@ -60,7 +60,7 @@ public class DialogConfig extends ConfigManager {
 
 		synchronized (configLock) {
 			configLock.notifyAll();
-			System.out.println("dialog closed");
+//			System.out.println("dialog closed");
 			configLock = null;
 		}
 	}

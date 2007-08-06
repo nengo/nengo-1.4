@@ -74,6 +74,11 @@ public class IconWrapper extends WorldObjectImpl implements NamedObject,
 		updateLabel();
 	}
 
+	@Override
+	public void doubleClicked() {
+		parent.doubleClicked();
+	}
+
 	public void setLabelVisible(boolean isVisible) {
 		if (isVisible) {
 			addChild(label);

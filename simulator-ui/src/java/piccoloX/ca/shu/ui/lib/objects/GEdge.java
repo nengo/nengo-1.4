@@ -142,11 +142,13 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		switch (state) {
 		case DEFAULT:
 			this.setStrokePaint(defaultColor);
+			this.setPaint(defaultColor);
 			// arrow.setPaint(defaultColor);
 
 			break;
 		case HIGHLIGHT:
 			this.setStrokePaint(highlightColor);
+			this.setPaint(highlightColor);
 			// arrow.setPaint(highlightColor);
 			break;
 		}

@@ -7,28 +7,25 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 
-public class MouseHandler extends PBasicInputEventHandler {
+public class ClickHandler extends PBasicInputEventHandler {
 	WorldImpl world;
-	
-	
-	public MouseHandler(WorldImpl world) {
+
+	public ClickHandler(WorldImpl world) {
 		super();
 		this.world = world;
 	}
-
 
 	@Override
 	public void mouseClicked(PInputEvent event) {
 		if (event.getClickCount() == 2) {
 			PNode node = event.getPickedNode();
-			
+
 			while (node != null) {
 				if (node instanceof WorldObjectImpl) {
 
 					WorldObjectImpl wo = (WorldObjectImpl) node;
 
-					if (world.containsNode(wo)) // only
-						world.zoomToNode(wo);
+					wo.doubleClicked();
 
 					break;
 				}
@@ -37,7 +34,6 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 		}
 		super.mouseClicked(event);
-		
 
 	}
 

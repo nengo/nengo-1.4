@@ -69,11 +69,8 @@ public abstract class ConfigManager {
 	 * 
 	 */
 	public void deletePropertiesFile(String name) {
-		getSavedObjectsFolder();
-		String fileName = FILE_SAVED_OBJECTS_DIR + "/"
-				+ getFileNamePrefix(configurable) + name;
-
-		File file = new File(fileName);
+		File file = new File(getSavedObjectsFolder(),
+				getFileNamePrefix(configurable) + name);
 
 		System.gc();
 		if (file.exists()) {
@@ -189,16 +186,18 @@ public abstract class ConfigManager {
 		// Write to disk with FileOutputStream
 		FileOutputStream f_out;
 		try {
-			getSavedObjectsFolder();
+			File objectsFolder = getSavedObjectsFolder();
+			File file = new File(objectsFolder, getFileNamePrefix(configurable)
+					+ name);
 
-			String fileName = FILE_SAVED_OBJECTS_DIR + "/"
-					+ getFileNamePrefix(configurable) + name;
+			// String fileName = FILE_SAVED_OBJECTS_DIR + "/"
+			// + getFileNamePrefix(configurable) + name;
 			// String fileName = "SavedObjects/" + name;
 
-			if ((new File(fileName)).exists()) {
-				System.out.println("Replaced existing file: " + fileName);
+			if (file.exists()) {
+				System.out.println("Replaced existing file: " + file.getName());
 			}
-			f_out = new FileOutputStream(fileName);
+			f_out = new FileOutputStream(file);
 
 			if (properties instanceof PNode) {
 				PObjectOutputStream obj_out = new PObjectOutputStream(f_out);

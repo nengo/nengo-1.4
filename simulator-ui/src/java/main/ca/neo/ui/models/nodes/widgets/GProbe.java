@@ -25,6 +25,7 @@ public class GProbe extends PModel {
 	private static final long serialVersionUID = 1L;
 	PNeoNode nodeProxy;
 
+
 	public GProbe(PNeoNode nodeProxy, String state) {
 		super();
 		this.nodeProxy = nodeProxy;
@@ -46,7 +47,7 @@ public class GProbe extends PModel {
 		Node node = nodeProxy.getNode();
 
 		try {
-			Probe probe = nodeProxy.getNetworkModel().getSimulator().addProbe(
+			Probe probe = nodeProxy.getParentNetwork().getSimulator().addProbe(
 					node.getName(), state, true);
 
 			setModel(probe);

@@ -80,16 +80,16 @@ public class ContextMenuHandler extends PBasicInputEventHandler {
 				&& (objPressed == (IContextMenu) Util.getNodeFromPickPath(
 						event, IContextMenu.class))) {
 
-			JPopupMenu menu = objPressed.showPopupMenu(event);
+			if (objPressed.isContextMenuEnabled()) {
+				JPopupMenu menu = objPressed.showContextMenu(event);
 
-			if (menu != null) {
-				menu.setVisible(true);
-				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
+				if (menu != null) {
+					menu.setVisible(true);
+					MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
 
-				menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+					menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+				}
 			}
-			// event.setHandled(true);
 		}
 	}
 }
-

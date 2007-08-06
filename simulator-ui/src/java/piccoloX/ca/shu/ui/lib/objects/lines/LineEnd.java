@@ -22,7 +22,7 @@ public class LineEnd extends WorldObjectImpl {
 		addChild(new LineEndIcon(this));
 		setBounds(getFullBounds());
 		setChildrenPickable(false);
-		setTangible(false);
+//		setTangible(false);
 
 		setDraggable(true);
 	}
