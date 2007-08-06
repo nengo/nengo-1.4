@@ -39,7 +39,7 @@ public class NetworkImpl implements Network {
 	private Map myProjectionMap; //keyed on Termination
 	private String myName;
 	private SimulationMode myMode;
-	private Simulator mySimulator;
+	private transient Simulator mySimulator;
 	private float myStepSize;
 	private Map myProbeables;
 	private Map myProbeableStates;
@@ -74,6 +74,10 @@ public class NetworkImpl implements Network {
 	 * @return Simulator used to run this Network
 	 */
 	public Simulator getSimulator() {
+		if (mySimulator == null) {
+			mySimulator = new LocalSimulator();
+			mySimulator.initialize(this);
+		}
 		return mySimulator;
 	}	
 	
