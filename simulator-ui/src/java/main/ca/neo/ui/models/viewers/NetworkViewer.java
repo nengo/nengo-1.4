@@ -20,6 +20,7 @@ import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.actions.SaveNetworkAction;
 import ca.neo.ui.models.icons.IconWrapper;
 import ca.neo.ui.models.nodes.PFunctionInput;
 import ca.neo.ui.models.nodes.PNEFEnsemble;
@@ -52,7 +53,6 @@ import edu.uci.ics.jung.visualization.FRLayout;
 import edu.uci.ics.jung.visualization.Layout;
 import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
-import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -80,16 +80,16 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 	Hashtable<String, PNeoNode> nodesUI = new Hashtable<String, PNeoNode>();
 
-	PNetwork pNetwork;
+	PNetwork networkProxy;
 
 	/**
 	 * 
 	 * @param pNetwork
 	 * @param root
 	 */
-	public NetworkViewer(PNetwork pNetwork, PRoot root) {
-		super("", root);
-		this.pNetwork = pNetwork;
+	public NetworkViewer(PNetwork pNetwork) {
+		super("");
+		this.networkProxy = pNetwork;
 		this.network = pNetwork.getModelNetwork();
 
 		// getSky().setViewScale(0.5);
@@ -235,8 +235,17 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		// }
 
 		menu.addSection("Simulator");
-		menu.addAction(new RunSimulatorAction(network.getSimulator()));
+		menu.addAction(new RunSimulatorAction("Run", network.getSimulator()));
 
+		/*
+		 * File menu
+		 */
+		menu.addSection("File");
+		menu.addAction(new SaveNetworkAction("Save network", networkProxy));
+
+		/*
+		 * Create new models
+		 */
 		menu.addSection("Create new model");
 
 		MenuBuilder nodesMenu = menu.createSubMenu("Nodes");
@@ -256,13 +265,12 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		/*
 		 * Layouts
 		 */
-
-		menu.addSection("Organize");
+		menu.addSection("Layout");
 
 		MenuBuilder layoutMenu = menu.createSubMenu("Apply layout");
 
 		MenuBuilder layoutSettings = layoutMenu.createSubMenu("Settings");
-		layoutSettings.addAction(new SetLayoutBoundsAction(this));
+		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
 
 		layoutMenu.addAction(new SquareLayoutAction());
 		layoutMenu.addAction(new LayoutAction(FRLayout.class,
@@ -272,14 +280,13 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 		// MenuBuilder layoutFile = menu.createSubMenu("File");
 
-		menu.addAction(new SaveLayoutActivity());
+		menu.addAction(new SaveLayout("Save layout"));
 		MenuBuilder savedLayouts = menu.createSubMenu("Restore layout");
 		String[] layoutNames = getNodeLayoutManager().getLayoutNames();
 
 		if (layoutNames.length > 0) {
 			for (int i = 0; i < layoutNames.length; i++) {
-				savedLayouts
-						.addAction(new RestoreLayoutActivity(layoutNames[i]));
+				savedLayouts.addAction(new RestoreLayout(layoutNames[i]));
 			}
 		} else {
 			savedLayouts.addLabel("none");
@@ -343,7 +350,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 	 * 
 	 * @return Layout bounds to be used by Layout algorithms
 	 */
-	public Dimension getLayoutBounds() {
+	protected Dimension getLayoutBounds() {
 		return layoutBounds;
 	}
 
@@ -356,7 +363,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 	}
 
 	public String getName() {
-		return "Network Viewer: " + pNetwork.getName();
+		return "Network Viewer: " + networkProxy.getName();
 	}
 
 	/**
@@ -459,8 +466,10 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 			// NEO Network model
 			originUI.connectTo(termUI, false);
 		}
-
+		restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME);
 	}
+
+	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
 
 	class AddModelAction extends ReversableAction {
 
@@ -578,7 +587,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		 * TODO: Save node positions here, it's safer and won't get deleted by
 		 * other layouts
 		 */
-		Hashtable<String, Point2D> savedPositions;
+		NodeLayout savedLayout;
 
 		@SuppressWarnings("unchecked")
 		public LayoutAction(Class layoutClass, String name) {
@@ -592,7 +601,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 		@Override
 		protected void action() throws ActionException {
-			saveNodePositions();
+			savedLayout = new NodeLayout("", nodesUI);
 			applyJungLayout(layoutClass);
 
 		}
@@ -603,25 +612,9 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 			while (en.hasMoreElements()) {
 				PNeoNode node = en.nextElement();
 
-				Point2D savedPosition = savedPositions.get(node.getName());
-				if (savedPosition != null) {
-					node.setOffset(savedPosition);
-				}
-				// node.addAttribute("lastOffset", node.getOffset());
-			}
-		}
-
-		protected void saveNodePositions() {
-			savedPositions = new Hashtable<String, Point2D>();
-
-			Enumeration<PNeoNode> en = nodesUI.elements();
-
-			while (en.hasMoreElements()) {
-				PNeoNode node = en.nextElement();
-				savedPositions.put(node.getName(), node.getOffset());
+				node.setOffset(savedLayout.getPosition(node.getName()));
 
 			}
-
 		}
 
 		@Override
@@ -641,7 +634,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 		@Override
 		protected void action() throws ActionException {
-			saveNodePositions();
+			savedLayout = new NodeLayout("", nodesUI);
 			applySquareLayout();
 		}
 
@@ -675,7 +668,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 		while (en.hasMoreElements()) {
 			PNeoNode node = en.nextElement();
-			nodeLayout.putPosition(node.getName(), node.getOffset());
+			nodeLayout.addPosition(node.getName(), node.getOffset());
 
 		}
 
@@ -683,15 +676,16 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 	}
 
 	/**
-	 * 
+	 * @return Whether the layout could be restored
 	 * @param name
 	 *            of layout to restore
 	 */
-	public void restoreNodeLayout(String name) {
+	public boolean restoreNodeLayout(String name) {
 		NodeLayoutManager layouts = getNodeLayoutManager();
 		NodeLayout layout = layouts.getLayout(name);
+
 		if (layout == null) {
-			Util.Error("Could not restore layout");
+			return false;
 		}
 
 		Enumeration<PNeoNode> en = nodesUI.elements();
@@ -706,7 +700,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 								.getRotation(), 1000);
 			}
 		}
-
+		return true;
 	}
 
 	static final String LAYOUT_MANAGER_KEY = "layout/manager";
@@ -730,27 +724,29 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 	}
 
-	class RestoreLayoutActivity extends StandardAction {
+	class RestoreLayout extends StandardAction {
 		private static final long serialVersionUID = 1L;
 
 		String layoutName;
 
-		public RestoreLayoutActivity(String name) {
+		public RestoreLayout(String name) {
 			super("Restore layout: " + name, name);
 			this.layoutName = name;
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			restoreNodeLayout(layoutName);
+			if (!restoreNodeLayout(layoutName)) {
+				throw new ActionException("Could not restore layout");
+			}
 		}
 	}
 
-	class SaveLayoutActivity extends StandardAction {
+	class SaveLayout extends StandardAction {
 		private static final long serialVersionUID = 1L;
 
-		public SaveLayoutActivity() {
-			super("Save layout");
+		public SaveLayout(String description) {
+			super("Save layout", description);
 		}
 
 		@Override
@@ -804,8 +800,8 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	NetworkViewer parent;
 
-	public SetLayoutBoundsAction(NetworkViewer parent) {
-		super("Set layout bounds");
+	public SetLayoutBoundsAction(String actionName, NetworkViewer parent) {
+		super("Set layout bounds", actionName);
 		this.parent = parent;
 	}
 

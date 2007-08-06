@@ -94,12 +94,10 @@ public interface WorldObject extends NamedObject {
 
 	public void setOffset(double x, double y);
 
+	public void doubleClicked();
+	
 	public void setOffset(Point2D point);
 
-	/*
-	 * Called when the object is removed from its parent
-	 */
-	// public void close();
 	public void setScale(double scale);
 
 	public void startDrag();

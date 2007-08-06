@@ -1,22 +1,15 @@
 package ca.neo.ui.models.nodes;
 
-import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
 
-import javax.swing.AbstractAction;
-import javax.swing.SwingUtilities;
-
+import ca.neo.io.FileManager;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
-import ca.neo.model.Origin;
-import ca.neo.model.Projection;
-import ca.neo.model.Termination;
-import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;
-import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.actions.SaveNetworkAction;
 import ca.neo.ui.models.icons.NetworkIcon;
-import ca.neo.ui.models.nodes.connectors.POrigin;
-import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
@@ -26,7 +19,6 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.objects.Window.WindowState;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * GUI Wrapper for a Network Model
@@ -46,11 +38,30 @@ public class PNetwork extends PNeoNode {
 
 	NetworkViewer networkViewer;
 
+	@Override
+	public void doubleClicked() {
+		openViewer();
+	}
+
+	public void saveNetwork(File file) throws IOException {
+		FileManager fm = new FileManager();
+
+		if (networkViewer != null) {
+			networkViewer
+					.saveNodeLayout(NetworkViewer.DEFAULT_NODE_LAYOUT_NAME);
+		}
+
+		fm.save((Network) getModel(), file);
+
+	}
+
 	Window networkWindow;
 
 	public PNetwork() {
 		super();
 		init();
+
+		
 	}
 
 	public PNetwork(Network model) {
@@ -74,12 +85,14 @@ public class PNetwork extends PNeoNode {
 	@Override
 	public PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
-		menu.addSection("View Network");
+		menu.addSection("Network");
+
+		menu.addAction(new SaveNetworkAction("Save", this));
 
 		if (networkWindow == null
 				|| (networkWindow.getWindowState() == Window.WindowState.MINIMIZED)) {
 
-			menu.addAction(new StandardAction("Expand Network") {
+			menu.addAction(new StandardAction("Expand nodes") {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -89,7 +102,7 @@ public class PNetwork extends PNeoNode {
 			});
 
 		} else {
-			menu.addAction(new StandardAction("Minimize Network") {
+			menu.addAction(new StandardAction("Hide nodes") {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -107,9 +120,9 @@ public class PNetwork extends PNeoNode {
 	 * Creates the Network Viewer
 	 */
 	public void constructNetworkViewer() {
-		networkViewer = new NetworkViewer(this, getRoot());
+		networkViewer = new NetworkViewer(this);
 		networkWindow = new Window(this, networkViewer);
-		networkWindow.translate(0, this.getHeight());
+		networkWindow.translate(0, this.getHeight() + 20);
 	}
 
 	@Override
@@ -173,6 +186,7 @@ public class PNetwork extends PNeoNode {
 	public NetworkViewer openViewer() {
 		if (networkViewer == null) {
 			constructNetworkViewer();
+
 		}
 		networkWindow.setWindowState(WindowState.WINDOW);
 
@@ -184,6 +198,7 @@ public class PNetwork extends PNeoNode {
 	 * Initializes the PNetwork
 	 */
 	private void init() {
+		
 		setIcon(new NetworkIcon(this));
 	}
 

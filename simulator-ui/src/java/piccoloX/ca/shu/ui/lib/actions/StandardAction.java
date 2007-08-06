@@ -61,9 +61,11 @@ public abstract class StandardAction implements Serializable {
 	}
 
 	protected void processActionException(ActionException e) {
-		if (e.showWarning())
-			Util.Warning(e.toString());
-		else
+		if (e.showWarning()) {
+			System.out.println("Action Exception: " + e.toString());
+			Util.Warning(e.getMessage());
+
+		} else
 			System.out.println("Action Exception: " + e.toString());
 	}
 
@@ -82,9 +84,6 @@ public abstract class StandardAction implements Serializable {
 		});
 	}
 
-
-
-	
 	protected void postAction() {
 
 	}

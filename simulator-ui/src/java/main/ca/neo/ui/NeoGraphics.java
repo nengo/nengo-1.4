@@ -1,29 +1,32 @@
 package ca.neo.ui;
 
-import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
 
-import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 
+import ca.neo.io.FileManager;
 import ca.neo.model.Network;
 import ca.neo.ui.models.nodes.PNetwork;
-import ca.neo.ui.util.UIBuilder;
 import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.widgets.Toolbox;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.GFrame;
+import edu.umd.cs.piccolo.util.PDebug;
 
 public class NeoGraphics extends GFrame {
 
+	public static final JFileChooser FileChooser = new JFileChooser();
 	private static final long serialVersionUID = 1L;
 
 	public static void main(String[] args) {
-		UIEnvironment.setInstance(new NeoGraphics("NEOWorld"));
+		new NeoGraphics("NEOWorld");
 	}
 
 	Toolbox canvasView;
@@ -31,12 +34,9 @@ public class NeoGraphics extends GFrame {
 	public NeoGraphics(String title) {
 		super(title + " - NEO Workspace");
 
-		/*
-		 * Only one instance of NeoWorld may be running at once
-		 */
-		UIEnvironment.setInstance(this);
-
 		Environment.setUserInterface(true);
+
+		// PDebug.debugPaintCalls = true;
 
 	}
 
@@ -53,9 +53,10 @@ public class NeoGraphics extends GFrame {
 
 	@Override
 	public void constructMenuBar(JMenuBar menuBar) {
-		MenuBuilder menu = new MenuBuilder("Start");
+		MenuBuilder menu = new MenuBuilder("File");
 		menuBar.add(menu.getJMenu());
-		menu.addAction(new CreateNetworkAction());
+		menu.addAction(new LoadNetworkAction("Load network from file"));
+		menu.addAction(new CreateNetworkAction("New network"));
 	}
 
 	public Toolbox getCanvasView() {
@@ -75,8 +76,8 @@ public class NeoGraphics extends GFrame {
 
 		PNetwork network;
 
-		public CreateNetworkAction() {
-			super("Create new network");
+		public CreateNetworkAction(String actionName) {
+			super("Create new network", actionName);
 		}
 
 		@Override
@@ -96,6 +97,59 @@ public class NeoGraphics extends GFrame {
 		@Override
 		protected void undo() {
 			network.destroy();
+		}
+	}
+
+	class LoadNetworkAction extends ReversableAction {
+
+		private static final long serialVersionUID = 1L;
+
+		PNetwork networkUI;
+
+		public LoadNetworkAction(String actionName) {
+			super("Load network from file", actionName);
+			// TODO Auto-generated constructor stub
+		}
+
+		File file;
+
+		@Override
+		protected void action() throws ActionException {
+			int response = FileChooser.showOpenDialog(NeoGraphics.this);
+			if (response == JFileChooser.APPROVE_OPTION) {
+				file = FileChooser.getSelectedFile();
+
+				TrackedActivity loadActivity = new TrackedActivity(
+						"Loading network") {
+
+					@Override
+					public void doActivity() {
+						FileManager fm = new FileManager();
+						try {
+							Network network = (Network) (fm.load(file));
+							networkUI = new PNetwork(network);
+							getWorld().getGround().catchObject(networkUI);
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						} catch (ClassCastException e) {
+							e.printStackTrace();
+						}
+
+					}
+
+				};
+				loadActivity.startThread(true);
+
+			}
+
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			networkUI.destroy();
+
 		}
 	}
 

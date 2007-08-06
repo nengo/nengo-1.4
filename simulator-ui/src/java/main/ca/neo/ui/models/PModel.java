@@ -37,6 +37,10 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 
 	}
 
+	public boolean isContextMenuEnabled() {
+		return true;
+	}
+
 	/**
 	 * Default constructor, model is constructed internally
 	 */
@@ -78,11 +82,10 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 
 		@Override
 		protected void action() throws ActionException {
-			int response = JOptionPane
-					.showConfirmDialog(
-							UIEnvironment.getInstance(),
-							"Once an object has been removed, it cannot be undone.",
-							"Are you sure?", JOptionPane.YES_NO_OPTION);
+			int response = JOptionPane.showConfirmDialog(UIEnvironment
+					.getInstance(),
+					"Once an object has been removed, it cannot be undone.",
+					"Are you sure?", JOptionPane.YES_NO_OPTION);
 			if (response == 0) {
 				destroy();
 			} else {
@@ -109,7 +112,7 @@ public abstract class PModel extends WorldObjectImpl implements IContextMenu {
 
 	}
 
-	public JPopupMenu showPopupMenu(PInputEvent event) {
+	public JPopupMenu showContextMenu(PInputEvent event) {
 		if (!isModelCreated()) {
 			Util.Warning("Model is not configured yet");
 			return null;

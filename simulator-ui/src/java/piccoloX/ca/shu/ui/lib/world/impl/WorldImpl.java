@@ -14,13 +14,15 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.activities.Fader;
 import ca.shu.ui.lib.handlers.ContextMenuHandler;
 import ca.shu.ui.lib.handlers.DragHandler;
+import ca.shu.ui.lib.handlers.EventConsumer;
 import ca.shu.ui.lib.handlers.IContextMenu;
-import ca.shu.ui.lib.handlers.MouseHandler;
+import ca.shu.ui.lib.handlers.ClickHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
@@ -54,6 +56,22 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 	}
 
+	private PInputEventListener contextMenuHandler;
+
+	private PInputEventListener dragHandler;
+
+	private PInputEventListener eventConsumer;
+
+	private PInputEventListener mouseHandler;
+
+	private PPanEventHandler panHandler;
+
+	private PInputEventListener scrollZoomHandler;
+
+	private PInputEventListener tooltipHandler;
+
+	private PZoomEventHandler zoomHandler;
+
 	double cameraX = 0;
 
 	double cameraY = 0;
@@ -74,7 +92,7 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 	PBasicInputEventHandler statusBarHandler;
 
-	public WorldImpl(String titleStr, PRoot root) {
+	public WorldImpl(String titleStr) {
 		super(titleStr);
 
 		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
@@ -84,12 +102,7 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 		layer = new PLayer();
 
-		if (root == null) {
-			Util
-					.Error("World can only be created when it is attached to a root");
-			return;
-		}
-		root.addChild(layer);
+		UIEnvironment.getInstance().getRoot().addChild(layer);
 
 		ground = new WorldGround(this);
 		ground.setDraggable(false);
@@ -97,42 +110,46 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 		skyCamera = new WorldSky(this);
 
-		PZoomEventHandler zoomHandler = new PZoomEventHandler();
+		zoomHandler = new PZoomEventHandler();
 		zoomHandler.setMinDragStartDistance(20);
 		zoomHandler.setMinScale(0.02);
 		zoomHandler.setMaxScale(4);
+
+		panHandler = new PPanEventHandler();
+
+		mouseHandler = new ClickHandler(this);
+		tooltipHandler = new TooltipHandler(this);
+		dragHandler = new DragHandler();
+		contextMenuHandler = new ContextMenuHandler(this);
+		scrollZoomHandler = new ScrollZoomHandler();
+		eventConsumer = new EventConsumer();
+
+		/*
+		 * Add handlers
+		 */
 		skyCamera.addInputEventListener(zoomHandler);
-
-		PPanEventHandler panHandler = new PPanEventHandler();
-		// panHandler.setAutopan(true);
 		skyCamera.addInputEventListener(panHandler);
+		skyCamera.addInputEventListener(mouseHandler);
+		skyCamera.addInputEventListener(tooltipHandler);
+		skyCamera.addInputEventListener(dragHandler);
+		skyCamera.addInputEventListener(contextMenuHandler);
+		skyCamera.addInputEventListener(scrollZoomHandler);
+		addInputEventListener(eventConsumer);
+		setStatusBarHandler(new StatusBarHandler(this));
 
-		skyCamera.addInputEventListener(new MouseHandler(this));
-		skyCamera.addInputEventListener(new TooltipHandler(this));
-		skyCamera.addInputEventListener(new DragHandler());
-		skyCamera.addInputEventListener(new ContextMenuHandler(this));
-		skyCamera.addInputEventListener(new ScrollZoomHandler());
 		skyCamera.setPaint(Style.COLOR_BACKGROUND);
 		skyCamera.addChild(controlsHolder);
 		setCameraCenterPosition(0, 0);
 		setWorldScale(0.7f);
 		skyCamera.addLayer(layer);
-		setStatusBarHandler(new StatusBarHandler(this));
 
 		addChild(skyCamera);
 
 		setDraggable(false);
 		// PBoundsHandle.addBoundsHandlesTo(this);
 
-		addInputEventListener(new PInputEventListener() {
-			public void processEvent(PInputEvent aEvent, int type) {
-				// System.out.println("Event handled 2");
-				aEvent.setHandled(true);
-			}
-		});
-
-		gridLayer = Grid.createGrid(getSky(), root, Style.COLOR_DARKBORDER,
-				1500);
+		gridLayer = Grid.createGrid(getSky(), UIEnvironment.getInstance()
+				.getRoot(), Style.COLOR_DARKBORDER, 1500);
 
 		// System.out.println(this+"Finished
 		// Constructing MiniWorld");
@@ -189,14 +206,14 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		return getHeight();
 	}
 
-	public double getScreenWidth() {
-		return getWidth();
-	}
-
 	// public void createGrid() {
 	//		
 	//
 	// }
+
+	public double getScreenWidth() {
+		return getWidth();
+	}
 
 	public WorldSky getSky() {
 		return skyCamera;
@@ -209,6 +226,15 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 		(new RemoveControlsThread(controls)).start();
 		controls = null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.handlers.IContextMenu#isContextMenuEnabled()
+	 */
+	public boolean isContextMenuEnabled() {
+		return true;
 	}
 
 	public void propertyChange(PropertyChangeEvent arg0) {
@@ -258,6 +284,10 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 	public void setWorldScale(float scale) {
 		getSky().setViewScale(scale);
 
+	}
+
+	public JPopupMenu showContextMenu(PInputEvent event) {
+		return constructPopupMenu().getJPopupMenu();
 	}
 
 	public void showTooltip(WorldObjectImpl pControls,
@@ -319,63 +349,6 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 	}
 
-	// public void showHelperMsg(String msg,
-	// WorldObjectImpl nodeAttacedTo) {
-	// hideControls();
-	// if (nodeAttacedTo == null) {
-	// return;
-	// }
-	// PCamera camera = getSky();
-	//
-	// position = nodeAttacedTo.getOffset();
-	// if (camera.isAncestorOf(nodeAttacedTo)) {
-	//
-	// position = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
-	// nodeAttacedTo.getHeight()));
-	// } else {
-	//
-	// position = nodeAttacedTo.getOffset();
-	// position = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
-	// nodeAttacedTo.getHeight()));
-	// position = camera.viewToLocal(position);
-	// }
-	// double x = position.getX();
-	// double y = position.getY();
-	//
-	// this.controls = new WorldObjectImpl();
-	//
-	// // pControls.setDraggable(false);
-	// controls.addToLayout(pControls);
-	//
-	// controls.pushState(WorldObject.State.SELECTED);
-	//
-	// if (x + controls.getWidth() > camera.getBounds().getWidth()) {
-	// x = camera.getBounds().getWidth() - controls.getWidth();
-	//
-	// // leave some room at the top of the screen
-	// if (x < 100) {
-	// x = 100;
-	// }
-	// }
-	// if (y + controls.getHeight() > camera.getBounds().getHeight()) {
-	// y = camera.getBounds().getHeight() - controls.getHeight();
-	// }
-	//
-	// position = new Point2D.Double(x, y);
-	//
-	// SwingUtilities.invokeLater(new Runnable() {
-	// public void run() {
-	// if (controls != null) {
-	// controlsHolder.bringToFront();
-	// controlsHolder.addChildFancy(controls);
-	// controlsHolder.setTransparency(0.5f);
-	//
-	// controls.setOffset(position);
-	// }
-	// }
-	// });
-	// }
-
 	public Point2D skyToGround(Point2D position) {
 		skyCamera.localToView(position);
 
@@ -392,13 +365,25 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 	}
 
+	public PTransformActivity zoomToFit() {
+		return zoomToBounds(getGround().getFullBounds());
+
+	}
+
 	public PTransformActivity zoomToNode(WorldObject node) {
-		Rectangle2D bounds = node.localToGlobal(node.getFullBounds());
+		Rectangle2D bounds = node.getParent().localToGlobal(node.getFullBounds());
+		
 		return zoomToBounds(bounds);
 	}
 
-	public PTransformActivity zoomToFit() {
-		return zoomToBounds(getGround().getFullBounds());
+	protected PopupMenuBuilder constructPopupMenu() {
+		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
+
+		menu.addAction(new ZoomOutAction());
+		// menu.addSection("View");
+		// menu.addAction(new MinimizeAction());
+
+		return menu;
 
 	}
 
@@ -414,21 +399,6 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		protected void action() throws ActionException {
 			zoomToFit();
 		}
-
-	}
-
-	public JPopupMenu showPopupMenu(PInputEvent event) {
-		return constructPopupMenu().getJPopupMenu();
-	}
-
-	protected PopupMenuBuilder constructPopupMenu() {
-		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
-
-		menu.addAction(new ZoomOutAction());
-		// menu.addSection("View");
-		// menu.addAction(new MinimizeAction());
-
-		return menu;
 
 	}
 

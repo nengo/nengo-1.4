@@ -103,4 +103,9 @@ public class WorldSky extends PCamera implements WorldLayer {
 		throw new NotImplementedException();
 	}
 
+	public void doubleClicked() {
+		throw new NotImplementedException();
+
+	}
+
 }

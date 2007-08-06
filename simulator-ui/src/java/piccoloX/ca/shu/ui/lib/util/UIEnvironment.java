@@ -16,10 +16,20 @@ public class UIEnvironment {
 
 	/**
 	 * 
+	 * 
 	 * @param instance
 	 *            UI Instance
 	 */
 	public static void setInstance(GFrame instance) {
+
+		/*
+		 * Only one instance of NeoWorld may be running at once
+		 */
+		if (uiInstance != null) {
+			throw new RuntimeException(
+					"Only one instance of GFrame may be running in one environment.");
+		}
+
 		uiInstance = instance;
 	}
 

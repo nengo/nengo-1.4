@@ -27,9 +27,11 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
+import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PUtil;
 
@@ -69,6 +71,8 @@ public class GFrame extends JFrame {
 		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
 
+		UIEnvironment.setInstance(this);
+
 		actionManager = new ReversableActionManager(this);
 		getContentPane().setLayout(new BorderLayout());
 		initMenu();
@@ -87,6 +91,7 @@ public class GFrame extends JFrame {
 		} // expected from applets
 
 		canvas = new GCanvas(this);
+		canvas.createWorld();
 
 		getContentPane().add(canvas);
 		canvas.requestFocus();
@@ -577,5 +582,9 @@ public class GFrame extends JFrame {
 
 	public ReversableActionManager getActionManager() {
 		return actionManager;
+	}
+
+	public PRoot getRoot() {
+		return canvas.getRoot();
 	}
 }

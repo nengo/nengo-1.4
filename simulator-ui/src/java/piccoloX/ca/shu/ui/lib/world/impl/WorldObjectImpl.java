@@ -5,10 +5,10 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Stack;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.activities.Fader;
 import ca.shu.ui.lib.objects.LayoutManager;
@@ -21,6 +21,7 @@ import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PNodeFilter;
+import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 /*
  * TODO: Clean up class, move non-core functionality to child objects
@@ -28,37 +29,27 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
 public class WorldObjectImpl extends PNode implements WorldObject {
 	private static final long serialVersionUID = 1L;
 
+	private PPath borderFrame = null;
+
+	private PActivity currentActivity = null;
+
 	private PPath frame = null;
+
+	private boolean isDestroyed;
+
+	private boolean isDraggable = true;
+
+	private boolean isFrameVisible = false;
+
+	private LayoutManager layoutManager;
 
 	private String name;
 
 	private State state = State.DEFAULT;
 
-	PActivity animation = null;
+	private Stack<State> states;
 
-	boolean autoPositionCloseButton = true;
-
-	boolean draggable = true;
-
-	// GContextButton closeButton = null;
-
-	Stack<PNode> frames;
-
-	boolean isAlive = true;
-
-	boolean isFrameVisible = false;
-
-	LayoutManager layoutManager;
-
-	boolean selected;
-
-	Stack<State> states;
-
-	boolean tangible = true;
-
-	PPath tempFrame = null;
-
-	// GText titleBar;
+	private TransformChangeListener transformChangeListener = new TransformChangeListener();
 
 	public WorldObjectImpl() {
 		this("");
@@ -73,33 +64,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		this.setFrameVisible(false);
 		this.setDraggable(true);
 
-		// this.setBounds(0, 0, 25, 25);
-
-		layoutManager = new LayoutManager();
-
-		// if (name.compareTo("") != 0) {
-		//
-		// titleBar = new GText(name);
-		// titleBar.setConstrainWidthToTextWidth(true);
-		// titleBar.setFont(new Font("Arial", Font.PLAIN, 20));
-		// titleBar.setOffset(3, 3);
-		//
-		// addChild(titleBar);
-		// getLayoutManager().translate(0, titleBar.getHeight() + 3);
-		// }
-
 		addPropertyChangeListener(PROPERTY_TRANSFORM, transformChangeListener);
-
-	}
-
-	TransformChangeListener transformChangeListener = new TransformChangeListener();
-
-	class TransformChangeListener implements PropertyChangeListener {
-
-		public void propertyChange(PropertyChangeEvent evt) {
-			signalEdgesChanged();
-
-		}
 
 	}
 
@@ -129,6 +94,15 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	 */
 	public void addToLayout(PNode node) {
 		addToLayout(node, false);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.WorldObject#doubleClicked()
+	 */
+	public void doubleClicked() {
+		getWorld().zoomToNode(this);
 	}
 
 	/*
@@ -180,7 +154,12 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		// TODO Auto-generated method stub
 		PTransformActivity activity = super.animateToPositionScaleRotation(x,
 				y, scale, theta, duration);
-		setAnimation(animation);
+
+		if (currentActivity != null && currentActivity.isStepping()) {
+			activity.startAfter(currentActivity);
+		}
+
+		currentActivity = activity;
 		return activity;
 	}
 
@@ -193,6 +172,43 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		PNode parent = getParent();
 		removeFromParent();
 		parent.addChild(this);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.WorldObject#destroy()
+	 */
+	public void destroy() {
+		isDestroyed = true;
+
+		/*
+		 * Notify edges that this object has changed (ie. destroyed)
+		 */
+		signalEdgesChanged();
+
+		/*
+		 * Remove listeners
+		 */
+		removePropertyChangeListener(PROPERTY_TRANSFORM,
+				transformChangeListener);
+
+		/*
+		 * Removes this object from the world and finish any tasks
+		 * 
+		 * Convert to array to allow for concurrent modification
+		 */
+		Object[] children = getChildrenReference().toArray();
+
+		for (int i = 0; i < children.length; i++) {
+			Object child = children[i];
+
+			if (child instanceof WorldObjectImpl) {
+				((WorldObjectImpl) child).destroy();
+			}
+		}
+		removeFromParent();
 
 	}
 
@@ -230,11 +246,11 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	 * @see ca.sw.graphics.nodes.WorldO#getLayoutManager()
 	 */
 	public LayoutManager getLayoutManager() {
+		if (layoutManager == null)
+			layoutManager = new LayoutManager();
 		return layoutManager;
 	}
 
-
-	
 	public String getName() {
 		if (name == null) {
 			return "";
@@ -267,18 +283,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 			return null;
 	}
 
-	// /*
-	// * (non-Javadoc)
-	// *
-	// * @see ca.sw.graphics.nodes.WorldO#getTitleBarText()
-	// */
-	// public String getTitleBarText() {
-	// if (titleBar == null) {
-	// return "";
-	// }
-	// return titleBar.getText();
-	// }
-
 	public WorldLayer getWorldLayer() {
 		PNode node = this;
 
@@ -293,20 +297,16 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
-	public boolean isAlive() {
-		return isAlive;
-	}
-
-	public boolean isAncestorOf(WorldObjectImpl node) {
-		return isAncestorOf((PNode) node);
-	}
-
 	// public void hideContextButton() {
 	// if (closeButton != null) {
 	// closeButton.removeFromParent();
 	// closeButton = null;
 	// }
 	// }
+
+	public boolean isAncestorOf(WorldObjectImpl node) {
+		return isAncestorOf((PNode) node);
+	}
 
 	public boolean isContained() {
 		PNode parentNode = getParent();
@@ -323,32 +323,26 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		return false;
 	}
 
+	/**
+	 * @return Whether this Object has been destroyed (ie. ready for garbage
+	 *         collection)
+	 */
+	public boolean isDestroyed() {
+		return isDestroyed;
+	}
+
 	public boolean isDraggable() {
-		return draggable;
+		return isDraggable;
 	}
 
 	public boolean isFrameVisible() {
 		return isFrameVisible;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#isSelected()
-	 */
-	public boolean isSelected() {
-		return selected;
-	}
-
-	public boolean isTangible() {
-		return tangible;
-	}
-
 	/**
-	 * End of a drag and dorp operation
+	 * End of a drag and drop operation
 	 */
 	public void justDropped() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -365,14 +359,14 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#moveOverlappedNodes()
-	 */
-	public void moveOverlappedNodes() {
-		moveOverlappedNodes(null);
-	}
+	// /*
+	// * (non-Javadoc)
+	// *
+	// * @see ca.sw.graphics.nodes.WorldO#moveOverlappedNodes()
+	// */
+	// public void moveOverlappedNodes() {
+	// moveOverlappedNodes(null);
+	// }
 
 	public void pack() {
 		boolean frameVisible = isFrameVisible();
@@ -400,10 +394,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
-	// public Object loadStatic(String name) {
-	// return Util.loadProperty(getFileNamePrefix() + name);
-	// }
-
 	public void popState(State state) {
 		states.remove(state);
 		if (states.size() == 0)
@@ -422,67 +412,39 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		setState(state);
 	}
 
-	/*
+	/**
 	 * TODO: implement this
 	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#removeFromLayout(edu.umd.cs.piccolo.PNode)
-	 */
 	public void removeFromLayout(PNode node) {
-
-	}
-
-	/*
-	 * 
-	 * TODO: Prune inactive animations
-	 */
-	public void setAnimation(PActivity animation) {
-		terminateAnimation();
-		this.animation = animation;
+		throw new NotImplementedException();
 	}
 
 	public void setBorder(Color borderColor) {
 		if (borderColor == null) {
-			if (tempFrame != null)
-				tempFrame.removeFromParent();
-			tempFrame = null;
+			if (borderFrame != null)
+				borderFrame.removeFromParent();
+			borderFrame = null;
 			return;
 		}
 
-		if (tempFrame == null) {
+		if (borderFrame == null) {
 
-			tempFrame = PPath.createRectangle((float) getX(), (float) getY(),
+			borderFrame = PPath.createRectangle((float) getX(), (float) getY(),
 					(float) getWidth(), (float) getHeight());
-			synchronized (tempFrame) {
-				tempFrame.setPaint(null);
 
-				addChild(tempFrame);
+			synchronized (borderFrame) {
+				borderFrame.setPaint(null);
+
+				addChild(borderFrame);
 			}
 		}
 
-		tempFrame.setStrokePaint(borderColor);
+		borderFrame.setStrokePaint(borderColor);
 
 	}
-
-	public void setBoundsWithPadding(double x, double y, double width,
-			double height, double padding) {
-		this.setBounds(x, y, width - (padding * 2), height - (padding * 2));
-		this.setOffset(padding, padding);
-	}
-
-	public void setBoundsWithPadding(Rectangle2D bounds, double padding) {
-		this.setBoundsWithPadding(bounds.getX(), bounds.getY(), bounds
-				.getWidth(), bounds.getHeight(), padding);
-	}
-
-	// public void saveStatic(Object obj, String name) {
-	// Util.saveProperty(obj, getFileNamePrefix() + name);
-	// }
 
 	public void setDraggable(boolean isDraggable) {
-		this.draggable = isDraggable;
+		this.isDraggable = isDraggable;
 	}
 
 	public void setFrameVisible(boolean isVisible) {
@@ -506,16 +468,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 			}
 		}
 	}
-
-	// @Override
-	// public boolean setBounds(double x, double y, double width, double height)
-	// {
-	// boolean rtn = super.setBounds(x, y, width, height);
-	//
-	// boundsChanged();
-	// // TODO Auto-generated method stub
-	// return rtn;
-	// }
 
 	/*
 	 * (non-Javadoc)
@@ -576,57 +528,11 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		signalEdgesChanged();
 	}
 
-	/*
-	 * @param tangible Whether physical rules of the world apply to this node
-	 */
-	public void setTangible(boolean tangible) {
-		this.tangible = tangible;
-	}
-
 	@Override
 	public void signalBoundsChanged() {
 		// TODO Auto-generated method stub
 		super.signalBoundsChanged();
 		signalEdgesChanged();
-
-	}
-
-	boolean isDestroyed;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.world.WorldObject#destroy()
-	 */
-	public void destroy() {
-		isDestroyed = true;
-
-		/*
-		 * Notify edges that this object has changed (ie. destroyed)
-		 */
-		signalEdgesChanged();
-
-		/*
-		 * Remove listeners
-		 */
-		removePropertyChangeListener(PROPERTY_TRANSFORM,
-				transformChangeListener);
-
-		/*
-		 * Removes this object from the world and finish any tasks
-		 * 
-		 * Convert to array to allow for concurrent modification
-		 */
-		Object[] children = getChildrenReference().toArray();
-
-		for (int i = 0; i < children.length; i++) {
-			Object child = children[i];
-
-			if (child instanceof WorldObjectImpl) {
-				((WorldObjectImpl) child).destroy();
-			}
-		}
-		removeFromParent();
 
 	}
 
@@ -654,75 +560,10 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#setTitleBarText(java.lang.String)
+	 * @see ca.shu.ui.lib.world.WorldObject#startDrag()
 	 */
-	// public void setTitleBarText(String str) {
-	//
-	// if (titleBar != null) {
-	// titleBar.setText(str);
-	// }
-	// }
-	// /*
-	// * (non-Javadoc)
-	// *
-	// * @see ca.sw.graphics.nodes.WorldO#springBack()
-	// */
-	// public boolean springBack() {
-	//
-	// if (springX == 0 && springY == 0)
-	// return true;
-	//
-	// return false;
-	// }
-	//
-	// /*
-	// * translate to location and spring back
-	// */
-	// /*
-	// * (non-Javadoc)
-	// *
-	// * @see ca.sw.graphics.nodes.WorldO#springTranslate(double, double)
-	// */
-	// public void springTranslate(double dx, double dy) {
-	// springX = dx;
-	// springY = dy;
-	//
-	// translate(dx, dy);
-	//
-	// }
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#showContextButton()
-	 */
-	// public PNode showContextButton() {
-	// return showContextButton(autoPositionCloseButton);
-	// }
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#showContextButton(boolean)
-	 */
-	// public PNode showContextButton(boolean autoPosition) {
-	// autoPositionCloseButton = autoPosition;
-	// if (closeButton == null) {
-	// closeButton = new GContextButton(this);
-	//
-	// this.addChildFancy(closeButton);
-	//
-	// }
-	// boundsChanged();
-	// return closeButton;
-	// }
 	public void startDrag() {
 
-	}
-
-	public void terminateAnimation() {
-		if (animation != null) {
-			animation.terminate(PActivity.TERMINATE_AND_FINISH);
-		}
-		animation = null;
 	}
 
 	private void setState(State newState) {
@@ -734,19 +575,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		stateChanged();
 	}
 
-	// protected void boundsChanged() {
-	//
-	// if (titleBar != null) {
-	// titleBar.setWidth(this.getWidth());
-	// // titleBar.recomputeLayout()
-	// }
-	//
-	// if ((closeButton != null) && autoPositionCloseButton) {
-	// closeButton.setOffset(getWidth() - closeButton.getWidth() - 10, 10);
-	//
-	// }
-	// }
-
 	/**
 	 * Called when the World the object lives in has changed
 	 */
@@ -757,7 +585,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 			double width, double height) {
 
 		return getChildrenAtBounds(new PBounds(x, y, width, height));
-
 	}
 
 	@Override
@@ -768,79 +595,84 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 			frame.setBounds(getBounds());
 		}
 
-		if (tempFrame != null) {
-			tempFrame.setBounds(getBounds());
+		if (borderFrame != null) {
+			borderFrame.setBounds(getBounds());
 		}
 	}
 
-	/*
-	 * Moves nodes which overlap
-	 * 
+	// /**
+	// * Moves nodes which overlap
+	// *
+	// */
+	// protected void moveOverlappedNodes(WorldObjectImpl callingNode) {
+	// if (!isTangible())
+	// return;
+	//
+	// Rectangle2D dBounds = localToGlobal(getBounds());
+	//
+	// /*
+	// * Move nodes which are close to it
+	// *
+	// */
+	//
+	// WorldLayer world = getWorldLayer();
+	// if (world == null)
+	// return;
+	//
+	// world.globalToLocal(dBounds);
+	//
+	// Collection<WorldObject> intersectingNodes = world
+	// .getChildrenAtBounds(dBounds);
+	//
+	// // find intersecting nodes
+	// Iterator<WorldObject> it = intersectingNodes.iterator();
+	// while (it.hasNext()) {
+	// WorldObject node = it.next();
+	//
+	// if (node != this && node != callingNode) {
+	// WorldObjectImpl gNode = (WorldObjectImpl) node;
+	//
+	// if (gNode.isDraggable() && gNode.isTangible()) {
+	// Rectangle2D bounds = gNode.localToGlobal(gNode.getBounds());
+	//
+	// double translateX = Double.MAX_VALUE;
+	//
+	// double translateY = 0;
+	//
+	// translateX = dBounds.getMaxX() - bounds.getMinX();
+	// double trX = dBounds.getMinX() - bounds.getMaxX();
+	// if (Math.abs(trX) < Math.abs(translateX))
+	// translateX = trX;
+	//
+	// translateY = dBounds.getMaxY() - bounds.getMinY();
+	// double trY = dBounds.getMinY() - bounds.getMaxY();
+	// if (Math.abs(trY) < Math.abs(translateY))
+	// translateY = trY;
+	//
+	// if (Math.abs(translateX) < Math.abs(translateY)) {
+	// gNode.translate(translateX, 0);
+	// } else
+	// gNode.translate(0, translateY);
+	//
+	// gNode.moveOverlappedNodes(this);
+	// }
+	//
+	// }
+	//
+	// }
+	//
+	// }
+
+	/**
+	 * Called when this object is removed from the World
 	 */
-	protected void moveOverlappedNodes(WorldObjectImpl callingNode) {
-		if (!isTangible())
-			return;
-
-		Rectangle2D dBounds = localToGlobal(getBounds());
-
-		/*
-		 * Move nodes which are close to it
-		 * 
-		 */
-
-		WorldLayer world = getWorldLayer();
-		if (world == null)
-			return;
-
-		world.globalToLocal(dBounds);
-
-		Collection<WorldObject> intersectingNodes = world
-				.getChildrenAtBounds(dBounds);
-
-		// find intersecting nodes
-		Iterator<WorldObject> it = intersectingNodes.iterator();
-		while (it.hasNext()) {
-			WorldObject node = it.next();
-
-			if (node != this && node != callingNode) {
-				WorldObjectImpl gNode = (WorldObjectImpl) node;
-
-				if (gNode.isDraggable() && gNode.isTangible()) {
-					Rectangle2D bounds = gNode.localToGlobal(gNode.getBounds());
-
-					double translateX = Double.MAX_VALUE;
-
-					double translateY = 0;
-
-					translateX = dBounds.getMaxX() - bounds.getMinX();
-					double trX = dBounds.getMinX() - bounds.getMaxX();
-					if (Math.abs(trX) < Math.abs(translateX))
-						translateX = trX;
-
-					translateY = dBounds.getMaxY() - bounds.getMinY();
-					double trY = dBounds.getMinY() - bounds.getMaxY();
-					if (Math.abs(trY) < Math.abs(translateY))
-						translateY = trY;
-
-					if (Math.abs(translateX) < Math.abs(translateY)) {
-						gNode.translate(translateX, 0);
-					} else
-						gNode.translate(0, translateY);
-
-					gNode.moveOverlappedNodes(this);
-				}
-
-			}
-
-		}
-
-	}
-
 	protected void removedFromWorld() {
-		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * Called when the Object's state has changed
+	 */
 	protected void stateChanged() {
 
 		if (state == State.DEFAULT) {
@@ -852,26 +684,14 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		}
 	}
 
-	public boolean isDestroyed() {
-		return isDestroyed;
-	}
+	class TransformChangeListener implements PropertyChangeListener {
 
-	// /*
-	// * (non-Javadoc)
-	// *
-	// * @see ca.sw.graphics.nodes.WorldO#setSelected(boolean)
-	// */
-	// public void setSelected(boolean isSelected) {
-	// this.selected = isSelected;
-	// if (isSelected) {
-	// setFrameVisible(true);
-	//
-	// } else {
-	// setFrameVisible(isFrameVisible());
-	// getFrame().setStrokePaint(GDefaults.FOREGROUND_COLOR);
-	// }
-	//
-	// }
+		public void propertyChange(PropertyChangeEvent evt) {
+			signalEdgesChanged();
+
+		}
+
+	}
 
 }
 

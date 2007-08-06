@@ -146,7 +146,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 	@Override
 	public void destroy() {
 
-		getNetworkViewer().removeNode(this);
+		NetworkViewer viewer = getNetworkViewer();
+		if (viewer != null)
+			getNetworkViewer().removeNode(this);
 
 		/*
 		 * remove widgets... since they are not children, they have to be
@@ -170,7 +172,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	/**
 	 * @return Network model the node is attached to
 	 */
-	public Network getNetworkModel() {
+	public Network getParentNetwork() {
 		NetworkViewer netV = getNetworkViewer();
 		if (netV != null) {
 			return netV.getModel();
@@ -189,7 +191,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		if (network != null && network instanceof NetworkViewer) {
 			return (NetworkViewer) network;
 		} else {
-			Util.Error("Node is not attached to a network");
+			// Util.Error("Node is not attached to a network");
 			return null;
 		}
 	}
@@ -388,7 +390,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	private void init() {
-//		vertex = new DirectedSparseVertex();
+		// vertex = new DirectedSparseVertex();
 	}
 
 	/**

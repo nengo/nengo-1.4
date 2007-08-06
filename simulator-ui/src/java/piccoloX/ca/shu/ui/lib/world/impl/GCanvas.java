@@ -31,11 +31,13 @@ public class GCanvas extends PCanvas {
 		setZoomEventHandler(null);
 		setPanEventHandler(null);
 
-		world = new WorldImpl("Top Layer", getRoot());
-
-		getLayer().addChild((WorldImpl) world);
 		// world.setBounds(0, 0, 500, 500);
 		// getLayer().addChild((MiniWorld) world);
+	}
+
+	public void createWorld() {
+		world = new WorldImpl("Top Layer");
+		getLayer().addChild((WorldImpl) world);
 	}
 
 	public WorldImpl getWorld() {

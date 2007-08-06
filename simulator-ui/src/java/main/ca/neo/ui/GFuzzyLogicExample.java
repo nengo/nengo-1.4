@@ -27,7 +27,7 @@ public class GFuzzyLogicExample {
 			Network network = FuzzyLogicExample.createNetwork();
 			task.finished();
 
-			task = new TrackedMsg("Executing FuzzyLogic Example");
+			task = new TrackedMsg("Creating FuzzyLogic Model UI");
 			PNetwork networkUI = new PNetwork(network);
 
 			neoGraphics.addWorldObject(networkUI);

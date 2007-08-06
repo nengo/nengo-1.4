@@ -19,7 +19,7 @@ public class ActionException extends Exception {
 	 * @param description
 	 */
 	public ActionException(String description) {
-		this(description, false);
+		this(description, true);
 	}
 
 	/**

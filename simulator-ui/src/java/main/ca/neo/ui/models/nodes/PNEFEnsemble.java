@@ -158,10 +158,6 @@ public class PNEFEnsemble extends PNeoNode {
 	@Override
 	protected Node configureModel(PropertySet prop) {
 		try {
-			GText loadingText = new GText(
-					"WARNING: Ensemble Model creation in progress");
-			loadingText.setFont(Style.FONT_XXLARGE);
-			addChild(loadingText);
 
 			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 
@@ -176,7 +172,6 @@ public class PNEFEnsemble extends PNeoNode {
 			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions,
 					storageName, false);
 
-			loadingText.removeFromParent();
 			return ensemble;
 		} catch (StructuralException e) {
 			// TODO Auto-generated catch block
