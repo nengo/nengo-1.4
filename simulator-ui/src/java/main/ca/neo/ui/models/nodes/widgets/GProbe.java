@@ -22,9 +22,9 @@ import ca.shu.ui.lib.util.Util;
 
 public class GProbe extends PModel {
 
+	
 	private static final long serialVersionUID = 1L;
 	PNeoNode nodeProxy;
-
 
 	public GProbe(PNeoNode nodeProxy, String state) {
 		super();
@@ -44,7 +44,7 @@ public class GProbe extends PModel {
 		/*
 		 * Create the node
 		 */
-		Node node = nodeProxy.getNode();
+		Node node = nodeProxy.getModel();
 
 		try {
 			Probe probe = nodeProxy.getParentNetwork().getSimulator().addProbe(

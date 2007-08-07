@@ -8,7 +8,7 @@ import javax.swing.JPopupMenu;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.handlers.EventConsumer;
-import ca.shu.ui.lib.handlers.IContextMenu;
+import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.objects.widgets.AffinityHalo;
 import ca.shu.ui.lib.objects.widgets.BoundsHandle;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -340,8 +340,8 @@ class MenuBarHandler extends PDragSequenceEventHandler {
 		 * Object
 		 */
 		if (event.getButton() == MouseEvent.BUTTON3) {
-			if (window.contentNode instanceof IContextMenu) {
-				IContextMenu menuNode = ((IContextMenu) (window.contentNode));
+			if (window.contentNode instanceof Interactable) {
+				Interactable menuNode = ((Interactable) (window.contentNode));
 
 				if (menuNode.isContextMenuEnabled()) {
 					JPopupMenu menu = menuNode.showContextMenu(event);

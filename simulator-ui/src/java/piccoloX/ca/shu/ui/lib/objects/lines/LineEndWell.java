@@ -4,6 +4,7 @@ import ca.shu.ui.lib.objects.GEdge;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PPickPath;
 import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
@@ -60,8 +61,8 @@ public class LineEndWell extends WorldObjectImpl {
 	protected void addLineEnd(LineEnd lineEnd) {
 		getParent().addChild(lineEnd);
 
-		GEdge edge = new GEdge(this, lineEnd);
-		lineEnd.addChild(edge);
+		Edge edge = new Edge(this, lineEnd);
+		getWorldLayer().addChild(edge);
 
 		// PBoundsHandle.addBoundsHandlesTo(this);
 
@@ -114,6 +115,32 @@ class MouseHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		// TODO Auto-generated method stub
 		super.mouseReleased(event);
+	}
+
+}
+
+/**
+ * This edge is conditionally visible
+ * 
+ * @author Shu Wu
+ * 
+ */
+class Edge extends GEdge {
+
+	public Edge(LineEndWell startNode, LineEnd endNode) {
+		super(startNode, endNode);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	protected void paint(PPaintContext paintContext) {
+		/*
+		 * Only paint this edge, if the LineEndWell is visible, or the LineEnd
+		 * is connected
+		 */
+		if (getStartNode().getVisible()
+				|| ((LineEnd) getEndNode()).isConnected())
+			super.paint(paintContext);
 	}
 
 }

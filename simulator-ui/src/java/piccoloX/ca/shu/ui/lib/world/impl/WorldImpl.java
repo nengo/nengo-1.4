@@ -12,25 +12,22 @@ import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.activities.Fader;
-import ca.shu.ui.lib.handlers.ContextMenuHandler;
 import ca.shu.ui.lib.handlers.DragHandler;
 import ca.shu.ui.lib.handlers.EventConsumer;
-import ca.shu.ui.lib.handlers.IContextMenu;
-import ca.shu.ui.lib.handlers.ClickHandler;
+import ca.shu.ui.lib.handlers.Interactable;
+import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -39,7 +36,7 @@ import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 
-public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
+public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
 
@@ -56,13 +53,11 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 	}
 
-	private PInputEventListener contextMenuHandler;
+	private PInputEventListener mouseHandler;
 
 	private PInputEventListener dragHandler;
 
 	private PInputEventListener eventConsumer;
-
-	private PInputEventListener mouseHandler;
 
 	private PPanEventHandler panHandler;
 
@@ -117,10 +112,9 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 		panHandler = new PPanEventHandler();
 
-		mouseHandler = new ClickHandler(this);
 		tooltipHandler = new TooltipHandler(this);
 		dragHandler = new DragHandler();
-		contextMenuHandler = new ContextMenuHandler(this);
+		mouseHandler = new MouseHandler(this);
 		scrollZoomHandler = new ScrollZoomHandler();
 		eventConsumer = new EventConsumer();
 
@@ -129,10 +123,10 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		 */
 		skyCamera.addInputEventListener(zoomHandler);
 		skyCamera.addInputEventListener(panHandler);
-		skyCamera.addInputEventListener(mouseHandler);
+
 		skyCamera.addInputEventListener(tooltipHandler);
 		skyCamera.addInputEventListener(dragHandler);
-		skyCamera.addInputEventListener(contextMenuHandler);
+		skyCamera.addInputEventListener(mouseHandler);
 		skyCamera.addInputEventListener(scrollZoomHandler);
 		addInputEventListener(eventConsumer);
 		setStatusBarHandler(new StatusBarHandler(this));
@@ -371,8 +365,9 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 	}
 
 	public PTransformActivity zoomToNode(WorldObject node) {
-		Rectangle2D bounds = node.getParent().localToGlobal(node.getFullBounds());
-		
+		Rectangle2D bounds = node.getParent().localToGlobal(
+				node.getFullBounds());
+
 		return zoomToBounds(bounds);
 	}
 
@@ -401,6 +396,8 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		}
 
 	}
+
+
 
 }
 

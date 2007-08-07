@@ -7,6 +7,7 @@ import ca.neo.model.StructuralException;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.IconWrapper;
+import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Tooltip;
 import ca.shu.ui.lib.objects.lines.LineEnd;
@@ -21,19 +22,24 @@ import ca.shu.ui.lib.world.impl.WorldObjectImpl;
  * @author Shu Wu
  * 
  */
-public class POrigin extends PModel {
+public class POrigin extends PModelWidget {
 
 	private static final long serialVersionUID = 1L;
 
-	static final String typeName = "Origin";
+	@Override
+	public void setVisible(boolean isVisible) {
+		super.setVisible(isVisible);
 
-	PNeoNode nodeParent;
+		lineWell.setVisible(isVisible);
+
+	}
+
+	static final String typeName = "Origin";
 
 	OriginWell lineWell;
 
 	public POrigin(PNeoNode nodeParent, Origin origin) {
-		super();
-		this.nodeParent = nodeParent;
+		super(nodeParent);
 
 		setModel(origin);
 		lineWell = new OriginWell();
@@ -48,8 +54,8 @@ public class POrigin extends PModel {
 		if (target != null) {
 			Util.debugMsg("Projection removed " + target.getName());
 			try {
-				nodeParent.getNetworkViewer().getNetwork().removeProjection(
-						target.getModelTermination());
+				getNodeParent().getNetworkViewer().getNetwork()
+						.removeProjection(target.getModelTermination());
 				return true;
 			} catch (StructuralException e) {
 				Util.Warning("Could not disconnect: " + e.toString());
@@ -89,7 +95,7 @@ public class POrigin extends PModel {
 		Util.debugMsg("Projection added " + target.getName());
 		try {
 
-			nodeParent.getNetworkViewer().getNetwork().addProjection(
+			getNodeParent().getNetworkViewer().getNetwork().addProjection(
 					getModelOrigin(), target.getModelTermination());
 
 			// getWorld().showTooltip(new ConnectedTooltip("Connected"),
@@ -135,8 +141,6 @@ public class POrigin extends PModel {
 				((WorldObjectImpl) (endsAr[i])).destroy();
 			}
 		}
-
-		nodeParent.removeWidget(this);
 
 		super.destroy();
 	}
@@ -241,9 +245,17 @@ public class POrigin extends PModel {
 		}
 
 	}
+
+	@Override
+	public PropDescriptor[] getConfigSchema() {
+		Util.Error("POrigin is not configurable yet");
+		return null;
+	}
 }
 
 class ConnectedTooltip extends Tooltip {
+
+	private static final long serialVersionUID = 1L;
 
 	public ConnectedTooltip(String msg) {
 		super();

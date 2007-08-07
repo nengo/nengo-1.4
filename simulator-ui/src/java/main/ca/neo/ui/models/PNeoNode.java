@@ -1,13 +1,10 @@
 package ca.neo.ui.models;
 
-import java.awt.event.ActionEvent;
-import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.Map.Entry;
-
-import javax.swing.AbstractAction;
 
 import ca.neo.model.Network;
 import ca.neo.model.Node;
@@ -15,12 +12,12 @@ import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.ui.models.nodes.connectors.PModelWidget;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.nodes.widgets.GProbe;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -31,8 +28,8 @@ import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
 
 public abstract class PNeoNode extends PModelConfigurable {
 
@@ -41,18 +38,18 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 */
 	Vector<GProbe> probes;
 
+	Vertex vertex;
+
 	/*
 	 * Widgets are attached objects which are not children.
 	 */
-	Vector<WorldObjectImpl> widgets;
+	Vector<PModelWidget> widgets;
 
 	public PNeoNode() {
 		super();
 		init();
 
 	}
-
-	Vertex vertex;
 
 	public PNeoNode(Node model) {
 		super(model);
@@ -66,9 +63,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 		moveWidgetsToFront();
 	}
 
-	public void addWidget(WorldObjectImpl widget) {
+	public void addWidget(PModelWidget widget) {
 		if (widgets == null) {
-			widgets = new Vector<WorldObjectImpl>(3);
+			widgets = new Vector<PModelWidget>(3);
 		}
 		widget.setScale(0.5);
 		widgets.add(widget);
@@ -107,15 +104,18 @@ public abstract class PNeoNode extends PModelConfigurable {
 			}
 		}
 
+		MenuBuilder originsAndTerminations = menu
+				.createSubMenu("Origins and terminations");
+
 		/*
 		 * Build the "show origins" menu
 		 */
-		Origin[] origins = getNode().getOrigins();
+		Origin[] origins = getModel().getOrigins();
 		if (origins.length > 0) {
 
-			MenuBuilder originsMenu = menu.createSubMenu("Show origins");
+			MenuBuilder originsMenu = originsAndTerminations
+					.createSubMenu("Show origin");
 
-			originsMenu.addAction(new ShowAllOriginAction());
 			for (int i = 0; i < origins.length; i++) {
 				originsMenu
 						.addAction(new ShowOriginAction(origins[i].getName()));
@@ -123,6 +123,23 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		}
 
+		/*
+		 * Build the "show origins" menu
+		 */
+		Termination[] terminations = getModel().getTerminations();
+		if (terminations.length > 0) {
+
+			MenuBuilder terminationsMenu = originsAndTerminations
+					.createSubMenu("Show termination");
+
+			for (int i = 0; i < terminations.length; i++) {
+				terminationsMenu.addAction(new ShowTerminationAction(
+						terminations[i].getName()));
+			}
+
+		}
+		originsAndTerminations.addAction(new ShowAllOandTAction("Show all"));
+		originsAndTerminations.addAction(new HideAllOandTAction("Hide all"));
 		return menu;
 	}
 
@@ -165,15 +182,72 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	/**
-	 * @return Network model the node is attached to
+	 * @param layoutName
+	 *            Name of an Origin on the Node model
+	 * @return the POrigin shown
 	 */
-	public Network getParentNetwork() {
-		NetworkViewer netV = getNetworkViewer();
-		if (netV != null) {
-			return netV.getNetwork();
-		} else {
-			return null;
+	public POrigin getAndShowOrigin(String originName) {
+		/*
+		 * Try to find if the origin has already been created
+		 */
+		Object origin = getWidget(originName, POrigin.class);
+		if (origin != null) {
+			return (POrigin) origin;
 		}
+
+		/*
+		 * Otherwise try to create it
+		 */
+
+		POrigin originUI;
+		try {
+			originUI = new POrigin(this, getModel().getOrigin(originName));
+			addWidget(originUI);
+
+			return originUI;
+
+		} catch (StructuralException e) {
+			Util.Error(e.toString());
+		}
+		return null;
+
+	}
+
+	/**
+	 * @param layoutName
+	 *            Name of an Termination on the Node model
+	 * @return the POrigin shown
+	 */
+	public PTermination getAndShowTermination(String terminationName) {
+		/*
+		 * Try to find if the origin has already been created
+		 */
+		Object term = getWidget(terminationName, PTermination.class);
+		if (term != null) {
+			return (PTermination) term;
+		}
+
+		/*
+		 * Otherwise try to create it
+		 */
+
+		PTermination termUI;
+		try {
+			termUI = new PTermination(this, getModel().getTermination(
+					terminationName));
+			addWidget(termUI);
+			return termUI;
+		} catch (StructuralException e) {
+			Util.Error(e.toString());
+		}
+		return null;
+
+	}
+
+	@Override
+	public Node getModel() {
+		// TODO Auto-generated method stub
+		return (Node) super.getModel();
 	}
 
 	/**
@@ -191,52 +265,24 @@ public abstract class PNeoNode extends PModelConfigurable {
 		}
 	}
 
-	public Node getNode() {
-		return (Node) getModel();
+	/**
+	 * @return Network model the node is attached to
+	 */
+	public Network getParentNetwork() {
+		NetworkViewer netV = getNetworkViewer();
+		if (netV != null) {
+			return netV.getNetwork();
+		} else {
+			return null;
+		}
 	}
 
 	/**
-	 * @param layoutName
-	 *            Name of an Origin on the Node model
-	 * @return the POrigin shown
+	 * 
+	 * @return Vertex to be used by Jung Graph visualization library
 	 */
-	public POrigin getOrigin(String originName) {
-		/*
-		 * Try to find if the origin has already been created
-		 */
-		Object origin = getWidget(originName, POrigin.class);
-		if (origin != null) {
-			return (POrigin) origin;
-		}
-
-		/*
-		 * Otherwise try to create it
-		 */
-
-		return showOrigin(originName);
-
-	}
-
-	/**
-	 * @param layoutName
-	 *            Name of an Termination on the Node model
-	 * @return the POrigin shown
-	 */
-	public PTermination getTermination(String terminationName) {
-		/*
-		 * Try to find if the origin has already been created
-		 */
-		Object term = getWidget(terminationName, PTermination.class);
-		if (term != null) {
-			return (PTermination) term;
-		}
-
-		/*
-		 * Otherwise try to create it
-		 */
-
-		return showTermination(terminationName);
-
+	public Vertex getVertex() {
+		return vertex;
 	}
 
 	public WorldObjectImpl getWidget(String name) {
@@ -259,10 +305,10 @@ public abstract class PNeoNode extends PModelConfigurable {
 		 * Linear search used because there tends to be only a small number of
 		 * widets
 		 */
-		Iterator<WorldObjectImpl> it = widgets.iterator();
+		Iterator<PModelWidget> it = widgets.iterator();
 
 		while (it.hasNext()) {
-			WorldObjectImpl wo = it.next();
+			PModelWidget wo = it.next();
 
 			if (type != null) {
 				if (type.isInstance(wo) && (wo.getName().compareTo(name) == 0)) {
@@ -274,6 +320,88 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		}
 		return null;
+	}
+
+	/**
+	 * Hides all origins and terminations
+	 */
+	public void hideAllOandT() {
+		Iterator<PModelWidget> it = widgets.iterator();
+		while (it.hasNext()) {
+			PModelWidget widget = it.next();
+			if (widget instanceof PTermination || widget instanceof POrigin) {
+				widget.setWidgetVisible(false);
+			}
+
+		}
+	}
+
+	/**
+	 * layout widgets such as Origins and Terminations
+	 */
+	public void layoutWidgets() {
+		if (widgets != null) {
+			Rectangle2D bounds = getIcon().localToGlobal(getIcon().getBounds());
+
+			double offsetX = bounds.getX();
+			double offsetY = bounds.getY();
+
+			double centerX = offsetX + bounds.getWidth() / 2f;
+			double centerY = offsetY + bounds.getHeight() / 2f;
+
+			double termX = -20 + bounds.getX();
+			double termY = getIcon().getHeight() + offsetY;
+
+			double originX = getIcon().getWidth() + 5 + offsetX;
+			double originY = termY;
+
+			Iterator<PModelWidget> it = widgets.iterator();
+
+			/*
+			 * Lays out origin objects
+			 */
+			while (it.hasNext()) {
+				PModelWidget widget = it.next();
+
+				if (widget.getParent() == null) {
+					/*
+					 * Check to see that the origin has not been removed from
+					 * the world
+					 */
+
+				} else {
+
+					double scale = widget.getScale();
+
+					if (!isHoverOver && !(widget).isWidgetVisible()) {
+						widget
+								.setOffset(centerX - widget.getWidth() * scale
+										/ 2f, centerY - widget.getHeight()
+										* scale / 2f);
+
+						widget.setVisible(false);
+						widget.setPickable(false);
+						widget.setChildrenPickable(false);
+
+					} else {
+						widget.setVisible(true);
+						widget.setPickable(true);
+						widget.setChildrenPickable(true);
+
+						if (widget instanceof POrigin) {
+							originY -= scale * widget.getHeight() + 5;
+							widget.setOffset(originX, originY);
+
+						} else if (widget instanceof PTermination) {
+							termY -= scale * widget.getHeight() + 5;
+							widget.setOffset(termX, termY);
+						}
+					}
+				}
+
+			}
+		}
+
 	}
 
 	@Override
@@ -303,6 +431,8 @@ public abstract class PNeoNode extends PModelConfigurable {
 		assignProbes();
 	}
 
+	// Vector<POrigin> origins;
+
 	@Override
 	public void setModel(Object model) {
 		// TODO Auto-generated method stub
@@ -310,57 +440,36 @@ public abstract class PNeoNode extends PModelConfigurable {
 		setName(((Node) model).getName());
 	}
 
+	public void setVertex(Vertex vertex) {
+		this.vertex = vertex;
+	}
+
 	/**
 	 * Shows all the origins on the Node model
 	 */
 	public void showAllOrigins() {
 
-		Origin[] origins = getNode().getOrigins();
+		Origin[] origins = getModel().getOrigins();
 
 		for (int i = 0; i < origins.length; i++) {
-			getOrigin(origins[i].getName());
+			POrigin originUI = getAndShowOrigin(origins[i].getName());
+			originUI.setWidgetVisible(true);
 		}
 
 	}
 
-	// Vector<POrigin> origins;
-
 	/**
-	 * 
-	 * @param origin
-	 *            to be shown in the UI
-	 * @return the origin UI object
+	 * Shows all the terminations on the Node model
 	 */
-	public POrigin showOrigin(String name) {
-		POrigin originUI;
-		try {
-			originUI = new POrigin(this, getNode().getOrigin(name));
-			addWidget(originUI);
+	public void showAllTerminations() {
 
-			return originUI;
+		Termination[] terminations = getModel().getTerminations();
 
-		} catch (StructuralException e) {
-			Util.Error(e.toString());
+		for (int i = 0; i < terminations.length; i++) {
+			PTermination termUI = getAndShowTermination(terminations[i]
+					.getName());
+			termUI.setWidgetVisible(true);
 		}
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param term
-	 *            Termination to be shown to the UI
-	 * @return
-	 */
-	public PTermination showTermination(String name) {
-		PTermination termUI;
-		try {
-			termUI = new PTermination(this, getNode().getTermination(name));
-			addWidget(termUI);
-			return termUI;
-		} catch (StructuralException e) {
-			Util.Error(e.toString());
-		}
-		return null;
 
 	}
 
@@ -369,8 +478,8 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		super.update();
 
-		Origin[] origins = getNode().getOrigins();
-		Termination[] terminations = getNode().getTerminations();
+		Origin[] origins = getModel().getOrigins();
+		Termination[] terminations = getModel().getTerminations();
 
 		for (int i = 0; i < origins.length; i++) {
 			Origin origin = origins[i];
@@ -379,7 +488,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	private void init() {
-		// vertex = new DirectedSparseVertex();
+
 	}
 
 	/**
@@ -411,6 +520,10 @@ public abstract class PNeoNode extends PModelConfigurable {
 		return null;
 	}
 
+	protected Vector<PModelWidget> getWidgets() {
+		return widgets;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void layoutChildren() {
@@ -418,48 +531,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 		super.layoutChildren();
 
 		layoutWidgets();
-
-	}
-
-	/**
-	 * layout widgets such as Origins and Terminations
-	 */
-	protected void layoutWidgets() {
-		if (widgets != null) {
-			Point2D bounds = localToGlobal(new Point2D.Double(0, 0));
-
-			double termX = -20 + bounds.getX();
-			double termY = getIcon().getHeight() + bounds.getY();
-
-			double originX = getIcon().getWidth() + 5 + +bounds.getX();
-			double originY = termY;
-
-			Iterator<WorldObjectImpl> it = widgets.iterator();
-
-			/*
-			 * Lays out origin objects
-			 */
-			while (it.hasNext()) {
-				WorldObjectImpl widget = it.next();
-
-				if (widget.getParent() == null) {
-					/*
-					 * Check to see that the origin has not been removed from
-					 * the world
-					 */
-
-				} else {
-					if (widget instanceof POrigin) {
-						originY -= widget.getScale() * widget.getHeight() + 5;
-						widget.setOffset(originX, originY);
-
-					} else if (widget instanceof PTermination) {
-						termY -= widget.getScale() * widget.getHeight() + 5;
-						widget.setOffset(termX, termY);
-					}
-				}
-			}
-		}
 
 	}
 
@@ -476,7 +547,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		if (layer == null)
 			return;
 
-		Iterator<WorldObjectImpl> it = widgets.iterator();
+		Iterator<PModelWidget> it = widgets.iterator();
 
 		while (it.hasNext()) {
 			WorldObjectImpl wo = it.next();
@@ -517,17 +588,32 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	}
 
-	class ShowAllOriginAction extends StandardAction {
+	class HideAllOandTAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public ShowAllOriginAction() {
-			super("Show all");
+		public HideAllOandTAction(String actionName) {
+			super("Hide all origins and terminations", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			hideAllOandT();
+		}
+	}
+
+	class ShowAllOandTAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ShowAllOandTAction(String actionName) {
+			super("Show all origins and terminations", actionName);
 		}
 
 		@Override
 		protected void action() throws ActionException {
 			showAllOrigins();
+			showAllTerminations();
 		}
 	}
 
@@ -543,30 +629,31 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		@Override
 		protected void action() throws ActionException {
-			getOrigin(originName);
+			getAndShowOrigin(originName);
 		}
 	}
 
-	protected Vector<WorldObjectImpl> getWidgets() {
-		return widgets;
+	class ShowTerminationAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+		String termName;
+
+		public ShowTerminationAction(String termName) {
+			super(termName);
+			this.termName = termName;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			getAndShowTermination(termName);
+		}
 	}
 
-	/**
-	 * 
-	 * @return Vertex to be used by Jung Graph visualization library
-	 */
-	public Vertex getVertex() {
-		return vertex;
-	}
+	boolean isHoverOver = false;
 
-	public void setVertex(Vertex vertex) {
-		this.vertex = vertex;
-	}
-
-	@Override
-	public Node getModel() {
-		// TODO Auto-generated method stub
-		return (Node) super.getModel();
+	public void setHoveredOver(boolean bool) {
+		isHoverOver = bool;
+		layoutWidgets();
 	}
 
 }

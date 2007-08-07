@@ -14,34 +14,25 @@ import ca.shu.ui.lib.objects.lines.LineIn;
  * @author Shu Wu
  * 
  */
-public class PTermination extends PModelConfigurable {
+public class PTermination extends PModelWidget {
 
 	private static final long serialVersionUID = 1L;
 	PNeoNode nodeParent;
 
 	public PTermination(PNeoNode nodeParent, Termination term) {
-		super(term);
+		super(nodeParent, term);
 		setName(term.getName());
-
-		init(nodeParent);
+		init();
 	}
 
 	public PTermination(PNeoNode nodeParent) {
-		super();
-		init(nodeParent);
+		super(nodeParent);
+		init();
 	}
 
-	private void init(PNeoNode nodeParent) {
+	private void init() {
 		setIcon(new TermIcon(this));
-		this.setDraggable(false);
-		this.nodeParent = nodeParent;
-	}
 
-	@Override
-	public void destroy() {
-
-		super.destroy();
-		nodeParent.removeWidget(this);
 	}
 
 	public Termination getModelTermination() {

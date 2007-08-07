@@ -9,7 +9,7 @@ import javax.swing.JPopupMenu;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.handlers.IContextMenu;
+import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -18,7 +18,7 @@ import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public abstract class PModel extends WorldObjectImpl implements IContextMenu {
+public abstract class PModel extends WorldObjectImpl implements Interactable {
 	/**
 	 * 
 	 */

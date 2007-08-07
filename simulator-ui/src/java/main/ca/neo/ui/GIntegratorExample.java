@@ -74,8 +74,10 @@ public class GIntegratorExample {
 		Termination fbterm = integrator.addDecodedTermination("feedback",
 				new float[][] { new float[] { 1f } }, tau, false);
 
-		PTermination intermUI = integratorUI.showTermination(interm.getName());
-		PTermination fbtermUI = integratorUI.showTermination(fbterm.getName());
+		PTermination intermUI = integratorUI.getAndShowTermination(interm
+				.getName());
+		PTermination fbtermUI = integratorUI.getAndShowTermination(fbterm
+				.getName());
 
 		/*
 		 * Add the nodes to the network
@@ -90,8 +92,8 @@ public class GIntegratorExample {
 		/*
 		 * Add connections
 		 */
-		inputUI.getOrigin(FunctionInput.ORIGIN_NAME).connectTo(intermUI);
-		integratorUI.getOrigin(NEFEnsemble.X).connectTo(fbtermUI);
+		inputUI.getAndShowOrigin(FunctionInput.ORIGIN_NAME).connectTo(intermUI);
+		integratorUI.getAndShowOrigin(NEFEnsemble.X).connectTo(fbtermUI);
 
 		/*
 		 * Opens up the network viewer

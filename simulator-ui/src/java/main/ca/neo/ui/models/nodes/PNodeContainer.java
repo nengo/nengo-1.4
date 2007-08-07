@@ -117,6 +117,7 @@ public abstract class PNodeContainer extends PNeoNode {
 		 * they might block the Window
 		 */
 		if (viewerWindow == null
+				|| viewerWindow.isDestroyed()
 				|| viewerWindow.getWindowState() == Window.WindowState.MINIMIZED)
 			super.moveWidgetsToFront();
 

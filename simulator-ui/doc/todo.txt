@@ -1,6 +1,9 @@
 *******************************************
  Done
 *******************************************
+(08/07) done - hide/show origins and terminations
+(08/07) done - automatically show origins and terminations on hover over
+
 (08/07) done - Preliminary Ensemble Viewer created
 (08/07) done - fixed some bugs with UI connections not detaching correctly
 
@@ -17,16 +20,11 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
-
-Ensemble View
-	A Network can also contain Ensembles. There should be a separate Ensemble view, 
-	in which Nodes that make up the Ensemble are visible. 
-	The user should be able to open Ensemble views in the same manner(s) as 
-	network views. 
-	
-fix origins
-
-
+- There should be separate options for removing and hiding origins
+(some can't be removed but we don't want to see them)
+- There should be a plot option for function nodes (with user-defined domain)
+- When a projection is removed the corresponding origin and
+termination should remain
 
 Add ability to remove probes from simulator
 
@@ -34,17 +32,11 @@ Add ability to remove probes from simulator
  Pri 1 - to do
 *******************************************
 
-For Jung Layout algorithms, consider making WorldObject a Vertice, or making a Vertice Wrapper for world objects
 
 Connection Weights
 - I think I know why it isn't acting as an integrator -- it looks like
 there is no way to set connection weights on a projection? (something
 like a spreadsheet-style matrix editor would be good)
-- There should be separate options for removing and hiding origins
-(some can't be removed but we don't want to see them)
-- There should be a plot option for function nodes (with user-defined domain)
-- When a projection is removed the corresponding origin and
-termination should remain
 
 Ctrl-key to enable popups (even when autopops are turned off)
 
@@ -94,6 +86,9 @@ Complete java docs
 Edit properties of existing models
 
 keyboard search of nodes (auto-panning)
+
+For Jung Layout algorithms, consider making WorldObject a Vertice, or making a Vertice Wrapper for world objects
+
 
 *******************************************
  Pri 3 - maybe if there's time

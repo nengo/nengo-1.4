@@ -11,6 +11,15 @@ import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 public class LineEnd extends WorldObjectImpl {
+	@Override
+	public void destroy() {
+		if (!isDestroyed()) {
+			setConnectionState(ConnectionState.RECEDED_INTO_WELL, null, true);
+
+			super.destroy();
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	private WorldObject target;
@@ -87,8 +96,12 @@ public class LineEnd extends WorldObjectImpl {
 			WorldObject newTarget, boolean modifyModel) {
 
 		if (newState == connectionState && newTarget == target) {
-			this.setOffset(0, 0); // move the LineEnd back to the center of
-									// the target
+			if (connectionState == ConnectionState.CONNECTED) {
+				/*
+				 * move the LineEnd back to the center of the target
+				 */
+				this.setOffset(0, 0);
+			}
 			return;
 		}
 

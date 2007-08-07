@@ -14,15 +14,11 @@ import ca.neo.model.Origin;
 import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.model.impl.FunctionInput;
-import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.actions.SaveNetworkAction;
 import ca.neo.ui.models.icons.IconWrapper;
-import ca.neo.ui.models.nodes.PFunctionInput;
-import ca.neo.ui.models.nodes.PNEFEnsemble;
 import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
@@ -34,7 +30,7 @@ import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.handlers.IContextMenu;
+import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
@@ -51,6 +47,8 @@ import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
  * 
@@ -60,16 +58,19 @@ import edu.umd.cs.piccolo.activities.PTransformActivity;
  * @author Shu Wu
  */
 public class NetworkViewer extends NodeViewer implements NamedObject,
-		IContextMenu {
+		Interactable {
+	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
+
 	private static final long serialVersionUID = -3018937112672942653L;
 
+	@SuppressWarnings("unchecked")
 	Class currentLayoutType = null;
-
-	IconWrapper icon;
 
 	// Network network;
 
 	// PNetwork networkProxy;
+
+	IconWrapper icon;
 
 	/**
 	 * 
@@ -79,10 +80,6 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 	public NetworkViewer(PNetwork pNetwork) {
 		super(pNetwork);
 
-		// this.networkProxy = pNetwork;
-
-		// getSky().setViewScale(0.5);
-
 	}
 
 	@Override
@@ -91,6 +88,28 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 		super.addedToWorld();
 
 		// this.animateToBounds(0, 0, 400, 300, 1000);
+	}
+
+	@Override
+	public void addNodeToUI(PNeoNode nodeProxy, boolean updateModel,
+			boolean dropInCenterOfCamera) {
+		if (updateModel) {
+			try {
+
+				getNetwork().addNode(nodeProxy.getModel());
+
+			} catch (StructuralException e) {
+				Util.Warning(e.toString());
+				return;
+			}
+		}
+		super.addNodeToUI(nodeProxy, updateModel, dropInCenterOfCamera);
+	}
+
+	public void applyDefaultLayout() {
+		if (!restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
+			applyJungLayout(KKLayout.class);
+		}
 	}
 
 	@SuppressWarnings( { "unchecked" })
@@ -134,11 +153,6 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 	@Override
 	public PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
-
-		// if (getParent() instanceof Window) {
-		// menu.addSection("Viewer");
-		// menu.addAction(new MinimizeAction());
-		// }
 
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run", getNetwork()
@@ -188,7 +202,11 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 		/*
 		 * Layouts
 		 */
+
 		menu.addSection("Layout");
+
+		menu.addAction(new ShowAllWidgetsAction("Show all widgets"));
+		menu.addAction(new HideAllWidgetsAction("Hide all widgets"));
 
 		MenuBuilder layoutMenu = menu.createSubMenu("Apply layout");
 
@@ -269,6 +287,10 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 
 	}
 
+	public Network getNetwork() {
+		return (Network) getModel();
+	}
+
 	/**
 	 * 
 	 * @param name
@@ -277,6 +299,12 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 	 */
 	public PNeoNode getNode(String name) {
 		return nodesUI.get(name);
+	}
+
+	@Override
+	public PNetwork getViewerParent() {
+		// TODO Auto-generated method stub
+		return (PNetwork) super.getViewerParent();
 	}
 
 	public void removeNode(PNeoNode nodeProxy) {
@@ -303,6 +331,34 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 				return;
 			}
 		}
+	}
+
+	/**
+	 * @return Whether the layout could be restored
+	 * @param name
+	 *            of layout to restore
+	 */
+	public boolean restoreNodeLayout(String name) {
+		NodeLayoutManager layouts = getNodeLayoutManager();
+		NodeLayout layout = layouts.getLayout(name);
+
+		if (layout == null) {
+			return false;
+		}
+
+		Enumeration<PNeoNode> en = nodesUI.elements();
+
+		while (en.hasMoreElements()) {
+			PNeoNode node = en.nextElement();
+
+			Point2D savedPosition = layout.getPosition(node.getName());
+			if (savedPosition != null) {
+				node.animateToPositionScaleRotation(savedPosition.getX(),
+						savedPosition.getY(), node.getScale(), node
+								.getRotation(), 1000);
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -337,8 +393,9 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 
 			PNeoNode nodeTerm = getNode(term.getNode().getName());
 
-			POrigin originUI = nodeOrigin.getOrigin(origin.getName());
-			PTermination termUI = nodeTerm.getTermination(term.getName());
+			POrigin originUI = nodeOrigin.getAndShowOrigin(origin.getName());
+			PTermination termUI = nodeTerm
+					.getAndShowTermination(term.getName());
 
 			// modifyModel is false because the connections already exist in the
 			// NEO Network model
@@ -347,13 +404,52 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 
 	}
 
-	public void applyDefaultLayout() {
-		if (!restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
-			applyJungLayout(KKLayout.class);
+	class ShowAllWidgetsAction extends StandardAction {
+
+		public ShowAllWidgetsAction(String actionName) {
+			super("Show all widgets", actionName);
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void action() throws ActionException {
+			showAllWidgets();
+		}
+
+	}
+
+	class HideAllWidgetsAction extends StandardAction {
+
+		public HideAllWidgetsAction(String actionName) {
+			super("Hide all widgets", actionName);
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void action() throws ActionException {
+			hideAllWidgets();
+		}
+
+	}
+
+	public void showAllWidgets() {
+		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		while (enumeration.hasMoreElements()) {
+			PNeoNode node = enumeration.nextElement();
+			node.showAllTerminations();
+			node.showAllOrigins();
 		}
 	}
 
-	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
+	public void hideAllWidgets() {
+		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		while (enumeration.hasMoreElements()) {
+			PNeoNode node = enumeration.nextElement();
+			node.hideAllOandT();
+		}
+	}
 
 	class AddModelAction extends ReversableAction {
 
@@ -364,6 +460,7 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 
 		PNeoNode nodeAdded;
 
+		@SuppressWarnings("unchecked")
 		public AddModelAction(Class nc) {
 			super("Add new " + nc.getSimpleName(), nc.getSimpleName());
 			this.nc = nc;
@@ -508,84 +605,6 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 
 	}
 
-	class SquareLayoutAction extends LayoutAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public SquareLayoutAction() {
-			super("Apply square layout", "Square");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			savedLayout = new NodeLayout("", nodesUI);
-			applySquareLayout();
-		}
-
-	}
-
-	class ZoomActivity extends PActivity {
-
-		public ZoomActivity() {
-			super(0);
-			getRoot().addActivity(this);
-		}
-
-		@Override
-		protected void activityStarted() {
-			zoomToFit();
-		}
-
-	}
-
-	public Network getNetwork() {
-		return (Network) getModel();
-	}
-
-	@Override
-	public void addNodeToUI(PNeoNode nodeProxy, boolean updateModel,
-			boolean dropInCenterOfCamera) {
-		if (updateModel) {
-			try {
-
-				getNetwork().addNode(nodeProxy.getNode());
-
-			} catch (StructuralException e) {
-				Util.Warning(e.toString());
-				return;
-			}
-		}
-		super.addNodeToUI(nodeProxy, updateModel, dropInCenterOfCamera);
-	}
-
-	/**
-	 * @return Whether the layout could be restored
-	 * @param name
-	 *            of layout to restore
-	 */
-	public boolean restoreNodeLayout(String name) {
-		NodeLayoutManager layouts = getNodeLayoutManager();
-		NodeLayout layout = layouts.getLayout(name);
-
-		if (layout == null) {
-			return false;
-		}
-
-		Enumeration<PNeoNode> en = nodesUI.elements();
-
-		while (en.hasMoreElements()) {
-			PNeoNode node = en.nextElement();
-
-			Point2D savedPosition = layout.getPosition(node.getName());
-			if (savedPosition != null) {
-				node.animateToPositionScaleRotation(savedPosition.getX(),
-						savedPosition.getY(), node.getScale(), node
-								.getRotation(), 1000);
-			}
-		}
-		return true;
-	}
-
 	class RestoreLayout extends StandardAction {
 		private static final long serialVersionUID = 1L;
 
@@ -626,10 +645,34 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 
 	}
 
-	@Override
-	public PNetwork getViewerParent() {
-		// TODO Auto-generated method stub
-		return (PNetwork) super.getViewerParent();
+	class SquareLayoutAction extends LayoutAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public SquareLayoutAction() {
+			super("Apply square layout", "Square");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			savedLayout = new NodeLayout("", nodesUI);
+			applySquareLayout();
+		}
+
+	}
+
+	class ZoomActivity extends PActivity {
+
+		public ZoomActivity() {
+			super(0);
+			getRoot().addActivity(this);
+		}
+
+		@Override
+		protected void activityStarted() {
+			zoomToFit();
+		}
+
 	}
 }
 

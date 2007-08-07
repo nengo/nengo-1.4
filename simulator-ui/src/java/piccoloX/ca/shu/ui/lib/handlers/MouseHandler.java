@@ -5,33 +5,57 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
-import ca.shu.ui.lib.objects.widgets.AutomaticFrame;
+import ca.shu.ui.lib.objects.widgets.MouseFollower;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.impl.WorldImpl;
+import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public class ContextMenuHandler extends PBasicInputEventHandler {
+public class MouseHandler extends PBasicInputEventHandler {
+
+	static MouseFollower frame = new MouseFollower();
 
 	/*
 	 * Maximum distance that the mouse is allowed to drag before the handler
 	 * gives up on the context menu
 	 */
-	static double maxDragDistance = 20;
-
-	static AutomaticFrame frame = new AutomaticFrame();
+	static final double MAX_CONTEXT_MENU_DRAG_DISTANCE = 20;
 
 	int mouseButtonPressed = -1;
 
 	Point2D mouseCanvasPositionPressed;
 
-	IContextMenu objPressed;
+	Interactable objPressed;
 	World world;
 
-	public ContextMenuHandler(World world) {
+	public MouseHandler(World world) {
 		super();
 		this.world = world;
+	}
+
+	@Override
+	public void mouseClicked(PInputEvent event) {
+		if (event.getClickCount() == 2) {
+			PNode node = event.getPickedNode();
+
+			while (node != null) {
+				if (node instanceof WorldObjectImpl) {
+
+					WorldObjectImpl wo = (WorldObjectImpl) node;
+
+					wo.doubleClicked();
+
+					break;
+				}
+				node = node.getParent();
+			}
+
+		}
+		super.mouseClicked(event);
+
 	}
 
 	@Override
@@ -39,13 +63,14 @@ public class ContextMenuHandler extends PBasicInputEventHandler {
 		// TODO Auto-generated method stub
 		super.mouseMoved(event);
 
-		IContextMenu obj = (IContextMenu) Util.getNodeFromPickPath(event,
-				IContextMenu.class);
+		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
+				Interactable.class);
 
 		if ((obj instanceof WorldImpl)) {
 			frame.setObjToFollow(null);
 		} else {
 			frame.setObjToFollow(obj);
+
 		}
 
 	}
@@ -59,8 +84,8 @@ public class ContextMenuHandler extends PBasicInputEventHandler {
 			mouseCanvasPositionPressed = event.getCanvasPosition();
 
 			mouseButtonPressed = event.getButton();
-			objPressed = (IContextMenu) Util.getNodeFromPickPath(event,
-					IContextMenu.class);
+			objPressed = (Interactable) Util.getNodeFromPickPath(event,
+					Interactable.class);
 		} else {
 			mouseButtonPressed = -1;
 			objPressed = null;
@@ -75,10 +100,10 @@ public class ContextMenuHandler extends PBasicInputEventHandler {
 
 		if ((objPressed != null)
 				&& (mouseCanvasPositionPressed.distance(event
-						.getCanvasPosition()) < maxDragDistance)
+						.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)
 				&& (mouseButtonPressed == event.getButton())
-				&& (objPressed == (IContextMenu) Util.getNodeFromPickPath(
-						event, IContextMenu.class))) {
+				&& (objPressed == (Interactable) Util.getNodeFromPickPath(
+						event, Interactable.class))) {
 
 			if (objPressed.isContextMenuEnabled()) {
 				JPopupMenu menu = objPressed.showContextMenu(event);

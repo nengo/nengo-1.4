@@ -4,15 +4,17 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
-public class AutomaticFrame implements PropertyChangeListener {
+public class MouseFollower implements PropertyChangeListener {
 	PPath frame = PPath.createRectangle(0f, 0f, 1f, 1f);
-	WorldObject currentlySelected;
-	WorldObject prevObj = null;
+	Interactable currentlySelected;
+
+	// Interactable prevObj = null;
 
 	public WorldObject getObjToFollow() {
 		return currentlySelected;
@@ -22,12 +24,10 @@ public class AutomaticFrame implements PropertyChangeListener {
 		updateBounds();
 	}
 
-	public void setObjToFollow(WorldObject obj) {
-		if (obj == prevObj) {
+	public void setObjToFollow(Interactable obj) {
+		if (obj == currentlySelected) {
 			return;
 		}
-		
-		
 
 		if (currentlySelected != null) {
 			currentlySelected.removePropertyChangeListener(this);
@@ -36,16 +36,18 @@ public class AutomaticFrame implements PropertyChangeListener {
 		currentlySelected = obj;
 		if (currentlySelected != null) {
 
-			currentlySelected.addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
+			currentlySelected.addPropertyChangeListener(PNode.PROPERTY_BOUNDS,
+					this);
 			currentlySelected.addChild(frame);
-//			frame.setVisible(true);
+			// frame.setVisible(true);
+
 			updateBounds();
 		} else {
-			
+
 			frame.removeFromParent();
-//			frame.setVisible(false);
+			// frame.setVisible(false);
 		}
-		prevObj = currentlySelected;
+
 	}
 
 	public void updateBounds() {
