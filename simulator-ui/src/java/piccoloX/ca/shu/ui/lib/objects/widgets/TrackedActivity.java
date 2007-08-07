@@ -26,6 +26,8 @@ public abstract class TrackedActivity {
 	public void startAsThread() {
 		startThread(false);
 	}
+	
+	
 	/**
 	 * 
 	 * @param invokelater

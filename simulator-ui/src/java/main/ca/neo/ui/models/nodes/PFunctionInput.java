@@ -5,12 +5,21 @@ import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
+import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
+import ca.neo.ui.views.objects.configurable.IConfigurable;
+import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
+import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PTFunction;
+import ca.neo.ui.views.objects.configurable.struct.PTInt;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.util.MenuBuilder;
+import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 
 public class PFunctionInput extends PNeoNode {
@@ -25,22 +34,16 @@ public class PFunctionInput extends PNeoNode {
 		init();
 	}
 
-	// /**
-	// * Default constructor, uses the default configuration manager to set up
-	// * function input
-	// */
-	// public PFunctionInput(boolean useDefaultConfigManager) {
-	// super(useDefaultConfigManager);
-	// init();
-	// }
+	@Override
+	public PopupMenuBuilder constructMenu() {
+		PopupMenuBuilder menu = super.constructMenu();
+		// MenuBuilder plotMenu = menu.createSubMenu("Plot");
+		menu.addSection("Function");
 
-	// public PFunctionInput(String name, Function function) {
-	// super(false);
-	// setProperty(pName, name);
-	// setProperty(pFunction, function);
-	// init();
-	// initModel();
-	// }
+		menu.addAction(new PlotFunctionAction("Plot function", getModel()));
+		return menu;
+
+	}
 
 	private void init() {
 		setIcon(new FunctionInputIcon(this));
@@ -99,6 +102,79 @@ public class PFunctionInput extends PNeoNode {
 	protected void afterModelCreated() {
 		super.afterModelCreated();
 		showAllOrigins();
+	}
+
+	@Override
+	public FunctionInput getModel() {
+
+		return (FunctionInput) super.getModel();
+	}
+
+}
+
+class PlotFunctionAction extends StandardAction implements IConfigurable {
+	private static final long serialVersionUID = 1L;
+
+	static final PropDescriptor pTitle = new PTString("Title");
+	static final PropDescriptor pStart = new PTFloat("Start");
+	static final PropDescriptor pIncrement = new PTFloat("Increment");
+	static final PropDescriptor pEnd = new PTFloat("End");
+	PropDescriptor pFunctionIndex;
+	PropDescriptor[] zProperties = { pTitle, pStart, pIncrement, pEnd };
+	FunctionInput functionInput;
+
+	public PlotFunctionAction(String actionName, FunctionInput functionInput) {
+		super("Plot function input", actionName);
+		this.functionInput = functionInput;
+
+	}
+
+	@Override
+	protected void action() throws ActionException {
+		pFunctionIndex = new PTInt("Function index", 0, functionInput
+				.getFunctions().length - 1);
+
+		new DialogConfig(this);
+
+	}
+
+	public void cancelConfiguration() {
+
+	}
+
+	public void completeConfiguration(PropertySet properties) {
+		String title = (String) properties.getProperty(pTitle);
+		int functionIndex = (Integer) properties.getProperty(pFunctionIndex);
+		float start = (Float) properties.getProperty(pStart);
+		float end = (Float) properties.getProperty(pEnd);
+		float increment = (Float) properties.getProperty(pIncrement);
+
+		Function[] functions = functionInput.getFunctions();
+
+		if (functionIndex >= functions.length) {
+			Util.Warning("Function index out of bounds");
+			return;
+		}
+		Function function = functionInput.getFunctions()[functionIndex];
+		Plotter.plot(function, start, increment, end, title + " ("
+				+ function.getClass().getSimpleName() + ")");
+
+	}
+
+	public PropDescriptor[] getConfigSchema() {
+
+		PropDescriptor[] properties = { pTitle, pFunctionIndex, pStart,
+				pIncrement, pEnd };
+		return properties;
+
+	}
+
+	public String getTypeName() {
+		return "Function plotter";
+	}
+
+	public boolean isConfigured() {
+		return true;
 	}
 
 }

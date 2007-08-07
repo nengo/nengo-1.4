@@ -16,7 +16,7 @@ public class EnsembleViewer extends NodeViewer {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void constructChildrenNodes() {
+	public void updateNodesFromModel() {
 
 		Node[] nodes = getModel().getNodes();
 

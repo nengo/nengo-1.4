@@ -1,20 +1,14 @@
 package ca.neo.ui.models.nodes;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-
+import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
-import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.models.nodes.connectors.PDecodedTermination;
 import ca.neo.ui.models.nodes.connectors.PTermination;
-import ca.neo.ui.style.Style;
 import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTInt;
@@ -23,10 +17,8 @@ import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * A UI object for NEFEnsemble
@@ -66,45 +58,6 @@ public class PNEFEnsemble extends PEnsemble {
 		init();
 	}
 
-	@Override
-	public PopupMenuBuilder constructMenu() {
-		// TODO Auto-generated method stub
-		PopupMenuBuilder menu = super.constructMenu();
-		menu.addSection("NEFEnsemble");
-
-		MenuBuilder plotMenu = menu.createSubMenu("Plot");
-
-		plotMenu.addAction(new StandardAction("Ensemble") {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void action() {
-				Plotter.plot((NEFEnsemble) getModel());
-			}
-
-		});
-
-		plotMenu.addAction(new StandardAction("Origin X") {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void action() {
-				Plotter.plot((NEFEnsemble) getModel(), NEFEnsemble.X);
-			}
-		});
-
-		if (getModel().isCollectingSpikes())
-			menu.addAction(new StopCollectSpikes());
-		else
-			menu.addAction(new StartCollectSpikes());
-
-		// Termination
-
-		menu.addAction(new AddDecodedTerminationAction());
-
-		return menu;
-	}
-
 	/**
 	 * Adds a decoded termination to the UI and Ensemble Model
 	 * 
@@ -128,11 +81,33 @@ public class PNEFEnsemble extends PEnsemble {
 		return zProperties;
 	}
 
-	/*
-	 * @return Ensemble Model
-	 */
-	public NEFEnsemble getModel() {
-		return (NEFEnsemble) super.getModel();
+	class AddDecodedTerminationAction extends ReversableAction {
+
+		private static final long serialVersionUID = 1L;
+
+		PTermination addedTermination;
+
+		public AddDecodedTerminationAction() {
+			super("Add decoded termination");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			PTermination term = createDecodedTermintation();
+			if (term == null)
+				throw new ActionException(
+						"Could not create decoded termination");
+
+			else
+				addedTermination = term;
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			addedTermination.destroy();
+
+		}
+
 	}
 
 	@Override
@@ -180,33 +155,42 @@ public class PNEFEnsemble extends PEnsemble {
 		return null;
 	}
 
-	class AddDecodedTerminationAction extends ReversableAction {
+	@Override
+	public PopupMenuBuilder constructMenu() {
 
-		private static final long serialVersionUID = 1L;
+		PopupMenuBuilder menu = super.constructMenu();
 
-		PTermination addedTermination;
+		menu.addSection("NEFEnsemble");
 
-		public AddDecodedTerminationAction() {
-			super("Add decoded termination");
-		}
+		MenuBuilder plotMenu = menu.createSubMenu("Plot");
 
-		@Override
-		protected void action() throws ActionException {
-			PTermination term = createDecodedTermintation();
-			if (term == null)
-				throw new ActionException(
-						"Could not create decoded termination");
+		plotMenu.addAction(new StandardAction("Ensemble") {
+			private static final long serialVersionUID = 1L;
 
-			else
-				addedTermination = term;
-		}
+			@Override
+			protected void action() {
+				Plotter.plot((NEFEnsemble) getModel());
+			}
 
-		@Override
-		protected void undo() throws ActionException {
-			addedTermination.destroy();
+		});
 
-		}
+		plotMenu.addAction(new StandardAction("Origin X") {
+			private static final long serialVersionUID = 1L;
 
+			@Override
+			protected void action() {
+				Plotter.plot((NEFEnsemble) getModel(), NEFEnsemble.X);
+			}
+		});
+
+		if (getModel().isCollectingSpikes())
+			menu.addAction(new StopCollectSpikes());
+		else
+			menu.addAction(new StartCollectSpikes());
+
+		// Termination
+		menu.addAction(new AddDecodedTerminationAction());
+		return menu;
 	}
 
 	class StartCollectSpikes extends ReversableAction {
@@ -258,4 +242,8 @@ public class PNEFEnsemble extends PEnsemble {
 
 	}
 
+	@Override
+	public NEFEnsemble getModel() {
+		return (NEFEnsemble) super.getModel();
+	}
 }

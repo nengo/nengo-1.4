@@ -6,7 +6,6 @@ import java.util.Hashtable;
 
 import ca.neo.model.Network;
 import ca.neo.model.Node;
-import ca.neo.model.StructuralException;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.nodes.PNetwork;
@@ -37,11 +36,11 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 	private static final long serialVersionUID = 1L;
 	static final Dimension DEFAULT_BOUNDS = new Dimension(1000, 1000);
 	static final String LAYOUT_MANAGER_KEY = "layout/manager";
+
 	private Dimension layoutBounds = DEFAULT_BOUNDS;
 
-	Hashtable<String, PNeoNode> nodesUI = new Hashtable<String, PNeoNode>();
-
-	PNodeContainer parentOfViewer;
+	private PNodeContainer parentOfViewer;
+	protected Hashtable<String, PNeoNode> nodesUI = new Hashtable<String, PNeoNode>();
 
 	/**
 	 * @param nodeContainer
@@ -63,11 +62,16 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 
 			@Override
 			public void doActivity() {
-				constructChildrenNodes();
-				applyDefaultLayout();
+
+				updateNodesFromModel();
+				if (nodesUI.size() > 0) {
+					applyDefaultLayout();
+				}
+
 			}
 
 		}).startThread(true);
+
 	}
 
 	public void addNodeToUI(PNeoNode nodeProxy) {
@@ -101,6 +105,7 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 	public abstract void applyDefaultLayout();
 
 	public void applySquareLayout() {
+
 		/*
 		 * basic rectangle layout variables
 		 */
@@ -128,22 +133,6 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 			zoomToFit().startAfter(moveNodeActivity);
 		}
 
-	}
-
-	public void showAllWidgets() {
-		Enumeration<PNeoNode> enumeration = nodesUI.elements();
-		while (enumeration.hasMoreElements()) {
-			PNeoNode node = enumeration.nextElement();
-			node.showAllWidgets();
-		}
-	}
-
-	public void hideAllWidgets() {
-		Enumeration<PNeoNode> enumeration = nodesUI.elements();
-		while (enumeration.hasMoreElements()) {
-			PNeoNode node = enumeration.nextElement();
-			node.hideAllWidgets();
-		}
 	}
 
 	@Override
@@ -201,6 +190,14 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 		return parentOfViewer;
 	}
 
+	public void hideAllWidgets() {
+		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		while (enumeration.hasMoreElements()) {
+			PNeoNode node = enumeration.nextElement();
+			node.hideAllWidgets();
+		}
+	}
+
 	/**
 	 * Saves layout
 	 * 
@@ -226,6 +223,14 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 		this.layoutBounds = layoutBounds;
 	}
 
+	public void showAllWidgets() {
+		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		while (enumeration.hasMoreElements()) {
+			PNeoNode node = enumeration.nextElement();
+			node.showAllWidgets();
+		}
+	}
+
 	/**
 	 * 
 	 * @return The Key used to access Metadata containing layout information
@@ -240,7 +245,7 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 		}
 	}
 
-	protected abstract void constructChildrenNodes();
+	protected abstract void updateNodesFromModel();
 
 	/**
 	 * 

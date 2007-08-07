@@ -9,13 +9,13 @@ import ca.neo.ui.style.Style;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 public abstract class PropertyInputPanel extends JPanel {
-	PropDescriptor type;
+	PropDescriptor propDescriptor;
 
 	JLabel statusMessage;
 
 	public PropertyInputPanel(PropDescriptor property) {
 		super();
-		this.type = property;
+		this.propDescriptor = property;
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setAlignmentY(TOP_ALIGNMENT);
@@ -38,7 +38,7 @@ public abstract class PropertyInputPanel extends JPanel {
 	}
 
 	public String getName() {
-		return type.getName();
+		return propDescriptor.getName();
 	}
 
 	protected void setStatusMsg(String msg) {
@@ -54,11 +54,11 @@ public abstract class PropertyInputPanel extends JPanel {
 	public abstract void init(JPanel panel);
 
 	public PropDescriptor getType() {
-		return type;
+		return propDescriptor;
 	}
 
 	public void setType(PropDescriptor type) {
-		this.type = type;
+		this.propDescriptor = type;
 	}
 
 }

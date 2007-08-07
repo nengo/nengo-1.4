@@ -12,6 +12,16 @@ public class PTInt extends PropDescriptor {
 		// TODO Auto-generated constructor stub
 	}
 
+	int min, max;
+	boolean rangeEnabled = false;
+
+	public PTInt(String name, int min, int max) {
+		super(name + " min:" + min + " max:" + max);
+		this.min = min;
+		this.max = max;
+		rangeEnabled = true;
+	}
+
 	@Override
 	public PropertyInputPanel createInputPanel() {
 		// TODO Auto-generated method stub
@@ -35,9 +45,15 @@ public class PTInt extends PropDescriptor {
 class IntegerInputPanel extends PropertyInputPanel {
 	JTextField tf;
 
-	public IntegerInputPanel(PropDescriptor property) {
+	public IntegerInputPanel(PTInt property) {
 		super(property);
 		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public PTInt getType() {
+		// TODO Auto-generated method stub
+		return (PTInt) super.getType();
 	}
 
 	/**
@@ -55,7 +71,7 @@ class IntegerInputPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public Object getValue() {
+	public Integer getValue() {
 
 		Integer integerValue = new Integer(tf.getText());
 		return integerValue.intValue();
@@ -76,7 +92,13 @@ class IntegerInputPanel extends PropertyInputPanel {
 			return false;
 
 		try {
-			getValue();
+			Integer value = getValue();
+
+			if (getType().rangeEnabled) {
+				if (value > getType().max || value < getType().min) {
+					return false;
+				}
+			}
 
 		} catch (NumberFormatException e) {
 			return false;

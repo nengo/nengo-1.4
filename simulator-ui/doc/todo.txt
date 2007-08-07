@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+(08/07) done - Plot Functions
 (08/07) done - hide/show origins and terminations
 (08/07) done - automatically show origins and terminations on hover over
 

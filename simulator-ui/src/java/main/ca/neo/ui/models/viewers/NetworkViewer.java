@@ -362,23 +362,35 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 	/**
 	 * Construct children UI nodes from the NEO Network model
 	 */
-	protected void constructChildrenNodes() {
+	public void updateNodesFromModel() {
+		/*
+		 * Removes all existing nodes from this viewer
+		 */
+		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		while (enumeration.hasMoreElements()) {
+			enumeration.nextElement().removeFromParent();
+		}
 
 		/*
-		 * Construct UI objects for nodes
+		 * Construct Nodes from the Network model
 		 */
 
 		Node[] nodes = getNetwork().getNodes();
 
 		for (int i = 0; i < nodes.length; i++) {
+
 			Node node = nodes[i];
-			PNeoNode nodeUI = PModelClasses.createUIFromModel(node);
-			addNodeToUI(nodeUI, false, false);
+			/*
+			 * only add nodes if they don't already exist
+			 */
+			if (getNode(node.getName()) == null) {
+				PNeoNode nodeUI = PModelClasses.createUIFromModel(node);
+				addNodeToUI(nodeUI, false, false);
+			}
 		}
 
-		/**
-		 * TODO: get references to origins and terminations
-		 * 
+		/*
+		 * Construct projections
 		 */
 		Projection[] projections = getNetwork().getProjections();
 		for (int i = 0; i < projections.length; i++) {
@@ -431,8 +443,6 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 		}
 
 	}
-
-	
 
 	class AddModelAction extends ReversableAction {
 
@@ -519,14 +529,19 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 					PTransformActivity nodeMoveActivity = null;
 					while (enumeration.hasMoreElements()) {
 						PNeoNode node = enumeration.nextElement();
+						if (node.getVertex() != null) {
+							Point2D coord = layout
+									.getLocation(node.getVertex());
 
-						Point2D coord = layout.getLocation(node.getVertex());
+							if (coord != null) {
+								nodeMoveActivity = node
+										.animateToPositionScaleRotation(coord
+												.getX(), coord.getY(), node
+												.getScale(),
+												node.getRotation(), 1000);
+							}
 
-						// if (coord != null) {
-						nodeMoveActivity = node.animateToPositionScaleRotation(
-								coord.getX(), coord.getY(), node.getScale(),
-								node.getRotation(), 1000);
-						// }
+						}
 
 					}
 
