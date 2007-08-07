@@ -33,7 +33,6 @@ public class GFuzzyLogicExample {
 			neoGraphics.addWorldObject(networkUI);
 
 			networkUI.openViewer();
-			networkUI.getViewer().applyJungLayout(FRLayout.class);
 			task.finished();
 
 		} catch (StructuralException e) {

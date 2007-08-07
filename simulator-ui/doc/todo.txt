@@ -1,6 +1,8 @@
 *******************************************
  Done
 *******************************************
+(08/07) done - Preliminary Ensemble Viewer created
+(08/07) done - fixed some bugs with UI connections not detaching correctly
 
 done - File menu, to load saved networks (Use Swing File Dialogs)
 done - Save network from NetworkViewer, or PNetwork
@@ -16,13 +18,15 @@ done- There should be either scrollbars or a fit-on-screen function (I
  Pri 0 - doing next
 *******************************************
 
-fix origins
-
 Ensemble View
 	A Network can also contain Ensembles. There should be a separate Ensemble view, 
 	in which Nodes that make up the Ensemble are visible. 
 	The user should be able to open Ensemble views in the same manner(s) as 
 	network views. 
+	
+fix origins
+
+
 
 Add ability to remove probes from simulator
 
@@ -89,6 +93,8 @@ Complete java docs
 
 Edit properties of existing models
 
+keyboard search of nodes (auto-panning)
+
 *******************************************
  Pri 3 - maybe if there's time
 *******************************************
@@ -97,19 +103,20 @@ Lenses
 Customize FileChooser to add extensions
 
 debug paint events using PDebug to optimize performance
+	
+
 
 *******************************************
  Bugs
 *******************************************
 bug: ensure threads are safety accessing the piccolo graph
 bug: debug the events related with adding and removing connections
+bug: window appears underneath lines and widgets
 
 *******************************************
  Bryan requests
 *******************************************
 
 
-more examples to try to draw using NetworkViewer
+more Network examples
 
-Network is not serializable
-	Local Simulator

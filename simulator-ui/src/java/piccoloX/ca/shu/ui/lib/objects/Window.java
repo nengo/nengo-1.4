@@ -86,6 +86,13 @@ public class Window extends WorldObjectImpl {
 	}
 
 	/**
+	 * Closes the window
+	 */
+	public void close() {
+		destroy();
+	}
+
+	/**
 	 * Decreases the size of the window through state transitions
 	 */
 	public void decreaseWindowSize() {
@@ -102,6 +109,10 @@ public class Window extends WorldObjectImpl {
 	@Override
 	public void destroy() {
 		super.destroy();
+		if (affinityHalo != null) {
+			affinityHalo.destroy();
+			affinityHalo = null;
+		}
 
 		menubar.removeInputEventListener(menuBarHandler);
 		removeInputEventListener(eventConsumer);
@@ -131,7 +142,7 @@ public class Window extends WorldObjectImpl {
 		}
 
 	}
-	
+
 	public void setWindowState(WindowState state) {
 		if (state != windowState) {
 
@@ -230,12 +241,20 @@ public class Window extends WorldObjectImpl {
 		MAXIMIZED, MINIMIZED, WINDOW
 	}
 
+	/**
+	 * 
+	 * @return Node representing the contents of the Window
+	 */
+	public WorldObjectImpl getWindowContent() {
+		return contentNode;
+	}
+
 }
 
 class MenuBar extends PPath {
 
 	private static final long serialVersionUID = 1L;
-	GButton maximizeButton, minimizeButton;
+	GButton maximizeButton, minimizeButton, closeButton;
 	GText title;
 
 	Window window;
@@ -266,8 +285,16 @@ class MenuBar extends PPath {
 		});
 		minimizeButton.setFont(Style.FONT_BIG);
 
+		closeButton = new GButton("X", new Runnable() {
+			public void run() {
+				window.close();
+			}
+		});
+		closeButton.setFont(Style.FONT_BIG);
+
 		addChild(maximizeButton);
 		addChild(minimizeButton);
+		addChild(closeButton);
 		setPaint(Style.COLOR_BACKGROUND2);
 	}
 
@@ -277,7 +304,9 @@ class MenuBar extends PPath {
 		super.layoutChildren();
 		title.setBounds(4, 3, getWidth(), getHeight());
 
-		double buttonX = getWidth() - maximizeButton.getWidth() - 2;
+		double buttonX = getWidth() - closeButton.getWidth() - 2;
+		closeButton.setOffset(buttonX, 2);
+		buttonX -= closeButton.getWidth() - 2;
 		maximizeButton.setOffset(buttonX, 2);
 		buttonX -= minimizeButton.getWidth() - 2;
 		minimizeButton.setOffset(buttonX, 2);
@@ -287,7 +316,7 @@ class MenuBar extends PPath {
 
 class MenuBarHandler extends PDragSequenceEventHandler {
 
-	private boolean moveToFrontOnPress = false;
+	private boolean moveToFrontOnPress = true;
 
 	private Window window;
 	boolean enabled = true;
@@ -371,6 +400,7 @@ class MenuBarHandler extends PDragSequenceEventHandler {
 		super.startDrag(event);
 
 		if (moveToFrontOnPress) {
+			window.getParent().moveToFront();
 			window.moveToFront();
 		}
 	}

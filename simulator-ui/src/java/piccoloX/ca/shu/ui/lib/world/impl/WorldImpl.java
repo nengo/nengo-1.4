@@ -92,8 +92,8 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 
 	PBasicInputEventHandler statusBarHandler;
 
-	public WorldImpl(String titleStr) {
-		super(titleStr);
+	public WorldImpl(String name) {
+		super(name);
 
 		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
 		addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
@@ -287,7 +287,7 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 	}
 
 	public JPopupMenu showContextMenu(PInputEvent event) {
-		return constructPopupMenu().getJPopupMenu();
+		return constructMenu().getJPopupMenu();
 	}
 
 	public void showTooltip(WorldObjectImpl pControls,
@@ -376,7 +376,7 @@ public class WorldImpl extends WorldObjectImpl implements World, IContextMenu,
 		return zoomToBounds(bounds);
 	}
 
-	protected PopupMenuBuilder constructPopupMenu() {
+	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
 
 		menu.addAction(new ZoomOutAction());

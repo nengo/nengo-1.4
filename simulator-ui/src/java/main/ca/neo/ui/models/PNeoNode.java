@@ -49,6 +49,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	public PNeoNode() {
 		super();
 		init();
+
 	}
 
 	Vertex vertex;
@@ -62,7 +63,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	public void addedToWorld() {
 		// TODO Auto-generated method stub
 		super.addedToWorld();
-		updateWidgets();
+		moveWidgetsToFront();
 	}
 
 	public void addWidget(WorldObjectImpl widget) {
@@ -72,7 +73,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		widget.setScale(0.5);
 		widgets.add(widget);
 
-		updateWidgets();
+		moveWidgetsToFront();
 		assignProbes();
 	}
 
@@ -163,19 +164,13 @@ public abstract class PNeoNode extends PModelConfigurable {
 		super.destroy();
 	}
 
-	@Override
-	public PropDescriptor[] getConfigSchema() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	/**
 	 * @return Network model the node is attached to
 	 */
 	public Network getParentNetwork() {
 		NetworkViewer netV = getNetworkViewer();
 		if (netV != null) {
-			return netV.getModel();
+			return netV.getNetwork();
 		} else {
 			return null;
 		}
@@ -244,12 +239,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	}
 
-	@Override
-	public String getTypeName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public WorldObjectImpl getWidget(String name) {
 		return getWidget(name, null);
 	}
@@ -291,7 +280,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	public void moveToFront() {
 		// TODO Auto-generated method stub
 		super.moveToFront();
-		updateWidgets();
+		moveWidgetsToFront();
 	}
 
 	/**
@@ -310,7 +299,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		widgets.remove(widget);
 		widget.removeFromParent();
 
-		updateWidgets();
+		moveWidgetsToFront();
 		assignProbes();
 	}
 
@@ -474,7 +463,11 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	}
 
-	protected void updateWidgets() {
+	/**
+	 * Moves widgets to front, so that they are always visible in front of the
+	 * node
+	 */
+	protected void moveWidgetsToFront() {
 		if (widgets == null)
 			return;
 
@@ -568,6 +561,12 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	public void setVertex(Vertex vertex) {
 		this.vertex = vertex;
+	}
+
+	@Override
+	public Node getModel() {
+		// TODO Auto-generated method stub
+		return (Node) super.getModel();
 	}
 
 }

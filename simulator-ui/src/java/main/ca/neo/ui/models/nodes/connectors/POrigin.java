@@ -45,15 +45,20 @@ public class POrigin extends PModel {
 	}
 
 	public boolean disconnectModelFrom(PTermination target) {
-		Util.debugMsg("Projection removed " + target.getName());
-		try {
-			nodeParent.getNetworkViewer().getModel().removeProjection(
-					target.getModelTermination());
+		if (target != null) {
+			Util.debugMsg("Projection removed " + target.getName());
+			try {
+				nodeParent.getNetworkViewer().getNetwork().removeProjection(
+						target.getModelTermination());
+				return true;
+			} catch (StructuralException e) {
+				Util.Warning("Could not disconnect: " + e.toString());
+			}
+			return false;
+		} else {
 			return true;
-		} catch (StructuralException e) {
-			Util.Warning("Could not disconnect: " + e.toString());
 		}
-		return false;
+
 	}
 
 	public void connectTo(PTermination term) {
@@ -69,8 +74,8 @@ public class POrigin extends PModel {
 	 *            connection
 	 */
 	public void connectTo(PTermination term, boolean modifyModel) {
-		OriginEnd lineEnd = lineWell.createConnection(modifyModel);
-		lineEnd.tryConnectTo(term, modifyModel);
+		OriginEnd lineEnd = lineWell.createConnection();
+		lineEnd.connectTo(term, modifyModel);
 
 	}
 
@@ -84,7 +89,7 @@ public class POrigin extends PModel {
 		Util.debugMsg("Projection added " + target.getName());
 		try {
 
-			nodeParent.getNetworkViewer().getModel().addProjection(
+			nodeParent.getNetworkViewer().getNetwork().addProjection(
 					getModelOrigin(), target.getModelTermination());
 
 			// getWorld().showTooltip(new ConnectedTooltip("Connected"),
@@ -157,43 +162,43 @@ public class POrigin extends PModel {
 			super.destroy();
 		}
 
-		/*
-		 * Whether NEO model is updated with projection on initialization. This
-		 * is set to false, when the model already has the projection (ie. a
-		 * preloaded NEO Model)
-		 */
-		boolean modifyModel;
-
 		/**
 		 * 
 		 * @param well
 		 * @param modifyModelOnFirstConnection
 		 *            Whether to modify the NEO Model on the first connection
 		 */
-		public OriginEnd(LineEndWell well, boolean modifyModelOnFirstConnection) {
+		public OriginEnd(LineEndWell well) {
 
 			super(well);
-			this.modifyModel = modifyModelOnFirstConnection;
 			addOriginEnd(this);
 		}
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		protected boolean initConnection(WorldObject target) {
+		protected boolean canConnectTo(WorldObject target) {
+			if ((target instanceof PTermination))
+				return true;
+			else
+				return false;
+
+		}
+
+		@Override
+		protected boolean initConnection(WorldObject target, boolean modifyModel) {
 			if (!(target instanceof PTermination))
 				return false;
 			if (modifyModel) {
 				return POrigin.this.connectModelTo((PTermination) target);
 			}
-			modifyModel = true;
 			return true;
 		}
 
 		@Override
 		protected void justDisconnected() {
 			super.justDisconnected();
-			POrigin.this.disconnectModelFrom((PTermination) getTarget());
+			disconnectModelFrom((PTermination) getTarget());
 
 		}
 
@@ -219,7 +224,7 @@ public class POrigin extends PModel {
 
 		@Override
 		protected LineEnd constructLineEnd() {
-			return new OriginEnd(this, true);
+			return new OriginEnd(this);
 		}
 
 		/**
@@ -229,8 +234,8 @@ public class POrigin extends PModel {
 		 *            underneath
 		 * @return
 		 */
-		public OriginEnd createConnection(boolean modifyModel) {
-			OriginEnd lineEnd = new OriginEnd(this, modifyModel);
+		public OriginEnd createConnection() {
+			OriginEnd lineEnd = new OriginEnd(this);
 			super.addLineEnd(lineEnd);
 			return lineEnd;
 		}

@@ -34,7 +34,7 @@ import ca.shu.ui.lib.util.Util;
  * @author Shu Wu
  * 
  */
-public class PNEFEnsemble extends PNeoNode {
+public class PNEFEnsemble extends PEnsemble {
 	private static final long serialVersionUID = 1L;
 
 	static final PropDescriptor pDim = new PTInt("Dimensions");
@@ -152,7 +152,7 @@ public class PNEFEnsemble extends PNeoNode {
 	}
 
 	private void init() {
-		setIcon(new EnsembleIcon(this));
+
 	}
 
 	@Override

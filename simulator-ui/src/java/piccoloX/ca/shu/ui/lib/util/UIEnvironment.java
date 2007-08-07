@@ -6,6 +6,8 @@ import ca.shu.ui.lib.world.impl.GFrame;
 public class UIEnvironment {
 	static GFrame uiInstance;
 
+	public static final double SEMANTIC_ZOOM_LEVEL = 0.2;
+	
 	/**
 	 * 
 	 * @return UI Instance

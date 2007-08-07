@@ -5,7 +5,6 @@ import java.awt.geom.Point2D;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
-import java.util.Hashtable;
 
 import javax.swing.JOptionPane;
 
@@ -18,7 +17,7 @@ import ca.neo.model.Termination;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.ui.actions.RunSimulatorAction;
-import ca.neo.ui.models.PModel;
+import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.actions.SaveNetworkAction;
 import ca.neo.ui.models.icons.IconWrapper;
@@ -36,15 +35,12 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.handlers.IContextMenu;
-import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.NamedObject;
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.impl.WorldImpl;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
@@ -55,7 +51,6 @@ import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
-import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
  * 
@@ -64,23 +59,17 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * 
  * @author Shu Wu
  */
-public class NetworkViewer extends WorldImpl implements NamedObject,
+public class NetworkViewer extends NodeViewer implements NamedObject,
 		IContextMenu {
 	private static final long serialVersionUID = -3018937112672942653L;
-
-	static final Dimension DEFAULT_BOUNDS = new Dimension(1000, 1000);
 
 	Class currentLayoutType = null;
 
 	IconWrapper icon;
 
-	Dimension layoutBounds = DEFAULT_BOUNDS;
+	// Network network;
 
-	Network network;
-
-	Hashtable<String, PNeoNode> nodesUI = new Hashtable<String, PNeoNode>();
-
-	PNetwork networkProxy;
+	// PNetwork networkProxy;
 
 	/**
 	 * 
@@ -88,25 +77,11 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 	 * @param root
 	 */
 	public NetworkViewer(PNetwork pNetwork) {
-		super("");
-		this.networkProxy = pNetwork;
-		this.network = pNetwork.getModelNetwork();
+		super(pNetwork);
+
+		// this.networkProxy = pNetwork;
 
 		// getSky().setViewScale(0.5);
-
-		setStatusBarHandler(new ModelStatusBarHandler(this));
-
-		setFrameVisible(false);
-
-		(new TrackedActivity("Building network UI") {
-
-			@Override
-			public void doActivity() {
-				constructChildrenNodes();
-
-			}
-
-		}).startThread(true);
 
 	}
 
@@ -116,45 +91,6 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		super.addedToWorld();
 
 		// this.animateToBounds(0, 0, 400, 300, 1000);
-	}
-
-	public void addNodeToUI(PNeoNode nodeProxy) {
-		addNodeToUI(nodeProxy, true, true);
-	}
-
-	/**
-	 * 
-	 * @param nodeProxy
-	 *            node to be added
-	 * @param updateModel
-	 *            if true, the network model is updated. this may be false, if
-	 *            it is known that the network model already contains this node
-	 */
-	public void addNodeToUI(PNeoNode nodeProxy, boolean updateModel,
-			boolean dropInCenterOfCamera) {
-
-		if (updateModel) {
-			try {
-
-				getModel().addNode(nodeProxy.getNode());
-
-			} catch (StructuralException e) {
-				Util.Warning(e.toString());
-				return;
-			}
-		}
-
-		/**
-		 * Moves the camera to where the node is positioned, if it's not dropped
-		 * in the center of the camera
-		 */
-		if (!dropInCenterOfCamera) {
-			setCameraCenterPosition(nodeProxy.getOffset().getX(), nodeProxy
-					.getOffset().getY());
-		}
-
-		nodesUI.put(nodeProxy.getName(), nodeProxy);
-		getGround().catchObject(nodeProxy, dropInCenterOfCamera);
 	}
 
 	@SuppressWarnings( { "unchecked" })
@@ -195,39 +131,9 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 	}
 
-	public void applySquareLayout() {
-		/*
-		 * basic rectangle layout variables
-		 */
-		double x = 0;
-		double y = 0;
-
-		Enumeration<PNeoNode> em = nodesUI.elements();
-		PTransformActivity moveNodeActivity = null;
-		while (em.hasMoreElements()) {
-			PNeoNode node = em.nextElement();
-
-			moveNodeActivity = node.animateToPositionScaleRotation(x, y, node
-					.getScale(), node.getRotation(), 1000);
-
-			x += 150;
-
-			if (x > getLayoutBounds().getWidth()) {
-				x = 0;
-				y += 130;
-			}
-
-		}
-
-		if (moveNodeActivity != null) {
-			zoomToFit().startAfter(moveNodeActivity);
-		}
-
-	}
-
 	@Override
-	public PopupMenuBuilder constructPopupMenu() {
-		PopupMenuBuilder menu = super.constructPopupMenu();
+	public PopupMenuBuilder constructMenu() {
+		PopupMenuBuilder menu = super.constructMenu();
 
 		// if (getParent() instanceof Window) {
 		// menu.addSection("Viewer");
@@ -235,32 +141,49 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		// }
 
 		menu.addSection("Simulator");
-		menu.addAction(new RunSimulatorAction("Run", network.getSimulator()));
+		menu.addAction(new RunSimulatorAction("Run", getNetwork()
+				.getSimulator()));
 
 		/*
 		 * File menu
 		 */
 		menu.addSection("File");
-		menu.addAction(new SaveNetworkAction("Save network", networkProxy));
+		menu
+				.addAction(new SaveNetworkAction("Save network",
+						getViewerParent()));
 
 		/*
 		 * Create new models
 		 */
 		menu.addSection("Create new model");
 
+		MenuBuilder nodeContainersMenu = menu.createSubMenu("Node Containers");
 		MenuBuilder nodesMenu = menu.createSubMenu("Nodes");
 		MenuBuilder functionsMenu = menu.createSubMenu("Functions");
 
 		/*
 		 * Nodes
 		 */
-		nodesMenu.addAction(new AddModelAction(PNetwork.class));
-		nodesMenu.addAction(new AddModelAction(PNEFEnsemble.class));
+		for (int i = 0; i < PModelClasses.NODE_TYPES.length; i++) {
+			nodesMenu
+					.addAction(new AddModelAction(PModelClasses.NODE_TYPES[i]));
+		}
+
+		/*
+		 * Node Containers
+		 */
+		for (int i = 0; i < PModelClasses.NODE_CONTAINER_TYPES.length; i++) {
+			nodeContainersMenu.addAction(new AddModelAction(
+					PModelClasses.NODE_CONTAINER_TYPES[i]));
+		}
 
 		/*
 		 * Functions
 		 */
-		functionsMenu.addAction(new AddModelAction(PFunctionInput.class));
+		for (int i = 0; i < PModelClasses.FUNCTION_TYPES.length; i++) {
+			functionsMenu.addAction(new AddModelAction(
+					PModelClasses.FUNCTION_TYPES[i]));
+		}
 
 		/*
 		 * Layouts
@@ -326,7 +249,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		 * Add Directed edges
 		 * 
 		 */
-		Projection[] projections = getModel().getProjections();
+		Projection[] projections = getNetwork().getProjections();
 		for (int i = 0; i < projections.length; i++) {
 			Projection projection = projections[i];
 
@@ -338,32 +261,12 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 			DirectedSparseEdge edge = new DirectedSparseEdge(nodeOrigin
 					.getVertex(), nodeTerm.getVertex());
+			graph.addEdge(edge);
 
 		}
 
 		return graph;
 
-	}
-
-	/**
-	 * TODO: Move these functions into a helper class
-	 * 
-	 * @return Layout bounds to be used by Layout algorithms
-	 */
-	protected Dimension getLayoutBounds() {
-		return layoutBounds;
-	}
-
-	/**
-	 * 
-	 * @return NEO Network model
-	 */
-	public Network getModel() {
-		return network;
-	}
-
-	public String getName() {
-		return "Network Viewer: " + networkProxy.getName();
 	}
 
 	/**
@@ -393,7 +296,7 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		if (updateModel) {
 			try {
 
-				getModel().removeNode(nodeProxy.getName());
+				getNetwork().removeNode(nodeProxy.getName());
 
 			} catch (StructuralException e) {
 				Util.Warning(e.toString());
@@ -402,53 +305,28 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		}
 	}
 
-	public void setLayoutBounds(Dimension layoutBounds) {
-		this.layoutBounds = layoutBounds;
-	}
-
-	protected PNeoNode buildNodeUI(Node node) {
-		if (node instanceof NEFEnsemble) {
-			return new PNEFEnsemble((NEFEnsemble) node);
-		} else if (node instanceof FunctionInput) {
-
-			return new PFunctionInput((FunctionInput) node);
-		} else if (node instanceof Network) {
-			return new PNetwork((Network) node);
-
-		} else {
-			Util.Error("Unsupported node type");
-			return null;
-		}
-
-	}
-
 	/**
 	 * Construct children UI nodes from the NEO Network model
 	 */
 	protected void constructChildrenNodes() {
 
-		setName(network.getName());
-
 		/*
 		 * Construct UI objects for nodes
 		 */
 
-		Node[] nodes = network.getNodes();
+		Node[] nodes = getNetwork().getNodes();
 
 		for (int i = 0; i < nodes.length; i++) {
 			Node node = nodes[i];
-
-			PNeoNode nodeUI = buildNodeUI(node);
-
+			PNeoNode nodeUI = PModelClasses.createUIFromModel(node);
 			addNodeToUI(nodeUI, false, false);
-
 		}
 
 		/**
 		 * TODO: get references to origins and terminations
 		 * 
 		 */
-		Projection[] projections = network.getProjections();
+		Projection[] projections = getNetwork().getProjections();
 		for (int i = 0; i < projections.length; i++) {
 			Projection projection = projections[i];
 
@@ -466,7 +344,13 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 			// NEO Network model
 			originUI.connectTo(termUI, false);
 		}
-		restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME);
+
+	}
+
+	public void applyDefaultLayout() {
+		if (!restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
+			applyJungLayout(KKLayout.class);
+		}
 	}
 
 	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
@@ -654,25 +538,24 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 
 	}
 
-	/**
-	 * Saves layout
-	 * 
-	 * @param name
-	 */
-	public void saveNodeLayout(String name) {
+	public Network getNetwork() {
+		return (Network) getModel();
+	}
 
-		NodeLayoutManager layouts = getNodeLayoutManager();
-		NodeLayout nodeLayout = new NodeLayout(name);
+	@Override
+	public void addNodeToUI(PNeoNode nodeProxy, boolean updateModel,
+			boolean dropInCenterOfCamera) {
+		if (updateModel) {
+			try {
 
-		Enumeration<PNeoNode> en = nodesUI.elements();
+				getNetwork().addNode(nodeProxy.getNode());
 
-		while (en.hasMoreElements()) {
-			PNeoNode node = en.nextElement();
-			nodeLayout.addPosition(node.getName(), node.getOffset());
-
+			} catch (StructuralException e) {
+				Util.Warning(e.toString());
+				return;
+			}
 		}
-
-		layouts.addLayout(nodeLayout);
+		super.addNodeToUI(nodeProxy, updateModel, dropInCenterOfCamera);
 	}
 
 	/**
@@ -701,27 +584,6 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 			}
 		}
 		return true;
-	}
-
-	static final String LAYOUT_MANAGER_KEY = "layout/manager";
-
-	public NodeLayoutManager getNodeLayoutManager() {
-		NodeLayoutManager layoutManager = null;
-		try {
-			Object obj = getModel().getMetaData(LAYOUT_MANAGER_KEY);
-			if (obj != null)
-				layoutManager = (NodeLayoutManager) obj;
-		} catch (Throwable e) {
-			Util.Error("Could not access layout manager, creating a new one");
-			// catch all exceptions
-		}
-
-		if (layoutManager == null) {
-			layoutManager = new NodeLayoutManager();
-			getModel().setMetaData(LAYOUT_MANAGER_KEY, layoutManager);
-		}
-		return (NodeLayoutManager) layoutManager;
-
 	}
 
 	class RestoreLayout extends StandardAction {
@@ -763,29 +625,11 @@ public class NetworkViewer extends WorldImpl implements NamedObject,
 		}
 
 	}
-}
 
-class ModelStatusBarHandler extends StatusBarHandler {
-
-	public ModelStatusBarHandler(World world) {
-		super(world);
-		// TODO Auto-generated constructor stub
-	}
-
-	@SuppressWarnings("unchecked")
 	@Override
-	public String getStatusStr(PInputEvent event) {
-		PModel wo = (PModel) Util.getNodeFromPickPath(event, PModel.class);
-
-		StringBuilder statuStr = new StringBuilder(getWorld().getName() + " | ");
-
-		if (wo != null) {
-			statuStr.append("Model name: " + wo.getName() + " ("
-					+ wo.getTypeName() + ")");
-		} else {
-			statuStr.append("No Model Selected");
-		}
-		return statuStr.toString();
+	public PNetwork getViewerParent() {
+		// TODO Auto-generated method stub
+		return (PNetwork) super.getViewerParent();
 	}
 }
 
