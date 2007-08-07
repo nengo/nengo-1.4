@@ -4,11 +4,9 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
-import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 public class LineEnd extends WorldObjectImpl {
 	@Override

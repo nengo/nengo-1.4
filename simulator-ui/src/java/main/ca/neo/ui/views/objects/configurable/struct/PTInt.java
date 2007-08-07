@@ -7,9 +7,10 @@ import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
 public class PTInt extends PropDescriptor {
 
+	private static final long serialVersionUID = 1L;
+
 	public PTInt(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
 	int min, max;
@@ -24,19 +25,16 @@ public class PTInt extends PropDescriptor {
 
 	@Override
 	public PropertyInputPanel createInputPanel() {
-		// TODO Auto-generated method stub
 		return new IntegerInputPanel(this);
 	}
 
 	@Override
-	public Class getTypeClass() {
-		// TODO Auto-generated method stub
-		return int.class;
+	public Class<Integer> getTypeClass() {
+		return Integer.class;
 	}
 
 	@Override
 	public String getTypeName() {
-		// TODO Auto-generated method stub
 		return "Integer";
 	}
 
@@ -47,12 +45,10 @@ class IntegerInputPanel extends PropertyInputPanel {
 
 	public IntegerInputPanel(PTInt property) {
 		super(property);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public PTInt getType() {
-		// TODO Auto-generated method stub
 		return (PTInt) super.getType();
 	}
 
@@ -63,7 +59,6 @@ class IntegerInputPanel extends PropertyInputPanel {
 
 	@Override
 	public void init(JPanel panel) {
-		// TODO Auto-generated method stub
 		tf = new JTextField(10);
 
 		panel.add(tf);

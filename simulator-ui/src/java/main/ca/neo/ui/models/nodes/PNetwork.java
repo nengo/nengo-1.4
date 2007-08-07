@@ -7,19 +7,11 @@ import ca.neo.io.FileManager;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.impl.NetworkImpl;
-import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.actions.SaveNetworkAction;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.viewers.NetworkViewer;
-import ca.neo.ui.models.viewers.NodeViewer;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.Window;
-import ca.shu.ui.lib.objects.Window.WindowState;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
 
 /**
  * GUI Wrapper for a Network Model
@@ -37,21 +29,6 @@ public class PNetwork extends PNodeContainer {
 
 	static final PropDescriptor[] zProperties = { pName };
 
-
-
-	public void saveNetwork(File file) throws IOException {
-		FileManager fm = new FileManager();
-
-		if (getViewer() != null) {
-			getViewer().saveNodeLayout(NetworkViewer.DEFAULT_NODE_LAYOUT_NAME);
-		}
-
-		fm.save((Network) getModel(), file);
-
-	}
-
-	
-
 	public PNetwork() {
 		super();
 		init();
@@ -67,36 +44,15 @@ public class PNetwork extends PNodeContainer {
 	}
 
 	/**
-	 * Delegate function for NetworkViewer
-	 * 
-	 * @param nodeProxy
-	 */
-	public void addNode(PNeoNode nodeProxy) {
-		getViewer().addNodeToUI(nodeProxy, true, false);
-	}
-
-	@Override
-	public NetworkViewer getViewer() {
-		return (NetworkViewer) super.getViewer();
-	}
-
-	@Override
-	public PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
-		menu.addSection("Network");
-
-		menu.addAction(new SaveNetworkAction("Save", this));
-
-		
-		return menu;
-
-	}
-
-	/**
 	 * Creates the Network Viewer
 	 */
 	public NetworkViewer createNodeViewerInstance() {
 		return new NetworkViewer(this);
+	}
+
+	@Override
+	public NetworkViewer getAndConstructViewer() {
+		return (NetworkViewer) super.getAndConstructViewer();
 	}
 
 	@Override
@@ -127,7 +83,22 @@ public class PNetwork extends PNodeContainer {
 		return typeName;
 	}
 
+	@Override
+	public NetworkViewer getViewer() {
+		return (NetworkViewer) super.getViewer();
+	}
 
+	@Override
+	public void saveModel(File file) throws IOException {
+
+		if (getViewer() != null) {
+			getViewer().saveLayoutAsDefault();
+		}
+
+		FileManager fm = new FileManager();
+
+		fm.save((Network) getModel(), file);
+	}
 
 	/**
 	 * Initializes the PNetwork

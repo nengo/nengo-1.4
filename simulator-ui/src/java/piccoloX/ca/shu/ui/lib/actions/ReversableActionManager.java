@@ -1,6 +1,5 @@
 package ca.shu.ui.lib.actions;
 
-import java.util.Stack;
 import java.util.Vector;
 
 import ca.shu.ui.lib.util.Util;

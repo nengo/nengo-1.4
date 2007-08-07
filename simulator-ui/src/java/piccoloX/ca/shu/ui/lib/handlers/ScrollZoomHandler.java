@@ -6,7 +6,6 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.util.PAffineTransform;
 
 public class ScrollZoomHandler extends PBasicInputEventHandler {
 	PActivity zoomActivity;

@@ -1,12 +1,8 @@
 package ca.neo.ui.models.nodes.widgets;
 
-import java.awt.Color;
-
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.icons.IconWrapper;
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.objects.GText;
-import edu.umd.cs.piccolo.nodes.PImage;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 public class ProbeIcon extends IconWrapper {

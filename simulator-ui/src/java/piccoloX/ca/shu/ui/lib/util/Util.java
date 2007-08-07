@@ -1,24 +1,13 @@
 package ca.shu.ui.lib.util;
 
 import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
 import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.impl.GFrame;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.util.PObjectOutputStream;
 import edu.umd.cs.piccolo.util.PStack;
 
 public class Util {
@@ -116,6 +105,7 @@ public class Util {
 	 * @param type
 	 *            The type of node to be picked from the pick tree
 	 */
+	@SuppressWarnings("unchecked")
 	public static Object getNodeFromPickPath(PInputEvent event, Class type) {
 		PStack nodeStack = event.getPath().getNodeStackReference();
 		ListIterator it = nodeStack.listIterator(nodeStack.size());

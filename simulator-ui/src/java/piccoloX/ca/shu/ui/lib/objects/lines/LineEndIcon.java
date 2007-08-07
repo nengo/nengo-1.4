@@ -1,13 +1,9 @@
 package ca.shu.ui.lib.objects.lines;
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.GEdge;
-
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class LineEndIcon extends LineEndWellIcon {
 

@@ -5,7 +5,6 @@ import java.awt.geom.Point2D;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.util.PBounds;
 
 public class WorldGround extends WorldObjectImpl implements WorldLayer {
 

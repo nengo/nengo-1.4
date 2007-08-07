@@ -1,11 +1,9 @@
 package ca.shu.ui.lib.util;
 
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 
 public class MenuBuilder extends AbstractMenuBuilder {

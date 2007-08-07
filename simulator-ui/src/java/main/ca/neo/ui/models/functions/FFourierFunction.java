@@ -1,9 +1,7 @@
 package ca.neo.ui.models.functions;
 
-import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
-import ca.neo.ui.views.objects.configurable.struct.PTInt;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 public class FFourierFunction extends ConfigurableFunction {
@@ -12,7 +10,7 @@ public class FFourierFunction extends ConfigurableFunction {
 			new PTFloat("RMS") };
 
 
-	public Class getFunctionClass() {
+	public Class<FourierFunction> getFunctionClass() {
 		return FourierFunction.class;
 	}
 

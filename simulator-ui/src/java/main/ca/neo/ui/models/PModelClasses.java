@@ -5,7 +5,6 @@ import ca.neo.model.Node;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.neuron.Neuron;
-import ca.neo.ui.models.nodes.PEnsemble;
 import ca.neo.ui.models.nodes.PFunctionInput;
 import ca.neo.ui.models.nodes.PNEFEnsemble;
 import ca.neo.ui.models.nodes.PNetwork;

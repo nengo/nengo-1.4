@@ -352,6 +352,7 @@ public class GFrame extends JFrame {
 		return PUtil.createBasicScenegraph();
 	}
 
+	@SuppressWarnings("unchecked")
 	protected DisplayMode getBestDisplayMode(GraphicsDevice device) {
 		Iterator itr = getPreferredDisplayModes(device).iterator();
 		while (itr.hasNext()) {
@@ -373,6 +374,7 @@ public class GFrame extends JFrame {
 	 * By default return the current display mode. Subclasses may override this
 	 * method to return other modes in the collection.
 	 */
+	@SuppressWarnings("unchecked")
 	protected Collection getPreferredDisplayModes(GraphicsDevice device) {
 		ArrayList<DisplayMode> result = new ArrayList<DisplayMode>();
 

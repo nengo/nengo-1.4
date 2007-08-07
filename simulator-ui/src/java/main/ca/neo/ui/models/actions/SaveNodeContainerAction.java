@@ -6,21 +6,21 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 
 import ca.neo.ui.NeoGraphics;
-import ca.neo.ui.models.nodes.PNetwork;
+import ca.neo.ui.models.nodes.PNodeContainer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
-import ca.shu.ui.lib.objects.widgets.TrackedMsg;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 
-public class SaveNetworkAction extends StandardAction {
-	PNetwork networkUI;
+public class SaveNodeContainerAction extends StandardAction {
+	PNodeContainer nodeContainer;
 
-	public SaveNetworkAction(String description, PNetwork network) {
-		super("Save network", description);
-		this.networkUI = network;
+	public SaveNodeContainerAction(String description,
+			PNodeContainer nodeContainer) {
+		super("Save " + nodeContainer.getTypeName(), description);
+		this.nodeContainer = nodeContainer;
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -41,7 +41,7 @@ public class SaveNetworkAction extends StandardAction {
 				@Override
 				public void doActivity() {
 					try {
-						networkUI.saveNetwork(file);
+						nodeContainer.saveModel(file);
 					} catch (IOException e) {
 						Util.Error("Could not save file: " + e.toString());
 					} catch (OutOfMemoryError e) {

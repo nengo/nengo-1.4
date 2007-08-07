@@ -17,7 +17,7 @@ import ca.neo.model.Termination;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.actions.SaveNetworkAction;
+import ca.neo.ui.models.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.icons.IconWrapper;
 import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.models.nodes.connectors.POrigin;
@@ -28,15 +28,14 @@ import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTInt;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.CreateModelAction;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.NamedObject;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
@@ -55,8 +54,7 @@ import edu.umd.cs.piccolo.activities.PTransformActivity;
  * 
  * @author Shu Wu
  */
-public class NetworkViewer extends NodeViewer implements NamedObject,
-		Interactable {
+public class NetworkViewer extends NodeViewer {
 	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
 
 	private static final long serialVersionUID = -3018937112672942653L;
@@ -69,6 +67,74 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 	// PNetwork networkProxy;
 
 	IconWrapper icon;
+
+	public void saveLayoutAsDefault() {
+		saveNodeLayout(NetworkViewer.DEFAULT_NODE_LAYOUT_NAME);
+	}
+
+	@Override
+	public void destroy() {
+		saveLayoutAsDefault();
+		super.destroy();
+	}
+
+	/**
+	 * Saves layout
+	 * 
+	 * @param name
+	 */
+	public void saveNodeLayout(String name) {
+
+		NodeLayoutManager layouts = getNodeLayoutManager();
+		if (layouts != null) {
+			NodeLayout nodeLayout = new NodeLayout(name);
+
+			Enumeration<PNeoNode> en = nodesUI.elements();
+
+			while (en.hasMoreElements()) {
+				PNeoNode node = en.nextElement();
+				nodeLayout.addPosition(node.getName(), node.getOffset());
+
+			}
+
+			layouts.addLayout(nodeLayout);
+		} else {
+			Util.Error("Could not save node layout");
+		}
+	}
+
+	/**
+	 * 
+	 * @return The Key used to access Metadata containing layout information
+	 *         from the Network node
+	 */
+	private String getLayoutManagerKey() {
+
+		return LAYOUT_MANAGER_KEY;
+
+	}
+
+	public NodeLayoutManager getNodeLayoutManager() {
+		NodeLayoutManager layoutManager = null;
+		try {
+
+			Object obj = getViewerParent().getModel().getMetaData(
+					getLayoutManagerKey());
+			if (obj != null)
+				layoutManager = (NodeLayoutManager) obj;
+		} catch (Throwable e) {
+			Util.Error("Could not access layout manager, creating a new one");
+			// catch all exceptions
+		}
+
+		if (layoutManager == null) {
+			layoutManager = new NodeLayoutManager();
+			getViewerParent().getModel().setMetaData(getLayoutManagerKey(),
+					layoutManager);
+		}
+		return (NodeLayoutManager) layoutManager;
+
+	}
 
 	/**
 	 * 
@@ -89,8 +155,8 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 	}
 
 	@Override
-	public void addNodeToUI(PNeoNode nodeProxy, boolean updateModel,
-			boolean dropInCenterOfCamera) {
+	public void addNodeToViewer(PNeoNode nodeProxy, boolean updateModel,
+			boolean dropInCenterOfCamera, boolean moveCamera) {
 		if (updateModel) {
 			try {
 
@@ -101,7 +167,8 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 				return;
 			}
 		}
-		super.addNodeToUI(nodeProxy, updateModel, dropInCenterOfCamera);
+		super.addNodeToViewer(nodeProxy, updateModel, dropInCenterOfCamera,
+				moveCamera);
 	}
 
 	public void applyDefaultLayout() {
@@ -161,7 +228,7 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 		 */
 		menu.addSection("File");
 		menu
-				.addAction(new SaveNetworkAction("Save network",
+				.addAction(new SaveNodeContainerAction("Save network",
 						getViewerParent()));
 
 		/*
@@ -177,15 +244,15 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 		 * Nodes
 		 */
 		for (int i = 0; i < PModelClasses.NODE_TYPES.length; i++) {
-			nodesMenu
-					.addAction(new AddModelAction(PModelClasses.NODE_TYPES[i]));
+			nodesMenu.addAction(new CreateModelAction(this,
+					PModelClasses.NODE_TYPES[i]));
 		}
 
 		/*
 		 * Node Containers
 		 */
 		for (int i = 0; i < PModelClasses.NODE_CONTAINER_TYPES.length; i++) {
-			nodeContainersMenu.addAction(new AddModelAction(
+			nodeContainersMenu.addAction(new CreateModelAction(this,
 					PModelClasses.NODE_CONTAINER_TYPES[i]));
 		}
 
@@ -193,7 +260,7 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 		 * Functions
 		 */
 		for (int i = 0; i < PModelClasses.FUNCTION_TYPES.length; i++) {
-			functionsMenu.addAction(new AddModelAction(
+			functionsMenu.addAction(new CreateModelAction(this,
 					PModelClasses.FUNCTION_TYPES[i]));
 		}
 
@@ -352,8 +419,7 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 			Point2D savedPosition = layout.getPosition(node.getName());
 			if (savedPosition != null) {
 				node.animateToPositionScaleRotation(savedPosition.getX(),
-						savedPosition.getY(), node.getScale(), node
-								.getRotation(), 1000);
+						savedPosition.getY(), 1, 0, 1000);
 			}
 		}
 		return true;
@@ -385,7 +451,7 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 			 */
 			if (getNode(node.getName()) == null) {
 				PNeoNode nodeUI = PModelClasses.createUIFromModel(node);
-				addNodeToUI(nodeUI, false, false);
+				addNodeToViewer(nodeUI, false, false, false);
 			}
 		}
 
@@ -444,62 +510,6 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 
 	}
 
-	class AddModelAction extends ReversableAction {
-
-		private static final long serialVersionUID = 1L;
-
-		@SuppressWarnings("unchecked")
-		Class nc;
-
-		PNeoNode nodeAdded;
-
-		@SuppressWarnings("unchecked")
-		public AddModelAction(Class nc) {
-			super("Add new " + nc.getSimpleName(), nc.getSimpleName());
-			this.nc = nc;
-		}
-
-		@Override
-		protected void action() throws ActionException {
-
-			PNeoNode nodeProxy = null;
-			try {
-
-				nodeProxy = (PNeoNode) nc.newInstance();
-				new DialogConfig(nodeProxy);
-
-				if (nodeProxy.isModelCreated()) {
-
-					addNodeToUI(nodeProxy, true, true);
-				}
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			if (nodeProxy == null) {
-				throw new ActionException("Could not create node", false);
-			} else {
-				nodeAdded = nodeProxy;
-			}
-		}
-
-		@Override
-		protected void undo() throws ActionException {
-			nodeAdded.destroy();
-
-		}
-	}
-
 	class JungLayoutActivity extends TrackedActivity {
 		Layout layout;
 
@@ -536,9 +546,8 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 							if (coord != null) {
 								nodeMoveActivity = node
 										.animateToPositionScaleRotation(coord
-												.getX(), coord.getY(), node
-												.getScale(),
-												node.getRotation(), 1000);
+												.getX(), coord.getY(), 1, 0,
+												1000);
 							}
 
 						}

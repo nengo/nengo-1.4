@@ -1,7 +1,9 @@
 *******************************************
  Done
 *******************************************
+(08/07) done - save/open ensembles
 (08/07) done - Plot Functions
+(08/07) done - added option to remove projections from terminations
 (08/07) done - hide/show origins and terminations
 (08/07) done - automatically show origins and terminations on hover over
 
@@ -11,7 +13,7 @@
 done - File menu, to load saved networks (Use Swing File Dialogs)
 done - Save network from NetworkViewer, or PNetwork
 
-done-Undo & redo would be a big help
+done - undo /redo
 done - It would be nice to have an easy way to maximize the network viewer
 	(controls in upper-right corner like windows would be good)
 done- When a node is deleted, its origins and terminations should also be deleted
@@ -21,9 +23,13 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
-- There should be a plot option for function nodes (with user-defined domain)
-- When a projection is removed the corresponding origin and
-termination should remain
+fixed warnings
+
+show simulation progress in UI
+
+display information about nodes in a hover over
+
+set simulator
 
 Add ability to remove probes from simulator
 
@@ -37,13 +43,8 @@ Connection Weights
 there is no way to set connection weights on a projection? (something
 like a spreadsheet-style matrix editor would be good)
 
-Ctrl-key to enable popups (even when autopops are turned off)
-
-
 
 redo functionality to allow duplicate actions to be performed
-
-
 
 
 *******************************************
@@ -98,6 +99,7 @@ Customize FileChooser to add extensions
 
 debug paint events using PDebug to optimize performance
 	
+Ctrl-key to enable popups (even when autopops are turned off)
 
 
 *******************************************
@@ -110,7 +112,9 @@ bug: window appears underneath lines and widgets
 *******************************************
  Bryan requests
 *******************************************
-
+Ensemble's don't have metadata, can't save layout information
 
 more Network examples
 
+Require events notification
+	show scopes data in real time from the UI

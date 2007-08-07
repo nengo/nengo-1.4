@@ -1,9 +1,7 @@
 package ca.neo.ui.models.functions;
 
-import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
-import ca.neo.ui.views.objects.configurable.struct.PTInt;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 public class FGaussianPDF extends ConfigurableFunction {
@@ -11,7 +9,7 @@ public class FGaussianPDF extends ConfigurableFunction {
 			new PTFloat("Mean"), new PTFloat("Variance"), new PTFloat("Peak") };
 
 
-	public Class getFunctionClass() {
+	public Class<GaussianPDF> getFunctionClass() {
 		return GaussianPDF.class;
 	}
 

@@ -2,13 +2,11 @@ package ca.shu.ui.lib.handlers;
 
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.impl.GCanvas;
 import ca.shu.ui.lib.world.impl.WorldImpl;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 public class TooltipHandler extends PBasicInputEventHandler {
 

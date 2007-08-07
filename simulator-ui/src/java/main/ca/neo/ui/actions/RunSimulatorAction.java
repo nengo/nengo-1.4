@@ -1,7 +1,5 @@
 package ca.neo.ui.actions;
 
-import java.awt.event.ActionEvent;
-
 import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
 import ca.neo.ui.views.objects.configurable.AbstractConfigurable;

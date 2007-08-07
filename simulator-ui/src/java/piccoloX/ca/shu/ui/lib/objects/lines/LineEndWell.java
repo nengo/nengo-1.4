@@ -6,7 +6,6 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PPickPath;
-import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 public class LineEndWell extends WorldObjectImpl  {
 
@@ -126,6 +125,8 @@ class MouseHandler extends PBasicInputEventHandler {
  * 
  */
 class Edge extends GEdge {
+
+	private static final long serialVersionUID = 1L;
 
 	public Edge(LineEndWell startNode, LineEnd endNode) {
 		super(startNode, endNode);

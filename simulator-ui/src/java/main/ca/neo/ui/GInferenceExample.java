@@ -1,6 +1,5 @@
 package ca.neo.ui;
 
-import ca.neo.examples.FuzzyLogicExample;
 import ca.neo.examples.InferenceExample;
 import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
@@ -34,7 +33,7 @@ public class GInferenceExample {
 			neoGraphics.addWorldObject(networkUI);
 
 			networkUI.openViewer();
-			networkUI.getViewer().applyJungLayout(FRLayout.class);
+			networkUI.getAndConstructViewer().applyJungLayout(FRLayout.class);
 			task.finished();
 
 		} catch (StructuralException e) {

@@ -21,7 +21,6 @@ import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PNodeFilter;
-import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
 /*
  * TODO: Clean up class, move non-core functionality to child objects
@@ -145,7 +144,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	public PTransformActivity animateToPosition(double x, double y,
 			long duration) {
 
-		return animateToPositionScaleRotation(x, y, getScale(), getRotation(), duration);
+		return animateToPositionScaleRotation(x, y, 1, 0, duration);
 	}
 
 	@Override

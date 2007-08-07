@@ -1,7 +1,6 @@
 package ca.shu.ui.lib.activities;
 
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
 public class Fader extends PInterpolatingActivity {

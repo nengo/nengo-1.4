@@ -1,8 +1,5 @@
 package ca.neo.ui.views.objects.configurable;
 
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 

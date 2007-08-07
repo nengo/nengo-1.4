@@ -4,10 +4,8 @@ import ca.neo.examples.FuzzyLogicExample;
 import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.models.nodes.PNetwork;
-import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.objects.widgets.TrackedMsg;
 import ca.shu.ui.lib.util.Util;
-import edu.uci.ics.jung.visualization.FRLayout;
 
 /**
  * In this example, the FuzzyLogic network is constructed from an existing
@@ -33,7 +31,7 @@ public class GFuzzyLogicExample {
 
 			neoGraphics.addWorldObject(networkUI);
 
-			NodeViewer viewer = networkUI.openViewer();
+			networkUI.openViewer();
 
 			task.finished();
 

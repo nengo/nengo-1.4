@@ -1,9 +1,6 @@
 package ca.shu.ui.lib.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 import javax.swing.AbstractAction;
@@ -11,8 +8,6 @@ import javax.swing.Action;
 import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.util.Util;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PObjectOutputStream;
 
 public abstract class StandardAction implements Serializable {
 

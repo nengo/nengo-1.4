@@ -2,10 +2,8 @@ package ca.neo.ui.models.viewers;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import ca.neo.ui.models.PNeoNode;
 

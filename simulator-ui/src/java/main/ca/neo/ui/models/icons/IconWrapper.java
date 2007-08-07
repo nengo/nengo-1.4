@@ -1,20 +1,16 @@
 package ca.neo.ui.models.icons;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.GText;
-import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
  * An UI Object with an Icon and a Label
@@ -30,8 +26,6 @@ public class IconWrapper extends WorldObjectImpl implements NamedObject,
 	private static final long serialVersionUID = 1L;
 
 	PNode iconReal;
-
-
 
 	GText label;
 

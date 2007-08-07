@@ -1,13 +1,11 @@
 package ca.shu.ui.lib.world.impl;
 
-import java.util.List;
 import java.util.Stack;
 
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
-import edu.umd.cs.piccolo.PNode;
 
 /**
  * Holder of worlds

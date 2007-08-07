@@ -3,15 +3,12 @@ package ca.neo.ui.models.nodes.connectors;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.nef.impl.DecodedTermination;
-import ca.neo.ui.models.PModel;
-import ca.neo.ui.models.icons.IconWrapper;
 import ca.neo.ui.models.nodes.PNEFEnsemble;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTBoolean;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
-import ca.shu.ui.lib.objects.lines.LineInIcon;
 
 public class PDecodedTermination extends PTermination {
 

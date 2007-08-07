@@ -30,6 +30,7 @@ public abstract class PropDescriptor implements Serializable {
 		return name;
 	}
 
+	@SuppressWarnings("unchecked")
 	public abstract Class getTypeClass();
 
 	public abstract String getTypeName();

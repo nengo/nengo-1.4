@@ -7,6 +7,8 @@ import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
 public class PTString extends PropDescriptor {
 
+	private static final long serialVersionUID = 1L;
+
 	public PTString(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
@@ -19,7 +21,7 @@ public class PTString extends PropDescriptor {
 	}
 
 	@Override
-	public Class getTypeClass() {
+	public Class<String> getTypeClass() {
 		// TODO Auto-generated method stub
 		return String.class;
 	}

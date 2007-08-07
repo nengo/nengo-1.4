@@ -1,6 +1,5 @@
 package ca.neo.ui.models.nodes;
 
-import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;

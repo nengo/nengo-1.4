@@ -4,11 +4,10 @@ import java.awt.Dimension;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import ca.neo.model.Network;
 import ca.neo.model.Node;
+import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.models.nodes.PNodeContainer;
 import ca.neo.ui.models.nodes.connectors.PModelWidget;
 import ca.shu.ui.lib.handlers.Interactable;
@@ -19,7 +18,6 @@ import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.impl.WorldImpl;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -32,14 +30,15 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * 
  */
 public abstract class NodeViewer extends WorldImpl implements NamedObject,
-		Interactable {
+		Interactable, INodeContainer {
 	private static final long serialVersionUID = 1L;
+
 	static final Dimension DEFAULT_BOUNDS = new Dimension(1000, 1000);
 	static final String LAYOUT_MANAGER_KEY = "layout/manager";
-
 	private Dimension layoutBounds = DEFAULT_BOUNDS;
 
 	private PNodeContainer parentOfViewer;
+
 	protected Hashtable<String, PNeoNode> nodesUI = new Hashtable<String, PNeoNode>();
 
 	/**
@@ -74,8 +73,9 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 
 	}
 
-	public void addNodeToUI(PNeoNode nodeProxy) {
-		addNodeToUI(nodeProxy, true, true);
+	public void addNeoNode(PNeoNode node) {
+		addNodeToViewer(node, true, true, false);
+
 	}
 
 	/**
@@ -85,15 +85,19 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 	 * @param updateModel
 	 *            if true, the network model is updated. this may be false, if
 	 *            it is known that the network model already contains this node
+	 * @param dropInCenterOfCamera
+	 *            whether to drop the node in the center of the camera
+	 * @param moveCameraToNode
+	 *            whether to move the camera to where the node is
 	 */
-	public void addNodeToUI(PNeoNode nodeProxy, boolean updateModel,
-			boolean dropInCenterOfCamera) {
+	public void addNodeToViewer(PNeoNode nodeProxy, boolean updateModel,
+			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
 
 		/**
 		 * Moves the camera to where the node is positioned, if it's not dropped
 		 * in the center of the camera
 		 */
-		if (!dropInCenterOfCamera) {
+		if (moveCameraToNode) {
 			setCameraCenterPosition(nodeProxy.getOffset().getX(), nodeProxy
 					.getOffset().getY());
 		}
@@ -153,39 +157,6 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 		return "Network Viewer: " + getViewerParent().getName();
 	}
 
-	public Network getNetworkParent() {
-		PNode node = parentOfViewer;
-		while (node != null) {
-			if (node instanceof PNetwork) {
-				return ((PNetwork) node).getModel();
-			}
-
-			node = node.getParent();
-		}
-
-		return null;
-	}
-
-	public NodeLayoutManager getNodeLayoutManager() {
-		NodeLayoutManager layoutManager = null;
-		try {
-			Object obj = getNetworkParent().getMetaData(getLayoutManagerKey());
-			if (obj != null)
-				layoutManager = (NodeLayoutManager) obj;
-		} catch (Throwable e) {
-			Util.Error("Could not access layout manager, creating a new one");
-			// catch all exceptions
-		}
-
-		if (layoutManager == null) {
-			layoutManager = new NodeLayoutManager();
-			getNetworkParent()
-					.setMetaData(getLayoutManagerKey(), layoutManager);
-		}
-		return (NodeLayoutManager) layoutManager;
-
-	}
-
 	public PNodeContainer getViewerParent() {
 		return parentOfViewer;
 	}
@@ -196,27 +167,6 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 			PNeoNode node = enumeration.nextElement();
 			node.hideAllWidgets();
 		}
-	}
-
-	/**
-	 * Saves layout
-	 * 
-	 * @param name
-	 */
-	public void saveNodeLayout(String name) {
-
-		NodeLayoutManager layouts = getNodeLayoutManager();
-		NodeLayout nodeLayout = new NodeLayout(name);
-
-		Enumeration<PNeoNode> en = nodesUI.elements();
-
-		while (en.hasMoreElements()) {
-			PNeoNode node = en.nextElement();
-			nodeLayout.addPosition(node.getName(), node.getOffset());
-
-		}
-
-		layouts.addLayout(nodeLayout);
 	}
 
 	public void setLayoutBounds(Dimension layoutBounds) {
@@ -233,27 +183,13 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 
 	/**
 	 * 
-	 * @return The Key used to access Metadata containing layout information
-	 *         from the Network node
-	 */
-	private String getLayoutManagerKey() {
-		if (parentOfViewer instanceof PNetwork) {
-			return LAYOUT_MANAGER_KEY;
-
-		} else {
-			return getName() + "/" + LAYOUT_MANAGER_KEY;
-		}
-	}
-
-	protected abstract void updateNodesFromModel();
-
-	/**
-	 * 
 	 * @return Layout bounds to be used by Layout algorithms
 	 */
 	protected Dimension getLayoutBounds() {
 		return layoutBounds;
 	}
+
+	protected abstract void updateNodesFromModel();
 
 }
 

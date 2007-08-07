@@ -24,6 +24,10 @@ import ca.uwaterloo.nesim.editor.model.impl.CouplingMatrixImpl;
  */
 public class MatrixEditor extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private TableModel myTableModel;
 	
 	/**
@@ -39,6 +43,10 @@ public class MatrixEditor extends JPanel {
 		
 	private class MatrixTableModel extends AbstractTableModel {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private CouplingMatrix myMatrix;
 		
 		public MatrixTableModel(CouplingMatrix theMatrix) {

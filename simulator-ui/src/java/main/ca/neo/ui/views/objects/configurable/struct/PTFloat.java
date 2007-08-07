@@ -7,6 +7,8 @@ import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 
 public class PTFloat extends PropDescriptor {
 
+	private static final long serialVersionUID = 1L;
+
 	public PTFloat(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
@@ -19,14 +21,12 @@ public class PTFloat extends PropDescriptor {
 	}
 
 	@Override
-	public Class getTypeClass() {
-		// TODO Auto-generated method stub
-		return float.class;
+	public Class<Float> getTypeClass() {
+		return Float.class;
 	}
 
 	@Override
 	public String getTypeName() {
-		// TODO Auto-generated method stub
 		return "Float";
 	}
 
@@ -37,7 +37,6 @@ class FloatInputPanel extends PropertyInputPanel {
 
 	public FloatInputPanel(PropDescriptor property) {
 		super(property);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -47,7 +46,6 @@ class FloatInputPanel extends PropertyInputPanel {
 
 	@Override
 	public void init(JPanel panel) {
-		// TODO Auto-generated method stub
 		tf = new JTextField(10);
 
 		panel.add(tf);

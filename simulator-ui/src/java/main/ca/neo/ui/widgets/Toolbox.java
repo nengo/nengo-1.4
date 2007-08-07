@@ -12,8 +12,6 @@ import ca.shu.ui.lib.objects.Tooltip;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PDragEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
 
 public class Toolbox extends WorldObjectImpl {
 
@@ -114,6 +112,7 @@ class SymbolHolder extends WorldObjectImpl {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<PModel> getSymbols() {
 		Vector<PModel> symbols = new Vector<PModel>();
 

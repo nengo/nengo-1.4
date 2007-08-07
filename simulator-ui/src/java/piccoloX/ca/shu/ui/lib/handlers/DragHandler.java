@@ -1,14 +1,11 @@
 package ca.shu.ui.lib.handlers;
 
 import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
 import java.util.ListIterator;
 
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
-import ca.shu.ui.lib.world.impl.WorldSky;
-import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.event.PDragEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -54,6 +51,7 @@ public class DragHandler extends PDragEventHandler {
 		return (WorldObjectImpl) getDraggedNode();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void startDrag(PInputEvent event) {
 		if (event.getButton() != MouseEvent.BUTTON1)

@@ -89,6 +89,7 @@ public class BoundsHandle extends PHandle {
 		camera.addChild(new BoundsHandle(PBoundsLocator.createSouthWestLocator(aNode)));
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void removeBoundsHandlesFrom(PNode aNode) {
 		ArrayList handles = new ArrayList();
 
@@ -237,6 +238,7 @@ public class BoundsHandle extends PHandle {
 		l.getNode().endResizeBounds();
 	}	
 	
+	@SuppressWarnings("unchecked")
 	public void flipSiblingBoundsHandles(boolean flipX, boolean flipY) {
 		Iterator i = getParent().getChildrenIterator();
 		while (i.hasNext()) {

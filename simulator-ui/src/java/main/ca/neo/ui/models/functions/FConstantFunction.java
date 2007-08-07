@@ -10,7 +10,7 @@ public class FConstantFunction extends ConfigurableFunction {
 			new PTInt("Dimension"), new PTFloat("Value") };
 
 
-	public Class getFunctionClass() {
+	public Class<ConstantFunction> getFunctionClass() {
 		return ConstantFunction.class;
 	}
 

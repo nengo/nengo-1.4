@@ -25,6 +25,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  */
 public class GText extends PNode {
 
+	private static final long serialVersionUID = 1L;
 	/**
 	 * The property name that identifies a change of this node's text (see
 	 * {@link #getText getText}). Both old and new value will be set in any
@@ -203,6 +204,7 @@ public class GText extends PNode {
 	 * Compute the bounds of the text wrapped by this node. The text layout is
 	 * wrapped based on the bounds of this node.
 	 */
+	@SuppressWarnings("unchecked")
 	public void recomputeLayout() {
 		ArrayList linesList = new ArrayList();
 		double textWidth = 0;
@@ -272,8 +274,8 @@ public class GText extends PNode {
 	}
 
 	/*
-	 * TODO: Adaptive rendering
-	 * (non-Javadoc)
+	 * TODO: Adaptive rendering (non-Javadoc)
+	 * 
 	 * @see edu.umd.cs.piccolo.PNode#paint(edu.umd.cs.piccolo.util.PPaintContext)
 	 */
 	protected void paint(PPaintContext paintContext) {
@@ -285,7 +287,7 @@ public class GText extends PNode {
 			paintScale = 1;
 
 		float screenFontSize = getFont().getSize() * paintScale;
-		
+
 		if (textPaint != null && screenFontSize > greekThreshold) {
 			float x = (float) getX();
 			float y = (float) getY();

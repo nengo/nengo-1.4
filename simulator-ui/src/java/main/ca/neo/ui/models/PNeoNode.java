@@ -324,6 +324,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * Hides all origins and terminations
 	 */
 	public void hideAllOandT() {
+		if (widgets == null)
+			return;
+
 		Iterator<PModelWidget> it = widgets.iterator();
 		while (it.hasNext()) {
 			PModelWidget widget = it.next();
@@ -478,6 +481,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * Hide all widgets
 	 */
 	public void hideAllWidgets() {
+		if (widgets == null)
+			return;
+
 		Iterator<PModelWidget> it = widgets.iterator();
 		while (it.hasNext()) {
 			it.next().setWidgetVisible(false);
@@ -494,18 +500,18 @@ public abstract class PNeoNode extends PModelConfigurable {
 		}
 	}
 
-	@Override
+	/**
+	 * Todo: update origins and terminations based on model
+	 */
 	public void update() {
 
-		super.update();
-
-		Origin[] origins = getModel().getOrigins();
-		Termination[] terminations = getModel().getTerminations();
-
-		for (int i = 0; i < origins.length; i++) {
-			Origin origin = origins[i];
-
-		}
+//		Origin[] origins = getModel().getOrigins();
+//		Termination[] terminations = getModel().getTerminations();
+//
+//		for (int i = 0; i < origins.length; i++) {
+//			Origin origin = origins[i];
+//
+//		}
 	}
 
 	private void init() {
@@ -620,7 +626,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		@Override
 		protected void action() throws ActionException {
-			hideAllOandT();
+			hideAllWidgets();
 		}
 	}
 

@@ -1,15 +1,12 @@
 package ca.shu.ui.lib.objects.widgets;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.objects.GEdge;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class AffinityHalo extends GEdge {

@@ -1,6 +1,5 @@
 package ca.shu.ui.lib.objects.lines;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
@@ -10,6 +9,9 @@ import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class LineEndWellIcon extends WorldObjectImpl {
+
+	private static final long serialVersionUID = 1L;
+
 	public LineEndWellIcon() {
 		super();
 		this.setBounds(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);

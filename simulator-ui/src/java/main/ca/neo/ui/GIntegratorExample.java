@@ -1,7 +1,5 @@
 package ca.neo.ui;
 
-import ca.neo.examples.FuzzyLogicExample;
-import ca.neo.examples.IntegratorExample;
 import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.model.Network;
@@ -13,12 +11,7 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
-import ca.neo.plot.Plotter;
-import ca.neo.ui.models.nodes.PFunctionInput;
-import ca.neo.ui.models.nodes.PNEFEnsemble;
 import ca.neo.ui.models.nodes.PNetwork;
-import ca.neo.ui.models.nodes.connectors.PTermination;
-import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.objects.widgets.TrackedMsg;
 import ca.shu.ui.lib.util.Util;
 
@@ -52,7 +45,7 @@ public class GIntegratorExample {
 
 			neoGraphics.addWorldObject(networkUI);
 
-			NodeViewer viewer = networkUI.openViewer();
+			networkUI.openViewer();
 
 			task.finished();
 

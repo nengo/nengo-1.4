@@ -1,18 +1,15 @@
 package ca.neo.ui.models.nodes;
 
+import java.io.File;
+import java.io.IOException;
+
+import ca.neo.io.FileManager;
 import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
-import ca.neo.model.nef.NEFEnsemble;
-import ca.neo.plot.Plotter;
 import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 
 public class PEnsemble extends PNodeContainer {
@@ -46,6 +43,12 @@ public class PEnsemble extends PNodeContainer {
 	public String getTypeName() {
 
 		return "Ensemble";
+	}
+
+	public void saveModel(File file) throws IOException {
+		FileManager fm = new FileManager();
+
+		fm.save(getModel(), file);
 	}
 
 	private void init() {
