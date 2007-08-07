@@ -10,7 +10,7 @@ import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-public class LineIn extends WorldObjectImpl {
+public class LineInIcon extends WorldObjectImpl {
 
 	/**
 	 * 
@@ -23,40 +23,11 @@ public class LineIn extends WorldObjectImpl {
 
 	Color color = Style.COLOR_LINEIN;
 
-	LineEnd lineEnd;
-
-	public LineIn() {
+	public LineInIcon() {
 		super();
 		this.setBounds(0, 0, LINE_IN_WIDTH, LINE_IN_HEIGHT);
 		this.setDraggable(false);
 
-	}
-
-	public boolean connect(LineEnd lineEnd) {
-		if (this.lineEnd == null) {
-
-			this.lineEnd = lineEnd;
-
-			Point2D position = lineEnd.localToGlobal(new Point2D.Double(0, 0));
-			globalToLocal(position);
-
-			lineEnd.removeFromParent();
-			addChild(lineEnd);
-			lineEnd.setOffset(position.getX(), position.getY());
-
-			lineEnd.animateToPosition(0, 0, 500);
-
-			return true;
-		} else {
-			// There is already a lineEnd connected
-			return false;
-		}
-	}
-
-	public void disconnect() {
-		
-		
-		lineEnd = null;		
 	}
 
 	public Color getColor() {

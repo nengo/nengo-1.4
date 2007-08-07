@@ -130,6 +130,22 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 
 	}
 
+	public void showAllWidgets() {
+		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		while (enumeration.hasMoreElements()) {
+			PNeoNode node = enumeration.nextElement();
+			node.showAllWidgets();
+		}
+	}
+
+	public void hideAllWidgets() {
+		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		while (enumeration.hasMoreElements()) {
+			PNeoNode node = enumeration.nextElement();
+			node.hideAllWidgets();
+		}
+	}
+
 	@Override
 	public PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
@@ -292,6 +308,7 @@ class NodeHoverHandler extends PBasicInputEventHandler {
 			if (selectedNode != null)
 				selectedNode.setHoveredOver(false);
 			if (node != null) {
+
 				node.setHoveredOver(true);
 			}
 			selectedNode = node;

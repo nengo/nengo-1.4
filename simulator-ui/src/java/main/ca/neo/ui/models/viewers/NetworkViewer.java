@@ -47,8 +47,6 @@ import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
  * 
@@ -434,22 +432,7 @@ public class NetworkViewer extends NodeViewer implements NamedObject,
 
 	}
 
-	public void showAllWidgets() {
-		Enumeration<PNeoNode> enumeration = nodesUI.elements();
-		while (enumeration.hasMoreElements()) {
-			PNeoNode node = enumeration.nextElement();
-			node.showAllTerminations();
-			node.showAllOrigins();
-		}
-	}
-
-	public void hideAllWidgets() {
-		Enumeration<PNeoNode> enumeration = nodesUI.elements();
-		while (enumeration.hasMoreElements()) {
-			PNeoNode node = enumeration.nextElement();
-			node.hideAllOandT();
-		}
-	}
+	
 
 	class AddModelAction extends ReversableAction {
 

@@ -28,8 +28,6 @@ import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
 
 public abstract class PNeoNode extends PModelConfigurable {
 
@@ -336,10 +334,13 @@ public abstract class PNeoNode extends PModelConfigurable {
 		}
 	}
 
+	int i = 0;
+
 	/**
 	 * layout widgets such as Origins and Terminations
 	 */
 	public void layoutWidgets() {
+
 		if (widgets != null) {
 			Rectangle2D bounds = getIcon().localToGlobal(getIcon().getBounds());
 
@@ -374,10 +375,10 @@ public abstract class PNeoNode extends PModelConfigurable {
 					double scale = widget.getScale();
 
 					if (!isHoverOver && !(widget).isWidgetVisible()) {
-						widget
-								.setOffset(centerX - widget.getWidth() * scale
-										/ 2f, centerY - widget.getHeight()
-										* scale / 2f);
+						double x = centerX - widget.getWidth() * scale / 2f;
+						double y = centerY - widget.getHeight() * scale / 2f;
+
+						widget.setOffset(x, y);
 
 						widget.setVisible(false);
 						widget.setPickable(false);
@@ -473,6 +474,26 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	}
 
+	/**
+	 * Hide all widgets
+	 */
+	public void hideAllWidgets() {
+		Iterator<PModelWidget> it = widgets.iterator();
+		while (it.hasNext()) {
+			it.next().setWidgetVisible(false);
+		}
+	}
+
+	/**
+	 * Show all widgets
+	 */
+	public void showAllWidgets() {
+		Iterator<PModelWidget> it = widgets.iterator();
+		while (it.hasNext()) {
+			it.next().setWidgetVisible(true);
+		}
+	}
+
 	@Override
 	public void update() {
 
@@ -552,6 +573,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		while (it.hasNext()) {
 			WorldObjectImpl wo = it.next();
 			wo.signalBoundsChanged();
+
 			layer.addChild(wo);
 			wo.moveToFront();
 		}

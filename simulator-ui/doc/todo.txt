@@ -20,8 +20,6 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
-- There should be separate options for removing and hiding origins
-(some can't be removed but we don't want to see them)
 - There should be a plot option for function nodes (with user-defined domain)
 - When a projection is removed the corresponding origin and
 termination should remain

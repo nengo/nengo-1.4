@@ -8,7 +8,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PPickPath;
 import edu.umd.cs.piccolox.handles.PBoundsHandle;
 
-public class LineEndWell extends WorldObjectImpl {
+public class LineEndWell extends WorldObjectImpl  {
 
 	public LineEndWell() {
 		super();

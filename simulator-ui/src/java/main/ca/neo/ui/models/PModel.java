@@ -67,7 +67,7 @@ public abstract class PModel extends WorldObjectImpl implements Interactable {
 
 		MenuBuilder objectMenu = menu.createSubMenu("Object");
 
-		objectMenu.addAction(new RemoveModelAction());
+		objectMenu.addAction(new RemoveModelAction("Remove " + getTypeName()));
 
 		return menu;
 	}
@@ -76,8 +76,8 @@ public abstract class PModel extends WorldObjectImpl implements Interactable {
 
 		private static final long serialVersionUID = 1L;
 
-		public RemoveModelAction() {
-			super("Remove model", "Remove");
+		public RemoveModelAction(String actionName) {
+			super("Remove " + getTypeName(), actionName);
 		}
 
 		@Override

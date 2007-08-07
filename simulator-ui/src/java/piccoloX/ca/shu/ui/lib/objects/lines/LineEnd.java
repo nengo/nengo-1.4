@@ -20,7 +20,7 @@ public class LineEnd extends WorldObjectImpl {
 
 	private static final long serialVersionUID = 1L;
 
-	private WorldObject target;
+	private ILineAcceptor target;
 	private LineEndWell well;
 
 	public LineEnd(LineEndWell well) {
@@ -45,7 +45,7 @@ public class LineEnd extends WorldObjectImpl {
 		Iterator<WorldObject> it = nodes.iterator();
 		ConnectionState newState = ConnectionState.NOT_CONNECTED;
 
-		WorldObject newTarget = null;
+		ILineAcceptor newTarget = null;
 		while (it.hasNext()) {
 			WorldObject node = it.next();
 
@@ -54,7 +54,7 @@ public class LineEnd extends WorldObjectImpl {
 
 				if (newState == ConnectionState.CONNECTED) {
 
-					newTarget = node;
+					newTarget = (ILineAcceptor) node;
 				}
 				break;
 			}
@@ -80,7 +80,7 @@ public class LineEnd extends WorldObjectImpl {
 	 * @param modifyModel
 	 *            Whether to modify the model represented by the connection
 	 */
-	public void connectTo(WorldObject newTarget, boolean modifyModel) {
+	public void connectTo(ILineAcceptor newTarget, boolean modifyModel) {
 
 		setConnectionState(ConnectionState.CONNECTED, newTarget, modifyModel);
 
@@ -91,7 +91,7 @@ public class LineEnd extends WorldObjectImpl {
 	 *            New connection state
 	 */
 	private void setConnectionState(ConnectionState newState,
-			WorldObject newTarget, boolean modifyModel) {
+			ILineAcceptor newTarget, boolean modifyModel) {
 
 		if (newState == connectionState && newTarget == target) {
 			if (connectionState == ConnectionState.CONNECTED) {
@@ -108,6 +108,7 @@ public class LineEnd extends WorldObjectImpl {
 		 */
 		if (newState != ConnectionState.CONNECTED
 				&& connectionState == ConnectionState.CONNECTED) {
+			target.setLineEnd(null);
 			justDisconnected();
 
 		}
@@ -115,6 +116,7 @@ public class LineEnd extends WorldObjectImpl {
 		switch (newState) {
 		case CONNECTED:
 			if (initConnection(newTarget, modifyModel)) {
+				newTarget.setLineEnd(this);
 				newTarget.addChild(this);
 				this.setOffset(0, 0);
 			} else {
@@ -196,7 +198,7 @@ public class LineEnd extends WorldObjectImpl {
 			return ConnectionState.NOT_CONNECTED;
 		} else if (target == rootOfWell) {
 			return ConnectionState.RECEDED_INTO_WELL;
-		} else if (canConnectTo(target)) {
+		} else if (target instanceof ILineAcceptor && canConnectTo(target)) {
 			return ConnectionState.CONNECTED;
 		}
 

@@ -48,6 +48,12 @@ public abstract class PModelWidget extends PModelConfigurable {
 		return isWidgetVisible;
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param isWidgetVisible
+	 *            Whether the user has marked this widget as hidden
+	 */
 	public void setWidgetVisible(boolean isWidgetVisible) {
 		this.isWidgetVisible = isWidgetVisible;
 

@@ -11,7 +11,7 @@ import ca.neo.ui.views.objects.configurable.struct.PTBoolean;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
-import ca.shu.ui.lib.objects.lines.LineIn;
+import ca.shu.ui.lib.objects.lines.LineInIcon;
 
 public class PDecodedTermination extends PTermination {
 

@@ -1,12 +1,11 @@
 package ca.shu.ui.lib.objects.lines;
 
-/**
- * Deprecated
- */
-//public interface ILineAcceptor {
-//	
-//	public boolean connect(LineEnd lineEnd);
-//	
-//	public void disconnect();
-//	
-//}
+import ca.shu.ui.lib.world.WorldObject;
+
+public interface ILineAcceptor extends WorldObject {
+
+	public boolean setLineEnd(LineEnd lineEnd);
+
+	public void removeLineEnd();
+
+}

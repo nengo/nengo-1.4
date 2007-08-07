@@ -145,7 +145,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	public PTransformActivity animateToPosition(double x, double y,
 			long duration) {
 
-		return animateToPositionScaleRotation(x, y, 1, 0, duration);
+		return animateToPositionScaleRotation(x, y, getScale(), getRotation(), duration);
 	}
 
 	@Override
