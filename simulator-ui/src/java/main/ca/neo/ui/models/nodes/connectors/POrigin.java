@@ -132,6 +132,9 @@ public class POrigin extends PModelWidget {
 	@Override
 	public void destroy() {
 
+		Util
+				.Warning("Origins can only be removed from the UI, not the Model. Projections will be removed.");
+
 		/*
 		 * Removes line ends
 		 */
@@ -162,7 +165,6 @@ public class POrigin extends PModelWidget {
 		@Override
 		public void destroy() {
 			removeOriginEnd(this);
-			justDisconnected();
 			super.destroy();
 		}
 

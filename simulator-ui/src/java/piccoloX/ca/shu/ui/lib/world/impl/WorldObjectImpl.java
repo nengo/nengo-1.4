@@ -35,7 +35,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	private PPath frame = null;
 
-	private boolean isDestroyed;
+	private boolean isDestroyed = false;
 
 	private boolean isDraggable = true;
 

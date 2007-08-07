@@ -5,6 +5,7 @@ import ca.neo.ui.models.PNeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.Util;
 
 public abstract class PModelWidget extends PModelConfigurable {
 	private boolean isWidgetVisible = true;
@@ -34,6 +35,7 @@ public abstract class PModelWidget extends PModelConfigurable {
 
 	@Override
 	public void destroy() {
+
 		nodeParent.removeWidget(this);
 		super.destroy();
 	}
@@ -97,6 +99,5 @@ public abstract class PModelWidget extends PModelConfigurable {
 
 		}
 	}
-
 
 }

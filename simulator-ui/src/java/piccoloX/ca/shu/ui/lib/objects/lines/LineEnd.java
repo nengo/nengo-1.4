@@ -13,11 +13,9 @@ import edu.umd.cs.piccolox.handles.PBoundsHandle;
 public class LineEnd extends WorldObjectImpl {
 	@Override
 	public void destroy() {
-		if (!isDestroyed()) {
-			setConnectionState(ConnectionState.RECEDED_INTO_WELL, null, true);
+		super.destroy();
+		setConnectionState(ConnectionState.RECEDED_INTO_WELL, null, true);
 
-			super.destroy();
-		}
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -140,7 +138,8 @@ public class LineEnd extends WorldObjectImpl {
 			/*
 			 * remove the lineEnd if its put back in the well's parent
 			 */
-			destroy();
+			if (!isDestroyed())
+				destroy();
 			break;
 		}
 		target = newTarget;
