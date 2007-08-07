@@ -84,6 +84,13 @@ public class FunctionInput implements Node, Probeable {
 	}
 
 	/**
+	 * @return array of functions
+	 */
+	public Function[] getFunctions() {
+		return myFunctions;
+	}
+	
+	/**
 	 * @see ca.neo.model.Node#getName()
 	 */
 	public String getName() {
