@@ -335,7 +335,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * Hides all origins and terminations
 	 */
 	public void hideAllOandT() {
-		
+
 		Iterator<PModelWidget> it = widgets.iterator();
 		while (it.hasNext()) {
 			PModelWidget widget = it.next();
@@ -350,7 +350,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * Hide all widgets
 	 */
 	public void hideAllWidgets() {
-		
+
 		Iterator<PModelWidget> it = widgets.iterator();
 		while (it.hasNext()) {
 			it.next().setWidgetVisible(false);
@@ -447,7 +447,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	public void removeWidget(WorldObjectImpl widget) {
 		widgets.remove(widget);
-		widget.removeFromParent();
 
 		moveWidgetsToFront();
 		assignProbes();
@@ -597,10 +596,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 	@Override
 	protected void prepareForDestroy() {
 
-		NetworkViewer viewer = getNetworkViewer();
-		if (viewer != null)
-			getNetworkViewer().removeNodeFromNetwork(this);
-
 		/*
 		 * remove widgets... since they are not children, they have to be
 		 * removed explicitly
@@ -611,7 +606,11 @@ public abstract class PNeoNode extends PModelConfigurable {
 			((WorldObjectImpl) (widgetsAr[i])).destroy();
 		}
 
-		super.destroy();
+		NetworkViewer viewer = getNetworkViewer();
+		if (viewer != null)
+			getNetworkViewer().removeNodeFromNetwork(this);
+
+		super.prepareForDestroy();
 	}
 
 	class AddProbeAction extends ReversableAction {

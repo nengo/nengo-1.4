@@ -205,6 +205,7 @@ public class POrigin extends PModelWidget {
 		protected void justDisconnected() {
 			super.justDisconnected();
 			if (disconnectModelFrom((PTermination) getTarget())) {
+
 				getWorld().showTransientMsg("Projection removed from Network",
 						this);
 			}
