@@ -8,4 +8,5 @@ public interface ILineAcceptor extends WorldObject {
 
 	public void removeLineEnd();
 
+	public LineEnd getLineEnd();
 }

@@ -35,7 +35,7 @@ public class Style {
 	 * Line Colors
 	 */
 	public static final Color COLOR_LINEEND = new Color(176, 246, 182);
-	public static final Color COLOR_LINEIN = new Color(176, 246, 182);
+	public static final Color COLOR_LINEIN = new Color(0, 128, 0);
 
 	public static final Color COLOR_LINE = new Color(176, 246, 182);
 	public static final Color COLOR_LINE_HIGHLIGHT = COLOR_BORDER_DRAGGED;

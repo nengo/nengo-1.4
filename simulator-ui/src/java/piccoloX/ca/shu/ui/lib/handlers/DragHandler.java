@@ -3,9 +3,12 @@ package ca.shu.ui.lib.handlers;
 import java.awt.event.MouseEvent;
 import java.util.ListIterator;
 
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -36,14 +39,13 @@ public class DragHandler extends PDragEventHandler {
 		wo.popState(WorldObject.State.IN_DRAG);
 		wo.justDropped();
 
+		// if (wo instanceof IDragAndDroppable) {
+		//
+		// wo.getWorld().addActivity(
+		// new DropActivity((IDragAndDroppable) wo,
+		// StyleConstants.ANIMATION_DROP_IN_WORLD_MS));
+		// }
 
-//		if (wo instanceof IDragAndDroppable) {
-//
-//			wo.getWorld().addActivity(
-//					new DropActivity((IDragAndDroppable) wo,
-//							StyleConstants.ANIMATION_DROP_IN_WORLD_MS));
-//		}
-		
 		super.endDrag(event);
 	}
 
@@ -79,7 +81,20 @@ public class DragHandler extends PDragEventHandler {
 
 					super.startDrag(event);
 					setDraggedNode(wo);
+
 					wo.moveToFront();
+
+					/*
+					 * Moves the node parent which is the child of a WorldLayer
+					 * to the front
+					 */
+					PNode topLayerNode = wo;
+					while (topLayerNode != null
+							&& !(topLayerNode.getParent() instanceof WorldLayer)) {
+						topLayerNode = topLayerNode.getParent();
+					}
+					topLayerNode.moveToFront();
+
 					wo.startDrag();
 					wo.pushState(WorldObject.State.IN_DRAG);
 
@@ -91,52 +106,52 @@ public class DragHandler extends PDragEventHandler {
 }
 
 // /*
-//	 * Drops a Node into a container
-//	 * 
-//	 */
-//class DropActivity extends PActivity {
-//	IWorldObject wo;
+// * Drops a Node into a container
+// *
+// */
+// class DropActivity extends PActivity {
+// IWorldObject wo;
 //
-//	IWorld world;
+// IWorld world;
 //
-//	public DropActivity(IWorldObject nodeToDrop, long aDuration) {
-//		super(aDuration, aDuration);
+// public DropActivity(IWorldObject nodeToDrop, long aDuration) {
+// super(aDuration, aDuration);
 //
-//		this.wo = nodeToDrop;
-//		world = nodeToDrop.getWorld();
-//	}
+// this.wo = nodeToDrop;
+// world = nodeToDrop.getWorld();
+// }
 //
-//	@Override
-//	protected void activityFinished() {
-//		// TODO Auto-generated method stub
-//		super.activityFinished();
-//		Point2D position = wo.getWorld().getPositionInGround(wo);
-//		wo.setOffset(position);
-//		world.getGround().addChildWorldObject(wo);
+// @Override
+// protected void activityFinished() {
+// // TODO Auto-generated method stub
+// super.activityFinished();
+// Point2D position = wo.getWorld().getPositionInGround(wo);
+// wo.setOffset(position);
+// world.getGround().addChildWorldObject(wo);
 //
-//		// wo.justDropped();
-//	}
+// // wo.justDropped();
+// }
 //
-//	int i = 0;
+// int i = 0;
 //
-//	@Override
-//	protected void activityStarted() {
-//		// TODO Auto-generated method stub
-//		super.activityStarted();
+// @Override
+// protected void activityStarted() {
+// // TODO Auto-generated method stub
+// super.activityStarted();
 //
-//		// wo.animateToPositionScaleRotation(0, 0, 1, 0, 2000);
-//		if (wo.getWorldLayer() instanceof WorldSky) {
-//			// wo.animateToPositionScaleRotation(312, 67, 1, 0, 200);
+// // wo.animateToPositionScaleRotation(0, 0, 1, 0, 2000);
+// if (wo.getWorldLayer() instanceof WorldSky) {
+// // wo.animateToPositionScaleRotation(312, 67, 1, 0, 200);
 //
-//			wo.animateToPositionScaleRotation(wo.getOffset().getX(), wo
-//					.getOffset().getY(), world.getGroundScale() + i++, 0,
-//					getDuration());
+// wo.animateToPositionScaleRotation(wo.getOffset().getX(), wo
+// .getOffset().getY(), world.getGroundScale() + i++, 0,
+// getDuration());
 //
-//		} else {
-//			terminate(TERMINATE_WITHOUT_FINISHING);
-//			activityFinished();
-//		}
+// } else {
+// terminate(TERMINATE_WITHOUT_FINISHING);
+// activityFinished();
+// }
 //
-//	}
+// }
 //
-//}
+// }

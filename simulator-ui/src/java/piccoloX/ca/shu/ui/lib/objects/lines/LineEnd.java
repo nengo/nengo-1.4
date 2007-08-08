@@ -11,7 +11,7 @@ import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 public class LineEnd extends WorldObjectImpl {
 	private static final long serialVersionUID = 1L;
 
-	private ILineAcceptor target;
+	private ILineAcceptor myTarget;
 
 	private LineEndWell well;
 	ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
@@ -41,7 +41,7 @@ public class LineEnd extends WorldObjectImpl {
 	}
 
 	public WorldObject getTarget() {
-		return target;
+		return myTarget;
 	}
 
 	public LineEndWell getWell() {
@@ -93,8 +93,19 @@ public class LineEnd extends WorldObjectImpl {
 			return ConnectionState.NOT_CONNECTED;
 		} else if (target == rootOfWell) {
 			return ConnectionState.RECEDED_INTO_WELL;
-		} else if (target instanceof ILineAcceptor && canConnectTo(target)) {
+		} else if (target == myTarget) {
 			return ConnectionState.CONNECTED;
+		} else if (target instanceof ILineAcceptor) {
+			ILineAcceptor targetAcc = (ILineAcceptor) target;
+
+			/**
+			 * check that there isn't a line connected to it already
+			 */
+			if (targetAcc.getLineEnd() == null
+					&& canConnectTo((ILineAcceptor) targetAcc)) {
+				return ConnectionState.CONNECTED;
+			}
+
 		}
 
 		return ConnectionState.NOT_CONNECTED;
@@ -123,9 +134,9 @@ public class LineEnd extends WorldObjectImpl {
 	 *            New connection state
 	 */
 	private void setConnectionState(ConnectionState newState,
-			ILineAcceptor newTarget, boolean modifyModel) {
+			ILineAcceptor newTarget, boolean initConnection) {
 
-		if (newState == connectionState && newTarget == target) {
+		if (newState == connectionState && newTarget == myTarget) {
 			if (connectionState == ConnectionState.CONNECTED) {
 				/*
 				 * move the LineEnd back to the center of the target
@@ -138,21 +149,22 @@ public class LineEnd extends WorldObjectImpl {
 		/*
 		 * discover transitions;
 		 */
-		if (newState != ConnectionState.CONNECTED
-				&& connectionState == ConnectionState.CONNECTED) {
-			target.setLineEnd(null);
+		if (myTarget != null && myTarget != newTarget) {
+			myTarget.setLineEnd(null);
 			justDisconnected();
-
 		}
+		myTarget = null;
 
 		switch (newState) {
 		case CONNECTED:
-			if (initConnection(newTarget, modifyModel)) {
+			if (initConnection(newTarget, initConnection)) {
 				newTarget.setLineEnd(this);
 				newTarget.addChild(this);
 				this.setOffset(0, 0);
+				myTarget = newTarget;
 			} else {
-				this.setOffset(0, -50);
+				getWorld().showTransientMsg("*** WARNING Connection refused ***", this);
+				this.translate(-50, -50);
 				setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
 			}
 			break;
@@ -176,7 +188,7 @@ public class LineEnd extends WorldObjectImpl {
 				destroy();
 			break;
 		}
-		target = newTarget;
+
 		connectionState = newState;
 	}
 
@@ -191,7 +203,7 @@ public class LineEnd extends WorldObjectImpl {
 	 *            the object to be connected to
 	 * @return true if successfully connected
 	 */
-	protected boolean canConnectTo(WorldObject target) {
+	protected boolean canConnectTo(ILineAcceptor target) {
 		return true;
 	};
 

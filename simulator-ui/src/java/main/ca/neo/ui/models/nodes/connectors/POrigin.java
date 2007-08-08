@@ -10,6 +10,7 @@ import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Tooltip;
+import ca.shu.ui.lib.objects.lines.ILineAcceptor;
 import ca.shu.ui.lib.objects.lines.LineEnd;
 import ca.shu.ui.lib.objects.lines.LineEndWell;
 import ca.shu.ui.lib.util.Util;
@@ -180,10 +181,10 @@ public class POrigin extends PModelWidget {
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		protected boolean canConnectTo(WorldObject target) {
-			if ((target instanceof PTermination))
+		protected boolean canConnectTo(ILineAcceptor target) {
+			if ((target instanceof PTermination)) {
 				return true;
-			else
+			} else
 				return false;
 
 		}
@@ -196,6 +197,9 @@ public class POrigin extends PModelWidget {
 				if (POrigin.this.connectModelTo((PTermination) target)) {
 					getWorld().showTransientMsg("Projection added to Network",
 							this);
+					return true;
+				} else {
+					return false;
 				}
 			}
 			return true;

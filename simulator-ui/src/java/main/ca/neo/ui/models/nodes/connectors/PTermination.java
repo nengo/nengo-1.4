@@ -10,7 +10,6 @@ import ca.shu.ui.lib.objects.lines.ILineAcceptor;
 import ca.shu.ui.lib.objects.lines.LineEnd;
 import ca.shu.ui.lib.objects.lines.LineInIcon;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * Termination UI Object
@@ -97,5 +96,9 @@ public class PTermination extends PModelWidget implements ILineAcceptor {
 	public void removeLineEnd() {
 		lineEnd = null;
 
+	}
+
+	public LineEnd getLineEnd() {
+		return lineEnd;
 	}
 }

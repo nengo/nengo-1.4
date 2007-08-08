@@ -31,6 +31,7 @@ done- There should be either scrollbars or a fit-on-screen function (I
  Pri 0 - doing next
 *******************************************
 
+
 information visualization
 	dimensions of functions, nodes
 
@@ -43,7 +44,7 @@ display information about nodes in a hover over
 
 set simulator
 
-Add ability to remove probes from simulator
+
 
 *******************************************
  Pri 1 - to do
@@ -58,16 +59,13 @@ like a spreadsheet-style matrix editor would be good)
 
 redo functionality to allow duplicate actions to be performed
 
-
+unconnected lines should be highlighted
 *******************************************
  Pri 2 - will do eventually
 *******************************************
 debug paint calls using PDebug
 
 add keyboard shortcuts
-
-fading popup texts as a lightweight way to notify of 
-  events such as connections, changes, etc...
 
 Rectangular group select cursor
 
@@ -84,13 +82,6 @@ Contiunous updating layouts (ie SpringLayout).
 getInformation method for Nodes, for tooltips
 
 units selection for UI Dialog
-
-create tooltips to show connection and disconnection events
-	probe added text
-
-Ensure correct implementation of destroy() function for UI Objects
-
-paint nodes as shapes rather than icons at high zooms
 
 convert Iconfiguration's isConfigured option to a exception thrown and caught by ConfigManager
 
