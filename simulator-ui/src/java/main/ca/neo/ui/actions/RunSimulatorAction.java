@@ -3,12 +3,13 @@ package ca.neo.ui.actions;
 import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
 import ca.neo.ui.views.objects.configurable.AbstractConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
+import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.util.Util;
 
@@ -26,25 +27,22 @@ public class RunSimulatorAction extends StandardAction {
 		this.simulator = simulator;
 	}
 
-	class RunSimulatorThread extends Thread {
+	class RunSimulatorThread extends TrackedActivity {
 		SimulatorConfig config;
 
 		public RunSimulatorThread(SimulatorConfig config) {
-			super();
+			super("Simulation in progress");
 			this.config = config;
 		}
 
-		public void run() {
-			TrackedStatusMsg trackedTask = new TrackedStatusMsg("Running simulator");
-
+		@Override
+		public void doActivity() {
 			try {
 				simulator.run(config.getStartTime(), config.getEndTime(),
 						config.getStepSize());
 			} catch (SimulationException e) {
 				Util.Error("Simulator problem: " + e.toString());
 			}
-
-			trackedTask.finished();
 		}
 	}
 
@@ -55,10 +53,10 @@ public class RunSimulatorAction extends StandardAction {
 		/*
 		 * Configures the simulatorConfig
 		 */
-		new DialogConfig(simulatorConfig);
+		new UserConfig(simulatorConfig);
 
 		if (simulatorConfig.isConfigured()) {
-			(new RunSimulatorThread(simulatorConfig)).start();
+			(new RunSimulatorThread(simulatorConfig)).startThread();
 
 		} else {
 			throw new ActionException("Simulator configuration not complete",

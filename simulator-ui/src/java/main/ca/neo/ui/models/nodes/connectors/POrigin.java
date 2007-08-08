@@ -130,7 +130,7 @@ public class POrigin extends PModelWidget {
 	 * @see ca.shu.ui.lib.world.impl.WorldObjectImpl#destroy()
 	 */
 	@Override
-	public void destroy() {
+	protected void prepareForDestroy() {
 
 		Util
 				.Warning("Origins can only be removed from the UI, not the Model. Projections will be removed.");
@@ -145,7 +145,7 @@ public class POrigin extends PModelWidget {
 			}
 		}
 
-		super.destroy();
+		super.prepareForDestroy();
 	}
 
 	private Vector<OriginEnd> ends;
@@ -163,9 +163,9 @@ public class POrigin extends PModelWidget {
 	class OriginEnd extends LineEnd {
 
 		@Override
-		public void destroy() {
+		protected void prepareForDestroy() {
 			removeOriginEnd(this);
-			super.destroy();
+			super.prepareForDestroy();
 		}
 
 		/**

@@ -19,11 +19,11 @@ import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
+import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
@@ -89,8 +89,6 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 
 	PLayer layer;
 
-	Point2D positionOfControls;
-
 	WorldSky skyCamera;
 
 	PBasicInputEventHandler statusBarHandler;
@@ -149,6 +147,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 
 		setDraggable(false);
 		// PBoundsHandle.addBoundsHandlesTo(this);
+		setBounds(0, 0, 800, 600);
 
 		gridLayer = Grid.createGrid(getSky(), UIEnvironment.getInstance()
 				.getRoot(), Style.COLOR_DARKBORDER, 1500);
@@ -170,38 +169,6 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 
 	public double getGroundScale() {
 		return getSky().getViewScale();
-	}
-
-	public Point2D getPositionInGround(WorldObject wo) {
-		WorldLayer layer = wo.getWorldLayer();
-		Point2D position;
-
-		position = wo.localToGlobal(new Point2D.Double(0, 0));
-
-		if (layer instanceof WorldSky) {
-			skyCamera.localToView(position);
-			return position;
-		} else if (layer instanceof WorldGround) {
-			return position;
-		}
-		return null;
-
-	}
-
-	public Point2D getPositionInSky(WorldObjectImpl wo) {
-		WorldLayer layer = wo.getWorldLayer();
-		Point2D position;
-
-		position = wo.localToGlobal(new Point2D.Double(0, 0));
-
-		if (layer instanceof WorldGround) {
-			skyCamera.viewToLocal(position);
-			return position;
-		} else if (layer instanceof WorldSky) {
-			return position;
-		}
-		return null;
-
 	}
 
 	public double getScreenHeight() {
@@ -226,6 +193,9 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 			return;
 		}
 
+		/**
+		 * Remove the controls with an animation
+		 */
 		(new RemoveControlsThread(controls)).start();
 		controls = null;
 	}
@@ -292,29 +262,42 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		return constructMenu().getJPopupMenu();
 	}
 
+	public void showTransientMsg(String msg, WorldObjectImpl objectAttachedTo) {
+
+		GText msgObject = new GText(msg);
+
+	}
+
+	// public Point2D getPositionInSky(WorldObjectImpl wo) {
+	// WorldLayer layer = wo.getWorldLayer();
+	// Point2D position;
+	//
+	// position = wo.localToGlobal(new Point2D.Double(0, 0));
+	//
+	// if (layer instanceof WorldGround) {
+	// skyCamera.viewToLocal(position);
+	// return position;
+	// } else if (layer instanceof WorldSky) {
+	// return position;
+	// }
+	// return null;
+	//
+	// }
+
 	public void showTooltip(WorldObjectImpl pControls,
-			WorldObjectImpl nodeAttacedTo) {
+			WorldObjectImpl objectAttachedTo) {
 
 		hideControls();
-		if (nodeAttacedTo == null) {
+		if (objectAttachedTo == null) {
 			return;
 		}
 		PCamera camera = getSky();
 
-		positionOfControls = nodeAttacedTo.getOffset();
-		if (camera.isAncestorOf(nodeAttacedTo)) {
+		Point2D position = objectAttachedTo.objectToSky(new Point2D.Double(0,
+				objectAttachedTo.getHeight()));
 
-			positionOfControls = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
-					nodeAttacedTo.getHeight()));
-		} else {
-
-			positionOfControls = nodeAttacedTo.getOffset();
-			positionOfControls = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
-					nodeAttacedTo.getHeight()));
-			positionOfControls = camera.viewToLocal(positionOfControls);
-		}
-		double x = positionOfControls.getX();
-		double y = positionOfControls.getY();
+		double x = position.getX();
+		double y = position.getY();
 
 		this.controls = new WorldObjectImpl();
 
@@ -335,21 +318,13 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 			y = camera.getBounds().getHeight() - controls.getHeight();
 		}
 
-		positionOfControls = new Point2D.Double(x, y);
+		position = new Point2D.Double(x, y);
 
-		
-		
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if (controls != null) {
-					controlsHolder.bringToFront();
-					controlsHolder.addChildFancy(controls);
-					controlsHolder.setTransparency(0.5f);
+		controlsHolder.moveToFront();
+		controlsHolder.addChildFancy(controls);
+		controlsHolder.setTransparency(0.5f);
 
-					controls.setOffset(positionOfControls);
-				}
-			}
-		});
+		controls.setOffset(position);
 
 	}
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 
 import ca.neo.io.FileManager;
 import ca.neo.ui.NeoGraphics;
@@ -28,6 +29,8 @@ public abstract class LoadObjectAction extends StandardAction {
 
 	protected abstract void processObject(Object objLoaded);
 
+	Object objLoaded;
+
 	@Override
 	protected void action() throws ActionException {
 		int response = NeoGraphics.FileChooser.showOpenDialog(UIEnvironment
@@ -42,8 +45,13 @@ public abstract class LoadObjectAction extends StandardAction {
 				public void doActivity() {
 					FileManager fm = new FileManager();
 					try {
-						Object objLoaded = fm.load(file);
-						processObject(objLoaded);
+						objLoaded = fm.load(file);
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								processObject(objLoaded);								
+							}
+						});
+						
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ClassNotFoundException e) {
@@ -55,9 +63,8 @@ public abstract class LoadObjectAction extends StandardAction {
 				}
 
 			};
-			loadActivity.invokeLater();
+			loadActivity.startThread();
 		}
 
 	}
-
 }

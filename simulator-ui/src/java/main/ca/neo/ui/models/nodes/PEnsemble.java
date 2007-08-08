@@ -62,7 +62,10 @@ public class PEnsemble extends PNodeContainer {
 
 	@Override
 	public int getNodesCount() {
-		return getModel().getNodes().length;
+		if (getModel() != null) {
+			return getModel().getNodes().length;
+		} else
+			return 0;
 	}
 
 }

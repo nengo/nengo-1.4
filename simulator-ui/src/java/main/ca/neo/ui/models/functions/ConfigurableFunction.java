@@ -7,7 +7,7 @@ import javax.swing.JDialog;
 
 import ca.neo.math.Function;
 import ca.neo.ui.views.objects.configurable.AbstractConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
+import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 

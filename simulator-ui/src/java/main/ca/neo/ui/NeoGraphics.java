@@ -6,6 +6,7 @@ import javax.swing.JMenuBar;
 import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.LoadObjectAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PNeoNode;
@@ -14,11 +15,11 @@ import ca.neo.ui.models.nodes.PNEFEnsemble;
 import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.widgets.Toolbox;
 import ca.neo.util.Environment;
-import ca.shu.ui.lib.actions.CreateModelAction;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.GFrame;
+import edu.umd.cs.piccolo.util.PDebug;
 
 public class NeoGraphics extends GFrame implements INodeContainer {
 
@@ -36,7 +37,7 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 
 		Environment.setUserInterface(true);
 
-		// PDebug.debugPaintCalls = true;
+//		 PDebug.debugPaintCalls = true;
 
 	}
 

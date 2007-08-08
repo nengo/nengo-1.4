@@ -1,7 +1,5 @@
 package ca.shu.ui.lib.objects.widgets;
 
-import javax.swing.SwingUtilities;
-
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
 

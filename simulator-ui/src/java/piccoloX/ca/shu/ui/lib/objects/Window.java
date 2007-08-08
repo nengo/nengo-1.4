@@ -107,7 +107,7 @@ public class Window extends WorldObjectImpl {
 	}
 
 	@Override
-	public void destroy() {
+	protected void prepareForDestroy() {
 		if (affinityHalo != null) {
 			affinityHalo.destroy();
 			affinityHalo = null;
@@ -115,8 +115,8 @@ public class Window extends WorldObjectImpl {
 
 		menubar.removeInputEventListener(menuBarHandler);
 		removeInputEventListener(eventConsumer);
-		
-		super.destroy();
+
+		super.prepareForDestroy();
 	}
 
 	@Override

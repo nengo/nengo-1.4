@@ -20,6 +20,7 @@ import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.nodes.widgets.GProbe;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
+import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -32,6 +33,10 @@ import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.uci.ics.jung.graph.Vertex;
 
 public abstract class PNeoNode extends PModelConfigurable {
+
+	int i = 0;
+
+	boolean isHoverOver = false;
 
 	/*
 	 * Probes can be attached to the node, or the node's widgets
@@ -144,41 +149,40 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	/**
+	 * Call this function if the probe already exists in the simulator and only
+	 * needs to be shown
+	 * 
+	 * @param probe
+	 *            To be shown
+	 * @return Probe UI Object
+	 */
+	public GProbe showProbe(Probe probe) {
+		GProbe probeUI = new GProbe(this, probe);
+		newProbeAdded(probeUI);
+		return probeUI;
+	}
+
+	private void newProbeAdded(GProbe probeUI) {
+		if (probes == null)
+			probes = new Vector<GProbe>();
+
+		addChild(probeUI);
+		probes.add(probeUI);
+		assignProbes();
+
+	}
+
+	/**
 	 * Creates a new probe and adds the UI object to the node
 	 * 
 	 * @param stateName
 	 *            The name of the state variable to probe
 	 */
-	public GProbe createProbe(String stateName) {
-		if (probes == null)
-			probes = new Vector<GProbe>();
+	public GProbe addProbe(String stateName) {
 
-		GProbe probe = new GProbe(this, stateName);
-		addChild(probe);
-		probes.add(probe);
-		assignProbes();
-
-		return probe;
-	}
-
-	@Override
-	public void destroy() {
-
-		NetworkViewer viewer = getNetworkViewer();
-		if (viewer != null)
-			getNetworkViewer().removeNode(this);
-
-		/*
-		 * remove widgets... since they are not children, they have to be
-		 * removed explicitly
-		 */
-		Object[] widgetsAr = widgets.toArray();
-
-		for (int i = 0; i < widgetsAr.length; i++) {
-			((WorldObjectImpl) (widgetsAr[i])).destroy();
-		}
-
-		super.destroy();
+		GProbe probeUI = new GProbe(this, stateName);
+		newProbeAdded(probeUI);
+		return probeUI;
 	}
 
 	/**
@@ -186,7 +190,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 *            Name of an Origin on the Node model
 	 * @return the POrigin shown
 	 */
-	public POrigin getAndShowOrigin(String originName) {
+	public POrigin showOrigin(String originName) {
 		/*
 		 * Try to find if the origin has already been created
 		 */
@@ -218,7 +222,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 *            Name of an Termination on the Node model
 	 * @return the POrigin shown
 	 */
-	public PTermination getAndShowTermination(String terminationName) {
+	public PTermination showTermination(String terminationName) {
 		/*
 		 * Try to find if the origin has already been created
 		 */
@@ -248,6 +252,15 @@ public abstract class PNeoNode extends PModelConfigurable {
 	public Node getModel() {
 		// TODO Auto-generated method stub
 		return (Node) super.getModel();
+	}
+
+	@Override
+	public String getName() {
+		if (getModel() != null) {
+			return getModel().getName();
+		} else {
+			return "Model not constructed";
+		}
 	}
 
 	/**
@@ -339,7 +352,18 @@ public abstract class PNeoNode extends PModelConfigurable {
 		}
 	}
 
-	int i = 0;
+	/**
+	 * Hide all widgets
+	 */
+	public void hideAllWidgets() {
+		if (widgets == null)
+			return;
+
+		Iterator<PModelWidget> it = widgets.iterator();
+		while (it.hasNext()) {
+			it.next().setWidgetVisible(false);
+		}
+	}
 
 	/**
 	 * layout widgets such as Origins and Terminations
@@ -437,6 +461,11 @@ public abstract class PNeoNode extends PModelConfigurable {
 		assignProbes();
 	}
 
+	public void setHoveredOver(boolean bool) {
+		isHoverOver = bool;
+		layoutWidgets();
+	}
+
 	@Override
 	public final void setName(String name) {
 		/*
@@ -457,7 +486,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		Origin[] origins = getModel().getOrigins();
 
 		for (int i = 0; i < origins.length; i++) {
-			POrigin originUI = getAndShowOrigin(origins[i].getName());
+			POrigin originUI = showOrigin(origins[i].getName());
 			originUI.setWidgetVisible(true);
 		}
 
@@ -471,24 +500,11 @@ public abstract class PNeoNode extends PModelConfigurable {
 		Termination[] terminations = getModel().getTerminations();
 
 		for (int i = 0; i < terminations.length; i++) {
-			PTermination termUI = getAndShowTermination(terminations[i]
+			PTermination termUI = showTermination(terminations[i]
 					.getName());
 			termUI.setWidgetVisible(true);
 		}
 
-	}
-
-	/**
-	 * Hide all widgets
-	 */
-	public void hideAllWidgets() {
-		if (widgets == null)
-			return;
-
-		Iterator<PModelWidget> it = widgets.iterator();
-		while (it.hasNext()) {
-			it.next().setWidgetVisible(false);
-		}
 	}
 
 	/**
@@ -587,6 +603,26 @@ public abstract class PNeoNode extends PModelConfigurable {
 		layoutWidgets();
 	}
 
+	@Override
+	protected void prepareForDestroy() {
+
+		NetworkViewer viewer = getNetworkViewer();
+		if (viewer != null)
+			getNetworkViewer().removeNode(this);
+
+		/*
+		 * remove widgets... since they are not children, they have to be
+		 * removed explicitly
+		 */
+		Object[] widgetsAr = widgets.toArray();
+
+		for (int i = 0; i < widgetsAr.length; i++) {
+			((WorldObjectImpl) (widgetsAr[i])).destroy();
+		}
+
+		super.destroy();
+	}
+
 	class AddProbeAction extends ReversableAction {
 
 		private static final long serialVersionUID = 1;
@@ -604,7 +640,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		@Override
 		protected void action() throws ActionException {
 
-			probeCreated = createProbe(state.getKey());
+			probeCreated = addProbe(state.getKey());
 
 		}
 
@@ -657,7 +693,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		@Override
 		protected void action() throws ActionException {
-			getAndShowOrigin(originName);
+			showOrigin(originName);
 		}
 	}
 
@@ -673,24 +709,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		@Override
 		protected void action() throws ActionException {
-			getAndShowTermination(termName);
+			showTermination(termName);
 		}
 	}
-
-	boolean isHoverOver = false;
-
-	public void setHoveredOver(boolean bool) {
-		isHoverOver = bool;
-		layoutWidgets();
-	}
-
-	@Override
-	public String getName() {
-		if (getModel() != null) {
-			return getModel().getName();
-		} else {
-			return "";
-		}
-	}
-
 }

@@ -11,9 +11,11 @@ import javax.swing.JOptionPane;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
+import ca.neo.model.Probeable;
 import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
@@ -23,12 +25,12 @@ import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
+import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.neo.ui.views.objects.configurable.struct.PTInt;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.CreateModelAction;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
@@ -73,9 +75,9 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	public void destroy() {
+	protected void prepareForDestroy() {
 		saveLayoutAsDefault();
-		super.destroy();
+		super.prepareForDestroy();
 	}
 
 	/**
@@ -410,7 +412,7 @@ public class NetworkViewer extends NodeViewer {
 			Point2D savedPosition = layout.getPosition(node.getName());
 			if (savedPosition != null) {
 				node.animateToPositionScaleRotation(savedPosition.getX(),
-						savedPosition.getY(), 1, 0, 1000);
+						savedPosition.getY(), 1, 0, 700);
 			}
 		}
 		if (layout.getSavedViewBounds() != null) {
@@ -463,13 +465,39 @@ public class NetworkViewer extends NodeViewer {
 
 			PNeoNode nodeTerm = getNode(term.getNode().getName());
 
-			POrigin originUI = nodeOrigin.getAndShowOrigin(origin.getName());
-			PTermination termUI = nodeTerm
-					.getAndShowTermination(term.getName());
+			POrigin originUI = nodeOrigin.showOrigin(origin.getName());
+			PTermination termUI = nodeTerm.showTermination(term.getName());
 
 			// modifyModel is false because the connections already exist in the
 			// NEO Network model
 			originUI.connectTo(termUI, false);
+		}
+
+		/*
+		 * Construct probes
+		 */
+		Probe[] probes = getNetwork().getSimulator().getProbes();
+
+		for (int i = 0; i < probes.length; i++) {
+			Probe probe = probes[i];
+			Probeable target = probe.getTarget();
+
+			if (!(target instanceof Node)) {
+				Util.Error("Unsupported target type for probe");
+			} else {
+
+				if (probe.isInEnsemble()) {
+					Util
+							.Error("A probe is inside an ensemble. Displaying this is not supported yet");
+				} else {
+
+					Node node = (Node) target;
+
+					PNeoNode nodeUI = getNode(node.getName());
+					nodeUI.showProbe(probe);
+
+				}
+			}
 		}
 
 	}
@@ -719,7 +747,7 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	@Override
 	protected void action() throws ActionException {
-		new DialogConfig(this);
+		new UserConfig(this);
 
 	}
 

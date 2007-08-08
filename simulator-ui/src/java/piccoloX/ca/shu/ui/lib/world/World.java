@@ -27,9 +27,6 @@ public interface World {
 
 	public void hideControls();
 
-	public Point2D getPositionInGround(WorldObject wo);
-
-	public Point2D getPositionInSky(WorldObjectImpl wo);
 
 	public WorldGround getGround();
 

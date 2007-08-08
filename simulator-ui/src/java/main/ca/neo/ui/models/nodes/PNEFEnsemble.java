@@ -8,7 +8,7 @@ import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.models.nodes.connectors.PDecodedTermination;
 import ca.neo.ui.models.nodes.connectors.PTermination;
-import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
+import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTInt;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
@@ -66,7 +66,7 @@ public class PNEFEnsemble extends PEnsemble {
 	 */
 	public PTermination createDecodedTermintation() {
 		PDecodedTermination termUI = new PDecodedTermination(this);
-		new DialogConfig(termUI);
+		new UserConfig(termUI);
 		if (termUI.isConfigured()) {
 			addWidget(termUI);
 			return termUI;

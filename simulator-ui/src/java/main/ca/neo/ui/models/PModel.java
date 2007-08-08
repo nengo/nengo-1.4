@@ -1,5 +1,8 @@
 package ca.neo.ui.models;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
@@ -106,7 +109,7 @@ public abstract class PModel extends WorldObjectImpl implements Interactable {
 	public void setModel(Object model) {
 		this.model = model;
 		fireModelPropertyChanged();
-		
+
 	}
 
 	public JPopupMenu showContextMenu(PInputEvent event) {
@@ -120,20 +123,31 @@ public abstract class PModel extends WorldObjectImpl implements Interactable {
 		}
 	}
 
-	protected void setIcon(WorldObjectImpl icon) {
-		if (this.icon != null) {
+	PropertyChangeListener iconPropertyChangeListener;
 
-			this.icon.removeFromParent();
+	protected void setIcon(WorldObjectImpl newIcon) {
+		if (icon != null) {
+			icon.removePropertyChangeListener(PROPERTY_BOUNDS,
+					iconPropertyChangeListener);
+			icon.removeFromParent();
 		}
 
-		this.icon = icon;
+		icon = newIcon;
 
-		this.addChild(icon);
+		addChild(icon);
 		icon.setDraggable(false);
 		// icon.setPickable(false);
 
-		setBounds(getFullBounds());
+		iconPropertyChangeListener = new PropertyChangeListener() {
+
+			public void propertyChange(PropertyChangeEvent arg0) {
+				PModel.this.setBounds(icon.getFullBounds());
+			}
+
+		};
+		PModel.this.setBounds(icon.getFullBounds());
+		icon.addPropertyChangeListener(PROPERTY_BOUNDS,
+				iconPropertyChangeListener);
 
 	}
-
 }

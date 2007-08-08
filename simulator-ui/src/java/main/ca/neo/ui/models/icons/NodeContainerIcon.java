@@ -17,7 +17,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 	public NodeContainerIcon(PNodeContainer parent, PNode icon) {
 		super(parent, icon);
-		sizeLabel = new GText("Hello world!");
+		sizeLabel = new GText("");
 		sizeLabel.setFont(Style.FONT_SMALL);
 		sizeLabel.setConstrainWidthToTextWidth(true);
 		addChild(sizeLabel);
@@ -31,7 +31,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 		return (PNodeContainer) super.getModelParent();
 	}
 
-	private int myNumOfNodes;
+	private int myNumOfNodes = -1;
 	private GText sizeLabel;
 
 	/**

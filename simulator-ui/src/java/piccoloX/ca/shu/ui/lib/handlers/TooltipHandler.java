@@ -99,21 +99,25 @@ public class TooltipHandler extends PBasicInputEventHandler {
 			super("Control Timer");
 		}
 
+		WorldObjectImpl currNode;
+
 		@Override
 		public void run() {
 			try {
 				while (true) {
 					if (selectedNode != null) {
-						WorldObjectImpl currNode = selectedNode;
+						currNode = selectedNode;
 						Thread.sleep(selectedNode.getControlDelay());
 
 						if ((currNode == selectedNode)
 								&& (selectedNode != null)) {
-							currNode.pushState(WorldObject.State.SELECTED);
-							controls = selectedNode.getTooltipObject();
 
 							SwingUtilities.invokeAndWait(new Runnable() {
 								public void run() {
+									currNode
+											.pushState(WorldObject.State.SELECTED);
+									controls = selectedNode.getTooltipObject();
+
 									world.showTooltip(controls, selectedNode);
 								}
 							});
@@ -131,8 +135,14 @@ public class TooltipHandler extends PBasicInputEventHandler {
 								}
 							}
 
-							currNode.popState(WorldObject.State.SELECTED);
-							world.hideControls();
+							SwingUtilities.invokeAndWait(new Runnable() {
+								public void run() {
+									currNode
+											.popState(WorldObject.State.SELECTED);
+									world.hideControls();
+								}
+							});
+
 						}
 					} else {
 						synchronized (mouseEventLock) {

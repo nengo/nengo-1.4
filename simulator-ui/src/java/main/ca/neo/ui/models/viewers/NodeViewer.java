@@ -103,7 +103,12 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 		}
 
 		nodesUI.put(nodeProxy.getName(), nodeProxy);
-		getGround().catchObject(nodeProxy, dropInCenterOfCamera);
+
+		if (dropInCenterOfCamera) {
+			getGround().catchObject(nodeProxy, dropInCenterOfCamera);
+		} else {
+			getGround().addWorldObject(nodeProxy);
+		}
 	}
 
 	public abstract void applyDefaultLayout();

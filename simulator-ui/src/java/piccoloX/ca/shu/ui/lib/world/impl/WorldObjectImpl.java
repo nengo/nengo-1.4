@@ -1,6 +1,8 @@
 package ca.shu.ui.lib.world.impl;
 
 import java.awt.Color;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -67,13 +69,76 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
+	public Point2D objectToGround(Point2D position) {
+		WorldLayer layer = getWorldLayer();
+
+		localToGlobal(position);
+
+		if (layer instanceof WorldSky) {
+			layer.getWorld().getSky().localToView(position);
+			return position;
+		} else if (layer instanceof WorldGround) {
+			return position;
+		}
+		return null;
+
+	}
+
+	public Dimension2D objectToGround(Dimension2D rectangle) {
+		WorldLayer layer = getWorldLayer();
+
+		localToGlobal(rectangle);
+
+		if (layer instanceof WorldSky) {
+			layer.getWorld().getSky().localToView(rectangle);
+			return rectangle;
+		} else if (layer instanceof WorldGround) {
+			return rectangle;
+		}
+		return null;
+
+	}
+
+	public Point2D objectToSky(Point2D position) {
+		WorldLayer layer = getWorldLayer();
+
+		localToGlobal(position);
+
+		if (layer instanceof WorldGround) {
+			layer.getWorld().getSky().viewToLocal(position);
+			return position;
+		} else if (layer instanceof WorldSky) {
+			return position;
+		}
+		return null;
+
+	}
+
+	public Dimension2D objectToSky(Dimension2D rectangle) {
+		WorldLayer layer = getWorldLayer();
+
+		localToGlobal(rectangle);
+
+		if (layer instanceof WorldGround) {
+			layer.getWorld().getSky().viewToLocal(rectangle);
+			return rectangle;
+		} else if (layer instanceof WorldSky) {
+			return rectangle;
+		}
+		return null;
+
+	}
+
 	public void addChildFancy(PNode node) {
 		addChildFancy(node, 1, 500);
 	}
 
-	/*
-	 * TODO: hmmm, maybe addToWorld has to be made thread safe
+	/**
+	 * Makes adding objects a little fancier
 	 * 
+	 * @param node
+	 * @param scale
+	 * @param duration
 	 */
 	public void addChildFancy(PNode node, float scale, long duration) {
 		this.addChild(node);
@@ -161,12 +226,12 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		this.animateToPositionScaleRotation(this.getOffset().getX(), this
 				.getOffset().getY(), scale, this.getRotation(), duration);
 	}
-
-	public void bringToFront() {
-		PNode parent = getParent();
-		removeFromParent();
-		parent.addChild(this);
-
+	
+	/**
+	 * Perform  any operations before being destroyed
+	 */
+	protected void prepareForDestroy() {
+		
 	}
 
 	/*
@@ -174,30 +239,32 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	 * 
 	 * @see ca.shu.ui.lib.world.WorldObject#destroy()
 	 */
-	public void destroy() {
-		isDestroyed = true;
+	public final void destroy() {
+		if (!isDestroyed) {
+			isDestroyed = true;
 
-		/*
-		 * Notify edges that this object has changed (ie. destroyed)
-		 */
-		signalEdgesChanged();
+			prepareForDestroy();
+			/*
+			 * Notify edges that this object has been destroyed
+			 */
+			signalEdgesChanged();
 
-		/*
-		 * Removes this object from the world and finish any tasks
-		 * 
-		 * Convert to array to allow for concurrent modification
-		 */
-		Object[] children = getChildrenReference().toArray();
+			/*
+			 * Removes this object from the world and finish any tasks
+			 * 
+			 * Convert to array to allow for concurrent modification
+			 */
+			Object[] children = getChildrenReference().toArray();
 
-		for (int i = 0; i < children.length; i++) {
-			Object child = children[i];
+			for (int i = 0; i < children.length; i++) {
+				Object child = children[i];
 
-			if (child instanceof WorldObjectImpl) {
-				((WorldObjectImpl) child).destroy();
+				if (child instanceof WorldObjectImpl) {
+					((WorldObjectImpl) child).destroy();
+				}
 			}
+			removeFromParent();
 		}
-		removeFromParent();
-
 	}
 
 	public void endDrag() {
@@ -410,10 +477,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	}
 
 	public void setName(String name) {
-		String oldName = this.name;
 		this.name = name;
-
-		// firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
 
 	}
 

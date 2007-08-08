@@ -53,15 +53,15 @@ public class WorldGround extends WorldObjectImpl implements WorldLayer {
 	 * 
 	 * @param wo
 	 *            Object to be added
-	 * @param dropInCenterOfCamera
+	 * @param centerCameraPosition
 	 *            whether the object's position should be changed to appear at
 	 *            the center of the camera
 	 */
-	public void catchObject(WorldObject wo, boolean dropInCenterOfCamera) {
+	public void catchObject(WorldObject wo, boolean centerCameraPosition) {
 		addChildW(wo);
 
 		Point2D finalPosition;
-		if (dropInCenterOfCamera) {
+		if (centerCameraPosition) {
 			finalPosition = world.skyToGround(new Point2D.Double(world
 					.getScreenWidth() / 2, world.getScreenHeight() / 2));
 		} else {

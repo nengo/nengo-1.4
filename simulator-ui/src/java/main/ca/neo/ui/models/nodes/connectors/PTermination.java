@@ -21,10 +21,10 @@ import ca.shu.ui.lib.util.Util;
 public class PTermination extends PModelWidget implements ILineAcceptor {
 
 	@Override
-	public void destroy() {
+	protected void prepareForDestroy() {
 		Util
 				.Warning("Terminations can only be removed from the UI, not the Model. Projections will be removed.");
-		super.destroy();
+		super.prepareForDestroy();
 	}
 
 	private static final long serialVersionUID = 1L;

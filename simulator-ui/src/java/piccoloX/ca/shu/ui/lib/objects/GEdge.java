@@ -84,6 +84,7 @@ public class GEdge extends PPath implements PropertyChangeListener {
 
 	public void setDefaultColor(Color defaultColor) {
 		this.defaultColor = defaultColor;
+		stateChanged();
 	}
 
 	/*
@@ -98,13 +99,14 @@ public class GEdge extends PPath implements PropertyChangeListener {
 
 	public void setHighlightColor(Color highlightColor) {
 		this.highlightColor = highlightColor;
+		stateChanged();
 	}
 
 	public final void setState(State state) {
 		if (this.state != state) {
 			this.state = state;
 
-			stateChanged0();
+			stateChanged();
 		}
 
 	}
@@ -134,7 +136,8 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		// arrow.setOffset(bound2);
 	}
 
-	private void stateChanged0() {
+	private void stateChanged() {
+		
 		if (isHideByDefault() && state == State.DEFAULT)
 			setVisible(false);
 		else

@@ -6,7 +6,7 @@ public class SavedConfig extends ConfigManager {
 	String configFileName;
 
 	public SavedConfig(IConfigurable configurable) {
-		this(configurable, DialogConfig.DEFAULT_PROPERTY_FILE_NAME);
+		this(configurable, UserConfig.DEFAULT_PROPERTY_FILE_NAME);
 		init();
 	}
 

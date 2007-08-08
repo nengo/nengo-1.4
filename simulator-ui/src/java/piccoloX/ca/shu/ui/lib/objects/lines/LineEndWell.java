@@ -1,5 +1,7 @@
 package ca.shu.ui.lib.objects.lines;
 
+import java.awt.event.MouseEvent;
+
 import ca.shu.ui.lib.objects.GEdge;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -7,7 +9,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PPickPath;
 
-public class LineEndWell extends WorldObjectImpl  {
+public class LineEndWell extends WorldObjectImpl {
 
 	public LineEndWell() {
 		super();
@@ -92,14 +94,16 @@ class MouseHandler extends PBasicInputEventHandler {
 	public MouseHandler(LineEndWell lineEndWell) {
 		super();
 		this.lineEndWell = lineEndWell;
+
 	}
 
 	@Override
 	public void mousePressed(PInputEvent event) {
-		// TODO Auto-generated method stub
+
 		super.mousePressed(event);
 
-		// if (event.getPickedNode() == )
+		if (event.getButton() != MouseEvent.BUTTON1)
+			return;
 
 		newLineEnd = lineEndWell.createAndAddLineEnd();
 
@@ -108,12 +112,6 @@ class MouseHandler extends PBasicInputEventHandler {
 		path.pushNode(newLineEnd);
 		path.pushTransform(newLineEnd.getTransform());
 
-	}
-
-	@Override
-	public void mouseReleased(PInputEvent event) {
-		// TODO Auto-generated method stub
-		super.mouseReleased(event);
 	}
 
 }

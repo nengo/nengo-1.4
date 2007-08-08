@@ -9,17 +9,12 @@ import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 
 public class LineEnd extends WorldObjectImpl {
-	@Override
-	public void destroy() {
-		super.destroy();
-		setConnectionState(ConnectionState.RECEDED_INTO_WELL, null, true);
-
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	private ILineAcceptor target;
+
 	private LineEndWell well;
+	ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
 	public LineEnd(LineEndWell well) {
 		super();
@@ -33,7 +28,29 @@ public class LineEnd extends WorldObjectImpl {
 		setDraggable(true);
 	}
 
-	ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
+	/**
+	 * @param newTarget
+	 *            Target to connect to
+	 * @param modifyModel
+	 *            Whether to modify the model represented by the connection
+	 */
+	public void connectTo(ILineAcceptor newTarget, boolean modifyModel) {
+
+		setConnectionState(ConnectionState.CONNECTED, newTarget, modifyModel);
+
+	}
+
+	public WorldObject getTarget() {
+		return target;
+	}
+
+	public LineEndWell getWell() {
+		return well;
+	}
+
+	public boolean isConnected() {
+		return (connectionState == ConnectionState.CONNECTED);
+	}
 
 	public void justDropped() {
 
@@ -65,23 +82,40 @@ public class LineEnd extends WorldObjectImpl {
 
 	/**
 	 * @param target
-	 * @return Whether the connection was successfully initialized
+	 *            to be connected with
+	 * @return State of the connection with that target
 	 */
-	protected boolean initConnection(WorldObject target, boolean modifyModel) {
+	private ConnectionState getConnectionState(WorldObject target) {
+		WorldObjectImpl rootOfWell = getRootOfWell();
 
-		return true;
+		if (target == null) {
+
+			return ConnectionState.NOT_CONNECTED;
+		} else if (target == rootOfWell) {
+			return ConnectionState.RECEDED_INTO_WELL;
+		} else if (target instanceof ILineAcceptor && canConnectTo(target)) {
+			return ConnectionState.CONNECTED;
+		}
+
+		return ConnectionState.NOT_CONNECTED;
 	}
 
 	/**
-	 * @param newTarget
-	 *            Target to connect to
-	 * @param modifyModel
-	 *            Whether to modify the model represented by the connection
+	 * 
+	 * @return The root WorldObject which is inside a WorldLayer
 	 */
-	public void connectTo(ILineAcceptor newTarget, boolean modifyModel) {
+	private WorldObjectImpl getRootOfWell() {
+		WorldObjectImpl rootOfWell = well;
 
-		setConnectionState(ConnectionState.CONNECTED, newTarget, modifyModel);
+		while (rootOfWell != null) {
+			WorldObjectImpl parent = (WorldObjectImpl) rootOfWell.getParent();
 
+			if (parent instanceof WorldLayer) {
+				return rootOfWell;
+			}
+			rootOfWell = parent;
+		}
+		return null;
 	}
 
 	/**
@@ -146,61 +180,28 @@ public class LineEnd extends WorldObjectImpl {
 		connectionState = newState;
 	}
 
-	public WorldObject getTarget() {
-		return target;
-	}
-
-	/**
-	 * Called when the LineEnd is first disconnected from a LineIn
-	 */
-	protected void justDisconnected() {
-
-	}
-
-	/**
-	 * 
-	 * @return The root WorldObject which is inside a WorldLayer
-	 */
-	private WorldObjectImpl getRootOfWell() {
-		WorldObjectImpl rootOfWell = well;
-
-		while (rootOfWell != null) {
-			WorldObjectImpl parent = (WorldObjectImpl) rootOfWell.getParent();
-
-			if (parent instanceof WorldLayer) {
-				return rootOfWell;
-			}
-			rootOfWell = parent;
-		}
-		return null;
-	}
-
 	// public int tryConnectTo(WorldObject target) {
 	// return tryConnectTo(target, true);
 	// }
 
-	static enum ConnectionState {
-		CONNECTED, NOT_CONNECTED, RECEDED_INTO_WELL
+	/**
+	 * Does some tasks before the UI connection is mde
+	 * 
+	 * @param target
+	 *            the object to be connected to
+	 * @return true if successfully connected
+	 */
+	protected boolean canConnectTo(WorldObject target) {
+		return true;
 	};
 
 	/**
 	 * @param target
-	 *            to be connected with
-	 * @return State of the connection with that target
+	 * @return Whether the connection was successfully initialized
 	 */
-	private ConnectionState getConnectionState(WorldObject target) {
-		WorldObjectImpl rootOfWell = getRootOfWell();
+	protected boolean initConnection(WorldObject target, boolean modifyModel) {
 
-		if (target == null) {
-
-			return ConnectionState.NOT_CONNECTED;
-		} else if (target == rootOfWell) {
-			return ConnectionState.RECEDED_INTO_WELL;
-		} else if (target instanceof ILineAcceptor && canConnectTo(target)) {
-			return ConnectionState.CONNECTED;
-		}
-
-		return ConnectionState.NOT_CONNECTED;
+		return true;
 	}
 
 	// /**
@@ -252,21 +253,20 @@ public class LineEnd extends WorldObjectImpl {
 	// }
 
 	/**
-	 * Does some tasks before the UI connection is mde
-	 * 
-	 * @param target
-	 *            the object to be connected to
-	 * @return true if successfully connected
+	 * Called when the LineEnd is first disconnected from a LineIn
 	 */
-	protected boolean canConnectTo(WorldObject target) {
-		return true;
+	protected void justDisconnected() {
+
 	}
 
-	public boolean isConnected() {
-		return (connectionState == ConnectionState.CONNECTED);
+	@Override
+	protected void prepareForDestroy() {
+		super.prepareForDestroy();
+		setConnectionState(ConnectionState.RECEDED_INTO_WELL, null, true);
+
 	}
 
-	public LineEndWell getWell() {
-		return well;
+	static enum ConnectionState {
+		CONNECTED, NOT_CONNECTED, RECEDED_INTO_WELL
 	}
 }

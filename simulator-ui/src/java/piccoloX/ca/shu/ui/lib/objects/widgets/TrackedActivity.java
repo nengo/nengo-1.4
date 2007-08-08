@@ -32,13 +32,13 @@ public abstract class TrackedActivity {
 	}
 
 	public void invokeLater() {
-		SwingUtilities.invokeLater(getSwingRunnable());
+		SwingUtilities.invokeLater(getSwingThread());
 
 	}
 
 	public void invokeAndWait() {
 		try {
-			SwingUtilities.invokeAndWait(getSwingRunnable());
+			SwingUtilities.invokeAndWait(getSwingThread());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
@@ -47,7 +47,7 @@ public abstract class TrackedActivity {
 	}
 
 	/**
-	 * @returns a Swing Thread Safe instance of Runnable
+	 * @returns a Thread Safe instance of Runnable
 	 */
 	private Runnable getRunnableThreadSafe() {
 
@@ -85,21 +85,26 @@ public abstract class TrackedActivity {
 	}
 
 	/**
-	 * @return Returns a instance of Runnable which can be invoked within the
-	 *         Swing Event thread
+	 * @returns a thread that must be invoked from a Swing Thread
 	 */
-	private Runnable getSwingRunnable() {
+	private Runnable getSwingThread() {
+
 		Runnable r = new Runnable() {
 			public void run() {
+
 				trackedMsg = new TrackedStatusMsg(taskName, wo);
+
 				try {
 					doActivity();
 				} catch (RuntimeException e) {
 					e.printStackTrace();
 				}
+
 				trackedMsg.finished();
+
 			}
 		};
+
 		return r;
 	}
 

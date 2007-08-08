@@ -26,25 +26,25 @@ import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 
-public class DialogConfig extends ConfigManager {
+public class UserConfig extends ConfigManager {
 	JDialog parent0;
 	Frame parent1;
 
 	public static final String DEFAULT_PROPERTY_FILE_NAME = "last_used";
 
-	public DialogConfig(IConfigurable configurable) {
+	public UserConfig(IConfigurable configurable) {
 		super(configurable);
 		this.parent1 = UIEnvironment.getInstance();
 		init();
 	}
 
-	public DialogConfig(IConfigurable configurable, Frame parent) {
+	public UserConfig(IConfigurable configurable, Frame parent) {
 		super(configurable);
 		this.parent1 = parent;
 		init();
 	}
 
-	public DialogConfig(IConfigurable configurable, JDialog parent) {
+	public UserConfig(IConfigurable configurable, JDialog parent) {
 		super(configurable);
 		this.parent0 = parent;
 		init();
@@ -54,39 +54,19 @@ public class DialogConfig extends ConfigManager {
 		configure();
 	}
 
-	Object configLock = new Object();
-
-	protected void finishedConfiguring() {
-
-		synchronized (configLock) {
-			configLock.notifyAll();
-//			System.out.println("dialog closed");
-			configLock = null;
-		}
-	}
+	ConfigDialog dialog;
 
 	protected void configure() {
 		if (parent0 != null) {
-			new ConfigDialog(this, parent0);
+			dialog = new ConfigDialog(this, parent0);
 		} else {
-			new ConfigDialog(this, parent1);
+			dialog = new ConfigDialog(this, parent1);
 		}
 
-		/*
-		 * Block until configuration has completed
-		 */
-		if (configLock != null) {
-			synchronized (configLock) {
-				try {
-					if (configLock != null)
-						configLock.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		// }
+	}
 
+	public boolean isCancelled() {
+		return dialog.isCancelled();
 	}
 
 }
@@ -97,9 +77,9 @@ class ConfigDialog extends JDialog {
 
 	private Vector<PropertyInputPanel> propertyInputPanels;
 
-	DialogConfig configManager;
+	UserConfig configManager;
 
-	public ConfigDialog(DialogConfig configManager, JDialog owner) {
+	public ConfigDialog(UserConfig configManager, JDialog owner) {
 		super(owner, "New " + configManager.getConfigurable().getTypeName()
 				+ " properties");
 
@@ -107,7 +87,7 @@ class ConfigDialog extends JDialog {
 
 	}
 
-	public ConfigDialog(DialogConfig configManager, Frame owner) {
+	public ConfigDialog(UserConfig configManager, Frame owner) {
 		super(owner, "New " + configManager.getConfigurable().getTypeName()
 				+ " Properties");
 
@@ -119,7 +99,7 @@ class ConfigDialog extends JDialog {
 
 	JPanel panel;
 
-	public void init(DialogConfig configManager, Component c) {
+	public void init(UserConfig configManager, Component c) {
 		this.configManager = configManager;
 		setResizable(false);
 		setModal(true);
@@ -201,12 +181,12 @@ class ConfigDialog extends JDialog {
 		 */
 		boolean defaultFound = false;
 		for (int i = 0; i < files.length; i++) {
-			if (files[i].compareTo(DialogConfig.DEFAULT_PROPERTY_FILE_NAME) == 0) {
+			if (files[i].compareTo(UserConfig.DEFAULT_PROPERTY_FILE_NAME) == 0) {
 				defaultFound = true;
 				fileList.setSelectedIndex(i);
 
 				configManager
-						.loadPropertiesFromFile(DialogConfig.DEFAULT_PROPERTY_FILE_NAME);
+						.loadPropertiesFromFile(UserConfig.DEFAULT_PROPERTY_FILE_NAME);
 			}
 		}
 		if (!defaultFound && fileList.getSelectedItem() != null) {
@@ -285,6 +265,32 @@ class ConfigDialog extends JDialog {
 		panel.add(seperator);
 	}
 
+	private void okAction() {
+		if (applyProperties()) {
+			setVisible(false);
+			dispose();
+
+			configManager.getConfigurable().completeConfiguration(
+					new PropertySet(configManager.getProperties()));
+
+			configManager
+					.savePropertiesFile(UserConfig.DEFAULT_PROPERTY_FILE_NAME);
+
+		} else {
+
+		}
+	}
+
+	boolean isCancelled = false;
+
+	private void cancelAction() {
+		isCancelled = true;
+
+		setVisible(false);
+		dispose();
+		configManager.getConfigurable().cancelConfiguration();
+	}
+
 	public void createButtons() {
 		JPanel buttonsPanel = new Panel();
 		buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
@@ -294,25 +300,7 @@ class ConfigDialog extends JDialog {
 		JButton addToWorldButton = new JButton("Ok");
 		addToWorldButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (applyProperties()) {
-					setVisible(false);
-					dispose();
-
-					(new Thread() {
-						public void run() {
-							configManager.getConfigurable()
-									.completeConfiguration(
-											new PropertySet(configManager
-													.getProperties()));
-							configManager.finishedConfiguring();
-							configManager
-									.savePropertiesFile(DialogConfig.DEFAULT_PROPERTY_FILE_NAME);
-						}
-					}).start();
-
-				} else {
-
-				}
+				okAction();
 			}
 		});
 		buttonsPanel.add(addToWorldButton);
@@ -320,11 +308,7 @@ class ConfigDialog extends JDialog {
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				configManager.finishedConfiguring();
-				setVisible(false);
-				dispose();
-				configManager.getConfigurable().cancelConfiguration();
+				cancelAction();
 			}
 		});
 		buttonsPanel.add(cancelButton);
@@ -366,6 +350,10 @@ class ConfigDialog extends JDialog {
 		}
 
 		return true;
+	}
+
+	public boolean isCancelled() {
+		return isCancelled;
 	}
 
 }

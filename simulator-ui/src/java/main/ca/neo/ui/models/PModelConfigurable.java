@@ -1,9 +1,14 @@
 package ca.neo.ui.models;
 
+import java.lang.reflect.InvocationTargetException;
+
+import javax.swing.SwingUtilities;
+
 import ca.neo.ui.style.Style;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PText;
@@ -26,7 +31,6 @@ public abstract class PModelConfigurable extends PModel implements
 		init();
 	}
 
-	
 	public PModelConfigurable(Object model) {
 		super(model);
 		init();
@@ -37,15 +41,40 @@ public abstract class PModelConfigurable extends PModel implements
 
 	}
 
-	
 	public void completeConfiguration(PropertySet properties) {
-		TrackedStatusMsg task = new TrackedStatusMsg("Creating " + getName() + " ("
-				+ getTypeName() + ")");
 
-		setModel(configureModel(properties));
-		afterModelCreated();
-		task.finished();
+		(new ConfigureModelActivity(properties)).startThread();
 
+	}
+
+	class ConfigureModelActivity extends TrackedActivity {
+		PropertySet properties;
+
+		public ConfigureModelActivity(PropertySet properties) {
+			super("Creating " + getName() + " (" + getTypeName() + ")");
+			this.properties = properties;
+		}
+
+		Object model;
+
+		@Override
+		public void doActivity() {
+			model = configureModel(properties);
+
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						setModel(model);
+						afterModelCreated();
+					}
+				});
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+
+		}
 	}
 
 	public abstract PropDescriptor[] getConfigSchema();
@@ -77,6 +106,10 @@ public abstract class PModelConfigurable extends PModel implements
 	}
 
 	/**
+	 * WARNING: This function may be called from any Thread, so it is not safe
+	 * to put UI stuff here If there's UI Stuff to be done, put it in
+	 * afterModelCreated
+	 * 
 	 * Creates a model for the configuration process, called if a ConfigManager
 	 * is used
 	 * 

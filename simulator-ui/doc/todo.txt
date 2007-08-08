@@ -1,7 +1,9 @@
 *******************************************
  Done
 *******************************************
-fixed some Swing thread safety issues
+(08/08) done - Remove probes, probes are also updated from the Simulator using getProbes
+(08/08) done - fixed infinite loop bug when GProbe is destroyed
+(08/08) done - fixed some Swing thread safety issues
 
 (08/08) done - size of ensembles & networks proportional to number of nodes
 (08/07) done - save/open ensembles
@@ -26,7 +28,9 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
-add messages in UI
+
+
+add transient messages in UI
 
 information visualization
 	dimensions of functions, nodes
@@ -36,6 +40,7 @@ fixed warnings
 show simulation progress in UI
 	create a listener object for Simulator
 
+minimize all windows action
 
 display information about nodes in a hover over
 
@@ -60,6 +65,7 @@ redo functionality to allow duplicate actions to be performed
 *******************************************
  Pri 2 - will do eventually
 *******************************************
+debug paint calls using PDebug
 
 add keyboard shortcuts
 
@@ -110,7 +116,6 @@ Lenses
 
 Customize FileChooser to add extensions
 
-debug paint events using PDebug to optimize performance
 	
 Ctrl-key to enable popups (even when autopops are turned off)
 
@@ -134,3 +139,5 @@ more Network examples
 
 Require events notification
 	show scopes data in real time from the UI
+
+talk about brain view

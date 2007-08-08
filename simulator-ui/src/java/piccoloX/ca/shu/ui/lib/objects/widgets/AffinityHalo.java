@@ -5,6 +5,7 @@ import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 
+import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.GEdge;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -17,6 +18,8 @@ public class AffinityHalo extends GEdge {
 		startNode.addChild(1, this);
 		// this.setStroke(new Stroke( ))
 		updateEdge();
+		setDefaultColor(Style.COLOR_FOREGROUND);
+
 	}
 
 	/**

@@ -33,10 +33,10 @@ public abstract class PModelWidget extends PModelConfigurable {
 	}
 
 	@Override
-	public void destroy() {
+	protected void prepareForDestroy() {
 
 		nodeParent.removeWidget(this);
-		super.destroy();
+		super.prepareForDestroy();
 	}
 
 	public PNeoNode getNodeParent() {

@@ -152,4 +152,10 @@ public abstract class PNodeContainer extends PNeoNode {
 
 	}
 
+	@Override
+	protected void afterModelCreated() {
+		super.afterModelCreated();
+
+	}
+
 }

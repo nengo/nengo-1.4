@@ -9,7 +9,7 @@ import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
+import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PTFunction;
@@ -133,7 +133,7 @@ class PlotFunctionAction extends StandardAction implements IConfigurable {
 		pFunctionIndex = new PTInt("Function index", 0, functionInput
 				.getFunctions().length - 1);
 
-		new DialogConfig(this);
+		new UserConfig(this);
 
 	}
 

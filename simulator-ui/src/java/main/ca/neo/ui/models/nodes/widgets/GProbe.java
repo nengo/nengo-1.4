@@ -22,27 +22,19 @@ import ca.shu.ui.lib.util.Util;
 
 public class GProbe extends PModel {
 
-	
 	private static final long serialVersionUID = 1L;
 	PNeoNode nodeProxy;
 
+	public GProbe(PNeoNode nodeProxy, Probe model) {
+		super(model);
+		init(nodeProxy);
+	}
+
 	public GProbe(PNeoNode nodeProxy, String state) {
 		super();
-		this.nodeProxy = nodeProxy;
-
-		setDraggable(false);
-		setName(state);
 
 		/*
-		 * Create icon
-		 */
-		ModelIcon icon = new ProbeIcon(this);
-		icon.configureLabel(false);
-		icon.setLabelVisible(false);
-		setIcon(icon);
-
-		/*
-		 * Create the node
+		 * Creates the probe
 		 */
 		Node node = nodeProxy.getModel();
 
@@ -51,11 +43,26 @@ public class GProbe extends PModel {
 					node.getName(), state, true);
 
 			setModel(probe);
+			init(nodeProxy);
 		} catch (SimulationException e) {
 			destroy();
 			Util.Error("Could not add probe: " + e.toString());
 		}
+	}
 
+	private void init(PNeoNode nodeProxy) {
+		this.nodeProxy = nodeProxy;
+
+		setDraggable(false);
+		setName(getModel().getStateName());
+
+		/*
+		 * Create icon
+		 */
+		ModelIcon icon = new ProbeIcon(this);
+		icon.configureLabel(false);
+		icon.setLabelVisible(false);
+		setIcon(icon);
 	}
 
 	@Override
@@ -119,24 +126,30 @@ public class GProbe extends PModel {
 	}
 
 	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		super.destroy();
+	protected void prepareForDestroy() {
+
+		super.prepareForDestroy();
+
+		try {
+			nodeProxy.getParentNetwork().getSimulator().removeProbe(getProbe());
+		} catch (SimulationException e) {
+			Util.Error("Could not remove probe");
+		}
+
 		nodeProxy.removeProbe(this);
 
-		Util.Error("Ability to remove probes functionality is not implemented");
 	}
 
 	class ExportToMatlabAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
+		String name;
+
 		public ExportToMatlabAction() {
 			super("Matlab");
 			// TODO Auto-generated constructor stub
 		}
-
-		String name;
 
 		@Override
 		protected void action() throws ActionException {
@@ -190,6 +203,11 @@ public class GProbe extends PModel {
 			}
 
 		}
+	}
+
+	@Override
+	public Probe getModel() {
+		return (Probe) super.getModel();
 	}
 
 }
