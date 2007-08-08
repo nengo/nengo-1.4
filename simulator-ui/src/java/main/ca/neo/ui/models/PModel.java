@@ -141,13 +141,17 @@ public abstract class PModel extends WorldObjectImpl implements Interactable {
 		iconPropertyChangeListener = new PropertyChangeListener() {
 
 			public void propertyChange(PropertyChangeEvent arg0) {
-				PModel.this.setBounds(icon.getFullBounds());
+				updateBounds();
 			}
 
 		};
-		PModel.this.setBounds(icon.getFullBounds());
+		updateBounds();
 		icon.addPropertyChangeListener(PROPERTY_BOUNDS,
 				iconPropertyChangeListener);
 
+	}
+
+	private void updateBounds() {
+		PModel.this.setBounds(icon.getBounds());
 	}
 }

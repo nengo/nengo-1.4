@@ -196,7 +196,11 @@ public class POrigin extends PModelWidget {
 			if (!(target instanceof PTermination))
 				return false;
 			if (modifyModel) {
-				return POrigin.this.connectModelTo((PTermination) target);
+				if (POrigin.this.connectModelTo((PTermination) target)) {
+
+				} else {
+//					getWorld().showTransientMsg("New projection added", this);
+				}
 			}
 			return true;
 		}

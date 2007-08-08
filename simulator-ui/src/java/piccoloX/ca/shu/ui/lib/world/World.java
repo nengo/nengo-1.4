@@ -13,6 +13,8 @@ import edu.umd.cs.piccolo.activities.PTransformActivity;
 public interface World {
 	public boolean containsNode(PNode node);
 
+	public void showTransientMsg(String msg, WorldObjectImpl attachTo);
+
 	public PTransformActivity zoomToFit();
 
 	public void addPropertyChangeListener(String propertyName,
@@ -26,7 +28,6 @@ public interface World {
 			WorldObjectImpl nodeAttacedTo);
 
 	public void hideControls();
-
 
 	public WorldGround getGround();
 

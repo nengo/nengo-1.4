@@ -81,7 +81,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 
 	WorldObjectImpl controls;
 
-	WorldObjectImpl controlsHolder;
+	WorldObjectImpl widgetLayer;
 
 	PNode gridLayer = null;
 
@@ -99,7 +99,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
 		addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
 
-		controlsHolder = new WorldObjectImpl();
+		widgetLayer = new WorldObjectImpl();
 
 		layer = new PLayer();
 
@@ -138,7 +138,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		setStatusBarHandler(new StatusBarHandler(this));
 
 		skyCamera.setPaint(Style.COLOR_BACKGROUND);
-		skyCamera.addChild(controlsHolder);
+		skyCamera.addChild(widgetLayer);
 		setCameraCenterPosition(0, 0);
 		setWorldScale(0.7f);
 		skyCamera.addLayer(layer);
@@ -262,39 +262,31 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		return constructMenu().getJPopupMenu();
 	}
 
-	public void showTransientMsg(String msg, WorldObjectImpl objectAttachedTo) {
+	public void showTransientMsg(String msg, WorldObjectImpl attachTo) {
 
 		GText msgObject = new GText(msg);
+		msgObject.setConstrainWidthToTextWidth(true);
+
+		double offsetX = (msgObject.getWidth() - attachTo.getWidth()) / 2d;
+
+		Point2D position = attachTo
+				.objectToSky(new Point2D.Double(offsetX, -5));
+
+		msgObject.setOffset(position);
+		getSky().addChild(msgObject);
 
 	}
 
-	// public Point2D getPositionInSky(WorldObjectImpl wo) {
-	// WorldLayer layer = wo.getWorldLayer();
-	// Point2D position;
-	//
-	// position = wo.localToGlobal(new Point2D.Double(0, 0));
-	//
-	// if (layer instanceof WorldGround) {
-	// skyCamera.viewToLocal(position);
-	// return position;
-	// } else if (layer instanceof WorldSky) {
-	// return position;
-	// }
-	// return null;
-	//
-	// }
-
-	public void showTooltip(WorldObjectImpl pControls,
-			WorldObjectImpl objectAttachedTo) {
+	public void showTooltip(WorldObjectImpl pControls, WorldObjectImpl attachTo) {
 
 		hideControls();
-		if (objectAttachedTo == null) {
+		if (attachTo == null) {
 			return;
 		}
 		PCamera camera = getSky();
 
-		Point2D position = objectAttachedTo.objectToSky(new Point2D.Double(0,
-				objectAttachedTo.getHeight()));
+		Point2D position = attachTo.objectToSky(new Point2D.Double(0, attachTo
+				.getHeight()));
 
 		double x = position.getX();
 		double y = position.getY();
@@ -320,9 +312,9 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 
 		position = new Point2D.Double(x, y);
 
-		controlsHolder.moveToFront();
-		controlsHolder.addChildFancy(controls);
-		controlsHolder.setTransparency(0.5f);
+		widgetLayer.moveToFront();
+		widgetLayer.addChildFancy(controls);
+		widgetLayer.setTransparency(0.5f);
 
 		controls.setOffset(position);
 

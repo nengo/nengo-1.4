@@ -66,7 +66,11 @@ public class ModelIcon extends WorldObjectImpl implements NamedObject,
 		 * The bounds of this object matches those of the real icon
 		 */
 		iconReal.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+		updateBounds();
+	}
 
+	private void updateBounds() {
+		setBounds(iconReal.localToParent(iconReal.getBounds()));
 	}
 
 	boolean showTypeInLabel = true;
@@ -111,8 +115,7 @@ public class ModelIcon extends WorldObjectImpl implements NamedObject,
 		String propertyName = event.getPropertyName();
 
 		if (propertyName == PROPERTY_FULL_BOUNDS) {
-			setBounds(iconReal.localToParent(iconReal.getBounds()));
-			invalidateLayout();
+			updateBounds();
 		} else if (propertyName == PModel.PROPERTY_MODEL) {
 			modelUpdated();
 		}
