@@ -68,9 +68,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	public void addWidget(PModelWidget widget) {
-		if (widgets == null) {
-			widgets = new Vector<PModelWidget>(3);
-		}
 
 		widget.setScale(0.5);
 		widgets.add(widget);
@@ -179,12 +176,10 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 *            The name of the state variable to probe
 	 */
 	public GProbe addProbe(String stateName) {
-		
-		
+
 		GProbe probeUI = new GProbe(this, stateName);
 		newProbeAdded(probeUI);
-		
-		
+
 		return probeUI;
 	}
 
@@ -315,8 +310,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 	@SuppressWarnings("unchecked")
 	public WorldObjectImpl getWidget(String name, Class type) {
 
-		if (widgets == null)
-			return null;
 		/*
 		 * Linear search used because there tends to be only a small number of
 		 * widets
@@ -342,9 +335,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * Hides all origins and terminations
 	 */
 	public void hideAllOandT() {
-		if (widgets == null)
-			return;
-
+		
 		Iterator<PModelWidget> it = widgets.iterator();
 		while (it.hasNext()) {
 			PModelWidget widget = it.next();
@@ -359,9 +350,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * Hide all widgets
 	 */
 	public void hideAllWidgets() {
-		if (widgets == null)
-			return;
-
+		
 		Iterator<PModelWidget> it = widgets.iterator();
 		while (it.hasNext()) {
 			it.next().setWidgetVisible(false);
@@ -373,7 +362,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 */
 	public void layoutWidgets() {
 
-		if (widgets != null) {
+		if (widgets.size() >= 0) {
 			Rectangle2D bounds = getIcon().localToGlobal(getIcon().getBounds());
 
 			double offsetX = bounds.getX();
@@ -534,7 +523,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	private void init() {
-
+		widgets = new Vector<PModelWidget>(0);
 	}
 
 	/**
@@ -584,7 +573,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * node
 	 */
 	protected void moveWidgetsToFront() {
-		if (widgets == null)
+		if (widgets.size() == 0)
 			return;
 
 		WorldLayer layer = getWorldLayer();
