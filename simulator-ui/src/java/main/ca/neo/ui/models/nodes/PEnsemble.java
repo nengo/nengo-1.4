@@ -60,4 +60,9 @@ public class PEnsemble extends PNodeContainer {
 		return new EnsembleViewer(this);
 	}
 
+	@Override
+	public int getNodesCount() {
+		return getModel().getNodes().length;
+	}
+
 }

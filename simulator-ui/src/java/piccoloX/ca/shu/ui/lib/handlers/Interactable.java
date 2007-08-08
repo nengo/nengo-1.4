@@ -6,6 +6,12 @@ import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
+/**
+ * Objects which can be interacted with through context menus
+ * 
+ * @author Shu
+ * 
+ */
 public interface Interactable extends NamedObject, WorldObject {
 
 	/**
@@ -19,6 +25,5 @@ public interface Interactable extends NamedObject, WorldObject {
 	 * @return whether the Context Menu is enabled
 	 */
 	public boolean isContextMenuEnabled();
-
 
 }

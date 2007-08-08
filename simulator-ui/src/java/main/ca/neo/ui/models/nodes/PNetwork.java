@@ -16,7 +16,7 @@ import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 /**
  * GUI Wrapper for a Network Model
  * 
- * @author Shu
+ * @author Shu Wu
  * 
  */
 public class PNetwork extends PNodeContainer {
@@ -38,9 +38,7 @@ public class PNetwork extends PNodeContainer {
 	public PNetwork(Network model) {
 		super(model);
 
-		setName(model.getName());
 		init();
-
 	}
 
 	/**
@@ -115,6 +113,17 @@ public class PNetwork extends PNodeContainer {
 		network.setName((String) configuredProperties.getProperty(pName));
 
 		return network;
+	}
+
+	@Override
+	protected boolean validateFullBounds() {
+		// TODO Auto-generated method stub
+		return super.validateFullBounds();
+	}
+
+	@Override
+	public int getNodesCount() {
+		return getModel().getNodes().length;
 	}
 
 }

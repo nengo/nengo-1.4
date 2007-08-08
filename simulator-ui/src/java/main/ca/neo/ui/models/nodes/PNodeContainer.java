@@ -35,6 +35,11 @@ public abstract class PNodeContainer extends PNeoNode {
 	}
 
 	/**
+	 * @return Number of nodes contained by the Model
+	 */
+	public abstract int getNodesCount();
+
+	/**
 	 * Minimizes the Network Viewer GUI
 	 */
 	public void closeViewer() {

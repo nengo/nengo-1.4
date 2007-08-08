@@ -41,6 +41,10 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 
 	protected Hashtable<String, PNeoNode> nodesUI = new Hashtable<String, PNeoNode>();
 
+	public Enumeration<PNeoNode> getViewedNodesElements() {
+		return nodesUI.elements();
+	}
+
 	/**
 	 * @param nodeContainer
 	 *            UI Object containing the Node model

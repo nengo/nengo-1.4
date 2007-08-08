@@ -481,7 +481,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		String oldName = this.name;
 		this.name = name;
 
-		firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
+//		firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
 
 	}
 

@@ -9,6 +9,7 @@ import java.net.URL;
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.util.UIEnvironment;
 import edu.umd.cs.piccolo.nodes.PImage;
+import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
@@ -32,12 +33,21 @@ public class IconImage extends PImage {
 
 	private void init() {
 		path = new GeneralPath();
-
+		originalBounds = getBounds();
 	}
 
+	PBounds originalBounds;
+
 	private void updatePath(double scale) {
+		double origWidth = originalBounds.getWidth();
+		double origHeight = originalBounds.getHeight();
+		double width = origWidth * scale;
+		double height = origWidth * scale;
+		double offsetX = (origWidth - width) / 2f;
+		double offsetY = (origHeight - height) / 2f;
+
 		path.reset();
-		TEMP_ELLIPSE.setFrame(0, 0, 50 * scale, 50 * scale);
+		TEMP_ELLIPSE.setFrame(offsetX, offsetY, width, height);
 		path.append(TEMP_ELLIPSE, false);
 
 	}

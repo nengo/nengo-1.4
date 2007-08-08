@@ -6,6 +6,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import ca.neo.ui.models.PNeoNode;
+import edu.umd.cs.piccolo.util.PBounds;
 
 public class NodeLayout implements Serializable {
 
@@ -14,31 +15,34 @@ public class NodeLayout implements Serializable {
 	Hashtable<String, Point2D> nodePositions;
 	String layoutName;
 
+	// /**
+	// * @param layoutName
+	// * Name of the layout
+	// */
+	// public NodeLayout(String layoutName) {
+	// super();
+	//
+	// }
+	PBounds savedViewBounds;
+
 	/**
 	 * @param layoutName
 	 *            Name of the layout
+	 * @param nodeViewer
+	 *            Viewer containing nodes
 	 */
-	public NodeLayout(String layoutName) {
+	public NodeLayout(String layoutName, NodeViewer nodeViewer) {
 		super();
 		this.layoutName = layoutName;
 		nodePositions = new Hashtable<String, Point2D>();
-	}
 
-	/**
-	 * @param layoutName
-	 *            Name of the layout
-	 * @param nodes
-	 *            Hastable of nodes
-	 */
-	public NodeLayout(String layoutName, Hashtable<String, PNeoNode> nodes) {
-		this(layoutName);
-
-		Enumeration<PNeoNode> en = nodes.elements();
+		Enumeration<PNeoNode> en = nodeViewer.getViewedNodesElements();
 
 		while (en.hasMoreElements()) {
 			PNeoNode node = en.nextElement();
 			addPosition(node.getName(), node.getOffset());
 		}
+		savedViewBounds = nodeViewer.getSky().getViewBounds();
 
 	}
 
@@ -52,6 +56,10 @@ public class NodeLayout implements Serializable {
 
 	public String getName() {
 		return layoutName;
+	}
+
+	public PBounds getSavedViewBounds() {
+		return savedViewBounds;
 	}
 
 }

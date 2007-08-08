@@ -1,11 +1,11 @@
 package ca.neo.ui.models.nodes.widgets;
 
 import ca.neo.ui.models.PModel;
-import ca.neo.ui.models.icons.IconWrapper;
+import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.style.Style;
 import edu.umd.cs.piccolo.nodes.PPath;
 
-public class ProbeIcon extends IconWrapper {
+public class ProbeIcon extends ModelIcon {
 
 	public ProbeIcon(PModel parent) {
 		super(parent, new IconNode());

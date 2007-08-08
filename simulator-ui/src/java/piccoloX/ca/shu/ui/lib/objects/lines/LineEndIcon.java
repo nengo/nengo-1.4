@@ -34,7 +34,7 @@ class PointerTriangle extends GEdge {
 
 	public PointerTriangle(LineEndIcon lineEndIcon) {
 		super(lineEndIcon.parent.getWell(), lineEndIcon.parent);
-		setPaint(Style.COLOR_FOREGROUND);
+		setPaint(Style.COLOR_LINEEND);
 
 		setOffset(lineEndIcon.getWidth() / 2, lineEndIcon.getHeight() / 2);
 		setBounds(-TRIANGLE_EDGE_LENGTH / 2, -TRIANGLE_EDGE_LENGTH / 2,

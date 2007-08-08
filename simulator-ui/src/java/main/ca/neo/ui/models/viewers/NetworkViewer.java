@@ -18,7 +18,7 @@ import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.actions.SaveNodeContainerAction;
-import ca.neo.ui.models.icons.IconWrapper;
+import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
@@ -66,7 +66,7 @@ public class NetworkViewer extends NodeViewer {
 
 	// PNetwork networkProxy;
 
-	IconWrapper icon;
+	ModelIcon icon;
 
 	public void saveLayoutAsDefault() {
 		saveNodeLayout(NetworkViewer.DEFAULT_NODE_LAYOUT_NAME);
@@ -87,15 +87,7 @@ public class NetworkViewer extends NodeViewer {
 
 		NodeLayoutManager layouts = getNodeLayoutManager();
 		if (layouts != null) {
-			NodeLayout nodeLayout = new NodeLayout(name);
-
-			Enumeration<PNeoNode> en = nodesUI.elements();
-
-			while (en.hasMoreElements()) {
-				PNeoNode node = en.nextElement();
-				nodeLayout.addPosition(node.getName(), node.getOffset());
-
-			}
+			NodeLayout nodeLayout = new NodeLayout(name, this);
 
 			layouts.addLayout(nodeLayout);
 		} else {
@@ -187,7 +179,7 @@ public class NetworkViewer extends NodeViewer {
 
 			Constructor ct = layoutType.getConstructor(ctArgs);
 			Object[] args = new Object[1];
-			args[0] = getGraph();
+			args[0] = createGraph();
 
 			layout = (Layout) ct.newInstance(args);
 
@@ -227,9 +219,8 @@ public class NetworkViewer extends NodeViewer {
 		 * File menu
 		 */
 		menu.addSection("File");
-		menu
-				.addAction(new SaveNodeContainerAction("Save network",
-						getViewerParent()));
+		menu.addAction(new SaveNodeContainerAction("Save network",
+				getViewerParent()));
 
 		/*
 		 * Create new models
@@ -310,10 +301,10 @@ public class NetworkViewer extends NodeViewer {
 	 * 
 	 * @return The nodes as a graph
 	 */
-	public Graph getGraph() {
+	protected Graph createGraph() {
 		DirectedSparseGraph graph = new DirectedSparseGraph();
 
-		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		Enumeration<PNeoNode> enumeration = getViewedNodesElements();
 
 		/**
 		 * Add vertices
@@ -421,6 +412,9 @@ public class NetworkViewer extends NodeViewer {
 				node.animateToPositionScaleRotation(savedPosition.getX(),
 						savedPosition.getY(), 1, 0, 1000);
 			}
+		}
+		if (layout.getSavedViewBounds() != null) {
+			getSky().setViewBounds(layout.getSavedViewBounds());
 		}
 		return true;
 	}
@@ -589,7 +583,7 @@ public class NetworkViewer extends NodeViewer {
 
 		@Override
 		protected void action() throws ActionException {
-			savedLayout = new NodeLayout("", nodesUI);
+			savedLayout = new NodeLayout("", NetworkViewer.this);
 			applyJungLayout(layoutClass);
 
 		}
@@ -662,7 +656,7 @@ public class NetworkViewer extends NodeViewer {
 
 		@Override
 		protected void action() throws ActionException {
-			savedLayout = new NodeLayout("", nodesUI);
+			savedLayout = new NodeLayout("", NetworkViewer.this);
 			applySquareLayout();
 		}
 

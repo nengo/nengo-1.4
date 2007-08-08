@@ -36,6 +36,14 @@ import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 
+/**
+ * Implementation of World. World holds World Objects and has navigation and
+ * interaction handlers.
+ * 
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
@@ -396,8 +404,6 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		}
 
 	}
-
-
 
 }
 

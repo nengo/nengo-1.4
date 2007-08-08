@@ -11,7 +11,7 @@ import ca.neo.model.SimulationException;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.icons.IconWrapper;
+import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -36,7 +36,7 @@ public class GProbe extends PModel {
 		/*
 		 * Create icon
 		 */
-		IconWrapper icon = new ProbeIcon(this);
+		ModelIcon icon = new ProbeIcon(this);
 		icon.configureLabel(false);
 		icon.setLabelVisible(false);
 		setIcon(icon);

@@ -106,6 +106,8 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 			if (ensembleUI != null)
 				getWorld().getGround().catchObject(ensembleUI);
 
+			ensembleUI.openViewer();
+
 		}
 
 	}
@@ -124,6 +126,9 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 			if (objLoaded instanceof Network) {
 				PNetwork networkUI = new PNetwork((Network) objLoaded);
 				getWorld().getGround().catchObject(networkUI);
+
+				networkUI.openViewer();
+
 			} else {
 				Util.Error("Could not load Network file");
 			}

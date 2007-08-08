@@ -11,9 +11,6 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
-import ca.neo.ui.models.nodes.PNetwork;
-import ca.shu.ui.lib.objects.widgets.TrackedMsg;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * DEFUNCT: Originally, in this example, the integrator network is constructed
@@ -27,30 +24,18 @@ import ca.shu.ui.lib.util.Util;
  * @author Shu Wu
  * 
  */
-public class GIntegratorExample {
-	static final float tau = .05f;
+public class GIntegratorExample extends ExampleRunner {
+
+	public GIntegratorExample() throws StructuralException {
+		super("Integrator Example", createNetwork());
+	}
 
 	public static void main(String[] args) {
 
-		NeoGraphics neoGraphics = new NeoGraphics("Integrator Example");
-
 		try {
-			TrackedMsg task = new TrackedMsg(
-					"Creating Integrator NEO Network model");
-			Network network = createNetwork();
-			task.finished();
-
-			task = new TrackedMsg("Creating Integrator Model UI");
-			PNetwork networkUI = new PNetwork(network);
-
-			neoGraphics.addWorldObject(networkUI);
-
-			networkUI.openViewer();
-
-			task.finished();
-
+			new GIntegratorExample();
 		} catch (StructuralException e) {
-			Util.Error("Could not create network: " + e.toString());
+			e.printStackTrace();
 		}
 	}
 

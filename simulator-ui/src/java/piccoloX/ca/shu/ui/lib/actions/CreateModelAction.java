@@ -2,6 +2,7 @@ package ca.shu.ui.lib.actions;
 
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.nodes.PNodeContainer;
 import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 
 public class CreateModelAction extends ReversableAction {
@@ -53,6 +54,10 @@ public class CreateModelAction extends ReversableAction {
 
 			if (nodeProxy.isModelCreated()) {
 				nodeContainer.addNeoNode(nodeProxy);
+
+				if (nodeProxy instanceof PNodeContainer) {
+					((PNodeContainer) nodeProxy).openViewer();
+				}
 
 			}
 		} catch (InstantiationException e) {

@@ -20,7 +20,7 @@ import edu.umd.cs.piccolo.nodes.PText;
  * @author Shu Wu
  * 
  */
-public class IconWrapper extends WorldObjectImpl implements NamedObject,
+public class ModelIcon extends WorldObjectImpl implements NamedObject,
 		PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
@@ -31,8 +31,8 @@ public class IconWrapper extends WorldObjectImpl implements NamedObject,
 
 	PModel parent;
 
-	public IconWrapper(PModel parent, PNode innerNode) {
-		this(parent, innerNode, 1);
+	public PModel getModelParent() {
+		return parent;
 	}
 
 	/**
@@ -43,11 +43,10 @@ public class IconWrapper extends WorldObjectImpl implements NamedObject,
 	 * @param scale
 	 *            Scale of the Icon
 	 */
-	public IconWrapper(PModel parent, PNode icon, float scale) {
+	public ModelIcon(PModel parent, PNode icon) {
 		super();
 		this.parent = parent;
 		this.iconReal = icon;
-		this.iconReal.setScale(scale);
 
 		addChild(icon);
 		label = new GText();
@@ -59,10 +58,14 @@ public class IconWrapper extends WorldObjectImpl implements NamedObject,
 			((WorldObject) icon).setDraggable(false);
 		}
 
-		parent.addPropertyChangeListener(PROPERTY_NAME, this);
-		this.setDraggable(false);
+		// parent.addPropertyChangeListener(PROPERTY_NAME, this);
+		parent.addPropertyChangeListener(PModel.PROPERTY_MODEL, this);
+		setDraggable(false);
 
-		this.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+		/*
+		 * The bounds of this object matches those of the real icon
+		 */
+		iconReal.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
 	}
 
@@ -102,22 +105,22 @@ public class IconWrapper extends WorldObjectImpl implements NamedObject,
 	}
 
 	/**
-	 * Is called when the parent's name is changed
+	 * Updates bounds and label name
 	 */
 	public void propertyChange(PropertyChangeEvent event) {
-		if (event.getPropertyName() == PROPERTY_NAME) {
-			updateLabel();
-		} else if (event.getPropertyName() == PROPERTY_FULL_BOUNDS) {
+		String propertyName = event.getPropertyName();
+
+		if (propertyName == PROPERTY_FULL_BOUNDS) {
 			setBounds(iconReal.localToParent(iconReal.getBounds()));
+			invalidateLayout();
+		} else if (propertyName == PModel.PROPERTY_MODEL) {
+			modelUpdated();
 		}
 
 	}
 
-	@Override
-	public void removedFromWorld() {
-		super.removedFromWorld();
-		parent.removePropertyChangeListener(PROPERTY_NAME, this);
-		this.removePropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+	protected void modelUpdated() {
+		updateLabel();
 	}
 
 	/**
@@ -145,11 +148,11 @@ public class IconWrapper extends WorldObjectImpl implements NamedObject,
 		/*
 		 * Layout the icon and label
 		 */
-		double iconWidth = iconReal.getWidth() * iconReal.getScale();
+		double iconWidth = getWidth() * getScale();
 		double labelWidth = label.getWidth();
 		double offsetX = ((labelWidth - iconWidth) / 2.0) * -1;
 
-		label.setOffset(offsetX, iconReal.getHeight() * iconReal.getScale());
+		label.setOffset(offsetX, getHeight() * getScale());
 
 	}
 
@@ -177,7 +180,7 @@ class IconTooltip extends WorldObjectImpl {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public IconTooltip(IconWrapper icon) {
+	public IconTooltip(ModelIcon icon) {
 		super();
 		PText tag = new PText(icon.getName() + " Icon");
 		tag.setTextPaint(Style.COLOR_FOREGROUND);

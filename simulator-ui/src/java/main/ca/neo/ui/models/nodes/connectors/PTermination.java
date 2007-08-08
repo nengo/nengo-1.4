@@ -2,7 +2,7 @@ package ca.neo.ui.models.nodes.connectors;
 
 import ca.neo.model.Termination;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.icons.IconWrapper;
+import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -47,7 +47,7 @@ public class PTermination extends PModelWidget implements ILineAcceptor {
 		 * Set up the Icon
 		 */
 
-		IconWrapper icon = new IconWrapper(this, new LineInIcon());
+		ModelIcon icon = new ModelIcon(this, new LineInIcon());
 		icon.configureLabel(false);
 
 		setIcon(icon);

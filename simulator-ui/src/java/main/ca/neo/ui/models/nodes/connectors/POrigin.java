@@ -6,7 +6,7 @@ import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.icons.IconWrapper;
+import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Tooltip;
@@ -210,7 +210,7 @@ public class POrigin extends PModelWidget {
 
 	}
 
-	class OriginIcon extends IconWrapper {
+	class OriginIcon extends ModelIcon {
 
 		private static final long serialVersionUID = 1L;
 

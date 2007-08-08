@@ -6,6 +6,8 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
@@ -435,13 +437,12 @@ public abstract class PNeoNode extends PModelConfigurable {
 		assignProbes();
 	}
 
-	// Vector<POrigin> origins;
-
 	@Override
-	public void setModel(Object model) {
-		// TODO Auto-generated method stub
-		super.setModel(model);
-		setName(((Node) model).getName());
+	public final void setName(String name) {
+		/*
+		 * Set name is disabled, the Name is automatically retrieved from model
+		 */
+		throw new NotImplementedException();
 	}
 
 	public void setVertex(Vertex vertex) {
@@ -505,13 +506,13 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 */
 	public void update() {
 
-//		Origin[] origins = getModel().getOrigins();
-//		Termination[] terminations = getModel().getTerminations();
-//
-//		for (int i = 0; i < origins.length; i++) {
-//			Origin origin = origins[i];
-//
-//		}
+		// Origin[] origins = getModel().getOrigins();
+		// Termination[] terminations = getModel().getTerminations();
+		//
+		// for (int i = 0; i < origins.length; i++) {
+		// Origin origin = origins[i];
+		//
+		// }
 	}
 
 	private void init() {
@@ -554,7 +555,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void layoutChildren() {
-		// TODO Auto-generated method stub
 		super.layoutChildren();
 
 		layoutWidgets();
@@ -682,6 +682,15 @@ public abstract class PNeoNode extends PModelConfigurable {
 	public void setHoveredOver(boolean bool) {
 		isHoverOver = bool;
 		layoutWidgets();
+	}
+
+	@Override
+	public String getName() {
+		if (getModel() != null) {
+			return getModel().getName();
+		} else {
+			return "";
+		}
 	}
 
 }

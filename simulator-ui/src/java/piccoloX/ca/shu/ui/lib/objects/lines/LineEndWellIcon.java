@@ -19,8 +19,9 @@ public class LineEndWellIcon extends WorldObjectImpl {
 
 	static final int LINE_END_WIDTH = 30;
 	static final int LINE_END_HEIGHT = 30;
-	static final double ICON_RADIUS = Math.sqrt((LINE_END_WIDTH * LINE_END_WIDTH)
-			+ (LINE_END_HEIGHT * LINE_END_HEIGHT)) / 2;
+	static final double ICON_RADIUS = Math
+			.sqrt((LINE_END_WIDTH * LINE_END_WIDTH)
+					+ (LINE_END_HEIGHT * LINE_END_HEIGHT)) / 2;
 
 	static Color color = Style.COLOR_LINEEND;
 
@@ -31,7 +32,7 @@ public class LineEndWellIcon extends WorldObjectImpl {
 		Graphics2D g2 = (Graphics2D) paintContext.getGraphics();
 		Color bright2 = Util.colorAdd(color, new Color(0.4f, 0.4f, 0.4f));
 		if (paintContext.getScale() < 0.5) {
-			g2.setColor(bright2);
+			g2.setColor(color);
 			g2.fillOval(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);
 		} else {
 

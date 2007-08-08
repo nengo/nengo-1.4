@@ -26,18 +26,23 @@ public abstract class TrackedActivity {
 	public void startAsThread() {
 		startThread(false);
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param invokelater
-	 *            Whether to use SwingUtilities to invoke this later
+	 *            If true, the thread will be invoked on the Swing event
+	 *            dispatching thread
 	 */
 	public void startThread(boolean invokelater) {
 		trackedMsg = new TrackedMsg(taskName, wo);
 		Runnable r = new Runnable() {
 			public void run() {
-				doActivity();
+
+				try {
+					doActivity();
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+				}
 				trackedMsg.finished();
 			}
 		};
@@ -57,5 +62,3 @@ public abstract class TrackedActivity {
 	public abstract void doActivity();
 
 }
-
-

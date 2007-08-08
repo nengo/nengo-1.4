@@ -5,6 +5,8 @@ import java.awt.Font;
 
 import javax.swing.JComponent;
 
+import org.w3c.dom.css.RGBColor;
+
 public class Style {
 	public static final int ANIMATION_DROP_IN_WORLD_MS = 200;
 	public static final Color COLOR_BACKGROUND = Color.black;
@@ -32,8 +34,11 @@ public class Style {
 	/*
 	 * Line Colors
 	 */
-	public static final Color COLOR_LINEEND = Color.gray;
-	public static final Color COLOR_LINEIN = Color.gray;
+	public static final Color COLOR_LINEEND = new Color(176, 246, 182);
+	public static final Color COLOR_LINEIN = new Color(176, 246, 182);
+
+	public static final Color COLOR_LINE = new Color(176, 246, 182);
+	public static final Color COLOR_LINE_HIGHLIGHT = COLOR_BORDER_DRAGGED;
 
 	/*
 	 * Fonts

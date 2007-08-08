@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -15,9 +16,9 @@ public class GEdge extends PPath implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
-	private Color defaultColor = Color.lightGray;
+	private Color defaultColor = Style.COLOR_LINE;
 
-	private Color highlightColor = Color.red;
+	private Color highlightColor = Style.COLOR_LINE_HIGHLIGHT;
 
 	private State state;
 

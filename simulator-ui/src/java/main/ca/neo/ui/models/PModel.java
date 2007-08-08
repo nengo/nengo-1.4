@@ -19,12 +19,19 @@ public abstract class PModel extends WorldObjectImpl implements Interactable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected Object model;
+	private Object model;
 
 	WorldObjectImpl icon;
 
 	// boolean modelCreationCancelled = false;
+	public static final String PROPERTY_MODEL = "neoModel";
 
+	/**
+	 * Fires when the model has changed
+	 */
+	public void fireModelPropertyChanged() {
+		firePropertyChange(0, PROPERTY_MODEL, null, null);
+	}
 
 	public boolean isContextMenuEnabled() {
 		return true;
@@ -98,7 +105,8 @@ public abstract class PModel extends WorldObjectImpl implements Interactable {
 
 	public void setModel(Object model) {
 		this.model = model;
-
+		fireModelPropertyChanged();
+		
 	}
 
 	public JPopupMenu showContextMenu(PInputEvent event) {

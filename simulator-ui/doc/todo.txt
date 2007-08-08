@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+(08/08) done - size of ensembles & networks proportional to number of nodes
 (08/07) done - save/open ensembles
 (08/07) done - Plot Functions
 (08/07) done - added option to remove projections from terminations
@@ -23,9 +24,17 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
+add messages in UI
+
+information visualization
+	size <-> size of a node container
+	dimensions of functions, nodes
+
 fixed warnings
 
 show simulation progress in UI
+	create a listener object for Simulator
+
 
 display information about nodes in a hover over
 
@@ -89,6 +98,9 @@ keyboard search of nodes (auto-panning)
 
 For Jung Layout algorithms, consider making WorldObject a Vertice, or making a Vertice Wrapper for world objects
 
+hot keys to change the level of semantic detail in the view. ie. press ctrl to see Node properties
+
+Write an short instruction doc
 
 *******************************************
  Pri 3 - maybe if there's time
@@ -113,6 +125,9 @@ bug: window appears underneath lines and widgets
  Bryan requests
 *******************************************
 Ensemble's don't have metadata, can't save layout information
+
+visualization... what information should be most visible? how to edit
+what are the ways to create an ensemble?
 
 more Network examples
 

@@ -2,11 +2,11 @@ package ca.neo.ui.models.icons;
 
 import ca.neo.ui.models.PModel;
 
-public class FunctionInputIcon extends IconWrapper {
+public class FunctionInputIcon extends ModelIcon {
 
 	public FunctionInputIcon(PModel parent) {
-		super(parent, new IconImage("images/FunctionIcon.gif"), 0.7f);
-		// TODO Auto-generated constructor stub
+		super(parent, new IconImage("images/FunctionIcon.gif"));
+		this.getIconReal().setScale(0.7f);
 
 	}
 

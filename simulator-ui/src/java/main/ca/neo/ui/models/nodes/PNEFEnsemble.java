@@ -60,8 +60,8 @@ public class PNEFEnsemble extends PEnsemble {
 	/**
 	 * Adds a decoded termination to the UI and Ensemble Model
 	 * 
-	 * The UI is used to configure it
 	 * 
+	 * The UI is used to configure it
 	 * @return PTermination created, null if not
 	 */
 	public PTermination createDecodedTermintation() {
@@ -140,8 +140,6 @@ public class PNEFEnsemble extends PEnsemble {
 			Integer numOfNeurons = (Integer) prop.getProperty(pNumOfNeurons);
 			Integer dimensions = (Integer) prop.getProperty(pDim);
 			String storageName = (String) prop.getProperty(pStorageName);
-
-			// setName(name);
 
 			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions,
 					storageName, false);

@@ -21,7 +21,7 @@ public interface WorldObject extends NamedObject {
 	public void addChild(PNode child);
 
 	public static final String PROPERTY_EDGES = "edges";
-	public static final String PROPERTY_NAME = "objectName";
+//	public static final String PROPERTY_NAME = "objectName";
 
 	public void addChildW(WorldObject child);
 
