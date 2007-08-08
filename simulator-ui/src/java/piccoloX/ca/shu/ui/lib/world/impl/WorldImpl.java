@@ -89,7 +89,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 
 	PLayer layer;
 
-	Point2D position;
+	Point2D positionOfControls;
 
 	WorldSky skyCamera;
 
@@ -301,20 +301,20 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		}
 		PCamera camera = getSky();
 
-		position = nodeAttacedTo.getOffset();
+		positionOfControls = nodeAttacedTo.getOffset();
 		if (camera.isAncestorOf(nodeAttacedTo)) {
 
-			position = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
+			positionOfControls = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
 					nodeAttacedTo.getHeight()));
 		} else {
 
-			position = nodeAttacedTo.getOffset();
-			position = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
+			positionOfControls = nodeAttacedTo.getOffset();
+			positionOfControls = nodeAttacedTo.localToGlobal(new Point2D.Double(0,
 					nodeAttacedTo.getHeight()));
-			position = camera.viewToLocal(position);
+			positionOfControls = camera.viewToLocal(positionOfControls);
 		}
-		double x = position.getX();
-		double y = position.getY();
+		double x = positionOfControls.getX();
+		double y = positionOfControls.getY();
 
 		this.controls = new WorldObjectImpl();
 
@@ -335,8 +335,10 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 			y = camera.getBounds().getHeight() - controls.getHeight();
 		}
 
-		position = new Point2D.Double(x, y);
+		positionOfControls = new Point2D.Double(x, y);
 
+		
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				if (controls != null) {
@@ -344,7 +346,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 					controlsHolder.addChildFancy(controls);
 					controlsHolder.setTransparency(0.5f);
 
-					controls.setOffset(position);
+					controls.setOffset(positionOfControls);
 				}
 			}
 		});

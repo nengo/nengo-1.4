@@ -150,7 +150,7 @@ public class GProbe extends PModel {
 					exportToMatlab(name);
 				}
 
-			}).startAsThread();
+			}).startThread();
 
 		}
 	}

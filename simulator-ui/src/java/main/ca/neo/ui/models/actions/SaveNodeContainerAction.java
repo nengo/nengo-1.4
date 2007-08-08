@@ -51,7 +51,7 @@ public class SaveNodeContainerAction extends StandardAction {
 					}
 				}
 			};
-			task.startThread(false);
+			task.startThread();
 
 		} else {
 			throw new UserCancelledException();

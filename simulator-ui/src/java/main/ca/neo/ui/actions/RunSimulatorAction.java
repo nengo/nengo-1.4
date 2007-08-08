@@ -9,7 +9,7 @@ import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.widgets.TrackedMsg;
+import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.util.Util;
 
 public class RunSimulatorAction extends StandardAction {
@@ -35,7 +35,7 @@ public class RunSimulatorAction extends StandardAction {
 		}
 
 		public void run() {
-			TrackedMsg trackedTask = new TrackedMsg("Running simulator");
+			TrackedStatusMsg trackedTask = new TrackedStatusMsg("Running simulator");
 
 			try {
 				simulator.run(config.getStartTime(), config.getEndTime(),

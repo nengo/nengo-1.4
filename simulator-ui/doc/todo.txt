@@ -1,6 +1,8 @@
 *******************************************
  Done
 *******************************************
+fixed some Swing thread safety issues
+
 (08/08) done - size of ensembles & networks proportional to number of nodes
 (08/07) done - save/open ensembles
 (08/07) done - Plot Functions
@@ -27,7 +29,6 @@ done- There should be either scrollbars or a fit-on-screen function (I
 add messages in UI
 
 information visualization
-	size <-> size of a node container
 	dimensions of functions, nodes
 
 fixed warnings

@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import ca.neo.math.Function;
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
+import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.util.Util;
 
@@ -65,7 +66,7 @@ public class FunctionInputPanel extends PropertyInputPanel {
 	public void setValue(Object value) {
 		if (value != null && value instanceof Function) {
 			function = (Function) value;
-//			System.out.println("setting status msg");
+			// System.out.println("setting status msg");
 			setStatusMsg("");
 
 		} else {
@@ -99,7 +100,9 @@ public class FunctionInputPanel extends PropertyInputPanel {
 			/*
 			 * Configure the function
 			 */
-			fnDescriptor.launchConfigDialog((JDialog) parent);
+			fnDescriptor.setFunction(null);
+			new DialogConfig(fnDescriptor, (JDialog) parent);
+
 		} else {
 			Util.Error("Could not attach properties dialog");
 		}

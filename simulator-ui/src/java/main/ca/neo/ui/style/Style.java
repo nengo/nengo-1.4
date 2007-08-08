@@ -5,8 +5,6 @@ import java.awt.Font;
 
 import javax.swing.JComponent;
 
-import org.w3c.dom.css.RGBColor;
-
 public class Style {
 	public static final int ANIMATION_DROP_IN_WORLD_MS = 200;
 	public static final Color COLOR_BACKGROUND = Color.black;

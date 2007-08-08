@@ -13,13 +13,6 @@ import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 
 /**
- * DEFUNCT: Originally, in this example, the integrator network is constructed
- * by piece-by-piece through the construction of individual UI wrapper objects
- * of NEO node. However, this method is not recommended, as many of the UI
- * functions cannot be safely called from the main thread):
- * 
- * Users should either create Network models and pass it into the UI, or create
- * the model from the Graphical interface itself
  * 
  * @author Shu Wu
  * 

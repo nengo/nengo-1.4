@@ -1,5 +1,6 @@
 package ca.neo.ui.widgets;
 
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
@@ -62,7 +63,31 @@ public class Toolbox extends WorldObjectImpl {
 		addChild(symbolHolder);
 		pack();
 	}
+	public void pack() {
+		boolean frameVisible = isFrameVisible();
 
+		// hide the frame first, so it does not contribute to the bounds
+		if (frameVisible) {
+			setFrameVisible(false);
+		}
+
+		// if (border != null) {
+		// border.removeFromParent();
+		// }
+
+		Rectangle2D newBounds = parentToLocal(getFullBounds());
+
+		// if (border != null) {
+		// border.setVisible(true);
+		// }
+
+		if (frameVisible) {
+			setFrameVisible(true);
+		}
+
+		this.setBounds(newBounds);
+
+	}
 	@Override
 	public WorldObjectImpl getTooltipObject() {
 		// TODO Auto-generated method stub

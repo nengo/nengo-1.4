@@ -55,8 +55,7 @@ public abstract class LoadObjectAction extends StandardAction {
 				}
 
 			};
-			loadActivity.startThread(true);
-
+			loadActivity.invokeLater();
 		}
 
 	}

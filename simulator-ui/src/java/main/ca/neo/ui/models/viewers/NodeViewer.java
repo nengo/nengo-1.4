@@ -13,6 +13,7 @@ import ca.neo.ui.models.nodes.connectors.PModelWidget;
 import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
+import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.NamedObject;
@@ -61,19 +62,14 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 
 		addInputEventListener(new NodeHoverHandler(this));
 
-		(new TrackedActivity("Building network UI") {
+		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
 
-			@Override
-			public void doActivity() {
+		updateNodesFromModel();
+		if (nodesUI.size() > 0) {
+			applyDefaultLayout();
+		}
 
-				updateNodesFromModel();
-				if (nodesUI.size() > 0) {
-					applyDefaultLayout();
-				}
-
-			}
-
-		}).startThread(true);
+		msg.finished();
 
 	}
 

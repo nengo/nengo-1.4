@@ -203,7 +203,7 @@ public class NetworkViewer extends NodeViewer {
 		}
 
 		currentLayoutType = layoutType;
-		(new JungLayoutActivity(layout)).startThread(false);
+		(new JungLayoutActivity(layout)).startThread();
 
 	}
 
@@ -553,7 +553,7 @@ public class NetworkViewer extends NodeViewer {
 
 					}
 				}
-			}).startThread(true);
+			}).invokeLater();
 
 		}
 	}

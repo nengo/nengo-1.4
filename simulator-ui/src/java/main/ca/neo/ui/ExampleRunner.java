@@ -4,7 +4,7 @@ import javax.swing.SwingUtilities;
 
 import ca.neo.model.Network;
 import ca.neo.ui.models.nodes.PNetwork;
-import ca.shu.ui.lib.objects.widgets.TrackedMsg;
+import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 
 public class ExampleRunner {
 	String networkName;
@@ -14,6 +14,10 @@ public class ExampleRunner {
 		this.networkName = networkName;
 		this.network = exampleNetwork;
 
+		/**
+		 * All UI funcitons and constructors must be invoked from the Swing
+		 * Event Thread
+		 */
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				buildUI();
@@ -25,11 +29,12 @@ public class ExampleRunner {
 
 		NeoGraphics neoGraphics = new NeoGraphics(networkName);
 
-		TrackedMsg task = new TrackedMsg("Creating NEO Network model");
+		TrackedStatusMsg task = new TrackedStatusMsg(
+				"Creating NEO Network model");
 
 		task.finished();
 
-		task = new TrackedMsg("Creating Model UI");
+		task = new TrackedStatusMsg("Creating Model UI");
 		PNetwork networkUI = new PNetwork(network);
 
 		neoGraphics.addWorldObject(networkUI);

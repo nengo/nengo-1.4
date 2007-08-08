@@ -48,7 +48,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	private Stack<State> states;
 
-	private TransformChangeListener transformChangeListener = new TransformChangeListener();
+	private TransformChangeListener transformChangeListener;
 
 	public WorldObjectImpl() {
 		this("");
@@ -62,7 +62,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 		this.setFrameVisible(false);
 		this.setDraggable(true);
-
+		transformChangeListener = new TransformChangeListener();
 		addPropertyChangeListener(PROPERTY_TRANSFORM, transformChangeListener);
 
 	}
@@ -104,11 +104,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		getWorld().zoomToNode(this);
 	}
 
-	/*
-	 * Be careful, if the "this" node is removed from its process while an
-	 * animation the animation will not complete and the node will not be added.
-	 * 
-	 */
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -188,12 +183,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		signalEdgesChanged();
 
 		/*
-		 * Remove listeners
-		 */
-		removePropertyChangeListener(PROPERTY_TRANSFORM,
-				transformChangeListener);
-
-		/*
 		 * Removes this object from the world and finish any tasks
 		 * 
 		 * Convert to array to allow for concurrent modification
@@ -222,6 +211,14 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
+	/**
+	 * Gets the children which intersect the rectangle bounds in the coordinate
+	 * system of this object.
+	 * 
+	 * @param bounds
+	 * @param classType
+	 * @return Collection of Children
+	 */
 	@SuppressWarnings("unchecked")
 	public Collection<PNode> getChildrenAtBounds(Rectangle2D bounds,
 			Class classType) {
@@ -250,6 +247,11 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		return layoutManager;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.NamedObject#getName()
+	 */
 	public String getName() {
 		if (name == null) {
 			return "";
@@ -257,6 +259,9 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 			return name;
 	}
 
+	/**
+	 * @return State of this WorldObject
+	 */
 	public State getState() {
 		return state;
 	}
@@ -296,32 +301,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
-	// public void hideContextButton() {
-	// if (closeButton != null) {
-	// closeButton.removeFromParent();
-	// closeButton = null;
-	// }
-	// }
-
-	public boolean isAncestorOf(WorldObjectImpl node) {
-		return isAncestorOf((PNode) node);
-	}
-
-	public boolean isContained() {
-		PNode parentNode = getParent();
-		while (parentNode != null && !(parentNode instanceof WorldGround)) {
-			Rectangle2D dBounds = localToGlobal(getBounds());
-
-			Rectangle2D pBounds = parentNode.localToGlobal(parentNode
-					.getBounds());
-			if (dBounds.intersects(pBounds))
-				return true;
-
-			parentNode = parentNode.getParent();
-		}
-		return false;
-	}
-
 	/**
 	 * @return Whether this Object has been destroyed (ie. ready for garbage
 	 *         collection)
@@ -330,10 +309,18 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		return isDestroyed;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.WorldObject#isDraggable()
+	 */
 	public boolean isDraggable() {
 		return isDraggable;
 	}
 
+	/**
+	 * @return Whether the Frame is visible
+	 */
 	public boolean isFrameVisible() {
 		return isFrameVisible;
 	}
@@ -342,54 +329,6 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 	 * End of a drag and drop operation
 	 */
 	public void justDropped() {
-
-	}
-
-	/*
-	 * TODO: Perhaps this is not needed
-	 */
-	public PBounds localToLayer(PBounds bounds) {
-		WorldLayer worldLayer = getWorldLayer();
-
-		this.localToGlobal(bounds);
-		worldLayer.globalToLocal(bounds);
-
-		return bounds;
-
-	}
-
-	// /*
-	// * (non-Javadoc)
-	// *
-	// * @see ca.sw.graphics.nodes.WorldO#moveOverlappedNodes()
-	// */
-	// public void moveOverlappedNodes() {
-	// moveOverlappedNodes(null);
-	// }
-
-	public void pack() {
-		boolean frameVisible = isFrameVisible();
-
-		// hide the frame first, so it does not contribute to the bounds
-		if (frameVisible) {
-			setFrameVisible(false);
-		}
-
-		// if (border != null) {
-		// border.removeFromParent();
-		// }
-
-		Rectangle2D newBounds = parentToLocal(getFullBounds());
-
-		// if (border != null) {
-		// border.setVisible(true);
-		// }
-
-		if (frameVisible) {
-			setFrameVisible(true);
-		}
-
-		this.setBounds(newBounds);
 
 	}
 
@@ -411,14 +350,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		setState(state);
 	}
 
-	/**
-	 * TODO: implement this
-	 */
-	public void removeFromLayout(PNode node) {
-		throw new NotImplementedException();
-	}
-
-	public void setBorder(Color borderColor) {
+	protected void setBorder(Color borderColor) {
 		if (borderColor == null) {
 			if (borderFrame != null)
 				borderFrame.removeFromParent();
@@ -481,7 +413,7 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 		String oldName = this.name;
 		this.name = name;
 
-//		firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
+		// firePropertyChange(0, PROPERTY_NAME, oldName, this.name);
 
 	}
 
@@ -535,9 +467,12 @@ public class WorldObjectImpl extends PNode implements WorldObject {
 
 	}
 
-	// int i = 0;
+	/**
+	 * Signal to the attached edges that this node's position or transform in
+	 * the World has changed
+	 */
 	public void signalEdgesChanged() {
-		// System.out.println("Signal edges changed " + i++);
+
 		firePropertyChange(0, PROPERTY_EDGES, null, null);
 
 		/*

@@ -11,16 +11,18 @@ import ca.neo.ui.views.objects.configurable.managers.DialogConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
-/*
- * Schema for describing a function
+/**
+ * 
+ * Functions are configured through the Configuration Manager. Function
+ * instances are created through reflection.
+ * 
+ * @author Shu Wu
+ * 
  */
 public abstract class ConfigurableFunction extends AbstractConfigurable {
 
-	// FunctionInputPanel inputPanel;
-
 	public ConfigurableFunction() {
 		super();
-		// this.inputPanel = inputPanel;
 
 	}
 
@@ -34,7 +36,8 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 		PropDescriptor[] metaProperties = getConfigSchema();
 
 		/*
-		 * Create function using Java reflection
+		 * Create function using Java reflection, function parameter are
+		 * configured via the IConfigurable interface
 		 */
 		Class partypes[] = new Class[metaProperties.length];
 		for (int i = 0; i < metaProperties.length; i++) {
@@ -79,22 +82,7 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 			e.printStackTrace();
 		}
 
-		// if (retobj != null) {
-		// inputPanel.setValue(retobj);
-		// }
 		setFunction((Function) retobj);
-
-	}
-
-	/**
-	 * 
-	 * @param parent
-	 *            Parent component to hold the dialog
-	 */
-	public void launchConfigDialog(JDialog parent) {
-		setFunction(null);
-
-		new DialogConfig(this, (JDialog) parent);
 
 	}
 
@@ -108,23 +96,10 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 		this.function = function;
 	}
 
+	/**
+	 * @return Type of Function to create
+	 */
 	@SuppressWarnings("unchecked")
 	public abstract Class getFunctionClass();
-
-	// public void cancelConfiguration() {
-	// // TODO Auto-generated method stub
-	//		
-	// }
-	//
-	// public void completeConfiguration() {
-	// // TODO Auto-generated method stub
-	//		
-	// }
-
-	@Override
-	public String toString() {
-
-		return getTypeName();
-	}
 
 }

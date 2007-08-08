@@ -1,5 +1,9 @@
 package ca.shu.ui.lib.handlers;
 
+import java.lang.reflect.InvocationTargetException;
+
+import javax.swing.SwingUtilities;
+
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.WorldImpl;
@@ -108,7 +112,11 @@ public class TooltipHandler extends PBasicInputEventHandler {
 							currNode.pushState(WorldObject.State.SELECTED);
 							controls = selectedNode.getTooltipObject();
 
-							world.showTooltip(controls, selectedNode);
+							SwingUtilities.invokeAndWait(new Runnable() {
+								public void run() {
+									world.showTooltip(controls, selectedNode);
+								}
+							});
 
 							while (true) {
 								Thread.sleep(1000);
@@ -133,6 +141,8 @@ public class TooltipHandler extends PBasicInputEventHandler {
 					}
 				}
 			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
 				e.printStackTrace();
 			}
 		}
