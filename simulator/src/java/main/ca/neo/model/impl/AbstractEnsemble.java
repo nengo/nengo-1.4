@@ -45,8 +45,8 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 
 	private String myName;
 	private Node[] myNodes;
-	// private NodeRunner[] myNodeRunners;
-	// private Thread[] myThreads;
+	private NodeRunner[] myNodeRunners;
+	transient private Thread[] myThreads;
 	private Map<String, Origin> myOrigins;
 	private Map<String, Termination> myTerminations;
 	private Map<String, List<Integer>> myStateNames; // for Probeable
@@ -58,25 +58,23 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	/**
 	 * Note that setMode(SimulationMode.DEFAULT) is called at construction time.
 	 * 
-	 * @param name
-	 *            Unique name of Ensemble
-	 * @param nodes
-	 *            Nodes that Ensemble contains
+	 * @param name Unique name of Ensemble 
+	 * @param nodes Nodes that Ensemble contains
 	 */
 	public AbstractEnsemble(String name, Node[] nodes) {
 		myName = name;
-		myNodes = nodes;
+		myNodes = nodes; 
 		mySpikePattern = new SpikePatternImpl(nodes.length);
 		myCollectSpikesFlag = false;
-
-		// setupNodeRunners(2);
-
+		
+		setupNodeRunners(10);
+		
 		myOrigins = new HashMap<String, Origin>(10);
 		Origin[] origins = findOrigins(this, nodes);
 		for (int i = 0; i < origins.length; i++) {
 			myOrigins.put(origins[i].getName(), origins[i]);
 		}
-
+		
 		myTerminations = new HashMap<String, Termination>(10);
 		Termination[] terminations = findTerminations(this, nodes);
 		for (int i = 0; i < terminations.length; i++) {
@@ -87,27 +85,31 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 
 		setMode(SimulationMode.DEFAULT);
 	}
-
-	// private void setupNodeRunners(int n) {
-	// myNodeRunners = new NodeRunner[n];
-	// myThreads = new Thread[n];
-	//			
-	// List[] nodeLists = new ArrayList[n];
-	// for (int i = 0; i < n; i++) {
-	// nodeLists[i] = new ArrayList<Node>(50);
-	// }
-	//		
-	// for (int i = 0; i < myNodes.length; i++) {
-	// int runner = i % myNodeRunners.length;
-	// nodeLists[runner].add(myNodes[i]);
-	// }
-	//		
-	// for (int i = 0; i < n; i++) {
-	// myNodeRunners[i] = new NodeRunner((Node[]) nodeLists[i].toArray(new
-	// Node[0]));
-	// myThreads[i] = new Thread(myNodeRunners[i]);
-	// }
-	// }
+	
+	private void setupNodeRunners(int n) {
+		myNodeRunners = new NodeRunner[n];
+			
+		List[] nodeLists = new ArrayList[n];
+		for (int i = 0; i < n; i++) {
+			nodeLists[i] = new ArrayList<Node>(50);
+		}
+		
+		for (int i = 0; i < myNodes.length; i++) {
+			int runner = i % myNodeRunners.length;	
+			nodeLists[runner].add(myNodes[i]);
+		}
+		
+		for (int i = 0; i < n; i++) {
+			myNodeRunners[i] = new NodeRunner((Node[]) nodeLists[i].toArray(new Node[0]));
+		}
+	}
+	
+	private void setupThreads() {
+		myThreads = new Thread[myNodeRunners.length];
+		for (int i = 0; i < myNodeRunners.length; i++) {
+			myThreads[i] = new Thread(myNodeRunners[i]);			
+		}
+	}
 
 	/**
 	 * @see ca.neo.model.Ensemble#getName()
@@ -124,92 +126,86 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	}
 
 	/**
-	 * When this method is called, setMode(...) is called on each Node in the
-	 * Ensemble. Each Node will then run in the mode that is closest to the
-	 * requested mode (this could be different for different Node). Note that at
-	 * Ensemble construction time, setMode(SimulationMode.DEFAULT) is called.
+	 * When this method is called, setMode(...) is called on each Node in the Ensemble. 
+	 * Each Node will then run in the mode that is closest to the requested mode (this 
+	 * could be different for different Node). Note that at Ensemble construction time, 
+	 * setMode(SimulationMode.DEFAULT) is called.
 	 * 
 	 * @see ca.neo.model.Ensemble#setMode(ca.neo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
 		myMode = mode;
-
+		
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodes[i].setMode(mode);
 		}
 	}
 
 	/**
-	 * Note that this reflects the latest mode requested of the Ensemble, and
-	 * that individual Neurons may run in different modes (see setMode).
-	 * 
+	 * Note that this reflects the latest mode requested of the Ensemble, and that individual 
+	 * Neurons may run in different modes (see setMode).  
+	 *   
 	 * @see ca.neo.model.Ensemble#getMode()
 	 */
 	public SimulationMode getMode() {
 		return myMode;
 	}
 
+
 	/**
-	 * Runs each neuron in the Ensemble.
+	 * Runs each neuron in the Ensemble. 
 	 * 
 	 * @see ca.neo.model.Ensemble#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
+//		System.out.println(this.getName());
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodes[i].run(startTime, endTime);
 
 			if (myCollectSpikesFlag) {
 				try {
-					InstantaneousOutput output = myNodes[i].getOrigin(
-							Neuron.AXON).getValues();
-					if (output instanceof SpikeOutput
-							&& ((SpikeOutput) output).getValues()[0]) {
+					InstantaneousOutput output = myNodes[i].getOrigin(Neuron.AXON).getValues();
+					if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
 						mySpikePattern.addSpike(i, endTime);
-					}
+					}				
 				} catch (StructuralException e) {
-					ourLogger
-							.warn(
-									"Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON",
-									e);
+					ourLogger.warn("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
 				}
 			}
 		}
 
-		// for (int i = 0; i < myNodeRunners.length; i++) {
-		// myNodeRunners[i].setTime(startTime, endTime);
-		// myThreads[i].run();
-		// }
-		//		
-		// for (int i = 0; i < myThreads.length; i++) {
-		// try {
-		// myThreads[i].join();
-		// } catch (InterruptedException e) {
-		// throw new SimulationException(e);
-		// }
-		//			
-		// if (myNodeRunners[i].getException() != null) throw
-		// myNodeRunners[i].getException();
-		// }
-		//		
-		// for (int i = 0; i < myNodes.length; i++) {
-		// if (myCollectSpikesFlag) {
-		// try {
-		// InstantaneousOutput output =
-		// myNodes[i].getOrigin(Neuron.AXON).getValues();
-		// if (output instanceof SpikeOutput && ((SpikeOutput)
-		// output).getValues()[0]) {
-		// mySpikePattern.addSpike(i, endTime);
-		// }
-		// } catch (StructuralException e) {
-		// ourLogger.warn("Ensemble has been set to collect spikes, but not all
-		// components have Origin Neuron.AXON", e);
-		// }
-		// }
-		// }
-	}
-
+//		if (myThreads == null) setupThreads();
+//		for (int i = 0; i < myNodeRunners.length; i++) {
+//			myNodeRunners[i].setTime(startTime, endTime);
+//			myThreads[i].run();
+//		}
+//		
+//		for (int i = 0; i < myThreads.length; i++) {
+//			try {
+//				myThreads[i].join();
+//			} catch (InterruptedException e) {
+//				throw new SimulationException(e);
+//			}
+//			
+//			if (myNodeRunners[i].getException() != null) throw myNodeRunners[i].getException();			
+//		}
+//		
+//		for (int i = 0; i < myNodes.length; i++) {
+//			if (myCollectSpikesFlag) {
+//				try {
+//					InstantaneousOutput output = myNodes[i].getOrigin(Neuron.AXON).getValues();
+//					if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
+//						mySpikePattern.addSpike(i, endTime);
+//					}				
+//				} catch (StructuralException e) {
+//					ourLogger.warn("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
+//				}
+//			}
+//		}				
+	}	
+	
 	/**
-	 * Resets each Node in this Ensemble.
+	 * Resets each Node in this Ensemble. 
 	 * 
 	 * @see ca.neo.model.Resettable#reset(boolean)
 	 */
@@ -217,7 +213,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodes[i].reset(randomize);
 		}
-
+		
 		mySpikePattern = new SpikePatternImpl(myNodes.length);
 	}
 
@@ -234,7 +230,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	public Termination getTermination(String name) throws StructuralException {
 		return myTerminations.get(name);
 	}
-
+	
 	/**
 	 * @see ca.neo.model.Node#getOrigins()
 	 */
@@ -267,48 +263,42 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	 * @see ca.neo.model.Ensemble#getSpikePattern()
 	 */
 	public SpikePattern getSpikePattern() {
-		if (!myCollectSpikesFlag)
-			ourLogger.warn("Warning: collect spikes flag is off");
+		if (!myCollectSpikesFlag) ourLogger.warn("Warning: collect spikes flag is off"); 
 		return mySpikePattern;
 	}
-
+		
 	/**
-	 * @return Composite of Node states by given name. States of different nodes
-	 *         may be defined at different times, so only the states at the end
-	 *         of the most recent step are given. Only the first dimension of
-	 *         each Node state is included in the composite.
+	 * @return Composite of Node states by given name. States of different nodes may be defined at different 
+	 * 		times, so only the states at the end of the most recent step are given. Only the first 
+	 * 		dimension of each Node state is included in the composite. 
 	 * @see ca.neo.model.Probeable#getHistory(java.lang.String)
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		if (!myStateNames.containsKey(stateName)) {
-			throw new SimulationException("The state " + stateName
-					+ " is unknown");
+			throw new SimulationException("The state " + stateName + " is unknown");
 		}
-
+		
 		List<Integer> nodeNumbers = myStateNames.get(stateName);
-		float[] firstNodeTimes = ((Probeable) myNodes[nodeNumbers.get(0)
-				.intValue()]).getHistory(stateName).getTimes();
+		float[] firstNodeTimes = ((Probeable) myNodes[nodeNumbers.get(0).intValue()]).getHistory(stateName).getTimes();		
 
 		float[] times = new float[0];
 		float[][] values = new float[0][];
 		Units[] units = Units.uniform(Units.UNK, myNodes.length);
-
+		
 		if (firstNodeTimes.length >= 1) {
-			times = new float[] { firstNodeTimes[firstNodeTimes.length - 1] };
+			times = new float[]{firstNodeTimes[firstNodeTimes.length - 1]};
 
-			values = new float[][] { new float[myNodes.length] };
+			values = new float[][]{new float[myNodes.length]};
 			for (int i = 0; i < myNodes.length; i++) {
 				if (nodeNumbers.contains(new Integer(i))) {
-					TimeSeries history = ((Probeable) myNodes[i])
-							.getHistory(stateName);
+					TimeSeries history = ((Probeable) myNodes[i]).getHistory(stateName);
 					int index = history.getTimes().length - 1;
 					values[0][i] = history.getValues()[index][0];
-					if (i == 0)
-						units[i] = history.getUnits()[0];
+					if (i == 0) units[i] = history.getUnits()[0]; 
 				}
 			}
 		}
-
+		
 		return new TimeSeriesImpl(times, values, units);
 	}
 
@@ -319,26 +309,23 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		Properties result = new Properties();
 		Iterator<String> keys = myStateNames.keySet().iterator();
 		while (keys.hasNext()) {
-			result.setProperty(keys.next(),
-					"Composite of Node states by the same name");
+			result.setProperty(keys.next(), "Composite of Node states by the same name");
 		}
 		return result;
 	}
 
 	/**
-	 * Finds existing one-dimensional Origins by same name on the given Nodes,
-	 * and groups them into EnsembleOrigins.
+	 * Finds existing one-dimensional Origins by same name on the given Nodes, and groups 
+	 * them into EnsembleOrigins.
 	 * 
-	 * @param nodes
-	 *            Nodes on which to look for Origins
+	 * @param nodes Nodes on which to look for Origins
 	 * @return Ensemble Origins encompassing Node-level Origins
 	 */
 	private static Origin[] findOrigins(Node parent, Node[] nodes) {
 		Map<String, List<Origin>> groups = new HashMap<String, List<Origin>>(10);
-
+		
 		for (int i = 0; i < nodes.length; i++) {
 			Origin[] origins = nodes[i].getOrigins();
-			;
 			for (int j = 0; j < origins.length; j++) {
 				if (origins[j].getDimensions() == 1) {
 					List<Origin> group = groups.get(origins[j].getName());
@@ -346,74 +333,65 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 						group = new ArrayList<Origin>(nodes.length * 2);
 						groups.put(origins[j].getName(), group);
 					}
-					group.add(origins[j]);
+					group.add(origins[j]);					
 				}
 			}
 		}
-
+		
 		Iterator<String> it = groups.keySet().iterator();
 		List<Origin> result = new ArrayList<Origin>(10);
 		while (it.hasNext()) {
 			String name = it.next();
 			List<Origin> group = groups.get(name);
-			result.add(new EnsembleOrigin(parent, name, (Origin[]) group
-					.toArray(new Origin[0])));
+			result.add(new EnsembleOrigin(parent, name, (Origin[]) group.toArray(new Origin[0])));
 		}
-
+		
 		return result.toArray(new Origin[0]);
 	}
-
+	
 	/**
-	 * Finds existing one-dimensional Terminations by the same name on different
-	 * nodes, and groups them into EnsembleTerminations.
+	 * Finds existing one-dimensional Terminations by the same name on different nodes, and 
+	 * groups them into EnsembleTerminations. 
 	 * 
-	 * @param parent
-	 *            The ensemble to which new terminations will belong
-	 * @param nodes
-	 *            Nodes on which to look for Terminations
-	 * @return Ensemble Terminations encompassing Node-level Terminations
+	 * @param parent The ensemble to which new terminations will belong
+	 * @param nodes Nodes on which to look for Terminations
+	 * @return Ensemble Terminations encompassing Node-level Terminations 
 	 */
 	private static Termination[] findTerminations(Node parent, Node[] nodes) {
-		Map<String, List<Termination>> groups = new HashMap<String, List<Termination>>(
-				10);
-
+		Map<String, List<Termination>> groups = new HashMap<String, List<Termination>>(10);
+		
 		for (int i = 0; i < nodes.length; i++) {
 			Termination[] terminations = nodes[i].getTerminations();
 			for (int j = 0; j < terminations.length; j++) {
 				if (terminations[j].getDimensions() == 1) {
-					List<Termination> group = groups.get(terminations[j]
-							.getName());
+					List<Termination> group = groups.get(terminations[j].getName());
 					if (group == null) {
 						group = new ArrayList<Termination>(nodes.length * 2);
 						groups.put(terminations[j].getName(), group);
 					}
-					group.add(terminations[j]);
+					group.add(terminations[j]);					
 				}
 			}
 		}
-
+		
 		Iterator<String> it = groups.keySet().iterator();
 		List<Termination> result = new ArrayList<Termination>(10);
 		while (it.hasNext()) {
 			String name = it.next();
 			List<Termination> group = groups.get(name);
 			try {
-				result.add(new EnsembleTermination(parent, name, group
-						.toArray(new Termination[0])));
+				result.add(new EnsembleTermination(parent, name, group.toArray(new Termination[0])));
 			} catch (StructuralException e) {
-				throw new Error(
-						"Composite Termination should consist only of 1D Terminations, but apparently does not",
-						e);
+				throw new Error("Composite Termination should consist only of 1D Terminations, but apparently does not", e);
 			}
 		}
-
+		
 		return result.toArray(new Termination[0]);
 	}
-
+	
 	private static Map<String, List<Integer>> findStateNames(Node[] nodes) {
-		Map<String, List<Integer>> result = new HashMap<String, List<Integer>>(
-				10);
-
+		Map<String, List<Integer>> result = new HashMap<String, List<Integer>>(10);
+		
 		for (int i = 0; i < nodes.length; i++) {
 			if (nodes[i] instanceof Probeable) {
 				Properties p = ((Probeable) nodes[i]).listStates();
@@ -427,10 +405,10 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 				}
 			}
 		}
-
+		
 		return result;
 	}
-
+	
 	/**
 	 * @see ca.neo.model.Node#getDocumentation()
 	 */
@@ -444,32 +422,31 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	public void setDocumentation(String text) {
 		myDocumentation = text;
 	}
-
+	
 	/**
-	 * Allows us to run a node in a separate thread.
-	 * 
+	 * Allows us to run a node in a separate thread. 
+	 *  
 	 * @author Bryan Tripp
 	 */
 	private static class NodeRunner implements Runnable, Serializable {
 
+		private static final long serialVersionUID = 1L;
+		
 		private Node[] myNodes;
 		private float myStartTime;
 		private float myEndTime;
 		private SimulationException myException;
 
 		/**
-		 * @param nodes
-		 *            The Nodes that will be run by this runner.
+		 * @param nodes The Nodes that will be run by this runner. 
 		 */
 		public NodeRunner(Node[] nodes) {
 			myNodes = nodes;
 		}
 
 		/**
-		 * @param start
-		 *            Simulation time at next run is to start
-		 * @param end
-		 *            Simulation time at which next run is to end
+		 * @param start Simulation time at next run is to start
+		 * @param end Simulation time at which next run is to end
 		 */
 		public void setTime(float start, float end) {
 			myStartTime = start;
@@ -477,7 +454,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		}
 
 		/**
-		 * @return The exception thrown in the last run, if any, otherwise null.
+		 * @return The exception thrown in the last run, if any, otherwise null.   
 		 */
 		public SimulationException getException() {
 			return myException;
@@ -490,13 +467,13 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 			myException = null;
 			try {
 				for (int i = 0; i < myNodes.length; i++) {
-					myNodes[i].run(myStartTime, myEndTime);
+					myNodes[i].run(myStartTime, myEndTime);					
 				}
 			} catch (SimulationException e) {
 				myException = e;
 			}
 		}
-
+		
 	}
-
+	
 }
