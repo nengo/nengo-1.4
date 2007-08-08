@@ -39,8 +39,12 @@ public class GProbe extends PModel {
 		Node node = nodeProxy.getModel();
 
 		try {
+
 			Probe probe = nodeProxy.getParentNetwork().getSimulator().addProbe(
 					node.getName(), state, true);
+
+			nodeProxy.getWorld().showTransientMsg(
+					"Probe " + state + " added to Simulator", nodeProxy);
 
 			setModel(probe);
 			init(nodeProxy);
@@ -132,6 +136,7 @@ public class GProbe extends PModel {
 
 		try {
 			nodeProxy.getParentNetwork().getSimulator().removeProbe(getProbe());
+			getWorld().showTransientMsg("Probe removed from Simulator", this);
 		} catch (SimulationException e) {
 			Util.Error("Could not remove probe");
 		}

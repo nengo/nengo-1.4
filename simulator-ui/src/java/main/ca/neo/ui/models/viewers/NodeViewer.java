@@ -74,7 +74,7 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 	}
 
 	public void addNeoNode(PNeoNode node) {
-		addNodeToViewer(node, true, true, false);
+		addNodeToNetwork(node, true, true, false);
 
 	}
 
@@ -90,7 +90,7 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 	 * @param moveCameraToNode
 	 *            whether to move the camera to where the node is
 	 */
-	public void addNodeToViewer(PNeoNode nodeProxy, boolean updateModel,
+	public void addNodeToNetwork(PNeoNode nodeProxy, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
 
 		/**

@@ -149,7 +149,7 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	public void addNodeToViewer(PNeoNode nodeProxy, boolean updateModel,
+	public void addNodeToNetwork(PNeoNode nodeProxy, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCamera) {
 		if (updateModel) {
 			try {
@@ -161,8 +161,15 @@ public class NetworkViewer extends NodeViewer {
 				return;
 			}
 		}
-		super.addNodeToViewer(nodeProxy, updateModel, dropInCenterOfCamera,
+		super.addNodeToNetwork(nodeProxy, updateModel, dropInCenterOfCamera,
 				moveCamera);
+
+		if (updateModel) {
+
+			showTransientMsg("Node " + getName()
+					+ " added to Network", nodeProxy);
+
+		}
 	}
 
 	public void applyDefaultLayout() {
@@ -365,30 +372,24 @@ public class NetworkViewer extends NodeViewer {
 		return (PNetwork) super.getViewerParent();
 	}
 
-	public void removeNode(PNeoNode nodeProxy) {
-		removeNode(nodeProxy, true);
-	}
-
 	/**
 	 * 
 	 * @param nodeProxy
 	 *            node to be removed
-	 * @param updateModel
-	 *            if true, the network model is updated. this may be false, if
-	 *            it is known that the network model already contains this node
 	 */
-	public void removeNode(PNeoNode nodeProxy, boolean updateModel) {
+	public void removeNodeFromNetwork(PNeoNode nodeProxy) {
 		nodesUI.remove(nodeProxy);
-		if (updateModel) {
-			try {
 
-				getNetwork().removeNode(nodeProxy.getName());
+		try {
+			showTransientMsg("Node " + nodeProxy.getName()
+					+ " removed from Network", nodeProxy);
+			getNetwork().removeNode(nodeProxy.getName());
 
-			} catch (StructuralException e) {
-				Util.Warning(e.toString());
-				return;
-			}
+		} catch (StructuralException e) {
+			Util.Warning(e.toString());
+			return;
 		}
+
 	}
 
 	/**
@@ -447,7 +448,7 @@ public class NetworkViewer extends NodeViewer {
 			 */
 			if (getNode(node.getName()) == null) {
 				PNeoNode nodeUI = PModelClasses.createUIFromModel(node);
-				addNodeToViewer(nodeUI, false, false, false);
+				addNodeToNetwork(nodeUI, false, false, false);
 			}
 		}
 
@@ -498,8 +499,8 @@ public class NetworkViewer extends NodeViewer {
 
 				}
 			}
-		}
 
+		}
 	}
 
 	class ShowAllWidgetsAction extends StandardAction {

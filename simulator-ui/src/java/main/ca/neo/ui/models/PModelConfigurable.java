@@ -41,40 +41,38 @@ public abstract class PModelConfigurable extends PModel implements
 
 	}
 
+	/*
+	 * (non-Javadoc) This function can be safely called from any thread
+	 * 
+	 * @see ca.neo.ui.views.objects.configurable.IConfigurable#completeConfiguration(ca.neo.ui.views.objects.configurable.managers.PropertySet)
+	 */
 	public void completeConfiguration(PropertySet properties) {
 
-		(new ConfigureModelActivity(properties)).startThread();
+		Object model = configureModel(properties);
 
+		try {
+			SwingUtilities.invokeAndWait(new CompleteConfiguration(model));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
 	}
 
-	class ConfigureModelActivity extends TrackedActivity {
-		PropertySet properties;
-
-		public ConfigureModelActivity(PropertySet properties) {
-			super("Creating " + getName() + " (" + getTypeName() + ")");
-			this.properties = properties;
-		}
-
+	class CompleteConfiguration implements Runnable {
 		Object model;
 
-		@Override
-		public void doActivity() {
-			model = configureModel(properties);
+		public CompleteConfiguration(Object model) {
+			super();
+			this.model = model;
+		}
 
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						setModel(model);
-						afterModelCreated();
-					}
-				});
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
+		public void run() {
+			setModel(model);
+			afterModelCreated();
 
 		}
+
 	}
 
 	public abstract PropDescriptor[] getConfigSchema();

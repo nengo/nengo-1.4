@@ -12,6 +12,7 @@ import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PTString;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.objects.widgets.TransientStatusMessage;
 
 /**
  * GUI Wrapper for a Network Model
@@ -96,6 +97,8 @@ public class PNetwork extends PNodeContainer {
 		FileManager fm = new FileManager();
 
 		fm.save((Network) getModel(), file);
+
+		TransientStatusMessage.show("File saved!", 2500);
 	}
 
 	/**

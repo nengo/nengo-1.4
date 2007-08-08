@@ -13,6 +13,16 @@ import edu.umd.cs.piccolo.activities.PTransformActivity;
 public interface World {
 	public boolean containsNode(PNode node);
 
+	/**
+	 * Shows a notification message to the user that will dissappear after a
+	 * duration. These messages should be non-essential, and are used to give
+	 * feedback to the user)
+	 * 
+	 * @param msg
+	 *            Text message
+	 * @param attachTo
+	 *            Object to which the text message should appear next to
+	 */
 	public void showTransientMsg(String msg, WorldObjectImpl attachTo);
 
 	public PTransformActivity zoomToFit();

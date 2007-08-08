@@ -25,9 +25,10 @@ public abstract class TrackedActivity {
 
 	}
 
-	public void startThread() {
-
-		(new Thread(getRunnableThreadSafe())).start();
+	public Thread startThread() {
+		Thread runner = new Thread(getRunnableThreadSafe());
+		runner.start();
+		return runner;
 
 	}
 

@@ -27,7 +27,7 @@ public class EnsembleViewer extends NodeViewer {
 
 				PNeuron neuronUI = new PNeuron(neuron);
 
-				addNodeToViewer(neuronUI, false, false, false);
+				addNodeToNetwork(neuronUI, false, false, false);
 			} else {
 				Util.Error("Unsupported node type "
 						+ node.getClass().getSimpleName()

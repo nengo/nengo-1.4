@@ -132,9 +132,6 @@ public class POrigin extends PModelWidget {
 	@Override
 	protected void prepareForDestroy() {
 
-		Util
-				.Warning("Origins can only be removed from the UI, not the Model. Projections will be removed.");
-
 		/*
 		 * Removes line ends
 		 */
@@ -197,9 +194,8 @@ public class POrigin extends PModelWidget {
 				return false;
 			if (modifyModel) {
 				if (POrigin.this.connectModelTo((PTermination) target)) {
-
-				} else {
-//					getWorld().showTransientMsg("New projection added", this);
+					getWorld().showTransientMsg("Projection added to Network",
+							this);
 				}
 			}
 			return true;
@@ -208,7 +204,10 @@ public class POrigin extends PModelWidget {
 		@Override
 		protected void justDisconnected() {
 			super.justDisconnected();
-			disconnectModelFrom((PTermination) getTarget());
+			if (disconnectModelFrom((PTermination) getTarget())) {
+				getWorld().showTransientMsg("Projection removed from Network",
+						this);
+			}
 
 		}
 

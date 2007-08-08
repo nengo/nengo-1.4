@@ -20,6 +20,8 @@ public class Style {
 	public static final Color COLOR_BORDER_CONTEXT = Color.BLUE;
 
 	public static final Color COLOR_WARNING = new Color(150, 0, 0);
+	
+	public static final Color COLOR_NOTIFICATION = Color.orange;
 
 	/*
 	 * Button Colors

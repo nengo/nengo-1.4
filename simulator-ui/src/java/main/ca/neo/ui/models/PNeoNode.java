@@ -7,7 +7,6 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
@@ -72,6 +71,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		if (widgets == null) {
 			widgets = new Vector<PModelWidget>(3);
 		}
+
 		widget.setScale(0.5);
 		widgets.add(widget);
 
@@ -179,9 +179,12 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 *            The name of the state variable to probe
 	 */
 	public GProbe addProbe(String stateName) {
-
+		
+		
 		GProbe probeUI = new GProbe(this, stateName);
 		newProbeAdded(probeUI);
+		
+		
 		return probeUI;
 	}
 
@@ -500,8 +503,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		Termination[] terminations = getModel().getTerminations();
 
 		for (int i = 0; i < terminations.length; i++) {
-			PTermination termUI = showTermination(terminations[i]
-					.getName());
+			PTermination termUI = showTermination(terminations[i].getName());
 			termUI.setWidgetVisible(true);
 		}
 
@@ -608,7 +610,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		NetworkViewer viewer = getNetworkViewer();
 		if (viewer != null)
-			getNetworkViewer().removeNode(this);
+			getNetworkViewer().removeNodeFromNetwork(this);
 
 		/*
 		 * remove widgets... since they are not children, they have to be

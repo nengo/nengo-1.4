@@ -1,5 +1,7 @@
 package ca.neo.ui.actions;
 
+import javax.swing.SwingUtilities;
+
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.nodes.PNodeContainer;
@@ -45,43 +47,55 @@ public class CreateModelAction extends ReversableAction {
 		this.nc = nodeUIType;
 	}
 
+	PNeoNode nodeProxy;
+
 	@Override
 	protected void action() throws ActionException {
 
-		PNeoNode nodeProxy = null;
-		try {
+		(new Thread() {
+			public void run() {
+				nodeProxy = null;
+				try {
 
-			nodeProxy = (PNeoNode) nc.newInstance();
-			UserConfig config = new UserConfig(nodeProxy);
+					nodeProxy = (PNeoNode) nc.newInstance();
+					new UserConfig(nodeProxy);
 
-			if (!config.isCancelled()) {
-				nodeContainer.addNeoNode(nodeProxy);
+					if (nodeProxy.isConfigured()) {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								nodeContainer.addNeoNode(nodeProxy);
+							}
+						});
 
+					}
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				if (nodeProxy != null) {
+
+					nodeAdded = nodeProxy;
+				}
 			}
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		}).start();
 
-		if (nodeProxy == null) {
-			throw new ActionException("Could not create node", false);
-		} else {
-			nodeAdded = nodeProxy;
-		}
 	}
 
 	@Override
 	protected void undo() throws ActionException {
-		nodeAdded.destroy();
+		if (nodeAdded != null) {
+			nodeAdded.destroy();
+		}
 
 	}
 }

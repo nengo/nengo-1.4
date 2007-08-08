@@ -23,6 +23,7 @@ import ca.neo.ui.style.Style;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 
@@ -31,6 +32,16 @@ public class UserConfig extends ConfigManager {
 	Frame parent1;
 
 	public static final String DEFAULT_PROPERTY_FILE_NAME = "last_used";
+	Object configLock = new Object();
+
+	protected void finishedConfiguring() {
+
+		synchronized (configLock) {
+			configLock.notifyAll();
+			// System.out.println("dialog closed");
+			configLock = null;
+		}
+	}
 
 	public UserConfig(IConfigurable configurable) {
 		super(configurable);
@@ -62,7 +73,19 @@ public class UserConfig extends ConfigManager {
 		} else {
 			dialog = new ConfigDialog(this, parent1);
 		}
-
+		/*
+		 * Block until configuration has completed
+		 */
+		if (configLock != null) {
+			synchronized (configLock) {
+				try {
+					if (configLock != null)
+						configLock.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public boolean isCancelled() {
@@ -270,11 +293,19 @@ class ConfigDialog extends JDialog {
 			setVisible(false);
 			dispose();
 
-			configManager.getConfigurable().completeConfiguration(
-					new PropertySet(configManager.getProperties()));
+			(new TrackedActivity("Creating new "
+					+ configManager.getConfigurable().getTypeName()) {
 
-			configManager
-					.savePropertiesFile(UserConfig.DEFAULT_PROPERTY_FILE_NAME);
+				@Override
+				public void doActivity() {
+					configManager.getConfigurable().completeConfiguration(
+							new PropertySet(configManager.getProperties()));
+
+					configManager.finishedConfiguring();
+					configManager
+							.savePropertiesFile(UserConfig.DEFAULT_PROPERTY_FILE_NAME);
+				}
+			}).startThread();
 
 		} else {
 
@@ -289,6 +320,7 @@ class ConfigDialog extends JDialog {
 		setVisible(false);
 		dispose();
 		configManager.getConfigurable().cancelConfiguration();
+		configManager.finishedConfiguring();
 	}
 
 	public void createButtons() {

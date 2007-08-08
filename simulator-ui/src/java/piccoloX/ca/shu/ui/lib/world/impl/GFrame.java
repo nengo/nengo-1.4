@@ -391,7 +391,7 @@ public class GFrame extends JFrame {
 	protected void updateStatusBar() {
 		StringBuilder strBuff = new StringBuilder("<HTML>");
 		if (taskStatusStrings.size() > 0) {
-			strBuff.append("*** Tasks ***<BR>");
+			strBuff.append("*** Messages ***<BR>");
 
 			Iterator<String> taskIt = taskStatusStrings.iterator();
 			while (taskIt.hasNext()) {

@@ -28,9 +28,9 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
+Two types of Transient UI feedback for events such as File Save, New connections, etc...
+	Events which modify NEO models should now have UI feedback
 
-
-add transient messages in UI
 
 information visualization
 	dimensions of functions, nodes

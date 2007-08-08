@@ -262,18 +262,28 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable,
 		return constructMenu().getJPopupMenu();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.World#showTransientMsg(java.lang.String,
+	 *      ca.shu.ui.lib.world.impl.WorldObjectImpl)
+	 */
 	public void showTransientMsg(String msg, WorldObjectImpl attachTo) {
 
 		GText msgObject = new GText(msg);
+		msgObject.setFont(Style.FONT_BOLD);
+		msgObject.setTextPaint(Style.COLOR_NOTIFICATION);
 		msgObject.setConstrainWidthToTextWidth(true);
 
-		double offsetX = (msgObject.getWidth() - attachTo.getWidth()) / 2d;
+		double offsetX = -(msgObject.getWidth() - attachTo.getWidth()) / 2d;
 
 		Point2D position = attachTo
 				.objectToSky(new Point2D.Double(offsetX, -5));
 
 		msgObject.setOffset(position);
 		getSky().addChild(msgObject);
+
+		(new AnimateMsgObjectThread(msgObject)).start();
 
 	}
 
@@ -422,4 +432,34 @@ class RemoveControlsThread extends Thread {
 		});
 	}
 
+}
+
+class AnimateMsgObjectThread extends Thread {
+	PNode msgObject;
+	static final int ANIMATE_MSG_DURATION = 1000;
+
+	public AnimateMsgObjectThread(PNode msgObject) {
+		super();
+		this.msgObject = msgObject;
+	}
+
+	public void run() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				Point2D startingOffset = msgObject.getOffset();
+				msgObject
+						.animateToPositionScaleRotation(startingOffset.getX(),
+								startingOffset.getY() - 50, 1, 0,
+								ANIMATE_MSG_DURATION);
+			}
+		});
+		try {
+			Thread.sleep(ANIMATE_MSG_DURATION);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		msgObject.removeFromParent();
+	}
 }
