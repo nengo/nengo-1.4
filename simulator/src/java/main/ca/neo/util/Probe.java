@@ -14,6 +14,17 @@ import ca.neo.model.SimulationException;
  */
 public interface Probe {
 
+
+	/**
+	 * @param ensembleName Name of the Ensemble the target object belongs to
+	 * @param target The object about which state history is to be collected 
+	 * @param stateName The name of the state variable to collect 
+	 * @param record If true, getData() returns history since last connect() or reset(),
+	 * 		otherwise getData() returns most recent sample 
+	 * @throws SimulationException if the given target does not have the given state
+	 */
+	public void connect(String ensembleName, Probeable target, String stateName, boolean record) throws SimulationException;
+	
 	/**
 	 * @param target The object about which state history is to be collected 
 	 * @param stateName The name of the state variable to collect 
@@ -44,4 +55,25 @@ public interface Probe {
 	 */
 	public TimeSeries getData();
 	
+	/**
+	 * @param target The object about which state history is to be collected 
+	 */
+	public Probeable getTarget();
+
+	/**
+	 * @param stateName
+	 *            The name of the state variable to collect
+	 */
+	public String getStateName();
+
+	/**
+	 * @return Whether the target the node is attached to is inside an Ensemble
+	 */
+	public boolean isInEnsemble();
+
+	/**
+	 * @return The name of the Ensemble the target the Probe is attached to is
+	 *         in. Null if it's not in one
+	 */
+	public String getEnsembleName();
 }

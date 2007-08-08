@@ -24,7 +24,18 @@ public class ProbeImpl implements Probe {
 	private Units[] myUnits;
 	private float mySamplingPeriod = -1;
 	private float myLastSampleTime = -100000;
-	
+	private String myEnsembleName = null;
+
+
+	/**
+	 * @see ca.neo.util.Probe#connect(java.lang.String, ca.neo.model.Probeable, java.lang.String, boolean)
+	 */
+	public void connect(String ensembleName, Probeable target,
+			String stateName, boolean record) throws SimulationException {
+		myEnsembleName = ensembleName;
+		connect(target, stateName, record);
+	}
+
 	/**
 	 * @see ca.neo.util.Probe#connect(Probeable, String, boolean)
 	 */
@@ -120,6 +131,37 @@ public class ProbeImpl implements Probe {
 	 */
 	public void setSamplingRate(float rate) {
 		mySamplingPeriod = 1f / rate;
+	}
+
+	/**
+	 * @see ca.neo.util.Probe#getTarget()
+	 */
+	public Probeable getTarget() {
+		return myTarget;
+	}
+
+	/**
+	 * @see ca.neo.util.Probe#getStateName()
+	 */
+	public String getStateName() {
+		return myStateName;
+	}
+
+	/**
+	 * @see ca.neo.util.Probe#isInEnsemble()
+	 */
+	public boolean isInEnsemble() {
+		if (myEnsembleName != null)
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * @see ca.neo.util.Probe#getEnsembleName()
+	 */
+	public String getEnsembleName() {
+		return myEnsembleName;
 	}
 	
 }

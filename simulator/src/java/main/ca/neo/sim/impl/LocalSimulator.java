@@ -129,11 +129,22 @@ public class LocalSimulator implements Simulator {
 		Probeable p = getNeuron(ensembleName, neuronIndex);
 		
 		Probe result = new ProbeImpl();
-		result.connect(p, state, record);
+		result.connect(ensembleName, p, state, record);
 		
 		myProbes.add(result);
 		
 		return result;
+	}
+	
+	
+	/**
+	 * @see ca.neo.sim.Simulator#removeProbe(ca.neo.util.Probe)
+	 */
+	public void removeProbe(Probe probe) throws SimulationException {
+	
+		if (!myProbes.remove(probe)) {
+			throw new SimulationException("Probe could not be removed");
+		}		
 	}
 	
 	private Probeable getNode(String nodeName) throws SimulationException {

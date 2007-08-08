@@ -5,7 +5,6 @@ package ca.neo.sim;
 
 import ca.neo.model.Network;
 import ca.neo.model.SimulationException;
-import ca.neo.model.SimulationMode;
 import ca.neo.util.Probe;
 
 /**
@@ -58,6 +57,13 @@ public interface Simulator {
 	 * 		not have the specified state variable
 	 */
 	public Probe addProbe(String ensembleName, int neuronIndex, String state, boolean record) throws SimulationException;
+	
+	
+	/**
+	 * @param probe Probe to be removed
+	 * @throws SimulationException if the referenced probe cannot be removed
+	 */
+	public void removeProbe(Probe probe) throws SimulationException;
 	
 	/**
 	 * Runs the Network for the given time range. The states of all components of the 
