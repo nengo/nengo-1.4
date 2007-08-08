@@ -436,7 +436,7 @@ class RemoveControlsThread extends Thread {
 
 class AnimateMsgObjectThread extends Thread {
 	PNode msgObject;
-	static final int ANIMATE_MSG_DURATION = 1000;
+	static final int ANIMATE_MSG_DURATION = 2500;
 
 	public AnimateMsgObjectThread(PNode msgObject) {
 		super();

@@ -3,14 +3,13 @@ package ca.neo.ui.actions;
 import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
 import ca.neo.ui.views.objects.configurable.AbstractConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
+import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.neo.ui.views.objects.configurable.struct.PTFloat;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
-import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.util.Util;
 
 public class RunSimulatorAction extends StandardAction {

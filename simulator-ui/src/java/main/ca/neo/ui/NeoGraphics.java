@@ -19,7 +19,6 @@ import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.impl.GFrame;
-import edu.umd.cs.piccolo.util.PDebug;
 
 public class NeoGraphics extends GFrame implements INodeContainer {
 

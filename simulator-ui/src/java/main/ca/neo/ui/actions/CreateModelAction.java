@@ -4,7 +4,6 @@ import javax.swing.SwingUtilities;
 
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.nodes.PNodeContainer;
 import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;

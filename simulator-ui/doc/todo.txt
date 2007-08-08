@@ -1,6 +1,8 @@
 *******************************************
  Done
 *******************************************
+(08/08) done - Two types of Transient UI feedback for events such as File Save, New connections, etc...
+	Events which modify NEO models should now have UI feedback
 (08/08) done - Remove probes, probes are also updated from the Simulator using getProbes
 (08/08) done - fixed infinite loop bug when GProbe is destroyed
 (08/08) done - fixed some Swing thread safety issues
@@ -28,14 +30,9 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
-Two types of Transient UI feedback for events such as File Save, New connections, etc...
-	Events which modify NEO models should now have UI feedback
-
 
 information visualization
 	dimensions of functions, nodes
-
-fixed warnings
 
 show simulation progress in UI
 	create a listener object for Simulator

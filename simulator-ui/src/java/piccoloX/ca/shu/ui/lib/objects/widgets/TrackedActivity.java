@@ -54,30 +54,24 @@ public abstract class TrackedActivity {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				try {
-					SwingUtilities.invokeAndWait(new Runnable() {
-						public void run() {
-							trackedMsg = new TrackedStatusMsg(taskName, wo);
-						}
-					});
 
-					try {
-						doActivity();
-					} catch (RuntimeException e) {
-						e.printStackTrace();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						trackedMsg = new TrackedStatusMsg(taskName, wo);
 					}
+				});
 
-					SwingUtilities.invokeAndWait(new Runnable() {
-						public void run() {
-							trackedMsg.finished();
-						}
-					});
-
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
+				try {
+					doActivity();
+				} catch (RuntimeException e) {
 					e.printStackTrace();
 				}
+
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						trackedMsg.finished();
+					}
+				});
 
 			}
 		};
