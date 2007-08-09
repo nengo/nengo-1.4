@@ -5,11 +5,11 @@ import java.awt.Color;
 import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.handlers.HandCursorHandler;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public abstract class Button extends WorldObjectImpl {
+public abstract class Button extends WorldObject {
 
 	protected Color defaultColor = Color.white;
 

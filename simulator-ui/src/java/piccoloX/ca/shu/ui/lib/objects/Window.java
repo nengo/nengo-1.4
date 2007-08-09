@@ -12,7 +12,7 @@ import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.objects.widgets.AffinityHalo;
 import ca.shu.ui.lib.objects.widgets.BoundsHandle;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
@@ -20,7 +20,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
 
-public class Window extends WorldObjectImpl {
+public class Window extends WorldObject {
 	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.WINDOW;
 
 	private static final int DEFAULT_HEIGHT = 400;
@@ -35,9 +35,9 @@ public class Window extends WorldObjectImpl {
 
 	AffinityHalo affinityHalo = null;
 
-	WorldObjectImpl attachTo;
+	WorldObject attachTo;
 
-	WorldObjectImpl contentNode;
+	WorldObject contentNode;
 
 	final int MENU_BAR_HEIGHT = 27;
 
@@ -64,7 +64,7 @@ public class Window extends WorldObjectImpl {
 	 * @param contentNode
 	 *            Node containing the contents of this Window
 	 */
-	public Window(WorldObjectImpl attachTo, WorldObjectImpl contentNode) {
+	public Window(WorldObject attachTo, WorldObject contentNode) {
 		super();
 		this.attachTo = attachTo;
 
@@ -76,7 +76,7 @@ public class Window extends WorldObjectImpl {
 
 		setFrameVisible(true);
 		addChild(menubar);
-		addChildW(contentNode);
+		addChild(contentNode);
 		menuBarHandler = new MenuBarHandler(this);
 		menubar.addInputEventListener(menuBarHandler);
 
@@ -246,7 +246,7 @@ public class Window extends WorldObjectImpl {
 	 * 
 	 * @return Node representing the contents of the Window
 	 */
-	public WorldObjectImpl getWindowContent() {
+	public WorldObject getWindowContent() {
 		return contentNode;
 	}
 

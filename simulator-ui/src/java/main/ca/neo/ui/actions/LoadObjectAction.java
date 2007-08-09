@@ -12,6 +12,7 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.util.Util;
 
 public abstract class LoadObjectAction extends StandardAction {
 
@@ -48,16 +49,20 @@ public abstract class LoadObjectAction extends StandardAction {
 						objLoaded = fm.load(file);
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
-								processObject(objLoaded);								
+								processObject(objLoaded);
 							}
 						});
-						
+
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					} catch (ClassCastException e) {
 						e.printStackTrace();
+					} finally {
+						if (objLoaded == null) {
+							Util.Error("Incorrect file type or wrong version");
+						}
 					}
 
 				}

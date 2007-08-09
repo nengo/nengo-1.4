@@ -1,6 +1,5 @@
 package ca.shu.ui.lib.objects;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;

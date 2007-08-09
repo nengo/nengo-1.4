@@ -7,6 +7,8 @@ import ca.neo.io.FileManager;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.TooltipBuilder;
+import ca.neo.ui.models.TooltipPart;
 import ca.neo.ui.models.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
@@ -23,6 +25,14 @@ public abstract class PNodeContainer extends PNeoNode {
 	private static final long serialVersionUID = 1L;
 
 	Window networkWindow;
+
+	@Override
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
+
+		tooltips.addPart(new TooltipPart("# Nodes", "" + getNodesCount()));
+		return tooltips;
+	}
 
 	Window viewerWindow;
 
@@ -48,7 +58,7 @@ public abstract class PNodeContainer extends PNeoNode {
 
 	}
 
-	public PopupMenuBuilder constructMenu() {
+	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
 
 		menu.addSection("File");
@@ -139,18 +149,18 @@ public abstract class PNodeContainer extends PNeoNode {
 	 */
 	protected abstract NodeViewer createNodeViewerInstance();
 
-	@Override
-	protected void moveWidgetsToFront() {
-		/**
-		 * Only move widgets to the front if there is no Window open Otherwise,
-		 * they might block the Window
-		 */
-		if (viewerWindow == null
-				|| viewerWindow.isDestroyed()
-				|| viewerWindow.getWindowState() == Window.WindowState.MINIMIZED)
-			super.moveWidgetsToFront();
-
-	}
+	// @Override
+	// protected void moveWidgetsToFront() {
+	// /**
+	// * Only move widgets to the front if there is no Window open Otherwise,
+	// * they might block the Window
+	// */
+	// if (viewerWindow == null
+	// || viewerWindow.isDestroyed()
+	// || viewerWindow.getWindowState() == Window.WindowState.MINIMIZED)
+	// super.moveWidgetsToFront();
+	//
+	// }
 
 	@Override
 	protected void afterModelCreated() {

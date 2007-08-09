@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 
+import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.util.Util;
@@ -20,7 +21,7 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PObjectOutputStream;
 
 public abstract class ConfigManager {
-	static final String FILE_SAVED_OBJECTS_DIR = "SavedObjects";
+	static final String FILE_SAVED_OBJECTS_DIR = NeoGraphics.USER_FILE_DIR;
 
 	/**
 	 * Creates a saved objects folder if it isn't already there
@@ -161,6 +162,7 @@ public abstract class ConfigManager {
 
 				this.properties = (MutableAttributeSet) obj;
 			}
+			obj_in.close();
 
 		} catch (FileNotFoundException e) {
 			System.out.println(e);
@@ -202,10 +204,13 @@ public abstract class ConfigManager {
 			if (properties instanceof PNode) {
 				PObjectOutputStream obj_out = new PObjectOutputStream(f_out);
 				obj_out.writeObjectTree(properties);
+				obj_out.close();
 			} else {
 				ObjectOutputStream obj_out = new ObjectOutputStream(f_out);
 				obj_out.writeObject(properties);
+				obj_out.close();
 			}
+
 			f_out.close();
 			// System.out.println("Saved: " + fileName);
 

@@ -1,160 +1,79 @@
 package ca.shu.ui.lib.handlers;
 
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.SwingUtilities;
+import java.awt.event.InputEvent;
 
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.impl.WorldImpl;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public class TooltipHandler extends PBasicInputEventHandler {
-
-	WorldObjectImpl controls;
-
-	Thread controlTimer;
-
-	boolean isInsideControl = false;
-
-	Object mouseEventLock = new Object();
-
-	World world;
-
-	WorldObjectImpl pickedNode;
-
-	WorldObjectImpl selectedNode;
+public class TooltipHandler extends NodePickerHandler {
+	private WorldObject controls;
 
 	public TooltipHandler(World parent) {
-		super();
-		this.world = parent;
-		controlTimer = new ControlTimer();
-		controlTimer.start();
+		super(parent);
+	}
+
+	protected int getPickDelay() {
+		return 500;
+	}
+
+	protected int getKeepPickDelay() {
+		return 1500;
 	}
 
 	@Override
-	public void mouseDragged(PInputEvent event) {
-		updateMouse(event);
+	protected void nodePicked() {
+		WorldObject node = getPickedNode();
+		node.pushState(WorldObject.State.SELECTED);
+		controls = node.getTooltip();
+
+		getWorld().showTooltip(controls, node);
 	}
 
 	@Override
-	public void mouseMoved(PInputEvent event) {
-		updateMouse(event);
+	protected void nodeUnPicked() {
+		WorldObject node = getPickedNode();
+
+		node.popState(WorldObject.State.SELECTED);
+		getWorld().hideTooltip();
+
 	}
 
-	public void updateMouse(PInputEvent event) {
-		PNode node = event.getPickedNode();
+	@Override
+	public void eventUpdated(PInputEvent event) {
 
-		if (!WorldImpl.isContexualTipsVisible()) {
-			selectedNode = null;
-			synchronized (mouseEventLock) {
-				mouseEventLock.notifyAll();
-			}
-			return;
-		}
+		if (World.isTooltipsVisible()
+				|| ((event.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
 
-		while (node != null) {
-			if (node instanceof WorldObjectImpl) {
+			PNode node = event.getPickedNode();
+			while (node != null) {
 
+				/*
+				 * Do nothing if the mouse is over the controls
+				 */
 				if (node == controls) {
-					isInsideControl = true;
+					setKeepPickAlive(true);
 					return;
 				}
+				if (node instanceof WorldObject) {
+					WorldObject wo = (WorldObject) node;
 
-				WorldObjectImpl wo = (WorldObjectImpl) node;
+					if (wo.getTooltip() != null) {
 
-				if (wo.getTooltipObject() != null) {
+						setSelectedNode(wo);
 
-					if (wo != selectedNode) {
-						selectedNode = wo;
-						synchronized (mouseEventLock) {
-							mouseEventLock.notifyAll();
-						}
+						return;
 					}
-					return;
 				}
+
+				node = node.getParent();
 			}
 
-			node = node.getParent();
 		}
-
-		isInsideControl = false;
-
-		if (selectedNode != null) {
-
-			selectedNode = null;
-			synchronized (mouseEventLock) {
-				mouseEventLock.notifyAll();
-			}
-		}
+		setKeepPickAlive(false);
+		setSelectedNode(null);
 
 	}
 
-	class ControlTimer extends Thread {
-
-		private ControlTimer() {
-			super("Control Timer");
-		}
-
-		WorldObjectImpl currNode;
-
-		@Override
-		public void run() {
-			try {
-				while (true) {
-					if (selectedNode != null) {
-						currNode = selectedNode;
-						Thread.sleep(selectedNode.getControlDelay());
-
-						if ((currNode == selectedNode)
-								&& (selectedNode != null)) {
-
-							SwingUtilities.invokeAndWait(new Runnable() {
-								public void run() {
-									currNode
-											.pushState(WorldObject.State.SELECTED);
-									controls = selectedNode.getTooltipObject();
-
-									world.showTooltip(controls, selectedNode);
-								}
-							});
-
-							while (true) {
-								Thread.sleep(1000);
-
-								if ((currNode == selectedNode)
-										|| ((selectedNode == null) && isInsideControl)) {
-									synchronized (mouseEventLock) {
-										mouseEventLock.wait(1000);
-									}
-								} else {
-									break;
-								}
-							}
-
-							SwingUtilities.invokeAndWait(new Runnable() {
-								public void run() {
-									currNode
-											.popState(WorldObject.State.SELECTED);
-									world.hideControls();
-								}
-							});
-
-						}
-					} else {
-						synchronized (mouseEventLock) {
-							mouseEventLock.wait();
-						}
-					}
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 }

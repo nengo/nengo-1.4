@@ -1,7 +1,7 @@
 package ca.shu.ui.lib.util;
 
 import ca.shu.ui.lib.actions.ReversableActionManager;
-import ca.shu.ui.lib.world.impl.GFrame;
+import ca.shu.ui.lib.world.GFrame;
 
 public class UIEnvironment {
 	static GFrame uiInstance;

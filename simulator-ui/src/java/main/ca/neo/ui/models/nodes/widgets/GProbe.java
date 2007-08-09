@@ -11,6 +11,8 @@ import ca.neo.model.SimulationException;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.TooltipBuilder;
+import ca.neo.ui.models.TooltipPart;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
@@ -70,7 +72,7 @@ public class GProbe extends PModel {
 	}
 
 	@Override
-	public PopupMenuBuilder constructMenu() {
+	protected PopupMenuBuilder constructMenu() {
 		// TODO Auto-generated method stub
 		PopupMenuBuilder menu = super.constructMenu();
 
@@ -213,6 +215,14 @@ public class GProbe extends PModel {
 	@Override
 	public Probe getModel() {
 		return (Probe) super.getModel();
+	}
+
+	@Override
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = new TooltipBuilder("Probe");
+		tooltips.addPart(new TooltipPart("Attached to", getModel()
+				.getStateName()));
+		return tooltips;
 	}
 
 }

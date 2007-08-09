@@ -3,7 +3,7 @@ package ca.shu.ui.lib.actions;
 import java.util.Vector;
 
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.impl.GFrame;
+import ca.shu.ui.lib.world.GFrame;
 
 public class ReversableActionManager {
 

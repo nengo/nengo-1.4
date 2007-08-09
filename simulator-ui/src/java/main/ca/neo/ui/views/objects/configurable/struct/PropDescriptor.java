@@ -11,6 +11,11 @@ import ca.neo.ui.views.objects.configurable.PropertyInputPanel;
  */
 public abstract class PropDescriptor implements Serializable {
 
+	@Override
+	public String toString() {
+		return getTypeName();
+	}
+
 	String name;
 
 	public PropDescriptor(String name) {

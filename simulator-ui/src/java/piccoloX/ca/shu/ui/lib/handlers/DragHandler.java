@@ -3,11 +3,9 @@ package ca.shu.ui.lib.handlers;
 import java.awt.event.MouseEvent;
 import java.util.ListIterator;
 
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.IWorldLayer;
 import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -49,8 +47,8 @@ public class DragHandler extends PDragEventHandler {
 		super.endDrag(event);
 	}
 
-	protected WorldObjectImpl getDraggedWO() {
-		return (WorldObjectImpl) getDraggedNode();
+	protected WorldObject getDraggedWO() {
+		return (WorldObject) getDraggedNode();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,8 +73,8 @@ public class DragHandler extends PDragEventHandler {
 				return;
 			}
 
-			if (node instanceof WorldObjectImpl) {
-				WorldObjectImpl wo = (WorldObjectImpl) node;
+			if (node instanceof WorldObject) {
+				WorldObject wo = (WorldObject) node;
 				if (wo.isDraggable()) {
 
 					super.startDrag(event);
@@ -90,7 +88,7 @@ public class DragHandler extends PDragEventHandler {
 					 */
 					PNode topLayerNode = wo;
 					while (topLayerNode != null
-							&& !(topLayerNode.getParent() instanceof WorldLayer)) {
+							&& !(topLayerNode.getParent() instanceof IWorldLayer)) {
 						topLayerNode = topLayerNode.getParent();
 					}
 					topLayerNode.moveToFront();

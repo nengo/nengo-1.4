@@ -1,12 +1,9 @@
-package ca.shu.ui.lib.world.impl;
+package ca.shu.ui.lib.world;
 
 import java.awt.geom.Point2D;
 
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldLayer;
-import ca.shu.ui.lib.world.WorldObject;
 
-public class WorldGround extends WorldObjectImpl implements WorldLayer {
+public class WorldGround extends WorldObject implements IWorldLayer {
 
 	/**
 	 * 
@@ -31,11 +28,7 @@ public class WorldGround extends WorldObjectImpl implements WorldLayer {
 
 	public void addWorldObject(WorldObject node) {
 
-		// PBounds bounds = this.getFullBounds();
-
-		// node.setOffset(bounds.getWidth() + 50, 0);
-
-		addChildW(node);
+		addChild(node);
 
 	}
 
@@ -58,7 +51,7 @@ public class WorldGround extends WorldObjectImpl implements WorldLayer {
 	 *            the center of the camera
 	 */
 	public void catchObject(WorldObject wo, boolean centerCameraPosition) {
-		addChildW(wo);
+		addChild(wo);
 
 		Point2D finalPosition;
 		if (centerCameraPosition) {

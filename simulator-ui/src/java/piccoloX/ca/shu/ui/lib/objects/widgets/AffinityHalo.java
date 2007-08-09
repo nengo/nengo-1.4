@@ -7,12 +7,12 @@ import java.awt.geom.Point2D;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.GEdge;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class AffinityHalo extends GEdge {
 
-	public AffinityHalo(WorldObjectImpl startNode, WorldObjectImpl endNode) {
+	public AffinityHalo(WorldObject startNode, WorldObject endNode) {
 		super(startNode, endNode);
 		// TODO Set a thicker stroke for the affinity halo
 		startNode.addChild(1, this);
@@ -54,8 +54,8 @@ public class AffinityHalo extends GEdge {
 		// when
 		// determining their position.
 
-		WorldObjectImpl start = getStartNode();
-		WorldObjectImpl end = getEndNode();
+		WorldObject start = getStartNode();
+		WorldObject end = getEndNode();
 
 		double sX = start.getX();
 		double sY = start.getY();

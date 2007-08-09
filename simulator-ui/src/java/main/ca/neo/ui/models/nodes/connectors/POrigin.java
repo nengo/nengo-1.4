@@ -15,7 +15,6 @@ import ca.shu.ui.lib.objects.lines.LineEnd;
 import ca.shu.ui.lib.objects.lines.LineEndWell;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 
 /**
  * Proxy UI Object for a Origin model
@@ -23,7 +22,7 @@ import ca.shu.ui.lib.world.impl.WorldObjectImpl;
  * @author Shu Wu
  * 
  */
-public class POrigin extends PModelWidget {
+public class POrigin extends PWidget {
 
 	private static final long serialVersionUID = 1L;
 
@@ -104,7 +103,7 @@ public class POrigin extends PModelWidget {
 
 			return true;
 		} catch (StructuralException e) {
-			Util.Warning("Could not connect: " + e.toString());
+			Util.Warning("Could not connect: " + e.getMessage());
 			return false;
 		}
 	}
@@ -139,7 +138,7 @@ public class POrigin extends PModelWidget {
 		if (ends != null) {
 			Object[] endsAr = ends.toArray();
 			for (int i = 0; i < endsAr.length; i++) {
-				((WorldObjectImpl) (endsAr[i])).destroy();
+				((WorldObject) (endsAr[i])).destroy();
 			}
 		}
 
@@ -190,7 +189,7 @@ public class POrigin extends PModelWidget {
 		}
 
 		@Override
-		protected boolean initConnection(WorldObject target, boolean modifyModel) {
+		protected boolean initConnection(ILineAcceptor target, boolean modifyModel) {
 			if (!(target instanceof PTermination))
 				return false;
 			if (modifyModel) {
@@ -222,7 +221,7 @@ public class POrigin extends PModelWidget {
 
 		private static final long serialVersionUID = 1L;
 
-		public OriginIcon(PModel parent, WorldObjectImpl lineEnd) {
+		public OriginIcon(PModel parent, WorldObject lineEnd) {
 			super(parent, lineEnd);
 
 			configureLabel(false);

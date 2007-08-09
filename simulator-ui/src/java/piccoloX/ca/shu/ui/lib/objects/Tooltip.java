@@ -3,13 +3,13 @@ package ca.shu.ui.lib.objects;
 import java.util.Collection;
 import java.util.Vector;
 
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 
 
-public abstract class Tooltip extends WorldObjectImpl {
+public abstract class Tooltip extends WorldObject {
 	Collection<Button> buttons;
 
-	WorldObjectImpl buttonsNode;
+	WorldObject buttonsNode;
 
 	public Tooltip() {
 		super();
@@ -20,7 +20,7 @@ public abstract class Tooltip extends WorldObjectImpl {
 		// this.addInputEventListener(new MouseDetector(this));
 		getLayoutManager().setLeftPadding(0);
 		getLayoutManager().setVerticalPadding(0);
-		buttonsNode = new WorldObjectImpl();
+		buttonsNode = new WorldObject();
 		buttonsNode.setFrameVisible(false);
 		buttonsNode.setDraggable(false);
 		
@@ -47,7 +47,7 @@ public abstract class Tooltip extends WorldObjectImpl {
 	
 	
 	@Override
-	public Tooltip getTooltipObject() {
+	public Tooltip getTooltip() {
 		return null;
 	}
 

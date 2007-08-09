@@ -4,7 +4,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -12,7 +11,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 
 public class MouseFollower implements PropertyChangeListener {
 	PPath frame = PPath.createRectangle(0f, 0f, 1f, 1f);
-	Interactable currentlySelected;
+	WorldObject currentlySelected;
 
 	// Interactable prevObj = null;
 
@@ -24,7 +23,7 @@ public class MouseFollower implements PropertyChangeListener {
 		updateBounds();
 	}
 
-	public void setObjToFollow(Interactable obj) {
+	public void setObjToFollow(WorldObject obj) {
 		if (obj == currentlySelected) {
 			return;
 		}

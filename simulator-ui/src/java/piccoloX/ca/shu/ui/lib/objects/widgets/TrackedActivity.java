@@ -4,12 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 
 public abstract class TrackedActivity {
 
 	String taskName;
-	WorldObjectImpl wo;
+	WorldObject wo;
 
 	public TrackedActivity(String taskName) {
 		this(taskName, null);
@@ -18,7 +18,7 @@ public abstract class TrackedActivity {
 
 	TrackedStatusMsg trackedMsg;
 
-	public TrackedActivity(String taskName, WorldObjectImpl wo) {
+	public TrackedActivity(String taskName, WorldObject wo) {
 		super();
 		this.taskName = taskName;
 		this.wo = wo;

@@ -6,10 +6,10 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-public class LineInIcon extends WorldObjectImpl {
+public class LineInIcon extends WorldObject {
 
 	/**
 	 * 

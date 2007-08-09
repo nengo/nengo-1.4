@@ -1,20 +1,20 @@
 package ca.shu.ui.lib.objects;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.nodes.PPath;
 
-public class GContextButton extends WorldObjectImpl {
+public class GContextButton extends WorldObject {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	WorldObjectImpl node;
+	WorldObject node;
 
 	PPath circle;
 
-	public GContextButton(WorldObjectImpl node) {
+	public GContextButton(WorldObject node) {
 		super();
 		this.node = node;
 		this.setDraggable(false);
@@ -25,29 +25,24 @@ public class GContextButton extends WorldObjectImpl {
 		this.setFrameVisible(false);
 		circle.setPickable(false);
 
-		addToLayout(circle, false);
+		addToLayout(circle);
 
 	}
 
 	Tooltip buttons;
 
 	@Override
-	public Tooltip getTooltipObject() {
-//		G node = new GFramedNode();
+	public Tooltip getTooltip() {
+		// G node = new GFramedNode();
 		Tooltip buttons = new Buttons();
 
-//		node.addToLayout(buttons);
-//		node
-//				.setOffset(this.getWidth() - node.getWidth(),
-//						this.getHeight() + 10);
+		// node.addToLayout(buttons);
+		// node
+		// .setOffset(this.getWidth() - node.getWidth(),
+		// this.getHeight() + 10);
 
 		// node.setFrameVisible(true);
 		return buttons;
-	}
-
-	@Override
-	public long getControlDelay() {
-		return 200;
 	}
 
 	class Buttons extends Tooltip {

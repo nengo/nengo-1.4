@@ -9,18 +9,15 @@ import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.nodes.PNodeContainer;
-import ca.neo.ui.models.nodes.connectors.PModelWidget;
 import ca.shu.ui.lib.handlers.Interactable;
+import ca.shu.ui.lib.handlers.NodePickerHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
-import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.impl.WorldImpl;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
@@ -30,7 +27,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * @author Shu
  * 
  */
-public abstract class NodeViewer extends WorldImpl implements NamedObject,
+public abstract class NodeViewer extends World implements NamedObject,
 		Interactable, INodeContainer {
 	private static final long serialVersionUID = 1L;
 
@@ -60,7 +57,7 @@ public abstract class NodeViewer extends WorldImpl implements NamedObject,
 
 		setName(getModel().getName());
 
-		addInputEventListener(new NodeHoverHandler(this));
+		addInputEventListener(new HoverHandler(this));
 
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
 
@@ -222,51 +219,41 @@ class ModelStatusBarHandler extends StatusBarHandler {
 	}
 }
 
-class NodeHoverHandler extends PBasicInputEventHandler {
-	NodeViewer parent;
-	PNeoNode selectedNode = null;
+class HoverHandler extends NodePickerHandler {
 
-	public NodeHoverHandler(NodeViewer parent) {
-		super();
-		this.parent = parent;
+	public HoverHandler(NodeViewer world) {
+		super(world);
 	}
 
 	@Override
-	public void mouseEntered(PInputEvent event) {
-		// TODO Auto-generated method stub
-		super.mouseEntered(event);
+	protected int getKeepPickDelay() {
+		return 1500;
+	}
+
+	@Override
+	protected int getPickDelay() {
+		return 0;
+	}
+
+	@Override
+	public void eventUpdated(PInputEvent event) {
 		PNeoNode node = (PNeoNode) Util.getNodeFromPickPath(event,
 				PNeoNode.class);
 
-		/*
-		 * If no node is picked, find if the mouse is hovering over a widget
-		 */
-		if (node == null) {
-
-			PModelWidget widget = (PModelWidget) Util.getNodeFromPickPath(
-					event, PModelWidget.class);
-			if (widget != null)
-				node = widget.getNodeParent();
-
-		}
-
-		if (selectedNode != node) {
-			if (selectedNode != null)
-				selectedNode.setHoveredOver(false);
-			if (node != null) {
-
-				node.setHoveredOver(true);
-			}
-			selectedNode = node;
-		}
+		setSelectedNode(node);
 
 	}
 
 	@Override
-	public void mouseExited(PInputEvent event) {
-		// TODO Auto-generated method stub
-		super.mouseExited(event);
-		// parent.setHoveredOver(false);
+	protected void nodePicked() {
+		((PNeoNode) getPickedNode()).setHoveredOver(true);
+
+	}
+
+	@Override
+	protected void nodeUnPicked() {
+		((PNeoNode) getPickedNode()).setHoveredOver(false);
+
 	}
 
 }

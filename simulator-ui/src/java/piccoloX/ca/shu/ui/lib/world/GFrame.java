@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.world.impl;
+package ca.shu.ui.lib.world;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -9,6 +9,16 @@ import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
@@ -28,7 +38,6 @@ import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PRoot;
@@ -53,11 +62,17 @@ public class GFrame extends JFrame {
 
 	private boolean isFullScreenMode;
 
+	private UserPreferences preferences;
+
 	private JLabel statusBar;
+
+	ReversableActionManager actionManager;
 
 	PCamera camera;
 
 	GCanvas canvas;
+
+	MenuBuilder editMenu;
 
 	String statusStr = "";
 
@@ -65,12 +80,12 @@ public class GFrame extends JFrame {
 
 	PLayer topLayer;
 
-	ReversableActionManager actionManager;
+	MenuBuilder worldMenu;
 
 	public GFrame(String title) {
 		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
-
+		loadPreferences();
 		UIEnvironment.setInstance(this);
 
 		actionManager = new ReversableActionManager(this);
@@ -84,6 +99,7 @@ public class GFrame extends JFrame {
 
 		setBounds(new Rectangle(100, 100, 800, 600));
 		setBackground(null);
+		addWindowListener(new MyWindowListener());
 
 		try {
 			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -122,18 +138,20 @@ public class GFrame extends JFrame {
 		canvas.addKeyListener((KeyListener) escapeFullScreenModeListener);
 	}
 
-	/**
-	 * Use this function to add menu items to the frame menu bar
-	 * 
-	 * @param menuBar
-	 *            is attached to the frame
-	 */
-	public void constructMenuBar(JMenuBar menuBar) {
-
+	public ReversableActionManager getActionManager() {
+		return actionManager;
 	}
 
 	public GCanvas getCanvas() {
 		return canvas;
+	}
+
+	public PRoot getRoot() {
+		return canvas.getRoot();
+	}
+
+	public String getUserFileDirectory() {
+		return "UI";
 	}
 
 	/**
@@ -166,6 +184,10 @@ public class GFrame extends JFrame {
 					.removeKeyListener((KeyListener) escapeFullScreenModeListener);
 			escapeFullScreenModeListener = null;
 		}
+	}
+
+	public void reversableActionsUpdated() {
+		updateEditMenu();
 	}
 
 	/*
@@ -212,9 +234,6 @@ public class GFrame extends JFrame {
 		updateStatusBar();
 	}
 
-	MenuBuilder worldMenu;
-	MenuBuilder editMenu;
-
 	/**
 	 * Initializes the menu
 	 */
@@ -223,7 +242,7 @@ public class GFrame extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		Style.applyStyleToComponent(menuBar);
 
-		constructMenuBar(menuBar);
+		constructMenu(menuBar);
 
 		// menu.setMnemonic(KeyEvent.VK_V);
 
@@ -240,89 +259,6 @@ public class GFrame extends JFrame {
 		this.repaint();
 
 	}
-
-	public void reversableActionsUpdated() {
-		updateEditMenu();
-	}
-
-	protected void updateEditMenu() {
-		editMenu.reset();
-
-		editMenu.addAction(new UndoAction());
-		editMenu.addAction(new RedoAction());
-
-	}
-
-	class UndoAction extends StandardAction {
-
-		public UndoAction() {
-			super("Undo: " + actionManager.getUndoActionDescription());
-			if (!actionManager.canUndo()) {
-				setEnabled(false);
-			}
-		}
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		protected void action() throws ActionException {
-			actionManager.undoAction();
-		}
-	}
-
-	class RedoAction extends StandardAction {
-
-		public RedoAction() {
-			super("Redo: " + actionManager.getRedoActionDescription());
-			if (!actionManager.canRedo()) {
-				setEnabled(false);
-			}
-		}
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		protected void action() throws ActionException {
-			actionManager.redoAction();
-
-		}
-
-	}
-
-	protected void updateWorldMenu() {
-		worldMenu.reset();
-
-		worldMenu.addAction(new ZoomOutAction());
-		if (!isFullScreenMode) {
-			worldMenu.addAction(new TurnOnFullScreen());
-		} else {
-			worldMenu.addAction(new TurnOffFullScreen());
-		}
-
-		if (!WorldImpl.isContexualTipsVisible()) {
-			worldMenu.addAction(new TurnOnTooltips());
-		} else {
-			worldMenu.addAction(new TurnOffTooltips());
-		}
-
-		if (!Grid.isGridVisible()) {
-			worldMenu.addAction(new TurnOnGrid());
-		} else {
-			worldMenu.addAction(new TurnOffGrid());
-		}
-
-		MenuBuilder qualityMenu = worldMenu.createSubMenu("Rendering Quality");
-		qualityMenu.addAction(new LowQualityAction());
-		qualityMenu.addAction(new MediumQualityAction());
-		qualityMenu.addAction(new HighQualityAction());
-	}
-
-	// protected JMenu addMenu(JMenuBar menuBar, String name) {
-	// JMenu menu = new JMenu(name);
-	// Style.styleComponent(menu);
-	// menuBar.add(menu);
-	// return menu;
-	// }
 
 	/*
 	 * Initializes the status bar
@@ -346,6 +282,16 @@ public class GFrame extends JFrame {
 		if (best != null) {
 			device.setDisplayMode(best);
 		}
+	}
+
+	/**
+	 * Use this function to add menu items to the frame menu bar
+	 * 
+	 * @param menuBar
+	 *            is attached to the frame
+	 */
+	protected void constructMenu(JMenuBar menuBar) {
+
 	}
 
 	protected PCamera createDefaultCamera() {
@@ -388,6 +334,70 @@ public class GFrame extends JFrame {
 		return result;
 	}
 
+	// protected JMenu addMenu(JMenuBar menuBar, String name) {
+	// JMenu menu = new JMenu(name);
+	// Style.styleComponent(menu);
+	// menuBar.add(menu);
+	// return menu;
+	// }
+
+	protected void loadPreferences() {
+		File preferencesFile = new File(getUserFileDirectory(), "userSettings");
+
+		if (preferencesFile.exists()) {
+			FileInputStream fis;
+			try {
+				fis = new FileInputStream(preferencesFile);
+
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				try {
+					preferences = (UserPreferences) ois.readObject();
+				} catch (ClassNotFoundException e) {
+					System.out.println("Could not load preferences");
+				}
+			} catch (IOException e1) {
+				System.out.println("Could not read preferences file");
+			}
+		}
+
+		if (preferences == null) {
+			preferences = new UserPreferences();
+
+		}
+		preferences.apply(this);
+	}
+
+	protected void savePreferences() {
+		File file = new File(getUserFileDirectory());
+		if (!file.exists())
+			file.mkdir();
+
+		File preferencesFile = new File(getUserFileDirectory(), "userSettings");
+
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream oos;
+		try {
+			oos = new ObjectOutputStream(bos);
+
+			oos.writeObject(preferences);
+
+			FileOutputStream fos = new FileOutputStream(preferencesFile);
+			fos.write(bos.toByteArray());
+			fos.flush();
+			fos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void updateEditMenu() {
+		editMenu.reset();
+
+		editMenu.addAction(new UndoAction());
+		editMenu.addAction(new RedoAction());
+
+	}
+
 	protected void updateStatusBar() {
 		StringBuilder strBuff = new StringBuilder("<HTML>");
 		if (taskStatusStrings.size() > 0) {
@@ -404,6 +414,33 @@ public class GFrame extends JFrame {
 		strBuff.append("</HTML>");
 
 		statusBar.setText(strBuff.toString());
+	}
+
+	protected void updateWorldMenu() {
+		worldMenu.reset();
+
+		if (!isFullScreenMode) {
+			worldMenu.addAction(new TurnOnFullScreen());
+		} else {
+			worldMenu.addAction(new TurnOffFullScreen());
+		}
+
+		if (!preferences.isEnableTooltips()) {
+			worldMenu.addAction(new TurnOnTooltips());
+		} else {
+			worldMenu.addAction(new TurnOffTooltips());
+		}
+
+		if (!Grid.isGridVisible()) {
+			worldMenu.addAction(new TurnOnGrid());
+		} else {
+			worldMenu.addAction(new TurnOffGrid());
+		}
+
+		MenuBuilder qualityMenu = worldMenu.createSubMenu("Rendering Quality");
+		qualityMenu.addAction(new LowQualityAction());
+		qualityMenu.addAction(new MediumQualityAction());
+		qualityMenu.addAction(new HighQualityAction());
 	}
 
 	class HighQualityAction extends StandardAction {
@@ -469,6 +506,52 @@ public class GFrame extends JFrame {
 
 	}
 
+	class MyWindowListener implements WindowListener {
+
+		public void windowActivated(WindowEvent arg0) {
+		}
+
+		public void windowClosed(WindowEvent arg0) {
+
+		}
+
+		public void windowClosing(WindowEvent arg0) {
+			savePreferences();
+		}
+
+		public void windowDeactivated(WindowEvent arg0) {
+		}
+
+		public void windowDeiconified(WindowEvent arg0) {
+		}
+
+		public void windowIconified(WindowEvent arg0) {
+		}
+
+		public void windowOpened(WindowEvent arg0) {
+		}
+
+	}
+
+	class RedoAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public RedoAction() {
+			super("Redo: " + actionManager.getRedoActionDescription());
+			if (!actionManager.canRedo()) {
+				setEnabled(false);
+			}
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			actionManager.redoAction();
+
+		}
+
+	}
+
 	class TurnOffFullScreen extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -496,7 +579,7 @@ public class GFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			Grid.setGridVisible(false);
+			preferences.setGridVisible(false);
 			updateWorldMenu();
 		}
 
@@ -512,7 +595,7 @@ public class GFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			WorldImpl.setContexualTipsVisible(false);
+			preferences.setEnableTooltips(false);
 			updateWorldMenu();
 		}
 
@@ -544,7 +627,8 @@ public class GFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			Grid.setGridVisible(true);
+			preferences.setGridVisible(true);
+
 			updateWorldMenu();
 		}
 
@@ -560,33 +644,61 @@ public class GFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			WorldImpl.setContexualTipsVisible(true);
+			preferences.setEnableTooltips(true);
 			updateWorldMenu();
 		}
 
 	}
 
-	class ZoomOutAction extends StandardAction {
+	class UndoAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public ZoomOutAction() {
-			super("Fit on screen");
+		public UndoAction() {
+			super("Undo: " + actionManager.getUndoActionDescription());
+			if (!actionManager.canUndo()) {
+				setEnabled(false);
+			}
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			getWorld().zoomToFit();
-			updateWorldMenu();
+			actionManager.undoAction();
 		}
-
 	}
 
-	public ReversableActionManager getActionManager() {
-		return actionManager;
+}
+
+class UserPreferences implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private boolean enableTooltips = true;
+	private boolean gridVisible = true;
+
+	/*
+	 * Apply preferences
+	 */
+	public void apply(GFrame parent) {
+		setEnableTooltips(enableTooltips);
+		setGridVisible(gridVisible);
 	}
 
-	public PRoot getRoot() {
-		return canvas.getRoot();
+	public boolean isEnableTooltips() {
+		return enableTooltips;
 	}
+
+	public boolean isGridVisible() {
+		return gridVisible;
+	}
+
+	public void setEnableTooltips(boolean enableTooltips) {
+		this.enableTooltips = enableTooltips;
+		World.setTooltipsVisible(this.enableTooltips);
+	}
+
+	public void setGridVisible(boolean gridVisible) {
+		this.gridVisible = gridVisible;
+		Grid.setGridVisible(gridVisible);
+	}
+
 }

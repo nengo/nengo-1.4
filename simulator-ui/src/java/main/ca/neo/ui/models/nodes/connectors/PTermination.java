@@ -17,7 +17,7 @@ import ca.shu.ui.lib.util.PopupMenuBuilder;
  * @author Shu Wu
  * 
  */
-public class PTermination extends PModelWidget implements ILineAcceptor {
+public class PTermination extends PWidget implements ILineAcceptor {
 
 	private static final long serialVersionUID = 1L;
 	PNeoNode nodeParent;
@@ -26,6 +26,7 @@ public class PTermination extends PModelWidget implements ILineAcceptor {
 		super(nodeParent, term);
 		setName(term.getName());
 		init();
+
 	}
 
 	public PTermination(PNeoNode nodeParent) {
@@ -61,7 +62,7 @@ public class PTermination extends PModelWidget implements ILineAcceptor {
 	}
 
 	@Override
-	public PopupMenuBuilder constructMenu() {
+	protected PopupMenuBuilder constructMenu() {
 		// TODO Auto-generated method stub
 		PopupMenuBuilder menu = super.constructMenu();
 
@@ -90,12 +91,12 @@ public class PTermination extends PModelWidget implements ILineAcceptor {
 
 	public boolean setLineEnd(LineEnd lineEnd) {
 		this.lineEnd = lineEnd;
+		if (lineEnd != null) {
+			addChild(lineEnd);
+			this.lineEnd = lineEnd;
+
+		}
 		return true;
-	}
-
-	public void removeLineEnd() {
-		lineEnd = null;
-
 	}
 
 	public LineEnd getLineEnd() {

@@ -30,7 +30,7 @@ public class PTInt extends PropDescriptor {
 
 	@Override
 	public Class<Integer> getTypeClass() {
-		return Integer.class;
+		return int.class;
 	}
 
 	@Override

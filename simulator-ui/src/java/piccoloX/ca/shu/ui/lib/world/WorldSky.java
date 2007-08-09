@@ -1,17 +1,13 @@
-package ca.shu.ui.lib.world.impl;
+package ca.shu.ui.lib.world;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldLayer;
-import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 
-public class WorldSky extends PCamera implements WorldLayer {
+public class WorldSky extends PCamera implements IWorldLayer {
 
 	@Override
 	public void translateView(double arg0, double arg1) {
@@ -58,7 +54,7 @@ public class WorldSky extends PCamera implements WorldLayer {
 		throw new NotImplementedException();
 	}
 
-	public WorldLayer getWorldLayer() {
+	public IWorldLayer getWorldLayer() {
 		throw new NotImplementedException();
 	}
 
@@ -72,15 +68,6 @@ public class WorldSky extends PCamera implements WorldLayer {
 
 	public void addedToWorld() {
 		throw new NotImplementedException();
-	}
-
-	public void popState(State state) {
-		throw new NotImplementedException();
-	}
-
-	public void pushState(State state) {
-		throw new NotImplementedException();
-
 	}
 
 	public void removedFromWorld() {

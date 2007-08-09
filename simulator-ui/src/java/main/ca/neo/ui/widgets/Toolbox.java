@@ -11,10 +11,10 @@ import ca.neo.ui.models.PModel;
 import ca.shu.ui.lib.objects.GButton;
 import ca.shu.ui.lib.objects.Tooltip;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 
-public class Toolbox extends WorldObjectImpl {
+public class Toolbox extends WorldObject {
 
 	/**
 	 * 
@@ -89,7 +89,7 @@ public class Toolbox extends WorldObjectImpl {
 
 	}
 	@Override
-	public WorldObjectImpl getTooltipObject() {
+	public WorldObject getTooltip() {
 		// TODO Auto-generated method stub
 		return new ToolBoxControls(this);
 
@@ -105,7 +105,7 @@ public class Toolbox extends WorldObjectImpl {
 	}
 }
 
-class SymbolHolder extends WorldObjectImpl {
+class SymbolHolder extends WorldObject {
 	private static final long serialVersionUID = -776911995031604664L;
 
 	// Vector<Symbol> symbols = new Vector<Symbol>();
@@ -157,15 +157,15 @@ class SymbolHolder extends WorldObjectImpl {
 }
 
 class SymbolCloner implements PropertyChangeListener {
-	WorldObjectImpl symbol;
+	WorldObject symbol;
 
-	public SymbolCloner(WorldObjectImpl symbol) {
+	public SymbolCloner(WorldObject symbol) {
 		super();
 		this.symbol = symbol;
 	}
 
 	public void propertyChange(PropertyChangeEvent arg0) {
-		WorldObjectImpl clonedSymbol = (WorldObjectImpl) (symbol.clone());
+		WorldObject clonedSymbol = (WorldObject) (symbol.clone());
 		clonedSymbol.getParent().addChild(0, clonedSymbol);
 
 	}

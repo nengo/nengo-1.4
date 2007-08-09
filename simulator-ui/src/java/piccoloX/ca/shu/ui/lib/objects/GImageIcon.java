@@ -1,8 +1,8 @@
 package ca.shu.ui.lib.objects;
 
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 
-public class GImageIcon extends WorldObjectImpl {
+public class GImageIcon extends WorldObject {
 	/**
 	 * 
 	 */

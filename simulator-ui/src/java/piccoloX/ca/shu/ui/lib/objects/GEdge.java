@@ -7,7 +7,6 @@ import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 public class GEdge extends PPath implements PropertyChangeListener {
@@ -22,13 +21,13 @@ public class GEdge extends PPath implements PropertyChangeListener {
 
 	private State state;
 
-	protected WorldObjectImpl endNode;
+	protected WorldObject endNode;
 
-	protected WorldObjectImpl startNode;
+	protected WorldObject startNode;
 
 	boolean hideByDefault;
 
-	public GEdge(WorldObjectImpl startNode, WorldObjectImpl endNode) {
+	public GEdge(WorldObject startNode, WorldObject endNode) {
 		super();
 		this.startNode = startNode;
 		this.endNode = endNode;
@@ -62,7 +61,7 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		return defaultColor;
 	}
 
-	public WorldObjectImpl getEndNode() {
+	public WorldObject getEndNode() {
 		return endNode;
 	}
 
@@ -70,7 +69,7 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		return highlightColor;
 	}
 
-	public WorldObjectImpl getStartNode() {
+	public WorldObject getStartNode() {
 		return startNode;
 	}
 
@@ -159,11 +158,11 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		this.repaint();
 	}
 
-	protected Point2D toLocal(WorldObjectImpl node, double x, double y) {
+	protected Point2D toLocal(WorldObject node, double x, double y) {
 		return toLocal(node, new Point2D.Double(x, y));
 	}
 
-	protected Point2D toLocal(WorldObjectImpl node, Point2D point) {
+	protected Point2D toLocal(WorldObject node, Point2D point) {
 		return this.globalToLocal(node.localToGlobal(point));
 	}
 

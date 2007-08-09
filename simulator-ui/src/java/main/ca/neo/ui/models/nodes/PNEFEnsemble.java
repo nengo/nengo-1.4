@@ -1,11 +1,15 @@
 package ca.neo.ui.models.nodes;
 
 import ca.neo.model.Node;
+import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
+import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
+import ca.neo.ui.models.TooltipBuilder;
+import ca.neo.ui.models.TooltipPart;
 import ca.neo.ui.models.nodes.connectors.PDecodedTermination;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.views.objects.configurable.managers.UserConfig;
@@ -50,6 +54,7 @@ public class PNEFEnsemble extends PEnsemble {
 	public PNEFEnsemble() {
 		super();
 		init();
+
 	}
 
 	public PNEFEnsemble(NEFEnsemble model) {
@@ -62,6 +67,7 @@ public class PNEFEnsemble extends PEnsemble {
 	 * 
 	 * 
 	 * The UI is used to configure it
+	 * 
 	 * @return PTermination created, null if not
 	 */
 	public PTermination createDecodedTermintation() {
@@ -80,33 +86,9 @@ public class PNEFEnsemble extends PEnsemble {
 		return zProperties;
 	}
 
-	class AddDecodedTerminationAction extends ReversableAction {
-
-		private static final long serialVersionUID = 1L;
-
-		PTermination addedTermination;
-
-		public AddDecodedTerminationAction() {
-			super("Add decoded termination");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			PTermination term = createDecodedTermintation();
-			if (term == null)
-				throw new ActionException(
-						"Could not create decoded termination");
-
-			else
-				addedTermination = term;
-		}
-
-		@Override
-		protected void undo() throws ActionException {
-			addedTermination.destroy();
-
-		}
-
+	@Override
+	public NEFEnsemble getModel() {
+		return (NEFEnsemble) super.getModel();
 	}
 
 	@Override
@@ -153,15 +135,15 @@ public class PNEFEnsemble extends PEnsemble {
 	}
 
 	@Override
-	public PopupMenuBuilder constructMenu() {
+	protected PopupMenuBuilder constructMenu() {
 
 		PopupMenuBuilder menu = super.constructMenu();
 
-		menu.addSection("NEFEnsemble");
+		MenuBuilder nefMenu = menu.createSubMenu("NEF");
+		
+		MenuBuilder plotMenu = nefMenu.createSubMenu("Plot");
 
-		MenuBuilder plotMenu = menu.createSubMenu("Plot");
-
-		plotMenu.addAction(new StandardAction("Ensemble") {
+		plotMenu.addAction(new StandardAction("NEFEnsemble") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -171,76 +153,73 @@ public class PNEFEnsemble extends PEnsemble {
 
 		});
 
-		plotMenu.addAction(new StandardAction("Origin X") {
-			private static final long serialVersionUID = 1L;
+		Origin[] origins = getModel().getOrigins();
 
-			@Override
-			protected void action() {
-				Plotter.plot((NEFEnsemble) getModel(), NEFEnsemble.X);
+		for (int i = 0; i < origins.length; i++) {
+			if (origins[i] instanceof DecodedOrigin) {
+				plotMenu.addAction(new PlotDecodedOrigin("Decoded origin: "
+						+ origins[i].getName(), origins[i].getName()));
 			}
-		});
-
-		if (getModel().isCollectingSpikes())
-			menu.addAction(new StopCollectSpikes());
-		else
-			menu.addAction(new StartCollectSpikes());
+		}
 
 		// Termination
-		menu.addAction(new AddDecodedTerminationAction());
+		nefMenu.addAction(new AddDecodedTerminationAction());
 		return menu;
 	}
 
-	class StartCollectSpikes extends ReversableAction {
-
+	class PlotDecodedOrigin extends StandardAction {
+		String decodedOriginName;
 		private static final long serialVersionUID = 1L;
 
-		public StartCollectSpikes() {
-			super("Collect Spikes");
+		public PlotDecodedOrigin(String actionName, String decodedOriginName) {
+			super("Plot decoded origin", actionName);
+			this.decodedOriginName = decodedOriginName;
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			if (getModel().isCollectingSpikes())
-				throw new ActionException("Already collecting spikes");
-			else
-				getModel().collectSpikes(true);
-		}
-
-		@Override
-		protected void undo() {
-			getModel().collectSpikes(false);
-
-		}
-
-	}
-
-	class StopCollectSpikes extends ReversableAction {
-		private static final long serialVersionUID = 1L;
-
-		public StopCollectSpikes() {
-			super("Stop Collecting Spikes");
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			if (!getModel().isCollectingSpikes())
-				throw new ActionException("Already not collecting spikes");
-			else
-				getModel().collectSpikes(false);
-
-		}
-
-		@Override
-		protected void undo() throws ActionException {
-			getModel().collectSpikes(true);
+			Plotter.plot(getModel(), decodedOriginName);
 
 		}
 
 	}
 
 	@Override
-	public NEFEnsemble getModel() {
-		return (NEFEnsemble) super.getModel();
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
+		tooltips.addPart(new TooltipPart("# Dimension", ""
+				+ getModel().getDimension()));
+
+		return tooltips;
 	}
+
+	class AddDecodedTerminationAction extends ReversableAction {
+
+		private static final long serialVersionUID = 1L;
+
+		PTermination addedTermination;
+
+		public AddDecodedTerminationAction() {
+			super("Add decoded termination");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			PTermination term = createDecodedTermintation();
+			if (term == null)
+				throw new ActionException(
+						"Could not create decoded termination");
+
+			else
+				addedTermination = term;
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			addedTermination.destroy();
+
+		}
+
+	}
+
 }

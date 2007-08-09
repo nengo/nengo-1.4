@@ -22,7 +22,7 @@ public class PTFloat extends PropDescriptor {
 
 	@Override
 	public Class<Float> getTypeClass() {
-		return Float.class;
+		return float.class;
 	}
 
 	@Override

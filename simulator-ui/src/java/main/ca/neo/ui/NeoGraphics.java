@@ -17,16 +17,19 @@ import ca.neo.ui.widgets.Toolbox;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.GFrame;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.impl.GFrame;
+import edu.umd.cs.piccolo.util.PDebug;
 
 public class NeoGraphics extends GFrame implements INodeContainer {
 
 	public static final JFileChooser FileChooser = new JFileChooser();
 	private static final long serialVersionUID = 1L;
+	public static final String USER_FILE_DIR = "UIFiles";
 
 	public static void main(String[] args) {
 		new NeoGraphics("Default");
+
 	}
 
 	Toolbox canvasView;
@@ -35,9 +38,14 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 		super(title + " - NEO Workspace");
 
 		Environment.setUserInterface(true);
+		PDebug.debugThreads = true;
+	
 
-//		 PDebug.debugPaintCalls = true;
+	}
 
+	@Override
+	public String getUserFileDirectory() {
+		return USER_FILE_DIR;
 	}
 
 	/**
@@ -52,7 +60,7 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 	}
 
 	@Override
-	public void constructMenuBar(JMenuBar menuBar) {
+	public void constructMenu(JMenuBar menuBar) {
 		MenuBuilder menu = new MenuBuilder("File");
 		menuBar.add(menu.getJMenu());
 

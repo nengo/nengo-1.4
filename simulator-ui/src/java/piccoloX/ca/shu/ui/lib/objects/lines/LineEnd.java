@@ -1,14 +1,21 @@
 package ca.shu.ui.lib.objects.lines;
 
 import java.awt.geom.Point2D;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Iterator;
 
-import ca.shu.ui.lib.world.WorldLayer;
-import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import javax.swing.JPopupMenu;
 
-public class LineEnd extends WorldObjectImpl {
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.handlers.Interactable;
+import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.world.IWorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.event.PInputEvent;
+
+public class LineEnd extends WorldObject implements Interactable {
 	private static final long serialVersionUID = 1L;
 
 	private ILineAcceptor myTarget;
@@ -40,7 +47,7 @@ public class LineEnd extends WorldObjectImpl {
 
 	}
 
-	public WorldObject getTarget() {
+	public ILineAcceptor getTarget() {
 		return myTarget;
 	}
 
@@ -52,17 +59,23 @@ public class LineEnd extends WorldObjectImpl {
 		return (connectionState == ConnectionState.CONNECTED);
 	}
 
+	public boolean isContextMenuEnabled() {
+		return true;
+	}
+
 	public void justDropped() {
 
-		Collection<WorldObject> nodes = this.getWorldLayer()
-				.getChildrenAtBounds(localToGlobal(getBounds()));
+		ArrayList<PNode> results = new ArrayList<PNode>(20);
 
-		Iterator<WorldObject> it = nodes.iterator();
+		((WorldObject) getWorldLayer()).findIntersectingNodes(
+				localToGlobal(getBounds()), results);
+
+		Iterator<PNode> it = results.iterator();
 		ConnectionState newState = ConnectionState.NOT_CONNECTED;
 
 		ILineAcceptor newTarget = null;
 		while (it.hasNext()) {
-			WorldObject node = it.next();
+			PNode node = it.next();
 
 			newState = getConnectionState(node);
 			if (newState != ConnectionState.NOT_CONNECTED) {
@@ -80,13 +93,29 @@ public class LineEnd extends WorldObjectImpl {
 
 	}
 
+	public JPopupMenu showContextMenu(PInputEvent event) {
+		PopupMenuBuilder menu = new PopupMenuBuilder("Line End");
+		menu.addAction(new StandardAction("Remove") {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void action() throws ActionException {
+				destroy();
+
+			}
+
+		});
+		return menu.getJPopupMenu();
+	}
+
 	/**
 	 * @param target
 	 *            to be connected with
 	 * @return State of the connection with that target
 	 */
-	private ConnectionState getConnectionState(WorldObject target) {
-		WorldObjectImpl rootOfWell = getRootOfWell();
+	private ConnectionState getConnectionState(PNode target) {
+		WorldObject rootOfWell = getRootOfWell();
 
 		if (target == null) {
 
@@ -115,19 +144,23 @@ public class LineEnd extends WorldObjectImpl {
 	 * 
 	 * @return The root WorldObject which is inside a WorldLayer
 	 */
-	private WorldObjectImpl getRootOfWell() {
-		WorldObjectImpl rootOfWell = well;
+	private WorldObject getRootOfWell() {
+		WorldObject rootOfWell = well;
 
 		while (rootOfWell != null) {
-			WorldObjectImpl parent = (WorldObjectImpl) rootOfWell.getParent();
+			WorldObject parent = (WorldObject) rootOfWell.getParent();
 
-			if (parent instanceof WorldLayer) {
+			if (parent instanceof IWorldLayer) {
 				return rootOfWell;
 			}
 			rootOfWell = parent;
 		}
 		return null;
 	}
+
+	// public int tryConnectTo(WorldObject target) {
+	// return tryConnectTo(target, true);
+	// }
 
 	/**
 	 * @param newState
@@ -159,11 +192,12 @@ public class LineEnd extends WorldObjectImpl {
 		case CONNECTED:
 			if (initConnection(newTarget, initConnection)) {
 				newTarget.setLineEnd(this);
-				newTarget.addChild(this);
+
 				this.setOffset(0, 0);
 				myTarget = newTarget;
 			} else {
-				getWorld().showTransientMsg("*** WARNING Connection refused ***", this);
+				getWorld().showTransientMsg(
+						"*** WARNING Connection refused ***", this);
 				this.translate(-50, -50);
 				setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
 			}
@@ -190,11 +224,7 @@ public class LineEnd extends WorldObjectImpl {
 		}
 
 		connectionState = newState;
-	}
-
-	// public int tryConnectTo(WorldObject target) {
-	// return tryConnectTo(target, true);
-	// }
+	};
 
 	/**
 	 * Does some tasks before the UI connection is mde
@@ -204,15 +234,6 @@ public class LineEnd extends WorldObjectImpl {
 	 * @return true if successfully connected
 	 */
 	protected boolean canConnectTo(ILineAcceptor target) {
-		return true;
-	};
-
-	/**
-	 * @param target
-	 * @return Whether the connection was successfully initialized
-	 */
-	protected boolean initConnection(WorldObject target, boolean modifyModel) {
-
 		return true;
 	}
 
@@ -265,6 +286,15 @@ public class LineEnd extends WorldObjectImpl {
 	// }
 
 	/**
+	 * @param target
+	 * @return Whether the connection was successfully initialized
+	 */
+	protected boolean initConnection(ILineAcceptor target, boolean modifyModel) {
+
+		return true;
+	}
+
+	/**
 	 * Called when the LineEnd is first disconnected from a LineIn
 	 */
 	protected void justDisconnected() {
@@ -281,4 +311,5 @@ public class LineEnd extends WorldObjectImpl {
 	static enum ConnectionState {
 		CONNECTED, NOT_CONNECTED, RECEDED_INTO_WELL
 	}
+
 }

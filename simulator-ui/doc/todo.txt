@@ -1,6 +1,13 @@
 *******************************************
  Done
 *******************************************
+(08/09) - Some user preferences are saved to file
+(08/09) - GFrame remembers user preferences in a serialized user configuration file
+(08/09) - Plot decoded origins
+(08/09) - Plot spikes
+(08/09) - Set/view documentation
+(08/09) - Tooltips with heterogeneous node information added
+
 (08/08) done - Two types of Transient UI feedback for events such as File Save, New connections, etc...
 	Events which modify NEO models should now have UI feedback
 (08/08) done - Remove probes, probes are also updated from the Simulator using getProbes
@@ -30,25 +37,22 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
-
-
-information visualization
-	dimensions of functions, nodes
+Bug: Could not receive keyboard events from piccolo
+make text window for inputting doumentation bigger
 
 show simulation progress in UI
 	create a listener object for Simulator
 
-minimize all windows action
-
-display information about nodes in a hover over
-
 set simulator
 
-
+information visualization
+	dimensions of functions, nodes
 
 *******************************************
  Pri 1 - to do
 *******************************************
+
+minimize all windows action
 
 
 Connection Weights

@@ -8,8 +8,7 @@ import javax.swing.JPopupMenu;
 import ca.shu.ui.lib.objects.widgets.MouseFollower;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.impl.WorldImpl;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -42,9 +41,9 @@ public class MouseHandler extends PBasicInputEventHandler {
 			PNode node = event.getPickedNode();
 
 			while (node != null) {
-				if (node instanceof WorldObjectImpl) {
+				if (node instanceof WorldObject) {
 
-					WorldObjectImpl wo = (WorldObjectImpl) node;
+					WorldObject wo = (WorldObject) node;
 
 					wo.doubleClicked();
 
@@ -66,11 +65,14 @@ public class MouseHandler extends PBasicInputEventHandler {
 		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
 				Interactable.class);
 
-		if ((obj instanceof WorldImpl)) {
+		if ((obj instanceof World)) {
 			frame.setObjToFollow(null);
-		} else {
-			frame.setObjToFollow(obj);
+		} else if (obj instanceof WorldObject) {
+			frame.setObjToFollow((WorldObject) obj);
 
+		} else {
+			System.out
+					.println("Unsupported Interactable object in MouseHandler");
 		}
 
 	}

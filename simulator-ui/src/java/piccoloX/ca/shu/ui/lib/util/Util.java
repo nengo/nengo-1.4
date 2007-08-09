@@ -43,6 +43,11 @@ public class Util {
 
 	}
 
+	public static void Message(String msg, String title) {
+		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg, title,
+				JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	public static void Warning(String msg) {
 		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
 				"Warning", JOptionPane.WARNING_MESSAGE);
@@ -127,8 +132,5 @@ public class Util {
 		}
 		return null;
 	}
-
-	
-	
 
 }

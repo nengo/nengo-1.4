@@ -4,13 +4,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.models.PModel;
-import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PText;
 
 /**
  * An UI Object with an Icon and a Label
@@ -20,7 +17,7 @@ import edu.umd.cs.piccolo.nodes.PText;
  * @author Shu Wu
  * 
  */
-public class ModelIcon extends WorldObjectImpl implements NamedObject,
+public class ModelIcon extends WorldObject implements NamedObject,
 		PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
@@ -103,11 +100,6 @@ public class ModelIcon extends WorldObjectImpl implements NamedObject,
 		return label.getText();
 	}
 
-	@Override
-	public WorldObjectImpl getTooltipObject() {
-		return new IconTooltip(this);
-	}
-
 	/**
 	 * Updates bounds and label name
 	 */
@@ -176,19 +168,19 @@ public class ModelIcon extends WorldObjectImpl implements NamedObject,
 
 }
 
-class IconTooltip extends WorldObjectImpl {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public IconTooltip(ModelIcon icon) {
-		super();
-		PText tag = new PText(icon.getName() + " Icon");
-		tag.setTextPaint(Style.COLOR_FOREGROUND);
-		tag.setFont(Style.FONT_LARGE);
-		addToLayout(tag);
-	}
-
-}
+// class IconTooltip extends WorldObject {
+//
+// /**
+// *
+// */
+// private static final long serialVersionUID = 1L;
+//
+// public IconTooltip(ModelIcon icon) {
+// super();
+// PText tag = new PText(icon.getName() + " Icon");
+// tag.setTextPaint(Style.COLOR_FOREGROUND);
+// tag.setFont(Style.FONT_LARGE);
+// addToLayout(tag);
+// }
+//
+// }

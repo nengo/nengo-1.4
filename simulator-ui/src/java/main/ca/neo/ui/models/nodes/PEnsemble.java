@@ -6,10 +6,17 @@ import java.io.IOException;
 import ca.neo.io.FileManager;
 import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
+import ca.neo.plot.Plotter;
+import ca.neo.ui.models.TooltipBuilder;
 import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.util.MenuBuilder;
+import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 
 public class PEnsemble extends PNodeContainer {
@@ -40,6 +47,14 @@ public class PEnsemble extends PNodeContainer {
 	}
 
 	@Override
+	public int getNodesCount() {
+		if (getModel() != null) {
+			return getModel().getNodes().length;
+		} else
+			return 0;
+	}
+
+	@Override
 	public String getTypeName() {
 
 		return "Ensemble";
@@ -56,16 +71,98 @@ public class PEnsemble extends PNodeContainer {
 	}
 
 	@Override
+	protected PopupMenuBuilder constructMenu() {
+
+		PopupMenuBuilder menu = super.constructMenu();
+		menu.addSection("Ensemble");
+		MenuBuilder spikesMenu = menu.createSubMenu("Spikes");
+
+		if (getModel().isCollectingSpikes())
+			spikesMenu.addAction(new StopCollectSpikes());
+		else
+			spikesMenu.addAction(new StartCollectSpikes());
+
+		spikesMenu.addAction(new PlotSpikePattern("Plot spikes"));
+		return menu;
+	}
+
+	@Override
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
+
+		return tooltips;
+	}
+
+	@Override
 	protected NodeViewer createNodeViewerInstance() {
 		return new EnsembleViewer(this);
 	}
 
-	@Override
-	public int getNodesCount() {
-		if (getModel() != null) {
-			return getModel().getNodes().length;
-		} else
-			return 0;
+	class PlotSpikePattern extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public PlotSpikePattern(String actionName) {
+			super("Plot spike pattern", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			if (!getModel().isCollectingSpikes()) {
+				Util.Warning("Ensemble is not set to collect spikes.");
+			}
+			Plotter.plot(getModel().getSpikePattern());
+
+		}
+
 	}
 
+	class StartCollectSpikes extends ReversableAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public StartCollectSpikes() {
+			super("Collect Spikes");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			if (getModel().isCollectingSpikes())
+				throw new ActionException("Already collecting spikes");
+			else
+				getModel().collectSpikes(true);
+		}
+
+		@Override
+		protected void undo() {
+			getModel().collectSpikes(false);
+
+		}
+
+	}
+
+	class StopCollectSpikes extends ReversableAction {
+		private static final long serialVersionUID = 1L;
+
+		public StopCollectSpikes() {
+			super("Stop Collecting Spikes");
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			if (!getModel().isCollectingSpikes())
+				throw new ActionException("Already not collecting spikes");
+			else
+				getModel().collectSpikes(false);
+
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			getModel().collectSpikes(true);
+
+		}
+
+	}
 }

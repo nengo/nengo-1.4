@@ -2,26 +2,39 @@ package ca.neo.ui.models.nodes.connectors;
 
 import ca.neo.ui.models.PModelConfigurable;
 import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.TooltipBuilder;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 
-public abstract class PModelWidget extends PModelConfigurable {
-	private boolean isWidgetVisible = true;
+/**
+ * Widgets are models such as Terminations and Origins which can be attached to
+ * a PNeoNode
+ * 
+ * @author Shu
+ * 
+ */
+public abstract class PWidget extends PModelConfigurable {
+	@Override
+	protected TooltipBuilder constructTooltips() {
+		return null;
+	}
+
+	private boolean isPermenantlyAttached = true;
 	private PNeoNode nodeParent;
 
-	public PModelWidget(PNeoNode nodeParent) {
+	public PWidget(PNeoNode nodeParent) {
 		super();
 		init(nodeParent);
 	}
 
-	public PModelWidget(PNeoNode nodeParent, Object model) {
+	public PWidget(PNeoNode nodeParent, Object model) {
 		super(model);
 		init(nodeParent);
 	}
 
 	@Override
-	public PopupMenuBuilder constructMenu() {
+	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
 
 		if (isWidgetVisible()) {
@@ -32,31 +45,22 @@ public abstract class PModelWidget extends PModelConfigurable {
 		return menu;
 	}
 
-	@Override
-	protected void prepareForDestroy() {
-
-		nodeParent.removeWidget(this);
-		super.prepareForDestroy();
-	}
-
 	public PNeoNode getNodeParent() {
 		return nodeParent;
 	}
 
 	public boolean isWidgetVisible() {
-		return isWidgetVisible;
+		return isPermenantlyAttached;
 	}
 
 	/**
 	 * 
 	 * 
-	 * @param isWidgetVisible
+	 * @param isPermenantlyAttached
 	 *            Whether the user has marked this widget as hidden
 	 */
-	public void setWidgetVisible(boolean isWidgetVisible) {
-		this.isWidgetVisible = isWidgetVisible;
-
-		nodeParent.layoutWidgets();
+	public void setPermenantlyAttached(boolean isPermenantlyAttached) {
+		this.isPermenantlyAttached = isPermenantlyAttached;
 
 	}
 
@@ -75,12 +79,12 @@ public abstract class PModelWidget extends PModelConfigurable {
 
 		@Override
 		protected void action() throws ActionException {
-			setWidgetVisible(false);
+			setPermenantlyAttached(false);
 		}
 
 		@Override
 		protected void undo() throws ActionException {
-			setWidgetVisible(true);
+			setPermenantlyAttached(true);
 
 		}
 	}
@@ -95,12 +99,12 @@ public abstract class PModelWidget extends PModelConfigurable {
 
 		@Override
 		protected void action() throws ActionException {
-			setWidgetVisible(true);
+			setPermenantlyAttached(true);
 		}
 
 		@Override
 		protected void undo() throws ActionException {
-			setWidgetVisible(false);
+			setPermenantlyAttached(false);
 
 		}
 	}

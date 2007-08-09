@@ -3,7 +3,6 @@ package ca.shu.ui.lib.handlers;
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.world.NamedObject;
-import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
@@ -12,7 +11,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * @author Shu
  * 
  */
-public interface Interactable extends NamedObject, WorldObject {
+public interface Interactable extends NamedObject {
 
 	/**
 	 * @param event

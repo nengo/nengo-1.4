@@ -1,9 +1,8 @@
-package ca.shu.ui.lib.world.impl;
+package ca.shu.ui.lib.world;
 
 import java.util.Stack;
 
 import ca.shu.ui.lib.objects.Window;
-import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 
@@ -19,7 +18,7 @@ public class GCanvas extends PCanvas {
 
 	static final double CLICK_ZOOM_PADDING = 100;
 
-	WorldImpl world;
+	World world;
 
 	Stack<World> miniWorlds = new Stack<World>();
 
@@ -34,11 +33,11 @@ public class GCanvas extends PCanvas {
 	}
 
 	public void createWorld() {
-		world = new WorldImpl("Top Layer");
-		getLayer().addChild((WorldImpl) world);
+		world = new World("Top Layer");
+		getLayer().addChild((World) world);
 	}
 
-	public WorldImpl getWorld() {
+	public World getWorld() {
 		return world;
 	}
 

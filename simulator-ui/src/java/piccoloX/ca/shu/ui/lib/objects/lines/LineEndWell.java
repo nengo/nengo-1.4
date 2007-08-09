@@ -3,13 +3,13 @@ package ca.shu.ui.lib.objects.lines;
 import java.awt.event.MouseEvent;
 
 import ca.shu.ui.lib.objects.GEdge;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PPickPath;
 
-public class LineEndWell extends WorldObjectImpl {
+public class LineEndWell extends WorldObject {
 
 	public LineEndWell() {
 		super();
@@ -18,7 +18,7 @@ public class LineEndWell extends WorldObjectImpl {
 		// icon.setPaint(GDefaults.FOREGROUND_COLOR);
 		// addChild(icon);
 
-		WorldObjectImpl icon = new LineEndWellIcon();
+		WorldObject icon = new LineEndWellIcon();
 
 		addChild(icon);
 		setBounds(getFullBounds());

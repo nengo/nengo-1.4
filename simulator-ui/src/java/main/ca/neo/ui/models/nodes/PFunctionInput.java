@@ -7,6 +7,8 @@ import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.TooltipBuilder;
+import ca.neo.ui.models.TooltipPart;
 import ca.neo.ui.models.icons.FunctionInputIcon;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.managers.UserConfig;
@@ -34,7 +36,7 @@ public class PFunctionInput extends PNeoNode {
 	}
 
 	@Override
-	public PopupMenuBuilder constructMenu() {
+	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
 		// MenuBuilder plotMenu = menu.createSubMenu("Plot");
 		menu.addSection("Function");
@@ -109,6 +111,15 @@ public class PFunctionInput extends PNeoNode {
 		return (FunctionInput) super.getModel();
 	}
 
+	@Override
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
+
+		tooltips.addPart(new TooltipPart("# Functions", ""
+				+ getModel().getFunctions().length));
+
+		return tooltips;
+	}
 }
 
 class PlotFunctionAction extends StandardAction implements IConfigurable {

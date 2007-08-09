@@ -5,10 +5,10 @@ import java.awt.Graphics2D;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.impl.WorldObjectImpl;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-public class LineEndWellIcon extends WorldObjectImpl {
+public class LineEndWellIcon extends WorldObject {
 
 	private static final long serialVersionUID = 1L;
 
