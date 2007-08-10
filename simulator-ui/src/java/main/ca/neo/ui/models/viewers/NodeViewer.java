@@ -1,6 +1,7 @@
 package ca.neo.ui.models.viewers;
 
 import java.awt.Dimension;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -37,10 +38,10 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	private PNodeContainer parentOfViewer;
 
-	protected Hashtable<String, PNeoNode> nodesUI = new Hashtable<String, PNeoNode>();
+	private Hashtable<String, PNeoNode> viewerNodes = new Hashtable<String, PNeoNode>();
 
 	public Enumeration<PNeoNode> getViewedNodesElements() {
-		return nodesUI.elements();
+		return viewerNodes.elements();
 	}
 
 	/**
@@ -62,7 +63,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
 
 		updateNodesFromModel();
-		if (nodesUI.size() > 0) {
+		if (viewerNodes.size() > 0) {
 			applyDefaultLayout();
 		}
 
@@ -71,7 +72,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	public void addNeoNode(PNeoNode node) {
-		addNodeToNetwork(node, true, true, false);
+		addNeoNode(node, true, true, false);
 
 	}
 
@@ -87,7 +88,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	 * @param moveCameraToNode
 	 *            whether to move the camera to where the node is
 	 */
-	public void addNodeToNetwork(PNeoNode nodeProxy, boolean updateModel,
+	public void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
 
 		/**
@@ -99,13 +100,23 @@ public abstract class NodeViewer extends World implements NamedObject,
 					.getOffset().getY());
 		}
 
-		nodesUI.put(nodeProxy.getName(), nodeProxy);
+		viewerNodes.put(nodeProxy.getName(), nodeProxy);
 
 		if (dropInCenterOfCamera) {
 			getGround().catchObject(nodeProxy, dropInCenterOfCamera);
 		} else {
 			getGround().addWorldObject(nodeProxy);
 		}
+	}
+
+	/**
+	 * 
+	 * @param nodeUI
+	 *            node to be removed
+	 */
+	public void removeNeoNode(PNeoNode nodeUI) {
+		viewerNodes.remove(nodeUI.getName());
+
 	}
 
 	public abstract void applyDefaultLayout();
@@ -118,7 +129,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 		double x = 0;
 		double y = 0;
 
-		Enumeration<PNeoNode> em = nodesUI.elements();
+		Enumeration<PNeoNode> em = viewerNodes.elements();
 		PTransformActivity moveNodeActivity = null;
 		while (em.hasMoreElements()) {
 			PNeoNode node = em.nextElement();
@@ -164,7 +175,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	public void hideAllWidgets() {
-		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		Enumeration<PNeoNode> enumeration = viewerNodes.elements();
 		while (enumeration.hasMoreElements()) {
 			PNeoNode node = enumeration.nextElement();
 			node.hideAllWidgets();
@@ -176,7 +187,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	public void showAllWidgets() {
-		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		Enumeration<PNeoNode> enumeration = viewerNodes.elements();
 		while (enumeration.hasMoreElements()) {
 			PNeoNode node = enumeration.nextElement();
 			node.showAllWidgets();
@@ -192,6 +203,10 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	protected abstract void updateNodesFromModel();
+
+	protected Dictionary<String, PNeoNode> getViewerNodes() {
+		return viewerNodes;
+	}
 
 }
 

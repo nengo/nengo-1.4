@@ -54,7 +54,7 @@ public class POrigin extends PWidget {
 		if (target != null) {
 			Util.debugMsg("Projection removed " + target.getName());
 			try {
-				getNodeParent().getNetworkViewer().getNetwork()
+				getNodeParent().getParentNetwork()
 						.removeProjection(target.getModelTermination());
 				return true;
 			} catch (StructuralException e) {
@@ -95,7 +95,7 @@ public class POrigin extends PWidget {
 		Util.debugMsg("Projection added " + target.getName());
 		try {
 
-			getNodeParent().getNetworkViewer().getNetwork().addProjection(
+			getNodeParent().getParentNetwork().addProjection(
 					getModelOrigin(), target.getModelTermination());
 
 			// getWorld().showTooltip(new ConnectedTooltip("Connected"),

@@ -29,10 +29,6 @@ public class Window extends WorldObject {
 
 	private static final long serialVersionUID = 1L;
 
-	private PInputEventListener eventConsumer;
-
-	private PPath menubar;
-
 	private AffinityHalo affinityHalo = null;
 
 	// private WorldObject attachTo;
@@ -40,23 +36,19 @@ public class Window extends WorldObject {
 
 	private WorldObject contentNode;
 
-	final int MENU_BAR_HEIGHT = 27;
+	private PInputEventListener eventConsumer;
+
+	private PPath menubar;
 
 	private MenuBarHandler menuBarHandler;
 
-	/**
-	 * 
-	 */
+	private PBounds savedWindowBounds;
 
-	private PBounds savedWindowBounds;;
-
-	private Point2D savedWindowOffset;
-
-	/**
-	 * TODO: Window state control
-	 */
+	private Point2D savedWindowOffset;;
 
 	private WindowState windowState = WINDOW_STATE_DEFAULT;
+
+	final int MENU_BAR_HEIGHT = 27;
 
 	/**
 	 * 
@@ -108,22 +100,17 @@ public class Window extends WorldObject {
 	}
 
 	@Override
-	protected void prepareForDestroy() {
-		if (affinityHalo != null) {
-			affinityHalo.destroy();
-			affinityHalo = null;
-		}
-
-		menubar.removeInputEventListener(menuBarHandler);
-		removeInputEventListener(eventConsumer);
-
-		super.prepareForDestroy();
-	}
-
-	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
 		return contentNode.getName();
+	}
+
+	/**
+	 * 
+	 * @return Node representing the contents of the Window
+	 */
+	public WorldObject getWindowContent() {
+		return contentNode;
 	}
 
 	public WindowState getWindowState() {
@@ -197,6 +184,19 @@ public class Window extends WorldObject {
 
 	}
 
+	@Override
+	protected void prepareForDestroy() {
+		if (affinityHalo != null) {
+			affinityHalo.destroy();
+			affinityHalo = null;
+		}
+
+		menubar.removeInputEventListener(menuBarHandler);
+		removeInputEventListener(eventConsumer);
+
+		super.prepareForDestroy();
+	}
+
 	protected void windowStateChanged() {
 		switch (windowState) {
 		case MAXIMIZED:
@@ -236,22 +236,24 @@ public class Window extends WorldObject {
 				affinityHalo.destroy();
 				affinityHalo = null;
 			}
-
-			removeFromParent();
-			windowState = WindowState.MINIMIZED;
+			if (attachToRef.get() != null) {
+				attachToRef.get().addChild(this);
+			}
+			break;
+		}
+		if (windowState == WindowState.MINIMIZED) {
+			setVisible(false);
+			setChildrenPickable(false);
+			setPickable(false);
+		} else {
+			setVisible(true);
+			setChildrenPickable(true);
+			setPickable(true);
 		}
 	}
 
 	public static enum WindowState {
 		MAXIMIZED, MINIMIZED, WINDOW
-	}
-
-	/**
-	 * 
-	 * @return Node representing the contents of the Window
-	 */
-	public WorldObject getWindowContent() {
-		return contentNode;
 	}
 
 }

@@ -20,6 +20,7 @@ import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.nodes.connectors.PWidget;
 import ca.neo.ui.models.nodes.widgets.GProbe;
 import ca.neo.ui.models.viewers.NetworkViewer;
+import ca.neo.ui.models.viewers.NodeViewer;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
@@ -91,15 +92,15 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	/**
 	 * 
-	 * @return NetworkViewer the node is attached to
+	 * @return The viewer the node is contained in, this may be a regular world
+	 *         or a specialized viewer such as a NetworkViewer or EnsembleViewer
 	 */
-	public NetworkViewer getNetworkViewer() {
+	public NodeViewer getParentViewer() {
 
-		World network = getWorld();
-		if (network != null && network instanceof NetworkViewer) {
-			return (NetworkViewer) network;
+		World viewer = getWorld();
+		if (viewer != null && viewer instanceof NodeViewer) {
+			return (NodeViewer) viewer;
 		} else {
-			// Util.Error("Node is not attached to a network");
 			return null;
 		}
 	}
@@ -108,12 +109,16 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * @return Network model the node is attached to
 	 */
 	public Network getParentNetwork() {
-		NetworkViewer netV = getNetworkViewer();
-		if (netV != null) {
-			return netV.getNetwork();
-		} else {
-			return null;
+		World viewer = getWorld();
+
+		/*
+		 * Can only access parent network if the Node is inside a Network Viewer
+		 */
+		if (viewer instanceof NetworkViewer) {
+			return ((NetworkViewer) viewer).getNetwork();
 		}
+
+		return null;
 	}
 
 	/**
@@ -599,9 +604,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 	@Override
 	protected void prepareForDestroy() {
 
-		NetworkViewer viewer = getNetworkViewer();
+		NodeViewer viewer = getParentViewer();
 		if (viewer != null)
-			getNetworkViewer().removeNodeFromNetwork(this);
+			getParentViewer().removeNeoNode(this);
 
 		super.prepareForDestroy();
 	}

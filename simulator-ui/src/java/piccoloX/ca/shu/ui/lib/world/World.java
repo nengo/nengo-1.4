@@ -23,7 +23,6 @@ import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Window;
-import ca.shu.ui.lib.objects.Window.WindowState;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
@@ -39,6 +38,7 @@ import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolo.util.PNodeFilter;
 
 /**
  * Implementation of World. World holds World Objects and has navigation and
@@ -174,28 +174,50 @@ public class World extends WorldObject implements Interactable,
 
 	@SuppressWarnings("unchecked")
 	public Collection<Window> getAllWindows() {
-		Iterator it = getSky().getChildrenIterator();
-
 		Vector<Window> windows = new Vector<Window>(10);
 
-		while (it.hasNext()) {
-			Object next = it.next();
-			if (next instanceof Window) {
-				windows.add((Window) next);
+		PNodeFilter filter = new PNodeFilter() {
+
+			public boolean accept(PNode node) {
+				if (node instanceof Window)
+					return true;
+				else
+					return false;
 
 			}
-		}
-		
-		it = getGround().getChildrenIterator();
-		while (it.hasNext()) {
-			Object next = it.next();
-			if (next instanceof Window) {
-				windows.add((Window) next);
 
+			public boolean acceptChildrenOf(PNode node) {
+				if (node instanceof Window) {
+					return false;
+				} else {
+					return true;
+				}
 			}
-		}
-		
-		
+
+		};
+
+		getSky().getAllNodes(filter, windows);
+		getGround().getAllNodes(filter, windows);
+
+		// Iterator it = getSky().getChildrenIterator();
+
+		// while (it.hasNext()) {
+		// Object next = it.next();
+		// if (next instanceof Window) {
+		// windows.add((Window) next);
+		//
+		// }
+		// }
+		//
+		// it = getGround().getChildrenIterator();
+		// while (it.hasNext()) {
+		// Object next = it.next();
+		// if (next instanceof Window) {
+		// windows.add((Window) next);
+		//
+		// }
+		// }
+
 		return windows;
 	}
 
@@ -319,9 +341,8 @@ public class World extends WorldObject implements Interactable,
 			return;
 		}
 
-		tooltipWrapper = new ToolTipWrapper(tooltipObject, follow);
+		tooltipWrapper = new ToolTipWrapper(getSky(), tooltipObject, follow);
 
-		getSky().addChild(tooltipWrapper);
 		tooltipWrapper.fadeIn();
 		tooltipWrapper.updatePosition();
 
@@ -486,12 +507,17 @@ class ToolTipWrapper extends WorldObject implements PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
 	WorldObject follow;
 	WorldObject tooltip;
-	PActivity fadeInActivity;
+	PActivity fadeInActivity, fadeInPhase2Activity;
+	WorldSky parent;
 
-	public ToolTipWrapper(WorldObject tooltip, WorldObject follow) {
+	public ToolTipWrapper(WorldSky parent, WorldObject tooltip,
+			WorldObject follow) {
 		super();
 		this.tooltip = tooltip;
 		this.follow = follow;
+		this.parent = parent;
+
+		parent.addChild(this);
 
 		tooltip.setDraggable(false);
 		addToLayout(tooltip);
@@ -506,6 +532,7 @@ class ToolTipWrapper extends WorldObject implements PropertyChangeListener {
 		/*
 		 * The tooltip will follow where the object it's attached to goes
 		 */
+		parent.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
 		follow.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
 
 	}
@@ -513,6 +540,14 @@ class ToolTipWrapper extends WorldObject implements PropertyChangeListener {
 	public void fadeIn() {
 		fadeInActivity = new Fader(this, 500, 0.5f);
 		addActivity(fadeInActivity);
+
+		/*
+		 * fade in much more slowly in the second phase.
+		 */
+		fadeInPhase2Activity = new Fader(this, 2000, 1f);
+		fadeInPhase2Activity.startAfter(fadeInActivity);
+		addActivity(fadeInPhase2Activity);
+
 	}
 
 	/**
@@ -524,6 +559,11 @@ class ToolTipWrapper extends WorldObject implements PropertyChangeListener {
 			fadeOutActivity.startAfter(fadeInActivity);
 
 		}
+		if (fadeInPhase2Activity != null) {
+			fadeInPhase2Activity
+					.terminate(PActivity.TERMINATE_WITHOUT_FINISHING);
+		}
+
 		addActivity(fadeOutActivity);
 
 		PActivity destroyActivity = new PActivity(0) {
@@ -578,6 +618,8 @@ class ToolTipWrapper extends WorldObject implements PropertyChangeListener {
 
 	@Override
 	protected void prepareForDestroy() {
+		parent.removePropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM,
+				this);
 		follow.removePropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
 	}
 

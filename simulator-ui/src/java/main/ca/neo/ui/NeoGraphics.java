@@ -11,6 +11,7 @@ import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.nodes.PEnsemble;
 import ca.neo.ui.models.nodes.PNEFEnsemble;
 import ca.neo.ui.models.nodes.PNetwork;
+import ca.neo.ui.models.nodes.PNodeContainer;
 import ca.neo.ui.widgets.Toolbox;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.util.MenuBuilder;
@@ -55,6 +56,9 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 		return object;
 	}
 
+	double nodesPositionX = 0;
+	double nodesPositionY = 0;
+
 	@Override
 	public void constructMenu(JMenuBar menuBar) {
 		MenuBuilder menu = new MenuBuilder("File");
@@ -70,28 +74,8 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 		newMenu.addAction(new CreateModelAction("Ensemble", this,
 				PEnsemble.class));
 
-		menu.addAction(new LoadNetworkAction("Open Network") {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void gotNetwork(PNetwork network) {
-				getWorld().getGround().catchObject(network);
-				network.openViewer();
-			}
-
-		});
-		menu.addAction(new LoadEnsembleAction("Open (NEF)Ensemble") {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void gotEnsemble(PEnsemble ensemble) {
-				getWorld().getGround().catchObject(ensemble);
-				ensemble.openViewer();
-			}
-
-		});
+		menu.addAction(new LoadNetworkAction("Open Network", this));
+		menu.addAction(new LoadEnsembleAction("Open (NEF)Ensemble", this));
 
 	}
 
@@ -114,6 +98,9 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 	 */
 	public void addNeoNode(PNeoNode node) {
 		getWorld().getGround().catchObject(node);
+		if (node instanceof PNodeContainer) {
+			((PNodeContainer) (node)).openViewer();
+		}
 
 	}
 

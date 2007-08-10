@@ -1,6 +1,8 @@
 *******************************************
  Done
 *******************************************
+(08/10) - Two phase fade-in for tooltips (they turn opaque after 2.5 seconds)
+
 (08/10) - Option to load other networks& ensembles from within networks
 (08/10) - Added option to minimize/close all windows
 (08/10) - Performance debugging, fixed some memory leaks with Windows & Viewers. 
@@ -56,7 +58,7 @@ information visualization
  Pri 1 - to do
 *******************************************
 
-minimize all windows action
+show open windows
 
 
 Connection Weights

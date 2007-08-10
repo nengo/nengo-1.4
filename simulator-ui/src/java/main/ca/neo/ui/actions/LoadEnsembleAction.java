@@ -2,17 +2,19 @@ package ca.neo.ui.actions;
 
 import ca.neo.model.Ensemble;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.nodes.PEnsemble;
 import ca.neo.ui.models.nodes.PNEFEnsemble;
 import ca.shu.ui.lib.util.Util;
 
-public abstract class LoadEnsembleAction extends LoadObjectAction {
+public class LoadEnsembleAction extends LoadObjectAction {
 
 	private static final long serialVersionUID = 1L;
+	INodeContainer nodeContainer;
 
-	public LoadEnsembleAction(String actionName) {
+	public LoadEnsembleAction(String actionName, INodeContainer nodeContainer) {
 		super("Load Ensemble from file", actionName);
-		// TODO Auto-generated constructor stub
+		this.nodeContainer = nodeContainer;
 	}
 
 	@Override
@@ -27,10 +29,8 @@ public abstract class LoadEnsembleAction extends LoadObjectAction {
 			Util.Error("Could not load Ensemble file");
 		}
 		if (ensembleUI != null)
-			gotEnsemble(ensembleUI);
+			nodeContainer.addNeoNode(ensembleUI);
 
 	}
-
-	protected abstract void gotEnsemble(PEnsemble ensemble);
 
 }

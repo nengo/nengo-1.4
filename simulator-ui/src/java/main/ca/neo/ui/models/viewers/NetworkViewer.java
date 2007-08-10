@@ -23,7 +23,6 @@ import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.icons.ModelIcon;
-import ca.neo.ui.models.nodes.PEnsemble;
 import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
@@ -92,7 +91,7 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	public void addNodeToNetwork(PNeoNode nodeProxy, boolean updateModel,
+	public void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCamera) {
 		if (updateModel) {
 			try {
@@ -104,11 +103,10 @@ public class NetworkViewer extends NodeViewer {
 				return;
 			}
 		}
-		super.addNodeToNetwork(nodeProxy, updateModel, dropInCenterOfCamera,
+		super.addNeoNode(nodeProxy, updateModel, dropInCenterOfCamera,
 				moveCamera);
 
 		if (updateModel) {
-
 			showTransientMsg("Node " + getName() + " added to Network",
 					nodeProxy);
 
@@ -186,24 +184,9 @@ public class NetworkViewer extends NodeViewer {
 		MenuBuilder functionsMenu = createNewMenu.createSubMenu("Functions");
 
 		MenuBuilder fromFileMenu = menu.createSubMenu("From file");
-		fromFileMenu.addAction(new LoadNetworkAction("Network") {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void gotNetwork(PNetwork network) {
-				addNeoNode(network);
-			}
-		});
-		fromFileMenu
-				.addAction(new LoadEnsembleAction("NEFEnsemble / Ensemble") {
-
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					protected void gotEnsemble(PEnsemble ensemble) {
-						addNeoNode(ensemble);
-					}
-				});
+		fromFileMenu.addAction(new LoadNetworkAction("Network", this));
+		fromFileMenu.addAction(new LoadEnsembleAction("NEFEnsemble / Ensemble",
+				this));
 
 		// Nodes
 		for (int i = 0; i < PModelClasses.NODE_TYPES.length; i++) {
@@ -276,7 +259,7 @@ public class NetworkViewer extends NodeViewer {
 	 * @return Node UI object
 	 */
 	public PNeoNode getNode(String name) {
-		return nodesUI.get(name);
+		return getViewerNodes().get(name);
 	}
 
 	public NodeLayoutManager getNodeLayoutManager() {
@@ -307,23 +290,19 @@ public class NetworkViewer extends NodeViewer {
 		return (PNetwork) super.getViewerParent();
 	}
 
-	/**
-	 * 
-	 * @param nodeProxy
-	 *            node to be removed
-	 */
-	public void removeNodeFromNetwork(PNeoNode nodeProxy) {
-		nodesUI.remove(nodeProxy);
+	@Override
+	public void removeNeoNode(PNeoNode nodeUI) {
 
 		try {
-			showTransientMsg("Node " + nodeProxy.getName()
-					+ " removed from Network", nodeProxy);
-			getNetwork().removeNode(nodeProxy.getName());
+			showTransientMsg("Node " + nodeUI.getName()
+					+ " removed from Network", nodeUI);
+			getNetwork().removeNode(nodeUI.getName());
 
 		} catch (StructuralException e) {
 			Util.Warning(e.toString());
 			return;
 		}
+		super.removeNeoNode(nodeUI);
 
 	}
 
@@ -340,7 +319,7 @@ public class NetworkViewer extends NodeViewer {
 			return false;
 		}
 
-		Enumeration<PNeoNode> en = nodesUI.elements();
+		Enumeration<PNeoNode> en = getViewerNodes().elements();
 
 		while (en.hasMoreElements()) {
 			PNeoNode node = en.nextElement();
@@ -386,7 +365,7 @@ public class NetworkViewer extends NodeViewer {
 		/*
 		 * Removes all existing nodes from this viewer
 		 */
-		Enumeration<PNeoNode> enumeration = nodesUI.elements();
+		Enumeration<PNeoNode> enumeration = getViewerNodes().elements();
 		while (enumeration.hasMoreElements()) {
 			enumeration.nextElement().removeFromParent();
 		}
@@ -405,7 +384,7 @@ public class NetworkViewer extends NodeViewer {
 			 */
 			if (getNode(node.getName()) == null) {
 				PNeoNode nodeUI = PModelClasses.createUIFromModel(node);
-				addNodeToNetwork(nodeUI, false, false, false);
+				addNeoNode(nodeUI, false, false, false);
 			}
 		}
 
@@ -564,7 +543,7 @@ public class NetworkViewer extends NodeViewer {
 					/**
 					 * Layout nodes
 					 */
-					Enumeration<PNeoNode> enumeration = nodesUI.elements();
+					Enumeration<PNeoNode> enumeration = getViewerNodes().elements();
 					PTransformActivity nodeMoveActivity = null;
 					while (enumeration.hasMoreElements()) {
 						PNeoNode node = enumeration.nextElement();
@@ -624,7 +603,7 @@ public class NetworkViewer extends NodeViewer {
 		}
 
 		protected void restoreNodePositions() {
-			Enumeration<PNeoNode> en = nodesUI.elements();
+			Enumeration<PNeoNode> en = getViewerNodes().elements();
 
 			while (en.hasMoreElements()) {
 				PNeoNode node = en.nextElement();
