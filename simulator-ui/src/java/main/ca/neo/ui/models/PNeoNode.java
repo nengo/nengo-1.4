@@ -64,13 +64,14 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 *            The name of the state variable to probe
 	 */
 	public GProbe addProbe(String stateName) {
-
+		
 		GProbe probeUI = new GProbe(this, stateName);
 		newProbeAdded(probeUI);
 
 		return probeUI;
 	}
 
+	
 	public void addWidget(PWidget widget) {
 		widget.setScale(0.5);
 		addChild(widget);
@@ -390,19 +391,26 @@ public abstract class PNeoNode extends PModelConfigurable {
 		Origin origin = null;
 		try {
 			origin = getModel().getOrigin(probeUI.getName());
-			probeHolder = showOrigin(origin.getName());
+
 		} catch (StructuralException e1) {
 		}
-		if (origin == null) {
-			Termination term;
+
+		if (origin != null) {
+			probeHolder = showOrigin(origin.getName());
+		} else if (origin == null) {
+			Termination term = null;
 			try {
 				term = getModel().getTermination(probeUI.getName());
-				probeHolder = showTermination(term.getName());
+
 			} catch (StructuralException e) {
 			}
+			if (term != null)
+				probeHolder = showTermination(term.getName());
 		}
+
 		if (probeHolder != null) {
 			probeUI.setOffset(0, probeHolder.getHeight() / 2);
+			probeHolder.addChild(probeUI);
 
 		} else {
 			addChild(probeUI);
@@ -412,7 +420,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 		// assignProbes();
 
 	}
-
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -501,28 +508,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	}
 
-	// /**
-	// * Assign Probe UI objects to the appropriate widget
-	// */
-	// protected void assignProbes() {
-	// if (probes == null)
-	// return;
-	// Iterator<GProbe> it = probes.iterator();
-	//
-	// while (it.hasNext()) {
-	// GProbe probe = it.next();
-	//
-	// WorldObjectImpl widget = getWidget(probe.getName());
-	// if (widget != null) {
-	// probe.setOffset(0, widget.getHeight() / 2);
-	// widget.addChild(probe);
-	// } else {
-	//			
-	// }
-	//
-	// }
-	// }
-
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void layoutChildren() {
@@ -582,11 +567,11 @@ public abstract class PNeoNode extends PModelConfigurable {
 						widget.setChildrenPickable(true);
 
 						if (widget instanceof POrigin) {
-							originY -= scale * widget.getHeight() + 5;
+							originY -= scale * widget.getHeight() + 8;
 							widget.setOffset(originX, originY);
 
 						} else if (widget instanceof PTermination) {
-							termY -= scale * widget.getHeight() + 5;
+							termY -= scale * widget.getHeight() + 8;
 							widget.setOffset(termX, termY);
 						}
 					}
