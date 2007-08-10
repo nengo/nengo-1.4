@@ -4,6 +4,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
 
 import javax.swing.JPopupMenu;
 
@@ -19,7 +22,10 @@ import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
 import ca.shu.ui.lib.objects.GText;
+import ca.shu.ui.lib.objects.Window;
+import ca.shu.ui.lib.objects.Window.WindowState;
 import ca.shu.ui.lib.util.Grid;
+import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
 import edu.umd.cs.piccolo.PCamera;
@@ -95,9 +101,6 @@ public class World extends WorldObject implements Interactable,
 	public World(String name) {
 		super(name);
 
-		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
-		addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
-
 		layer = new PLayer();
 
 		UIEnvironment.getInstance().getRoot().addChild(layer);
@@ -124,6 +127,9 @@ public class World extends WorldObject implements Interactable,
 		/*
 		 * Add handlers
 		 */
+		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
+		addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
+
 		skyCamera.addInputEventListener(zoomHandler);
 		skyCamera.addInputEventListener(panHandler);
 
@@ -151,6 +157,56 @@ public class World extends WorldObject implements Interactable,
 
 		// System.out.println(this+"Finished
 		// Constructing MiniWorld");
+	}
+
+	public void addWindow(Window window) {
+		getSky().addChild(window);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void closeAllWindows() {
+		Iterator<Window> itW = getAllWindows().iterator();
+		while (itW.hasNext()) {
+			itW.next().close();
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<Window> getAllWindows() {
+		Iterator it = getSky().getChildrenIterator();
+
+		Vector<Window> windows = new Vector<Window>(10);
+
+		while (it.hasNext()) {
+			Object next = it.next();
+			if (next instanceof Window) {
+				windows.add((Window) next);
+
+			}
+		}
+		
+		it = getGround().getChildrenIterator();
+		while (it.hasNext()) {
+			Object next = it.next();
+			if (next instanceof Window) {
+				windows.add((Window) next);
+
+			}
+		}
+		
+		
+		return windows;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void minimizeAllWindows() {
+
+		Iterator<Window> itW = getAllWindows().iterator();
+		while (itW.hasNext()) {
+			itW.next().decreaseWindowSize();
+		}
+
 	}
 
 	public boolean containsNode(PNode node) {
@@ -324,10 +380,43 @@ public class World extends WorldObject implements Interactable,
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
 
 		menu.addAction(new ZoomOutAction());
-		// menu.addSection("View");
-		// menu.addAction(new MinimizeAction());
+		MenuBuilder windowsMenu = menu.createSubMenu("Windows");
+		windowsMenu.addAction(new MinimizeAllWindows("Close all"));
+		windowsMenu.addAction(new CloseAllWindows("Minmize all"));
 
 		return menu;
+
+	}
+
+	class CloseAllWindows extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public CloseAllWindows(String actionName) {
+			super("Close all windows", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			closeAllWindows();
+
+		}
+
+	}
+
+	class MinimizeAllWindows extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public MinimizeAllWindows(String actionName) {
+			super("Minimize all windows", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			minimizeAllWindows();
+
+		}
 
 	}
 
@@ -344,6 +433,14 @@ public class World extends WorldObject implements Interactable,
 			zoomToFit();
 		}
 
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+
+		layer.removeFromParent();
+
+		super.prepareForDestroy();
 	}
 
 }

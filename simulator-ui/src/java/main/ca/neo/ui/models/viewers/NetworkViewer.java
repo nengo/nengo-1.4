@@ -16,11 +16,14 @@ import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.ui.actions.CreateModelAction;
+import ca.neo.ui.actions.LoadEnsembleAction;
+import ca.neo.ui.actions.LoadNetworkAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.icons.ModelIcon;
+import ca.neo.ui.models.nodes.PEnsemble;
 import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
@@ -70,66 +73,6 @@ public class NetworkViewer extends NodeViewer {
 
 	ModelIcon icon;
 
-	public void saveLayoutAsDefault() {
-		saveNodeLayout(NetworkViewer.DEFAULT_NODE_LAYOUT_NAME);
-	}
-
-	@Override
-	protected void prepareForDestroy() {
-		saveLayoutAsDefault();
-		super.prepareForDestroy();
-	}
-
-	/**
-	 * Saves layout
-	 * 
-	 * @param name
-	 */
-	public void saveNodeLayout(String name) {
-
-		NodeLayoutManager layouts = getNodeLayoutManager();
-		if (layouts != null) {
-			NodeLayout nodeLayout = new NodeLayout(name, this);
-
-			layouts.addLayout(nodeLayout);
-		} else {
-			Util.Error("Could not save node layout");
-		}
-	}
-
-	/**
-	 * 
-	 * @return The Key used to access Metadata containing layout information
-	 *         from the Network node
-	 */
-	private String getLayoutManagerKey() {
-
-		return LAYOUT_MANAGER_KEY;
-
-	}
-
-	public NodeLayoutManager getNodeLayoutManager() {
-		NodeLayoutManager layoutManager = null;
-		try {
-
-			Object obj = getViewerParent().getModel().getMetaData(
-					getLayoutManagerKey());
-			if (obj != null)
-				layoutManager = (NodeLayoutManager) obj;
-		} catch (Throwable e) {
-			Util.Error("Could not access layout manager, creating a new one");
-			// catch all exceptions
-		}
-
-		if (layoutManager == null) {
-			layoutManager = new NodeLayoutManager();
-			getViewerParent().getModel().setMetaData(getLayoutManagerKey(),
-					layoutManager);
-		}
-		return (NodeLayoutManager) layoutManager;
-
-	}
-
 	/**
 	 * 
 	 * @param pNetwork
@@ -166,8 +109,8 @@ public class NetworkViewer extends NodeViewer {
 
 		if (updateModel) {
 
-			showTransientMsg("Node " + getName()
-					+ " added to Network", nodeProxy);
+			showTransientMsg("Node " + getName() + " added to Network",
+					nodeProxy);
 
 		}
 	}
@@ -227,38 +170,54 @@ public class NetworkViewer extends NodeViewer {
 		/*
 		 * File menu
 		 */
-		menu.addSection("File");
-		menu.addAction(new SaveNodeContainerAction("Save network",
+		// menu.addSection("File");
+		menu.addAction(new SaveNodeContainerAction("Save network to file",
 				getViewerParent()));
 
 		/*
 		 * Create new models
 		 */
-		menu.addSection("Create new model");
+		menu.addSection("Add model to network");
+		MenuBuilder createNewMenu = menu.createSubMenu("Create new");
 
-		MenuBuilder nodeContainersMenu = menu.createSubMenu("Node Containers");
-		MenuBuilder nodesMenu = menu.createSubMenu("Nodes");
-		MenuBuilder functionsMenu = menu.createSubMenu("Functions");
+		MenuBuilder nodeContainersMenu = createNewMenu
+				.createSubMenu("Node Containers");
+		MenuBuilder nodesMenu = createNewMenu.createSubMenu("Nodes");
+		MenuBuilder functionsMenu = createNewMenu.createSubMenu("Functions");
 
-		/*
-		 * Nodes
-		 */
+		MenuBuilder fromFileMenu = menu.createSubMenu("From file");
+		fromFileMenu.addAction(new LoadNetworkAction("Network") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void gotNetwork(PNetwork network) {
+				addNeoNode(network);
+			}
+		});
+		fromFileMenu
+				.addAction(new LoadEnsembleAction("NEFEnsemble / Ensemble") {
+
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					protected void gotEnsemble(PEnsemble ensemble) {
+						addNeoNode(ensemble);
+					}
+				});
+
+		// Nodes
 		for (int i = 0; i < PModelClasses.NODE_TYPES.length; i++) {
 			nodesMenu.addAction(new CreateModelAction(this,
 					PModelClasses.NODE_TYPES[i]));
 		}
 
-		/*
-		 * Node Containers
-		 */
+		// Node Containers
 		for (int i = 0; i < PModelClasses.NODE_CONTAINER_TYPES.length; i++) {
 			nodeContainersMenu.addAction(new CreateModelAction(this,
 					PModelClasses.NODE_CONTAINER_TYPES[i]));
 		}
 
-		/*
-		 * Functions
-		 */
+		// Functions
 		for (int i = 0; i < PModelClasses.FUNCTION_TYPES.length; i++) {
 			functionsMenu.addAction(new CreateModelAction(this,
 					PModelClasses.FUNCTION_TYPES[i]));
@@ -306,52 +265,6 @@ public class NetworkViewer extends NodeViewer {
 		return menu;
 	}
 
-	/**
-	 * 
-	 * @return The nodes as a graph
-	 */
-	protected Graph createGraph() {
-		DirectedSparseGraph graph = new DirectedSparseGraph();
-
-		Enumeration<PNeoNode> enumeration = getViewedNodesElements();
-
-		/**
-		 * Add vertices
-		 */
-		while (enumeration.hasMoreElements()) {
-			PNeoNode node = enumeration.nextElement();
-			DirectedSparseVertex vertex = new DirectedSparseVertex();
-
-			node.setVertex(vertex);
-
-			graph.addVertex(vertex);
-
-		}
-
-		/**
-		 * Add Directed edges
-		 * 
-		 */
-		Projection[] projections = getNetwork().getProjections();
-		for (int i = 0; i < projections.length; i++) {
-			Projection projection = projections[i];
-
-			Origin origin = projection.getOrigin();
-			Termination term = projection.getTermination();
-
-			PNeoNode nodeOrigin = getNode(origin.getNode().getName());
-			PNeoNode nodeTerm = getNode(term.getNode().getName());
-
-			DirectedSparseEdge edge = new DirectedSparseEdge(nodeOrigin
-					.getVertex(), nodeTerm.getVertex());
-			graph.addEdge(edge);
-
-		}
-
-		return graph;
-
-	}
-
 	public Network getNetwork() {
 		return (Network) getModel();
 	}
@@ -364,6 +277,28 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public PNeoNode getNode(String name) {
 		return nodesUI.get(name);
+	}
+
+	public NodeLayoutManager getNodeLayoutManager() {
+		NodeLayoutManager layoutManager = null;
+		try {
+
+			Object obj = getViewerParent().getModel().getMetaData(
+					getLayoutManagerKey());
+			if (obj != null)
+				layoutManager = (NodeLayoutManager) obj;
+		} catch (Throwable e) {
+			Util.Error("Could not access layout manager, creating a new one");
+			// catch all exceptions
+		}
+
+		if (layoutManager == null) {
+			layoutManager = new NodeLayoutManager();
+			getViewerParent().getModel().setMetaData(getLayoutManagerKey(),
+					layoutManager);
+		}
+		return (NodeLayoutManager) layoutManager;
+
 	}
 
 	@Override
@@ -422,10 +357,32 @@ public class NetworkViewer extends NodeViewer {
 		return true;
 	}
 
+	public void saveLayoutAsDefault() {
+		saveNodeLayout(NetworkViewer.DEFAULT_NODE_LAYOUT_NAME);
+	}
+
+	/**
+	 * Saves layout
+	 * 
+	 * @param name
+	 */
+	public void saveNodeLayout(String name) {
+
+		NodeLayoutManager layouts = getNodeLayoutManager();
+		if (layouts != null) {
+			NodeLayout nodeLayout = new NodeLayout(name, this);
+
+			layouts.addLayout(nodeLayout);
+		} else {
+			Util.Error("Could not save node layout");
+		}
+	}
+
 	/**
 	 * Construct children UI nodes from the NEO Network model
 	 */
 	public void updateNodesFromModel() {
+
 		/*
 		 * Removes all existing nodes from this viewer
 		 */
@@ -503,28 +460,77 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
-	class ShowAllWidgetsAction extends StandardAction {
+	/**
+	 * 
+	 * @return The Key used to access Metadata containing layout information
+	 *         from the Network node
+	 */
+	private String getLayoutManagerKey() {
 
-		public ShowAllWidgetsAction(String actionName) {
-			super("Show all widgets", actionName);
+		return LAYOUT_MANAGER_KEY;
+
+	}
+
+	/**
+	 * 
+	 * @return The nodes as a graph
+	 */
+	protected Graph createGraph() {
+		DirectedSparseGraph graph = new DirectedSparseGraph();
+
+		Enumeration<PNeoNode> enumeration = getViewedNodesElements();
+
+		/**
+		 * Add vertices
+		 */
+		while (enumeration.hasMoreElements()) {
+			PNeoNode node = enumeration.nextElement();
+			DirectedSparseVertex vertex = new DirectedSparseVertex();
+
+			node.setVertex(vertex);
+
+			graph.addVertex(vertex);
+
 		}
 
-		private static final long serialVersionUID = 1L;
+		/**
+		 * Add Directed edges
+		 * 
+		 */
+		Projection[] projections = getNetwork().getProjections();
+		for (int i = 0; i < projections.length; i++) {
+			Projection projection = projections[i];
 
-		@Override
-		protected void action() throws ActionException {
-			showAllWidgets();
+			Origin origin = projection.getOrigin();
+			Termination term = projection.getTermination();
+
+			PNeoNode nodeOrigin = getNode(origin.getNode().getName());
+			PNeoNode nodeTerm = getNode(term.getNode().getName());
+
+			DirectedSparseEdge edge = new DirectedSparseEdge(nodeOrigin
+					.getVertex(), nodeTerm.getVertex());
+			graph.addEdge(edge);
+
 		}
 
+		return graph;
+
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+
+		saveLayoutAsDefault();
+		super.prepareForDestroy();
 	}
 
 	class HideAllWidgetsAction extends StandardAction {
 
+		private static final long serialVersionUID = 1L;
+
 		public HideAllWidgetsAction(String actionName) {
 			super("Hide all widgets", actionName);
 		}
-
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected void action() throws ActionException {
@@ -675,6 +681,21 @@ public class NetworkViewer extends NodeViewer {
 
 	}
 
+	class ShowAllWidgetsAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ShowAllWidgetsAction(String actionName) {
+			super("Show all widgets", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			showAllWidgets();
+		}
+
+	}
+
 	class SquareLayoutAction extends LayoutAction {
 
 		private static final long serialVersionUID = 1L;
@@ -695,7 +716,7 @@ public class NetworkViewer extends NodeViewer {
 
 		public ZoomActivity() {
 			super(0);
-			getRoot().addActivity(this);
+			addActivity(this);
 		}
 
 		@Override

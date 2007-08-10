@@ -34,13 +34,13 @@ import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PRoot;
+import edu.umd.cs.piccolo.util.PDebug;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PUtil;
 
@@ -114,11 +114,6 @@ public class GFrame extends JFrame {
 		validate();
 		setFullScreenMode(false);
 
-	}
-
-	public void addChild(Window wo) {
-
-		canvas.addWindow(wo);
 	}
 
 	/**
@@ -255,6 +250,7 @@ public class GFrame extends JFrame {
 		menuBar.setVisible(true);
 		updateWorldMenu();
 		updateEditMenu();
+
 		this.setJMenuBar(menuBar);
 		this.repaint();
 
@@ -418,6 +414,7 @@ public class GFrame extends JFrame {
 
 	protected void updateWorldMenu() {
 		worldMenu.reset();
+		worldMenu.addAction(new MinimizeAllWindows());
 
 		if (!isFullScreenMode) {
 			worldMenu.addAction(new TurnOnFullScreen());
@@ -441,6 +438,14 @@ public class GFrame extends JFrame {
 		qualityMenu.addAction(new LowQualityAction());
 		qualityMenu.addAction(new MediumQualityAction());
 		qualityMenu.addAction(new HighQualityAction());
+
+		MenuBuilder debugMenu = worldMenu.createSubMenu("Debug");
+
+		if (!PDebug.debugPrintUsedMemory) {
+			debugMenu.addAction(new ShowDebugMemory());
+		} else {
+			debugMenu.addAction(new HideDebugMemory());
+		}
 	}
 
 	class HighQualityAction extends StandardAction {
@@ -502,6 +507,22 @@ public class GFrame extends JFrame {
 			getCanvas().setInteractingRenderQuality(
 					PPaintContext.LOW_QUALITY_RENDERING);
 			updateWorldMenu();
+		}
+
+	}
+
+	class MinimizeAllWindows extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public MinimizeAllWindows() {
+			super("Minimize all windows");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			getWorld().minimizeAllWindows();
+
 		}
 
 	}
@@ -629,6 +650,38 @@ public class GFrame extends JFrame {
 		protected void action() throws ActionException {
 			preferences.setGridVisible(true);
 
+			updateWorldMenu();
+		}
+
+	}
+
+	class ShowDebugMemory extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ShowDebugMemory() {
+			super("Print Memory Used to console");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			PDebug.debugPrintUsedMemory = true;
+			updateWorldMenu();
+		}
+
+	}
+
+	class HideDebugMemory extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public HideDebugMemory() {
+			super("Stop printing Memory Used to console");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			PDebug.debugPrintUsedMemory = false;
 			updateWorldMenu();
 		}
 

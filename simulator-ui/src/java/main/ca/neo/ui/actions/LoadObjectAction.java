@@ -47,9 +47,13 @@ public abstract class LoadObjectAction extends StandardAction {
 					FileManager fm = new FileManager();
 					try {
 						objLoaded = fm.load(file);
+
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
+								if (objLoaded != null)
 								processObject(objLoaded);
+								objLoaded = null;
+
 							}
 						});
 

@@ -2,6 +2,7 @@ package ca.neo.ui.models.nodes;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import ca.neo.io.FileManager;
 import ca.neo.model.Network;
@@ -24,17 +25,11 @@ public abstract class PNodeContainer extends PNeoNode {
 
 	private static final long serialVersionUID = 1L;
 
-	Window networkWindow;
+	// private Window networkWindow;
 
-	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
+	WeakReference<Window> viewerWindowRef = new WeakReference<Window>(null);
 
-		tooltips.addPart(new TooltipPart("# Nodes", "" + getNodesCount()));
-		return tooltips;
-	}
-
-	Window viewerWindow;
+	// Window viewerWindow;
 
 	public PNodeContainer() {
 		super();
@@ -45,16 +40,77 @@ public abstract class PNodeContainer extends PNeoNode {
 	}
 
 	/**
+	 * Closes the Network viewer
+	 */
+	public void closeViewer() {
+		if (viewerWindowRef.get() != null)
+			viewerWindowRef.get().destroy();
+		
+	}
+
+	@Override
+	public void doubleClicked() {
+		openViewer();
+	}
+
+	public NodeViewer getAndConstructViewer() {
+
+		if (viewerWindowRef.get() == null
+				|| viewerWindowRef.get().isDestroyed()) {
+			Window viewerWindow = new Window(this, createNodeViewerInstance());
+			viewerWindow.translate(0, this.getHeight() + 20);
+			viewerWindowRef = new WeakReference<Window>(viewerWindow);
+
+		}
+
+		return (NodeViewer) viewerWindowRef.get().getWindowContent();
+
+	}
+
+	/**
 	 * @return Number of nodes contained by the Model
 	 */
 	public abstract int getNodesCount();
 
+	public NodeViewer getViewer() {
+		if (viewerWindowRef.get() != null) {
+			return (NodeViewer) viewerWindowRef.get().getWindowContent();
+		}
+		return null;
+	}
+
 	/**
-	 * Minimizes the Network Viewer GUI
+	 * 
+	 * @return opens the network viewer which contains the nodes of the Network
+	 *         model
 	 */
-	public void closeViewer() {
-		if (networkWindow != null)
-			networkWindow.destroy();
+	public NodeViewer openViewer() {
+		NodeViewer nodeViewer = getAndConstructViewer();
+
+		viewerWindowRef.get().setWindowState(WindowState.MAXIMIZED);
+		viewerWindowRef = new WeakReference<Window>(null);
+		
+		return nodeViewer;
+
+	}
+
+	/**
+	 * Saves the model representing the Node Container
+	 * 
+	 * @param file
+	 *            File to save the model to
+	 * @throws IOException
+	 */
+
+	public void saveModel(File file) throws IOException {
+		FileManager fm = new FileManager();
+
+		fm.save((Network) getModel(), file);
+	}
+
+	@Override
+	protected void afterModelCreated() {
+		super.afterModelCreated();
 
 	}
 
@@ -66,8 +122,8 @@ public abstract class PNodeContainer extends PNeoNode {
 				"Save " + this.getTypeName(), this));
 
 		menu.addSection("Container");
-		if (networkWindow == null
-				|| (networkWindow.getWindowState() == Window.WindowState.MINIMIZED)) {
+		if (viewerWindowRef.get() == null
+				|| (viewerWindowRef.get().getWindowState() == Window.WindowState.MINIMIZED)) {
 
 			menu.addAction(new StandardAction("Open viewer") {
 				private static final long serialVersionUID = 1L;
@@ -89,65 +145,19 @@ public abstract class PNodeContainer extends PNeoNode {
 			});
 
 		}
+		
+		
 		return menu;
 
 	}
 
 	@Override
-	public void doubleClicked() {
-		openViewer();
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
+
+		tooltips.addPart(new TooltipPart("# Nodes", "" + getNodesCount()));
+		return tooltips;
 	}
-
-	public NodeViewer getAndConstructViewer() {
-		if (viewerWindow == null || viewerWindow.isDestroyed()) {
-			viewerWindow = new Window(this, createNodeViewerInstance());
-			viewerWindow.translate(0, this.getHeight() + 20);
-		}
-
-		return (NodeViewer) viewerWindow.getWindowContent();
-	}
-
-	public NodeViewer getViewer() {
-		if (viewerWindow != null) {
-			return (NodeViewer) viewerWindow.getWindowContent();
-		}
-		return null;
-	}
-
-	/**
-	 * 
-	 * @return opens the network viewer which contains the nodes of the Network
-	 *         model
-	 */
-	public NodeViewer openViewer() {
-		NodeViewer nodeViewer = getAndConstructViewer();
-
-		viewerWindow.setWindowState(WindowState.MAXIMIZED);
-
-		return nodeViewer;
-
-	}
-
-	/**
-	 * Saves the model representing the Node Container
-	 * 
-	 * @param file
-	 *            File to save the model to
-	 * @throws IOException
-	 */
-
-	public void saveModel(File file) throws IOException {
-		FileManager fm = new FileManager();
-
-		fm.save((Network) getModel(), file);
-	}
-
-	/**
-	 * 
-	 * @return NodeViewer An instance of the Node Viewer to peek into the nodes
-	 *         contained
-	 */
-	protected abstract NodeViewer createNodeViewerInstance();
 
 	// @Override
 	// protected void moveWidgetsToFront() {
@@ -162,10 +172,17 @@ public abstract class PNodeContainer extends PNeoNode {
 	//
 	// }
 
-	@Override
-	protected void afterModelCreated() {
-		super.afterModelCreated();
+	/**
+	 * 
+	 * @return NodeViewer An instance of the Node Viewer to peek into the nodes
+	 *         contained
+	 */
+	protected abstract NodeViewer createNodeViewerInstance();
 
+	@Override
+	protected void prepareForDestroy() {
+		closeViewer();
+		super.prepareForDestroy();
 	}
 
 }

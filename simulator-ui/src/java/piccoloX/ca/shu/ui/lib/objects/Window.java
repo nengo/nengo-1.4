@@ -3,6 +3,7 @@ package ca.shu.ui.lib.objects;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.lang.ref.WeakReference;
 
 import javax.swing.JPopupMenu;
 
@@ -13,12 +14,11 @@ import ca.shu.ui.lib.objects.widgets.AffinityHalo;
 import ca.shu.ui.lib.objects.widgets.BoundsHandle;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PDimension;
 
 public class Window extends WorldObject {
 	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.WINDOW;
@@ -33,29 +33,30 @@ public class Window extends WorldObject {
 
 	private PPath menubar;
 
-	AffinityHalo affinityHalo = null;
+	private AffinityHalo affinityHalo = null;
 
-	WorldObject attachTo;
+	// private WorldObject attachTo;
+	private WeakReference<WorldObject> attachToRef;
 
-	WorldObject contentNode;
+	private WorldObject contentNode;
 
 	final int MENU_BAR_HEIGHT = 27;
 
-	MenuBarHandler menuBarHandler;
+	private MenuBarHandler menuBarHandler;
 
 	/**
 	 * 
 	 */
 
-	PBounds savedWindowBounds;;
+	private PBounds savedWindowBounds;;
 
-	Point2D savedWindowOffset;
+	private Point2D savedWindowOffset;
 
 	/**
 	 * TODO: Window state control
 	 */
 
-	WindowState windowState = WINDOW_STATE_DEFAULT;
+	private WindowState windowState = WINDOW_STATE_DEFAULT;
 
 	/**
 	 * 
@@ -66,7 +67,7 @@ public class Window extends WorldObject {
 	 */
 	public Window(WorldObject attachTo, WorldObject contentNode) {
 		super();
-		this.attachTo = attachTo;
+		attachToRef = new WeakReference<WorldObject>(attachTo);
 
 		this.contentNode = contentNode;
 		this.setWidth(DEFAULT_WIDTH);
@@ -78,10 +79,10 @@ public class Window extends WorldObject {
 		addChild(menubar);
 		addChild(contentNode);
 		menuBarHandler = new MenuBarHandler(this);
-		menubar.addInputEventListener(menuBarHandler);
+		// menubar.addInputEventListener(menuBarHandler);
 
 		eventConsumer = new EventConsumer();
-		addInputEventListener(new EventConsumer());
+		// addInputEventListener(eventConsumer);
 		windowStateChanged();
 	}
 
@@ -205,8 +206,8 @@ public class Window extends WorldObject {
 				affinityHalo = null;
 			}
 
-			menuBarHandler.setEnabled(false);
-			UIEnvironment.getInstance().addChild(this);
+			setDraggable(false);
+			UIEnvironment.getInstance().getWorld().addWindow(this);
 
 			maximizeBounds();
 
@@ -217,12 +218,15 @@ public class Window extends WorldObject {
 				setBounds(savedWindowBounds);
 				setOffset(savedWindowOffset);
 			}
-			menuBarHandler.setEnabled(true);
-			attachTo.addChild(this);
+			if (attachToRef.get() != null) {
+				setDraggable(true);
 
-			BoundsHandle.addBoundsHandlesTo(this);
-			if (affinityHalo == null) {
-				affinityHalo = new AffinityHalo(attachTo, this);
+				attachToRef.get().addChild(this);
+
+				BoundsHandle.addBoundsHandlesTo(this);
+				if (affinityHalo == null) {
+					affinityHalo = new AffinityHalo(attachToRef.get(), this);
+				}
 			}
 
 			break;
@@ -315,17 +319,15 @@ class MenuBar extends PPath {
 
 }
 
-class MenuBarHandler extends PDragSequenceEventHandler {
+class MenuBarHandler extends PBasicInputEventHandler {
 
 	private boolean moveToFrontOnPress = true;
 
 	private Window window;
-	boolean enabled = true;
 
 	public MenuBarHandler(Window window) {
 		super();
 		this.window = window;
-		// setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
 	}
 
 	public boolean getMoveToFrontOnPress() {
@@ -341,8 +343,9 @@ class MenuBarHandler extends PDragSequenceEventHandler {
 		 * Object
 		 */
 		if (event.getButton() == MouseEvent.BUTTON3) {
-			if (window.contentNode instanceof Interactable) {
-				Interactable menuNode = ((Interactable) (window.contentNode));
+			if (window.getWindowContent() instanceof Interactable) {
+				Interactable menuNode = ((Interactable) (window
+						.getWindowContent()));
 
 				if (menuNode.isContextMenuEnabled()) {
 					JPopupMenu menu = menuNode.showContextMenu(event);
@@ -363,46 +366,4 @@ class MenuBarHandler extends PDragSequenceEventHandler {
 		this.moveToFrontOnPress = moveToFrontOnPress;
 	}
 
-	protected void drag(PInputEvent event) {
-		super.drag(event);
-		PDimension d = event.getDeltaRelativeTo(window);
-		window.localToParent(d);
-		window.offset(d.getWidth(), d.getHeight());
-	}
-
-	protected void endDrag(PInputEvent event) {
-		super.endDrag(event);
-	}
-
-	protected boolean isEnabled() {
-		return enabled;
-	}
-
-	protected void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	// ****************************************************************
-	// Debugging - methods for debugging
-	// ****************************************************************
-
-	protected boolean shouldStartDragInteraction(PInputEvent event) {
-		if (super.shouldStartDragInteraction(event)
-				&& event.getButton() == MouseEvent.BUTTON1) {
-			return event.getPickedNode() != event.getTopCamera();
-		}
-		return false;
-	}
-
-	protected void startDrag(PInputEvent event) {
-		if (!enabled)
-			return;
-
-		super.startDrag(event);
-
-		if (moveToFrontOnPress) {
-			window.getParent().moveToFront();
-			window.moveToFront();
-		}
-	}
 }

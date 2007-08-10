@@ -106,6 +106,7 @@ public abstract class NodePickerHandler extends PBasicInputEventHandler {
 
 						}
 					} else {
+						pickedNode = null;
 						synchronized (pickChangeLock) {
 							pickChangeLock.wait(1000);
 						}

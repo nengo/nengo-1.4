@@ -1,6 +1,10 @@
 *******************************************
  Done
 *******************************************
+(08/10) - Option to load other networks& ensembles from within networks
+(08/10) - Added option to minimize/close all windows
+(08/10) - Performance debugging, fixed some memory leaks with Windows & Viewers. 
+
 (08/09) - Some user preferences are saved to file
 (08/09) - GFrame remembers user preferences in a serialized user configuration file
 (08/09) - Plot decoded origins

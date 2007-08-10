@@ -3,11 +3,9 @@ package ca.neo.ui;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 
-import ca.neo.model.Ensemble;
-import ca.neo.model.Network;
-import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.ui.actions.CreateModelAction;
-import ca.neo.ui.actions.LoadObjectAction;
+import ca.neo.ui.actions.LoadEnsembleAction;
+import ca.neo.ui.actions.LoadNetworkAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.nodes.PEnsemble;
@@ -16,10 +14,8 @@ import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.widgets.Toolbox;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.GFrame;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.util.PDebug;
 
 public class NeoGraphics extends GFrame implements INodeContainer {
 
@@ -38,8 +34,8 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 		super(title + " - NEO Workspace");
 
 		Environment.setUserInterface(true);
-		PDebug.debugThreads = true;
-	
+		// PDebug.debugThreads = true;
+		// PDebug.debugPrintUsedMemory = true;
 
 	}
 
@@ -74,8 +70,28 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 		newMenu.addAction(new CreateModelAction("Ensemble", this,
 				PEnsemble.class));
 
-		menu.addAction(new LoadNetworkAction("Open Network"));
-		menu.addAction(new LoadEnsembleAction("Open (NEF)Ensemble"));
+		menu.addAction(new LoadNetworkAction("Open Network") {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void gotNetwork(PNetwork network) {
+				getWorld().getGround().catchObject(network);
+				network.openViewer();
+			}
+
+		});
+		menu.addAction(new LoadEnsembleAction("Open (NEF)Ensemble") {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void gotEnsemble(PEnsemble ensemble) {
+				getWorld().getGround().catchObject(ensemble);
+				ensemble.openViewer();
+			}
+
+		});
 
 	}
 
@@ -89,60 +105,6 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 			canvasView = new Toolbox();
 			getWorld().getSky().addChild(canvasView);
 		}
-	}
-
-	class LoadEnsembleAction extends LoadObjectAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public LoadEnsembleAction(String actionName) {
-			super("Load Ensemble from file", actionName);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		protected void processObject(Object objLoaded) {
-
-			PEnsemble ensembleUI = null;
-			if (objLoaded instanceof Ensemble) {
-				ensembleUI = new PEnsemble((Ensemble) objLoaded);
-			} else if (objLoaded instanceof NEFEnsemble) {
-				ensembleUI = new PNEFEnsemble((NEFEnsemble) objLoaded);
-			} else {
-				Util.Error("Could not load Ensemble file");
-			}
-			if (ensembleUI != null)
-				getWorld().getGround().catchObject(ensembleUI);
-
-			ensembleUI.openViewer();
-
-		}
-
-	}
-
-	class LoadNetworkAction extends LoadObjectAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public LoadNetworkAction(String actionName) {
-			super("Load network from file", actionName);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		protected void processObject(Object objLoaded) {
-			if (objLoaded instanceof Network) {
-				PNetwork networkUI = new PNetwork((Network) objLoaded);
-				getWorld().getGround().catchObject(networkUI);
-
-				networkUI.openViewer();
-
-			} else {
-				Util.Error("Could not load Network file");
-			}
-
-		}
-
 	}
 
 	/*

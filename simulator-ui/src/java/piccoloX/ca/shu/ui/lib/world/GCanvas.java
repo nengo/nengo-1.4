@@ -2,7 +2,6 @@ package ca.shu.ui.lib.world;
 
 import java.util.Stack;
 
-import ca.shu.ui.lib.objects.Window;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 
@@ -41,10 +40,7 @@ public class GCanvas extends PCanvas {
 		return world;
 	}
 
-	public void addWindow(Window wo) {
 
-		getLayer().addChild(wo);
-	}
 
 	@Override
 	public void setBounds(int x, int y, int w, int h) {
