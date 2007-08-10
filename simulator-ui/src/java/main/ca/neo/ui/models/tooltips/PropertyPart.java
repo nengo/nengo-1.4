@@ -1,14 +1,14 @@
-package ca.neo.ui.models;
+package ca.neo.ui.models.tooltips;
 
 /**
  * @author Shu
  * 
  */
-public class TooltipPart {
+public class PropertyPart extends TooltipPart {
 	String propertyName;
 	String propertyValue;
 
-	public TooltipPart(String propertyName, String propertyValue) {
+	public PropertyPart(String propertyName, String propertyValue) {
 		super();
 		this.propertyName = propertyName;
 		this.propertyValue = propertyValue;
@@ -20,5 +20,9 @@ public class TooltipPart {
 
 	protected String getPropertyValue() {
 		return propertyValue;
+	}
+
+	public String toString() {
+		return propertyName + ": " + propertyValue;
 	}
 }

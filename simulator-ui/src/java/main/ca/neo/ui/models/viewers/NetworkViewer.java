@@ -207,37 +207,52 @@ public class NetworkViewer extends NodeViewer {
 		}
 
 		/*
-		 * Layouts
+		 * Visual
 		 */
 
-		menu.addSection("Layout");
+		menu.addSection("Visual");
 
-		menu.addAction(new ShowAllWidgetsAction("Show all widgets"));
-		menu.addAction(new HideAllWidgetsAction("Hide all widgets"));
+		MenuBuilder widgetMenu = menu.createSubMenu("Widgets");
+		widgetMenu.addAction(new ShowAllWidgetsAction("Show all widgets"));
+		widgetMenu.addAction(new HideAllWidgetsAction("Hide all widgets"));
 
-		MenuBuilder layoutMenu = menu.createSubMenu("Apply layout");
+		// Layouts
+		MenuBuilder layoutsMenu = menu.createSubMenu("Layouts");
 
-		MenuBuilder layoutSettings = layoutMenu.createSubMenu("Settings");
+		MenuBuilder applyLayoutMenu = layoutsMenu
+				.createSubMenu("Use algorithm");
+
+		MenuBuilder layoutSettings = applyLayoutMenu.createSubMenu("Settings");
 		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
 
-		layoutMenu.addAction(new SquareLayoutAction());
-		layoutMenu.addAction(new LayoutAction(FRLayout.class,
+		applyLayoutMenu.addAction(new SquareLayoutAction());
+		applyLayoutMenu.addAction(new LayoutAction(FRLayout.class,
 				"Fruchterman-Reingold"));
-		layoutMenu.addAction(new LayoutAction(KKLayout.class, "Kamada-Kawai"));
-		layoutMenu.addAction(new LayoutAction(CircleLayout.class, "Circle"));
+		applyLayoutMenu.addAction(new LayoutAction(KKLayout.class,
+				"Kamada-Kawai"));
+		applyLayoutMenu
+				.addAction(new LayoutAction(CircleLayout.class, "Circle"));
 
-		// MenuBuilder layoutFile = menu.createSubMenu("File");
-
-		menu.addAction(new SaveLayout("Save layout"));
-		MenuBuilder savedLayouts = menu.createSubMenu("Restore layout");
+		layoutsMenu.addAction(new SaveLayout("Save as new"));
+		MenuBuilder restoreLayout = layoutsMenu.createSubMenu("Restore");
 		String[] layoutNames = getNodeLayoutManager().getLayoutNames();
 
 		if (layoutNames.length > 0) {
 			for (int i = 0; i < layoutNames.length; i++) {
-				savedLayouts.addAction(new RestoreLayout(layoutNames[i]));
+				restoreLayout.addAction(new RestoreLayout(layoutNames[i]));
 			}
 		} else {
-			savedLayouts.addLabel("none");
+			restoreLayout.addLabel("none");
+		}
+
+		MenuBuilder deleteLayout = layoutsMenu.createSubMenu("Delete");
+
+		if (layoutNames.length > 0) {
+			for (int i = 0; i < layoutNames.length; i++) {
+				deleteLayout.addAction(new DeleteLayout(layoutNames[i]));
+			}
+		} else {
+			deleteLayout.addLabel("none");
 		}
 
 		/**
@@ -304,6 +319,11 @@ public class NetworkViewer extends NodeViewer {
 		}
 		super.removeNeoNode(nodeUI);
 
+	}
+
+	public void deleteNodeLayout(String name) {
+		NodeLayoutManager layouts = getNodeLayoutManager();
+		layouts.removeLayout(name);
 	}
 
 	/**
@@ -543,7 +563,8 @@ public class NetworkViewer extends NodeViewer {
 					/**
 					 * Layout nodes
 					 */
-					Enumeration<PNeoNode> enumeration = getViewerNodes().elements();
+					Enumeration<PNeoNode> enumeration = getViewerNodes()
+							.elements();
 					PTransformActivity nodeMoveActivity = null;
 					while (enumeration.hasMoreElements()) {
 						PNeoNode node = enumeration.nextElement();
@@ -635,6 +656,22 @@ public class NetworkViewer extends NodeViewer {
 			if (!restoreNodeLayout(layoutName)) {
 				throw new ActionException("Could not restore layout");
 			}
+		}
+	}
+
+	class DeleteLayout extends StandardAction {
+		private static final long serialVersionUID = 1L;
+
+		String layoutName;
+
+		public DeleteLayout(String name) {
+			super("Delete layout: " + name, name);
+			this.layoutName = name;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			deleteNodeLayout(layoutName);
 		}
 	}
 

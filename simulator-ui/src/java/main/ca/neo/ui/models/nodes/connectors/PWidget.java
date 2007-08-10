@@ -2,7 +2,7 @@ package ca.neo.ui.models.nodes.connectors;
 
 import ca.neo.ui.models.PModelConfigurable;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.TooltipBuilder;
+import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
@@ -15,10 +15,6 @@ import ca.shu.ui.lib.util.PopupMenuBuilder;
  * 
  */
 public abstract class PWidget extends PModelConfigurable {
-	@Override
-	protected TooltipBuilder constructTooltips() {
-		return null;
-	}
 
 	private boolean isPermenantlyAttached = true;
 	private PNeoNode nodeParent;
@@ -31,6 +27,16 @@ public abstract class PWidget extends PModelConfigurable {
 	public PWidget(PNeoNode nodeParent, Object model) {
 		super(model);
 		init(nodeParent);
+	}
+
+	@Override
+	protected TooltipBuilder constructTooltips() {
+
+		TooltipBuilder tooltips = new TooltipBuilder(getName() + "("
+				+ getTypeName() + ") attached to " + nodeParent.getName());
+
+		return tooltips;
+
 	}
 
 	@Override

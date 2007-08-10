@@ -3,14 +3,18 @@ package ca.neo.ui.models.nodes;
 import java.io.File;
 import java.io.IOException;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import ca.neo.io.FileManager;
 import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
 import ca.neo.plot.Plotter;
-import ca.neo.ui.models.TooltipBuilder;
+import ca.neo.ui.exceptions.ModelConfigurationException;
 import ca.neo.ui.models.icons.EnsembleIcon;
+import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
+import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -164,5 +168,11 @@ public class PEnsemble extends PNodeContainer {
 
 		}
 
+	}
+
+	@Override
+	protected Object configureModel(PropertySet configuredProperties)
+			throws ModelConfigurationException {
+		throw new NotImplementedException();
 	}
 }

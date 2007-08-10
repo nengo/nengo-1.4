@@ -1,4 +1,4 @@
-package ca.neo.ui.models;
+package ca.neo.ui.models.tooltips;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -46,8 +46,7 @@ public class GTooltip extends WorldObject {
 		while (it.hasNext()) {
 			TooltipPart part = it.next();
 
-			strBd.append(part.getPropertyName() + ": "
-					+ part.getPropertyValue() + "\n");
+			strBd.append(part.toString() + "\n");
 		}
 		GText propertyText = new GText(strBd.toString());
 		propertyText.setOffset(0, tag.getHeight() + 10);

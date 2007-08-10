@@ -1,4 +1,4 @@
-package ca.neo.ui.models;
+package ca.neo.ui.models.tooltips;
 
 import java.util.Collection;
 import java.util.Vector;

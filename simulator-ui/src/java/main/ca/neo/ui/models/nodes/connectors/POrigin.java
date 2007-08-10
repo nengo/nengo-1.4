@@ -2,11 +2,18 @@ package ca.neo.ui.models.nodes.connectors;
 
 import java.util.Vector;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
+import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
+import ca.neo.ui.exceptions.ModelConfigurationException;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
+import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Tooltip;
@@ -27,43 +34,39 @@ public class POrigin extends PWidget {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void setVisible(boolean isVisible) {
-		super.setVisible(isVisible);
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
 
-		lineWell.setVisible(isVisible);
+		tooltips.addPart(new PropertyPart("Dimensions", ""
+				+ getModel().getDimensions()));
 
+		try {
+			InstantaneousOutput value = getModel().getValues();
+
+			tooltips.addPart(new PropertyPart("Time: ", "" + value.getTime()));
+			tooltips.addPart(new PropertyPart("Units: ", "" + value.getUnits()));
+
+		} catch (SimulationException e) {
+		}
+
+		return tooltips;
 	}
 
 	static final String typeName = "Origin";
 
-	OriginWell lineWell;
+	private Vector<MyLineEnd> ends;
+
+	MyWell lineWell;
 
 	public POrigin(PNeoNode nodeParent, Origin origin) {
 		super(nodeParent);
 
 		setModel(origin);
-		lineWell = new OriginWell();
+		lineWell = new MyWell();
 
-		setIcon(new OriginIcon(this, lineWell));
+		setIcon(new MyIcon(this, lineWell));
 
 		this.setDraggable(false);
-
-	}
-
-	public boolean disconnectModelFrom(PTermination target) {
-		if (target != null) {
-			Util.debugMsg("Projection removed " + target.getName());
-			try {
-				getNodeParent().getParentNetwork()
-						.removeProjection(target.getModelTermination());
-				return true;
-			} catch (StructuralException e) {
-				Util.Warning("Could not disconnect: " + e.toString());
-			}
-			return false;
-		} else {
-			return true;
-		}
 
 	}
 
@@ -80,9 +83,64 @@ public class POrigin extends PWidget {
 	 *            connection
 	 */
 	public void connectTo(PTermination term, boolean modifyModel) {
-		OriginEnd lineEnd = lineWell.createConnection();
+		MyLineEnd lineEnd = lineWell.createConnection();
 		lineEnd.connectTo(term, modifyModel);
 
+	}
+
+	public boolean disconnectModelFrom(PTermination target) {
+		if (target != null) {
+			Util.debugMsg("Projection removed " + target.getName());
+			try {
+				getNodeParent().getParentNetwork().removeProjection(
+						target.getModelTermination());
+				return true;
+			} catch (StructuralException e) {
+				Util.Warning("Could not disconnect: " + e.toString());
+			}
+			return false;
+		} else {
+			return true;
+		}
+
+	}
+
+	@Override
+	public PropDescriptor[] getConfigSchema() {
+		Util.Error("POrigin is not configurable yet");
+		return null;
+	}
+
+	@Override
+	public String getName() {
+
+		return getModel().getName();
+	}
+
+	@Override
+	public String getTypeName() {
+		// TODO Auto-generated method stub
+		return typeName;
+	}
+
+	@Override
+	public void setVisible(boolean isVisible) {
+		super.setVisible(isVisible);
+
+		lineWell.setVisible(isVisible);
+
+	}
+
+	protected void addOriginEnd(MyLineEnd end) {
+		if (ends == null)
+			ends = new Vector<MyLineEnd>();
+		ends.add(end);
+	}
+
+	@Override
+	protected Object configureModel(PropertySet configuredProperties)
+			throws ModelConfigurationException {
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -95,8 +153,8 @@ public class POrigin extends PWidget {
 		Util.debugMsg("Projection added " + target.getName());
 		try {
 
-			getNodeParent().getParentNetwork().addProjection(
-					getModelOrigin(), target.getModelTermination());
+			getNodeParent().getParentNetwork().addProjection(getModel(),
+					target.getModelTermination());
 
 			// getWorld().showTooltip(new ConnectedTooltip("Connected"),
 			// target);
@@ -106,22 +164,6 @@ public class POrigin extends PWidget {
 			Util.Warning("Could not connect: " + e.getMessage());
 			return false;
 		}
-	}
-
-	@Override
-	public String getName() {
-
-		return getModelOrigin().getName();
-	}
-
-	public Origin getModelOrigin() {
-		return (Origin) getModel();
-	}
-
-	@Override
-	public String getTypeName() {
-		// TODO Auto-generated method stub
-		return typeName;
 	}
 
 	/*
@@ -145,25 +187,27 @@ public class POrigin extends PWidget {
 		super.prepareForDestroy();
 	}
 
-	private Vector<OriginEnd> ends;
-
-	protected void addOriginEnd(OriginEnd end) {
-		if (ends == null)
-			ends = new Vector<OriginEnd>();
-		ends.add(end);
-	}
-
-	protected void removeOriginEnd(OriginEnd end) {
+	protected void removeOriginEnd(MyLineEnd end) {
 		ends.remove(end);
 	}
 
-	class OriginEnd extends LineEnd {
+	class MyIcon extends ModelIcon {
 
-		@Override
-		protected void prepareForDestroy() {
-			removeOriginEnd(this);
-			super.prepareForDestroy();
+		private static final long serialVersionUID = 1L;
+
+		public MyIcon(PModel parent, WorldObject lineEnd) {
+			super(parent, lineEnd);
+
+			configureLabel(false);
+
+			// TODO Auto-generated constructor stub
 		}
+
+	}
+
+	class MyLineEnd extends LineEnd {
+
+		private static final long serialVersionUID = 1L;
 
 		/**
 		 * 
@@ -171,13 +215,11 @@ public class POrigin extends PWidget {
 		 * @param modifyModelOnFirstConnection
 		 *            Whether to modify the NEO Model on the first connection
 		 */
-		public OriginEnd(LineEndWell well) {
+		public MyLineEnd(LineEndWell well) {
 
 			super(well);
 			addOriginEnd(this);
 		}
-
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected boolean canConnectTo(ILineAcceptor target) {
@@ -189,7 +231,8 @@ public class POrigin extends PWidget {
 		}
 
 		@Override
-		protected boolean initConnection(ILineAcceptor target, boolean modifyModel) {
+		protected boolean initConnection(ILineAcceptor target,
+				boolean modifyModel) {
 			if (!(target instanceof PTermination))
 				return false;
 			if (modifyModel) {
@@ -215,30 +258,17 @@ public class POrigin extends PWidget {
 
 		}
 
-	}
-
-	class OriginIcon extends ModelIcon {
-
-		private static final long serialVersionUID = 1L;
-
-		public OriginIcon(PModel parent, WorldObject lineEnd) {
-			super(parent, lineEnd);
-
-			configureLabel(false);
-
-			// TODO Auto-generated constructor stub
-		}
-
-	}
-
-	class OriginWell extends LineEndWell {
-
-		private static final long serialVersionUID = 1L;
-
 		@Override
-		protected LineEnd constructLineEnd() {
-			return new OriginEnd(this);
+		protected void prepareForDestroy() {
+			removeOriginEnd(this);
+			super.prepareForDestroy();
 		}
+
+	}
+
+	class MyWell extends LineEndWell {
+
+		private static final long serialVersionUID = 1L;
 
 		/**
 		 * 
@@ -247,18 +277,22 @@ public class POrigin extends PWidget {
 		 *            underneath
 		 * @return
 		 */
-		public OriginEnd createConnection() {
-			OriginEnd lineEnd = new OriginEnd(this);
+		public MyLineEnd createConnection() {
+			MyLineEnd lineEnd = new MyLineEnd(this);
 			super.addLineEnd(lineEnd);
 			return lineEnd;
+		}
+
+		@Override
+		protected LineEnd constructLineEnd() {
+			return new MyLineEnd(this);
 		}
 
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
-		Util.Error("POrigin is not configurable yet");
-		return null;
+	public Origin getModel() {
+		return (Origin) super.getModel();
 	}
 }
 

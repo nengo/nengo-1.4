@@ -6,10 +6,11 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.plot.Plotter;
+import ca.neo.ui.exceptions.ModelConfigurationException;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.TooltipBuilder;
-import ca.neo.ui.models.TooltipPart;
 import ca.neo.ui.models.icons.FunctionInputIcon;
+import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.views.objects.configurable.IConfigurable;
 import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.neo.ui.views.objects.configurable.managers.PropertySet;
@@ -62,7 +63,8 @@ public class PFunctionInput extends PNeoNode {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected Node configureModel(PropertySet props) {
+	protected Node configureModel(PropertySet props)
+			throws ModelConfigurationException {
 
 		Function function = (Function) props.getProperty(pFunction);
 		int dimensions = function.getDimension();
@@ -79,11 +81,10 @@ public class PFunctionInput extends PNeoNode {
 			return new FunctionInput((String) props.getProperty(pName),
 					functions, Units.UNK);
 		} catch (StructuralException e) {
-			Util.Warning(e.toString());
+			throw new ModelConfigurationException(e.getMessage());
 
-			this.removeFromParent();
 		}
-		return null;
+
 	}
 
 	@Override
@@ -115,7 +116,7 @@ public class PFunctionInput extends PNeoNode {
 	protected TooltipBuilder constructTooltips() {
 		TooltipBuilder tooltips = super.constructTooltips();
 
-		tooltips.addPart(new TooltipPart("# Functions", ""
+		tooltips.addPart(new PropertyPart("# Functions", ""
 				+ getModel().getFunctions().length));
 
 		return tooltips;

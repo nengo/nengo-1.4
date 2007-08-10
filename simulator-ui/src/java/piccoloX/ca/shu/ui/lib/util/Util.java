@@ -49,8 +49,9 @@ public class Util {
 	}
 
 	public static void Warning(String msg) {
-		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
-				"Warning", JOptionPane.WARNING_MESSAGE);
+//		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
+//				"Warning", JOptionPane.WARNING_MESSAGE);
+		Assert(false, msg);
 	}
 
 	public static void Assert(boolean bool, String msg) {

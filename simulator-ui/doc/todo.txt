@@ -1,8 +1,10 @@
 *******************************************
  Done
 *******************************************
-(08/10) - Two phase fade-in for tooltips (they turn opaque after 2.5 seconds)
+(08/10) - Show information on Origins and terminations
+(08/10) - Made tooltips follow the camera on zoom
 
+(08/10) - Two phase fade-in for tooltips (they turn opaque after 2.5 seconds)
 (08/10) - Option to load other networks& ensembles from within networks
 (08/10) - Added option to minimize/close all windows
 (08/10) - Performance debugging, fixed some memory leaks with Windows & Viewers. 
@@ -43,6 +45,10 @@ done- There should be either scrollbars or a fit-on-screen function (I
 *******************************************
  Pri 0 - doing next
 *******************************************
+Create functions with dimensions
+
+create exceptions
+
 Bug: Could not receive keyboard events from piccolo
 make text window for inputting doumentation bigger
 

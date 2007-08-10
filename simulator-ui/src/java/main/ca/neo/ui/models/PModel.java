@@ -6,6 +6,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import ca.neo.ui.models.tooltips.GTooltip;
+import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.handlers.Interactable;

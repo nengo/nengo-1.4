@@ -19,9 +19,10 @@ import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.nodes.connectors.PWidget;
 import ca.neo.ui.models.nodes.widgets.GProbe;
+import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -412,11 +413,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	}
 
-	@Override
-	protected Object configureModel(PropertySet configuredProperties) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -496,9 +492,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 		TooltipBuilder tooltips = new TooltipBuilder(getName() + "("
 				+ getTypeName() + ")");
 
-		tooltips.addPart(new TooltipPart("Documentation", getModel()
+		tooltips.addPart(new PropertyPart("Documentation", getModel()
 				.getDocumentation()));
-		tooltips.addPart(new TooltipPart("Simulation mode", getModel()
+		tooltips.addPart(new PropertyPart("Simulation mode", getModel()
 				.getMode().toString()));
 
 		return tooltips;

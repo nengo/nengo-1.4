@@ -11,9 +11,9 @@ import ca.neo.model.SimulationException;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.TooltipBuilder;
-import ca.neo.ui.models.TooltipPart;
 import ca.neo.ui.models.icons.ModelIcon;
+import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -220,7 +220,7 @@ public class GProbe extends PModel {
 	@Override
 	protected TooltipBuilder constructTooltips() {
 		TooltipBuilder tooltips = new TooltipBuilder("Probe");
-		tooltips.addPart(new TooltipPart("Attached to", getModel()
+		tooltips.addPart(new PropertyPart("Attached to", getModel()
 				.getStateName()));
 		return tooltips;
 	}

@@ -8,9 +8,9 @@ import ca.neo.io.FileManager;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.TooltipBuilder;
-import ca.neo.ui.models.TooltipPart;
 import ca.neo.ui.models.actions.SaveNodeContainerAction;
+import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -155,7 +155,7 @@ public abstract class PNodeContainer extends PNeoNode {
 	protected TooltipBuilder constructTooltips() {
 		TooltipBuilder tooltips = super.constructTooltips();
 
-		tooltips.addPart(new TooltipPart("# Nodes", "" + getNodesCount()));
+		tooltips.addPart(new PropertyPart("# Nodes", "" + getNodesCount()));
 		return tooltips;
 	}
 
