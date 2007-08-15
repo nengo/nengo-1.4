@@ -1,0 +1,53 @@
+
+** ver_2_4 [26-apr-2004] :
+
+- inline config feature was in fact buggy! now done properly with a
+  separate 'inline_cfg' applet parameter.
+- more informative error messages (e.g. when invalid config file).
+- bug fix: keyboard shortcuts in 2D viewports now work properly.
+
+
+** ver_2_3  [07-jul-2002] :
+
+- bug fix: a 1mm slice thickness was assumed by the commands
+  changing the displayed slice (+/-, arrows, etc).
+- util/jiv.pl : added -force command line switch.
+
+
+** [21-apr-2002] :
+
+- documentation update: config file can also be provided inline
+  within the applet html tag.
+- util/minc2jiv.pl : added -force command line switch.
+
+
+** ver_2_2  [20-dec-2001] :
+
+- new colormap: mni_labels .
+- bug fixes related to image-value: negative/zero values, 
+  display updating.
+- optimization: volumes that don't need resampling or reordering
+  now load much faster (important for slow Java platforms, 
+  e.g. Netscape on Unix).
+- minor optimization in the multi-threading code: JIV may 
+  be more responsive on some platforms.
+
+
+** ver_2_1  [15-nov-2001] :
+
+- bug fix: 'quit' was crashing some browsers.
+- minor improvement in the multi-threading code: JIV may 
+  be more responsive on some platforms.
+
+
+** ver_2_0  [8-oct-2001] :
+
+- new features: on_demand and hybrid download modes; support
+  for arbitrary sampling of the 3D image data files!
+
+
+** ver_1_3  [16-may-2001] :
+
+- first public release
+
+

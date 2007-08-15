@@ -1,0 +1,222 @@
+%
+% file: internals.tex
+%
+% author: Chris Cocosco <crisco@bic.mni.mcgill.ca>
+%
+
+\documentclass[11pt]{article} 
+\usepackage{times}
+\usepackage{mathptm}
+\usepackage{epsfig}
+
+\topmargin=-0.6in
+\textwidth=6.4in
+\textheight=9in
+\oddsidemargin=0.1in
+\evensidemargin=0.1in
+
+\title{JIV Internals}
+\author{Chris A.\ Cocosco \\
+ \small{$<$\texttt{crisco@bic.mni.mcgill.ca}$>$} }
+% FIXME: find a way to automatically include the version number (or
+% released date)?
+%\date{}
+
+\begin{document}
+%\psdraft
+
+\maketitle
+\thispagestyle{empty}
+
+\vfill
+\newpage
+
+\tableofcontents
+\listoffigures
+\newpage
+
+\newcommand{\estimate}[2]{[~{\em estimated time required:} {#1}~hrs~{#2}]}
+
+
+\section{Program Design and Organization}
+
+\subsection{Overview}
+\begin{enumerate}
+\item The overall design is an object-oriented one. The class
+  hierarchy (presented in section~\ref{sec:tree}) attempts to separate
+  the common parts of different classes, where possible.
+  
+  The object interfaces (i.e.\ the inter-class communication) are
+  using Java~1.1~AWT's \linebreak \texttt{ImageProducer/ImageObserver}
+  and \texttt{EventProducer/EventListener} models.  This makes it easy
+  to further expand (and possibly reuse) the software, and to
+  interchangeably use \mbox{standard} Java AWT user-interface \&
+  image-processing components or custom-written components (AWT is the
+  graphical/user-interface part of the standard Java~1.x API).
+  
+\item Most basic graphical user interface (GUI) building blocks
+  (components) are provided by AWT\@.  
+  A peculiarity of AWT is that it uses the GUI components provided by
+  the underlying platform; while this makes it easier for the user, it
+  also makes it harder for the programmer (testing only on one Java
+  environment is definitely not enough).
+
+\item Individual volume images are processed and displayed in 8-bit
+  indexed-color mode (see figure~\ref{fig:IndividualDataVolumePanel})
+  --- in fact, in the JIV input file format the voxel data (intensity
+  level) is 8-bit anyway. Moreover, this way the colormap adjustments
+  only need to change the palette: it's much faster to change 256
+  values rather than $181 \times 217$~!
+  
+  Combined (blended) volume images are processed and displayed in true
+  color mode (see figure~\ref{fig:CombinedDataVolumePanel}) --- color
+  blendings/transitions wouldn't look good if reduced to 256 (8-bit)
+  colors.
+
+\item Internally, the cursor position is stored as world coordinates
+  (float values); this offers more flexibility for future functionality.
+  However, inside the slice viewports the visible (cross-hair) cursor
+  snaps to the center of the voxels.
+  
+\item For efficiency reasons, the receivers (listeners) of
+  \texttt{PositionEvent}-s are not required to check the range of the
+  new position coordinates received.  Thus, it is the responsibility
+  of the class generating (sending) such events not to send
+  coordinates outside the valid range of the 3D data volume.
+  
+\item In the image viewports (class \texttt{Slice2DViewport}), AWT
+  functions are used for the actual image clipping and scaling (this
+  also speeds up the execution, because these functions are generally
+  implemented by native code libraries). However, the double-buffering
+  of the image viewports had to be explicitly implemented.
+  
+  Also, a clip window is computed for cross-hair cursor and
+  distance-measurement updates. But no clip window is specified for
+  slice change, zoom, pan, and viewport resize operations (not a big
+  problem, since usually for these operations there isn't much more
+  extra screen space, hence the rendering/blit CPU cycles saving won't
+  be significant).
+  
+  The interpolation method used for 2D image scaling is
+  nearest-neighbour (provided by AWT). This was chosen mainly for
+  interactive speed reasons.
+  
+\item In the 2D slice viewports, the field of view (FOV), in the
+  original image space, is preserved (and centered) when the viewport
+  is resized (e.g. when the JIV window is resized). Also, FOV's center
+  is maintained when performing zoom-in/out (i.e.\ when changing the
+  scale factor).
+
+\item When there are several input volumes with different sampling,
+  they are resampled internally to a common sampling during loading (see
+  \texttt{VolumeHeader.java} and \texttt{Data3DVolume.java}).
+
+\item The \emph{on-demand} and \emph{hybrid} data download is
+  implemented using multiple parallel threads, having a lower
+  scheduling priority than the main threads (but not all Java
+  runtime environments honor thread priorities...).
+  
+\item The error handling makes extensive use of Java's elegant
+  exception mechanism (\verb+throw+\ and \verb+catch+). Invalid user
+  inputs is handled by reverting to the previous (valid) value, or to
+  a default value.
+
+\item The code can be divided into two broad groups, based on how it's
+  executed:
+  \begin{description}
+  \item[Initialization:] Code that parses the config file, loads the
+    image data, and builds the entire graphical user interface (GUI)
+    according to the config file (this includes registering ``event
+    listeners'' for all the user-triggered GUI events that we care
+    about). After all this is completed, JIV goes to sleep waiting for
+    events --- from now on, all the execution will be event-driven.
+  \item[Event Handling:] Code that gets called in response to:
+    \begin{description}
+    \item[user-triggered GUI events:] ``\texttt{InputEvent} listener''
+      functions that update the necessary data structures, then issue
+      a request to AWT for the screen to be updated.
+    \item[AWT-triggered (re)paint requests:] Functions that get called
+      by AWT (in response to requests from JIV itself, or from the
+      host graphical/windowing system) whenever parts of the screen
+      need to be redrawn. 
+    \end{description}
+  \end{description}
+
+
+
+\end{enumerate}
+
+
+\subsection{Class Hierarchy}
+\label{sec:tree}
+\input{class-tree} %Ok
+
+\subsection{Class Summary}
+\label{sec:summary}
+\input{class-summary} %Ok
+
+%%%%%% TODO: state diagram for interactions inside Slice2DVport !!??
+
+\begin{figure}[p]
+\begin{center}
+\epsfig{file=figs/IndividualDataVolumePanel.eps,width=\linewidth}
+\end{center}
+\caption[Overview of interactions in
+\texttt{IndividualDataVolumePanel}]{Overview of interactions in
+  \texttt{IndividualDataVolumePanel}. For clarity, the
+  \mbox{\texttt{PositionEvent}} flow is shown separately in the bottom
+  figure. The \mbox{\texttt{PositionEventGateway}} is used for sharing
+  cursor position information with the other volume panels when the
+  \mbox{\emph{Sync all cursors}} mode is active.}
+\label{fig:IndividualDataVolumePanel}
+\end{figure}
+
+\begin{figure}[p]
+\begin{center}
+\epsfig{file=figs/CombinedDataVolumePanel.eps,width=\linewidth}
+\end{center}
+\caption[Overview of interactions in
+\texttt{CombinedDataVolumePanel}]{Overview of interactions in
+  \texttt{CombinedDataVolumePanel}.  For clarity, the
+  \mbox{\texttt{PositionEvent}} flow is shown separately in the bottom
+  figure.}
+\label{fig:CombinedDataVolumePanel}
+\end{figure}
+
+
+\subsection{Implementation: Problems Encountered}
+\label{sec:problems-encountered}
+
+\begin{itemize}
+\item Since existing (no-cost) Java compilers do a very poor job at
+  optimizing the byte-code, time was spent on hand-optimizing the
+  time-consuming bits of the code (needed in order to obtain good
+  interactive response of the viewer).
+\item In Java there's no way of allocating non-primitive data types
+  (objects) on the stack (for local/temporary variables); only a
+  reference (pointer) to objects can go on the stack. Moreover, the
+  heap memory manager (which uses a garbage-collection model) of
+  Java~1.1 runtime environments seems not to be very efficient in
+  terms of overhead time and memory usage. Thus, in order to improve
+  the response time, and also minimize the memory footprint increase
+  during execution, most local object variables that are frequently
+  used were manually pre-allocated and reused after that; such
+  variables are named \verb+__methodname_variablename+.
+\item The development environment used (IBM JDK for Linux,
+  version~1.1.8 -- a port of Sun's JDK~1.1.8) has several serious bugs
+  in the compiler.  Workarounds had to be found \ldots Also, there's
+  also a significant memory leak in one standard AWT class: 
+  \verb+java.awt.image.ReplicateScaleFilter+.
+%   more: x-platform portability (Win32: popups, auto-repeating
+%   keys, MouseEvent bugs, scrollbars returning vals out of range,
+%   \ldots)
+  
+\item The file \verb+jiv/JAVA_NOTES+ (in the source code directory)
+  contains more notes about undocumented/obscure issues with the Java
+  language and the version 1.1 JDK (Java Development Kit) \ldots
+
+\end{itemize}
+
+
+\end{document}
+

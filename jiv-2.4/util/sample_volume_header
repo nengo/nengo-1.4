@@ -1,0 +1,7 @@
+
+size   :  100 60 180
+start  :  -90 31.53 -72
+step   :  1.45 -2.67 0.89
+order  :  y z x
+
+imagerange  :  0 753709.72

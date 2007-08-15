@@ -1,0 +1,143 @@
+
+\newcommand{\entityintro}[3]{ \item[{#1}] ~\\ {#3} }
+\newenvironment{entityenvironment}{\begin{description}}{\end{description}}
+
+%%%%%%
+% Helper command:
+%
+% ls -1 jiv > _sorted_java_files
+% /data/web/tools/java/Linux/IBMJava2-13/bin/javadoc -output texdoclet/doc.tex -doclet com.c2_tech.doclets.TexDoclet -docletpath /data/nil/crisco/lib/java/texdoclet.jar -noinherited -package @_sorted_java_files
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%\newcommand{\entityintro}[3]{ \subparagraph{{#1}} {#3} }
+
+% \newcommand{\entityintro}[3]{%
+%   \hbox to \hsize{%
+%     \vbox{%
+%       \hbox to .2in{}%
+%     }%
+%     {\bf #1}%
+%   }
+%   \makebox[\hsize]{%
+%     \parbox{.4in}{}%
+%     \parbox[l]{5in}{%
+%       \vspace{1mm}\it%
+%       #3%
+%       \vspace{1mm}%
+%     }%
+%   }%
+% }
+
+\subsubsection{Interfaces}
+\begin{entityenvironment}
+\entityintro{ColormapListener}{l0}{The interface that all {\tt ColormapEvent} listener
+ (receiver) classes must implement.}
+\entityintro{DataVolumePanel.CoordinateTypes}{l1}{Support interface for the inner class
+ {\tt DataVolumePanel.CoordinateFields}.}
+\entityintro{IndividualDataVolumePanel.ColormapControlMenus}{l2}{Support interface for the inner class
+ {\tt IndividualDataVolumePanel.ColormapControl}.}
+\entityintro{IndividualDataVolumePanel.ColormapDisplayConstants}{l3}{Support interface for the inner class
+ {\tt IndividualDataVolumePanel.ColormapDisplay}.}
+\entityintro{PositionGenerator}{l4}{The interface that all classes sending {\tt PositionEvent}-s
+ must implement.}
+\entityintro{PositionListener}{l5}{The interface that all {\tt PositionEvent} listener
+ (receiver) classes must implement.}
+\end{entityenvironment}
+   
+\subsubsection{Classes}
+\begin{entityenvironment}
+\entityintro{About}{l6}{Static class providing text descriptions (including copyright 
+ and license) for this software.}
+\entityintro{ChoiceMenu}{l7}{A choice menu that allows to select one item from it, radio-buttons
+ style.}
+\entityintro{ColorCoding}{l8}{Produces 8bit colormaps (palettes), according to given
+ specifications.}
+\entityintro{ColormapEvent}{l9}{An event type used for communicating colormap changes.}
+\entityintro{CombinedDataVolumePanel}{l10}{Implements the volume panel functionality specific to panels
+ displaying a combination of two image volumes.}
+\entityintro{CombinedDataVolumePanel.BlendedCombinedImageSource}{l11}{Member (inner) class: a {\tt CombinedImageSource} that
+ uses an adjustable blending factor for combining two images
+ (in RGB color space).}
+\entityintro{CombinedDataVolumePanel.BlendedCombinedImageSource.ByteColormapEntries}{l12}{helper class (a member$/$inner class)}
+\entityintro{CombinedDataVolumePanel.BlendedCombinedImageSource.ShortColormapEntries}{l13}{helper class (a member$/$inner class)}
+\entityintro{CombinedDataVolumePanel.BlendControl}{l14}{Member (inner) class: the user interface input controls for
+ adjusting the blending factor.}
+\entityintro{CombinedImageSource}{l15}{Template for a class that combines two source images into one
+ output image using the
+ {\tt ImageProducer}$/${\tt ImageConsumer}
+ interfaces.}
+\entityintro{CombinedImageSource.InputReader}{l16}{Inner (member) class: the interface to the source
+ {\tt ImageProducer}-s.}
+\entityintro{CoordConv}{l17}{Functions for converting 3D positions between the "voxel" (array
+ index) and "world" coordinate systems.}
+\entityintro{CoronalSlice2DViewport}{l18}{A {\tt Slice2DViewport} customized for "coronal"
+ (Y=constant) slices.}
+\entityintro{CoronalSliceImageProducer}{l19}{A {\tt SliceImageProducer} customized for "coronal"
+ (Y=constant) 2D slices.}
+\entityintro{Data3DVolume}{l20}{Loads, stores, and provides access to a 3D image volume.}
+\entityintro{DataVolumePanel}{l21}{Provides the functionality common for both volume panel types
+ (individual and combined).}
+\entityintro{DataVolumePanel.CoordinateFields}{l22}{Member (inner) class: the textual coordinate display$/$input
+ boxes ("fields").}
+\entityintro{Help}{l23}{Static class providing the help text functionality.}
+\entityintro{IndividualDataVolumePanel}{l24}{Provides the volume panel functionality specific to panels
+ displaying a single image volume.}
+\entityintro{IndividualDataVolumePanel.ColormapControl}{l25}{Member (inner) class : the user interface input
+ controls for adjusting the colormap.}
+\entityintro{IndividualDataVolumePanel.ColormapDisplay}{l26}{Member (inner) class: produces a visual representation of
+ the current colormap.}
+\entityintro{InfoPopupWindow}{l27}{An information popup window, complete with an Ok button to dismiss it.}
+\entityintro{LightweightPanel}{l28}{A "lightweight" alternative to {\tt java.awt.Panel}; it
+ doesn't have a native peer, hence should use fewer system
+ resources.}
+\entityintro{Main}{l29}{The entry-point class, both when running as an applet and when
+ running as a standalone application.}
+\entityintro{Main.VolumeStruct}{l30}{Helper data structure: represents an individual 3D image
+ volume.}
+\entityintro{Main.PanelStruct}{l31}{Helper data structure: represents a GUI panel.}
+\entityintro{MultiLineStringBuffer}{l32}{A buffer for multi-line text.}
+\entityintro{Point3Dfloat}{l33}{A tuple of (x,y,z) floating point coordinates.}
+\entityintro{Point3Dint}{l34}{A tuple of (x,y,z) integer coordinates.}
+\entityintro{PositionEvent}{l35}{An event type used for communicating position (cursor) changes, as
+ "world" coordinates.}
+\entityintro{PositionGateway}{l36}{Provides a gateway ("firewall") for exchanging
+ {\tt PositionEvent}-s between two sets of
+ {\tt PositionListener$/$PositionGenerator}-s.}
+\entityintro{PositionListenerAdapter}{l37}{An adapter (convenience) class for receiving
+ {\tt PositionEvent}-s.}
+\entityintro{PositionSyncMenuItem}{l38}{A menu item that toggles the cursor position sync mode.}
+\entityintro{QuitMenuItem}{l39}{An application 'quit' menu item.}
+\entityintro{Rectangle2}{l40}{An enhancement of the stock AWT {\tt java.awt.Rectangle}.}
+\entityintro{SagittalSlice2DViewport}{l41}{A {\tt Slice2DViewport} customized for "sagittal"
+ (X=constant) slices.}
+\entityintro{SagittalSliceImageProducer}{l42}{A {\tt SliceImageProducer} customized for "sagittal"
+ (X=constant) 2D slices.}
+\entityintro{Slice2DViewport}{l43}{Provides the orientation-independent functionality of displaying 2D
+ slice image data in a viewport, and of allowing the user to
+ interact with it.}
+\entityintro{SliceImageProducer}{l44}{An {\tt ImageProducer} that provides the
+ orientation-independent functionality of producing 2D slice image
+ data.}
+\entityintro{StandaloneAppletContext}{l45}{Provides a (very basic) {\tt AppletContext}, allowing an
+ applet to be run as a standalone application, without an
+ appletviewer or web browser.}
+\entityintro{StandaloneAppletStub}{l46}{Provides a (very basic) {\tt AppletStub}, allowing an
+ applet to be run as a standalone application, without an
+ appletviewer or web browser.}
+\entityintro{TransverseSlice2DViewport}{l47}{A {\tt Slice2DViewport} customized for "transverse"
+ (Z=constant) slices.}
+\entityintro{TransverseSliceImageProducer}{l48}{A {\tt SliceImageProducer} customized for "transverse"
+ (Z=constant) 2D slices.}
+\entityintro{Util}{l49}{A collection of various ({\tt static}) utility functions.}
+\entityintro{VerticalLineComponent}{l50}{A stretchable vertical line (useful as a separator).}
+\entityintro{ViewportCursor}{l51}{A graphical position cursor.}
+\entityintro{ViewportDistanceDisplay}{l52}{Graphically displays a "distance measurement" rubber band, complete
+ with a supplied text.}
+\entityintro{VolumeHeader}{l53}{Loads, stores, and provides access to the header info of a 
+ 3D image volume.}
+\entityintro{VolumeHeader.ResampleTable}{l54}{...no description...}
+\end{entityenvironment}
+

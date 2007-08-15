@@ -1,0 +1,84 @@
+
+** serious:
+
+
+* with j2re1.4.1_02 on linux (cocosco's old laptop), you need this
+runtime jvm option: -Dsun.java2d.pmoffscreen=false
+otherwise, slice viewports won't update properly.
+
+(from http://java.sun.com/products/java-media/2D/perf_graphics.html#33309
+"Disabling offscreen pixmap support can solve some rendering problem")
+
+* on linux, with sun's jre-1.3.1_01-fcs and j2re-{1.4.1_02,142_03}-fcs:
+  some popup menu cmds don't work (no effect): Quit, Sync-all-cursors,
+  tie-colormap sliders
+  (but this bug is not present with "IBMJava2-SDK-13-{20001124,20010626}")
+
+* on linux + java runtime "IBMJava2-SDK-13-{20001124,20010626}", often (but
+not always) all slice viewports are empty or black. 
+
+
+=============================================================================
+
+** minor:
+
+- 'quit' menu cmd doesn't do anything on linux + sun jre-1.4.1-02; but
+interactive ctrl-c does kill the jre
+
+- class ViewportDistanceDisplay: for the distance text, the 
+  xor draw mode, with black as bg_color, doesn't work with MS IE
+  version 6.0.2600.0000  
+
+
+=============================================================================
+
+** unconfirmed:
+
+alex@bic.mni.mcgill.ca :
+noted two bugs (which I unfortunately can't reproduce voluntarily:
+1) I often can't sync the cursors at all. Selecting the option simply
+   doesn't do anything...
+2) After shifting the window off the screen or placing other windows
+   on top of it, I am often left with `empty' image areas.
+I'm running Sun's JRE v1.3.1. Here's the rpm info:
+-------------------------
+Name        : jre                          Relocations: (not relocateable)
+Version     : 1.3.1                             Vendor: Sun Microsystems
+Release     : fcs                           Build Date: Sun 06 May 2001 06:44:01 AM
+EDT
+Install date: Fri 06 Jul 2001 09:13:52 AM EDT      Build Host: lady-linux
+Group       : Development/Tools             Source RPM: jre-1.3.1-fcs.src.rpm
+Size        : 41404507                         License: 1994-2001 Sun Microsystems,
+Inc.
+Packager    : Java Software <jre-comments@java.sun.com>
+URL         : http://java.sun.com/linux
+Summary     : Java(TM) 2 Runtime Environment, Standard Edition
+Description :
+The Java 2 Runtime Enviornment consists of the Java virtual machine,
+the Java platform core classes, and supporting files. It is the runtime
+part of the Java 2 SDK, but without the development tools such as
+compilers and debuggers.
+The JRE is freely redistributable, per the terms of the included
+license, when bundled with Java applets and applications.
+-------------------------
+
+=============================================================================
+
+** inconveniences:
+
+- ? Currently, Slice2DViewport._newSlice(float) _does_not_ operates in
+  "grid-mode", unlike Slice2DViewport._newCursor() ; this is
+  inconsistent, and could be easily fixed...
+
+- on_demand mode doesn't use less memory than hybrid&upfront, as it
+  should; this is because the internal storage is presently fully
+  allocated in Data3DVolume constructor, regardless of download mode;
+  instead, it should be allocated as needed in on_demand mode ...
+
+- header is read if listed in config, while vol data only if used in a panel!
+(confusing)
+
+- frequently, the default font is too large, hence crammed textfields at
+  the bottom of the frame (even with only 4 panels) ...
+
+=============================================================================

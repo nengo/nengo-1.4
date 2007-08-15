@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<!-- $Id: compatibility.html,v 1.10 2003/12/29 00:01:27 crisco Exp $ -->
+<html> <head>
+<title>JIV compatibility information</title>
+</head>
+
+<body>
+<h1>JIV compatibility information</h1>
+
+&quot;JIV&quot; is a <em>Java&nbsp;1.1&nbsp;applet</em>.  It should
+run on any Web browser or appletviewer that properly supports
+Java&nbsp;1.1 (including AWT&nbsp;1.1), as per <a
+href="http://java.sun.com/">Sun</a>'s reference specification.
+The Java support, also known as &quot;Java Virtual Machine&quot; (JVM) or &quot;Java Runtime Environment&quot; (JRE), can be built-in the browser (for example, Netscape Navigator/Communicator version&nbsp;4.x, and Microsoft Internet Explorer), or can be provided by a browser plugin.  Java plugins can be upgraded/replaced independent of the browser.
+
+<p> JIV is quite memory-hungry: every loaded 3D data volume requires
+8-9Mb of memory. For faster interactive response, try to use a Java
+implementation that has a &quot;just-in-time&quot;&nbsp;(JIT)
+compiler.
+
+<p> The following Java environments were tested and appear to work for
+JIV:<br>
+(<em>please contribute corrections and additions</em>)
+
+<h3>Linux (i386)</h3>
+<ul>
+  <li><dl>
+    <dt>IBM JDK for Linux, version&nbsp;1.1.8 (a port of Sun's JDK)
+    <dd>Available at no-cost from IBM.
+	<!-- former url, now dead: www.ibm.com/java/jdk/118/linux/ -->
+	It uses a good JIT compiler, and is the fastest solution 
+	for JIV on Linux. However, it may not work on some modern Linux distributions (in which case use the IBM Java 1.4.1 below).<br>
+	You can download the JRE version from
+	<a href="http://www.bic.mni.mcgill.ca/~crisco/jiv/jre/">here</a>.
+  </dl>
+  <li><dl>
+    <dt>IBM JRE or SDK for Linux, version&nbsp;1.4.1 (a good Linux port of Sun's SDK)
+    <dd>Available at no-cost from 
+	<a href="http://www-106.ibm.com/developerworks/java/jdk/linux140/index.html">www-106.ibm.com/developerworks/java/jdk/linux140/index.html</a>.
+	It uses a good JIT compiler.
+  </dl>
+  <li><dl>
+    <dt> Netscape Navigator/Communicator 4.6-4.7 (built-in Java, but with no JIT compiler, hence slow).
+    <dd>
+  </dl>
+  <li><dl>
+    <dt>Sun JDK for Linux, version&nbsp;1.2.2 (&quot;Java2 SDK, standard edition&quot;)
+    <dd><!-- http://java.sun.com/products/jdk/1.2/ -->
+  </dl>
+  </ul>
+
+<h3>SGI IRIX</h3>
+<ul>
+  <li><dl>
+    <dt>SGI Java Development Environment 3.2 (a port of Sun's JDK
+	1.1.8)
+    <dd>Available at no-cost from
+	<a href="http://www.sgi.com/products/evaluation/6.x_jdk_3.2/">www.sgi.com/products/evaluation/6.x_jdk_3.2/</a>.
+	It has a JIT compiler, and is the recommended platform for
+	IRIX 6.x. (SGI Java 3.1.1 also works, but it may be a bit slower)
+  </dl>
+  <li><dl>
+    <dt>Netscape Navigator/Communicator 4.x (4.08 and later). Built-in Java, but with no JIT compiler.
+    <dd><!-- do any of the sgi-customized versions have jit compilers?? -->
+  </dl>
+  <li><dl>
+    <dt>SGI Java2 Software Development Kit v1.2.1 (a port of Sun's JDK 1.2.1) 
+    <dd>It has a JIT compiler.
+	<!-- http://www.sgi.com/Products/Evaluation/6.x_java2_1.2.1/ -->
+  </dl>
+</ul>
+Several versions of SGI JDK, Java plugins and Netscape browsers are available from 
+<a href="http://www.sgi.com/products/evaluation/">www.sgi.com/products/evaluation/</a>
+(released versions), and
+<a href="http://www.sgi.com/developers/devtools/languages/java.html">www.sgi.com/developers/devtools/languages/java.html</a>
+(development/beta versions).
+  
+<h3>Windows 95/98/NT/2000/etc</h3>
+<ul>
+  <li><dl>
+    <dt> Netscape Navigator/Communicator 4.6-4.7
+    <dd> This uses a fast JIT compiler by Symantec.
+  </dl>
+  <li><dl>
+    <dt> IBM JDK for Windows, version&nbsp;1.1.8 (a port of
+	Sun's JDK)
+    <dd> Available at no-cost from IBM.
+      <!-- former url, now dead? "http://www.ibm.com/java/jdk/118/" -->
+  </dl>
+  <li><dl>
+    <dt> Sun J2SDK for Windows, version&nbsp;1.4.2 
+    <dd> (on WinXP)
+  </dl>
+  <li><dl>
+    <dt> Microsoft Internet Explorer version&nbsp;4 and above, with
+	Microsoft Java&nbsp;VM&nbsp;version&nbsp;5.0&nbsp;<em>build&nbsp;3167</em>
+	(or later)
+    <dd>(older Microsoft Java&nbsp;VM versions, which were shipped
+	with IE4 and with some early IE5 versions, will <em>not</em> do!)
+  </dl>
+</ul>
+
+<h3>MacOS (PowerPC)</h3>
+<ul>
+  <li><dl>
+    <dt> Apple MRJ (Mac OS Runtime for Java) version&nbsp;2.2
+    <dd> Available at no-cost from
+	<a href="http://www.apple.com/java/">www.apple.com/java/</a>.
+	It provides a JVM compatible with Sun's JDK&nbsp;1.1.8, 
+	and can be used in two ways:
+	<ul>
+	  <li>by using the &quot;Applet Runner&quot; 
+	      bundled with it.
+	  <li>by configuring a web browser to use it (MRJ)
+	      as its Java engine. Cooperating browsers include:
+	      Sun's HotJava, iCab (available from
+	      <a href="http://www.icab.de">www.icab.de</a>),
+	      and Microsoft Internet Explorer version&nbsp;4 or later. 
+	</ul>
+  </dl>
+  <li><dl>
+    <dt> Netscape Navigator/Communicator will <em>not</em> do.
+    <dd> (since it doesn't fully support Java AWT 1.1)
+  </dl>
+</ul>
+
+<h3>...Other operating systems</h3>
+<ul>
+  <li><dl>
+    <dt>Netscape Navigator/Communicator version&nbsp;4.x (4.06 or above).
+    <dd>Available for a variety of platforms; it has built-in Java support.
+  </dl>
+  <li><dl>
+  <dt>Sun's Java Runtime 1.1.x or later.
+  <dd>May be available for your platform ... check out <a href="http://java.sun.com/">java.sun.com</a> 
+      (versions not provided by Sun are
+      listed in the &quot;ports&quot; section), or check with your operating system vendor.
+
+  </dl>
+</ul>
+
+<p>
+
+<hr>
+<center>
+<em>Please contribute corrections and additions to this page!</em>
+</center>
+<p>
+<small>
+<address>
+Chris Cocosco
+(<a href="mailto:crisco+jiv@bic.mni.mcgill.ca">crisco+jiv@bic.mni.mcgill.ca</a>)
+<br>
+$Date: 2003/12/29 00:01:27 $ UTC
+</address>
+</small>
+</body> </html>
