@@ -107,6 +107,8 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	}
 
 	/**
+	 * @param weights Each row is used as a 1 by m matrix of weights in a new termination on the nth expandable node
+	 * 
 	 * @see ca.neo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
 	public synchronized Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
