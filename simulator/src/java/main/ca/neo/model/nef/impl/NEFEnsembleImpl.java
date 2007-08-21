@@ -424,7 +424,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @param node Node number 
 	 * @return Radial input to the given node 
 	 */
-	protected float getRadialInput(float[] state, int node) {
+	public float getRadialInput(float[] state, int node) {
 		return MU.prod(state, myEncoders[node]);
 	}
 	
