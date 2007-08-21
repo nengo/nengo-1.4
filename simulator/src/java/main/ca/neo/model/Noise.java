@@ -12,11 +12,12 @@ package ca.neo.model;
 public interface Noise {
 	
 	/**
-	 * @param elapsedTime Elapsed simulation time corresponding to this call
+	 * @param startTime Simulation time at which step starts 
+	 * @param endTime Simulation time at which step ends
 	 * @param input Values which are to be corrupted by noise
 	 * @return The noisy values (inputs corrupted by noise) 
 	 */
-	public float[] getValues(float elapsedTime, float[] input);
+	public float[] getValues(float startTime, float endTime, float[] input);
 	
 	/**
 	 * @return Dimension of input that can be corrupted by noise

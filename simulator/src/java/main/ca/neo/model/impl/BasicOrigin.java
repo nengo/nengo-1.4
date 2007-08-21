@@ -55,7 +55,7 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 
 		float[] v = values;
 		if (myNoise != null) {
-			v = myNoise.getValues(endTime-startTime, values);
+			v = myNoise.getValues(startTime, endTime, values);
 		}
 		
 		myValues = new RealOutputImpl(v, myUnits, endTime);

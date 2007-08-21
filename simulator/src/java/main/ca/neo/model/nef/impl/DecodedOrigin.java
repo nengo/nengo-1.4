@@ -249,7 +249,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		
 		if (myNoise != null) {
 //			values = MU.sum(values, myNoise.getValues(stepSize, values));
-			values = myNoise.getValues(stepSize, values);
+			values = myNoise.getValues(startTime, endTime, values);
 		}
 		
 		myOutput = new RealOutputImpl(values, Units.UNK, endTime);
