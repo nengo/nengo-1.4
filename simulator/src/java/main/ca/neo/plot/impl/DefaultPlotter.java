@@ -34,6 +34,7 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.nef.impl.DecodedOrigin;
+import ca.neo.model.nef.impl.NEFEnsembleImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.plot.Plotter;
 import ca.neo.util.SpikePattern;
@@ -161,7 +162,8 @@ public class DefaultPlotter extends Plotter {
 								
 				ensemble.setMode(SimulationMode.CONSTANT_RATE);
 				for (int j = 0; j < nodes.length; j++) {
-					((NEFNode) nodes[j]).setRadialInput(x[i]*encoders[j][0]);
+//					((NEFNode) nodes[j]).setRadialInput(x[i]*encoders[j][0]);
+					((NEFNode) nodes[j]).setRadialInput(getRadialInput(ensemble, j, x[i]));
 					nodes[j].run(0f, 0f);					
 				}
 				origin.run(null, 0f, 1f);
@@ -183,6 +185,20 @@ public class DefaultPlotter extends Plotter {
 		} catch (SimulationException e) {
 			throw new RuntimeException("Can't plot origin error", e);
 		}
+	}
+	
+	private static float getRadialInput(NEFEnsemble ensemble, int node, float radius) {
+		//plot along preferred direction for multi-dimensional ensembles
+		float radialInput = radius; 
+		if (ensemble.getDimension() == 1) {
+			if (ensemble instanceof NEFEnsembleImpl) {
+				radialInput = ((NEFEnsembleImpl) ensemble).getRadialInput(new float[]{radius}, node);
+			} else {
+				radialInput = radius*ensemble.getEncoders()[node][0];
+			}
+		}
+		
+		return radialInput;
 	}
 	
 	//used by origin plot
@@ -249,8 +265,8 @@ public class DefaultPlotter extends Plotter {
 			XYSeries series = new XYSeries("Neuron " + i);
 			
 			for (int j = 0; j < x.length; j++) {
-				//plot along preferred direction for multi-dimensional ensembles
-				float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j]; 
+//				float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j];
+				float radialInput = getRadialInput(ensemble, i, x[j]);
 				
 				((NEFNode) nodes[i]).setRadialInput(radialInput);
 				try {
