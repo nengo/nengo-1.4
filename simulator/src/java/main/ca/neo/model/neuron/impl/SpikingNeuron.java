@@ -169,6 +169,36 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public String getName() {
 		return myName;
 	}
+	
+	/**
+	 * @return The coefficient that scales summed input    
+	 */
+	public float getScale() {
+		return myScale;
+	}
+
+	/**
+	 * @return The bias current that models unaccounted-for inputs and/or intrinsic currents 
+	 */
+	public float getBias() {
+		return myBias;
+	}
+
+	/**
+	 * @return The SynapticIntegrator used to model dendritic/somatic integration of inputs
+	 * 		to this Neuron
+	 */
+	public SynapticIntegrator getIntegrator() {
+		return myIntegrator;
+	}
+
+	/**
+	 * @return The SpikeGenerator used to model spike generation at the axon hillock of this 
+	 * 		Neuron
+	 */
+	public SpikeGenerator getGenerator() {
+		return myGenerator;
+	}
 
 	/**
 	 * @see ca.neo.model.Node#getTerminations()
