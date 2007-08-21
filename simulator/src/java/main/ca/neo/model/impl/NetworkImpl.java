@@ -52,7 +52,6 @@ public class NetworkImpl implements Network {
 		myNodeMap = new HashMap<String, Node>(20);
 		myProjectionMap	= new HashMap(50);
 		myName = DEFAULT_NAME;
-		mySimulator = new LocalSimulator();
 		myStepSize = .001f; 
 		myProbeables = new HashMap(30);
 		myProbeableStates = new HashMap(30);
@@ -71,7 +70,7 @@ public class NetworkImpl implements Network {
 	}
 	
 	/**
-	 * @return Simulator used to run this Network
+	 * @return Simulator used to run this Network (a LocalSimulator by default) 
 	 */
 	public Simulator getSimulator() {
 		if (mySimulator == null) {
@@ -107,7 +106,7 @@ public class NetworkImpl implements Network {
 		
 		myNodeMap.put(node.getName(), node);
 		
-		mySimulator.initialize(this);
+		getSimulator().initialize(this);
 	}
 
 	/**
@@ -137,7 +136,7 @@ public class NetworkImpl implements Network {
 			throw new StructuralException("No Node named " + name + " in this Network");
 		}
 
-		mySimulator.initialize(this);		
+		getSimulator().initialize(this);		
 	}
 
 	/**
@@ -155,7 +154,7 @@ public class NetworkImpl implements Network {
 		
 		myProjectionMap.put(termination, new ProjectionImpl(origin, termination));
 
-		mySimulator.initialize(this);
+		getSimulator().initialize(this);
 	}
 
 	/**
@@ -175,7 +174,7 @@ public class NetworkImpl implements Network {
 			throw new StructuralException("The Network contains no Projection ending on the specified Termination");
 		}
 		
-		mySimulator.initialize(this);
+		getSimulator().initialize(this);
 	}
 
 	/**
@@ -216,7 +215,7 @@ public class NetworkImpl implements Network {
 	 * @see ca.neo.model.Node#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
-		mySimulator.run(startTime, endTime, myStepSize);
+		getSimulator().run(startTime, endTime, myStepSize);
 	}
 
 	/**
