@@ -103,11 +103,14 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	 * @see ca.neo.model.neuron.Neuron#getOrigin(java.lang.String)
 	 */
 	public Origin getOrigin(String name) throws StructuralException {
-		assert (name.equals(Neuron.AXON) || name.equals(CURRENT)); //this is going to be called a lot, so let's skip the exception
+//		assert (name.equals(Neuron.AXON) || name.equals(CURRENT)); //this is going to be called a lot, so let's skip the exception
+		//Shu: I added the exception back in because the UI needs it for reflection.
 		if (name.equals(Neuron.AXON)) {
 			return mySpikeOrigin;			
-		} else {
+		} else if (name.equals(CURRENT)){
 			return myCurrentOrigin;
+		} else {
+			throw new StructuralException("Origin does not exist");
 		}
 	}
 
