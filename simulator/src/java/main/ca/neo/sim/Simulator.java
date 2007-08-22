@@ -4,6 +4,7 @@
 package ca.neo.sim;
 
 import ca.neo.model.Network;
+import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.util.Probe;
 
@@ -57,6 +58,18 @@ public interface Simulator {
 	 * 		not have the specified state variable
 	 */
 	public Probe addProbe(String ensembleName, int neuronIndex, String state, boolean record) throws SimulationException;
+	
+
+	/**
+	 * @param ensembleName Name of Ensemble containing a Probeable Neuron from which state is to be probed 
+	 * @param neuron Neuron within the specified Ensemble
+	 * @param state The name of the state variable to probe
+	 * @param record Probe retains history if true
+	 * @return A Probe connected to the specified Neuron
+	 * @throws SimulationException if the referenced Neuron can not be found, or is not Probeable, or does 
+	 * 		not have the specified state variable
+	 */
+	public Probe addProbe(String ensembleName, Probeable neuron, String state, boolean record) throws SimulationException;
 	
 	
 	/**

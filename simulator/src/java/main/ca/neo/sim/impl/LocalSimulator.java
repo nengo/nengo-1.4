@@ -123,19 +123,31 @@ public class LocalSimulator implements Simulator {
 	}
 
 	/**
-	 * @see ca.neo.sim.Simulator#addProbe(java.lang.String, int, java.lang.String, boolean)
+	 * @see ca.neo.sim.Simulator#addProbe(java.lang.String, int,
+	 *      java.lang.String, boolean)
 	 */
-	public Probe addProbe(String ensembleName, int neuronIndex, String state, boolean record) throws SimulationException {
+	public Probe addProbe(String ensembleName, int neuronIndex, String state,
+			boolean record) throws SimulationException {
 		Probeable p = getNeuron(ensembleName, neuronIndex);
-		
+
+		return addProbe(ensembleName, p, state, record);
+
+	}
+
+	/**
+	 * @see ca.neo.sim.Simulator#addProbe(java.lang.String, int,
+	 *      java.lang.String, boolean)
+	 */
+	public Probe addProbe(String ensembleName, Probeable neuron, String state,
+			boolean record) throws SimulationException {
+
 		Probe result = new ProbeImpl();
-		result.connect(ensembleName, p, state, record);
-		
+		result.connect(ensembleName, neuron, state, record);
+
 		myProbes.add(result);
-		
+
 		return result;
 	}
-	
 	
 	/**
 	 * @see ca.neo.sim.Simulator#removeProbe(ca.neo.util.Probe)
