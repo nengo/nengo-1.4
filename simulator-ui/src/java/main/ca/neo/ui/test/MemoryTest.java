@@ -17,12 +17,20 @@ import ca.shu.ui.lib.objects.Window;
  *
  */
 public class MemoryTest {
-	static final int NUM_OF_LOOPS = 500;
+	static int i;
 	static NeoGraphics neoGraphics;
+	static NetworkViewer netView;
+	static final int NUM_OF_LOOPS = 500;
 	static Window window;
 	static Window[] windows;
-	static int i;
-	static NetworkViewer netView;
+	public static long getApproximateUsedMemory() {
+		System.gc();
+		System.runFinalization();
+		long totalMemory = Runtime.getRuntime().totalMemory();
+		long free = Runtime.getRuntime().freeMemory();
+		return totalMemory - free;
+	}
+
 	/**
 	 * @param args
 	 */
@@ -80,14 +88,6 @@ public class MemoryTest {
 		System.out.println("*** " + msg + " ***");
 		System.out.println("Approximate used memory: "
 				+ getApproximateUsedMemory() / 1024 + " k");
-	}
-
-	public static long getApproximateUsedMemory() {
-		System.gc();
-		System.runFinalization();
-		long totalMemory = Runtime.getRuntime().totalMemory();
-		long free = Runtime.getRuntime().freeMemory();
-		return totalMemory - free;
 	}
 
 }

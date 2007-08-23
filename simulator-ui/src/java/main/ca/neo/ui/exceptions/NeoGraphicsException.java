@@ -18,13 +18,13 @@ public class NeoGraphicsException extends Exception {
 		// TODO Auto-generated constructor stub
 	}
 
-	public NeoGraphicsException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
+	public NeoGraphicsException(String message) {
+		super(message);
 		// TODO Auto-generated constructor stub
 	}
 
-	public NeoGraphicsException(String message) {
-		super(message);
+	public NeoGraphicsException(String arg0, Throwable arg1) {
+		super(arg0, arg1);
 		// TODO Auto-generated constructor stub
 	}
 
