@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import javax.swing.JPopupMenu;
 
+import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.handlers.Interactable;
@@ -22,7 +23,7 @@ public class LineEnd extends WorldObject implements Interactable {
 	private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
 	private Edge edge;
-	private LineEndIcon myIcon;
+	private LineEndWellIcon myIcon;
 	private ILineAcceptor myTarget;
 	private LineEndWell well;
 
@@ -33,11 +34,13 @@ public class LineEnd extends WorldObject implements Interactable {
 		edge = new Edge(well, this);
 		well.getWorldLayer().addChild(edge);
 
-		myIcon = new LineEndIcon(this);
+		myIcon = new LineEndWellIcon();
+		myIcon.setColor(Style.COLOR_LINEEND);
 		addChild(myIcon);
 		setBounds(getFullBounds());
 		setChildrenPickable(false);
 		// setTangible(false);
+		edge.setPointerVisible(true);
 
 		setDraggable(true);
 	}
@@ -101,7 +104,7 @@ public class LineEnd extends WorldObject implements Interactable {
 	}
 
 	public void setPointerVisible(boolean visible) {
-		myIcon.setPointerVisible(visible);
+		edge.setPointerVisible(visible);
 	}
 
 	public JPopupMenu showContextMenu(PInputEvent event) {

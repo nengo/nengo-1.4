@@ -10,19 +10,19 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class LineEndWellIcon extends WorldObject {
 
+	public static final int _LINE_END_HEIGHT = 30;
+
+	public static final int _LINE_END_WIDTH = 30;
+
+	public static final double ICON_RADIUS = Math
+			.sqrt((_LINE_END_WIDTH * _LINE_END_WIDTH)
+					+ (_LINE_END_HEIGHT * _LINE_END_HEIGHT)) / 2;
 	private static final long serialVersionUID = 1L;
-
-	static final int LINE_END_HEIGHT = 30;
-
-	static final int LINE_END_WIDTH = 30;
-	static final double zICON_RADIUS = Math
-			.sqrt((LINE_END_WIDTH * LINE_END_WIDTH)
-					+ (LINE_END_HEIGHT * LINE_END_HEIGHT)) / 2;
 	private Color color = Style.COLOR_FOREGROUND;
 
 	public LineEndWellIcon() {
 		super();
-		this.setBounds(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);
+		this.setBounds(0, 0, _LINE_END_WIDTH, _LINE_END_HEIGHT);
 		setColor(Style.COLOR_LINEENDWELL);
 
 	}
@@ -43,7 +43,7 @@ public class LineEndWellIcon extends WorldObject {
 		Color bright2 = Util.colorAdd(color, new Color(0.4f, 0.4f, 0.4f));
 		if (paintContext.getScale() < 0.5) {
 			g2.setColor(color);
-			g2.fillOval(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);
+			g2.fillOval(0, 0, _LINE_END_WIDTH, _LINE_END_HEIGHT);
 		} else {
 
 			// AlphaComposite ac;
@@ -61,21 +61,21 @@ public class LineEndWellIcon extends WorldObject {
 			// ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 			// g2.setComposite(ac);
 			g2.setColor(dark);
-			g2.fillOval(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);
+			g2.fillOval(0, 0, _LINE_END_WIDTH, _LINE_END_HEIGHT);
 			g2.setColor(medium);
-			g2.fillOval(LINE_END_WIDTH / 4, 0, LINE_END_WIDTH / 2,
-					LINE_END_HEIGHT);
+			g2.fillOval(_LINE_END_WIDTH / 4, 0, _LINE_END_WIDTH / 2,
+					_LINE_END_HEIGHT);
 			g2.setColor(bright1);
-			g2.fillOval(LINE_END_WIDTH / 6, LINE_END_HEIGHT / 2,
-					2 * LINE_END_WIDTH / 3, LINE_END_HEIGHT / 3);
+			g2.fillOval(_LINE_END_WIDTH / 6, _LINE_END_HEIGHT / 2,
+					2 * _LINE_END_WIDTH / 3, _LINE_END_HEIGHT / 3);
 			g2.setColor(bright2);
-			g2.fillOval(LINE_END_WIDTH / 6 + 2, LINE_END_HEIGHT / 2 + 2,
-					2 * LINE_END_WIDTH / 3 - 4, LINE_END_HEIGHT / 3 - 2);
+			g2.fillOval(_LINE_END_WIDTH / 6 + 2, _LINE_END_HEIGHT / 2 + 2,
+					2 * _LINE_END_WIDTH / 3 - 4, _LINE_END_HEIGHT / 3 - 2);
 			// ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f);
 			// g2.setComposite(ac);
 			g2.setColor(hilite);
-			g2.fillOval(LINE_END_WIDTH / 3 - 1, LINE_END_HEIGHT / 6,
-					LINE_END_WIDTH / 3 + 2, 3 * LINE_END_HEIGHT / 16);
+			g2.fillOval(_LINE_END_WIDTH / 3 - 1, _LINE_END_HEIGHT / 6,
+					_LINE_END_WIDTH / 3 + 2, 3 * _LINE_END_HEIGHT / 16);
 		}
 	}
 

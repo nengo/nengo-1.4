@@ -7,6 +7,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.objects.lines.LineEndWellIcon;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.nodes.PPath;
 
@@ -27,10 +28,23 @@ public class GEdge extends PPath implements PropertyChangeListener {
 	protected WorldObject startNode;
 
 	boolean hideByDefault;
+	PointerTriangle pointer;
 
 	double minArcRadius = 200;
 
 	LineShape myLineType = LineShape.STRAIGHT;
+
+	public void setPointerVisible(boolean visible) {
+		if (!visible) {
+			pointer.removeFromParent();
+			pointer = null;
+		} else {
+			if (pointer == null) {
+				pointer = new PointerTriangle(this);
+				addChild(pointer);
+			}
+		}
+	}
 
 	public GEdge(WorldObject startNode, WorldObject endNode) {
 		super();
@@ -170,6 +184,12 @@ public class GEdge extends PPath implements PropertyChangeListener {
 			break;
 		}
 
+		if (pointer != null) {
+			pointer.setOffset(endBounds.getX() ,
+					endBounds.getY() );
+
+		}
+
 	}
 
 	private void createArc(Point2D startBounds, Point2D endBounds,
@@ -300,4 +320,62 @@ public class GEdge extends PPath implements PropertyChangeListener {
 	public static enum State {
 		DEFAULT, HIGHLIGHT
 	}
+}
+
+class PointerTriangle extends GEdge {
+
+	private static final long serialVersionUID = 1L;
+
+	static final double TRIANGLE_EDGE_LENGTH = 13;
+
+	public PointerTriangle(GEdge parentEdge) {
+		super(parentEdge.getStartNode(), parentEdge.getEndNode());
+		setPaint(Style.COLOR_LINEEND);
+
+		setBounds(-TRIANGLE_EDGE_LENGTH / 2, -TRIANGLE_EDGE_LENGTH / 2,
+				TRIANGLE_EDGE_LENGTH, TRIANGLE_EDGE_LENGTH);
+	}
+
+	@Override
+	public void updateEdge() {
+		updatePointer();
+	}
+
+	protected void updatePointer() {
+
+		/*
+		 * Find the angle between well and end
+		 */
+		// LineEndWell well = getStartNode();
+		Point2D startPosition = getStartNode().localToGlobal(
+				getStartNode().getBounds().getOrigin());
+		Point2D endPosition = getEndNode().localToGlobal(
+				getEndNode().getBounds().getOrigin());
+
+		double deltaX = endPosition.getX() - startPosition.getX();
+		double deltaY = endPosition.getY() - startPosition.getY();
+
+		double angle = Math.atan2(deltaY, deltaX);
+
+		double x = Math.cos(angle + Math.PI) * LineEndWellIcon.ICON_RADIUS;
+		double y = Math.sin(angle + Math.PI) * LineEndWellIcon.ICON_RADIUS;
+		Point2D point0 = new Point2D.Double(x, y);
+
+		// System.out.println("angle: " + angle);
+		x += Math.cos(angle + Math.PI * (5d / 6d)) * TRIANGLE_EDGE_LENGTH;
+		y += Math.sin(angle + Math.PI * (5d / 6d)) * TRIANGLE_EDGE_LENGTH;
+		Point2D point1 = new Point2D.Double(x, y);
+
+		x += Math.cos(angle + Math.PI * (3d / 2d)) * TRIANGLE_EDGE_LENGTH;
+		y += Math.sin(angle + Math.PI * (3d / 2d)) * TRIANGLE_EDGE_LENGTH;
+		Point2D point2 = new Point2D.Double(x, y);
+
+		Point2D[] path = { point0, point1, point2 };
+
+		// this.setPaint(Color.black);
+		this.setPathToPolyline(path);
+		this.closePath();
+
+	}
+
 }
