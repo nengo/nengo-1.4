@@ -11,7 +11,7 @@ public class NetworkUIConfiguration implements Serializable {
 	private String fileName;
 
 	private String folderName;
-	private Hashtable<String, NodeLayout> layouts;
+	private final Hashtable<String, NodeLayout> layouts;
 
 	public NetworkUIConfiguration(String defaultFileName) {
 		super();
@@ -21,6 +21,14 @@ public class NetworkUIConfiguration implements Serializable {
 
 	public void addLayout(NodeLayout e) {
 		layouts.put(e.getName(), e);
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public String getFolderName() {
+		return folderName;
 	}
 
 	public NodeLayout getLayout(String name) {
@@ -41,16 +49,8 @@ public class NetworkUIConfiguration implements Serializable {
 		return layouts.remove(name);
 	}
 
-	public String getFileName() {
-		return fileName;
-	}
-
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
-	}
-
-	public String getFolderName() {
-		return folderName;
 	}
 
 	public void setFolderName(String folderName) {

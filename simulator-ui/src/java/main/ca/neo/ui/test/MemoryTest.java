@@ -13,8 +13,9 @@ import ca.shu.ui.lib.objects.Window;
 
 /**
  * Just a quick check of memory leaks in Network Viewer
+ * 
  * @author Shu
- *
+ * 
  */
 public class MemoryTest {
 	static int i;
@@ -23,6 +24,7 @@ public class MemoryTest {
 	static final int NUM_OF_LOOPS = 500;
 	static Window window;
 	static Window[] windows;
+
 	public static long getApproximateUsedMemory() {
 		System.gc();
 		System.runFinalization();
@@ -51,11 +53,11 @@ public class MemoryTest {
 						try {
 							network = new PNetwork(FuzzyLogicExample
 									.createNetwork());
-							
+
 							network.openViewer();
-//							
-//							netView = new NetworkViewer(network);
-//							
+							//							
+							// netView = new NetworkViewer(network);
+							//							
 							window = new Window(neoGraphics.getWorld()
 									.getGround(), network);
 						} catch (StructuralException e) {
@@ -68,8 +70,8 @@ public class MemoryTest {
 
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-//						network.destroy()
-//						netView.destroy();
+						// network.destroy()
+						// netView.destroy();
 						window.destroy();
 					}
 				});

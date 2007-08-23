@@ -11,6 +11,7 @@ public class PropertySet {
 		super();
 		this.properties = properties;
 	}
+
 	public Object getProperty(PropDescriptor obj) {
 		return getProperty(obj.getName());
 	}
@@ -25,5 +26,4 @@ public class PropertySet {
 		return properties.getAttribute(name);
 	}
 
-	
 }

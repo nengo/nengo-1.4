@@ -12,7 +12,7 @@ import ca.shu.ui.lib.actions.StandardAction;
  * 
  */
 public abstract class AbstractMenuBuilder {
-	private boolean applyStyle;
+	private final boolean applyStyle;
 
 	public AbstractMenuBuilder(boolean applyCustomStyle) {
 		this.applyStyle = applyCustomStyle;

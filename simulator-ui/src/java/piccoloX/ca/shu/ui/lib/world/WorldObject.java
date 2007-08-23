@@ -47,7 +47,7 @@ public class WorldObject extends PNode implements NamedObject {
 
 	private Stack<State> states;
 
-	private TransformChangeListener transformChangeListener;
+	private final TransformChangeListener transformChangeListener;
 
 	public WorldObject() {
 		this("");
@@ -140,9 +140,7 @@ public class WorldObject extends PNode implements NamedObject {
 			 */
 			Object[] children = getChildrenReference().toArray();
 
-			for (int i = 0; i < children.length; i++) {
-				Object child = children[i];
-
+			for (Object child : children) {
 				if (child instanceof WorldObject) {
 					((WorldObject) child).destroy();
 				}
@@ -177,8 +175,8 @@ public class WorldObject extends PNode implements NamedObject {
 	@SuppressWarnings("unchecked")
 	public Collection<PNode> getChildrenAtBounds(Rectangle2D bounds,
 			Class classType) {
-		return (Collection<PNode>) (this.getAllNodes(new BoundsFilter(this,
-				this.localToGlobal(bounds), classType), null));
+		return (this.getAllNodes(new BoundsFilter(this, this
+				.localToGlobal(bounds), classType), null));
 
 	}
 

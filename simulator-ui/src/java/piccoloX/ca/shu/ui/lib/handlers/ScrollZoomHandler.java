@@ -47,8 +47,8 @@ public class ScrollZoomHandler extends PBasicInputEventHandler {
 		// zoomActivity = camera.animateViewToTransform(transform, 100);
 
 		// event.getCamera().scaleView()
-//		event.getCamera().scaleView(
-//				event.getCamera().getViewScale() * scaleDelta);
+		// event.getCamera().scaleView(
+		// event.getCamera().getViewScale() * scaleDelta);
 		event.getCamera().scaleViewAboutPoint(scaleDelta, viewZoomPoint.getX(),
 				viewZoomPoint.getY());
 	}

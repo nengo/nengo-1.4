@@ -21,7 +21,7 @@ public class GCanvas extends PCanvas {
 
 	World world;
 
-	public GCanvas(GFrame frame) {
+	public GCanvas(AppFrame frame) {
 		super();
 
 		setZoomEventHandler(null);
@@ -33,14 +33,12 @@ public class GCanvas extends PCanvas {
 
 	public void createWorld() {
 		world = new World("Top Layer");
-		getLayer().addChild((World) world);
+		getLayer().addChild(world);
 	}
 
 	public World getWorld() {
 		return world;
 	}
-
-
 
 	@Override
 	public void setBounds(int x, int y, int w, int h) {

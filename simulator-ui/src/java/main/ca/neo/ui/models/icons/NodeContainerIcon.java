@@ -15,7 +15,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 	private int myNumOfNodes = -1;
 
-	private GText sizeLabel;
+	private final GText sizeLabel;
 
 	public NodeContainerIcon(PNodeContainer parent, PNode icon) {
 		super(parent, icon);
@@ -32,6 +32,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 		return (PNodeContainer) super.getModelParent();
 	}
+
 	public abstract int getNodeCountNormalization();
 
 	/**

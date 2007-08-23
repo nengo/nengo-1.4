@@ -9,15 +9,17 @@ public class FConstantFunction extends ConfigurableFunction {
 	static final PropDescriptor[] propStruct = new PropDescriptor[] {
 			new PTInt("Dimension"), new PTFloat("Value") };
 
-
+	@Override
 	public PropDescriptor[] getConfigSchema() {
 		return propStruct;
 	}
 
+	@Override
 	public Class<ConstantFunction> getFunctionClass() {
 		return ConstantFunction.class;
 	}
 
+	@Override
 	public String getTypeName() {
 		return "Constant Function";
 	}

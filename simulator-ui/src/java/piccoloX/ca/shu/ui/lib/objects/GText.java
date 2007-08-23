@@ -1,5 +1,6 @@
 package ca.shu.ui.lib.objects;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -48,7 +49,7 @@ public class GText extends PNode {
 	private boolean constrainHeightToTextHeight = true;
 	private boolean constrainWidthToTextWidth = false;
 	private Font font;
-	private float justification = javax.swing.JLabel.LEFT_ALIGNMENT;
+	private float justification = Component.LEFT_ALIGNMENT;
 	private transient TextLayout[] lines;
 	private String text;
 	private Paint textPaint;
@@ -271,6 +272,7 @@ public class GText extends PNode {
 		return measurer.nextLayout(availibleWidth, nextLineBreakOffset, false);
 	}
 
+	@Override
 	protected void internalUpdateBounds(double x, double y, double width,
 			double height) {
 		recomputeLayout();
@@ -281,6 +283,7 @@ public class GText extends PNode {
 	 * 
 	 * @see edu.umd.cs.piccolo.PNode#paint(edu.umd.cs.piccolo.util.PPaintContext)
 	 */
+	@Override
 	protected void paint(PPaintContext paintContext) {
 		super.paint(paintContext);
 
@@ -306,8 +309,7 @@ public class GText extends PNode {
 
 			g2.setPaint(textPaint);
 
-			for (int i = 0; i < lines.length; i++) {
-				TextLayout tl = lines[i];
+			for (TextLayout tl : lines) {
 				y += tl.getAscent();
 
 				if (bottomY < y) {
@@ -335,6 +337,7 @@ public class GText extends PNode {
 	 * 
 	 * @return a string representation of this node's state
 	 */
+	@Override
 	protected String paramString() {
 		StringBuffer result = new StringBuffer();
 

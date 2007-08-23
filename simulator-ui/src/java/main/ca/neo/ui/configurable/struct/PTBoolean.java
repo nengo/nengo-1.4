@@ -7,7 +7,6 @@ import ca.neo.ui.configurable.PropertyInputPanel;
 
 public class PTBoolean extends PropDescriptor {
 
-
 	private static final long serialVersionUID = 1L;
 
 	public PTBoolean(String name) {
@@ -18,7 +17,6 @@ public class PTBoolean extends PropDescriptor {
 	public PropertyInputPanel createInputPanel() {
 		return new BooleanInputPanel(this);
 	}
-
 
 	@Override
 	public Class<Boolean> getTypeClass() {

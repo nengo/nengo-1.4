@@ -22,6 +22,16 @@ import ca.shu.ui.lib.util.Util;
 public class SaveNodeContainerAction extends StandardAction {
 	private static final long serialVersionUID = 1L;
 
+	public static boolean canSave(Node node) {
+		if (node instanceof Network) {
+			return true;
+		} else if (node instanceof Ensemble) {
+			return true;
+		}
+		return false;
+
+	}
+
 	File file;
 
 	PNodeContainer nodeContainer;
@@ -35,16 +45,6 @@ public class SaveNodeContainerAction extends StandardAction {
 
 	public NeoFileChooser getFileChooser() {
 		return NeoGraphics.FileChooser;
-	}
-
-	public static boolean canSave(Node node) {
-		if (node instanceof Network) {
-			return true;
-		} else if (node instanceof Ensemble) {
-			return true;
-		}
-		return false;
-
 	}
 
 	public void saveModel(Node model, File file) throws IOException {

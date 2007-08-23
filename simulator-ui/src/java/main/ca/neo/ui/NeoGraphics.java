@@ -17,50 +17,20 @@ import ca.neo.ui.models.nodes.PNodeContainer;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.world.GFrame;
+import ca.shu.ui.lib.world.AppFrame;
 import ca.shu.ui.lib.world.WorldObject;
 
-public class NeoGraphics extends GFrame implements INodeContainer {
-
-	@Override
-	protected void windowClosing() {
-		promptToSaveModels();
-		super.windowClosing();
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void promptToSaveModels() {
-		if (getWorld().getGround().getChildrenCount() == 0)
-			return;
-
-		if (JOptionPane.showConfirmDialog(this, "Save models before closing?",
-				"Confirmation", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-			return;
-		}
-
-		Iterator<Object> it = getWorld().getGround().getChildrenIterator();
-
-		while (it.hasNext()) {
-			Object obj = it.next();
-
-			if (obj instanceof PNodeContainer) {
-				PNodeContainer node = (PNodeContainer) obj;
-				if (SaveNodeContainerAction.canSave(node.getModel())) {
-
-					SaveNodeContainerAction saveAction = new SaveNodeContainerAction(
-							"Save model", node);
-					saveAction.doAction();
-
-				}
-			}
-
-		}
-	}
+public class NeoGraphics extends AppFrame implements INodeContainer {
+	public static final String ABOUT = "NeoGraphics<BR><BR>"
+			+ "(c) Copyright Center for Theoretical Neuroscience  007.  All rights reserved<BR>"
+			+ "Visit http://ctn.uwaterloo.ca/<BR>"
+			+ "<BR> User Inteface by Shu Wu";
 
 	public static final String ENSEMBLE_FILE_EXTENSION = "ens";
-	public static final NeoFileChooser FileChooser = new NeoFileChooser();
-	public static final String NETWORK_FILE_EXTENSION = "net";
 
+	public static final NeoFileChooser FileChooser = new NeoFileChooser();
+
+	public static final String NETWORK_FILE_EXTENSION = "net";
 	public static final String USER_FILE_DIR = "UIFiles";
 	private static final long serialVersionUID = 1L;
 
@@ -103,7 +73,22 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 	}
 
 	@Override
-	public void constructMenu(JMenuBar menuBar) {
+	public String getAboutString() {
+		return ABOUT;
+	}
+
+	@Override
+	public String getAppName() {
+		return "NeoGraphics";
+	}
+
+	@Override
+	public String getUserFileDirectory() {
+		return USER_FILE_DIR;
+	}
+
+	@Override
+	public void initApplicationMenu(JMenuBar menuBar) {
 		MenuBuilder menu = new MenuBuilder("File");
 		menuBar.add(menu.getJMenu());
 
@@ -121,9 +106,38 @@ public class NeoGraphics extends GFrame implements INodeContainer {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	protected void promptToSaveModels() {
+
+		Iterator<Object> it = getWorld().getGround().getChildrenIterator();
+
+		while (it.hasNext()) {
+			Object obj = it.next();
+
+			if (obj instanceof PNodeContainer) {
+				PNodeContainer node = (PNodeContainer) obj;
+				if (SaveNodeContainerAction.canSave(node.getModel())) {
+
+					SaveNodeContainerAction saveAction = new SaveNodeContainerAction(
+							"Save model", node);
+					saveAction.doAction();
+
+				}
+			}
+
+		}
+	}
+
 	@Override
-	public String getUserFileDirectory() {
-		return USER_FILE_DIR;
+	protected void windowClosing() {
+		if (getWorld().getGround().getChildrenCount() > 0
+				&& JOptionPane.showConfirmDialog(this,
+						"Save models before closing?", "Exiting "
+								+ getAppName(), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			promptToSaveModels();
+		}
+
+		super.windowClosing();
 	}
 
 }

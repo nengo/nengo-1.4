@@ -38,9 +38,9 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	private Dimension layoutBounds = DEFAULT_BOUNDS;
 
-	private PNodeContainer parentOfViewer;
+	private final PNodeContainer parentOfViewer;
 
-	private Hashtable<String, PNeoNode> viewerNodes = new Hashtable<String, PNeoNode>();
+	private final Hashtable<String, PNeoNode> viewerNodes = new Hashtable<String, PNeoNode>();
 
 	/**
 	 * @param nodeContainer
@@ -145,8 +145,6 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	}
 
-	
-
 	@Override
 	public PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
@@ -168,6 +166,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 		return parentOfViewer.getModel();
 	}
 
+	@Override
 	public String getName() {
 		return getViewerParent().getTypeName() + " Viewer: "
 				+ getViewerParent().getName();

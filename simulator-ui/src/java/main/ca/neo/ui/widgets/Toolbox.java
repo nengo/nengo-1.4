@@ -27,7 +27,8 @@ public class Toolbox extends WorldObject {
 		super("Toolbox");
 
 		System.out.println("loading SymbolHolder");
-//		symbolHolder = (SymbolHolder) Util.loadProperty(this, "defaultSymbols");
+		// symbolHolder = (SymbolHolder) Util.loadProperty(this,
+		// "defaultSymbols");
 		System.out.println("finished loading SymbolHolder");
 
 		if (symbolHolder == null) {
@@ -51,7 +52,7 @@ public class Toolbox extends WorldObject {
 
 		pack();
 
-//		Util.saveProperty(this, symbolHolder, "defaultSymbols");
+		// Util.saveProperty(this, symbolHolder, "defaultSymbols");
 	}
 
 	@Override
@@ -60,6 +61,7 @@ public class Toolbox extends WorldObject {
 		return new ToolBoxControls(this);
 
 	}
+
 	public void initSymbolHolder() {
 		if (symbolHolder != null)
 			symbolHolder.removeFromParent();
@@ -69,6 +71,7 @@ public class Toolbox extends WorldObject {
 		addChild(symbolHolder);
 		pack();
 	}
+
 	public void pack() {
 		boolean frameVisible = isFrameVisible();
 

@@ -46,7 +46,7 @@ public class LineInIcon extends WorldObject {
 				LINE_IN_HEIGHT));
 		a1.exclusiveOr(new Area(new Ellipse2D.Double(5.0, 5.0,
 				LINE_IN_WIDTH - 10.0, LINE_IN_HEIGHT - 10.0)));
-		Graphics2D g2 = (Graphics2D) paintContext.getGraphics();
+		Graphics2D g2 = paintContext.getGraphics();
 		// g2.setColor(new Color(200,200,240));
 		g2.setColor(getColor());
 		g2.fill(a1);

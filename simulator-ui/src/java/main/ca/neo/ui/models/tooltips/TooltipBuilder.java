@@ -7,7 +7,7 @@ public class TooltipBuilder {
 	String name;
 
 	Vector<TooltipPart> tooltipParts;
-	
+
 	public TooltipBuilder(String name) {
 		super();
 		this.name = name;

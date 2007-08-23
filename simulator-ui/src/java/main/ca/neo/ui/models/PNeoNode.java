@@ -202,8 +202,8 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		Origin[] origins = getModel().getOrigins();
 
-		for (int i = 0; i < origins.length; i++) {
-			POrigin originUI = showOrigin(origins[i].getName());
+		for (Origin element : origins) {
+			POrigin originUI = showOrigin(element.getName());
 			originUI.setPermenantlyAttached(true);
 		}
 		layoutChildren();
@@ -216,8 +216,8 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		Termination[] terminations = getModel().getTerminations();
 
-		for (int i = 0; i < terminations.length; i++) {
-			PTermination termUI = showTermination(terminations[i].getName());
+		for (Termination element : terminations) {
+			PTermination termUI = showTermination(element.getName());
 			termUI.setPermenantlyAttached(true);
 		}
 		layoutChildren();
@@ -447,9 +447,8 @@ public abstract class PNeoNode extends PModelConfigurable {
 			MenuBuilder originsMenu = originsAndTerminations
 					.createSubMenu("Show origin");
 
-			for (int i = 0; i < origins.length; i++) {
-				originsMenu
-						.addAction(new ShowOriginAction(origins[i].getName()));
+			for (Origin element : origins) {
+				originsMenu.addAction(new ShowOriginAction(element.getName()));
 			}
 
 		}
@@ -463,9 +462,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 			MenuBuilder terminationsMenu = originsAndTerminations
 					.createSubMenu("Show termination");
 
-			for (int i = 0; i < terminations.length; i++) {
-				terminationsMenu.addAction(new ShowTerminationAction(
-						terminations[i].getName()));
+			for (Termination element : terminations) {
+				terminationsMenu.addAction(new ShowTerminationAction(element
+						.getName()));
 			}
 
 		}

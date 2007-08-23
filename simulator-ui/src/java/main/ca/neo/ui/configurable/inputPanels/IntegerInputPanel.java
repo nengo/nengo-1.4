@@ -50,7 +50,8 @@ public class IntegerInputPanel extends PropertyInputPanel {
 			Integer value = getValue();
 
 			if (getDescriptor().isCheckRange()) {
-				if (value > getDescriptor().getMax() || value < getDescriptor().getMin()) {
+				if (value > getDescriptor().getMax()
+						|| value < getDescriptor().getMin()) {
 					return false;
 				}
 			}

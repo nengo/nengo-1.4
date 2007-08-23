@@ -28,6 +28,7 @@ import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.border.EtchedBorder;
 
 import ca.neo.ui.style.Style;
@@ -49,7 +50,11 @@ import edu.umd.cs.piccolo.util.PUtil;
  * 
  * @author Shu Wu
  */
-public class GFrame extends JFrame {
+public abstract class AppFrame extends JFrame {
+	public static final String TIPS = "<B>Keyboard Shortcuts</B><BR>"
+			+ "Hold down Ctrl key to view tooltips at any time"
+			+ "<BR><BR><B>Mouse Shortcuts</B><BR>"
+			+ "Zooming: scroll the Mouse Wheel or Right Click and Drag";
 
 	/**
 	 * 
@@ -58,7 +63,7 @@ public class GFrame extends JFrame {
 
 	private EventListener escapeFullScreenModeListener;
 
-	private GraphicsDevice graphicsDevice;
+	private final GraphicsDevice graphicsDevice;
 
 	private boolean isFullScreenMode;
 
@@ -82,7 +87,7 @@ public class GFrame extends JFrame {
 
 	MenuBuilder worldMenu;
 
-	public GFrame(String title) {
+	public AppFrame(String title) {
 		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
 		loadPreferences();
@@ -108,6 +113,7 @@ public class GFrame extends JFrame {
 
 		canvas = new GCanvas(this);
 		canvas.createWorld();
+		canvas.setFocusable(true);
 
 		getContentPane().add(canvas);
 		canvas.requestFocus();
@@ -124,6 +130,7 @@ public class GFrame extends JFrame {
 	public void addEscapeFullScreenModeListener() {
 		removeEscapeFullScreenModeListener();
 		escapeFullScreenModeListener = new KeyAdapter() {
+			@Override
 			public void keyPressed(KeyEvent aEvent) {
 				if (aEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					setFullScreenMode(false);
@@ -133,9 +140,13 @@ public class GFrame extends JFrame {
 		canvas.addKeyListener((KeyListener) escapeFullScreenModeListener);
 	}
 
+	public abstract String getAboutString();
+
 	public ReversableActionManager getActionManager() {
 		return actionManager;
 	}
+
+	public abstract String getAppName();
 
 	public GCanvas getCanvas() {
 		return canvas;
@@ -237,7 +248,7 @@ public class GFrame extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		Style.applyStyleToComponent(menuBar);
 
-		constructMenu(menuBar);
+		initApplicationMenu(menuBar);
 
 		// menu.setMnemonic(KeyEvent.VK_V);
 
@@ -250,6 +261,11 @@ public class GFrame extends JFrame {
 		menuBar.setVisible(true);
 		updateWorldMenu();
 		updateEditMenu();
+
+		MenuBuilder helpMenu = new MenuBuilder("Help");
+		menuBar.add(helpMenu.getJMenu());
+		helpMenu.addAction(new TipsAction("Tips"));
+		helpMenu.addAction(new AboutAction("About"));
 
 		this.setJMenuBar(menuBar);
 		this.repaint();
@@ -280,16 +296,6 @@ public class GFrame extends JFrame {
 		}
 	}
 
-	/**
-	 * Use this function to add menu items to the frame menu bar
-	 * 
-	 * @param menuBar
-	 *            is attached to the frame
-	 */
-	protected void constructMenu(JMenuBar menuBar) {
-
-	}
-
 	protected PCamera createDefaultCamera() {
 		return PUtil.createBasicScenegraph();
 	}
@@ -300,10 +306,10 @@ public class GFrame extends JFrame {
 		while (itr.hasNext()) {
 			DisplayMode each = (DisplayMode) itr.next();
 			DisplayMode[] modes = device.getDisplayModes();
-			for (int i = 0; i < modes.length; i++) {
-				if (modes[i].getWidth() == each.getWidth()
-						&& modes[i].getHeight() == each.getHeight()
-						&& modes[i].getBitDepth() == each.getBitDepth()) {
+			for (DisplayMode element : modes) {
+				if (element.getWidth() == each.getWidth()
+						&& element.getHeight() == each.getHeight()
+						&& element.getBitDepth() == each.getBitDepth()) {
 					return each;
 				}
 			}
@@ -328,6 +334,16 @@ public class GFrame extends JFrame {
 		 */
 
 		return result;
+	}
+
+	/**
+	 * Use this function to add menu items to the frame menu bar
+	 * 
+	 * @param menuBar
+	 *            is attached to the frame
+	 */
+	protected void initApplicationMenu(JMenuBar menuBar) {
+
 	}
 
 	// protected JMenu addMenu(JMenuBar menuBar, String name) {
@@ -361,10 +377,6 @@ public class GFrame extends JFrame {
 
 		}
 		preferences.apply(this);
-	}
-
-	protected void windowClosing() {
-		savePreferences();
 	}
 
 	protected void savePreferences() {
@@ -450,6 +462,27 @@ public class GFrame extends JFrame {
 		} else {
 			debugMenu.addAction(new HideDebugMemory());
 		}
+	}
+
+	protected void windowClosing() {
+		savePreferences();
+	}
+
+	class AboutAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public AboutAction(String actionName) {
+			super("About", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			JLabel editor = new JLabel("<html>" + getAboutString() + "</html>");
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor,
+					"About " + getAppName(), JOptionPane.PLAIN_MESSAGE);
+		}
+
 	}
 
 	class HideDebugMemory extends StandardAction {
@@ -557,7 +590,7 @@ public class GFrame extends JFrame {
 		}
 
 		public void windowClosing(WindowEvent arg0) {
-			GFrame.this.windowClosing();
+			AppFrame.this.windowClosing();
 		}
 
 		public void windowDeactivated(WindowEvent arg0) {
@@ -605,6 +638,23 @@ public class GFrame extends JFrame {
 		protected void action() throws ActionException {
 			PDebug.debugPrintUsedMemory = true;
 			updateWorldMenu();
+		}
+
+	}
+
+	class TipsAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public TipsAction(String actionName) {
+			super("Show UI tips", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			JLabel editor = new JLabel("<html>" + TIPS + "</html>");
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor,
+					"NeoGraphics Tips", JOptionPane.PLAIN_MESSAGE);
 		}
 
 	}
@@ -735,7 +785,7 @@ class UserPreferences implements Serializable {
 	/*
 	 * Apply preferences
 	 */
-	public void apply(GFrame parent) {
+	public void apply(AppFrame parent) {
 		setEnableTooltips(enableTooltips);
 		setGridVisible(gridVisible);
 	}

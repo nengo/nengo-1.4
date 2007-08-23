@@ -49,19 +49,7 @@ public abstract class PNodeContainer extends PNeoNode {
 		openViewer();
 	}
 
-	protected Window getViewerWindow() {
-
-		if (viewerWindowRef.get() == null
-				|| viewerWindowRef.get().isDestroyed()) {
-			Window viewerWindow = new Window(this, createNodeViewerInstance());
-
-			viewerWindowRef = new WeakReference<Window>(viewerWindow);
-
-		}
-
-		return viewerWindowRef.get();
-
-	}
+	public abstract String getFileName();
 
 	/**
 	 * @return Number of nodes contained by the Model
@@ -96,9 +84,8 @@ public abstract class PNodeContainer extends PNeoNode {
 	}
 
 	public abstract void setFileName(String fileName);
-	
-	public abstract String getFileName();
 
+	@Override
 	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
 
@@ -144,6 +131,13 @@ public abstract class PNodeContainer extends PNeoNode {
 		return tooltips;
 	}
 
+	/**
+	 * 
+	 * @return NodeViewer An instance of the Node Viewer to peek into the nodes
+	 *         contained
+	 */
+	protected abstract NodeViewer createNodeViewerInstance();
+
 	// @Override
 	// protected void moveWidgetsToFront() {
 	// /**
@@ -157,12 +151,19 @@ public abstract class PNodeContainer extends PNeoNode {
 	//
 	// }
 
-	/**
-	 * 
-	 * @return NodeViewer An instance of the Node Viewer to peek into the nodes
-	 *         contained
-	 */
-	protected abstract NodeViewer createNodeViewerInstance();
+	protected Window getViewerWindow() {
+
+		if (viewerWindowRef.get() == null
+				|| viewerWindowRef.get().isDestroyed()) {
+			Window viewerWindow = new Window(this, createNodeViewerInstance());
+
+			viewerWindowRef = new WeakReference<Window>(viewerWindow);
+
+		}
+
+		return viewerWindowRef.get();
+
+	}
 
 	@Override
 	protected void prepareForDestroy() {

@@ -15,9 +15,9 @@ public class GTextButton extends Button {
 	 */
 	private static final long serialVersionUID = -8982670127440624596L;
 
-	private PPath frame;
+	private final PPath frame;
 
-	private PText pText;
+	private final PText pText;
 
 	public GTextButton(String value, Runnable action) {
 		super(action);

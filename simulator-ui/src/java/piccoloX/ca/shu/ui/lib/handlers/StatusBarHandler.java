@@ -16,12 +16,12 @@ public class StatusBarHandler extends PBasicInputEventHandler {
 	}
 
 	public String getStatusStr(PInputEvent event) {
-//		Point2D position = event.getPositionRelativeTo(world.getSky());
+		// Point2D position = event.getPositionRelativeTo(world.getSky());
 		NumberFormat formatter = NumberFormat.getNumberInstance();
 		formatter.setMaximumFractionDigits(2);
-		
-		return "Mouse X: " + formatter.format(event.getPosition().getX()) + " Y: "
-				+ formatter.format(event.getPosition().getY());
+
+		return "Mouse X: " + formatter.format(event.getPosition().getX())
+				+ " Y: " + formatter.format(event.getPosition().getY());
 	}
 
 	public World getWorld() {

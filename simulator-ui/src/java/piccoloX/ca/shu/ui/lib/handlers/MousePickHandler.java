@@ -9,53 +9,53 @@ import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public abstract class NodePickerHandler extends PBasicInputEventHandler {
+public abstract class MousePickHandler extends PBasicInputEventHandler {
 
-	private Thread controlTimer;
+	private final Thread controlTimer;
+
+	// @Override
+	// public void keyboardFocusLost(PInputEvent event) {
+	// System.out.println("Keyboard focus gained: " + this);
+	// super.keyboardFocusLost(event);
+	// }
 
 	private boolean keepPickAlive = false;
-	private Object pickChangeLock = new Object();
+	private final Object pickChangeLock = new Object();
 
-	private Object pickSetLock = new Object();
+	private final Object pickSetLock = new Object();
 
 	private WorldObject transientNode;
 
-	private World world;
+	private final World world;
 
 	WorldObject pickedNode;
 
-	public NodePickerHandler(World parent) {
+	public MousePickHandler(World parent) {
 		super();
 		this.world = parent;
 		controlTimer = new Timer();
 		controlTimer.start();
 	}
 
-	public abstract void eventUpdated(PInputEvent event);
-
 	public boolean isKeepPickAlive() {
 		return keepPickAlive;
 	}
 
 	@Override
-	public void keyPressed(PInputEvent event) {
-		eventUpdated(event);
-	}
-
-	@Override
 	public void mouseDragged(PInputEvent event) {
-		eventUpdated(event);
+		processMouseEvent(event);
 	}
 
 	@Override
 	public void mouseMoved(PInputEvent event) {
-		eventUpdated(event);
+		processMouseEvent(event);
 	}
 
 	@Override
 	public void processEvent(PInputEvent event, int type) {
 		super.processEvent(event, type);
 	}
+
 	protected abstract int getKeepPickDelay();
 
 	protected abstract int getPickDelay();
@@ -71,6 +71,8 @@ public abstract class NodePickerHandler extends PBasicInputEventHandler {
 	protected abstract void nodePicked();
 
 	protected abstract void nodeUnPicked();
+
+	protected abstract void processMouseEvent(PInputEvent event);
 
 	protected void setKeepPickAlive(boolean keepPickAlive) {
 		this.keepPickAlive = keepPickAlive;

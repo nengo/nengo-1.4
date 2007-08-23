@@ -15,9 +15,9 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-
 /**
- * An UI component for editing matrices. 
+ * An UI component for editing matrices.
+ * 
  * @author Bryan Tripp
  */
 public class MatrixEditor extends JPanel {
@@ -26,38 +26,40 @@ public class MatrixEditor extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	//for testing	
+
+	// for testing
 	public static void main(String args[]) {
 		CouplingMatrix matrix = new CouplingMatrixImpl(5, 3);
 		MatrixEditor editor = new MatrixEditor(matrix);
-		
+
 		try {
 			JFrame frame = new JFrame("test");
 			frame.getContentPane().add(editor);
 
 			frame.addWindowListener(new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent e) {
 					System.exit(0);
 				}
 			});
-        
+
 			frame.pack();
-			frame.setVisible(true);			
+			frame.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	private TableModel myTableModel;
-		
+
+	private final TableModel myTableModel;
+
 	/**
-	 * Creates an editor for the given coupling matrix.   
+	 * Creates an editor for the given coupling matrix.
 	 */
 	public MatrixEditor(CouplingMatrix theMatrix) {
 		super(new BorderLayout());
 		myTableModel = new MatrixTableModel(theMatrix);
-		JTable table = new JTable(myTableModel); 
+		JTable table = new JTable(myTableModel);
 		JScrollPane scroll = new JScrollPane(table);
 		this.add(scroll, BorderLayout.CENTER);
 	}
@@ -76,16 +78,17 @@ public class MatrixEditor extends JPanel {
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
-		private CouplingMatrix myMatrix;
-		
+		private final CouplingMatrix myMatrix;
+
 		public MatrixTableModel(CouplingMatrix theMatrix) {
-			myMatrix = theMatrix;	
+			myMatrix = theMatrix;
 		}
-		
+
 		public int getColumnCount() {
 			return myMatrix.getFromSize();
 		}
 
+		@Override
 		public String getColumnName(int theColumn) {
 			return String.valueOf(theColumn + 1);
 		}
@@ -93,24 +96,27 @@ public class MatrixEditor extends JPanel {
 		public int getRowCount() {
 			return myMatrix.getToSize();
 		}
-		
+
 		public Object getValueAt(int theRow, int theColumn) {
 			return new Float(myMatrix.getElement(theRow + 1, theColumn + 1));
 		}
-		
+
+		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return true;
 		}
-		
+
+		@Override
 		public void setValueAt(Object theValue, int theRow, int theColumn) {
 			try {
 				float val = Float.parseFloat(theValue.toString());
 				myMatrix.setElement(val, theRow + 1, theColumn + 1);
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(null, "Please enter a number", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Please enter a number",
+						"Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		
+
 	}
 
 }

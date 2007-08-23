@@ -29,6 +29,8 @@ public class PNetwork extends PNodeContainer {
 
 	static final PropDescriptor[] zProperties = { pName };
 
+	static final String LAYOUT_MANAGER_KEY = "layout/manager";
+
 	public PNetwork() {
 		super();
 		init();
@@ -44,34 +46,9 @@ public class PNetwork extends PNodeContainer {
 	/**
 	 * Creates the Network Viewer
 	 */
+	@Override
 	public NetworkViewer createNodeViewerInstance() {
 		return new NetworkViewer(this);
-	}
-
-	static final String LAYOUT_MANAGER_KEY = "layout/manager";
-
-	public NetworkUIConfiguration getUIConfig() {
-		NetworkUIConfiguration layoutManager = null;
-		try {
-			Object obj = getModel().getMetaData(LAYOUT_MANAGER_KEY);
-
-			if (obj != null)
-				layoutManager = (NetworkUIConfiguration) obj;
-		} catch (Throwable e) {
-			Util
-					.UserError("Could not access layout manager, creating a new one");
-		}
-
-		if (layoutManager == null) {
-			layoutManager = new NetworkUIConfiguration(getName() + ".net");
-			setUICOnfig(layoutManager);
-		}
-
-		return layoutManager;
-	}
-
-	public void setUICOnfig(NetworkUIConfiguration config) {
-		getModel().setMetaData(LAYOUT_MANAGER_KEY, config);
 	}
 
 	@Override
@@ -79,9 +56,15 @@ public class PNetwork extends PNodeContainer {
 		return zProperties;
 	}
 
+	@Override
+	public String getFileName() {
+		return getUIConfig().getFileName();
+	}
+
 	/**
 	 * @return The Network Model
 	 */
+	@Override
 	public NetworkImpl getModel() {
 		return (NetworkImpl) super.getModel();
 	}
@@ -110,6 +93,26 @@ public class PNetwork extends PNodeContainer {
 		return typeName;
 	}
 
+	public NetworkUIConfiguration getUIConfig() {
+		NetworkUIConfiguration layoutManager = null;
+		try {
+			Object obj = getModel().getMetaData(LAYOUT_MANAGER_KEY);
+
+			if (obj != null)
+				layoutManager = (NetworkUIConfiguration) obj;
+		} catch (Throwable e) {
+			Util
+					.UserError("Could not access layout manager, creating a new one");
+		}
+
+		if (layoutManager == null) {
+			layoutManager = new NetworkUIConfiguration(getName() + ".net");
+			setUICOnfig(layoutManager);
+		}
+
+		return layoutManager;
+	}
+
 	@Override
 	public NetworkViewer getViewer() {
 		return (NetworkViewer) super.getViewer();
@@ -122,6 +125,16 @@ public class PNetwork extends PNodeContainer {
 			getViewer().saveLayoutAsDefault();
 		}
 
+	}
+
+	@Override
+	public void setFileName(String fileName) {
+		getUIConfig().setFileName(fileName);
+
+	}
+
+	public void setUICOnfig(NetworkUIConfiguration config) {
+		getModel().setMetaData(LAYOUT_MANAGER_KEY, config);
 	}
 
 	/**
@@ -157,17 +170,6 @@ public class PNetwork extends PNodeContainer {
 	protected boolean validateFullBounds() {
 		// TODO Auto-generated method stub
 		return super.validateFullBounds();
-	}
-
-	@Override
-	public String getFileName() {
-		return getUIConfig().getFileName();
-	}
-
-	@Override
-	public void setFileName(String fileName) {
-		getUIConfig().setFileName(fileName);
-
 	}
 
 }

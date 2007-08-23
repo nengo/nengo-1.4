@@ -18,7 +18,7 @@ import ca.shu.ui.lib.util.Util;
 public class PTTerminationWeights extends PropDescriptor {
 
 	private static final long serialVersionUID = 1L;
-	private int ensembleDimensions;
+	private final int ensembleDimensions;
 
 	public PTTerminationWeights(String name, int dimensions) {
 		super(name);
@@ -109,6 +109,7 @@ class DimensionAndWeightsInputPanel extends PropertyInputPanel {
 
 		return true;
 	}
+
 	@Override
 	public boolean isValueSet() {
 		if (matrixEdited && matrix != null) {
@@ -153,8 +154,8 @@ class DimensionAndWeightsInputPanel extends PropertyInputPanel {
 			ConfigurableMatrix configurableMatrix = new ConfigurableMatrix(
 					getFromSize(), getToSize());
 
-			UserTemplateConfig config = new UserTemplateConfig(configurableMatrix,
-					(JDialog) parent);
+			UserTemplateConfig config = new UserTemplateConfig(
+					configurableMatrix, (JDialog) parent);
 			config.configureAndWait();
 
 			if (configurableMatrix.isConfigured()) {

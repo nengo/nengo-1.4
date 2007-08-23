@@ -10,16 +10,39 @@ import ca.neo.ui.NeoGraphics;
 import ca.shu.ui.lib.util.UIEnvironment;
 
 public class NeoFileChooser {
+	private static final long serialVersionUID = 1L;
+
 	JFileChooser fileChooser;
 
-	private static final long serialVersionUID = 1L;
+	FileFilter allFileFilter, networkFileFilter, ensembleFileFilter;
 
 	public NeoFileChooser() {
 		super();
 		init();
 	}
 
-	FileFilter allFileFilter, networkFileFilter, ensembleFileFilter;
+	public File getSelectedFile() {
+		return fileChooser.getSelectedFile();
+	}
+
+	public void setSelectedFile(File file) {
+		fileChooser.setSelectedFile(file);
+	}
+
+	public int showOpenDialog() throws HeadlessException {
+		fileChooser.setFileFilter(allFileFilter);
+		return fileChooser.showOpenDialog(UIEnvironment.getInstance());
+	}
+
+	public int showSaveEnsembleDialog() throws HeadlessException {
+		fileChooser.setFileFilter(ensembleFileFilter);
+		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
+	}
+
+	public int showSaveNetworkDialog() throws HeadlessException {
+		fileChooser.setFileFilter(networkFileFilter);
+		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
+	}
 
 	private void init() {
 		fileChooser = new JFileChooser();
@@ -32,29 +55,6 @@ public class NeoFileChooser {
 		fileChooser.addChoosableFileFilter(networkFileFilter);
 		fileChooser.addChoosableFileFilter(ensembleFileFilter);
 		fileChooser.setFileFilter(allFileFilter);
-	}
-
-	public int showOpenDialog() throws HeadlessException {
-		fileChooser.setFileFilter(allFileFilter);
-		return fileChooser.showOpenDialog(UIEnvironment.getInstance());
-	}
-
-	public int showSaveNetworkDialog() throws HeadlessException {
-		fileChooser.setFileFilter(networkFileFilter);
-		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
-	}
-
-	public int showSaveEnsembleDialog() throws HeadlessException {
-		fileChooser.setFileFilter(ensembleFileFilter);
-		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
-	}
-
-	public File getSelectedFile() {
-		return fileChooser.getSelectedFile();
-	}
-
-	public void setSelectedFile(File file) {
-		fileChooser.setSelectedFile(file);
 	}
 }
 

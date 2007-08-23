@@ -41,7 +41,6 @@ public class PropertyWrapper implements Serializable {
 		return (value != null);
 	}
 
-
 	public void setValue(Object value) {
 		if (value != null) {
 			if (metaProperty.getTypeClass().isInstance(value)) {

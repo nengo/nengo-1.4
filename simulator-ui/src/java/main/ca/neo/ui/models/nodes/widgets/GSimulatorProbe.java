@@ -97,7 +97,7 @@ public class GSimulatorProbe extends PModel {
 	 * @return Probe object
 	 */
 	public Probe getProbe() {
-		return (Probe) getModel();
+		return getModel();
 	}
 
 	@Override

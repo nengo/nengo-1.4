@@ -69,6 +69,7 @@ class ConfigTemplateDialog extends ConfigDialog {
 		updateDialog();
 	}
 
+	@Override
 	public void initPanel() {
 		/*
 		 * construct existing properties

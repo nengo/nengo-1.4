@@ -34,18 +34,6 @@ public class GEdge extends PPath implements PropertyChangeListener {
 
 	LineShape myLineType = LineShape.STRAIGHT;
 
-	public void setPointerVisible(boolean visible) {
-		if (!visible) {
-			pointer.removeFromParent();
-			pointer = null;
-		} else {
-			if (pointer == null) {
-				pointer = new PointerTriangle(this);
-				addChild(pointer);
-			}
-		}
-	}
-
 	public GEdge(WorldObject startNode, WorldObject endNode) {
 		super();
 		this.startNode = startNode;
@@ -125,12 +113,12 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		if (hideByDefault)
 			this.setVisible(false);
 		this.hideByDefault = hideByDefault;
-	};
+	}
 
 	public void setHighlightColor(Color highlightColor) {
 		this.highlightColor = highlightColor;
 		stateChanged();
-	}
+	};
 
 	public void setLineShape(LineShape lineShape) {
 		this.myLineType = lineShape;
@@ -139,6 +127,18 @@ public class GEdge extends PPath implements PropertyChangeListener {
 
 	public void setMinArcRadius(double minArcRadius) {
 		this.minArcRadius = minArcRadius;
+	}
+
+	public void setPointerVisible(boolean visible) {
+		if (!visible) {
+			pointer.removeFromParent();
+			pointer = null;
+		} else {
+			if (pointer == null) {
+				pointer = new PointerTriangle(this);
+				addChild(pointer);
+			}
+		}
 	}
 
 	public final void setState(State state) {
@@ -185,8 +185,7 @@ public class GEdge extends PPath implements PropertyChangeListener {
 		}
 
 		if (pointer != null) {
-			pointer.setOffset(endBounds.getX() ,
-					endBounds.getY() );
+			pointer.setOffset(endBounds.getX(), endBounds.getY());
 
 		}
 

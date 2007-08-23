@@ -16,6 +16,7 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.handlers.DragHandler;
 import ca.shu.ui.lib.handlers.EventConsumer;
 import ca.shu.ui.lib.handlers.Interactable;
+import ca.shu.ui.lib.handlers.KeyboardFocusHandler;
 import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
@@ -66,19 +67,19 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
-	private PInputEventListener dragHandler;
+	private final PInputEventListener dragHandler;
 
-	private PInputEventListener eventConsumer;
+	private final PInputEventListener eventConsumer;
 
-	private PInputEventListener mouseHandler;
+	private final PInputEventListener mouseHandler;
 
-	private PPanEventHandler panHandler;
+	private final PPanEventHandler panHandler;
 
-	private PInputEventListener scrollZoomHandler;
+	private final PInputEventListener scrollZoomHandler;
 
-	private PInputEventListener tooltipHandler;
+	private final PInputEventListener tooltipHandler;
 
-	private PZoomEventHandler zoomHandler;
+	private final PZoomEventHandler zoomHandler;
 
 	double cameraX = 0;
 
@@ -130,7 +131,7 @@ public class World extends WorldObject implements Interactable,
 
 		skyCamera.addInputEventListener(zoomHandler);
 		skyCamera.addInputEventListener(panHandler);
-
+		skyCamera.addInputEventListener(new KeyboardFocusHandler());
 		skyCamera.addInputEventListener(tooltipHandler);
 		skyCamera.addInputEventListener(dragHandler);
 		skyCamera.addInputEventListener(mouseHandler);
@@ -251,14 +252,14 @@ public class World extends WorldObject implements Interactable,
 		return skyCamera;
 	}
 
-	public void hideTooltip() {
-		if (tooltipWrapper == null) {
-			return;
-		}
-
-		tooltipWrapper.fadeAndDestroy();
-		tooltipWrapper = null;
-	}
+	// public void hideTooltip() {
+	// if (tooltipWrapper == null) {
+	// return;
+	// }
+	//
+	// tooltipWrapper.fadeAndDestroy();
+	// tooltipWrapper = null;
+	// }
 
 	/*
 	 * (non-Javadoc)
@@ -332,17 +333,14 @@ public class World extends WorldObject implements Interactable,
 		return constructMenu().getJPopupMenu();
 	}
 
-	public void showTooltip(WorldObject tooltipObject, WorldObject follow) {
+	public TooltipWrapper showTooltip(WorldObject follow) {
 
-		hideTooltip();
-		if (follow == null) {
-			return;
-		}
-
-		tooltipWrapper = new TooltipWrapper(getSky(), tooltipObject, follow);
+		tooltipWrapper = new TooltipWrapper(getSky(), follow.getTooltip(),
+				follow);
 
 		tooltipWrapper.fadeIn();
 		tooltipWrapper.updatePosition();
+		return tooltipWrapper;
 
 	}
 

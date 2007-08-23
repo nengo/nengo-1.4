@@ -51,6 +51,7 @@ public class UserConfig extends ConfigManager {
 	 * 
 	 * 
 	 */
+	@Override
 	public void configureAndWait() {
 		// Util.Assert(!SwingUtilities.isEventDispatchThread(), "Configuration
 		// cannot be called from the Event Dispatch Thread");
@@ -178,9 +179,7 @@ class ConfigDialog extends JDialog {
 				.getConfigSchema();
 		propertyInputPanels = new Vector<PropertyInputPanel>(properties.length);
 
-		for (int i = 0; i < properties.length; i++) {
-
-			PropDescriptor property = properties[i];
+		for (PropDescriptor property : properties) {
 
 			PropertyInputPanel inputPanel = property.createInputPanel();
 			panel.add(inputPanel);
@@ -225,6 +224,7 @@ class ConfigDialog extends JDialog {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
 		addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
 			public void windowClosing(java.awt.event.WindowEvent evt) {
 				cancelAction();
 

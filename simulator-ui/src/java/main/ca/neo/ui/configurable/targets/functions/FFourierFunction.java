@@ -9,15 +9,17 @@ public class FFourierFunction extends ConfigurableFunction {
 			new PTFloat("Fundamental"), new PTFloat("Cutoff"),
 			new PTFloat("RMS") };
 
-
+	@Override
 	public PropDescriptor[] getConfigSchema() {
 		return propStruct;
 	}
 
+	@Override
 	public Class<FourierFunction> getFunctionClass() {
 		return FourierFunction.class;
 	}
 
+	@Override
 	public String getTypeName() {
 		return "Fourier Function";
 	}

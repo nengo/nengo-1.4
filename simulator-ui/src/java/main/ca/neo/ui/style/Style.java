@@ -49,9 +49,9 @@ public class Style {
 	/*
 	 * Fonts
 	 */
-	public static final Font FONT_WINDOW_BUTTONS = new Font("sansserif", Font.BOLD, 16);
-	
-	
+	public static final Font FONT_WINDOW_BUTTONS = new Font("sansserif",
+			Font.BOLD, 16);
+
 	public static final Font FONT_BIG = new Font("Helvetica", Font.BOLD, 16);
 	public static final Font FONT_BOLD = new Font("Helvetica", Font.BOLD, 14);
 	public static final Font FONT_BUTTONS = new Font("Helvetica", Font.PLAIN,

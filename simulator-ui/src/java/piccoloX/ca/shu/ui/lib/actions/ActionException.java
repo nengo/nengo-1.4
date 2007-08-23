@@ -8,8 +8,8 @@ package ca.shu.ui.lib.actions;
  */
 public class ActionException extends Exception {
 	private static final long serialVersionUID = 1L;
-	
-	private boolean showWarning;
+
+	private final boolean showWarning;
 
 	/**
 	 * @param description

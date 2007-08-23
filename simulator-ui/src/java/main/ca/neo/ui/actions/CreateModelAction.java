@@ -25,6 +25,7 @@ public class CreateModelAction extends ReversableAction {
 		}
 		return "unable to retrieve name";
 	}
+
 	@SuppressWarnings("unchecked")
 	Class nc;
 
@@ -66,12 +67,14 @@ public class CreateModelAction extends ReversableAction {
 	protected void action() throws ActionException {
 
 		(new Thread() {
+			@Override
 			public void run() {
 				nodeProxy = null;
 				try {
 
 					nodeProxy = (PNeoNode) nc.newInstance();
-					UserTemplateConfig config = new UserTemplateConfig(nodeProxy);
+					UserTemplateConfig config = new UserTemplateConfig(
+							nodeProxy);
 					config.configureAndWait();
 
 					if (nodeProxy.isConfigured()) {

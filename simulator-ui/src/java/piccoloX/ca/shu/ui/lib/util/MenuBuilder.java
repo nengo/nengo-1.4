@@ -21,6 +21,7 @@ public class MenuBuilder extends AbstractMenuBuilder {
 		style(menu);
 	}
 
+	@Override
 	public void addAction(StandardAction action) {
 		JMenuItem item = new JMenuItem(action.getSwingAction());
 		style(item);
@@ -33,6 +34,7 @@ public class MenuBuilder extends AbstractMenuBuilder {
 		menu.add(item);
 	}
 
+	@Override
 	public MenuBuilder createSubMenu(String label) {
 		MenuBuilder mb = new MenuBuilder(label, isApplyCustomStyle());
 		getJMenu().add(mb.getJMenu());

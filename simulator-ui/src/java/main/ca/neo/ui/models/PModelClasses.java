@@ -40,7 +40,7 @@ public class PModelClasses {
 			return new PNetwork((Network) node);
 
 		} else if (node instanceof Neuron) {
-			return new PNeuron((Network) node);
+			return new PNeuron(node);
 		} else {
 			Util.UserError("Unsupported node type");
 			return null;

@@ -14,6 +14,7 @@ public class PropertyPart extends TooltipPart {
 		this.propertyValue = propertyValue;
 	}
 
+	@Override
 	public String toString() {
 		return propertyName + ": " + propertyValue;
 	}

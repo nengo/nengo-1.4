@@ -140,7 +140,7 @@ public class PNEFEnsemble extends PEnsemble {
 
 		PopupMenuBuilder menu = super.constructMenu();
 
-//		MenuBuilder nefMenu = menu.addSection("NEFEnsemble");
+		// MenuBuilder nefMenu = menu.addSection("NEFEnsemble");
 
 		MenuBuilder plotMenu = menu.createSubMenu("Plot");
 
@@ -149,17 +149,17 @@ public class PNEFEnsemble extends PEnsemble {
 
 			@Override
 			protected void action() {
-				Plotter.plot((NEFEnsemble) getModel());
+				Plotter.plot(getModel());
 			}
 
 		});
 
 		Origin[] origins = getModel().getOrigins();
 
-		for (int i = 0; i < origins.length; i++) {
-			if (origins[i] instanceof DecodedOrigin) {
+		for (Origin element : origins) {
+			if (element instanceof DecodedOrigin) {
 				plotMenu.addAction(new PlotDecodedOrigin("Decoded origin: "
-						+ origins[i].getName(), origins[i].getName()));
+						+ element.getName(), element.getName()));
 			}
 		}
 

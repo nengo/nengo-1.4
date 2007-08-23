@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PNode;
 
 public class WorldSky extends PCamera implements IWorldLayer {
 
@@ -32,11 +31,11 @@ public class WorldSky extends PCamera implements IWorldLayer {
 
 	public void addToWorldLayer(WorldObject wo) {
 
-		addChild((PNode) wo);
+		addChild(wo);
 	}
 
 	public void addWorldObject(WorldObject node) {
-		addChild((PNode) node);
+		addChild(node);
 	}
 
 	public void destroy() {

@@ -27,11 +27,11 @@ public class Window extends WorldObject implements Interactable {
 
 	private AffinityHalo affinityHalo = null;
 
-	private WeakReference<WorldObject> attachToRef;
+	private final WeakReference<WorldObject> attachToRef;
 
-	private WorldObject contentNode;
+	private final WorldObject contentNode;
 
-	private PPath menubar;
+	private final PPath menubar;
 
 	private PBounds savedWindowBounds;
 
@@ -92,7 +92,7 @@ public class Window extends WorldObject implements Interactable {
 
 	@Override
 	public void doubleClicked() {
-		setWindowState(WindowState.MAXIMIZED);
+		cycleVisibleWindowState();
 
 	}
 
@@ -131,6 +131,18 @@ public class Window extends WorldObject implements Interactable {
 
 	public void restoreWindow() {
 		setWindowState(restoreWindowState);
+	}
+
+	@Override
+	public void setOffset(double x, double y) {
+		// TODO Auto-generated method stub
+		super.setOffset(x, y);
+	}
+
+	@Override
+	public void setOffset(Point2D point) {
+		// TODO Auto-generated method stub
+		super.setOffset(point);
 	}
 
 	public void setWindowState(WindowState state) {
@@ -182,18 +194,6 @@ public class Window extends WorldObject implements Interactable {
 				- MENU_BAR_HEIGHT);
 		contentNode.setOffset(2, 2 + MENU_BAR_HEIGHT);
 		// }
-	}
-
-	@Override
-	public void setOffset(double x, double y) {
-		// TODO Auto-generated method stub
-		super.setOffset(x, y);
-	}
-
-	@Override
-	public void setOffset(Point2D point) {
-		// TODO Auto-generated method stub
-		super.setOffset(point);
 	}
 
 	protected void maximizeBounds() {

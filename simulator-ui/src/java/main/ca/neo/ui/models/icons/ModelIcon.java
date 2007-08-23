@@ -85,6 +85,7 @@ public class ModelIcon extends WorldObject implements NamedObject,
 	/**
 	 * @return the name of the label
 	 */
+	@Override
 	public String getName() {
 		return label.getText();
 	}

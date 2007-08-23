@@ -97,7 +97,8 @@ public class FunctionInputPanel extends PropertyInputPanel {
 			 * Configure the function
 			 */
 			fnDescriptor.setFunction(null);
-			UserTemplateConfig config = new UserTemplateConfig(fnDescriptor, (JDialog) parent);
+			UserTemplateConfig config = new UserTemplateConfig(fnDescriptor,
+					(JDialog) parent);
 			config.configureAndWait();
 
 		} else {

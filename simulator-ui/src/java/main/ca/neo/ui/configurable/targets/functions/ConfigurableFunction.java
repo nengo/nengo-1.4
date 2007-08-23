@@ -25,10 +25,12 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 
 	}
 
+	@Override
 	public void cancelConfiguration() {
 
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public void completeConfiguration(PropertySet props) {
 

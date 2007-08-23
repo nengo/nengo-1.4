@@ -66,7 +66,7 @@ public class PTermination extends PWidget implements ILineAcceptor {
 	}
 
 	public Termination getModelTermination() {
-		return (Termination) getModel();
+		return getModel();
 	}
 
 	@Override
@@ -137,10 +137,10 @@ public class PTermination extends PWidget implements ILineAcceptor {
 		tooltips.addPart(new TitlePart("Configuration"));
 		Configuration config = getModel().getConfiguration();
 		String[] configProperties = config.listPropertyNames();
-		for (int i = 0; i < configProperties.length; i++) {
-			Object propertyValue = config.getProperty(configProperties[i]);
+		for (String element : configProperties) {
+			Object propertyValue = config.getProperty(element);
 
-			tooltips.addPart(new PropertyPart(configProperties[i], NeoUtil
+			tooltips.addPart(new PropertyPart(element, NeoUtil
 					.objToString(propertyValue)));
 		}
 		return tooltips;

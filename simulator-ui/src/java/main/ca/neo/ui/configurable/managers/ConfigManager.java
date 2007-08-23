@@ -40,15 +40,15 @@ public abstract class ConfigManager {
 	 */
 	@SuppressWarnings("unchecked")
 	protected static String getFileNamePrefix(IConfigurable obj) {
-//		if (obj instanceof Class) {
-//			return ((Class) obj).getName() + "_";
-//		} else {
-			return obj.getTypeName() + "_Props_";
-//		}
+		// if (obj instanceof Class) {
+		// return ((Class) obj).getName() + "_";
+		// } else {
+		return obj.getTypeName() + "_Props_";
+		// }
 
 	}
 
-	private IConfigurable configurable;
+	private final IConfigurable configurable;
 
 	MutableAttributeSet properties;
 

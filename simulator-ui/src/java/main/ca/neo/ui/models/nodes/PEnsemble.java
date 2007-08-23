@@ -27,6 +27,8 @@ public class PEnsemble extends PNodeContainer {
 
 	private static final long serialVersionUID = 1L;
 
+	String fileName = getName() + "." + NeoGraphics.ENSEMBLE_FILE_EXTENSION;
+
 	public PEnsemble() {
 		super();
 		init();
@@ -43,9 +45,15 @@ public class PEnsemble extends PNodeContainer {
 		return null;
 	}
 
+	@Override
+	public String getFileName() {
+		return fileName;
+	}
+
 	/*
 	 * @return Ensemble Model
 	 */
+	@Override
 	public Ensemble getModel() {
 		return (Ensemble) super.getModel();
 	}
@@ -68,6 +76,11 @@ public class PEnsemble extends PNodeContainer {
 		FileManager fm = new FileManager();
 
 		fm.save(getModel(), file);
+	}
+
+	@Override
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	private void init() {
@@ -174,17 +187,5 @@ public class PEnsemble extends PNodeContainer {
 
 		}
 
-	}
-
-	String fileName = getName() + "." + NeoGraphics.ENSEMBLE_FILE_EXTENSION;
-
-	@Override
-	public String getFileName() {
-		return fileName;
-	}
-
-	@Override
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
 	}
 }

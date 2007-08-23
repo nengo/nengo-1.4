@@ -22,10 +22,10 @@ public class LineEnd extends WorldObject implements Interactable {
 
 	private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
-	private Edge edge;
-	private LineEndWellIcon myIcon;
+	private final Edge edge;
+	private final LineEndWellIcon myIcon;
 	private ILineAcceptor myTarget;
-	private LineEndWell well;
+	private final LineEndWell well;
 
 	public LineEnd(LineEndWell well) {
 		super();
@@ -73,6 +73,7 @@ public class LineEnd extends WorldObject implements Interactable {
 		return true;
 	}
 
+	@Override
 	public void justDropped() {
 
 		ArrayList<PNode> results = new ArrayList<PNode>(20);
@@ -149,8 +150,7 @@ public class LineEnd extends WorldObject implements Interactable {
 			/**
 			 * check that there isn't a line connected to it already
 			 */
-			if (targetAcc.getLineEnd() == null
-					&& canConnectTo((ILineAcceptor) targetAcc)) {
+			if (targetAcc.getLineEnd() == null && canConnectTo(targetAcc)) {
 				return ConnectionState.CONNECTED;
 			}
 

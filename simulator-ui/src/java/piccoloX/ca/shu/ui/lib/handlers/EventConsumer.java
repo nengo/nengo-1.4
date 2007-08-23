@@ -12,4 +12,3 @@ public class EventConsumer implements PInputEventListener {
 		aEvent.setHandled(true);
 	}
 }
-

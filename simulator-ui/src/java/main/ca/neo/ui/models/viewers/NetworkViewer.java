@@ -99,6 +99,7 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
+	@Override
 	public void applyDefaultLayout() {
 		if (!restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
 			applyJungLayout(KKLayout.class);
@@ -165,21 +166,18 @@ public class NetworkViewer extends NodeViewer {
 		menu.addAction(new OpenNeoFileAction("Open from file", this));
 
 		// Nodes
-		for (int i = 0; i < PModelClasses.NODE_TYPES.length; i++) {
-			nodesMenu.addAction(new CreateModelAction(this,
-					PModelClasses.NODE_TYPES[i]));
+		for (Class element : PModelClasses.NODE_TYPES) {
+			nodesMenu.addAction(new CreateModelAction(this, element));
 		}
 
 		// Node Containers
-		for (int i = 0; i < PModelClasses.NODE_CONTAINER_TYPES.length; i++) {
-			nodeContainersMenu.addAction(new CreateModelAction(this,
-					PModelClasses.NODE_CONTAINER_TYPES[i]));
+		for (Class element : PModelClasses.NODE_CONTAINER_TYPES) {
+			nodeContainersMenu.addAction(new CreateModelAction(this, element));
 		}
 
 		// Functions
-		for (int i = 0; i < PModelClasses.FUNCTION_TYPES.length; i++) {
-			functionsMenu.addAction(new CreateModelAction(this,
-					PModelClasses.FUNCTION_TYPES[i]));
+		for (Class element : PModelClasses.FUNCTION_TYPES) {
+			functionsMenu.addAction(new CreateModelAction(this, element));
 		}
 
 		/*
@@ -214,8 +212,8 @@ public class NetworkViewer extends NodeViewer {
 		String[] layoutNames = getUIConfig().getLayoutNames();
 
 		if (layoutNames.length > 0) {
-			for (int i = 0; i < layoutNames.length; i++) {
-				restoreLayout.addAction(new RestoreLayout(layoutNames[i]));
+			for (String element : layoutNames) {
+				restoreLayout.addAction(new RestoreLayout(element));
 			}
 		} else {
 			restoreLayout.addLabel("none");
@@ -224,8 +222,8 @@ public class NetworkViewer extends NodeViewer {
 		MenuBuilder deleteLayout = layoutsMenu.createSubMenu("Delete");
 
 		if (layoutNames.length > 0) {
-			for (int i = 0; i < layoutNames.length; i++) {
-				deleteLayout.addAction(new DeleteLayout(layoutNames[i]));
+			for (String element : layoutNames) {
+				deleteLayout.addAction(new DeleteLayout(element));
 			}
 		} else {
 			deleteLayout.addLabel("none");
@@ -345,9 +343,8 @@ public class NetworkViewer extends NodeViewer {
 
 		Node[] nodes = getNetwork().getNodes();
 
-		for (int i = 0; i < nodes.length; i++) {
+		for (Node node : nodes) {
 
-			Node node = nodes[i];
 			/*
 			 * only add nodes if they don't already exist
 			 */
@@ -361,9 +358,7 @@ public class NetworkViewer extends NodeViewer {
 		 * Construct projections
 		 */
 		Projection[] projections = getNetwork().getProjections();
-		for (int i = 0; i < projections.length; i++) {
-			Projection projection = projections[i];
-
+		for (Projection projection : projections) {
 			Origin origin = projection.getOrigin();
 			Termination term = projection.getTermination();
 
@@ -384,8 +379,7 @@ public class NetworkViewer extends NodeViewer {
 		 */
 		Probe[] probes = getNetwork().getSimulator().getProbes();
 
-		for (int i = 0; i < probes.length; i++) {
-			Probe probe = probes[i];
+		for (Probe probe : probes) {
 			Probeable target = probe.getTarget();
 
 			if (!(target instanceof Node)) {
@@ -432,9 +426,7 @@ public class NetworkViewer extends NodeViewer {
 		 * 
 		 */
 		Projection[] projections = getNetwork().getProjections();
-		for (int i = 0; i < projections.length; i++) {
-			Projection projection = projections[i];
-
+		for (Projection projection : projections) {
 			Origin origin = projection.getOrigin();
 			Termination term = projection.getTermination();
 

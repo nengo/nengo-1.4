@@ -1,13 +1,13 @@
 package ca.shu.ui.lib.util;
 
 import ca.shu.ui.lib.actions.ReversableActionManager;
-import ca.shu.ui.lib.world.GFrame;
+import ca.shu.ui.lib.world.AppFrame;
 
 public class UIEnvironment {
 	public static final double SEMANTIC_ZOOM_LEVEL = 0.2;
 
-	static GFrame uiInstance;
-	
+	static AppFrame uiInstance;
+
 	public static ReversableActionManager getActionManager() {
 		return getInstance().getActionManager();
 	}
@@ -16,7 +16,7 @@ public class UIEnvironment {
 	 * 
 	 * @return UI Instance
 	 */
-	public static GFrame getInstance() {
+	public static AppFrame getInstance() {
 		return uiInstance;
 	}
 
@@ -26,7 +26,7 @@ public class UIEnvironment {
 	 * @param instance
 	 *            UI Instance
 	 */
-	public static void setInstance(GFrame instance) {
+	public static void setInstance(AppFrame instance) {
 
 		/*
 		 * Only one instance of NeoWorld may be running at once

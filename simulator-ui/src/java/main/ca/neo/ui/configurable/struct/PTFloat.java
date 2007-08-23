@@ -29,4 +29,3 @@ public class PTFloat extends PropDescriptor {
 	}
 
 }
-

@@ -20,6 +20,7 @@ public class SavedConfig extends ConfigManager {
 		this.configFileName = configFileName;
 	}
 
+	@Override
 	public void configureAndWait() {
 		loadPropertiesFromFile(configFileName);
 		getConfigurable().completeConfiguration(

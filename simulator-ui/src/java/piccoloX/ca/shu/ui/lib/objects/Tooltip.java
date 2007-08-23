@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import ca.shu.ui.lib.world.WorldObject;
 
-
 public abstract class Tooltip extends WorldObject {
 	Collection<Button> buttons;
 
@@ -15,8 +14,6 @@ public abstract class Tooltip extends WorldObject {
 
 	double yPos = 0;
 
-	
-	
 	public Tooltip() {
 		super();
 		buttons = new Vector<Button>();
@@ -29,7 +26,7 @@ public abstract class Tooltip extends WorldObject {
 		buttonsNode = new WorldObject();
 		buttonsNode.setFrameVisible(false);
 		buttonsNode.setDraggable(false);
-		
+
 		initButtons();
 
 		addToLayout(buttonsNode);
@@ -50,13 +47,13 @@ public abstract class Tooltip extends WorldObject {
 		buttonsNode.addChild(btn);
 
 		buttonsNode.setBounds(buttonsNode.getFullBounds());
-		
+
 		return btn;
 
 	}
 
 	protected void initButtons() {
-		
+
 	}
 
 }

@@ -39,7 +39,7 @@ public class LineEndWellIcon extends WorldObject {
 	protected void paint(PPaintContext paintContext) {
 		// TODO Auto-generated method stub
 		super.paint(paintContext);
-		Graphics2D g2 = (Graphics2D) paintContext.getGraphics();
+		Graphics2D g2 = paintContext.getGraphics();
 		Color bright2 = Util.colorAdd(color, new Color(0.4f, 0.4f, 0.4f));
 		if (paintContext.getScale() < 0.5) {
 			g2.setColor(color);

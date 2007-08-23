@@ -186,8 +186,8 @@ public class POrigin extends PWidget {
 		 */
 		if (ends != null) {
 			Object[] endsAr = ends.toArray();
-			for (int i = 0; i < endsAr.length; i++) {
-				((WorldObject) (endsAr[i])).destroy();
+			for (Object element : endsAr) {
+				((WorldObject) (element)).destroy();
 			}
 		}
 

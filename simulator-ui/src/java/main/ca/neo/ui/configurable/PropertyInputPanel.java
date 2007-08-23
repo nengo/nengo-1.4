@@ -11,7 +11,7 @@ import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.style.Style;
 
 public abstract class PropertyInputPanel extends JPanel {
-	private JPanel innerPanel;
+	private final JPanel innerPanel;
 
 	PropDescriptor propDescriptor;
 
@@ -49,6 +49,7 @@ public abstract class PropertyInputPanel extends JPanel {
 		return propDescriptor;
 	}
 
+	@Override
 	public String getName() {
 		return propDescriptor.getName();
 	}

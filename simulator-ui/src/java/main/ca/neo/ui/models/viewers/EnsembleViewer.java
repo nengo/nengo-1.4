@@ -25,14 +25,14 @@ public class EnsembleViewer extends NodeViewer {
 	}
 
 	@Override
-	public PEnsemble getViewerParent() {
-		return (PEnsemble) super.getViewerParent();
-	}
-
-	@Override
 	public Ensemble getModel() {
 
 		return (Ensemble) super.getModel();
+	}
+
+	@Override
+	public PEnsemble getViewerParent() {
+		return (PEnsemble) super.getViewerParent();
 	}
 
 	@Override
@@ -43,8 +43,7 @@ public class EnsembleViewer extends NodeViewer {
 		/*
 		 * Construct Neurons
 		 */
-		for (int i = 0; i < nodes.length; i++) {
-			Node node = nodes[i];
+		for (Node node : nodes) {
 			if (node instanceof Neuron) {
 				Neuron neuron = (Neuron) node;
 
@@ -66,8 +65,7 @@ public class EnsembleViewer extends NodeViewer {
 			Probe[] probes = getViewerParent().getParentNetwork()
 					.getSimulator().getProbes();
 
-			for (int i = 0; i < probes.length; i++) {
-				Probe probe = probes[i];
+			for (Probe probe : probes) {
 				Probeable target = probe.getTarget();
 
 				if (!(target instanceof Node)) {

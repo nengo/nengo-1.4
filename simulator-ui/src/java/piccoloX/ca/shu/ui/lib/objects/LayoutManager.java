@@ -20,13 +20,13 @@ public class LayoutManager implements Serializable {
 	double horizontalPadding = 0;
 
 	PBounds layoutBounds;
-	
+
 	LayoutStyle style = LayoutStyle.VERTICAL;
 
 	double verticalPadding = 0;;
 
 	public LayoutManager() {
-		
+
 		setLeftPadding(10);
 		setVerticalPadding(10);
 		reset();
@@ -59,7 +59,7 @@ public class LayoutManager implements Serializable {
 			firstLayout = false;
 			translate(horizontalPadding, verticalPadding);
 		}
-		
+
 		// translate(leftPadding, verticalPadding);
 		node.setOffset(currentPosition);
 		if (style == LayoutStyle.VERTICAL) {
@@ -98,7 +98,7 @@ public class LayoutManager implements Serializable {
 	}
 
 	public void translate(double dX, double dY) {
-		
+
 		currentPosition.setLocation(currentPosition.getX() + dX,
 				currentPosition.getY() + dY);
 	}

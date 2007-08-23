@@ -2,7 +2,6 @@ package ca.shu.ui.lib.world;
 
 import java.awt.geom.Point2D;
 
-
 public class WorldGround extends WorldObject implements IWorldLayer {
 
 	/**
@@ -65,6 +64,7 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 		return world.getSky().getViewScale();
 	}
 
+	@Override
 	public World getWorld() {
 		return world;
 	}

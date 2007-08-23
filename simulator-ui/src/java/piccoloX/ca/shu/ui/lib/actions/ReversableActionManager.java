@@ -3,7 +3,7 @@ package ca.shu.ui.lib.actions;
 import java.util.Vector;
 
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.GFrame;
+import ca.shu.ui.lib.world.AppFrame;
 
 public class ReversableActionManager {
 
@@ -11,11 +11,11 @@ public class ReversableActionManager {
 
 	int numOfUndoSteps = 0;
 
-	GFrame parent;
+	AppFrame parent;
 
 	Vector<ReversableAction> reversableActions;
 
-	public ReversableActionManager(GFrame parent) {
+	public ReversableActionManager(AppFrame parent) {
 		super();
 		reversableActions = new Vector<ReversableAction>(
 				MAX_NUM_OF_UNDO_ACTIONS + 1);

@@ -25,6 +25,7 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 	}
 
+	@Override
 	public void addAction(StandardAction standardAction) {
 		JMenuItem item;
 		item = new JMenuItem(standardAction.getSwingAction());
@@ -59,6 +60,7 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 		menu.add(label);
 	}
 
+	@Override
 	public MenuBuilder createSubMenu(String label) {
 		MenuBuilder mb = new MenuBuilder(label, isApplyCustomStyle());
 		getJPopupMenu().add(mb.getJMenu());

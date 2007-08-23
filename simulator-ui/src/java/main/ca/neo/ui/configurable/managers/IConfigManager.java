@@ -1,8 +1,7 @@
 package ca.neo.ui.configurable.managers;
 
-
-//public interface IConfigManager {
+// public interface IConfigManager {
 //
-//	public void configure();
+// public void configure();
 //
-//}
+// }

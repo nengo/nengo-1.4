@@ -15,6 +15,7 @@ public class ConfigurableMatrix extends AbstractConfigurable {
 	float[][] myMatrix;
 
 	PropDescriptor pMatrix;
+
 	public ConfigurableMatrix(float[][] matrixValues) {
 		super();
 		this.fromSize = matrixValues[0].length;
@@ -78,6 +79,7 @@ class CouplingMatrixInputPanel extends PropertyInputPanel {
 
 		addToPanel(editor);
 	}
+
 	@Override
 	public float[][] getValue() {
 		return couplingMatrix.getData();

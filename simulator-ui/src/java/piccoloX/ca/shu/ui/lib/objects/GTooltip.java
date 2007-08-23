@@ -14,7 +14,7 @@ public class GTooltip extends WorldObject {
 	}
 
 	public GTooltip(String titleStr) {
-		
+
 		super(titleStr);
 		setWidth(600);
 		getLayoutManager().setLeftPadding(0);

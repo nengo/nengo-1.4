@@ -15,8 +15,7 @@ public class TrackedStatusMsg {
 
 	public TrackedStatusMsg(String taskName, WorldObject wo) {
 		super();
-		
-		
+
 		if (wo != null) {
 			setTaskName(wo.getName() + ": " + taskName);
 		} else {
