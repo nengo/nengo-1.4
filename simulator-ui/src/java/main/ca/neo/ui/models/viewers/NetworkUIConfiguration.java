@@ -4,19 +4,27 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class NodeLayoutManager implements Serializable {
+public class NetworkUIConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	Hashtable<String, NodeLayout> layouts;
+	private String fileName;
 
-	public NodeLayoutManager() {
+	private String folderName;
+	private Hashtable<String, NodeLayout> layouts;
+
+	public NetworkUIConfiguration(String defaultFileName) {
 		super();
+		this.fileName = defaultFileName;
 		layouts = new Hashtable<String, NodeLayout>();
 	}
 
 	public void addLayout(NodeLayout e) {
 		layouts.put(e.getName(), e);
+	}
+
+	public NodeLayout getLayout(String name) {
+		return layouts.get(name);
 	}
 
 	public String[] getLayoutNames() {
@@ -29,12 +37,24 @@ public class NodeLayoutManager implements Serializable {
 		return names;
 	}
 
-	public NodeLayout getLayout(String name) {
-		return layouts.get(name);
-	}
-
 	public NodeLayout removeLayout(String name) {
 		return layouts.remove(name);
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getFolderName() {
+		return folderName;
+	}
+
+	public void setFolderName(String folderName) {
+		this.folderName = folderName;
 	}
 
 }

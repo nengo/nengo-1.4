@@ -1,50 +1,151 @@
 *******************************************
  Done
 *******************************************
-(08/10) - Show information on Origins and terminations
-(08/10) - Made tooltips follow the camera on zoom
-
-(08/10) - Two phase fade-in for tooltips (they turn opaque after 2.5 seconds)
-(08/10) - Option to load other networks& ensembles from within networks
-(08/10) - Added option to minimize/close all windows
-(08/10) - Performance debugging, fixed some memory leaks with Windows & Viewers. 
-
-(08/09) - Some user preferences are saved to file
-(08/09) - GFrame remembers user preferences in a serialized user configuration file
-(08/09) - Plot decoded origins
-(08/09) - Plot spikes
-(08/09) - Set/view documentation
-(08/09) - Tooltips with heterogeneous node information added
-
-(08/08) done - Two types of Transient UI feedback for events such as File Save, New connections, etc...
-	Events which modify NEO models should now have UI feedback
-(08/08) done - Remove probes, probes are also updated from the Simulator using getProbes
-(08/08) done - fixed infinite loop bug when GProbe is destroyed
-(08/08) done - fixed some Swing thread safety issues
-
-(08/08) done - size of ensembles & networks proportional to number of nodes
-(08/07) done - save/open ensembles
-(08/07) done - Plot Functions
-(08/07) done - added option to remove projections from terminations
-(08/07) done - hide/show origins and terminations
-(08/07) done - automatically show origins and terminations on hover over
-
-(08/07) done - Preliminary Ensemble Viewer created
-(08/07) done - fixed some bugs with UI connections not detaching correctly
-
-done - File menu, to load saved networks (Use Swing File Dialogs)
-done - Save network from NetworkViewer, or PNetwork
-
-done - undo /redo
-done - It would be nice to have an easy way to maximize the network viewer
-	(controls in upper-right corner like windows would be good)
-done- When a node is deleted, its origins and terminations should also be deleted
-done- There should be either scrollbars or a fit-on-screen function (I
-	lost a function in the infinite network viewer)
 
 *******************************************
  Pri 0 - doing next
-*******************************************
+******************************************* 
+Double clicking on Menu Status bar maximizes it, context menu of menu bar is inhereted from Window content object.
+
+
+
+
+
+11. NOT DONE w/ Notes
+Bryan, can you add the change name function to the Node API? It's not trivial,
+because Node names are unique and are referenced by hashmaps in places such as the 
+Network.
+	11. should be able to edit the names of the functions/populations by
+	clicking
+
+15. NOT DONE
+AXON and current are of the class EnsembleOrigin, they are not probeable.
+They also do not appear in the Ensemble's listStates. 
+Bryan: How do I probe these?
+Investigating 
+	15. can't add probes to the ensemble 'current' and 'AXON' origins (which
+	are hidden by default).
+
+12. TODO
+	12. it would be nice to be able to select multiple things at once. this
+	could help for layout, but would also be nice if, e.g., a bunch of
+	neurons could be chosen and then 'add probe' could be used on all
+	at once (bryan will look into the last possiblity more)
+
+7. DONE w/ Notes
+The default template is created after the first run. 
+The function index lets the user select which function from the function 
+array to plot. The min and max represent the array bounds (I renamed the 
+string to make it a little clearer). 
+	7. the plot function on input needs boxes set by default, e.g.
+	start:0, increment:.01, end:1  (this could be a 'default template'
+	on the first run).  We're not sure what the first integer argument
+	is min:0 max:0, and just set it to 0...?
+
+
+13. DONE w/ Notes
+Windows are restored to their original size once Minimized.
+Window buttons have also been changed: minimize always minimizes, and 
+"cycle" cycles through visible states (maximize and windowed). 
+
+Note that Closing the window using "x", will destroy the window 
+contents (positions and zoom levels are remembered, but the window 
+position goes back to the default.)
+
+	13. when the container viewer is closed (note: the window title is
+	'network viewer') and re-opened, it goes back to a defaul full
+	screen instead of the last window state (position, size, zoom
+	level, etc.).
+
+21. DONE w/ Notes
+Could not reproduce. 
+When a new network is created from the file menu, 
+it is opened by default. This is because the Network model is added to the top-most
+viewer and may be hidden by other network viewers. To add a Network model
+to the existing viewer, right-click within the viewer and use the popup-menu
+instead.
+	** 21. after starting from scratch and adding a network, you can't view it.
+
+
+5. DONE
+Weights information added, and weights editor added
+	**5. The weights info on terminations is junk... matrix size may
+	be useful.  **Is there a way to edit the weights?
+
+14. DONE
+I can no longer reproduce this. 
+May have been fixed with changes to the weights editor.
+
+	**14.  it crashed when we attempted to add a decoded termination to
+	the population:Exception in thread "AWT-EventQueue-0"
+	java.lang.NullPointerException
+	       at ca.neo.ui.models.nodes.widgets.GProbe.<init>(GProbe.java:45)
+       
+17. DONE
+Weights editor added
+**17. there should be a way to add a decoded origin to the population
+
+
+8.DONE
+Removed hover handling which showed origins and terminations on mouse over
+	8. perhaps origins shouldn't pop-up when you scroll over a population
+	after you've hidden them.
+
+1. DONE
+Recurrent connections are drawn as an arc
+	1. recurrent connections (from the output to input of the same
+	population) should go around the population (not through
+	as currently)
+
+2. DONE
+Fixed bug
+	2. When saving and reopening a network, the lay out is changed &
+	should be preserved
+
+3. DONE
+Fixed bug
+	3. Fit on screen should make the network as large as possible, it
+	seemed to go to a default size (which was small on our screen)
+
+4. DONE
+Fixed bug
+	4. double-clicking on origins results in a triangle in the bottom
+	left, pointing at the origin that seems to have no function
+
+6. DONE
+	6. documentation on, e.g., input function should support paragraphs,
+	and have a larger, box, input area.  Current contents should
+	be presented for editing on a second 'set'...
+
+
+9. DONE
+Probes can be added in ensemble
+	9. we aren't able to add probes in the container viewer (i.e., viewing
+	all neurons in the population)
+
+10. DONE
+	10. would it make more sense for the neurons to be arranged in a square
+	rather than long rectangle?
+
+16. DONE
+File extensions now added, file names remembered, and file save is prompted on exit.
+	16. when closing the program, it should prompt to save changes to the
+	simulation
+
+18. DONE
+fixed
+	18. hiding widgets results in the recurrent connection disappearing.
+
+19. DONE
+fixed
+	19. grid off doesn't show until you interact with the window again
+
+20. DONE
+fixed
+	20. 'create new' has a 'P' in front of a bunch of the names?
+
+
+
 Create functions with dimensions
 
 create exceptions
@@ -59,6 +160,10 @@ set simulator
 
 information visualization
 	dimensions of functions, nodes
+	
+re-order popup menus to be more intuitive
+
+mouse handlers should draw frames in the sky
 
 *******************************************
  Pri 1 - to do
@@ -79,6 +184,8 @@ unconnected lines should be highlighted
 *******************************************
  Pri 2 - will do eventually
 *******************************************
+fix the color coding issues with frames on selection, context menu and during drag
+
 debug paint calls using PDebug
 
 add keyboard shortcuts
@@ -127,9 +234,9 @@ Ctrl-key to enable popups (even when autopops are turned off)
 *******************************************
  Bugs
 *******************************************
-bug: ensure threads are safety accessing the piccolo graph
-bug: debug the events related with adding and removing connections
-bug: window appears underneath lines and widgets
+fixed bug: ensure threads are safety accessing the piccolo graph
+fixed bug: debug the events related with adding and removing connections
+fixed bug: window appears underneath lines and widgets
 
 *******************************************
  Bryan requests
@@ -145,3 +252,47 @@ Require events notification
 	show scopes data in real time from the UI
 
 talk about brain view
+
+*******************************************
+ Previously Done
+*******************************************
+(08/10) - Show information on Origins and terminations
+(08/10) - Made tooltips follow the camera on zoom
+
+(08/10) - Two phase fade-in for tooltips (they turn opaque after 2.5 seconds)
+(08/10) - Option to load other networks& ensembles from within networks
+(08/10) - Added option to minimize/close all windows
+(08/10) - Performance debugging, fixed some memory leaks with Windows & Viewers. 
+
+(08/09) - Some user preferences are saved to file
+(08/09) - GFrame remembers user preferences in a serialized user configuration file
+(08/09) - Plot decoded origins
+(08/09) - Plot spikes
+(08/09) - Set/view documentation
+(08/09) - Tooltips with heterogeneous node information added
+
+(08/08) done - Two types of Transient UI feedback for events such as File Save, New connections, etc...
+	Events which modify NEO models should now have UI feedback
+(08/08) done - Remove probes, probes are also updated from the Simulator using getProbes
+(08/08) done - fixed infinite loop bug when GProbe is destroyed
+(08/08) done - fixed some Swing thread safety issues
+
+(08/08) done - size of ensembles & networks proportional to number of nodes
+(08/07) done - save/open ensembles
+(08/07) done - Plot Functions
+(08/07) done - added option to remove projections from terminations
+(08/07) done - hide/show origins and terminations
+(08/07) done - automatically show origins and terminations on hover over
+
+(08/07) done - Preliminary Ensemble Viewer created
+(08/07) done - fixed some bugs with UI connections not detaching correctly
+
+done - File menu, to load saved networks (Use Swing File Dialogs)
+done - Save network from NetworkViewer, or PNetwork
+
+done - undo /redo
+done - It would be nice to have an easy way to maximize the network viewer
+	(controls in upper-right corner like windows would be good)
+done- When a node is deleted, its origins and terminations should also be deleted
+done- There should be either scrollbars or a fit-on-screen function (I
+	lost a function in the infinite network viewer)

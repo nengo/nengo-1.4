@@ -13,7 +13,9 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 	static final float MIN_SCALE = 0.5f;
 
-	public abstract int getNodeCountNormalization();
+	private int myNumOfNodes = -1;
+
+	private GText sizeLabel;
 
 	public NodeContainerIcon(PNodeContainer parent, PNode icon) {
 		super(parent, icon);
@@ -30,9 +32,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 		return (PNodeContainer) super.getModelParent();
 	}
-
-	private int myNumOfNodes = -1;
-	private GText sizeLabel;
+	public abstract int getNodeCountNormalization();
 
 	/**
 	 * Scales the icon display size depending on how many nodes are contained
@@ -66,18 +66,18 @@ public abstract class NodeContainerIcon extends ModelIcon {
 	}
 
 	@Override
-	protected void modelUpdated() {
-		super.modelUpdated();
-		updateIconScale();
-	}
-
-	@Override
 	protected void layoutChildren() {
 		super.layoutChildren();
 
 		sizeLabel.setOffset(0, -(sizeLabel.getHeight() + 1));
 
 		sizeLabel.moveToFront();
+	}
+
+	@Override
+	protected void modelUpdated() {
+		super.modelUpdated();
+		updateIconScale();
 	}
 
 }

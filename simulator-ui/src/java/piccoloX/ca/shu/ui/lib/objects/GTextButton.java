@@ -6,36 +6,18 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 
 public class GTextButton extends Button {
+	private static final int BORDER_HEIGHT = 3;
+
+	private static final int BORDER_WIDTH = 5;
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8982670127440624596L;
 
-	private PText pText;
-
 	private PPath frame;
 
-	private static final int BORDER_WIDTH = 5;
-
-	private static final int BORDER_HEIGHT = 3;
-
-	@Override
-	public void buttonStateChanged() {
-		ButtonState buttonState = getButtonState();
-
-		switch (buttonState) {
-		case DEFAULT:
-			frame.setPaint(defaultColor);
-
-			break;
-		case HIGHLIGHT:
-			frame.setPaint(highlightColor);
-			break;
-		case SELECTED:
-			frame.setPaint(selectedColor);
-			break;
-		}
-	}
+	private PText pText;
 
 	public GTextButton(String value, Runnable action) {
 		super(action);
@@ -56,6 +38,32 @@ public class GTextButton extends Button {
 		buttonStateChanged();
 	}
 
+	@Override
+	public void buttonStateChanged() {
+		ButtonState buttonState = getButtonState();
+
+		switch (buttonState) {
+		case DEFAULT:
+			frame.setPaint(defaultColor);
+
+			break;
+		case HIGHLIGHT:
+			frame.setPaint(highlightColor);
+			break;
+		case SELECTED:
+			frame.setPaint(selectedColor);
+			break;
+		}
+	}
+
+	public PPath getFrame() {
+		return frame;
+	}
+
+	public PText getText() {
+		return pText;
+	}
+
 	public void recomputeBounds() {
 
 		frame.setBounds(0f, 0f, (float) (pText.getWidth() + 2 * BORDER_WIDTH),
@@ -65,22 +73,14 @@ public class GTextButton extends Button {
 		// setBounds(getFullBounds());
 	}
 
+	public void setFont(Font font) {
+		pText.setFont(font);
+	}
+
 	public void setText(String str) {
 		pText.setText(str);
 
 		recomputeBounds();
 
-	}
-
-	public void setFont(Font font) {
-		pText.setFont(font);
-	}
-
-	public PText getText() {
-		return pText;
-	}
-
-	public PPath getFrame() {
-		return frame;
 	}
 }

@@ -9,6 +9,17 @@ public class GButton extends GTextButton {
 	 */
 	private static final long serialVersionUID = 773422993714826750L;
 
+	public GButton(String value, Runnable action) {
+		super(value, action);
+
+		getText().setFont(Style.FONT_BUTTONS);
+		getText().setTextPaint(Style.COLOR_FOREGROUND);
+		// getFrame().setPaint(Style.COLOR_BACKGROUND);
+		getFrame().setStrokePaint(Style.COLOR_BUTTON_BORDER);
+
+		// recomputeBounds();
+	}
+
 	@Override
 	public void buttonStateChanged() {
 
@@ -24,17 +35,6 @@ public class GButton extends GTextButton {
 			getFrame().setPaint(Style.COLOR_BUTTON_SELECTED);
 			break;
 		}
-	}
-
-	public GButton(String value, Runnable action) {
-		super(value, action);
-
-		getText().setFont(Style.FONT_BUTTONS);
-		getText().setTextPaint(Style.COLOR_FOREGROUND);
-		// getFrame().setPaint(Style.COLOR_BACKGROUND);
-		getFrame().setStrokePaint(Style.COLOR_BUTTON_BORDER);
-
-		// recomputeBounds();
 	}
 
 }

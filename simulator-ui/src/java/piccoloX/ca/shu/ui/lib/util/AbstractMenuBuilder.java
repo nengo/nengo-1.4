@@ -19,16 +19,16 @@ public abstract class AbstractMenuBuilder {
 
 	}
 
-	public void style(JComponent item) {
-		if (applyStyle)
-			Style.applyStyleToComponent(item);
-	}
+	public abstract void addAction(StandardAction action);
+
+	public abstract AbstractMenuBuilder createSubMenu(String label);
 
 	public boolean isApplyCustomStyle() {
 		return applyStyle;
 	}
 
-	public abstract void addAction(StandardAction action);
-
-	public abstract AbstractMenuBuilder createSubMenu(String label);
+	public void style(JComponent item) {
+		if (applyStyle)
+			Style.applyStyleToComponent(item);
+	}
 }

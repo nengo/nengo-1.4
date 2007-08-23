@@ -6,12 +6,12 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import ca.neo.model.Node;
+import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.nodes.PNodeContainer;
 import ca.shu.ui.lib.handlers.Interactable;
-import ca.shu.ui.lib.handlers.NodePickerHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
@@ -33,16 +33,14 @@ public abstract class NodeViewer extends World implements NamedObject,
 	private static final long serialVersionUID = 1L;
 
 	static final Dimension DEFAULT_BOUNDS = new Dimension(1000, 1000);
-	static final String LAYOUT_MANAGER_KEY = "layout/manager";
+
+	static final double SQUARE_LAYOUT_NODE_SPACING = 150;
+
 	private Dimension layoutBounds = DEFAULT_BOUNDS;
 
 	private PNodeContainer parentOfViewer;
 
 	private Hashtable<String, PNeoNode> viewerNodes = new Hashtable<String, PNeoNode>();
-
-	public Enumeration<PNeoNode> getViewedNodesElements() {
-		return viewerNodes.elements();
-	}
 
 	/**
 	 * @param nodeContainer
@@ -58,11 +56,11 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 		setName(getModel().getName());
 
-		addInputEventListener(new HoverHandler(this));
+		// addInputEventListener(new HoverHandler(this));
 
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
 
-		updateNodesFromModel();
+		updateViewFromModel();
 		if (viewerNodes.size() > 0) {
 			applyDefaultLayout();
 		}
@@ -109,16 +107,6 @@ public abstract class NodeViewer extends World implements NamedObject,
 		}
 	}
 
-	/**
-	 * 
-	 * @param nodeUI
-	 *            node to be removed
-	 */
-	public void removeNeoNode(PNeoNode nodeUI) {
-		viewerNodes.remove(nodeUI.getName());
-
-	}
-
 	public abstract void applyDefaultLayout();
 
 	public void applySquareLayout() {
@@ -130,6 +118,10 @@ public abstract class NodeViewer extends World implements NamedObject,
 		double y = 0;
 
 		Enumeration<PNeoNode> em = viewerNodes.elements();
+		int numberOfNodes = viewerNodes.size();
+		int numberOfColumns = (int) Math.sqrt(numberOfNodes);
+		int columnCounter = 0;
+
 		PTransformActivity moveNodeActivity = null;
 		while (em.hasMoreElements()) {
 			PNeoNode node = em.nextElement();
@@ -139,9 +131,10 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 			x += 150;
 
-			if (x > getLayoutBounds().getWidth()) {
+			if (++columnCounter > numberOfColumns) {
 				x = 0;
-				y += 130;
+				y += SQUARE_LAYOUT_NODE_SPACING;
+				columnCounter = 0;
 			}
 
 		}
@@ -152,10 +145,19 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	}
 
+	
+
 	@Override
 	public PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
 
+		/*
+		 * File menu
+		 */
+		// menu.addSection("File");
+		menu.addAction(new SaveNodeContainerAction("Save "
+				+ getViewerParent().getTypeName() + " to file",
+				getViewerParent()));
 		return menu;
 	}
 
@@ -167,7 +169,22 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	public String getName() {
-		return "Network Viewer: " + getViewerParent().getName();
+		return getViewerParent().getTypeName() + " Viewer: "
+				+ getViewerParent().getName();
+	}
+
+	/**
+	 * 
+	 * @param name
+	 *            of Node
+	 * @return Node UI object
+	 */
+	public PNeoNode getNode(String name) {
+		return getViewerNodes().get(name);
+	}
+
+	public Enumeration<PNeoNode> getViewedNodesElements() {
+		return viewerNodes.elements();
 	}
 
 	public PNodeContainer getViewerParent() {
@@ -180,6 +197,16 @@ public abstract class NodeViewer extends World implements NamedObject,
 			PNeoNode node = enumeration.nextElement();
 			node.hideAllWidgets();
 		}
+	}
+
+	/**
+	 * 
+	 * @param nodeUI
+	 *            node to be removed
+	 */
+	public void removeNeoNode(PNeoNode nodeUI) {
+		viewerNodes.remove(nodeUI.getName());
+
 	}
 
 	public void setLayoutBounds(Dimension layoutBounds) {
@@ -202,13 +229,52 @@ public abstract class NodeViewer extends World implements NamedObject,
 		return layoutBounds;
 	}
 
-	protected abstract void updateNodesFromModel();
-
 	protected Dictionary<String, PNeoNode> getViewerNodes() {
 		return viewerNodes;
 	}
 
+	protected abstract void updateViewFromModel();
+
 }
+
+// class HoverHandler extends NodePickerHandler {
+//
+// public HoverHandler(NodeViewer world) {
+// super(world);
+// }
+//
+// @Override
+// public void eventUpdated(PInputEvent event) {
+// PNeoNode node = (PNeoNode) Util.getNodeFromPickPath(event,
+// PNeoNode.class);
+//
+// setSelectedNode(node);
+//
+// }
+//
+// @Override
+// protected int getKeepPickDelay() {
+// return 1500;
+// }
+//
+// @Override
+// protected int getPickDelay() {
+// return 0;
+// }
+//
+// // @Override
+// // protected void nodePicked() {
+// // ((PNeoNode) getPickedNode()).setHoveredOver(true);
+// //
+// // }
+// //
+// // @Override
+// // protected void nodeUnPicked() {
+// // ((PNeoNode) getPickedNode()).setHoveredOver(false);
+// //
+// // }
+//
+// }
 
 class ModelStatusBarHandler extends StatusBarHandler {
 
@@ -232,43 +298,4 @@ class ModelStatusBarHandler extends StatusBarHandler {
 		}
 		return statuStr.toString();
 	}
-}
-
-class HoverHandler extends NodePickerHandler {
-
-	public HoverHandler(NodeViewer world) {
-		super(world);
-	}
-
-	@Override
-	protected int getKeepPickDelay() {
-		return 1500;
-	}
-
-	@Override
-	protected int getPickDelay() {
-		return 0;
-	}
-
-	@Override
-	public void eventUpdated(PInputEvent event) {
-		PNeoNode node = (PNeoNode) Util.getNodeFromPickPath(event,
-				PNeoNode.class);
-
-		setSelectedNode(node);
-
-	}
-
-	@Override
-	protected void nodePicked() {
-		((PNeoNode) getPickedNode()).setHoveredOver(true);
-
-	}
-
-	@Override
-	protected void nodeUnPicked() {
-		((PNeoNode) getPickedNode()).setHoveredOver(false);
-
-	}
-
 }

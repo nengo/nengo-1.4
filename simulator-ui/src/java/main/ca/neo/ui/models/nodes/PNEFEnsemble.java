@@ -8,18 +8,19 @@ import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.struct.PTInt;
+import ca.neo.ui.configurable.struct.PTString;
+import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.models.nodes.connectors.PDecodedTermination;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.views.objects.configurable.managers.UserConfig;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.struct.PTInt;
-import ca.neo.ui.views.objects.configurable.struct.PTString;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 
@@ -72,7 +73,9 @@ public class PNEFEnsemble extends PEnsemble {
 	 */
 	public PTermination createDecodedTermintation() {
 		PDecodedTermination termUI = new PDecodedTermination(this);
-		new UserConfig(termUI);
+		UserTemplateConfig config = new UserTemplateConfig(termUI);
+		config.configureAndWait();
+
 		if (termUI.isConfigured()) {
 			addWidget(termUI);
 			return termUI;
@@ -82,7 +85,6 @@ public class PNEFEnsemble extends PEnsemble {
 
 	@Override
 	public PropDescriptor[] getConfigSchema() {
-		// TODO Auto-generated method stub
 		return zProperties;
 	}
 
@@ -93,7 +95,6 @@ public class PNEFEnsemble extends PEnsemble {
 
 	@Override
 	public String getTypeName() {
-		// TODO Auto-generated method stub
 		return typeName;
 	}
 
@@ -139,9 +140,9 @@ public class PNEFEnsemble extends PEnsemble {
 
 		PopupMenuBuilder menu = super.constructMenu();
 
-		MenuBuilder nefMenu = menu.createSubMenu("NEF");
-		
-		MenuBuilder plotMenu = nefMenu.createSubMenu("Plot");
+//		MenuBuilder nefMenu = menu.addSection("NEFEnsemble");
+
+		MenuBuilder plotMenu = menu.createSubMenu("Plot");
 
 		plotMenu.addAction(new StandardAction("NEFEnsemble") {
 			private static final long serialVersionUID = 1L;
@@ -163,25 +164,8 @@ public class PNEFEnsemble extends PEnsemble {
 		}
 
 		// Termination
-		nefMenu.addAction(new AddDecodedTerminationAction());
+		menu.addAction(new AddDecodedTerminationAction());
 		return menu;
-	}
-
-	class PlotDecodedOrigin extends StandardAction {
-		String decodedOriginName;
-		private static final long serialVersionUID = 1L;
-
-		public PlotDecodedOrigin(String actionName, String decodedOriginName) {
-			super("Plot decoded origin", actionName);
-			this.decodedOriginName = decodedOriginName;
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			Plotter.plot(getModel(), decodedOriginName);
-
-		}
-
 	}
 
 	@Override
@@ -207,9 +191,7 @@ public class PNEFEnsemble extends PEnsemble {
 		protected void action() throws ActionException {
 			PTermination term = createDecodedTermintation();
 			if (term == null)
-				throw new ActionException(
-						"Could not create decoded termination");
-
+				throw new UserCancelledException();
 			else
 				addedTermination = term;
 		}
@@ -217,6 +199,23 @@ public class PNEFEnsemble extends PEnsemble {
 		@Override
 		protected void undo() throws ActionException {
 			addedTermination.destroy();
+
+		}
+
+	}
+
+	class PlotDecodedOrigin extends StandardAction {
+		private static final long serialVersionUID = 1L;
+		String decodedOriginName;
+
+		public PlotDecodedOrigin(String actionName, String decodedOriginName) {
+			super("Plot decoded origin", actionName);
+			this.decodedOriginName = decodedOriginName;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			Plotter.plot(getModel(), decodedOriginName);
 
 		}
 

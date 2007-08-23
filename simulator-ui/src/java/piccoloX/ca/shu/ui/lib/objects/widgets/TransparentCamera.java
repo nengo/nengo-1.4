@@ -8,17 +8,17 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class TransparentCamera extends PCamera {
-	float transparency;
-	
-	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	
+	float transparency;
 
-	private AlphaComposite makeComposite(float alpha) {
-		int type = AlphaComposite.SRC_OVER;
-		return (AlphaComposite.getInstance(type, alpha));
+	public TransparentCamera(float transparency) {
+		super();
+		this.transparency = transparency;
 	}
 
 	// Nodes that override the visual representation of their super
@@ -34,9 +34,9 @@ public class TransparentCamera extends PCamera {
 	}
 
 
-	public TransparentCamera(float transparency) {
-		super();
-		this.transparency = transparency;
+	private AlphaComposite makeComposite(float alpha) {
+		int type = AlphaComposite.SRC_OVER;
+		return (AlphaComposite.getInstance(type, alpha));
 	}
 
 }

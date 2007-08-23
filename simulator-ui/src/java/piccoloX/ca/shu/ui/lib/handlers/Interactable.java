@@ -14,15 +14,15 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 public interface Interactable extends NamedObject {
 
 	/**
+	 * @return whether the Context Menu is enabled
+	 */
+	public boolean isContextMenuEnabled();
+
+	/**
 	 * @param event
 	 *            The input event triggering the context menu
 	 * @return context menu associated to the Named Object
 	 */
 	public JPopupMenu showContextMenu(PInputEvent event);
-
-	/**
-	 * @return whether the Context Menu is enabled
-	 */
-	public boolean isContextMenuEnabled();
 
 }

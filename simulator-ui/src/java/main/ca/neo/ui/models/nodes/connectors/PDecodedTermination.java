@@ -3,12 +3,13 @@ package ca.neo.ui.models.nodes.connectors;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.nef.impl.DecodedTermination;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.struct.PTBoolean;
+import ca.neo.ui.configurable.struct.PTFloat;
+import ca.neo.ui.configurable.struct.PTString;
+import ca.neo.ui.configurable.struct.PTTerminationWeights;
+import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.models.nodes.PNEFEnsemble;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.struct.PTBoolean;
-import ca.neo.ui.views.objects.configurable.struct.PTFloat;
-import ca.neo.ui.views.objects.configurable.struct.PTString;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 
 public class PDecodedTermination extends PTermination {
 
@@ -18,25 +19,19 @@ public class PDecodedTermination extends PTermination {
 
 	static final PropDescriptor pName = new PTString("Name");
 
-	static final PropDescriptor pTauPSC = new PTFloat("tau");
+	static final PropDescriptor pTauPSC = new PTFloat("tauPSC");
 
-	static final PropDescriptor[] zProperties = { pName, pTauPSC, pIsModulatory };
+	static final String typeName = "Decoded Termination";
 
 	PNEFEnsemble ensembleProxy;
 
-	// public PDecodedTermination(PNEFEnsemble ensembleProxy, String name,
-	// float tauPSC, boolean isModulatory) {
-	// super(ensembleProxy);
-	// setProperty(pName, name);
-	// setProperty(pTauPSC, tauPSC);
-	// setProperty(pIsModulatory, isModulatory);
-	//
-	//		
-	//		
-	// init(ensembleProxy);
-	//		
-	//
-	// }
+	PropDescriptor pTransformMatrix;
+
+	public PDecodedTermination(PNEFEnsemble ensembleProxy) {
+		super(ensembleProxy);
+
+		init(ensembleProxy);
+	}
 
 	public PDecodedTermination(PNEFEnsemble ensembleProxy,
 			DecodedTermination term) {
@@ -45,21 +40,25 @@ public class PDecodedTermination extends PTermination {
 		init(ensembleProxy);
 	}
 
-	public PDecodedTermination(PNEFEnsemble ensembleProxy) {
-		super(ensembleProxy);
+	@Override
+	public PropDescriptor[] getConfigSchema() {
+		pTransformMatrix = new PTTerminationWeights("Weights", ensembleProxy
+				.getModel().getDimension());
 
-		init(ensembleProxy);
+		PropDescriptor[] zProperties = { pName, pTransformMatrix, pTauPSC,
+				pIsModulatory };
+		return zProperties;
+
+	}
+
+	@Override
+	public String getTypeName() {
+		// TODO Auto-generated method stub
+		return typeName;
 	}
 
 	private void init(PNEFEnsemble ensembleProxy) {
 		this.ensembleProxy = ensembleProxy;
-		
-	}
-
-	@Override
-	public PropDescriptor[] getConfigSchema() {
-		// TODO Auto-generated method stub
-		return zProperties;
 
 	}
 
@@ -70,10 +69,13 @@ public class PDecodedTermination extends PTermination {
 		try {
 			term = ensembleProxy.getModel().addDecodedTermination(
 					(String) configuredProperties.getProperty(pName),
-					new float[][] { new float[] { (Float) configuredProperties
-							.getProperty(pTauPSC) } },
+					(float[][]) configuredProperties
+							.getProperty(pTransformMatrix),
 					(Float) configuredProperties.getProperty(pTauPSC),
 					(Boolean) configuredProperties.getProperty(pIsModulatory));
+
+			ensembleProxy
+					.popupTransientMsg("New decoded termination added to ensemble");
 
 			setName(term.getName());
 		} catch (StructuralException e) {
@@ -84,13 +86,12 @@ public class PDecodedTermination extends PTermination {
 		return term;
 	}
 
-	static final String typeName = "Decoded Termination";
-
 	@Override
-	public String getTypeName() {
-		// TODO Auto-generated method stub
-		return typeName;
+	protected void prepareForDestroy() {
+		ensembleProxy.getModel().removeDecodedTermination(getModel().getName());
+		popupTransientMsg("decoded termination removed from ensemble");
+
+		super.prepareForDestroy();
 	}
 
 }
-

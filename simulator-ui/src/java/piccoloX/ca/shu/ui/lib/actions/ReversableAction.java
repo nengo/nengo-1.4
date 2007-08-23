@@ -13,11 +13,6 @@ import ca.shu.ui.lib.util.Util;
  */
 public abstract class ReversableAction extends StandardAction {
 
-	@Override
-	public boolean canBeUndone() {
-		return true;
-	}
-
 	public ReversableAction(String description) {
 		super(description);
 	}
@@ -26,9 +21,14 @@ public abstract class ReversableAction extends StandardAction {
 		super(description, actionName);
 	}
 
+	@Override
+	public boolean canBeUndone() {
+		return true;
+	}
+
 	public void undoAction() {
 		if (!isActionCompleted()) {
-			Util.Error("Action was never done, so it can't be undone");
+			Util.UserError("Action was never done, so it can't be undone");
 			return;
 		}
 
@@ -53,12 +53,6 @@ public abstract class ReversableAction extends StandardAction {
 
 	}
 
-	/**
-	 * 
-	 * @return Whether the undo action was successful
-	 */
-	protected abstract void undo() throws ActionException;
-
 	@Override
 	protected void postAction() {
 		/*
@@ -68,5 +62,11 @@ public abstract class ReversableAction extends StandardAction {
 			UIEnvironment.getActionManager().addReversableAction(this);
 		}
 	}
+
+	/**
+	 * 
+	 * @return Whether the undo action was successful
+	 */
+	protected abstract void undo() throws ActionException;
 
 }

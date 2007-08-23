@@ -1,20 +1,17 @@
 package ca.neo.ui.models.nodes;
 
-import java.io.File;
-import java.io.IOException;
-
-import ca.neo.io.FileManager;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.impl.NetworkImpl;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.struct.PTString;
+import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.neo.ui.models.viewers.NetworkUIConfiguration;
 import ca.neo.ui.models.viewers.NetworkViewer;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.struct.PTString;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
-import ca.shu.ui.lib.objects.widgets.TransientStatusMessage;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * GUI Wrapper for a Network Model
@@ -44,18 +41,6 @@ public class PNetwork extends PNodeContainer {
 		init();
 	}
 
-	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
-		tooltips.addPart(new PropertyPart("# Projections", ""
-				+ getModel().getProjections().length));
-
-		tooltips.addPart(new PropertyPart("Simulator", ""
-				+ getModel().getSimulator().getClass().getSimpleName()));
-
-		return tooltips;
-	}
-
 	/**
 	 * Creates the Network Viewer
 	 */
@@ -63,9 +48,30 @@ public class PNetwork extends PNodeContainer {
 		return new NetworkViewer(this);
 	}
 
-	@Override
-	public NetworkViewer getAndConstructViewer() {
-		return (NetworkViewer) super.getAndConstructViewer();
+	static final String LAYOUT_MANAGER_KEY = "layout/manager";
+
+	public NetworkUIConfiguration getUIConfig() {
+		NetworkUIConfiguration layoutManager = null;
+		try {
+			Object obj = getModel().getMetaData(LAYOUT_MANAGER_KEY);
+
+			if (obj != null)
+				layoutManager = (NetworkUIConfiguration) obj;
+		} catch (Throwable e) {
+			Util
+					.UserError("Could not access layout manager, creating a new one");
+		}
+
+		if (layoutManager == null) {
+			layoutManager = new NetworkUIConfiguration(getName() + ".net");
+			setUICOnfig(layoutManager);
+		}
+
+		return layoutManager;
+	}
+
+	public void setUICOnfig(NetworkUIConfiguration config) {
+		getModel().setMetaData(LAYOUT_MANAGER_KEY, config);
 	}
 
 	@Override
@@ -91,6 +97,14 @@ public class PNetwork extends PNodeContainer {
 	}
 
 	@Override
+	public int getNodesCount() {
+		if (getModel() != null)
+			return getModel().getNodes().length;
+		else
+			return 0;
+	}
+
+	@Override
 	public String getTypeName() {
 		// TODO Auto-generated method stub
 		return typeName;
@@ -102,17 +116,12 @@ public class PNetwork extends PNodeContainer {
 	}
 
 	@Override
-	public void saveModel(File file) throws IOException {
+	public void saveConfig() {
 
 		if (getViewer() != null) {
 			getViewer().saveLayoutAsDefault();
 		}
 
-		FileManager fm = new FileManager();
-
-		fm.save((Network) getModel(), file);
-
-		TransientStatusMessage.show("File saved!", 2500);
 	}
 
 	/**
@@ -133,17 +142,32 @@ public class PNetwork extends PNodeContainer {
 	}
 
 	@Override
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
+		tooltips.addPart(new PropertyPart("# Projections", ""
+				+ getModel().getProjections().length));
+
+		tooltips.addPart(new PropertyPart("Simulator", ""
+				+ getModel().getSimulator().getClass().getSimpleName()));
+
+		return tooltips;
+	}
+
+	@Override
 	protected boolean validateFullBounds() {
 		// TODO Auto-generated method stub
 		return super.validateFullBounds();
 	}
 
 	@Override
-	public int getNodesCount() {
-		if (getModel() != null)
-			return getModel().getNodes().length;
-		else
-			return 0;
+	public String getFileName() {
+		return getUIConfig().getFileName();
+	}
+
+	@Override
+	public void setFileName(String fileName) {
+		getUIConfig().setFileName(fileName);
+
 	}
 
 }

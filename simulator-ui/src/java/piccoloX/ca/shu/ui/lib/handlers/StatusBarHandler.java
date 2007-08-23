@@ -15,15 +15,6 @@ public class StatusBarHandler extends PBasicInputEventHandler {
 		this.world = world;
 	}
 
-	@Override
-	public void mouseMoved(PInputEvent event) {
-		// TODO Auto-generated method stub
-		super.mouseMoved(event);
-
-		UIEnvironment.getInstance().setStatusStr(getStatusStr(event));
-
-	}
-
 	public String getStatusStr(PInputEvent event) {
 //		Point2D position = event.getPositionRelativeTo(world.getSky());
 		NumberFormat formatter = NumberFormat.getNumberInstance();
@@ -35,5 +26,14 @@ public class StatusBarHandler extends PBasicInputEventHandler {
 
 	public World getWorld() {
 		return world;
+	}
+
+	@Override
+	public void mouseMoved(PInputEvent event) {
+		// TODO Auto-generated method stub
+		super.mouseMoved(event);
+
+		UIEnvironment.getInstance().setStatusStr(getStatusStr(event));
+
 	}
 }

@@ -14,15 +14,15 @@ public class PropertyPart extends TooltipPart {
 		this.propertyValue = propertyValue;
 	}
 
+	public String toString() {
+		return propertyName + ": " + propertyValue;
+	}
+
 	protected String getPropertyName() {
 		return propertyName;
 	}
 
 	protected String getPropertyValue() {
 		return propertyValue;
-	}
-
-	public String toString() {
-		return propertyName + ": " + propertyValue;
 	}
 }

@@ -51,17 +51,6 @@ public abstract class PModel extends WorldObject implements Interactable {
 
 	}
 
-	protected PopupMenuBuilder constructMenu() {
-
-		PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
-
-		// MenuBuilder objectMenu = menu.createSubMenu("Object");
-
-		menu.addAction(new RemoveModelAction("Remove " + getTypeName()));
-
-		return menu;
-	}
-
 	/**
 	 * Fires when the model has changed
 	 */
@@ -105,7 +94,7 @@ public abstract class PModel extends WorldObject implements Interactable {
 
 	public JPopupMenu showContextMenu(PInputEvent event) {
 		if (!isModelCreated()) {
-			Util.Warning("Model is not configured yet");
+			Util.UserWarning("Model is not configured yet");
 			return null;
 		} else {
 			JPopupMenu menu = constructMenu().getJPopupMenu();
@@ -118,8 +107,19 @@ public abstract class PModel extends WorldObject implements Interactable {
 		PModel.this.setBounds(icon.getBounds());
 	}
 
+	protected PopupMenuBuilder constructMenu() {
+
+		PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
+
+		// MenuBuilder objectMenu = menu.createSubMenu("Object");
+
+		menu.addAction(new RemoveModelAction("Remove " + getTypeName()));
+
+		return menu;
+	}
+
 	protected abstract TooltipBuilder constructTooltips();
-	
+
 	protected void setIcon(WorldObject newIcon) {
 		if (icon != null) {
 			icon.removePropertyChangeListener(PROPERTY_BOUNDS,

@@ -7,6 +7,7 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Network;
@@ -18,7 +19,7 @@ import ca.neo.model.Termination;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.nodes.connectors.PWidget;
-import ca.neo.ui.models.nodes.widgets.GProbe;
+import ca.neo.ui.models.nodes.widgets.GSimulatorProbe;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkViewer;
@@ -30,6 +31,7 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
@@ -37,12 +39,12 @@ import edu.uci.ics.jung.graph.Vertex;
 
 public abstract class PNeoNode extends PModelConfigurable {
 
-	boolean isHoverOver = false;
+	// boolean isHoverOver = false;
 
 	/*
 	 * Probes can be attached to the node, or the node's widgets
 	 */
-	Vector<GProbe> probes;
+	Vector<GSimulatorProbe> probes;
 
 	Vertex vertex;
 
@@ -63,15 +65,14 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * @param stateName
 	 *            The name of the state variable to probe
 	 */
-	public GProbe addProbe(String stateName) {
-		
-		GProbe probeUI = new GProbe(this, stateName);
+	public GSimulatorProbe addProbe(String stateName) {
+
+		GSimulatorProbe probeUI = new GSimulatorProbe(this, stateName);
 		newProbeAdded(probeUI);
 
 		return probeUI;
 	}
 
-	
 	public void addWidget(PWidget widget) {
 		widget.setScale(0.5);
 		addChild(widget);
@@ -93,21 +94,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 	}
 
 	/**
-	 * 
-	 * @return The viewer the node is contained in, this may be a regular world
-	 *         or a specialized viewer such as a NetworkViewer or EnsembleViewer
-	 */
-	public NodeViewer getParentViewer() {
-
-		World viewer = getWorld();
-		if (viewer != null && viewer instanceof NodeViewer) {
-			return (NodeViewer) viewer;
-		} else {
-			return null;
-		}
-	}
-
-	/**
 	 * @return Network model the node is attached to
 	 */
 	public Network getParentNetwork() {
@@ -121,6 +107,21 @@ public abstract class PNeoNode extends PModelConfigurable {
 		}
 
 		return null;
+	}
+
+	/**
+	 * 
+	 * @return The viewer the node is contained in, this may be a regular world
+	 *         or a specialized viewer such as a NetworkViewer or EnsembleViewer
+	 */
+	public NodeViewer getParentViewer() {
+
+		World viewer = getWorld();
+		if (viewer != null && viewer instanceof NodeViewer) {
+			return (NodeViewer) viewer;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -171,16 +172,16 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 * @param probe
 	 *            to be removed
 	 */
-	public void removeProbe(GProbe probe) {
+	public void removeProbe(GSimulatorProbe probe) {
 		probes.remove(probe);
 		probe.destroy();
 
 	}
 
-	public void setHoveredOver(boolean bool) {
-		isHoverOver = bool;
-		layoutChildren();
-	}
+	// public void setHoveredOver(boolean bool) {
+	// isHoverOver = bool;
+	// layoutChildren();
+	// }
 
 	@Override
 	public final void setName(String name) {
@@ -263,7 +264,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 			return originUI;
 
 		} catch (StructuralException e) {
-			Util.Error(e.toString());
+			Util.UserError(e.toString());
 		}
 		return null;
 
@@ -277,8 +278,8 @@ public abstract class PNeoNode extends PModelConfigurable {
 	 *            To be shown
 	 * @return Probe UI Object
 	 */
-	public GProbe showProbe(Probe probe) {
-		GProbe probeUI = new GProbe(this, probe);
+	public GSimulatorProbe showProbe(Probe probe) {
+		GSimulatorProbe probeUI = new GSimulatorProbe(this, probe);
 		newProbeAdded(probeUI);
 		return probeUI;
 	}
@@ -315,7 +316,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 			addWidget(termUI);
 			return termUI;
 		} catch (StructuralException e) {
-			Util.Error(e.toString());
+			Util.UserError(e.toString());
 		}
 		return null;
 
@@ -375,9 +376,9 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 	}
 
-	private void newProbeAdded(GProbe probeUI) {
+	private void newProbeAdded(GSimulatorProbe probeUI) {
 		if (probes == null)
-			probes = new Vector<GProbe>();
+			probes = new Vector<GSimulatorProbe>();
 
 		addChild(probeUI);
 		probes.add(probeUI);
@@ -414,7 +415,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		} else {
 			addChild(probeUI);
-			probeUI.setOffset(0, getHeight() / 2);
+
 		}
 
 		// assignProbes();
@@ -433,27 +434,6 @@ public abstract class PNeoNode extends PModelConfigurable {
 		MenuBuilder docMenu = menu.createSubMenu("Documentation");
 		docMenu.addAction(new SetDocumentationAction("Set"));
 		docMenu.addAction(new ViewDocumentationAction("View"));
-
-		/*
-		 * Build the "add probe" menu
-		 */
-		if (getModel() instanceof Probeable) {
-
-			Probeable probeable = (Probeable) getModel();
-			Properties states = probeable.listStates();
-
-			// Enumeration e = states.elements();
-			Iterator it = states.entrySet().iterator();
-			MenuBuilder probesMenu = null;
-
-			while (it.hasNext()) {
-				if (probesMenu == null) {
-					probesMenu = menu.createSubMenu("Add probe");
-				}
-				Entry<String, String> el = (Entry<String, String>) it.next();
-				probesMenu.addAction(new AddProbeAction(el));
-			}
-		}
 
 		MenuBuilder originsAndTerminations = menu
 				.createSubMenu("Origins and terminations");
@@ -491,6 +471,28 @@ public abstract class PNeoNode extends PModelConfigurable {
 		}
 		originsAndTerminations.addAction(new ShowAllOandTAction("Show all"));
 		originsAndTerminations.addAction(new HideAllOandTAction("Hide all"));
+
+		/*
+		 * Build the "add probe" menu
+		 */
+		if (getModel() instanceof Probeable) {
+
+			Probeable probeable = (Probeable) getModel();
+			Properties states = probeable.listStates();
+
+			// Enumeration e = states.elements();
+			Iterator it = states.entrySet().iterator();
+			MenuBuilder probesMenu = null;
+
+			while (it.hasNext()) {
+				if (probesMenu == null) {
+					probesMenu = menu.createSubMenu("Add probe");
+				}
+				Entry<String, String> el = (Entry<String, String>) it.next();
+				probesMenu.addAction(new AddProbeAction(el));
+			}
+		}
+
 		return menu;
 	}
 
@@ -531,6 +533,8 @@ public abstract class PNeoNode extends PModelConfigurable {
 		double originX = getIcon().getWidth() + 5 + offsetX;
 		double originY = termY;
 
+		double probeY = 0;
+
 		Iterator<Object> it = getChildrenIterator();
 
 		/*
@@ -539,7 +543,13 @@ public abstract class PNeoNode extends PModelConfigurable {
 		while (it.hasNext()) {
 			Object obj = it.next();
 
-			if (obj instanceof PWidget) {
+			if (obj instanceof GSimulatorProbe) {
+				GSimulatorProbe probe = (GSimulatorProbe) obj;
+
+				probe.setOffset(0, probeY + getHeight() / 2);
+				probeY -= probe.getHeight() + 5;
+
+			} else if (obj instanceof PWidget) {
 				PWidget widget = (PWidget) obj;
 				if (widget.getParent() == null) {
 					/*
@@ -551,7 +561,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 					double scale = widget.getScale();
 
-					if (!isHoverOver && !(widget).isWidgetVisible()) {
+					if (!(widget).isWidgetVisible()) {
 						double x = centerX - widget.getWidth() * scale / 2f;
 						double y = centerY - widget.getHeight() * scale / 2f;
 
@@ -622,7 +632,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		private static final long serialVersionUID = 1;
 
-		GProbe probeCreated;
+		GSimulatorProbe probeCreated;
 
 		Entry<String, String> state;
 
@@ -675,14 +685,26 @@ public abstract class PNeoNode extends PModelConfigurable {
 		@Override
 		protected void action() throws ActionException {
 			prevDoc = getModel().getDocumentation();
-			String text = JOptionPane.showInputDialog("Enter documentation");
-			if (text != null) {
 
-				getModel().setDocumentation(text);
-				getWorld().showTransientMsg("Documentation changed",
-						PNeoNode.this);
-			} else {
-				throw new UserCancelledException();
+			JTextArea editor = new JTextArea(30, 50);
+			editor.setText(prevDoc);
+
+			int rtnValue = JOptionPane.showOptionDialog(UIEnvironment
+					.getInstance(), editor, getName()
+					+ " - Documenation Editor", JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE, null, null, null);
+
+			if (rtnValue == JOptionPane.OK_OPTION) {
+				String text = editor.getText();
+				// String text = JOptionPane.showInputDialog("Enter
+				// documentation");
+				if (text != null) {
+
+					getModel().setDocumentation(text);
+					popupTransientMsg("Documentation changed");
+				} else {
+					throw new UserCancelledException();
+				}
 			}
 
 		}
@@ -690,7 +712,7 @@ public abstract class PNeoNode extends PModelConfigurable {
 		@Override
 		protected void undo() throws ActionException {
 			getModel().setDocumentation(prevDoc);
-			getWorld().showTransientMsg("Documentation changed", PNeoNode.this);
+			popupTransientMsg("Documentation changed");
 		}
 	}
 
@@ -752,7 +774,14 @@ public abstract class PNeoNode extends PModelConfigurable {
 
 		@Override
 		protected void action() throws ActionException {
-			Util.Message(getModel().getDocumentation(), "Title");
+
+			JTextArea editor = new JTextArea(30, 50);
+			editor.setText(getModel().getDocumentation());
+			editor.setEditable(false);
+
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor,
+					getName() + " - Documentation Viewer",
+					JOptionPane.PLAIN_MESSAGE);
 
 		}
 

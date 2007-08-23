@@ -3,11 +3,6 @@ package ca.neo.ui.models.icons;
 import ca.neo.ui.models.nodes.PNetwork;
 
 public class NetworkIcon extends NodeContainerIcon {
-	@Override
-	protected void setFullBoundsInvalid(boolean fullBoundsInvalid) {
-		super.setFullBoundsInvalid(fullBoundsInvalid);
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	public NetworkIcon(PNetwork parent) {
@@ -16,13 +11,18 @@ public class NetworkIcon extends NodeContainerIcon {
 	}
 
 	@Override
-	protected boolean validateFullBounds() {
-		return super.validateFullBounds();
+	public int getNodeCountNormalization() {
+		return 20;
 	}
 
 	@Override
-	public int getNodeCountNormalization() {
-		return 20;
+	protected void setFullBoundsInvalid(boolean fullBoundsInvalid) {
+		super.setFullBoundsInvalid(fullBoundsInvalid);
+	}
+
+	@Override
+	protected boolean validateFullBounds() {
+		return super.validateFullBounds();
 	}
 
 }

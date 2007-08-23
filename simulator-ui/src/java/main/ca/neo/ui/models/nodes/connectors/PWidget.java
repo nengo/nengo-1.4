@@ -29,28 +29,6 @@ public abstract class PWidget extends PModelConfigurable {
 		init(nodeParent);
 	}
 
-	@Override
-	protected TooltipBuilder constructTooltips() {
-
-		TooltipBuilder tooltips = new TooltipBuilder(getName() + "("
-				+ getTypeName() + ") attached to " + nodeParent.getName());
-
-		return tooltips;
-
-	}
-
-	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
-
-		if (isWidgetVisible()) {
-			menu.addAction(new HideWidgetAction("Hide " + getTypeName()));
-		} else {
-			menu.addAction(new ShowWidgetAction("Show " + getTypeName()));
-		}
-		return menu;
-	}
-
 	public PNeoNode getNodeParent() {
 		return nodeParent;
 	}
@@ -73,6 +51,28 @@ public abstract class PWidget extends PModelConfigurable {
 	private void init(PNeoNode nodeParent) {
 		this.setDraggable(false);
 		this.nodeParent = nodeParent;
+	}
+
+	@Override
+	protected PopupMenuBuilder constructMenu() {
+		PopupMenuBuilder menu = super.constructMenu();
+
+		if (isWidgetVisible()) {
+			menu.addAction(new HideWidgetAction("Hide " + getTypeName()));
+		} else {
+			menu.addAction(new ShowWidgetAction("Show " + getTypeName()));
+		}
+		return menu;
+	}
+
+	@Override
+	protected TooltipBuilder constructTooltips() {
+
+		TooltipBuilder tooltips = new TooltipBuilder(getName() + "("
+				+ getTypeName() + ") attached to " + nodeParent.getName());
+
+		return tooltips;
+
 	}
 
 	class HideWidgetAction extends ReversableAction {

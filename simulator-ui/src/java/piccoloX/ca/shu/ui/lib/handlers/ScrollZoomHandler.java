@@ -8,11 +8,11 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 public class ScrollZoomHandler extends PBasicInputEventHandler {
-	PActivity zoomActivity;
+	double maxScale = 5;
 
 	double minScale = 0.05;
 
-	double maxScale = 5;
+	PActivity zoomActivity;
 
 	@Override
 	public void mouseWheelRotated(PInputEvent event) {

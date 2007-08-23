@@ -2,11 +2,11 @@ package ca.neo.ui.actions;
 
 import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
-import ca.neo.ui.views.objects.configurable.AbstractConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.managers.UserConfig;
-import ca.neo.ui.views.objects.configurable.struct.PTFloat;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.neo.ui.configurable.AbstractConfigurable;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.struct.PTFloat;
+import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
@@ -26,6 +26,26 @@ public class RunSimulatorAction extends StandardAction {
 		this.simulator = simulator;
 	}
 
+	@Override
+	protected void action() throws ActionException {
+		SimulatorConfig simulatorConfig = new SimulatorConfig();
+
+		/*
+		 * Configures the simulatorConfig
+		 */
+		UserTemplateConfig config = new UserTemplateConfig(simulatorConfig);
+		config.configureAndWait();
+
+		if (simulatorConfig.isConfigured()) {
+			(new RunSimulatorThread(simulatorConfig)).startThread();
+
+		} else {
+			throw new ActionException("Simulator configuration not complete",
+					false);
+		}
+
+	}
+
 	class RunSimulatorThread extends TrackedActivity {
 		SimulatorConfig config;
 
@@ -40,28 +60,9 @@ public class RunSimulatorAction extends StandardAction {
 				simulator.run(config.getStartTime(), config.getEndTime(),
 						config.getStepSize());
 			} catch (SimulationException e) {
-				Util.Error("Simulator problem: " + e.toString());
+				Util.UserError("Simulator problem: " + e.toString());
 			}
 		}
-	}
-
-	@Override
-	protected void action() throws ActionException {
-		SimulatorConfig simulatorConfig = new SimulatorConfig();
-
-		/*
-		 * Configures the simulatorConfig
-		 */
-		new UserConfig(simulatorConfig);
-
-		if (simulatorConfig.isConfigured()) {
-			(new RunSimulatorThread(simulatorConfig)).startThread();
-
-		} else {
-			throw new ActionException("Simulator configuration not complete",
-					false);
-		}
-
 	}
 }
 
@@ -79,14 +80,22 @@ class SimulatorConfig extends AbstractConfigurable {
 	static final PropDescriptor[] zProperties = { pStartTime, pEndTime,
 			pStepSize };
 
-	public float getEndTime() {
-		return (Float) configuredProperties.getProperty(pEndTime);
+	PropertySet configuredProperties;
+
+	@Override
+	public void completeConfiguration(PropertySet properties) {
+		super.completeConfiguration(properties);
+		configuredProperties = properties;
 	}
 
 	@Override
 	public PropDescriptor[] getConfigSchema() {
 		// TODO Auto-generated method stub
 		return zProperties;
+	}
+
+	public float getEndTime() {
+		return (Float) configuredProperties.getProperty(pEndTime);
 	}
 
 	public float getStartTime() {
@@ -101,14 +110,6 @@ class SimulatorConfig extends AbstractConfigurable {
 	public String getTypeName() {
 		// TODO Auto-generated method stub
 		return "Simulator Runtime Configuration";
-	}
-
-	PropertySet configuredProperties;
-
-	@Override
-	public void completeConfiguration(PropertySet properties) {
-		super.completeConfiguration(properties);
-		configuredProperties = properties;
 	}
 
 }

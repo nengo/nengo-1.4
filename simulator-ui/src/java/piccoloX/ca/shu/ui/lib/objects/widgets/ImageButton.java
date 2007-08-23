@@ -22,7 +22,7 @@ public class ImageButton extends Button {
 
 	@Override
 	public void buttonStateChanged() {
-		Util.Error("unimplemented function");
+		Util.UserError("unimplemented function");
 
 	}
 

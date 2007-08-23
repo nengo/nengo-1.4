@@ -13,7 +13,6 @@ import javax.swing.JPopupMenu;
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.activities.Fader;
 import ca.shu.ui.lib.handlers.DragHandler;
 import ca.shu.ui.lib.handlers.EventConsumer;
 import ca.shu.ui.lib.handlers.Interactable;
@@ -21,7 +20,6 @@ import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
-import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.objects.widgets.TooltipWrapper;
 import ca.shu.ui.lib.util.Grid;
@@ -31,7 +29,6 @@ import ca.shu.ui.lib.util.UIEnvironment;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -87,8 +84,6 @@ public class World extends WorldObject implements Interactable,
 
 	double cameraY = 0;
 
-	TooltipWrapper tooltipWrapper;
-
 	PNode gridLayer = null;
 
 	WorldGround ground;
@@ -98,6 +93,8 @@ public class World extends WorldObject implements Interactable,
 	WorldSky skyCamera;
 
 	PBasicInputEventHandler statusBarHandler;
+
+	TooltipWrapper tooltipWrapper;
 
 	public World(String name) {
 		super(name);
@@ -173,6 +170,13 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
+	public boolean containsNode(PNode node) {
+		if (getGround().isAncestorOf(node) || getSky().isAncestorOf(node)) {
+			return true;
+		}
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	public Collection<Window> getAllWindows() {
 		Vector<Window> windows = new Vector<Window>(10);
@@ -222,23 +226,6 @@ public class World extends WorldObject implements Interactable,
 		return windows;
 	}
 
-	@SuppressWarnings("unchecked")
-	public void minimizeAllWindows() {
-
-		Iterator<Window> itW = getAllWindows().iterator();
-		while (itW.hasNext()) {
-			itW.next().decreaseWindowSize();
-		}
-
-	}
-
-	public boolean containsNode(PNode node) {
-		if (getGround().isAncestorOf(node) || getSky().isAncestorOf(node)) {
-			return true;
-		}
-		return false;
-	}
-
 	public WorldGround getGround() {
 		return ground;
 	}
@@ -247,14 +234,14 @@ public class World extends WorldObject implements Interactable,
 		return getSky().getViewScale();
 	}
 
+	public double getScreenHeight() {
+		return getHeight();
+	}
+
 	// public void createGrid() {
 	//		
 	//
 	// }
-
-	public double getScreenHeight() {
-		return getHeight();
-	}
 
 	public double getScreenWidth() {
 		return getWidth();
@@ -280,6 +267,16 @@ public class World extends WorldObject implements Interactable,
 	 */
 	public boolean isContextMenuEnabled() {
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void minimizeAllWindows() {
+
+		Iterator<Window> itW = getAllWindows().iterator();
+		while (itW.hasNext()) {
+			itW.next().setWindowState(Window.WindowState.MINIMIZED);
+		}
+
 	}
 
 	public void propertyChange(PropertyChangeEvent arg0) {
@@ -349,27 +346,6 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.world.World#showTransientMsg(java.lang.String,
-	 *      ca.shu.ui.lib.world.impl.WorldObjectImpl)
-	 */
-	public void showTransientMsg(String msg, WorldObject attachTo) {
-
-		TransientMsg msgObject = new TransientMsg(msg);
-
-		double offsetX = -(msgObject.getWidth() - attachTo.getWidth()) / 2d;
-
-		Point2D position = attachTo
-				.objectToSky(new Point2D.Double(offsetX, -5));
-
-		msgObject.setOffset(position);
-		getSky().addChild(msgObject);
-		msgObject.animate();
-
-	}
-
 	public Point2D skyToGround(Point2D position) {
 		skyCamera.localToView(position);
 
@@ -387,7 +363,7 @@ public class World extends WorldObject implements Interactable,
 	}
 
 	public PTransformActivity zoomToFit() {
-		return zoomToBounds(getGround().getFullBounds());
+		return zoomToBounds(getGround().getUnionOfChildrenBounds(null));
 
 	}
 
@@ -403,11 +379,19 @@ public class World extends WorldObject implements Interactable,
 
 		menu.addAction(new ZoomOutAction());
 		MenuBuilder windowsMenu = menu.createSubMenu("Windows");
-		windowsMenu.addAction(new MinimizeAllWindows("Close all"));
-		windowsMenu.addAction(new CloseAllWindows("Minmize all"));
+		windowsMenu.addAction(new CloseAllWindows("Close all"));
+		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
 
 		return menu;
 
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+
+		layer.removeFromParent();
+
+		super.prepareForDestroy();
 	}
 
 	class CloseAllWindows extends StandardAction {
@@ -457,49 +441,4 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
-	@Override
-	protected void prepareForDestroy() {
-
-		layer.removeFromParent();
-
-		super.prepareForDestroy();
-	}
-
 }
-
-class TransientMsg extends GText {
-
-	private static final long serialVersionUID = 1L;
-	static final int ANIMATE_MSG_DURATION = 2500;
-
-	public TransientMsg(String text) {
-		super(text);
-		setFont(Style.FONT_BOLD);
-		setTextPaint(Style.COLOR_NOTIFICATION);
-		setConstrainWidthToTextWidth(true);
-		setPickable(false);
-		setChildrenPickable(false);
-
-	}
-
-	public void animate() {
-		Point2D startingOffset = getOffset();
-		animateToPositionScaleRotation(startingOffset.getX(), startingOffset
-				.getY() - 50, 1, 0, ANIMATE_MSG_DURATION);
-
-		PActivity fadeOutActivity = new Fader(this, ANIMATE_MSG_DURATION, 0f);
-		addActivity(fadeOutActivity);
-
-		PActivity removeActivity = new PActivity(0) {
-
-			@Override
-			protected void activityStarted() {
-				TransientMsg.this.removeFromParent();
-			}
-
-		};
-		addActivity(removeActivity);
-		removeActivity.startAfter(fadeOutActivity);
-	}
-}
-

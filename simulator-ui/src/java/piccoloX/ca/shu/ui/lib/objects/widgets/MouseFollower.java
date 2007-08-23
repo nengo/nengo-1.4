@@ -10,8 +10,8 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
 public class MouseFollower implements PropertyChangeListener {
-	PPath frame = PPath.createRectangle(0f, 0f, 1f, 1f);
 	WorldObject currentlySelected;
+	PPath frame = PPath.createRectangle(0f, 0f, 1f, 1f);
 
 	// Interactable prevObj = null;
 

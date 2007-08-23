@@ -55,7 +55,8 @@ public class Grid extends PLayer {
 
 	public static void setGridVisible(boolean gridVisible) {
 		Grid.gridVisible = gridVisible;
-
+		if (UIEnvironment.getInstance() != null)
+			UIEnvironment.getInstance().getWorld().repaint();
 	}
 
 	Color gridPaint;

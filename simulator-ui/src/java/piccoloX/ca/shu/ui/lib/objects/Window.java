@@ -1,6 +1,5 @@
 package ca.shu.ui.lib.objects;
 
-import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
@@ -8,20 +7,17 @@ import java.lang.ref.WeakReference;
 import javax.swing.JPopupMenu;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.handlers.EventConsumer;
 import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.objects.widgets.AffinityHalo;
 import ca.shu.ui.lib.objects.widgets.BoundsHandle;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
-public class Window extends WorldObject {
-	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.WINDOW;
+public class Window extends WorldObject implements Interactable {
+	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.MAXIMIZED;
 
 	private static final int DEFAULT_HEIGHT = 400;
 
@@ -31,24 +27,21 @@ public class Window extends WorldObject {
 
 	private AffinityHalo affinityHalo = null;
 
-	// private WorldObject attachTo;
 	private WeakReference<WorldObject> attachToRef;
 
 	private WorldObject contentNode;
 
-	private PInputEventListener eventConsumer;
-
 	private PPath menubar;
-
-	private MenuBarHandler menuBarHandler;
 
 	private PBounds savedWindowBounds;
 
-	private Point2D savedWindowOffset;;
+	private Point2D savedWindowOffset;
 
-	private WindowState windowState = WINDOW_STATE_DEFAULT;
+	private WindowState windowState = WINDOW_STATE_DEFAULT;;
 
-	final int MENU_BAR_HEIGHT = 27;
+	private final int MENU_BAR_HEIGHT = 27;
+
+	private WindowState restoreWindowState = WINDOW_STATE_DEFAULT;
 
 	/**
 	 * 
@@ -62,18 +55,13 @@ public class Window extends WorldObject {
 		attachToRef = new WeakReference<WorldObject>(attachTo);
 
 		this.contentNode = contentNode;
-		this.setWidth(DEFAULT_WIDTH);
-		this.setHeight(DEFAULT_HEIGHT);
 
 		menubar = new MenuBar(this);
 
 		setFrameVisible(true);
 		addChild(menubar);
 		addChild(contentNode);
-		menuBarHandler = new MenuBarHandler(this);
-		// menubar.addInputEventListener(menuBarHandler);
 
-		eventConsumer = new EventConsumer();
 		// addInputEventListener(eventConsumer);
 		windowStateChanged();
 	}
@@ -86,17 +74,26 @@ public class Window extends WorldObject {
 	}
 
 	/**
-	 * Decreases the size of the window through state transitions
+	 * Increases the size of the window through state transitions
 	 */
-	public void decreaseWindowSize() {
+	public void cycleVisibleWindowState() {
 		switch (windowState) {
 		case MAXIMIZED:
 			setWindowState(WindowState.WINDOW);
 			break;
 		case WINDOW:
-			setWindowState(WindowState.MINIMIZED);
+			setWindowState(WindowState.MAXIMIZED);
 			break;
+		case MINIMIZED:
+			setWindowState(WindowState.WINDOW);
 		}
+
+	}
+
+	@Override
+	public void doubleClicked() {
+		setWindowState(WindowState.MAXIMIZED);
+
 	}
 
 	@Override
@@ -117,35 +114,53 @@ public class Window extends WorldObject {
 		return windowState;
 	}
 
-	/**
-	 * Increases the size of the window through state transitions
-	 */
-	public void increaseWindowSize() {
-		switch (windowState) {
-
-		case WINDOW:
-			setWindowState(WindowState.MAXIMIZED);
-			break;
-		case MINIMIZED:
-			setWindowState(WindowState.WINDOW);
+	public boolean isContextMenuEnabled() {
+		if (getWindowContent() instanceof Interactable) {
+			return ((Interactable) (getWindowContent())).isContextMenuEnabled();
 		}
+		return false;
+	}
+
+	/**
+	 * Decreases the size of the window through state transitions
+	 */
+	public void minimizeWindow() {
+		setWindowState(WindowState.MINIMIZED);
 
 	}
 
+	public void restoreWindow() {
+		setWindowState(restoreWindowState);
+	}
+
 	public void setWindowState(WindowState state) {
+
 		if (state != windowState) {
 
 			/*
-			 * Saves the window state
+			 * Saves the window bounds and offset
 			 */
 			if (windowState == WindowState.WINDOW) {
 				savedWindowBounds = getBounds();
 				savedWindowOffset = getOffset();
 			}
+			/*
+			 * Saves the previous window state
+			 */
+			if (state == WindowState.MINIMIZED) {
+				restoreWindowState = windowState;
+			}
 
 			windowState = state;
 			windowStateChanged();
 		}
+	}
+
+	public JPopupMenu showContextMenu(PInputEvent event) {
+		if (getWindowContent() instanceof Interactable) {
+			return ((Interactable) (getWindowContent())).showContextMenu(event);
+		}
+		return null;
 	}
 
 	@Override
@@ -169,7 +184,20 @@ public class Window extends WorldObject {
 		// }
 	}
 
+	@Override
+	public void setOffset(double x, double y) {
+		// TODO Auto-generated method stub
+		super.setOffset(x, y);
+	}
+
+	@Override
+	public void setOffset(Point2D point) {
+		// TODO Auto-generated method stub
+		super.setOffset(point);
+	}
+
 	protected void maximizeBounds() {
+		// setOffset(0, 0);
 		setBounds(parentToLocal(getParent().getBounds()));
 	}
 
@@ -190,9 +218,6 @@ public class Window extends WorldObject {
 			affinityHalo.destroy();
 			affinityHalo = null;
 		}
-
-		menubar.removeInputEventListener(menuBarHandler);
-		removeInputEventListener(eventConsumer);
 
 		super.prepareForDestroy();
 	}
@@ -217,6 +242,12 @@ public class Window extends WorldObject {
 			if (savedWindowBounds != null) {
 				setBounds(savedWindowBounds);
 				setOffset(savedWindowOffset);
+			} else {
+				if (attachToRef.get() != null) {
+					setOffset(0, attachToRef.get().getHeight() + 20);
+				}
+				setWidth(DEFAULT_WIDTH);
+				setHeight(DEFAULT_HEIGHT);
 			}
 			if (attachToRef.get() != null) {
 				setDraggable(true);
@@ -261,7 +292,7 @@ public class Window extends WorldObject {
 class MenuBar extends PPath {
 
 	private static final long serialVersionUID = 1L;
-	GButton maximizeButton, minimizeButton, closeButton;
+	GButton cycleButton, minimizeButton, closeButton;
 	GText title;
 
 	Window window;
@@ -278,19 +309,19 @@ class MenuBar extends PPath {
 		title.setFont(Style.FONT_LARGE);
 		addChild(title);
 
-		maximizeButton = new GButton("+", new Runnable() {
+		cycleButton = new GButton("=", new Runnable() {
 			public void run() {
-				window.increaseWindowSize();
+				window.cycleVisibleWindowState();
 			}
 		});
-		maximizeButton.setFont(Style.FONT_BIG);
+		cycleButton.setFont(Style.FONT_WINDOW_BUTTONS);
 
 		minimizeButton = new GButton("-", new Runnable() {
 			public void run() {
-				window.decreaseWindowSize();
+				window.minimizeWindow();
 			}
 		});
-		minimizeButton.setFont(Style.FONT_BIG);
+		minimizeButton.setFont(Style.FONT_WINDOW_BUTTONS);
 
 		closeButton = new GButton("X", new Runnable() {
 			public void run() {
@@ -299,7 +330,7 @@ class MenuBar extends PPath {
 		});
 		closeButton.setFont(Style.FONT_BIG);
 
-		addChild(maximizeButton);
+		addChild(cycleButton);
 		addChild(minimizeButton);
 		addChild(closeButton);
 		setPaint(Style.COLOR_BACKGROUND2);
@@ -314,58 +345,9 @@ class MenuBar extends PPath {
 		double buttonX = getWidth() - closeButton.getWidth() - 2;
 		closeButton.setOffset(buttonX, 2);
 		buttonX -= closeButton.getWidth() - 2;
-		maximizeButton.setOffset(buttonX, 2);
+		cycleButton.setOffset(buttonX, 2);
 		buttonX -= minimizeButton.getWidth() - 2;
 		minimizeButton.setOffset(buttonX, 2);
-	}
-
-}
-
-class MenuBarHandler extends PBasicInputEventHandler {
-
-	private boolean moveToFrontOnPress = true;
-
-	private Window window;
-
-	public MenuBarHandler(Window window) {
-		super();
-		this.window = window;
-	}
-
-	public boolean getMoveToFrontOnPress() {
-		return moveToFrontOnPress;
-	}
-
-	@Override
-	public void mouseClicked(PInputEvent event) {
-		super.mouseClicked(event);
-
-		/*
-		 * Opens the context menu associated with the Content Node of the Window
-		 * Object
-		 */
-		if (event.getButton() == MouseEvent.BUTTON3) {
-			if (window.getWindowContent() instanceof Interactable) {
-				Interactable menuNode = ((Interactable) (window
-						.getWindowContent()));
-
-				if (menuNode.isContextMenuEnabled()) {
-					JPopupMenu menu = menuNode.showContextMenu(event);
-
-					if (menu != null) {
-						menu.setVisible(true);
-						MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
-
-						menu.show(e.getComponent(), e.getPoint().x, e
-								.getPoint().y);
-					}
-				}
-			}
-		}
-	}
-
-	public void setMoveToFrontOnPress(boolean moveToFrontOnPress) {
-		this.moveToFrontOnPress = moveToFrontOnPress;
 	}
 
 }

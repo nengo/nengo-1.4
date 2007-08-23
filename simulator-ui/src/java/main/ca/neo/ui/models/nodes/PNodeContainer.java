@@ -1,14 +1,10 @@
 package ca.neo.ui.models.nodes;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import ca.neo.io.FileManager;
-import ca.neo.model.Network;
 import ca.neo.model.Node;
+import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NodeViewer;
@@ -45,7 +41,7 @@ public abstract class PNodeContainer extends PNeoNode {
 	public void closeViewer() {
 		if (viewerWindowRef.get() != null)
 			viewerWindowRef.get().destroy();
-		
+
 	}
 
 	@Override
@@ -53,17 +49,17 @@ public abstract class PNodeContainer extends PNeoNode {
 		openViewer();
 	}
 
-	public NodeViewer getAndConstructViewer() {
+	protected Window getViewerWindow() {
 
 		if (viewerWindowRef.get() == null
 				|| viewerWindowRef.get().isDestroyed()) {
 			Window viewerWindow = new Window(this, createNodeViewerInstance());
-			viewerWindow.translate(0, this.getHeight() + 20);
+
 			viewerWindowRef = new WeakReference<Window>(viewerWindow);
 
 		}
 
-		return (NodeViewer) viewerWindowRef.get().getWindowContent();
+		return viewerWindowRef.get();
 
 	}
 
@@ -85,34 +81,23 @@ public abstract class PNodeContainer extends PNeoNode {
 	 *         model
 	 */
 	public NodeViewer openViewer() {
-		NodeViewer nodeViewer = getAndConstructViewer();
+		Window viewerWindow = getViewerWindow();
 
-		viewerWindowRef.get().setWindowState(WindowState.MAXIMIZED);
-		viewerWindowRef = new WeakReference<Window>(null);
-		
-		return nodeViewer;
+		if (viewerWindow.getWindowState() == WindowState.MINIMIZED) {
+			viewerWindow.restoreWindow();
+		}
+
+		return (NodeViewer) viewerWindow.getWindowContent();
+
+	}
+
+	public void saveConfig() {
 
 	}
 
-	/**
-	 * Saves the model representing the Node Container
-	 * 
-	 * @param file
-	 *            File to save the model to
-	 * @throws IOException
-	 */
-
-	public void saveModel(File file) throws IOException {
-		FileManager fm = new FileManager();
-
-		fm.save((Network) getModel(), file);
-	}
-
-	@Override
-	protected void afterModelCreated() {
-		super.afterModelCreated();
-
-	}
+	public abstract void setFileName(String fileName);
+	
+	public abstract String getFileName();
 
 	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
@@ -123,6 +108,7 @@ public abstract class PNodeContainer extends PNeoNode {
 
 		menu.addSection("Container");
 		if (viewerWindowRef.get() == null
+				|| viewerWindowRef.get().isDestroyed()
 				|| (viewerWindowRef.get().getWindowState() == Window.WindowState.MINIMIZED)) {
 
 			menu.addAction(new StandardAction("Open viewer") {
@@ -145,8 +131,7 @@ public abstract class PNodeContainer extends PNeoNode {
 			});
 
 		}
-		
-		
+
 		return menu;
 
 	}

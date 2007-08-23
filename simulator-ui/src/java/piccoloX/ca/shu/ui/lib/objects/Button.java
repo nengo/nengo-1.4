@@ -11,16 +11,18 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 
 public abstract class Button extends WorldObject {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private ButtonState buttonState = ButtonState.DEFAULT;
+
 	protected Color defaultColor = Color.white;
 
 	protected Color highlightColor = Color.lightGray;
 
 	protected Color selectedColor = Color.darkGray;
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 	Runnable action;
 
@@ -35,13 +37,6 @@ public abstract class Button extends WorldObject {
 		// buttonStateChanged();
 	}
 
-	private ButtonState buttonState = ButtonState.DEFAULT;
-
-	public void setButtonState(ButtonState pState) {
-		buttonState = pState;
-		buttonStateChanged();
-	}
-
 	public abstract void buttonStateChanged();
 
 	public void doAction() {
@@ -53,12 +48,29 @@ public abstract class Button extends WorldObject {
 		}
 	}
 
-	public static enum ButtonState {
-		DEFAULT, HIGHLIGHT, SELECTED
+	public Runnable getAction() {
+		return action;
 	}
 
 	public Color getDefaultColor() {
 		return defaultColor;
+	}
+
+	public Color getHighlightColor() {
+		return highlightColor;
+	}
+
+	public Color getSelectedColor() {
+		return selectedColor;
+	}
+
+	public void setAction(Runnable action) {
+		this.action = action;
+	}
+
+	public void setButtonState(ButtonState pState) {
+		buttonState = pState;
+		buttonStateChanged();
 	}
 
 	public void setDefaultColor(Color btnDefaultColor) {
@@ -66,17 +78,9 @@ public abstract class Button extends WorldObject {
 		setButtonState(buttonState);
 	}
 
-	public Color getHighlightColor() {
-		return highlightColor;
-	}
-
 	public void setHighlightColor(Color btnHighlightColor) {
 		this.highlightColor = btnHighlightColor;
 		setButtonState(buttonState);
-	}
-
-	public Color getSelectedColor() {
-		return selectedColor;
 	}
 
 	public void setSelectedColor(Color btnSelectedColor) {
@@ -84,16 +88,12 @@ public abstract class Button extends WorldObject {
 		setButtonState(buttonState);
 	}
 
-	public Runnable getAction() {
-		return action;
-	}
-
-	public void setAction(Runnable action) {
-		this.action = action;
-	}
-
 	protected ButtonState getButtonState() {
 		return buttonState;
+	}
+
+	public static enum ButtonState {
+		DEFAULT, HIGHLIGHT, SELECTED
 	}
 
 }
@@ -104,13 +104,6 @@ class ButtonHandler extends PBasicInputEventHandler {
 	public ButtonHandler(Button button) {
 		super();
 		this.button = button;
-	}
-
-	@Override
-	public void processEvent(PInputEvent event, int type) {
-		// TODO Auto-generated method stub
-		super.processEvent(event, type);
-		// event.setHandled(true);
 	}
 
 	@Override
@@ -150,5 +143,12 @@ class ButtonHandler extends PBasicInputEventHandler {
 		// TODO Auto-generated method stub
 		super.mouseReleased(event);
 		button.setButtonState(GTextButton.ButtonState.HIGHLIGHT);
+	}
+
+	@Override
+	public void processEvent(PInputEvent event, int type) {
+		// TODO Auto-generated method stub
+		super.processEvent(event, type);
+		// event.setHandled(true);
 	}
 }

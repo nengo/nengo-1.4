@@ -5,13 +5,13 @@ import javax.swing.SwingUtilities;
 import ca.shu.ui.lib.util.UIEnvironment;
 
 public class TransientStatusMessage {
-	String myMessage;
-
 	public static void show(String msg, long duration) {
 		new TransientStatusMessage(msg, duration);
 	}
 
 	long myDuration;
+
+	String myMessage;
 	protected TransientStatusMessage(String msg, long duration) {
 		super();
 		myMessage = msg;

@@ -5,11 +5,11 @@ import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
 public class Fader extends PInterpolatingActivity {
 
+	PNode node;
+
 	float startingTransparency;
 
 	float targetTransparency;
-
-	PNode node;
 
 	public Fader(PNode node, long duration, float targetTransparency) {
 		this(node, duration, 25, targetTransparency);

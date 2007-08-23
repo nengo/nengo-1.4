@@ -7,8 +7,8 @@ import ca.neo.ui.models.nodes.PNetwork;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 
 public class ExampleRunner {
-	String networkName;
 	Network network;
+	String networkName;
 
 	public ExampleRunner(String networkName, Network exampleNetwork) {
 		this.networkName = networkName;

@@ -12,10 +12,6 @@ import ca.neo.model.StructuralException;
  */
 public class GFuzzyLogicExample extends ExampleRunner {
 
-	public GFuzzyLogicExample() throws StructuralException {
-		super("Fuzzy Logic Example", FuzzyLogicExample.createNetwork());
-	}
-
 	public static void main(String[] args) {
 		try {
 			new GFuzzyLogicExample();
@@ -23,6 +19,10 @@ public class GFuzzyLogicExample extends ExampleRunner {
 
 			e.printStackTrace();
 		}
+	}
+
+	public GFuzzyLogicExample() throws StructuralException {
+		super("Fuzzy Logic Example", FuzzyLogicExample.createNetwork());
 	}
 
 }

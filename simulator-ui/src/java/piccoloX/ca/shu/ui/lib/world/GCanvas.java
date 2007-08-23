@@ -17,9 +17,9 @@ public class GCanvas extends PCanvas {
 
 	static final double CLICK_ZOOM_PADDING = 100;
 
-	World world;
-
 	Stack<World> miniWorlds = new Stack<World>();
+
+	World world;
 
 	public GCanvas(GFrame frame) {
 		super();

@@ -4,14 +4,10 @@ import java.util.Collection;
 import java.util.Vector;
 
 public class TooltipBuilder {
-	Vector<TooltipPart> tooltipParts;
-
 	String name;
-	
-	protected String getName() {
-		return name;
-	}
 
+	Vector<TooltipPart> tooltipParts;
+	
 	public TooltipBuilder(String name) {
 		super();
 		this.name = name;
@@ -21,6 +17,10 @@ public class TooltipBuilder {
 	public void addPart(TooltipPart part) {
 		tooltipParts.add(part);
 
+	}
+
+	protected String getName() {
+		return name;
 	}
 
 	protected Collection<TooltipPart> getParts() {

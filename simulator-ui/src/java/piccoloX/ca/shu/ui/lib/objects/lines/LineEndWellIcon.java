@@ -12,18 +12,28 @@ public class LineEndWellIcon extends WorldObject {
 
 	private static final long serialVersionUID = 1L;
 
+	static final int LINE_END_HEIGHT = 30;
+
+	static final int LINE_END_WIDTH = 30;
+	static final double zICON_RADIUS = Math
+			.sqrt((LINE_END_WIDTH * LINE_END_WIDTH)
+					+ (LINE_END_HEIGHT * LINE_END_HEIGHT)) / 2;
+	private Color color = Style.COLOR_FOREGROUND;
+
 	public LineEndWellIcon() {
 		super();
 		this.setBounds(0, 0, LINE_END_WIDTH, LINE_END_HEIGHT);
+		setColor(Style.COLOR_LINEENDWELL);
+
 	}
 
-	static final int LINE_END_WIDTH = 30;
-	static final int LINE_END_HEIGHT = 30;
-	static final double ICON_RADIUS = Math
-			.sqrt((LINE_END_WIDTH * LINE_END_WIDTH)
-					+ (LINE_END_HEIGHT * LINE_END_HEIGHT)) / 2;
+	public Color getColor() {
+		return color;
+	}
 
-	static Color color = Style.COLOR_LINEEND;
+	public void setColor(Color color) {
+		this.color = color;
+	}
 
 	@Override
 	protected void paint(PPaintContext paintContext) {
@@ -67,14 +77,6 @@ public class LineEndWellIcon extends WorldObject {
 			g2.fillOval(LINE_END_WIDTH / 3 - 1, LINE_END_HEIGHT / 6,
 					LINE_END_WIDTH / 3 + 2, 3 * LINE_END_HEIGHT / 16);
 		}
-	}
-
-	public static Color getColor() {
-		return color;
-	}
-
-	public static void setColor(Color color) {
-		LineEndWellIcon.color = color;
 	}
 
 }

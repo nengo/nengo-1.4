@@ -13,20 +13,12 @@ public abstract class StandardAction implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	boolean actionCompleted = false;
+
 	String actionName;
 
 	String description;
-
-	boolean actionCompleted = false;
 	boolean isEnabled = true;
-
-	public boolean isEnabled() {
-		return isEnabled;
-	}
-
-	public void setEnabled(boolean isEnabled) {
-		this.isEnabled = isEnabled;
-	}
 
 	/**
 	 * 
@@ -55,32 +47,24 @@ public abstract class StandardAction implements Serializable {
 		return false;
 	}
 
-	protected void processActionException(ActionException e) {
-		if (e.showWarning()) {
-			System.out.println("Action Exception: " + e.toString());
-			Util.Warning(e.getMessage());
+	public void doAction() {
 
-		} else
-			System.out.println("Action Exception: " + e.toString());
+		try {
+			action();
+			postAction();
+			actionCompleted = true;
+		} catch (ActionException e) {
+			processActionException(e);
+		}
 	}
 
-	public void doAction() {
+	public void doActionLater() {
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				try {
-					action();
-					postAction();
-					actionCompleted = true;
-				} catch (ActionException e) {
-					processActionException(e);
-				}
+				doAction();
 			}
 		});
-	}
-
-	protected void postAction() {
-
 	}
 
 	public Action getSwingAction() {
@@ -97,6 +81,14 @@ public abstract class StandardAction implements Serializable {
 		return action;
 	}
 
+	public boolean isEnabled() {
+		return isEnabled;
+	}
+
+	public void setEnabled(boolean isEnabled) {
+		this.isEnabled = isEnabled;
+	}
+
 	/**
 	 * 
 	 * @return Whether the action was successful
@@ -111,6 +103,23 @@ public abstract class StandardAction implements Serializable {
 		return description;
 	}
 
+	protected boolean isActionCompleted() {
+		return actionCompleted;
+	}
+
+	protected void postAction() {
+
+	}
+
+	protected void processActionException(ActionException e) {
+		if (e.showWarning()) {
+			System.out.println("Action Exception: " + e.toString());
+			Util.UserWarning(e.getMessage());
+
+		} else
+			System.out.println("Action Exception: " + e.toString());
+	}
+
 	class SwingAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -119,12 +128,8 @@ public abstract class StandardAction implements Serializable {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			doAction();
+			doActionLater();
 		}
 
-	}
-
-	protected boolean isActionCompleted() {
-		return actionCompleted;
 	}
 }

@@ -12,25 +12,35 @@ public class LineEndIcon extends LineEndWellIcon {
 	 */
 	private static final long serialVersionUID = 1L;
 	LineEnd parent;
+	PointerTriangle pointer;
 
 	public LineEndIcon(LineEnd parent) {
 		super();
 		this.parent = parent;
-		addChild(new PointerTriangle(this));
+
+		setColor(Style.COLOR_LINEEND);
+		setPointerVisible(true);
+	}
+
+	public void setPointerVisible(boolean visible) {
+		if (!visible) {
+			pointer.removeFromParent();
+			pointer = null;
+		} else {
+			if (pointer == null) {
+				pointer = new PointerTriangle(this);
+				addChild(pointer);
+			}
+		}
 	}
 
 }
 
 class PointerTriangle extends GEdge {
 
-	@Override
-	public void updateEdge() {
-		updatePointer();
-	}
+	private static final long serialVersionUID = 1L;
 
 	static final double TRIANGLE_EDGE_LENGTH = 20;
-
-	private static final long serialVersionUID = 1L;
 
 	public PointerTriangle(LineEndIcon lineEndIcon) {
 		super(lineEndIcon.parent.getWell(), lineEndIcon.parent);
@@ -39,6 +49,11 @@ class PointerTriangle extends GEdge {
 		setOffset(lineEndIcon.getWidth() / 2, lineEndIcon.getHeight() / 2);
 		setBounds(-TRIANGLE_EDGE_LENGTH / 2, -TRIANGLE_EDGE_LENGTH / 2,
 				TRIANGLE_EDGE_LENGTH, TRIANGLE_EDGE_LENGTH);
+	}
+
+	@Override
+	public void updateEdge() {
+		updatePointer();
 	}
 
 	protected void updatePointer() {
@@ -55,10 +70,10 @@ class PointerTriangle extends GEdge {
 		double deltaX = endPosition.getX() - startPosition.getX();
 		double deltaY = endPosition.getY() - startPosition.getY();
 
-		double angle = getAngle(deltaX, deltaY);
+		double angle = Math.atan2(deltaY, deltaX);
 
-		double x = Math.cos(angle + Math.PI) * LineEndWellIcon.ICON_RADIUS;
-		double y = Math.sin(angle + Math.PI) * LineEndWellIcon.ICON_RADIUS;
+		double x = Math.cos(angle + Math.PI) * LineEndWellIcon.zICON_RADIUS;
+		double y = Math.sin(angle + Math.PI) * LineEndWellIcon.zICON_RADIUS;
 		Point2D point0 = new Point2D.Double(x, y);
 
 		// System.out.println("angle: " + angle);
@@ -78,17 +93,4 @@ class PointerTriangle extends GEdge {
 
 	}
 
-	public static double getAngle(double x, double y) {
-		if (x == 0) {
-			if (y < 0) {
-				return Math.PI / 4;
-			} else {
-				return -Math.PI / 4;
-			}
-		} else if (x < 0) {
-			return Math.atan(y / x) + Math.PI;
-		} else {
-			return Math.atan(y / x);
-		}
-	}
 }

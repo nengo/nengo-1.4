@@ -25,11 +25,6 @@ public class TrackedStatusMsg {
 		init();
 	}
 
-	private void init() {
-		UIEnvironment.getInstance().pushTaskStatusStr(getTaskName());
-
-	}
-
 	/*
 	 * Stop tracking the task. ie. remove it from the User Interface
 	 */
@@ -37,11 +32,16 @@ public class TrackedStatusMsg {
 		UIEnvironment.getInstance().popTaskStatusStr(getTaskName());
 	}
 
-	protected void setTaskName(String taskName) {
-		this.taskName = taskName;
+	private void init() {
+		UIEnvironment.getInstance().pushTaskStatusStr(getTaskName());
+
 	}
 
 	protected String getTaskName() {
 		return taskName;
+	}
+
+	protected void setTaskName(String taskName) {
+		this.taskName = taskName;
 	}
 }

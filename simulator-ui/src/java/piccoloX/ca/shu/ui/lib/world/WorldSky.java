@@ -9,13 +9,6 @@ import edu.umd.cs.piccolo.PNode;
 
 public class WorldSky extends PCamera implements IWorldLayer {
 
-	@Override
-	public void translateView(double arg0, double arg1) {
-		// TODO Auto-generated method stub
-		super.translateView(arg0, arg1);
-
-	}
-
 	/**
 	 * 
 	 */
@@ -23,21 +16,17 @@ public class WorldSky extends PCamera implements IWorldLayer {
 
 	World world;
 
-	public void addWorldObject(WorldObject node) {
-		addChild((PNode) node);
-	}
-
-	public World getWorld() {
-		return world;
-	}
-
 	public WorldSky(World world) {
 		super();
 		this.world = world;
 
 	}
 
-	public Collection<WorldObject> getChildrenAtBounds(Rectangle2D bounds) {
+	public void addChildW(WorldObject child) {
+		throw new NotImplementedException();
+	}
+
+	public void addedToWorld() {
 		throw new NotImplementedException();
 	}
 
@@ -46,12 +35,33 @@ public class WorldSky extends PCamera implements IWorldLayer {
 		addChild((PNode) wo);
 	}
 
-	public void addChildW(WorldObject child) {
+	public void addWorldObject(WorldObject node) {
+		addChild((PNode) node);
+	}
+
+	public void destroy() {
 		throw new NotImplementedException();
+	}
+
+	public void doubleClicked() {
+		throw new NotImplementedException();
+
 	}
 
 	public void endDrag() {
 		throw new NotImplementedException();
+	}
+
+	public Collection<WorldObject> getChildrenAtBounds(Rectangle2D bounds) {
+		throw new NotImplementedException();
+	}
+
+	public String getName() {
+		throw new NotImplementedException();
+	}
+
+	public World getWorld() {
+		return world;
 	}
 
 	public IWorldLayer getWorldLayer() {
@@ -66,19 +76,7 @@ public class WorldSky extends PCamera implements IWorldLayer {
 		throw new NotImplementedException();
 	}
 
-	public void addedToWorld() {
-		throw new NotImplementedException();
-	}
-
 	public void removedFromWorld() {
-		throw new NotImplementedException();
-	}
-
-	public void startDrag() {
-		throw new NotImplementedException();
-	}
-
-	public String getName() {
 		throw new NotImplementedException();
 	}
 
@@ -86,12 +84,14 @@ public class WorldSky extends PCamera implements IWorldLayer {
 		throw new NotImplementedException();
 	}
 
-	public void destroy() {
+	public void startDrag() {
 		throw new NotImplementedException();
 	}
 
-	public void doubleClicked() {
-		throw new NotImplementedException();
+	@Override
+	public void translateView(double arg0, double arg1) {
+		// TODO Auto-generated method stub
+		super.translateView(arg0, arg1);
 
 	}
 

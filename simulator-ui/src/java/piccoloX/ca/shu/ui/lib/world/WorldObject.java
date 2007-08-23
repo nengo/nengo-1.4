@@ -11,6 +11,7 @@ import java.util.Stack;
 
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.LayoutManager;
+import ca.shu.ui.lib.objects.widgets.TransientMsg;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
@@ -22,16 +23,12 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
  * TODO: Clean up class, move non-core functionality to child objects
  */
 public class WorldObject extends PNode implements NamedObject {
-	private static final long serialVersionUID = 1L;
 	public static final String PROPERTY_EDGES = "edges";
-
-	public static enum State {
-		DEFAULT, IN_DRAG, SELECTED
-	}
-
 	public static final String PROPERTY_STATE = "state";
-	private PPath borderFrame = null;
 
+	private static final long serialVersionUID = 1L;
+
+	private PPath borderFrame = null;
 	private PActivity currentActivity = null;
 
 	private PPath frame = null;
@@ -67,75 +64,6 @@ public class WorldObject extends PNode implements NamedObject {
 		transformChangeListener = new TransformChangeListener();
 		addPropertyChangeListener(PROPERTY_TRANSFORM, transformChangeListener);
 
-	}
-
-	public Point2D objectToGround(Point2D position) {
-		IWorldLayer layer = getWorldLayer();
-
-		localToGlobal(position);
-
-		if (layer instanceof WorldSky) {
-			layer.getWorld().getSky().localToView(position);
-			return position;
-		} else if (layer instanceof WorldGround) {
-			return position;
-		}
-		return null;
-
-	}
-
-	public Rectangle2D objectToGround(Rectangle2D rectangle) {
-		IWorldLayer layer = getWorldLayer();
-
-		localToGlobal(rectangle);
-
-		if (layer instanceof WorldSky) {
-			layer.getWorld().getSky().localToView(rectangle);
-			return rectangle;
-		} else if (layer instanceof WorldGround) {
-			return rectangle;
-		}
-		return null;
-
-	}
-
-	public Point2D objectToSky(Point2D position) {
-		IWorldLayer layer = getWorldLayer();
-
-		localToGlobal(position);
-
-		if (layer instanceof WorldGround) {
-			layer.getWorld().getSky().viewToLocal(position);
-			return position;
-		} else if (layer instanceof WorldSky) {
-			return position;
-		}
-		return null;
-
-	}
-
-	public Rectangle2D objectToSky(Rectangle2D rectangle) {
-		IWorldLayer layer = getWorldLayer();
-
-		localToGlobal(rectangle);
-
-		if (layer instanceof WorldGround) {
-			layer.getWorld().getSky().viewToLocal(rectangle);
-			return rectangle;
-		} else if (layer instanceof WorldSky) {
-			return rectangle;
-		}
-		return null;
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.world.WorldObject#doubleClicked()
-	 */
-	public void doubleClicked() {
-		getWorld().zoomToNode(this);
 	}
 
 	/*
@@ -190,13 +118,6 @@ public class WorldObject extends PNode implements NamedObject {
 				.getOffset().getY(), scale, this.getRotation(), duration);
 	}
 
-	/**
-	 * Perform any operations before being destroyed
-	 */
-	protected void prepareForDestroy() {
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -227,6 +148,17 @@ public class WorldObject extends PNode implements NamedObject {
 				}
 			}
 			removeFromParent();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.WorldObject#doubleClicked()
+	 */
+	public void doubleClicked() {
+		if (getWorld() != null) {
+			getWorld().zoomToNode(this);
 		}
 	}
 
@@ -346,12 +278,86 @@ public class WorldObject extends PNode implements NamedObject {
 
 	}
 
+	public Point2D objectToGround(Point2D position) {
+		IWorldLayer layer = getWorldLayer();
+
+		localToGlobal(position);
+
+		if (layer instanceof WorldSky) {
+			layer.getWorld().getSky().localToView(position);
+			return position;
+		} else if (layer instanceof WorldGround) {
+			return position;
+		}
+		return null;
+
+	}
+
+	public Rectangle2D objectToGround(Rectangle2D rectangle) {
+		IWorldLayer layer = getWorldLayer();
+
+		localToGlobal(rectangle);
+
+		if (layer instanceof WorldSky) {
+			layer.getWorld().getSky().localToView(rectangle);
+			return rectangle;
+		} else if (layer instanceof WorldGround) {
+			return rectangle;
+		}
+		return null;
+
+	}
+
+	public Point2D objectToSky(Point2D position) {
+		IWorldLayer layer = getWorldLayer();
+
+		localToGlobal(position);
+
+		if (layer instanceof WorldGround) {
+			layer.getWorld().getSky().viewToLocal(position);
+			return position;
+		} else if (layer instanceof WorldSky) {
+			return position;
+		}
+		return null;
+
+	}
+
+	public Rectangle2D objectToSky(Rectangle2D rectangle) {
+		IWorldLayer layer = getWorldLayer();
+
+		localToGlobal(rectangle);
+
+		if (layer instanceof WorldGround) {
+			layer.getWorld().getSky().viewToLocal(rectangle);
+			return rectangle;
+		} else if (layer instanceof WorldSky) {
+			return rectangle;
+		}
+		return null;
+
+	}
+
 	public void popState(State state) {
 		states.remove(state);
 		if (states.size() == 0)
 			setState(State.DEFAULT);
 		else
 			setState(states.peek());
+
+	}
+
+	public void popupTransientMsg(String msg) {
+
+		TransientMsg msgObject = new TransientMsg(msg);
+
+		double offsetX = -(msgObject.getWidth() - getWidth()) / 2d;
+
+		Point2D position = objectToSky(new Point2D.Double(offsetX, -5));
+
+		msgObject.setOffset(position);
+		getWorld().getSky().addChild(msgObject);
+		msgObject.animate();
 
 	}
 
@@ -362,30 +368,6 @@ public class WorldObject extends PNode implements NamedObject {
 		states.push(state);
 
 		setState(state);
-	}
-
-	protected void setBorder(Color borderColor) {
-		if (borderColor == null) {
-			if (borderFrame != null)
-				borderFrame.removeFromParent();
-			borderFrame = null;
-			return;
-		}
-
-		if (borderFrame == null) {
-
-			borderFrame = PPath.createRectangle((float) getX(), (float) getY(),
-					(float) getWidth(), (float) getHeight());
-
-			synchronized (borderFrame) {
-				borderFrame.setPaint(null);
-
-				addChild(borderFrame);
-			}
-		}
-
-		borderFrame.setStrokePaint(borderColor);
-
 	}
 
 	public void setDraggable(boolean isDraggable) {
@@ -539,6 +521,44 @@ public class WorldObject extends PNode implements NamedObject {
 		}
 	}
 
+	/**
+	 * Perform any operations before being destroyed
+	 */
+	protected void prepareForDestroy() {
+
+	}
+
+	/**
+	 * Called when this object is removed from the World
+	 */
+	protected void removedFromWorld() {
+
+	}
+
+	protected void setBorder(Color borderColor) {
+		if (borderColor == null) {
+			if (borderFrame != null)
+				borderFrame.removeFromParent();
+			borderFrame = null;
+			return;
+		}
+
+		if (borderFrame == null) {
+
+			borderFrame = PPath.createRectangle((float) getX(), (float) getY(),
+					(float) getWidth(), (float) getHeight());
+
+			synchronized (borderFrame) {
+				borderFrame.setPaint(null);
+
+				addChild(borderFrame);
+			}
+		}
+
+		borderFrame.setStrokePaint(borderColor);
+
+	}
+
 	// /**
 	// * Moves nodes which overlap
 	// *
@@ -603,13 +623,6 @@ public class WorldObject extends PNode implements NamedObject {
 	// }
 
 	/**
-	 * Called when this object is removed from the World
-	 */
-	protected void removedFromWorld() {
-
-	}
-
-	/**
 	 * Called when the Object's state has changed
 	 */
 	protected void stateChanged() {
@@ -621,6 +634,10 @@ public class WorldObject extends PNode implements NamedObject {
 		} else if (state == State.SELECTED) {
 			setBorder(Style.COLOR_SELECTED);
 		}
+	}
+
+	public static enum State {
+		DEFAULT, IN_DRAG, SELECTED
 	}
 
 	class TransformChangeListener implements PropertyChangeListener {

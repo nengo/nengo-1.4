@@ -363,6 +363,10 @@ public class GFrame extends JFrame {
 		preferences.apply(this);
 	}
 
+	protected void windowClosing() {
+		savePreferences();
+	}
+
 	protected void savePreferences() {
 		File file = new File(getUserFileDirectory());
 		if (!file.exists())
@@ -446,6 +450,22 @@ public class GFrame extends JFrame {
 		} else {
 			debugMenu.addAction(new HideDebugMemory());
 		}
+	}
+
+	class HideDebugMemory extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public HideDebugMemory() {
+			super("Stop printing Memory Used to console");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			PDebug.debugPrintUsedMemory = false;
+			updateWorldMenu();
+		}
+
 	}
 
 	class HighQualityAction extends StandardAction {
@@ -537,7 +557,7 @@ public class GFrame extends JFrame {
 		}
 
 		public void windowClosing(WindowEvent arg0) {
-			savePreferences();
+			GFrame.this.windowClosing();
 		}
 
 		public void windowDeactivated(WindowEvent arg0) {
@@ -569,6 +589,22 @@ public class GFrame extends JFrame {
 		protected void action() throws ActionException {
 			actionManager.redoAction();
 
+		}
+
+	}
+
+	class ShowDebugMemory extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ShowDebugMemory() {
+			super("Print Memory Used to console");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			PDebug.debugPrintUsedMemory = true;
+			updateWorldMenu();
 		}
 
 	}
@@ -650,38 +686,6 @@ public class GFrame extends JFrame {
 		protected void action() throws ActionException {
 			preferences.setGridVisible(true);
 
-			updateWorldMenu();
-		}
-
-	}
-
-	class ShowDebugMemory extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ShowDebugMemory() {
-			super("Print Memory Used to console");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			PDebug.debugPrintUsedMemory = true;
-			updateWorldMenu();
-		}
-
-	}
-
-	class HideDebugMemory extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public HideDebugMemory() {
-			super("Stop printing Memory Used to console");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			PDebug.debugPrintUsedMemory = false;
 			updateWorldMenu();
 		}
 

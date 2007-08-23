@@ -10,9 +10,11 @@ public class GContextButton extends WorldObject {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	WorldObject node;
+	Tooltip buttons;
 
 	PPath circle;
+
+	WorldObject node;
 
 	public GContextButton(WorldObject node) {
 		super();
@@ -28,8 +30,6 @@ public class GContextButton extends WorldObject {
 		addToLayout(circle);
 
 	}
-
-	Tooltip buttons;
 
 	@Override
 	public Tooltip getTooltip() {

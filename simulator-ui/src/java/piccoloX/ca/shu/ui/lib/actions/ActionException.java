@@ -11,10 +11,6 @@ public class ActionException extends Exception {
 	
 	private boolean showWarning;
 
-	public boolean showWarning() {
-		return showWarning;
-	}
-
 	/**
 	 * @param description
 	 */
@@ -33,6 +29,10 @@ public class ActionException extends Exception {
 
 		this.showWarning = showWarningPopup;
 
+	}
+
+	public boolean showWarning() {
+		return showWarning;
 	}
 
 }

@@ -13,18 +13,33 @@ public abstract class NodePickerHandler extends PBasicInputEventHandler {
 
 	private Thread controlTimer;
 
-	private Object pickSetLock = new Object();
+	private boolean keepPickAlive = false;
 	private Object pickChangeLock = new Object();
+
+	private Object pickSetLock = new Object();
+
+	private WorldObject transientNode;
 
 	private World world;
 
-	private WorldObject transientNode;
+	WorldObject pickedNode;
 
 	public NodePickerHandler(World parent) {
 		super();
 		this.world = parent;
 		controlTimer = new Timer();
 		controlTimer.start();
+	}
+
+	public abstract void eventUpdated(PInputEvent event);
+
+	public boolean isKeepPickAlive() {
+		return keepPickAlive;
+	}
+
+	@Override
+	public void keyPressed(PInputEvent event) {
+		eventUpdated(event);
 	}
 
 	@Override
@@ -37,18 +52,45 @@ public abstract class NodePickerHandler extends PBasicInputEventHandler {
 		eventUpdated(event);
 	}
 
-	public abstract void eventUpdated(PInputEvent event);
+	@Override
+	public void processEvent(PInputEvent event, int type) {
+		super.processEvent(event, type);
+	}
+	protected abstract int getKeepPickDelay();
+
+	protected abstract int getPickDelay();
+
+	protected WorldObject getPickedNode() {
+		return pickedNode;
+	}
+
+	protected World getWorld() {
+		return world;
+	}
 
 	protected abstract void nodePicked();
 
 	protected abstract void nodeUnPicked();
 
-	protected abstract int getPickDelay();
+	protected void setKeepPickAlive(boolean keepPickAlive) {
+		this.keepPickAlive = keepPickAlive;
+	}
 
-	protected abstract int getKeepPickDelay();
+	protected void setSelectedNode(WorldObject selectedNode) {
+		WorldObject oldNode = transientNode;
+		transientNode = selectedNode;
 
-	WorldObject pickedNode;
-	private boolean keepPickAlive = false;
+		if (selectedNode != null && selectedNode != oldNode) {
+			synchronized (pickChangeLock) {
+				pickChangeLock.notifyAll();
+			}
+		}
+
+		synchronized (pickSetLock) {
+			pickSetLock.notifyAll();
+		}
+
+	}
 
 	class Timer extends Thread {
 
@@ -118,47 +160,5 @@ public abstract class NodePickerHandler extends PBasicInputEventHandler {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	protected WorldObject getPickedNode() {
-		return pickedNode;
-	}
-
-	protected void setSelectedNode(WorldObject selectedNode) {
-		WorldObject oldNode = transientNode;
-		transientNode = selectedNode;
-
-		if (selectedNode != null && selectedNode != oldNode) {
-			synchronized (pickChangeLock) {
-				pickChangeLock.notifyAll();
-			}
-		}
-
-		synchronized (pickSetLock) {
-			pickSetLock.notifyAll();
-		}
-
-	}
-
-	protected World getWorld() {
-		return world;
-	}
-
-	protected void setKeepPickAlive(boolean keepPickAlive) {
-		this.keepPickAlive = keepPickAlive;
-	}
-
-	@Override
-	public void keyPressed(PInputEvent event) {
-		eventUpdated(event);
-	}
-
-	@Override
-	public void processEvent(PInputEvent event, int type) {
-		super.processEvent(event, type);
-	}
-
-	public boolean isKeepPickAlive() {
-		return keepPickAlive;
 	}
 }

@@ -22,18 +22,10 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 
 	}
 
-	public World getWorld() {
-		return world;
-	}
-
 	public void addWorldObject(WorldObject node) {
 
 		addChild(node);
 
-	}
-
-	public double getGroundScale() {
-		return world.getSky().getViewScale();
 	}
 
 	public void catchObject(WorldObject wo) {
@@ -67,5 +59,13 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 
 		wo.animateToPositionScaleRotation(finalPosition.getX(), finalPosition
 				.getY(), 1, 0, 500);
+	}
+
+	public double getGroundScale() {
+		return world.getSky().getViewScale();
+	}
+
+	public World getWorld() {
+		return world;
 	}
 }

@@ -14,32 +14,6 @@ public class TooltipHandler extends NodePickerHandler {
 		super(parent);
 	}
 
-	protected int getPickDelay() {
-		return 500;
-	}
-
-	protected int getKeepPickDelay() {
-		return 1500;
-	}
-
-	@Override
-	protected void nodePicked() {
-		WorldObject node = getPickedNode();
-		node.pushState(WorldObject.State.SELECTED);
-		controls = node.getTooltip();
-
-		getWorld().showTooltip(controls, node);
-	}
-
-	@Override
-	protected void nodeUnPicked() {
-		WorldObject node = getPickedNode();
-
-		node.popState(WorldObject.State.SELECTED);
-		getWorld().hideTooltip();
-
-	}
-
 	@Override
 	public void eventUpdated(PInputEvent event) {
 
@@ -73,6 +47,32 @@ public class TooltipHandler extends NodePickerHandler {
 		}
 		setKeepPickAlive(false);
 		setSelectedNode(null);
+
+	}
+
+	protected int getKeepPickDelay() {
+		return 1500;
+	}
+
+	protected int getPickDelay() {
+		return 500;
+	}
+
+	@Override
+	protected void nodePicked() {
+		WorldObject node = getPickedNode();
+		node.pushState(WorldObject.State.SELECTED);
+		controls = node.getTooltip();
+
+		getWorld().showTooltip(controls, node);
+	}
+
+	@Override
+	protected void nodeUnPicked() {
+		WorldObject node = getPickedNode();
+
+		node.popState(WorldObject.State.SELECTED);
+		getWorld().hideTooltip();
 
 	}
 

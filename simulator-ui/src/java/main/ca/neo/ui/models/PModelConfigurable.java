@@ -1,13 +1,11 @@
 package ca.neo.ui.models;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javax.swing.SwingUtilities;
 
+import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.exceptions.ModelConfigurationException;
-import ca.neo.ui.views.objects.configurable.IConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.util.Util;
 
 /**
@@ -49,35 +47,18 @@ public abstract class PModelConfigurable extends PModel implements
 		try {
 			model = configureModel(properties);
 		} catch (ModelConfigurationException e1) {
-			Util.Error("Problem configuring model: " + e1.getMessage());
+			Util.UserError("Problem configuring model: " + e1.getMessage());
 			destroy();
 			return;
 		}
 
-		try {
-			SwingUtilities
-					.invokeAndWait(new CompleteConfigurationRunner(model));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
+		setModel(model);
 
-	}
-
-	class CompleteConfigurationRunner implements Runnable {
-		Object model;
-
-		public CompleteConfigurationRunner(Object model) {
-			super();
-			this.model = model;
-		}
-
-		public void run() {
-			setModel(model);
-			afterModelCreated();
-
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				afterModelCreated();
+			}
+		});
 
 	}
 
@@ -116,5 +97,21 @@ public abstract class PModelConfigurable extends PModel implements
 	 */
 	protected abstract Object configureModel(PropertySet configuredProperties)
 			throws ModelConfigurationException;
+
+	class CompleteConfigurationRunner implements Runnable {
+		Object model;
+
+		public CompleteConfigurationRunner(Object model) {
+			super();
+			this.model = model;
+		}
+
+		public void run() {
+
+			afterModelCreated();
+
+		}
+
+	}
 
 }

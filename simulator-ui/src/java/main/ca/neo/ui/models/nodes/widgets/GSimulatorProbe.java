@@ -6,14 +6,18 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import ca.neo.io.MatlabExporter;
+import ca.neo.model.Network;
 import ca.neo.model.Node;
+import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
+import ca.neo.ui.models.nodes.PEnsemble;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -22,38 +26,99 @@ import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 
-public class GProbe extends PModel {
+public class GSimulatorProbe extends PModel {
 
 	private static final long serialVersionUID = 1L;
 	PNeoNode nodeProxy;
 
-	public GProbe(PNeoNode nodeProxy, Probe model) {
+	public GSimulatorProbe(PNeoNode nodeProxy, Probe model) {
 		super(model);
 		init(nodeProxy);
 	}
 
-	public GProbe(PNeoNode nodeProxy, String state) {
+	public GSimulatorProbe(PNeoNode nodeProxy, String state) {
 		super();
 
 		/*
 		 * Creates the probe
 		 */
 		Node node = nodeProxy.getModel();
-
+		Probe probe;
 		try {
 
-			Probe probe = nodeProxy.getParentNetwork().getSimulator().addProbe(
-					node.getName(), state, true);
+			if (nodeProxy.getParentViewer() instanceof EnsembleViewer) {
+				EnsembleViewer ensembleViewer = (EnsembleViewer) nodeProxy
+						.getParentViewer();
 
-			nodeProxy.getWorld().showTransientMsg(
-					"Probe " + state + " added to Simulator", nodeProxy);
+				PEnsemble ensemble = ensembleViewer.getViewerParent();
+				Network network = ensemble.getParentNetwork();
+
+				probe = network.getSimulator().addProbe(ensemble.getName(),
+						(Probeable) node, state, true);
+
+			} else {
+				probe = nodeProxy.getParentNetwork().getSimulator().addProbe(
+						node.getName(), state, true);
+			}
+
+			nodeProxy.popupTransientMsg("Probe " + state
+					+ " added to Simulator");
 
 			setModel(probe);
 			init(nodeProxy);
 		} catch (SimulationException e) {
 			destroy();
-			Util.Error("Could not add probe: " + e.toString());
+			Util.UserError("Could not add probe: " + e.toString());
 		}
+	}
+
+	/**
+	 * @param name
+	 *            prefix of the fileName to be exported to
+	 * @throws IOException
+	 */
+	public void exportToMatlab(String name) {
+		MatlabExporter me = new MatlabExporter();
+		me.add(getName(), getProbe().getData());
+		try {
+			me.write(new File(name + ".mat"));
+		} catch (IOException e) {
+			Util.UserError("Could not export file: " + e.toString());
+		}
+	}
+
+	@Override
+	public Probe getModel() {
+		return (Probe) super.getModel();
+	}
+
+	/**
+	 * 
+	 * @return Probe object
+	 */
+	public Probe getProbe() {
+		return (Probe) getModel();
+	}
+
+	@Override
+	public String getTypeName() {
+		// TODO Auto-generated method stub
+		return "Probe";
+	}
+
+	/**
+	 * Plots the probe data
+	 */
+	public void plot() {
+		Plotter.plot(getProbe().getData(), getName());
+	}
+
+	/**
+	 * @param tauFilter
+	 *            Time constant of display filter (s)
+	 */
+	public void plot(float tauFilter) {
+		Plotter.plot(getProbe().getData(), tauFilter, getName());
 	}
 
 	private void init(PNeoNode nodeProxy) {
@@ -87,48 +152,12 @@ public class GProbe extends PModel {
 		return menu;
 	}
 
-	/**
-	 * @param name
-	 *            prefix of the fileName to be exported to
-	 * @throws IOException
-	 */
-	public void exportToMatlab(String name) {
-		MatlabExporter me = new MatlabExporter();
-		me.add(getName(), getProbe().getData());
-		try {
-			me.write(new File(name + ".mat"));
-		} catch (IOException e) {
-			Util.Error("Could not export file: " + e.toString());
-		}
-	}
-
-	/**
-	 * 
-	 * @return Probe object
-	 */
-	public Probe getProbe() {
-		return (Probe) getModel();
-	}
-
 	@Override
-	public String getTypeName() {
-		// TODO Auto-generated method stub
-		return "Probe";
-	}
-
-	/**
-	 * Plots the probe data
-	 */
-	public void plot() {
-		Plotter.plot(getProbe().getData(), getName());
-	}
-
-	/**
-	 * @param tauFilter
-	 *            Time constant of display filter (s)
-	 */
-	public void plot(float tauFilter) {
-		Plotter.plot(getProbe().getData(), tauFilter, getName());
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = new TooltipBuilder("Probe");
+		tooltips.addPart(new PropertyPart("Attached to", getModel()
+				.getStateName()));
+		return tooltips;
 	}
 
 	@Override
@@ -138,9 +167,9 @@ public class GProbe extends PModel {
 
 		try {
 			nodeProxy.getParentNetwork().getSimulator().removeProbe(getProbe());
-			getWorld().showTransientMsg("Probe removed from Simulator", this);
+			popupTransientMsg("Probe removed from Simulator");
 		} catch (SimulationException e) {
-			Util.Error("Could not remove probe");
+			Util.UserError("Could not remove probe");
 		}
 
 		nodeProxy.removeProbe(this);
@@ -206,23 +235,10 @@ public class GProbe extends PModel {
 								.showInputDialog("Time constant of display filter (s): "));
 				plot(tauFilter);
 			} catch (java.lang.NumberFormatException exception) {
-				Util.Warning("Could not parse number");
+				Util.UserWarning("Could not parse number");
 			}
 
 		}
-	}
-
-	@Override
-	public Probe getModel() {
-		return (Probe) super.getModel();
-	}
-
-	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = new TooltipBuilder("Probe");
-		tooltips.addPart(new PropertyPart("Attached to", getModel()
-				.getStateName()));
-		return tooltips;
 	}
 
 }

@@ -15,30 +15,21 @@ public class LayoutManager implements Serializable {
 
 	Point2D currentPosition;
 
-	PBounds layoutBounds;
+	boolean firstLayout;
 
 	double horizontalPadding = 0;
 
-	double verticalPadding = 0;
+	PBounds layoutBounds;
 	
-	boolean firstLayout;
-
-	enum LayoutStyle {
-		HORIZONTAL, VERTICAL
-	};
-
 	LayoutStyle style = LayoutStyle.VERTICAL;
+
+	double verticalPadding = 0;;
 
 	public LayoutManager() {
 		
 		setLeftPadding(10);
 		setVerticalPadding(10);
 		reset();
-	}
-
-	public void setStyle(LayoutStyle style) {
-		this.style = style;
-
 	}
 
 	public PBounds getBounds() {
@@ -97,6 +88,11 @@ public class LayoutManager implements Serializable {
 		this.horizontalPadding = leftPadding;
 	}
 
+	public void setStyle(LayoutStyle style) {
+		this.style = style;
+
+	}
+
 	public void setVerticalPadding(double verticalPadding) {
 		this.verticalPadding = verticalPadding;
 	}
@@ -105,6 +101,10 @@ public class LayoutManager implements Serializable {
 		
 		currentPosition.setLocation(currentPosition.getX() + dX,
 				currentPosition.getY() + dY);
+	}
+
+	enum LayoutStyle {
+		HORIZONTAL, VERTICAL
 	}
 
 }

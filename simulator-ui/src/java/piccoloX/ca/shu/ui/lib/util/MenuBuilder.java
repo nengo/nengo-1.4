@@ -21,10 +21,6 @@ public class MenuBuilder extends AbstractMenuBuilder {
 		style(menu);
 	}
 
-	public JMenu getJMenu() {
-		return menu;
-	}
-
 	public void addAction(StandardAction action) {
 		JMenuItem item = new JMenuItem(action.getSwingAction());
 		style(item);
@@ -42,6 +38,10 @@ public class MenuBuilder extends AbstractMenuBuilder {
 		getJMenu().add(mb.getJMenu());
 		return mb;
 
+	}
+
+	public JMenu getJMenu() {
+		return menu;
 	}
 
 	/**

@@ -28,9 +28,7 @@ public class ModelIcon extends WorldObject implements NamedObject,
 
 	PModel parent;
 
-	public PModel getModelParent() {
-		return parent;
-	}
+	boolean showTypeInLabel = true;
 
 	/**
 	 * @param parent
@@ -66,12 +64,6 @@ public class ModelIcon extends WorldObject implements NamedObject,
 		updateBounds();
 	}
 
-	private void updateBounds() {
-		setBounds(iconReal.localToParent(iconReal.getBounds()));
-	}
-
-	boolean showTypeInLabel = true;
-
 	public void configureLabel(boolean showType) {
 		showTypeInLabel = showType;
 		updateLabel();
@@ -82,15 +74,12 @@ public class ModelIcon extends WorldObject implements NamedObject,
 		parent.doubleClicked();
 	}
 
-	public void setLabelVisible(boolean isVisible) {
-		if (isVisible) {
-			addChild(label);
-		} else {
-			if (label.getParent() != null)
-				label.removeFromParent();
+	public PNode getIconReal() {
+		return iconReal;
+	}
 
-		}
-		// label.setVisible(isVisible);
+	public PModel getModelParent() {
+		return parent;
 	}
 
 	/**
@@ -114,8 +103,26 @@ public class ModelIcon extends WorldObject implements NamedObject,
 
 	}
 
-	protected void modelUpdated() {
-		updateLabel();
+	public void setLabelVisible(boolean isVisible) {
+		if (isVisible) {
+			addChild(label);
+		} else {
+			if (label.getParent() != null)
+				label.removeFromParent();
+
+		}
+		// label.setVisible(isVisible);
+	}
+
+	@Override
+	public void signalBoundsChanged() {
+
+		super.signalBoundsChanged();
+
+		/*
+		 * Pass on the message to icon
+		 */
+		iconReal.signalBoundsChanged();
 	}
 
 	/**
@@ -136,6 +143,10 @@ public class ModelIcon extends WorldObject implements NamedObject,
 		}
 	}
 
+	private void updateBounds() {
+		setBounds(iconReal.localToParent(iconReal.getBounds()));
+	}
+
 	@Override
 	protected void layoutChildren() {
 		super.layoutChildren();
@@ -151,19 +162,8 @@ public class ModelIcon extends WorldObject implements NamedObject,
 
 	}
 
-	@Override
-	public void signalBoundsChanged() {
-
-		super.signalBoundsChanged();
-
-		/*
-		 * Pass on the message to icon
-		 */
-		iconReal.signalBoundsChanged();
-	}
-
-	public PNode getIconReal() {
-		return iconReal;
+	protected void modelUpdated() {
+		updateLabel();
 	}
 
 }

@@ -2,9 +2,9 @@ package ca.neo.ui.actions;
 
 import javax.swing.SwingUtilities;
 
+import ca.neo.ui.configurable.managers.UserTemplateConfig;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.views.objects.configurable.managers.UserConfig;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 
@@ -13,10 +13,26 @@ public class CreateModelAction extends ReversableAction {
 	private static final long serialVersionUID = 1L;
 
 	@SuppressWarnings("unchecked")
+	private static String getModelName(Class nodeUIType) {
+		PNeoNode nodeProxy;
+		try {
+			nodeProxy = (PNeoNode) nodeUIType.newInstance();
+			return nodeProxy.getTypeName();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return "unable to retrieve name";
+	}
+	@SuppressWarnings("unchecked")
 	Class nc;
-	INodeContainer nodeContainer;
 
 	PNeoNode nodeAdded;
+
+	INodeContainer nodeContainer;
+
+	PNeoNode nodeProxy;
 
 	/**
 	 * 
@@ -28,7 +44,7 @@ public class CreateModelAction extends ReversableAction {
 	 */
 	@SuppressWarnings("unchecked")
 	public CreateModelAction(INodeContainer nodeContainer, Class nodeUIType) {
-		this(nodeUIType.getSimpleName(), nodeContainer, nodeUIType);
+		this(getModelName(nodeUIType), nodeContainer, nodeUIType);
 	}
 
 	/**
@@ -46,8 +62,6 @@ public class CreateModelAction extends ReversableAction {
 		this.nc = nodeUIType;
 	}
 
-	PNeoNode nodeProxy;
-
 	@Override
 	protected void action() throws ActionException {
 
@@ -57,7 +71,8 @@ public class CreateModelAction extends ReversableAction {
 				try {
 
 					nodeProxy = (PNeoNode) nc.newInstance();
-					new UserConfig(nodeProxy);
+					UserTemplateConfig config = new UserTemplateConfig(nodeProxy);
+					config.configureAndWait();
 
 					if (nodeProxy.isConfigured()) {
 						SwingUtilities.invokeLater(new Runnable() {

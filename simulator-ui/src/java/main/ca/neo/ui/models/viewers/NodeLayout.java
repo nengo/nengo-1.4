@@ -12,8 +12,8 @@ public class NodeLayout implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	Hashtable<String, Point2D> nodePositions;
 	String layoutName;
+	Hashtable<String, Point2D> nodePositions;
 
 	// /**
 	// * @param layoutName
@@ -46,16 +46,16 @@ public class NodeLayout implements Serializable {
 
 	}
 
-	public Point2D getPosition(String nodeName) {
-		return nodePositions.get(nodeName);
-	}
-
 	public Point2D addPosition(String nodeName, Point2D position) {
 		return nodePositions.put(nodeName, position);
 	}
 
 	public String getName() {
 		return layoutName;
+	}
+
+	public Point2D getPosition(String nodeName) {
+		return nodePositions.get(nodeName);
 	}
 
 	public PBounds getSavedViewBounds() {

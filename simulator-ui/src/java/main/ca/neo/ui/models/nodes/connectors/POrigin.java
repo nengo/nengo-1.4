@@ -7,14 +7,15 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.exceptions.ModelConfigurationException;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.shu.ui.lib.objects.GEdge;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Tooltip;
 import ca.shu.ui.lib.objects.lines.ILineAcceptor;
@@ -32,25 +33,6 @@ import ca.shu.ui.lib.world.WorldObject;
 public class POrigin extends PWidget {
 
 	private static final long serialVersionUID = 1L;
-
-	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
-
-		tooltips.addPart(new PropertyPart("Dimensions", ""
-				+ getModel().getDimensions()));
-
-		try {
-			InstantaneousOutput value = getModel().getValues();
-
-			tooltips.addPart(new PropertyPart("Time: ", "" + value.getTime()));
-			tooltips.addPart(new PropertyPart("Units: ", "" + value.getUnits()));
-
-		} catch (SimulationException e) {
-		}
-
-		return tooltips;
-	}
 
 	static final String typeName = "Origin";
 
@@ -96,7 +78,7 @@ public class POrigin extends PWidget {
 						target.getModelTermination());
 				return true;
 			} catch (StructuralException e) {
-				Util.Warning("Could not disconnect: " + e.toString());
+				Util.UserWarning("Could not disconnect: " + e.toString());
 			}
 			return false;
 		} else {
@@ -107,8 +89,13 @@ public class POrigin extends PWidget {
 
 	@Override
 	public PropDescriptor[] getConfigSchema() {
-		Util.Error("POrigin is not configurable yet");
+		Util.UserError("POrigin is not configurable yet");
 		return null;
+	}
+
+	@Override
+	public Origin getModel() {
+		return (Origin) super.getModel();
 	}
 
 	@Override
@@ -161,9 +148,29 @@ public class POrigin extends PWidget {
 
 			return true;
 		} catch (StructuralException e) {
-			Util.Warning("Could not connect: " + e.getMessage());
+			Util.UserWarning("Could not connect: " + e.getMessage());
 			return false;
 		}
+	}
+
+	@Override
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
+
+		tooltips.addPart(new PropertyPart("Dimensions", ""
+				+ getModel().getDimensions()));
+
+		try {
+			InstantaneousOutput value = getModel().getValues();
+
+			tooltips.addPart(new PropertyPart("Time: ", "" + value.getTime()));
+			tooltips
+					.addPart(new PropertyPart("Units: ", "" + value.getUnits()));
+
+		} catch (SimulationException e) {
+		}
+
+		return tooltips;
 	}
 
 	/*
@@ -221,6 +228,21 @@ public class POrigin extends PWidget {
 			addOriginEnd(this);
 		}
 
+		private void setConnectionRecursive(boolean isRecursive) {
+			if (isRecursive) {
+				PNeoNode nodeParent = POrigin.this.getNodeParent();
+				getEdge().setLineShape(GEdge.LineShape.UPWARD_ARC);
+				getEdge().setMinArcRadius(
+						nodeParent.localToParent(nodeParent.getBounds())
+								.getWidth());
+				setPointerVisible(false);
+			} else {
+				getEdge().setLineShape(GEdge.LineShape.STRAIGHT);
+				setPointerVisible(true);
+			}
+
+		}
+
 		@Override
 		protected boolean canConnectTo(ILineAcceptor target) {
 			if ((target instanceof PTermination)) {
@@ -237,8 +259,8 @@ public class POrigin extends PWidget {
 				return false;
 			if (modifyModel) {
 				if (POrigin.this.connectModelTo((PTermination) target)) {
-					getWorld().showTransientMsg("Projection added to Network",
-							this);
+					popupTransientMsg("Projection added to Network");
+
 					return true;
 				} else {
 					return false;
@@ -248,12 +270,27 @@ public class POrigin extends PWidget {
 		}
 
 		@Override
+		protected void justConnected() {
+			super.justConnected();
+
+			/*
+			 * Detect recurrent connections
+			 */
+			if (((PTermination) getTarget()).getNodeParent() == getNodeParent()) {
+
+				setConnectionRecursive(true);
+			}
+		}
+
+		@Override
 		protected void justDisconnected() {
 			super.justDisconnected();
+			setConnectionRecursive(false);
+
+			WorldObject oldTarget = (WorldObject) getTarget();
 			if (disconnectModelFrom((PTermination) getTarget())) {
 
-				getWorld().showTransientMsg("Projection removed from Network",
-						this);
+				oldTarget.popupTransientMsg("Projection removed from Network");
 			}
 
 		}
@@ -279,7 +316,7 @@ public class POrigin extends PWidget {
 		 */
 		public MyLineEnd createConnection() {
 			MyLineEnd lineEnd = new MyLineEnd(this);
-			super.addLineEnd(lineEnd);
+			addChild(lineEnd);
 			return lineEnd;
 		}
 
@@ -288,11 +325,6 @@ public class POrigin extends PWidget {
 			return new MyLineEnd(this);
 		}
 
-	}
-
-	@Override
-	public Origin getModel() {
-		return (Origin) super.getModel();
 	}
 }
 

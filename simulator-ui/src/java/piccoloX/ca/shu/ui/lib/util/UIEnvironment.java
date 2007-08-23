@@ -4,10 +4,14 @@ import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.world.GFrame;
 
 public class UIEnvironment {
-	static GFrame uiInstance;
-
 	public static final double SEMANTIC_ZOOM_LEVEL = 0.2;
+
+	static GFrame uiInstance;
 	
+	public static ReversableActionManager getActionManager() {
+		return getInstance().getActionManager();
+	}
+
 	/**
 	 * 
 	 * @return UI Instance
@@ -33,10 +37,6 @@ public class UIEnvironment {
 		}
 
 		uiInstance = instance;
-	}
-
-	public static ReversableActionManager getActionManager() {
-		return getInstance().getActionManager();
 	}
 
 }

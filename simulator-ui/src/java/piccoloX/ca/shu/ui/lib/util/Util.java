@@ -1,7 +1,9 @@
 package ca.shu.ui.lib.util;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
@@ -11,15 +13,22 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PStack;
 
 public class Util {
-	static final String ZEROES = "000000000000";
+	private static final String BLANKS = "            ";
 
-	static final String BLANKS = "            ";
+	private static final String ZEROES = "000000000000";
 
-	static public Color colorTimes(Color c1, double f) {
-		int r = (int) Math.min(c1.getRed() * f, 255);
-		int g = (int) Math.min(c1.getGreen() * f, 255);
-		int b = (int) Math.min(c1.getBlue() * f, 255);
-		return new Color(r, g, b);
+	static final boolean DEBUG_ENABLED = true;
+
+	public static String arrayToString(Object array) {
+		StringBuffer sb = new StringBuffer();
+		arrayToStringRecursive(sb, array);
+		return sb.toString();
+	}
+
+	public static void Assert(boolean bool, String msg) {
+		if (!bool)
+			(new Exception(msg)).printStackTrace();
+
 	}
 
 	static public Color colorAdd(Color c1, Color c2) {
@@ -29,37 +38,18 @@ public class Util {
 		return new Color(r, g, b);
 	}
 
-	public static void Error(String msg) {
-		Assert(false, msg);
-
+	static public Color colorTimes(Color c1, double f) {
+		int r = (int) Math.min(c1.getRed() * f, 255);
+		int g = (int) Math.min(c1.getGreen() * f, 255);
+		int b = (int) Math.min(c1.getBlue() * f, 255);
+		return new Color(r, g, b);
 	}
-
-	static final boolean DEBUG_ENABLED = true;
 
 	public static void debugMsg(String msg) {
 		if (DEBUG_ENABLED) {
 			System.out.println("DebugMSG: " + msg);
 		}
 
-	}
-
-	public static void Message(String msg, String title) {
-		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg, title,
-				JOptionPane.INFORMATION_MESSAGE);
-	}
-
-	public static void Warning(String msg) {
-//		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
-//				"Warning", JOptionPane.WARNING_MESSAGE);
-		Assert(false, msg);
-	}
-
-	public static void Assert(boolean bool, String msg) {
-		if (!bool) {
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
-					"Error", JOptionPane.ERROR_MESSAGE);
-			(new Exception(msg)).printStackTrace();
-		}
 	}
 
 	public static String format(double val, int n, int w) {
@@ -87,20 +77,18 @@ public class Util {
 		return s;
 	}
 
-	public static void openURL(String url) {
+	/*
+	 * Get the extension of a file.
+	 */
+	public static String getExtension(File f) {
+		String ext = null;
+		String s = f.getName();
+		int i = s.lastIndexOf('.');
 
-		String[] cmd = new String[4];
-		cmd[0] = "cmd.exe";
-		cmd[1] = "/C";
-		cmd[2] = "start";
-		cmd[3] = url;
-
-		try {
-			Runtime.getRuntime().exec(cmd);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (i > 0 && i < s.length() - 1) {
+			ext = s.substring(i + 1).toLowerCase();
 		}
-
+		return ext;
 	}
 
 	/**
@@ -132,6 +120,91 @@ public class Util {
 
 		}
 		return null;
+	}
+
+	public static boolean isArray(Object obj) {
+		if ((obj instanceof Object[]) || (obj instanceof float[])
+				|| (obj instanceof int[]) || (obj instanceof long[])
+				|| (obj instanceof double[])) {
+			return true;
+		}
+		return false;
+
+	}
+
+	public static void Message(String msg, String title) {
+		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg, title,
+				JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public static void openURL(String url) {
+
+		String[] cmd = new String[4];
+		cmd[0] = "cmd.exe";
+		cmd[1] = "/C";
+		cmd[2] = "start";
+		cmd[3] = url;
+
+		try {
+			Runtime.getRuntime().exec(cmd);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void UserError(String msg) {
+		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
+				"Error", JOptionPane.ERROR_MESSAGE);
+		(new Exception(msg)).printStackTrace();
+
+	}
+
+	public static void UserWarning(String msg) {
+		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
+				"Warning", JOptionPane.WARNING_MESSAGE);
+		// Assert(false, msg);
+	}
+
+	private static void arrayToStringRecursive(StringBuffer sb, Object array) {
+		sb.append("[");
+		if (array == null) {
+			sb.append("NULL");
+		} else {
+			Object obj = null;
+
+			int length = Array.getLength(array);
+			int lastItem = length - 1;
+
+			for (int i = 0; i < length; i++) {
+				obj = Array.get(array, i);
+
+				if (obj instanceof Object[]) {
+					arrayToStringRecursive(sb, obj);
+				} else if (obj instanceof float[]) {
+					arrayToStringRecursive(sb, obj);
+
+				} else if (obj instanceof int[]) {
+					arrayToStringRecursive(sb, obj);
+
+				} else if (obj instanceof long[]) {
+					arrayToStringRecursive(sb, obj);
+
+				} else if (obj instanceof double[]) {
+					arrayToStringRecursive(sb, obj);
+
+				} else if (obj != null) {
+					sb.append(obj);
+				} else {
+					sb.append("NULL");
+				}
+				if (i < lastItem) {
+					sb.append(", ");
+				}
+			}
+
+		}
+		sb.append("]");
 	}
 
 }

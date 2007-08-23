@@ -1,22 +1,29 @@
 package ca.neo.ui.models.nodes.connectors;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.managers.UserConfig;
+import ca.neo.ui.configurable.struct.PropDescriptor;
+import ca.neo.ui.configurable.targets.ConfigurableMatrix;
 import ca.neo.ui.exceptions.ModelConfigurationException;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TitlePart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
+import ca.neo.ui.util.NeoUtil;
 import ca.neo.util.Configuration;
 import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.objects.lines.ILineAcceptor;
 import ca.shu.ui.lib.objects.lines.LineEnd;
 import ca.shu.ui.lib.objects.lines.LineInIcon;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * Termination UI Object
@@ -27,6 +34,7 @@ import ca.shu.ui.lib.util.PopupMenuBuilder;
 public class PTermination extends PWidget implements ILineAcceptor {
 
 	private static final long serialVersionUID = 1L;
+
 	LineEnd lineEnd;
 
 	PNeoNode nodeParent;
@@ -52,6 +60,11 @@ public class PTermination extends PWidget implements ILineAcceptor {
 		return lineEnd;
 	}
 
+	@Override
+	public Termination getModel() {
+		return (Termination) super.getModel();
+	}
+
 	public Termination getModelTermination() {
 		return (Termination) getModel();
 	}
@@ -61,21 +74,9 @@ public class PTermination extends PWidget implements ILineAcceptor {
 		return "Termination";
 	}
 
-	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
-
-		tooltips.addPart(new PropertyPart("Dimensions", ""
-				+ getModel().getDimensions()));
-		
-		tooltips.addPart(new TitlePart("Configuration"));
-		Configuration config = getModel().getConfiguration();
-		String[] configProperties = config.listPropertyNames();
-		for (int i = 0; i < configProperties.length; i++) {
-			tooltips.addPart(new PropertyPart(configProperties[i], config
-					.getProperty(configProperties[i]).toString()));
-		}
-		return tooltips;
+	public float[][] getWeights() {
+		return (float[][]) getModel().getConfiguration().getProperty(
+				Termination.WEIGHTS);
 	}
 
 	public boolean setLineEnd(LineEnd lineEnd) {
@@ -88,17 +89,22 @@ public class PTermination extends PWidget implements ILineAcceptor {
 		return true;
 	}
 
+	public void setWeights(float[][] newWeights) {
+		try {
+			getModel().getConfiguration().setProperty(Termination.WEIGHTS,
+					newWeights);
+			popupTransientMsg("Weights changed on Termination");
+		} catch (StructuralException e) {
+			Util.UserWarning("Could not modify weights: " + e.getMessage());
+		}
+
+	}
+
 	private void init() {
-
-		/*
-		 * Set up the Icon
-		 */
-
 		ModelIcon icon = new ModelIcon(this, new LineInIcon());
 		icon.configureLabel(false);
 
 		setIcon(icon);
-
 	}
 
 	@Override
@@ -109,13 +115,65 @@ public class PTermination extends PWidget implements ILineAcceptor {
 
 	@Override
 	protected PopupMenuBuilder constructMenu() {
-		// TODO Auto-generated method stub
 		PopupMenuBuilder menu = super.constructMenu();
 
 		if (lineEnd != null) {
 			menu.addAction(new RemoveConnectionAction("Remove connection"));
 		}
+
+		menu.addSection("Termination Model");
+		menu.addAction(new EditWeightsAction("Edit weights"));
+
 		return menu;
+	}
+
+	@Override
+	protected TooltipBuilder constructTooltips() {
+		TooltipBuilder tooltips = super.constructTooltips();
+
+		tooltips.addPart(new PropertyPart("Dimensions", ""
+				+ getModel().getDimensions()));
+
+		tooltips.addPart(new TitlePart("Configuration"));
+		Configuration config = getModel().getConfiguration();
+		String[] configProperties = config.listPropertyNames();
+		for (int i = 0; i < configProperties.length; i++) {
+			Object propertyValue = config.getProperty(configProperties[i]);
+
+			tooltips.addPart(new PropertyPart(configProperties[i], NeoUtil
+					.objToString(propertyValue)));
+		}
+		return tooltips;
+	}
+
+	class EditWeightsAction extends ReversableAction {
+		private static final long serialVersionUID = 1L;
+
+		float[][] oldWeights;
+
+		public EditWeightsAction(String actionName) {
+			super("Edit weights at Termination " + getName(), actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			oldWeights = getWeights();
+
+			ConfigurableMatrix matrixEditor = new ConfigurableMatrix(oldWeights);
+			UserConfig config = new UserConfig(matrixEditor);
+			config.configureAndWait();
+			if (matrixEditor.isConfigured()) {
+				setWeights(matrixEditor.getMatrix());
+			} else {
+				throw new UserCancelledException();
+			}
+
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			setWeights(oldWeights);
+		}
 	}
 
 	class RemoveConnectionAction extends StandardAction {
@@ -131,10 +189,5 @@ public class PTermination extends PWidget implements ILineAcceptor {
 			lineEnd.destroy();
 			lineEnd = null;
 		}
-	}
-
-	@Override
-	public Termination getModel() {
-		return (Termination) super.getModel();
 	}
 }

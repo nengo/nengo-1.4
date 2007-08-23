@@ -11,6 +11,12 @@ public abstract class Tooltip extends WorldObject {
 
 	WorldObject buttonsNode;
 
+	double xPos = 0;
+
+	double yPos = 0;
+
+	
+	
 	public Tooltip() {
 		super();
 		buttons = new Vector<Button>();
@@ -31,6 +37,11 @@ public abstract class Tooltip extends WorldObject {
 		// this.setF
 	}
 
+	@Override
+	public Tooltip getTooltip() {
+		return null;
+	}
+
 	protected Button addButton(Button btn) {
 		btn.setOffset(xPos, yPos);
 		xPos += btn.getWidth() + 10;
@@ -44,19 +55,8 @@ public abstract class Tooltip extends WorldObject {
 
 	}
 
-	
-	
-	@Override
-	public Tooltip getTooltip() {
-		return null;
-	}
-
 	protected void initButtons() {
 		
 	}
-
-	double xPos = 0;
-
-	double yPos = 0;
 
 }

@@ -7,20 +7,24 @@ import edu.umd.cs.piccolo.nodes.PPath;
 
 public class ProbeIcon extends ModelIcon {
 
-	public ProbeIcon(PModel parent) {
-		super(parent, new IconNode());
-		// TODO Auto-generated constructor stub
-
-	}
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public ProbeIcon(PModel parent) {
+		super(parent, new IconNode());
+
+	}
+
 }
 
 class IconNode extends PPath {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	static final double probeIconSize = 20;
 
 	public IconNode() {
@@ -47,13 +51,8 @@ class IconNode extends PPath {
 		// result.moveTo(x1, y1);
 
 		// result.lineTo(x2, y2);
-		setPaint(Style.COLOR_SELECTED);
+		setPaint(Style.COLOR_LIGHT_PURPLE);
 
 	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 }

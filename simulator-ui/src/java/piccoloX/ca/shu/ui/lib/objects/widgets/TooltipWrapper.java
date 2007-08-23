@@ -17,10 +17,10 @@ public class TooltipWrapper extends WorldObject implements
 		PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
-	WorldObject follow;
-	WorldObject tooltip;
 	PActivity fadeInActivity, fadeInPhase2Activity;
+	WorldObject follow;
 	WorldSky parent;
+	WorldObject tooltip;
 
 	public TooltipWrapper(WorldSky parent, WorldObject tooltip,
 			WorldObject follow) {
@@ -46,19 +46,6 @@ public class TooltipWrapper extends WorldObject implements
 		 */
 		parent.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
 		follow.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
-
-	}
-
-	public void fadeIn() {
-		fadeInActivity = new Fader(this, 500, 0.5f);
-		addActivity(fadeInActivity);
-
-		/*
-		 * fade in much more slowly in the second phase.
-		 */
-		fadeInPhase2Activity = new Fader(this, 2000, 1f);
-		fadeInPhase2Activity.startAfter(fadeInActivity);
-		addActivity(fadeInPhase2Activity);
 
 	}
 
@@ -90,6 +77,19 @@ public class TooltipWrapper extends WorldObject implements
 
 		addActivity(destroyActivity);
 		destroyActivity.startAfter(fadeOutActivity);
+
+	}
+
+	public void fadeIn() {
+		fadeInActivity = new Fader(this, 500, 0.5f);
+		addActivity(fadeInActivity);
+
+		/*
+		 * fade in much more slowly in the second phase.
+		 */
+		fadeInPhase2Activity = new Fader(this, 2000, 1f);
+		fadeInPhase2Activity.startAfter(fadeInActivity);
+		addActivity(fadeInPhase2Activity);
 
 	}
 

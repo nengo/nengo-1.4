@@ -6,11 +6,11 @@ import java.awt.geom.Rectangle2D;
 import edu.umd.cs.piccolo.PNode;
 
 public interface IWorldLayer {
-	public World getWorld();
+	public void addChild(PNode child);
 
-	public Rectangle2D globalToLocal(Rectangle2D globalPoint);
+	public World getWorld();
 
 	public Point2D globalToLocal(Point2D globalPoint);
 
-	public void addChild(PNode child);
+	public Rectangle2D globalToLocal(Rectangle2D globalPoint);
 }

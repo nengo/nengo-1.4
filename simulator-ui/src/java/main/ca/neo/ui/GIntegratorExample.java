@@ -19,19 +19,6 @@ import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
  */
 public class GIntegratorExample extends ExampleRunner {
 
-	public GIntegratorExample() throws StructuralException {
-		super("Integrator Example", createNetwork());
-	}
-
-	public static void main(String[] args) {
-
-		try {
-			new GIntegratorExample();
-		} catch (StructuralException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static Network createNetwork() throws StructuralException {
 
 		Network network = new NetworkImpl();
@@ -65,6 +52,19 @@ public class GIntegratorExample extends ExampleRunner {
 		// System.out.println("Network creation: " + (System.currentTimeMillis()
 		// - start));
 		return network;
+	}
+
+	public static void main(String[] args) {
+
+		try {
+			new GIntegratorExample();
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public GIntegratorExample() throws StructuralException {
+		super("Integrator Example", createNetwork());
 	}
 
 }

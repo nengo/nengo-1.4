@@ -54,6 +54,12 @@ public class Toolbox extends WorldObject {
 //		Util.saveProperty(this, symbolHolder, "defaultSymbols");
 	}
 
+	@Override
+	public WorldObject getTooltip() {
+		// TODO Auto-generated method stub
+		return new ToolBoxControls(this);
+
+	}
 	public void initSymbolHolder() {
 		if (symbolHolder != null)
 			symbolHolder.removeFromParent();
@@ -88,12 +94,6 @@ public class Toolbox extends WorldObject {
 		this.setBounds(newBounds);
 
 	}
-	@Override
-	public WorldObject getTooltip() {
-		// TODO Auto-generated method stub
-		return new ToolBoxControls(this);
-
-	}
 
 	@Override
 	protected void layoutChildren() {
@@ -101,6 +101,21 @@ public class Toolbox extends WorldObject {
 		super.layoutChildren();
 
 		symbolHolder.setOffset(5, 30);
+
+	}
+}
+
+class SymbolCloner implements PropertyChangeListener {
+	WorldObject symbol;
+
+	public SymbolCloner(WorldObject symbol) {
+		super();
+		this.symbol = symbol;
+	}
+
+	public void propertyChange(PropertyChangeEvent arg0) {
+		WorldObject clonedSymbol = (WorldObject) (symbol.clone());
+		clonedSymbol.getParent().addChild(0, clonedSymbol);
 
 	}
 }
@@ -124,7 +139,7 @@ class SymbolHolder extends WorldObject {
 
 			// don't allow duplicate instances
 			if (sym.getName().compareTo(symbol.getName()) == 0) {
-				Util.Warning("There is already a " + symbol.getName()
+				Util.UserWarning("There is already a " + symbol.getName()
 						+ " symbol in the toolbox");
 				return;
 			}
@@ -153,21 +168,6 @@ class SymbolHolder extends WorldObject {
 		}
 
 		return symbols;
-	}
-}
-
-class SymbolCloner implements PropertyChangeListener {
-	WorldObject symbol;
-
-	public SymbolCloner(WorldObject symbol) {
-		super();
-		this.symbol = symbol;
-	}
-
-	public void propertyChange(PropertyChangeEvent arg0) {
-		WorldObject clonedSymbol = (WorldObject) (symbol.clone());
-		clonedSymbol.getParent().addChild(0, clonedSymbol);
-
 	}
 }
 

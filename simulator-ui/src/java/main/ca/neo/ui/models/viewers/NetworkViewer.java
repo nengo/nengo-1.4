@@ -16,21 +16,19 @@ import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.ui.actions.CreateModelAction;
-import ca.neo.ui.actions.LoadEnsembleAction;
-import ca.neo.ui.actions.LoadNetworkAction;
+import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
+import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.struct.PTInt;
+import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.nodes.PNetwork;
 import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
-import ca.neo.ui.views.objects.configurable.IConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.managers.UserConfig;
-import ca.neo.ui.views.objects.configurable.struct.PTInt;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -66,10 +64,6 @@ public class NetworkViewer extends NodeViewer {
 	@SuppressWarnings("unchecked")
 	Class currentLayoutType = null;
 
-	// Network network;
-
-	// PNetwork networkProxy;
-
 	ModelIcon icon;
 
 	/**
@@ -83,14 +77,6 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	public void addedToWorld() {
-		// TODO Auto-generated method stub
-		super.addedToWorld();
-
-		// this.animateToBounds(0, 0, 400, 300, 1000);
-	}
-
-	@Override
 	public void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCamera) {
 		if (updateModel) {
@@ -99,7 +85,7 @@ public class NetworkViewer extends NodeViewer {
 				getNetwork().addNode(nodeProxy.getModel());
 
 			} catch (StructuralException e) {
-				Util.Warning(e.toString());
+				Util.UserWarning(e.toString());
 				return;
 			}
 		}
@@ -107,8 +93,8 @@ public class NetworkViewer extends NodeViewer {
 				moveCamera);
 
 		if (updateModel) {
-			showTransientMsg("Node " + getName() + " added to Network",
-					nodeProxy);
+			nodeProxy.popupTransientMsg("Node " + getName()
+					+ " added to Network");
 
 		}
 	}
@@ -148,7 +134,7 @@ public class NetworkViewer extends NodeViewer {
 		}
 
 		if (layout == null) {
-			Util.Error("Could not apply layout");
+			Util.UserError("Could not apply layout");
 			return;
 		}
 
@@ -166,13 +152,6 @@ public class NetworkViewer extends NodeViewer {
 				.getSimulator()));
 
 		/*
-		 * File menu
-		 */
-		// menu.addSection("File");
-		menu.addAction(new SaveNodeContainerAction("Save network to file",
-				getViewerParent()));
-
-		/*
 		 * Create new models
 		 */
 		menu.addSection("Add model to network");
@@ -183,10 +162,7 @@ public class NetworkViewer extends NodeViewer {
 		MenuBuilder nodesMenu = createNewMenu.createSubMenu("Nodes");
 		MenuBuilder functionsMenu = createNewMenu.createSubMenu("Functions");
 
-		MenuBuilder fromFileMenu = menu.createSubMenu("From file");
-		fromFileMenu.addAction(new LoadNetworkAction("Network", this));
-		fromFileMenu.addAction(new LoadEnsembleAction("NEFEnsemble / Ensemble",
-				this));
+		menu.addAction(new OpenNeoFileAction("Open from file", this));
 
 		// Nodes
 		for (int i = 0; i < PModelClasses.NODE_TYPES.length; i++) {
@@ -235,7 +211,7 @@ public class NetworkViewer extends NodeViewer {
 
 		layoutsMenu.addAction(new SaveLayout("Save as new"));
 		MenuBuilder restoreLayout = layoutsMenu.createSubMenu("Restore");
-		String[] layoutNames = getNodeLayoutManager().getLayoutNames();
+		String[] layoutNames = getUIConfig().getLayoutNames();
 
 		if (layoutNames.length > 0) {
 			for (int i = 0; i < layoutNames.length; i++) {
@@ -263,40 +239,17 @@ public class NetworkViewer extends NodeViewer {
 		return menu;
 	}
 
+	public void deleteNodeLayout(String name) {
+		NetworkUIConfiguration layouts = getUIConfig();
+		layouts.removeLayout(name);
+	}
+
 	public Network getNetwork() {
 		return (Network) getModel();
 	}
 
-	/**
-	 * 
-	 * @param name
-	 *            of Node
-	 * @return Node UI object
-	 */
-	public PNeoNode getNode(String name) {
-		return getViewerNodes().get(name);
-	}
-
-	public NodeLayoutManager getNodeLayoutManager() {
-		NodeLayoutManager layoutManager = null;
-		try {
-
-			Object obj = getViewerParent().getModel().getMetaData(
-					getLayoutManagerKey());
-			if (obj != null)
-				layoutManager = (NodeLayoutManager) obj;
-		} catch (Throwable e) {
-			Util.Error("Could not access layout manager, creating a new one");
-			// catch all exceptions
-		}
-
-		if (layoutManager == null) {
-			layoutManager = new NodeLayoutManager();
-			getViewerParent().getModel().setMetaData(getLayoutManagerKey(),
-					layoutManager);
-		}
-		return (NodeLayoutManager) layoutManager;
-
+	public NetworkUIConfiguration getUIConfig() {
+		return getViewerParent().getUIConfig();
 	}
 
 	@Override
@@ -309,21 +262,16 @@ public class NetworkViewer extends NodeViewer {
 	public void removeNeoNode(PNeoNode nodeUI) {
 
 		try {
-			showTransientMsg("Node " + nodeUI.getName()
-					+ " removed from Network", nodeUI);
+			nodeUI.popupTransientMsg("Node " + nodeUI.getName()
+					+ " removed from Network");
 			getNetwork().removeNode(nodeUI.getName());
 
 		} catch (StructuralException e) {
-			Util.Warning(e.toString());
+			Util.UserWarning(e.toString());
 			return;
 		}
 		super.removeNeoNode(nodeUI);
 
-	}
-
-	public void deleteNodeLayout(String name) {
-		NodeLayoutManager layouts = getNodeLayoutManager();
-		layouts.removeLayout(name);
 	}
 
 	/**
@@ -332,7 +280,7 @@ public class NetworkViewer extends NodeViewer {
 	 *            of layout to restore
 	 */
 	public boolean restoreNodeLayout(String name) {
-		NodeLayoutManager layouts = getNodeLayoutManager();
+		NetworkUIConfiguration layouts = getUIConfig();
 		NodeLayout layout = layouts.getLayout(name);
 
 		if (layout == null) {
@@ -367,20 +315,21 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public void saveNodeLayout(String name) {
 
-		NodeLayoutManager layouts = getNodeLayoutManager();
+		NetworkUIConfiguration layouts = getUIConfig();
 		if (layouts != null) {
 			NodeLayout nodeLayout = new NodeLayout(name, this);
 
 			layouts.addLayout(nodeLayout);
 		} else {
-			Util.Error("Could not save node layout");
+			Util.UserError("Could not save node layout");
 		}
 	}
 
 	/**
 	 * Construct children UI nodes from the NEO Network model
 	 */
-	public void updateNodesFromModel() {
+	@Override
+	public void updateViewFromModel() {
 
 		/*
 		 * Removes all existing nodes from this viewer
@@ -440,13 +389,10 @@ public class NetworkViewer extends NodeViewer {
 			Probeable target = probe.getTarget();
 
 			if (!(target instanceof Node)) {
-				Util.Error("Unsupported target type for probe");
+				Util.UserError("Unsupported target type for probe");
 			} else {
 
-				if (probe.isInEnsemble()) {
-					Util
-							.Error("A probe is inside an ensemble. Displaying this is not supported yet");
-				} else {
+				if (!probe.isInEnsemble()) {
 
 					Node node = (Node) target;
 
@@ -457,17 +403,6 @@ public class NetworkViewer extends NodeViewer {
 			}
 
 		}
-	}
-
-	/**
-	 * 
-	 * @return The Key used to access Metadata containing layout information
-	 *         from the Network node
-	 */
-	private String getLayoutManagerKey() {
-
-		return LAYOUT_MANAGER_KEY;
-
 	}
 
 	/**
@@ -521,6 +456,22 @@ public class NetworkViewer extends NodeViewer {
 
 		saveLayoutAsDefault();
 		super.prepareForDestroy();
+	}
+
+	class DeleteLayout extends StandardAction {
+		private static final long serialVersionUID = 1L;
+
+		String layoutName;
+
+		public DeleteLayout(String name) {
+			super("Delete layout: " + name, name);
+			this.layoutName = name;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			deleteNodeLayout(layoutName);
+		}
 	}
 
 	class HideAllWidgetsAction extends StandardAction {
@@ -659,22 +610,6 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
-	class DeleteLayout extends StandardAction {
-		private static final long serialVersionUID = 1L;
-
-		String layoutName;
-
-		public DeleteLayout(String name) {
-			super("Delete layout: " + name, name);
-			this.layoutName = name;
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			deleteNodeLayout(layoutName);
-		}
-	}
-
 	class SaveLayout extends StandardAction {
 		private static final long serialVersionUID = 1L;
 
@@ -785,7 +720,8 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	@Override
 	protected void action() throws ActionException {
-		new UserConfig(this);
+		UserTemplateConfig config = new UserTemplateConfig(this);
+		config.configureAndWait();
 
 	}
 

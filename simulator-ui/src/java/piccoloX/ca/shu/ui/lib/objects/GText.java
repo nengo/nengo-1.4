@@ -24,34 +24,36 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  */
 public class GText extends PNode {
 
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The property name that identifies a change of this node's text (see
-	 * {@link #getText getText}). Both old and new value will be set in any
-	 * property change event.
-	 */
-	public static final String PROPERTY_TEXT = "text";
-	public static final int PROPERTY_CODE_TEXT = 1 << 19;
+	public static Font DEFAULT_FONT = new Font("Helvetica", Font.PLAIN, 12);
+	public static double DEFAULT_GREEK_THRESHOLD = 4;
+	public static final int PROPERTY_CODE_FONT = 1 << 20;
 
+	public static final int PROPERTY_CODE_TEXT = 1 << 19;
 	/**
 	 * The property name that identifies a change of this node's font (see
 	 * {@link #getFont getFont}). Both old and new value will be set in any
 	 * property change event.
 	 */
 	public static final String PROPERTY_FONT = "font";
-	public static final int PROPERTY_CODE_FONT = 1 << 20;
 
-	public static Font DEFAULT_FONT = new Font("Helvetica", Font.PLAIN, 12);
-	public static double DEFAULT_GREEK_THRESHOLD = 4;
+	/**
+	 * The property name that identifies a change of this node's text (see
+	 * {@link #getText getText}). Both old and new value will be set in any
+	 * property change event.
+	 */
+	public static final String PROPERTY_TEXT = "text";
+	private static final TextLayout[] EMPTY_TEXT_LAYOUT_ARRAY = new TextLayout[0];
 
-	private String text;
-	private Paint textPaint;
-	private Font font;
-	protected double greekThreshold = DEFAULT_GREEK_THRESHOLD;
-	private float justification = javax.swing.JLabel.LEFT_ALIGNMENT;
+	private static final long serialVersionUID = 1L;
 	private boolean constrainHeightToTextHeight = true;
 	private boolean constrainWidthToTextWidth = false;
+	private Font font;
+	private float justification = javax.swing.JLabel.LEFT_ALIGNMENT;
 	private transient TextLayout[] lines;
+	private String text;
+	private Paint textPaint;
+
+	protected double greekThreshold = DEFAULT_GREEK_THRESHOLD;
 
 	public GText() {
 		super();
@@ -63,110 +65,6 @@ public class GText extends PNode {
 	public GText(String aText) {
 		this();
 		setText(aText);
-	}
-
-	/**
-	 * Return the justificaiton of the text in the bounds.
-	 * 
-	 * @return float
-	 */
-	public float getJustification() {
-		return justification;
-	}
-
-	/**
-	 * Sets the justificaiton of the text in the bounds.
-	 * 
-	 * @param just
-	 */
-	public void setJustification(float just) {
-		justification = just;
-		recomputeLayout();
-	}
-
-	/**
-	 * Get the paint used to paint this nodes text.
-	 * 
-	 * @return Paint
-	 */
-	public Paint getTextPaint() {
-		return textPaint;
-	}
-
-	/**
-	 * Set the paint used to paint this node's text background.
-	 * 
-	 * @param textPaint
-	 */
-	public void setTextPaint(Paint textPaint) {
-		this.textPaint = textPaint;
-		invalidatePaint();
-	}
-
-	public boolean isConstrainWidthToTextWidth() {
-		return constrainWidthToTextWidth;
-	}
-
-	/**
-	 * Controls whether this node changes its width to fit the width of its
-	 * text. If flag is true it does; if flag is false it doesn't
-	 */
-	public void setConstrainWidthToTextWidth(boolean constrainWidthToTextWidth) {
-		this.constrainWidthToTextWidth = constrainWidthToTextWidth;
-		recomputeLayout();
-	}
-
-	public boolean isConstrainHeightToTextHeight() {
-		return constrainHeightToTextHeight;
-	}
-
-	/**
-	 * Controls whether this node changes its height to fit the height of its
-	 * text. If flag is true it does; if flag is false it doesn't
-	 */
-	public void setConstrainHeightToTextHeight(
-			boolean constrainHeightToTextHeight) {
-		this.constrainHeightToTextHeight = constrainHeightToTextHeight;
-		recomputeLayout();
-	}
-
-	/**
-	 * Returns the current greek threshold. When the screen font size will be
-	 * below this threshold the text is rendered as 'greek' instead of drawing
-	 * the text glyphs.
-	 */
-	public double getGreekThreshold() {
-		return greekThreshold;
-	}
-
-	/**
-	 * Sets the current greek threshold. When the screen font size will be below
-	 * this threshold the text is rendered as 'greek' instead of drawing the
-	 * text glyphs.
-	 * 
-	 * @param threshold
-	 *            minimum screen font size.
-	 */
-	public void setGreekThreshold(double threshold) {
-		greekThreshold = threshold;
-		invalidatePaint();
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	/**
-	 * Set the text for this node. The text will be broken up into multiple
-	 * lines based on the size of the text and the bounds width of this node.
-	 */
-	public void setText(String aText) {
-		String old = text;
-		text = aText;
-		lines = null;
-		recomputeLayout();
-		invalidatePaint();
-		firePropertyChange(PROPERTY_CODE_TEXT, PROPERTY_TEXT, old, text);
 	}
 
 	/**
@@ -182,21 +80,43 @@ public class GText extends PNode {
 	}
 
 	/**
-	 * Set the font of this PText. Note that in Piccolo if you want to change
-	 * the size of a text object it's often a better idea to scale the PText
-	 * node instead of changing the font size to get that same effect. Using
-	 * very large font sizes can slow performance.
+	 * Returns the current greek threshold. When the screen font size will be
+	 * below this threshold the text is rendered as 'greek' instead of drawing
+	 * the text glyphs.
 	 */
-	public void setFont(Font aFont) {
-		Font old = font;
-		font = aFont;
-		lines = null;
-		recomputeLayout();
-		invalidatePaint();
-		firePropertyChange(PROPERTY_CODE_FONT, PROPERTY_FONT, old, font);
+	public double getGreekThreshold() {
+		return greekThreshold;
 	}
 
-	private static final TextLayout[] EMPTY_TEXT_LAYOUT_ARRAY = new TextLayout[0];
+	/**
+	 * Return the justificaiton of the text in the bounds.
+	 * 
+	 * @return float
+	 */
+	public float getJustification() {
+		return justification;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	/**
+	 * Get the paint used to paint this nodes text.
+	 * 
+	 * @return Paint
+	 */
+	public Paint getTextPaint() {
+		return textPaint;
+	}
+
+	public boolean isConstrainHeightToTextHeight() {
+		return constrainHeightToTextHeight;
+	}
+
+	public boolean isConstrainWidthToTextWidth() {
+		return constrainWidthToTextWidth;
+	}
 
 	/**
 	 * Compute the bounds of the text wrapped by this node. The text layout is
@@ -264,11 +184,96 @@ public class GText extends PNode {
 		}
 	}
 
+	/**
+	 * Controls whether this node changes its height to fit the height of its
+	 * text. If flag is true it does; if flag is false it doesn't
+	 */
+	public void setConstrainHeightToTextHeight(
+			boolean constrainHeightToTextHeight) {
+		this.constrainHeightToTextHeight = constrainHeightToTextHeight;
+		recomputeLayout();
+	}
+
+	/**
+	 * Controls whether this node changes its width to fit the width of its
+	 * text. If flag is true it does; if flag is false it doesn't
+	 */
+	public void setConstrainWidthToTextWidth(boolean constrainWidthToTextWidth) {
+		this.constrainWidthToTextWidth = constrainWidthToTextWidth;
+		recomputeLayout();
+	}
+
+	/**
+	 * Set the font of this PText. Note that in Piccolo if you want to change
+	 * the size of a text object it's often a better idea to scale the PText
+	 * node instead of changing the font size to get that same effect. Using
+	 * very large font sizes can slow performance.
+	 */
+	public void setFont(Font aFont) {
+		Font old = font;
+		font = aFont;
+		lines = null;
+		recomputeLayout();
+		invalidatePaint();
+		firePropertyChange(PROPERTY_CODE_FONT, PROPERTY_FONT, old, font);
+	}
+
+	/**
+	 * Sets the current greek threshold. When the screen font size will be below
+	 * this threshold the text is rendered as 'greek' instead of drawing the
+	 * text glyphs.
+	 * 
+	 * @param threshold
+	 *            minimum screen font size.
+	 */
+	public void setGreekThreshold(double threshold) {
+		greekThreshold = threshold;
+		invalidatePaint();
+	}
+
+	/**
+	 * Sets the justificaiton of the text in the bounds.
+	 * 
+	 * @param just
+	 */
+	public void setJustification(float just) {
+		justification = just;
+		recomputeLayout();
+	}
+
+	/**
+	 * Set the text for this node. The text will be broken up into multiple
+	 * lines based on the size of the text and the bounds width of this node.
+	 */
+	public void setText(String aText) {
+		String old = text;
+		text = aText;
+		lines = null;
+		recomputeLayout();
+		invalidatePaint();
+		firePropertyChange(PROPERTY_CODE_TEXT, PROPERTY_TEXT, old, text);
+	}
+
+	/**
+	 * Set the paint used to paint this node's text background.
+	 * 
+	 * @param textPaint
+	 */
+	public void setTextPaint(Paint textPaint) {
+		this.textPaint = textPaint;
+		invalidatePaint();
+	}
+
 	// provided in case someone needs to override the way that lines are
 	// wrapped.
 	protected TextLayout computeNextLayout(LineBreakMeasurer measurer,
 			float availibleWidth, int nextLineBreakOffset) {
 		return measurer.nextLayout(availibleWidth, nextLineBreakOffset, false);
+	}
+
+	protected void internalUpdateBounds(double x, double y, double width,
+			double height) {
+		recomputeLayout();
 	}
 
 	/*
@@ -316,11 +321,6 @@ public class GText extends PNode {
 				y += tl.getDescent() + tl.getLeading();
 			}
 		}
-	}
-
-	protected void internalUpdateBounds(double x, double y, double width,
-			double height) {
-		recomputeLayout();
 	}
 
 	// ****************************************************************

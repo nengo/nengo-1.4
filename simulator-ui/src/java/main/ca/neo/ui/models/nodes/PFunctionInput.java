@@ -6,25 +6,38 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.plot.Plotter;
+import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.struct.PTFloat;
+import ca.neo.ui.configurable.struct.PTFunction;
+import ca.neo.ui.configurable.struct.PTInt;
+import ca.neo.ui.configurable.struct.PTString;
+import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.exceptions.ModelConfigurationException;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.views.objects.configurable.IConfigurable;
-import ca.neo.ui.views.objects.configurable.managers.UserConfig;
-import ca.neo.ui.views.objects.configurable.managers.PropertySet;
-import ca.neo.ui.views.objects.configurable.struct.PTFloat;
-import ca.neo.ui.views.objects.configurable.struct.PTFunction;
-import ca.neo.ui.views.objects.configurable.struct.PTInt;
-import ca.neo.ui.views.objects.configurable.struct.PTString;
-import ca.neo.ui.views.objects.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 
 public class PFunctionInput extends PNeoNode {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	static PropDescriptor pFunction = new PTFunction("Function Type");
+
+	static PropDescriptor pName = new PTString("Name");
+
+	static final String typeName = "Function Input";
+
+	static PropDescriptor[] zProperties = { pName, pFunction };
 
 	public PFunctionInput() {
 		super();
@@ -37,30 +50,31 @@ public class PFunctionInput extends PNeoNode {
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
-		// MenuBuilder plotMenu = menu.createSubMenu("Plot");
-		menu.addSection("Function");
+	public PropDescriptor[] getConfigSchema() {
+		// TODO Auto-generated method stub
+		return zProperties;
+	}
 
-		menu.addAction(new PlotFunctionAction("Plot function", getModel()));
-		return menu;
+	@Override
+	public FunctionInput getModel() {
 
+		return (FunctionInput) super.getModel();
+	}
+
+	@Override
+	public String getTypeName() {
+		return typeName;
 	}
 
 	private void init() {
 		setIcon(new FunctionInputIcon(this));
 	}
 
-	static PropDescriptor pName = new PTString("Name");
-
-	static PropDescriptor pFunction = new PTFunction("Function Type");
-
-	static PropDescriptor[] metaProperties = { pName, pFunction };
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	@Override
+	protected void afterModelCreated() {
+		super.afterModelCreated();
+		showAllOrigins();
+	}
 
 	@Override
 	protected Node configureModel(PropertySet props)
@@ -88,35 +102,22 @@ public class PFunctionInput extends PNeoNode {
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
-		// TODO Auto-generated method stub
-		return metaProperties;
-	}
+	protected PopupMenuBuilder constructMenu() {
+		PopupMenuBuilder menu = super.constructMenu();
+		// MenuBuilder plotMenu = menu.createSubMenu("Plot");
+		menu.addSection("Function");
 
-	static final String typeName = "Function Input";
+		menu.addAction(new PlotFunctionAction(getName(), "Plot function",
+				getModel()));
+		return menu;
 
-	@Override
-	public String getTypeName() {
-		return typeName;
-	}
-
-	@Override
-	protected void afterModelCreated() {
-		super.afterModelCreated();
-		showAllOrigins();
-	}
-
-	@Override
-	public FunctionInput getModel() {
-
-		return (FunctionInput) super.getModel();
 	}
 
 	@Override
 	protected TooltipBuilder constructTooltips() {
 		TooltipBuilder tooltips = super.constructTooltips();
 
-		tooltips.addPart(new PropertyPart("# Functions", ""
+		tooltips.addPart(new PropertyPart("Dimensions", ""
 				+ getModel().getFunctions().length));
 
 		return tooltips;
@@ -126,26 +127,19 @@ public class PFunctionInput extends PNeoNode {
 class PlotFunctionAction extends StandardAction implements IConfigurable {
 	private static final long serialVersionUID = 1L;
 
-	static final PropDescriptor pTitle = new PTString("Title");
-	static final PropDescriptor pStart = new PTFloat("Start");
-	static final PropDescriptor pIncrement = new PTFloat("Increment");
 	static final PropDescriptor pEnd = new PTFloat("End");
-	PropDescriptor pFunctionIndex;
-	PropDescriptor[] zProperties = { pTitle, pStart, pIncrement, pEnd };
+	static final PropDescriptor pIncrement = new PTFloat("Increment");
+	static final PropDescriptor pStart = new PTFloat("Start");
+	// static final PropDescriptor pTitle = new PTString("Title");
 	FunctionInput functionInput;
+	PropDescriptor pFunctionIndex;
+	String plotName;
 
-	public PlotFunctionAction(String actionName, FunctionInput functionInput) {
+	public PlotFunctionAction(String plotName, String actionName,
+			FunctionInput functionInput) {
 		super("Plot function input", actionName);
+		this.plotName = plotName;
 		this.functionInput = functionInput;
-
-	}
-
-	@Override
-	protected void action() throws ActionException {
-		pFunctionIndex = new PTInt("Function index", 0, functionInput
-				.getFunctions().length - 1);
-
-		new UserConfig(this);
 
 	}
 
@@ -154,7 +148,8 @@ class PlotFunctionAction extends StandardAction implements IConfigurable {
 	}
 
 	public void completeConfiguration(PropertySet properties) {
-		String title = (String) properties.getProperty(pTitle);
+		String title = plotName + " - Function Plot";
+
 		int functionIndex = (Integer) properties.getProperty(pFunctionIndex);
 		float start = (Float) properties.getProperty(pStart);
 		float end = (Float) properties.getProperty(pEnd);
@@ -163,7 +158,7 @@ class PlotFunctionAction extends StandardAction implements IConfigurable {
 		Function[] functions = functionInput.getFunctions();
 
 		if (functionIndex >= functions.length) {
-			Util.Warning("Function index out of bounds");
+			Util.UserWarning("Function index out of bounds");
 			return;
 		}
 		Function function = functionInput.getFunctions()[functionIndex];
@@ -174,8 +169,8 @@ class PlotFunctionAction extends StandardAction implements IConfigurable {
 
 	public PropDescriptor[] getConfigSchema() {
 
-		PropDescriptor[] properties = { pTitle, pFunctionIndex, pStart,
-				pIncrement, pEnd };
+		PropDescriptor[] properties = { pFunctionIndex, pStart, pIncrement,
+				pEnd };
 		return properties;
 
 	}
@@ -186,6 +181,16 @@ class PlotFunctionAction extends StandardAction implements IConfigurable {
 
 	public boolean isConfigured() {
 		return true;
+	}
+
+	@Override
+	protected void action() throws ActionException {
+		pFunctionIndex = new PTInt("Function index", 0, functionInput
+				.getFunctions().length - 1);
+
+		UserTemplateConfig config = new UserTemplateConfig(this);
+		config.configureAndWait();
+
 	}
 
 }

@@ -12,17 +12,17 @@ import ca.neo.model.StructuralException;
  */
 public class GInferenceExample extends ExampleRunner {
 
-	public GInferenceExample() throws StructuralException {
-		super("Inference Example", InferenceExample.createNetwork());
-
-	}
-
 	public static void main(String[] args) {
 		try {
 			new GInferenceExample();
 		} catch (StructuralException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public GInferenceExample() throws StructuralException {
+		super("Inference Example", InferenceExample.createNetwork());
+
 	}
 
 }

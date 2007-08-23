@@ -12,14 +12,9 @@ import ca.shu.ui.lib.actions.StandardAction;
 
 public class PopupMenuBuilder extends AbstractMenuBuilder {
 
-	JPopupMenu menu;
+	boolean isFirstSection = true;
 
-	/*
-	 * @return unwraps the JPopupMenu
-	 */
-	public JPopupMenu getJPopupMenu() {
-		return menu;
-	}
+	JPopupMenu menu;
 
 	public PopupMenuBuilder(String label) {
 		super(false);
@@ -37,8 +32,6 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 		menu.add(item);
 
 	}
-
-	boolean isFirstSection = true;
 
 	public void addSection(String name) {
 		addSection(name, Style.FONT_BOLD);
@@ -71,6 +64,13 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 		getJPopupMenu().add(mb.getJMenu());
 		return mb;
 
+	}
+
+	/*
+	 * @return unwraps the JPopupMenu
+	 */
+	public JPopupMenu getJPopupMenu() {
+		return menu;
 	}
 
 }

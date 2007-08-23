@@ -9,9 +9,11 @@ public class ReversableActionManager {
 
 	static final int MAX_NUM_OF_UNDO_ACTIONS = 5;
 
-	Vector<ReversableAction> reversableActions;
+	int numOfUndoSteps = 0;
 
 	GFrame parent;
+
+	Vector<ReversableAction> reversableActions;
 
 	public ReversableActionManager(GFrame parent) {
 		super();
@@ -35,25 +37,29 @@ public class ReversableActionManager {
 		updateParent();
 	}
 
-	public void updateParent() {
-		parent.reversableActionsUpdated();
+	public boolean canRedo() {
+		if (numOfUndoSteps > 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	int numOfUndoSteps = 0;
+	public boolean canUndo() {
+		if ((reversableActions.size() - numOfUndoSteps) > 0)
+			return true;
+		else
+			return false;
 
-	public void undoAction() {
-		if (canUndo()) {
+	}
 
-			ReversableAction action = reversableActions.get(reversableActions
-					.size()
-					- 1 - numOfUndoSteps);
-			numOfUndoSteps++;
-			action.undoAction();
+	public String getRedoActionDescription() {
+		if (canRedo()) {
+			return reversableActions.get(
+					reversableActions.size() - numOfUndoSteps).getDescription();
 		} else {
-			Util.Error("Cannot undo anymore steps");
+			return "none";
 		}
-
-		updateParent();
 	}
 
 	public String getUndoActionDescription() {
@@ -66,31 +72,6 @@ public class ReversableActionManager {
 		}
 	}
 
-	public String getRedoActionDescription() {
-		if (canRedo()) {
-			return reversableActions.get(
-					reversableActions.size() - numOfUndoSteps).getDescription();
-		} else {
-			return "none";
-		}
-	}
-
-	public boolean canUndo() {
-		if ((reversableActions.size() - numOfUndoSteps) > 0)
-			return true;
-		else
-			return false;
-
-	}
-
-	public boolean canRedo() {
-		if (numOfUndoSteps > 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public void redoAction() {
 		ReversableAction action = reversableActions.get(reversableActions
 				.size()
@@ -98,7 +79,26 @@ public class ReversableActionManager {
 
 		numOfUndoSteps--;
 
-		action.doAction();
+		action.doActionLater();
 		updateParent();
+	}
+
+	public void undoAction() {
+		if (canUndo()) {
+
+			ReversableAction action = reversableActions.get(reversableActions
+					.size()
+					- 1 - numOfUndoSteps);
+			numOfUndoSteps++;
+			action.undoAction();
+		} else {
+			Util.UserError("Cannot undo anymore steps");
+		}
+
+		updateParent();
+	}
+
+	public void updateParent() {
+		parent.reversableActionsUpdated();
 	}
 }

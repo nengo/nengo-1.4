@@ -12,6 +12,11 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class AffinityHalo extends GEdge {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public AffinityHalo(WorldObject startNode, WorldObject endNode) {
 		super(startNode, endNode);
 		// TODO Set a thicker stroke for the affinity halo
@@ -19,17 +24,8 @@ public class AffinityHalo extends GEdge {
 		// this.setStroke(new Stroke( ))
 		updateEdge();
 		setDefaultColor(Style.COLOR_FOREGROUND);
+		setPaint(Style.COLOR_FOREGROUND);
 
-	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	private AlphaComposite makeComposite(float alpha) {
-		int type = AlphaComposite.SRC_OVER;
-		return (AlphaComposite.getInstance(type, alpha));
 	}
 
 	// Nodes that override the visual representation of their super
@@ -100,5 +96,10 @@ public class AffinityHalo extends GEdge {
 		this.setPathToPolyline(path);
 		this.closePath();
 
+	}
+
+	private AlphaComposite makeComposite(float alpha) {
+		int type = AlphaComposite.SRC_OVER;
+		return (AlphaComposite.getInstance(type, alpha));
 	}
 }

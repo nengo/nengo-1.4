@@ -21,35 +21,20 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  */
 public class IconImage extends PImage {
 
-	private static final long serialVersionUID = 1L;
 	public static final boolean ENABLE_SEMANTIC_ZOOM = false;
+	private static final long serialVersionUID = 1L;
+
+	private static final Ellipse2D.Float TEMP_ELLIPSE = new Ellipse2D.Float();
+
+	private transient GeneralPath path;
+
+	PBounds originalBounds;
+
+	double prevScale = 0;
 
 	public IconImage() {
 		super();
 		init();
-	}
-
-	private transient GeneralPath path;
-
-	private void init() {
-		path = new GeneralPath();
-		originalBounds = getBounds();
-	}
-
-	PBounds originalBounds;
-
-	private void updatePath(double scale) {
-		double origWidth = originalBounds.getWidth();
-		double origHeight = originalBounds.getHeight();
-		double width = origWidth * scale;
-		double height = origWidth * scale;
-		double offsetX = (origWidth - width) / 2f;
-		double offsetY = (origHeight - height) / 2f;
-
-		path.reset();
-		TEMP_ELLIPSE.setFrame(offsetX, offsetY, width, height);
-		path.append(TEMP_ELLIPSE, false);
-
 	}
 
 	public IconImage(Image arg0) {
@@ -67,9 +52,24 @@ public class IconImage extends PImage {
 		init();
 	}
 
-	private static final Ellipse2D.Float TEMP_ELLIPSE = new Ellipse2D.Float();
+	private void init() {
+		path = new GeneralPath();
+		originalBounds = getBounds();
+	}
 
-	double prevScale = 0;
+	private void updatePath(double scale) {
+		double origWidth = originalBounds.getWidth();
+		double origHeight = originalBounds.getHeight();
+		double width = origWidth * scale;
+		double height = origWidth * scale;
+		double offsetX = (origWidth - width) / 2f;
+		double offsetY = (origHeight - height) / 2f;
+
+		path.reset();
+		TEMP_ELLIPSE.setFrame(offsetX, offsetY, width, height);
+		path.append(TEMP_ELLIPSE, false);
+
+	}
 
 	@Override
 	protected void paint(PPaintContext aPaintContext) {

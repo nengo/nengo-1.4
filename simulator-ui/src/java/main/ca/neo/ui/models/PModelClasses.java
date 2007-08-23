@@ -21,14 +21,14 @@ import ca.shu.ui.lib.util.Util;
 public class PModelClasses {
 
 	@SuppressWarnings("unchecked")
+	public static final Class[] FUNCTION_TYPES = { PFunctionInput.class };
+
+	@SuppressWarnings("unchecked")
 	public static final Class[] NODE_CONTAINER_TYPES = { PNetwork.class,
 			PNEFEnsemble.class, };
 
 	@SuppressWarnings("unchecked")
 	public static final Class[] NODE_TYPES = { PNeuron.class };
-
-	@SuppressWarnings("unchecked")
-	public static final Class[] FUNCTION_TYPES = { PFunctionInput.class };
 
 	public static PNeoNode createUIFromModel(Node node) {
 		if (node instanceof NEFEnsemble) {
@@ -42,7 +42,7 @@ public class PModelClasses {
 		} else if (node instanceof Neuron) {
 			return new PNeuron((Network) node);
 		} else {
-			Util.Error("Unsupported node type");
+			Util.UserError("Unsupported node type");
 			return null;
 		}
 

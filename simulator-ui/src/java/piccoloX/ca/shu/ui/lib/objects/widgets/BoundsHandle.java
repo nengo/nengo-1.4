@@ -65,8 +65,6 @@ public class BoundsHandle extends PHandle {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private transient PBasicInputEventHandler handleCursorHandler;
-	
 	public static void addBoundsHandlesTo(PNode aNode) {
 		aNode.addChild(new BoundsHandle(PBoundsLocator.createEastLocator(aNode))); 
 		aNode.addChild(new BoundsHandle(PBoundsLocator.createWestLocator(aNode))); 
@@ -77,7 +75,7 @@ public class BoundsHandle extends PHandle {
 		aNode.addChild(new BoundsHandle(PBoundsLocator.createSouthEastLocator(aNode))); 
 		aNode.addChild(new BoundsHandle(PBoundsLocator.createSouthWestLocator(aNode))); 	
 	}
-
+	
 	public static void addStickyBoundsHandlesTo(PNode aNode, PCamera camera) {
 		camera.addChild(new BoundsHandle(PBoundsLocator.createEastLocator(aNode)));
 		camera.addChild(new BoundsHandle(PBoundsLocator.createWestLocator(aNode)));
@@ -88,7 +86,7 @@ public class BoundsHandle extends PHandle {
 		camera.addChild(new BoundsHandle(PBoundsLocator.createSouthEastLocator(aNode)));
 		camera.addChild(new BoundsHandle(PBoundsLocator.createSouthWestLocator(aNode)));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static void removeBoundsHandlesFrom(PNode aNode) {
 		ArrayList handles = new ArrayList();
@@ -103,50 +101,10 @@ public class BoundsHandle extends PHandle {
 		aNode.removeChildren(handles);		
 	}
 	
+	private transient PBasicInputEventHandler handleCursorHandler;
+	
 	public BoundsHandle(PBoundsLocator aLocator) {
 		super(aLocator);
-	}
-	
-	protected void installHandleEventHandlers() {
-		super.installHandleEventHandlers();
-		handleCursorHandler = new PBasicInputEventHandler() {
-			boolean cursorPushed = false;			
-			public void mouseEntered(PInputEvent aEvent) {
-				if (!cursorPushed) {
-					aEvent.pushCursor(getCursorFor(((PBoundsLocator)getLocator()).getSide()));
-					cursorPushed = true;
-				}
-			}
-			public void mouseExited(PInputEvent aEvent) {
-				PPickPath focus = aEvent.getInputManager().getMouseFocus();
-				if (cursorPushed) {
-					if (focus == null || focus.getPickedNode() != BoundsHandle.this) {
-						aEvent.popCursor();
-						cursorPushed = false;
-					}
-				}
-			}
-			public void mouseReleased(PInputEvent event) {
-				if (cursorPushed) {
-					event.popCursor();
-					cursorPushed = false;
-				}
-			}
-		};
-		addInputEventListener(handleCursorHandler);
-	}	
-
-	/**
-	 * Return the event handler that is responsible for setting the mouse
-	 * cursor when it enters/exits this handle.
-	 */
-	public PBasicInputEventHandler getHandleCursorEventHandler() {
-		return handleCursorHandler;
-	}
-
-	public void startHandleDrag(Point2D aLocalPoint, PInputEvent aEvent) {
-		PBoundsLocator l = (PBoundsLocator) getLocator();
-		l.getNode().startResizeBounds();
 	}
 	
 	public void dragHandle(PDimension aLocalDimension, PInputEvent aEvent) {
@@ -231,24 +189,13 @@ public class BoundsHandle extends PHandle {
 		 */
 		
 		n.setBounds(b);
-	}
-	
+	}	
+
 	public void endHandleDrag(Point2D aLocalPoint, PInputEvent aEvent) {
 		PBoundsLocator l = (PBoundsLocator) getLocator();
 		l.getNode().endResizeBounds();
-	}	
-	
-	@SuppressWarnings("unchecked")
-	public void flipSiblingBoundsHandles(boolean flipX, boolean flipY) {
-		Iterator i = getParent().getChildrenIterator();
-		while (i.hasNext()) {
-			Object each = i.next();
-			if (each instanceof BoundsHandle) {
-				((BoundsHandle)each).flipHandleIfNeeded(flipX, flipY);
-			}
-		}
 	}
-	
+
 	public void flipHandleIfNeeded(boolean flipX, boolean flipY) {		
 		PBoundsLocator l = (PBoundsLocator) getLocator();	
 		
@@ -333,6 +280,17 @@ public class BoundsHandle extends PHandle {
 		setLocator(l);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void flipSiblingBoundsHandles(boolean flipX, boolean flipY) {
+		Iterator i = getParent().getChildrenIterator();
+		while (i.hasNext()) {
+			Object each = i.next();
+			if (each instanceof BoundsHandle) {
+				((BoundsHandle)each).flipHandleIfNeeded(flipX, flipY);
+			}
+		}
+	}
+	
 	public Cursor getCursorFor(int side) {
 		switch (side) {
 			case SwingConstants.NORTH:
@@ -360,6 +318,48 @@ public class BoundsHandle extends PHandle {
 				return new Cursor(Cursor.SE_RESIZE_CURSOR);
 		}
 		return null;
+	}	
+	
+	/**
+	 * Return the event handler that is responsible for setting the mouse
+	 * cursor when it enters/exits this handle.
+	 */
+	public PBasicInputEventHandler getHandleCursorEventHandler() {
+		return handleCursorHandler;
+	}
+	
+	public void startHandleDrag(Point2D aLocalPoint, PInputEvent aEvent) {
+		PBoundsLocator l = (PBoundsLocator) getLocator();
+		l.getNode().startResizeBounds();
+	}
+	
+	protected void installHandleEventHandlers() {
+		super.installHandleEventHandlers();
+		handleCursorHandler = new PBasicInputEventHandler() {
+			boolean cursorPushed = false;			
+			public void mouseEntered(PInputEvent aEvent) {
+				if (!cursorPushed) {
+					aEvent.pushCursor(getCursorFor(((PBoundsLocator)getLocator()).getSide()));
+					cursorPushed = true;
+				}
+			}
+			public void mouseExited(PInputEvent aEvent) {
+				PPickPath focus = aEvent.getInputManager().getMouseFocus();
+				if (cursorPushed) {
+					if (focus == null || focus.getPickedNode() != BoundsHandle.this) {
+						aEvent.popCursor();
+						cursorPushed = false;
+					}
+				}
+			}
+			public void mouseReleased(PInputEvent event) {
+				if (cursorPushed) {
+					event.popCursor();
+					cursorPushed = false;
+				}
+			}
+		};
+		addInputEventListener(handleCursorHandler);
 	}
 }
 

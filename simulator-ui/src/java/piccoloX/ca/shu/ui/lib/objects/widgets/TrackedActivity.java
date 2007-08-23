@@ -9,14 +9,18 @@ import ca.shu.ui.lib.world.WorldObject;
 public abstract class TrackedActivity {
 
 	String taskName;
+	TrackedStatusMsg trackedMsg;
+
 	WorldObject wo;
+
+	public TrackedActivity() {
+		super();
+	}
 
 	public TrackedActivity(String taskName) {
 		this(taskName, null);
 
 	}
-
-	TrackedStatusMsg trackedMsg;
 
 	public TrackedActivity(String taskName, WorldObject wo) {
 		super();
@@ -25,17 +29,7 @@ public abstract class TrackedActivity {
 
 	}
 
-	public Thread startThread() {
-		Thread runner = new Thread(getRunnableThreadSafe());
-		runner.start();
-		return runner;
-
-	}
-
-	public void invokeLater() {
-		SwingUtilities.invokeLater(getSwingThread());
-
-	}
+	public abstract void doActivity();
 
 	public void invokeAndWait() {
 		try {
@@ -45,6 +39,18 @@ public abstract class TrackedActivity {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void invokeLater() {
+		SwingUtilities.invokeLater(getSwingThread());
+
+	}
+
+	public Thread startThread() {
+		Thread runner = new Thread(getRunnableThreadSafe());
+		runner.start();
+		return runner;
+
 	}
 
 	/**
@@ -102,11 +108,5 @@ public abstract class TrackedActivity {
 
 		return r;
 	}
-
-	public TrackedActivity() {
-		super();
-	}
-
-	public abstract void doActivity();
 
 }

@@ -9,25 +9,32 @@ import javax.swing.JPopupMenu;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.handlers.Interactable;
+import ca.shu.ui.lib.objects.GEdge;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
-import ca.shu.ui.lib.world.IWorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.util.PPaintContext;
 
 public class LineEnd extends WorldObject implements Interactable {
 	private static final long serialVersionUID = 1L;
 
-	private ILineAcceptor myTarget;
+	private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
+	private Edge edge;
+	private LineEndIcon myIcon;
+	private ILineAcceptor myTarget;
 	private LineEndWell well;
-	ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
 	public LineEnd(LineEndWell well) {
 		super();
 		this.well = well;
 
-		addChild(new LineEndIcon(this));
+		edge = new Edge(well, this);
+		well.getWorldLayer().addChild(edge);
+
+		myIcon = new LineEndIcon(this);
+		addChild(myIcon);
 		setBounds(getFullBounds());
 		setChildrenPickable(false);
 		// setTangible(false);
@@ -93,7 +100,17 @@ public class LineEnd extends WorldObject implements Interactable {
 
 	}
 
+	public void setPointerVisible(boolean visible) {
+		myIcon.setPointerVisible(visible);
+	}
+
 	public JPopupMenu showContextMenu(PInputEvent event) {
+
+		// delegate the context menu from the target if it's attached
+		if (isConnected() && (myTarget instanceof Interactable)) {
+			return ((Interactable) myTarget).showContextMenu(event);
+		}
+
 		PopupMenuBuilder menu = new PopupMenuBuilder("Line End");
 		menu.addAction(new StandardAction("Remove") {
 
@@ -115,12 +132,11 @@ public class LineEnd extends WorldObject implements Interactable {
 	 * @return State of the connection with that target
 	 */
 	private ConnectionState getConnectionState(PNode target) {
-		WorldObject rootOfWell = getRootOfWell();
 
 		if (target == null) {
 
 			return ConnectionState.NOT_CONNECTED;
-		} else if (target == rootOfWell) {
+		} else if (target == well) {
 			return ConnectionState.RECEDED_INTO_WELL;
 		} else if (target == myTarget) {
 			return ConnectionState.CONNECTED;
@@ -139,28 +155,6 @@ public class LineEnd extends WorldObject implements Interactable {
 
 		return ConnectionState.NOT_CONNECTED;
 	}
-
-	/**
-	 * 
-	 * @return The root WorldObject which is inside a WorldLayer
-	 */
-	private WorldObject getRootOfWell() {
-		WorldObject rootOfWell = well;
-
-		while (rootOfWell != null) {
-			WorldObject parent = (WorldObject) rootOfWell.getParent();
-
-			if (parent instanceof IWorldLayer) {
-				return rootOfWell;
-			}
-			rootOfWell = parent;
-		}
-		return null;
-	}
-
-	// public int tryConnectTo(WorldObject target) {
-	// return tryConnectTo(target, true);
-	// }
 
 	/**
 	 * @param newState
@@ -195,9 +189,9 @@ public class LineEnd extends WorldObject implements Interactable {
 
 				this.setOffset(0, 0);
 				myTarget = newTarget;
+				justConnected();
 			} else {
-				getWorld().showTransientMsg(
-						"*** WARNING Connection refused ***", this);
+				popupTransientMsg("*** WARNING Connection refused ***");
 				this.translate(-50, -50);
 				setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
 			}
@@ -237,53 +231,9 @@ public class LineEnd extends WorldObject implements Interactable {
 		return true;
 	}
 
-	// /**
-	// *
-	// * @param newTarget
-	// * Target to be connected with
-	// * @param initializeConnection
-	// * Whether to initialize the connection before connecting
-	// *
-	// * @return 0 if successfully connected, 1 if not connected, 2 if the
-	// LineEnd
-	// * has been receded back into the well
-	// *
-	// *
-	// */
-	// public int tryConnectTo(WorldObject newTarget, boolean
-	// initializeConnection) {
-	//
-	// WorldObjectImpl rootOfWell = getRootOfWell();
-	//
-	// boolean recededIntoWell = false;
-	// if (newTarget == null) {
-	//
-	// return false;
-	// } else if (newTarget == rootOfWell) {
-	//
-	// recededIntoWell = true;
-	// connected = false;
-	// } else {
-	// if (initializeConnection) {
-	// if (initConnection(newTarget)) {
-	// newTarget.addChild(this);
-	// this.target = newTarget;
-	// this.setOffset(0, 0);
-	// connected = true;
-	// }
-	// } else {
-	// newTarget.addChild(this);
-	// this.target = newTarget;
-	// this.setOffset(0, 0);
-	// connected = true;
-	// }
-	// }
-	//
-	// if (recededIntoWell)
-	// return true;
-	// return connected;
-	//
-	// }
+	protected GEdge getEdge() {
+		return edge;
+	}
 
 	/**
 	 * @param target
@@ -292,6 +242,13 @@ public class LineEnd extends WorldObject implements Interactable {
 	protected boolean initConnection(ILineAcceptor target, boolean modifyModel) {
 
 		return true;
+	}
+
+	// public int tryConnectTo(WorldObject target) {
+	// return tryConnectTo(target, true);
+	// }
+	protected void justConnected() {
+
 	}
 
 	/**
@@ -310,6 +267,35 @@ public class LineEnd extends WorldObject implements Interactable {
 
 	static enum ConnectionState {
 		CONNECTED, NOT_CONNECTED, RECEDED_INTO_WELL
+	}
+
+}
+
+/**
+ * This edge is only visible when the LineEndWell is visible or the LineEnd is
+ * connected
+ * 
+ * @author Shu Wu
+ * 
+ */
+class Edge extends GEdge {
+
+	private static final long serialVersionUID = 1L;
+
+	public Edge(LineEndWell startNode, LineEnd endNode) {
+		super(startNode, endNode);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	protected void paint(PPaintContext paintContext) {
+		/*
+		 * Only paint this edge, if the LineEndWell is visible, or the LineEnd
+		 * is connected
+		 */
+		if (getStartNode().getVisible()
+				|| ((LineEnd) getEndNode()).isConnected())
+			super.paint(paintContext);
 	}
 
 }
