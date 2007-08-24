@@ -26,6 +26,20 @@ public abstract class ConfigParamDescriptor implements Serializable {
 	}
 
 	/**
+	 * @param name
+	 *            Name to be given to the parameter
+	 * 
+	 * @param defaultValue
+	 *            Default value of this parameter
+	 */
+	public ConfigParamDescriptor(String name, Object defaultValue) {
+		super();
+		this.defaultValue = defaultValue;
+		this.name = name;
+
+	}
+
+	/**
 	 * @return UI Input panel which can be used for User Configuration of this
 	 *         property, null if none exists
 	 */
@@ -56,13 +70,6 @@ public abstract class ConfigParamDescriptor implements Serializable {
 	 */
 	public abstract String getTypeName();
 
-	/**
-	 * @param defaultValue
-	 *            Default value of this parameter
-	 */
-	public void setDefaultValue(Object defaultValue) {
-		this.defaultValue = defaultValue;
-	}
 
 	@Override
 	public String toString() {

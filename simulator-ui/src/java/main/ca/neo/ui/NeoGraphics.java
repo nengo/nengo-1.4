@@ -161,11 +161,19 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	@Override
 	protected void windowClosing() {
-		if (getWorld().getGround().getChildrenCount() > 0
-				&& JOptionPane.showConfirmDialog(this,
-						"Save models before closing?", "Exiting "
-								+ getAppName(), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-			promptToSaveModels();
+		if (getWorld().getGround().getChildrenCount() > 0) {
+			int response = JOptionPane.showConfirmDialog(this,
+					"Save models before closing?", "Exiting " + getAppName(),
+					JOptionPane.YES_NO_CANCEL_OPTION);
+			if (response == JOptionPane.YES_OPTION) {
+
+				promptToSaveModels();
+			} else if (response == JOptionPane.CANCEL_OPTION) {
+				/*
+				 * Cancel exit
+				 */
+				return;
+			}
 		}
 
 		super.windowClosing();

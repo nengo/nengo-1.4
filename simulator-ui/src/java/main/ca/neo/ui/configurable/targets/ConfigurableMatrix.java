@@ -117,15 +117,13 @@ class CouplingMatrixProp extends ConfigParamDescriptor {
 	int fromSize, toSize;
 
 	public CouplingMatrixProp(float[][] matrixValues) {
-		this(matrixValues[0].length, matrixValues.length);
-		setDefaultValue(matrixValues);
-
+		super("Editor", matrixValues);
+		init(matrixValues[0].length, matrixValues.length);
 	}
 
 	public CouplingMatrixProp(int fromSize, int toSize) {
 		super("Editor");
-		this.fromSize = fromSize;
-		this.toSize = toSize;
+		init(fromSize, toSize);
 	}
 
 	@Override
@@ -141,6 +139,11 @@ class CouplingMatrixProp extends ConfigParamDescriptor {
 	@Override
 	public String getTypeName() {
 		return "Coupling Matrix";
+	}
+
+	private void init(int fromSize, int toSize) {
+		this.fromSize = fromSize;
+		this.toSize = toSize;
 	}
 
 }

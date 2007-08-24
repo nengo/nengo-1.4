@@ -1,7 +1,9 @@
-package ca.neo.ui.configurable.targets.functions;
+package ca.neo.ui.configurable.struct;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -15,39 +17,44 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.managers.UserTemplateConfig;
 import ca.shu.ui.lib.util.Util;
 
-public class FunctionInputPanel extends ConfigParamInputPanel {
+public class FunctionPanel extends ConfigParamInputPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/*
-	 * TODO: make meta properties static to save memory
-	 * 
-	 */
-	static final ConfigurableFunction[] functions = new ConfigurableFunction[] {
+	private JComboBox comboBox;
 
-	new FConstantFunction(), new FFourierFunction(), new FGaussianPDF(), };
+	private Function function = null;
 
-	JComboBox comboBox;
-
-	Function function = null;
-
-	public FunctionInputPanel(ConfigParamDescriptor property) {
+	public FunctionPanel(ConfigParamDescriptor property) {
 		super(property);
-		// TODO Auto-generated constructor stub
-		setValue(null);
+		// setValue(null);
 	}
 
 	@Override
 	public Object getValue() {
-		// TODO Auto-generated method stub
 		return function;
 	}
 
+	ConfigurableFunction selectedFunctionType;
+
 	@Override
 	public void initPanel() {
-		comboBox = new JComboBox(functions);
+		comboBox = new JComboBox(PTFunction.functions);
+		selectedFunctionType = (ConfigurableFunction) comboBox
+				.getSelectedItem();
+
+		comboBox.addItemListener(new ItemListener() {
+
+			public void itemStateChanged(ItemEvent e) {
+				if (comboBox.getSelectedItem() != selectedFunctionType) {
+					setValue(null);
+				}
+
+			}
+
+		});
 		JButton configureFunction = new JButton(new SetParametersAction());
 
 		addToPanel(comboBox);
@@ -56,30 +63,50 @@ public class FunctionInputPanel extends ConfigParamInputPanel {
 
 	@Override
 	public boolean isValueSet() {
-		if (function != null)
+		if (function != null) {
+
 			return true;
-		else
+
+		} else {
+			setStatusMsg("function parameters not set");
+
 			return false;
+		}
+
 	}
 
 	@Override
 	public void setValue(Object value) {
 		if (value != null && value instanceof Function) {
+
 			function = (Function) value;
-			// System.out.println("setting status msg");
+
+			/*
+			 * Updates the combo box to reflect the function type set
+			 */
+			for (int i = 0; i < PTFunction.functions.length; i++) {
+
+				if ((PTFunction.functions[i].getFunctionClass())
+						.isInstance(function)) {
+					selectedFunctionType = PTFunction.functions[i];
+					comboBox.setSelectedItem(PTFunction.functions[i]);
+
+				}
+			}
+
 			setStatusMsg("");
 
 		} else {
-			setStatusMsg("function parameters not set");
+			function = null;
 		}
 
 	}
 
 	protected void setParameters() {
-		ConfigurableFunction fnDescriptor = (ConfigurableFunction) comboBox
+		selectedFunctionType = (ConfigurableFunction) comboBox
 				.getSelectedItem();
 
-		if (fnDescriptor == null)
+		if (selectedFunctionType == null)
 			return;
 
 		/*
@@ -96,9 +123,9 @@ public class FunctionInputPanel extends ConfigParamInputPanel {
 			/*
 			 * Configure the function
 			 */
-			fnDescriptor.setFunction(null);
-			UserTemplateConfig config = new UserTemplateConfig(fnDescriptor,
-					(JDialog) parent);
+			selectedFunctionType.setFunction(null);
+			UserTemplateConfig config = new UserTemplateConfig(
+					selectedFunctionType, (JDialog) parent);
 			try {
 				config.configureAndWait();
 			} catch (ConfigException e) {
@@ -108,7 +135,7 @@ public class FunctionInputPanel extends ConfigParamInputPanel {
 		} else {
 			Util.UserError("Could not attach properties dialog");
 		}
-		setValue(fnDescriptor.getFunction());
+		setValue(selectedFunctionType.getFunction());
 
 	}
 
@@ -118,12 +145,10 @@ public class FunctionInputPanel extends ConfigParamInputPanel {
 
 		public SetParametersAction() {
 			super("Set Parameters");
-			// TODO Auto-generated constructor stub
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			setParameters();
-
 		}
 
 	}

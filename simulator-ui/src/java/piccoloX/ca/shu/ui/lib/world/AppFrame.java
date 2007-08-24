@@ -107,9 +107,10 @@ public abstract class AppFrame extends JFrame {
 		addWindowListener(new MyWindowListener());
 
 		try {
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		} catch (SecurityException e) {
-		} // expected from applets
+			e.printStackTrace();
+		}
 
 		canvas = new GCanvas(this);
 		canvas.createWorld();
@@ -466,6 +467,7 @@ public abstract class AppFrame extends JFrame {
 
 	protected void windowClosing() {
 		savePreferences();
+		System.exit(0);
 	}
 
 	class AboutAction extends StandardAction {

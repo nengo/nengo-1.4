@@ -50,6 +50,7 @@ public abstract class ConfigParamInputPanel extends JPanel {
 		statusMessage.setForeground(Style.COLOR_HIGH_SALIENCE);
 
 		add(statusMessage);
+
 	}
 
 	/**

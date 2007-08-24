@@ -1,52 +1,36 @@
 package ca.neo.ui.configurable.struct;
 
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.inputPanels.IntegerInputPanel;
 
-public class PTInt extends ConfigParamDescriptor {
+public class PTInt extends RangedConfigParam {
 
 	private static final long serialVersionUID = 1L;
 
-	private boolean checkRange = false;
-
-	private int min, max;
+	public PTInt(String name, int min, int max) {
+		super(name, min, max);
+	}
 
 	public PTInt(String name) {
 		super(name);
 	}
 
-	public PTInt(String name, int min, int max) {
-		super(name + " (" + min + " to " + max + ")");
-		this.min = min;
-		this.max = max;
-		checkRange = true;
-	}
-
 	@Override
-	public IntegerInputPanel createInputPanel() {
-		return new IntegerInputPanel(this);
+	public IntegerPanel createInputPanel() {
+		return new IntegerPanel(this);
 	}
 
-	public int getMax() {
-		return max;
-	}
-
-	public int getMin() {
-		return min;
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
-	public Class<Integer> getTypeClass() {
-		return Integer.class;
+	public Class getTypeClass() {
+		/*
+		 * Return the primitive type... Integer values can always be cast as the
+		 * primitive
+		 */
+		return int.class;
 	}
 
 	@Override
 	public String getTypeName() {
 		return "Integer";
-	}
-
-	public boolean isCheckRange() {
-		return checkRange;
 	}
 
 }

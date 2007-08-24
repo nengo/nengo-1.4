@@ -1,11 +1,10 @@
-package ca.neo.ui.configurable.inputPanels;
+package ca.neo.ui.configurable.struct;
 
 import javax.swing.JTextField;
 
 import ca.neo.ui.configurable.ConfigParamInputPanel;
-import ca.neo.ui.configurable.struct.PTInt;
 
-public class IntegerInputPanel extends ConfigParamInputPanel {
+public class IntegerPanel extends ConfigParamInputPanel {
 	/**
 	 * 
 	 */
@@ -13,7 +12,7 @@ public class IntegerInputPanel extends ConfigParamInputPanel {
 
 	JTextField tf;
 
-	public IntegerInputPanel(PTInt property) {
+	public IntegerPanel(PTInt property) {
 		super(property);
 	}
 

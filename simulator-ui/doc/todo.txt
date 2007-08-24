@@ -1,15 +1,149 @@
 *******************************************
  Done
 *******************************************
+Added option to sort nodes alphabetically/by type
+Cleaned up configuration code
+started documentation
+
+FunctionInputs can now be created with multiple dimensions
 
 *******************************************
  Pri 0 - doing next
 ******************************************* 
-Double clicking on Menu Status bar maximizes it, context menu of menu bar is inhereted from Window content object.
+Make drag handler undooable
+	1. What operations are undoable? I think it would be nice if
+	    everything was (including object removals & layout changes). Would
+	    this be hard?
+		
+		There are two primary types of user actions in the Interface. Standard Action and Reversible Action. Layout algorithms are undoable, but individual node movements aren't yet. I'll add "make node layout changes undooable" to my todo list.
+		There are some concerns about object removals. It's somewhat difficult because I have to remember not only the Node that was removed but the connections, probes, etc... that it had. Also, some networks take up quite a lot of memory, and keeping them in the undo history would keep them from removal. Perhaps I can make some types of object removals undooable?
+ 
+
+Select multiple things at once
+	12. it would be nice to be able to select multiple things at once. this
+	could help for layout, but would also be nice if, e.g., a bunch of
+	neurons could be chosen and then 'add probe' could be used on all
+	at once (bryan will look into the last possiblity more)
+
+
+show simulation progress in UI
+	create a listener object for Simulator
+
+set simulator
+
+information visualization
+	dimensions of functions, nodes
+	
+re-order popup menus to be more intuitive
+
+mouse handlers should draw frames in the sky
+
+*******************************************
+ Pri 1 - to do
+*******************************************
+
+
+create exceptions
+
+There are some bugs with the new Function Input configuration.  I'll fix that soon.
+
+The function list is built in FunctionInputPanel. Each function in the list is a description wrapper that describes the properties of the function to configure and their names. 
+
+show open windows
+
+
+Connection Weights
+- I think I know why it isn't acting as an integrator -- it looks like
+there is no way to set connection weights on a projection? (something
+like a spreadsheet-style matrix editor would be good)
 
 
 
+*******************************************
+ Pri 2 - will do eventually
+*******************************************
+fix the color coding issues with frames on selection, context menu and during drag
 
+debug paint calls using PDebug
+
+add keyboard shortcuts
+
+Rectangular group select cursor
+
+optimize data structures
+
+2) Methods getDocumentation() and setDocumentation() added to Node.
+(Although I think we were going to defer documentation until later.) I
+thought about using wrappers, but this would be a bit of a nuissance
+as we would have to wrap NodeFactory instances for the UI. Let me know
+if you have any thoughts on this.
+
+Contiunous updating layouts (ie SpringLayout).
+
+getInformation method for Nodes, for tooltips
+
+units selection for UI Dialog
+
+convert Iconfiguration's isConfigured option to a exception thrown and caught by ConfigManager
+
+Complete java docs
+
+Edit properties of existing models
+
+keyboard search of nodes (auto-panning)
+
+For Jung Layout algorithms, consider making WorldObject a Vertice, or making a Vertice Wrapper for world objects
+
+hot keys to change the level of semantic detail in the view. ie. press ctrl to see Node properties
+
+Write an short instruction doc
+
+*******************************************
+ Pri 3 - maybe if there's time
+*******************************************
+Lenses
+
+Customize FileChooser to add extensions
+
+unconnected lines should be highlighted
+	
+Ctrl-key to enable popups (even when autopops are turned off)
+
+
+redo functionality to allow duplicate actions to be performed
+
+*******************************************
+ Bugs
+*******************************************
+fixed bug: ensure threads are safety accessing the piccolo graph
+fixed bug: debug the events related with adding and removing connections
+fixed bug: window appears underneath lines and widgets
+
+*******************************************
+ Bryan requests
+*******************************************
+Ensemble's don't have metadata, can't save layout information
+
+visualization... what information should be most visible? how to edit
+what are the ways to create an ensemble?
+
+more Network examples
+
+Require events notification
+	show scopes data in real time from the UI
+
+talk about brain view
+
+*******************************************
+ Previously Done
+*******************************************
+create help tips
+
+Move about text to application layer, add getAppName to application layer
+	application layer = NeoGraphics
+
+Double clicking on Menu Status bar maximizes it, 
+context menu of menu bar is inhereted from Window content object.
 
 11. NOT DONE w/ Notes
 Bryan, can you add the change name function to the Node API? It's not trivial,
@@ -26,11 +160,7 @@ Investigating
 	15. can't add probes to the ensemble 'current' and 'AXON' origins (which
 	are hidden by default).
 
-12. TODO
-	12. it would be nice to be able to select multiple things at once. this
-	could help for layout, but would also be nice if, e.g., a bunch of
-	neurons could be chosen and then 'add probe' could be used on all
-	at once (bryan will look into the last possiblity more)
+
 
 7. DONE w/ Notes
 The default template is created after the first run. 
@@ -144,118 +274,6 @@ fixed
 fixed
 	20. 'create new' has a 'P' in front of a bunch of the names?
 
-
-
-Create functions with dimensions
-
-create exceptions
-
-Bug: Could not receive keyboard events from piccolo
-make text window for inputting doumentation bigger
-
-show simulation progress in UI
-	create a listener object for Simulator
-
-set simulator
-
-information visualization
-	dimensions of functions, nodes
-	
-re-order popup menus to be more intuitive
-
-mouse handlers should draw frames in the sky
-
-*******************************************
- Pri 1 - to do
-*******************************************
-
-show open windows
-
-
-Connection Weights
-- I think I know why it isn't acting as an integrator -- it looks like
-there is no way to set connection weights on a projection? (something
-like a spreadsheet-style matrix editor would be good)
-
-
-redo functionality to allow duplicate actions to be performed
-
-unconnected lines should be highlighted
-*******************************************
- Pri 2 - will do eventually
-*******************************************
-fix the color coding issues with frames on selection, context menu and during drag
-
-debug paint calls using PDebug
-
-add keyboard shortcuts
-
-Rectangular group select cursor
-
-optimize data structures
-
-2) Methods getDocumentation() and setDocumentation() added to Node.
-(Although I think we were going to defer documentation until later.) I
-thought about using wrappers, but this would be a bit of a nuissance
-as we would have to wrap NodeFactory instances for the UI. Let me know
-if you have any thoughts on this.
-
-Contiunous updating layouts (ie SpringLayout).
-
-getInformation method for Nodes, for tooltips
-
-units selection for UI Dialog
-
-convert Iconfiguration's isConfigured option to a exception thrown and caught by ConfigManager
-
-Complete java docs
-
-Edit properties of existing models
-
-keyboard search of nodes (auto-panning)
-
-For Jung Layout algorithms, consider making WorldObject a Vertice, or making a Vertice Wrapper for world objects
-
-hot keys to change the level of semantic detail in the view. ie. press ctrl to see Node properties
-
-Write an short instruction doc
-
-*******************************************
- Pri 3 - maybe if there's time
-*******************************************
-Lenses
-
-Customize FileChooser to add extensions
-
-	
-Ctrl-key to enable popups (even when autopops are turned off)
-
-
-*******************************************
- Bugs
-*******************************************
-fixed bug: ensure threads are safety accessing the piccolo graph
-fixed bug: debug the events related with adding and removing connections
-fixed bug: window appears underneath lines and widgets
-
-*******************************************
- Bryan requests
-*******************************************
-Ensemble's don't have metadata, can't save layout information
-
-visualization... what information should be most visible? how to edit
-what are the ways to create an ensemble?
-
-more Network examples
-
-Require events notification
-	show scopes data in real time from the UI
-
-talk about brain view
-
-*******************************************
- Previously Done
-*******************************************
 (08/10) - Show information on Origins and terminations
 (08/10) - Made tooltips follow the camera on zoom
 

@@ -1,11 +1,11 @@
-package ca.neo.ui.configurable.inputPanels;
+package ca.neo.ui.configurable.struct;
 
 import javax.swing.JTextField;
 
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
 
-public class FloatInputPanel extends ConfigParamInputPanel {
+public class FloatPanel extends ConfigParamInputPanel {
 	/**
 	 * 
 	 */
@@ -13,7 +13,7 @@ public class FloatInputPanel extends ConfigParamInputPanel {
 
 	JTextField tf;
 
-	public FloatInputPanel(ConfigParamDescriptor property) {
+	public FloatPanel(ConfigParamDescriptor property) {
 		super(property);
 	}
 
