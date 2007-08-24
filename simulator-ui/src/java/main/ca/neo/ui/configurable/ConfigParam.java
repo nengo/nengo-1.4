@@ -1,18 +1,17 @@
-package ca.neo.ui.configurable.managers;
+package ca.neo.ui.configurable;
 
 import javax.swing.text.MutableAttributeSet;
 
-import ca.neo.ui.configurable.struct.PropDescriptor;
 
-public class PropertySet {
+public class ConfigParam {
 	MutableAttributeSet properties;
 
-	public PropertySet(MutableAttributeSet properties) {
+	public ConfigParam(MutableAttributeSet properties) {
 		super();
 		this.properties = properties;
 	}
 
-	public Object getProperty(PropDescriptor obj) {
+	public Object getProperty(ConfigParamDescriptor obj) {
 		return getProperty(obj.getName());
 	}
 

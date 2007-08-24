@@ -36,7 +36,7 @@ public class NodeLayout implements Serializable {
 		this.layoutName = layoutName;
 		nodePositions = new Hashtable<String, Point2D>();
 
-		Enumeration<PNeoNode> en = nodeViewer.getViewedNodesElements();
+		Enumeration<PNeoNode> en = nodeViewer.getNeoNodes().elements();
 
 		while (en.hasMoreElements()) {
 			PNeoNode node = en.nextElement();

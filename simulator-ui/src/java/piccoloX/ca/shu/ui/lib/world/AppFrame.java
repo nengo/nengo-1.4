@@ -485,6 +485,17 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * 
+	 * @param object
+	 *            Object to be added to NeoGraphics
+	 * @return the object being added
+	 */
+	public WorldObject addWorldObject(WorldObject object) {
+		getWorld().getGround().catchObject(object);
+		return object;
+	}
+
 	class HideDebugMemory extends StandardAction {
 
 		private static final long serialVersionUID = 1L;

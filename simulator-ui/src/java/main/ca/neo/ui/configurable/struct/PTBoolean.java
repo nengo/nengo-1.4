@@ -1,11 +1,11 @@
 package ca.neo.ui.configurable.struct;
 
 import javax.swing.JCheckBox;
-import javax.swing.JPanel;
 
-import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 
-public class PTBoolean extends PropDescriptor {
+public class PTBoolean extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -14,7 +14,7 @@ public class PTBoolean extends PropDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public ConfigParamInputPanel createInputPanel() {
 		return new BooleanInputPanel(this);
 	}
 
@@ -30,7 +30,7 @@ public class PTBoolean extends PropDescriptor {
 
 }
 
-class BooleanInputPanel extends PropertyInputPanel {
+class BooleanInputPanel extends ConfigParamInputPanel {
 	/**
 	 * 
 	 */
@@ -38,7 +38,7 @@ class BooleanInputPanel extends PropertyInputPanel {
 
 	JCheckBox checkBox;
 
-	public BooleanInputPanel(PropDescriptor property) {
+	public BooleanInputPanel(ConfigParamDescriptor property) {
 		super(property);
 	}
 
@@ -49,10 +49,10 @@ class BooleanInputPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public void init(JPanel panel) {
+	public void initPanel() {
 		checkBox = new JCheckBox();
 		checkBox.setSelected(false);
-		panel.add(checkBox);
+		addToPanel(checkBox);
 
 	}
 

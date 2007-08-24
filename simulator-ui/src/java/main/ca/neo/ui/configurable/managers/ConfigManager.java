@@ -14,8 +14,9 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 
 import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.util.Util;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PObjectOutputStream;
@@ -98,7 +99,7 @@ public abstract class ConfigManager {
 	// Util.deleteProperty(configurable, fileName);
 	// }
 
-	public Object getProperty(PropDescriptor prop) {
+	public Object getProperty(ConfigParamDescriptor prop) {
 		return getProperty(prop.getName());
 	}
 
@@ -226,7 +227,7 @@ public abstract class ConfigManager {
 	/**
 	 * Configures the IConfigurable object
 	 */
-	protected abstract void configureAndWait();
+	protected abstract void configureAndWait() throws ConfigException;
 
 }
 

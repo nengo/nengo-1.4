@@ -2,16 +2,28 @@ package ca.neo.ui.actions;
 
 import javax.swing.SwingUtilities;
 
+import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.managers.UserTemplateConfig;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PNeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 
+/**
+ * Creates a new NEO model
+ * 
+ * @author Shu
+ * 
+ */
 public class CreateModelAction extends ReversableAction {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @param nodeUIType
+	 *            Class type of the model to be instantiated
+	 * @return Type name of the given model
+	 */
 	@SuppressWarnings("unchecked")
 	private static String getModelName(Class nodeUIType) {
 		PNeoNode nodeProxy;
@@ -26,14 +38,21 @@ public class CreateModelAction extends ReversableAction {
 		return "unable to retrieve name";
 	}
 
+	/**
+	 * Type of node to be created
+	 */
 	@SuppressWarnings("unchecked")
-	Class nc;
+	private Class nodeType;
 
-	PNeoNode nodeAdded;
+	/**
+	 * The created node
+	 */
+	private PNeoNode nodeCreated;
 
-	INodeContainer nodeContainer;
-
-	PNeoNode nodeProxy;
+	/**
+	 * Container to which the created node shall be added
+	 */
+	private INodeContainer container;
 
 	/**
 	 * 
@@ -59,8 +78,8 @@ public class CreateModelAction extends ReversableAction {
 	public CreateModelAction(String actionName, INodeContainer nodeContainer,
 			Class nodeUIType) {
 		super("Create new " + nodeUIType.getSimpleName(), actionName);
-		this.nodeContainer = nodeContainer;
-		this.nc = nodeUIType;
+		this.container = nodeContainer;
+		this.nodeType = nodeUIType;
 	}
 
 	@Override
@@ -69,39 +88,27 @@ public class CreateModelAction extends ReversableAction {
 		(new Thread() {
 			@Override
 			public void run() {
-				nodeProxy = null;
-				try {
 
-					nodeProxy = (PNeoNode) nc.newInstance();
+				try {
+					PNeoNode nodeProxy = (PNeoNode) nodeType.newInstance();
 					UserTemplateConfig config = new UserTemplateConfig(
 							nodeProxy);
-					config.configureAndWait();
-
-					if (nodeProxy.isConfigured()) {
-						SwingUtilities.invokeLater(new Runnable() {
+					try {
+						config.configureAndWait();
+						nodeCreated = nodeProxy;
+						SwingUtilities.invokeAndWait(new Runnable() {
 							public void run() {
-								nodeContainer.addNeoNode(nodeProxy);
+								container.addNeoNode(nodeCreated);
 							}
 						});
+					} catch (ConfigException e) {
 
+						e.defaultHandledBehavior();
+						nodeProxy.destroy();
 					}
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 
-				if (nodeProxy != null) {
-
-					nodeAdded = nodeProxy;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}).start();
@@ -110,8 +117,8 @@ public class CreateModelAction extends ReversableAction {
 
 	@Override
 	protected void undo() throws ActionException {
-		if (nodeAdded != null) {
-			nodeAdded.destroy();
+		if (nodeCreated != null) {
+			nodeCreated.destroy();
 		}
 
 	}

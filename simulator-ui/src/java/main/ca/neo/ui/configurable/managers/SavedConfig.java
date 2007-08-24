@@ -1,5 +1,7 @@
 package ca.neo.ui.configurable.managers;
 
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.IConfigurable;
 
 public class SavedConfig extends ConfigManager {
@@ -7,7 +9,7 @@ public class SavedConfig extends ConfigManager {
 
 	public SavedConfig(IConfigurable configurable) {
 		this(configurable, UserTemplateConfig.DEFAULT_PROPERTY_FILE_NAME);
-		init();
+
 	}
 
 	/**
@@ -21,14 +23,11 @@ public class SavedConfig extends ConfigManager {
 	}
 
 	@Override
-	public void configureAndWait() {
+	public void configureAndWait() throws ConfigException {
 		loadPropertiesFromFile(configFileName);
 		getConfigurable().completeConfiguration(
-				new PropertySet(getProperties()));
+				new ConfigParam(getProperties()));
 	}
 
-	private void init() {
-		configureAndWait();
-	}
 
 }

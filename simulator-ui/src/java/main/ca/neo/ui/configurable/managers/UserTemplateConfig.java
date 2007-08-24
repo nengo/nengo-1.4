@@ -17,9 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.struct.PropDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.util.Util;
 
@@ -184,9 +184,9 @@ class ConfigTemplateDialog extends ConfigDialog {
 		if (fileList.getSelectedItem() != null) {
 			configManager.loadPropertiesFromFile((String) fileList
 					.getSelectedItem());
-			Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
+			Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
 			while (it.hasNext()) {
-				PropertyInputPanel panel = it.next();
+				ConfigParamInputPanel panel = it.next();
 
 				Object currentValue = configManager
 						.getProperty(panel.getName());
@@ -217,16 +217,16 @@ class Panel extends JPanel {
 class PropertyField extends JTextField {
 	private static final long serialVersionUID = 5108856120484394597L;
 
-	PropDescriptor property;
+	ConfigParamDescriptor property;
 
-	public PropertyField(PropDescriptor property) {
+	public PropertyField(ConfigParamDescriptor property) {
 		super(10);
 		this.property = property;
 
 		property.getClass();
 	}
 
-	public PropDescriptor getProperty() {
+	public ConfigParamDescriptor getProperty() {
 		return property;
 	}
 

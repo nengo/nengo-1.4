@@ -1,8 +1,9 @@
 package ca.neo.ui.configurable.struct;
 
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.inputPanels.IntegerInputPanel;
 
-public class PTInt extends PropDescriptor {
+public class PTInt extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 

@@ -97,6 +97,11 @@ public class World extends WorldObject implements Interactable,
 
 	TooltipWrapper tooltipWrapper;
 
+	protected WorldGround createGround() {
+		return new WorldGround(this);
+
+	}
+
 	public World(String name) {
 		super(name);
 
@@ -104,7 +109,7 @@ public class World extends WorldObject implements Interactable,
 
 		UIEnvironment.getInstance().getRoot().addChild(layer);
 
-		ground = new WorldGround(this);
+		ground = createGround();
 		ground.setDraggable(false);
 		layer.addChild(ground);
 

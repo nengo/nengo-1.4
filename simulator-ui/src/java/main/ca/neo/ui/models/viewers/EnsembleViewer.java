@@ -20,7 +20,7 @@ public class EnsembleViewer extends NodeViewer {
 
 	@Override
 	public void applyDefaultLayout() {
-		applySquareLayout();
+		applySortLayout(SortMode.BY_NAME);
 
 	}
 
@@ -37,6 +37,7 @@ public class EnsembleViewer extends NodeViewer {
 
 	@Override
 	public void updateViewFromModel() {
+		removeAllNeoNodes();
 
 		Node[] nodes = getModel().getNodes();
 

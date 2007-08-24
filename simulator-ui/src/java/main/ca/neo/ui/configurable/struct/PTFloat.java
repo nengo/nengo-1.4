@@ -1,9 +1,10 @@
 package ca.neo.ui.configurable.struct;
 
-import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.inputPanels.FloatInputPanel;
 
-public class PTFloat extends PropDescriptor {
+public class PTFloat extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -13,7 +14,7 @@ public class PTFloat extends PropDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public ConfigParamInputPanel createInputPanel() {
 		// TODO Auto-generated method stub
 		return new FloatInputPanel(this);
 	}

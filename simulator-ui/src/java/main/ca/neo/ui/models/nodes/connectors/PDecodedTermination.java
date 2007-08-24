@@ -3,29 +3,29 @@ package ca.neo.ui.models.nodes.connectors;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.nef.impl.DecodedTermination;
-import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.struct.PTBoolean;
 import ca.neo.ui.configurable.struct.PTFloat;
 import ca.neo.ui.configurable.struct.PTString;
 import ca.neo.ui.configurable.struct.PTTerminationWeights;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.models.nodes.PNEFEnsemble;
 
 public class PDecodedTermination extends PTermination {
 
 	private static final long serialVersionUID = 1L;
 
-	static final PropDescriptor pIsModulatory = new PTBoolean("Is Modulatory");
+	static final ConfigParamDescriptor pIsModulatory = new PTBoolean("Is Modulatory");
 
-	static final PropDescriptor pName = new PTString("Name");
+	static final ConfigParamDescriptor pName = new PTString("Name");
 
-	static final PropDescriptor pTauPSC = new PTFloat("tauPSC");
+	static final ConfigParamDescriptor pTauPSC = new PTFloat("tauPSC");
 
 	static final String typeName = "Decoded Termination";
 
 	PNEFEnsemble ensembleProxy;
 
-	PropDescriptor pTransformMatrix;
+	ConfigParamDescriptor pTransformMatrix;
 
 	public PDecodedTermination(PNEFEnsemble ensembleProxy) {
 		super(ensembleProxy);
@@ -41,11 +41,11 @@ public class PDecodedTermination extends PTermination {
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
+	public ConfigParamDescriptor[] getConfigSchema() {
 		pTransformMatrix = new PTTerminationWeights("Weights", ensembleProxy
 				.getModel().getDimension());
 
-		PropDescriptor[] zProperties = { pName, pTransformMatrix, pTauPSC,
+		ConfigParamDescriptor[] zProperties = { pName, pTransformMatrix, pTauPSC,
 				pIsModulatory };
 		return zProperties;
 
@@ -63,7 +63,7 @@ public class PDecodedTermination extends PTermination {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties) {
+	protected Object configureModel(ConfigParam configuredProperties) {
 		Termination term = null;
 
 		try {

@@ -1,11 +1,16 @@
 package ca.neo.ui.models.viewers;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import ca.neo.model.Node;
+import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PModel;
@@ -14,6 +19,7 @@ import ca.neo.ui.models.nodes.PNodeContainer;
 import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
+import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.NamedObject;
@@ -30,6 +36,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  */
 public abstract class NodeViewer extends World implements NamedObject,
 		Interactable, INodeContainer {
+
 	private static final long serialVersionUID = 1L;
 
 	static final Dimension DEFAULT_BOUNDS = new Dimension(1000, 1000);
@@ -39,8 +46,6 @@ public abstract class NodeViewer extends World implements NamedObject,
 	private Dimension layoutBounds = DEFAULT_BOUNDS;
 
 	private final PNodeContainer parentOfViewer;
-
-	private final Hashtable<String, PNeoNode> viewerNodes = new Hashtable<String, PNeoNode>();
 
 	/**
 	 * @param nodeContainer
@@ -60,8 +65,10 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
 
+		init();
+
 		updateViewFromModel();
-		if (viewerNodes.size() > 0) {
+		if (getNeoNodes().size() > 0) {
 			applyDefaultLayout();
 		}
 
@@ -69,9 +76,19 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	}
 
+	private final Hashtable<String, PNeoNode> neoNodesChildren = new Hashtable<String, PNeoNode>();
+
+	public Dictionary<String, PNeoNode> getNeoNodes() {
+		return neoNodesChildren;
+	}
+
 	public void addNeoNode(PNeoNode node) {
 		addNeoNode(node, true, true, false);
 
+	}
+
+	public void removeNeoNode(PNeoNode node) {
+		neoNodesChildren.remove(node.getName());
 	}
 
 	/**
@@ -86,7 +103,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	 * @param moveCameraToNode
 	 *            whether to move the camera to where the node is
 	 */
-	public void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
+	protected void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
 
 		/**
@@ -94,11 +111,11 @@ public abstract class NodeViewer extends World implements NamedObject,
 		 * in the center of the camera
 		 */
 		if (moveCameraToNode) {
-			setCameraCenterPosition(nodeProxy.getOffset().getX(), nodeProxy
-					.getOffset().getY());
+			getWorld().setCameraCenterPosition(nodeProxy.getOffset().getX(),
+					nodeProxy.getOffset().getY());
 		}
 
-		viewerNodes.put(nodeProxy.getName(), nodeProxy);
+		neoNodesChildren.put(nodeProxy.getName(), nodeProxy);
 
 		if (dropInCenterOfCamera) {
 			getGround().catchObject(nodeProxy, dropInCenterOfCamera);
@@ -109,7 +126,62 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	public abstract void applyDefaultLayout();
 
-	public void applySquareLayout() {
+	public static enum SortMode {
+		BY_NAME("Name"), BY_TYPE("Type");
+
+		private String name;
+
+		SortMode(String name) {
+			this.name = name;
+		}
+
+		protected String getName() {
+			return name;
+		}
+	};
+
+	@SuppressWarnings("unchecked")
+	public void applySortLayout(SortMode sortMode) {
+		ArrayList<PNeoNode> nodes = new ArrayList(getNeoNodes().size());
+
+		Enumeration<PNeoNode> em = getNeoNodes().elements();
+
+		while (em.hasMoreElements()) {
+			nodes.add(em.nextElement());
+		}
+
+		switch (sortMode) {
+
+		case BY_NAME:
+			Collections.sort(nodes, new Comparator<PNeoNode>() {
+
+				public int compare(PNeoNode o1, PNeoNode o2) {
+					return (o1.getName().compareToIgnoreCase(o2.getName()));
+
+				}
+
+			});
+
+			break;
+		case BY_TYPE:
+			Collections.sort(nodes, new Comparator<PNeoNode>() {
+
+				public int compare(PNeoNode o1, PNeoNode o2) {
+					if (o1.getClass() != o2.getClass()) {
+
+						return o1.getClass().getSimpleName()
+								.compareToIgnoreCase(
+										o2.getClass().getSimpleName());
+					} else {
+						return (o1.getName().compareToIgnoreCase(o2.getName()));
+					}
+
+				}
+
+			});
+
+			break;
+		}
 
 		/*
 		 * basic rectangle layout variables
@@ -117,14 +189,14 @@ public abstract class NodeViewer extends World implements NamedObject,
 		double x = 0;
 		double y = 0;
 
-		Enumeration<PNeoNode> em = viewerNodes.elements();
-		int numberOfNodes = viewerNodes.size();
+		Iterator<PNeoNode> it = nodes.iterator();
+		int numberOfNodes = getNeoNodes().size();
 		int numberOfColumns = (int) Math.sqrt(numberOfNodes);
 		int columnCounter = 0;
 
 		PTransformActivity moveNodeActivity = null;
-		while (em.hasMoreElements()) {
-			PNeoNode node = em.nextElement();
+		while (it.hasNext()) {
+			PNeoNode node = it.next();
 
 			moveNodeActivity = node.animateToPositionScaleRotation(x, y, node
 					.getScale(), node.getRotation(), 1000);
@@ -149,6 +221,8 @@ public abstract class NodeViewer extends World implements NamedObject,
 	public PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
 
+		initLayoutMenu(menu.createSubMenu("Layout"));
+
 		/*
 		 * File menu
 		 */
@@ -157,6 +231,32 @@ public abstract class NodeViewer extends World implements NamedObject,
 				+ getViewerParent().getTypeName() + " to file",
 				getViewerParent()));
 		return menu;
+	}
+
+	class SortNodesAction extends LayoutAction {
+
+		private static final long serialVersionUID = 1L;
+		SortMode sortMode;
+
+		public SortNodesAction(SortMode sortMode) {
+			super(NodeViewer.this, "Sort nodes by " + sortMode.getName(),
+					sortMode.getName());
+			this.sortMode = sortMode;
+		}
+
+		@Override
+		protected void applyLayout() {
+			applySortLayout(sortMode);
+		}
+
+	}
+
+	protected void initLayoutMenu(MenuBuilder layoutMenu) {
+		MenuBuilder sortMenu = layoutMenu.createSubMenu("Sort by");
+
+		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
+		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
+
 	}
 
 	/**
@@ -179,11 +279,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	 * @return Node UI object
 	 */
 	public PNeoNode getNode(String name) {
-		return getViewerNodes().get(name);
-	}
-
-	public Enumeration<PNeoNode> getViewedNodesElements() {
-		return viewerNodes.elements();
+		return getNeoNodes().get(name);
 	}
 
 	public PNodeContainer getViewerParent() {
@@ -191,21 +287,11 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	public void hideAllWidgets() {
-		Enumeration<PNeoNode> enumeration = viewerNodes.elements();
+		Enumeration<PNeoNode> enumeration = getNeoNodes().elements();
 		while (enumeration.hasMoreElements()) {
 			PNeoNode node = enumeration.nextElement();
 			node.hideAllWidgets();
 		}
-	}
-
-	/**
-	 * 
-	 * @param nodeUI
-	 *            node to be removed
-	 */
-	public void removeNeoNode(PNeoNode nodeUI) {
-		viewerNodes.remove(nodeUI.getName());
-
 	}
 
 	public void setLayoutBounds(Dimension layoutBounds) {
@@ -213,7 +299,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	public void showAllWidgets() {
-		Enumeration<PNeoNode> enumeration = viewerNodes.elements();
+		Enumeration<PNeoNode> enumeration = getNeoNodes().elements();
 		while (enumeration.hasMoreElements()) {
 			PNeoNode node = enumeration.nextElement();
 			node.showAllWidgets();
@@ -228,8 +314,18 @@ public abstract class NodeViewer extends World implements NamedObject,
 		return layoutBounds;
 	}
 
-	protected Dictionary<String, PNeoNode> getViewerNodes() {
-		return viewerNodes;
+	protected void init() {
+
+	}
+
+	protected void removeAllNeoNodes() {
+		/*
+		 * Removes all existing nodes from this viewer
+		 */
+		Enumeration<PNeoNode> enumeration = getNeoNodes().elements();
+		while (enumeration.hasMoreElements()) {
+			enumeration.nextElement().destroy();
+		}
 	}
 
 	protected abstract void updateViewFromModel();

@@ -7,7 +7,7 @@ import ca.neo.model.StructuralException;
  * In this example, the FuzzyLogic network is constructed from an existing
  * Network Model
  * 
- * @author Shu
+ * @author Shu Wu
  * 
  */
 public class GFuzzyLogicExample extends ExampleRunner {

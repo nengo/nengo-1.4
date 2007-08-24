@@ -2,27 +2,37 @@ package ca.neo.ui.actions;
 
 import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
-import ca.neo.ui.configurable.AbstractConfigurable;
-import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.managers.UserTemplateConfig;
 import ca.neo.ui.configurable.struct.PTFloat;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.Util;
 
+/**
+ * Runs the Simulator
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class RunSimulatorAction extends StandardAction {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	Simulator simulator;
+	private Simulator simulator;
 
-	public RunSimulatorAction(String description, Simulator simulator) {
-		super("Run simulator", description);
+	/**
+	 * @param actionName
+	 *            Name of this action
+	 * @param simulator
+	 *            Simulator to run
+	 */
+	public RunSimulatorAction(String actionName, Simulator simulator) {
+		super("Run simulator", actionName);
 		this.simulator = simulator;
 	}
 
@@ -34,22 +44,28 @@ public class RunSimulatorAction extends StandardAction {
 		 * Configures the simulatorConfig
 		 */
 		UserTemplateConfig config = new UserTemplateConfig(simulatorConfig);
-		config.configureAndWait();
+		try {
+			config.configureAndWait();
+			(new RunSimulatorActivity(simulatorConfig)).startThread();
+		} catch (ConfigException e) {
+			e.defaultHandledBehavior();
 
-		if (simulatorConfig.isConfigured()) {
-			(new RunSimulatorThread(simulatorConfig)).startThread();
-
-		} else {
 			throw new ActionException("Simulator configuration not complete",
 					false);
 		}
 
 	}
 
-	class RunSimulatorThread extends TrackedActivity {
+	/**
+	 * Activity which will run the simulation
+	 * 
+	 * @author Shu Wu
+	 * 
+	 */
+	class RunSimulatorActivity extends TrackedActivity {
 		SimulatorConfig config;
 
-		public RunSimulatorThread(SimulatorConfig config) {
+		public RunSimulatorActivity(SimulatorConfig config) {
 			super("Simulation in progress");
 			this.config = config;
 		}
@@ -67,30 +83,29 @@ public class RunSimulatorAction extends StandardAction {
 }
 
 /**
- * Configures the simulator run options
+ * Contains configurable properties used to set up the Simulation
  * 
  * @author Shu Wu
  * 
  */
-class SimulatorConfig extends AbstractConfigurable {
-	static final PropDescriptor pEndTime = new PTFloat("End time");
-	static final PropDescriptor pStartTime = new PTFloat("Start time");
-	static final PropDescriptor pStepSize = new PTFloat("Step size");
+class SimulatorConfig implements IConfigurable {
+	private static final ConfigParamDescriptor pEndTime = new PTFloat(
+			"End time");
+	private static final ConfigParamDescriptor pStartTime = new PTFloat(
+			"Start time");
+	private static final ConfigParamDescriptor pStepSize = new PTFloat(
+			"Step size");
 
-	static final PropDescriptor[] zProperties = { pStartTime, pEndTime,
-			pStepSize };
+	private static final ConfigParamDescriptor[] zProperties = { pStartTime,
+			pEndTime, pStepSize };
 
-	PropertySet configuredProperties;
+	private ConfigParam configuredProperties;
 
-	@Override
-	public void completeConfiguration(PropertySet properties) {
-		super.completeConfiguration(properties);
+	public void completeConfiguration(ConfigParam properties) {
 		configuredProperties = properties;
 	}
 
-	@Override
-	public PropDescriptor[] getConfigSchema() {
-		// TODO Auto-generated method stub
+	public ConfigParamDescriptor[] getConfigSchema() {
 		return zProperties;
 	}
 
@@ -106,10 +121,9 @@ class SimulatorConfig extends AbstractConfigurable {
 		return (Float) configuredProperties.getProperty(pStepSize);
 	}
 
-	@Override
 	public String getTypeName() {
-		// TODO Auto-generated method stub
 		return "Simulator Runtime Configuration";
 	}
+
 
 }

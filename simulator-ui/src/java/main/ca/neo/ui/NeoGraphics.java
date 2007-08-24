@@ -18,30 +18,68 @@ import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.world.AppFrame;
-import ca.shu.ui.lib.world.WorldObject;
 
+/**
+ * Top level instance of the NeoGraphics application
+ * 
+ * @author Shu Wu
+ * 
+ */
+/**
+ * @author Shu
+ * 
+ */
 public class NeoGraphics extends AppFrame implements INodeContainer {
+	/**
+	 * Description of NeoGraphics to be shown in the "About" Dialog box
+	 */
 	public static final String ABOUT = "NeoGraphics<BR><BR>"
 			+ "(c) Copyright Center for Theoretical Neuroscience  007.  All rights reserved<BR>"
 			+ "Visit http://ctn.uwaterloo.ca/<BR>"
 			+ "<BR> User Inteface by Shu Wu";
 
+	/**
+	 * File extension for Ensembles
+	 */
 	public static final String ENSEMBLE_FILE_EXTENSION = "ens";
 
+	/**
+	 * UI delegate object used to show the FileChooser
+	 */
 	public static final NeoFileChooser FileChooser = new NeoFileChooser();
 
+	/**
+	 * File extension for Networks
+	 */
 	public static final String NETWORK_FILE_EXTENSION = "net";
+
+	/**
+	 * Name of the directory where UI Files are stored
+	 */
 	public static final String USER_FILE_DIR = "UIFiles";
+
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Runs NeoGraphics with a default name
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		new NeoGraphics("Default");
 
 	}
 
+	/**
+	 * @param title
+	 *            Text to be shown in the Title Bar
+	 */
 	public NeoGraphics(String title) {
 		super(title + " - NEO Workspace");
 
+		/*
+		 * Set up Environment variables
+		 */
 		Environment.setUserInterface(true);
 		// PDebug.debugThreads = true;
 		// PDebug.debugPrintUsedMemory = true;
@@ -51,7 +89,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ca.neo.ui.models.nodes.INodeContainer#addNeoNode(ca.neo.ui.models.PNeoNode)
+	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.PNeoNode)
 	 */
 	public void addNeoNode(PNeoNode node) {
 		getWorld().getGround().catchObject(node);
@@ -59,17 +97,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 			((PNodeContainer) (node)).openViewer();
 		}
 
-	}
-
-	/**
-	 * 
-	 * @param object
-	 *            Object to be added to the top-level world
-	 * @return the object being added
-	 */
-	public WorldObject addWorldObject(WorldObject object) {
-		getWorld().getGround().catchObject(object);
-		return object;
 	}
 
 	@Override
@@ -106,6 +133,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	}
 
+	/**
+	 * Prompt user to save models in NeoGraphics This is most likely called
+	 * right before the application is exiting
+	 */
 	@SuppressWarnings("unchecked")
 	protected void promptToSaveModels() {
 

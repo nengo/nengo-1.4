@@ -4,9 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import ca.neo.math.Function;
-import ca.neo.ui.configurable.AbstractConfigurable;
-import ca.neo.ui.configurable.managers.PropertySet;
-import ca.neo.ui.configurable.struct.PropDescriptor;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.IConfigurable;
 
 /**
  * 
@@ -16,7 +17,7 @@ import ca.neo.ui.configurable.struct.PropDescriptor;
  * @author Shu Wu
  * 
  */
-public abstract class ConfigurableFunction extends AbstractConfigurable {
+public abstract class ConfigurableFunction implements IConfigurable {
 
 	Function function;
 
@@ -25,16 +26,10 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 
 	}
 
-	@Override
-	public void cancelConfiguration() {
-
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
-	public void completeConfiguration(PropertySet props) {
+	public void completeConfiguration(ConfigParam props) throws ConfigException {
 
-		PropDescriptor[] metaProperties = getConfigSchema();
+		ConfigParamDescriptor[] metaProperties = getConfigSchema();
 
 		/*
 		 * Create function using Java reflection, function parameter are
@@ -59,7 +54,8 @@ public abstract class ConfigurableFunction extends AbstractConfigurable {
 		}
 
 		if (ct == null) {
-			return;
+			throw new ConfigException(
+					"Could not configure function, no suitable constructor found");
 		}
 
 		Object arglist[] = new Object[metaProperties.length];

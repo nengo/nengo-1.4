@@ -1,12 +1,14 @@
 package ca.neo.ui.exceptions;
 
+import ca.shu.ui.lib.exceptions.UIException;
+
 /**
  * Problem configuring the model inside the UI
  * 
  * @author Shu
  * 
  */
-public class ModelConfigurationException extends NeoGraphicsException {
+public class ModelConfigurationException extends UIException {
 
 	private static final long serialVersionUID = 1L;
 

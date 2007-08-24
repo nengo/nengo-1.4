@@ -7,11 +7,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.objects.lines.LineEndWellIcon;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.nodes.PPath;
 
-public class GEdge extends PPath implements PropertyChangeListener {
+public class GDirectedEdge extends PPath implements PropertyChangeListener {
 
 	// protected PNode arrow;
 
@@ -34,7 +33,7 @@ public class GEdge extends PPath implements PropertyChangeListener {
 
 	LineShape myLineType = LineShape.STRAIGHT;
 
-	public GEdge(WorldObject startNode, WorldObject endNode) {
+	public GDirectedEdge(WorldObject startNode, WorldObject endNode) {
 		super();
 		this.startNode = startNode;
 		this.endNode = endNode;
@@ -321,13 +320,14 @@ public class GEdge extends PPath implements PropertyChangeListener {
 	}
 }
 
-class PointerTriangle extends GEdge {
+class PointerTriangle extends GDirectedEdge {
 
 	private static final long serialVersionUID = 1L;
 
 	static final double TRIANGLE_EDGE_LENGTH = 13;
+	static final double POINTER_DISTANCE_FROM_END_NODE = 100;
 
-	public PointerTriangle(GEdge parentEdge) {
+	public PointerTriangle(GDirectedEdge parentEdge) {
 		super(parentEdge.getStartNode(), parentEdge.getEndNode());
 		setPaint(Style.COLOR_LINEEND);
 
@@ -353,11 +353,17 @@ class PointerTriangle extends GEdge {
 
 		double deltaX = endPosition.getX() - startPosition.getX();
 		double deltaY = endPosition.getY() - startPosition.getY();
+		double lineLength = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
+
+		double pointerDistanceFromEndNode = POINTER_DISTANCE_FROM_END_NODE;
+		if (pointerDistanceFromEndNode > (lineLength / 2d)) {
+			pointerDistanceFromEndNode = (lineLength) / 2d;
+		}
 
 		double angle = Math.atan2(deltaY, deltaX);
 
-		double x = Math.cos(angle + Math.PI) * LineEndWellIcon.ICON_RADIUS;
-		double y = Math.sin(angle + Math.PI) * LineEndWellIcon.ICON_RADIUS;
+		double x = Math.cos(angle + Math.PI) * pointerDistanceFromEndNode;
+		double y = Math.sin(angle + Math.PI) * pointerDistanceFromEndNode;
 		Point2D point0 = new Point2D.Double(x, y);
 
 		// System.out.println("angle: " + angle);

@@ -21,19 +21,34 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.Util;
 
+/**
+ * Action used to open a Neo model from file
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class OpenNeoFileAction extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
-	File file;
-	INodeContainer nodeContainer;
-	Object objLoaded;
+	private File file;
+	private INodeContainer nodeContainer;
+	private Object objLoaded;
 
+	/**
+	 * @param actionName
+	 *            Name of this action
+	 * @param nodeContainer
+	 *            Container to which the loaded model shall be added to
+	 */
 	public OpenNeoFileAction(String actionName, INodeContainer nodeContainer) {
 		super("Open model from file", actionName);
 		init(nodeContainer);
 	}
 
-	private void init(INodeContainer nodeContainer) {
+	/**
+	 * Initializes field variables
+	 */
+	protected void init(INodeContainer nodeContainer) {
 		this.nodeContainer = nodeContainer;
 	}
 
@@ -55,7 +70,7 @@ public class OpenNeoFileAction extends StandardAction {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
 								if (objLoaded != null)
-									processObject(objLoaded);
+									processLoadedObject(objLoaded);
 								objLoaded = null;
 
 							}
@@ -82,6 +97,13 @@ public class OpenNeoFileAction extends StandardAction {
 
 	}
 
+	/**
+	 * Tries to open the loaded object as an Ensemble and wrap it with a UI
+	 * object
+	 * 
+	 * @param objLoaded
+	 * @return An Ensemble UI Wrapper around the loaded object
+	 */
 	protected PNeoNode openAsEnsemble(Object objLoaded) {
 
 		PEnsemble ensembleUI = null;
@@ -96,6 +118,13 @@ public class OpenNeoFileAction extends StandardAction {
 			return null;
 	}
 
+	/**
+	 * Tries to open the loaded object as an Network and wrap it with a UI
+	 * object
+	 * 
+	 * @param objLoaded
+	 * @return An Network UI Wrapper around the loaded object
+	 */
 	protected PNeoNode openAsNetwork(Object objLoaded) {
 		if (objLoaded instanceof Network) {
 			PNetwork networkUI = new PNetwork((Network) objLoaded);
@@ -107,7 +136,11 @@ public class OpenNeoFileAction extends StandardAction {
 
 	}
 
-	protected void processObject(Object objLoaded) {
+	/**
+	 * Wraps the loaded object and adds it to the Node Container
+	 * @param objLoaded Loaded object
+	 */
+	protected void processLoadedObject(Object objLoaded) {
 		PNeoNode node;
 		node = openAsNetwork(objLoaded);
 		if (node == null)

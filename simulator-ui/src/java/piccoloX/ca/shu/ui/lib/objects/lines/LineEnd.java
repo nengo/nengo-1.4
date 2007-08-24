@@ -10,7 +10,7 @@ import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.handlers.Interactable;
-import ca.shu.ui.lib.objects.GEdge;
+import ca.shu.ui.lib.objects.GDirectedEdge;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
@@ -234,7 +234,7 @@ public class LineEnd extends WorldObject implements Interactable {
 		return true;
 	}
 
-	protected GEdge getEdge() {
+	protected GDirectedEdge getEdge() {
 		return edge;
 	}
 
@@ -281,7 +281,7 @@ public class LineEnd extends WorldObject implements Interactable {
  * @author Shu Wu
  * 
  */
-class Edge extends GEdge {
+class Edge extends GDirectedEdge {
 
 	private static final long serialVersionUID = 1L;
 

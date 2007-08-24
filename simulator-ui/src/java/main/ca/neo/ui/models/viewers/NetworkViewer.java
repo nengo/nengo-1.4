@@ -16,13 +16,15 @@ import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.ui.actions.CreateModelAction;
+import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.managers.PropertySet;
 import ca.neo.ui.configurable.managers.UserTemplateConfig;
 import ca.neo.ui.configurable.struct.PTInt;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
@@ -31,7 +33,6 @@ import ca.neo.ui.models.nodes.connectors.POrigin;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.MenuBuilder;
@@ -79,6 +80,7 @@ public class NetworkViewer extends NodeViewer {
 	@Override
 	public void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCamera) {
+
 		if (updateModel) {
 			try {
 
@@ -144,6 +146,7 @@ public class NetworkViewer extends NodeViewer {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
@@ -190,50 +193,6 @@ public class NetworkViewer extends NodeViewer {
 		widgetMenu.addAction(new ShowAllWidgetsAction("Show all widgets"));
 		widgetMenu.addAction(new HideAllWidgetsAction("Hide all widgets"));
 
-		// Layouts
-		MenuBuilder layoutsMenu = menu.createSubMenu("Layouts");
-
-		MenuBuilder applyLayoutMenu = layoutsMenu
-				.createSubMenu("Use algorithm");
-
-		MenuBuilder layoutSettings = applyLayoutMenu.createSubMenu("Settings");
-		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
-
-		applyLayoutMenu.addAction(new SquareLayoutAction());
-		applyLayoutMenu.addAction(new LayoutAction(FRLayout.class,
-				"Fruchterman-Reingold"));
-		applyLayoutMenu.addAction(new LayoutAction(KKLayout.class,
-				"Kamada-Kawai"));
-		applyLayoutMenu
-				.addAction(new LayoutAction(CircleLayout.class, "Circle"));
-
-		layoutsMenu.addAction(new SaveLayout("Save as new"));
-		MenuBuilder restoreLayout = layoutsMenu.createSubMenu("Restore");
-		String[] layoutNames = getUIConfig().getLayoutNames();
-
-		if (layoutNames.length > 0) {
-			for (String element : layoutNames) {
-				restoreLayout.addAction(new RestoreLayout(element));
-			}
-		} else {
-			restoreLayout.addLabel("none");
-		}
-
-		MenuBuilder deleteLayout = layoutsMenu.createSubMenu("Delete");
-
-		if (layoutNames.length > 0) {
-			for (String element : layoutNames) {
-				deleteLayout.addAction(new DeleteLayout(element));
-			}
-		} else {
-			deleteLayout.addLabel("none");
-		}
-
-		/**
-		 * TODO: Enable spring layout & ISOM Layout which are continuous
-		 */
-		// layoutMenu.addAction(new LayoutAction(SpringLayout.class, "Spring"));
-		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
 		return menu;
 	}
 
@@ -269,7 +228,6 @@ public class NetworkViewer extends NodeViewer {
 			return;
 		}
 		super.removeNeoNode(nodeUI);
-
 	}
 
 	/**
@@ -285,7 +243,7 @@ public class NetworkViewer extends NodeViewer {
 			return false;
 		}
 
-		Enumeration<PNeoNode> en = getViewerNodes().elements();
+		Enumeration<PNeoNode> en = getNeoNodes().elements();
 
 		while (en.hasMoreElements()) {
 			PNeoNode node = en.nextElement();
@@ -328,14 +286,7 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	@Override
 	public void updateViewFromModel() {
-
-		/*
-		 * Removes all existing nodes from this viewer
-		 */
-		Enumeration<PNeoNode> enumeration = getViewerNodes().elements();
-		while (enumeration.hasMoreElements()) {
-			enumeration.nextElement().removeFromParent();
-		}
+		removeAllNeoNodes();
 
 		/*
 		 * Construct Nodes from the Network model
@@ -406,7 +357,7 @@ public class NetworkViewer extends NodeViewer {
 	protected Graph createGraph() {
 		DirectedSparseGraph graph = new DirectedSparseGraph();
 
-		Enumeration<PNeoNode> enumeration = getViewedNodesElements();
+		Enumeration<PNeoNode> enumeration = getNeoNodes().elements();
 
 		/**
 		 * Add vertices
@@ -441,6 +392,12 @@ public class NetworkViewer extends NodeViewer {
 
 		return graph;
 
+	}
+
+	@Override
+	protected void init() {
+		// TODO Auto-generated method stub
+		super.init();
 	}
 
 	@Override
@@ -506,7 +463,7 @@ public class NetworkViewer extends NodeViewer {
 					/**
 					 * Layout nodes
 					 */
-					Enumeration<PNeoNode> enumeration = getViewerNodes()
+					Enumeration<PNeoNode> enumeration = getNeoNodes()
 							.elements();
 					PTransformActivity nodeMoveActivity = null;
 					while (enumeration.hasMoreElements()) {
@@ -534,54 +491,6 @@ public class NetworkViewer extends NodeViewer {
 			}).invokeLater();
 
 		}
-	}
-
-	class LayoutAction extends ReversableAction {
-
-		private static final long serialVersionUID = 1L;
-
-		@SuppressWarnings("unchecked")
-		Class layoutClass;
-
-		/**
-		 * TODO: Save node positions here, it's safer and won't get deleted by
-		 * other layouts
-		 */
-		NodeLayout savedLayout;
-
-		@SuppressWarnings("unchecked")
-		public LayoutAction(Class layoutClass, String name) {
-			super("Apply layout " + name, name);
-			this.layoutClass = layoutClass;
-		}
-
-		public LayoutAction(String description, String actionName) {
-			super(description, actionName);
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			savedLayout = new NodeLayout("", NetworkViewer.this);
-			applyJungLayout(layoutClass);
-
-		}
-
-		protected void restoreNodePositions() {
-			Enumeration<PNeoNode> en = getViewerNodes().elements();
-
-			while (en.hasMoreElements()) {
-				PNeoNode node = en.nextElement();
-
-				node.setOffset(savedLayout.getPosition(node.getName()));
-
-			}
-		}
-
-		@Override
-		protected void undo() throws ActionException {
-			restoreNodePositions();
-		}
-
 	}
 
 	class RestoreLayout extends StandardAction {
@@ -639,22 +548,6 @@ public class NetworkViewer extends NodeViewer {
 
 	}
 
-	class SquareLayoutAction extends LayoutAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public SquareLayoutAction() {
-			super("Apply square layout", "Square");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			savedLayout = new NodeLayout("", NetworkViewer.this);
-			applySquareLayout();
-		}
-
-	}
-
 	class ZoomActivity extends PActivity {
 
 		public ZoomActivity() {
@@ -668,16 +561,82 @@ public class NetworkViewer extends NodeViewer {
 		}
 
 	}
+
+	class JungLayoutAction extends LayoutAction {
+
+		private static final long serialVersionUID = 1L;
+		@SuppressWarnings("unchecked")
+		Class layoutClass;
+
+		@SuppressWarnings("unchecked")
+		public JungLayoutAction(Class layoutClass, String name) {
+			super(NetworkViewer.this, "Apply layout " + name, name);
+			this.layoutClass = layoutClass;
+		}
+
+		@Override
+		protected void applyLayout() {
+			applyJungLayout(layoutClass);
+
+		}
+
+	}
+
+	@Override
+	protected void initLayoutMenu(MenuBuilder layoutMenu) {
+
+		super.initLayoutMenu(layoutMenu);
+
+		MenuBuilder applyLayoutMenu = layoutMenu.createSubMenu("Use algorithm");
+
+		MenuBuilder layoutSettings = applyLayoutMenu.createSubMenu("Settings");
+		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
+
+		applyLayoutMenu.addAction(new JungLayoutAction(FRLayout.class,
+				"Fruchterman-Reingold"));
+		applyLayoutMenu.addAction(new JungLayoutAction(KKLayout.class,
+				"Kamada-Kawai"));
+		applyLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class,
+				"Circle"));
+
+		layoutMenu.addAction(new SaveLayout("Save as new"));
+		MenuBuilder restoreLayout = layoutMenu.createSubMenu("Restore");
+		String[] layoutNames = getUIConfig().getLayoutNames();
+
+		if (layoutNames.length > 0) {
+			for (String element : layoutNames) {
+				restoreLayout.addAction(new RestoreLayout(element));
+			}
+		} else {
+			restoreLayout.addLabel("none");
+		}
+
+		MenuBuilder deleteLayout = layoutMenu.createSubMenu("Delete");
+
+		if (layoutNames.length > 0) {
+			for (String element : layoutNames) {
+				deleteLayout.addAction(new DeleteLayout(element));
+			}
+		} else {
+			deleteLayout.addLabel("none");
+		}
+
+		/**
+		 * TODO: Enable spring layout & ISOM Layout which are continuous
+		 */
+		// layoutMenu.addAction(new LayoutAction(SpringLayout.class, "Spring"));
+		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
+	}
 }
 
 class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	private static final long serialVersionUID = 1L;
-	static final PropDescriptor pHeight = new PTInt("Height");
+	static final ConfigParamDescriptor pHeight = new PTInt("Height");
 
-	static final PropDescriptor pWidth = new PTInt("Width");
+	static final ConfigParamDescriptor pWidth = new PTInt("Width");
 
-	static final PropDescriptor[] zProperties = { pWidth, pHeight };
+	static final ConfigParamDescriptor[] zProperties = { pWidth, pHeight };
 
 	NetworkViewer parent;
 
@@ -686,11 +645,7 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 		this.parent = parent;
 	}
 
-	public void cancelConfiguration() {
-
-	}
-
-	public void completeConfiguration(PropertySet properties) {
+	public void completeConfiguration(ConfigParam properties) {
 		parent
 				.setLayoutBounds(new Dimension((Integer) properties
 						.getProperty(pWidth), (Integer) properties
@@ -698,7 +653,7 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	}
 
-	public PropDescriptor[] getConfigSchema() {
+	public ConfigParamDescriptor[] getConfigSchema() {
 		return zProperties;
 	}
 
@@ -706,14 +661,14 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 		return "Layout bounds";
 	}
 
-	public boolean isConfigured() {
-		return true;
-	}
-
 	@Override
 	protected void action() throws ActionException {
 		UserTemplateConfig config = new UserTemplateConfig(this);
-		config.configureAndWait();
+		try {
+			config.configureAndWait();
+		} catch (ConfigException e) {
+			e.defaultHandledBehavior();
+		}
 
 	}
 

@@ -8,11 +8,12 @@ import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
-import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.managers.UserTemplateConfig;
 import ca.neo.ui.configurable.struct.PTInt;
 import ca.neo.ui.configurable.struct.PTString;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.models.nodes.connectors.PDecodedTermination;
 import ca.neo.ui.models.nodes.connectors.PTermination;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -33,18 +34,20 @@ import ca.shu.ui.lib.util.PopupMenuBuilder;
 public class PNEFEnsemble extends PEnsemble {
 	private static final long serialVersionUID = 1L;
 
-	static final PropDescriptor pDim = new PTInt("Dimensions");
+	static final ConfigParamDescriptor pDim = new PTInt("Dimensions");
 
-	static final PropDescriptor pName = new PTString("Name");
+	static final ConfigParamDescriptor pName = new PTString("Name");
 
-	static final PropDescriptor pNumOfNeurons = new PTInt("Number of Neurons");
+	static final ConfigParamDescriptor pNumOfNeurons = new PTInt(
+			"Number of Neurons");
 
-	static final PropDescriptor pStorageName = new PTString("Storage Name");
+	static final ConfigParamDescriptor pStorageName = new PTString(
+			"Storage Name");
 
 	static final String typeName = "NEFEnsemble";
 
-	static final PropDescriptor[] zProperties = { pName, pNumOfNeurons, pDim,
-			pStorageName };
+	static final ConfigParamDescriptor[] zProperties = { pName, pNumOfNeurons,
+			pDim, pStorageName };
 
 	boolean collectingSpikes = false;
 
@@ -73,18 +76,23 @@ public class PNEFEnsemble extends PEnsemble {
 	 */
 	public PTermination createDecodedTermintation() {
 		PDecodedTermination termUI = new PDecodedTermination(this);
-		UserTemplateConfig config = new UserTemplateConfig(termUI);
-		config.configureAndWait();
 
-		if (termUI.isConfigured()) {
+		try {
+			UserTemplateConfig config = new UserTemplateConfig(termUI);
+			config.configureAndWait();
+
 			addWidget(termUI);
 			return termUI;
+
+		} catch (ConfigException e) {
+			e.defaultHandledBehavior();
 		}
+
 		return null;
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
+	public ConfigParamDescriptor[] getConfigSchema() {
 		return zProperties;
 	}
 
@@ -113,7 +121,7 @@ public class PNEFEnsemble extends PEnsemble {
 	}
 
 	@Override
-	protected Node configureModel(PropertySet prop) {
+	protected Node configureModel(ConfigParam prop) {
 		try {
 
 			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();

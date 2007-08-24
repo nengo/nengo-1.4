@@ -1,15 +1,14 @@
 package ca.neo.ui.configurable.targets.functions;
 
 import ca.neo.math.impl.GaussianPDF;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.struct.PTFloat;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 
 public class FGaussianPDF extends ConfigurableFunction {
-	static final PropDescriptor[] propStruct = new PropDescriptor[] {
+	static final ConfigParamDescriptor[] propStruct = new ConfigParamDescriptor[] {
 			new PTFloat("Mean"), new PTFloat("Variance"), new PTFloat("Peak") };
 
-	@Override
-	public PropDescriptor[] getConfigSchema() {
+	public ConfigParamDescriptor[] getConfigSchema() {
 		return propStruct;
 	}
 
@@ -18,7 +17,6 @@ public class FGaussianPDF extends ConfigurableFunction {
 		return GaussianPDF.class;
 	}
 
-	@Override
 	public String getTypeName() {
 		return "Gaussian PDF";
 	}

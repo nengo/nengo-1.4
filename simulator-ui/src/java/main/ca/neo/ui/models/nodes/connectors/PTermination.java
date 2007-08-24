@@ -3,11 +3,11 @@ package ca.neo.ui.models.nodes.connectors;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.managers.UserConfig;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.neo.ui.configurable.targets.ConfigurableMatrix;
-import ca.neo.ui.exceptions.ModelConfigurationException;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -52,7 +52,7 @@ public class PTermination extends PWidget implements ILineAcceptor {
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
+	public ConfigParamDescriptor[] getConfigSchema() {
 		return null;
 	}
 
@@ -108,8 +108,8 @@ public class PTermination extends PWidget implements ILineAcceptor {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties)
-			throws ModelConfigurationException {
+	protected Object configureModel(ConfigParam configuredProperties)
+			throws ConfigException {
 		throw new NotImplementedException();
 	}
 
@@ -161,10 +161,11 @@ public class PTermination extends PWidget implements ILineAcceptor {
 
 			ConfigurableMatrix matrixEditor = new ConfigurableMatrix(oldWeights);
 			UserConfig config = new UserConfig(matrixEditor);
-			config.configureAndWait();
-			if (matrixEditor.isConfigured()) {
+			try {
+				config.configureAndWait();
 				setWeights(matrixEditor.getMatrix());
-			} else {
+			} catch (ConfigException e) {
+				e.defaultHandledBehavior();
 				throw new UserCancelledException();
 			}
 

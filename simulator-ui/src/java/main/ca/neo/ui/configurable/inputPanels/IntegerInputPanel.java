@@ -1,12 +1,11 @@
 package ca.neo.ui.configurable.inputPanels;
 
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.struct.PTInt;
 
-public class IntegerInputPanel extends PropertyInputPanel {
+public class IntegerInputPanel extends ConfigParamInputPanel {
 	/**
 	 * 
 	 */
@@ -32,10 +31,10 @@ public class IntegerInputPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public void init(JPanel panel) {
+	public void initPanel() {
 		tf = new JTextField(10);
 
-		panel.add(tf);
+		addToPanel(tf);
 
 	}
 

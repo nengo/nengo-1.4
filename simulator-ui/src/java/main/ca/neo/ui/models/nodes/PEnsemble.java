@@ -9,9 +9,9 @@ import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.NeoGraphics;
-import ca.neo.ui.configurable.managers.PropertySet;
-import ca.neo.ui.configurable.struct.PropDescriptor;
-import ca.neo.ui.exceptions.ModelConfigurationException;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.EnsembleViewer;
@@ -40,7 +40,7 @@ public class PEnsemble extends PNodeContainer {
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
+	public ConfigParamDescriptor[] getConfigSchema() {
 		Util.UserError("Ensemble has not been implemented yet");
 		return null;
 	}
@@ -88,8 +88,8 @@ public class PEnsemble extends PNodeContainer {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties)
-			throws ModelConfigurationException {
+	protected Object configureModel(ConfigParam configuredProperties)
+			throws ConfigException {
 		throw new NotImplementedException();
 	}
 

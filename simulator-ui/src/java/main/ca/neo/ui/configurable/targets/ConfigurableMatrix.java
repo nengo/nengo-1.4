@@ -1,20 +1,18 @@
 package ca.neo.ui.configurable.targets;
 
-import javax.swing.JPanel;
-
-import ca.neo.ui.configurable.AbstractConfigurable;
-import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.managers.PropertySet;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.matrixEditor.CouplingMatrixImpl;
 import ca.neo.ui.configurable.matrixEditor.MatrixEditor;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 
-public class ConfigurableMatrix extends AbstractConfigurable {
+public class ConfigurableMatrix implements IConfigurable {
 	int fromSize, toSize;
 
 	float[][] myMatrix;
 
-	PropDescriptor pMatrix;
+	ConfigParamDescriptor pMatrix;
 
 	public ConfigurableMatrix(float[][] matrixValues) {
 		super();
@@ -34,16 +32,14 @@ public class ConfigurableMatrix extends AbstractConfigurable {
 
 	}
 
-	@Override
-	public void completeConfiguration(PropertySet properties) {
-		super.completeConfiguration(properties);
+	public void completeConfiguration(ConfigParam properties) {
+
 		myMatrix = (float[][]) properties.getProperty(pMatrix);
 
 	}
 
-	@Override
-	public PropDescriptor[] getConfigSchema() {
-		PropDescriptor[] props = new PropDescriptor[1];
+	public ConfigParamDescriptor[] getConfigSchema() {
+		ConfigParamDescriptor[] props = new ConfigParamDescriptor[1];
 		props[0] = pMatrix;
 		return props;
 	}
@@ -52,14 +48,13 @@ public class ConfigurableMatrix extends AbstractConfigurable {
 		return myMatrix;
 	}
 
-	@Override
 	public String getTypeName() {
 		return fromSize + " to " + toSize + " Coupling Matrix";
 	}
 
 }
 
-class CouplingMatrixInputPanel extends PropertyInputPanel {
+class CouplingMatrixInputPanel extends ConfigParamInputPanel {
 
 	private static final long serialVersionUID = 1L;
 	CouplingMatrixImpl couplingMatrix;
@@ -68,8 +63,8 @@ class CouplingMatrixInputPanel extends PropertyInputPanel {
 
 	int fromSize, toSize;
 
-	public CouplingMatrixInputPanel(PropDescriptor property, int fromSize,
-			int toSize) {
+	public CouplingMatrixInputPanel(ConfigParamDescriptor property,
+			int fromSize, int toSize) {
 		super(property);
 		this.fromSize = fromSize;
 		this.toSize = toSize;
@@ -86,7 +81,7 @@ class CouplingMatrixInputPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public void init(JPanel panel) {
+	public void initPanel() {
 		/*
 		 * do nothing here
 		 */
@@ -116,7 +111,7 @@ class CouplingMatrixInputPanel extends PropertyInputPanel {
 
 }
 
-class CouplingMatrixProp extends PropDescriptor {
+class CouplingMatrixProp extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 	int fromSize, toSize;
@@ -134,7 +129,7 @@ class CouplingMatrixProp extends PropDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public ConfigParamInputPanel createInputPanel() {
 		return new CouplingMatrixInputPanel(this, fromSize, toSize);
 	}
 

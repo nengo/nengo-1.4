@@ -6,13 +6,26 @@ import ca.neo.model.Network;
 import ca.neo.ui.models.nodes.PNetwork;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 
+/**
+ * Used to conveniently create a NeoGraphics instance with an existing Network
+ * model
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class ExampleRunner {
-	Network network;
-	String networkName;
+	private Network network;
+	private String networkName;
 
-	public ExampleRunner(String networkName, Network exampleNetwork) {
-		this.networkName = networkName;
-		this.network = exampleNetwork;
+	/**
+	 * @param name
+	 *            Name to be given to this instance
+	 * @param network
+	 *            Network to be given to NeoGraphics
+	 */
+	public ExampleRunner(String name, Network network) {
+		this.networkName = name;
+		this.network = network;
 
 		/**
 		 * All UI funcitons and constructors must be invoked from the Swing
@@ -25,7 +38,10 @@ public class ExampleRunner {
 		});
 	}
 
-	protected void buildUI() {
+	/**
+	 * Builds a NeoGraphics User Interface
+	 */
+	private void buildUI() {
 
 		NeoGraphics neoGraphics = new NeoGraphics(networkName);
 

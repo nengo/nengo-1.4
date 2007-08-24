@@ -2,11 +2,10 @@ package ca.neo.ui.models;
 
 import javax.swing.SwingUtilities;
 
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.managers.PropertySet;
-import ca.neo.ui.configurable.struct.PropDescriptor;
-import ca.neo.ui.exceptions.ModelConfigurationException;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * This abstract class implements IConfigurable, which allows it to be
@@ -31,26 +30,17 @@ public abstract class PModelConfigurable extends PModel implements
 		init();
 	}
 
-	public void cancelConfiguration() {
-		removeFromParent();
-
-	}
-
 	/*
 	 * (non-Javadoc) This function can be safely called from any thread
 	 * 
 	 * @see ca.neo.ui.views.objects.configurable.IConfigurable#completeConfiguration(ca.neo.ui.views.objects.configurable.managers.PropertySet)
 	 */
-	public void completeConfiguration(PropertySet properties) {
+	public void completeConfiguration(ConfigParam properties)
+			throws ConfigException {
 
 		Object model = null;
-		try {
-			model = configureModel(properties);
-		} catch (ModelConfigurationException e1) {
-			Util.UserError("Problem configuring model: " + e1.getMessage());
-			destroy();
-			return;
-		}
+
+		model = configureModel(properties);
 
 		setModel(model);
 
@@ -62,15 +52,7 @@ public abstract class PModelConfigurable extends PModel implements
 
 	}
 
-	public abstract PropDescriptor[] getConfigSchema();
-
-	public boolean isConfigured() {
-		if (getModel() != null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	public abstract ConfigParamDescriptor[] getConfigSchema();
 
 	private void init() {
 		// nothing to initialize yet
@@ -95,8 +77,8 @@ public abstract class PModelConfigurable extends PModel implements
 	 * @param configuredProperties
 	 *            the configured properties
 	 */
-	protected abstract Object configureModel(PropertySet configuredProperties)
-			throws ModelConfigurationException;
+	protected abstract Object configureModel(
+			ConfigParam configuredProperties) throws ConfigException;
 
 	class CompleteConfigurationRunner implements Runnable {
 		Object model;

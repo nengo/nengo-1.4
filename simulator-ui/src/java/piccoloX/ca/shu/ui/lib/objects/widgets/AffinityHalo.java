@@ -6,11 +6,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 
 import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.objects.GEdge;
+import ca.shu.ui.lib.objects.GDirectedEdge;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-public class AffinityHalo extends GEdge {
+public class AffinityHalo extends GDirectedEdge {
 
 	/**
 	 * 

@@ -4,6 +4,12 @@ import ca.neo.model.Network;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 
+/**
+ * TODO: Implement this
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class SetSimulatorAction extends StandardAction {
 	/**
 	 * 

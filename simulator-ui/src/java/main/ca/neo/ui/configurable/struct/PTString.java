@@ -1,11 +1,11 @@
 package ca.neo.ui.configurable.struct;
 
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 
-public class PTString extends PropDescriptor {
+public class PTString extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -15,7 +15,7 @@ public class PTString extends PropDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public ConfigParamInputPanel createInputPanel() {
 		// TODO Auto-generated method stub
 		return new StringInputPanel(this);
 	}
@@ -34,7 +34,7 @@ public class PTString extends PropDescriptor {
 
 }
 
-class StringInputPanel extends PropertyInputPanel {
+class StringInputPanel extends ConfigParamInputPanel {
 	/**
 	 * 
 	 */
@@ -42,7 +42,7 @@ class StringInputPanel extends PropertyInputPanel {
 
 	JTextField tf;
 
-	public StringInputPanel(PropDescriptor property) {
+	public StringInputPanel(ConfigParamDescriptor property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 	}
@@ -54,11 +54,11 @@ class StringInputPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public void init(JPanel panel) {
+	public void initPanel() {
 		// TODO Auto-generated method stub
 		tf = new JTextField(10);
 
-		panel.add(tf);
+		addToPanel(tf);
 
 	}
 

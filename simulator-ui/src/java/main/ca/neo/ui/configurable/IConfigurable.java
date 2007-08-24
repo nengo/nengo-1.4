@@ -1,27 +1,32 @@
 package ca.neo.ui.configurable;
 
-import ca.neo.ui.configurable.managers.PropertySet;
-import ca.neo.ui.configurable.struct.PropDescriptor;
-
 /**
- * Describes a object which can be configured programatically by a
- * IConfigurationManager
+ * Describes a object which can be configured by a IConfigurationManager
  * 
  * @author Shu Wu
  * 
  */
 public interface IConfigurable {
-	public void cancelConfiguration();
 
-	public void completeConfiguration(PropertySet properties);
+	/**
+	 * Called when configuration parameters have been set
+	 * 
+	 * @param configParameters
+	 *            A set of configured parameters to be used to complete
+	 *            configuration
+	 */
+	public void completeConfiguration(ConfigParam configParameters)
+			throws ConfigException;
 
-	public PropDescriptor[] getConfigSchema();
+	/**
+	 * @return An array of objects which describe what needs to be configured in
+	 *         this object
+	 */
+	public ConfigParamDescriptor[] getConfigSchema();
 
+	/**
+	 * @return Name given to this type of object
+	 */
 	public String getTypeName();
 
-	public boolean isConfigured();
-
-	// public MutableAttributeSet getPropertiesReference();
-
-	// public void setProperties(MutableAttributeSet properties);
 }

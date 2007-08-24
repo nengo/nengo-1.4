@@ -13,6 +13,7 @@ import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 
 /**
+ * In this example, an Integrator network is constructed
  * 
  * @author Shu Wu
  * 

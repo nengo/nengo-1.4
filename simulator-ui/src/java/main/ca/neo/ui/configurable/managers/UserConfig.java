@@ -14,9 +14,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
@@ -52,10 +54,7 @@ public class UserConfig extends ConfigManager {
 	 * 
 	 */
 	@Override
-	public void configureAndWait() {
-		// Util.Assert(!SwingUtilities.isEventDispatchThread(), "Configuration
-		// cannot be called from the Event Dispatch Thread");
-
+	public void configureAndWait() throws ConfigException {
 		dialog = createConfigDialog();
 
 		/*
@@ -71,6 +70,10 @@ public class UserConfig extends ConfigManager {
 				}
 			}
 		}
+
+		if (configException != null)
+			throw configException;
+
 	}
 
 	public ConfigDialog createConfigDialog() {
@@ -85,13 +88,41 @@ public class UserConfig extends ConfigManager {
 		return dialog.isCancelled();
 	}
 
-	protected void finishedConfiguring() {
+	/**
+	 * Exception thrown during configuration
+	 */
+	private ConfigException configException;
 
+	/**
+	 * @param configException
+	 *            Configuration Exception thrown during configuration, none if
+	 *            everything went smoothly
+	 */
+	protected void dialogConfigurationFinished(ConfigException configException) {
+		this.configException = configException;
 		synchronized (configLock) {
 			configLock.notifyAll();
 			// System.out.println("dialog closed");
 			configLock = null;
 		}
+	}
+
+}
+
+class ConfigDialogClosedException extends ConfigException {
+
+	@Override
+	public void defaultHandledBehavior() {
+		/*
+		 * Do nothing
+		 */
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	public ConfigDialogClosedException() {
+		super("Config dialog closed");
+
 	}
 
 }
@@ -105,7 +136,7 @@ class ConfigDialog extends JDialog {
 
 	protected UserConfig configManager;
 
-	protected Vector<PropertyInputPanel> propertyInputPanels;
+	protected Vector<ConfigParamInputPanel> propertyInputPanels;
 
 	boolean isCancelled = false;
 
@@ -144,8 +175,9 @@ class ConfigDialog extends JDialog {
 		isCancelled = true;
 
 		setVisible(false);
-		configManager.getConfigurable().cancelConfiguration();
-		configManager.finishedConfiguring();
+
+		configManager
+				.dialogConfigurationFinished(new ConfigDialogClosedException());
 		super.dispose();
 	}
 
@@ -175,13 +207,13 @@ class ConfigDialog extends JDialog {
 
 	public void createDialog() {
 
-		PropDescriptor[] properties = configManager.getConfigurable()
+		ConfigParamDescriptor[] properties = configManager.getConfigurable()
 				.getConfigSchema();
-		propertyInputPanels = new Vector<PropertyInputPanel>(properties.length);
+		propertyInputPanels = new Vector<ConfigParamInputPanel>(properties.length);
 
-		for (PropDescriptor property : properties) {
+		for (ConfigParamDescriptor property : properties) {
 
-			PropertyInputPanel inputPanel = property.createInputPanel();
+			ConfigParamInputPanel inputPanel = property.createInputPanel();
 			panel.add(inputPanel);
 
 			propertyInputPanels.add(inputPanel);
@@ -195,11 +227,11 @@ class ConfigDialog extends JDialog {
 	}
 
 	private boolean applyPropertyFields0(boolean setPropertyFields) {
-		Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
+		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
 
 		while (it.hasNext()) {
-			PropertyInputPanel inputPanel = it.next();
-			PropDescriptor property = inputPanel.getDescriptor();
+			ConfigParamInputPanel inputPanel = it.next();
+			ConfigParamDescriptor property = inputPanel.getDescriptor();
 
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
@@ -259,12 +291,19 @@ class ConfigDialog extends JDialog {
 
 				@Override
 				public void doActivity() {
-					configManager.getConfigurable().completeConfiguration(
-							new PropertySet(configManager.getProperties()));
+					ConfigException configException = null;
+					try {
+						configManager.getConfigurable().completeConfiguration(
+								new ConfigParam(configManager
+										.getProperties()));
+						configManager
+								.savePropertiesFile(UserTemplateConfig.DEFAULT_PROPERTY_FILE_NAME);
+					} catch (ConfigException e) {
+						configException = e;
+					}
 
-					configManager.finishedConfiguring();
-					configManager
-							.savePropertiesFile(UserTemplateConfig.DEFAULT_PROPERTY_FILE_NAME);
+					configManager.dialogConfigurationFinished(configException);
+
 				}
 			}).startThread();
 
@@ -284,9 +323,9 @@ class ConfigDialog extends JDialog {
 	 * down list
 	 */
 	protected void loadDefaultValues() {
-		Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
+		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
 		while (it.hasNext()) {
-			PropertyInputPanel panel = it.next();
+			ConfigParamInputPanel panel = it.next();
 
 			Object currentValue = panel.getDescriptor().getDefaultValue();
 			if (currentValue != null) {

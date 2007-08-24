@@ -17,7 +17,7 @@ public class Util {
 
 	private static final String ZEROES = "000000000000";
 
-	static final boolean DEBUG_ENABLED = true;
+	static final boolean DEBUG_MSG_ENABLED = false;
 
 	public static String arrayToString(Object array) {
 		StringBuffer sb = new StringBuffer();
@@ -46,7 +46,7 @@ public class Util {
 	}
 
 	public static void debugMsg(String msg) {
-		if (DEBUG_ENABLED) {
+		if (DEBUG_MSG_ENABLED) {
 			System.out.println("DebugMSG: " + msg);
 		}
 

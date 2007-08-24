@@ -11,7 +11,6 @@ import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.models.nodes.PNodeContainer;
-import ca.neo.ui.util.NeoFileChooser;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
@@ -19,39 +18,47 @@ import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.objects.widgets.TransientStatusMessage;
 import ca.shu.ui.lib.util.Util;
 
+/**
+ * Saves a PNodeContainer
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class SaveNodeContainerAction extends StandardAction {
 	private static final long serialVersionUID = 1L;
 
-	public static boolean canSave(Node node) {
-		if (node instanceof Network) {
-			return true;
-		} else if (node instanceof Ensemble) {
-			return true;
-		}
-		return false;
+	/**
+	 * File to be saved to
+	 */
+	private File file;
 
+	private PNodeContainer nodeUI;
+
+	/**
+	 * @param actionName
+	 *            Name of the action
+	 * @param nodeUI
+	 *            Node to be saved
+	 */
+	public SaveNodeContainerAction(String actionName, PNodeContainer nodeUI) {
+		super("Save " + nodeUI.getTypeName(), actionName);
+
+		this.nodeUI = nodeUI;
 	}
 
-	File file;
-
-	PNodeContainer nodeContainer;
-
-	public SaveNodeContainerAction(String actionName,
-			PNodeContainer nodeContainer) {
-		super("Save " + nodeContainer.getTypeName(), actionName);
-
-		this.nodeContainer = nodeContainer;
-	}
-
-	public NeoFileChooser getFileChooser() {
-		return NeoGraphics.FileChooser;
-	}
-
-	public void saveModel(Node model, File file) throws IOException {
+	/**
+	 * @param model
+	 *            Model to be saved
+	 * @param file
+	 *            File to be saved in
+	 * @throws IOException
+	 *             if model cannot be saved to file
+	 */
+	private void saveModel(Node model, File file) throws IOException {
 		FileManager fm = new FileManager();
 		if (!canSave(model)) {
 			Util.UserError("Trying to save an unsupported model "
-					+ nodeContainer.getClass().getSimpleName());
+					+ nodeUI.getClass().getSimpleName());
 			return;
 		}
 
@@ -63,35 +70,50 @@ public class SaveNodeContainerAction extends StandardAction {
 		TransientStatusMessage.show("File saved!", 2500);
 	}
 
+	/**
+	 * @param model
+	 *            Model to be saved
+	 * @return Whether the specified model can be saved
+	 */
+	public static boolean canSave(Node model) {
+		if (model instanceof Network) {
+			return true;
+		} else if (model instanceof Ensemble) {
+			return true;
+		}
+		return false;
+
+	}
+
 	@Override
 	protected void action() throws ActionException {
 		int returnVal = JFileChooser.CANCEL_OPTION;
-		Node model = nodeContainer.getModel();
+		Node model = nodeUI.getModel();
 
-		getFileChooser().setSelectedFile(new File(nodeContainer.getFileName()));
+		NeoGraphics.FileChooser.setSelectedFile(new File(nodeUI.getFileName()));
 
 		if (model instanceof Network) {
-			returnVal = getFileChooser().showSaveNetworkDialog();
+			returnVal = NeoGraphics.FileChooser.showSaveNetworkDialog();
 		} else if (model instanceof Ensemble) {
-			returnVal = getFileChooser().showSaveEnsembleDialog();
+			returnVal = NeoGraphics.FileChooser.showSaveEnsembleDialog();
 		} else {
 			throw new ActionException("Trying to save unsupported file type "
-					+ nodeContainer.getClass().getSimpleName());
+					+ nodeUI.getClass().getSimpleName());
 
 		}
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			file = getFileChooser().getSelectedFile();
+			file = NeoGraphics.FileChooser.getSelectedFile();
 
 			TrackedActivity task = new TrackedActivity("Saving model") {
 
 				@Override
 				public void doActivity() {
 					try {
-						nodeContainer.saveConfig();
-						nodeContainer.setFileName(file.toString());
+						nodeUI.saveConfig();
+						nodeUI.setFileName(file.toString());
 
-						saveModel(nodeContainer.getModel(), file);
+						saveModel(nodeUI.getModel(), file);
 
 					} catch (IOException e) {
 						Util.UserError("Could not save file: " + e.toString());

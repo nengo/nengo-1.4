@@ -2,9 +2,9 @@ package ca.neo.ui.models.nodes;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Node;
-import ca.neo.ui.configurable.managers.PropertySet;
-import ca.neo.ui.configurable.struct.PropDescriptor;
-import ca.neo.ui.exceptions.ModelConfigurationException;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.NeuronIcon;
 import ca.shu.ui.lib.util.Util;
@@ -24,7 +24,7 @@ public class PNeuron extends PNeoNode {
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
+	public ConfigParamDescriptor[] getConfigSchema() {
 		Util.UserError("not implemented yet");
 		return null;
 
@@ -44,8 +44,8 @@ public class PNeuron extends PNeoNode {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties)
-			throws ModelConfigurationException {
+	protected Object configureModel(ConfigParam configuredProperties)
+			throws ConfigException {
 		throw new NotImplementedException();
 	}
 

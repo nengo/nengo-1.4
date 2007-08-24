@@ -1,12 +1,14 @@
 package ca.shu.ui.lib.actions;
 
+import ca.shu.ui.lib.exceptions.UIException;
+
 /**
  * Error in performing an action
  * 
  * @author Shu Wu
  * 
  */
-public class ActionException extends Exception {
+public class ActionException extends UIException {
 	private static final long serialVersionUID = 1L;
 
 	private final boolean showWarning;

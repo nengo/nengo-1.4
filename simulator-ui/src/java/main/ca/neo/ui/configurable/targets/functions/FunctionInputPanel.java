@@ -7,15 +7,15 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 
 import ca.neo.math.Function;
-import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.managers.UserTemplateConfig;
-import ca.neo.ui.configurable.struct.PropDescriptor;
 import ca.shu.ui.lib.util.Util;
 
-public class FunctionInputPanel extends PropertyInputPanel {
+public class FunctionInputPanel extends ConfigParamInputPanel {
 	/**
 	 * 
 	 */
@@ -33,7 +33,7 @@ public class FunctionInputPanel extends PropertyInputPanel {
 
 	Function function = null;
 
-	public FunctionInputPanel(PropDescriptor property) {
+	public FunctionInputPanel(ConfigParamDescriptor property) {
 		super(property);
 		// TODO Auto-generated constructor stub
 		setValue(null);
@@ -46,12 +46,12 @@ public class FunctionInputPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public void init(JPanel panel) {
+	public void initPanel() {
 		comboBox = new JComboBox(functions);
 		JButton configureFunction = new JButton(new SetParametersAction());
 
-		panel.add(comboBox);
-		panel.add(configureFunction);
+		addToPanel(comboBox);
+		addToPanel(configureFunction);
 	}
 
 	@Override
@@ -99,7 +99,11 @@ public class FunctionInputPanel extends PropertyInputPanel {
 			fnDescriptor.setFunction(null);
 			UserTemplateConfig config = new UserTemplateConfig(fnDescriptor,
 					(JDialog) parent);
-			config.configureAndWait();
+			try {
+				config.configureAndWait();
+			} catch (ConfigException e) {
+				e.defaultHandledBehavior();
+			}
 
 		} else {
 			Util.UserError("Could not attach properties dialog");

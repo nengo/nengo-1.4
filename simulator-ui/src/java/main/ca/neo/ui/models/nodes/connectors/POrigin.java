@@ -7,15 +7,15 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
-import ca.neo.ui.configurable.managers.PropertySet;
-import ca.neo.ui.configurable.struct.PropDescriptor;
-import ca.neo.ui.exceptions.ModelConfigurationException;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParam;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.models.PModel;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.objects.GEdge;
+import ca.shu.ui.lib.objects.GDirectedEdge;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.objects.Tooltip;
 import ca.shu.ui.lib.objects.lines.ILineAcceptor;
@@ -88,7 +88,7 @@ public class POrigin extends PWidget {
 	}
 
 	@Override
-	public PropDescriptor[] getConfigSchema() {
+	public ConfigParamDescriptor[] getConfigSchema() {
 		Util.UserError("POrigin is not configurable yet");
 		return null;
 	}
@@ -125,8 +125,8 @@ public class POrigin extends PWidget {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties)
-			throws ModelConfigurationException {
+	protected Object configureModel(ConfigParam configuredProperties)
+			throws ConfigException {
 		throw new NotImplementedException();
 	}
 
@@ -231,13 +231,13 @@ public class POrigin extends PWidget {
 		private void setConnectionRecursive(boolean isRecursive) {
 			if (isRecursive) {
 				PNeoNode nodeParent = POrigin.this.getNodeParent();
-				getEdge().setLineShape(GEdge.LineShape.UPWARD_ARC);
+				getEdge().setLineShape(GDirectedEdge.LineShape.UPWARD_ARC);
 				getEdge().setMinArcRadius(
 						nodeParent.localToParent(nodeParent.getBounds())
 								.getWidth());
 				setPointerVisible(false);
 			} else {
-				getEdge().setLineShape(GEdge.LineShape.STRAIGHT);
+				getEdge().setLineShape(GDirectedEdge.LineShape.STRAIGHT);
 				setPointerVisible(true);
 			}
 

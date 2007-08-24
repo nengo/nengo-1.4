@@ -7,15 +7,16 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.managers.UserTemplateConfig;
 import ca.neo.ui.configurable.targets.ConfigurableMatrix;
 import ca.shu.ui.lib.util.Util;
 
-public class PTTerminationWeights extends PropDescriptor {
+public class PTTerminationWeights extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 	private final int ensembleDimensions;
@@ -27,7 +28,7 @@ public class PTTerminationWeights extends PropDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public ConfigParamInputPanel createInputPanel() {
 		return new DimensionAndWeightsInputPanel(this);
 
 	}
@@ -48,7 +49,7 @@ public class PTTerminationWeights extends PropDescriptor {
 
 }
 
-class DimensionAndWeightsInputPanel extends PropertyInputPanel {
+class DimensionAndWeightsInputPanel extends ConfigParamInputPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -80,16 +81,16 @@ class DimensionAndWeightsInputPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public void init(JPanel panel) {
+	public void initPanel() {
 		JLabel dimensions = new JLabel("Input Dim: ");
 		tf = new JTextField(10);
-		panel.add(dimensions);
-		panel.add(tf);
+		addToPanel(dimensions);
+		addToPanel(tf);
 
 		JButton configureFunction = new JButton(new EditMatrixAction());
 
-		panel.add(tf);
-		panel.add(configureFunction);
+		addToPanel(tf);
+		addToPanel(configureFunction);
 
 	}
 
@@ -156,12 +157,14 @@ class DimensionAndWeightsInputPanel extends PropertyInputPanel {
 
 			UserTemplateConfig config = new UserTemplateConfig(
 					configurableMatrix, (JDialog) parent);
-			config.configureAndWait();
-
-			if (configurableMatrix.isConfigured()) {
-				setValue(configurableMatrix.getMatrix());
-				matrixEdited = true;
+			try {
+				config.configureAndWait();
+			} catch (ConfigException e) {
+				e.defaultHandledBehavior();
 			}
+
+			setValue(configurableMatrix.getMatrix());
+			matrixEdited = true;
 
 		} else {
 			Util.UserError("Could not attach properties dialog");

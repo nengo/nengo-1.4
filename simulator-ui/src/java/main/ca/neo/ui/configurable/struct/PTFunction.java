@@ -1,10 +1,11 @@
 package ca.neo.ui.configurable.struct;
 
 import ca.neo.math.Function;
-import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.targets.functions.FunctionInputPanel;
 
-public class PTFunction extends PropDescriptor {
+public class PTFunction extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -13,7 +14,7 @@ public class PTFunction extends PropDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	public ConfigParamInputPanel createInputPanel() {
 		return new FunctionInputPanel(this);
 	}
 
