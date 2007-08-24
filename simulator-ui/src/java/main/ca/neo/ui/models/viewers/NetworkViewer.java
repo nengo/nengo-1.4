@@ -47,7 +47,6 @@ import edu.uci.ics.jung.visualization.FRLayout;
 import edu.uci.ics.jung.visualization.Layout;
 import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
-import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 
 /**
@@ -401,6 +400,52 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
+	protected void initLayoutMenu(MenuBuilder layoutMenu) {
+
+		super.initLayoutMenu(layoutMenu);
+
+		MenuBuilder applyLayoutMenu = layoutMenu.createSubMenu("Use algorithm");
+
+		MenuBuilder layoutSettings = applyLayoutMenu.createSubMenu("Settings");
+		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
+
+		applyLayoutMenu.addAction(new JungLayoutAction(FRLayout.class,
+				"Fruchterman-Reingold"));
+		applyLayoutMenu.addAction(new JungLayoutAction(KKLayout.class,
+				"Kamada-Kawai"));
+		applyLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class,
+				"Circle"));
+
+		layoutMenu.addAction(new SaveLayout("Save as new"));
+		MenuBuilder restoreLayout = layoutMenu.createSubMenu("Restore");
+		String[] layoutNames = getUIConfig().getLayoutNames();
+
+		if (layoutNames.length > 0) {
+			for (String element : layoutNames) {
+				restoreLayout.addAction(new RestoreLayout(element));
+			}
+		} else {
+			restoreLayout.addLabel("none");
+		}
+
+		MenuBuilder deleteLayout = layoutMenu.createSubMenu("Delete");
+
+		if (layoutNames.length > 0) {
+			for (String element : layoutNames) {
+				deleteLayout.addAction(new DeleteLayout(element));
+			}
+		} else {
+			deleteLayout.addLabel("none");
+		}
+
+		/**
+		 * TODO: Enable spring layout & ISOM Layout which are continuous
+		 */
+		// layoutMenu.addAction(new LayoutAction(SpringLayout.class, "Spring"));
+		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
+	}
+
+	@Override
 	protected void prepareForDestroy() {
 
 		saveLayoutAsDefault();
@@ -434,6 +479,26 @@ public class NetworkViewer extends NodeViewer {
 		@Override
 		protected void action() throws ActionException {
 			hideAllWidgets();
+		}
+
+	}
+
+	class JungLayoutAction extends LayoutAction {
+
+		private static final long serialVersionUID = 1L;
+		@SuppressWarnings("unchecked")
+		Class layoutClass;
+
+		@SuppressWarnings("unchecked")
+		public JungLayoutAction(Class layoutClass, String name) {
+			super(NetworkViewer.this, "Apply layout " + name, name);
+			this.layoutClass = layoutClass;
+		}
+
+		@Override
+		protected void applyLayout() {
+			applyJungLayout(layoutClass);
+
 		}
 
 	}
@@ -484,7 +549,7 @@ public class NetworkViewer extends NodeViewer {
 					}
 
 					if (nodeMoveActivity != null) {
-						(new ZoomActivity()).startAfter(nodeMoveActivity);
+						(new ZoomToFitActivity()).startAfter(nodeMoveActivity);
 
 					}
 				}
@@ -546,86 +611,6 @@ public class NetworkViewer extends NodeViewer {
 			showAllWidgets();
 		}
 
-	}
-
-	class ZoomActivity extends PActivity {
-
-		public ZoomActivity() {
-			super(0);
-			addActivity(this);
-		}
-
-		@Override
-		protected void activityStarted() {
-			zoomToFit();
-		}
-
-	}
-
-	class JungLayoutAction extends LayoutAction {
-
-		private static final long serialVersionUID = 1L;
-		@SuppressWarnings("unchecked")
-		Class layoutClass;
-
-		@SuppressWarnings("unchecked")
-		public JungLayoutAction(Class layoutClass, String name) {
-			super(NetworkViewer.this, "Apply layout " + name, name);
-			this.layoutClass = layoutClass;
-		}
-
-		@Override
-		protected void applyLayout() {
-			applyJungLayout(layoutClass);
-
-		}
-
-	}
-
-	@Override
-	protected void initLayoutMenu(MenuBuilder layoutMenu) {
-
-		super.initLayoutMenu(layoutMenu);
-
-		MenuBuilder applyLayoutMenu = layoutMenu.createSubMenu("Use algorithm");
-
-		MenuBuilder layoutSettings = applyLayoutMenu.createSubMenu("Settings");
-		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
-
-		applyLayoutMenu.addAction(new JungLayoutAction(FRLayout.class,
-				"Fruchterman-Reingold"));
-		applyLayoutMenu.addAction(new JungLayoutAction(KKLayout.class,
-				"Kamada-Kawai"));
-		applyLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class,
-				"Circle"));
-
-		layoutMenu.addAction(new SaveLayout("Save as new"));
-		MenuBuilder restoreLayout = layoutMenu.createSubMenu("Restore");
-		String[] layoutNames = getUIConfig().getLayoutNames();
-
-		if (layoutNames.length > 0) {
-			for (String element : layoutNames) {
-				restoreLayout.addAction(new RestoreLayout(element));
-			}
-		} else {
-			restoreLayout.addLabel("none");
-		}
-
-		MenuBuilder deleteLayout = layoutMenu.createSubMenu("Delete");
-
-		if (layoutNames.length > 0) {
-			for (String element : layoutNames) {
-				deleteLayout.addAction(new DeleteLayout(element));
-			}
-		} else {
-			deleteLayout.addLabel("none");
-		}
-
-		/**
-		 * TODO: Enable spring layout & ISOM Layout which are continuous
-		 */
-		// layoutMenu.addAction(new LayoutAction(SpringLayout.class, "Spring"));
-		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
 	}
 }
 

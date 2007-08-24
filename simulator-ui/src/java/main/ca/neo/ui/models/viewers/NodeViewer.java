@@ -24,6 +24,7 @@ import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.World;
+import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
@@ -44,6 +45,8 @@ public abstract class NodeViewer extends World implements NamedObject,
 	static final double SQUARE_LAYOUT_NODE_SPACING = 150;
 
 	private Dimension layoutBounds = DEFAULT_BOUNDS;
+
+	private final Hashtable<String, PNeoNode> neoNodesChildren = new Hashtable<String, PNeoNode>();
 
 	private final PNodeContainer parentOfViewer;
 
@@ -76,69 +79,12 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	}
 
-	private final Hashtable<String, PNeoNode> neoNodesChildren = new Hashtable<String, PNeoNode>();
-
-	public Dictionary<String, PNeoNode> getNeoNodes() {
-		return neoNodesChildren;
-	}
-
 	public void addNeoNode(PNeoNode node) {
 		addNeoNode(node, true, true, false);
 
 	}
 
-	public void removeNeoNode(PNeoNode node) {
-		neoNodesChildren.remove(node.getName());
-	}
-
-	/**
-	 * 
-	 * @param nodeProxy
-	 *            node to be added
-	 * @param updateModel
-	 *            if true, the network model is updated. this may be false, if
-	 *            it is known that the network model already contains this node
-	 * @param dropInCenterOfCamera
-	 *            whether to drop the node in the center of the camera
-	 * @param moveCameraToNode
-	 *            whether to move the camera to where the node is
-	 */
-	protected void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
-			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
-
-		/**
-		 * Moves the camera to where the node is positioned, if it's not dropped
-		 * in the center of the camera
-		 */
-		if (moveCameraToNode) {
-			getWorld().setCameraCenterPosition(nodeProxy.getOffset().getX(),
-					nodeProxy.getOffset().getY());
-		}
-
-		neoNodesChildren.put(nodeProxy.getName(), nodeProxy);
-
-		if (dropInCenterOfCamera) {
-			getGround().catchObject(nodeProxy, dropInCenterOfCamera);
-		} else {
-			getGround().addWorldObject(nodeProxy);
-		}
-	}
-
 	public abstract void applyDefaultLayout();
-
-	public static enum SortMode {
-		BY_NAME("Name"), BY_TYPE("Type");
-
-		private String name;
-
-		SortMode(String name) {
-			this.name = name;
-		}
-
-		protected String getName() {
-			return name;
-		}
-	};
 
 	@SuppressWarnings("unchecked")
 	public void applySortLayout(SortMode sortMode) {
@@ -212,7 +158,9 @@ public abstract class NodeViewer extends World implements NamedObject,
 		}
 
 		if (moveNodeActivity != null) {
-			zoomToFit().startAfter(moveNodeActivity);
+
+			(new ZoomToFitActivity()).startAfter(moveNodeActivity);
+
 		}
 
 	}
@@ -233,32 +181,6 @@ public abstract class NodeViewer extends World implements NamedObject,
 		return menu;
 	}
 
-	class SortNodesAction extends LayoutAction {
-
-		private static final long serialVersionUID = 1L;
-		SortMode sortMode;
-
-		public SortNodesAction(SortMode sortMode) {
-			super(NodeViewer.this, "Sort nodes by " + sortMode.getName(),
-					sortMode.getName());
-			this.sortMode = sortMode;
-		}
-
-		@Override
-		protected void applyLayout() {
-			applySortLayout(sortMode);
-		}
-
-	}
-
-	protected void initLayoutMenu(MenuBuilder layoutMenu) {
-		MenuBuilder sortMenu = layoutMenu.createSubMenu("Sort by");
-
-		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
-		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
-
-	}
-
 	/**
 	 * @return Neo Model of the Node Container
 	 */
@@ -270,6 +192,10 @@ public abstract class NodeViewer extends World implements NamedObject,
 	public String getName() {
 		return getViewerParent().getTypeName() + " Viewer: "
 				+ getViewerParent().getName();
+	};
+
+	public Dictionary<String, PNeoNode> getNeoNodes() {
+		return neoNodesChildren;
 	}
 
 	/**
@@ -294,6 +220,10 @@ public abstract class NodeViewer extends World implements NamedObject,
 		}
 	}
 
+	public void removeNeoNode(PNeoNode node) {
+		neoNodesChildren.remove(node.getName());
+	}
+
 	public void setLayoutBounds(Dimension layoutBounds) {
 		this.layoutBounds = layoutBounds;
 	}
@@ -303,6 +233,39 @@ public abstract class NodeViewer extends World implements NamedObject,
 		while (enumeration.hasMoreElements()) {
 			PNeoNode node = enumeration.nextElement();
 			node.showAllWidgets();
+		}
+	}
+
+	/**
+	 * 
+	 * @param nodeProxy
+	 *            node to be added
+	 * @param updateModel
+	 *            if true, the network model is updated. this may be false, if
+	 *            it is known that the network model already contains this node
+	 * @param dropInCenterOfCamera
+	 *            whether to drop the node in the center of the camera
+	 * @param moveCameraToNode
+	 *            whether to move the camera to where the node is
+	 */
+	protected void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
+			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
+
+		/**
+		 * Moves the camera to where the node is positioned, if it's not dropped
+		 * in the center of the camera
+		 */
+		if (moveCameraToNode) {
+			getWorld().setCameraCenterPosition(nodeProxy.getOffset().getX(),
+					nodeProxy.getOffset().getY());
+		}
+
+		neoNodesChildren.put(nodeProxy.getName(), nodeProxy);
+
+		if (dropInCenterOfCamera) {
+			getGround().catchObject(nodeProxy, dropInCenterOfCamera);
+		} else {
+			getGround().addWorldObject(nodeProxy);
 		}
 	}
 
@@ -318,6 +281,14 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	}
 
+	protected void initLayoutMenu(MenuBuilder layoutMenu) {
+		MenuBuilder sortMenu = layoutMenu.createSubMenu("Sort by");
+
+		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
+		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
+
+	}
+
 	protected void removeAllNeoNodes() {
 		/*
 		 * Removes all existing nodes from this viewer
@@ -329,6 +300,52 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	protected abstract void updateViewFromModel();
+
+	public static enum SortMode {
+		BY_NAME("Name"), BY_TYPE("Type");
+
+		private String name;
+
+		SortMode(String name) {
+			this.name = name;
+		}
+
+		protected String getName() {
+			return name;
+		}
+	}
+
+	class SortNodesAction extends LayoutAction {
+
+		private static final long serialVersionUID = 1L;
+		SortMode sortMode;
+
+		public SortNodesAction(SortMode sortMode) {
+			super(NodeViewer.this, "Sort nodes by " + sortMode.getName(),
+					sortMode.getName());
+			this.sortMode = sortMode;
+		}
+
+		@Override
+		protected void applyLayout() {
+			applySortLayout(sortMode);
+		}
+
+	}
+
+	class ZoomToFitActivity extends PActivity {
+
+		public ZoomToFitActivity() {
+			super(0);
+			addActivity(this);
+		}
+
+		@Override
+		protected void activityStarted() {
+			zoomToFit();
+		}
+
+	}
 
 }
 
