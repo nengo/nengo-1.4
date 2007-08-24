@@ -23,40 +23,70 @@ import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 
-public class UserConfig extends ConfigManager {
-	Object configLock = new Object();
-	ConfigDialog dialog;
-
-	JDialog parent0;
-
-	Frame parent1;
-
-	public UserConfig(IConfigurable configurable) {
-		super(configurable);
-		this.parent1 = UIEnvironment.getInstance();
-	}
-
-	public UserConfig(IConfigurable configurable, Frame parent) {
-		super(configurable);
-		this.parent1 = parent;
-	}
-
-	public UserConfig(IConfigurable configurable, JDialog parent) {
-		super(configurable);
-		this.parent0 = parent;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.configurable.managers.ConfigManager#configure()
-	 * 
-	 * 
+/**
+ * Configuration Manager which creates a dialog and let's the user enter
+ * parameters to used for configuration
+ * 
+ * @author Shu Wu
+ * 
+ */
+public class UserConfigurer extends ConfigManager {
+	/**
+	 * Exception thrown during configuration
 	 */
+	private ConfigException configException;
+
+	/**
+	 * Lock to be used to communicate cross-thread between this instance and the
+	 * Configuration Dialog
+	 */
+	private Object configLock = new Object();
+
+	/**
+	 * Dialog parent, if there is one
+	 */
+	protected JDialog dialogParent;
+
+	/**
+	 * Frame parent, if there is one
+	 */
+	protected Frame frameParent;
+
+	/**
+	 * 
+	 * @param configurable
+	 *            Object to be configured
+	 */
+	public UserConfigurer(IConfigurable configurable) {
+		super(configurable);
+		this.frameParent = UIEnvironment.getInstance();
+	}
+
+	/**
+	 * @param configurableObject
+	 *            Object to be configured
+	 * @param parent
+	 *            Frame the user configuration dialog should be attached to
+	 */
+	public UserConfigurer(IConfigurable configurable, Frame parent) {
+		super(configurable);
+		this.frameParent = parent;
+	}
+
+	/**
+	 * @param configurable
+	 *            Object to be configured
+	 * @param parent
+	 *            Dialog the configuration dialog should be attached to
+	 */
+	public UserConfigurer(IConfigurable configurable, JDialog parent) {
+		super(configurable);
+		this.dialogParent = parent;
+	}
+
 	@Override
 	public void configureAndWait() throws ConfigException {
-		dialog = createConfigDialog();
-
+		createConfigDialog();
 		/*
 		 * Block until configuration has completed
 		 */
@@ -76,22 +106,18 @@ public class UserConfig extends ConfigManager {
 
 	}
 
-	public ConfigDialog createConfigDialog() {
-		if (parent0 != null) {
-			return new ConfigDialog(this, parent0);
+	/**
+	 * Creates the configuration dialog
+	 * 
+	 * @return Created Configuration dialog
+	 */
+	protected ConfigDialog createConfigDialog() {
+		if (dialogParent != null) {
+			return new ConfigDialog(this, dialogParent);
 		} else {
-			return new ConfigDialog(this, parent1);
+			return new ConfigDialog(this, frameParent);
 		}
 	}
-
-	public boolean isCancelled() {
-		return dialog.isCancelled();
-	}
-
-	/**
-	 * Exception thrown during configuration
-	 */
-	private ConfigException configException;
 
 	/**
 	 * @param configException
@@ -102,47 +128,38 @@ public class UserConfig extends ConfigManager {
 		this.configException = configException;
 		synchronized (configLock) {
 			configLock.notifyAll();
-			// System.out.println("dialog closed");
 			configLock = null;
 		}
 	}
 
 }
 
-class ConfigDialogClosedException extends ConfigException {
-
-	@Override
-	public void defaultHandledBehavior() {
-		/*
-		 * Do nothing
-		 */
-	}
-
-	private static final long serialVersionUID = 1L;
-
-	public ConfigDialogClosedException() {
-		super("Config dialog closed");
-
-	}
-
-}
-
+/**
+ * Configuration dialog
+ * 
+ * @author Shu Wu
+ * 
+ */
 class ConfigDialog extends JDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	protected UserConfig configManager;
+	/**
+	 * Parent ConfigurationManager
+	 */
+	protected UserConfigurer parent;
 
 	protected Vector<ConfigParamInputPanel> propertyInputPanels;
 
-	boolean isCancelled = false;
+	protected JPanel panel;
 
-	JPanel panel;
-
-	public ConfigDialog(UserConfig configManager, Frame owner) {
+	/**
+	 * @param configManager
+	 *            Parent Configuration Manager
+	 * @param owner
+	 *            Component this dialog shall be added to
+	 */
+	public ConfigDialog(UserConfigurer configManager, Frame owner) {
 		super(owner, "New " + configManager.getConfigurable().getTypeName()
 				+ " Properties");
 
@@ -150,7 +167,13 @@ class ConfigDialog extends JDialog {
 
 	}
 
-	public ConfigDialog(UserConfig configManager, JDialog owner) {
+	/**
+	 * @param configManager
+	 *            Parent Configuration Manager
+	 * @param owner
+	 *            Component this dialog shall be added to
+	 */
+	public ConfigDialog(UserConfigurer configManager, JDialog owner) {
 		super(owner, "Configuring "
 				+ configManager.getConfigurable().getTypeName());
 
@@ -158,30 +181,39 @@ class ConfigDialog extends JDialog {
 
 	}
 
-	public boolean applyProperties() {
+	/**
+	 * Gets value entered in the dialog and applies them to the properties set
+	 * 
+	 * @return Whether operation was successfull
+	 */
+	protected boolean applyProperties() {
 		/*
 		 * first check if all the fields have been set correctly, then set them
 		 * 
 		 */
-		if (applyPropertyFields0(false)) {
-			applyPropertyFields0(true);
+		if (applyPropertyFieldsReal(false)) {
+			applyPropertyFieldsReal(true);
 			return true;
 		}
 		return false;
 
 	}
 
-	public void cancelAction() {
-		isCancelled = true;
+	/**
+	 * User wants to cancel the configuration
+	 */
+	private void cancelAction() {
 
 		setVisible(false);
 
-		configManager
-				.dialogConfigurationFinished(new ConfigDialogClosedException());
+		parent.dialogConfigurationFinished(new ConfigDialogClosedException());
 		super.dispose();
 	}
 
-	public void createButtons() {
+	/**
+	 * Creates ok, cancel buttons on the dialog
+	 */
+	private void createButtons() {
 		JPanel buttonsPanel = new Panel();
 		buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 		buttonsPanel.add(Box.createHorizontalGlue());
@@ -205,11 +237,15 @@ class ConfigDialog extends JDialog {
 		panel.add(buttonsPanel);
 	}
 
-	public void createDialog() {
+	/**
+	 * Creates the dialog
+	 */
+	protected void createDialog() {
 
-		ConfigParamDescriptor[] properties = configManager.getConfigurable()
+		ConfigParamDescriptor[] properties = parent.getConfigurable()
 				.getConfigSchema();
-		propertyInputPanels = new Vector<ConfigParamInputPanel>(properties.length);
+		propertyInputPanels = new Vector<ConfigParamInputPanel>(
+				properties.length);
 
 		for (ConfigParamDescriptor property : properties) {
 
@@ -222,11 +258,14 @@ class ConfigDialog extends JDialog {
 		loadDefaultValues();
 	}
 
-	public boolean isCancelled() {
-		return isCancelled;
-	}
-
-	private boolean applyPropertyFields0(boolean setPropertyFields) {
+	/**
+	 * @param setPropertyFields
+	 *            if True, the user's values will be applied to the properties
+	 *            set
+	 * 
+	 * @return Whether the user has set all the values on the dialog correctly
+	 */
+	private boolean applyPropertyFieldsReal(boolean setPropertyFields) {
 		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
 
 		while (it.hasNext()) {
@@ -236,7 +275,7 @@ class ConfigDialog extends JDialog {
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
 
-					configManager.setProperty(property.getName(), inputPanel
+					parent.setProperty(property.getName(), inputPanel
 							.getValue());
 				}
 			} else {
@@ -250,8 +289,16 @@ class ConfigDialog extends JDialog {
 		return true;
 	}
 
-	private void init(UserConfig configManager, Component c) {
-		this.configManager = configManager;
+	/**
+	 * Initialization to be called from the constructor
+	 * 
+	 * @param configManager
+	 *            Configuration manager parent
+	 * @param owner
+	 *            Component the dialog is to be added to
+	 */
+	private void init(UserConfigurer configManager, Component owner) {
+		this.parent = configManager;
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
@@ -277,32 +324,34 @@ class ConfigDialog extends JDialog {
 
 		add(panel);
 		pack();
-		setLocationRelativeTo(c);
+		setLocationRelativeTo(owner);
 		this.setVisible(true);
 	}
 
+	/**
+	 * What happens when the user presses the OK button
+	 */
 	private void okAction() {
 		if (applyProperties()) {
 			setVisible(false);
 			dispose();
 
 			(new TrackedActivity("Creating new "
-					+ configManager.getConfigurable().getTypeName()) {
+					+ parent.getConfigurable().getTypeName()) {
 
 				@Override
 				public void doActivity() {
 					ConfigException configException = null;
 					try {
-						configManager.getConfigurable().completeConfiguration(
-								new ConfigParam(configManager
-										.getProperties()));
-						configManager
-								.savePropertiesFile(UserTemplateConfig.DEFAULT_PROPERTY_FILE_NAME);
+						parent.getConfigurable().completeConfiguration(
+								new ConfigParam(parent.getProperties()));
+						parent
+								.savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
 					} catch (ConfigException e) {
 						configException = e;
 					}
 
-					configManager.dialogConfigurationFinished(configException);
+					parent.dialogConfigurationFinished(configException);
 
 				}
 			}).startThread();
@@ -312,6 +361,9 @@ class ConfigDialog extends JDialog {
 		}
 	}
 
+	/**
+	 * Initializes the dialog contents
+	 */
 	protected void initPanel() {
 		/*
 		 * Used by subclasses to add elements to the panel
@@ -322,7 +374,7 @@ class ConfigDialog extends JDialog {
 	 * Loads the properties associated with the item selected in the file drop
 	 * down list
 	 */
-	protected void loadDefaultValues() {
+	private void loadDefaultValues() {
 		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
 		while (it.hasNext()) {
 			ConfigParamInputPanel panel = it.next();
@@ -333,6 +385,30 @@ class ConfigDialog extends JDialog {
 			}
 
 		}
+	}
+
+}
+
+/**
+ * Exception to be thrown if the Dialog is intentionally closed by the User
+ * 
+ * @author Shu
+ * 
+ */
+class ConfigDialogClosedException extends ConfigException {
+
+	private static final long serialVersionUID = 1L;
+
+	public ConfigDialogClosedException() {
+		super("Config dialog closed");
+
+	}
+
+	@Override
+	public void defaultHandledBehavior() {
+		/*
+		 * Do nothing
+		 */
 	}
 
 }

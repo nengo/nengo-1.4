@@ -15,22 +15,29 @@ import javax.swing.text.SimpleAttributeSet;
 
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.shu.ui.lib.util.Util;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PObjectOutputStream;
 
+/**
+ * Configuration Manager used to configure IConfigurable objects
+ * 
+ * @author Shu Wu
+ * 
+ */
 public abstract class ConfigManager {
-	static final String FILE_SAVED_OBJECTS_DIR = NeoGraphics.USER_FILE_DIR;
+	/**
+	 * Name of directory where to store saved configuration
+	 */
+	static final String SAVED_CONFIG_DIR = NeoGraphics.USER_FILE_DIR
+			+ "/Config";
 
 	/**
 	 * Creates a saved objects folder if it isn't already there
 	 * 
 	 * @return The Saved Objects folder
 	 */
-	public static File getSavedObjectsFolder() {
-		File file = new File(FILE_SAVED_OBJECTS_DIR);
+	private static File getSavedObjectsFolder() {
+		File file = new File(SAVED_CONFIG_DIR);
 		if (!file.exists())
 			file.mkdir();
 		return file;
@@ -41,18 +48,25 @@ public abstract class ConfigManager {
 	 */
 	@SuppressWarnings("unchecked")
 	protected static String getFileNamePrefix(IConfigurable obj) {
-		// if (obj instanceof Class) {
-		// return ((Class) obj).getName() + "_";
-		// } else {
+
 		return obj.getTypeName() + "_Props_";
-		// }
 
 	}
 
+	/**
+	 * Object to be configured
+	 */
 	private final IConfigurable configurable;
 
-	MutableAttributeSet properties;
+	/**
+	 * Set of attributes that will be set during configuration
+	 */
+	private MutableAttributeSet properties;
 
+	/**
+	 * @param configurable
+	 *            Object to be configured
+	 */
 	public ConfigManager(IConfigurable configurable) {
 		super();
 		properties = new SimpleAttributeSet();
@@ -65,7 +79,7 @@ public abstract class ConfigManager {
 	 *            filename prefix
 	 * 
 	 */
-	public void deletePropertiesFile(String name) {
+	protected void deletePropertiesFile(String name) {
 		File file = new File(getSavedObjectsFolder(),
 				getFileNamePrefix(configurable) + name);
 
@@ -79,46 +93,38 @@ public abstract class ConfigManager {
 		}
 	}
 
-	public IConfigurable getConfigurable() {
+	/**
+	 * @return Object to be configured
+	 */
+	protected IConfigurable getConfigurable() {
 		return configurable;
 	}
 
-	// public void savePropertiesToFile(String fileName) {
-	// saveProperty(configurable, configurable.getPropertiesReference(),
-	// fileName);
-	//
-	// // saveStatic(properties, fileName);
-	// }
-
-	public MutableAttributeSet getProperties() {
+	/**
+	 * @return Set of properties to be set during the configuration process
+	 */
+	protected MutableAttributeSet getProperties() {
 		return properties;
 	}
 
-	// public static void deletePropretiesFile(IConfigurable configurable,
-	// String fileName) {
-	// Util.deleteProperty(configurable, fileName);
-	// }
-
-	public Object getProperty(ConfigParamDescriptor prop) {
-		return getProperty(prop.getName());
-	}
-
-	public Object getProperty(String name) {
+	/**
+	 * @param name
+	 *            Name of property
+	 * @return Value of property
+	 */
+	protected Object getProperty(String name) {
 		return getProperties().getAttribute(name);
 	}
 
 	/**
-	 * 
-	 * @param configurable
-	 *            The Object to be configured
-	 * @return the list of files for the parent
+	 * @return List of fileNames which point to saved configuration files
 	 */
-	public String[] getPropertyFiles() {
+	protected String[] getPropertyFiles() {
 		File file = getSavedObjectsFolder();
 		/*
 		 * Gets a list of property files
 		 */
-		String[] files = file.list(new CustomFileNameFilter(configurable));
+		String[] files = file.list(new ConfigFilesFilter(configurable));
 		/*
 		 * Return the file names without the prefix
 		 */
@@ -132,18 +138,16 @@ public abstract class ConfigManager {
 	}
 
 	/**
-	 * @param configurable
-	 *            The object holding the property
 	 * @param name
-	 *            Name of the property to be loaded
+	 *            Name of the properties set to be loaded
 	 * 
 	 */
-	public void loadPropertiesFromFile(String name) {
+	protected void loadPropertiesFromFile(String name) {
 
 		FileInputStream f_in;
 
 		try {
-			f_in = new FileInputStream(FILE_SAVED_OBJECTS_DIR + "/"
+			f_in = new FileInputStream(SAVED_CONFIG_DIR + "/"
 					+ getFileNamePrefix(configurable) + name);
 
 			ObjectInputStream obj_in = new ObjectInputStream(f_in);
@@ -163,12 +167,10 @@ public abstract class ConfigManager {
 		} catch (FileNotFoundException e) {
 			System.out.println(e);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Class not found exception");
 		} catch (InvalidClassException e) {
 			System.out.println("Invalid class exception");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -176,10 +178,10 @@ public abstract class ConfigManager {
 	/**
 	 * 
 	 * @param name
-	 *            name prefix given to the properties file
+	 *            name of the properties set to be saved
 	 * 
 	 */
-	public void savePropertiesFile(String name) {
+	protected void savePropertiesFile(String name) {
 
 		// Write to disk with FileOutputStream
 		FileOutputStream f_out;
@@ -188,60 +190,47 @@ public abstract class ConfigManager {
 			File file = new File(objectsFolder, getFileNamePrefix(configurable)
 					+ name);
 
-			// String fileName = FILE_SAVED_OBJECTS_DIR + "/"
-			// + getFileNamePrefix(configurable) + name;
-			// String fileName = "SavedObjects/" + name;
-
 			if (file.exists()) {
-				System.out.println("Replaced existing file: " + file.getName());
+				Util.debugMsg("Replaced existing file: " + file.getName());
 			}
 			f_out = new FileOutputStream(file);
 
-			if (properties instanceof PNode) {
-				PObjectOutputStream obj_out = new PObjectOutputStream(f_out);
-				obj_out.writeObjectTree(properties);
-				obj_out.close();
-			} else {
-				ObjectOutputStream obj_out = new ObjectOutputStream(f_out);
-				obj_out.writeObject(properties);
-				obj_out.close();
-			}
+			ObjectOutputStream obj_out = new ObjectOutputStream(f_out);
+			obj_out.writeObject(properties);
+			obj_out.close();
 
 			f_out.close();
-			// System.out.println("Saved: " + fileName);
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
-	public void setProperty(String name, Object value) {
+	protected void setProperty(String name, Object value) {
 		getProperties().addAttribute(name, value);
 	}
 
 	/**
-	 * Configures the IConfigurable object
+	 * Configures the IConfigurable object and waits until the configuration
+	 * finishes
 	 */
 	protected abstract void configureAndWait() throws ConfigException;
 
 }
 
 /**
- * A FilenameFilter that can be used statically to filter files related to a
- * object
+ * Filters files needed by ConfigManager
  * 
  * @author Shu
  * 
  */
-class CustomFileNameFilter implements FilenameFilter {
+class ConfigFilesFilter implements FilenameFilter {
 	IConfigurable parent;
 
-	public CustomFileNameFilter(IConfigurable parent) {
+	public ConfigFilesFilter(IConfigurable parent) {
 		super();
 		this.parent = parent;
 	}

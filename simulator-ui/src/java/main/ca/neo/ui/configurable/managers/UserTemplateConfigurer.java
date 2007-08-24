@@ -14,94 +14,108 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.util.Util;
 
-public class UserTemplateConfig extends UserConfig {
+/**
+ * A lot like UserConfigurer, except it allows the user to use templates to save
+ * and re-use values
+ * 
+ * @author Shu Wu
+ * 
+ */
+public class UserTemplateConfigurer extends UserConfigurer {
 
-	public static final String DEFAULT_PROPERTY_FILE_NAME = "last_used";
+	/**
+	 * Name of the default template
+	 */
+	public static final String DEFAULT_TEMPLATE_NAME = "last_used";
 
-	public UserTemplateConfig(IConfigurable configurable) {
+	public UserTemplateConfigurer(IConfigurable configurable) {
 		super(configurable);
 	}
 
-	public UserTemplateConfig(IConfigurable configurable, Frame parent) {
+	public UserTemplateConfigurer(IConfigurable configurable, Frame parent) {
 		super(configurable, parent);
 	}
 
-	public UserTemplateConfig(IConfigurable configurable, JDialog parent) {
+	public UserTemplateConfigurer(IConfigurable configurable, JDialog parent) {
 		super(configurable, parent);
 	}
 
 	@Override
-	public ConfigTemplateDialog createConfigDialog() {
-		if (parent0 != null) {
-			return new ConfigTemplateDialog(this, parent0);
+	protected ConfigTemplateDialog createConfigDialog() {
+		if (frameParent != null) {
+			return new ConfigTemplateDialog(this, frameParent);
 		} else {
-			return new ConfigTemplateDialog(this, parent1);
+			return new ConfigTemplateDialog(this, dialogParent);
 		}
 	}
 }
 
+/**
+ * A Configuration dialog which allows the user to manage templates
+ * 
+ * @author Shu
+ * 
+ */
 class ConfigTemplateDialog extends ConfigDialog {
 
 	private static final long serialVersionUID = 5650002324576913316L;
 
-	JComboBox fileList;
+	private JComboBox fileList;
 
-	public ConfigTemplateDialog(UserTemplateConfig configManager, Frame owner) {
+	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
+			Frame owner) {
 		super(configManager, owner);
 	}
 
-	public ConfigTemplateDialog(UserTemplateConfig configManager, JDialog owner) {
+	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
+			JDialog owner) {
 		super(configManager, owner);
 	}
 
 	@Override
-	public void createDialog() {
+	protected void createDialog() {
 		super.createDialog();
 		updateDialog();
 	}
 
 	@Override
-	public void initPanel() {
+	protected void initPanel() {
 		/*
-		 * construct existing properties
+		 * Add existing templates
 		 */
-		String[] files = configManager.getPropertyFiles();
+		String[] files = parent.getPropertyFiles();
 
 		fileList = new JComboBox(files);
 
 		JPanel savedFilesPanel = new Panel();
 
-		// list.setPreferredSize(new Dimension(100, list.getHeight()));
-		// list.revalidate();
-
 		JPanel dropDownPanel = new Panel();
 
 		/*
-		 * Selects the default property configuration
+		 * Selects the default template
 		 */
 		boolean defaultFound = false;
 		for (int i = 0; i < files.length; i++) {
 			if (files[i]
-					.compareTo(UserTemplateConfig.DEFAULT_PROPERTY_FILE_NAME) == 0) {
+					.compareTo(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME) == 0) {
 				defaultFound = true;
 				fileList.setSelectedIndex(i);
 
-				configManager
-						.loadPropertiesFromFile(UserTemplateConfig.DEFAULT_PROPERTY_FILE_NAME);
+				parent
+						.loadPropertiesFromFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
 			}
 		}
 		if (!defaultFound && fileList.getSelectedItem() != null) {
-			configManager.loadPropertiesFromFile(fileList.getSelectedItem()
-					.toString());
+			parent
+					.loadPropertiesFromFile(fileList.getSelectedItem()
+							.toString());
 		}
 
 		fileList.addActionListener(new ActionListener() {
@@ -131,7 +145,7 @@ class ConfigTemplateDialog extends ConfigDialog {
 					String name = JOptionPane.showInputDialog("Name:");
 
 					if (name != null && name.compareTo("") != 0) {
-						configManager.savePropertiesFile(name);
+						parent.savePropertiesFile(name);
 						fileList.addItem(name);
 						fileList.setSelectedIndex(fileList.getItemCount() - 1);
 					}
@@ -150,7 +164,7 @@ class ConfigTemplateDialog extends ConfigDialog {
 
 				fileList.removeItem(selectedFile);
 
-				configManager.deletePropertiesFile(selectedFile);
+				parent.deletePropertiesFile(selectedFile);
 
 				updateDialog();
 			}
@@ -182,14 +196,12 @@ class ConfigTemplateDialog extends ConfigDialog {
 	protected void updateDialog() {
 
 		if (fileList.getSelectedItem() != null) {
-			configManager.loadPropertiesFromFile((String) fileList
-					.getSelectedItem());
+			parent.loadPropertiesFromFile((String) fileList.getSelectedItem());
 			Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
 			while (it.hasNext()) {
 				ConfigParamInputPanel panel = it.next();
 
-				Object currentValue = configManager
-						.getProperty(panel.getName());
+				Object currentValue = parent.getProperty(panel.getName());
 				if (currentValue != null) {
 					panel.setValue(currentValue);
 				}
@@ -200,6 +212,12 @@ class ConfigTemplateDialog extends ConfigDialog {
 
 }
 
+/**
+ * A JPanel which has some commonly used settings
+ * 
+ * @author Shu
+ * 
+ */
 class Panel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -210,24 +228,6 @@ class Panel extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setAlignmentY(TOP_ALIGNMENT);
 		setAlignmentX(LEFT_ALIGNMENT);
-	}
-
-}
-
-class PropertyField extends JTextField {
-	private static final long serialVersionUID = 5108856120484394597L;
-
-	ConfigParamDescriptor property;
-
-	public PropertyField(ConfigParamDescriptor property) {
-		super(10);
-		this.property = property;
-
-		property.getClass();
-	}
-
-	public ConfigParamDescriptor getProperty() {
-		return property;
 	}
 
 }

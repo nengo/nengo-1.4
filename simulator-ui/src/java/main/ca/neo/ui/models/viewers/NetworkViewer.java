@@ -23,7 +23,7 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.configurable.struct.PTInt;
 import ca.neo.ui.models.PModelClasses;
 import ca.neo.ui.models.PNeoNode;
@@ -663,7 +663,7 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	@Override
 	protected void action() throws ActionException {
-		UserTemplateConfig config = new UserTemplateConfig(this);
+		UserTemplateConfigurer config = new UserTemplateConfigurer(this);
 		try {
 			config.configureAndWait();
 		} catch (ConfigException e) {

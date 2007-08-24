@@ -7,7 +7,7 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.configurable.struct.PTFloat;
 import ca.neo.ui.configurable.struct.PTInt;
 import ca.shu.ui.lib.actions.ActionException;
@@ -70,7 +70,7 @@ public class PlotFunctionAction extends StandardAction implements IConfigurable 
 		pFunctionIndex = new PTInt("Function index", 0, functionInput
 				.getFunctions().length - 1);
 
-		UserTemplateConfig config = new UserTemplateConfig(this);
+		UserTemplateConfigurer config = new UserTemplateConfigurer(this);
 		try {
 			config.configureAndWait();
 		} catch (ConfigException e) {

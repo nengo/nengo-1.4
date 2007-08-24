@@ -6,7 +6,7 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.configurable.struct.PTFloat;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -43,7 +43,7 @@ public class RunSimulatorAction extends StandardAction {
 		/*
 		 * Configures the simulatorConfig
 		 */
-		UserTemplateConfig config = new UserTemplateConfig(simulatorConfig);
+		UserTemplateConfigurer config = new UserTemplateConfigurer(simulatorConfig);
 		try {
 			config.configureAndWait();
 			(new RunSimulatorActivity(simulatorConfig)).startThread();

@@ -3,7 +3,7 @@ package ca.neo.ui.actions;
 import javax.swing.SwingUtilities;
 
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.PNeoNode;
 import ca.shu.ui.lib.actions.ActionException;
@@ -91,7 +91,7 @@ public class CreateModelAction extends ReversableAction {
 
 				try {
 					PNeoNode nodeProxy = (PNeoNode) nodeType.newInstance();
-					UserTemplateConfig config = new UserTemplateConfig(
+					UserTemplateConfigurer config = new UserTemplateConfigurer(
 							nodeProxy);
 					try {
 						config.configureAndWait();

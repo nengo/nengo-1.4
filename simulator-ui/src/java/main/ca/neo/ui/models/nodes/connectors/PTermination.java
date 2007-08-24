@@ -6,7 +6,7 @@ import ca.neo.model.Termination;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.managers.UserConfig;
+import ca.neo.ui.configurable.managers.UserConfigurer;
 import ca.neo.ui.configurable.targets.ConfigurableMatrix;
 import ca.neo.ui.models.PNeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
@@ -160,7 +160,7 @@ public class PTermination extends PWidget implements ILineAcceptor {
 			oldWeights = getWeights();
 
 			ConfigurableMatrix matrixEditor = new ConfigurableMatrix(oldWeights);
-			UserConfig config = new UserConfig(matrixEditor);
+			UserConfigurer config = new UserConfigurer(matrixEditor);
 			try {
 				config.configureAndWait();
 				setWeights(matrixEditor.getMatrix());

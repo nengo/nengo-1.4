@@ -11,7 +11,7 @@ import ca.neo.plot.Plotter;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.configurable.struct.PTInt;
 import ca.neo.ui.configurable.struct.PTString;
 import ca.neo.ui.models.nodes.connectors.PDecodedTermination;
@@ -78,7 +78,7 @@ public class PNEFEnsemble extends PEnsemble {
 		PDecodedTermination termUI = new PDecodedTermination(this);
 
 		try {
-			UserTemplateConfig config = new UserTemplateConfig(termUI);
+			UserTemplateConfigurer config = new UserTemplateConfigurer(termUI);
 			config.configureAndWait();
 
 			addWidget(termUI);

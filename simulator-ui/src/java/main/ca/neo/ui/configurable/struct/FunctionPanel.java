@@ -14,7 +14,7 @@ import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
-import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.util.Util;
 
 public class FunctionPanel extends ConfigParamInputPanel {
@@ -124,7 +124,7 @@ public class FunctionPanel extends ConfigParamInputPanel {
 			 * Configure the function
 			 */
 			selectedFunctionType.setFunction(null);
-			UserTemplateConfig config = new UserTemplateConfig(
+			UserTemplateConfigurer config = new UserTemplateConfigurer(
 					selectedFunctionType, (JDialog) parent);
 			try {
 				config.configureAndWait();

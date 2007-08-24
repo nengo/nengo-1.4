@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
-import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.configurable.targets.ConfigurableFunctionArray;
 import ca.shu.ui.lib.util.Util;
 
@@ -127,7 +127,7 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 			ConfigurableFunctionArray configurableFunctions = new ConfigurableFunctionArray(
 					getDimensions());
 
-			UserTemplateConfig config = new UserTemplateConfig(
+			UserTemplateConfigurer config = new UserTemplateConfigurer(
 					configurableFunctions, (JDialog) parent);
 			try {
 				config.configureAndWait();

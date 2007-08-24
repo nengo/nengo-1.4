@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
-import ca.neo.ui.configurable.managers.UserTemplateConfig;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.configurable.targets.ConfigurableMatrix;
 import ca.shu.ui.lib.util.Util;
 
@@ -129,7 +129,7 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 			ConfigurableMatrix configurableMatrix = new ConfigurableMatrix(
 					getFromSize(), getToSize());
 
-			UserTemplateConfig config = new UserTemplateConfig(
+			UserTemplateConfigurer config = new UserTemplateConfigurer(
 					configurableMatrix, (JDialog) parent);
 			try {
 				config.configureAndWait();
