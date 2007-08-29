@@ -4,17 +4,26 @@ import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
 import ca.neo.model.Probeable;
 import ca.neo.model.neuron.Neuron;
-import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.nodes.PEnsemble;
-import ca.neo.ui.models.nodes.PNeuron;
+import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.nodes.UIEnsemble;
+import ca.neo.ui.models.nodes.UINeuron;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.util.Util;
 
+/**
+ * Viewer for peeking into Ensembles
+ * 
+ * @author Shu
+ */
 public class EnsembleViewer extends NodeViewer {
 
 	private static final long serialVersionUID = 1L;
 
-	public EnsembleViewer(PEnsemble ensembleUI) {
+	/**
+	 * @param ensembleUI
+	 *            Parent Ensemble UI Wrapper
+	 */
+	public EnsembleViewer(UIEnsemble ensembleUI) {
 		super(ensembleUI);
 	}
 
@@ -31,8 +40,8 @@ public class EnsembleViewer extends NodeViewer {
 	}
 
 	@Override
-	public PEnsemble getViewerParent() {
-		return (PEnsemble) super.getViewerParent();
+	public UIEnsemble getViewerParent() {
+		return (UIEnsemble) super.getViewerParent();
 	}
 
 	@Override
@@ -48,7 +57,7 @@ public class EnsembleViewer extends NodeViewer {
 			if (node instanceof Neuron) {
 				Neuron neuron = (Neuron) node;
 
-				PNeuron neuronUI = new PNeuron(neuron);
+				UINeuron neuronUI = new UINeuron(neuron);
 
 				addNeoNode(neuronUI, false, false, false);
 			} else {
@@ -77,7 +86,7 @@ public class EnsembleViewer extends NodeViewer {
 							&& probe.getEnsembleName() == getModel().getName()) {
 						Node node = (Node) target;
 
-						PNeoNode nodeUI = getNode(node.getName());
+						UINeoNode nodeUI = getNode(node.getName());
 						nodeUI.showProbe(probe);
 					}
 				}

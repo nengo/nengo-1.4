@@ -12,10 +12,10 @@ import ca.neo.model.Network;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.models.INodeContainer;
-import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.nodes.PEnsemble;
-import ca.neo.ui.models.nodes.PNEFEnsemble;
-import ca.neo.ui.models.nodes.PNetwork;
+import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.nodes.UIEnsemble;
+import ca.neo.ui.models.nodes.UINEFEnsemble;
+import ca.neo.ui.models.nodes.UINetwork;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
@@ -43,13 +43,6 @@ public class OpenNeoFileAction extends StandardAction {
 	public OpenNeoFileAction(String actionName, INodeContainer nodeContainer) {
 		super("Open model from file", actionName);
 		init(nodeContainer);
-	}
-
-	/**
-	 * Initializes field variables
-	 */
-	protected void init(INodeContainer nodeContainer) {
-		this.nodeContainer = nodeContainer;
 	}
 
 	@Override
@@ -98,19 +91,26 @@ public class OpenNeoFileAction extends StandardAction {
 	}
 
 	/**
+	 * Initializes field variables
+	 */
+	protected void init(INodeContainer nodeContainer) {
+		this.nodeContainer = nodeContainer;
+	}
+
+	/**
 	 * Tries to open the loaded object as an Ensemble and wrap it with a UI
 	 * object
 	 * 
 	 * @param objLoaded
 	 * @return An Ensemble UI Wrapper around the loaded object
 	 */
-	protected PNeoNode openAsEnsemble(Object objLoaded) {
+	protected UINeoNode openAsEnsemble(Object objLoaded) {
 
-		PEnsemble ensembleUI = null;
+		UIEnsemble ensembleUI = null;
 		if (objLoaded instanceof Ensemble) {
-			ensembleUI = new PEnsemble((Ensemble) objLoaded);
+			ensembleUI = new UIEnsemble((Ensemble) objLoaded);
 		} else if (objLoaded instanceof NEFEnsemble) {
-			ensembleUI = new PNEFEnsemble((NEFEnsemble) objLoaded);
+			ensembleUI = new UINEFEnsemble((NEFEnsemble) objLoaded);
 		}
 		if (ensembleUI != null)
 			return ensembleUI;
@@ -125,9 +125,9 @@ public class OpenNeoFileAction extends StandardAction {
 	 * @param objLoaded
 	 * @return An Network UI Wrapper around the loaded object
 	 */
-	protected PNeoNode openAsNetwork(Object objLoaded) {
+	protected UINeoNode openAsNetwork(Object objLoaded) {
 		if (objLoaded instanceof Network) {
-			PNetwork networkUI = new PNetwork((Network) objLoaded);
+			UINetwork networkUI = new UINetwork((Network) objLoaded);
 
 			return networkUI;
 
@@ -141,7 +141,7 @@ public class OpenNeoFileAction extends StandardAction {
 	 * @param objLoaded Loaded object
 	 */
 	protected void processLoadedObject(Object objLoaded) {
-		PNeoNode node;
+		UINeoNode node;
 		node = openAsNetwork(objLoaded);
 		if (node == null)
 			node = openAsEnsemble(objLoaded);

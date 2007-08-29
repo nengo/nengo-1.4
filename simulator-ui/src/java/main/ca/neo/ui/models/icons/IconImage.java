@@ -16,15 +16,15 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * Just like PImage, except it semantically zooms (ie. at low scales, it does
  * not paint its bitmap)
  * 
- * @author Shu
+ * @author Shu Wu
  * 
  */
 public class IconImage extends PImage {
 
-	public static final boolean ENABLE_SEMANTIC_ZOOM = false;
 	private static final long serialVersionUID = 1L;
-
 	private static final Ellipse2D.Float TEMP_ELLIPSE = new Ellipse2D.Float();
+
+	public static final boolean ENABLE_SEMANTIC_ZOOM = false;
 
 	private transient GeneralPath path;
 

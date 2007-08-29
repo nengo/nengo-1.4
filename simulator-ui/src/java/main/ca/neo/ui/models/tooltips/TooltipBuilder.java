@@ -3,28 +3,48 @@ package ca.neo.ui.models.tooltips;
 import java.util.Collection;
 import java.util.Vector;
 
+/**
+ * Builds tooltips from parts
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class TooltipBuilder {
-	String name;
+	private String name;
 
-	Vector<TooltipPart> tooltipParts;
+	private Vector<ITooltipPart> tooltipParts;
 
+	/**
+	 * @param name
+	 *            Name of this tooltip
+	 */
 	public TooltipBuilder(String name) {
 		super();
 		this.name = name;
-		tooltipParts = new Vector<TooltipPart>(10);
+		tooltipParts = new Vector<ITooltipPart>(10);
 	}
 
-	public void addPart(TooltipPart part) {
-		tooltipParts.add(part);
-
-	}
-
+	/**
+	 * @return Name of this tooltip
+	 */
 	protected String getName() {
 		return name;
 	}
 
-	protected Collection<TooltipPart> getParts() {
+	/**
+	 * @return Collection of tooltip parts
+	 */
+	protected Collection<ITooltipPart> getParts() {
 		return tooltipParts;
+	}
+
+	/**
+	 * @param part
+	 *            Tooltip part to add
+	 */
+	public void addPart(ITooltipPart part) {
+		tooltipParts.add(part);
+
 	}
 
 }

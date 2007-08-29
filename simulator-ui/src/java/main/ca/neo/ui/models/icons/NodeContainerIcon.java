@@ -1,23 +1,30 @@
 package ca.neo.ui.models.icons;
 
-import ca.neo.ui.models.nodes.PNodeContainer;
+import ca.neo.ui.models.nodes.UINodeContainer;
 import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.GText;
 import edu.umd.cs.piccolo.PNode;
 
+/**
+ * Icon for a Node Container. The size of this icon scales depending on the
+ * number of nodes contained by the model.
+ * 
+ * @author Shu
+ * 
+ */
 public abstract class NodeContainerIcon extends ModelIcon {
 
 	private static final long serialVersionUID = 1L;
 
-	static final float MAX_SCALE = 1.5f;
+	public static final float MAX_SCALE = 1.5f;
 
-	static final float MIN_SCALE = 0.5f;
+	public static final float MIN_SCALE = 0.5f;
 
 	private int myNumOfNodes = -1;
 
 	private final GText sizeLabel;
 
-	public NodeContainerIcon(PNodeContainer parent, PNode icon) {
+	public NodeContainerIcon(UINodeContainer parent, PNode icon) {
 		super(parent, icon);
 		sizeLabel = new GText("");
 		sizeLabel.setFont(Style.FONT_SMALL);
@@ -26,14 +33,6 @@ public abstract class NodeContainerIcon extends ModelIcon {
 		layoutChildren();
 		modelUpdated();
 	}
-
-	@Override
-	public PNodeContainer getModelParent() {
-
-		return (PNodeContainer) super.getModelParent();
-	}
-
-	public abstract int getNodeCountNormalization();
 
 	/**
 	 * Scales the icon display size depending on how many nodes are contained
@@ -66,6 +65,8 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 	}
 
+	protected abstract int getNodeCountNormalization();
+
 	@Override
 	protected void layoutChildren() {
 		super.layoutChildren();
@@ -79,6 +80,12 @@ public abstract class NodeContainerIcon extends ModelIcon {
 	protected void modelUpdated() {
 		super.modelUpdated();
 		updateIconScale();
+	}
+
+	@Override
+	public UINodeContainer getModelParent() {
+
+		return (UINodeContainer) super.getModelParent();
 	}
 
 }

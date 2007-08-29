@@ -10,7 +10,7 @@ import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.ui.NeoGraphics;
-import ca.neo.ui.models.nodes.PNodeContainer;
+import ca.neo.ui.models.nodes.UINodeContainer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
@@ -28,11 +28,26 @@ public class SaveNodeContainerAction extends StandardAction {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @param model
+	 *            Model to be saved
+	 * @return Whether the specified model can be saved
+	 */
+	public static boolean canSave(Node model) {
+		if (model instanceof Network) {
+			return true;
+		} else if (model instanceof Ensemble) {
+			return true;
+		}
+		return false;
+
+	}
+
+	/**
 	 * File to be saved to
 	 */
 	private File file;
 
-	private PNodeContainer nodeUI;
+	private UINodeContainer nodeUI;
 
 	/**
 	 * @param actionName
@@ -40,7 +55,7 @@ public class SaveNodeContainerAction extends StandardAction {
 	 * @param nodeUI
 	 *            Node to be saved
 	 */
-	public SaveNodeContainerAction(String actionName, PNodeContainer nodeUI) {
+	public SaveNodeContainerAction(String actionName, UINodeContainer nodeUI) {
 		super("Save " + nodeUI.getTypeName(), actionName);
 
 		this.nodeUI = nodeUI;
@@ -70,21 +85,6 @@ public class SaveNodeContainerAction extends StandardAction {
 		TransientStatusMessage.show("File saved!", 2500);
 	}
 
-	/**
-	 * @param model
-	 *            Model to be saved
-	 * @return Whether the specified model can be saved
-	 */
-	public static boolean canSave(Node model) {
-		if (model instanceof Network) {
-			return true;
-		} else if (model instanceof Ensemble) {
-			return true;
-		}
-		return false;
-
-	}
-
 	@Override
 	protected void action() throws ActionException {
 		int returnVal = JFileChooser.CANCEL_OPTION;
@@ -110,7 +110,7 @@ public class SaveNodeContainerAction extends StandardAction {
 				@Override
 				public void doActivity() {
 					try {
-						nodeUI.saveConfig();
+						nodeUI.saveContainerConfig();
 						nodeUI.setFileName(file.toString());
 
 						saveModel(nodeUI.getModel(), file);

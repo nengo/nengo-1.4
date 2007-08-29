@@ -9,11 +9,11 @@ import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.INodeContainer;
-import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.nodes.PEnsemble;
-import ca.neo.ui.models.nodes.PNEFEnsemble;
-import ca.neo.ui.models.nodes.PNetwork;
-import ca.neo.ui.models.nodes.PNodeContainer;
+import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.nodes.UIEnsemble;
+import ca.neo.ui.models.nodes.UINEFEnsemble;
+import ca.neo.ui.models.nodes.UINetwork;
+import ca.neo.ui.models.nodes.UINodeContainer;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.util.MenuBuilder;
@@ -30,6 +30,8 @@ import ca.shu.ui.lib.world.AppFrame;
  * 
  */
 public class NeoGraphics extends AppFrame implements INodeContainer {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
 	 */
@@ -58,8 +60,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 */
 	public static final String USER_FILE_DIR = "UIFiles";
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Runs NeoGraphics with a default name
 	 * 
@@ -86,53 +86,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.PNeoNode)
-	 */
-	public void addNeoNode(PNeoNode node) {
-		getWorld().getGround().catchObject(node);
-		if (node instanceof PNodeContainer) {
-			((PNodeContainer) (node)).openViewer();
-		}
-
-	}
-
-	@Override
-	public String getAboutString() {
-		return ABOUT;
-	}
-
-	@Override
-	public String getAppName() {
-		return "NeoGraphics";
-	}
-
-	@Override
-	public String getUserFileDirectory() {
-		return USER_FILE_DIR;
-	}
-
-	@Override
-	public void initApplicationMenu(JMenuBar menuBar) {
-		MenuBuilder menu = new MenuBuilder("File");
-		menuBar.add(menu.getJMenu());
-
-		MenuBuilder newMenu = menu.createSubMenu("New");
-		newMenu
-				.addAction(new CreateModelAction("Network", this,
-						PNetwork.class));
-		newMenu.addAction(new CreateModelAction("NEFEnsemble", this,
-				PNEFEnsemble.class));
-
-		newMenu.addAction(new CreateModelAction("Ensemble", this,
-				PEnsemble.class));
-
-		menu.addAction(new OpenNeoFileAction("Open from file", this));
-
-	}
-
 	/**
 	 * Prompt user to save models in NeoGraphics This is most likely called
 	 * right before the application is exiting
@@ -145,8 +98,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		while (it.hasNext()) {
 			Object obj = it.next();
 
-			if (obj instanceof PNodeContainer) {
-				PNodeContainer node = (PNodeContainer) obj;
+			if (obj instanceof UINodeContainer) {
+				UINodeContainer node = (UINodeContainer) obj;
 				if (SaveNodeContainerAction.canSave(node.getModel())) {
 
 					SaveNodeContainerAction saveAction = new SaveNodeContainerAction(
@@ -177,6 +130,53 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		}
 
 		super.windowClosing();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.PNeoNode)
+	 */
+	public void addNeoNode(UINeoNode node) {
+		getWorld().getGround().catchObject(node);
+		if (node instanceof UINodeContainer) {
+			((UINodeContainer) (node)).openViewer();
+		}
+
+	}
+
+	@Override
+	public String getAboutString() {
+		return ABOUT;
+	}
+
+	@Override
+	public String getAppName() {
+		return "NeoGraphics";
+	}
+
+	@Override
+	public String getUserFileDirectory() {
+		return USER_FILE_DIR;
+	}
+
+	@Override
+	public void initApplicationMenu(JMenuBar menuBar) {
+		MenuBuilder menu = new MenuBuilder("File");
+		menuBar.add(menu.getJMenu());
+
+		MenuBuilder newMenu = menu.createSubMenu("New");
+		newMenu
+				.addAction(new CreateModelAction("Network", this,
+						UINetwork.class));
+		newMenu.addAction(new CreateModelAction("NEFEnsemble", this,
+				UINEFEnsemble.class));
+
+		newMenu.addAction(new CreateModelAction("Ensemble", this,
+				UIEnsemble.class));
+
+		menu.addAction(new OpenNeoFileAction("Open from file", this));
+
 	}
 
 }

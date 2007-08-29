@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.UINeoNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
 public class NodeLayout implements Serializable {
@@ -36,10 +36,10 @@ public class NodeLayout implements Serializable {
 		this.layoutName = layoutName;
 		nodePositions = new Hashtable<String, Point2D>();
 
-		Enumeration<PNeoNode> en = nodeViewer.getNeoNodes().elements();
+		Enumeration<UINeoNode> en = nodeViewer.getNeoNodes().elements();
 
 		while (en.hasMoreElements()) {
-			PNeoNode node = en.nextElement();
+			UINeoNode node = en.nextElement();
 			addPosition(node.getName(), node.getOffset());
 		}
 		savedViewBounds = nodeViewer.getSky().getViewBounds();

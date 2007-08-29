@@ -3,7 +3,7 @@ package ca.neo.ui;
 import javax.swing.SwingUtilities;
 
 import ca.neo.model.Network;
-import ca.neo.ui.models.nodes.PNetwork;
+import ca.neo.ui.models.nodes.UINetwork;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 
 /**
@@ -51,7 +51,7 @@ public class ExampleRunner {
 		task.finished();
 
 		task = new TrackedStatusMsg("Creating Model UI");
-		PNetwork networkUI = new PNetwork(network);
+		UINetwork networkUI = new UINetwork(network);
 
 		neoGraphics.addWorldObject(networkUI);
 

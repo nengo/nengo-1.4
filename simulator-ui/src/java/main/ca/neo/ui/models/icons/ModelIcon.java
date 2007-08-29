@@ -3,14 +3,15 @@ package ca.neo.ui.models.icons;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import ca.neo.ui.models.PModel;
+import ca.neo.ui.models.UIModel;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 
 /**
- * An UI Object with an Icon and a Label
+ * An Icon which has a representation and an label. It is used to represent NEO
+ * models.
  * 
  * TODO: Adaptively render the label, show more details when zoomed in
  * 
@@ -22,13 +23,25 @@ public class ModelIcon extends WorldObject implements NamedObject,
 
 	private static final long serialVersionUID = 1L;
 
-	PNode iconReal;
+	/**
+	 * The inner icon node which contains the actual icon representation
+	 */
+	private PNode iconReal;
 
-	GText label;
+	/**
+	 * Label of the icon
+	 */
+	private GText label;
 
-	PModel parent;
+	/**
+	 * Parent of this icon
+	 */
+	private UIModel parent;
 
-	boolean showTypeInLabel = true;
+	/**
+	 * Whether to show the type of model in the label
+	 */
+	private boolean showTypeInLabel = true;
 
 	/**
 	 * @param parent
@@ -38,7 +51,7 @@ public class ModelIcon extends WorldObject implements NamedObject,
 	 * @param scale
 	 *            Scale of the Icon
 	 */
-	public ModelIcon(PModel parent, PNode icon) {
+	public ModelIcon(UIModel parent, PNode icon) {
 		super();
 		this.parent = parent;
 		this.iconReal = icon;
@@ -54,7 +67,7 @@ public class ModelIcon extends WorldObject implements NamedObject,
 		}
 
 		// parent.addPropertyChangeListener(PROPERTY_NAME, this);
-		parent.addPropertyChangeListener(PModel.PROPERTY_MODEL, this);
+		parent.addPropertyChangeListener(UIModel.PROPERTY_MODEL, this);
 		setDraggable(false);
 
 		/*
@@ -64,6 +77,49 @@ public class ModelIcon extends WorldObject implements NamedObject,
 		updateBounds();
 	}
 
+	/**
+	 * Updates the bounds of this node based on the inner icon
+	 */
+	private void updateBounds() {
+		setBounds(iconReal.localToParent(iconReal.getBounds()));
+	}
+
+	protected PNode getIconReal() {
+		return iconReal;
+	}
+
+	protected UIModel getModelParent() {
+		return parent;
+	}
+
+	@Override
+	protected void layoutChildren() {
+		super.layoutChildren();
+
+		/*
+		 * Layout the icon and label
+		 */
+		double iconWidth = getWidth() * getScale();
+		double labelWidth = label.getWidth();
+		double offsetX = ((labelWidth - iconWidth) / 2.0) * -1;
+
+		label.setOffset(offsetX, getHeight() * getScale());
+
+	}
+
+	/**
+	 * Called when the NEO model has been updated
+	 */
+	protected void modelUpdated() {
+		updateLabel();
+	}
+
+	/**
+	 * Configures the label
+	 * 
+	 * @param showType
+	 *            Whether to show the model type in the label
+	 */
 	public void configureLabel(boolean showType) {
 		showTypeInLabel = showType;
 		updateLabel();
@@ -74,13 +130,16 @@ public class ModelIcon extends WorldObject implements NamedObject,
 		parent.doubleClicked();
 	}
 
-	public PNode getIconReal() {
-		return iconReal;
-	}
-
-	public PModel getModelParent() {
-		return parent;
-	}
+	// @Override
+	// public void signalBoundsChanged() {
+	//
+	// super.signalBoundsChanged();
+	//
+	// /*
+	// * Pass on the message to icon
+	// */
+	// iconReal.signalBoundsChanged();
+	// }
 
 	/**
 	 * @return the name of the label
@@ -98,12 +157,16 @@ public class ModelIcon extends WorldObject implements NamedObject,
 
 		if (propertyName == PROPERTY_FULL_BOUNDS) {
 			updateBounds();
-		} else if (propertyName == PModel.PROPERTY_MODEL) {
+		} else if (propertyName == UIModel.PROPERTY_MODEL) {
 			modelUpdated();
 		}
 
 	}
 
+	/**
+	 * @param isVisible
+	 *            Whether the label is visible
+	 */
 	public void setLabelVisible(boolean isVisible) {
 		if (isVisible) {
 			addChild(label);
@@ -112,18 +175,6 @@ public class ModelIcon extends WorldObject implements NamedObject,
 				label.removeFromParent();
 
 		}
-		// label.setVisible(isVisible);
-	}
-
-	@Override
-	public void signalBoundsChanged() {
-
-		super.signalBoundsChanged();
-
-		/*
-		 * Pass on the message to icon
-		 */
-		iconReal.signalBoundsChanged();
 	}
 
 	/**
@@ -144,44 +195,4 @@ public class ModelIcon extends WorldObject implements NamedObject,
 		}
 	}
 
-	private void updateBounds() {
-		setBounds(iconReal.localToParent(iconReal.getBounds()));
-	}
-
-	@Override
-	protected void layoutChildren() {
-		super.layoutChildren();
-
-		/*
-		 * Layout the icon and label
-		 */
-		double iconWidth = getWidth() * getScale();
-		double labelWidth = label.getWidth();
-		double offsetX = ((labelWidth - iconWidth) / 2.0) * -1;
-
-		label.setOffset(offsetX, getHeight() * getScale());
-
-	}
-
-	protected void modelUpdated() {
-		updateLabel();
-	}
-
 }
-
-// class IconTooltip extends WorldObject {
-//
-// /**
-// *
-// */
-// private static final long serialVersionUID = 1L;
-//
-// public IconTooltip(ModelIcon icon) {
-// super();
-// PText tag = new PText(icon.getName() + " Icon");
-// tag.setTextPaint(Style.COLOR_FOREGROUND);
-// tag.setFont(Style.FONT_LARGE);
-// addToLayout(tag);
-// }
-//
-// }

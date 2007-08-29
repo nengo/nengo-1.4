@@ -84,28 +84,6 @@ public class UserConfigurer extends ConfigManager {
 		this.dialogParent = parent;
 	}
 
-	@Override
-	public void configureAndWait() throws ConfigException {
-		createConfigDialog();
-		/*
-		 * Block until configuration has completed
-		 */
-		if (configLock != null) {
-			synchronized (configLock) {
-				try {
-					if (configLock != null)
-						configLock.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		if (configException != null)
-			throw configException;
-
-	}
-
 	/**
 	 * Creates the configuration dialog
 	 * 
@@ -132,6 +110,28 @@ public class UserConfigurer extends ConfigManager {
 		}
 	}
 
+	@Override
+	public void configureAndWait() throws ConfigException {
+		createConfigDialog();
+		/*
+		 * Block until configuration has completed
+		 */
+		if (configLock != null) {
+			synchronized (configLock) {
+				try {
+					if (configLock != null)
+						configLock.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		if (configException != null)
+			throw configException;
+
+	}
+
 }
 
 /**
@@ -144,14 +144,14 @@ class ConfigDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
+	protected JPanel panel;
+
 	/**
 	 * Parent ConfigurationManager
 	 */
 	protected UserConfigurer parent;
 
 	protected Vector<ConfigParamInputPanel> propertyInputPanels;
-
-	protected JPanel panel;
 
 	/**
 	 * @param configManager
@@ -182,21 +182,34 @@ class ConfigDialog extends JDialog {
 	}
 
 	/**
-	 * Gets value entered in the dialog and applies them to the properties set
+	 * @param setPropertyFields
+	 *            if True, the user's values will be applied to the properties
+	 *            set
 	 * 
-	 * @return Whether operation was successfull
+	 * @return Whether the user has set all the values on the dialog correctly
 	 */
-	protected boolean applyProperties() {
-		/*
-		 * first check if all the fields have been set correctly, then set them
-		 * 
-		 */
-		if (applyPropertyFieldsReal(false)) {
-			applyPropertyFieldsReal(true);
-			return true;
-		}
-		return false;
+	private boolean applyPropertyFieldsReal(boolean setPropertyFields) {
+		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
 
+		while (it.hasNext()) {
+			ConfigParamInputPanel inputPanel = it.next();
+			ConfigParamDescriptor property = inputPanel.getDescriptor();
+
+			if (inputPanel.isValueSet()) {
+				if (setPropertyFields) {
+
+					parent.setProperty(property.getName(), inputPanel
+							.getValue());
+				}
+			} else {
+				Util.UserWarning(property.getName()
+						+ " is not set or is incomplete");
+				return false;
+			}
+
+		}
+
+		return true;
 	}
 
 	/**
@@ -235,58 +248,6 @@ class ConfigDialog extends JDialog {
 		});
 		buttonsPanel.add(cancelButton);
 		panel.add(buttonsPanel);
-	}
-
-	/**
-	 * Creates the dialog
-	 */
-	protected void createDialog() {
-
-		ConfigParamDescriptor[] properties = parent.getConfigurable()
-				.getConfigSchema();
-		propertyInputPanels = new Vector<ConfigParamInputPanel>(
-				properties.length);
-
-		for (ConfigParamDescriptor property : properties) {
-
-			ConfigParamInputPanel inputPanel = property.createInputPanel();
-			panel.add(inputPanel);
-
-			propertyInputPanels.add(inputPanel);
-
-		}
-		loadDefaultValues();
-	}
-
-	/**
-	 * @param setPropertyFields
-	 *            if True, the user's values will be applied to the properties
-	 *            set
-	 * 
-	 * @return Whether the user has set all the values on the dialog correctly
-	 */
-	private boolean applyPropertyFieldsReal(boolean setPropertyFields) {
-		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
-
-		while (it.hasNext()) {
-			ConfigParamInputPanel inputPanel = it.next();
-			ConfigParamDescriptor property = inputPanel.getDescriptor();
-
-			if (inputPanel.isValueSet()) {
-				if (setPropertyFields) {
-
-					parent.setProperty(property.getName(), inputPanel
-							.getValue());
-				}
-			} else {
-				Util.UserWarning(property.getName()
-						+ " is not set or is incomplete");
-				return false;
-			}
-
-		}
-
-		return true;
 	}
 
 	/**
@@ -329,6 +290,23 @@ class ConfigDialog extends JDialog {
 	}
 
 	/**
+	 * Loads the properties associated with the item selected in the file drop
+	 * down list
+	 */
+	private void loadDefaultValues() {
+		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
+		while (it.hasNext()) {
+			ConfigParamInputPanel panel = it.next();
+
+			Object currentValue = panel.getDescriptor().getDefaultValue();
+			if (currentValue != null) {
+				panel.setValue(currentValue);
+			}
+
+		}
+	}
+
+	/**
 	 * What happens when the user presses the OK button
 	 */
 	private void okAction() {
@@ -362,29 +340,51 @@ class ConfigDialog extends JDialog {
 	}
 
 	/**
+	 * Gets value entered in the dialog and applies them to the properties set
+	 * 
+	 * @return Whether operation was successfull
+	 */
+	protected boolean applyProperties() {
+		/*
+		 * first check if all the fields have been set correctly, then set them
+		 * 
+		 */
+		if (applyPropertyFieldsReal(false)) {
+			applyPropertyFieldsReal(true);
+			return true;
+		}
+		return false;
+
+	}
+
+	/**
+	 * Creates the dialog
+	 */
+	protected void createDialog() {
+
+		ConfigParamDescriptor[] properties = parent.getConfigurable()
+				.getConfigSchema();
+		propertyInputPanels = new Vector<ConfigParamInputPanel>(
+				properties.length);
+
+		for (ConfigParamDescriptor property : properties) {
+
+			ConfigParamInputPanel inputPanel = property.createInputPanel();
+			panel.add(inputPanel);
+
+			propertyInputPanels.add(inputPanel);
+
+		}
+		loadDefaultValues();
+	}
+
+	/**
 	 * Initializes the dialog contents
 	 */
 	protected void initPanel() {
 		/*
 		 * Used by subclasses to add elements to the panel
 		 */
-	}
-
-	/**
-	 * Loads the properties associated with the item selected in the file drop
-	 * down list
-	 */
-	private void loadDefaultValues() {
-		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
-		while (it.hasNext()) {
-			ConfigParamInputPanel panel = it.next();
-
-			Object currentValue = panel.getDescriptor().getDefaultValue();
-			if (currentValue != null) {
-				panel.setValue(currentValue);
-			}
-
-		}
 	}
 
 }

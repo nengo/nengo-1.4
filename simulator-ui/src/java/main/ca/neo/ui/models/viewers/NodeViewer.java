@@ -13,9 +13,9 @@ import ca.neo.model.Node;
 import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.INodeContainer;
-import ca.neo.ui.models.PModel;
-import ca.neo.ui.models.PNeoNode;
-import ca.neo.ui.models.nodes.PNodeContainer;
+import ca.neo.ui.models.UIModel;
+import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.nodes.UINodeContainer;
 import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
@@ -46,15 +46,15 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	private Dimension layoutBounds = DEFAULT_BOUNDS;
 
-	private final Hashtable<String, PNeoNode> neoNodesChildren = new Hashtable<String, PNeoNode>();
+	private final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
 
-	private final PNodeContainer parentOfViewer;
+	private final UINodeContainer parentOfViewer;
 
 	/**
 	 * @param nodeContainer
 	 *            UI Object containing the Node model
 	 */
-	public NodeViewer(PNodeContainer nodeContainer) {
+	public NodeViewer(UINodeContainer nodeContainer) {
 		super("");
 		this.parentOfViewer = nodeContainer;
 
@@ -79,7 +79,72 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	}
 
-	public void addNeoNode(PNeoNode node) {
+	/**
+	 * 
+	 * @param nodeProxy
+	 *            node to be added
+	 * @param updateModel
+	 *            if true, the network model is updated. this may be false, if
+	 *            it is known that the network model already contains this node
+	 * @param dropInCenterOfCamera
+	 *            whether to drop the node in the center of the camera
+	 * @param moveCameraToNode
+	 *            whether to move the camera to where the node is
+	 */
+	protected void addNeoNode(UINeoNode nodeProxy, boolean updateModel,
+			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
+
+		/**
+		 * Moves the camera to where the node is positioned, if it's not dropped
+		 * in the center of the camera
+		 */
+		if (moveCameraToNode) {
+			getWorld().setCameraCenterPosition(nodeProxy.getOffset().getX(),
+					nodeProxy.getOffset().getY());
+		}
+
+		neoNodesChildren.put(nodeProxy.getName(), nodeProxy);
+
+		if (dropInCenterOfCamera) {
+			getGround().catchObject(nodeProxy, dropInCenterOfCamera);
+		} else {
+			getGround().addWorldObject(nodeProxy);
+		}
+	}
+
+	/**
+	 * 
+	 * @return Layout bounds to be used by Layout algorithms
+	 */
+	protected Dimension getLayoutBounds() {
+		return layoutBounds;
+	}
+
+	protected void init() {
+
+	}
+
+	protected void initLayoutMenu(MenuBuilder layoutMenu) {
+		MenuBuilder sortMenu = layoutMenu.createSubMenu("Sort by");
+
+		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
+		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
+
+	}
+
+	protected void removeAllNeoNodes() {
+		/*
+		 * Removes all existing nodes from this viewer
+		 */
+		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
+		while (enumeration.hasMoreElements()) {
+			enumeration.nextElement().destroy();
+		}
+	}
+
+	protected abstract void updateViewFromModel();;
+
+	public void addNeoNode(UINeoNode node) {
 		addNeoNode(node, true, true, false);
 
 	}
@@ -88,9 +153,9 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	@SuppressWarnings("unchecked")
 	public void applySortLayout(SortMode sortMode) {
-		ArrayList<PNeoNode> nodes = new ArrayList(getNeoNodes().size());
+		ArrayList<UINeoNode> nodes = new ArrayList(getNeoNodes().size());
 
-		Enumeration<PNeoNode> em = getNeoNodes().elements();
+		Enumeration<UINeoNode> em = getNeoNodes().elements();
 
 		while (em.hasMoreElements()) {
 			nodes.add(em.nextElement());
@@ -99,9 +164,9 @@ public abstract class NodeViewer extends World implements NamedObject,
 		switch (sortMode) {
 
 		case BY_NAME:
-			Collections.sort(nodes, new Comparator<PNeoNode>() {
+			Collections.sort(nodes, new Comparator<UINeoNode>() {
 
-				public int compare(PNeoNode o1, PNeoNode o2) {
+				public int compare(UINeoNode o1, UINeoNode o2) {
 					return (o1.getName().compareToIgnoreCase(o2.getName()));
 
 				}
@@ -110,9 +175,9 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 			break;
 		case BY_TYPE:
-			Collections.sort(nodes, new Comparator<PNeoNode>() {
+			Collections.sort(nodes, new Comparator<UINeoNode>() {
 
-				public int compare(PNeoNode o1, PNeoNode o2) {
+				public int compare(UINeoNode o1, UINeoNode o2) {
 					if (o1.getClass() != o2.getClass()) {
 
 						return o1.getClass().getSimpleName()
@@ -135,14 +200,14 @@ public abstract class NodeViewer extends World implements NamedObject,
 		double x = 0;
 		double y = 0;
 
-		Iterator<PNeoNode> it = nodes.iterator();
+		Iterator<UINeoNode> it = nodes.iterator();
 		int numberOfNodes = getNeoNodes().size();
 		int numberOfColumns = (int) Math.sqrt(numberOfNodes);
 		int columnCounter = 0;
 
 		PTransformActivity moveNodeActivity = null;
 		while (it.hasNext()) {
-			PNeoNode node = it.next();
+			UINeoNode node = it.next();
 
 			moveNodeActivity = node.animateToPositionScaleRotation(x, y, node
 					.getScale(), node.getRotation(), 1000);
@@ -192,9 +257,9 @@ public abstract class NodeViewer extends World implements NamedObject,
 	public String getName() {
 		return getViewerParent().getTypeName() + " Viewer: "
 				+ getViewerParent().getName();
-	};
+	}
 
-	public Dictionary<String, PNeoNode> getNeoNodes() {
+	public Dictionary<String, UINeoNode> getNeoNodes() {
 		return neoNodesChildren;
 	}
 
@@ -204,23 +269,23 @@ public abstract class NodeViewer extends World implements NamedObject,
 	 *            of Node
 	 * @return Node UI object
 	 */
-	public PNeoNode getNode(String name) {
+	public UINeoNode getNode(String name) {
 		return getNeoNodes().get(name);
 	}
 
-	public PNodeContainer getViewerParent() {
+	public UINodeContainer getViewerParent() {
 		return parentOfViewer;
 	}
 
 	public void hideAllWidgets() {
-		Enumeration<PNeoNode> enumeration = getNeoNodes().elements();
+		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
 		while (enumeration.hasMoreElements()) {
-			PNeoNode node = enumeration.nextElement();
+			UINeoNode node = enumeration.nextElement();
 			node.hideAllWidgets();
 		}
 	}
 
-	public void removeNeoNode(PNeoNode node) {
+	public void removeNeoNode(UINeoNode node) {
 		neoNodesChildren.remove(node.getName());
 	}
 
@@ -229,77 +294,12 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	public void showAllWidgets() {
-		Enumeration<PNeoNode> enumeration = getNeoNodes().elements();
+		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
 		while (enumeration.hasMoreElements()) {
-			PNeoNode node = enumeration.nextElement();
+			UINeoNode node = enumeration.nextElement();
 			node.showAllWidgets();
 		}
 	}
-
-	/**
-	 * 
-	 * @param nodeProxy
-	 *            node to be added
-	 * @param updateModel
-	 *            if true, the network model is updated. this may be false, if
-	 *            it is known that the network model already contains this node
-	 * @param dropInCenterOfCamera
-	 *            whether to drop the node in the center of the camera
-	 * @param moveCameraToNode
-	 *            whether to move the camera to where the node is
-	 */
-	protected void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
-			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
-
-		/**
-		 * Moves the camera to where the node is positioned, if it's not dropped
-		 * in the center of the camera
-		 */
-		if (moveCameraToNode) {
-			getWorld().setCameraCenterPosition(nodeProxy.getOffset().getX(),
-					nodeProxy.getOffset().getY());
-		}
-
-		neoNodesChildren.put(nodeProxy.getName(), nodeProxy);
-
-		if (dropInCenterOfCamera) {
-			getGround().catchObject(nodeProxy, dropInCenterOfCamera);
-		} else {
-			getGround().addWorldObject(nodeProxy);
-		}
-	}
-
-	/**
-	 * 
-	 * @return Layout bounds to be used by Layout algorithms
-	 */
-	protected Dimension getLayoutBounds() {
-		return layoutBounds;
-	}
-
-	protected void init() {
-
-	}
-
-	protected void initLayoutMenu(MenuBuilder layoutMenu) {
-		MenuBuilder sortMenu = layoutMenu.createSubMenu("Sort by");
-
-		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
-		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
-
-	}
-
-	protected void removeAllNeoNodes() {
-		/*
-		 * Removes all existing nodes from this viewer
-		 */
-		Enumeration<PNeoNode> enumeration = getNeoNodes().elements();
-		while (enumeration.hasMoreElements()) {
-			enumeration.nextElement().destroy();
-		}
-	}
-
-	protected abstract void updateViewFromModel();
 
 	public static enum SortMode {
 		BY_NAME("Name"), BY_TYPE("Type");
@@ -398,7 +398,7 @@ class ModelStatusBarHandler extends StatusBarHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	public String getStatusStr(PInputEvent event) {
-		PModel wo = (PModel) Util.getNodeFromPickPath(event, PModel.class);
+		UIModel wo = (UIModel) Util.getNodeFromPickPath(event, UIModel.class);
 
 		StringBuilder statuStr = new StringBuilder(getWorld().getName() + " | ");
 

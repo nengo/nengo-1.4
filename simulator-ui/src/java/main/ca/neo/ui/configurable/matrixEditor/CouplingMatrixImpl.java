@@ -30,6 +30,16 @@ public class CouplingMatrixImpl implements CouplingMatrix {
 		myData = new float[theToSize][theFromSize];
 	}
 
+	// convenience method for producing an error message
+	private void checkIndex(int theIndex, boolean isRow) {
+		String rowOrCol = (isRow) ? "row" : "col";
+		int size = (isRow) ? getToSize() : getFromSize();
+		if (theIndex < 1 || theIndex > size) {
+			throw new IllegalArgumentException("There is no " + rowOrCol + "#"
+					+ theIndex);
+		}
+	}
+
 	public float[][] getData() {
 		return myData;
 	}
@@ -58,16 +68,6 @@ public class CouplingMatrixImpl implements CouplingMatrix {
 
 	public void setElement(float theValue, int row, int col) {
 		myData[row - 1][col - 1] = theValue;
-	}
-
-	// convenience method for producing an error message
-	private void checkIndex(int theIndex, boolean isRow) {
-		String rowOrCol = (isRow) ? "row" : "col";
-		int size = (isRow) ? getToSize() : getFromSize();
-		if (theIndex < 1 || theIndex > size) {
-			throw new IllegalArgumentException("There is no " + rowOrCol + "#"
-					+ theIndex);
-		}
 	}
 
 }

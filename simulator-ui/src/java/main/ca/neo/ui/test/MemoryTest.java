@@ -7,7 +7,7 @@ import javax.swing.SwingUtilities;
 import ca.neo.examples.FuzzyLogicExample;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.NeoGraphics;
-import ca.neo.ui.models.nodes.PNetwork;
+import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.shu.ui.lib.objects.Window;
 
@@ -49,9 +49,9 @@ public class MemoryTest {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
 
-						PNetwork network;
+						UINetwork network;
 						try {
-							network = new PNetwork(FuzzyLogicExample
+							network = new UINetwork(FuzzyLogicExample
 									.createNetwork());
 
 							network.openViewer();

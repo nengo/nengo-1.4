@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import ca.neo.ui.models.PModel;
+import ca.neo.ui.models.UIModel;
 import ca.shu.ui.lib.objects.GButton;
 import ca.shu.ui.lib.objects.Tooltip;
 import ca.shu.ui.lib.util.Util;
@@ -45,7 +45,16 @@ public class Toolbox extends WorldObject {
 		this.setFrameVisible(true);
 	}
 
-	public void addItem(PModel item) {
+	@Override
+	protected void layoutChildren() {
+		// TODO Auto-generated method stub
+		super.layoutChildren();
+
+		symbolHolder.setOffset(5, 30);
+
+	}
+
+	public void addItem(UIModel item) {
 		this.setVisible(true);
 
 		symbolHolder.addSymbol(item);
@@ -97,15 +106,6 @@ public class Toolbox extends WorldObject {
 		this.setBounds(newBounds);
 
 	}
-
-	@Override
-	protected void layoutChildren() {
-		// TODO Auto-generated method stub
-		super.layoutChildren();
-
-		symbolHolder.setOffset(5, 30);
-
-	}
 }
 
 class SymbolCloner implements PropertyChangeListener {
@@ -135,10 +135,10 @@ class SymbolHolder extends WorldObject {
 
 	}
 
-	public void addSymbol(PModel symbol) {
-		Iterator<PModel> it = getSymbols().iterator();
+	public void addSymbol(UIModel symbol) {
+		Iterator<UIModel> it = getSymbols().iterator();
 		while (it.hasNext()) {
-			PModel sym = it.next();
+			UIModel sym = it.next();
 
 			// don't allow duplicate instances
 			if (sym.getName().compareTo(symbol.getName()) == 0) {
@@ -156,16 +156,16 @@ class SymbolHolder extends WorldObject {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<PModel> getSymbols() {
-		Vector<PModel> symbols = new Vector<PModel>();
+	public List<UIModel> getSymbols() {
+		Vector<UIModel> symbols = new Vector<UIModel>();
 
 		Iterator it = getChildrenIterator();
 
 		while (it.hasNext()) {
 			Object obj = it.next();
 
-			if (obj instanceof PModel) {
-				symbols.add((PModel) (obj));
+			if (obj instanceof UIModel) {
+				symbols.add((UIModel) (obj));
 			}
 
 		}

@@ -2,21 +2,13 @@ package ca.neo.ui.actions;
 
 import java.util.Enumeration;
 
-import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.viewers.NodeLayout;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 
 public abstract class LayoutAction extends ReversableAction {
-	NodeViewer nodeViewer;
-
-	public LayoutAction(NodeViewer nodeViewer, String description,
-			String actionName) {
-		super(description, actionName);
-		this.nodeViewer = nodeViewer;
-	}
-
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -24,6 +16,14 @@ public abstract class LayoutAction extends ReversableAction {
 	 * layouts
 	 */
 	private NodeLayout savedLayout;
+
+	NodeViewer nodeViewer;
+
+	public LayoutAction(NodeViewer nodeViewer, String description,
+			String actionName) {
+		super(description, actionName);
+		this.nodeViewer = nodeViewer;
+	}
 
 	@Override
 	protected void action() throws ActionException {
@@ -35,23 +35,23 @@ public abstract class LayoutAction extends ReversableAction {
 
 	protected void restoreNodePositions() {
 
-		Enumeration<PNeoNode> en = nodeViewer.getNeoNodes().elements();
+		Enumeration<UINeoNode> en = nodeViewer.getNeoNodes().elements();
 
 		while (en.hasMoreElements()) {
-			PNeoNode node = en.nextElement();
+			UINeoNode node = en.nextElement();
 
 			node.setOffset(savedLayout.getPosition(node.getName()));
 
 		}
 	}
 
+	protected void setSavedLayout(NodeLayout savedLayout) {
+		this.savedLayout = savedLayout;
+	}
+
 	@Override
 	protected void undo() throws ActionException {
 		restoreNodePositions();
-	}
-
-	protected void setSavedLayout(NodeLayout savedLayout) {
-		this.savedLayout = savedLayout;
 	}
 
 }

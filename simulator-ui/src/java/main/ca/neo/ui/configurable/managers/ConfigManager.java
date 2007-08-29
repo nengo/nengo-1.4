@@ -75,6 +75,12 @@ public abstract class ConfigManager {
 	}
 
 	/**
+	 * Configures the IConfigurable object and waits until the configuration
+	 * finishes
+	 */
+	protected abstract void configureAndWait() throws ConfigException;
+
+	/**
 	 * @param name
 	 *            filename prefix
 	 * 
@@ -212,12 +218,6 @@ public abstract class ConfigManager {
 	protected void setProperty(String name, Object value) {
 		getProperties().addAttribute(name, value);
 	}
-
-	/**
-	 * Configures the IConfigurable object and waits until the configuration
-	 * finishes
-	 */
-	protected abstract void configureAndWait() throws ConfigException;
 
 }
 

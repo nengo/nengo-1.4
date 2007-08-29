@@ -12,13 +12,26 @@ import ca.shu.ui.lib.util.UIEnvironment;
 public class NeoFileChooser {
 	private static final long serialVersionUID = 1L;
 
-	JFileChooser fileChooser;
-
 	FileFilter allFileFilter, networkFileFilter, ensembleFileFilter;
+
+	JFileChooser fileChooser;
 
 	public NeoFileChooser() {
 		super();
 		init();
+	}
+
+	private void init() {
+		fileChooser = new JFileChooser();
+
+		allFileFilter = new AllNeoFiles();
+		networkFileFilter = new NetworkFileFilter();
+		ensembleFileFilter = new EnsembleFileFilter();
+
+		fileChooser.addChoosableFileFilter(allFileFilter);
+		fileChooser.addChoosableFileFilter(networkFileFilter);
+		fileChooser.addChoosableFileFilter(ensembleFileFilter);
+		fileChooser.setFileFilter(allFileFilter);
 	}
 
 	public File getSelectedFile() {
@@ -42,19 +55,6 @@ public class NeoFileChooser {
 	public int showSaveNetworkDialog() throws HeadlessException {
 		fileChooser.setFileFilter(networkFileFilter);
 		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
-	}
-
-	private void init() {
-		fileChooser = new JFileChooser();
-
-		allFileFilter = new AllNeoFiles();
-		networkFileFilter = new NetworkFileFilter();
-		ensembleFileFilter = new EnsembleFileFilter();
-
-		fileChooser.addChoosableFileFilter(allFileFilter);
-		fileChooser.addChoosableFileFilter(networkFileFilter);
-		fileChooser.addChoosableFileFilter(ensembleFileFilter);
-		fileChooser.setFileFilter(allFileFilter);
 	}
 }
 

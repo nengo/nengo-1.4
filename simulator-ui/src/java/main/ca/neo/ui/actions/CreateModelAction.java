@@ -5,7 +5,7 @@ import javax.swing.SwingUtilities;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.INodeContainer;
-import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 
@@ -26,9 +26,9 @@ public class CreateModelAction extends ReversableAction {
 	 */
 	@SuppressWarnings("unchecked")
 	private static String getModelName(Class nodeUIType) {
-		PNeoNode nodeProxy;
+		UINeoNode nodeProxy;
 		try {
-			nodeProxy = (PNeoNode) nodeUIType.newInstance();
+			nodeProxy = (UINeoNode) nodeUIType.newInstance();
 			return nodeProxy.getTypeName();
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -39,20 +39,20 @@ public class CreateModelAction extends ReversableAction {
 	}
 
 	/**
-	 * Type of node to be created
+	 * Container to which the created node shall be added
 	 */
-	@SuppressWarnings("unchecked")
-	private Class nodeType;
+	private INodeContainer container;
 
 	/**
 	 * The created node
 	 */
-	private PNeoNode nodeCreated;
+	private UINeoNode nodeCreated;
 
 	/**
-	 * Container to which the created node shall be added
+	 * Type of node to be created
 	 */
-	private INodeContainer container;
+	@SuppressWarnings("unchecked")
+	private Class nodeType;
 
 	/**
 	 * 
@@ -90,7 +90,7 @@ public class CreateModelAction extends ReversableAction {
 			public void run() {
 
 				try {
-					PNeoNode nodeProxy = (PNeoNode) nodeType.newInstance();
+					UINeoNode nodeProxy = (UINeoNode) nodeType.newInstance();
 					UserTemplateConfigurer config = new UserTemplateConfigurer(
 							nodeProxy);
 					try {

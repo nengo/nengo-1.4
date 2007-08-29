@@ -1,17 +1,23 @@
 package ca.neo.ui.models.icons;
 
-import ca.neo.ui.models.nodes.PNetwork;
+import ca.neo.ui.models.nodes.UINetwork;
 
+/**
+ * Icon for a Network
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class NetworkIcon extends NodeContainerIcon {
 	private static final long serialVersionUID = 1L;
 
-	public NetworkIcon(PNetwork parent) {
+	public NetworkIcon(UINetwork parent) {
 		super(parent, new IconImage("images/NetworkIcon.gif"));
 
 	}
 
 	@Override
-	public int getNodeCountNormalization() {
+	protected int getNodeCountNormalization() {
 		return 20;
 	}
 

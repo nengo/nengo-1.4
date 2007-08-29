@@ -62,6 +62,19 @@ public abstract class ConfigParamInputPanel extends JPanel {
 	}
 
 	/**
+	 * Called by subclasses to cosntruct the input panel
+	 * 
+	 */
+	protected abstract void initPanel();
+
+	/**
+	 * @param msg
+	 */
+	protected void setStatusMsg(String msg) {
+		statusMessage.setText(msg);
+	}
+
+	/**
 	 * @return Descriptor of the configuration parameter
 	 */
 	public ConfigParamDescriptor getDescriptor() {
@@ -79,12 +92,6 @@ public abstract class ConfigParamInputPanel extends JPanel {
 	public abstract Object getValue();
 
 	/**
-	 * Called by subclasses to cosntruct the input panel
-	 * 
-	 */
-	protected abstract void initPanel();
-
-	/**
 	 * @return True if configuration parameter is set
 	 */
 	public abstract boolean isValueSet();
@@ -94,12 +101,5 @@ public abstract class ConfigParamInputPanel extends JPanel {
 	 *            Sets the configuration parameter
 	 */
 	public abstract void setValue(Object value);
-
-	/**
-	 * @param msg
-	 */
-	protected void setStatusMsg(String msg) {
-		statusMessage.setText(msg);
-	}
 
 }

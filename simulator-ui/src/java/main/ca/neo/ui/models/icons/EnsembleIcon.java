@@ -1,18 +1,24 @@
 package ca.neo.ui.models.icons;
 
-import ca.neo.ui.models.nodes.PEnsemble;
+import ca.neo.ui.models.nodes.UIEnsemble;
 
+/**
+ * Icon for an Ensemble
+ * 
+ * @author Shu Wu
+ * 
+ */
 public class EnsembleIcon extends NodeContainerIcon {
 	private static final long serialVersionUID = 1L;
 
-	public EnsembleIcon(PEnsemble parent) {
+	public EnsembleIcon(UIEnsemble parent) {
 
 		super(parent, new IconImage("images/EnsembleIcon.gif"));
 
 	}
 
 	@Override
-	public int getNodeCountNormalization() {
+	protected int getNodeCountNormalization() {
 		return 1000;
 	}
 

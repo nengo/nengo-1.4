@@ -23,14 +23,14 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.descriptors.PTInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
-import ca.neo.ui.configurable.struct.PTInt;
-import ca.neo.ui.models.PModelClasses;
-import ca.neo.ui.models.PNeoNode;
+import ca.neo.ui.models.UIModels;
+import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
-import ca.neo.ui.models.nodes.PNetwork;
-import ca.neo.ui.models.nodes.connectors.POrigin;
-import ca.neo.ui.models.nodes.connectors.PTermination;
+import ca.neo.ui.models.nodes.UINetwork;
+import ca.neo.ui.models.nodes.widgets.UIOrigin;
+import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -57,9 +57,9 @@ import edu.umd.cs.piccolo.activities.PTransformActivity;
  * @author Shu Wu
  */
 public class NetworkViewer extends NodeViewer {
-	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
-
 	private static final long serialVersionUID = -3018937112672942653L;
+
+	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
 
 	@SuppressWarnings("unchecked")
 	Class currentLayoutType = null;
@@ -71,13 +71,116 @@ public class NetworkViewer extends NodeViewer {
 	 * @param pNetwork
 	 * @param root
 	 */
-	public NetworkViewer(PNetwork pNetwork) {
+	public NetworkViewer(UINetwork pNetwork) {
 		super(pNetwork);
 
 	}
 
+	/**
+	 * 
+	 * @return The nodes as a graph
+	 */
+	protected Graph createGraph() {
+		DirectedSparseGraph graph = new DirectedSparseGraph();
+
+		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
+
+		/**
+		 * Add vertices
+		 */
+		while (enumeration.hasMoreElements()) {
+			UINeoNode node = enumeration.nextElement();
+			DirectedSparseVertex vertex = new DirectedSparseVertex();
+
+			node.setVertex(vertex);
+
+			graph.addVertex(vertex);
+
+		}
+
+		/**
+		 * Add Directed edges
+		 * 
+		 */
+		Projection[] projections = getNetwork().getProjections();
+		for (Projection projection : projections) {
+			Origin origin = projection.getOrigin();
+			Termination term = projection.getTermination();
+
+			UINeoNode nodeOrigin = getNode(origin.getNode().getName());
+			UINeoNode nodeTerm = getNode(term.getNode().getName());
+
+			DirectedSparseEdge edge = new DirectedSparseEdge(nodeOrigin
+					.getVertex(), nodeTerm.getVertex());
+			graph.addEdge(edge);
+
+		}
+
+		return graph;
+
+	}
+
 	@Override
-	public void addNeoNode(PNeoNode nodeProxy, boolean updateModel,
+	protected void init() {
+		// TODO Auto-generated method stub
+		super.init();
+	}
+
+	@Override
+	protected void initLayoutMenu(MenuBuilder layoutMenu) {
+
+		super.initLayoutMenu(layoutMenu);
+
+		MenuBuilder applyLayoutMenu = layoutMenu.createSubMenu("Use algorithm");
+
+		MenuBuilder layoutSettings = applyLayoutMenu.createSubMenu("Settings");
+		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
+
+		applyLayoutMenu.addAction(new JungLayoutAction(FRLayout.class,
+				"Fruchterman-Reingold"));
+		applyLayoutMenu.addAction(new JungLayoutAction(KKLayout.class,
+				"Kamada-Kawai"));
+		applyLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class,
+				"Circle"));
+
+		layoutMenu.addAction(new SaveLayout("Save as new"));
+		MenuBuilder restoreLayout = layoutMenu.createSubMenu("Restore");
+		String[] layoutNames = getUIConfig().getLayoutNames();
+
+		if (layoutNames.length > 0) {
+			for (String element : layoutNames) {
+				restoreLayout.addAction(new RestoreLayout(element));
+			}
+		} else {
+			restoreLayout.addLabel("none");
+		}
+
+		MenuBuilder deleteLayout = layoutMenu.createSubMenu("Delete");
+
+		if (layoutNames.length > 0) {
+			for (String element : layoutNames) {
+				deleteLayout.addAction(new DeleteLayout(element));
+			}
+		} else {
+			deleteLayout.addLabel("none");
+		}
+
+		/**
+		 * TODO: Enable spring layout & ISOM Layout which are continuous
+		 */
+		// layoutMenu.addAction(new LayoutAction(SpringLayout.class, "Spring"));
+		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+
+		saveLayoutAsDefault();
+		super.prepareForDestroy();
+	}
+
+	@Override
+	public void addNeoNode(UINeoNode nodeProxy, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCamera) {
 
 		if (updateModel) {
@@ -168,17 +271,17 @@ public class NetworkViewer extends NodeViewer {
 		menu.addAction(new OpenNeoFileAction("Open from file", this));
 
 		// Nodes
-		for (Class element : PModelClasses.NODE_TYPES) {
+		for (Class element : UIModels.NODE_TYPES) {
 			nodesMenu.addAction(new CreateModelAction(this, element));
 		}
 
 		// Node Containers
-		for (Class element : PModelClasses.NODE_CONTAINER_TYPES) {
+		for (Class element : UIModels.NODE_CONTAINER_TYPES) {
 			nodeContainersMenu.addAction(new CreateModelAction(this, element));
 		}
 
 		// Functions
-		for (Class element : PModelClasses.FUNCTION_TYPES) {
+		for (Class element : UIModels.FUNCTION_TYPES) {
 			functionsMenu.addAction(new CreateModelAction(this, element));
 		}
 
@@ -209,13 +312,13 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	public PNetwork getViewerParent() {
+	public UINetwork getViewerParent() {
 		// TODO Auto-generated method stub
-		return (PNetwork) super.getViewerParent();
+		return (UINetwork) super.getViewerParent();
 	}
 
 	@Override
-	public void removeNeoNode(PNeoNode nodeUI) {
+	public void removeNeoNode(UINeoNode nodeUI) {
 
 		try {
 			nodeUI.popupTransientMsg("Node " + nodeUI.getName()
@@ -242,10 +345,10 @@ public class NetworkViewer extends NodeViewer {
 			return false;
 		}
 
-		Enumeration<PNeoNode> en = getNeoNodes().elements();
+		Enumeration<UINeoNode> en = getNeoNodes().elements();
 
 		while (en.hasMoreElements()) {
-			PNeoNode node = en.nextElement();
+			UINeoNode node = en.nextElement();
 
 			Point2D savedPosition = layout.getPosition(node.getName());
 			if (savedPosition != null) {
@@ -299,7 +402,7 @@ public class NetworkViewer extends NodeViewer {
 			 * only add nodes if they don't already exist
 			 */
 			if (getNode(node.getName()) == null) {
-				PNeoNode nodeUI = PModelClasses.createUIFromModel(node);
+				UINeoNode nodeUI = UIModels.createUIFromModel(node);
 				addNeoNode(nodeUI, false, false, false);
 			}
 		}
@@ -312,12 +415,12 @@ public class NetworkViewer extends NodeViewer {
 			Origin origin = projection.getOrigin();
 			Termination term = projection.getTermination();
 
-			PNeoNode nodeOrigin = getNode(origin.getNode().getName());
+			UINeoNode nodeOrigin = getNode(origin.getNode().getName());
 
-			PNeoNode nodeTerm = getNode(term.getNode().getName());
+			UINeoNode nodeTerm = getNode(term.getNode().getName());
 
-			POrigin originUI = nodeOrigin.showOrigin(origin.getName());
-			PTermination termUI = nodeTerm.showTermination(term.getName());
+			UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
+			UITermination termUI = nodeTerm.showTermination(term.getName());
 
 			// modifyModel is false because the connections already exist in the
 			// NEO Network model
@@ -340,116 +443,13 @@ public class NetworkViewer extends NodeViewer {
 
 					Node node = (Node) target;
 
-					PNeoNode nodeUI = getNode(node.getName());
+					UINeoNode nodeUI = getNode(node.getName());
 					nodeUI.showProbe(probe);
 
 				}
 			}
 
 		}
-	}
-
-	/**
-	 * 
-	 * @return The nodes as a graph
-	 */
-	protected Graph createGraph() {
-		DirectedSparseGraph graph = new DirectedSparseGraph();
-
-		Enumeration<PNeoNode> enumeration = getNeoNodes().elements();
-
-		/**
-		 * Add vertices
-		 */
-		while (enumeration.hasMoreElements()) {
-			PNeoNode node = enumeration.nextElement();
-			DirectedSparseVertex vertex = new DirectedSparseVertex();
-
-			node.setVertex(vertex);
-
-			graph.addVertex(vertex);
-
-		}
-
-		/**
-		 * Add Directed edges
-		 * 
-		 */
-		Projection[] projections = getNetwork().getProjections();
-		for (Projection projection : projections) {
-			Origin origin = projection.getOrigin();
-			Termination term = projection.getTermination();
-
-			PNeoNode nodeOrigin = getNode(origin.getNode().getName());
-			PNeoNode nodeTerm = getNode(term.getNode().getName());
-
-			DirectedSparseEdge edge = new DirectedSparseEdge(nodeOrigin
-					.getVertex(), nodeTerm.getVertex());
-			graph.addEdge(edge);
-
-		}
-
-		return graph;
-
-	}
-
-	@Override
-	protected void init() {
-		// TODO Auto-generated method stub
-		super.init();
-	}
-
-	@Override
-	protected void initLayoutMenu(MenuBuilder layoutMenu) {
-
-		super.initLayoutMenu(layoutMenu);
-
-		MenuBuilder applyLayoutMenu = layoutMenu.createSubMenu("Use algorithm");
-
-		MenuBuilder layoutSettings = applyLayoutMenu.createSubMenu("Settings");
-		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
-
-		applyLayoutMenu.addAction(new JungLayoutAction(FRLayout.class,
-				"Fruchterman-Reingold"));
-		applyLayoutMenu.addAction(new JungLayoutAction(KKLayout.class,
-				"Kamada-Kawai"));
-		applyLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class,
-				"Circle"));
-
-		layoutMenu.addAction(new SaveLayout("Save as new"));
-		MenuBuilder restoreLayout = layoutMenu.createSubMenu("Restore");
-		String[] layoutNames = getUIConfig().getLayoutNames();
-
-		if (layoutNames.length > 0) {
-			for (String element : layoutNames) {
-				restoreLayout.addAction(new RestoreLayout(element));
-			}
-		} else {
-			restoreLayout.addLabel("none");
-		}
-
-		MenuBuilder deleteLayout = layoutMenu.createSubMenu("Delete");
-
-		if (layoutNames.length > 0) {
-			for (String element : layoutNames) {
-				deleteLayout.addAction(new DeleteLayout(element));
-			}
-		} else {
-			deleteLayout.addLabel("none");
-		}
-
-		/**
-		 * TODO: Enable spring layout & ISOM Layout which are continuous
-		 */
-		// layoutMenu.addAction(new LayoutAction(SpringLayout.class, "Spring"));
-		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
-	}
-
-	@Override
-	protected void prepareForDestroy() {
-
-		saveLayoutAsDefault();
-		super.prepareForDestroy();
 	}
 
 	class DeleteLayout extends StandardAction {
@@ -528,11 +528,11 @@ public class NetworkViewer extends NodeViewer {
 					/**
 					 * Layout nodes
 					 */
-					Enumeration<PNeoNode> enumeration = getNeoNodes()
+					Enumeration<UINeoNode> enumeration = getNeoNodes()
 							.elements();
 					PTransformActivity nodeMoveActivity = null;
 					while (enumeration.hasMoreElements()) {
-						PNeoNode node = enumeration.nextElement();
+						UINeoNode node = enumeration.nextElement();
 						if (node.getVertex() != null) {
 							Point2D coord = layout
 									.getLocation(node.getVertex());
@@ -630,6 +630,17 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 		this.parent = parent;
 	}
 
+	@Override
+	protected void action() throws ActionException {
+		UserTemplateConfigurer config = new UserTemplateConfigurer(this);
+		try {
+			config.configureAndWait();
+		} catch (ConfigException e) {
+			e.defaultHandledBehavior();
+		}
+
+	}
+
 	public void completeConfiguration(ConfigParam properties) {
 		parent
 				.setLayoutBounds(new Dimension((Integer) properties
@@ -644,17 +655,6 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	public String getTypeName() {
 		return "Layout bounds";
-	}
-
-	@Override
-	protected void action() throws ActionException {
-		UserTemplateConfigurer config = new UserTemplateConfigurer(this);
-		try {
-			config.configureAndWait();
-		} catch (ConfigException e) {
-			e.defaultHandledBehavior();
-		}
-
 	}
 
 }
