@@ -27,7 +27,6 @@ import ca.neo.ui.configurable.descriptors.CInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.UIModels;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UITermination;
@@ -50,35 +49,33 @@ import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 
 /**
- * 
- * TODO: Save layout information to Network model TODO: Layout bounds should be
- * saved by Configuration manager
+ * Viewer for peeking into a Network
  * 
  * @author Shu Wu
+ */
+/**
+ * @author Shu
  */
 public class NetworkViewer extends NodeViewer {
 	private static final long serialVersionUID = -3018937112672942653L;
 
+	/**
+	 * Name given to the current layout by default, saved when the viewer is
+	 * closed
+	 */
 	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
 
-	@SuppressWarnings("unchecked")
-	Class currentLayoutType = null;
-
-	ModelIcon icon;
-
 	/**
-	 * 
 	 * @param pNetwork
-	 * @param root
+	 *            Parent Network UI wrapper
 	 */
 	public NetworkViewer(UINetwork pNetwork) {
 		super(pNetwork);
-
 	}
 
 	/**
-	 * 
-	 * @return The nodes as a graph
+	 * @return The child nodes of this network as a Graph object readable by
+	 *         Jung Layout algorithms
 	 */
 	protected Graph createGraph() {
 		DirectedSparseGraph graph = new DirectedSparseGraph();
@@ -100,7 +97,6 @@ public class NetworkViewer extends NodeViewer {
 
 		/**
 		 * Add Directed edges
-		 * 
 		 */
 		Projection[] projections = getNetwork().getProjections();
 		for (Projection projection : projections) {
@@ -121,15 +117,9 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	protected void init() {
-		// TODO Auto-generated method stub
-		super.init();
-	}
+	protected void constructLayoutMenu(MenuBuilder layoutMenu) {
 
-	@Override
-	protected void initLayoutMenu(MenuBuilder layoutMenu) {
-
-		super.initLayoutMenu(layoutMenu);
+		super.constructLayoutMenu(layoutMenu);
 
 		MenuBuilder applyLayoutMenu = layoutMenu.createSubMenu("Use algorithm");
 
@@ -145,7 +135,7 @@ public class NetworkViewer extends NodeViewer {
 
 		layoutMenu.addAction(new SaveLayout("Save as new"));
 		MenuBuilder restoreLayout = layoutMenu.createSubMenu("Restore");
-		String[] layoutNames = getUIConfig().getLayoutNames();
+		String[] layoutNames = getUISettings().getLayoutNames();
 
 		if (layoutNames.length > 0) {
 			for (String element : layoutNames) {
@@ -243,7 +233,6 @@ public class NetworkViewer extends NodeViewer {
 			return;
 		}
 
-		currentLayoutType = layoutType;
 		(new JungLayoutActivity(layout)).startThread();
 
 	}
@@ -298,22 +287,31 @@ public class NetworkViewer extends NodeViewer {
 		return menu;
 	}
 
+	/**
+	 * @param name
+	 *            Name of layout to delete
+	 */
 	public void deleteNodeLayout(String name) {
-		NetworkUIConfiguration layouts = getUIConfig();
+		NetworkUISettings layouts = getUISettings();
 		layouts.removeLayout(name);
 	}
 
+	/**
+	 * @return NEO Network model represented by the viewer
+	 */
 	public Network getNetwork() {
 		return (Network) getModel();
 	}
 
-	public NetworkUIConfiguration getUIConfig() {
+	/**
+	 * @return Static settings including saved layouts
+	 */
+	public NetworkUISettings getUISettings() {
 		return getViewerParent().getUIConfig();
 	}
 
 	@Override
 	public UINetwork getViewerParent() {
-		// TODO Auto-generated method stub
 		return (UINetwork) super.getViewerParent();
 	}
 
@@ -333,12 +331,12 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	/**
-	 * @return Whether the layout could be restored
+	 * @return Whether the operation was successful
 	 * @param name
-	 *            of layout to restore
+	 *            Name of layout to restore
 	 */
 	public boolean restoreNodeLayout(String name) {
-		NetworkUIConfiguration layouts = getUIConfig();
+		NetworkUISettings layouts = getUISettings();
 		NodeLayout layout = layouts.getLayout(name);
 
 		if (layout == null) {
@@ -362,18 +360,20 @@ public class NetworkViewer extends NodeViewer {
 		return true;
 	}
 
+	/**
+	 * Saves the current layout as the default
+	 */
 	public void saveLayoutAsDefault() {
 		saveNodeLayout(NetworkViewer.DEFAULT_NODE_LAYOUT_NAME);
 	}
 
 	/**
-	 * Saves layout
-	 * 
 	 * @param name
+	 *            Name given to the saved layout
 	 */
 	public void saveNodeLayout(String name) {
 
-		NetworkUIConfiguration layouts = getUIConfig();
+		NetworkUISettings layouts = getUISettings();
 		if (layouts != null) {
 			NodeLayout nodeLayout = new NodeLayout(name, this);
 
@@ -384,7 +384,7 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	/**
-	 * Construct children UI nodes from the NEO Network model
+	 * Construct UI Nodes from the NEO Network model
 	 */
 	@Override
 	public void updateViewFromModel() {
@@ -452,6 +452,11 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
+	/**
+	 * Action to delete a layout
+	 * 
+	 * @author Shu Wu
+	 */
 	class DeleteLayout extends StandardAction {
 		private static final long serialVersionUID = 1L;
 
@@ -468,6 +473,11 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
+	/**
+	 * Action to hide all widgets
+	 * 
+	 * @author Shu Wu
+	 */
 	class HideAllWidgetsAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -483,6 +493,11 @@ public class NetworkViewer extends NodeViewer {
 
 	}
 
+	/**
+	 * Action for applying a Jung Layout
+	 * 
+	 * @author Shu
+	 */
 	class JungLayoutAction extends LayoutAction {
 
 		private static final long serialVersionUID = 1L;
@@ -503,6 +518,11 @@ public class NetworkViewer extends NodeViewer {
 
 	}
 
+	/**
+	 * Activity for performing a Jung Layout.
+	 * 
+	 * @author Shu Wu
+	 */
 	class JungLayoutActivity extends TrackedActivity {
 		Layout layout;
 
@@ -558,6 +578,11 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
+	/**
+	 * Action to restore a layout
+	 * 
+	 * @author Shu Wu
+	 */
 	class RestoreLayout extends StandardAction {
 		private static final long serialVersionUID = 1L;
 
@@ -576,6 +601,11 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
+	/**
+	 * Action to save a layout
+	 * 
+	 * @author Shu Wu
+	 */
 	class SaveLayout extends StandardAction {
 		private static final long serialVersionUID = 1L;
 
@@ -598,6 +628,11 @@ public class NetworkViewer extends NodeViewer {
 
 	}
 
+	/**
+	 * Action to show all widgets
+	 * 
+	 * @author Shu Wu
+	 */
 	class ShowAllWidgetsAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -614,16 +649,23 @@ public class NetworkViewer extends NodeViewer {
 	}
 }
 
+/**
+ * Action to set layout bounds.
+ * 
+ * @author Shu Wu
+ */
 class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	private static final long serialVersionUID = 1L;
-	static final ConfigParamDescriptor pHeight = new CInt("Height");
 
-	static final ConfigParamDescriptor pWidth = new CInt("Width");
+	private static final ConfigParamDescriptor pHeight = new CInt("Height");
 
-	static final ConfigParamDescriptor[] zProperties = { pWidth, pHeight };
+	private static final ConfigParamDescriptor pWidth = new CInt("Width");
 
-	NetworkViewer parent;
+	private static final ConfigParamDescriptor[] zProperties = { pWidth,
+			pHeight };
+
+	private NetworkViewer parent;
 
 	public SetLayoutBoundsAction(String actionName, NetworkViewer parent) {
 		super("Set layout bounds", actionName);
@@ -641,6 +683,9 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
+	 */
 	public void completeConfiguration(ConfigParam properties) {
 		parent
 				.setLayoutBounds(new Dimension((Integer) properties
@@ -649,10 +694,16 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
+	 */
 	public ConfigParamDescriptor[] getConfigSchema() {
 		return zProperties;
 	}
 
+	/* (non-Javadoc)
+	 * @see ca.neo.ui.configurable.IConfigurable#getTypeName()
+	 */
 	public String getTypeName() {
 		return "Layout bounds";
 	}

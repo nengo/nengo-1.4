@@ -29,25 +29,39 @@ import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
- * NodeViewer visualizes the nodes within a PNodeContainer such as an Ensemble
- * or Network
+ * Viewer for looking at NEO Node models
  * 
  * @author Shu
- * 
  */
 public abstract class NodeViewer extends World implements NamedObject,
 		Interactable, INodeContainer {
 
+	/**
+	 * Default layout bounds
+	 */
+	private static final Dimension DEFAULT_LAYOUT_BOUNDS = new Dimension(1000,
+			1000);
+
 	private static final long serialVersionUID = 1L;
 
-	static final Dimension DEFAULT_BOUNDS = new Dimension(1000, 1000);
+	/**
+	 * Node spacing used in the Square layout
+	 */
+	private static final double SQUARE_LAYOUT_NODE_SPACING = 150;
 
-	static final double SQUARE_LAYOUT_NODE_SPACING = 150;
+	/**
+	 * Layout bounds
+	 */
+	private Dimension layoutBounds = DEFAULT_LAYOUT_BOUNDS;
 
-	private Dimension layoutBounds = DEFAULT_BOUNDS;
-
+	/**
+	 * Children of NEO nodes
+	 */
 	private final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
 
+	/**
+	 * Viewer Parent
+	 */
 	private final UINodeContainer parentOfViewer;
 
 	/**
@@ -64,11 +78,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 		setName(getModel().getName());
 
-		// addInputEventListener(new HoverHandler(this));
-
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
-
-		init();
 
 		updateViewFromModel();
 		if (getNeoNodes().size() > 0) {
@@ -80,7 +90,6 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	/**
-	 * 
 	 * @param nodeProxy
 	 *            node to be added
 	 * @param updateModel
@@ -113,25 +122,29 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	/**
-	 * 
 	 * @return Layout bounds to be used by Layout algorithms
 	 */
 	protected Dimension getLayoutBounds() {
 		return layoutBounds;
 	}
 
-	protected void init() {
-
-	}
-
-	protected void initLayoutMenu(MenuBuilder layoutMenu) {
-		MenuBuilder sortMenu = layoutMenu.createSubMenu("Sort by");
+	/**
+	 * Creates the layout context menu
+	 * 
+	 * @param menu
+	 *            menu builder
+	 */
+	protected void constructLayoutMenu(MenuBuilder menu) {
+		MenuBuilder sortMenu = menu.createSubMenu("Sort by");
 
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
 
 	}
 
+	/**
+	 * Removes all NEO Node children
+	 */
 	protected void removeAllNeoNodes() {
 		/*
 		 * Removes all existing nodes from this viewer
@@ -142,15 +155,32 @@ public abstract class NodeViewer extends World implements NamedObject,
 		}
 	}
 
+	/**
+	 * Called when the model changes. Updates the viewer based on the NEO model.
+	 */
 	protected abstract void updateViewFromModel();;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
+	 */
 	public void addNeoNode(UINeoNode node) {
 		addNeoNode(node, true, true, false);
 
 	}
 
+	/**
+	 * Applies the default layout
+	 */
 	public abstract void applyDefaultLayout();
 
+	/**
+	 * Applies a square layout which is sorted
+	 * 
+	 * @param sortMode
+	 *            Type of sort layout to use
+	 */
 	@SuppressWarnings("unchecked")
 	public void applySortLayout(SortMode sortMode) {
 		ArrayList<UINeoNode> nodes = new ArrayList(getNeoNodes().size());
@@ -234,7 +264,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	public PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
 
-		initLayoutMenu(menu.createSubMenu("Layout"));
+		constructLayoutMenu(menu.createSubMenu("Layout"));
 
 		/*
 		 * File menu
@@ -247,7 +277,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 	}
 
 	/**
-	 * @return Neo Model of the Node Container
+	 * @return NEO Model represented by the viewer
 	 */
 	public Node getModel() {
 		return parentOfViewer.getModel();
@@ -259,24 +289,32 @@ public abstract class NodeViewer extends World implements NamedObject,
 				+ getViewerParent().getName();
 	}
 
+	/**
+	 * @return A collection of NEO Nodes contained in this viewer
+	 */
 	public Dictionary<String, UINeoNode> getNeoNodes() {
 		return neoNodesChildren;
 	}
 
 	/**
-	 * 
 	 * @param name
-	 *            of Node
-	 * @return Node UI object
+	 *            Name of Node
+	 * @return Node
 	 */
 	public UINeoNode getNode(String name) {
 		return getNeoNodes().get(name);
 	}
 
+	/**
+	 * @return Parent of this viewer
+	 */
 	public UINodeContainer getViewerParent() {
 		return parentOfViewer;
 	}
 
+	/**
+	 * Hides all widgets
+	 */
 	public void hideAllWidgets() {
 		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
 		while (enumeration.hasMoreElements()) {
@@ -285,14 +323,27 @@ public abstract class NodeViewer extends World implements NamedObject,
 		}
 	}
 
+	/**
+	 * Removes a node
+	 * 
+	 * @param node
+	 *            Node to remove
+	 */
 	public void removeNeoNode(UINeoNode node) {
 		neoNodesChildren.remove(node.getName());
 	}
 
-	public void setLayoutBounds(Dimension layoutBounds) {
-		this.layoutBounds = layoutBounds;
+	/**
+	 * @param bounds
+	 *            New bounds
+	 */
+	public void setLayoutBounds(Dimension bounds) {
+		this.layoutBounds = bounds;
 	}
 
+	/**
+	 * Shows all widgets
+	 */
 	public void showAllWidgets() {
 		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
 		while (enumeration.hasMoreElements()) {
@@ -301,6 +352,11 @@ public abstract class NodeViewer extends World implements NamedObject,
 		}
 	}
 
+	/**
+	 * Supported types of sorting allowed in layout
+	 * 
+	 * @author Shu Wu
+	 */
 	public static enum SortMode {
 		BY_NAME("Name"), BY_TYPE("Type");
 
@@ -315,6 +371,11 @@ public abstract class NodeViewer extends World implements NamedObject,
 		}
 	}
 
+	/**
+	 * Action to apply a sorting layout
+	 * 
+	 * @author Shu Wu
+	 */
 	class SortNodesAction extends LayoutAction {
 
 		private static final long serialVersionUID = 1L;
@@ -333,6 +394,11 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 	}
 
+	/**
+	 * Zooms the viewer to optimally fit all nodes
+	 * 
+	 * @author Shu Wu
+	 */
 	class ZoomToFitActivity extends PActivity {
 
 		public ZoomToFitActivity() {
@@ -349,50 +415,16 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 }
 
-// class HoverHandler extends NodePickerHandler {
-//
-// public HoverHandler(NodeViewer world) {
-// super(world);
-// }
-//
-// @Override
-// public void eventUpdated(PInputEvent event) {
-// PNeoNode node = (PNeoNode) Util.getNodeFromPickPath(event,
-// PNeoNode.class);
-//
-// setSelectedNode(node);
-//
-// }
-//
-// @Override
-// protected int getKeepPickDelay() {
-// return 1500;
-// }
-//
-// @Override
-// protected int getPickDelay() {
-// return 0;
-// }
-//
-// // @Override
-// // protected void nodePicked() {
-// // ((PNeoNode) getPickedNode()).setHoveredOver(true);
-// //
-// // }
-// //
-// // @Override
-// // protected void nodeUnPicked() {
-// // ((PNeoNode) getPickedNode()).setHoveredOver(false);
-// //
-// // }
-//
-// }
-
+/**
+ * Handler which updates the status bar of NeoGraphics to display information
+ * about the node which the mouse is hovering over.
+ * 
+ * @author Shu Wu
+ */
 class ModelStatusBarHandler extends StatusBarHandler {
 
 	public ModelStatusBarHandler(World world) {
 		super(world);
-		// TODO Auto-generated constructor stub
 	}
 
 	@SuppressWarnings("unchecked")

@@ -9,7 +9,7 @@ import ca.neo.ui.configurable.descriptors.CString;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.models.viewers.NetworkUIConfiguration;
+import ca.neo.ui.models.viewers.NetworkUISettings;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.shu.ui.lib.util.Util;
 
@@ -121,20 +121,20 @@ public class UINetwork extends UINodeContainer {
 	/**
 	 * @return UI Configuration manager associated with this network
 	 */
-	public NetworkUIConfiguration getUIConfig() {
-		NetworkUIConfiguration layoutManager = null;
+	public NetworkUISettings getUIConfig() {
+		NetworkUISettings layoutManager = null;
 		try {
 			Object obj = getModel().getMetaData(LAYOUT_MANAGER_KEY);
 
 			if (obj != null)
-				layoutManager = (NetworkUIConfiguration) obj;
+				layoutManager = (NetworkUISettings) obj;
 		} catch (Throwable e) {
 			Util
 					.UserError("Could not access layout manager, creating a new one");
 		}
 
 		if (layoutManager == null) {
-			layoutManager = new NetworkUIConfiguration(getName() + ".net");
+			layoutManager = new NetworkUISettings(getName() + ".net");
 			setUICOnfig(layoutManager);
 		}
 
@@ -165,7 +165,7 @@ public class UINetwork extends UINodeContainer {
 	 * @param config
 	 *            UI Configuration manager
 	 */
-	public void setUICOnfig(NetworkUIConfiguration config) {
+	public void setUICOnfig(NetworkUISettings config) {
 		getModel().setMetaData(LAYOUT_MANAGER_KEY, config);
 	}
 

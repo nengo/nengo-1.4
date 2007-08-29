@@ -132,10 +132,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		super.windowClosing();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.PNeoNode)
+
+	/* (non-Javadoc)
+	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
 	public void addNeoNode(UINeoNode node) {
 		getWorld().getGround().catchObject(node);

@@ -11,7 +11,7 @@ import ca.neo.util.Probe;
 import ca.shu.ui.lib.util.Util;
 
 /**
- * Viewer for peeking into Ensembles
+ * Viewer for peeking into an Ensemble
  * 
  * @author Shu
  */

@@ -8,22 +8,29 @@ import java.util.Hashtable;
 import ca.neo.ui.models.UINeoNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
+/**
+ * Layout of nodes which is serializable
+ * 
+ * @author Shu Wu
+ */
 public class NodeLayout implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	String layoutName;
-	Hashtable<String, Point2D> nodePositions;
+	/**
+	 * Name of the layout
+	 */
+	private String layoutName;
 
-	// /**
-	// * @param layoutName
-	// * Name of the layout
-	// */
-	// public NodeLayout(String layoutName) {
-	// super();
-	//
-	// }
-	PBounds savedViewBounds;
+	/**
+	 * Node positions referenced by name
+	 */
+	private Hashtable<String, Point2D> nodePositions;
+
+	/**
+	 * Saved view bounds
+	 */
+	private PBounds savedViewBounds;
 
 	/**
 	 * @param layoutName
@@ -46,18 +53,36 @@ public class NodeLayout implements Serializable {
 
 	}
 
+	/**
+	 * @param nodeName
+	 *            Name of node
+	 * @param position
+	 *            Position of node
+	 * @return Position of node
+	 */
 	public Point2D addPosition(String nodeName, Point2D position) {
 		return nodePositions.put(nodeName, position);
 	}
 
+	/**
+	 * @return Layout name
+	 */
 	public String getName() {
 		return layoutName;
 	}
 
+	/**
+	 * @param nodeName
+	 *            Name of node
+	 * @return Position of node
+	 */
 	public Point2D getPosition(String nodeName) {
 		return nodePositions.get(nodeName);
 	}
 
+	/**
+	 * @return Saved view bounds
+	 */
 	public PBounds getSavedViewBounds() {
 		return savedViewBounds;
 	}

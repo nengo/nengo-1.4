@@ -4,29 +4,58 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class NetworkUIConfiguration implements Serializable {
+/**
+ * Settings for a Network UI object
+ * 
+ * @author Shu Wu
+ */
+public class NetworkUISettings implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * File name of this Network
+	 */
 	private String fileName;
 
+	/**
+	 * Folder name of this Network
+	 */
 	private String folderName;
+
+	/**
+	 * Saved layouts
+	 */
 	private final Hashtable<String, NodeLayout> layouts;
 
-	public NetworkUIConfiguration(String defaultFileName) {
+	/**
+	 * @param defaultFileName
+	 *            Default file name to give to this network
+	 */
+	public NetworkUISettings(String defaultFileName) {
 		super();
 		this.fileName = defaultFileName;
 		layouts = new Hashtable<String, NodeLayout>();
 	}
 
-	public void addLayout(NodeLayout e) {
-		layouts.put(e.getName(), e);
+	/**
+	 * @param layout
+	 *            Layout to be added
+	 */
+	public void addLayout(NodeLayout layout) {
+		layouts.put(layout.getName(), layout);
 	}
 
+	/**
+	 * @return File name of this network
+	 */
 	public String getFileName() {
 		return fileName;
 	}
 
+	/**
+	 * @return Folder name of this network
+	 */
 	public String getFolderName() {
 		return folderName;
 	}
@@ -35,6 +64,9 @@ public class NetworkUIConfiguration implements Serializable {
 		return layouts.get(name);
 	}
 
+	/**
+	 * @return Names of the saved layouts
+	 */
 	public String[] getLayoutNames() {
 		String[] names = new String[layouts.size()];
 		int i = 0;
@@ -45,14 +77,27 @@ public class NetworkUIConfiguration implements Serializable {
 		return names;
 	}
 
+	/**
+	 * @param name
+	 *            Name of layout to be removed
+	 * @return Reference to the removed layout
+	 */
 	public NodeLayout removeLayout(String name) {
 		return layouts.remove(name);
 	}
 
+	/**
+	 * @param fileName
+	 *            File name
+	 */
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
 
+	/**
+	 * @param folderName
+	 *            Folder name
+	 */
 	public void setFolderName(String folderName) {
 		this.folderName = folderName;
 	}
