@@ -23,11 +23,6 @@ import ca.shu.ui.lib.world.AppFrame;
  * Top level instance of the NeoGraphics application
  * 
  * @author Shu Wu
- * 
- */
-/**
- * @author Shu
- * 
  */
 public class NeoGraphics extends AppFrame implements INodeContainer {
 	private static final long serialVersionUID = 1L;
@@ -132,8 +127,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		super.windowClosing();
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
 	public void addNeoNode(UINeoNode node) {
@@ -141,7 +137,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		if (node instanceof UINodeContainer) {
 			((UINodeContainer) (node)).openViewer();
 		}
-
 	}
 
 	@Override
@@ -165,9 +160,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		menuBar.add(menu.getJMenu());
 
 		MenuBuilder newMenu = menu.createSubMenu("New");
-		newMenu
-				.addAction(new CreateModelAction("Network", this,
-						UINetwork.class));
+		newMenu.addAction(new CreateModelAction("Network", this,
+				UINetwork.class));
 		newMenu.addAction(new CreateModelAction("NEFEnsemble", this,
 				UINEFEnsemble.class));
 

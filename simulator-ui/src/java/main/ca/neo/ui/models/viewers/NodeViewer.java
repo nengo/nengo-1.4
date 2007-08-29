@@ -403,7 +403,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 		public ZoomToFitActivity() {
 			super(0);
-			addActivity(this);
+			parentOfViewer.addActivity(this);
 		}
 
 		@Override
