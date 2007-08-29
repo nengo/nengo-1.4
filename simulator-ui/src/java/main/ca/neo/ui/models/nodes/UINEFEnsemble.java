@@ -24,12 +24,12 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * A UI object for NEFEnsemble
  * 
  * @author Shu Wu
- * 
  */
 public class UINEFEnsemble extends UIEnsemble {
 	private static final long serialVersionUID = 1L;
@@ -97,7 +97,7 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		MenuBuilder plotMenu = menu.createSubMenu("Plot");
 
-		plotMenu.addAction(new StandardAction("NEFEnsemble") {
+		plotMenu.addAction(new StandardAction("Activities") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -111,8 +111,9 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		for (Origin element : origins) {
 			if (element instanceof DecodedOrigin) {
-				plotMenu.addAction(new PlotDecodedOrigin("Decoded origin: "
-						+ element.getName(), element.getName()));
+				plotMenu.addAction(new PlotDecodedOriginDistortion(
+						"Decoded Origin (Distortion): " + element.getName(),
+						element.getName()));
 			}
 		}
 
@@ -131,10 +132,8 @@ public class UINEFEnsemble extends UIEnsemble {
 	}
 
 	/**
-	 * Adds a decoded termination to the UI and Ensemble Model
-	 * 
-	 * 
-	 * The UI is used to configure it
+	 * Adds a decoded termination to the UI and Ensemble Model The UI is used to
+	 * configure it
 	 * 
 	 * @return PTermination created, null if not
 	 */
@@ -174,7 +173,6 @@ public class UINEFEnsemble extends UIEnsemble {
 	 * Action for adding a decoded termination
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class AddDecodedTerminationAction extends ReversableAction {
 
@@ -207,20 +205,24 @@ public class UINEFEnsemble extends UIEnsemble {
 	 * Action for plotting a decoded origin
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
-	class PlotDecodedOrigin extends StandardAction {
+	class PlotDecodedOriginDistortion extends StandardAction {
 		private static final long serialVersionUID = 1L;
 		String decodedOriginName;
 
-		public PlotDecodedOrigin(String actionName, String decodedOriginName) {
-			super("Plot decoded origin", actionName);
+		public PlotDecodedOriginDistortion(String actionName,
+				String decodedOriginName) {
+			super("Plot decoded origin distortion", actionName);
 			this.decodedOriginName = decodedOriginName;
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			Plotter.plot(getModel(), decodedOriginName);
+			if (getModel().getDimension() > 1) {
+				Util
+						.UserWarning("Distortion cannot be plotted for multi-dimensional NEFEnsemble");
+			} else
+				Plotter.plot(getModel(), decodedOriginName);
 
 		}
 
