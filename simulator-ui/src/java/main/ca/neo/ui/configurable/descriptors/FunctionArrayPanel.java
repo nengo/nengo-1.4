@@ -43,7 +43,7 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 	 */
 	private JTextField tf;
 
-	public FunctionArrayPanel(PTFunctionArray property) {
+	public FunctionArrayPanel(CFunctionArray property) {
 		super(property);
 	}
 
@@ -88,8 +88,8 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 	}
 
 	@Override
-	public PTFunctionArray getDescriptor() {
-		return (PTFunctionArray) super.getDescriptor();
+	public CFunctionArray getDescriptor() {
+		return (CFunctionArray) super.getDescriptor();
 	}
 
 	public int getDimensions() {
@@ -271,7 +271,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 			if (myFunctions != null) {
 				defaultFunction = myFunctions[i];
 			}
-			PTFunction function = new PTFunction("Function " + i,
+			CFunction function = new CFunction("Function " + i,
 					defaultFunction);
 
 			props[i] = function;

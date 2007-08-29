@@ -16,13 +16,13 @@ public class LongPanel extends ConfigParamInputPanel {
 
 	private JTextField tf;
 
-	public LongPanel(PTLong property) {
+	public LongPanel(CLong property) {
 		super(property);
 	}
 
 	@Override
-	public PTLong getDescriptor() {
-		return (PTLong) super.getDescriptor();
+	public CLong getDescriptor() {
+		return (CLong) super.getDescriptor();
 	}
 
 	@Override

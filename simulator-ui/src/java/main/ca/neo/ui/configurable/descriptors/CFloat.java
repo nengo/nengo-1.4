@@ -1,22 +1,26 @@
 package ca.neo.ui.configurable.descriptors;
 
+import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.ConfigParamInputPanel;
+
+
 /**
- * Config Descriptor for Longs
+ * Config Descriptor for Floats
  * 
  * @author Shu Wu
  * 
  */
-public class PTLong extends RangedConfigParam {
+public class CFloat extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
-	public PTLong(String name) {
+	public CFloat(String name) {
 		super(name);
 	}
 
 	@Override
-	public LongPanel createInputPanel() {
-		return new LongPanel(this);
+	public ConfigParamInputPanel createInputPanel() {
+		return new FloatPanel(this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -25,12 +29,12 @@ public class PTLong extends RangedConfigParam {
 		/*
 		 * Return the primitive type
 		 */
-		return long.class;
+		return float.class;
 	}
 
 	@Override
 	public String getTypeName() {
-		return "Long";
+		return "Float";
 	}
 
 }

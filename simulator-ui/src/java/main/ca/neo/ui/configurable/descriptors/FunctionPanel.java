@@ -93,7 +93,7 @@ public class FunctionPanel extends ConfigParamInputPanel {
 
 	@Override
 	public void initPanel() {
-		comboBox = new JComboBox(PTFunction.functions);
+		comboBox = new JComboBox(CFunction.functions);
 		selectedType = (ConfigurableFunction) comboBox.getSelectedItem();
 
 		comboBox.addItemListener(new ItemListener() {
@@ -135,12 +135,12 @@ public class FunctionPanel extends ConfigParamInputPanel {
 			/*
 			 * Updates the combo box to reflect the function type set
 			 */
-			for (int i = 0; i < PTFunction.functions.length; i++) {
+			for (int i = 0; i < CFunction.functions.length; i++) {
 
-				if ((PTFunction.functions[i].getFunctionType())
+				if ((CFunction.functions[i].getFunctionType())
 						.isInstance(function)) {
-					selectedType = PTFunction.functions[i];
-					comboBox.setSelectedItem(PTFunction.functions[i]);
+					selectedType = CFunction.functions[i];
+					comboBox.setSelectedItem(CFunction.functions[i]);
 
 				}
 			}

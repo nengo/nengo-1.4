@@ -5,7 +5,7 @@ import ca.neo.model.Node;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.descriptors.PTString;
+import ca.neo.ui.configurable.descriptors.CString;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
@@ -23,7 +23,7 @@ public class UINetwork extends UINodeContainer {
 
 	private static final String LAYOUT_MANAGER_KEY = "layout/manager";
 
-	private static final ConfigParamDescriptor pName = new PTString("Name");
+	private static final ConfigParamDescriptor pName = new CString("Name");
 
 	private static final long serialVersionUID = 1L;
 

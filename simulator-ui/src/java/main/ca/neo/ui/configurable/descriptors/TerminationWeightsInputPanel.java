@@ -40,7 +40,7 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 	 */
 	private JTextField tf;
 
-	public TerminationWeightsInputPanel(PTTerminationWeights property) {
+	public TerminationWeightsInputPanel(CTerminationWeights property) {
 		super(property);
 	}
 
@@ -152,8 +152,8 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 	}
 
 	@Override
-	public PTTerminationWeights getDescriptor() {
-		return (PTTerminationWeights) super.getDescriptor();
+	public CTerminationWeights getDescriptor() {
+		return (CTerminationWeights) super.getDescriptor();
 	}
 
 	@Override

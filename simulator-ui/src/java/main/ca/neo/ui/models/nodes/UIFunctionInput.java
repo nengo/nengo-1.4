@@ -9,8 +9,8 @@ import ca.neo.ui.actions.PlotFunctionAction;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.descriptors.PTFunctionArray;
-import ca.neo.ui.configurable.descriptors.PTString;
+import ca.neo.ui.configurable.descriptors.CFunctionArray;
+import ca.neo.ui.configurable.descriptors.CString;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -25,10 +25,10 @@ import ca.shu.ui.lib.util.PopupMenuBuilder;
  */
 public class UIFunctionInput extends UINeoNode {
 
-	private static ConfigParamDescriptor pFunctions = new PTFunctionArray(
+	private static ConfigParamDescriptor pFunctions = new CFunctionArray(
 			"Functions Generators");
 
-	private static ConfigParamDescriptor pName = new PTString("Name");
+	private static ConfigParamDescriptor pName = new CString("Name");
 
 	private static final long serialVersionUID = 1L;
 

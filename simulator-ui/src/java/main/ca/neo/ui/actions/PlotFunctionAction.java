@@ -7,8 +7,8 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.descriptors.PTFloat;
-import ca.neo.ui.configurable.descriptors.PTInt;
+import ca.neo.ui.configurable.descriptors.CFloat;
+import ca.neo.ui.configurable.descriptors.CInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -16,9 +16,9 @@ import ca.shu.ui.lib.actions.StandardAction;
 public class PlotFunctionAction extends StandardAction implements IConfigurable {
 	private static final long serialVersionUID = 1L;
 
-	static final ConfigParamDescriptor pEnd = new PTFloat("End");
-	static final ConfigParamDescriptor pIncrement = new PTFloat("Increment");
-	static final ConfigParamDescriptor pStart = new PTFloat("Start");
+	static final ConfigParamDescriptor pEnd = new CFloat("End");
+	static final ConfigParamDescriptor pIncrement = new CFloat("Increment");
+	static final ConfigParamDescriptor pStart = new CFloat("Start");
 	// static final PropDescriptor pTitle = new PTString("Title");
 	FunctionInput functionInput;
 	ConfigParamDescriptor pFunctionIndex;
@@ -34,7 +34,7 @@ public class PlotFunctionAction extends StandardAction implements IConfigurable 
 
 	@Override
 	protected void action() throws ActionException {
-		pFunctionIndex = new PTInt("Function index", 0, functionInput
+		pFunctionIndex = new CInt("Function index", 0, functionInput
 				.getFunctions().length - 1);
 
 		UserTemplateConfigurer config = new UserTemplateConfigurer(this);

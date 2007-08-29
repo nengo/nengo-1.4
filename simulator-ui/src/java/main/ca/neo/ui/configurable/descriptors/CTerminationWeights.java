@@ -8,7 +8,7 @@ import ca.neo.ui.configurable.ConfigParamDescriptor;
  * @author Shu Wu
  * 
  */
-public class PTTerminationWeights extends ConfigParamDescriptor {
+public class CTerminationWeights extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 	/**
@@ -16,7 +16,7 @@ public class PTTerminationWeights extends ConfigParamDescriptor {
 	 */
 	private final int ensembleDimensions;
 
-	public PTTerminationWeights(String name, int dimensions) {
+	public CTerminationWeights(String name, int dimensions) {
 		super(name);
 		this.ensembleDimensions = dimensions;
 

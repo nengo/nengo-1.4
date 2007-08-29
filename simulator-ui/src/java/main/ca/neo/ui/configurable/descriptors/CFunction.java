@@ -18,23 +18,23 @@ import ca.neo.ui.configurable.IConfigurable;
  * @author Shu Wu
  * 
  */
-public class PTFunction extends ConfigParamDescriptor {
+public class CFunction extends ConfigParamDescriptor {
 
 	private static final ConfigurableFunction constantFunction = new ConfigurableFunction(
 			ConstantFunction.class, "Constant Function",
-			new ConfigParamDescriptor[] { new PTInt("Dimension"),
-					new PTFloat("Value") });
+			new ConfigParamDescriptor[] { new CInt("Dimension"),
+					new CFloat("Value") });
 
 	private static final ConfigurableFunction fourierFunction = new ConfigurableFunction(
 			FourierFunction.class, "Fourier Function",
-			new ConfigParamDescriptor[] { new PTFloat("Fundamental"),
-					new PTFloat("Cutoff"), new PTFloat("RMS"),
-					new PTLong("Seed") });
+			new ConfigParamDescriptor[] { new CFloat("Fundamental"),
+					new CFloat("Cutoff"), new CFloat("RMS"),
+					new CLong("Seed") });
 
 	private static final ConfigurableFunction gaussianPDF = new ConfigurableFunction(
 			GaussianPDF.class, "Guassiand PDF", new ConfigParamDescriptor[] {
-					new PTFloat("Mean"), new PTFloat("Variance"),
-					new PTFloat("Peak") });
+					new CFloat("Mean"), new CFloat("Variance"),
+					new CFloat("Peak") });
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,11 +44,11 @@ public class PTFunction extends ConfigParamDescriptor {
 	public static final ConfigurableFunction[] functions = new ConfigurableFunction[] {
 			constantFunction, fourierFunction, gaussianPDF };
 
-	public PTFunction(String name) {
+	public CFunction(String name) {
 		super(name);
 	}
 
-	public PTFunction(String name, Object defaultValue) {
+	public CFunction(String name, Object defaultValue) {
 		super(name, defaultValue);
 	}
 

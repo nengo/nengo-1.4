@@ -9,11 +9,11 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
  * @author Shu Wu
  * 
  */
-public class PTString extends ConfigParamDescriptor {
+public class CString extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
-	public PTString(String name) {
+	public CString(String name) {
 		super(name);
 	}
 

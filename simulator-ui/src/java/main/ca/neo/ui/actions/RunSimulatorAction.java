@@ -6,7 +6,7 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.descriptors.PTFloat;
+import ca.neo.ui.configurable.descriptors.CFloat;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -89,11 +89,11 @@ public class RunSimulatorAction extends StandardAction {
  * 
  */
 class SimulatorConfig implements IConfigurable {
-	private static final ConfigParamDescriptor pEndTime = new PTFloat(
+	private static final ConfigParamDescriptor pEndTime = new CFloat(
 			"End time");
-	private static final ConfigParamDescriptor pStartTime = new PTFloat(
+	private static final ConfigParamDescriptor pStartTime = new CFloat(
 			"Start time");
-	private static final ConfigParamDescriptor pStepSize = new PTFloat(
+	private static final ConfigParamDescriptor pStepSize = new CFloat(
 			"Step size");
 
 	private static final ConfigParamDescriptor[] zProperties = { pStartTime,

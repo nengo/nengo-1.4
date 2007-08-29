@@ -5,10 +5,10 @@ import ca.neo.model.Termination;
 import ca.neo.model.nef.impl.DecodedTermination;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.descriptors.PTBoolean;
-import ca.neo.ui.configurable.descriptors.PTFloat;
-import ca.neo.ui.configurable.descriptors.PTString;
-import ca.neo.ui.configurable.descriptors.PTTerminationWeights;
+import ca.neo.ui.configurable.descriptors.CBoolean;
+import ca.neo.ui.configurable.descriptors.CFloat;
+import ca.neo.ui.configurable.descriptors.CString;
+import ca.neo.ui.configurable.descriptors.CTerminationWeights;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 
 /**
@@ -19,12 +19,12 @@ import ca.neo.ui.models.nodes.UINEFEnsemble;
  */
 public class UIDecodedTermination extends UITermination {
 
-	private static final ConfigParamDescriptor pIsModulatory = new PTBoolean(
+	private static final ConfigParamDescriptor pIsModulatory = new CBoolean(
 			"Is Modulatory");
 
-	private static final ConfigParamDescriptor pName = new PTString("Name");
+	private static final ConfigParamDescriptor pName = new CString("Name");
 
-	private static final ConfigParamDescriptor pTauPSC = new PTFloat("tauPSC");
+	private static final ConfigParamDescriptor pTauPSC = new CFloat("tauPSC");
 
 	private static final long serialVersionUID = 1L;
 
@@ -86,7 +86,7 @@ public class UIDecodedTermination extends UITermination {
 
 	@Override
 	public ConfigParamDescriptor[] getConfigSchema() {
-		pTransformMatrix = new PTTerminationWeights("Weights", ensembleProxy
+		pTransformMatrix = new CTerminationWeights("Weights", ensembleProxy
 				.getModel().getDimension());
 
 		ConfigParamDescriptor[] zProperties = { pName, pTransformMatrix,

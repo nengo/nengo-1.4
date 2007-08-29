@@ -11,8 +11,8 @@ import ca.neo.plot.Plotter;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.descriptors.PTInt;
-import ca.neo.ui.configurable.descriptors.PTString;
+import ca.neo.ui.configurable.descriptors.CInt;
+import ca.neo.ui.configurable.descriptors.CString;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
 import ca.neo.ui.models.nodes.widgets.UITermination;
@@ -34,14 +34,14 @@ import ca.shu.ui.lib.util.PopupMenuBuilder;
 public class UINEFEnsemble extends UIEnsemble {
 	private static final long serialVersionUID = 1L;
 
-	static final ConfigParamDescriptor pDim = new PTInt("Dimensions");
+	static final ConfigParamDescriptor pDim = new CInt("Dimensions");
 
-	static final ConfigParamDescriptor pName = new PTString("Name");
+	static final ConfigParamDescriptor pName = new CString("Name");
 
-	static final ConfigParamDescriptor pNumOfNeurons = new PTInt(
+	static final ConfigParamDescriptor pNumOfNeurons = new CInt(
 			"Number of Neurons");
 
-	static final ConfigParamDescriptor pStorageName = new PTString(
+	static final ConfigParamDescriptor pStorageName = new CString(
 			"Storage Name");
 
 	static final String typeName = "NEFEnsemble";

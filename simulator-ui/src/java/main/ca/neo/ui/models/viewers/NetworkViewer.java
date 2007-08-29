@@ -23,7 +23,7 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.descriptors.PTInt;
+import ca.neo.ui.configurable.descriptors.CInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.UIModels;
 import ca.neo.ui.models.UINeoNode;
@@ -617,9 +617,9 @@ public class NetworkViewer extends NodeViewer {
 class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	private static final long serialVersionUID = 1L;
-	static final ConfigParamDescriptor pHeight = new PTInt("Height");
+	static final ConfigParamDescriptor pHeight = new CInt("Height");
 
-	static final ConfigParamDescriptor pWidth = new PTInt("Width");
+	static final ConfigParamDescriptor pWidth = new CInt("Width");
 
 	static final ConfigParamDescriptor[] zProperties = { pWidth, pHeight };
 

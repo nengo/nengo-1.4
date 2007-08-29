@@ -15,13 +15,13 @@ public class IntegerPanel extends ConfigParamInputPanel {
 
 	private JTextField tf;
 
-	public IntegerPanel(PTInt property) {
+	public IntegerPanel(CInt property) {
 		super(property);
 	}
 
 	@Override
-	public PTInt getDescriptor() {
-		return (PTInt) super.getDescriptor();
+	public CInt getDescriptor() {
+		return (CInt) super.getDescriptor();
 	}
 
 	@Override

@@ -1,36 +1,35 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
 
 /**
- * Config Descriptor for an Array of functions
+ * Config Descriptor for Booleans
  * 
  * @author Shu Wu
  * 
  */
-public class PTFunctionArray extends ConfigParamDescriptor {
+public class CBoolean extends ConfigParamDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
-	public PTFunctionArray(String name) {
+	public CBoolean(String name) {
 		super(name);
 	}
 
 	@Override
 	public ConfigParamInputPanel createInputPanel() {
-		return new FunctionArrayPanel(this);
+		return new BooleanPanel(this);
 	}
 
 	@Override
-	public Class<Function[]> getTypeClass() {
-		return Function[].class;
+	public Class<Boolean> getTypeClass() {
+		return Boolean.class;
 	}
 
 	@Override
 	public String getTypeName() {
-		return "Functions";
+		return "Boolean";
 	}
 
 }
