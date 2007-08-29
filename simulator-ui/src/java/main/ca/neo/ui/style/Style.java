@@ -5,8 +5,17 @@ import java.awt.Font;
 
 import javax.swing.JComponent;
 
+/**
+ * Style constants used by NEO Graphics
+ * 
+ * @author Shu Wu
+ */
 public class Style {
 	public static final int ANIMATION_DROP_IN_WORLD_MS = 200;
+
+	/*
+	 * Colors
+	 */
 	public static final Color COLOR_BACKGROUND = Color.black;
 	public static final Color COLOR_BACKGROUND2 = Color.darkGray;
 
@@ -46,6 +55,9 @@ public class Style {
 	public static final Color COLOR_NOTIFICATION = Color.orange;
 	public static final Color COLOR_SELECTED = new Color(100, 149, 237);
 
+	/*
+	 * Fonts
+	 */
 	public static final Font FONT_BIG = new Font("Helvetica", Font.BOLD, 16);
 
 	public static final Font FONT_BOLD = new Font("Helvetica", Font.BOLD, 14);
@@ -54,9 +66,7 @@ public class Style {
 	public static final Font FONT_LARGE = new Font("Helvetica", Font.BOLD, 18);
 	public static final Font FONT_NORMAL = new Font("Helvetica", Font.PLAIN, 14);
 	public static final Font FONT_SMALL = new Font("Helvetica", Font.PLAIN, 10);
-	/*
-	 * Fonts
-	 */
+
 	public static final Font FONT_WINDOW_BUTTONS = new Font("sansserif",
 			Font.BOLD, 16);
 	public static final Font FONT_XLARGE = new Font("Helvetica", Font.BOLD, 22);

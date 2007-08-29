@@ -9,19 +9,23 @@ import javax.swing.filechooser.FileFilter;
 import ca.neo.ui.NeoGraphics;
 import ca.shu.ui.lib.util.UIEnvironment;
 
+/**
+ * File chooser used for NEO Model files.
+ * 
+ * @author Shu Wu
+ */
 public class NeoFileChooser {
 	private static final long serialVersionUID = 1L;
 
-	FileFilter allFileFilter, networkFileFilter, ensembleFileFilter;
+	private FileFilter allFileFilter, networkFileFilter, ensembleFileFilter;
 
-	JFileChooser fileChooser;
+	/**
+	 * Swing File Chooser component
+	 */
+	private JFileChooser fileChooser;
 
 	public NeoFileChooser() {
 		super();
-		init();
-	}
-
-	private void init() {
 		fileChooser = new JFileChooser();
 
 		allFileFilter = new AllNeoFiles();
@@ -34,31 +38,61 @@ public class NeoFileChooser {
 		fileChooser.setFileFilter(allFileFilter);
 	}
 
+	/**
+	 * @return Selected file
+	 */
 	public File getSelectedFile() {
 		return fileChooser.getSelectedFile();
 	}
 
+	/**
+	 * @param file
+	 *            File to select
+	 */
 	public void setSelectedFile(File file) {
 		fileChooser.setSelectedFile(file);
 	}
 
+	/**
+	 * Shows a dialog for opening files
+	 * 
+	 * @return value returned by the Swing File Chooser
+	 * @throws HeadlessException
+	 */
 	public int showOpenDialog() throws HeadlessException {
 		fileChooser.setFileFilter(allFileFilter);
 		return fileChooser.showOpenDialog(UIEnvironment.getInstance());
 	}
 
+	/**
+	 * Shows a dialog for saving ensembles
+	 * 
+	 * @return value returned by Swing File Chooser
+	 * @throws HeadlessException
+	 */
 	public int showSaveEnsembleDialog() throws HeadlessException {
 		fileChooser.setFileFilter(ensembleFileFilter);
 		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
 	}
 
+	/**
+	 * Shows a dialog for saving networks
+	 * 
+	 * @return value returned by Swing File Chooser
+	 * @throws HeadlessException
+	 */
 	public int showSaveNetworkDialog() throws HeadlessException {
 		fileChooser.setFileFilter(networkFileFilter);
 		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
 	}
 }
 
-class AllNeoFiles extends AbstractFileFilter {
+/**
+ * File filter which allows all NEO files
+ * 
+ * @author Shu Wu
+ */
+class AllNeoFiles extends FileExtensionFilter {
 
 	@Override
 	public boolean acceptExtension(String str) {
@@ -74,7 +108,12 @@ class AllNeoFiles extends AbstractFileFilter {
 
 }
 
-class EnsembleFileFilter extends AbstractFileFilter {
+/**
+ * File filter which only allows Ensemble files
+ * 
+ * @author Shu Wu
+ */
+class EnsembleFileFilter extends FileExtensionFilter {
 
 	@Override
 	public boolean acceptExtension(String str) {
@@ -88,7 +127,12 @@ class EnsembleFileFilter extends AbstractFileFilter {
 
 }
 
-class NetworkFileFilter extends AbstractFileFilter {
+/**
+ * File filter which only allows Network files
+ * 
+ * @author Shu Wu
+ */
+class NetworkFileFilter extends FileExtensionFilter {
 
 	@Override
 	public boolean acceptExtension(String str) {

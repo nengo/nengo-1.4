@@ -8,22 +8,20 @@ import ca.neo.examples.FuzzyLogicExample;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.models.nodes.UINetwork;
-import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.shu.ui.lib.objects.Window;
 
 /**
- * Just a quick check of memory leaks in Network Viewer
+ * Just a quick check for one type of memory leaks in Network Viewer.
  * 
  * @author Shu
- * 
  */
-public class MemoryTest {
-	static int i;
-	static NeoGraphics neoGraphics;
-	static NetworkViewer netView;
-	static final int NUM_OF_LOOPS = 500;
-	static Window window;
-	static Window[] windows;
+public class NetworkViewerMemoryTest {
+	private static int i;
+	private static NeoGraphics neoGraphics;
+//	private static NetworkViewer netView;
+	private static final int NUM_OF_LOOPS = 500;
+	private static Window window;
+//	private static Window[] windows;
 
 	public static long getApproximateUsedMemory() {
 		System.gc();
@@ -41,7 +39,7 @@ public class MemoryTest {
 		printMemoryUsed("Start");
 		neoGraphics = new NeoGraphics("Test");
 
-		windows = new Window[NUM_OF_LOOPS];
+//		Window windows = new Window[NUM_OF_LOOPS];
 		for (i = 0; i < NUM_OF_LOOPS; i++) {
 
 			try {

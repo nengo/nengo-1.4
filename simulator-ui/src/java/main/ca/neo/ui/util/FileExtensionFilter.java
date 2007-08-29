@@ -6,7 +6,12 @@ import javax.swing.filechooser.FileFilter;
 
 import ca.shu.ui.lib.util.Util;
 
-public abstract class AbstractFileFilter extends FileFilter {
+/**
+ * Filters files based on file extension.
+ * 
+ * @author Shu Wu
+ */
+public abstract class FileExtensionFilter extends FileFilter {
 
 	@Override
 	public boolean accept(File f) {
@@ -28,10 +33,10 @@ public abstract class AbstractFileFilter extends FileFilter {
 	}
 
 	/**
-	 * @param str
+	 * @param extension
 	 *            Extension
-	 * @return Whether to accept it
+	 * @return Whether this type of extension is accepted
 	 */
-	public abstract boolean acceptExtension(String str);
+	public abstract boolean acceptExtension(String extension);
 
 }

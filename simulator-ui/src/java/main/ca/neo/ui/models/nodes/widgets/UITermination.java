@@ -13,7 +13,6 @@ import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TitlePart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.util.NeoUtil;
 import ca.neo.util.Configuration;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -29,11 +28,20 @@ import ca.shu.ui.lib.util.Util;
  * UI Wrapper for a Termination
  * 
  * @author Shu Wu
- * 
  */
 public class UITermination extends Widget implements ILineAcceptor {
 
 	private static final long serialVersionUID = 1L;
+
+	private static String objToString(Object configValue) {
+
+		if (Util.isArray(configValue)) {
+			return Util.arrayToString(configValue);
+		} else {
+			return configValue.toString();
+		}
+
+	}
 
 	private LineEnd lineEnd;
 
@@ -89,8 +97,8 @@ public class UITermination extends Widget implements ILineAcceptor {
 		for (String element : configProperties) {
 			Object propertyValue = config.getProperty(element);
 
-			tooltips.addPart(new PropertyPart(element, NeoUtil
-					.objToString(propertyValue)));
+			tooltips.addPart(new PropertyPart(element,
+					objToString(propertyValue)));
 		}
 		return tooltips;
 	}
@@ -160,7 +168,6 @@ public class UITermination extends Widget implements ILineAcceptor {
 	 * Action for editing termination weights matrix
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class EditWeightsAction extends ReversableAction {
 		private static final long serialVersionUID = 1L;
@@ -197,7 +204,6 @@ public class UITermination extends Widget implements ILineAcceptor {
 	 * Action for removing attached connection from the termination
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class RemoveConnectionAction extends StandardAction {
 		private static final long serialVersionUID = 1L;
