@@ -34,7 +34,7 @@ public class DragHandler extends PDragEventHandler {
 		WorldObject wo = getDraggedWO();
 
 		wo.endDrag();
-		wo.popState(WorldObject.State.IN_DRAG);
+		// wo.popState(WorldObject.State.IN_DRAG);
 		wo.justDropped();
 
 		// if (wo instanceof IDragAndDroppable) {
@@ -75,7 +75,7 @@ public class DragHandler extends PDragEventHandler {
 
 			if (node instanceof WorldObject) {
 				WorldObject wo = (WorldObject) node;
-				if (wo.isDraggable()) {
+				if (wo.isSelectable()) {
 
 					super.startDrag(event);
 					setDraggedNode(wo);
@@ -93,8 +93,7 @@ public class DragHandler extends PDragEventHandler {
 					}
 					topLayerNode.moveToFront();
 
-					wo.startDrag();
-					wo.pushState(WorldObject.State.IN_DRAG);
+					// wo.startDrag();
 
 					return;
 				}

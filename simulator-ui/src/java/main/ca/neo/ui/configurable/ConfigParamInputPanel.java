@@ -7,7 +7,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 
 /**
  * Swing Input panel to be used to enter in the value for a ConfigParam

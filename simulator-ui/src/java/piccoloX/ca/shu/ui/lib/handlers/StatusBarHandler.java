@@ -30,7 +30,6 @@ public class StatusBarHandler extends PBasicInputEventHandler {
 
 	@Override
 	public void mouseMoved(PInputEvent event) {
-		// TODO Auto-generated method stub
 		super.mouseMoved(event);
 
 		UIEnvironment.getInstance().setStatusStr(getStatusStr(event));

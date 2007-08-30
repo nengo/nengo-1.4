@@ -74,8 +74,6 @@ public abstract class NodeViewer extends World implements NamedObject,
 
 		setStatusBarHandler(new ModelStatusBarHandler(this));
 
-		setFrameVisible(false);
-
 		setName(getModel().getName());
 
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");

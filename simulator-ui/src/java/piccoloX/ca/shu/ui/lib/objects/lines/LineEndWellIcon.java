@@ -3,7 +3,7 @@ package ca.shu.ui.lib.objects.lines;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PPaintContext;

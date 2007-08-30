@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
@@ -25,7 +25,7 @@ public class LineInIcon extends WorldObject {
 	public LineInIcon() {
 		super();
 		this.setBounds(0, 0, LINE_IN_WIDTH, LINE_IN_HEIGHT);
-		this.setDraggable(false);
+		this.setSelectable(false);
 
 	}
 

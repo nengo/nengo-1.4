@@ -1,6 +1,5 @@
-package ca.shu.ui.lib.actions;
+package ca.shu.ui.lib.exceptions;
 
-import ca.shu.ui.lib.exceptions.UIException;
 
 /**
  * Error in performing an action

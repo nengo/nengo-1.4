@@ -2,6 +2,8 @@ package ca.shu.ui.lib.handlers;
 
 import java.awt.event.InputEvent;
 
+import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.objects.widgets.MoveableFrame;
 import ca.shu.ui.lib.objects.widgets.TooltipWrapper;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
@@ -16,9 +18,13 @@ public class TooltipHandler extends MousePickHandler {
 	private TooltipWrapper keyboardTooltip;
 
 	private TooltipWrapper mouseOverTooltip;
+	MoveableFrame tooltipFrame;
 
-	public TooltipHandler(World parent) {
-		super(parent);
+	public TooltipHandler(World world) {
+		super(world);
+		tooltipFrame = new MoveableFrame(world);
+		tooltipFrame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
+
 	}
 
 	@Override
@@ -84,19 +90,21 @@ public class TooltipHandler extends MousePickHandler {
 
 	}
 
+	public static final String TOOLTIP_BORDER_ATTR = "tooltipBdr";
+
 	@Override
 	protected void nodePicked() {
 		WorldObject node = getPickedNode();
-		node.pushState(WorldObject.State.SELECTED);
+		tooltipFrame.setSelected(node);
 
 		mouseOverTooltip = getWorld().showTooltip(node);
 	}
 
 	@Override
 	protected void nodeUnPicked() {
-		WorldObject node = getPickedNode();
 
-		node.popState(WorldObject.State.SELECTED);
+		tooltipFrame.setSelected(null);
+
 		mouseOverTooltip.fadeAndDestroy();
 		mouseOverTooltip = null;
 
@@ -126,6 +134,7 @@ public class TooltipHandler extends MousePickHandler {
 
 			if (keyboardTooltip != null) {
 				keyboardTooltip.fadeAndDestroy();
+				keyboardTooltip = null;
 			}
 
 			if (keyboardFocusObject != null) {

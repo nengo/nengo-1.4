@@ -11,7 +11,7 @@ import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.ArrayList;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PPaintContext;
 

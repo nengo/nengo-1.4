@@ -27,9 +27,9 @@ public class LineEndWell extends WorldObject {
 		setBounds(getFullBounds());
 		// setChildrenPickable(false);
 
-		setDraggable(false);
+		setSelectable(false);
 
-		icon.setDraggable(false);
+		icon.setSelectable(false);
 		icon.addInputEventListener(new MouseHandler(this));
 
 	}

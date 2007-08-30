@@ -8,8 +8,8 @@ import javax.swing.JPopupMenu;
 
 import ca.neo.ui.models.tooltips.ModelTooltip;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -98,7 +98,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 		icon = newIcon;
 
 		addChild(icon);
-		icon.setDraggable(false);
+		icon.setSelectable(false);
 
 		iconPropertyChangeListener = new PropertyChangeListener() {
 

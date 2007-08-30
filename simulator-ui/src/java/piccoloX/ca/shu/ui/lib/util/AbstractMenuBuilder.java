@@ -2,7 +2,7 @@ package ca.shu.ui.lib.util;
 
 import javax.swing.JComponent;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.StandardAction;
 
 /**

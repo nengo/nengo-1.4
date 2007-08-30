@@ -34,7 +34,7 @@ public abstract class Button extends WorldObject {
 
 		this.addInputEventListener(new HandCursorHandler());
 		this.addInputEventListener(new ButtonHandler(this));
-		// buttonStateChanged();
+		setSelectable(false);
 	}
 
 	public abstract void buttonStateChanged();

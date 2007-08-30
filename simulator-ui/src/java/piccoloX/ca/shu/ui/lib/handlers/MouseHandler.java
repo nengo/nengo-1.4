@@ -5,7 +5,8 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
-import ca.shu.ui.lib.objects.widgets.MouseFollower;
+import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.objects.widgets.MoveableFrame;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
@@ -15,7 +16,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 
 public class MouseHandler extends PBasicInputEventHandler {
 
-	static MouseFollower frame = new MouseFollower();
+	MoveableFrame frame;
 
 	/*
 	 * Maximum distance that the mouse is allowed to drag before the handler
@@ -32,6 +33,8 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	public MouseHandler(World world) {
 		super();
+		frame = new MoveableFrame(world);
+		frame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
 		this.world = world;
 	}
 
@@ -59,20 +62,15 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	@Override
 	public void mouseMoved(PInputEvent event) {
-		// TODO Auto-generated method stub
-		super.mouseMoved(event);
 
 		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
 				Interactable.class);
 
-		if ((obj instanceof World)) {
-			frame.setObjToFollow(null);
-		} else if (obj instanceof WorldObject) {
-			frame.setObjToFollow((WorldObject) obj);
-
+		if (obj == null || !world.isAncestorOf((WorldObject) obj)) {
+			frame.setSelected(null);
 		} else {
-			System.out
-					.println("Unsupported Interactable object in MouseHandler");
+			frame.setSelected((WorldObject) obj);
+
 		}
 
 	}

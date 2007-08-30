@@ -67,6 +67,8 @@ public class Grid extends PLayer {
 		super();
 		this.gridPaint = gridPaint;
 		this.gridSpacing = gridSpacing;
+		setPickable(false);
+		setChildrenPickable(false);
 	}
 
 	@Override

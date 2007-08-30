@@ -63,12 +63,12 @@ public class ModelIcon extends WorldObject implements NamedObject,
 		addChild(label);
 
 		if (icon instanceof WorldObject) {
-			((WorldObject) icon).setDraggable(false);
+			((WorldObject) icon).setSelectable(false);
 		}
 
 		// parent.addPropertyChangeListener(PROPERTY_NAME, this);
 		parent.addPropertyChangeListener(UIModel.PROPERTY_MODEL, this);
-		setDraggable(false);
+		setSelectable(false);
 
 		/*
 		 * The bounds of this object matches those of the real icon

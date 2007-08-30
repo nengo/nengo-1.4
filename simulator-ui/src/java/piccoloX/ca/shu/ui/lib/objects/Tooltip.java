@@ -17,15 +17,15 @@ public abstract class Tooltip extends WorldObject {
 	public Tooltip() {
 		super();
 		buttons = new Vector<Button>();
-		this.setFrameVisible(false);
-		this.setDraggable(false);
+
+		this.setSelectable(false);
 
 		// this.addInputEventListener(new MouseDetector(this));
 		getLayoutManager().setLeftPadding(0);
 		getLayoutManager().setVerticalPadding(0);
 		buttonsNode = new WorldObject();
-		buttonsNode.setFrameVisible(false);
-		buttonsNode.setDraggable(false);
+
+		buttonsNode.setSelectable(false);
 
 		initButtons();
 

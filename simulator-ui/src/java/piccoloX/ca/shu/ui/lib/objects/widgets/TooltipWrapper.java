@@ -5,7 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.activities.Fader;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.WorldSky;
@@ -31,13 +31,13 @@ public class TooltipWrapper extends WorldObject implements
 
 		parent.addChild(this);
 
-		tooltip.setDraggable(false);
+		tooltip.setSelectable(false);
 		addToLayout(tooltip);
 		setPickable(false);
 		setChildrenPickable(false);
 		setPaint(Style.COLOR_BACKGROUND);
 
-		pushState(WorldObject.State.SELECTED);
+		addChild(new Border(this, Style.COLOR_TOOLTIP_BORDER));
 
 		setTransparency(0);
 

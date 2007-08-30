@@ -9,6 +9,8 @@ import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.ByteArrayOutputStream;
@@ -29,12 +31,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
-import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -51,9 +54,10 @@ import edu.umd.cs.piccolo.util.PUtil;
  * @author Shu Wu
  */
 public abstract class AppFrame extends JFrame {
-	public static final String TIPS = "<B>Keyboard Shortcuts</B><BR>"
-			+ "Hold down Ctrl key to view tooltips at any time"
-			+ "<BR><BR><B>Mouse Shortcuts</B><BR>"
+	public static final String TIPS = "<B>*** Keyboard Shortcuts ***</B><BR>"
+			+ "Press 'S' key to switch between Navigation and Selection Interaction modes<BR>"
+			+ "Hold down Ctrl key to view tooltips at any time<BR>"
+			+ "<BR><B>*** Mouse Shortcuts ***</B><BR>"
 			+ "Zooming: scroll the Mouse Wheel or Right Click and Drag";
 
 	/**
@@ -69,7 +73,8 @@ public abstract class AppFrame extends JFrame {
 
 	private UserPreferences preferences;
 
-	private JLabel statusBar;
+	private JLabel statusMessageLabel;
+	private JLabel taskMessagesLabel;
 
 	ReversableActionManager actionManager;
 
@@ -96,7 +101,7 @@ public abstract class AppFrame extends JFrame {
 		actionManager = new ReversableActionManager(this);
 		getContentPane().setLayout(new BorderLayout());
 		initMenu();
-		initStatusBar();
+		initStatusPanel();
 
 		// System.out.println("constructing WorldFrame");
 		graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -112,9 +117,11 @@ public abstract class AppFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		canvas = new GCanvas(this);
+		canvas = new GCanvas();
 		canvas.createWorld();
 		canvas.setFocusable(true);
+
+		setSelectionMode(false);
 
 		getContentPane().add(canvas);
 		canvas.requestFocus();
@@ -170,12 +177,12 @@ public abstract class AppFrame extends JFrame {
 
 	public void popTaskStatusStr(String str) {
 		taskStatusStrings.remove(str);
-		updateStatusBar();
+		updateTaskMessages();
 	}
 
 	public String pushTaskStatusStr(String str) {
 		taskStatusStrings.add(str);
-		updateStatusBar();
+		updateTaskMessages();
 		return str;
 	}
 
@@ -238,7 +245,8 @@ public abstract class AppFrame extends JFrame {
 	 */
 	public void setStatusStr(String text) {
 		statusStr = text;
-		updateStatusBar();
+		statusMessageLabel.setText(statusStr);
+
 	}
 
 	/**
@@ -273,20 +281,86 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	JLabel interactionModeLabel;
+
+	/**
+	 * @param enabled
+	 *            True if selection mode is enabled, False if navigation
+	 */
+	public void setSelectionMode(boolean enabled) {
+
+		selectionModeEnabled = enabled;
+		if (selectionModeEnabled) {
+			interactionModeLabel.setText("Selection Mode");
+		} else {
+			interactionModeLabel.setText("Navigation Mode");
+		}
+
+		for (World world : getCanvas().getWorlds()) {
+			world.setSelectionMode(selectionModeEnabled);
+		}
+	}
+
+	public boolean isSelectionMode() {
+		return selectionModeEnabled;
+	}
+
+	boolean selectionModeEnabled;
+
+	private JPanel statusPanel;
+
 	/*
 	 * Initializes the status bar
 	 */
-	private void initStatusBar() {
+	private void initStatusPanel() {
 
-		statusBar = new JLabel("welcome to NeoWorld");
-		statusBar.setOpaque(true);
-		statusBar.setBackground(Style.COLOR_BACKGROUND);
-		statusBar.setForeground(Style.COLOR_FOREGROUND);
-		statusBar.setBorder(new EtchedBorder());
+		statusMessageLabel = new JLabel("welcome to " + getAppName());
+		statusMessageLabel.setForeground(Style.COLOR_FOREGROUND);
+
+		taskMessagesLabel = new JLabel();
+		taskMessagesLabel.setForeground(Style.COLOR_FOREGROUND);
+
+		interactionModeLabel = new JLabel();
+		interactionModeLabel.addMouseListener(new MouseListener() {
+
+			public void mouseClicked(MouseEvent e) {
+				setSelectionMode(!isSelectionMode());
+			}
+
+			public void mouseEntered(MouseEvent e) {
+			}
+
+			public void mouseExited(MouseEvent e) {
+			}
+
+			public void mousePressed(MouseEvent e) {
+			}
+
+			public void mouseReleased(MouseEvent e) {
+			}
+
+		});
+		interactionModeLabel.setForeground(Style.COLOR_FOREGROUND);
+
+		statusPanel = new JPanel();
+		statusPanel.setLayout(new BorderLayout());
+
+		statusPanel.setBackground(Style.COLOR_BACKGROUND);
+		statusPanel.setBorder(new EtchedBorder());
+
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BorderLayout());
+		bottomPanel.setBackground(null);
+		bottomPanel.add(statusMessageLabel, BorderLayout.WEST);
+		bottomPanel.add(interactionModeLabel, BorderLayout.EAST);
+
+		statusPanel.add(taskMessagesLabel, BorderLayout.NORTH);
+		statusPanel.add(bottomPanel, BorderLayout.SOUTH);
 
 		Container c = super.getContentPane();
+		taskMessagesLabel.setVisible(false);
 
-		c.add(statusBar, BorderLayout.SOUTH);
+		c.add(statusPanel, BorderLayout.SOUTH);
 
 	}
 
@@ -411,22 +485,25 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
-	protected void updateStatusBar() {
+	protected void updateTaskMessages() {
 		StringBuilder strBuff = new StringBuilder("<HTML>");
 		if (taskStatusStrings.size() > 0) {
-			strBuff.append("*** Messages ***<BR>");
+			strBuff.append("- MESSAGES -<BR>");
 
-			Iterator<String> taskIt = taskStatusStrings.iterator();
-			while (taskIt.hasNext()) {
-				strBuff.append(taskIt.next() + "<BR>");
+			for (int i = taskStatusStrings.size() - 1; i >= 0; i--) {
+				strBuff.append(taskStatusStrings.get(i) + "<BR>");
 			}
+
 			strBuff.append("<BR>");
 
+			taskMessagesLabel.setVisible(true);
+		} else {
+			taskMessagesLabel.setVisible(false);
 		}
-		strBuff.append(statusStr);
+
 		strBuff.append("</HTML>");
 
-		statusBar.setText(strBuff.toString());
+		taskMessagesLabel.setText(strBuff.toString());
 	}
 
 	protected void updateWorldMenu() {
@@ -488,7 +565,6 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
-	 * 
 	 * @param object
 	 *            Object to be added to NeoGraphics
 	 * @return the object being added

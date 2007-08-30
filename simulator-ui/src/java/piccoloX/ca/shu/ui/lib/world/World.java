@@ -10,15 +10,15 @@ import java.util.Vector;
 
 import javax.swing.JPopupMenu;
 
-import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.handlers.DragHandler;
+import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.handlers.EventConsumer;
 import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.handlers.KeyboardFocusHandler;
 import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
+import ca.shu.ui.lib.handlers.SelectionHandler;
 import ca.shu.ui.lib.handlers.StatusBarHandler;
 import ca.shu.ui.lib.handlers.TooltipHandler;
 import ca.shu.ui.lib.objects.Window;
@@ -43,20 +43,16 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
  * Implementation of World. World holds World Objects and has navigation and
  * interaction handlers.
  * 
- * 
  * @author Shu Wu
- * 
  */
 public class World extends WorldObject implements Interactable,
 		PropertyChangeListener {
 
+	private static final double CLICK_ZOOM_PADDING = 100;
+
 	private static final long serialVersionUID = 1L;
 
-	static final double CLICK_ZOOM_PADDING = 100;
-
-	static final float TOOLTIP_TRANSPARENCY = 0.5f;
-
-	static boolean tooltipsVisible = true;
+	private static boolean tooltipsVisible = true;
 
 	public static boolean isTooltipsVisible() {
 		return tooltipsVisible;
@@ -67,9 +63,7 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
-	private final PInputEventListener dragHandler;
-
-	private final PInputEventListener eventConsumer;
+	// private final PInputEventListener dragHandler;
 
 	private final PInputEventListener mouseHandler;
 
@@ -77,30 +71,25 @@ public class World extends WorldObject implements Interactable,
 
 	private final PInputEventListener scrollZoomHandler;
 
+	private SelectionHandler selectionEventHandler;
+
+	private PBasicInputEventHandler statusBarHandler;
+
 	private final PInputEventListener tooltipHandler;
 
 	private final PZoomEventHandler zoomHandler;
 
-	double cameraX = 0;
+	private WorldGround ground;
 
-	double cameraY = 0;
+	private PLayer layer;
 
-	PNode gridLayer = null;
+	private boolean selectionModeEnabled;
 
-	WorldGround ground;
+	private WorldSky skyCamera;
 
-	PLayer layer;
+	private TooltipWrapper tooltipWrapper;
 
-	WorldSky skyCamera;
-
-	PBasicInputEventHandler statusBarHandler;
-
-	TooltipWrapper tooltipWrapper;
-
-	protected WorldGround createGround() {
-		return new WorldGround(this);
-
-	}
+	PLayer gridLayer;
 
 	public World(String name) {
 		super(name);
@@ -110,7 +99,7 @@ public class World extends WorldObject implements Interactable,
 		UIEnvironment.getInstance().getRoot().addChild(layer);
 
 		ground = createGround();
-		ground.setDraggable(false);
+		ground.setSelectable(false);
 		layer.addChild(ground);
 
 		skyCamera = new WorldSky(this);
@@ -123,10 +112,15 @@ public class World extends WorldObject implements Interactable,
 		panHandler = new PPanEventHandler();
 
 		tooltipHandler = new TooltipHandler(this);
-		dragHandler = new DragHandler();
+		// dragHandler = new DragHandler();
 		mouseHandler = new MouseHandler(this);
 		scrollZoomHandler = new ScrollZoomHandler();
-		eventConsumer = new EventConsumer();
+
+		selectionEventHandler = new SelectionHandler(this);
+		selectionEventHandler.setMarqueePaint(Style.COLOR_BORDER_SELECTED);
+		selectionEventHandler
+				.setMarqueeStrokePaint(Style.COLOR_BORDER_SELECTED);
+		selectionEventHandler.setMarqueePaintTransparency(0.1f);
 
 		/*
 		 * Add handlers
@@ -134,14 +128,17 @@ public class World extends WorldObject implements Interactable,
 		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
 		addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
 
-		skyCamera.addInputEventListener(zoomHandler);
-		skyCamera.addInputEventListener(panHandler);
+		skyCamera.addInputEventListener(new SwitchSelectionModeHandler());
+		// skyCamera.addInputEventListener(zoomHandler);
+		// skyCamera.addInputEventListener(panHandler);
+
 		skyCamera.addInputEventListener(new KeyboardFocusHandler());
+
 		skyCamera.addInputEventListener(tooltipHandler);
-		skyCamera.addInputEventListener(dragHandler);
+		// skyCamera.addInputEventListener(dragHandler);
 		skyCamera.addInputEventListener(mouseHandler);
 		skyCamera.addInputEventListener(scrollZoomHandler);
-		addInputEventListener(eventConsumer);
+		addInputEventListener(new EventConsumer());
 		setStatusBarHandler(new StatusBarHandler(this));
 
 		skyCamera.setPaint(Style.COLOR_BACKGROUND);
@@ -151,16 +148,44 @@ public class World extends WorldObject implements Interactable,
 		skyCamera.addLayer(layer);
 
 		addChild(skyCamera);
+		setSelectable(false);
 
-		setDraggable(false);
-		// PBoundsHandle.addBoundsHandlesTo(this);
 		setBounds(0, 0, 800, 600);
 
 		gridLayer = Grid.createGrid(getSky(), UIEnvironment.getInstance()
 				.getRoot(), Style.COLOR_DARKBORDER, 1500);
 
-		// System.out.println(this+"Finished
-		// Constructing MiniWorld");
+		UIEnvironment.getInstance().getCanvas().addWorld(this);
+
+		initSelectionMode();
+
+	}
+
+	protected PopupMenuBuilder constructMenu() {
+		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
+
+		menu.addAction(new ZoomOutAction());
+		MenuBuilder windowsMenu = menu.createSubMenu("Windows");
+		windowsMenu.addAction(new CloseAllWindows("Close all"));
+		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
+
+		return menu;
+
+	}
+
+	protected WorldGround createGround() {
+		return new WorldGround(this);
+
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+		UIEnvironment.getInstance().getCanvas().removeWorld(this);
+
+		gridLayer.removeFromParent();
+		layer.removeFromParent();
+
+		super.prepareForDestroy();
 	}
 
 	public void addWindow(Window window) {
@@ -266,6 +291,14 @@ public class World extends WorldObject implements Interactable,
 	// tooltipWrapper = null;
 	// }
 
+	@Override
+	public boolean isAncestorOf(PNode node) {
+		if (getGround().isAncestorOf(node))
+			return true;
+		else
+			return super.isAncestorOf(node);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -273,6 +306,10 @@ public class World extends WorldObject implements Interactable,
 	 */
 	public boolean isContextMenuEnabled() {
 		return true;
+	}
+
+	public boolean isSelectionMode() {
+		return selectionModeEnabled;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -288,14 +325,6 @@ public class World extends WorldObject implements Interactable,
 	public void propertyChange(PropertyChangeEvent arg0) {
 		getSky().setBounds(getBounds());
 		getGround().setBounds(getBounds());
-	}
-
-	@Override
-	public void removedFromWorld() {
-		// TODO Auto-generated method stub
-		super.removedFromWorld();
-
-		gridLayer.removeFromParent();
 	}
 
 	public void setBounds(int x, int y, final int w, final int h) {
@@ -315,6 +344,35 @@ public class World extends WorldObject implements Interactable,
 		// skyCamera.setViewOffset(position.getX() + xOffset, position.getY()
 		// + yOffset);
 
+	}
+
+	private void initSelectionMode() {
+		selectionModeEnabled = false;
+		skyCamera.addInputEventListener(zoomHandler);
+		skyCamera.addInputEventListener(panHandler);
+		skyCamera.addInputEventListener(selectionEventHandler);
+	}
+
+	/**
+	 * @param enabled
+	 *            True if selection mode is enabled, False if navigation
+	 */
+	public void setSelectionMode(boolean enabled) {
+		if (selectionModeEnabled != enabled) {
+			selectionModeEnabled = enabled;
+			skyCamera.removeInputEventListener(selectionEventHandler);
+			if (!selectionModeEnabled) {
+
+				initSelectionMode();
+			} else {
+
+				skyCamera.removeInputEventListener(zoomHandler);
+				skyCamera.removeInputEventListener(panHandler);
+				skyCamera.addInputEventListener(selectionEventHandler);
+			}
+
+			layoutChildren();
+		}
 	}
 
 	public void setStatusBarHandler(StatusBarHandler statusHandler) {
@@ -377,26 +435,6 @@ public class World extends WorldObject implements Interactable,
 		return zoomToBounds(bounds);
 	}
 
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
-
-		menu.addAction(new ZoomOutAction());
-		MenuBuilder windowsMenu = menu.createSubMenu("Windows");
-		windowsMenu.addAction(new CloseAllWindows("Close all"));
-		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
-
-		return menu;
-
-	}
-
-	@Override
-	protected void prepareForDestroy() {
-
-		layer.removeFromParent();
-
-		super.prepareForDestroy();
-	}
-
 	class CloseAllWindows extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -429,6 +467,20 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
+	class SwitchSelectionModeHandler extends PBasicInputEventHandler {
+
+		@Override
+		public void keyTyped(PInputEvent event) {
+			if (event.getKeyChar() == 's' || event.getKeyChar() == 'S') {
+				UIEnvironment.getInstance()
+						.setSelectionMode(!isSelectionMode());
+
+			}
+
+		}
+
+	}
+
 	class ZoomOutAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -443,5 +495,4 @@ public class World extends WorldObject implements Interactable,
 		}
 
 	}
-
 }

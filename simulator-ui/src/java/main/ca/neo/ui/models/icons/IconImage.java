@@ -6,7 +6,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.net.URL;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UIEnvironment;
 import edu.umd.cs.piccolo.nodes.PImage;
 import edu.umd.cs.piccolo.util.PBounds;

@@ -5,8 +5,8 @@ import java.util.Enumeration;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.viewers.NodeLayout;
 import ca.neo.ui.models.viewers.NodeViewer;
-import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.exceptions.ActionException;
 
 public abstract class LayoutAction extends ReversableAction {
 	private static final long serialVersionUID = 1L;

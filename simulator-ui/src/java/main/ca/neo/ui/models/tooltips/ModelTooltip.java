@@ -3,7 +3,7 @@ package ca.neo.ui.models.tooltips;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.objects.GText;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.nodes.PText;

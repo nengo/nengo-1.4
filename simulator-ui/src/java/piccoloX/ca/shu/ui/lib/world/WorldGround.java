@@ -15,10 +15,10 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 		super();
 		this.world = world;
 
-		this.setDraggable(false);
-		this.setFrameVisible(false);
-		// this.addInputEventListener(new NodeDragHandler());
+		this.setSelectable(false);
 
+		// this.addInputEventListener(new NodeDragHandler());
+		// setPickable(false);
 	}
 
 	public void addWorldObject(WorldObject node) {

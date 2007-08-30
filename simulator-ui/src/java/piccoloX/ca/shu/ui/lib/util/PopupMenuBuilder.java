@@ -7,7 +7,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.StandardAction;
 
 public class PopupMenuBuilder extends AbstractMenuBuilder {

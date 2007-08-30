@@ -20,8 +20,8 @@ public class GTooltip extends WorldObject {
 		getLayoutManager().setLeftPadding(0);
 		getLayoutManager().setVerticalPadding(0);
 
-		setDraggable(false);
-		setFrameVisible(false);
+		setSelectable(false);
+
 	}
 
 }

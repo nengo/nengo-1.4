@@ -1,4 +1,4 @@
-package ca.neo.ui.style;
+package ca.shu.ui.lib.Style;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -12,6 +12,12 @@ import javax.swing.JComponent;
  */
 public class Style {
 	public static final int ANIMATION_DROP_IN_WORLD_MS = 200;
+	/*
+	 * Named colors
+	 */
+	public static final Color COLOR_LIGHT_PURPLE = new Color(225, 180, 255);
+	public static final Color COLOR_LIGHT_BLUE = new Color(176, 220, 246);
+	public static final Color COLOR_LIGHT_GREEN = new Color(176, 246, 182);
 
 	/*
 	 * Colors
@@ -19,8 +25,8 @@ public class Style {
 	public static final Color COLOR_BACKGROUND = Color.black;
 	public static final Color COLOR_BACKGROUND2 = Color.darkGray;
 
-	public static final Color COLOR_BORDER_CONTEXT = Color.BLUE;
-	public static final Color COLOR_BORDER_DRAGGED = Color.red;
+	public static final Color COLOR_BORDER_SELECTED = Color.orange;
+
 	/*
 	 * Button Colors
 	 */
@@ -36,24 +42,21 @@ public class Style {
 	public static final Color COLOR_HIGH_SALIENCE = new Color(150, 0, 0);
 
 	/*
-	 * Named colors
-	 */
-	public static final Color COLOR_LIGHT_PURPLE = new Color(225, 180, 255);
-	public static final Color COLOR_LINE = new Color(176, 246, 182);
-
-	public static final Color COLOR_LINE_HIGHLIGHT = COLOR_BORDER_DRAGGED;
-
-	/*
 	 * Line Colors
 	 */
-	public static final Color COLOR_LINEEND = new Color(176, 246, 182);
+	public static final Color COLOR_LINE = COLOR_LIGHT_GREEN;
 
-	public static final Color COLOR_LINEENDWELL = new Color(176, 220, 246);
+	public static final Color COLOR_LINE_HIGHLIGHT = Color.red;
+
+	public static final Color COLOR_LINEEND = COLOR_LIGHT_GREEN;
+
+	public static final Color COLOR_LINEENDWELL = COLOR_LIGHT_BLUE;
 	public static final Color COLOR_LINEIN = new Color(0, 128, 0);
 
 	public static final Color COLOR_MENU_BACKGROUND = Color.black;
 	public static final Color COLOR_NOTIFICATION = Color.orange;
-	public static final Color COLOR_SELECTED = new Color(100, 149, 237);
+
+	public static final Color COLOR_TOOLTIP_BORDER = new Color(100, 149, 237);
 
 	/*
 	 * Fonts

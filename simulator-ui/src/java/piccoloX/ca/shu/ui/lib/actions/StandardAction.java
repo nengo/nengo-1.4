@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
 
+import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.util.Util;
 
 public abstract class StandardAction implements Serializable {

@@ -51,7 +51,7 @@ public class UIOrigin extends Widget {
 		icon.configureLabel(false);
 		setIcon(icon);
 
-		this.setDraggable(false);
+		this.setSelectable(false);
 
 	}
 

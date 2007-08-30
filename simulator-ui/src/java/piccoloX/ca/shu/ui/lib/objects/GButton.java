@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.objects;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 
 public class GButton extends GTextButton {
 

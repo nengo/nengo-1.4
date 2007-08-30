@@ -20,8 +20,8 @@ import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.util.Probe;
-import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
@@ -82,7 +82,7 @@ public class UISimulatorProbe extends UIModel {
 	private void init(UINeoNode nodeProxy) {
 		this.nodeAttachedTo = nodeProxy;
 
-		setDraggable(false);
+		setSelectable(false);
 		setName(getModel().getStateName());
 
 		/*

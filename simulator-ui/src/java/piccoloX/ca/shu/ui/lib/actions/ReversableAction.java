@@ -2,6 +2,7 @@ package ca.shu.ui.lib.actions;
 
 import javax.swing.SwingUtilities;
 
+import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 

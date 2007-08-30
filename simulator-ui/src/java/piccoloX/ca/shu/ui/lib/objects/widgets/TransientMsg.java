@@ -2,7 +2,7 @@ package ca.shu.ui.lib.objects.widgets;
 
 import java.awt.geom.Point2D;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.activities.Fader;
 import ca.shu.ui.lib.objects.GText;
 import edu.umd.cs.piccolo.activities.PActivity;

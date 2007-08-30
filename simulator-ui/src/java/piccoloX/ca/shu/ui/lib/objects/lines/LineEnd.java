@@ -6,9 +6,9 @@ import java.util.Iterator;
 
 import javax.swing.JPopupMenu;
 
-import ca.neo.ui.style.Style;
-import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.objects.GDirectedEdge;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
@@ -42,7 +42,7 @@ public class LineEnd extends WorldObject implements Interactable {
 		// setTangible(false);
 		edge.setPointerVisible(true);
 
-		setDraggable(true);
+		setSelectable(true);
 	}
 
 	/**

@@ -13,13 +13,8 @@ public abstract class MousePickHandler extends PBasicInputEventHandler {
 
 	private final Thread controlTimer;
 
-	// @Override
-	// public void keyboardFocusLost(PInputEvent event) {
-	// System.out.println("Keyboard focus gained: " + this);
-	// super.keyboardFocusLost(event);
-	// }
-
 	private boolean keepPickAlive = false;
+
 	private final Object pickChangeLock = new Object();
 
 	private final Object pickSetLock = new Object();

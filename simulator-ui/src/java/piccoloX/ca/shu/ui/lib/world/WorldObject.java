@@ -7,9 +7,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.ListIterator;
-import java.util.Stack;
 
-import ca.neo.ui.style.Style;
 import ca.shu.ui.lib.objects.LayoutManager;
 import ca.shu.ui.lib.objects.widgets.TransientMsg;
 import edu.umd.cs.piccolo.PNode;
@@ -35,7 +33,7 @@ public class WorldObject extends PNode implements NamedObject {
 
 	private boolean isDestroyed = false;
 
-	private boolean isDraggable = true;
+	private boolean isSelectable = true;
 
 	private boolean isFrameVisible = false;
 
@@ -44,8 +42,6 @@ public class WorldObject extends PNode implements NamedObject {
 	private String name;
 
 	private State state = State.DEFAULT;
-
-	private Stack<State> states;
 
 	private final TransformChangeListener transformChangeListener;
 
@@ -59,8 +55,8 @@ public class WorldObject extends PNode implements NamedObject {
 
 		this.name = name;
 
-		this.setFrameVisible(false);
-		this.setDraggable(true);
+//		this.setFrameVisible(false);
+		this.setSelectable(true);
 		transformChangeListener = new TransformChangeListener();
 		addPropertyChangeListener(PROPERTY_TRANSFORM, transformChangeListener);
 
@@ -134,9 +130,8 @@ public class WorldObject extends PNode implements NamedObject {
 			signalEdgesChanged();
 
 			/*
-			 * Removes this object from the world and finish any tasks
-			 * 
-			 * Convert to array to allow for concurrent modification
+			 * Removes this object from the world and finish any tasks Convert
+			 * to array to allow for concurrent modification
 			 */
 			Object[] children = getChildrenReference().toArray();
 
@@ -253,13 +248,8 @@ public class WorldObject extends PNode implements NamedObject {
 		return isDestroyed;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.world.WorldObject#isDraggable()
-	 */
-	public boolean isDraggable() {
-		return isDraggable;
+	public boolean isSelectable() {
+		return isSelectable;
 	}
 
 	/**
@@ -336,15 +326,6 @@ public class WorldObject extends PNode implements NamedObject {
 
 	}
 
-	public void popState(State state) {
-		states.remove(state);
-		if (states.size() == 0)
-			setState(State.DEFAULT);
-		else
-			setState(states.peek());
-
-	}
-
 	public void popupTransientMsg(String msg) {
 
 		TransientMsg msgObject = new TransientMsg(msg);
@@ -359,40 +340,31 @@ public class WorldObject extends PNode implements NamedObject {
 
 	}
 
-	public void pushState(State state) {
-		if (states == null) {
-			states = new Stack<State>();
-		}
-		states.push(state);
-
-		setState(state);
+	public void setSelectable(boolean isSelectable) {
+		this.isSelectable = isSelectable;
 	}
 
-	public void setDraggable(boolean isDraggable) {
-		this.isDraggable = isDraggable;
-	}
-
-	public void setFrameVisible(boolean isVisible) {
-		isFrameVisible = isVisible;
-
-		if (isVisible) {
-			if (frame == null) {
-				frame = PPath.createRectangle(0, 0, 100, 100);
-
-				frame.setPaint(Style.COLOR_BACKGROUND);
-				frame.setStrokePaint(Style.COLOR_FOREGROUND);
-
-				// frame.setPickable(true);
-
-				this.addChild(0, frame);
-			}
-		} else {
-			if (frame != null) {
-				frame.removeFromParent();
-				frame = null;
-			}
-		}
-	}
+//	public void setFrameVisible(boolean isVisible) {
+//		isFrameVisible = isVisible;
+//
+//		if (isVisible) {
+//			if (frame == null) {
+//				frame = PPath.createRectangle(0, 0, 100, 100);
+//
+//				frame.setPaint(Style.COLOR_BACKGROUND);
+//				frame.setStrokePaint(Style.COLOR_FOREGROUND);
+//
+//				// frame.setPickable(true);
+//
+//				this.addChild(0, frame);
+//			}
+//		} else {
+//			if (frame != null) {
+//				frame.removeFromParent();
+//				frame = null;
+//			}
+//		}
+//	}
 
 	/*
 	 * (non-Javadoc)
@@ -447,7 +419,8 @@ public class WorldObject extends PNode implements NamedObject {
 				}
 			}
 		}
-		signalEdgesChanged();
+		if (newParent != null)
+			signalEdgesChanged();
 	}
 
 	@Override
@@ -480,24 +453,6 @@ public class WorldObject extends PNode implements NamedObject {
 			}
 		}
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.world.WorldObject#startDrag()
-	 */
-	public void startDrag() {
-
-	}
-
-	private void setState(State newState) {
-		State oldState = state;
-		state = newState;
-
-		firePropertyChange(0, PROPERTY_STATE, oldState, newState);
-
-		stateChanged();
 	}
 
 	/**
@@ -619,20 +574,6 @@ public class WorldObject extends PNode implements NamedObject {
 	// }
 	//
 	// }
-
-	/**
-	 * Called when the Object's state has changed
-	 */
-	protected void stateChanged() {
-
-		if (state == State.DEFAULT) {
-			setBorder(null);
-		} else if (state == State.IN_DRAG) {
-			setBorder(Style.COLOR_BORDER_DRAGGED);
-		} else if (state == State.SELECTED) {
-			setBorder(Style.COLOR_SELECTED);
-		}
-	}
 
 	public static enum State {
 		DEFAULT, IN_DRAG, SELECTED

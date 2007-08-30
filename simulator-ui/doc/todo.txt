@@ -1,15 +1,17 @@
 *******************************************
  Done
 *******************************************
-Added option to sort nodes alphabetically/by type
-Cleaned up configuration code
-started documentation
-
-FunctionInputs can now be created with multiple dimensions
 
 *******************************************
  Pri 0 - doing next
 ******************************************* 
+Select multiple things at once
+	12. it would be nice to be able to select multiple things at once. this
+	could help for layout, but would also be nice if, e.g., a bunch of
+	neurons could be chosen and then 'add probe' could be used on all
+	at once (bryan will look into the last possiblity more)
+
+
 Make drag handler undooable
 	1. What operations are undoable? I think it would be nice if
 	    everything was (including object removals & layout changes). Would
@@ -19,11 +21,7 @@ Make drag handler undooable
 		There are some concerns about object removals. It's somewhat difficult because I have to remember not only the Node that was removed but the connections, probes, etc... that it had. Also, some networks take up quite a lot of memory, and keeping them in the undo history would keep them from removal. Perhaps I can make some types of object removals undooable?
  
 
-Select multiple things at once
-	12. it would be nice to be able to select multiple things at once. this
-	could help for layout, but would also be nice if, e.g., a bunch of
-	neurons could be chosen and then 'add probe' could be used on all
-	at once (bryan will look into the last possiblity more)
+
 
 
 show simulation progress in UI
@@ -137,6 +135,13 @@ talk about brain view
 *******************************************
  Previously Done
 *******************************************
+Added option to sort nodes alphabetically/by type
+Cleaned up configuration code
+started documentation
+
+FunctionInputs can now be created with multiple dimensions
+
+
 create help tips
 
 Move about text to application layer, add getAppName to application layer

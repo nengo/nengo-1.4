@@ -18,7 +18,7 @@ import javax.swing.border.EtchedBorder;
 
 import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.Util;
 
 /**

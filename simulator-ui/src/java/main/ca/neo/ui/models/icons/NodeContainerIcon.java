@@ -1,7 +1,7 @@
 package ca.neo.ui.models.icons;
 
 import ca.neo.ui.models.nodes.UINodeContainer;
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.objects.GText;
 import edu.umd.cs.piccolo.PNode;
 

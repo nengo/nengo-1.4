@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.objects;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.nodes.PPath;
 
@@ -19,12 +19,12 @@ public class GContextButton extends WorldObject {
 	public GContextButton(WorldObject node) {
 		super();
 		this.node = node;
-		this.setDraggable(false);
+		this.setSelectable(false);
 
 		circle = PPath.createEllipse(0, 0, 25, 25);
 		circle.setPaint(Style.COLOR_FOREGROUND);
 		// circle.setStrokePaint(Color.white);
-		this.setFrameVisible(false);
+
 		circle.setPickable(false);
 
 		addToLayout(circle);
@@ -50,7 +50,7 @@ public class GContextButton extends WorldObject {
 
 		@Override
 		protected void initButtons() {
-			this.setFrameVisible(false);
+
 			addButton(new GButton("Expand", new Runnable() {
 				public void run() {
 					node.animateToScale(node.getScale() * 1.5, 1000);

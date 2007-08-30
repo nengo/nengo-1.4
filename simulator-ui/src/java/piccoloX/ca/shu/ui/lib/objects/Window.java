@@ -6,15 +6,17 @@ import java.lang.ref.WeakReference;
 
 import javax.swing.JPopupMenu;
 
-import ca.neo.ui.style.Style;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.objects.widgets.AffinityHalo;
+import ca.shu.ui.lib.objects.widgets.Border;
 import ca.shu.ui.lib.objects.widgets.BoundsHandle;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolox.nodes.PClip;
 
 public class Window extends WorldObject implements Interactable {
 	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.MAXIMIZED;
@@ -43,8 +45,9 @@ public class Window extends WorldObject implements Interactable {
 
 	private WindowState restoreWindowState = WINDOW_STATE_DEFAULT;
 
+	private PClip clippingRectangle;
+
 	/**
-	 * 
 	 * @param attachTo
 	 *            parent Node to attach this Window to
 	 * @param contentNode
@@ -58,9 +61,15 @@ public class Window extends WorldObject implements Interactable {
 
 		menubar = new MenuBar(this);
 
-		setFrameVisible(true);
 		addChild(menubar);
-		addChild(contentNode);
+
+		clippingRectangle = new PClip();
+		addChild(clippingRectangle);
+
+		Border border = new Border(this, Style.COLOR_FOREGROUND);
+		addChild(border);
+
+		clippingRectangle.addChild(contentNode);
 
 		// addInputEventListener(eventConsumer);
 		windowStateChanged();
@@ -103,7 +112,6 @@ public class Window extends WorldObject implements Interactable {
 	}
 
 	/**
-	 * 
 	 * @return Node representing the contents of the Window
 	 */
 	public WorldObject getWindowContent() {
@@ -193,6 +201,9 @@ public class Window extends WorldObject implements Interactable {
 		contentNode.setBounds(0, 0, getWidth() - 4, getHeight() - 4
 				- MENU_BAR_HEIGHT);
 		contentNode.setOffset(2, 2 + MENU_BAR_HEIGHT);
+
+		clippingRectangle.setPathToRectangle((float) getX(), (float) getY(),
+				(float) getWidth(), (float) getHeight());
 		// }
 	}
 
@@ -219,6 +230,7 @@ public class Window extends WorldObject implements Interactable {
 			affinityHalo = null;
 		}
 
+		contentNode.destroy();
 		super.prepareForDestroy();
 	}
 
@@ -231,7 +243,7 @@ public class Window extends WorldObject implements Interactable {
 				affinityHalo = null;
 			}
 
-			setDraggable(false);
+			setSelectable(false);
 			UIEnvironment.getInstance().getWorld().addWindow(this);
 
 			maximizeBounds();
@@ -250,7 +262,7 @@ public class Window extends WorldObject implements Interactable {
 				setHeight(DEFAULT_HEIGHT);
 			}
 			if (attachToRef.get() != null) {
-				setDraggable(true);
+				setSelectable(true);
 
 				attachToRef.get().addChild(this);
 
