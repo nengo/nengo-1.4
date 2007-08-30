@@ -1,6 +1,5 @@
-package ca.shu.ui.lib.objects.widgets;
+package ca.shu.ui.lib.objects;
 
-import ca.shu.ui.lib.objects.Button;
 import ca.shu.ui.lib.util.Util;
 import edu.umd.cs.piccolo.nodes.PImage;
 

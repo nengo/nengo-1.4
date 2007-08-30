@@ -3,9 +3,11 @@ package ca.shu.ui.lib.handlers;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 
-/*
- * Consume all events in the network viewer window.
- * whose behavior is like an internal frame
+/**
+ * Handler which consumes all events passed to it. Used when an object wants to
+ * shield its events from the outside.
+ * 
+ * @author Shu Wu
  */
 public class EventConsumer implements PInputEventListener {
 	public void processEvent(PInputEvent aEvent, int type) {

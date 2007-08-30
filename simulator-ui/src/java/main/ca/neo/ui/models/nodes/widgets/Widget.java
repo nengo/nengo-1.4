@@ -3,8 +3,8 @@ package ca.neo.ui.models.nodes.widgets;
 import ca.neo.ui.models.UIModelConfigurable;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 
 /**

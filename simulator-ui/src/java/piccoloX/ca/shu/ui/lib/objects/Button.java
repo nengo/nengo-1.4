@@ -1,10 +1,10 @@
 package ca.shu.ui.lib.objects;
 
 import java.awt.Color;
+import java.awt.Cursor;
 
 import javax.swing.SwingUtilities;
 
-import ca.shu.ui.lib.handlers.HandCursorHandler;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -98,6 +98,31 @@ public abstract class Button extends WorldObject {
 
 }
 
+class HandCursorHandler extends PBasicInputEventHandler {
+	Cursor handCursor;
+
+	@Override
+	public void mouseEntered(PInputEvent event) {
+		super.mouseEntered(event);
+
+		if (handCursor == null) {
+			handCursor = new Cursor(Cursor.HAND_CURSOR);
+			event.getComponent().pushCursor(handCursor);
+		}
+	}
+
+	@Override
+	public void mouseExited(PInputEvent event) {
+		super.mouseExited(event);
+
+		if (handCursor != null) {
+			handCursor = null;
+			event.getComponent().popCursor();
+		}
+	}
+
+}
+
 class ButtonHandler extends PBasicInputEventHandler {
 	Button button;
 
@@ -108,7 +133,6 @@ class ButtonHandler extends PBasicInputEventHandler {
 
 	@Override
 	public void mouseClicked(PInputEvent event) {
-		// TODO Auto-generated method stub
 		super.mouseClicked(event);
 		button.doAction();
 
@@ -116,7 +140,6 @@ class ButtonHandler extends PBasicInputEventHandler {
 
 	@Override
 	public void mouseEntered(PInputEvent event) {
-		// TODO Auto-generated method stub
 		super.mouseEntered(event);
 		button.setButtonState(GTextButton.ButtonState.HIGHLIGHT);
 

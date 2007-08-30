@@ -1,41 +1,73 @@
 package ca.shu.ui.lib.handlers;
 
+import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.widgets.MoveableFrame;
+import ca.shu.ui.lib.objects.MoveableFrame;
+import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
+/**
+ * Handles mouse events. Passes double click and mouse context button events to
+ * World Objects. Displays a frame around interactable objects as the mouse
+ * moves.
+ * 
+ * @author Shu Wu
+ */
 public class MouseHandler extends PBasicInputEventHandler {
 
-	MoveableFrame frame;
+	/**
+	 * Hand cursor
+	 */
+	private static final Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
 
-	/*
+	/**
 	 * Maximum distance that the mouse is allowed to drag before the handler
 	 * gives up on the context menu
 	 */
-	static final double MAX_CONTEXT_MENU_DRAG_DISTANCE = 20;
+	private static final double MAX_CONTEXT_MENU_DRAG_DISTANCE = 20;
 
-	int mouseButtonPressed = -1;
+	private MoveableFrame frame;
 
-	Point2D mouseCanvasPositionPressed;
+	private boolean handCursorShown = false;
 
-	Interactable objPressed;
-	World world;
+	private Interactable interactableObj;
+
+	private int mouseButtonPressed = -1;
+
+	private Point2D mouseCanvasPositionPressed;
+
+	private World world;
 
 	public MouseHandler(World world) {
 		super();
 		frame = new MoveableFrame(world);
 		frame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
 		this.world = world;
+	}
+
+	/**
+	 * @return Interactable object
+	 */
+	private Interactable getInteractableFromEvent(PInputEvent event) {
+		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
+				Interactable.class);
+
+		if (obj == null || !world.isAncestorOf((WorldObject) obj)) {
+			return null;
+		} else {
+			return obj;
+		}
 	}
 
 	@Override
@@ -63,12 +95,25 @@ public class MouseHandler extends PBasicInputEventHandler {
 	@Override
 	public void mouseMoved(PInputEvent event) {
 
-		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
-				Interactable.class);
+		Interactable obj = getInteractableFromEvent(event);
 
-		if (obj == null || !world.isAncestorOf((WorldObject) obj)) {
+		/*
+		 * Show cursor and frame around interactable objects NOTE: Do not show
+		 * cursor and frame around Windows or Worlds
+		 */
+		if (obj == null || (obj instanceof Window) || (obj instanceof World)) {
+			if (handCursorShown) {
+				handCursorShown = false;
+				event.getComponent().popCursor();
+			}
+
 			frame.setSelected(null);
 		} else {
+			if (!handCursorShown) {
+				handCursorShown = true;
+				event.getComponent().pushCursor(HAND_CURSOR);
+			}
+
 			frame.setSelected((WorldObject) obj);
 
 		}
@@ -77,36 +122,33 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	@Override
 	public void mousePressed(PInputEvent event) {
-		// TODO Auto-generated method stub
 		super.mousePressed(event);
 
 		if (event.getButton() == MouseEvent.BUTTON3) {
 			mouseCanvasPositionPressed = event.getCanvasPosition();
 
 			mouseButtonPressed = event.getButton();
-			objPressed = (Interactable) Util.getNodeFromPickPath(event,
-					Interactable.class);
+			interactableObj = getInteractableFromEvent(event);
 		} else {
 			mouseButtonPressed = -1;
-			objPressed = null;
+			interactableObj = null;
 		}
 
 	}
 
 	@Override
 	public void mouseReleased(PInputEvent event) {
-		// TODO Auto-generated method stub
 		super.mouseReleased(event);
 
-		if ((objPressed != null)
+		if ((interactableObj != null)
 				&& (mouseCanvasPositionPressed.distance(event
 						.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)
 				&& (mouseButtonPressed == event.getButton())
-				&& (objPressed == (Interactable) Util.getNodeFromPickPath(
+				&& (interactableObj == (Interactable) Util.getNodeFromPickPath(
 						event, Interactable.class))) {
 
-			if (objPressed.isContextMenuEnabled()) {
-				JPopupMenu menu = objPressed.showContextMenu(event);
+			if (interactableObj.isContextMenuEnabled()) {
+				JPopupMenu menu = interactableObj.showContextMenu(event);
 
 				if (menu != null) {
 					menu.setVisible(true);

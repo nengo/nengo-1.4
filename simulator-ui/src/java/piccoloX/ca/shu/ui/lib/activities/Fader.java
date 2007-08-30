@@ -3,26 +3,31 @@ package ca.shu.ui.lib.activities;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
+/**
+ * Activity which gradually changes the transparency of an node
+ * 
+ * @author Shu Wu
+ */
 public class Fader extends PInterpolatingActivity {
 
-	PNode node;
+	private PNode node;
 
-	float startingTransparency;
+	private float startingTransparency;
 
-	float targetTransparency;
+	private float targetTransparency;
 
-	public Fader(PNode node, long duration, float targetTransparency) {
-		this(node, duration, 25, targetTransparency);
-	}
-
-	public Fader(PNode node, long duration, long stepRate,
-			float targetTransparency) {
-		super(duration, stepRate);
-		// TODO Auto-generated constructor stub
-		this.node = node;
-
-		this.targetTransparency = targetTransparency;
-
+	/**
+	 * @param target
+	 *            Node target
+	 * @param duration
+	 *            Duration of the activity
+	 * @param finalOpacity
+	 *            Transparency target
+	 */
+	public Fader(PNode target, long duration, float finalOpacity) {
+		super(duration, 25);
+		this.node = target;
+		this.targetTransparency = finalOpacity;
 	}
 
 	@Override

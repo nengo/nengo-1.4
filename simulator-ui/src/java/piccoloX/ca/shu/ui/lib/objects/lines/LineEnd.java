@@ -7,11 +7,11 @@ import java.util.Iterator;
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.ActionException;
-import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.objects.GDirectedEdge;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;

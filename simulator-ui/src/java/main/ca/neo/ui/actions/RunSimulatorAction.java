@@ -8,8 +8,8 @@ import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.descriptors.CFloat;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.Util;
 
@@ -48,7 +48,7 @@ public class RunSimulatorAction extends StandardAction {
 			config.configureAndWait();
 			(new RunSimulatorActivity(simulatorConfig)).startThread();
 		} catch (ConfigException e) {
-			e.defaultHandledBehavior();
+			e.defaultHandleBehavior();
 
 			throw new ActionException("Simulator configuration not complete",
 					false);

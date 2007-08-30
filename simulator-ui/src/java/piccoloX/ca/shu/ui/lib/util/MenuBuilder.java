@@ -23,7 +23,7 @@ public class MenuBuilder extends AbstractMenuBuilder {
 
 	@Override
 	public void addAction(StandardAction action) {
-		JMenuItem item = new JMenuItem(action.getSwingAction());
+		JMenuItem item = new JMenuItem(action.toSwingAction());
 		style(item);
 		menu.add(item);
 	}

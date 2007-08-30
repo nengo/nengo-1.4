@@ -1,8 +1,7 @@
-package ca.shu.ui.lib.handlers;
+package ca.shu.ui.lib.world;
 
 import javax.swing.JPopupMenu;
 
-import ca.shu.ui.lib.world.INamedObject;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**

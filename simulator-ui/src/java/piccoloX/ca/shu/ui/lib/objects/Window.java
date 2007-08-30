@@ -7,11 +7,8 @@ import java.lang.ref.WeakReference;
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.handlers.Interactable;
-import ca.shu.ui.lib.objects.widgets.AffinityHalo;
-import ca.shu.ui.lib.objects.widgets.Border;
-import ca.shu.ui.lib.objects.widgets.BoundsHandle;
 import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.nodes.PPath;

@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.objects.widgets;
+package ca.shu.ui.lib.objects;
 
 import java.awt.AlphaComposite;
 import java.awt.Composite;

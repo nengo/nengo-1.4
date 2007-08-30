@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import ca.shu.ui.lib.objects.widgets.MoveableFrame;
+import ca.shu.ui.lib.objects.MoveableFrame;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldGround;
 import ca.shu.ui.lib.world.WorldObject;

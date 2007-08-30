@@ -7,22 +7,25 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
 
-import ca.shu.ui.lib.exceptions.ActionException;
-import ca.shu.ui.lib.util.Util;
 
+/**
+ * A standard non-reversable action
+ * 
+ * @author Shu Wu
+ */
 public abstract class StandardAction implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	boolean actionCompleted = false;
+	private boolean actionCompleted = false;
 
-	String actionName;
+	private String actionName;
 
-	String description;
-	boolean isEnabled = true;
+	private String description;
+
+	private boolean isEnabled = true;
 
 	/**
-	 * 
 	 * @param description
 	 *            Description of the action
 	 */
@@ -32,7 +35,6 @@ public abstract class StandardAction implements Serializable {
 	}
 
 	/**
-	 * 
 	 * @param description
 	 *            Description of the action
 	 * @param actionName
@@ -44,10 +46,9 @@ public abstract class StandardAction implements Serializable {
 		this.actionName = actionName;
 	}
 
-	public boolean canBeUndone() {
-		return false;
-	}
-
+	/**
+	 * Does the action
+	 */
 	public void doAction() {
 
 		try {
@@ -55,10 +56,13 @@ public abstract class StandardAction implements Serializable {
 			postAction();
 			actionCompleted = true;
 		} catch (ActionException e) {
-			processActionException(e);
+			e.defaultHandleBehavior();
 		}
 	}
 
+	/**
+	 * Does the action layer, in the Swing event thread
+	 */
 	public void doActionLater() {
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -68,7 +72,10 @@ public abstract class StandardAction implements Serializable {
 		});
 	}
 
-	public Action getSwingAction() {
+	/**
+	 * @return Swing-type action, which can be used in Swing components
+	 */
+	public Action toSwingAction() {
 		SwingAction action;
 		if (getActionName() != null) {
 			action = new SwingAction(getActionName());
@@ -82,45 +89,62 @@ public abstract class StandardAction implements Serializable {
 		return action;
 	}
 
+	/**
+	 * @return Whether this action is enabled
+	 */
 	public boolean isEnabled() {
 		return isEnabled;
 	}
 
+	/**
+	 * @param isEnabled
+	 *            True, if this action is enabled
+	 */
 	public void setEnabled(boolean isEnabled) {
 		this.isEnabled = isEnabled;
 	}
 
 	/**
+	 * Does the work
 	 * 
 	 * @return Whether the action was successful
 	 */
 	protected abstract void action() throws ActionException;
 
+	/**
+	 * @return Name of the action
+	 */
 	protected String getActionName() {
 		return actionName;
 	}
 
+	/**
+	 * @return Description of the action.
+	 */
 	protected String getDescription() {
 		return description;
 	}
 
+	/**
+	 * @return Whether the action succesffully completed
+	 */
 	protected boolean isActionCompleted() {
 		return actionCompleted;
 	}
 
+	/**
+	 * An subclass may put something here to do after an action has completed
+	 * successfully
+	 */
 	protected void postAction() {
 
 	}
 
-	protected void processActionException(ActionException e) {
-		if (e.showWarning()) {
-			System.out.println("Action Exception: " + e.toString());
-			Util.UserWarning(e.getMessage());
-
-		} else
-			System.out.println("Action Exception: " + e.toString());
-	}
-
+	/**
+	 * Action which can be used by swing components
+	 * 
+	 * @author Shu Wu
+	 */
 	class SwingAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 

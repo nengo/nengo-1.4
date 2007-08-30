@@ -16,12 +16,12 @@ import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UINodeContainer;
-import ca.shu.ui.lib.handlers.Interactable;
-import ca.shu.ui.lib.handlers.StatusBarHandler;
+import ca.shu.ui.lib.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
@@ -418,15 +418,14 @@ public abstract class NodeViewer extends World implements Interactable,
  * 
  * @author Shu Wu
  */
-class ModelStatusBarHandler extends StatusBarHandler {
+class ModelStatusBarHandler extends AbstractStatusHandler {
 
 	public ModelStatusBarHandler(World world) {
 		super(world);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public String getStatusStr(PInputEvent event) {
+	protected String getStatusMessage(PInputEvent event) {
 		UIModel wo = (UIModel) Util.getNodeFromPickPath(event, UIModel.class);
 
 		StringBuilder statuStr = new StringBuilder(getWorld().getName() + " | ");

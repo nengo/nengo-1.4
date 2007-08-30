@@ -6,8 +6,8 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.exceptions.ActionException;
 
 /**
  * Creates a new NEO model
@@ -100,7 +100,7 @@ public class CreateModelAction extends ReversableAction {
 						});
 					} catch (ConfigException e) {
 
-						e.defaultHandledBehavior();
+						e.defaultHandleBehavior();
 						nodeProxy.destroy();
 					}
 

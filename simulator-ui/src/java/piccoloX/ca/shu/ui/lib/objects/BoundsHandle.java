@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.objects.widgets;
+package ca.shu.ui.lib.objects;
 
 /*
  * Copyright (c) 2002-@year@, University of Maryland

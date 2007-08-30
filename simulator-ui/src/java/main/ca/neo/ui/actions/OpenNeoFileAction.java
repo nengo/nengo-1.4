@@ -16,8 +16,8 @@ import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.objects.widgets.TrackedActivity;
 import ca.shu.ui.lib.util.Util;
 

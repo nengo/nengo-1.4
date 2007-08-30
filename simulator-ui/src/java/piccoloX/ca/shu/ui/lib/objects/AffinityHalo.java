@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.objects.widgets;
+package ca.shu.ui.lib.objects;
 
 import java.awt.AlphaComposite;
 import java.awt.Composite;
@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.GDirectedEdge;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PPaintContext;
 

@@ -75,7 +75,7 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 			try {
 				config.configureAndWait();
 			} catch (ConfigException e) {
-				e.defaultHandledBehavior();
+				e.defaultHandleBehavior();
 			}
 
 			setValue(configurableFunctions.getFunctions());

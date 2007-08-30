@@ -7,7 +7,6 @@ import ca.shu.ui.lib.util.Util;
  * Exception to be thrown is if there is an error during Configuration
  * 
  * @author Shu Wu
- * 
  */
 public class ConfigException extends UIException {
 
@@ -21,10 +20,8 @@ public class ConfigException extends UIException {
 		super(message);
 	}
 
-	/**
-	 * Default thing to do to handle the exception
-	 */
-	public void defaultHandledBehavior() {
+	@Override
+	public void defaultHandleBehavior() {
 		Util.UserWarning("Could not complete configuration: " + getMessage());
 	}
 

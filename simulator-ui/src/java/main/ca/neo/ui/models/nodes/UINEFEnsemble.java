@@ -18,10 +18,10 @@ import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
@@ -148,7 +148,7 @@ public class UINEFEnsemble extends UIEnsemble {
 			return termUI;
 
 		} catch (ConfigException e) {
-			e.defaultHandledBehavior();
+			e.defaultHandleBehavior();
 		}
 
 		return null;

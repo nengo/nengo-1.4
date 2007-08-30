@@ -1,5 +1,10 @@
 package ca.shu.ui.lib.exceptions;
 
+/**
+ * Exception thrown by User Interface processes.
+ * 
+ * @author Shu Wu
+ */
 public class UIException extends Exception {
 
 	private static final long serialVersionUID = 1L;
@@ -18,6 +23,13 @@ public class UIException extends Exception {
 
 	public UIException(Throwable arg0) {
 		super(arg0);
+	}
+
+	/**
+	 * Default way to handle this exception
+	 */
+	public void defaultHandleBehavior() {
+		printStackTrace();
 	}
 
 }

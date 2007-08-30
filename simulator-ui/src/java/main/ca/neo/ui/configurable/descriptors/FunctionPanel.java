@@ -76,7 +76,7 @@ public class FunctionPanel extends ConfigParamInputPanel {
 			try {
 				config.configureAndWait();
 			} catch (ConfigException e) {
-				e.defaultHandledBehavior();
+				e.defaultHandleBehavior();
 			}
 
 		} else {

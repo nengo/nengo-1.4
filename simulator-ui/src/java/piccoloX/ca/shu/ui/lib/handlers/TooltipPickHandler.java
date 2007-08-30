@@ -3,14 +3,20 @@ package ca.shu.ui.lib.handlers;
 import java.awt.event.InputEvent;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.widgets.MoveableFrame;
-import ca.shu.ui.lib.objects.widgets.TooltipWrapper;
+import ca.shu.ui.lib.objects.MoveableFrame;
+import ca.shu.ui.lib.objects.TooltipWrapper;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public class TooltipHandler extends MousePickHandler {
+/**
+ * Picks objects in which to show tooltips for. Handles both both and keyboard
+ * events.
+ * 
+ * @author Shu Wu
+ */
+public class TooltipPickHandler extends AbstractPickHandler {
 	private WorldObject controls;
 
 	private WorldObject keyboardFocusObject;
@@ -20,7 +26,7 @@ public class TooltipHandler extends MousePickHandler {
 	private TooltipWrapper mouseOverTooltip;
 	MoveableFrame tooltipFrame;
 
-	public TooltipHandler(World world) {
+	public TooltipPickHandler(World world) {
 		super(world);
 		tooltipFrame = new MoveableFrame(world);
 		tooltipFrame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);

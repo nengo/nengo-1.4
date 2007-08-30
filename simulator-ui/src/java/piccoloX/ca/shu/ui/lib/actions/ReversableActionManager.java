@@ -5,16 +5,36 @@ import java.util.Vector;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.AppFrame;
 
+/**
+ * Manages reversable actions
+ * 
+ * @author Shu Wu
+ */
 public class ReversableActionManager {
 
+	/**
+	 * Max number of undo steps to reference
+	 */
 	static final int MAX_NUM_OF_UNDO_ACTIONS = 5;
 
-	int numOfUndoSteps = 0;
+	/**
+	 * Number of undo steps that have been taken
+	 */
+	private int undoStepCount = 0;
 
-	AppFrame parent;
+	private AppFrame parent;
 
-	Vector<ReversableAction> reversableActions;
+	/**
+	 * A collection of reversable actions
+	 */
+	private Vector<ReversableAction> reversableActions;
 
+	/**
+	 * Create a new reversable action manager
+	 * 
+	 * @param parent
+	 *            Application parent of this manager
+	 */
 	public ReversableActionManager(AppFrame parent) {
 		super();
 		reversableActions = new Vector<ReversableAction>(
@@ -22,12 +42,16 @@ public class ReversableActionManager {
 		this.parent = parent;
 	}
 
+	/**
+	 * @param action
+	 *            Action to add
+	 */
 	public void addReversableAction(ReversableAction action) {
 		reversableActions.add(action);
 
-		while (numOfUndoSteps > 0) {
+		while (undoStepCount > 0) {
 			reversableActions.remove(reversableActions.size() - 1);
-			numOfUndoSteps--;
+			undoStepCount--;
 		}
 
 		if (reversableActions.size() > MAX_NUM_OF_UNDO_ACTIONS) {
@@ -37,59 +61,77 @@ public class ReversableActionManager {
 		updateParent();
 	}
 
+	/**
+	 * @return True, if an action can be redone
+	 */
 	public boolean canRedo() {
-		if (numOfUndoSteps > 0) {
+		if (undoStepCount > 0) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
+	/**
+	 * @return True, if an action can be undone
+	 */
 	public boolean canUndo() {
-		if ((reversableActions.size() - numOfUndoSteps) > 0)
+		if ((reversableActions.size() - undoStepCount) > 0)
 			return true;
 		else
 			return false;
 
 	}
 
+	/**
+	 * @return Description of the action that can be redone
+	 */
 	public String getRedoActionDescription() {
 		if (canRedo()) {
 			return reversableActions.get(
-					reversableActions.size() - numOfUndoSteps).getDescription();
+					reversableActions.size() - undoStepCount).getDescription();
 		} else {
 			return "none";
 		}
 	}
 
+	/**
+	 * @return Description of the action that can be undone
+	 */
 	public String getUndoActionDescription() {
 		if (canUndo()) {
 			return reversableActions.get(
-					reversableActions.size() - 1 - numOfUndoSteps)
+					reversableActions.size() - 1 - undoStepCount)
 					.getDescription();
 		} else {
 			return "none";
 		}
 	}
 
+	/**
+	 * Redo the focused action
+	 */
 	public void redoAction() {
 		ReversableAction action = reversableActions.get(reversableActions
 				.size()
-				- numOfUndoSteps);
+				- undoStepCount);
 
-		numOfUndoSteps--;
+		undoStepCount--;
 
 		action.doActionLater();
 		updateParent();
 	}
 
+	/**
+	 * Undo the focused action
+	 */
 	public void undoAction() {
 		if (canUndo()) {
 
 			ReversableAction action = reversableActions.get(reversableActions
 					.size()
-					- 1 - numOfUndoSteps);
-			numOfUndoSteps++;
+					- 1 - undoStepCount);
+			undoStepCount++;
 			action.undoAction();
 		} else {
 			Util.UserError("Cannot undo anymore steps");
@@ -98,7 +140,10 @@ public class ReversableActionManager {
 		updateParent();
 	}
 
-	public void updateParent() {
+	/**
+	 * Updates the application parent that reversable actions have changed
+	 */
+	private void updateParent() {
 		parent.reversableActionsUpdated();
 	}
 }

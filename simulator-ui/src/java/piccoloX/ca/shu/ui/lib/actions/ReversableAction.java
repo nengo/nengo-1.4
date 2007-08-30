@@ -2,15 +2,13 @@ package ca.shu.ui.lib.actions;
 
 import javax.swing.SwingUtilities;
 
-import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 
 /**
- * An action that can be undo and redoed
+ * A reversable action than can be undone.
  * 
  * @author Shu
- * 
  */
 public abstract class ReversableAction extends StandardAction {
 
@@ -22,11 +20,9 @@ public abstract class ReversableAction extends StandardAction {
 		super(description, actionName);
 	}
 
-	@Override
-	public boolean canBeUndone() {
-		return true;
-	}
-
+	/**
+	 * Undo the action
+	 */
 	public void undoAction() {
 		if (!isActionCompleted()) {
 			Util.UserError("Action was never done, so it can't be undone");
@@ -38,7 +34,7 @@ public abstract class ReversableAction extends StandardAction {
 				try {
 					undo();
 				} catch (ActionException e) {
-					processActionException(e);
+					e.defaultHandleBehavior();
 				}
 			}
 		});
@@ -59,12 +55,13 @@ public abstract class ReversableAction extends StandardAction {
 		/*
 		 * Only add the action once to the Action manager
 		 */
-		if (!actionCompleted) {
+		if (!isActionCompleted()) {
 			UIEnvironment.getActionManager().addReversableAction(this);
 		}
 	}
 
 	/**
+	 * Does the undo work
 	 * 
 	 * @return Whether the undo action was successful
 	 */

@@ -35,9 +35,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.ActionException;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -593,11 +593,11 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
-	 * @param text
+	 * @param message
 	 *            Sets the text of the status bar in the UI
 	 */
-	public void setStatusStr(String text) {
-		statusStr = text;
+	public void setStatusMessage(String message) {
+		statusStr = message;
 		statusMessageLabel.setText(statusStr);
 
 	}

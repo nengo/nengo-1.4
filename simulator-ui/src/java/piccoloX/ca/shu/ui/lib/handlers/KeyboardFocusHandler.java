@@ -4,9 +4,10 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
- * @author Shu Focuses the Keyboard handler on the event Pick Path after the
- *         mouse is over it
+ * Focuses the Keyboard handler on the event Pick Path when the mouse enters a a
+ * new path.
  * 
+ * @author Shu Wu
  */
 public class KeyboardFocusHandler extends PBasicInputEventHandler {
 
@@ -14,5 +15,4 @@ public class KeyboardFocusHandler extends PBasicInputEventHandler {
 	public void mouseEntered(PInputEvent event) {
 		event.getInputManager().setKeyboardFocus(event.getPath());
 	}
-
 }

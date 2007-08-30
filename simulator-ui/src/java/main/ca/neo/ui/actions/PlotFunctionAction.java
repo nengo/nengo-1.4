@@ -10,8 +10,8 @@ import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.descriptors.CFloat;
 import ca.neo.ui.configurable.descriptors.CInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.ActionException;
 
 public class PlotFunctionAction extends StandardAction implements IConfigurable {
 	private static final long serialVersionUID = 1L;
@@ -41,7 +41,7 @@ public class PlotFunctionAction extends StandardAction implements IConfigurable 
 		try {
 			config.configureAndWait();
 		} catch (ConfigException e) {
-			e.defaultHandledBehavior();
+			e.defaultHandleBehavior();
 		}
 
 	}

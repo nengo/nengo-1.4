@@ -28,7 +28,7 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 	@Override
 	public void addAction(StandardAction standardAction) {
 		JMenuItem item;
-		item = new JMenuItem(standardAction.getSwingAction());
+		item = new JMenuItem(standardAction.toSwingAction());
 		style(item);
 		menu.add(item);
 

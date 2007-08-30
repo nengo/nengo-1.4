@@ -9,8 +9,12 @@ import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
-public abstract class MousePickHandler extends PBasicInputEventHandler {
-
+/**
+ * Abstract handler which picks and unpicks nodes with a delay
+ * 
+ * @author Shu Wu
+ */
+public abstract class AbstractPickHandler extends PBasicInputEventHandler {
 	private final Thread controlTimer;
 
 	private boolean keepPickAlive = false;
@@ -23,9 +27,9 @@ public abstract class MousePickHandler extends PBasicInputEventHandler {
 
 	private final World world;
 
-	WorldObject pickedNode;
+	private WorldObject pickedNode;
 
-	public MousePickHandler(World parent) {
+	public AbstractPickHandler(World parent) {
 		super();
 		this.world = parent;
 		controlTimer = new Timer();

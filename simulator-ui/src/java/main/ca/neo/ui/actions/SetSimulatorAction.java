@@ -1,8 +1,8 @@
 package ca.neo.ui.actions;
 
 import ca.neo.model.Network;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.ActionException;
 
 /**
  * TODO: Implement this

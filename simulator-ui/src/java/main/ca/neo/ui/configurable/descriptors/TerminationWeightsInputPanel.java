@@ -111,7 +111,7 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 			try {
 				config.configureAndWait();
 			} catch (ConfigException e) {
-				e.defaultHandledBehavior();
+				e.defaultHandleBehavior();
 			}
 
 			setValue(configurableMatrix.getMatrix());

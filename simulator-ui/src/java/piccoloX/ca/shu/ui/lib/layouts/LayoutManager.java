@@ -7,6 +7,11 @@ import java.io.Serializable;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
+/**
+ * TODO: This class is incomplete
+ * 
+ * @author Shu Wu
+ */
 public class LayoutManager implements Serializable {
 	/**
 	 * 

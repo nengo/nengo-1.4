@@ -8,18 +8,18 @@ import java.util.Vector;
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.ActionException;
+import ca.shu.ui.lib.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.handlers.EventConsumer;
-import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.handlers.KeyboardFocusHandler;
 import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.SelectionHandler;
-import ca.shu.ui.lib.handlers.StatusBarHandler;
-import ca.shu.ui.lib.handlers.TooltipHandler;
+import ca.shu.ui.lib.handlers.MouseStatusHandler;
+import ca.shu.ui.lib.handlers.TooltipPickHandler;
+import ca.shu.ui.lib.objects.TooltipWrapper;
 import ca.shu.ui.lib.objects.Window;
-import ca.shu.ui.lib.objects.widgets.TooltipWrapper;
 import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
@@ -53,6 +53,10 @@ public class World extends WorldObject implements Interactable {
 	 * Whether tooltips are enabled
 	 */
 	private static boolean tooltipsEnabled = true;
+
+	public static final double MAX_ZOOM_SCALE = 5;
+
+	public static final double MIN_ZOOM_SCALE = 0.05;
 
 	public static boolean isTooltipsVisible() {
 		return tooltipsEnabled;
@@ -146,8 +150,8 @@ public class World extends WorldObject implements Interactable {
 
 		zoomHandler = new PZoomEventHandler();
 		zoomHandler.setMinDragStartDistance(20);
-		zoomHandler.setMinScale(0.02);
-		zoomHandler.setMaxScale(4);
+		zoomHandler.setMinScale(MIN_ZOOM_SCALE);
+		zoomHandler.setMaxScale(MAX_ZOOM_SCALE);
 
 		selectionEventHandler = new SelectionHandler(this);
 		selectionEventHandler.setMarqueePaint(Style.COLOR_BORDER_SELECTED);
@@ -160,12 +164,12 @@ public class World extends WorldObject implements Interactable {
 		 */
 		mySkyCamera.addInputEventListener(new SwitchSelectionModeHandler());
 		mySkyCamera.addInputEventListener(new KeyboardFocusHandler());
-		mySkyCamera.addInputEventListener(new TooltipHandler(this));
+		mySkyCamera.addInputEventListener(new TooltipPickHandler(this));
 		mySkyCamera.addInputEventListener(new MouseHandler(this));
 		mySkyCamera.addInputEventListener(new ScrollZoomHandler());
 
 		addInputEventListener(new EventConsumer());
-		setStatusBarHandler(new StatusBarHandler(this));
+		setStatusBarHandler(new MouseStatusHandler(this));
 
 		/*
 		 * Set position and scale
@@ -301,6 +305,9 @@ public class World extends WorldObject implements Interactable {
 	 */
 	@Override
 	public boolean isAncestorOf(PNode node) {
+		if (node == this)
+			return true;
+
 		if (getGround().isAncestorOf(node))
 			return true;
 		else
@@ -398,7 +405,7 @@ public class World extends WorldObject implements Interactable {
 	 * @param statusHandler
 	 *            New Status bar handler
 	 */
-	public void setStatusBarHandler(StatusBarHandler statusHandler) {
+	public void setStatusBarHandler(AbstractStatusHandler statusHandler) {
 		if (statusBarHandler != null) {
 			getSky().removeInputEventListener(statusBarHandler);
 		}

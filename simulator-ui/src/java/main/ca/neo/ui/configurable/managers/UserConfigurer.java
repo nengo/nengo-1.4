@@ -405,7 +405,7 @@ class ConfigDialogClosedException extends ConfigException {
 	}
 
 	@Override
-	public void defaultHandledBehavior() {
+	public void defaultHandleBehavior() {
 		/*
 		 * Do nothing
 		 */

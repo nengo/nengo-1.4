@@ -8,12 +8,12 @@ import javax.swing.JPopupMenu;
 
 import ca.neo.ui.models.tooltips.ModelTooltip;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.ActionException;
-import ca.shu.ui.lib.handlers.Interactable;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
