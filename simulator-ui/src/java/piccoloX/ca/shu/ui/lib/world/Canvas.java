@@ -11,7 +11,7 @@ import edu.umd.cs.piccolo.PLayer;
  * 
  * @author Shu Wu
  */
-public class GCanvas extends PCanvas {
+public class Canvas extends PCanvas {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class GCanvas extends PCanvas {
 		worlds.remove(world);
 	}
 
-	public GCanvas() {
+	public Canvas() {
 		super();
 
 		setZoomEventHandler(null);

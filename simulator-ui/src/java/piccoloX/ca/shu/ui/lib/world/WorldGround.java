@@ -2,38 +2,48 @@ package ca.shu.ui.lib.world;
 
 import java.awt.geom.Point2D;
 
+/**
+ * Layer within a world which is zoomable and pannable. It contains world
+ * objects.
+ * 
+ * @author Shu Wu
+ */
 public class WorldGround extends WorldObject implements IWorldLayer {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	World world;
+	/**
+	 * World this layer belongs to
+	 */
+	private World world;
 
+	/**
+	 * Create a new ground layer
+	 * 
+	 * @param world
+	 *            World this layer belongs to
+	 */
 	public WorldGround(World world) {
 		super();
 		this.world = world;
 
 		this.setSelectable(false);
 
-		// this.addInputEventListener(new NodeDragHandler());
-		// setPickable(false);
 	}
 
-	public void addWorldObject(WorldObject node) {
-
-		addChild(node);
-
-	}
-
-	public void catchObject(WorldObject wo) {
-		catchObject(wo, true);
+	/**
+	 * Adds a child object. Like addChild, but with more pizzaz.
+	 * 
+	 * @param wo
+	 *            Object to add to the layer
+	 */
+	public void addObject(WorldObject wo) {
+		addObject(wo, true);
 
 	}
 
 	/**
-	 * Adds a little pizzaz while accepting new objects
+	 * Adds a little pizzaz when adding new objects
 	 * 
 	 * @param wo
 	 *            Object to be added
@@ -41,7 +51,7 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 	 *            whether the object's position should be changed to appear at
 	 *            the center of the camera
 	 */
-	public void catchObject(WorldObject wo, boolean centerCameraPosition) {
+	public void addObject(WorldObject wo, boolean centerCameraPosition) {
 		addChild(wo);
 
 		Point2D finalPosition;
@@ -60,6 +70,9 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 				.getY(), 1, 0, 500);
 	}
 
+	/**
+	 * @return The scale of the ground in relation to the sky
+	 */
 	public double getGroundScale() {
 		return world.getSky().getViewScale();
 	}

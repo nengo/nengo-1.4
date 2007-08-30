@@ -22,7 +22,6 @@ import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
@@ -33,8 +32,8 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * 
  * @author Shu
  */
-public abstract class NodeViewer extends World implements NamedObject,
-		Interactable, INodeContainer {
+public abstract class NodeViewer extends World implements Interactable,
+		INodeContainer {
 
 	/**
 	 * Default layout bounds
@@ -113,9 +112,9 @@ public abstract class NodeViewer extends World implements NamedObject,
 		neoNodesChildren.put(nodeProxy.getName(), nodeProxy);
 
 		if (dropInCenterOfCamera) {
-			getGround().catchObject(nodeProxy, dropInCenterOfCamera);
+			getGround().addObject(nodeProxy, dropInCenterOfCamera);
 		} else {
-			getGround().addWorldObject(nodeProxy);
+			getGround().addChild(nodeProxy);
 		}
 	}
 

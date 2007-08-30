@@ -122,7 +122,7 @@ public class World extends WorldObject implements Interactable {
 		 * Create layer
 		 */
 		layer = new PLayer();
-		UIEnvironment.getInstance().getRoot().addChild(layer);
+		UIEnvironment.getInstance().getCanvas().getRoot().addChild(layer);
 
 		/*
 		 * Create ground
@@ -177,7 +177,7 @@ public class World extends WorldObject implements Interactable {
 		 * Create the grid
 		 */
 		gridLayer = Grid.createGrid(getSky(), UIEnvironment.getInstance()
-				.getRoot(), Style.COLOR_DARKBORDER, 1500);
+				.getCanvas().getRoot(), Style.COLOR_DARKBORDER, 1500);
 
 		/*
 		 * Let the top canvas have a handle on this world

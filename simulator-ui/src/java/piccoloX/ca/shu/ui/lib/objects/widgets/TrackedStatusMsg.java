@@ -28,11 +28,11 @@ public class TrackedStatusMsg {
 	 * Stop tracking the task. ie. remove it from the User Interface
 	 */
 	public void finished() {
-		UIEnvironment.getInstance().popTaskStatusStr(getTaskName());
+		UIEnvironment.getInstance().removeTaskStatusMsg(getTaskName());
 	}
 
 	private void init() {
-		UIEnvironment.getInstance().pushTaskStatusStr(getTaskName());
+		UIEnvironment.getInstance().addTaskStatusMsg(getTaskName());
 
 	}
 

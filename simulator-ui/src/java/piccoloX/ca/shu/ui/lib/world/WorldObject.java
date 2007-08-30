@@ -18,7 +18,7 @@ import edu.umd.cs.piccolo.util.PUtil;
  * 
  * @author Shu Wu
  */
-public class WorldObject extends PNode implements NamedObject {
+public class WorldObject extends PNode implements INamedObject {
 	private static final long serialVersionUID = 1L;
 
 	/**

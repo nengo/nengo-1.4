@@ -5,21 +5,16 @@ import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.models.UIModel;
 import ca.shu.ui.lib.objects.GText;
-import ca.shu.ui.lib.world.NamedObject;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 
 /**
  * An Icon which has a representation and an label. It is used to represent NEO
- * models.
- * 
- * TODO: Adaptively render the label, show more details when zoomed in
+ * models. TODO: Adaptively render the label, show more details when zoomed in
  * 
  * @author Shu Wu
- * 
  */
-public class ModelIcon extends WorldObject implements NamedObject,
-		PropertyChangeListener {
+public class ModelIcon extends WorldObject implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 

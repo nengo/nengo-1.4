@@ -2,30 +2,42 @@ package ca.shu.ui.lib.world;
 
 import edu.umd.cs.piccolo.PCamera;
 
+/**
+ * A layer within a world which looks at the ground layer. This layer can also
+ * contain world objects, but their positions are static during panning and
+ * zooming.
+ * 
+ * @author Shu Wu
+ */
+/**
+ * @author Shu
+ */
 public class WorldSky extends PCamera implements IWorldLayer {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7467076877836999849L;
 
-	World world;
+	/**
+	 * World this layer belongs to
+	 */
+	private World world;
 
+	/**
+	 * Create a new sky layer
+	 * 
+	 * @param world
+	 *            World this layer belongs to
+	 */
 	public WorldSky(World world) {
 		super();
 		this.world = world;
 
 	}
 
-	public void addToWorldLayer(WorldObject wo) {
-
-		addChild(wo);
-	}
-
-	public void addWorldObject(WorldObject node) {
-		addChild(node);
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.IWorldLayer#getWorld()
+	 */
 	public World getWorld() {
 		return world;
 	}

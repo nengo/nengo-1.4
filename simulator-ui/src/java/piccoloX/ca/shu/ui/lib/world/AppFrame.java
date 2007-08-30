@@ -42,8 +42,6 @@ import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
 import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PLayer;
-import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.util.PDebug;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PUtil;
@@ -54,6 +52,11 @@ import edu.umd.cs.piccolo.util.PUtil;
  * @author Shu Wu
  */
 public abstract class AppFrame extends JFrame {
+	private static final long serialVersionUID = 2769082313231407201L;
+
+	/**
+	 * A String which briefly describes some commands used in this application
+	 */
 	public static final String TIPS = "<B>*** Keyboard Shortcuts ***</B><BR>"
 			+ "Press 's' to switch between Interaction modes<BR>"
 			+ "Hold down Ctrl key to view tooltips at any time<BR>"
@@ -61,37 +64,44 @@ public abstract class AppFrame extends JFrame {
 			+ "Zooming: scroll the Mouse Wheel or Right Click and Drag";
 
 	/**
-	 * 
+	 * Name of the directory where UI Files are stored
 	 */
-	private static final long serialVersionUID = 2769082313231407201L;
+	public static final String USER_FILE_DIR = "UIFiles";
+
+	private ReversableActionManager actionManager;
+
+	private Canvas canvas;
+
+	private MenuBuilder editMenu;
 
 	private EventListener escapeFullScreenModeListener;
 
 	private final GraphicsDevice graphicsDevice;
 
+	private JLabel interactionModeLabel;
+
 	private boolean isFullScreenMode;
 
 	private UserPreferences preferences;
 
+	private boolean selectionModeEnabled;
+
 	private JLabel statusMessageLabel;
+
+	private JPanel statusPanel;
+
+	private String statusStr = "";
+
 	private JLabel taskMessagesLabel;
 
-	ReversableActionManager actionManager;
+	private Vector<String> taskStatusStrings = new Vector<String>();
 
-	PCamera camera;
+	private MenuBuilder worldMenu;
 
-	GCanvas canvas;
-
-	MenuBuilder editMenu;
-
-	String statusStr = "";
-
-	Vector<String> taskStatusStrings = new Vector<String>();
-
-	PLayer topLayer;
-
-	MenuBuilder worldMenu;
-
+	/**
+	 * @param title
+	 *            Title of application
+	 */
 	public AppFrame(String title) {
 		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
@@ -103,7 +113,6 @@ public abstract class AppFrame extends JFrame {
 		initMenu();
 		initStatusPanel();
 
-		// System.out.println("constructing WorldFrame");
 		graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice();
 
@@ -117,7 +126,7 @@ public abstract class AppFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		canvas = new GCanvas();
+		canvas = new Canvas();
 		canvas.createWorld();
 		canvas.setFocusable(true);
 
@@ -127,125 +136,6 @@ public abstract class AppFrame extends JFrame {
 		canvas.requestFocus();
 		validate();
 		setFullScreenMode(false);
-
-	}
-
-	/**
-	 * This method adds a key listener that will take this PFrame out of full
-	 * screen mode when the escape key is pressed. This is called for you
-	 * automatically when the frame enters full screen mode.
-	 */
-	public void addEscapeFullScreenModeListener() {
-		removeEscapeFullScreenModeListener();
-		escapeFullScreenModeListener = new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent aEvent) {
-				if (aEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					setFullScreenMode(false);
-				}
-			}
-		};
-		canvas.addKeyListener((KeyListener) escapeFullScreenModeListener);
-	}
-
-	public abstract String getAboutString();
-
-	public ReversableActionManager getActionManager() {
-		return actionManager;
-	}
-
-	public abstract String getAppName();
-
-	public GCanvas getCanvas() {
-		return canvas;
-	}
-
-	public PRoot getRoot() {
-		return canvas.getRoot();
-	}
-
-	public String getUserFileDirectory() {
-		return "UI";
-	}
-
-	/**
-	 * @return the top-most World associated with this frame
-	 */
-	public World getWorld() {
-		return canvas.getWorld();
-	}
-
-	public void popTaskStatusStr(String str) {
-		taskStatusStrings.remove(str);
-		updateTaskMessages();
-	}
-
-	public String pushTaskStatusStr(String str) {
-		taskStatusStrings.add(str);
-		updateTaskMessages();
-		return str;
-	}
-
-	/**
-	 * This method removes the escape full screen mode key listener. It will be
-	 * called for you automatically when full screen mode exits, but the method
-	 * has been made public for applications that wish to use other methods for
-	 * exiting full screen mode.
-	 */
-	public void removeEscapeFullScreenModeListener() {
-		if (escapeFullScreenModeListener != null) {
-			canvas
-					.removeKeyListener((KeyListener) escapeFullScreenModeListener);
-			escapeFullScreenModeListener = null;
-		}
-	}
-
-	public void reversableActionsUpdated() {
-		updateEditMenu();
-	}
-
-	/*
-	 * @param fullScreenMode sets the screen to fullscreen
-	 */
-	public void setFullScreenMode(boolean fullScreenMode) {
-		this.isFullScreenMode = fullScreenMode;
-		if (fullScreenMode) {
-			addEscapeFullScreenModeListener();
-
-			if (isDisplayable()) {
-				dispose();
-			}
-
-			setUndecorated(true);
-			setResizable(false);
-			graphicsDevice.setFullScreenWindow(this);
-
-			if (graphicsDevice.isDisplayChangeSupported()) {
-				chooseBestDisplayMode(graphicsDevice);
-			}
-			validate();
-		} else {
-			removeEscapeFullScreenModeListener();
-
-			if (isDisplayable()) {
-				dispose();
-			}
-
-			setUndecorated(false);
-			setResizable(true);
-			graphicsDevice.setFullScreenWindow(null);
-			validate();
-			setVisible(true);
-		}
-	}
-
-	/**
-	 * @param text
-	 *            Sets the text of the status bar in the UI
-	 */
-	public void setStatusStr(String text) {
-		statusStr = text;
-		statusMessageLabel.setText(statusStr);
 
 	}
 
@@ -281,35 +171,7 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
-	JLabel interactionModeLabel;
-
 	/**
-	 * @param enabled
-	 *            True if selection mode is enabled, False if navigation
-	 */
-	public void setSelectionMode(boolean enabled) {
-
-		selectionModeEnabled = enabled;
-		if (selectionModeEnabled) {
-			interactionModeLabel.setText("Selection Mode");
-		} else {
-			interactionModeLabel.setText("Navigation Mode");
-		}
-
-		for (World world : getCanvas().getWorlds()) {
-			world.setSelectionMode(selectionModeEnabled);
-		}
-	}
-
-	public boolean isSelectionMode() {
-		return selectionModeEnabled;
-	}
-
-	boolean selectionModeEnabled;
-
-	private JPanel statusPanel;
-
-	/*
 	 * Initializes the status bar
 	 */
 	private void initStatusPanel() {
@@ -421,13 +283,9 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
-	// protected JMenu addMenu(JMenuBar menuBar, String name) {
-	// JMenu menu = new JMenu(name);
-	// Style.styleComponent(menu);
-	// menuBar.add(menu);
-	// return menu;
-	// }
-
+	/**
+	 * Loads saved preferences related to the application
+	 */
 	protected void loadPreferences() {
 		File preferencesFile = new File(getUserFileDirectory(), "userSettings");
 
@@ -454,6 +312,9 @@ public abstract class AppFrame extends JFrame {
 		preferences.apply(this);
 	}
 
+	/**
+	 * Save preferences to file
+	 */
 	protected void savePreferences() {
 		File file = new File(getUserFileDirectory());
 		if (!file.exists())
@@ -477,6 +338,9 @@ public abstract class AppFrame extends JFrame {
 		}
 	}
 
+	/**
+	 * Updates the menu 'edit'
+	 */
 	protected void updateEditMenu() {
 		editMenu.reset();
 
@@ -485,6 +349,9 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Updates task-related messages in the status bar
+	 */
 	protected void updateTaskMessages() {
 		StringBuilder strBuff = new StringBuilder("<HTML>");
 		if (taskStatusStrings.size() > 0) {
@@ -506,6 +373,9 @@ public abstract class AppFrame extends JFrame {
 		taskMessagesLabel.setText(strBuff.toString());
 	}
 
+	/**
+	 * Updates the menu 'world'
+	 */
 	protected void updateWorldMenu() {
 		worldMenu.reset();
 		worldMenu.addAction(new MinimizeAllWindows());
@@ -542,11 +412,201 @@ public abstract class AppFrame extends JFrame {
 		}
 	}
 
+	/**
+	 * Called when the user closes the Application window
+	 */
 	protected void windowClosing() {
 		savePreferences();
 		System.exit(0);
 	}
 
+	/**
+	 * This method adds a key listener that will take this PFrame out of full
+	 * screen mode when the escape key is pressed. This is called for you
+	 * automatically when the frame enters full screen mode.
+	 */
+	public void addEscapeFullScreenModeListener() {
+		removeEscapeFullScreenModeListener();
+		escapeFullScreenModeListener = new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent aEvent) {
+				if (aEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					setFullScreenMode(false);
+				}
+			}
+		};
+		canvas.addKeyListener((KeyListener) escapeFullScreenModeListener);
+	}
+
+	/**
+	 * @param object
+	 *            Object to be added to NeoGraphics
+	 * @return the object being added
+	 */
+	public WorldObject addWorldObject(WorldObject object) {
+		getWorld().getGround().addObject(object);
+		return object;
+	}
+
+	/**
+	 * @return String which describes what the application is about
+	 */
+	public abstract String getAboutString();
+
+	/**
+	 * @return Action manager responsible for managing actions. Enables undo,
+	 *         redo functionality.
+	 */
+	public ReversableActionManager getActionManager() {
+		return actionManager;
+	}
+
+	/**
+	 * @return Name of the application
+	 */
+	public abstract String getAppName();
+
+	/**
+	 * @return Canvas which hold the zoomable UI
+	 */
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	/**
+	 * @return Name of the directory to store user files
+	 */
+	public String getUserFileDirectory() {
+		return USER_FILE_DIR;
+	}
+
+	/**
+	 * @return the top-most World associated with this frame
+	 */
+	public World getWorld() {
+		return canvas.getWorld();
+	}
+
+	/**
+	 * Checks whether the UI is in selection or navigation mode.
+	 * 
+	 * @return If true, selection mode is enabled. If false, navigation mode is
+	 *         enabled.
+	 */
+	public boolean isSelectionMode() {
+		return selectionModeEnabled;
+	}
+
+	/**
+	 * @param message
+	 *            Task-related status message to add to the status bar
+	 */
+	public void removeTaskStatusMsg(String message) {
+		taskStatusStrings.remove(message);
+		updateTaskMessages();
+	}
+
+	/**
+	 * @param message
+	 *            Task related status message to remove from the status bar
+	 * @return status message
+	 */
+	public String addTaskStatusMsg(String message) {
+		taskStatusStrings.add(message);
+		updateTaskMessages();
+		return message;
+	}
+
+	/**
+	 * This method removes the escape full screen mode key listener. It will be
+	 * called for you automatically when full screen mode exits, but the method
+	 * has been made public for applications that wish to use other methods for
+	 * exiting full screen mode.
+	 */
+	public void removeEscapeFullScreenModeListener() {
+		if (escapeFullScreenModeListener != null) {
+			canvas
+					.removeKeyListener((KeyListener) escapeFullScreenModeListener);
+			escapeFullScreenModeListener = null;
+		}
+	}
+
+	/**
+	 * Called when reversable actions have changed. Updates the edit menu.
+	 */
+	public void reversableActionsUpdated() {
+		updateEditMenu();
+	}
+
+	/**
+	 * @param fullScreenMode
+	 *            sets the screen to fullscreen
+	 */
+	public void setFullScreenMode(boolean fullScreenMode) {
+		this.isFullScreenMode = fullScreenMode;
+		if (fullScreenMode) {
+			addEscapeFullScreenModeListener();
+
+			if (isDisplayable()) {
+				dispose();
+			}
+
+			setUndecorated(true);
+			setResizable(false);
+			graphicsDevice.setFullScreenWindow(this);
+
+			if (graphicsDevice.isDisplayChangeSupported()) {
+				chooseBestDisplayMode(graphicsDevice);
+			}
+			validate();
+		} else {
+			removeEscapeFullScreenModeListener();
+
+			if (isDisplayable()) {
+				dispose();
+			}
+
+			setUndecorated(false);
+			setResizable(true);
+			graphicsDevice.setFullScreenWindow(null);
+			validate();
+			setVisible(true);
+		}
+	}
+
+	/**
+	 * @param enabled
+	 *            True if selection mode is enabled, False if navigation
+	 */
+	public void setSelectionMode(boolean enabled) {
+
+		selectionModeEnabled = enabled;
+		if (selectionModeEnabled) {
+			interactionModeLabel.setText("Selection Mode");
+		} else {
+			interactionModeLabel.setText("Navigation Mode");
+		}
+
+		for (World world : getCanvas().getWorlds()) {
+			world.setSelectionMode(selectionModeEnabled);
+		}
+	}
+
+	/**
+	 * @param text
+	 *            Sets the text of the status bar in the UI
+	 */
+	public void setStatusStr(String text) {
+		statusStr = text;
+		statusMessageLabel.setText(statusStr);
+
+	}
+
+	/**
+	 * Action to show the 'about' dialog
+	 * 
+	 * @author Shu Wu
+	 */
 	class AboutAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -565,15 +625,10 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
-	 * @param object
-	 *            Object to be added to NeoGraphics
-	 * @return the object being added
+	 * Action to hide debug memory messages printed to the console.
+	 * 
+	 * @author Shu Wu
 	 */
-	public WorldObject addWorldObject(WorldObject object) {
-		getWorld().getGround().catchObject(object);
-		return object;
-	}
-
 	class HideDebugMemory extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -590,6 +645,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to set rendering mode to high quality.
+	 * 
+	 * @author Shu Wu
+	 */
 	class HighQualityAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -611,6 +671,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to set rendering mode to low quality.
+	 * 
+	 * @author Shu Wu
+	 */
 	class LowQualityAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -632,6 +697,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to set rendering mode to medium quality.
+	 * 
+	 * @author Shu Wu
+	 */
 	class MediumQualityAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -653,6 +723,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Minimizes all windows in the top-level world
+	 * 
+	 * @author Shu Wu
+	 */
 	class MinimizeAllWindows extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -669,6 +744,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Listener which listens for Application window close events
+	 * 
+	 * @author Shu Wu
+	 */
 	class MyWindowListener implements WindowListener {
 
 		public void windowActivated(WindowEvent arg0) {
@@ -696,6 +776,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to redo the last reversable action
+	 * 
+	 * @author Shu Wu
+	 */
 	class RedoAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -715,6 +800,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to enable the printing of memory usage messages to the console
+	 * 
+	 * @author Shu Wu
+	 */
 	class ShowDebugMemory extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -731,6 +821,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action which shows the tips dialog
+	 * 
+	 * @author Shu Wu
+	 */
 	class TipsAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -748,6 +843,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to turn off full screen mode
+	 * 
+	 * @author Shu Wu
+	 */
 	class TurnOffFullScreen extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -764,6 +864,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to turn off the grid
+	 * 
+	 * @author Shu Wu
+	 */
 	class TurnOffGrid extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -781,6 +886,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to turn off tooltips
+	 * 
+	 * @author Shu Wu
+	 */
 	class TurnOffTooltips extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -797,6 +907,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to turn on full screen mode
+	 * 
+	 * @author Shu Wu
+	 */
 	class TurnOnFullScreen extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -813,6 +928,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to turn on the grid
+	 * 
+	 * @author Shu Wu
+	 */
 	class TurnOnGrid extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -830,6 +950,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action to turn on tooltips
+	 * 
+	 * @author Shu Wu
+	 */
 	class TurnOnTooltips extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -846,6 +971,11 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	/**
+	 * Action which undos the last reversable action
+	 * 
+	 * @author Shu Wu
+	 */
 	class UndoAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -865,16 +995,27 @@ public abstract class AppFrame extends JFrame {
 
 }
 
+/**
+ * Serializable object which contains UI preferences of the application
+ * 
+ * @author Shu Wu
+ */
+/**
+ * @author Shu
+ */
 class UserPreferences implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private boolean enableTooltips = true;
 	private boolean gridVisible = true;
 
-	/*
-	 * Apply preferences
+	/**
+	 * Applies preferences
+	 * 
+	 * @param applyTo
+	 *            The application in which to apply the preferences to
 	 */
-	public void apply(AppFrame parent) {
+	public void apply(AppFrame applyTo) {
 		setEnableTooltips(enableTooltips);
 		setGridVisible(gridVisible);
 	}

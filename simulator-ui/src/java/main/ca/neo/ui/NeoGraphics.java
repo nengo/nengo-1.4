@@ -51,11 +51,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	public static final String NETWORK_FILE_EXTENSION = "net";
 
 	/**
-	 * Name of the directory where UI Files are stored
-	 */
-	public static final String USER_FILE_DIR = "UIFiles";
-
-	/**
 	 * Runs NeoGraphics with a default name
 	 * 
 	 * @param args
@@ -133,7 +128,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
 	public void addNeoNode(UINeoNode node) {
-		getWorld().getGround().catchObject(node);
+		getWorld().getGround().addObject(node);
 		if (node instanceof UINodeContainer) {
 			((UINodeContainer) (node)).openViewer();
 		}
@@ -147,11 +142,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	@Override
 	public String getAppName() {
 		return "NeoGraphics";
-	}
-
-	@Override
-	public String getUserFileDirectory() {
-		return USER_FILE_DIR;
 	}
 
 	@Override
