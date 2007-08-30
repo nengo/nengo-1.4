@@ -27,7 +27,7 @@ public class GContextButton extends WorldObject {
 
 		circle.setPickable(false);
 
-		addToLayout(circle);
+		addChild(circle);
 
 	}
 

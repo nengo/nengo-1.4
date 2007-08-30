@@ -106,7 +106,7 @@ public abstract class NodeViewer extends World implements NamedObject,
 		 * in the center of the camera
 		 */
 		if (moveCameraToNode) {
-			getWorld().setCameraCenterPosition(nodeProxy.getOffset().getX(),
+			getWorld().setSkyPosition(nodeProxy.getOffset().getX(),
 					nodeProxy.getOffset().getY());
 		}
 

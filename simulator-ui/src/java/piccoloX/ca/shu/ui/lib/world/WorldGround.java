@@ -47,7 +47,7 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 		Point2D finalPosition;
 		if (centerCameraPosition) {
 			finalPosition = world.skyToGround(new Point2D.Double(world
-					.getScreenWidth() / 2, world.getScreenHeight() / 2));
+					.getWidth() / 2, world.getHeight() / 2));
 		} else {
 			finalPosition = wo.getOffset();
 		}

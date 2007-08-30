@@ -29,23 +29,35 @@ public class TooltipWrapper extends WorldObject implements
 		this.follow = follow;
 		this.parent = parent;
 
-		parent.addChild(this);
-
 		tooltip.setSelectable(false);
-		addToLayout(tooltip);
+		addChild(tooltip);
 		setPickable(false);
 		setChildrenPickable(false);
 		setPaint(Style.COLOR_BACKGROUND);
 
+		tooltip.addPropertyChangeListener(PNode.PROPERTY_BOUNDS,
+				new PropertyChangeListener() {
+					public void propertyChange(PropertyChangeEvent evt) {
+						tooltipBoundsChanged();
+					}
+				});
+
 		addChild(new Border(this, Style.COLOR_TOOLTIP_BORDER));
 
 		setTransparency(0);
+		tooltipBoundsChanged();
 
 		/*
 		 * The tooltip will follow where the object it's attached to goes
 		 */
 		parent.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
 		follow.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
+
+	}
+
+	private void tooltipBoundsChanged() {
+		tooltip.setOffset(5, 5);
+		setBounds(0, 0, tooltip.getWidth() + 10, tooltip.getHeight() + 10);
 
 	}
 
@@ -134,6 +146,7 @@ public class TooltipWrapper extends WorldObject implements
 		parent.removePropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM,
 				this);
 		follow.removePropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
+
 	}
 
 }

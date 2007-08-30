@@ -2,10 +2,7 @@ package ca.shu.ui.lib.world;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JPopupMenu;
@@ -27,13 +24,11 @@ import ca.shu.ui.lib.util.Grid;
 import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
-import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -45,76 +40,114 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
  * 
  * @author Shu Wu
  */
-public class World extends WorldObject implements Interactable,
-		PropertyChangeListener {
+public class World extends WorldObject implements Interactable {
 
-	private static final double CLICK_ZOOM_PADDING = 100;
+	/**
+	 * Padding to use around objects when zooming in on them
+	 */
+	private static final double OBJECT_ZOOM_PADDING = 100;
 
 	private static final long serialVersionUID = 1L;
 
-	private static boolean tooltipsVisible = true;
+	/**
+	 * Whether tooltips are enabled
+	 */
+	private static boolean tooltipsEnabled = true;
 
 	public static boolean isTooltipsVisible() {
-		return tooltipsVisible;
+		return tooltipsEnabled;
 	}
 
 	public static void setTooltipsVisible(boolean tooltipsVisible) {
-		World.tooltipsVisible = tooltipsVisible;
+		World.tooltipsEnabled = tooltipsVisible;
 
 	}
 
-	// private final PInputEventListener dragHandler;
+	/**
+	 * If true, then selection mode. If false, then navigation mode.
+	 */
+	private boolean isSelectionMode;
 
-	private final PInputEventListener mouseHandler;
-
-	private final PPanEventHandler panHandler;
-
-	private final PInputEventListener scrollZoomHandler;
-
-	private SelectionHandler selectionEventHandler;
-
-	private PBasicInputEventHandler statusBarHandler;
-
-	private final PInputEventListener tooltipHandler;
-
-	private final PZoomEventHandler zoomHandler;
-
-	private WorldGround ground;
-
+	/**
+	 * PLayer which holds the ground layer
+	 */
 	private PLayer layer;
 
-	private boolean selectionModeEnabled;
+	/**
+	 * Ground which can be zoomed and navigated
+	 */
+	private WorldGround myGround;
 
-	private WorldSky skyCamera;
+	/**
+	 * Sky, which looks at the ground and whose position and scale remains
+	 * static
+	 */
+	private WorldSky mySkyCamera;
 
-	private TooltipWrapper tooltipWrapper;
+	/**
+	 * Panning handler
+	 */
+	private final PPanEventHandler panHandler;
 
+	/**
+	 * Selection handler
+	 */
+	private SelectionHandler selectionEventHandler;
+
+	/**
+	 * Status bar handler
+	 */
+	private PBasicInputEventHandler statusBarHandler;
+
+	/**
+	 * Zoom handler
+	 */
+	private final PZoomEventHandler zoomHandler;
+
+	/**
+	 * Layer attached to the camera which shows the zoomable grid
+	 */
 	PLayer gridLayer;
 
+	/**
+	 * Default constructor
+	 * 
+	 * @param name
+	 *            Name of this world
+	 */
 	public World(String name) {
 		super(name);
 
+		/*
+		 * Create layer
+		 */
 		layer = new PLayer();
-
 		UIEnvironment.getInstance().getRoot().addChild(layer);
 
-		ground = createGround();
-		ground.setSelectable(false);
-		layer.addChild(ground);
+		/*
+		 * Create ground
+		 */
+		myGround = createGround();
+		myGround.setSelectable(false);
+		layer.addChild(myGround);
 
-		skyCamera = new WorldSky(this);
+		/*
+		 * Create camera
+		 */
+		mySkyCamera = new WorldSky(this);
+		mySkyCamera.setPaint(Style.COLOR_BACKGROUND);
+		mySkyCamera.addLayer(layer);
+		addChild(mySkyCamera);
+
+		/*
+		 * Create handlers
+		 */
+		panHandler = new PPanEventHandler();
 
 		zoomHandler = new PZoomEventHandler();
 		zoomHandler.setMinDragStartDistance(20);
 		zoomHandler.setMinScale(0.02);
 		zoomHandler.setMaxScale(4);
-
-		panHandler = new PPanEventHandler();
-
-		tooltipHandler = new TooltipHandler(this);
-		// dragHandler = new DragHandler();
-		mouseHandler = new MouseHandler(this);
-		scrollZoomHandler = new ScrollZoomHandler();
 
 		selectionEventHandler = new SelectionHandler(this);
 		selectionEventHandler.setMarqueePaint(Style.COLOR_BORDER_SELECTED);
@@ -123,48 +156,60 @@ public class World extends WorldObject implements Interactable,
 		selectionEventHandler.setMarqueePaintTransparency(0.1f);
 
 		/*
-		 * Add handlers
+		 * Attach handlers
 		 */
-		addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
-		addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
+		mySkyCamera.addInputEventListener(new SwitchSelectionModeHandler());
+		mySkyCamera.addInputEventListener(new KeyboardFocusHandler());
+		mySkyCamera.addInputEventListener(new TooltipHandler(this));
+		mySkyCamera.addInputEventListener(new MouseHandler(this));
+		mySkyCamera.addInputEventListener(new ScrollZoomHandler());
 
-		skyCamera.addInputEventListener(new SwitchSelectionModeHandler());
-		// skyCamera.addInputEventListener(zoomHandler);
-		// skyCamera.addInputEventListener(panHandler);
-
-		skyCamera.addInputEventListener(new KeyboardFocusHandler());
-
-		skyCamera.addInputEventListener(tooltipHandler);
-		// skyCamera.addInputEventListener(dragHandler);
-		skyCamera.addInputEventListener(mouseHandler);
-		skyCamera.addInputEventListener(scrollZoomHandler);
 		addInputEventListener(new EventConsumer());
 		setStatusBarHandler(new StatusBarHandler(this));
 
-		skyCamera.setPaint(Style.COLOR_BACKGROUND);
+		/*
+		 * Set position and scale
+		 */
+		setSkyPosition(0, 0);
+		setSkyViewScale(0.7f);
 
-		setCameraCenterPosition(0, 0);
-		setWorldScale(0.7f);
-		skyCamera.addLayer(layer);
-
-		addChild(skyCamera);
-		setSelectable(false);
-
-		setBounds(0, 0, 800, 600);
-
+		/*
+		 * Create the grid
+		 */
 		gridLayer = Grid.createGrid(getSky(), UIEnvironment.getInstance()
 				.getRoot(), Style.COLOR_DARKBORDER, 1500);
 
+		/*
+		 * Let the top canvas have a handle on this world
+		 */
 		UIEnvironment.getInstance().getCanvas().addWorld(this);
+
+		/*
+		 * Miscellaneous
+		 */
+		setSelectable(false);
+		setBounds(0, 0, 800, 600);
 
 		initSelectionMode();
 
 	}
 
+	private void initSelectionMode() {
+		isSelectionMode = false;
+		mySkyCamera.addInputEventListener(zoomHandler);
+		mySkyCamera.addInputEventListener(panHandler);
+		mySkyCamera.addInputEventListener(selectionEventHandler);
+	}
+
+	/**
+	 * Create context menu
+	 * 
+	 * @return Menu builder
+	 */
 	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
 
-		menu.addAction(new ZoomOutAction());
+		menu.addAction(new ZoomToFitAction());
 		MenuBuilder windowsMenu = menu.createSubMenu("Windows");
 		windowsMenu.addAction(new CloseAllWindows("Close all"));
 		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
@@ -173,6 +218,11 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
+	/**
+	 * Create the ground
+	 * 
+	 * @return ground
+	 */
 	protected WorldGround createGround() {
 		return new WorldGround(this);
 
@@ -188,27 +238,19 @@ public class World extends WorldObject implements Interactable,
 		super.prepareForDestroy();
 	}
 
-	public void addWindow(Window window) {
-		getSky().addChild(window);
-	}
-
-	@SuppressWarnings("unchecked")
+	/**
+	 * Closes all windows which exist in this world
+	 */
 	public void closeAllWindows() {
-		Iterator<Window> itW = getAllWindows().iterator();
-		while (itW.hasNext()) {
-			itW.next().close();
+		for (Window window : getAllWindows()) {
+			window.close();
 		}
 
 	}
 
-	public boolean containsNode(PNode node) {
-		if (getGround().isAncestorOf(node) || getSky().isAncestorOf(node)) {
-			return true;
-		}
-		return false;
-	}
-
-	@SuppressWarnings("unchecked")
+	/**
+	 * @return A collection of all the windows in this world
+	 */
 	public Collection<Window> getAllWindows() {
 		Vector<Window> windows = new Vector<Window>(10);
 
@@ -235,62 +277,28 @@ public class World extends WorldObject implements Interactable,
 		getSky().getAllNodes(filter, windows);
 		getGround().getAllNodes(filter, windows);
 
-		// Iterator it = getSky().getChildrenIterator();
-
-		// while (it.hasNext()) {
-		// Object next = it.next();
-		// if (next instanceof Window) {
-		// windows.add((Window) next);
-		//
-		// }
-		// }
-		//
-		// it = getGround().getChildrenIterator();
-		// while (it.hasNext()) {
-		// Object next = it.next();
-		// if (next instanceof Window) {
-		// windows.add((Window) next);
-		//
-		// }
-		// }
-
 		return windows;
 	}
 
+	/**
+	 * @return ground
+	 */
 	public WorldGround getGround() {
-		return ground;
+		return myGround;
 	}
 
-	public double getGroundScale() {
-		return getSky().getViewScale();
-	}
-
-	public double getScreenHeight() {
-		return getHeight();
-	}
-
-	// public void createGrid() {
-	//		
-	//
-	// }
-
-	public double getScreenWidth() {
-		return getWidth();
-	}
-
+	/**
+	 * @return sky
+	 */
 	public WorldSky getSky() {
-		return skyCamera;
+		return mySkyCamera;
 	}
 
-	// public void hideTooltip() {
-	// if (tooltipWrapper == null) {
-	// return;
-	// }
-	//
-	// tooltipWrapper.fadeAndDestroy();
-	// tooltipWrapper = null;
-	// }
-
+	/*
+	 * Returns true if the node exists in this world (non-Javadoc)
+	 * 
+	 * @see edu.umd.cs.piccolo.PNode#isAncestorOf(edu.umd.cs.piccolo.PNode)
+	 */
 	@Override
 	public boolean isAncestorOf(PNode node) {
 		if (getGround().isAncestorOf(node))
@@ -302,55 +310,39 @@ public class World extends WorldObject implements Interactable,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ca.shu.ui.lib.handlers.IContextMenu#isContextMenuEnabled()
+	 * @see ca.shu.ui.lib.handlers.Interactable#isContextMenuEnabled()
 	 */
 	public boolean isContextMenuEnabled() {
 		return true;
 	}
 
+	/**
+	 * @return if true, selection mode is enabled. if false, navigation mode is
+	 *         enabled instead.
+	 */
 	public boolean isSelectionMode() {
-		return selectionModeEnabled;
+		return isSelectionMode;
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Minimizes all windows that exist in this world
+	 */
 	public void minimizeAllWindows() {
-
-		Iterator<Window> itW = getAllWindows().iterator();
-		while (itW.hasNext()) {
-			itW.next().setWindowState(Window.WindowState.MINIMIZED);
+		for (Window window : getAllWindows()) {
+			window.setWindowState(Window.WindowState.MINIMIZED);
 		}
-
 	}
 
-	public void propertyChange(PropertyChangeEvent arg0) {
-		getSky().setBounds(getBounds());
-		getGround().setBounds(getBounds());
-	}
+	/*
+	 * Set the bounds of the sky be the same as that of the world
+	 * 
+	 * @see edu.umd.cs.piccolo.PNode#setBounds(double, double, double, double)
+	 */
+	@Override
+	public boolean setBounds(double x, double y, double w, double h) {
+		mySkyCamera.setBounds(x, y, w, h);
 
-	public void setBounds(int x, int y, final int w, final int h) {
-		skyCamera.setBounds(skyCamera.getX(), skyCamera.getY(), w, h);
-		super.setBounds(x, y, w, h);
-	}
-
-	public void setCameraCenterPosition(double x, double y) {
-		// Point2D position = skyCamera.viewToLocal(new Point2D.Double(x, y));
-		//
-		// double xOffset = (getWidth() / 2);
-		// double yOffset = (getHeight() / 2);
-
-		Rectangle2D newBounds = new Rectangle2D.Double(x, y, 0, 0);
-
-		skyCamera.animateViewToCenterBounds(newBounds, false, 600);
-		// skyCamera.setViewOffset(position.getX() + xOffset, position.getY()
-		// + yOffset);
-
-	}
-
-	private void initSelectionMode() {
-		selectionModeEnabled = false;
-		skyCamera.addInputEventListener(zoomHandler);
-		skyCamera.addInputEventListener(panHandler);
-		skyCamera.addInputEventListener(selectionEventHandler);
+		return super.setBounds(x, y, w, h);
 	}
 
 	/**
@@ -358,23 +350,54 @@ public class World extends WorldObject implements Interactable,
 	 *            True if selection mode is enabled, False if navigation
 	 */
 	public void setSelectionMode(boolean enabled) {
-		if (selectionModeEnabled != enabled) {
-			selectionModeEnabled = enabled;
-			skyCamera.removeInputEventListener(selectionEventHandler);
-			if (!selectionModeEnabled) {
+		if (isSelectionMode != enabled) {
+			isSelectionMode = enabled;
+			mySkyCamera.removeInputEventListener(selectionEventHandler);
+			if (!isSelectionMode) {
 
 				initSelectionMode();
 			} else {
 
-				skyCamera.removeInputEventListener(zoomHandler);
-				skyCamera.removeInputEventListener(panHandler);
-				skyCamera.addInputEventListener(selectionEventHandler);
+				mySkyCamera.removeInputEventListener(zoomHandler);
+				mySkyCamera.removeInputEventListener(panHandler);
+				mySkyCamera.addInputEventListener(selectionEventHandler);
 			}
 
 			layoutChildren();
 		}
 	}
 
+	/**
+	 * Sets the view position of the sky, and animates to it.
+	 * 
+	 * @param x
+	 *            X Position relative to ground
+	 * @param y
+	 *            Y Position relative to ground
+	 */
+	public void setSkyPosition(double x, double y) {
+		Rectangle2D newBounds = new Rectangle2D.Double(x, y, 0, 0);
+
+		mySkyCamera.animateViewToCenterBounds(newBounds, false, 600);
+	}
+
+	/**
+	 * Set the scale at which to view the ground from the sky
+	 * 
+	 * @param scale
+	 *            Scale at which to view the ground
+	 */
+	public void setSkyViewScale(float scale) {
+		getSky().setViewScale(scale);
+
+	}
+
+	/**
+	 * Set the status bar handler, there can be only one.
+	 * 
+	 * @param statusHandler
+	 *            New Status bar handler
+	 */
 	public void setStatusBarHandler(StatusBarHandler statusHandler) {
 		if (statusBarHandler != null) {
 			getSky().removeInputEventListener(statusBarHandler);
@@ -387,54 +410,88 @@ public class World extends WorldObject implements Interactable,
 		}
 	}
 
-	public void setWorldScale(float scale) {
-		getSky().setViewScale(scale);
-
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
+	 */
 	public JPopupMenu showContextMenu(PInputEvent event) {
 		return constructMenu().getJPopupMenu();
 	}
 
-	public TooltipWrapper showTooltip(WorldObject follow) {
+	/**
+	 * @param objectSelected
+	 *            Object to show the tooltip for
+	 * @return Tooltip shown
+	 */
+	public TooltipWrapper showTooltip(WorldObject objectSelected) {
 
-		tooltipWrapper = new TooltipWrapper(getSky(), follow.getTooltip(),
-				follow);
+		TooltipWrapper tooltip = new TooltipWrapper(getSky(), objectSelected
+				.getTooltip(), objectSelected);
+		addChild(tooltip);
 
-		tooltipWrapper.fadeIn();
-		tooltipWrapper.updatePosition();
-		return tooltipWrapper;
+		tooltip.fadeIn();
+		tooltip.updatePosition();
+		return tooltip;
 
 	}
 
+	/**
+	 * @param position
+	 *            Position in sky
+	 * @return Position on ground
+	 */
 	public Point2D skyToGround(Point2D position) {
-		skyCamera.localToView(position);
+		mySkyCamera.localToView(position);
 
 		return position;
 	}
 
+	/**
+	 * Animate the sky to look at a portion of the ground at bounds
+	 * 
+	 * @param bounds
+	 *            Bounds to look at
+	 * @return Reference to the activity which is animating the zoom and
+	 *         positioning
+	 */
 	public PTransformActivity zoomToBounds(Rectangle2D bounds) {
-		PBounds biggerBounds = new PBounds(bounds.getX() - CLICK_ZOOM_PADDING,
-				bounds.getY() - CLICK_ZOOM_PADDING, bounds.getWidth()
-						+ CLICK_ZOOM_PADDING * 2, bounds.getHeight()
-						+ CLICK_ZOOM_PADDING * 2);
+		PBounds biggerBounds = new PBounds(bounds.getX() - OBJECT_ZOOM_PADDING,
+				bounds.getY() - OBJECT_ZOOM_PADDING, bounds.getWidth()
+						+ OBJECT_ZOOM_PADDING * 2, bounds.getHeight()
+						+ OBJECT_ZOOM_PADDING * 2);
 
 		return getSky().animateViewToCenterBounds(biggerBounds, true, 1000);
 
 	}
 
+	/**
+	 * Animate the sky to view all object on the ground
+	 * 
+	 * @return reference to animation activity
+	 */
 	public PTransformActivity zoomToFit() {
 		return zoomToBounds(getGround().getUnionOfChildrenBounds(null));
 
 	}
 
-	public PTransformActivity zoomToNode(WorldObject node) {
-		Rectangle2D bounds = node.getParent().localToGlobal(
-				node.getFullBounds());
+	/**
+	 * @param object
+	 *            Object to zoom to
+	 * @return reference to animation activity
+	 */
+	public PTransformActivity zoomToObject(WorldObject object) {
+		Rectangle2D bounds = object.getParent().localToGlobal(
+				object.getFullBounds());
 
 		return zoomToBounds(bounds);
 	}
 
+	/**
+	 * Action to close all windows
+	 * 
+	 * @author Shu Wu
+	 */
 	class CloseAllWindows extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -451,6 +508,11 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
+	/**
+	 * Action to minimize all windows
+	 * 
+	 * @author Shu Wu
+	 */
 	class MinimizeAllWindows extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -467,6 +529,11 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
+	/**
+	 * Action to switch the selection mode
+	 * 
+	 * @author Shu Wu
+	 */
 	class SwitchSelectionModeHandler extends PBasicInputEventHandler {
 
 		@Override
@@ -481,11 +548,16 @@ public class World extends WorldObject implements Interactable,
 
 	}
 
-	class ZoomOutAction extends StandardAction {
+	/**
+	 * Action to zoom to fit
+	 * 
+	 * @author Shu Wu
+	 */
+	class ZoomToFitAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public ZoomOutAction() {
+		public ZoomToFitAction() {
 			super("Fit on screen");
 		}
 
@@ -495,4 +567,5 @@ public class World extends WorldObject implements Interactable,
 		}
 
 	}
+
 }

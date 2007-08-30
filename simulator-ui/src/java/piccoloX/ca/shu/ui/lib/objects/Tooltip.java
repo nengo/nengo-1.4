@@ -20,16 +20,13 @@ public abstract class Tooltip extends WorldObject {
 
 		this.setSelectable(false);
 
-		// this.addInputEventListener(new MouseDetector(this));
-		getLayoutManager().setLeftPadding(0);
-		getLayoutManager().setVerticalPadding(0);
 		buttonsNode = new WorldObject();
 
 		buttonsNode.setSelectable(false);
 
 		initButtons();
 
-		addToLayout(buttonsNode);
+		addChild(buttonsNode);
 
 		// this.setF
 	}

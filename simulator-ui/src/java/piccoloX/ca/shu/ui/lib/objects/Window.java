@@ -141,18 +141,6 @@ public class Window extends WorldObject implements Interactable {
 		setWindowState(restoreWindowState);
 	}
 
-	@Override
-	public void setOffset(double x, double y) {
-		// TODO Auto-generated method stub
-		super.setOffset(x, y);
-	}
-
-	@Override
-	public void setOffset(Point2D point) {
-		// TODO Auto-generated method stub
-		super.setOffset(point);
-	}
-
 	public void setWindowState(WindowState state) {
 
 		if (state != windowState) {
@@ -244,7 +232,7 @@ public class Window extends WorldObject implements Interactable {
 			}
 
 			setSelectable(false);
-			UIEnvironment.getInstance().getWorld().addWindow(this);
+			UIEnvironment.getInstance().getWorld().getSky().addChild(this);
 
 			maximizeBounds();
 

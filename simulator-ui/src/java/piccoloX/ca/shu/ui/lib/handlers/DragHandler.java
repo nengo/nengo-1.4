@@ -33,7 +33,7 @@ public class DragHandler extends PDragEventHandler {
 	protected void endDrag(PInputEvent event) {
 		WorldObject wo = getDraggedWO();
 
-		wo.endDrag();
+//		wo.endDrag();
 		// wo.popState(WorldObject.State.IN_DRAG);
 		wo.justDropped();
 

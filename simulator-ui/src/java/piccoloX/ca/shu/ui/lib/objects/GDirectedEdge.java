@@ -43,24 +43,23 @@ public class GDirectedEdge extends PPath implements PropertyChangeListener {
 		// arrow = PPath.createRectangle(0, 0, 100, 100);
 		// addChild(arrow);
 
-		startNode.addPropertyChangeListener(WorldObject.PROPERTY_EDGES, this);
-		startNode.addPropertyChangeListener(WorldObject.PROPERTY_STATE, this);
+		startNode.addPropertyChangeListener(WorldObject.PROPERTY_GLOBAL_BOUNDS,
+				this);
 
-		endNode.addPropertyChangeListener(WorldObject.PROPERTY_EDGES, this);
-		endNode.addPropertyChangeListener(WorldObject.PROPERTY_STATE, this);
+		endNode.addPropertyChangeListener(WorldObject.PROPERTY_GLOBAL_BOUNDS,
+				this);
 
 		setState(State.DEFAULT);
 	}
 
 	public void destroy() {
 		removeFromParent();
-		startNode
-				.removePropertyChangeListener(WorldObject.PROPERTY_EDGES, this);
-		startNode
-				.removePropertyChangeListener(WorldObject.PROPERTY_STATE, this);
+		startNode.removePropertyChangeListener(
+				WorldObject.PROPERTY_GLOBAL_BOUNDS, this);
 
-		endNode.removePropertyChangeListener(WorldObject.PROPERTY_EDGES, this);
-		endNode.removePropertyChangeListener(WorldObject.PROPERTY_STATE, this);
+		endNode.removePropertyChangeListener(
+				WorldObject.PROPERTY_GLOBAL_BOUNDS, this);
+
 	}
 
 	public Color getDefaultColor() {
@@ -89,13 +88,6 @@ public class GDirectedEdge extends PPath implements PropertyChangeListener {
 
 	public void propertyChange(PropertyChangeEvent arg0) {
 		updateEdge();
-
-		if (startNode.getState() != WorldObject.State.DEFAULT
-				|| endNode.getState() != WorldObject.State.DEFAULT) {
-			setState(State.HIGHLIGHT);
-		} else {
-			setState(State.DEFAULT);
-		}
 
 	}
 

@@ -55,7 +55,7 @@ import edu.umd.cs.piccolo.util.PUtil;
  */
 public abstract class AppFrame extends JFrame {
 	public static final String TIPS = "<B>*** Keyboard Shortcuts ***</B><BR>"
-			+ "Press 'S' key to switch between Navigation and Selection Interaction modes<BR>"
+			+ "Press 's' to switch between Interaction modes<BR>"
 			+ "Hold down Ctrl key to view tooltips at any time<BR>"
 			+ "<BR><B>*** Mouse Shortcuts ***</B><BR>"
 			+ "Zooming: scroll the Mouse Wheel or Right Click and Drag";
@@ -273,7 +273,7 @@ public abstract class AppFrame extends JFrame {
 
 		MenuBuilder helpMenu = new MenuBuilder("Help");
 		menuBar.add(helpMenu.getJMenu());
-		helpMenu.addAction(new TipsAction("Tips"));
+		helpMenu.addAction(new TipsAction("Commands and Tips"));
 		helpMenu.addAction(new AboutAction("About"));
 
 		this.setJMenuBar(menuBar);

@@ -17,7 +17,6 @@ import ca.shu.ui.lib.util.Util;
  * UI Wrapper for a Network
  * 
  * @author Shu Wu
- * 
  */
 public class UINetwork extends UINodeContainer {
 
@@ -52,6 +51,7 @@ public class UINetwork extends UINodeContainer {
 	private void init() {
 
 		setIcon(new NetworkIcon(this));
+
 	}
 
 	@Override

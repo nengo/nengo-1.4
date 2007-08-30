@@ -1,15 +1,14 @@
 *******************************************
  Done
 *******************************************
-
+DONE - Select multiple things at once
+	
 *******************************************
  Pri 0 - doing next
 ******************************************* 
-Select multiple things at once
-	12. it would be nice to be able to select multiple things at once. this
-	could help for layout, but would also be nice if, e.g., a bunch of
-	neurons could be chosen and then 'add probe' could be used on all
-	at once (bryan will look into the last possiblity more)
+document PiccoloX Library
+
+Apply actions to selected items
 
 
 Make drag handler undooable

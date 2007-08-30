@@ -1,123 +1,155 @@
 package ca.shu.ui.lib.world;
 
-import java.awt.Color;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
-import java.util.ListIterator;
 
-import ca.shu.ui.lib.objects.LayoutManager;
 import ca.shu.ui.lib.objects.widgets.TransientMsg;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PNodeFilter;
+import edu.umd.cs.piccolo.util.PUtil;
 
-/*
- * TODO: Clean up class, move non-core functionality to child objects
+/**
+ * World objects are visible UI objects which exist in a World layer (Ground or
+ * Sky).
+ * 
+ * @author Shu Wu
  */
 public class WorldObject extends PNode implements NamedObject {
-	public static final String PROPERTY_EDGES = "edges";
-	public static final String PROPERTY_STATE = "state";
-
 	private static final long serialVersionUID = 1L;
 
-	private PPath borderFrame = null;
+	/**
+	 * The property name that identifies a change in this object's global
+	 * position
+	 */
+	public static final String PROPERTY_GLOBAL_BOUNDS = "globalBounds";
+
+	/**
+	 * Current Piccolo activity
+	 */
 	private PActivity currentActivity = null;
 
-	private PPath frame = null;
-
+	/**
+	 * Whether this object has been destroyed
+	 */
 	private boolean isDestroyed = false;
 
+	/**
+	 * Whether this object is selectable by the Selection handler
+	 */
 	private boolean isSelectable = true;
 
-	private boolean isFrameVisible = false;
+	/**
+	 * This object's name
+	 */
+	private String myName;
 
-	private LayoutManager layoutManager;
-
-	private String name;
-
-	private State state = State.DEFAULT;
-
-	private final TransformChangeListener transformChangeListener;
-
+	/**
+	 * Creates an unnamed WorldObject
+	 */
 	public WorldObject() {
-		this("");
+		super();
+		init("");
 
 	}
 
+	/**
+	 * Creates a named WorldObject
+	 * 
+	 * @param name
+	 *            Name of this object
+	 */
 	public WorldObject(String name) {
 		super();
-
-		this.name = name;
-
-//		this.setFrameVisible(false);
-		this.setSelectable(true);
-		transformChangeListener = new TransformChangeListener();
-		addPropertyChangeListener(PROPERTY_TRANSFORM, transformChangeListener);
+		init(name);
 
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Initializes this instance
 	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#addToLayout(edu.umd.cs.piccolo.PNode,
-	 *      boolean)
+	 * @param name
+	 *            Name of this Object
 	 */
-	public void addToLayout(PNode node) {
+	private void init(String name) {
+		this.myName = name;
 
-		addChild(node);
+		// this.setFrameVisible(false);
+		this.setSelectable(true);
 
-		getLayoutManager().positionNode(node);
+		addPropertyChangeListener(PROPERTY_TRANSFORM,
+				new TransformChangeListener());
+	}
 
-		PBounds bounds = getLayoutManager().getBounds();
-		// if (bounds.height < )
-
-		setBounds(bounds);
+	/**
+	 * Perform any operations before being destroyed
+	 */
+	protected void prepareForDestroy() {
 
 	}
 
-	public void animateToBounds(Rectangle2D rect, long duration) {
-
-		this.animateToBounds(rect.getX(), rect.getY(), rect.getWidth(), rect
-				.getHeight(), duration);
-
-	}
-
-	public PTransformActivity animateToPosition(double x, double y,
-			long duration) {
-
-		return animateToPositionScaleRotation(x, y, 1, 0, duration);
-	}
-
-	@Override
-	public PTransformActivity animateToPositionScaleRotation(double x,
-			double y, double scale, double theta, long duration) {
-		// TODO Auto-generated method stub
-		PTransformActivity activity = super.animateToPositionScaleRotation(x,
-				y, scale, theta, duration);
-
-		if (currentActivity != null && currentActivity.isStepping()) {
-			activity.startAfter(currentActivity);
-		}
-
-		currentActivity = activity;
-		return activity;
-	}
-
+	/**
+	 * @param scale
+	 *            Scale to animate to
+	 * @param duration
+	 *            Duration of animation
+	 */
 	public void animateToScale(double scale, long duration) {
 		this.animateToPositionScaleRotation(this.getOffset().getX(), this
 				.getOffset().getY(), scale, this.getRotation(), duration);
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * Modification to PNode's animateToTransform. This animation is sequenced
+	 * so that the previous transform animation finishes first (non-Javadoc)
 	 * 
-	 * @see ca.shu.ui.lib.world.WorldObject#destroy()
+	 * @see edu.umd.cs.piccolo.PNode#animateToTransform(java.awt.geom.AffineTransform,
+	 *      long)
+	 */
+	@Override
+	public PTransformActivity animateToTransform(AffineTransform destTransform,
+			long duration) {
+		if (duration == 0) {
+			setTransform(destTransform);
+			return null;
+		} else {
+			PTransformActivity.Target t = new PTransformActivity.Target() {
+				public void getSourceMatrix(double[] aSource) {
+					WorldObject.this.getTransformReference(true).getMatrix(
+							aSource);
+				}
+
+				public void setTransform(AffineTransform aTransform) {
+					WorldObject.this.setTransform(aTransform);
+				}
+			};
+
+			PTransformActivity ta = new PTransformActivity(duration,
+					PUtil.DEFAULT_ACTIVITY_STEP_RATE, t, destTransform);
+
+			/*
+			 * Sequences the animation to occur after
+			 */
+			if (currentActivity != null
+					&& ((currentActivity.getStartTime() + currentActivity
+							.getDuration()) > System.currentTimeMillis())) {
+				ta.startAfter(currentActivity);
+			}
+			currentActivity = ta;
+
+			addActivity(ta);
+			return ta;
+		}
+	}
+
+	/**
+	 * Call this method if this Object does not need to be used again. The
+	 * Object will prepare itself for garbage collection. Note: calling this
+	 * method does not mean that the object WILL be garbage collected. That will
+	 * not happen as long as there are external links to this object.
 	 */
 	public final void destroy() {
 		if (!isDestroyed) {
@@ -127,7 +159,7 @@ public class WorldObject extends PNode implements NamedObject {
 			/*
 			 * Notify edges that this object has been destroyed
 			 */
-			signalEdgesChanged();
+			signalGlobalBoundsChanged();
 
 			/*
 			 * Removes this object from the world and finish any tasks Convert
@@ -144,46 +176,13 @@ public class WorldObject extends PNode implements NamedObject {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.world.WorldObject#doubleClicked()
+	/**
+	 * Called if this object is double clicked on
 	 */
 	public void doubleClicked() {
 		if (getWorld() != null) {
-			getWorld().zoomToNode(this);
+			getWorld().zoomToObject(this);
 		}
-	}
-
-	public void endDrag() {
-
-	}
-
-	/**
-	 * Gets the children which intersect the rectangle bounds in the coordinate
-	 * system of this object.
-	 * 
-	 * @param bounds
-	 * @param classType
-	 * @return Collection of Children
-	 */
-	@SuppressWarnings("unchecked")
-	public Collection<PNode> getChildrenAtBounds(Rectangle2D bounds,
-			Class classType) {
-		return (this.getAllNodes(new BoundsFilter(this, this
-				.localToGlobal(bounds), classType), null));
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#getLayoutManager()
-	 */
-	public LayoutManager getLayoutManager() {
-		if (layoutManager == null)
-			layoutManager = new LayoutManager();
-		return layoutManager;
 	}
 
 	/*
@@ -192,32 +191,18 @@ public class WorldObject extends PNode implements NamedObject {
 	 * @see ca.shu.ui.lib.world.NamedObject#getName()
 	 */
 	public String getName() {
-		if (name == null) {
-			return "";
-		} else
-			return name;
+		return myName;
 	}
 
 	/**
-	 * @return State of this WorldObject
-	 */
-	public State getState() {
-		return state;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#getControls()
+	 * @return Tooltip object, null if there is none
 	 */
 	public WorldObject getTooltip() {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#getWorld()
+	/**
+	 * @return World which is an ancestor
 	 */
 	public World getWorld() {
 		if (getWorldLayer() != null)
@@ -226,6 +211,9 @@ public class WorldObject extends PNode implements NamedObject {
 			return null;
 	}
 
+	/**
+	 * @return World layer which is an ancestor
+	 */
 	public IWorldLayer getWorldLayer() {
 		PNode node = this;
 
@@ -241,31 +229,31 @@ public class WorldObject extends PNode implements NamedObject {
 	}
 
 	/**
-	 * @return Whether this Object has been destroyed (ie. ready for garbage
-	 *         collection)
+	 * @return Whether this Object has been destroyed
 	 */
 	public boolean isDestroyed() {
 		return isDestroyed;
 	}
 
+	/**
+	 * @return Whether this object is selectable by a Selection Handler
+	 */
 	public boolean isSelectable() {
 		return isSelectable;
 	}
 
 	/**
-	 * @return Whether the Frame is visible
-	 */
-	public boolean isFrameVisible() {
-		return isFrameVisible;
-	}
-
-	/**
-	 * End of a drag and drop operation
+	 * When this object is dropped by a Handler which support drag and drop
 	 */
 	public void justDropped() {
 
 	}
 
+	/**
+	 * @param position
+	 *            Position relative to object
+	 * @return Position relative to World's ground layer
+	 */
 	public Point2D objectToGround(Point2D position) {
 		IWorldLayer layer = getWorldLayer();
 
@@ -281,6 +269,11 @@ public class WorldObject extends PNode implements NamedObject {
 
 	}
 
+	/**
+	 * @param rectangle
+	 *            relative to object
+	 * @return Relative to World's ground layer
+	 */
 	public Rectangle2D objectToGround(Rectangle2D rectangle) {
 		IWorldLayer layer = getWorldLayer();
 
@@ -296,6 +289,11 @@ public class WorldObject extends PNode implements NamedObject {
 
 	}
 
+	/**
+	 * @param position
+	 *            relative to object
+	 * @return relative to World's sky layer
+	 */
 	public Point2D objectToSky(Point2D position) {
 		IWorldLayer layer = getWorldLayer();
 
@@ -311,6 +309,11 @@ public class WorldObject extends PNode implements NamedObject {
 
 	}
 
+	/**
+	 * @param rectangle
+	 *            relative to object
+	 * @return relative to World's sky layer
+	 */
 	public Rectangle2D objectToSky(Rectangle2D rectangle) {
 		IWorldLayer layer = getWorldLayer();
 
@@ -326,6 +329,12 @@ public class WorldObject extends PNode implements NamedObject {
 
 	}
 
+	/**
+	 * Show a transient message which appears over the object. The message is
+	 * added to the world's sky layer.
+	 * 
+	 * @param msg
+	 */
 	public void popupTransientMsg(String msg) {
 
 		TransientMsg msgObject = new TransientMsg(msg);
@@ -340,94 +349,42 @@ public class WorldObject extends PNode implements NamedObject {
 
 	}
 
-	public void setSelectable(boolean isSelectable) {
-		this.isSelectable = isSelectable;
-	}
-
-//	public void setFrameVisible(boolean isVisible) {
-//		isFrameVisible = isVisible;
-//
-//		if (isVisible) {
-//			if (frame == null) {
-//				frame = PPath.createRectangle(0, 0, 100, 100);
-//
-//				frame.setPaint(Style.COLOR_BACKGROUND);
-//				frame.setStrokePaint(Style.COLOR_FOREGROUND);
-//
-//				// frame.setPickable(true);
-//
-//				this.addChild(0, frame);
-//			}
-//		} else {
-//			if (frame != null) {
-//				frame.removeFromParent();
-//				frame = null;
-//			}
-//		}
-//	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.sw.graphics.nodes.WorldO#setLayoutManager(ca.sw.graphics.basics.LayoutManager)
+	/**
+	 * @param name
+	 *            New name for this object
 	 */
-	public void setLayoutManager(LayoutManager layoutManager) {
-		this.layoutManager = layoutManager;
-	}
-
 	public void setName(String name) {
-		this.name = name;
+		this.myName = name;
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setParent(PNode newParent) {
-		boolean worldChanged = false;
-
-		World newWorld = null;
-
-		if (newParent instanceof WorldObject) {
-			newWorld = ((WorldObject) newParent).getWorld();
-		}
-
-		if (newWorld != getWorld()) {
-			worldChanged = true;
-		}
-
 		super.setParent(newParent);
 
-		if (worldChanged) {
-			// World has disappeared
-			if (newWorld == null) {
-
-				removedFromWorld();
-
-			}
-			// Is in a new world
-			else {
-				addedToWorld();
-
-				ListIterator it = getChildrenIterator();
-
-				while (it.hasNext()) {
-					PNode node = (PNode) it.next();
-
-					if (node instanceof WorldObject) {
-						((WorldObject) node).addedToWorld();
-					}
-				}
-			}
-		}
 		if (newParent != null)
-			signalEdgesChanged();
+			signalGlobalBoundsChanged();
+	}
+
+	/**
+	 * @param isSelectable
+	 *            Whether this object is selectable by a Selection handler
+	 */
+	public void setSelectable(boolean isSelectable) {
+		this.isSelectable = isSelectable;
+	}
+
+	@Override
+	public void setVisible(boolean isVisible) {
+		super.setVisible(isVisible);
+		signalGlobalBoundsChanged();
 	}
 
 	@Override
 	public void signalBoundsChanged() {
-		// TODO Auto-generated method stub
 		super.signalBoundsChanged();
-		signalEdgesChanged();
+		signalGlobalBoundsChanged();
 
 	}
 
@@ -435,201 +392,36 @@ public class WorldObject extends PNode implements NamedObject {
 	 * Signal to the attached edges that this node's position or transform in
 	 * the World has changed
 	 */
-	public void signalEdgesChanged() {
+	public void signalGlobalBoundsChanged() {
 
-		firePropertyChange(0, PROPERTY_EDGES, null, null);
+		firePropertyChange(0, PROPERTY_GLOBAL_BOUNDS, null, null);
 
 		/*
 		 * Updates children edges
 		 */
-		int count = getChildrenCount();
-		for (int i = 0; i < count; i++) {
-			PNode each = (PNode) getChildrenReference().get(i);
-
+		for (Object each : getChildrenReference()) {
 			if (each instanceof WorldObject) {
 				WorldObject wo = (WorldObject) each;
 
-				wo.signalEdgesChanged();
+				wo.signalGlobalBoundsChanged();
 			}
 		}
 
 	}
 
 	/**
-	 * Called when the World the object lives in has changed
+	 * Listens for transform changes, and signals that the global bounds for
+	 * this object have changed
+	 * 
+	 * @author Shu Wu
 	 */
-	protected void addedToWorld() {
-	}
-
-	@Override
-	protected void layoutChildren() {
-		super.layoutChildren();
-
-		if (frame != null) {
-			frame.setBounds(getBounds());
-		}
-
-		if (borderFrame != null) {
-			borderFrame.setBounds(getBounds());
-		}
-	}
-
-	/**
-	 * Perform any operations before being destroyed
-	 */
-	protected void prepareForDestroy() {
-
-	}
-
-	/**
-	 * Called when this object is removed from the World
-	 */
-	protected void removedFromWorld() {
-
-	}
-
-	protected void setBorder(Color borderColor) {
-		if (borderColor == null) {
-			if (borderFrame != null)
-				borderFrame.removeFromParent();
-			borderFrame = null;
-			return;
-		}
-
-		if (borderFrame == null) {
-
-			borderFrame = PPath.createRectangle((float) getX(), (float) getY(),
-					(float) getWidth(), (float) getHeight());
-
-			synchronized (borderFrame) {
-				borderFrame.setPaint(null);
-
-				addChild(borderFrame);
-			}
-		}
-
-		borderFrame.setStrokePaint(borderColor);
-
-	}
-
-	// /**
-	// * Moves nodes which overlap
-	// *
-	// */
-	// protected void moveOverlappedNodes(WorldObjectImpl callingNode) {
-	// if (!isTangible())
-	// return;
-	//
-	// Rectangle2D dBounds = localToGlobal(getBounds());
-	//
-	// /*
-	// * Move nodes which are close to it
-	// *
-	// */
-	//
-	// WorldLayer world = getWorldLayer();
-	// if (world == null)
-	// return;
-	//
-	// world.globalToLocal(dBounds);
-	//
-	// Collection<WorldObject> intersectingNodes = world
-	// .getChildrenAtBounds(dBounds);
-	//
-	// // find intersecting nodes
-	// Iterator<WorldObject> it = intersectingNodes.iterator();
-	// while (it.hasNext()) {
-	// WorldObject node = it.next();
-	//
-	// if (node != this && node != callingNode) {
-	// WorldObjectImpl gNode = (WorldObjectImpl) node;
-	//
-	// if (gNode.isDraggable() && gNode.isTangible()) {
-	// Rectangle2D bounds = gNode.localToGlobal(gNode.getBounds());
-	//
-	// double translateX = Double.MAX_VALUE;
-	//
-	// double translateY = 0;
-	//
-	// translateX = dBounds.getMaxX() - bounds.getMinX();
-	// double trX = dBounds.getMinX() - bounds.getMaxX();
-	// if (Math.abs(trX) < Math.abs(translateX))
-	// translateX = trX;
-	//
-	// translateY = dBounds.getMaxY() - bounds.getMinY();
-	// double trY = dBounds.getMinY() - bounds.getMaxY();
-	// if (Math.abs(trY) < Math.abs(translateY))
-	// translateY = trY;
-	//
-	// if (Math.abs(translateX) < Math.abs(translateY)) {
-	// gNode.translate(translateX, 0);
-	// } else
-	// gNode.translate(0, translateY);
-	//
-	// gNode.moveOverlappedNodes(this);
-	// }
-	//
-	// }
-	//
-	// }
-	//
-	// }
-
-	public static enum State {
-		DEFAULT, IN_DRAG, SELECTED
-	}
-
 	class TransformChangeListener implements PropertyChangeListener {
 
 		public void propertyChange(PropertyChangeEvent evt) {
-			signalEdgesChanged();
+			signalGlobalBoundsChanged();
 
 		}
 
-	}
-
-}
-
-class BoundsFilter implements PNodeFilter {
-	Rectangle2D bounds;
-
-	@SuppressWarnings("unchecked")
-	Class classType;
-
-	PBounds localBounds = new PBounds();
-
-	PNode node;
-
-	@SuppressWarnings("unchecked")
-	protected BoundsFilter(PNode node, Rectangle2D bounds, Class classType) {
-		this.bounds = bounds;
-		this.node = node;
-		this.classType = classType;
-
-	}
-
-	public boolean accept(PNode node) {
-		if (this.node == node) // rejects the parent node... we only want the
-			// children
-			return false;
-
-		if (!classType.isInstance(node) || node instanceof IWorldLayer)
-			return false;
-
-		localBounds.setRect(bounds);
-		node.globalToLocal(localBounds);
-
-		boolean boundsIntersects = node.intersects(localBounds);
-
-		return boundsIntersects;
-	}
-
-	public boolean acceptChildrenOf(PNode node) {
-		if (this.node == node) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 }

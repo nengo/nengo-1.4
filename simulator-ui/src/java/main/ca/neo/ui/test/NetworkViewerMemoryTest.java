@@ -18,10 +18,11 @@ import ca.shu.ui.lib.objects.Window;
 public class NetworkViewerMemoryTest {
 	private static int i;
 	private static NeoGraphics neoGraphics;
-//	private static NetworkViewer netView;
+	// private static NetworkViewer netView;
 	private static final int NUM_OF_LOOPS = 500;
 	private static Window window;
-//	private static Window[] windows;
+
+	// private static Window[] windows;
 
 	public static long getApproximateUsedMemory() {
 		System.gc();
@@ -31,6 +32,8 @@ public class NetworkViewerMemoryTest {
 		return totalMemory - free;
 	}
 
+	static UINetwork network;
+
 	/**
 	 * @param args
 	 */
@@ -39,7 +42,7 @@ public class NetworkViewerMemoryTest {
 		printMemoryUsed("Start");
 		neoGraphics = new NeoGraphics("Test");
 
-//		Window windows = new Window[NUM_OF_LOOPS];
+		// Window windows = new Window[NUM_OF_LOOPS];
 		for (i = 0; i < NUM_OF_LOOPS; i++) {
 
 			try {
@@ -47,7 +50,6 @@ public class NetworkViewerMemoryTest {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
 
-						UINetwork network;
 						try {
 							network = new UINetwork(FuzzyLogicExample
 									.createNetwork());
@@ -68,7 +70,7 @@ public class NetworkViewerMemoryTest {
 
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						// network.destroy()
+						// network.destroy();
 						// netView.destroy();
 						window.destroy();
 					}

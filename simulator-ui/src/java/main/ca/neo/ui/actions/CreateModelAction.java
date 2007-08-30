@@ -13,7 +13,6 @@ import ca.shu.ui.lib.exceptions.ActionException;
  * Creates a new NEO model
  * 
  * @author Shu
- * 
  */
 public class CreateModelAction extends ReversableAction {
 
@@ -55,8 +54,6 @@ public class CreateModelAction extends ReversableAction {
 	private Class nodeType;
 
 	/**
-	 * 
-	 * 
 	 * @param nodeContainer
 	 *            The container to which the created node should be added to
 	 * @param nodeUIType
@@ -72,7 +69,6 @@ public class CreateModelAction extends ReversableAction {
 	 *            The container to which the created node should be added to
 	 * @param nodeUIType
 	 *            Type of Node to be create, such as PNetwork
-	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	public CreateModelAction(String actionName, INodeContainer nodeContainer,
@@ -99,6 +95,7 @@ public class CreateModelAction extends ReversableAction {
 						SwingUtilities.invokeAndWait(new Runnable() {
 							public void run() {
 								container.addNeoNode(nodeCreated);
+
 							}
 						});
 					} catch (ConfigException e) {

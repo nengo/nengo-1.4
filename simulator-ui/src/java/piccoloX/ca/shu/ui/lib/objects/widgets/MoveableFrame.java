@@ -29,7 +29,6 @@ public class MoveableFrame implements PropertyChangeListener {
 		super();
 		init(world);
 
-		
 	}
 
 	public MoveableFrame(World world, WorldObject objSelected) {
@@ -42,7 +41,7 @@ public class MoveableFrame implements PropertyChangeListener {
 		this.frameHolder = world.getSky();
 		frame = PPath.createRectangle(0f, 0f, 1f, 1f);
 		frame.setPickable(false);
-		
+
 		frameHolder.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM,
 				this);
 
@@ -51,14 +50,18 @@ public class MoveableFrame implements PropertyChangeListener {
 
 	protected void updateBounds() {
 		if (currentlySelected != null && !currentlySelected.isDestroyed()) {
+			if (currentlySelected.getVisible()) {
+				Rectangle2D bounds = currentlySelected
+						.objectToSky(currentlySelected.getBounds());
 
-			Rectangle2D bounds = currentlySelected
-					.objectToSky(currentlySelected.getBounds());
-
-			frame.setBounds((float) bounds.getX(), (float) bounds.getY(),
-					(float) bounds.getWidth(), (float) bounds.getHeight());
-			frame.setPaint(null);
-			frame.setStrokePaint(frameColor);
+				frame.setBounds((float) bounds.getX(), (float) bounds.getY(),
+						(float) bounds.getWidth(), (float) bounds.getHeight());
+				frame.setPaint(null);
+				frame.setStrokePaint(frameColor);
+				frame.setVisible(true);
+			} else {
+				frame.setVisible(false);
+			}
 		} else {
 			setSelected(null);
 		}
@@ -91,14 +94,14 @@ public class MoveableFrame implements PropertyChangeListener {
 
 		if (currentlySelected != null) {
 			currentlySelected.removePropertyChangeListener(
-					WorldObject.PROPERTY_EDGES, this);
+					WorldObject.PROPERTY_GLOBAL_BOUNDS, this);
 		}
 
 		currentlySelected = newSelected;
 		if (currentlySelected != null) {
 
 			currentlySelected.addPropertyChangeListener(
-					WorldObject.PROPERTY_EDGES, this);
+					WorldObject.PROPERTY_GLOBAL_BOUNDS, this);
 
 			// currentlySelected.addChild(frame);
 			// frame.setVisible(true);
