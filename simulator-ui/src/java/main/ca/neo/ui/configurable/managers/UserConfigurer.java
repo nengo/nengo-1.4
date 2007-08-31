@@ -19,9 +19,9 @@ import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.shu.ui.lib.objects.widgets.TrackedActivity;
+import ca.shu.ui.lib.objects.activities.AbstractActivity;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Configuration Manager which creates a dialog and let's the user enter
@@ -202,7 +202,7 @@ class ConfigDialog extends JDialog {
 							.getValue());
 				}
 			} else {
-				Util.UserWarning(property.getName()
+				UserMessages.showWarning(property.getName()
 						+ " is not set or is incomplete");
 				return false;
 			}
@@ -314,7 +314,7 @@ class ConfigDialog extends JDialog {
 			setVisible(false);
 			dispose();
 
-			(new TrackedActivity("Creating new "
+			(new AbstractActivity("Creating new "
 					+ parent.getConfigurable().getTypeName()) {
 
 				@Override

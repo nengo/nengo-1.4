@@ -10,9 +10,9 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * 
  * @author Shu Wu
  */
-public class MouseStatusHandler extends AbstractStatusHandler {
+public class TopWorldStatusHandler extends AbstractStatusHandler {
 
-	public MouseStatusHandler(World world) {
+	public TopWorldStatusHandler(World world) {
 		super(world);
 	}
 
@@ -25,8 +25,9 @@ public class MouseStatusHandler extends AbstractStatusHandler {
 	protected String getStatusMessage(PInputEvent event) {
 		NumberFormat formatter = NumberFormat.getNumberInstance();
 		formatter.setMaximumFractionDigits(2);
-		return "Mouse X: " + formatter.format(event.getPosition().getX())
-				+ " Y: " + formatter.format(event.getPosition().getY());
+		return "Top Window - Mouse X: "
+				+ formatter.format(event.getPosition().getX()) + " Y: "
+				+ formatter.format(event.getPosition().getY());
 	}
 
 }

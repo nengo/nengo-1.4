@@ -1,7 +1,7 @@
 package ca.neo.ui.configurable;
 
 import ca.shu.ui.lib.exceptions.UIException;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Exception to be thrown is if there is an error during Configuration
@@ -22,7 +22,7 @@ public class ConfigException extends UIException {
 
 	@Override
 	public void defaultHandleBehavior() {
-		Util.UserWarning("Could not complete configuration: " + getMessage());
+		UserMessages.showWarning("Could not complete configuration: " + getMessage());
 	}
 
 }

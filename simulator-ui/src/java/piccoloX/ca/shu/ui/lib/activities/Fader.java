@@ -31,6 +31,11 @@ public class Fader extends PInterpolatingActivity {
 	}
 
 	@Override
+	protected void activityStarted() {
+		startingTransparency = node.getTransparency();
+	}
+
+	@Override
 	public void setRelativeTargetValue(float zeroToOne) {
 
 		super.setRelativeTargetValue(zeroToOne);
@@ -40,11 +45,6 @@ public class Fader extends PInterpolatingActivity {
 
 		node.setTransparency(transparency);
 
-	}
-
-	@Override
-	protected void activityStarted() {
-		startingTransparency = node.getTransparency();
 	}
 
 }

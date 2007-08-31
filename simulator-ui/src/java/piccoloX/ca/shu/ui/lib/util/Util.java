@@ -12,12 +12,58 @@ import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PStack;
 
+/**
+ * Miscellaneous static functions used by the user interface
+ * 
+ * @author Shu Wu
+ */
 public class Util {
 	private static final String BLANKS = "            ";
 
 	private static final String ZEROES = "000000000000";
 
 	static final boolean DEBUG_MSG_ENABLED = false;
+
+	private static void arrayToStringRecursive(StringBuffer sb, Object array) {
+		sb.append("[");
+		if (array == null) {
+			sb.append("NULL");
+		} else {
+			Object obj = null;
+
+			int length = Array.getLength(array);
+			int lastItem = length - 1;
+
+			for (int i = 0; i < length; i++) {
+				obj = Array.get(array, i);
+
+				if (obj instanceof Object[]) {
+					arrayToStringRecursive(sb, obj);
+				} else if (obj instanceof float[]) {
+					arrayToStringRecursive(sb, obj);
+
+				} else if (obj instanceof int[]) {
+					arrayToStringRecursive(sb, obj);
+
+				} else if (obj instanceof long[]) {
+					arrayToStringRecursive(sb, obj);
+
+				} else if (obj instanceof double[]) {
+					arrayToStringRecursive(sb, obj);
+
+				} else if (obj != null) {
+					sb.append(obj);
+				} else {
+					sb.append("NULL");
+				}
+				if (i < lastItem) {
+					sb.append(", ");
+				}
+			}
+
+		}
+		sb.append("]");
+	}
 
 	public static String arrayToString(Object array) {
 		StringBuffer sb = new StringBuffer();
@@ -93,7 +139,6 @@ public class Util {
 
 	/**
 	 * @return The first node on the pick path that matches the parameter type
-	 * 
 	 * @param event
 	 *            Event sent from Piccolo
 	 * @param type
@@ -151,60 +196,6 @@ public class Util {
 			e.printStackTrace();
 		}
 
-	}
-
-	public static void UserError(String msg) {
-		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
-				"Error", JOptionPane.ERROR_MESSAGE);
-		(new Exception(msg)).printStackTrace();
-
-	}
-
-	public static void UserWarning(String msg) {
-		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
-				"Warning", JOptionPane.WARNING_MESSAGE);
-		// Assert(false, msg);
-	}
-
-	private static void arrayToStringRecursive(StringBuffer sb, Object array) {
-		sb.append("[");
-		if (array == null) {
-			sb.append("NULL");
-		} else {
-			Object obj = null;
-
-			int length = Array.getLength(array);
-			int lastItem = length - 1;
-
-			for (int i = 0; i < length; i++) {
-				obj = Array.get(array, i);
-
-				if (obj instanceof Object[]) {
-					arrayToStringRecursive(sb, obj);
-				} else if (obj instanceof float[]) {
-					arrayToStringRecursive(sb, obj);
-
-				} else if (obj instanceof int[]) {
-					arrayToStringRecursive(sb, obj);
-
-				} else if (obj instanceof long[]) {
-					arrayToStringRecursive(sb, obj);
-
-				} else if (obj instanceof double[]) {
-					arrayToStringRecursive(sb, obj);
-
-				} else if (obj != null) {
-					sb.append(obj);
-				} else {
-					sb.append("NULL");
-				}
-				if (i < lastItem) {
-					sb.append(", ");
-				}
-			}
-
-		}
-		sb.append("]");
 	}
 
 }

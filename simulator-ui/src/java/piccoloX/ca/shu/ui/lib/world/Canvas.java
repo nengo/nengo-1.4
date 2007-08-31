@@ -15,19 +15,13 @@ public class Canvas extends PCanvas {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String SELECTION_MODE_NOTIFICATION = "canvasSelectionMode";
+
 	static final double CLICK_ZOOM_PADDING = 100;
 
 	private World topWorld;
 
 	private Collection<World> worlds;
-
-	public void addWorld(World world) {
-		worlds.add(world);
-	}
-
-	public void removeWorld(World world) {
-		worlds.remove(world);
-	}
 
 	public Canvas() {
 		super();
@@ -39,19 +33,29 @@ public class Canvas extends PCanvas {
 
 	}
 
+	protected Collection<World> getWorlds() {
+		return worlds;
+	}
+
+	public void addWorld(World world) {
+		worlds.add(world);
+	}
+
+	// GText interactionModeLabel;
+
 	public void createWorld() {
 		topWorld = new World("Top Layer");
 		getLayer().addChild(topWorld);
 
 	}
 
-	// GText interactionModeLabel;
-
 	public World getWorld() {
 		return topWorld;
 	}
 
-	public static final String SELECTION_MODE_NOTIFICATION = "canvasSelectionMode";
+	public void removeWorld(World world) {
+		worlds.remove(world);
+	}
 
 	@Override
 	public void setBounds(int x, int y, int w, int h) {
@@ -62,10 +66,6 @@ public class Canvas extends PCanvas {
 
 		super.setBounds(x, y, w, h);
 
-	}
-
-	protected Collection<World> getWorlds() {
-		return worlds;
 	}
 
 }

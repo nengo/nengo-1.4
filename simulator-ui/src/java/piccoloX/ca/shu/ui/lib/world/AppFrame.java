@@ -38,9 +38,8 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.Grid;
-import ca.shu.ui.lib.util.MenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.util.PDebug;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -59,7 +58,7 @@ public abstract class AppFrame extends JFrame {
 	 */
 	public static final String TIPS = "<B>*** Keyboard Shortcuts ***</B><BR>"
 			+ "Press 's' to switch between Interaction modes<BR>"
-			+ "Hold down Ctrl key to view tooltips at any time<BR>"
+			+ "Mouse over a node and hold down 'ctrl' to view tooltips<BR>"
 			+ "<BR><B>*** Mouse Shortcuts ***</B><BR>"
 			+ "Zooming: scroll the Mouse Wheel or Right Click and Drag";
 
@@ -145,16 +144,16 @@ public abstract class AppFrame extends JFrame {
 	private void initMenu() {
 
 		JMenuBar menuBar = new JMenuBar();
-		Style.applyStyleToComponent(menuBar);
 
+		Style.applyStyleToComponent(menuBar);
 		initApplicationMenu(menuBar);
 
-		// menu.setMnemonic(KeyEvent.VK_V);
-
 		editMenu = new MenuBuilder("Edit");
+		editMenu.getJMenu().setMnemonic(KeyEvent.VK_E);
 		menuBar.add(editMenu.getJMenu());
 
 		worldMenu = new MenuBuilder("World");
+		worldMenu.getJMenu().setMnemonic(KeyEvent.VK_W);
 		menuBar.add(worldMenu.getJMenu());
 
 		menuBar.setVisible(true);
@@ -162,9 +161,10 @@ public abstract class AppFrame extends JFrame {
 		updateEditMenu();
 
 		MenuBuilder helpMenu = new MenuBuilder("Help");
+		helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
 		menuBar.add(helpMenu.getJMenu());
-		helpMenu.addAction(new TipsAction("Commands and Tips"));
-		helpMenu.addAction(new AboutAction("About"));
+		helpMenu.addAction(new TipsAction("Tips and Commands"), KeyEvent.VK_T);
+		helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
 
 		this.setJMenuBar(menuBar);
 		this.repaint();
@@ -344,8 +344,9 @@ public abstract class AppFrame extends JFrame {
 	protected void updateEditMenu() {
 		editMenu.reset();
 
-		editMenu.addAction(new UndoAction());
-		editMenu.addAction(new RedoAction());
+		editMenu.addAction(new UndoAction(), KeyEvent.VK_U);
+
+		editMenu.addAction(new RedoAction(), KeyEvent.VK_R);
 
 	}
 
@@ -378,37 +379,46 @@ public abstract class AppFrame extends JFrame {
 	 */
 	protected void updateWorldMenu() {
 		worldMenu.reset();
-		worldMenu.addAction(new MinimizeAllWindows());
+		worldMenu.addAction(new MinimizeAllWindows(), KeyEvent.VK_M);
 
 		if (!isFullScreenMode) {
-			worldMenu.addAction(new TurnOnFullScreen());
+			worldMenu.addAction(new TurnOnFullScreen(), KeyEvent.VK_F);
 		} else {
-			worldMenu.addAction(new TurnOffFullScreen());
+			worldMenu.addAction(new TurnOffFullScreen(), KeyEvent.VK_F);
 		}
 
 		if (!preferences.isEnableTooltips()) {
-			worldMenu.addAction(new TurnOnTooltips());
+			worldMenu.addAction(new TurnOnTooltips(), KeyEvent.VK_T);
 		} else {
-			worldMenu.addAction(new TurnOffTooltips());
+			worldMenu.addAction(new TurnOffTooltips(), KeyEvent.VK_T);
 		}
 
 		if (!Grid.isGridVisible()) {
-			worldMenu.addAction(new TurnOnGrid());
+			worldMenu.addAction(new TurnOnGrid(), KeyEvent.VK_G);
 		} else {
-			worldMenu.addAction(new TurnOffGrid());
+			worldMenu.addAction(new TurnOffGrid(), KeyEvent.VK_G);
+		}
+
+		if (!isSelectionMode()) {
+			worldMenu.addAction(new SwitchToSelectionMode(), KeyEvent.VK_S);
+		} else {
+			worldMenu.addAction(new SwitchToNavigationMode(), KeyEvent.VK_S);
 		}
 
 		MenuBuilder qualityMenu = worldMenu.createSubMenu("Rendering Quality");
-		qualityMenu.addAction(new LowQualityAction());
-		qualityMenu.addAction(new MediumQualityAction());
-		qualityMenu.addAction(new HighQualityAction());
+		qualityMenu.getJMenu().setMnemonic(KeyEvent.VK_Q);
+
+		qualityMenu.addAction(new LowQualityAction(), KeyEvent.VK_L);
+		qualityMenu.addAction(new MediumQualityAction(), KeyEvent.VK_M);
+		qualityMenu.addAction(new HighQualityAction(), KeyEvent.VK_H);
 
 		MenuBuilder debugMenu = worldMenu.createSubMenu("Debug");
+		debugMenu.getJMenu().setMnemonic(KeyEvent.VK_E);
 
 		if (!PDebug.debugPrintUsedMemory) {
-			debugMenu.addAction(new ShowDebugMemory());
+			debugMenu.addAction(new ShowDebugMemory(), KeyEvent.VK_S);
 		} else {
-			debugMenu.addAction(new HideDebugMemory());
+			debugMenu.addAction(new HideDebugMemory(), KeyEvent.VK_H);
 		}
 	}
 
@@ -439,13 +449,14 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
-	 * @param object
-	 *            Object to be added to NeoGraphics
-	 * @return the object being added
+	 * @param message
+	 *            Task related status message to remove from the status bar
+	 * @return status message
 	 */
-	public WorldObject addWorldObject(WorldObject object) {
-		getWorld().getGround().addObject(object);
-		return object;
+	public String addTaskStatusMsg(String message) {
+		taskStatusStrings.add(message);
+		updateTaskMessages();
+		return message;
 	}
 
 	/**
@@ -498,26 +509,6 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
-	 * @param message
-	 *            Task-related status message to add to the status bar
-	 */
-	public void removeTaskStatusMsg(String message) {
-		taskStatusStrings.remove(message);
-		updateTaskMessages();
-	}
-
-	/**
-	 * @param message
-	 *            Task related status message to remove from the status bar
-	 * @return status message
-	 */
-	public String addTaskStatusMsg(String message) {
-		taskStatusStrings.add(message);
-		updateTaskMessages();
-		return message;
-	}
-
-	/**
 	 * This method removes the escape full screen mode key listener. It will be
 	 * called for you automatically when full screen mode exits, but the method
 	 * has been made public for applications that wish to use other methods for
@@ -529,6 +520,15 @@ public abstract class AppFrame extends JFrame {
 					.removeKeyListener((KeyListener) escapeFullScreenModeListener);
 			escapeFullScreenModeListener = null;
 		}
+	}
+
+	/**
+	 * @param message
+	 *            Task-related status message to add to the status bar
+	 */
+	public void removeTaskStatusMsg(String message) {
+		taskStatusStrings.remove(message);
+		updateTaskMessages();
 	}
 
 	/**
@@ -896,7 +896,7 @@ public abstract class AppFrame extends JFrame {
 		private static final long serialVersionUID = 1L;
 
 		public TurnOffTooltips() {
-			super("Tooltips off");
+			super("Autoshow Tooltips off");
 		}
 
 		@Override
@@ -960,13 +960,53 @@ public abstract class AppFrame extends JFrame {
 		private static final long serialVersionUID = 1L;
 
 		public TurnOnTooltips() {
-			super("Tooltips on");
+			super("Autoshow Tooltips on");
 		}
 
 		@Override
 		protected void action() throws ActionException {
 			preferences.setEnableTooltips(true);
 			updateWorldMenu();
+		}
+
+	}
+
+	/**
+	 * Action to switch to selection mode
+	 * 
+	 * @author Shu Wu
+	 */
+	class SwitchToSelectionMode extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public SwitchToSelectionMode() {
+			super("Switch to Selection Mode");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			setSelectionMode(true);
+		}
+
+	}
+
+	/**
+	 * Action to switch to navigation mode
+	 * 
+	 * @author Shu Wu
+	 */
+	class SwitchToNavigationMode extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public SwitchToNavigationMode() {
+			super("Switch to Navigation Mode");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			setSelectionMode(false);
 		}
 
 	}

@@ -22,9 +22,9 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * A UI object for NEFEnsemble
@@ -219,8 +219,8 @@ public class UINEFEnsemble extends UIEnsemble {
 		@Override
 		protected void action() throws ActionException {
 			if (getModel().getDimension() > 1) {
-				Util
-						.UserWarning("Distortion cannot be plotted for multi-dimensional NEFEnsemble");
+				UserMessages
+						.showWarning("Distortion cannot be plotted for multi-dimensional NEFEnsemble");
 			} else
 				Plotter.plot(getModel(), decodedOriginName);
 

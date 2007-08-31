@@ -7,7 +7,7 @@ import java.awt.geom.Point2D;
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.MoveableFrame;
+import ca.shu.ui.lib.objects.SelectionBorder;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.Interactable;
@@ -37,7 +37,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 	 */
 	private static final double MAX_CONTEXT_MENU_DRAG_DISTANCE = 20;
 
-	private MoveableFrame frame;
+	private SelectionBorder frame;
 
 	private boolean handCursorShown = false;
 
@@ -51,7 +51,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	public MouseHandler(World world) {
 		super();
-		frame = new MoveableFrame(world);
+		frame = new SelectionBorder(world);
 		frame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
 		this.world = world;
 	}

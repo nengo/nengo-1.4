@@ -1,13 +1,15 @@
-package ca.shu.ui.lib.objects.widgets;
+package ca.shu.ui.lib.objects.activities;
 
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
 
-/*
- * Tracks CPU Intensive tasks and displays it in the User Interface
+/**
+ * Displays and removes a task message from the application status bar
+ * 
+ * @author Shu Wu
  */
 public class TrackedStatusMsg {
-	String taskName;
+	private String taskName;
 
 	public TrackedStatusMsg(String taskName) {
 		this(taskName, null);
@@ -24,13 +26,6 @@ public class TrackedStatusMsg {
 		init();
 	}
 
-	/*
-	 * Stop tracking the task. ie. remove it from the User Interface
-	 */
-	public void finished() {
-		UIEnvironment.getInstance().removeTaskStatusMsg(getTaskName());
-	}
-
 	private void init() {
 		UIEnvironment.getInstance().addTaskStatusMsg(getTaskName());
 
@@ -42,5 +37,12 @@ public class TrackedStatusMsg {
 
 	protected void setTaskName(String taskName) {
 		this.taskName = taskName;
+	}
+
+	/**
+	 * Removes the task message from the application status bar.
+	 */
+	public void finished() {
+		UIEnvironment.getInstance().removeTaskStatusMsg(getTaskName());
 	}
 }

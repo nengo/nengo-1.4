@@ -19,7 +19,7 @@ import javax.swing.border.EtchedBorder;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * A lot like UserConfigurer, except it allows the user to use templates to save
@@ -150,7 +150,7 @@ class ConfigTemplateDialog extends ConfigDialog {
 						fileList.setSelectedIndex(fileList.getItemCount() - 1);
 					}
 				} else {
-					Util.UserWarning("Properties not complete");
+					UserMessages.showWarning("Properties not complete");
 				}
 			}
 		});

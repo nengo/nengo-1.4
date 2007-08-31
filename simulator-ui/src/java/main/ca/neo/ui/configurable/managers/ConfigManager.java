@@ -16,6 +16,7 @@ import javax.swing.text.SimpleAttributeSet;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
+import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 
 /**
@@ -93,7 +94,7 @@ public abstract class ConfigManager {
 		if (file.exists()) {
 			boolean val = file.delete();
 			if (val == false) {
-				Util.UserError("Could not delete file");
+				UserMessages.showError("Could not delete file");
 			}
 
 		}
@@ -163,7 +164,7 @@ public abstract class ConfigManager {
 			obj = obj_in.readObject();
 
 			if (obj == null) {
-				Util.UserError("Could not load file: " + name);
+				UserMessages.showError("Could not load file: " + name);
 			} else {
 
 				this.properties = (MutableAttributeSet) obj;

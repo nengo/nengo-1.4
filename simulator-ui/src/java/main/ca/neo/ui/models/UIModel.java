@@ -10,9 +10,9 @@ import ca.neo.ui.models.tooltips.ModelTooltip;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -183,7 +183,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	 */
 	public JPopupMenu showContextMenu(PInputEvent event) {
 		if (!isModelExists()) {
-			Util.UserWarning("Model is not configured yet");
+			UserMessages.showWarning("Model is not configured yet");
 			return null;
 		} else {
 			JPopupMenu menu = constructMenu().getJPopupMenu();

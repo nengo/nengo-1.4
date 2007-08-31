@@ -17,15 +17,15 @@ import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UINodeContainer;
 import ca.shu.ui.lib.handlers.AbstractStatusHandler;
-import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
-import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.activities.PActivity;
-import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * Viewer for looking at NEO Node models
@@ -105,7 +105,7 @@ public abstract class NodeViewer extends World implements Interactable,
 		 * in the center of the camera
 		 */
 		if (moveCameraToNode) {
-			getWorld().setSkyPosition(nodeProxy.getOffset().getX(),
+			getWorld().animateToSkyPosition(nodeProxy.getOffset().getX(),
 					nodeProxy.getOffset().getY());
 		}
 
@@ -116,13 +116,6 @@ public abstract class NodeViewer extends World implements Interactable,
 		} else {
 			getGround().addChild(nodeProxy);
 		}
-	}
-
-	/**
-	 * @return Layout bounds to be used by Layout algorithms
-	 */
-	protected Dimension getLayoutBounds() {
-		return layoutBounds;
 	}
 
 	/**
@@ -137,6 +130,13 @@ public abstract class NodeViewer extends World implements Interactable,
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
 
+	}
+
+	/**
+	 * @return Layout bounds to be used by Layout algorithms
+	 */
+	protected Dimension getLayoutBounds() {
+		return layoutBounds;
 	}
 
 	/**
@@ -232,26 +232,43 @@ public abstract class NodeViewer extends World implements Interactable,
 		int numberOfColumns = (int) Math.sqrt(numberOfNodes);
 		int columnCounter = 0;
 
-		PTransformActivity moveNodeActivity = null;
-		while (it.hasNext()) {
-			UINeoNode node = it.next();
+		if (it.hasNext()) {
+			double startX = Double.MAX_VALUE;
+			double startY = Double.MAX_VALUE;
+			double endX = Double.MIN_VALUE;
+			double endY = Double.MIN_VALUE;
 
-			moveNodeActivity = node.animateToPositionScaleRotation(x, y, node
-					.getScale(), node.getRotation(), 1000);
+			while (it.hasNext()) {
+				UINeoNode node = it.next();
 
-			x += 150;
+				node.animateToPositionScaleRotation(x, y, node.getScale(), node
+						.getRotation(), 1000);
 
-			if (++columnCounter > numberOfColumns) {
-				x = 0;
-				y += SQUARE_LAYOUT_NODE_SPACING;
-				columnCounter = 0;
+				if (x < startX) {
+					startX = x;
+				} else if (x + node.getWidth() > endX) {
+					endX = x + node.getWidth();
+				}
+
+				if (y < startY) {
+					startY = y;
+				} else if (y + node.getHeight() > endY) {
+					endY = y + node.getHeight();
+				}
+
+				x += 150;
+
+				if (++columnCounter > numberOfColumns) {
+					x = 0;
+					y += SQUARE_LAYOUT_NODE_SPACING;
+					columnCounter = 0;
+				}
+
 			}
 
-		}
-
-		if (moveNodeActivity != null) {
-
-			(new ZoomToFitActivity()).startAfter(moveNodeActivity);
+			PBounds fullBounds = new PBounds(startX, startY, endX - startX,
+					endY - startY);
+			zoomToBounds(fullBounds);
 
 		}
 

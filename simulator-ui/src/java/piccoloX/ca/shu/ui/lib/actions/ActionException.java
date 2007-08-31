@@ -1,7 +1,7 @@
 package ca.shu.ui.lib.actions;
 
 import ca.shu.ui.lib.exceptions.UIException;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Exception thrown during an action
@@ -24,18 +24,6 @@ public class ActionException extends UIException {
 		this(description, true);
 	}
 
-	@Override
-	public void defaultHandleBehavior() {
-
-		if (showWarning) {
-			System.out.println("Action Exception: " + toString());
-			Util.UserWarning(getMessage());
-
-		} else
-			System.out.println("Action Exception: " + toString());
-
-	}
-
 	/**
 	 * @param description
 	 *            Description of the exception
@@ -46,6 +34,18 @@ public class ActionException extends UIException {
 		super(description);
 
 		this.showWarning = showWarningPopup;
+
+	}
+
+	@Override
+	public void defaultHandleBehavior() {
+
+		if (showWarning) {
+			System.out.println("Action Exception: " + toString());
+			UserMessages.showWarning(getMessage());
+
+		} else
+			System.out.println("Action Exception: " + toString());
 
 	}
 

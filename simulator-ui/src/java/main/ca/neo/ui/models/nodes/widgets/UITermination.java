@@ -18,18 +18,19 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.objects.lines.ILineAcceptor;
+import ca.shu.ui.lib.objects.lines.ILineEndHolder;
 import ca.shu.ui.lib.objects.lines.LineEnd;
-import ca.shu.ui.lib.objects.lines.LineInIcon;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.objects.lines.LineEndHolderIcon;
+import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper for a Termination
  * 
  * @author Shu Wu
  */
-public class UITermination extends Widget implements ILineAcceptor {
+public class UITermination extends Widget implements ILineEndHolder {
 
 	private static final long serialVersionUID = 1L;
 
@@ -58,7 +59,7 @@ public class UITermination extends Widget implements ILineAcceptor {
 	}
 
 	private void init() {
-		ModelIcon icon = new ModelIcon(this, new LineInIcon());
+		ModelIcon icon = new ModelIcon(this, new LineEndHolderIcon());
 		icon.configureLabel(false);
 
 		setIcon(icon);
@@ -159,7 +160,7 @@ public class UITermination extends Widget implements ILineAcceptor {
 					newWeights);
 			popupTransientMsg("Weights changed on Termination");
 		} catch (StructuralException e) {
-			Util.UserWarning("Could not modify weights: " + e.getMessage());
+			UserMessages.showWarning("Could not modify weights: " + e.getMessage());
 		}
 
 	}

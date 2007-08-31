@@ -126,6 +126,45 @@ public class BoundsHandle extends PHandle {
 	}
 
 	@Override
+	protected void installHandleEventHandlers() {
+		super.installHandleEventHandlers();
+		handleCursorHandler = new PBasicInputEventHandler() {
+			boolean cursorPushed = false;
+
+			@Override
+			public void mouseEntered(PInputEvent aEvent) {
+				if (!cursorPushed) {
+					aEvent
+							.pushCursor(getCursorFor(((PBoundsLocator) getLocator())
+									.getSide()));
+					cursorPushed = true;
+				}
+			}
+
+			@Override
+			public void mouseExited(PInputEvent aEvent) {
+				PPickPath focus = aEvent.getInputManager().getMouseFocus();
+				if (cursorPushed) {
+					if (focus == null
+							|| focus.getPickedNode() != BoundsHandle.this) {
+						aEvent.popCursor();
+						cursorPushed = false;
+					}
+				}
+			}
+
+			@Override
+			public void mouseReleased(PInputEvent event) {
+				if (cursorPushed) {
+					event.popCursor();
+					cursorPushed = false;
+				}
+			}
+		};
+		addInputEventListener(handleCursorHandler);
+	}
+
+	@Override
 	public void dragHandle(PDimension aLocalDimension, PInputEvent aEvent) {
 		PBoundsLocator l = (PBoundsLocator) getLocator();
 
@@ -352,44 +391,5 @@ public class BoundsHandle extends PHandle {
 	public void startHandleDrag(Point2D aLocalPoint, PInputEvent aEvent) {
 		PBoundsLocator l = (PBoundsLocator) getLocator();
 		l.getNode().startResizeBounds();
-	}
-
-	@Override
-	protected void installHandleEventHandlers() {
-		super.installHandleEventHandlers();
-		handleCursorHandler = new PBasicInputEventHandler() {
-			boolean cursorPushed = false;
-
-			@Override
-			public void mouseEntered(PInputEvent aEvent) {
-				if (!cursorPushed) {
-					aEvent
-							.pushCursor(getCursorFor(((PBoundsLocator) getLocator())
-									.getSide()));
-					cursorPushed = true;
-				}
-			}
-
-			@Override
-			public void mouseExited(PInputEvent aEvent) {
-				PPickPath focus = aEvent.getInputManager().getMouseFocus();
-				if (cursorPushed) {
-					if (focus == null
-							|| focus.getPickedNode() != BoundsHandle.this) {
-						aEvent.popCursor();
-						cursorPushed = false;
-					}
-				}
-			}
-
-			@Override
-			public void mouseReleased(PInputEvent event) {
-				if (cursorPushed) {
-					event.popCursor();
-					cursorPushed = false;
-				}
-			}
-		};
-		addInputEventListener(handleCursorHandler);
 	}
 }

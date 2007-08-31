@@ -10,8 +10,8 @@ import ca.neo.ui.configurable.descriptors.CFloat;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.widgets.TrackedActivity;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Runs the Simulator
@@ -62,7 +62,7 @@ public class RunSimulatorAction extends StandardAction {
 	 * @author Shu Wu
 	 * 
 	 */
-	class RunSimulatorActivity extends TrackedActivity {
+	class RunSimulatorActivity extends AbstractActivity {
 		SimulatorConfig config;
 
 		public RunSimulatorActivity(SimulatorConfig config) {
@@ -76,7 +76,7 @@ public class RunSimulatorAction extends StandardAction {
 				simulator.run(config.getStartTime(), config.getEndTime(),
 						config.getStepSize());
 			} catch (SimulationException e) {
-				Util.UserError("Simulator problem: " + e.toString());
+				UserMessages.showError("Simulator problem: " + e.toString());
 			}
 		}
 	}

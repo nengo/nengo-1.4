@@ -2,7 +2,7 @@ package ca.shu.ui.lib.actions;
 
 import java.util.Vector;
 
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.world.AppFrame;
 
 /**
@@ -17,17 +17,17 @@ public class ReversableActionManager {
 	 */
 	static final int MAX_NUM_OF_UNDO_ACTIONS = 5;
 
-	/**
-	 * Number of undo steps that have been taken
-	 */
-	private int undoStepCount = 0;
-
 	private AppFrame parent;
 
 	/**
 	 * A collection of reversable actions
 	 */
 	private Vector<ReversableAction> reversableActions;
+
+	/**
+	 * Number of undo steps that have been taken
+	 */
+	private int undoStepCount = 0;
 
 	/**
 	 * Create a new reversable action manager
@@ -40,6 +40,13 @@ public class ReversableActionManager {
 		reversableActions = new Vector<ReversableAction>(
 				MAX_NUM_OF_UNDO_ACTIONS + 1);
 		this.parent = parent;
+	}
+
+	/**
+	 * Updates the application parent that reversable actions have changed
+	 */
+	private void updateParent() {
+		parent.reversableActionsUpdated();
 	}
 
 	/**
@@ -134,16 +141,9 @@ public class ReversableActionManager {
 			undoStepCount++;
 			action.undoAction();
 		} else {
-			Util.UserError("Cannot undo anymore steps");
+			UserMessages.showError("Cannot undo anymore steps");
 		}
 
 		updateParent();
-	}
-
-	/**
-	 * Updates the application parent that reversable actions have changed
-	 */
-	private void updateParent() {
-		parent.reversableActionsUpdated();
 	}
 }

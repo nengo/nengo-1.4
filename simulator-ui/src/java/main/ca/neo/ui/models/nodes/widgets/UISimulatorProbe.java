@@ -22,10 +22,10 @@ import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.widgets.TrackedActivity;
-import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper for a Simulator Probe
@@ -75,7 +75,7 @@ public class UISimulatorProbe extends UIModel {
 			init(nodeAttachedTo);
 		} catch (SimulationException e) {
 			destroy();
-			Util.UserError("Could not add probe: " + e.toString());
+			UserMessages.showError("Could not add probe: " + e.toString());
 		}
 	}
 
@@ -127,7 +127,7 @@ public class UISimulatorProbe extends UIModel {
 					getProbe());
 			popupTransientMsg("Probe removed from Simulator");
 		} catch (SimulationException e) {
-			Util.UserError("Could not remove probe");
+			UserMessages.showError("Could not remove probe");
 		}
 
 		nodeAttachedTo.removeProbe(this);
@@ -145,7 +145,7 @@ public class UISimulatorProbe extends UIModel {
 		try {
 			me.write(new File(name + ".mat"));
 		} catch (IOException e) {
-			Util.UserError("Could not export file: " + e.toString());
+			UserMessages.showError("Could not export file: " + e.toString());
 		}
 	}
 
@@ -205,7 +205,7 @@ public class UISimulatorProbe extends UIModel {
 			name = JOptionPane
 					.showInputDialog("Enter name of file to export to: ");
 
-			(new TrackedActivity("Exporting to matlab") {
+			(new AbstractActivity("Exporting to matlab") {
 				@Override
 				public void doActivity() {
 					exportToMatlab(name);
@@ -259,7 +259,7 @@ public class UISimulatorProbe extends UIModel {
 								.showInputDialog("Time constant of display filter (s): "));
 				plot(tauFilter);
 			} catch (java.lang.NumberFormatException exception) {
-				Util.UserWarning("Could not parse number");
+				UserMessages.showWarning("Could not parse number");
 			}
 
 		}

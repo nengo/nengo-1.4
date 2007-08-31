@@ -8,7 +8,7 @@ import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UINeuron;
 import ca.neo.util.Probe;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Viewer for peeking into an Ensemble
@@ -61,7 +61,7 @@ public class EnsembleViewer extends NodeViewer {
 
 				addNeoNode(neuronUI, false, false, false);
 			} else {
-				Util.UserError("Unsupported node type "
+				UserMessages.showError("Unsupported node type "
 						+ node.getClass().getSimpleName()
 						+ " in EnsembleViewer");
 			}
@@ -79,7 +79,7 @@ public class EnsembleViewer extends NodeViewer {
 				Probeable target = probe.getTarget();
 
 				if (!(target instanceof Node)) {
-					Util.UserError("Unsupported target type for probe");
+					UserMessages.showError("Unsupported target type for probe");
 				} else {
 
 					if (probe.isInEnsemble()

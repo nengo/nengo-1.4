@@ -12,7 +12,7 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.objects.Window.WindowState;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper for Node Containers such as Ensembles and Networks.

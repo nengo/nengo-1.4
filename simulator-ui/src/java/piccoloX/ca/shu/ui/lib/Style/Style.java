@@ -13,18 +13,10 @@ import javax.swing.JComponent;
 public class Style {
 	public static final int ANIMATION_DROP_IN_WORLD_MS = 200;
 	/*
-	 * Named colors
-	 */
-	public static final Color COLOR_LIGHT_PURPLE = new Color(225, 180, 255);
-	public static final Color COLOR_LIGHT_BLUE = new Color(176, 220, 246);
-	public static final Color COLOR_LIGHT_GREEN = new Color(176, 246, 182);
-
-	/*
 	 * Colors
 	 */
 	public static final Color COLOR_BACKGROUND = Color.black;
 	public static final Color COLOR_BACKGROUND2 = Color.darkGray;
-
 	public static final Color COLOR_BORDER_SELECTED = Color.orange;
 
 	/*
@@ -34,12 +26,20 @@ public class Style {
 	public static final Color COLOR_BUTTON_BORDER = Color.darkGray;
 
 	public static final Color COLOR_BUTTON_HIGHLIGHT = Color.black;
+
 	public static final Color COLOR_BUTTON_SELECTED = Color.gray;
 	public static final Color COLOR_DARKBORDER = Color.darkGray;
 
 	public static final Color COLOR_DISABLED = Color.gray;
 	public static final Color COLOR_FOREGROUND = Color.white;
 	public static final Color COLOR_HIGH_SALIENCE = new Color(150, 0, 0);
+
+	public static final Color COLOR_LIGHT_BLUE = new Color(176, 220, 246);
+	public static final Color COLOR_LIGHT_GREEN = new Color(176, 246, 182);
+	/*
+	 * Named colors
+	 */
+	public static final Color COLOR_LIGHT_PURPLE = new Color(225, 180, 255);
 
 	/*
 	 * Line Colors

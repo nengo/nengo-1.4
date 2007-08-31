@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.GText;
+import ca.shu.ui.lib.objects.TextNode;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.nodes.PText;
 
@@ -50,7 +50,7 @@ public class ModelTooltip extends WorldObject {
 
 			strBd.append(part.getTooltipString() + "\n");
 		}
-		GText propertyText = new GText(strBd.toString());
+		TextNode propertyText = new TextNode(strBd.toString());
 		propertyText.setOffset(0, tag.getHeight() + 10);
 		propertyText.setWidth(tooltipWidth);
 		addChild(propertyText);

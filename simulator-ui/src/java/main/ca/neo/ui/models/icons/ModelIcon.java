@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.neo.ui.models.UIModel;
-import ca.shu.ui.lib.objects.GText;
+import ca.shu.ui.lib.objects.TextNode;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 
@@ -26,7 +26,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 	/**
 	 * Label of the icon
 	 */
-	private GText label;
+	private TextNode label;
 
 	/**
 	 * Parent of this icon
@@ -52,7 +52,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 		this.iconReal = icon;
 
 		addChild(icon);
-		label = new GText();
+		label = new TextNode();
 		label.setConstrainWidthToTextWidth(true);
 		updateLabel();
 		addChild(label);

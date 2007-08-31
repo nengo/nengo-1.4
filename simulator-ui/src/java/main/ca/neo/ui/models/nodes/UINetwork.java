@@ -11,7 +11,7 @@ import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkUISettings;
 import ca.neo.ui.models.viewers.NetworkViewer;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * UI Wrapper for a Network
@@ -129,8 +129,8 @@ public class UINetwork extends UINodeContainer {
 			if (obj != null)
 				layoutManager = (NetworkUISettings) obj;
 		} catch (Throwable e) {
-			Util
-					.UserError("Could not access layout manager, creating a new one");
+			UserMessages
+					.showError("Could not access layout manager, creating a new one");
 		}
 
 		if (layoutManager == null) {

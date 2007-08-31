@@ -18,14 +18,13 @@ import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.widgets.TrackedActivity;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Action used to open a Neo model from file
  * 
  * @author Shu Wu
- * 
  */
 public class OpenNeoFileAction extends StandardAction {
 
@@ -51,7 +50,7 @@ public class OpenNeoFileAction extends StandardAction {
 		if (response == JFileChooser.APPROVE_OPTION) {
 			file = NeoGraphics.FileChooser.getSelectedFile();
 
-			TrackedActivity loadActivity = new TrackedActivity(
+			AbstractActivity loadActivity = new AbstractActivity(
 					"Loading network") {
 
 				@Override
@@ -77,8 +76,8 @@ public class OpenNeoFileAction extends StandardAction {
 						e.printStackTrace();
 					} finally {
 						if (objLoaded == null) {
-							Util
-									.UserError("Incorrect file type or wrong version");
+							UserMessages
+									.showError("Incorrect file type or wrong version");
 						}
 					}
 
@@ -138,7 +137,9 @@ public class OpenNeoFileAction extends StandardAction {
 
 	/**
 	 * Wraps the loaded object and adds it to the Node Container
-	 * @param objLoaded Loaded object
+	 * 
+	 * @param objLoaded
+	 *            Loaded object
 	 */
 	protected void processLoadedObject(Object objLoaded) {
 		UINeoNode node;
@@ -149,8 +150,8 @@ public class OpenNeoFileAction extends StandardAction {
 		if (node != null) {
 			nodeContainer.addNeoNode(node);
 		} else {
-			Util
-					.UserError("Could not load Model (must be a Network / (NEF) Ensemble)");
+			UserMessages
+					.showError("Could not load Model (must be a Network / (NEF) Ensemble)");
 		}
 
 	}

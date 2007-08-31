@@ -15,9 +15,9 @@ import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper for an Ensemble
@@ -88,7 +88,7 @@ public class UIEnsemble extends UINodeContainer {
 
 	@Override
 	public ConfigParamDescriptor[] getConfigSchema() {
-		Util.UserError("Ensemble has not been implemented yet");
+		UserMessages.showError("Ensemble has not been implemented yet");
 		return null;
 	}
 
@@ -145,7 +145,7 @@ public class UIEnsemble extends UINodeContainer {
 		@Override
 		protected void action() throws ActionException {
 			if (!getModel().isCollectingSpikes()) {
-				Util.UserWarning("Ensemble is not set to collect spikes.");
+				UserMessages.showWarning("Ensemble is not set to collect spikes.");
 			}
 			Plotter.plot(getModel().getSpikePattern());
 

@@ -1,5 +1,6 @@
 package ca.neo.ui;
 
+import java.awt.event.KeyEvent;
 import java.util.Iterator;
 
 import javax.swing.JMenuBar;
@@ -16,7 +17,7 @@ import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.UINodeContainer;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
-import ca.shu.ui.lib.util.MenuBuilder;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.AppFrame;
 
 /**
@@ -128,10 +129,11 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
 	public void addNeoNode(UINeoNode node) {
-		getWorld().getGround().addObject(node);
 		if (node instanceof UINodeContainer) {
 			((UINodeContainer) (node)).openViewer();
 		}
+		getWorld().getGround().addObject(node);
+
 	}
 
 	@Override
@@ -147,18 +149,22 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	@Override
 	public void initApplicationMenu(JMenuBar menuBar) {
 		MenuBuilder menu = new MenuBuilder("File");
+		menu.getJMenu().setMnemonic(KeyEvent.VK_F);
+
 		menuBar.add(menu.getJMenu());
 
 		MenuBuilder newMenu = menu.createSubMenu("New");
+		newMenu.getJMenu().setMnemonic(KeyEvent.VK_N);
 		newMenu.addAction(new CreateModelAction("Network", this,
-				UINetwork.class));
+				UINetwork.class), KeyEvent.VK_N);
 		newMenu.addAction(new CreateModelAction("NEFEnsemble", this,
-				UINEFEnsemble.class));
+				UINEFEnsemble.class), KeyEvent.VK_F);
 
 		newMenu.addAction(new CreateModelAction("Ensemble", this,
-				UIEnsemble.class));
+				UIEnsemble.class), KeyEvent.VK_E);
 
-		menu.addAction(new OpenNeoFileAction("Open from file", this));
+		menu.addAction(new OpenNeoFileAction("Open from file", this),
+				KeyEvent.VK_O);
 
 	}
 

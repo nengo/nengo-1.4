@@ -47,64 +47,6 @@ public abstract class StandardAction implements Serializable {
 	}
 
 	/**
-	 * Does the action
-	 */
-	public void doAction() {
-
-		try {
-			action();
-			postAction();
-			actionCompleted = true;
-		} catch (ActionException e) {
-			e.defaultHandleBehavior();
-		}
-	}
-
-	/**
-	 * Does the action layer, in the Swing event thread
-	 */
-	public void doActionLater() {
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				doAction();
-			}
-		});
-	}
-
-	/**
-	 * @return Swing-type action, which can be used in Swing components
-	 */
-	public Action toSwingAction() {
-		SwingAction action;
-		if (getActionName() != null) {
-			action = new SwingAction(getActionName());
-		} else {
-			action = new SwingAction(getDescription());
-		}
-
-		if (!isEnabled()) {
-			action.setEnabled(false);
-		}
-		return action;
-	}
-
-	/**
-	 * @return Whether this action is enabled
-	 */
-	public boolean isEnabled() {
-		return isEnabled;
-	}
-
-	/**
-	 * @param isEnabled
-	 *            True, if this action is enabled
-	 */
-	public void setEnabled(boolean isEnabled) {
-		this.isEnabled = isEnabled;
-	}
-
-	/**
 	 * Does the work
 	 * 
 	 * @return Whether the action was successful
@@ -138,6 +80,64 @@ public abstract class StandardAction implements Serializable {
 	 */
 	protected void postAction() {
 
+	}
+
+	/**
+	 * Does the action
+	 */
+	public void doAction() {
+
+		try {
+			action();
+			postAction();
+			actionCompleted = true;
+		} catch (ActionException e) {
+			e.defaultHandleBehavior();
+		}
+	}
+
+	/**
+	 * Does the action layer, in the Swing event thread
+	 */
+	public void doActionLater() {
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				doAction();
+			}
+		});
+	}
+
+	/**
+	 * @return Whether this action is enabled
+	 */
+	public boolean isEnabled() {
+		return isEnabled;
+	}
+
+	/**
+	 * @param isEnabled
+	 *            True, if this action is enabled
+	 */
+	public void setEnabled(boolean isEnabled) {
+		this.isEnabled = isEnabled;
+	}
+
+	/**
+	 * @return Swing-type action, which can be used in Swing components
+	 */
+	public Action toSwingAction() {
+		SwingAction action;
+		if (getActionName() != null) {
+			action = new SwingAction(getActionName());
+		} else {
+			action = new SwingAction(getDescription());
+		}
+
+		if (!isEnabled()) {
+			action.setEnabled(false);
+		}
+		return action;
 	}
 
 	/**

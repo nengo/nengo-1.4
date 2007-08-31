@@ -33,11 +33,11 @@ import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.widgets.TrackedActivity;
-import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.objects.activities.AbstractActivity;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
@@ -46,7 +46,7 @@ import edu.uci.ics.jung.visualization.FRLayout;
 import edu.uci.ics.jung.visualization.Layout;
 import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
-import edu.umd.cs.piccolo.activities.PTransformActivity;
+import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * Viewer for peeking into a Network
@@ -71,49 +71,6 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public NetworkViewer(UINetwork pNetwork) {
 		super(pNetwork);
-	}
-
-	/**
-	 * @return The child nodes of this network as a Graph object readable by
-	 *         Jung Layout algorithms
-	 */
-	protected Graph createGraph() {
-		DirectedSparseGraph graph = new DirectedSparseGraph();
-
-		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
-
-		/**
-		 * Add vertices
-		 */
-		while (enumeration.hasMoreElements()) {
-			UINeoNode node = enumeration.nextElement();
-			DirectedSparseVertex vertex = new DirectedSparseVertex();
-
-			node.setVertex(vertex);
-
-			graph.addVertex(vertex);
-
-		}
-
-		/**
-		 * Add Directed edges
-		 */
-		Projection[] projections = getNetwork().getProjections();
-		for (Projection projection : projections) {
-			Origin origin = projection.getOrigin();
-			Termination term = projection.getTermination();
-
-			UINeoNode nodeOrigin = getNode(origin.getNode().getName());
-			UINeoNode nodeTerm = getNode(term.getNode().getName());
-
-			DirectedSparseEdge edge = new DirectedSparseEdge(nodeOrigin
-					.getVertex(), nodeTerm.getVertex());
-			graph.addEdge(edge);
-
-		}
-
-		return graph;
-
 	}
 
 	@Override
@@ -162,6 +119,49 @@ public class NetworkViewer extends NodeViewer {
 		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
 	}
 
+	/**
+	 * @return The child nodes of this network as a Graph object readable by
+	 *         Jung Layout algorithms
+	 */
+	protected Graph createGraph() {
+		DirectedSparseGraph graph = new DirectedSparseGraph();
+
+		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
+
+		/**
+		 * Add vertices
+		 */
+		while (enumeration.hasMoreElements()) {
+			UINeoNode node = enumeration.nextElement();
+			DirectedSparseVertex vertex = new DirectedSparseVertex();
+
+			node.setVertex(vertex);
+
+			graph.addVertex(vertex);
+
+		}
+
+		/**
+		 * Add Directed edges
+		 */
+		Projection[] projections = getNetwork().getProjections();
+		for (Projection projection : projections) {
+			Origin origin = projection.getOrigin();
+			Termination term = projection.getTermination();
+
+			UINeoNode nodeOrigin = getNode(origin.getNode().getName());
+			UINeoNode nodeTerm = getNode(term.getNode().getName());
+
+			DirectedSparseEdge edge = new DirectedSparseEdge(nodeOrigin
+					.getVertex(), nodeTerm.getVertex());
+			graph.addEdge(edge);
+
+		}
+
+		return graph;
+
+	}
+
 	@Override
 	protected void prepareForDestroy() {
 
@@ -179,7 +179,7 @@ public class NetworkViewer extends NodeViewer {
 				getNetwork().addNode(nodeProxy.getModel());
 
 			} catch (StructuralException e) {
-				Util.UserWarning(e.toString());
+				UserMessages.showWarning(e.toString());
 				return;
 			}
 		}
@@ -229,7 +229,7 @@ public class NetworkViewer extends NodeViewer {
 		}
 
 		if (layout == null) {
-			Util.UserError("Could not apply layout");
+			UserMessages.showError("Could not apply layout");
 			return;
 		}
 
@@ -324,7 +324,7 @@ public class NetworkViewer extends NodeViewer {
 			getNetwork().removeNode(nodeUI.getName());
 
 		} catch (StructuralException e) {
-			Util.UserWarning(e.toString());
+			UserMessages.showWarning(e.toString());
 			return;
 		}
 		super.removeNeoNode(nodeUI);
@@ -355,8 +355,10 @@ public class NetworkViewer extends NodeViewer {
 			}
 		}
 		if (layout.getSavedViewBounds() != null) {
-			getSky().setViewBounds(layout.getSavedViewBounds());
+			getSky().animateViewToCenterBounds(layout.getSavedViewBounds(),
+					true, 1000);
 		}
+
 		return true;
 	}
 
@@ -379,7 +381,7 @@ public class NetworkViewer extends NodeViewer {
 
 			layouts.addLayout(nodeLayout);
 		} else {
-			Util.UserError("Could not save node layout");
+			UserMessages.showError("Could not save node layout");
 		}
 	}
 
@@ -436,7 +438,7 @@ public class NetworkViewer extends NodeViewer {
 			Probeable target = probe.getTarget();
 
 			if (!(target instanceof Node)) {
-				Util.UserError("Unsupported target type for probe");
+				UserMessages.showError("Unsupported target type for probe");
 			} else {
 
 				if (!probe.isInEnsemble()) {
@@ -523,7 +525,7 @@ public class NetworkViewer extends NodeViewer {
 	 * 
 	 * @author Shu Wu
 	 */
-	class JungLayoutActivity extends TrackedActivity {
+	class JungLayoutActivity extends AbstractActivity {
 		Layout layout;
 
 		public JungLayoutActivity(Layout layout) {
@@ -541,7 +543,7 @@ public class NetworkViewer extends NodeViewer {
 			/**
 			 * Layout nodes needs to be done in a seperate UI-safe thread
 			 */
-			(new TrackedActivity("Layout nodes") {
+			(new AbstractActivity("Layout nodes") {
 
 				@Override
 				public void doActivity() {
@@ -550,28 +552,51 @@ public class NetworkViewer extends NodeViewer {
 					 */
 					Enumeration<UINeoNode> enumeration = getNeoNodes()
 							.elements();
-					PTransformActivity nodeMoveActivity = null;
-					while (enumeration.hasMoreElements()) {
-						UINeoNode node = enumeration.nextElement();
-						if (node.getVertex() != null) {
-							Point2D coord = layout
-									.getLocation(node.getVertex());
 
-							if (coord != null) {
-								nodeMoveActivity = node
-										.animateToPositionScaleRotation(coord
-												.getX(), coord.getY(), 1, 0,
-												1000);
+					if (enumeration.hasMoreElements()) {
+						double startX = Double.MAX_VALUE;
+						double startY = Double.MAX_VALUE;
+						double endX = Double.MIN_VALUE;
+						double endY = Double.MIN_VALUE;
+
+						while (enumeration.hasMoreElements()) {
+
+							UINeoNode node = enumeration.nextElement();
+
+							if (node.getVertex() != null) {
+								Point2D coord = layout.getLocation(node
+										.getVertex());
+
+								if (coord != null) {
+									double x = coord.getX();
+									double y = coord.getY();
+									node.animateToPositionScaleRotation(x, y,
+											1, 0, 1000);
+
+									if (x < startX) {
+										startX = x;
+									} else if (x + node.getWidth() > endX) {
+										endX = x + node.getWidth();
+									}
+
+									if (y < startY) {
+										startY = y;
+									} else if (y + node.getHeight() > endY) {
+										endY = y + node.getHeight();
+									}
+
+								}
+
 							}
 
 						}
 
+						PBounds fullBounds = new PBounds(startX, startY, endX
+								- startX, endY - startY);
+						zoomToBounds(fullBounds);
+
 					}
 
-					if (nodeMoveActivity != null) {
-						(new ZoomToFitActivity()).startAfter(nodeMoveActivity);
-
-					}
 				}
 			}).invokeLater();
 
@@ -656,11 +681,11 @@ public class NetworkViewer extends NodeViewer {
  */
 class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
-	private static final long serialVersionUID = 1L;
-
 	private static final ConfigParamDescriptor pHeight = new CInt("Height");
 
 	private static final ConfigParamDescriptor pWidth = new CInt("Width");
+
+	private static final long serialVersionUID = 1L;
 
 	private static final ConfigParamDescriptor[] zProperties = { pWidth,
 			pHeight };
@@ -683,7 +708,9 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
 	 */
 	public void completeConfiguration(ConfigParam properties) {
@@ -694,14 +721,18 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
 	 */
 	public ConfigParamDescriptor[] getConfigSchema() {
 		return zProperties;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#getTypeName()
 	 */
 	public String getTypeName() {

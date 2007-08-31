@@ -3,7 +3,7 @@ package ca.shu.ui.lib.handlers;
 import java.awt.event.InputEvent;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.MoveableFrame;
+import ca.shu.ui.lib.objects.SelectionBorder;
 import ca.shu.ui.lib.objects.TooltipWrapper;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
@@ -17,32 +17,22 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * @author Shu Wu
  */
 public class TooltipPickHandler extends AbstractPickHandler {
+	public static final String TOOLTIP_BORDER_ATTR = "tooltipBdr";
+
 	private WorldObject controls;
 
 	private WorldObject keyboardFocusObject;
 
 	private TooltipWrapper keyboardTooltip;
-
 	private TooltipWrapper mouseOverTooltip;
-	MoveableFrame tooltipFrame;
+
+	SelectionBorder tooltipFrame;
 
 	public TooltipPickHandler(World world) {
 		super(world);
-		tooltipFrame = new MoveableFrame(world);
+		tooltipFrame = new SelectionBorder(world);
 		tooltipFrame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
 
-	}
-
-	@Override
-	public void keyPressed(PInputEvent event) {
-		super.keyPressed(event);
-		processKeyboardEvent(event);
-	}
-
-	@Override
-	public void keyReleased(PInputEvent event) {
-		super.keyReleased(event);
-		processKeyboardEvent(event);
 	}
 
 	private void processKeyboardEvent(PInputEvent event) {
@@ -96,8 +86,6 @@ public class TooltipPickHandler extends AbstractPickHandler {
 
 	}
 
-	public static final String TOOLTIP_BORDER_ATTR = "tooltipBdr";
-
 	@Override
 	protected void nodePicked() {
 		WorldObject node = getPickedNode();
@@ -148,6 +136,18 @@ public class TooltipPickHandler extends AbstractPickHandler {
 			}
 
 		}
+	}
+
+	@Override
+	public void keyPressed(PInputEvent event) {
+		super.keyPressed(event);
+		processKeyboardEvent(event);
+	}
+
+	@Override
+	public void keyReleased(PInputEvent event) {
+		super.keyReleased(event);
+		processKeyboardEvent(event);
 	}
 
 }

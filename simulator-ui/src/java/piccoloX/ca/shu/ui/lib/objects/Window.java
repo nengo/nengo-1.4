@@ -15,61 +15,172 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolox.nodes.PClip;
 
+/**
+ * A Window which can be minimized, normal, maximized and closed. A Window wraps
+ * another world object which contains content displayed in the window.
+ * 
+ * @author Shu Wu
+ */
 public class Window extends WorldObject implements Interactable {
-	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.MAXIMIZED;
-
 	private static final int DEFAULT_HEIGHT = 400;
 
 	private static final int DEFAULT_WIDTH = 600;
 
+	private static final int MENU_BAR_HEIGHT = 27;
+
 	private static final long serialVersionUID = 1L;
 
-	private AffinityHalo affinityHalo = null;
-
-	private final WeakReference<WorldObject> attachToRef;
-
-	private final WorldObject contentNode;
+	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.NORMAL;
 
 	private final PPath menubar;
 
-	private PBounds savedWindowBounds;
+	private PClip myClippingRectangle;
+
+	private final WorldObject myContent;
+
+	private final WeakReference<WorldObject> mySourceRef;
+
+	private WindowState savedRestoreState = WINDOW_STATE_DEFAULT;
+
+	private PBounds savedWindowBounds;;
 
 	private Point2D savedWindowOffset;
 
-	private WindowState windowState = WINDOW_STATE_DEFAULT;;
+	private RectangularEdge mySourceShadow = null;
 
-	private final int MENU_BAR_HEIGHT = 27;
-
-	private WindowState restoreWindowState = WINDOW_STATE_DEFAULT;
-
-	private PClip clippingRectangle;
+	private WindowState myState = WINDOW_STATE_DEFAULT;
 
 	/**
-	 * @param attachTo
+	 * @param source
 	 *            parent Node to attach this Window to
-	 * @param contentNode
+	 * @param content
 	 *            Node containing the contents of this Window
 	 */
-	public Window(WorldObject attachTo, WorldObject contentNode) {
+	public Window(WorldObject source, WorldObject content) {
 		super();
-		attachToRef = new WeakReference<WorldObject>(attachTo);
+		mySourceRef = new WeakReference<WorldObject>(source);
 
-		this.contentNode = contentNode;
+		this.myContent = content;
 
 		menubar = new MenuBar(this);
 
 		addChild(menubar);
 
-		clippingRectangle = new PClip();
-		addChild(clippingRectangle);
+		myClippingRectangle = new PClip();
+		myClippingRectangle.addChild(content);
+		addChild(myClippingRectangle);
 
-		Border border = new Border(this, Style.COLOR_FOREGROUND);
-		addChild(border);
+		addChild(new Border(this, Style.COLOR_FOREGROUND));
 
-		clippingRectangle.addChild(contentNode);
-
-		// addInputEventListener(eventConsumer);
 		windowStateChanged();
+	}
+
+	@Override
+	protected void layoutChildren() {
+		super.layoutChildren();
+
+		menubar.setBounds(1, 1, getWidth() - 2, MENU_BAR_HEIGHT);
+
+		myContent.setBounds(0, 0, getWidth() - 4, getHeight() - 4
+				- MENU_BAR_HEIGHT);
+		myContent.setOffset(2, 2 + MENU_BAR_HEIGHT);
+
+		myClippingRectangle.setPathToRectangle((float) getX(), (float) getY(),
+				(float) getWidth(), (float) getHeight());
+
+	}
+
+	protected void maximizeBounds() {
+		setOffset(0,0);
+		setBounds(parentToLocal(getParent().getBounds()));
+	}
+
+	@Override
+	protected void parentBoundsChanged() {
+		super.parentBoundsChanged();
+
+		if (myState == WindowState.MAXIMIZED) {
+			maximizeBounds();
+		}
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+		if (mySourceShadow != null) {
+			mySourceShadow.destroy();
+			mySourceShadow = null;
+		}
+
+		myContent.destroy();
+		super.prepareForDestroy();
+	}
+
+	protected void windowStateChanged() {
+		switch (myState) {
+		case MAXIMIZED:
+
+			if (mySourceShadow != null) {
+				mySourceShadow.destroy();
+				mySourceShadow = null;
+			}
+
+			setSelectable(false);
+			UIEnvironment.getInstance().getWorld().getSky().addChild(this);
+
+			maximizeBounds();
+
+			BoundsHandle.removeBoundsHandlesFrom(this);
+			break;
+		case NORMAL:
+			WorldObject source = mySourceRef.get();
+
+			if (savedWindowBounds != null) {
+				setBounds(savedWindowBounds);
+				setOffset(savedWindowOffset);
+			} else {
+				setWidth(DEFAULT_WIDTH);
+				setHeight(DEFAULT_HEIGHT);
+				if (source != null) {
+					setOffset((getWidth() - source.getWidth()) / -2f, source
+							.getHeight() + 20);
+				}
+
+			}
+			if (source != null) {
+
+				setSelectable(true);
+
+				source.addChild(this);
+
+				BoundsHandle.addBoundsHandlesTo(this);
+				if (mySourceShadow == null) {
+
+					mySourceShadow = new RectangularEdge(source, this);
+					source.addChild(1, mySourceShadow);
+				}
+			}
+
+			break;
+		case MINIMIZED:
+
+			if (mySourceShadow != null) {
+				mySourceShadow.destroy();
+				mySourceShadow = null;
+			}
+			if (mySourceRef.get() != null) {
+				mySourceRef.get().addChild(this);
+			}
+			break;
+		}
+		if (myState == WindowState.MINIMIZED) {
+			setVisible(false);
+			setChildrenPickable(false);
+			setPickable(false);
+		} else {
+			setVisible(true);
+			setChildrenPickable(true);
+			setPickable(true);
+		}
 	}
 
 	/**
@@ -83,15 +194,15 @@ public class Window extends WorldObject implements Interactable {
 	 * Increases the size of the window through state transitions
 	 */
 	public void cycleVisibleWindowState() {
-		switch (windowState) {
+		switch (myState) {
 		case MAXIMIZED:
-			setWindowState(WindowState.WINDOW);
+			setWindowState(WindowState.NORMAL);
 			break;
-		case WINDOW:
+		case NORMAL:
 			setWindowState(WindowState.MAXIMIZED);
 			break;
 		case MINIMIZED:
-			setWindowState(WindowState.WINDOW);
+			setWindowState(WindowState.NORMAL);
 		}
 
 	}
@@ -104,19 +215,18 @@ public class Window extends WorldObject implements Interactable {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return contentNode.getName();
+		return myContent.getName();
 	}
 
 	/**
 	 * @return Node representing the contents of the Window
 	 */
 	public WorldObject getWindowContent() {
-		return contentNode;
+		return myContent;
 	}
 
 	public WindowState getWindowState() {
-		return windowState;
+		return myState;
 	}
 
 	public boolean isContextMenuEnabled() {
@@ -135,17 +245,17 @@ public class Window extends WorldObject implements Interactable {
 	}
 
 	public void restoreWindow() {
-		setWindowState(restoreWindowState);
+		setWindowState(savedRestoreState);
 	}
 
 	public void setWindowState(WindowState state) {
 
-		if (state != windowState) {
+		if (state != myState) {
 
 			/*
 			 * Saves the window bounds and offset
 			 */
-			if (windowState == WindowState.WINDOW) {
+			if (myState == WindowState.NORMAL) {
 				savedWindowBounds = getBounds();
 				savedWindowOffset = getOffset();
 			}
@@ -153,10 +263,10 @@ public class Window extends WorldObject implements Interactable {
 			 * Saves the previous window state
 			 */
 			if (state == WindowState.MINIMIZED) {
-				restoreWindowState = windowState;
+				savedRestoreState = myState;
 			}
 
-			windowState = state;
+			myState = state;
 			windowStateChanged();
 		}
 	}
@@ -168,120 +278,8 @@ public class Window extends WorldObject implements Interactable {
 		return null;
 	}
 
-	@Override
-	protected void layoutChildren() {
-		super.layoutChildren();
-
-		// Bounds always start at 0,0
-		PBounds bounds = this.getBounds();
-		this.translate(bounds.getOrigin().getX(), bounds.getOrigin().getY());
-		bounds.setOrigin(0, 0);
-		this.setBounds(bounds);
-		// System.out.println(getBounds().getOrigin());
-
-		// if (isInitialized) {
-		menubar.setBounds(1, 1, getWidth() - 2, MENU_BAR_HEIGHT);
-
-		// border.setBounds(-2, -2, getWidth() + 4, getHeight() + 4);
-		contentNode.setBounds(0, 0, getWidth() - 4, getHeight() - 4
-				- MENU_BAR_HEIGHT);
-		contentNode.setOffset(2, 2 + MENU_BAR_HEIGHT);
-
-		clippingRectangle.setPathToRectangle((float) getX(), (float) getY(),
-				(float) getWidth(), (float) getHeight());
-		// }
-	}
-
-	protected void maximizeBounds() {
-		// setOffset(0, 0);
-		setBounds(parentToLocal(getParent().getBounds()));
-	}
-
-	@Override
-	protected void parentBoundsChanged() {
-		// TODO Auto-generated method stub
-		super.parentBoundsChanged();
-
-		if (windowState == WindowState.MAXIMIZED) {
-			maximizeBounds();
-		}
-
-	}
-
-	@Override
-	protected void prepareForDestroy() {
-		if (affinityHalo != null) {
-			affinityHalo.destroy();
-			affinityHalo = null;
-		}
-
-		contentNode.destroy();
-		super.prepareForDestroy();
-	}
-
-	protected void windowStateChanged() {
-		switch (windowState) {
-		case MAXIMIZED:
-
-			if (affinityHalo != null) {
-				affinityHalo.destroy();
-				affinityHalo = null;
-			}
-
-			setSelectable(false);
-			UIEnvironment.getInstance().getWorld().getSky().addChild(this);
-
-			maximizeBounds();
-
-			BoundsHandle.removeBoundsHandlesFrom(this);
-			break;
-		case WINDOW:
-			if (savedWindowBounds != null) {
-				setBounds(savedWindowBounds);
-				setOffset(savedWindowOffset);
-			} else {
-				if (attachToRef.get() != null) {
-					setOffset(0, attachToRef.get().getHeight() + 20);
-				}
-				setWidth(DEFAULT_WIDTH);
-				setHeight(DEFAULT_HEIGHT);
-			}
-			if (attachToRef.get() != null) {
-				setSelectable(true);
-
-				attachToRef.get().addChild(this);
-
-				BoundsHandle.addBoundsHandlesTo(this);
-				if (affinityHalo == null) {
-					affinityHalo = new AffinityHalo(attachToRef.get(), this);
-				}
-			}
-
-			break;
-		case MINIMIZED:
-
-			if (affinityHalo != null) {
-				affinityHalo.destroy();
-				affinityHalo = null;
-			}
-			if (attachToRef.get() != null) {
-				attachToRef.get().addChild(this);
-			}
-			break;
-		}
-		if (windowState == WindowState.MINIMIZED) {
-			setVisible(false);
-			setChildrenPickable(false);
-			setPickable(false);
-		} else {
-			setVisible(true);
-			setChildrenPickable(true);
-			setPickable(true);
-		}
-	}
-
 	public static enum WindowState {
-		MAXIMIZED, MINIMIZED, WINDOW
+		MAXIMIZED, MINIMIZED, NORMAL
 	}
 
 }
@@ -289,10 +287,10 @@ public class Window extends WorldObject implements Interactable {
 class MenuBar extends PPath {
 
 	private static final long serialVersionUID = 1L;
-	GButton cycleButton, minimizeButton, closeButton;
-	GText title;
+	private TextButton cycleButton, minimizeButton, closeButton;
+	private TextNode title;
 
-	Window window;
+	private Window window;
 
 	public MenuBar(Window window) {
 		super(new Rectangle2D.Double(0, 0, 1, 1));
@@ -302,25 +300,25 @@ class MenuBar extends PPath {
 	}
 
 	private void init() {
-		title = new GText(window.getName());
+		title = new TextNode(window.getName());
 		title.setFont(Style.FONT_LARGE);
 		addChild(title);
 
-		cycleButton = new GButton("=", new Runnable() {
+		cycleButton = new TextButton("=", new Runnable() {
 			public void run() {
 				window.cycleVisibleWindowState();
 			}
 		});
 		cycleButton.setFont(Style.FONT_WINDOW_BUTTONS);
 
-		minimizeButton = new GButton("-", new Runnable() {
+		minimizeButton = new TextButton("-", new Runnable() {
 			public void run() {
 				window.minimizeWindow();
 			}
 		});
 		minimizeButton.setFont(Style.FONT_WINDOW_BUTTONS);
 
-		closeButton = new GButton("X", new Runnable() {
+		closeButton = new TextButton("X", new Runnable() {
 			public void run() {
 				window.close();
 			}
@@ -335,7 +333,6 @@ class MenuBar extends PPath {
 
 	@Override
 	protected void layoutChildren() {
-		// TODO Auto-generated method stub
 		super.layoutChildren();
 		title.setBounds(4, 3, getWidth(), getHeight());
 

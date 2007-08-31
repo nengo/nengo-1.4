@@ -29,10 +29,10 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.uci.ics.jung.graph.Vertex;
@@ -536,7 +536,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 			return originUI;
 
 		} catch (StructuralException e) {
-			Util.UserError(e.toString());
+			UserMessages.showError(e.toString());
 		}
 		return null;
 
@@ -581,7 +581,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 			addWidget(termUI);
 			return termUI;
 		} catch (StructuralException e) {
-			Util.UserError(e.toString());
+			UserMessages.showError(e.toString());
 		}
 		return null;
 

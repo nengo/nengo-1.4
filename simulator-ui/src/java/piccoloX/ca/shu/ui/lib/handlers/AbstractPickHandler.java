@@ -21,38 +21,19 @@ public abstract class AbstractPickHandler extends PBasicInputEventHandler {
 
 	private final Object pickChangeLock = new Object();
 
+	private WorldObject pickedNode;
+
 	private final Object pickSetLock = new Object();
 
 	private WorldObject transientNode;
 
 	private final World world;
 
-	private WorldObject pickedNode;
-
 	public AbstractPickHandler(World parent) {
 		super();
 		this.world = parent;
 		controlTimer = new Timer();
 		controlTimer.start();
-	}
-
-	public boolean isKeepPickAlive() {
-		return keepPickAlive;
-	}
-
-	@Override
-	public void mouseDragged(PInputEvent event) {
-		processMouseEvent(event);
-	}
-
-	@Override
-	public void mouseMoved(PInputEvent event) {
-		processMouseEvent(event);
-	}
-
-	@Override
-	public void processEvent(PInputEvent event, int type) {
-		super.processEvent(event, type);
 	}
 
 	protected abstract int getKeepPickDelay();
@@ -91,6 +72,25 @@ public abstract class AbstractPickHandler extends PBasicInputEventHandler {
 			pickSetLock.notifyAll();
 		}
 
+	}
+
+	public boolean isKeepPickAlive() {
+		return keepPickAlive;
+	}
+
+	@Override
+	public void mouseDragged(PInputEvent event) {
+		processMouseEvent(event);
+	}
+
+	@Override
+	public void mouseMoved(PInputEvent event) {
+		processMouseEvent(event);
+	}
+
+	@Override
+	public void processEvent(PInputEvent event, int type) {
+		super.processEvent(event, type);
 	}
 
 	class Timer extends Thread {

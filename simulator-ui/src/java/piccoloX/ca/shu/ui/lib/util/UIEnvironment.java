@@ -1,19 +1,18 @@
 package ca.shu.ui.lib.util;
 
-import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.world.AppFrame;
 
+/**
+ * Holds user interface instance variables.
+ * 
+ * @author Shu Wu
+ */
 public class UIEnvironment {
 	public static final double SEMANTIC_ZOOM_LEVEL = 0.2;
 
-	static AppFrame uiInstance;
-
-	public static ReversableActionManager getActionManager() {
-		return getInstance().getActionManager();
-	}
+	private static AppFrame uiInstance;
 
 	/**
-	 * 
 	 * @return UI Instance
 	 */
 	public static AppFrame getInstance() {
@@ -21,19 +20,17 @@ public class UIEnvironment {
 	}
 
 	/**
-	 * 
-	 * 
 	 * @param instance
 	 *            UI Instance
 	 */
 	public static void setInstance(AppFrame instance) {
 
 		/*
-		 * Only one instance of NeoWorld may be running at once
+		 * Only one instance of the UI may be running at once
 		 */
 		if (uiInstance != null) {
 			throw new RuntimeException(
-					"Only one instance of GFrame may be running in one environment.");
+					"Only one instance of the User Inteface may be running.");
 		}
 
 		uiInstance = instance;

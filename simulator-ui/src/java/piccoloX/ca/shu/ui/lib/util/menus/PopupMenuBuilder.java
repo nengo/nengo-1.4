@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.util;
+package ca.shu.ui.lib.util.menus;
 
 import java.awt.Font;
 
@@ -10,6 +10,12 @@ import javax.swing.JSeparator;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.StandardAction;
 
+/**
+ * Used to build a popup menu. The created menu can later be converted to a
+ * Swing component.
+ * 
+ * @author Shu Wu
+ */
 public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 	boolean isFirstSection = true;
@@ -68,8 +74,8 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 	}
 
-	/*
-	 * @return unwraps the JPopupMenu
+	/**
+	 * @return Swing component
 	 */
 	public JPopupMenu getJPopupMenu() {
 		return menu;

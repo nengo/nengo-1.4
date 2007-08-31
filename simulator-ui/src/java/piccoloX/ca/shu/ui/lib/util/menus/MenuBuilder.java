@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.util;
+package ca.shu.ui.lib.util.menus;
 
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -23,7 +23,21 @@ public class MenuBuilder extends AbstractMenuBuilder {
 
 	@Override
 	public void addAction(StandardAction action) {
+		addAction(action, -1);
+	}
+
+	/**
+	 * @param action
+	 *            Action to add
+	 * @param mnemonic
+	 *            Mnemonic to assign to this action
+	 */
+	public void addAction(StandardAction action, int mnemonic) {
 		JMenuItem item = new JMenuItem(action.toSwingAction());
+		if (mnemonic != -1) {
+			item.setMnemonic(mnemonic);
+		}
+
 		style(item);
 		menu.add(item);
 	}

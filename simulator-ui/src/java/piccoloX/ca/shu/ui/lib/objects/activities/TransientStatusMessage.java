@@ -1,19 +1,22 @@
-package ca.shu.ui.lib.objects.widgets;
+package ca.shu.ui.lib.objects.activities;
 
 import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.util.UIEnvironment;
 
+/**
+ * Displays a task message in the status bar which appears for a finite
+ * duration.
+ * 
+ * @author Shu Wu
+ */
 public class TransientStatusMessage {
-	public static void show(String msg, long duration) {
-		new TransientStatusMessage(msg, duration);
-	}
 
-	long myDuration;
+	private long myDuration;
 
-	String myMessage;
+	private String myMessage;
 
-	protected TransientStatusMessage(String msg, long duration) {
+	public TransientStatusMessage(String msg, long duration) {
 		super();
 		myMessage = msg;
 		myDuration = duration;
@@ -23,8 +26,7 @@ public class TransientStatusMessage {
 			public void run() {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						UIEnvironment.getInstance()
-								.addTaskStatusMsg(myMessage);
+						UIEnvironment.getInstance().addTaskStatusMsg(myMessage);
 					}
 				});
 				try {
@@ -35,7 +37,8 @@ public class TransientStatusMessage {
 
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						UIEnvironment.getInstance().removeTaskStatusMsg(myMessage);
+						UIEnvironment.getInstance().removeTaskStatusMsg(
+								myMessage);
 					}
 				});
 

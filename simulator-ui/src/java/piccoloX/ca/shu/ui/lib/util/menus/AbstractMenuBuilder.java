@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.util;
+package ca.shu.ui.lib.util.menus;
 
 import javax.swing.JComponent;
 
@@ -6,10 +6,10 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.StandardAction;
 
 /**
- * A menu builder for Swing
+ * Used to build a menu. The created menu can later be converted to a Swing
+ * component.
  * 
  * @author Shu
- * 
  */
 public abstract class AbstractMenuBuilder {
 	private final boolean applyStyle;

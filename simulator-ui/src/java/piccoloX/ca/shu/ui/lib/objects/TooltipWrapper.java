@@ -17,17 +17,27 @@ public class TooltipWrapper extends WorldObject implements
 		PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
-	PActivity fadeInActivity, fadeInPhase2Activity;
-	WorldObject follow;
-	WorldSky parent;
-	WorldObject tooltip;
+	private PActivity fadeInActivity, fadeInPhase2Activity;
+	private WorldObject target;
+	private WorldSky parent;
+	private WorldObject tooltip;
 
+	/**
+	 * @param parent
+	 *            Parent which will hold this wrapper
+	 * @param tooltip
+	 *            Tooltip object
+	 * @param target
+	 *            Target which this tooltip shall be attached to
+	 */
 	public TooltipWrapper(WorldSky parent, WorldObject tooltip,
-			WorldObject follow) {
+			WorldObject target) {
 		super();
 		this.tooltip = tooltip;
-		this.follow = follow;
+		this.target = target;
 		this.parent = parent;
+
+		parent.addChild(this);
 
 		tooltip.setSelectable(false);
 		addChild(tooltip);
@@ -38,87 +48,44 @@ public class TooltipWrapper extends WorldObject implements
 		tooltip.addPropertyChangeListener(PNode.PROPERTY_BOUNDS,
 				new PropertyChangeListener() {
 					public void propertyChange(PropertyChangeEvent evt) {
-						tooltipBoundsChanged();
+						updateBounds();
 					}
 				});
 
 		addChild(new Border(this, Style.COLOR_TOOLTIP_BORDER));
 
 		setTransparency(0);
-		tooltipBoundsChanged();
+		updateBounds();
 
 		/*
 		 * The tooltip will follow where the object it's attached to goes
 		 */
 		parent.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, this);
-		follow.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
-
+		target.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
+		updatePosition();
 	}
 
-	private void tooltipBoundsChanged() {
+	/**
+	 * Updates the bounds of this node in response to the tooltip it's carrying
+	 */
+	private void updateBounds() {
 		tooltip.setOffset(5, 5);
 		setBounds(0, 0, tooltip.getWidth() + 10, tooltip.getHeight() + 10);
 
 	}
 
 	/**
-	 * Fades away and destroys itself after
+	 * Updates the position of this node in response to its target
 	 */
-	public void fadeAndDestroy() {
-		PActivity fadeOutActivity = new Fader(this, 500, 0);
-		if (fadeInActivity != null) {
-			if (fadeInActivity.isStepping())
-				fadeOutActivity.startAfter(fadeInActivity);
-
-		}
-		if (fadeInPhase2Activity != null) {
-			fadeInPhase2Activity
-					.terminate(PActivity.TERMINATE_WITHOUT_FINISHING);
-		}
-
-		addActivity(fadeOutActivity);
-
-		PActivity destroyActivity = new PActivity(0) {
-
-			@Override
-			protected void activityStarted() {
-				TooltipWrapper.this.destroy();
-			}
-
-		};
-
-		addActivity(destroyActivity);
-		destroyActivity.startAfter(fadeOutActivity);
-
-	}
-
-	public void fadeIn() {
-		fadeInActivity = new Fader(this, 500, 0.5f);
-		addActivity(fadeInActivity);
-
-		/*
-		 * fade in much more slowly in the second phase.
-		 */
-		fadeInPhase2Activity = new Fader(this, 2000, 1f);
-		fadeInPhase2Activity.startAfter(fadeInActivity);
-		addActivity(fadeInPhase2Activity);
-
-	}
-
-	public void propertyChange(PropertyChangeEvent arg0) {
-		updatePosition();
-
-	}
-
-	public void updatePosition() {
-		if (follow.isDestroyed()) {
+	private void updatePosition() {
+		if (target.isDestroyed()) {
 
 			return;
 		}
 
-		PCamera camera = follow.getWorld().getSky();
+		PCamera camera = target.getWorld().getSky();
 
-		Rectangle2D followBounds = follow.objectToSky(follow.getBounds());
+		Rectangle2D followBounds = target.objectToSky(target.getBounds());
 
 		double x = followBounds.getX()
 				- ((getWidth() - followBounds.getWidth()) / 2f);
@@ -145,7 +112,67 @@ public class TooltipWrapper extends WorldObject implements
 	protected void prepareForDestroy() {
 		parent.removePropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM,
 				this);
-		follow.removePropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
+		target.removePropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, this);
+
+	}
+
+	/**
+	 * Fades away in an animated sequence, and then destroy itself
+	 */
+	public void fadeAndDestroy() {
+		PActivity fadeOutActivity = new Fader(this, 500, 0);
+		if (fadeInActivity != null) {
+
+			if ((fadeInActivity.getStartTime() + fadeInActivity.getDuration()) > System
+					.currentTimeMillis())
+				fadeOutActivity.startAfter(fadeInActivity);
+
+		}
+		if (fadeInPhase2Activity != null) {
+			fadeInPhase2Activity
+					.terminate(PActivity.TERMINATE_WITHOUT_FINISHING);
+		}
+
+		addActivity(fadeOutActivity);
+
+		PActivity destroyActivity = new PActivity(0) {
+
+			@Override
+			protected void activityStarted() {
+				TooltipWrapper.this.destroy();
+			}
+
+		};
+
+		addActivity(destroyActivity);
+		destroyActivity.startAfter(fadeOutActivity);
+
+	}
+
+	/**
+	 * Fades in, in an animated sequence
+	 */
+	public void fadeIn() {
+		fadeInActivity = new Fader(this, 500, 0.5f);
+		addActivity(fadeInActivity);
+
+		/*
+		 * fade in more slowly in the second phase.
+		 */
+		fadeInPhase2Activity = new Fader(this, 2000, 1f);
+		fadeInPhase2Activity.startAfter(fadeInActivity);
+		addActivity(fadeInPhase2Activity);
+
+	}
+
+	/*
+	 * Listens for position changes of the target, and view changes of the sky
+	 * which this tooltip is attached to.(non-Javadoc)
+	 * 
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	public void propertyChange(PropertyChangeEvent arg0) {
+		updatePosition();
 
 	}
 

@@ -13,30 +13,50 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
- * A Frame instance that can change its object of focus (As long as the object
- * are within the world that the frame is in).
+ * A Border instance that can change its object of focus (As long as the object
+ * are within the world that the frame is in). Border is attached to the sky
+ * layer so there is no attenuation of the edge width when the ground is viewed
+ * at a low scale.
  * 
  * @author Shu Wu
  */
-public class MoveableFrame implements PropertyChangeListener {
-	private WorldObject currentlySelected;
+public class SelectionBorder implements PropertyChangeListener {
 	private PPath frame;
-	Color frameColor = Style.COLOR_BORDER_SELECTED;
 
-	WorldSky frameHolder;
+	private Color frameColor = Style.COLOR_BORDER_SELECTED;
 
-	public MoveableFrame(World world) {
+	private WorldSky frameHolder;
+
+	private WorldObject selectedObj;
+
+	/**
+	 * @param world
+	 *            World, whose sky, this border shall be added to.
+	 */
+	public SelectionBorder(World world) {
 		super();
 		init(world);
 
 	}
 
-	public MoveableFrame(World world, WorldObject objSelected) {
+	/**
+	 * @param world
+	 *            World, whose sky, this border shall be added to.
+	 * @param objSelected
+	 *            Object to select initially
+	 */
+	public SelectionBorder(World world, WorldObject objSelected) {
 		super();
 		init(world);
 		setSelected(objSelected);
 	}
 
+	/**
+	 * Initializes this instance
+	 * 
+	 * @param world
+	 *            World, whose sky, this border shall be added to.
+	 */
 	private void init(World world) {
 		this.frameHolder = world.getSky();
 		frame = PPath.createRectangle(0f, 0f, 1f, 1f);
@@ -48,11 +68,14 @@ public class MoveableFrame implements PropertyChangeListener {
 		frameHolder.addChild(frame);
 	}
 
+	/**
+	 * Updates the bounds of the border to match those of the selected object
+	 */
 	protected void updateBounds() {
-		if (currentlySelected != null && !currentlySelected.isDestroyed()) {
-			if (currentlySelected.getVisible()) {
-				Rectangle2D bounds = currentlySelected
-						.objectToSky(currentlySelected.getBounds());
+		if (selectedObj != null && !selectedObj.isDestroyed()) {
+			if (selectedObj.getVisible()) {
+				Rectangle2D bounds = selectedObj
+						.objectToSky(selectedObj.getBounds());
 
 				frame.setBounds((float) bounds.getX(), (float) bounds.getY(),
 						(float) bounds.getWidth(), (float) bounds.getHeight());
@@ -88,29 +111,26 @@ public class MoveableFrame implements PropertyChangeListener {
 	}
 
 	public void setSelected(WorldObject newSelected) {
-		if (newSelected == currentlySelected) {
+		if (newSelected == selectedObj) {
 			return;
 		}
 
-		if (currentlySelected != null) {
-			currentlySelected.removePropertyChangeListener(
+		if (selectedObj != null) {
+			selectedObj.removePropertyChangeListener(
 					WorldObject.PROPERTY_GLOBAL_BOUNDS, this);
 		}
 
-		currentlySelected = newSelected;
-		if (currentlySelected != null) {
+		selectedObj = newSelected;
+		if (selectedObj != null) {
 
-			currentlySelected.addPropertyChangeListener(
+			selectedObj.addPropertyChangeListener(
 					WorldObject.PROPERTY_GLOBAL_BOUNDS, this);
 
-			// currentlySelected.addChild(frame);
-			// frame.setVisible(true);
 			frameHolder.addChild(frame);
 			updateBounds();
 		} else {
 
 			frame.removeFromParent();
-			// frame.setVisible(false);
 		}
 
 	}

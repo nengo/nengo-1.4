@@ -15,7 +15,7 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Input Panel for editing an individual Function
@@ -80,7 +80,7 @@ public class FunctionPanel extends ConfigParamInputPanel {
 			}
 
 		} else {
-			Util.UserError("Could not attach properties dialog");
+			UserMessages.showError("Could not attach properties dialog");
 		}
 		setValue(selectedType.getFunction());
 

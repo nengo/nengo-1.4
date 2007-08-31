@@ -9,77 +9,55 @@ import edu.umd.cs.piccolo.util.PPickPath;
 
 public class LineEndWell extends WorldObject {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public LineEndWell() {
 		super();
 
-		// PNode icon = PPath.createEllipse(0, 0, 30, 30);
-		// icon.setPaint(GDefaults.FOREGROUND_COLOR);
-		// addChild(icon);
-
 		WorldObject icon = new LineEndWellIcon();
 
 		addChild(icon);
 		setBounds(getFullBounds());
-		// setChildrenPickable(false);
 
 		setSelectable(false);
 
 		icon.setSelectable(false);
-		icon.addInputEventListener(new MouseHandler(this));
+		icon.addInputEventListener(new CreateLineEndHandler(this));
 
 	}
 
 	/**
-	 * 
-	 * @return The new LineEnd which has been created and added to the
-	 *         LineEndWell
-	 */
-	public LineEnd createAndAddLineEnd() {
-		LineEnd newLineEnd = constructLineEnd();
-		addChild(newLineEnd);
-		return newLineEnd;
-	}
-
-	@Override
-	public void signalBoundsChanged() {
-		// TODO Auto-generated method stub
-		super.signalBoundsChanged();
-	}
-
-	/**
-	 * 
 	 * @return new LineEnd
 	 */
 	protected LineEnd constructLineEnd() {
 		return new LineEnd(this);
 	}
 
-	@Override
-	protected void parentBoundsChanged() {
-		// TODO Auto-generated method stub
-		super.parentBoundsChanged();
-	}
-
-	@Override
-	protected boolean validateFullBounds() {
-		// TODO Auto-generated method stub
-		return super.validateFullBounds();
+	/**
+	 * @return The new LineEnd which has been created and added to the
+	 *         LineEndWell
+	 */
+	protected LineEnd createAndAddLineEnd() {
+		LineEnd newLineEnd = constructLineEnd();
+		addChild(newLineEnd);
+		return newLineEnd;
 	}
 
 }
 
-class MouseHandler extends PBasicInputEventHandler {
+/**
+ * This handler listens for mouse events on the line end well and creates new
+ * line ends when needed.
+ * 
+ * @author Shu Wu
+ */
+class CreateLineEndHandler extends PBasicInputEventHandler {
 
-	LineEndWell lineEndWell;
+	private LineEndWell lineEndWell;
 
-	LineEnd newLineEnd;
+	private LineEnd newLineEnd;
 
-	public MouseHandler(LineEndWell lineEndWell) {
+	public CreateLineEndHandler(LineEndWell lineEndWell) {
 		super();
 		this.lineEndWell = lineEndWell;
 

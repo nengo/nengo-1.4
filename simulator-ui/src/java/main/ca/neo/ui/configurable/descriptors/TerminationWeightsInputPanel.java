@@ -13,7 +13,7 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.configurable.matrixEditor.ConfigurableMatrix;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Input panel for Termination Weights Matrix
@@ -88,7 +88,7 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 	 */
 	protected void editMatrix() {
 		if (!isDimensionsSet()) {
-			Util.UserWarning("Input dimensions not set");
+			UserMessages.showWarning("Input dimensions not set");
 			return;
 		}
 
@@ -118,7 +118,7 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 			matrixEdited = true;
 
 		} else {
-			Util.UserError("Could not attach properties dialog");
+			UserMessages.showError("Could not attach properties dialog");
 		}
 
 	}

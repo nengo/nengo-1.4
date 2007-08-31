@@ -10,53 +10,71 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
+/**
+ * Adds a border around an object.
+ * 
+ * @author Shu Wu
+ */
 public class Border extends WorldObject implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
-	private PNode borderParent;
-	PPath frame;
-	Color frameColor;
+	private Color myColor;
+	private PPath myFrame;
+	private PNode myTarget;
 
-	public Border(PNode objSelected, Color color) {
+	/**
+	 * Create a new border
+	 * 
+	 * @param target
+	 *            Object to create a border around
+	 * @param color
+	 *            Color of border
+	 */
+	public Border(PNode target, Color color) {
 		super();
-		this.frameColor = color;
-		this.borderParent = objSelected;
+		this.myColor = color;
+		this.myTarget = target;
 
-		frame = PPath.createRectangle(0f, 0f, 1f, 1f);
+		myFrame = PPath.createRectangle(0f, 0f, 1f, 1f);
 		setPickable(false);
 		setChildrenPickable(false);
 		setSelectable(false);
 
-		addChild(frame);
+		addChild(myFrame);
 
-		borderParent.addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
+		target.addPropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
 
-		updateBounds();
-	}
-
-	protected void updateBounds() {
-		if (borderParent != null) {
-
-			PBounds bounds = borderParent.getBounds();
-
-			frame.setBounds((float) bounds.x, (float) bounds.y,
-					(float) bounds.width, (float) bounds.height);
-			frame.setPaint(null);
-			frame.setStrokePaint(frameColor);
-		}
-	}
-
-	public void propertyChange(PropertyChangeEvent arg0) {
-		updateBounds();
+		updateBorder();
 	}
 
 	@Override
 	protected void prepareForDestroy() {
-
-		borderParent.removePropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
+		/*
+		 * Remove listener from target
+		 */
+		myTarget.removePropertyChangeListener(PNode.PROPERTY_BOUNDS, this);
 
 		super.prepareForDestroy();
+	}
+
+	/**
+	 * Updates the border when the target bounds changes
+	 */
+	protected void updateBorder() {
+		if (myTarget != null) {
+
+			PBounds bounds = myTarget.getBounds();
+
+			myFrame.setBounds((float) bounds.x, (float) bounds.y,
+					(float) bounds.width, (float) bounds.height);
+			myFrame.setPaint(null);
+			myFrame.setStrokePaint(myColor);
+		}
+	}
+
+	public void propertyChange(PropertyChangeEvent arg0) {
+		updateBorder();
 	}
 
 }

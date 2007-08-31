@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.objects.widgets;
+package ca.shu.ui.lib.objects.activities;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -6,50 +6,33 @@ import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.world.WorldObject;
 
-public abstract class TrackedActivity {
+/**
+ * An activity which is tracked by the application UI. An activity can be
+ * executed in several ways, one of which is Swing thread safe.
+ * 
+ * @author Shu Wu
+ */
+public abstract class AbstractActivity {
 
-	String taskName;
-	TrackedStatusMsg trackedMsg;
+	private String taskName;
 
-	WorldObject wo;
+	private TrackedStatusMsg trackedMsg;
 
-	public TrackedActivity() {
+	private WorldObject wo;
+
+	public AbstractActivity() {
 		super();
 	}
 
-	public TrackedActivity(String taskName) {
+	public AbstractActivity(String taskName) {
 		this(taskName, null);
 
 	}
 
-	public TrackedActivity(String taskName, WorldObject wo) {
+	public AbstractActivity(String taskName, WorldObject wo) {
 		super();
 		this.taskName = taskName;
 		this.wo = wo;
-
-	}
-
-	public abstract void doActivity();
-
-	public void invokeAndWait() {
-		try {
-			SwingUtilities.invokeAndWait(getSwingThread());
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void invokeLater() {
-		SwingUtilities.invokeLater(getSwingThread());
-
-	}
-
-	public Thread startThread() {
-		Thread runner = new Thread(getRunnableThreadSafe());
-		runner.start();
-		return runner;
 
 	}
 
@@ -107,6 +90,30 @@ public abstract class TrackedActivity {
 		};
 
 		return r;
+	}
+
+	public abstract void doActivity();
+
+	public void invokeAndWait() {
+		try {
+			SwingUtilities.invokeAndWait(getSwingThread());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void invokeLater() {
+		SwingUtilities.invokeLater(getSwingThread());
+
+	}
+
+	public Thread startThread() {
+		Thread runner = new Thread(getRunnableThreadSafe());
+		runner.start();
+		return runner;
+
 	}
 
 }

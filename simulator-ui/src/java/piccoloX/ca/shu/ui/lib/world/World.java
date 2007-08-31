@@ -16,16 +16,16 @@ import ca.shu.ui.lib.handlers.KeyboardFocusHandler;
 import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.SelectionHandler;
-import ca.shu.ui.lib.handlers.MouseStatusHandler;
+import ca.shu.ui.lib.handlers.TopWorldStatusHandler;
 import ca.shu.ui.lib.handlers.TooltipPickHandler;
 import ca.shu.ui.lib.objects.TooltipWrapper;
 import ca.shu.ui.lib.objects.Window;
-import ca.shu.ui.lib.util.Grid;
-import ca.shu.ui.lib.util.MenuBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
 import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -126,7 +126,7 @@ public class World extends WorldObject implements Interactable {
 		 * Create layer
 		 */
 		layer = new PLayer();
-		UIEnvironment.getInstance().getCanvas().getRoot().addChild(layer);
+		getRoot().addChild(layer);
 
 		/*
 		 * Create ground
@@ -169,12 +169,12 @@ public class World extends WorldObject implements Interactable {
 		mySkyCamera.addInputEventListener(new ScrollZoomHandler());
 
 		addInputEventListener(new EventConsumer());
-		setStatusBarHandler(new MouseStatusHandler(this));
+		setStatusBarHandler(new TopWorldStatusHandler(this));
 
 		/*
 		 * Set position and scale
 		 */
-		setSkyPosition(0, 0);
+//		animateToSkyPosition(0, 0);
 		setSkyViewScale(0.7f);
 
 		/*
@@ -382,7 +382,7 @@ public class World extends WorldObject implements Interactable {
 	 * @param y
 	 *            Y Position relative to ground
 	 */
-	public void setSkyPosition(double x, double y) {
+	public void animateToSkyPosition(double x, double y) {
 		Rectangle2D newBounds = new Rectangle2D.Double(x, y, 0, 0);
 
 		mySkyCamera.animateViewToCenterBounds(newBounds, false, 600);
@@ -435,10 +435,9 @@ public class World extends WorldObject implements Interactable {
 
 		TooltipWrapper tooltip = new TooltipWrapper(getSky(), objectSelected
 				.getTooltip(), objectSelected);
-		addChild(tooltip);
 
 		tooltip.fadeIn();
-		tooltip.updatePosition();
+
 		return tooltip;
 
 	}
@@ -575,4 +574,12 @@ public class World extends WorldObject implements Interactable {
 
 	}
 
+	@Override
+	public PRoot getRoot() {
+		/*
+		 * This world's root is always to top-level root associated with the
+		 * canvas
+		 */
+		return UIEnvironment.getInstance().getCanvas().getRoot();
+	}
 }

@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import ca.shu.ui.lib.objects.widgets.TransientMsg;
+import ca.shu.ui.lib.objects.activities.TransientMsg;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
@@ -18,7 +18,7 @@ import edu.umd.cs.piccolo.util.PUtil;
  * 
  * @author Shu Wu
  */
-public class WorldObject extends PNode implements INamedObject {
+public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -145,11 +145,9 @@ public class WorldObject extends PNode implements INamedObject {
 		}
 	}
 
-	/**
-	 * Call this method if this Object does not need to be used again. The
-	 * Object will prepare itself for garbage collection. Note: calling this
-	 * method does not mean that the object WILL be garbage collected. That will
-	 * not happen as long as there are external links to this object.
+
+	/* (non-Javadoc)
+	 * @see ca.shu.ui.lib.world.IDestroyable#destroy()
 	 */
 	public final void destroy() {
 		if (!isDestroyed) {
@@ -345,7 +343,7 @@ public class WorldObject extends PNode implements INamedObject {
 
 		msgObject.setOffset(position);
 		getWorld().getSky().addChild(msgObject);
-		msgObject.animate();
+		msgObject.startAnimation();
 
 	}
 

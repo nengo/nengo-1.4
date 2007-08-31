@@ -5,7 +5,7 @@ import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * Widgets are models such as Terminations and Origins which can be attached to

@@ -14,10 +14,11 @@ import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.objects.GDirectedEdge;
-import ca.shu.ui.lib.objects.lines.ILineAcceptor;
+import ca.shu.ui.lib.objects.DirectedEdge;
+import ca.shu.ui.lib.objects.lines.ILineEndHolder;
 import ca.shu.ui.lib.objects.lines.LineEnd;
 import ca.shu.ui.lib.objects.lines.LineEndWell;
+import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldObject;
 
@@ -79,7 +80,7 @@ public class UIOrigin extends Widget {
 						term.getModelTermination());
 				return true;
 			} catch (StructuralException e) {
-				Util.UserWarning("Could not disconnect: " + e.toString());
+				UserMessages.showWarning("Could not disconnect: " + e.toString());
 			}
 			return false;
 		} else {
@@ -117,7 +118,7 @@ public class UIOrigin extends Widget {
 
 			return true;
 		} catch (StructuralException e) {
-			Util.UserWarning("Could not connect: " + e.getMessage());
+			UserMessages.showWarning("Could not connect: " + e.getMessage());
 			return false;
 		}
 	}
@@ -184,7 +185,7 @@ public class UIOrigin extends Widget {
 
 	@Override
 	public ConfigParamDescriptor[] getConfigSchema() {
-		Util.UserError("POrigin is not configurable yet");
+		UserMessages.showError("POrigin is not configurable yet");
 		return null;
 	}
 
@@ -243,20 +244,20 @@ public class UIOrigin extends Widget {
 				 * edge
 				 */
 				UINeoNode nodeParent = UIOrigin.this.getNodeParent();
-				getEdge().setLineShape(GDirectedEdge.LineShape.UPWARD_ARC);
+				getEdge().setLineShape(DirectedEdge.EdgeShape.UPWARD_ARC);
 				getEdge().setMinArcRadius(
 						nodeParent.localToParent(nodeParent.getBounds())
 								.getWidth());
 				setPointerVisible(false);
 			} else {
-				getEdge().setLineShape(GDirectedEdge.LineShape.STRAIGHT);
+				getEdge().setLineShape(DirectedEdge.EdgeShape.STRAIGHT);
 				setPointerVisible(true);
 			}
 
 		}
 
 		@Override
-		protected boolean canConnectTo(ILineAcceptor target) {
+		protected boolean canConnectTo(ILineEndHolder target) {
 			if ((target instanceof UITermination)) {
 				return true;
 			} else
@@ -265,7 +266,7 @@ public class UIOrigin extends Widget {
 		}
 
 		@Override
-		protected boolean initConnection(ILineAcceptor target,
+		protected boolean initConnection(ILineEndHolder target,
 				boolean modifyModel) {
 			if (!(target instanceof UITermination))
 				return false;

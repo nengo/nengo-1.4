@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.util;
+package ca.shu.ui.lib.world;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -9,23 +9,28 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import ca.shu.ui.lib.util.UIEnvironment;
+
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
+/**
+ * A Grid layer which is zoomable and pannable.
+ * 
+ * @author Shu Wu
+ */
 public class Grid extends PLayer {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;;
 
-	static protected Line2D gridLine = new Line2D.Double();
+	private static Line2D gridLine = new Line2D.Double();;
 
-	static protected Stroke gridStroke = new BasicStroke(1);
+	private static Stroke gridStroke = new BasicStroke(1);
 
-	static boolean gridVisible = true;
+	private static boolean gridVisible = true;
+
+	private static final long serialVersionUID = 1L;
 
 	public static PLayer createGrid(PCamera camera, PRoot root,
 			Color gridPaint, double gridSpacing) {
@@ -59,9 +64,9 @@ public class Grid extends PLayer {
 			UIEnvironment.getInstance().getWorld().repaint();
 	}
 
-	Color gridPaint;
+	private Color gridPaint;
 
-	double gridSpacing;
+	private double gridSpacing;
 
 	public Grid(Color gridPaint, double gridSpacing) {
 		super();
@@ -106,9 +111,9 @@ public class Grid extends PLayer {
 }
 
 class CameraPropertyChangeListener implements PropertyChangeListener {
-	PCamera camera;
+	private PCamera camera;
 
-	PLayer gridLayer;
+	private PLayer gridLayer;
 
 	public CameraPropertyChangeListener(PCamera camera, PLayer gridLayer) {
 		super();

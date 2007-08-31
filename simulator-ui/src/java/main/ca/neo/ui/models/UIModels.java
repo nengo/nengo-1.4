@@ -9,7 +9,7 @@ import ca.neo.ui.models.nodes.UIFunctionInput;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.UINeuron;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Contains static members which reveal what sort of Nodes can be created by the
@@ -50,7 +50,7 @@ public class UIModels {
 		} else if (node instanceof Neuron) {
 			return new UINeuron(node);
 		} else {
-			Util.UserError("Unsupported node type");
+			UserMessages.showError("Unsupported node type");
 			return null;
 		}
 

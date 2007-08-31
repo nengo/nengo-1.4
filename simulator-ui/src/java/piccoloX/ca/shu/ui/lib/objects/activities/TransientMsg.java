@@ -1,13 +1,19 @@
-package ca.shu.ui.lib.objects.widgets;
+package ca.shu.ui.lib.objects.activities;
 
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.activities.Fader;
-import ca.shu.ui.lib.objects.GText;
+import ca.shu.ui.lib.objects.TextNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 
-public class TransientMsg extends GText {
+/**
+ * A message that appears in the World and disappears smoothly after a
+ * duration.
+ * 
+ * @author Shu Wu
+ */
+public class TransientMsg extends TextNode {
 
 	private static final long serialVersionUID = 1L;
 	static final int ANIMATE_MSG_DURATION = 2500;
@@ -22,7 +28,7 @@ public class TransientMsg extends GText {
 
 	}
 
-	public void animate() {
+	public void startAnimation() {
 		Point2D startingOffset = getOffset();
 		animateToPositionScaleRotation(startingOffset.getX(), startingOffset
 				.getY() - 50, 1, 0, ANIMATE_MSG_DURATION);

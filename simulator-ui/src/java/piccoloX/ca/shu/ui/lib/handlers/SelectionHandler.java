@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import ca.shu.ui.lib.objects.MoveableFrame;
+import ca.shu.ui.lib.objects.SelectionBorder;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldGround;
 import ca.shu.ui.lib.world.WorldObject;
@@ -69,32 +69,34 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	public static final String SELECTION_CHANGED_NOTIFICATION = "SELECTION_CHANGED_NOTIFICATION";
 
+	public static final String SELECTION_HANDLER_FRAME_ATTR = "SelHandlerFrame";
 	final static int DASH_WIDTH = 5;
-	final static int NUM_STROKES = 10;
 
-	private HashMap<WorldObject, Boolean> selection = null; // The current
-	// selection
-	private WorldGround selectableParent = null; // List of nodes whose
+	final static int NUM_STROKES = 10;
+	private HashMap<WorldObject, Boolean> allItems = null; // Used within drag
+	private Point2D canvasPressPt = null;
+	private boolean deleteKeyActive = true; // True if DELETE key should delete
 	// children can be selected
 	private PPath marquee = null;
+	// temporarily
+	private HashMap<WorldObject, Boolean> marqueeMap = null;
+	// selection
+	private Paint marqueePaint;
+	private float marqueePaintTransparency = 1.0f;
 	private WorldSky marqueeParent = null; // Node that marquee is added to as
+	private Paint marqueeStrokePaint;
+	private WorldObject pressNode = null; // Node pressed on (or null if none)
 	// a
 	// child
 	private Point2D presspt = null;
-	private Point2D canvasPressPt = null;
+	// selection
+	private WorldGround selectableParent = null; // List of nodes whose
+	private HashMap<WorldObject, Boolean> selection = null; // The current
 	private float strokeNum = 0;
 	private Stroke[] strokes = null;
-	private HashMap<WorldObject, Boolean> allItems = null; // Used within drag
+
 	// handler temporarily
 	private ArrayList<PNode> unselectList = null; // Used within drag handler
-	// temporarily
-	private HashMap<WorldObject, Boolean> marqueeMap = null;
-	private WorldObject pressNode = null; // Node pressed on (or null if none)
-	private boolean deleteKeyActive = true; // True if DELETE key should delete
-	// selection
-	private Paint marqueePaint;
-	private Paint marqueeStrokePaint;
-	private float marqueePaintTransparency = 1.0f;
 
 	World world;
 
@@ -116,39 +118,9 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		init();
 	}
 
-	protected void init() {
-		float[] dash = { DASH_WIDTH, DASH_WIDTH };
-		strokes = new Stroke[NUM_STROKES];
-		for (int i = 0; i < NUM_STROKES; i++) {
-			strokes[i] = new BasicStroke(1, BasicStroke.CAP_BUTT,
-					BasicStroke.JOIN_MITER, 1, dash, i);
-		}
-
-		selection = new HashMap<WorldObject, Boolean>();
-		allItems = new HashMap<WorldObject, Boolean>();
-		unselectList = new ArrayList<PNode>();
-		marqueeMap = new HashMap<WorldObject, Boolean>();
-	}
-
 	// /////////////////////////////////////////////////////
 	// Public static methods for manipulating the selection
 	// /////////////////////////////////////////////////////
-
-	public void select(Collection<WorldObject> items) {
-		boolean changes = false;
-		Iterator<WorldObject> itemIt = items.iterator();
-		while (itemIt.hasNext()) {
-			WorldObject node = itemIt.next();
-			changes |= internalSelect(node);
-		}
-		if (changes) {
-			postSelectionChanged();
-		}
-	}
-
-	public void select(Map<WorldObject, Boolean> items) {
-		select(items.keySet());
-	}
 
 	private boolean internalSelect(WorldObject node) {
 		if (isSelected(node)) {
@@ -158,40 +130,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		selection.put(node, Boolean.TRUE);
 		decorateSelectedNode(node);
 		return true;
-	}
-
-	private void postSelectionChanged() {
-		PNotificationCenter.defaultCenter().postNotification(
-				SELECTION_CHANGED_NOTIFICATION, this);
-	}
-
-	public void select(WorldObject node) {
-		if (internalSelect(node)) {
-			postSelectionChanged();
-		}
-	}
-
-	public static final String SELECTION_HANDLER_FRAME_ATTR = "SelHandlerFrame";
-
-	public void decorateSelectedNode(WorldObject node) {
-		MoveableFrame frame = new MoveableFrame(world, node);
-		// frame.setFrameColor(Style.COLOR_BORDER_DRAGGED);
-
-		node.addAttribute(SELECTION_HANDLER_FRAME_ATTR, frame);
-
-		// PBoundsHandle.addBoundsHandlesTo(node);
-	}
-
-	public void unselect(Collection<PNode> items) {
-		boolean changes = false;
-		Iterator<PNode> itemIt = items.iterator();
-		while (itemIt.hasNext()) {
-			PNode node = (PNode) itemIt.next();
-			changes |= internalUnselect(node);
-		}
-		if (changes) {
-			postSelectionChanged();
-		}
 	}
 
 	private boolean internalUnselect(PNode node) {
@@ -204,255 +142,9 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		return true;
 	}
 
-	public void unselect(PNode node) {
-		if (internalUnselect(node)) {
-			postSelectionChanged();
-		}
-	}
-
-	public void undecorateSelectedNode(PNode node) {
-
-		Object frame = node.getAttribute(SELECTION_HANDLER_FRAME_ATTR);
-		if (frame != null && frame instanceof MoveableFrame) {
-			((MoveableFrame) frame).destroy();
-
-		}
-		node.addAttribute(SELECTION_HANDLER_FRAME_ATTR, null);
-
-		// PBoundsHandle.removeBoundsHandlesFrom(node);
-	}
-
-	public void unselectAll() {
-		// Because unselect() removes from selection, we need to
-		// take a copy of it first so it isn't changed while we're iterating
-		ArrayList<PNode> sel = new ArrayList<PNode>(selection.keySet());
-		unselect(sel);
-	}
-
-	public boolean isSelected(PNode node) {
-		if ((node != null) && (selection.containsKey(node))) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Returns a copy of the currently selected nodes.
-	 */
-	public Collection<PNode> getSelection() {
-		ArrayList<PNode> sel = new ArrayList<PNode>(selection.keySet());
-		return sel;
-	}
-
-	/**
-	 * Gets a reference to the currently selected nodes. You should not modify
-	 * or store this collection.
-	 */
-	public Collection<WorldObject> getSelectionReference() {
-		return Collections.unmodifiableCollection(selection.keySet());
-	}
-
-	/**
-	 * Determine if the specified node is selectable (i.e., if it is a child of
-	 * the one the list of selectable parents.
-	 */
-	protected boolean isSelectable(PNode node) {
-		boolean selectable = false;
-
-		if (node != null && selectableParent.isAncestorOf(node)) {
-			selectable = true;
-
-		}
-
-		return selectable;
-	}
-
-	// //////////////////////////////////////////////////////
-	// The overridden methods from PDragSequenceEventHandler
-	// //////////////////////////////////////////////////////
-
-	protected void startDrag(PInputEvent e) {
-		super.startDrag(e);
-
-		initializeSelection(e);
-
-		if (isMarqueeSelection(e)) {
-			initializeMarquee(e);
-
-			if (!isOptionSelection(e)) {
-				startMarqueeSelection(e);
-			} else {
-				startOptionMarqueeSelection(e);
-			}
-		} else {
-			if (!isOptionSelection(e)) {
-				startStandardSelection(e);
-			} else {
-				startStandardOptionSelection(e);
-			}
-		}
-	}
-
-	protected void drag(PInputEvent e) {
-		super.drag(e);
-
-		if (isMarqueeSelection(e)) {
-			updateMarquee(e);
-
-			if (!isOptionSelection(e)) {
-				computeMarqueeSelection(e);
-			} else {
-				computeOptionMarqueeSelection(e);
-			}
-		} else {
-			dragStandardSelection(e);
-
-		}
-	}
-
-	protected void endDrag(PInputEvent e) {
-		super.endDrag(e);
-
-		for (PNode node : getSelection()) {
-			if (node instanceof WorldObject) {
-				((WorldObject) node).justDropped();
-			}
-		}
-
-		if (isMarqueeSelection(e)) {
-			endMarqueeSelection(e);
-		} else {
-			if (getSelection().size() == 1) {
-				unselectAll();
-			}
-			endStandardSelection(e);
-		}
-	}
-
-	// //////////////////////////
-	// Additional methods
-	// //////////////////////////
-
-	public boolean isOptionSelection(PInputEvent pie) {
-		return pie.isShiftDown();
-	}
-
-	protected boolean isMarqueeSelection(PInputEvent pie) {
-		return (pressNode == null && world.isSelectionMode());
-	}
-
-	protected void initializeSelection(PInputEvent pie) {
-		canvasPressPt = pie.getCanvasPosition();
-		presspt = pie.getPosition();
-
-		PNode node = pie.getPath().getPickedNode();
-
-		while (node != null) {
-			if (node == marqueeParent) {
-				pressNode = null;
-				return;
-			}
-
-			if (node == selectableParent) {
-				pressNode = null;
-				return;
-			}
-
-			if ((node instanceof WorldObject)
-					&& ((WorldObject) node).isSelectable()) {
-				pressNode = (WorldObject) node;
-				pressNode.moveToFront();
-				return;
-			}
-
-			node = node.getParent();
-		}
-
-	}
-
-	protected void initializeMarquee(PInputEvent e) {
-
-		marquee = PPath.createRectangle((float) presspt.getX(), (float) presspt
-				.getY(), 0, 0);
-		marquee.setPaint(marqueePaint);
-		marquee.setTransparency(marqueePaintTransparency);
-		marquee.setStrokePaint(marqueeStrokePaint);
-		marquee.setStroke(strokes[0]);
-
-		marqueeParent.addChild(marquee);
-
-		marqueeMap.clear();
-	}
-
-	protected void startOptionMarqueeSelection(PInputEvent e) {
-	}
-
-	protected void startMarqueeSelection(PInputEvent e) {
-		unselectAll();
-	}
-
-	protected void startStandardSelection(PInputEvent pie) {
-		// Option indicator not down - clear selection, and start fresh
-		if (!isSelected(pressNode)) {
-			unselectAll();
-
-			if (isSelectable(pressNode)) {
-				select(pressNode);
-			}
-		}
-	}
-
-	protected void startStandardOptionSelection(PInputEvent pie) {
-		// Option indicator is down, toggle selection
-		if (isSelectable(pressNode)) {
-			if (isSelected(pressNode)) {
-				unselect(pressNode);
-			} else {
-				select(pressNode);
-			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void updateMarquee(PInputEvent pie) {
-		PBounds b = new PBounds();
-
-		if (marqueeParent instanceof PCamera) {
-			b.add(canvasPressPt);
-			b.add(pie.getCanvasPosition());
-		} else {
-			b.add(presspt);
-			b.add(pie.getPosition());
-		}
-
-		b.reset();
-		b.add(presspt);
-		b.add(pie.getPosition());
-
-		PBounds marqueeBounds = (PBounds) b.clone();
-
-		selectableParent.globalToLocal(marqueeBounds);
-
-		marqueeParent.viewToLocal(marqueeBounds);
-
-		// marquee.globalToLocal(b);
-		marquee.setPathToRectangle((float) marqueeBounds.x,
-				(float) marqueeBounds.y, (float) marqueeBounds.width,
-				(float) marqueeBounds.height);
-
-		allItems.clear();
-		PNodeFilter filter = createNodeFilter(b);
-
-		Collection<PNode> items;
-
-		items = selectableParent.getAllNodes(filter, null);
-
-		Iterator<PNode> itemsIt = items.iterator();
-		while (itemsIt.hasNext()) {
-			allItems.put((WorldObject) itemsIt.next(), Boolean.TRUE);
-		}
-
+	private void postSelectionChanged() {
+		PNotificationCenter.defaultCenter().postNotification(
+				SELECTION_CHANGED_NOTIFICATION, this);
 	}
 
 	protected void computeMarqueeSelection(PInputEvent pie) {
@@ -514,11 +206,38 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		return new BoundsFilter(bounds);
 	}
 
-	protected PBounds getMarqueeBounds() {
-		if (marquee != null) {
-			return marquee.getBounds();
+	protected void drag(PInputEvent e) {
+		super.drag(e);
+
+		if (isMarqueeSelection(e)) {
+			updateMarquee(e);
+
+			if (!isOptionSelection(e)) {
+				computeMarqueeSelection(e);
+			} else {
+				computeOptionMarqueeSelection(e);
+			}
+		} else {
+			dragStandardSelection(e);
+
 		}
-		return new PBounds();
+	}
+
+	/**
+	 * This gets called continuously during the drag, and is used to animate the
+	 * marquee
+	 */
+	protected void dragActivityStep(PInputEvent aEvent) {
+		if (marquee != null) {
+			float origStrokeNum = strokeNum;
+			strokeNum = (strokeNum + 0.5f) % NUM_STROKES; // Increment by
+			// partial steps to
+			// slow down
+			// animation
+			if ((int) strokeNum != (int) origStrokeNum) {
+				marquee.setStroke(strokes[(int) strokeNum]);
+			}
+		}
 	}
 
 	protected void dragStandardSelection(PInputEvent e) {
@@ -543,6 +262,25 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		}
 	}
 
+	protected void endDrag(PInputEvent e) {
+		super.endDrag(e);
+
+		for (PNode node : getSelection()) {
+			if (node instanceof WorldObject) {
+				((WorldObject) node).justDropped();
+			}
+		}
+
+		if (isMarqueeSelection(e)) {
+			endMarqueeSelection(e);
+		} else {
+			if (getSelection().size() == 1) {
+				unselectAll();
+			}
+			endStandardSelection(e);
+		}
+	}
+
 	protected void endMarqueeSelection(PInputEvent e) {
 		// Remove marquee
 		marquee.removeFromParent();
@@ -553,20 +291,249 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		pressNode = null;
 	}
 
-	/**
-	 * This gets called continuously during the drag, and is used to animate the
-	 * marquee
-	 */
-	protected void dragActivityStep(PInputEvent aEvent) {
+	protected PBounds getMarqueeBounds() {
 		if (marquee != null) {
-			float origStrokeNum = strokeNum;
-			strokeNum = (strokeNum + 0.5f) % NUM_STROKES; // Increment by
-			// partial steps to
-			// slow down
-			// animation
-			if ((int) strokeNum != (int) origStrokeNum) {
-				marquee.setStroke(strokes[(int) strokeNum]);
+			return marquee.getBounds();
+		}
+		return new PBounds();
+	}
+
+	protected void init() {
+		float[] dash = { DASH_WIDTH, DASH_WIDTH };
+		strokes = new Stroke[NUM_STROKES];
+		for (int i = 0; i < NUM_STROKES; i++) {
+			strokes[i] = new BasicStroke(1, BasicStroke.CAP_BUTT,
+					BasicStroke.JOIN_MITER, 1, dash, i);
+		}
+
+		selection = new HashMap<WorldObject, Boolean>();
+		allItems = new HashMap<WorldObject, Boolean>();
+		unselectList = new ArrayList<PNode>();
+		marqueeMap = new HashMap<WorldObject, Boolean>();
+	}
+
+	protected void initializeMarquee(PInputEvent e) {
+
+		marquee = PPath.createRectangle((float) presspt.getX(), (float) presspt
+				.getY(), 0, 0);
+		marquee.setPaint(marqueePaint);
+		marquee.setTransparency(marqueePaintTransparency);
+		marquee.setStrokePaint(marqueeStrokePaint);
+		marquee.setStroke(strokes[0]);
+
+		marqueeParent.addChild(marquee);
+
+		marqueeMap.clear();
+	}
+
+	protected void initializeSelection(PInputEvent pie) {
+		canvasPressPt = pie.getCanvasPosition();
+		presspt = pie.getPosition();
+
+		PNode node = pie.getPath().getPickedNode();
+
+		while (node != null) {
+			if (node == marqueeParent) {
+				pressNode = null;
+				return;
 			}
+
+			if (node == selectableParent) {
+				pressNode = null;
+				return;
+			}
+
+			if ((node instanceof WorldObject)
+					&& ((WorldObject) node).isSelectable()) {
+				pressNode = (WorldObject) node;
+				pressNode.moveToFront();
+				return;
+			}
+
+			node = node.getParent();
+		}
+
+	}
+
+	// //////////////////////////////////////////////////////
+	// The overridden methods from PDragSequenceEventHandler
+	// //////////////////////////////////////////////////////
+
+	protected boolean isMarqueeSelection(PInputEvent pie) {
+		return (pressNode == null && world.isSelectionMode());
+	}
+
+	/**
+	 * Determine if the specified node is selectable (i.e., if it is a child of
+	 * the one the list of selectable parents.
+	 */
+	protected boolean isSelectable(PNode node) {
+		boolean selectable = false;
+
+		if (node != null && selectableParent.isAncestorOf(node)) {
+			selectable = true;
+
+		}
+
+		return selectable;
+	}
+
+	protected void startDrag(PInputEvent e) {
+		super.startDrag(e);
+
+		initializeSelection(e);
+
+		if (isMarqueeSelection(e)) {
+			initializeMarquee(e);
+
+			if (!isOptionSelection(e)) {
+				startMarqueeSelection(e);
+			} else {
+				startOptionMarqueeSelection(e);
+			}
+		} else {
+			if (!isOptionSelection(e)) {
+				startStandardSelection(e);
+			} else {
+				startStandardOptionSelection(e);
+			}
+		}
+	}
+
+	// //////////////////////////
+	// Additional methods
+	// //////////////////////////
+
+	protected void startMarqueeSelection(PInputEvent e) {
+		unselectAll();
+	}
+
+	protected void startOptionMarqueeSelection(PInputEvent e) {
+	}
+
+	protected void startStandardOptionSelection(PInputEvent pie) {
+		// Option indicator is down, toggle selection
+		if (isSelectable(pressNode)) {
+			if (isSelected(pressNode)) {
+				unselect(pressNode);
+			} else {
+				select(pressNode);
+			}
+		}
+	}
+
+	protected void startStandardSelection(PInputEvent pie) {
+		// Option indicator not down - clear selection, and start fresh
+		if (!isSelected(pressNode)) {
+			unselectAll();
+
+			if (isSelectable(pressNode)) {
+				select(pressNode);
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void updateMarquee(PInputEvent pie) {
+		PBounds b = new PBounds();
+
+		if (marqueeParent instanceof PCamera) {
+			b.add(canvasPressPt);
+			b.add(pie.getCanvasPosition());
+		} else {
+			b.add(presspt);
+			b.add(pie.getPosition());
+		}
+
+		b.reset();
+		b.add(presspt);
+		b.add(pie.getPosition());
+
+		PBounds marqueeBounds = (PBounds) b.clone();
+
+		selectableParent.globalToLocal(marqueeBounds);
+
+		marqueeParent.viewToLocal(marqueeBounds);
+
+		// marquee.globalToLocal(b);
+		marquee.setPathToRectangle((float) marqueeBounds.x,
+				(float) marqueeBounds.y, (float) marqueeBounds.width,
+				(float) marqueeBounds.height);
+
+		allItems.clear();
+		PNodeFilter filter = createNodeFilter(b);
+
+		Collection<PNode> items;
+
+		items = selectableParent.getAllNodes(filter, null);
+
+		Iterator<PNode> itemsIt = items.iterator();
+		while (itemsIt.hasNext()) {
+			allItems.put((WorldObject) itemsIt.next(), Boolean.TRUE);
+		}
+
+	}
+
+	public void decorateSelectedNode(WorldObject node) {
+		SelectionBorder frame = new SelectionBorder(world, node);
+		// frame.setFrameColor(Style.COLOR_BORDER_DRAGGED);
+
+		node.addAttribute(SELECTION_HANDLER_FRAME_ATTR, frame);
+
+		// PBoundsHandle.addBoundsHandlesTo(node);
+	}
+
+	/**
+	 * Indicates the color used to paint the marquee.
+	 * 
+	 * @return the paint for interior of the marquee
+	 */
+	public Paint getMarqueePaint() {
+		return marqueePaint;
+	}
+
+	/**
+	 * Indicates the transparency level for the interior of the marquee.
+	 * 
+	 * @return Returns the marquee paint transparency, zero to one
+	 */
+	public float getMarqueePaintTransparency() {
+		return marqueePaintTransparency;
+	}
+
+	/**
+	 * Returns a copy of the currently selected nodes.
+	 */
+	public Collection<PNode> getSelection() {
+		ArrayList<PNode> sel = new ArrayList<PNode>(selection.keySet());
+		return sel;
+	}
+
+	/**
+	 * Gets a reference to the currently selected nodes. You should not modify
+	 * or store this collection.
+	 */
+	public Collection<WorldObject> getSelectionReference() {
+		return Collections.unmodifiableCollection(selection.keySet());
+	}
+
+	public boolean getSupportDeleteKey() {
+		return deleteKeyActive;
+	}
+
+	public boolean isDeleteKeyActive() {
+		return deleteKeyActive;
+	}
+
+	public boolean isOptionSelection(PInputEvent pie) {
+		return pie.isShiftDown();
+	}
+
+	public boolean isSelected(PNode node) {
+		if ((node != null) && (selection.containsKey(node))) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -588,12 +555,26 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		}
 	}
 
-	public boolean getSupportDeleteKey() {
-		return deleteKeyActive;
+	public void select(Collection<WorldObject> items) {
+		boolean changes = false;
+		Iterator<WorldObject> itemIt = items.iterator();
+		while (itemIt.hasNext()) {
+			WorldObject node = itemIt.next();
+			changes |= internalSelect(node);
+		}
+		if (changes) {
+			postSelectionChanged();
+		}
 	}
 
-	public boolean isDeleteKeyActive() {
-		return deleteKeyActive;
+	public void select(Map<WorldObject, Boolean> items) {
+		select(items.keySet());
+	}
+
+	public void select(WorldObject node) {
+		if (internalSelect(node)) {
+			postSelectionChanged();
+		}
 	}
 
 	/**
@@ -603,13 +584,74 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		this.deleteKeyActive = deleteKeyActive;
 	}
 
+	/**
+	 * Sets the color used to paint the marquee.
+	 * 
+	 * @param paint
+	 *            the paint color
+	 */
+	public void setMarqueePaint(Paint paint) {
+		this.marqueePaint = paint;
+	}
+
+	/**
+	 * Sets the transparency level for the interior of the marquee.
+	 * 
+	 * @param marqueePaintTransparency
+	 *            The marquee paint transparency to set.
+	 */
+	public void setMarqueePaintTransparency(float marqueePaintTransparency) {
+		this.marqueePaintTransparency = marqueePaintTransparency;
+	}
+
 	// ////////////////////
 	// Inner classes
 	// ////////////////////
 
+	public void setMarqueeStrokePaint(Paint marqueeStrokePaint) {
+		this.marqueeStrokePaint = marqueeStrokePaint;
+	}
+
+	public void undecorateSelectedNode(PNode node) {
+
+		Object frame = node.getAttribute(SELECTION_HANDLER_FRAME_ATTR);
+		if (frame != null && frame instanceof SelectionBorder) {
+			((SelectionBorder) frame).destroy();
+
+		}
+		node.addAttribute(SELECTION_HANDLER_FRAME_ATTR, null);
+
+		// PBoundsHandle.removeBoundsHandlesFrom(node);
+	}
+
+	public void unselect(Collection<PNode> items) {
+		boolean changes = false;
+		Iterator<PNode> itemIt = items.iterator();
+		while (itemIt.hasNext()) {
+			PNode node = (PNode) itemIt.next();
+			changes |= internalUnselect(node);
+		}
+		if (changes) {
+			postSelectionChanged();
+		}
+	}
+
+	public void unselect(PNode node) {
+		if (internalUnselect(node)) {
+			postSelectionChanged();
+		}
+	}
+
+	public void unselectAll() {
+		// Because unselect() removes from selection, we need to
+		// take a copy of it first so it isn't changed while we're iterating
+		ArrayList<PNode> sel = new ArrayList<PNode>(selection.keySet());
+		unselect(sel);
+	}
+
 	protected class BoundsFilter implements PNodeFilter {
-		PBounds localBounds = new PBounds();
 		PBounds bounds;
+		PBounds localBounds = new PBounds();
 
 		protected BoundsFilter(PBounds bounds) {
 			this.bounds = bounds;
@@ -635,48 +677,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			return node == selectableParent;
 		}
 
-	}
-
-	/**
-	 * Indicates the color used to paint the marquee.
-	 * 
-	 * @return the paint for interior of the marquee
-	 */
-	public Paint getMarqueePaint() {
-		return marqueePaint;
-	}
-
-	/**
-	 * Sets the color used to paint the marquee.
-	 * 
-	 * @param paint
-	 *            the paint color
-	 */
-	public void setMarqueePaint(Paint paint) {
-		this.marqueePaint = paint;
-	}
-
-	/**
-	 * Indicates the transparency level for the interior of the marquee.
-	 * 
-	 * @return Returns the marquee paint transparency, zero to one
-	 */
-	public float getMarqueePaintTransparency() {
-		return marqueePaintTransparency;
-	}
-
-	/**
-	 * Sets the transparency level for the interior of the marquee.
-	 * 
-	 * @param marqueePaintTransparency
-	 *            The marquee paint transparency to set.
-	 */
-	public void setMarqueePaintTransparency(float marqueePaintTransparency) {
-		this.marqueePaintTransparency = marqueePaintTransparency;
-	}
-
-	public void setMarqueeStrokePaint(Paint marqueeStrokePaint) {
-		this.marqueeStrokePaint = marqueeStrokePaint;
 	}
 
 }

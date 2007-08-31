@@ -23,18 +23,18 @@ public abstract class AbstractStatusHandler extends PBasicInputEventHandler {
 	}
 
 	/**
-	 * @return World this handler belongs to
-	 */
-	protected World getWorld() {
-		return world;
-	}
-
-	/**
 	 * @param event
 	 *            Input event
 	 * @return Message to show on the status bar
 	 */
 	protected abstract String getStatusMessage(PInputEvent event);
+
+	/**
+	 * @return World this handler belongs to
+	 */
+	protected World getWorld() {
+		return world;
+	}
 
 	@Override
 	public void mouseMoved(PInputEvent event) {

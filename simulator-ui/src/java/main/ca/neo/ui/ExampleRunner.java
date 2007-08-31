@@ -4,14 +4,13 @@ import javax.swing.SwingUtilities;
 
 import ca.neo.model.Network;
 import ca.neo.ui.models.nodes.UINetwork;
-import ca.shu.ui.lib.objects.widgets.TrackedStatusMsg;
+import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 
 /**
  * Used to conveniently create a NeoGraphics instance with an existing Network
  * model
  * 
  * @author Shu Wu
- * 
  */
 public class ExampleRunner {
 	private Network network;
@@ -53,9 +52,7 @@ public class ExampleRunner {
 		task = new TrackedStatusMsg("Creating Model UI");
 		UINetwork networkUI = new UINetwork(network);
 
-		neoGraphics.addWorldObject(networkUI);
-
-		networkUI.openViewer();
+		neoGraphics.addNeoNode(networkUI);
 
 		task.finished();
 

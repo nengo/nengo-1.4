@@ -3,7 +3,7 @@ package ca.shu.ui.lib.actions;
 import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * A reversable action than can be undone.
@@ -18,26 +18,6 @@ public abstract class ReversableAction extends StandardAction {
 
 	public ReversableAction(String description, String actionName) {
 		super(description, actionName);
-	}
-
-	/**
-	 * Undo the action
-	 */
-	public void undoAction() {
-		if (!isActionCompleted()) {
-			Util.UserError("Action was never done, so it can't be undone");
-			return;
-		}
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					undo();
-				} catch (ActionException e) {
-					e.defaultHandleBehavior();
-				}
-			}
-		});
 	}
 
 	/**
@@ -56,7 +36,7 @@ public abstract class ReversableAction extends StandardAction {
 		 * Only add the action once to the Action manager
 		 */
 		if (!isActionCompleted()) {
-			UIEnvironment.getActionManager().addReversableAction(this);
+			UIEnvironment.getInstance().getActionManager().addReversableAction(this);
 		}
 	}
 
@@ -66,5 +46,25 @@ public abstract class ReversableAction extends StandardAction {
 	 * @return Whether the undo action was successful
 	 */
 	protected abstract void undo() throws ActionException;
+
+	/**
+	 * Undo the action
+	 */
+	public void undoAction() {
+		if (!isActionCompleted()) {
+			UserMessages.showError("Action was never done, so it can't be undone");
+			return;
+		}
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					undo();
+				} catch (ActionException e) {
+					e.defaultHandleBehavior();
+				}
+			}
+		});
+	}
 
 }

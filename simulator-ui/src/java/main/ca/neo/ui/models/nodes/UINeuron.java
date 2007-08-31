@@ -7,7 +7,7 @@ import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.NeuronIcon;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * UI Wrapper for a Neuron
@@ -42,7 +42,7 @@ public class UINeuron extends UINeoNode {
 
 	@Override
 	public ConfigParamDescriptor[] getConfigSchema() {
-		Util.UserError("not implemented yet");
+		UserMessages.showError("not implemented yet");
 		return null;
 
 	}

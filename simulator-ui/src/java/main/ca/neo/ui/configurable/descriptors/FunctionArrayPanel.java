@@ -16,7 +16,7 @@ import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.ConfigParamInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Input panel for entering an Array of Functions
@@ -52,7 +52,7 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 	 */
 	protected void editFunctionArray() {
 		if (!isDimensionsSet()) {
-			Util.UserWarning("Input dimensions not set");
+			UserMessages.showWarning("Input dimensions not set");
 			return;
 		}
 
@@ -82,7 +82,7 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 			functionsEdited = true;
 
 		} else {
-			Util.UserError("Could not attach properties dialog");
+			UserMessages.showError("Could not attach properties dialog");
 		}
 
 	}

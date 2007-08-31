@@ -24,6 +24,8 @@ public class NetworkViewerMemoryTest {
 
 	// private static Window[] windows;
 
+	static UINetwork network;
+
 	public static long getApproximateUsedMemory() {
 		System.gc();
 		System.runFinalization();
@@ -31,8 +33,6 @@ public class NetworkViewerMemoryTest {
 		long free = Runtime.getRuntime().freeMemory();
 		return totalMemory - free;
 	}
-
-	static UINetwork network;
 
 	/**
 	 * @param args

@@ -15,7 +15,7 @@ import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.util.PopupMenuBuilder;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper of FunctionInput

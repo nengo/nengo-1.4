@@ -14,9 +14,9 @@ import ca.neo.ui.models.nodes.UINodeContainer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.objects.widgets.TrackedActivity;
-import ca.shu.ui.lib.objects.widgets.TransientStatusMessage;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.objects.activities.TransientStatusMessage;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Saves a PNodeContainer
@@ -72,7 +72,7 @@ public class SaveNodeContainerAction extends StandardAction {
 	private void saveModel(Node model, File file) throws IOException {
 		FileManager fm = new FileManager();
 		if (!canSave(model)) {
-			Util.UserError("Trying to save an unsupported model "
+			UserMessages.showError("Trying to save an unsupported model "
 					+ nodeUI.getClass().getSimpleName());
 			return;
 		}
@@ -82,7 +82,7 @@ public class SaveNodeContainerAction extends StandardAction {
 		} else if (model instanceof Ensemble) {
 			fm.save((Ensemble) model, file);
 		}
-		TransientStatusMessage.show("File saved!", 2500);
+		new TransientStatusMessage("File saved!", 2500);
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class SaveNodeContainerAction extends StandardAction {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			file = NeoGraphics.FileChooser.getSelectedFile();
 
-			TrackedActivity task = new TrackedActivity("Saving model") {
+			AbstractActivity task = new AbstractActivity("Saving model") {
 
 				@Override
 				public void doActivity() {
@@ -116,10 +116,10 @@ public class SaveNodeContainerAction extends StandardAction {
 						saveModel(nodeUI.getModel(), file);
 
 					} catch (IOException e) {
-						Util.UserError("Could not save file: " + e.toString());
+						UserMessages.showError("Could not save file: " + e.toString());
 					} catch (OutOfMemoryError e) {
-						Util
-								.UserError("Out of memory, please increase memory size: "
+						UserMessages
+								.showError("Out of memory, please increase memory size: "
 										+ e.toString());
 					}
 				}
