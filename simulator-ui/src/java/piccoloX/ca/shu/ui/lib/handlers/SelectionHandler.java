@@ -242,24 +242,26 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	protected void dragStandardSelection(PInputEvent e) {
 		// There was a press node, so drag selection
-		PDimension d = e.getCanvasDelta();
 
-		marqueeParent.localToView(d);
+		// marqueeParent.localToView(d);
 
 		PDimension gDist = new PDimension();
 		Iterator<PNode> selectionEn = getSelection().iterator();
 
 		if (selectionEn.hasNext()) {
 			e.setHandled(true);
+			PDimension d = e.getDeltaRelativeTo(selectableParent);
+
+			while (selectionEn.hasNext()) {
+				PNode node = (PNode) selectionEn.next();
+
+				gDist.setSize(d);
+				node.getParent().globalToLocal(gDist);
+				node.offset(gDist.getWidth(), gDist.getHeight());
+			}
+
 		}
 
-		while (selectionEn.hasNext()) {
-			PNode node = (PNode) selectionEn.next();
-
-			gDist.setSize(d);
-			node.getParent().globalToLocal(gDist);
-			node.offset(gDist.getWidth(), gDist.getHeight());
-		}
 	}
 
 	protected void endDrag(PInputEvent e) {
