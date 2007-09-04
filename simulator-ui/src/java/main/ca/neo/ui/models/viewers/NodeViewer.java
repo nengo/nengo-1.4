@@ -18,7 +18,7 @@ import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.ModelsContextMenu;
 import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.nodes.UINodeContainer;
+import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.util.Util;
@@ -65,13 +65,13 @@ public abstract class NodeViewer extends World implements Interactable,
 	/**
 	 * Viewer Parent
 	 */
-	private final UINodeContainer parentOfViewer;
+	private final NodeContainer parentOfViewer;
 
 	/**
 	 * @param nodeContainer
 	 *            UI Object containing the Node model
 	 */
-	public NodeViewer(UINodeContainer nodeContainer) {
+	public NodeViewer(NodeContainer nodeContainer) {
 		super("");
 		this.parentOfViewer = nodeContainer;
 
@@ -326,7 +326,7 @@ public abstract class NodeViewer extends World implements Interactable,
 	/**
 	 * @return Parent of this viewer
 	 */
-	public UINodeContainer getViewerParent() {
+	public NodeContainer getViewerParent() {
 		return parentOfViewer;
 	}
 

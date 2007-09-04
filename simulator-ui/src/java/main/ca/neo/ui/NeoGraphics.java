@@ -14,7 +14,7 @@ import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
-import ca.neo.ui.models.nodes.UINodeContainer;
+import ca.neo.ui.models.nodes.NodeContainer;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
@@ -89,8 +89,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		while (it.hasNext()) {
 			Object obj = it.next();
 
-			if (obj instanceof UINodeContainer) {
-				UINodeContainer node = (UINodeContainer) obj;
+			if (obj instanceof NodeContainer) {
+				NodeContainer node = (NodeContainer) obj;
 				if (SaveNodeContainerAction.canSave(node.getModel())) {
 
 					SaveNodeContainerAction saveAction = new SaveNodeContainerAction(
@@ -129,8 +129,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
 	public void addNeoNode(UINeoNode node) {
-		if (node instanceof UINodeContainer) {
-			((UINodeContainer) (node)).openViewer();
+		if (node instanceof NodeContainer) {
+			((NodeContainer) (node)).openViewer();
 		}
 		getWorld().getGround().addObject(node);
 

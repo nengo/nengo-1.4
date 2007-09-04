@@ -54,7 +54,12 @@ public class ExampleRunner {
 
 		neoGraphics.addNeoNode(networkUI);
 
+		processNetwork(networkUI);
 		task.finished();
+
+	}
+
+	protected void processNetwork(UINetwork network) {
 
 	}
 

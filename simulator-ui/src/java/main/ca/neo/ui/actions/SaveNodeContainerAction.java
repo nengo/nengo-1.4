@@ -10,7 +10,7 @@ import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.ui.NeoGraphics;
-import ca.neo.ui.models.nodes.UINodeContainer;
+import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
@@ -47,7 +47,7 @@ public class SaveNodeContainerAction extends StandardAction {
 	 */
 	private File file;
 
-	private UINodeContainer nodeUI;
+	private NodeContainer nodeUI;
 
 	/**
 	 * @param actionName
@@ -55,7 +55,7 @@ public class SaveNodeContainerAction extends StandardAction {
 	 * @param nodeUI
 	 *            Node to be saved
 	 */
-	public SaveNodeContainerAction(String actionName, UINodeContainer nodeUI) {
+	public SaveNodeContainerAction(String actionName, NodeContainer nodeUI) {
 		super("Save " + nodeUI.getTypeName(), actionName);
 
 		this.nodeUI = nodeUI;

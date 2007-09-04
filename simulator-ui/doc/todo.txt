@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+DONE (Sept 4) - Can view Z-Plane brain imagery, see BrainViewExample.java
 DONE (Sept 4) - Some actions can be applied to multiple selected objects
 DONE (Sept 1) - Move actions are now undooable
 DONE (Aug 31) - Added first iteration of comments, code cleanup, refactoring
@@ -61,6 +62,8 @@ like a spreadsheet-style matrix editor would be good)
 *******************************************
  Pri 2 - will do eventually
 *******************************************
+set the title of the Swing Frame to that of the maximized Zoomable Window
+
 fix the color coding issues with frames on selection, context menu and during drag
 
 debug paint calls using PDebug

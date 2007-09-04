@@ -63,12 +63,11 @@ public class Window extends WorldObject implements Interactable {
 
 		menubar = new MenuBar(this);
 
-		addChild(menubar);
-
 		myClippingRectangle = new PClip();
 		myClippingRectangle.addChild(content);
+		myClippingRectangle.setPaint(Style.COLOR_BACKGROUND);
 		addChild(myClippingRectangle);
-
+		addChild(menubar);
 		addChild(new Border(this, Style.COLOR_FOREGROUND));
 
 		windowStateChanged();

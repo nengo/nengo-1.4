@@ -25,7 +25,7 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  * @author Shu
  * 
  */
-public class UIEnsemble extends UINodeContainer {
+public class UIEnsemble extends NodeContainer {
 
 	private static final long serialVersionUID = 1L;
 

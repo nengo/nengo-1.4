@@ -554,10 +554,10 @@ public class NetworkViewer extends NodeViewer {
 							.elements();
 
 					if (enumeration.hasMoreElements()) {
-						double startX = Double.MAX_VALUE;
-						double startY = Double.MAX_VALUE;
-						double endX = Double.MIN_VALUE;
-						double endY = Double.MIN_VALUE;
+						double startX = Double.POSITIVE_INFINITY;
+						double startY = Double.POSITIVE_INFINITY;
+						double endX = Double.NEGATIVE_INFINITY;
+						double endY = Double.NEGATIVE_INFINITY;
 
 						while (enumeration.hasMoreElements()) {
 
@@ -575,13 +575,15 @@ public class NetworkViewer extends NodeViewer {
 
 									if (x < startX) {
 										startX = x;
-									} else if (x + node.getWidth() > endX) {
+									}
+									if (x + node.getWidth() > endX) {
 										endX = x + node.getWidth();
 									}
 
 									if (y < startY) {
 										startY = y;
-									} else if (y + node.getHeight() > endY) {
+									}
+									if (y + node.getHeight() > endY) {
 										endY = y + node.getHeight();
 									}
 

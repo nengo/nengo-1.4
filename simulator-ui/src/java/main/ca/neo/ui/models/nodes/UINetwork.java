@@ -18,7 +18,7 @@ import ca.shu.ui.lib.util.UserMessages;
  * 
  * @author Shu Wu
  */
-public class UINetwork extends UINodeContainer {
+public class UINetwork extends NodeContainer {
 
 	private static final String LAYOUT_MANAGER_KEY = "layout/manager";
 

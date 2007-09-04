@@ -2,6 +2,8 @@ package ca.neo.ui.models.nodes;
 
 import java.lang.ref.WeakReference;
 
+import BrianView.BrainViewer;
+
 import ca.neo.model.Node;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.UINeoNode;
@@ -20,9 +22,8 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  */
 /**
  * @author Shu
- * 
  */
-public abstract class UINodeContainer extends UINeoNode {
+public abstract class NodeContainer extends UINeoNode {
 
 	private static final long serialVersionUID = 1L;
 
@@ -32,11 +33,11 @@ public abstract class UINodeContainer extends UINeoNode {
 	private WeakReference<Window> viewerWindowRef = new WeakReference<Window>(
 			null);
 
-	public UINodeContainer() {
+	public NodeContainer() {
 		super();
 	}
 
-	public UINodeContainer(Node model) {
+	public NodeContainer(Node model) {
 		super(model);
 	}
 
@@ -74,6 +75,15 @@ public abstract class UINodeContainer extends UINeoNode {
 
 		}
 
+		menu.addAction(new StandardAction(
+				"Create Brain View (under construction)") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void action() throws ActionException {
+				openBrainViewer();
+			}
+		});
 		return menu;
 
 	}
@@ -157,13 +167,22 @@ public abstract class UINodeContainer extends UINeoNode {
 	 */
 	public NodeViewer openViewer() {
 		Window viewerWindow = getViewerWindow();
-
 		if (viewerWindow.getWindowState() == WindowState.MINIMIZED) {
 			viewerWindow.restoreWindow();
 		}
-
 		return (NodeViewer) viewerWindow.getWindowContent();
 
+	}
+
+	/**
+	 * Opens a new instance of Brain View
+	 */
+	public void openBrainViewer() {
+		BrainViewer brainViewer = new BrainViewer();
+
+		new Window(this, brainViewer);
+		// window.setOffset(0, -brainViewer.getHeight());
+		// addChild(brainViewer);
 	}
 
 	/**

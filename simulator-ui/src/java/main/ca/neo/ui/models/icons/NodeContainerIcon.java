@@ -1,6 +1,6 @@
 package ca.neo.ui.models.icons;
 
-import ca.neo.ui.models.nodes.UINodeContainer;
+import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.objects.TextNode;
 import edu.umd.cs.piccolo.PNode;
@@ -24,7 +24,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 	private final TextNode sizeLabel;
 
-	public NodeContainerIcon(UINodeContainer parent, PNode icon) {
+	public NodeContainerIcon(NodeContainer parent, PNode icon) {
 		super(parent, icon);
 		sizeLabel = new TextNode("");
 		sizeLabel.setFont(Style.FONT_SMALL);
@@ -83,9 +83,9 @@ public abstract class NodeContainerIcon extends ModelIcon {
 	}
 
 	@Override
-	public UINodeContainer getModelParent() {
+	public NodeContainer getModelParent() {
 
-		return (UINodeContainer) super.getModelParent();
+		return (NodeContainer) super.getModelParent();
 	}
 
 }
