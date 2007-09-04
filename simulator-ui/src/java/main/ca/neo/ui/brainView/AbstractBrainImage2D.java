@@ -3,6 +3,7 @@ package ca.neo.ui.brainView;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
 import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
@@ -46,9 +47,34 @@ public abstract class AbstractBrainImage2D extends BufferedImage {
 
 	int viewCoord;
 
+	int imageWidth, imageHeight;
+
 	public AbstractBrainImage2D(int width, int height) {
 		super(getBrainColorModel(), getBrainRaster(width, height), false, null);
+		imageWidth = width;
+		imageHeight = height;
 		setCoord(getCoordDefault());
+	}
+
+	private void updateViewCoord() {
+
+		byte[] imageArray = new byte[imageWidth * imageHeight];
+		int imageArrayIndex = 0;
+		for (int imageY = imageHeight - 1; imageY >= 0; imageY--) {
+
+			for (int imageX = 0; imageX < imageWidth; imageX++) {
+				// image.getRaster().setPixel(x, y, new int[] { 0 });
+
+				imageArray[imageArrayIndex++] = getImageByte(imageX, imageY);
+			}
+		}
+		DataBuffer buffer = new DataBufferByte(imageArray, imageArray.length, 0);
+
+		WritableRaster raster = Raster.createWritableRaster(getSampleModel(),
+				buffer, null);
+
+		setData(raster);
+
 	}
 
 	public int getCoordDefault() {
@@ -56,6 +82,8 @@ public abstract class AbstractBrainImage2D extends BufferedImage {
 	}
 
 	public abstract int getCoordMax();
+
+	// protected abstract int get
 
 	public abstract int getCoordMin();
 
@@ -74,7 +102,7 @@ public abstract class AbstractBrainImage2D extends BufferedImage {
 
 	}
 
-	public abstract void updateViewCoord();
+	public abstract byte getImageByte(int imageX, int imageY);
 
 	public abstract String getViewName();
 

@@ -1,12 +1,16 @@
 package ca.neo.ui.brainView;
 
+import java.util.Iterator;
+
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.handlers.EventConsumer;
 import ca.shu.ui.lib.objects.Border;
 import ca.shu.ui.lib.objects.TextNode;
 import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldGround;
 import ca.shu.ui.lib.world.WorldObject;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.nodes.PImage;
@@ -15,7 +19,7 @@ public class BrainViewer extends World {
 
 	private static final long serialVersionUID = 1L;
 
-	BrainTopImage topView;
+	AbstractBrainImage2D topView, sideView, frontView;
 
 	public BrainViewer() {
 		super("Brain View");
@@ -23,21 +27,51 @@ public class BrainViewer extends World {
 		setStatusBarHandler(null);
 		init();
 
-		getSky().setScale(2);
+		// getSky().setScale(2);
 		// setBounds(parentToLocal(getFullBounds()));
 		// addInputEventListener(new EventConsumer());
 
 	}
 
 	private void init() {
+		sideView = new BrainSideImage();
+		frontView = new BrainFrontImage();
+
 		topView = new BrainTopImage();
 
+		getGround().addChild(new BrainImageWrapper(sideView));
+		getGround().addChild(new BrainImageWrapper(frontView));
 		getGround().addChild(new BrainImageWrapper(topView));
 
 	}
 
 	public int getZCoord() {
 		return topView.getCoord();
+	}
+
+	public int getYCoord() {
+		return frontView.getCoord();
+	}
+
+	@Override
+	protected WorldGround createGround() {
+		return new WorldGround(this) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void layoutChildren() {
+				Iterator<?> it = getChildrenReference().iterator();
+				int x = 0;
+				while (it.hasNext()) {
+					PNode obj = (PNode) it.next();
+
+					obj.setOffset(x, 0);
+					x += obj.getWidth() + 10;
+
+				}
+			}
+		};
 	}
 }
 
@@ -87,15 +121,17 @@ class BrainImageWrapper extends WorldObject {
 		protected void dragActivityStep(PInputEvent aEvent) {
 
 			double dx = (aEvent.getCanvasPosition().getX() - getMousePressedCanvasPoint()
-					.getX()) / 10;
-
-			roundingError += dx - ((int) dx);
-
+					.getX()) / 30;
 			int dxInteger = (int) dx;
+
+			roundingError += dx - (int) dx;
 
 			if (roundingError > 1) {
 				dxInteger++;
 				roundingError--;
+			} else if (roundingError < -1) {
+				roundingError++;
+				dxInteger--;
 			}
 
 			myBrainImage.setCoord(myBrainImage.getCoord() + dxInteger);

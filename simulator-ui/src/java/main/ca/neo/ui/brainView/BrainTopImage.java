@@ -1,14 +1,10 @@
 package ca.neo.ui.brainView;
 
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 
 public class BrainTopImage extends AbstractBrainImage2D {
 
 	public BrainTopImage() {
-		super(BrainData.Y_DIMENSIONS, BrainData.X_DIMENSIONS);
+		super(BrainData.X_DIMENSIONS, BrainData.Y_DIMENSIONS);
 
 	}
 
@@ -23,31 +19,6 @@ public class BrainTopImage extends AbstractBrainImage2D {
 	}
 
 	@Override
-	public void updateViewCoord() {
-		int coord = getCoord();
-
-		byte[] imageArray = new byte[BrainData.Y_DIMENSIONS
-				* BrainData.Z_DIMENSIONS];
-		int imageArrayIndex = 0;
-		for (int x = 0; x < BrainData.X_DIMENSIONS; x++) {
-
-			for (int y = 0; y < BrainData.Y_DIMENSIONS; y++) {
-				// image.getRaster().setPixel(x, y, new int[] { 0 });
-
-				imageArray[imageArrayIndex++] = BrainData.getVoxelData()[coord
-						+ BrainData.Z_START][y][x];
-			}
-		}
-		DataBuffer buffer = new DataBufferByte(imageArray, imageArray.length, 0);
-
-		WritableRaster raster = Raster.createWritableRaster(getSampleModel(),
-				buffer, null);
-
-		setData(raster);
-
-	}
-
-	@Override
 	public String getCoordName() {
 		return "Z";
 	}
@@ -55,5 +26,9 @@ public class BrainTopImage extends AbstractBrainImage2D {
 	@Override
 	public String getViewName() {
 		return "Top View";
+	}
+
+	public byte getImageByte(int imageX, int imageY) {
+		return BrainData.getVoxelData()[getCoord() + BrainData.Z_START][imageY][imageX];
 	}
 }
