@@ -30,13 +30,21 @@ public abstract class ReversableAction extends StandardAction {
 
 	}
 
+	/**
+	 * @return True, if this action is reversable
+	 */
+	protected boolean isReversable() {
+		return true;
+	}
+
 	@Override
 	protected void postAction() {
 		/*
 		 * Only add the action once to the Action manager
 		 */
-		if (!isActionCompleted()) {
-			UIEnvironment.getInstance().getActionManager().addReversableAction(this);
+		if (!isActionCompleted() && isReversable()) {
+			UIEnvironment.getInstance().getActionManager().addReversableAction(
+					this);
 		}
 	}
 
@@ -52,7 +60,8 @@ public abstract class ReversableAction extends StandardAction {
 	 */
 	public void undoAction() {
 		if (!isActionCompleted()) {
-			UserMessages.showError("Action was never done, so it can't be undone");
+			UserMessages
+					.showError("Action was never done, so it can't be undone");
 			return;
 		}
 

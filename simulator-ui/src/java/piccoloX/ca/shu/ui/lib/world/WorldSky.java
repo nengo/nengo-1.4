@@ -9,9 +9,6 @@ import edu.umd.cs.piccolo.PCamera;
  * 
  * @author Shu Wu
  */
-/**
- * @author Shu
- */
 public class WorldSky extends PCamera implements IWorldLayer {
 
 	private static final long serialVersionUID = -7467076877836999849L;

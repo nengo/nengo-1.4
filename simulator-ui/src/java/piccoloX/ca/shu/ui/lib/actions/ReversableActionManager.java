@@ -54,12 +54,12 @@ public class ReversableActionManager {
 	 *            Action to add
 	 */
 	public void addReversableAction(ReversableAction action) {
-		reversableActions.add(action);
 
 		while (undoStepCount > 0) {
 			reversableActions.remove(reversableActions.size() - 1);
 			undoStepCount--;
 		}
+		reversableActions.add(action);
 
 		if (reversableActions.size() > MAX_NUM_OF_UNDO_ACTIONS) {
 			ReversableAction reversableAction = reversableActions.remove(0);

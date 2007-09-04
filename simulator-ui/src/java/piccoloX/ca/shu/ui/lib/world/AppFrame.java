@@ -987,6 +987,7 @@ public abstract class AppFrame extends JFrame {
 		@Override
 		protected void action() throws ActionException {
 			setSelectionMode(true);
+			updateWorldMenu();
 		}
 
 	}
@@ -1007,6 +1008,7 @@ public abstract class AppFrame extends JFrame {
 		@Override
 		protected void action() throws ActionException {
 			setSelectionMode(false);
+			updateWorldMenu();
 		}
 
 	}

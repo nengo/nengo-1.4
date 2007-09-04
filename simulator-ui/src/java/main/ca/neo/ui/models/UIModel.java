@@ -3,14 +3,11 @@ package ca.neo.ui.models;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import ca.neo.ui.actions.RemoveModelAction;
 import ca.neo.ui.models.tooltips.ModelTooltip;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
@@ -21,7 +18,6 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * A UI Object which wraps a NEO Model
  * 
  * @author Shu Wu
- * 
  */
 public abstract class UIModel extends WorldObject implements Interactable {
 
@@ -74,7 +70,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 
 		PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
 
-		menu.addAction(new RemoveModelAction("Remove " + getTypeName()));
+		menu.addAction(new RemoveModelAction("Remove " + getTypeName(), this));
 
 		return menu;
 	}
@@ -190,34 +186,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 
 			return menu;
 		}
-	}
-
-	/**
-	 * Action for removing this UI Wrapper and the model
-	 * 
-	 * @author Shu Wu
-	 * 
-	 */
-	class RemoveModelAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public RemoveModelAction(String actionName) {
-			super("Remove " + getTypeName(), actionName);
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			int response = JOptionPane.showConfirmDialog(UIEnvironment
-					.getInstance(),
-					"Once an object has been removed, it cannot be undone.",
-					"Are you sure?", JOptionPane.YES_NO_OPTION);
-			if (response == 0) {
-				destroy();
-			} else {
-				throw new ActionException("Action cancelled by user", false);
-			}
-		}
 
 	}
+
 }

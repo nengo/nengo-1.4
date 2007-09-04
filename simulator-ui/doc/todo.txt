@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+DONE (Sept 1) - Move actions are now undooable
 DONE (Aug 31) - Added first iteration of comments, code cleanup, refactoring
 DONE (Aug 31) - Added Keyboard mnemonic shortcuts for menubar
 DONE (Aug 31) - Made layout animations zooming parallel with node positions.
@@ -11,10 +12,9 @@ DONE - Select multiple things at once
 *******************************************
  Pri 0 - doing next
 ******************************************* 
-document PiccoloX Library
 
 Apply actions to selected items
-
+	add function getActions
 
 Make drag handler undooable
 	1. What operations are undoable? I think it would be nice if
