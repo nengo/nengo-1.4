@@ -9,10 +9,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import javax.swing.JPopupMenu;
+
 import ca.neo.model.Node;
 import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.INodeContainer;
+import ca.neo.ui.models.ModelsContextMenu;
 import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UINodeContainer;
@@ -23,6 +26,7 @@ import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -62,7 +66,6 @@ public abstract class NodeViewer extends World implements Interactable,
 	 * Viewer Parent
 	 */
 	private final UINodeContainer parentOfViewer;
-
 	/**
 	 * @param nodeContainer
 	 *            UI Object containing the Node model
@@ -155,7 +158,7 @@ public abstract class NodeViewer extends World implements Interactable,
 	/**
 	 * Called when the model changes. Updates the viewer based on the NEO model.
 	 */
-	protected abstract void updateViewFromModel();;
+	protected abstract void updateViewFromModel();
 
 	/*
 	 * (non-Javadoc)
@@ -165,7 +168,7 @@ public abstract class NodeViewer extends World implements Interactable,
 	public void addNeoNode(UINeoNode node) {
 		addNeoNode(node, true, true, false);
 
-	}
+	};
 
 	/**
 	 * Applies the default layout
@@ -364,6 +367,21 @@ public abstract class NodeViewer extends World implements Interactable,
 			UINeoNode node = enumeration.nextElement();
 			node.showAllWidgets();
 		}
+	}
+
+	@Override
+	public JPopupMenu showSelectionContextMenu() {
+		ArrayList<UIModel> models = new ArrayList<UIModel>(getSelection()
+				.size());
+
+		for (WorldObject object : getSelection()) {
+			if (object instanceof UIModel) {
+				models.add((UIModel) object);
+
+			}
+		}
+
+		return ModelsContextMenu.getMenu(models);
 	}
 
 	/**

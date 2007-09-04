@@ -14,8 +14,10 @@ import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
+import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.ui.actions.AddProbeAction;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UISimulatorProbe;
 import ca.neo.ui.models.nodes.widgets.UITermination;
@@ -41,7 +43,6 @@ import edu.uci.ics.jung.graph.Vertex;
  * UI Wrapper for a NEO Node Model
  * 
  * @author Shu
- * 
  */
 public abstract class UINeoNode extends UIModelConfigurable {
 
@@ -218,7 +219,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 					probesMenu = menu.createSubMenu("Add probe");
 				}
 				Entry<String, String> el = (Entry<String, String>) it.next();
-				probesMenu.addAction(new AddProbeAction(el));
+				probesMenu.addAction(new AddProbeAction(this, el));
 			}
 		}
 
@@ -337,9 +338,10 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * @param stateName
 	 *            The name of the state variable to probe
 	 */
-	public UISimulatorProbe addProbe(String stateName) {
+	public UISimulatorProbe addProbe(String stateName) throws SimulationException {
 
 		UISimulatorProbe probeUI = new UISimulatorProbe(this, stateName);
+		
 		newProbeAdded(probeUI);
 
 		return probeUI;
@@ -595,45 +597,9 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	/**
-	 * Action for adding probes
-	 * 
-	 * @author Shu Wu
-	 * 
-	 */
-	class AddProbeAction extends ReversableAction {
-
-		private static final long serialVersionUID = 1;
-
-		UISimulatorProbe probeCreated;
-
-		Entry<String, String> state;
-
-		public AddProbeAction(Entry<String, String> state) {
-			super(state.getKey() + " - " + state.getValue());
-			this.state = state;
-
-		}
-
-		@Override
-		protected void action() throws ActionException {
-
-			probeCreated = addProbe(state.getKey());
-
-		}
-
-		@Override
-		protected void undo() throws ActionException {
-			removeProbe(probeCreated);
-
-		}
-
-	}
-
-	/**
 	 * Action for hiding all origins and terminations
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class HideAllOandTAction extends StandardAction {
 
@@ -653,7 +619,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * Action for setting the documentation of the node
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class SetDocumentationAction extends ReversableAction {
 
@@ -703,7 +668,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * Action for showing all origins and terminations
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class ShowAllOandTAction extends StandardAction {
 
@@ -724,7 +688,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * Action for showing a specific origin
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class ShowOriginAction extends StandardAction {
 
@@ -746,7 +709,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * Action for showing a specific termination
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class ShowTerminationAction extends StandardAction {
 
@@ -768,7 +730,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * Action for viewing the node's documentation
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class ViewDocumentationAction extends StandardAction {
 

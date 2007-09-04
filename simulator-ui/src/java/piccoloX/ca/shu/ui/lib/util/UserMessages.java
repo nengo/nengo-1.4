@@ -9,14 +9,14 @@ import javax.swing.JOptionPane;
  */
 public class UserMessages {
 	public static void showError(String msg) {
-		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
-				"Error", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), "<HTML>"
+				+ msg + "</HTML>", "Error", JOptionPane.ERROR_MESSAGE);
 		(new Exception(msg)).printStackTrace();
 
 	}
 
 	public static void showWarning(String msg) {
-		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), msg,
-				"Warning", JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), "<HTML>"
+				+ msg + "</HTML>", "Warning", JOptionPane.WARNING_MESSAGE);
 	}
 }

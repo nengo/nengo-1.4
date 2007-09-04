@@ -140,24 +140,28 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		super.mouseReleased(event);
 
-		if ((interactableObj != null)
-				&& (mouseCanvasPositionPressed.distance(event
-						.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)
-				&& (mouseButtonPressed == event.getButton())
-				&& (interactableObj == (Interactable) Util.getNodeFromPickPath(
-						event, Interactable.class))) {
+		if (((mouseButtonPressed == event.getButton()) && mouseCanvasPositionPressed
+				.distance(event.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
 
-			if (interactableObj.isContextMenuEnabled()) {
-				JPopupMenu menu = interactableObj.showContextMenu(event);
+			JPopupMenu menuToShow = world.showSelectionContextMenu();
 
-				if (menu != null) {
-					menu.setVisible(true);
-					MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
+			if (menuToShow == null
+					&& (interactableObj != null)
+					&& interactableObj.isContextMenuEnabled()
+					&& (interactableObj == (Interactable) Util
+							.getNodeFromPickPath(event, Interactable.class))) {
+				menuToShow = interactableObj.showContextMenu(event);
 
-					menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
-				}
+			}
+
+			if (menuToShow != null) {
+				menuToShow.setVisible(true);
+				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
+
+				menuToShow.show(e.getComponent(), e.getPoint().x,
+						e.getPoint().y);
 			}
 		}
-	}
 
+	}
 }

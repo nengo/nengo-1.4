@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+DONE (Sept 4) - Some actions can be applied to multiple selected objects
 DONE (Sept 1) - Move actions are now undooable
 DONE (Aug 31) - Added first iteration of comments, code cleanup, refactoring
 DONE (Aug 31) - Added Keyboard mnemonic shortcuts for menubar
@@ -13,11 +14,7 @@ DONE - Select multiple things at once
  Pri 0 - doing next
 ******************************************* 
 
-Apply actions to selected items
-	add function getActions
-
-Make drag handler undooable
-	1. What operations are undoable? I think it would be nice if
+1. What operations are undoable? I think it would be nice if
 	    everything was (including object removals & layout changes). Would
 	    this be hard?
 		

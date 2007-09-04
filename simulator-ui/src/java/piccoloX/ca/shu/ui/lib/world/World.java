@@ -174,7 +174,7 @@ public class World extends WorldObject implements Interactable {
 		/*
 		 * Set position and scale
 		 */
-//		animateToSkyPosition(0, 0);
+		// animateToSkyPosition(0, 0);
 		setSkyViewScale(0.7f);
 
 		/*
@@ -581,5 +581,22 @@ public class World extends WorldObject implements Interactable {
 		 * canvas
 		 */
 		return UIEnvironment.getInstance().getCanvas().getRoot();
+	}
+
+	/**
+	 * @return Context menu for currently selected items, null is none is to be
+	 *         shown
+	 */
+	public JPopupMenu showSelectionContextMenu() {
+		return null;
+	}
+
+	/**
+	 * Returns a copy of currently selected nodes
+	 * 
+	 * @return Selection Currently Selected nodes
+	 */
+	public Collection<WorldObject> getSelection() {
+		return selectionEventHandler.getSelection();
 	}
 }

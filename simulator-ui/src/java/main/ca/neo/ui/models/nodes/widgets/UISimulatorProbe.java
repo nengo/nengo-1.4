@@ -31,7 +31,6 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  * UI Wrapper for a Simulator Probe
  * 
  * @author Shu Wu
- * 
  */
 public class UISimulatorProbe extends UIModel {
 
@@ -43,7 +42,8 @@ public class UISimulatorProbe extends UIModel {
 		init(nodeAttachedTo);
 	}
 
-	public UISimulatorProbe(UINeoNode nodeAttachedTo, String state) {
+	public UISimulatorProbe(UINeoNode nodeAttachedTo, String state)
+			throws SimulationException {
 		super();
 
 		/*
@@ -52,7 +52,6 @@ public class UISimulatorProbe extends UIModel {
 		Node node = nodeAttachedTo.getModel();
 		Probe probe;
 		try {
-
 			if (nodeAttachedTo.getParentViewer() instanceof EnsembleViewer) {
 				EnsembleViewer ensembleViewer = (EnsembleViewer) nodeAttachedTo
 						.getParentViewer();
@@ -67,16 +66,18 @@ public class UISimulatorProbe extends UIModel {
 				probe = nodeAttachedTo.getParentNetwork().getSimulator()
 						.addProbe(node.getName(), state, true);
 			}
-
-			nodeAttachedTo.popupTransientMsg("Probe " + state
-					+ " added to Simulator");
-
-			setModel(probe);
-			init(nodeAttachedTo);
-		} catch (SimulationException e) {
-			destroy();
-			UserMessages.showError("Could not add probe: " + e.toString());
+		} catch (SimulationException exception) {
+//			nodeAttachedTo.popupTransientMsg("Could not add Probe (" + state
+//					+ ") added to Simulator");
+			throw exception;
 		}
+
+		nodeAttachedTo.popupTransientMsg("Probe (" + state
+				+ ") added to Simulator");
+
+		setModel(probe);
+		init(nodeAttachedTo);
+
 	}
 
 	private void init(UINeoNode nodeProxy) {
@@ -155,7 +156,6 @@ public class UISimulatorProbe extends UIModel {
 	}
 
 	/**
-	 * 
 	 * @return Probe object
 	 */
 	public Probe getProbe() {
@@ -186,7 +186,6 @@ public class UISimulatorProbe extends UIModel {
 	 * Action for exporting to MatLab
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class ExportToMatlabAction extends StandardAction {
 
@@ -220,7 +219,6 @@ public class UISimulatorProbe extends UIModel {
 	 * Action for Plotting
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class PlotAction extends StandardAction {
 
@@ -241,7 +239,6 @@ public class UISimulatorProbe extends UIModel {
 	 * Action for Plotting with a Tau Filter
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class PlotTauFilterAction extends StandardAction {
 

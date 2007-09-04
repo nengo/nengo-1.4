@@ -1,22 +1,26 @@
 package ca.neo.ui.models;
 
+import java.util.Collection;
+
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.neuron.Neuron;
+import ca.neo.ui.actions.AddProbesAction;
+import ca.neo.ui.actions.RemoveModelsAction;
 import ca.neo.ui.models.nodes.UIFunctionInput;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.UINeuron;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 
 /**
  * Contains static members which reveal what sort of Nodes can be created by the
  * UI
  * 
  * @author Shu
- * 
  */
 public class UIModels {
 
@@ -52,6 +56,20 @@ public class UIModels {
 		} else {
 			UserMessages.showError("Unsupported node type");
 			return null;
+		}
+
+	}
+
+	public static void constructMenuForModels(AbstractMenuBuilder menuBuilder,
+			Class<? extends UIModel> modelType, String typeName,
+			Collection<UIModel> homogeneousModels) {
+
+		menuBuilder.addAction(new RemoveModelsAction(homogeneousModels,
+				typeName));
+
+		if (UINeoNode.class.isAssignableFrom(modelType)) {
+
+			menuBuilder.addAction(new AddProbesAction(homogeneousModels));
 		}
 
 	}
