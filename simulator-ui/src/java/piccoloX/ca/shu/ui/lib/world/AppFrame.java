@@ -57,10 +57,11 @@ public abstract class AppFrame extends JFrame {
 	 * A String which briefly describes some commands used in this application
 	 */
 	public static final String TIPS = "<B>*** Keyboard Shortcuts ***</B><BR>"
-			+ "Press 's' to switch between Interaction modes<BR>"
-			+ "Mouse over a node and hold down 'ctrl' to view tooltips<BR>"
+			+ "Interaction modes: Press 's' to switch modes<BR>"
+			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips<BR>"
 			+ "<BR><B>*** Mouse Shortcuts ***</B><BR>"
-			+ "Zooming: scroll the Mouse Wheel or Right Click and Drag";
+			+ "Context menu: Right click opens a context menu on most objects<BR>"
+			+ "Zooming: Scroll the mouse wheel or right click and drag";
 
 	/**
 	 * Name of the directory where UI Files are stored

@@ -66,6 +66,7 @@ public abstract class NodeViewer extends World implements Interactable,
 	 * Viewer Parent
 	 */
 	private final UINodeContainer parentOfViewer;
+
 	/**
 	 * @param nodeContainer
 	 *            UI Object containing the Node model
@@ -465,11 +466,18 @@ class ModelStatusBarHandler extends AbstractStatusHandler {
 
 		StringBuilder statuStr = new StringBuilder(getWorld().getName() + " | ");
 
-		if (wo != null) {
-			statuStr.append("Model name: " + wo.getName() + " ("
-					+ wo.getTypeName() + ")");
+		if (getWorld().getSelection().size() > 1) {
+			statuStr.append(getWorld().getSelection().size()
+					+ " Objects selected");
+
 		} else {
-			statuStr.append("No Model Selected");
+
+			if (wo != null) {
+				statuStr.append("Model name: " + wo.getName() + " ("
+						+ wo.getTypeName() + ")");
+			} else {
+				statuStr.append("No Model Selected");
+			}
 		}
 		return statuStr.toString();
 	}
