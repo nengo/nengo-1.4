@@ -1,4 +1,4 @@
-package BrianView;
+package ca.neo.ui.brainView;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;

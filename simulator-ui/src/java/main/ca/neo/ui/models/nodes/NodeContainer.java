@@ -2,10 +2,10 @@ package ca.neo.ui.models.nodes;
 
 import java.lang.ref.WeakReference;
 
-import BrianView.BrainViewer;
 
 import ca.neo.model.Node;
 import ca.neo.ui.actions.SaveNodeContainerAction;
+import ca.neo.ui.brainView.BrainViewer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;

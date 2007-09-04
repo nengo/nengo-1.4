@@ -1,4 +1,4 @@
-package BrianView;
+package ca.neo.ui.brainView;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.handlers.AbstractStatusHandler;
