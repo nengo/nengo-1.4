@@ -12,7 +12,6 @@ import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
  * A UI Object which wraps a NEO Model
@@ -177,7 +176,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	 * 
 	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
 	 */
-	public JPopupMenu showContextMenu(PInputEvent event) {
+	public JPopupMenu showContextMenu() {
 		if (!isModelExists()) {
 			UserMessages.showWarning("Model is not configured yet");
 			return null;

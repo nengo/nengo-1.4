@@ -2,8 +2,6 @@ package ca.shu.ui.lib.world;
 
 import javax.swing.JPopupMenu;
 
-import edu.umd.cs.piccolo.event.PInputEvent;
-
 /**
  * Objects which can be interacted with through context menus
  * 
@@ -22,6 +20,6 @@ public interface Interactable extends INamedObject {
 	 *            The input event triggering the context menu
 	 * @return context menu associated to the Named Object
 	 */
-	public JPopupMenu showContextMenu(PInputEvent event);
+	public JPopupMenu showContextMenu();
 
 }

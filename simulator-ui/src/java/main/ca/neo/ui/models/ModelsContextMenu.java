@@ -25,7 +25,10 @@ public class ModelsContextMenu {
 	public static JPopupMenu getMenu(Collection<UIModel> selectedObjects) {
 		if (selectedObjects.size() == 0)
 			return null;
-		else {
+		else if (selectedObjects.size() == 1) {
+			return selectedObjects.iterator().next().showContextMenu();
+			
+		} else {
 			ModelsContextMenu instance = new ModelsContextMenu(selectedObjects);
 
 			return instance.getMenu();

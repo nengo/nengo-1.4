@@ -14,7 +14,6 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
@@ -257,13 +256,13 @@ public class LineEnd extends WorldObject implements Interactable {
 		myEdge.setPointerVisible(visible);
 	}
 
-	public JPopupMenu showContextMenu(PInputEvent event) {
+	public JPopupMenu showContextMenu() {
 
 		/*
 		 * delegate the context menu from the target if it's attached
 		 */
 		if (isConnected() && (myTarget instanceof Interactable)) {
-			return ((Interactable) myTarget).showContextMenu(event);
+			return ((Interactable) myTarget).showContextMenu();
 		}
 
 		PopupMenuBuilder menu = new PopupMenuBuilder("Line End");

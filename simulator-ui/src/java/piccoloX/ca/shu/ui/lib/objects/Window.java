@@ -10,7 +10,6 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolox.nodes.PClip;
@@ -91,7 +90,7 @@ public class Window extends WorldObject implements Interactable {
 	}
 
 	protected void maximizeBounds() {
-		setOffset(0,0);
+		setOffset(0, 0);
 		setBounds(parentToLocal(getParent().getBounds()));
 	}
 
@@ -271,9 +270,9 @@ public class Window extends WorldObject implements Interactable {
 		}
 	}
 
-	public JPopupMenu showContextMenu(PInputEvent event) {
+	public JPopupMenu showContextMenu() {
 		if (getWindowContent() instanceof Interactable) {
-			return ((Interactable) (getWindowContent())).showContextMenu(event);
+			return ((Interactable) (getWindowContent())).showContextMenu();
 		}
 		return null;
 	}

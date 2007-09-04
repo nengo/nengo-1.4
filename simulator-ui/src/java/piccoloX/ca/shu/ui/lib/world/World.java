@@ -422,7 +422,7 @@ public class World extends WorldObject implements Interactable {
 	 * 
 	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
 	 */
-	public JPopupMenu showContextMenu(PInputEvent event) {
+	public JPopupMenu showContextMenu() {
 		return constructMenu().getJPopupMenu();
 	}
 
