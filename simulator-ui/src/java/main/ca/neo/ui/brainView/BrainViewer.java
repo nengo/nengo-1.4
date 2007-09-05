@@ -2,10 +2,8 @@ package ca.neo.ui.brainView;
 
 import java.util.Iterator;
 
-import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.handlers.EventConsumer;
-import ca.shu.ui.lib.objects.Border;
 import ca.shu.ui.lib.objects.TextNode;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldGround;
@@ -63,10 +61,21 @@ public class BrainViewer extends World {
 			protected void layoutChildren() {
 				Iterator<?> it = getChildrenReference().iterator();
 				int x = 0;
+				double maxHeight = 0;
+
+				while (it.hasNext()) {
+					PNode obj = (PNode) it.next();
+					if (obj.getHeight() > maxHeight) {
+						maxHeight = obj.getHeight();
+					}
+
+				}
+
+				it = getChildrenReference().iterator();
 				while (it.hasNext()) {
 					PNode obj = (PNode) it.next();
 
-					obj.setOffset(x, 0);
+					obj.setOffset(x, maxHeight - obj.getHeight());
 					x += obj.getWidth() + 10;
 
 				}
@@ -96,7 +105,7 @@ class BrainImageWrapper extends WorldObject {
 
 		layoutChildren();
 		setBounds(parentToLocal(getFullBounds()));
-		addChild(new Border(this, Style.COLOR_FOREGROUND));
+		// addChild(new Border(this, Style.COLOR_FOREGROUND));
 
 	}
 

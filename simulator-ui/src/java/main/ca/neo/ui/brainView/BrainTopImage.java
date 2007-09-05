@@ -20,7 +20,7 @@ public class BrainTopImage extends AbstractBrainImage2D {
 
 	@Override
 	public String getCoordName() {
-		return "Z";
+		return "Z(mm)";
 	}
 
 	@Override

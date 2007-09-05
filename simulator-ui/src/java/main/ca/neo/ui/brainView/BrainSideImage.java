@@ -25,7 +25,7 @@ public class BrainSideImage extends AbstractBrainImage2D {
 
 	@Override
 	public String getCoordName() {
-		return "X";
+		return "X(mm)";
 	}
 
 	@Override

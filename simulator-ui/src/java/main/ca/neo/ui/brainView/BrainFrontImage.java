@@ -1,6 +1,5 @@
 package ca.neo.ui.brainView;
 
-
 public class BrainFrontImage extends AbstractBrainImage2D {
 
 	public BrainFrontImage() {
@@ -24,7 +23,7 @@ public class BrainFrontImage extends AbstractBrainImage2D {
 
 	@Override
 	public String getCoordName() {
-		return "Y";
+		return "Y(mm)";
 	}
 
 	@Override

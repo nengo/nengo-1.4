@@ -14,6 +14,9 @@ DONE - Select multiple things at once
 *******************************************
  Pri 0 - doing next
 ******************************************* 
+Brain View interface
+Click to bring a cross section to front, zooming between sections
+
 
 1. What operations are undoable? I think it would be nice if
 	    everything was (including object removals & layout changes). Would
