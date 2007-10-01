@@ -21,7 +21,6 @@ import ca.shu.ui.lib.util.UserMessages;
  * Input Panel for editing an individual Function
  * 
  * @author Shu Wu
- * 
  */
 public class FunctionPanel extends ConfigParamInputPanel {
 
@@ -45,6 +44,7 @@ public class FunctionPanel extends ConfigParamInputPanel {
 
 	public FunctionPanel(ConfigParamDescriptor property) {
 		super(property);
+		initPanel();
 	}
 
 	/**
@@ -91,8 +91,7 @@ public class FunctionPanel extends ConfigParamInputPanel {
 		return function;
 	}
 
-	@Override
-	public void initPanel() {
+	private void initPanel() {
 		comboBox = new JComboBox(CFunction.functions);
 		selectedType = (ConfigurableFunction) comboBox.getSelectedItem();
 
@@ -157,7 +156,6 @@ public class FunctionPanel extends ConfigParamInputPanel {
 	 * Action triggered by the user to set up the parameters of the function
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class SetParametersAction extends AbstractAction {
 

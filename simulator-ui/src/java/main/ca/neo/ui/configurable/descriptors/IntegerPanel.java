@@ -8,7 +8,6 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
  * Input Panel for entering Integers
  * 
  * @author Shu Wu
- * 
  */
 public class IntegerPanel extends ConfigParamInputPanel {
 	private static final long serialVersionUID = 1L;
@@ -17,6 +16,7 @@ public class IntegerPanel extends ConfigParamInputPanel {
 
 	public IntegerPanel(CInt property) {
 		super(property);
+		initPanel();
 	}
 
 	@Override
@@ -32,8 +32,7 @@ public class IntegerPanel extends ConfigParamInputPanel {
 
 	}
 
-	@Override
-	public void initPanel() {
+	private void initPanel() {
 		tf = new JTextField(10);
 
 		addToPanel(tf);

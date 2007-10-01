@@ -19,7 +19,6 @@ import ca.shu.ui.lib.util.UserMessages;
  * Input panel for Termination Weights Matrix
  * 
  * @author Shu
- * 
  */
 class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 
@@ -42,6 +41,7 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 
 	public TerminationWeightsInputPanel(CTerminationWeights property) {
 		super(property);
+		initPanel();
 	}
 
 	/**
@@ -137,8 +137,7 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 		return getDescriptor().getEnsembleDimensions();
 	}
 
-	@Override
-	protected void initPanel() {
+	private void initPanel() {
 		JLabel dimensions = new JLabel("Input Dim: ");
 		tf = new JTextField(10);
 		addToPanel(dimensions);
@@ -192,7 +191,6 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 	 * User triggered action to edit the termination weights matrix
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class EditMatrixAction extends AbstractAction {
 
@@ -209,4 +207,3 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 
 	}
 }
-

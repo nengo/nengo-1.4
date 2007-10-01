@@ -8,7 +8,6 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
  * Input panel for entering Longs
  * 
  * @author Shu Wu
- * 
  */
 public class LongPanel extends ConfigParamInputPanel {
 
@@ -18,6 +17,7 @@ public class LongPanel extends ConfigParamInputPanel {
 
 	public LongPanel(CLong property) {
 		super(property);
+		initPanel();
 	}
 
 	@Override
@@ -33,12 +33,9 @@ public class LongPanel extends ConfigParamInputPanel {
 
 	}
 
-	@Override
-	public void initPanel() {
+	private void initPanel() {
 		tf = new JTextField(10);
-
 		addToPanel(tf);
-
 	}
 
 	@Override

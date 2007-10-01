@@ -22,7 +22,6 @@ import ca.shu.ui.lib.util.UserMessages;
  * Input panel for entering an Array of Functions
  * 
  * @author Shu Wu
- * 
  */
 public class FunctionArrayPanel extends ConfigParamInputPanel {
 
@@ -45,6 +44,7 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 
 	public FunctionArrayPanel(CFunctionArray property) {
 		super(property);
+		initPanel();
 	}
 
 	/**
@@ -104,8 +104,7 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 		return functions;
 	}
 
-	@Override
-	public void initPanel() {
+	private void initPanel() {
 		JLabel dimensions = new JLabel("Dimensions: ");
 		tf = new JTextField(10);
 		addToPanel(dimensions);
@@ -174,7 +173,6 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 	 * Edit Functions Action
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class EditFunctions extends AbstractAction {
 
@@ -196,11 +194,9 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
  * Configurable object which creates an array of functions
  * 
  * @author Shu Wu
- * 
  */
 /**
  * @author Shu
- * 
  */
 class ConfigurableFunctionArray implements IConfigurable {
 
@@ -271,8 +267,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 			if (myFunctions != null) {
 				defaultFunction = myFunctions[i];
 			}
-			CFunction function = new CFunction("Function " + i,
-					defaultFunction);
+			CFunction function = new CFunction("Function " + i, defaultFunction);
 
 			props[i] = function;
 		}

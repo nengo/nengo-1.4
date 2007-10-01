@@ -407,6 +407,7 @@ public abstract class AppFrame extends JFrame {
 		}
 
 		MenuBuilder qualityMenu = worldMenu.createSubMenu("Rendering Quality");
+
 		qualityMenu.getJMenu().setMnemonic(KeyEvent.VK_Q);
 
 		qualityMenu.addAction(new LowQualityAction(), KeyEvent.VK_L);

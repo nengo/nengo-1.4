@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import javax.swing.JPopupMenu;
 
+import ca.neo.ui.actions.ZoomToFitAction;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -16,8 +17,8 @@ import ca.shu.ui.lib.handlers.KeyboardFocusHandler;
 import ca.shu.ui.lib.handlers.MouseHandler;
 import ca.shu.ui.lib.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.handlers.SelectionHandler;
-import ca.shu.ui.lib.handlers.TopWorldStatusHandler;
 import ca.shu.ui.lib.handlers.TooltipPickHandler;
+import ca.shu.ui.lib.handlers.TopWorldStatusHandler;
 import ca.shu.ui.lib.objects.TooltipWrapper;
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -213,7 +214,7 @@ public class World extends WorldObject implements Interactable {
 	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
 
-		menu.addAction(new ZoomToFitAction());
+		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
 		MenuBuilder windowsMenu = menu.createSubMenu("Windows");
 		windowsMenu.addAction(new CloseAllWindows("Close all"));
 		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
@@ -550,26 +551,6 @@ public class World extends WorldObject implements Interactable {
 
 			}
 
-		}
-
-	}
-
-	/**
-	 * Action to zoom to fit
-	 * 
-	 * @author Shu Wu
-	 */
-	class ZoomToFitAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ZoomToFitAction() {
-			super("Fit on screen");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			zoomToFit();
 		}
 
 	}

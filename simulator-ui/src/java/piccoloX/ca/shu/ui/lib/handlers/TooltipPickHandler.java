@@ -5,6 +5,8 @@ import java.awt.event.InputEvent;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.objects.SelectionBorder;
 import ca.shu.ui.lib.objects.TooltipWrapper;
+import ca.shu.ui.lib.objects.Window;
+import ca.shu.ui.lib.world.IWorldLayer;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
@@ -70,6 +72,8 @@ public class TooltipPickHandler extends AbstractPickHandler {
 			if (node == controls) {
 				setKeepPickAlive(true);
 				return null;
+			} else if (node instanceof IWorldLayer || node instanceof Window) {
+				break;
 			} else if (node instanceof WorldObject) {
 				WorldObject wo = (WorldObject) node;
 

@@ -9,7 +9,6 @@ import ca.neo.ui.configurable.IConfigurable;
  * Configurable transformation matrix
  * 
  * @author Shu Wu
- * 
  */
 public class ConfigurableMatrix implements IConfigurable {
 
@@ -103,7 +102,6 @@ public class ConfigurableMatrix implements IConfigurable {
  * Input panel for a matrix
  * 
  * @author Shu Wu
- * 
  */
 class CouplingMatrixInputPanel extends ConfigParamInputPanel {
 
@@ -124,11 +122,6 @@ class CouplingMatrixInputPanel extends ConfigParamInputPanel {
 		editor = new MatrixEditor(couplingMatrix);
 
 		addToPanel(editor);
-	}
-
-	@Override
-	protected void initPanel() {
-
 	}
 
 	@Override
@@ -163,7 +156,6 @@ class CouplingMatrixInputPanel extends ConfigParamInputPanel {
  * Config Descriptor for a Coupling Matrix
  * 
  * @author Shu Wu
- * 
  */
 class CouplingMatrixProp extends ConfigParamDescriptor {
 

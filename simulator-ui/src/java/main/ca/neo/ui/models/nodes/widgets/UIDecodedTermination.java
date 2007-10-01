@@ -2,7 +2,6 @@ package ca.neo.ui.models.nodes.widgets;
 
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.model.nef.impl.DecodedTermination;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.descriptors.CBoolean;
@@ -15,7 +14,6 @@ import ca.neo.ui.models.nodes.UINEFEnsemble;
  * UI Wrapper for a Decoded Termination
  * 
  * @author Shu Wu
- * 
  */
 public class UIDecodedTermination extends UITermination {
 
@@ -30,25 +28,10 @@ public class UIDecodedTermination extends UITermination {
 
 	private static final String typeName = "Decoded Termination";
 
-	private UINEFEnsemble ensembleProxy;
-
 	private ConfigParamDescriptor pTransformMatrix;
 
 	public UIDecodedTermination(UINEFEnsemble ensembleProxy) {
 		super(ensembleProxy);
-
-		init(ensembleProxy);
-	}
-
-	public UIDecodedTermination(UINEFEnsemble ensembleProxy,
-			DecodedTermination term) {
-		super(ensembleProxy, term);
-
-		init(ensembleProxy);
-	}
-
-	private void init(UINEFEnsemble ensembleProxy) {
-		this.ensembleProxy = ensembleProxy;
 
 	}
 
@@ -57,19 +40,18 @@ public class UIDecodedTermination extends UITermination {
 		Termination term = null;
 
 		try {
-			term = ensembleProxy.getModel().addDecodedTermination(
+			term = getNodeParent().getModel().addDecodedTermination(
 					(String) configuredProperties.getProperty(pName),
 					(float[][]) configuredProperties
 							.getProperty(pTransformMatrix),
 					(Float) configuredProperties.getProperty(pTauPSC),
 					(Boolean) configuredProperties.getProperty(pIsModulatory));
 
-			ensembleProxy
-					.popupTransientMsg("New decoded termination added to ensemble");
+			getNodeParent().popupTransientMsg(
+					"New decoded termination added to ensemble");
 
 			setName(term.getName());
 		} catch (StructuralException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -78,7 +60,8 @@ public class UIDecodedTermination extends UITermination {
 
 	@Override
 	protected void prepareForDestroy() {
-		ensembleProxy.getModel().removeDecodedTermination(getModel().getName());
+		getNodeParent().getModel().removeDecodedTermination(
+				getModel().getName());
 		popupTransientMsg("decoded termination removed from ensemble");
 
 		super.prepareForDestroy();
@@ -86,13 +69,18 @@ public class UIDecodedTermination extends UITermination {
 
 	@Override
 	public ConfigParamDescriptor[] getConfigSchema() {
-		pTransformMatrix = new CTerminationWeights("Weights", ensembleProxy
+		pTransformMatrix = new CTerminationWeights("Weights", getNodeParent()
 				.getModel().getDimension());
 
 		ConfigParamDescriptor[] zProperties = { pName, pTransformMatrix,
 				pTauPSC, pIsModulatory };
 		return zProperties;
 
+	}
+
+	@Override
+	public UINEFEnsemble getNodeParent() {
+		return (UINEFEnsemble) super.getNodeParent();
 	}
 
 	@Override

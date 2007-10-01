@@ -13,7 +13,6 @@ import ca.shu.ui.lib.Style.Style;
  * Swing Input panel to be used to enter in the value for a ConfigParam
  * 
  * @author Shu
- * 
  */
 public abstract class ConfigParamInputPanel extends JPanel {
 	private final JPanel innerPanel;
@@ -44,7 +43,6 @@ public abstract class ConfigParamInputPanel extends JPanel {
 		innerPanel.setAlignmentX(LEFT_ALIGNMENT);
 
 		add(innerPanel);
-		initPanel();
 
 		statusMessage = new JLabel("");
 		statusMessage.setForeground(Style.COLOR_HIGH_SALIENCE);
@@ -60,12 +58,6 @@ public abstract class ConfigParamInputPanel extends JPanel {
 	protected void addToPanel(Component comp) {
 		innerPanel.add(comp);
 	}
-
-	/**
-	 * Called by subclasses to cosntruct the input panel
-	 * 
-	 */
-	protected abstract void initPanel();
 
 	/**
 	 * @param msg

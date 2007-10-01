@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+DONE (Sept 30) - Ability to add decoded origin
 DONE (Sept 4) - Can view Z-Plane brain imagery, see BrainViewExample.java
 DONE (Sept 4) - Some actions can be applied to multiple selected objects
 DONE (Sept 1) - Move actions are now undooable
@@ -14,6 +15,11 @@ DONE - Select multiple things at once
 *******************************************
  Pri 0 - doing next
 ******************************************* 
+Watch simulator progress
+
+
+Structure the popup menus for better usability
+
 Brain View interface
 Click to bring a cross section to front, zooming between sections
 

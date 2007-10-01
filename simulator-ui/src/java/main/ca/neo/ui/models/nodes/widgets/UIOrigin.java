@@ -30,7 +30,6 @@ import ca.shu.ui.lib.world.WorldObject;
  */
 /**
  * @author Shu
- * 
  */
 public class UIOrigin extends Widget {
 
@@ -43,9 +42,17 @@ public class UIOrigin extends Widget {
 	private MyWell lineWell;
 
 	public UIOrigin(UINeoNode nodeParent, Origin origin) {
-		super(nodeParent);
+		super(nodeParent, origin);
+		setName(origin.getName());
+		init();
+	}
 
-		setModel(origin);
+	public UIOrigin(UINeoNode nodeParent) {
+		super(nodeParent);
+		init();
+	}
+
+	private void init() {
 		lineWell = new MyWell();
 
 		ModelIcon icon = new ModelIcon(this, lineWell);
@@ -53,7 +60,6 @@ public class UIOrigin extends Widget {
 		setIcon(icon);
 
 		this.setSelectable(false);
-
 	}
 
 	/**
@@ -80,7 +86,8 @@ public class UIOrigin extends Widget {
 						term.getModelTermination());
 				return true;
 			} catch (StructuralException e) {
-				UserMessages.showWarning("Could not disconnect: " + e.toString());
+				UserMessages.showWarning("Could not disconnect: "
+						+ e.toString());
 			}
 			return false;
 		} else {
@@ -104,7 +111,6 @@ public class UIOrigin extends Widget {
 	}
 
 	/**
-	 * 
 	 * @param target
 	 *            Target to be connected with
 	 * @return true is successfully connected
@@ -170,7 +176,6 @@ public class UIOrigin extends Widget {
 	}
 
 	/**
-	 * 
 	 * @param term
 	 *            Termination to connect to
 	 * @param modifyModel
@@ -195,12 +200,6 @@ public class UIOrigin extends Widget {
 	}
 
 	@Override
-	public String getName() {
-
-		return getModel().getName();
-	}
-
-	@Override
 	public String getTypeName() {
 		// TODO Auto-generated method stub
 		return typeName;
@@ -218,7 +217,6 @@ public class UIOrigin extends Widget {
 	 * Line Ends for this origin
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class MyLineEnd extends LineEnd {
 
@@ -320,7 +318,6 @@ public class UIOrigin extends Widget {
 	 * LineEndWell for this origin
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class MyWell extends LineEndWell {
 

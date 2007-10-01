@@ -9,7 +9,6 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
  * Input Panel for Strings
  * 
  * @author Shu Wu
- * 
  */
 public class StringPanel extends ConfigParamInputPanel {
 
@@ -19,6 +18,7 @@ public class StringPanel extends ConfigParamInputPanel {
 
 	public StringPanel(ConfigParamDescriptor property) {
 		super(property);
+		initPanel();
 	}
 
 	@Override
@@ -27,12 +27,9 @@ public class StringPanel extends ConfigParamInputPanel {
 
 	}
 
-	@Override
-	public void initPanel() {
+	private void initPanel() {
 		tf = new JTextField(10);
-
 		addToPanel(tf);
-
 	}
 
 	@Override

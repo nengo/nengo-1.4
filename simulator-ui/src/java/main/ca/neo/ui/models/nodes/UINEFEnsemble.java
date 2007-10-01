@@ -14,7 +14,9 @@ import ca.neo.ui.configurable.ConfigParamDescriptor;
 import ca.neo.ui.configurable.descriptors.CInt;
 import ca.neo.ui.configurable.descriptors.CString;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
 import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
+import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
@@ -117,8 +119,9 @@ public class UINEFEnsemble extends UIEnsemble {
 			}
 		}
 
-		// Termination
+		// Decoded termination and origins
 		menu.addAction(new AddDecodedTerminationAction());
+		menu.addAction(new AddDecodedOriginAction());
 		return menu;
 	}
 
@@ -146,6 +149,24 @@ public class UINEFEnsemble extends UIEnsemble {
 
 			addWidget(termUI);
 			return termUI;
+
+		} catch (ConfigException e) {
+			e.defaultHandleBehavior();
+		}
+
+		return null;
+	}
+	
+
+	public UIOrigin createDecodedOrigin() {
+		UIDecodedOrigin originUI = new UIDecodedOrigin(this);
+
+		try {
+			UserTemplateConfigurer config = new UserTemplateConfigurer(originUI);
+			config.configureAndWait();
+
+			addWidget(originUI);
+			return originUI;
 
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
@@ -199,6 +220,35 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		}
 
+	}
+	/**
+	 * Action for adding a decoded termination
+	 * 
+	 * @author Shu Wu
+	 */
+	class AddDecodedOriginAction extends ReversableAction {
+
+		private static final long serialVersionUID = 1L;
+
+		UIOrigin addedOrigin;
+
+		public AddDecodedOriginAction() {
+			super("Add decoded origin");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			UIOrigin origin = createDecodedOrigin();
+			if (origin == null)
+				throw new UserCancelledException();
+			else
+				addedOrigin = origin;
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			addedOrigin.destroy();
+		}
 	}
 
 	/**

@@ -21,6 +21,7 @@ public class BooleanPanel extends ConfigParamInputPanel {
 
 	public BooleanPanel(ConfigParamDescriptor property) {
 		super(property);
+		initPanel();
 	}
 
 	@Override
@@ -29,8 +30,8 @@ public class BooleanPanel extends ConfigParamInputPanel {
 		return bool.booleanValue();
 	}
 
-	@Override
-	public void initPanel() {
+	
+	private void initPanel() {
 		checkBox = new JCheckBox();
 		checkBox.setSelected(false);
 		addToPanel(checkBox);

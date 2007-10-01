@@ -9,7 +9,6 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
  * Input panel for entering floating point numbers
  * 
  * @author Shu Wu
- * 
  */
 public class FloatPanel extends ConfigParamInputPanel {
 
@@ -22,6 +21,9 @@ public class FloatPanel extends ConfigParamInputPanel {
 
 	public FloatPanel(ConfigParamDescriptor property) {
 		super(property);
+
+		tf = new JTextField(10);
+		addToPanel(tf);
 	}
 
 	@Override
@@ -29,13 +31,6 @@ public class FloatPanel extends ConfigParamInputPanel {
 
 		Float floatValue = new Float(tf.getText());
 		return floatValue.floatValue();
-
-	}
-
-	@Override
-	public void initPanel() {
-		tf = new JTextField(10);
-		addToPanel(tf);
 
 	}
 
