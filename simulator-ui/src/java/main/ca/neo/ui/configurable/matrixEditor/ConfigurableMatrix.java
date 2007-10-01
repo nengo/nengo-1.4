@@ -1,8 +1,8 @@
 package ca.neo.ui.configurable.matrixEditor;
 
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
 
 /**
@@ -25,7 +25,7 @@ public class ConfigurableMatrix implements IConfigurable {
 	/**
 	 * Config Descriptor for the Matrix
 	 */
-	private ConfigParamDescriptor pMatrix;
+	private PropertyDescriptor pMatrix;
 
 	/**
 	 * Number of rows
@@ -65,7 +65,7 @@ public class ConfigurableMatrix implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
 	 */
-	public void completeConfiguration(ConfigParam properties) {
+	public void completeConfiguration(PropertySet properties) {
 		myMatrix = (float[][]) properties.getProperty(pMatrix);
 	}
 
@@ -74,8 +74,8 @@ public class ConfigurableMatrix implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
 	 */
-	public ConfigParamDescriptor[] getConfigSchema() {
-		ConfigParamDescriptor[] props = new ConfigParamDescriptor[1];
+	public PropertyDescriptor[] getConfigSchema() {
+		PropertyDescriptor[] props = new PropertyDescriptor[1];
 		props[0] = pMatrix;
 		return props;
 	}
@@ -103,7 +103,7 @@ public class ConfigurableMatrix implements IConfigurable {
  * 
  * @author Shu Wu
  */
-class CouplingMatrixInputPanel extends ConfigParamInputPanel {
+class CouplingMatrixInputPanel extends PropertyInputPanel {
 
 	private static final long serialVersionUID = 1L;
 	private CouplingMatrixImpl couplingMatrix;
@@ -114,7 +114,7 @@ class CouplingMatrixInputPanel extends ConfigParamInputPanel {
 	 */
 	private MatrixEditor editor;
 
-	public CouplingMatrixInputPanel(ConfigParamDescriptor property,
+	public CouplingMatrixInputPanel(PropertyDescriptor property,
 			int fromSize, int toSize) {
 		super(property);
 
@@ -157,7 +157,7 @@ class CouplingMatrixInputPanel extends ConfigParamInputPanel {
  * 
  * @author Shu Wu
  */
-class CouplingMatrixProp extends ConfigParamDescriptor {
+class CouplingMatrixProp extends PropertyDescriptor {
 
 	private static final long serialVersionUID = 1L;
 	private int fromSize, toSize;
@@ -178,7 +178,7 @@ class CouplingMatrixProp extends ConfigParamDescriptor {
 	}
 
 	@Override
-	public ConfigParamInputPanel createInputPanel() {
+	public PropertyInputPanel createInputPanel() {
 		return new CouplingMatrixInputPanel(this, fromSize, toSize);
 	}
 

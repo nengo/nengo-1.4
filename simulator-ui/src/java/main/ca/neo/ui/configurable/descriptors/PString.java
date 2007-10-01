@@ -1,7 +1,7 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
  * Config Descriptor for Strings
@@ -9,16 +9,20 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
  * @author Shu Wu
  * 
  */
-public class CString extends ConfigParamDescriptor {
+public class PString extends PropertyDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
-	public CString(String name) {
+	public PString(String name) {
 		super(name);
 	}
 
+	public PString(String name, String defaultValue) {
+		super(name, defaultValue);
+	}
+
 	@Override
-	public ConfigParamInputPanel createInputPanel() {
+	public PropertyInputPanel createInputPanel() {
 		return new StringPanel(this);
 	}
 

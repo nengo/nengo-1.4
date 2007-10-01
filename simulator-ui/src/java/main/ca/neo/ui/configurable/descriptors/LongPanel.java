@@ -2,27 +2,27 @@ package ca.neo.ui.configurable.descriptors;
 
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
  * Input panel for entering Longs
  * 
  * @author Shu Wu
  */
-public class LongPanel extends ConfigParamInputPanel {
+public class LongPanel extends PropertyInputPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private JTextField tf;
 
-	public LongPanel(CLong property) {
+	public LongPanel(PLong property) {
 		super(property);
 		initPanel();
 	}
 
 	@Override
-	public CLong getDescriptor() {
-		return (CLong) super.getDescriptor();
+	public PLong getDescriptor() {
+		return (PLong) super.getDescriptor();
 	}
 
 	@Override

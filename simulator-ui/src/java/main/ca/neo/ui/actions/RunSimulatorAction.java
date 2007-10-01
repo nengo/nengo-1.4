@@ -7,10 +7,10 @@ import ca.neo.sim.Simulator;
 import ca.neo.sim.SimulatorEvent;
 import ca.neo.sim.SimulatorListener;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.descriptors.CFloat;
+import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -142,22 +142,22 @@ public class RunSimulatorAction extends StandardAction {
  * @author Shu Wu
  */
 class SimulatorConfig implements IConfigurable {
-	private static final ConfigParamDescriptor pEndTime = new CFloat("End time");
-	private static final ConfigParamDescriptor pStartTime = new CFloat(
+	private static final PropertyDescriptor pEndTime = new PFloat("End time");
+	private static final PropertyDescriptor pStartTime = new PFloat(
 			"Start time");
-	private static final ConfigParamDescriptor pStepSize = new CFloat(
+	private static final PropertyDescriptor pStepSize = new PFloat(
 			"Step size");
 
-	private static final ConfigParamDescriptor[] zProperties = { pStartTime,
+	private static final PropertyDescriptor[] zProperties = { pStartTime,
 			pEndTime, pStepSize };
 
-	private ConfigParam configuredProperties;
+	private PropertySet configuredProperties;
 
-	public void completeConfiguration(ConfigParam properties) {
+	public void completeConfiguration(PropertySet properties) {
 		configuredProperties = properties;
 	}
 
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		return zProperties;
 	}
 

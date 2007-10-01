@@ -20,10 +20,10 @@ import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.descriptors.CInt;
+import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.UIModels;
 import ca.neo.ui.models.UINeoNode;
@@ -683,13 +683,13 @@ public class NetworkViewer extends NodeViewer {
  */
 class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
-	private static final ConfigParamDescriptor pHeight = new CInt("Height");
+	private static final PropertyDescriptor pHeight = new PInt("Height");
 
-	private static final ConfigParamDescriptor pWidth = new CInt("Width");
+	private static final PropertyDescriptor pWidth = new PInt("Width");
 
 	private static final long serialVersionUID = 1L;
 
-	private static final ConfigParamDescriptor[] zProperties = { pWidth,
+	private static final PropertyDescriptor[] zProperties = { pWidth,
 			pHeight };
 
 	private NetworkViewer parent;
@@ -715,7 +715,7 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
 	 */
-	public void completeConfiguration(ConfigParam properties) {
+	public void completeConfiguration(PropertySet properties) {
 		parent
 				.setLayoutBounds(new Dimension((Integer) properties
 						.getProperty(pWidth), (Integer) properties
@@ -728,7 +728,7 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
 	 */
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		return zProperties;
 	}
 

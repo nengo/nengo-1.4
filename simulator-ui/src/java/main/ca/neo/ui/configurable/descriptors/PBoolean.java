@@ -1,7 +1,7 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
  * Config Descriptor for Booleans
@@ -9,16 +9,20 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
  * @author Shu Wu
  * 
  */
-public class CBoolean extends ConfigParamDescriptor {
+public class PBoolean extends PropertyDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
-	public CBoolean(String name) {
+	public PBoolean(String name) {
 		super(name);
 	}
 
+	public PBoolean(String name, boolean defaultValue) {
+		super(name, defaultValue);
+	}
+
 	@Override
-	public ConfigParamInputPanel createInputPanel() {
+	public PropertyInputPanel createInputPanel() {
 		return new BooleanPanel(this);
 	}
 

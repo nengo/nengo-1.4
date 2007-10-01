@@ -12,8 +12,8 @@ import javax.swing.JDialog;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.util.UserMessages;
 
@@ -22,7 +22,7 @@ import ca.shu.ui.lib.util.UserMessages;
  * 
  * @author Shu Wu
  */
-public class FunctionPanel extends ConfigParamInputPanel {
+public class FunctionPanel extends PropertyInputPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +42,7 @@ public class FunctionPanel extends ConfigParamInputPanel {
 	 */
 	private ConfigurableFunction selectedType;
 
-	public FunctionPanel(ConfigParamDescriptor property) {
+	public FunctionPanel(PropertyDescriptor property) {
 		super(property);
 		initPanel();
 	}
@@ -92,7 +92,7 @@ public class FunctionPanel extends ConfigParamInputPanel {
 	}
 
 	private void initPanel() {
-		comboBox = new JComboBox(CFunction.functions);
+		comboBox = new JComboBox(PFunction.functions);
 		selectedType = (ConfigurableFunction) comboBox.getSelectedItem();
 
 		comboBox.addItemListener(new ItemListener() {
@@ -134,12 +134,12 @@ public class FunctionPanel extends ConfigParamInputPanel {
 			/*
 			 * Updates the combo box to reflect the function type set
 			 */
-			for (int i = 0; i < CFunction.functions.length; i++) {
+			for (int i = 0; i < PFunction.functions.length; i++) {
 
-				if ((CFunction.functions[i].getFunctionType())
+				if ((PFunction.functions[i].getFunctionType())
 						.isInstance(function)) {
-					selectedType = CFunction.functions[i];
-					comboBox.setSelectedItem(CFunction.functions[i]);
+					selectedType = PFunction.functions[i];
+					comboBox.setSelectedItem(PFunction.functions[i]);
 
 				}
 			}

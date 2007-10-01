@@ -3,9 +3,9 @@ package ca.neo.ui.models.nodes;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.impl.NetworkImpl;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.descriptors.CString;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
@@ -22,7 +22,7 @@ public class UINetwork extends NodeContainer {
 
 	private static final String LAYOUT_MANAGER_KEY = "layout/manager";
 
-	private static final ConfigParamDescriptor pName = new CString("Name");
+	private static final PropertyDescriptor pName = new PString("Name");
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,7 +31,7 @@ public class UINetwork extends NodeContainer {
 	/**
 	 * Config descriptors
 	 */
-	private static final ConfigParamDescriptor[] zConfig = { pName };
+	private static final PropertyDescriptor[] zConfig = { pName };
 
 	public UINetwork() {
 		super();
@@ -55,7 +55,7 @@ public class UINetwork extends NodeContainer {
 	}
 
 	@Override
-	protected Node configureModel(ConfigParam configuredProperties) {
+	protected Node configureModel(PropertySet configuredProperties) {
 
 		NetworkImpl network = new NetworkImpl();
 		network.setName((String) configuredProperties.getProperty(pName));
@@ -81,7 +81,7 @@ public class UINetwork extends NodeContainer {
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		return zConfig;
 	}
 

@@ -2,21 +2,21 @@ package ca.neo.ui.configurable.descriptors;
 
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
  * Input Panel for Strings
  * 
  * @author Shu Wu
  */
-public class StringPanel extends ConfigParamInputPanel {
+public class StringPanel extends PropertyInputPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private JTextField tf;
 
-	public StringPanel(ConfigParamDescriptor property) {
+	public StringPanel(PropertyDescriptor property) {
 		super(property);
 		initPanel();
 	}

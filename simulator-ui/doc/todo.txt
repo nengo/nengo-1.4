@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+DONE (Sept 30) - Termination is now configured reflectively through ca.neo.util.Configurable interface
 DONE (Sept 30) - Simulation progress is now tracked in the UI
 DONE (Sept 30) - Ability to add decoded origin
 DONE (Sept 4) - Can view Z-Plane brain imagery, see BrainViewExample.java
@@ -16,7 +17,7 @@ DONE - Select multiple things at once
 *******************************************
  Pri 0 - doing next
 ******************************************* 
-Editing ca.neo.util.Configurable
+
 Creating more types of nodes, ensembles.
 
 Structure the popup menus for better usability

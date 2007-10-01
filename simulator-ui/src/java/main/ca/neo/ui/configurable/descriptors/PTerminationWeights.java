@@ -1,6 +1,6 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertyDescriptor;
 
 /**
  * Config Descriptor for Termination Weights Matrix
@@ -8,7 +8,7 @@ import ca.neo.ui.configurable.ConfigParamDescriptor;
  * @author Shu Wu
  * 
  */
-public class CTerminationWeights extends ConfigParamDescriptor {
+public class PTerminationWeights extends PropertyDescriptor {
 
 	private static final long serialVersionUID = 1L;
 	/**
@@ -16,7 +16,7 @@ public class CTerminationWeights extends ConfigParamDescriptor {
 	 */
 	private final int ensembleDimensions;
 
-	public CTerminationWeights(String name, int dimensions) {
+	public PTerminationWeights(String name, int dimensions) {
 		super(name);
 		this.ensembleDimensions = dimensions;
 

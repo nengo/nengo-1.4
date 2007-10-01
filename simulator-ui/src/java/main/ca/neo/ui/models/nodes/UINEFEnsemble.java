@@ -9,10 +9,10 @@ import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.descriptors.CInt;
-import ca.neo.ui.configurable.descriptors.CString;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.descriptors.PInt;
+import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
 import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
@@ -36,14 +36,14 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 public class UINEFEnsemble extends UIEnsemble {
 	private static final long serialVersionUID = 1L;
 
-	static final ConfigParamDescriptor pDim = new CInt("Dimensions");
+	static final PropertyDescriptor pDim = new PInt("Dimensions");
 
-	static final ConfigParamDescriptor pName = new CString("Name");
+	static final PropertyDescriptor pName = new PString("Name");
 
-	static final ConfigParamDescriptor pNumOfNeurons = new CInt(
+	static final PropertyDescriptor pNumOfNeurons = new PInt(
 			"Number of Neurons");
 
-	static final ConfigParamDescriptor pStorageName = new CString(
+	static final PropertyDescriptor pStorageName = new PString(
 			"Storage Name");
 
 	static final String typeName = "NEFEnsemble";
@@ -51,7 +51,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	/**
 	 * Config descriptors
 	 */
-	static final ConfigParamDescriptor[] zConfig = { pName, pNumOfNeurons,
+	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons,
 			pDim, pStorageName };
 
 	public UINEFEnsemble() {
@@ -70,7 +70,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	}
 
 	@Override
-	protected Node configureModel(ConfigParam prop) {
+	protected Node configureModel(PropertySet prop) {
 		try {
 
 			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
@@ -176,7 +176,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		return zConfig;
 	}
 

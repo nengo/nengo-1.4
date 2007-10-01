@@ -14,10 +14,10 @@ import ca.shu.ui.lib.Style.Style;
  * 
  * @author Shu
  */
-public abstract class ConfigParamInputPanel extends JPanel {
+public abstract class PropertyInputPanel extends JPanel {
 	private final JPanel innerPanel;
 
-	private ConfigParamDescriptor propDescriptor;
+	private PropertyDescriptor propDescriptor;
 
 	private JLabel statusMessage;
 
@@ -25,7 +25,7 @@ public abstract class ConfigParamInputPanel extends JPanel {
 	 * @param property
 	 *            A description of the Configuration parameter to be configured
 	 */
-	public ConfigParamInputPanel(ConfigParamDescriptor property) {
+	public PropertyInputPanel(PropertyDescriptor property) {
 		super();
 		this.propDescriptor = property;
 
@@ -69,7 +69,7 @@ public abstract class ConfigParamInputPanel extends JPanel {
 	/**
 	 * @return Descriptor of the configuration parameter
 	 */
-	public ConfigParamDescriptor getDescriptor() {
+	public PropertyDescriptor getDescriptor() {
 		return propDescriptor;
 	}
 

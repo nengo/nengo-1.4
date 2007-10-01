@@ -4,11 +4,11 @@ import ca.neo.math.Function;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.descriptors.CFloat;
-import ca.neo.ui.configurable.descriptors.CInt;
+import ca.neo.ui.configurable.descriptors.PFloat;
+import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -16,12 +16,12 @@ import ca.shu.ui.lib.actions.StandardAction;
 public class PlotFunctionAction extends StandardAction implements IConfigurable {
 	private static final long serialVersionUID = 1L;
 
-	static final ConfigParamDescriptor pEnd = new CFloat("End");
-	static final ConfigParamDescriptor pIncrement = new CFloat("Increment");
-	static final ConfigParamDescriptor pStart = new CFloat("Start");
+	static final PropertyDescriptor pEnd = new PFloat("End");
+	static final PropertyDescriptor pIncrement = new PFloat("Increment");
+	static final PropertyDescriptor pStart = new PFloat("Start");
 	// static final PropDescriptor pTitle = new PTString("Title");
 	FunctionInput functionInput;
-	ConfigParamDescriptor pFunctionIndex;
+	PropertyDescriptor pFunctionIndex;
 	String plotName;
 
 	public PlotFunctionAction(String plotName, String actionName,
@@ -34,7 +34,7 @@ public class PlotFunctionAction extends StandardAction implements IConfigurable 
 
 	@Override
 	protected void action() throws ActionException {
-		pFunctionIndex = new CInt("Function index", 0, functionInput
+		pFunctionIndex = new PInt("Function index", 0, 0, functionInput
 				.getFunctions().length - 1);
 
 		UserTemplateConfigurer config = new UserTemplateConfigurer(this);
@@ -46,7 +46,7 @@ public class PlotFunctionAction extends StandardAction implements IConfigurable 
 
 	}
 
-	public void completeConfiguration(ConfigParam properties)
+	public void completeConfiguration(PropertySet properties)
 			throws ConfigException {
 		String title = plotName + " - Function Plot";
 
@@ -67,9 +67,9 @@ public class PlotFunctionAction extends StandardAction implements IConfigurable 
 
 	}
 
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 
-		ConfigParamDescriptor[] properties = { pFunctionIndex, pStart,
+		PropertyDescriptor[] properties = { pFunctionIndex, pStart,
 				pIncrement, pEnd };
 		return properties;
 

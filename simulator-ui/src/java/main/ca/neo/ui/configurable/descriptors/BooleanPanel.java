@@ -2,16 +2,15 @@ package ca.neo.ui.configurable.descriptors;
 
 import javax.swing.JCheckBox;
 
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
  * Input panel for entering Booleans
  * 
  * @author Shu Wu
- * 
  */
-public class BooleanPanel extends ConfigParamInputPanel {
+public class BooleanPanel extends PropertyInputPanel {
 	/**
 	 * 
 	 */
@@ -19,7 +18,7 @@ public class BooleanPanel extends ConfigParamInputPanel {
 
 	JCheckBox checkBox;
 
-	public BooleanPanel(ConfigParamDescriptor property) {
+	public BooleanPanel(PropertyDescriptor property) {
 		super(property);
 		initPanel();
 	}
@@ -30,7 +29,6 @@ public class BooleanPanel extends ConfigParamInputPanel {
 		return bool.booleanValue();
 	}
 
-	
 	private void initPanel() {
 		checkBox = new JCheckBox();
 		checkBox.setSelected(false);
@@ -45,8 +43,7 @@ public class BooleanPanel extends ConfigParamInputPanel {
 
 	@Override
 	public void setValue(Object value) {
-		checkBox.setText(value.toString());
-
+		checkBox.setSelected((Boolean) value);
 	}
 
 }

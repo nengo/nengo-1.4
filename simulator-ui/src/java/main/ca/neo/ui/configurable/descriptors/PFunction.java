@@ -8,8 +8,8 @@ import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
 
 /**
@@ -18,23 +18,23 @@ import ca.neo.ui.configurable.IConfigurable;
  * @author Shu Wu
  * 
  */
-public class CFunction extends ConfigParamDescriptor {
+public class PFunction extends PropertyDescriptor {
 
 	private static final ConfigurableFunction constantFunction = new ConfigurableFunction(
 			ConstantFunction.class, "Constant Function",
-			new ConfigParamDescriptor[] { new CInt("Dimension"),
-					new CFloat("Value") });
+			new PropertyDescriptor[] { new PInt("Dimension"),
+					new PFloat("Value") });
 
 	private static final ConfigurableFunction fourierFunction = new ConfigurableFunction(
 			FourierFunction.class, "Fourier Function",
-			new ConfigParamDescriptor[] { new CFloat("Fundamental"),
-					new CFloat("Cutoff"), new CFloat("RMS"),
-					new CLong("Seed") });
+			new PropertyDescriptor[] { new PFloat("Fundamental"),
+					new PFloat("Cutoff"), new PFloat("RMS"),
+					new PLong("Seed") });
 
 	private static final ConfigurableFunction gaussianPDF = new ConfigurableFunction(
-			GaussianPDF.class, "Guassiand PDF", new ConfigParamDescriptor[] {
-					new CFloat("Mean"), new CFloat("Variance"),
-					new CFloat("Peak") });
+			GaussianPDF.class, "Guassiand PDF", new PropertyDescriptor[] {
+					new PFloat("Mean"), new PFloat("Variance"),
+					new PFloat("Peak") });
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,11 +44,11 @@ public class CFunction extends ConfigParamDescriptor {
 	public static final ConfigurableFunction[] functions = new ConfigurableFunction[] {
 			constantFunction, fourierFunction, gaussianPDF };
 
-	public CFunction(String name) {
+	public PFunction(String name) {
 		super(name);
 	}
 
-	public CFunction(String name, Object defaultValue) {
+	public PFunction(String name, Object defaultValue) {
 		super(name, defaultValue);
 	}
 
@@ -90,7 +90,7 @@ class ConfigurableFunction implements IConfigurable {
 	/**
 	 * A list of parameters required to create this function
 	 */
-	private ConfigParamDescriptor[] propStruct;
+	private PropertyDescriptor[] propStruct;
 
 	/**
 	 * What the type of function to be created is called
@@ -107,7 +107,7 @@ class ConfigurableFunction implements IConfigurable {
 	 *            required to create the function
 	 */
 	public ConfigurableFunction(Class<?> functionClass, String typeName,
-			ConfigParamDescriptor[] propStruct) {
+			PropertyDescriptor[] propStruct) {
 		super();
 
 		this.functionClass = functionClass;
@@ -132,9 +132,9 @@ class ConfigurableFunction implements IConfigurable {
 	 * the user parameters to it
 	 */
 	@SuppressWarnings("unchecked")
-	public void completeConfiguration(ConfigParam props) throws ConfigException {
+	public void completeConfiguration(PropertySet props) throws ConfigException {
 
-		ConfigParamDescriptor[] metaProperties = getConfigSchema();
+		PropertyDescriptor[] metaProperties = getConfigSchema();
 
 		/*
 		 * Create function using Java reflection, function parameter are
@@ -185,7 +185,7 @@ class ConfigurableFunction implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
 	 */
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		return propStruct;
 	}
 

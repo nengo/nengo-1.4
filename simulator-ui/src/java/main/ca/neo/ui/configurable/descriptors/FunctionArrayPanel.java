@@ -11,9 +11,9 @@ import javax.swing.JTextField;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.util.UserMessages;
@@ -23,7 +23,7 @@ import ca.shu.ui.lib.util.UserMessages;
  * 
  * @author Shu Wu
  */
-public class FunctionArrayPanel extends ConfigParamInputPanel {
+public class FunctionArrayPanel extends PropertyInputPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +42,7 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 	 */
 	private JTextField tf;
 
-	public FunctionArrayPanel(CFunctionArray property) {
+	public FunctionArrayPanel(PFunctionArray property) {
 		super(property);
 		initPanel();
 	}
@@ -88,8 +88,8 @@ public class FunctionArrayPanel extends ConfigParamInputPanel {
 	}
 
 	@Override
-	public CFunctionArray getDescriptor() {
-		return (CFunctionArray) super.getDescriptor();
+	public PFunctionArray getDescriptor() {
+		return (PFunctionArray) super.getDescriptor();
 	}
 
 	public int getDimensions() {
@@ -245,7 +245,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
 	 */
-	public void completeConfiguration(ConfigParam properties) {
+	public void completeConfiguration(PropertySet properties) {
 		myFunctions = new Function[dimension];
 		for (int i = 0; i < dimension; i++) {
 			myFunctions[i] = (Function) properties.getProperty("Function " + i);
@@ -259,15 +259,15 @@ class ConfigurableFunctionArray implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
 	 */
-	public ConfigParamDescriptor[] getConfigSchema() {
-		ConfigParamDescriptor[] props = new ConfigParamDescriptor[dimension];
+	public PropertyDescriptor[] getConfigSchema() {
+		PropertyDescriptor[] props = new PropertyDescriptor[dimension];
 
 		for (int i = 0; i < dimension; i++) {
 			Function defaultFunction = null;
 			if (myFunctions != null) {
 				defaultFunction = myFunctions[i];
 			}
-			CFunction function = new CFunction("Function " + i, defaultFunction);
+			PFunction function = new PFunction("Function " + i, defaultFunction);
 
 			props[i] = function;
 		}

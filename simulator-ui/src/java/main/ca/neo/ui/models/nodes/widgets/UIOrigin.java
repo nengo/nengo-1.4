@@ -8,8 +8,8 @@ import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -105,7 +105,7 @@ public class UIOrigin extends Widget {
 	}
 
 	@Override
-	protected Object configureModel(ConfigParam configuredProperties)
+	protected Object configureModel(PropertySet configuredProperties)
 			throws ConfigException {
 		throw new NotImplementedException();
 	}
@@ -189,7 +189,7 @@ public class UIOrigin extends Widget {
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		UserMessages.showError("POrigin is not configurable yet");
 		return null;
 	}

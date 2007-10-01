@@ -5,11 +5,11 @@ import javax.swing.JComboBox;
 import ca.neo.math.Function;
 import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
-import ca.neo.ui.configurable.descriptors.CFunctionArray;
-import ca.neo.ui.configurable.descriptors.CString;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.descriptors.PFunctionArray;
+import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 
 /**
@@ -19,21 +19,21 @@ import ca.neo.ui.models.nodes.UINEFEnsemble;
  */
 public class UIDecodedOrigin extends UIOrigin {
 
-	private static final ConfigParamDescriptor pName = new CString("Name");
+	private static final PropertyDescriptor pName = new PString("Name");
 
-	private ConfigParamDescriptor pNodeOrigin;
+	private PropertyDescriptor pNodeOrigin;
 
 	private static final long serialVersionUID = 1L;
 	private static final String typeName = "Decoded Origin";
 
-	private ConfigParamDescriptor pFunctions;
+	private PropertyDescriptor pFunctions;
 
 	public UIDecodedOrigin(UINEFEnsemble ensembleProxy) {
 		super(ensembleProxy);
 	}
 
 	@Override
-	protected Object configureModel(ConfigParam configuredProperties) {
+	protected Object configureModel(PropertySet configuredProperties) {
 		Origin origin = null;
 
 		try {
@@ -63,8 +63,8 @@ public class UIDecodedOrigin extends UIOrigin {
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
-		pFunctions = new CFunctionArray("Functions");
+	public PropertyDescriptor[] getConfigSchema() {
+		pFunctions = new PFunctionArray("Functions");
 
 		Origin[] origins = getNodeParent().getModel().getOrigins();
 		String[] originNames = new String[origins.length];
@@ -74,7 +74,7 @@ public class UIDecodedOrigin extends UIOrigin {
 
 		pNodeOrigin = new OriginSelector("Node Origin Name", originNames);
 
-		ConfigParamDescriptor[] zProperties = { pName, pFunctions, pNodeOrigin };
+		PropertyDescriptor[] zProperties = { pName, pFunctions, pNodeOrigin };
 		return zProperties;
 
 	}
@@ -96,7 +96,7 @@ public class UIDecodedOrigin extends UIOrigin {
  * 
  * @author Shu Wu
  */
-class OriginInputPanel extends ConfigParamInputPanel {
+class OriginInputPanel extends PropertyInputPanel {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -146,7 +146,7 @@ class OriginInputPanel extends ConfigParamInputPanel {
  * 
  * @author Shu Wu
  */
-class OriginSelector extends ConfigParamDescriptor {
+class OriginSelector extends PropertyDescriptor {
 
 	private static final long serialVersionUID = 1L;
 	String[] origins;

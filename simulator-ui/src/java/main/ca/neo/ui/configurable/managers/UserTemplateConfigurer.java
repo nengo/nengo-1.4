@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UserMessages;
@@ -197,9 +197,9 @@ class ConfigTemplateDialog extends ConfigDialog {
 
 		if (fileList.getSelectedItem() != null) {
 			parent.loadPropertiesFromFile((String) fileList.getSelectedItem());
-			Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
+			Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 			while (it.hasNext()) {
-				ConfigParamInputPanel panel = it.next();
+				PropertyInputPanel panel = it.next();
 
 				Object currentValue = parent.getProperty(panel.getName());
 				if (currentValue != null) {

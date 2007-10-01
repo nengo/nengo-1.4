@@ -6,8 +6,8 @@ import ca.neo.model.Node;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.EnsembleViewer;
@@ -53,7 +53,7 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
-	protected Object configureModel(ConfigParam configuredProperties)
+	protected Object configureModel(PropertySet configuredProperties)
 			throws ConfigException {
 		throw new NotImplementedException();
 	}
@@ -87,7 +87,7 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		UserMessages.showError("Ensemble has not been implemented yet");
 		return null;
 	}

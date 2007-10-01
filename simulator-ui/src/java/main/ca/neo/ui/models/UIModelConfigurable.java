@@ -3,8 +3,8 @@ package ca.neo.ui.models;
 import javax.swing.SwingUtilities;
 
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
 
 /**
@@ -42,7 +42,7 @@ public abstract class UIModelConfigurable extends UIModel implements
 	 * @param configuredProperties
 	 *            the configured properties
 	 */
-	protected abstract Object configureModel(ConfigParam configuredProperties)
+	protected abstract Object configureModel(PropertySet configuredProperties)
 			throws ConfigException;
 
 	/*
@@ -50,7 +50,7 @@ public abstract class UIModelConfigurable extends UIModel implements
 	 * 
 	 * @see ca.neo.ui.views.objects.configurable.IConfigurable#completeConfiguration(ca.neo.ui.views.objects.configurable.managers.PropertySet)
 	 */
-	public void completeConfiguration(ConfigParam properties)
+	public void completeConfiguration(PropertySet properties)
 			throws ConfigException {
 
 		Object model = null;
@@ -72,6 +72,6 @@ public abstract class UIModelConfigurable extends UIModel implements
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
 	 */
-	public abstract ConfigParamDescriptor[] getConfigSchema();
+	public abstract PropertyDescriptor[] getConfigSchema();
 
 }

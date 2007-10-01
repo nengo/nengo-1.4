@@ -15,9 +15,9 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.shu.ui.lib.objects.activities.AbstractActivity;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -28,7 +28,6 @@ import ca.shu.ui.lib.util.UserMessages;
  * parameters to used for configuration
  * 
  * @author Shu Wu
- * 
  */
 public class UserConfigurer extends ConfigManager {
 	/**
@@ -53,7 +52,6 @@ public class UserConfigurer extends ConfigManager {
 	protected Frame frameParent;
 
 	/**
-	 * 
 	 * @param configurable
 	 *            Object to be configured
 	 */
@@ -138,7 +136,6 @@ public class UserConfigurer extends ConfigManager {
  * Configuration dialog
  * 
  * @author Shu Wu
- * 
  */
 class ConfigDialog extends JDialog {
 
@@ -151,7 +148,7 @@ class ConfigDialog extends JDialog {
 	 */
 	protected UserConfigurer parent;
 
-	protected Vector<ConfigParamInputPanel> propertyInputPanels;
+	protected Vector<PropertyInputPanel> propertyInputPanels;
 
 	/**
 	 * @param configManager
@@ -160,8 +157,7 @@ class ConfigDialog extends JDialog {
 	 *            Component this dialog shall be added to
 	 */
 	public ConfigDialog(UserConfigurer configManager, Frame owner) {
-		super(owner, "New " + configManager.getConfigurable().getTypeName()
-				+ " Properties");
+		super(owner, configManager.getConfigurable().getTypeName());
 
 		init(configManager, owner);
 
@@ -185,15 +181,14 @@ class ConfigDialog extends JDialog {
 	 * @param setPropertyFields
 	 *            if True, the user's values will be applied to the properties
 	 *            set
-	 * 
 	 * @return Whether the user has set all the values on the dialog correctly
 	 */
 	private boolean applyPropertyFieldsReal(boolean setPropertyFields) {
-		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
+		Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 
 		while (it.hasNext()) {
-			ConfigParamInputPanel inputPanel = it.next();
-			ConfigParamDescriptor property = inputPanel.getDescriptor();
+			PropertyInputPanel inputPanel = it.next();
+			PropertyDescriptor property = inputPanel.getDescriptor();
 
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
@@ -294,9 +289,9 @@ class ConfigDialog extends JDialog {
 	 * down list
 	 */
 	private void loadDefaultValues() {
-		Iterator<ConfigParamInputPanel> it = propertyInputPanels.iterator();
+		Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 		while (it.hasNext()) {
-			ConfigParamInputPanel panel = it.next();
+			PropertyInputPanel panel = it.next();
 
 			Object currentValue = panel.getDescriptor().getDefaultValue();
 			if (currentValue != null) {
@@ -322,7 +317,7 @@ class ConfigDialog extends JDialog {
 					ConfigException configException = null;
 					try {
 						parent.getConfigurable().completeConfiguration(
-								new ConfigParam(parent.getProperties()));
+								new PropertySet(parent.getProperties()));
 						parent
 								.savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
 					} catch (ConfigException e) {
@@ -347,7 +342,6 @@ class ConfigDialog extends JDialog {
 	protected boolean applyProperties() {
 		/*
 		 * first check if all the fields have been set correctly, then set them
-		 * 
 		 */
 		if (applyPropertyFieldsReal(false)) {
 			applyPropertyFieldsReal(true);
@@ -362,14 +356,14 @@ class ConfigDialog extends JDialog {
 	 */
 	protected void createDialog() {
 
-		ConfigParamDescriptor[] properties = parent.getConfigurable()
+		PropertyDescriptor[] properties = parent.getConfigurable()
 				.getConfigSchema();
-		propertyInputPanels = new Vector<ConfigParamInputPanel>(
+		propertyInputPanels = new Vector<PropertyInputPanel>(
 				properties.length);
 
-		for (ConfigParamDescriptor property : properties) {
+		for (PropertyDescriptor property : properties) {
 
-			ConfigParamInputPanel inputPanel = property.createInputPanel();
+			PropertyInputPanel inputPanel = property.createInputPanel();
 			panel.add(inputPanel);
 
 			propertyInputPanels.add(inputPanel);
@@ -393,7 +387,6 @@ class ConfigDialog extends JDialog {
  * Exception to be thrown if the Dialog is intentionally closed by the User
  * 
  * @author Shu
- * 
  */
 class ConfigDialogClosedException extends ConfigException {
 

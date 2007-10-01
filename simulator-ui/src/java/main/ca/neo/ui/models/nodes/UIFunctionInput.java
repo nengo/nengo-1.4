@@ -7,10 +7,10 @@ import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.ui.actions.PlotFunctionAction;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.descriptors.CFunctionArray;
-import ca.neo.ui.configurable.descriptors.CString;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.descriptors.PFunctionArray;
+import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -25,10 +25,10 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  */
 public class UIFunctionInput extends UINeoNode {
 
-	private static ConfigParamDescriptor pFunctions = new CFunctionArray(
+	private static PropertyDescriptor pFunctions = new PFunctionArray(
 			"Functions Generators");
 
-	private static ConfigParamDescriptor pName = new CString("Name");
+	private static PropertyDescriptor pName = new PString("Name");
 
 	private static final long serialVersionUID = 1L;
 
@@ -37,7 +37,7 @@ public class UIFunctionInput extends UINeoNode {
 	/**
 	 * Config Descriptors
 	 */
-	private static ConfigParamDescriptor[] zConfig = { pName, pFunctions };
+	private static PropertyDescriptor[] zConfig = { pName, pFunctions };
 
 	public UIFunctionInput() {
 		super();
@@ -60,7 +60,7 @@ public class UIFunctionInput extends UINeoNode {
 	}
 
 	@Override
-	protected Node configureModel(ConfigParam props) throws ConfigException {
+	protected Node configureModel(PropertySet props) throws ConfigException {
 
 		Function[] functions = (Function[]) props.getProperty(pFunctions);
 
@@ -98,7 +98,7 @@ public class UIFunctionInput extends UINeoNode {
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		return zConfig;
 	}
 

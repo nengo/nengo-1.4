@@ -4,8 +4,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.UserDialogs;
 import ca.neo.ui.configurable.managers.UserConfigurer;
 import ca.neo.ui.configurable.matrixEditor.ConfigurableMatrix;
 import ca.neo.ui.models.UINeoNode;
@@ -23,6 +24,7 @@ import ca.shu.ui.lib.objects.lines.LineEnd;
 import ca.shu.ui.lib.objects.lines.LineEndHolderIcon;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
@@ -66,21 +68,38 @@ public class UITermination extends Widget implements ILineEndHolder {
 	}
 
 	@Override
-	protected Object configureModel(ConfigParam configuredProperties)
+	protected Object configureModel(PropertySet configuredProperties)
 			throws ConfigException {
 		throw new NotImplementedException();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected PopupMenuBuilder constructMenu() {
 		PopupMenuBuilder menu = super.constructMenu();
 
 		if (lineEnd != null) {
-			menu.addAction(new RemoveConnectionAction("Remove connection"));
+			menu.addAction(new RemoveConnectionAction("Disconnect"));
 		}
 
-		menu.addSection("Termination Model");
-		menu.addAction(new EditWeightsAction("Edit weights"));
+		MenuBuilder configureMenu = menu.createSubMenu("Configure Termination");
+
+		/*
+		 * Reflectively build property editors
+		 */
+		Configuration configuration = getModel().getConfiguration();
+		String[] propertyNames = configuration.listPropertyNames();
+
+		for (String propertyName : propertyNames) {
+			Class type = configuration.getType(propertyName);
+			if (type == float[][].class) {
+				configureMenu.addAction(new EditWeightsAction("Weights"));
+			} else {
+				configureMenu.addAction(new ConfigurePropertyAction(
+						propertyName, type));
+			}
+
+		}
 
 		return menu;
 	}
@@ -105,7 +124,7 @@ public class UITermination extends Widget implements ILineEndHolder {
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		return null;
 	}
 
@@ -160,9 +179,63 @@ public class UITermination extends Widget implements ILineEndHolder {
 					newWeights);
 			popupTransientMsg("Weights changed on Termination");
 		} catch (StructuralException e) {
-			UserMessages.showWarning("Could not modify weights: " + e.getMessage());
+			UserMessages.showWarning("Could not modify weights: "
+					+ e.getMessage());
 		}
 
+	}
+
+	@SuppressWarnings("unchecked")
+	class ConfigurePropertyAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private String propertyName;
+
+		private Class propertyType;
+
+		ConfigurePropertyAction(String propertyName, Class type) {
+			super(propertyName);
+			this.propertyName = propertyName;
+			this.propertyType = type;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			Object propertyValue = null;
+			Object defaultPropertyValue = getModel().getConfiguration()
+					.getProperty(propertyName); // get the current value of this
+			// property
+
+			try {
+				if (propertyType == Boolean.class) {
+					propertyValue = UserDialogs.showDialogBoolean(propertyName,
+							(Boolean) defaultPropertyValue);
+				} else if (propertyType == Integer.class) {
+					propertyValue = UserDialogs.showDialogInteger(propertyName,
+							(Integer) defaultPropertyValue);
+				} else if (propertyType == Float.class) {
+					propertyValue = UserDialogs.showDialogFloat(propertyName,
+							(Float) defaultPropertyValue);
+				} else if (propertyType == String.class) {
+					propertyValue = UserDialogs.showDialogString(propertyName,
+							(String) defaultPropertyValue);
+				} else {
+					UserMessages
+							.showWarning("Could not configure because the property type is unsupported by this UI");
+					return;
+				}
+
+				try {
+					getModel().getConfiguration().setProperty(propertyName,
+							propertyValue);
+				} catch (StructuralException e) {
+					e.printStackTrace();
+				}
+			} catch (ConfigException e) {
+				e.defaultHandleBehavior();
+			}
+		}
 	}
 
 	/**

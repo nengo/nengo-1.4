@@ -15,14 +15,14 @@ public interface IConfigurable {
 	 *            A set of configured parameters to be used to complete
 	 *            configuration
 	 */
-	public void completeConfiguration(ConfigParam configParameters)
+	public void completeConfiguration(PropertySet configParameters)
 			throws ConfigException;
 
 	/**
 	 * @return An array of objects which describe what needs to be configured in
 	 *         this object
 	 */
-	public ConfigParamDescriptor[] getConfigSchema();
+	public PropertyDescriptor[] getConfigSchema();
 
 	/**
 	 * @return Name given to this type of object

@@ -6,16 +6,20 @@ package ca.neo.ui.configurable.descriptors;
  * @author Shu Wu
  * 
  */
-public class CInt extends RangedConfigParam {
+public class PInt extends RangedConfigParam {
 
 	private static final long serialVersionUID = 1L;
 
-	public CInt(String name) {
+	public PInt(String name) {
 		super(name);
 	}
 
-	public CInt(String name, int min, int max) {
-		super(name, min, max);
+	public PInt(String name, int defaultValue) {
+		super(name, defaultValue);
+	}
+
+	public PInt(String name, int defaultvalue, int min, int max) {
+		super(name, defaultvalue, min, max);
 	}
 
 	@Override

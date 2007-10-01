@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.configurable.matrixEditor.ConfigurableMatrix;
 import ca.shu.ui.lib.util.UserMessages;
@@ -20,7 +20,7 @@ import ca.shu.ui.lib.util.UserMessages;
  * 
  * @author Shu
  */
-class TerminationWeightsInputPanel extends ConfigParamInputPanel {
+class TerminationWeightsInputPanel extends PropertyInputPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,7 +39,7 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 	 */
 	private JTextField tf;
 
-	public TerminationWeightsInputPanel(CTerminationWeights property) {
+	public TerminationWeightsInputPanel(PTerminationWeights property) {
 		super(property);
 		initPanel();
 	}
@@ -151,8 +151,8 @@ class TerminationWeightsInputPanel extends ConfigParamInputPanel {
 	}
 
 	@Override
-	public CTerminationWeights getDescriptor() {
-		return (CTerminationWeights) super.getDescriptor();
+	public PTerminationWeights getDescriptor() {
+		return (PTerminationWeights) super.getDescriptor();
 	}
 
 	@Override

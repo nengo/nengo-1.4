@@ -3,8 +3,8 @@ package ca.neo.ui.models.nodes;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Node;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.NeuronIcon;
 import ca.shu.ui.lib.util.UserMessages;
@@ -35,13 +35,13 @@ public class UINeuron extends UINeoNode {
 	}
 
 	@Override
-	protected Object configureModel(ConfigParam configuredProperties)
+	protected Object configureModel(PropertySet configuredProperties)
 			throws ConfigException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getConfigSchema() {
 		UserMessages.showError("not implemented yet");
 		return null;
 

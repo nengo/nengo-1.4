@@ -2,26 +2,26 @@ package ca.neo.ui.configurable.descriptors;
 
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
  * Input Panel for entering Integers
  * 
  * @author Shu Wu
  */
-public class IntegerPanel extends ConfigParamInputPanel {
+public class IntegerPanel extends PropertyInputPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JTextField tf;
 
-	public IntegerPanel(CInt property) {
+	public IntegerPanel(PInt property) {
 		super(property);
 		initPanel();
 	}
 
 	@Override
-	public CInt getDescriptor() {
-		return (CInt) super.getDescriptor();
+	public PInt getDescriptor() {
+		return (PInt) super.getDescriptor();
 	}
 
 	@Override

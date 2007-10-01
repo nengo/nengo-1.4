@@ -1,8 +1,8 @@
 package ca.neo.ui.configurable.descriptors;
 
 import ca.neo.math.Function;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
  * Config Descriptor for an Array of functions
@@ -10,16 +10,16 @@ import ca.neo.ui.configurable.ConfigParamInputPanel;
  * @author Shu Wu
  * 
  */
-public class CFunctionArray extends ConfigParamDescriptor {
+public class PFunctionArray extends PropertyDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
-	public CFunctionArray(String name) {
+	public PFunctionArray(String name) {
 		super(name);
 	}
 
 	@Override
-	public ConfigParamInputPanel createInputPanel() {
+	public PropertyInputPanel createInputPanel() {
 		return new FunctionArrayPanel(this);
 	}
 

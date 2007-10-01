@@ -2,12 +2,12 @@ package ca.neo.ui.models.nodes.widgets;
 
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.ui.configurable.ConfigParam;
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.descriptors.CBoolean;
-import ca.neo.ui.configurable.descriptors.CFloat;
-import ca.neo.ui.configurable.descriptors.CString;
-import ca.neo.ui.configurable.descriptors.CTerminationWeights;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.descriptors.PBoolean;
+import ca.neo.ui.configurable.descriptors.PFloat;
+import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.configurable.descriptors.PTerminationWeights;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 
 /**
@@ -17,18 +17,18 @@ import ca.neo.ui.models.nodes.UINEFEnsemble;
  */
 public class UIDecodedTermination extends UITermination {
 
-	private static final ConfigParamDescriptor pIsModulatory = new CBoolean(
+	private static final PropertyDescriptor pIsModulatory = new PBoolean(
 			"Is Modulatory");
 
-	private static final ConfigParamDescriptor pName = new CString("Name");
+	private static final PropertyDescriptor pName = new PString("Name");
 
-	private static final ConfigParamDescriptor pTauPSC = new CFloat("tauPSC");
+	private static final PropertyDescriptor pTauPSC = new PFloat("tauPSC");
 
 	private static final long serialVersionUID = 1L;
 
 	private static final String typeName = "Decoded Termination";
 
-	private ConfigParamDescriptor pTransformMatrix;
+	private PropertyDescriptor pTransformMatrix;
 
 	public UIDecodedTermination(UINEFEnsemble ensembleProxy) {
 		super(ensembleProxy);
@@ -36,7 +36,7 @@ public class UIDecodedTermination extends UITermination {
 	}
 
 	@Override
-	protected Object configureModel(ConfigParam configuredProperties) {
+	protected Object configureModel(PropertySet configuredProperties) {
 		Termination term = null;
 
 		try {
@@ -68,11 +68,11 @@ public class UIDecodedTermination extends UITermination {
 	}
 
 	@Override
-	public ConfigParamDescriptor[] getConfigSchema() {
-		pTransformMatrix = new CTerminationWeights("Weights", getNodeParent()
+	public PropertyDescriptor[] getConfigSchema() {
+		pTransformMatrix = new PTerminationWeights("Weights", getNodeParent()
 				.getModel().getDimension());
 
-		ConfigParamDescriptor[] zProperties = { pName, pTransformMatrix,
+		PropertyDescriptor[] zProperties = { pName, pTransformMatrix,
 				pTauPSC, pIsModulatory };
 		return zProperties;
 

@@ -3,15 +3,15 @@ package ca.neo.ui.configurable;
 import javax.swing.text.MutableAttributeSet;
 
 
-public class ConfigParam {
+public class PropertySet {
 	MutableAttributeSet properties;
 
-	public ConfigParam(MutableAttributeSet properties) {
+	public PropertySet(MutableAttributeSet properties) {
 		super();
 		this.properties = properties;
 	}
 
-	public Object getProperty(ConfigParamDescriptor obj) {
+	public Object getProperty(PropertyDescriptor obj) {
 		return getProperty(obj.getName());
 	}
 

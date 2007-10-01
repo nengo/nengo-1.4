@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author Shu
  * 
  */
-public abstract class ConfigParamDescriptor implements Serializable {
+public abstract class PropertyDescriptor implements Serializable {
 
 	private Object defaultValue = null;
 
@@ -19,7 +19,7 @@ public abstract class ConfigParamDescriptor implements Serializable {
 	 * @param name
 	 *            Name to be given to the parameter
 	 */
-	public ConfigParamDescriptor(String name) {
+	public PropertyDescriptor(String name) {
 		super();
 		this.name = name;
 
@@ -32,7 +32,7 @@ public abstract class ConfigParamDescriptor implements Serializable {
 	 * @param defaultValue
 	 *            Default value of this parameter
 	 */
-	public ConfigParamDescriptor(String name, Object defaultValue) {
+	public PropertyDescriptor(String name, Object defaultValue) {
 		super();
 		this.defaultValue = defaultValue;
 		this.name = name;
@@ -43,7 +43,7 @@ public abstract class ConfigParamDescriptor implements Serializable {
 	 * @return UI Input panel which can be used for User Configuration of this
 	 *         property, null if none exists
 	 */
-	public abstract ConfigParamInputPanel createInputPanel();
+	public abstract PropertyInputPanel createInputPanel();
 
 	/**
 	 * @return Default value of this parameter

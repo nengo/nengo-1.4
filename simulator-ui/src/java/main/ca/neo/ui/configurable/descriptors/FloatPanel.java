@@ -2,15 +2,15 @@ package ca.neo.ui.configurable.descriptors;
 
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.ConfigParamDescriptor;
-import ca.neo.ui.configurable.ConfigParamInputPanel;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
  * Input panel for entering floating point numbers
  * 
  * @author Shu Wu
  */
-public class FloatPanel extends ConfigParamInputPanel {
+public class FloatPanel extends PropertyInputPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -19,7 +19,7 @@ public class FloatPanel extends ConfigParamInputPanel {
 	 */
 	private JTextField tf;
 
-	public FloatPanel(ConfigParamDescriptor property) {
+	public FloatPanel(PropertyDescriptor property) {
 		super(property);
 
 		tf = new JTextField(10);
