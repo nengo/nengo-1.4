@@ -1,7 +1,11 @@
 package ca.neo.ui.actions;
 
+import javax.swing.SwingUtilities;
+
 import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
+import ca.neo.sim.SimulatorEvent;
+import ca.neo.sim.SimulatorListener;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigParam;
 import ca.neo.ui.configurable.ConfigParamDescriptor;
@@ -11,13 +15,13 @@ import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Runs the Simulator
  * 
  * @author Shu Wu
- * 
  */
 public class RunSimulatorAction extends StandardAction {
 
@@ -43,7 +47,8 @@ public class RunSimulatorAction extends StandardAction {
 		/*
 		 * Configures the simulatorConfig
 		 */
-		UserTemplateConfigurer config = new UserTemplateConfigurer(simulatorConfig);
+		UserTemplateConfigurer config = new UserTemplateConfigurer(
+				simulatorConfig);
 		try {
 			config.configureAndWait();
 			(new RunSimulatorActivity(simulatorConfig)).startThread();
@@ -60,23 +65,72 @@ public class RunSimulatorAction extends StandardAction {
 	 * Activity which will run the simulation
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
-	class RunSimulatorActivity extends AbstractActivity {
+	/**
+	 * @author Shu
+	 *
+	 */
+	class RunSimulatorActivity extends AbstractActivity implements
+			SimulatorListener {
 		SimulatorConfig config;
 
 		public RunSimulatorActivity(SimulatorConfig config) {
-			super("Simulation in progress");
+			super("Simulation started");
 			this.config = config;
 		}
 
 		@Override
 		public void doActivity() {
 			try {
+				simulator.addSimulatorListener(this);
+
 				simulator.run(config.getStartTime(), config.getEndTime(),
 						config.getStepSize());
+
 			} catch (SimulationException e) {
 				UserMessages.showError("Simulator problem: " + e.toString());
+			}
+		}
+
+		private TrackedStatusMsg progressMsg;
+
+		private float currentProgress = 0;
+
+
+		/* (non-Javadoc)
+		 * @see ca.neo.sim.SimulatorListener#processEvent(ca.neo.sim.SimulatorEvent)
+		 */
+		public void processEvent(SimulatorEvent event) {
+			/*
+			 * Track events from the simulator and show progress in the UI
+			 */
+
+			if (event.getType() == SimulatorEvent.Type.FINISHED) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if (progressMsg != null) {
+							progressMsg.finished();
+						}
+					}
+				});
+
+				return;
+			}
+
+			if ((event.getProgress() - currentProgress) > 0.01) {
+				currentProgress = event.getProgress();
+
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if (progressMsg != null) {
+							progressMsg.finished();
+						}
+						progressMsg = new TrackedStatusMsg(
+								(int) (currentProgress * 100)
+										+ "% - simulation running");
+
+					}
+				});
 			}
 		}
 	}
@@ -86,11 +140,9 @@ public class RunSimulatorAction extends StandardAction {
  * Contains configurable properties used to set up the Simulation
  * 
  * @author Shu Wu
- * 
  */
 class SimulatorConfig implements IConfigurable {
-	private static final ConfigParamDescriptor pEndTime = new CFloat(
-			"End time");
+	private static final ConfigParamDescriptor pEndTime = new CFloat("End time");
 	private static final ConfigParamDescriptor pStartTime = new CFloat(
 			"Start time");
 	private static final ConfigParamDescriptor pStepSize = new CFloat(
@@ -124,6 +176,5 @@ class SimulatorConfig implements IConfigurable {
 	public String getTypeName() {
 		return "Simulator Runtime Configuration";
 	}
-
 
 }
