@@ -98,4 +98,9 @@ public interface Simulator {
 	 */
 	public Probe[] getProbes();
 	
+	/**
+	 * @param listener A Simulator listener
+	 */
+	public void addSimulatorListener(SimulatorListener listener);
+	
 }
