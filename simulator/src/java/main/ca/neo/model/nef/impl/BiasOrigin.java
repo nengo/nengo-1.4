@@ -43,8 +43,7 @@ public class BiasOrigin extends DecodedOrigin {
 	private NEFEnsemble myInterneurons;
 	
 	public BiasOrigin(Node node, String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
-		super(node, name, nodes, nodeOrigin, new Function[]{new ConstantFunction(0, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));
-		//note above ConstantFunction has dimension 0, but the input dimension isn't checked
+		super(node, name, nodes, nodeOrigin, new Function[]{new ConstantFunction(1, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));		//note above ConstantFunction has dimension 0, but the input dimension isn't checked
 		
 		myInterneurons = createInterneurons(name + "_interneurons", numInterneurons, excitatory);
 	}
@@ -82,7 +81,7 @@ public class BiasOrigin extends DecodedOrigin {
 					Function f = new AbstractFunction(1) {
 						private static final long serialVersionUID = 1L;
 						public float map(float[] from) {
-							return 1f + from[0];
+							return -1 - from[0];
 						}
 					};
 					ensemble.addDecodedOrigin(NEFEnsemble.X, new Function[]{f}, Neuron.AXON);
@@ -92,13 +91,14 @@ public class BiasOrigin extends DecodedOrigin {
 		//TODO: handle additional bias in inhibitory case 
 		
 		new NEFEnsembleFactoryImpl();
-		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory()));
-		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? 1f : -1f));
+		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory(), true));
+		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? .5f : -.5f));
 		
-		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.1f, .99f) : new IndicatorPDF(-.99f, .1f);
+//		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.5f, .75f) : new IndicatorPDF(-.99f, .35f);
+		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.5f, .75f) : new IndicatorPDF(-1.2f, .1f);
 		PDF maxRatePDF = excitatoryProjection ? new IndicatorPDF(200f, 500f) : new IndicatorPDF(400f, 800f);
-		ef.setNodeFactory(new LIFNeuronFactory(.02f, .001f, maxRatePDF, interceptPDF));
-		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(new CoefficientsPositive(), false));
+		ef.setNodeFactory(new LIFNeuronFactory(.02f, .0001f, maxRatePDF, interceptPDF));
+		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(new CoefficientsSameSign(excitatoryProjection), false));
 		return ef.make(name, num, 1);
 	}
 
@@ -115,9 +115,15 @@ public class BiasOrigin extends DecodedOrigin {
 	 * 
 	 * @author Bryan Tripp
 	 */
-	private static class CoefficientsPositive implements GradientDescentApproximator.Constraints {
+	private static class CoefficientsSameSign implements GradientDescentApproximator.Constraints {
 		
 		private static final long serialVersionUID = 1L;
+		
+		private boolean mySignPositive;
+		
+		public CoefficientsSameSign(boolean positive) {
+			mySignPositive = positive;
+		}
 		
 		/**
 		 * @see ca.neo.math.impl.GradientDescentApproximator.Constraints#correct(float[])
@@ -125,7 +131,7 @@ public class BiasOrigin extends DecodedOrigin {
 		public boolean correct(float[] coefficients) {
 			boolean allCorrected = true;
 			for (int i = 0; i < coefficients.length; i++) {
-				if (coefficients[i] < 0) {
+				if ( (mySignPositive && coefficients[i] < 0) || (!mySignPositive && coefficients[i] > 0)) {
 					coefficients[i] = 0;
 				} else {
 					allCorrected = false;
