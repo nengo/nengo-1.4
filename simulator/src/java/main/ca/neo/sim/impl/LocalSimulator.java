@@ -41,6 +41,10 @@ public class LocalSimulator implements Simulator {
 	 */
 	Collection<SimulatorListener> listeners;
 
+	public LocalSimulator() {
+		listeners = new ArrayList<SimulatorListener>(1);
+	}
+	
 	/**
 	 * @see ca.neo.sim.Simulator#initialize(ca.neo.model.Network)
 	 */
@@ -220,11 +224,10 @@ public class LocalSimulator implements Simulator {
 		return myProbes.toArray(new Probe[0]);
 	}
 
+	/**
+	 * @see ca.neo.sim.Simulator#addSimulatorListener(ca.neo.sim.SimulatorListener)
+	 */
 	public void addSimulatorListener(SimulatorListener listener) {
-		if (listeners == null) {
-			listeners = new ArrayList<SimulatorListener>(1);
-		}
-
 		listeners.add(listener);
 	}
 
