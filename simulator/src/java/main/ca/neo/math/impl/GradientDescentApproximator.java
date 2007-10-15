@@ -65,6 +65,13 @@ public class GradientDescentApproximator implements LinearApproximator {
 	}
 	
 	/**
+	 * @param coefficients Coefficients at which to start the optimization
+	 */
+	public void setStartingCoefficients(float[] coefficients) {
+		myStartingCoefficients = coefficients;
+	}
+	
+	/**
 	 * @return Maximum iterations per findCoefficients(...)
 	 */
 	public int getMaxIterations() {
