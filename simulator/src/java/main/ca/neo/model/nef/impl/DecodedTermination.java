@@ -17,6 +17,7 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
+import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.util.Configuration;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
@@ -64,6 +65,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private boolean myTauMutable;
 	private ConfigurationImpl myConfiguration;
 	private DecodedTermination myScalingTermination;
+	private float[] myStaticBias;
 	
 	/**
 	 * @param Node The parent Node
@@ -118,6 +120,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		}
 		
 		myScalingTermination = null;
+		myStaticBias = new float[transform.length];
 	}
 
 	//copies dynamics for to each dimension
@@ -138,6 +141,16 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		
 		myDynamics = newDynamics;
 	}
+
+	/**
+	 * @param bias Intrinsic bias that is added to inputs to this termination 
+	 */
+	public void setStaticBias(float[] bias) {
+		if (bias.length != myTransform.length) {
+			throw new IllegalArgumentException("Bias must have length " + myTransform.length);
+		}
+		myStaticBias = bias;
+	}
 	
 	/**
 	 * @param values Only RealOutput is accepted. 
@@ -154,7 +167,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			throw new SimulationException("Only real-valued input is accepted at a DecodedTermination");
 		}
 
-		myInputValues = (RealOutput) values;
+		RealOutput ro = (RealOutput) values;
+		myInputValues = new RealOutputImpl(MU.sum(ro.getValues(), myStaticBias), ro.getUnits(), ro.getTime());
 	}
 	
 	/**
@@ -221,6 +235,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	}
 
 	/**
+	 * TODO: should return a copy here and provide a setter for updates
+	 * 
 	 * @return The matrix that maps input (which has the dimension of this Termination)  
 	 * 		onto the state space represented by the NEFEnsemble to which the Termination belongs
 	 */

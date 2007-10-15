@@ -190,7 +190,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	public BiasOrigin addBiasOrigin(Origin existing, int numInterneurons, boolean excitatory) throws StructuralException {
 		if ( !(existing instanceof DecodedOrigin) ) {
-			throw new StructuralException("A DecodedOrigin is needed to make a SignedDecodedOrigin");
+			throw new StructuralException("A DecodedOrigin is needed to make a BiasOrigin");
 		}
 		
 		DecodedOrigin o = (DecodedOrigin) existing;
@@ -271,7 +271,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			biasEncoders[j] = max;
 		}
 		
-		EulerIntegrator integrator = new EulerIntegrator(interneuronTauPSC / 10f); //assume this is fast enough for bias as well (interneurons termination probably faster)
+		//assume this is fast enough for bias as well (interneurons termination probably faster)
+		EulerIntegrator integrator = new EulerIntegrator(interneuronTauPSC / 10f); 
 		
 		float scale = 1 / interneuronTauPSC; //output scaling to make impulse integral = 1		
 		LinearSystem interneuronDynamics = new SimpleLTISystem(

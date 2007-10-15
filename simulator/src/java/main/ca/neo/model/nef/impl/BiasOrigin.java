@@ -15,6 +15,7 @@ import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.impl.LIFNeuronFactory;
+import ca.neo.util.MU;
 import ca.neo.util.VectorGenerator;
 import ca.neo.util.impl.RandomHypersphereVG;
 import ca.neo.util.impl.Rectifier;
@@ -41,11 +42,30 @@ public class BiasOrigin extends DecodedOrigin {
 	private static final long serialVersionUID = 1L;		
 	
 	private NEFEnsemble myInterneurons;
+	private float[][] myConstantOutputs;
 	
 	public BiasOrigin(Node node, String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
 		super(node, name, nodes, nodeOrigin, new Function[]{new ConstantFunction(1, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));		//note above ConstantFunction has dimension 0, but the input dimension isn't checked
 		
 		myInterneurons = createInterneurons(name + "_interneurons", numInterneurons, excitatory);
+		myConstantOutputs = constantOutputs;
+	}
+	
+	public void tweakDecoders(float[][] baseWeights, float[] biasEncoders) {
+		float[][] evalPoints = MU.transpose(new float[][]{new float[myConstantOutputs[0].length]}); //can use anything here because target function is constant
+		GradientDescentApproximator.Constraints constraints = new BiasEncodersMaintained(baseWeights, biasEncoders);
+		GradientDescentApproximator approximator = new GradientDescentApproximator(evalPoints, MU.clone(myConstantOutputs), constraints, true);
+		approximator.setStartingCoefficients(MU.transpose(getDecoders())[0]);
+		float[] newDecoders = approximator.findCoefficients(new ConstantFunction(1, 0));
+		super.setDecoders(MU.transpose(new float[][]{newDecoders}));
+	}
+	
+	/**
+	 * @return Vector of mininum and maximum output of this origin, ie {min, max}
+	 */
+	public float[] getRange() {
+		float[] outputs = MU.prod(MU.transpose(myConstantOutputs), MU.transpose(getDecoders())[0]);		
+		return new float[]{MU.min(outputs), MU.max(outputs)};
 	}
 	
 	private static float[][] getUniformBiasDecoders(float[][] constantOutputs, boolean excitatory) {
@@ -139,6 +159,44 @@ public class BiasOrigin extends DecodedOrigin {
 			}
 			return allCorrected;
 		}
+	}
+	
+	private static class BiasEncodersMaintained implements GradientDescentApproximator.Constraints {
+
+		private static final long serialVersionUID = 1L;
+		
+		private float[][] myBaseWeights;
+		private float[] myBiasEncoders; 
+		
+		public BiasEncodersMaintained(float[][] baseWeights, float[] biasEncoders) {
+			myBaseWeights = baseWeights;
+			myBiasEncoders = biasEncoders;
+		}
+		
+		public boolean correct(float[] coefficients) {
+			boolean allCorrected = true;
+			
+			for (int i = 0; i < coefficients.length; i++) {
+				boolean corrected = false;
+
+				if (coefficients[i] < 0) { //next correction will fail
+					coefficients[i] = Float.MIN_VALUE; 
+					corrected = true;
+				}
+				
+				for (int j = 0; j < myBiasEncoders.length; j++) {
+					if ( - myBaseWeights[j][i] / coefficients[i] > myBiasEncoders[j] )  {
+						coefficients[i] = - myBaseWeights[j][i] / myBiasEncoders[j];
+						corrected = true;
+					}
+				}
+				
+				if (!corrected) allCorrected = false;
+			}
+			
+			return allCorrected;
+		}
+		
 	}
 
 	/**
