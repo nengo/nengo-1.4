@@ -490,6 +490,34 @@ public class MU {
 	
 	/**
 	 * @param vector Any vector
+	 * @return Minimum of elements
+	 */
+	public static float min(float[] vector) {
+		float result = vector[0];
+		
+		for (int i = 1; i < vector.length; i++) {
+			if (vector[i] < result) result = vector[i];
+		}
+		
+		return result;
+	}
+
+	/**
+	 * @param vector Any vector
+	 * @return Minimum of elements
+	 */
+	public static float max(float[] vector) {
+		float result = vector[0];
+		
+		for (int i = 1; i < vector.length; i++) {
+			if (vector[i] > result) result = vector[i];
+		}
+		
+		return result;
+	}
+
+	/**
+	 * @param vector Any vector
 	 * @return Sum of elements
 	 */
 	public static float sum(float[] vector) {
