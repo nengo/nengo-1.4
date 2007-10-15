@@ -153,7 +153,7 @@ public class NEFEnsembleImplTest extends TestCase {
 //		Plotter.plot(pre, bo.getName());
 		float[][] baseWeights = MU.prod(post.getEncoders(), MU.prod(baseTermination.getTransform(), MU.transpose(baseOrigin.getDecoders())));
 		float[] encodersBeforeTweak = findBiasEncoders(baseWeights, MU.transpose(bo.getDecoders())[0]);
-		bo.tweakDecoders(baseWeights, bt[0].getBiasEncoders());
+		bo.optimizeDecoders(baseWeights, bt[0].getBiasEncoders());
 //		Plotter.plot(pre, bo.getName());
 		float[] encodersAfterTweak = findBiasEncoders(baseWeights, MU.transpose(bo.getDecoders())[0]);
 		TestUtil.assertClose(MU.sum(MU.difference(encodersBeforeTweak, encodersAfterTweak)), 0, .0001f);

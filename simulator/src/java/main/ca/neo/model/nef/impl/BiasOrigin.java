@@ -45,19 +45,44 @@ public class BiasOrigin extends DecodedOrigin {
 	private float[][] myConstantOutputs;
 	
 	public BiasOrigin(Node node, String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
-		super(node, name, nodes, nodeOrigin, new Function[]{new ConstantFunction(1, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));		//note above ConstantFunction has dimension 0, but the input dimension isn't checked
+		super(node, name, nodes, nodeOrigin, new Function[]{new ConstantFunction(1, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));		
 		
 		myInterneurons = createInterneurons(name + "_interneurons", numInterneurons, excitatory);
 		myConstantOutputs = constantOutputs;
 	}
 	
-	public void tweakDecoders(float[][] baseWeights, float[] biasEncoders) {
+	/**
+	 * This method adjusts bias decoders so that the bias function is as flat as possible, without changing the 
+	 * bias encoders on the post-synaptic ensemble. Distortion can be minimized by calling this method and then 
+	 * calling optimizeInterneuronDomain().   
+	 * 
+	 * @param baseWeights Matrix of synaptic weights in the unbiased projection (ie the weights of mixed sign)  
+	 * @param biasEncoders Encoders of the bias dimension on the post-synaptic ensemble 
+	 */
+	public void optimizeDecoders(float[][] baseWeights, float[] biasEncoders) {
 		float[][] evalPoints = MU.transpose(new float[][]{new float[myConstantOutputs[0].length]}); //can use anything here because target function is constant
 		GradientDescentApproximator.Constraints constraints = new BiasEncodersMaintained(baseWeights, biasEncoders);
 		GradientDescentApproximator approximator = new GradientDescentApproximator(evalPoints, MU.clone(myConstantOutputs), constraints, true);
 		approximator.setStartingCoefficients(MU.transpose(getDecoders())[0]);
 		float[] newDecoders = approximator.findCoefficients(new ConstantFunction(1, 0));
 		super.setDecoders(MU.transpose(new float[][]{newDecoders}));
+	}
+	
+	/**
+	 * This method adjusts the interneuron channel so that the interneurons are tuned to the 
+	 * range of values that is output by the bias function.  
+	 * 
+	 * @param interneuronTermination The Termination on getInterneurons() that recieves input from this Origin 
+	 * @param biasTermination The BiasTermination to which the interneurons project (not the one to which this Origin 
+	 * 		projects directly)
+	 */
+	public void optimizeInterneuronDomain(DecodedTermination interneuronTermination, DecodedTermination biasTermination) {
+		float[] range = this.getRange();
+		range[0] = range[0] - .25f * (range[1] - range[0]); //avoid distorted area near zero in interneurons 
+		interneuronTermination.setStaticBias(new float[]{-range[0]});
+		interneuronTermination.getTransform()[0][0] = 1f / (range[1] - range[0]);
+		biasTermination.setStaticBias(new float[]{range[0]/(range[1] - range[0])});
+		biasTermination.getTransform()[0][0] = -(range[1] - range[0]);				
 	}
 	
 	/**
@@ -119,6 +144,7 @@ public class BiasOrigin extends DecodedOrigin {
 		PDF maxRatePDF = excitatoryProjection ? new IndicatorPDF(200f, 500f) : new IndicatorPDF(400f, 800f);
 		ef.setNodeFactory(new LIFNeuronFactory(.02f, .0001f, maxRatePDF, interceptPDF));
 		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(new CoefficientsSameSign(excitatoryProjection), false));
+		
 		return ef.make(name, num, 1);
 	}
 
