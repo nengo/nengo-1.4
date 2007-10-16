@@ -58,12 +58,13 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	 * TODO: with a little work this could be pushed up to DecodableEnsemble (have to generalize constant-rate responses)
 	 * 
 	 * @param existing An existing Origin on this NEFEnsemble
-	 * @param numInterneurons Number of neurons 
+	 * @param numInterneurons Number of interneurons 
+	 * @param name Name of BiasOrigin (name of associated interneuron ensemble is also derived from this) 
 	 * @param excitatory If true, effective weights will be positive; if false they will be negative (inhibitory)
 	 * @return Resulting BiasOrigin
 	 * @throws StructuralException if given Origin is not a DecodedOrigin or if there is a construction problem 
 	 */
-	public BiasOrigin addBiasOrigin(Origin existing, int numInterneurons, boolean excitatory) throws StructuralException;
+	public BiasOrigin addBiasOrigin(Origin existing, int numInterneurons, String name, boolean excitatory) throws StructuralException;
 		
 	/**
 	 * Adds a new Termination into this Ensemble, at which information is to be received 

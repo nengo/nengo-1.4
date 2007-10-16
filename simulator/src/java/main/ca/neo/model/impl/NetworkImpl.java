@@ -142,7 +142,7 @@ public class NetworkImpl implements Network {
 	/**
 	 * @see ca.neo.model.Network#addProjection(ca.neo.model.Origin, ca.neo.model.Termination)
 	 */
-	public void addProjection(Origin origin, Termination termination) throws StructuralException {
+	public Projection addProjection(Origin origin, Termination termination) throws StructuralException {
 		if (myProjectionMap.containsKey(termination)) {
 			throw new StructuralException("There is already an Origin connected to the specified Termination");
 		}
@@ -152,9 +152,11 @@ public class NetworkImpl implements Network {
 					+ " to Termination of dimension " + termination.getDimensions());
 		}
 		
-		myProjectionMap.put(termination, new ProjectionImpl(origin, termination));
-
+		Projection result = new ProjectionImpl(origin, termination, this);
+		myProjectionMap.put(termination, result);
 		getSimulator().initialize(this);
+		
+		return result;
 	}
 
 	/**

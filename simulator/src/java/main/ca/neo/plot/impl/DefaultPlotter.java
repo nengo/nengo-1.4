@@ -8,6 +8,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,6 +27,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.util.ShapeUtilities;
 
+import ca.neo.io.MatlabExporter;
 import ca.neo.math.Function;
 import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
@@ -261,8 +264,10 @@ public class DefaultPlotter extends Plotter {
 		
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		
+		float[][] rates = new float[nodes.length][];
 		for (int i = 0; i < nodes.length; i++) {
 			XYSeries series = new XYSeries("Neuron " + i);
+			rates[i] = new float[x.length];
 			
 			for (int j = 0; j < x.length; j++) {
 //				float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j];
@@ -273,6 +278,7 @@ public class DefaultPlotter extends Plotter {
 					nodes[i].run(0f, 0f);
 					RealOutput output = (RealOutput) nodes[i].getOrigin(Neuron.AXON).getValues();
 					series.add(x[j], output.getValues()[0]);
+					rates[i][j] = output.getValues()[0];
 				} catch (SimulationException e) {
 					throw new RuntimeException("Can't plot activities: error running neurons", e);
 				} catch (ClassCastException e) {
@@ -283,6 +289,14 @@ public class DefaultPlotter extends Plotter {
 			}
 			
 			dataset.addSeries(series);
+		}
+		MatlabExporter exporter = new MatlabExporter();
+		exporter.add("x", new float[][]{x});
+		exporter.add("rates", rates);
+		try {
+			exporter.write(new File("activities.mat"));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		ensemble.setMode(mode);

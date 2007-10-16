@@ -32,7 +32,7 @@ public class ProjectionImplTest extends TestCase {
 		
 		myOrigin = new MockOrigin("mock origin", 1);
 		myTermination = new MockTermination("mock termination", 1);
-		myProjection = new ProjectionImpl(myOrigin, myTermination);		
+		myProjection = new ProjectionImpl(myOrigin, myTermination, null);		
 	}
 
 	/*

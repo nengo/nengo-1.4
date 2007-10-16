@@ -61,7 +61,7 @@ public interface Network extends Node, Probeable {
 	 * 		or if there is already an Origin connected to the given Termination (note that an 
 	 * 		Origin can project to multiple Terminations though). 
 	 */
-	public void addProjection(Origin origin, Termination termination) throws StructuralException;
+	public Projection addProjection(Origin origin, Termination termination) throws StructuralException;
 
 	/**
 	 * @return All Projections in this Network 

@@ -47,7 +47,7 @@ public class BiasOrigin extends DecodedOrigin {
 	public BiasOrigin(Node node, String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
 		super(node, name, nodes, nodeOrigin, new Function[]{new ConstantFunction(1, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));		
 		
-		myInterneurons = createInterneurons(name + "_interneurons", numInterneurons, excitatory);
+		myInterneurons = createInterneurons(name + ":interneurons", numInterneurons, excitatory);
 		myConstantOutputs = constantOutputs;
 	}
 	

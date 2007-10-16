@@ -515,6 +515,38 @@ public class MU {
 		
 		return result;
 	}
+	
+	/**
+	 * @param matrix Any matrix
+	 * @return Minimum of elements
+	 */
+	public static float min(float[][] matrix) {
+		float result = matrix[0][0];
+		
+		for (int i = 1; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				if (matrix[i][j] < result) result = matrix[i][j];				
+			}
+		}
+		
+		return result;
+	}
+
+	/**
+	 * @param matrix Any matrix
+	 * @return Minimum of elements
+	 */
+	public static float max(float[][] matrix) {
+		float result = matrix[0][0];
+		
+		for (int i = 1; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				if (matrix[i][j] > result) result = matrix[i][j];				
+			}
+		}
+		
+		return result;
+	}
 
 	/**
 	 * @param vector Any vector

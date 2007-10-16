@@ -186,15 +186,15 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	}	
 
 	/**
-	 * @see ca.neo.model.nef.NEFEnsemble#addSignedDecodedOrigin(java.lang.String, ca.neo.model.Origin, int, boolean)
+	 * @see ca.neo.model.nef.NEFEnsemble#addBiasOrigin(ca.neo.model.Origin, int, java.lang.String, boolean)
 	 */
-	public BiasOrigin addBiasOrigin(Origin existing, int numInterneurons, boolean excitatory) throws StructuralException {
+	public BiasOrigin addBiasOrigin(Origin existing, int numInterneurons, String name, boolean excitatory) throws StructuralException {
 		if ( !(existing instanceof DecodedOrigin) ) {
 			throw new StructuralException("A DecodedOrigin is needed to make a BiasOrigin");
 		}
 		
 		DecodedOrigin o = (DecodedOrigin) existing;
-		BiasOrigin result = new BiasOrigin(this, getName()+"_"+existing.getName()+BIAS_SUFFIX, getNodes(), o.getNodeOrigin(), 
+		BiasOrigin result = new BiasOrigin(this, name, getNodes(), o.getNodeOrigin(), 
 				getConstantOutputs(myEvalPoints, o.getNodeOrigin()), numInterneurons, excitatory);
 		
 		addDecodedOrigin(result.getName(), result);
@@ -271,8 +271,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			biasEncoders[j] = max;
 		}
 		
-		//assume this is fast enough for bias as well (interneurons termination probably faster)
-		EulerIntegrator integrator = new EulerIntegrator(interneuronTauPSC / 10f); 
+		float baseTauPSC = ((Float) baseTermination.getConfiguration().getProperty(Termination.TAU_PSC)).floatValue();
+		EulerIntegrator integrator = new EulerIntegrator(Math.min(interneuronTauPSC, baseTauPSC) / 10f);
+		System.out.println("base: " + baseTauPSC + " inter" + interneuronTauPSC + " min: " + Math.min(interneuronTauPSC, baseTauPSC));
 		
 		float scale = 1 / interneuronTauPSC; //output scaling to make impulse integral = 1		
 		LinearSystem interneuronDynamics = new SimpleLTISystem(
