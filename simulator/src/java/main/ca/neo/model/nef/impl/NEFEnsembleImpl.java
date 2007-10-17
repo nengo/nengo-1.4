@@ -257,15 +257,18 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		return result;
 	}
-		
-	public BiasTermination[] addBiasTerminations(DecodedTermination baseTermination, float interneuronTauPSC, float biasDecoder, float[][] functionDecoders) throws StructuralException {
+
+	/**
+	 * @see ca.neo.model.nef.NEFEnsemble#addBiasTerminations(ca.neo.model.nef.impl.DecodedTermination, float, float[][], float[][])
+	 */
+	public BiasTermination[] addBiasTerminations(DecodedTermination baseTermination, float interneuronTauPSC, float[][] biasDecoders, float[][] functionDecoders) throws StructuralException {
 		float[][] transform = baseTermination.getTransform();
 		
 		float[] biasEncoders = new float[myEncoders.length];
 		for (int j = 0; j < biasEncoders.length; j++) {
 			float max = 0;
 			for (int i = 0; i < functionDecoders.length; i++) {
-				float x = - MU.prod(myEncoders[j], MU.prod(transform, functionDecoders[i])) / biasDecoder;
+				float x = - MU.prod(myEncoders[j], MU.prod(transform, functionDecoders[i])) / biasDecoders[i][0];
 				if (x > max) max = x;
 			}			
 			biasEncoders[j] = max;

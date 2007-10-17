@@ -153,6 +153,15 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	}
 	
 	/**
+	 * @return Static bias vector (a copy)
+	 */
+	public float[] getStaticBias() {
+		float[] result = new float[myStaticBias.length];
+		System.arraycopy(myStaticBias, 0, result, 0, result.length);
+		return result;
+	}
+	
+	/**
 	 * @param values Only RealOutput is accepted. 
 	 * 
 	 * @see ca.neo.model.Termination#setValues(ca.neo.model.InstantaneousOutput)
