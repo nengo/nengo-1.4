@@ -140,10 +140,10 @@ public class BiasOrigin extends DecodedOrigin {
 		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? .5f : -.5f));
 		
 //		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.5f, .75f) : new IndicatorPDF(-.99f, .35f);
-		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.5f, .75f) : new IndicatorPDF(-1.2f, .1f);
+		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.15f, .5f) : new IndicatorPDF(-1.2f, .1f); //was -.5f, .75f for excitatory
 		PDF maxRatePDF = excitatoryProjection ? new IndicatorPDF(200f, 500f) : new IndicatorPDF(400f, 800f);
 		ef.setNodeFactory(new LIFNeuronFactory(.02f, .0001f, maxRatePDF, interceptPDF));
-		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(new CoefficientsSameSign(excitatoryProjection), false));
+		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(new CoefficientsSameSign(excitatoryProjection), false)); 
 		
 		return ef.make(name, num, 1);
 	}

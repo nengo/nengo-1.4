@@ -47,8 +47,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 	private static final long serialVersionUID = 1L;
 	
-	public static String BIAS_SUFFIX = "_bias";
-	public static String INTERNEURON_SUFFIX = "_interneuron";
+	public static String BIAS_SUFFIX = ":bias";
+	public static String INTERNEURON_SUFFIX = ":interneuron";
 	
 	private int myDimension;
 	private float[][] myEncoders;
@@ -273,7 +273,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		float baseTauPSC = ((Float) baseTermination.getConfiguration().getProperty(Termination.TAU_PSC)).floatValue();
 		EulerIntegrator integrator = new EulerIntegrator(Math.min(interneuronTauPSC, baseTauPSC) / 10f);
-		System.out.println("base: " + baseTauPSC + " inter" + interneuronTauPSC + " min: " + Math.min(interneuronTauPSC, baseTauPSC));
 		
 		float scale = 1 / interneuronTauPSC; //output scaling to make impulse integral = 1		
 		LinearSystem interneuronDynamics = new SimpleLTISystem(

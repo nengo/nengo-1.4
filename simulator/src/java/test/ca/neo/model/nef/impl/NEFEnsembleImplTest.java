@@ -116,12 +116,12 @@ public class NEFEnsembleImplTest extends TestCase {
 		network.addNode(input);
 		
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-		NEFEnsemble pre = ef.make("pre", 400, 1, "nefe_pre", true);
+		NEFEnsemble pre = ef.make("pre", 400, 1, "nefe_pre", false);
 		pre.addDecodedTermination("input", MU.I(1), tauPSC, false);
 		DecodedOrigin baseOrigin = (DecodedOrigin) pre.getOrigin(NEFEnsemble.X);
 		network.addNode(pre);
 		
-		NEFEnsemble post = ef.make("post", 200, 1, "nefe_post", true);
+		NEFEnsemble post = ef.make("post", 200, 1, "nefe_post", false);
 		DecodedTermination baseTermination = (DecodedTermination) post.addDecodedTermination("pre", MU.I(1), tauPSC, false);
 		network.addNode(post);
 		
@@ -135,7 +135,7 @@ public class NEFEnsembleImplTest extends TestCase {
 		
 		//remove negative weights ... 
 		System.out.println("Minimum weight without bias: " + MU.min(projection.getWeights()));
-		projection.addBias(100, tauPSC/5f, tauPSC, true, false);
+		projection.addBias(100, .005f, tauPSC, true, false);
 		System.out.println("Minimum weight with bias: " + MU.min(projection.getWeights()));
 		pPost.reset();
 		network.run(0, 2);
@@ -150,6 +150,8 @@ public class NEFEnsembleImplTest extends TestCase {
 		diff = new TimeSeriesImpl(ideal.getTimes(), MU.difference(ideal.getValues(), pPost.getData().getValues()), ideal.getUnits()); 
 		Plotter.plot(diff, .01f, "positive weights optimized");
 		Plotter.plot(pInter.getData(), .01f, "interneurons");
+
+		
 		
 //		//remove negative weights ... 
 //		BiasOrigin bo = pre.addBiasOrigin(baseOrigin, 100, "interneurons", true);
