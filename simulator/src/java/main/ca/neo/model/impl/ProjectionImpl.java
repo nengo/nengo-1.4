@@ -119,7 +119,7 @@ public class ProjectionImpl implements Projection {
 		myInterneurons = myBiasOrigin.getInterneurons();
 		Plotter.plot(myInterneurons, NEFEnsemble.X);
 		myNetwork.addNode(myInterneurons);		
-		BiasTermination[] bt = post.addBiasTerminations(baseTermination, tauBias, myBiasOrigin.getDecoders()[0][0], baseOrigin.getDecoders());
+		BiasTermination[] bt = post.addBiasTerminations(baseTermination, tauBias, myBiasOrigin.getDecoders(), baseOrigin.getDecoders());
 		myDirectBT = bt[0];
 		myIndirectBT = bt[1];
 		float[][] tf = new float[][]{new float[]{0, 1/tauInterneurons/tauInterneurons}, new float[]{2/tauInterneurons, 1/tauInterneurons/tauInterneurons}};
