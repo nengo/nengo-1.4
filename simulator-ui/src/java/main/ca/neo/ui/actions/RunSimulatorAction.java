@@ -1,5 +1,7 @@
 package ca.neo.ui.actions;
 
+import java.util.Random;
+
 import javax.swing.SwingUtilities;
 
 import ca.neo.model.SimulationException;
@@ -82,10 +84,14 @@ public class RunSimulatorAction extends StandardAction {
 		@Override
 		public void doActivity() {
 			try {
+				simulator.resetNetwork(false);
 				simulator.addSimulatorListener(this);
 
 				simulator.run(config.getStartTime(), config.getEndTime(),
 						config.getStepSize());
+				
+				simulator.removeSimulatorListener(this);
+				
 
 			} catch (SimulationException e) {
 				UserMessages.showError("Simulator problem: " + e.toString());
