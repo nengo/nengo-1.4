@@ -44,7 +44,7 @@ public class LocalSimulator implements Simulator {
 	public LocalSimulator() {
 		listeners = new ArrayList<SimulatorListener>(1);
 	}
-	
+
 	/**
 	 * @see ca.neo.sim.Simulator#initialize(ca.neo.model.Network)
 	 */
@@ -228,12 +228,26 @@ public class LocalSimulator implements Simulator {
 	 * @see ca.neo.sim.Simulator#addSimulatorListener(ca.neo.sim.SimulatorListener)
 	 */
 	public void addSimulatorListener(SimulatorListener listener) {
-		listeners.add(listener);
+		if (listeners.contains(listener)) {
+			System.out.println("Trying to add simulator listener that already exists");
+		} else {
+			listeners.add(listener);
+		}
 	}
 
+	/**
+	 * @param event
+	 */
 	protected void fireSimulatorEvent(SimulatorEvent event) {
 		for (SimulatorListener listener : listeners) {
 			listener.processEvent(event);
 		}
+	}
+
+	/**
+	 * @see ca.neo.sim.Simulator#removeSimulatorListener(ca.neo.sim.SimulatorListener)
+	 */
+	public void removeSimulatorListener(SimulatorListener listener) {
+		listeners.remove(listener);
 	}
 }

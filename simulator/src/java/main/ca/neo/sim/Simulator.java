@@ -99,8 +99,13 @@ public interface Simulator {
 	public Probe[] getProbes();
 	
 	/**
-	 * @param listener A Simulator listener
+	 * @param listener A Simulator listener to be added
 	 */
 	public void addSimulatorListener(SimulatorListener listener);
+	
+	/**
+	 * @param listener A Simulator listener to be removed
+	 */
+	public void removeSimulatorListener(SimulatorListener listener);
 	
 }
