@@ -25,7 +25,7 @@ public class NodeLayout implements Serializable {
 	/**
 	 * Node positions referenced by name
 	 */
-	private Hashtable<String, Point2D> nodePositions;
+	private Hashtable<String, PointSerializable> nodePositions;
 
 	/**
 	 * Saved view bounds
@@ -41,7 +41,7 @@ public class NodeLayout implements Serializable {
 	public NodeLayout(String layoutName, NodeViewer nodeViewer) {
 		super();
 		this.layoutName = layoutName;
-		nodePositions = new Hashtable<String, Point2D>();
+		nodePositions = new Hashtable<String, PointSerializable>();
 
 		Enumeration<UINeoNode> en = nodeViewer.getNeoNodes().elements();
 
@@ -58,10 +58,9 @@ public class NodeLayout implements Serializable {
 	 *            Name of node
 	 * @param position
 	 *            Position of node
-	 * @return Position of node
 	 */
-	public Point2D addPosition(String nodeName, Point2D position) {
-		return nodePositions.put(nodeName, position);
+	public void addPosition(String nodeName, Point2D position) {
+		nodePositions.put(nodeName, new PointSerializable(position));
 	}
 
 	/**
@@ -77,7 +76,7 @@ public class NodeLayout implements Serializable {
 	 * @return Position of node
 	 */
 	public Point2D getPosition(String nodeName) {
-		return nodePositions.get(nodeName);
+		return nodePositions.get(nodeName).toPoint2D();
 	}
 
 	/**
@@ -85,6 +84,31 @@ public class NodeLayout implements Serializable {
 	 */
 	public PBounds getSavedViewBounds() {
 		return savedViewBounds;
+	}
+
+}
+
+/**
+ * Wraps point2D in a serializable wrapper
+ * 
+ * @author Shu Wu
+ */
+class PointSerializable implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	double x, y;
+
+	public PointSerializable(Point2D point) {
+		x = point.getX();
+		y = point.getY();
+	}
+
+	public Point2D toPoint2D() {
+		return new Point2D.Double(x, y);
 	}
 
 }
