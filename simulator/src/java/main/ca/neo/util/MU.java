@@ -182,6 +182,24 @@ public class MU {
 	}
 	
 	/**
+	 * @param A Any vector
+	 * @param B Any vector
+	 * @return A*B (matrix with the outer product of A and B)
+	 */
+	public static float[][] outerprod(float[] A, float[] B) {
+		//???assert isVector(A);
+		
+		float[][] result = new float[A.length][B.length];
+		
+		for (int i = 0; i < A.length; i++) {
+			for (int j = 0; j < B.length; j++) {
+				result[i][j] = A[i] * B[j];
+			}
+		}
+		
+		return result;
+	}
+	/**
 	 * @param A Any m x n matrix 
 	 * @param B Any m x n matrix
 	 * @return The element-wise sum of the given matrices
