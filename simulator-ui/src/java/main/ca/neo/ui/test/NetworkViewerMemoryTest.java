@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-import ca.neo.examples.FuzzyLogicExample;
+import ca.neo.examples.IntegratorExample;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.models.nodes.UINetwork;
@@ -51,7 +51,7 @@ public class NetworkViewerMemoryTest {
 					public void run() {
 
 						try {
-							network = new UINetwork(FuzzyLogicExample
+							network = new UINetwork(IntegratorExample
 									.createNetwork());
 
 							network.openViewer();
