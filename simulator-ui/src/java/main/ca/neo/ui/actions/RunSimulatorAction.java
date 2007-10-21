@@ -1,7 +1,5 @@
 package ca.neo.ui.actions;
 
-import java.util.Random;
-
 import javax.swing.SwingUtilities;
 
 import ca.neo.model.SimulationException;
@@ -9,9 +7,9 @@ import ca.neo.sim.Simulator;
 import ca.neo.sim.SimulatorEvent;
 import ca.neo.sim.SimulatorListener;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
-import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.actions.ActionException;
