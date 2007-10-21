@@ -114,8 +114,8 @@ class CouplingMatrixInputPanel extends PropertyInputPanel {
 	 */
 	private MatrixEditor editor;
 
-	public CouplingMatrixInputPanel(PropertyDescriptor property,
-			int fromSize, int toSize) {
+	public CouplingMatrixInputPanel(PropertyDescriptor property, int fromSize,
+			int toSize) {
 		super(property);
 
 		couplingMatrix = new CouplingMatrixImpl(fromSize, toSize);
@@ -126,6 +126,8 @@ class CouplingMatrixInputPanel extends PropertyInputPanel {
 
 	@Override
 	public float[][] getValue() {
+		editor.finishEditing();
+
 		return couplingMatrix.getData();
 	}
 

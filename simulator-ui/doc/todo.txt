@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+DONE (Oct 24) - MatrixEditor is accepts the last change when user clicks ok
 DONE (Sept 30) - Termination is now configured reflectively through ca.neo.util.Configurable interface
 DONE (Sept 30) - Simulation progress is now tracked in the UI
 DONE (Sept 30) - Ability to add decoded origin

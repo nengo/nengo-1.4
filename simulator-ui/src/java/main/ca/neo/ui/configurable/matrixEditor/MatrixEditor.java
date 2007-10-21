@@ -52,6 +52,7 @@ public class MatrixEditor extends JPanel {
 	}
 
 	private final TableModel myTableModel;
+	JTable myTable;
 
 	/**
 	 * Creates an editor for the given coupling matrix.
@@ -59,9 +60,13 @@ public class MatrixEditor extends JPanel {
 	public MatrixEditor(CouplingMatrix theMatrix) {
 		super(new BorderLayout());
 		myTableModel = new MatrixTableModel(theMatrix);
-		JTable table = new JTable(myTableModel);
-		JScrollPane scroll = new JScrollPane(table);
+		myTable = new JTable(myTableModel);
+		JScrollPane scroll = new JScrollPane(myTable);
 		this.add(scroll, BorderLayout.CENTER);
+	}
+
+	public void finishEditing() {
+		myTable.getCellEditor().stopCellEditing();
 	}
 
 	public Object getValueAt(int arg0, int arg1) {
