@@ -16,7 +16,8 @@ DONE - Select multiple things at once
 	
 *******************************************
  Pri 0 - doing next
-******************************************* 
+*******************************************
+do not require defocus on matrix editor
 
 Creating more types of nodes, ensembles.
 

@@ -155,11 +155,12 @@ public class MouseHandler extends PBasicInputEventHandler {
 			}
 
 			if (menuToShow != null) {
-				menuToShow.setVisible(true);
+				
 				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
 
 				menuToShow.show(e.getComponent(), e.getPoint().x,
 						e.getPoint().y);
+				menuToShow.setVisible(true);
 			}
 		}
 
