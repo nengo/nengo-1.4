@@ -161,7 +161,7 @@ public class BiasOrigin extends DecodedOrigin {
 	 * 
 	 * @author Bryan Tripp
 	 */
-	private static class CoefficientsSameSign implements GradientDescentApproximator.Constraints {
+	public static class CoefficientsSameSign implements GradientDescentApproximator.Constraints {
 		
 		private static final long serialVersionUID = 1L;
 		

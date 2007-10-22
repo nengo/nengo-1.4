@@ -120,7 +120,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		}
 		
 		myScalingTermination = null;
-		myStaticBias = new float[transform.length];
+		myStaticBias = new float[transform[0].length];
 	}
 
 	//copies dynamics for to each dimension
