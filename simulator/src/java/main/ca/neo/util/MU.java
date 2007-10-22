@@ -187,7 +187,6 @@ public class MU {
 	 * @return A*B (matrix with the outer product of A and B)
 	 */
 	public static float[][] outerprod(float[] A, float[] B) {
-		//???assert isVector(A);
 		
 		float[][] result = new float[A.length][B.length];
 		
