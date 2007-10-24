@@ -163,6 +163,22 @@ public class MU {
 	}
 	
 	/**
+	 * @param A Any vector
+	 * @param B Any vector the same length as A
+	 * @return A(start:end) The identified subvector from A
+	 */
+	public static float[] prodElementwise(float[] A, float[] B) {
+		assert A.length==B.length;
+		
+		float[] result = new float[A.length];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = A[i]*B[i];
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * @param A Any matrix
 	 * @param a Any scalar
 	 * @return aA (each element of matrix multiplied by scalar)
