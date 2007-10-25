@@ -66,7 +66,8 @@ public class MatrixEditor extends JPanel {
 	}
 
 	public void finishEditing() {
-		myTable.getCellEditor().stopCellEditing();
+		if (myTable.getCellEditor() != null)
+			myTable.getCellEditor().stopCellEditing();
 	}
 
 	public Object getValueAt(int arg0, int arg1) {
