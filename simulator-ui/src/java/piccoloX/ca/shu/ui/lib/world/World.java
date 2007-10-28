@@ -454,6 +454,9 @@ public class World extends WorldObject implements Interactable {
 		return position;
 	}
 
+	public PTransformActivity zoomToBounds(Rectangle2D bounds) {
+		return zoomToBounds(bounds, 1000);
+	}
 	/**
 	 * Animate the sky to look at a portion of the ground at bounds
 	 * 
@@ -462,13 +465,13 @@ public class World extends WorldObject implements Interactable {
 	 * @return Reference to the activity which is animating the zoom and
 	 *         positioning
 	 */
-	public PTransformActivity zoomToBounds(Rectangle2D bounds) {
+	public PTransformActivity zoomToBounds(Rectangle2D bounds, long time) {
 		PBounds biggerBounds = new PBounds(bounds.getX() - OBJECT_ZOOM_PADDING,
 				bounds.getY() - OBJECT_ZOOM_PADDING, bounds.getWidth()
 						+ OBJECT_ZOOM_PADDING * 2, bounds.getHeight()
 						+ OBJECT_ZOOM_PADDING * 2);
 
-		return getSky().animateViewToCenterBounds(biggerBounds, true, 1000);
+		return getSky().animateViewToCenterBounds(biggerBounds, true, time);
 
 	}
 

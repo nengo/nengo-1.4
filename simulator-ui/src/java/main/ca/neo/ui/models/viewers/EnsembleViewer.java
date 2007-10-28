@@ -29,8 +29,10 @@ public class EnsembleViewer extends NodeViewer {
 
 	@Override
 	public void applyDefaultLayout() {
-		applySortLayout(SortMode.BY_NAME);
+		if (getNeoNodes().size() == 0)
+			return;
 
+		applySortLayout(SortMode.BY_NAME);
 	}
 
 	@Override

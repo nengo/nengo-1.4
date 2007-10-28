@@ -2,7 +2,6 @@ package ca.neo.ui.models.nodes;
 
 import java.lang.ref.WeakReference;
 
-
 import ca.neo.model.Node;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.brainView.BrainViewer;
@@ -110,7 +109,10 @@ public abstract class NodeContainer extends UINeoNode {
 
 		if (viewerWindowRef.get() == null
 				|| viewerWindowRef.get().isDestroyed()) {
-			Window viewerWindow = new Window(this, createViewerInstance());
+
+			NodeViewer nodeViewer = createViewerInstance();
+			Window viewerWindow = new Window(this, nodeViewer);
+			nodeViewer.applyDefaultLayout();
 
 			viewerWindowRef = new WeakReference<Window>(viewerWindow);
 
@@ -168,7 +170,7 @@ public abstract class NodeContainer extends UINeoNode {
 	public NodeViewer openViewer() {
 		Window viewerWindow = getViewerWindow();
 		if (viewerWindow.getWindowState() == WindowState.MINIMIZED) {
-			viewerWindow.restoreWindow();
+			viewerWindow.restoreWindow();			
 		}
 		return (NodeViewer) viewerWindow.getWindowContent();
 

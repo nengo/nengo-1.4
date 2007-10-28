@@ -71,6 +71,7 @@ public class Window extends WorldObject implements Interactable {
 		addChild(new Border(this, Style.COLOR_FOREGROUND));
 
 		windowStateChanged();
+		
 	}
 
 	@Override
@@ -179,6 +180,7 @@ public class Window extends WorldObject implements Interactable {
 			setChildrenPickable(true);
 			setPickable(true);
 		}
+		layoutChildren();
 	}
 
 	/**

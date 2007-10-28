@@ -82,9 +82,6 @@ public abstract class NodeViewer extends World implements Interactable,
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
 
 		updateViewFromModel();
-		if (getNeoNodes().size() > 0) {
-			applyDefaultLayout();
-		}
 
 		msg.finished();
 

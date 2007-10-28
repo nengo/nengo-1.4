@@ -195,6 +195,9 @@ public class NetworkViewer extends NodeViewer {
 
 	@Override
 	public void applyDefaultLayout() {
+		if (getNeoNodes().size() == 0)
+			return;
+
 		if (!restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
 			applyJungLayout(KKLayout.class);
 		}
@@ -345,18 +348,45 @@ public class NetworkViewer extends NodeViewer {
 
 		Enumeration<UINeoNode> en = getNeoNodes().elements();
 
+		double startX = Double.MAX_VALUE;
+		double startY = Double.MAX_VALUE;
+		double endX = Double.MIN_VALUE;
+		double endY = Double.MIN_VALUE;
+		boolean foundSavedPosition = false;
+
 		while (en.hasMoreElements()) {
 			UINeoNode node = en.nextElement();
 
 			Point2D savedPosition = layout.getPosition(node.getName());
 			if (savedPosition != null) {
-				node.animateToPositionScaleRotation(savedPosition.getX(),
-						savedPosition.getY(), 1, 0, 700);
+				double x = savedPosition.getX();
+				double y = savedPosition.getY();
+
+				node.animateToPositionScaleRotation(x, y, 1, 0, 700);
+
+				if (x < startX) {
+					startX = x;
+				}
+				if (x + node.getWidth() > endX) {
+					endX = x + node.getWidth();
+				}
+
+				if (y < startY) {
+					startY = y;
+				}
+				if (y + node.getHeight() > endY) {
+					endY = y + node.getHeight();
+				}
+
+				foundSavedPosition = true;
 			}
+
 		}
-		if (layout.getSavedViewBounds() != null) {
-			getSky().animateViewToCenterBounds(layout.getSavedViewBounds(),
-					true, 1000);
+
+		if (foundSavedPosition) {
+			PBounds fullBounds = new PBounds(startX, startY, endX - startX,
+					endY - startY);
+			zoomToBounds(fullBounds, 700);
 		}
 
 		return true;
@@ -689,8 +719,7 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final PropertyDescriptor[] zProperties = { pWidth,
-			pHeight };
+	private static final PropertyDescriptor[] zProperties = { pWidth, pHeight };
 
 	private NetworkViewer parent;
 
