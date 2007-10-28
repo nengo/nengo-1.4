@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
+import ca.neo.math.impl.DefaultFunctionInterpreter;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.ui.configurable.ConfigException;
@@ -16,7 +17,6 @@ import ca.neo.ui.configurable.IConfigurable;
  * Config Descriptor for Functions
  * 
  * @author Shu Wu
- * 
  */
 public class PFunction extends PropertyDescriptor {
 
@@ -26,15 +26,20 @@ public class PFunction extends PropertyDescriptor {
 					new PFloat("Value") });
 
 	private static final ConfigurableFunction fourierFunction = new ConfigurableFunction(
-			FourierFunction.class, "Fourier Function",
+			FourierFunction.class,
+			"Fourier Function",
 			new PropertyDescriptor[] { new PFloat("Fundamental"),
-					new PFloat("Cutoff"), new PFloat("RMS"),
-					new PLong("Seed") });
+					new PFloat("Cutoff"), new PFloat("RMS"), new PLong("Seed") });
 
 	private static final ConfigurableFunction gaussianPDF = new ConfigurableFunction(
 			GaussianPDF.class, "Guassiand PDF", new PropertyDescriptor[] {
 					new PFloat("Mean"), new PFloat("Variance"),
 					new PFloat("Peak") });
+
+	private static final ConfigurableFunction interpreterFunction = new ConfigurableFunction(
+			DefaultFunctionInterpreter.class, "Default Interpreter Function",
+			new PropertyDescriptor[] { new PString("Expression"),
+					new PInt("Dimensions") });
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +47,7 @@ public class PFunction extends PropertyDescriptor {
 	 * A list of configurable function wrappers
 	 */
 	public static final ConfigurableFunction[] functions = new ConfigurableFunction[] {
-			constantFunction, fourierFunction, gaussianPDF };
+			constantFunction, fourierFunction, gaussianPDF, interpreterFunction };
 
 	public PFunction(String name) {
 		super(name);
@@ -70,12 +75,10 @@ public class PFunction extends PropertyDescriptor {
 }
 
 /**
- * 
  * Describes how to configure a function through the IConfigurable interface.
  * Function instances are created through reflection.
  * 
  * @author Shu Wu
- * 
  */
 class ConfigurableFunction implements IConfigurable {
 
@@ -127,9 +130,8 @@ class ConfigurableFunction implements IConfigurable {
 	 * (non-Javadoc)
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
-	 * 
-	 * Creates the function through reflection of its constructor and passing
-	 * the user parameters to it
+	 *      Creates the function through reflection of its constructor and
+	 *      passing the user parameters to it
 	 */
 	@SuppressWarnings("unchecked")
 	public void completeConfiguration(PropertySet props) throws ConfigException {
