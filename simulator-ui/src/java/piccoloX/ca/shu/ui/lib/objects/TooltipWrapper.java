@@ -153,15 +153,15 @@ public class TooltipWrapper extends WorldObject implements
 	 * Fades in, in an animated sequence
 	 */
 	public void fadeIn() {
-		fadeInActivity = new Fader(this, 500, 0.5f);
+		fadeInActivity = new Fader(this, 100, 1f);
 		addActivity(fadeInActivity);
 
-		/*
-		 * fade in more slowly in the second phase.
-		 */
-		fadeInPhase2Activity = new Fader(this, 2000, 1f);
-		fadeInPhase2Activity.startAfter(fadeInActivity);
-		addActivity(fadeInPhase2Activity);
+//		/*
+//		 * fade in more slowly in the second phase.
+//		 */
+//		fadeInPhase2Activity = new Fader(this, 1000, 1f);
+//		fadeInPhase2Activity.startAfter(fadeInActivity);
+//		addActivity(fadeInPhase2Activity);
 
 	}
 

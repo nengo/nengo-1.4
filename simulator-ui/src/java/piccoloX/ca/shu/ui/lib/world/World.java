@@ -165,7 +165,7 @@ public class World extends WorldObject implements Interactable {
 		 */
 		mySkyCamera.addInputEventListener(new SwitchSelectionModeHandler());
 		mySkyCamera.addInputEventListener(new KeyboardFocusHandler());
-		mySkyCamera.addInputEventListener(new TooltipPickHandler(this));
+		mySkyCamera.addInputEventListener(new TooltipPickHandler(this, 1000, 1500));
 		mySkyCamera.addInputEventListener(new MouseHandler(this));
 		mySkyCamera.addInputEventListener(new ScrollZoomHandler());
 

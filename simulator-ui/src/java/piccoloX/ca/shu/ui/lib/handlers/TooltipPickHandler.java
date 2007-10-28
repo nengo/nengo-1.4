@@ -28,10 +28,15 @@ public class TooltipPickHandler extends AbstractPickHandler {
 	private TooltipWrapper keyboardTooltip;
 	private TooltipWrapper mouseOverTooltip;
 
-	SelectionBorder tooltipFrame;
+	private SelectionBorder tooltipFrame;
+	
+	private int myPickDelay, myKeepPickDelay;
+	
 
-	public TooltipPickHandler(World world) {
+	public TooltipPickHandler(World world, int pickDelay, int keepPickDelay) {
 		super(world);
+		myPickDelay = pickDelay;
+		myKeepPickDelay = keepPickDelay;
 		tooltipFrame = new SelectionBorder(world);
 		tooltipFrame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
 
@@ -53,12 +58,12 @@ public class TooltipPickHandler extends AbstractPickHandler {
 
 	@Override
 	protected int getKeepPickDelay() {
-		return 1500;
+		return myKeepPickDelay;
 	}
 
 	@Override
 	protected int getPickDelay() {
-		return 500;
+		return myPickDelay;
 	}
 
 	protected WorldObject getTooltipNode(PInputEvent event) {
