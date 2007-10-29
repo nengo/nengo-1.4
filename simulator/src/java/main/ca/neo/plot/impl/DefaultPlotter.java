@@ -453,7 +453,7 @@ public class DefaultPlotter extends Plotter {
 	}
 	
 	//shows a chart in a new window 
-	private void showChart(JFreeChart chart, String title) {
+	protected void showChart(JFreeChart chart, String title) {
 		JPanel panel = new ChartPanel(chart);
 
 		openingPlot();
