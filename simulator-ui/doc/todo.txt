@@ -18,9 +18,7 @@ DONE - Select multiple things at once
 *******************************************
  Pri 0 - doing next
 *******************************************
-Custom functions, parse them before hand, test them, before commiting to new function object. 
-
-
+Create a instantiated plotter which uses dialogs rather than frames
 
 Creating more types of nodes, ensembles.
 

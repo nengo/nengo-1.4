@@ -1,6 +1,5 @@
 package ca.neo.ui.configurable.descriptors;
 
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -11,9 +10,11 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 
 import ca.neo.math.Function;
+import ca.neo.ui.actions.PlotFunctionAction;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.descriptors.functions.AbstractConfigurableFunction;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.util.UserMessages;
 
@@ -40,7 +41,9 @@ public class FunctionPanel extends PropertyInputPanel {
 	/**
 	 * Type of configuration function wrapper selected
 	 */
-	private ConfigurableFunction selectedType;
+	private AbstractConfigurableFunction selectedType;
+
+	private JButton previewBtn;
 
 	public FunctionPanel(PropertyDescriptor property) {
 		super(property);
@@ -48,10 +51,24 @@ public class FunctionPanel extends PropertyInputPanel {
 	}
 
 	/**
+	 * Previews the function
+	 */
+	protected void previewFunction() {
+
+		if (function != null) {
+			(new PlotFunctionAction("Function preview", "Preview function",
+					function, getDialogParent())).doAction();
+		} else {
+			UserMessages.showWarning("Please set this function first.");
+		}
+	}
+
+	/**
 	 * Sets up the function using the configurable Function wrapper
 	 */
 	protected void setParameters() {
-		selectedType = (ConfigurableFunction) comboBox.getSelectedItem();
+		selectedType = (AbstractConfigurableFunction) comboBox
+				.getSelectedItem();
 
 		if (selectedType == null)
 			return;
@@ -59,14 +76,9 @@ public class FunctionPanel extends PropertyInputPanel {
 		/*
 		 * get the JDialog parent
 		 */
-		Container parent = getParent();
-		while (parent != null) {
-			if (parent instanceof JDialog)
-				break;
-			parent = parent.getParent();
-		}
+		JDialog parent = getDialogParent();
 
-		if (parent != null && parent instanceof JDialog) {
+		if (parent != null ) {
 			/*
 			 * Configure the function
 			 */
@@ -87,13 +99,14 @@ public class FunctionPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public Object getValue() {
+	public Function getValue() {
 		return function;
 	}
 
 	private void initPanel() {
 		comboBox = new JComboBox(PFunction.functions);
-		selectedType = (ConfigurableFunction) comboBox.getSelectedItem();
+		selectedType = (AbstractConfigurableFunction) comboBox
+				.getSelectedItem();
 
 		comboBox.addItemListener(new ItemListener() {
 
@@ -105,10 +118,14 @@ public class FunctionPanel extends PropertyInputPanel {
 			}
 
 		});
-		JButton configureFunction = new JButton(new SetParametersAction());
+		JButton configureBtn = new JButton(new SetParametersAction());
 
 		addToPanel(comboBox);
-		addToPanel(configureFunction);
+		addToPanel(configureBtn);
+
+		previewBtn = new JButton(new PreviewFunctionAction());
+		addToPanel(previewBtn);
+
 	}
 
 	@Override
@@ -127,6 +144,7 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	@Override
 	public void setValue(Object value) {
+
 		if (value != null && value instanceof Function) {
 
 			function = (Function) value;
@@ -140,7 +158,6 @@ public class FunctionPanel extends PropertyInputPanel {
 						.isInstance(function)) {
 					selectedType = PFunction.functions[i];
 					comboBox.setSelectedItem(PFunction.functions[i]);
-
 				}
 			}
 
@@ -153,7 +170,7 @@ public class FunctionPanel extends PropertyInputPanel {
 	}
 
 	/**
-	 * Action triggered by the user to set up the parameters of the function
+	 * Set up the parameters of the function
 	 * 
 	 * @author Shu Wu
 	 */
@@ -162,11 +179,30 @@ public class FunctionPanel extends PropertyInputPanel {
 		private static final long serialVersionUID = 1L;
 
 		public SetParametersAction() {
-			super("Set Parameters");
+			super("Set");
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			setParameters();
+		}
+
+	}
+
+	/**
+	 * Preview the funciton
+	 * 
+	 * @author Shu Wu
+	 */
+	class PreviewFunctionAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public PreviewFunctionAction() {
+			super("Preview");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			previewFunction();
 		}
 
 	}

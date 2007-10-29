@@ -5,10 +5,10 @@ import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
-import ca.neo.ui.actions.PlotFunctionAction;
+import ca.neo.ui.actions.PlotFunctionNodeAction;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.UINeoNode;
@@ -81,7 +81,7 @@ public class UIFunctionInput extends UINeoNode {
 		// MenuBuilder plotMenu = menu.createSubMenu("Plot");
 		menu.addSection("Function");
 
-		menu.addAction(new PlotFunctionAction(getName(), "Plot function",
+		menu.addAction(new PlotFunctionNodeAction(getName(), "Plot function",
 				getModel()));
 		return menu;
 
