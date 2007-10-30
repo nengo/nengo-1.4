@@ -51,6 +51,30 @@ public class MU {
 	}
 	
 	/**
+	 * Unlike System.arraycopy, this function copies the source matrix into the destination
+	 * while preserving the original row length. It copies the full source.
+	 * 
+	 * @param src - source matrix
+	 * @param dest - destination matrix
+	 * @param destRowPos - starting target row
+	 * @param destColPos - starting target column position
+	 * @param length - number of rows to copy
+	 * 
+	 */
+	
+	public static void copyInto(float[][] src, float[][] dest, int destRowPos, int destColPos, int length) {
+		assert destColPos+dest[0].length>src[0].length;
+		
+		for (int i = 0; i < length; i++) {
+			for (int j = 0; j < src[0].length; j++) {
+			dest[i+destRowPos][j+destColPos]=src[i][j];	
+			}
+		}
+		return;
+	}
+	
+	
+	/**
 	 * @param vector Vector to copy from
 	 * @param start Index in vector from which to start copying
 	 * @param interval Interval separating copied entries in source vector (ie skip over interval-1 entries)
