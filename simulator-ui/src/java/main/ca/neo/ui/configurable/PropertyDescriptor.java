@@ -7,13 +7,14 @@ import java.io.Serializable;
  */
 /**
  * @author Shu
- * 
  */
 public abstract class PropertyDescriptor implements Serializable {
 
 	private Object defaultValue = null;
 
 	private String name;
+
+	private boolean isEnabled = true;
 
 	/**
 	 * @param name
@@ -28,7 +29,6 @@ public abstract class PropertyDescriptor implements Serializable {
 	/**
 	 * @param name
 	 *            Name to be given to the parameter
-	 * 
 	 * @param defaultValue
 	 *            Default value of this parameter
 	 */
@@ -40,10 +40,29 @@ public abstract class PropertyDescriptor implements Serializable {
 	}
 
 	/**
+	 * Sets whether this property can be changed from its default value
+	 * 
+	 * @param bool
+	 */
+	public void setEditable(boolean bool) {
+		isEnabled = bool;
+	}
+
+	/**
+	 * Gets the input panel.
+	 */
+	public PropertyInputPanel getInputPanel() {
+		// Instantiate a new input panel for each call, this is ok.
+		PropertyInputPanel inputPanel = createInputPanel();
+		inputPanel.setEnabled(isEnabled);
+		return inputPanel;
+	}
+
+	/**
 	 * @return UI Input panel which can be used for User Configuration of this
 	 *         property, null if none exists
 	 */
-	public abstract PropertyInputPanel createInputPanel();
+	protected abstract PropertyInputPanel createInputPanel();
 
 	/**
 	 * @return Default value of this parameter
@@ -69,7 +88,6 @@ public abstract class PropertyDescriptor implements Serializable {
 	 * @return A name given to the Class type of this parameter's value
 	 */
 	public abstract String getTypeName();
-
 
 	@Override
 	public String toString() {

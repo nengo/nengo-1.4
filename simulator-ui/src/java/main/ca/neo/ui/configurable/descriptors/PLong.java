@@ -15,7 +15,7 @@ public class PLong extends RangedConfigParam {
 	}
 
 	@Override
-	public LongPanel createInputPanel() {
+	protected LongPanel createInputPanel() {
 		return new LongPanel(this);
 	}
 

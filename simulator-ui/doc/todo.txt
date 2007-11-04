@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+DONE (Nov 4) - Function input dimensions are enforced in UI Panels 
 DONE (Oct 24) - MatrixEditor is accepts the last change when user clicks ok
 DONE (Sept 30) - Termination is now configured reflectively through ca.neo.util.Configurable interface
 DONE (Sept 30) - Simulation progress is now tracked in the UI
@@ -18,6 +19,11 @@ DONE - Select multiple things at once
 *******************************************
  Pri 0 - doing next
 *******************************************
+allow creation of multi-dimensional fourier functions
+
+
+create decoded origin in a non-UI thread
+
 Create a instantiated plotter which uses dialogs rather than frames
 
 Creating more types of nodes, ensembles.

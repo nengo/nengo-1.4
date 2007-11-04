@@ -7,7 +7,6 @@ import ca.neo.ui.configurable.PropertyInputPanel;
  * Config Descriptor for Booleans
  * 
  * @author Shu Wu
- * 
  */
 public class PBoolean extends PropertyDescriptor {
 
@@ -22,7 +21,7 @@ public class PBoolean extends PropertyDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	protected PropertyInputPanel createInputPanel() {
 		return new BooleanPanel(this);
 	}
 

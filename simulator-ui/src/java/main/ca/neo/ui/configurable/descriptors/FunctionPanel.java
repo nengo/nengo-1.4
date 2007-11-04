@@ -45,8 +45,13 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	private JButton previewBtn;
 
-	public FunctionPanel(PropertyDescriptor property) {
-		super(property);
+	private AbstractConfigurableFunction[] configurableFunctionsList;
+
+	public FunctionPanel(PropertyDescriptor property,
+			AbstractConfigurableFunction[] functions) {
+		super(property);		
+		this.configurableFunctionsList = functions;
+		
 		initPanel();
 	}
 
@@ -78,7 +83,7 @@ public class FunctionPanel extends PropertyInputPanel {
 		 */
 		JDialog parent = getDialogParent();
 
-		if (parent != null ) {
+		if (parent != null) {
 			/*
 			 * Configure the function
 			 */
@@ -104,7 +109,7 @@ public class FunctionPanel extends PropertyInputPanel {
 	}
 
 	private void initPanel() {
-		comboBox = new JComboBox(PFunction.functions);
+		comboBox = new JComboBox(configurableFunctionsList);
 		selectedType = (AbstractConfigurableFunction) comboBox
 				.getSelectedItem();
 
@@ -152,12 +157,12 @@ public class FunctionPanel extends PropertyInputPanel {
 			/*
 			 * Updates the combo box to reflect the function type set
 			 */
-			for (int i = 0; i < PFunction.functions.length; i++) {
+			for (int i = 0; i < configurableFunctionsList.length; i++) {
 
-				if ((PFunction.functions[i].getFunctionType())
+				if ((configurableFunctionsList[i].getFunctionType())
 						.isInstance(function)) {
-					selectedType = PFunction.functions[i];
-					comboBox.setSelectedItem(PFunction.functions[i]);
+					selectedType = configurableFunctionsList[i];
+					comboBox.setSelectedItem(configurableFunctionsList[i]);
 				}
 			}
 

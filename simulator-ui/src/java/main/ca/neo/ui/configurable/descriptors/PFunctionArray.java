@@ -8,19 +8,21 @@ import ca.neo.ui.configurable.PropertyInputPanel;
  * Config Descriptor for an Array of functions
  * 
  * @author Shu Wu
- * 
  */
 public class PFunctionArray extends PropertyDescriptor {
 
 	private static final long serialVersionUID = 1L;
 
-	public PFunctionArray(String name) {
+	private int inputDimension;
+
+	public PFunctionArray(String name, int inputDimension) {
 		super(name);
+		this.inputDimension = inputDimension;
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
-		return new FunctionArrayPanel(this);
+	protected PropertyInputPanel createInputPanel() {
+		return new FunctionArrayPanel(this, inputDimension);
 	}
 
 	@Override

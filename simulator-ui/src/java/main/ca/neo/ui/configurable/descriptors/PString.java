@@ -22,7 +22,7 @@ public class PString extends PropertyDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	protected PropertyInputPanel createInputPanel() {
 		return new StringPanel(this);
 	}
 

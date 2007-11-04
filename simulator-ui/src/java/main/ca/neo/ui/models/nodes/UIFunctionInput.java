@@ -21,12 +21,11 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  * UI Wrapper of FunctionInput
  * 
  * @author Shu Wu
- * 
  */
 public class UIFunctionInput extends UINeoNode {
 
 	private static PropertyDescriptor pFunctions = new PFunctionArray(
-			"Functions Generators");
+			"Functions Generators", 1);
 
 	private static PropertyDescriptor pName = new PString("Name");
 

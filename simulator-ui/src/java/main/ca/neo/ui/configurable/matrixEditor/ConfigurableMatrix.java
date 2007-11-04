@@ -180,7 +180,7 @@ class CouplingMatrixProp extends PropertyDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	protected PropertyInputPanel createInputPanel() {
 		return new CouplingMatrixInputPanel(this, fromSize, toSize);
 	}
 

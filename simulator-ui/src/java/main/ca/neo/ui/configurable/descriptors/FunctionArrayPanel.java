@@ -11,10 +11,10 @@ import javax.swing.JTextField;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.util.UserMessages;
 
@@ -41,18 +41,20 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 	 * Text field component for entering the dimensions of the function array
 	 */
 	private JTextField tf;
+	private int inputDimension;
 
-	public FunctionArrayPanel(PFunctionArray property) {
+	public FunctionArrayPanel(PFunctionArray property, int inputDimension) {
 		super(property);
 		initPanel();
+		this.inputDimension = inputDimension;
 	}
 
 	/**
 	 * Edits the Function Array using a child dialog
 	 */
 	protected void editFunctionArray() {
-		if (!isDimensionsSet()) {
-			UserMessages.showWarning("Input dimensions not set");
+		if (!isOutputDimensionsSet()) {
+			UserMessages.showWarning("Output dimensions not set");
 			return;
 		}
 
@@ -68,7 +70,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
 		if (parent != null && parent instanceof JDialog) {
 			ConfigurableFunctionArray configurableFunctions = new ConfigurableFunctionArray(
-					getDimensions());
+					getInputDimension(), getOutputDimension());
 
 			UserTemplateConfigurer config = new UserTemplateConfigurer(
 					configurableFunctions, (JDialog) parent);
@@ -92,7 +94,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 		return (PFunctionArray) super.getDescriptor();
 	}
 
-	public int getDimensions() {
+	public int getOutputDimension() {
 
 		Integer integerValue = new Integer(tf.getText());
 		return integerValue.intValue();
@@ -105,7 +107,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 	}
 
 	private void initPanel() {
-		JLabel dimensions = new JLabel("Dimensions: ");
+		JLabel dimensions = new JLabel("Output Dimensions: ");
 		tf = new JTextField(10);
 		addToPanel(dimensions);
 		addToPanel(tf);
@@ -119,7 +121,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 	/**
 	 * @return True if Function Array dimensions has been set
 	 */
-	public boolean isDimensionsSet() {
+	public boolean isOutputDimensionsSet() {
 		String textValue = tf.getText();
 
 		if (textValue == null || textValue.compareTo("") == 0)
@@ -127,7 +129,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
 		try {
 			@SuppressWarnings("unused")
-			Integer value = getDimensions();
+			Integer value = getOutputDimension();
 
 		} catch (NumberFormatException e) {
 			return false;
@@ -139,7 +141,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 	@Override
 	public boolean isValueSet() {
 		if (functionsEdited && functions != null) {
-			if (functions.length == getDimensions())
+			if (functions.length == getOutputDimension())
 				return true;
 
 		} else {
@@ -188,6 +190,10 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 		}
 
 	}
+
+	public int getInputDimension() {
+		return inputDimension;
+	}
 }
 
 /**
@@ -203,7 +209,12 @@ class ConfigurableFunctionArray implements IConfigurable {
 	/**
 	 * Number of functions to be created
 	 */
-	private int dimension;
+	private int outputDimension;
+
+	/**
+	 * Dimensions of the functions to be created
+	 */
+	private int inputDimension;
 
 	/**
 	 * Array of functions to be created
@@ -211,33 +222,24 @@ class ConfigurableFunctionArray implements IConfigurable {
 	private Function[] myFunctions;
 
 	/**
-	 * @param functions
-	 *            Existing function array to be used as starting values
-	 */
-	public ConfigurableFunctionArray(Function[] functions) {
-		super();
-		myFunctions = functions;
-		init(functions.length);
-	}
-
-	/**
-	 * @param dimension
+	 * @param outputDimension
 	 *            Number of functions to create
 	 */
-	public ConfigurableFunctionArray(int dimension) {
+	public ConfigurableFunctionArray(int inputDimension, int outputDimension) {
 		super();
-		init(dimension);
+		init(inputDimension, outputDimension);
 
 	}
 
 	/**
 	 * Initializes this instance
 	 * 
-	 * @param dimension
+	 * @param outputDimension
 	 *            number of functions to create
 	 */
-	private void init(int dimension) {
-		this.dimension = dimension;
+	private void init(int inputDimension, int outputDimension) {
+		this.inputDimension = inputDimension;
+		this.outputDimension = outputDimension;
 	}
 
 	/*
@@ -246,8 +248,8 @@ class ConfigurableFunctionArray implements IConfigurable {
 	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
 	 */
 	public void completeConfiguration(PropertySet properties) {
-		myFunctions = new Function[dimension];
-		for (int i = 0; i < dimension; i++) {
+		myFunctions = new Function[outputDimension];
+		for (int i = 0; i < outputDimension; i++) {
 			myFunctions[i] = (Function) properties.getProperty("Function " + i);
 
 		}
@@ -260,14 +262,11 @@ class ConfigurableFunctionArray implements IConfigurable {
 	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
 	 */
 	public PropertyDescriptor[] getConfigSchema() {
-		PropertyDescriptor[] props = new PropertyDescriptor[dimension];
+		PropertyDescriptor[] props = new PropertyDescriptor[outputDimension];
 
-		for (int i = 0; i < dimension; i++) {
-			Function defaultFunction = null;
-			if (myFunctions != null) {
-				defaultFunction = myFunctions[i];
-			}
-			PFunction function = new PFunction("Function " + i, defaultFunction);
+		for (int i = 0; i < outputDimension; i++) {
+
+			PFunction function = new PFunction("Function " + i, inputDimension);
 
 			props[i] = function;
 		}
@@ -288,6 +287,6 @@ class ConfigurableFunctionArray implements IConfigurable {
 	 * @see ca.neo.ui.configurable.IConfigurable#getTypeName()
 	 */
 	public String getTypeName() {
-		return dimension + "x Functions";
+		return outputDimension + "x Functions";
 	}
 }

@@ -23,7 +23,7 @@ public class PFloat extends PropertyDescriptor {
 	}
 
 	@Override
-	public PropertyInputPanel createInputPanel() {
+	protected PropertyInputPanel createInputPanel() {
 		return new FloatPanel(this);
 	}
 

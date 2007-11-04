@@ -5,6 +5,7 @@ import javax.swing.JComboBox;
 import ca.neo.math.Function;
 import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
+import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
@@ -21,19 +22,23 @@ public class UIDecodedOrigin extends UIOrigin {
 
 	private static final PropertyDescriptor pName = new PString("Name");
 
-	private PropertyDescriptor pNodeOrigin;
-
 	private static final long serialVersionUID = 1L;
+
 	private static final String typeName = "Decoded Origin";
+	private int inputDimensions;
 
 	private PropertyDescriptor pFunctions;
 
+	private PropertyDescriptor pNodeOrigin;
+
 	public UIDecodedOrigin(UINEFEnsemble ensembleProxy) {
 		super(ensembleProxy);
+		this.inputDimensions = ensembleProxy.getModel().getDimension();
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties) {
+	protected Object configureModel(PropertySet configuredProperties)
+			throws ConfigException {
 		Origin origin = null;
 
 		try {
@@ -47,10 +52,14 @@ public class UIDecodedOrigin extends UIOrigin {
 
 			setName(origin.getName());
 		} catch (StructuralException e) {
-			e.printStackTrace();
+			throw new ConfigException(e.getMessage());
 		}
 
 		return origin;
+	}
+
+	protected int getInputDimensions() {
+		return inputDimensions;
 	}
 
 	@Override
@@ -64,7 +73,7 @@ public class UIDecodedOrigin extends UIOrigin {
 
 	@Override
 	public PropertyDescriptor[] getConfigSchema() {
-		pFunctions = new PFunctionArray("Functions");
+		pFunctions = new PFunctionArray("Functions", getInputDimensions());
 
 		Origin[] origins = getNodeParent().getModel().getOrigins();
 		String[] originNames = new String[origins.length];
@@ -157,7 +166,7 @@ class OriginSelector extends PropertyDescriptor {
 	}
 
 	@Override
-	public OriginInputPanel createInputPanel() {
+	protected OriginInputPanel createInputPanel() {
 		return new OriginInputPanel(this, origins);
 	}
 

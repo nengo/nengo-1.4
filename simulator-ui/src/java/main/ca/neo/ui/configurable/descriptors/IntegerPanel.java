@@ -38,6 +38,8 @@ public class IntegerPanel extends PropertyInputPanel {
 		addToPanel(tf);
 
 	}
+	
+	
 
 	@Override
 	public boolean isValueSet() {
@@ -66,7 +68,12 @@ public class IntegerPanel extends PropertyInputPanel {
 	@Override
 	public void setValue(Object value) {
 		tf.setText(value.toString());
+	}
 
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		tf.setEnabled(enabled);
 	}
 
 }

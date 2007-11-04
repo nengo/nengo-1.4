@@ -23,7 +23,7 @@ public class PTerminationWeights extends PropertyDescriptor {
 	}
 
 	@Override
-	public TerminationWeightsInputPanel createInputPanel() {
+	protected TerminationWeightsInputPanel createInputPanel() {
 		return new TerminationWeightsInputPanel(this);
 
 	}

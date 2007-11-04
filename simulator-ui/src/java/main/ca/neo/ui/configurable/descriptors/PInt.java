@@ -23,7 +23,7 @@ public class PInt extends RangedConfigParam {
 	}
 
 	@Override
-	public IntegerPanel createInputPanel() {
+	protected IntegerPanel createInputPanel() {
 		return new IntegerPanel(this);
 	}
 

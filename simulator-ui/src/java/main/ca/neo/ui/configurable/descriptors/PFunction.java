@@ -1,5 +1,7 @@
 package ca.neo.ui.configurable.descriptors;
 
+import java.util.Vector;
+
 import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
@@ -16,43 +18,62 @@ import ca.neo.ui.configurable.descriptors.functions.ReflectiveConfigurableFuncti
  */
 public class PFunction extends PropertyDescriptor {
 
-	private static final ReflectiveConfigurableFunction constantFunction = new ReflectiveConfigurableFunction(
-			ConstantFunction.class, "Constant Function",
-			new PropertyDescriptor[] { new PInt("Dimension"),
-					new PFloat("Value") });
-
-	private static final ReflectiveConfigurableFunction fourierFunction = new ReflectiveConfigurableFunction(
-			FourierFunction.class,
-			"Fourier Function",
-			new PropertyDescriptor[] { new PFloat("Fundamental"),
-					new PFloat("Cutoff"), new PFloat("RMS"), new PLong("Seed") });
-
-	private static final ReflectiveConfigurableFunction gaussianPDF = new ReflectiveConfigurableFunction(
-			GaussianPDF.class, "Guassiand PDF", new PropertyDescriptor[] {
-					new PFloat("Mean"), new PFloat("Variance"),
-					new PFloat("Peak") });
-
-	private static final InterpretorFunction interpreterFunction = new InterpretorFunction();
-
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * A list of configurable function wrappers
-	 */
-	public static final AbstractConfigurableFunction[] functions = new AbstractConfigurableFunction[] {
-			constantFunction, fourierFunction, gaussianPDF, interpreterFunction };
+	private int myInputDimension;
 
-	public PFunction(String name) {
+	public PFunction(String name, int inputDimension) {
 		super(name);
+		myInputDimension = inputDimension;
 	}
 
-	public PFunction(String name, Object defaultValue) {
-		super(name, defaultValue);
+	// public PFunction(String name, Object defaultValue) {
+	// super(name, defaultValue);
+	// }
+
+	private AbstractConfigurableFunction[] createConfigurableFunctions() {
+		Vector<AbstractConfigurableFunction> functions = new Vector<AbstractConfigurableFunction>();
+
+		PInt pInputDimension = new PInt("Input Dimension", myInputDimension);
+		pInputDimension.setEditable(false);
+
+		ReflectiveConfigurableFunction constantFunction = new ReflectiveConfigurableFunction(
+				ConstantFunction.class,
+				"Constant Function",
+				new PropertyDescriptor[] { pInputDimension, new PFloat("Value") });
+		functions.add(constantFunction);
+
+		InterpretorFunction interpreterFunction = new InterpretorFunction(
+				myInputDimension);
+
+		functions.add(interpreterFunction);
+
+		/*
+		 * These functions can only have a input dimension of 1
+		 */
+		if (myInputDimension == 1) {
+			ReflectiveConfigurableFunction fourierFunction = new ReflectiveConfigurableFunction(
+					FourierFunction.class, "Fourier Function",
+					new PropertyDescriptor[] { new PFloat("Fundamental"),
+							new PFloat("Cutoff"), new PFloat("RMS"),
+							new PLong("Seed") });
+
+			ReflectiveConfigurableFunction gaussianPDF = new ReflectiveConfigurableFunction(
+					GaussianPDF.class, "Guassiand PDF",
+					new PropertyDescriptor[] { new PFloat("Mean"),
+							new PFloat("Variance"), new PFloat("Peak") });
+
+			functions.add(fourierFunction);
+			functions.add(gaussianPDF);
+		}
+
+		return functions.toArray(new AbstractConfigurableFunction[0]);
 	}
 
 	@Override
-	public FunctionPanel createInputPanel() {
-		return new FunctionPanel(this);
+	protected FunctionPanel createInputPanel() {
+		AbstractConfigurableFunction[] functions = createConfigurableFunctions();
+		return new FunctionPanel(this, functions);
 	}
 
 	@Override
