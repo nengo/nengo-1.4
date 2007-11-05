@@ -7,7 +7,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
 
-
 /**
  * A standard non-reversable action
  * 
@@ -24,6 +23,12 @@ public abstract class StandardAction implements Serializable {
 	private String description;
 
 	private boolean isEnabled = true;
+
+	/**
+	 * If true, this action will execute inside the Swing Event dispatcher
+	 * Thread.
+	 */
+	protected boolean doActionInSwingThread = true;
 
 	/**
 	 * @param description
@@ -85,10 +90,10 @@ public abstract class StandardAction implements Serializable {
 	/**
 	 * Does the action
 	 */
-	public void doAction() {
+	protected void doActionInternal() {
 
 		try {
-			action();
+			action();			
 			postAction();
 			actionCompleted = true;
 		} catch (ActionException e) {
@@ -97,15 +102,35 @@ public abstract class StandardAction implements Serializable {
 	}
 
 	/**
-	 * Does the action layer, in the Swing event thread
+	 * Does the action layer, starts an appropriate thread
 	 */
-	public void doActionLater() {
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				doAction();
+	public void doAction() {
+		if (doActionInSwingThread) {
+			if (SwingUtilities.isEventDispatchThread()) {
+				doActionInternal();
+			} else {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						doActionInternal();
+					}
+				});
 			}
-		});
+
+		} else {
+			if (SwingUtilities.isEventDispatchThread()) {
+				(new Thread() {
+					public void run() {
+						doActionInternal();
+					}
+				}).start();
+			} else {
+				doActionInternal();
+			}
+		}
+	}
+	
+	protected void doSomething(boolean isUndo) {
+		
 	}
 
 	/**
@@ -153,8 +178,20 @@ public abstract class StandardAction implements Serializable {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			doActionLater();
+			doAction();
 		}
+	}
 
+	protected void setActionCompleted(boolean actionCompleted) {
+		this.actionCompleted = actionCompleted;
+	}
+
+	/**
+	 * @param doActionInSwingThread
+	 *            If true, this action will execute inside the Swing Event
+	 *            dispatcher Thread.
+	 */
+	protected void setThreadType(boolean doActionInSwingThread) {
+		this.doActionInSwingThread = doActionInSwingThread;
 	}
 }

@@ -11,12 +11,13 @@ import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.nodes.NodeContainer;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
-import ca.neo.ui.models.nodes.NodeContainer;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.AppFrame;
 
@@ -68,6 +69,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	public NeoGraphics(String title) {
 		super(title + " - NEO Workspace");
 
+		UIEnvironment.setDebugEnabled(true);
 		/*
 		 * Set up Environment variables
 		 */

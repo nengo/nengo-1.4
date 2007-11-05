@@ -21,9 +21,6 @@ DONE - Select multiple things at once
 *******************************************
 allow creation of multi-dimensional fourier functions
 
-
-create decoded origin in a non-UI thread
-
 Create a instantiated plotter which uses dialogs rather than frames
 
 Creating more types of nodes, ensembles.

@@ -22,8 +22,6 @@ public class Util {
 
 	private static final String ZEROES = "000000000000";
 
-	static final boolean DEBUG_MSG_ENABLED = false;
-
 	private static void arrayToStringRecursive(StringBuffer sb, Object array) {
 		sb.append("[");
 		if (array == null) {
@@ -72,8 +70,11 @@ public class Util {
 	}
 
 	public static void Assert(boolean bool, String msg) {
-		if (!bool)
-			(new Exception(msg)).printStackTrace();
+		if (!bool) {
+			String assertMsg = "ASSERT == FALSE: " + msg;
+			(new Exception(assertMsg)).printStackTrace();
+			UserMessages.showWarning(assertMsg);
+		}
 
 	}
 
@@ -92,7 +93,7 @@ public class Util {
 	}
 
 	public static void debugMsg(String msg) {
-		if (DEBUG_MSG_ENABLED) {
+		if (UIEnvironment.isDebugEnabled()) {
 			System.out.println("DebugMSG: " + msg);
 		}
 

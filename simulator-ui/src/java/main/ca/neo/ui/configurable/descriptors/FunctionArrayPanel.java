@@ -17,6 +17,7 @@ import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * Input panel for entering an Array of Functions
@@ -30,12 +31,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 	/**
 	 * Function array
 	 */
-	private Function[] functions;
-
-	/**
-	 * Whether function array has been user edited
-	 */
-	private boolean functionsEdited = false;
+	private Function[] myFunctions;
 
 	/**
 	 * Text field component for entering the dimensions of the function array
@@ -81,7 +77,6 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 			}
 
 			setValue(configurableFunctions.getFunctions());
-			functionsEdited = true;
 
 		} else {
 			UserMessages.showError("Could not attach properties dialog");
@@ -103,7 +98,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
 	@Override
 	public Function[] getValue() {
-		return functions;
+		return myFunctions;
 	}
 
 	private void initPanel() {
@@ -140,10 +135,8 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
 	@Override
 	public boolean isValueSet() {
-		if (functionsEdited && functions != null) {
-			if (functions.length == getOutputDimension())
-				return true;
-
+		if (myFunctions != null && (myFunctions.length == getOutputDimension())) {
+			return true;
 		} else {
 			setStatusMsg("Functions not set");
 		}
@@ -162,9 +155,22 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
 	@Override
 	public void setValue(Object value) {
+		Function[] functions = (Function[]) value;
+
+		/*
+		 * Check that the functions are of the correct dimension before
+		 * committing
+		 */
+		for (int i = 0; i < functions.length; i++) {
+			if (functions[i].getDimension() != getInputDimension()) {
+				Util.debugMsg("Function values do not match, discarded");
+				return;
+			}
+		}
+
 		if (value != null) {
-			functions = (Function[]) value;
-			setDimensions(functions.length);
+			myFunctions = functions;
+			setDimensions(myFunctions.length);
 			setStatusMsg("");
 		} else {
 

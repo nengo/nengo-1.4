@@ -125,7 +125,7 @@ public class ReversableActionManager {
 
 		undoStepCount--;
 
-		action.doActionLater();
+		action.doAction();
 		updateParent();
 	}
 

@@ -76,44 +76,38 @@ public class CreateModelAction extends ReversableAction {
 		super("Create new " + nodeUIType.getSimpleName(), actionName);
 		this.container = nodeContainer;
 		this.nodeType = nodeUIType;
+		setThreadType(false);
 	}
 
 	@Override
 	protected void action() throws ActionException {
+		try {
+			UINeoNode nodeProxy = (UINeoNode) nodeType.newInstance();
+			UserTemplateConfigurer config = new UserTemplateConfigurer(
+					nodeProxy);
+			try {
+				config.configureAndWait();
+				nodeCreated = nodeProxy;
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						container.addNeoNode(nodeCreated);
 
-		(new Thread() {
-			@Override
-			public void run() {
-
-				try {
-					UINeoNode nodeProxy = (UINeoNode) nodeType.newInstance();
-					UserTemplateConfigurer config = new UserTemplateConfigurer(
-							nodeProxy);
-					try {
-						config.configureAndWait();
-						nodeCreated = nodeProxy;
-						SwingUtilities.invokeAndWait(new Runnable() {
-							public void run() {
-								container.addNeoNode(nodeCreated);
-
-							}
-						});
-					} catch (ConfigException e) {
-
-						e.defaultHandleBehavior();
-						nodeProxy.destroy();
 					}
+				});
+			} catch (ConfigException e) {
 
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				e.defaultHandleBehavior();
+				nodeProxy.destroy();
 			}
-		}).start();
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	protected void undo() throws ActionException {
+
 		if (nodeCreated != null) {
 			nodeCreated.destroy();
 		}

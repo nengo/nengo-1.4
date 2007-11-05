@@ -9,8 +9,8 @@ import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
@@ -43,16 +43,15 @@ public class UINEFEnsemble extends UIEnsemble {
 	static final PropertyDescriptor pNumOfNeurons = new PInt(
 			"Number of Neurons");
 
-	static final PropertyDescriptor pStorageName = new PString(
-			"Storage Name");
+	static final PropertyDescriptor pStorageName = new PString("Storage Name");
 
 	static final String typeName = "NEFEnsemble";
 
 	/**
 	 * Config descriptors
 	 */
-	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons,
-			pDim, pStorageName };
+	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons, pDim,
+			pStorageName };
 
 	public UINEFEnsemble() {
 		super();
@@ -156,7 +155,6 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		return null;
 	}
-	
 
 	public UIOrigin createDecodedOrigin() {
 		UIDecodedOrigin originUI = new UIDecodedOrigin(this);
@@ -199,7 +197,7 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		private static final long serialVersionUID = 1L;
 
-		UITermination addedTermination;
+		private UITermination addedTermination;
 
 		public AddDecodedTerminationAction() {
 			super("Add decoded termination");
@@ -221,6 +219,7 @@ public class UINEFEnsemble extends UIEnsemble {
 		}
 
 	}
+
 	/**
 	 * Action for adding a decoded termination
 	 * 
@@ -230,19 +229,22 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		private static final long serialVersionUID = 1L;
 
-		UIOrigin addedOrigin;
+		private UIOrigin addedOrigin;
 
 		public AddDecodedOriginAction() {
 			super("Add decoded origin");
+			setThreadType(false);
 		}
 
 		@Override
 		protected void action() throws ActionException {
 			UIOrigin origin = createDecodedOrigin();
+
 			if (origin == null)
 				throw new UserCancelledException();
 			else
 				addedOrigin = origin;
+
 		}
 
 		@Override

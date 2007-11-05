@@ -2,6 +2,8 @@ package ca.neo.ui.configurable;
 
 import java.io.Serializable;
 
+import ca.shu.ui.lib.util.Util;
+
 /**
  * Describes a configuration parameter of a IConfigurable object
  */
@@ -53,8 +55,16 @@ public abstract class PropertyDescriptor implements Serializable {
 	 */
 	public PropertyInputPanel getInputPanel() {
 		// Instantiate a new input panel for each call, this is ok.
+		Util.Assert(!(!isEnabled && (getDefaultValue() == null)),
+				"An input panel cannot be disabled and have no default value");
+
 		PropertyInputPanel inputPanel = createInputPanel();
+
+		if (getDefaultValue() != null) {
+			inputPanel.setValue(getDefaultValue());
+		}
 		inputPanel.setEnabled(isEnabled);
+
 		return inputPanel;
 	}
 

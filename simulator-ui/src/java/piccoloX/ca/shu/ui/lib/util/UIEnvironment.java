@@ -12,6 +12,16 @@ public class UIEnvironment {
 
 	private static AppFrame uiInstance;
 
+	static boolean debugEnabled = false;
+
+	public static boolean isDebugEnabled() {
+		return debugEnabled;
+	}
+
+	public static void setDebugEnabled(boolean debugEnabled) {
+		UIEnvironment.debugEnabled = debugEnabled;
+	}
+
 	/**
 	 * @return UI Instance
 	 */

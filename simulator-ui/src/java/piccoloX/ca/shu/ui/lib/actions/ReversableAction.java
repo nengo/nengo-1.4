@@ -43,8 +43,12 @@ public abstract class ReversableAction extends StandardAction {
 		 * Only add the action once to the Action manager
 		 */
 		if (!isActionCompleted() && isReversable()) {
-			UIEnvironment.getInstance().getActionManager().addReversableAction(
-					this);
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					UIEnvironment.getInstance().getActionManager()
+							.addReversableAction(ReversableAction.this);
+				}
+			});
 		}
 	}
 
@@ -56,6 +60,17 @@ public abstract class ReversableAction extends StandardAction {
 	protected abstract void undo() throws ActionException;
 
 	/**
+	 * Handles exceptions from undo
+	 */
+	private void undoInternal() {
+		try {
+			undo();
+		} catch (ActionException e) {
+			e.defaultHandleBehavior();
+		}
+	}
+
+	/**
 	 * Undo the action
 	 */
 	public void undoAction() {
@@ -65,15 +80,28 @@ public abstract class ReversableAction extends StandardAction {
 			return;
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					undo();
-				} catch (ActionException e) {
-					e.defaultHandleBehavior();
-				}
+		if (doActionInSwingThread) {
+			if (SwingUtilities.isEventDispatchThread()) {
+				undoInternal();
+			} else {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						undoInternal();
+					}
+				});
 			}
-		});
+
+		} else {
+			if (SwingUtilities.isEventDispatchThread()) {
+				(new Thread() {
+					public void run() {
+						undoInternal();
+					}
+				}).start();
+			} else {
+				undoInternal();
+			}
+		}
 	}
 
 }
