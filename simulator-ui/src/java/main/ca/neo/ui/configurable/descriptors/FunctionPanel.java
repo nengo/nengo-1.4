@@ -11,11 +11,9 @@ import javax.swing.JDialog;
 
 import ca.neo.math.Function;
 import ca.neo.ui.actions.PlotFunctionAction;
-import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.descriptors.functions.AbstractConfigurableFunction;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -49,9 +47,9 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	public FunctionPanel(PropertyDescriptor property,
 			AbstractConfigurableFunction[] functions) {
-		super(property);		
+		super(property);
 		this.configurableFunctionsList = functions;
-		
+
 		initPanel();
 	}
 
@@ -61,8 +59,8 @@ public class FunctionPanel extends PropertyInputPanel {
 	protected void previewFunction() {
 
 		if (function != null) {
-			(new PlotFunctionAction("Function preview", "Preview function",
-					function, getDialogParent())).doAction();
+			(new PlotFunctionAction("Function preview", function,
+					getDialogParent())).doAction();
 		} else {
 			UserMessages.showWarning("Please set this function first.");
 		}
@@ -88,13 +86,7 @@ public class FunctionPanel extends PropertyInputPanel {
 			 * Configure the function
 			 */
 			selectedType.setFunction(null);
-			UserTemplateConfigurer config = new UserTemplateConfigurer(
-					selectedType, (JDialog) parent);
-			try {
-				config.configureAndWait();
-			} catch (ConfigException e) {
-				e.defaultHandleBehavior();
-			}
+			selectedType.configure(parent);
 
 		} else {
 			UserMessages.showError("Could not attach properties dialog");

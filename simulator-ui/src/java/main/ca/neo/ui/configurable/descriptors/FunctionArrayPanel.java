@@ -69,14 +69,13 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 					getInputDimension(), getOutputDimension());
 
 			UserTemplateConfigurer config = new UserTemplateConfigurer(
-					configurableFunctions, (JDialog) parent);
+					configurableFunctions, (JDialog) parent, false);
 			try {
 				config.configureAndWait();
+				setValue(configurableFunctions.getFunctions());
 			} catch (ConfigException e) {
 				e.defaultHandleBehavior();
 			}
-
-			setValue(configurableFunctions.getFunctions());
 
 		} else {
 			UserMessages.showError("Could not attach properties dialog");
@@ -295,4 +294,5 @@ class ConfigurableFunctionArray implements IConfigurable {
 	public String getTypeName() {
 		return outputDimension + "x Functions";
 	}
+
 }

@@ -3,10 +3,14 @@ package ca.neo.ui.configurable.descriptors.functions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.JDialog;
+
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 
 /**
  * Function instances are created through reflection.
@@ -14,11 +18,14 @@ import ca.neo.ui.configurable.PropertySet;
  * @author Shu Wu
  */
 public class ReflectiveConfigurableFunction extends
-		AbstractConfigurableFunction {
+		AbstractConfigurableFunction implements IConfigurable {
+	private PropertyDescriptor[] myProperties;
 
 	public ReflectiveConfigurableFunction(Class<?> functionClass,
 			String typeName, PropertyDescriptor[] propStruct) {
-		super(functionClass, typeName, propStruct);
+		super(functionClass, typeName);
+
+		this.myProperties = propStruct;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -67,6 +74,22 @@ public class ReflectiveConfigurableFunction extends
 			throw new ConfigException(
 					"Could not configure function, no suitable constructor found");
 		}
+	}
+
+	public PropertyDescriptor[] getConfigSchema() {
+		return myProperties;
+	}
+
+	@Override
+	public void configure(JDialog parent) {
+		UserTemplateConfigurer config = new UserTemplateConfigurer(this,
+				parent, false);
+		try {
+			config.configureAndWait();
+		} catch (ConfigException e) {
+			e.defaultHandleBehavior();
+		}
+
 	}
 
 }

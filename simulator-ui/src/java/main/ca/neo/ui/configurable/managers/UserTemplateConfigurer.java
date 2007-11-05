@@ -1,233 +1,117 @@
 package ca.neo.ui.configurable.managers;
 
+import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Iterator;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.EtchedBorder;
-
-import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.util.UserMessages;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertySet;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * A lot like UserConfigurer, except it allows the user to use templates to save
  * and re-use values
  * 
  * @author Shu Wu
- * 
  */
 public class UserTemplateConfigurer extends UserConfigurer {
-
 	/**
 	 * Name of the default template
 	 */
 	public static final String DEFAULT_TEMPLATE_NAME = "last_used";
 
+	public static Object configure(PropertyDescriptor prop, String typeName,
+			Container parent) throws ConfigException {
+
+		PropertySet properties = configure(new PropertyDescriptor[] { prop },
+				typeName, parent);
+		return properties.getProperty(prop);
+	}
+
+	public static PropertySet configure(PropertyDescriptor[] props,
+			String typeName, Container parent) throws ConfigException {
+
+		Configureable configurable = new Configureable(props, typeName);
+
+		UserTemplateConfigurer configurer = new UserTemplateConfigurer(
+				configurable, parent, false);
+
+		configurer.configureAndWait();
+
+		return configurable.getProperties();
+	}
+
+	private boolean isTemplateEditable;
 	public UserTemplateConfigurer(IConfigurable configurable) {
 		super(configurable);
 	}
 
-	public UserTemplateConfigurer(IConfigurable configurable, Frame parent) {
+	public UserTemplateConfigurer(IConfigurable configurable, Container parent) {
 		super(configurable, parent);
+		init(true);
 	}
 
-	public UserTemplateConfigurer(IConfigurable configurable, JDialog parent) {
+	public UserTemplateConfigurer(IConfigurable configurable, Container parent,
+			boolean isTemplateEditable) {
 		super(configurable, parent);
+		init(isTemplateEditable);
+	}
+
+	private void init(boolean isTemplateEditable) {
+		this.isTemplateEditable = isTemplateEditable;
 	}
 
 	@Override
-	protected ConfigTemplateDialog createConfigDialog() {
-		if (frameParent != null) {
-			return new ConfigTemplateDialog(this, frameParent);
+	protected ConfigDialog createConfigDialog() {
+		if (parent instanceof Frame) {
+
+			return new ConfigTemplateDialog(this, (Frame) parent,
+					isTemplateEditable);
+		} else if (parent instanceof Dialog) {
+			return new ConfigTemplateDialog(this, (Dialog) parent,
+					isTemplateEditable);
 		} else {
-			return new ConfigTemplateDialog(this, dialogParent);
+			Util
+					.Assert(false,
+							"Could not create config dialog because parent type if not supported");
+
 		}
-	}
-}
+		return null;
 
-/**
- * A Configuration dialog which allows the user to manage templates
- * 
- * @author Shu
- * 
- */
-class ConfigTemplateDialog extends ConfigDialog {
-
-	private static final long serialVersionUID = 5650002324576913316L;
-
-	private JComboBox fileList;
-
-	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
-			Frame owner) {
-		super(configManager, owner);
 	}
 
-	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
-			JDialog owner) {
-		super(configManager, owner);
-	}
+	private static class Configureable implements IConfigurable {
 
-	@Override
-	protected void createDialog() {
-		super.createDialog();
-		updateDialog();
-	}
+		private PropertySet properties;
 
-	@Override
-	protected void initPanel() {
-		/*
-		 * Add existing templates
-		 */
-		String[] files = parent.getPropertyFiles();
+		private PropertyDescriptor[] props;
+		private String typeName;
 
-		fileList = new JComboBox(files);
-
-		JPanel savedFilesPanel = new Panel();
-
-		JPanel dropDownPanel = new Panel();
-
-		/*
-		 * Selects the default template
-		 */
-		boolean defaultFound = false;
-		for (int i = 0; i < files.length; i++) {
-			if (files[i]
-					.compareTo(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME) == 0) {
-				defaultFound = true;
-				fileList.setSelectedIndex(i);
-
-				parent
-						.loadPropertiesFromFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
-			}
-		}
-		if (!defaultFound && fileList.getSelectedItem() != null) {
-			parent
-					.loadPropertiesFromFile(fileList.getSelectedItem()
-							.toString());
+		public Configureable(PropertyDescriptor[] props, String typeName) {
+			super();
+			this.props = props;
+			this.typeName = typeName;
 		}
 
-		fileList.addActionListener(new ActionListener() {
+		public void completeConfiguration(PropertySet props)
+				throws ConfigException {
+			properties = props;
 
-			public void actionPerformed(ActionEvent e) {
-
-				updateDialog();
-
-			}
-
-		});
-		savedFilesPanel.add(new JLabel("Templates"));
-		dropDownPanel.add(fileList);
-		dropDownPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		savedFilesPanel.add(dropDownPanel);
-
-		JPanel buttonsPanel = new Panel();
-		buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
-		buttonsPanel.add(Box.createHorizontalGlue());
-		buttonsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 5));
-
-		JButton button;
-		button = new JButton("New");
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (applyProperties()) {
-					String name = JOptionPane.showInputDialog("Name:");
-
-					if (name != null && name.compareTo("") != 0) {
-						parent.savePropertiesFile(name);
-						fileList.addItem(name);
-						fileList.setSelectedIndex(fileList.getItemCount() - 1);
-					}
-				} else {
-					UserMessages.showWarning("Properties not complete");
-				}
-			}
-		});
-		button.setFont(Style.FONT_SMALL);
-		buttonsPanel.add(button);
-
-		button = new JButton("Remove");
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String selectedFile = (String) fileList.getSelectedItem();
-
-				fileList.removeItem(selectedFile);
-
-				parent.deletePropertiesFile(selectedFile);
-
-				updateDialog();
-			}
-		});
-		button.setFont(Style.FONT_SMALL);
-		buttonsPanel.add(button);
-
-		savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10,
-				10));
-
-		savedFilesPanel.add(buttonsPanel);
-
-		JPanel wrapperPanel = new Panel();
-		wrapperPanel.setBorder(BorderFactory
-				.createEtchedBorder(EtchedBorder.LOWERED));
-		wrapperPanel.add(savedFilesPanel);
-
-		JPanel seperator = new Panel();
-		seperator.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-
-		panel.add(wrapperPanel);
-		panel.add(seperator);
-	}
-
-	/**
-	 * Loads the properties associated with the item selected in the file drop
-	 * down list
-	 */
-	protected void updateDialog() {
-
-		if (fileList.getSelectedItem() != null) {
-			parent.loadPropertiesFromFile((String) fileList.getSelectedItem());
-			Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
-			while (it.hasNext()) {
-				PropertyInputPanel panel = it.next();
-
-				Object currentValue = parent.getProperty(panel.getName());
-				if (currentValue != null && panel.isEnabled()) {
-					panel.setValue(currentValue);
-				}
-
-			}
 		}
+
+		public PropertyDescriptor[] getConfigSchema() {
+			return props;
+		}
+
+		public PropertySet getProperties() {
+			return properties;
+		}
+
+		public String getTypeName() {
+			return typeName;
+		}
+
 	}
-
-}
-
-/**
- * A JPanel which has some commonly used settings
- * 
- * @author Shu
- * 
- */
-class Panel extends JPanel {
-
-	private static final long serialVersionUID = 1L;
-
-	public Panel() {
-		super();
-
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		setAlignmentY(TOP_ALIGNMENT);
-		setAlignmentX(LEFT_ALIGNMENT);
-	}
-
 }

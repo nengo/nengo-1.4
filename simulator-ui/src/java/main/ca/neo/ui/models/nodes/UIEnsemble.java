@@ -194,7 +194,6 @@ public class UIEnsemble extends NodeContainer {
 
 		public StopCollectSpikes() {
 			super("Stop Collecting Spikes");
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override

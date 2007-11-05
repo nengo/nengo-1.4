@@ -85,7 +85,6 @@ public class UINEFEnsemble extends UIEnsemble {
 
 			return ensemble;
 		} catch (StructuralException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

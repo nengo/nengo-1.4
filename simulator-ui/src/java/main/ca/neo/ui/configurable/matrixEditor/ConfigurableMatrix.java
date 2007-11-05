@@ -1,9 +1,9 @@
 package ca.neo.ui.configurable.matrixEditor;
 
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.PropertySet;
 
 /**
  * Configurable transformation matrix

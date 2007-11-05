@@ -1,9 +1,9 @@
 package ca.neo.ui.configurable.descriptors.functions;
 
+import javax.swing.JDialog;
+
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 
 /**
@@ -14,7 +14,7 @@ import ca.neo.ui.configurable.PropertySet;
 /**
  * @author User
  */
-public abstract class AbstractConfigurableFunction implements IConfigurable {
+public abstract class AbstractConfigurableFunction  {
 
 	/**
 	 * Function to be created
@@ -23,11 +23,6 @@ public abstract class AbstractConfigurableFunction implements IConfigurable {
 
 	@SuppressWarnings("unchecked")
 	private Class functionClass;
-
-	/**
-	 * A list of parameters required to create this function
-	 */
-	private PropertyDescriptor[] propStruct;
 
 	/**
 	 * What the type of function to be created is called
@@ -44,20 +39,12 @@ public abstract class AbstractConfigurableFunction implements IConfigurable {
 	 *            required to create the function
 	 */
 	public AbstractConfigurableFunction(Class<?> functionClass,
-			String typeName, PropertyDescriptor[] propStruct) {
+			String typeName) {
 		super();
 
 		this.functionClass = functionClass;
-		this.propStruct = propStruct;
-		this.typeName = typeName;
-	}
 
-	/**
-	 * @param function
-	 *            function
-	 */
-	public void setFunction(Function function) {
-		this.function = function;
+		this.typeName = typeName;
 	}
 
 	protected abstract Function createFunction(PropertySet props)
@@ -77,15 +64,8 @@ public abstract class AbstractConfigurableFunction implements IConfigurable {
 		setFunction(function);
 
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
-	 */
-	public PropertyDescriptor[] getConfigSchema() {
-		return propStruct;
-	}
+	
+	public abstract void configure(JDialog parent);
 
 	/**
 	 * @return The function created
@@ -109,6 +89,14 @@ public abstract class AbstractConfigurableFunction implements IConfigurable {
 	 */
 	public String getTypeName() {
 		return typeName;
+	}
+
+	/**
+	 * @param function
+	 *            function
+	 */
+	public void setFunction(Function function) {
+		this.function = function;
 	}
 
 	@Override

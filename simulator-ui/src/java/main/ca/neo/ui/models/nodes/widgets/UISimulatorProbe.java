@@ -195,7 +195,6 @@ public class UISimulatorProbe extends UIModel {
 
 		public ExportToMatlabAction() {
 			super("Matlab");
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override

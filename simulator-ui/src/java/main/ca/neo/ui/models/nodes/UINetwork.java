@@ -114,7 +114,6 @@ public class UINetwork extends NodeContainer {
 
 	@Override
 	public String getTypeName() {
-		// TODO Auto-generated method stub
 		return typeName;
 	}
 

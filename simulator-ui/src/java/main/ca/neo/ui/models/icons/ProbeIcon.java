@@ -37,10 +37,6 @@ class IconNode extends PPath {
 
 	public IconNode() {
 		super();
-		// TODO Auto-generated constructor stub
-		// setFont(Style.createFont(30, true));
-
-		// PPath result = new PPath();
 
 		float x = 0;
 		float y = 0;
@@ -56,9 +52,7 @@ class IconNode extends PPath {
 
 		lineTo(x, y);
 		closePath();
-		// result.moveTo(x1, y1);
 
-		// result.lineTo(x2, y2);
 		setPaint(Style.COLOR_LIGHT_PURPLE);
 
 	}

@@ -201,7 +201,6 @@ public class UIOrigin extends Widget {
 
 	@Override
 	public String getTypeName() {
-		// TODO Auto-generated method stub
 		return typeName;
 	}
 

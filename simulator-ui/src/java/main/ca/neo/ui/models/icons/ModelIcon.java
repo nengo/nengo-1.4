@@ -10,7 +10,7 @@ import edu.umd.cs.piccolo.PNode;
 
 /**
  * An Icon which has a representation and an label. It is used to represent NEO
- * models. TODO: Adaptively render the label, show more details when zoomed in
+ * models. 
  * 
  * @author Shu Wu
  */

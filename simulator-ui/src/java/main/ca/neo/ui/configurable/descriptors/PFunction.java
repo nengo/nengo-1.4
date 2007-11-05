@@ -21,10 +21,18 @@ public class PFunction extends PropertyDescriptor {
 	private static final long serialVersionUID = 1L;
 
 	private int myInputDimension;
+	
+	private boolean isInputDimensionEditable;
 
 	public PFunction(String name, int inputDimension) {
+		this(name, inputDimension, false);
+	}
+
+	public PFunction(String name, int inputDimension,
+			boolean isInputDimensionEditable) {
 		super(name);
-		myInputDimension = inputDimension;
+		this.myInputDimension = inputDimension;
+		this.isInputDimensionEditable = isInputDimensionEditable;
 	}
 
 	// public PFunction(String name, Object defaultValue) {
@@ -35,7 +43,7 @@ public class PFunction extends PropertyDescriptor {
 		Vector<AbstractConfigurableFunction> functions = new Vector<AbstractConfigurableFunction>();
 
 		PInt pInputDimension = new PInt("Input Dimension", myInputDimension);
-		pInputDimension.setEditable(false);
+		pInputDimension.setEditable(isInputDimensionEditable);
 
 		ReflectiveConfigurableFunction constantFunction = new ReflectiveConfigurableFunction(
 				ConstantFunction.class,
@@ -44,8 +52,9 @@ public class PFunction extends PropertyDescriptor {
 		functions.add(constantFunction);
 
 		InterpretorFunction interpreterFunction = new InterpretorFunction(
-				myInputDimension);
+				myInputDimension, false);
 
+		
 		functions.add(interpreterFunction);
 
 		/*
@@ -59,7 +68,7 @@ public class PFunction extends PropertyDescriptor {
 							new PLong("Seed") });
 
 			ReflectiveConfigurableFunction gaussianPDF = new ReflectiveConfigurableFunction(
-					GaussianPDF.class, "Guassiand PDF",
+					GaussianPDF.class, "Guassian PDF",
 					new PropertyDescriptor[] { new PFloat("Mean"),
 							new PFloat("Variance"), new PFloat("Peak") });
 

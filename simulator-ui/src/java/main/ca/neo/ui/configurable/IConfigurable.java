@@ -4,19 +4,16 @@ package ca.neo.ui.configurable;
  * Describes a object which can be configured by a IConfigurationManager
  * 
  * @author Shu Wu
- * 
  */
 public interface IConfigurable {
 
 	/**
 	 * Called when configuration parameters have been set
 	 * 
-	 * @param configParameters
-	 *            A set of configured parameters to be used to complete
-	 *            configuration
+	 * @param props
+	 *            A set of properties
 	 */
-	public void completeConfiguration(PropertySet configParameters)
-			throws ConfigException;
+	public void completeConfiguration(PropertySet props) throws ConfigException;
 
 	/**
 	 * @return An array of objects which describe what needs to be configured in
