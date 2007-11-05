@@ -27,6 +27,7 @@ import ca.neo.ui.configurable.descriptors.PFunction;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.configurable.managers.ConfigDialog;
+import ca.neo.ui.configurable.managers.ConfigTemplateDialog;
 import ca.neo.ui.configurable.managers.UserConfigurer;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.Style.Style;
@@ -91,13 +92,13 @@ public class InterpretorFunction extends AbstractConfigurableFunction implements
  * 
  * @author Shu Wu
  */
-class InterpreterFunctionConfigurer extends UserConfigurer {
+class InterpreterFunctionConfigurer extends UserTemplateConfigurer {
 	FunctionInterpreter interpreter;
 	Dialog parent;
 
 	public InterpreterFunctionConfigurer(IConfigurable configurable,
 			Dialog parent, FunctionInterpreter interpreter) {
-		super(configurable, parent);
+		super(configurable, parent, false);
 		this.interpreter = interpreter;
 		this.parent = parent;
 	}
@@ -113,14 +114,14 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 	 * 
 	 * @author Shu Wu
 	 */
-	class FunctionDialog extends ConfigDialog {
+	class FunctionDialog extends ConfigTemplateDialog {
 
 		private static final long serialVersionUID = 1L;
 
 		private JComboBox registeredFunctionsList;
 
-		public FunctionDialog(UserConfigurer configManager, Dialog owner) {
-			super(configManager, owner);
+		public FunctionDialog(UserTemplateConfigurer configManager, Dialog owner) {
+			super(configManager, owner, false);
 
 		}
 

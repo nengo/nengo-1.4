@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+DONE (Nov 5) - Interperter work
 DONE (Nov 4) - Function input dimensions are enforced in UI Panels 
 DONE (Oct 24) - MatrixEditor is accepts the last change when user clicks ok
 DONE (Sept 30) - Termination is now configured reflectively through ca.neo.util.Configurable interface
@@ -19,6 +20,9 @@ DONE - Select multiple things at once
 *******************************************
  Pri 0 - doing next
 *******************************************
+Handle on user-end, when a chosen template does not fit in configurable. 
+ie. when PFunctionArray's input dimensions are incompatible with given functions.
+
 change IConfigurable to use UserConfigurer.configure where possible.
 
 How to nested interpreted functions (interpreted functions registered) 
