@@ -36,7 +36,7 @@ public class ConfigDialog extends JDialog {
 	/**
 	 * Parent ConfigurationManager
 	 */
-	protected UserConfigurer parent;
+	protected UserConfigurer configurerParent;
 
 	protected Vector<PropertyInputPanel> propertyInputPanels;
 
@@ -83,7 +83,7 @@ public class ConfigDialog extends JDialog {
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
 
-					parent.setProperty(property.getName(), inputPanel
+					configurerParent.setProperty(property.getName(), inputPanel
 							.getValue());
 				}
 			} else {
@@ -104,7 +104,7 @@ public class ConfigDialog extends JDialog {
 
 		setVisible(false);
 
-		parent.dialogConfigurationFinished(new ConfigDialogClosedException());
+		configurerParent.dialogConfigurationFinished(new ConfigDialogClosedException());
 		super.dispose();
 	}
 
@@ -144,7 +144,7 @@ public class ConfigDialog extends JDialog {
 	 *            Component the dialog is to be added to
 	 */
 	private void init(UserConfigurer configManager, Component owner) {
-		this.parent = configManager;
+		this.configurerParent = configManager;
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
@@ -202,21 +202,21 @@ public class ConfigDialog extends JDialog {
 			dispose();
 
 			(new AbstractActivity("Creating new "
-					+ parent.getConfigurable().getTypeName()) {
+					+ configurerParent.getConfigurable().getTypeName()) {
 
 				@Override
 				public void doActivity() {
 					ConfigException configException = null;
 					try {
-						parent.getConfigurable().completeConfiguration(
-								new PropertySet(parent.getProperties()));
-						parent
+						configurerParent.getConfigurable().completeConfiguration(
+								new PropertySet(configurerParent.getProperties()));
+						configurerParent
 								.savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
 					} catch (ConfigException e) {
 						configException = e;
 					}
 
-					parent.dialogConfigurationFinished(configException);
+					configurerParent.dialogConfigurationFinished(configException);
 
 				}
 			}).startThread();
@@ -248,7 +248,7 @@ public class ConfigDialog extends JDialog {
 	 */
 	protected void createPropertiesDialog(JPanel panel) {
 
-		PropertyDescriptor[] properties = parent.getConfigurable()
+		PropertyDescriptor[] properties = configurerParent.getConfigurable()
 				.getConfigSchema();
 		propertyInputPanels = new Vector<PropertyInputPanel>(properties.length);
 
@@ -279,6 +279,10 @@ public class ConfigDialog extends JDialog {
 		/*
 		 * Used by subclasses to add elements to the panel
 		 */
+	}
+
+	public UserConfigurer getConfigurerParent() {
+		return configurerParent;
 	}
 
 }

@@ -1,39 +1,23 @@
 *******************************************
  Done
 *******************************************
-DONE (Nov 5) - Interperter work
-DONE (Nov 4) - Function input dimensions are enforced in UI Panels 
-DONE (Oct 24) - MatrixEditor is accepts the last change when user clicks ok
-DONE (Sept 30) - Termination is now configured reflectively through ca.neo.util.Configurable interface
-DONE (Sept 30) - Simulation progress is now tracked in the UI
-DONE (Sept 30) - Ability to add decoded origin
-DONE (Sept 4) - Can view Z-Plane brain imagery, see BrainViewExample.java
-DONE (Sept 4) - Some actions can be applied to multiple selected objects
-DONE (Sept 1) - Move actions are now undooable
-DONE (Aug 31) - Added first iteration of comments, code cleanup, refactoring
-DONE (Aug 31) - Added Keyboard mnemonic shortcuts for menubar
-DONE (Aug 31) - Made layout animations zooming parallel with node positions.
 
-
-DONE - Select multiple things at once
-	
 *******************************************
  Pri 0 - doing next
 *******************************************
+Use JTree to draw data list view
+	http://java.sun.com/docs/books/tutorial/uiswing/components/tree.html
+
+
 Handle on user-end, when a chosen template does not fit in configurable. 
 ie. when PFunctionArray's input dimensions are incompatible with given functions.
 
 change IConfigurable to use UserConfigurer.configure where possible.
 
-How to nested interpreted functions (interpreted functions registered) 
-How do interpreted functions use registered functions, what if they get changed / removed later?
-
 
 Research using serializable as file format 
 
-allow creation of multi-dimensional fourier functions
-
-Create a instantiated plotter which uses dialogs rather than frames
+Allow creation of multi-dimensional fourier functions
 
 Creating more types of nodes, ensembles.
 
@@ -50,22 +34,9 @@ Click to bring a cross section to front, zooming between sections
 		There are two primary types of user actions in the Interface. Standard Action and Reversible Action. Layout algorithms are undoable, but individual node movements aren't yet. I'll add "make node layout changes undooable" to my todo list.
 		There are some concerns about object removals. It's somewhat difficult because I have to remember not only the Node that was removed but the connections, probes, etc... that it had. Also, some networks take up quite a lot of memory, and keeping them in the undo history would keep them from removal. Perhaps I can make some types of object removals undooable?
  
-
-window animation transitions
-
-
-show simulation progress in UI
-	create a listener object for Simulator
-
-set simulator
-
 information visualization
 	dimensions of functions, nodes
 	
-re-order popup menus to be more intuitive
-
-mouse handlers should draw frames in the sky
-
 *******************************************
  Pri 1 - to do
 *******************************************
@@ -311,6 +282,19 @@ fixed
 fixed
 	20. 'create new' has a 'P' in front of a bunch of the names?
 
+
+DONE (Nov 5) - Interperter work
+DONE (Nov 4) - Function input dimensions are enforced in UI Panels 
+DONE (Oct 24) - MatrixEditor is accepts the last change when user clicks ok
+DONE (Sept 30) - Termination is now configured reflectively through ca.neo.util.Configurable interface
+DONE (Sept 30) - Simulation progress is now tracked in the UI
+DONE (Sept 30) - Ability to add decoded origin
+DONE (Sept 4) - Can view Z-Plane brain imagery, see BrainViewExample.java
+DONE (Sept 4) - Some actions can be applied to multiple selected objects
+DONE (Sept 1) - Move actions are now undooable
+DONE (Aug 31) - Added first iteration of comments, code cleanup, refactoring
+DONE (Aug 31) - Added Keyboard mnemonic shortcuts for menubar
+DONE (Aug 31) - Made layout animations zooming parallel with node positions.
 (08/10) - Show information on Origins and terminations
 (08/10) - Made tooltips follow the camera on zoom
 
@@ -341,6 +325,7 @@ fixed
 
 (08/07) done - Preliminary Ensemble Viewer created
 (08/07) done - fixed some bugs with UI connections not detaching correctly
+DONE - Select multiple things at once
 
 done - File menu, to load saved networks (Use Swing File Dialogs)
 done - Save network from NetworkViewer, or PNetwork

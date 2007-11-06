@@ -44,8 +44,10 @@ public class UserTemplateConfigurer extends UserConfigurer {
 	}
 
 	private boolean isTemplateEditable;
+
 	public UserTemplateConfigurer(IConfigurable configurable) {
 		super(configurable);
+		init(true);
 	}
 
 	public UserTemplateConfigurer(IConfigurable configurable, Container parent) {
@@ -67,11 +69,9 @@ public class UserTemplateConfigurer extends UserConfigurer {
 	protected ConfigDialog createConfigDialog() {
 		if (parent instanceof Frame) {
 
-			return new ConfigTemplateDialog(this, (Frame) parent,
-					isTemplateEditable);
+			return new ConfigTemplateDialog(this, (Frame) parent);
 		} else if (parent instanceof Dialog) {
-			return new ConfigTemplateDialog(this, (Dialog) parent,
-					isTemplateEditable);
+			return new ConfigTemplateDialog(this, (Dialog) parent);
 		} else {
 			Util
 					.Assert(false,
@@ -80,6 +80,10 @@ public class UserTemplateConfigurer extends UserConfigurer {
 		}
 		return null;
 
+	}
+
+	public boolean isTemplateEditable() {
+		return isTemplateEditable;
 	}
 
 	private static class Configureable implements IConfigurable {

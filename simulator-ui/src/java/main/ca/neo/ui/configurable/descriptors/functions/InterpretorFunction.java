@@ -28,7 +28,6 @@ import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.configurable.managers.ConfigDialog;
 import ca.neo.ui.configurable.managers.ConfigTemplateDialog;
-import ca.neo.ui.configurable.managers.UserConfigurer;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UserMessages;
@@ -121,7 +120,7 @@ class InterpreterFunctionConfigurer extends UserTemplateConfigurer {
 		private JComboBox registeredFunctionsList;
 
 		public FunctionDialog(UserTemplateConfigurer configManager, Dialog owner) {
-			super(configManager, owner, false);
+			super(configManager, owner);
 
 		}
 

@@ -30,22 +30,15 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	private static final long serialVersionUID = 5650002324576913316L;
 
 	private JComboBox fileList;
-	private boolean isTemplateEditable;
 
 	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
-			Frame owner, boolean isTemplateEditable) {
+			Frame owner) {
 		super(configManager, owner);
-		init(isTemplateEditable);
 	}
 
 	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
-			Dialog owner, boolean isTemplateEditable) {
+			Dialog owner) {
 		super(configManager, owner);
-		init(isTemplateEditable);
-	}
-
-	private void init(boolean isTemplateEditable) {
-		this.isTemplateEditable = isTemplateEditable;
 	}
 
 	@Override
@@ -59,7 +52,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		/*
 		 * Add existing templates
 		 */
-		String[] files = parent.getPropertyFiles();
+		String[] files = configurerParent.getPropertyFiles();
 
 		fileList = new JComboBox(files);
 
@@ -77,14 +70,13 @@ public class ConfigTemplateDialog extends ConfigDialog {
 				defaultFound = true;
 				fileList.setSelectedIndex(i);
 
-				parent
+				configurerParent
 						.loadPropertiesFromFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
 			}
 		}
 		if (!defaultFound && fileList.getSelectedItem() != null) {
-			parent
-					.loadPropertiesFromFile(fileList.getSelectedItem()
-							.toString());
+			configurerParent.loadPropertiesFromFile(fileList.getSelectedItem()
+					.toString());
 		}
 
 		fileList.addActionListener(new ActionListener() {
@@ -115,7 +107,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 					String name = JOptionPane.showInputDialog("Name:");
 
 					if (name != null && name.compareTo("") != 0) {
-						parent.savePropertiesFile(name);
+						configurerParent.savePropertiesFile(name);
 						fileList.addItem(name);
 						fileList.setSelectedIndex(fileList.getItemCount() - 1);
 					}
@@ -134,7 +126,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
 				fileList.removeItem(selectedFile);
 
-				parent.deletePropertiesFile(selectedFile);
+				configurerParent.deletePropertiesFile(selectedFile);
 
 				updateDialog();
 			}
@@ -155,7 +147,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		JPanel seperator = new JCustomPanel();
 		seperator.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
-		if (isTemplateEditable) {
+		if (getConfigurerParent().isTemplateEditable()) {
 			panel.add(wrapperPanel);
 			panel.add(seperator);
 		}
@@ -168,18 +160,25 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	protected void updateDialog() {
 
 		if (fileList.getSelectedItem() != null) {
-			parent.loadPropertiesFromFile((String) fileList.getSelectedItem());
+			configurerParent.loadPropertiesFromFile((String) fileList
+					.getSelectedItem());
 			Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 			while (it.hasNext()) {
 				PropertyInputPanel panel = it.next();
 
-				Object currentValue = parent.getProperty(panel.getName());
+				Object currentValue = configurerParent.getProperty(panel
+						.getName());
 				if (currentValue != null && panel.isEnabled()) {
 					panel.setValue(currentValue);
 				}
 
 			}
 		}
+	}
+
+	@Override
+	public UserTemplateConfigurer getConfigurerParent() {
+		return (UserTemplateConfigurer) super.getConfigurerParent();
 	}
 
 }
