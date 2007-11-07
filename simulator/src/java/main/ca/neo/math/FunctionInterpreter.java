@@ -3,6 +3,8 @@
  */
 package ca.neo.math;
 
+import java.util.Map;
+
 public interface FunctionInterpreter {
 
 	/**
@@ -17,7 +19,22 @@ public interface FunctionInterpreter {
 	 * @param function Function instance 
 	 */
 	public void registerFunction(String name, Function function);
+	
+	/**
+	 * Removes a registered function.
+	 * 
+	 * @param name
+	 *            Name of function to be removed
+	 */
+	public void removeRegisteredFunction(String name);
 
+	/**
+	 * Returns a map of registered functions. 
+	 * 
+	 * @return The registered functions
+	 */
+	public Map<String, Function> getRegisteredFunctions();
+	
 	/**
 	 * <p>Parses a mathematical expression into a Function instance. The function can 
 	 * include the unary operators - and !, the binary operators +-/^*&|, the standard 

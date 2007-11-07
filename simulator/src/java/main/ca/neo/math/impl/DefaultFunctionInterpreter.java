@@ -24,7 +24,7 @@ import ca.neo.math.FunctionInterpreter;
  */
 public class DefaultFunctionInterpreter implements FunctionInterpreter {
 
-	private Map myFunctions; 
+	private Map<String, Function> myFunctions; 
 	private Map myOperators;
 	private String myTokens;
 	
@@ -393,6 +393,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		public String toString() {
 			return "|";
 		}
+	}
+
+	public Map<String, Function> getRegisteredFunctions() {
+		return myFunctions;
+	}
+
+	public void removeRegisteredFunction(String name) {
+		myFunctions.remove(name);
+		
 	}
 		
 }
