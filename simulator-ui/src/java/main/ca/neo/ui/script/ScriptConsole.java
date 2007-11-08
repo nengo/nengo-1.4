@@ -52,7 +52,7 @@ public class ScriptConsole extends JPanel {
 	private String myTypedText;
 	private StyleContext myStyleContext;
 	
-	public ScriptConsole(PythonInterpreter interpreter) throws IOException {
+	public ScriptConsole(PythonInterpreter interpreter) {
 		myInterpreter = interpreter;
 		
 		myDisplayArea = new JEditorPane("text/html", "");
@@ -73,10 +73,15 @@ public class ScriptConsole extends JPanel {
 		myHistory = new CommandHistory();
 		myTypedText = "";
 		
-		OutputWriter ow = new OutputWriter(this);
-		interpreter.setOut(ow.getOutputStream());
-		Thread owThread = new Thread(ow);
-		owThread.start();
+		
+		try {
+			OutputWriter ow = new OutputWriter(this);
+			interpreter.setOut(ow.getOutputStream());
+			Thread owThread = new Thread(ow);
+			owThread.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void initStyles() {
@@ -248,13 +253,8 @@ public class ScriptConsole extends JPanel {
 	public static void main(String[] args) {
 		
 		PythonInterpreter interpreter = new PythonInterpreter();
+		ScriptConsole console = new ScriptConsole(interpreter);
 
-		ScriptConsole console = null;
-		try {
-			console = new ScriptConsole(interpreter);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
 		JFrame frame = new JFrame("Script Console");
 		frame.getContentPane().add(console); 
 		

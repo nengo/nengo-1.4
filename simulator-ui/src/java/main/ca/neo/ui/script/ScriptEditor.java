@@ -4,72 +4,190 @@
 package ca.neo.ui.script;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
+import org.python.util.PythonInterpreter;
+
 /**
- * A basic text editor. 
+ * A basic tabbed text editor. 
  * 
  * @author Bryan Tripp
  */
 public class ScriptEditor extends JPanel {
 	
+	private static final long serialVersionUID = 1L;
+	
 	private JTabbedPane myTabs;
-	private List<ScriptData> myScripts; //TODO
+	private List<ScriptData> myScripts;
 
 	public ScriptEditor() {
-		setLayout(new BorderLayout());
-		
+		myScripts = new ArrayList<ScriptData>(10);
+		setLayout(new BorderLayout());		
 		myTabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 		add(myTabs, BorderLayout.CENTER);		
 	}
 	
+	/**
+	 * Opens a blank script in a new tab. 
+	 */
 	public void newFile() {
-		openEditor("New Script");
+		ScriptData sd = openEditor(null, false, "New Script");
+		sd.getTextComponent().getDocument().addDocumentListener(new ChangeListener(sd));
 	}
 	
-	public void saveCurrentFile() {
+	/**
+	 * Saves the current script in its current location. If the script doesn't have a location, this method 
+	 * defers to saveCurrentFileAs(). 
+	 * 
+	 * @throws IOException
+	 */
+	public void saveCurrentFile() throws IOException {
 		System.out.println("saving ... ");
 		
-		//TODO
+		int index = myTabs.getSelectedIndex();
+		ScriptData sd = myScripts.get(index);
+		
+		if (sd.getFile() == null) {
+			saveCurrentFileAs();
+		} else {
+			FileWriter writer = new FileWriter(sd.getFile());
+			writer.write(sd.getTextComponent().getText());
+			writer.flush();
+			writer.close();
+			
+			sd.setSaved(true);
+		}		
 	}
 	
-	public void saveCurrentFileAs() {
-		System.out.println("saving as ... ");
-		JFileChooser fileChooser = new JFileChooser(); //TODO: set working directory
+	/**
+	 * Saves the currrent script in a new location. 
+	 * 
+	 * @throws IOException
+	 */
+	public void saveCurrentFileAs() throws IOException {
+		int index = myTabs.getSelectedIndex();
+		
+		JFileChooser fileChooser = new JFileChooser(); //TODO: set working directory; filter python files
 		int selection = fileChooser.showSaveDialog(this);
 		if (selection == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
+			myScripts.get(index).setFile(file);
+			saveCurrentFile();
+		}		
+	}
+	
+	/**
+	 * Closes the current script, prompting the user to save if there are unsaved changes. 
+	 * 
+	 * @throws IOException
+	 */
+	public void closeCurrentFile() throws IOException {
+		int index = myTabs.getSelectedIndex();
+		
+		if (!myScripts.get(index).isSaved()) {
+			Object[] options = {"Save", "Discard", "Cancel"};
+			int selection = JOptionPane.showOptionDialog(this, 
+					"Would you like to save " + myScripts.get(index).getName() + " before closing?",
+					"Confirm",
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE, 
+					null, 
+					options,
+					options[0]);
+			if (selection == JOptionPane.YES_OPTION) {
+				saveCurrentFile();
+				doClose(index);
+			} else if (selection == JOptionPane.NO_OPTION) {
+				doClose(index);
+			}
+		} else {
+			doClose(index);
+		}
+		
+	}
+	
+	private void doClose(int index) {
+		myTabs.remove(index);
+		myScripts.remove(index);
+	}
+	
+	/**
+	 * Opens a user-specified script file. 
+	 * 
+	 * @throws IOException
+	 */
+	public void openFile() throws IOException {
+		JFileChooser fileChooser = new JFileChooser(); //TODO: working directory, filter python files
+		int selection = fileChooser.showOpenDialog(this);
+		if (selection == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			ScriptData sd = openEditor(file, true, file.getName());
+			
+			FileReader reader = new FileReader(file);
+			char[] buffer = new char[(int) file.length()];
+			reader.read(buffer);
+			String text = String.valueOf(buffer);
+			sd.getTextComponent().setText(text);
+			
+			sd.getTextComponent().getDocument().addDocumentListener(new ChangeListener(sd));
 		}
 	}
 	
-	public void closeCurrentFile() {
-		System.out.println("closing ... ");
-		myTabs.remove(myTabs.getSelectedComponent());
-	}
-	
-	public void openFile() {
-		System.out.println("opening ... ");
-		//TODO
-	}
-	
-	private void openEditor(String name) {
+	private ScriptData openEditor(File file, boolean saved, String name) {
 		JEditorPane ep = new JEditorPane();
+		ScriptData result = new ScriptData(ep, file, saved, name);
+		
 		myTabs.addTab(name, ep);
+		myScripts.add(result);
+		
+		return result;
+	}
+	
+	private class ChangeListener implements DocumentListener {
+		
+		private ScriptData myScript;
+		
+		public ChangeListener(ScriptData script) {
+			myScript = script;
+		}
+
+		public void changedUpdate(DocumentEvent e) {
+			myScript.setSaved(false);
+		}
+
+		public void insertUpdate(DocumentEvent e) {
+			myScript.setSaved(false);
+		}
+
+		public void removeUpdate(DocumentEvent e) {
+			myScript.setSaved(false);			
+		}
+		
 	}
 	
 	/**
@@ -82,11 +200,13 @@ public class ScriptEditor extends JPanel {
 		private JTextComponent myTextComponent;
 		private File myFile;
 		private boolean mySaved;
+		private String myName;
 		
-		public ScriptData(JTextComponent textComponent, File file, boolean saved) {
+		public ScriptData(JTextComponent textComponent, File file, boolean saved, String name) {
 			myTextComponent = textComponent;
 			myFile = file;
 			mySaved = saved;
+			myName = name;
 		}
 		
 		public JTextComponent getTextComponent() {
@@ -109,17 +229,32 @@ public class ScriptEditor extends JPanel {
 			mySaved = saved;
 		}
 		
+		public String getName() {
+			return myName;
+		}
+		
+		public void setName(String name) {
+			myName = name;
+		}
+		
 	}
 	
 	public static void main(String[] args) {
 		
 		final ScriptEditor editor = new ScriptEditor();
 		
+		PythonInterpreter interpreter = new PythonInterpreter();
+		ScriptConsole console = new ScriptConsole(interpreter);
+		console.setPreferredSize(new Dimension(450, 400));
+		
 		JFrame frame = new JFrame("Script Editor");
-		frame.getContentPane().add(editor);
+		frame.getContentPane().setLayout(new BorderLayout());
+		frame.getContentPane().add(editor, BorderLayout.CENTER);
+		frame.getContentPane().add(console, BorderLayout.EAST);
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
+
 		JMenuItem newItem = new JMenuItem("New");
 		newItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -127,30 +262,56 @@ public class ScriptEditor extends JPanel {
 			}
 		});
 		fileMenu.add(newItem);
+
 		JMenuItem openItem = new JMenuItem("Open");
 		openItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				editor.openFile();
+				try {
+					editor.openFile();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		fileMenu.add(openItem);
-		JMenuItem saveItem = new JMenuItem("Save As ...");
+
+		JMenuItem saveItem = new JMenuItem("Save");
 		saveItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				editor.saveCurrentFileAs();
+				try {
+					editor.saveCurrentFile();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		fileMenu.add(saveItem);		
-		menuBar.add(fileMenu);
+	
+		JMenuItem saveAsItem = new JMenuItem("Save As...");
+		saveItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					editor.saveCurrentFileAs();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		fileMenu.add(saveAsItem);		
+	
 		JMenuItem closeItem = new JMenuItem("Close");
 		closeItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				editor.closeCurrentFile();
+				try {
+					editor.closeCurrentFile();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		fileMenu.add(closeItem);		
+
 		menuBar.add(fileMenu);
-		
 		frame.setJMenuBar(menuBar);
 		
 		frame.addWindowListener(
@@ -161,7 +322,7 @@ public class ScriptEditor extends JPanel {
 			}
 		);
 		
-		frame.setSize(500, 400);
+		frame.setSize(900, 400);
 		frame.setVisible(true);
 		
 	}
