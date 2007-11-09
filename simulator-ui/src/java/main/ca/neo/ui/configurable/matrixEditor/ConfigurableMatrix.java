@@ -1,5 +1,6 @@
 package ca.neo.ui.configurable.matrixEditor;
 
+import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
@@ -94,6 +95,10 @@ public class ConfigurableMatrix implements IConfigurable {
 	 */
 	public String getTypeName() {
 		return fromSize + " to " + toSize + " Coupling Matrix";
+	}
+
+	public void preConfiguration(PropertySet props) throws ConfigException {
+		// do nothing
 	}
 
 }

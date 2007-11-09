@@ -1,5 +1,7 @@
 package ca.shu.ui.lib.util;
 
+import java.awt.Component;
+
 import javax.swing.JOptionPane;
 
 /**
@@ -9,14 +11,22 @@ import javax.swing.JOptionPane;
  */
 public class UserMessages {
 	public static void showError(String msg) {
-		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), "<HTML>"
-				+ msg + "</HTML>", "Error", JOptionPane.ERROR_MESSAGE);
+		showError(msg, UIEnvironment.getInstance());
+	}
+
+	public static void showError(String msg, Component parent) {
+		JOptionPane.showMessageDialog(parent, "<HTML>" + msg + "</HTML>",
+				"Error", JOptionPane.ERROR_MESSAGE);
 		(new Exception(msg)).printStackTrace();
 
 	}
 
 	public static void showWarning(String msg) {
-		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), "<HTML>"
-				+ msg + "</HTML>", "Warning", JOptionPane.WARNING_MESSAGE);
+		showWarning(msg, UIEnvironment.getInstance());
+	}
+
+	public static void showWarning(String msg, Component parent) {
+		JOptionPane.showMessageDialog(parent, "<HTML>" + msg + "</HTML>",
+				"Warning", JOptionPane.WARNING_MESSAGE);
 	}
 }

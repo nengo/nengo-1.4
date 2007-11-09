@@ -11,10 +11,13 @@ import ca.neo.ui.configurable.IConfigurable;
  * A UIModel which can be configured through the IConfigurable interface
  * 
  * @author Shu Wu
- * 
  */
 public abstract class UIModelConfigurable extends UIModel implements
 		IConfigurable {
+
+	public void preConfiguration(PropertySet props) throws ConfigException {
+		// do nothing
+	}
 
 	public UIModelConfigurable() {
 		super();
@@ -35,7 +38,6 @@ public abstract class UIModelConfigurable extends UIModel implements
 	/**
 	 * This function is called from a common thread, so it is not safe to put UI
 	 * stuff here If there's UI Stuff to be done, put it in afterModelCreated
-	 * 
 	 * Creates a model for the configuration process, called if a ConfigManager
 	 * is used
 	 * 

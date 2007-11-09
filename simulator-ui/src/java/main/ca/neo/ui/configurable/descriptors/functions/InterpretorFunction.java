@@ -22,34 +22,47 @@ import ca.neo.ui.actions.PlotFunctionAction;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.PropertySet;
-import ca.neo.ui.configurable.descriptors.PFunction;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.configurable.descriptors.StringPanel;
 import ca.neo.ui.configurable.managers.ConfigDialog;
-import ca.neo.ui.configurable.managers.ConfigTemplateDialog;
+import ca.neo.ui.configurable.managers.UserConfigurer;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UserMessages;
 
-public class InterpretorFunction extends AbstractConfigurableFunction implements
-		IConfigurable {
-	private static final String DIMENSION_STR = "Input Dimensions";
+public class InterpretorFunction extends AbstractConfigurableFunction {
+	@Override
+	public void setFunctionWrapper(FunctionWrapper functionWr) {
+		super.setFunctionWrapper(functionWr);
 
-	private static DefaultFunctionInterpreter interpreter = new DefaultFunctionInterpreter();
-	private static final PropertyDescriptor pExpression = new PString(
-			"Expression");
-	private int myInputDimensions;
-	boolean isInputDimEditable;
-
-	public InterpretorFunction(int inputDimensions, boolean isInputDimEditable) {
-		super(DefaultFunctionInterpreter.class, "Function Interpreter");
-		this.myInputDimensions = inputDimensions;
-		this.isInputDimEditable = isInputDimEditable;
+		if (functionWr.getTypeName().compareTo(this.getTypeName()) == 0) {
+			defaultProperties = functionWr.getProperties();
+		}
 	}
 
-	@Override
-	protected Function createFunction(PropertySet props) throws ConfigException {
+	private static final String DIMENSION_STR = "Input Dimensions";
+	private static final String EXPRESSION_STR = "Expression";
+
+	private static DefaultFunctionInterpreter interpreter = new DefaultFunctionInterpreter();
+	private PropertyDescriptor pExpression;
+	private int myInputDimensions;
+	InterpreterFunctionConfigurer configurer;
+
+	boolean isInputDimEditable;
+
+	PropertySet defaultProperties;
+
+	public InterpretorFunction(int inputDimensions, boolean isInputDimEditable) {
+		super("User-defined Function");
+		this.myInputDimensions = inputDimensions;
+		this.isInputDimEditable = isInputDimEditable;
+
+	}
+
+	private Function parseFunction(PropertySet props) throws ConfigException {
 		String expression = (String) props.getProperty(pExpression);
 		int dimensions = (Integer) props.getProperty(DIMENSION_STR);
 
@@ -64,11 +77,17 @@ public class InterpretorFunction extends AbstractConfigurableFunction implements
 	}
 
 	@Override
+	protected Function createFunction(PropertySet props) throws ConfigException {
+		return parseFunction(props);
+	}
+
+	@Override
 	public void configure(JDialog parent) {
-		InterpreterFunctionConfigurer config = new InterpreterFunctionConfigurer(
-				this, parent, interpreter);
+		if (configurer == null)
+			configurer = new InterpreterFunctionConfigurer(this, parent,
+					interpreter);
 		try {
-			config.configureAndWait();
+			configurer.configureAndWait();
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 		}
@@ -76,13 +95,68 @@ public class InterpretorFunction extends AbstractConfigurableFunction implements
 	}
 
 	public PropertyDescriptor[] getConfigSchema() {
-		PropertyDescriptor pDimensions = new PInt(DIMENSION_STR,
-				myInputDimensions);
-		pDimensions.setEditable(isInputDimEditable);
+		String expression = null;
+		int dim = myInputDimensions;
+
+		if (defaultProperties != null) {
+			expression = (String) defaultProperties.getProperty(EXPRESSION_STR);
+
+			if (isInputDimEditable)
+				dim = (Integer) defaultProperties.getProperty(DIMENSION_STR);
+		}
+
+		pExpression = new PString(EXPRESSION_STR, expression);
+		PropertyDescriptor pDimensions = new PInt(DIMENSION_STR, dim);
+
+		if (isInputDimEditable) {
+
+			pDimensions.setEditable(true);
+		}
 
 		PropertyDescriptor[] props = new PropertyDescriptor[] { pExpression,
 				pDimensions };
 		return props;
+	}
+
+	@Override
+	public void preConfiguration(PropertySet props) throws ConfigException {
+		/*
+		 * Try to parse the expression and throw an exception if it dosen't
+		 * succeed
+		 */
+		parseFunction(props);
+	}
+
+	/**
+	 * Property descriptor for a function expression.
+	 * 
+	 * @author Shu Wu
+	 */
+	class PExpression extends PString {
+		private static final long serialVersionUID = 1L;
+
+		public PExpression(String name) {
+			super(name);
+		}
+
+		@Override
+		protected PropertyInputPanel createInputPanel() {
+			/*
+			 * This custom String Panel will check that the expression is
+			 * correct before returning that value is set. This allows a UI to
+			 */
+
+			return new StringPanel(this) {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean isValueSet() {
+					return super.isValueSet();
+				}
+
+			};
+		}
+
 	}
 }
 
@@ -91,13 +165,13 @@ public class InterpretorFunction extends AbstractConfigurableFunction implements
  * 
  * @author Shu Wu
  */
-class InterpreterFunctionConfigurer extends UserTemplateConfigurer {
+class InterpreterFunctionConfigurer extends UserConfigurer {
 	FunctionInterpreter interpreter;
 	Dialog parent;
 
 	public InterpreterFunctionConfigurer(IConfigurable configurable,
 			Dialog parent, FunctionInterpreter interpreter) {
-		super(configurable, parent, false);
+		super(configurable, parent);
 		this.interpreter = interpreter;
 		this.parent = parent;
 	}
@@ -113,73 +187,14 @@ class InterpreterFunctionConfigurer extends UserTemplateConfigurer {
 	 * 
 	 * @author Shu Wu
 	 */
-	class FunctionDialog extends ConfigTemplateDialog {
+	class FunctionDialog extends ConfigDialog {
 
 		private static final long serialVersionUID = 1L;
 
 		private JComboBox registeredFunctionsList;
 
-		public FunctionDialog(UserTemplateConfigurer configManager, Dialog owner) {
+		public FunctionDialog(UserConfigurer configManager, Dialog owner) {
 			super(configManager, owner);
-
-		}
-
-		class NewFunctionAL implements ActionListener {
-
-			public void actionPerformed(ActionEvent e) {
-				try {
-					PString pFnName = new PString("Name");
-					PFunction pFunction = new PFunction("New Function", 1, true);
-
-					PropertySet props = UserTemplateConfigurer.configure(
-							new PropertyDescriptor[] { pFnName, pFunction },
-							"Register fuction", FunctionDialog.this);
-
-					String name = (String) props.getProperty(pFnName);
-					Function fn = (Function) props.getProperty(pFunction);
-
-					interpreter.registerFunction(name, fn);
-					registeredFunctionsList.addItem(name);
-				} catch (ConfigException e1) {
-					e1.defaultHandleBehavior();
-				}
-			}
-		}
-
-		class PreviewFunctionAL implements ActionListener {
-			public void actionPerformed(ActionEvent e) {
-				String functionName = (String) registeredFunctionsList
-						.getSelectedItem();
-
-				if (functionName != null) {
-					Function function = interpreter.getRegisteredFunctions()
-							.get(functionName);
-
-					if (function != null) {
-						PlotFunctionAction action = new PlotFunctionAction(
-								"Function preview", function,
-								FunctionDialog.this);
-						action.doAction();
-
-					} else {
-						UserMessages.showWarning("No function selected");
-					}
-				}
-			}
-		}
-
-		class RemoveFunctionAL implements ActionListener {
-
-			public void actionPerformed(ActionEvent e) {
-				String functionName = (String) registeredFunctionsList
-						.getSelectedItem();
-				if (functionName != null) {
-					interpreter.removeRegisteredFunction(functionName);
-					registeredFunctionsList.removeItem(functionName);
-				} else {
-					UserMessages.showWarning("No function selected");
-				}
-			}
 
 		}
 
@@ -241,6 +256,66 @@ class InterpreterFunctionConfigurer extends UserTemplateConfigurer {
 
 			panel.add(wrapperPanel);
 			panel.add(seperator);
+		}
+
+		class NewFunctionAL implements ActionListener {
+
+			public void actionPerformed(ActionEvent e) {
+				try {
+					PString pFnName = new PString("Name");
+					PFunction pFunction = new PFunction("New Function", 1,
+							true, null);
+
+					PropertySet props = UserTemplateConfigurer.configure(
+							new PropertyDescriptor[] { pFnName, pFunction },
+							"Register fuction", FunctionDialog.this);
+
+					String name = (String) props.getProperty(pFnName);
+					Function fn = (Function) props.getProperty(pFunction);
+
+					interpreter.registerFunction(name, fn);
+					registeredFunctionsList.addItem(name);
+				} catch (ConfigException e1) {
+					e1.defaultHandleBehavior();
+				}
+			}
+		}
+
+		class PreviewFunctionAL implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				String functionName = (String) registeredFunctionsList
+						.getSelectedItem();
+
+				if (functionName != null) {
+					Function function = interpreter.getRegisteredFunctions()
+							.get(functionName);
+
+					if (function != null) {
+						PlotFunctionAction action = new PlotFunctionAction(
+								"Function preview", function,
+								FunctionDialog.this);
+						action.doAction();
+
+					} else {
+						UserMessages.showWarning("No function selected");
+					}
+				}
+			}
+		}
+
+		class RemoveFunctionAL implements ActionListener {
+
+			public void actionPerformed(ActionEvent e) {
+				String functionName = (String) registeredFunctionsList
+						.getSelectedItem();
+				if (functionName != null) {
+					interpreter.removeRegisteredFunction(functionName);
+					registeredFunctionsList.removeItem(functionName);
+				} else {
+					UserMessages.showWarning("No function selected");
+				}
+			}
+
 		}
 	}
 

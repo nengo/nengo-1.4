@@ -117,5 +117,9 @@ public class UserTemplateConfigurer extends UserConfigurer {
 			return typeName;
 		}
 
+		public void preConfiguration(PropertySet props) throws ConfigException {
+			// do nothing
+		}
+
 	}
 }

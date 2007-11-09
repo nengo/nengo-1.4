@@ -1,4 +1,4 @@
-package ca.neo.ui.configurable.descriptors;
+package ca.neo.ui.configurable.descriptors.functions;
 
 import java.util.Vector;
 
@@ -7,9 +7,9 @@ import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.descriptors.functions.AbstractConfigurableFunction;
-import ca.neo.ui.configurable.descriptors.functions.InterpretorFunction;
-import ca.neo.ui.configurable.descriptors.functions.ReflectiveConfigurableFunction;
+import ca.neo.ui.configurable.descriptors.PFloat;
+import ca.neo.ui.configurable.descriptors.PInt;
+import ca.neo.ui.configurable.descriptors.PLong;
 
 /**
  * Config Descriptor for Functions
@@ -21,16 +21,16 @@ public class PFunction extends PropertyDescriptor {
 	private static final long serialVersionUID = 1L;
 
 	private int myInputDimension;
-	
+
 	private boolean isInputDimensionEditable;
 
 	public PFunction(String name, int inputDimension) {
-		this(name, inputDimension, false);
+		this(name, inputDimension, false, null);
 	}
 
 	public PFunction(String name, int inputDimension,
-			boolean isInputDimensionEditable) {
-		super(name);
+			boolean isInputDimensionEditable, FunctionWrapper defaultValue) {
+		super(name, defaultValue);
 		this.myInputDimension = inputDimension;
 		this.isInputDimensionEditable = isInputDimensionEditable;
 	}
@@ -54,7 +54,6 @@ public class PFunction extends PropertyDescriptor {
 		InterpretorFunction interpreterFunction = new InterpretorFunction(
 				myInputDimension, false);
 
-		
 		functions.add(interpreterFunction);
 
 		/*
@@ -93,6 +92,10 @@ public class PFunction extends PropertyDescriptor {
 	@Override
 	public String getTypeName() {
 		return "Function";
+	}
+
+	public int getInputDimension() {
+		return myInputDimension;
 	}
 
 }

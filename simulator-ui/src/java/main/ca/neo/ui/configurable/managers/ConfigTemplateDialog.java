@@ -19,6 +19,7 @@ import javax.swing.border.EtchedBorder;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * A Configuration dialog which allows the user to manage templates
@@ -29,7 +30,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
 	private static final long serialVersionUID = 5650002324576913316L;
 
-	private JComboBox fileList;
+	private JComboBox templateList;
 
 	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
 			Frame owner) {
@@ -44,7 +45,26 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	@Override
 	protected void createPropertiesDialog(JPanel panel) {
 		super.createPropertiesDialog(panel);
-		updateDialog();
+
+		if (checkPropreties()) {
+			/*
+			 * Use existing properties
+			 */
+			templateList.setSelectedItem(null);
+		} else {
+			/*
+			 * Selects the default template
+			 */
+			for (int i = 0; i < templateList.getItemCount(); i++) {
+				if (templateList.getItemAt(i).toString().compareTo(
+						UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME) == 0) {
+					templateList.setSelectedIndex(i);
+					break;
+				}
+			}
+
+			updateDialogFromFile();
+		}
 	}
 
 	@Override
@@ -54,43 +74,24 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		 */
 		String[] files = configurerParent.getPropertyFiles();
 
-		fileList = new JComboBox(files);
+		templateList = new JComboBox(files);
 
 		JPanel savedFilesPanel = new JCustomPanel();
 
 		JPanel dropDownPanel = new JCustomPanel();
 
-		/*
-		 * Selects the default template
-		 */
-		boolean defaultFound = false;
-		for (int i = 0; i < files.length; i++) {
-			if (files[i]
-					.compareTo(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME) == 0) {
-				defaultFound = true;
-				fileList.setSelectedIndex(i);
-
-				configurerParent
-						.loadPropertiesFromFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
-			}
-		}
-		if (!defaultFound && fileList.getSelectedItem() != null) {
-			configurerParent.loadPropertiesFromFile(fileList.getSelectedItem()
-					.toString());
-		}
-
-		fileList.addActionListener(new ActionListener() {
+		templateList.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 
-				updateDialog();
+				updateDialogFromFile();
 
 			}
 
 		});
 
 		savedFilesPanel.add(new JLabel("Templates"));
-		dropDownPanel.add(fileList);
+		dropDownPanel.add(templateList);
 		dropDownPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		savedFilesPanel.add(dropDownPanel);
 
@@ -108,8 +109,9 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
 					if (name != null && name.compareTo("") != 0) {
 						configurerParent.savePropertiesFile(name);
-						fileList.addItem(name);
-						fileList.setSelectedIndex(fileList.getItemCount() - 1);
+						templateList.addItem(name);
+						templateList.setSelectedIndex(templateList
+								.getItemCount() - 1);
 					}
 				} else {
 					UserMessages.showWarning("Properties not complete");
@@ -122,13 +124,13 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		button = new JButton("Remove");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String selectedFile = (String) fileList.getSelectedItem();
+				String selectedFile = (String) templateList.getSelectedItem();
 
-				fileList.removeItem(selectedFile);
+				templateList.removeItem(selectedFile);
 
 				configurerParent.deletePropertiesFile(selectedFile);
 
-				updateDialog();
+				updateDialogFromFile();
 			}
 		});
 		button.setFont(Style.FONT_SMALL);
@@ -157,22 +159,27 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	 * Loads the properties associated with the item selected in the file drop
 	 * down list
 	 */
-	protected void updateDialog() {
+	protected void updateDialogFromFile() {
+		try {
+			if (templateList.getSelectedItem() != null) {
+				configurerParent.loadPropertiesFromFile((String) templateList
+						.getSelectedItem());
+				Iterator<PropertyInputPanel> it = propertyInputPanels
+						.iterator();
+				while (it.hasNext()) {
+					PropertyInputPanel panel = it.next();
 
-		if (fileList.getSelectedItem() != null) {
-			configurerParent.loadPropertiesFromFile((String) fileList
-					.getSelectedItem());
-			Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
-			while (it.hasNext()) {
-				PropertyInputPanel panel = it.next();
+					Object currentValue = configurerParent.getProperty(panel
+							.getName());
+					if (currentValue != null && panel.isEnabled()) {
+						panel.setValue(currentValue);
+					}
 
-				Object currentValue = configurerParent.getProperty(panel
-						.getName());
-				if (currentValue != null && panel.isEnabled()) {
-					panel.setValue(currentValue);
 				}
-
 			}
+		} catch (ClassCastException e) {
+			Util
+					.debugMsg("Saved template has incompatible data, it will be ignored");
 		}
 	}
 

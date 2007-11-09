@@ -16,6 +16,15 @@ public interface IConfigurable {
 	public void completeConfiguration(PropertySet props) throws ConfigException;
 
 	/**
+	 * Called before full configuration to initialize and find errors.
+	 * 
+	 * @throws ConfigException
+	 *             Exception thrown if there is an error during
+	 *             pre-configuration.
+	 */
+	public void preConfiguration(PropertySet props) throws ConfigException;
+
+	/**
 	 * @return An array of objects which describe what needs to be configured in
 	 *         this object
 	 */

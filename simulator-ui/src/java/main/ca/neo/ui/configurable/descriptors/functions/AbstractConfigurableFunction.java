@@ -4,6 +4,8 @@ import javax.swing.JDialog;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 
 /**
@@ -14,15 +16,20 @@ import ca.neo.ui.configurable.PropertySet;
 /**
  * @author User
  */
-public abstract class AbstractConfigurableFunction  {
+public abstract class AbstractConfigurableFunction implements IConfigurable {
+
+	public PropertyDescriptor[] getConfigSchema() {
+		return null;
+	}
+
+	public void preConfiguration(PropertySet props) throws ConfigException {
+		// do nothing
+	}
 
 	/**
 	 * Function to be created
 	 */
-	private Function function;
-
-	@SuppressWarnings("unchecked")
-	private Class functionClass;
+	private FunctionWrapper functionWr;
 
 	/**
 	 * What the type of function to be created is called
@@ -38,11 +45,8 @@ public abstract class AbstractConfigurableFunction  {
 	 *            A list of parameters referencing the constructor parameters
 	 *            required to create the function
 	 */
-	public AbstractConfigurableFunction(Class<?> functionClass,
-			String typeName) {
+	public AbstractConfigurableFunction(String typeName) {
 		super();
-
-		this.functionClass = functionClass;
 
 		this.typeName = typeName;
 	}
@@ -57,29 +61,23 @@ public abstract class AbstractConfigurableFunction  {
 	 *      Creates the function through reflection of its constructor and
 	 *      passing the user parameters to it
 	 */
-	@SuppressWarnings("unchecked")
 	public void completeConfiguration(PropertySet props) throws ConfigException {
 
 		Function function = createFunction(props);
-		setFunction(function);
+		FunctionWrapper functionWr = new FunctionWrapper(function, props,
+				getTypeName());
+
+		setFunctionWrapper(functionWr);
 
 	}
-	
+
 	public abstract void configure(JDialog parent);
 
 	/**
 	 * @return The function created
 	 */
-	public Function getFunction() {
-		return function;
-	}
-
-	/**
-	 * @return The Class type the function belongs to
-	 */
-	@SuppressWarnings("unchecked")
-	public Class getFunctionType() {
-		return functionClass;
+	public FunctionWrapper getFunctionWrapper() {
+		return functionWr;
 	}
 
 	/*
@@ -92,11 +90,11 @@ public abstract class AbstractConfigurableFunction  {
 	}
 
 	/**
-	 * @param function
-	 *            function
+	 * @param functionWr
+	 *            function wrapper
 	 */
-	public void setFunction(Function function) {
-		this.function = function;
+	public void setFunctionWrapper(FunctionWrapper functionWr) {
+		this.functionWr = functionWr;
 	}
 
 	@Override

@@ -9,8 +9,9 @@ import ca.neo.ui.actions.PlotFunctionNodeAction;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
-import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.configurable.descriptors.functions.FunctionWrapper;
+import ca.neo.ui.configurable.descriptors.functions.PFunctionArray;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -61,7 +62,14 @@ public class UIFunctionInput extends UINeoNode {
 	@Override
 	protected Node configureModel(PropertySet props) throws ConfigException {
 
-		Function[] functions = (Function[]) props.getProperty(pFunctions);
+		FunctionWrapper[] functionsWrapper = (FunctionWrapper[]) props
+				.getProperty(pFunctions);
+
+		// unwrap functions
+		Function[] functions = new Function[functionsWrapper.length];
+		for (int i = 0; i < functions.length; i++) {
+			functions[i] = functionsWrapper[i].unwrap();
+		}
 
 		try {
 			// setName((String) getProperty(pName));

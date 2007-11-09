@@ -14,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.text.MutableAttributeSet;
 
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
@@ -73,7 +74,8 @@ public class ConfigDialog extends JDialog {
 	 *            set
 	 * @return Whether the user has set all the values on the dialog correctly
 	 */
-	private boolean applyPropertyFieldsReal(boolean setPropertyFields) {
+	private boolean processPropertiesInternal(boolean setPropertyFields,
+			boolean showMessage) {
 		Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 
 		while (it.hasNext()) {
@@ -87,8 +89,10 @@ public class ConfigDialog extends JDialog {
 							.getValue());
 				}
 			} else {
-				UserMessages.showWarning(property.getName()
-						+ " is not set or is incomplete");
+				if (showMessage) {
+					UserMessages.showWarning(property.getName()
+							+ " is not set or is incomplete");
+				}
 				return false;
 			}
 
@@ -104,7 +108,8 @@ public class ConfigDialog extends JDialog {
 
 		setVisible(false);
 
-		configurerParent.dialogConfigurationFinished(new ConfigDialogClosedException());
+		configurerParent
+				.dialogConfigurationFinished(new ConfigDialogClosedException());
 		super.dispose();
 	}
 
@@ -177,66 +182,67 @@ public class ConfigDialog extends JDialog {
 	}
 
 	/**
-	 * Loads the properties associated with the item selected in the file drop
-	 * down list
-	 */
-	private void loadDefaultValues() {
-		Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
-		while (it.hasNext()) {
-			PropertyInputPanel panel = it.next();
-
-			Object currentValue = panel.getDescriptor().getDefaultValue();
-			if (currentValue != null) {
-				panel.setValue(currentValue);
-			}
-
-		}
-	}
-
-	/**
 	 * What happens when the user presses the OK button
 	 */
 	private void okAction() {
 		if (applyProperties()) {
-			setVisible(false);
-			dispose();
+			boolean preConfigurationSuccess = true;
+			try {
+				PropertySet properties = new PropertySet(configurerParent
+						.getProperties());
+				configurerParent.getConfigurable().preConfiguration(properties);
+			} catch (ConfigException e1) {
+				e1.defaultHandleBehavior();
+				preConfigurationSuccess = false;
+			}
 
-			(new AbstractActivity("Creating new "
-					+ configurerParent.getConfigurable().getTypeName()) {
+			if (preConfigurationSuccess) {
+				setVisible(false);
+				dispose();
 
-				@Override
-				public void doActivity() {
-					ConfigException configException = null;
-					try {
-						configurerParent.getConfigurable().completeConfiguration(
-								new PropertySet(configurerParent.getProperties()));
+				(new AbstractActivity("Configuring "
+						+ configurerParent.getConfigurable().getTypeName()) {
+
+					@Override
+					public void doActivity() {
+						ConfigException configException = null;
+
+						try {
+							configurerParent.getConfigurable()
+									.completeConfiguration(
+											new PropertySet(configurerParent
+													.getProperties()));
+							configurerParent
+									.savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
+						} catch (ConfigException e) {
+							configException = e;
+
+						}
+
 						configurerParent
-								.savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
-					} catch (ConfigException e) {
-						configException = e;
+								.dialogConfigurationFinished(configException);
+
 					}
-
-					configurerParent.dialogConfigurationFinished(configException);
-
-				}
-			}).startThread();
-
-		} else {
-
+				}).startThread();
+			}
 		}
+	}
+
+	protected boolean checkPropreties() {
+		return processPropertiesInternal(false, false);
 	}
 
 	/**
 	 * Gets value entered in the dialog and applies them to the properties set
 	 * 
-	 * @return Whether operation was successfull
+	 * @return Whether operation was successful
 	 */
 	protected boolean applyProperties() {
 		/*
 		 * first check if all the fields have been set correctly, then set them
 		 */
-		if (applyPropertyFieldsReal(false)) {
-			applyPropertyFieldsReal(true);
+		if (processPropertiesInternal(false, true)) {
+			processPropertiesInternal(true, false);
 			return true;
 		}
 		return false;
@@ -246,21 +252,32 @@ public class ConfigDialog extends JDialog {
 	/**
 	 * Creates the dialog
 	 */
+
 	protected void createPropertiesDialog(JPanel panel) {
+		PropertyDescriptor[] propDescriptors = configurerParent
+				.getConfigurable().getConfigSchema();
+		propertyInputPanels = new Vector<PropertyInputPanel>(
+				propDescriptors.length);
 
-		PropertyDescriptor[] properties = configurerParent.getConfigurable()
-				.getConfigSchema();
-		propertyInputPanels = new Vector<PropertyInputPanel>(properties.length);
+		MutableAttributeSet properties = configurerParent.getProperties();
 
-		for (PropertyDescriptor property : properties) {
+		for (PropertyDescriptor property : propDescriptors) {
 
 			PropertyInputPanel inputPanel = property.getInputPanel();
 			panel.add(inputPanel);
 
-			propertyInputPanels.add(inputPanel);
+			/*
+			 * Try to get the configurer's current value and apply it to the
+			 * input panels
+			 */
+			Object currentValue = properties.getAttribute(inputPanel.getName());
+			if (currentValue != null) {
+				inputPanel.setValue(currentValue);
+			}
 
+			propertyInputPanels.add(inputPanel);
 		}
-		loadDefaultValues();
+		checkPropreties();
 	}
 
 	/**

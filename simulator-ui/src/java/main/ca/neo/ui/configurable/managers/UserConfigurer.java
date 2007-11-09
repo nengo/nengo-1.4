@@ -26,7 +26,7 @@ public class UserConfigurer extends ConfigManager {
 	 * Lock to be used to communicate cross-thread between this instance and the
 	 * Configuration Dialog
 	 */
-	private Object configLock = new Object();
+	private Object configLock;
 
 	/**
 	 * Parent, if there is one
@@ -87,8 +87,13 @@ public class UserConfigurer extends ConfigManager {
 	}
 
 	@Override
-	public void configureAndWait() throws ConfigException {
+	public synchronized void configureAndWait() throws ConfigException {
+		if (configLock == null) {
+			configLock = new Object();
+		}
+
 		createConfigDialog();
+
 		/*
 		 * Block until configuration has completed
 		 */

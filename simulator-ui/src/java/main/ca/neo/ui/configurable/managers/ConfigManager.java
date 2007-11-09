@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InvalidClassException;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -23,7 +24,6 @@ import ca.shu.ui.lib.util.Util;
  * Configuration Manager used to configure IConfigurable objects
  * 
  * @author Shu Wu
- * 
  */
 public abstract class ConfigManager {
 	/**
@@ -84,7 +84,6 @@ public abstract class ConfigManager {
 	/**
 	 * @param name
 	 *            filename prefix
-	 * 
 	 */
 	protected void deletePropertiesFile(String name) {
 		File file = new File(getSavedObjectsFolder(),
@@ -147,7 +146,6 @@ public abstract class ConfigManager {
 	/**
 	 * @param name
 	 *            Name of the properties set to be loaded
-	 * 
 	 */
 	protected void loadPropertiesFromFile(String name) {
 
@@ -177,16 +175,17 @@ public abstract class ConfigManager {
 			System.out.println("Class not found exception");
 		} catch (InvalidClassException e) {
 			System.out.println("Invalid class exception");
+		} catch (NotSerializableException e) {
+			Util.debugMsg("Loading properties not serializable: "
+					+ e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			Util.debugMsg("IO Error serializing properties: " + e.getMessage());
 		}
 	}
 
 	/**
-	 * 
 	 * @param name
 	 *            name of the properties set to be saved
-	 * 
 	 */
 	protected void savePropertiesFile(String name) {
 
@@ -226,7 +225,6 @@ public abstract class ConfigManager {
  * Filters files needed by ConfigManager
  * 
  * @author Shu
- * 
  */
 class ConfigFilesFilter implements FilenameFilter {
 	IConfigurable parent;

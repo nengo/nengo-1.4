@@ -4,17 +4,16 @@ import ca.neo.math.Function;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.util.UIEnvironment;
 
-public class PlotFunctionNodeAction extends StandardAction implements
-		IConfigurable {
+public class PlotFunctionNodeAction extends StandardAction {
 	private static final long serialVersionUID = 1L;
 
 	static final PropertyDescriptor pEnd = new PFloat("End");
@@ -37,12 +36,17 @@ public class PlotFunctionNodeAction extends StandardAction implements
 	protected void action() throws ActionException {
 		pFunctionIndex = new PInt("Function index", 0, 0, functionInput
 				.getFunctions().length - 1);
-
-		UserTemplateConfigurer config = new UserTemplateConfigurer(this);
+		PropertyDescriptor[] propDescripters = { pFunctionIndex, pStart,
+				pIncrement, pEnd };
 		try {
-			config.configureAndWait();
+			PropertySet properties = UserTemplateConfigurer.configure(
+					propDescripters, "Function plotter", UIEnvironment
+							.getInstance());
+
+			completeConfiguration(properties);
+
 		} catch (ConfigException e) {
-			e.defaultHandleBehavior();
+			e.printStackTrace();
 		}
 
 	}
@@ -56,6 +60,10 @@ public class PlotFunctionNodeAction extends StandardAction implements
 		float end = (Float) properties.getProperty(pEnd);
 		float increment = (Float) properties.getProperty(pIncrement);
 
+		if (increment == 0) {
+			throw new ConfigException("Cannot plot with infinite steps because step size is 0");
+		}
+		
 		Function[] functions = functionInput.getFunctions();
 
 		if (functionIndex >= functions.length) {
@@ -67,17 +75,4 @@ public class PlotFunctionNodeAction extends StandardAction implements
 				+ function.getClass().getSimpleName() + ")");
 
 	}
-
-	public PropertyDescriptor[] getConfigSchema() {
-
-		PropertyDescriptor[] properties = { pFunctionIndex, pStart, pIncrement,
-				pEnd };
-		return properties;
-
-	}
-
-	public String getTypeName() {
-		return "Function plotter";
-	}
-
 }

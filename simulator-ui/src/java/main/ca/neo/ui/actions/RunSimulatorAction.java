@@ -7,7 +7,6 @@ import ca.neo.sim.Simulator;
 import ca.neo.sim.SimulatorEvent;
 import ca.neo.sim.SimulatorListener;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFloat;
@@ -16,6 +15,7 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.AbstractActivity;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -24,6 +24,13 @@ import ca.shu.ui.lib.util.UserMessages;
  * @author Shu Wu
  */
 public class RunSimulatorAction extends StandardAction {
+	private static final PropertyDescriptor pEndTime = new PFloat("End time");
+	private static final PropertyDescriptor pStartTime = new PFloat(
+			"Start time");
+	private static final PropertyDescriptor pStepSize = new PFloat("Step size");
+
+	private static final PropertyDescriptor[] zProperties = { pStartTime,
+			pEndTime, pStepSize };
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,16 +49,18 @@ public class RunSimulatorAction extends StandardAction {
 
 	@Override
 	protected void action() throws ActionException {
-		SimulatorConfig simulatorConfig = new SimulatorConfig();
 
-		/*
-		 * Configures the simulatorConfig
-		 */
-		UserTemplateConfigurer config = new UserTemplateConfigurer(
-				simulatorConfig);
 		try {
-			config.configureAndWait();
-			(new RunSimulatorActivity(simulatorConfig)).startThread();
+			PropertySet properties = UserTemplateConfigurer.configure(
+					zProperties, "Simulator Runtime Configuration",
+					UIEnvironment.getInstance());
+
+			float startTime = (Float) properties.getProperty(pStartTime);
+			float endTime = (Float) properties.getProperty(pEndTime);
+			float stepTime = (Float) properties.getProperty(pStepSize);
+
+			(new RunSimulatorActivity(startTime, endTime, stepTime))
+					.startThread();
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 
@@ -68,15 +77,19 @@ public class RunSimulatorAction extends StandardAction {
 	 */
 	/**
 	 * @author Shu
-	 *
 	 */
 	class RunSimulatorActivity extends AbstractActivity implements
 			SimulatorListener {
-		SimulatorConfig config;
+		private float startTime;
+		private float endTime;
+		private float stepTime;
 
-		public RunSimulatorActivity(SimulatorConfig config) {
+		public RunSimulatorActivity(float startTime, float endTime,
+				float stepTime) {
 			super("Simulation started");
-			this.config = config;
+			this.startTime = startTime;
+			this.endTime = endTime;
+			this.stepTime = stepTime;
 		}
 
 		@Override
@@ -85,11 +98,9 @@ public class RunSimulatorAction extends StandardAction {
 				simulator.resetNetwork(false);
 				simulator.addSimulatorListener(this);
 
-				simulator.run(config.getStartTime(), config.getEndTime(),
-						config.getStepSize());
-				
+				simulator.run(startTime, endTime, stepTime);
+
 				simulator.removeSimulatorListener(this);
-				
 
 			} catch (SimulationException e) {
 				UserMessages.showError("Simulator problem: " + e.toString());
@@ -100,8 +111,9 @@ public class RunSimulatorAction extends StandardAction {
 
 		private float currentProgress = 0;
 
-
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see ca.neo.sim.SimulatorListener#processEvent(ca.neo.sim.SimulatorEvent)
 		 */
 		public void processEvent(SimulatorEvent event) {
@@ -138,47 +150,4 @@ public class RunSimulatorAction extends StandardAction {
 			}
 		}
 	}
-}
-
-/**
- * Contains configurable properties used to set up the Simulation
- * 
- * @author Shu Wu
- */
-class SimulatorConfig implements IConfigurable {
-	private static final PropertyDescriptor pEndTime = new PFloat("End time");
-	private static final PropertyDescriptor pStartTime = new PFloat(
-			"Start time");
-	private static final PropertyDescriptor pStepSize = new PFloat(
-			"Step size");
-
-	private static final PropertyDescriptor[] zProperties = { pStartTime,
-			pEndTime, pStepSize };
-
-	private PropertySet configuredProperties;
-
-	public void completeConfiguration(PropertySet properties) {
-		configuredProperties = properties;
-	}
-
-	public PropertyDescriptor[] getConfigSchema() {
-		return zProperties;
-	}
-
-	public float getEndTime() {
-		return (Float) configuredProperties.getProperty(pEndTime);
-	}
-
-	public float getStartTime() {
-		return (Float) configuredProperties.getProperty(pStartTime);
-	}
-
-	public float getStepSize() {
-		return (Float) configuredProperties.getProperty(pStepSize);
-	}
-
-	public String getTypeName() {
-		return "Simulator Runtime Configuration";
-	}
-
 }

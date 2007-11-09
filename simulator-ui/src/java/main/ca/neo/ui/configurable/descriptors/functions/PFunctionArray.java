@@ -1,4 +1,4 @@
-package ca.neo.ui.configurable.descriptors;
+package ca.neo.ui.configurable.descriptors.functions;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.PropertyDescriptor;

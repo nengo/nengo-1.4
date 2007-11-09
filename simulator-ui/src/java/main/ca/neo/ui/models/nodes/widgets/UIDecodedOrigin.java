@@ -9,8 +9,8 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.configurable.descriptors.functions.PFunctionArray;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 
 /**

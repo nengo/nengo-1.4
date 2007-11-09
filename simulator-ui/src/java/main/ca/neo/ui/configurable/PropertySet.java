@@ -1,9 +1,12 @@
 package ca.neo.ui.configurable;
 
+import java.io.Serializable;
+
 import javax.swing.text.MutableAttributeSet;
 
+public class PropertySet implements Serializable {
 
-public class PropertySet {
+	private static final long serialVersionUID = 1L;
 	MutableAttributeSet properties;
 
 	public PropertySet(MutableAttributeSet properties) {
@@ -16,7 +19,6 @@ public class PropertySet {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 *            of property
 	 * @return the value of that property

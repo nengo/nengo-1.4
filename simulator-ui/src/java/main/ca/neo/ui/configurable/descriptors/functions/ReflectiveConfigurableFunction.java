@@ -7,10 +7,9 @@ import javax.swing.JDialog;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.configurable.managers.UserConfigurer;
 
 /**
  * Function instances are created through reflection.
@@ -18,12 +17,17 @@ import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
  * @author Shu Wu
  */
 public class ReflectiveConfigurableFunction extends
-		AbstractConfigurableFunction implements IConfigurable {
+		AbstractConfigurableFunction {
 	private PropertyDescriptor[] myProperties;
+
+	private UserConfigurer configurer;
+
+	private Class<?> functionClass;
 
 	public ReflectiveConfigurableFunction(Class<?> functionClass,
 			String typeName, PropertyDescriptor[] propStruct) {
-		super(functionClass, typeName);
+		super(typeName);
+		this.functionClass = functionClass;
 
 		this.myProperties = propStruct;
 	}
@@ -45,7 +49,7 @@ public class ReflectiveConfigurableFunction extends
 		}
 		Constructor<?> ct = null;
 		try {
-			ct = getFunctionType().getConstructor(partypes);
+			ct = functionClass.getConstructor(partypes);
 
 			Object arglist[] = new Object[metaProperties.length];
 			for (int i = 0; i < metaProperties.length; i++) {
@@ -76,20 +80,21 @@ public class ReflectiveConfigurableFunction extends
 		}
 	}
 
-	public PropertyDescriptor[] getConfigSchema() {
-		return myProperties;
-	}
-
 	@Override
 	public void configure(JDialog parent) {
-		UserTemplateConfigurer config = new UserTemplateConfigurer(this,
-				parent, false);
+		if (configurer == null) {
+			configurer = new UserConfigurer(this, parent);
+		}
 		try {
-			config.configureAndWait();
+			configurer.configureAndWait();
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 		}
 
+	}
+
+	public PropertyDescriptor[] getConfigSchema() {
+		return myProperties;
 	}
 
 }

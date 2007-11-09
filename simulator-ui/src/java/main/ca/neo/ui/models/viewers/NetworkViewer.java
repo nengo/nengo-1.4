@@ -20,9 +20,8 @@ import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
 import ca.neo.ui.models.UIModels;
@@ -258,7 +257,7 @@ public class NetworkViewer extends NodeViewer {
 		MenuBuilder nodeContainersMenu = createNewMenu
 				.createSubMenu("Node Containers");
 		MenuBuilder nodesMenu = createNewMenu.createSubMenu("Nodes");
-		MenuBuilder functionsMenu = createNewMenu.createSubMenu("Functions");
+//		MenuBuilder functionsMenu = createNewMenu.createSubMenu("Functions");
 
 		menu.addAction(new OpenNeoFileAction("Open from file", this));
 
@@ -274,7 +273,7 @@ public class NetworkViewer extends NodeViewer {
 
 		// Functions
 		for (Class element : UIModels.FUNCTION_TYPES) {
-			functionsMenu.addAction(new CreateModelAction(this, element));
+			createNewMenu.addAction(new CreateModelAction(this, element));
 		}
 
 		/*
@@ -711,14 +710,11 @@ public class NetworkViewer extends NodeViewer {
  * 
  * @author Shu Wu
  */
-class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
+class SetLayoutBoundsAction extends StandardAction {
 
 	private static final PropertyDescriptor pHeight = new PInt("Height");
-
 	private static final PropertyDescriptor pWidth = new PInt("Width");
-
 	private static final long serialVersionUID = 1L;
-
 	private static final PropertyDescriptor[] zProperties = { pWidth, pHeight };
 
 	private NetworkViewer parent;
@@ -730,44 +726,24 @@ class SetLayoutBoundsAction extends StandardAction implements IConfigurable {
 
 	@Override
 	protected void action() throws ActionException {
-		UserTemplateConfigurer config = new UserTemplateConfigurer(this);
+
 		try {
-			config.configureAndWait();
+			PropertySet properties = UserTemplateConfigurer.configure(
+					zProperties, "Layout bounds", UIEnvironment.getInstance());
+			completeConfiguration(properties);
+
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 		}
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
-	 */
-	public void completeConfiguration(PropertySet properties) {
+	private void completeConfiguration(PropertySet properties) {
 		parent
 				.setLayoutBounds(new Dimension((Integer) properties
 						.getProperty(pWidth), (Integer) properties
 						.getProperty(pHeight)));
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
-	 */
-	public PropertyDescriptor[] getConfigSchema() {
-		return zProperties;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.configurable.IConfigurable#getTypeName()
-	 */
-	public String getTypeName() {
-		return "Layout bounds";
 	}
 
 }

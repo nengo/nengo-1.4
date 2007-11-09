@@ -1,4 +1,4 @@
-package ca.neo.ui.configurable.descriptors;
+package ca.neo.ui.configurable.descriptors.functions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -9,12 +9,10 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 
-import ca.neo.math.Function;
 import ca.neo.ui.actions.PlotFunctionAction;
-import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.descriptors.functions.AbstractConfigurableFunction;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * Input Panel for editing an individual Function
@@ -34,18 +32,18 @@ public class FunctionPanel extends PropertyInputPanel {
 	/**
 	 * Function
 	 */
-	private Function function = null;
+	private FunctionWrapper functionWr = null;
 
 	/**
-	 * Type of configuration function wrapper selected
+	 * Currently selected item in the comboBox
 	 */
-	private AbstractConfigurableFunction selectedType;
+	private AbstractConfigurableFunction selectedConfigurableFunction;
 
 	private JButton previewBtn;
 
 	private AbstractConfigurableFunction[] configurableFunctionsList;
 
-	public FunctionPanel(PropertyDescriptor property,
+	public FunctionPanel(PFunction property,
 			AbstractConfigurableFunction[] functions) {
 		super(property);
 		this.configurableFunctionsList = functions;
@@ -58,8 +56,8 @@ public class FunctionPanel extends PropertyInputPanel {
 	 */
 	protected void previewFunction() {
 
-		if (function != null) {
-			(new PlotFunctionAction("Function preview", function,
+		if (functionWr != null) {
+			(new PlotFunctionAction("Function preview", functionWr.unwrap(),
 					getDialogParent())).doAction();
 		} else {
 			UserMessages.showWarning("Please set this function first.");
@@ -70,11 +68,9 @@ public class FunctionPanel extends PropertyInputPanel {
 	 * Sets up the function using the configurable Function wrapper
 	 */
 	protected void setParameters() {
-		selectedType = (AbstractConfigurableFunction) comboBox
-				.getSelectedItem();
 
-		if (selectedType == null)
-			return;
+		selectedConfigurableFunction = (AbstractConfigurableFunction) comboBox
+				.getSelectedItem();
 
 		/*
 		 * get the JDialog parent
@@ -85,30 +81,30 @@ public class FunctionPanel extends PropertyInputPanel {
 			/*
 			 * Configure the function
 			 */
-			selectedType.setFunction(null);
-			selectedType.configure(parent);
+			// selectedType.setFunction(null);
+			selectedConfigurableFunction.configure(parent);
 
 		} else {
 			UserMessages.showError("Could not attach properties dialog");
 		}
-		setValue(selectedType.getFunction());
+		setValue(selectedConfigurableFunction.getFunctionWrapper());
 
 	}
 
 	@Override
-	public Function getValue() {
-		return function;
+	public FunctionWrapper getValue() {
+		return functionWr;
 	}
 
 	private void initPanel() {
 		comboBox = new JComboBox(configurableFunctionsList);
-		selectedType = (AbstractConfigurableFunction) comboBox
+		selectedConfigurableFunction = (AbstractConfigurableFunction) comboBox
 				.getSelectedItem();
 
 		comboBox.addItemListener(new ItemListener() {
 
 			public void itemStateChanged(ItemEvent e) {
-				if (comboBox.getSelectedItem() != selectedType) {
+				if (comboBox.getSelectedItem() != selectedConfigurableFunction) {
 					setValue(null);
 				}
 
@@ -127,7 +123,9 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	@Override
 	public boolean isValueSet() {
-		if (function != null) {
+		if (functionWr != null
+				&& functionWr.unwrap().getDimension() == getDescriptor()
+						.getInputDimension()) {
 
 			return true;
 
@@ -142,26 +140,36 @@ public class FunctionPanel extends PropertyInputPanel {
 	@Override
 	public void setValue(Object value) {
 
-		if (value != null && value instanceof Function) {
+		if (value != null && value instanceof FunctionWrapper) {
 
-			function = (Function) value;
+			functionWr = (FunctionWrapper) value;
+
+			boolean configurableFunctionFound = false;
 
 			/*
 			 * Updates the combo box to reflect the function type set
 			 */
 			for (int i = 0; i < configurableFunctionsList.length; i++) {
 
-				if ((configurableFunctionsList[i].getFunctionType())
-						.isInstance(function)) {
-					selectedType = configurableFunctionsList[i];
-					comboBox.setSelectedItem(configurableFunctionsList[i]);
+				if (configurableFunctionsList[i].getTypeName().compareTo(
+						functionWr.getTypeName()) == 0) {
+					selectedConfigurableFunction = configurableFunctionsList[i];
+					selectedConfigurableFunction.setFunctionWrapper(functionWr);
+
+					comboBox.setSelectedItem(selectedConfigurableFunction);
+					configurableFunctionFound = true;
+					break;
 				}
 			}
 
-			setStatusMsg("");
+			Util.Assert(configurableFunctionFound, "Unsupported function");
+
+			if (isValueSet()) {
+				setStatusMsg("");
+			}
 
 		} else {
-			function = null;
+			functionWr = null;
 		}
 
 	}
@@ -202,6 +210,11 @@ public class FunctionPanel extends PropertyInputPanel {
 			previewFunction();
 		}
 
+	}
+
+	@Override
+	public PFunction getDescriptor() {
+		return (PFunction) super.getDescriptor();
 	}
 
 }

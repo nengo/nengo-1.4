@@ -39,9 +39,8 @@ public class UserDialogs {
 
 	public static Object showDialog(String dialogName,
 			PropertyDescriptor descriptor) throws ConfigException {
-		return showDialog(dialogName,
-				new PropertyDescriptor[] { descriptor }).getProperty(
-				descriptor);
+		return showDialog(dialogName, new PropertyDescriptor[] { descriptor })
+				.getProperty(descriptor);
 	}
 
 	public static PropertySet showDialog(String dialogName,
@@ -92,6 +91,10 @@ class UserMultiPropDialog {
 
 		public String getTypeName() {
 			return dialogName;
+		}
+
+		public void preConfiguration(PropertySet props) throws ConfigException {
+			// do nothing
 		}
 
 	}

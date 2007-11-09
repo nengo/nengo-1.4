@@ -5,6 +5,11 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+In ReflectiveFunction, I should look at default Values and apply them
+Regular template configuration should not save to file.
+
+
+
 Use JTree to draw data list view
 	http://java.sun.com/docs/books/tutorial/uiswing/components/tree.html
 
