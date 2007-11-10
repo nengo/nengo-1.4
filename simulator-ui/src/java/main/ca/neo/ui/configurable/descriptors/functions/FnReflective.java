@@ -3,31 +3,24 @@ package ca.neo.ui.configurable.descriptors.functions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import javax.swing.JDialog;
-
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
-import ca.neo.ui.configurable.managers.UserConfigurer;
 
 /**
  * Function instances are created through reflection.
  * 
  * @author Shu Wu
  */
-public class ReflectiveConfigurableFunction extends
-		AbstractConfigurableFunction {
+public class FnReflective extends
+		AbstractFn {
 	private PropertyDescriptor[] myProperties;
 
-	private UserConfigurer configurer;
 
-	private Class<?> functionClass;
-
-	public ReflectiveConfigurableFunction(Class<?> functionClass,
+	public FnReflective(Class<?> functionClass,
 			String typeName, PropertyDescriptor[] propStruct) {
-		super(typeName);
-		this.functionClass = functionClass;
+		super(typeName, functionClass);
 
 		this.myProperties = propStruct;
 	}
@@ -49,7 +42,7 @@ public class ReflectiveConfigurableFunction extends
 		}
 		Constructor<?> ct = null;
 		try {
-			ct = functionClass.getConstructor(partypes);
+			ct = getFunctionType().getConstructor(partypes);
 
 			Object arglist[] = new Object[metaProperties.length];
 			for (int i = 0; i < metaProperties.length; i++) {
@@ -80,18 +73,7 @@ public class ReflectiveConfigurableFunction extends
 		}
 	}
 
-	@Override
-	public void configure(JDialog parent) {
-		if (configurer == null) {
-			configurer = new UserConfigurer(this, parent);
-		}
-		try {
-			configurer.configureAndWait();
-		} catch (ConfigException e) {
-			e.defaultHandleBehavior();
-		}
 
-	}
 
 	public PropertyDescriptor[] getConfigSchema() {
 		return myProperties;

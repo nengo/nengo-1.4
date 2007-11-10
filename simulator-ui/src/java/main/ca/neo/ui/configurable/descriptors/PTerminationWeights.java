@@ -1,6 +1,7 @@
 package ca.neo.ui.configurable.descriptors;
 
 import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.panels.TerminationWeightsInputPanel;
 
 /**
  * Config Descriptor for Termination Weights Matrix

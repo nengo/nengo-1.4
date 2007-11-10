@@ -1,4 +1,4 @@
-package ca.neo.ui.configurable.descriptors;
+package ca.neo.ui.configurable.panels;
 
 import javax.swing.JCheckBox;
 

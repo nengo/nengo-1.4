@@ -5,8 +5,8 @@ import javax.swing.JDialog;
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.managers.UserConfigurer;
 
 /**
  * Describes how to configure a function through the IConfigurable interface.
@@ -16,39 +16,32 @@ import ca.neo.ui.configurable.PropertySet;
 /**
  * @author User
  */
-public abstract class AbstractConfigurableFunction implements IConfigurable {
+public abstract class AbstractFn implements IConfigurable {
 
-	public PropertyDescriptor[] getConfigSchema() {
-		return null;
-	}
 
-	public void preConfiguration(PropertySet props) throws ConfigException {
-		// do nothing
-	}
+	private UserConfigurer configurer;
 
 	/**
 	 * Function to be created
 	 */
-	private FunctionWrapper functionWr;
+	private Function function;
 
 	/**
 	 * What the type of function to be created is called
 	 */
 	private String typeName;
 
+	Class<?> functionType;
+
 	/**
-	 * @param functionClass
-	 *            Class the function to be created belongs to
 	 * @param typeName
-	 *            Name of the type the function
-	 * @param propStruct
-	 *            A list of parameters referencing the constructor parameters
-	 *            required to create the function
+	 * @param functionType
 	 */
-	public AbstractConfigurableFunction(String typeName) {
+	public AbstractFn(String typeName, Class<?> functionType) {
 		super();
 
 		this.typeName = typeName;
+		this.functionType = functionType;
 	}
 
 	protected abstract Function createFunction(PropertySet props)
@@ -64,20 +57,31 @@ public abstract class AbstractConfigurableFunction implements IConfigurable {
 	public void completeConfiguration(PropertySet props) throws ConfigException {
 
 		Function function = createFunction(props);
-		FunctionWrapper functionWr = new FunctionWrapper(function, props,
-				getTypeName());
 
-		setFunctionWrapper(functionWr);
+		setFunction(function);
 
 	}
+	public void configure(JDialog parent) {
+		if (configurer == null) {
+			configurer = new UserConfigurer(this, parent);
+		}
+		try {
+			configurer.configureAndWait();
+		} catch (ConfigException e) {
+			e.defaultHandleBehavior();
+		}
 
-	public abstract void configure(JDialog parent);
+	}
 
 	/**
 	 * @return The function created
 	 */
-	public FunctionWrapper getFunctionWrapper() {
-		return functionWr;
+	public Function getFunction() {
+		return function;
+	}
+
+	public Class<?> getFunctionType() {
+		return functionType;
 	}
 
 	/*
@@ -89,12 +93,20 @@ public abstract class AbstractConfigurableFunction implements IConfigurable {
 		return typeName;
 	}
 
+	public void preConfiguration(PropertySet props) throws ConfigException {
+		// do nothing
+	}
+
 	/**
-	 * @param functionWr
+	 * @param function
 	 *            function wrapper
 	 */
-	public void setFunctionWrapper(FunctionWrapper functionWr) {
-		this.functionWr = functionWr;
+	public void setFunction(Function function) {
+		if (!getFunctionType().isInstance(function)) {
+			throw new IllegalArgumentException("Invalid function type");
+		} else {
+			this.function = function;
+		}
 	}
 
 	@Override

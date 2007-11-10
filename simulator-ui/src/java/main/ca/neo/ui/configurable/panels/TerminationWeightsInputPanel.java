@@ -1,4 +1,4 @@
-package ca.neo.ui.configurable.descriptors;
+package ca.neo.ui.configurable.panels;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -10,9 +10,12 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
-import ca.neo.ui.configurable.matrixEditor.ConfigurableMatrix;
+import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.descriptors.PCouplingMatrix;
+import ca.neo.ui.configurable.descriptors.PTerminationWeights;
+import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -20,7 +23,7 @@ import ca.shu.ui.lib.util.UserMessages;
  * 
  * @author Shu
  */
-class TerminationWeightsInputPanel extends PropertyInputPanel {
+public class TerminationWeightsInputPanel extends PropertyInputPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,11 +31,6 @@ class TerminationWeightsInputPanel extends PropertyInputPanel {
 	 * The termination weights matrix
 	 */
 	private float[][] matrix;
-
-	/**
-	 * Whether the matrix has been user edited
-	 */
-	private boolean matrixEdited = false;
 
 	/**
 	 * Text field containing the user-entered dimensions of the weights
@@ -80,7 +78,6 @@ class TerminationWeightsInputPanel extends PropertyInputPanel {
 	 */
 	private void setDimensions(int dimensions) {
 		tf.setText(dimensions + "");
-
 	}
 
 	/**
@@ -103,19 +100,32 @@ class TerminationWeightsInputPanel extends PropertyInputPanel {
 		}
 
 		if (parent != null && parent instanceof JDialog) {
-			ConfigurableMatrix configurableMatrix = new ConfigurableMatrix(
-					getFromSize(), getToSize());
+			PropertyDescriptor pCouplingMatrix;
+			if (getValue() != null) {
+				/*
+				 * Create a property descriptor with a set matrix
+				 */
+				pCouplingMatrix = new PCouplingMatrix(getValue());
+			} else {
+				/*
+				 * Create a property descriptor with no default value
+				 */
+				pCouplingMatrix = new PCouplingMatrix(getFromSize(),
+						getToSize());
+			}
 
-			UserTemplateConfigurer config = new UserTemplateConfigurer(
-					configurableMatrix, (JDialog) parent);
+			String configName = getFromSize() + " to " + getToSize()
+					+ " Coupling Matrix";
+
 			try {
-				config.configureAndWait();
+				PropertySet result = ConfigManager.configure(
+						new PropertyDescriptor[] { pCouplingMatrix }, configName,
+						parent, ConfigManager.ConfigMode.STANDARD);
+
+				setValue((float[][]) result.getProperty(pCouplingMatrix));
 			} catch (ConfigException e) {
 				e.defaultHandleBehavior();
 			}
-
-			setValue(configurableMatrix.getMatrix());
-			matrixEdited = true;
 
 		} else {
 			UserMessages.showError("Could not attach properties dialog");
@@ -147,7 +157,6 @@ class TerminationWeightsInputPanel extends PropertyInputPanel {
 
 		addToPanel(tf);
 		addToPanel(configureFunction);
-
 	}
 
 	@Override
@@ -162,27 +171,24 @@ class TerminationWeightsInputPanel extends PropertyInputPanel {
 
 	@Override
 	public boolean isValueSet() {
-		if (matrixEdited && matrix != null) {
-			if (matrix[0].length == getDimensions())
-				return true;
-
-		} else {
-
-			setStatusMsg("matrix not set");
+		if (matrix != null && matrix[0].length == getDimensions()) {
+			return true;
 		}
-
+		setStatusMsg("matrix not set");
 		return false;
 	}
 
 	@Override
 	public void setValue(Object value) {
-		if (value != null) {
+		if (value != null && value instanceof float[][]) {
 			matrix = (float[][]) value;
 
 			setDimensions(matrix[0].length);
 
-			setStatusMsg("");
-
+			if (isValueSet())
+				setStatusMsg("");
+		} else {
+			throw new IllegalArgumentException();
 		}
 
 	}
@@ -202,8 +208,8 @@ class TerminationWeightsInputPanel extends PropertyInputPanel {
 
 		public void actionPerformed(ActionEvent e) {
 			editMatrix();
-
 		}
-
 	}
 }
+
+

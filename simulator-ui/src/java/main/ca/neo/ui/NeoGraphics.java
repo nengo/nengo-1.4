@@ -45,7 +45,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	/**
 	 * UI delegate object used to show the FileChooser
 	 */
-	public static final NeoFileChooser FileChooser = new NeoFileChooser();
+	public static NeoFileChooser FileChooser;
 
 	/**
 	 * File extension for Networks
@@ -58,6 +58,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		FileChooser = new NeoFileChooser();
+
 		new NeoGraphics("Default");
 
 	}

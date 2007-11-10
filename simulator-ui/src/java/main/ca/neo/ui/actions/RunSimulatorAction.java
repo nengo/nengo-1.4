@@ -10,7 +10,8 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFloat;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.configurable.managers.ConfigManager;
+import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.AbstractActivity;
@@ -51,9 +52,9 @@ public class RunSimulatorAction extends StandardAction {
 	protected void action() throws ActionException {
 
 		try {
-			PropertySet properties = UserTemplateConfigurer.configure(
-					zProperties, "Simulator Runtime Configuration",
-					UIEnvironment.getInstance());
+			PropertySet properties = ConfigManager.configure(zProperties,
+					"Simulator Runtime Configuration", UIEnvironment
+							.getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
 			float startTime = (Float) properties.getProperty(pStartTime);
 			float endTime = (Float) properties.getProperty(pEndTime);

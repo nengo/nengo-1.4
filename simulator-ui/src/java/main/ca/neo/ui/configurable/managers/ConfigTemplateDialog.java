@@ -114,7 +114,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 								.getItemCount() - 1);
 					}
 				} else {
-					UserMessages.showWarning("Properties not complete");
+					UserMessages.showWarning("Cannot create template with incomplete properties");
 				}
 			}
 		});

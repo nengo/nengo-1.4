@@ -23,7 +23,8 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PInt;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.configurable.managers.ConfigManager;
+import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.neo.ui.models.UIModels;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UINetwork;
@@ -257,7 +258,7 @@ public class NetworkViewer extends NodeViewer {
 		MenuBuilder nodeContainersMenu = createNewMenu
 				.createSubMenu("Node Containers");
 		MenuBuilder nodesMenu = createNewMenu.createSubMenu("Nodes");
-//		MenuBuilder functionsMenu = createNewMenu.createSubMenu("Functions");
+		// MenuBuilder functionsMenu = createNewMenu.createSubMenu("Functions");
 
 		menu.addAction(new OpenNeoFileAction("Open from file", this));
 
@@ -728,8 +729,9 @@ class SetLayoutBoundsAction extends StandardAction {
 	protected void action() throws ActionException {
 
 		try {
-			PropertySet properties = UserTemplateConfigurer.configure(
-					zProperties, "Layout bounds", UIEnvironment.getInstance());
+			PropertySet properties = ConfigManager.configure(zProperties,
+					"Layout bounds", UIEnvironment.getInstance(),
+					ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 			completeConfiguration(properties);
 
 		} catch (ConfigException e) {

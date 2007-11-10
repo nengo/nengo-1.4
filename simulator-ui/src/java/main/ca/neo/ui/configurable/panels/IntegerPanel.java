@@ -1,8 +1,9 @@
-package ca.neo.ui.configurable.descriptors;
+package ca.neo.ui.configurable.panels;
 
 import javax.swing.JTextField;
 
 import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.descriptors.PInt;
 
 /**
  * Input Panel for entering Integers

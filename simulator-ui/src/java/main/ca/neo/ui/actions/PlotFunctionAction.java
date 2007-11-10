@@ -7,7 +7,8 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFloat;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.configurable.managers.ConfigManager;
+import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.neo.ui.util.DialogPlotter;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -44,8 +45,9 @@ public class PlotFunctionAction extends StandardAction {
 	protected void action() throws ActionException {
 
 		try {
-			PropertySet properties = UserTemplateConfigurer.configure(propD,
-					"Function Node plotter", UIEnvironment.getInstance());
+			PropertySet properties = ConfigManager.configure(propD,
+					"Function Node plotter", UIEnvironment.getInstance(),
+					ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 			String title = plotName + " - Function Plot";
 
 			float start = (Float) properties.getProperty(pStart);

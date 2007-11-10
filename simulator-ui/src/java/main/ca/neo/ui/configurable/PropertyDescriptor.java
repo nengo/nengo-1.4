@@ -14,9 +14,9 @@ public abstract class PropertyDescriptor implements Serializable {
 
 	private Object defaultValue = null;
 
-	private String name;
+	private boolean isEditable = true;
 
-	private boolean isEnabled = true;
+	private String name;
 
 	/**
 	 * @param name
@@ -42,33 +42,6 @@ public abstract class PropertyDescriptor implements Serializable {
 	}
 
 	/**
-	 * Sets whether this property can be changed from its default value
-	 * 
-	 * @param bool
-	 */
-	public void setEditable(boolean bool) {
-		isEnabled = bool;
-	}
-
-	/**
-	 * Gets the input panel.
-	 */
-	public PropertyInputPanel getInputPanel() {
-		// Instantiate a new input panel for each call, this is ok.
-		Util.Assert(!(!isEnabled && (getDefaultValue() == null)),
-				"An input panel cannot be disabled and have no default value");
-
-		PropertyInputPanel inputPanel = createInputPanel();
-
-		if (getDefaultValue() != null) {
-			inputPanel.setValue(getDefaultValue());
-		}
-		inputPanel.setEnabled(isEnabled);
-
-		return inputPanel;
-	}
-
-	/**
 	 * @return UI Input panel which can be used for User Configuration of this
 	 *         property, null if none exists
 	 */
@@ -79,6 +52,24 @@ public abstract class PropertyDescriptor implements Serializable {
 	 */
 	public Object getDefaultValue() {
 		return defaultValue;
+	}
+
+	/**
+	 * Gets the input panel.
+	 */
+	public PropertyInputPanel getInputPanel() {
+		// Instantiate a new input panel for each call, this is ok.
+		Util.Assert(!(!isEditable && (getDefaultValue() == null)),
+				"An input panel cannot be disabled and have no default value");
+
+		PropertyInputPanel inputPanel = createInputPanel();
+
+		if (getDefaultValue() != null) {
+			inputPanel.setValue(getDefaultValue());
+		}
+		inputPanel.setEnabled(isEditable);
+
+		return inputPanel;
 	}
 
 	/**
@@ -99,9 +90,26 @@ public abstract class PropertyDescriptor implements Serializable {
 	 */
 	public abstract String getTypeName();
 
+	public boolean isEditable() {
+		return isEditable;
+	}
+
+	/**
+	 * Sets whether this property can be changed from its default value
+	 * 
+	 * @param bool
+	 */
+	public void setEditable(boolean bool) {
+		isEditable = bool;
+	}
+
 	@Override
 	public String toString() {
 		return getTypeName();
+	}
+
+	public void setDefaultValue(Object defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 
 }

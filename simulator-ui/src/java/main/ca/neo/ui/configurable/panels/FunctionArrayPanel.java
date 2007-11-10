@@ -1,4 +1,4 @@
-package ca.neo.ui.configurable.descriptors.functions;
+package ca.neo.ui.configurable.panels;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -9,11 +9,14 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.descriptors.PFunction;
+import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.managers.UserConfigurer;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
@@ -30,7 +33,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 	/**
 	 * Function array
 	 */
-	private FunctionWrapper[] myFunctionsWr;
+	private Function[] myFunctionsWr;
 
 	/**
 	 * Text field component for entering the dimensions of the function array
@@ -95,7 +98,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public FunctionWrapper[] getValue() {
+	public Function[] getValue() {
 		return myFunctionsWr;
 	}
 
@@ -154,14 +157,14 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
 	@Override
 	public void setValue(Object value) {
-		FunctionWrapper[] functions = (FunctionWrapper[]) value;
+		Function[] functions = (Function[]) value;
 
 		/*
 		 * Check that the functions are of the correct dimension before
 		 * committing
 		 */
 		for (int i = 0; i < functions.length; i++) {
-			if (functions[i].unwrap().getDimension() != getInputDimension()) {
+			if (functions[i].getDimension() != getInputDimension()) {
 				Util.debugMsg("Function values do not match, discarded");
 				return;
 			}
@@ -224,16 +227,16 @@ class ConfigurableFunctionArray implements IConfigurable {
 	/**
 	 * Array of functions to be created
 	 */
-	private FunctionWrapper[] myFunctions;
+	private Function[] myFunctions;
 
-	private FunctionWrapper[] defaultValues;
+	private Function[] defaultValues;
 
 	/**
 	 * @param outputDimension
 	 *            Number of functions to create
 	 */
 	public ConfigurableFunctionArray(int inputDimension, int outputDimension,
-			FunctionWrapper[] defaultValues) {
+			Function[] defaultValues) {
 		super();
 		this.defaultValues = defaultValues;
 		init(inputDimension, outputDimension);
@@ -257,9 +260,9 @@ class ConfigurableFunctionArray implements IConfigurable {
 	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
 	 */
 	public void completeConfiguration(PropertySet properties) {
-		myFunctions = new FunctionWrapper[outputDimension];
+		myFunctions = new Function[outputDimension];
 		for (int i = 0; i < outputDimension; i++) {
-			myFunctions[i] = ((FunctionWrapper) properties
+			myFunctions[i] = ((Function) properties
 					.getProperty("Function " + i));
 
 		}
@@ -276,7 +279,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 
 		for (int i = 0; i < outputDimension; i++) {
 
-			FunctionWrapper defaultValue = null;
+			Function defaultValue = null;
 
 			if (defaultValues != null && i < defaultValues.length
 					&& defaultValues[i] != null) {
@@ -295,7 +298,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 	/**
 	 * @return Functions created
 	 */
-	public FunctionWrapper[] getFunctions() {
+	public Function[] getFunctions() {
 		return myFunctions;
 	}
 

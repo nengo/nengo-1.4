@@ -1,4 +1,4 @@
-package ca.neo.ui.configurable.descriptors.functions;
+package ca.neo.ui.configurable.panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -9,10 +9,12 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 
+import ca.neo.math.Function;
 import ca.neo.ui.actions.PlotFunctionAction;
 import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.descriptors.PFunction;
+import ca.neo.ui.configurable.descriptors.functions.AbstractFn;
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * Input Panel for editing an individual Function
@@ -32,19 +34,19 @@ public class FunctionPanel extends PropertyInputPanel {
 	/**
 	 * Function
 	 */
-	private FunctionWrapper functionWr = null;
+	private Function function = null;
 
 	/**
 	 * Currently selected item in the comboBox
 	 */
-	private AbstractConfigurableFunction selectedConfigurableFunction;
+	private AbstractFn selectedConfigurableFunction;
 
 	private JButton previewBtn;
 
-	private AbstractConfigurableFunction[] configurableFunctionsList;
+	private AbstractFn[] configurableFunctionsList;
 
 	public FunctionPanel(PFunction property,
-			AbstractConfigurableFunction[] functions) {
+			AbstractFn[] functions) {
 		super(property);
 		this.configurableFunctionsList = functions;
 
@@ -56,8 +58,8 @@ public class FunctionPanel extends PropertyInputPanel {
 	 */
 	protected void previewFunction() {
 
-		if (functionWr != null) {
-			(new PlotFunctionAction("Function preview", functionWr.unwrap(),
+		if (function != null) {
+			(new PlotFunctionAction("Function preview", function,
 					getDialogParent())).doAction();
 		} else {
 			UserMessages.showWarning("Please set this function first.");
@@ -69,7 +71,7 @@ public class FunctionPanel extends PropertyInputPanel {
 	 */
 	protected void setParameters() {
 
-		selectedConfigurableFunction = (AbstractConfigurableFunction) comboBox
+		selectedConfigurableFunction = (AbstractFn) comboBox
 				.getSelectedItem();
 
 		/*
@@ -87,18 +89,18 @@ public class FunctionPanel extends PropertyInputPanel {
 		} else {
 			UserMessages.showError("Could not attach properties dialog");
 		}
-		setValue(selectedConfigurableFunction.getFunctionWrapper());
+		setValue(selectedConfigurableFunction.getFunction());
 
 	}
 
 	@Override
-	public FunctionWrapper getValue() {
-		return functionWr;
+	public Function getValue() {
+		return function;
 	}
 
 	private void initPanel() {
 		comboBox = new JComboBox(configurableFunctionsList);
-		selectedConfigurableFunction = (AbstractConfigurableFunction) comboBox
+		selectedConfigurableFunction = (AbstractFn) comboBox
 				.getSelectedItem();
 
 		comboBox.addItemListener(new ItemListener() {
@@ -123,8 +125,8 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	@Override
 	public boolean isValueSet() {
-		if (functionWr != null
-				&& functionWr.unwrap().getDimension() == getDescriptor()
+		if (function != null
+				&& function.getDimension() == getDescriptor()
 						.getInputDimension()) {
 
 			return true;
@@ -140,10 +142,9 @@ public class FunctionPanel extends PropertyInputPanel {
 	@Override
 	public void setValue(Object value) {
 
-		if (value != null && value instanceof FunctionWrapper) {
+		if (value != null && value instanceof Function) {
 
-			functionWr = (FunctionWrapper) value;
-
+			function = (Function) value;
 			boolean configurableFunctionFound = false;
 
 			/*
@@ -151,10 +152,10 @@ public class FunctionPanel extends PropertyInputPanel {
 			 */
 			for (int i = 0; i < configurableFunctionsList.length; i++) {
 
-				if (configurableFunctionsList[i].getTypeName().compareTo(
-						functionWr.getTypeName()) == 0) {
+				if (configurableFunctionsList[i].getFunctionType().isInstance(
+						function)) {
 					selectedConfigurableFunction = configurableFunctionsList[i];
-					selectedConfigurableFunction.setFunctionWrapper(functionWr);
+					selectedConfigurableFunction.setFunction(function);
 
 					comboBox.setSelectedItem(selectedConfigurableFunction);
 					configurableFunctionFound = true;
@@ -162,14 +163,15 @@ public class FunctionPanel extends PropertyInputPanel {
 				}
 			}
 
-			Util.Assert(configurableFunctionFound, "Unsupported function");
+			if (!configurableFunctionFound)
+				throw new IllegalArgumentException("Unsupported function");
 
 			if (isValueSet()) {
 				setStatusMsg("");
 			}
 
 		} else {
-			functionWr = null;
+			function = null;
 		}
 
 	}

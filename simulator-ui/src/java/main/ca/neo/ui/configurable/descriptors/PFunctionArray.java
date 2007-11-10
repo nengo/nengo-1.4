@@ -1,8 +1,9 @@
-package ca.neo.ui.configurable.descriptors.functions;
+package ca.neo.ui.configurable.descriptors;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.panels.FunctionArrayPanel;
 
 /**
  * Config Descriptor for an Array of functions

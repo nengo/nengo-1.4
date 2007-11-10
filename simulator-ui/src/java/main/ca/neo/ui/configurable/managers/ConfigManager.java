@@ -1,5 +1,6 @@
 package ca.neo.ui.configurable.managers;
 
+import java.awt.Container;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,6 +18,8 @@ import javax.swing.text.SimpleAttributeSet;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertySet;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 
@@ -42,6 +45,41 @@ public abstract class ConfigManager {
 		if (!file.exists())
 			file.mkdir();
 		return file;
+	}
+
+	public enum ConfigMode {
+		STANDARD, TEMPLATE_NOT_CHOOSABLE, TEMPLATE_CHOOSABLE
+	}
+
+	public static Object configure(PropertyDescriptor prop, String typeName,
+			Container parent) throws ConfigException {
+
+		PropertySet properties = configure(new PropertyDescriptor[] { prop },
+				typeName, parent, ConfigMode.TEMPLATE_NOT_CHOOSABLE);
+		return properties.getProperty(prop);
+	}
+
+	public static PropertySet configure(PropertyDescriptor[] props,
+			String typeName, Container parent, ConfigMode configMode)
+			throws ConfigException {
+
+		Configureable configurable = new Configureable(props, typeName);
+
+		UserConfigurer configurer;
+
+		if (configMode == ConfigMode.STANDARD) {
+			configurer = new UserConfigurer(configurable, parent);
+		} else if (configMode == ConfigMode.TEMPLATE_NOT_CHOOSABLE) {
+			configurer = new UserTemplateConfigurer(configurable, parent, false);
+		} else if (configMode == ConfigMode.TEMPLATE_CHOOSABLE) {
+			configurer = new UserTemplateConfigurer(configurable, parent, false);
+		} else {
+			throw new IllegalArgumentException("Unsupported config mode");
+		}
+
+		configurer.configureAndWait();
+
+		return configurable.getProperties();
 	}
 
 	/**
@@ -242,4 +280,40 @@ class ConfigFilesFilter implements FilenameFilter {
 			return false;
 
 	}
+}
+
+class Configureable implements IConfigurable {
+
+	private PropertySet properties;
+
+	private PropertyDescriptor[] props;
+	private String typeName;
+
+	public Configureable(PropertyDescriptor[] props, String typeName) {
+		super();
+		this.props = props;
+		this.typeName = typeName;
+	}
+
+	public void completeConfiguration(PropertySet props) throws ConfigException {
+		properties = props;
+
+	}
+
+	public PropertyDescriptor[] getConfigSchema() {
+		return props;
+	}
+
+	public PropertySet getProperties() {
+		return properties;
+	}
+
+	public String getTypeName() {
+		return typeName;
+	}
+
+	public void preConfiguration(PropertySet props) throws ConfigException {
+		// do nothing
+	}
+
 }

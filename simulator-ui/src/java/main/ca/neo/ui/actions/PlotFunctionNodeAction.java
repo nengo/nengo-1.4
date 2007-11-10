@@ -8,7 +8,8 @@ import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.descriptors.PInt;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.configurable.managers.ConfigManager;
+import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -39,9 +40,9 @@ public class PlotFunctionNodeAction extends StandardAction {
 		PropertyDescriptor[] propDescripters = { pFunctionIndex, pStart,
 				pIncrement, pEnd };
 		try {
-			PropertySet properties = UserTemplateConfigurer.configure(
-					propDescripters, "Function plotter", UIEnvironment
-							.getInstance());
+			PropertySet properties = ConfigManager.configure(propDescripters,
+					"Function plotter", UIEnvironment.getInstance(),
+					ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
 			completeConfiguration(properties);
 
@@ -61,9 +62,10 @@ public class PlotFunctionNodeAction extends StandardAction {
 		float increment = (Float) properties.getProperty(pIncrement);
 
 		if (increment == 0) {
-			throw new ConfigException("Cannot plot with infinite steps because step size is 0");
+			throw new ConfigException(
+					"Cannot plot with infinite steps because step size is 0");
 		}
-		
+
 		Function[] functions = functionInput.getFunctions();
 
 		if (functionIndex >= functions.length) {

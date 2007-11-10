@@ -1,15 +1,16 @@
-package ca.neo.ui.configurable.descriptors.functions;
+package ca.neo.ui.configurable.descriptors;
 
 import java.util.Vector;
 
 import ca.neo.math.Function;
-import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.descriptors.PFloat;
-import ca.neo.ui.configurable.descriptors.PInt;
-import ca.neo.ui.configurable.descriptors.PLong;
+import ca.neo.ui.configurable.descriptors.functions.AbstractFn;
+import ca.neo.ui.configurable.descriptors.functions.FnConstant;
+import ca.neo.ui.configurable.descriptors.functions.FnCustom;
+import ca.neo.ui.configurable.descriptors.functions.FnReflective;
+import ca.neo.ui.configurable.panels.FunctionPanel;
 
 /**
  * Config Descriptor for Functions
@@ -29,7 +30,7 @@ public class PFunction extends PropertyDescriptor {
 	}
 
 	public PFunction(String name, int inputDimension,
-			boolean isInputDimensionEditable, FunctionWrapper defaultValue) {
+			boolean isInputDimensionEditable, Function defaultValue) {
 		super(name, defaultValue);
 		this.myInputDimension = inputDimension;
 		this.isInputDimensionEditable = isInputDimensionEditable;
@@ -39,20 +40,13 @@ public class PFunction extends PropertyDescriptor {
 	// super(name, defaultValue);
 	// }
 
-	private AbstractConfigurableFunction[] createConfigurableFunctions() {
-		Vector<AbstractConfigurableFunction> functions = new Vector<AbstractConfigurableFunction>();
+	private AbstractFn[] createConfigurableFunctions() {
+		Vector<AbstractFn> functions = new Vector<AbstractFn>();
 
-		PInt pInputDimension = new PInt("Input Dimension", myInputDimension);
-		pInputDimension.setEditable(isInputDimensionEditable);
+		functions
+				.add(new FnConstant(myInputDimension, isInputDimensionEditable));
 
-		ReflectiveConfigurableFunction constantFunction = new ReflectiveConfigurableFunction(
-				ConstantFunction.class,
-				"Constant Function",
-				new PropertyDescriptor[] { pInputDimension, new PFloat("Value") });
-		functions.add(constantFunction);
-
-		InterpretorFunction interpreterFunction = new InterpretorFunction(
-				myInputDimension, false);
+		FnCustom interpreterFunction = new FnCustom(myInputDimension, false);
 
 		functions.add(interpreterFunction);
 
@@ -60,13 +54,13 @@ public class PFunction extends PropertyDescriptor {
 		 * These functions can only have a input dimension of 1
 		 */
 		if (myInputDimension == 1) {
-			ReflectiveConfigurableFunction fourierFunction = new ReflectiveConfigurableFunction(
+			FnReflective fourierFunction = new FnReflective(
 					FourierFunction.class, "Fourier Function",
 					new PropertyDescriptor[] { new PFloat("Fundamental"),
 							new PFloat("Cutoff"), new PFloat("RMS"),
 							new PLong("Seed") });
 
-			ReflectiveConfigurableFunction gaussianPDF = new ReflectiveConfigurableFunction(
+			FnReflective gaussianPDF = new FnReflective(
 					GaussianPDF.class, "Guassian PDF",
 					new PropertyDescriptor[] { new PFloat("Mean"),
 							new PFloat("Variance"), new PFloat("Peak") });
@@ -75,12 +69,12 @@ public class PFunction extends PropertyDescriptor {
 			functions.add(gaussianPDF);
 		}
 
-		return functions.toArray(new AbstractConfigurableFunction[0]);
+		return functions.toArray(new AbstractFn[0]);
 	}
 
 	@Override
 	protected FunctionPanel createInputPanel() {
-		AbstractConfigurableFunction[] functions = createConfigurableFunctions();
+		AbstractFn[] functions = createConfigurableFunctions();
 		return new FunctionPanel(this, functions);
 	}
 

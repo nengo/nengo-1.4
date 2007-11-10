@@ -18,45 +18,37 @@ import javax.swing.border.EtchedBorder;
 import ca.neo.math.Function;
 import ca.neo.math.FunctionInterpreter;
 import ca.neo.math.impl.DefaultFunctionInterpreter;
+import ca.neo.math.impl.PostfixFunction;
 import ca.neo.ui.actions.PlotFunctionAction;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.descriptors.PFunction;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PString;
-import ca.neo.ui.configurable.descriptors.StringPanel;
 import ca.neo.ui.configurable.managers.ConfigDialog;
+import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.UserConfigurer;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.configurable.panels.StringPanel;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UserMessages;
 
-public class InterpretorFunction extends AbstractConfigurableFunction {
-	@Override
-	public void setFunctionWrapper(FunctionWrapper functionWr) {
-		super.setFunctionWrapper(functionWr);
-
-		if (functionWr.getTypeName().compareTo(this.getTypeName()) == 0) {
-			defaultProperties = functionWr.getProperties();
-		}
-	}
+public class FnCustom extends AbstractFn {
 
 	private static final String DIMENSION_STR = "Input Dimensions";
+
 	private static final String EXPRESSION_STR = "Expression";
-
 	private static DefaultFunctionInterpreter interpreter = new DefaultFunctionInterpreter();
-	private PropertyDescriptor pExpression;
-	private int myInputDimensions;
-	InterpreterFunctionConfigurer configurer;
 
+	private int myInputDimensions;
+	private PropertyDescriptor pExpression;
+	InterpreterFunctionConfigurer configurer;
 	boolean isInputDimEditable;
 
-	PropertySet defaultProperties;
-
-	public InterpretorFunction(int inputDimensions, boolean isInputDimEditable) {
-		super("User-defined Function");
+	public FnCustom(int inputDimensions, boolean isInputDimEditable) {
+		super("User-defined Function", PostfixFunction.class);
 		this.myInputDimensions = inputDimensions;
 		this.isInputDimEditable = isInputDimEditable;
 
@@ -98,11 +90,13 @@ public class InterpretorFunction extends AbstractConfigurableFunction {
 		String expression = null;
 		int dim = myInputDimensions;
 
-		if (defaultProperties != null) {
-			expression = (String) defaultProperties.getProperty(EXPRESSION_STR);
+		PostfixFunction function = getFunction();
+
+		if (function != null) {
+			expression = function.getExpressionStr();
 
 			if (isInputDimEditable)
-				dim = (Integer) defaultProperties.getProperty(DIMENSION_STR);
+				dim = function.getDimension();
 		}
 
 		pExpression = new PString(EXPRESSION_STR, expression);
@@ -116,6 +110,11 @@ public class InterpretorFunction extends AbstractConfigurableFunction {
 		PropertyDescriptor[] props = new PropertyDescriptor[] { pExpression,
 				pDimensions };
 		return props;
+	}
+
+	@Override
+	public PostfixFunction getFunction() {
+		return (PostfixFunction) super.getFunction();
 	}
 
 	@Override
@@ -266,9 +265,10 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 					PFunction pFunction = new PFunction("New Function", 1,
 							true, null);
 
-					PropertySet props = UserTemplateConfigurer.configure(
+					PropertySet props = ConfigManager.configure(
 							new PropertyDescriptor[] { pFnName, pFunction },
-							"Register fuction", FunctionDialog.this);
+							"Register fuction", FunctionDialog.this,
+							ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
 					String name = (String) props.getProperty(pFnName);
 					Function fn = (Function) props.getProperty(pFunction);

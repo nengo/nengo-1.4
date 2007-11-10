@@ -7,8 +7,8 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.UserDialogs;
-import ca.neo.ui.configurable.managers.UserConfigurer;
-import ca.neo.ui.configurable.matrixEditor.ConfigurableMatrix;
+import ca.neo.ui.configurable.descriptors.PCouplingMatrix;
+import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -22,6 +22,7 @@ import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.objects.lines.ILineEndHolder;
 import ca.shu.ui.lib.objects.lines.LineEnd;
 import ca.shu.ui.lib.objects.lines.LineEndHolderIcon;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
@@ -254,17 +255,21 @@ public class UITermination extends Widget implements ILineEndHolder {
 
 		@Override
 		protected void action() throws ActionException {
-			oldWeights = getWeights();
-
-			ConfigurableMatrix matrixEditor = new ConfigurableMatrix(oldWeights);
-			UserConfigurer config = new UserConfigurer(matrixEditor);
+			PropertyDescriptor pCouplingMatrix = new PCouplingMatrix(
+					getWeights());
 			try {
-				config.configureAndWait();
-				setWeights(matrixEditor.getMatrix());
+				PropertySet result = ConfigManager.configure(
+						new PropertyDescriptor[] { pCouplingMatrix },
+						"Coupling matrix", UIEnvironment.getInstance(),
+						ConfigManager.ConfigMode.STANDARD);
+
+				setWeights((float[][]) result.getProperty(pCouplingMatrix));
 			} catch (ConfigException e) {
 				e.defaultHandleBehavior();
 				throw new UserCancelledException();
 			}
+
+		
 
 		}
 

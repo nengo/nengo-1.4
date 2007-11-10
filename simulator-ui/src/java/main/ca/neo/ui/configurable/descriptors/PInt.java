@@ -1,5 +1,7 @@
 package ca.neo.ui.configurable.descriptors;
 
+import ca.neo.ui.configurable.panels.IntegerPanel;
+
 /**
  * Config Descriptor for Integers
  * 
