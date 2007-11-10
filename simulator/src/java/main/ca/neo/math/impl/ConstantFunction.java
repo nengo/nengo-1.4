@@ -62,4 +62,11 @@ public class ConstantFunction implements Function {
 		return result;
 	}
 
+	/**
+	 * @return Value of function
+	 */
+	public float getValue() {
+		return myValue;
+	}
+
 }
