@@ -17,6 +17,7 @@ import ca.neo.ui.configurable.descriptors.PCouplingMatrix;
 import ca.neo.ui.configurable.descriptors.PTerminationWeights;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * Input panel for Termination Weights Matrix
@@ -119,8 +120,8 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 
 			try {
 				PropertySet result = ConfigManager.configure(
-						new PropertyDescriptor[] { pCouplingMatrix }, configName,
-						parent, ConfigManager.ConfigMode.STANDARD);
+						new PropertyDescriptor[] { pCouplingMatrix },
+						configName, parent, ConfigManager.ConfigMode.STANDARD);
 
 				setValue((float[][]) result.getProperty(pCouplingMatrix));
 			} catch (ConfigException e) {
@@ -180,17 +181,17 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 
 	@Override
 	public void setValue(Object value) {
-		if (value != null && value instanceof float[][]) {
+		if ((value != null) && (value instanceof float[][])
+				&& (getToSize() == ((float[][]) value).length)) {
 			matrix = (float[][]) value;
-
 			setDimensions(matrix[0].length);
 
 			if (isValueSet())
 				setStatusMsg("");
 		} else {
-			throw new IllegalArgumentException();
+			Util
+					.debugMsg("Saved termination weights don't fit, they will be replaced");
 		}
-
 	}
 
 	/**
@@ -211,5 +212,3 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 		}
 	}
 }
-
-

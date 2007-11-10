@@ -165,7 +165,8 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 		 */
 		for (int i = 0; i < functions.length; i++) {
 			if (functions[i].getDimension() != getInputDimension()) {
-				Util.debugMsg("Function values do not match, discarded");
+				Util
+						.debugMsg("Saved functions are of a different dimension, they can't be used");
 				return;
 			}
 		}

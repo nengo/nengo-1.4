@@ -37,7 +37,7 @@ public class ConfigDialog extends JDialog {
 	/**
 	 * Parent ConfigurationManager
 	 */
-	protected UserConfigurer configurerParent;
+	private UserConfigurer myConfigurer;
 
 	protected Vector<PropertyInputPanel> propertyInputPanels;
 
@@ -85,7 +85,7 @@ public class ConfigDialog extends JDialog {
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
 
-					configurerParent.setProperty(property.getName(), inputPanel
+					myConfigurer.setProperty(property.getName(), inputPanel
 							.getValue());
 				}
 			} else {
@@ -108,7 +108,7 @@ public class ConfigDialog extends JDialog {
 
 		setVisible(false);
 
-		configurerParent
+		myConfigurer
 				.dialogConfigurationFinished(new ConfigDialogClosedException());
 		super.dispose();
 	}
@@ -149,7 +149,7 @@ public class ConfigDialog extends JDialog {
 	 *            Component the dialog is to be added to
 	 */
 	private void init(UserConfigurer configManager, Component owner) {
-		this.configurerParent = configManager;
+		this.myConfigurer = configManager;
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
@@ -181,6 +181,11 @@ public class ConfigDialog extends JDialog {
 		this.setVisible(true);
 	}
 
+	protected void completeConfiguration() throws ConfigException {
+		myConfigurer.getConfigurable().completeConfiguration(
+				new PropertySet(myConfigurer.getProperties()));
+	}
+
 	/**
 	 * What happens when the user presses the OK button
 	 */
@@ -188,9 +193,9 @@ public class ConfigDialog extends JDialog {
 		if (applyProperties()) {
 			boolean preConfigurationSuccess = true;
 			try {
-				PropertySet properties = new PropertySet(configurerParent
+				PropertySet properties = new PropertySet(myConfigurer
 						.getProperties());
-				configurerParent.getConfigurable().preConfiguration(properties);
+				myConfigurer.getConfigurable().preConfiguration(properties);
 			} catch (ConfigException e1) {
 				e1.defaultHandleBehavior();
 				preConfigurationSuccess = false;
@@ -201,25 +206,20 @@ public class ConfigDialog extends JDialog {
 				dispose();
 
 				(new AbstractActivity("Configuring "
-						+ configurerParent.getConfigurable().getTypeName()) {
+						+ myConfigurer.getConfigurable().getTypeName()) {
 
 					@Override
 					public void doActivity() {
 						ConfigException configException = null;
 
 						try {
-							configurerParent.getConfigurable()
-									.completeConfiguration(
-											new PropertySet(configurerParent
-													.getProperties()));
-							configurerParent
-									.savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
+							completeConfiguration();
 						} catch (ConfigException e) {
 							configException = e;
 
 						}
 
-						configurerParent
+						myConfigurer
 								.dialogConfigurationFinished(configException);
 
 					}
@@ -254,12 +254,12 @@ public class ConfigDialog extends JDialog {
 	 */
 
 	protected void createPropertiesDialog(JPanel panel) {
-		PropertyDescriptor[] propDescriptors = configurerParent
+		PropertyDescriptor[] propDescriptors = myConfigurer
 				.getConfigurable().getConfigSchema();
 		propertyInputPanels = new Vector<PropertyInputPanel>(
 				propDescriptors.length);
 
-		MutableAttributeSet properties = configurerParent.getProperties();
+		MutableAttributeSet properties = myConfigurer.getProperties();
 
 		for (PropertyDescriptor property : propDescriptors) {
 
@@ -298,8 +298,8 @@ public class ConfigDialog extends JDialog {
 		 */
 	}
 
-	public UserConfigurer getConfigurerParent() {
-		return configurerParent;
+	public UserConfigurer getConfigurer() {
+		return myConfigurer;
 	}
 
 }

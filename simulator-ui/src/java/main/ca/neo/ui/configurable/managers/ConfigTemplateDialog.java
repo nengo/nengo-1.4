@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
+import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UserMessages;
@@ -33,13 +34,22 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	private JComboBox templateList;
 
 	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
-			Frame owner) {
+			Dialog owner) {
 		super(configManager, owner);
 	}
 
 	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
-			Dialog owner) {
+			Frame owner) {
 		super(configManager, owner);
+	}
+
+	@Override
+	protected void completeConfiguration() throws ConfigException {
+		super.completeConfiguration();
+
+		getConfigurer().savePropertiesFile(
+				UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
+
 	}
 
 	@Override
@@ -63,7 +73,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 				}
 			}
 
-			updateDialogFromFile();
+//			updateDialogFromFile();
 		}
 	}
 
@@ -72,7 +82,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		/*
 		 * Add existing templates
 		 */
-		String[] files = configurerParent.getPropertyFiles();
+		String[] files = getConfigurer().getPropertyFiles();
 
 		templateList = new JComboBox(files);
 
@@ -81,11 +91,8 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		JPanel dropDownPanel = new JCustomPanel();
 
 		templateList.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
-
 				updateDialogFromFile();
-
 			}
 
 		});
@@ -108,13 +115,14 @@ public class ConfigTemplateDialog extends ConfigDialog {
 					String name = JOptionPane.showInputDialog("Name:");
 
 					if (name != null && name.compareTo("") != 0) {
-						configurerParent.savePropertiesFile(name);
+						getConfigurer().savePropertiesFile(name);
 						templateList.addItem(name);
 						templateList.setSelectedIndex(templateList
 								.getItemCount() - 1);
 					}
 				} else {
-					UserMessages.showWarning("Cannot create template with incomplete properties");
+					UserMessages
+							.showWarning("Cannot create template with incomplete properties");
 				}
 			}
 		});
@@ -128,7 +136,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
 				templateList.removeItem(selectedFile);
 
-				configurerParent.deletePropertiesFile(selectedFile);
+				getConfigurer().deletePropertiesFile(selectedFile);
 
 				updateDialogFromFile();
 			}
@@ -149,7 +157,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		JPanel seperator = new JCustomPanel();
 		seperator.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
-		if (getConfigurerParent().isTemplateEditable()) {
+		if (getConfigurer().isTemplateEditable()) {
 			panel.add(wrapperPanel);
 			panel.add(seperator);
 		}
@@ -162,15 +170,15 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	protected void updateDialogFromFile() {
 		try {
 			if (templateList.getSelectedItem() != null) {
-				configurerParent.loadPropertiesFromFile((String) templateList
-						.getSelectedItem());
+				getConfigurer().loadPropertiesFromFile(
+						(String) templateList.getSelectedItem());
 				Iterator<PropertyInputPanel> it = propertyInputPanels
 						.iterator();
 				while (it.hasNext()) {
 					PropertyInputPanel panel = it.next();
 
-					Object currentValue = configurerParent.getProperty(panel
-							.getName());
+					Object currentValue = getConfigurer().getProperty(
+							panel.getName());
 					if (currentValue != null && panel.isEnabled()) {
 						panel.setValue(currentValue);
 					}
@@ -184,8 +192,8 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	}
 
 	@Override
-	public UserTemplateConfigurer getConfigurerParent() {
-		return (UserTemplateConfigurer) super.getConfigurerParent();
+	public UserTemplateConfigurer getConfigurer() {
+		return (UserTemplateConfigurer) super.getConfigurer();
 	}
 
 }
