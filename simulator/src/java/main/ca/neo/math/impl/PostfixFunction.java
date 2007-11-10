@@ -28,6 +28,12 @@ public class PostfixFunction implements Function {
 	private static final long serialVersionUID = 1L;
 	
 	private List myExpression;
+	
+	/**
+	 * A human-readable string representation of the function
+	 */
+	private String myExpressionStr;
+	
 	private int myDimension;
 	
 	/**
@@ -36,6 +42,16 @@ public class PostfixFunction implements Function {
 	 * 		placeholders that appear in the expression)
 	 */
 	public PostfixFunction(List expression, int dimension) {
+		this(expression,"", dimension);
+	}
+	
+	/**
+	 * @param expression Postfix expression list (as described in class docs)
+	 * @param expressionStr String representation of the expression
+	 * @param dimension Dimension of the function (must be at least as great as any operand 
+	 * 		placeholders that appear in the expression)
+	 */
+	public PostfixFunction(List expression, String expressionStr, int dimension) {
 		int highest = findHighestDimension(expression);
 		if (dimension <= highest) {
 			throw new IllegalArgumentException("Dimension must be at least " + (highest+1) + " so satisfy expresion");			
@@ -43,6 +59,7 @@ public class PostfixFunction implements Function {
 		
 		myDimension = dimension;
 		myExpression = expression;
+		myExpressionStr = expressionStr;
 	}
 	
 	/**
@@ -137,6 +154,17 @@ public class PostfixFunction implements Function {
 		}
 		
 		return highest;
+	}
+
+	/**
+	 * @return A human-readable string representation of the function
+	 */
+	public String getExpressionStr() {
+		if (myExpressionStr != null && myExpressionStr.compareTo("") != 0) {
+			return myExpressionStr;
+		} else {
+			return "Postfix: " + myExpression.toString();
+		}
 	}
 
 }

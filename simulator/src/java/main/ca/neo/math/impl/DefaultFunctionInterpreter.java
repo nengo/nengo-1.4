@@ -145,7 +145,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 			result.add(stack.pop());
 		}
 		
-		return new PostfixFunction(result, dimension);
+		return new PostfixFunction(result,expression, dimension);
 	}
 
 	
