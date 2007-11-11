@@ -18,6 +18,8 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Reader;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -30,6 +32,17 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
+import org.python.core.PyInstance;
+import org.python.core.PyInteger;
+import org.python.core.PyJavaInstance;
+import org.python.core.PyList;
+import org.python.core.PyMethod;
+import org.python.core.PyObject;
+import org.python.core.PyReflectedFunction;
+import org.python.core.PySequence;
+import org.python.core.PyString;
+import org.python.core.PyStringMap;
+import org.python.core.PyTuple;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -49,6 +62,7 @@ public class ScriptConsole extends JPanel {
 	private JEditorPane myDisplayArea;
 	private JTextField myCommandField;
 	private CommandHistory myHistory;
+	private CodeCompletor myCompletor;
 	private String myTypedText;
 	private StyleContext myStyleContext;
 	
@@ -71,8 +85,8 @@ public class ScriptConsole extends JPanel {
 		myCommandField.addActionListener(new CommandActionListener(this));
 		
 		myHistory = new CommandHistory();
-		myTypedText = "";
-		
+		myCompletor = new CodeCompletor(myInterpreter);
+		myTypedText = "";		
 		
 		try {
 			OutputWriter ow = new OutputWriter(this);
@@ -81,6 +95,18 @@ public class ScriptConsole extends JPanel {
 			owThread.start();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		
+	}
+	
+	protected void test() {
+//		List<String> variables = myCompletor.getVariables();
+//		for (Iterator<String> iter = variables.iterator(); iter.hasNext(); ) {
+//			System.out.println("variable: " + iter.next());
+//		}
+		List<String> members = myCompletor.getMembers(myCommandField.getText());
+		for (Iterator<String> iter = members.iterator(); iter.hasNext(); ) {
+			System.out.println("member: " + iter.next());
 		}
 	}
 	
@@ -194,6 +220,8 @@ public class ScriptConsole extends JPanel {
 				myConsole.historyUp();
 			} else if (code == 40) { //down arrow
 				myConsole.historyDown();
+			} else if (code == 39) { //right arrow
+				myConsole.test();
 			}
 		}
 

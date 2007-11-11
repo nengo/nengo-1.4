@@ -26,6 +26,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -242,15 +243,16 @@ public class ScriptEditor extends JPanel {
 	public static void main(String[] args) {
 		
 		final ScriptEditor editor = new ScriptEditor();
+		editor.setPreferredSize(new Dimension(600, 600));
 		
 		PythonInterpreter interpreter = new PythonInterpreter();
 		ScriptConsole console = new ScriptConsole(interpreter);
-		console.setPreferredSize(new Dimension(450, 400));
+		console.setPreferredSize(new Dimension(600, 600));
 		
 		JFrame frame = new JFrame("Script Editor");
+		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, console, editor);
 		frame.getContentPane().setLayout(new BorderLayout());
-		frame.getContentPane().add(editor, BorderLayout.CENTER);
-		frame.getContentPane().add(console, BorderLayout.EAST);
+		frame.getContentPane().add(split, BorderLayout.CENTER);
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
@@ -322,7 +324,7 @@ public class ScriptEditor extends JPanel {
 			}
 		);
 		
-		frame.setSize(900, 400);
+		frame.pack();
 		frame.setVisible(true);
 		
 	}

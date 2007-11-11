@@ -42,7 +42,6 @@ public class CommandHistory {
 	public String previous(String partial) {
 		String result = null;
 		for (int i = myIndex-1; i >= 0 && result == null; i--) {
-//			System.out.println("history (up) " + myIndex + ": " + myCommands.get(i));
 			if (myCommands.get(i).startsWith(partial)) {
 				result = myCommands.get(i);
 				myIndex = i;
@@ -63,7 +62,6 @@ public class CommandHistory {
 	public String next(String partial) {
 		String result = null;
 		for (int i = myIndex+1; i < myCommands.size() && result == null; i++) {
-//			System.out.println("history (down) " + myIndex + ": " + myCommands.get(i));
 			if (myCommands.get(i).startsWith(partial)) {
 				result = myCommands.get(i);
 				myIndex = i;
