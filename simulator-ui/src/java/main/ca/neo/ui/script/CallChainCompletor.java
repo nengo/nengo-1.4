@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.python.core.PyFunction;
 import org.python.core.PyInstance;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
@@ -16,16 +17,33 @@ import org.python.core.PyMethod;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
+import org.python.core.PyTableCode;
 import org.python.util.PythonInterpreter;
 
+/**
+ * A CommandCompletor that suggests completions based on Python variable names and 
+ * methods/fields of Python objects.
+ *    
+ * @author Bryan Tripp
+ */
 public class CallChainCompletor extends CommandCompletor {
 	
 	private PythonInterpreter myInterpreter;
 	
+	/**
+	 * @param interpreter The Python interpreter from which variables are gleaned  
+	 */
 	public CallChainCompletor(PythonInterpreter interpreter) {
 		myInterpreter = interpreter;
 	}
 	
+	/**
+	 * Rebuilds the completion options list from a "base" call chain.
+	 *  
+	 * @param callChain A partial call chain, eg "x.getY().get", from which we would extract
+	 * 		the base call chain "x.getY()". (In this case the new options list might include 
+	 * 		"x.getY().toString()", "x.getY().wait()", etc.)
+	 */
 	public void setBase(String callChain) {
 		List<String> options = null;
 		if (callChain.contains(".")) { //the root variable is specified
@@ -63,7 +81,8 @@ public class CallChainCompletor extends CommandCompletor {
 	 * 		Java objects, this arg can consist of a call chain, eg x.getY().getZ()
 	 * 		For native python variables, the return type of a call isn't known, 
 	 * 		so this method can't return anything given a call chain.   
-	 * @return A list of methods (with args) and variables on the named variable.  
+	 * @return A list of completion options including methods (with args) 
+	 * 		and fields on the named variable.  
 	 */
 	public List<String> getMembers(String base) {
 		PyStringMap map = (PyStringMap) myInterpreter.getLocals();
@@ -84,7 +103,6 @@ public class CallChainCompletor extends CommandCompletor {
 				}
 				
 				Method[] methods = c.getMethods();
-				System.out.println("MEMBERS:");
 				for (int i = 0; i < methods.length; i++) {
 					StringBuffer buf = new StringBuffer(base + ".");
 					buf.append(methods[i].getName());
@@ -95,7 +113,6 @@ public class CallChainCompletor extends CommandCompletor {
 						if (j < paramTypes.length - 1) buf.append(", ");
 					}
 					buf.append(')');
-					System.out.println(" " + buf.toString());
 					result.add(buf.toString());
 				}
 			} catch (Exception e) {
@@ -106,15 +123,23 @@ public class CallChainCompletor extends CommandCompletor {
 			if ( !varTok.hasMoreTokens() ) {
 				PyObject iter = ((PyList) ((PyInstance) po).__dir__()).__iter__();
 				
-				System.out.println("MEMBERS:");
-				for (PyObject item; (item = iter.__iternext__()) != null; ) {						
-					PyObject attr = po.__findattr__((PyString) item);
-					StringBuffer buf = new StringBuffer(base + ".");
-					buf.append(attr.toString());
-					if (attr instanceof PyMethod) {
+				for (PyString item; (item = (PyString) iter.__iternext__()) != null; ) {
+					PyObject attr = po.__findattr__(item);
+					StringBuffer buf = new StringBuffer(base + ".");					
+					buf.append(item.toString());
+					if (attr instanceof PyMethod) {						
 						buf.append("(");
+						try {
+							String[] varnames = ((PyTableCode) ((PyFunction) ((PyMethod) attr).im_func).func_code).co_varnames;
+							for (int i = 1; i < varnames.length; i++) { //skip 'self' arg
+								buf.append(varnames[i]);
+								if (i < varnames.length - 1) buf.append(", ");
+							}
+						} catch (ClassCastException e) {
+							e.printStackTrace();
+						}
+						buf.append(")");
 					}
-					System.out.println(" " + buf.toString());
 					result.add(buf.toString());
 				}
 			}

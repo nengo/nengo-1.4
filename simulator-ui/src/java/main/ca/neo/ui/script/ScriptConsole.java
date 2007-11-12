@@ -18,9 +18,6 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Reader;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JEditorPane;
@@ -34,17 +31,6 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-import org.python.core.PyInstance;
-import org.python.core.PyInteger;
-import org.python.core.PyJavaInstance;
-import org.python.core.PyList;
-import org.python.core.PyMethod;
-import org.python.core.PyObject;
-import org.python.core.PyReflectedFunction;
-import org.python.core.PySequence;
-import org.python.core.PyString;
-import org.python.core.PyStringMap;
-import org.python.core.PyTuple;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -70,6 +56,9 @@ public class ScriptConsole extends JPanel {
 	private int myTypedCaretPosition;
 	private StyleContext myStyleContext;
 	
+	/**
+	 * @param interpreter The interpreter on which the console runs  
+	 */
 	public ScriptConsole(PythonInterpreter interpreter) {
 		myInterpreter = interpreter;
 		
@@ -106,45 +95,6 @@ public class ScriptConsole extends JPanel {
 		
 	}
 	
-	protected void test() {
-//		List<String> variables = myCompletor.getVariables();
-//		for (Iterator<String> iter = variables.iterator(); iter.hasNext(); ) {
-//			System.out.println("variable: " + iter.next());
-//		}
-//		List<String> members = myCompletor.getMembers(myCommandField.getText());
-//		for (Iterator<String> iter = members.iterator(); iter.hasNext(); ) {
-//			System.out.println("member: " + iter.next());
-//		}
-		
-		System.out.println(getCallChain(myCommandField.getText()));
-	}
-	
-	/**
-	 * @param command A line of python code 
-	 * @return The segment at the end of the command that looks like a partial 
-	 * 		call chain, eg for command "y.getY(x.get" this method would return 
-	 * 		"x.get" 
-	 */
-	public static String getCallChain(String command) {
-		//note: I tried to do this with a single regex but I can't see how to handle nested brackets properly
-		Pattern pattern = Pattern.compile("\\w||\\."); //word character or dot 
-		
-		char[] cc = command.toCharArray(); //command characters
-		int brackets = 0;
-		int start = 0;
-		for (int i = cc.length - 1; i >= 0 && start == 0; i--) {
-			if (cc[i] == ')') {
-				brackets++;
-			} else if (brackets > 0 && cc[i] == '(') {
-				brackets--;
-			} else if (brackets == 0 && !pattern.matcher(String.valueOf(cc[i])).matches()) {
-				start = i+1;
-			}
-		}
-		
-		return command.substring(start);
-	}
-	
 	private void initStyles() {
 		myStyleContext = new StyleContext();
 		Style rootStyle = myStyleContext.addStyle("root", null);
@@ -153,6 +103,23 @@ public class ScriptConsole extends JPanel {
 		myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
 		Style errorStyle = myStyleContext.addStyle(ERROR_STYLE, rootStyle);
 		StyleConstants.setForeground(errorStyle, Color.RED);
+	}
+
+	/**
+	 * @param name Name of a new Python variable
+	 * @param variable Java object underlying the new variable
+	 */
+	public void addVariable(String name, Object variable) {
+		myInterpreter.set(name, variable);
+	}
+	
+	/**
+	 * @param name Name of python variable to delete
+	 */
+	public void removeVariable(String name) {
+		if (myInterpreter.get(name) != null) {
+			myInterpreter.exec("del " + name);			
+		}
 	}
 	
 	/**
@@ -181,17 +148,23 @@ public class ScriptConsole extends JPanel {
 	public void clearCommand() {
 		myCommandField.setText("");
 	}
-	
+
+	/**
+	 * @param inMode Sets whether the console is in the mode of completing a call chain 
+	 * 		(otherwise it uses history completion)
+	 */
 	public void setInCallChainCompletionMode(boolean inMode) {
 		myInCallChainCompletionMode = inMode;
 		if (inMode) {
 			String typedTextToCaret = myTypedText.substring(0, myTypedCaretPosition);
-			String callChain = getCallChain(typedTextToCaret);
-			System.out.println("typed to caret: " + typedTextToCaret + " call chain: " + callChain);	
-			myCallChainCompletor.setBase(callChain);
+			myCallChainCompletor.setBase(getCallChain(typedTextToCaret));
 		}
 	}
-	
+
+	/**
+	 * @return True if command completion is currently based on the call chain that 
+	 * 		the user is typing, false if completion is based on command history
+	 */
 	public boolean getInCallChainCompletionMode() {
 		return myInCallChainCompletionMode;
 	}
@@ -223,13 +196,13 @@ public class ScriptConsole extends JPanel {
 			String callChain = getCallChain(myTypedText.substring(0, myTypedCaretPosition));
 			String replacement = myCallChainCompletor.previous(callChain);
 			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField.getCaretPosition());
-			String selection = myCommandField.getSelectedText();
+//			String selection = myCommandField.getSelectedText();
 			myCommandField.replaceSelection(replacement);
 			
-			System.out.println("caret pos: " + myTypedCaretPosition);
-			System.out.println("call chain: " + callChain);
-			System.out.println("selection: " + selection);
-			System.out.println("replacement: " + replacement);
+//			System.out.println("caret pos: " + myTypedCaretPosition);
+//			System.out.println("call chain: " + callChain);
+//			System.out.println("selection: " + selection);
+//			System.out.println("replacement: " + replacement);
 		} else {
 			myCommandField.setText(myHistoryCompletor.previous(myTypedText));			
 		}
@@ -243,12 +216,12 @@ public class ScriptConsole extends JPanel {
 			String callChain = getCallChain(myTypedText.substring(0, myTypedCaretPosition));
 			String replacement = myCallChainCompletor.next(callChain);
 			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField.getCaretPosition());
-			String selection = myCommandField.getSelectedText();
+//			String selection = myCommandField.getSelectedText();
 			myCommandField.replaceSelection(replacement);
 
-			System.out.println("call chain: " + callChain);
-			System.out.println("selection: " + selection);
-			System.out.println("replacement: " + replacement);
+//			System.out.println("call chain: " + callChain);
+//			System.out.println("selection: " + selection);
+//			System.out.println("replacement: " + replacement);
 		} else {
 			myCommandField.setText(myHistoryCompletor.next(myTypedText));
 		}
@@ -272,9 +245,34 @@ public class ScriptConsole extends JPanel {
 	 * autocompleted text). 
 	 */
 	public void revertToTypedText() {
-		System.out.println("reverting");
 		myCommandField.setText(myTypedText);
 		myCommandField.setCaretPosition(myTypedCaretPosition);
+	}
+	
+	/**
+	 * @param command A line of python code 
+	 * @return The segment at the end of the command that looks like a partial 
+	 * 		call chain, eg for command "y.getY(x.get" this method would return 
+	 * 		"x.get" 
+	 */
+	public static String getCallChain(String command) {
+		//note: I tried to do this with a single regex but I can't see how to handle nested brackets properly
+		Pattern pattern = Pattern.compile("\\w||\\."); //word character or dot 
+		
+		char[] cc = command.toCharArray(); //command characters
+		int brackets = 0;
+		int start = 0;
+		for (int i = cc.length - 1; i >= 0 && start == 0; i--) {
+			if (cc[i] == ')') {
+				brackets++;
+			} else if (brackets > 0 && cc[i] == '(') {
+				brackets--;
+			} else if (brackets == 0 && !pattern.matcher(String.valueOf(cc[i])).matches()) {
+				start = i+1;
+			}
+		}
+		
+		return command.substring(start);
 	}
 	
 	private class CommandActionListener implements ActionListener {
@@ -310,8 +308,6 @@ public class ScriptConsole extends JPanel {
 				myConsole.completorUp();
 			} else if (code == 40) { //down arrow
 				myConsole.completorDown();
-			} else if (code == 39) { //right arrow
-				myConsole.test();				
 			} else {
 				myConsole.setInCallChainCompletionMode(false);
 			}

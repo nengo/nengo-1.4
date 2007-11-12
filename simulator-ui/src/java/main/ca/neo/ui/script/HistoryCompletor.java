@@ -3,9 +3,6 @@
  */
 package ca.neo.ui.script;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A list of commands that have been entered previously. 
  * 

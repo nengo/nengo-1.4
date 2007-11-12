@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for command completion managers. 
+ * Base class for command completors, which provide suggestions for filling in the 
+ * remainder of partially-specified scripting commands. 
  * 
  * @author Bryan Tripp
  */
@@ -21,18 +22,24 @@ public abstract class CommandCompletor {
 		myIndex = myOptions.size();
 	}
 	
+	/**
+	 * @return The list of completion options currently under consideration 
+	 */
 	protected List<String> getOptions() {
 		return myOptions;
 	}
-	
+
+	/**
+	 * Resets the index to the list of completion options to its default location.
+	 */
 	public void resetIndex() {
 		myIndex = myOptions.size();
 	}
 	
 	/**
-	 * @param partial Partial command string (from beginning)
-	 * @return Next most recent command (from current position) that begins with 
-	 * 		given partial command. Returns partial if end of list is reached.  
+	 * @param partial Partial command string 
+	 * @return Next most recent command (from current index in options list) that begins with 
+	 * 		given partial command. Returns the arg if end of list is reached.  
 	 */
 	public String previous(String partial) {
 		String result = null;
@@ -50,9 +57,9 @@ public abstract class CommandCompletor {
 	}
 	
 	/**
-	 * @param partial Partial command string (from beginning)
-	 * @return Next command (from current position) that begins with 
-	 * 		given partial command. Returns partial if end of list is reached.  
+	 * @param partial Partial command string 
+	 * @return Next command (from current index in options list) that begins with 
+	 * 		given partial command. Returns the arg if end of list is reached.  
 	 */
 	public String next(String partial) {
 		String result = null;
