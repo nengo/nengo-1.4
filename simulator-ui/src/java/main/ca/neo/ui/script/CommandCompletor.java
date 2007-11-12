@@ -1,5 +1,5 @@
 /*
- * Created on 5-Nov-07
+ * Created on 11-Nov-07
  */
 package ca.neo.ui.script;
 
@@ -7,31 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A list of commands that have been entered previously. 
+ * Base class for command completion managers. 
  * 
  * @author Bryan Tripp
  */
-public class CommandHistory {
+public abstract class CommandCompletor {
 
-	private List<String> myCommands;
+	private List<String> myOptions;
 	private int myIndex;
-	
-	public CommandHistory() {
-		//TODO: load saved history of available
-		myCommands = new ArrayList<String>(100);
-		myIndex = myCommands.size();
+
+	public CommandCompletor() {
+		myOptions = new ArrayList<String>(100);
+		myIndex = myOptions.size();
 	}
 	
-	/**
-	 * @param command New command to add to the history
-	 */
-	public void add(String command) {
-		myCommands.add(command);
-		resetIndex();
+	protected List<String> getOptions() {
+		return myOptions;
 	}
 	
 	public void resetIndex() {
-		myIndex = myCommands.size();
+		myIndex = myOptions.size();
 	}
 	
 	/**
@@ -42,8 +37,8 @@ public class CommandHistory {
 	public String previous(String partial) {
 		String result = null;
 		for (int i = myIndex-1; i >= 0 && result == null; i--) {
-			if (myCommands.get(i).startsWith(partial)) {
-				result = myCommands.get(i);
+			if (myOptions.get(i).startsWith(partial)) {
+				result = myOptions.get(i);
 				myIndex = i;
 			}
 		}
@@ -61,21 +56,17 @@ public class CommandHistory {
 	 */
 	public String next(String partial) {
 		String result = null;
-		for (int i = myIndex+1; i < myCommands.size() && result == null; i++) {
-			if (myCommands.get(i).startsWith(partial)) {
-				result = myCommands.get(i);
+		for (int i = myIndex+1; i < myOptions.size() && result == null; i++) {
+			if (myOptions.get(i).startsWith(partial)) {
+				result = myOptions.get(i);
 				myIndex = i;
 			}
 		}
 		if (result == null) {
 			result = partial;
-			myIndex = myCommands.size();
+			myIndex = myOptions.size();
 		}
 		return result;		
 	}
 	
-	public void save() {
-		//TODO
-	}
-
 }

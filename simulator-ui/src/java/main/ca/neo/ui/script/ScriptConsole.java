@@ -20,6 +20,8 @@ import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -61,9 +63,11 @@ public class ScriptConsole extends JPanel {
 	private PythonInterpreter myInterpreter;
 	private JEditorPane myDisplayArea;
 	private JTextField myCommandField;
-	private CommandHistory myHistory;
-	private CodeCompletor myCompletor;
+	private HistoryCompletor myHistoryCompletor;
+	private CallChainCompletor myCallChainCompletor;
+	private boolean myInCallChainCompletionMode;
 	private String myTypedText;
+	private int myTypedCaretPosition;
 	private StyleContext myStyleContext;
 	
 	public ScriptConsole(PythonInterpreter interpreter) {
@@ -83,10 +87,13 @@ public class ScriptConsole extends JPanel {
 				
 		myCommandField.addKeyListener(new CommandKeyListener(this));
 		myCommandField.addActionListener(new CommandActionListener(this));
+		myCommandField.setFocusTraversalKeysEnabled(false);
 		
-		myHistory = new CommandHistory();
-		myCompletor = new CodeCompletor(myInterpreter);
+		myHistoryCompletor = new HistoryCompletor();
+		myCallChainCompletor = new CallChainCompletor(myInterpreter);
+		myInCallChainCompletionMode = false;
 		myTypedText = "";		
+		myTypedCaretPosition = 0;
 		
 		try {
 			OutputWriter ow = new OutputWriter(this);
@@ -104,10 +111,38 @@ public class ScriptConsole extends JPanel {
 //		for (Iterator<String> iter = variables.iterator(); iter.hasNext(); ) {
 //			System.out.println("variable: " + iter.next());
 //		}
-		List<String> members = myCompletor.getMembers(myCommandField.getText());
-		for (Iterator<String> iter = members.iterator(); iter.hasNext(); ) {
-			System.out.println("member: " + iter.next());
+//		List<String> members = myCompletor.getMembers(myCommandField.getText());
+//		for (Iterator<String> iter = members.iterator(); iter.hasNext(); ) {
+//			System.out.println("member: " + iter.next());
+//		}
+		
+		System.out.println(getCallChain(myCommandField.getText()));
+	}
+	
+	/**
+	 * @param command A line of python code 
+	 * @return The segment at the end of the command that looks like a partial 
+	 * 		call chain, eg for command "y.getY(x.get" this method would return 
+	 * 		"x.get" 
+	 */
+	public static String getCallChain(String command) {
+		//note: I tried to do this with a single regex but I can't see how to handle nested brackets properly
+		Pattern pattern = Pattern.compile("\\w||\\."); //word character or dot 
+		
+		char[] cc = command.toCharArray(); //command characters
+		int brackets = 0;
+		int start = 0;
+		for (int i = cc.length - 1; i >= 0 && start == 0; i--) {
+			if (cc[i] == ')') {
+				brackets++;
+			} else if (brackets > 0 && cc[i] == '(') {
+				brackets--;
+			} else if (brackets == 0 && !pattern.matcher(String.valueOf(cc[i])).matches()) {
+				start = i+1;
+			}
 		}
+		
+		return command.substring(start);
 	}
 	
 	private void initStyles() {
@@ -115,7 +150,7 @@ public class ScriptConsole extends JPanel {
 		Style rootStyle = myStyleContext.addStyle("root", null);
 		Style commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
 		StyleConstants.setItalic(commandStyle, true);
-		Style outputStyle = myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
+		myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
 		Style errorStyle = myStyleContext.addStyle(ERROR_STYLE, rootStyle);
 		StyleConstants.setForeground(errorStyle, Color.RED);
 	}
@@ -147,13 +182,27 @@ public class ScriptConsole extends JPanel {
 		myCommandField.setText("");
 	}
 	
+	public void setInCallChainCompletionMode(boolean inMode) {
+		myInCallChainCompletionMode = inMode;
+		if (inMode) {
+			String typedTextToCaret = myTypedText.substring(0, myTypedCaretPosition);
+			String callChain = getCallChain(typedTextToCaret);
+			System.out.println("typed to caret: " + typedTextToCaret + " call chain: " + callChain);	
+			myCallChainCompletor.setBase(callChain);
+		}
+	}
+	
+	public boolean getInCallChainCompletionMode() {
+		return myInCallChainCompletionMode;
+	}
+	
 	/**
 	 * @param text Processes the current command in the command field 
 	 */
 	public void enterCommand(String text) {
 		appendText(">>", "root");
 		appendText(text + "\r\n", COMMAND_STYLE);
-		myHistory.add(text);
+		myHistoryCompletor.add(text);
 		clearCommand();
 		try {
 			if (text.startsWith("run ")) {
@@ -167,17 +216,42 @@ public class ScriptConsole extends JPanel {
 	}
 	
 	/**
-	 * Moves up the command history 
+	 * Moves up the command completor list 
 	 */
-	public void historyUp() {
-		myCommandField.setText(myHistory.previous(myTypedText));
+	public void completorUp() {
+		if (myInCallChainCompletionMode) {
+			String callChain = getCallChain(myTypedText.substring(0, myTypedCaretPosition));
+			String replacement = myCallChainCompletor.previous(callChain);
+			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField.getCaretPosition());
+			String selection = myCommandField.getSelectedText();
+			myCommandField.replaceSelection(replacement);
+			
+			System.out.println("caret pos: " + myTypedCaretPosition);
+			System.out.println("call chain: " + callChain);
+			System.out.println("selection: " + selection);
+			System.out.println("replacement: " + replacement);
+		} else {
+			myCommandField.setText(myHistoryCompletor.previous(myTypedText));			
+		}
 	}
 
 	/**
-	 * Moves down the command history
+	 * Moves down the command completor list
 	 */
-	public void historyDown() {
-		myCommandField.setText(myHistory.next(myTypedText));		
+	public void completorDown() {
+		if (myInCallChainCompletionMode) {
+			String callChain = getCallChain(myTypedText.substring(0, myTypedCaretPosition));
+			String replacement = myCallChainCompletor.next(callChain);
+			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField.getCaretPosition());
+			String selection = myCommandField.getSelectedText();
+			myCommandField.replaceSelection(replacement);
+
+			System.out.println("call chain: " + callChain);
+			System.out.println("selection: " + selection);
+			System.out.println("replacement: " + replacement);
+		} else {
+			myCommandField.setText(myHistoryCompletor.next(myTypedText));
+		}
 	}
 	
 	/**
@@ -188,7 +262,19 @@ public class ScriptConsole extends JPanel {
 	 */
 	public void setTypedText() {
 		myTypedText = myCommandField.getText();
-		myHistory.resetIndex();
+		myTypedCaretPosition = myCommandField.getCaretPosition();
+		myHistoryCompletor.resetIndex();
+		myCallChainCompletor.resetIndex();
+	}
+
+	/**
+	 * Resets command field text to the last text typed by the user (as opposed to 
+	 * autocompleted text). 
+	 */
+	public void revertToTypedText() {
+		System.out.println("reverting");
+		myCommandField.setText(myTypedText);
+		myCommandField.setCaretPosition(myTypedCaretPosition);
 	}
 	
 	private class CommandActionListener implements ActionListener {
@@ -214,14 +300,20 @@ public class ScriptConsole extends JPanel {
 
 		public void keyPressed(KeyEvent e) {			
 			int code = e.getKeyCode();
-			if (code == 27) { //escape
+			if (code == 27 && myConsole.getInCallChainCompletionMode()) { //escape
+				myConsole.revertToTypedText();
+			} else if (code == 27) {
 				myConsole.clearCommand();
+			} else if (code == 9) { // tab
+				myConsole.setInCallChainCompletionMode(true);
 			} else if (code == 38) { //up arrow
-				myConsole.historyUp();
+				myConsole.completorUp();
 			} else if (code == 40) { //down arrow
-				myConsole.historyDown();
+				myConsole.completorDown();
 			} else if (code == 39) { //right arrow
-				myConsole.test();
+				myConsole.test();				
+			} else {
+				myConsole.setInCallChainCompletionMode(false);
 			}
 		}
 
@@ -229,6 +321,11 @@ public class ScriptConsole extends JPanel {
 			int code = e.getKeyCode();
 			if (code != 38 && code != 40) {
 				myConsole.setTypedText();	
+				if (code == 9) myConsole.completorUp();
+			}
+			
+			if (code == 46) { // .
+				myConsole.setInCallChainCompletionMode(true); 
 			}
 		}
 

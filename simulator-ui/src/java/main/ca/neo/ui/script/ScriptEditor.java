@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
@@ -246,7 +247,7 @@ public class ScriptEditor extends JPanel {
 		editor.setPreferredSize(new Dimension(600, 600));
 		
 		PythonInterpreter interpreter = new PythonInterpreter();
-		ScriptConsole console = new ScriptConsole(interpreter);
+		final ScriptConsole console = new ScriptConsole(interpreter);
 		console.setPreferredSize(new Dimension(600, 600));
 		
 		JFrame frame = new JFrame("Script Editor");
@@ -326,6 +327,14 @@ public class ScriptEditor extends JPanel {
 		
 		frame.pack();
 		frame.setVisible(true);
+		
+		SwingUtilities.invokeLater(
+			new Runnable() {
+				public void run() {
+					console.setFocus();
+				}
+			}
+		);
 		
 	}
 }

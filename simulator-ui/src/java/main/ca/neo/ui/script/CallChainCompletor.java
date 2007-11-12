@@ -18,14 +18,28 @@ import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
 
-public class CodeCompletor {
+public class CallChainCompletor extends CommandCompletor {
 	
 	private PythonInterpreter myInterpreter;
 	
-	public CodeCompletor(PythonInterpreter interpreter) {
+	public CallChainCompletor(PythonInterpreter interpreter) {
 		myInterpreter = interpreter;
 	}
-
+	
+	public void setBase(String callChain) {
+		List<String> options = null;
+		if (callChain.contains(".")) { //the root variable is specified
+			String base = callChain.substring(0, callChain.lastIndexOf('.'));
+			System.out.println(base);
+			options = getMembers(base);
+		} else {
+			options = getVariables();
+		}
+		getOptions().clear();
+		getOptions().addAll(options);
+		resetIndex();
+	}
+	
 	/**
 	 * @return List of variable names known to the interpreter. 
 	 */
@@ -35,24 +49,26 @@ public class CodeCompletor {
 		PyObject iter = keys.__iter__();
 
 		List<String> result = new ArrayList<String>(50);
+		System.out.println("VARIABLES:");
 		for (PyObject item; (item = iter.__iternext__()) != null; ) {
 			result.add(item.toString());
+			System.out.println(" " + item.toString());
 		}
 		
 		return result;
 	}
 	
 	/**
-	 * @param variable A variable name in the interpreter. For variables that wrap 
-	 * 		Java objects, this arg can consist of a call chain, eg x.getY().getZ().
+	 * @param base A variable name in the interpreter. For variables that wrap 
+	 * 		Java objects, this arg can consist of a call chain, eg x.getY().getZ()
 	 * 		For native python variables, the return type of a call isn't known, 
 	 * 		so this method can't return anything given a call chain.   
 	 * @return A list of methods (with args) and variables on the named variable.  
 	 */
-	public List<String> getMembers(String variable) {
+	public List<String> getMembers(String base) {
 		PyStringMap map = (PyStringMap) myInterpreter.getLocals();
 
-		StringTokenizer varTok = new StringTokenizer(variable, ".", false);
+		StringTokenizer varTok = new StringTokenizer(base, ".", false);
 		String rootVariable = varTok.nextToken();
 
 		PyObject po = getObject(map, rootVariable);
@@ -60,7 +76,7 @@ public class CodeCompletor {
 		if (po instanceof PyJavaInstance) {
 			String rootClassName = ((PyJavaInstance) po).instclass.__name__;
 			try {
-				Class c = getReturnClass(rootClassName, variable);
+				Class c = getReturnClass(rootClassName, base);
 
 				Field[] fields = c.getFields();
 				for (int i = 0; i < fields.length; i++) {
@@ -68,15 +84,18 @@ public class CodeCompletor {
 				}
 				
 				Method[] methods = c.getMethods();
+				System.out.println("MEMBERS:");
 				for (int i = 0; i < methods.length; i++) {
-					StringBuffer buf = new StringBuffer(methods[i].getName());
+					StringBuffer buf = new StringBuffer(base + ".");
+					buf.append(methods[i].getName());
 					buf.append('(');
 					Class[] paramTypes = methods[i].getParameterTypes();
 					for (int j = 0; j < paramTypes.length; j++) {
-						buf.append(paramTypes[j].getName());
+						buf.append(paramTypes[j].getSimpleName());
 						if (j < paramTypes.length - 1) buf.append(", ");
 					}
 					buf.append(')');
+					System.out.println(" " + buf.toString());
 					result.add(buf.toString());
 				}
 			} catch (Exception e) {
@@ -87,12 +106,15 @@ public class CodeCompletor {
 			if ( !varTok.hasMoreTokens() ) {
 				PyObject iter = ((PyList) ((PyInstance) po).__dir__()).__iter__();
 				
+				System.out.println("MEMBERS:");
 				for (PyObject item; (item = iter.__iternext__()) != null; ) {						
 					PyObject attr = po.__findattr__((PyString) item);
-					StringBuffer buf = new StringBuffer(attr.toString());
+					StringBuffer buf = new StringBuffer(base + ".");
+					buf.append(attr.toString());
 					if (attr instanceof PyMethod) {
 						buf.append("(");
 					}
+					System.out.println(" " + buf.toString());
 					result.add(buf.toString());
 				}
 			}
