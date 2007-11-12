@@ -35,6 +35,14 @@ import org.python.util.PythonInterpreter;
 
 /**
  * A user interface panel for entering script commands. 
+ * 
+ * TODO: 
+ * escape not working all the time
+ * import defaults
+ * completion for arrays
+ * NO (need to catch exception) default print 
+ * getting documentation help (see qdox)
+ * static completion
  *  
  * @author Bryan Tripp
  */

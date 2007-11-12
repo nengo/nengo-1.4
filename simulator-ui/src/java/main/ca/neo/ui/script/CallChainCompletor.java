@@ -48,7 +48,6 @@ public class CallChainCompletor extends CommandCompletor {
 		List<String> options = null;
 		if (callChain.contains(".")) { //the root variable is specified
 			String base = callChain.substring(0, callChain.lastIndexOf('.'));
-			System.out.println(base);
 			options = getMembers(base);
 		} else {
 			options = getVariables();
@@ -67,10 +66,8 @@ public class CallChainCompletor extends CommandCompletor {
 		PyObject iter = keys.__iter__();
 
 		List<String> result = new ArrayList<String>(50);
-		System.out.println("VARIABLES:");
 		for (PyObject item; (item = iter.__iternext__()) != null; ) {
 			result.add(item.toString());
-			System.out.println(" " + item.toString());
 		}
 		
 		return result;
