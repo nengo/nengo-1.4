@@ -338,7 +338,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	 * @param nodes A list of Nodes in an Ensemble
 	 * @return A grouping of one-dimensional origins on these nodes, by name
 	 */
-	public static Map<String, List<Origin>> group1DOrigins(Node[] nodes) {
+	private static Map<String, List<Origin>> group1DOrigins(Node[] nodes) {
 		Map<String, List<Origin>> groups = new HashMap<String, List<Origin>>(10);
 		
 		for (int i = 0; i < nodes.length; i++) {
@@ -356,6 +356,29 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		}
 		
 		return groups;
+	}
+
+	/**
+	 * @param nodes A list of Nodes
+	 * @return Names of one-dimensional origins that are shared by all the nodes 
+	 */
+	public static List<String> findCommon1DOrigins(Node[] nodes) {
+		List<String> result = get1DOriginNames(nodes[0]);
+		
+		for (int i = 1; i < nodes.length; i++) {
+			result.retainAll(get1DOriginNames(nodes[i]));
+		}
+		
+		return result;
+	}
+	
+	private static List<String> get1DOriginNames(Node node) {
+		List<String> result = new ArrayList<String>(10);
+		Origin[] origins = node.getOrigins();
+		for (int i = 0; i < origins.length; i++) {
+			if (origins[i].getDimensions() == 1) result.add(origins[i].getName());
+		}
+		return result;
 	}
 	
 	/**

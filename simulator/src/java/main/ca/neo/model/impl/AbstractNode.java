@@ -26,6 +26,7 @@ public abstract class AbstractNode implements Node {
 	private SimulationMode myMode;
 	private Map<String, Origin> myOrigins;
 	private Map<String, Termination> myTerminations;
+	private String myDocumentation;
 	
 	/**
 	 * @param name Name of Node
@@ -113,5 +114,21 @@ public abstract class AbstractNode implements Node {
 	 */
 	public void reset(boolean randomize) {
 	}
+
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
+	}
+	
+	
 
 }
