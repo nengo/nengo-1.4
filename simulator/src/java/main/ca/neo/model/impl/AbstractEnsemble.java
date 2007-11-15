@@ -322,6 +322,23 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	 * @return Ensemble Origins encompassing Node-level Origins
 	 */
 	private static Origin[] findOrigins(Node parent, Node[] nodes) {
+		Map<String, List<Origin>> groups = group1DOrigins(nodes);
+		Iterator<String> it = groups.keySet().iterator();
+		List<Origin> result = new ArrayList<Origin>(10);
+		while (it.hasNext()) {
+			String name = it.next();
+			List<Origin> group = groups.get(name);
+			result.add(new EnsembleOrigin(parent, name, (Origin[]) group.toArray(new Origin[0])));
+		}
+		
+		return result.toArray(new Origin[0]);
+	}
+	
+	/**
+	 * @param nodes A list of Nodes in an Ensemble
+	 * @return A grouping of one-dimensional origins on these nodes, by name
+	 */
+	public static Map<String, List<Origin>> group1DOrigins(Node[] nodes) {
 		Map<String, List<Origin>> groups = new HashMap<String, List<Origin>>(10);
 		
 		for (int i = 0; i < nodes.length; i++) {
@@ -338,15 +355,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 			}
 		}
 		
-		Iterator<String> it = groups.keySet().iterator();
-		List<Origin> result = new ArrayList<Origin>(10);
-		while (it.hasNext()) {
-			String name = it.next();
-			List<Origin> group = groups.get(name);
-			result.add(new EnsembleOrigin(parent, name, (Origin[]) group.toArray(new Origin[0])));
-		}
-		
-		return result.toArray(new Origin[0]);
+		return groups;
 	}
 	
 	/**
