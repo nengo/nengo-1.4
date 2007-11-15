@@ -3,6 +3,8 @@
  */
 package ca.neo.plot;
 
+import java.util.List;
+
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
 import ca.neo.dynamics.impl.LTISystem;
@@ -27,7 +29,7 @@ public abstract class Plotter {
 	
 	private synchronized static Plotter getInstance() {
 		if (ourInstance == null) {
-			//TODO: this can be made configurable if we get more plotters
+			//this can be made configurable if we get more plotters
 			ourInstance = new DefaultPlotter(); 
 		}
 		
@@ -112,6 +114,17 @@ public abstract class Plotter {
 	public static void plot(TimeSeries ideal, TimeSeries actual, String title) {
 		getInstance().doPlot(ideal, actual, title);
 	}
+	
+	/**
+	 * Plots multiple TimeSeries and/or SpikePatterns together in the same plot.
+	 *   
+	 * @param series A list of TimeSeries to plot (can be null if none)  
+	 * @param patterns A list of SpikePatterns to plot (can be null if none)
+	 * @param title Plot title
+	 */
+	public static void plot(List<TimeSeries> series, List<SpikePattern> patterns, String title) {
+		getInstance().doPlot(series, patterns, title);
+	}
 
 	/**
 	 * Plots ideal and actual TimeSeries' together, with each series filtered before plotting. 
@@ -139,6 +152,13 @@ public abstract class Plotter {
 	 * @param title Plot title
 	 */
 	public abstract void doPlot(TimeSeries ideal, TimeSeries actual, String title);
+	
+	/**
+	 * @param series A list of TimeSeries to plot (can be null if none)  
+	 * @param patterns A list of SpikePatterns to plot (can be null if none)
+	 * @param title Plot title
+	 */
+	public abstract void doPlot(List<TimeSeries> series, List<SpikePattern> patterns, String title);
 	
 	/**
 	 * Static convenience method for producing a decoding error plot of an NEFEnsemble origin. 

@@ -10,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -100,7 +101,35 @@ public class DefaultPlotter extends Plotter {
 
 		showChart(chart, "Time Series Plot");
 	}
-	
+
+	/**
+	 * @see ca.neo.plot.Plotter#doPlot(java.util.List, java.util.List, java.lang.String)
+	 */
+	public void doPlot(List<TimeSeries> series, List<SpikePattern> patterns, String title) {
+		JFreeChart chart = ChartFactory.createXYLineChart(
+				title,
+				"Time (s)", 
+				"", 
+				null, 
+				PlotOrientation.VERTICAL, 
+				false, false, false
+		);
+		XYPlot plot = (XYPlot) chart.getPlot();	
+		
+		int i = 0;
+		for (; series != null && i < series.size(); i++) {
+			plot.setDataset(i, getDataset(series.get(i)));			
+		}
+		
+		for (int j = 0; patterns != null && j < patterns.size(); j++) {
+			int index = i+j;
+			plot.setDataset(index, getDataset(patterns.get(j)));
+			configSpikeRenderer((XYLineAndShapeRenderer) plot.getRenderer(index));
+		}
+		
+		showChart(chart, title);
+	}
+
 	private XYSeriesCollection getDataset(TimeSeries series) {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		
@@ -317,16 +346,7 @@ public class DefaultPlotter extends Plotter {
 	 * @see ca.neo.plot.Plotter#doPlot(ca.neo.util.SpikePattern)
 	 */
 	public void doPlot(SpikePattern pattern) {
-		XYSeriesCollection dataset = new XYSeriesCollection();
-		
-		for (int i = 0; i < pattern.getNumNeurons(); i++) {
-			XYSeries series = new XYSeries("Neuron " + i);
-			float[] spikes = pattern.getSpikeTimes(i);
-			for (int j = 0; j < spikes.length; j++) {
-				series.add(spikes[j], i);
-			}
-			dataset.addSeries(series);
-		}		
+		XYSeriesCollection dataset = getDataset(pattern);
 		
 		JFreeChart chart = ChartFactory.createXYLineChart(
 				"Spike Raster",
@@ -338,13 +358,32 @@ public class DefaultPlotter extends Plotter {
 		);
 
 		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) chart.getXYPlot().getRenderer();
+		configSpikeRenderer(renderer);
+
+		showChart(chart, "Spike Raster");
+	}
+	
+	private static XYSeriesCollection getDataset(SpikePattern pattern) {
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		
+		for (int i = 0; i < pattern.getNumNeurons(); i++) {
+			XYSeries series = new XYSeries("Neuron " + i);
+			float[] spikes = pattern.getSpikeTimes(i);
+			for (int j = 0; j < spikes.length; j++) {
+				series.add(spikes[j], i);
+			}
+			dataset.addSeries(series);
+		}		
+
+		return dataset;
+	}
+	
+	private static void configSpikeRenderer(XYLineAndShapeRenderer renderer) {
 		renderer.setShape(ShapeUtilities.createDiamond(1f));
 		renderer.setShapesVisible(true);
 		renderer.setShapesFilled(true);
 		renderer.setLinesVisible(false);
 		renderer.setPaint(Color.BLACK);
-
-		showChart(chart, "Spike Raster");
 	}
 
 	/**
