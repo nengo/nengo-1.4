@@ -761,6 +761,20 @@ public class MU {
 	}
 	
 	/**
+	 * @param vector A vector
+	 * @return Elements rounded to nearest integer
+	 */
+	public static int[] round(float[] vector) {
+		int[] result = new int[vector.length];
+		
+		for (int i = 0; i < result.length; i++) {
+			result[i] = (int) Math.round(vector[i]);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * A tool for growing vectors (similar to java.util.List). 
 	 *    
 	 * @author Bryan Tripp
