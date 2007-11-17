@@ -1,7 +1,7 @@
 /*
  * Created on 14-Nov-07
  */
-package ca.neo.util.impl;
+package ca.neo.util;
 
 import java.util.Arrays;
 
@@ -16,9 +16,9 @@ import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.model.neuron.impl.ALIFSpikeGenerator;
 import ca.neo.model.neuron.impl.LIFSpikeGenerator;
 import ca.neo.model.neuron.impl.SpikingNeuron;
-import ca.neo.util.MU;
-import ca.neo.util.SpikePattern;
-import ca.neo.util.TimeSeries;
+import ca.neo.util.impl.SpikePatternImpl;
+import ca.neo.util.impl.TimeSeries1DImpl;
+import ca.neo.util.impl.TimeSeriesImpl;
 
 /**
  * Tools manipulating TimeSeries and SpikePattern data.
@@ -121,6 +121,7 @@ public class DataUtils {
 	 */
 	public static SpikePattern subset(SpikePattern pattern, int start, int interval, int end) {
 		int[] indices = MU.round(MU.makeVector(start, interval, end));
+		System.out.println(MU.toString(new float[][]{MU.makeVector(start, interval, end)}, 10));
 		return subset(pattern, indices);
 	}
 
@@ -169,30 +170,23 @@ public class DataUtils {
 	/**
 	 * For sorting. We try to extract encoding vectors and certain properties of 
 	 * common SpikeGenerators for ordering. 
-	 * 
-	 * TODO: expose spike generator properties
 	 */
 	private static class ComparableNodeWrapper implements Comparable {
 		
 		private int myIndex;
 		private float myFirstDimEncoder;
-		private float myIntercept;
+		private float myBias;
 		
 		public ComparableNodeWrapper(Ensemble ensemble, int nodeIndex) {
 			myIndex = nodeIndex;
 			
-			myIntercept = 0;
+			myBias = 1;
 			Node node = ensemble.getNodes()[nodeIndex];
 			if (node instanceof SpikingNeuron) {
-				SpikeGenerator sg = ((SpikingNeuron) node).getGenerator();
-				if (sg instanceof LIFSpikeGenerator) {
-//					intercept = ((LIFSpikeGenerator) sg).
-				} else if (sg instanceof ALIFSpikeGenerator) {
-//					intercept = ((ALIFSpikeGenerator) sg).
-				}
+				myBias = ((SpikingNeuron) node).getBias();
 			}
 			
-			myFirstDimEncoder = 0;
+			myFirstDimEncoder = 1;
 			if (ensemble instanceof NEFEnsemble) {
 				myFirstDimEncoder = ((NEFEnsemble) ensemble).getEncoders()[nodeIndex][0];
 			}
@@ -210,10 +204,12 @@ public class DataUtils {
 		 * 		in a global ordering
 		 */
 		public float getOrderingMetric() {
-			return myFirstDimEncoder * myIntercept;
+			return myFirstDimEncoder * myBias;
 		}
 
-		@Override
+		/**
+		 * @see java.lang.Comparable#compareTo(java.lang.Object)
+		 */
 		public int compareTo(Object o) {
 			int result = 0;			
 			if (o instanceof ComparableNodeWrapper) {
