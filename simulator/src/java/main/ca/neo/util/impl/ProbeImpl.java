@@ -33,13 +33,6 @@ public class ProbeImpl implements Probe {
 	public void connect(String ensembleName, Probeable target,
 			String stateName, boolean record) throws SimulationException {
 		myEnsembleName = ensembleName;
-		connect(target, stateName, record);
-	}
-
-	/**
-	 * @see ca.neo.util.Probe#connect(Probeable, String, boolean)
-	 */
-	public void connect(Probeable target, String stateName, boolean record) throws SimulationException {
 		myTarget = target;
 		myStateName = stateName;
 		myRecord = record;
@@ -52,7 +45,14 @@ public class ProbeImpl implements Probe {
 			myUnits[i] = initial.getUnits()[i];
 		}
 		
-		reset();		
+		reset();
+	}
+
+	/**
+	 * @see ca.neo.util.Probe#connect(Probeable, String, boolean)
+	 */
+	public void connect(Probeable target, String stateName, boolean record) throws SimulationException {
+		connect(null, target, stateName, record);
 	}
 	
 	/**

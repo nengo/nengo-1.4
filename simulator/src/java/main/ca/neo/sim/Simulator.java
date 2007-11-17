@@ -61,20 +61,28 @@ public interface Simulator {
 	
 
 	/**
-	 * @param ensembleName Name of Ensemble containing a Probeable Neuron from which state is to be probed 
-	 * @param neuron Neuron within the specified Ensemble
-	 * @param state The name of the state variable to probe
-	 * @param record Probe retains history if true
+	 * @param ensembleName
+	 *            Name of Ensemble the target belongs to. Null, if the target is
+	 *            a top-level node
+	 * @param target
+	 *            Probeable target
+	 * @param state
+	 *            The name of the state variable to probe
+	 * @param record
+	 *            Probe retains history if true
 	 * @return A Probe connected to the specified Neuron
-	 * @throws SimulationException if the referenced Neuron can not be found, or is not Probeable, or does 
-	 * 		not have the specified state variable
+	 * @throws SimulationException
+	 *             if the referenced Neuron can not be found, or is not
+	 *             Probeable, or does not have the specified state variable
 	 */
-	public Probe addProbe(String ensembleName, Probeable neuron, String state, boolean record) throws SimulationException;
-	
-	
+	public Probe addProbe(String ensembleName, Probeable target, String state,
+			boolean record) throws SimulationException;
+
 	/**
-	 * @param probe Probe to be removed
-	 * @throws SimulationException if the referenced probe cannot be removed
+	 * @param probe
+	 *            Probe to be removed
+	 * @throws SimulationException
+	 *             if the referenced probe cannot be removed
 	 */
 	public void removeProbe(Probe probe) throws SimulationException;
 	

@@ -133,12 +133,7 @@ public class LocalSimulator implements Simulator {
 			throws SimulationException {
 		Probeable p = getNode(nodeName);
 
-		Probe result = new ProbeImpl();
-		result.connect(p, state, record);
-
-		myProbes.add(result);
-
-		return result;
+		return addProbe(null, p, state, record);
 	}
 
 	/**
@@ -157,11 +152,22 @@ public class LocalSimulator implements Simulator {
 	 * @see ca.neo.sim.Simulator#addProbe(java.lang.String, int,
 	 *      java.lang.String, boolean)
 	 */
-	public Probe addProbe(String ensembleName, Probeable neuron, String state,
+	public Probe addProbe(String ensembleName, Probeable target, String state,
 			boolean record) throws SimulationException {
 
+		/*
+		 * Check that no duplicate probes are created
+		 */
+		for (Probe probe : myProbes) {			
+			if (probe.getTarget() == target) {
+				if (probe.getStateName().compareTo(state) == 0) {
+					throw new SimulationException("A probe already exists on this target & state");
+				}	
+			}
+		}
+		
 		Probe result = new ProbeImpl();
-		result.connect(ensembleName, neuron, state, record);
+		result.connect(ensembleName, target, state, record);
 
 		myProbes.add(result);
 
@@ -229,7 +235,8 @@ public class LocalSimulator implements Simulator {
 	 */
 	public void addSimulatorListener(SimulatorListener listener) {
 		if (listeners.contains(listener)) {
-			System.out.println("Trying to add simulator listener that already exists");
+			System.out
+					.println("Trying to add simulator listener that already exists");
 		} else {
 			listeners.add(listener);
 		}

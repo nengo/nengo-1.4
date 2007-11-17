@@ -16,21 +16,32 @@ public interface Probe {
 
 
 	/**
-	 * @param ensembleName Name of the Ensemble the target object belongs to
-	 * @param target The object about which state history is to be collected 
-	 * @param stateName The name of the state variable to collect 
-	 * @param record If true, getData() returns history since last connect() or reset(),
-	 * 		otherwise getData() returns most recent sample 
-	 * @throws SimulationException if the given target does not have the given state
+	 * @param ensembleName
+	 *            Name of the Ensemble the target object belongs to. Null, if
+	 *            the target is a top-level node.
+	 * @param target
+	 *            The object about which state history is to be collected
+	 * @param stateName
+	 *            The name of the state variable to collect
+	 * @param record
+	 *            If true, getData() returns history since last connect() or
+	 *            reset(), otherwise getData() returns most recent sample
+	 * @throws SimulationException
+	 *             if the given target does not have the given state
 	 */
-	public void connect(String ensembleName, Probeable target, String stateName, boolean record) throws SimulationException;
-	
+	public void connect(String ensembleName, Probeable target,
+			String stateName, boolean record) throws SimulationException;
+
 	/**
-	 * @param target The object about which state history is to be collected 
-	 * @param stateName The name of the state variable to collect 
-	 * @param record If true, getData() returns history since last connect() or reset(),
-	 * 		otherwise getData() returns most recent sample 
-	 * @throws SimulationException if the given target does not have the given state
+	 * @param target
+	 *            The object about which state history is to be collected
+	 * @param stateName
+	 *            The name of the state variable to collect
+	 * @param record
+	 *            If true, getData() returns history since last connect() or
+	 *            reset(), otherwise getData() returns most recent sample
+	 * @throws SimulationException
+	 *             if the given target does not have the given state
 	 */
 	public void connect(Probeable target, String stateName, boolean record) throws SimulationException;
 	
