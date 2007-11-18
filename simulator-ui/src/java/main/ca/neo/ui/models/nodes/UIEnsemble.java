@@ -3,27 +3,25 @@ package ca.neo.ui.models.nodes;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
-import ca.neo.plot.Plotter;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.models.icons.EnsembleIcon;
+import ca.neo.ui.models.nodes.widgets.UISpikeProbe;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper for an Ensemble
  * 
  * @author Shu
- * 
  */
 public class UIEnsemble extends NodeContainer {
 
@@ -34,6 +32,8 @@ public class UIEnsemble extends NodeContainer {
 	 */
 	private String fileName = getName() + "."
 			+ NeoGraphics.ENSEMBLE_FILE_EXTENSION;
+
+	private UISpikeProbe spikeCollector;
 
 	public UIEnsemble() {
 		super();
@@ -59,18 +59,23 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
+	protected void constructDataCollectionMenu(AbstractMenuBuilder menu) {
+		super.constructDataCollectionMenu(menu);
+
+		if (spikeCollector == null || spikeCollector.isDestroyed()) {
+			menu.addAction(new StartCollectSpikes());
+		} else {
+			menu.addAction(new StopCollectSpikes());
+		}
+
+	}
+
+	@Override
 	protected PopupMenuBuilder constructMenu() {
 
 		PopupMenuBuilder menu = super.constructMenu();
 		menu.addSection("Ensemble");
-		MenuBuilder spikesMenu = menu.createSubMenu("Spikes");
 
-		if (getModel().isCollectingSpikes())
-			spikesMenu.addAction(new StopCollectSpikes());
-		else
-			spikesMenu.addAction(new StartCollectSpikes());
-
-		spikesMenu.addAction(new PlotSpikePattern("Plot spikes"));
 		return menu;
 	}
 
@@ -84,6 +89,20 @@ public class UIEnsemble extends NodeContainer {
 	@Override
 	protected NodeViewer createViewerInstance() {
 		return new EnsembleViewer(this);
+	}
+
+	public void collectSpikes(boolean collect) {
+		if (collect) {
+			if (spikeCollector == null || spikeCollector.isDestroyed()) {
+				spikeCollector = new UISpikeProbe(this);
+				newProbeAdded(spikeCollector);
+			}
+		} else {
+			if (spikeCollector != null) {
+				spikeCollector.destroy();
+				spikeCollector = null;
+			}
+		}
 	}
 
 	@Override
@@ -129,35 +148,9 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	/**
-	 * Action for Plotting the Spike Pattern
-	 * 
-	 * @author Shu Wu
-	 * 
-	 */
-	class PlotSpikePattern extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public PlotSpikePattern(String actionName) {
-			super("Plot spike pattern", actionName);
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			if (!getModel().isCollectingSpikes()) {
-				UserMessages.showWarning("Ensemble is not set to collect spikes.");
-			}
-			Plotter.plot(getModel().getSpikePattern());
-
-		}
-
-	}
-
-	/**
 	 * Action to enable Spike Collection
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class StartCollectSpikes extends ReversableAction {
 
@@ -172,12 +165,12 @@ public class UIEnsemble extends NodeContainer {
 			if (getModel().isCollectingSpikes())
 				throw new ActionException("Already collecting spikes");
 			else
-				getModel().collectSpikes(true);
+				collectSpikes(true);
 		}
 
 		@Override
 		protected void undo() {
-			getModel().collectSpikes(false);
+			collectSpikes(false);
 
 		}
 
@@ -187,7 +180,6 @@ public class UIEnsemble extends NodeContainer {
 	 * Action to Stop Collecting Spikes
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class StopCollectSpikes extends ReversableAction {
 		private static final long serialVersionUID = 1L;
@@ -201,14 +193,13 @@ public class UIEnsemble extends NodeContainer {
 			if (!getModel().isCollectingSpikes())
 				throw new ActionException("Already not collecting spikes");
 			else
-				getModel().collectSpikes(false);
+				collectSpikes(false);
 
 		}
 
 		@Override
 		protected void undo() throws ActionException {
-			getModel().collectSpikes(true);
-
+			collectSpikes(true);
 		}
 
 	}

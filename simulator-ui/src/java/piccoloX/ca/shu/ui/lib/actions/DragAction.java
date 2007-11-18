@@ -43,15 +43,13 @@ public class DragAction extends ReversableAction {
 
 	}
 
-	static int i = 1;
-
 	private static String getActionDescription(
 			Collection<WorldObject> selectedObjects) {
 
 		if (selectedObjects.size() > 1) {
-			return i++ + "Drag objects";
+			return "Drag objects";
 		} else if (selectedObjects.size() == 1) {
-			return i++ + "Drag " + selectedObjects.iterator().next().getName();
+			return "Drag " + selectedObjects.iterator().next().getName();
 		} else {
 			return "No Objects Dragged";
 		}

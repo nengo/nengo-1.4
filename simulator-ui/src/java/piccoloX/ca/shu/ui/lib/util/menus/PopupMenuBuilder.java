@@ -81,4 +81,11 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 		return menu;
 	}
 
+	@Override
+	public void addLabel(String msg) {
+		JLabel item = new JLabel(msg);
+		style(item);
+		menu.add(item);
+	}
+
 }

@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 import ca.neo.model.SimulationException;
 import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.nodes.widgets.UISimulatorProbe;
+import ca.neo.ui.models.nodes.widgets.UIProbe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -23,7 +23,7 @@ public class AddProbesAction extends ReversableAction {
 
 	private static final long serialVersionUID = 1;
 
-	private HashMap<UINeoNode, UISimulatorProbe> myCreatedProbesMap;
+	private HashMap<UINeoNode, UIProbe> myCreatedProbesMap;
 
 	private Collection<UIModel> myNodes;
 
@@ -36,7 +36,7 @@ public class AddProbesAction extends ReversableAction {
 
 	@Override
 	protected void action() throws ActionException {
-		myCreatedProbesMap = new HashMap<UINeoNode, UISimulatorProbe>(myNodes
+		myCreatedProbesMap = new HashMap<UINeoNode, UIProbe>(myNodes
 				.size());
 
 		String stateName = JOptionPane.showInputDialog(UIEnvironment
@@ -50,7 +50,7 @@ public class AddProbesAction extends ReversableAction {
 			for (UIModel model : myNodes) {
 				if (model instanceof UINeoNode) {
 					UINeoNode node = (UINeoNode) model;
-					UISimulatorProbe probeCreated;
+					UIProbe probeCreated;
 
 					try {
 						probeCreated = node.addProbe(stateName);
@@ -80,7 +80,7 @@ public class AddProbesAction extends ReversableAction {
 		for (UIModel model : myNodes) {
 			if (model instanceof UINeoNode) {
 				UINeoNode node = (UINeoNode) model;
-				UISimulatorProbe probeCreated = myCreatedProbesMap.get(node);
+				UIProbe probeCreated = myCreatedProbesMap.get(node);
 				node.removeProbe(probeCreated);
 			}
 

@@ -27,7 +27,7 @@ public class BrainViewExample extends ExampleRunner {
 	@Override
 	protected void processNetwork(UINetwork network) {
 		network.closeViewer();
-		network.openBrainViewer();
+		network.createBrainViewer();
 	}
 
 }

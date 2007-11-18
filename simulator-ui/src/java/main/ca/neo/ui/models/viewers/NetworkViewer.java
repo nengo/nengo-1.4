@@ -71,6 +71,7 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public NetworkViewer(UINetwork pNetwork) {
 		super(pNetwork);
+
 	}
 
 	@Override
@@ -246,8 +247,7 @@ public class NetworkViewer extends NodeViewer {
 		PopupMenuBuilder menu = super.constructMenu();
 
 		menu.addSection("Simulator");
-		menu.addAction(new RunSimulatorAction("Run", getNetwork()
-				.getSimulator()));
+		menu.addAction(new RunSimulatorAction("Run", getViewerParent()));
 
 		/*
 		 * Create new models

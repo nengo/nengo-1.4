@@ -11,10 +11,7 @@ import ca.neo.model.Node;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.plot.Plotter;
-import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.icons.ModelIcon;
-import ca.neo.ui.models.icons.ProbeIcon;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
@@ -32,19 +29,16 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  * 
  * @author Shu Wu
  */
-public class UISimulatorProbe extends UIModel {
+public class UIStateProbe extends UIProbe {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
-	private UINeoNode nodeAttachedTo;
 
-	public UISimulatorProbe(UINeoNode nodeAttachedTo, Probe model) {
-		super(model);
-		init(nodeAttachedTo);
-	}
-
-	public UISimulatorProbe(UINeoNode nodeAttachedTo, String state)
+	public UIStateProbe(UINeoNode nodeAttachedTo, String state)
 			throws SimulationException {
-		super();
+		super(nodeAttachedTo);
 
 		/*
 		 * Creates the probe
@@ -67,8 +61,8 @@ public class UISimulatorProbe extends UIModel {
 						.addProbe(node.getName(), state, true);
 			}
 		} catch (SimulationException exception) {
-//			nodeAttachedTo.popupTransientMsg("Could not add Probe (" + state
-//					+ ") added to Simulator");
+			// nodeAttachedTo.popupTransientMsg("Could not add Probe (" + state
+			// + ") added to Simulator");
 			throw exception;
 		}
 
@@ -76,38 +70,16 @@ public class UISimulatorProbe extends UIModel {
 				+ ") added to Simulator");
 
 		setModel(probe);
-		init(nodeAttachedTo);
 
-	}
-
-	private void init(UINeoNode nodeProxy) {
-		this.nodeAttachedTo = nodeProxy;
-
-		setSelectable(false);
-		setName(getModel().getStateName());
-
-		/*
-		 * Create icon
-		 */
-		ModelIcon icon = new ProbeIcon(this);
-		icon.configureLabel(false);
-		icon.setLabelVisible(false);
-		setIcon(icon);
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	public String getTypeName() {
+		return "Probe";
+	}
 
-		menu.addSection("Probe");
-		MenuBuilder plotMenu = menu.createSubMenu("plot");
-		plotMenu.addAction(new PlotAction());
-		plotMenu.addAction(new PlotTauFilterAction());
-
-		MenuBuilder exportMenu = menu.createSubMenu("export data");
-		exportMenu.addAction(new ExportToMatlabAction());
-
-		return menu;
+	public UIStateProbe(UINeoNode nodeAttachedTo, Probe probeModel) {
+		super(nodeAttachedTo, probeModel);
 	}
 
 	@Override
@@ -118,60 +90,11 @@ public class UISimulatorProbe extends UIModel {
 		return tooltips;
 	}
 
-	@Override
-	protected void prepareForDestroy() {
-
-		super.prepareForDestroy();
-
-		try {
-			nodeAttachedTo.getParentNetwork().getSimulator().removeProbe(
-					getProbe());
-			popupTransientMsg("Probe removed from Simulator");
-		} catch (SimulationException e) {
-			UserMessages.showError("Could not remove probe");
-		}
-
-		nodeAttachedTo.removeProbe(this);
-
-	}
-
-	/**
-	 * @param name
-	 *            prefix of the fileName to be exported to
-	 * @throws IOException
-	 */
-	public void exportToMatlab(String name) {
-		MatlabExporter me = new MatlabExporter();
-		me.add(getName(), getProbe().getData());
-		try {
-			me.write(new File(name + ".mat"));
-		} catch (IOException e) {
-			UserMessages.showError("Could not export file: " + e.toString());
-		}
-	}
-
-	@Override
-	public Probe getModel() {
-		return (Probe) super.getModel();
-	}
-
-	/**
-	 * @return Probe object
-	 */
-	public Probe getProbe() {
-		return getModel();
-	}
-
-	@Override
-	public String getTypeName() {
-		return "Probe";
-	}
-
 	/**
 	 * Plots the probe data
 	 */
 	public void plot() {
-		Plotter.plot(getProbe().getData(), getName());
+		Plotter.plot(getModel().getData(), getName());
 	}
 
 	/**
@@ -179,7 +102,7 @@ public class UISimulatorProbe extends UIModel {
 	 *            Time constant of display filter (s)
 	 */
 	public void plot(float tauFilter) {
-		Plotter.plot(getProbe().getData(), tauFilter, getName());
+		Plotter.plot(getModel().getData(), tauFilter, getName());
 	}
 
 	/**
@@ -258,6 +181,69 @@ public class UISimulatorProbe extends UIModel {
 				UserMessages.showWarning("Could not parse number");
 			}
 
+		}
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+
+		super.prepareForDestroy();
+
+		try {
+			getProbeParent().getParentNetwork().getSimulator().removeProbe(
+					getModel());
+			popupTransientMsg("Probe removed from Simulator");
+		} catch (SimulationException e) {
+			UserMessages.showError("Could not remove probe");
+		}
+
+		getProbeParent().removeProbe(this);
+
+	}
+
+	@Override
+	protected PopupMenuBuilder constructMenu() {
+		PopupMenuBuilder menu = super.constructMenu();
+
+		menu.addSection("Probe");
+		MenuBuilder plotMenu = menu.createSubMenu("plot");
+		plotMenu.addAction(new PlotAction());
+		plotMenu.addAction(new PlotTauFilterAction());
+
+		MenuBuilder exportMenu = menu.createSubMenu("export data");
+		exportMenu.addAction(new ExportToMatlabAction());
+
+		return menu;
+	}
+
+	/**
+	 * @param name
+	 *            prefix of the fileName to be exported to
+	 * @throws IOException
+	 */
+	public void exportToMatlab(String name) {
+		MatlabExporter me = new MatlabExporter();
+		me.add(getName(), getModel().getData());
+		try {
+			me.write(new File(name + ".mat"));
+		} catch (IOException e) {
+			UserMessages.showError("Could not export file: " + e.toString());
+		}
+	}
+
+	@Override
+	public Probe getModel() {
+		return (Probe) super.getModel();
+	}
+
+	@Override
+	public void setModel(Object model) {
+		super.setModel(model);
+
+		if (model instanceof Probe) {
+			setName(((Probe) model).getStateName());
+		} else {
+			throw new IllegalArgumentException("Wrong model type");
 		}
 	}
 

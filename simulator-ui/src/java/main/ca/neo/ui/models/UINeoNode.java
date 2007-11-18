@@ -19,7 +19,8 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.ui.actions.AddProbeAction;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
-import ca.neo.ui.models.nodes.widgets.UISimulatorProbe;
+import ca.neo.ui.models.nodes.widgets.UIProbe;
+import ca.neo.ui.models.nodes.widgets.UIStateProbe;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.ui.models.nodes.widgets.Widget;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -33,7 +34,7 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
@@ -49,7 +50,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	/**
 	 * Attached probes
 	 */
-	private Vector<UISimulatorProbe> probes;
+	private Vector<UIProbe> probes;
 
 	/**
 	 * Representative vertex used by Jung layout algorithms
@@ -107,9 +108,9 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * @param probeUI
 	 *            New probe that was just added
 	 */
-	private void newProbeAdded(UISimulatorProbe probeUI) {
+	protected void newProbeAdded(UIProbe probeUI) {
 		if (probes == null)
-			probes = new Vector<UISimulatorProbe>();
+			probes = new Vector<UIProbe>();
 
 		addChild(probeUI);
 		probes.add(probeUI);
@@ -146,27 +147,15 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 		} else {
 			addChild(probeUI);
-
 		}
 
 		// assignProbes();
 
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected PopupMenuBuilder constructMenu() {
+	protected void constructViewMenu(AbstractMenuBuilder menu) {
 
-		PopupMenuBuilder menu = super.constructMenu();
-
-		// menu.addSubMenu(label)
-		menu.addSection("Node");
-
-		MenuBuilder docMenu = menu.createSubMenu("Documentation");
-		docMenu.addAction(new SetDocumentationAction("Set"));
-		docMenu.addAction(new ViewDocumentationAction("View"));
-
-		MenuBuilder originsAndTerminations = menu
+		AbstractMenuBuilder originsAndTerminations = menu
 				.createSubMenu("Origins and terminations");
 
 		/*
@@ -175,7 +164,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		Origin[] origins = getModel().getOrigins();
 		if (origins.length > 0) {
 
-			MenuBuilder originsMenu = originsAndTerminations
+			AbstractMenuBuilder originsMenu = originsAndTerminations
 					.createSubMenu("Show origin");
 
 			for (Origin element : origins) {
@@ -190,7 +179,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		Termination[] terminations = getModel().getTerminations();
 		if (terminations.length > 0) {
 
-			MenuBuilder terminationsMenu = originsAndTerminations
+			AbstractMenuBuilder terminationsMenu = originsAndTerminations
 					.createSubMenu("Show termination");
 
 			for (Termination element : terminations) {
@@ -202,26 +191,50 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		originsAndTerminations.addAction(new ShowAllOandTAction("Show all"));
 		originsAndTerminations.addAction(new HideAllOandTAction("Hide all"));
 
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void constructDataCollectionMenu(AbstractMenuBuilder menu) {
 		/*
 		 * Build the "add probe" menu
 		 */
+		AbstractMenuBuilder probesMenu = menu.createSubMenu("Add probe");
+		boolean somethingFound = false;
 		if (getModel() instanceof Probeable) {
 
 			Probeable probeable = (Probeable) getModel();
 			Properties states = probeable.listStates();
 
 			// Enumeration e = states.elements();
-			Iterator it = states.entrySet().iterator();
-			MenuBuilder probesMenu = null;
+			Iterator<?> it = states.entrySet().iterator();
 
 			while (it.hasNext()) {
-				if (probesMenu == null) {
-					probesMenu = menu.createSubMenu("Add probe");
-				}
+				somethingFound = true;
 				Entry<String, String> el = (Entry<String, String>) it.next();
 				probesMenu.addAction(new AddProbeAction(this, el));
+
 			}
 		}
+
+		if (!somethingFound) {
+			probesMenu.addLabel("Nothing probeable");
+		}
+
+	}
+
+	@Override
+	protected PopupMenuBuilder constructMenu() {
+		PopupMenuBuilder menu = super.constructMenu();
+
+		AbstractMenuBuilder docMenu = menu.createSubMenu("Documentation");
+		docMenu.addAction(new SetDocumentationAction("Set"));
+		docMenu.addAction(new ViewDocumentationAction("View"));
+
+		menu.addSection("View");
+		constructViewMenu(menu);
+
+		menu.addSection("Data Collection");
+		constructDataCollectionMenu(menu);
 
 		return menu;
 	}
@@ -273,11 +286,12 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		while (it.hasNext()) {
 			Object obj = it.next();
 
-			if (obj instanceof UISimulatorProbe) {
-				UISimulatorProbe probe = (UISimulatorProbe) obj;
+			if (obj instanceof UIProbe) {
+				UIProbe probe = (UIProbe) obj;
 
-				probe.setOffset(0, probeY + getHeight() / 2);
-				probeY -= probe.getHeight() + 5;
+				probe.setOffset(getWidth() * (1f / 4f), probeY + getHeight()
+						* (1f / 4f));
+				probeY += probe.getHeight() + 5;
 
 			} else if (obj instanceof Widget) {
 				Widget widget = (Widget) obj;
@@ -338,10 +352,10 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * @param stateName
 	 *            The name of the state variable to probe
 	 */
-	public UISimulatorProbe addProbe(String stateName) throws SimulationException {
+	public UIStateProbe addProbe(String stateName) throws SimulationException {
 
-		UISimulatorProbe probeUI = new UISimulatorProbe(this, stateName);
-		
+		UIStateProbe probeUI = new UIStateProbe(this, stateName);
+
 		newProbeAdded(probeUI);
 
 		return probeUI;
@@ -447,7 +461,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * @param probe
 	 *            to be removed
 	 */
-	public void removeProbe(UISimulatorProbe probe) {
+	public void removeProbe(UIProbe probe) {
 		probes.remove(probe);
 		probe.destroy();
 
@@ -552,8 +566,8 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 *            To be shown
 	 * @return Probe UI Object
 	 */
-	public UISimulatorProbe showProbe(Probe probe) {
-		UISimulatorProbe probeUI = new UISimulatorProbe(this, probe);
+	public UIProbe showProbe(Probe probe) {
+		UIStateProbe probeUI = new UIStateProbe(this, probe);
 		newProbeAdded(probeUI);
 		return probeUI;
 	}

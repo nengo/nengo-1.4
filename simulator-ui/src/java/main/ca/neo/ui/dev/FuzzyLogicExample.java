@@ -26,7 +26,7 @@ import ca.neo.model.neuron.Neuron;
 public class FuzzyLogicExample {
 
 	public static Network createNetwork() throws StructuralException {
-		Network net = new NetworkImpl();
+		Network net = new NetworkImpl();		
 		
 		//Rules: 
 		// 1) if A and (B or C) then 1 

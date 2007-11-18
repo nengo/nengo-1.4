@@ -42,6 +42,7 @@ public class MenuBuilder extends AbstractMenuBuilder {
 		menu.add(item);
 	}
 
+	@Override
 	public void addLabel(String msg) {
 		JLabel item = new JLabel(msg);
 		style(item);

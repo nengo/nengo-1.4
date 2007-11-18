@@ -21,6 +21,8 @@ public abstract class AbstractMenuBuilder {
 
 	public abstract void addAction(StandardAction action);
 
+	public abstract void addLabel(String msg);
+	
 	public abstract AbstractMenuBuilder createSubMenu(String label);
 
 	public boolean isApplyCustomStyle() {

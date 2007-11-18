@@ -1,39 +1,74 @@
 *******************************************
  Done
 *******************************************
+11/17/07 - Duplicate probes cannot be added in local simulator
+11/17/07 - Spike collection is now represented by a probe icon
+11/17/07 - Preliminary check-in of data list viewer, it is not complete
 
 *******************************************
  Pri 0 - doing next
 *******************************************
-In ReflectiveFunction, I should look at default Values and apply them
-Regular template configuration should not save to file.
+Collecting spikes should be represented by an icon
+
+One data list manager
+
+Ah, I don't think we'd talked about supporting that last thing in the UI, but it would be good (e.g. right-click an origin and select "externalize").
+Or "expose" rather. See Network.exposeOrigin() and exposeTermination()
+
+Clean up menus
+
+Replacing ensembles in place - Instead, why not change parameters
+
+Manage views: Network, Brain, Data
+
+Sort data list view by alphabet
+
+Parse data list in a different thread
+
+Question about nested Networks, are they possible?
 
 
-Do away with Reflective function, and create function UIs directly.
-Use function API to receive parameters to populate UI config elements.
+I just wrote a static method you can use for this:
+AbstractEnsemble.findCommon1DOrigins().
 
+While an action is in progress, some other actions should be blocked (such as run simulator).
+
+If an ensemble is collecting spikes, show it in the UI
 
 Use JTree to draw data list view
 	http://java.sun.com/docs/books/tutorial/uiswing/components/tree.html
 
 
+You know, I'm not sure you even need that. I can imagine creating an
+origin that takes 20 minutes (it can take longer depending on the # of
+nodes) and then realizing in the mean time that I wanted to run the
+rest of the network again for some reason (without the new Origin). If
+there was an empty Termination that the Origin was supposed to project
+to, then it would error when it ran, but if not, no problem.
+
+I'd say just don't let the user connect the Origin until it's ready,
+and make it clear somehow in the meantime that it isn't ready yet but
+will be.
+
+*******************************************
+ Pri 1 - to do
+*******************************************
+Node tree needs to be reversely traversable
+	
+
+
+
 Handle on user-end, when a chosen template does not fit in configurable. 
 ie. when PFunctionArray's input dimensions are incompatible with given functions.
 
-change IConfigurable to use UserConfigurer.configure where possible.
-
-
-Research using serializable as file format 
+Custom file format
 
 Allow creation of multi-dimensional fourier functions
-
-Creating more types of nodes, ensembles.
 
 Structure the popup menus for better usability
 
 Brain View interface
 Click to bring a cross section to front, zooming between sections
-
 
 1. What operations are undoable? I think it would be nice if
 	    everything was (including object removals & layout changes). Would
@@ -45,27 +80,6 @@ Click to bring a cross section to front, zooming between sections
 information visualization
 	dimensions of functions, nodes
 	
-*******************************************
- Pri 1 - to do
-*******************************************
-
-
-create exceptions
-
-There are some bugs with the new Function Input configuration.  I'll fix that soon.
-
-The function list is built in FunctionInputPanel. Each function in the list is a description wrapper that describes the properties of the function to configure and their names. 
-
-show open windows
-
-
-Connection Weights
-- I think I know why it isn't acting as an integrator -- it looks like
-there is no way to set connection weights on a projection? (something
-like a spreadsheet-style matrix editor would be good)
-
-
-
 *******************************************
  Pri 2 - will do eventually
 *******************************************
@@ -94,8 +108,6 @@ getInformation method for Nodes, for tooltips
 units selection for UI Dialog
 
 convert Iconfiguration's isConfigured option to a exception thrown and caught by ConfigManager
-
-Complete java docs
 
 Edit properties of existing models
 

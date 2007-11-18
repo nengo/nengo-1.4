@@ -1,5 +1,7 @@
 package ca.neo.ui.models.icons;
 
+import java.awt.Color;
+
 import ca.neo.ui.models.UIModel;
 import ca.shu.ui.lib.Style.Style;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -8,15 +10,20 @@ import edu.umd.cs.piccolo.nodes.PPath;
  * Icon for a Simulator Probe
  * 
  * @author Shu Wu
- * 
  */
 public class ProbeIcon extends ModelIcon {
+
+	public static Color DEFAULT_COLOR = Style.COLOR_LIGHT_PURPLE;
 
 	private static final long serialVersionUID = 1L;
 
 	public ProbeIcon(UIModel parent) {
-		super(parent, new IconNode());
+		super(parent, new Triangle());
 
+	}
+
+	public void setColor(Color color) {
+		getIconReal().setPaint(color);
 	}
 
 }
@@ -25,9 +32,8 @@ public class ProbeIcon extends ModelIcon {
  * Icon which is basically a right-facing equilateral triangle
  * 
  * @author Shu Wu
- * 
  */
-class IconNode extends PPath {
+class Triangle extends PPath {
 	/**
 	 * 
 	 */
@@ -35,7 +41,7 @@ class IconNode extends PPath {
 
 	static final double probeIconSize = 20;
 
-	public IconNode() {
+	public Triangle() {
 		super();
 
 		float x = 0;

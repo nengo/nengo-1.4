@@ -4,10 +4,9 @@ import java.util.Map.Entry;
 
 import ca.neo.model.SimulationException;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.nodes.widgets.UISimulatorProbe;
+import ca.neo.ui.models.nodes.widgets.UIProbe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Action for adding probes
@@ -18,7 +17,7 @@ public class AddProbeAction extends ReversableAction {
 
 	private static final long serialVersionUID = 1;
 
-	private UISimulatorProbe probeCreated;
+	private UIProbe probeCreated;
 
 	private Entry<String, String> state;
 	private UINeoNode myNode;
@@ -36,10 +35,8 @@ public class AddProbeAction extends ReversableAction {
 		try {
 			probeCreated = myNode.addProbe(state.getKey());
 		} catch (SimulationException e) {
-
-			UserMessages.showError("Could not add probe: " + e.toString());
+			throw new ActionException("Probe could not be added: " + e.getMessage(), true);
 		}
-
 	}
 
 	@Override

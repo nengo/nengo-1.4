@@ -9,9 +9,12 @@ import ca.neo.sim.SimulatorListener;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.descriptors.PBoolean;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.neo.ui.dataList.DataTree;
+import ca.neo.ui.models.nodes.UINetwork;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.AbstractActivity;
@@ -30,12 +33,15 @@ public class RunSimulatorAction extends StandardAction {
 			"Start time");
 	private static final PropertyDescriptor pStepSize = new PFloat("Step size");
 
+	private static final PropertyDescriptor pShowDataViewer = new PBoolean(
+			"Open data viewer after simulation");
+
 	private static final PropertyDescriptor[] zProperties = { pStartTime,
-			pEndTime, pStepSize };
+			pEndTime, pStepSize, pShowDataViewer };
 
 	private static final long serialVersionUID = 1L;
 
-	private Simulator simulator;
+	private UINetwork uiNetwork;
 
 	/**
 	 * @param actionName
@@ -43,9 +49,9 @@ public class RunSimulatorAction extends StandardAction {
 	 * @param simulator
 	 *            Simulator to run
 	 */
-	public RunSimulatorAction(String actionName, Simulator simulator) {
+	public RunSimulatorAction(String actionName, UINetwork uiNetwork) {
 		super("Run simulator", actionName);
-		this.simulator = simulator;
+		this.uiNetwork = uiNetwork;
 	}
 
 	@Override
@@ -59,14 +65,16 @@ public class RunSimulatorAction extends StandardAction {
 			float startTime = (Float) properties.getProperty(pStartTime);
 			float endTime = (Float) properties.getProperty(pEndTime);
 			float stepTime = (Float) properties.getProperty(pStepSize);
-
-			(new RunSimulatorActivity(startTime, endTime, stepTime))
-					.startThread();
+			boolean showDataViewer = (Boolean) properties
+					.getProperty(pShowDataViewer);
+			(new RunSimulatorActivity(startTime, endTime, stepTime,
+					showDataViewer)).startThread();
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 
 			throw new ActionException("Simulator configuration not complete",
 					false);
+
 		}
 
 	}
@@ -84,24 +92,35 @@ public class RunSimulatorAction extends StandardAction {
 		private float startTime;
 		private float endTime;
 		private float stepTime;
+		private boolean showDataViewer;
 
 		public RunSimulatorActivity(float startTime, float endTime,
-				float stepTime) {
+				float stepTime, boolean showDataViewer) {
 			super("Simulation started");
 			this.startTime = startTime;
 			this.endTime = endTime;
 			this.stepTime = stepTime;
+			this.showDataViewer = showDataViewer;
 		}
 
 		@Override
 		public void doActivity() {
 			try {
+				Simulator simulator = uiNetwork.getSimulator();
+				DataTree simData = uiNetwork.getSimData();
+
 				simulator.resetNetwork(false);
 				simulator.addSimulatorListener(this);
 
 				simulator.run(startTime, endTime, stepTime);
 
 				simulator.removeSimulatorListener(this);
+
+				simData.captureData();
+
+				if (showDataViewer) {
+					uiNetwork.openDataViewer();
+				}
 
 			} catch (SimulationException e) {
 				UserMessages.showError("Simulator problem: " + e.toString());
