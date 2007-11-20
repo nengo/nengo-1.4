@@ -92,7 +92,7 @@ public class CallChainCompletor extends CommandCompletor {
 		if (po instanceof PyJavaInstance) {
 			String rootClassName = ((PyJavaInstance) po).instclass.__name__;
 			try {
-				Class c = getReturnClass(rootClassName, base);
+				Class<?> c = getReturnClass(rootClassName, base);
 
 				Field[] fields = c.getFields();
 				for (int i = 0; i < fields.length; i++) {
@@ -104,7 +104,7 @@ public class CallChainCompletor extends CommandCompletor {
 					StringBuffer buf = new StringBuffer(base + ".");
 					buf.append(methods[i].getName());
 					buf.append('(');
-					Class[] paramTypes = methods[i].getParameterTypes();
+					Class<?>[] paramTypes = methods[i].getParameterTypes();
 					for (int j = 0; j < paramTypes.length; j++) {
 						buf.append(paramTypes[j].getSimpleName());
 						if (j < paramTypes.length - 1) buf.append(", ");
@@ -166,8 +166,8 @@ public class CallChainCompletor extends CommandCompletor {
 	 * @param callChain Full call chain, eg x.getY().getZ(foo)
 	 * @return The class of the final return value
 	 */
-	private Class getReturnClass(String rootClassName, String callChain) throws Exception {
-		Class result = Class.forName(rootClassName);				
+	private Class<?> getReturnClass(String rootClassName, String callChain) throws Exception {
+		Class<?> result = Class.forName(rootClassName);				
 
 		StringTokenizer varTok = new StringTokenizer(callChain, ".", false);
 		varTok.nextToken(); //skip root	

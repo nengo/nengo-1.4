@@ -2,7 +2,6 @@ package ca.neo.ui.models.nodes.widgets;
 
 import ca.neo.model.Ensemble;
 import ca.neo.plot.Plotter;
-import ca.neo.ui.models.icons.ProbeIcon;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;

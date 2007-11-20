@@ -2,7 +2,6 @@ package ca.neo.ui.models.nodes;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Ensemble;
-import ca.neo.model.Node;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
@@ -40,8 +39,9 @@ public class UIEnsemble extends NodeContainer {
 		init();
 	}
 
-	public UIEnsemble(Node model) {
+	public UIEnsemble(Ensemble model) {
 		super(model);
+
 		init();
 	}
 
@@ -202,5 +202,14 @@ public class UIEnsemble extends NodeContainer {
 			collectSpikes(true);
 		}
 
+	}
+
+	@Override
+	public void setModel(Object model) {
+		super.setModel(model);
+
+		if (getModel().isCollectingSpikes()) {
+			collectSpikes(true);
+		}
 	}
 }

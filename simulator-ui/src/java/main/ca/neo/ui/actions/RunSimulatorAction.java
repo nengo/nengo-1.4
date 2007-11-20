@@ -6,6 +6,7 @@ import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.SimulatorEvent;
 import ca.neo.sim.SimulatorListener;
+import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
@@ -13,7 +14,6 @@ import ca.neo.ui.configurable.descriptors.PBoolean;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
-import ca.neo.ui.dataList.DataTree;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -21,6 +21,7 @@ import ca.shu.ui.lib.objects.activities.AbstractActivity;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.world.AppFrame;
 
 /**
  * Runs the Simulator
@@ -107,7 +108,6 @@ public class RunSimulatorAction extends StandardAction {
 		public void doActivity() {
 			try {
 				Simulator simulator = uiNetwork.getSimulator();
-				DataTree simData = uiNetwork.getSimData();
 
 				simulator.resetNetwork(false);
 				simulator.addSimulatorListener(this);
@@ -116,10 +116,10 @@ public class RunSimulatorAction extends StandardAction {
 
 				simulator.removeSimulatorListener(this);
 
-				simData.captureData();
-
 				if (showDataViewer) {
-					uiNetwork.openDataViewer();
+					AppFrame frame = UIEnvironment.getInstance();
+					((NeoGraphics) (frame)).captureInDataViewer(uiNetwork.getModel());
+					((NeoGraphics) (frame)).openDataViewer();
 				}
 
 			} catch (SimulationException e) {

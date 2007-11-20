@@ -34,8 +34,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 	 * Create the GUI and show it. For thread safety, this method should be
 	 * invoked from the event-dispatching thread.
 	 */
-	private static void createAndShowGUI(Frame owner,
-			DataTree simulatorData) {
+	public static JDialog createViewer(Frame owner, DataTree simulatorData) {
 		if (useSystemLookAndFeel) {
 			try {
 				UIManager.setLookAndFeel(UIManager
@@ -46,12 +45,10 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		}
 
 		// Create and set up the window.
-		JDialog dialog = new JDialog(owner, simulatorData.getNetwork()
-				.getName()
-				+ " - Data Viewer");
+		JDialog dialog = new JDialog(owner, "Data Viewer");
 
 		dialog.setPreferredSize(new Dimension(300, 600));
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
 
 		// Create and set up the content pane.
 		DataListView newContentPane = new DataListView(simulatorData);
@@ -62,12 +59,8 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		// Display the window.
 		dialog.pack();
 		dialog.setVisible(true);
-	}
 
-	public static void createViewer(Frame owner, DataTree data) {
-		// Schedule a job for the event-dispatching thread:
-		// creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(new ViewerRunnable(owner, data));
+		return dialog;
 	}
 
 	private JTree tree;
@@ -79,6 +72,8 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		// Create a tree that allows one selection at a time.
 		tree = new JTree(data);
+		tree.setEditable(true);
+
 		tree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 
@@ -125,22 +120,6 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		if (DEBUG) {
 			System.out.println(nodeInfo.toString());
 		}
-	}
-
-	static class ViewerRunnable implements Runnable {
-		private DataTree data;
-		private Frame owner;
-
-		public ViewerRunnable(Frame owner, DataTree data) {
-			super();
-			this.owner = owner;
-			this.data = data;
-		}
-
-		public void run() {
-			createAndShowGUI(owner, data);
-		}
-
 	}
 
 }

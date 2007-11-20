@@ -3,12 +3,17 @@ package ca.neo.ui;
 import java.awt.event.KeyEvent;
 import java.util.Iterator;
 
+import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
+import ca.neo.model.Network;
 import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.SaveNodeContainerAction;
+import ca.neo.ui.dataList.DataListView;
+import ca.neo.ui.dataList.DataTree;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.NodeContainer;
@@ -17,6 +22,8 @@ import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.AppFrame;
@@ -64,6 +71,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	}
 
+	private JDialog dataViewerDialog = null;
+
+	private DataTree simulationData;
+
 	/**
 	 * @param title
 	 *            Text to be shown in the Title Bar
@@ -72,6 +83,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		super(title + " - NEO Workspace");
 
 		UIEnvironment.setDebugEnabled(true);
+
+		simulationData = new DataTree();
+
 		/*
 		 * Set up Environment variables
 		 */
@@ -140,6 +154,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	}
 
+	public void captureInDataViewer(Network network) {
+		simulationData.captureData(network);
+	}
+
 	@Override
 	public String getAboutString() {
 		return ABOUT;
@@ -152,12 +170,12 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	@Override
 	public void initApplicationMenu(JMenuBar menuBar) {
-		MenuBuilder menu = new MenuBuilder("File");
-		menu.getJMenu().setMnemonic(KeyEvent.VK_F);
+		MenuBuilder fileMenu = new MenuBuilder("File");
+		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_F);
 
-		menuBar.add(menu.getJMenu());
+		menuBar.add(fileMenu.getJMenu());
 
-		MenuBuilder newMenu = menu.createSubMenu("New");
+		MenuBuilder newMenu = fileMenu.createSubMenu("New");
 		newMenu.getJMenu().setMnemonic(KeyEvent.VK_N);
 		newMenu.addAction(new CreateModelAction("Network", this,
 				UINetwork.class), KeyEvent.VK_N);
@@ -167,8 +185,42 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		newMenu.addAction(new CreateModelAction("Ensemble", this,
 				UIEnsemble.class), KeyEvent.VK_E);
 
-		menu.addAction(new OpenNeoFileAction("Open from file", this),
+		fileMenu.addAction(new OpenNeoFileAction("Open from file", this),
 				KeyEvent.VK_O);
+
+		MenuBuilder viewMenu = new MenuBuilder("View");
+		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_F);
+		menuBar.add(viewMenu.getJMenu());
+
+		viewMenu.addAction(new OpenDataViewerAction(), KeyEvent.VK_N);
+
+	}
+
+	public void openDataViewer() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (dataViewerDialog == null) {
+					dataViewerDialog = DataListView.createViewer(UIEnvironment
+							.getInstance(), simulationData);
+				}
+				dataViewerDialog.setVisible(true);
+			}
+		});
+
+	}
+
+	public class OpenDataViewerAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public OpenDataViewerAction() {
+			super("Open data viewer");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			openDataViewer();
+		}
 
 	}
 

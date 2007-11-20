@@ -7,18 +7,12 @@ import ca.neo.sim.Simulator;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PString;
-import ca.neo.ui.dataList.DataListView;
-import ca.neo.ui.dataList.DataTree;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkUISettings;
 import ca.neo.ui.models.viewers.NetworkViewer;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 
 /**
  * UI Wrapper for a Network
@@ -34,8 +28,6 @@ public class UINetwork extends NodeContainer {
 	private static final long serialVersionUID = 1L;
 
 	private static final String typeName = "Network";
-
-	DataTree simData;
 
 	/**
 	 * Config descriptors
@@ -102,13 +94,6 @@ public class UINetwork extends NodeContainer {
 		return (NetworkImpl) super.getModel();
 	}
 
-	/**
-	 * @return Simulator
-	 */
-	public Simulator getSimulator() {
-		return getModel().getSimulator();
-	}
-
 	@Override
 	public String getName() {
 		if (getModel() == null) {
@@ -124,6 +109,13 @@ public class UINetwork extends NodeContainer {
 			return getModel().getNodes().length;
 		else
 			return 0;
+	}
+
+	/**
+	 * @return Simulator
+	 */
+	public Simulator getSimulator() {
+		return getModel().getSimulator();
 	}
 
 	@Override
@@ -155,21 +147,6 @@ public class UINetwork extends NodeContainer {
 	}
 
 	@Override
-	protected void constructDataCollectionMenu(AbstractMenuBuilder menu) {
-		super.constructDataCollectionMenu(menu);
-
-		menu.addAction(new StandardAction("Open collected data") {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void action() throws ActionException {
-				openDataViewer();
-			}
-		});
-
-	}
-
-	@Override
 	public NetworkViewer getViewer() {
 		return (NetworkViewer) super.getViewer();
 	}
@@ -190,28 +167,11 @@ public class UINetwork extends NodeContainer {
 	}
 
 	/**
-	 * Opens the data Viewer
-	 */
-	public void openDataViewer() {
-		DataListView.createViewer(UIEnvironment.getInstance(), getSimData());
-	}
-
-	/**
 	 * @param config
 	 *            UI Configuration manager
 	 */
 	public void setUICOnfig(NetworkUISettings config) {
 		getModel().setMetaData(LAYOUT_MANAGER_KEY, config);
-	}
-
-	public DataTree getSimData() {
-		return simData;
-	}
-
-	@Override
-	public void setModel(Object model) {
-		super.setModel(model);
-		simData = new DataTree((Network) getModel());
 	}
 
 }

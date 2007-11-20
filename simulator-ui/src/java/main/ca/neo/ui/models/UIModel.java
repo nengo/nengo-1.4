@@ -92,7 +92,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 
 		icon = newIcon;
 
-		addChild(icon);
+		addChild(0, icon);
 		icon.setSelectable(false);
 
 		iconPropertyChangeListener = new PropertyChangeListener() {

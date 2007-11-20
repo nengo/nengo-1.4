@@ -145,8 +145,9 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 		}
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ca.shu.ui.lib.world.IDestroyable#destroy()
 	 */
 	public final void destroy() {
@@ -334,17 +335,17 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 * @param msg
 	 */
 	public void popupTransientMsg(String msg) {
+		if (getWorld() != null) {
+			TransientMsg msgObject = new TransientMsg(msg);
 
-		TransientMsg msgObject = new TransientMsg(msg);
+			double offsetX = -(msgObject.getWidth() - getWidth()) / 2d;
 
-		double offsetX = -(msgObject.getWidth() - getWidth()) / 2d;
+			Point2D position = objectToSky(new Point2D.Double(offsetX, -5));
 
-		Point2D position = objectToSky(new Point2D.Double(offsetX, -5));
-
-		msgObject.setOffset(position);
-		getWorld().getSky().addChild(msgObject);
-		msgObject.startAnimation();
-
+			msgObject.setOffset(position);
+			getWorld().getSky().addChild(msgObject);
+			msgObject.startAnimation();
+		}
 	}
 
 	/**
