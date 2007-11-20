@@ -212,10 +212,6 @@ public class LineEnd extends WorldObject implements Interactable {
 		return (connectionState == ConnectionState.CONNECTED);
 	}
 
-	public boolean isContextMenuEnabled() {
-		return true;
-	}
-
 	@Override
 	public void justDropped() {
 
@@ -277,7 +273,7 @@ public class LineEnd extends WorldObject implements Interactable {
 			}
 
 		});
-		return menu.getJPopupMenu();
+		return menu.toJPopupMenu();
 	}
 
 	/**

@@ -71,7 +71,7 @@ public class Window extends WorldObject implements Interactable {
 		addChild(new Border(this, Style.COLOR_FOREGROUND));
 
 		windowStateChanged();
-		
+
 	}
 
 	@Override
@@ -227,13 +227,6 @@ public class Window extends WorldObject implements Interactable {
 
 	public WindowState getWindowState() {
 		return myState;
-	}
-
-	public boolean isContextMenuEnabled() {
-		if (getWindowContent() instanceof Interactable) {
-			return ((Interactable) (getWindowContent())).isContextMenuEnabled();
-		}
-		return false;
 	}
 
 	/**

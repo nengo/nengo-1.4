@@ -1,6 +1,9 @@
 *******************************************
  Done
 *******************************************
+11/20/07 - One data list manager
+
+11/17/07 - Collecting spikes should be represented by an icon
 11/17/07 - Duplicate probes cannot be added in local simulator
 11/17/07 - Spike collection is now represented by a probe icon
 11/17/07 - Preliminary check-in of data list viewer, it is not complete
@@ -8,9 +11,8 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Collecting spikes should be represented by an icon
+Decoded ensembles & nodes under construction should fade in & out
 
-One data list manager
 
 Ah, I don't think we'd talked about supporting that last thing in the UI, but it would be good (e.g. right-click an origin and select "externalize").
 Or "expose" rather. See Network.exposeOrigin() and exposeTermination()
