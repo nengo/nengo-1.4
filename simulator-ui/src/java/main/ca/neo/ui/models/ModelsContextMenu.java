@@ -114,6 +114,6 @@ public class ModelsContextMenu {
 
 		}
 
-		menu = menuBuilder.getJPopupMenu();
+		menu = menuBuilder.toJPopupMenu();
 	}
 }

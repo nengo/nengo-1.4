@@ -13,7 +13,7 @@ import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.dataList.DataListView;
-import ca.neo.ui.dataList.DataTree;
+import ca.neo.ui.dataList.SimulatorDataModel;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.NodeContainer;
@@ -73,7 +73,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	private JDialog dataViewerDialog = null;
 
-	private DataTree simulationData;
+	private SimulatorDataModel simulationData;
 
 	/**
 	 * @param title
@@ -84,7 +84,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 		UIEnvironment.setDebugEnabled(true);
 
-		simulationData = new DataTree();
+		simulationData = new SimulatorDataModel();
 
 		/*
 		 * Set up Environment variables
@@ -189,7 +189,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 				KeyEvent.VK_O);
 
 		MenuBuilder viewMenu = new MenuBuilder("View");
-		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_F);
+		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
 		menuBar.add(viewMenu.getJMenu());
 
 		viewMenu.addAction(new OpenDataViewerAction(), KeyEvent.VK_N);

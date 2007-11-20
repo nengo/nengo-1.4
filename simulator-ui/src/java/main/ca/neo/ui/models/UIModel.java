@@ -145,15 +145,6 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	 */
 	public abstract String getTypeName();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.handlers.Interactable#isContextMenuEnabled()
-	 */
-	public boolean isContextMenuEnabled() {
-		return true;
-	}
-
 	/**
 	 * @return Whether the NEO Model exists
 	 */
@@ -181,7 +172,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 			UserMessages.showWarning("Model is not configured yet");
 			return null;
 		} else {
-			JPopupMenu menu = constructMenu().getJPopupMenu();
+			JPopupMenu menu = constructMenu().toJPopupMenu();
 
 			return menu;
 		}

@@ -15,9 +15,10 @@ import ca.neo.model.Node;
 import ca.neo.model.Probeable;
 import ca.neo.util.Probe;
 import ca.neo.util.SpikePattern;
+import ca.neo.util.TimeSeries;
 import ca.shu.ui.lib.util.Util;
 
-public class DataTree extends DefaultTreeModel {
+public class SimulatorDataModel extends DefaultTreeModel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -70,7 +71,7 @@ public class DataTree extends DefaultTreeModel {
 
 	private Hashtable<Network, DefaultMutableTreeNode> topLevelNetworks = new Hashtable<Network, DefaultMutableTreeNode>();
 
-	public DataTree() {
+	public SimulatorDataModel() {
 		super(new DefaultMutableTreeNode("Data List"));
 	}
 
@@ -83,17 +84,15 @@ public class DataTree extends DefaultTreeModel {
 
 				if (ensemble.isCollectingSpikes()) {
 
+					DefaultMutableTreeNode ensNode = createUniqueNode(top,
+							ensemble.getName());
 					/*
-					 * Clone the serialization pattern before storing it
+					 * Make a clone of the data
 					 */
 					SpikePattern spikePattern = (SpikePattern) Util
 							.cloneSerializable(ensemble.getSpikePattern());
-
-					DefaultMutableTreeNode ensNode = createUniqueNode(top,
-							ensemble.getName());
-
-					DefaultMutableTreeNode spNode = new DefaultMutableTreeNode(
-							new SpikePatternWrapper(spikePattern));
+					DefaultMutableTreeNode spNode = new SpikePatternNode(
+							spikePattern);
 					ensNode.add(spNode);
 				}
 
@@ -127,10 +126,19 @@ public class DataTree extends DefaultTreeModel {
 				DefaultMutableTreeNode targetNode = createUniqueNode(top0,
 						targetNodeName);
 
-				DefaultMutableTreeNode stateNode = new DefaultMutableTreeNode(
-						probe.getStateName() + " (Probe data)");
+				/*
+				 * Make a clone of the data
+				 */
+				TimeSeries probeData = (TimeSeries) Util
+						.cloneSerializable(probe.getData());
+
+				DefaultMutableTreeNode stateNode = new TimeSeriesNode(
+						probeData, probe.getStateName());
+
 				targetNode.add(stateNode);
 
+			} else {
+				Util.Assert(false, "Probe target is not a node");
 			}
 
 		}
@@ -166,33 +174,25 @@ public class DataTree extends DefaultTreeModel {
 			networkNode = new DefaultMutableTreeNode(name);
 			topLevelNetworks.put(network, networkNode);
 
+			
+			
 			this.insertNodeInto(networkNode, ((MutableTreeNode) getRoot()), 0);
 			// add(networkNode);
 		}
 
 		Date date = new Date();
 
-		DefaultMutableTreeNode captureNode = new DefaultMutableTreeNode(date
-				.toString());
-
-		this.insertNodeInto(captureNode, networkNode, 0);
+		DefaultMutableTreeNode captureNode = new DefaultMutableTreeNode(
+				"Simulation (" + date.toString() + ")");
 
 		addSpikePatterns(captureNode, network);
 		addTimeSeries(captureNode, network.getSimulator().getProbes());
-	}
 
-	static class SpikePatternWrapper {
-		SpikePattern spikePattern;
-
-		public SpikePatternWrapper(SpikePattern spikePattern) {
-			super();
-			this.spikePattern = spikePattern;
+		if (captureNode.getChildCount() == 0) {
+			captureNode.add(new DefaultMutableTreeNode("no data collected"));
 		}
 
-		public String toString() {
-			return "Spike Pattern";
-		}
-
+		this.insertNodeInto(captureNode, networkNode, 0);
 	}
 
 }

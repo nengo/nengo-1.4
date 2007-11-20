@@ -165,7 +165,8 @@ public class World extends WorldObject implements Interactable {
 		 */
 		mySkyCamera.addInputEventListener(new SwitchSelectionModeHandler());
 		mySkyCamera.addInputEventListener(new KeyboardFocusHandler());
-		mySkyCamera.addInputEventListener(new TooltipPickHandler(this, 1000, 1500));
+		mySkyCamera.addInputEventListener(new TooltipPickHandler(this, 1000,
+				1500));
 		mySkyCamera.addInputEventListener(new MouseHandler(this));
 		mySkyCamera.addInputEventListener(new ScrollZoomHandler());
 
@@ -315,15 +316,6 @@ public class World extends WorldObject implements Interactable {
 			return super.isAncestorOf(node);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.handlers.Interactable#isContextMenuEnabled()
-	 */
-	public boolean isContextMenuEnabled() {
-		return true;
-	}
-
 	/**
 	 * @return if true, selection mode is enabled. if false, navigation mode is
 	 *         enabled instead.
@@ -424,7 +416,7 @@ public class World extends WorldObject implements Interactable {
 	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
 	 */
 	public JPopupMenu showContextMenu() {
-		return constructMenu().getJPopupMenu();
+		return constructMenu().toJPopupMenu();
 	}
 
 	/**
@@ -457,6 +449,7 @@ public class World extends WorldObject implements Interactable {
 	public PTransformActivity zoomToBounds(Rectangle2D bounds) {
 		return zoomToBounds(bounds, 1000);
 	}
+
 	/**
 	 * Animate the sky to look at a portion of the ground at bounds
 	 * 

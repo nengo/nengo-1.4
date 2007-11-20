@@ -3,12 +3,17 @@ package ca.neo.ui.dataList;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.UIManager;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -34,7 +39,8 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 	 * Create the GUI and show it. For thread safety, this method should be
 	 * invoked from the event-dispatching thread.
 	 */
-	public static JDialog createViewer(Frame owner, DataTree simulatorData) {
+	public static JDialog createViewer(Frame owner,
+			SimulatorDataModel simulatorData) {
 		if (useSystemLookAndFeel) {
 			try {
 				UIManager.setLookAndFeel(UIManager
@@ -65,7 +71,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 	private JTree tree;
 
-	public DataListView(DataTree data) {
+	public DataListView(SimulatorDataModel data) {
 		super(new GridLayout(1, 0));
 
 		// createNodes(top);
@@ -74,12 +80,15 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		tree = new JTree(data);
 		tree.setEditable(true);
 
+		data.addTreeModelListener(new MyTreeModelListener());
 		tree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-		// Listen for when the selection changes.
-		tree.addTreeSelectionListener(this);
+		tree.addMouseListener(new TreeMouseListener());
 
+		// Listen for when the selection changes.
+
+		tree.addTreeSelectionListener(this);
 		if (playWithLineStyle) {
 			System.out.println("line style = " + lineStyle);
 			tree.putClientProperty("JTree.lineStyle", lineStyle);
@@ -112,6 +121,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		Object nodeInfo = node.getUserObject();
 		if (node.isLeaf()) {
+
 			System.out.println("Leaf Node clicked: " + node.toString());
 
 		} else {
@@ -120,6 +130,83 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		if (DEBUG) {
 			System.out.println(nodeInfo.toString());
 		}
+	}
+
+	private class MyTreeModelListener implements TreeModelListener {
+
+		public void treeNodesChanged(TreeModelEvent e) {
+		}
+
+		public void treeNodesInserted(TreeModelEvent e) {
+			tree.scrollPathToVisible(e.getTreePath());
+		}
+
+		public void treeNodesRemoved(TreeModelEvent e) {
+		}
+
+		public void treeStructureChanged(TreeModelEvent e) {
+		}
+
+	}
+
+	private class TreeMouseListener implements MouseListener {
+
+		private void DoubleMouseClicked(MouseEvent e) {
+			DataTreeNode dataNode = getDataNode(e);
+
+			if (dataNode != null) {
+				dataNode.getDefaultAction().doAction();
+			}
+		}
+
+		private DataTreeNode getDataNode(MouseEvent e) {
+			Object source = e.getSource();
+			if (source instanceof JTree) {
+				Object selectedComponent = ((JTree) source)
+						.getLastSelectedPathComponent();
+
+				if (selectedComponent instanceof DataTreeNode) {
+					return (DataTreeNode) selectedComponent;
+
+				}
+			}
+			return null;
+		}
+
+		private void LeftMouseClicked(MouseEvent e) {
+			DataTreeNode dataNode = getDataNode(e);
+
+			if (dataNode != null) {
+				JPopupMenu menu = dataNode.showContextMenu();
+
+				menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+				menu.setVisible(true);
+
+			}
+		}
+
+		public void mouseClicked(MouseEvent e) {
+			if (e.getButton() == MouseEvent.BUTTON3) {
+				LeftMouseClicked(e);
+			} else if (e.getClickCount() == 2
+					&& e.getButton() == MouseEvent.BUTTON1) {
+				DoubleMouseClicked(e);
+			}
+
+		}
+
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		public void mouseExited(MouseEvent e) {
+		}
+
+		public void mousePressed(MouseEvent e) {
+		}
+
+		public void mouseReleased(MouseEvent e) {
+		}
+
 	}
 
 }

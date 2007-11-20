@@ -6,14 +6,8 @@ import javax.swing.JPopupMenu;
  * Objects which can be interacted with through context menus
  * 
  * @author Shu
- * 
  */
-public interface Interactable extends INamedObject {
-
-	/**
-	 * @return whether the Context Menu is enabled
-	 */
-	public boolean isContextMenuEnabled();
+public interface Interactable {
 
 	/**
 	 * @param event

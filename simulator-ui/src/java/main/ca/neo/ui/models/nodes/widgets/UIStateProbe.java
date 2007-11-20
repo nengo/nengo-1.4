@@ -10,7 +10,8 @@ import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
-import ca.neo.plot.Plotter;
+import ca.neo.ui.actions.PlotTimeSeries;
+import ca.neo.ui.actions.PlotTimeSeriesTau;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -91,21 +92,6 @@ public class UIStateProbe extends UIProbe {
 	}
 
 	/**
-	 * Plots the probe data
-	 */
-	public void plot() {
-		Plotter.plot(getModel().getData(), getName());
-	}
-
-	/**
-	 * @param tauFilter
-	 *            Time constant of display filter (s)
-	 */
-	public void plot(float tauFilter) {
-		Plotter.plot(getModel().getData(), tauFilter, getName());
-	}
-
-	/**
 	 * Action for exporting to MatLab
 	 * 
 	 * @author Shu Wu
@@ -137,53 +123,6 @@ public class UIStateProbe extends UIProbe {
 		}
 	}
 
-	/**
-	 * Action for Plotting
-	 * 
-	 * @author Shu Wu
-	 */
-	class PlotAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public PlotAction() {
-			super("Plot");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			plot();
-		}
-
-	}
-
-	/**
-	 * Action for Plotting with a Tau Filter
-	 * 
-	 * @author Shu Wu
-	 */
-	class PlotTauFilterAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public PlotTauFilterAction() {
-			super("Plot w/ filter");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			try {
-				float tauFilter = new Float(
-						JOptionPane
-								.showInputDialog("Time constant of display filter (s): "));
-				plot(tauFilter);
-			} catch (java.lang.NumberFormatException exception) {
-				UserMessages.showWarning("Could not parse number");
-			}
-
-		}
-	}
-
 	@Override
 	protected void prepareForDestroy() {
 
@@ -207,8 +146,8 @@ public class UIStateProbe extends UIProbe {
 
 		menu.addSection("Probe");
 		MenuBuilder plotMenu = menu.createSubMenu("plot");
-		plotMenu.addAction(new PlotAction());
-		plotMenu.addAction(new PlotTauFilterAction());
+		plotMenu.addAction(new PlotTimeSeries(getModel().getData(), getName()));
+		plotMenu.addAction(new PlotTimeSeriesTau(getModel().getData(), getName()));
 
 		MenuBuilder exportMenu = menu.createSubMenu("export data");
 		exportMenu.addAction(new ExportToMatlabAction());
