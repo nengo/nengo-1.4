@@ -5,6 +5,8 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -16,14 +18,18 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import ca.neo.model.Network;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 public class DataListView extends JPanel implements TreeSelectionListener {
-
-	private static boolean DEBUG = false;
 
 	private static String lineStyle = "Horizontal";
 	// Optionally play with line styles. Possible values are
@@ -69,67 +75,55 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		return dialog;
 	}
 
+	private SimulatorDataModel dataModel;
 	private JTree tree;
 
 	public DataListView(SimulatorDataModel data) {
 		super(new GridLayout(1, 0));
 
-		// createNodes(top);
+		this.dataModel = data;
 
 		// Create a tree that allows one selection at a time.
-		tree = new JTree(data);
+		tree = new JTree(dataModel);
 		tree.setEditable(true);
-
-		data.addTreeModelListener(new MyTreeModelListener());
 		tree.getSelectionModel().setSelectionMode(
-				TreeSelectionModel.SINGLE_TREE_SELECTION);
+				TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
 
-		tree.addMouseListener(new TreeMouseListener());
+		dataModel.addTreeModelListener(new MyTreeModelListener());
+		tree.addMouseListener(new MyTreeMouseListener());
 
 		// Listen for when the selection changes.
-
 		tree.addTreeSelectionListener(this);
 		if (playWithLineStyle) {
-			System.out.println("line style = " + lineStyle);
 			tree.putClientProperty("JTree.lineStyle", lineStyle);
 		}
 
-		// Create the scroll pane and add the tree to it.
-		JScrollPane treeView = new JScrollPane(tree);
-
-		// Add the scroll panes to a split pane.
-		// JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		// splitPane.setTopComponent(treeView);
-		add(treeView);
+		JScrollPane scrollPane = new JScrollPane(tree);
+		add(scrollPane);
 
 		Dimension minimumSize = new Dimension(100, 50);
-		treeView.setMinimumSize(minimumSize);
-		// splitPane.setDividerLocation(100);
-		// splitPane.setPreferredSize(new Dimension(500, 300));
-
-		// Add the split pane to this panel.
-		// add(splitPane);
+		scrollPane.setMinimumSize(minimumSize);
 	}
 
 	/** Required by TreeSelectionListener interface. */
 	public void valueChanged(TreeSelectionEvent e) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-				.getLastSelectedPathComponent();
-
-		if (node == null)
-			return;
-
-		Object nodeInfo = node.getUserObject();
-		if (node.isLeaf()) {
-
-			System.out.println("Leaf Node clicked: " + node.toString());
-
-		} else {
-			System.out.println("Node clicked: " + node.toString());
-		}
-		if (DEBUG) {
-			System.out.println(nodeInfo.toString());
-		}
+		// DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
+		// .getLastSelectedPathComponent();
+		//
+		// if (node == null)
+		// return;
+		//
+		// Object nodeInfo = node.getUserObject();
+		// if (node.isLeaf()) {
+		//
+		// System.out.println("Leaf Node clicked: " + node.toString());
+		//
+		// } else {
+		// System.out.println("Node clicked: " + node.toString());
+		// }
+		// if (DEBUG) {
+		// System.out.println(nodeInfo.toString());
+		// }
 	}
 
 	private class MyTreeModelListener implements TreeModelListener {
@@ -149,39 +143,79 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 	}
 
-	private class TreeMouseListener implements MouseListener {
+	private class MyTreeMouseListener implements MouseListener {
 
 		private void DoubleMouseClicked(MouseEvent e) {
-			DataTreeNode dataNode = getDataNode(e);
+			TreePath[] paths = getTreePaths(e);
+			if (paths.length == 1) {
+				DataTreeNode dataNode = getDataNode(paths[0]);
 
-			if (dataNode != null) {
-				dataNode.getDefaultAction().doAction();
+				if (dataNode != null) {
+					dataNode.getDefaultAction().doAction();
+				}
 			}
 		}
 
-		private DataTreeNode getDataNode(MouseEvent e) {
-			Object source = e.getSource();
-			if (source instanceof JTree) {
-				Object selectedComponent = ((JTree) source)
-						.getLastSelectedPathComponent();
+		private DataTreeNode getDataNode(TreePath treePath) {
+			Object selectedNode = treePath.getLastPathComponent();
 
-				if (selectedComponent instanceof DataTreeNode) {
-					return (DataTreeNode) selectedComponent;
+			if (selectedNode instanceof DataTreeNode) {
+				return (DataTreeNode) selectedNode;
 
-				}
 			}
 			return null;
 		}
 
+		private MutableTreeNode[] getTreeNodes(TreePath[] treePaths) {
+
+			ArrayList<MutableTreeNode> treeNodes = new ArrayList<MutableTreeNode>(
+					treePaths.length);
+
+			for (TreePath path : treePaths) {
+				Object obj = path.getLastPathComponent();
+				if (obj instanceof MutableTreeNode) {
+					treeNodes.add((MutableTreeNode) obj);
+				}
+			}
+			return treeNodes.toArray(new MutableTreeNode[0]);
+		}
+
+		private TreePath[] getTreePaths(MouseEvent e) {
+			Object source = e.getSource();
+			TreePath[] paths;
+			if (source instanceof JTree) {
+				JTree tree = (JTree) source;
+
+				paths = tree.getSelectionPaths();
+
+			} else {
+				paths = new TreePath[0];
+			}
+			return paths;
+		}
+
 		private void LeftMouseClicked(MouseEvent e) {
-			DataTreeNode dataNode = getDataNode(e);
+
+			JPopupMenu menu = null;
+
+			TreePath[] paths = getTreePaths(e);
+
+			DataTreeNode dataNode = null;
+			if (paths.length == 1) {
+				dataNode = getDataNode(paths[0]);
+			}
 
 			if (dataNode != null) {
-				JPopupMenu menu = dataNode.showContextMenu();
-
+				menu = dataNode.showContextMenu();
+			} else {
+				PopupMenuBuilder menuBuilder = new PopupMenuBuilder(null);
+				MutableTreeNode[] treeNodes = getTreeNodes(paths);
+				menuBuilder.addAction(new RemoveTreeNodes(treeNodes));
+				menu = menuBuilder.toJPopupMenu();
+			}
+			if (menu != null) {
 				menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
 				menu.setVisible(true);
-
 			}
 		}
 
@@ -207,6 +241,81 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		public void mouseReleased(MouseEvent e) {
 		}
 
+	}
+
+	private static class UndoInfo {
+		TreeNode nodeParent;
+		int nodeIndex;
+
+		public UndoInfo(TreeNode nodeParent, int nodeIndex) {
+			super();
+			this.nodeParent = nodeParent;
+			this.nodeIndex = nodeIndex;
+		}
+	}
+
+	private class RemoveTreeNodes extends ReversableAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private MutableTreeNode[] nodesToRemove;
+
+		Hashtable<MutableTreeNode, UndoInfo> undoLUT;
+
+		public RemoveTreeNodes(MutableTreeNode[] nodesToRemove) {
+			super("Clear data");
+
+			this.nodesToRemove = nodesToRemove;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			undoLUT = new Hashtable<MutableTreeNode, UndoInfo>(
+					nodesToRemove.length);
+
+			for (MutableTreeNode nodeToRemove : nodesToRemove) {
+				TreeNode nodeParent = nodeToRemove.getParent();
+				int nodeIndex = nodeParent.getIndex(nodeToRemove);
+
+				undoLUT.put(nodeToRemove, new UndoInfo(nodeParent, nodeIndex));
+
+				dataModel.removeNodeFromParent(nodeToRemove);
+			}
+		}
+
+		@Override
+		protected void undo() throws ActionException {
+			int numOfFailures = 0;
+
+			/*
+			 * To maintain same node order as before the removal. we add back in
+			 * the reverse order we remove them.
+			 */
+			for (int i = nodesToRemove.length - 1; i >= 0; i--) {
+				MutableTreeNode nodeToRemove = nodesToRemove[i];
+
+				UndoInfo undoInfo = undoLUT.get(nodeToRemove);
+				if (undoInfo != null) {
+					if (undoInfo.nodeParent instanceof MutableTreeNode) {
+						dataModel.insertNodeInto(nodeToRemove,
+								(MutableTreeNode) undoInfo.nodeParent,
+								undoInfo.nodeIndex);
+					} else {
+						numOfFailures++;
+					}
+
+				} else {
+					numOfFailures++;
+				}
+
+			}
+
+			if (numOfFailures > 0) {
+				UserMessages.showWarning("Undo clear failed for "
+						+ numOfFailures + " nodes");
+			}
+
+		}
 	}
 
 }

@@ -76,9 +76,8 @@ public class UITermination extends Widget implements ILineEndHolder {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
-
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 		if (lineEnd != null) {
 			menu.addAction(new RemoveConnectionAction("Disconnect"));
 		}
@@ -101,8 +100,6 @@ public class UITermination extends Widget implements ILineEndHolder {
 			}
 
 		}
-
-		return menu;
 	}
 
 	@Override
@@ -268,8 +265,6 @@ public class UITermination extends Widget implements ILineEndHolder {
 				e.defaultHandleBehavior();
 				throw new UserCancelledException();
 			}
-
-		
 
 		}
 

@@ -212,15 +212,12 @@ public class World extends WorldObject implements Interactable {
 	 * 
 	 * @return Menu builder
 	 */
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
+	protected void constructMenu(PopupMenuBuilder menu) {
 
 		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
 		MenuBuilder windowsMenu = menu.createSubMenu("Windows");
 		windowsMenu.addAction(new CloseAllWindows("Close all"));
 		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
-
-		return menu;
 
 	}
 
@@ -416,7 +413,10 @@ public class World extends WorldObject implements Interactable {
 	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
 	 */
 	public JPopupMenu showContextMenu() {
-		return constructMenu().toJPopupMenu();
+		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
+		constructMenu(menu);
+
+		return menu.toJPopupMenu();
 	}
 
 	/**

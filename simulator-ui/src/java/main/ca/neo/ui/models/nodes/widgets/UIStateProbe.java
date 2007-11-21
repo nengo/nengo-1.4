@@ -141,18 +141,18 @@ public class UIStateProbe extends UIProbe {
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 
 		menu.addSection("Probe");
 		MenuBuilder plotMenu = menu.createSubMenu("plot");
 		plotMenu.addAction(new PlotTimeSeries(getModel().getData(), getName()));
-		plotMenu.addAction(new PlotTimeSeriesTau(getModel().getData(), getName()));
+		plotMenu.addAction(new PlotTimeSeriesTau(getModel().getData(),
+				getName()));
 
 		MenuBuilder exportMenu = menu.createSubMenu("export data");
 		exportMenu.addAction(new ExportToMatlabAction());
 
-		return menu;
 	}
 
 	/**

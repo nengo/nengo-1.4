@@ -58,12 +58,11 @@ public class UISpikeProbe extends UIProbe {
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 
 		if (getModel().getSpikePattern() != null) {
 			menu.addAction(new PlotSpikePattern(getModel().getSpikePattern()));
 		}
-		return menu;
 	}
 }

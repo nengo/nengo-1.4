@@ -15,7 +15,6 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper for an Ensemble
@@ -68,15 +67,6 @@ public class UIEnsemble extends NodeContainer {
 			menu.addAction(new StopCollectSpikes());
 		}
 
-	}
-
-	@Override
-	protected PopupMenuBuilder constructMenu() {
-
-		PopupMenuBuilder menu = super.constructMenu();
-		menu.addSection("Ensemble");
-
-		return menu;
 	}
 
 	@Override

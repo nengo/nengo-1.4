@@ -91,10 +91,10 @@ public class UINEFEnsemble extends UIEnsemble {
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 
-		PopupMenuBuilder menu = super.constructMenu();
-
+		menu.addSection("NEFEnsemble");
 		MenuBuilder plotMenu = menu.createSubMenu("Plot");
 
 		plotMenu.addAction(new StandardAction("Activities") {
@@ -120,7 +120,6 @@ public class UINEFEnsemble extends UIEnsemble {
 		// Decoded termination and origins
 		menu.addAction(new AddDecodedTerminationAction());
 		menu.addAction(new AddDecodedOriginAction());
-		return menu;
 	}
 
 	@Override

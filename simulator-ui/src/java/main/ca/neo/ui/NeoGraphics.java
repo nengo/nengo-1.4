@@ -169,7 +169,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	}
 
 	@Override
-	public void initApplicationMenu(JMenuBar menuBar) {
+	public void initFileMenu(JMenuBar menuBar) {
 		MenuBuilder fileMenu = new MenuBuilder("File");
 		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_F);
 
@@ -188,12 +188,15 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		fileMenu.addAction(new OpenNeoFileAction("Open from file", this),
 				KeyEvent.VK_O);
 
+	}
+
+	@Override
+	public void initViewMenu(JMenuBar menuBar) {
 		MenuBuilder viewMenu = new MenuBuilder("View");
 		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
 		menuBar.add(viewMenu.getJMenu());
 
 		viewMenu.addAction(new OpenDataViewerAction(), KeyEvent.VK_N);
-
 	}
 
 	public void openDataViewer() {

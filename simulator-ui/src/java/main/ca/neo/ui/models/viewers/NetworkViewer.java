@@ -243,8 +243,8 @@ public class NetworkViewer extends NodeViewer {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	public void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run", getViewerParent()));
@@ -287,7 +287,6 @@ public class NetworkViewer extends NodeViewer {
 		widgetMenu.addAction(new ShowAllWidgetsAction("Show all widgets"));
 		widgetMenu.addAction(new HideAllWidgetsAction("Hide all widgets"));
 
-		return menu;
 	}
 
 	/**

@@ -1,16 +1,27 @@
 *******************************************
  Done
 *******************************************
-11/20/07 - One data list manager
-
+11/21/07 - Multiple data items can be cleared and undone
+11/20/07 - Data List manager created
 11/17/07 - Collecting spikes should be represented by an icon
 11/17/07 - Duplicate probes cannot be added in local simulator
-11/17/07 - Spike collection is now represented by a probe icon
-11/17/07 - Preliminary check-in of data list viewer, it is not complete
 
 *******************************************
  Pri 0 - doing next
 *******************************************
+
+***  Data List Items ***
+export partial data tree to folders and files
+make tree nodes sorted
+how to represent multidimensional data?
+subsampling plots
+
+plotting multiple items together
+
+***
+
+delete, export in data list viewer
+
 Decoded ensembles & nodes under construction should fade in & out
 
 
@@ -55,10 +66,6 @@ will be.
 *******************************************
  Pri 1 - to do
 *******************************************
-Node tree needs to be reversely traversable
-	
-
-
 
 Handle on user-end, when a chosen template does not fit in configurable. 
 ie. when PFunctionArray's input dimensions are incompatible with given functions.
@@ -87,29 +94,11 @@ information visualization
 *******************************************
 set the title of the Swing Frame to that of the maximized Zoomable Window
 
-fix the color coding issues with frames on selection, context menu and during drag
-
-debug paint calls using PDebug
-
-add keyboard shortcuts
-
-Rectangular group select cursor
-
 optimize data structures
-
-2) Methods getDocumentation() and setDocumentation() added to Node.
-(Although I think we were going to defer documentation until later.) I
-thought about using wrappers, but this would be a bit of a nuissance
-as we would have to wrap NodeFactory instances for the UI. Let me know
-if you have any thoughts on this.
 
 Contiunous updating layouts (ie SpringLayout).
 
-getInformation method for Nodes, for tooltips
-
 units selection for UI Dialog
-
-convert Iconfiguration's isConfigured option to a exception thrown and caught by ConfigManager
 
 Edit properties of existing models
 
@@ -119,43 +108,23 @@ For Jung Layout algorithms, consider making WorldObject a Vertice, or making a V
 
 hot keys to change the level of semantic detail in the view. ie. press ctrl to see Node properties
 
-Write an short instruction doc
+Write a help doc
 
 *******************************************
  Pri 3 - maybe if there's time
 *******************************************
-Lenses
+Lenses to show/hide information
 
-Customize FileChooser to add extensions
-
-unconnected lines should be highlighted
+Unconnected lines should be highlighted
 	
-Ctrl-key to enable popups (even when autopops are turned off)
+Redo functionality to allow duplicate actions to be performed
 
 
-redo functionality to allow duplicate actions to be performed
-
-*******************************************
- Bugs
-*******************************************
-fixed bug: ensure threads are safety accessing the piccolo graph
-fixed bug: debug the events related with adding and removing connections
-fixed bug: window appears underneath lines and widgets
 
 *******************************************
- Bryan requests
+ Requests
 *******************************************
-Ensemble's don't have metadata, can't save layout information
-
-visualization... what information should be most visible? how to edit
-what are the ways to create an ensemble?
-
-more Network examples
-
-Require events notification
-	show scopes data in real time from the UI
-
-talk about brain view
+Event notifications from Models
 
 *******************************************
  Previously Done

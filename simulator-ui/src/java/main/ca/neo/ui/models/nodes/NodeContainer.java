@@ -44,7 +44,7 @@ public abstract class NodeContainer extends UINeoNode {
 	@Override
 	protected void constructViewMenu(AbstractMenuBuilder menu) {
 		super.constructViewMenu(menu);
-		
+
 		if (viewerWindowRef.get() == null
 				|| viewerWindowRef.get().isDestroyed()
 				|| (viewerWindowRef.get().getWindowState() == Window.WindowState.MINIMIZED)) {
@@ -70,8 +70,7 @@ public abstract class NodeContainer extends UINeoNode {
 
 		}
 
-		menu.addAction(new StandardAction(
-				"Brain View (under construction)") {
+		menu.addAction(new StandardAction("Brain View (under construction)") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -82,16 +81,13 @@ public abstract class NodeContainer extends UINeoNode {
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 
 		menu.addSection("File");
 		menu.addAction(new SaveNodeContainerAction(
 				"Save " + this.getTypeName(), this));
 
-		
-
-		return menu;
 	}
 
 	@Override

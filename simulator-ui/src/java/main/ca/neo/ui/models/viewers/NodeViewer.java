@@ -276,19 +276,17 @@ public abstract class NodeViewer extends World implements Interactable,
 	}
 
 	@Override
-	public PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	public void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 
 		constructLayoutMenu(menu.createSubMenu("Layout"));
 
 		/*
 		 * File menu
 		 */
-		// menu.addSection("File");
+		menu.addSection("File");
 		menu.addAction(new SaveNodeContainerAction("Save "
-				+ getViewerParent().getTypeName() + " to file",
-				getViewerParent()));
-		return menu;
+				+ getViewerParent().getTypeName(), getViewerParent()));
 	}
 
 	/**

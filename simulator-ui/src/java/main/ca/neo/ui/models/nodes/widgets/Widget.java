@@ -12,7 +12,6 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  * a PNeoNode
  * 
  * @author Shu Wu
- * 
  */
 public abstract class Widget extends UIModelConfigurable {
 
@@ -35,15 +34,14 @@ public abstract class Widget extends UIModelConfigurable {
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 
 		if (isWidgetVisible()) {
 			menu.addAction(new HideWidgetAction("Hide " + getTypeName()));
 		} else {
 			menu.addAction(new ShowWidgetAction("Show " + getTypeName()));
 		}
-		return menu;
 	}
 
 	@Override
@@ -68,8 +66,6 @@ public abstract class Widget extends UIModelConfigurable {
 	}
 
 	/**
-	 * 
-	 * 
 	 * @param isVisible
 	 *            Whether the user has marked this widget as hidden
 	 */
@@ -82,7 +78,6 @@ public abstract class Widget extends UIModelConfigurable {
 	 * Action for hiding this widget
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class HideWidgetAction extends ReversableAction {
 
@@ -108,7 +103,6 @@ public abstract class Widget extends UIModelConfigurable {
 	 * Action for showing this widget
 	 * 
 	 * @author Shu Wu
-	 * 
 	 */
 	class ShowWidgetAction extends ReversableAction {
 

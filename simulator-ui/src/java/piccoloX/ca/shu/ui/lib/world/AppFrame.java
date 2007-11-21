@@ -105,12 +105,14 @@ public abstract class AppFrame extends JFrame {
 	public AppFrame(String title) {
 		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
+
 		loadPreferences();
+
 		UIEnvironment.setInstance(this);
 
 		actionManager = new ReversableActionManager(this);
 		getContentPane().setLayout(new BorderLayout());
-		initMenu();
+
 		initStatusPanel();
 
 		graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -134,30 +136,32 @@ public abstract class AppFrame extends JFrame {
 
 		getContentPane().add(canvas);
 		canvas.requestFocus();
+		
 		validate();
 		setFullScreenMode(false);
-
+		
+		initMenu();
 	}
 
 	/**
 	 * Initializes the menu
 	 */
 	private void initMenu() {
-
 		JMenuBar menuBar = new JMenuBar();
 
 		Style.applyStyleToComponent(menuBar);
-		initApplicationMenu(menuBar);
+		initFileMenu(menuBar);
 
 		editMenu = new MenuBuilder("Edit");
 		editMenu.getJMenu().setMnemonic(KeyEvent.VK_E);
 		menuBar.add(editMenu.getJMenu());
 
+		initViewMenu(menuBar);
+
 		worldMenu = new MenuBuilder("World");
 		worldMenu.getJMenu().setMnemonic(KeyEvent.VK_W);
 		menuBar.add(worldMenu.getJMenu());
 
-		menuBar.setVisible(true);
 		updateWorldMenu();
 		updateEditMenu();
 
@@ -167,9 +171,8 @@ public abstract class AppFrame extends JFrame {
 		helpMenu.addAction(new TipsAction("Tips and Commands"), KeyEvent.VK_T);
 		helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
 
+		menuBar.setVisible(true);
 		this.setJMenuBar(menuBar);
-		this.repaint();
-
 	}
 
 	/**
@@ -280,7 +283,17 @@ public abstract class AppFrame extends JFrame {
 	 * @param menuBar
 	 *            is attached to the frame
 	 */
-	protected void initApplicationMenu(JMenuBar menuBar) {
+	protected void initFileMenu(JMenuBar menuBar) {
+
+	}
+
+	/**
+	 * Use this function to add menu items to the frame menu bar
+	 * 
+	 * @param menuBar
+	 *            is attached to the frame
+	 */
+	protected void initViewMenu(JMenuBar menuBar) {
 
 	}
 

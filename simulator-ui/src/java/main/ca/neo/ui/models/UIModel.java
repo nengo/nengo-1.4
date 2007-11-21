@@ -65,13 +65,10 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	/**
 	 * @return Constructed Context Menu
 	 */
-	protected PopupMenuBuilder constructMenu() {
-
-		PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
+	protected void constructMenu(PopupMenuBuilder menu) {
 
 		menu.addAction(new RemoveModelAction("Remove " + getTypeName(), this));
 
-		return menu;
 	}
 
 	/**
@@ -172,9 +169,10 @@ public abstract class UIModel extends WorldObject implements Interactable {
 			UserMessages.showWarning("Model is not configured yet");
 			return null;
 		} else {
-			JPopupMenu menu = constructMenu().toJPopupMenu();
+			PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
+			constructMenu(menu);
 
-			return menu;
+			return menu.toJPopupMenu();
 		}
 
 	}

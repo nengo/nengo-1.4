@@ -77,15 +77,13 @@ public class UIFunctionInput extends UINeoNode {
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 		// MenuBuilder plotMenu = menu.createSubMenu("Plot");
 		menu.addSection("Function");
 
 		menu.addAction(new PlotFunctionNodeAction(getName(), "Plot function",
 				getModel()));
-		return menu;
-
 	}
 
 	@Override

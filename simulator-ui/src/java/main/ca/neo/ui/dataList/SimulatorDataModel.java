@@ -2,8 +2,8 @@ package ca.neo.ui.dataList;
 
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Vector;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -67,12 +67,13 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		return targetNode;
 	}
 
-	private Vector<String> nameLUT = new Vector<String>();
+	private HashSet<String> nameLUT = new HashSet<String>();
 
 	private Hashtable<Network, DefaultMutableTreeNode> topLevelNetworks = new Hashtable<Network, DefaultMutableTreeNode>();
 
 	public SimulatorDataModel() {
 		super(new DefaultMutableTreeNode("Data List"));
+
 	}
 
 	private void addSpikePatterns(DefaultMutableTreeNode top, Network network) {
@@ -174,8 +175,6 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			networkNode = new DefaultMutableTreeNode(name);
 			topLevelNetworks.put(network, networkNode);
 
-			
-			
 			this.insertNodeInto(networkNode, ((MutableTreeNode) getRoot()), 0);
 			// add(networkNode);
 		}

@@ -223,8 +223,8 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	@Override
-	protected PopupMenuBuilder constructMenu() {
-		PopupMenuBuilder menu = super.constructMenu();
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
 
 		AbstractMenuBuilder docMenu = menu.createSubMenu("Documentation");
 		docMenu.addAction(new SetDocumentationAction("Set"));
@@ -236,7 +236,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		menu.addSection("Data Collection");
 		constructDataCollectionMenu(menu);
 
-		return menu;
 	}
 
 	@Override

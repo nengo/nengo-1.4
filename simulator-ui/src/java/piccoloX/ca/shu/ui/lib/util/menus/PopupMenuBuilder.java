@@ -27,8 +27,9 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 		menu = new JPopupMenu(label);
 		style(menu);
 
-		addSection(label, Style.FONT_LARGE);
-
+		if (label != null && label.compareTo("") != 0) {
+			addSection(label, Style.FONT_LARGE);
+		}
 	}
 
 	@Override
