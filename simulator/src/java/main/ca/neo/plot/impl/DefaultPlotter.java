@@ -15,9 +15,13 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.jfree.chart.ChartColor;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.LegendItemCollection;
+import org.jfree.chart.LegendItemSource;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -51,6 +55,18 @@ import ca.neo.util.TimeSeries1D;
  * @author Bryan Tripp
  */
 public class DefaultPlotter extends Plotter {
+	
+	private static Color[] ourColors = {
+		ChartColor.BLACK, 
+		ChartColor.LIGHT_GRAY, 
+		ChartColor.DARK_BLUE, 
+		ChartColor.BLUE, 
+		ChartColor.LIGHT_CYAN, 
+		ChartColor.LIGHT_GREEN,
+		ChartColor.YELLOW,
+		ChartColor.ORANGE,
+		ChartColor.LIGHT_RED
+	}; 
 
 	/**
 	 * @see ca.neo.plot.Plotter#doPlot(ca.neo.util.TimeSeries, java.lang.String)
@@ -112,22 +128,59 @@ public class DefaultPlotter extends Plotter {
 				"", 
 				null, 
 				PlotOrientation.VERTICAL, 
-				false, false, false
-		);
-		XYPlot plot = (XYPlot) chart.getPlot();	
+				true, false, false
+		);		
+		XYPlot plot = (XYPlot) chart.getPlot();
+		
+		//we will change the legend to show one item per series/pattern (rather than dimension/neuron)
+		LegendItemCollection revisedItems = new LegendItemCollection();
+		int legendItemIndex = 0;
 		
 		int i = 0;
 		for (; series != null && i < series.size(); i++) {
 			plot.setDataset(i, getDataset(series.get(i)));			
+			XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
+			renderer.setDrawSeriesLineAsPath(true);
+			renderer.setPaint(getColor(i));
+			plot.setRenderer(i, renderer);
+						
+			revisedItems.add(getCopy(plot.getLegendItems().get(legendItemIndex), "Series " + i));
+			legendItemIndex += series.get(i).getDimension();
 		}
 		
 		for (int j = 0; patterns != null && j < patterns.size(); j++) {
 			int index = i+j;
 			plot.setDataset(index, getDataset(patterns.get(j)));
-			configSpikeRenderer((XYLineAndShapeRenderer) plot.getRenderer(index));
+			XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
+			configSpikeRenderer(renderer);
+			renderer.setPaint(getColor(j));
+			plot.setRenderer(index, renderer);
+			
+			revisedItems.add(getCopy(plot.getLegendItems().get(legendItemIndex), "Spike Pattern " + j));
+			legendItemIndex += patterns.get(j).getNumNeurons();
 		}
-		
+
+		plot.setFixedLegendItems(revisedItems);
 		showChart(chart, title);
+	}
+	
+	private static LegendItem getCopy(LegendItem original, String newLabel) {
+		return new LegendItem(newLabel,
+				null, //description
+				null, //tooltip text
+				null, //URL
+				original.isShapeVisible(), 
+				original.getShape(), 
+				original.isShapeFilled(), 
+				original.getFillPaint(), 
+				original.isShapeOutlineVisible(), 
+				original.getOutlinePaint(), 
+				original.getOutlineStroke(), 
+				original.isLineVisible(), 
+				original.getLine(), 
+				original.getLineStroke(), 
+				original.getLinePaint()
+		);
 	}
 
 	private XYSeriesCollection getDataset(TimeSeries series) {
@@ -510,4 +563,11 @@ public class DefaultPlotter extends Plotter {
         frame.setVisible(true);		
 	}
 
+	/**
+	 * @param index Index of a chart dataset (eg 0 to 2 if there are 3 datasets in a chart) 
+	 * @return A Color to use for rendering that dataset
+	 */
+	private static Color getColor(int index) {
+		return ourColors[index % ourColors.length];
+	}
 }
