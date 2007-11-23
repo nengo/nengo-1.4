@@ -1,6 +1,5 @@
 package ca.neo.ui.dataList;
 
-import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import ca.neo.ui.actions.PlotSpikePattern;
@@ -10,15 +9,13 @@ import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.Interactable;
 
 /**
  * Tree Node with NEO Data
  * 
  * @author Shu Wu
  */
-public abstract class DataTreeNode extends DefaultMutableTreeNode implements
-		Interactable {
+public abstract class DataTreeNode extends DefaultMutableTreeNode {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,7 +24,7 @@ public abstract class DataTreeNode extends DefaultMutableTreeNode implements
 	}
 
 	public abstract StandardAction getDefaultAction();
-
+	public abstract void constructPopupMenu(PopupMenuBuilder menu);
 	public abstract String toString();
 }
 
@@ -43,17 +40,20 @@ class SpikePatternNode extends DataTreeNode {
 	public SpikePatternNode(SpikePattern spikePattern) {
 		super(spikePattern);
 	}
+	
+	@Override
+	public SpikePattern getUserObject() {
+		return (SpikePattern)super.getUserObject();
+	}
 
 	@Override
 	public StandardAction getDefaultAction() {
 		return new PlotSpikePattern((SpikePattern) getUserObject());
 	}
 
-	public JPopupMenu showContextMenu() {
-		PopupMenuBuilder menuBuilder = new PopupMenuBuilder("Spike Pattern");
-		menuBuilder.addAction(getDefaultAction());
-
-		return menuBuilder.toJPopupMenu();
+	public void constructPopupMenu(PopupMenuBuilder menu) {
+		// PopupMenuBuilder menuBuilder = new PopupMenuBuilder("Spike Pattern");
+		menu.addAction(getDefaultAction());
 	}
 
 	public String toString() {
@@ -83,12 +83,15 @@ class TimeSeriesNode extends DataTreeNode {
 				+ stateName);
 	}
 
-	public JPopupMenu showContextMenu() {
-		PopupMenuBuilder menuBuilder = new PopupMenuBuilder("Probe Data");
-		menuBuilder.addAction(getDefaultAction());
-		menuBuilder.addAction(new PlotTimeSeriesTau(
+	public void constructPopupMenu(PopupMenuBuilder menu) {
+		menu.addAction(getDefaultAction());
+		menu.addAction(new PlotTimeSeriesTau(
 				(TimeSeries) getUserObject(), "Probe data: " + stateName));
-		return menuBuilder.toJPopupMenu();
+	}
+	
+	@Override
+	public TimeSeries getUserObject() {
+		return (TimeSeries)super.getUserObject();
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 public class ExampleRunner {
 	private Network network;
 	private String networkName;
+	private UINetwork networkUI;
 
 	/**
 	 * @param name
@@ -33,10 +34,16 @@ public class ExampleRunner {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				buildUI();
+				
+				doStuff();
 			}
 		});
 	}
 
+	protected void doStuff() {
+		
+	}
+	
 	/**
 	 * Builds a NeoGraphics User Interface
 	 */
@@ -50,8 +57,7 @@ public class ExampleRunner {
 		task.finished();
 
 		task = new TrackedStatusMsg("Creating Model UI");
-		UINetwork networkUI = new UINetwork(network);
-
+		networkUI = new UINetwork(network);
 		neoGraphics.addNeoNode(networkUI);
 
 		processNetwork(networkUI);
@@ -61,6 +67,10 @@ public class ExampleRunner {
 
 	protected void processNetwork(UINetwork network) {
 
+	}
+
+	public UINetwork getNetworkUI() {
+		return networkUI;
 	}
 
 }

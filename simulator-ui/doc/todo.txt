@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+11/22/07 - Export data files
 11/21/07 - Multiple data items can be cleared and undone
 11/20/07 - Data List manager created
 11/17/07 - Collecting spikes should be represented by an icon
@@ -9,9 +10,9 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+find memory leak in GFuzzyLogicExample
 
 ***  Data List Items ***
-export partial data tree to folders and files
 make tree nodes sorted
 how to represent multidimensional data?
 subsampling plots

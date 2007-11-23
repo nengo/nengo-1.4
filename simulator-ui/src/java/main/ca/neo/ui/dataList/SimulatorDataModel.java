@@ -1,7 +1,8 @@
 package ca.neo.ui.dataList;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Hashtable;
 
@@ -179,10 +180,14 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			// add(networkNode);
 		}
 
-		Date date = new Date();
+		Calendar cal = new GregorianCalendar();
 
 		DefaultMutableTreeNode captureNode = new DefaultMutableTreeNode(
-				"Simulation (" + date.toString() + ")");
+				"Simulation " + cal.get(Calendar.HOUR_OF_DAY) + "h"
+						+ cal.get(Calendar.MINUTE) + "m"
+						+ cal.get(Calendar.SECOND) + "s "
+						+ cal.get(Calendar.MONTH) + "M"
+						+ cal.get(Calendar.DATE) + "D");
 
 		addSpikePatterns(captureNode, network);
 		addTimeSeries(captureNode, network.getSimulator().getProbes());

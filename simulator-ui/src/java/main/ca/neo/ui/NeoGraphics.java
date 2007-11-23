@@ -65,7 +65,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		FileChooser = new NeoFileChooser();
 
 		new NeoGraphics("Default");
 
@@ -85,6 +84,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		UIEnvironment.setDebugEnabled(true);
 
 		simulationData = new SimulatorDataModel();
+
+		if (FileChooser == null) {
+			FileChooser = new NeoFileChooser();
+		}
 
 		/*
 		 * Set up Environment variables

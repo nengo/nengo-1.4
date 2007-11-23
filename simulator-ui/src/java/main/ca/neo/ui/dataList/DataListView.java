@@ -1,43 +1,48 @@
 package ca.neo.ui.dataList;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import ca.neo.io.DelimitedFileExporter;
 import ca.neo.model.Network;
+import ca.neo.ui.util.FileExtensionFilter;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 public class DataListView extends JPanel implements TreeSelectionListener {
 
-	private static String lineStyle = "Horizontal";
-	// Optionally play with line styles. Possible values are
-	// "Angled" (the default), "Horizontal", and "None".
-	private static boolean playWithLineStyle = false;
 	private static final long serialVersionUID = 1L;
-	// Optionally set the look and feel.
-	private static boolean useSystemLookAndFeel = false;
+
+	public static final String DATA_FILE_EXTENSION = "txt";
 
 	static Network myNetwork;
 
@@ -47,14 +52,6 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 	 */
 	public static JDialog createViewer(Frame owner,
 			SimulatorDataModel simulatorData) {
-		if (useSystemLookAndFeel) {
-			try {
-				UIManager.setLookAndFeel(UIManager
-						.getSystemLookAndFeelClassName());
-			} catch (Exception e) {
-				System.err.println("Couldn't use system look and feel.");
-			}
-		}
 
 		// Create and set up the window.
 		JDialog dialog = new JDialog(owner, "Data Viewer");
@@ -94,9 +91,6 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		// Listen for when the selection changes.
 		tree.addTreeSelectionListener(this);
-		if (playWithLineStyle) {
-			tree.putClientProperty("JTree.lineStyle", lineStyle);
-		}
 
 		JScrollPane scrollPane = new JScrollPane(tree);
 		add(scrollPane);
@@ -145,10 +139,12 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 	private class MyTreeMouseListener implements MouseListener {
 
-		private void DoubleMouseClicked(MouseEvent e) {
+		private void DoubleClickEvent(MouseEvent e) {
 			TreePath[] paths = getTreePaths(e);
-			if (paths.length == 1) {
-				DataTreeNode dataNode = getDataNode(paths[0]);
+			MutableTreeNode[] leafNodes = getLeafNodes(paths);
+
+			if (leafNodes.length == 1 && leafNodes[0] instanceof DataTreeNode) {
+				DataTreeNode dataNode = (DataTreeNode) (leafNodes[0]);
 
 				if (dataNode != null) {
 					dataNode.getDefaultAction().doAction();
@@ -156,24 +152,16 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			}
 		}
 
-		private DataTreeNode getDataNode(TreePath treePath) {
-			Object selectedNode = treePath.getLastPathComponent();
-
-			if (selectedNode instanceof DataTreeNode) {
-				return (DataTreeNode) selectedNode;
-
-			}
-			return null;
-		}
-
-		private MutableTreeNode[] getTreeNodes(TreePath[] treePaths) {
+		private MutableTreeNode[] getLeafNodes(TreePath[] treePaths) {
 
 			ArrayList<MutableTreeNode> treeNodes = new ArrayList<MutableTreeNode>(
 					treePaths.length);
 
+			Object treeRoot = dataModel.getRoot();
+
 			for (TreePath path : treePaths) {
 				Object obj = path.getLastPathComponent();
-				if (obj instanceof MutableTreeNode) {
+				if (obj != treeRoot && obj instanceof MutableTreeNode) {
 					treeNodes.add((MutableTreeNode) obj);
 				}
 			}
@@ -182,49 +170,63 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		private TreePath[] getTreePaths(MouseEvent e) {
 			Object source = e.getSource();
-			TreePath[] paths;
+			TreePath[] paths = null;
 			if (source instanceof JTree) {
 				JTree tree = (JTree) source;
 
 				paths = tree.getSelectionPaths();
-
-			} else {
+			}
+			if (paths == null) {
 				paths = new TreePath[0];
 			}
+
 			return paths;
 		}
 
-		private void LeftMouseClicked(MouseEvent e) {
+		private void ContextMenuEvent(MouseEvent e) {
 
 			JPopupMenu menu = null;
 
 			TreePath[] paths = getTreePaths(e);
+			MutableTreeNode[] leafNodes = getLeafNodes(paths);
 
-			DataTreeNode dataNode = null;
-			if (paths.length == 1) {
-				dataNode = getDataNode(paths[0]);
-			}
+			if (leafNodes.length > 0) {
+				PopupMenuBuilder menuBuilder;
 
-			if (dataNode != null) {
-				menu = dataNode.showContextMenu();
-			} else {
-				PopupMenuBuilder menuBuilder = new PopupMenuBuilder(null);
-				MutableTreeNode[] treeNodes = getTreeNodes(paths);
-				menuBuilder.addAction(new RemoveTreeNodes(treeNodes));
+				if (leafNodes.length == 1) {
+					MutableTreeNode leafNode = leafNodes[0];
+
+					menuBuilder = new PopupMenuBuilder(leafNode.toString());
+
+					menuBuilder.addAction(new ExportData(DataListView.this,
+							leafNode));
+
+					if (leafNode instanceof DataTreeNode) {
+						((DataTreeNode) leafNode)
+								.constructPopupMenu(menuBuilder);
+					}
+
+				} else {
+					menuBuilder = new PopupMenuBuilder(leafNodes.length
+							+ " nodes selected");
+				}
+
+				menuBuilder.addAction(new RemoveTreeNodes(leafNodes));
 				menu = menuBuilder.toJPopupMenu();
-			}
-			if (menu != null) {
-				menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
-				menu.setVisible(true);
+
+				if (menu != null) {
+					menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+					menu.setVisible(true);
+				}
 			}
 		}
 
 		public void mouseClicked(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON3) {
-				LeftMouseClicked(e);
+				ContextMenuEvent(e);
 			} else if (e.getClickCount() == 2
 					&& e.getButton() == MouseEvent.BUTTON1) {
-				DoubleMouseClicked(e);
+				DoubleClickEvent(e);
 			}
 
 		}
@@ -241,17 +243,6 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		public void mouseReleased(MouseEvent e) {
 		}
 
-	}
-
-	private static class UndoInfo {
-		TreeNode nodeParent;
-		int nodeIndex;
-
-		public UndoInfo(TreeNode nodeParent, int nodeIndex) {
-			super();
-			this.nodeParent = nodeParent;
-			this.nodeIndex = nodeIndex;
-		}
 	}
 
 	private class RemoveTreeNodes extends ReversableAction {
@@ -318,4 +309,234 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		}
 	}
 
+	private static class UndoInfo {
+		int nodeIndex;
+		TreeNode nodeParent;
+
+		public UndoInfo(TreeNode nodeParent, int nodeIndex) {
+			super();
+			this.nodeParent = nodeParent;
+			this.nodeIndex = nodeIndex;
+		}
+	}
+
+}
+
+/**
+ * Describes how to build a folder structure for a wrapped data node when it is
+ * being exported
+ * 
+ * @author Shu Wu
+ */
+class DataFilePath {
+	private DataTreeNode dataNode;
+	private Collection<String> position;
+
+	public DataFilePath(DataTreeNode dataNode, Collection<String> position) {
+		super();
+		this.dataNode = dataNode;
+		this.position = position;
+	}
+
+	public Collection<String> getFolderPath() {
+		return position;
+	}
+
+	public DataTreeNode getDataNode() {
+		return dataNode;
+	}
+
+}
+
+class DataFileChooser extends JFileChooser {
+
+	public DataFileChooser() {
+		super();
+		setAcceptAllFileFilterUsed(false);
+	}
+
+	private static final long serialVersionUID = 1L;
+
+}
+
+class DataFileFilter extends FileExtensionFilter {
+
+	@Override
+	public boolean acceptExtension(String extension) {
+		if (extension.compareTo(DataListView.DATA_FILE_EXTENSION) == 0) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String getDescription() {
+		// TODO Auto-generated method stub
+		return "Delimited Text File";
+	}
+
+}
+
+class ExportData extends StandardAction {
+
+	private static final long serialVersionUID = 1L;
+	private MutableTreeNode nodeToExport;
+	private DelimitedFileExporter fileExporter;
+	private static DataFileChooser fileChooser = new DataFileChooser();
+	private Component parent;
+	private static final DataFileFilter DATA_FILE_FILTER = new DataFileFilter();
+
+	public ExportData(Component parent, MutableTreeNode nodeToExport) {
+		super(getActionDescription(nodeToExport));
+		this.nodeToExport = nodeToExport;
+		fileExporter = new DelimitedFileExporter();
+		this.parent = parent;
+
+	}
+
+	private static String getActionDescription(MutableTreeNode node) {
+		if (isSingleFileExport(node)) {
+			return "Export to file";
+		} else {
+			return "Export to folder";
+		}
+	}
+
+	private static boolean isSingleFileExport(MutableTreeNode node) {
+		if (node.getChildCount() == 0 && node instanceof DataTreeNode) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	protected void action() throws ActionException {
+		try {
+			if (isSingleFileExport(nodeToExport)) {
+				File file = getUserSelectedFile(DATA_FILE_FILTER);
+
+				if (file != null) {
+					exportNode((DataTreeNode) nodeToExport, file);
+				}
+
+				/*
+				 * Export one data item
+				 */
+			} else {
+				exportAllDataNodes();
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			UserMessages.showWarning("Could not export: " + e.getMessage());
+		}
+	}
+
+	private File getUserSelectedFolder() {
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+		int result = fileChooser.showSaveDialog(parent);
+
+		if (result == JFileChooser.APPROVE_OPTION) {
+			return fileChooser.getSelectedFile();
+		} else {
+			return null;
+		}
+
+	}
+
+	private File getUserSelectedFile(FileFilter filter) {
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setFileFilter(filter);
+
+		int result = fileChooser.showSaveDialog(parent);
+
+		if (result == JFileChooser.APPROVE_OPTION) {
+			return fileChooser.getSelectedFile();
+		} else {
+			return null;
+		}
+
+	}
+
+	private void exportNode(DataTreeNode node, File file) throws IOException,
+			ActionException {
+		if (node instanceof SpikePatternNode) {
+			fileExporter.export((((SpikePatternNode) node).getUserObject()),
+					file);
+		} else if (node instanceof TimeSeriesNode) {
+			fileExporter
+					.export((((TimeSeriesNode) node).getUserObject()), file);
+		} else {
+			throw new ActionException("Could not export node type: "
+					+ node.getClass().getSimpleName());
+		}
+	}
+
+	private void findDataItemsRecursive(MutableTreeNode node,
+			ArrayList<String> position, Collection<DataFilePath> dataItemsPaths) {
+
+		if (node instanceof DataTreeNode) {
+			DataFilePath dataP = new DataFilePath((DataTreeNode) node, position);
+			dataItemsPaths.add(dataP);
+		}
+
+		Enumeration<?> children = node.children();
+		while (children.hasMoreElements()) {
+			Object obj = children.nextElement();
+			if (obj instanceof MutableTreeNode) {
+				MutableTreeNode childNode = (MutableTreeNode) obj;
+
+				@SuppressWarnings("unchecked")
+				ArrayList<String> childStack = (ArrayList<String>) position
+						.clone();
+
+				String childName = childNode.toString();
+				childStack.add(childName);
+
+				findDataItemsRecursive(childNode, childStack, dataItemsPaths);
+
+			}
+		}
+	}
+
+	private void exportAllDataNodes() throws IOException, ActionException {
+
+		/*
+		 * Use recursion to find data items
+		 */
+		File folder = getUserSelectedFolder();
+
+		folder.mkdir();
+		if (folder != null) {
+
+			ArrayList<DataFilePath> dataFilePaths = new ArrayList<DataFilePath>();
+			findDataItemsRecursive(nodeToExport, new ArrayList<String>(),
+					dataFilePaths);
+
+			for (DataFilePath dataPath : dataFilePaths) {
+
+				Collection<String> folderPath = dataPath.getFolderPath();
+				DataTreeNode dataNode = dataPath.getDataNode();
+
+				File dataFile = folder;
+				for (String folderName : folderPath) {
+					dataFile = new File(dataFile, folderName);
+					dataFile.mkdir();
+
+					if (!dataFile.exists()) {
+						throw new ActionException("Problem creating folder: "
+								+ dataFile.toString());
+					}
+				}
+
+				dataFile = new File(dataFile, dataNode.toString() + "."
+						+ DataListView.DATA_FILE_EXTENSION);
+
+				exportNode(dataNode, dataFile);
+			}
+
+		}
+
+	}
 }
