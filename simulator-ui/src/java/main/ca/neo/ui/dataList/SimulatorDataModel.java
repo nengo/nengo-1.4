@@ -14,6 +14,7 @@ import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Probeable;
+import ca.neo.util.DataUtils;
 import ca.neo.util.Probe;
 import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
@@ -134,8 +135,20 @@ public class SimulatorDataModel extends DefaultTreeModel {
 				TimeSeries probeData = (TimeSeries) Util
 						.cloneSerializable(probe.getData());
 
-				DefaultMutableTreeNode stateNode = new TimeSeriesNode(
-						probeData, probe.getStateName());
+				DefaultMutableTreeNode stateNode = new ProbeDataNode(probeData,
+						probe.getStateName());
+
+				/*
+				 * Extract dimensions
+				 */
+				for (int dimCount = 0; dimCount < probeData.getDimension(); dimCount++) {
+					TimeSeries oneDimData = DataUtils.extractDimension(
+							probeData, dimCount);
+
+					DefaultMutableTreeNode stateDimNode = new ProbeDataExpandedNode(
+							oneDimData, dimCount);
+					stateNode.add(stateDimNode);
+				}
 
 				targetNode.add(stateNode);
 
@@ -155,7 +168,8 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		Util.Assert(network.getSimulator() != null,
 				"No simulator available for data view");
 
-		DefaultMutableTreeNode networkNode = topLevelNetworks.get(network.hashCode());
+		DefaultMutableTreeNode networkNode = topLevelNetworks.get(network
+				.hashCode());
 
 		if (networkNode == null) {
 			String name = network.getName();

@@ -11,7 +11,7 @@ import ca.neo.model.Node;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.ui.actions.PlotTimeSeries;
-import ca.neo.ui.actions.PlotTimeSeriesTau;
+import ca.neo.ui.actions.PlotAdvanced;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.tooltips.PropertyPart;
@@ -147,7 +147,7 @@ public class UIStateProbe extends UIProbe {
 		menu.addSection("Probe");
 		MenuBuilder plotMenu = menu.createSubMenu("plot");
 		plotMenu.addAction(new PlotTimeSeries(getModel().getData(), getName()));
-		plotMenu.addAction(new PlotTimeSeriesTau(getModel().getData(),
+		plotMenu.addAction(new PlotAdvanced(getModel().getData(),
 				getName()));
 
 		MenuBuilder exportMenu = menu.createSubMenu("export data");

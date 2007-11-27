@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+11/26/04 - DragAction no longer has hard references to objects
 11/22/07 - Export data files
 11/21/07 - Multiple data items can be cleared and undone
 11/20/07 - Data List manager created
@@ -10,7 +11,7 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-find memory leak in GFuzzyLogicExample
+
 
 ***  Data List Items ***
 make tree nodes sorted
@@ -20,8 +21,6 @@ subsampling plots
 plotting multiple items together
 
 ***
-
-delete, export in data list viewer
 
 Decoded ensembles & nodes under construction should fade in & out
 

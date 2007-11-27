@@ -116,9 +116,10 @@ public class RunSimulatorAction extends StandardAction {
 
 				simulator.removeSimulatorListener(this);
 
-				if (showDataViewer) {
-					AppFrame frame = UIEnvironment.getInstance();
-					((NeoGraphics) (frame)).captureInDataViewer(uiNetwork.getModel());
+				AppFrame frame = UIEnvironment.getInstance();
+				((NeoGraphics) (frame)).captureInDataViewer(uiNetwork.getModel());				
+				
+				if (showDataViewer) {									
 					((NeoGraphics) (frame)).openDataViewer();
 				}
 

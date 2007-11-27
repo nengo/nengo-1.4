@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -84,7 +85,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		tree = new JTree(dataModel);
 		tree.setEditable(true);
 		tree.getSelectionModel().setSelectionMode(
-				TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
+				TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
 		dataModel.addTreeModelListener(new MyTreeModelListener());
 		tree.addMouseListener(new MyTreeMouseListener());
@@ -141,10 +142,11 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		private void DoubleClickEvent(MouseEvent e) {
 			TreePath[] paths = getTreePaths(e);
-			MutableTreeNode[] leafNodes = getLeafNodes(paths);
+			List<MutableTreeNode> leafNodes = getLeafNodes(paths);
 
-			if (leafNodes.length == 1 && leafNodes[0] instanceof DataTreeNode) {
-				DataTreeNode dataNode = (DataTreeNode) (leafNodes[0]);
+			if (leafNodes.size() == 1
+					&& leafNodes.get(0) instanceof DataTreeNode) {
+				DataTreeNode dataNode = (DataTreeNode) (leafNodes.get(0));
 
 				if (dataNode != null) {
 					dataNode.getDefaultAction().doAction();
@@ -152,7 +154,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			}
 		}
 
-		private MutableTreeNode[] getLeafNodes(TreePath[] treePaths) {
+		private List<MutableTreeNode> getLeafNodes(TreePath[] treePaths) {
 
 			ArrayList<MutableTreeNode> treeNodes = new ArrayList<MutableTreeNode>(
 					treePaths.length);
@@ -165,7 +167,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 					treeNodes.add((MutableTreeNode) obj);
 				}
 			}
-			return treeNodes.toArray(new MutableTreeNode[0]);
+			return treeNodes;
 		}
 
 		private TreePath[] getTreePaths(MouseEvent e) {
@@ -188,13 +190,13 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			JPopupMenu menu = null;
 
 			TreePath[] paths = getTreePaths(e);
-			MutableTreeNode[] leafNodes = getLeafNodes(paths);
+			List<MutableTreeNode> leafNodes = getLeafNodes(paths);
 
-			if (leafNodes.length > 0) {
+			if (leafNodes.size() > 0) {
 				PopupMenuBuilder menuBuilder;
 
-				if (leafNodes.length == 1) {
-					MutableTreeNode leafNode = leafNodes[0];
+				if (leafNodes.size() == 1) {
+					MutableTreeNode leafNode = leafNodes.get(0);
 
 					menuBuilder = new PopupMenuBuilder(leafNode.toString());
 
@@ -207,8 +209,11 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 					}
 
 				} else {
-					menuBuilder = new PopupMenuBuilder(leafNodes.length
+					menuBuilder = new PopupMenuBuilder(leafNodes.size()
 							+ " nodes selected");
+
+					menuBuilder.addAction(new PlotNodesAction(leafNodes));
+
 				}
 
 				menuBuilder.addAction(new RemoveTreeNodes(leafNodes));
@@ -249,11 +254,11 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		private static final long serialVersionUID = 1L;
 
-		private MutableTreeNode[] nodesToRemove;
+		private List<MutableTreeNode> nodesToRemove;
 
 		Hashtable<MutableTreeNode, UndoInfo> undoLUT;
 
-		public RemoveTreeNodes(MutableTreeNode[] nodesToRemove) {
+		public RemoveTreeNodes(List<MutableTreeNode> nodesToRemove) {
 			super("Clear data");
 
 			this.nodesToRemove = nodesToRemove;
@@ -262,7 +267,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		@Override
 		protected void action() throws ActionException {
 			undoLUT = new Hashtable<MutableTreeNode, UndoInfo>(
-					nodesToRemove.length);
+					nodesToRemove.size());
 
 			for (MutableTreeNode nodeToRemove : nodesToRemove) {
 				TreeNode nodeParent = nodeToRemove.getParent();
@@ -282,8 +287,8 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			 * To maintain same node order as before the removal. we add back in
 			 * the reverse order we remove them.
 			 */
-			for (int i = nodesToRemove.length - 1; i >= 0; i--) {
-				MutableTreeNode nodeToRemove = nodesToRemove[i];
+			for (int i = nodesToRemove.size() - 1; i >= 0; i--) {
+				MutableTreeNode nodeToRemove = nodesToRemove.get(i);
 
 				UndoInfo undoInfo = undoLUT.get(nodeToRemove);
 				if (undoInfo != null) {
@@ -477,8 +482,12 @@ class ExportData extends StandardAction {
 			ArrayList<String> position, Collection<DataFilePath> dataItemsPaths) {
 
 		if (node instanceof DataTreeNode) {
-			DataFilePath dataP = new DataFilePath((DataTreeNode) node, position);
-			dataItemsPaths.add(dataP);
+			DataTreeNode dataNode = (DataTreeNode) node;
+
+			if (dataNode.includeInExport()) {
+				DataFilePath dataP = new DataFilePath(dataNode, position);
+				dataItemsPaths.add(dataP);
+			}
 		}
 
 		Enumeration<?> children = node.children();
