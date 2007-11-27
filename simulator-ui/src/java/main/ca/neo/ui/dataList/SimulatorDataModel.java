@@ -70,7 +70,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 	private HashSet<String> nameLUT = new HashSet<String>();
 
-	private Hashtable<Network, DefaultMutableTreeNode> topLevelNetworks = new Hashtable<Network, DefaultMutableTreeNode>();
+	private Hashtable<Integer, DefaultMutableTreeNode> topLevelNetworks = new Hashtable<Integer, DefaultMutableTreeNode>();
 
 	public SimulatorDataModel() {
 		super(new DefaultMutableTreeNode("Data List"));
@@ -155,7 +155,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		Util.Assert(network.getSimulator() != null,
 				"No simulator available for data view");
 
-		DefaultMutableTreeNode networkNode = topLevelNetworks.get(network);
+		DefaultMutableTreeNode networkNode = topLevelNetworks.get(network.hashCode());
 
 		if (networkNode == null) {
 			String name = network.getName();
@@ -174,7 +174,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			nameLUT.add(name);
 
 			networkNode = new DefaultMutableTreeNode(name);
-			topLevelNetworks.put(network, networkNode);
+			topLevelNetworks.put(network.hashCode(), networkNode);
 
 			this.insertNodeInto(networkNode, ((MutableTreeNode) getRoot()), 0);
 			// add(networkNode);

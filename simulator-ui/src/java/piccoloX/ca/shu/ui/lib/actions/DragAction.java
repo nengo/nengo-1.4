@@ -1,6 +1,8 @@
 package ca.shu.ui.lib.actions;
 
 import java.awt.geom.Point2D;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -19,9 +21,9 @@ import edu.umd.cs.piccolo.PNode;
 public class DragAction extends ReversableAction {
 
 	private static final long serialVersionUID = 1L;
-	private Collection<WorldObject> selectedObjects;
+	private Collection<WeakReference<WorldObject>> selectedObjectsRef;
 
-	private HashMap<WorldObject, ObjectState> objectStates;
+	private HashMap<WeakReference<WorldObject>, ObjectState> objectStates;
 
 	/**
 	 * @param selectedObjects
@@ -29,29 +31,23 @@ public class DragAction extends ReversableAction {
 	 *            used as initial positions.
 	 */
 	public DragAction(Collection<WorldObject> selectedObjects) {
-		super(getActionDescription(selectedObjects));
-		this.selectedObjects = selectedObjects;
+		super("Drag operation");
 
-		objectStates = new HashMap<WorldObject, ObjectState>(selectedObjects
-				.size());
+		selectedObjectsRef = new ArrayList<WeakReference<WorldObject>>(
+				selectedObjects.size());
 
-		for (WorldObject object : selectedObjects) {
-			ObjectState state = new ObjectState(object.getParent(), object
-					.getOffset());
-			objectStates.put(object, state);
-		}
+		objectStates = new HashMap<WeakReference<WorldObject>, ObjectState>(
+				selectedObjects.size());
 
-	}
+		for (WorldObject wo : selectedObjects) {
 
-	private static String getActionDescription(
-			Collection<WorldObject> selectedObjects) {
+			WeakReference<WorldObject> woRef = new WeakReference<WorldObject>(
+					wo);
+			selectedObjectsRef.add(woRef);
+			
+			ObjectState state = new ObjectState(wo.getParent(), wo.getOffset());
+			objectStates.put(woRef, state);
 
-		if (selectedObjects.size() > 1) {
-			return "Drag objects";
-		} else if (selectedObjects.size() == 1) {
-			return "Drag " + selectedObjects.iterator().next().getName();
-		} else {
-			return "No Objects Dragged";
 		}
 
 	}
@@ -76,44 +72,74 @@ public class DragAction extends ReversableAction {
 	 * selection handler after dragging has ended
 	 */
 	public void setFinalPositions() {
-		for (WorldObject object : selectedObjects) {
-			ObjectState state = objectStates.get(object);
-			state.setFinalState(object.getParent(), object.getOffset());
+		for (WeakReference<WorldObject> object : selectedObjectsRef) {
+			WorldObject node = object.get();
+
+			if (node != null) {
+				ObjectState state = objectStates.get(object);
+				if (state != null) {
+					state.setFinalState(node.getParent(), node.getOffset());
+				}
+			}
 		}
 	}
 
 	@Override
 	protected void action() throws ActionException {
 
-		for (WorldObject object : selectedObjects) {
-			ObjectState state = objectStates.get(object);
-			state.getFinalParent().addChild(object);
-			object.setOffset(state.getFinalOffset());
+		for (WeakReference<WorldObject> object : selectedObjectsRef) {
+			WorldObject node = object.get();
 
-			object.justDropped();
+			if (node != null) {
+				ObjectState state = objectStates.get(object);
+				PNode fParent = state.getFinalParentRef().get();
+				if (fParent != null) {
+
+					fParent.addChild(node);
+					node.setOffset(state.getFinalOffset());
+
+					node.justDropped();
+				}
+			}
 		}
 	}
 
 	@Override
 	protected void undo() throws ActionException {
-		for (WorldObject object : selectedObjects) {
-			if (isObjectDragUndoable(object)) {
-				ObjectState state = objectStates.get(object);
-				state.getInitialParent().addChild(object);
-				object.setOffset(state.getInitialOffset());
+		for (WeakReference<WorldObject> woRef : selectedObjectsRef) {
+			WorldObject wo = woRef.get();
+			if (wo != null) {
+				if (isObjectDragUndoable(wo)) {
+					ObjectState state = objectStates.get(woRef);
 
-				object.justDropped();
+					PNode iParent = state.getInitialParentRef().get();
+
+					if (iParent != null) {
+
+						iParent.addChild(wo);
+						wo.setOffset(state.getInitialOffset());
+
+						wo.justDropped();
+					}
+				}
 			}
 		}
 	}
 
 	@Override
 	protected boolean isReversable() {
-		if ((selectedObjects.size() == 0))
-			return false;
+		int numOfDraggableObjects = 0;
+		for (WeakReference<WorldObject> woRef : selectedObjectsRef) {
+			if (woRef.get() != null && isObjectDragUndoable(woRef.get())) {
+				numOfDraggableObjects++;
+			}
+		}
 
-		return ((!(selectedObjects.size() == 1 && !isObjectDragUndoable(selectedObjects
-				.iterator().next()))));
+		if (numOfDraggableObjects >= 1) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 
@@ -123,23 +149,23 @@ public class DragAction extends ReversableAction {
  * @author Shu Wu
  */
 class ObjectState {
-	private PNode iParent;
+	private WeakReference<PNode> iParent;
 	private Point2D iOffset;
-	private PNode fParent;
+	private WeakReference<PNode> fParent;
 	private Point2D fOffset;
 
 	protected ObjectState(PNode initialParent, Point2D initialOffset) {
 		super();
-		this.iParent = initialParent;
+		this.iParent = new WeakReference<PNode>(initialParent);
 		this.iOffset = initialOffset;
 	}
 
 	protected void setFinalState(PNode finalParent, Point2D finalOffset) {
-		this.fParent = finalParent;
+		this.fParent = new WeakReference<PNode>(finalParent);
 		this.fOffset = finalOffset;
 	}
 
-	protected PNode getInitialParent() {
+	protected WeakReference<PNode> getInitialParentRef() {
 		return iParent;
 	}
 
@@ -147,7 +173,7 @@ class ObjectState {
 		return iOffset;
 	}
 
-	protected PNode getFinalParent() {
+	protected WeakReference<PNode> getFinalParentRef() {
 		return fParent;
 	}
 

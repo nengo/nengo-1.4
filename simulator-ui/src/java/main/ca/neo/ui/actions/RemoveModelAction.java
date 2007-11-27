@@ -30,6 +30,7 @@ public class RemoveModelAction extends StandardAction {
 				"Are you sure?", JOptionPane.YES_NO_OPTION);
 		if (response == 0) {
 			modelToRemove.destroy();
+			modelToRemove = null;
 		} else {
 			throw new ActionException("Action cancelled by user", false);
 		}

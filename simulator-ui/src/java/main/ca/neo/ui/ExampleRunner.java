@@ -33,21 +33,21 @@ public class ExampleRunner {
 		 */
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				buildUI();
-				
-				doStuff();
+				UINetwork uiNetwork = buildUI();
+
+				doStuff(uiNetwork);
 			}
 		});
 	}
 
-	protected void doStuff() {
-		
+	protected void doStuff(UINetwork network) {
+
 	}
-	
+
 	/**
 	 * Builds a NeoGraphics User Interface
 	 */
-	private void buildUI() {
+	private UINetwork buildUI() {
 
 		NeoGraphics neoGraphics = new NeoGraphics(networkName);
 
@@ -63,14 +63,12 @@ public class ExampleRunner {
 		processNetwork(networkUI);
 		task.finished();
 
+		return networkUI;
+
 	}
 
 	protected void processNetwork(UINetwork network) {
 
-	}
-
-	public UINetwork getNetworkUI() {
-		return networkUI;
 	}
 
 }
