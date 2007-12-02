@@ -1,19 +1,23 @@
 <project name="NEO" default="dist" basedir=".">
 
-	<property name="releasename" value="neo-0.1" />
+	<property name="releasename" value="nengo-0.1" />
 	<property name="src" value="${basedir}/src" />
-	<property name="build" value="${basedir}/build" />
+	<property name="build" value="${basedir}/target" />
 	<property name="classes" value="${build}/classes" />
-	<property name="docs" value="${build}/docs" />
-	<property name="dist" value="${basedir}/dist" />
+	<property name="test-classes" value="${build}/test-classes" />
+	<property name="docs" value="${build}/javadoc" />
+	<property name="dist" value="${build}" />
 	<property name="lib" value="${basedir}/lib" />
 
 	<path id="classpath">
 		<pathelement path="${src}" />
 		<pathelement location="${lib}/commons-lang-2.1.jar" /> 
-		<pathelement location="${lib}/commons-math-1.1.jar" /> 
-		<pathelement location="${lib}/jfig3-itext.jar" /> 
 		<pathelement location="${lib}/Jama-1.0.2.jar" /> 		
+		<pathelement location="${lib}/junit.jar" /> 		
+		<pathelement location="${lib}/jcommon-1.0.0.jar" /> 		
+		<pathelement location="${lib}/jfreechart-1.0.1.jar" /> 
+		<pathelement location="${lib}/jmatio.jar" /> 
+		<pathelement location="${lib}/log4j-1.2.14.jar" /> 
 	</path>
 	
 	
@@ -23,11 +27,11 @@
 		
 	    <!-- Note: if this fails because of the source attribute, you need ant 1.4 -->
 	    <javadoc packagenames="ca.neo.*"
-	        source="1.4"
+	        source="1.5"
 	        classpathref="classpath"
 	        sourcepath="${src}/java/main"
 	        destdir="${docs}"
-	        windowtitle="NEO Documentation"/>  
+	        windowtitle="NENGO Documentation"/>  
 	</target>
 	
 	
@@ -36,11 +40,11 @@
 		<mkdir dir="${classes}/main"/>
 		<mkdir dir="${classes}/test"/>
 		
-	 	<javac source="1.4" srcdir="${src}/java/main" destdir="${classes}/main" includes="ca/neo/**" debug="true">
+	 	<javac source="1.5" srcdir="${src}/java/main" destdir="${classes}" includes="ca/neo/**" debug="true">
 	        <classpath refid="classpath" />
 	    </javac>
 
-	 	<javac source="1.4" srcdir="${src}/java/test" destdir="${classes}/test" includes="ca/neo/**" debug="true">
+	 	<javac source="1.5" srcdir="${src}/java/test" destdir="${test-classes}" includes="ca/neo/**" debug="true">
 	        <classpath refid="classpath" />
 	    </javac>
 	</target>
@@ -69,7 +73,9 @@
 	
 	<!-- Deletes all build products --> 
 	<target name="clean">
-		<delete><fileset dir="${build}" /></delete>
+		<delete><fileset dir="${classes}" /></delete>
+		<delete><fileset dir="${test-classes}" /></delete>
+		<delete><fileset dir="${docs}" /></delete>
 	</target>
 	
 	
