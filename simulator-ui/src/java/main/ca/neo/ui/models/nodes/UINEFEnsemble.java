@@ -97,7 +97,7 @@ public class UINEFEnsemble extends UIEnsemble {
 		menu.addSection("NEFEnsemble");
 		MenuBuilder plotMenu = menu.createSubMenu("Plot");
 
-		plotMenu.addAction(new StandardAction("Activities") {
+		plotMenu.addAction(new StandardAction("Constant Rate Responses") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -106,14 +106,12 @@ public class UINEFEnsemble extends UIEnsemble {
 			}
 
 		});
-
 		Origin[] origins = getModel().getOrigins();
 
 		for (Origin element : origins) {
 			if (element instanceof DecodedOrigin) {
-				plotMenu.addAction(new PlotDecodedOriginDistortion(
-						"Decoded Origin (Distortion): " + element.getName(),
-						element.getName()));
+				plotMenu.addAction(new PlotDecodedOriginDistortion(element
+						.getName()));
 			}
 		}
 
@@ -123,12 +121,11 @@ public class UINEFEnsemble extends UIEnsemble {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
 		tooltips.addPart(new PropertyPart("# Dimension", ""
 				+ getModel().getDimension()));
 
-		return tooltips;
 	}
 
 	/**
@@ -157,18 +154,22 @@ public class UINEFEnsemble extends UIEnsemble {
 	public UIOrigin createDecodedOrigin() {
 		UIDecodedOrigin originUI = new UIDecodedOrigin(this);
 
+		addWidget(originUI);
+
 		try {
+			originUI.setModelBusy(true);
 			UserTemplateConfigurer config = new UserTemplateConfigurer(originUI);
+
 			config.configureAndWait();
 
-			addWidget(originUI);
-			return originUI;
+			originUI.setModelBusy(false);
 
 		} catch (ConfigException e) {
+			originUI.destroy();
 			e.defaultHandleBehavior();
 		}
 
-		return null;
+		return originUI;
 	}
 
 	@Override
@@ -231,17 +232,18 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		public AddDecodedOriginAction() {
 			super("Add decoded origin");
-			setThreadType(false);
+			setBlocking(false);
 		}
 
 		@Override
 		protected void action() throws ActionException {
 			UIOrigin origin = createDecodedOrigin();
 
-			if (origin == null)
-				throw new UserCancelledException();
-			else
+			if (origin != null) {
 				addedOrigin = origin;
+			} else {
+				throw new UserCancelledException();
+			}
 
 		}
 
@@ -260,9 +262,8 @@ public class UINEFEnsemble extends UIEnsemble {
 		private static final long serialVersionUID = 1L;
 		String decodedOriginName;
 
-		public PlotDecodedOriginDistortion(String actionName,
-				String decodedOriginName) {
-			super("Plot decoded origin distortion", actionName);
+		public PlotDecodedOriginDistortion(String decodedOriginName) {
+			super("Plot distortion: " + decodedOriginName);
 			this.decodedOriginName = decodedOriginName;
 		}
 

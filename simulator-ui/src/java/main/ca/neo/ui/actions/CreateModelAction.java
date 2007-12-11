@@ -76,7 +76,7 @@ public class CreateModelAction extends ReversableAction {
 		super("Create new " + nodeUIType.getSimpleName(), actionName);
 		this.container = nodeContainer;
 		this.nodeType = nodeUIType;
-		setThreadType(false);
+		setBlocking(false);
 	}
 
 	@Override

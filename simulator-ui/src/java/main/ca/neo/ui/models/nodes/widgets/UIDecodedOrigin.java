@@ -1,14 +1,18 @@
 package ca.neo.ui.models.nodes.widgets;
 
+import java.util.List;
+
 import javax.swing.JComboBox;
 
 import ca.neo.math.Function;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.StructuralException;
+import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
@@ -64,9 +68,11 @@ public class UIDecodedOrigin extends UIOrigin {
 
 	@Override
 	protected void prepareForDestroy() {
-		getNodeParent().getModel().removeDecodedTermination(
-				getModel().getName());
-		popupTransientMsg("decoded termination removed from ensemble");
+		if (isModelExists()) {
+			getNodeParent().getModel().removeDecodedTermination(
+					getModel().getName());
+			popupTransientMsg("decoded termination removed from ensemble");
+		}
 
 		super.prepareForDestroy();
 	}
@@ -75,13 +81,12 @@ public class UIDecodedOrigin extends UIOrigin {
 	public PropertyDescriptor[] getConfigSchema() {
 		pFunctions = new PFunctionArray("Functions", getInputDimensions());
 
-		Origin[] origins = getNodeParent().getModel().getOrigins();
-		String[] originNames = new String[origins.length];
-		for (int i = 0; i < origins.length; i++) {
-			originNames[i] = origins[i].getName();
-		}
+		// Find common nodes
+		Node[] nodes = getNodeParent().getModel().getNodes();
+		List<String> commonNodes = AbstractEnsemble.findCommon1DOrigins(nodes);
 
-		pNodeOrigin = new OriginSelector("Node Origin Name", originNames);
+		pNodeOrigin = new OriginSelector("Node Origin Name", commonNodes
+				.toArray(new String[0]));
 
 		PropertyDescriptor[] zProperties = { pName, pFunctions, pNodeOrigin };
 		return zProperties;

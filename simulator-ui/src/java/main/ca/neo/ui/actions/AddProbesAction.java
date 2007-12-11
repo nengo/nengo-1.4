@@ -44,7 +44,7 @@ public class AddProbesAction extends ReversableAction {
 				"Adding probes", JOptionPane.QUESTION_MESSAGE);
 
 		if (stateName != null && !stateName.equals("")) {
-			int success = 0;
+			int successCount = 0;
 			int failed = 0;
 
 			for (UIModel model : myNodes) {
@@ -55,7 +55,7 @@ public class AddProbesAction extends ReversableAction {
 					try {
 						probeCreated = node.addProbe(stateName);
 						myCreatedProbesMap.put(node, probeCreated);
-						success++;
+						successCount++;
 					} catch (SimulationException e) {
 
 						failed++;
@@ -66,8 +66,8 @@ public class AddProbesAction extends ReversableAction {
 			}
 			if (failed > 0) {
 				UserMessages
-						.showWarning(success
-								+ "probes were successfully added. <BR> However it was not added to "
+						.showWarning(successCount
+								+ " probes were successfully added. <BR> However it was not added to "
 								+ failed
 								+ " nodes. The state name specified may not exist on those nodes.");
 			}

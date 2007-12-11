@@ -14,7 +14,6 @@ import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Probeable;
-import ca.neo.util.DataUtils;
 import ca.neo.util.Probe;
 import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
@@ -31,13 +30,13 @@ public class SimulatorDataModel extends DefaultTreeModel {
 	 * @param parent
 	 * @param newNodeName
 	 */
-	private static DefaultMutableTreeNode createUniqueNode(
+	private static SortableMutableTreeNode createSortableNode(
 			DefaultMutableTreeNode parent, String newNodeName) {
-		DefaultMutableTreeNode newNode = findInDirectChildren(parent,
+		SortableMutableTreeNode newNode = findInDirectChildren(parent,
 				newNodeName);
 
 		if (newNode == null) {
-			newNode = new DefaultMutableTreeNode(newNodeName);
+			newNode = new SortableMutableTreeNode(newNodeName);
 			parent.add(newNode);
 		}
 
@@ -51,22 +50,45 @@ public class SimulatorDataModel extends DefaultTreeModel {
 	 * @param name
 	 * @return
 	 */
-	private static DefaultMutableTreeNode findInDirectChildren(
+	private static SortableMutableTreeNode findInDirectChildren(
 			DefaultMutableTreeNode parent, String name) {
 
 		Enumeration<?> enumeration = parent.children();
-		DefaultMutableTreeNode targetNode = null;
+		SortableMutableTreeNode targetNode = null;
 
 		while (enumeration.hasMoreElements()) {
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumeration
-					.nextElement();
+			Object obj = enumeration.nextElement();
+			if (obj instanceof SortableMutableTreeNode) {
+				SortableMutableTreeNode node = (SortableMutableTreeNode) obj;
 
-			if (node.getUserObject().toString().compareTo(name) == 0) {
-				targetNode = node;
-				break;
+				if (node.getUserObject().toString().compareTo(name) == 0) {
+					targetNode = node;
+					break;
+				}
+			} else {
+				throw new UnsupportedOperationException(
+						"An unsupported Node type was found");
 			}
 		}
 		return targetNode;
+	}
+
+	private static void sortTree(MutableTreeNode node) {
+		if (node instanceof SortableMutableTreeNode) {
+			((SortableMutableTreeNode) node).sort();
+		}
+
+		if (!node.isLeaf()) {
+			Enumeration<?> enumeration = node.children();
+
+			while (enumeration.hasMoreElements()) {
+				Object obj = enumeration.nextElement();
+
+				if (obj instanceof MutableTreeNode) {
+					sortTree(((MutableTreeNode) obj));
+				}
+			}
+		}
 	}
 
 	private HashSet<String> nameLUT = new HashSet<String>();
@@ -75,7 +97,6 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 	public SimulatorDataModel() {
 		super(new DefaultMutableTreeNode("Data List"));
-
 	}
 
 	private void addSpikePatterns(DefaultMutableTreeNode top, Network network) {
@@ -87,7 +108,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 				if (ensemble.isCollectingSpikes()) {
 
-					DefaultMutableTreeNode ensNode = createUniqueNode(top,
+					SortableMutableTreeNode ensNode = createSortableNode(top,
 							ensemble.getName());
 					/*
 					 * Make a clone of the data
@@ -102,7 +123,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			} else if (node instanceof Network) {
 				Network subNet = (Network) node;
 
-				DefaultMutableTreeNode netNode = createUniqueNode(top, subNet
+				DefaultMutableTreeNode netNode = createSortableNode(top, subNet
 						.getName()
 						+ " (Network)");
 
@@ -117,7 +138,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 			if (probe.getEnsembleName() != null
 					&& probe.getEnsembleName().compareTo("") != 0) {
-				DefaultMutableTreeNode ensembleNode = createUniqueNode(top0,
+				SortableMutableTreeNode ensembleNode = createSortableNode(top0,
 						probe.getEnsembleName());
 				top0 = ensembleNode;
 			}
@@ -126,7 +147,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			if (target instanceof Node) {
 				String targetNodeName = ((Node) target).getName();
 
-				DefaultMutableTreeNode targetNode = createUniqueNode(top0,
+				SortableMutableTreeNode targetNode = createSortableNode(top0,
 						targetNodeName);
 
 				/*
@@ -137,18 +158,6 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 				DefaultMutableTreeNode stateNode = new ProbeDataNode(probeData,
 						probe.getStateName());
-
-				/*
-				 * Extract dimensions
-				 */
-				for (int dimCount = 0; dimCount < probeData.getDimension(); dimCount++) {
-					TimeSeries oneDimData = DataUtils.extractDimension(
-							probeData, dimCount);
-
-					DefaultMutableTreeNode stateDimNode = new ProbeDataExpandedNode(
-							oneDimData, dimCount);
-					stateNode.add(stateDimNode);
-				}
 
 				targetNode.add(stateNode);
 
@@ -196,7 +205,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 		Calendar cal = new GregorianCalendar();
 
-		DefaultMutableTreeNode captureNode = new DefaultMutableTreeNode(
+		SortableMutableTreeNode captureNode = new SortableMutableTreeNode(
 				"Simulation " + cal.get(Calendar.HOUR_OF_DAY) + "h"
 						+ cal.get(Calendar.MINUTE) + "m"
 						+ cal.get(Calendar.SECOND) + "s "
@@ -205,6 +214,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 		addSpikePatterns(captureNode, network);
 		addTimeSeries(captureNode, network.getSimulator().getProbes());
+		sortTree(captureNode);
 
 		if (captureNode.getChildCount() == 0) {
 			captureNode.add(new DefaultMutableTreeNode("no data collected"));

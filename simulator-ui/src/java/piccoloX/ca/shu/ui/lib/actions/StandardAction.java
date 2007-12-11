@@ -28,7 +28,7 @@ public abstract class StandardAction implements Serializable {
 	 * If true, this action will execute inside the Swing Event dispatcher
 	 * Thread.
 	 */
-	protected boolean doActionInSwingThread = true;
+	protected RunThreadType runSwingType = RunThreadType.JAVA_SWING;
 
 	/**
 	 * @param description
@@ -93,7 +93,7 @@ public abstract class StandardAction implements Serializable {
 	protected void doActionInternal() {
 
 		try {
-			action();			
+			action();
 			postAction();
 			actionCompleted = true;
 		} catch (ActionException e) {
@@ -105,7 +105,7 @@ public abstract class StandardAction implements Serializable {
 	 * Does the action layer, starts an appropriate thread
 	 */
 	public void doAction() {
-		if (doActionInSwingThread) {
+		if (runSwingType == RunThreadType.JAVA_SWING) {
 			if (SwingUtilities.isEventDispatchThread()) {
 				doActionInternal();
 			} else {
@@ -116,7 +116,7 @@ public abstract class StandardAction implements Serializable {
 				});
 			}
 
-		} else {
+		} else if (runSwingType == RunThreadType.NON_SWING) {
 			if (SwingUtilities.isEventDispatchThread()) {
 				(new Thread() {
 					public void run() {
@@ -126,11 +126,14 @@ public abstract class StandardAction implements Serializable {
 			} else {
 				doActionInternal();
 			}
+		} else {
+			throw new UnsupportedOperationException();
 		}
+
 	}
-	
+
 	protected void doSomething(boolean isUndo) {
-		
+
 	}
 
 	/**
@@ -186,12 +189,30 @@ public abstract class StandardAction implements Serializable {
 		this.actionCompleted = actionCompleted;
 	}
 
+	public enum RunThreadType {
+		JAVA_SWING, NON_SWING
+	}
+
 	/**
-	 * @param doActionInSwingThread
+	 * @param threadType
 	 *            If true, this action will execute inside the Swing Event
-	 *            dispatcher Thread.
+	 *            dispatcher Thread. If false, the action can execute in any
+	 *            non-swing thread. The second type allows actions to proceed
+	 *            without blocking the UI.
 	 */
-	protected void setThreadType(boolean doActionInSwingThread) {
-		this.doActionInSwingThread = doActionInSwingThread;
+	private void setThreadType(RunThreadType threadType) {
+		this.runSwingType = threadType;
+	}
+
+	/**
+	 * @param isBlocking
+	 *            Whether this action will execute in the Java Swing thread
+	 */
+	public void setBlocking(boolean isBlocking) {
+		if (isBlocking) {
+			setThreadType(RunThreadType.JAVA_SWING);
+		} else {
+			setThreadType(RunThreadType.NON_SWING);
+		}
 	}
 }

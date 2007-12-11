@@ -103,8 +103,8 @@ public class UITermination extends Widget implements ILineEndHolder {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
 
 		tooltips.addPart(new PropertyPart("Dimensions", ""
 				+ getModel().getDimensions()));
@@ -118,7 +118,6 @@ public class UITermination extends Widget implements ILineEndHolder {
 			tooltips.addPart(new PropertyPart(element,
 					objToString(propertyValue)));
 		}
-		return tooltips;
 	}
 
 	@Override

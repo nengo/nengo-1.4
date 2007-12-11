@@ -91,11 +91,8 @@ public abstract class NodeContainer extends UINeoNode {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
-
+	protected void constructTooltips(TooltipBuilder tooltips) {
 		tooltips.addPart(new PropertyPart("# Nodes", "" + getNodesCount()));
-		return tooltips;
 	}
 
 	/**

@@ -9,6 +9,7 @@ import ca.shu.ui.lib.world.AppFrame;
  */
 public class UIEnvironment {
 	public static final double SEMANTIC_ZOOM_LEVEL = 0.2;
+	public static final double ANIMATION_TARGET_FRAME_RATE = 25;
 
 	private static AppFrame uiInstance;
 

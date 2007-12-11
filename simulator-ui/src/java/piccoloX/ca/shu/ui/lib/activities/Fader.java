@@ -1,5 +1,6 @@
 package ca.shu.ui.lib.activities;
 
+import ca.shu.ui.lib.util.UIEnvironment;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
@@ -25,7 +26,7 @@ public class Fader extends PInterpolatingActivity {
 	 *            Transparency target
 	 */
 	public Fader(PNode target, long duration, float finalOpacity) {
-		super(duration, 25);
+		super(duration, (int) (1000 / UIEnvironment.ANIMATION_TARGET_FRAME_RATE));
 		this.node = target;
 		this.targetTransparency = finalOpacity;
 	}

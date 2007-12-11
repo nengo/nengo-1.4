@@ -8,7 +8,6 @@ import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.models.nodes.widgets.UISpikeProbe;
-import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
@@ -67,13 +66,6 @@ public class UIEnsemble extends NodeContainer {
 			menu.addAction(new StopCollectSpikes());
 		}
 
-	}
-
-	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
-
-		return tooltips;
 	}
 
 	@Override

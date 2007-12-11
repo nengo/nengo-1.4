@@ -130,8 +130,8 @@ public class UIOrigin extends Widget {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
 
 		tooltips.addPart(new PropertyPart("Dimensions", ""
 				+ getModel().getDimensions()));
@@ -146,7 +146,6 @@ public class UIOrigin extends Widget {
 		} catch (SimulationException e) {
 		}
 
-		return tooltips;
 	}
 
 	@Override

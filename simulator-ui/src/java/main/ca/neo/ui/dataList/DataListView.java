@@ -205,7 +205,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 					if (leafNode instanceof DataTreeNode) {
 						((DataTreeNode) leafNode)
-								.constructPopupMenu(menuBuilder);
+								.constructPopupMenu(menuBuilder, dataModel);
 					}
 
 				} else {

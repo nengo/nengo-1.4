@@ -80,7 +80,7 @@ public abstract class ReversableAction extends StandardAction {
 			return;
 		}
 
-		if (doActionInSwingThread) {
+		if (runSwingType == StandardAction.RunThreadType.JAVA_SWING) {
 			if (SwingUtilities.isEventDispatchThread()) {
 				undoInternal();
 			} else {

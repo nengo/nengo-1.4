@@ -239,16 +239,13 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = new TooltipBuilder(getName() + "("
-				+ getTypeName() + ")");
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
 
 		tooltips.addPart(new PropertyPart("Documentation", getModel()
 				.getDocumentation()));
 		tooltips.addPart(new PropertyPart("Simulation mode", getModel()
 				.getMode().toString()));
-
-		return tooltips;
 
 	}
 

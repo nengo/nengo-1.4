@@ -6,6 +6,7 @@ import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.DefaultFunctionInterpreter;
 import ca.neo.model.Network;
+import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
@@ -14,6 +15,7 @@ import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.model.neuron.Neuron;
+import ca.neo.sim.Simulator;
 
 /**
  * Fuzzification is implemented as a function transformation. Inference is done
@@ -28,7 +30,7 @@ public class FuzzyLogicExample {
 
 	public static Network createNetwork() throws StructuralException {
 		Network net = new NetworkImpl();
-
+		Simulator simulator = net.getSimulator();
 		// Rules:
 		// 1) if A and (B or C) then 1
 		// 2) if D then 2
@@ -71,6 +73,17 @@ public class FuzzyLogicExample {
 		net.addNode(rule2);
 		net.addNode(output);
 
+		/*
+		 * Add probes
+		 */
+		try {
+			simulator.addProbe(C.getName(), "V", true);
+			simulator.addProbe(A.getName(), "V", true);
+			simulator.addProbe(B.getName(), "V", true);
+			simulator.addProbe(D.getName(), "V", true);
+		} catch (SimulationException e) {
+			e.printStackTrace();
+		}
 		A.addDecodedTermination("in", new float[][] { new float[] { 1f, 0f, 0f,
 				0f } }, .005f, false);
 		B.addDecodedTermination("in", new float[][] { new float[] { 0f, 1f, 0f,

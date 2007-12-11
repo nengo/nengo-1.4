@@ -2,6 +2,7 @@ package ca.neo.ui.models.nodes.widgets;
 
 import ca.neo.ui.models.UIModelConfigurable;
 import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -45,13 +46,9 @@ public abstract class Widget extends UIModelConfigurable {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-
-		TooltipBuilder tooltips = new TooltipBuilder(getName() + "("
-				+ getTypeName() + ") attached to " + parent.getName());
-
-		return tooltips;
-
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
+		tooltips.addPart(new PropertyPart("Attached to", parent.getName()));
 	}
 
 	public UINeoNode getNodeParent() {

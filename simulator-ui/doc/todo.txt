@@ -1,7 +1,14 @@
 *******************************************
  Done
 *******************************************
-11/26/04 - DragAction no longer has hard references to objects
+12/19/07 - New Ensemble decoded origin dialog now only shows common origins in child nodes 
+12/19/07 - Decoded ensembles & nodes under construction should fade in & out
+12/19/07 - Due to memory considerations, dimension expansion on 
+			TimeSeries nodes in DataListViewer requires a user action
+			it is no longer automatic
+12/19/07 -  Container nodes in the Data List viewer are sorted.
+
+11/26/07 - DragAction no longer has hard references to objects
 11/22/07 - Export data files
 11/21/07 - Multiple data items can be cleared and undone
 11/20/07 - Data List manager created
@@ -12,17 +19,8 @@
  Pri 0 - doing next
 *******************************************
 
+Plotting things together,labelling the plots 
 
-***  Data List Items ***
-make tree nodes sorted
-how to represent multidimensional data?
-subsampling plots
-
-plotting multiple items together
-
-***
-
-Decoded ensembles & nodes under construction should fade in & out
 
 
 Ah, I don't think we'd talked about supporting that last thing in the UI, but it would be good (e.g. right-click an origin and select "externalize").
@@ -33,13 +31,6 @@ Clean up menus
 Replacing ensembles in place - Instead, why not change parameters
 
 Manage views: Network, Brain, Data
-
-Sort data list view by alphabet
-
-Parse data list in a different thread
-
-Question about nested Networks, are they possible?
-
 
 I just wrote a static method you can use for this:
 AbstractEnsemble.findCommon1DOrigins().

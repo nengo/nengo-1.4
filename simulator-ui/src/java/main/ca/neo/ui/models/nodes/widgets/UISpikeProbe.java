@@ -22,10 +22,9 @@ public class UISpikeProbe extends UIProbe {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = new TooltipBuilder("Collecting spikes");
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
 		tooltips.addPart(new PropertyPart("Attached to", getModel().getName()));
-		return tooltips;
 	}
 
 	@Override

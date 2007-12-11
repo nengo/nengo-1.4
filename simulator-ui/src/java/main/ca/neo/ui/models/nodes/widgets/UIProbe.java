@@ -5,7 +5,6 @@ import java.awt.Color;
 import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ProbeIcon;
-import ca.neo.ui.models.tooltips.TooltipBuilder;
 
 public abstract class UIProbe extends UIModel {
 
@@ -24,7 +23,7 @@ public abstract class UIProbe extends UIModel {
 	}
 
 	private void init(UINeoNode nodeAttachedTo) {
-//		setTransparency(0.5f);
+		// setTransparency(0.5f);
 		this.nodeAttachedTo = nodeAttachedTo;
 		setSelectable(false);
 		myIcon = new ProbeIcon(this);
@@ -32,9 +31,6 @@ public abstract class UIProbe extends UIModel {
 		myIcon.setLabelVisible(false);
 		setIcon(myIcon);
 	}
-
-	@Override
-	protected abstract TooltipBuilder constructTooltips();
 
 	public UINeoNode getProbeParent() {
 		return nodeAttachedTo;

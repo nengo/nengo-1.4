@@ -61,9 +61,7 @@ public class UIFunctionInput extends UINeoNode {
 	@Override
 	protected Node configureModel(PropertySet props) throws ConfigException {
 
-		Function[] functions = (Function[]) props
-				.getProperty(pFunctions);
-
+		Function[] functions = (Function[]) props.getProperty(pFunctions);
 
 		try {
 			// setName((String) getProperty(pName));
@@ -87,13 +85,12 @@ public class UIFunctionInput extends UINeoNode {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
 
 		tooltips.addPart(new PropertyPart("Dimensions", ""
 				+ getModel().getFunctions().length));
 
-		return tooltips;
 	}
 
 	@Override

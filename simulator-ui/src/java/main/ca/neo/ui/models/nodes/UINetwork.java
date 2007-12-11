@@ -63,15 +63,13 @@ public class UINetwork extends NodeContainer {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = super.constructTooltips();
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
 		tooltips.addPart(new PropertyPart("# Projections", ""
 				+ getModel().getProjections().length));
 
 		tooltips.addPart(new PropertyPart("Simulator", ""
 				+ getSimulator().getClass().getSimpleName()));
-
-		return tooltips;
 	}
 
 	@Override

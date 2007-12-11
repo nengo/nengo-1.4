@@ -2,11 +2,13 @@ package ca.neo.ui.dataList;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import ca.neo.ui.actions.PlotAdvanced;
 import ca.neo.ui.actions.PlotSpikePattern;
 import ca.neo.ui.actions.PlotTimeSeries;
-import ca.neo.ui.actions.PlotAdvanced;
+import ca.neo.util.DataUtils;
 import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
@@ -15,7 +17,7 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  * 
  * @author Shu Wu
  */
-public abstract class DataTreeNode extends DefaultMutableTreeNode {
+public abstract class DataTreeNode extends SortableMutableTreeNode {
 
 	private static final long serialVersionUID = 1L;
 
@@ -23,7 +25,8 @@ public abstract class DataTreeNode extends DefaultMutableTreeNode {
 		super(userObject);
 	}
 
-	public abstract void constructPopupMenu(PopupMenuBuilder menu);
+	public abstract void constructPopupMenu(PopupMenuBuilder menu,
+			SimulatorDataModel dataModel);
 
 	public abstract StandardAction getDefaultAction();
 
@@ -54,6 +57,7 @@ class ProbeDataNode extends TimeSeriesNode {
 	public String toString() {
 		return name + " (Probe data " + getUserObject().getDimension() + "D)";
 	}
+
 }
 
 /**
@@ -93,8 +97,8 @@ class SpikePatternNode extends DataTreeNode {
 		super(spikePattern);
 	}
 
-	public void constructPopupMenu(PopupMenuBuilder menu) {
-		// PopupMenuBuilder menuBuilder = new PopupMenuBuilder("Spike Pattern");
+	public void constructPopupMenu(PopupMenuBuilder menu,
+			SimulatorDataModel dataModel) {
 		menu.addAction(getDefaultAction());
 	}
 
@@ -134,10 +138,44 @@ abstract class TimeSeriesNode extends DataTreeNode {
 		this.name = name;
 	}
 
-	public void constructPopupMenu(PopupMenuBuilder menu) {
+	public void constructPopupMenu(PopupMenuBuilder menu,
+			SimulatorDataModel dataModel) {
 		menu.addAction(getDefaultAction());
 		menu.addAction(new PlotAdvanced((TimeSeries) getUserObject(),
 				"Probe data: " + name));
+		menu.addAction(new ExtractDimenmsions(dataModel));
+	}
+
+	class ExtractDimenmsions extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+		private SimulatorDataModel dataModel;
+
+		public ExtractDimenmsions(SimulatorDataModel dataModel) {
+			super("Extract dimensions");
+			this.dataModel = dataModel;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			extractDimensions();
+			dataModel.nodeStructureChanged(TimeSeriesNode.this);
+		}
+
+		public void extractDimensions() {
+			TimeSeries probeData = getUserObject();
+			/*
+			 * Extract dimensions
+			 */
+			for (int dimCount = 0; dimCount < probeData.getDimension(); dimCount++) {
+				TimeSeries oneDimData = DataUtils.extractDimension(probeData,
+						dimCount);
+
+				DefaultMutableTreeNode stateDimNode = new ProbeDataExpandedNode(
+						oneDimData, dimCount);
+				add(stateDimNode);
+			}
+		}
 	}
 
 	@Override

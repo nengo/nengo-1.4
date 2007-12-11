@@ -84,11 +84,10 @@ public class UIStateProbe extends UIProbe {
 	}
 
 	@Override
-	protected TooltipBuilder constructTooltips() {
-		TooltipBuilder tooltips = new TooltipBuilder("Probe");
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
 		tooltips.addPart(new PropertyPart("Attached to", getModel()
 				.getStateName()));
-		return tooltips;
 	}
 
 	/**
@@ -147,8 +146,7 @@ public class UIStateProbe extends UIProbe {
 		menu.addSection("Probe");
 		MenuBuilder plotMenu = menu.createSubMenu("plot");
 		plotMenu.addAction(new PlotTimeSeries(getModel().getData(), getName()));
-		plotMenu.addAction(new PlotAdvanced(getModel().getData(),
-				getName()));
+		plotMenu.addAction(new PlotAdvanced(getModel().getData(), getName()));
 
 		MenuBuilder exportMenu = menu.createSubMenu("export data");
 		exportMenu.addAction(new ExportToMatlabAction());

@@ -7,8 +7,11 @@ import javax.swing.JPopupMenu;
 
 import ca.neo.ui.actions.RemoveModelAction;
 import ca.neo.ui.models.tooltips.ModelTooltip;
+import ca.neo.ui.models.tooltips.TitlePart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.shu.ui.lib.activities.Pulsator;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
@@ -38,10 +41,14 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	 */
 	private PropertyChangeListener iconPropertyChangeListener;
 
+	private boolean isModelBusy = false;
+
 	/**
 	 * NEO Model
 	 */
 	private Object model;
+
+	private Pulsator pulsator = null;
 
 	/**
 	 * Creates a hollow wrapper without any NEO model
@@ -71,10 +78,15 @@ public abstract class UIModel extends WorldObject implements Interactable {
 
 	}
 
-	/**
-	 * @return Constructed Tooltip
-	 */
-	protected abstract TooltipBuilder constructTooltips();
+	protected void constructTooltips(TooltipBuilder builder) {
+		// do nothing
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+		super.prepareForDestroy();
+		setModelBusy(false);
+	}
 
 	/**
 	 * @param newIcon
@@ -129,7 +141,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 
 	@Override
 	public final WorldObject getTooltip() {
-		TooltipBuilder tooltips = constructTooltips();
+		TooltipBuilder tooltips = showTooltips();
 		if (tooltips == null) {
 			return null;
 		} else {
@@ -141,6 +153,10 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	 * @return What this type of NEO Model is called
 	 */
 	public abstract String getTypeName();
+
+	public boolean isModelBusy() {
+		return isModelBusy;
+	}
 
 	/**
 	 * @return Whether the NEO Model exists
@@ -159,14 +175,40 @@ public abstract class UIModel extends WorldObject implements Interactable {
 
 	}
 
+	/**
+	 * @param isBusy
+	 *            Whether the model is currently busy. If it is busy, the object
+	 *            will not be interactable.
+	 */
+	public void setModelBusy(boolean isBusy) {
+		if (isModelBusy != isBusy) {
+			isModelBusy = isBusy;
+
+			if (isModelBusy) {
+				Util
+						.Assert(pulsator == null,
+								"Previous pulsator has not been disposed of properly);");
+				pulsator = new Pulsator(this);
+			} else {
+				if (pulsator != null) {
+					pulsator.finish();
+					pulsator = null;
+				}
+			}
+
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
 	 */
 	public JPopupMenu showContextMenu() {
-		if (!isModelExists()) {
-			UserMessages.showWarning("Model is not configured yet");
+		if (isModelBusy()) {
+			return null;
+		} else if (!isModelExists()) {
+			UserMessages.showWarning("This model  is not configured yet");
 			return null;
 		} else {
 			PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
@@ -174,7 +216,25 @@ public abstract class UIModel extends WorldObject implements Interactable {
 
 			return menu.toJPopupMenu();
 		}
+	}
 
+	/**
+	 * @return Constructed Tooltip
+	 */
+	public final TooltipBuilder showTooltips() {
+		String toolTipTitle = getName() + "(" + getTypeName() + ")";
+		TooltipBuilder tooltipBuilder = new TooltipBuilder(toolTipTitle);
+		if (isModelBusy()) {
+
+			tooltipBuilder.addPart(new TitlePart("Currently busy"));
+
+		} else if (!isModelExists()) {
+			tooltipBuilder.addPart(new TitlePart("Model is not ready"));
+		} else {
+
+			constructTooltips(tooltipBuilder);
+		}
+		return tooltipBuilder;
 	}
 
 }
