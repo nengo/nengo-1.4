@@ -67,6 +67,9 @@ public abstract class ReversableAction extends StandardAction {
 			undo();
 		} catch (ActionException e) {
 			e.defaultHandleBehavior();
+		} catch (Exception e) {
+			e.printStackTrace();
+			UserMessages.showWarning("Unexpected Exception: " + e.toString());
 		}
 	}
 
