@@ -7,6 +7,9 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
 
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
+
 /**
  * A standard non-reversable action
  * 
@@ -98,6 +101,9 @@ public abstract class StandardAction implements Serializable {
 			actionCompleted = true;
 		} catch (ActionException e) {
 			e.defaultHandleBehavior();
+		} catch (Exception e) {
+			e.printStackTrace();
+			UserMessages.showWarning("Unexpected Exception: " + e.toString());
 		}
 	}
 
