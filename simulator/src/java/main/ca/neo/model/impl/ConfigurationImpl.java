@@ -47,9 +47,6 @@ public class ConfigurationImpl implements Configuration {
 
 	private Configurable myConfigurable;
 	private List<Listener> myListeners;
-//	private Map<String, Object> myValues;
-//	private Map<String, Class> myTypes;
-//	private Map<String, Boolean> myIsMutable;
 	private Map<String, Property> myProperties;
 	
 	/**
@@ -59,9 +56,6 @@ public class ConfigurationImpl implements Configuration {
 		myConfigurable = configurable;
 		myListeners = new ArrayList<Listener>(5);
 		myProperties = new HashMap<String, Property>(20);
-//		myValues = new HashMap<String, Object>(20);
-//		myTypes = new HashMap<String, Class>(20);
-//		myIsMutable = new HashMap<String, Boolean>(20);
 	}
 	
 	/**
@@ -71,21 +65,6 @@ public class ConfigurationImpl implements Configuration {
 		return myConfigurable;
 	}
 
-//	/**
-//	 * To be called by the associated Configurable, immediately after construction (once 
-//	 * per parameter). 
-//	 *   
-//	 * @param name Parameter name
-//	 * @param type Parameter type
-//	 * @param mutable True if parameter can be changed after construction
-//	 * @param 
-//	 */
-//	public void defineParameter(String name, Class type, boolean mutable, Object defaultValue) {
-//		myValues.put(name, defaultValue);
-//		myTypes.put(name, type);
-//		myIsMutable.put(name, new Boolean(mutable));
-//	}
-	
 	/**
 	 * To be called by the associated Configurable, immediately after construction (once 
 	 * per property). 
@@ -114,26 +93,6 @@ public class ConfigurationImpl implements Configuration {
 		return property;
 	}
 	
-	/**
-	 * To be called ONLY by the Configurable to which this Configuration belongs, 
-	 * after the Configurable has accepted a change. This method updates the 
-	 * internal property list and sends events to listeners.
-	 * 
-	 * Clients of a Configurable should not call this method to change the 
-	 * Configurable. Use instead the Configurable's native setters, or setValue(...)   
-	 *  
-	 * @param name Name of changed parameter
-	 * @param value New value of changed parameter
-	 */
-//	public void changeAndNotify(String name, Object value) {
-//		myValues.put(name, value);
-//		
-//		Event event = new EventImpl(myConfigurable, name, value);
-//		for (Iterator<Listener> it = myListeners.iterator(); it.hasNext(); ) {
-//			it.next().configurationChange(event);			
-//		}
-//	}
-	
 	public void notifyListeners(Event event) {
 		for (Iterator<Listener> it = myListeners.iterator(); it.hasNext(); ) {
 			it.next().configurationChange(event);			
@@ -156,37 +115,6 @@ public class ConfigurationImpl implements Configuration {
 		}
 	}
 	
-//	/**
-//	 * @see ca.neo.model.Configuration#getMutable(java.lang.String)
-//	 */
-//	public boolean getMutable(String name) throws StructuralException {
-//		validateParam(name, myValues);
-//		return myIsMutable.get(name).booleanValue();
-//	}
-
-	
-//	/**
-//	 * @see ca.neo.model.Configuration#getType(java.lang.String)
-//	 */
-//	public Class getType(String name) throws StructuralException {
-//		validateParam(name, myValues);
-//		return myTypes.get(name);
-//	}
-//
-//	/**
-//	 * @see ca.neo.model.Configuration#getValue(java.lang.String)
-//	 */
-//	public Object getValue(String name) throws StructuralException {
-//		validateParam(name, myValues);
-//		return myValues.get(name);
-//	}
-
-//	private static void validateParam(String name, Map<String, Object> values) throws StructuralException {
-//		if (!values.containsKey(name)) {
-//			throw new StructuralException("The parameter " + name + " is unknown");
-//		}
-//	}
-
 	/**
 	 * @see ca.neo.model.Configuration#getPropertyNames()
 	 */
@@ -205,16 +133,6 @@ public class ConfigurationImpl implements Configuration {
 		}
 	}
 
-//	/**
-//	 * The implementation of this method should call appropriate native setters
-//	 * on the associated Configurable. The native setters should in turn call
-//	 * changeAndNotify(...). 
-//	 *   
-//	 * @see ca.neo.model.Configuration#setValue(java.lang.String, java.lang.Object)
-//	 */
-//	public abstract void setValue(String name, Object value) throws StructuralException;
-
-		
 	private static abstract class BaseProperty implements Property {
 		
 		private Configuration myConfiguration;
@@ -482,6 +400,7 @@ public class ConfigurationImpl implements Configuration {
 		 */
 		public Object getValue(int index) throws StructuralException {
 			try {
+				System.out.println("request " + index + " from " + myValues.size());
 				return myValues.get(index);				
 			} catch (IndexOutOfBoundsException e) {
 				throw new StructuralException("Value #" + index + " doesn't exist", e);

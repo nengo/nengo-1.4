@@ -36,8 +36,8 @@ public class MockConfigurable implements Configurable {
 	private Configurable myConfigurableField;
 	
 	private final String myImmutableField;
-	private List<String> myMultiValuedField;
-	private String[] myFixedCardinalityField;
+	private final List<String> myMultiValuedField;
+	private final String[] myFixedCardinalityField;
 	
 	private SingleValuedProperty myIntProperty;
 	private SingleValuedProperty myFloatProperty;
@@ -87,21 +87,26 @@ public class MockConfigurable implements Configurable {
 			@Override
 			public void addValue(Object value) throws StructuralException {
 				myMultiValuedField.add((String) value); 
+				System.out.println("length: " + myMultiValuedField.size());
+				addValueCompleted(value);
 			}
 
 			@Override
 			public void doInsert(int index, Object value) throws StructuralException {
-				myMultiValuedField.add(index, (String) value); 
+				myMultiValuedField.add(index, (String) value);
+				insertCompleted(index, value);
 			}
 
 			@Override
 			public void doRemove(int index) throws StructuralException {
 				myMultiValuedField.remove(index);
+				removeCompleted(index);
 			}
 
 			@Override
 			public void doSetValue(int index, Object value) throws StructuralException {
 				myMultiValuedField.set(index, (String) value);
+				setValueCompleted(index, value);
 			}
 		};
 		myConfiguration.defineProperty(myMultiValuedProperty);
