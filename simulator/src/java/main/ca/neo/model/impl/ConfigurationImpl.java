@@ -157,7 +157,8 @@ public class ConfigurationImpl implements Configuration {
 				
 			myConfiguration = configuration;
 			myName = name;
-			myClass = c;			
+			myClass = c;	
+			myMutable = mutable;
 		}
 		
 		/**

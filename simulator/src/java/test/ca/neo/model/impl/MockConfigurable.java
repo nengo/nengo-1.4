@@ -61,7 +61,7 @@ public class MockConfigurable implements Configurable {
 		myBooleanField = true;
 		myStringField = "test";
 		myFloatArrayField = new float[]{1, 2};
-		myFloatArrayArrayField = new float[][]{new float[]{1, 2}, new float[]{3, 4}};
+		myFloatArrayArrayField = new float[][]{new float[]{1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1}, new float[]{3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
 		mySimulationModeField = SimulationMode.DEFAULT;
 		myUnitsField = Units.UNK;
 		myConfigurableField = new MockLittleConfigurable(); 

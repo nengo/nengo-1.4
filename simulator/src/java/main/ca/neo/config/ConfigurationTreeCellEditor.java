@@ -7,18 +7,16 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.EventListener;
 import java.util.EventObject;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.text.JTextComponent;
+import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreePath;
 
 import ca.neo.config.ConfigurationTreeModel.LeafNode;
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration;
-import ca.neo.model.StructuralException;
 import ca.neo.model.Configuration.Property;
 
 public class ConfigurationTreeCellEditor extends DefaultCellEditor {
@@ -38,9 +36,12 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 		
 		if (e instanceof MouseEvent) {
 			MouseEvent me = (MouseEvent) e;
-			Object o = myTree.getPathForLocation(me.getX(), me.getY()).getLastPathComponent();
-			if ( !(o instanceof Configurable) && !(o instanceof Configuration.Property)) {
-				result = true;
+			TreePath path = myTree.getPathForLocation(me.getX(), me.getY()); 
+			if (path.getLastPathComponent() instanceof LeafNode) {
+				Object o = path.getParentPath().getLastPathComponent();
+				if (o instanceof Property && ((Property) o).isMutable()) {
+					result = true;					
+				}
 			}
 		}
 		
@@ -51,31 +52,46 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 	public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
 		Component result = super.getTreeCellEditorComponent(tree, value, isSelected, expanded, leaf, row);
 		
-		final TreePath path = tree.getPathForRow(row);
-		Object parent = tree.getPathForRow(row).getParentPath().getLastPathComponent();		
+		TreePath path = tree.getPathForRow(row);
 		if (path.getParentPath().getLastPathComponent() instanceof Property && value instanceof LeafNode) {
-			final ConfigurationTreeModel model = (ConfigurationTreeModel) tree.getModel();
 			Property property = (Property) path.getParentPath().getLastPathComponent();
 			LeafNode node = (LeafNode) value;
-			if (Integer.class.isAssignableFrom(property.getType())) {
-				final JTextField tf = new JTextField(ConfigurationConfiguration.getInstance().getDisplayText(node.getObject()));
-				tf.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						try {
-							model.setValue(this, path, new Integer(tf.getText()));
-						} catch (NumberFormatException e1) {
-							e1.printStackTrace();
-						}
-						ConfigurationTreeCellEditor.this.stopCellEditing();
-					}
-				});
-				result = tf;
+			if (result instanceof JTextComponent) {
+				((JTextComponent) result).setText(ConfigurationConfiguration.getInstance().getDisplayText(node.getObject()));
 			}
+			Component customEditor = ConfigurationConfiguration.getInstance().getEditor(property.getType(), node.getObject(), tree, path);
+			if (customEditor != null) result = customEditor;
 		}
 		
 		return result;
 	}
 	
-	
+	public static abstract class ConfigurationChangeListener implements ActionListener {
+		
+		private ConfigurationTreeModel myModel;
+		private TreeCellEditor myEditor;
+		private TreePath myPath;
+		
+		public ConfigurationChangeListener(JTree tree, TreePath path) {
+			myModel = (ConfigurationTreeModel) tree.getModel();
+			myEditor = tree.getCellEditor();
+			myPath = path;
+		}
+		
+		public abstract Object getValue() throws Exception;
+
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(ActionEvent e) {
+			try {
+				myModel.setValue(this, myPath, getValue());
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			myEditor.stopCellEditing();
+		}
+		
+	}
 
 }
