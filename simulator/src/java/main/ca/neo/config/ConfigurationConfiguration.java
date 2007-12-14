@@ -27,8 +27,10 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 import ca.neo.config.ConfigurationTreeCellEditor.ConfigurationChangeListener;
+import ca.neo.model.Configurable;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.Units;
+import ca.neo.model.impl.MockConfigurable;
 
 /**
  * 
@@ -96,7 +98,6 @@ public class ConfigurationConfiguration {
 	
 	public Component getRenderer(Object o) {
 		Component result = null;
-		
 		if (o instanceof float[][]) {
 			float[][] f = (float[][]) o;
 			StringBuffer buf = new StringBuffer();
@@ -108,7 +109,6 @@ public class ConfigurationConfiguration {
 				if (i < f.length - 1) buf.append("\r\n");
 			}
 			JPanel panel = new JPanel(new FlowLayout());
-			panel.setBackground(Color.WHITE);
 			panel.add(new JLabel(getIcon(float[][].class)));
 			panel.add(new JTextArea(buf.toString()));
 			result = panel;
@@ -272,6 +272,15 @@ public class ConfigurationConfiguration {
 			result = buf.toString();
 		}
 		
+		return result;
+	}
+	
+	public List<Class> getImplementations(Class type) {
+		List<Class> result = new ArrayList<Class>(10);
+		if (Configurable.class.isAssignableFrom(type)) {
+			result.add(MockConfigurable.class);
+			result.add(MockConfigurable.MockChildConfigurable.class);
+		}
 		return result;
 	}
 	

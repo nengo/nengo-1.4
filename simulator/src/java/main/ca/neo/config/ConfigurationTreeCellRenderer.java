@@ -3,6 +3,7 @@
  */
 package ca.neo.config;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.Icon;
@@ -52,6 +53,7 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 				setText(ConfigurationConfiguration.getInstance().getDisplayText(o));
 				setToolTipText(null);							
 			} else {
+				customRenderer.setBackground(sel ? new Color(.1f, .4f, .7f, .2f) : Color.WHITE);
 				result = customRenderer;
 			}
 		} else {

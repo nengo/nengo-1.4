@@ -301,9 +301,20 @@ public class MockConfigurable implements Configurable {
 		private String myField;
 		
 		public MockChildConfigurable(Configuration immutableProperties) throws StructuralException {
-			super(immutableProperties);
+			super(addParentProperties(immutableProperties));
 			myField = "test";
 			((ConfigurationImpl) getConfiguration()).defineSingleValuedProperty("field", String.class, true, myField);
+		}
+		
+		private static Configuration addParentProperties(Configuration configuration) {
+			((ConfigurationImpl) configuration).defineTemplateProperty("immutableField", String.class, "foo");
+			return configuration;
+		}
+		
+		public static Configuration getConstructionTemplate() {
+			ConfigurationImpl template = new ConfigurationImpl(null);
+			template.defineTemplateProperty("immutableFoo", String.class, "foo");
+			return template;
 		}
 		
 		public void setField(String val) {

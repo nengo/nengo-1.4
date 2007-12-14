@@ -69,7 +69,8 @@ public class ConfigurationTreeModel implements TreeModel {
 	public void setValue(Object source, TreePath path, Object value) {
 		try {
 			Object parent = path.getParentPath().getLastPathComponent();
-			if (parent instanceof Property && path.getLastPathComponent() instanceof LeafNode) {
+			if (parent instanceof Property 
+					&& (path.getLastPathComponent() instanceof LeafNode || path.getLastPathComponent() instanceof Configurable)) {
 				Property property = (Property) parent;
 				int index = ((LeafNode) path.getLastPathComponent()).getIndex();
 				property.setValue(index, value);
@@ -230,9 +231,8 @@ public class ConfigurationTreeModel implements TreeModel {
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);
-			tree.setEditable(true); //whole tree?
+			tree.setEditable(true); 
 			tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
-			System.out.println(tree.getCellEditor());
 			tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));
 			ConfigurationTreeCellRenderer cellRenderer = new ConfigurationTreeCellRenderer();
 			tree.setCellRenderer(cellRenderer);

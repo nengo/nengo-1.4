@@ -15,6 +15,8 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 //import ca.neo.config.ConfigurationTreeModel.PropertyNode;
+import ca.neo.model.Configurable;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Configuration.Property;
 
 public class ConfigurationTreePopupListener extends MouseAdapter {
@@ -24,7 +26,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 	
 	public ConfigurationTreePopupListener(JTree tree, ConfigurationTreeModel model) {
 		myTree = tree;
-		myModel = model;
+		myModel = model;			
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 			if (path.getLastPathComponent() instanceof Property) {
 				Property p = (Property) path.getLastPathComponent();
 				if (p.isMultiValued() && !p.isFixedCardinality()) {
-					JMenuItem addValueItem = new JMenuItem("Add value");
+					JMenuItem addValueItem = new JMenuItem("Add");
 					addValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent E) {
 							myModel.addValue(this, path, "foo foo foo");
@@ -55,13 +57,22 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					popup.add(addValueItem);				
 				}
 			} else if (path.getParentPath().getLastPathComponent() instanceof Property) {
-				Property p = (Property) path.getParentPath().getLastPathComponent();
-				JMenuItem editValueItem = new JMenuItem("Edit value");
-				popup.add(editValueItem);				
+				final Property p = (Property) path.getParentPath().getLastPathComponent();
+				if (Configurable.class.isAssignableFrom(p.getType())) {
+					final JMenuItem replaceValueItem = new JMenuItem("Replace");
+					replaceValueItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							Configurable c = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), path.getLastPathComponent().getClass());
+							//TODO: have to find index of value
+							if (c != null) myModel.setValue(this, path, c);
+						}
+					});
+					popup.add(replaceValueItem);									
+				}
 				if (p.isMultiValued() && !p.isFixedCardinality()) {
-					JMenuItem insertValueItem = new JMenuItem("Insert value");
+					JMenuItem insertValueItem = new JMenuItem("Insert");
 					popup.add(insertValueItem);				
-					JMenuItem removeValueItem = new JMenuItem("Remove value");
+					JMenuItem removeValueItem = new JMenuItem("Remove");
 					popup.add(removeValueItem);				
 				}
 			}

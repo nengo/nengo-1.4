@@ -33,15 +33,17 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 	@Override
 	public boolean isCellEditable(EventObject e) {
 		boolean result = false;
-		
+
 		if (e instanceof MouseEvent) {
 			MouseEvent me = (MouseEvent) e;
-			TreePath path = myTree.getPathForLocation(me.getX(), me.getY()); 
-			if (path.getLastPathComponent() instanceof LeafNode) {
-				Object o = path.getParentPath().getLastPathComponent();
-				if (o instanceof Property && ((Property) o).isMutable()) {
-					result = true;					
-				}
+			if (me.getClickCount() > 1) {
+				TreePath path = myTree.getPathForLocation(me.getX(), me.getY()); 
+				if (path.getLastPathComponent() instanceof LeafNode) {
+					Object o = path.getParentPath().getLastPathComponent();
+					if (o instanceof Property && ((Property) o).isMutable()) {
+						result = true;					
+					}
+				}				
 			}
 		}
 		
