@@ -14,7 +14,7 @@ import ca.neo.ui.actions.PlotTimeSeries;
 import ca.neo.ui.actions.PlotAdvanced;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UIEnsemble;
-import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.util.Probe;
@@ -86,7 +86,7 @@ public class UIStateProbe extends UIProbe {
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new PropertyPart("Attached to", getModel()
+		tooltips.addPart(new TooltipProperty("Attached to", getModel()
 				.getStateName()));
 	}
 

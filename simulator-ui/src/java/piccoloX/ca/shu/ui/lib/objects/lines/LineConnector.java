@@ -1,6 +1,8 @@
 package ca.shu.ui.lib.objects.lines;
 
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.JPopupMenu;
@@ -24,12 +26,13 @@ public abstract class LineConnector extends WorldObject implements
 
 	private static final long serialVersionUID = 1L;
 
+	private DestroyListener myDestroyListener;
+
 	private final Edge myEdge;
 
 	private final LineOriginIcon myIcon;
 
 	private ILineTermination myTermination;
-
 	private final LineWell myWell;
 
 	public LineConnector(LineWell well) {
@@ -47,6 +50,9 @@ public abstract class LineConnector extends WorldObject implements
 		setBounds(parentToLocal(getFullBounds()));
 		setChildrenPickable(false);
 		setSelectable(true);
+		myDestroyListener = new DestroyListener(this);
+		myWell.addPropertyChangeListener(myDestroyListener);
+
 	}
 
 	private boolean tryConnectTo(ILineTermination newTermination,
@@ -89,6 +95,10 @@ public abstract class LineConnector extends WorldObject implements
 		return myEdge;
 	}
 
+	protected LineWell getWell() {
+		return myWell;
+	}
+
 	/**
 	 * @param target
 	 * @return Whether the connection was successfully initialized
@@ -112,6 +122,7 @@ public abstract class LineConnector extends WorldObject implements
 	@Override
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
+		myWell.removePropertyChangeListener(myDestroyListener);
 	}
 
 	/**
@@ -166,11 +177,11 @@ public abstract class LineConnector extends WorldObject implements
 
 			setOffset(position);
 			myWell.addChild(this);
-			
+
 			if (attemptedConnection) {
 				translate(-40, -20);
 			}
-			
+
 		}
 	}
 
@@ -205,6 +216,28 @@ public abstract class LineConnector extends WorldObject implements
 
 		});
 		return menu.toJPopupMenu();
+	}
+}
+
+/**
+ * Listens for destroy events from the Well and destroys the connector Note: The
+ * connector isn't destroyed automatically by the well's destruct function
+ * because it is not a Piccolo child of the well.
+ * 
+ * @author Shu Wu
+ */
+class DestroyListener implements PropertyChangeListener {
+	private LineConnector parent;
+
+	public DestroyListener(LineConnector parent) {
+		super();
+		this.parent = parent;
+	}
+
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (evt.getPropertyName().compareTo(WorldObject.PROPERTY_DESTROYED) == 0) {
+			parent.destroy();
+		}
 	}
 }
 

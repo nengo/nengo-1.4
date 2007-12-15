@@ -6,8 +6,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JPopupMenu;
 
 import ca.neo.ui.actions.RemoveModelAction;
-import ca.neo.ui.models.tooltips.ModelTooltip;
-import ca.neo.ui.models.tooltips.TitlePart;
+import ca.neo.ui.models.tooltips.Tooltip;
+import ca.neo.ui.models.tooltips.TooltipTitle;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.activities.Pulsator;
 import ca.shu.ui.lib.util.UserMessages;
@@ -74,7 +74,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	 */
 	protected void constructMenu(PopupMenuBuilder menu) {
 
-		menu.addAction(new RemoveModelAction("Remove " + getTypeName(), this));
+		menu.addAction(new RemoveModelAction("Remove this", this));
 
 	}
 
@@ -145,7 +145,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 		if (tooltips == null) {
 			return null;
 		} else {
-			return new ModelTooltip(tooltips);
+			return new Tooltip(tooltips);
 		}
 	}
 
@@ -172,7 +172,13 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	public void setModel(Object model) {
 		this.model = model;
 		fireModelPropertyChanged();
+	}
 
+	/**
+	 * Updates the UI from the model
+	 */
+	public final void updateModel() {
+		setModel(getModel());
 	}
 
 	/**
@@ -226,10 +232,10 @@ public abstract class UIModel extends WorldObject implements Interactable {
 		TooltipBuilder tooltipBuilder = new TooltipBuilder(toolTipTitle);
 		if (isModelBusy()) {
 
-			tooltipBuilder.addPart(new TitlePart("Currently busy"));
+			tooltipBuilder.addPart(new TooltipTitle("Currently busy"));
 
 		} else if (!isModelExists()) {
-			tooltipBuilder.addPart(new TitlePart("Model is not ready"));
+			tooltipBuilder.addPart(new TooltipTitle("Model is not ready"));
 		} else {
 
 			constructTooltips(tooltipBuilder);

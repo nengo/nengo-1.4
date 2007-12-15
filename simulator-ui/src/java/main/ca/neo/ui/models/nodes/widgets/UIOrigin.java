@@ -1,7 +1,10 @@
 package ca.neo.ui.models.nodes.widgets;
 
+import java.awt.Color;
+
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.InstantaneousOutput;
+import ca.neo.model.Network;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
@@ -10,10 +13,8 @@ import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
-import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.objects.lines.LineConnector;
-import ca.shu.ui.lib.objects.lines.LineWell;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 
@@ -32,51 +33,27 @@ public class UIOrigin extends Widget {
 
 	private static final String typeName = "Origin";
 
-	private MyWell lineWell;
-
-	public UIOrigin(UINeoNode nodeParent, Origin origin) {
-		super(nodeParent, origin);
-		setName(origin.getName());
-		init();
-	}
+	private UIProjectionWell lineWell;
 
 	public UIOrigin(UINeoNode nodeParent) {
 		super(nodeParent);
 		init();
 	}
 
-	private void init() {
-		lineWell = new MyWell();
+	public UIOrigin(UINeoNode nodeParent, Origin origin) {
+		super(nodeParent, origin);
 
+		init();
+	}
+
+	private void init() {
+		lineWell = new UIProjectionWell(this);
 		ModelIcon icon = new ModelIcon(this, lineWell);
 		icon.configureLabel(false);
 		setIcon(icon);
 
 		this.setSelectable(false);
-	}
-
-	/**
-	 * @param term
-	 *            Termination to be disconnected from
-	 * @return True if successful
-	 */
-	public boolean disconnect(UITermination term) {
-
-		if (term != null) {
-			Util.debugMsg("Projection removed " + term.getName());
-			try {
-				getNodeParent().getParentNetwork().removeProjection(
-						term.getModelTermination());
-				return true;
-			} catch (StructuralException e) {
-				UserMessages.showWarning("Could not disconnect: "
-						+ e.toString());
-			}
-			return false;
-		} else {
-			return true;
-		}
-
+		updateModel();
 	}
 
 	@Override
@@ -108,19 +85,45 @@ public class UIOrigin extends Widget {
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 
-		tooltips.addPart(new PropertyPart("Dimensions", ""
+		tooltips.addPart(new TooltipProperty("Dimensions", ""
 				+ getModel().getDimensions()));
 
 		try {
 			InstantaneousOutput value = getModel().getValues();
 
-			tooltips.addPart(new PropertyPart("Time: ", "" + value.getTime()));
 			tooltips
-					.addPart(new PropertyPart("Units: ", "" + value.getUnits()));
+					.addPart(new TooltipProperty("Time: ", "" + value.getTime()));
+			tooltips.addPart(new TooltipProperty("Units: ", ""
+					+ value.getUnits()));
 
 		} catch (SimulationException e) {
 		}
 
+	}
+
+	@Override
+	protected void expose(Network network, String exposedName) {
+		network.exposeOrigin(getModel(), exposedName);
+	}
+
+	@Override
+	protected String getExposedName(Network network) {
+		return network.getExposedOriginName(getModel());
+	}
+
+	@Override
+	protected String getModelName() {
+		return getModel().getName();
+	}
+
+	@Override
+	protected void unExpose(Network network) {
+
+		if (getExposedName() != null) {
+			network.hideOrigin(getExposedName());
+		} else {
+			UserMessages.showWarning("Could not unexpose this origin");
+		}
 	}
 
 	/**
@@ -146,10 +149,37 @@ public class UIOrigin extends Widget {
 
 	}
 
+	/**
+	 * @param term
+	 *            Termination to be disconnected from
+	 * @return True if successful
+	 */
+	public boolean disconnect(UITermination term) {
+
+		if (term != null) {
+			Util.debugMsg("Projection removed " + term.getName());
+			try {
+				getNodeParent().getParentNetwork().removeProjection(
+						term.getModelTermination());
+				return true;
+			} catch (StructuralException e) {
+				UserMessages.showWarning("Could not disconnect: "
+						+ e.toString());
+			}
+			return false;
+		} else {
+			return true;
+		}
+
+	}
+
 	@Override
 	public PropertyDescriptor[] getConfigSchema() {
 		UserMessages.showError("POrigin is not configurable yet");
 		return null;
+	}
+	public Color getColor() {
+		return lineWell.getColor();
 	}
 
 	@Override
@@ -167,32 +197,5 @@ public class UIOrigin extends Widget {
 		super.setVisible(isVisible);
 
 		lineWell.setVisible(isVisible);
-
-	}
-
-	/**
-	 * LineEndWell for this origin
-	 * 
-	 * @author Shu Wu
-	 */
-	class MyWell extends LineWell {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		protected LineConnector constructLineEnd() {
-			UIProjection projection = new UIProjection(this, UIOrigin.this);
-			return projection;
-		}
-
-		/**
-		 * @return new LineEnd created
-		 */
-		public UIProjection createAndAddLineEnd() {
-			UIProjection lineEnd = new UIProjection(this, UIOrigin.this);
-			addChild(lineEnd);
-			return lineEnd;
-		}
-
 	}
 }

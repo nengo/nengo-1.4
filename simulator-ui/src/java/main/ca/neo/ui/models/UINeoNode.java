@@ -23,7 +23,7 @@ import ca.neo.ui.models.nodes.widgets.UIProbe;
 import ca.neo.ui.models.nodes.widgets.UIStateProbe;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.ui.models.nodes.widgets.Widget;
-import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
@@ -242,9 +242,9 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 
-		tooltips.addPart(new PropertyPart("Documentation", getModel()
+		tooltips.addPart(new TooltipProperty("Documentation", getModel()
 				.getDocumentation()));
-		tooltips.addPart(new PropertyPart("Simulation mode", getModel()
+		tooltips.addPart(new TooltipProperty("Simulation mode", getModel()
 				.getMode().toString()));
 
 	}
@@ -257,7 +257,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		/*
 		 * layout widgets such as Origins and Terminations
 		 */
-
 		Rectangle2D bounds = getIcon().localToParent(getIcon().getBounds());
 
 		double offsetX = bounds.getX();
@@ -334,7 +333,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 	@Override
 	protected void prepareForDestroy() {
-
 		NodeViewer viewer = getParentViewer();
 		if (viewer != null)
 			getParentViewer().removeNeoNode(this);
@@ -349,11 +347,8 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 *            The name of the state variable to probe
 	 */
 	public UIStateProbe addProbe(String stateName) throws SimulationException {
-
 		UIStateProbe probeUI = new UIStateProbe(this, stateName);
-
 		newProbeAdded(probeUI);
-
 		return probeUI;
 	}
 
@@ -361,7 +356,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * @param widget
 	 *            Widget to be added
 	 */
-	public void addWidget(Widget widget) {
+	protected void addWidget(Widget widget) {
 		widget.setScale(0.5);
 		addChild(widget);
 	}

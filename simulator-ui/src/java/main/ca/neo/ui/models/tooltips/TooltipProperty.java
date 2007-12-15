@@ -6,11 +6,11 @@ package ca.neo.ui.models.tooltips;
  * @author Shu Wu
  * 
  */
-public class PropertyPart implements ITooltipPart {
+public class TooltipProperty implements ITooltipPart {
 	private String propertyName;
 	private String propertyValue;
 
-	public PropertyPart(String propertyName, String propertyValue) {
+	public TooltipProperty(String propertyName, String propertyValue) {
 		super();
 		this.propertyName = propertyName;
 		this.propertyValue = propertyValue;

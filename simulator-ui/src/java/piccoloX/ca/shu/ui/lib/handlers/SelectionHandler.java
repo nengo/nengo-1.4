@@ -32,6 +32,7 @@ package ca.shu.ui.lib.handlers;
 import java.awt.BasicStroke;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.event.PInputEventFilter;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
@@ -116,7 +118,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		this.world = world;
 		this.marqueeParent = world.getSky();
 		this.selectableParent = world.getGround();
-		// setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
+		setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
 		init();
 	}
 

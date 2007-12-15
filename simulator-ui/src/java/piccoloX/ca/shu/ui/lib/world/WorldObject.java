@@ -7,6 +7,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.shu.ui.lib.objects.activities.TransientMsg;
+import ca.shu.ui.lib.util.Util;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
@@ -21,12 +22,12 @@ import edu.umd.cs.piccolo.util.PUtil;
 public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	private static final long serialVersionUID = 1L;
 
+	public static final String PROPERTY_DESTROYED = "destroyed";
 	/**
 	 * The property name that identifies a change in this object's global
 	 * position
 	 */
 	public static final String PROPERTY_GLOBAL_BOUNDS = "globalBounds";
-	public static final String PROPERTY_DESTROYED = "destroyed";
 
 	/**
 	 * Current Piccolo activity
@@ -332,6 +333,8 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 */
 	public void popupTransientMsg(String msg) {
 		if (getWorld() != null) {
+			Util.debugMsg("UI Popup Msg: " + msg);
+			
 			TransientMsg msgObject = new TransientMsg(msg);
 
 			double offsetX = -(msgObject.getWidth() - getWidth()) / 2d;
@@ -350,7 +353,6 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 */
 	public void setName(String name) {
 		this.myName = name;
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -380,7 +382,6 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	public void signalBoundsChanged() {
 		super.signalBoundsChanged();
 		signalGlobalBoundsChanged();
-
 	}
 
 	/**

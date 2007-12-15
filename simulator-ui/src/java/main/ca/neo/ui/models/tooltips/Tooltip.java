@@ -14,13 +14,13 @@ import edu.umd.cs.piccolo.nodes.PText;
  * @author Shu Wu
  * 
  */
-public class ModelTooltip extends WorldObject {
+public class Tooltip extends WorldObject {
 	private static final long serialVersionUID = 1L;
 
 	private TooltipBuilder tooltipBuilder;
 	private double tooltipWidth = 400;
 
-	public ModelTooltip(TooltipBuilder tooltipBuilder) {
+	public Tooltip(TooltipBuilder tooltipBuilder) {
 		super();
 
 		this.tooltipBuilder = tooltipBuilder;

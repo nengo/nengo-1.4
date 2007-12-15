@@ -18,7 +18,7 @@ import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
 import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UITermination;
-import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -123,7 +123,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new PropertyPart("# Dimension", ""
+		tooltips.addPart(new TooltipProperty("# Dimension", ""
 				+ getModel().getDimension()));
 
 	}

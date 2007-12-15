@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+12/15/07 - Expose Origin and Expose Termination.
 12/15/07 - Improved drag & drop handling code
 12/09/07 - New Ensemble decoded origin dialog now only shows common origins in child nodes 
 12/09/07 - Decoded ensembles & nodes under construction should fade in & out
@@ -19,12 +20,16 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Check-in changes to Simulator branch
+
+Loading code on the fly
+
 Doing next:
 
 Add weak reference to UI Nodes from DataListView
 	Support feature such as focus on node (check node.isDestroyed && node is not hidden)
 
-Request: Listener interface for models, networks and simulators UI updates when model changes.
+Request: A notification when model changes, this way it will trigger a UI update
 	UpdateUIFromModel()
 		Ensembles - origins and terminations have to be checked
 

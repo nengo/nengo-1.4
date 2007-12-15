@@ -3,7 +3,7 @@ package ca.neo.ui.models.nodes.widgets;
 import ca.neo.model.Ensemble;
 import ca.neo.ui.actions.PlotSpikePattern;
 import ca.neo.ui.models.nodes.UIEnsemble;
-import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
@@ -24,7 +24,7 @@ public class UISpikeProbe extends UIProbe {
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new PropertyPart("Attached to", getModel().getName()));
+		tooltips.addPart(new TooltipProperty("Attached to", getModel().getName()));
 	}
 
 	@Override

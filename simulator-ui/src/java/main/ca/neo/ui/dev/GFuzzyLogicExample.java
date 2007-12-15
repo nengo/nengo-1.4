@@ -2,11 +2,10 @@ package ca.neo.ui.dev;
 
 import ca.neo.model.StructuralException;
 import ca.neo.ui.ExampleRunner;
-import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.nodes.UINetwork;
 
 /**
- * In this example, an Integrator network is constructed
+ * In this example, a Fuzzy Logic network is constructed
  * 
  * @author Shu Wu
  */
@@ -27,7 +26,7 @@ public class GFuzzyLogicExample extends ExampleRunner {
 
 	@Override
 	protected void doStuff(UINetwork network) {
-		(new RunSimulatorAction("Run", network)).doAction();
+		// (new RunSimulatorAction("Run", network)).doAction();
 	}
 
 }

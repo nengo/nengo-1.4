@@ -6,7 +6,7 @@ import ca.neo.model.Node;
 import ca.neo.ui.actions.SaveNodeContainerAction;
 import ca.neo.ui.brainView.BrainViewer;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
@@ -92,7 +92,7 @@ public abstract class NodeContainer extends UINeoNode {
 
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
-		tooltips.addPart(new PropertyPart("# Nodes", "" + getNodesCount()));
+		tooltips.addPart(new TooltipProperty("# Nodes", "" + getNodesCount()));
 	}
 
 	/**

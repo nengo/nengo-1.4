@@ -1,14 +1,9 @@
 package ca.neo.ui.models.nodes.widgets;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.objects.DirectedEdge;
 import ca.shu.ui.lib.objects.lines.ILineTermination;
 import ca.shu.ui.lib.objects.lines.LineConnector;
-import ca.shu.ui.lib.objects.lines.LineWell;
-import ca.shu.ui.lib.world.WorldObject;
 
 /**
  * Line Ends for this origin
@@ -18,21 +13,9 @@ import ca.shu.ui.lib.world.WorldObject;
 public class UIProjection extends LineConnector {
 
 	private static final long serialVersionUID = 1L;
-	private UIOrigin myOrigin;
 
-	public UIProjection(LineWell well, UIOrigin origin) {
+	public UIProjection(UIProjectionWell well) {
 		super(well);
-		myOrigin = origin;
-
-		origin.addPropertyChangeListener(new PropertyChangeListener() {
-
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (evt.getPropertyName().compareTo(
-						WorldObject.PROPERTY_DESTROYED) == 0) {
-					destroy();
-				}
-			}
-		});
 	}
 
 	/**
@@ -47,7 +30,7 @@ public class UIProjection extends LineConnector {
 			/*
 			 * Recursive connections are represented by an upward arcing edge
 			 */
-			UINeoNode nodeParent = myOrigin.getNodeParent();
+			UINeoNode nodeParent = getOriginUI().getNodeParent();
 			getEdge().setLineShape(DirectedEdge.EdgeShape.UPWARD_ARC);
 			getEdge()
 					.setMinArcRadius(
@@ -80,7 +63,7 @@ public class UIProjection extends LineConnector {
 		if (!(target instanceof UITermination))
 			return false;
 		if (modifyModel) {
-			if (myOrigin.connect((UITermination) target)) {
+			if (getOriginUI().connect((UITermination) target)) {
 				popupTransientMsg("Projection added to Network");
 
 				return true;
@@ -92,16 +75,11 @@ public class UIProjection extends LineConnector {
 	}
 
 	@Override
-	public UITermination getTermination() {
-		return (UITermination) super.getTermination();
-	}
-
-	@Override
 	protected void justConnected() {
 		/*
 		 * Detect recurrent connections
 		 */
-		if ((getTermination()).getNodeParent() == myOrigin.getNodeParent()) {
+		if ((getTermination()).getNodeParent() == getOriginUI().getNodeParent()) {
 
 			setRecursive(true);
 		}
@@ -112,7 +90,7 @@ public class UIProjection extends LineConnector {
 		setRecursive(false);
 
 		UITermination termination = getTermination();
-		if (myOrigin.disconnect(termination)) {
+		if (getOriginUI().disconnect(termination)) {
 
 			termination.popupTransientMsg("Projection removed from Network");
 		}
@@ -122,6 +100,15 @@ public class UIProjection extends LineConnector {
 	@Override
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
+	}
+
+	public UIOrigin getOriginUI() {
+		return ((UIProjectionWell) getWell()).getOriginUI();
+	}
+
+	@Override
+	public UITermination getTermination() {
+		return (UITermination) super.getTermination();
 	}
 
 }

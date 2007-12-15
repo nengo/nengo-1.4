@@ -163,6 +163,7 @@ public class World extends WorldObject implements Interactable {
 		/*
 		 * Attach handlers
 		 */
+		mySkyCamera.addInputEventListener(zoomHandler);
 		mySkyCamera.addInputEventListener(new SwitchSelectionModeHandler());
 		mySkyCamera.addInputEventListener(new KeyboardFocusHandler());
 		mySkyCamera.addInputEventListener(new TooltipPickHandler(this, 1000,
@@ -202,7 +203,6 @@ public class World extends WorldObject implements Interactable {
 
 	private void initSelectionMode() {
 		isSelectionMode = false;
-		mySkyCamera.addInputEventListener(zoomHandler);
 		mySkyCamera.addInputEventListener(panHandler);
 		mySkyCamera.addInputEventListener(selectionEventHandler);
 	}
@@ -351,11 +351,8 @@ public class World extends WorldObject implements Interactable {
 			isSelectionMode = enabled;
 			mySkyCamera.removeInputEventListener(selectionEventHandler);
 			if (!isSelectionMode) {
-
 				initSelectionMode();
 			} else {
-
-				mySkyCamera.removeInputEventListener(zoomHandler);
 				mySkyCamera.removeInputEventListener(panHandler);
 				mySkyCamera.addInputEventListener(selectionEventHandler);
 			}

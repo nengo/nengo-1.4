@@ -1,5 +1,6 @@
 package ca.shu.ui.lib.objects.lines;
 
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 
 import ca.shu.ui.lib.world.WorldObject;
@@ -10,20 +11,16 @@ import edu.umd.cs.piccolo.util.PPickPath;
 public abstract class LineWell extends WorldObject {
 
 	private static final long serialVersionUID = 1L;
+	private LineOriginIcon myIcon;
 
 	public LineWell() {
 		super();
-
-		WorldObject icon = new LineOriginIcon();
-
-		addChild(icon);
+		myIcon = new LineOriginIcon();
+		addChild(myIcon);
 		setBounds(getFullBounds());
-
 		setSelectable(false);
-
-		icon.setSelectable(false);
-		icon.addInputEventListener(new CreateLineEndHandler(this));
-
+		myIcon.setSelectable(false);
+		myIcon.addInputEventListener(new CreateLineEndHandler(this));
 	}
 
 	/**
@@ -39,6 +36,14 @@ public abstract class LineWell extends WorldObject {
 		LineConnector newLineEnd = constructLineEnd();
 		addChild(newLineEnd);
 		return newLineEnd;
+	}
+
+	public Color getColor() {
+		return myIcon.getColor();
+	}
+
+	public void setColor(Color color) {
+		myIcon.setColor(color);
 	}
 
 }

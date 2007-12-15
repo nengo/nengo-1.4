@@ -6,10 +6,10 @@ package ca.neo.ui.models.tooltips;
  * @author Shu Wu
  * 
  */
-public class TitlePart implements ITooltipPart {
+public class TooltipTitle implements ITooltipPart {
 	String titleName;
 
-	public TitlePart(String titleName) {
+	public TooltipTitle(String titleName) {
 		super();
 		this.titleName = titleName;
 	}

@@ -8,7 +8,7 @@ import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.icons.NetworkIcon;
-import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkUISettings;
 import ca.neo.ui.models.viewers.NetworkViewer;
@@ -65,10 +65,10 @@ public class UINetwork extends NodeContainer {
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new PropertyPart("# Projections", ""
+		tooltips.addPart(new TooltipProperty("# Projections", ""
 				+ getModel().getProjections().length));
 
-		tooltips.addPart(new PropertyPart("Simulator", ""
+		tooltips.addPart(new TooltipProperty("Simulator", ""
 				+ getSimulator().getClass().getSimpleName()));
 	}
 

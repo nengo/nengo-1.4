@@ -1,12 +1,23 @@
 package ca.neo.ui.models.nodes.widgets;
 
+import java.awt.Color;
+
+import javax.swing.JOptionPane;
+
+import ca.neo.model.Network;
 import ca.neo.ui.models.UIModelConfigurable;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.tooltips.PropertyPart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.neo.ui.models.tooltips.TooltipProperty;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import edu.umd.cs.piccolo.nodes.PText;
 
 /**
  * Widgets are models such as Terminations and Origins which can be attached to
@@ -15,8 +26,14 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  * @author Shu Wu
  */
 public abstract class Widget extends UIModelConfigurable {
+	/**
+	 * The property name that identifies a change in this widget
+	 */
+	public static final String PROPERTY_WIDGET = "neoWidget";
 
 	private boolean isWidgetVisible = true;
+	private ExposedIcon myExposedIcon;
+
 	private UINeoNode parent;
 
 	public Widget(UINeoNode nodeParent) {
@@ -39,17 +56,94 @@ public abstract class Widget extends UIModelConfigurable {
 		super.constructMenu(menu);
 
 		if (isWidgetVisible()) {
-			menu.addAction(new HideWidgetAction("Hide " + getTypeName()));
+			menu.addAction(new HideWidgetAction("Hide this icon"));
 		} else {
-			menu.addAction(new ShowWidgetAction("Show " + getTypeName()));
+			menu.addAction(new ShowWidgetAction("Show this icon"));
 		}
+
+		menu.addSection(getTypeName());
+
+		if (getExposedName() == null) {
+			menu.addAction(new ExposeAction());
+		} else {
+			menu.addAction(new UnExposeAction());
+		}
+		constructWidgetMenu(menu);
 	}
 
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new PropertyPart("Attached to", parent.getName()));
+		tooltips.addPart(new TooltipProperty("Attached to", parent.getName()));
+		tooltips.addPart(new TooltipProperty("Exposed as", getExposedName()));
 	}
+
+	/**
+	 * Constructs widget-specific menu
+	 * 
+	 * @param menu
+	 */
+	protected void constructWidgetMenu(AbstractMenuBuilder menu) {
+
+	}
+
+	protected abstract void expose(Network network, String exposedName);
+
+	/**
+	 * Exposes this origin/termination outside the Network
+	 * 
+	 * @param exposedName
+	 *            Name of the newly exposed origin/termination
+	 */
+	protected void expose(String exposedName) {
+		Network network = getNodeParent().getParentNetwork();
+		if (network != null) {
+			expose(network, exposedName);
+			popupTransientMsg(this.getName() + " is exposed as " + exposedName
+					+ " on Network: " + network.getName());
+			updateModel();
+		} else {
+			UserMessages
+					.showWarning("Cannot expose because no external network is available");
+		}
+	}
+
+	protected String getExposedName() {
+		if (getNodeParent() != null) {
+			Network network = getNodeParent().getParentNetwork();
+			if (network != null) {
+				String exposedName = getExposedName(network);
+				if (exposedName != null) {
+					return exposedName;
+				}
+			}
+		}
+		return null;
+	}
+
+	protected abstract String getExposedName(Network network);
+
+	protected abstract String getModelName();
+
+	/**
+	 * UnExposes this origin/termination outside the Network
+	 */
+	protected void unExpose() {
+		Network network = getNodeParent().getParentNetwork();
+		if (network != null) {
+			unExpose(network);
+			popupTransientMsg(this.getName() + " is UN-exposed on Network: "
+					+ network.getName());
+			updateModel();
+		} else {
+			UserMessages
+					.showWarning("Cannot expose because no external network is available");
+		}
+	}
+
+	protected abstract void unExpose(Network network);
+
+	public abstract Color getColor();
 
 	public UINeoNode getNodeParent() {
 		return parent;
@@ -62,6 +156,32 @@ public abstract class Widget extends UIModelConfigurable {
 		return isWidgetVisible;
 	}
 
+	@Override
+	public void setModel(Object model) {
+		super.setModel(model);
+
+		String name = getModelName();
+
+		String exposedName = getExposedName();
+		if (exposedName != null) {
+			if (myExposedIcon == null) {
+				myExposedIcon = new ExposedIcon(getColor());
+				addChild(myExposedIcon);
+				myExposedIcon.setOffset(getWidth() + 2,
+						(getHeight() - myExposedIcon.getHeight()) / 2);
+			}
+
+		} else {
+			if (myExposedIcon != null) {
+				myExposedIcon.removeFromParent();
+			}
+		}
+		setName(name);
+
+		fireModelPropertyChanged();
+
+	}
+
 	/**
 	 * @param isVisible
 	 *            Whether the user has marked this widget as hidden
@@ -69,6 +189,33 @@ public abstract class Widget extends UIModelConfigurable {
 	public void setWidgetVisible(boolean isVisible) {
 		this.isWidgetVisible = isVisible;
 
+		firePropertyChange(0, PROPERTY_WIDGET, null, null);
+		setVisible(isVisible);
+		invalidateFullBounds();
+	}
+
+	class ExposeAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ExposeAction() {
+			super("Expose outside Network");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+
+			String name = JOptionPane
+					.showInputDialog(UIEnvironment.getInstance(),
+							"Please enter the name to expose this as: ");
+
+			if (name != null && name.compareTo("") != 0) {
+				expose(name);
+			} else {
+				throw new ActionException("Invalid name");
+			}
+
+		}
 	}
 
 	/**
@@ -117,8 +264,33 @@ public abstract class Widget extends UIModelConfigurable {
 		@Override
 		protected void undo() throws ActionException {
 			setWidgetVisible(false);
-
 		}
+	}
+
+	class UnExposeAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public UnExposeAction() {
+			super("Un-expose as " + getExposedName());
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			unExpose();
+		}
+	}
+}
+
+class ExposedIcon extends PText {
+
+	private static final long serialVersionUID = 1L;
+
+	public ExposedIcon(Color color) {
+		super("E");
+
+		setTextPaint(color);
+		setFont(Style.FONT_XLARGE);
 	}
 
 }

@@ -1,8 +1,10 @@
 package ca.neo.ui.models.nodes.widgets;
 
+import java.awt.Color;
 import java.util.List;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.ui.configurable.ConfigException;
@@ -13,9 +15,9 @@ import ca.neo.ui.configurable.descriptors.PCouplingMatrix;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
-import ca.neo.ui.models.tooltips.PropertyPart;
-import ca.neo.ui.models.tooltips.TitlePart;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.neo.ui.models.tooltips.TooltipProperty;
+import ca.neo.ui.models.tooltips.TooltipTitle;
 import ca.neo.util.Configuration;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -27,8 +29,7 @@ import ca.shu.ui.lib.objects.lines.LineTerminationIcon;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.util.menus.MenuBuilder;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 
 /**
  * UI Wrapper for a Termination
@@ -49,6 +50,8 @@ public class UITermination extends Widget implements ILineTermination {
 
 	}
 
+	private LineTerminationIcon myIcon;
+
 	public UITermination(UINeoNode nodeParent) {
 		super(nodeParent);
 		init();
@@ -62,10 +65,11 @@ public class UITermination extends Widget implements ILineTermination {
 	}
 
 	private void init() {
-		ModelIcon icon = new ModelIcon(this, new LineTerminationIcon());
-		icon.configureLabel(false);
+		myIcon = new LineTerminationIcon();
+		ModelIcon iconWr = new ModelIcon(this, myIcon);
+		iconWr.configureLabel(false);
 
-		setIcon(icon);
+		setIcon(iconWr);
 	}
 
 	@Override
@@ -74,19 +78,35 @@ public class UITermination extends Widget implements ILineTermination {
 		throw new NotImplementedException();
 	}
 
+	@Override
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
+
+		tooltips.addPart(new TooltipProperty("Dimensions", ""
+				+ getModel().getDimensions()));
+
+		tooltips.addPart(new TooltipTitle("Configuration"));
+		Configuration config = getModel().getConfiguration();
+		String[] configProperties = config.listPropertyNames();
+		for (String element : configProperties) {
+			Object propertyValue = config.getProperty(element);
+
+			tooltips.addPart(new TooltipProperty(element,
+					objToString(propertyValue)));
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void constructMenu(PopupMenuBuilder menu) {
-		super.constructMenu(menu);
-
-		menu.addSection("Termination");
+	protected void constructWidgetMenu(AbstractMenuBuilder menu) {
+		super.constructWidgetMenu(menu);
 
 		if (getLineEnd() != null) {
 			menu.addAction(new RemoveConnectionAction("Disconnect",
 					getLineEnd()));
 		}
 
-		MenuBuilder configureMenu = menu.createSubMenu("Configure");
+		AbstractMenuBuilder configureMenu = menu.createSubMenu("Configure");
 
 		/*
 		 * Reflectively build property editors
@@ -107,21 +127,31 @@ public class UITermination extends Widget implements ILineTermination {
 	}
 
 	@Override
-	protected void constructTooltips(TooltipBuilder tooltips) {
-		super.constructTooltips(tooltips);
+	protected void expose(Network network, String exposedName) {
+		network.exposeTermination(getModel(), exposedName);
+	}
 
-		tooltips.addPart(new PropertyPart("Dimensions", ""
-				+ getModel().getDimensions()));
+	@Override
+	protected String getExposedName(Network network) {
+		return network.getExposedTerminationName(getModel());
+	}
 
-		tooltips.addPart(new TitlePart("Configuration"));
-		Configuration config = getModel().getConfiguration();
-		String[] configProperties = config.listPropertyNames();
-		for (String element : configProperties) {
-			Object propertyValue = config.getProperty(element);
+	@Override
+	protected String getModelName() {
+		return getModel().getName();
+	}
 
-			tooltips.addPart(new PropertyPart(element,
-					objToString(propertyValue)));
+	@Override
+	protected void unExpose(Network network) {
+		if (getExposedName() != null) {
+			network.hideTermination(getExposedName());
+		} else {
+			UserMessages.showWarning("Could not unexpose this termination");
 		}
+	}
+
+	public Color getColor() {
+		return myIcon.getColor();
 	}
 
 	@Override

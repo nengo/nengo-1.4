@@ -13,7 +13,7 @@ import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
-import ca.neo.ui.models.tooltips.PropertyPart;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
@@ -88,7 +88,7 @@ public class UIFunctionInput extends UINeoNode {
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 
-		tooltips.addPart(new PropertyPart("Dimensions", ""
+		tooltips.addPart(new TooltipProperty("Dimensions", ""
 				+ getModel().getFunctions().length));
 
 	}
