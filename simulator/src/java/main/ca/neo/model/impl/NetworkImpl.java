@@ -48,6 +48,9 @@ public class NetworkImpl implements Network {
 	private String myDocumentation;
 	private Map<String, Object> myMetaData;
 
+	private Map myExposedOriginNames;
+	private Map myExposedTerminationNames;
+	
 	public NetworkImpl() {
 		myNodeMap = new HashMap<String, Node>(20);
 		myProjectionMap	= new HashMap(50);
@@ -56,7 +59,9 @@ public class NetworkImpl implements Network {
 		myProbeables = new HashMap(30);
 		myProbeableStates = new HashMap(30);
 		myExposedOrigins = new HashMap(10);
+		myExposedOriginNames = new HashMap(10);
 		myExposedTerminations = new HashMap(10);
+		myExposedTerminationNames = new HashMap(10);
 		myMode = SimulationMode.DEFAULT;
 		myMetaData = new HashMap<String, Object>(20);
 	}
@@ -259,17 +264,29 @@ public class NetworkImpl implements Network {
 	}
 
 	/**
-	 * @see ca.neo.model.Network#exposeOrigin(ca.neo.model.Origin, java.lang.String)
+	 * @see ca.neo.model.Network#exposeOrigin(ca.neo.model.Origin,
+	 *      java.lang.String)
 	 */
 	public void exposeOrigin(Origin origin, String name) {
 		myExposedOrigins.put(name, new OriginWrapper(this, origin, name));
+		myExposedOriginNames.put(origin, name);
 	}
 
 	/**
 	 * @see ca.neo.model.Network#hideOrigin(java.lang.String)
 	 */
 	public void hideOrigin(String name) {
-		myExposedOrigins.remove(name);
+		OriginWrapper originWr = (OriginWrapper)myExposedOrigins.remove(name);
+		if (originWr != null) {
+			myExposedOriginNames.remove(originWr.myWrapped);
+		}
+	}
+
+	/**
+	 * @see ca.neo.model.Network#getExposedOriginName(ca.neo.model.Origin)
+	 */
+	public String getExposedOriginName(Origin insideOrigin) {
+		return (String)myExposedOriginNames.get(insideOrigin);
 	}
 
 	/**
@@ -286,7 +303,7 @@ public class NetworkImpl implements Network {
 	 * @see ca.neo.model.Network#getOrigins()
 	 */
 	public Origin[] getOrigins() {
-		return (Origin[]) myExposedOrigins.entrySet().toArray(new Origin[0]);
+		return (Origin[]) myExposedOrigins.values().toArray(new Origin[0]);
 	}
 
 	/**
@@ -294,14 +311,25 @@ public class NetworkImpl implements Network {
 	 */
 	public void exposeTermination(Termination termination, String name) {
 		myExposedTerminations.put(name, new TerminationWrapper(this, termination, name));
+		myExposedTerminationNames.put(termination, name);
 	}
 
 	/**
 	 * @see ca.neo.model.Network#hideTermination(java.lang.String)
 	 */
 	public void hideTermination(String name) {
-		myExposedTerminations.remove(name);
+		TerminationWrapper termination = (TerminationWrapper)myExposedTerminations.remove(name);
+		if (termination != null) {
+			myExposedTerminationNames.remove(termination.myWrapped);
+		}
 	}
+
+	/**
+	 * @see ca.neo.model.Network#getExposedTerminationName(ca.neo.model.Termination)
+	 */
+	public String getExposedTerminationName(Termination insideTermination) {
+		return (String)myExposedTerminationNames.get(insideTermination);
+	}	
 
 	/**
 	 * @see ca.neo.model.Network#getTermination(java.lang.String)
@@ -317,7 +345,7 @@ public class NetworkImpl implements Network {
 	 * @see ca.neo.model.Network#getTerminations()
 	 */
 	public Termination[] getTerminations() {
-		return (Termination[]) myExposedTerminations.entrySet().toArray(new Termination[0]);
+		return (Termination[]) myExposedTerminations.values().toArray(new Termination[0]);
 	}
 
 	/**
@@ -448,5 +476,5 @@ public class NetworkImpl implements Network {
 		}
 		myMetaData.put(key, value);
 	}
-	
+
 }

@@ -85,6 +85,16 @@ public interface Network extends Node, Probeable {
 	 */
 	public void exposeOrigin(Origin origin, String name);
 	
+	
+	/**
+	 * Returns the name of the exposed origin given the inner origin. Returns
+	 * null if no such origin is exposed.
+	 * 
+	 * @param insideOrigin
+	 *            Origin inside the network
+	 */
+	public String getExposedOriginName(Origin insideOrigin);	
+	
 	/**
 	 * Undoes exposeOrigin(x, x, name). 
 	 * 
@@ -109,6 +119,15 @@ public interface Network extends Node, Probeable {
 	 */
 	public void hideTermination(String name);
 
+	/**
+	 * Returns the name of the exposed termination given the inner termination. Returns
+	 * null if no such termination is exposed.
+	 * 
+	 * @param insideTermination
+	 *            Termination inside the network
+	 */
+	public String getExposedTerminationName(Termination insideTermination);
+	
 	/**
 	 * Declares the given Probeable state as being available for Probing from outside this 
 	 * Network. 
