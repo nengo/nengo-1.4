@@ -401,7 +401,6 @@ public class ConfigurationImpl implements Configuration {
 		 */
 		public Object getValue(int index) throws StructuralException {
 			try {
-				System.out.println("request " + index + " from " + myValues.size());
 				return myValues.get(index);				
 			} catch (IndexOutOfBoundsException e) {
 				throw new StructuralException("Value #" + index + " doesn't exist", e);

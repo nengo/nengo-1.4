@@ -16,7 +16,8 @@ import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreePath;
 
-import ca.neo.config.ConfigurationTreeModel.LeafNode;
+import ca.neo.config.ConfigurationTreeModel.Value;
+import ca.neo.model.Configurable;
 import ca.neo.model.Configuration.Property;
 
 public class ConfigurationTreeCellEditor extends DefaultCellEditor {
@@ -38,7 +39,8 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 			MouseEvent me = (MouseEvent) e;
 			if (me.getClickCount() > 1) {
 				TreePath path = myTree.getPathForLocation(me.getX(), me.getY()); 
-				if (path.getLastPathComponent() instanceof LeafNode) {
+				if (path.getLastPathComponent() instanceof Value 
+						&& !(((Value) path.getLastPathComponent()).getObject() instanceof Configurable) ) {
 					Object o = path.getParentPath().getLastPathComponent();
 					if (o instanceof Property && ((Property) o).isMutable()) {
 						result = true;					
@@ -55,9 +57,9 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 		Component result = super.getTreeCellEditorComponent(tree, value, isSelected, expanded, leaf, row);
 		
 		TreePath path = tree.getPathForRow(row);
-		if (path.getParentPath().getLastPathComponent() instanceof Property && value instanceof LeafNode) {
+		if (path.getParentPath().getLastPathComponent() instanceof Property && value instanceof Value) {
 			Property property = (Property) path.getParentPath().getLastPathComponent();
-			LeafNode node = (LeafNode) value;
+			Value node = (Value) value;
 			if (result instanceof JTextComponent) {
 				((JTextComponent) result).setText(ConfigurationConfiguration.getInstance().getDisplayText(node.getObject()));
 			}

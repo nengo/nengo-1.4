@@ -28,10 +28,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import javax.swing.tree.DefaultTreeModel;
 
+import ca.neo.config.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.impl.MockConfigurable.MockChildConfigurable;
+import ca.neo.model.impl.MockConfigurable.MockLittleConfigurable;
 
 public class NewConfigurableDialog extends JDialog implements ActionListener {
 
@@ -86,7 +90,8 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			@Override
 			public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 				Component result = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-				if (value instanceof ConstructionProperties && result instanceof JLabel) {
+				if (value instanceof Value && ((Value) value).getObject() instanceof ConstructionProperties 
+						&& result instanceof JLabel) {
 					((JLabel) result).setText("Construction properties");
 				}
 				return result;
@@ -151,6 +156,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			myConfigurationTree.removeMouseListener(myPopupListener);
 		}
 		
+		
 		if (templateMethod != null) {
 			try {
 				myConfiguration = (Configuration) templateMethod.invoke(type, new Object[0]);
@@ -165,6 +171,10 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
 			}
+		} else {
+//			myConfiguration = new ConfigurationImpl(null);
+			myConfiguration = null;
+			myConfigurationTree.setModel(new DefaultTreeModel(null));
 		}
 		
 		myOKButton.setEnabled(false);
@@ -242,7 +252,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		button.setPreferredSize(new Dimension(200, 50));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Configurable result = showDialog(button, Configurable.class, MockChildConfigurable.class);
+				Configurable result = showDialog(button, Configurable.class, MockLittleConfigurable.class);
 				System.out.println("Result: " + result);
 			}
 		});

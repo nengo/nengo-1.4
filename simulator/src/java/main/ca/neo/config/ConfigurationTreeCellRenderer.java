@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import ca.neo.config.ConfigurationTreeModel.LeafNode;
+import ca.neo.config.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
 
@@ -33,9 +33,9 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 		Icon icon = getCustomIcon(value);
 		if (icon != null) setIcon(icon);
 		
-		if (value instanceof Configurable) {
-			setText(value.getClass().getSimpleName());
-			setToolTipText(value.getClass().getCanonicalName());
+		if (value instanceof Value && ((Value) value).getObject() instanceof Configurable) {
+			setText(((Value) value).getObject().getClass().getSimpleName());
+			setToolTipText(((Value) value).getObject().getClass().getCanonicalName());
 		} else if (value instanceof Configuration.Property) {
 			Configuration.Property property = (Configuration.Property) value;
 			
@@ -46,8 +46,8 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 			setText(text.toString());
 			
 			setToolTipText(null);
-		} else if (value instanceof LeafNode) {
-			Object o = ((LeafNode) value).getObject();
+		} else if (value instanceof Value) {
+			Object o = ((Value) value).getObject();
 			Component customRenderer = ConfigurationConfiguration.getInstance().getRenderer(o);
 			if (customRenderer == null) {
 				setText(ConfigurationConfiguration.getInstance().getDisplayText(o));
@@ -64,19 +64,8 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 	}
 	
 	private Icon getCustomIcon(Object node) {
-		Object value = (node instanceof LeafNode) ? ((LeafNode) node).getObject() : node;
+		Object value = (node instanceof Value) ? ((Value) node).getObject() : node;
 		return ConfigurationConfiguration.getInstance().getIcon(value);
 	}
 	
-//	private ImageIcon createImageIcon(String path, String description) {
-//	    java.net.URL imgURL = getClass().getResource(path);
-//	    if (imgURL != null) {
-//	        return new ImageIcon(imgURL, description);
-//	    } else {
-//	        return null;
-//	    }
-//	}
-
-	
-
 }

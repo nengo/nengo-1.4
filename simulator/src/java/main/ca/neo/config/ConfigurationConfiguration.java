@@ -31,6 +31,7 @@ import ca.neo.model.Configurable;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.Units;
 import ca.neo.model.impl.MockConfigurable;
+import ca.neo.model.impl.MockConfigurable.MockLittleConfigurable;
 
 /**
  * 
@@ -280,6 +281,7 @@ public class ConfigurationConfiguration {
 		if (Configurable.class.isAssignableFrom(type)) {
 			result.add(MockConfigurable.class);
 			result.add(MockConfigurable.MockChildConfigurable.class);
+			result.add(MockLittleConfigurable.class);
 		}
 		return result;
 	}

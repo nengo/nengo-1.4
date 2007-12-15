@@ -15,6 +15,7 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 //import ca.neo.config.ConfigurationTreeModel.PropertyNode;
+import ca.neo.config.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Configuration.Property;
@@ -51,6 +52,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					JMenuItem addValueItem = new JMenuItem("Add");
 					addValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent E) {
+							//TODO: how to construct / replace non-configurables? clone?
 							myModel.addValue(this, path, "foo foo foo");
 						}
 					});
@@ -62,8 +64,8 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					final JMenuItem replaceValueItem = new JMenuItem("Replace");
 					replaceValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							Configurable c = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), path.getLastPathComponent().getClass());
-							//TODO: have to find index of value
+							Class currentType = ((Value) path.getLastPathComponent()).getObject().getClass();
+							Configurable c = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), currentType);
 							if (c != null) myModel.setValue(this, path, c);
 						}
 					});
@@ -73,6 +75,11 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					JMenuItem insertValueItem = new JMenuItem("Insert");
 					popup.add(insertValueItem);				
 					JMenuItem removeValueItem = new JMenuItem("Remove");
+					removeValueItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							myModel.removeValue(this, path);
+						}
+					});
 					popup.add(removeValueItem);				
 				}
 			}

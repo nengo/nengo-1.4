@@ -28,17 +28,15 @@ import ca.neo.model.impl.MockConfigurable;
 /**
  * Data model underlying JTree user interface for a Configurable.
  * 
- * TODO: tooltips stopped working -- did I mess with the listeners?  
- * 
  * @author Bryan Tripp
  */
 public class ConfigurationTreeModel implements TreeModel {
 
-	private Configurable myRoot;
+	private Value myRoot;
 	private List<TreeModelListener> myListeners;
 		
 	public ConfigurationTreeModel(Configurable configurable) {
-		myRoot = configurable;
+		myRoot = new Value(0, configurable);
 		myListeners = new ArrayList<TreeModelListener>(5);
 	}
 	
@@ -61,27 +59,52 @@ public class ConfigurationTreeModel implements TreeModel {
 		}		
 	}
 	
-//	public void insertValue(Property parent, int index, Object value) {
-//		
-//	}
-//	
+	//path to node to insert before
+	public void insertValue(Object source, TreePath path, Object value) {
+		try {
+			Object parent = path.getParentPath().getLastPathComponent();
+			if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
+				Property property = (Property) parent;
+				Value toInsertBefore = (Value) path.getLastPathComponent();
+				property.insert(toInsertBefore.getIndex(), value);
+				
+				Value node = new Value(toInsertBefore.getIndex(), value);
+				TreeModelEvent event = new TreeModelEvent(source, path.getParentPath(), new int[]{toInsertBefore.getIndex()}, new Object[]{node});
+				for (int i = 0; i <myListeners.size(); i++) {
+					myListeners.get(i).treeNodesInserted(event);						
+				}
+				
+				//TODO: change later indices and fire events (new method)
+			} else {
+				throw new RuntimeException("Can't set value on child of " + parent.getClass().getName());
+			}
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		}
+	}	
 
 	public void setValue(Object source, TreePath path, Object value) {
 		try {
 			Object parent = path.getParentPath().getLastPathComponent();
-			if (parent instanceof Property 
-					&& (path.getLastPathComponent() instanceof LeafNode || path.getLastPathComponent() instanceof Configurable)) {
+			if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
 				Property property = (Property) parent;
-				int index = ((LeafNode) path.getLastPathComponent()).getIndex();
+				int index = ((Value) path.getLastPathComponent()).getIndex();
 				property.setValue(index, value);
 				
-				LeafNode child = (LeafNode) path.getLastPathComponent();
+				Value child = (Value) path.getLastPathComponent();
 				child.setObject(value);
 				
-				TreePath foo = new TreePath(new Object[]{parent, child});
-				TreeModelEvent event = new TreeModelEvent(source, foo, new int[]{index}, new Object[]{child});
-				for (int i = 0; i <myListeners.size(); i++) {
-					myListeners.get(i).treeNodesChanged(event);
+				if (child.getObject() instanceof Configurable) {
+					TreeModelEvent event = new TreeModelEvent(source, path);
+					for (int i = 0; i <myListeners.size(); i++) {
+						myListeners.get(i).treeStructureChanged(event);						
+					}
+				} else {
+					TreePath shortPath = new TreePath(new Object[]{parent, child});
+					TreeModelEvent event = new TreeModelEvent(source, shortPath, new int[]{index}, new Object[]{child});
+					for (int i = 0; i <myListeners.size(); i++) {
+						myListeners.get(i).treeNodesChanged(event);
+					}
 				}
 			} else {
 				throw new RuntimeException("Can't set value on child of " + parent.getClass().getName());
@@ -90,10 +113,28 @@ public class ConfigurationTreeModel implements TreeModel {
 			e.printStackTrace();
 		}		
 	}
-//	
-//	public void removeValue(Property parent, int index) {
-//		
-//	}
+	
+	public void removeValue(Object source, TreePath path) {
+		try {
+			Object parent = path.getParentPath().getLastPathComponent();
+			if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
+				Property property = (Property) parent;
+				Value toRemove = (Value) path.getLastPathComponent();
+				property.remove(toRemove.getIndex());
+				
+				TreeModelEvent event = new TreeModelEvent(source, path.getParentPath(), new int[]{toRemove.getIndex()}, new Object[]{toRemove});
+				for (int i = 0; i <myListeners.size(); i++) {
+					myListeners.get(i).treeNodesRemoved(event);						
+				}	
+
+				//TODO: change later indices and fire events (new method)				
+			} else {
+				throw new RuntimeException("Can't set value on child of " + parent.getClass().getName());
+			}
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
@@ -101,19 +142,15 @@ public class ConfigurationTreeModel implements TreeModel {
 	public Object getChild(Object parent, int index) {
 		Object result = null;
 		try {
-			if (parent instanceof Configurable) {
-				Configuration c = ((Configurable) parent).getConfiguration();
+			if (parent instanceof Value && ((Value) parent).getObject() instanceof Configurable) {
+				Configuration c = ((Configurable) ((Value) parent).getObject()).getConfiguration();
 				List<String> propertyNames = c.getPropertyNames();
 				Collections.sort(propertyNames);
 				result = c.getProperty(propertyNames.get(index));
 			} else if (parent instanceof Property) {
 				Property p = (Property) parent;
 				Object o = p.getValue(index);
-				if (o instanceof Configurable) {
-					result = (Configurable) o;
-				} else { 
-					result = new LeafNode(index, o); //TODO: adjust indices with insertions and removals
-				}	
+				result = new Value(index, o); //TODO: adjust indices with insertions and removals
 			}			
 		} catch (StructuralException e) {
 			throw new RuntimeException(e);
@@ -128,8 +165,8 @@ public class ConfigurationTreeModel implements TreeModel {
 	public int getChildCount(Object parent) {
 		int result = 0;
 		
-		if (parent instanceof Configurable) {
-			result = ((Configurable) parent).getConfiguration().getPropertyNames().size();
+		if (parent instanceof Value && ((Value) parent).getObject() instanceof Configurable) {
+			result = ((Configurable) ((Value) parent).getObject()).getConfiguration().getPropertyNames().size();
 		} else if (parent instanceof Property) {
 			result = ((Property) parent).getNumValues();
 		}
@@ -144,8 +181,8 @@ public class ConfigurationTreeModel implements TreeModel {
 		int index = -1;
 		
 		try {
-			if (parent instanceof Configurable && child instanceof Property) {
-				Configuration c = ((Configurable) parent).getConfiguration();
+			if (child instanceof Property) {
+				Configuration c = ((Configurable) ((Value) parent).getObject()).getConfiguration();
 				Property p = (Property) child;
 				List<String> propertyNames = c.getPropertyNames();
 				Collections.sort(propertyNames);
@@ -174,7 +211,7 @@ public class ConfigurationTreeModel implements TreeModel {
 	 * @see javax.swing.tree.TreeModel#isLeaf(java.lang.Object)
 	 */
 	public boolean isLeaf(Object o) {
-		return ( !(o instanceof Configurable) && !(o instanceof Property) );
+		return ( !(o instanceof Value && ((Value) o).getObject() instanceof Configurable) && !(o instanceof Property) );
 	}
 
 	/**
@@ -195,12 +232,12 @@ public class ConfigurationTreeModel implements TreeModel {
 		// TODO Auto-generated method stub
 	}
 	
-	public static class LeafNode {
+	public static class Value {
 		
 		private int myIndex;
 		private Object myObject;
 		
-		public LeafNode(int index, Object object) {
+		public Value(int index, Object object) {
 			myIndex = index;
 			myObject = object;
 		}

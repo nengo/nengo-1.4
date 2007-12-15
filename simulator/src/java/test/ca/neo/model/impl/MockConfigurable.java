@@ -87,7 +87,6 @@ public class MockConfigurable implements Configurable {
 			@Override
 			public void addValue(Object value) throws StructuralException {
 				myMultiValuedField.add((String) value); 
-				System.out.println("length: " + myMultiValuedField.size());
 				addValueCompleted(value);
 			}
 
