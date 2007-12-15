@@ -101,9 +101,9 @@ public class UITermination extends Widget implements ILineTermination {
 	protected void constructWidgetMenu(AbstractMenuBuilder menu) {
 		super.constructWidgetMenu(menu);
 
-		if (getLineEnd() != null) {
+		if (getConnector() != null) {
 			menu.addAction(new RemoveConnectionAction("Disconnect",
-					getLineEnd()));
+					getConnector()));
 		}
 
 		AbstractMenuBuilder configureMenu = menu.createSubMenu("Configure");
@@ -159,7 +159,7 @@ public class UITermination extends Widget implements ILineTermination {
 		return null;
 	}
 
-	public LineConnector getLineEnd() {
+	public LineConnector getConnector() {
 		List<?> children = getChildrenReference();
 
 		for (Object obj : children) {

@@ -13,7 +13,7 @@ import javax.swing.JPopupMenu;
 
 import ca.neo.model.Node;
 import ca.neo.ui.actions.LayoutAction;
-import ca.neo.ui.actions.SaveNodeContainerAction;
+import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.ModelsContextMenu;
 import ca.neo.ui.models.UIModel;
@@ -285,8 +285,7 @@ public abstract class NodeViewer extends World implements Interactable,
 		 * File menu
 		 */
 		menu.addSection("File");
-		menu.addAction(new SaveNodeContainerAction("Save "
-				+ getViewerParent().getTypeName(), getViewerParent()));
+		menu.addAction(new SaveNodeAction(getViewerParent()));
 	}
 
 	/**

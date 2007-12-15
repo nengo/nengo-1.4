@@ -7,15 +7,10 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
 import ca.neo.io.FileManager;
-import ca.neo.model.Ensemble;
-import ca.neo.model.Network;
-import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.Node;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.nodes.UIEnsemble;
-import ca.neo.ui.models.nodes.UINEFEnsemble;
-import ca.neo.ui.models.nodes.UINetwork;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.AbstractActivity;
@@ -96,44 +91,7 @@ public class OpenNeoFileAction extends StandardAction {
 		this.nodeContainer = nodeContainer;
 	}
 
-	/**
-	 * Tries to open the loaded object as an Ensemble and wrap it with a UI
-	 * object
-	 * 
-	 * @param objLoaded
-	 * @return An Ensemble UI Wrapper around the loaded object
-	 */
-	protected UINeoNode openAsEnsemble(Object objLoaded) {
-
-		UIEnsemble ensembleUI = null;
-		if (objLoaded instanceof Ensemble) {
-			ensembleUI = new UIEnsemble((Ensemble) objLoaded);
-		} else if (objLoaded instanceof NEFEnsemble) {
-			ensembleUI = new UINEFEnsemble((NEFEnsemble) objLoaded);
-		}
-		if (ensembleUI != null)
-			return ensembleUI;
-		else
-			return null;
-	}
-
-	/**
-	 * Tries to open the loaded object as an Network and wrap it with a UI
-	 * object
-	 * 
-	 * @param objLoaded
-	 * @return An Network UI Wrapper around the loaded object
-	 */
-	protected UINeoNode openAsNetwork(Object objLoaded) {
-		if (objLoaded instanceof Network) {
-			UINetwork networkUI = new UINetwork((Network) objLoaded);
-
-			return networkUI;
-
-		} else
-			return null;
-
-	}
+	
 
 	/**
 	 * Wraps the loaded object and adds it to the Node Container
@@ -142,16 +100,12 @@ public class OpenNeoFileAction extends StandardAction {
 	 *            Loaded object
 	 */
 	protected void processLoadedObject(Object objLoaded) {
-		UINeoNode node;
-		node = openAsNetwork(objLoaded);
-		if (node == null)
-			node = openAsEnsemble(objLoaded);
 
-		if (node != null) {
-			nodeContainer.addNeoNode(node);
+		if (objLoaded instanceof Node) {
+			UINeoNode nodeUI = UINeoNode.createNodeUI((Node) objLoaded);
+			nodeContainer.addNeoNode(nodeUI);
 		} else {
-			UserMessages
-					.showError("Could not load Model (must be a Network / (NEF) Ensemble)");
+			UserMessages.showError("File does not contain a Node");
 		}
 
 	}

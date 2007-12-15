@@ -2,7 +2,6 @@ package ca.neo.ui.models.nodes;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Ensemble;
-import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
@@ -23,12 +22,6 @@ import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 public class UIEnsemble extends NodeContainer {
 
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * File name for saving this ensemble
-	 */
-	private String fileName = getName() + "."
-			+ NeoGraphics.ENSEMBLE_FILE_EXTENSION;
 
 	private UISpikeProbe spikeCollector;
 
@@ -94,11 +87,6 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
-	public String getFileName() {
-		return fileName;
-	}
-
-	@Override
 	public Ensemble getModel() {
 		return (Ensemble) super.getModel();
 	}
@@ -125,8 +113,12 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setModel(Object model) {
+		super.setModel(model);
+
+		if (getModel().isCollectingSpikes()) {
+			collectSpikes(true);
+		}
 	}
 
 	/**
@@ -184,14 +176,5 @@ public class UIEnsemble extends NodeContainer {
 			collectSpikes(true);
 		}
 
-	}
-
-	@Override
-	public void setModel(Object model) {
-		super.setModel(model);
-
-		if (getModel().isCollectingSpikes()) {
-			collectSpikes(true);
-		}
 	}
 }

@@ -433,7 +433,7 @@ public class NetworkViewer extends NodeViewer {
 			 * only add nodes if they don't already exist
 			 */
 			if (getNode(node.getName()) == null) {
-				UINeoNode nodeUI = UIModels.createUIFromModel(node);
+				UINeoNode nodeUI = UINeoNode.createNodeUI(node);
 				addNeoNode(nodeUI, false, false, false);
 			}
 		}

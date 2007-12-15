@@ -10,6 +10,6 @@ public interface ILineTermination {
 	/**
 	 * @return Line end being held
 	 */
-	public LineConnector getLineEnd();
+	public LineConnector getConnector();
 
 }

@@ -1,5 +1,8 @@
 package ca.neo.ui.models.nodes;
 
+import java.io.File;
+import java.io.IOException;
+
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.impl.NetworkImpl;
@@ -159,9 +162,9 @@ public class UINetwork extends NodeContainer {
 	}
 
 	@Override
-	public void setFileName(String fileName) {
-		getUIConfig().setFileName(fileName);
-
+	public void saveModel(File file) throws IOException {
+		getUIConfig().setFileName(file.toString());
+		super.saveModel(file);
 	}
 
 	/**

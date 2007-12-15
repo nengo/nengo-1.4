@@ -1,6 +1,8 @@
 package ca.neo.ui.models;
 
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
@@ -10,6 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ca.neo.io.FileManager;
+import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
@@ -17,14 +21,25 @@ import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.model.impl.FunctionInput;
+import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.neuron.Neuron;
+import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.actions.AddProbeAction;
+import ca.neo.ui.actions.SaveNodeAction;
+import ca.neo.ui.models.nodes.UIEnsemble;
+import ca.neo.ui.models.nodes.UIFunctionInput;
+import ca.neo.ui.models.nodes.UIGenericNode;
+import ca.neo.ui.models.nodes.UINEFEnsemble;
+import ca.neo.ui.models.nodes.UINetwork;
+import ca.neo.ui.models.nodes.UINeuron;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UIProbe;
 import ca.neo.ui.models.nodes.widgets.UIStateProbe;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.ui.models.nodes.widgets.Widget;
-import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.neo.util.Probe;
@@ -32,6 +47,7 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
+import ca.shu.ui.lib.objects.activities.TransientStatusMessage;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
@@ -46,6 +62,31 @@ import edu.uci.ics.jung.graph.Vertex;
  * @author Shu
  */
 public abstract class UINeoNode extends UIModelConfigurable {
+	/**
+	 * Factory method which creates a Node UI object around a Node
+	 * 
+	 * @param node
+	 *            Node to be wrapped
+	 * @return Node UI Wrapper
+	 */
+	public static UINeoNode createNodeUI(Node node) {
+
+		UINeoNode nodeUI = null;
+		if (node instanceof Network) {
+			nodeUI = new UINetwork((Network) node);
+		} else if (node instanceof Ensemble) {
+			nodeUI = new UIEnsemble((Ensemble) node);
+		} else if (node instanceof NEFEnsemble) {
+			nodeUI = new UINEFEnsemble((NEFEnsemble) node);
+		} else if (node instanceof Neuron) {
+			nodeUI = new UINeuron((Neuron) node);
+		} else if (node instanceof FunctionInput) {
+			nodeUI = new UIFunctionInput((FunctionInput) node);
+		} else {
+			nodeUI = new UIGenericNode(node);
+		}
+		return nodeUI;
+	}
 
 	/**
 	 * Attached probes
@@ -103,53 +144,69 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	/**
-	 * Called when a new probe is added
-	 * 
-	 * @param probeUI
-	 *            New probe that was just added
+	 * @param widget
+	 *            Widget to be added
 	 */
-	protected void newProbeAdded(UIProbe probeUI) {
-		if (probes == null)
-			probes = new Vector<UIProbe>();
+	protected void addWidget(Widget widget) {
+		widget.setScale(0.5);
+		addChild(widget);
+	}
 
-		addChild(probeUI);
-		probes.add(probeUI);
-
+	@SuppressWarnings("unchecked")
+	protected void constructDataCollectionMenu(AbstractMenuBuilder menu) {
 		/*
-		 * Assign the probe to a Origin / Termination
+		 * Build the "add probe" menu
 		 */
+		AbstractMenuBuilder probesMenu = menu.createSubMenu("Add probe");
+		boolean somethingFound = false;
+		if (getModel() instanceof Probeable) {
 
-		WorldObject probeHolder = null;
+			Probeable probeable = (Probeable) getModel();
+			Properties states = probeable.listStates();
 
-		Origin origin = null;
-		try {
-			origin = getModel().getOrigin(probeUI.getName());
+			// Enumeration e = states.elements();
+			Iterator<?> it = states.entrySet().iterator();
 
-		} catch (StructuralException e1) {
-		}
+			while (it.hasNext()) {
+				somethingFound = true;
+				Entry<String, String> el = (Entry<String, String>) it.next();
+				probesMenu.addAction(new AddProbeAction(this, el));
 
-		if (origin != null) {
-			probeHolder = showOrigin(origin.getName());
-		} else if (origin == null) {
-			Termination term = null;
-			try {
-				term = getModel().getTermination(probeUI.getName());
-
-			} catch (StructuralException e) {
 			}
-			if (term != null)
-				probeHolder = showTermination(term.getName());
 		}
 
-		if (probeHolder != null) {
-			probeUI.setOffset(0, probeHolder.getHeight() / 2);
-			probeHolder.addChild(probeUI);
-
-		} else {
-			addChild(probeUI);
+		if (!somethingFound) {
+			probesMenu.addLabel("Nothing probeable");
 		}
 
-		// assignProbes();
+	}
+
+	@Override
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
+
+		menu.addSection("File");
+		menu.addAction(new SaveNodeAction(this));
+
+		menu.addSection("View");
+		AbstractMenuBuilder docMenu = menu.createSubMenu("Documentation");
+		docMenu.addAction(new SetDocumentationAction("Set"));
+		docMenu.addAction(new ViewDocumentationAction("View"));
+		constructViewMenu(menu);
+
+		menu.addSection("Data Collection");
+		constructDataCollectionMenu(menu);
+
+	}
+
+	@Override
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
+
+		tooltips.addPart(new TooltipProperty("Documentation", getModel()
+				.getDocumentation()));
+		tooltips.addPart(new TooltipProperty("Simulation mode", getModel()
+				.getMode().toString()));
 
 	}
 
@@ -190,62 +247,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		}
 		originsAndTerminations.addAction(new ShowAllOandTAction("Show all"));
 		originsAndTerminations.addAction(new HideAllOandTAction("Hide all"));
-
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void constructDataCollectionMenu(AbstractMenuBuilder menu) {
-		/*
-		 * Build the "add probe" menu
-		 */
-		AbstractMenuBuilder probesMenu = menu.createSubMenu("Add probe");
-		boolean somethingFound = false;
-		if (getModel() instanceof Probeable) {
-
-			Probeable probeable = (Probeable) getModel();
-			Properties states = probeable.listStates();
-
-			// Enumeration e = states.elements();
-			Iterator<?> it = states.entrySet().iterator();
-
-			while (it.hasNext()) {
-				somethingFound = true;
-				Entry<String, String> el = (Entry<String, String>) it.next();
-				probesMenu.addAction(new AddProbeAction(this, el));
-
-			}
-		}
-
-		if (!somethingFound) {
-			probesMenu.addLabel("Nothing probeable");
-		}
-
-	}
-
-	@Override
-	protected void constructMenu(PopupMenuBuilder menu) {
-		super.constructMenu(menu);
-
-		AbstractMenuBuilder docMenu = menu.createSubMenu("Documentation");
-		docMenu.addAction(new SetDocumentationAction("Set"));
-		docMenu.addAction(new ViewDocumentationAction("View"));
-
-		menu.addSection("View");
-		constructViewMenu(menu);
-
-		menu.addSection("Data Collection");
-		constructDataCollectionMenu(menu);
-
-	}
-
-	@Override
-	protected void constructTooltips(TooltipBuilder tooltips) {
-		super.constructTooltips(tooltips);
-
-		tooltips.addPart(new TooltipProperty("Documentation", getModel()
-				.getDocumentation()));
-		tooltips.addPart(new TooltipProperty("Simulation mode", getModel()
-				.getMode().toString()));
 
 	}
 
@@ -331,6 +332,57 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 	}
 
+	/**
+	 * Called when a new probe is added
+	 * 
+	 * @param probeUI
+	 *            New probe that was just added
+	 */
+	protected void newProbeAdded(UIProbe probeUI) {
+		if (probes == null)
+			probes = new Vector<UIProbe>();
+
+		addChild(probeUI);
+		probes.add(probeUI);
+
+		/*
+		 * Assign the probe to a Origin / Termination
+		 */
+
+		WorldObject probeHolder = null;
+
+		Origin origin = null;
+		try {
+			origin = getModel().getOrigin(probeUI.getName());
+
+		} catch (StructuralException e1) {
+		}
+
+		if (origin != null) {
+			probeHolder = showOrigin(origin.getName());
+		} else if (origin == null) {
+			Termination term = null;
+			try {
+				term = getModel().getTermination(probeUI.getName());
+
+			} catch (StructuralException e) {
+			}
+			if (term != null)
+				probeHolder = showTermination(term.getName());
+		}
+
+		if (probeHolder != null) {
+			probeUI.setOffset(0, probeHolder.getHeight() / 2);
+			probeHolder.addChild(probeUI);
+
+		} else {
+			addChild(probeUI);
+		}
+
+		// assignProbes();
+
+	}
+
 	@Override
 	protected void prepareForDestroy() {
 		NodeViewer viewer = getParentViewer();
@@ -353,12 +405,14 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	/**
-	 * @param widget
-	 *            Widget to be added
+	 * @return The default file name for this node
 	 */
-	protected void addWidget(Widget widget) {
-		widget.setScale(0.5);
-		addChild(widget);
+	public String getFileName() {
+		return this.getName() + "." + NeoGraphics.NEONODE_FILE_EXTENSION;
+	}
+
+	public String getFullName() {
+		return getName() + " (" + getTypeName() + ")";
 	}
 
 	@Override
@@ -456,6 +510,20 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		probes.remove(probe);
 		probe.destroy();
 
+	}
+
+	/**
+	 * @param file
+	 *            File to be saved in
+	 * @throws IOException
+	 *             if model cannot be saved to file
+	 */
+	public void saveModel(File file) throws IOException {
+		FileManager fm = new FileManager();
+
+		fm.save(this.getModel(), file);
+		new TransientStatusMessage(this.getFullName() + " was saved to "
+				+ file.toString(), 2500);
 	}
 
 	@Override

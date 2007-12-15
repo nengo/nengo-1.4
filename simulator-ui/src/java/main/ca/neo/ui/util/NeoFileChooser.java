@@ -17,7 +17,7 @@ import ca.shu.ui.lib.util.UIEnvironment;
 public class NeoFileChooser {
 	private static final long serialVersionUID = 1L;
 
-	private FileFilter allFileFilter, networkFileFilter, ensembleFileFilter;
+	private FileFilter allFileFilter, nodeFileFilter;
 
 	/**
 	 * Swing File Chooser component
@@ -29,12 +29,10 @@ public class NeoFileChooser {
 		fileChooser = new JFileChooser();
 
 		allFileFilter = new AllNeoFiles();
-		networkFileFilter = new NetworkFileFilter();
-		ensembleFileFilter = new EnsembleFileFilter();
+		nodeFileFilter = new NodeFileFilter();
 
 		fileChooser.addChoosableFileFilter(allFileFilter);
-		fileChooser.addChoosableFileFilter(networkFileFilter);
-		fileChooser.addChoosableFileFilter(ensembleFileFilter);
+		fileChooser.addChoosableFileFilter(nodeFileFilter);
 		fileChooser.setFileFilter(allFileFilter);
 	}
 
@@ -70,21 +68,11 @@ public class NeoFileChooser {
 	 * @return value returned by Swing File Chooser
 	 * @throws HeadlessException
 	 */
-	public int showSaveEnsembleDialog() throws HeadlessException {
-		fileChooser.setFileFilter(ensembleFileFilter);
+	public int showSaveDialog() throws HeadlessException {
+		fileChooser.setFileFilter(nodeFileFilter);
 		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
 	}
 
-	/**
-	 * Shows a dialog for saving networks
-	 * 
-	 * @return value returned by Swing File Chooser
-	 * @throws HeadlessException
-	 */
-	public int showSaveNetworkDialog() throws HeadlessException {
-		fileChooser.setFileFilter(networkFileFilter);
-		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
-	}
 }
 
 /**
@@ -97,8 +85,7 @@ class AllNeoFiles extends FileExtensionFilter {
 	@Override
 	public boolean acceptExtension(String str) {
 
-		return (str.equals(NeoGraphics.ENSEMBLE_FILE_EXTENSION) || str
-				.equals(NeoGraphics.NETWORK_FILE_EXTENSION));
+		return (str.equals(NeoGraphics.NEONODE_FILE_EXTENSION));
 	}
 
 	@Override
@@ -113,35 +100,16 @@ class AllNeoFiles extends FileExtensionFilter {
  * 
  * @author Shu Wu
  */
-class EnsembleFileFilter extends FileExtensionFilter {
+class NodeFileFilter extends FileExtensionFilter {
 
 	@Override
 	public boolean acceptExtension(String str) {
-		return (str.equals(NeoGraphics.ENSEMBLE_FILE_EXTENSION));
+		return (str.equals(NeoGraphics.NEONODE_FILE_EXTENSION));
 	}
 
 	@Override
 	public String getDescription() {
-		return "Neo Ensemble";
-	}
-
-}
-
-/**
- * File filter which only allows Network files
- * 
- * @author Shu Wu
- */
-class NetworkFileFilter extends FileExtensionFilter {
-
-	@Override
-	public boolean acceptExtension(String str) {
-		return (str.equals(NeoGraphics.NETWORK_FILE_EXTENSION));
-	}
-
-	@Override
-	public String getDescription() {
-		return "Neo Network";
+		return "NEO Node";
 	}
 
 }

@@ -11,7 +11,7 @@ import javax.swing.SwingUtilities;
 import ca.neo.model.Network;
 import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
-import ca.neo.ui.actions.SaveNodeContainerAction;
+import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.dataList.DataListView;
 import ca.neo.ui.dataList.SimulatorDataModel;
 import ca.neo.ui.models.INodeContainer;
@@ -39,25 +39,20 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
 	 */
-	public static final String ABOUT = "NeoGraphics<BR><BR>"
-			+ "(c) Copyright Center for Theoretical Neuroscience  007.  All rights reserved<BR>"
+	public static final String ABOUT = "NEO Graphics<BR><BR>"
+			+ "(c) Copyright Center for Theoretical Neuroscience 2007.  All rights reserved<BR>"
 			+ "Visit http://ctn.uwaterloo.ca/<BR>"
-			+ "<BR> User Inteface by Shu Wu";
+			+ "<BR> User Interface by Shu Wu (shuwu83@gmail.com)";
 
 	/**
-	 * File extension for Ensembles
+	 * File extension for Neo Nodes
 	 */
-	public static final String ENSEMBLE_FILE_EXTENSION = "ens";
+	public static final String NEONODE_FILE_EXTENSION = "neonode";
 
 	/**
 	 * UI delegate object used to show the FileChooser
 	 */
 	public static NeoFileChooser FileChooser;
-
-	/**
-	 * File extension for Networks
-	 */
-	public static final String NETWORK_FILE_EXTENSION = "net";
 
 	/**
 	 * Runs NeoGraphics with a default name
@@ -110,17 +105,12 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		while (it.hasNext()) {
 			Object obj = it.next();
 
-			if (obj instanceof NodeContainer) {
-				NodeContainer node = (NodeContainer) obj;
-				if (SaveNodeContainerAction.canSave(node.getModel())) {
+			if (obj instanceof UINeoNode) {
 
-					SaveNodeContainerAction saveAction = new SaveNodeContainerAction(
-							"Save model", node);
-					saveAction.doAction();
+				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) obj);
+				saveAction.doAction();
 
-				}
 			}
-
 		}
 	}
 

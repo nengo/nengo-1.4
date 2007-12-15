@@ -254,8 +254,8 @@ public class ConfigDialog extends JDialog {
 	 */
 
 	protected void createPropertiesDialog(JPanel panel) {
-		PropertyDescriptor[] propDescriptors = myConfigurer
-				.getConfigurable().getConfigSchema();
+		PropertyDescriptor[] propDescriptors = myConfigurer.getConfigurable()
+				.getConfigSchema();
 		propertyInputPanels = new Vector<PropertyInputPanel>(
 				propDescriptors.length);
 
