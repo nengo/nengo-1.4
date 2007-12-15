@@ -11,13 +11,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import ca.neo.model.Ensemble;
-import ca.neo.model.Network;
-import ca.neo.model.neuron.Neuron;
+import ca.neo.model.Node;
 import ca.neo.util.TimeSeries;
 
 /**
- * Handles saving and loading of Networks, Ensembles, and individual Neurons.   
+ * Handles saving and loading of Node   
  * 
  * TODO: a better job (this is a quick one)
  * TODO: is there any metadata to store? 
@@ -44,17 +42,9 @@ public class FileManager {
 		ourDefaultLocation = location;
 	}
 
-	public void save(Network network, File destination) throws IOException {
-		saveObject(network, destination);
+	public void save(Node node, File destination) throws IOException {
+		saveObject(node, destination);
 	}
-	
-	public void save(Ensemble ensemble, File destination) throws IOException {
-		saveObject(ensemble, destination);
-	}
-	
-	public void save(Neuron neuron, File destination) throws IOException {
-		saveObject(neuron, destination);
-	}	
 	
 	public void save(TimeSeries timeSeries, File destination) throws IOException {
 		saveObject(timeSeries, destination);
