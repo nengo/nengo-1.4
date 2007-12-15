@@ -1,5 +1,7 @@
 package ca.neo.ui.models.nodes.widgets;
 
+import java.util.List;
+
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
@@ -19,9 +21,9 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.objects.lines.ILineEndHolder;
-import ca.shu.ui.lib.objects.lines.LineEnd;
-import ca.shu.ui.lib.objects.lines.LineEndHolderIcon;
+import ca.shu.ui.lib.objects.lines.ILineTermination;
+import ca.shu.ui.lib.objects.lines.LineConnector;
+import ca.shu.ui.lib.objects.lines.LineTerminationIcon;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
@@ -33,7 +35,7 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  * 
  * @author Shu Wu
  */
-public class UITermination extends Widget implements ILineEndHolder {
+public class UITermination extends Widget implements ILineTermination {
 
 	private static final long serialVersionUID = 1L;
 
@@ -46,8 +48,6 @@ public class UITermination extends Widget implements ILineEndHolder {
 		}
 
 	}
-
-	private LineEnd lineEnd;
 
 	public UITermination(UINeoNode nodeParent) {
 		super(nodeParent);
@@ -62,7 +62,7 @@ public class UITermination extends Widget implements ILineEndHolder {
 	}
 
 	private void init() {
-		ModelIcon icon = new ModelIcon(this, new LineEndHolderIcon());
+		ModelIcon icon = new ModelIcon(this, new LineTerminationIcon());
 		icon.configureLabel(false);
 
 		setIcon(icon);
@@ -78,11 +78,15 @@ public class UITermination extends Widget implements ILineEndHolder {
 	@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
-		if (lineEnd != null) {
-			menu.addAction(new RemoveConnectionAction("Disconnect"));
+
+		menu.addSection("Termination");
+
+		if (getLineEnd() != null) {
+			menu.addAction(new RemoveConnectionAction("Disconnect",
+					getLineEnd()));
 		}
 
-		MenuBuilder configureMenu = menu.createSubMenu("Configure Termination");
+		MenuBuilder configureMenu = menu.createSubMenu("Configure");
 
 		/*
 		 * Reflectively build property editors
@@ -125,8 +129,14 @@ public class UITermination extends Widget implements ILineEndHolder {
 		return null;
 	}
 
-	public LineEnd getLineEnd() {
-		return lineEnd;
+	public LineConnector getLineEnd() {
+		List<?> children = getChildrenReference();
+
+		for (Object obj : children) {
+			if (obj instanceof LineConnector)
+				return (LineConnector) obj;
+		}
+		return null;
 	}
 
 	@Override
@@ -149,21 +159,6 @@ public class UITermination extends Widget implements ILineEndHolder {
 	public float[][] getWeights() {
 		return (float[][]) getModel().getConfiguration().getProperty(
 				Termination.WEIGHTS);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.shu.ui.lib.objects.lines.ILineAcceptor#setLineEnd(ca.shu.ui.lib.objects.lines.LineEnd)
-	 */
-	public boolean setLineEnd(LineEnd lineEnd) {
-		this.lineEnd = lineEnd;
-		if (lineEnd != null) {
-			addChild(lineEnd);
-			this.lineEnd = lineEnd;
-
-		}
-		return true;
 	}
 
 	/**
@@ -272,23 +267,26 @@ public class UITermination extends Widget implements ILineEndHolder {
 			setWeights(oldWeights);
 		}
 	}
+}
 
-	/**
-	 * Action for removing attached connection from the termination
-	 * 
-	 * @author Shu Wu
-	 */
-	class RemoveConnectionAction extends StandardAction {
-		private static final long serialVersionUID = 1L;
+/**
+ * Action for removing attached connection from the termination
+ * 
+ * @author Shu Wu
+ */
+class RemoveConnectionAction extends StandardAction {
+	private static final long serialVersionUID = 1L;
+	private LineConnector lineEndToRemove;
 
-		public RemoveConnectionAction(String actionName) {
-			super("Remove connection from Termination", actionName);
-		}
+	public RemoveConnectionAction(String actionName,
+			LineConnector lineEndToRemove) {
+		super("Remove connection from Termination", actionName);
+		this.lineEndToRemove = lineEndToRemove;
+	}
 
-		@Override
-		protected void action() throws ActionException {
-			lineEnd.destroy();
-			lineEnd = null;
-		}
+	@Override
+	protected void action() throws ActionException {
+		lineEndToRemove.destroy();
+		lineEndToRemove = null;
 	}
 }

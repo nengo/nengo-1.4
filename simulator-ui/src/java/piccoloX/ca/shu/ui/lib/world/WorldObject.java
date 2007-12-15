@@ -26,6 +26,7 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 * position
 	 */
 	public static final String PROPERTY_GLOBAL_BOUNDS = "globalBounds";
+	public static final String PROPERTY_DESTROYED = "destroyed";
 
 	/**
 	 * Current Piccolo activity
@@ -172,6 +173,8 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 				}
 			}
 			removeFromParent();
+
+			firePropertyChange(0, PROPERTY_DESTROYED, null, null);
 		}
 	}
 
@@ -239,13 +242,6 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 */
 	public boolean isSelectable() {
 		return isSelectable;
-	}
-
-	/**
-	 * When this object is dropped by a Handler which support drag and drop
-	 */
-	public void justDropped() {
-
 	}
 
 	/**

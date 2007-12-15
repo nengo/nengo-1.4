@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import ca.shu.ui.lib.objects.Window;
+import ca.shu.ui.lib.world.IDroppable;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 
@@ -44,7 +45,7 @@ public class DragAction extends ReversableAction {
 			WeakReference<WorldObject> woRef = new WeakReference<WorldObject>(
 					wo);
 			selectedObjectsRef.add(woRef);
-			
+
 			ObjectState state = new ObjectState(wo.getParent(), wo.getOffset());
 			objectStates.put(woRef, state);
 
@@ -98,9 +99,34 @@ public class DragAction extends ReversableAction {
 					fParent.addChild(node);
 					node.setOffset(state.getFinalOffset());
 
-					node.justDropped();
+					dropNode(node);
+
 				}
 			}
+		}
+	}
+
+	public static void dropNode(WorldObject node) {
+		if (node instanceof IDroppable) {
+			IDroppable droppable = (IDroppable) node;
+
+			ArrayList<PNode> results = new ArrayList<PNode>(20);
+			((WorldObject) node.getWorldLayer()).findIntersectingNodes(node
+					.localToGlobal(node.getBounds()), results);
+
+			ArrayList<WorldObject> targets = new ArrayList<WorldObject>(results.size());
+
+			for (PNode targetNode : results) {
+				if (targetNode instanceof WorldObject) {
+					WorldObject targetWo = (WorldObject) targetNode;
+
+					targets.add(targetWo);
+
+				}
+			}
+
+			droppable.justDropped(targets);
+
 		}
 	}
 
@@ -119,7 +145,7 @@ public class DragAction extends ReversableAction {
 						iParent.addChild(wo);
 						wo.setOffset(state.getInitialOffset());
 
-						wo.justDropped();
+						dropNode(wo);
 					}
 				}
 			}

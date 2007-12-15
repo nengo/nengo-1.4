@@ -13,7 +13,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * 
  * @author Shu Wu
  */
-public class LineEndWellIcon extends WorldObject {
+public class LineOriginIcon extends WorldObject {
 
 	private static final int _LINE_END_HEIGHT = 30;
 
@@ -27,7 +27,7 @@ public class LineEndWellIcon extends WorldObject {
 
 	private Color color = Style.COLOR_FOREGROUND;
 
-	public LineEndWellIcon() {
+	public LineOriginIcon() {
 		super();
 		this.setBounds(0, 0, _LINE_END_WIDTH, _LINE_END_HEIGHT);
 		setColor(Style.COLOR_LINEENDWELL);

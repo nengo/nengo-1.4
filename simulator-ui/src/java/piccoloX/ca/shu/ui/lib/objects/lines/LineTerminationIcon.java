@@ -14,7 +14,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * 
  * @author Shu Wu
  */
-public class LineEndHolderIcon extends WorldObject {
+public class LineTerminationIcon extends WorldObject {
 
 	private static final long serialVersionUID = 1L;
 
@@ -24,7 +24,7 @@ public class LineEndHolderIcon extends WorldObject {
 
 	private Color myColor = Style.COLOR_LINEIN;
 
-	public LineEndHolderIcon() {
+	public LineTerminationIcon() {
 		super();
 		this.setBounds(0, 0, LINE_IN_WIDTH, LINE_IN_HEIGHT);
 		this.setSelectable(false);

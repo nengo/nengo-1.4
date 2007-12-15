@@ -7,14 +7,14 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PPickPath;
 
-public class LineEndWell extends WorldObject {
+public abstract class LineWell extends WorldObject {
 
 	private static final long serialVersionUID = 1L;
 
-	public LineEndWell() {
+	public LineWell() {
 		super();
 
-		WorldObject icon = new LineEndWellIcon();
+		WorldObject icon = new LineOriginIcon();
 
 		addChild(icon);
 		setBounds(getFullBounds());
@@ -29,16 +29,14 @@ public class LineEndWell extends WorldObject {
 	/**
 	 * @return new LineEnd
 	 */
-	protected LineEnd constructLineEnd() {
-		return new LineEnd(this);
-	}
+	protected abstract LineConnector constructLineEnd();
 
 	/**
 	 * @return The new LineEnd which has been created and added to the
 	 *         LineEndWell
 	 */
-	protected LineEnd createAndAddLineEnd() {
-		LineEnd newLineEnd = constructLineEnd();
+	protected LineConnector createAndAddLineEnd() {
+		LineConnector newLineEnd = constructLineEnd();
 		addChild(newLineEnd);
 		return newLineEnd;
 	}
@@ -53,11 +51,11 @@ public class LineEndWell extends WorldObject {
  */
 class CreateLineEndHandler extends PBasicInputEventHandler {
 
-	private LineEndWell lineEndWell;
+	private LineWell lineEndWell;
 
-	private LineEnd newLineEnd;
+	private LineConnector newLineEnd;
 
-	public CreateLineEndHandler(LineEndWell lineEndWell) {
+	public CreateLineEndHandler(LineWell lineEndWell) {
 		super();
 		this.lineEndWell = lineEndWell;
 

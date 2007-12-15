@@ -8,7 +8,6 @@ import javax.swing.Action;
 import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * A standard non-reversable action

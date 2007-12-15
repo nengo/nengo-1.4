@@ -1,12 +1,13 @@
 *******************************************
  Done
 *******************************************
-12/19/07 - New Ensemble decoded origin dialog now only shows common origins in child nodes 
-12/19/07 - Decoded ensembles & nodes under construction should fade in & out
-12/19/07 - Due to memory considerations, dimension expansion on 
+12/15/07 - Improved drag & drop handling code
+12/09/07 - New Ensemble decoded origin dialog now only shows common origins in child nodes 
+12/09/07 - Decoded ensembles & nodes under construction should fade in & out
+12/09/07 - Due to memory considerations, dimension expansion on 
 			TimeSeries nodes in DataListViewer requires a user action
 			it is no longer automatic
-12/19/07 -  Container nodes in the Data List viewer are sorted.
+12/09/07 -  Container nodes in the Data List viewer are sorted.
 
 11/26/07 - DragAction no longer has hard references to objects
 11/22/07 - Export data files
@@ -18,10 +19,30 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Doing next:
 
-Plotting things together,labelling the plots 
+Add weak reference to UI Nodes from DataListView
+	Support feature such as focus on node (check node.isDestroyed && node is not hidden)
+
+Request: Listener interface for models, networks and simulators UI updates when model changes.
+	UpdateUIFromModel()
+		Ensembles - origins and terminations have to be checked
+
+Aggregate actions: actions can be chained, and this chain undone.
+
+    * Network exposeOrigin & exposeTermination
+    * Investigate loading code on the fly
+    * Drag & Drop improvements (might support future features)
+    	3) It would be great if people could load their own code on the fly,
+		e.g. by going to the file system for a jar. I'm a little hazy on
+		classloading, but this is straightforward, right? If you load the
+		first UI class with a custom classloader, then the custom classloader
+		should be used from then on? And the custom classloader could just be
+		URLClassLoader, with addURL(...) made public?
 
 
+
+Proper labelling for multiple plots 
 
 Ah, I don't think we'd talked about supporting that last thing in the UI, but it would be good (e.g. right-click an origin and select "externalize").
 Or "expose" rather. See Network.exposeOrigin() and exposeTermination()
@@ -30,29 +51,9 @@ Clean up menus
 
 Replacing ensembles in place - Instead, why not change parameters
 
+
 Manage views: Network, Brain, Data
 
-I just wrote a static method you can use for this:
-AbstractEnsemble.findCommon1DOrigins().
-
-While an action is in progress, some other actions should be blocked (such as run simulator).
-
-If an ensemble is collecting spikes, show it in the UI
-
-Use JTree to draw data list view
-	http://java.sun.com/docs/books/tutorial/uiswing/components/tree.html
-
-
-You know, I'm not sure you even need that. I can imagine creating an
-origin that takes 20 minutes (it can take longer depending on the # of
-nodes) and then realizing in the mean time that I wanted to run the
-rest of the network again for some reason (without the new Origin). If
-there was an empty Termination that the Origin was supposed to project
-to, then it would error when it ran, but if not, no problem.
-
-I'd say just don't let the user connect the Origin until it's ready,
-and make it clear somehow in the meantime that it isn't ready yet but
-will be.
 
 *******************************************
  Pri 1 - to do
