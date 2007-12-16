@@ -450,15 +450,22 @@ public abstract class NodeViewer extends World implements Interactable,
  */
 class ModelStatusBarHandler extends AbstractStatusHandler {
 
-	public ModelStatusBarHandler(World world) {
+	public ModelStatusBarHandler(NodeViewer world) {
 		super(world);
+	}
+
+	@Override
+	protected NodeViewer getWorld() {
+		return (NodeViewer) super.getWorld();
 	}
 
 	@Override
 	protected String getStatusMessage(PInputEvent event) {
 		UIModel wo = (UIModel) Util.getNodeFromPickPath(event, UIModel.class);
 
-		StringBuilder statuStr = new StringBuilder(getWorld().getName() + " | ");
+		StringBuilder statuStr = new StringBuilder(getWorld().getViewerParent()
+				.getFullName()
+				+ " | ");
 
 		if (getWorld().getSelection().size() > 1) {
 			statuStr.append(getWorld().getSelection().size()
@@ -467,8 +474,7 @@ class ModelStatusBarHandler extends AbstractStatusHandler {
 		} else {
 
 			if (wo != null) {
-				statuStr.append("Model name: " + wo.getName() + " ("
-						+ wo.getTypeName() + ")");
+				statuStr.append(wo.getFullName());
 			} else {
 				statuStr.append("No Model Selected");
 			}

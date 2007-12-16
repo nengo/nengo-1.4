@@ -1,8 +1,11 @@
 *******************************************
  Done
 *******************************************
+12/15/07 - Updated menu styles, Improved Windowing behavior when overlapped, Aesthetic improvements
+12/15/07 - Support saving/opening of any NEO Node
 12/15/07 - Expose Origin and Expose Termination.
 12/15/07 - Improved drag & drop handling code
+
 12/09/07 - New Ensemble decoded origin dialog now only shows common origins in child nodes 
 12/09/07 - Decoded ensembles & nodes under construction should fade in & out
 12/09/07 - Due to memory considerations, dimension expansion on 

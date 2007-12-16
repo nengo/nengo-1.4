@@ -56,7 +56,6 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	public UIModel() {
 		super();
 	}
-
 	/**
 	 * Create a UI Wrapper around a NEO Model
 	 * 
@@ -119,10 +118,25 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	}
 
 	/**
+	 * Called if this object is double clicked on
+	 */
+	@Override
+	public void doubleClicked() {
+		super.doubleClicked();
+		if (getWorld() != null) {
+			getWorld().zoomToObject(this);
+		}
+	}
+
+	/**
 	 * Fires when the NEO model has changed
 	 */
 	public void fireModelPropertyChanged() {
 		firePropertyChange(0, PROPERTY_MODEL, null, null);
+	}
+
+	public String getFullName() {
+		return getName() + " (" + getTypeName() + ")";
 	}
 
 	/**
@@ -172,24 +186,6 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	public void setModel(Object model) {
 		this.model = model;
 		fireModelPropertyChanged();
-	}
-
-	/**
-	 * Called if this object is double clicked on
-	 */
-	@Override
-	public void doubleClicked() {
-		super.doubleClicked();
-		if (getWorld() != null) {
-			getWorld().zoomToObject(this);
-		}
-	}
-
-	/**
-	 * Updates the UI from the model
-	 */
-	public final void updateModel() {
-		setModel(getModel());
 	}
 
 	/**
@@ -252,6 +248,13 @@ public abstract class UIModel extends WorldObject implements Interactable {
 			constructTooltips(tooltipBuilder);
 		}
 		return tooltipBuilder;
+	}
+
+	/**
+	 * Updates the UI from the model
+	 */
+	public final void updateModel() {
+		setModel(getModel());
 	}
 
 }

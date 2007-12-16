@@ -416,10 +416,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		return this.getName() + "." + NeoGraphics.NEONODE_FILE_EXTENSION;
 	}
 
-	public String getFullName() {
-		return getName() + " (" + getTypeName() + ")";
-	}
-
 	@Override
 	public Node getModel() {
 		return (Node) super.getModel();
