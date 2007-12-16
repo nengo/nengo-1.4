@@ -13,7 +13,6 @@ import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -37,7 +36,7 @@ public class Window extends WorldObject implements Interactable {
 
 	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.NORMAL;
 
-	private final PPath menubar;
+	private final MenuBar menubar;
 
 	private Border myBorder;
 
@@ -53,7 +52,7 @@ public class Window extends WorldObject implements Interactable {
 
 	private WindowState myState = WINDOW_STATE_DEFAULT;
 
-	private WindowState savedRestoreState = WINDOW_STATE_DEFAULT;
+	private WindowState savedWindowState = WINDOW_STATE_DEFAULT;
 
 	private PBounds savedWindowBounds;
 
@@ -127,6 +126,7 @@ public class Window extends WorldObject implements Interactable {
 	}
 
 	protected void windowStateChanged() {
+		menubar.updateButtons();
 		switch (myState) {
 		case MAXIMIZED:
 
@@ -246,14 +246,6 @@ public class Window extends WorldObject implements Interactable {
 		return myState;
 	}
 
-	/**
-	 * Decreases the size of the window through state transitions
-	 */
-	public void minimizeWindow() {
-		setWindowState(WindowState.MINIMIZED);
-
-	}
-
 	@Override
 	public void moveToFront() {
 		super.moveToFront();
@@ -262,14 +254,8 @@ public class Window extends WorldObject implements Interactable {
 		}
 	}
 
-	public void restoreWindow() {
-		setWindowState(savedRestoreState);
-	}
-
-	@Override
-	public void setParent(PNode newParent) {
-		// TODO Auto-generated method stub
-		super.setParent(newParent);
+	public void restoreSavedWindow() {
+		setWindowState(savedWindowState);
 	}
 
 	public void setWindowState(WindowState state) {
@@ -287,7 +273,7 @@ public class Window extends WorldObject implements Interactable {
 			 * Saves the previous window state
 			 */
 			if (state == WindowState.MINIMIZED) {
-				savedRestoreState = myState;
+				savedWindowState = myState;
 			}
 
 			myState = state;
@@ -311,55 +297,70 @@ public class Window extends WorldObject implements Interactable {
 class MenuBar extends PPath implements PInputEventListener {
 
 	private static final long serialVersionUID = 1L;
-	private TextButton cycleButton, minimizeButton, closeButton;
-	private TextNode title;
+	private AbstractButton maximizeButton, minimizeButton, closeButton,
+			normalButton;
+	private PXText title;
 
-	private Window window;
+	private Window myWindow;
 
 	public MenuBar(Window window) {
 		super(new Rectangle2D.Double(0, 0, 1, 1));
-		this.window = window;
+		this.myWindow = window;
 
 		addInputEventListener(this);
 		init();
 	}
 
 	private void init() {
-		title = new TextNode(window.getName());
+		title = new PXText(myWindow.getName());
 		title.setFont(Style.FONT_LARGE);
 		addChild(title);
 
-		cycleButton = new TextButton("=", new Runnable() {
+		normalButton = new ImageButton("images/icons/restore.gif",
+				new Runnable() {
+					public void run() {
+						myWindow.setWindowState(Window.WindowState.NORMAL);
+					}
+				});
+
+		maximizeButton = new ImageButton("images/icons/maximize.gif",
+				new Runnable() {
+					public void run() {
+						myWindow.setWindowState(Window.WindowState.MAXIMIZED);
+					}
+				});
+
+		minimizeButton = new ImageButton("images/icons/minimize.gif",
+				new Runnable() {
+					public void run() {
+						myWindow.setWindowState(Window.WindowState.MINIMIZED);
+					}
+				});
+
+		closeButton = new ImageButton("images/icons/close.gif", new Runnable() {
 			public void run() {
-				window.cycleVisibleWindowState();
+				myWindow.close();
 			}
 		});
-		cycleButton.setDefaultColor(null);
-		cycleButton.setStrokePaint(null);
-		cycleButton.setFont(Style.FONT_WINDOW_BUTTONS);
 
-		minimizeButton = new TextButton("-", new Runnable() {
-			public void run() {
-				window.minimizeWindow();
-			}
-		});
-		minimizeButton.setDefaultColor(null);
-		minimizeButton.setStrokePaint(null);
-		minimizeButton.setFont(Style.FONT_WINDOW_BUTTONS);
-
-		closeButton = new TextButton("X", new Runnable() {
-			public void run() {
-				window.close();
-			}
-		});
-		closeButton.setDefaultColor(null);
-		closeButton.setStrokePaint(null);
-		closeButton.setFont(Style.FONT_BIG);
-
-		addChild(cycleButton);
+		addChild(maximizeButton);
+		addChild(normalButton);
 		addChild(minimizeButton);
 		addChild(closeButton);
 		setPaint(Style.COLOR_BACKGROUND2);
+	}
+
+	public void updateButtons() {
+		boolean isWindowMaximized = (myWindow.getWindowState() == Window.WindowState.MAXIMIZED);
+
+		if (isWindowMaximized) {
+			maximizeButton.removeFromParent();
+			addChild(normalButton);
+		} else {
+			normalButton.removeFromParent();
+			addChild(maximizeButton);
+		}
+
 	}
 
 	@Override
@@ -367,17 +368,18 @@ class MenuBar extends PPath implements PInputEventListener {
 		super.layoutChildren();
 		title.setBounds(4, 3, getWidth(), getHeight());
 
-		double buttonX = getWidth() - closeButton.getWidth() - 2;
-		closeButton.setOffset(buttonX, 2);
-		buttonX -= closeButton.getWidth() - 2;
-		cycleButton.setOffset(buttonX, 2);
-		buttonX -= minimizeButton.getWidth() - 2;
-		minimizeButton.setOffset(buttonX, 2);
+		double buttonX = getWidth() - closeButton.getWidth();
+		closeButton.setOffset(buttonX, 0);
+		buttonX -= closeButton.getWidth();
+		maximizeButton.setOffset(buttonX, 0);
+		normalButton.setOffset(buttonX, 0);
+		buttonX -= minimizeButton.getWidth();
+		minimizeButton.setOffset(buttonX, 0);
 	}
 
 	public void processEvent(PInputEvent event, int type) {
 		if (type == MouseEvent.MOUSE_CLICKED && event.getClickCount() == 2) {
-			window.cycleVisibleWindowState();
+			myWindow.cycleVisibleWindowState();
 		}
 	}
 

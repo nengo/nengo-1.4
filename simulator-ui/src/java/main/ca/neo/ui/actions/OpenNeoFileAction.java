@@ -13,7 +13,7 @@ import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -45,11 +45,12 @@ public class OpenNeoFileAction extends StandardAction {
 		if (response == JFileChooser.APPROVE_OPTION) {
 			file = NeoGraphics.FileChooser.getSelectedFile();
 
-			AbstractActivity loadActivity = new AbstractActivity(
+			TrackedAction loadActivity = new TrackedAction(
 					"Loading network") {
+				private static final long serialVersionUID = 1L;
 
 				@Override
-				public void doActivity() {
+				protected void action() throws ActionException {
 					FileManager fm = new FileManager();
 					try {
 						objLoaded = fm.load(file);
@@ -79,7 +80,7 @@ public class OpenNeoFileAction extends StandardAction {
 				}
 
 			};
-			loadActivity.startThread();
+			loadActivity.doAction();
 		}
 
 	}

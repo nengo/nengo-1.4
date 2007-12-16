@@ -174,7 +174,7 @@ public abstract class NodeContainer extends UINeoNode {
 	public NodeViewer openViewer() {
 		Window viewerWindow = getViewerWindow();
 		if (viewerWindow.getWindowState() == WindowState.MINIMIZED) {
-			viewerWindow.restoreWindow();
+			viewerWindow.restoreSavedWindow();
 
 		}
 		return (NodeViewer) viewerWindow.getWindowContent();

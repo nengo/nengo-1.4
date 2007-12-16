@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import ca.shu.ui.lib.objects.activities.TransientMsg;
+import ca.shu.ui.lib.objects.activities.TransientMessage;
 import ca.shu.ui.lib.util.Util;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
@@ -328,11 +328,11 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 * 
 	 * @param msg
 	 */
-	public void popupTransientMsg(String msg) {
+	public void showPopupMessage(String msg) {
 		if (getWorld() != null) {
 			Util.debugMsg("UI Popup Msg: " + msg);
 			
-			TransientMsg msgObject = new TransientMsg(msg);
+			TransientMessage msgObject = new TransientMessage(msg);
 
 			double offsetX = -(msgObject.getWidth() - getWidth()) / 2d;
 

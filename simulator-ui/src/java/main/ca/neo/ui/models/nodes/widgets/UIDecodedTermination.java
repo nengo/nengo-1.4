@@ -47,7 +47,7 @@ public class UIDecodedTermination extends UITermination {
 					(Float) configuredProperties.getProperty(pTauPSC),
 					(Boolean) configuredProperties.getProperty(pIsModulatory));
 
-			getNodeParent().popupTransientMsg(
+			getNodeParent().showPopupMessage(
 					"New decoded termination added to ensemble");
 
 			setName(term.getName());
@@ -62,7 +62,7 @@ public class UIDecodedTermination extends UITermination {
 	protected void prepareForDestroy() {
 		getNodeParent().getModel().removeDecodedTermination(
 				getModel().getName());
-		popupTransientMsg("decoded termination removed from ensemble");
+		showPopupMessage("decoded termination removed from ensemble");
 
 		super.prepareForDestroy();
 	}

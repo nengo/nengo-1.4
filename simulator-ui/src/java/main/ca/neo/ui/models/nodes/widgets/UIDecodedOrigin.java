@@ -51,7 +51,7 @@ public class UIDecodedOrigin extends UIOrigin {
 					(Function[]) configuredProperties.getProperty(pFunctions),
 					(String) configuredProperties.getProperty(pNodeOrigin));
 
-			getNodeParent().popupTransientMsg(
+			getNodeParent().showPopupMessage(
 					"New decoded origin added to ensemble");
 
 			setName(origin.getName());
@@ -71,7 +71,7 @@ public class UIDecodedOrigin extends UIOrigin {
 		if (isModelExists()) {
 			getNodeParent().getModel().removeDecodedTermination(
 					getModel().getName());
-			popupTransientMsg("decoded termination removed from ensemble");
+			showPopupMessage("decoded termination removed from ensemble");
 		}
 
 		super.prepareForDestroy();

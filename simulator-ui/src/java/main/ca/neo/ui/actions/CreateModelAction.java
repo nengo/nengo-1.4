@@ -79,11 +79,9 @@ public class CreateModelAction extends ReversableAction {
 	@SuppressWarnings("unchecked")
 	public CreateModelAction(String modelTypeName,
 			INodeContainer nodeContainer, Class nodeUIType) {
-		super("Create new " + modelTypeName, modelTypeName);
+		super("Create new " + modelTypeName, modelTypeName, false);
 		this.container = nodeContainer;
 		this.nodeType = nodeUIType;
-		setBlocking(false);
-
 	}
 
 	@Override

@@ -11,10 +11,6 @@ import ca.shu.ui.lib.actions.ReversableAction;
 public abstract class LayoutAction extends ReversableAction {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * TODO: Save node positions here, it's safer and won't get deleted by other
-	 * layouts
-	 */
 	private NodeLayout savedLayout;
 
 	NodeViewer nodeViewer;

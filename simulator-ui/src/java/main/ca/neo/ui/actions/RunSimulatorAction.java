@@ -17,7 +17,7 @@ import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
@@ -30,17 +30,17 @@ import ca.shu.ui.lib.world.AppFrame;
  */
 public class RunSimulatorAction extends StandardAction {
 	private static final PropertyDescriptor pEndTime = new PFloat("End time");
-	private static final PropertyDescriptor pStartTime = new PFloat(
-			"Start time");
-	private static final PropertyDescriptor pStepSize = new PFloat("Step size");
-
 	private static final PropertyDescriptor pShowDataViewer = new PBoolean(
 			"Open data viewer after simulation");
+	private static final PropertyDescriptor pStartTime = new PFloat(
+			"Start time");
+
+	private static final PropertyDescriptor pStepSize = new PFloat("Step size");
+
+	private static final long serialVersionUID = 1L;
 
 	private static final PropertyDescriptor[] zProperties = { pStartTime,
 			pEndTime, pStepSize, pShowDataViewer };
-
-	private static final long serialVersionUID = 1L;
 
 	private UINetwork uiNetwork;
 
@@ -69,7 +69,7 @@ public class RunSimulatorAction extends StandardAction {
 			boolean showDataViewer = (Boolean) properties
 					.getProperty(pShowDataViewer);
 			(new RunSimulatorActivity(startTime, endTime, stepTime,
-					showDataViewer)).startThread();
+					showDataViewer)).doAction();
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 
@@ -88,12 +88,18 @@ public class RunSimulatorAction extends StandardAction {
 	/**
 	 * @author Shu
 	 */
-	class RunSimulatorActivity extends AbstractActivity implements
+	class RunSimulatorActivity extends TrackedAction implements
 			SimulatorListener {
-		private float startTime;
+
+		private static final long serialVersionUID = 1L;
+		private float currentProgress = 0;
 		private float endTime;
-		private float stepTime;
+		private TrackedStatusMsg progressMsg;
 		private boolean showDataViewer;
+
+		private float startTime;
+
+		private float stepTime;
 
 		public RunSimulatorActivity(float startTime, float endTime,
 				float stepTime, boolean showDataViewer) {
@@ -105,7 +111,7 @@ public class RunSimulatorAction extends StandardAction {
 		}
 
 		@Override
-		public void doActivity() {
+		protected void action() throws ActionException {
 			try {
 				Simulator simulator = uiNetwork.getSimulator();
 
@@ -117,20 +123,18 @@ public class RunSimulatorAction extends StandardAction {
 				simulator.removeSimulatorListener(this);
 
 				AppFrame frame = UIEnvironment.getInstance();
-				((NeoGraphics) (frame)).captureInDataViewer(uiNetwork.getModel());				
-				
-				if (showDataViewer) {									
+				((NeoGraphics) (frame)).captureInDataViewer(uiNetwork
+						.getModel());
+
+				if (showDataViewer) {
 					((NeoGraphics) (frame)).openDataViewer();
 				}
 
 			} catch (SimulationException e) {
 				UserMessages.showError("Simulator problem: " + e.toString());
 			}
+
 		}
-
-		private TrackedStatusMsg progressMsg;
-
-		private float currentProgress = 0;
 
 		/*
 		 * (non-Javadoc)

@@ -80,9 +80,11 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		if (node instanceof Network) {
 			nodeUI = new UINetwork((Network) node);
 		} else if (node instanceof Ensemble) {
-			nodeUI = new UIEnsemble((Ensemble) node);
-		} else if (node instanceof NEFEnsemble) {
-			nodeUI = new UINEFEnsemble((NEFEnsemble) node);
+			if (node instanceof NEFEnsemble) {
+				nodeUI = new UINEFEnsemble((NEFEnsemble) node);
+			} else {
+				nodeUI = new UIEnsemble((Ensemble) node);
+			}
 		} else if (node instanceof Neuron) {
 			nodeUI = new UINeuron((Neuron) node);
 		} else if (node instanceof FunctionInput) {
@@ -664,13 +666,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	/**
-	 * TODO: update origins and terminations based on model
-	 */
-	public void update() {
-
-	}
-
-	/**
 	 * Action for hiding all origins and terminations
 	 * 
 	 * @author Shu Wu
@@ -723,7 +718,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 				if (text != null) {
 
 					getModel().setDocumentation(text);
-					popupTransientMsg("Documentation changed");
+					showPopupMessage("Documentation changed");
 				} else {
 					throw new UserCancelledException();
 				}
@@ -734,7 +729,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		@Override
 		protected void undo() throws ActionException {
 			getModel().setDocumentation(prevDoc);
-			popupTransientMsg("Documentation changed");
+			showPopupMessage("Documentation changed");
 		}
 	}
 

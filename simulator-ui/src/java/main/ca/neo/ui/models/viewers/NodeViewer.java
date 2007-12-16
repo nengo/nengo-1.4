@@ -48,11 +48,6 @@ public abstract class NodeViewer extends World implements Interactable,
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Node spacing used in the Square layout
-	 */
-	private static final double SQUARE_LAYOUT_NODE_SPACING = 150;
-
-	/**
 	 * Layout bounds
 	 */
 	private Dimension layoutBounds = DEFAULT_LAYOUT_BOUNDS;
@@ -236,6 +231,7 @@ public abstract class NodeViewer extends World implements Interactable,
 		if (it.hasNext()) {
 			double startX = Double.MAX_VALUE;
 			double startY = Double.MAX_VALUE;
+			double maxRowHeight = 0;
 			double endX = Double.MIN_VALUE;
 			double endY = Double.MIN_VALUE;
 
@@ -257,11 +253,16 @@ public abstract class NodeViewer extends World implements Interactable,
 					endY = y + node.getHeight();
 				}
 
-				x += 150;
+				if (node.getFullBounds().getHeight() > maxRowHeight) {
+					maxRowHeight = node.getFullBounds().getHeight();
+				}
+
+				x += node.getFullBounds().getWidth() + 50;
 
 				if (++columnCounter > numberOfColumns) {
 					x = 0;
-					y += SQUARE_LAYOUT_NODE_SPACING;
+					y += maxRowHeight + 50;
+					maxRowHeight = 0;
 					columnCounter = 0;
 				}
 

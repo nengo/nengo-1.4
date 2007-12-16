@@ -141,7 +141,7 @@ class ButtonStateHandler extends PBasicInputEventHandler {
 
 	@Override
 	public void mouseReleased(PInputEvent event) {
-		button.setButtonState(AbstractButton.ButtonState.HIGHLIGHT);
+		button.setButtonState(AbstractButton.ButtonState.DEFAULT);
 	}
 
 }

@@ -2,7 +2,7 @@ package ca.neo.ui.models.icons;
 
 import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.TextNode;
+import ca.shu.ui.lib.objects.PXText;
 import edu.umd.cs.piccolo.PNode;
 
 /**
@@ -22,11 +22,11 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 	private int myNumOfNodes = -1;
 
-	private final TextNode sizeLabel;
+	private final PXText sizeLabel;
 
 	public NodeContainerIcon(NodeContainer parent, PNode icon) {
 		super(parent, icon);
-		sizeLabel = new TextNode("");
+		sizeLabel = new PXText("");
 		sizeLabel.setFont(Style.FONT_SMALL);
 		sizeLabel.setConstrainWidthToTextWidth(true);
 		addChild(sizeLabel);

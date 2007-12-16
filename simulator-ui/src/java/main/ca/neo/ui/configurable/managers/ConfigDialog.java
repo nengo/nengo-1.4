@@ -20,7 +20,8 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.PropertySet;
-import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -205,11 +206,13 @@ public class ConfigDialog extends JDialog {
 				setVisible(false);
 				dispose();
 
-				(new AbstractActivity("Configuring "
+				(new TrackedAction("Configuring "
 						+ myConfigurer.getConfigurable().getTypeName()) {
 
+					private static final long serialVersionUID = 1L;
+
 					@Override
-					public void doActivity() {
+					protected void action() throws ActionException {
 						ConfigException configException = null;
 
 						try {
@@ -223,7 +226,7 @@ public class ConfigDialog extends JDialog {
 								.dialogConfigurationFinished(configException);
 
 					}
-				}).startThread();
+				}).doAction();
 			}
 		}
 	}

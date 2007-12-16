@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.activities.Fader;
-import ca.shu.ui.lib.objects.TextNode;
+import ca.shu.ui.lib.objects.PXText;
 import edu.umd.cs.piccolo.activities.PActivity;
 
 /**
@@ -13,12 +13,12 @@ import edu.umd.cs.piccolo.activities.PActivity;
  * 
  * @author Shu Wu
  */
-public class TransientMsg extends TextNode {
+public class TransientMessage extends PXText {
 
 	private static final long serialVersionUID = 1L;
 	static final int ANIMATE_MSG_DURATION = 2500;
 
-	public TransientMsg(String text) {
+	public TransientMessage(String text) {
 		super(text);
 		setFont(Style.FONT_BOLD);
 		setTextPaint(Style.COLOR_NOTIFICATION);
@@ -41,7 +41,7 @@ public class TransientMsg extends TextNode {
 
 			@Override
 			protected void activityStarted() {
-				TransientMsg.this.removeFromParent();
+				TransientMessage.this.removeFromParent();
 			}
 
 		};

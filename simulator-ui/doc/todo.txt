@@ -23,9 +23,16 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Save / Load any node
+iterable layouts
+	keep graph updated
 
-Loading code on the fly
+TODO:
+
+    * Dynamic class loading
+    * Adding comments to new code
+    * Reversable actions
+    * Fixing the ugly window icons
+
 
 Doing next:
 

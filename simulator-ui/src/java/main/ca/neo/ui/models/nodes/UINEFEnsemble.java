@@ -231,8 +231,7 @@ public class UINEFEnsemble extends UIEnsemble {
 		private UIOrigin addedOrigin;
 
 		public AddDecodedOriginAction() {
-			super("Add decoded origin");
-			setBlocking(false);
+			super("Add decoded origin", null, false);
 		}
 
 		@Override

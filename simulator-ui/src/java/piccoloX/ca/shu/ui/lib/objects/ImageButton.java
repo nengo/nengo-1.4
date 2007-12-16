@@ -24,6 +24,7 @@ public class ImageButton extends AbstractButton {
 		buttonCover = PPath.createRectangle(0f, 0f, (float) buttonImg
 				.getWidth(), (float) buttonImg.getHeight());
 		buttonCover.setPaint(Style.COLOR_FOREGROUND);
+		addChild(buttonCover);
 
 		initDefaultState();
 		this.setWidth(buttonImg.getWidth());
@@ -32,7 +33,6 @@ public class ImageButton extends AbstractButton {
 
 	private void initDefaultState() {
 		buttonCover.setTransparency(0f);
-
 	}
 
 	@Override

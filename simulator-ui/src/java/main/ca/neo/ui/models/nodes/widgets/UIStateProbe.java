@@ -20,7 +20,7 @@ import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
@@ -67,7 +67,7 @@ public class UIStateProbe extends UIProbe {
 			throw exception;
 		}
 
-		nodeAttachedTo.popupTransientMsg("Probe (" + state
+		nodeAttachedTo.showPopupMessage("Probe (" + state
 				+ ") added to Simulator");
 
 		setModel(probe);
@@ -111,13 +111,16 @@ public class UIStateProbe extends UIProbe {
 			name = JOptionPane
 					.showInputDialog("Enter name of file to export to: ");
 
-			(new AbstractActivity("Exporting to matlab") {
+			(new TrackedAction("Exporting to matlab") {
+
+				private static final long serialVersionUID = 1L;
+
 				@Override
-				public void doActivity() {
+				protected void action() throws ActionException {
 					exportToMatlab(name);
 				}
 
-			}).startThread();
+			}).doAction();
 
 		}
 	}
@@ -130,7 +133,7 @@ public class UIStateProbe extends UIProbe {
 		try {
 			getProbeParent().getParentNetwork().getSimulator().removeProbe(
 					getModel());
-			popupTransientMsg("Probe removed from Simulator");
+			showPopupMessage("Probe removed from Simulator");
 		} catch (SimulationException e) {
 			UserMessages.showError("Could not remove probe");
 		}

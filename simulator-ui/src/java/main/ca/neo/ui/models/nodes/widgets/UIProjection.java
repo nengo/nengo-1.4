@@ -64,7 +64,7 @@ public class UIProjection extends LineConnector {
 			return false;
 		if (modifyModel) {
 			if (getOriginUI().connect((UITermination) target)) {
-				popupTransientMsg("Projection added to Network");
+				showPopupMessage("Projection added to Network");
 
 				return true;
 			} else {
@@ -92,7 +92,7 @@ public class UIProjection extends LineConnector {
 		UITermination termination = getTermination();
 		if (getOriginUI().disconnect(termination)) {
 
-			termination.popupTransientMsg("Projection removed from Network");
+			termination.showPopupMessage("Projection removed from Network");
 		}
 
 	}

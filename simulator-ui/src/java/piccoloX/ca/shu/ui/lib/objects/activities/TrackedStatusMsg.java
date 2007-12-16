@@ -1,7 +1,10 @@
 package ca.shu.ui.lib.objects.activities;
 
+import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.objects.PXText;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
+import edu.umd.cs.piccolo.nodes.PText;
 
 /**
  * Displays and removes a task message from the application status bar
@@ -10,6 +13,7 @@ import ca.shu.ui.lib.world.WorldObject;
  */
 public class TrackedStatusMsg {
 	private String taskName;
+	PText taskText;
 
 	public TrackedStatusMsg(String taskName) {
 		this(taskName, null);
@@ -19,6 +23,11 @@ public class TrackedStatusMsg {
 		super();
 
 		if (wo != null) {
+			taskText = new PXText(taskName);
+			taskText.setPaint(Style.COLOR_NOTIFICATION);
+			taskText.setOffset(0, -taskText.getHeight());
+			wo.addChild(taskText);
+
 			setTaskName(wo.getName() + ": " + taskName);
 		} else {
 			setTaskName(taskName);
@@ -44,5 +53,9 @@ public class TrackedStatusMsg {
 	 */
 	public void finished() {
 		UIEnvironment.getInstance().removeTaskStatusMsg(getTaskName());
+
+		if (taskText != null) {
+			taskText.removeFromParent();
+		}
 	}
 }

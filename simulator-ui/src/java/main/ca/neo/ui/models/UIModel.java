@@ -56,6 +56,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	public UIModel() {
 		super();
 	}
+
 	/**
 	 * Create a UI Wrapper around a NEO Model
 	 * 
@@ -254,7 +255,9 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	 * Updates the UI from the model
 	 */
 	public final void updateModel() {
-		setModel(getModel());
+		if (getModel() != null) {
+			setModel(getModel());
+		}
 	}
 
 }

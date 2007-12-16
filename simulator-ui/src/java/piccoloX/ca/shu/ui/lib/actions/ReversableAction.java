@@ -20,6 +20,25 @@ public abstract class ReversableAction extends StandardAction {
 		super(description, actionName);
 	}
 
+	public ReversableAction(String description, String actionName,
+			boolean isSwingAction) {
+		super(description, actionName, isSwingAction);
+	}
+
+	/**
+	 * Handles exceptions from undo
+	 */
+	private void undoInternal() {
+		try {
+			undo();
+		} catch (ActionException e) {
+			e.defaultHandleBehavior();
+		} catch (Exception e) {
+			e.printStackTrace();
+			UserMessages.showWarning("Unexpected Exception: " + e.toString());
+		}
+	}
+
 	/**
 	 * This function is called if completing the action requires two stages.
 	 * First stage does the action but it can still be undone (leaving some
@@ -58,20 +77,6 @@ public abstract class ReversableAction extends StandardAction {
 	 * @return Whether the undo action was successful
 	 */
 	protected abstract void undo() throws ActionException;
-
-	/**
-	 * Handles exceptions from undo
-	 */
-	private void undoInternal() {
-		try {
-			undo();
-		} catch (ActionException e) {
-			e.defaultHandleBehavior();
-		} catch (Exception e) {
-			e.printStackTrace();
-			UserMessages.showWarning("Unexpected Exception: " + e.toString());
-		}
-	}
 
 	/**
 	 * Undo the action

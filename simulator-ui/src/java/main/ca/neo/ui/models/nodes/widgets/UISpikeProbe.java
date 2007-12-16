@@ -14,7 +14,7 @@ public class UISpikeProbe extends UIProbe {
 	public UISpikeProbe(UIEnsemble nodeAttachedTo) {
 		super(nodeAttachedTo, nodeAttachedTo.getModel());
 
-		getProbeParent().popupTransientMsg(
+		getProbeParent().showPopupMessage(
 				"Collecting spikes on " + getProbeParent().getName());
 		getModel().collectSpikes(true);
 
@@ -34,7 +34,7 @@ public class UISpikeProbe extends UIProbe {
 
 		getModel().collectSpikes(false);
 
-		getProbeParent().popupTransientMsg(
+		getProbeParent().showPopupMessage(
 				"Spike collection stopped on " + getProbeParent().getName());
 
 		getProbeParent().removeProbe(this);

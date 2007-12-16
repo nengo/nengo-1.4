@@ -376,7 +376,6 @@ class DataFileFilter extends FileExtensionFilter {
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
 		return "Delimited Text File";
 	}
 

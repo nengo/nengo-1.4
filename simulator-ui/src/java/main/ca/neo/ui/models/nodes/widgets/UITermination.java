@@ -199,7 +199,7 @@ public class UITermination extends Widget implements ILineTermination {
 		try {
 			getModel().getConfiguration().setProperty(Termination.WEIGHTS,
 					newWeights);
-			popupTransientMsg("Weights changed on Termination");
+			showPopupMessage("Weights changed on Termination");
 		} catch (StructuralException e) {
 			UserMessages.showWarning("Could not modify weights: "
 					+ e.getMessage());

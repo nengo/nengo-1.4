@@ -99,7 +99,7 @@ public abstract class Widget extends UIModelConfigurable {
 		Network network = getNodeParent().getParentNetwork();
 		if (network != null) {
 			expose(network, exposedName);
-			popupTransientMsg(this.getName() + " is exposed as " + exposedName
+			showPopupMessage(this.getName() + " is exposed as " + exposedName
 					+ " on Network: " + network.getName());
 			updateModel();
 		} else {
@@ -132,7 +132,7 @@ public abstract class Widget extends UIModelConfigurable {
 		Network network = getNodeParent().getParentNetwork();
 		if (network != null) {
 			unExpose(network);
-			popupTransientMsg(this.getName() + " is UN-exposed on Network: "
+			showPopupMessage(this.getName() + " is UN-exposed on Network: "
 					+ network.getName());
 			updateModel();
 		} else {

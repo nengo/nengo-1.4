@@ -10,7 +10,7 @@ import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.objects.activities.AbstractActivity;
+import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -49,10 +49,12 @@ public class SaveNodeAction extends StandardAction {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			file = NeoGraphics.FileChooser.getSelectedFile();
 
-			AbstractActivity task = new AbstractActivity("Saving model") {
+			TrackedAction task = new TrackedAction("Saving model") {
+
+				private static final long serialVersionUID = 1L;
 
 				@Override
-				public void doActivity() {
+				protected void action() throws ActionException {
 					try {
 
 						nodeUI.saveModel(file);
@@ -65,9 +67,10 @@ public class SaveNodeAction extends StandardAction {
 								.showError("Out of memory, please increase memory size: "
 										+ e.toString());
 					}
+
 				}
 			};
-			task.startThread();
+			task.doAction();
 
 		} else {
 			throw new UserCancelledException();

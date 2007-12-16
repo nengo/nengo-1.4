@@ -8,16 +8,16 @@ import edu.umd.cs.piccolo.nodes.PText;
  * 
  * @author Shu Wu
  */
-public class TextNode extends PText {
+public class PXText extends PText {
 
 	private static final long serialVersionUID = 1L;
 
-	public TextNode() {
+	public PXText() {
 		super();
 		init();
 	}
 
-	public TextNode(String aText) {
+	public PXText(String aText) {
 		super(aText);
 		init();
 	}

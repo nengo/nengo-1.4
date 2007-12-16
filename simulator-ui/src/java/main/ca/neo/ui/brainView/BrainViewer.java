@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import ca.shu.ui.lib.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.handlers.EventConsumer;
-import ca.shu.ui.lib.objects.TextNode;
+import ca.shu.ui.lib.objects.PXText;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldGround;
 import ca.shu.ui.lib.world.WorldObject;
@@ -88,14 +88,14 @@ class BrainImageWrapper extends WorldObject {
 
 	private static final long serialVersionUID = 1L;
 	AbstractBrainImage2D myBrainImage;
-	TextNode myLabel;
+	PXText myLabel;
 
 	public BrainImageWrapper(AbstractBrainImage2D brainImage) {
 		super();
 		myBrainImage = brainImage;
 		addChild(new PImage(brainImage));
 
-		myLabel = new TextNode();
+		myLabel = new PXText();
 		addChild(myLabel);
 		updateLabel();
 		setSelectable(false);
