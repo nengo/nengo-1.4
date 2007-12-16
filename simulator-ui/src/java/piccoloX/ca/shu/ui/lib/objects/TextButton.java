@@ -1,6 +1,7 @@
 package ca.shu.ui.lib.objects;
 
 import java.awt.Font;
+import java.awt.Paint;
 
 import ca.shu.ui.lib.Style.Style;
 
@@ -82,7 +83,6 @@ public class TextButton extends AbstractButton {
 		switch (buttonState) {
 		case DEFAULT:
 			frame.setPaint(getDefaultColor());
-
 			break;
 		case HIGHLIGHT:
 			frame.setPaint(getHighlightColor());
@@ -92,5 +92,9 @@ public class TextButton extends AbstractButton {
 			break;
 		}
 		repaint();
+	}
+
+	public void setStrokePaint(Paint paint) {
+		frame.setStrokePaint(paint);
 	}
 }

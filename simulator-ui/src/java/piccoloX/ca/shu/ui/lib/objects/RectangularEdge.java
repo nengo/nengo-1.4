@@ -26,9 +26,8 @@ public class RectangularEdge extends DirectedEdge {
 	public RectangularEdge(WorldObject startNode, WorldObject endNode) {
 		super(startNode, endNode);
 
-		setDefaultColor(Style.COLOR_FOREGROUND);
-		setPaint(Style.COLOR_FOREGROUND);
-		setTransparency(0.2f);
+		setDefaultColor(Style.colorTimes(Style.COLOR_FOREGROUND, 0.2f));
+		setPaint(getDefaultColor());
 
 		updateEdgeBounds();
 	}

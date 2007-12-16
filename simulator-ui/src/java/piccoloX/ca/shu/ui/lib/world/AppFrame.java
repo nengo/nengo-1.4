@@ -136,10 +136,10 @@ public abstract class AppFrame extends JFrame {
 
 		getContentPane().add(canvas);
 		canvas.requestFocus();
-		
+
 		validate();
 		setFullScreenMode(false);
-		
+
 		initMenu();
 	}
 
@@ -148,8 +148,9 @@ public abstract class AppFrame extends JFrame {
 	 */
 	private void initMenu() {
 		JMenuBar menuBar = new JMenuBar();
+		menuBar.setBorder(null);
+		Style.applyMenuStyle(menuBar, true);
 
-		Style.applyStyleToComponent(menuBar);
 		initFileMenu(menuBar);
 
 		editMenu = new MenuBuilder("Edit");

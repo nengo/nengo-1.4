@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
@@ -38,7 +37,7 @@ public class LineOriginIcon extends WorldObject {
 	protected void paint(PPaintContext paintContext) {
 		super.paint(paintContext);
 		Graphics2D g2 = paintContext.getGraphics();
-		Color bright2 = Util.colorAdd(color, new Color(0.4f, 0.4f, 0.4f));
+		Color bright2 = Style.colorAdd(color, new Color(0.4f, 0.4f, 0.4f));
 		if (paintContext.getScale() < 0.5) {
 			g2.setColor(color);
 			g2.fillOval(0, 0, _LINE_END_WIDTH, _LINE_END_HEIGHT);
@@ -46,13 +45,13 @@ public class LineOriginIcon extends WorldObject {
 
 			Color color = getColor();
 
-			Color dark = Util.colorAdd(Util.colorTimes(color, 0.65), new Color(
+			Color dark = Style.colorAdd(Style.colorTimes(color, 0.65), new Color(
 					0.05f, 0.05f, 0.05f));
 			Color medium = color;
-			Color bright1 = Util
+			Color bright1 = Style
 					.colorAdd(color, new Color(0.15f, 0.15f, 0.15f));
 
-			Color hilite = Util.colorAdd(Util.colorTimes(color, 0.05),
+			Color hilite = Style.colorAdd(Style.colorTimes(color, 0.05),
 					new Color(0.8f, 0.8f, 0.8f));
 
 			g2.setColor(dark);

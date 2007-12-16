@@ -178,8 +178,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		newMenu.addAction(new CreateModelAction("Ensemble", this,
 				UIEnsemble.class), KeyEvent.VK_E);
 
-		fileMenu.addAction(new OpenNeoFileAction("Open from file", this),
-				KeyEvent.VK_O);
+		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O);
 
 	}
 

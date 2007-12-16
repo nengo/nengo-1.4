@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import javax.swing.SwingUtilities;
+
 import ca.neo.model.Node;
 import ca.neo.ui.brainView.BrainViewer;
 import ca.neo.ui.models.UINeoNode;
@@ -103,9 +105,15 @@ public abstract class NodeContainer extends UINeoNode {
 			NodeViewer nodeViewer = createViewerInstance();
 			Window viewerWindow = new Window(this, nodeViewer);
 			nodeViewer.applyDefaultLayout();
+			
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					if (viewerWindowRef.get() != null)
+						getWorld().zoomToObject(viewerWindowRef.get());
+				}
+			});
 
 			viewerWindowRef = new WeakReference<Window>(viewerWindow);
-
 		}
 
 		return viewerWindowRef.get();
@@ -167,6 +175,7 @@ public abstract class NodeContainer extends UINeoNode {
 		Window viewerWindow = getViewerWindow();
 		if (viewerWindow.getWindowState() == WindowState.MINIMIZED) {
 			viewerWindow.restoreWindow();
+
 		}
 		return (NodeViewer) viewerWindow.getWindowContent();
 

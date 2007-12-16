@@ -79,6 +79,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	private HashMap<WorldObject, Boolean> allItems = null; // Used within drag
 	private Point2D canvasPressPt = null;
 	private boolean deleteKeyActive = true; // True if DELETE key should delete
+	private DragAction dragAction;
 	// children can be selected
 	private PPath marquee = null;
 	// temporarily
@@ -96,6 +97,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	private WorldGround selectableParent = null; // List of nodes whose
 	private HashMap<WorldObject, Boolean> selection = null; // The current
 	private float strokeNum = 0;
+
 	private Stroke[] strokes = null;
 
 	// handler temporarily
@@ -103,6 +105,10 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	// handler
 
 	World world;
+
+	// /////////////////////////////////////////////////////
+	// Public static methods for manipulating the selection
+	// /////////////////////////////////////////////////////
 
 	/**
 	 * Creates a selection event handler.
@@ -121,10 +127,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
 		init();
 	}
-
-	// /////////////////////////////////////////////////////
-	// Public static methods for manipulating the selection
-	// /////////////////////////////////////////////////////
 
 	private boolean internalSelect(WorldObject node) {
 		if (isSelected(node)) {
@@ -327,6 +329,10 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		marqueeMap.clear();
 	}
 
+	// //////////////////////////////////////////////////////
+	// The overridden methods from PDragSequenceEventHandler
+	// //////////////////////////////////////////////////////
+
 	protected void initializeSelection(PInputEvent pie) {
 		canvasPressPt = pie.getCanvasPosition();
 		presspt = pie.getPosition();
@@ -356,10 +362,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	}
 
-	// //////////////////////////////////////////////////////
-	// The overridden methods from PDragSequenceEventHandler
-	// //////////////////////////////////////////////////////
-
 	protected boolean isMarqueeSelection(PInputEvent pie) {
 		return (pressNode == null && world.isSelectionMode());
 	}
@@ -378,8 +380,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 		return selectable;
 	}
-
-	DragAction dragAction;
 
 	protected void startDrag(PInputEvent e) {
 		super.startDrag(e);

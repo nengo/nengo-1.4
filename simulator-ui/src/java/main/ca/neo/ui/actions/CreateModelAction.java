@@ -8,7 +8,7 @@ import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.exceptions.UIException;
 
 /**
  * Creates a new NEO model
@@ -20,20 +20,22 @@ public class CreateModelAction extends ReversableAction {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * Gets the model type name and throws an exception if the model type is not
+	 * supported
+	 * 
 	 * @param nodeUIType
 	 *            Class type of the model to be instantiated
 	 * @return Type name of the given model
 	 */
 	@SuppressWarnings("unchecked")
-	private static String getModelName(Class nodeUIType) {
+	private static String getModelName(Class nodeUIType) throws UIException {
 		UINeoNode nodeProxy;
 		try {
 			nodeProxy = (UINeoNode) nodeUIType.newInstance();
 			return nodeProxy.getTypeName();
 		} catch (InstantiationException e) {
-			Util
-					.Assert(false,
-							"Can't get model type name because default constructor is missing");
+			throw new UIException(
+					"Can't get model type name because default constructor is missing");
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
@@ -63,7 +65,8 @@ public class CreateModelAction extends ReversableAction {
 	 *            Type of Node to be create, such as PNetwork
 	 */
 	@SuppressWarnings("unchecked")
-	public CreateModelAction(INodeContainer nodeContainer, Class nodeUIType) {
+	public CreateModelAction(INodeContainer nodeContainer, Class nodeUIType)
+			throws UIException {
 		this(getModelName(nodeUIType), nodeContainer, nodeUIType);
 	}
 
@@ -74,12 +77,13 @@ public class CreateModelAction extends ReversableAction {
 	 *            Type of Node to be create, such as PNetwork
 	 */
 	@SuppressWarnings("unchecked")
-	public CreateModelAction(String actionName, INodeContainer nodeContainer,
-			Class nodeUIType) {
-		super("Create new " + nodeUIType.getSimpleName(), actionName);
+	public CreateModelAction(String modelTypeName,
+			INodeContainer nodeContainer, Class nodeUIType) {
+		super("Create new " + modelTypeName, modelTypeName);
 		this.container = nodeContainer;
 		this.nodeType = nodeUIType;
 		setBlocking(false);
+
 	}
 
 	@Override
@@ -104,7 +108,7 @@ public class CreateModelAction extends ReversableAction {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ActionException(e.getMessage());
 		}
 	}
 

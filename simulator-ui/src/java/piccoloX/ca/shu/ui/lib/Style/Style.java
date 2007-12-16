@@ -68,6 +68,7 @@ public class Style {
 			14);
 	public static final Font FONT_LARGE = new Font("Helvetica", Font.BOLD, 18);
 	public static final Font FONT_NORMAL = new Font("Helvetica", Font.PLAIN, 14);
+
 	public static final Font FONT_SMALL = new Font("Helvetica", Font.PLAIN, 10);
 
 	public static final Font FONT_WINDOW_BUTTONS = new Font("sansserif",
@@ -75,10 +76,33 @@ public class Style {
 	public static final Font FONT_XLARGE = new Font("Helvetica", Font.BOLD, 22);
 	public static final Font FONT_XXLARGE = new Font("Helvetica", Font.BOLD, 32);
 
-	public static void applyStyleToComponent(JComponent item) {
+	public static final Font FONT_MENU_TITLE = new Font("Helvetica", Font.BOLD,
+			13);
+	public static final Font FONT_MENU = new Font("Helvetica", Font.BOLD, 12);
+
+	public static void applyMenuStyle(JComponent item, boolean isTitle) {
 		item.setOpaque(true);
 		item.setBackground(Style.COLOR_BACKGROUND);
 		item.setForeground(Style.COLOR_FOREGROUND);
+		if (isTitle) {
+			item.setFont(Style.FONT_MENU_TITLE);
+		} else {
+			item.setFont(Style.FONT_MENU);
+		}
+	}
+
+	static public Color colorAdd(Color c1, Color c2) {
+		int r = Math.min(c1.getRed() + c2.getRed(), 255);
+		int g = Math.min(c1.getGreen() + c2.getGreen(), 255);
+		int b = Math.min(c1.getBlue() + c2.getBlue(), 255);
+		return new Color(r, g, b);
+	}
+
+	static public Color colorTimes(Color c1, double f) {
+		int r = (int) Math.min(c1.getRed() * f, 255);
+		int g = (int) Math.min(c1.getGreen() * f, 255);
+		int b = (int) Math.min(c1.getBlue() * f, 255);
+		return new Color(r, g, b);
 	}
 
 	public static Font createFont(int size) {

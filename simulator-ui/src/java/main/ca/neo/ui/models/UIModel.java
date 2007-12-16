@@ -175,6 +175,17 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	}
 
 	/**
+	 * Called if this object is double clicked on
+	 */
+	@Override
+	public void doubleClicked() {
+		super.doubleClicked();
+		if (getWorld() != null) {
+			getWorld().zoomToObject(this);
+		}
+	}
+
+	/**
 	 * Updates the UI from the model
 	 */
 	public final void updateModel() {

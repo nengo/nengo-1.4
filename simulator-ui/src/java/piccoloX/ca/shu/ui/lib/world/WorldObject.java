@@ -183,9 +183,6 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 * Called if this object is double clicked on
 	 */
 	public void doubleClicked() {
-		if (getWorld() != null) {
-			getWorld().zoomToObject(this);
-		}
 	}
 
 	/*

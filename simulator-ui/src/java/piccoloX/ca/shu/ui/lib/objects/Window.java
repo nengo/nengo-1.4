@@ -1,5 +1,6 @@
 package ca.shu.ui.lib.objects;
 
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
@@ -7,9 +8,14 @@ import java.lang.ref.WeakReference;
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.handlers.EventConsumer;
 import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolox.nodes.PClip;
@@ -33,21 +39,25 @@ public class Window extends WorldObject implements Interactable {
 
 	private final PPath menubar;
 
+	private Border myBorder;
+
 	private PClip myClippingRectangle;
 
 	private final WorldObject myContent;
 
-	private final WeakReference<WorldObject> mySourceRef;
+	private EventConsumer myEventConsumer;
 
-	private WindowState savedRestoreState = WINDOW_STATE_DEFAULT;
-
-	private PBounds savedWindowBounds;;
-
-	private Point2D savedWindowOffset;
+	private final WeakReference<WorldObject> mySourceRef;;
 
 	private RectangularEdge mySourceShadow = null;
 
 	private WindowState myState = WINDOW_STATE_DEFAULT;
+
+	private WindowState savedRestoreState = WINDOW_STATE_DEFAULT;
+
+	private PBounds savedWindowBounds;
+
+	private Point2D savedWindowOffset;
 
 	/**
 	 * @param source
@@ -66,9 +76,11 @@ public class Window extends WorldObject implements Interactable {
 		myClippingRectangle = new PClip();
 		myClippingRectangle.addChild(content);
 		myClippingRectangle.setPaint(Style.COLOR_BACKGROUND);
+		myBorder = new Border(this, Style.COLOR_FOREGROUND);
+
 		addChild(myClippingRectangle);
 		addChild(menubar);
-		addChild(new Border(this, Style.COLOR_FOREGROUND));
+		addChild(myBorder);
 
 		windowStateChanged();
 
@@ -78,7 +90,7 @@ public class Window extends WorldObject implements Interactable {
 	protected void layoutChildren() {
 		super.layoutChildren();
 
-		menubar.setBounds(1, 1, getWidth() - 2, MENU_BAR_HEIGHT);
+		menubar.setBounds(0, 0, getWidth(), MENU_BAR_HEIGHT);
 
 		myContent.setBounds(0, 0, getWidth() - 4, getHeight() - 4
 				- MENU_BAR_HEIGHT);
@@ -122,9 +134,13 @@ public class Window extends WorldObject implements Interactable {
 				mySourceShadow.destroy();
 				mySourceShadow = null;
 			}
-
-			setSelectable(false);
 			UIEnvironment.getInstance().getWorld().getSky().addChild(this);
+			myBorder.setVisible(false);
+
+			if (myEventConsumer == null) {
+				myEventConsumer = new EventConsumer();
+				addInputEventListener(myEventConsumer);
+			}
 
 			maximizeBounds();
 
@@ -146,17 +162,24 @@ public class Window extends WorldObject implements Interactable {
 
 			}
 			if (source != null) {
-
-				setSelectable(true);
+				if (myEventConsumer != null) {
+					removeInputEventListener(myEventConsumer);
+					myEventConsumer = null;
+				}
 
 				source.addChild(this);
+				myBorder.setVisible(true);
 
 				BoundsHandle.addBoundsHandlesTo(this);
 				if (mySourceShadow == null) {
 
 					mySourceShadow = new RectangularEdge(source, this);
-					source.addChild(1, mySourceShadow);
+					source.addChild(0, mySourceShadow);
 				}
+			} else {
+				Util
+						.Assert(false,
+								"Window still active after source destroyed");
 			}
 
 			break;
@@ -208,12 +231,6 @@ public class Window extends WorldObject implements Interactable {
 	}
 
 	@Override
-	public void doubleClicked() {
-		cycleVisibleWindowState();
-
-	}
-
-	@Override
 	public String getName() {
 		return myContent.getName();
 	}
@@ -237,8 +254,22 @@ public class Window extends WorldObject implements Interactable {
 
 	}
 
+	@Override
+	public void moveToFront() {
+		super.moveToFront();
+		if (mySourceRef.get() != null) {
+			mySourceRef.get().moveToFront();
+		}
+	}
+
 	public void restoreWindow() {
 		setWindowState(savedRestoreState);
+	}
+
+	@Override
+	public void setParent(PNode newParent) {
+		// TODO Auto-generated method stub
+		super.setParent(newParent);
 	}
 
 	public void setWindowState(WindowState state) {
@@ -277,7 +308,7 @@ public class Window extends WorldObject implements Interactable {
 
 }
 
-class MenuBar extends PPath {
+class MenuBar extends PPath implements PInputEventListener {
 
 	private static final long serialVersionUID = 1L;
 	private TextButton cycleButton, minimizeButton, closeButton;
@@ -289,6 +320,7 @@ class MenuBar extends PPath {
 		super(new Rectangle2D.Double(0, 0, 1, 1));
 		this.window = window;
 
+		addInputEventListener(this);
 		init();
 	}
 
@@ -302,6 +334,8 @@ class MenuBar extends PPath {
 				window.cycleVisibleWindowState();
 			}
 		});
+		cycleButton.setDefaultColor(null);
+		cycleButton.setStrokePaint(null);
 		cycleButton.setFont(Style.FONT_WINDOW_BUTTONS);
 
 		minimizeButton = new TextButton("-", new Runnable() {
@@ -309,6 +343,8 @@ class MenuBar extends PPath {
 				window.minimizeWindow();
 			}
 		});
+		minimizeButton.setDefaultColor(null);
+		minimizeButton.setStrokePaint(null);
 		minimizeButton.setFont(Style.FONT_WINDOW_BUTTONS);
 
 		closeButton = new TextButton("X", new Runnable() {
@@ -316,6 +352,8 @@ class MenuBar extends PPath {
 				window.close();
 			}
 		});
+		closeButton.setDefaultColor(null);
+		closeButton.setStrokePaint(null);
 		closeButton.setFont(Style.FONT_BIG);
 
 		addChild(cycleButton);
@@ -335,6 +373,12 @@ class MenuBar extends PPath {
 		cycleButton.setOffset(buttonX, 2);
 		buttonX -= minimizeButton.getWidth() - 2;
 		minimizeButton.setOffset(buttonX, 2);
+	}
+
+	public void processEvent(PInputEvent event, int type) {
+		if (type == MouseEvent.MOUSE_CLICKED && event.getClickCount() == 2) {
+			window.cycleVisibleWindowState();
+		}
 	}
 
 }

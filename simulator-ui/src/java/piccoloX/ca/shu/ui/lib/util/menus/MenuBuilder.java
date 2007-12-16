@@ -15,10 +15,8 @@ public class MenuBuilder extends AbstractMenuBuilder {
 
 	public MenuBuilder(String label, boolean applyCustomStyle) {
 		super(applyCustomStyle);
-
 		menu = new JMenu(label);
-
-		style(menu);
+		style(menu, true);
 	}
 
 	@Override

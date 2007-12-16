@@ -34,8 +34,8 @@ public class OpenNeoFileAction extends StandardAction {
 	 * @param nodeContainer
 	 *            Container to which the loaded model shall be added to
 	 */
-	public OpenNeoFileAction(String actionName, INodeContainer nodeContainer) {
-		super("Open model from file", actionName);
+	public OpenNeoFileAction(INodeContainer nodeContainer) {
+		super("Open from file");
 		init(nodeContainer);
 	}
 
@@ -90,8 +90,6 @@ public class OpenNeoFileAction extends StandardAction {
 	protected void init(INodeContainer nodeContainer) {
 		this.nodeContainer = nodeContainer;
 	}
-
-	
 
 	/**
 	 * Wraps the loaded object and adds it to the Node Container

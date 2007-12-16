@@ -22,15 +22,20 @@ public abstract class AbstractMenuBuilder {
 	public abstract void addAction(StandardAction action);
 
 	public abstract void addLabel(String msg);
-	
+
 	public abstract AbstractMenuBuilder createSubMenu(String label);
 
 	public boolean isApplyCustomStyle() {
 		return applyStyle;
 	}
 
+	public void style(JComponent item, boolean isTitle) {
+		if (applyStyle) {
+			Style.applyMenuStyle(item, isTitle);
+		}
+	}
+
 	public void style(JComponent item) {
-		if (applyStyle)
-			Style.applyStyleToComponent(item);
+		style(item, false);
 	}
 }

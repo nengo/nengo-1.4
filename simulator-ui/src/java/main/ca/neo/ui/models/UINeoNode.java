@@ -62,6 +62,11 @@ import edu.uci.ics.jung.graph.Vertex;
  * @author Shu
  */
 public abstract class UINeoNode extends UIModelConfigurable {
+
+	@SuppressWarnings("unchecked")
+	public static final Class[] NODE_TYPES = { UINetwork.class,
+			UINEFEnsemble.class, UIFunctionInput.class, UINeuron.class };
+
 	/**
 	 * Factory method which creates a Node UI object around a Node
 	 * 

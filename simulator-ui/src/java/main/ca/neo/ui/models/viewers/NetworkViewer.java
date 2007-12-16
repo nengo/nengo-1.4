@@ -25,7 +25,6 @@ import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
-import ca.neo.ui.models.UIModels;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
@@ -33,6 +32,7 @@ import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.exceptions.UIException;
 import ca.shu.ui.lib.objects.activities.AbstractActivity;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
@@ -255,32 +255,19 @@ public class NetworkViewer extends NodeViewer {
 		menu.addSection("Add model to network");
 		MenuBuilder createNewMenu = menu.createSubMenu("Create new");
 
-		MenuBuilder nodeContainersMenu = createNewMenu
-				.createSubMenu("Node Containers");
-		MenuBuilder nodesMenu = createNewMenu.createSubMenu("Nodes");
-		// MenuBuilder functionsMenu = createNewMenu.createSubMenu("Functions");
-
-		menu.addAction(new OpenNeoFileAction("Open from file", this));
-
 		// Nodes
-		for (Class element : UIModels.NODE_TYPES) {
-			nodesMenu.addAction(new CreateModelAction(this, element));
+		for (Class element : UINeoNode.NODE_TYPES) {
+			try {
+				createNewMenu.addAction(new CreateModelAction(this, element));
+			} catch (UIException e) {
+				// swallow this, not all model types can be instantiated
+			}
 		}
-
-		// Node Containers
-		for (Class element : UIModels.NODE_CONTAINER_TYPES) {
-			nodeContainersMenu.addAction(new CreateModelAction(this, element));
-		}
-
-		// Functions
-		for (Class element : UIModels.FUNCTION_TYPES) {
-			createNewMenu.addAction(new CreateModelAction(this, element));
-		}
+		menu.addAction(new OpenNeoFileAction(this));
 
 		/*
 		 * Visual
 		 */
-
 		menu.addSection("Visual");
 
 		MenuBuilder widgetMenu = menu.createSubMenu("Widgets");
