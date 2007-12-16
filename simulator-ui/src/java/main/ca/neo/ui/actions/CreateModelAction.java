@@ -8,6 +8,7 @@ import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * Creates a new NEO model
@@ -30,7 +31,9 @@ public class CreateModelAction extends ReversableAction {
 			nodeProxy = (UINeoNode) nodeUIType.newInstance();
 			return nodeProxy.getTypeName();
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			Util
+					.Assert(false,
+							"Can't get model type name because default constructor is missing");
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}

@@ -18,6 +18,10 @@ public class UINeuron extends UINeoNode {
 
 	private static final long serialVersionUID = 1L;
 
+	public UINeuron() {
+		super();
+	}
+
 	public UINeuron(Neuron model) {
 		super(model);
 		init();

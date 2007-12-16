@@ -90,7 +90,7 @@ class AllNeoFiles extends FileExtensionFilter {
 
 	@Override
 	public String getDescription() {
-		return "All Neo Files";
+		return "All NEO Files";
 	}
 
 }
