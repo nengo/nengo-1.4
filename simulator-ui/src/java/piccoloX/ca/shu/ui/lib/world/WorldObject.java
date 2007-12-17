@@ -29,6 +29,8 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 */
 	public static final String PROPERTY_GLOBAL_BOUNDS = "globalBounds";
 
+	public static final long TIME_BETWEEN_POPUPS = 500;
+
 	/**
 	 * Current Piccolo activity
 	 */
@@ -43,6 +45,8 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 * Whether this object is selectable by the Selection handler
 	 */
 	private boolean isSelectable = true;
+
+	private long lastPopupTime = 0;
 
 	/**
 	 * This object's name
@@ -157,6 +161,7 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 			isDestroyed = true;
 
 			prepareForDestroy();
+
 			/*
 			 * Notify edges that this object has been destroyed
 			 */
@@ -173,9 +178,9 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 					((WorldObject) child).destroy();
 				}
 			}
-			removeFromParent();
 
 			firePropertyChange(0, PROPERTY_DESTROYED, null, null);
+			removeFromParent();
 		}
 	}
 
@@ -323,28 +328,6 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	}
 
 	/**
-	 * Show a transient message which appears over the object. The message is
-	 * added to the world's sky layer.
-	 * 
-	 * @param msg
-	 */
-	public void showPopupMessage(String msg) {
-		if (getWorld() != null) {
-			Util.debugMsg("UI Popup Msg: " + msg);
-			
-			TransientMessage msgObject = new TransientMessage(msg);
-
-			double offsetX = -(msgObject.getWidth() - getWidth()) / 2d;
-
-			Point2D position = objectToSky(new Point2D.Double(offsetX, -5));
-
-			msgObject.setOffset(position);
-			getWorld().getSky().addChild(msgObject);
-			msgObject.startAnimation();
-		}
-	}
-
-	/**
 	 * @param name
 	 *            New name for this object
 	 */
@@ -373,6 +356,39 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	public void setVisible(boolean isVisible) {
 		super.setVisible(isVisible);
 		signalGlobalBoundsChanged();
+	}
+
+	/**
+	 * Show a transient message which appears over the object. The message is
+	 * added to the world's sky layer.
+	 * 
+	 * @param msg
+	 */
+	public synchronized void showPopupMessage(String msg) {
+		if (getWorld() != null) {
+
+			Util.debugMsg("UI Popup Msg: " + msg);
+
+			TransientMessage msgObject = new TransientMessage(msg);
+
+			double offsetX = -(msgObject.getWidth() - getWidth()) / 2d;
+
+			Point2D position = objectToSky(new Point2D.Double(offsetX, -5));
+
+			msgObject.setOffset(position);
+			getWorld().getSky().addChild(msgObject);
+
+			long currentTime = System.currentTimeMillis();
+			long delay = TIME_BETWEEN_POPUPS - (currentTime - lastPopupTime);
+
+			if (delay < 0) {
+				delay = 0;
+			}
+
+			msgObject.popup(delay);
+
+			lastPopupTime = currentTime + delay;
+		}
 	}
 
 	@Override

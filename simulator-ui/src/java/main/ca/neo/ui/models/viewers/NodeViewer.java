@@ -1,6 +1,8 @@
 package ca.neo.ui.models.viewers;
 
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -82,7 +84,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	}
 
 	/**
-	 * @param nodeProxy
+	 * @param node
 	 *            node to be added
 	 * @param updateModel
 	 *            if true, the network model is updated. this may be false, if
@@ -92,24 +94,34 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	 * @param moveCameraToNode
 	 *            whether to move the camera to where the node is
 	 */
-	protected void addNeoNode(UINeoNode nodeProxy, boolean updateModel,
+	protected void addNeoNode(UINeoNode node, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
+
+		node.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName().compareTo(
+						WorldObject.PROPERTY_DESTROYED) == 0) {
+
+					removeNeoNode((UINeoNode) evt.getSource());
+				}
+			}
+		});
 
 		/**
 		 * Moves the camera to where the node is positioned, if it's not dropped
 		 * in the center of the camera
 		 */
 		if (moveCameraToNode) {
-			getWorld().animateToSkyPosition(nodeProxy.getOffset().getX(),
-					nodeProxy.getOffset().getY());
+			getWorld().animateToSkyPosition(node.getOffset().getX(),
+					node.getOffset().getY());
 		}
 
-		neoNodesChildren.put(nodeProxy.getName(), nodeProxy);
+		neoNodesChildren.put(node.getName(), node);
 
 		if (dropInCenterOfCamera) {
-			getGround().addObject(nodeProxy, dropInCenterOfCamera);
+			getGround().addObject(node, dropInCenterOfCamera);
 		} else {
-			getGround().addChild(nodeProxy);
+			getGround().addChild(node);
 		}
 	}
 
@@ -319,7 +331,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	/**
 	 * Hides all widgets
 	 */
-	public void hideAllWidgets() {
+	public void hideAllOriginTerminations() {
 		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
 		while (enumeration.hasMoreElements()) {
 			UINeoNode node = enumeration.nextElement();
@@ -333,7 +345,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	 * @param node
 	 *            Node to remove
 	 */
-	public void removeNeoNode(UINeoNode node) {
+	protected void removeNeoNode(UINeoNode node) {
 		neoNodesChildren.remove(node.getName());
 	}
 
@@ -348,7 +360,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	/**
 	 * Shows all widgets
 	 */
-	public void showAllWidgets() {
+	public void showAllOriginTerminations() {
 		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
 		while (enumeration.hasMoreElements()) {
 			UINeoNode node = enumeration.nextElement();

@@ -67,8 +67,8 @@ public class UIStateProbe extends UIProbe {
 			throw exception;
 		}
 
-		nodeAttachedTo.showPopupMessage("Probe (" + state
-				+ ") added to Simulator");
+		getProbeParent().showPopupMessage(
+				"Probe (" + state + ") added to Simulator");
 
 		setModel(probe);
 
@@ -133,7 +133,7 @@ public class UIStateProbe extends UIProbe {
 		try {
 			getProbeParent().getParentNetwork().getSimulator().removeProbe(
 					getModel());
-			showPopupMessage("Probe removed from Simulator");
+			getProbeParent().showPopupMessage("Probe removed from Simulator");
 		} catch (SimulationException e) {
 			UserMessages.showError("Could not remove probe");
 		}

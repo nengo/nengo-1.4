@@ -60,7 +60,7 @@ public abstract class LineConnector extends WorldObject implements
 
 		if (newTermination != getTermination()) {
 			if (canConnectTo(newTermination)) {
-				if (!initConnection(newTermination, modifyModel)) {
+				if (!initTarget(newTermination, modifyModel)) {
 					newTermination = null;
 				}
 			}
@@ -77,14 +77,14 @@ public abstract class LineConnector extends WorldObject implements
 
 		if (term != myTermination) {
 			if (myTermination != null) {
-				justDisconnected();
+				disconnectFromTermination();
 			}
 
 			myTermination = term;
 
 			if (term != null) {
 				((WorldObject) term).addChild(this);
-				justConnected();
+				connectToTermination();
 			}
 		}
 	}
@@ -103,8 +103,7 @@ public abstract class LineConnector extends WorldObject implements
 	 * @param target
 	 * @return Whether the connection was successfully initialized
 	 */
-	protected boolean initConnection(ILineTermination target,
-			boolean modifyModel) {
+	protected boolean initTarget(ILineTermination target, boolean modifyModel) {
 
 		return true;
 	}
@@ -112,12 +111,12 @@ public abstract class LineConnector extends WorldObject implements
 	/**
 	 * Called when the LineEnd is first connected to a Line end holder
 	 */
-	protected abstract void justConnected();
+	protected abstract void connectToTermination();
 
 	/**
 	 * Called when the LineEnd is first disconnected from a Line end holder
 	 */
-	protected abstract void justDisconnected();
+	protected abstract void disconnectFromTermination();
 
 	@Override
 	protected void prepareForDestroy() {
@@ -140,10 +139,6 @@ public abstract class LineConnector extends WorldObject implements
 
 	}
 
-	public LineWell getOrigin() {
-		return myWell;
-	}
-
 	public ILineTermination getTermination() {
 		return myTermination;
 	}
@@ -153,7 +148,7 @@ public abstract class LineConnector extends WorldObject implements
 		boolean attemptedConnection = false;
 
 		for (WorldObject target : targets) {
-			if (target == getOrigin()) {
+			if (target == getWell()) {
 				// Connector has been receded back into the origin
 				destroy();
 				target = null;

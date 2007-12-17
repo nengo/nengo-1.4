@@ -58,47 +58,39 @@ public class UIProjection extends LineConnector {
 	}
 
 	@Override
-	protected boolean initConnection(ILineTermination target,
-			boolean modifyModel) {
-		if (!(target instanceof UITermination))
-			return false;
-		if (modifyModel) {
-			if (getOriginUI().connect((UITermination) target)) {
-				showPopupMessage("Projection added to Network");
-
-				return true;
-			} else {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	protected void justConnected() {
+	protected void connectToTermination() {
 		/*
 		 * Detect recurrent connections
 		 */
 		if ((getTermination()).getNodeParent() == getOriginUI().getNodeParent()) {
-
 			setRecursive(true);
 		}
 	}
 
 	@Override
-	protected void justDisconnected() {
+	protected void disconnectFromTermination() {
 		setRecursive(false);
+		getTermination().disconnect();
+	}
 
-		UITermination termination = getTermination();
-		if (getOriginUI().disconnect(termination)) {
-
-			termination.showPopupMessage("Projection removed from Network");
+	@Override
+	protected boolean initTarget(ILineTermination target, boolean modifyModel) {
+		if (!(target instanceof UITermination)) {
+			return false;
 		}
 
+		if (((UITermination) target).connect(getOriginUI(), modifyModel)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	protected void prepareForDestroy() {
+		if (getTermination() != null) {
+			disconnectFromTermination();
+		}
 		super.prepareForDestroy();
 	}
 

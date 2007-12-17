@@ -7,7 +7,6 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
-import ca.neo.model.StructuralException;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
@@ -16,7 +15,6 @@ import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * UI Wrapper for an Origin
@@ -60,25 +58,6 @@ public class UIOrigin extends Widget {
 	protected Object configureModel(PropertySet configuredProperties)
 			throws ConfigException {
 		throw new NotImplementedException();
-	}
-
-	/**
-	 * @param target
-	 *            Target to be connected with
-	 * @return true is successfully connected
-	 */
-	protected boolean connect(UITermination target) {
-		Util.debugMsg("Projection added " + target.getName());
-		try {
-
-			getNodeParent().getParentNetwork().addProjection(getModel(),
-					target.getModelTermination());
-
-			return true;
-		} catch (StructuralException e) {
-			UserMessages.showWarning("Could not connect: " + e.getMessage());
-			return false;
-		}
 	}
 
 	@Override
@@ -149,35 +128,12 @@ public class UIOrigin extends Widget {
 
 	}
 
-	/**
-	 * @param term
-	 *            Termination to be disconnected from
-	 * @return True if successful
-	 */
-	public boolean disconnect(UITermination term) {
-
-		if (term != null) {
-			Util.debugMsg("Projection removed " + term.getName());
-			try {
-				getNodeParent().getParentNetwork().removeProjection(
-						term.getModelTermination());
-				return true;
-			} catch (StructuralException e) {
-				UserMessages.showWarning("Could not disconnect: "
-						+ e.toString());
-			}
-			return false;
-		} else {
-			return true;
-		}
-
-	}
-
 	@Override
 	public PropertyDescriptor[] getConfigSchema() {
 		UserMessages.showError("POrigin is not configurable yet");
 		return null;
 	}
+
 	public Color getColor() {
 		return lineWell.getColor();
 	}

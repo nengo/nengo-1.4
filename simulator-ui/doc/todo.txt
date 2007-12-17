@@ -3,6 +3,7 @@
 *******************************************
 12/17/2007 - Spring Layout done
 12/17/2007 - New prettier window icons
+12/17/2007 - Sequential popup messages no longer overlap
 
 *******************************************
  Pri 0 - doing next

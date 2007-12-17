@@ -174,10 +174,6 @@ public class UITermination extends Widget implements ILineTermination {
 		return (Termination) super.getModel();
 	}
 
-	public Termination getModelTermination() {
-		return getModel();
-	}
-
 	@Override
 	public String getTypeName() {
 		return "Termination";
@@ -189,6 +185,55 @@ public class UITermination extends Widget implements ILineTermination {
 	public float[][] getWeights() {
 		return (float[][]) getModel().getConfiguration().getProperty(
 				Termination.WEIGHTS);
+	}
+
+	private boolean isConnected;
+
+	/**
+	 * @param term
+	 *            Termination to be disconnected from
+	 * @return True if successful
+	 */
+	public void disconnect() {
+		if (!isConnected) {
+			return;
+		}
+
+		try {
+			getNodeParent().getParentNetwork().removeProjection(getModel());
+			getNodeParent().showPopupMessage(
+					"Projection to " + getName() + " REMOVED");
+			isConnected = false;
+		} catch (StructuralException e) {
+			UserMessages.showWarning("Could not disconnect: " + e.toString());
+		}
+	}
+
+	/**
+	 * @param target
+	 *            Target to be connected with
+	 * @return true is successfully connected
+	 */
+	protected boolean connect(UIOrigin source, boolean modifyModel) {
+		if (isConnected) {
+			disconnect();
+		}
+		if (modifyModel) {
+			try {
+
+				getNodeParent().showPopupMessage(
+						"Projection to " + getName() + " ADDED");
+				getNodeParent().getParentNetwork().addProjection(
+						source.getModel(), getModel());
+
+			} catch (StructuralException e) {
+				UserMessages
+						.showWarning("Could not connect: " + e.getMessage());
+			}
+		}
+		isConnected = true;
+
+		return isConnected;
 	}
 
 	/**
@@ -296,6 +341,12 @@ public class UITermination extends Widget implements ILineTermination {
 		protected void undo() throws ActionException {
 			setWeights(oldWeights);
 		}
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+		disconnect();
+		super.prepareForDestroy();
 	}
 }
 

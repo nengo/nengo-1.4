@@ -379,18 +379,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		} else {
 			addChild(probeUI);
 		}
-
-		// assignProbes();
-
-	}
-
-	@Override
-	protected void prepareForDestroy() {
-		NodeViewer viewer = getParentViewer();
-		if (viewer != null)
-			getParentViewer().removeNeoNode(this);
-
-		super.prepareForDestroy();
 	}
 
 	/**

@@ -73,17 +73,6 @@ public class FuzzyLogicExample {
 		net.addNode(rule2);
 		net.addNode(output);
 
-		/*
-		 * Add probes
-		 */
-		try {
-			simulator.addProbe(C.getName(), "V", true);
-			simulator.addProbe(A.getName(), "V", true);
-			simulator.addProbe(B.getName(), "V", true);
-			simulator.addProbe(D.getName(), "V", true);
-		} catch (SimulationException e) {
-			e.printStackTrace();
-		}
 		A.addDecodedTermination("in", new float[][] { new float[] { 1f, 0f, 0f,
 				0f } }, .005f, false);
 		B.addDecodedTermination("in", new float[][] { new float[] { 0f, 1f, 0f,
@@ -153,6 +142,18 @@ public class FuzzyLogicExample {
 
 		net.addProjection(output.getOrigin("recurrent"), output
 				.getTermination("recurrent"));
+
+		/*
+		 * Add probes
+		 */
+		try {
+			simulator.addProbe(C.getName(), "in", true);
+			simulator.addProbe(A.getName(), "in", true);
+			simulator.addProbe(B.getName(), "in", true);
+			simulator.addProbe(D.getName(), "in", true);
+		} catch (SimulationException e) {
+			e.printStackTrace();
+		}
 
 		return net;
 	}

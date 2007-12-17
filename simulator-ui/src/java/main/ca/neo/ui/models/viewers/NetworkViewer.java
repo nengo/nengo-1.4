@@ -264,13 +264,11 @@ public class NetworkViewer extends NodeViewer {
 		menu.addAction(new OpenNeoFileAction(this));
 
 		/*
-		 * Visual
+		 * Origins & Terminations
 		 */
-		menu.addSection("Visual");
-
-		MenuBuilder widgetMenu = menu.addSubMenu("Widgets");
-		widgetMenu.addAction(new ShowAllWidgetsAction("Show all widgets"));
-		widgetMenu.addAction(new HideAllWidgetsAction("Hide all widgets"));
+		menu.addSection("Origins and Terminations");
+		menu.addAction(new ShowAllOriginTerminations("Show all"));
+		menu.addAction(new HideAllOriginTerminations("Hide all"));
 
 	}
 
@@ -303,7 +301,7 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	public void removeNeoNode(UINeoNode nodeUI) {
+	protected void removeNeoNode(UINeoNode nodeUI) {
 
 		try {
 			nodeUI.showPopupMessage("Node " + nodeUI.getName()
@@ -537,17 +535,17 @@ public class NetworkViewer extends NodeViewer {
 	 * 
 	 * @author Shu Wu
 	 */
-	class HideAllWidgetsAction extends StandardAction {
+	class HideAllOriginTerminations extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public HideAllWidgetsAction(String actionName) {
-			super("Hide all widgets", actionName);
+		public HideAllOriginTerminations(String actionName) {
+			super("Hide all origins & terminations", actionName);
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			hideAllWidgets();
+			hideAllOriginTerminations();
 		}
 
 	}
@@ -652,17 +650,17 @@ public class NetworkViewer extends NodeViewer {
 	 * 
 	 * @author Shu Wu
 	 */
-	class ShowAllWidgetsAction extends StandardAction {
+	class ShowAllOriginTerminations extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public ShowAllWidgetsAction(String actionName) {
-			super("Show all widgets", actionName);
+		public ShowAllOriginTerminations(String actionName) {
+			super("Show all origins / terminations", actionName);
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			showAllWidgets();
+			showAllOriginTerminations();
 		}
 
 	}
