@@ -1,7 +1,7 @@
 /*
  * Created on Jan 30, 2004
  */
-package ca.neo.config;
+package ca.neo.config.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

@@ -1,7 +1,7 @@
 /*
  * Created on 10-Dec-07
  */
-package ca.neo.config;
+package ca.neo.config.ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -11,7 +11,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import ca.neo.config.ConfigurationTreeModel.Value;
+import ca.neo.config.ConfigurationConfiguration;
+import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
 
@@ -50,7 +51,7 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 			Object o = ((Value) value).getObject();
 			Component customRenderer = ConfigurationConfiguration.getInstance().getRenderer(o);
 			if (customRenderer == null) {
-				setText(ConfigurationConfiguration.getInstance().getDisplayText(o));
+				setText(o.toString()); //ConfigurationConfiguration.getInstance().getDisplayText(o));
 				setToolTipText(null);							
 			} else {
 				customRenderer.setBackground(sel ? new Color(.1f, .4f, .7f, .2f) : Color.WHITE);

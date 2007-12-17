@@ -1,11 +1,9 @@
 /*
  * Created on 10-Dec-07
  */
-package ca.neo.config;
+package ca.neo.config.ui;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
 
@@ -13,10 +11,10 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.text.JTextComponent;
-import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreePath;
 
-import ca.neo.config.ConfigurationTreeModel.Value;
+import ca.neo.config.ConfigurationConfiguration;
+import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration.Property;
 
@@ -60,42 +58,14 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 		if (path.getParentPath().getLastPathComponent() instanceof Property && value instanceof Value) {
 			Property property = (Property) path.getParentPath().getLastPathComponent();
 			Value node = (Value) value;
-			if (result instanceof JTextComponent) {
-				((JTextComponent) result).setText(ConfigurationConfiguration.getInstance().getDisplayText(node.getObject()));
-			}
+//			if (result instanceof JTextComponent) {
+//				((JTextComponent) result).setText(ConfigurationConfiguration.getInstance().getDisplayText(node.getObject()));
+//			}
 			Component customEditor = ConfigurationConfiguration.getInstance().getEditor(property.getType(), node.getObject(), tree, path);
 			if (customEditor != null) result = customEditor;
 		}
 		
 		return result;
-	}
-	
-	public static abstract class ConfigurationChangeListener implements ActionListener {
-		
-		private ConfigurationTreeModel myModel;
-		private TreeCellEditor myEditor;
-		private TreePath myPath;
-		
-		public ConfigurationChangeListener(JTree tree, TreePath path) {
-			myModel = (ConfigurationTreeModel) tree.getModel();
-			myEditor = tree.getCellEditor();
-			myPath = path;
-		}
-		
-		public abstract Object getValue() throws Exception;
-
-		/**
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		 */
-		public void actionPerformed(ActionEvent e) {
-			try {
-				myModel.setValue(this, myPath, getValue());
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-			myEditor.stopCellEditing();
-		}
-		
 	}
 
 }

@@ -1,7 +1,7 @@
 /*
  * Created on 14-Dec-07
  */
-package ca.neo.config;
+package ca.neo.config.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -30,7 +30,8 @@ import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
-import ca.neo.config.ConfigurationTreeModel.Value;
+import ca.neo.config.ConfigurationConfiguration;
+import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
 import ca.neo.model.impl.ConfigurationImpl;
