@@ -165,6 +165,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	 */
 	@SuppressWarnings("unchecked")
 	public void applySortLayout(SortMode sortMode) {
+		getGround().setElasticLayout(false);
+
 		ArrayList<UINeoNode> nodes = new ArrayList(getNeoNodes().size());
 
 		Enumeration<UINeoNode> em = getNeoNodes().elements();
