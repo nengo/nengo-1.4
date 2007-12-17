@@ -4,10 +4,15 @@
 12/17/2007 - Spring Layout done
 12/17/2007 - New prettier window icons
 12/17/2007 - Sequential popup messages no longer overlap
+12/17/2007 - Connection code improved
 
 *******************************************
  Pri 0 - doing next
 *******************************************
+Transient messages should not fall off the screen
+	reference tooltips code
+Transient messages should follow the objects
+	reference tooltips code
 
 TODO:
     * Dynamic class loading

@@ -15,7 +15,7 @@ import edu.umd.cs.piccolo.activities.PActivity;
 public class TransientMessage extends PXText {
 
 	private static final long serialVersionUID = 1L;
-	static final int ANIMATE_MSG_DURATION = 2500;
+	static final int ANIMATE_MSG_DURATION = 4000;
 
 	public TransientMessage(String text) {
 		super(text);

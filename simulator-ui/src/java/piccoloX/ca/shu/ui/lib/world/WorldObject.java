@@ -29,7 +29,7 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 */
 	public static final String PROPERTY_GLOBAL_BOUNDS = "globalBounds";
 
-	public static final long TIME_BETWEEN_POPUPS = 500;
+	public static final long TIME_BETWEEN_POPUPS = 1500;
 
 	/**
 	 * Current Piccolo activity
