@@ -59,6 +59,13 @@ public class ConfigurationTreeModel implements TreeModel {
 		}		
 	}
 	
+	public void refresh(Object source, TreePath path) {
+		TreeModelEvent event = new TreeModelEvent(source, path);
+		for (int i = 0; i <myListeners.size(); i++) {
+			myListeners.get(i).treeStructureChanged(event);						
+		}
+	}
+	
 	//path to node to insert before
 	public void insertValue(Object source, TreePath path, Object value) {
 		try {

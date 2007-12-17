@@ -47,18 +47,18 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 			
 			JPopupMenu popup = new JPopupMenu();
 			if (path.getLastPathComponent() instanceof Property) {
-				Property p = (Property) path.getLastPathComponent();
+				final Property p = (Property) path.getLastPathComponent();
 				if (p.isMultiValued() && !p.isFixedCardinality()) {
 					JMenuItem addValueItem = new JMenuItem("Add");
 					addValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent E) {
 							//TODO: how to construct / replace non-configurables? clone?
-							myModel.addValue(this, path, "foo foo foo");
+							myModel.addValue(this, path, p.getDefaultValue());
 						}
 					});
 					popup.add(addValueItem);				
 				}
-			} else if (path.getParentPath().getLastPathComponent() instanceof Property) {
+			} else if (path.getParentPath() != null && path.getParentPath().getLastPathComponent() instanceof Property) {
 				final Property p = (Property) path.getParentPath().getLastPathComponent();
 				if (Configurable.class.isAssignableFrom(p.getType())) {
 					final JMenuItem replaceValueItem = new JMenuItem("Replace");
@@ -71,8 +71,14 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					});
 					popup.add(replaceValueItem);									
 				}
+				
 				if (p.isMultiValued() && !p.isFixedCardinality()) {
 					JMenuItem insertValueItem = new JMenuItem("Insert");
+					insertValueItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							myModel.insertValue(this, path, p.getDefaultValue());
+						}
+					}); 
 					popup.add(insertValueItem);				
 					JMenuItem removeValueItem = new JMenuItem("Remove");
 					removeValueItem.addActionListener(new ActionListener() {
@@ -82,7 +88,15 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					});
 					popup.add(removeValueItem);				
 				}
+				
 			}
+			JMenuItem refreshItem = new JMenuItem("Refresh");
+			refreshItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					myModel.refresh(this, path);
+				}
+			});
+			popup.add(refreshItem);
 			popup.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}

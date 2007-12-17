@@ -186,6 +186,14 @@ public class ConfigurationImpl implements Configuration {
 			return myConfiguration;
 		}
 
+		/**
+		 * Returns getValue() be default. 
+		 */
+		public Object getDefaultValue() {
+			return getValue();
+		}		
+		
+
 	}
 	
 	
@@ -393,6 +401,7 @@ public class ConfigurationImpl implements Configuration {
 		 * @see ca.neo.model.Configuration.Property#getValue()
 		 */
 		public Object getValue() {
+			System.out.println("Getting value");
 			return (myValues.size() > 0) ? myValues.get(0) : null;
 		}
 

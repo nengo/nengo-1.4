@@ -168,6 +168,11 @@ public interface Configuration {
 		 */
 		public void remove(int index) throws StructuralException;
 		
+		/**
+		 * @return Default value for insertions
+		 */
+		public Object getDefaultValue(); 
+		
 	}
 
 	
