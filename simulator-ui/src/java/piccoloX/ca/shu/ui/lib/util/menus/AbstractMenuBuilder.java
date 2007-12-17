@@ -23,19 +23,21 @@ public abstract class AbstractMenuBuilder {
 
 	public abstract void addLabel(String msg);
 
-	public abstract AbstractMenuBuilder createSubMenu(String label);
+	public abstract void addSection(String name);
 
-	public boolean isApplyCustomStyle() {
+	public abstract AbstractMenuBuilder addSubMenu(String label);
+
+	public boolean isCustomStyle() {
 		return applyStyle;
+	}
+
+	public void style(JComponent item) {
+		style(item, false);
 	}
 
 	public void style(JComponent item, boolean isTitle) {
 		if (applyStyle) {
 			Style.applyMenuStyle(item, isTitle);
 		}
-	}
-
-	public void style(JComponent item) {
-		style(item, false);
 	}
 }

@@ -68,8 +68,8 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 	}
 
 	@Override
-	public MenuBuilder createSubMenu(String label) {
-		MenuBuilder mb = new MenuBuilder(label, isApplyCustomStyle());
+	public MenuBuilder addSubMenu(String label) {
+		MenuBuilder mb = new MenuBuilder(label, isCustomStyle());
 		toJPopupMenu().add(mb.getJMenu());
 		return mb;
 

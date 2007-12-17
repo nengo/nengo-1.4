@@ -41,7 +41,7 @@ public abstract class LineConnector extends WorldObject implements
 
 		myEdge = new Edge(well, this);
 		myEdge.setPointerVisible(true);
-		well.getWorldLayer().addChild(myEdge);
+		well.getWorldLayer().addEdge(myEdge);
 
 		myIcon = new LineOriginIcon();
 		myIcon.setColor(Style.COLOR_LINEEND);
