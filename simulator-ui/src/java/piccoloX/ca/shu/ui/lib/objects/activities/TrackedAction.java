@@ -40,6 +40,12 @@ public abstract class TrackedAction extends StandardAction {
 			}
 		});
 		super.doAction();
+
+	}
+
+	@Override
+	protected void postAction() {
+		super.postAction();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				trackedMsg.finished();

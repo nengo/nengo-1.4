@@ -15,13 +15,14 @@ import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.elastic.ElasticObject;
 
 /**
  * A UI Object which wraps a NEO Model
  * 
  * @author Shu Wu
  */
-public abstract class UIModel extends WorldObject implements Interactable {
+public abstract class UIModel extends ElasticObject implements Interactable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -236,7 +237,7 @@ public abstract class UIModel extends WorldObject implements Interactable {
 	 * @return Constructed Tooltip
 	 */
 	public final TooltipBuilder showTooltips() {
-		String toolTipTitle = getName() + "(" + getTypeName() + ")";
+		String toolTipTitle = getFullName();
 		TooltipBuilder tooltipBuilder = new TooltipBuilder(toolTipTitle);
 		if (isModelBusy()) {
 

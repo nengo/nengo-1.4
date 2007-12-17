@@ -8,6 +8,7 @@ import ca.shu.ui.lib.objects.PXText;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldGround;
 import ca.shu.ui.lib.world.WorldObject;
+import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -52,8 +53,8 @@ public class BrainViewer extends World {
 	}
 
 	@Override
-	protected WorldGround createGround() {
-		return new WorldGround(this) {
+	protected WorldGround createGround(PLayer pLayer) {
+		return new WorldGround(this, pLayer) {
 
 			private static final long serialVersionUID = 1L;
 

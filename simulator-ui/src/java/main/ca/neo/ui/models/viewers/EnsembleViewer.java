@@ -1,5 +1,6 @@
 package ca.neo.ui.models.viewers;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
 import ca.neo.model.Probeable;
@@ -9,6 +10,7 @@ import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UINeuron;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.util.UserMessages;
+import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 
 /**
  * Viewer for peeking into an Ensemble
@@ -48,7 +50,7 @@ public class EnsembleViewer extends NodeViewer {
 
 	@Override
 	public void updateViewFromModel() {
-		removeAllNeoNodes();
+		getGround().destroyAndClearChildren();
 
 		Node[] nodes = getModel().getNodes();
 
@@ -96,6 +98,11 @@ public class EnsembleViewer extends NodeViewer {
 			}
 		}
 
+	}
+
+	@Override
+	protected void updateGraph(DirectedSparseGraph graph) {
+		throw new NotImplementedException();
 	}
 
 }

@@ -168,7 +168,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 		menuBar.add(fileMenu.getJMenu());
 
-		MenuBuilder newMenu = fileMenu.createSubMenu("New");
+		MenuBuilder newMenu = fileMenu.addSubMenu("New");
 		newMenu.getJMenu().setMnemonic(KeyEvent.VK_N);
 		newMenu.addAction(new CreateModelAction("Network", this,
 				UINetwork.class), KeyEvent.VK_N);

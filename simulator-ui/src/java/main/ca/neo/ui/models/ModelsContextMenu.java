@@ -105,7 +105,7 @@ public class ModelsContextMenu {
 				typeMenu = new PopupMenuBuilder(typeMenuName);
 				menuBuilder = (PopupMenuBuilder) typeMenu;
 			} else {
-				typeMenu = menuBuilder.createSubMenu(typeMenuName);
+				typeMenu = menuBuilder.addSubMenu(typeMenuName);
 
 			}
 

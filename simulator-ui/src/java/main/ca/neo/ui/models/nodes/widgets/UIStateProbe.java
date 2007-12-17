@@ -76,7 +76,7 @@ public class UIStateProbe extends UIProbe {
 
 	@Override
 	public String getTypeName() {
-		return "Probe";
+		return "State Probe";
 	}
 
 	public UIStateProbe(UINeoNode nodeAttachedTo, Probe probeModel) {
@@ -147,11 +147,11 @@ public class UIStateProbe extends UIProbe {
 		super.constructMenu(menu);
 
 		menu.addSection("Probe");
-		MenuBuilder plotMenu = menu.createSubMenu("plot");
+		MenuBuilder plotMenu = menu.addSubMenu("plot");
 		plotMenu.addAction(new PlotTimeSeries(getModel().getData(), getName()));
 		plotMenu.addAction(new PlotAdvanced(getModel().getData(), getName()));
 
-		MenuBuilder exportMenu = menu.createSubMenu("export data");
+		MenuBuilder exportMenu = menu.addSubMenu("export data");
 		exportMenu.addAction(new ExportToMatlabAction());
 
 	}

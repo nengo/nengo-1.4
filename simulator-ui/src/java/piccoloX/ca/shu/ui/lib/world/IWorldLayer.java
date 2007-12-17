@@ -3,6 +3,8 @@ package ca.shu.ui.lib.world;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import ca.shu.ui.lib.objects.DirectedEdge;
+
 import edu.umd.cs.piccolo.PNode;
 
 /**
@@ -31,6 +33,8 @@ public interface IWorldLayer {
 	 * @return Local coordinate
 	 */
 	public Point2D globalToLocal(Point2D globalPoint);
+
+	public void addEdge(DirectedEdge edge);
 
 	/**
 	 * Converts a local bound to a global bound. This method modifies the

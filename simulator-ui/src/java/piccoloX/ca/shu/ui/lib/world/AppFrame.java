@@ -420,7 +420,7 @@ public abstract class AppFrame extends JFrame {
 			worldMenu.addAction(new SwitchToNavigationMode(), KeyEvent.VK_S);
 		}
 
-		MenuBuilder qualityMenu = worldMenu.createSubMenu("Rendering Quality");
+		MenuBuilder qualityMenu = worldMenu.addSubMenu("Rendering Quality");
 
 		qualityMenu.getJMenu().setMnemonic(KeyEvent.VK_Q);
 
@@ -428,7 +428,7 @@ public abstract class AppFrame extends JFrame {
 		qualityMenu.addAction(new MediumQualityAction(), KeyEvent.VK_M);
 		qualityMenu.addAction(new HighQualityAction(), KeyEvent.VK_H);
 
-		MenuBuilder debugMenu = worldMenu.createSubMenu("Debug");
+		MenuBuilder debugMenu = worldMenu.addSubMenu("Debug");
 		debugMenu.getJMenu().setMnemonic(KeyEvent.VK_E);
 
 		if (!PDebug.debugPrintUsedMemory) {

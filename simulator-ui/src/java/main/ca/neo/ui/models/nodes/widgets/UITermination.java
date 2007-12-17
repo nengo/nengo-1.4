@@ -106,7 +106,7 @@ public class UITermination extends Widget implements ILineTermination {
 					getConnector()));
 		}
 
-		AbstractMenuBuilder configureMenu = menu.createSubMenu("Configure");
+		AbstractMenuBuilder configureMenu = menu.addSubMenu("Configure");
 
 		/*
 		 * Reflectively build property editors

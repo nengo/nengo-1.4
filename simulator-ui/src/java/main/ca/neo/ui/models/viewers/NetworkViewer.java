@@ -42,10 +42,9 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
 import edu.uci.ics.jung.visualization.FRLayout;
+import edu.uci.ics.jung.visualization.ISOMLayout;
 import edu.uci.ics.jung.visualization.Layout;
-import edu.uci.ics.jung.visualization.SpringLayout;
 import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -73,29 +72,39 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public NetworkViewer(UINetwork pNetwork) {
 		super(pNetwork);
-
 	}
 
 	@Override
 	protected void constructLayoutMenu(MenuBuilder layoutMenu) {
+		layoutMenu.addSection("Elastic layout");
+		if (!getGround().isAutoLayout()) {
+			layoutMenu.addAction(new SetElasticLayoutAction("Enable", true));
+		} else {
+			layoutMenu.addAction(new SetElasticLayoutAction("Disable", false));
+		}
 
+		layoutMenu.addSection("Apply layout");
 		super.constructLayoutMenu(layoutMenu);
+		MenuBuilder algorithmLayoutMenu = layoutMenu.addSubMenu("Algorithm");
 
-		MenuBuilder applyLayoutMenu = layoutMenu.createSubMenu("Use algorithm");
-		MenuBuilder autoLayoutMenu = layoutMenu.createSubMenu("Auto layout");
+		layoutMenu.addSection("File");
+		layoutMenu.addAction(new SaveLayout("Save"));
 
-		MenuBuilder layoutSettings = applyLayoutMenu.createSubMenu("Settings");
-		layoutSettings.addAction(new SetLayoutBoundsAction("Set bounds", this));
+		MenuBuilder restoreLayout = layoutMenu.addSubMenu("Restore");
 
-		applyLayoutMenu.addAction(new JungLayoutAction(FRLayout.class,
+		algorithmLayoutMenu.addAction(new JungLayoutAction(FRLayout.class,
 				"Fruchterman-Reingold"));
-		applyLayoutMenu.addAction(new JungLayoutAction(KKLayout.class,
+		algorithmLayoutMenu.addAction(new JungLayoutAction(KKLayout.class,
 				"Kamada-Kawai"));
-		applyLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class,
+		algorithmLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class,
 				"Circle"));
+		algorithmLayoutMenu.addAction(new JungLayoutAction(ISOMLayout.class,
+				"ISOM"));
 
-		layoutMenu.addAction(new SaveLayout("Save current"));
-		MenuBuilder restoreLayout = layoutMenu.createSubMenu("Restore");
+		MenuBuilder layoutSettings = algorithmLayoutMenu.addSubMenu("Settings");
+		layoutSettings.addAction(new SetLayoutBoundsAction(
+				"Set preferred bounds", this));
+
 		String[] layoutNames = getUISettings().getLayoutNames();
 
 		if (layoutNames.length > 0) {
@@ -106,7 +115,7 @@ public class NetworkViewer extends NodeViewer {
 			restoreLayout.addLabel("none");
 		}
 
-		MenuBuilder deleteLayout = layoutMenu.createSubMenu("Delete");
+		MenuBuilder deleteLayout = restoreLayout.addSubMenu("Delete");
 
 		if (layoutNames.length > 0) {
 			for (String element : layoutNames) {
@@ -116,35 +125,32 @@ public class NetworkViewer extends NodeViewer {
 			deleteLayout.addLabel("none");
 		}
 
-		/**
-		 * TODO: Enable spring layout & ISOM Layout which are continuous
-		 */
-
-		autoLayoutMenu.addAction(new StartIterableLayoutAction(
-				SpringLayout.class, "Spring"));
-		// layoutMenu.addAction(new LayoutAction(ISOMLayout.class, "ISOM"));
 	}
 
-	/**
-	 * @return The child nodes of this network as a Graph object readable by
-	 *         Jung Layout algorithms
-	 */
-	protected Graph createGraph() {
-		DirectedSparseGraph graph = new DirectedSparseGraph();
+	@Override
+	protected void prepareForDestroy() {
+
+		saveLayoutAsDefault();
+		super.prepareForDestroy();
+	}
+
+	protected void updateGraph(DirectedSparseGraph graph) {
+		/*
+		 * TODO: Only update when network model and nodes are updated. This
+		 * requires event notification from models.
+		 */
+
+		graph.removeAllVertices();
+		graph.removeAllEdges();
 
 		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
-
 		/**
 		 * Add vertices
 		 */
 		while (enumeration.hasMoreElements()) {
 			UINeoNode node = enumeration.nextElement();
-			DirectedSparseVertex vertex = new DirectedSparseVertex();
 
-			node.setVertex(vertex);
-
-			graph.addVertex(vertex);
-
+			graph.addVertex(node.getVertex());
 		}
 
 		/**
@@ -163,38 +169,26 @@ public class NetworkViewer extends NodeViewer {
 			graph.addEdge(edge);
 
 		}
-
-		return graph;
-
 	}
 
 	@Override
-	protected void prepareForDestroy() {
-
-		saveLayoutAsDefault();
-		super.prepareForDestroy();
-	}
-
-	@Override
-	public void addNeoNode(UINeoNode nodeProxy, boolean updateModel,
+	public void addNeoNode(UINeoNode node, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCamera) {
 
 		if (updateModel) {
 			try {
 
-				getNetwork().addNode(nodeProxy.getModel());
+				getNetwork().addNode(node.getModel());
 
 			} catch (StructuralException e) {
 				UserMessages.showWarning(e.toString());
 				return;
 			}
 		}
-		super.addNeoNode(nodeProxy, updateModel, dropInCenterOfCamera,
-				moveCamera);
+		super.addNeoNode(node, updateModel, dropInCenterOfCamera, moveCamera);
 
 		if (updateModel) {
-			nodeProxy.showPopupMessage("Node " + getName()
-					+ " added to Network");
+			node.showPopupMessage("Node " + getName() + " added to Network");
 
 		}
 	}
@@ -218,7 +212,7 @@ public class NetworkViewer extends NodeViewer {
 
 			Constructor<?> ct = layoutType.getConstructor(ctArgs);
 			Object[] args = new Object[1];
-			args[0] = createGraph();
+			args[0] = getGround().getGraph(true);
 
 			layout = (Layout) ct.newInstance(args);
 
@@ -241,7 +235,7 @@ public class NetworkViewer extends NodeViewer {
 			return;
 		}
 
-		(new JungLayoutActivity(layout)).doAction();
+		(new ApplyJungLayout(layout)).doAction();
 
 	}
 
@@ -257,7 +251,7 @@ public class NetworkViewer extends NodeViewer {
 		 * Create new models
 		 */
 		menu.addSection("Add model to network");
-		MenuBuilder createNewMenu = menu.createSubMenu("Create new");
+		MenuBuilder createNewMenu = menu.addSubMenu("Create new");
 
 		// Nodes
 		for (Class element : UINeoNode.NODE_TYPES) {
@@ -274,7 +268,7 @@ public class NetworkViewer extends NodeViewer {
 		 */
 		menu.addSection("Visual");
 
-		MenuBuilder widgetMenu = menu.createSubMenu("Widgets");
+		MenuBuilder widgetMenu = menu.addSubMenu("Widgets");
 		widgetMenu.addAction(new ShowAllWidgetsAction("Show all widgets"));
 		widgetMenu.addAction(new HideAllWidgetsAction("Hide all widgets"));
 
@@ -329,6 +323,8 @@ public class NetworkViewer extends NodeViewer {
 	 *            Name of layout to restore
 	 */
 	public boolean restoreNodeLayout(String name) {
+		getGround().setElasticLayout(false);
+
 		NetworkUISettings layouts = getUISettings();
 		NodeLayout layout = layouts.getLayout(name);
 
@@ -410,7 +406,7 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	@Override
 	public void updateViewFromModel() {
-		removeAllNeoNodes();
+		getGround().destroyAndClearChildren();
 
 		/*
 		 * Construct Nodes from the Network model
@@ -475,6 +471,47 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	/**
+	 * Activity for performing a Jung Layout.
+	 * 
+	 * @author Shu Wu
+	 */
+	class ApplyJungLayout extends TrackedAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private Layout layout;
+
+		public ApplyJungLayout(Layout layout) {
+			super("Performing layout: " + layout.getClass().getSimpleName());
+			this.layout = layout;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			getGround().setElasticLayout(false);
+			layout.initialize(getLayoutBounds());
+
+			if (layout.isIncremental()) {
+				long timeNow = System.currentTimeMillis();
+				while (!layout.incrementsAreDone()
+						&& (System.currentTimeMillis() - timeNow < 1000 && !layout
+								.incrementsAreDone())) {
+					layout.advancePositions();
+				}
+			}
+			/**
+			 * Layout nodes needs to be done in the Swing dispatcher thread
+			 */
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					getGround().updateChildrensFromLayout(layout, true);
+				}
+			});
+
+		}
+	}
+
+	/**
 	 * Action to delete a layout
 	 * 
 	 * @author Shu Wu
@@ -516,56 +553,6 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	/**
-	 * Action for starting and running a Iterable Jung Layout
-	 * 
-	 * @author Shu
-	 */
-	class StartIterableLayoutAction extends LayoutAction {
-
-		private static final long serialVersionUID = 1L;
-
-		private Class<? extends Layout> layoutClass;
-
-		public StartIterableLayoutAction(Class<? extends Layout> layoutClass,
-				String name) {
-			super(NetworkViewer.this, "Apply layout " + name, name);
-			this.layoutClass = layoutClass;
-		}
-
-		@Override
-		protected void applyLayout() {
-			setAutoLayout(layoutClass);
-		}
-
-	}
-
-	public void setAutoLayout(Class<? extends Layout> layoutType) {
-
-		Layout layout = null;
-		try {
-			Class<?>[] ctArgs = new Class[1];
-			ctArgs[0] = Graph.class;
-
-			Constructor<?> ct = layoutType.getConstructor(ctArgs);
-			Object[] args = new Object[1];
-			args[0] = createGraph();
-
-			layout = (Layout) ct.newInstance(args);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		if (layout == null) {
-			UserMessages.showError("Could not apply layout");
-			return;
-		}
-
-		// TODO: Create new activity for iterating this layout
-		UserMessages.showError("This layout is not implemented yet");
-		(new JungLayoutActivity(layout)).doAction();
-	}
-
-	/**
 	 * Action for applying a Jung Layout
 	 * 
 	 * @author Shu
@@ -586,92 +573,6 @@ public class NetworkViewer extends NodeViewer {
 			applyJungLayout(layoutClass);
 		}
 
-	}
-
-	/**
-	 * Activity for performing a Jung Layout.
-	 * 
-	 * @author Shu Wu
-	 */
-	class JungLayoutActivity extends TrackedAction {
-
-		private static final long serialVersionUID = 1L;
-
-		private Layout layout;
-
-		public JungLayoutActivity(Layout layout) {
-			super("Performing layout: " + layout.getClass().getSimpleName());
-			this.layout = layout;
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			layout.initialize(getLayoutBounds());
-			while (!layout.incrementsAreDone()) {
-				layout.advancePositions();
-			}
-
-			/**
-			 * Layout nodes needs to be done in the Swing dispatcher thread
-			 */
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					/**
-					 * Layout nodes
-					 */
-					Enumeration<UINeoNode> enumeration = getNeoNodes()
-							.elements();
-
-					if (enumeration.hasMoreElements()) {
-						double startX = Double.POSITIVE_INFINITY;
-						double startY = Double.POSITIVE_INFINITY;
-						double endX = Double.NEGATIVE_INFINITY;
-						double endY = Double.NEGATIVE_INFINITY;
-
-						while (enumeration.hasMoreElements()) {
-
-							UINeoNode node = enumeration.nextElement();
-
-							if (node.getVertex() != null) {
-								Point2D coord = layout.getLocation(node
-										.getVertex());
-
-								if (coord != null) {
-									double x = coord.getX();
-									double y = coord.getY();
-									node.animateToPositionScaleRotation(x, y,
-											1, 0, 1000);
-
-									if (x < startX) {
-										startX = x;
-									}
-									if (x + node.getWidth() > endX) {
-										endX = x + node.getWidth();
-									}
-
-									if (y < startY) {
-										startY = y;
-									}
-									if (y + node.getHeight() > endY) {
-										endY = y + node.getHeight();
-									}
-
-								}
-
-							}
-
-						}
-
-						PBounds fullBounds = new PBounds(startX, startY, endX
-								- startX, endY - startY);
-						zoomToBounds(fullBounds);
-
-					}
-
-				}
-			});
-
-		}
 	}
 
 	/**
@@ -725,6 +626,28 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	/**
+	 * Action for starting and running a Iterable Jung Layout
+	 * 
+	 * @author Shu
+	 */
+	class SetElasticLayoutAction extends LayoutAction {
+
+		private static final long serialVersionUID = 1L;
+		private boolean enabled;
+
+		public SetElasticLayoutAction(String name, boolean enabled) {
+			super(NetworkViewer.this, "Set Spring Layout: " + enabled, name);
+			this.enabled = enabled;
+		}
+
+		@Override
+		protected void applyLayout() {
+			getGround().setElasticLayout(enabled);
+		}
+
+	}
+
+	/**
 	 * Action to show all widgets
 	 * 
 	 * @author Shu Wu
@@ -743,6 +666,7 @@ public class NetworkViewer extends NodeViewer {
 		}
 
 	}
+
 }
 
 /**
@@ -764,6 +688,14 @@ class SetLayoutBoundsAction extends StandardAction {
 		this.parent = parent;
 	}
 
+	private void completeConfiguration(PropertySet properties) {
+		parent
+				.setLayoutBounds(new Dimension((Integer) properties
+						.getProperty(pWidth), (Integer) properties
+						.getProperty(pHeight)));
+
+	}
+
 	@Override
 	protected void action() throws ActionException {
 
@@ -776,14 +708,6 @@ class SetLayoutBoundsAction extends StandardAction {
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 		}
-
-	}
-
-	private void completeConfiguration(PropertySet properties) {
-		parent
-				.setLayoutBounds(new Dimension((Integer) properties
-						.getProperty(pWidth), (Integer) properties
-						.getProperty(pHeight)));
 
 	}
 

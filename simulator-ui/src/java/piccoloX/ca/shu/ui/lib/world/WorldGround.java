@@ -1,7 +1,13 @@
 package ca.shu.ui.lib.world;
 
 import java.awt.geom.Point2D;
+import java.security.InvalidParameterException;
+import java.util.List;
 
+import ca.shu.ui.lib.objects.DirectedEdge;
+import ca.shu.ui.lib.util.Util;
+import edu.umd.cs.piccolo.PLayer;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
@@ -14,10 +20,14 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 
 	private static final long serialVersionUID = 1L;
 
+	private ChildFilter myChildFilter;
+
 	/**
 	 * World this layer belongs to
 	 */
 	private World world;
+
+	private PNode myEdgeHolder;
 
 	/**
 	 * Create a new ground layer
@@ -25,12 +35,47 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 	 * @param world
 	 *            World this layer belongs to
 	 */
-	public WorldGround(World world) {
+	public WorldGround(World world, PLayer layer) {
 		super();
 		this.world = world;
-
+		myEdgeHolder = new PNode();
+		myEdgeHolder.setPickable(false);
+		layer.addChild(myEdgeHolder);
 		this.setSelectable(false);
+	}
 
+	public void addEdge(DirectedEdge edge) {
+		myEdgeHolder.addChild(edge);
+	}
+
+	@Override
+	public void addChild(int index, PNode child) {
+		if (child instanceof WorldObject) {
+			if (myChildFilter != null
+					&& (!myChildFilter.acceptChild((WorldObject) child))) {
+				throw new InvalidParameterException();
+			}
+		} else {
+			throw new InvalidParameterException();
+		}
+		super.addChild(index, child);
+	}
+
+	/**
+	 * Removes and destroys children
+	 */
+	public void destroyAndClearChildren() {
+		List<?> childrenList = getChildrenReference();
+
+		PNode[] children = childrenList.toArray(new PNode[0]);
+
+		for (PNode node : children) {
+			if (node instanceof WorldObject) {
+				((WorldObject) node).destroy();
+			} else {
+				Util.Assert(false, "Non-WorldObject in the world");
+			}
+		}
 	}
 
 	/**
@@ -94,5 +139,19 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 	@Override
 	public World getWorld() {
 		return world;
+	}
+
+	public void setChildFilter(ChildFilter childFilter) {
+		myChildFilter = childFilter;
+	}
+
+	public static interface ChildFilter {
+		public boolean acceptChild(WorldObject obj);
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+		myEdgeHolder.removeFromParent();
+		super.prepareForDestroy();
 	}
 }

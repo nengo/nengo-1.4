@@ -69,6 +69,11 @@ public class World extends WorldObject implements Interactable {
 	}
 
 	/**
+	 * Layer attached to the camera which shows the zoomable grid
+	 */
+	private PLayer gridLayer;
+
+	/**
 	 * If true, then selection mode. If false, then navigation mode.
 	 */
 	private boolean isSelectionMode;
@@ -110,11 +115,6 @@ public class World extends WorldObject implements Interactable {
 	private final PZoomEventHandler zoomHandler;
 
 	/**
-	 * Layer attached to the camera which shows the zoomable grid
-	 */
-	PLayer gridLayer;
-
-	/**
 	 * Default constructor
 	 * 
 	 * @param name
@@ -132,7 +132,7 @@ public class World extends WorldObject implements Interactable {
 		/*
 		 * Create ground
 		 */
-		myGround = createGround();
+		myGround = createGround(layer);
 		myGround.setSelectable(false);
 		layer.addChild(myGround);
 
@@ -215,7 +215,7 @@ public class World extends WorldObject implements Interactable {
 	protected void constructMenu(PopupMenuBuilder menu) {
 
 		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
-		MenuBuilder windowsMenu = menu.createSubMenu("Windows");
+		MenuBuilder windowsMenu = menu.addSubMenu("Windows");
 		windowsMenu.addAction(new CloseAllWindows("Close all"));
 		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
 
@@ -226,9 +226,8 @@ public class World extends WorldObject implements Interactable {
 	 * 
 	 * @return ground
 	 */
-	protected WorldGround createGround() {
-		return new WorldGround(this);
-
+	protected WorldGround createGround(PLayer pLayer) {
+		return new WorldGround(this, pLayer);
 	}
 
 	@Override
@@ -239,6 +238,20 @@ public class World extends WorldObject implements Interactable {
 		layer.removeFromParent();
 
 		super.prepareForDestroy();
+	}
+
+	/**
+	 * Sets the view position of the sky, and animates to it.
+	 * 
+	 * @param x
+	 *            X Position relative to ground
+	 * @param y
+	 *            Y Position relative to ground
+	 */
+	public void animateToSkyPosition(double x, double y) {
+		Rectangle2D newBounds = new Rectangle2D.Double(x, y, 0, 0);
+
+		mySkyCamera.animateViewToCenterBounds(newBounds, false, 600);
 	}
 
 	/**
@@ -288,6 +301,24 @@ public class World extends WorldObject implements Interactable {
 	 */
 	public WorldGround getGround() {
 		return myGround;
+	}
+
+	@Override
+	public PRoot getRoot() {
+		/*
+		 * This world's root is always to top-level root associated with the
+		 * canvas
+		 */
+		return UIEnvironment.getInstance().getCanvas().getRoot();
+	}
+
+	/**
+	 * Returns a copy of currently selected nodes
+	 * 
+	 * @return Selection Currently Selected nodes
+	 */
+	public Collection<WorldObject> getSelection() {
+		return selectionEventHandler.getSelection();
 	}
 
 	/**
@@ -362,20 +393,6 @@ public class World extends WorldObject implements Interactable {
 	}
 
 	/**
-	 * Sets the view position of the sky, and animates to it.
-	 * 
-	 * @param x
-	 *            X Position relative to ground
-	 * @param y
-	 *            Y Position relative to ground
-	 */
-	public void animateToSkyPosition(double x, double y) {
-		Rectangle2D newBounds = new Rectangle2D.Double(x, y, 0, 0);
-
-		mySkyCamera.animateViewToCenterBounds(newBounds, false, 600);
-	}
-
-	/**
 	 * Set the scale at which to view the ground from the sky
 	 * 
 	 * @param scale
@@ -414,6 +431,14 @@ public class World extends WorldObject implements Interactable {
 		constructMenu(menu);
 
 		return menu.toJPopupMenu();
+	}
+
+	/**
+	 * @return Context menu for currently selected items, null is none is to be
+	 *         shown
+	 */
+	public JPopupMenu showSelectionContextMenu() {
+		return null;
 	}
 
 	/**
@@ -546,31 +571,5 @@ public class World extends WorldObject implements Interactable {
 
 		}
 
-	}
-
-	@Override
-	public PRoot getRoot() {
-		/*
-		 * This world's root is always to top-level root associated with the
-		 * canvas
-		 */
-		return UIEnvironment.getInstance().getCanvas().getRoot();
-	}
-
-	/**
-	 * @return Context menu for currently selected items, null is none is to be
-	 *         shown
-	 */
-	public JPopupMenu showSelectionContextMenu() {
-		return null;
-	}
-
-	/**
-	 * Returns a copy of currently selected nodes
-	 * 
-	 * @return Selection Currently Selected nodes
-	 */
-	public Collection<WorldObject> getSelection() {
-		return selectionEventHandler.getSelection();
 	}
 }

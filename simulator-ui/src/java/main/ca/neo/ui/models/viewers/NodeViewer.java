@@ -25,8 +25,8 @@ import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
-import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -36,9 +36,8 @@ import edu.umd.cs.piccolo.util.PBounds;
  * 
  * @author Shu
  */
-public abstract class NodeViewer extends World implements Interactable,
+public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		INodeContainer {
-
 	/**
 	 * Default layout bounds
 	 */
@@ -55,7 +54,7 @@ public abstract class NodeViewer extends World implements Interactable,
 	/**
 	 * Children of NEO nodes
 	 */
-	private final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
+	private final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();;
 
 	/**
 	 * Viewer Parent
@@ -70,7 +69,7 @@ public abstract class NodeViewer extends World implements Interactable,
 		super("");
 		this.parentOfViewer = nodeContainer;
 
-		setStatusBarHandler(new ModelStatusBarHandler(this));
+		setStatusBarHandler(new NodeViewerStatus(this));
 
 		setName(getModel().getName());
 
@@ -121,10 +120,13 @@ public abstract class NodeViewer extends World implements Interactable,
 	 *            menu builder
 	 */
 	protected void constructLayoutMenu(MenuBuilder menu) {
-		MenuBuilder sortMenu = menu.createSubMenu("Sort by");
+		MenuBuilder sortMenu = menu.addSubMenu("Sort");
 
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
+	}
+
+	protected void constructLayoutAlgorithmsMenu(MenuBuilder menu) {
 
 	}
 
@@ -133,19 +135,6 @@ public abstract class NodeViewer extends World implements Interactable,
 	 */
 	protected Dimension getLayoutBounds() {
 		return layoutBounds;
-	}
-
-	/**
-	 * Removes all NEO Node children
-	 */
-	protected void removeAllNeoNodes() {
-		/*
-		 * Removes all existing nodes from this viewer
-		 */
-		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
-		while (enumeration.hasMoreElements()) {
-			enumeration.nextElement().destroy();
-		}
 	}
 
 	/**
@@ -161,7 +150,7 @@ public abstract class NodeViewer extends World implements Interactable,
 	public void addNeoNode(UINeoNode node) {
 		addNeoNode(node, true, true, false);
 
-	};
+	}
 
 	/**
 	 * Applies the default layout
@@ -280,7 +269,7 @@ public abstract class NodeViewer extends World implements Interactable,
 	public void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
 
-		constructLayoutMenu(menu.createSubMenu("Layout"));
+		constructLayoutMenu(menu.addSubMenu("Layout"));
 
 		/*
 		 * File menu
@@ -449,37 +438,39 @@ public abstract class NodeViewer extends World implements Interactable,
  * 
  * @author Shu Wu
  */
-class ModelStatusBarHandler extends AbstractStatusHandler {
+class NodeViewerStatus extends AbstractStatusHandler {
 
-	public ModelStatusBarHandler(NodeViewer world) {
+	public NodeViewerStatus(NodeViewer world) {
 		super(world);
-	}
-
-	@Override
-	protected NodeViewer getWorld() {
-		return (NodeViewer) super.getWorld();
 	}
 
 	@Override
 	protected String getStatusMessage(PInputEvent event) {
 		UIModel wo = (UIModel) Util.getNodeFromPickPath(event, UIModel.class);
 
-		StringBuilder statuStr = new StringBuilder(getWorld().getViewerParent()
-				.getFullName()
-				+ " | ");
+		StringBuilder statusStr = new StringBuilder(200);
+		if (getWorld().getGround().isAutoLayout()) {
+			statusStr.append("Elastic layout enabled | ");
+		}
+		statusStr.append(getWorld().getViewerParent().getFullName() + " -> ");
 
 		if (getWorld().getSelection().size() > 1) {
-			statuStr.append(getWorld().getSelection().size()
+			statusStr.append(getWorld().getSelection().size()
 					+ " Objects selected");
 
 		} else {
 
 			if (wo != null) {
-				statuStr.append(wo.getFullName());
+				statusStr.append(wo.getFullName());
 			} else {
-				statuStr.append("No Model Selected");
+				statusStr.append("No Model Selected");
 			}
 		}
-		return statuStr.toString();
+		return statusStr.toString();
+	}
+
+	@Override
+	protected NodeViewer getWorld() {
+		return (NodeViewer) super.getWorld();
 	}
 }

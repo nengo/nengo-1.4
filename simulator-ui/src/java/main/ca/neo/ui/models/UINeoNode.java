@@ -54,7 +54,6 @@ import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.uci.ics.jung.graph.Vertex;
 
 /**
  * UI Wrapper for a NEO Node Model
@@ -99,11 +98,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * Attached probes
 	 */
 	private Vector<UIProbe> probes;
-
-	/**
-	 * Representative vertex used by Jung layout algorithms
-	 */
-	private Vertex vertex;
 
 	public UINeoNode() {
 		super();
@@ -164,7 +158,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		/*
 		 * Build the "add probe" menu
 		 */
-		AbstractMenuBuilder probesMenu = menu.createSubMenu("Add probe");
+		AbstractMenuBuilder probesMenu = menu.addSubMenu("Add probe");
 		boolean somethingFound = false;
 		if (getModel() instanceof Probeable) {
 
@@ -196,7 +190,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		menu.addAction(new SaveNodeAction(this));
 
 		menu.addSection("View");
-		AbstractMenuBuilder docMenu = menu.createSubMenu("Documentation");
+		AbstractMenuBuilder docMenu = menu.addSubMenu("Documentation");
 		docMenu.addAction(new SetDocumentationAction("Set"));
 		docMenu.addAction(new ViewDocumentationAction("View"));
 		constructViewMenu(menu);
@@ -220,7 +214,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	protected void constructViewMenu(AbstractMenuBuilder menu) {
 
 		AbstractMenuBuilder originsAndTerminations = menu
-				.createSubMenu("Origins and terminations");
+				.addSubMenu("Origins and terminations");
 
 		/*
 		 * Build the "show origins" menu
@@ -229,7 +223,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		if (origins.length > 0) {
 
 			AbstractMenuBuilder originsMenu = originsAndTerminations
-					.createSubMenu("Show origin");
+					.addSubMenu("Show origin");
 
 			for (Origin element : origins) {
 				originsMenu.addAction(new ShowOriginAction(element.getName()));
@@ -244,7 +238,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		if (terminations.length > 0) {
 
 			AbstractMenuBuilder terminationsMenu = originsAndTerminations
-					.createSubMenu("Show termination");
+					.addSubMenu("Show termination");
 
 			for (Termination element : terminations) {
 				terminationsMenu.addAction(new ShowTerminationAction(element
@@ -463,13 +457,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	/**
-	 * @return Vertex to be used by Jung Graph visualization library
-	 */
-	public Vertex getVertex() {
-		return vertex;
-	}
-
-	/**
 	 * Hides all origins and terminations
 	 */
 	@SuppressWarnings("unchecked")
@@ -535,14 +522,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		 * Set name is disabled, the Name is automatically retrieved from model
 		 */
 		throw new NotImplementedException();
-	}
-
-	/**
-	 * @param vertex
-	 *            Vertex representation of this node
-	 */
-	public void setVertex(Vertex vertex) {
-		this.vertex = vertex;
 	}
 
 	/**

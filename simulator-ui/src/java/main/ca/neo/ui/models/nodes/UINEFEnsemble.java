@@ -95,7 +95,7 @@ public class UINEFEnsemble extends UIEnsemble {
 		super.constructMenu(menu);
 
 		menu.addSection("NEFEnsemble");
-		MenuBuilder plotMenu = menu.createSubMenu("Plot");
+		MenuBuilder plotMenu = menu.addSubMenu("Plot");
 
 		plotMenu.addAction(new StandardAction("Constant Rate Responses") {
 			private static final long serialVersionUID = 1L;
