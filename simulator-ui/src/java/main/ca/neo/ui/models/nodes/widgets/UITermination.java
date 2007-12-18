@@ -198,14 +198,15 @@ public class UITermination extends Widget implements ILineTermination {
 		if (!isConnected) {
 			return;
 		}
-
+		isConnected = false;
 		try {
 			getNodeParent().getParentNetwork().removeProjection(getModel());
 			getNodeParent().showPopupMessage(
 					"Projection to " + getName() + " REMOVED");
-			isConnected = false;
+
 		} catch (StructuralException e) {
-			UserMessages.showWarning("Could not disconnect: " + e.toString());
+			UserMessages.showWarning("Problem trying to disconnect: "
+					+ e.toString());
 		}
 	}
 
@@ -218,20 +219,20 @@ public class UITermination extends Widget implements ILineTermination {
 		if (isConnected) {
 			disconnect();
 		}
+		isConnected = true;
 		if (modifyModel) {
 			try {
 
-				getNodeParent().showPopupMessage(
-						"Projection to " + getName() + " ADDED");
 				getNodeParent().getParentNetwork().addProjection(
 						source.getModel(), getModel());
-
+				getNodeParent().showPopupMessage(
+						"Projection to " + getName() + " ADDED");
 			} catch (StructuralException e) {
+				isConnected = false;
 				UserMessages
 						.showWarning("Could not connect: " + e.getMessage());
 			}
 		}
-		isConnected = true;
 
 		return isConnected;
 	}
