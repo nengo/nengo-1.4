@@ -1,14 +1,20 @@
 package ca.shu.ui.lib.world.elastic;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
-import ca.neo.ui.models.UINeoNode;
+import ca.shu.ui.lib.objects.DirectedEdge;
 import ca.shu.ui.lib.util.ElasticLayout;
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldGround;
+import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.Layout;
 import edu.umd.cs.piccolo.PLayer;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
 public class ElasticGround extends WorldGround {
@@ -23,37 +29,36 @@ public class ElasticGround extends WorldGround {
 		super(world, layer);
 	}
 
+	public ElasticLayout getElasticLayout() {
+		if (springLayoutRunner != null) {
+			return springLayoutRunner.getLayout();
+		}
+		return null;
+	}
+
 	public Point2D getElasticPosition(ElasticObject node) {
 		if (getElasticLayout() != null) {
-			return getElasticLayout().getLocation(node.getVertex());
-		} else {
-			return node.getOffsetReal();
+			ElasticVertex vertex = myVertexMap.get(node);
+			if (vertex != null) {
+				return getElasticLayout().getLocation(myVertexMap.get(node));
+			}
 		}
-
+		return node.getOffsetReal();
 	}
 
 	/**
-	 * @return The child nodes of this network as a Graph object readable by
-	 *         Jung Layout algorithms
+	 * @return A Graph used to by Jung Layouts
 	 */
-	public DirectedSparseGraph getGraph(boolean updateFromModel) {
-		if (myGraph == null) {
-			myGraph = new DirectedSparseGraph();
-			updateFromModel = true;
-		}
-		if (updateFromModel) {
-			getWorld().updateGraph(myGraph);
-		}
+	public DirectedSparseGraph getGraph() {
+		updateGraph();
 		return myGraph;
 	}
 
-	public void getNeoNodePosition(UINeoNode node, double x, double y) {
-		if (getElasticLayout() != null) {
-			getElasticLayout().forceMove(node.getVertex(), x, y);
-		} else {
-			node.setOffsetReal(x, y);
-		}
+	private Hashtable<ElasticObject, ElasticVertex> myVertexMap = new Hashtable<ElasticObject, ElasticVertex>();
 
+	@Override
+	public ElasticWorld getWorld() {
+		return (ElasticWorld) super.getWorld();
 	}
 
 	public boolean isAutoLayout() {
@@ -62,18 +67,6 @@ public class ElasticGround extends WorldGround {
 		} else {
 			return false;
 		}
-	}
-
-	public ElasticLayout getElasticLayout() {
-		if (springLayoutRunner != null) {
-			return springLayoutRunner.getLayout();
-		}
-		return null;
-	}
-
-	@Override
-	public ElasticWorld getWorld() {
-		return (ElasticWorld) super.getWorld();
 	}
 
 	public void setElasticLayout(boolean enabled) {
@@ -91,9 +84,26 @@ public class ElasticGround extends WorldGround {
 
 	public void setElasticPosition(ElasticObject node, double x, double y) {
 		if (getElasticLayout() != null) {
-			getElasticLayout().forceMove(node.getVertex(), x, y);
-		} else {
-			node.setOffsetReal(x, y);
+			ElasticVertex vertex = myVertexMap.get(node);
+			if (vertex != null) {
+				getElasticLayout().forceMove(vertex, x, y);
+				return;
+			}
+		}
+		node.setOffsetReal(x, y);
+	}
+
+	public void setElasticLock(ElasticObject node, boolean lockEnabled) {
+		if (getElasticLayout() != null) {
+			ElasticVertex vertex = myVertexMap.get(node);
+
+			if (vertex != null) {
+				if (lockEnabled) {
+					getElasticLayout().lockVertex(vertex);
+				} else {
+					getElasticLayout().unlockVertex(vertex);
+				}
+			}
 		}
 
 	}
@@ -113,9 +123,10 @@ public class ElasticGround extends WorldGround {
 		while (it.hasNext()) {
 			ElasticObject node = (ElasticObject) (it.next());
 
-			if (node.getVertex() != null) {
+			ElasticVertex vertex = myVertexMap.get(node);
+			if (vertex != null) {
 
-				Point2D coord = layout.getLocation(node.getVertex());
+				Point2D coord = layout.getLocation(vertex);
 
 				if (coord != null) {
 					foundNode = true;
@@ -150,6 +161,92 @@ public class ElasticGround extends WorldGround {
 			getWorld().zoomToBounds(fullBounds);
 		}
 
+	}
+
+	public void updateGraph() {
+		if (myGraph == null) {
+			myGraph = new DirectedSparseGraph();
+		} else {
+			myGraph.removeAllEdges();
+		}
+
+		/*
+		 * TODO: Only update when network model and nodes are updated. This
+		 * requires event notification from models.
+		 */
+
+		Iterator<?> it = getChildrenIterator();
+		/**
+		 * Add vertices
+		 */
+		while (it.hasNext()) {
+			ElasticObject obj = (ElasticObject) it.next();
+
+			ElasticVertex vertex = myVertexMap.get(obj);
+
+			if (myVertexMap.get(obj) == null) {
+
+				vertex = new ElasticVertex(obj);
+				myGraph.addVertex(vertex);
+				myVertexMap.put(obj, vertex);
+			}
+		}
+
+		/**
+		 * Remove vertices
+		 */
+		List<ElasticObject> elasticObjToRemove = new ArrayList<ElasticObject>();
+		for (ElasticObject elasticObj : myVertexMap.keySet()) {
+			if (elasticObj.getParent() != this) {
+				ElasticVertex vertex = myVertexMap.get(elasticObj);
+				myGraph.removeVertex(vertex);
+				elasticObjToRemove.add(elasticObj);
+
+			}
+		}
+
+		for (ElasticObject elasticObj : elasticObjToRemove) {
+			myVertexMap.remove(elasticObj);
+		}
+
+		/**
+		 * Convert UI Directed edges to Jung directed edges
+		 */
+		List<DirectedEdge> edges = getEdges();
+
+		for (DirectedEdge uiEdge : edges) {
+			PNode startNode = uiEdge.getStartNode();
+			PNode endNode = uiEdge.getEndNode();
+
+			// Find the Elastic Objects which are ancestors of the start and end
+			// nodes
+			while (startNode.getParent() != this && startNode != null) {
+				startNode = startNode.getParent();
+			}
+
+			while (endNode.getParent() != this && endNode != null) {
+				endNode = endNode.getParent();
+			}
+
+			if (startNode.getParent() == this && endNode.getParent() == this) {
+
+				ElasticVertex startVertex = myVertexMap.get(startNode);
+				ElasticVertex endVertex = myVertexMap.get(endNode);
+
+				if (startVertex == null || endVertex == null) {
+					System.out.println("one of these is null");
+				}
+				// ignore recursive connections
+				if (startVertex != endVertex) {
+					DirectedSparseEdge edge = new DirectedSparseEdge(
+							startVertex, endVertex);
+					myGraph.addEdge(edge);
+				}
+			} else {
+				Util.Assert(false, "Could not find Elastic Nodes of edge");
+			}
+
+		}
 	}
 
 }

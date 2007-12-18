@@ -40,8 +40,6 @@ import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.FRLayout;
 import edu.uci.ics.jung.visualization.ISOMLayout;
 import edu.uci.ics.jung.visualization.Layout;
@@ -53,9 +51,6 @@ import edu.umd.cs.piccolo.util.PBounds;
  * Viewer for peeking into a Network
  * 
  * @author Shu Wu
- */
-/**
- * @author Shu
  */
 public class NetworkViewer extends NodeViewer {
 	private static final long serialVersionUID = -3018937112672942653L;
@@ -134,43 +129,6 @@ public class NetworkViewer extends NodeViewer {
 		super.prepareForDestroy();
 	}
 
-	protected void updateGraph(DirectedSparseGraph graph) {
-		/*
-		 * TODO: Only update when network model and nodes are updated. This
-		 * requires event notification from models.
-		 */
-
-		graph.removeAllVertices();
-		graph.removeAllEdges();
-
-		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
-		/**
-		 * Add vertices
-		 */
-		while (enumeration.hasMoreElements()) {
-			UINeoNode node = enumeration.nextElement();
-
-			graph.addVertex(node.getVertex());
-		}
-
-		/**
-		 * Add Directed edges
-		 */
-		Projection[] projections = getNetwork().getProjections();
-		for (Projection projection : projections) {
-			Origin origin = projection.getOrigin();
-			Termination term = projection.getTermination();
-
-			UINeoNode nodeOrigin = getNode(origin.getNode().getName());
-			UINeoNode nodeTerm = getNode(term.getNode().getName());
-
-			DirectedSparseEdge edge = new DirectedSparseEdge(nodeOrigin
-					.getVertex(), nodeTerm.getVertex());
-			graph.addEdge(edge);
-
-		}
-	}
-
 	@Override
 	public void addNeoNode(UINeoNode node, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCamera) {
@@ -212,7 +170,7 @@ public class NetworkViewer extends NodeViewer {
 
 			Constructor<?> ct = layoutType.getConstructor(ctArgs);
 			Object[] args = new Object[1];
-			args[0] = getGround().getGraph(true);
+			args[0] = getGround().getGraph();
 
 			layout = (Layout) ct.newInstance(args);
 

@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+12/18/2007 - Create graph from ElasticObject and Edge
 12/17/2007 - Spring Layout done
 12/17/2007 - New prettier window icons
 12/17/2007 - Sequential popup messages no longer overlap
@@ -9,6 +10,17 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+
+	In ElasticGround, attach to that event in edges and children.
+	If detected, update graph()
+	Create graph from ElasticObject and Edge
+	
+
+
+Create a test which creates a Network via UI and compares results
+	are results deterministic?
+	
+
 Transient messages should not fall off the screen
 	reference tooltips code
 Transient messages should follow the objects

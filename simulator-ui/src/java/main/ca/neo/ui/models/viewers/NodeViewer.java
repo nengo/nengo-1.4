@@ -97,16 +97,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	protected void addNeoNode(UINeoNode node, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
 
-		node.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (evt.getPropertyName().compareTo(
-						WorldObject.PROPERTY_DESTROYED) == 0) {
-
-					removeNeoNode((UINeoNode) evt.getSource());
-				}
-			}
-		});
-
 		/**
 		 * Moves the camera to where the node is positioned, if it's not dropped
 		 * in the center of the camera
@@ -123,6 +113,16 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		} else {
 			getGround().addChild(node);
 		}
+
+		node.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName().compareTo(
+						WorldObject.PROPERTY_DESTROYED) == 0) {
+
+					removeNeoNode((UINeoNode) evt.getSource());
+				}
+			}
+		});
 	}
 
 	/**

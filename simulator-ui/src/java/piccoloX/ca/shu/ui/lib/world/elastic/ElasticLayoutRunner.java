@@ -15,24 +15,26 @@ public class ElasticLayoutRunner {
 	public static final int SPRING_LAYOUT_REPULSION_DISTANCE = 400 / 2;
 	private boolean continueLayout = true;
 	private ElasticLayout layout;
-	private final ElasticGround world;
+	private DirectedSparseGraph myGraph;
+
+	private final ElasticGround myParent;
 
 	public ElasticLayoutRunner(ElasticGround world) {
 		super();
-		this.world = world;
+		this.myParent = world;
 		init();
 	}
 
 	private void init() {
-		DirectedSparseGraph graph = world.getGraph(true);
-		this.layout = new ElasticLayout(graph,
+		myGraph = myParent.getGraph();
+		this.layout = new ElasticLayout(myGraph,
 				new ElasticLayout.UnitLengthFunction(
 						SPRING_LAYOUT_NODE_DISTANCE));
 		layout.setRepulsionRange(SPRING_LAYOUT_REPULSION_DISTANCE);
 		layout.setForceMultiplier(SPRING_LAYOUT_FORCE_MULTIPLIER);
 		layout.initialize();
 
-		for (Object obj : graph.getVertices()) {
+		for (Object obj : myGraph.getVertices()) {
 			ElasticVertex vertex = (ElasticVertex) obj;
 			Point2D vertexLocation = vertex.getLocation();
 			layout.forceMove(vertex, vertexLocation.getX(), vertexLocation
@@ -42,7 +44,7 @@ public class ElasticLayoutRunner {
 
 	private void runLayout() {
 
-		while (!layout.incrementsAreDone() && !world.isDestroyed()
+		while (!layout.incrementsAreDone() && !myParent.isDestroyed()
 				&& continueLayout) {
 			updateLayout();
 
@@ -52,7 +54,7 @@ public class ElasticLayoutRunner {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						world.updateChildrensFromLayout(layout, false);
+						myParent.updateChildrensFromLayout(layout, false);
 					}
 				});
 			} catch (InterruptedException e1) {
@@ -75,7 +77,7 @@ public class ElasticLayoutRunner {
 	}
 
 	private void updateLayout() {
-		world.getGraph(true);
+		myParent.updateGraph();
 		layout.update();
 		layout.advancePositions();
 	}

@@ -23,6 +23,7 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	private static final long serialVersionUID = 1L;
 
 	public static final String PROPERTY_DESTROYED = "destroyed";
+
 	/**
 	 * The property name that identifies a change in this object's global
 	 * position
@@ -338,10 +339,18 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setParent(PNode newParent) {
+		PNode oldParent = getParent();
 		super.setParent(newParent);
 
-		if (newParent != null)
-			signalGlobalBoundsChanged();
+		if (newParent != oldParent) {
+
+			if (newParent != null)
+				signalGlobalBoundsChanged();
+		}
+	}
+
+	public void setSelected(boolean isSelected) {
+
 	}
 
 	/**

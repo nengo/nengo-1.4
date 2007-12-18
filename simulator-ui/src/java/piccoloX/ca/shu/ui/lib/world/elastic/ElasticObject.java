@@ -3,7 +3,6 @@ package ca.shu.ui.lib.world.elastic;
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.world.WorldObject;
-import edu.uci.ics.jung.graph.Vertex;
 import edu.umd.cs.piccolo.PNode;
 
 public class ElasticObject extends WorldObject {
@@ -12,11 +11,6 @@ public class ElasticObject extends WorldObject {
 
 	// Cache the Elastic world for fast access because it is used often
 	private ElasticGround elasticGround;
-
-	/**
-	 * Representative vertex used by Jung layout algorithms
-	 */
-	private transient Vertex vertex;
 
 	protected ElasticGround getElasticWorld() {
 		return elasticGround;
@@ -27,8 +21,8 @@ public class ElasticObject extends WorldObject {
 		if (getElasticWorld() != null) {
 			return getElasticWorld().getElasticPosition(this);
 		} else {
-			return super.getOffset();
 		}
+		return super.getOffset();
 	}
 
 	/**
@@ -39,16 +33,6 @@ public class ElasticObject extends WorldObject {
 	 */
 	public Point2D getOffsetReal() {
 		return super.getOffset();
-	}
-
-	/**
-	 * @return Vertex to be used by Jung Graph visualization library
-	 */
-	public Vertex getVertex() {
-		if (vertex == null) {
-			vertex = new ElasticVertex(this);
-		}
-		return vertex;
 	}
 
 	@Override
@@ -86,10 +70,27 @@ public class ElasticObject extends WorldObject {
 
 	@Override
 	public void setParent(PNode newParent) {
+
 		super.setParent(newParent);
 		if (getParent() instanceof ElasticGround) {
 			elasticGround = (ElasticGround) getParent();
+		} else {
+			elasticGround = null;
 		}
 	}
 
+	@Override
+	protected void prepareForDestroy() {
+		// vertex = null;
+		super.prepareForDestroy();
+	}
+
+	@Override
+	public void setSelected(boolean isSelected) {
+		super.setSelected(isSelected);
+
+		if (elasticGround != null) {
+			elasticGround.setElasticLock(this, isSelected);
+		}
+	}
 }

@@ -3,7 +3,6 @@ package ca.shu.ui.lib.world.elastic;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldGround;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.umd.cs.piccolo.PLayer;
 
 /**
@@ -35,8 +34,6 @@ public abstract class ElasticWorld extends World {
 	protected WorldGround createGround(PLayer layer) {
 		return new ElasticGround(this, layer);
 	}
-
-	protected abstract void updateGraph(DirectedSparseGraph graph);
 
 	@Override
 	public ElasticGround getGround() {

@@ -483,11 +483,9 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	public void decorateSelectedNode(WorldObject node) {
 		SelectionBorder frame = new SelectionBorder(world, node);
-		// frame.setFrameColor(Style.COLOR_BORDER_DRAGGED);
 
+		node.setSelected(true);
 		node.addAttribute(SELECTION_HANDLER_FRAME_ATTR, frame);
-
-		// PBoundsHandle.addBoundsHandlesTo(node);
 	}
 
 	/**
@@ -627,9 +625,8 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			((SelectionBorder) frame).destroy();
 
 		}
+		node.setSelected(false);
 		node.addAttribute(SELECTION_HANDLER_FRAME_ATTR, null);
-
-		// PBoundsHandle.removeBoundsHandlesFrom(node);
 	}
 
 	public void unselect(Collection<WorldObject> items) {

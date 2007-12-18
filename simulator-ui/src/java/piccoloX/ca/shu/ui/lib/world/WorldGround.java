@@ -2,6 +2,8 @@ package ca.shu.ui.lib.world;
 
 import java.awt.geom.Point2D;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import ca.shu.ui.lib.objects.DirectedEdge;
@@ -28,6 +30,19 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 	private World world;
 
 	private PNode myEdgeHolder;
+
+	public List<DirectedEdge> getEdges() {
+		myEdgeHolder.getChildrenCount();
+
+		ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>(
+				myEdgeHolder.getChildrenCount());
+
+		Iterator<?> it = myEdgeHolder.getChildrenIterator();
+		while (it.hasNext()) {
+			edges.add((DirectedEdge) it.next());
+		}
+		return edges;
+	}
 
 	/**
 	 * Create a new ground layer
