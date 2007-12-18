@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import ca.shu.ui.lib.objects.DirectedEdge;
-import ca.shu.ui.lib.util.ElasticLayout;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldGround;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
@@ -29,9 +28,9 @@ public class ElasticGround extends WorldGround {
 		super(world, layer);
 	}
 
-	public ElasticLayout getElasticLayout() {
+	public ElasticLayoutRunner getElasticLayout() {
 		if (springLayoutRunner != null) {
-			return springLayoutRunner.getLayout();
+			return springLayoutRunner;
 		}
 		return null;
 	}
@@ -40,7 +39,10 @@ public class ElasticGround extends WorldGround {
 		if (getElasticLayout() != null) {
 			ElasticVertex vertex = myVertexMap.get(node);
 			if (vertex != null) {
-				return getElasticLayout().getLocation(myVertexMap.get(node));
+				if (!getElasticLayout().isLocked(vertex)) {
+					return getElasticLayout()
+							.getLocation(myVertexMap.get(node));
+				}
 			}
 		}
 		return node.getOffsetReal();
@@ -55,6 +57,35 @@ public class ElasticGround extends WorldGround {
 	}
 
 	private Hashtable<ElasticObject, ElasticVertex> myVertexMap = new Hashtable<ElasticObject, ElasticVertex>();
+
+	private Hashtable<DirectedEdge, DirectedSparseEdge> myEdgeMap = new Hashtable<DirectedEdge, DirectedSparseEdge>();
+
+	// private class EdgeMap {
+	// private Hashtable<ElasticObject, HashSet<ElasticObject>> myEdgesMap = new
+	// Hashtable<ElasticObject, HashSet<ElasticObject>>();
+	//
+	// private class ProjectionsSet extends HashSet<ElasticObject> {
+	//
+	// private static final long serialVersionUID = 1L;
+	//
+	// }
+	//
+	// public void containsEdge(ElasticObject startNode, ElasticObject endNode)
+	// {
+	// ProjectionsSet projectionsTo = myEdgesMap.get(startNode);
+	//
+	// if (projectionsTo != null) {
+	// if (projectionsTo.contains(endNode)) {
+	// return true;
+	// }
+	// }
+	//
+	// }
+	//
+	// public void clear() {
+	// myEdgesMap.clear();
+	// }
+	// }
 
 	@Override
 	public ElasticWorld getWorld() {
@@ -75,7 +106,9 @@ public class ElasticGround extends WorldGround {
 			springLayoutRunner = null;
 		}
 		if (enabled) {
-
+			myVertexMap.clear();
+			myEdgeMap.clear();
+			myGraph = null;
 			springLayoutRunner = new ElasticLayoutRunner(this);
 			springLayoutRunner.start();
 		}
@@ -84,13 +117,15 @@ public class ElasticGround extends WorldGround {
 
 	public void setElasticPosition(ElasticObject node, double x, double y) {
 		boolean doRealMove = true;
+		if (x == 0 || y == 0)
+			return;
 
 		if (getElasticLayout() != null) {
 			ElasticVertex vertex = myVertexMap.get(node);
 			if (vertex != null) {
-				getElasticLayout().forceMove(vertex, x, y);
 
-				if (getElasticLayout().isLocked(vertex)) {
+				getElasticLayout().forceMove(vertex, x, y);
+				if (!getElasticLayout().isLocked(vertex)) {
 					doRealMove = false;
 				}
 			}
@@ -115,7 +150,7 @@ public class ElasticGround extends WorldGround {
 
 	}
 
-	public void updateChildrensFromLayout(Layout layout, boolean zoomToLayout) {
+	public void updateChildrenFromLayout(Layout layout, boolean zoomToLayout) {
 		/**
 		 * Layout nodes
 		 */
@@ -170,11 +205,14 @@ public class ElasticGround extends WorldGround {
 
 	}
 
-	public void updateGraph() {
+	/**
+	 * @return True, if the graph changed
+	 */
+	public boolean updateGraph() {
+		boolean changed = false;
 		if (myGraph == null) {
+			changed = true;
 			myGraph = new DirectedSparseGraph();
-		} else {
-			myGraph.removeAllEdges();
 		}
 
 		/*
@@ -189,13 +227,11 @@ public class ElasticGround extends WorldGround {
 		while (it.hasNext()) {
 			ElasticObject obj = (ElasticObject) it.next();
 
-			ElasticVertex vertex = myVertexMap.get(obj);
-
-			if (myVertexMap.get(obj) == null) {
-
-				vertex = new ElasticVertex(obj);
+			if (!myVertexMap.containsKey(obj)) {
+				ElasticVertex vertex = new ElasticVertex(obj);
 				myGraph.addVertex(vertex);
 				myVertexMap.put(obj, vertex);
+				changed = true;
 			}
 		}
 
@@ -205,27 +241,28 @@ public class ElasticGround extends WorldGround {
 		List<ElasticObject> elasticObjToRemove = new ArrayList<ElasticObject>();
 		for (ElasticObject elasticObj : myVertexMap.keySet()) {
 			if (elasticObj.getParent() != this) {
-				ElasticVertex vertex = myVertexMap.get(elasticObj);
-				myGraph.removeVertex(vertex);
 				elasticObjToRemove.add(elasticObj);
-
 			}
 		}
 
 		for (ElasticObject elasticObj : elasticObjToRemove) {
+			myGraph.removeVertex(myVertexMap.get(elasticObj));
 			myVertexMap.remove(elasticObj);
+			changed = true;
 		}
 
 		/**
-		 * Convert UI Directed edges to Jung directed edges
+		 * Add edges
 		 */
 		List<DirectedEdge> edges = getEdges();
 
 		for (DirectedEdge uiEdge : edges) {
+
 			PNode startNode = uiEdge.getStartNode();
 			PNode endNode = uiEdge.getEndNode();
 
-			// Find the Elastic Objects which are ancestors of the start and end
+			// Find the Elastic Objects which are ancestors of the start and
+			// end
 			// nodes
 			while (startNode.getParent() != this && startNode != null) {
 				startNode = startNode.getParent();
@@ -236,24 +273,73 @@ public class ElasticGround extends WorldGround {
 			}
 
 			if (startNode.getParent() == this && endNode.getParent() == this) {
-
 				ElasticVertex startVertex = myVertexMap.get(startNode);
 				ElasticVertex endVertex = myVertexMap.get(endNode);
 
-				if (startVertex == null || endVertex == null) {
-					System.out.println("one of these is null");
+				Util.Assert(startVertex != null && endVertex != null,
+						"Could not find vertice");
+
+				DirectedSparseEdge jungEdge = myEdgeMap.get(uiEdge);
+
+				boolean createJungEdge = false;
+				if (jungEdge != null) {
+					// find if an existing edge has changed
+					if (jungEdge.getSource() != startVertex
+							|| jungEdge.getDest() != endVertex) {
+
+						myEdgeMap.remove(uiEdge);
+						myGraph.removeEdge(jungEdge);
+						changed = true;
+
+						// try to add the new changed one
+						createJungEdge = true;
+					}
+
+				} else {
+					createJungEdge = true;
 				}
-				// ignore recursive connections
-				if (startVertex != endVertex) {
-					DirectedSparseEdge edge = new DirectedSparseEdge(
-							startVertex, endVertex);
-					myGraph.addEdge(edge);
+
+				if (createJungEdge) {
+					// avoid recursive edges
+					if (startVertex != endVertex) {
+						jungEdge = new DirectedSparseEdge(startVertex,
+								endVertex);
+						myEdgeMap.put(uiEdge, jungEdge);
+
+						myGraph.addEdge(jungEdge);
+						changed = true;
+					}
 				}
+
 			} else {
 				Util.Assert(false, "Could not find Elastic Nodes of edge");
 			}
 
 		}
+		/*
+		 * Remove edges
+		 */
+		List<DirectedEdge> edgesToRemove = new ArrayList<DirectedEdge>();
+		for (DirectedEdge uiEdge : myEdgeMap.keySet()) {
+			if (!containsEdge(uiEdge)) {
+				edgesToRemove.add(uiEdge);
+				changed = true;
+			}
+		}
+		for (DirectedEdge uiEdge : edgesToRemove) {
+			myGraph.removeEdge(myEdgeMap.get(uiEdge));
+			myEdgeMap.remove(uiEdge);
+		}
+
+		// Return whether the graph changed
+		return changed;
+
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+		setElasticLayout(false);
+		super.prepareForDestroy();
 	}
 
 }

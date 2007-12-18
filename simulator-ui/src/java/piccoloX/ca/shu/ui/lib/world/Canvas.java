@@ -33,7 +33,7 @@ public class Canvas extends PCanvas {
 
 	}
 
-	protected Collection<World> getWorlds() {
+	public Collection<World> getWorlds() {
 		return worlds;
 	}
 

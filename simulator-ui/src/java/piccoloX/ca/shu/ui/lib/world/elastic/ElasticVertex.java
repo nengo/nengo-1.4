@@ -13,7 +13,7 @@ public class ElasticVertex extends DirectedSparseVertex {
 	}
 
 	public Point2D getLocation() {
-		return myObject.getOffset();
+		return myObject.getOffsetReal();
 	}
 
 }

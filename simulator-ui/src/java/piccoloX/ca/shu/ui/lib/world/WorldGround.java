@@ -44,6 +44,14 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 		return edges;
 	}
 
+	public boolean containsEdge(DirectedEdge edge) {
+		if (edge.getParent() == myEdgeHolder) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * Create a new ground layer
 	 * 

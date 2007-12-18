@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.util;
 
-import ca.shu.ui.lib.world.AppFrame;
+import ca.shu.ui.lib.AppFrame;
 
 /**
  * Holds user interface instance variables.

@@ -7,14 +7,23 @@ import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.ElasticLayout;
+import edu.uci.ics.jung.graph.ArchetypeVertex;
+import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 
 public class ElasticLayoutRunner {
+	/**
+	 * Used to determine when to pause the algorithm
+	 */
+	public static final double RELAX_DELTA = 2;
 	public static final float SPRING_LAYOUT_FORCE_MULTIPLIER = 1f / 3f;
 	public static final int SPRING_LAYOUT_NODE_DISTANCE = 400;
 	public static final int SPRING_LAYOUT_REPULSION_DISTANCE = 400 / 2;
+	private int relaxCount;
 	private boolean continueLayout = true;
+
 	private ElasticLayout layout;
+
 	private DirectedSparseGraph myGraph;
 
 	private final ElasticGround myParent;
@@ -54,7 +63,7 @@ public class ElasticLayoutRunner {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						myParent.updateChildrensFromLayout(layout, false);
+						myParent.updateChildrenFromLayout(layout, false);
 					}
 				});
 			} catch (InterruptedException e1) {
@@ -77,9 +86,42 @@ public class ElasticLayoutRunner {
 	}
 
 	private void updateLayout() {
-		myParent.updateGraph();
-		layout.update();
-		layout.advancePositions();
+		boolean graphUpdated = myParent.updateGraph();
+
+		if (graphUpdated) {
+			layout.update();
+			relaxCount = 0;
+		}
+
+		boolean isResting = false;
+
+		if (relaxCount >= 50) {
+			relaxCount = 50;
+			isResting = true;
+		}
+		if (!isResting) {
+			layout.advancePositions();
+
+			// Check to see if the elastic graph has settled in a certain
+			// position
+			double maxDelta = 0;
+			for (Object obj : myGraph.getVertices()) {
+				ElasticVertex vertex = (ElasticVertex) obj;
+				Point2D vertexLocation = vertex.getLocation();
+				Point2D layoutLocation = layout.getLocation(vertex);
+
+				double delta = Math
+						.abs(vertexLocation.distance(layoutLocation));
+
+				if (delta > maxDelta) {
+					maxDelta = delta;
+				}
+			}
+
+			if (maxDelta < RELAX_DELTA) {
+				relaxCount++;
+			}
+		}
 	}
 
 	protected ElasticLayout getLayout() {
@@ -99,5 +141,26 @@ public class ElasticLayoutRunner {
 
 	public void stopLayout() {
 		continueLayout = false;
+	}
+
+	public void forceMove(Vertex picked, double x, double y) {
+		relaxCount = 0;
+		layout.forceMove(picked, x, y);
+	}
+
+	public boolean isLocked(Vertex v) {
+		return layout.isLocked(v);
+	}
+
+	public Point2D getLocation(ArchetypeVertex v) {
+		return layout.getLocation(v);
+	}
+
+	public void lockVertex(Vertex v) {
+		layout.lockVertex(v);
+	}
+
+	public void unlockVertex(Vertex v) {
+		layout.unlockVertex(v);
 	}
 }

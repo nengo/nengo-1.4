@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.world;
+package ca.shu.ui.lib;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -40,6 +40,9 @@ import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.world.Canvas;
+import ca.shu.ui.lib.world.Grid;
+import ca.shu.ui.lib.world.World;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.util.PDebug;
 import edu.umd.cs.piccolo.util.PPaintContext;

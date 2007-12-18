@@ -2,8 +2,8 @@ package ca.shu.ui.lib.actions;
 
 import java.util.Vector;
 
+import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.world.AppFrame;
 
 /**
  * Manages reversable actions
