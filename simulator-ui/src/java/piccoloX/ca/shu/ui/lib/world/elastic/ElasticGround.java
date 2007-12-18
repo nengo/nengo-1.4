@@ -83,14 +83,21 @@ public class ElasticGround extends WorldGround {
 	}
 
 	public void setElasticPosition(ElasticObject node, double x, double y) {
+		boolean doRealMove = true;
+
 		if (getElasticLayout() != null) {
 			ElasticVertex vertex = myVertexMap.get(node);
 			if (vertex != null) {
 				getElasticLayout().forceMove(vertex, x, y);
-				return;
+
+				if (getElasticLayout().isLocked(vertex)) {
+					doRealMove = false;
+				}
 			}
 		}
-		node.setOffsetReal(x, y);
+		if (doRealMove) {
+			node.setOffsetReal(x, y);
+		}
 	}
 
 	public void setElasticLock(ElasticObject node, boolean lockEnabled) {
