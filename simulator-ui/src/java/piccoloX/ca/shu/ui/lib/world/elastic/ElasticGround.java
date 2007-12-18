@@ -1,6 +1,8 @@
 package ca.shu.ui.lib.world.elastic;
 
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -23,9 +25,19 @@ public class ElasticGround extends WorldGround {
 	private DirectedSparseGraph myGraph;
 
 	private ElasticLayoutRunner springLayoutRunner;
+	private boolean childrenUpdatedFlag = false;
 
 	public ElasticGround(ElasticWorld world, PLayer layer) {
 		super(world, layer);
+		this.addPropertyChangeListener(new PropertyChangeListener() {
+
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName().compareTo(PNode.PROPERTY_CHILDREN) == 0) {
+					childrenUpdatedFlag = true;
+				}
+			}
+
+		});
 	}
 
 	public ElasticLayoutRunner getElasticLayout() {
@@ -33,6 +45,7 @@ public class ElasticGround extends WorldGround {
 			return springLayoutRunner;
 		}
 		return null;
+
 	}
 
 	public Point2D getElasticPosition(ElasticObject node) {
@@ -212,44 +225,51 @@ public class ElasticGround extends WorldGround {
 		boolean changed = false;
 		if (myGraph == null) {
 			changed = true;
+			childrenUpdatedFlag = true;
 			myGraph = new DirectedSparseGraph();
 		}
 
-		/*
-		 * TODO: Only update when network model and nodes are updated. This
-		 * requires event notification from models.
-		 */
+		if (childrenUpdatedFlag) {
+			childrenUpdatedFlag = false;
 
-		Iterator<?> it = getChildrenIterator();
-		/**
-		 * Add vertices
-		 */
-		while (it.hasNext()) {
-			ElasticObject obj = (ElasticObject) it.next();
+			Iterator<?> it = getChildrenIterator();
+			/**
+			 * Add vertices
+			 */
+			while (it.hasNext()) {
+				ElasticObject obj = (ElasticObject) it.next();
 
-			if (!myVertexMap.containsKey(obj)) {
-				ElasticVertex vertex = new ElasticVertex(obj);
-				myGraph.addVertex(vertex);
-				myVertexMap.put(obj, vertex);
+				if (!myVertexMap.containsKey(obj)) {
+					ElasticVertex vertex = new ElasticVertex(obj);
+					myGraph.addVertex(vertex);
+					myVertexMap.put(obj, vertex);
+					changed = true;
+				}
+			}
+
+			/**
+			 * Remove vertices
+			 */
+			List<ElasticObject> elasticObjToRemove = new ArrayList<ElasticObject>();
+			for (ElasticObject elasticObj : myVertexMap.keySet()) {
+				if (elasticObj.getParent() != this) {
+					elasticObjToRemove.add(elasticObj);
+				}
+			}
+
+			for (ElasticObject elasticObj : elasticObjToRemove) {
+				myGraph.removeVertex(myVertexMap.get(elasticObj));
+				myVertexMap.remove(elasticObj);
 				changed = true;
 			}
 		}
 
-		/**
-		 * Remove vertices
+		/*
+		 * TODO: Only update edges when they are changed. Have to figure out a
+		 * way to know when edge start and end nodes are changed. This is tricky
+		 * because the start and end nodes we're interested in are the Elastic
+		 * Objects above the ground, which the dosen't know about
 		 */
-		List<ElasticObject> elasticObjToRemove = new ArrayList<ElasticObject>();
-		for (ElasticObject elasticObj : myVertexMap.keySet()) {
-			if (elasticObj.getParent() != this) {
-				elasticObjToRemove.add(elasticObj);
-			}
-		}
-
-		for (ElasticObject elasticObj : elasticObjToRemove) {
-			myGraph.removeVertex(myVertexMap.get(elasticObj));
-			myVertexMap.remove(elasticObj);
-			changed = true;
-		}
 
 		/**
 		 * Add edges
@@ -323,11 +343,17 @@ public class ElasticGround extends WorldGround {
 		for (DirectedEdge uiEdge : myEdgeMap.keySet()) {
 			if (!containsEdge(uiEdge)) {
 				edgesToRemove.add(uiEdge);
-				changed = true;
+
 			}
 		}
 		for (DirectedEdge uiEdge : edgesToRemove) {
-			myGraph.removeEdge(myEdgeMap.get(uiEdge));
+			DirectedSparseEdge jungEdge = myEdgeMap.get(uiEdge);
+			changed = true;
+			// have to check if the edge is still there because it might have
+			// been removed when the vertice was removed
+			if (myGraph.getEdges().contains(jungEdge)) {
+				myGraph.removeEdge(jungEdge);
+			}
 			myEdgeMap.remove(uiEdge);
 		}
 

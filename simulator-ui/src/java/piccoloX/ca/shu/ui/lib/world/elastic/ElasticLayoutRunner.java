@@ -1,12 +1,11 @@
 package ca.shu.ui.lib.world.elastic;
 
 import java.awt.geom.Point2D;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.ElasticLayout;
+import ca.shu.ui.lib.util.Util;
 import edu.uci.ics.jung.graph.ArchetypeVertex;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
@@ -55,7 +54,6 @@ public class ElasticLayoutRunner {
 
 		while (!layout.incrementsAreDone() && !myParent.isDestroyed()
 				&& continueLayout) {
-			updateLayout();
 
 			/**
 			 * Layout nodes needs to be done in the Swing dispatcher thread
@@ -63,13 +61,13 @@ public class ElasticLayoutRunner {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						myParent.updateChildrenFromLayout(layout, false);
+						if (updateLayout()) {
+							myParent.updateChildrenFromLayout(layout, false);
+						}
 					}
 				});
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			} catch (InvocationTargetException e1) {
-				e1.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			try {
@@ -85,7 +83,8 @@ public class ElasticLayoutRunner {
 		}
 	}
 
-	private void updateLayout() {
+	private boolean updateLayout() {
+
 		boolean graphUpdated = myParent.updateGraph();
 
 		if (graphUpdated) {
@@ -122,10 +121,7 @@ public class ElasticLayoutRunner {
 				relaxCount++;
 			}
 		}
-	}
-
-	protected ElasticLayout getLayout() {
-		return layout;
+		return !isResting;
 	}
 
 	public void start() {
