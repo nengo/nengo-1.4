@@ -13,7 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import ca.neo.config.ConfigurationConfiguration;
+import ca.neo.config.IconRegistry;
 import ca.neo.config.EditorProxy;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.config.ui.MatrixEditor;
@@ -50,7 +50,7 @@ public class VectorHandler extends BaseHandler {
 	@Override
 	public Component getRenderer(Object o) {
 		return new JLabel(MatrixHandler.toString(new float[][]{(float[]) o}, '\t', "\r\n"), 
-				ConfigurationConfiguration.getInstance().getIcon(o), SwingConstants.LEFT);
+				IconRegistry.getInstance().getIcon(o), SwingConstants.LEFT);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class VectorHandler extends BaseHandler {
 	
 	@Override
 	public Object fromString(String s) {
-		return MatrixHandler.fromString(s, ',', "\r\n");
+		return MatrixHandler.fromString(s, ',', "\r\n")[0];
 	}	
 
 }

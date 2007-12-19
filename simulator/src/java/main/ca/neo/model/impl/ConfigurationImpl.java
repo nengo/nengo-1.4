@@ -327,7 +327,8 @@ public class ConfigurationImpl implements Configuration {
 		
 		private void checkClass(Object value) throws StructuralException {
 			if (!getType().isAssignableFrom(value.getClass())) {
-				throw new StructuralException("Values must be of type " + getType());
+				throw new StructuralException("Value must be of type " + getType() 
+						+ " (was " + value.getClass().getName() + ")");
 			}
 		}
 		

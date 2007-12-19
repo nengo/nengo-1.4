@@ -1,0 +1,4 @@
+ca.neo.model.impl.MockConfigurable
+ca.neo.model.impl.MockConfigurable$MockChildConfigurable
+
+

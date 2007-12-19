@@ -29,6 +29,7 @@ public class ConfigurableIOFunctional {
 			
 			Configurable loaded = ConfigurableIO.load(file);
 			System.out.println(loaded.getClass().getName());
+			ConfigurableIO.save(loaded, new File("testsavecompare.xml"));
 		} catch (StructuralException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

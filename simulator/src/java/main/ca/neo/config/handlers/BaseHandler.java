@@ -10,14 +10,14 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import ca.neo.config.ConfigurationConfiguration;
+import ca.neo.config.IconRegistry;
 import ca.neo.config.ConfigurationHandler;
 import ca.neo.config.EditorProxy;
 import ca.neo.config.ui.ConfigurationChangeListener;
 
 public abstract class BaseHandler implements ConfigurationHandler {
 
-	private Class myClass;
+	private Class<?> myClass;
 	
 	/**
 	 * @param c Class of objects handled by this handler
@@ -79,7 +79,7 @@ public abstract class BaseHandler implements ConfigurationHandler {
 	 * @see ca.neo.config.ConfigurationHandler#getRenderer(java.lang.Object)
 	 */
 	public Component getRenderer(Object o) {
-		return new JLabel(toString(o), ConfigurationConfiguration.getInstance().getIcon(o), SwingConstants.LEFT);
+		return new JLabel(toString(o), IconRegistry.getInstance().getIcon(o), SwingConstants.LEFT);
 	}
 
 	/**

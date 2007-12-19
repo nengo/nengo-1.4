@@ -7,9 +7,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.StringTokenizer;
 
 import javax.swing.JButton;
@@ -17,12 +14,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import ca.neo.config.ConfigurationConfiguration;
-import ca.neo.config.ConfigurationHandler;
+import ca.neo.config.IconRegistry;
 import ca.neo.config.EditorProxy;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.config.ui.MatrixEditor;
-import ca.neo.util.MU;
 import ca.neo.util.MU.MatrixExpander;
 import ca.neo.util.MU.VectorExpander;
 
@@ -62,7 +57,7 @@ public class MatrixHandler extends BaseHandler {
 		
 		float[][] matrix = (float[][]) o;
 		String text = toString(matrix, '\t', "\r\n");
-		result.add(new JLabel(ConfigurationConfiguration.getInstance().getIcon(float[][].class)));
+		result.add(new JLabel(IconRegistry.getInstance().getIcon(float[][].class)));
 		result.add(new JTextArea(text));
 
 		return result;

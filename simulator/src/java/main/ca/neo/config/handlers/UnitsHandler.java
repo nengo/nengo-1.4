@@ -12,6 +12,25 @@ import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.model.Units;
 
 public class UnitsHandler extends BaseHandler {
+	
+	private static Units[] myList = new Units[]{
+			Units.UNK, 
+			Units.ACU, 
+			Units.AVU, 
+			Units.M, 
+			Units.M_PER_S, 
+			Units.mV, 
+			Units.N, 
+			Units.Nm, 
+			Units.RAD, 
+			Units.RAD_PER_S, 
+			Units.S, 
+			Units.SPIKES, 
+			Units.SPIKES_PER_S, 
+			Units.uA, 
+			Units.uAcm2 
+		};
+ 
 
 	public UnitsHandler() {
 		super(Units.class);
@@ -20,25 +39,8 @@ public class UnitsHandler extends BaseHandler {
 	@Override
 	public Component getEditor(Object o, ConfigurationChangeListener listener) {
 		Units unit = (Units) o;
-		Units[] units = new Units[]{
-				Units.ACU, 
-				Units.AVU, 
-				Units.M, 
-				Units.M_PER_S, 
-				Units.mV, 
-				Units.N, 
-				Units.Nm, 
-				Units.RAD, 
-				Units.RAD_PER_S, 
-				Units.S, 
-				Units.SPIKES, 
-				Units.SPIKES_PER_S, 
-				Units.uA, 
-				Units.uAcm2, 
-				Units.UNK 
-		};
 		
-		final JComboBox result = new JComboBox(units);
+		final JComboBox result = new JComboBox(myList);
 		result.setSelectedItem(unit);
 		
 		listener.setProxy(new EditorProxy() {
@@ -50,5 +52,24 @@ public class UnitsHandler extends BaseHandler {
 		
 		return result;
 	}
+
+	@Override
+	public Object fromString(String s) {
+		Units result = null;
+
+		for (int i = 0; i < myList.length && result == null; i++) {
+			if (s.equals(myList[i].toString())) {
+				result = myList[i];
+			}
+		}
+		
+		if (result == null) {
+			throw new RuntimeException("Units " + s.toString() + " not recognized");
+		}
+		
+		return result;
+	}
+	
+	
 	
 }

@@ -10,13 +10,10 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -28,25 +25,22 @@ import org.apache.log4j.Logger;
 import ca.neo.config.MainHandler;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
-import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Units;
 import ca.neo.model.Configuration.Property;
 import ca.neo.model.impl.ConfigurationImpl;
-import ca.neo.util.MU;
 
 /**
  * 
- * TODO: shorter names, name constants
+ * TODO: namespaces?
  * 
  * @author Bryan Tripp
  */
 public class ConfigurableIO {
 	
-	private static final String NAMESPACE = "http://www.nengo.ca";
-	private static final String CONFIGURABLE = "configurable";
-	private static final String PROPERTY = "property";
-	private static final String NONCONFIGURABLE = "nonconfigurable";
+//	private static final String NAMESPACE = "http://www.nengo.ca";
+	private static final String CONFIGURABLE = "conf";
+	private static final String PROPERTY = "prop";
+	private static final String NONCONFIGURABLE = "nonconf";
 	private static final String CLASS = "class";
 	private static final String VALUE = "value";
 	private static final String NAME = "name";
@@ -97,7 +91,6 @@ public class ConfigurableIO {
 		writer.writeAttribute(/*NAMESPACE,*/ CLASS, property.getType().getName());
 		
 		boolean isConfigurable = Configurable.class.isAssignableFrom(property.getType());
-		System.out.println(property.getType().getName() + " configurable " + isConfigurable);
 		for (int i = 0; i < property.getNumValues(); i++) {
 			Object o = property.getValue(i);
 			if (isConfigurable) {
@@ -121,26 +114,6 @@ public class ConfigurableIO {
 		} else {
 			writer.writeAttribute(VALUE, text);
 		}
-		
-//		if (o instanceof Integer 
-//			|| o instanceof Float 
-//			|| o instanceof Boolean 
-//			|| o instanceof String 
-//			|| o instanceof SimulationMode 
-//			|| o instanceof Units)
-//		{			
-//			writer.writeAttribute(/*NAMESPACE,*/ VALUE, o.toString());
-//		} else {
-//			float[][] data = null;
-//			if (o instanceof float[][]) {
-//				data = (float[][]) o;  
-//			} else if (o instanceof float[]) {
-//				data = new float[][]{(float[]) o};
-//			} else {
-//				throw new StructuralException("Unexpected parameter type: " + o.getClass().getName());
-//			}
-//			writer.writeCharacters(MU.toString(data, 5)); //TODO: better performance and accuracy possible
-//		}
 		
 		writer.writeEndElement();
 	}
@@ -169,13 +142,13 @@ public class ConfigurableIO {
 	
 	//assumes we start on a <configurable> tag
 	private static Configurable readConfigurable(XMLStreamReader reader) throws StructuralException, IOException {
-		String className = reader.getAttributeValue(0); //TODO: use name (namespace needed)
+		String className = reader.getAttributeValue(null, CLASS); 
 		Map<String, Property> properties = new HashMap<String, Property>(10);
-		
 		try {
 			readContents : while (reader.hasNext()) {
 				int eventType = reader.next();
-				if (eventType == XMLStreamReader.END_ELEMENT && reader.getName().equals(CONFIGURABLE)) {
+				
+				if (eventType == XMLStreamReader.END_ELEMENT && reader.getLocalName().equals(CONFIGURABLE)) {
 					break readContents;
 				} else if (eventType == XMLStreamReader.START_ELEMENT && reader.getLocalName().equals(PROPERTY)) {
 					Property property = readProperty(reader);
@@ -251,8 +224,8 @@ public class ConfigurableIO {
 	}
 	
 	private static Property readProperty(XMLStreamReader reader) throws StructuralException, IOException {
-		String name = reader.getAttributeValue(0);
-		String className = reader.getAttributeValue(1);
+		String name = reader.getAttributeValue(null, NAME);
+		String className = reader.getAttributeValue(null, CLASS);
 
 		Class c;
 		try {
@@ -265,7 +238,8 @@ public class ConfigurableIO {
 		try {
 			readContents : while (reader.hasNext()) {
 				int eventType = reader.next();
-				if (eventType == XMLStreamReader.END_ELEMENT && reader.getName().equals(PROPERTY)) {
+				
+				if (eventType == XMLStreamReader.END_ELEMENT && reader.getLocalName().equals(PROPERTY)) {					
 					break readContents;
 				} else if (eventType == XMLStreamReader.START_ELEMENT && reader.getLocalName().equals(CONFIGURABLE)) {
 					Configurable configurable = readConfigurable(reader);
@@ -284,7 +258,7 @@ public class ConfigurableIO {
 	}
 	
 	private static Object readNonConfigurable(XMLStreamReader reader) throws StructuralException {
-		String className = reader.getAttributeValue(0);
+		String className = reader.getAttributeValue(null, CLASS);
 		Class<?> c;
 		
 		try {
@@ -295,7 +269,7 @@ public class ConfigurableIO {
 		
 		String value = null; 
 		if (reader.getAttributeCount() > 1) {
-			value = reader.getAttributeValue(1);
+			value = reader.getAttributeValue(null, VALUE);
 		} else {
 			try {
 				value = reader.getElementText();

@@ -22,7 +22,6 @@ import ca.neo.config.handlers.StringHandler;
 import ca.neo.config.handlers.UnitsHandler;
 import ca.neo.config.handlers.VectorHandler;
 import ca.neo.config.ui.ConfigurationChangeListener;
-import ca.neo.model.SimulationMode;
 
 public class MainHandler implements ConfigurationHandler {
 	

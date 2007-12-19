@@ -30,12 +30,10 @@ import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
-import ca.neo.config.ConfigurationConfiguration;
+import ca.neo.config.ClassRegistry;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
-import ca.neo.model.impl.ConfigurationImpl;
-import ca.neo.model.impl.MockConfigurable.MockChildConfigurable;
 import ca.neo.model.impl.MockConfigurable.MockLittleConfigurable;
 
 public class NewConfigurableDialog extends JDialog implements ActionListener {
@@ -103,7 +101,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		
 		JScrollPane treeScroll = new JScrollPane(myConfigurationTree);
 		
-		List<Class> types = ConfigurationConfiguration.getInstance().getImplementations(type);
+		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
 		if (currentType != null && !types.contains(currentType)) {
 			types.add(0, currentType);
 		}
