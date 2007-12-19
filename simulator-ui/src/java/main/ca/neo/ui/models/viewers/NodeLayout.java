@@ -23,6 +23,11 @@ public class NodeLayout implements Serializable {
 	private String layoutName;
 
 	/**
+	 * Whether elastic layout is enabled
+	 */
+	private boolean elasticMode;
+
+	/**
 	 * Node positions referenced by name
 	 */
 	private Hashtable<String, PointSerializable> nodePositions;
@@ -38,9 +43,12 @@ public class NodeLayout implements Serializable {
 	 * @param nodeViewer
 	 *            Viewer containing nodes
 	 */
-	public NodeLayout(String layoutName, NodeViewer nodeViewer) {
+	public NodeLayout(String layoutName, NodeViewer nodeViewer,
+			boolean elasticMode) {
 		super();
 		this.layoutName = layoutName;
+		this.elasticMode = elasticMode;
+
 		nodePositions = new Hashtable<String, PointSerializable>();
 
 		Enumeration<UINeoNode> en = nodeViewer.getNeoNodes().elements();
@@ -84,6 +92,10 @@ public class NodeLayout implements Serializable {
 	 */
 	public PBounds getSavedViewBounds() {
 		return savedViewBounds;
+	}
+
+	public boolean elasticModeEnabled() {
+		return elasticMode;
 	}
 
 }

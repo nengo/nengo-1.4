@@ -22,11 +22,11 @@ import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
+import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
-import ca.shu.ui.lib.world.AppFrame;
 
 /**
  * Top level instance of the NeoGraphics application

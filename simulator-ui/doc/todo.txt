@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+12/18/2007 - Elastic layout now works with animations
 12/18/2007 - Create graph from ElasticObject and Edge
 12/17/2007 - Spring Layout done
 12/17/2007 - New prettier window icons
@@ -10,6 +11,10 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Data List Viewer: # Nodes Selected. The # is inaccurate (counts too many)
+
+Apply default layout, then enable elastic layout afterwards
+
 
 	In ElasticGround, attach to that event in edges and children.
 	If detected, update graph()

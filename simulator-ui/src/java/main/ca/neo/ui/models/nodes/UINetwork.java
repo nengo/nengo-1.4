@@ -13,7 +13,7 @@ import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.models.viewers.NetworkUISettings;
+import ca.neo.ui.models.viewers.NetworkViewerConfig;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.shu.ui.lib.util.UserMessages;
 
@@ -87,7 +87,7 @@ public class UINetwork extends NodeContainer {
 
 	@Override
 	public String getFileName() {
-		return getUIConfig().getFileName();
+		return getSavedConfig().getFileName();
 	}
 
 	@Override
@@ -127,20 +127,20 @@ public class UINetwork extends NodeContainer {
 	/**
 	 * @return UI Configuration manager associated with this network
 	 */
-	public NetworkUISettings getUIConfig() {
-		NetworkUISettings layoutManager = null;
+	public NetworkViewerConfig getSavedConfig() {
+		NetworkViewerConfig layoutManager = null;
 		try {
 			Object obj = getModel().getMetaData(LAYOUT_MANAGER_KEY);
 
 			if (obj != null)
-				layoutManager = (NetworkUISettings) obj;
+				layoutManager = (NetworkViewerConfig) obj;
 		} catch (Throwable e) {
 			UserMessages
 					.showError("Could not access layout manager, creating a new one");
 		}
 
 		if (layoutManager == null) {
-			layoutManager = new NetworkUISettings(getName() + ".net");
+			layoutManager = new NetworkViewerConfig(getName() + ".net");
 			setUICOnfig(layoutManager);
 		}
 
@@ -163,7 +163,7 @@ public class UINetwork extends NodeContainer {
 
 	@Override
 	public void saveModel(File file) throws IOException {
-		getUIConfig().setFileName(file.toString());
+		getSavedConfig().setFileName(file.toString());
 		super.saveModel(file);
 	}
 
@@ -171,7 +171,7 @@ public class UINetwork extends NodeContainer {
 	 * @param config
 	 *            UI Configuration manager
 	 */
-	public void setUICOnfig(NetworkUISettings config) {
+	public void setUICOnfig(NetworkViewerConfig config) {
 		getModel().setMetaData(LAYOUT_MANAGER_KEY, config);
 	}
 

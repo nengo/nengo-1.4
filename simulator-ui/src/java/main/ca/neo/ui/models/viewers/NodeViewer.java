@@ -177,7 +177,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	 */
 	@SuppressWarnings("unchecked")
 	public void applySortLayout(SortMode sortMode) {
-		getGround().setElasticLayout(false);
+		getGround().setElasticEnabled(false);
 
 		ArrayList<UINeoNode> nodes = new ArrayList(getNeoNodes().size());
 
@@ -463,7 +463,7 @@ class NodeViewerStatus extends AbstractStatusHandler {
 		UIModel wo = (UIModel) Util.getNodeFromPickPath(event, UIModel.class);
 
 		StringBuilder statusStr = new StringBuilder(200);
-		if (getWorld().getGround().isAutoLayout()) {
+		if (getWorld().getGround().isElasticMode()) {
 			statusStr.append("Elastic layout enabled | ");
 		}
 		statusStr.append(getWorld().getViewerParent().getFullName() + " -> ");

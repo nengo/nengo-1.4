@@ -72,7 +72,7 @@ public class NetworkViewer extends NodeViewer {
 	@Override
 	protected void constructLayoutMenu(MenuBuilder layoutMenu) {
 		layoutMenu.addSection("Elastic layout");
-		if (!getGround().isAutoLayout()) {
+		if (!getGround().isElasticMode()) {
 			layoutMenu.addAction(new SetElasticLayoutAction("Enable", true));
 		} else {
 			layoutMenu.addAction(new SetElasticLayoutAction("Disable", false));
@@ -100,7 +100,7 @@ public class NetworkViewer extends NodeViewer {
 		layoutSettings.addAction(new SetLayoutBoundsAction(
 				"Set preferred bounds", this));
 
-		String[] layoutNames = getUISettings().getLayoutNames();
+		String[] layoutNames = getConfig().getLayoutNames();
 
 		if (layoutNames.length > 0) {
 			for (String element : layoutNames) {
@@ -130,6 +130,21 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
+	protected void removeNeoNode(UINeoNode nodeUI) {
+
+		try {
+			nodeUI.showPopupMessage("Node " + nodeUI.getName()
+					+ " removed from Network");
+			getNetwork().removeNode(nodeUI.getName());
+
+		} catch (StructuralException e) {
+			UserMessages.showWarning(e.toString());
+			return;
+		}
+		super.removeNeoNode(nodeUI);
+	}
+
+	@Override
 	public void addNeoNode(UINeoNode node, boolean updateModel,
 			boolean dropInCenterOfCamera, boolean moveCamera) {
 
@@ -153,48 +168,12 @@ public class NetworkViewer extends NodeViewer {
 
 	@Override
 	public void applyDefaultLayout() {
-		if (getNeoNodes().size() == 0)
-			return;
-
-		if (!restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
-			applyJungLayout(KKLayout.class);
+		if (getNeoNodes().size() != 0) {
+			if (!restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
+				(new DoJungLayout(KKLayout.class)).doAction();
+			}
 		}
-	}
-
-	public void applyJungLayout(Class<? extends Layout> layoutType) {
-
-		Layout layout = null;
-		try {
-			Class<?>[] ctArgs = new Class[1];
-			ctArgs[0] = Graph.class;
-
-			Constructor<?> ct = layoutType.getConstructor(ctArgs);
-			Object[] args = new Object[1];
-			args[0] = getGround().getGraph();
-
-			layout = (Layout) ct.newInstance(args);
-
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
-
-		if (layout == null) {
-			UserMessages.showError("Could not apply layout");
-			return;
-		}
-
-		(new ApplyJungLayout(layout)).doAction();
-
+		getGround().setElasticEnabled(true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -235,7 +214,7 @@ public class NetworkViewer extends NodeViewer {
 	 *            Name of layout to delete
 	 */
 	public void deleteNodeLayout(String name) {
-		NetworkUISettings layouts = getUISettings();
+		NetworkViewerConfig layouts = getConfig();
 		layouts.removeLayout(name);
 	}
 
@@ -249,28 +228,13 @@ public class NetworkViewer extends NodeViewer {
 	/**
 	 * @return Static settings including saved layouts
 	 */
-	public NetworkUISettings getUISettings() {
-		return getViewerParent().getUIConfig();
+	public NetworkViewerConfig getConfig() {
+		return getViewerParent().getSavedConfig();
 	}
 
 	@Override
 	public UINetwork getViewerParent() {
 		return (UINetwork) super.getViewerParent();
-	}
-
-	@Override
-	protected void removeNeoNode(UINeoNode nodeUI) {
-
-		try {
-			nodeUI.showPopupMessage("Node " + nodeUI.getName()
-					+ " removed from Network");
-			getNetwork().removeNode(nodeUI.getName());
-
-		} catch (StructuralException e) {
-			UserMessages.showWarning(e.toString());
-			return;
-		}
-		super.removeNeoNode(nodeUI);
 	}
 
 	/**
@@ -279,14 +243,15 @@ public class NetworkViewer extends NodeViewer {
 	 *            Name of layout to restore
 	 */
 	public boolean restoreNodeLayout(String name) {
-		getGround().setElasticLayout(false);
 
-		NetworkUISettings layouts = getUISettings();
-		NodeLayout layout = layouts.getLayout(name);
+		NetworkViewerConfig config = getConfig();
+		NodeLayout layout = config.getLayout(name);
 
 		if (layout == null) {
 			return false;
 		}
+		getGround().setElasticEnabled(false);
+		boolean enableElasticMode = layout.elasticModeEnabled();
 
 		Enumeration<UINeoNode> en = getNeoNodes().elements();
 
@@ -304,7 +269,11 @@ public class NetworkViewer extends NodeViewer {
 				double x = savedPosition.getX();
 				double y = savedPosition.getY();
 
-				node.animateToPositionScaleRotation(x, y, 1, 0, 700);
+				if (!enableElasticMode) {
+					node.animateToPositionScaleRotation(x, y, 1, 0, 700);
+				} else {
+					node.setOffset(x, y);
+				}
 
 				if (x < startX) {
 					startX = x;
@@ -331,6 +300,10 @@ public class NetworkViewer extends NodeViewer {
 			zoomToBounds(fullBounds, 700);
 		}
 
+		if (enableElasticMode) {
+			getGround().setElasticEnabled(true);
+		}
+
 		return true;
 	}
 
@@ -347,9 +320,10 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public void saveNodeLayout(String name) {
 
-		NetworkUISettings layouts = getUISettings();
+		NetworkViewerConfig layouts = getConfig();
 		if (layouts != null) {
-			NodeLayout nodeLayout = new NodeLayout(name, this);
+			NodeLayout nodeLayout = new NodeLayout(name, this, getGround()
+					.isElasticMode());
 
 			layouts.addLayout(nodeLayout);
 		} else {
@@ -427,47 +401,6 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	/**
-	 * Activity for performing a Jung Layout.
-	 * 
-	 * @author Shu Wu
-	 */
-	class ApplyJungLayout extends TrackedAction {
-
-		private static final long serialVersionUID = 1L;
-
-		private Layout layout;
-
-		public ApplyJungLayout(Layout layout) {
-			super("Performing layout: " + layout.getClass().getSimpleName());
-			this.layout = layout;
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			getGround().setElasticLayout(false);
-			layout.initialize(getLayoutBounds());
-
-			if (layout.isIncremental()) {
-				long timeNow = System.currentTimeMillis();
-				while (!layout.incrementsAreDone()
-						&& (System.currentTimeMillis() - timeNow < 1000 && !layout
-								.incrementsAreDone())) {
-					layout.advancePositions();
-				}
-			}
-			/**
-			 * Layout nodes needs to be done in the Swing dispatcher thread
-			 */
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					getGround().updateChildrensFromLayout(layout, true);
-				}
-			});
-
-		}
-	}
-
-	/**
 	 * Action to delete a layout
 	 * 
 	 * @author Shu Wu
@@ -485,6 +418,73 @@ public class NetworkViewer extends NodeViewer {
 		@Override
 		protected void action() throws ActionException {
 			deleteNodeLayout(layoutName);
+		}
+	}
+
+	/**
+	 * Activity for performing a Jung Layout.
+	 * 
+	 * @author Shu Wu
+	 */
+	class DoJungLayout extends TrackedAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private Class<? extends Layout> layoutType;
+
+		public DoJungLayout(Class<? extends Layout> layoutType) {
+			super("Performing layout: " + layoutType.getSimpleName());
+			this.layoutType = layoutType;
+		}
+
+		Layout layout;
+
+		@Override
+		protected void action() throws ActionException {
+
+			try {
+				Class<?>[] ctArgs = new Class[1];
+				ctArgs[0] = Graph.class;
+
+				Constructor<?> ct = layoutType.getConstructor(ctArgs);
+				Object[] args = new Object[1];
+				args[0] = getGround().getGraph();
+
+				layout = (Layout) ct.newInstance(args);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new ActionException("Could not apply layout: "
+						+ e.getMessage());
+			}
+
+			getGround().setElasticEnabled(false);
+			layout.initialize(getLayoutBounds());
+
+			if (layout.isIncremental()) {
+				long timeNow = System.currentTimeMillis();
+				while (!layout.incrementsAreDone()
+						&& (System.currentTimeMillis() - timeNow < 1000 && !layout
+								.incrementsAreDone())) {
+					layout.advancePositions();
+				}
+			}
+			/**
+			 * Layout nodes needs to be done in the Swing dispatcher thread
+			 */
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						getGround()
+								.updateChildrenFromLayout(layout, true, true);
+					}
+				});
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+
 		}
 	}
 
@@ -526,7 +526,7 @@ public class NetworkViewer extends NodeViewer {
 
 		@Override
 		protected void applyLayout() {
-			applyJungLayout(layoutClass);
+			(new DoJungLayout(layoutClass)).doAction();
 		}
 
 	}
@@ -598,7 +598,7 @@ public class NetworkViewer extends NodeViewer {
 
 		@Override
 		protected void applyLayout() {
-			getGround().setElasticLayout(enabled);
+			getGround().setElasticEnabled(enabled);
 		}
 
 	}

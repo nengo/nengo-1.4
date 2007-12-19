@@ -24,33 +24,12 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 
 	private ChildFilter myChildFilter;
 
+	private PNode myEdgeHolder;
+
 	/**
 	 * World this layer belongs to
 	 */
 	private World world;
-
-	private PNode myEdgeHolder;
-
-	public List<DirectedEdge> getEdges() {
-		myEdgeHolder.getChildrenCount();
-
-		ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>(
-				myEdgeHolder.getChildrenCount());
-
-		Iterator<?> it = myEdgeHolder.getChildrenIterator();
-		while (it.hasNext()) {
-			edges.add((DirectedEdge) it.next());
-		}
-		return edges;
-	}
-
-	public boolean containsEdge(DirectedEdge edge) {
-		if (edge.getParent() == myEdgeHolder) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 	/**
 	 * Create a new ground layer
@@ -67,8 +46,10 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 		this.setSelectable(false);
 	}
 
-	public void addEdge(DirectedEdge edge) {
-		myEdgeHolder.addChild(edge);
+	@Override
+	protected void prepareForDestroy() {
+		myEdgeHolder.removeFromParent();
+		super.prepareForDestroy();
 	}
 
 	@Override
@@ -84,21 +65,8 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 		super.addChild(index, child);
 	}
 
-	/**
-	 * Removes and destroys children
-	 */
-	public void destroyAndClearChildren() {
-		List<?> childrenList = getChildrenReference();
-
-		PNode[] children = childrenList.toArray(new PNode[0]);
-
-		for (PNode node : children) {
-			if (node instanceof WorldObject) {
-				((WorldObject) node).destroy();
-			} else {
-				Util.Assert(false, "Non-WorldObject in the world");
-			}
-		}
+	public void addEdge(DirectedEdge edge) {
+		myEdgeHolder.addChild(edge);
 	}
 
 	/**
@@ -152,6 +120,44 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 				.getY(), 1, 0, 500);
 	}
 
+	public boolean containsEdge(DirectedEdge edge) {
+		if (edge.getParent() == myEdgeHolder) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Removes and destroys children
+	 */
+	public void destroyAndClearChildren() {
+		List<?> childrenList = getChildrenReference();
+
+		PNode[] children = childrenList.toArray(new PNode[0]);
+
+		for (PNode node : children) {
+			if (node instanceof WorldObject) {
+				((WorldObject) node).destroy();
+			} else {
+				Util.Assert(false, "Non-WorldObject in the world");
+			}
+		}
+	}
+
+	public List<DirectedEdge> getEdges() {
+		myEdgeHolder.getChildrenCount();
+
+		ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>(
+				myEdgeHolder.getChildrenCount());
+
+		Iterator<?> it = myEdgeHolder.getChildrenIterator();
+		while (it.hasNext()) {
+			edges.add((DirectedEdge) it.next());
+		}
+		return edges;
+	}
+
 	/**
 	 * @return The scale of the ground in relation to the sky
 	 */
@@ -170,11 +176,5 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 
 	public static interface ChildFilter {
 		public boolean acceptChild(WorldObject obj);
-	}
-
-	@Override
-	protected void prepareForDestroy() {
-		myEdgeHolder.removeFromParent();
-		super.prepareForDestroy();
 	}
 }

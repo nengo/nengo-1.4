@@ -62,7 +62,8 @@ public class ElasticLayoutRunner {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
 						if (updateLayout()) {
-							myParent.updateChildrenFromLayout(layout, false);
+							myParent.updateChildrenFromLayout(layout, false,
+									false);
 						}
 					}
 				});
@@ -131,7 +132,7 @@ public class ElasticLayoutRunner {
 			}
 		});
 
-		myLayoutThread.setPriority(Thread.MIN_PRIORITY);
+		// myLayoutThread.setPriority(Thread.NORM_PRIORITY);
 		myLayoutThread.start();
 	}
 

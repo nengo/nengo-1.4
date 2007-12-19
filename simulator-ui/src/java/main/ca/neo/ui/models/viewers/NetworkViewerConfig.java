@@ -9,7 +9,7 @@ import java.util.Hashtable;
  * 
  * @author Shu Wu
  */
-public class NetworkUISettings implements Serializable {
+public class NetworkViewerConfig implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -32,7 +32,7 @@ public class NetworkUISettings implements Serializable {
 	 * @param defaultFileName
 	 *            Default file name to give to this network
 	 */
-	public NetworkUISettings(String defaultFileName) {
+	public NetworkViewerConfig(String defaultFileName) {
 		super();
 		this.fileName = defaultFileName;
 		layouts = new Hashtable<String, NodeLayout>();

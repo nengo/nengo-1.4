@@ -24,7 +24,7 @@ public class ElasticGround extends WorldGround {
 
 	private DirectedSparseGraph myGraph;
 
-	private ElasticLayoutRunner springLayoutRunner;
+	private ElasticLayoutRunner elasticLayoutThread;
 	private boolean childrenUpdatedFlag = false;
 
 	public ElasticGround(ElasticWorld world, PLayer layer) {
@@ -40,21 +40,13 @@ public class ElasticGround extends WorldGround {
 		});
 	}
 
-	public ElasticLayoutRunner getElasticLayout() {
-		if (springLayoutRunner != null) {
-			return springLayoutRunner;
-		}
-		return null;
-
-	}
-
 	public Point2D getElasticPosition(ElasticObject node) {
-		if (getElasticLayout() != null) {
+		if (elasticLayoutThread != null) {
 			ElasticVertex vertex = myVertexMap.get(node);
 			if (vertex != null) {
-				if (!getElasticLayout().isLocked(vertex)) {
-					return getElasticLayout()
-							.getLocation(myVertexMap.get(node));
+				if (!elasticLayoutThread.isLocked(vertex)) {
+					return elasticLayoutThread.getLocation(myVertexMap
+							.get(node));
 				}
 			}
 		}
@@ -105,25 +97,25 @@ public class ElasticGround extends WorldGround {
 		return (ElasticWorld) super.getWorld();
 	}
 
-	public boolean isAutoLayout() {
-		if (getElasticLayout() != null) {
+	public boolean isElasticMode() {
+		if (elasticLayoutThread != null) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public void setElasticLayout(boolean enabled) {
-		if (springLayoutRunner != null) {
-			springLayoutRunner.stopLayout();
-			springLayoutRunner = null;
+	public void setElasticEnabled(boolean enabled) {
+		if (elasticLayoutThread != null) {
+			elasticLayoutThread.stopLayout();
+			elasticLayoutThread = null;
 		}
 		if (enabled) {
 			myVertexMap.clear();
 			myEdgeMap.clear();
 			myGraph = null;
-			springLayoutRunner = new ElasticLayoutRunner(this);
-			springLayoutRunner.start();
+			elasticLayoutThread = new ElasticLayoutRunner(this);
+			elasticLayoutThread.start();
 		}
 
 	}
@@ -133,12 +125,12 @@ public class ElasticGround extends WorldGround {
 		if (x == 0 || y == 0)
 			return;
 
-		if (getElasticLayout() != null) {
+		if (elasticLayoutThread != null) {
 			ElasticVertex vertex = myVertexMap.get(node);
 			if (vertex != null) {
 
-				getElasticLayout().forceMove(vertex, x, y);
-				if (!getElasticLayout().isLocked(vertex)) {
+				elasticLayoutThread.forceMove(vertex, x, y);
+				if (!elasticLayoutThread.isLocked(vertex)) {
 					doRealMove = false;
 				}
 			}
@@ -149,21 +141,22 @@ public class ElasticGround extends WorldGround {
 	}
 
 	public void setElasticLock(ElasticObject node, boolean lockEnabled) {
-		if (getElasticLayout() != null) {
+		if (elasticLayoutThread != null) {
 			ElasticVertex vertex = myVertexMap.get(node);
 
 			if (vertex != null) {
 				if (lockEnabled) {
-					getElasticLayout().lockVertex(vertex);
+					elasticLayoutThread.lockVertex(vertex);
 				} else {
-					getElasticLayout().unlockVertex(vertex);
+					elasticLayoutThread.unlockVertex(vertex);
 				}
 			}
 		}
 
 	}
 
-	public void updateChildrenFromLayout(Layout layout, boolean zoomToLayout) {
+	public void updateChildrenFromLayout(Layout layout, boolean animateNodes,
+			boolean zoomToLayout) {
 		/**
 		 * Layout nodes
 		 */
@@ -176,35 +169,50 @@ public class ElasticGround extends WorldGround {
 		double endY = Double.NEGATIVE_INFINITY;
 
 		while (it.hasNext()) {
-			ElasticObject node = (ElasticObject) (it.next());
+			ElasticObject elasticObj = (ElasticObject) (it.next());
 
-			ElasticVertex vertex = myVertexMap.get(node);
+			ElasticVertex vertex = myVertexMap.get(elasticObj);
 			if (vertex != null) {
 
 				Point2D coord = layout.getLocation(vertex);
 
 				if (coord != null) {
+
 					foundNode = true;
 					double x = coord.getX();
 					double y = coord.getY();
-					if (zoomToLayout) {
-						node.animateToPositionScaleRotation(x, y, 1, 0, 1000);
+
+					if (elasticObj.isAnimating()) {
+						// If the object is being animated in another process,
+						// then we force update it's position in the layout
+						x = elasticObj.getOffsetReal().getX();
+						y = elasticObj.getOffsetReal().getY();
+						if (elasticLayoutThread != null) {
+							elasticLayoutThread.forceMove(vertex, x, y);
+						}
 					} else {
-						node.setOffsetReal(x, y);
+						x = coord.getX();
+						y = coord.getY();
+						if (animateNodes) {
+							elasticObj.animateToPositionScaleRotation(x, y, 1,
+									0, 1000);
+						} else {
+							elasticObj.setOffsetReal(x, y);
+						}
 					}
 
 					if (x < startX) {
 						startX = x;
 					}
-					if (x + node.getWidth() > endX) {
-						endX = x + node.getWidth();
+					if (x + elasticObj.getWidth() > endX) {
+						endX = x + elasticObj.getWidth();
 					}
 
 					if (y < startY) {
 						startY = y;
 					}
-					if (y + node.getHeight() > endY) {
-						endY = y + node.getHeight();
+					if (y + elasticObj.getHeight() > endY) {
+						endY = y + elasticObj.getHeight();
 					}
 				}
 			}
@@ -221,7 +229,7 @@ public class ElasticGround extends WorldGround {
 	/**
 	 * @return True, if the graph changed
 	 */
-	public boolean updateGraph() {
+	public synchronized boolean updateGraph() {
 		boolean changed = false;
 		if (myGraph == null) {
 			changed = true;
@@ -296,8 +304,9 @@ public class ElasticGround extends WorldGround {
 				ElasticVertex startVertex = myVertexMap.get(startNode);
 				ElasticVertex endVertex = myVertexMap.get(endNode);
 
-				Util.Assert(startVertex != null && endVertex != null,
-						"Could not find vertice");
+				if (!(startVertex != null && endVertex != null)) {
+					Util.Assert(false, "Could not find vertice");
+				}
 
 				DirectedSparseEdge jungEdge = myEdgeMap.get(uiEdge);
 
@@ -364,7 +373,7 @@ public class ElasticGround extends WorldGround {
 
 	@Override
 	protected void prepareForDestroy() {
-		setElasticLayout(false);
+		setElasticEnabled(false);
 		super.prepareForDestroy();
 	}
 

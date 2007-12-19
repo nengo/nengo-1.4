@@ -9,7 +9,6 @@ import java.beans.PropertyChangeListener;
 import ca.shu.ui.lib.objects.activities.TransientMessage;
 import ca.shu.ui.lib.util.Util;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.util.PUtil;
 
@@ -31,11 +30,6 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	public static final String PROPERTY_GLOBAL_BOUNDS = "globalBounds";
 
 	public static final long TIME_BETWEEN_POPUPS = 1500;
-
-	/**
-	 * Current Piccolo activity
-	 */
-	private PActivity currentActivity = null;
 
 	/**
 	 * Whether this object has been destroyed
@@ -140,15 +134,25 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 			/*
 			 * Sequences the animation to occur after
 			 */
-			if (currentActivity != null
-					&& ((currentActivity.getStartTime() + currentActivity
-							.getDuration()) > System.currentTimeMillis())) {
-				ta.startAfter(currentActivity);
+			if (busyAnimatingUntilTime > System.currentTimeMillis()) {
+				ta.setStartTime(busyAnimatingUntilTime);
+			} else {
+				busyAnimatingUntilTime = System.currentTimeMillis();
 			}
-			currentActivity = ta;
+			busyAnimatingUntilTime += ta.getDuration();
 
 			addActivity(ta);
 			return ta;
+		}
+	}
+
+	private long busyAnimatingUntilTime = 0;
+
+	public boolean isAnimating() {
+		if (busyAnimatingUntilTime < System.currentTimeMillis()) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 

@@ -23,7 +23,7 @@ public abstract class LayoutAction extends ReversableAction {
 
 	@Override
 	protected void action() throws ActionException {
-		savedLayout = new NodeLayout("", nodeViewer);
+		savedLayout = new NodeLayout("", nodeViewer, false);
 		applyLayout();
 	}
 

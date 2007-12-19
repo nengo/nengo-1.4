@@ -15,13 +15,13 @@ import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.neo.ui.models.nodes.UINetwork;
+import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.world.AppFrame;
 
 /**
  * Runs the Simulator
