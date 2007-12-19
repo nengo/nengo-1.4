@@ -169,10 +169,13 @@ public class NetworkViewer extends NodeViewer {
 	@Override
 	public void applyDefaultLayout() {
 		if (getNeoNodes().size() != 0) {
-			if (!restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
+			if (restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
+				return;
+			} else {
 				(new DoJungLayout(KKLayout.class)).doAction();
 			}
 		}
+		// enable elastic layout for Jung && when no nodes are loaded.
 		getGround().setElasticEnabled(true);
 	}
 
