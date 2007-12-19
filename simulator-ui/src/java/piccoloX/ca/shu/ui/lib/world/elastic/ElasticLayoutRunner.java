@@ -16,8 +16,8 @@ public class ElasticLayoutRunner {
 	 */
 	public static final double RELAX_DELTA = 2;
 	public static final float SPRING_LAYOUT_FORCE_MULTIPLIER = 1f / 3f;
-	public static final int SPRING_LAYOUT_NODE_DISTANCE = 400;
-	public static final int SPRING_LAYOUT_REPULSION_DISTANCE = 400 / 2;
+	public static final int SPRING_LAYOUT_NODE_DISTANCE = 300;
+	public static final int SPRING_LAYOUT_REPULSION_DISTANCE = 200;
 	private int relaxCount;
 	private boolean continueLayout = true;
 
