@@ -11,8 +11,6 @@ public interface ConfigurationHandler {
 	
 	public boolean canHandle(Class c);
 	
-//	public String getDisplayText(Object o);
-	
 	public Component getRenderer(Object o);
 	
 	public Component getEditor(Object o, ConfigurationChangeListener listener);

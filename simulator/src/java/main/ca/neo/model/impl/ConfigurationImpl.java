@@ -22,25 +22,6 @@ import ca.neo.model.Configuration.Event.Type;
  * an associated implementation of <code>setValue(String, Object)</code> that 
  * maps to the Configurable's native setters.
  * 
- * TODO: zero-arg constructor useful for replacing configurable params in UI 
- * 		(need list of implementations though)
- * TODO: can we force (in UI) setting of immutable properties before finishing construction?
- * 		and set without setters? how about a static method that returns a template Configuration (all mutable)?
- * 		getConstructionTemplate() -- how are these searched with parent classes during reflection?  
- * OK: enforce types in defineParameter  
- * OK: change primitive types for auto setValue
- * OK: how do we set params on loading without firing events? don't persist listeners
- * OK: default setValue(...) using reflection
- * OK: catch list edits
- * OK: should try to do as much as possible automatically, including definition of parameters through 
- * 		bean patterns (mutable if no setter? then how do we load it?)
- * NO: can we handle constructor args automatically? 
- * NO: immutable params preclude zero-arg constructor (would need Configuration arg at least) but we can 
- * 		make it so they lack a default, i.e. default to null if not set, and become immutable after first setting 
- * 		Need an efficient way to ensure object isn't used until set (flag set on zero-arg and setters? checked on
- * 		getters though?) maybe have defaults but allow one edit?
- * NO: how to handle dependencies between params (e.g. matching array lengths in PiecewiseConstantFunction)
- *   
  * @author Bryan Tripp
  */
 public class ConfigurationImpl implements Configuration {

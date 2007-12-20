@@ -47,14 +47,6 @@ public abstract class BaseHandler implements ConfigurationHandler {
 	}
 
 	/**
-	 * @return o.toString()
-	 * @see ca.neo.config.ConfigurationHandler#getDisplayText(java.lang.Object)
-	 */
-//	public String getDisplayText(Object o) {
-//		return o.toString();
-//	}
-
-	/**
 	 * Returns a JTextField. An object is built from the text using fromString().
 	 *   
 	 * @see ca.neo.config.ConfigurationHandler#getEditor(java.lang.Object, ConfigurationChangeListener)

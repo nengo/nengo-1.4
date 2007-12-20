@@ -5,6 +5,8 @@ package ca.neo.config.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Polygon;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -33,7 +35,7 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		
 		Icon icon = getCustomIcon(value);
-		if (icon != null) setIcon(icon);
+		if (icon != null) setIcon(icon);		
 		
 		if (value instanceof Value && ((Value) value).getObject() instanceof Configurable) {
 			setText(((Value) value).getObject().getClass().getSimpleName());
@@ -51,9 +53,10 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 		} else if (value instanceof Value) {
 			Object o = ((Value) value).getObject();
 			Component customRenderer = MainHandler.getInstance().getRenderer(o);
+			
 			if (customRenderer == null) {
-				setText(o.toString()); //ConfigurationConfiguration.getInstance().getDisplayText(o));
-				setToolTipText(null);							
+				setText("UNKNOWN TYPE (" + o.toString() + ")"); 
+				setToolTipText(o.getClass().getCanonicalName());			
 			} else {
 				customRenderer.setBackground(sel ? new Color(.1f, .4f, .7f, .2f) : Color.WHITE);
 				result = customRenderer;

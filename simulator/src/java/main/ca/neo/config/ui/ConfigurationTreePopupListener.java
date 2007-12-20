@@ -3,7 +3,6 @@
  */
 package ca.neo.config.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,10 +13,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
-//import ca.neo.config.ConfigurationTreeModel.PropertyNode;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
-import ca.neo.model.StructuralException;
 import ca.neo.model.Configuration.Property;
 
 public class ConfigurationTreePopupListener extends MouseAdapter {

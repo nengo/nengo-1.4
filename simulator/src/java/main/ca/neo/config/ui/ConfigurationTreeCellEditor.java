@@ -38,9 +38,15 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 				TreePath path = myTree.getPathForLocation(me.getX(), me.getY()); 
 				if (path.getLastPathComponent() instanceof Value 
 						&& !(((Value) path.getLastPathComponent()).getObject() instanceof Configurable) ) {
-					Object o = path.getParentPath().getLastPathComponent();
-					if (o instanceof Property && ((Property) o).isMutable()) {
-						result = true;					
+					
+					Value value = (Value) path.getLastPathComponent();
+					if ( !(value.getObject() instanceof Configurable) 
+							&& MainHandler.getInstance().canHandle(value.getObject().getClass())) {
+						
+						Object o = path.getParentPath().getLastPathComponent();
+						if (o instanceof Property && ((Property) o).isMutable()) {
+							result = true;					
+						}						
 					}
 				}				
 			}
@@ -55,11 +61,7 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 		
 		TreePath path = tree.getPathForRow(row);
 		if (path.getParentPath().getLastPathComponent() instanceof Property && value instanceof Value) {
-//			Property property = (Property) path.getParentPath().getLastPathComponent();
 			Value node = (Value) value;
-//			if (result instanceof JTextComponent) {
-//				((JTextComponent) result).setText(ConfigurationConfiguration.getInstance().getDisplayText(node.getObject()));
-//			}
 			
 			ConfigurationChangeListener listener = new ConfigurationChangeListener(tree, path);;
 			Component customEditor = MainHandler.getInstance().getEditor(node.getObject(), listener);

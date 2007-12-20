@@ -12,7 +12,6 @@ package ca.neo.model;
  * through a common panel.</p>   
  * 
  * TODO: discuss importance of restrictions for robust serialization (not as much for UI) vs bean patterns
- * TODO: can this be used for UI undoable actions? (mixed with purely visual)
  * TODO: contrast with JAXB (generates Java classes from schema)
  *  
  * @author Bryan Tripp

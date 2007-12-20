@@ -39,34 +39,6 @@ public interface Configuration {
 	 * @throws StructuralException if the named property does not exist
 	 */
 	public Property getProperty(String name) throws StructuralException;
-//	
-//	/**
-//	 * @param name Parameter name
-//	 * @return Type of the named parameter 
-//	 * @throws StructuralException
-//	 */
-//	public Class getType(String name) throws StructuralException;
-//	
-//	/**
-//	 * @param name Parameter name
-//	 * @return True iff the named parameter can be changed after the Configurable is first created
-//	 * @throws StructuralException
-//	 */
-//	public boolean getMutable(String name) throws StructuralException;
-//	
-//	/**
-//	 * @param name Parameter name
-//	 * @return Value of the named parameter
-//	 * @throws StructuralException
-//	 */
-//	public Object getValue(String name) throws StructuralException;
-//	
-//	/**
-//	 * @param name Parameter name
-//	 * @param value New value of named parameter
-//	 * @throws StructuralException
-//	 */
-//	public void setValue(String name, Object value) throws StructuralException;
 	
 	/**
 	 * @param listener Listener to add
@@ -206,16 +178,6 @@ public interface Configuration {
 		 */
 		public Configurable getConfigurable();
 		
-//		/**
-//		 * @return The name of the changed parameter
-//		 */
-//		public String getParameterName();
-//		
-//		/**
-//		 * @return The new value of the changed parameter 
-//		 */
-//		public Object getParameterValue();
-
 		/**
 		 * @return The updated Property
 		 */

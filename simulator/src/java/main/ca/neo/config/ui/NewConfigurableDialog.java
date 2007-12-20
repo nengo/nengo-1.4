@@ -171,7 +171,6 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 				e.printStackTrace();
 			}
 		} else {
-//			myConfiguration = new ConfigurationImpl(null);
 			myConfiguration = null;
 			myConfigurationTree.setModel(new DefaultTreeModel(null));
 		}

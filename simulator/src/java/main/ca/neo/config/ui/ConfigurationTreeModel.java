@@ -235,6 +235,9 @@ public class ConfigurationTreeModel implements TreeModel {
 		myListeners.remove(listener);
 	}
 
+	/**
+	 * @see javax.swing.tree.TreeModel#valueForPathChanged(javax.swing.tree.TreePath, java.lang.Object)
+	 */
 	public void valueForPathChanged(TreePath arg0, Object arg1) {
 		// TODO Auto-generated method stub
 	}

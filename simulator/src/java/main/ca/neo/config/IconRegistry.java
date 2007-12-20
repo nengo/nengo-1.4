@@ -3,11 +3,16 @@
  */
 package ca.neo.config;
 
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -15,6 +20,7 @@ import javax.swing.ImageIcon;
  */
 public class IconRegistry {
 
+	private static Logger ourLogger = Logger.getLogger(IconRegistry.class);
 	private static IconRegistry ourInstance;
 	
 	private List<Class> myIconClasses;
@@ -25,10 +31,10 @@ public class IconRegistry {
 			ourInstance = new IconRegistry();
 			
 			//TODO: move these somewhere configurable
-			ourInstance.setIcon(Integer.class, "/ca/neo/config/integer_icon.GIF");
-			ourInstance.setIcon(float[].class, "/ca/neo/config/float_array_icon.GIF");
-			ourInstance.setIcon(float[][].class, "/ca/neo/config/matrix_icon.GIF");
-			ourInstance.setIcon(String.class, "/ca/neo/config/string_icon.JPG");
+			ourInstance.setIcon(Integer.class, "/ca/neo/config/ui/integer_icon.GIF");
+			ourInstance.setIcon(float[].class, "/ca/neo/config/ui/float_array_icon.GIF");
+			ourInstance.setIcon(float[][].class, "/ca/neo/config/ui/matrix_icon.GIF");
+			ourInstance.setIcon(String.class, "/ca/neo/config/ui/string_icon.JPG");
 		}
 		
 		return ourInstance;
@@ -51,6 +57,10 @@ public class IconRegistry {
 			}
 		}
 		
+		if (result == null) {
+			result = new DefaultIcon();
+		}
+		
 		return result;
 	}
 	
@@ -65,12 +75,33 @@ public class IconRegistry {
 	}
 	
 	private ImageIcon createImageIcon(String path, String description) {
+		ImageIcon result = null;
 	    java.net.URL imgURL = getClass().getResource(path);
 	    if (imgURL != null) {
-	        return new ImageIcon(imgURL, description);
+	        result = new ImageIcon(imgURL, description);
 	    } else {
-	        return null;
+	        ourLogger.warn("Can't load icon from " + path);
 	    }
+	    
+	    return result;
+	}
+	
+	private static class DefaultIcon implements Icon {
+
+		public int getIconHeight() {
+			return 16;
+		}
+
+		public int getIconWidth() {
+			return 16;
+		}
+
+		public void paintIcon(Component c, Graphics g, int x, int y) {
+			Polygon p = new Polygon(new int[]{x+3, x+3, x+13, x+13}, new int[]{y+3, y+13, y+13, y+3}, 4);
+			g.drawPolygon(p);
+//			g.fillPolygon(p);			
+		}
+		
 	}
 	
 }

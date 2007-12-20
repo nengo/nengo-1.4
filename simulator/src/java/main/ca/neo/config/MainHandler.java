@@ -56,7 +56,7 @@ public class MainHandler implements ConfigurationHandler {
 			ourLogger.warn("Can't open configuration handlers file " + fileName);
 		}
 		
-		addHandler(new FloatHandler());
+//		addHandler(new FloatHandler());
 		addHandler(new StringHandler());
 		addHandler(new IntegerHandler());
 		addHandler(new BooleanHandler());
@@ -119,21 +119,6 @@ public class MainHandler implements ConfigurationHandler {
 	public Object fromString(String s) {
 		return null;
 	}
-
-	/**
-	 * @see ca.neo.config.ConfigurationHandler#getDisplayText(java.lang.Object)
-	 */
-//	public String getDisplayText(Object o) {
-//		String result = null;
-//		
-//		Class c = o.getClass();
-//		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
-//			if (myHandlers.get(i).canHandle(c)) {
-//				result = myHandlers.get(i).getDisplayText(o);
-//			}
-//		}
-//		return result;
-//	}
 
 	/**
 	 * @see ca.neo.config.ConfigurationHandler#getEditor(Object, ConfigurationChangeListener)
