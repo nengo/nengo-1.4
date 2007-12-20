@@ -40,17 +40,17 @@ public interface Configuration {
 	 */
 	public Property getProperty(String name) throws StructuralException;
 	
-	/**
-	 * @param listener Listener to add
-	 */
-	public void addListener(Configuration.Listener listener);
-
-	/**
-	 * @param listener Listener ro remove
-	 */
-	public void removeListener(Configuration.Listener listener);
-	
-	public void notifyListeners(Event event);
+//	/**
+//	 * @param listener Listener to add
+//	 */
+//	public void addListener(Configuration.Listener listener);
+//
+//	/**
+//	 * @param listener Listener ro remove
+//	 */
+//	public void removeListener(Configuration.Listener listener);
+//	
+//	public void notifyListeners(Event event);
 	
 	
 	

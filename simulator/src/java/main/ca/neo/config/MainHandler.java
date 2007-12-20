@@ -56,7 +56,7 @@ public class MainHandler implements ConfigurationHandler {
 			ourLogger.warn("Can't open configuration handlers file " + fileName);
 		}
 		
-//		addHandler(new FloatHandler());
+		addHandler(new FloatHandler());
 		addHandler(new StringHandler());
 		addHandler(new IntegerHandler());
 		addHandler(new BooleanHandler());

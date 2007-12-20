@@ -76,12 +76,15 @@ public class ConfigurationTreeModel implements TreeModel {
 				property.insert(toInsertBefore.getIndex(), value);
 				
 				Value node = new Value(toInsertBefore.getIndex(), value);
-				TreeModelEvent event = new TreeModelEvent(source, path.getParentPath(), new int[]{toInsertBefore.getIndex()}, new Object[]{node});
+				TreeModelEvent insertEvent = new TreeModelEvent(source, path.getParentPath(), 
+						new int[]{toInsertBefore.getIndex()}, new Object[]{node});
+				TreeModelEvent changeEvent = getIndexUpdateEvent(source, path.getParentPath(), 
+						toInsertBefore.getIndex()+1, property.getNumValues());
 				for (int i = 0; i <myListeners.size(); i++) {
-					myListeners.get(i).treeNodesInserted(event);						
+					myListeners.get(i).treeNodesInserted(insertEvent);
+					myListeners.get(i).treeNodesChanged(changeEvent);
 				}
 				
-				//TODO: change later indices and fire events (new method)
 			} else {
 				throw new RuntimeException("Can't set value on child of " + parent.getClass().getName());
 			}
@@ -90,6 +93,18 @@ public class ConfigurationTreeModel implements TreeModel {
 		}
 	}	
 
+	//creates an event to update a range of child indices with given parent    
+	private TreeModelEvent getIndexUpdateEvent(Object source, TreePath parentPath, int fromIndex, int toIndex) {
+		Object parent = parentPath.getLastPathComponent();
+		int[] changedIndices = new int[toIndex-fromIndex];
+		Object[] changedValues = new Object[changedIndices.length];
+		for (int i = 0; i < changedIndices.length; i++) {
+			changedIndices[i] = fromIndex + i;
+			changedValues[i] = getChild(parent, changedIndices[i]); //creates new Value object with correct index
+		}
+		return new TreeModelEvent(source, parentPath, changedIndices, changedValues);
+	}
+	
 	public void setValue(Object source, TreePath path, Object value) {
 		try {
 			Object parent = path.getParentPath().getLastPathComponent();
@@ -129,12 +144,15 @@ public class ConfigurationTreeModel implements TreeModel {
 				Value toRemove = (Value) path.getLastPathComponent();
 				property.remove(toRemove.getIndex());
 				
-				TreeModelEvent event = new TreeModelEvent(source, path.getParentPath(), new int[]{toRemove.getIndex()}, new Object[]{toRemove});
-				for (int i = 0; i <myListeners.size(); i++) {
-					myListeners.get(i).treeNodesRemoved(event);						
+				TreeModelEvent removeEvent = new TreeModelEvent(source, path.getParentPath(), 
+						new int[]{toRemove.getIndex()}, new Object[]{toRemove});
+				TreeModelEvent changeEvent = getIndexUpdateEvent(source, path.getParentPath(), 
+						toRemove.getIndex(), property.getNumValues());
+				for (int i = 0; i < myListeners.size(); i++) {
+					myListeners.get(i).treeNodesRemoved(removeEvent);
+					myListeners.get(i).treeNodesChanged(changeEvent);					
 				}	
 
-				//TODO: change later indices and fire events (new method)				
 			} else {
 				throw new RuntimeException("Can't set value on child of " + parent.getClass().getName());
 			}
@@ -238,8 +256,14 @@ public class ConfigurationTreeModel implements TreeModel {
 	/**
 	 * @see javax.swing.tree.TreeModel#valueForPathChanged(javax.swing.tree.TreePath, java.lang.Object)
 	 */
-	public void valueForPathChanged(TreePath arg0, Object arg1) {
-		// TODO Auto-generated method stub
+	public void valueForPathChanged(TreePath path, Object newValue) {
+		if (newValue instanceof Value) {
+			TreeModelEvent event = new TreeModelEvent(null, path.getParentPath(), 
+					new int[]{((Value) newValue).getIndex()}, new Object[]{newValue});
+			for (int i = 0; i < myListeners.size(); i++) {
+				myListeners.get(i).treeNodesChanged(event);
+			}
+		}
 	}
 	
 	public static class Value {

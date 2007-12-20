@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -49,8 +50,10 @@ public class VectorHandler extends BaseHandler {
 	
 	@Override
 	public Component getRenderer(Object o) {
-		return new JLabel(MatrixHandler.toString(new float[][]{(float[]) o}, '\t', "\r\n"), 
+		JLabel result = new JLabel(MatrixHandler.toString(new float[][]{(float[]) o}, ' ', "\r\n"), 
 				IconRegistry.getInstance().getIcon(o), SwingConstants.LEFT);
+		result.setFont(result.getFont().deriveFont(Font.PLAIN));
+		return result;
 	}
 
 	@Override

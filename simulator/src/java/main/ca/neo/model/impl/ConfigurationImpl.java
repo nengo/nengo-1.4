@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import ca.neo.config.MainHandler;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
 import ca.neo.model.SimulationMode;
@@ -27,7 +28,7 @@ import ca.neo.model.Configuration.Event.Type;
 public class ConfigurationImpl implements Configuration {
 
 	private Configurable myConfigurable;
-	private List<Listener> myListeners;
+//	private List<Listener> myListeners;
 	private Map<String, Property> myProperties;
 	
 	/**
@@ -35,7 +36,7 @@ public class ConfigurationImpl implements Configuration {
 	 */
 	public ConfigurationImpl(Configurable configurable) {
 		myConfigurable = configurable;
-		myListeners = new ArrayList<Listener>(5);
+//		myListeners = new ArrayList<Listener>(5);
 		myProperties = new HashMap<String, Property>(20);
 	}
 	
@@ -74,27 +75,27 @@ public class ConfigurationImpl implements Configuration {
 		return property;
 	}
 	
-	public void notifyListeners(Event event) {
-		for (Iterator<Listener> it = myListeners.iterator(); it.hasNext(); ) {
-			it.next().configurationChange(event);			
-		}		
-	}
-	
-	/**
-	 * @see ca.neo.model.Configuration#addListener(ca.neo.model.Configuration.Listener)
-	 */
-	public void addListener(Listener listener) {
-		myListeners.add(listener);
-	}
-
-	/**
-	 * @see ca.neo.model.Configuration#removeListener(ca.neo.model.Configuration.Listener)
-	 */
-	public void removeListener(Listener listener) {
-		if (myListeners.contains(listener)) {
-			myListeners.remove(listener);			
-		}
-	}
+//	public void notifyListeners(Event event) {
+//		for (Iterator<Listener> it = myListeners.iterator(); it.hasNext(); ) {
+//			it.next().configurationChange(event);			
+//		}		
+//	}
+//	
+//	/**
+//	 * @see ca.neo.model.Configuration#addListener(ca.neo.model.Configuration.Listener)
+//	 */
+//	public void addListener(Listener listener) {
+//		myListeners.add(listener);
+//	}
+//
+//	/**
+//	 * @see ca.neo.model.Configuration#removeListener(ca.neo.model.Configuration.Listener)
+//	 */
+//	public void removeListener(Listener listener) {
+//		if (myListeners.contains(listener)) {
+//			myListeners.remove(listener);			
+//		}
+//	}
 	
 	/**
 	 * @see ca.neo.model.Configuration#getPropertyNames()
@@ -122,19 +123,22 @@ public class ConfigurationImpl implements Configuration {
 		private boolean myMutable;
 		
 		public BaseProperty(Configuration configuration, String name, Class c, boolean mutable) {
-			if (!Integer.class.isAssignableFrom(c)
-				&& !Float.class.isAssignableFrom(c)
-				&& !Boolean.class.isAssignableFrom(c)
-				&& !String.class.isAssignableFrom(c)
-				&& !float[].class.isAssignableFrom(c)
-				&& !float[][].class.isAssignableFrom(c)
-				&& !SimulationMode.class.isAssignableFrom(c)
-				&& !Units.class.isAssignableFrom(c)
-				&& !Configurable.class.isAssignableFrom(c))
-			{
-				throw new IllegalArgumentException(
-						"Property class must be Float, Boolean, String, float[], float[][], SimulationMode, Units, or Configurable");
+			if (!Configurable.class.isAssignableFrom(c) && !MainHandler.getInstance().canHandle(c)) {
+				throw new IllegalArgumentException("No handler for property type " + c.getName());
 			}
+//			if (!Integer.class.isAssignableFrom(c)
+//				&& !Float.class.isAssignableFrom(c)
+//				&& !Boolean.class.isAssignableFrom(c)
+//				&& !String.class.isAssignableFrom(c)
+//				&& !float[].class.isAssignableFrom(c)
+//				&& !float[][].class.isAssignableFrom(c)
+//				&& !SimulationMode.class.isAssignableFrom(c)
+//				&& !Units.class.isAssignableFrom(c)
+//				&& !Configurable.class.isAssignableFrom(c))
+//			{
+//				throw new IllegalArgumentException(
+//						"Property class must be Float, Boolean, String, float[], float[][], SimulationMode, Units, or Configurable");
+//			}
 				
 			myConfiguration = configuration;
 			myName = name;
@@ -179,7 +183,7 @@ public class ConfigurationImpl implements Configuration {
 	
 	
 	
-	public static class TemplateProperty extends BaseProperty{
+	public static class TemplateProperty extends BaseProperty {
 
 		private boolean myMultiValued;
 		private boolean myFixedCardinality;
@@ -351,19 +355,20 @@ public class ConfigurationImpl implements Configuration {
 	
 	public static abstract class MultiValuedProperty extends BaseProperty implements Property {
 		
-		private List<Object> myValues;
+//		private List<Object> myValues;
 
 		public MultiValuedProperty(Configuration configuration, String name, Class c, boolean mutable) {
 			super(configuration, name, c, mutable);
-			myValues = new ArrayList<Object>(10);
+//			myValues = new ArrayList<Object>(10);
 		}
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#getNumValues()
 		 */
-		public int getNumValues() {
-			return myValues.size();
-		}
+		public abstract int getNumValues();
+//		public int getNumValues() {
+//			return myValues.size();
+//		}
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#isMultiValued()
@@ -383,8 +388,12 @@ public class ConfigurationImpl implements Configuration {
 		 * @see ca.neo.model.Configuration.Property#getValue()
 		 */
 		public Object getValue() {
-			System.out.println("Getting value");
-			return (myValues.size() > 0) ? myValues.get(0) : null;
+			try {
+				return (getNumValues() > 0) ? getValue(0) : null;
+			} catch (StructuralException e) {
+				throw new RuntimeException("There are " + getNumValues() 
+						+ " values but there was a problem returning the first (this may be a bug)", e);
+			}
 		}
 
 		/**
@@ -392,22 +401,25 @@ public class ConfigurationImpl implements Configuration {
 		 */
 		public Object getValue(int index) throws StructuralException {
 			try {
-				return myValues.get(index);				
+//				return myValues.get(index);			
+				return doGetValue(index);			 
 			} catch (IndexOutOfBoundsException e) {
 				throw new StructuralException("Value #" + index + " doesn't exist", e);
 			}
 		}
+		
+		public abstract Object doGetValue(int index) throws StructuralException;
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#addValue(java.lang.Object)
 		 */
 		public abstract void addValue(Object value) throws StructuralException;
 		
-		public void addValueCompleted(Object value) {
-			myValues.add(value);
-			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.ADD, myValues.size());
-			getConfiguration().notifyListeners(event);			
-		}
+//		public void addValueCompleted(Object value) {
+//			myValues.add(value);
+//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.ADD, myValues.size());
+//			getConfiguration().notifyListeners(event);			
+//		}
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#insert(int, java.lang.Object)
@@ -422,11 +434,11 @@ public class ConfigurationImpl implements Configuration {
 		
 		public abstract void doInsert(int index, Object value) throws IndexOutOfBoundsException, StructuralException;
 		
-		public void insertCompleted(int index, Object value) {
-			myValues.add(index, value);
-			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.INSERT, index);
-			getConfiguration().notifyListeners(event);
-		}
+//		public void insertCompleted(int index, Object value) {
+//			myValues.add(index, value);
+//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.INSERT, index);
+//			getConfiguration().notifyListeners(event);
+//		}
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#remove(int)
@@ -441,11 +453,11 @@ public class ConfigurationImpl implements Configuration {
 		
 		public abstract void doRemove(int index) throws IndexOutOfBoundsException, StructuralException;
 		
-		public void removeCompleted(int index) {
-			myValues.remove(index);
-			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.REMOVE, myValues.size());
-			getConfiguration().notifyListeners(event);			
-		}
+//		public void removeCompleted(int index) {
+//			myValues.remove(index);
+//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.REMOVE, myValues.size());
+//			getConfiguration().notifyListeners(event);			
+//		}
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#setValue(java.lang.Object)
@@ -476,11 +488,11 @@ public class ConfigurationImpl implements Configuration {
 		 * 
 		 * @param value Value that has been set
 		 */
-		public void setValueCompleted(int index, Object value) {
-			myValues.set(index, value);
-			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.CHANGE, index);
-			getConfiguration().notifyListeners(event);
-		}
+//		public void setValueCompleted(int index, Object value) {
+//			myValues.set(index, value);
+//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.CHANGE, index);
+//			getConfiguration().notifyListeners(event);
+//		}
 	}
 	
 	/**
@@ -490,13 +502,14 @@ public class ConfigurationImpl implements Configuration {
 	 */
 	public static class SingleValuedProperty extends BaseProperty implements Property {
 		
-		private Object myValue;
+//		private Object myValue;
 		
 		public SingleValuedProperty(Configuration configuration, String name, Class c, boolean mutable, Object value) throws StructuralException {
 			super(configuration, name, c, mutable);
-			if (c.isAssignableFrom(value.getClass())) {
-				myValue = value;
-			} else {
+//			if (c.isAssignableFrom(value.getClass())) {
+//				myValue = value;
+//			} else {
+			if (!c.isAssignableFrom(value.getClass())) {
 				throw new StructuralException("Value of class " + value.getClass().getName() + " doesn't match class " + c.getName());
 			}
 		}
@@ -519,7 +532,19 @@ public class ConfigurationImpl implements Configuration {
 		 * @see ca.neo.model.Configuration.Property#getValue()
 		 */
 		public Object getValue() {
-			return myValue;
+			Object result = null;
+			
+			Configurable c = getConfiguration().getConfigurable();
+			String methodName = "get" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
+			
+			try {
+				Method method = c.getClass().getMethod(methodName, new Class[0]);
+				result = method.invoke(c, new Object[0]);
+			} catch (Exception e) {
+				throw new RuntimeException("Can't get property", e);
+			}
+			
+			return result; 
 		}
 
 		/**
@@ -527,7 +552,7 @@ public class ConfigurationImpl implements Configuration {
 		 */
 		public Object getValue(int index) throws StructuralException {
 			if (index == 0) {
-				return myValue;
+				return getValue();
 			} else {
 				throw new StructuralException("Value " + index + " of the single-valued property " + getName() + " does not exist");
 			}
@@ -573,6 +598,7 @@ public class ConfigurationImpl implements Configuration {
 				Configurable c = getConfiguration().getConfigurable();
 				String methodName = "set" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
 				Class argClass = getType();
+				//TODO: use handlers? support other primitives?
 				if (argClass.equals(Integer.class)) {
 					argClass = Integer.TYPE;
 				} else if (argClass.equals(Float.class)) {
@@ -598,11 +624,11 @@ public class ConfigurationImpl implements Configuration {
 		 * 
 		 * @param value Value that has been set
 		 */
-		public void setValueCompleted(Object value) {
-			myValue = value;
-			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.CHANGE, 0);
-			getConfiguration().notifyListeners(event);
-		}
+//		public void setValueCompleted(Object value) {
+//			myValue = value;
+//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.CHANGE, 0);
+//			getConfiguration().notifyListeners(event);
+//		}
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#setValue(int, java.lang.Object)
@@ -622,48 +648,48 @@ public class ConfigurationImpl implements Configuration {
 	 * 
 	 * @author Bryan Tripp
 	 */
-	private static class EventImpl implements Event {
-
-		private Configurable myConfigurable;
-		private Property myProperty;
-		private Type myType;
-		private int myLocation;
-		
-		public EventImpl(Configurable configurable, Property property, Type type, int location) {
-			myConfigurable = configurable;
-			myProperty = property;
-			myType = type;
-			myLocation = location;
-		}
-		
-		/**
-		 * @see ca.neo.model.Configuration.Event#getConfigurable()
-		 */
-		public Configurable getConfigurable() {
-			return myConfigurable;
-		}
-
-		/**
-		 * @see ca.neo.model.Configuration.Event#getEventType()
-		 */
-		public Type getEventType() {
-			return myType;
-		}
-
-		/**
-		 * @see ca.neo.model.Configuration.Event#getLocationOfChange()
-		 */
-		public int getLocationOfChange() {
-			return myLocation;
-		}
-
-		/**
-		 * @see ca.neo.model.Configuration.Event#getProperty()
-		 */
-		public Property getProperty() {
-			return myProperty;
-		}
-		
-	}
+//	private static class EventImpl implements Event {
+//
+//		private Configurable myConfigurable;
+//		private Property myProperty;
+//		private Type myType;
+//		private int myLocation;
+//		
+//		public EventImpl(Configurable configurable, Property property, Type type, int location) {
+//			myConfigurable = configurable;
+//			myProperty = property;
+//			myType = type;
+//			myLocation = location;
+//		}
+//		
+//		/**
+//		 * @see ca.neo.model.Configuration.Event#getConfigurable()
+//		 */
+//		public Configurable getConfigurable() {
+//			return myConfigurable;
+//		}
+//
+//		/**
+//		 * @see ca.neo.model.Configuration.Event#getEventType()
+//		 */
+//		public Type getEventType() {
+//			return myType;
+//		}
+//
+//		/**
+//		 * @see ca.neo.model.Configuration.Event#getLocationOfChange()
+//		 */
+//		public int getLocationOfChange() {
+//			return myLocation;
+//		}
+//
+//		/**
+//		 * @see ca.neo.model.Configuration.Event#getProperty()
+//		 */
+//		public Property getProperty() {
+//			return myProperty;
+//		}
+//		
+//	}
 
 }

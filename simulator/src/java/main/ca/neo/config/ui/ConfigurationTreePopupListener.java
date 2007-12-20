@@ -94,6 +94,17 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 				}
 			});
 			popup.add(refreshItem);
+			
+			if (path.getLastPathComponent() instanceof Value) {
+				final Value v = (Value) path.getLastPathComponent();
+				JMenuItem displayItem = new JMenuItem("Display");
+				displayItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						System.out.println("index: " + v.getIndex());
+					}
+				});
+				popup.add(displayItem);
+			}
 			popup.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}

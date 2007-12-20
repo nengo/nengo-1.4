@@ -18,8 +18,6 @@ import ca.neo.model.impl.ConfigurationImpl.SingleValuedProperty;
 /**
  * A dummy Configurable class for testing purposes.
  * 
- * TODO: should go to underlying variable in Parameter.getValue() -- synchronization bugs will be confusing
- * TODO: do we really need listeners? can the UI check periodically? maybe not. refresh on select? listeners optional? listeners separate?
  * TODO: can we get rid of list methods if we don't need listeners?  
  * 
  * @author Bryan Tripp
@@ -87,25 +85,35 @@ public class MockConfigurable implements Configurable {
 			@Override
 			public void addValue(Object value) throws StructuralException {
 				myMultiValuedField.add((String) value); 
-				addValueCompleted(value);
+//				addValueCompleted(value);
 			}
 
 			@Override
 			public void doInsert(int index, Object value) throws StructuralException {
 				myMultiValuedField.add(index, (String) value);
-				insertCompleted(index, value);
+//				insertCompleted(index, value);
 			}
 
 			@Override
 			public void doRemove(int index) throws StructuralException {
 				myMultiValuedField.remove(index);
-				removeCompleted(index);
+//				removeCompleted(index);
 			}
 
 			@Override
 			public void doSetValue(int index, Object value) throws StructuralException {
 				myMultiValuedField.set(index, (String) value);
-				setValueCompleted(index, value);
+//				setValueCompleted(index, value);
+			}
+
+			@Override
+			public Object doGetValue(int index) throws StructuralException {
+				return myMultiValuedField.get(index);
+			}
+
+			@Override
+			public int getNumValues() {
+				return myMultiValuedField.size();
 			}
 		};
 		myConfiguration.defineProperty(myMultiValuedProperty);
@@ -114,6 +122,16 @@ public class MockConfigurable implements Configurable {
 			@Override
 			public void doSetValue(int index, Object value) throws StructuralException {
 				myFixedCardinalityField[index] = (String) value;
+			}
+
+			@Override
+			public Object doGetValue(int index) throws StructuralException {
+				return myFixedCardinalityField[index];
+			}
+
+			@Override
+			public int getNumValues() {
+				return myFixedCardinalityField.length;
 			}
 		};
 		myConfiguration.defineProperty(myFixedCardinalityProperty);
@@ -139,7 +157,7 @@ public class MockConfigurable implements Configurable {
 	
 	public void setIntField(int val) {
 		myIntField = val;
-		myIntProperty.setValueCompleted(val);
+//		myIntProperty.setValueCompleted(val);
 	}
 	
 	public int getIntField() {
@@ -148,7 +166,7 @@ public class MockConfigurable implements Configurable {
 	
 	public void setFloatField(float val) {
 		myFloatField = val;
-		myFloatProperty.setValueCompleted(val);
+//		myFloatProperty.setValueCompleted(val);
 	}
 	
 	public float getFloatField() {
@@ -157,7 +175,7 @@ public class MockConfigurable implements Configurable {
 	
 	public void setBooleanField(boolean val) {
 		myBooleanField = val;
-		myBooleanProperty.setValueCompleted(val);
+//		myBooleanProperty.setValueCompleted(val);
 	}
 	
 	public boolean getBooleanField() {
@@ -166,7 +184,7 @@ public class MockConfigurable implements Configurable {
 
 	public void setStringField(String val) {
 		myStringField = val;
-		myStringProperty.setValueCompleted(val);
+//		myStringProperty.setValueCompleted(val);
 	}
 	
 	public String getStringField() {
@@ -175,7 +193,7 @@ public class MockConfigurable implements Configurable {
 
 	public void setFloatArrayField(float[] val) {
 		myFloatArrayField = val;
-		myFloatArrayProperty.setValueCompleted(val);
+//		myFloatArrayProperty.setValueCompleted(val);
 	}
 	
 	public float[] getFloatArrayField() {
@@ -184,7 +202,7 @@ public class MockConfigurable implements Configurable {
 
 	public void setFloatArrayArrayField(float[][] val) {
 		myFloatArrayArrayField = val;
-		myFloatArrayArrayProperty.setValueCompleted(val);
+//		myFloatArrayArrayProperty.setValueCompleted(val);
 	}
 	
 	public float[][] getFloatArrayArrayField() {
@@ -193,7 +211,7 @@ public class MockConfigurable implements Configurable {
 
 	public void setSimulationModeField(SimulationMode val) {
 		mySimulationModeField = val;
-		mySimulationModeProperty.setValueCompleted(val);		
+//		mySimulationModeProperty.setValueCompleted(val);		
 	}
 	
 	public SimulationMode getSimulationModeField() {
@@ -202,7 +220,7 @@ public class MockConfigurable implements Configurable {
 
 	public void setUnitsField(Units val) {
 		myUnitsField = val;
-		myUnitsProperty.setValueCompleted(val);
+//		myUnitsProperty.setValueCompleted(val);
 	}
 	
 	public Units getUnitsField() {
@@ -211,7 +229,7 @@ public class MockConfigurable implements Configurable {
 
 	public void setConfigurableField(Configurable val) {
 		myConfigurableField = val;
-		myConfigurableProperty.setValueCompleted(val);
+//		myConfigurableProperty.setValueCompleted(val);
 	}
 	
 	public Configurable getConfigurableField() {
@@ -224,22 +242,22 @@ public class MockConfigurable implements Configurable {
 	
 	public void setMultiValuedField(int index, String val) {
 		myMultiValuedField.set(index, val);
-		myMultiValuedProperty.setValueCompleted(index, val);		
+//		myMultiValuedProperty.setValueCompleted(index, val);		
 	}
 	
 	public void addMultiValuedField(String val) {
 		myMultiValuedField.add(val);
-		myMultiValuedProperty.addValueCompleted(val);
+//		myMultiValuedProperty.addValueCompleted(val);
 	}
 	
 	public void addMultiValuedField(int index, String val) {
 		myMultiValuedField.add(index, val);
-		myMultiValuedProperty.insertCompleted(index, val);
+//		myMultiValuedProperty.insertCompleted(index, val);
 	}
 	
 	public void removeMultiValuedField(int index) {
 		myMultiValuedField.remove(index);
-		myMultiValuedProperty.removeCompleted(index);
+//		myMultiValuedProperty.removeCompleted(index);
 	}
 	
 	public String[] getFixedCardinalityField() {
@@ -250,7 +268,7 @@ public class MockConfigurable implements Configurable {
 	
 	public void setFixedCardinalityField(int index, String val) {
 		myFixedCardinalityField[index] = val;
-		myFixedCardinalityProperty.setValueCompleted(index, val);
+//		myFixedCardinalityProperty.setValueCompleted(index, val);
 	}
 	
 	/**
@@ -281,7 +299,7 @@ public class MockConfigurable implements Configurable {
 		
 		public void setField(String value) {
 			myField = value;
-			myProperty.setValueCompleted(value);
+//			myProperty.setValueCompleted(value);
 		}
 		
 		public String getField() {

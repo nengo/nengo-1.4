@@ -3,9 +3,9 @@
  */
 package ca.neo.config;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +13,8 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.apache.log4j.Logger;
+
+import ca.neo.model.Configuration.Property;
 
 /**
  * 
@@ -31,6 +33,17 @@ public class IconRegistry {
 			ourInstance = new IconRegistry();
 			
 			//TODO: move these somewhere configurable
+			ourInstance.setIcon(Property.class, new Icon(){
+				public void paintIcon(Component c, Graphics g, int x, int y) {
+					g.drawPolygon(new int[]{8, 13, 8, 3}, new int[]{3, 8, 13, 8}, 4);
+				}
+				public int getIconWidth() {
+					return 16;
+				}
+				public int getIconHeight() {
+					return 16;
+				}
+			});
 			ourInstance.setIcon(Integer.class, "/ca/neo/config/ui/integer_icon.GIF");
 			ourInstance.setIcon(float[].class, "/ca/neo/config/ui/float_array_icon.GIF");
 			ourInstance.setIcon(float[][].class, "/ca/neo/config/ui/matrix_icon.GIF");
@@ -97,9 +110,8 @@ public class IconRegistry {
 		}
 
 		public void paintIcon(Component c, Graphics g, int x, int y) {
-			Polygon p = new Polygon(new int[]{x+3, x+3, x+13, x+13}, new int[]{y+3, y+13, y+13, y+3}, 4);
-			g.drawPolygon(p);
-//			g.fillPolygon(p);			
+			g.setColor(Color.LIGHT_GRAY);
+			g.drawOval(1, 1, 14, 14);
 		}
 		
 	}

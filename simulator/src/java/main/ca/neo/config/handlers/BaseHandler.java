@@ -5,6 +5,7 @@ package ca.neo.config.handlers;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -71,7 +72,9 @@ public abstract class BaseHandler implements ConfigurationHandler {
 	 * @see ca.neo.config.ConfigurationHandler#getRenderer(java.lang.Object)
 	 */
 	public Component getRenderer(Object o) {
-		return new JLabel(toString(o), IconRegistry.getInstance().getIcon(o), SwingConstants.LEFT);
+		JLabel result = new JLabel(toString(o), IconRegistry.getInstance().getIcon(o), SwingConstants.LEFT);
+		result.setFont(result.getFont().deriveFont(Font.PLAIN));
+		return result;
 	}
 
 	/**
