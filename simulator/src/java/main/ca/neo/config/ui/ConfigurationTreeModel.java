@@ -178,7 +178,7 @@ public class ConfigurationTreeModel implements TreeModel {
 				result = new Value(index, o); //TODO: adjust indices with insertions and removals
 			}			
 		} catch (StructuralException e) {
-			throw new RuntimeException(e);
+			ConfigExceptionHandler.handle(e, ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
 		}
 		
 		return result;
@@ -219,7 +219,7 @@ public class ConfigurationTreeModel implements TreeModel {
 				}
 			}			
 		} catch (StructuralException e) {
-			throw new RuntimeException(e);
+			ConfigExceptionHandler.handle(e, ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
 		}
 		
 		return index;

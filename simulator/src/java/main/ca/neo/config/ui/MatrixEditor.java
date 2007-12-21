@@ -25,6 +25,8 @@ import javax.swing.table.TableModel;
 /**
  * An UI component for editing matrices.
  * 
+ * TODO: don't really need to enforce equal column lengths
+ * 
  * @author Bryan Tripp
  */
 public class MatrixEditor extends JPanel {

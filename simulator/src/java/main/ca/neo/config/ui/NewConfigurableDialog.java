@@ -34,6 +34,7 @@ import ca.neo.config.ClassRegistry;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
+import ca.neo.model.StructuralException;
 import ca.neo.model.impl.MockConfigurable.MockLittleConfigurable;
 
 public class NewConfigurableDialog extends JDialog implements ActionListener {
@@ -57,7 +58,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		return myResult;
 	}
 	
-	private NewConfigurableDialog(Component comp, Class type, Class currentType) {
+	private NewConfigurableDialog(Component comp, final Class type, Class currentType) {
 		super(JOptionPane.getFrameForComponent(comp), "New " + type.getSimpleName(), true);
 		
 		JButton cancelButton = new JButton("Cancel");
@@ -66,7 +67,13 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		JButton createButton = new JButton("Create");
 		createButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				NewConfigurableDialog.this.setResult();
+				try {
+					NewConfigurableDialog.this.setResult();
+				} catch (StructuralException ex) {
+					ConfigExceptionHandler.handle(ex, 
+							"A programming bug was encountered while trying to create the new " + type.getSimpleName() 
+							+ ". The error log may contain more information.", NewConfigurableDialog.this);
+				}
 			}
 		});
 		myOKButton = new JButton("OK");
@@ -178,7 +185,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		myOKButton.setEnabled(false);
 	}
 	
-	private void setResult() {
+	private void setResult() throws StructuralException {
 		Constructor<?>[] constructors = myType.getConstructors();
 		Constructor zeroArgConstructor = null;
 		Constructor templateConstructor = null;
@@ -197,7 +204,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			} else if (zeroArgConstructor != null) {
 				myResult = (Configurable) zeroArgConstructor.newInstance(new Object[0]);
 			} else {
-				throw new RuntimeException(myType.getName() + " doesn't have template-arg or zero-arg constructor");
+				throw new StructuralException(myType.getName() + " doesn't have template-arg or zero-arg constructor");
 			}
 			
 			if (myPopupListener != null) {
