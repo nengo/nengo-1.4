@@ -5,6 +5,7 @@ package ca.neo.math.impl;
 
 import java.util.Random;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.Function;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
@@ -124,28 +125,19 @@ public class FourierFunction implements Function {
 	 */
 	public FourierFunction(Configuration properties) throws StructuralException {
 		if (properties.getPropertyNames().contains(DIMENSION_PROPERTY)) { //looks like user specs
-			int dimension = ((Integer) get(properties, DIMENSION_PROPERTY, Integer.class)).intValue();
-			int components = ((Integer) get(properties, COMPONENTS_PROPERTY, Integer.class)).intValue();			
+			int dimension = ((Integer) ConfigUtil.get(properties, DIMENSION_PROPERTY, Integer.class)).intValue();
+			int components = ((Integer) ConfigUtil.get(properties, COMPONENTS_PROPERTY, Integer.class)).intValue();			
 			float[][] frequencies = MU.zero(dimension, components);
 			float[] amplitudes = new float[components];
 			float[][] phases = MU.zero(dimension, components);
 			init(frequencies, amplitudes, phases);
 			
 		} else { //looks like we're loading from a file
-			float[][] frequencies = (float[][]) get(properties, FREQUENCIES_PROPERTY, float[][].class);
-			float[] amplitudes = (float[]) get(properties, AMPLITUDES_PROPERTY, float[].class);
-			float[][] phases = (float[][]) get(properties, PHASES_PROPERTY, float[][].class);			
+			float[][] frequencies = (float[][]) ConfigUtil.get(properties, FREQUENCIES_PROPERTY, float[][].class);
+			float[] amplitudes = (float[]) ConfigUtil.get(properties, AMPLITUDES_PROPERTY, float[].class);
+			float[][] phases = (float[][]) ConfigUtil.get(properties, PHASES_PROPERTY, float[][].class);			
 			init(frequencies, amplitudes, phases);
 		}
-	}
-	
-	private Object get(Configuration properties, String name, Class c) throws StructuralException {
-		Object o = properties.getProperty(name).getValue();		
-		if ( !c.isAssignableFrom(o.getClass()) ) {
-			throw new StructuralException("Property " + name 
-					+ " must be of class " + c.getName() + " (was " + o.getClass().getName() + ")");
-		}		
-		return o;
 	}
 	
 	public static Configuration getConstructionTemplate() {
@@ -250,37 +242,5 @@ public class FourierFunction implements Function {
 		
 		return result;
 	}
-	
-//	/**
-//	 * This is to underlie a construction template. Its only purpose is to allow 
-//	 * the user to define the dimensions of the frequency etc. matrices when 
-//	 * constructing a new instance using the configuration UI.
-//	 * 
-//	 * TODO: what we really want is different properties for loading as opposed to user 
-//	 * construction. 
-//	 * Or to change the dimension etc online. 
-//	 * 
-//	 * @author Bryan Tripp
-//	 */
-//	private class Template implements Configurable {
-//		
-//		private int myDimension;
-//		private int myComponents;
-//		
-//		private ConfigurationImpl myConfiguration;
-//
-//		public Template() {
-//			myDimension = 1;
-//			myComponents = 1;
-//			myConfiguration = new ConfigurationImpl(this);
-//		}
-//		
-//		public Configuration getConfiguration() {
-//			return myConfiguration;
-//		}
-//		
-//		public 
-//		
-//	}
 	
 }

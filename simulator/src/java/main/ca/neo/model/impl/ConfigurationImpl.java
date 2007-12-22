@@ -7,17 +7,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import ca.neo.config.MainHandler;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
-import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Units;
-import ca.neo.model.Configuration.Event.Type;
 
 /**
  * Base implementation of Configuration. A Configurable would normally have 
@@ -29,7 +25,6 @@ import ca.neo.model.Configuration.Event.Type;
 public class ConfigurationImpl implements Configuration {
 
 	private Configurable myConfigurable;
-//	private List<Listener> myListeners;
 	private Map<String, Property> myProperties;
 	
 	/**
@@ -37,7 +32,6 @@ public class ConfigurationImpl implements Configuration {
 	 */
 	public ConfigurationImpl(Configurable configurable) {
 		myConfigurable = configurable;
-//		myListeners = new ArrayList<Listener>(5);
 		myProperties = new HashMap<String, Property>(20);
 	}
 	
@@ -76,28 +70,6 @@ public class ConfigurationImpl implements Configuration {
 		return property;
 	}
 	
-//	public void notifyListeners(Event event) {
-//		for (Iterator<Listener> it = myListeners.iterator(); it.hasNext(); ) {
-//			it.next().configurationChange(event);			
-//		}		
-//	}
-//	
-//	/**
-//	 * @see ca.neo.model.Configuration#addListener(ca.neo.model.Configuration.Listener)
-//	 */
-//	public void addListener(Listener listener) {
-//		myListeners.add(listener);
-//	}
-//
-//	/**
-//	 * @see ca.neo.model.Configuration#removeListener(ca.neo.model.Configuration.Listener)
-//	 */
-//	public void removeListener(Listener listener) {
-//		if (myListeners.contains(listener)) {
-//			myListeners.remove(listener);			
-//		}
-//	}
-	
 	/**
 	 * @see ca.neo.model.Configuration#getPropertyNames()
 	 */
@@ -127,19 +99,6 @@ public class ConfigurationImpl implements Configuration {
 			if (!Configurable.class.isAssignableFrom(c) && !MainHandler.getInstance().canHandle(c)) {
 				throw new IllegalArgumentException("No handler for property type " + c.getName());
 			}
-//			if (!Integer.class.isAssignableFrom(c)
-//				&& !Float.class.isAssignableFrom(c)
-//				&& !Boolean.class.isAssignableFrom(c)
-//				&& !String.class.isAssignableFrom(c)
-//				&& !float[].class.isAssignableFrom(c)
-//				&& !float[][].class.isAssignableFrom(c)
-//				&& !SimulationMode.class.isAssignableFrom(c)
-//				&& !Units.class.isAssignableFrom(c)
-//				&& !Configurable.class.isAssignableFrom(c))
-//			{
-//				throw new IllegalArgumentException(
-//						"Property class must be Float, Boolean, String, float[], float[][], SimulationMode, Units, or Configurable");
-//			}
 				
 			myConfiguration = configuration;
 			myName = name;

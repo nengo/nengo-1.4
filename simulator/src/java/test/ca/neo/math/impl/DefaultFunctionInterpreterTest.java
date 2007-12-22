@@ -20,7 +20,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		DefaultFunctionInterpreter interpreter = new DefaultFunctionInterpreter();
 		interpreter.registerFunction("const", c);
 		PostfixFunction f = (PostfixFunction) interpreter.parse("const(x0, x1)", 2);
-		List l = f.getExpression();
+		List l = f.getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(c, l.get(2));
@@ -42,42 +42,42 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		
 		// basic binary cases ...
 		f = interpreter.parse("x0 + x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("+", l.get(2).toString());
 		TestUtil.assertClose(2f, f.map(new float[]{1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 - x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("-", l.get(2).toString());
 		TestUtil.assertClose(0f, f.map(new float[]{1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 * x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("*", l.get(2).toString());
 		TestUtil.assertClose(1f, f.map(new float[]{1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 / x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("/", l.get(2).toString());
 		TestUtil.assertClose(.5f, f.map(new float[]{1f, 2f}), tolerance);
 		
 		f = interpreter.parse("x0 ^ x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("^", l.get(2).toString());
 		TestUtil.assertClose(4f, f.map(new float[]{2f, 2f}), tolerance);
 		
 		f = interpreter.parse("x0 < x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("<", l.get(2).toString());
@@ -85,7 +85,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(0f, f.map(new float[]{1f, 0f}), tolerance);
 		
 		f = interpreter.parse("x0 > x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(">", l.get(2).toString());
@@ -93,7 +93,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(1f, f.map(new float[]{1f, 0f}), tolerance);
 		
 		f = interpreter.parse("x0 & x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("&", l.get(2).toString());
@@ -101,7 +101,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(0f, f.map(new float[]{0f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 | x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("|", l.get(2).toString());
@@ -109,50 +109,50 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(1f, f.map(new float[]{0f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0|x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("|", l.get(2).toString());
 		
 		f = interpreter.parse("x0| x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("|", l.get(2).toString());
 		
 		f = interpreter.parse("x0 |x1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("|", l.get(2).toString());
 		
 		// basic unary cases ...  
 		f = interpreter.parse("x0", 1);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		TestUtil.assertClose(1f, f.map(new float[]{1f}), tolerance);
 		
 		f = interpreter.parse("-x0", 1);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals("~", l.get(1).toString());
 		TestUtil.assertClose(-1f, f.map(new float[]{1f}), tolerance);
 		
 		f = interpreter.parse("!x0", 1);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals("!", l.get(1).toString());
 		TestUtil.assertClose(0f, f.map(new float[]{1f}), tolerance);
 		TestUtil.assertClose(1f, f.map(new float[]{0f}), tolerance);
 		
 		f = interpreter.parse("! x0", 1);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals("!", l.get(1).toString());
 		
 		//precedence ... 
 		f = interpreter.parse("x0 + x1 + x2", 3);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("+", l.get(2).toString());
@@ -161,7 +161,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(6f, f.map(new float[]{1f, 2f, 3f}), tolerance);
 		
 		f = interpreter.parse("x0 * x1 + x2", 3);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("*", l.get(2).toString());
@@ -170,7 +170,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(5f, f.map(new float[]{1f, 2f, 3f}), tolerance);
 		
 		f = interpreter.parse("x0 / x1 - x2", 3);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("/", l.get(2).toString());
@@ -179,7 +179,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(-2.5f, f.map(new float[]{1f, 2f, 3f}), tolerance);
 		
 		f = interpreter.parse("x0 + x1 * x2", 3);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(new Integer(2), l.get(2));
@@ -188,7 +188,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(7f, f.map(new float[]{1f, 2f, 3f}), tolerance);
 		
 		f = interpreter.parse("x0 + x1 * -x2", 3);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(new Integer(2), l.get(2));
@@ -198,7 +198,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(-5f, f.map(new float[]{1f, 2f, 3f}), tolerance);
 		
 		f = interpreter.parse("x0 * x1 ^ x2", 3);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(new Integer(2), l.get(2));
@@ -207,7 +207,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(8f, f.map(new float[]{1f, 2f, 3f}), tolerance);
 		
 		f = interpreter.parse("x0 * x1 ^ x2 & x3", 4);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(new Integer(2), l.get(2));
@@ -219,7 +219,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		
 		//brackets ... 
 		f = interpreter.parse("x0 * (x1 + x2)", 3);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(new Integer(2), l.get(2));
@@ -228,7 +228,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(5f, f.map(new float[]{1f, 2f, 3f}), tolerance);
 		
 		f = interpreter.parse("(x0 * x1) ^ (x2 & x3)", 4);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals("*", l.get(2).toString());
@@ -239,7 +239,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(2f, f.map(new float[]{1f, 2f, 3f, 4f}), tolerance);
 		
 		f = interpreter.parse("x0 ^ (x1 * (x2 + x3))", 4);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(new Integer(2), l.get(2));
@@ -251,7 +251,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		
 		//functions ... 
 		f = interpreter.parse("x0 + sin(x1)", 4);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertTrue(l.get(2) instanceof SineFunction);
@@ -259,7 +259,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(2f, f.map(new float[]{2f, (float) Math.PI, 1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 + sin(x1 + x2)", 4);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(new Integer(2), l.get(2));
@@ -270,13 +270,13 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		
 		//constants ... 
 		f = interpreter.parse("1.1", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertTrue(l.get(0) instanceof Float);
 		TestUtil.assertClose(1.1f, ((Float) l.get(0)).floatValue(), .0001f);
 		TestUtil.assertClose(1.1f, f.map(new float[]{1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 + 5", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertTrue(l.get(1) instanceof Float);
 		TestUtil.assertClose(5f, ((Float) l.get(1)).floatValue(), .0001f);
@@ -284,7 +284,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(6f, f.map(new float[]{1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 + 1.5", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertTrue(l.get(1) instanceof Float);
 		TestUtil.assertClose(1.5f, ((Float) l.get(1)).floatValue(), .0001f);
@@ -292,7 +292,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(2.5f, f.map(new float[]{1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 + 0.5", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertTrue(l.get(1) instanceof Float);
 		TestUtil.assertClose(0.5f, ((Float) l.get(1)).floatValue(), .0001f);
@@ -300,7 +300,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(1.5f, f.map(new float[]{1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 + .5", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertTrue(l.get(1) instanceof Float);
 		TestUtil.assertClose(0.5f, ((Float) l.get(1)).floatValue(), .0001f);
@@ -308,7 +308,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		TestUtil.assertClose(1.5f, f.map(new float[]{1f, 1f}), tolerance);
 		
 		f = interpreter.parse("x0 + pi", 2);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertTrue(l.get(1) instanceof Float);
 		TestUtil.assertClose((float) Math.PI, ((Float) l.get(1)).floatValue(), .0001f);
@@ -326,7 +326,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		
 		//everything ... 
 		f = interpreter.parse("2*pi + .5*x0 / sin((x1 + x2)^x3)", 4);
-		l = ((PostfixFunction) f).getExpression();
+		l = ((PostfixFunction) f).getExpressionList();
 		assertTrue(l.get(0) instanceof Float);
 		TestUtil.assertClose(2f, ((Float) l.get(0)).floatValue(), .0001f);
 		assertTrue(l.get(1) instanceof Float);

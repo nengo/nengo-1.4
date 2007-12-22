@@ -26,16 +26,28 @@ import ca.neo.model.impl.ConfigurationImpl;
  */
 public class DefaultFunctionInterpreter implements FunctionInterpreter {
 
+	private static DefaultFunctionInterpreter ourInstance;
+	
 	private Map<String, Function> myFunctions; 
-	private Map myOperators;
+	private Map<String, AbstractOperator> myOperators;
 	private String myTokens;
 	
+	/**
+	 * @return A singleton instance of DefaultFunctionInterpreter 
+	 */
+	public static synchronized DefaultFunctionInterpreter sharedInstance() {
+		if (ourInstance == null) {
+			ourInstance = new DefaultFunctionInterpreter();
+		}
+		return ourInstance;
+	}
+	
 	public DefaultFunctionInterpreter() {
-		myFunctions = new HashMap(20);
+		myFunctions = new HashMap<String, Function>(20);
 		myFunctions.put("sin", new SineFunction(1));
 		//TODO: other standard functions
 
-		myOperators = new HashMap(20);
+		myOperators = new HashMap<String, AbstractOperator>(20);
 		myOperators.put("^", new ExponentOperator());
 		myOperators.put("*", new MultiplicationOperator());
 		myOperators.put("/", new DivisionOperator());
@@ -75,6 +87,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 	 * @see ca.neo.math.FunctionInterpreter#parse(java.lang.String, int)
 	 */
 	public Function parse(String expression, int dimension) {
+		List postfix = getPostfixList(expression);		
+		return new PostfixFunction(postfix, expression, dimension);
+	}
+	
+	/**
+	 * @param expression Mathematical expression, as in parse(...) 
+	 * @return List of operators and operands in postfix order
+	 */
+	public List getPostfixList(String expression) {
 		//Dijkstra's shunting yard algorithm to convert infix to postfix
 		// see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 		// see also http://en.wikipedia.org/wiki/Reverse_Polish_notation
@@ -147,7 +168,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 			result.add(stack.pop());
 		}
 		
-		return new PostfixFunction(result,expression, dimension);
+		return result;
 	}
 
 	

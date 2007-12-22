@@ -35,13 +35,13 @@ public class CompositeApproximatorTest extends TestCase {
 		l.add(polys[0]);
 		l.add(new Integer(1));
 		l.add(polys[1]);
-		posts[0] = new PostfixFunction(l, 2);
+		posts[0] = new PostfixFunction(l, "", 2);
 		l = new ArrayList();
 		l.add(new Integer(0));
 		l.add(polys[1]);
 		l.add(new Integer(1));
 		l.add(polys[0]);
-		posts[1] = new PostfixFunction(l,2);
+		posts[1] = new PostfixFunction(l, "", 2);
 		
 		LinearApproximator[] comps = new WeightedCostApproximator[2];
 		float[][] evalPoints = new float[199][];
@@ -102,7 +102,7 @@ public class CompositeApproximatorTest extends TestCase {
 		l.add(new Polynomial(new float[]{0f,-2f}));
 		l.add(new Integer(1));
 		l.add(new Polynomial(new float[]{0f,0f,3f}));
-		target = new PostfixFunction(l,2);
+		target = new PostfixFunction(l, "", 2);
 		
 		coefficients = approximator.findCoefficients(target);
 		for (int j=0; j<evalPoints2.length; j++) {

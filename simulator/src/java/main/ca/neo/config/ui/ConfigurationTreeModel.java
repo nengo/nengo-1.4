@@ -25,6 +25,7 @@ import ca.neo.math.impl.GaussianPDF;
 import ca.neo.math.impl.IdentityFunction;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.math.impl.NumericallyDifferentiableFunction;
+import ca.neo.math.impl.PostfixFunction;
 import ca.neo.math.impl.SineFunction;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
@@ -303,7 +304,8 @@ public class ConfigurationTreeModel implements TreeModel {
 //			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
 //			configurable.addMultiValuedField("test1");
 //			configurable.addMultiValuedField("test2");
-			NumericallyDifferentiableFunction configurable = new NumericallyDifferentiableFunction(new FourierFunction(1, 10, 1, 1), 0, .01f);
+//			NumericallyDifferentiableFunction configurable = new NumericallyDifferentiableFunction(new FourierFunction(1, 10, 1, 1), 0, .01f);
+			PostfixFunction configurable = new PostfixFunction("x0 + (x1*sin(x2))", 2);
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

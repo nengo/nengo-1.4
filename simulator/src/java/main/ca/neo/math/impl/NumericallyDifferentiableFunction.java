@@ -3,6 +3,7 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.DifferentiableFunction;
 import ca.neo.math.Function;
 import ca.neo.model.Configuration;
@@ -172,8 +173,8 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 		}
 		
 		public NumericalDerivative(Configuration properties) throws StructuralException {
-			Function f = (Function) get(properties, FUNCTION_PROPERTY, Function.class);
-			int d = ((Integer) get(properties, DERIVATIVE_DIMENSION_PROPERTY, Function.class)).intValue();
+			Function f = (Function) ConfigUtil.get(properties, FUNCTION_PROPERTY, Function.class);
+			int d = ((Integer) ConfigUtil.get(properties, DERIVATIVE_DIMENSION_PROPERTY, Function.class)).intValue();
 			init(f, d, .01f);
 		}
 		
@@ -187,17 +188,6 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 			myConfiguration.defineSingleValuedProperty(FUNCTION_PROPERTY, Function.class, false);
 			myConfiguration.defineSingleValuedProperty(DERIVATIVE_DIMENSION_PROPERTY, Integer.class, false);
 			myConfiguration.defineSingleValuedProperty(DELTA_PROPERTY, Float.class, true);
-		}
-		
-		private static Object get(Configuration properties, String name, Class c) throws StructuralException {
-			Object value = properties.getProperty(name);
-			
-			if ( !c.isAssignableFrom(value.getClass()) ) {
-				throw new StructuralException("Property " + name + " must be a " 
-						+ c.getName() + " (was " + value.getClass().getName() + ")");
-			}
-			
-			return value;
 		}
 		
 		/**
