@@ -13,6 +13,8 @@ import java.util.StringTokenizer;
 
 import ca.neo.math.Function;
 import ca.neo.math.FunctionInterpreter;
+import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * <p>Default implementation of FunctionInterpreter. This implementation produces
@@ -167,13 +169,20 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		private int myDimension;
 		private boolean myRightAssociative;
 		private int myPrecendence;
+		private ConfigurationImpl myConfiguration;
 		
 		public AbstractOperator(int dimension, boolean rightAssociative, int precedence) {
 			myDimension = dimension;
 			myRightAssociative = rightAssociative;
 			myPrecendence = precedence;
+			myConfiguration = new ConfigurationImpl(this);
+			//TODO: add immutable properties
 		}
 		
+		public Configuration getConfiguration() {
+			return myConfiguration;
+		}
+
 		public int getDimension() {
 			return myDimension;
 		}

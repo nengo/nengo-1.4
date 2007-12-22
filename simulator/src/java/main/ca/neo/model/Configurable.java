@@ -5,7 +5,7 @@ package ca.neo.model;
  * the Configuration interface. All of the variable parameters of a Configurable object 
  * must be accessible through this interface.</p> 
  * 
- * <p>A Configurable must have a zero-argument constructor.</p>
+ * <p>A Configurable must have a zero-argument constructor or TODO.</p>
  * 
  * <p>The reasons for this interface are 1) to facilitate saving and loading of model elements, 
  * and 2) to simplify graphical user interfaces by allowing the configuration of all model elements 

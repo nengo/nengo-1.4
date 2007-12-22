@@ -4,6 +4,8 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.PDF;
+import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * Uniform probability between upper and lower limits, zero elsewhere.
@@ -14,12 +16,36 @@ public class IndicatorPDF implements PDF {
 
 	private static final long serialVersionUID = 1L;
 	
+	public static final String LOW_PROPERTY = "low";
+	public static final String HIGH_PROPERTY = "high";
+	public static final String DENSITY_PROPERTY = "density";
+	
 	private float myLow;
 	private float myHigh;
 	private float myDifference;
 	private float myVal;
+	private ConfigurationImpl myConfiguration;
 
+	/**
+	 * @param low Lower limit of range of possible values
+	 * @param high Upper limit of range of possible values
+	 */
 	public IndicatorPDF(float low, float high) {
+		set(low, high);
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.defineSingleValuedProperty(LOW_PROPERTY, Float.class, true);
+		myConfiguration.defineSingleValuedProperty(HIGH_PROPERTY, Float.class, true);
+		myConfiguration.defineSingleValuedProperty(DENSITY_PROPERTY, Float.class, false);
+	}
+	
+	/**
+	 * Instantiates with default range [0,1]. 
+	 */
+	public IndicatorPDF() {
+		this(0, 1);
+	}
+	
+	private void set(float low, float high) {
 		if (high <= low) {
 			throw new IllegalArgumentException("High value must be greater than low value");
 		}
@@ -27,7 +53,49 @@ public class IndicatorPDF implements PDF {
 		myLow = low;
 		myHigh = high;
 		myDifference = high - low;
-		myVal = 1f / myDifference;   
+		myVal = 1f / myDifference;   		
+	}
+
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	/**
+	 * @param low Lower limit of range of possible values
+	 */
+	public void setLow(float low) {
+		set(low, myHigh);
+	}
+
+	/**
+	 * @param high Upper limit of range of possible values
+	 */
+	public void setHigh(float high) {
+		set(myLow, high);
+	}
+	
+	/**
+	 * @return Lower limit of range of possible values
+	 */
+	public float getLow() {
+		return myLow;
+	}
+
+	/**
+	 * @return Upper limit of range of possible values
+	 */
+	public float getHigh() {
+		return myHigh;
+	}
+	
+	/**
+	 * @return Probability density between low and high limits
+	 */
+	public float getDensity() {
+		return myVal;
 	}
 
 	/**

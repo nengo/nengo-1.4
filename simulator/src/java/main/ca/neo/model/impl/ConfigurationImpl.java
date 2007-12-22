@@ -3,6 +3,7 @@
  */
 package ca.neo.model.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,8 +58,8 @@ public class ConfigurationImpl implements Configuration {
 		myProperties.put(property.getName(), property);
 	}
 	
-	public SingleValuedProperty defineSingleValuedProperty(String name, Class c, boolean mutable, Object value) throws StructuralException {		
-		SingleValuedProperty property = new SingleValuedProperty(this, name, c, mutable, value);
+	public SingleValuedProperty defineSingleValuedProperty(String name, Class c, boolean mutable) {		
+		SingleValuedProperty property = new SingleValuedProperty(this, name, c, mutable);
 		myProperties.put(name, property);
 		return property;
 	}
@@ -502,16 +503,8 @@ public class ConfigurationImpl implements Configuration {
 	 */
 	public static class SingleValuedProperty extends BaseProperty implements Property {
 		
-//		private Object myValue;
-		
-		public SingleValuedProperty(Configuration configuration, String name, Class c, boolean mutable, Object value) throws StructuralException {
+		public SingleValuedProperty(Configuration configuration, String name, Class c, boolean mutable) {
 			super(configuration, name, c, mutable);
-//			if (c.isAssignableFrom(value.getClass())) {
-//				myValue = value;
-//			} else {
-			if (!c.isAssignableFrom(value.getClass())) {
-				throw new StructuralException("Value of class " + value.getClass().getName() + " doesn't match class " + c.getName());
-			}
 		}
 
 		/**
@@ -611,7 +604,11 @@ public class ConfigurationImpl implements Configuration {
 					Method method = c.getClass().getMethod(methodName, new Class[]{argClass});
 					method.invoke(c, value);
 				} catch (Exception e) {
-					throw new StructuralException("Can't change property on this Configurable", e);
+					Throwable t = e;
+					if (t instanceof InvocationTargetException) {
+						t = ((InvocationTargetException) t).getCause();
+					}
+					throw new StructuralException("Can't change property: " + t.getMessage(), t);
 				}
 			} else {
 				throw new StructuralException("Value must be of class " + getType().getName());

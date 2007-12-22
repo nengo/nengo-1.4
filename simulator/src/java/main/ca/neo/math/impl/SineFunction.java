@@ -4,10 +4,11 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.Function;
+import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 
 /**
- * Function wrapper for sin(omega x), where x is in radians and omega is an angular frequency 
- * specified in the constructor.   
+ * Function wrapper for sin(omega x), where x is in radians and omega is the angular frequency.  
  * 
  * TODO: test
  *  
@@ -17,15 +18,28 @@ public class SineFunction implements Function {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final float myOmega;
-	private final float myAmplitude;
+	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
+	public static final String OMEGA_PROPERTY = "omega";
+	public static final String AMPLITUDE_PROPERTY = "amplitude";
+	
+	private float myOmega;
+	private float myAmplitude;
+	private ConfigurationImpl myConfiguration;
+
+	/**
+	 * Uses default angular frequency of 2pi and amplitude of 1
+	 */
+	public SineFunction() {
+		this(2 * (float) Math.PI);
+	}
 	
 	/**
+	 * Uses default amplitude of 1. 
+	 * 
 	 * @param omega Angular frequency
 	 */
 	public SineFunction(float omega) {
-		myOmega = omega;
-		myAmplitude = 1;
+		this(omega, 1);
 	}
 	
 	/**
@@ -35,13 +49,45 @@ public class SineFunction implements Function {
 	public SineFunction(float omega, float amplitude) {
 		myOmega = omega;
 		myAmplitude = amplitude;
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
+		myConfiguration.defineSingleValuedProperty(OMEGA_PROPERTY, Float.class, true);
+		myConfiguration.defineSingleValuedProperty(AMPLITUDE_PROPERTY, Float.class, true);
 	}
-	
+
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
 	/**
 	 * @return Angular frequency
 	 */
 	public float getOmega() {
 		return myOmega;
+	}
+	
+	/**
+	 * @param omega Angular frequency
+	 */
+	public void setOmega(float omega) {
+		myOmega = omega;
+	}
+	
+	/**
+	 * @return Amplitude (peak value)
+	 */
+	public float getAmplitude() {
+		return myAmplitude;
+	}
+	
+	/**
+	 * @param amplitude Amplitude (peak value)
+	 */
+	public void setAmplitude(float amplitude) {
+		myAmplitude = amplitude;
 	}
 
 	/**

@@ -15,6 +15,7 @@ import javax.swing.tree.TreePath;
 
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.Configurable;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Configuration.Property;
 
 public class ConfigurationTreePopupListener extends MouseAdapter {
@@ -37,9 +38,9 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 		maybeShowPopup(e);
 	}
 	
-	private void maybeShowPopup(MouseEvent e) {
-		if (e.isPopupTrigger() && e.getComponent().equals(myTree)) {
-			final TreePath path = myTree.getPathForLocation(e.getX(), e.getY());
+	private void maybeShowPopup(final MouseEvent event) {
+		if (event.isPopupTrigger() && event.getComponent().equals(myTree)) {
+			final TreePath path = myTree.getPathForLocation(event.getX(), event.getY());
 			myTree.setSelectionPath(path);
 			
 			JPopupMenu popup = new JPopupMenu();
@@ -57,13 +58,18 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 				}
 			} else if (path.getParentPath() != null && path.getParentPath().getLastPathComponent() instanceof Property) {
 				final Property p = (Property) path.getParentPath().getLastPathComponent();
-				if (Configurable.class.isAssignableFrom(p.getType())) {
+				if (p.isMutable() && Configurable.class.isAssignableFrom(p.getType())) {
 					final JMenuItem replaceValueItem = new JMenuItem("Replace");
 					replaceValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 							Class currentType = ((Value) path.getLastPathComponent()).getObject().getClass();
 							Configurable c = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), currentType);
-							if (c != null) myModel.setValue(this, path, c);
+							if (c != null)
+								try {
+									myModel.setValue(this, path, c);
+								} catch (StructuralException ex) {
+									ConfigExceptionHandler.handle(ex, ex.getMessage(), event.getComponent());
+								}
 						}
 					});
 					popup.add(replaceValueItem);									
@@ -105,7 +111,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 				});
 				popup.add(displayItem);
 			}
-			popup.show(e.getComponent(), e.getX(), e.getY());
+			popup.show(event.getComponent(), event.getX(), event.getY());
 		}
 	}
 	

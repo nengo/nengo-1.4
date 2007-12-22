@@ -4,6 +4,8 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.Function;
+import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * Identity function on a particular dimension of input, ie f(x) = x_i, 
@@ -15,8 +17,12 @@ public class IdentityFunction implements Function {
 
 	private static final long serialVersionUID = 1L;
 	
+	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
+	public static final String INDEX_PROPERTY = "identityDimension";
+	
 	private int myDimension;
 	private int myIdentityDimension;
+	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param dimension Dimension of input vector  
@@ -24,16 +30,25 @@ public class IdentityFunction implements Function {
 	 * 		an identity 
 	 */
 	public IdentityFunction(int dimension, int i) {
-		if (i >= dimension || i < 0) {
-			throw new IllegalArgumentException("Index " + i + " is out of range");
-		}
-		
-		if (dimension <= 0) {
-			throw new IllegalArgumentException("Dimension must be a +ve integer");
-		}
-		
-		myDimension = dimension;
-		myIdentityDimension = i;
+		setDimension(dimension);
+		setIdentityDimension(i);
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, true);
+		myConfiguration.defineSingleValuedProperty(INDEX_PROPERTY, Integer.class, true);
+	}
+	
+	/**
+	 * Instantiates with default of one dimension. 
+	 */
+	public IdentityFunction() {
+		this(1, 0);
+	}
+
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
 	}
 
 	/**
@@ -44,10 +59,31 @@ public class IdentityFunction implements Function {
 	}
 	
 	/**
+	 * @param dimension New dimension of expected input vectors
+	 */
+	public void setDimension(int dimension) {
+		if (dimension <= 0) {
+			throw new IllegalArgumentException("Dimension must be a +ve integer");
+		}
+		myDimension = dimension;
+	}
+	
+	/**
 	 * @return Index on input vector of which this funciton is an identity
 	 */
 	public int getIdentityDimension() {
 		return myIdentityDimension;
+	}
+	
+	/**
+	 * @param i Index (from 0) of input vector of which this function is 
+	 * 		an identity 
+	 */
+	public void setIdentityDimension(int i) {
+		if (i >= myDimension || i < 0) {
+			throw new IllegalArgumentException("Index " + i + " is out of range");
+		}
+		myIdentityDimension = i;
 	}
 
 	/**

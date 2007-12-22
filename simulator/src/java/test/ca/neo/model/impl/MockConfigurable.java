@@ -11,9 +11,7 @@ import ca.neo.model.Configuration;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.impl.ConfigurationImpl.FixedCardinalityProperty;
-import ca.neo.model.impl.ConfigurationImpl.MultiValuedProperty;
-import ca.neo.model.impl.ConfigurationImpl.SingleValuedProperty;
+import ca.neo.model.Configuration.Property;
 
 /**
  * A dummy Configurable class for testing purposes.
@@ -37,18 +35,6 @@ public class MockConfigurable implements Configurable {
 	private final List<String> myMultiValuedField;
 	private final String[] myFixedCardinalityField;
 	
-	private SingleValuedProperty myIntProperty;
-	private SingleValuedProperty myFloatProperty;
-	private SingleValuedProperty myBooleanProperty;
-	private SingleValuedProperty myStringProperty;
-	private SingleValuedProperty myFloatArrayProperty;
-	private SingleValuedProperty myFloatArrayArrayProperty;
-	private SingleValuedProperty mySimulationModeProperty;
-	private SingleValuedProperty myUnitsProperty;
-	private SingleValuedProperty myConfigurableProperty;
-	private MultiValuedProperty myMultiValuedProperty;
-	private FixedCardinalityProperty myFixedCardinalityProperty;
-	
 	private ConfigurationImpl myConfiguration;
 	
 	public MockConfigurable(Configuration immutableProperties) throws StructuralException {
@@ -68,20 +54,20 @@ public class MockConfigurable implements Configurable {
 		myFixedCardinalityField = new String[]{"test1", "test2"};
 		
 		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty("immutableField", String.class, false, myImmutableField);
+		myConfiguration.defineSingleValuedProperty("immutableField", String.class, false);
 		
-		myIntProperty = myConfiguration.defineSingleValuedProperty("intField", Integer.class, true, new Integer(myIntField));
-		myFloatProperty = myConfiguration.defineSingleValuedProperty("floatField", Float.class, true, new Float(myFloatField));
-		myBooleanProperty = myConfiguration.defineSingleValuedProperty("booleanField", Boolean.class, true, new Boolean(myBooleanField));
-		myStringProperty = myConfiguration.defineSingleValuedProperty("stringField", String.class, true, myStringField);
-		myFloatArrayProperty = myConfiguration.defineSingleValuedProperty("floatArrayField", float[].class, true, myFloatArrayField);
-		myFloatArrayArrayProperty = myConfiguration.defineSingleValuedProperty("floatArrayArrayField", float[][].class, true, myFloatArrayArrayField);
-		mySimulationModeProperty = myConfiguration.defineSingleValuedProperty("simulationModeField", SimulationMode.class, true, mySimulationModeField);
-		myUnitsProperty = myConfiguration.defineSingleValuedProperty("unitsField", Units.class, true, myUnitsField);
-		myConfigurableProperty = myConfiguration.defineSingleValuedProperty("configurableField", Configurable.class, true, myConfigurableField);
-		myConfiguration.defineSingleValuedProperty("immutableField", String.class, false, myImmutableField);
+		myConfiguration.defineSingleValuedProperty("intField", Integer.class, true);
+		myConfiguration.defineSingleValuedProperty("floatField", Float.class, true);
+		myConfiguration.defineSingleValuedProperty("booleanField", Boolean.class, true);
+		myConfiguration.defineSingleValuedProperty("stringField", String.class, true);
+		myConfiguration.defineSingleValuedProperty("floatArrayField", float[].class, true);
+		myConfiguration.defineSingleValuedProperty("floatArrayArrayField", float[][].class, true);
+		myConfiguration.defineSingleValuedProperty("simulationModeField", SimulationMode.class, true);
+		myConfiguration.defineSingleValuedProperty("unitsField", Units.class, true);
+		myConfiguration.defineSingleValuedProperty("configurableField", Configurable.class, true);
+		myConfiguration.defineSingleValuedProperty("immutableField", String.class, false);
 		
-		myMultiValuedProperty = new ConfigurationImpl.MultiValuedProperty(myConfiguration, "multiValuedField", String.class, true) {
+		Property mvp = new ConfigurationImpl.MultiValuedProperty(myConfiguration, "multiValuedField", String.class, true) {
 			@Override
 			public void addValue(Object value) throws StructuralException {
 				myMultiValuedField.add((String) value); 
@@ -116,9 +102,9 @@ public class MockConfigurable implements Configurable {
 				return myMultiValuedField.size();
 			}
 		};
-		myConfiguration.defineProperty(myMultiValuedProperty);
+		myConfiguration.defineProperty(mvp);
 		
-		myFixedCardinalityProperty = new ConfigurationImpl.FixedCardinalityProperty(myConfiguration, "fixedCardinalityField", String.class, true) {
+		Property fcp = new ConfigurationImpl.FixedCardinalityProperty(myConfiguration, "fixedCardinalityField", String.class, true) {
 			@Override
 			public void doSetValue(int index, Object value) throws StructuralException {
 				myFixedCardinalityField[index] = (String) value;
@@ -134,7 +120,7 @@ public class MockConfigurable implements Configurable {
 				return myFixedCardinalityField.length;
 			}
 		};
-		myConfiguration.defineProperty(myFixedCardinalityProperty);
+		myConfiguration.defineProperty(fcp);
 		
 	}
 	
@@ -280,17 +266,11 @@ public class MockConfigurable implements Configurable {
 
 		private String myField;
 		private ConfigurationImpl myConfiguration;
-		private SingleValuedProperty myProperty;
 		
 		public MockLittleConfigurable() {
 			myField = "test";
 			myConfiguration = new ConfigurationImpl(this);
-			try {
-				myProperty = myConfiguration.defineSingleValuedProperty("field", String.class, true, myField);
-			} catch (StructuralException e) {
-				throw new RuntimeException(e);
-			}
-			
+			myConfiguration.defineSingleValuedProperty("field", String.class, true);
 		}
 		
 		public Configuration getConfiguration() {
@@ -299,7 +279,6 @@ public class MockConfigurable implements Configurable {
 		
 		public void setField(String value) {
 			myField = value;
-//			myProperty.setValueCompleted(value);
 		}
 		
 		public String getField() {
@@ -320,7 +299,7 @@ public class MockConfigurable implements Configurable {
 		public MockChildConfigurable(Configuration immutableProperties) throws StructuralException {
 			super(addParentProperties(immutableProperties));
 			myField = "test";
-			((ConfigurationImpl) getConfiguration()).defineSingleValuedProperty("field", String.class, true, myField);
+			((ConfigurationImpl) getConfiguration()).defineSingleValuedProperty("field", String.class, true);
 		}
 		
 		private static Configuration addParentProperties(Configuration configuration) {

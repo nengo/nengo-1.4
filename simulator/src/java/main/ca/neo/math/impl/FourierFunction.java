@@ -6,6 +6,11 @@ package ca.neo.math.impl;
 import java.util.Random;
 
 import ca.neo.math.Function;
+import ca.neo.model.Configurable;
+import ca.neo.model.Configuration;
+import ca.neo.model.StructuralException;
+import ca.neo.model.impl.ConfigurationImpl;
+import ca.neo.util.MU;
 
 /**
  * A Function that is composed of a finite number of sinusoids.
@@ -16,9 +21,16 @@ public class FourierFunction implements Function {
 
 	private static final long serialVersionUID = 1L;
 	
+	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
+	public static final String COMPONENTS_PROPERTY = "components";
+	public static final String FREQUENCIES_PROPERTY = "frequencies";
+	public static final String AMPLITUDES_PROPERTY = "amplitudes";
+	public static final String PHASES_PROPERTY = "phases";
+	
 	private float[][] myFrequencies;
 	private float[] myAmplitudes;
 	private float[][] myPhases;
+	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * Creates a 1-dimensional function composed of explicitly defined sinusoids. 
@@ -29,13 +41,7 @@ public class FourierFunction implements Function {
 	 * @param phases The phase lead of each component (from -.5 to .5)
 	 */
 	public FourierFunction(float[] frequencies, float[] amplitudes, float[] phases) {
-		if (frequencies.length != amplitudes.length || frequencies.length != phases.length) {
-			throw new IllegalArgumentException("Lists of frequencies, amplitudes, and phases must have same length");
-		}
-		
-		myFrequencies = new float[][]{frequencies};
-		myAmplitudes = amplitudes;
-		myPhases = new float[][]{phases};
+		init(new float[][]{frequencies}, amplitudes, new float[][]{phases});
 	}
 	
 	/**
@@ -46,6 +52,58 @@ public class FourierFunction implements Function {
 	 * @param phases Lists of phases (length n; ith members define phases of ith component along each dimension)
 	 */
 	public FourierFunction(float[][] frequencies, float[] amplitudes, float[][] phases) {
+		init(frequencies, amplitudes, phases);
+	}
+	
+	/**
+	 * Creates a 1-dimensional band-limited pink noise function with specified parameters. 
+	 *  
+	 * @param fundamental The fundamental frequency (Hz)
+	 * @param cutoff The high-frequency limit (Hz)
+	 * @param rms The root-mean-squared function amplitude
+	 */
+	public FourierFunction(float fundamental, float cutoff, float rms, long seed) {
+		int n = (int) Math.floor(cutoff / fundamental);
+		
+		float[][] frequencies = new float[][]{new float[n]};
+		float[] amplitudes = new float[n];
+		float[][] phases = new float[][]{new float[n]};
+		Random random = new Random(seed); 
+		
+		for (int i = 0; i < n; i++) {
+			frequencies[0][i] = fundamental * (i+1);
+			amplitudes[i] = (float) random.nextFloat() * fundamental / frequencies[0][i]; //decreasing amplitude = pink noise
+			phases[0][i] = -.5f + 2f * (float) random.nextFloat();
+		}
+		
+		//find amplitude over one period and rescale to specified amplitude 
+		int samplePoints = 500;
+		float dx = (1f / fundamental) / samplePoints;
+		double sumSquared = 0;
+		for (int i = 0; i < samplePoints; i++) {
+			float val = getValue(new float[]{i*dx}, frequencies, amplitudes, phases);
+			sumSquared += val * val;
+		}
+		double unscaledRMS = Math.sqrt(sumSquared / samplePoints);
+		
+		for (int i = 0; i < n; i++) {
+			amplitudes[i] = amplitudes[i] * rms / (float) unscaledRMS;
+		}
+		
+		init(frequencies, amplitudes, phases);
+	}
+	
+	private void init(float[][] frequencies, float[] amplitudes, float[][] phases) {
+		set(frequencies, amplitudes, phases);
+		myConfiguration = new ConfigurationImpl(this);	
+		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
+		myConfiguration.defineSingleValuedProperty(COMPONENTS_PROPERTY, Integer.class, false);
+		myConfiguration.defineSingleValuedProperty(FREQUENCIES_PROPERTY, float[][].class, true);
+		myConfiguration.defineSingleValuedProperty(AMPLITUDES_PROPERTY, float[].class, true);
+		myConfiguration.defineSingleValuedProperty(PHASES_PROPERTY, float[][].class, true);
+	}
+	
+	private void set(float[][] frequencies, float[] amplitudes, float[][] phases) {
 		if (frequencies.length != phases.length) {
 			throw new IllegalArgumentException("Lists of frequencies and phases must have same dimension");
 		}
@@ -60,50 +118,105 @@ public class FourierFunction implements Function {
 	}
 	
 	/**
-	 * Creates a 1-dimensional band-limited pink noise function with specified parameters. 
-	 *  
-	 * @param fundamental The fundamental frequency (Hz)
-	 * @param cutoff The high-frequency limit (Hz)
-	 * @param rms The root-mean-squared function amplitude
+	 * @param properties Construction properties as defined by getConstructionTemplate() or 
+	 * 		getUserConstructionTemplate()
+	 * @throws StructuralException 
 	 */
-	public FourierFunction(float fundamental, float cutoff, float rms, long seed) {
-		int n = (int) Math.floor(cutoff / fundamental);
-		
-		myFrequencies = new float[][]{new float[n]};
-		myAmplitudes = new float[n];
-		myPhases = new float[][]{new float[n]};
-		Random random = new Random(seed); 
-		
-		for (int i = 0; i < n; i++) {
-			myFrequencies[0][i] = fundamental * (i+1);
-			myAmplitudes[i] = (float) random.nextFloat() * fundamental / myFrequencies[0][i]; //decreasing amplitude = pink noise
-//			myPhases[i] = (float) ( -Math.PI + (2d *  Math.PI * Math.random()) ) ;
-			myPhases[0][i] = -.5f + 2f * (float) random.nextFloat();
+	public FourierFunction(Configuration properties) throws StructuralException {
+		if (properties.getPropertyNames().contains(DIMENSION_PROPERTY)) { //looks like user specs
+			int dimension = ((Integer) get(properties, DIMENSION_PROPERTY, Integer.class)).intValue();
+			int components = ((Integer) get(properties, COMPONENTS_PROPERTY, Integer.class)).intValue();			
+			float[][] frequencies = MU.zero(dimension, components);
+			float[] amplitudes = new float[components];
+			float[][] phases = MU.zero(dimension, components);
+			init(frequencies, amplitudes, phases);
+			
+		} else { //looks like we're loading from a file
+			float[][] frequencies = (float[][]) get(properties, FREQUENCIES_PROPERTY, float[][].class);
+			float[] amplitudes = (float[]) get(properties, AMPLITUDES_PROPERTY, float[].class);
+			float[][] phases = (float[][]) get(properties, PHASES_PROPERTY, float[][].class);			
+			init(frequencies, amplitudes, phases);
 		}
-		
-		//find amplitude over one period and rescale to specified amplitude 
-		int samplePoints = 500;
-		float dx = (1f / fundamental) / samplePoints;
-		double sumSquared = 0;
-		for (int i = 0; i < samplePoints; i++) {
-			float val = getValue(new float[]{i*dx}, myFrequencies, myAmplitudes, myPhases);
-			sumSquared += val * val;
-		}
-		double unscaledRMS = Math.sqrt(sumSquared / samplePoints);
-		
-		for (int i = 0; i < n; i++) {
-			myAmplitudes[i] = myAmplitudes[i] * rms / (float) unscaledRMS;
-		}
+	}
+	
+	private Object get(Configuration properties, String name, Class c) throws StructuralException {
+		Object o = properties.getProperty(name).getValue();		
+		if ( !c.isAssignableFrom(o.getClass()) ) {
+			throw new StructuralException("Property " + name 
+					+ " must be of class " + c.getName() + " (was " + o.getClass().getName() + ")");
+		}		
+		return o;
+	}
+	
+	public static Configuration getConstructionTemplate() {
+		ConfigurationImpl result = new ConfigurationImpl(null);
+		result.defineTemplateProperty(FREQUENCIES_PROPERTY, float[][].class, new float[0][]);
+		result.defineTemplateProperty(AMPLITUDES_PROPERTY, float[].class, new float[0]);
+		result.defineTemplateProperty(PHASES_PROPERTY, float[][].class, new float[0][]);
+		return result;
+	}
+	
+	public static Configuration getUserConstructionTemplate() {
+		ConfigurationImpl result = new ConfigurationImpl(null);
+		result.defineTemplateProperty(DIMENSION_PROPERTY, Integer.class, new Integer(1));
+		result.defineTemplateProperty(COMPONENTS_PROPERTY, Integer.class, new Integer(1));
+		return result;
 	}
 
 	/**
-	 * @return 1 
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	/**
 	 * @see ca.neo.math.Function#getDimension()
 	 */
 	public int getDimension() {
 		return myFrequencies.length;
 	}
+	
+	/**
+	 * @return Number of frequency components  
+	 */
+	public int getComponents() {
+		return myFrequencies[0].length;
+	}
+	
+	/**
+	 * @return Lists of frequencies (length n; ith members define frequencies of ith component along each dimension)
+	 */
+	public float[][] getFrequencies() {
+		return myFrequencies;
+	}
+	
+	public void setFrequencies(float[][] frequencies) {
+		set(frequencies, getAmplitudes(), getPhases());
+	}
+	
+	/**
+	 * @return The amplitude of each component
+	 */
+	public float[] getAmplitudes() {
+		return myAmplitudes;
+	}
+	
+	public void setAmplitudes(float[] amplitudes) {
+		set(getFrequencies(), amplitudes, getPhases());
+	}
+	
+	/**
+	 * @return Lists of phases (length n; ith members define phases of ith component along each dimension)
+	 */
+	public float[][] getPhases() {
+		return myPhases;
+	}
 
+	public void setPhases(float[][] phases) {
+		set(getFrequencies(), getAmplitudes(), phases);
+	}
+	
 	/**
 	 * @see ca.neo.math.Function#map(float[])
 	 */
@@ -137,5 +250,37 @@ public class FourierFunction implements Function {
 		
 		return result;
 	}
+	
+//	/**
+//	 * This is to underlie a construction template. Its only purpose is to allow 
+//	 * the user to define the dimensions of the frequency etc. matrices when 
+//	 * constructing a new instance using the configuration UI.
+//	 * 
+//	 * TODO: what we really want is different properties for loading as opposed to user 
+//	 * construction. 
+//	 * Or to change the dimension etc online. 
+//	 * 
+//	 * @author Bryan Tripp
+//	 */
+//	private class Template implements Configurable {
+//		
+//		private int myDimension;
+//		private int myComponents;
+//		
+//		private ConfigurationImpl myConfiguration;
+//
+//		public Template() {
+//			myDimension = 1;
+//			myComponents = 1;
+//			myConfiguration = new ConfigurationImpl(this);
+//		}
+//		
+//		public Configuration getConfiguration() {
+//			return myConfiguration;
+//		}
+//		
+//		public 
+//		
+//	}
 	
 }

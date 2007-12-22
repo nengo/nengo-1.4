@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Stack;
 
 import ca.neo.math.Function;
+import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * <p>A Function based on a mathematical expression and on other functions. The expression 
@@ -32,9 +34,9 @@ public class PostfixFunction implements Function {
 	/**
 	 * A human-readable string representation of the function
 	 */
-	private String myExpressionStr;
-	
+	private String myExpressionStr;	
 	private int myDimension;
+	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param expression Postfix expression list (as described in class docs)
@@ -60,8 +62,17 @@ public class PostfixFunction implements Function {
 		myDimension = dimension;
 		myExpression = expression;
 		myExpressionStr = expressionStr;
+		myConfiguration = new ConfigurationImpl(this);
+		//TODO: properties
 	}
 	
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */	
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
 	/**
 	 * @return Postfix expression list 
 	 */

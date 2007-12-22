@@ -6,6 +6,7 @@ package ca.neo.config.handlers;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -43,7 +44,9 @@ public abstract class BaseHandler implements ConfigurationHandler {
 		try {
 			return myClass.getConstructor(new Class[]{String.class}).newInstance(new Object[]{s});
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			Throwable t = e;
+			if (t instanceof InvocationTargetException) t = e.getCause();
+			throw new RuntimeException(t);
 		}
 	}
 

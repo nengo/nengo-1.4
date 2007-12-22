@@ -4,6 +4,8 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.PDF;
+import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * Univariate Gaussian probability density function. 
@@ -14,19 +16,28 @@ public class GaussianPDF implements PDF {
 
 	private static final long serialVersionUID = 1L;
 	
+	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
+	public static final String MEAN_PROPERTY = "mean";
+	public static final String VARIANCE_PROPERTY = "variance";
+	public static final String PEAK_PROPERTY = "peak";
+	public static final String SCALE_PEAK_PROPERTY = "scalePeakWithVariance";
+	
 	private float myMean;
 	private float myVariance;
 	private float mySD;
 	private float nextNormal;
 	private boolean nextAvailable;
-	private float myScale = 1f;
+	private float myPeak;
+	private boolean myScalePeakWithVariance;
+	private ConfigurationImpl myConfiguration;	
 	
 	/**
 	 * @param mean Mean of the distribution 
 	 * @param variance Variance of the distribution
 	 */
 	public GaussianPDF(float mean, float variance) {
-		init(mean, variance);
+		this(mean, variance, 1f / (float) Math.pow(variance * 2f * Math.PI, .5));
+		myScalePeakWithVariance = true;
 	}
 
 	/**
@@ -37,18 +48,73 @@ public class GaussianPDF implements PDF {
 	 * @param peak Maximum value of scaled Gaussian 
 	 */
 	public GaussianPDF(float mean, float variance, float peak) {
-		init(mean, variance);
-		float unscaledPeak = map(new float[]{mean});
-		myScale = peak / unscaledPeak;
-	}
-	
-	//common initialization
-	private void init(float mean, float variance) {
 		myMean = mean;
 		myVariance = variance;
 		mySD = (float) Math.sqrt(variance);
+		myPeak = peak;
 		nextNormal = 0;
 		nextAvailable = false;		
+		myScalePeakWithVariance = false;
+		
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
+		myConfiguration.defineSingleValuedProperty(MEAN_PROPERTY, Float.class, true);
+		myConfiguration.defineSingleValuedProperty(VARIANCE_PROPERTY, Float.class, true);
+		myConfiguration.defineSingleValuedProperty(PEAK_PROPERTY, Float.class, true);
+		myConfiguration.defineSingleValuedProperty(SCALE_PEAK_PROPERTY, Boolean.class, true);
+	}
+
+	/**
+	 * Instantiates with default mean=0 and variance=1
+	 */
+	public GaussianPDF() {
+		this(0, 1);
+	}
+
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+	
+	public void setMean(float mean) {
+		myMean = mean;
+		nextAvailable = false;
+	}
+	
+	public float getMean() {
+		return myMean;
+	}
+	
+	public void setVariance(float variance) {
+		myVariance = variance;
+		nextAvailable = false;
+		if (myScalePeakWithVariance) {
+			myPeak = 1f / (float) Math.pow(variance * 2f * Math.PI, .5);
+		}
+	}
+	
+	public float getVariance() {
+		return myVariance;
+	}
+	
+	public void setPeak(float peak) {
+		myPeak = peak;
+		nextAvailable = false;
+		myScalePeakWithVariance = false;
+	}
+	
+	public float getPeak() {
+		return myPeak;
+	}
+	
+	public void setScalePeakWithVariance(boolean scale) {
+		myScalePeakWithVariance = scale;
+	}
+	
+	public boolean getScalePeakWithVariance() {
+		return myScalePeakWithVariance;
 	}
 
 	/**
@@ -108,7 +174,7 @@ public class GaussianPDF implements PDF {
 	 * @see ca.neo.math.Function#map(float[])
 	 */
 	public float map(float[] from) {
-		return doMap(from, myMean, myVariance, myScale);
+		return doMap(from, myMean, myVariance, myPeak);
 	}
 
 	/**
@@ -117,7 +183,7 @@ public class GaussianPDF implements PDF {
 	public float[] multiMap(float[][] from) {
 		float[] result = new float[from.length];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = doMap(from[i], myMean, myVariance, myScale);
+			result[i] = doMap(from[i], myMean, myVariance, myPeak);
 		}
 		return result;
 	}
@@ -129,7 +195,7 @@ public class GaussianPDF implements PDF {
 		
 		float d = from[0] - mean;
 		
-		double result = scale / Math.pow(variance * 2f * Math.PI, .5) * Math.pow(Math.E, -(d*d) / (2*variance));
+		double result = scale * Math.pow(Math.E, -(d*d) / (2*variance));
 		
 		return (float) result;
 	}

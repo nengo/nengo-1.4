@@ -19,6 +19,13 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import ca.neo.math.impl.ConstantFunction;
+import ca.neo.math.impl.FourierFunction;
+import ca.neo.math.impl.GaussianPDF;
+import ca.neo.math.impl.IdentityFunction;
+import ca.neo.math.impl.IndicatorPDF;
+import ca.neo.math.impl.NumericallyDifferentiableFunction;
+import ca.neo.math.impl.SineFunction;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
@@ -105,35 +112,32 @@ public class ConfigurationTreeModel implements TreeModel {
 		return new TreeModelEvent(source, parentPath, changedIndices, changedValues);
 	}
 	
-	public void setValue(Object source, TreePath path, Object value) {
-		try {
-			Object parent = path.getParentPath().getLastPathComponent();
-			if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
-				Property property = (Property) parent;
-				int index = ((Value) path.getLastPathComponent()).getIndex();
-				property.setValue(index, value);
-				
-				Value child = (Value) path.getLastPathComponent();
-				child.setObject(value);
-				
-				if (child.getObject() instanceof Configurable) {
-					TreeModelEvent event = new TreeModelEvent(source, path);
-					for (int i = 0; i <myListeners.size(); i++) {
-						myListeners.get(i).treeStructureChanged(event);						
-					}
-				} else {
-					TreePath shortPath = new TreePath(new Object[]{parent, child});
-					TreeModelEvent event = new TreeModelEvent(source, shortPath, new int[]{index}, new Object[]{child});
-					for (int i = 0; i <myListeners.size(); i++) {
-						myListeners.get(i).treeNodesChanged(event);
-					}
+	public void setValue(Object source, TreePath path, Object value) throws StructuralException {
+		Object parent = path.getParentPath().getLastPathComponent();
+		if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
+			Property property = (Property) parent;
+			int index = ((Value) path.getLastPathComponent()).getIndex();
+			property.setValue(index, value);
+			
+			Value child = (Value) path.getLastPathComponent();
+			child.setObject(value);
+			
+			if (child.getObject() instanceof Configurable) {
+				TreeModelEvent event = new TreeModelEvent(source, path);
+				for (int i = 0; i <myListeners.size(); i++) {
+					myListeners.get(i).treeStructureChanged(event);						
 				}
 			} else {
-				throw new RuntimeException("Can't set value on child of " + parent.getClass().getName());
+				TreePath shortPath = new TreePath(new Object[]{parent, child});
+				TreeModelEvent event = new TreeModelEvent(source, shortPath, new int[]{index}, new Object[]{child});
+				for (int i = 0; i <myListeners.size(); i++) {
+					myListeners.get(i).treeNodesChanged(event);
+				}
 			}
-		} catch (StructuralException e) {
-			e.printStackTrace();
-		}		
+		} else {
+			throw new RuntimeException("Can't set value on child of " 
+					+ parent.getClass().getName() + " (this is probably a bug).");
+		}
 	}
 	
 	public void removeValue(Object source, TreePath path) {
@@ -296,9 +300,10 @@ public class ConfigurationTreeModel implements TreeModel {
 	public static void main(String[] args) {
 		try {
 			JFrame frame = new JFrame("Tree Test");
-			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
-			configurable.addMultiValuedField("test1");
-			configurable.addMultiValuedField("test2");
+//			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
+//			configurable.addMultiValuedField("test1");
+//			configurable.addMultiValuedField("test2");
+			NumericallyDifferentiableFunction configurable = new NumericallyDifferentiableFunction(new FourierFunction(1, 10, 1, 1), 0, .01f);
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);
@@ -323,7 +328,7 @@ public class ConfigurationTreeModel implements TreeModel {
 				}
 			});
 
-		} catch (StructuralException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

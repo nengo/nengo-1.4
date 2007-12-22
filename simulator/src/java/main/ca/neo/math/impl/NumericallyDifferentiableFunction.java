@@ -5,6 +5,9 @@ package ca.neo.math.impl;
 
 import ca.neo.math.DifferentiableFunction;
 import ca.neo.math.Function;
+import ca.neo.model.Configuration;
+import ca.neo.model.StructuralException;
+import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * A wrapper around any Function that provides a numerical approximation of its derivative, 
@@ -19,8 +22,15 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 
 	private static final long serialVersionUID = 1L;
 	
+	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
+	public static final String FUNCTION_PROPERTY = "function";
+	public static final String DERIVATIVE_PROPERTY = "derivative";
+	public static final String DERIVATIVE_DIMENSION_PROPERTY = NumericalDerivative.DERIVATIVE_DIMENSION_PROPERTY;
+	public static final String DELTA_PROPERTY = NumericalDerivative.DELTA_PROPERTY;
+	
 	private Function myFunction;
-	private Function myDerivative;
+	private NumericalDerivative myDerivative;
+	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param function An underlying Function
@@ -29,8 +39,33 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 	 * @param delta Derivative approximation of f(x) is [f(x+delta)-f(x-delta)]/[2*delta]
 	 */
 	public NumericallyDifferentiableFunction(Function function, int derivativeDimension, float delta) {
+		set(function, derivativeDimension, delta);
+		
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
+		myConfiguration.defineSingleValuedProperty(FUNCTION_PROPERTY, Function.class, true);
+		myConfiguration.defineSingleValuedProperty(DERIVATIVE_PROPERTY, Function.class, false);
+		myConfiguration.defineSingleValuedProperty(DERIVATIVE_DIMENSION_PROPERTY, Integer.class, true);
+		myConfiguration.defineSingleValuedProperty(DELTA_PROPERTY, Float.class, true);
+	}
+	
+	/**
+	 * Uses dummy parameters to allow setting after construction.  
+	 */
+	public NumericallyDifferentiableFunction() {
+		this(new IdentityFunction(1,0), 0, .01f);
+	}
+	
+	private void set(Function function, int derivativeDimension, float delta) {
 		myFunction = function;
-		myDerivative = new NumericalDerivative(myFunction, derivativeDimension, delta);
+		myDerivative = new NumericalDerivative(myFunction, derivativeDimension, delta);		
+	}
+	
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
 	}
 
 	/**
@@ -48,6 +83,48 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 	 */
 	public int getDimension() {
 		return myFunction.getDimension();
+	}
+	
+	/**
+	 * @return The underlying Function
+	 */
+	public Function getFunction() {
+		return myFunction;
+	}
+	
+	/**
+	 * @param function A new underlying Function
+	 */
+	public void setFunction(Function function) {
+		set(function, getDerivativeDimension(), getDelta());
+	}
+	
+	/**
+	 * @return The dimension along which the derivative is to be calculated 
+	 */
+	public int getDerivativeDimension() {
+		return myDerivative.getDerivativeDimension();
+	}
+	
+	/**
+	 * @param dim The dimension along which the derivative is to be calculated 
+	 */
+	public void setDerivativeDimension(int dim) {
+		set(myFunction, dim, getDelta());
+	}
+	
+	/**
+	 * @return Delta in derivative approximation [f(x+delta)-f(x-delta)]/[2*delta]
+	 */
+	public float getDelta() {
+		return myDerivative.getDelta();
+	}
+	
+	/**
+	 * @param delta Delta in derivative approximation [f(x+delta)-f(x-delta)]/[2*delta]
+	 */
+	public void setDelta(float delta) {
+		myDerivative.setDelta(delta);
 	}
 
 	/**
@@ -75,9 +152,15 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 
 		private static final long serialVersionUID = 1L;
 		
+		public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
+		public static final String FUNCTION_PROPERTY = "function";
+		public static final String DERIVATIVE_DIMENSION_PROPERTY = "derivativeDimension";
+		public static final String DELTA_PROPERTY = "delta";
+		
 		private Function myFunction;
 		private int myDerivativeDimension;
 		private float myDelta;
+		private ConfigurationImpl myConfiguration;
 		
 		/**
 		 * @param function The Function of which the derivative is to be approximated
@@ -85,9 +168,53 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 		 * @param delta Derivative approximation of f(x) is [f(x+delta)-f(x-delta)]/[2*delta]
 		 */
 		public NumericalDerivative(Function function, int derivativeDimension, float delta) {
+			init(function, derivativeDimension, delta);
+		}
+		
+		public NumericalDerivative(Configuration properties) throws StructuralException {
+			Function f = (Function) get(properties, FUNCTION_PROPERTY, Function.class);
+			int d = ((Integer) get(properties, DERIVATIVE_DIMENSION_PROPERTY, Function.class)).intValue();
+			init(f, d, .01f);
+		}
+		
+		private void init(Function function, int derivativeDimension, float delta) {
 			myFunction = function;
 			myDerivativeDimension = derivativeDimension;
 			myDelta = delta;
+			
+			myConfiguration = new ConfigurationImpl(this);
+			myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
+			myConfiguration.defineSingleValuedProperty(FUNCTION_PROPERTY, Function.class, false);
+			myConfiguration.defineSingleValuedProperty(DERIVATIVE_DIMENSION_PROPERTY, Integer.class, false);
+			myConfiguration.defineSingleValuedProperty(DELTA_PROPERTY, Float.class, true);
+		}
+		
+		private static Object get(Configuration properties, String name, Class c) throws StructuralException {
+			Object value = properties.getProperty(name);
+			
+			if ( !c.isAssignableFrom(value.getClass()) ) {
+				throw new StructuralException("Property " + name + " must be a " 
+						+ c.getName() + " (was " + value.getClass().getName() + ")");
+			}
+			
+			return value;
+		}
+		
+		/**
+		 * @return A construction template
+		 */
+		public static Configuration getConstructionTemplate() {
+			ConfigurationImpl result = new ConfigurationImpl(null);
+			result.defineTemplateProperty(FUNCTION_PROPERTY, Function.class, new ConstantFunction(1, 1));
+			result.defineTemplateProperty(DERIVATIVE_DIMENSION_PROPERTY, Integer.class, new Integer(0));
+			return result;
+		}
+
+		/**
+		 * @see ca.neo.model.Configurable#getConfiguration()
+		 */
+		public Configuration getConfiguration() {
+			return myConfiguration;
 		}
 
 		/**
@@ -95,6 +222,35 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 		 */
 		public int getDimension() {
 			return myFunction.getDimension();
+		}
+
+		/**
+		 * @return The Function of which the derivative is to be approximated
+		 */
+		public Function getFunction() {
+			return myFunction;
+		}
+		
+		/**
+		 * @return The dimension along which the derivative is to be calculated
+		 */
+		public int getDerivativeDimension() {
+			return myDerivativeDimension;
+		}
+		
+		/**
+		 * @return The variable delta in derivative approximation [f(x+delta)-f(x-delta)]/[2*delta]
+		 */
+		public float getDelta() {
+			return myDelta;
+		}
+		
+		/**
+		 * @param delta The variable delta in derivative approximation [f(x+delta)-f(x-delta)]/[2*delta]
+		 */
+		public void setDelta(float delta) {
+			System.out.println("setting delta to " + delta);
+			myDelta = delta;
 		}
 
 		/**
