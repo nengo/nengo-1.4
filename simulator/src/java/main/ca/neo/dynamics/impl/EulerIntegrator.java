@@ -5,7 +5,9 @@ package ca.neo.dynamics.impl;
 
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
+import ca.neo.model.Configuration;
 import ca.neo.model.Units;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.LinearInterpolatorND;
@@ -25,9 +27,34 @@ public class EulerIntegrator implements Integrator {
 	//TODO: solve this problem more robustly
 	private static final float SHRINK = .99999f; 
 	
-	private float h;	
+	private float h;
+	private ConfigurationImpl myConfiguration;
 	
 	public EulerIntegrator(float stepSize) {
+		h = stepSize;
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.defineSingleValuedProperty("stepSize", Float.class, true);
+	}
+	
+	/**
+	 * Uses default step size of .0001
+	 */
+	public EulerIntegrator() {
+		this(.0001f);
+	}
+	
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	public float getStepSize() {
+		return h;
+	}
+	
+	public void setStepSize(float stepSize) {
 		h = stepSize;
 	}
 

@@ -5,6 +5,7 @@ package ca.neo.dynamics;
 
 import java.io.Serializable;
 
+import ca.neo.model.Configurable;
 import ca.neo.model.Units;
 
 /**
@@ -19,7 +20,7 @@ import ca.neo.model.Units;
  * 
  * @author Bryan Tripp
  */
-public interface DynamicalSystem extends Serializable, Cloneable {
+public interface DynamicalSystem extends Serializable, Cloneable, Configurable {
 
 	/**
 	 * The dynamic equation. 

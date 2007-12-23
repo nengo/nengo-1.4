@@ -9,7 +9,9 @@ package ca.neo.model;
  *   
  * @author Bryan Tripp
  */
-public interface Noise {
+public interface Noise extends Configurable {
+	
+	public static final String DIMENSION_PROPERTY = "dimension";
 	
 	/**
 	 * @param startTime Simulation time at which step starts 

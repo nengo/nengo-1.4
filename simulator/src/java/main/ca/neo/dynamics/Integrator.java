@@ -5,6 +5,7 @@ package ca.neo.dynamics;
 
 import java.io.Serializable;
 
+import ca.neo.model.Configurable;
 import ca.neo.util.TimeSeries;
 
 /**
@@ -12,7 +13,7 @@ import ca.neo.util.TimeSeries;
  *  
  * @author Bryan Tripp
  */
-public interface Integrator extends Serializable {
+public interface Integrator extends Configurable, Serializable {
 
 	/**
 	 * Integrates the given system over the time span defined by the input time series. 

@@ -7,7 +7,9 @@ import org.apache.log4j.Logger;
 
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
+import ca.neo.model.Configuration;
 import ca.neo.model.Units;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.LinearInterpolatorND;
@@ -50,19 +52,43 @@ public class RK45Integrator implements Integrator {
     //  Society for Industrial and Applied Mathematics (SIAM), Philadelphia, 1998
     private double myPow = 1f/6f; 
     private float myTolerance;
+    private ConfigurationImpl myConfiguration;
     
     /**
      * @param tolerance Error tolerance
      */
     public RK45Integrator(float tolerance) {
     	myTolerance = tolerance;
+    	myConfiguration = new ConfigurationImpl(this);
+    	myConfiguration.defineSingleValuedProperty("tolerance", Float.class, true);
     }
     
     /**
      * Uses default error tolerance of 1e-6
      */
     public RK45Integrator() {
-    	myTolerance = 1e-6f;
+    	this(1e-6f);
+    }
+    
+    /**
+     * @see ca.neo.model.Configurable#getConfiguration()
+     */
+    public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	/**
+     * @return Error tolerance
+     */
+    public float getTolerance() {
+    	return myTolerance;
+    }
+    
+    /**
+     * @param tolerance Error tolerance
+     */
+    public void setTolerance(float tolerance) {
+    	myTolerance = tolerance;
     }
 	
     /**

@@ -5,11 +5,12 @@ package ca.neo.model.neuron.impl;
 
 import ca.neo.dynamics.impl.AbstractDynamicalSystem;
 import ca.neo.dynamics.impl.RK45Integrator;
+import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * A SpikeGenerator based on the Hodgkin-Huxley model.
  * 
- * TODO: find firing rate curve empirically
  * TODO: factory
  * TODO: unit test
  * 
@@ -38,9 +39,22 @@ public class HodgkinHuxleySpikeGenerator extends DynamicalSystemSpikeGenerator {
 	    private static float G_m = 0.3f;
 	    private static float V_rest = 10.613f;
 	    private static float C_m = 1f;
+	    private Configuration myConfiguration;
 
 		public HodgkinHuxleySystem(float[] state) {
 			super(state);
+			myConfiguration = new ConfigurationImpl(this);
+		}
+		
+		public HodgkinHuxleySystem() {
+			this(new float[4]);
+		}
+		
+		/**
+		 * @see ca.neo.model.Configurable#getConfiguration()
+		 */
+		public Configuration getConfiguration() {
+			return myConfiguration;
 		}
 
 		public float[] f(float t, float[] u) {

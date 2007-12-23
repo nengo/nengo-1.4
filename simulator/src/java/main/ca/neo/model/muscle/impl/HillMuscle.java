@@ -13,6 +13,7 @@ import ca.neo.math.RootFinder;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.NewtonRootFinder;
+import ca.neo.model.Configuration;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
@@ -28,7 +29,8 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * state variables l_CE and activation? 
  * 
  * TODO: ref Keener & Sneyd
- * TODO: review -- this has been made to compile after model change but it might not make sense  
+ * TODO: review -- this has been made to compile after model change but it might not make sense
+ * TODO: implement getConfiguration()  
  * 
  * @author Bryan Tripp
  */
@@ -140,6 +142,14 @@ public class HillMuscle extends SkeletalMuscleImpl {
 			myRootFinder = new NewtonRootFinder(20, true);
 		}
 		
+
+		/**
+		 * @see ca.neo.model.Configurable#getConfiguration()
+		 */
+		public Configuration getConfiguration() {
+			return null;
+		}
+
 		/**
 		 * @param t Simulation time (s)
 		 * @param u Input: [excitation (0-1), muscle-tendon length, muscle-tendon lengthening velocity]

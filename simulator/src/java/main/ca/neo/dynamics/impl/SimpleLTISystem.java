@@ -3,7 +3,10 @@
  */
 package ca.neo.dynamics.impl;
 
+import ca.neo.model.Configuration;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.util.MU;
 
 /**
@@ -37,11 +40,27 @@ public class SimpleLTISystem extends LTISystem {
 	 * @param outputUnits Units in which each dimension of the output are expressed 
 	 */
 	public SimpleLTISystem(float[] A, float[][] B, float[][] C, float[] x0, Units[] outputUnits) {
-		super(diagonalMatrix(A), B, C, zeroMatrix(C.length, B[0].length), x0, outputUnits);
+		super(MU.diag(A), B, C, MU.zero(C.length, B[0].length), x0, outputUnits);
 		
 		this.A = A;
 		this.B = B;
 		this.C = C;
+		
+		((ConfigurationImpl) getConfiguration()).removeProperty("D");		
+	}
+	
+	/**
+	 * @param properties Construction properties (as for LTISystem)
+	 * @throws StructuralException
+	 */
+	public SimpleLTISystem(Configuration properties) throws StructuralException {
+		super(properties);
+		
+		this.A = MU.diag(super.getA());
+		this.B = super.getB();
+		this.C = super.getC();
+		
+		((ConfigurationImpl) getConfiguration()).removeProperty("D");
 	}
 	
 	/**
@@ -72,28 +91,24 @@ public class SimpleLTISystem extends LTISystem {
 		
 		return MU.prod(C, getState());
 	}
-	
-	//creates dummy matrix for superclass
-	private static float[][] diagonalMatrix(float[] entries) {
-		float[][] result = new float[entries.length][];
-		
-		for (int i = 0; i < entries.length; i++) {
-			result[i] = new float[entries.length];
-			result[i][i] = entries[i];
-		}
-		
-		return result;		
-	}
-	
-	//creates dummy matrix for superclass
-	private static float[][] zeroMatrix(int rows, int cols) {
-		float[][] result = new float[rows][];
-		
-		for (int i = 0; i < rows; i++) {
-			result[i] = new float[cols];
-		}
-		
-		return result;
+
+	@Override
+	public void setA(float[][] newA) {
+		float[] newAVector = MU.diag(newA);
+		super.setA(MU.diag(newAVector));
+		this.A = newAVector;
 	}
 
+	@Override
+	public void setB(float[][] newB) {
+		super.setB(newB);
+		this.B = newB;
+	}
+
+	@Override
+	public void setC(float[][] newC) {
+		super.setC(newC);
+		this.C = newC;
+	}
+	
 }

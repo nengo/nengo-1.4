@@ -413,6 +413,20 @@ public class MU {
 		
 		return result;
 	}
+	
+	/**
+	 * @param matrix Any matrix
+	 * @return Diagonal entries 
+	 */
+	public static float[] diag(float[][] matrix) {
+		float[] result = new float[Math.min(matrix.length, matrix[0].length)];
+		
+		for (int i = 0; i < result.length; i++) {
+			result[i] = matrix[i][i];
+		}
+		
+		return result;
+	}
 
 	/**
 	 * @param dimension # of rows/columns

@@ -19,6 +19,9 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import ca.neo.dynamics.impl.EulerIntegrator;
+import ca.neo.dynamics.impl.LTISystem;
+import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
@@ -30,8 +33,11 @@ import ca.neo.math.impl.SineFunction;
 import ca.neo.model.Configurable;
 import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
+import ca.neo.model.Units;
 import ca.neo.model.Configuration.Property;
 import ca.neo.model.impl.MockConfigurable;
+import ca.neo.model.impl.NoiseFactory;
+import ca.neo.util.MU;
 
 /**
  * Data model underlying JTree user interface for a Configurable.
@@ -305,7 +311,11 @@ public class ConfigurationTreeModel implements TreeModel {
 //			configurable.addMultiValuedField("test1");
 //			configurable.addMultiValuedField("test2");
 //			NumericallyDifferentiableFunction configurable = new NumericallyDifferentiableFunction(new FourierFunction(1, 10, 1, 1), 0, .01f);
-			PostfixFunction configurable = new PostfixFunction("x0 + (x1*sin(x2))", 2);
+//			PostfixFunction configurable = new PostfixFunction("x0 + (x1*sin(x2))", 2);
+			Configurable configurable = NoiseFactory.makeRandomNoise(100, new GaussianPDF(0, .5f),
+					new SimpleLTISystem(new float[]{-1}, MU.I(1), MU.I(1), new float[1], new Units[]{Units.UNK}),
+//					new LTISystem(MU.I(1), MU.I(1), MU.I(1), MU.zero(1, 1), new float[]{0}, new Units[]{Units.UNK}), 
+					new EulerIntegrator());
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

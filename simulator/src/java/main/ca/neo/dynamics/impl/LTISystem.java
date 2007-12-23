@@ -3,8 +3,13 @@
  */
 package ca.neo.dynamics.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.dynamics.LinearSystem;
+import ca.neo.model.Configuration;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
+import ca.neo.model.impl.ConfigurationImpl;
+import ca.neo.model.impl.ConfigurationImpl.FixedCardinalityProperty;
 import ca.neo.util.MU;
 
 /**
@@ -18,6 +23,9 @@ import ca.neo.util.MU;
 public class LTISystem implements LinearSystem {
 
 	private static final long serialVersionUID = 1L;
+	private static final String INPUT_DIMENSION_PROPERTY = "inputDimension";
+	private static final String OUTPUT_DIMENSION_PROPERTY = "outputDimension";
+	private static final String STATE_DIMENSION_PROPERTY = "stateDimension";
 	
 	private float[][] A;
 	private float[][] B;
@@ -25,6 +33,7 @@ public class LTISystem implements LinearSystem {
 	private float[][] D;
 	private float[] x;
 	private Units[] myOutputUnits;
+	private ConfigurationImpl myConfiguration; 
 	
 	/**
 	 * Each argument is an array of arrays that represents a matrix. The first 
@@ -47,14 +56,73 @@ public class LTISystem implements LinearSystem {
 			throw new IllegalArgumentException("Units needed for each output");
 		}
 
+		init(A, B, C, D, x0, outputUnits);
+	}
+	
+	public LTISystem(Configuration properties) throws StructuralException {
+		int inputDim = ((Integer) ConfigUtil.get(properties, INPUT_DIMENSION_PROPERTY, Integer.class)).intValue();
+		int outputDim = ((Integer) ConfigUtil.get(properties, OUTPUT_DIMENSION_PROPERTY, Integer.class)).intValue();
+		int stateDim = ((Integer) ConfigUtil.get(properties, STATE_DIMENSION_PROPERTY, Integer.class)).intValue();
+		
+		init(MU.zero(stateDim, stateDim), 
+			MU.zero(stateDim, inputDim), 
+			MU.zero(outputDim, stateDim), 
+			MU.zero(outputDim, inputDim), 
+			new float[stateDim], 
+			Units.uniform(Units.UNK, outputDim));
+	}
+	
+	private void init(float[][] A, float[][] B, float[][] C, float[][] D, float[] x0, Units[] outputUnits) {
 		this.A = A;
 		this.B = B;
 		this.C = C;
 		this.D = D;
 		this.x = x0;
 		this.myOutputUnits = outputUnits;
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.defineSingleValuedProperty(INPUT_DIMENSION_PROPERTY, Integer.class, true);
+		myConfiguration.defineSingleValuedProperty(OUTPUT_DIMENSION_PROPERTY, Integer.class, true);
+		myConfiguration.defineSingleValuedProperty(STATE_DIMENSION_PROPERTY, Integer.class, true);
+		myConfiguration.defineSingleValuedProperty("A", float[][].class, true);
+		myConfiguration.defineSingleValuedProperty("B", float[][].class, true);
+		myConfiguration.defineSingleValuedProperty("C", float[][].class, true);
+		myConfiguration.defineSingleValuedProperty("D", float[][].class, true);
+		myConfiguration.defineSingleValuedProperty("state", float[].class, true);
+		FixedCardinalityProperty p = new FixedCardinalityProperty(myConfiguration, "outputUnits", Units.class, true) {
+			@Override
+			public int getNumValues() {
+				return getOutputDimension();
+			}
+			@Override
+			public void doSetValue(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
+				
+			}
+		
+			@Override
+			public Object doGetValue(int index) throws StructuralException {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		
+		};
+		
 	}
 	
+	public static Configuration getConstructionTemplate() {
+		ConfigurationImpl result = new ConfigurationImpl(null);
+		result.defineTemplateProperty(INPUT_DIMENSION_PROPERTY, Integer.class, new Integer(1));
+		result.defineTemplateProperty(OUTPUT_DIMENSION_PROPERTY, Integer.class, new Integer(1));
+		result.defineTemplateProperty(STATE_DIMENSION_PROPERTY, Integer.class, new Integer(1));
+		return result;	
+	}
+	
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
 	//checks that matrices have the dimensions that form a valid state model 
 	private static void checkIsStateModel(float[][] A, float[][] B, float[][] C, float[][] D, float[] x) {
 		checkIsMatrix(A);
@@ -142,6 +210,11 @@ public class LTISystem implements LinearSystem {
 	public int getInputDimension() {
 		return B[0].length;
 	}
+	
+	public void setInputDimension(int dim) {
+		B = copyColumns(B, dim);
+		D = copyColumns(D, dim);
+	}
 
 	/**
 	 * @see ca.neo.dynamics.DynamicalSystem#getOutputDimension()
@@ -149,19 +222,58 @@ public class LTISystem implements LinearSystem {
 	public int getOutputDimension() {
 		return C.length;
 	}
+	
+	public void setOutputDimension(int dim) {
+		C = copyRows(C, dim);
+		D = copyRows(D, dim);
+		
+		Units[] newUnits = Units.uniform(Units.UNK, dim);
+		System.arraycopy(myOutputUnits, 0, newUnits, 0, Math.min(dim, myOutputUnits.length));
+		myOutputUnits = newUnits;
+	}
 
+	public int getStateDimension() {
+		return x.length;
+	}
+	
+	public void setStateDimension(int dim) {
+		float[] newX = new float[dim];
+		System.arraycopy(x, 0, newX, 0, Math.min(dim, x.length));
+		x = newX;
+		
+		A = copyRows(A, dim);
+		A = copyColumns(A, dim);
+		B = copyRows(B, dim);
+		C = copyColumns(C, dim);
+	}
+	
 	/**
 	 * @see ca.neo.dynamics.DynamicalSystem#getOutputUnits(int)
 	 */
 	public Units getOutputUnits(int outputDimension) {
 		return myOutputUnits[outputDimension];
 	}
-
+	
+	public void setOutputUnits(int outputDimension, Units units) {
+		myOutputUnits[outputDimension] = units;
+	}
+	
 	/**
 	 * @see ca.neo.dynamics.LinearSystem#getA(float)
 	 */
 	public float[][] getA(float t) {
 		return MU.clone(A);
+	}
+	
+	public float[][] getA() {
+		return MU.clone(A);
+	}
+	
+	public void setA(float[][] newA) {
+		checkIsMatrix(newA);
+		checkSameDimension(newA.length, newA[0].length, "A matrix must be square");
+		checkSameDimension(newA.length, A.length, "A matrix must match state dimension " + A.length);
+		A = newA;
 	}
 
 	/**
@@ -170,6 +282,17 @@ public class LTISystem implements LinearSystem {
 	public float[][] getB(float t) {
 		return MU.clone(B);
 	}
+	
+	public float[][] getB() {
+		return MU.clone(B);
+	}
+	
+	public void setB(float[][] newB) {
+		checkIsMatrix(newB);
+		checkSameDimension(newB.length, B.length, "B matrix must match state dimension " + B.length);
+		checkSameDimension(newB[0].length, B[0].length, "B matrix must match input dimension " + B[0].length);
+		B = newB;
+	}
 
 	/**
 	 * @see ca.neo.dynamics.LinearSystem#getC(float)
@@ -177,12 +300,47 @@ public class LTISystem implements LinearSystem {
 	public float[][] getC(float t) {
 		return MU.clone(C);
 	}
-
+	
+	public float[][] getC() {
+		return MU.clone(C);
+	}
+	
+	public void setC(float[][] newC) {
+		checkIsMatrix(newC);
+		checkSameDimension(newC.length, C.length, "C matrix must match output dimension " + C.length);
+		checkSameDimension(newC[0].length, C[0].length, "B matrix must match state dimension " + C[0].length);
+		C = newC;
+	}
+	
 	/**
 	 * @see ca.neo.dynamics.LinearSystem#getD(float)
 	 */
 	public float[][] getD(float t) {
 		return MU.clone(D);
+	}
+	
+	public float[][] getD() {
+		return MU.clone(D);
+	}
+	
+	public void setD(float[][] newD) {
+		checkIsMatrix(newD);
+		checkSameDimension(newD.length, D.length, "D matrix must match output dimension " + D.length);
+		checkSameDimension(newD[0].length, D[0].length, "D matrix must match input dimension " + D[0].length);
+		D = newD;
+	}
+
+	private float[][] copyRows(float[][] original, int n) {
+		float[][] result = new float[n][];
+		System.arraycopy(original, 0, result, 0, Math.min(n, original.length));
+		for (int i = original.length; i < n; i++) {
+			result[i] = new float[original[0].length];
+		}
+		return result;
+	}
+	
+	private float[][] copyColumns(float[][] original, int n) {
+		return MU.transpose(copyRows(MU.transpose(original), n));
 	}
 
 	/**

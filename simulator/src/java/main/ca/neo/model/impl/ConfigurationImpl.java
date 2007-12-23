@@ -52,6 +52,13 @@ public class ConfigurationImpl implements Configuration {
 		myProperties.put(property.getName(), property);
 	}
 	
+	/**
+	 * @param name Property to remove 
+	 */
+	public void removeProperty(String name) {
+		myProperties.remove(name);
+	}
+	
 	public SingleValuedProperty defineSingleValuedProperty(String name, Class c, boolean mutable) {		
 		SingleValuedProperty property = new SingleValuedProperty(this, name, c, mutable);
 		myProperties.put(name, property);
@@ -315,20 +322,14 @@ public class ConfigurationImpl implements Configuration {
 	
 	public static abstract class MultiValuedProperty extends BaseProperty implements Property {
 		
-//		private List<Object> myValues;
-
 		public MultiValuedProperty(Configuration configuration, String name, Class c, boolean mutable) {
 			super(configuration, name, c, mutable);
-//			myValues = new ArrayList<Object>(10);
 		}
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#getNumValues()
 		 */
 		public abstract int getNumValues();
-//		public int getNumValues() {
-//			return myValues.size();
-//		}
 
 		/**
 		 * @see ca.neo.model.Configuration.Property#isMultiValued()
@@ -361,7 +362,6 @@ public class ConfigurationImpl implements Configuration {
 		 */
 		public Object getValue(int index) throws StructuralException {
 			try {
-//				return myValues.get(index);			
 				return doGetValue(index);			 
 			} catch (IndexOutOfBoundsException e) {
 				throw new StructuralException("Value #" + index + " doesn't exist", e);
@@ -375,12 +375,6 @@ public class ConfigurationImpl implements Configuration {
 		 */
 		public abstract void addValue(Object value) throws StructuralException;
 		
-//		public void addValueCompleted(Object value) {
-//			myValues.add(value);
-//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.ADD, myValues.size());
-//			getConfiguration().notifyListeners(event);			
-//		}
-
 		/**
 		 * @see ca.neo.model.Configuration.Property#insert(int, java.lang.Object)
 		 */
@@ -394,12 +388,6 @@ public class ConfigurationImpl implements Configuration {
 		
 		public abstract void doInsert(int index, Object value) throws IndexOutOfBoundsException, StructuralException;
 		
-//		public void insertCompleted(int index, Object value) {
-//			myValues.add(index, value);
-//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.INSERT, index);
-//			getConfiguration().notifyListeners(event);
-//		}
-
 		/**
 		 * @see ca.neo.model.Configuration.Property#remove(int)
 		 */
@@ -413,12 +401,6 @@ public class ConfigurationImpl implements Configuration {
 		
 		public abstract void doRemove(int index) throws IndexOutOfBoundsException, StructuralException;
 		
-//		public void removeCompleted(int index) {
-//			myValues.remove(index);
-//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.REMOVE, myValues.size());
-//			getConfiguration().notifyListeners(event);			
-//		}
-
 		/**
 		 * @see ca.neo.model.Configuration.Property#setValue(java.lang.Object)
 		 */
@@ -442,17 +424,51 @@ public class ConfigurationImpl implements Configuration {
 		
 		public abstract void doSetValue(int index, Object value) throws IndexOutOfBoundsException, StructuralException;
 		
-		/**
-		 * To be called by Configurable after a value has been set. Updates local field and 
-		 * notifies listeners. 
-		 * 
-		 * @param value Value that has been set
-		 */
-//		public void setValueCompleted(int index, Object value) {
-//			myValues.set(index, value);
-//			Event event = new EventImpl(getConfiguration().getConfigurable(), this, Type.CHANGE, index);
-//			getConfiguration().notifyListeners(event);
-//		}
+	}
+	
+	/**
+	 * A multi-valued property based on an underlying List. 
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class ListProperty extends MultiValuedProperty implements Property {
+
+		private List myList;
+		
+		public ListProperty(Configuration configuration, String name, Class c, List list) {
+			super(configuration, name, c, true);
+		}
+
+		@Override
+		public void addValue(Object value) throws StructuralException {
+			myList.add(value);
+		}
+
+		@Override
+		public Object doGetValue(int index) throws StructuralException {
+			return myList.get(index);
+		}
+
+		@Override
+		public void doInsert(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
+			myList.add(index, value);
+		}
+
+		@Override
+		public void doRemove(int index) throws IndexOutOfBoundsException, StructuralException {
+			myList.remove(index);
+		}
+
+		@Override
+		public void doSetValue(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
+			myList.set(index, value);
+		}
+
+		@Override
+		public int getNumValues() {
+			return myList.size();
+		}
+		
 	}
 	
 	/**

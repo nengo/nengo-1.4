@@ -20,7 +20,6 @@ import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.SpikeGenerator;
-import ca.neo.plot.Plotter;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.TimeSeries1DImpl;
@@ -117,13 +116,10 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 		for (int i = 0; i < currents.length; i++) {
 			countSpikes(currents[i], dt, transientTime);
 			rates[i] = (float) countSpikes(currents[i], dt, simTime) / simTime; 
-//			System.out.println(currents[i] + " ACU: " + rates[i] + " spikes/s");
 		}
 		
-//		Plotter.plot(currents, rates, "actual");
 		CurveFitter cf = new LinearCurveFitter();
 		Function result = cf.fit(currents, rates);
-//		Plotter.plot(result, currents[0], (currents[currents.length-1] - currents[0])/20, currents[currents.length-1], "function");
 		return result;
 	}
 	
@@ -160,7 +156,6 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 					
 					if (crossingThreshold || nonDuplicateAtStart) {
 						spike = true;
-//						System.out.println("*");
 						myLastSpikeTime = myDynamicsOutput.getTimes()[i];
 					}
 				}

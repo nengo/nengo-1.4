@@ -4,6 +4,7 @@
 package ca.neo.model.muscle.impl;
 
 import ca.neo.dynamics.impl.AbstractDynamicalSystem;
+import ca.neo.model.Configuration;
 import ca.neo.model.muscle.LinkSegmentModel;
 import junit.framework.TestCase;
 
@@ -25,8 +26,13 @@ public class LinkSegmentModelImplTest extends TestCase {
 
 		public UpperLimbDynamics() {
 			super(new float[]{0, 0});
-		}
+		}		
 		
+		public Configuration getConfiguration() {
+			return null;
+		}
+
+
 		public float[] f(float t, float[] u) {
 			return null;
 		}
