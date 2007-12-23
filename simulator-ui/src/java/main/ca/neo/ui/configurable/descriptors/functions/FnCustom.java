@@ -93,7 +93,7 @@ public class FnCustom extends AbstractFn {
 		PostfixFunction function = getFunction();
 
 		if (function != null) {
-			expression = function.getExpressionStr();
+			expression = function.getExpression();
 
 			if (isInputDimEditable)
 				dim = function.getDimension();
