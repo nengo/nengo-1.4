@@ -3,7 +3,11 @@
  */
 package ca.neo.math.impl;
 
+import java.util.Arrays;
+
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.Function;
+import ca.neo.model.Configuration;
 import ca.neo.plot.Plotter;
 
 /**
@@ -18,8 +22,9 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final float[] myDiscontinuities;
-	private final float[] myValues;
+	private float[] myDiscontinuities;
+	private float[] myValues;
+	private Configuration myConfiguration;
 	
 	/**
 	 * @param discontinuities Ordered points x at which the function is y = f(x) is discontinuous 
@@ -28,14 +33,87 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 	public PiecewiseConstantFunction(float[] discontinuities, float[] values) {
 		super(1);
 		
+		myDiscontinuities = discontinuities;
 		if ( discontinuities.length != (values.length - 1) ) {
 			throw new IllegalArgumentException("There must be one more value than point of discontinuity");
 		}
 		
-		myDiscontinuities = discontinuities;
-		myValues = values;
+		myDiscontinuities = new float[discontinuities.length];
+		System.arraycopy(discontinuities, 0, myDiscontinuities, 0, discontinuities.length);
+		Arrays.sort(myDiscontinuities);
+		
+		setValues(values);
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+	}
+	
+	public PiecewiseConstantFunction() {
+		this(new float[0], new float[]{0});
+	}
+	
+	@Override
+	public Configuration getConfiguration() {
+		return myConfiguration;
 	}
 
+	/**
+	 * @return Number of discontinuities 
+	 */
+	public int getNumDiscontinuities() {
+		return myDiscontinuities.length;
+	}
+
+	/**
+	 * @param num New number of discontinuities
+	 */
+	public void setNumDiscontinuities(int num) {
+		float[] nd = new float[num];
+		System.arraycopy(myDiscontinuities, 0, nd, 0, Math.min(num, myDiscontinuities.length));
+		myDiscontinuities = nd;
+		
+		float[] nv = new float[num+1];
+		System.arraycopy(myValues, 0, nv, 0, Math.min(num+1, myValues.length));
+		myValues = nv;
+	}
+	
+	/**
+	 * @return Ordered points x at which the function is y = f(x) is discontinuous 
+	 */
+	public float[] getDiscontinuities() {
+		return myDiscontinuities;
+	}
+	
+	/**
+	 * @param discontinuities Ordered points x at which the function is y = f(x) is discontinuous
+	 */
+	public void setDiscontinuities(float[] discontinuities) {
+		if (discontinuities.length != myDiscontinuities.length) {
+			throw new IllegalArgumentException(
+					"Number of discontinuities must be consistent with number of values (use setNumDiscontinuities() to change).");
+		}
+		myDiscontinuities = new float[discontinuities.length];
+		System.arraycopy(discontinuities, 0, myDiscontinuities, 0, discontinuities.length);
+		Arrays.sort(myDiscontinuities);
+	}
+
+	/**
+	 * @return Values y below x1 and above x1..xn
+	 */
+	public float[] getValues() {
+		return myValues;
+	}
+
+	/**
+	 * @param values Values y below x1 and above x1..xn
+	 */
+	public void setValues(float[] values) {
+		if (values.length - 1 != myDiscontinuities.length) {
+			throw new IllegalArgumentException(
+				"Number of discontinuities must be consistent with number of values (use setNumDiscontinuities() to change).");			
+		}
+		myValues = new float[values.length];
+		System.arraycopy(values, 0, myValues, 0, values.length);
+	}
+	
 	/**
 	 * @see ca.neo.math.Function#map(float[])
 	 */
@@ -43,7 +121,7 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 		float y = 0;
 		float x = from[0];
 		
-		if (x <= myDiscontinuities[0]) {
+		if (myDiscontinuities.length == 0 || x <= myDiscontinuities[0]) {
 			y = myValues[0];
 			
 		} else if (x >= myDiscontinuities[myDiscontinuities.length-1]) {
@@ -73,7 +151,8 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 	
 	public static void main(String args[]) {
 //		Function f = new PiecewiseConstantFunction(new float[]{0, 1, 3, 7}, new float[]{5, 2});
-		Function f = new PiecewiseConstantFunction(new float[]{0, 1, 3, 7}, new float[]{5, 2, -3, 6, 7});
+//		Function f = new PiecewiseConstantFunction(new float[]{0, 1, 3, 7}, new float[]{5, 2, -3, 6, 7});
+		Function f = new PiecewiseConstantFunction(new float[0], new float[]{5});
 		Plotter.plot(f, -1, .01f, 10, "");
 	}
 

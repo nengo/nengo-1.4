@@ -43,11 +43,12 @@ public class ConfigUtil {
 					&& !methods[i].getName().equals("getConstructor")) {
 				
 				Class returnType = methods[i].getReturnType();
-				if (MainHandler.getInstance().canHandle(returnType)) {
+				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType);
+				if (MainHandler.getInstance().canHandle(returnTypeWrapped) || Configurable.class.isAssignableFrom(returnType)) {
 					String propName = Character.toLowerCase(methods[i].getName().charAt(3))
 						+ methods[i].getName().substring(4);
 					boolean mutable = hasSetter(configurable, methods[i].getName(), returnType);
-					result.defineSingleValuedProperty(propName, returnType, mutable);
+					result.defineSingleValuedProperty(propName, returnTypeWrapped, mutable);
 				}
 			}
 		}
@@ -61,6 +62,7 @@ public class ConfigUtil {
 			return false;
 		}
 	}
+	
 	private static boolean hasSetter(Object o, String getterName, Class type) {
 		boolean has = false;
 		Method[] methods = o.getClass().getMethods();
@@ -73,6 +75,30 @@ public class ConfigUtil {
 		}
 		return has;
 	}
-	
 
+	/**
+	 * @param c Any class 
+	 * @return Either c or if c is a primitive class (eg Integer.TYPE), the corresponding wrapper class 
+	 */
+	public static Class getPrimitiveWrapperClass(Class c) {
+		if (Integer.TYPE.isAssignableFrom(c)) {
+			c = Integer.class;
+		} else if (Float.TYPE.isAssignableFrom(c)) {
+			c = Float.class;
+		} else if (Boolean.TYPE.isAssignableFrom(c)) {
+			c = Boolean.class;
+		} else if (Long.TYPE.isAssignableFrom(c)) {
+			c = Long.class;
+		} else if (Double.TYPE.isAssignableFrom(c)) {
+			c = Double.class;
+		} else if (Character.TYPE.isAssignableFrom(c)) {
+			c = Character.class;
+		} else if (Byte.TYPE.isAssignableFrom(c)) {
+			c = Byte.class;
+		} else if (Short.TYPE.isAssignableFrom(c)) {
+			c = Short.class;
+		}		
+		
+		return c;
+	}
 }

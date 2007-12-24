@@ -1,18 +1,23 @@
 package ca.neo.math.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.DifferentiableFunction;
 import ca.neo.math.Function;
 //import ca.neo.plot.Plotter;
+import ca.neo.model.Configuration;
 
 /**
  * A one-dimensional sigmoid function with configurable high and low 
  * values, slope, and inflection point.
  * 
  * TODO: unit tests
+ * TODO: docs
  * 
  * @author Bryan Tripp
  */
 public class SigmoidFunction extends AbstractFunction implements DifferentiableFunction {
+
+	private static final long serialVersionUID = 1L;
 
 	private float myLow;
 	private float myHigh;
@@ -20,17 +25,13 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 	private float myMultiplier;
 	private Function myDerivative;
 	
+	private Configuration myConfiguration;
+	
 	/**
 	 * Default parameters (inflection=0; slope=1/4; low=0; high=1). 
 	 */
 	public SigmoidFunction() {
-		super(1);
-		
-		myLow = 0;
-		myHigh = 1;
-		myInflection = 0;
-		myMultiplier = 1;
-		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);
+		this(0, 1f/4f, 0, 1);
 	}
 
 	/**
@@ -47,10 +48,49 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 		myInflection = inflection;
 		myMultiplier = slope * 4f; //usual slope is 1/4
 		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);
+		
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
-	private static final long serialVersionUID = 1L;
+	@Override
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
 
+	public float getInflection() {
+		return myInflection;
+	}
+	
+	public void setInflection(float inflection) {
+		myInflection = inflection;
+		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);
+	}
+	
+	public float getSlope() {
+		return myMultiplier / 4f;
+	}
+	
+	public void setSlope(float slope) {
+		myMultiplier = 4f * slope;
+		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);	}
+	
+	public float getLow() {
+		return myLow;
+	}
+	
+	public void setLow(float low) {
+		myLow = low;
+		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);	}
+	
+	public float getHigh() {
+		return myHigh;
+	}
+	
+	public void setHigh(float high) {
+		myHigh = high;
+		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);		
+	}
+	
 	/**
 	 * @see ca.neo.math.DifferentiableFunction#getDerivative()
 	 */
@@ -61,12 +101,15 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 	/**
 	 * @see ca.neo.math.Function#map(float[])
 	 */
-	public float map(float[] from) {	
+	public float map(float[] from) {			
 		return myLow + (myHigh-myLow) * ( 1f / (1f + (float) Math.exp(-myMultiplier*(from[0]-myInflection))) ) ;
 	}
 	
 	/**
 	 * Derivative of a sigmoid. 
+	 * 
+	 * Note: this has a read-only configuration because it is never created by the user or loaded from a file, 
+	 * it's only created by SigmoidFunction 
 	 * 
 	 * @author Bryan Tripp
 	 */
@@ -82,7 +125,7 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 			super(1);
 			myScale = scale;
 			myInflection = inflection;
-			myMultiplier = multiplier;			
+			myMultiplier = multiplier;
 		}
 		
 		public float map(float[] from) {

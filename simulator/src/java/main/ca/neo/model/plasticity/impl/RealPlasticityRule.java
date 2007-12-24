@@ -4,8 +4,11 @@
 package ca.neo.model.plasticity.impl;
 
 import ca.neo.math.Function;
+import ca.neo.math.impl.ConstantFunction;
+import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.plasticity.PlasticityRule;
 
 /**
@@ -23,13 +26,15 @@ import ca.neo.model.plasticity.PlasticityRule;
  */
 public class RealPlasticityRule implements PlasticityRule {
 
-	private final String myModTermName;
-	private final int myModTermDim;
-	private final Function myFunction;
-	private final String myOriginName;
+	private String myModTermName;
+	private int myModTermDim;
+	private Function myFunction;
+	private String myOriginName;
 	
 	private float myModInput;
 	private float[] myOriginState;	
+	
+	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param modTermName Name of the Termination from which modulatory input is drawn (can be null if not used)
@@ -41,17 +46,94 @@ public class RealPlasticityRule implements PlasticityRule {
 	 * @param originName Name of Origin from which post-synaptic activity is drawn
 	 */
 	public RealPlasticityRule(String modTermName, int modTermDim, Function function, String originName) {
-		myModTermName = modTermName;
-		myModTermDim = modTermDim;
-		myFunction = function;
-		myOriginName = originName;
+		setModTermName(modTermName);
+		setModTermDim(modTermDim);
+		setFunction(function);
+		setOriginName(originName);
 		
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.defineSingleValuedProperty("modTermName", String.class, true);
+		myConfiguration.defineSingleValuedProperty("modTermDim", Integer.class, true);
+		myConfiguration.defineSingleValuedProperty("function", Function.class, true);
+		myConfiguration.defineSingleValuedProperty("originName", String.class, true);
+	}
+
+	/**
+	 * Uses null defaults, allowing setting of properties after construction
+	 */
+	public RealPlasticityRule() {
+		this(null, 0, new ConstantFunction(4, 0), null);
+	}
+	
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	/**
+	 * @return Name of the Termination from which modulatory input is drawn (can be null if not used)
+	 */
+	public String getModTermName() {
+		return myModTermName;
+	}
+
+	/**
+	 * @param name Name of the Termination from which modulatory input is drawn (can be null if not used)
+	 */
+	public void setModTermName(String name) {
+		myModTermName = (name == null) ? "" : name; 
+	}
+
+	/**
+	 * @return Dimension index of the modulatory input within above Termination
+	 */
+	public int getModTermDim() {
+		return myModTermDim;
+	}
+	
+	/**
+	 * @param dim Dimension index of the modulatory input within above Termination 
+	 */
+	public void setModTermDim(int dim) {
+		myModTermDim = dim;
+	}
+
+	/**
+	 * @return Four-dimensional function defining the rate of change of transformation matrix weights.
+	 */
+	public Function getFunction() {
+		return myFunction;
+	}
+	
+	/**
+	 * 
+	 * @param function Four-dimensional function defining the rate of change of transformation matrix weights (as in constructor)
+	 */
+	public void setFunction(Function function) {
 		if (function.getDimension() != 4) {
 			throw new IllegalArgumentException("Learning rate function has dimension " 
 					+ function.getDimension() + " (should be 4)");
 		}
+		
+		myFunction = function;
 	}
-
+	
+	/**
+	 * @return Name of Origin from which post-synaptic activity is drawn
+	 */
+	public String getOriginName() {
+		return myOriginName;
+	}
+	
+	/**
+	 * @param originName Name of Origin from which post-synaptic activity is drawn
+	 */
+	public void setOriginName(String originName) {
+		myOriginName = (originName == null) ? "" : originName;
+	}
+	
 	/**
 	 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.neo.model.InstantaneousOutput, float)
 	 */
@@ -82,7 +164,8 @@ public class RealPlasticityRule implements PlasticityRule {
 		for (int i = 0; i < transform.length; i++) {
 			result[i] = new float[transform[i].length];
 			for (int j = 0; j < transform[i].length; j++) {
-				result[i][j] = myFunction.map(new float[]{values[j], myOriginState[i], transform[i][j], myModInput});
+				float os = (myOriginState != null) ? myOriginState[i] : 0;
+				result[i][j] = myFunction.map(new float[]{values[j], os, transform[i][j], myModInput});
 			}
 		}
 		

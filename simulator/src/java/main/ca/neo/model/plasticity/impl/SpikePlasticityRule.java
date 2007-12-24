@@ -3,10 +3,14 @@
  */
 package ca.neo.model.plasticity.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.Function;
+import ca.neo.math.impl.ConstantFunction;
+import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SpikeOutput;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.plasticity.PlasticityRule;
 import ca.neo.util.MU;
 
@@ -32,6 +36,8 @@ public class SpikePlasticityRule implements PlasticityRule {
 	private boolean[] myInSpiking;
 	private boolean[] myOutSpiking;
 	private float myModInput;
+	
+	private ConfigurationImpl myConfiguration;
 
 	/**
 	 * @param origin Name of Origin from which post-synaptic activity is drawn
@@ -47,16 +53,140 @@ public class SpikePlasticityRule implements PlasticityRule {
 	 * @param originDim Dimension of post-synaptic activity (eg number of neurons if rule belongs to an Ensemble) 
 	 */
 	public SpikePlasticityRule(String origin, String modTerm, int modTermDim, Function onInSpike, Function onOutSpike, int termDim, int originDim) {
-		myOriginName = origin;
-		myModTermName = modTerm;
+		setOriginName(origin);
+		setModTermName(modTerm);
 		myModTermDim = modTermDim;
-		myOnInSpikeFunction = onInSpike;
-		myOnOutSpikeFunction = onOutSpike;
+		setOnInSpike(onInSpike);
+		setOnOutSpike(onOutSpike);
+	
+		setTermDim(termDim);
+		setOriginDim(originDim);
 		
-		myLastInSpike = initialize(termDim);
-		myLastOutSpike = initialize(originDim);		
-		myInSpiking = new boolean[termDim];
-		myOutSpiking = new boolean[originDim];
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+	}
+	
+	public SpikePlasticityRule() {
+		this(null, null, 0, new ConstantFunction(3, 0), new ConstantFunction(3, 0), 1, 1);
+	}
+
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+	
+	/**
+	 * @return Name of Origin from which post-synaptic activity is drawn
+	 */
+	public String getOriginName() {
+		return myOriginName;
+	}
+	
+	/**
+	 * 
+	 * @param name Name of Origin from which post-synaptic activity is drawn
+	 */
+	public void setOriginName(String name) {
+		myOriginName = (name == null) ? "" : name;
+	}
+
+	/**
+	 * @return Name of the Termination from which modulatory input is drawn (can be null if not used)
+	 */
+	public String getModTermName() {
+		return myModTermName;
+	}
+
+	/**
+	 * 
+	 * @param name Name of the Termination from which modulatory input is drawn (can be null if not used)
+	 */
+	public void setModTermName(String name) {
+		myModTermName = (name == null) ? "" : name;
+	}
+
+	/**
+	 * @return Dimension index of the modulatory input within above Termination 
+	 */
+	public int getModTermDim() {
+		return myModTermDim;
+	}
+
+	/**
+	 * 
+	 * @param dim Dimension index of the modulatory input within above Termination 
+	 */
+	public void setModTermDim(int dim) {
+		myModTermDim = dim;
+	}
+	
+	/**
+	 * @return Function defining synaptic weight change when there is an <bold>incoming</bold> spike. 
+	 */
+	public Function getOnInSpike() {
+		return myOnInSpikeFunction;
+	}
+	
+	/**
+	 * @param function Function defining synaptic weight change when there is an <bold>incoming</bold> spike. 
+	 */
+	public void setOnInSpike(Function function) {
+		if (function.getDimension() != 3) {
+			throw new IllegalArgumentException("Function must have three dimensions: " +
+					"1) time since last post-synaptic spike; 2) existing weight; 3) modulatory input.");
+		}
+		myOnInSpikeFunction = function;
+	}
+	
+	/**
+	 * @return Function defining synaptic weight change when there is an <bold>outgoing</bold> spike.
+	 */
+	public Function getOnOutSpike() {
+		return myOnOutSpikeFunction;
+	}
+	
+	/**
+	 * 
+	 * @param function Function defining synaptic weight change when there is an <bold>outgoing</bold> spike.
+	 */
+	public void setOnOutSpike(Function function) {
+		if (function.getDimension() != 3) {
+			throw new IllegalArgumentException("Function must have three dimensions: " +
+					"1) time since last post-synaptic spike; 2) existing weight; 3) modulatory input.");
+		}
+		myOnOutSpikeFunction = function;
+	}
+
+	/**
+	 * @return Dimension of Termination this rule applies to 
+	 */
+	public int getTermDim() {
+		return myInSpiking.length;
+	}
+	
+	/**
+	 * 
+	 * @param dim Dimension of Termination this rule applies to 
+	 */
+	public void setTermDim(int dim) {
+		myLastInSpike = MU.uniform(1, dim, -1)[0];
+		myInSpiking = new boolean[dim];
+	}
+
+	/**
+	 * @return Dimension of post-synaptic activity (eg number of neurons if rule belongs to an Ensemble) 
+	 */
+	public int getOriginDim() {
+		return myOutSpiking.length;
+	}
+
+	/**
+	 * @param dim Dimension of post-synaptic activity (eg number of neurons if rule belongs to an Ensemble) 
+	 */
+	public void setOriginDim(int dim) {
+		myLastOutSpike = MU.uniform(1, dim, -1)[0];		
+		myOutSpiking = new boolean[dim];		
 	}
 	
 	/**
@@ -119,13 +249,13 @@ public class SpikePlasticityRule implements PlasticityRule {
 			}
 		}
 	}
-	
-	private static float[] initialize(int dim) {
-		float[] result = new float[dim];
-		for (int i = 0; i < dim; i++) {
-			result[i] = -1f;
-		}
-		return result;
-	}
+
+//	private static float[] initialize(int dim) {
+//		float[] result = new float[dim];
+//		for (int i = 0; i < dim; i++) {
+//			result[i] = -1f;
+//		}
+//		return result;
+//	}
 	
 }

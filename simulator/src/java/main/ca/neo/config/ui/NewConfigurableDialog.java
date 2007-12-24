@@ -149,7 +149,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		myType = type;
 		
 		Method templateMethod = null;
-		Method[] methods = type.getMethods();
+		Method[] methods = type.getDeclaredMethods();
 		for (int i = 0; i < methods.length; i++) {
 			if ((methods[i].getName().equals("getUserConstructionTemplate") 
 						|| (templateMethod == null && methods[i].getName().equals("getConstructionTemplate")))  

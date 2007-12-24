@@ -3,7 +3,9 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.PDF;
+import ca.neo.model.Configuration;
 import ca.neo.plot.Plotter;
 
 /**
@@ -19,9 +21,29 @@ public class ExponentialPDF extends AbstractFunction implements PDF {
 	private static final long serialVersionUID = 1L;
 
 	private float myTau;
+	private Configuration myConfiguration;
 	
 	public ExponentialPDF(float tau) {
 		super(1);
+		myTau = tau;
+		
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+	}
+	
+	public ExponentialPDF(){
+		this(1);
+	}
+	
+	@Override
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	public float getTau() {
+		return myTau;
+	}
+	
+	public void setTau(float tau) {
 		myTau = tau;
 	}
 

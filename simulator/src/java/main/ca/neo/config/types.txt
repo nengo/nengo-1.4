@@ -1,1 +1,9 @@
 ca.neo.model.Configurable
+ca.neo.model.plasticity.PlasticityRule
+ca.neo.dynamics.DynamicalSystem
+ca.neo.dynamics.Integrator
+ca.neo.dynamics.LinearSystem
+ca.neo.model.Noise
+ca.neo.math.Function
+ca.neo.math.PDF
+

@@ -23,6 +23,8 @@ import ca.neo.dynamics.impl.EulerIntegrator;
 import ca.neo.dynamics.impl.LTISystem;
 import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.impl.ConstantFunction;
+import ca.neo.math.impl.Convolution;
+import ca.neo.math.impl.ExponentialPDF;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.math.impl.IdentityFunction;
@@ -37,6 +39,8 @@ import ca.neo.model.Units;
 import ca.neo.model.Configuration.Property;
 import ca.neo.model.impl.MockConfigurable;
 import ca.neo.model.impl.NoiseFactory;
+import ca.neo.model.plasticity.impl.CompositePlasticityRule;
+import ca.neo.model.plasticity.impl.SpikePlasticityRule;
 import ca.neo.util.MU;
 
 /**
@@ -310,12 +314,7 @@ public class ConfigurationTreeModel implements TreeModel {
 //			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
 //			configurable.addMultiValuedField("test1");
 //			configurable.addMultiValuedField("test2");
-//			NumericallyDifferentiableFunction configurable = new NumericallyDifferentiableFunction(new FourierFunction(1, 10, 1, 1), 0, .01f);
-//			PostfixFunction configurable = new PostfixFunction("x0 + (x1*sin(x2))", 2);
-			Configurable configurable = NoiseFactory.makeRandomNoise(100, new GaussianPDF(0, .5f),
-					new SimpleLTISystem(new float[]{-1}, MU.I(1), MU.I(1), new float[1], new Units[]{Units.UNK}),
-//					new LTISystem(MU.I(1), MU.I(1), MU.I(1), MU.zero(1, 1), new float[]{0}, new Units[]{Units.UNK}), 
-					new EulerIntegrator());
+			Configurable configurable = new SpikePlasticityRule();
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

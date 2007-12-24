@@ -3,7 +3,9 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.Function;
+import ca.neo.model.Configuration;
 import ca.neo.plot.Plotter;
 
 /**
@@ -22,12 +24,65 @@ public class Convolution extends AbstractFunction {
 	private float myTimeStep;
 	private float myWindow;
 	
+	private Configuration myConfiguration;
+	
 	public Convolution(Function one, Function two, float timeStep, float window) {
 		super(1);		
-		myOne = one;
-		myTwo = two;		
+		setFunctionOne(one);
+		setFunctionTwo(two);		
 		myTimeStep = timeStep;
 		myWindow = window;
+		
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+	}
+	
+	public Convolution() {
+		this(new ConstantFunction(1, 1), new ConstantFunction(1, 1), .001f, 1f);
+	}
+	
+	@Override
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	public Function getFunctionOne() {
+		return myOne;
+	}
+	
+	public void setFunctionOne(Function function) {
+		checkDimension(function);
+		myOne = function;
+	}
+	
+	public Function getFunctionTwo() {
+		return myTwo;
+	}
+	
+	public void setFunctionTwo(Function function) {
+		checkDimension(function);
+		myTwo = function;
+	}
+	
+	public float getTimeStep() {
+		return myTimeStep;
+	}
+	
+	public void setTimeStep(float timeStep) {
+		myTimeStep = timeStep;
+	}
+	
+	public float getWindow() {
+		return myWindow;
+	}
+	
+	public void setWindow(float window) {
+		myWindow = window;
+	}
+	
+	private static void checkDimension(Function function) {
+		if (function.getDimension() != 1) {
+			throw new IllegalArgumentException("Functions for convolution must be one-dimensional");
+		}		
 	}
 
 	/**
