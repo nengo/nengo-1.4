@@ -139,7 +139,7 @@ public class World extends WorldObject implements Interactable {
 		/*
 		 * Create camera
 		 */
-		mySkyCamera = new WorldSky(this);
+		mySkyCamera = createSky();
 		mySkyCamera.setPaint(Style.COLOR_BACKGROUND);
 		mySkyCamera.addLayer(layer);
 		addChild(mySkyCamera);
@@ -228,6 +228,15 @@ public class World extends WorldObject implements Interactable {
 	 */
 	protected WorldGround createGround(PLayer pLayer) {
 		return new WorldGround(this, pLayer);
+	}
+
+	/**
+	 * Create the sky
+	 * 
+	 * @return sky
+	 */
+	protected WorldSky createSky() {
+		return new WorldSky(this);
 	}
 
 	@Override

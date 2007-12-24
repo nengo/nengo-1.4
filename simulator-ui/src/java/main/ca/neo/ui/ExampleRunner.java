@@ -49,7 +49,7 @@ public class ExampleRunner {
 	 */
 	private UINetwork buildUI() {
 
-		NeoGraphics neoGraphics = new NeoGraphics(networkName);
+		NeoGraphics neoGraphics = new NeoGraphics();
 
 		TrackedStatusMsg task = new TrackedStatusMsg(
 				"Creating NEO Network model");

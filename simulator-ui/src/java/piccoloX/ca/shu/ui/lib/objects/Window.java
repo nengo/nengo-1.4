@@ -134,14 +134,14 @@ public class Window extends WorldObject implements Interactable {
 				mySourceShadow.destroy();
 				mySourceShadow = null;
 			}
-			UIEnvironment.getInstance().getWorld().getSky().addChild(this);
 			myBorder.setVisible(false);
+			UIEnvironment.getInstance().addWindow(this);
 
 			if (myEventConsumer == null) {
 				myEventConsumer = new EventConsumer();
 				addInputEventListener(myEventConsumer);
-			}
-
+			}			
+			
 			maximizeBounds();
 
 			BoundsHandle.removeBoundsHandlesFrom(this);

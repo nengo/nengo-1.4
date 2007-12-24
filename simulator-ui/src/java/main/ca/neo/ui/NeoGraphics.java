@@ -60,21 +60,23 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
-		new NeoGraphics("Default");
-
+		new NeoGraphics();
 	}
 
 	private JDialog dataViewerDialog = null;
 
 	private SimulatorDataModel simulationData;
+	
+	public String getAppWindowTitle() {
+		return "NEO Workspace";
+	}
 
 	/**
 	 * @param title
 	 *            Text to be shown in the Title Bar
 	 */
-	public NeoGraphics(String title) {
-		super(title + " - NEO Workspace");
+	public NeoGraphics() {
+		super();
 
 		UIEnvironment.setDebugEnabled(true);
 

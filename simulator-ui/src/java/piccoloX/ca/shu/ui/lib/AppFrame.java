@@ -38,6 +38,7 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.Canvas;
@@ -105,10 +106,11 @@ public abstract class AppFrame extends JFrame {
 	 * @param title
 	 *            Title of application
 	 */
-	public AppFrame(String title) {
-		super(title, GraphicsEnvironment.getLocalGraphicsEnvironment()
+	public AppFrame() {
+		super(GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
 
+		setTitle(getAppWindowTitle());
 		loadPreferences();
 
 		UIEnvironment.setInstance(this);
@@ -478,6 +480,10 @@ public abstract class AppFrame extends JFrame {
 		return message;
 	}
 
+	public void addWindow(Window window) {
+		canvas.addWindow(window);
+	}
+
 	/**
 	 * @return String which describes what the application is about
 	 */
@@ -495,6 +501,8 @@ public abstract class AppFrame extends JFrame {
 	 * @return Name of the application
 	 */
 	public abstract String getAppName();
+
+	public abstract String getAppWindowTitle();
 
 	/**
 	 * @return Canvas which hold the zoomable UI
@@ -841,6 +849,48 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
+	 * Action to switch to navigation mode
+	 * 
+	 * @author Shu Wu
+	 */
+	class SwitchToNavigationMode extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public SwitchToNavigationMode() {
+			super("Switch to Navigation Mode");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			setSelectionMode(false);
+			updateWorldMenu();
+		}
+
+	}
+
+	/**
+	 * Action to switch to selection mode
+	 * 
+	 * @author Shu Wu
+	 */
+	class SwitchToSelectionMode extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public SwitchToSelectionMode() {
+			super("Switch to Selection Mode");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			setSelectionMode(true);
+			updateWorldMenu();
+		}
+
+	}
+
+	/**
 	 * Action which shows the tips dialog
 	 * 
 	 * @author Shu Wu
@@ -985,48 +1035,6 @@ public abstract class AppFrame extends JFrame {
 		@Override
 		protected void action() throws ActionException {
 			preferences.setEnableTooltips(true);
-			updateWorldMenu();
-		}
-
-	}
-
-	/**
-	 * Action to switch to selection mode
-	 * 
-	 * @author Shu Wu
-	 */
-	class SwitchToSelectionMode extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public SwitchToSelectionMode() {
-			super("Switch to Selection Mode");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			setSelectionMode(true);
-			updateWorldMenu();
-		}
-
-	}
-
-	/**
-	 * Action to switch to navigation mode
-	 * 
-	 * @author Shu Wu
-	 */
-	class SwitchToNavigationMode extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public SwitchToNavigationMode() {
-			super("Switch to Navigation Mode");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			setSelectionMode(false);
 			updateWorldMenu();
 		}
 

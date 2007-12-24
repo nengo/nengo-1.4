@@ -440,7 +440,7 @@ public class NetworkViewer extends NodeViewer {
 			this.layoutType = layoutType;
 		}
 
-		Layout layout;
+		private Layout layout;
 
 		@Override
 		protected void action() throws ActionException {
@@ -451,6 +451,13 @@ public class NetworkViewer extends NodeViewer {
 
 				Constructor<?> ct = layoutType.getConstructor(ctArgs);
 				Object[] args = new Object[1];
+
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						getGround().updateGraph();
+					}
+				});
+
 				args[0] = getGround().getGraph();
 
 				layout = (Layout) ct.newInstance(args);
@@ -461,7 +468,6 @@ public class NetworkViewer extends NodeViewer {
 						+ e.getMessage());
 			}
 
-			getGround().setElasticEnabled(false);
 			layout.initialize(getLayoutBounds());
 
 			if (layout.isIncremental()) {
@@ -512,7 +518,8 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	/**
-	 * Action for applying a Jung Layout
+	 * Action for applying a Jung Layout. It implements LayoutAction, which
+	 * allows it to be reversable.
 	 * 
 	 * @author Shu
 	 */
@@ -529,6 +536,7 @@ public class NetworkViewer extends NodeViewer {
 
 		@Override
 		protected void applyLayout() {
+			getGround().setElasticEnabled(false);
 			(new DoJungLayout(layoutClass)).doAction();
 		}
 

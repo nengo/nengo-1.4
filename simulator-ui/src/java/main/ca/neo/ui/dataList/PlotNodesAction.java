@@ -1,6 +1,7 @@
 package ca.neo.ui.dataList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.tree.MutableTreeNode;
@@ -15,9 +16,9 @@ public class PlotNodesAction extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
 
-	List<MutableTreeNode> nodes;
+	Collection<DataTreeNode> nodes;
 
-	public PlotNodesAction(List<MutableTreeNode> nodes) {
+	public PlotNodesAction(Collection<DataTreeNode> nodes) {
 		super("Plot data together");
 		this.nodes = nodes;
 	}
@@ -36,6 +37,9 @@ public class PlotNodesAction extends StandardAction {
 				spikePatterns.add(((SpikePatternNode) node).getUserObject());
 			} else if (node instanceof TimeSeriesNode) {
 				timeSeries.add(((TimeSeriesNode) node).getUserObject());
+			} else {
+				throw new UnsupportedOperationException(
+						"This type of data node is not supported for plotting together");
 			}
 
 		}

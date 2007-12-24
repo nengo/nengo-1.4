@@ -40,7 +40,7 @@ public class NetworkViewerMemoryTest {
 	public static void main(String[] args) {
 
 		printMemoryUsed("Start");
-		neoGraphics = new NeoGraphics("Test");
+		neoGraphics = new NeoGraphics();
 
 		// Window windows = new Window[NUM_OF_LOOPS];
 		for (i = 0; i < NUM_OF_LOOPS; i++) {

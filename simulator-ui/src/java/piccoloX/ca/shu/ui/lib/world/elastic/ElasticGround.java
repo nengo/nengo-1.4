@@ -54,10 +54,9 @@ public class ElasticGround extends WorldGround {
 	}
 
 	/**
-	 * @return A Graph used to by Jung Layouts
+	 * @return The current graph representation of the Ground.
 	 */
 	public DirectedSparseGraph getGraph() {
-		updateGraph();
 		return myGraph;
 	}
 
@@ -227,9 +226,16 @@ public class ElasticGround extends WorldGround {
 	}
 
 	/**
+	 * This method must be executed from the swing dispatcher thread because it
+	 * must be synchronized with the Graphical children elements.
+	 * 
 	 * @return True, if the graph changed
 	 */
-	public synchronized boolean updateGraph() {
+	public boolean updateGraph() {
+		// if (!SwingUtilities.isEventDispatchThread()) {
+		// Util.debugMsg("Update not dispatched from Swing thread");
+		// }
+
 		boolean changed = false;
 		if (myGraph == null) {
 			changed = true;

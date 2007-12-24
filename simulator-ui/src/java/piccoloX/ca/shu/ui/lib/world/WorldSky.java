@@ -29,7 +29,6 @@ public class WorldSky extends PCamera implements IWorldLayer {
 	public WorldSky(World world) {
 		super();
 		this.world = world;
-
 	}
 
 	/*
@@ -48,12 +47,6 @@ public class WorldSky extends PCamera implements IWorldLayer {
 	 */
 	public World getWorld() {
 		return world;
-	}
-
-	@Override
-	public void translateView(double arg0, double arg1) {
-		super.translateView(arg0, arg1);
-
 	}
 
 }

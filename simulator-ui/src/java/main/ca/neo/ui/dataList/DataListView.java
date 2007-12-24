@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -185,6 +186,22 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			return paths;
 		}
 
+		@SuppressWarnings("unchecked")
+		private void RecursiveFindDataNodes(TreeNode topNode,
+				HashSet<DataTreeNode> dataTreeNodes) {
+			Enumeration<TreeNode> childEnumerator = topNode.children();
+			while (childEnumerator.hasMoreElements()) {
+				RecursiveFindDataNodes(childEnumerator.nextElement(),
+						dataTreeNodes);
+			}
+			if (topNode instanceof DataTreeNode) {
+				if (!dataTreeNodes.contains(topNode)) {
+					dataTreeNodes.add((DataTreeNode) topNode);
+				}
+			}
+
+		}
+
 		private void ContextMenuEvent(MouseEvent e) {
 
 			JPopupMenu menu = null;
@@ -192,7 +209,17 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			TreePath[] paths = getTreePaths(e);
 			List<MutableTreeNode> leafNodes = getLeafNodes(paths);
 
-			if (leafNodes.size() > 0) {
+			// Have no idea how many data nodes there are going to be. Might as
+			// well make it proportional to the number of nodes.
+			HashSet<DataTreeNode> dataNodes = new HashSet<DataTreeNode>(
+					leafNodes.size());
+
+			// Find data nodes in tree nodes
+			for (MutableTreeNode treeNode : leafNodes) {
+				RecursiveFindDataNodes(treeNode, dataNodes);
+			}
+
+			if (dataNodes.size() > 0) {
 				PopupMenuBuilder menuBuilder;
 
 				if (leafNodes.size() == 1) {
@@ -204,15 +231,16 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 							leafNode));
 
 					if (leafNode instanceof DataTreeNode) {
-						((DataTreeNode) leafNode)
-								.constructPopupMenu(menuBuilder, dataModel);
+						((DataTreeNode) leafNode).constructPopupMenu(
+								menuBuilder, dataModel);
 					}
 
 				} else {
-					menuBuilder = new PopupMenuBuilder(leafNodes.size()
-							+ " nodes selected");
 
-					menuBuilder.addAction(new PlotNodesAction(leafNodes));
+					menuBuilder = new PopupMenuBuilder(dataNodes.size()
+							+ " data nodes selected");
+
+					menuBuilder.addAction(new PlotNodesAction(dataNodes));
 
 				}
 
@@ -266,8 +294,8 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		@Override
 		protected void action() throws ActionException {
-			undoLUT = new Hashtable<MutableTreeNode, UndoInfo>(
-					nodesToRemove.size());
+			undoLUT = new Hashtable<MutableTreeNode, UndoInfo>(nodesToRemove
+					.size());
 
 			for (MutableTreeNode nodeToRemove : nodesToRemove) {
 				TreeNode nodeParent = nodeToRemove.getParent();

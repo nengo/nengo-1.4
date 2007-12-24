@@ -1,6 +1,9 @@
 *******************************************
  Done
 *******************************************
+12/22/2007 - Data List viewer recursively find data nodes and displays the correct number
+12/22/2007 - UpdateGraph() is called from Swing context to avoid synchronization problems 
+
 12/18/2007 - Elastic layout now works with animations
 12/18/2007 - Create graph from ElasticObject and Edge
 12/17/2007 - Spring Layout done
@@ -11,21 +14,15 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Data List Viewer: # Nodes Selected. The # is inaccurate (counts too many)
-
-Apply default layout, then enable elastic layout afterwards
+AppFrame needs a special WorldSky, which notifies the Frame when Window(s) are added to it.
 
 
-	In ElasticGround, attach to that event in edges and children.
-	If detected, update graph()
-	Create graph from ElasticObject and Edge
-	
+Optimize edge change detection in Elastic Ground.	
 
 
 Create a test which creates a Network via UI and compares results
 	are results deterministic?
 	
-
 Transient messages should not fall off the screen
 	reference tooltips code
 Transient messages should follow the objects
@@ -35,57 +32,21 @@ TODO:
     * Dynamic class loading
     * Adding comments to new code
     * Reversable actions
-    * Fixing the ugly window icons
-
 
 Doing next:
 
 Add weak reference to UI Nodes from DataListView
 	Support feature such as focus on node (check node.isDestroyed && node is not hidden)
 
-Request: A notification when model changes, this way it will trigger a UI update
-	UpdateUIFromModel()
-		Ensembles - origins and terminations have to be checked
-
 Aggregate actions: actions can be chained, and this chain undone.
 
-    * Network exposeOrigin & exposeTermination
-    * Investigate loading code on the fly
-    * Drag & Drop improvements (might support future features)
-    	3) It would be great if people could load their own code on the fly,
-		e.g. by going to the file system for a jar. I'm a little hazy on
-		classloading, but this is straightforward, right? If you load the
-		first UI class with a custom classloader, then the custom classloader
-		should be used from then on? And the custom classloader could just be
-		URLClassLoader, with addURL(...) made public?
-
-
-
-Proper labelling for multiple plots 
-
-Ah, I don't think we'd talked about supporting that last thing in the UI, but it would be good (e.g. right-click an origin and select "externalize").
-Or "expose" rather. See Network.exposeOrigin() and exposeTermination()
-
-Clean up menus
-
-Replacing ensembles in place - Instead, why not change parameters
-
-
-Manage views: Network, Brain, Data
-
+Proper labeling for multiple plots 
 
 *******************************************
  Pri 1 - to do
 *******************************************
 
-Handle on user-end, when a chosen template does not fit in configurable. 
-ie. when PFunctionArray's input dimensions are incompatible with given functions.
-
 Custom file format
-
-Allow creation of multi-dimensional fourier functions
-
-Structure the popup menus for better usability
 
 Brain View interface
 Click to bring a cross section to front, zooming between sections
@@ -104,10 +65,6 @@ information visualization
  Pri 2 - will do eventually
 *******************************************
 set the title of the Swing Frame to that of the maximized Zoomable Window
-
-optimize data structures
-
-Contiunous updating layouts (ie SpringLayout).
 
 units selection for UI Dialog
 

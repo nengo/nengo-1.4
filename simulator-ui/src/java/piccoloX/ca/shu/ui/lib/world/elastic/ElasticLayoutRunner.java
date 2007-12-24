@@ -34,7 +34,9 @@ public class ElasticLayoutRunner {
 	}
 
 	private void init() {
+		myParent.updateGraph();
 		myGraph = myParent.getGraph();
+		
 		this.layout = new ElasticLayout(myGraph,
 				new ElasticLayout.UnitLengthFunction(
 						SPRING_LAYOUT_NODE_DISTANCE));
