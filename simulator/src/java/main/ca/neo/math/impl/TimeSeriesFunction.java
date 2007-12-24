@@ -3,7 +3,9 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.Function;
+import ca.neo.model.Configuration;
 import ca.neo.model.Units;
 import ca.neo.plot.Plotter;
 import ca.neo.util.InterpolatorND;
@@ -29,7 +31,9 @@ public class TimeSeriesFunction extends AbstractFunction {
 	private static final long serialVersionUID = 1L;
 	
 	private int myDimension;
+	private TimeSeries myTimeSeries;
 	private InterpolatorND myInterpolator;
+	private Configuration myConfiguration;
 	
 	/**
 	 * @param series TimeSeries from which to obtain Function of time 
@@ -38,7 +42,46 @@ public class TimeSeriesFunction extends AbstractFunction {
 	public TimeSeriesFunction(TimeSeries series, int dimension) {
 		super(1);
 		myDimension = dimension;
+		setTimeSeries(series);
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+	}
+	
+	public TimeSeriesFunction() {
+		this(new TimeSeries1DImpl(new float[0], new float[0], Units.UNK), 0);
+	}
+	
+	@Override
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	/**
+	 * @return TimeSeries from which to obtain Function of time
+	 */
+	public TimeSeries getTimeSeries() {
+		return myTimeSeries;
+	}
+	
+	/**
+	 * @param series TimeSeries from which to obtain Function of time
+	 */
+	public void setTimeSeries(TimeSeries series) {
+		myTimeSeries = series;
 		myInterpolator = new LinearInterpolatorND(series);
+	}
+
+	/**
+	 * @return Dimension of series on which to base Function output
+	 */
+	public int getSeriesDimension() {
+		return myDimension;
+	}
+
+	/**
+	 * @param dim Dimension of series on which to base Function output
+	 */
+	public void setSeriesDimension(int dim) {
+		myDimension = dim;
 	}
 
 	/**

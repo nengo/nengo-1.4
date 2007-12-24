@@ -5,6 +5,7 @@ package ca.neo.util;
 
 import java.io.Serializable;
 
+import ca.neo.model.Configurable;
 import ca.neo.model.Units;
 
 /**
@@ -12,7 +13,7 @@ import ca.neo.model.Units;
  * 
  * @author Bryan Tripp
  */
-public interface TimeSeries extends Serializable {
+public interface TimeSeries extends Serializable, Configurable {
 
 	/**
 	 * @return Times for which values are available

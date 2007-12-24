@@ -9,6 +9,8 @@ import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.GradientDescentApproximator;
 import ca.neo.math.impl.IndicatorPDF;
+import ca.neo.model.Configuration;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
@@ -235,11 +237,22 @@ public class BiasOrigin extends DecodedOrigin {
 		private VectorGenerator myVG;
 		private int myDim;
 		private float myBias;
+		private Configuration myConfiguration;
 		
 		public BiasedVG(VectorGenerator vg, int dim, float bias) {
 			myVG = vg;
 			myDim = dim;
 			myBias = bias;
+			
+			// this can be empty because it's never configured (only contructed locally)
+			myConfiguration = new ConfigurationImpl(this); 
+		}
+
+		/**
+		 * @see ca.neo.model.Configurable#getConfiguration()
+		 */
+		public Configuration getConfiguration() {
+			return myConfiguration;
 		}
 
 		/**

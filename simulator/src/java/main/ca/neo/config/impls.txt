@@ -21,3 +21,7 @@ ca.neo.math.impl.PostfixFunction
 ca.neo.math.impl.SigmoidFunction
 ca.neo.math.impl.SineFunction
 ca.neo.math.impl.TimeSeriesFunction
+ca.neo.util.impl.TimeSeriesImpl
+ca.neo.util.impl.TimeSeries1DImpl
+ca.neo.util.impl.RandomHypersphereVG
+ca.neo.util.impl.Rectifier

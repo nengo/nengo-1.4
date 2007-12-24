@@ -6,4 +6,7 @@ ca.neo.dynamics.LinearSystem
 ca.neo.model.Noise
 ca.neo.math.Function
 ca.neo.math.PDF
+ca.neo.util.TimeSeries
+ca.neo.util.TimeSeries1D
+ca.neo.util.VectorGenerator
 

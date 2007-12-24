@@ -3,7 +3,9 @@
  */
 package ca.neo.util.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.impl.GaussianPDF;
+import ca.neo.model.Configuration;
 import ca.neo.util.VectorGenerator;
 
 /**
@@ -17,8 +19,10 @@ public class RandomHypersphereVG implements VectorGenerator {
 
 	private boolean mySurface;
 	private float myRadius;
+	private float myAxisClusterFactor;
 	private boolean myAllOnAxes; //true if vectors are all to lie on an axis
 	private float myAxisRatio; //ratio of vector density between cluster-centre axis to other axes
+	private Configuration myConfiguration;
 	
 	/**
 	 * @param surface If true, vectors are generated on surface of hypersphere; if false, throughout
@@ -37,13 +41,53 @@ public class RandomHypersphereVG implements VectorGenerator {
 		
 		mySurface = surface;
 		myRadius = radius;
+		setAxisClusterFactor(axisClusterFactor);
 		
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+	}
+	
+	/**
+	 * Uses default settings (on surface; radius 1; no axis cluster)  
+	 */
+	public RandomHypersphereVG() {
+		this(true, 1, 0);
+	}
+	
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	public boolean getOnSurface() {
+		return mySurface;
+	}
+	
+	public void setOnSurface(boolean onSurface) {
+		mySurface = onSurface;
+	}
+	
+	public float getRadius() {
+		return myRadius;
+	}
+	
+	public void setRadius(float radius) {
+		myRadius = radius;
+	}
+	
+	public float getAxisClusterFactor() {
+		return myAxisClusterFactor;
+	}
+	
+	public void setAxisClusterFactor(float axisClusterFactor) {
+		myAxisClusterFactor = axisClusterFactor;
 		if (axisClusterFactor > .999) {
 			myAllOnAxes = true;
 		} else {
 			myAllOnAxes = false;
 			myAxisRatio = (float) Math.tan( (.5 + axisClusterFactor/2) * (Math.PI / 2) );
-		}
+		}		
 	}
 
 	/**

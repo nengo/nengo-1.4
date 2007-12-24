@@ -3,9 +3,11 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
+import ca.neo.model.Configuration;
 import ca.neo.util.MU;
 import ca.neo.util.VectorGenerator;
 import ca.neo.util.impl.RandomHypersphereVG;
@@ -155,15 +157,46 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 	 */
 	public static class EvalPointFactory implements VectorGenerator {
 		
+		private float myRadius;
 		private VectorGenerator myVG;		
 		private int myPoints;
+		private Configuration myConfiguration;
 		
 		/**
 		 * @param radius As RandomHypersphereGenerator arg
 		 * @param points Number of vectors produced, regardless of number requested 
 		 */
 		public EvalPointFactory(float radius, int points) {
+			setRadius(radius);
+			myPoints = points;
+			myConfiguration = ConfigUtil.defaultConfiguration(this);
+		}
+		
+		public EvalPointFactory() {
+			this(1, 100);
+		}
+
+		/**
+		 * @see ca.neo.model.Configurable#getConfiguration()
+		 */
+		public Configuration getConfiguration() {
+			return myConfiguration;
+		}
+
+		public float getRadius() {
+			return myRadius;
+		}
+		
+		public void setRadius(float radius) {
+			myRadius = radius;
 			myVG = new RandomHypersphereVG(false, radius, 1);
+		}
+		
+		public int getPoints() {
+			return myPoints;
+		}
+		
+		public void setPoints(int points) {
 			myPoints = points;
 		}
 
@@ -193,12 +226,35 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 	 */
 	public static class EncoderFactory implements VectorGenerator {
 
+		private float myRadius;
 		private VectorGenerator myVG;
+		private Configuration myConfiguration;
 		
 		/**
 		 * @param radius As RandomHypersphereGenerator arg
 		 */
 		public EncoderFactory(float radius) {
+			setRadius(radius);
+			myConfiguration = ConfigUtil.defaultConfiguration(this);
+		}
+		
+		public EncoderFactory() {
+			this(1);
+		}
+		
+		/**
+		 * @see ca.neo.model.Configurable#getConfiguration()
+		 */
+		public Configuration getConfiguration() {
+			return myConfiguration;
+		}
+
+		public float getRadius() {
+			return myRadius;
+		}
+		
+		public void setRadius(float radius) {
+			myRadius = radius;
 			myVG = new RandomHypersphereVG(true, radius, 1);
 		}
 

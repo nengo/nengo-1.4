@@ -11,7 +11,6 @@ import ca.neo.model.Configuration;
  * values, slope, and inflection point.
  * 
  * TODO: unit tests
- * TODO: docs
  * 
  * @author Bryan Tripp
  */
@@ -57,35 +56,61 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 		return myConfiguration;
 	}
 
+	/**
+	 * @return Inflection point
+	 */
 	public float getInflection() {
 		return myInflection;
 	}
 	
+	/**
+	 * @param inflection Inflection point
+	 */
 	public void setInflection(float inflection) {
 		myInflection = inflection;
 		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);
 	}
 	
+	/**
+	 * @return Slope at inflection point 
+	 */
 	public float getSlope() {
 		return myMultiplier / 4f;
 	}
-	
+
+	/**
+	 * @param slope Slope at inflection point
+	 */
 	public void setSlope(float slope) {
 		myMultiplier = 4f * slope;
-		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);	}
+		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);	
+	}
 	
+	/**
+	 * @return Result for inputs much lower than inflection point 
+	 */
 	public float getLow() {
 		return myLow;
 	}
 	
+	/**
+	 * @param low Result for inputs much lower than inflection point 
+	 */
 	public void setLow(float low) {
 		myLow = low;
-		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);	}
+		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);	
+	}
 	
+	/**
+	 * @return Result for inputs much higher than inflection point 
+	 */
 	public float getHigh() {
 		return myHigh;
 	}
 	
+	/**
+	 * @param high Result for inputs much higher than inflection point 
+	 */
 	public void setHigh(float high) {
 		myHigh = high;
 		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);		

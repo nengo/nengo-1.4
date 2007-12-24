@@ -3,12 +3,14 @@
  */
 package ca.neo.util;
 
+import ca.neo.model.Configurable;
+
 /**
  * A tool for generating sets of uniformly or randomly distributed vectors. 
  * 
  * @author Bryan Tripp
  */
-public interface VectorGenerator {
+public interface VectorGenerator extends Configurable {
 
 	/**
 	 * The vector distribution is decided by implementing classes. 
