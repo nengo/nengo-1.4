@@ -301,8 +301,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 
 	@Override
 	public String getName() {
-		return getViewerParent().getTypeName() + " Viewer: "
-				+ getViewerParent().getName();
+		return getViewerParent().getName() + " ("
+				+ getViewerParent().getTypeName() + " Viewer)";
 	}
 
 	/**

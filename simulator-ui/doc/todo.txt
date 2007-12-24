@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+12/22/2007 - The Java Swing Frame's title is updated with the maximized Window's name
 12/22/2007 - Data List viewer recursively find data nodes and displays the correct number
 12/22/2007 - UpdateGraph() is called from Swing context to avoid synchronization problems 
 
