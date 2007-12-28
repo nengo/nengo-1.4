@@ -2,12 +2,14 @@ package ca.neo.model.neuron.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 
+import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.Units;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.Neuron;
@@ -84,6 +86,12 @@ public class SpikeGeneratorOriginTest extends TestCase {
 			myNextRateOutput = nextRateOutput;
 		}
 		
+		public Configuration getConfiguration() {
+			return new ConfigurationImpl(null);
+		}
+
+
+
 		public InstantaneousOutput run(float[] time, float[] current) {
 			if (myMode.equals(SimulationMode.DEFAULT)) {
 				return new SpikeOutputImpl(new boolean[]{myNextSpikeOutput}, Units.SPIKES, 0);

@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import ca.neo.config.ConfigUtil;
+import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.SimulationException;
@@ -15,6 +17,8 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
+import ca.neo.model.Configuration.Property;
+import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.impl.LinearExponentialTermination;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.neuron.ExpandableSynapticIntegrator;
@@ -42,6 +46,8 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 
 	private static final long serialVersionUID = 1L;
 	
+	private static final float ourTimeStepCorrection = 1.01f;
+	
 	private Node myNode;  
 	private float myMaxTimeStep;
 	private Units myCurrentUnits;
@@ -49,6 +55,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	private Map<String, PlasticityRule> myPlasticityRules;
 	private float myPlasticityInterval;
 	private float myLastPlasticityTime;
+	private ConfigurationImpl myConfiguration;
 
 	/**
 	 * @param maxTimeStep Maximum length of integration time step. Shorter steps may be used to better match
@@ -62,8 +69,55 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 		myPlasticityInterval = -1;
 		myLastPlasticityTime = 0;
+		
+		myConfiguration = (ConfigurationImpl) ConfigUtil.defaultConfiguration(this);
+		myConfiguration.removeProperty("terminations");
+		
+		Property tp = new ConfigurationImpl.MultiValuedProperty(myConfiguration, "terminations", LinearExponentialTermination.class, true) {
+
+			@Override
+			public void addValue(Object value) throws StructuralException {
+			}
+
+			@Override
+			public Object doGetValue(int index) throws StructuralException {
+				return null;
+			}
+
+			@Override
+			public void doInsert(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
+			}
+
+			@Override
+			public void doRemove(int index) throws IndexOutOfBoundsException, StructuralException {
+			}
+
+			@Override
+			public void doSetValue(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
+			}
+
+			@Override
+			public int getNumValues() {
+				return 0;
+			}
+		}; 
+		myConfiguration.defineProperty(tp);
+		
+		//TODO: make terminations configurable, deal with plasticity
+		
 	}
 	
+	public LinearSynapticIntegrator() {
+		this(.001f, Units.ACU);
+	}
+	
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
 	/**
 	 * @see ca.neo.model.neuron.SynapticIntegrator#run(float, float)
 	 */
@@ -151,6 +205,22 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		while (it.hasNext()) {
 			it.next().reset(false);
 		}
+	}
+	
+	public float getMaxTimeStep() {
+		return myMaxTimeStep / ourTimeStepCorrection;
+	}
+	
+	public void setMaxTimeStep(float maxTimeStep) {
+		myMaxTimeStep = maxTimeStep * ourTimeStepCorrection; //increased slightly because float/float != integer 
+	}
+	
+	public Units getCurrentUnits() {
+		return myCurrentUnits;
+	}
+	
+	public void setCurrentUnits(Units units) {
+		myCurrentUnits = units;
 	}
 
 	/**

@@ -5,6 +5,7 @@ package ca.neo.model.neuron;
 
 import java.io.Serializable;
 
+import ca.neo.model.Configurable;
 import ca.neo.model.Node;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
@@ -21,7 +22,7 @@ import ca.neo.util.TimeSeries1D;
  * 
  * @author Bryan Tripp
  */
-public interface SynapticIntegrator extends Resettable, Serializable {
+public interface SynapticIntegrator extends Resettable, Serializable, Configurable {
 	
 	/**
 	 * @return List of distinct inputs (eg sets of synapses from different ensembles).    

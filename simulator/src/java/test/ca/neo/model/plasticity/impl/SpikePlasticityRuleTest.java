@@ -189,42 +189,42 @@ public class SpikePlasticityRuleTest extends TestCase {
 	 * 
 	 * @author Bryan Tripp
 	 */
-	private static class TimedSpikeGenerator implements SpikeGenerator {
-
-		private static final long serialVersionUID = 1L;
-		
-		private float[] mySpikeTimes;
-		private float myTolerance;
-		
-		public TimedSpikeGenerator(float[] spikeTimes, float tolerance) {
-			mySpikeTimes = spikeTimes;
-			myTolerance = tolerance;
-		}
-		
-		public InstantaneousOutput run(float[] time, float[] current) {
-			boolean spiking = false;
-			search : for (int i = 0; i < mySpikeTimes.length; i++) {
-				for (int j = 0; j < time.length; j++) {
-					if (Math.abs(mySpikeTimes[i] - time[j]) <= myTolerance) {
-						spiking = true;
-						break search;
-					}
-				}
-			}
-			return new SpikeOutputImpl(new boolean[]{spiking}, Units.SPIKES, time[time.length]);
-		}
-
-		public void reset(boolean randomize) {
-		}
-
-		public SimulationMode getMode() {
-			return SimulationMode.DEFAULT;
-		}
-
-		public void setMode(SimulationMode mode) {
-		}
-		
-	}
+//	private static class TimedSpikeGenerator implements SpikeGenerator {
+//
+//		private static final long serialVersionUID = 1L;
+//		
+//		private float[] mySpikeTimes;
+//		private float myTolerance;
+//		
+//		public TimedSpikeGenerator(float[] spikeTimes, float tolerance) {
+//			mySpikeTimes = spikeTimes;
+//			myTolerance = tolerance;
+//		}
+//		
+//		public InstantaneousOutput run(float[] time, float[] current) {
+//			boolean spiking = false;
+//			search : for (int i = 0; i < mySpikeTimes.length; i++) {
+//				for (int j = 0; j < time.length; j++) {
+//					if (Math.abs(mySpikeTimes[i] - time[j]) <= myTolerance) {
+//						spiking = true;
+//						break search;
+//					}
+//				}
+//			}
+//			return new SpikeOutputImpl(new boolean[]{spiking}, Units.SPIKES, time[time.length]);
+//		}
+//
+//		public void reset(boolean randomize) {
+//		}
+//
+//		public SimulationMode getMode() {
+//			return SimulationMode.DEFAULT;
+//		}
+//
+//		public void setMode(SimulationMode mode) {
+//		}
+//		
+//	}
 	
 	//exponential function for STDP modulated by another input
 	public static class STDP extends AbstractFunction {
