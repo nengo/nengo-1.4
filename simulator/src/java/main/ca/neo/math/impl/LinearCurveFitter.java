@@ -42,8 +42,8 @@ public class LinearCurveFitter implements CurveFitter {
 		private float[] myY;
 
 		/**
-	 * @param x Example x points 
-	 * @param y Example y points (must be same length as x)
+		 * @param x Example x points 
+		 * @param y Example y points (must be same length as x)
 		 */
 		public InterpolatedFunction(float[] x, float[] y) {
 			super(1);
@@ -51,8 +51,60 @@ public class LinearCurveFitter implements CurveFitter {
 			myY = y;
 			
 			if (x.length != y.length) {
-				throw new IllegalArgumentException("Arrays x and y must have the same length; we take it that y = f(x)");
+				throw new IllegalArgumentException("Arrays x and y must have the same length; y = f(x)");
 			}					
+			if (x.length < 2) {
+				throw new IllegalArgumentException("At least two points are needed");
+			}
+		}
+		
+		public InterpolatedFunction() {
+			this(new float[]{0, 1}, new float[]{0, 0});
+		}
+		
+		public int getNumPoints() {
+			return myX.length;
+		}
+		
+		public void setNumPoints(int num) {
+			if (num < 2) {
+				throw new IllegalArgumentException("At least two points are needed");
+			}
+			
+			float[] newX = new float[num];
+			float[] newY = new float[num];
+			System.arraycopy(myX, 0, newX, 0, Math.min(num, myX.length));
+			System.arraycopy(myY, 0, newY, 0, Math.min(num, myY.length));
+			myX = newX;
+			myY = newY;
+		}
+		
+		public float[] getX() {
+			return copy(myX);
+		}
+		
+		public void setX(float[] x) {
+			if (x.length != myX.length) {
+				throw new IllegalArgumentException("Expected " + myX.length + " values.");
+			}
+			myX = copy(x);
+		}
+		
+		public float[] getY() {
+			return copy(myY);
+		}
+		
+		public void setY(float[] y) {
+			if (y.length != myY.length) {
+				throw new IllegalArgumentException("Expected " + myY.length + " values.");
+			}
+			myY = copy(y);
+		}
+		
+		private static float[] copy(float[] vector) {
+			float[] result = new float[vector.length];
+			System.arraycopy(vector, 0, result, 0, vector.length);
+			return result;
 		}
 
 		/**

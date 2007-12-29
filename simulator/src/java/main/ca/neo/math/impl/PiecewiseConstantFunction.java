@@ -24,7 +24,6 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 	
 	private float[] myDiscontinuities;
 	private float[] myValues;
-	private Configuration myConfiguration;
 	
 	/**
 	 * @param discontinuities Ordered points x at which the function is y = f(x) is discontinuous 
@@ -43,18 +42,12 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 		Arrays.sort(myDiscontinuities);
 		
 		setValues(values);
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	public PiecewiseConstantFunction() {
 		this(new float[0], new float[]{0});
 	}
 	
-	@Override
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @return Number of discontinuities 
 	 */

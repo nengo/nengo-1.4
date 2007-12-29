@@ -1,10 +1,8 @@
 package ca.neo.math.impl;
 
-import ca.neo.config.ConfigUtil;
 import ca.neo.math.DifferentiableFunction;
 import ca.neo.math.Function;
 //import ca.neo.plot.Plotter;
-import ca.neo.model.Configuration;
 
 /**
  * A one-dimensional sigmoid function with configurable high and low 
@@ -24,7 +22,6 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 	private float myMultiplier;
 	private Function myDerivative;
 	
-	private Configuration myConfiguration;
 	
 	/**
 	 * Default parameters (inflection=0; slope=1/4; low=0; high=1). 
@@ -47,15 +44,8 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 		myInflection = inflection;
 		myMultiplier = slope * 4f; //usual slope is 1/4
 		myDerivative = new SigmoidDerivative(myHigh-myLow, myInflection, myMultiplier);
-		
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
-	@Override
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @return Inflection point
 	 */

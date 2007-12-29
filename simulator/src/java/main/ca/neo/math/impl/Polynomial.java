@@ -18,7 +18,6 @@ public class Polynomial extends AbstractFunction implements Function {
 	private static final long serialVersionUID = 1L;
 	
 	private float[] myCoefficients;
-	private Configuration myConfiguration;
 	
 	/**
 	 * @param coefficients Coefficients [a0 a1 a2 ...] in polynomial y = a0 + a1x + a2x^2 + ...
@@ -26,18 +25,12 @@ public class Polynomial extends AbstractFunction implements Function {
 	public Polynomial(float[] coefficients) {
 		super(1);
 		myCoefficients = coefficients;
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	public Polynomial() {
 		this(new float[]{1});
 	}
 	
-	@Override
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @return Polynomial order
 	 */

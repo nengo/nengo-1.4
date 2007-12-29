@@ -1,5 +1,6 @@
 package ca.neo.math.impl;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.Function;
 import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
@@ -18,37 +19,16 @@ public abstract class AbstractFunction implements Function {
 	public static final String DIMENSION_PROPERTY = "dimension";
 	
 	private int myDim;
-	private ConfigurationImpl myConfiguration;
+	private Configuration myConfiguration;
 	
 	/**
 	 * @param dim Input dimension of the function
 	 */
 	public AbstractFunction(int dim) {
-		init(dim);
-	}
-	
-	public AbstractFunction(Configuration properties) throws StructuralException {
-		Object o = properties.getProperty(DIMENSION_PROPERTY).getValue();
-		if (o instanceof Integer) {
-			init(((Integer) o).intValue());
-		} else {
-			throw new StructuralException("Property " + DIMENSION_PROPERTY 
-					+ " must be an Integer; was " + o.getClass().getCanonicalName());
-		}
-	}
-	
-	private void init(int dim) {
 		myDim = dim;
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);		
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
-	public static Configuration getConstructionTemplate() {
-		ConfigurationImpl result = new ConfigurationImpl(null);
-		result.defineTemplateProperty(DIMENSION_PROPERTY, Integer.class, new Integer(1));
-		return result;
-	}
-
 	/**
 	 * @see ca.neo.model.Configurable#getConfiguration()
 	 */

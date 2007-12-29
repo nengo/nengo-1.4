@@ -5,12 +5,14 @@ package ca.neo.model.neuron.impl;
 
 import java.util.Properties;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.math.Function;
 import ca.neo.math.RootFinder;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.math.impl.NewtonRootFinder;
 import ca.neo.math.impl.PiecewiseConstantFunction;
+import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
@@ -74,10 +76,19 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 	private float[] myNHistory;
 	private float[] myRateHistory;
 	
+	private Configuration myConfiguration;
+	
 	private static final float[] ourNullTime = new float[0]; 
 	private static final float[] ourNullVHistory = new float[0];	
 	private static final float[] ourNullNHistory = new float[0];	
 	private static final float[] ourNullRateHistory = new float[0];	
+	
+	/**
+	 * Uses default parameters
+	 */
+	public ALIFSpikeGenerator() {
+		this(.002f, .02f, .2f, 0);
+	}
 	
 	/**
 	 * @param tauRef Refracory period (s)
@@ -89,9 +100,48 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myTauRef = tauRef;
 		myTauRC = tauRC;
 		myTauN = tauN;
-		myIncN = Math.max(0, incN); //TODO: rethink this (prevents potentiation)
-		
+		setIncN(incN);
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
 		reset(false);
+	}
+
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+
+	public float getTauRef() {
+		return myTauRef;
+	}
+	
+	public void setTauRef(float tauRef) {
+		myTauRef = tauRef;
+	}
+	
+	public float getTauRC() {
+		return myTauRC;
+	}
+	
+	public void setTauRC(float tauRC) {
+		myTauRC = tauRC;
+	}
+	
+	public float getTauN() {
+		return myTauN;
+	}
+	
+	public void setTauN(float tauN) {
+		myTauN = tauN;
+	}
+	
+	public float getIncN() {
+		return myIncN;
+	}
+	
+	public void setIncN(float incN) {
+		myIncN = Math.max(0, incN); //TODO: rethink this (prevents potentiation)
 	}
 
 	/**

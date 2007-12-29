@@ -21,24 +21,16 @@ public class ExponentialPDF extends AbstractFunction implements PDF {
 	private static final long serialVersionUID = 1L;
 
 	private float myTau;
-	private Configuration myConfiguration;
 	
 	public ExponentialPDF(float tau) {
 		super(1);
 		myTau = tau;
-		
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	public ExponentialPDF(){
 		this(1);
 	}
 	
-	@Override
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	public float getTau() {
 		return myTau;
 	}

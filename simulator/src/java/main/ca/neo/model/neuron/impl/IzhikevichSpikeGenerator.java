@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import ca.neo.config.ConfigUtil;
+import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
@@ -31,6 +33,9 @@ import ca.neo.util.impl.TimeSeries1DImpl;
  * u is a membrane recovery variable;
  * a, b, c, and d are modifiable parameters</p>
  * 
+ * TODO: write rate mode; fix max step at 1/2 ms
+ * 
+ * @author Hussein
  */
 public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 
@@ -56,6 +61,8 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	private SimulationMode myMode;
 	private SimulationMode[] mySupportedModes;
 	
+	private Configuration myConfiguration;
+	
 	private static final float[] ourNullTime = new float[0]; 
 	private static final float[] ourNullVoltageHistory = new float[0];
 	
@@ -64,18 +71,8 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 * 		run(...) is requested with a length that is not an integer multiple of this value.  
 	 * Constructor using "default" parameters
 	 */
-	public IzhikevichSpikeGenerator(float maxTimeStep) {
-		myMaxTimeStep = maxTimeStep; 
-		myInitialVoltage = -65f;
-		myA = 0.02f;
-		myB = 0.2f;
-		myC = -65f;
-		myD = 2f;
-		
-		myMode = SimulationMode.DEFAULT;
-		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
-		
-		reset(false);
+	public IzhikevichSpikeGenerator() {
+		this(.0005f, 0.02f, .2f, -65f, 2f);
 	}
 
 	/**
@@ -96,6 +93,8 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		
 		myMode = SimulationMode.DEFAULT;
 		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
+
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
 		
 		reset(false);
 	}
@@ -110,17 +109,47 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 * @param initialVoltage initial voltage value
 	 */
 	public IzhikevichSpikeGenerator(float maxTimeStep, float a, float b, float c, float d, float initialVoltage) {
-		myMaxTimeStep = maxTimeStep; 
+		this(maxTimeStep, a, b, c, d);
 		myInitialVoltage = initialVoltage;
+	}
+
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+	
+	public float getA() {
+		return myA;
+	}
+	
+	public void setA(float a) {
 		myA = a;
+	}
+	
+	public float getB() {
+		return myB;
+	}
+	
+	public void setB(float b) {
 		myB = b;
+	}
+	
+	public float getC() {
+		return myC;
+	}
+	
+	public void setC(float c) {
 		myC = c;
+	}
+	
+	public float getD() {
+		return myD;
+	}
+	
+	public void setD(float d) {
 		myD = d;
-		
-		myMode = SimulationMode.DEFAULT;
-		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
-		
-		reset(false);
 	}
 	
 	public void reset(boolean randomize) {
@@ -202,7 +231,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		myVoltageHistory = ourNullVoltageHistory;
 		
 		//implicitly Vth == R == 1		
-		return current > 1 ? 1f : 0;
+		return current > 1 ? 1f : 0; //TODO: this isn't right
 	}
 
 	/**

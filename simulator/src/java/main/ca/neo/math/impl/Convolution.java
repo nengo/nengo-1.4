@@ -33,17 +33,17 @@ public class Convolution extends AbstractFunction {
 		myTimeStep = timeStep;
 		myWindow = window;
 		
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
+//		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	public Convolution() {
 		this(new ConstantFunction(1, 1), new ConstantFunction(1, 1), .001f, 1f);
 	}
 	
-	@Override
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
+//	@Override
+//	public Configuration getConfiguration() {
+//		return myConfiguration;
+//	}
 
 	public Function getFunctionOne() {
 		return myOne;

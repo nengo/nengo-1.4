@@ -40,6 +40,10 @@ import ca.neo.model.Units;
 import ca.neo.model.Configuration.Property;
 import ca.neo.model.impl.MockConfigurable;
 import ca.neo.model.impl.NoiseFactory;
+import ca.neo.model.neuron.impl.ALIFSpikeGenerator;
+import ca.neo.model.neuron.impl.DynamicalSystemSpikeGenerator;
+import ca.neo.model.neuron.impl.IzhikevichSpikeGenerator;
+import ca.neo.model.neuron.impl.LIFSpikeGenerator;
 import ca.neo.model.neuron.impl.PoissonSpikeGenerator;
 import ca.neo.model.plasticity.impl.CompositePlasticityRule;
 import ca.neo.model.plasticity.impl.SpikePlasticityRule;
@@ -313,11 +317,11 @@ public class ConfigurationTreeModel implements TreeModel {
 	
 	public static void main(String[] args) {
 		try {
-			JFrame frame = new JFrame("Tree Test");
+			JFrame frame = new JFrame("Tree Test"); 
 //			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
 //			configurable.addMultiValuedField("test1");
 //			configurable.addMultiValuedField("test2");
-			Configurable configurable = new PoissonSpikeGenerator(); 
+			Configurable configurable = new ALIFSpikeGenerator(); 
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

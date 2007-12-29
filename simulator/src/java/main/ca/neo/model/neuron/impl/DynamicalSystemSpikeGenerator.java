@@ -6,11 +6,15 @@ package ca.neo.model.neuron.impl;
 import java.util.Arrays;
 import java.util.Properties;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
+import ca.neo.dynamics.impl.EulerIntegrator;
+import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.CurveFitter;
 import ca.neo.math.Function;
 import ca.neo.math.impl.LinearCurveFitter;
+import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
@@ -46,6 +50,10 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	private SimulationMode myMode;
 	private SimulationMode[] mySupportedModes;
 	private Function myConstantRateFunction;
+	private boolean myConstantRateFunctionOK; //false if there are relevant configuration changes since function calculated
+	private float[] myCurrents;
+	private float myTransientTime;
+	private Configuration myConfiguration;
 	
 	/**
 	 * @param dynamics A DynamicalSystem that defines the dynamics of spike generation. 
@@ -71,6 +79,7 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	
 		myMode = SimulationMode.DEFAULT;
 		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT};
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	/**
@@ -84,15 +93,18 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	 * @param minIntraSpikeTime Minimum time between spike onsets. If there appears to be a spike onset at the 
 	 * 		beginning of a timestep, this value is used to determine whether this is just the continuation of a spike 
 	 * 		onset that was already registered in the last timestep
-	 * @param currents Driving currents at which to simulate to find steady-state firing rates for CONSTANT_RATE mode
+	 * @param currentRange Range of driving currents at which to simulate to find steady-state firing rates for CONSTANT_RATE mode
 	 * @param transientTime Simulation time to ignore before counting spikes when finding steady-state rates 
 	 */
-	public DynamicalSystemSpikeGenerator(DynamicalSystem dynamics, Integrator integrator, int voltageDim, float spikeThreshold, float minIntraSpikeTime, float[] currents, float transientTime) {
+	public DynamicalSystemSpikeGenerator(DynamicalSystem dynamics, Integrator integrator, int voltageDim, float spikeThreshold, float minIntraSpikeTime, float[] currentRange, float transientTime) {
 		myDynamics = dynamics;
 		myIntegrator = integrator;
 		myVDim = voltageDim;
 		mySpikeThreshold = spikeThreshold;
 		myMinIntraSpikeTime = minIntraSpikeTime;
+		setCurrentRange(new float[]{currentRange[0], currentRange[currentRange.length-1]});
+		myTransientTime = transientTime;
+		setConstantRateFunction(); 
 
 		Units[] units = new Units[dynamics.getOutputDimension()];
 		for (int i = 0; i < units.length; i++) {
@@ -102,25 +114,125 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	
 		myMode = SimulationMode.DEFAULT;
 		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
-		myConstantRateFunction = getConstantRateFunction(currents, transientTime); 
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
-	private Function getConstantRateFunction(float[] currents, float transientTime) {
+	/**
+	 * Uses default parameters to allow later configuration.
+	 */
+	public DynamicalSystemSpikeGenerator() {
+		this(getDefaultDynamics(), new EulerIntegrator(.001f), 0, 0.99f, .002f, new float[]{0, 1}, .5f);		
+	}
+	
+	/**
+	 * @see ca.neo.model.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+	
+	public DynamicalSystem getDynamics() {
+		return myDynamics;
+	}
+	
+	public void setDynamics(DynamicalSystem dynamics) {
+		myDynamics = dynamics;
+		myConstantRateFunctionOK = false;
+	}
+	
+	public Integrator getIntegrator() {
+		return myIntegrator;
+	}
+	
+	public void setIntegrator(Integrator integrator) {
+		myIntegrator = integrator;
+		myConstantRateFunctionOK = false;
+	}
+	
+	public int getVoltageDim() {
+		return myVDim;
+	}
+	
+	public void setVoltageDim(int dim) {
+		if (dim < 0 || dim >= myDynamics.getOutputDimension()) {
+			throw new IllegalArgumentException(dim 
+					+ " is out of range for dynamics with output of dimension " + myDynamics.getOutputDimension());
+		}
+		myVDim = dim;
+		myConstantRateFunctionOK = false;
+	}
+	
+	public float getSpikeThreshold() {
+		return mySpikeThreshold;
+	}
+	
+	public void setSpikeThreshold(float threshold) {
+		mySpikeThreshold = threshold;
+		myConstantRateFunctionOK = false;
+	}
+	
+	public float getMinIntraSpikeTime() {
+		return myMinIntraSpikeTime;
+	}
+	
+	public void setMinIntraSpikeTime(float min) {
+		myMinIntraSpikeTime = min;
+		myConstantRateFunctionOK = false;
+	}
+	
+	public float[] getCurrentRange() {
+		return new float[]{myCurrents[0], myCurrents[myCurrents.length - 1]};
+	}
+	
+	public void setCurrentRange(float[] range) {
+		if (range.length != 2) {
+			throw new IllegalArgumentException("Expected range of length 2: [low high]");
+		}
+		myCurrents = MU.makeVector(range[0], (range[1]-range[0])/20f, range[1]);
+		myConstantRateFunctionOK = false;
+	}
+
+	public float getTransientTime() {
+		return myTransientTime;
+	}
+	
+	public void setTransientTime(float transientTime) {
+		myTransientTime = transientTime;
+		myConstantRateFunctionOK = false;
+	}
+	
+	public boolean getConstantRateModeSupported() {
+		return mySupportedModes.length == 2;
+	}
+	
+	private static DynamicalSystem getDefaultDynamics() {
+		return new SimpleLTISystem(
+				new float[]{2*(float)Math.PI, 2*(float)Math.PI}, 
+				new float[][]{new float[1], new float[]{1}},
+				new float[][]{new float[]{1, 0}}, 
+				new float[2], 
+				Units.uniform(Units.UNK, 1));
+	}
+	
+	private void setConstantRateFunction() {
 		//make sure currents are in ascending order
-		Arrays.sort(currents);
-		
-		//note: this assumes we're running in DEFAULT mode		
+		Arrays.sort(myCurrents);
+
+		SimulationMode mode = myMode;
+		myMode = SimulationMode.DEFAULT;
 		float dt = .001f;
 		float simTime = 1f; 
-		float[] rates = new float[currents.length];
-		for (int i = 0; i < currents.length; i++) {
-			countSpikes(currents[i], dt, transientTime);
-			rates[i] = (float) countSpikes(currents[i], dt, simTime) / simTime; 
+		float[] rates = new float[myCurrents.length];
+		for (int i = 0; i < myCurrents.length; i++) {
+			countSpikes(myCurrents[i], dt, myTransientTime);
+			rates[i] = (float) countSpikes(myCurrents[i], dt, simTime) / simTime; 
 		}
 		
 		CurveFitter cf = new LinearCurveFitter();
-		Function result = cf.fit(currents, rates);
-		return result;
+		Function result = cf.fit(myCurrents, rates);
+		myConstantRateFunction = result;
+		myConstantRateFunctionOK = true;
+		myMode = mode;
 	}
 	
 	private int countSpikes(float current, float dt, float time) {
@@ -140,6 +252,7 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	 */
 	public InstantaneousOutput run(float[] time, float[] current) {
 		if (myMode.equals(SimulationMode.CONSTANT_RATE)) {
+			if (!myConstantRateFunctionOK) setConstantRateFunction();
 			float rate = myConstantRateFunction.map(new float[]{current[current.length-1]});			
 			return new RealOutputImpl(new float[]{rate}, Units.SPIKES_PER_S, time[time.length-1]);
 		} else {
