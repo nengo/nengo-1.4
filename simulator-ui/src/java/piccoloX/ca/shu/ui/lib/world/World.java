@@ -115,12 +115,20 @@ public class World extends WorldObject implements Interactable {
 	private final PZoomEventHandler zoomHandler;
 
 	/**
+	 * @param name
+	 * @param ground
+	 */
+	public World(String name, WorldGround ground) {
+		this(name, new WorldSky(), ground);
+	}
+
+	/**
 	 * Default constructor
 	 * 
 	 * @param name
 	 *            Name of this world
 	 */
-	public World(String name) {
+	public World(String name, WorldSky sky, WorldGround ground) {
 		super(name);
 
 		/*
@@ -132,14 +140,15 @@ public class World extends WorldObject implements Interactable {
 		/*
 		 * Create ground
 		 */
-		myGround = createGround(layer);
+		ground.setWorld(this);
+		myGround = ground;
 		myGround.setSelectable(false);
 		layer.addChild(myGround);
 
 		/*
-		 * Create camera
+		 * Create sky
 		 */
-		mySkyCamera = createSky();
+		mySkyCamera = sky;
 		mySkyCamera.setPaint(Style.COLOR_BACKGROUND);
 		mySkyCamera.addLayer(layer);
 		addChild(mySkyCamera);
@@ -219,24 +228,6 @@ public class World extends WorldObject implements Interactable {
 		windowsMenu.addAction(new CloseAllWindows("Close all"));
 		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
 
-	}
-
-	/**
-	 * Create the ground
-	 * 
-	 * @return ground
-	 */
-	protected WorldGround createGround(PLayer pLayer) {
-		return new WorldGround(this, pLayer);
-	}
-
-	/**
-	 * Create the sky
-	 * 
-	 * @return sky
-	 */
-	protected WorldSky createSky() {
-		return new WorldSky(this);
 	}
 
 	@Override
@@ -435,7 +426,7 @@ public class World extends WorldObject implements Interactable {
 	 * 
 	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
 	 */
-	public JPopupMenu showContextMenu() {
+	public JPopupMenu getContextMenu() {
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
 		constructMenu(menu);
 

@@ -26,7 +26,7 @@ public class NetworkViewerConfig implements Serializable {
 	/**
 	 * Saved layouts
 	 */
-	private final Hashtable<String, NodeLayout> layouts;
+	private final Hashtable<String, WorldLayout> layouts;
 
 	/**
 	 * @param defaultFileName
@@ -35,14 +35,14 @@ public class NetworkViewerConfig implements Serializable {
 	public NetworkViewerConfig(String defaultFileName) {
 		super();
 		this.fileName = defaultFileName;
-		layouts = new Hashtable<String, NodeLayout>();
+		layouts = new Hashtable<String, WorldLayout>();
 	}
 
 	/**
 	 * @param layout
 	 *            Layout to be added
 	 */
-	public void addLayout(NodeLayout layout) {
+	public void addLayout(WorldLayout layout) {
 		layouts.put(layout.getName(), layout);
 	}
 
@@ -60,7 +60,7 @@ public class NetworkViewerConfig implements Serializable {
 		return folderName;
 	}
 
-	public NodeLayout getLayout(String name) {
+	public WorldLayout getLayout(String name) {
 		return layouts.get(name);
 	}
 
@@ -70,7 +70,7 @@ public class NetworkViewerConfig implements Serializable {
 	public String[] getLayoutNames() {
 		String[] names = new String[layouts.size()];
 		int i = 0;
-		Enumeration<NodeLayout> en = layouts.elements();
+		Enumeration<WorldLayout> en = layouts.elements();
 		while (en.hasMoreElements()) {
 			names[i++] = en.nextElement().getName();
 		}
@@ -82,7 +82,7 @@ public class NetworkViewerConfig implements Serializable {
 	 *            Name of layout to be removed
 	 * @return Reference to the removed layout
 	 */
-	public NodeLayout removeLayout(String name) {
+	public WorldLayout removeLayout(String name) {
 		return layouts.remove(name);
 	}
 

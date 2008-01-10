@@ -1,7 +1,7 @@
 package ca.neo.ui.models.nodes.widgets;
 
 import ca.neo.ui.models.UINeoNode;
-import ca.shu.ui.lib.objects.DirectedEdge;
+import ca.shu.ui.lib.objects.PEdge;
 import ca.shu.ui.lib.objects.lines.ILineTermination;
 import ca.shu.ui.lib.objects.lines.LineConnector;
 
@@ -31,14 +31,14 @@ public class UIProjection extends LineConnector {
 			 * Recursive connections are represented by an upward arcing edge
 			 */
 			UINeoNode nodeParent = getOriginUI().getNodeParent();
-			getEdge().setLineShape(DirectedEdge.EdgeShape.UPWARD_ARC);
+			getEdge().setLineShape(PEdge.EdgeShape.UPWARD_ARC);
 			getEdge()
 					.setMinArcRadius(
 							nodeParent.localToParent(nodeParent.getBounds())
 									.getWidth());
 			setPointerVisible(false);
 		} else {
-			getEdge().setLineShape(DirectedEdge.EdgeShape.STRAIGHT);
+			getEdge().setLineShape(PEdge.EdgeShape.STRAIGHT);
 			setPointerVisible(true);
 		}
 

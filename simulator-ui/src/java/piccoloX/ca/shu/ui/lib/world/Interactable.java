@@ -14,6 +14,6 @@ public interface Interactable {
 	 *            The input event triggering the context menu
 	 * @return context menu associated to the Named Object
 	 */
-	public JPopupMenu showContextMenu();
+	public JPopupMenu getContextMenu();
 
 }

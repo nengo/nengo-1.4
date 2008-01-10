@@ -12,11 +12,11 @@ import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
- * And edge with direction. An piccolo component.
+ * An edge with direction. An piccolo component.
  * 
  * @author Shu Wu
  */
-public class DirectedEdge extends PPath implements PropertyChangeListener,
+public class PEdge extends PPath implements PropertyChangeListener,
 		IDestroyable {
 
 	private static final long serialVersionUID = 1L;
@@ -41,6 +41,8 @@ public class DirectedEdge extends PPath implements PropertyChangeListener,
 	 * Color of the line when it is highlighted
 	 */
 	private Color highlightColor = Style.COLOR_LINE_HIGHLIGHT;
+
+	private boolean isDirected;
 
 	/**
 	 * Radius of the arc shape used by this edge. Only applies when the shape of
@@ -73,6 +75,10 @@ public class DirectedEdge extends PPath implements PropertyChangeListener,
 	 */
 	private PointerTriangle trianglePointer;
 
+	public PEdge(WorldObject startNode, WorldObject endNode) {
+		this(startNode, endNode, true);
+	}
+
 	/**
 	 * Creates a new directed edge
 	 * 
@@ -80,11 +86,14 @@ public class DirectedEdge extends PPath implements PropertyChangeListener,
 	 *            Starting node
 	 * @param endNode
 	 *            Ending node
+	 * @param isDirected
+	 *            Whether the direction of this edge matters
 	 */
-	public DirectedEdge(WorldObject startNode, WorldObject endNode) {
+	public PEdge(WorldObject startNode, WorldObject endNode, boolean isDirected) {
 		super();
 		this.myStartNode = startNode;
 		this.myEndNode = endNode;
+		this.isDirected = isDirected;
 
 		setPickable(false);
 
@@ -260,6 +269,10 @@ public class DirectedEdge extends PPath implements PropertyChangeListener,
 		return myState;
 	}
 
+	public boolean isDirected() {
+		return isDirected;
+	}
+
 	/**
 	 * @return Whether this edge is visible when in it's default state
 	 */
@@ -406,7 +419,7 @@ public class DirectedEdge extends PPath implements PropertyChangeListener,
  * 
  * @author Shu Wu
  */
-class PointerTriangle extends DirectedEdge {
+class PointerTriangle extends PEdge {
 
 	private static final long serialVersionUID = 1L;
 
@@ -419,7 +432,7 @@ class PointerTriangle extends DirectedEdge {
 	 * @param edge
 	 *            Directed edge which dictates where and how to point
 	 */
-	public PointerTriangle(DirectedEdge edge) {
+	public PointerTriangle(PEdge edge) {
 		super(edge.getStartNode(), edge.getEndNode());
 		setPaint(Style.COLOR_LINEEND);
 

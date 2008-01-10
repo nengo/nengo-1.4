@@ -11,7 +11,7 @@ import ca.shu.ui.lib.world.WorldObject;
  * 
  * @author Shu Wu
  */
-public class RectangularEdge extends DirectedEdge {
+public class RectangularEdge extends PEdge {
 
 	private static final long serialVersionUID = 1L;
 

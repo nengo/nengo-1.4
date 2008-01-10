@@ -14,7 +14,6 @@ import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
  */
 public class ExampleRunner {
 	private Network network;
-	private String networkName;
 	private UINetwork networkUI;
 
 	/**
@@ -24,8 +23,8 @@ public class ExampleRunner {
 	 *            Network to be given to NeoGraphics
 	 */
 	public ExampleRunner(String name, Network network) {
-		this.networkName = name;
 		this.network = network;
+		System.out.println("Running example: " + name);
 
 		/**
 		 * All UI funcitons and constructors must be invoked from the Swing

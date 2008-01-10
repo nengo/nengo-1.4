@@ -281,9 +281,9 @@ public class Window extends WorldObject implements Interactable {
 		}
 	}
 
-	public JPopupMenu showContextMenu() {
+	public JPopupMenu getContextMenu() {
 		if (getWindowContent() instanceof Interactable) {
-			return ((Interactable) (getWindowContent())).showContextMenu();
+			return ((Interactable) (getWindowContent())).getContextMenu();
 		}
 		return null;
 	}

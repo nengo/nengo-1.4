@@ -4,17 +4,20 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-import ca.shu.ui.lib.objects.DirectedEdge;
+import ca.shu.ui.lib.objects.PEdge;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldGround;
+import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.Layout;
-import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
@@ -27,8 +30,8 @@ public class ElasticGround extends WorldGround {
 	private ElasticLayoutRunner elasticLayoutThread;
 	private boolean childrenUpdatedFlag = false;
 
-	public ElasticGround(ElasticWorld world, PLayer layer) {
-		super(world, layer);
+	public ElasticGround() {
+		super();
 		this.addPropertyChangeListener(new PropertyChangeListener() {
 
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -62,7 +65,7 @@ public class ElasticGround extends WorldGround {
 
 	private Hashtable<ElasticObject, ElasticVertex> myVertexMap = new Hashtable<ElasticObject, ElasticVertex>();
 
-	private Hashtable<DirectedEdge, DirectedSparseEdge> myEdgeMap = new Hashtable<DirectedEdge, DirectedSparseEdge>();
+	private Hashtable<PEdge, AbstractSparseEdge> myEdgeMap = new Hashtable<PEdge, AbstractSparseEdge>();
 
 	// private class EdgeMap {
 	// private Hashtable<ElasticObject, HashSet<ElasticObject>> myEdgesMap = new
@@ -225,13 +228,32 @@ public class ElasticGround extends WorldGround {
 
 	}
 
+	public static class UpdateGraphResult {
+		private boolean graphUpdated;
+		private Collection<ElasticVertex> addedVertices;
+
+		public UpdateGraphResult(boolean graphUpdated,
+				Collection<ElasticVertex> addedVertices) {
+			super();
+			this.graphUpdated = graphUpdated;
+			this.addedVertices = addedVertices;
+		}
+
+		public boolean isGraphUpdated() {
+			return graphUpdated;
+		}
+
+		public Collection<ElasticVertex> getAddedVertices() {
+			return addedVertices;
+		}
+
+	}
+
 	/**
 	 * This method must be executed from the swing dispatcher thread because it
 	 * must be synchronized with the Graphical children elements.
-	 * 
-	 * @return True, if the graph changed
 	 */
-	public boolean updateGraph() {
+	public UpdateGraphResult updateGraph() {
 		// if (!SwingUtilities.isEventDispatchThread()) {
 		// Util.debugMsg("Update not dispatched from Swing thread");
 		// }
@@ -242,8 +264,9 @@ public class ElasticGround extends WorldGround {
 			childrenUpdatedFlag = true;
 			myGraph = new DirectedSparseGraph();
 		}
-
+		Collection<ElasticVertex> addedVertexes = Collections.emptyList();
 		if (childrenUpdatedFlag) {
+			addedVertexes = new LinkedList<ElasticVertex>();
 			childrenUpdatedFlag = false;
 
 			Iterator<?> it = getChildrenIterator();
@@ -257,6 +280,8 @@ public class ElasticGround extends WorldGround {
 					ElasticVertex vertex = new ElasticVertex(obj);
 					myGraph.addVertex(vertex);
 					myVertexMap.put(obj, vertex);
+					addedVertexes.add(vertex);
+
 					changed = true;
 				}
 			}
@@ -288,9 +313,9 @@ public class ElasticGround extends WorldGround {
 		/**
 		 * Add edges
 		 */
-		List<DirectedEdge> edges = getEdges();
+		Collection<PEdge> edges = getEdges();
 
-		for (DirectedEdge uiEdge : edges) {
+		for (PEdge uiEdge : edges) {
 
 			PNode startNode = uiEdge.getStartNode();
 			PNode endNode = uiEdge.getEndNode();
@@ -314,13 +339,13 @@ public class ElasticGround extends WorldGround {
 					Util.Assert(false, "Could not find vertice");
 				}
 
-				DirectedSparseEdge jungEdge = myEdgeMap.get(uiEdge);
+				AbstractSparseEdge jungEdge = myEdgeMap.get(uiEdge);
 
 				boolean createJungEdge = false;
 				if (jungEdge != null) {
 					// find if an existing edge has changed
-					if (jungEdge.getSource() != startVertex
-							|| jungEdge.getDest() != endVertex) {
+					if (jungEdge.getEndpoints().getFirst() != startVertex
+							|| jungEdge.getEndpoints().getSecond() != endVertex) {
 
 						myEdgeMap.remove(uiEdge);
 						myGraph.removeEdge(jungEdge);
@@ -339,6 +364,7 @@ public class ElasticGround extends WorldGround {
 					if (startVertex != endVertex) {
 						jungEdge = new DirectedSparseEdge(startVertex,
 								endVertex);
+
 						myEdgeMap.put(uiEdge, jungEdge);
 
 						myGraph.addEdge(jungEdge);
@@ -354,15 +380,15 @@ public class ElasticGround extends WorldGround {
 		/*
 		 * Remove edges
 		 */
-		List<DirectedEdge> edgesToRemove = new ArrayList<DirectedEdge>();
-		for (DirectedEdge uiEdge : myEdgeMap.keySet()) {
+		List<PEdge> edgesToRemove = new ArrayList<PEdge>();
+		for (PEdge uiEdge : myEdgeMap.keySet()) {
 			if (!containsEdge(uiEdge)) {
 				edgesToRemove.add(uiEdge);
 
 			}
 		}
-		for (DirectedEdge uiEdge : edgesToRemove) {
-			DirectedSparseEdge jungEdge = myEdgeMap.get(uiEdge);
+		for (PEdge uiEdge : edgesToRemove) {
+			AbstractSparseEdge jungEdge = myEdgeMap.get(uiEdge);
 			changed = true;
 			// have to check if the edge is still there because it might have
 			// been removed when the vertice was removed
@@ -373,7 +399,7 @@ public class ElasticGround extends WorldGround {
 		}
 
 		// Return whether the graph changed
-		return changed;
+		return new UpdateGraphResult(changed, addedVertexes);
 
 	}
 

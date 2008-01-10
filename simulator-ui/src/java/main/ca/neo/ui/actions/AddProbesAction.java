@@ -6,11 +6,11 @@ import java.util.HashMap;
 import javax.swing.JOptionPane;
 
 import ca.neo.model.SimulationException;
-import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.widgets.UIProbe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 
@@ -25,9 +25,9 @@ public class AddProbesAction extends ReversableAction {
 
 	private HashMap<UINeoNode, UIProbe> myCreatedProbesMap;
 
-	private Collection<UIModel> myNodes;
+	private Collection<ModelObject> myNodes;
 
-	public AddProbesAction(Collection<UIModel> nodes) {
+	public AddProbesAction(Collection<ModelObject> nodes) {
 		super("Add probes");
 
 		this.myNodes = nodes;
@@ -47,7 +47,7 @@ public class AddProbesAction extends ReversableAction {
 			int successCount = 0;
 			int failed = 0;
 
-			for (UIModel model : myNodes) {
+			for (ModelObject model : myNodes) {
 				if (model instanceof UINeoNode) {
 					UINeoNode node = (UINeoNode) model;
 					UIProbe probeCreated;
@@ -77,7 +77,7 @@ public class AddProbesAction extends ReversableAction {
 
 	@Override
 	protected void undo() throws ActionException {
-		for (UIModel model : myNodes) {
+		for (ModelObject model : myNodes) {
 			if (model instanceof UINeoNode) {
 				UINeoNode node = (UINeoNode) model;
 				UIProbe probeCreated = myCreatedProbesMap.get(node);

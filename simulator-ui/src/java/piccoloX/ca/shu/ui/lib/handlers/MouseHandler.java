@@ -149,7 +149,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 					&& (interactableObj != null)
 					&& (interactableObj == (Interactable) Util
 							.getNodeFromPickPath(event, Interactable.class))) {
-				menuToShow = interactableObj.showContextMenu();
+				menuToShow = interactableObj.getContextMenu();
 			}
 
 			if (menuToShow != null) {

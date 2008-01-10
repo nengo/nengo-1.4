@@ -1,7 +1,7 @@
 package ca.shu.ui.lib.world;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import ca.shu.ui.lib.objects.DirectedEdge;
+import ca.shu.ui.lib.objects.PEdge;
 import edu.umd.cs.piccolo.PCamera;
 
 /**
@@ -26,8 +26,11 @@ public class WorldSky extends PCamera implements IWorldLayer {
 	 * @param world
 	 *            World this layer belongs to
 	 */
-	public WorldSky(World world) {
+	public WorldSky() {
 		super();
+	}
+
+	public void setWorld(World world) {
 		this.world = world;
 	}
 
@@ -36,7 +39,7 @@ public class WorldSky extends PCamera implements IWorldLayer {
 	 * 
 	 * @see ca.shu.ui.lib.world.IWorldLayer#addEdge(ca.shu.ui.lib.objects.DirectedEdge)
 	 */
-	public void addEdge(DirectedEdge edge) {
+	public void addEdge(PEdge edge) {
 		throw new NotImplementedException();
 	}
 

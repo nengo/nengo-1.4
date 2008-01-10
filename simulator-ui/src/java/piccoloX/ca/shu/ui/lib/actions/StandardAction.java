@@ -135,7 +135,7 @@ public abstract class StandardAction implements Serializable {
 
 		} else if (runSwingType == RunThreadType.NON_SWING) {
 			if (SwingUtilities.isEventDispatchThread()) {
-				(new Thread() {
+				(new Thread(getDescription()) {
 					public void run() {
 						doActionInternal();
 					}

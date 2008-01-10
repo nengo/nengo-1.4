@@ -4,9 +4,9 @@ import java.util.Collection;
 
 import javax.swing.JOptionPane;
 
-import ca.neo.ui.models.UIModel;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.UIEnvironment;
 
 /**
@@ -17,10 +17,10 @@ import ca.shu.ui.lib.util.UIEnvironment;
 public class RemoveModelsAction extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
-	private Collection<UIModel> modelsToRemove;
+	private Collection<ModelObject> modelsToRemove;
 	private String typeName;
 
-	public RemoveModelsAction(Collection<UIModel> modelsToRemove,
+	public RemoveModelsAction(Collection<ModelObject> modelsToRemove,
 			String typeName) {
 		super("Remove " + typeName + "s");
 		this.modelsToRemove = modelsToRemove;
@@ -34,7 +34,7 @@ public class RemoveModelsAction extends StandardAction {
 				+ "s have been removed, it cannot be undone.", "Are you sure?",
 				JOptionPane.YES_NO_OPTION);
 		if (response == 0) {
-			for (UIModel model : modelsToRemove) {
+			for (ModelObject model : modelsToRemove) {
 				model.destroy();
 			}
 		} else {

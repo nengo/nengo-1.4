@@ -44,6 +44,8 @@ import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.Canvas;
 import ca.shu.ui.lib.world.Grid;
 import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.elastic.ElasticGround;
+import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.util.PDebug;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -133,10 +135,9 @@ public abstract class AppFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		canvas = new Canvas();
+		canvas = new Canvas(createGround());
 		canvas.createWorld();
 		canvas.setFocusable(true);
-
 		setSelectionMode(false);
 
 		getContentPane().add(canvas);
@@ -241,6 +242,10 @@ public abstract class AppFrame extends JFrame {
 		if (best != null) {
 			device.setDisplayMode(best);
 		}
+	}
+
+	protected ElasticGround createGround() {
+		return new ElasticGround();
 	}
 
 	protected PCamera createDefaultCamera() {
@@ -521,7 +526,7 @@ public abstract class AppFrame extends JFrame {
 	/**
 	 * @return the top-most World associated with this frame
 	 */
-	public World getWorld() {
+	public ElasticWorld getWorld() {
 		return canvas.getWorld();
 	}
 

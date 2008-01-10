@@ -1,4 +1,4 @@
-package ca.neo.ui.models;
+package ca.shu.ui.lib.objects.models;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -7,8 +7,8 @@ import javax.swing.JPopupMenu;
 
 import ca.neo.ui.actions.RemoveModelAction;
 import ca.neo.ui.models.tooltips.Tooltip;
-import ca.neo.ui.models.tooltips.TooltipTitle;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.neo.ui.models.tooltips.TooltipTitle;
 import ca.shu.ui.lib.activities.Pulsator;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
@@ -18,18 +18,18 @@ import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.elastic.ElasticObject;
 
 /**
- * A UI Object which wraps a NEO Model
+ * A UI Object which wraps a model
  * 
  * @author Shu Wu
  */
-public abstract class UIModel extends ElasticObject implements Interactable {
+public abstract class ModelObject extends ElasticObject implements Interactable {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * The property name that identifies a change in this node's NEO Model
+	 * The property name that identifies a change in this node's Model
 	 */
-	public static final String PROPERTY_MODEL = "neoModel";
+	public static final String PROPERTY_MODEL = "uiModel";
 
 	/**
 	 * Icon for this model
@@ -45,26 +45,26 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 	private boolean isModelBusy = false;
 
 	/**
-	 * NEO Model
+	 * Model
 	 */
 	private Object model;
 
 	private Pulsator pulsator = null;
 
 	/**
-	 * Creates a hollow wrapper without any NEO model
+	 * Creates a hollow wrapper without any model
 	 */
-	public UIModel() {
+	public ModelObject() {
 		super();
 	}
 
 	/**
-	 * Create a UI Wrapper around a NEO Model
+	 * Create a UI Wrapper around a Model
 	 * 
 	 * @param model
-	 *            NEO Model
+	 *            Model
 	 */
-	public UIModel(Object model) {
+	public ModelObject(Object model) {
 
 		setModel(model);
 
@@ -74,9 +74,7 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 	 * @return Constructed Context Menu
 	 */
 	protected void constructMenu(PopupMenuBuilder menu) {
-
 		menu.addAction(new RemoveModelAction("Remove this", this));
-
 	}
 
 	protected void constructTooltips(TooltipBuilder builder) {
@@ -131,7 +129,7 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 	}
 
 	/**
-	 * Fires when the NEO model has changed
+	 * Fires when the model has changed
 	 */
 	public void fireModelPropertyChanged() {
 		firePropertyChange(0, PROPERTY_MODEL, null, null);
@@ -149,7 +147,7 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 	}
 
 	/**
-	 * @return NEO Model
+	 * @return Model
 	 */
 	public Object getModel() {
 		return model;
@@ -157,16 +155,25 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 
 	@Override
 	public final WorldObject getTooltip() {
-		TooltipBuilder tooltips = showTooltips();
-		if (tooltips == null) {
-			return null;
+		String toolTipTitle = getFullName();
+
+		TooltipBuilder tooltipBuilder = new TooltipBuilder(toolTipTitle);
+		if (isModelBusy()) {
+
+			tooltipBuilder.addPart(new TooltipTitle("Currently busy"));
+
+		} else if (!isModelExists()) {
+			tooltipBuilder.addPart(new TooltipTitle("Model is not ready"));
 		} else {
-			return new Tooltip(tooltips);
+
+			constructTooltips(tooltipBuilder);
 		}
+
+		return new Tooltip(tooltipBuilder);
 	}
 
 	/**
-	 * @return What this type of NEO Model is called
+	 * @return What this type of Model is called
 	 */
 	public abstract String getTypeName();
 
@@ -175,7 +182,7 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 	}
 
 	/**
-	 * @return Whether the NEO Model exists
+	 * @return Whether the Model exists
 	 */
 	public boolean isModelExists() {
 		return (model != null);
@@ -183,7 +190,7 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 
 	/**
 	 * @param model
-	 *            New NEO Model
+	 *            New Model
 	 */
 	public void setModel(Object model) {
 		this.model = model;
@@ -215,11 +222,12 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * (non-Javadoc) This method is final. To add items to the menu, override
+	 * constructMenu() instead.
 	 * 
 	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
 	 */
-	public JPopupMenu showContextMenu() {
+	public final JPopupMenu getContextMenu() {
 		if (isModelBusy()) {
 			return null;
 		} else if (!isModelExists()) {
@@ -231,25 +239,6 @@ public abstract class UIModel extends ElasticObject implements Interactable {
 
 			return menu.toJPopupMenu();
 		}
-	}
-
-	/**
-	 * @return Constructed Tooltip
-	 */
-	public final TooltipBuilder showTooltips() {
-		String toolTipTitle = getFullName();
-		TooltipBuilder tooltipBuilder = new TooltipBuilder(toolTipTitle);
-		if (isModelBusy()) {
-
-			tooltipBuilder.addPart(new TooltipTitle("Currently busy"));
-
-		} else if (!isModelExists()) {
-			tooltipBuilder.addPart(new TooltipTitle("Model is not ready"));
-		} else {
-
-			constructTooltips(tooltipBuilder);
-		}
-		return tooltipBuilder;
 	}
 
 	/**

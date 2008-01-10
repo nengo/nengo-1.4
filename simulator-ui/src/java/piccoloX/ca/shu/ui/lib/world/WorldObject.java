@@ -31,6 +31,8 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 
 	public static final long TIME_BETWEEN_POPUPS = 1500;
 
+	private long busyAnimatingUntilTime = 0;
+
 	/**
 	 * Whether this object has been destroyed
 	 */
@@ -47,6 +49,8 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 * This object's name
 	 */
 	private String myName;
+
+	boolean isSelected = false;
 
 	/**
 	 * Creates an unnamed WorldObject
@@ -146,16 +150,6 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 		}
 	}
 
-	private long busyAnimatingUntilTime = 0;
-
-	public boolean isAnimating() {
-		if (busyAnimatingUntilTime < System.currentTimeMillis()) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -238,6 +232,14 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 
 	}
 
+	public boolean isAnimating() {
+		if (busyAnimatingUntilTime < System.currentTimeMillis()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	/**
 	 * @return Whether this Object has been destroyed
 	 */
@@ -250,6 +252,10 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 	 */
 	public boolean isSelectable() {
 		return isSelectable;
+	}
+
+	public boolean isSelected() {
+		return isSelected;
 	}
 
 	/**
@@ -340,7 +346,12 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 		this.myName = name;
 	}
 
-	@SuppressWarnings("unchecked")
+	public PTransformActivity animateToPosition(double x, double y,
+			long duration) {
+		return super.animateToPositionScaleRotation(x, y, getScale(),
+				getRotation(), duration);
+	}
+
 	@Override
 	public void setParent(PNode newParent) {
 		PNode oldParent = getParent();
@@ -353,16 +364,16 @@ public class WorldObject extends PNode implements INamedObject, IDestroyable {
 		}
 	}
 
-	public void setSelected(boolean isSelected) {
-
-	}
-
 	/**
 	 * @param isSelectable
 	 *            Whether this object is selectable by a Selection handler
 	 */
 	public void setSelectable(boolean isSelectable) {
 		this.isSelectable = isSelectable;
+	}
+
+	public void setSelected(boolean isSelected) {
+		this.isSelected = isSelected;
 	}
 
 	@Override

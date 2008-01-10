@@ -15,11 +15,14 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Add graph updated notificatier so that listeners may know when the graph 
+	has been changed from another thread
+	
+Figure out if directed edge are applying elastic forces in the right direction
+
 AppFrame needs a special WorldSky, which notifies the Frame when Window(s) are added to it.
 
-
 Optimize edge change detection in Elastic Ground.	
-
 
 Create a test which creates a Network via UI and compares results
 	are results deterministic?

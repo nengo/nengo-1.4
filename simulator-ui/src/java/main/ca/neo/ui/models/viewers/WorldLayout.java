@@ -2,10 +2,10 @@ package ca.neo.ui.models.viewers;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
-import ca.neo.ui.models.UINeoNode;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
@@ -13,7 +13,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  * 
  * @author Shu Wu
  */
-public class NodeLayout implements Serializable {
+public class WorldLayout implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -30,7 +30,7 @@ public class NodeLayout implements Serializable {
 	/**
 	 * Node positions referenced by name
 	 */
-	private Hashtable<String, PointSerializable> nodePositions;
+	private Hashtable<Integer, PointSerializable> nodePositions;
 
 	/**
 	 * Saved view bounds
@@ -40,24 +40,21 @@ public class NodeLayout implements Serializable {
 	/**
 	 * @param layoutName
 	 *            Name of the layout
-	 * @param nodeViewer
+	 * @param world
 	 *            Viewer containing nodes
 	 */
-	public NodeLayout(String layoutName, NodeViewer nodeViewer,
-			boolean elasticMode) {
+	public WorldLayout(String layoutName, World world, boolean elasticMode) {
 		super();
 		this.layoutName = layoutName;
 		this.elasticMode = elasticMode;
 
-		nodePositions = new Hashtable<String, PointSerializable>();
+		nodePositions = new Hashtable<Integer, PointSerializable>();
 
-		Enumeration<UINeoNode> en = nodeViewer.getNeoNodes().elements();
-
-		while (en.hasMoreElements()) {
-			UINeoNode node = en.nextElement();
-			addPosition(node.getName(), node.getOffset());
+		for (WorldObject object : world.getGround().getObjects()) {
+			addPosition(object, object.getOffset());
 		}
-		savedViewBounds = nodeViewer.getSky().getViewBounds();
+
+		savedViewBounds = world.getSky().getViewBounds();
 
 	}
 
@@ -67,8 +64,8 @@ public class NodeLayout implements Serializable {
 	 * @param position
 	 *            Position of node
 	 */
-	public void addPosition(String nodeName, Point2D position) {
-		nodePositions.put(nodeName, new PointSerializable(position));
+	private void addPosition(WorldObject wo, Point2D position) {
+		nodePositions.put(wo.hashCode(), new PointSerializable(position));
 	}
 
 	/**
@@ -83,8 +80,9 @@ public class NodeLayout implements Serializable {
 	 *            Name of node
 	 * @return Position of node
 	 */
-	public Point2D getPosition(String nodeName) {
-		return nodePositions.get(nodeName).toPoint2D();
+	public Point2D getPosition(WorldObject node) {
+
+		return nodePositions.get(node.hashCode()).toPoint2D();
 	}
 
 	/**

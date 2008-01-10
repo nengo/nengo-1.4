@@ -1,19 +1,20 @@
-package ca.neo.ui.actions;
+package ca.shu.ui.lib.actions;
 
+import java.util.Enumeration;
+
+import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.viewers.WorldLayout;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.neo.ui.models.viewers.NodeViewer;
 
 public abstract class LayoutAction extends ReversableAction {
 	private static final long serialVersionUID = 1L;
 
 	private WorldLayout savedLayout;
 
-	World nodeViewer;
+	NodeViewer nodeViewer;
 
-	public LayoutAction(World nodeViewer, String description, String actionName) {
+	public LayoutAction(NodeViewer nodeViewer, String description,
+			String actionName) {
 		super(description, actionName);
 		this.nodeViewer = nodeViewer;
 	}
@@ -28,8 +29,13 @@ public abstract class LayoutAction extends ReversableAction {
 
 	protected void restoreNodePositions() {
 
-		for (WorldObject wo : nodeViewer.getGround().getObjects()) {
-			wo.setOffset(savedLayout.getPosition(wo));
+		Enumeration<UINeoNode> en = nodeViewer.getNeoNodes().elements();
+
+		while (en.hasMoreElements()) {
+			UINeoNode node = en.nextElement();
+
+			node.setOffset(savedLayout.getPosition(node));
+
 		}
 	}
 

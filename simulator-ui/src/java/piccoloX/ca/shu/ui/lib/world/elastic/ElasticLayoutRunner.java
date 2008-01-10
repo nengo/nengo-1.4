@@ -1,6 +1,7 @@
 package ca.shu.ui.lib.world.elastic;
 
 import java.awt.geom.Point2D;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
@@ -34,9 +35,9 @@ public class ElasticLayoutRunner {
 	}
 
 	private void init() {
+
 		myParent.updateGraph();
 		myGraph = myParent.getGraph();
-		
 		this.layout = new ElasticLayout(myGraph,
 				new ElasticLayout.UnitLengthFunction(
 						SPRING_LAYOUT_NODE_DISTANCE));
@@ -50,6 +51,7 @@ public class ElasticLayoutRunner {
 			layout.forceMove(vertex, vertexLocation.getX(), vertexLocation
 					.getY());
 		}
+
 	}
 
 	private void runLayout() {
@@ -69,6 +71,8 @@ public class ElasticLayoutRunner {
 						}
 					}
 				});
+			} catch (InvocationTargetException e) {
+				e.getTargetException().printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -88,10 +92,17 @@ public class ElasticLayoutRunner {
 
 	private boolean updateLayout() {
 
-		boolean graphUpdated = myParent.updateGraph();
+		ElasticGround.UpdateGraphResult result = myParent.updateGraph();
 
-		if (graphUpdated) {
+		if (result.isGraphUpdated()) {
 			layout.update();
+
+			// update new vertex positions
+			for (ElasticVertex vertex : result.getAddedVertices()) {
+				layout.forceMove(vertex, vertex.getLocation().getX(), vertex
+						.getLocation().getY());
+			}
+
 			relaxCount = 0;
 		}
 
@@ -132,7 +143,7 @@ public class ElasticLayoutRunner {
 			public void run() {
 				runLayout();
 			}
-		});
+		}, "Elastic layout runner");
 
 		// myLayoutThread.setPriority(Thread.NORM_PRIORITY);
 		myLayoutThread.start();

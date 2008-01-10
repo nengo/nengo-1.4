@@ -3,7 +3,7 @@ package ca.shu.ui.lib.world;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import ca.shu.ui.lib.objects.DirectedEdge;
+import ca.shu.ui.lib.objects.PEdge;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -25,6 +25,12 @@ public interface IWorldLayer {
 	public World getWorld();
 
 	/**
+	 * @param world
+	 *            The world
+	 */
+	public void setWorld(World world);
+
+	/**
 	 * Converts a global coordinate to a local coordinate. This method modifies
 	 * the parameter.
 	 * 
@@ -34,7 +40,7 @@ public interface IWorldLayer {
 	 */
 	public Point2D globalToLocal(Point2D globalPoint);
 
-	public void addEdge(DirectedEdge edge);
+	public void addEdge(PEdge edge);
 
 	/**
 	 * Converts a local bound to a global bound. This method modifies the

@@ -1,12 +1,17 @@
 package ca.shu.ui.lib.world;
 
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import ca.shu.ui.lib.objects.DirectedEdge;
+import javax.swing.SwingUtilities;
+
+import ca.shu.ui.lib.objects.PEdge;
 import ca.shu.ui.lib.util.Util;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -37,13 +42,39 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 	 * @param world
 	 *            World this layer belongs to
 	 */
-	public WorldGround(World world, PLayer layer) {
+	public WorldGround() {
 		super();
-		this.world = world;
 		myEdgeHolder = new PNode();
 		myEdgeHolder.setPickable(false);
-		layer.addChild(myEdgeHolder);
+
 		this.setSelectable(false);
+		this.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals(PROPERTY_PARENT)) {
+
+				}
+			}
+		});
+	}
+
+	@Override
+	public void setParent(PNode newParent) {
+		if (!(newParent instanceof PLayer)) {
+			throw new InvalidParameterException();
+		}
+		super.setParent(newParent);
+		/*
+		 * Invoke later, otherwise the edge holder may be added below the
+		 * ground. We can't add directly here because this function is called
+		 * from also addChild
+		 */
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (getParent() != null) {
+					getParent().addChild(0, myEdgeHolder);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -65,7 +96,7 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 		super.addChild(index, child);
 	}
 
-	public void addEdge(DirectedEdge edge) {
+	public void addEdge(PEdge edge) {
 		myEdgeHolder.addChild(edge);
 	}
 
@@ -120,7 +151,7 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 				.getY(), 1, 0, 500);
 	}
 
-	public boolean containsEdge(DirectedEdge edge) {
+	public boolean containsEdge(PEdge edge) {
 		if (edge.getParent() == myEdgeHolder) {
 			return true;
 		} else {
@@ -145,17 +176,26 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 		}
 	}
 
-	public List<DirectedEdge> getEdges() {
-		myEdgeHolder.getChildrenCount();
-
-		ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>(
-				myEdgeHolder.getChildrenCount());
+	public Collection<PEdge> getEdges() {
+		ArrayList<PEdge> edges = new ArrayList<PEdge>(myEdgeHolder
+				.getChildrenCount());
 
 		Iterator<?> it = myEdgeHolder.getChildrenIterator();
 		while (it.hasNext()) {
-			edges.add((DirectedEdge) it.next());
+			edges.add((PEdge) it.next());
 		}
 		return edges;
+	}
+
+	public Collection<WorldObject> getObjects() {
+		ArrayList<WorldObject> objects = new ArrayList<WorldObject>(
+				getChildrenCount());
+
+		Iterator<?> it = getChildrenIterator();
+		while (it.hasNext()) {
+			objects.add((WorldObject) it.next());
+		}
+		return objects;
 	}
 
 	/**
@@ -168,6 +208,10 @@ public class WorldGround extends WorldObject implements IWorldLayer {
 	@Override
 	public World getWorld() {
 		return world;
+	}
+
+	public void setWorld(World world) {
+		this.world = world;
 	}
 
 	public void setChildFilter(ChildFilter childFilter) {

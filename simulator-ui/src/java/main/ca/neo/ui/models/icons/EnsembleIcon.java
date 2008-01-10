@@ -13,7 +13,7 @@ public class EnsembleIcon extends NodeContainerIcon {
 
 	public EnsembleIcon(UIEnsemble parent) {
 
-		super(parent, new IconImage("images/EnsembleIcon.gif"));
+		super(parent, new IconImage("images/neoIcons/EnsembleIcon.gif"));
 
 	}
 

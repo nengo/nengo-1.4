@@ -6,13 +6,14 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
+import ca.shu.ui.lib.objects.models.ModelObject;
 
 /**
  * A UIModel which can be configured through the IConfigurable interface
  * 
  * @author Shu Wu
  */
-public abstract class UIModelConfigurable extends UIModel implements
+public abstract class UIModelConfigurable extends ModelObject implements
 		IConfigurable {
 
 	public void preConfiguration(PropertySet props) throws ConfigException {

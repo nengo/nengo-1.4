@@ -10,7 +10,7 @@ import javax.swing.JPopupMenu;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.DirectedEdge;
+import ca.shu.ui.lib.objects.PEdge;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.IDroppable;
@@ -91,7 +91,7 @@ public abstract class LineConnector extends WorldObject implements
 
 	protected abstract boolean canConnectTo(ILineTermination termination);
 
-	protected DirectedEdge getEdge() {
+	protected PEdge getEdge() {
 		return myEdge;
 	}
 
@@ -189,13 +189,13 @@ public abstract class LineConnector extends WorldObject implements
 		myEdge.setPointerVisible(visible);
 	}
 
-	public JPopupMenu showContextMenu() {
+	public JPopupMenu getContextMenu() {
 
 		/*
 		 * delegate the context menu from the target if it's attached
 		 */
 		if ((myTermination != null) && (myTermination instanceof Interactable)) {
-			return ((Interactable) myTermination).showContextMenu();
+			return ((Interactable) myTermination).getContextMenu();
 		}
 
 		PopupMenuBuilder menu = new PopupMenuBuilder("Line End");
@@ -242,7 +242,7 @@ class DestroyListener implements PropertyChangeListener {
  * 
  * @author Shu Wu
  */
-class Edge extends DirectedEdge {
+class Edge extends PEdge {
 
 	private static final long serialVersionUID = 1L;
 

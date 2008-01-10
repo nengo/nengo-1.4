@@ -1,6 +1,5 @@
 package ca.neo.ui.models.viewers;
 
-import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -18,11 +17,11 @@ import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.ModelsContextMenu;
-import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
@@ -40,18 +39,8 @@ import edu.umd.cs.piccolo.util.PBounds;
  */
 public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		INodeContainer {
-	/**
-	 * Default layout bounds
-	 */
-	private static final Dimension DEFAULT_LAYOUT_BOUNDS = new Dimension(1000,
-			1000);
 
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * Layout bounds
-	 */
-	private Dimension layoutBounds = DEFAULT_LAYOUT_BOUNDS;
 
 	/**
 	 * Children of NEO nodes
@@ -125,28 +114,13 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		});
 	}
 
-	/**
-	 * Creates the layout context menu
-	 * 
-	 * @param menu
-	 *            menu builder
-	 */
+	@Override
 	protected void constructLayoutMenu(MenuBuilder menu) {
+		super.constructLayoutMenu(menu);
 		MenuBuilder sortMenu = menu.addSubMenu("Sort");
 
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
-	}
-
-	protected void constructLayoutAlgorithmsMenu(MenuBuilder menu) {
-
-	}
-
-	/**
-	 * @return Layout bounds to be used by Layout algorithms
-	 */
-	protected Dimension getLayoutBounds() {
-		return layoutBounds;
 	}
 
 	/**
@@ -283,8 +257,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	public void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
 
-		constructLayoutMenu(menu.addSubMenu("Layout"));
-
 		/*
 		 * File menu
 		 */
@@ -350,14 +322,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	}
 
 	/**
-	 * @param bounds
-	 *            New bounds
-	 */
-	public void setLayoutBounds(Dimension bounds) {
-		this.layoutBounds = bounds;
-	}
-
-	/**
 	 * Shows all widgets
 	 */
 	public void showAllOriginTerminations() {
@@ -370,12 +334,12 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 
 	@Override
 	public JPopupMenu showSelectionContextMenu() {
-		ArrayList<UIModel> models = new ArrayList<UIModel>(getSelection()
-				.size());
+		ArrayList<ModelObject> models = new ArrayList<ModelObject>(
+				getSelection().size());
 
 		for (WorldObject object : getSelection()) {
-			if (object instanceof UIModel) {
-				models.add((UIModel) object);
+			if (object instanceof ModelObject) {
+				models.add((ModelObject) object);
 
 			}
 		}
@@ -460,7 +424,8 @@ class NodeViewerStatus extends AbstractStatusHandler {
 
 	@Override
 	protected String getStatusMessage(PInputEvent event) {
-		UIModel wo = (UIModel) Util.getNodeFromPickPath(event, UIModel.class);
+		ModelObject wo = (ModelObject) Util.getNodeFromPickPath(event,
+				ModelObject.class);
 
 		StringBuilder statusStr = new StringBuilder(200);
 		if (getWorld().getGround().isElasticMode()) {

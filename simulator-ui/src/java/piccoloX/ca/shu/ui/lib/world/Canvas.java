@@ -5,7 +5,8 @@ import java.util.Vector;
 
 import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.UIEnvironment;
-
+import ca.shu.ui.lib.world.elastic.ElasticGround;
+import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -23,19 +24,26 @@ public class Canvas extends PCanvas {
 
 	static final double CLICK_ZOOM_PADDING = 100;
 
-	private World topWorld;
+	private ElasticWorld topWorld;
 
 	private Collection<World> worlds;
+	private ElasticGround worldGround;
 
-	public Canvas() {
+	public Canvas(ElasticGround worldGround) {
 		super();
 
 		setZoomEventHandler(null);
 		setPanEventHandler(null);
-
+		this.worldGround = worldGround;
 		worlds = new Vector<World>(5);
 
 	}
+
+	public void createWorld() {
+		topWorld = new ElasticWorld("Top World", new CanvasSky(), worldGround);
+		getLayer().addChild(topWorld);
+	}
+
 	public void addWindow(Window window) {
 		getWorld().getSky().addChild(window);
 	}
@@ -44,12 +52,7 @@ public class Canvas extends PCanvas {
 		worlds.add(world);
 	}
 
-	public void createWorld() {
-		topWorld = new CanvasWorld("Top Layer");
-		getLayer().addChild(topWorld);
-	}
-
-	public World getWorld() {
+	public ElasticWorld getWorld() {
 		return topWorld;
 	}
 
@@ -70,15 +73,14 @@ public class Canvas extends PCanvas {
 
 		super.setBounds(x, y, w, h);
 	}
-
 }
 
 class CanvasSky extends WorldSky {
 
 	private static final long serialVersionUID = 1L;
 
-	public CanvasSky(World world) {
-		super(world);
+	public CanvasSky() {
+		super();
 	}
 
 	@Override
@@ -113,16 +115,13 @@ class CanvasSky extends WorldSky {
 
 }
 
-class CanvasWorld extends World {
+class CanvasWorld extends ElasticWorld {
 	private static final long serialVersionUID = 1L;
 
-	public CanvasWorld(String name) {
-		super(name);
-	}
+	WorldGround worldGround;
 
-	@Override
-	protected CanvasSky createSky() {
-		return new CanvasSky(this);
+	public CanvasWorld(ElasticGround worldGround) {
+		super("World Canvas", new CanvasSky(), worldGround);
+		this.worldGround = worldGround;
 	}
-
 }

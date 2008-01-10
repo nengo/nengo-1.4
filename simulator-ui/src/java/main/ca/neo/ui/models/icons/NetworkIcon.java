@@ -11,7 +11,7 @@ public class NetworkIcon extends NodeContainerIcon {
 	private static final long serialVersionUID = 1L;
 
 	public NetworkIcon(UINetwork parent) {
-		super(parent, new IconImage("images/NetworkIcon.gif"));
+		super(parent, new IconImage("images/neoIcons/NetworkIcon.gif"));
 	}
 
 	@Override

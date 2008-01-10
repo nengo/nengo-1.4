@@ -1,7 +1,7 @@
 package ca.neo.ui.models.icons;
 
-import ca.neo.ui.models.UIModel;
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
@@ -13,7 +13,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
 public class NeuronIcon extends ModelIcon {
 	private static final long serialVersionUID = 1L;
 
-	public NeuronIcon(UIModel parent) {
+	public NeuronIcon(ModelObject parent) {
 		super(parent, PPath.createEllipse(0, 0, 50, 50));
 		getIconReal().setPaint(Style.COLOR_FOREGROUND);
 		configureLabel(false);

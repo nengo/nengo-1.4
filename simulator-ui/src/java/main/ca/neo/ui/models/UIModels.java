@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import ca.neo.ui.actions.AddProbesAction;
 import ca.neo.ui.actions.RemoveModelsAction;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 
 /**
@@ -15,8 +16,8 @@ import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 public class UIModels {
 
 	public static void constructMenuForModels(AbstractMenuBuilder menuBuilder,
-			Class<? extends UIModel> modelType, String typeName,
-			Collection<UIModel> homogeneousModels) {
+			Class<? extends ModelObject> modelType, String typeName,
+			Collection<ModelObject> homogeneousModels) {
 
 		menuBuilder.addAction(new RemoveModelsAction(homogeneousModels,
 				typeName));

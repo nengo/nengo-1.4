@@ -1,6 +1,6 @@
 package ca.neo.ui.models.icons;
 
-import ca.neo.ui.models.UIModel;
+import ca.shu.ui.lib.objects.models.ModelObject;
 
 /**
  * Icon for an Function Input
@@ -15,8 +15,8 @@ public class FunctionInputIcon extends ModelIcon {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public FunctionInputIcon(UIModel parent) {
-		super(parent, new IconImage("images/FunctionIcon.gif"));
+	public FunctionInputIcon(ModelObject parent) {
+		super(parent, new IconImage("images/neoIcons/FunctionIcon.gif"));
 		this.getIconReal().setScale(0.7f);
 
 	}

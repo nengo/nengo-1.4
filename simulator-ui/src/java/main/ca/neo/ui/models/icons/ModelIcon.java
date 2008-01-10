@@ -3,8 +3,8 @@ package ca.neo.ui.models.icons;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import ca.neo.ui.models.UIModel;
 import ca.shu.ui.lib.objects.PXText;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 
@@ -31,7 +31,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 	/**
 	 * Parent of this icon
 	 */
-	private UIModel parent;
+	private ModelObject parent;
 
 	/**
 	 * Whether to show the type of model in the label
@@ -46,7 +46,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 	 * @param scale
 	 *            Scale of the Icon
 	 */
-	public ModelIcon(UIModel parent, PNode icon) {
+	public ModelIcon(ModelObject parent, PNode icon) {
 		super();
 		this.parent = parent;
 		this.iconReal = icon;
@@ -62,7 +62,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 		}
 
 		// parent.addPropertyChangeListener(PROPERTY_NAME, this);
-		parent.addPropertyChangeListener(UIModel.PROPERTY_MODEL, this);
+		parent.addPropertyChangeListener(ModelObject.PROPERTY_MODEL, this);
 		setSelectable(false);
 
 		/*
@@ -83,7 +83,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 		return iconReal;
 	}
 
-	protected UIModel getModelParent() {
+	protected ModelObject getModelParent() {
 		return parent;
 	}
 
@@ -152,7 +152,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 
 		if (propertyName == PROPERTY_FULL_BOUNDS) {
 			updateBounds();
-		} else if (propertyName == UIModel.PROPERTY_MODEL) {
+		} else if (propertyName == ModelObject.PROPERTY_MODEL) {
 			modelUpdated();
 		}
 

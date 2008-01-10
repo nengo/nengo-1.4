@@ -2,11 +2,11 @@ package ca.neo.ui.models.nodes.widgets;
 
 import java.awt.Color;
 
-import ca.neo.ui.models.UIModel;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ProbeIcon;
+import ca.shu.ui.lib.objects.models.ModelObject;
 
-public abstract class UIProbe extends UIModel {
+public abstract class UIProbe extends ModelObject {
 
 	private static final long serialVersionUID = 1L;
 	private ProbeIcon myIcon;

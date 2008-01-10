@@ -2,8 +2,8 @@ package ca.neo.ui.models.icons;
 
 import java.awt.Color;
 
-import ca.neo.ui.models.UIModel;
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
@@ -17,7 +17,7 @@ public class ProbeIcon extends ModelIcon {
 
 	private static final long serialVersionUID = 1L;
 
-	public ProbeIcon(UIModel parent) {
+	public ProbeIcon(ModelObject parent) {
 		super(parent, new Triangle());
 
 	}
