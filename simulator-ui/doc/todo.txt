@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+01/12/2008 - Use ClassRegistry to register classes in plugins directory
 12/22/2007 - The Java Swing Frame's title is updated with the maximized Window's name
 12/22/2007 - Data List viewer recursively find data nodes and displays the correct number
 12/22/2007 - UpdateGraph() is called from Swing context to avoid synchronization problems 
@@ -15,17 +16,20 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+
+
+Request:
+	ConfigurationImpl is not serializable, breaks the serialization of TimeSeries
+	
+	Create a test which creates a Network via UI and compares results
+		are results deterministic?
+
+
 Add graph updated notificatier so that listeners may know when the graph 
 	has been changed from another thread
 	
 Figure out if directed edge are applying elastic forces in the right direction
 
-AppFrame needs a special WorldSky, which notifies the Frame when Window(s) are added to it.
-
-Optimize edge change detection in Elastic Ground.	
-
-Create a test which creates a Network via UI and compares results
-	are results deterministic?
 	
 Transient messages should not fall off the screen
 	reference tooltips code

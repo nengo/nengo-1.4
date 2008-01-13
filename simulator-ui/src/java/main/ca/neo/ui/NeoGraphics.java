@@ -1,13 +1,24 @@
 package ca.neo.ui;
 
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import ca.neo.config.ClassRegistry;
 import ca.neo.model.Network;
 import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
@@ -26,12 +37,16 @@ import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 
 /**
  * Top level instance of the NeoGraphics application
  * 
  * @author Shu Wu
+ */
+/**
+ * @author User
  */
 public class NeoGraphics extends AppFrame implements INodeContainer {
 	private static final long serialVersionUID = 1L;
@@ -45,14 +60,14 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 			+ "<BR> User Interface by Shu Wu (shuwu83@gmail.com)";
 
 	/**
-	 * File extension for Neo Nodes
-	 */
-	public static final String NEONODE_FILE_EXTENSION = "neonode";
-
-	/**
 	 * UI delegate object used to show the FileChooser
 	 */
 	public static NeoFileChooser FileChooser;
+
+	/**
+	 * File extension for Neo Nodes
+	 */
+	public static final String NEONODE_FILE_EXTENSION = "neonode";
 
 	/**
 	 * Runs NeoGraphics with a default name
@@ -63,13 +78,15 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		new NeoGraphics();
 	}
 
+	/**
+	 * Data viewer dialog
+	 */
 	private JDialog dataViewerDialog = null;
 
+	/**
+	 * Data viewer data
+	 */
 	private SimulatorDataModel simulationData;
-	
-	public String getAppWindowTitle() {
-		return "NEO Workspace";
-	}
 
 	/**
 	 * @param title
@@ -87,12 +104,85 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		}
 
 		/*
+		 * Register plugin classes
+		 */
+		registerPlugins();
+
+		/*
 		 * Set up Environment variables
 		 */
 		Environment.setUserInterface(true);
-		// PDebug.debugThreads = true;
-		// PDebug.debugPrintUsedMemory = true;
+	}
 
+	static final String PLUGIN_DIRECTORY = "plugins";
+
+	/**
+	 * Register plugins
+	 */
+	private void registerPlugins() {
+		try {
+			LinkedList<URL> pluginUrls = new LinkedList<URL>();
+			LinkedList<JarFile> pluginJars = new LinkedList<JarFile>();
+
+			File pluginDir = new File(PLUGIN_DIRECTORY);
+			pluginUrls.add(pluginDir.toURI().toURL());
+
+			File[] pluginJarFiles = pluginDir.listFiles(new FilenameFilter() {
+				public boolean accept(File dir, String name) {
+					if (name.endsWith("jar")) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			});
+
+			for (File jarFile : pluginJarFiles) {
+				pluginUrls.add(jarFile.toURI().toURL());
+			}
+
+			URL[] pluginUrlsArray = pluginUrls.toArray(new URL[] {});
+
+			URLClassLoader urlClassLoader = new URLClassLoader(pluginUrlsArray);
+
+			/*
+			 * Loads all classes in each plugin jar
+			 */
+			for (File jarFile : pluginJarFiles) {
+				try {
+					JarFile jar = new JarFile(jarFile);
+					pluginJars.add(jar);
+					Enumeration<JarEntry> entries = jar.entries();
+					while (entries.hasMoreElements()) {
+						JarEntry entry = entries.nextElement();
+						String fileName = entry.getName();
+						if (fileName.endsWith(".class")) {
+							try {
+								String className = fileName.substring(0,
+										fileName.lastIndexOf('.')).replace('/',
+										'.');// .replace('$', '.');
+								Class<?> newClass = urlClassLoader
+										.loadClass(className);
+
+								Util.debugMsg("Registering class: "
+										+ newClass.getName());
+								ClassRegistry.getInstance().register(newClass);
+
+							} catch (ClassNotFoundException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+
+					pluginUrls.add(jarFile.toURI().toURL());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -161,6 +251,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	@Override
 	public String getAppName() {
 		return "NeoGraphics";
+	}
+
+	public String getAppWindowTitle() {
+		return "NEO Workspace";
 	}
 
 	@Override

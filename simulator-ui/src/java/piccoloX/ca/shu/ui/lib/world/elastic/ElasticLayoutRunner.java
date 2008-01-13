@@ -9,7 +9,7 @@ import ca.shu.ui.lib.util.ElasticLayout;
 import ca.shu.ui.lib.util.Util;
 import edu.uci.ics.jung.graph.ArchetypeVertex;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.impl.SparseGraph;
 
 public class ElasticLayoutRunner {
 	/**
@@ -24,7 +24,7 @@ public class ElasticLayoutRunner {
 
 	private ElasticLayout layout;
 
-	private DirectedSparseGraph myGraph;
+	private SparseGraph myGraph;
 
 	private final ElasticGround myParent;
 

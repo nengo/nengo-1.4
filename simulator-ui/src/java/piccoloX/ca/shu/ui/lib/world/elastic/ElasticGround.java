@@ -16,7 +16,8 @@ import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldGround;
 import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.impl.SparseGraph;
+import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.visualization.Layout;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -25,7 +26,7 @@ public class ElasticGround extends WorldGround {
 
 	private static final long serialVersionUID = 1L;
 
-	private DirectedSparseGraph myGraph;
+	private SparseGraph myGraph;
 
 	private ElasticLayoutRunner elasticLayoutThread;
 	private boolean childrenUpdatedFlag = false;
@@ -59,7 +60,7 @@ public class ElasticGround extends WorldGround {
 	/**
 	 * @return The current graph representation of the Ground.
 	 */
-	public DirectedSparseGraph getGraph() {
+	public SparseGraph getGraph() {
 		return myGraph;
 	}
 
@@ -262,7 +263,7 @@ public class ElasticGround extends WorldGround {
 		if (myGraph == null) {
 			changed = true;
 			childrenUpdatedFlag = true;
-			myGraph = new DirectedSparseGraph();
+			myGraph = new SparseGraph();
 		}
 		Collection<ElasticVertex> addedVertexes = Collections.emptyList();
 		if (childrenUpdatedFlag) {
@@ -362,8 +363,13 @@ public class ElasticGround extends WorldGround {
 				if (createJungEdge) {
 					// avoid recursive edges
 					if (startVertex != endVertex) {
-						jungEdge = new DirectedSparseEdge(startVertex,
-								endVertex);
+						if (uiEdge.isDirected()) {
+							jungEdge = new DirectedSparseEdge(startVertex,
+									endVertex);
+						} else {
+							jungEdge = new UndirectedSparseEdge(startVertex,
+									endVertex);
+						}
 
 						myEdgeMap.put(uiEdge, jungEdge);
 

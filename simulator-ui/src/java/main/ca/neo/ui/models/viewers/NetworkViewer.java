@@ -126,6 +126,8 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
+	private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
+
 	@Override
 	public void applyDefaultLayout() {
 		if (getNeoNodes().size() != 0) {
@@ -135,8 +137,10 @@ public class NetworkViewer extends NodeViewer {
 				applyJungLayout(KKLayout.class);
 			}
 		}
-		// enable elastic layout for Jung && when no nodes are loaded.
-		getGround().setElasticEnabled(true);
+		if (ELASTIC_LAYOUT_ENABLED_DEFAULT) {
+			// enable elastic layout for Jung && when no nodes are loaded.
+			getGround().setElasticEnabled(true);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
