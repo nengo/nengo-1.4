@@ -210,20 +210,4 @@ public class Util {
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	public static void openURL(String url) {
-
-		String[] cmd = new String[4];
-		cmd[0] = "cmd.exe";
-		cmd[1] = "/C";
-		cmd[2] = "start";
-		cmd[3] = url;
-
-		try {
-			Runtime.getRuntime().exec(cmd);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 }

@@ -38,6 +38,11 @@ public class RectangularEdge extends PEdge {
 		WorldObject start = getStartNode();
 		WorldObject end = getEndNode();
 
+		if (start.isDestroyed() || end.isDestroyed()) {
+			destroy();
+			return;
+		}
+
 		double sX = start.getX();
 		double sY = start.getY();
 		double sHY = start.getHeight() + sY;

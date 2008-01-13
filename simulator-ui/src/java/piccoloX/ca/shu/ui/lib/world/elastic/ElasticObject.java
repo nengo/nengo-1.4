@@ -88,9 +88,37 @@ public class ElasticObject extends WorldObject {
 	@Override
 	public void setSelected(boolean isSelected) {
 		super.setSelected(isSelected);
+		setPositionLocked(isSelected);
+	}
+
+	public boolean isPositionLocked() {
+		if (elasticGround != null) {
+			return elasticGround.isPositionLocked(this);
+		}
+		return false;
+	}
+
+	/**
+	 * Counts the number of times the position has been locked
+	 */
+	private int positionLock = 0;
+
+	public void setPositionLocked(boolean lock) {
+		if (lock) {
+			positionLock++;
+		} else {
+			positionLock--;
+			if (positionLock < 0)
+				positionLock = 0;
+		}
 
 		if (elasticGround != null) {
-			elasticGround.setElasticLock(this, isSelected);
+			if (positionLock > 0) {
+				elasticGround.setPositionLocked(this, true);
+			} else {
+				elasticGround.setPositionLocked(this, false);
+			}
+
 		}
 	}
 }

@@ -65,10 +65,7 @@ public class ElasticLayoutRunner {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						if (updateLayout()) {
-							myParent.updateChildrenFromLayout(layout, false,
-									false);
-						}
+						updateLayout();
 					}
 				});
 			} catch (InvocationTargetException e) {
@@ -90,7 +87,13 @@ public class ElasticLayoutRunner {
 		}
 	}
 
-	private boolean updateLayout() {
+	public void updateLayout() {
+		if (checkLayout()) {
+			myParent.updateChildrenFromLayout(layout, false, false);
+		}
+	}
+
+	private boolean checkLayout() {
 
 		ElasticGround.UpdateGraphResult result = myParent.updateGraph();
 
@@ -164,6 +167,10 @@ public class ElasticLayoutRunner {
 
 	public Point2D getLocation(ArchetypeVertex v) {
 		return layout.getLocation(v);
+	}
+
+	public boolean isLockedVertex(Vertex v) {
+		return layout.isLocked(v);
 	}
 
 	public void lockVertex(Vertex v) {

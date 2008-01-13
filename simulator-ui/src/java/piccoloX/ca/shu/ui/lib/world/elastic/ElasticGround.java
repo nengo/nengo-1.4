@@ -68,33 +68,6 @@ public class ElasticGround extends WorldGround {
 
 	private Hashtable<PEdge, AbstractSparseEdge> myEdgeMap = new Hashtable<PEdge, AbstractSparseEdge>();
 
-	// private class EdgeMap {
-	// private Hashtable<ElasticObject, HashSet<ElasticObject>> myEdgesMap = new
-	// Hashtable<ElasticObject, HashSet<ElasticObject>>();
-	//
-	// private class ProjectionsSet extends HashSet<ElasticObject> {
-	//
-	// private static final long serialVersionUID = 1L;
-	//
-	// }
-	//
-	// public void containsEdge(ElasticObject startNode, ElasticObject endNode)
-	// {
-	// ProjectionsSet projectionsTo = myEdgesMap.get(startNode);
-	//
-	// if (projectionsTo != null) {
-	// if (projectionsTo.contains(endNode)) {
-	// return true;
-	// }
-	// }
-	//
-	// }
-	//
-	// public void clear() {
-	// myEdgesMap.clear();
-	// }
-	// }
-
 	@Override
 	public ElasticWorld getWorld() {
 		return (ElasticWorld) super.getWorld();
@@ -143,9 +116,24 @@ public class ElasticGround extends WorldGround {
 		}
 	}
 
-	public void setElasticLock(ElasticObject node, boolean lockEnabled) {
+	/**
+	 * Locks the position of an elastic node so it isn't affected by the layout
+	 * runner
+	 * 
+	 * @param node
+	 * @param lockEnabled
+	 */
+	public void setPositionLocked(ElasticObject node, boolean lockEnabled) {
 		if (elasticLayoutThread != null) {
 			ElasticVertex vertex = myVertexMap.get(node);
+
+			if (vertex == null) {
+				// Try to update the layout and get the vertex again
+				// Node might have been updated recently and not added to the
+				// graph
+				elasticLayoutThread.updateLayout();
+				vertex = myVertexMap.get(node);
+			}
 
 			if (vertex != null) {
 				if (lockEnabled) {
@@ -153,9 +141,22 @@ public class ElasticGround extends WorldGround {
 				} else {
 					elasticLayoutThread.unlockVertex(vertex);
 				}
+			} else {
+				Util.Assert(false, "Vertex not found");
 			}
 		}
 
+	}
+
+	public boolean isPositionLocked(ElasticObject node) {
+		if (elasticLayoutThread != null) {
+			ElasticVertex vertex = myVertexMap.get(node);
+
+			if (vertex != null) {
+				return elasticLayoutThread.isLocked(vertex);
+			}
+		}
+		return false;
 	}
 
 	public void updateChildrenFromLayout(Layout layout, boolean animateNodes,

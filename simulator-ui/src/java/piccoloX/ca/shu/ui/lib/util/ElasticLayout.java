@@ -213,7 +213,11 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 
 				double f = force_multiplier * (desiredLen - len) / len;
 
-				f = f * Math.pow(stretch, (v1.degree() + v2.degree() - 2));
+				// f = f * Math.pow(stretch, (v1.degree() + v2.degree() - 2));
+				// shuwu: reduced the degree attenuation with a sqrt dampener
+				f = f
+						* Math.pow(stretch, Math.sqrt((v1.degree()
+								+ v2.degree() - 2)));
 
 				// the actual movement distance 'dx' is the force multiplied by
 				// the

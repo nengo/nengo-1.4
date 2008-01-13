@@ -91,11 +91,12 @@ public class TooltipWrapper extends WorldObject implements
 				- ((getWidth() - followBounds.getWidth()) / 2f);
 		double y = followBounds.getY() + followBounds.getHeight();
 
+		if (x + getWidth() > camera.getBounds().getWidth()) {
+			x = camera.getBounds().getWidth() - getWidth();
+		}
+
 		if (x < 0) {
 			x = 0;
-		} else if (x + getWidth() > camera.getBounds().getWidth()) {
-			x = camera.getBounds().getWidth() - getWidth();
-
 		}
 		if ((y + getHeight() > camera.getBounds().getHeight())
 				&& ((followBounds.getY() - getHeight()) > 0)) {
@@ -156,12 +157,12 @@ public class TooltipWrapper extends WorldObject implements
 		fadeInActivity = new Fader(this, 100, 1f);
 		addActivity(fadeInActivity);
 
-//		/*
-//		 * fade in more slowly in the second phase.
-//		 */
-//		fadeInPhase2Activity = new Fader(this, 1000, 1f);
-//		fadeInPhase2Activity.startAfter(fadeInActivity);
-//		addActivity(fadeInPhase2Activity);
+		// /*
+		// * fade in more slowly in the second phase.
+		// */
+		// fadeInPhase2Activity = new Fader(this, 1000, 1f);
+		// fadeInPhase2Activity.startAfter(fadeInActivity);
+		// addActivity(fadeInPhase2Activity);
 
 	}
 
