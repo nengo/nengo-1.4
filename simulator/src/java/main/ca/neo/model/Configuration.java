@@ -19,14 +19,16 @@ import java.util.List;
  *  <li>Units</li>
  *  </ul>
  *  
+ *  TODO: should there be a mutableSize parameter to support vector length changes? (e.g. currents in DynamicalSystemSpikeGenerator)
+ *  
  * @author Bryan Tripp
  */
 public interface Configuration {
 	
 	/**
-	 * @return The Configurable to which this Configuration belongs
+	 * @return The Object to which this Configuration belongs
 	 */
-	public Configurable getConfigurable();
+	public Object getConfigurable();
 
 	/**
 	 * @return Names of configuration properties 

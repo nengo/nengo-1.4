@@ -24,13 +24,13 @@ import ca.neo.model.StructuralException;
  */
 public class ConfigurationImpl implements Configuration {
 
-	private Configurable myConfigurable;
+	private Object myConfigurable;
 	private Map<String, Property> myProperties;
 	
 	/**
-	 * @param configurable The Configurable to which this Configuration belongs
+	 * @param configurable The Object to which this Configuration belongs
 	 */
-	public ConfigurationImpl(Configurable configurable) {
+	public ConfigurationImpl(Object configurable) {
 		myConfigurable = configurable;
 		myProperties = new HashMap<String, Property>(20);
 	}
@@ -38,7 +38,7 @@ public class ConfigurationImpl implements Configuration {
 	/**
 	 * @see ca.neo.model.Configuration#getConfigurable()
 	 */
-	public Configurable getConfigurable() {
+	public Object getConfigurable() {
 		return myConfigurable;
 	}
 
@@ -502,7 +502,7 @@ public class ConfigurationImpl implements Configuration {
 		public Object getValue() {
 			Object result = null;
 			
-			Configurable c = getConfiguration().getConfigurable();
+			Object c = getConfiguration().getConfigurable();
 			String methodName = "get" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
 			
 			try {
@@ -563,7 +563,7 @@ public class ConfigurationImpl implements Configuration {
 		 */
 		public void setValue(Object value) throws StructuralException {
 			if (getType().isAssignableFrom(value.getClass())) {
-				Configurable c = getConfiguration().getConfigurable();
+				Object c = getConfiguration().getConfigurable();
 				String methodName = "set" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
 				Class argClass = getType();
 				//TODO: use handlers? support other primitives?
