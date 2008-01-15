@@ -1,8 +1,8 @@
-package ca.shu.ui.lib.handlers;
+package ca.shu.ui.lib.world.handlers;
 
 import java.text.NumberFormat;
 
-import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
@@ -12,7 +12,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  */
 public class TopWorldStatusHandler extends AbstractStatusHandler {
 
-	public TopWorldStatusHandler(World world) {
+	public TopWorldStatusHandler(WorldImpl world) {
 		super(world);
 	}
 

@@ -1,12 +1,12 @@
 package ca.shu.ui.lib.util;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Hashtable;
 
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.util.PBounds;
+import ca.shu.ui.lib.world.IWorld;
+import ca.shu.ui.lib.world.IWorldObject;
 
 /**
  * Layout of nodes which is serializable
@@ -35,7 +35,7 @@ public class WorldLayout implements Serializable {
 	/**
 	 * Saved view bounds
 	 */
-	private PBounds savedViewBounds;
+	private Rectangle2D savedViewBounds;
 
 	/**
 	 * @param layoutName
@@ -43,14 +43,14 @@ public class WorldLayout implements Serializable {
 	 * @param world
 	 *            Viewer containing nodes
 	 */
-	public WorldLayout(String layoutName, World world, boolean elasticMode) {
+	public WorldLayout(String layoutName, IWorld world, boolean elasticMode) {
 		super();
 		this.layoutName = layoutName;
 		this.elasticMode = elasticMode;
 
 		nodePositions = new Hashtable<Integer, PointSerializable>();
 
-		for (WorldObject object : world.getGround().getObjects()) {
+		for (IWorldObject object : world.getGround().getChildren()) {
 			addPosition(object, object.getOffset());
 		}
 
@@ -64,7 +64,7 @@ public class WorldLayout implements Serializable {
 	 * @param position
 	 *            Position of node
 	 */
-	private void addPosition(WorldObject wo, Point2D position) {
+	private void addPosition(IWorldObject wo, Point2D position) {
 		nodePositions.put(wo.hashCode(), new PointSerializable(position));
 	}
 
@@ -80,15 +80,19 @@ public class WorldLayout implements Serializable {
 	 *            Name of node
 	 * @return Position of node
 	 */
-	public Point2D getPosition(WorldObject node) {
-
-		return nodePositions.get(node.hashCode()).toPoint2D();
+	public Point2D getPosition(IWorldObject node) {
+		PointSerializable savedPosition = nodePositions.get(node.hashCode());
+		if (savedPosition != null) {
+			return nodePositions.get(node.hashCode()).toPoint2D();
+		} else {
+			return null;
+		}
 	}
 
 	/**
 	 * @return Saved view bounds
 	 */
-	public PBounds getSavedViewBounds() {
+	public Rectangle2D getSavedViewBounds() {
 		return savedViewBounds;
 	}
 

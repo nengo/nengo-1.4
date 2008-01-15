@@ -6,7 +6,6 @@ import ca.shu.ui.lib.objects.models.ModelObject;
  * Icon for an Function Input
  * 
  * @author Shu Wu
- * 
  */
 public class FunctionInputIcon extends ModelIcon {
 

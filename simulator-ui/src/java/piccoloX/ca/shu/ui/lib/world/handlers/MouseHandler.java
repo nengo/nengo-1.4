@@ -1,4 +1,4 @@
-package ca.shu.ui.lib.handlers;
+package ca.shu.ui.lib.world.handlers;
 
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
@@ -7,12 +7,13 @@ import java.awt.geom.Point2D;
 import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.SelectionBorder;
-import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.Interactable;
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
+import ca.shu.ui.lib.world.piccolo.objects.SelectionBorder;
+import ca.shu.ui.lib.world.piccolo.objects.Window;
+import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -47,9 +48,9 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	private Point2D mouseCanvasPositionPressed;
 
-	private World world;
+	private WorldImpl world;
 
-	public MouseHandler(World world) {
+	public MouseHandler(WorldImpl world) {
 		super();
 		frame = new SelectionBorder(world);
 		frame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
@@ -63,7 +64,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
 				Interactable.class);
 
-		if (obj == null || !world.isAncestorOf((WorldObject) obj)) {
+		if (obj == null || !world.isAncestorOf(obj)) {
 			return null;
 		} else {
 			return obj;
@@ -76,9 +77,10 @@ public class MouseHandler extends PBasicInputEventHandler {
 			PNode node = event.getPickedNode();
 
 			while (node != null) {
-				if (node instanceof WorldObject) {
+				if (node instanceof PiccoloNodeInWorld) {
 
-					WorldObject wo = (WorldObject) node;
+					IWorldObject wo = ((PiccoloNodeInWorld) node)
+							.getWorldObjectParent();
 
 					wo.doubleClicked();
 
@@ -101,7 +103,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 		 * Show cursor and frame around interactable objects NOTE: Do not show
 		 * cursor and frame around Windows or Worlds
 		 */
-		if (obj == null || (obj instanceof Window) || (obj instanceof World)) {
+		if (obj == null || (obj instanceof Window) || (obj instanceof WorldImpl)) {
 			if (handCursorShown) {
 				handCursorShown = false;
 				event.getComponent().popCursor();
@@ -114,7 +116,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 				event.getComponent().pushCursor(HAND_CURSOR);
 			}
 
-			frame.setSelected((WorldObject) obj);
+			frame.setSelected((IWorldObject) obj);
 
 		}
 

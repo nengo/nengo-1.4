@@ -3,12 +3,12 @@ package ca.shu.ui.lib.objects.lines;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PPickPath;
 
-public abstract class LineWell extends WorldObject {
+public abstract class LineWell extends WorldObjectImpl {
 
 	private static final long serialVersionUID = 1L;
 	private LineOriginIcon myIcon;
@@ -78,8 +78,8 @@ class CreateLineEndHandler extends PBasicInputEventHandler {
 
 		PPickPath path = event.getPath();
 
-		path.pushNode(newLineEnd);
-		path.pushTransform(newLineEnd.getTransform());
+		path.pushNode(newLineEnd.getPiccolo());
+		path.pushTransform(newLineEnd.getPiccolo().getTransform());
 
 	}
 

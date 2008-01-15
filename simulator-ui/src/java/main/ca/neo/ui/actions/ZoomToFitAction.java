@@ -2,7 +2,7 @@ package ca.neo.ui.actions;
 
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
 
 /**
  * Action to zoom to fit
@@ -13,9 +13,9 @@ public class ZoomToFitAction extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
 
-	World world;
+	WorldImpl world;
 
-	public ZoomToFitAction(String actionName, World world) {
+	public ZoomToFitAction(String actionName, WorldImpl world) {
 		super("Zoom to fit", actionName);
 		this.world = world;
 	}

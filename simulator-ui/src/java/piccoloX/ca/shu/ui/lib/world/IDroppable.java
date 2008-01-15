@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface IDroppable {
 
-	public void justDropped(List<WorldObject> targets);
+	public void justDropped(List<IWorldObject> targets);
 }

@@ -3,7 +3,7 @@ package ca.shu.ui.lib.objects.activities;
 import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 
 /**
  * An action which is tracked by the UI. Since tracked actions are slow and have
@@ -18,14 +18,14 @@ public abstract class TrackedAction extends StandardAction {
 
 	private TrackedStatusMsg trackedMsg;
 
-	private WorldObject wo;
+	private WorldObjectImpl wo;
 
 	public TrackedAction(String taskName) {
 		this(taskName, null);
 
 	}
 
-	public TrackedAction(String taskName, WorldObject wo) {
+	public TrackedAction(String taskName, WorldObjectImpl wo) {
 		super(taskName, null, false);
 		this.taskName = taskName;
 		this.wo = wo;

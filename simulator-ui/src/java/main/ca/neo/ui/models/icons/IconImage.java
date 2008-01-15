@@ -8,18 +8,32 @@ import java.net.URL;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UIEnvironment;
-import edu.umd.cs.piccolo.nodes.PImage;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.PXImage;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
+
+public class IconImage extends WorldObjectImpl {
+
+	public IconImage(String arg0) {
+		super(new IconImageNode(arg0));
+		setSelectable(false);
+		setPickable(false);
+	}
+
+	public IconImage(URL arg0) {
+		super(new IconImageNode(arg0));
+
+	}
+}
 
 /**
  * Just like PImage, except it semantically zooms (ie. at low scales, it does
  * not paint its bitmap)
  * 
  * @author Shu Wu
- * 
  */
-public class IconImage extends PImage {
+class IconImageNode extends PXImage {
 
 	private static final long serialVersionUID = 1L;
 	private static final Ellipse2D.Float TEMP_ELLIPSE = new Ellipse2D.Float();
@@ -28,26 +42,26 @@ public class IconImage extends PImage {
 
 	private transient GeneralPath path;
 
-	PBounds originalBounds;
+	private PBounds originalBounds;
 
-	double prevScale = 0;
+	private double prevScale = 0;
 
-	public IconImage() {
+	public IconImageNode() {
 		super();
 		init();
 	}
 
-	public IconImage(Image arg0) {
+	public IconImageNode(Image arg0) {
 		super(arg0);
 		init();
 	}
 
-	public IconImage(String arg0) {
+	public IconImageNode(String arg0) {
 		super(arg0);
 		init();
 	}
 
-	public IconImage(URL arg0) {
+	public IconImageNode(URL arg0) {
 		super(arg0);
 		init();
 	}

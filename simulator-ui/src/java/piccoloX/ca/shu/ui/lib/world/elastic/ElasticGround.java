@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import ca.shu.ui.lib.objects.PEdge;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.WorldGround;
+import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
 import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.SparseGraph;
@@ -22,7 +22,7 @@ import edu.uci.ics.jung.visualization.Layout;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
-public class ElasticGround extends WorldGround {
+public class ElasticGround extends WorldGroundImpl {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,8 +33,7 @@ public class ElasticGround extends WorldGround {
 
 	public ElasticGround() {
 		super();
-		this.addPropertyChangeListener(new PropertyChangeListener() {
-
+		getPiccolo().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
 				if (evt.getPropertyName().compareTo(PNode.PROPERTY_CHILDREN) == 0) {
 					childrenUpdatedFlag = true;
@@ -66,7 +65,7 @@ public class ElasticGround extends WorldGround {
 
 	private Hashtable<ElasticObject, ElasticVertex> myVertexMap = new Hashtable<ElasticObject, ElasticVertex>();
 
-	private Hashtable<PEdge, AbstractSparseEdge> myEdgeMap = new Hashtable<PEdge, AbstractSparseEdge>();
+	private Hashtable<PXEdge, AbstractSparseEdge> myEdgeMap = new Hashtable<PXEdge, AbstractSparseEdge>();
 
 	@Override
 	public ElasticWorld getWorld() {
@@ -165,15 +164,14 @@ public class ElasticGround extends WorldGround {
 		 * Layout nodes
 		 */
 		boolean foundNode = false;
-		Iterator<?> it = getChildrenIterator();
 
 		double startX = Double.POSITIVE_INFINITY;
 		double startY = Double.POSITIVE_INFINITY;
 		double endX = Double.NEGATIVE_INFINITY;
 		double endY = Double.NEGATIVE_INFINITY;
 
-		while (it.hasNext()) {
-			ElasticObject elasticObj = (ElasticObject) (it.next());
+		for (IWorldObject child : getChildren()) {
+			ElasticObject elasticObj = (ElasticObject) (child);
 
 			ElasticVertex vertex = myVertexMap.get(elasticObj);
 			if (vertex != null) {
@@ -271,12 +269,11 @@ public class ElasticGround extends WorldGround {
 			addedVertexes = new LinkedList<ElasticVertex>();
 			childrenUpdatedFlag = false;
 
-			Iterator<?> it = getChildrenIterator();
 			/**
 			 * Add vertices
 			 */
-			while (it.hasNext()) {
-				ElasticObject obj = (ElasticObject) it.next();
+			for (IWorldObject wo : getChildren()) {
+				ElasticObject obj = (ElasticObject) wo;
 
 				if (!myVertexMap.containsKey(obj)) {
 					ElasticVertex vertex = new ElasticVertex(obj);
@@ -315,12 +312,12 @@ public class ElasticGround extends WorldGround {
 		/**
 		 * Add edges
 		 */
-		Collection<PEdge> edges = getEdges();
+		Collection<PXEdge> edges = getEdges();
 
-		for (PEdge uiEdge : edges) {
+		for (PXEdge uiEdge : edges) {
 
-			PNode startNode = uiEdge.getStartNode();
-			PNode endNode = uiEdge.getEndNode();
+			IWorldObject startNode = uiEdge.getStartNode();
+			IWorldObject endNode = uiEdge.getEndNode();
 
 			// Find the Elastic Objects which are ancestors of the start and
 			// end
@@ -387,14 +384,14 @@ public class ElasticGround extends WorldGround {
 		/*
 		 * Remove edges
 		 */
-		List<PEdge> edgesToRemove = new ArrayList<PEdge>();
-		for (PEdge uiEdge : myEdgeMap.keySet()) {
+		List<PXEdge> edgesToRemove = new ArrayList<PXEdge>();
+		for (PXEdge uiEdge : myEdgeMap.keySet()) {
 			if (!containsEdge(uiEdge)) {
 				edgesToRemove.add(uiEdge);
 
 			}
 		}
-		for (PEdge uiEdge : edgesToRemove) {
+		for (PXEdge uiEdge : edgesToRemove) {
 			AbstractSparseEdge jungEdge = myEdgeMap.get(uiEdge);
 			changed = true;
 			// have to check if the edge is still there because it might have

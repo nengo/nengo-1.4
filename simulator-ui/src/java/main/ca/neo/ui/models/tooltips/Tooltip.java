@@ -4,17 +4,16 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.PXText;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PText;
 
 /**
  * UI Object which builds itself from a ToolTipBuilder
  * 
  * @author Shu Wu
- * 
  */
-public class Tooltip extends WorldObject {
+public class Tooltip extends WorldObjectImpl {
 	private static final long serialVersionUID = 1L;
 
 	private TooltipBuilder tooltipBuilder;
@@ -31,29 +30,33 @@ public class Tooltip extends WorldObject {
 
 	private void init() {
 		PText tag = new PText(tooltipBuilder.getName());
+		tag.setConstrainWidthToTextWidth(false);
 		tag.setTextPaint(Style.COLOR_FOREGROUND);
 		tag.setFont(Style.FONT_LARGE);
 		tag.setWidth(tooltipWidth);
+		int layoutY = 0;
+		getPiccolo().addChild(tag);
 
-		addChild(tag);
+		layoutY += tag.getHeight() + 10;
 
 		Collection<ITooltipPart> parts = tooltipBuilder.getParts();
 
 		Iterator<ITooltipPart> it = parts.iterator();
 
 		/*
-		 * Builds the tooltip string
+		 * Builds the tooltip parts
 		 */
-		StringBuilder strBd = new StringBuilder(200);
+
 		while (it.hasNext()) {
 			ITooltipPart part = it.next();
+			IWorldObject wo = part.toWorldObject(tooltipWidth);
 
-			strBd.append(part.getTooltipString() + "\n");
+			wo.setOffset(wo.getOffset().getX(), layoutY);
+
+			addChild(wo);
+
+			layoutY += wo.getHeight();
 		}
-		PXText propertyText = new PXText(strBd.toString());
-		propertyText.setOffset(0, tag.getHeight() + 10);
-		propertyText.setWidth(tooltipWidth);
-		addChild(propertyText);
 
 		setBounds(parentToLocal(getFullBounds()));
 	}

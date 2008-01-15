@@ -1,7 +1,6 @@
 package ca.neo.ui.models.viewers;
 
 import java.awt.geom.Point2D;
-import java.util.Enumeration;
 
 import javax.swing.JOptionPane;
 
@@ -171,8 +170,8 @@ public class NetworkViewer extends NodeViewer {
 		 * Origins & Terminations
 		 */
 		menu.addSection("Origins and Terminations");
-		menu.addAction(new ShowAllOriginTerminations("Show all"));
-		menu.addAction(new HideAllOriginTerminations("Hide all"));
+		menu.addAction(new SetOTVisiblityAction("Show all", true));
+		menu.addAction(new SetOTVisiblityAction("Hide all", false));
 
 	}
 
@@ -212,7 +211,7 @@ public class NetworkViewer extends NodeViewer {
 	public boolean restoreNodeLayout(String name) {
 
 		NetworkViewerConfig config = getConfig();
-		WorldLayout layout = config.getLayout(name);
+		NodeLayout layout = config.getLayout(name);
 
 		if (layout == null) {
 			return false;
@@ -220,7 +219,7 @@ public class NetworkViewer extends NodeViewer {
 		getGround().setElasticEnabled(false);
 		boolean enableElasticMode = layout.elasticModeEnabled();
 
-		Enumeration<UINeoNode> en = getNeoNodes().elements();
+	
 
 		double startX = Double.MAX_VALUE;
 		double startY = Double.MAX_VALUE;
@@ -228,8 +227,7 @@ public class NetworkViewer extends NodeViewer {
 		double endY = Double.MIN_VALUE;
 		boolean foundSavedPosition = false;
 
-		while (en.hasMoreElements()) {
-			UINeoNode node = en.nextElement();
+		for (UINeoNode node : getNeoNodes()) {
 
 			Point2D savedPosition = layout.getPosition(node);
 			if (savedPosition != null) {
@@ -289,7 +287,7 @@ public class NetworkViewer extends NodeViewer {
 
 		NetworkViewerConfig layouts = getConfig();
 		if (layouts != null) {
-			WorldLayout nodeLayout = new WorldLayout(name, this, getGround()
+			NodeLayout nodeLayout = new NodeLayout(name, this, getGround()
 					.isElasticMode());
 
 			layouts.addLayout(nodeLayout);
@@ -303,7 +301,7 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	@Override
 	public void updateViewFromModel() {
-		getGround().destroyAndClearChildren();
+		getGround().clearLayer();
 
 		/*
 		 * Construct Nodes from the Network model
@@ -393,17 +391,20 @@ public class NetworkViewer extends NodeViewer {
 	 * 
 	 * @author Shu Wu
 	 */
-	class HideAllOriginTerminations extends StandardAction {
+	class SetOTVisiblityAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public HideAllOriginTerminations(String actionName) {
-			super("Hide all origins & terminations", actionName);
+		private boolean visible;
+
+		public SetOTVisiblityAction(String actionName, boolean visible) {
+			super(actionName);
+			this.visible = visible;
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			hideAllOriginTerminations();
+			setOriginsTerminationsVisible(visible);
 		}
 
 	}
@@ -454,26 +455,6 @@ public class NetworkViewer extends NodeViewer {
 				throw new ActionException("Could not get layout name", false);
 			}
 
-		}
-
-	}
-
-	/**
-	 * Action to show all widgets
-	 * 
-	 * @author Shu Wu
-	 */
-	class ShowAllOriginTerminations extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ShowAllOriginTerminations(String actionName) {
-			super("Show all origins / terminations", actionName);
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			showAllOriginTerminations();
 		}
 
 	}

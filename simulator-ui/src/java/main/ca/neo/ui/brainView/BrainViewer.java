@@ -1,19 +1,17 @@
 package ca.neo.ui.brainView;
 
-import java.util.Iterator;
-
-import ca.shu.ui.lib.handlers.AbstractStatusHandler;
-import ca.shu.ui.lib.handlers.EventConsumer;
-import ca.shu.ui.lib.objects.PXText;
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldGround;
-import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.PNode;
+import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
+import ca.shu.ui.lib.world.handlers.EventConsumer;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
+import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.PXImage;
+import ca.shu.ui.lib.world.piccolo.primitives.Text;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.nodes.PImage;
 
-public class BrainViewer extends World {
+public class BrainViewer extends WorldImpl {
 
 	private static final long serialVersionUID = 1L;
 
@@ -51,31 +49,29 @@ public class BrainViewer extends World {
 		return frontView.getCoord();
 	}
 
-	private static WorldGround createGround() {
-		return new WorldGround() {
+	private static WorldGroundImpl createGround() {
+		return new WorldGroundImpl() {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected void layoutChildren() {
-				Iterator<?> it = getChildrenReference().iterator();
+			public void layoutChildren() {
+
 				int x = 0;
 				double maxHeight = 0;
 
-				while (it.hasNext()) {
-					PNode obj = (PNode) it.next();
-					if (obj.getHeight() > maxHeight) {
-						maxHeight = obj.getHeight();
+				for (IWorldObject wo : getChildren()) {
+
+					if (wo.getHeight() > maxHeight) {
+						maxHeight = wo.getHeight();
 					}
 
 				}
 
-				it = getChildrenReference().iterator();
-				while (it.hasNext()) {
-					PNode obj = (PNode) it.next();
+				for (IWorldObject wo : getChildren()) {
 
-					obj.setOffset(x, maxHeight - obj.getHeight());
-					x += obj.getWidth() + 10;
+					wo.setOffset(x, maxHeight - wo.getHeight());
+					x += wo.getWidth() + 10;
 
 				}
 			}
@@ -83,18 +79,18 @@ public class BrainViewer extends World {
 	}
 }
 
-class BrainImageWrapper extends WorldObject {
+class BrainImageWrapper extends WorldObjectImpl {
 
 	private static final long serialVersionUID = 1L;
 	AbstractBrainImage2D myBrainImage;
-	PXText myLabel;
+	Text myLabel;
 
 	public BrainImageWrapper(AbstractBrainImage2D brainImage) {
 		super();
 		myBrainImage = brainImage;
-		addChild(new PImage(brainImage));
+		addChild(new WorldObjectImpl(new PXImage(brainImage)));
 
-		myLabel = new PXText();
+		myLabel = new Text();
 		addChild(myLabel);
 		updateLabel();
 		setSelectable(false);
@@ -115,7 +111,7 @@ class BrainImageWrapper extends WorldObject {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		super.layoutChildren();
 
 		myLabel.setOffset(0, myBrainImage.getHeight() + 10);

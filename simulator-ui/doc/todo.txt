@@ -16,6 +16,12 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+	
+
+Make WorldOBject and interface
+
+Rename WorldObject interfaces and implementations
+
 
 
 Request:

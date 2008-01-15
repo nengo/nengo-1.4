@@ -1,11 +1,13 @@
 package ca.shu.ui.lib.world.elastic;
 
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.PNode;
 
-public class ElasticObject extends WorldObject {
+public class ElasticObject extends WorldObjectImpl {
 
 	private static final long serialVersionUID = 1L;
 
@@ -14,6 +16,24 @@ public class ElasticObject extends WorldObject {
 
 	protected ElasticGround getElasticWorld() {
 		return elasticGround;
+	}
+
+	public ElasticObject() {
+		super();
+
+		getPiccolo().addPropertyChangeListener(new PropertyChangeListener() {
+
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals(PNode.PROPERTY_PARENT)) {
+					if (getParent() instanceof ElasticGround) {
+						elasticGround = (ElasticGround) getParent();
+					} else {
+//						elasticGround = null;
+					}
+				}
+			}
+
+		});
 	}
 
 	@Override
@@ -35,12 +55,7 @@ public class ElasticObject extends WorldObject {
 		return super.getOffset();
 	}
 
-	@Override
-	public void offset(double dx, double dy) {
-		Point2D offset = getOffset();
-		offset.setLocation(offset.getX() + dx, offset.getY() + dy);
-		setOffset(offset);
-	}
+	
 
 	/**
 	 * @see edu.umd.cs.piccolo.PNode#setOffset(double, double)
@@ -66,17 +81,6 @@ public class ElasticObject extends WorldObject {
 	 */
 	public void setOffsetReal(double x, double y) {
 		super.setOffset(x, y);
-	}
-
-	@Override
-	public void setParent(PNode newParent) {
-
-		super.setParent(newParent);
-		if (getParent() instanceof ElasticGround) {
-			elasticGround = (ElasticGround) getParent();
-		} else {
-			elasticGround = null;
-		}
 	}
 
 	@Override

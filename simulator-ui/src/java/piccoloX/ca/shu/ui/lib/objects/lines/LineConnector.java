@@ -1,8 +1,6 @@
 package ca.shu.ui.lib.objects.lines;
 
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.JPopupMenu;
@@ -10,18 +8,22 @@ import javax.swing.JPopupMenu;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.PEdge;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.IDroppable;
+import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.Interactable;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.IWorldObject.EventType;
+import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
  * @author Shu
  */
-public abstract class LineConnector extends WorldObject implements
+public abstract class LineConnector extends WorldObjectImpl implements
 		Interactable, IDroppable {
 
 	private static final long serialVersionUID = 1L;
@@ -41,7 +43,7 @@ public abstract class LineConnector extends WorldObject implements
 
 		myEdge = new Edge(well, this);
 		myEdge.setPointerVisible(true);
-		well.getWorldLayer().addEdge(myEdge);
+		((WorldGroundImpl) well.getWorldLayer()).addEdge(myEdge);
 
 		myIcon = new LineOriginIcon();
 		myIcon.setColor(Style.COLOR_LINEEND);
@@ -51,7 +53,9 @@ public abstract class LineConnector extends WorldObject implements
 		setChildrenPickable(false);
 		setSelectable(true);
 		myDestroyListener = new DestroyListener(this);
-		myWell.addPropertyChangeListener(myDestroyListener);
+		myWell
+				.addPropertyChangeListener(EventType.DESTROYED,
+						myDestroyListener);
 
 	}
 
@@ -83,7 +87,7 @@ public abstract class LineConnector extends WorldObject implements
 			myTermination = term;
 
 			if (term != null) {
-				((WorldObject) term).addChild(this);
+				((IWorldObject) term).addChild(this);
 				connectToTermination();
 			}
 		}
@@ -91,7 +95,7 @@ public abstract class LineConnector extends WorldObject implements
 
 	protected abstract boolean canConnectTo(ILineTermination termination);
 
-	protected PEdge getEdge() {
+	protected PXEdge getEdge() {
 		return myEdge;
 	}
 
@@ -121,7 +125,8 @@ public abstract class LineConnector extends WorldObject implements
 	@Override
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
-		myWell.removePropertyChangeListener(myDestroyListener);
+		myWell.removePropertyChangeListener(EventType.DESTROYED,
+				myDestroyListener);
 	}
 
 	/**
@@ -143,11 +148,11 @@ public abstract class LineConnector extends WorldObject implements
 		return myTermination;
 	}
 
-	public void justDropped(List<WorldObject> targets) {
+	public void justDropped(List<IWorldObject> targets) {
 		boolean success = false;
 		boolean attemptedConnection = false;
 
-		for (WorldObject target : targets) {
+		for (IWorldObject target : targets) {
 			if (target == getWell()) {
 				// Connector has been receded back into the origin
 				destroy();
@@ -221,7 +226,7 @@ public abstract class LineConnector extends WorldObject implements
  * 
  * @author Shu Wu
  */
-class DestroyListener implements PropertyChangeListener {
+class DestroyListener implements EventListener {
 	private LineConnector parent;
 
 	public DestroyListener(LineConnector parent) {
@@ -229,10 +234,8 @@ class DestroyListener implements PropertyChangeListener {
 		this.parent = parent;
 	}
 
-	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().compareTo(WorldObject.PROPERTY_DESTROYED) == 0) {
-			parent.destroy();
-		}
+	public void propertyChanged(EventType event) {
+		parent.destroy();
 	}
 }
 
@@ -242,7 +245,7 @@ class DestroyListener implements PropertyChangeListener {
  * 
  * @author Shu Wu
  */
-class Edge extends PEdge {
+class Edge extends PXEdge {
 
 	private static final long serialVersionUID = 1L;
 

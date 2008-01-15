@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.IWorldObject;
 
 /**
  * Builds tooltips from parts
@@ -49,7 +49,7 @@ public class TooltipBuilder {
 		tooltipParts.add(part);
 	}
 
-	public void addCustomPart(WorldObject obj) {
+	public void addCustomPart(IWorldObject obj) {
 		throw new NotImplementedException();
 	}
 }

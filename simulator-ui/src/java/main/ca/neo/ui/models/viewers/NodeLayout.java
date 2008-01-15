@@ -1,19 +1,18 @@
 package ca.neo.ui.models.viewers;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Hashtable;
 
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.util.PBounds;
+import ca.neo.ui.models.UINeoNode;
 
 /**
  * Layout of nodes which is serializable
  * 
  * @author Shu Wu
  */
-public class WorldLayout implements Serializable {
+public class NodeLayout implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,7 +34,7 @@ public class WorldLayout implements Serializable {
 	/**
 	 * Saved view bounds
 	 */
-	private PBounds savedViewBounds;
+	private Rectangle2D savedViewBounds;
 
 	/**
 	 * @param layoutName
@@ -43,14 +42,14 @@ public class WorldLayout implements Serializable {
 	 * @param world
 	 *            Viewer containing nodes
 	 */
-	public WorldLayout(String layoutName, World world, boolean elasticMode) {
+	public NodeLayout(String layoutName, NodeViewer world, boolean elasticMode) {
 		super();
 		this.layoutName = layoutName;
 		this.elasticMode = elasticMode;
 
 		nodePositions = new Hashtable<Integer, PointSerializable>();
 
-		for (WorldObject object : world.getGround().getObjects()) {
+		for (UINeoNode object : world.getNeoNodes()) {
 			addPosition(object, object.getOffset());
 		}
 
@@ -64,8 +63,9 @@ public class WorldLayout implements Serializable {
 	 * @param position
 	 *            Position of node
 	 */
-	private void addPosition(WorldObject wo, Point2D position) {
-		nodePositions.put(wo.hashCode(), new PointSerializable(position));
+	private void addPosition(UINeoNode wo, Point2D position) {
+		nodePositions.put(wo.getModel().hashCode(), new PointSerializable(
+				position));
 	}
 
 	/**
@@ -80,15 +80,20 @@ public class WorldLayout implements Serializable {
 	 *            Name of node
 	 * @return Position of node
 	 */
-	public Point2D getPosition(WorldObject node) {
-
-		return nodePositions.get(node.hashCode()).toPoint2D();
+	public Point2D getPosition(UINeoNode node) {
+		PointSerializable savedPosition = nodePositions.get(node.getModel()
+				.hashCode());
+		if (savedPosition != null) {
+			return savedPosition.toPoint2D();
+		} else {
+			return null;
+		}
 	}
 
 	/**
 	 * @return Saved view bounds
 	 */
-	public PBounds getSavedViewBounds() {
+	public Rectangle2D getSavedViewBounds() {
 		return savedViewBounds;
 	}
 

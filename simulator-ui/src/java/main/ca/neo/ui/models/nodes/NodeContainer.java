@@ -14,9 +14,9 @@ import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.Window;
-import ca.shu.ui.lib.objects.Window.WindowState;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
+import ca.shu.ui.lib.world.piccolo.objects.Window;
+import ca.shu.ui.lib.world.piccolo.objects.Window.WindowState;
 
 /**
  * UI Wrapper for Node Containers such as Ensembles and Networks.
@@ -105,11 +105,13 @@ public abstract class NodeContainer extends UINeoNode {
 			NodeViewer nodeViewer = createViewerInstance();
 			Window viewerWindow = new Window(this, nodeViewer);
 			nodeViewer.applyDefaultLayout();
-			
+
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					if (viewerWindowRef.get() != null)
+					if (viewerWindowRef.get() != null) {
 						getWorld().zoomToObject(viewerWindowRef.get());
+					}
+
 				}
 			});
 

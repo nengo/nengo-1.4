@@ -52,8 +52,8 @@ import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
 
 /**
  * UI Wrapper for a NEO Node Model
@@ -117,28 +117,20 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 *            of the Child
 	 */
 	@SuppressWarnings("unchecked")
-	private WorldObject getChild(String name, Class type) {
+	private IWorldObject getChild(String name, Class type) {
 
 		/*
 		 * Linear search used because there tends to be only a small number of
 		 * widets
 		 */
-		Iterator it = getChildrenIterator();
 
-		while (it.hasNext()) {
-			Object obj = it.next();
-			if (obj instanceof WorldObject) {
-
-				WorldObject wo = (WorldObject) obj;
-
-				if (type != null) {
-					if (type.isInstance(wo)
-							&& (wo.getName().compareTo(name) == 0)) {
-						return wo;
-					}
-				} else if ((wo.getName().compareTo(name) == 0)) {
+		for (IWorldObject wo : getChildren()) {
+			if (type != null) {
+				if (type.isInstance(wo) && (wo.getName().compareTo(name) == 0)) {
 					return wo;
 				}
+			} else if ((wo.getName().compareTo(name) == 0)) {
+				return wo;
 			}
 		}
 		return null;
@@ -253,7 +245,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		super.layoutChildren();
 
 		/*
@@ -275,23 +267,20 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 		double probeY = 0;
 
-		Iterator<Object> it = getChildrenIterator();
-
 		/*
 		 * Lays out origin objects
 		 */
-		while (it.hasNext()) {
-			Object obj = it.next();
+		for (IWorldObject wo : getChildren()) {
 
-			if (obj instanceof UIProbe) {
-				UIProbe probe = (UIProbe) obj;
+			if (wo instanceof UIProbe) {
+				UIProbe probe = (UIProbe) wo;
 
 				probe.setOffset(getWidth() * (1f / 4f), probeY + getHeight()
 						* (1f / 4f));
 				probeY += probe.getHeight() + 5;
 
-			} else if (obj instanceof Widget) {
-				Widget widget = (Widget) obj;
+			} else if (wo instanceof Widget) {
+				Widget widget = (Widget) wo;
 				if (widget.getParent() == null) {
 					/*
 					 * Check to see that the origin has not been removed from
@@ -350,7 +339,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		 * Assign the probe to a Origin / Termination
 		 */
 
-		WorldObject probeHolder = null;
+		IWorldObject probeHolder = null;
 
 		Origin origin = null;
 		try {
@@ -418,7 +407,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * @return The Network model the Node is attached to
 	 */
 	public Network getParentNetwork() {
-		World viewer = getWorld();
+		WorldImpl viewer = getWorld();
 
 		/*
 		 * Can only access parent network if the Node is inside a Network Viewer
@@ -436,7 +425,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 */
 	public NodeViewer getParentViewer() {
 
-		World viewer = getWorld();
+		WorldImpl viewer = getWorld();
 		if (viewer != null && viewer instanceof NodeViewer) {
 			return (NodeViewer) viewer;
 		} else {
@@ -450,30 +439,12 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	@SuppressWarnings("unchecked")
 	public void hideAllOandT() {
 
-		Iterator<Object> it = getChildrenIterator();
-		while (it.hasNext()) {
-			Object obj = it.next();
-			if (obj instanceof Widget
-					&& (obj instanceof UITermination || obj instanceof UIOrigin)) {
-				((Widget) obj).setWidgetVisible(false);
+		for (IWorldObject wo : getChildren()) {
+			if (wo instanceof Widget
+					&& (wo instanceof UITermination || wo instanceof UIOrigin)) {
+				((Widget) wo).setWidgetVisible(false);
 			}
 
-		}
-		layoutChildren();
-	}
-
-	/**
-	 * Hides all widgets
-	 */
-	@SuppressWarnings("unchecked")
-	public void hideAllWidgets() {
-
-		Iterator<Object> it = getChildrenIterator();
-		while (it.hasNext()) {
-			Object obj = it.next();
-			if (obj instanceof Widget) {
-				((Widget) obj).setWidgetVisible(false);
-			}
 		}
 		layoutChildren();
 	}
@@ -541,15 +512,12 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	/**
-	 * Show all widgets
+	 * Sets the visibility of widgets
 	 */
-	@SuppressWarnings("unchecked")
-	public void showAllWidgets() {
-		Iterator<Object> it = getChildrenIterator();
-		while (it.hasNext()) {
-			Object obj = it.next();
-			if (obj instanceof Widget) {
-				((Widget) obj).setWidgetVisible(true);
+	public void setWidgetsVisible(boolean visible) {
+		for (IWorldObject wo : getChildren()) {
+			if (wo instanceof Widget) {
+				((Widget) wo).setWidgetVisible(visible);
 			}
 		}
 		layoutChildren();
@@ -647,7 +615,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 		@Override
 		protected void action() throws ActionException {
-			hideAllWidgets();
+			setWidgetsVisible(false);
 		}
 	}
 

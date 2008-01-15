@@ -1,20 +1,18 @@
 package ca.shu.ui.lib.objects.models;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import javax.swing.JPopupMenu;
 
 import ca.neo.ui.actions.RemoveModelAction;
 import ca.neo.ui.models.tooltips.Tooltip;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.tooltips.TooltipTitle;
-import ca.shu.ui.lib.activities.Pulsator;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import ca.shu.ui.lib.world.EventListener;
+import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.Interactable;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.activities.Pulsator;
 import ca.shu.ui.lib.world.elastic.ElasticObject;
 
 /**
@@ -34,13 +32,13 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	/**
 	 * Icon for this model
 	 */
-	private WorldObject icon;
+	private IWorldObject icon;
 
 	/**
 	 * Property Listener which listens to changes of the Icon's bounds and
 	 * updates this node bounds accordingly
 	 */
-	private PropertyChangeListener iconPropertyChangeListener;
+	private EventListener iconPropertyChangeListener;
 
 	private boolean isModelBusy = false;
 
@@ -91,28 +89,27 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * @param newIcon
 	 *            New Icon
 	 */
-	protected void setIcon(WorldObject newIcon) {
+	protected void setIcon(IWorldObject newIcon) {
 		if (icon != null) {
-			icon.removePropertyChangeListener(PROPERTY_BOUNDS,
+			icon.removePropertyChangeListener(EventType.BOUNDS_CHANGED,
 					iconPropertyChangeListener);
 			icon.removeFromParent();
 		}
 
 		icon = newIcon;
 
-		addChild(0, icon);
+		addChild(icon, 0);
 		icon.setSelectable(false);
 
-		iconPropertyChangeListener = new PropertyChangeListener() {
-
-			public void propertyChange(PropertyChangeEvent arg0) {
+		iconPropertyChangeListener = new EventListener() {
+			public void propertyChanged(EventType event) {
 				setBounds(icon.getBounds());
 			}
 
 		};
 		setBounds(icon.getBounds());
 
-		icon.addPropertyChangeListener(PROPERTY_BOUNDS,
+		icon.addPropertyChangeListener(EventType.BOUNDS_CHANGED,
 				iconPropertyChangeListener);
 
 	}
@@ -128,13 +125,6 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		}
 	}
 
-	/**
-	 * Fires when the model has changed
-	 */
-	public void fireModelPropertyChanged() {
-		firePropertyChange(0, PROPERTY_MODEL, null, null);
-	}
-
 	public String getFullName() {
 		return getName() + " (" + getTypeName() + ")";
 	}
@@ -142,7 +132,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	/**
 	 * @return Icon of this node
 	 */
-	public WorldObject getIcon() {
+	public IWorldObject getIcon() {
 		return icon;
 	}
 
@@ -154,7 +144,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	}
 
 	@Override
-	public final WorldObject getTooltip() {
+	public final IWorldObject getTooltip() {
 		String toolTipTitle = getFullName();
 
 		TooltipBuilder tooltipBuilder = new TooltipBuilder(toolTipTitle);
@@ -194,7 +184,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	public void setModel(Object model) {
 		this.model = model;
-		fireModelPropertyChanged();
+		firePropertyChange(EventType.MODEL_CHANGED);
 	}
 
 	/**

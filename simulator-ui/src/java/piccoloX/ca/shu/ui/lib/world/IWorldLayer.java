@@ -1,54 +1,41 @@
 package ca.shu.ui.lib.world;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 
-import ca.shu.ui.lib.objects.PEdge;
-
-import edu.umd.cs.piccolo.PNode;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
+import ca.shu.ui.lib.world.piccolo.objects.Window;
 
 /**
  * A Layer of the world
  * 
  * @author Shu Wu
  */
-public interface IWorldLayer {
+public interface IWorldLayer extends IWorldObject {
 	/**
 	 * @param child
 	 *            Child node to add
 	 */
-	public void addChild(PNode child);
+	public void addChild(IWorldObject child);
 
 	/**
 	 * @return World which this layer belongs to
 	 */
-	public World getWorld();
+	public WorldImpl getWorld();
+
+	/**
+	 * @return A Collection of windows
+	 */
+	public Collection<Window> getAllWindows();
 
 	/**
 	 * @param world
 	 *            The world
 	 */
-	public void setWorld(World world);
+	public void setWorld(WorldImpl world);
 
 	/**
-	 * Converts a global coordinate to a local coordinate. This method modifies
-	 * the parameter.
-	 * 
-	 * @param globalPoint
-	 *            Global coordinate
-	 * @return Local coordinate
+	 * Clears the layer of all children
 	 */
-	public Point2D globalToLocal(Point2D globalPoint);
+	public void clearLayer();
 
-	public void addEdge(PEdge edge);
-
-	/**
-	 * Converts a local bound to a global bound. This method modifies the
-	 * parameter.
-	 * 
-	 * @param globalPoint
-	 *            Global bound
-	 * @return local bound
-	 */
-	public Rectangle2D globalToLocal(Rectangle2D globalPoint);
 }

@@ -1,33 +1,33 @@
 package ca.neo.ui.models.viewers;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JPopupMenu;
 
 import ca.neo.model.Node;
-import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.ModelsContextMenu;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.NodeContainer;
-import ca.shu.ui.lib.handlers.AbstractStatusHandler;
+import ca.shu.ui.lib.actions.LayoutAction;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import ca.shu.ui.lib.world.EventListener;
+import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.Interactable;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.IWorldObject.EventType;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
+import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -103,15 +103,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 			getGround().addChild(node);
 		}
 
-		node.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (evt.getPropertyName().compareTo(
-						WorldObject.PROPERTY_DESTROYED) == 0) {
-
-					removeNeoNode((UINeoNode) evt.getSource());
-				}
-			}
-		});
+		node.addPropertyChangeListener(EventType.DESTROYED,
+				new RemoveNodeListener(node, this));
 	}
 
 	@Override
@@ -153,16 +146,9 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	public void applySortLayout(SortMode sortMode) {
 		getGround().setElasticEnabled(false);
 
-		ArrayList<UINeoNode> nodes = new ArrayList(getNeoNodes().size());
-
-		Enumeration<UINeoNode> em = getNeoNodes().elements();
-
-		while (em.hasMoreElements()) {
-			nodes.add(em.nextElement());
-		}
+		List<UINeoNode> nodes = getNeoNodes();
 
 		switch (sortMode) {
-
 		case BY_NAME:
 			Collections.sort(nodes, new Comparator<UINeoNode>() {
 
@@ -200,23 +186,19 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		double x = 0;
 		double y = 0;
 
-		Iterator<UINeoNode> it = nodes.iterator();
-		int numberOfNodes = getNeoNodes().size();
-		int numberOfColumns = (int) Math.sqrt(numberOfNodes);
+		int numberOfColumns = (int) Math.sqrt(nodes.size());
 		int columnCounter = 0;
 
-		if (it.hasNext()) {
-			double startX = Double.MAX_VALUE;
-			double startY = Double.MAX_VALUE;
-			double maxRowHeight = 0;
-			double endX = Double.MIN_VALUE;
-			double endY = Double.MIN_VALUE;
+		double startX = Double.MAX_VALUE;
+		double startY = Double.MAX_VALUE;
+		double maxRowHeight = 0;
+		double endX = Double.MIN_VALUE;
+		double endY = Double.MIN_VALUE;
 
-			while (it.hasNext()) {
-				UINeoNode node = it.next();
+		if (nodes.size() > 0) {
+			for (UINeoNode node : getNeoNodes()) {
 
-				node.animateToPositionScaleRotation(x, y, node.getScale(), node
-						.getRotation(), 1000);
+				node.animateToPosition(x, y, 1000);
 
 				if (x < startX) {
 					startX = x;
@@ -242,14 +224,13 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 					maxRowHeight = 0;
 					columnCounter = 0;
 				}
-
 			}
 
-			PBounds fullBounds = new PBounds(startX, startY, endX - startX,
-					endY - startY);
-			zoomToBounds(fullBounds);
-
 		}
+
+		PBounds fullBounds = new PBounds(startX, startY, endX - startX, endY
+				- startY);
+		zoomToBounds(fullBounds);
 
 	}
 
@@ -277,11 +258,24 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 				+ getViewerParent().getTypeName() + " Viewer)";
 	}
 
+	public UINeoNode getNeoNode(String name) {
+		return neoNodesChildren.get(name);
+	}
+
 	/**
 	 * @return A collection of NEO Nodes contained in this viewer
 	 */
-	public Dictionary<String, UINeoNode> getNeoNodes() {
-		return neoNodesChildren;
+	public List<UINeoNode> getNeoNodes() {
+		Enumeration<UINeoNode> en = neoNodesChildren.elements();
+
+		ArrayList<UINeoNode> nodesList = new ArrayList<UINeoNode>(
+				neoNodesChildren.size());
+
+		while (en.hasMoreElements()) {
+			nodesList.add(en.nextElement());
+		}
+
+		return nodesList;
 	}
 
 	/**
@@ -290,7 +284,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	 * @return Node
 	 */
 	public UINeoNode getNode(String name) {
-		return getNeoNodes().get(name);
+		return neoNodesChildren.get(name);
 	}
 
 	/**
@@ -298,17 +292,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	 */
 	public NodeContainer getViewerParent() {
 		return parentOfViewer;
-	}
-
-	/**
-	 * Hides all widgets
-	 */
-	public void hideAllOriginTerminations() {
-		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
-		while (enumeration.hasMoreElements()) {
-			UINeoNode node = enumeration.nextElement();
-			node.hideAllWidgets();
-		}
 	}
 
 	/**
@@ -321,14 +304,9 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		neoNodesChildren.remove(node.getName());
 	}
 
-	/**
-	 * Shows all widgets
-	 */
-	public void showAllOriginTerminations() {
-		Enumeration<UINeoNode> enumeration = getNeoNodes().elements();
-		while (enumeration.hasMoreElements()) {
-			UINeoNode node = enumeration.nextElement();
-			node.showAllWidgets();
+	public void setOriginsTerminationsVisible(boolean visible) {
+		for (UINeoNode node : getNeoNodes()) {
+			node.setWidgetsVisible(visible);
 		}
 	}
 
@@ -337,7 +315,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		ArrayList<ModelObject> models = new ArrayList<ModelObject>(
 				getSelection().size());
 
-		for (WorldObject object : getSelection()) {
+		for (IWorldObject object : getSelection()) {
 			if (object instanceof ModelObject) {
 				models.add((ModelObject) object);
 
@@ -452,4 +430,23 @@ class NodeViewerStatus extends AbstractStatusHandler {
 	protected NodeViewer getWorld() {
 		return (NodeViewer) super.getWorld();
 	}
+}
+
+class RemoveNodeListener implements EventListener {
+	private UINeoNode node;
+	WeakReference<NodeViewer> nodeViewer;
+
+	public RemoveNodeListener(UINeoNode node, NodeViewer nodeViewer) {
+		super();
+		this.node = node;
+		this.nodeViewer = new WeakReference<NodeViewer>(nodeViewer);
+	}
+
+	public void propertyChanged(EventType event) {
+		if (nodeViewer.get() != null) {
+
+			nodeViewer.get().removeNeoNode((UINeoNode) node);
+		}
+	}
+
 }

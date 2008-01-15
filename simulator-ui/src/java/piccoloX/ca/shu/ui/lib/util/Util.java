@@ -12,7 +12,9 @@ import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
-import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PStack;
 
@@ -173,24 +175,30 @@ public class Util {
 	 *            The type of node to be picked from the pick tree
 	 */
 	@SuppressWarnings("unchecked")
-	public static Object getNodeFromPickPath(PInputEvent event, Class type) {
+	public static IWorldObject getNodeFromPickPath(PInputEvent event,
+			Class<? extends IWorldObject> type) {
 		PStack nodeStack = event.getPath().getNodeStackReference();
 		ListIterator it = nodeStack.listIterator(nodeStack.size());
 
 		while (it.hasPrevious()) {
 			Object node = it.previous();
 
-			if (type.isInstance(node)) {
-				return node;
-			}
+			if (node instanceof PiccoloNodeInWorld) {
+				IWorldObject wo = ((PiccoloNodeInWorld) node).getWorldObjectParent();
 
-			/*
-			 * Stop picking objects at the boundary of the worlds
-			 */
-			if (node instanceof World) {
-				return null;
-			}
+				if (wo != null) {
+					if (type.isInstance(wo)) {
+						return (IWorldObject) wo;
+					}
 
+					/*
+					 * Stop picking objects at the boundary of the worlds
+					 */
+					if (node instanceof WorldImpl) {
+						return null;
+					}
+				}
+			}
 		}
 		return null;
 	}

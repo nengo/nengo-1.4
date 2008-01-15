@@ -1,7 +1,6 @@
 package ca.neo.ui.models.nodes.widgets;
 
 import java.awt.Color;
-import java.util.List;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Network;
@@ -30,6 +29,7 @@ import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
+import ca.shu.ui.lib.world.IWorldObject;
 
 /**
  * UI Wrapper for a Termination
@@ -160,11 +160,9 @@ public class UITermination extends Widget implements ILineTermination {
 	}
 
 	public LineConnector getConnector() {
-		List<?> children = getChildrenReference();
-
-		for (Object obj : children) {
-			if (obj instanceof LineConnector)
-				return (LineConnector) obj;
+		for (IWorldObject wo : getChildren()) {
+			if (wo instanceof LineConnector)
+				return (LineConnector) wo;
 		}
 		return null;
 	}

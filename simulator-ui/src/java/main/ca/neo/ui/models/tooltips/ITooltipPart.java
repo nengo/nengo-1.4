@@ -1,6 +1,8 @@
 package ca.neo.ui.models.tooltips;
 
+import ca.shu.ui.lib.world.IWorldObject;
+
 public interface ITooltipPart {
 
-	public String getTooltipString();
+	public IWorldObject toWorldObject(double width);
 }

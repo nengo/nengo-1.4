@@ -8,7 +8,7 @@ import ca.neo.examples.IntegratorExample;
 import ca.neo.model.StructuralException;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.models.nodes.UINetwork;
-import ca.shu.ui.lib.objects.Window;
+import ca.shu.ui.lib.world.piccolo.objects.Window;
 
 /**
  * Just a quick check for one type of memory leaks in Network Viewer.

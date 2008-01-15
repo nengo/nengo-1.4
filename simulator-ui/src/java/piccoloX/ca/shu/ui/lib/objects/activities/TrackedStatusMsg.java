@@ -1,10 +1,9 @@
 package ca.shu.ui.lib.objects.activities;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.PXText;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.nodes.PText;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.Text;
 
 /**
  * Displays and removes a task message from the application status bar
@@ -13,17 +12,17 @@ import edu.umd.cs.piccolo.nodes.PText;
  */
 public class TrackedStatusMsg {
 	private String taskName;
-	PText taskText;
+	Text taskText;
 
 	public TrackedStatusMsg(String taskName) {
 		this(taskName, null);
 	}
 
-	public TrackedStatusMsg(String taskName, WorldObject wo) {
+	public TrackedStatusMsg(String taskName, WorldObjectImpl wo) {
 		super();
 
 		if (wo != null) {
-			taskText = new PXText(taskName);
+			taskText = new Text(taskName);
 			taskText.setPaint(Style.COLOR_NOTIFICATION);
 			taskText.setOffset(0, -taskText.getHeight());
 			wo.addChild(taskText);

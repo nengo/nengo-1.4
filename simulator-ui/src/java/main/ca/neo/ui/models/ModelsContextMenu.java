@@ -9,7 +9,7 @@ import javax.swing.JPopupMenu;
 import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.IWorldObject;
 
 /**
  * Creates a Popup menu which applies to a collection of models
@@ -65,7 +65,7 @@ public class ModelsContextMenu {
 		 * sort the selection by class type, so that for each class type a
 		 * collection of models are of the same type (homogeneous)
 		 */
-		for (WorldObject object : selectedObjects) {
+		for (IWorldObject object : selectedObjects) {
 			if (object instanceof ModelObject) {
 				ModelObject modelUI = (ModelObject) object;
 

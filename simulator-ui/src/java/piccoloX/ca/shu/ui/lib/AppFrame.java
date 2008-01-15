@@ -32,20 +32,21 @@ import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.Window;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
-import ca.shu.ui.lib.world.Canvas;
-import ca.shu.ui.lib.world.Grid;
-import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.elastic.ElasticGround;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
+import ca.shu.ui.lib.world.piccolo.objects.Window;
+import ca.shu.ui.lib.world.piccolo.primitives.PXCanvas;
+import ca.shu.ui.lib.world.piccolo.primitives.PXGrid;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.util.PDebug;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -76,13 +77,13 @@ public abstract class AppFrame extends JFrame {
 
 	private ReversableActionManager actionManager;
 
-	private Canvas canvas;
+	private PXCanvas canvas;
 
 	private MenuBuilder editMenu;
 
 	private EventListener escapeFullScreenModeListener;
 
-	private final GraphicsDevice graphicsDevice;
+	private GraphicsDevice graphicsDevice;
 
 	private JLabel interactionModeLabel;
 
@@ -112,18 +113,34 @@ public abstract class AppFrame extends JFrame {
 		super(GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration());
 
-		setTitle(getAppWindowTitle());
-		loadPreferences();
+		if (!SwingUtilities.isEventDispatchThread()) {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						init();
+					}
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			init();
+		}
 
+	}
+
+	private void init() {
+		graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getDefaultScreenDevice();
+		loadPreferences();
 		UIEnvironment.setInstance(this);
+
+		setTitle(getAppWindowTitle());
 
 		actionManager = new ReversableActionManager(this);
 		getContentPane().setLayout(new BorderLayout());
 
 		initStatusPanel();
-
-		graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getDefaultScreenDevice();
 
 		setBounds(new Rectangle(100, 100, 800, 600));
 		setBackground(null);
@@ -135,7 +152,7 @@ public abstract class AppFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		canvas = new Canvas(createGround());
+		canvas = new PXCanvas(createGround());
 		canvas.createWorld();
 		canvas.setFocusable(true);
 		setSelectionMode(false);
@@ -145,7 +162,6 @@ public abstract class AppFrame extends JFrame {
 
 		validate();
 		setFullScreenMode(false);
-
 		initMenu();
 	}
 
@@ -418,7 +434,7 @@ public abstract class AppFrame extends JFrame {
 			worldMenu.addAction(new TurnOffTooltips(), KeyEvent.VK_T);
 		}
 
-		if (!Grid.isGridVisible()) {
+		if (!PXGrid.isGridVisible()) {
 			worldMenu.addAction(new TurnOnGrid(), KeyEvent.VK_G);
 		} else {
 			worldMenu.addAction(new TurnOffGrid(), KeyEvent.VK_G);
@@ -512,7 +528,7 @@ public abstract class AppFrame extends JFrame {
 	/**
 	 * @return Canvas which hold the zoomable UI
 	 */
-	public Canvas getCanvas() {
+	public PXCanvas getCanvas() {
 		return canvas;
 	}
 
@@ -619,7 +635,7 @@ public abstract class AppFrame extends JFrame {
 			interactionModeLabel.setText("Navigation Mode");
 		}
 
-		for (World world : getCanvas().getWorlds()) {
+		for (WorldImpl world : getCanvas().getWorlds()) {
 			world.setSelectionMode(selectionModeEnabled);
 		}
 	}
@@ -1104,12 +1120,12 @@ class UserPreferences implements Serializable {
 
 	public void setEnableTooltips(boolean enableTooltips) {
 		this.enableTooltips = enableTooltips;
-		World.setTooltipsVisible(this.enableTooltips);
+		WorldImpl.setTooltipsVisible(this.enableTooltips);
 	}
 
 	public void setGridVisible(boolean gridVisible) {
 		this.gridVisible = gridVisible;
-		Grid.setGridVisible(gridVisible);
+		PXGrid.setGridVisible(gridVisible);
 	}
 
 }

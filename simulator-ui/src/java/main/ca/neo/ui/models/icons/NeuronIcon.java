@@ -2,22 +2,20 @@ package ca.neo.ui.models.icons;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.objects.models.ModelObject;
-import edu.umd.cs.piccolo.nodes.PPath;
+import ca.shu.ui.lib.world.piccolo.primitives.Path;
 
 /**
  * Icon for a neuron
  * 
  * @author Shu Wu
- * 
  */
 public class NeuronIcon extends ModelIcon {
 	private static final long serialVersionUID = 1L;
 
 	public NeuronIcon(ModelObject parent) {
-		super(parent, PPath.createEllipse(0, 0, 50, 50));
+		super(parent, Path.createEllipse(0, 0, 50, 50));
 		getIconReal().setPaint(Style.COLOR_FOREGROUND);
 		configureLabel(false);
 
 	}
-
 }

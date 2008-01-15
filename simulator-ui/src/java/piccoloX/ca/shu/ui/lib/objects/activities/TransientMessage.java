@@ -3,8 +3,8 @@ package ca.shu.ui.lib.objects.activities;
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.activities.Fader;
-import ca.shu.ui.lib.objects.PXText;
+import ca.shu.ui.lib.world.activities.Fader;
+import ca.shu.ui.lib.world.piccolo.primitives.Text;
 import edu.umd.cs.piccolo.activities.PActivity;
 
 /**
@@ -12,7 +12,7 @@ import edu.umd.cs.piccolo.activities.PActivity;
  * 
  * @author Shu Wu
  */
-public class TransientMessage extends PXText {
+public class TransientMessage extends Text {
 
 	private static final long serialVersionUID = 1L;
 	static final int ANIMATE_MSG_DURATION = 4000;

@@ -6,15 +6,15 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.util.PPaintContext;
+import ca.shu.ui.lib.world.PaintContext;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 
 /**
  * Standard Icon for a line end holder
  * 
  * @author Shu Wu
  */
-public class LineTerminationIcon extends WorldObject {
+public class LineTerminationIcon extends WorldObjectImpl {
 
 	private static final long serialVersionUID = 1L;
 
@@ -32,7 +32,7 @@ public class LineTerminationIcon extends WorldObject {
 	}
 
 	@Override
-	protected void paint(PPaintContext paintContext) {
+	public void paint(PaintContext paintContext) {
 		super.paint(paintContext);
 
 		Area a1 = new Area(new Ellipse2D.Double(0, 0, LINE_IN_WIDTH,

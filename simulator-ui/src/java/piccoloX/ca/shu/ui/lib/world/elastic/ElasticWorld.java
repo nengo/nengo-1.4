@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-import ca.neo.ui.actions.LayoutAction;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
@@ -14,15 +13,16 @@ import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.LayoutAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldGround;
-import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.WorldSky;
+import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
+import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
+import ca.shu.ui.lib.world.piccolo.WorldSkyImpl;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.FRLayout;
 import edu.uci.ics.jung.visualization.ISOMLayout;
@@ -36,7 +36,7 @@ import edu.uci.ics.jung.visualization.contrib.KKLayout;
  * 
  * @author Shu Wu
  */
-public class ElasticWorld extends World {
+public class ElasticWorld extends WorldImpl {
 	/**
 	 * Default layout bounds
 	 */
@@ -45,8 +45,8 @@ public class ElasticWorld extends World {
 
 	private static final long serialVersionUID = 1L;
 
-	private final WorldGround.ChildFilter elasticObjectFilter = new WorldGround.ChildFilter() {
-		public boolean acceptChild(WorldObject obj) {
+	private final WorldGroundImpl.ChildFilter elasticObjectFilter = new WorldGroundImpl.ChildFilter() {
+		public boolean acceptChild(IWorldObject obj) {
 			if (obj instanceof ElasticObject) {
 				return true;
 			} else {
@@ -61,10 +61,10 @@ public class ElasticWorld extends World {
 	private Dimension layoutBounds = DEFAULT_LAYOUT_BOUNDS;
 
 	public ElasticWorld(String name) {
-		this(name, new WorldSky(), new ElasticGround());
+		this(name, new WorldSkyImpl(), new ElasticGround());
 	}
 
-	public ElasticWorld(String name, WorldSky sky, ElasticGround ground) {
+	public ElasticWorld(String name, WorldSkyImpl sky, ElasticGround ground) {
 		super(name, sky, ground);
 		getGround().setChildFilter(elasticObjectFilter);
 	}

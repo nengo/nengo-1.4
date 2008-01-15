@@ -6,7 +6,6 @@ import ca.neo.ui.models.nodes.UIEnsemble;
  * Icon for an Ensemble
  * 
  * @author Shu Wu
- * 
  */
 public class EnsembleIcon extends NodeContainerIcon {
 	private static final long serialVersionUID = 1L;

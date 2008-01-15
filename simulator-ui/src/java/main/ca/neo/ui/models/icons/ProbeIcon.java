@@ -4,7 +4,8 @@ import java.awt.Color;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.objects.models.ModelObject;
-import edu.umd.cs.piccolo.nodes.PPath;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.PXPath;
 
 /**
  * Icon for a Simulator Probe
@@ -18,7 +19,7 @@ public class ProbeIcon extends ModelIcon {
 	private static final long serialVersionUID = 1L;
 
 	public ProbeIcon(ModelObject parent) {
-		super(parent, new Triangle());
+		super(parent, new WorldObjectImpl(new Triangle()));
 
 	}
 
@@ -33,7 +34,7 @@ public class ProbeIcon extends ModelIcon {
  * 
  * @author Shu Wu
  */
-class Triangle extends PPath {
+class Triangle extends PXPath {
 	/**
 	 * 
 	 */

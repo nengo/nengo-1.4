@@ -1,27 +1,26 @@
 package ca.shu.ui.lib.actions;
 
-import java.util.Enumeration;
+import java.awt.geom.Point2D;
 
-import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.viewers.WorldLayout;
-import ca.neo.ui.models.viewers.NodeViewer;
+import ca.shu.ui.lib.util.WorldLayout;
+import ca.shu.ui.lib.world.IWorld;
+import ca.shu.ui.lib.world.IWorldObject;
 
 public abstract class LayoutAction extends ReversableAction {
 	private static final long serialVersionUID = 1L;
 
 	private WorldLayout savedLayout;
 
-	NodeViewer nodeViewer;
+	private IWorld world;
 
-	public LayoutAction(NodeViewer nodeViewer, String description,
-			String actionName) {
+	public LayoutAction(IWorld world, String description, String actionName) {
 		super(description, actionName);
-		this.nodeViewer = nodeViewer;
+		this.world = world;
 	}
 
 	@Override
 	protected void action() throws ActionException {
-		savedLayout = new WorldLayout("", nodeViewer, false);
+		savedLayout = new WorldLayout("", world, false);
 		applyLayout();
 	}
 
@@ -29,18 +28,12 @@ public abstract class LayoutAction extends ReversableAction {
 
 	protected void restoreNodePositions() {
 
-		Enumeration<UINeoNode> en = nodeViewer.getNeoNodes().elements();
-
-		while (en.hasMoreElements()) {
-			UINeoNode node = en.nextElement();
-
-			node.setOffset(savedLayout.getPosition(node));
-
+		for (IWorldObject node : world.getGround().getChildren()) {
+			Point2D savedPosition = savedLayout.getPosition(node);
+			if (savedPosition != null) {
+				node.setOffset(savedPosition);
+			}
 		}
-	}
-
-	protected void setSavedLayout(WorldLayout savedLayout) {
-		this.savedLayout = savedLayout;
 	}
 
 	@Override

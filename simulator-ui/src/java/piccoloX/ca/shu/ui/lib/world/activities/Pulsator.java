@@ -1,7 +1,7 @@
-package ca.shu.ui.lib.activities;
+package ca.shu.ui.lib.world.activities;
 
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PActivity.PActivityDelegate;
 
@@ -15,7 +15,7 @@ public class Pulsator {
 
 	private static final long PULSATION_STATE_TRANSITION = (1000 / (PULSATION_RATE_PER_SEC * 2));
 
-	private WorldObject target;
+	private WorldObjectImpl target;
 	private float originalTransparency;
 	private boolean isPulsating = true;
 	PActivity fadeActivity;
@@ -26,7 +26,7 @@ public class Pulsator {
 
 	PulsationState pulsationState = PulsationState.FADING_OUT;
 
-	public Pulsator(WorldObject wo) {
+	public Pulsator(WorldObjectImpl wo) {
 		this.target = wo;
 		originalTransparency = wo.getTransparency();
 		pulsate();

@@ -8,7 +8,7 @@ import ca.shu.ui.lib.objects.lines.LineWell;
  * 
  * @author Shu Wu
  */
-class UIProjectionWell extends LineWell {
+public class UIProjectionWell extends LineWell {
 
 	private static final long serialVersionUID = 1L;
 	private UIOrigin myOrigin;

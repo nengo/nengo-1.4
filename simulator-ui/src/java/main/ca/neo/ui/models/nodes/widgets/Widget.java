@@ -26,10 +26,6 @@ import edu.umd.cs.piccolo.nodes.PText;
  * @author Shu Wu
  */
 public abstract class Widget extends UIModelConfigurable {
-	/**
-	 * The property name that identifies a change in this widget
-	 */
-	public static final String PROPERTY_WIDGET = "neoWidget";
 
 	private boolean isWidgetVisible = true;
 	private ExposedIcon myExposedIcon;
@@ -166,7 +162,7 @@ public abstract class Widget extends UIModelConfigurable {
 		if (exposedName != null) {
 			if (myExposedIcon == null) {
 				myExposedIcon = new ExposedIcon(getColor());
-				addChild(myExposedIcon);
+				getPiccolo().addChild(myExposedIcon);
 				myExposedIcon.setOffset(getWidth() + 2,
 						(getHeight() - myExposedIcon.getHeight()) / 2);
 			}
@@ -178,7 +174,7 @@ public abstract class Widget extends UIModelConfigurable {
 		}
 		setName(name);
 
-		fireModelPropertyChanged();
+		firePropertyChange(EventType.MODEL_CHANGED);
 
 	}
 
@@ -189,9 +185,10 @@ public abstract class Widget extends UIModelConfigurable {
 	public void setWidgetVisible(boolean isVisible) {
 		this.isWidgetVisible = isVisible;
 
-		firePropertyChange(0, PROPERTY_WIDGET, null, null);
+		firePropertyChange(EventType.WIDGET);
+
 		setVisible(isVisible);
-		invalidateFullBounds();
+		getPiccolo().invalidateFullBounds();
 	}
 
 	class ExposeAction extends StandardAction {

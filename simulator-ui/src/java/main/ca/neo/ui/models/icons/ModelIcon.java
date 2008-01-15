@@ -1,32 +1,30 @@
 package ca.neo.ui.models.icons;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import ca.shu.ui.lib.objects.PXText;
 import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.PNode;
+import ca.shu.ui.lib.world.EventListener;
+import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.Text;
 
 /**
  * An Icon which has a representation and an label. It is used to represent NEO
- * models. 
+ * models.
  * 
  * @author Shu Wu
  */
-public class ModelIcon extends WorldObject implements PropertyChangeListener {
+public class ModelIcon extends WorldObjectImpl implements EventListener {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * The inner icon node which contains the actual icon representation
 	 */
-	private PNode iconReal;
+	private IWorldObject iconReal;
 
 	/**
 	 * Label of the icon
 	 */
-	private PXText label;
+	private Text label;
 
 	/**
 	 * Parent of this icon
@@ -46,29 +44,33 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 	 * @param scale
 	 *            Scale of the Icon
 	 */
-	public ModelIcon(ModelObject parent, PNode icon) {
+	public ModelIcon(ModelObject parent, IWorldObject icon) {
 		super();
 		this.parent = parent;
 		this.iconReal = icon;
 
+		setSelectable(false);
 		addChild(icon);
-		label = new PXText();
+		// icon.setSelectable(false);
+		// icon.setChildrenPickable(false);
+
+		label = new Text();
 		label.setConstrainWidthToTextWidth(true);
 		updateLabel();
 		addChild(label);
 
-		if (icon instanceof WorldObject) {
-			((WorldObject) icon).setSelectable(false);
-		}
+		// if (icon instanceof WorldObject) {
+		// ((IWorldObject) icon).setSelectable(false);
+		// }
 
 		// parent.addPropertyChangeListener(PROPERTY_NAME, this);
-		parent.addPropertyChangeListener(ModelObject.PROPERTY_MODEL, this);
+		parent.addPropertyChangeListener(EventType.MODEL_CHANGED, this);
 		setSelectable(false);
 
 		/*
 		 * The bounds of this object matches those of the real icon
 		 */
-		iconReal.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+		iconReal.addPropertyChangeListener(EventType.FULL_BOUNDS, this);
 		updateBounds();
 	}
 
@@ -79,7 +81,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 		setBounds(iconReal.localToParent(iconReal.getBounds()));
 	}
 
-	protected PNode getIconReal() {
+	protected IWorldObject getIconReal() {
 		return iconReal;
 	}
 
@@ -88,7 +90,7 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 	}
 
 	@Override
-	protected void layoutChildren() {
+	public void layoutChildren() {
 		super.layoutChildren();
 
 		/*
@@ -145,20 +147,6 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 	}
 
 	/**
-	 * Updates bounds and label name
-	 */
-	public void propertyChange(PropertyChangeEvent event) {
-		String propertyName = event.getPropertyName();
-
-		if (propertyName == PROPERTY_FULL_BOUNDS) {
-			updateBounds();
-		} else if (propertyName == ModelObject.PROPERTY_MODEL) {
-			modelUpdated();
-		}
-
-	}
-
-	/**
 	 * @param isVisible
 	 *            Whether the label is visible
 	 */
@@ -187,6 +175,15 @@ public class ModelIcon extends WorldObject implements PropertyChangeListener {
 				label.setText("unnamed");
 			else
 				label.setText(parent.getName());
+		}
+	}
+
+	public void propertyChanged(EventType event) {
+
+		if (event == EventType.FULL_BOUNDS) {
+			updateBounds();
+		} else if (event == EventType.MODEL_CHANGED) {
+			modelUpdated();
 		}
 	}
 

@@ -1,7 +1,7 @@
-package ca.shu.ui.lib.handlers;
+package ca.shu.ui.lib.world.handlers;
 
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
@@ -11,13 +11,13 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * @author Shu Wu
  */
 public abstract class AbstractStatusHandler extends PBasicInputEventHandler {
-	private World world;
+	private WorldImpl world;
 
 	/**
 	 * @param world
 	 *            World this handler belongs to
 	 */
-	public AbstractStatusHandler(World world) {
+	public AbstractStatusHandler(WorldImpl world) {
 		super();
 		this.world = world;
 	}
@@ -32,7 +32,7 @@ public abstract class AbstractStatusHandler extends PBasicInputEventHandler {
 	/**
 	 * @return World this handler belongs to
 	 */
-	protected World getWorld() {
+	protected WorldImpl getWorld() {
 		return world;
 	}
 

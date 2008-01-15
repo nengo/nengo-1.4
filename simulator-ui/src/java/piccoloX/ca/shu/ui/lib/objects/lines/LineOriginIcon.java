@@ -4,15 +4,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.WorldObject;
-import edu.umd.cs.piccolo.util.PPaintContext;
+import ca.shu.ui.lib.world.PaintContext;
+import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 
 /**
  * Icon for a line end well
  * 
  * @author Shu Wu
  */
-public class LineOriginIcon extends WorldObject {
+public class LineOriginIcon extends WorldObjectImpl {
 
 	private static final int _LINE_END_HEIGHT = 30;
 
@@ -34,7 +34,7 @@ public class LineOriginIcon extends WorldObject {
 	}
 
 	@Override
-	protected void paint(PPaintContext paintContext) {
+	public void paint(PaintContext paintContext) {
 		super.paint(paintContext);
 		Graphics2D g2 = paintContext.getGraphics();
 		Color bright2 = Style.colorAdd(color, new Color(0.4f, 0.4f, 0.4f));
@@ -45,11 +45,11 @@ public class LineOriginIcon extends WorldObject {
 
 			Color color = getColor();
 
-			Color dark = Style.colorAdd(Style.colorTimes(color, 0.65), new Color(
-					0.05f, 0.05f, 0.05f));
+			Color dark = Style.colorAdd(Style.colorTimes(color, 0.65),
+					new Color(0.05f, 0.05f, 0.05f));
 			Color medium = color;
-			Color bright1 = Style
-					.colorAdd(color, new Color(0.15f, 0.15f, 0.15f));
+			Color bright1 = Style.colorAdd(color,
+					new Color(0.15f, 0.15f, 0.15f));
 
 			Color hilite = Style.colorAdd(Style.colorTimes(color, 0.05),
 					new Color(0.8f, 0.8f, 0.8f));

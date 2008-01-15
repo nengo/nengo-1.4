@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -39,6 +38,7 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.world.IWorldObject;
 
 /**
  * Top level instance of the NeoGraphics application
@@ -192,14 +192,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	@SuppressWarnings("unchecked")
 	protected void promptToSaveModels() {
 
-		Iterator<Object> it = getWorld().getGround().getChildrenIterator();
-
-		while (it.hasNext()) {
-			Object obj = it.next();
-
-			if (obj instanceof UINeoNode) {
-
-				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) obj);
+		for (IWorldObject wo : getWorld().getGround().getChildren()) {
+			if (wo instanceof UINeoNode) {
+				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) wo);
 				saveAction.doAction();
 
 			}
@@ -208,7 +203,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	@Override
 	protected void windowClosing() {
-		if (getWorld().getGround().getChildrenCount() > 0) {
+		if (getWorld().getGround().getChildren().size() > 0) {
 			int response = JOptionPane.showConfirmDialog(this,
 					"Save models before closing?", "Exiting " + getAppName(),
 					JOptionPane.YES_NO_CANCEL_OPTION);

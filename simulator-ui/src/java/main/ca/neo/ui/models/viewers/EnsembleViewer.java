@@ -48,7 +48,7 @@ public class EnsembleViewer extends NodeViewer {
 
 	@Override
 	public void updateViewFromModel() {
-		getGround().destroyAndClearChildren();
+		getGround().clearLayer();
 
 		Node[] nodes = getModel().getNodes();
 
