@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
 import ca.neo.math.FunctionInterpreter;
-import ca.neo.model.Configuration;
-import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * <p>Default implementation of FunctionInterpreter. This implementation produces

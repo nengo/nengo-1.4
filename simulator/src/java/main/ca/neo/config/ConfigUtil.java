@@ -5,10 +5,8 @@ package ca.neo.config;
 
 import java.lang.reflect.Method;
 
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.model.StructuralException;
-import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * Configuration-related utility methods. 
@@ -25,7 +23,7 @@ public class ConfigUtil {
 	 * @throws StructuralException If value doesn't belong to specified class
 	 */
 	public static Object get(Configuration properties, String name, Class c) throws StructuralException {
-		Object o = properties.getProperty(name).getValue();		
+		Object o = ((SingleValuedProperty) properties.getProperty(name)).getValue();		
 		if ( !c.isAssignableFrom(o.getClass()) ) {
 			throw new StructuralException("Property " + name 
 					+ " must be of class " + c.getName() + " (was " + o.getClass().getName() + ")");

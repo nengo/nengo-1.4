@@ -5,6 +5,9 @@ package ca.neo.model.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 
+import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configurable;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
@@ -49,24 +52,47 @@ public class ProjectionImplTest extends TestCase {
 		assertEquals(myTermination, myProjection.getTermination());
 	}
 	
-	public static class MockOrigin implements Origin {
+	public static class MockOrigin implements Origin, Configurable {
 
 		private static final long serialVersionUID = 1L;
 		
 		private String myName;
 		private int myDimensions;
+		private ca.neo.config.Configuration myConfiguration;
 		
 		public MockOrigin(String name, int dimensions) {
 			myName = name;
 			myDimensions = dimensions;
+			
+			myConfiguration = ConfigUtil.defaultConfiguration(this);
+			((ConfigurationImpl) myConfiguration).removeProperty("node");
 		}
 		
+		public MockOrigin() {
+			this("mock", 1);
+		}
+
+		/**
+		 * @see ca.neo.config.Configurable#getConfiguration()
+		 */
+		public ca.neo.config.Configuration getConfiguration() {
+			return myConfiguration;
+		}
+
 		public String getName() {
 			return myName;
+		}
+		
+		public void setName(String name) {
+			myName = name;
 		}
 
 		public int getDimensions() {
 			return myDimensions;
+		}
+		
+		public void setDimensions(int dim) {
+			myDimensions = dim;
 		}
 
 		public InstantaneousOutput getValues() {

@@ -3,10 +3,10 @@
  */
 package ca.neo.dynamics.impl;
 
-import ca.neo.model.Configuration;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.util.MU;
 
 /**
@@ -61,6 +61,10 @@ public class SimpleLTISystem extends LTISystem {
 		this.C = super.getC();
 		
 		((ConfigurationImpl) getConfiguration()).removeProperty("D");
+	}
+	
+	public static Configuration getConstructionTemplate() {
+		return LTISystem.getConstructionTemplate();
 	}
 	
 	/**

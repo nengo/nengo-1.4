@@ -6,10 +6,10 @@ package ca.neo.model.impl;
 import java.util.List;
 
 import ca.neo.TestUtil;
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration;
+import ca.neo.config.Configurable;
+import ca.neo.config.Configuration;
+import ca.neo.config.Configuration.Event;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Configuration.Event;
 import ca.neo.model.impl.MockConfigurable.MockChildConfigurable;
 import junit.framework.TestCase;
 

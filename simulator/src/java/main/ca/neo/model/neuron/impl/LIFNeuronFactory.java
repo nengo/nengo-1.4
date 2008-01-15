@@ -5,7 +5,10 @@ package ca.neo.model.neuron.impl;
 
 import org.apache.log4j.Logger;
 
+import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
 import ca.neo.math.PDF;
+import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.NodeFactory;
@@ -26,6 +29,7 @@ public class LIFNeuronFactory implements NodeFactory {
 	private float myTauRef;
 	private PDF myMaxRate;
 	private PDF myIntercept;
+	private Configuration myConfiguration;
 	
 	private static float ourMaxTimeStep = .00025f;
 	private static Units ourCurrentUnits = Units.ACU;
@@ -40,6 +44,53 @@ public class LIFNeuronFactory implements NodeFactory {
 		myTauRC = tauRC;
 		myTauRef = tauRef;
 		myMaxRate = maxRate;
+		myIntercept = intercept;
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+	}
+	
+	/**
+	 * Uses default parameters. 
+	 */
+	public LIFNeuronFactory() {
+		this(.02f, .001f, new IndicatorPDF(200, 400), new IndicatorPDF(-.9f, .9f));
+	}
+	
+	/**
+	 * @see ca.neo.config.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
+	}
+	
+	public float getTauRef() {
+		return myTauRef;
+	}
+	
+	public void setTauRef(float tauRef) {
+		myTauRef = tauRef;
+	}
+	
+	public float getTauRC() {
+		return myTauRC;
+	}
+	
+	public void setTauRC(float tauRC) {
+		myTauRC = tauRC;
+	}
+	
+	public PDF getMaxRate() {
+		return myMaxRate;
+	}
+	
+	public void setMaxRate(PDF maxRate) {
+		myMaxRate = maxRate;
+	}
+
+	public PDF getIntercept() {
+		return myIntercept;
+	}
+	
+	public void setIntercept(PDF intercept) {
 		myIntercept = intercept;
 	}
 

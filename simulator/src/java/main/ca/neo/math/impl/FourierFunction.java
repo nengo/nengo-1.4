@@ -6,11 +6,11 @@ package ca.neo.math.impl;
 import java.util.Random;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configurable;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.util.MU;
 
 /**
@@ -156,7 +156,7 @@ public class FourierFunction implements Function {
 	}
 
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

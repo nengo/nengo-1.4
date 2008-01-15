@@ -1,10 +1,10 @@
 package ca.neo.model.neuron.impl;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.SigmoidFunction;
-import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;

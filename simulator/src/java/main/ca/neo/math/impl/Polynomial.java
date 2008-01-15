@@ -4,8 +4,8 @@
 package ca.neo.math.impl;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
 import ca.neo.math.Function;
-import ca.neo.model.Configuration;
 
 /**
  * A one-dimensional polynomial Function. It is defined by a series of coefficients that 

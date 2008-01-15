@@ -3,7 +3,7 @@
  */
 package ca.neo.model.plasticity;
 
-import ca.neo.model.Configurable;
+import ca.neo.config.Configurable;
 import ca.neo.model.InstantaneousOutput;
 
 /**

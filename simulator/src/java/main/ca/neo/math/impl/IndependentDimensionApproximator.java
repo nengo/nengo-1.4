@@ -4,10 +4,10 @@
 package ca.neo.math.impl;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
 import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
-import ca.neo.model.Configuration;
 import ca.neo.util.MU;
 import ca.neo.util.VectorGenerator;
 import ca.neo.util.impl.RandomHypersphereVG;
@@ -177,7 +177,7 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		}
 
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return myConfiguration;
@@ -243,7 +243,7 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		}
 		
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return myConfiguration;

@@ -3,6 +3,10 @@
  */
 package ca.neo.model.impl;
 
+import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configurable;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.Noise;
@@ -16,7 +20,7 @@ import ca.neo.model.Units;
  * 
  * @author Bryan Tripp
  */
-public class BasicOrigin implements Origin, Noise.Noisy {
+public class BasicOrigin implements Origin, Noise.Noisy, Configurable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,6 +30,7 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	private Units myUnits;
 	private InstantaneousOutput myValues;
 	private Noise myNoise;
+	private Configuration myConfiguration;
 
 	/**
 	 * @param node The parent Node
@@ -38,6 +43,20 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 		myDimension = dimension;
 		myUnits = units;
 		myValues = new RealOutputImpl(new float[dimension], units, 0);
+		
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+		((ConfigurationImpl) myConfiguration).removeProperty("node"); //can't have a cyclic property
+	}
+	
+	public BasicOrigin() {
+		this(null, "basic", 1, Units.UNK);
+	}
+	
+	/**
+	 * @see ca.neo.config.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		return myConfiguration;
 	}
 
 	/**
@@ -79,12 +98,28 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	public int getDimensions() {
 		return myDimension;
 	}
+	
+	public void setDimensions(int dim) {
+		myDimension = dim;
+	}
 
 	/**
 	 * @see ca.neo.model.Origin#getName()
 	 */
 	public String getName() {
 		return myName;
+	}
+	
+	public void setName(String name) {
+		myName = name;
+	}
+	
+	public Units getUnits() {
+		return myUnits;
+	}
+	
+	public void setUnits(Units units) {
+		myUnits = units;
 	}
 
 	/**
@@ -115,6 +150,10 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	 */
 	public Node getNode() {
 		return myNode;
+	}
+	
+	public void setNode(Node node) {
+		myNode = node;
 	}
 	
 }

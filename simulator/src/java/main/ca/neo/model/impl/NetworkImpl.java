@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configurable;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
@@ -382,9 +384,25 @@ public class NetworkImpl implements Network {
 			myWrapped = wrapped;
 			myName = name;
 		}
+		
+		public OriginWrapper() {
+			this(null, null, "exposed");
+		}
+		
+		public Origin getWrappedOrigin() {
+			return myWrapped;
+		}
+		
+		public void setWrappedOrigin(Origin wrapped) {
+			myWrapped = wrapped;
+		}
 
 		public String getName() {
 			return myName;
+		}
+		
+		public void setName(String name) {
+			myName = name;
 		}
 
 		public int getDimensions() {
@@ -397,6 +415,10 @@ public class NetworkImpl implements Network {
 
 		public Node getNode() {
 			return myNode;
+		}
+		
+		public void setNode(Node node) {
+			myNode = node;
 		}
 		
 	}

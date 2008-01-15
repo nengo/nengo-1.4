@@ -13,11 +13,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import ca.neo.config.Configurable;
 import ca.neo.config.IconRegistry;
 import ca.neo.config.MainHandler;
+import ca.neo.config.Property;
+import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration;
 
 /**
  * Renderer for cells in a configuration tree. 
@@ -40,8 +41,8 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 		if (value instanceof Value && ((Value) value).getObject() instanceof Configurable) {
 			setText(((Value) value).getObject().getClass().getSimpleName());
 			setToolTipText(((Value) value).getObject().getClass().getCanonicalName());
-		} else if (value instanceof Configuration.Property) {
-			Configuration.Property property = (Configuration.Property) value;
+		} else if (value instanceof Property) {
+			Property property = (Property) value;
 			
 			StringBuffer text = new StringBuffer(property.getName());
 			text.append(" (");
@@ -60,7 +61,7 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 			} else {
 				customRenderer.setBackground(sel ? new Color(.1f, .4f, .7f, .2f) : Color.WHITE);
 				result = customRenderer;
-			}
+			}				
 		} else {
 			setToolTipText(value.getClass().getCanonicalName());
 		}

@@ -14,7 +14,6 @@ import javax.swing.ImageIcon;
 
 import org.apache.log4j.Logger;
 
-import ca.neo.model.Configuration.Property;
 
 /**
  * 
@@ -59,7 +58,7 @@ public class IconRegistry {
 	}
 	
 	public Icon getIcon(Object o) {
-		return getIcon(o.getClass());
+		return (o == null) ? null : getIcon(o.getClass());
 	}
 	
 	private Icon getIcon(Class c) {

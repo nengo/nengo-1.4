@@ -19,6 +19,11 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import ca.neo.config.Configurable;
+import ca.neo.config.Configuration;
+import ca.neo.config.ListProperty;
+import ca.neo.config.Property;
+import ca.neo.config.SingleValuedProperty;
 import ca.neo.dynamics.impl.EulerIntegrator;
 import ca.neo.dynamics.impl.LTISystem;
 import ca.neo.dynamics.impl.SimpleLTISystem;
@@ -33,16 +38,17 @@ import ca.neo.math.impl.NumericallyDifferentiableFunction;
 import ca.neo.math.impl.PostfixFunction;
 import ca.neo.math.impl.SineFunction;
 import ca.neo.math.impl.TimeSeriesFunction;
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.Configuration.Property;
+import ca.neo.model.impl.BasicOrigin;
 import ca.neo.model.impl.MockConfigurable;
 import ca.neo.model.impl.NoiseFactory;
+import ca.neo.model.impl.ProjectionImplTest;
+import ca.neo.model.neuron.impl.ALIFNeuronFactory;
 import ca.neo.model.neuron.impl.ALIFSpikeGenerator;
 import ca.neo.model.neuron.impl.DynamicalSystemSpikeGenerator;
 import ca.neo.model.neuron.impl.IzhikevichSpikeGenerator;
+import ca.neo.model.neuron.impl.LIFNeuronFactory;
 import ca.neo.model.neuron.impl.LIFSpikeGenerator;
 import ca.neo.model.neuron.impl.PoissonSpikeGenerator;
 import ca.neo.model.plasticity.impl.CompositePlasticityRule;
@@ -68,8 +74,8 @@ public class ConfigurationTreeModel implements TreeModel {
 	public void addValue(Object source, TreePath parentPath, Object value) {
 		try {
 			Object parent = parentPath.getLastPathComponent();
-			if (parent instanceof Property) {
-				Property property = (Property) parent; 
+			if (parent instanceof ListProperty) {
+				ListProperty property = (ListProperty) parent; 
 				property.addValue(value);
 				
 				TreeModelEvent event = new TreeModelEvent(source, parentPath, new int[]{property.getNumValues()-1}, new Object[]{value});
@@ -95,8 +101,8 @@ public class ConfigurationTreeModel implements TreeModel {
 	public void insertValue(Object source, TreePath path, Object value) {
 		try {
 			Object parent = path.getParentPath().getLastPathComponent();
-			if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
-				Property property = (Property) parent;
+			if (parent instanceof ListProperty && path.getLastPathComponent() instanceof Value) {
+				ListProperty property = (ListProperty) parent;
 				Value toInsertBefore = (Value) path.getLastPathComponent();
 				property.insert(toInsertBefore.getIndex(), value);
 				
@@ -133,9 +139,13 @@ public class ConfigurationTreeModel implements TreeModel {
 	public void setValue(Object source, TreePath path, Object value) throws StructuralException {
 		Object parent = path.getParentPath().getLastPathComponent();
 		if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
-			Property property = (Property) parent;
 			int index = ((Value) path.getLastPathComponent()).getIndex();
-			property.setValue(index, value);
+			
+			if (parent instanceof SingleValuedProperty) {
+				((SingleValuedProperty) parent).setValue(value);
+			} else if (parent instanceof ListProperty) {
+				((ListProperty) parent).setValue(index, value);				
+			}
 			
 			Value child = (Value) path.getLastPathComponent();
 			child.setObject(value);
@@ -161,8 +171,8 @@ public class ConfigurationTreeModel implements TreeModel {
 	public void removeValue(Object source, TreePath path) {
 		try {
 			Object parent = path.getParentPath().getLastPathComponent();
-			if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
-				Property property = (Property) parent;
+			if (parent instanceof ListProperty && path.getLastPathComponent() instanceof Value) {
+				ListProperty property = (ListProperty) parent;
 				Value toRemove = (Value) path.getLastPathComponent();
 				property.remove(toRemove.getIndex());
 				
@@ -194,11 +204,19 @@ public class ConfigurationTreeModel implements TreeModel {
 				List<String> propertyNames = c.getPropertyNames();
 				Collections.sort(propertyNames);
 				result = c.getProperty(propertyNames.get(index));
-			} else if (parent instanceof Property) {
-				Property p = (Property) parent;
+			} else if (parent instanceof ListProperty) {
+				ListProperty p = (ListProperty) parent;
 				Object o = p.getValue(index);
-				result = new Value(index, o); //TODO: adjust indices with insertions and removals
-			}			
+				result = new Value(index, o); 
+			} else if (parent instanceof SingleValuedProperty) {
+				if (index == 0) {
+					Object o = ((SingleValuedProperty) parent).getValue();
+				} else {
+					ConfigExceptionHandler.handle(
+							new StructuralException("SingleValuedProperty doesn't have child " + index), 
+							ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
+				}
+			}
 		} catch (StructuralException e) {
 			ConfigExceptionHandler.handle(e, ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
 		}
@@ -214,8 +232,10 @@ public class ConfigurationTreeModel implements TreeModel {
 		
 		if (parent instanceof Value && ((Value) parent).getObject() instanceof Configurable) {
 			result = ((Configurable) ((Value) parent).getObject()).getConfiguration().getPropertyNames().size();
-		} else if (parent instanceof Property) {
-			result = ((Property) parent).getNumValues();
+		} else if (parent instanceof SingleValuedProperty) {
+			result = 1; 
+		} else if (parent instanceof ListProperty) {
+			result = ((ListProperty) parent).getNumValues();
 		}
 		
 		return result;
@@ -234,10 +254,14 @@ public class ConfigurationTreeModel implements TreeModel {
 				List<String> propertyNames = c.getPropertyNames();
 				Collections.sort(propertyNames);
 				index = propertyNames.indexOf(p.getName());
-			} else if (parent instanceof Property) {
-				Property p = (Property) parent;
+			} else if (parent instanceof SingleValuedProperty) {
+				if (((SingleValuedProperty) parent).getValue().equals(child)) {
+					index = 0;
+				}
+			} else if (parent instanceof ListProperty) {
+				ListProperty p = (ListProperty) parent;
 				for (int i = 0; i < p.getNumValues() && index == -1; i++) {
-					if (p.getValue(i).equals(child)) index = i;
+					if (p.getValue(i) != null && p.getValue(i).equals(child)) index = i;
 				}
 			}			
 		} catch (StructuralException e) {
@@ -295,7 +319,7 @@ public class ConfigurationTreeModel implements TreeModel {
 		
 		public Value(int index, Object object) {
 			myIndex = index;
-			myObject = object;
+			myObject = (object == null) ? new NullValue() : object;
 		}
 		
 		public int getIndex() {
@@ -315,13 +339,19 @@ public class ConfigurationTreeModel implements TreeModel {
 		}
 	}
 	
+	public static class NullValue {
+		public String toString() {
+			return "NULL";
+		}
+	}
+	
 	public static void main(String[] args) {
 		try {
 			JFrame frame = new JFrame("Tree Test"); 
 //			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
 //			configurable.addMultiValuedField("test1");
 //			configurable.addMultiValuedField("test2");
-			Configurable configurable = new ALIFSpikeGenerator(); 
+			Configurable configurable = new BasicOrigin(); 
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

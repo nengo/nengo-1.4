@@ -6,10 +6,11 @@ package ca.neo.util.impl;
 import java.io.Serializable;
 
 import ca.neo.config.ConfigUtil;
-import ca.neo.model.Configuration;
+import ca.neo.config.Configuration;
+import ca.neo.config.Property;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.SingleValuedPropertyImpl;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Configuration.Property;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.Units;
 import ca.neo.util.TimeSeries1D;
 
@@ -48,10 +49,11 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 			init(new float[length], new float[length], Units.UNK);
 		} else { //from file
 			float[] times = ((float[]) ConfigUtil.get(properties, TIMES_PROPERTY, float[].class));
-			float[] values = ((float[]) ConfigUtil.get(properties, VALUES_PROPERTY, float[].class));			
-			Units units = (Units) properties.getProperty(UNITS_PROPERTY).getValue();
+			float[] values = ((float[]) ConfigUtil.get(properties, VALUES_PROPERTY, float[].class));					
+			Units units = (Units) ConfigUtil.get(properties, UNITS_PROPERTY, Units.class);
 			init(times, values, units);
-			setLabel((String) properties.getProperty(LABEL_PROPERTY).getValue());
+			String label = (String) ConfigUtil.get(properties, LABEL_PROPERTY, String.class);
+			setLabel(label);
 		}
 	}
 	
@@ -87,7 +89,7 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 		this.myLabel = "1";		
 		
 		myConfiguration = new ConfigurationImpl(this);
-		Property tp = new ConfigurationImpl.SingleValuedProperty(myConfiguration, TIMES_PROPERTY, float[].class, true) {
+		Property tp = new SingleValuedPropertyImpl(myConfiguration, TIMES_PROPERTY, float[].class, true) {
 			@Override
 			public void setValue(Object value) throws StructuralException {
 				setTimes((float[]) value);
@@ -95,7 +97,7 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 		};
 		myConfiguration.defineProperty(tp);
 
-		Property vp = new ConfigurationImpl.SingleValuedProperty(myConfiguration, VALUES_PROPERTY, float[].class, true) {
+		Property vp = new SingleValuedPropertyImpl(myConfiguration, VALUES_PROPERTY, float[].class, true) {
 			@Override
 			public void setValue(Object value) throws StructuralException {
 				setValues((float[]) value);
@@ -107,7 +109,7 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 		};
 		myConfiguration.defineProperty(vp);
 		
-		Property up = new ConfigurationImpl.SingleValuedProperty(myConfiguration, UNITS_PROPERTY, Units.class, true) {
+		Property up = new SingleValuedPropertyImpl(myConfiguration, UNITS_PROPERTY, Units.class, true) {
 			@Override
 			public Object getValue() {
 				return getUnits1D();
@@ -115,7 +117,7 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 		};
 		myConfiguration.defineProperty(up);
 		
-		Property lp = new ConfigurationImpl.SingleValuedProperty(myConfiguration, LABEL_PROPERTY, String.class, true) {
+		Property lp = new SingleValuedPropertyImpl(myConfiguration, LABEL_PROPERTY, String.class, true) {
 			@Override
 			public Object getValue() {
 				return getLabels()[0];
@@ -125,7 +127,7 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 	}
 
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

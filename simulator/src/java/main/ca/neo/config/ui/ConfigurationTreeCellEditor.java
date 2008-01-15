@@ -12,10 +12,10 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
+import ca.neo.config.Configurable;
 import ca.neo.config.MainHandler;
+import ca.neo.config.Property;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration.Property;
 
 public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 

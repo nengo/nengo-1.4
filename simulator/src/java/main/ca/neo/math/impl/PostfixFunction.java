@@ -9,11 +9,11 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.Property;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Configuration.Property;
-import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * <p>A Function based on a mathematical expression and on other functions. The expression 
@@ -160,7 +160,7 @@ public class PostfixFunction implements Function {
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */	
 	public Configuration getConfiguration() {
 		return myConfiguration;

@@ -5,6 +5,7 @@ package ca.neo.model.muscle.impl;
 
 import org.apache.log4j.Logger;
 
+import ca.neo.config.Configuration;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
@@ -13,7 +14,6 @@ import ca.neo.math.RootFinder;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.NewtonRootFinder;
-import ca.neo.model.Configuration;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
@@ -144,7 +144,7 @@ public class HillMuscle extends SkeletalMuscleImpl {
 		
 
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return null;

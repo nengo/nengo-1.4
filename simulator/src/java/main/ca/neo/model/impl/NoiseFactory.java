@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.ListBasedProperty;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
@@ -14,11 +17,9 @@ import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.Function;
 import ca.neo.math.PDF;
 import ca.neo.math.impl.GaussianPDF;
-import ca.neo.model.Configuration;
 import ca.neo.model.Noise;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.Configuration.Property;
 import ca.neo.plot.Plotter;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
@@ -88,7 +89,7 @@ public class NoiseFactory {
 //					}
 //				}				
 //			};
-			myConfiguration.defineProperty(new ConfigurationImpl.ListProperty(myConfiguration, "functions", Function.class, myFunctions));
+			myConfiguration.defineProperty(new ListBasedProperty(myConfiguration, "functions", Function.class, myFunctions));
 //			Property funProp = new ConfigurationImpl.MultiValuedProperty(myConfiguration, "functions", Function.class, true) {
 //				
 //			};
@@ -99,7 +100,7 @@ public class NoiseFactory {
 		}
 		
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return myConfiguration;
@@ -149,7 +150,7 @@ public class NoiseFactory {
 		}
 
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return myConfiguration;
@@ -178,7 +179,7 @@ public class NoiseFactory {
 		
 	}
 
-	private static class NoiseImplPDF implements Noise {
+	public static class NoiseImplPDF implements Noise {
 		
 		private float myPeriod;
 		private PDF myPDF;
@@ -218,12 +219,11 @@ public class NoiseFactory {
 		}
 		
 		public NoiseImplPDF() {
-			this(1, null, null, null);
-			//TODO: reasonable defaults / Configuration constructor; deal with null dynamics and integrator in getter
+			this(1, new GaussianPDF(0, 1), null, null);
 		}
 		
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return myConfiguration;

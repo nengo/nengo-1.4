@@ -3,8 +3,8 @@
  */
 package ca.neo.model.muscle.impl;
 
+import ca.neo.config.Configuration;
 import ca.neo.dynamics.impl.AbstractDynamicalSystem;
-import ca.neo.model.Configuration;
 import ca.neo.model.muscle.LinkSegmentModel;
 import junit.framework.TestCase;
 

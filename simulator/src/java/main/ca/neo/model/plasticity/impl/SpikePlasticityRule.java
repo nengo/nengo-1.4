@@ -4,13 +4,13 @@
 package ca.neo.model.plasticity.impl;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
-import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SpikeOutput;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.plasticity.PlasticityRule;
 import ca.neo.util.MU;
 
@@ -70,7 +70,7 @@ public class SpikePlasticityRule implements PlasticityRule {
 	}
 
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

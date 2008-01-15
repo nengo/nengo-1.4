@@ -3,9 +3,9 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.PDF;
-import ca.neo.model.Configuration;
-import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * Univariate Gaussian probability density function. 
@@ -72,7 +72,7 @@ public class GaussianPDF implements PDF {
 	}
 
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

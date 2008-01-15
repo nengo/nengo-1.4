@@ -3,9 +3,9 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.model.Configuration;
-import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * Identity function on a particular dimension of input, ie f(x) = x_i, 
@@ -45,7 +45,7 @@ public class IdentityFunction implements Function {
 	}
 
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

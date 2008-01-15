@@ -5,7 +5,7 @@ package ca.neo.model.neuron;
 
 import java.io.Serializable;
 
-import ca.neo.model.Configurable;
+import ca.neo.config.Configurable;
 import ca.neo.model.Node;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;

@@ -6,8 +6,8 @@ package ca.neo.math.impl;
 import java.util.Arrays;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
 import ca.neo.math.Function;
-import ca.neo.model.Configuration;
 import ca.neo.plot.Plotter;
 
 /**

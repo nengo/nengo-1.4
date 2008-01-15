@@ -6,12 +6,16 @@ package ca.neo.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration;
+import ca.neo.config.Configurable;
+import ca.neo.config.Configuration;
+import ca.neo.config.Property;
+import ca.neo.config.SingleValuedProperty;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.FixedCardinalityProperty;
+import ca.neo.config.impl.MultiValuedProperty;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.Configuration.Property;
 
 /**
  * A dummy Configurable class for testing purposes.
@@ -38,7 +42,7 @@ public class MockConfigurable implements Configurable {
 	private ConfigurationImpl myConfiguration;
 	
 	public MockConfigurable(Configuration immutableProperties) throws StructuralException {
-		myImmutableField = immutableProperties.getProperty("immutableField").getValue().toString();
+		myImmutableField = ((SingleValuedProperty) immutableProperties.getProperty("immutableField")).getValue().toString();
 		
 		myIntField = 1;
 		myFloatField = 1;
@@ -67,7 +71,7 @@ public class MockConfigurable implements Configurable {
 		myConfiguration.defineSingleValuedProperty("configurableField", Configurable.class, true);
 		myConfiguration.defineSingleValuedProperty("immutableField", String.class, false);
 		
-		Property mvp = new ConfigurationImpl.MultiValuedProperty(myConfiguration, "multiValuedField", String.class, true) {
+		Property mvp = new MultiValuedProperty(myConfiguration, "multiValuedField", String.class, true) {
 			@Override
 			public void addValue(Object value) throws StructuralException {
 				myMultiValuedField.add((String) value); 
@@ -104,7 +108,7 @@ public class MockConfigurable implements Configurable {
 		};
 		myConfiguration.defineProperty(mvp);
 		
-		Property fcp = new ConfigurationImpl.FixedCardinalityProperty(myConfiguration, "fixedCardinalityField", String.class, true) {
+		Property fcp = new FixedCardinalityProperty(myConfiguration, "fixedCardinalityField", String.class, true) {
 			@Override
 			public void doSetValue(int index, Object value) throws StructuralException {
 				myFixedCardinalityField[index] = (String) value;
@@ -131,7 +135,7 @@ public class MockConfigurable implements Configurable {
 	}
 
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

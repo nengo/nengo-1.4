@@ -5,7 +5,7 @@ package ca.neo.dynamics;
 
 import java.io.Serializable;
 
-import ca.neo.model.Configurable;
+import ca.neo.config.Configurable;
 import ca.neo.util.TimeSeries;
 
 /**

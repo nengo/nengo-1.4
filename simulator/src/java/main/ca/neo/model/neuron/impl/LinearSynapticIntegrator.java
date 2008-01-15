@@ -9,7 +9,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import ca.neo.config.ConfigUtil;
-import ca.neo.model.Configuration;
+import ca.neo.config.Configuration;
+import ca.neo.config.Property;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.MultiValuedProperty;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.SimulationException;
@@ -17,8 +20,6 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
-import ca.neo.model.Configuration.Property;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.impl.LinearExponentialTermination;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.neuron.ExpandableSynapticIntegrator;
@@ -73,7 +74,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		myConfiguration = (ConfigurationImpl) ConfigUtil.defaultConfiguration(this);
 		myConfiguration.removeProperty("terminations");
 		
-		Property tp = new ConfigurationImpl.MultiValuedProperty(myConfiguration, "terminations", LinearExponentialTermination.class, true) {
+		Property tp = new MultiValuedProperty(myConfiguration, "terminations", LinearExponentialTermination.class, true) {
 
 			@Override
 			public void addValue(Object value) throws StructuralException {
@@ -112,7 +113,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

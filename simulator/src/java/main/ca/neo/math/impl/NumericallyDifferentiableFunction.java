@@ -4,11 +4,11 @@
 package ca.neo.math.impl;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.DifferentiableFunction;
 import ca.neo.math.Function;
-import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
-import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * A wrapper around any Function that provides a numerical approximation of its derivative, 
@@ -63,7 +63,7 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;
@@ -201,7 +201,7 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 		}
 
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return myConfiguration;

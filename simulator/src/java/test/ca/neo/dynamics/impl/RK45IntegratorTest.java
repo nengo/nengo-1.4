@@ -4,10 +4,10 @@
 package ca.neo.dynamics.impl;
 
 import ca.neo.TestUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.dynamics.Integrator;
-import ca.neo.model.Configuration;
 import ca.neo.model.Units;
-import ca.neo.model.impl.ConfigurationImpl;
 //import ca.neo.plot.Plotter;
 import ca.neo.util.InterpolatorND;
 import ca.neo.util.TimeSeries;
@@ -61,7 +61,7 @@ public class RK45IntegratorTest extends TestCase {
 		}
 		
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return myConfiguration;

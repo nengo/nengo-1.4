@@ -3,6 +3,8 @@
  */
 package ca.neo.model;
 
+import ca.neo.config.Configurable;
+
 /**
  * An model of noise that can be explicitly injected into a circuit (e.g. added to 
  * an Origin). 

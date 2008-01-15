@@ -3,7 +3,7 @@
  */
 package ca.neo.util;
 
-import ca.neo.model.Configurable;
+import ca.neo.config.Configurable;
 
 /**
  * A tool for generating sets of uniformly or randomly distributed vectors. 

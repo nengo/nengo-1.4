@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
@@ -14,7 +15,6 @@ import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.CurveFitter;
 import ca.neo.math.Function;
 import ca.neo.math.impl.LinearCurveFitter;
-import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
@@ -125,7 +125,7 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

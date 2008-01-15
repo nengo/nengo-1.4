@@ -3,9 +3,9 @@
  */
 package ca.neo.math.impl;
 
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.model.Configuration;
-import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * Function wrapper for sin(omega x), where x is in radians and omega is the angular frequency.  
@@ -56,7 +56,7 @@ public class SineFunction implements Function {
 	}
 
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

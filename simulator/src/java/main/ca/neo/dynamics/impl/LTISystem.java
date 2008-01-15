@@ -4,12 +4,12 @@
 package ca.neo.dynamics.impl;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.FixedCardinalityProperty;
 import ca.neo.dynamics.LinearSystem;
-import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.impl.ConfigurationImpl;
-import ca.neo.model.impl.ConfigurationImpl.FixedCardinalityProperty;
 import ca.neo.util.MU;
 
 /**
@@ -117,7 +117,7 @@ public class LTISystem implements LinearSystem {
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

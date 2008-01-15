@@ -31,9 +31,10 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 import ca.neo.config.ClassRegistry;
+import ca.neo.config.Configurable;
+import ca.neo.config.Configuration;
+import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
-import ca.neo.model.Configurable;
-import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
 import ca.neo.model.impl.MockConfigurable.MockLittleConfigurable;
 
@@ -109,7 +110,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		JScrollPane treeScroll = new JScrollPane(myConfigurationTree);
 		
 		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
-		if (currentType != null && !types.contains(currentType)) {
+		if (currentType != null && !NullValue.class.isAssignableFrom(currentType) && !types.contains(currentType)) {
 			types.add(0, currentType);
 		}
 		final JComboBox typeBox = new JComboBox(types.toArray());
@@ -127,11 +128,8 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 				NewConfigurableDialog.this.setSelectedType((Class) typeBox.getSelectedItem());
 			}
 		});
-		if (currentType != null) {
-			typeBox.setSelectedItem(currentType);
-		} else {
-			typeBox.setSelectedIndex(0);
-		}
+
+		typeBox.setSelectedIndex(0);
 
 		treeScroll.setPreferredSize(new Dimension(typeBox.getPreferredSize().width, 200));
 		

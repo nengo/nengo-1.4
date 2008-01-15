@@ -13,10 +13,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
+import ca.neo.config.Configurable;
+import ca.neo.config.ListProperty;
+import ca.neo.config.Property;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
-import ca.neo.model.Configurable;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Configuration.Property;
 
 public class ConfigurationTreePopupListener extends MouseAdapter {
 	
@@ -44,9 +45,9 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 			myTree.setSelectionPath(path);
 			
 			JPopupMenu popup = new JPopupMenu();
-			if (path.getLastPathComponent() instanceof Property) {
-				final Property p = (Property) path.getLastPathComponent();
-				if (p.isMultiValued() && !p.isFixedCardinality()) {
+			if (path.getLastPathComponent() instanceof ListProperty) {
+				final ListProperty p = (ListProperty) path.getLastPathComponent();
+				if (!p.isFixedCardinality()) {
 					JMenuItem addValueItem = new JMenuItem("Add");
 					addValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent E) {
@@ -75,11 +76,11 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					popup.add(replaceValueItem);									
 				}
 				
-				if (p.isMultiValued() && !p.isFixedCardinality()) {
+				if (p instanceof ListProperty && !p.isFixedCardinality()) {
 					JMenuItem insertValueItem = new JMenuItem("Insert");
 					insertValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							myModel.insertValue(this, path, p.getDefaultValue());
+							myModel.insertValue(this, path, ((ListProperty) p).getDefaultValue());
 						}
 					}); 
 					popup.add(insertValueItem);				

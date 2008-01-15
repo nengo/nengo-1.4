@@ -6,13 +6,13 @@ package ca.neo.model.neuron.impl;
 import java.util.Properties;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 import ca.neo.math.RootFinder;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.math.impl.NewtonRootFinder;
 import ca.neo.math.impl.PiecewiseConstantFunction;
-import ca.neo.model.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
@@ -106,7 +106,7 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 	}
 
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

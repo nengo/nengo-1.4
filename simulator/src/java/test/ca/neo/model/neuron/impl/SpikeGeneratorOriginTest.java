@@ -2,14 +2,14 @@ package ca.neo.model.neuron.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import ca.neo.model.Configuration;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.Units;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.Neuron;

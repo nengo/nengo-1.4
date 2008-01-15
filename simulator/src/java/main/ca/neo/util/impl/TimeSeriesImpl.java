@@ -6,10 +6,13 @@ package ca.neo.util.impl;
 import java.io.Serializable;
 
 import ca.neo.config.ConfigUtil;
-import ca.neo.model.Configuration;
+import ca.neo.config.Configuration;
+import ca.neo.config.ListProperty;
+import ca.neo.config.Property;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.FixedCardinalityProperty;
+import ca.neo.config.impl.SingleValuedPropertyImpl;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Configuration.Property;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.Units;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
@@ -64,11 +67,11 @@ public class TimeSeriesImpl implements TimeSeries, Serializable {
 		} else { //from file
 			float[] times = ((float[]) ConfigUtil.get(properties, TIMES_PROPERTY, float[].class));
 			float[][] values = ((float[][]) ConfigUtil.get(properties, VALUES_PROPERTY, float[][].class));			
-			Units[] units = new Units[properties.getProperty(UNITS_PROPERTY).getNumValues()];
+			Units[] units = new Units[((ListProperty) properties.getProperty(UNITS_PROPERTY)).getNumValues()];
 			String[] labels = new String[units.length];
 			for (int i = 0; i < units.length; i++) {
-				units[i] = (Units) properties.getProperty(UNITS_PROPERTY).getValue(i);
-				labels[i] = (String) properties.getProperty(LABELS_PROPERTY).getValue(i);
+				units[i] = (Units) ((ListProperty) properties.getProperty(UNITS_PROPERTY)).getValue(i);
+				labels[i] = (String) ((ListProperty) properties.getProperty(LABELS_PROPERTY)).getValue(i);
 			}
 			init(times, values, units, labels);
 		}
@@ -83,7 +86,7 @@ public class TimeSeriesImpl implements TimeSeries, Serializable {
 		myLabels = labels;		
 		
 		myConfiguration = new ConfigurationImpl(this);
-		Property tp = new ConfigurationImpl.SingleValuedProperty(myConfiguration, TIMES_PROPERTY, float[].class, true) {
+		Property tp = new SingleValuedPropertyImpl(myConfiguration, TIMES_PROPERTY, float[].class, true) {
 			@Override
 			public void setValue(Object value) throws StructuralException {
 				setTimes((float[]) value);
@@ -91,7 +94,7 @@ public class TimeSeriesImpl implements TimeSeries, Serializable {
 		};
 		myConfiguration.defineProperty(tp);
 
-		Property vp = new ConfigurationImpl.SingleValuedProperty(myConfiguration, VALUES_PROPERTY, float[][].class, true) {
+		Property vp = new SingleValuedPropertyImpl(myConfiguration, VALUES_PROPERTY, float[][].class, true) {
 			@Override
 			public void setValue(Object value) throws StructuralException {
 				setValues((float[][]) value);
@@ -99,7 +102,7 @@ public class TimeSeriesImpl implements TimeSeries, Serializable {
 		};
 		myConfiguration.defineProperty(vp);
 
-		Property up = new ConfigurationImpl.FixedCardinalityProperty(myConfiguration, UNITS_PROPERTY, Units.class, true) {
+		Property up = new FixedCardinalityProperty(myConfiguration, UNITS_PROPERTY, Units.class, true) {
 			@Override
 			public Object doGetValue(int index) throws StructuralException {
 				return getUnits()[index];
@@ -117,7 +120,7 @@ public class TimeSeriesImpl implements TimeSeries, Serializable {
 		};
 		myConfiguration.defineProperty(up);
 		
-		Property lp = new ConfigurationImpl.FixedCardinalityProperty(myConfiguration, LABELS_PROPERTY, String.class, true) {
+		Property lp = new FixedCardinalityProperty(myConfiguration, LABELS_PROPERTY, String.class, true) {
 			@Override
 			public Object doGetValue(int index) throws StructuralException {
 				return getLabels()[index];
@@ -153,13 +156,13 @@ public class TimeSeriesImpl implements TimeSeries, Serializable {
 		ConfigurationImpl properties = new ConfigurationImpl(null);
 		properties.defineTemplateProperty(TIMES_PROPERTY, float[].class, new float[0]);
 		properties.defineTemplateProperty(VALUES_PROPERTY, float[][].class, new float[0][]);
-		properties.defineTemplateProperty(UNITS_PROPERTY, Units.class, true, false);
-		properties.defineTemplateProperty(LABELS_PROPERTY, String.class, true, false);
+//		properties.defineTemplateProperty(UNITS_PROPERTY, Units.class, true, false);
+//		properties.defineTemplateProperty(LABELS_PROPERTY, String.class, true, false);
 		return properties;
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

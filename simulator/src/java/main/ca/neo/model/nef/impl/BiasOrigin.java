@@ -3,14 +3,14 @@
  */
 package ca.neo.model.nef.impl;
 
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
 import ca.neo.math.PDF;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.GradientDescentApproximator;
 import ca.neo.math.impl.IndicatorPDF;
-import ca.neo.model.Configuration;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
@@ -249,7 +249,7 @@ public class BiasOrigin extends DecodedOrigin {
 		}
 
 		/**
-		 * @see ca.neo.model.Configurable#getConfiguration()
+		 * @see ca.neo.config.Configurable#getConfiguration()
 		 */
 		public Configuration getConfiguration() {
 			return myConfiguration;

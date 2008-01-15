@@ -1,4 +1,4 @@
-package ca.neo.model;
+package ca.neo.config;
 
 /**
  * <p>An object with parameters that can be written and read in a standard way, through 

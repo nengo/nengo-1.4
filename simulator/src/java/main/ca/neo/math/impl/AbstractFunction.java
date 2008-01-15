@@ -1,10 +1,10 @@
 package ca.neo.math.impl;
 
 import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.model.Configuration;
 import ca.neo.model.StructuralException;
-import ca.neo.model.impl.ConfigurationImpl;
 
 /**
  * Base class for Function implementations. The default implementation of 
@@ -30,7 +30,7 @@ public abstract class AbstractFunction implements Function {
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

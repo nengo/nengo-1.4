@@ -3,11 +3,11 @@
  */
 package ca.neo.dynamics.impl;
 
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
-import ca.neo.model.Configuration;
 import ca.neo.model.Units;
-import ca.neo.model.impl.ConfigurationImpl;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.impl.LinearInterpolatorND;
@@ -44,7 +44,7 @@ public class EulerIntegrator implements Integrator {
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;

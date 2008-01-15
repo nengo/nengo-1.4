@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JLabel;
+
 import org.apache.log4j.Logger;
 
 import ca.neo.config.handlers.BooleanHandler;
@@ -22,6 +24,7 @@ import ca.neo.config.handlers.StringHandler;
 import ca.neo.config.handlers.UnitsHandler;
 import ca.neo.config.handlers.VectorHandler;
 import ca.neo.config.ui.ConfigurationChangeListener;
+import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 
 public class MainHandler implements ConfigurationHandler {
 	
@@ -140,13 +143,16 @@ public class MainHandler implements ConfigurationHandler {
 	 */
 	public Component getRenderer(Object o) {
 		Component result = null;
-		
+
+		if (o instanceof NullValue) result = new JLabel("NULL"); 
+			
 		Class c = o.getClass();
 		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
 			if (myHandlers.get(i).canHandle(c)) {
 				result = myHandlers.get(i).getRenderer(o);
 			}
 		}
+		
 		return result;
 	}
 

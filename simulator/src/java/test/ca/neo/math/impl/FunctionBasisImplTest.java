@@ -5,10 +5,10 @@ package ca.neo.math.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 
+import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 import ca.neo.math.FunctionBasis;
 import ca.neo.math.impl.FunctionBasisImpl;
-import ca.neo.model.Configuration;
 import junit.framework.TestCase;
 
 /**

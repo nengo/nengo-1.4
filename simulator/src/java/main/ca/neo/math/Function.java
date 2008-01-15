@@ -5,7 +5,7 @@ package ca.neo.math;
 
 import java.io.Serializable;
 
-import ca.neo.model.Configurable;
+import ca.neo.config.Configurable;
 
 /**
  * <p>A mathematical function from an n-D space to a 1-D space. For simplicity we always 

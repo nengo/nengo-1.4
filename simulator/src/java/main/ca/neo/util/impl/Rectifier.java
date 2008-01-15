@@ -4,7 +4,7 @@
 package ca.neo.util.impl;
 
 import ca.neo.config.ConfigUtil;
-import ca.neo.model.Configuration;
+import ca.neo.config.Configuration;
 import ca.neo.util.VectorGenerator;
 
 /**
@@ -43,7 +43,7 @@ public class Rectifier implements VectorGenerator {
 	}
 	
 	/**
-	 * @see ca.neo.model.Configurable#getConfiguration()
+	 * @see ca.neo.config.Configurable#getConfiguration()
 	 */
 	public Configuration getConfiguration() {
 		return myConfiguration;
