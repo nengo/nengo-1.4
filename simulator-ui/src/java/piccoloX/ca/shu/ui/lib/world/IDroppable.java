@@ -1,9 +1,13 @@
 package ca.shu.ui.lib.world;
 
-import java.util.List;
 
-
+/**
+ * @author Shu Wu
+ */
 public interface IDroppable {
 
-	public void justDropped(List<IWorldObject> targets);
+	public void justDropped();
+
+	public boolean acceptTarget(IWorldObject target);
+
 }

@@ -23,12 +23,29 @@ public class Wrapper extends WorldObjectImpl {
 		return myPackage;
 	}
 
-	public void setPackage(IWorldObject obj) {
-		if (getPackage() != null) {
-			removeChild(getPackage());
+	public final void setPackage(IWorldObject obj) {
+		if (myPackage != null) {
+			myPackage.removeFromParent();
 		}
+		IWorldObject oldPackage = myPackage;
 
-		addChild(obj);
-		this.myPackage = obj;
+		myPackage = obj;
+
+		if (obj != null) {
+			addChild(obj);
+			packageChanged(oldPackage);
+		}
 	}
+
+	public void destroyPackage() {
+		if (myPackage != null) {
+			myPackage.destroy();
+			myPackage = null;
+		}
+	}
+
+	protected void packageChanged(IWorldObject oldPackage) {
+
+	}
+
 }

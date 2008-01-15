@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import ca.shu.ui.lib.world.ICustomDroppable;
 import ca.shu.ui.lib.world.IDroppable;
 import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
@@ -107,24 +108,39 @@ public class DragAction extends ReversableAction {
 	}
 
 	public static void dropNode(IWorldObject node) {
-		if (node instanceof IDroppable) {
-			IDroppable droppable = (IDroppable) node;
+		if (node instanceof ICustomDroppable || node instanceof IDroppable) {
+			IWorldObject worldLayer = node.getWorldLayer();
 
-			Collection<IWorldObject> results = node
-					.getWorldLayer()
+			Collection<IWorldObject> targets = worldLayer
 					.findIntersectingNodes(node.localToGlobal(node.getBounds()));
 
-			ArrayList<IWorldObject> targets = new ArrayList<IWorldObject>(
-					results.size());
+			if (node instanceof ICustomDroppable) {
+				ICustomDroppable droppable = (ICustomDroppable) node;
+				droppable.droppedOnTargets(targets);
+			}
+			if (node instanceof IDroppable) {
+				IDroppable droppable = (IDroppable) node;
+				IWorldObject target = null;
+				for (IWorldObject potentialTarget : targets) {
+					if (droppable.acceptTarget(potentialTarget)) {
+						target = potentialTarget;
+					}
+				}
+				if (target == null) {
+					if (droppable.acceptTarget(worldLayer)) {
+						target = worldLayer;
+					}
+				}
+				if (target != null) {
+					Point2D position = target.globalToLocal(node
+							.localToGlobal(new Point2D.Double(0, 0)));
 
-			for (IWorldObject wo : results) {
-
-				targets.add(wo);
+					node.setOffset(position);
+					target.addChild(node);
+					droppable.justDropped();
+				}
 
 			}
-
-			droppable.justDropped(targets);
-
 		}
 	}
 

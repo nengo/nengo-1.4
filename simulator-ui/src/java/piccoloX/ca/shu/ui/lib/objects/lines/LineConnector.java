@@ -1,7 +1,7 @@
 package ca.shu.ui.lib.objects.lines;
 
 import java.awt.geom.Point2D;
-import java.util.List;
+import java.util.Collection;
 
 import javax.swing.JPopupMenu;
 
@@ -11,7 +11,7 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.IDroppable;
+import ca.shu.ui.lib.world.ICustomDroppable;
 import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.IWorldObject.EventType;
@@ -24,7 +24,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * @author Shu
  */
 public abstract class LineConnector extends WorldObjectImpl implements
-		Interactable, IDroppable {
+		Interactable, ICustomDroppable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -148,7 +148,7 @@ public abstract class LineConnector extends WorldObjectImpl implements
 		return myTermination;
 	}
 
-	public void justDropped(List<IWorldObject> targets) {
+	public void droppedOnTargets(Collection<IWorldObject> targets) {
 		boolean success = false;
 		boolean attemptedConnection = false;
 
@@ -217,6 +217,7 @@ public abstract class LineConnector extends WorldObjectImpl implements
 		});
 		return menu.toJPopupMenu();
 	}
+
 }
 
 /**

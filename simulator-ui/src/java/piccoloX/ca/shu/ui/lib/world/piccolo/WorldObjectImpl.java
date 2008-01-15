@@ -600,8 +600,9 @@ public class WorldObjectImpl implements IWorldObject {
 			return position;
 		} else if (layer instanceof WorldSkyImpl) {
 			return position;
+		} else {
+			throw new InvalidParameterException();
 		}
-		return null;
 
 	}
 
@@ -620,8 +621,9 @@ public class WorldObjectImpl implements IWorldObject {
 			return rectangle;
 		} else if (layer instanceof WorldSkyImpl) {
 			return rectangle;
+		} else {
+			throw new InvalidParameterException();
 		}
-		return null;
 
 	}
 
