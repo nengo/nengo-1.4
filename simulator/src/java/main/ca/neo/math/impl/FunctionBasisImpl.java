@@ -11,23 +11,34 @@ import ca.neo.math.FunctionBasis;
  *  
  * @author Bryan Tripp
  */
-public class FunctionBasisImpl implements FunctionBasis {
+public class FunctionBasisImpl extends AbstractFunction implements FunctionBasis {
 
 	private static final long serialVersionUID = 1L;
 	
 	private Function[] myFunctions;
+	private float[] myCoefficients;
+	private int myDim;
 	
 	/**
-	 * @param functions Ordered list of functions composing this basis 
+	 * @param functions Ordered list of functions composing this basis (all must have same dimension)
 	 */
-	public FunctionBasisImpl(Function[] functions) {
+	public FunctionBasisImpl(Function[] functions, float[][] domain) {
+		super(functions[0].getDimension());
+
+		for (int i = 1; i < functions.length; i++) {
+			if (functions[i].getDimension() != getDimension()) {
+				throw new IllegalArgumentException("Functions must all have same dimension");
+			}
+		}
+		
 		myFunctions = functions;
+		myCoefficients = new float[functions.length];
 	}
 
 	/**
-	 * @see ca.neo.math.FunctionBasis#getDimensions()
+	 * @see ca.neo.math.FunctionBasis#getBasisDimension()
 	 */
-	public int getDimensions() {
+	public int getBasisDimension() {
 		return myFunctions.length;
 	}
 
@@ -40,6 +51,35 @@ public class FunctionBasisImpl implements FunctionBasis {
 		}
 		
 		return myFunctions[dimension-1];
+	}
+
+	/**
+	 * @see ca.neo.math.FunctionBasis#setCoefficients(float[])
+	 */
+	public void setCoefficients(float[] coefficients) {
+		if (coefficients.length != myCoefficients.length) {
+			throw new IllegalArgumentException(myCoefficients.length + " coefficients are needed");
+		}
+	}
+
+	/**
+	 * @see ca.neo.math.Function#getDimension()
+	 */
+	public int getDimension() {
+		return myDim;
+	}
+
+	/**
+	 * @see ca.neo.math.Function#map(float[])
+	 */
+	public float map(float[] from) {
+		float result = 0;
+		
+		for (int i = 0; i < myFunctions.length; i++) {
+			result += myCoefficients[i] * myFunctions[i].map(from);
+		}
+		
+		return result;
 	}
 
 }

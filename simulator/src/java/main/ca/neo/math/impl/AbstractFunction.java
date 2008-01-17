@@ -2,9 +2,7 @@ package ca.neo.math.impl;
 
 import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.model.StructuralException;
 
 /**
  * Base class for Function implementations. The default implementation of 

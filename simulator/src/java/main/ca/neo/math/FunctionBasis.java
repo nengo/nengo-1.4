@@ -3,8 +3,6 @@
  */
 package ca.neo.math;
 
-import java.io.Serializable;
-
 /**
  * <p>A list of orthogonal functions.</p>
  * 
@@ -20,17 +18,22 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public interface FunctionBasis extends Serializable {
+public interface FunctionBasis extends Function {
 
 	/**
 	 * @return Dimensionality of basis
 	 */
-	public int getDimensions();
+	public int getBasisDimension();
 	
 	/**
-	 * @param dimension Dimension index (starting from 1)
+	 * @param basisIndex Dimension index
 	 * @return Basis function corresponding to given dimension 
 	 */
-	public Function getFunction(int dimension);
+	public Function getFunction(int basisIndex);
+	
+	/**
+	 * @param coefficients Coefficient for summing basis functions 
+	 */
+	public void setCoefficients(float[] coefficients);
 	
 }
