@@ -19,20 +19,6 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	}
 
 	/**
-	 * @see ca.neo.config.Property#addValue(java.lang.Object)
-	 */
-//	public void addValue(Object value) throws StructuralException {
-//		throw new StructuralException("Can't add a value to the single-valued property " + getName());
-//	}
-	
-	/**
-	 * @see ca.neo.config.Property#getNumValues()
-	 */
-//	public int getNumValues() {
-//		return 1;
-//	}
-
-	/**
 	 * @see ca.neo.config.Property#getValue()
 	 */
 	public Object getValue() {
@@ -52,43 +38,11 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	}
 
 	/**
-	 * @see ca.neo.config.Property#getValue(int)
-	 */
-//	public Object getValue(int index) throws StructuralException {
-//		if (index == 0) {
-//			return getValue();
-//		} else {
-//			throw new StructuralException("Value " + index + " of the single-valued property " + getName() + " does not exist");
-//		}
-//	}
-
-	/**
-	 * @see ca.neo.config.Property#insert(int, java.lang.Object)
-	 */
-//	public void insert(int index, Object value) throws StructuralException {
-//		throw new StructuralException("Can't add a value to the single-valued property " + getName());
-//	}
-
-	/**
-	 * @see ca.neo.config.Property#isMultiValued()
-	 */
-//	public boolean isMultiValued() {
-//		return false;
-//	}
-	
-	/**
 	 * @see ca.neo.config.Property#isFixedCardinality()
 	 */
 	public boolean isFixedCardinality() {
 		return true;
 	}
-
-	/**
-	 * @see ca.neo.config.Property#remove(int)
-	 */
-//	public void remove(int index) throws StructuralException {
-//		throw new StructuralException("Can't remove a value from the single-valued property " + getName());
-//	}
 
 	/**
 	 * By default, attempts to call method setX(y) on Configurable, where X is the name of the property (with 
@@ -125,23 +79,5 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 			throw new StructuralException("Value must be of class " + getType().getName());
 		}
 	}
-	
-	/**
-	 * @see ca.neo.config.Property#setValue(int, java.lang.Object)
-	 */
-//	public void setValue(int index, Object value) throws StructuralException {
-//		if (index == 0) {
-//			setValue(value);
-//		} else {
-//			throw new StructuralException("Can't set value " + index + " of the single-valued property " + getName());
-//		}
-//	}
-	
-	/**
-	 * Returns getValue() be default. 
-	 */
-//	public Object getDefaultValue() {
-//		return getValue();
-//	}		
 	
 }

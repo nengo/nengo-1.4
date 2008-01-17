@@ -38,7 +38,7 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 		Icon icon = getCustomIcon(value);
 		if (icon != null) setIcon(icon);		
 		
-		if (value instanceof Value && ((Value) value).getObject() instanceof Configurable) {
+		if (value instanceof Value && ((Value) value).getConfiguration() != null) {
 			setText(((Value) value).getObject().getClass().getSimpleName());
 			setToolTipText(((Value) value).getObject().getClass().getCanonicalName());
 		} else if (value instanceof Property) {

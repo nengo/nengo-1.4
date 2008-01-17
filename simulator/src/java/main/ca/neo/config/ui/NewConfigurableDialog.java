@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -35,8 +36,10 @@ import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
 import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
+import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.impl.MockConfigurable.MockLittleConfigurable;
+import ca.neo.model.neuron.impl.SpikingNeuron;
 
 public class NewConfigurableDialog extends JDialog implements ActionListener {
 
@@ -50,6 +53,8 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	private Configuration myConfiguration;
 	private JTree myConfigurationTree;
 	private ConfigurationTreePopupListener myPopupListener;
+	private JButton myPreviousButton;
+	private JButton myNextButton;
 	private JButton myOKButton;
 	
 	public static Configurable showDialog(Component comp, Class type, Class currentType) {
@@ -109,6 +114,9 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		
 		JScrollPane treeScroll = new JScrollPane(myConfigurationTree);
 		
+		JPanel typePanel = new JPanel();
+		typePanel.setLayout(new BoxLayout(typePanel, BoxLayout.X_AXIS));
+		
 		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
 		if (currentType != null && !NullValue.class.isAssignableFrom(currentType) && !types.contains(currentType)) {
 			types.add(0, currentType);
@@ -128,14 +136,29 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 				NewConfigurableDialog.this.setSelectedType((Class) typeBox.getSelectedItem());
 			}
 		});
-
 		typeBox.setSelectedIndex(0);
-
+		typePanel.add(typeBox);
+		
+		myPreviousButton = new JButton("<");
+		myPreviousButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				NewConfigurableDialog.this.changeConstructor(-1);
+			}
+		});
+		myNextButton = new JButton(">");
+		myNextButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				NewConfigurableDialog.this.changeConstructor(1);
+			}
+		});
+		typePanel.add(myPreviousButton);
+		typePanel.add(myNextButton);
+		
 		treeScroll.setPreferredSize(new Dimension(typeBox.getPreferredSize().width, 200));
 		
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-		contentPane.add(typeBox, BorderLayout.NORTH);
+		contentPane.add(typePanel, BorderLayout.NORTH);
 		contentPane.add(treeScroll, BorderLayout.CENTER);
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 		
@@ -182,6 +205,10 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		}
 		
 		myOKButton.setEnabled(false);
+	}
+	
+	private void changeConstructor(int increment) {
+		System.out.println("Changing constructor by " + increment);
 	}
 	
 	private void setResult() throws StructuralException {
@@ -256,7 +283,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		button.setPreferredSize(new Dimension(200, 50));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Configurable result = showDialog(button, Configurable.class, MockLittleConfigurable.class);
+				Configurable result = showDialog(button, Node.class, SpikingNeuron.class);
 				System.out.println("Result: " + result);
 			}
 		});

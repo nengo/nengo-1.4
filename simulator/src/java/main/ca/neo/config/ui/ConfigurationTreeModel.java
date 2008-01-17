@@ -19,42 +19,20 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
 import ca.neo.config.ListProperty;
+import ca.neo.config.MainHandler;
 import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
-import ca.neo.dynamics.impl.EulerIntegrator;
-import ca.neo.dynamics.impl.LTISystem;
-import ca.neo.dynamics.impl.SimpleLTISystem;
-import ca.neo.math.impl.ConstantFunction;
-import ca.neo.math.impl.Convolution;
-import ca.neo.math.impl.ExponentialPDF;
-import ca.neo.math.impl.FourierFunction;
-import ca.neo.math.impl.GaussianPDF;
-import ca.neo.math.impl.IdentityFunction;
-import ca.neo.math.impl.IndicatorPDF;
-import ca.neo.math.impl.NumericallyDifferentiableFunction;
-import ca.neo.math.impl.PostfixFunction;
-import ca.neo.math.impl.SineFunction;
-import ca.neo.math.impl.TimeSeriesFunction;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.BasicOrigin;
-import ca.neo.model.impl.MockConfigurable;
-import ca.neo.model.impl.NoiseFactory;
-import ca.neo.model.impl.ProjectionImplTest;
-import ca.neo.model.neuron.impl.ALIFNeuronFactory;
-import ca.neo.model.neuron.impl.ALIFSpikeGenerator;
-import ca.neo.model.neuron.impl.DynamicalSystemSpikeGenerator;
-import ca.neo.model.neuron.impl.IzhikevichSpikeGenerator;
-import ca.neo.model.neuron.impl.LIFNeuronFactory;
+import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.neuron.impl.LIFSpikeGenerator;
-import ca.neo.model.neuron.impl.PoissonSpikeGenerator;
-import ca.neo.model.plasticity.impl.CompositePlasticityRule;
-import ca.neo.model.plasticity.impl.SpikePlasticityRule;
-import ca.neo.util.MU;
-import ca.neo.util.impl.Rectifier;
+import ca.neo.model.neuron.impl.LinearSynapticIntegrator;
+import ca.neo.model.neuron.impl.SpikingNeuron;
 
 /**
  * Data model underlying JTree user interface for a Configurable.
@@ -66,7 +44,7 @@ public class ConfigurationTreeModel implements TreeModel {
 	private Value myRoot;
 	private List<TreeModelListener> myListeners;
 		
-	public ConfigurationTreeModel(Configurable configurable) {
+	public ConfigurationTreeModel(Object configurable) {
 		myRoot = new Value(0, configurable);
 		myListeners = new ArrayList<TreeModelListener>(5);
 	}
@@ -197,13 +175,16 @@ public class ConfigurationTreeModel implements TreeModel {
 	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
 	 */
 	public Object getChild(Object parent, int index) {
+//		System.out.println("called getChild() with " + parent.getClass().getName());
 		Object result = null;
 		try {
-			if (parent instanceof Value && ((Value) parent).getObject() instanceof Configurable) {
-				Configuration c = ((Configurable) ((Value) parent).getObject()).getConfiguration();
-				List<String> propertyNames = c.getPropertyNames();
-				Collections.sort(propertyNames);
-				result = c.getProperty(propertyNames.get(index));
+			if (parent instanceof Value) {
+				Configuration c = ((Value) parent).getConfiguration();
+				if (c != null) {
+					List<String> propertyNames = c.getPropertyNames();
+					Collections.sort(propertyNames);
+					result = c.getProperty(propertyNames.get(index));
+				}
 			} else if (parent instanceof ListProperty) {
 				ListProperty p = (ListProperty) parent;
 				Object o = p.getValue(index);
@@ -211,6 +192,7 @@ public class ConfigurationTreeModel implements TreeModel {
 			} else if (parent instanceof SingleValuedProperty) {
 				if (index == 0) {
 					Object o = ((SingleValuedProperty) parent).getValue();
+					result = new Value(index, o);
 				} else {
 					ConfigExceptionHandler.handle(
 							new StructuralException("SingleValuedProperty doesn't have child " + index), 
@@ -221,23 +203,26 @@ public class ConfigurationTreeModel implements TreeModel {
 			ConfigExceptionHandler.handle(e, ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
 		}
 		
+//		System.out.println("Child " + index + " of " + parent.toString() + ": " + result);
 		return result;
 	}
 
 	/**
 	 * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
 	 */
-	public int getChildCount(Object parent) {
+	public int getChildCount(Object parent) {		
 		int result = 0;
 		
-		if (parent instanceof Value && ((Value) parent).getObject() instanceof Configurable) {
-			result = ((Configurable) ((Value) parent).getObject()).getConfiguration().getPropertyNames().size();
+		if (parent instanceof Value) {
+			Configuration configuration = ((Value) parent).getConfiguration(); 
+			if (configuration != null) result = configuration.getPropertyNames().size();
 		} else if (parent instanceof SingleValuedProperty) {
 			result = 1; 
 		} else if (parent instanceof ListProperty) {
 			result = ((ListProperty) parent).getNumValues();
 		}
 		
+//		System.out.println("child count of " + parent.toString() + ": " + result);
 		return result;
 	}
 
@@ -249,19 +234,22 @@ public class ConfigurationTreeModel implements TreeModel {
 		
 		try {
 			if (child instanceof Property) {
-				Configuration c = ((Configurable) ((Value) parent).getObject()).getConfiguration();
+				Configuration c = ((Value) parent).getConfiguration();
 				Property p = (Property) child;
 				List<String> propertyNames = c.getPropertyNames();
 				Collections.sort(propertyNames);
 				index = propertyNames.indexOf(p.getName());
 			} else if (parent instanceof SingleValuedProperty) {
-				if (((SingleValuedProperty) parent).getValue().equals(child)) {
+				SingleValuedProperty p = (SingleValuedProperty) parent;
+				Value v = (Value) child;
+				if (p.getValue() != null && p.getValue().equals(v.getObject())) {
 					index = 0;
 				}
 			} else if (parent instanceof ListProperty) {
 				ListProperty p = (ListProperty) parent;
+				Value v = (Value) child;
 				for (int i = 0; i < p.getNumValues() && index == -1; i++) {
-					if (p.getValue(i) != null && p.getValue(i).equals(child)) index = i;
+					if (p.getValue(i) != null && p.getValue(i).equals(v.getObject())) index = i;
 				}
 			}			
 		} catch (StructuralException e) {
@@ -282,7 +270,7 @@ public class ConfigurationTreeModel implements TreeModel {
 	 * @see javax.swing.tree.TreeModel#isLeaf(java.lang.Object)
 	 */
 	public boolean isLeaf(Object o) {
-		return ( !(o instanceof Value && ((Value) o).getObject() instanceof Configurable) && !(o instanceof Property) );
+		return ( !(o instanceof Value && ((Value) o).getConfiguration() != null) && !(o instanceof Property) );
 	}
 
 	/**
@@ -316,10 +304,15 @@ public class ConfigurationTreeModel implements TreeModel {
 		
 		private int myIndex;
 		private Object myObject;
+		private Configuration myConfiguration;
 		
 		public Value(int index, Object object) {
 			myIndex = index;
 			myObject = (object == null) ? new NullValue() : object;
+			
+			if (object != null && !MainHandler.getInstance().canHandle(object.getClass())) {
+				myConfiguration = ConfigUtil.getConfiguration(object);
+			}
 		}
 		
 		public int getIndex() {
@@ -337,6 +330,10 @@ public class ConfigurationTreeModel implements TreeModel {
 		public Object getObject() {
 			return myObject;
 		}
+		
+		public Configuration getConfiguration() {
+			return myConfiguration;
+		}
 	}
 	
 	public static class NullValue {
@@ -351,7 +348,8 @@ public class ConfigurationTreeModel implements TreeModel {
 //			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
 //			configurable.addMultiValuedField("test1");
 //			configurable.addMultiValuedField("test2");
-			Configurable configurable = new BasicOrigin(); 
+			Object configurable = new SpikingNeuron(new LinearSynapticIntegrator(.001f, Units.ACU), 
+					new LIFSpikeGenerator(.001f, .02f, .001f), 15, 0, "neuron"); 
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

@@ -62,12 +62,6 @@ public class ConfigurationImpl implements Configuration {
 		return property;
 	}
 	
-//	public TemplateProperty defineTemplateProperty(String name, Class c, boolean multiValued, boolean fixedCardinality) {
-//		TemplateProperty property = new TemplateProperty(this, name, c, multiValued, fixedCardinality);
-//		myProperties.put(name, property);
-//		return property;
-//	}
-//	
 	public TemplateProperty defineTemplateProperty(String name, Class c, Object defaultValue) {
 		TemplateProperty property = new TemplateProperty(this, name, c, defaultValue);
 		myProperties.put(name, property);

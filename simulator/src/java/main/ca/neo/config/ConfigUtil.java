@@ -3,9 +3,13 @@
  */
 package ca.neo.config;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
 
 import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.ListPropertyImpl;
 import ca.neo.model.StructuralException;
 
 /**
@@ -30,41 +34,108 @@ public class ConfigUtil {
 		}		
 		return o;
 	}
-
-	//TODO: pass methods to properties
-	//TODO: finish indexed property
+	
+	public static Configuration getConfiguration(Object configurable) {
+		Configuration result = null;
+		Method[] methods = configurable.getClass().getMethods();
+		for (int i = 0; i < methods.length && result == null; i++) {
+			if (methods[i].getName().equals("getConfiguration")
+					&& methods[i].getParameterTypes().length == 0
+					&& Configuration.class.isAssignableFrom(methods[i].getReturnType())) {
+				
+				try {
+					result = (Configuration) methods[i].invoke(configurable, new Object[0]);
+				} catch (IllegalArgumentException e) {
+					throw new RuntimeException(e);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				} catch (InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		
+		if (result == null) {
+			result = defaultConfiguration(configurable);
+		}
+		
+		return result;
+	}
+	
 	//TODO: add Configuration to Value in tree model; use getConfiguration() if available
 	//TODO: test against non-Configurable objects
-	//TODO: rewrite property as hierarchy and handle map properties (check against Ensemble & Plastic)
-	//TODO: write map property handler here 
-	//TODO: support vector and matrix size changes in editor components? maybe not (setLength() might be better)
+	//TODO: andle map properties (check against Ensemble & Plastic)
+	//TODO: support constructors with arbitrary args
+	//TODO: support primitives in ListProperty or limit Property use to objects 
 	public static ConfigurationImpl defaultConfiguration(Object configurable) {
 		ConfigurationImpl result = new ConfigurationImpl(configurable);
 		
 		Method[] methods = configurable.getClass().getMethods();
 		for (int i = 0; i < methods.length; i++) {
 			Class returnType = methods[i].getReturnType();
+
 			if (isGetter(methods[i]) 
 					&& !methods[i].getName().equals("getClass")
-					&& !methods[i].getName().equals("getConstructor")) {
+					&& !methods[i].getName().equals("getConstructor")
+					&& !isCounter(methods[i])) {
 				
-				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType);
-				//TODO: remove Configurable check here; need above wrapped?
-				if (MainHandler.getInstance().canHandle(returnTypeWrapped) || Configurable.class.isAssignableFrom(returnType)) {
-					String propName = Character.toLowerCase(methods[i].getName().charAt(3))
-						+ methods[i].getName().substring(4);
-					boolean mutable = hasSetter(configurable, methods[i].getName(), returnType);
-					result.defineSingleValuedProperty(propName, returnTypeWrapped, mutable);
+				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType); //TODO: need this?
+				boolean mutable = hasSetter(configurable, methods[i].getName(), returnType);
+				result.defineSingleValuedProperty(getPropertyName(methods[i]), returnTypeWrapped, mutable);				
+				
+			} else if (isIndexedGetter(methods[i]) || isListGetter(methods[i])) {
+				String propName = getPropertyName(methods[i]);
+				if (!result.getPropertyNames().contains(propName)) {
+					Property p = ListPropertyImpl.getListProperty(result, propName, returnType);
+					if (p != null) result.defineProperty(p);					
 				}
-			} else if (isIndexGetter(methods[i])) {
-				
 			}
 		}
 		return result;
 	}
 	
+	private static boolean isCounter(Method method) {
+		String name = method.getName(); 
+		if (method.getReturnType().equals(Integer.TYPE) 
+				&& (name.matches("getNum.+") || name.matches("get.+Count")) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private static String getPropertyName(Method method) {
+		String result = method.getName();
+
+		result = stripPrefix(result, "get");
+		result = stripPrefix(result, "All");
+		result = stripSuffix(result, "Array");
+		result = stripSuffix(result, "List");
+		
+		return Character.toLowerCase(result.charAt(0)) + result.substring(1);
+	}
+	
+	private static String stripSuffix(String s, String suffix) {
+		if (s.endsWith(suffix)) {
+			return s.substring(0, s.length() - suffix.length());
+		} else {
+			return s;
+		}
+	}
+	
+	private static String stripPrefix(String s, String prefix) {
+		if (s.startsWith(prefix)) {
+			return s.substring(prefix.length());
+		} else {
+			return s;
+		}
+	}
+	
 	private static boolean isGetter(Method m) {
-		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
+		if (m.getName().startsWith("get") 
+				&& m.getParameterTypes().length == 0
+				&& !Collection.class.isAssignableFrom(m.getReturnType()) 
+				&& !m.getReturnType().isArray()) {
 			return true;
 		} else {
 			return false;
@@ -84,7 +155,7 @@ public class ConfigUtil {
 		return has;
 	}
 
-	private static boolean isIndexGetter(Method m) {
+	private static boolean isIndexedGetter(Method m) {
 		Class[] paramTypes = m.getParameterTypes();
 		if (m.getName().startsWith("get") && paramTypes.length == 1 && paramTypes[0].equals(Integer.TYPE)) {
 			return true;
@@ -93,43 +164,53 @@ public class ConfigUtil {
 		}
 	}
 	
-	//TODO: document name pattern
-	private static Method getIndexCounter(Object o, String getterName) {
-		Method result = null;
-		
-		String[] counterNames = new String[]{
-				"getNum" + getterName.substring(3),
-				"getNum" + getterName.substring(3) + "s"};
-
-		Method[] methods = o.getClass().getMethods();
-		for (int i = 0; i < methods.length && result == null; i++) {
-			if (methods[i].getParameterTypes().length == 0) {
-				for (int j = 0; j < counterNames.length && result == null; j++) {
-					if (methods[i].getName().equals(counterNames[j])) {
-						result = methods[i];
-					}
-				}
-			}
+	private static boolean isListGetter(Method m) {
+		if (m.getName().startsWith("get") 
+				&& m.getParameterTypes().length == 0
+				&& (List.class.isAssignableFrom(m.getReturnType()) || m.getReturnType().isArray())) {
+			return true;
+		} else {
+			return false;
 		}
-		
-		return result;
 	}
 	
-	private static Method getIndexSetter(Object o, String getterName, Class type) {
-		Method result = null;
-		
-		Method[] methods = o.getClass().getMethods();
-		for (int i = 0; i < methods.length && result == null; i++) {
-			if (methods[i].getName().equals("s" + getterName.substring(1))
-					&& methods[i].getParameterTypes().length == 1
-					&& methods[i].getParameterTypes()[0].isAssignableFrom(Integer.TYPE)
-					&& methods[i].getParameterTypes()[1].isAssignableFrom(type)) {
-				result = methods[i];
-			}
-		}
-		
-		return result;
-	}
+//	//TODO: document name pattern
+//	private static Method getIndexCounter(Object o, String getterName) {
+//		Method result = null;
+//		
+//		String[] counterNames = new String[]{
+//				"getNum" + getterName.substring(3),
+//				"getNum" + getterName.substring(3) + "s"};
+//
+//		Method[] methods = o.getClass().getMethods();
+//		for (int i = 0; i < methods.length && result == null; i++) {
+//			if (methods[i].getParameterTypes().length == 0) {
+//				for (int j = 0; j < counterNames.length && result == null; j++) {
+//					if (methods[i].getName().equals(counterNames[j])) {
+//						result = methods[i];
+//					}
+//				}
+//			}
+//		}
+//		
+//		return result;
+//	}
+//	
+//	private static Method getIndexSetter(Object o, String getterName, Class type) {
+//		Method result = null;
+//		
+//		Method[] methods = o.getClass().getMethods();
+//		for (int i = 0; i < methods.length && result == null; i++) {
+//			if (methods[i].getName().equals("s" + getterName.substring(1))
+//					&& methods[i].getParameterTypes().length == 1
+//					&& methods[i].getParameterTypes()[0].isAssignableFrom(Integer.TYPE)
+//					&& methods[i].getParameterTypes()[1].isAssignableFrom(type)) {
+//				result = methods[i];
+//			}
+//		}
+//		
+//		return result;
+//	}
 	
 	/**
 	 * @param c Any class 
@@ -155,5 +236,39 @@ public class ConfigUtil {
 		}		
 		
 		return c;
+	}
+		
+	public static void main(String[] args) {
+		Object foo = new Object() {
+			public int getFooCount() {
+				return 0;
+			}
+			public int getNumFoo() {
+				return 0;
+			}
+			public int[] getAllFoo() {
+				return new int[0];
+			}
+			public int[] getFooArray() {
+				return new int[0];
+			}
+			public int[] getFooList() {
+				return new int[0];
+			}
+		};
+		
+		try {
+			System.out.println(isCounter(foo.getClass().getMethod("toString", new Class[0])));
+			System.out.println(isCounter(foo.getClass().getMethod("getFooCount", new Class[0])));
+			System.out.println(isCounter(foo.getClass().getMethod("getNumFoo", new Class[0])));
+			
+			System.out.println(getPropertyName(foo.getClass().getMethod("getAllFoo", new Class[0])));
+			System.out.println(getPropertyName(foo.getClass().getMethod("getFooArray", new Class[0])));
+			System.out.println(getPropertyName(foo.getClass().getMethod("getFooList", new Class[0])));
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -13,10 +13,25 @@ import ca.neo.config.ListProperty;
 import ca.neo.model.StructuralException;
 
 /**
- * TODO: handle generic list types
- * TODO: unit test with bean pattern, list, setter/getter/counter, inserter/remover/adder 
- * TODO: override isMutable() based on available methods
- * TODO: expose separate setters for method groups
+ * <p>Default implementation of ListProperty. This implementation uses reflection to call methods on an 
+ * underlying configurable object in order to get and set multiple property values.</p>
+ * 
+ * <p>The easiest way to use this class is via the factory method getListProperty(...). In this case,
+ * the class of configuration.getConfigurable() is searched for methods that appear to be getters, 
+ * setters, etc. of a named parameter. For example if the parameter is named "X" and has type Foo, then 
+ * a method getX(int) with return type Foo is taken as the getter. Methods to get, set, insert, add, remove values, 
+ * get/set arrays, and get lists are searched based on return and argument types, and a variety of probable names 
+ * (including bean patterns). If there are not methods available for at least getting and counting values, 
+ * null is returned. The set of other methods found determines whether the property is mutable and has 
+ * fixed cardinality (i.e. # of values).</p>
+ *   
+ * <p>If customization is needed, there are two alternative public constructors that accept user-specified methods, 
+ * and additional functionality can then be imparted via setSetter(...), setArraySetter(...), and setInserter(...).
+ * This allows use of methods with unexpected names, although the expected arguments and return types are 
+ * still required.</p>
+ * 
+ * <p>If further customization is needed (e.g. using an Integer index argument instead of an int), then the methods 
+ * of this class must be overridden.</p> 
  * 
  * @author Bryan Tripp
  */
@@ -45,15 +60,15 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 		Class targetClass = configuration.getConfigurable().getClass();
 		
 		String uname = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-		String[] getterNames = new String[]{"get" + uname};
-		String[] setterNames = new String[]{"set" +uname};
-		String[] countGetterNames = new String[]{"getNum" + uname, "getNum" + uname + "s", "get" + uname + "Count"};
-		String[] arrayGetterNames = new String[]{"get" + uname + "s", "get" + uname + "Array"};
-		String[] arraySetterNames = new String[]{"set" + uname + "s", "set" + uname + "Array"};
-		String[] listGetterNames = new String[]{"get" + uname + "s", "get" + uname + "List"};
-		String[] inserterNames = new String[]{"insert" + uname};
-		String[] adderNames = new String[]{"add" + uname};
-		String[] removerNames = new String[]{"remove" + uname};
+		String[] getterNames = new String[]{"get"+uname};
+		String[] setterNames = new String[]{"set"+uname};
+		String[] countGetterNames = new String[]{"getNum"+uname, "getNum"+uname+"s", "get"+uname+"Count"};
+		String[] arrayGetterNames = new String[]{"get"+uname+"s", "get"+uname+"Array", "getAll"+uname};
+		String[] arraySetterNames = new String[]{"set"+uname+"s", "set"+uname+"Array", "setAll"+uname};
+		String[] listGetterNames = new String[]{"get"+uname, "get"+uname+"s", "get"+uname+"List"};
+		String[] inserterNames = new String[]{"insert"+uname};
+		String[] adderNames = new String[]{"add"+uname};
+		String[] removerNames = new String[]{"remove"+uname};
 		
 		Method getter = getMethod(targetClass, getterNames, new Class[]{Integer.TYPE}, type);
 		Method setter = getMethod(targetClass, setterNames, new Class[]{Integer.TYPE, type}, null);
@@ -68,9 +83,8 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 			remover = getMethod(targetClass, removerNames, new Class[]{Integer.TYPE}, type);
 		}
 		
-		if (arrayGetter != null || (getter != null && countGetter != null)) { //OK, minimal method set exists
-			boolean mutable = (setter != null || arraySetter != null);
-			result = new ListPropertyImpl(configuration, name, type, mutable);
+		if (arrayGetter != null || listGetter != null || (getter != null && countGetter != null)) { //OK, minimal method set exists
+			result = new ListPropertyImpl(configuration, name, type);
 			result.setAccessors(getter, setter, countGetter, arrayGetter, arraySetter, listGetter, inserter, remover, adder);
 		}
 		
@@ -84,10 +98,10 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 		Method[] methods = c.getMethods();
 		for (int i = 0; i < methods.length && result == null; i++) {
 			for (int j = 0; j < names.length; j++) {
-				if (methods[i].getName().equals(names[j]) 
-						&& typesCompatible(methods[i].getParameterTypes(), argTypes) 
-						&& ((returnType == null && methods[i].getReturnType() == null) || methods[i].getReturnType().equals(returnType))) {
-					result = methods[i];
+				if (methods[i].getName().equals(names[j]) && typesCompatible(methods[i].getParameterTypes(), argTypes)) {
+					if (returnType == null || methods[i].getReturnType().equals(returnType)) {
+						result = methods[i];
+					}					
 				}
 			}
 		}
@@ -108,11 +122,74 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 		return match;
 	}
 	
-	private ListPropertyImpl(Configuration configuration, String name, Class c, boolean mutable) {
-		super(configuration, name, c, mutable);
+	//used by factory method
+	private ListPropertyImpl(Configuration configuration, String name, Class c) {
+		super(configuration, name, c, false);
 		myTarget = configuration.getConfigurable();
 	}
+	
+	/**
+	 * @param configuration Configuration to which this Property is to belong
+	 * @param name Name of the Property, eg X if it is accessed via getX(...)
+	 * @param c Class of the Property
+	 * @param listGetter A method on the underlying class (the configuration target; not c) that 
+	 * 		returns multiple values of the property, as either an array of c or a list of c.   
+	 */
+	public ListPropertyImpl(Configuration configuration, String name, Class c, Method listGetter) {
+		super(configuration, name, c, false);
+		myTarget = configuration.getConfigurable();
+		
+		if (listGetter.getReturnType().equals(List.class)) {
+			myListGetter = listGetter;
+		} else {
+			myArrayGetter = listGetter;
+		}
+	}
 
+	/**
+	 * @param configuration Configuration to which this Property is to belong
+	 * @param name Name of the Property, eg X if it is accessed via getX()
+	 * @param c Class of the Property
+	 * @param getter A method on the underlying class (the configuration target; not c) that 
+	 * 		returns a single indexed value of the property, eg getX(int). 
+	 * @param countGetter A method on the underlying class that returns the number of 
+	 * 		values of the property
+	 */
+	public ListPropertyImpl(Configuration configuration, String name, Class c, Method getter, Method countGetter) {
+		super(configuration, name, c, false);
+		myTarget = configuration.getConfigurable();
+		myGetter = getter;
+		myCountGetter = countGetter;
+	}
+	
+	/**
+	 * @param setter A method on the underlying class acts as a setter for a single 
+	 * 		value of the property, eg setX(int, Object) 
+	 */
+	public void setSetter(Method setter) {
+		mySetter = setter;
+	}
+
+	/**
+	 * @param arraySetter A method on the underlying class that acts as a setter for 
+	 * 		all values of the property using an array argument, eg setX(Object[])
+	 */
+	public void setArraySetter(Method arraySetter) {
+		myArraySetter = arraySetter;
+	}
+
+	/**
+	 * @param inserter A method on the underlying class that inserts a value, eg insertX(int, Object)
+	 * @param adder A method on the underlying class that adds a value to the end of the list, eg addX(Object)
+	 * @param remover A method on the underlying class that removes a value, eg removeX(int)
+	 */
+	public void setInserter(Method inserter, Method adder, Method remover) {
+		myInserter = inserter;
+		myAdder = adder;
+		myRemover = remover;
+	}
+
+	//used by factory method
 	private void setAccessors(Method getter, Method setter, Method countGetter, Method arrayGetter, Method arraySetter,  
 			Method listGetter, Method inserter, Method remover, Method adder) {
 		myGetter = getter;
@@ -202,6 +279,12 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 				myArraySetter.invoke(myTarget, new Object[]{array});
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).set(index, value);
+			} else {
+				if (isMutable()) {
+					throw new RuntimeException("The property is marked as mutable but there are no methods for changing -- this appears to be a bug");
+				} else {
+					throw new StructuralException("This property is immutable");					
+				}
 			}
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
@@ -225,7 +308,12 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).add(value);
 			} else {
-				throw new StructuralException("There is no method available for adding a value");
+				if (isFixedCardinality()) {
+					throw new StructuralException("This property has fixed cardinality");					
+				} else {
+					throw new RuntimeException("The property is not marked as having fixed cardinality " +
+							"but there are no methods for adding a value -- this appears to be a bug");
+				}
 			}
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
@@ -246,7 +334,12 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).add(index, value);
 			} else {
-				throw new StructuralException("There is no method available for inserting a value");
+				if (isFixedCardinality()) {
+					throw new StructuralException("This property has fixed cardinality");					
+				} else {
+					throw new RuntimeException("The property is not marked as having fixed cardinality " +
+							"but there are no methods for inserting a value -- this appears to be a bug");
+				}
 			}
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
@@ -267,7 +360,12 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).remove(index);
 			} else {
-				throw new StructuralException("There is no method available for removing a value");
+				if (isFixedCardinality()) {
+					throw new StructuralException("This property has fixed cardinality");					
+				} else {
+					throw new RuntimeException("The property is not marked as having fixed cardinality " +
+							"but there are no methods for removing a value -- this appears to be a bug");
+				}
 			}
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
@@ -294,8 +392,13 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	 * @see ca.neo.config.Property#isFixedCardinality()
 	 */
 	public boolean isFixedCardinality() {
-		return (myListGetter != null 
-				|| (myInserter != null && myRemover != null));
+		return (myListGetter == null 
+				&& (myInserter == null || myRemover == null));
+	}
+
+	@Override
+	public boolean isMutable() {
+		return (mySetter != null || myListGetter != null || myArraySetter != null);
 	}
 
 }

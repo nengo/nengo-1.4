@@ -3,11 +3,14 @@
  */
 package ca.neo.config.impl;
 
-import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
-import ca.neo.config.MainHandler;
 import ca.neo.config.Property;
 
+/**
+ * Base implementation of Property. 
+ *  
+ * @author Bryan Tripp
+ */
 abstract class AbstractProperty implements Property {
 		
 	private Configuration myConfiguration;
@@ -15,11 +18,13 @@ abstract class AbstractProperty implements Property {
 	private Class myClass;
 	private boolean myMutable;
 	
+	/**
+	 * @param configuration Configuration to which the Property belongs
+	 * @param name Name of the Property
+	 * @param c Type of the Property
+	 * @param mutable Whether the Property value(s) can be modified
+	 */
 	public AbstractProperty(Configuration configuration, String name, Class c, boolean mutable) {
-		if (!Configurable.class.isAssignableFrom(c) && !MainHandler.getInstance().canHandle(c)) {
-			throw new IllegalArgumentException("No handler for property type " + c.getName());
-		}
-			
 		myConfiguration = configuration;
 		myName = name;
 		myClass = c;	

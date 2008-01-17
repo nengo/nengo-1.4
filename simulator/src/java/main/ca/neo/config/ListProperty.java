@@ -18,14 +18,14 @@ public interface ListProperty extends Property {
 	 * @param index Index of a certain single value of a multi-valued property 
 	 * @param value New value to replace that at the given index 
 	 * @throws StructuralException if the value is invalid (as in setValue) or the given index is 
-	 * 		out of range 
+	 * 		out of range or the Property is immutable
 	 */
 	public void setValue(int index, Object value) throws StructuralException;
 
 	/**
 	 * @param value New value to be added to the end of the list 
 	 * @throws StructuralException if the value is invalid (as in setValue) or the Property is 
-	 * 		not multi-valued 
+	 * 		immutable or fixed-cardinality 
 	 */
 	public void addValue(Object value) throws StructuralException;
 	
@@ -38,13 +38,13 @@ public interface ListProperty extends Property {
 	 * @param index Index at which new value is to be inserted  
 	 * @param value New value
 	 * @throws StructuralException if the value is invalid (as in setValue) or the Property is 
-	 * 		not multi-valued or the index is out of range 
+	 * 		immutable or fixed-cardinality or the index is out of range 
 	 */
 	public void insert(int index, Object value) throws StructuralException;
 	
 	/**
 	 * @param index Index of a single value of a multi-valued property that is to be removed
-	 * @throws StructuralException if the given index is out of range or the Property is immutable
+	 * @throws StructuralException if the given index is out of range or the Property is immutable or fixed cardinality
 	 */
 	public void remove(int index) throws StructuralException;
 	

@@ -1,4 +1,3 @@
-ca.neo.model.Configurable
 ca.neo.model.plasticity.PlasticityRule
 ca.neo.dynamics.DynamicalSystem
 ca.neo.dynamics.Integrator
@@ -9,4 +8,5 @@ ca.neo.math.PDF
 ca.neo.util.TimeSeries
 ca.neo.util.TimeSeries1D
 ca.neo.util.VectorGenerator
+ca.neo.model.Node
 
