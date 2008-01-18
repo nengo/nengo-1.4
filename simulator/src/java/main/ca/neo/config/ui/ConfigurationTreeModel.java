@@ -28,14 +28,22 @@ import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
-import ca.neo.model.impl.BasicOrigin;
-import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.neuron.impl.LIFSpikeGenerator;
 import ca.neo.model.neuron.impl.LinearSynapticIntegrator;
 import ca.neo.model.neuron.impl.SpikingNeuron;
 
 /**
  * Data model underlying JTree user interface for a Configurable.
+ * 
+ * TODO (friday): handle MapParameters (check against Ensemble & Plastic) 
+ * TODO (monday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
+ * TODO (tuesday): support float[] and float[][] size changes
+ * TODO (tuesday): constructor arg names and docs from source
+ * TODO (wednesday): support primitives in ListProperty or limit Property use to objects 
+ * TODO (wednesday): clean up configuration code  
+ * TODO (thursday): remove Configurable 
+ * TODO (thursday): augment model classes with getters
+ * TODO (later): register factories and allow factory use for new object creation
  * 
  * @author Bryan Tripp
  */
@@ -222,7 +230,6 @@ public class ConfigurationTreeModel implements TreeModel {
 			result = ((ListProperty) parent).getNumValues();
 		}
 		
-//		System.out.println("child count of " + parent.toString() + ": " + result);
 		return result;
 	}
 

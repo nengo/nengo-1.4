@@ -9,4 +9,6 @@ ca.neo.util.TimeSeries
 ca.neo.util.TimeSeries1D
 ca.neo.util.VectorGenerator
 ca.neo.model.Node
-
+ca.neo.model.neuron.SynapticIntegrator
+ca.neo.model.neuron.SpikeGenerator
+ca.neo.model.neuron.Neuron

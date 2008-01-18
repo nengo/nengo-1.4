@@ -62,11 +62,6 @@ public class ConfigUtil {
 		return result;
 	}
 	
-	//TODO: add Configuration to Value in tree model; use getConfiguration() if available
-	//TODO: test against non-Configurable objects
-	//TODO: andle map properties (check against Ensemble & Plastic)
-	//TODO: support constructors with arbitrary args
-	//TODO: support primitives in ListProperty or limit Property use to objects 
 	public static ConfigurationImpl defaultConfiguration(Object configurable) {
 		ConfigurationImpl result = new ConfigurationImpl(configurable);
 		
@@ -237,7 +232,7 @@ public class ConfigUtil {
 		
 		return c;
 	}
-		
+	
 	public static void main(String[] args) {
 		Object foo = new Object() {
 			public int getFooCount() {

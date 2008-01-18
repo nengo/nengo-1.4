@@ -15,6 +15,8 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -32,8 +34,14 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 import ca.neo.config.ClassRegistry;
+import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
+import ca.neo.config.MainHandler;
+import ca.neo.config.Property;
+import ca.neo.config.SingleValuedProperty;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.TemplateProperty;
 import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.Node;
@@ -46,25 +54,39 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final String CANCEL_ACTION_COMMAND = "cancel";
 	
-	private static Configurable myResult;	
+	private static Object myResult;	
 	private static NewConfigurableDialog myDialog;
 	
-	private Class myType;
+//	private Class myType;
 	private Configuration myConfiguration;
 	private JTree myConfigurationTree;
 	private ConfigurationTreePopupListener myPopupListener;
 	private JButton myPreviousButton;
 	private JButton myNextButton;
 	private JButton myOKButton;
+	private Constructor[] myConstructors;
+	private int myConstructorIndex;
 	
-	public static Configurable showDialog(Component comp, Class type, Class currentType) {
+	public static Object showDialog(Component comp, Class type, Class currentType) {
 		myResult = null;
-		myDialog = new NewConfigurableDialog(comp, type, currentType);
-		myDialog.setVisible(true);
+		
+		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
+		if (currentType != null && !NullValue.class.isAssignableFrom(currentType) && !types.contains(currentType)) {
+			types.add(0, currentType);
+		}
+		
+		if (types.size() > 0) {
+			myDialog = new NewConfigurableDialog(comp, type, types);
+			myDialog.setVisible(true);			
+		} else {
+			String errorMessage = "There are no registered implementations of type " + type.getName();
+			ConfigExceptionHandler.handle(new RuntimeException(errorMessage), errorMessage, comp);
+		}
+		
 		return myResult;
 	}
 	
-	private NewConfigurableDialog(Component comp, final Class type, Class currentType) {
+	private NewConfigurableDialog(Component comp, final Class type, List<Class> types) {
 		super(JOptionPane.getFrameForComponent(comp), "New " + type.getSimpleName(), true);
 		
 		JButton cancelButton = new JButton("Cancel");
@@ -104,7 +126,11 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 				Component result = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 				if (value instanceof Value && ((Value) value).getObject() instanceof ConstructionProperties 
 						&& result instanceof JLabel) {
-					((JLabel) result).setText("Construction properties");
+					String text = "Constructor Arguments";
+					if (((ConstructionProperties) ((Value) value).getObject()).getConfiguration().getPropertyNames().size() == 0) {
+						text = "Zero-Argument Constructor";
+					}
+					((JLabel) result).setText(text);
 				}
 				return result;
 			}
@@ -117,10 +143,10 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		JPanel typePanel = new JPanel();
 		typePanel.setLayout(new BoxLayout(typePanel, BoxLayout.X_AXIS));
 		
-		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
-		if (currentType != null && !NullValue.class.isAssignableFrom(currentType) && !types.contains(currentType)) {
-			types.add(0, currentType);
-		}
+//		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
+//		if (currentType != null && !NullValue.class.isAssignableFrom(currentType) && !types.contains(currentType)) {
+//			types.add(0, currentType);
+//		}
 		final JComboBox typeBox = new JComboBox(types.toArray());
 		typeBox.setRenderer(new BasicComboBoxRenderer() {
 			private static final long serialVersionUID = 1L;
@@ -131,12 +157,6 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 				return result;
 			}
 		});
-		typeBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				NewConfigurableDialog.this.setSelectedType((Class) typeBox.getSelectedItem());
-			}
-		});
-		typeBox.setSelectedIndex(0);
 		typePanel.add(typeBox);
 		
 		myPreviousButton = new JButton("<");
@@ -153,8 +173,15 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		});
 		typePanel.add(myPreviousButton);
 		typePanel.add(myNextButton);
+
+		typeBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				NewConfigurableDialog.this.setSelectedType((Class) typeBox.getSelectedItem());
+			}
+		});
 		
 		treeScroll.setPreferredSize(new Dimension(typeBox.getPreferredSize().width, 200));
+		typeBox.setSelectedIndex(0);
 		
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
@@ -167,71 +194,144 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	}
 	
 	private void setSelectedType(Class type) {
-		myType = type;
+//		myType = type;				
+		myConstructors = type.getConstructors();		
+		setConstructor(0);
+		System.out.println("setting constructors " + myConstructors.length);
 		
-		Method templateMethod = null;
-		Method[] methods = type.getDeclaredMethods();
-		for (int i = 0; i < methods.length; i++) {
-			if ((methods[i].getName().equals("getUserConstructionTemplate") 
-						|| (templateMethod == null && methods[i].getName().equals("getConstructionTemplate")))  
-					&& methods[i].getParameterTypes().length == 0
-					&& Configuration.class.isAssignableFrom(methods[i].getReturnType())) {
-				templateMethod = methods[i];
-			}
-		}
-		
-		if (myPopupListener != null) {
-			myConfigurationTree.removeMouseListener(myPopupListener);
-		}
-		
-		
-		if (templateMethod != null) {
-			try {
-				myConfiguration = (Configuration) templateMethod.invoke(type, new Object[0]);
-				ConfigurationTreeModel model = new ConfigurationTreeModel(new ConstructionProperties(myConfiguration)); 
-				myConfigurationTree.setModel(model);
-				myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
-				myConfigurationTree.addMouseListener(myPopupListener);
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		} else {
-			myConfiguration = null;
-			myConfigurationTree.setModel(new DefaultTreeModel(null));
-		}
+//		Method templateMethod = null;
+//		Method[] methods = type.getDeclaredMethods();
+//		for (int i = 0; i < methods.length; i++) {
+//			if ((methods[i].getName().equals("getUserConstructionTemplate") 
+//						|| (templateMethod == null && methods[i].getName().equals("getConstructionTemplate")))  
+//					&& methods[i].getParameterTypes().length == 0
+//					&& Configuration.class.isAssignableFrom(methods[i].getReturnType())) {
+//				templateMethod = methods[i];
+//			}
+//		}
+//		
+//		if (myPopupListener != null) {
+//			myConfigurationTree.removeMouseListener(myPopupListener);
+//		}
+//		
+//		
+//		if (templateMethod != null) {
+//			try {
+//				myConfiguration = (Configuration) templateMethod.invoke(type, new Object[0]);
+//				ConfigurationTreeModel model = new ConfigurationTreeModel(new ConstructionProperties(myConfiguration)); 
+//				myConfigurationTree.setModel(model);
+//				myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
+//				myConfigurationTree.addMouseListener(myPopupListener);
+//			} catch (IllegalArgumentException e) {
+//				e.printStackTrace();
+//			} catch (IllegalAccessException e) {
+//				e.printStackTrace();
+//			} catch (InvocationTargetException e) {
+//				e.printStackTrace();
+//			}
+//		} else {
+//			myConfiguration = null;
+//			myConfigurationTree.setModel(new DefaultTreeModel(null));
+//		}
 		
 		myOKButton.setEnabled(false);
 	}
 	
 	private void changeConstructor(int increment) {
-		System.out.println("Changing constructor by " + increment);
+		int newIndex = myConstructorIndex + increment;
+		if (newIndex >= 0 && newIndex < myConstructors.length) {
+			setConstructor(newIndex);			
+		}
+	}
+	
+	private void setConstructor(int index) {
+		System.out.println("Setting constructor index to " + index);
+		myConstructorIndex = index;
+		Constructor constructor = myConstructors[index];
+		
+		if (myConstructorIndex == 0) {
+			myPreviousButton.setEnabled(false);
+		} else {
+			myPreviousButton.setEnabled(true);
+		}
+		
+		if (myConstructorIndex == myConstructors.length - 1) {
+			myNextButton.setEnabled(false);
+		} else {
+			myNextButton.setEnabled(true);
+		}
+		
+		if (myPopupListener != null) {
+			myConfigurationTree.removeMouseListener(myPopupListener);
+		}		
+		
+//		if (constructor.getParameterTypes().length > 0) {
+			myConfiguration = makeTemplate(constructor);
+			ConfigurationTreeModel model = new ConfigurationTreeModel(new ConstructionProperties(myConfiguration)); 
+			myConfigurationTree.setModel(model);
+			myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
+			myConfigurationTree.addMouseListener(myPopupListener);
+//		} else {
+//			myConfiguration = null;
+//			myConfigurationTree.setModel(new DefaultTreeModel(null));
+//		}		
+	}
+	
+	private static Configuration makeTemplate(Constructor constructor) {
+		ConfigurationImpl result = new ConfigurationImpl(null);
+		Class[] types = constructor.getParameterTypes();
+		for (int i = 0; i < types.length; i++) {
+			if (types[i].isPrimitive()) types[i] = ConfigUtil.getPrimitiveWrapperClass(types[i]);
+			TemplateProperty p = new TemplateProperty(result, "arg"+i, types[i], getDefaultValue(types[i]));
+			result.defineProperty(p);
+		}
+		return result;
+	}
+	
+	private static Object getDefaultValue(Class type) {
+		Object result = null;
+		
+//		if (type.isPrimitive()) type = ConfigUtil.getPrimitiveWrapperClass(type);
+		
+		if (MainHandler.getInstance().canHandle(type)) {
+			result = MainHandler.getInstance().getDefaultValue(type);
+		}
+		
+		if (result == null) {
+			Constructor<?>[] constructors = type.getConstructors();
+			Constructor zeroArgConstructor = null;
+			for (int i = 0; i < constructors.length && zeroArgConstructor == null; i++) {
+				if (constructors[i].getParameterTypes().length == 0) {
+					zeroArgConstructor = constructors[i];
+				}
+			}
+			if (zeroArgConstructor != null) {
+				try {
+					result = zeroArgConstructor.newInstance(new Object[0]);
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}			
+		}
+		
+		return result; 
 	}
 	
 	private void setResult() throws StructuralException {
-		Constructor<?>[] constructors = myType.getConstructors();
-		Constructor zeroArgConstructor = null;
-		Constructor templateConstructor = null;
-		for (int i = 0; i < constructors.length; i++) {
-			Class[] paramTypes = constructors[i].getParameterTypes();
-			if (paramTypes.length == 0) {
-				zeroArgConstructor = constructors[i];
-			} else if (paramTypes.length == 1 && Configuration.class.isAssignableFrom(paramTypes[0])) {
-				templateConstructor = constructors[i];
-			}
+		List<Object> args = new ArrayList<Object>(myConfiguration.getPropertyNames().size());
+		for (Iterator<String> iter = myConfiguration.getPropertyNames().iterator(); iter.hasNext(); ) {
+			SingleValuedProperty p = (SingleValuedProperty) myConfiguration.getProperty(iter.next());
+			args.add(p.getValue());
 		}
 		
 		try {
-			if (templateConstructor != null) {
-				myResult = (Configurable) templateConstructor.newInstance(new Object[]{myConfiguration});
-			} else if (zeroArgConstructor != null) {
-				myResult = (Configurable) zeroArgConstructor.newInstance(new Object[0]);
-			} else {
-				throw new StructuralException(myType.getName() + " doesn't have template-arg or zero-arg constructor");
-			}
+			myResult = myConstructors[myConstructorIndex].newInstance(args.toArray(new Object[0]));
 			
 			if (myPopupListener != null) {
 				myConfigurationTree.removeMouseListener(myPopupListener);
@@ -241,7 +341,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
 			myConfigurationTree.addMouseListener(myPopupListener);
 
-			myOKButton.setEnabled(true);
+			myOKButton.setEnabled(true);			
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -250,7 +350,47 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
-		} 		
+		}
+		
+//		Constructor<?>[] constructors = myType.getConstructors();
+//		Constructor zeroArgConstructor = null;
+//		Constructor templateConstructor = null;
+//		for (int i = 0; i < constructors.length; i++) {
+//			Class[] paramTypes = constructors[i].getParameterTypes();
+//			if (paramTypes.length == 0) {
+//				zeroArgConstructor = constructors[i];
+//			} else if (paramTypes.length == 1 && Configuration.class.isAssignableFrom(paramTypes[0])) {
+//				templateConstructor = constructors[i];
+//			}
+//		}
+//		
+//		try {
+//			if (templateConstructor != null) {
+//				myResult = (Configurable) templateConstructor.newInstance(new Object[]{myConfiguration});
+//			} else if (zeroArgConstructor != null) {
+//				myResult = (Configurable) zeroArgConstructor.newInstance(new Object[0]);
+//			} else {
+//				throw new StructuralException(myType.getName() + " doesn't have template-arg or zero-arg constructor");
+//			}
+//			
+//			if (myPopupListener != null) {
+//				myConfigurationTree.removeMouseListener(myPopupListener);
+//			}
+//			ConfigurationTreeModel model = new ConfigurationTreeModel(myResult); 
+//			myConfigurationTree.setModel(model);
+//			myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
+//			myConfigurationTree.addMouseListener(myPopupListener);
+//
+//			myOKButton.setEnabled(true);
+//		} catch (IllegalArgumentException e) {
+//			e.printStackTrace();
+//		} catch (InstantiationException e) {
+//			e.printStackTrace();
+//		} catch (IllegalAccessException e) {
+//			e.printStackTrace();
+//		} catch (InvocationTargetException e) {
+//			e.printStackTrace();
+//		} 		
 	}
 	
 	/**
@@ -263,7 +403,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		myDialog.setVisible(false);
 	}
 
-	private static class ConstructionProperties implements Configurable {
+	public static class ConstructionProperties implements Configurable {
 
 		private Configuration myConfiguration;
 		
@@ -283,7 +423,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		button.setPreferredSize(new Dimension(200, 50));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Configurable result = showDialog(button, Node.class, SpikingNeuron.class);
+				Object result = showDialog(button, Node.class, SpikingNeuron.class);
 				System.out.println("Result: " + result);
 			}
 		});

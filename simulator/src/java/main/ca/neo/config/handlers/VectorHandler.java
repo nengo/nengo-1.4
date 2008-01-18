@@ -66,4 +66,11 @@ public class VectorHandler extends BaseHandler {
 		return MatrixHandler.fromString(s, ',', "\r\n")[0];
 	}	
 
+	/**
+	 * @see ca.neo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
+	 */
+	public Object getDefaultValue(Class c) {
+		return new float[0];
+	}
+
 }

@@ -13,15 +13,18 @@ import ca.neo.config.Property;
 import ca.neo.model.StructuralException;
 
 /**
- * Base implementation of Configuration. A Configurable would normally have 
+ * <p>Base implementation of Configuration. A Configurable would normally have 
  * an associated implementation of <code>setValue(String, Object)</code> that 
- * maps to the Configurable's native setters.
+ * maps to the Configurable's native setters.</p>
+ * 
+ * <p>This implementation reports property names in the order they are defined.</p>
  * 
  * @author Bryan Tripp
  */
 public class ConfigurationImpl implements Configuration {
 
 	private Object myConfigurable;
+	private List<String> myPropertyNames;
 	private Map<String, Property> myProperties;
 	
 	/**
@@ -29,6 +32,7 @@ public class ConfigurationImpl implements Configuration {
 	 */
 	public ConfigurationImpl(Object configurable) {
 		myConfigurable = configurable;
+		myPropertyNames = new ArrayList<String>(20); 
 		myProperties = new HashMap<String, Property>(20);
 	}
 	
@@ -46,7 +50,10 @@ public class ConfigurationImpl implements Configuration {
 	 * @param property The new Property 
 	 */
 	public void defineProperty(Property property) {
-		myProperties.put(property.getName(), property);
+		String name = property.getName();
+		myProperties.put(name, property);
+		if (myPropertyNames.contains(name)) myPropertyNames.remove(name);
+		myPropertyNames.add(name);
 	}
 	
 	/**
@@ -54,6 +61,7 @@ public class ConfigurationImpl implements Configuration {
 	 */
 	public void removeProperty(String name) {
 		myProperties.remove(name);
+		myPropertyNames.remove(name);
 	}
 	
 	public SingleValuedPropertyImpl defineSingleValuedProperty(String name, Class c, boolean mutable) {		
@@ -72,7 +80,7 @@ public class ConfigurationImpl implements Configuration {
 	 * @see ca.neo.config.Configuration#getPropertyNames()
 	 */
 	public List<String> getPropertyNames() {
-		return new ArrayList<String>(myProperties.keySet());
+		return new ArrayList<String>(myPropertyNames);
 	}
 
 	/**

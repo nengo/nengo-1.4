@@ -135,4 +135,11 @@ public class MatrixHandler extends BaseHandler {
 		return result.toString();
 	}
 
+	/**
+	 * @see ca.neo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
+	 */
+	public Object getDefaultValue(Class c) {
+		return new float[0][];
+	}
+
 }

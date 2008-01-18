@@ -70,6 +70,11 @@ public class UnitsHandler extends BaseHandler {
 		return result;
 	}
 	
-	
+	/**
+	 * @see ca.neo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
+	 */
+	public Object getDefaultValue(Class c) {
+		return Units.UNK;
+	}
 	
 }

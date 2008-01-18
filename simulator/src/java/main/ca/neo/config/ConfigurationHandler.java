@@ -18,5 +18,7 @@ public interface ConfigurationHandler {
 	public String toString(Object o);
 	
 	public Object fromString(String s);
+	
+	public Object getDefaultValue(Class c);
 
 }

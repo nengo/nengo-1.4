@@ -64,10 +64,10 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					replaceValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 							Class currentType = ((Value) path.getLastPathComponent()).getObject().getClass();
-							Configurable c = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), currentType);
-							if (c != null)
+							Object o = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), currentType);
+							if (o != null)
 								try {
-									myModel.setValue(this, path, c);
+									myModel.setValue(this, path, o);
 								} catch (StructuralException ex) {
 									ConfigExceptionHandler.handle(ex, ex.getMessage(), event.getComponent());
 								}

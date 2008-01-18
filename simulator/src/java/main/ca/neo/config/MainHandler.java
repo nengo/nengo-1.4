@@ -26,6 +26,7 @@ import ca.neo.config.handlers.VectorHandler;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 
+//TODO: make getHandler() private method
 public class MainHandler implements ConfigurationHandler {
 	
 	public static String HANDLERS_FILE_PROPERTY = "ca.neo.config.handlers";
@@ -166,6 +167,20 @@ public class MainHandler implements ConfigurationHandler {
 		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
 			if (myHandlers.get(i).canHandle(c)) {
 				result = myHandlers.get(i).toString(o);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * @see ca.neo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
+	 */
+	public Object getDefaultValue(Class c) {
+		Object result = null;
+		
+		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
+			if (myHandlers.get(i).canHandle(c)) {
+				result = myHandlers.get(i).getDefaultValue(c);
 			}
 		}
 		return result;

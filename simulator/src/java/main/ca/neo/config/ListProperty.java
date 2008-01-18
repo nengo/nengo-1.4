@@ -50,6 +50,7 @@ public interface ListProperty extends Property {
 	
 	/**
 	 * @return Default value for insertions
+	 * TODO: remove; use default from NewConfigurableDialog (move to ConfigUtil)
 	 */
 	public Object getDefaultValue(); 
 

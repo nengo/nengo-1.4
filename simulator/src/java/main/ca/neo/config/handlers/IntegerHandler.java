@@ -9,4 +9,11 @@ public class IntegerHandler extends BaseHandler {
 		super(Integer.class);
 	}
 
+	/**
+	 * @see ca.neo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
+	 */
+	public Object getDefaultValue(Class c) {
+		return new Integer(0);
+	}
+
 }

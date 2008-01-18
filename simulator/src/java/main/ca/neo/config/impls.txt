@@ -28,3 +28,13 @@ ca.neo.util.impl.RandomHypersphereVG
 ca.neo.util.impl.Rectifier
 ca.neo.model.impl.NoiseFactory$NoiseImplPDF
 ca.neo.model.neuron.impl.SpikingNeuron
+ca.neo.model.neuron.impl.PlasticExpandableSpikingNeuron
+ca.neo.model.neuron.impl.ALIFSpikeGenerator
+ca.neo.model.neuron.impl.LIFSpikeGenerator
+ca.neo.model.neuron.impl.DynamicalSystemSpikeGenerator
+ca.neo.model.neuron.impl.HodgkinHuxleySpikeGenerator
+ca.neo.model.neuron.impl.IzhikevichSpikeGenerator
+ca.neo.model.neuron.impl.PoissonSpikeGenerator
+ca.neo.model.neuron.impl.LinearSynapticIntegrator
+
+
