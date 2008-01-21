@@ -5,11 +5,14 @@ package ca.neo.config.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
@@ -64,6 +67,16 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 			}				
 		} else {
 			setToolTipText(value.getClass().getCanonicalName());
+		}
+		
+		//show name 
+		if (value instanceof Value && ((Value) value).getName() != null && result instanceof JLabel) {
+			JLabel label = (JLabel) result;
+			label.setText(((Value) value).getName() + ": " + label.getText());
+//			JPanel wrapper = new JPanel(new FlowLayout());
+//			wrapper.add(new JLabel(((Value) value).getName()));
+//			wrapper.add(result);
+//			result = wrapper;
 		}
 		
 		return result;

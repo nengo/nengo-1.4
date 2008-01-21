@@ -66,13 +66,13 @@ public class ConfigurationImpl implements Configuration {
 	
 	public SingleValuedPropertyImpl defineSingleValuedProperty(String name, Class c, boolean mutable) {		
 		SingleValuedPropertyImpl property = new SingleValuedPropertyImpl(this, name, c, mutable);
-		myProperties.put(name, property);
+		defineProperty(property);
 		return property;
 	}
 	
 	public TemplateProperty defineTemplateProperty(String name, Class c, Object defaultValue) {
 		TemplateProperty property = new TemplateProperty(this, name, c, defaultValue);
-		myProperties.put(name, property);
+		defineProperty(property);
 		return property;
 	}
 	

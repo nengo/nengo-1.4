@@ -24,10 +24,13 @@ import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
 import ca.neo.config.ListProperty;
 import ca.neo.config.MainHandler;
+import ca.neo.config.NamedValueProperty;
 import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
+import ca.neo.model.nef.NEFEnsembleFactory;
+import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.model.neuron.impl.LIFSpikeGenerator;
 import ca.neo.model.neuron.impl.LinearSynapticIntegrator;
 import ca.neo.model.neuron.impl.SpikingNeuron;
@@ -35,15 +38,16 @@ import ca.neo.model.neuron.impl.SpikingNeuron;
 /**
  * Data model underlying JTree user interface for a Configurable.
  * 
- * TODO (friday): handle MapParameters (check against Ensemble & Plastic) 
- * TODO (monday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
- * TODO (tuesday): support float[] and float[][] size changes
- * TODO (tuesday): constructor arg names and docs from source
- * TODO (wednesday): support primitives in ListProperty or limit Property use to objects 
- * TODO (wednesday): clean up configuration code  
- * TODO (thursday): remove Configurable 
- * TODO (thursday): augment model classes with getters
+ * TODO (tuesday) add, remove, set for map parameters; test against plastic 
+ * TODO (tuesday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
+ * TODO (wed): support float[] and float[][] size changes
+ * TODO (wed): constructor arg names and docs from source
+ * TODO (thurs): support primitives in ListProperty or limit Property use to objects 
+ * TODO (thurs): clean up configuration code  
+ * TODO (friday): remove Configurable 
+ * TODO (friday): augment model classes with getters
  * TODO (later): register factories and allow factory use for new object creation
+ * 
  * 
  * @author Bryan Tripp
  */
@@ -197,6 +201,12 @@ public class ConfigurationTreeModel implements TreeModel {
 				ListProperty p = (ListProperty) parent;
 				Object o = p.getValue(index);
 				result = new Value(index, o); 
+			} else if (parent instanceof NamedValueProperty) {
+				NamedValueProperty p = (NamedValueProperty) parent;
+				String name = p.getValueNames().get(index);
+				Object o = p.getValue(name);
+				result = new Value(index, o);
+				((Value) result).setName(name);
 			} else if (parent instanceof SingleValuedProperty) {
 				if (index == 0) {
 					Object o = ((SingleValuedProperty) parent).getValue();
@@ -224,10 +234,13 @@ public class ConfigurationTreeModel implements TreeModel {
 		if (parent instanceof Value) {
 			Configuration configuration = ((Value) parent).getConfiguration(); 
 			if (configuration != null) result = configuration.getPropertyNames().size();
+//			System.out.println("Child count for " + ((Value) parent).getObject().getClass().getName() + ": " + result);
 		} else if (parent instanceof SingleValuedProperty) {
 			result = 1; 
 		} else if (parent instanceof ListProperty) {
 			result = ((ListProperty) parent).getNumValues();
+		} else if (parent instanceof NamedValueProperty) {
+			result = ((NamedValueProperty) parent).getValueNames().size();
 		}
 		
 		return result;
@@ -258,7 +271,13 @@ public class ConfigurationTreeModel implements TreeModel {
 				for (int i = 0; i < p.getNumValues() && index == -1; i++) {
 					if (p.getValue(i) != null && p.getValue(i).equals(v.getObject())) index = i;
 				}
-			}			
+			} else if (parent instanceof NamedValueProperty) {
+				NamedValueProperty p = (NamedValueProperty) parent;
+				String name = ((Value) child).getName();				
+				for (int i = 0; i < p.getValueNames().size() && index == -1; i++) {
+					if (p.getValueNames().get(i).equals(name)) index = i;
+				}				
+			}
 		} catch (StructuralException e) {
 			ConfigExceptionHandler.handle(e, ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
 		}
@@ -311,6 +330,7 @@ public class ConfigurationTreeModel implements TreeModel {
 		
 		private int myIndex;
 		private Object myObject;
+		private String myName;
 		private Configuration myConfiguration;
 		
 		public Value(int index, Object object) {
@@ -338,6 +358,14 @@ public class ConfigurationTreeModel implements TreeModel {
 			return myObject;
 		}
 		
+		public String getName() {
+			return myName;
+		}
+		
+		public void setName(String name) {
+			myName = name;
+		}
+		
 		public Configuration getConfiguration() {
 			return myConfiguration;
 		}
@@ -355,8 +383,10 @@ public class ConfigurationTreeModel implements TreeModel {
 //			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
 //			configurable.addMultiValuedField("test1");
 //			configurable.addMultiValuedField("test2");
-			Object configurable = new SpikingNeuron(new LinearSynapticIntegrator(.001f, Units.ACU), 
-					new LIFSpikeGenerator(.001f, .02f, .001f), 15, 0, "neuron"); 
+//			Object configurable = new SpikingNeuron(new LinearSynapticIntegrator(.001f, Units.ACU), 
+//					new LIFSpikeGenerator(.001f, .02f, .001f), 15, 0, "neuron");
+			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
+			Object configurable = ef.make("test", 100, 2);
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

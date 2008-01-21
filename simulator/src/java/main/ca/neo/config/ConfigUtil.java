@@ -3,13 +3,16 @@
  */
 package ca.neo.config;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.config.impl.ListPropertyImpl;
+import ca.neo.config.impl.NamedValuePropertyImpl;
 import ca.neo.model.StructuralException;
 
 /**
@@ -68,24 +71,30 @@ public class ConfigUtil {
 		Method[] methods = configurable.getClass().getMethods();
 		for (int i = 0; i < methods.length; i++) {
 			Class returnType = methods[i].getReturnType();
+			String propName = getPropertyName(methods[i]);
 
 			if (isGetter(methods[i]) 
 					&& !methods[i].getName().equals("getClass")
-					&& !methods[i].getName().equals("getConstructor")
+					&& !methods[i].getName().equals("getConfiguration")
 					&& !isCounter(methods[i])) {
 				
 				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType); //TODO: need this?
 				boolean mutable = hasSetter(configurable, methods[i].getName(), returnType);
 				result.defineSingleValuedProperty(getPropertyName(methods[i]), returnTypeWrapped, mutable);				
 				
-			} else if (isIndexedGetter(methods[i]) || isListGetter(methods[i])) {
-				String propName = getPropertyName(methods[i]);
-				if (!result.getPropertyNames().contains(propName)) {
-					Property p = ListPropertyImpl.getListProperty(result, propName, returnType);
-					if (p != null) result.defineProperty(p);					
-				}
+			} else if (isIndexedGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
+				Property p = ListPropertyImpl.getListProperty(result, propName, returnType);
+				if (p != null) result.defineProperty(p);					
+			} else if (isNamedGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
+				Property p = NamedValuePropertyImpl.getNamedValueProperty(result, propName, returnType);
+				if (p != null) result.defineProperty(p);									
 			}
 		}
+		
+		//TODO: might be nice to build properties from lone map, list, or array, but 
+		//  1) not sure how to check generic type in map/list
+		//  2) not sure how to check element type in array
+		
 		return result;
 	}
 	
@@ -159,15 +168,42 @@ public class ConfigUtil {
 		}
 	}
 	
+	private static boolean isNamedGetter(Method m) {
+		Class[] paramTypes = m.getParameterTypes();
+		if (m.getName().startsWith("get") && paramTypes.length == 1 && paramTypes[0].equals(String.class)) {
+			return true;
+		} else {
+			return false;
+		}		
+	}
+	
+	private static boolean isArrayGetter(Method m) {
+		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
+				&& m.getReturnType().isArray()) {
+			return true;
+		} else {
+			return false;
+		}		
+	}
+	
 	private static boolean isListGetter(Method m) {
-		if (m.getName().startsWith("get") 
-				&& m.getParameterTypes().length == 0
-				&& (List.class.isAssignableFrom(m.getReturnType()) || m.getReturnType().isArray())) {
+		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
+				&& List.class.isAssignableFrom(m.getReturnType())) {
 			return true;
 		} else {
 			return false;
 		}
 	}
+	
+	private static boolean isMapGetter(Method m) {
+		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
+				&& Map.class.isAssignableFrom(m.getReturnType())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	
 //	//TODO: document name pattern
 //	private static Method getIndexCounter(Object o, String getterName) {

@@ -63,8 +63,8 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 		String[] getterNames = new String[]{"get"+uname};
 		String[] setterNames = new String[]{"set"+uname};
 		String[] countGetterNames = new String[]{"getNum"+uname, "getNum"+uname+"s", "get"+uname+"Count"};
-		String[] arrayGetterNames = new String[]{"get"+uname+"s", "get"+uname+"Array", "getAll"+uname};
-		String[] arraySetterNames = new String[]{"set"+uname+"s", "set"+uname+"Array", "setAll"+uname};
+		String[] arrayGetterNames = new String[]{"get"+uname, "get"+uname+"s", "get"+uname+"Array", "getAll"+uname};
+		String[] arraySetterNames = new String[]{"set"+uname, "set"+uname+"s", "set"+uname+"Array", "setAll"+uname};
 		String[] listGetterNames = new String[]{"get"+uname, "get"+uname+"s", "get"+uname+"List"};
 		String[] inserterNames = new String[]{"insert"+uname};
 		String[] adderNames = new String[]{"add"+uname};
@@ -92,7 +92,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	}
 	
 	//looks for defined method; returns null if no match (no exception thrown)
-	private static Method getMethod(Class c, String[] names, Class[] argTypes, Class returnType) {
+	public static Method getMethod(Class c, String[] names, Class[] argTypes, Class returnType) {
 		Method result = null;
 		
 		Method[] methods = c.getMethods();

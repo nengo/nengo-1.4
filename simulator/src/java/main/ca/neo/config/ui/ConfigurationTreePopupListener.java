@@ -15,6 +15,7 @@ import javax.swing.tree.TreePath;
 
 import ca.neo.config.Configurable;
 import ca.neo.config.ListProperty;
+import ca.neo.config.MainHandler;
 import ca.neo.config.Property;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.StructuralException;
@@ -59,18 +60,19 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 				}
 			} else if (path.getParentPath() != null && path.getParentPath().getLastPathComponent() instanceof Property) {
 				final Property p = (Property) path.getParentPath().getLastPathComponent();
-				if (p.isMutable() && Configurable.class.isAssignableFrom(p.getType())) {
+				if (p.isMutable() /**&& Configurable.class.isAssignableFrom(p.getType())**/) {
 					final JMenuItem replaceValueItem = new JMenuItem("Replace");
 					replaceValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 							Class currentType = ((Value) path.getLastPathComponent()).getObject().getClass();
 							Object o = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), currentType);
-							if (o != null)
+							if (o != null) {
 								try {
 									myModel.setValue(this, path, o);
 								} catch (StructuralException ex) {
 									ConfigExceptionHandler.handle(ex, ex.getMessage(), event.getComponent());
 								}
+							}
 						}
 					});
 					popup.add(replaceValueItem);									
