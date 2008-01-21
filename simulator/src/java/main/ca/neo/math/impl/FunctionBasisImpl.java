@@ -17,12 +17,11 @@ public class FunctionBasisImpl extends AbstractFunction implements FunctionBasis
 	
 	private Function[] myFunctions;
 	private float[] myCoefficients;
-	private int myDim;
 	
 	/**
 	 * @param functions Ordered list of functions composing this basis (all must have same dimension)
 	 */
-	public FunctionBasisImpl(Function[] functions, float[][] domain) {
+	public FunctionBasisImpl(Function[] functions) {
 		super(functions[0].getDimension());
 
 		for (int i = 1; i < functions.length; i++) {
@@ -60,13 +59,6 @@ public class FunctionBasisImpl extends AbstractFunction implements FunctionBasis
 		if (coefficients.length != myCoefficients.length) {
 			throw new IllegalArgumentException(myCoefficients.length + " coefficients are needed");
 		}
-	}
-
-	/**
-	 * @see ca.neo.math.Function#getDimension()
-	 */
-	public int getDimension() {
-		return myDim;
 	}
 
 	/**

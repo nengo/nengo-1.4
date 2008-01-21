@@ -14,6 +14,8 @@ import junit.framework.TestCase;
 /**
  * Unit tests for FunctionBasisImpl. 
  * 
+ * TODO: test Function methods 
+ * 
  * @author Bryan Tripp
  */
 public class FunctionBasisImplTest extends TestCase {
@@ -31,7 +33,7 @@ public class FunctionBasisImplTest extends TestCase {
 	 * Test method for 'ca.bpt.cn.math.impl.FunctionBasisImpl.getDimensions()'
 	 */
 	public void testGetDimensions() {
-		assertEquals(2, myFunctionBasis.getDimensions());
+		assertEquals(2, myFunctionBasis.getBasisDimension());
 	}
 
 	/*
