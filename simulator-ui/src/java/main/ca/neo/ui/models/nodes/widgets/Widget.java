@@ -8,7 +8,6 @@ import ca.neo.model.Network;
 import ca.neo.ui.models.UIModelConfigurable;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -43,7 +42,7 @@ public abstract class Widget extends UIModelConfigurable {
 	}
 
 	private void init(UINeoNode nodeParent) {
-		this.setSelectable(false);
+		setSelectable(false);
 		this.parent = nodeParent;
 	}
 
@@ -70,8 +69,8 @@ public abstract class Widget extends UIModelConfigurable {
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new TooltipProperty("Attached to", parent.getName()));
-		tooltips.addPart(new TooltipProperty("Exposed as", getExposedName()));
+		tooltips.addProperty("Attached to", parent.getName());
+		tooltips.addProperty("Exposed as", getExposedName());
 	}
 
 	/**
@@ -95,12 +94,11 @@ public abstract class Widget extends UIModelConfigurable {
 		Network network = getNodeParent().getParentNetwork();
 		if (network != null) {
 			expose(network, exposedName);
-			showPopupMessage(this.getName() + " is exposed as " + exposedName
-					+ " on Network: " + network.getName());
+			showPopupMessage(this.getName() + " is exposed as " + exposedName + " on Network: "
+					+ network.getName());
 			updateModel();
 		} else {
-			UserMessages
-					.showWarning("Cannot expose because no external network is available");
+			UserMessages.showWarning("Cannot expose because no external network is available");
 		}
 	}
 
@@ -128,12 +126,10 @@ public abstract class Widget extends UIModelConfigurable {
 		Network network = getNodeParent().getParentNetwork();
 		if (network != null) {
 			unExpose(network);
-			showPopupMessage(this.getName() + " is UN-exposed on Network: "
-					+ network.getName());
+			showPopupMessage(this.getName() + " is UN-exposed on Network: " + network.getName());
 			updateModel();
 		} else {
-			UserMessages
-					.showWarning("Cannot expose because no external network is available");
+			UserMessages.showWarning("Cannot expose because no external network is available");
 		}
 	}
 
@@ -202,9 +198,8 @@ public abstract class Widget extends UIModelConfigurable {
 		@Override
 		protected void action() throws ActionException {
 
-			String name = JOptionPane
-					.showInputDialog(UIEnvironment.getInstance(),
-							"Please enter the name to expose this as: ");
+			String name = JOptionPane.showInputDialog(UIEnvironment.getInstance(),
+					"Please enter the name to expose this as: ");
 
 			if (name != null && name.compareTo("") != 0) {
 				expose(name);

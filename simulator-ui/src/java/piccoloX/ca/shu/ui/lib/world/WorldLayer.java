@@ -10,12 +10,12 @@ import ca.shu.ui.lib.world.piccolo.objects.Window;
  * 
  * @author Shu Wu
  */
-public interface IWorldLayer extends IWorldObject {
+public interface WorldLayer extends WorldObject {
 	/**
 	 * @param child
 	 *            Child node to add
 	 */
-	public void addChild(IWorldObject child);
+	public void addChild(WorldObject child);
 
 	/**
 	 * @return World which this layer belongs to

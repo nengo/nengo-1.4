@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.world.piccolo.objects;
 
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 
 /**
@@ -10,24 +10,23 @@ import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
  * @author Shu Wu
  */
 public class Wrapper extends WorldObjectImpl {
-	private IWorldObject myPackage;
+	private WorldObject myPackage;
 
-	public Wrapper(IWorldObject obj) {
+	public Wrapper(WorldObject obj) {
 		super();
 		setPickable(false);
-		setSelectable(false);
 		setPackage(obj);
 	}
 
-	public IWorldObject getPackage() {
+	public WorldObject getPackage() {
 		return myPackage;
 	}
 
-	public final void setPackage(IWorldObject obj) {
+	public final void setPackage(WorldObject obj) {
 		if (myPackage != null) {
 			myPackage.removeFromParent();
 		}
-		IWorldObject oldPackage = myPackage;
+		WorldObject oldPackage = myPackage;
 
 		myPackage = obj;
 
@@ -44,7 +43,7 @@ public class Wrapper extends WorldObjectImpl {
 		}
 	}
 
-	protected void packageChanged(IWorldObject oldPackage) {
+	protected void packageChanged(WorldObject oldPackage) {
 
 	}
 

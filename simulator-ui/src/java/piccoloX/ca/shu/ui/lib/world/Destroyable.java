@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.world;
 
-public interface IDestroyable {
+public interface Destroyable {
 	/**
 	 * Call this method if this Object does not need to be used again. The
 	 * Object will prepare itself for garbage collection. Note: calling this

@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -21,11 +21,11 @@ public abstract class AbstractPickHandler extends PBasicInputEventHandler {
 
 	private final Object pickChangeLock = new Object();
 
-	private IWorldObject pickedNode;
+	private WorldObject pickedNode;
 
 	private final Object pickSetLock = new Object();
 
-	private IWorldObject transientNode;
+	private WorldObject transientNode;
 
 	private final WorldImpl world;
 
@@ -40,7 +40,7 @@ public abstract class AbstractPickHandler extends PBasicInputEventHandler {
 
 	protected abstract int getPickDelay();
 
-	protected IWorldObject getPickedNode() {
+	protected WorldObject getPickedNode() {
 		return pickedNode;
 	}
 
@@ -58,8 +58,8 @@ public abstract class AbstractPickHandler extends PBasicInputEventHandler {
 		this.keepPickAlive = keepPickAlive;
 	}
 
-	protected void setSelectedNode(IWorldObject selectedNode) {
-		IWorldObject oldNode = transientNode;
+	protected void setSelectedNode(WorldObject selectedNode) {
+		WorldObject oldNode = transientNode;
 		transientNode = selectedNode;
 
 		if (selectedNode != null && selectedNode != oldNode) {

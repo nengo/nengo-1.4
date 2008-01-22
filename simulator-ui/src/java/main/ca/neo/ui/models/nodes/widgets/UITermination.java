@@ -15,8 +15,6 @@ import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.models.tooltips.TooltipProperty;
-import ca.neo.ui.models.tooltips.TooltipTitle;
 import ca.neo.util.Configuration;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -29,7 +27,7 @@ import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 
 /**
  * UI Wrapper for a Termination
@@ -73,8 +71,7 @@ public class UITermination extends Widget implements ILineTermination {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties)
-			throws ConfigException {
+	protected Object configureModel(PropertySet configuredProperties) throws ConfigException {
 		throw new NotImplementedException();
 	}
 
@@ -82,17 +79,15 @@ public class UITermination extends Widget implements ILineTermination {
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 
-		tooltips.addPart(new TooltipProperty("Dimensions", ""
-				+ getModel().getDimensions()));
+		tooltips.addProperty("Dimensions", "" + getModel().getDimensions());
 
-		tooltips.addPart(new TooltipTitle("Configuration"));
+		tooltips.addTitle("Configuration");
 		Configuration config = getModel().getConfiguration();
 		String[] configProperties = config.listPropertyNames();
 		for (String element : configProperties) {
 			Object propertyValue = config.getProperty(element);
 
-			tooltips.addPart(new TooltipProperty(element,
-					objToString(propertyValue)));
+			tooltips.addProperty(element, objToString(propertyValue));
 		}
 	}
 
@@ -102,8 +97,7 @@ public class UITermination extends Widget implements ILineTermination {
 		super.constructWidgetMenu(menu);
 
 		if (getConnector() != null) {
-			menu.addAction(new RemoveConnectionAction("Disconnect",
-					getConnector()));
+			menu.addAction(new RemoveConnectionAction("Disconnect", getConnector()));
 		}
 
 		AbstractMenuBuilder configureMenu = menu.addSubMenu("Configure");
@@ -119,8 +113,7 @@ public class UITermination extends Widget implements ILineTermination {
 			if (type == float[][].class) {
 				configureMenu.addAction(new EditWeightsAction("Weights"));
 			} else {
-				configureMenu.addAction(new ConfigurePropertyAction(
-						propertyName, type));
+				configureMenu.addAction(new ConfigurePropertyAction(propertyName, type));
 			}
 
 		}
@@ -160,7 +153,7 @@ public class UITermination extends Widget implements ILineTermination {
 	}
 
 	public LineConnector getConnector() {
-		for (IWorldObject wo : getChildren()) {
+		for (WorldObject wo : getChildren()) {
 			if (wo instanceof LineConnector)
 				return (LineConnector) wo;
 		}
@@ -181,8 +174,7 @@ public class UITermination extends Widget implements ILineTermination {
 	 * @return Termination weights matrix
 	 */
 	public float[][] getWeights() {
-		return (float[][]) getModel().getConfiguration().getProperty(
-				Termination.WEIGHTS);
+		return (float[][]) getModel().getConfiguration().getProperty(Termination.WEIGHTS);
 	}
 
 	private boolean isConnected;
@@ -199,12 +191,10 @@ public class UITermination extends Widget implements ILineTermination {
 		isConnected = false;
 		try {
 			getNodeParent().getParentNetwork().removeProjection(getModel());
-			getNodeParent().showPopupMessage(
-					"Projection to " + getName() + " REMOVED");
+			getNodeParent().showPopupMessage("Projection to " + getName() + " REMOVED");
 
 		} catch (StructuralException e) {
-			UserMessages.showWarning("Problem trying to disconnect: "
-					+ e.toString());
+			UserMessages.showWarning("Problem trying to disconnect: " + e.toString());
 		}
 	}
 
@@ -221,14 +211,11 @@ public class UITermination extends Widget implements ILineTermination {
 		if (modifyModel) {
 			try {
 
-				getNodeParent().getParentNetwork().addProjection(
-						source.getModel(), getModel());
-				getNodeParent().showPopupMessage(
-						"Projection to " + getName() + " ADDED");
+				getNodeParent().getParentNetwork().addProjection(source.getModel(), getModel());
+				getNodeParent().showPopupMessage("Projection to " + getName() + " ADDED");
 			} catch (StructuralException e) {
 				isConnected = false;
-				UserMessages
-						.showWarning("Could not connect: " + e.getMessage());
+				UserMessages.showWarning("Could not connect: " + e.getMessage());
 			}
 		}
 
@@ -241,12 +228,10 @@ public class UITermination extends Widget implements ILineTermination {
 	 */
 	public void setWeights(float[][] newWeights) {
 		try {
-			getModel().getConfiguration().setProperty(Termination.WEIGHTS,
-					newWeights);
+			getModel().getConfiguration().setProperty(Termination.WEIGHTS, newWeights);
 			showPopupMessage("Weights changed on Termination");
 		} catch (StructuralException e) {
-			UserMessages.showWarning("Could not modify weights: "
-					+ e.getMessage());
+			UserMessages.showWarning("Could not modify weights: " + e.getMessage());
 		}
 
 	}
@@ -269,8 +254,12 @@ public class UITermination extends Widget implements ILineTermination {
 		@Override
 		protected void action() throws ActionException {
 			Object propertyValue = null;
-			Object defaultPropertyValue = getModel().getConfiguration()
-					.getProperty(propertyName); // get the current value of this
+			Object defaultPropertyValue = getModel().getConfiguration().getProperty(propertyName); // get
+			// the
+			// current
+			// value
+			// of
+			// this
 			// property
 
 			try {
@@ -293,8 +282,7 @@ public class UITermination extends Widget implements ILineTermination {
 				}
 
 				try {
-					getModel().getConfiguration().setProperty(propertyName,
-							propertyValue);
+					getModel().getConfiguration().setProperty(propertyName, propertyValue);
 				} catch (StructuralException e) {
 					e.printStackTrace();
 				}
@@ -320,13 +308,11 @@ public class UITermination extends Widget implements ILineTermination {
 
 		@Override
 		protected void action() throws ActionException {
-			PropertyDescriptor pCouplingMatrix = new PCouplingMatrix(
-					getWeights());
+			PropertyDescriptor pCouplingMatrix = new PCouplingMatrix(getWeights());
 			try {
 				PropertySet result = ConfigManager.configure(
-						new PropertyDescriptor[] { pCouplingMatrix },
-						"Coupling matrix", UIEnvironment.getInstance(),
-						ConfigManager.ConfigMode.STANDARD);
+						new PropertyDescriptor[] { pCouplingMatrix }, "Coupling matrix",
+						UIEnvironment.getInstance(), ConfigManager.ConfigMode.STANDARD);
 
 				setWeights((float[][]) result.getProperty(pCouplingMatrix));
 			} catch (ConfigException e) {
@@ -358,8 +344,7 @@ class RemoveConnectionAction extends StandardAction {
 	private static final long serialVersionUID = 1L;
 	private LineConnector lineEndToRemove;
 
-	public RemoveConnectionAction(String actionName,
-			LineConnector lineEndToRemove) {
+	public RemoveConnectionAction(String actionName, LineConnector lineEndToRemove) {
 		super("Remove connection from Termination", actionName);
 		this.lineEndToRemove = lineEndToRemove;
 	}

@@ -49,7 +49,6 @@ public class Text extends WorldObjectImpl {
 
 	private void init() {
 		setPickable(false);
-		setSelectable(false);
 
 		textNode = (PXText) getPiccolo();
 	}

@@ -7,8 +7,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.IDestroyable;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.Destroyable;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 
 /**
@@ -16,8 +17,8 @@ import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
  * 
  * @author Shu Wu
  */
-public class PXEdge extends PXPath implements PropertyChangeListener,
-		IDestroyable, PiccoloNodeInWorld {
+public class PXEdge extends PXPath implements PropertyChangeListener, Destroyable,
+		PiccoloNodeInWorld {
 
 	private static final long serialVersionUID = 1L;
 
@@ -53,7 +54,7 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 	/**
 	 * Node which defines the end point of this edge
 	 */
-	private WorldObjectImpl myEndNode;
+	private final WorldObjectImpl myEndNode;
 
 	/**
 	 * Shape of this edge
@@ -63,7 +64,7 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 	/**
 	 * Node which defines the start point of this edge
 	 */
-	private WorldObjectImpl myStartNode;
+	private final WorldObjectImpl myStartNode;
 
 	/**
 	 * State of this edge
@@ -97,11 +98,16 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 
 		setPickable(false);
 
-		startNode.getPiccolo().addPropertyChangeListener(
-				PXNode.PROPERTY_GLOBAL_BOUNDS, this);
+		Util.Assert(startNode != null);
+		Util.Assert(endNode != null);
 
-		endNode.getPiccolo().addPropertyChangeListener(
-				PXNode.PROPERTY_GLOBAL_BOUNDS, this);
+		startNode.getPiccolo().addPropertyChangeListener(PXNode.PROPERTY_GLOBAL_BOUNDS, this);
+
+		endNode.getPiccolo().addPropertyChangeListener(PXNode.PROPERTY_GLOBAL_BOUNDS, this);
+
+		startNode.getPiccolo().addPropertyChangeListener(PXNode.PROPERTY_REMOVED_FROM_WORLD, this);
+
+		endNode.getPiccolo().addPropertyChangeListener(PXNode.PROPERTY_REMOVED_FROM_WORLD, this);
 
 		setState(EdgeState.DEFAULT);
 	}
@@ -169,11 +175,9 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 
 		double endXFromCenter = endPos.getX() - circleCenterX;
 		double endYFromCenter = endPos.getY() - circleCenterY;
-		double start = Math.toDegrees(Math.atan2(-startYFromCenter,
-				startXFromCenter));
+		double start = Math.toDegrees(Math.atan2(-startYFromCenter, startXFromCenter));
 
-		double end = Math
-				.toDegrees(Math.atan2(-endYFromCenter, endXFromCenter));
+		double end = Math.toDegrees(Math.atan2(-endYFromCenter, endXFromCenter));
 
 		if (isUpward) {
 			if (deltaX > 0) {
@@ -197,8 +201,7 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 			extent = 360 + extent;
 		}
 
-		Arc2D arc = new Arc2D.Double(x, y, arcRadius * 2, arcRadius * 2, start,
-				extent, Arc2D.OPEN);
+		Arc2D arc = new Arc2D.Double(x, y, arcRadius * 2, arcRadius * 2, start, extent, Arc2D.OPEN);
 
 		append(arc, false);
 	}
@@ -223,11 +226,11 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 		this.repaint();
 	}
 
-	protected Point2D toLocal(IWorldObject node, double x, double y) {
+	protected Point2D toLocal(WorldObject node, double x, double y) {
 		return toLocal(node, new Point2D.Double(x, y));
 	}
 
-	protected Point2D toLocal(IWorldObject node, Point2D point) {
+	protected Point2D toLocal(WorldObject node, Point2D point) {
 		return this.globalToLocal(node.localToGlobal(point));
 	}
 
@@ -238,11 +241,15 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 	 */
 	public void destroy() {
 		removeFromParent();
-		myStartNode.getPiccolo().removePropertyChangeListener(
-				PXNode.PROPERTY_GLOBAL_BOUNDS, this);
+		myStartNode.getPiccolo().removePropertyChangeListener(PXNode.PROPERTY_GLOBAL_BOUNDS, this);
 
-		myEndNode.getPiccolo().removePropertyChangeListener(
-				PXNode.PROPERTY_GLOBAL_BOUNDS, this);
+		myEndNode.getPiccolo().removePropertyChangeListener(PXNode.PROPERTY_GLOBAL_BOUNDS, this);
+
+		myStartNode.getPiccolo().removePropertyChangeListener(PXNode.PROPERTY_REMOVED_FROM_WORLD,
+				this);
+
+		myEndNode.getPiccolo().removePropertyChangeListener(PXNode.PROPERTY_REMOVED_FROM_WORLD,
+				this);
 
 	}
 
@@ -286,9 +293,15 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 	 * 
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
-	public void propertyChange(PropertyChangeEvent arg0) {
-		updateEdgeBounds();
-
+	public void propertyChange(PropertyChangeEvent event) {
+		/**
+		 * Remove this object if both start and endNodes are destroyed
+		 */
+		if (event.getPropertyName().equals(PXNode.PROPERTY_REMOVED_FROM_WORLD)) {
+			removeFromWorld();
+		} else {
+			updateEdgeBounds();
+		}
 	}
 
 	public void setDefaultColor(Color defaultColor) {
@@ -356,23 +369,8 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 	public void updateEdgeBounds() {
 		reset();
 
-		/**
-		 * Remove this object if both start and endNodes are destroyed
-		 */
-		if (myStartNode.isDestroyed() || myEndNode.isDestroyed()) {
-			destroy();
-			return;
-		}
-
-		// Note that the node's "FullBounds" must be used (instead of just the
-		// "Bound")
-		// because the nodes have non-identity transforms which must be included
-		// when
-		// determining their position.
-		Point2D startBounds = toLocal(myStartNode, myStartNode.getBounds()
-				.getCenter2D());
-		Point2D endBounds = toLocal(myEndNode, myEndNode.getBounds()
-				.getCenter2D());
+		Point2D startBounds = toLocal(myStartNode, myStartNode.getBounds().getCenter2D());
+		Point2D endBounds = toLocal(myEndNode, myEndNode.getBounds().getCenter2D());
 
 		switch (myShape) {
 		case STRAIGHT:
@@ -413,9 +411,9 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 		DEFAULT, HIGHLIGHT
 	}
 
-	private IWorldObject woParent;
+	private WorldObject woParent;
 
-	public IWorldObject getWorldObjectParent() {
+	public WorldObject getWorldObject() {
 		return woParent;
 	}
 
@@ -423,7 +421,7 @@ public class PXEdge extends PXPath implements PropertyChangeListener,
 		return false;
 	}
 
-	public void setWorldObjectParent(IWorldObject worldObjectParent) {
+	public void setWorldObject(WorldObject worldObjectParent) {
 		woParent = worldObjectParent;
 	}
 }
@@ -450,8 +448,8 @@ class PointerTriangle extends PXEdge {
 		super(edge.getStartNode(), edge.getEndNode());
 		setPaint(Style.COLOR_LINEEND);
 
-		setBounds(-TRIANGLE_EDGE_LENGTH / 2, -TRIANGLE_EDGE_LENGTH / 2,
-				TRIANGLE_EDGE_LENGTH, TRIANGLE_EDGE_LENGTH);
+		setBounds(-TRIANGLE_EDGE_LENGTH / 2, -TRIANGLE_EDGE_LENGTH / 2, TRIANGLE_EDGE_LENGTH,
+				TRIANGLE_EDGE_LENGTH);
 	}
 
 	@Override
@@ -460,10 +458,9 @@ class PointerTriangle extends PXEdge {
 		/*
 		 * Find the angle between well and end
 		 */
-		Point2D startPosition = getStartNode().localToGlobal(
-				getStartNode().getBounds().getOrigin());
-		Point2D endPosition = getEndNode().localToGlobal(
-				getEndNode().getBounds().getOrigin());
+		Point2D startPosition = getStartNode()
+				.localToGlobal(getStartNode().getBounds().getOrigin());
+		Point2D endPosition = getEndNode().localToGlobal(getEndNode().getBounds().getOrigin());
 
 		double deltaX = endPosition.getX() - startPosition.getX();
 		double deltaY = endPosition.getY() - startPosition.getY();

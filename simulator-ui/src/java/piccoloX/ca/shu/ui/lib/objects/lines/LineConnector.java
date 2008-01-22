@@ -11,10 +11,10 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.ICustomDroppable;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.DroppableX;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
-import ca.shu.ui.lib.world.IWorldObject.EventType;
+import ca.shu.ui.lib.world.WorldObject.EventType;
 import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
@@ -24,7 +24,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * @author Shu
  */
 public abstract class LineConnector extends WorldObjectImpl implements
-		Interactable, ICustomDroppable {
+		Interactable, DroppableX {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,6 +41,7 @@ public abstract class LineConnector extends WorldObjectImpl implements
 		super();
 		this.myWell = well;
 
+		setSelectable(true);
 		myEdge = new Edge(well, this);
 		myEdge.setPointerVisible(true);
 		((WorldGroundImpl) well.getWorldLayer()).addEdge(myEdge);
@@ -51,10 +52,9 @@ public abstract class LineConnector extends WorldObjectImpl implements
 
 		setBounds(parentToLocal(getFullBounds()));
 		setChildrenPickable(false);
-		setSelectable(true);
 		myDestroyListener = new DestroyListener(this);
 		myWell
-				.addPropertyChangeListener(EventType.DESTROYED,
+				.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD,
 						myDestroyListener);
 
 	}
@@ -87,7 +87,7 @@ public abstract class LineConnector extends WorldObjectImpl implements
 			myTermination = term;
 
 			if (term != null) {
-				((IWorldObject) term).addChild(this);
+				((WorldObject) term).addChild(this);
 				connectToTermination();
 			}
 		}
@@ -125,7 +125,7 @@ public abstract class LineConnector extends WorldObjectImpl implements
 	@Override
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
-		myWell.removePropertyChangeListener(EventType.DESTROYED,
+		myWell.removePropertyChangeListener(EventType.REMOVED_FROM_WORLD,
 				myDestroyListener);
 	}
 
@@ -148,11 +148,11 @@ public abstract class LineConnector extends WorldObjectImpl implements
 		return myTermination;
 	}
 
-	public void droppedOnTargets(Collection<IWorldObject> targets) {
+	public void droppedOnTargets(Collection<WorldObject> targets) {
 		boolean success = false;
 		boolean attemptedConnection = false;
 
-		for (IWorldObject target : targets) {
+		for (WorldObject target : targets) {
 			if (target == getWell()) {
 				// Connector has been receded back into the origin
 				destroy();

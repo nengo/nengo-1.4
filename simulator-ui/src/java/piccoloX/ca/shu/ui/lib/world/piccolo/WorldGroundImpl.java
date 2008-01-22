@@ -9,8 +9,9 @@ import java.util.Iterator;
 
 import javax.swing.SwingUtilities;
 
-import ca.shu.ui.lib.world.IWorldLayer;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
 import ca.shu.ui.lib.world.piccolo.primitives.PXNode;
 import edu.umd.cs.piccolo.PLayer;
@@ -22,7 +23,7 @@ import edu.umd.cs.piccolo.PNode;
  * 
  * @author Shu Wu
  */
-public class WorldGroundImpl extends WorldLayerImpl implements IWorldLayer {
+public class WorldGroundImpl extends WorldLayerImpl implements WorldLayer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -43,13 +44,13 @@ public class WorldGroundImpl extends WorldLayerImpl implements IWorldLayer {
 	}
 
 	@Override
-	public void addChild(IWorldObject wo) {
+	public void addChild(WorldObject wo, int index) {
 
 		if (myChildFilter != null && (!myChildFilter.acceptChild(wo))) {
 			throw new InvalidParameterException();
 		}
 
-		super.addChild(wo);
+		super.addChild(wo, index);
 	}
 
 	public void addEdge(PXEdge edge) {
@@ -62,9 +63,13 @@ public class WorldGroundImpl extends WorldLayerImpl implements IWorldLayer {
 	 * @param wo
 	 *            Object to add to the layer
 	 */
-	public void addObject(IWorldObject wo) {
+	public void addObject(WorldObject wo) {
 		addObject(wo, true);
 
+	}
+
+	public void addObject(WorldObject wo, boolean centerCameraPosition) {
+		dropObject(world, this, wo, centerCameraPosition);
 	}
 
 	/**
@@ -76,8 +81,9 @@ public class WorldGroundImpl extends WorldLayerImpl implements IWorldLayer {
 	 *            whether the object's position should be changed to appear at
 	 *            the center of the camera
 	 */
-	public void addObject(IWorldObject wo, boolean centerCameraPosition) {
-		addChild(wo);
+	protected static void dropObject(World world, WorldObject parent,
+			WorldObject wo, boolean centerCameraPosition) {
+		parent.addChild(wo);
 
 		Point2D finalPosition;
 		if (centerCameraPosition) {
@@ -98,10 +104,10 @@ public class WorldGroundImpl extends WorldLayerImpl implements IWorldLayer {
 			finalPosition = wo.getOffset();
 
 		}
-		wo.setScale(1 / getGroundScale());
+		wo.setScale(1 / world.getSky().getViewScale());
 
 		wo.setOffset(finalPosition.getX(), finalPosition.getY()
-				- (100 / getGroundScale()));
+				- (100 / world.getSky().getViewScale()));
 
 		wo.animateToPositionScaleRotation(finalPosition.getX(), finalPosition
 				.getY(), 1, 0, 500);
@@ -127,7 +133,7 @@ public class WorldGroundImpl extends WorldLayerImpl implements IWorldLayer {
 	}
 
 	public static interface ChildFilter {
-		public boolean acceptChild(IWorldObject obj);
+		public boolean acceptChild(WorldObject obj);
 	}
 }
 

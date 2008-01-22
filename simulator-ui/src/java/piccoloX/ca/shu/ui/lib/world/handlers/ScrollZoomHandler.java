@@ -2,7 +2,7 @@ package ca.shu.ui.lib.world.handlers;
 
 import java.awt.geom.Point2D;
 
-import ca.shu.ui.lib.world.IWorldSky;
+import ca.shu.ui.lib.world.WorldSky;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -25,11 +25,11 @@ public class ScrollZoomHandler extends PBasicInputEventHandler {
 		double currentScale = camera.getViewScale();
 		double newScale = currentScale * scaleDelta;
 
-		if (newScale < IWorldSky.MIN_ZOOM_SCALE) {
-			scaleDelta = IWorldSky.MIN_ZOOM_SCALE / currentScale;
+		if (newScale < WorldSky.MIN_ZOOM_SCALE) {
+			scaleDelta = WorldSky.MIN_ZOOM_SCALE / currentScale;
 		}
-		if (newScale > IWorldSky.MAX_ZOOM_SCALE) {
-			scaleDelta = IWorldSky.MAX_ZOOM_SCALE / currentScale;
+		if (newScale > WorldSky.MAX_ZOOM_SCALE) {
+			scaleDelta = WorldSky.MAX_ZOOM_SCALE / currentScale;
 		}
 
 		Point2D viewZoomPoint = event.getPosition();

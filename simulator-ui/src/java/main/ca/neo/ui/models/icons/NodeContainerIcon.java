@@ -2,7 +2,7 @@ package ca.neo.ui.models.icons;
 
 import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.primitives.Text;
 
 /**
@@ -23,7 +23,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 	private final Text sizeLabel;
 
-	public NodeContainerIcon(NodeContainer parent, IWorldObject icon) {
+	public NodeContainerIcon(NodeContainer parent, WorldObject icon) {
 		super(parent, icon);
 		sizeLabel = new Text("");
 		sizeLabel.setFont(Style.FONT_SMALL);

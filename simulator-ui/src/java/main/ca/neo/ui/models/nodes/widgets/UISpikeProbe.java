@@ -3,7 +3,6 @@ package ca.neo.ui.models.nodes.widgets;
 import ca.neo.model.Ensemble;
 import ca.neo.ui.actions.PlotSpikePattern;
 import ca.neo.ui.models.nodes.UIEnsemble;
-import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
@@ -14,8 +13,7 @@ public class UISpikeProbe extends UIProbe {
 	public UISpikeProbe(UIEnsemble nodeAttachedTo) {
 		super(nodeAttachedTo, nodeAttachedTo.getModel());
 
-		getProbeParent().showPopupMessage(
-				"Collecting spikes on " + getProbeParent().getName());
+		getProbeParent().showPopupMessage("Collecting spikes on " + getProbeParent().getName());
 		getModel().collectSpikes(true);
 
 		// setProbeColor(ProbeIcon.SPIKE_PROBE_COLOR);
@@ -24,7 +22,7 @@ public class UISpikeProbe extends UIProbe {
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new TooltipProperty("Attached to", getModel().getName()));
+		tooltips.addProperty("Attached to", getModel().getName());
 	}
 
 	@Override

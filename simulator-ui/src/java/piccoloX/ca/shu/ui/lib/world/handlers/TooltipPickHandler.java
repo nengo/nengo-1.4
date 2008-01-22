@@ -3,8 +3,8 @@ package ca.shu.ui.lib.world.handlers;
 import java.awt.event.InputEvent;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.IWorldLayer;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.shu.ui.lib.world.piccolo.objects.TooltipWrapper;
@@ -22,9 +22,9 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 public class TooltipPickHandler extends AbstractPickHandler {
 	public static final String TOOLTIP_BORDER_ATTR = "tooltipBdr";
 
-	private IWorldObject controls;
+	private WorldObject controls;
 
-	private IWorldObject keyboardFocusObject;
+	private WorldObject keyboardFocusObject;
 
 	private TooltipWrapper keyboardTooltip;
 	private TooltipWrapper mouseOverTooltip;
@@ -45,7 +45,7 @@ public class TooltipPickHandler extends AbstractPickHandler {
 	private void processKeyboardEvent(PInputEvent event) {
 		if ((event.getModifiers() & InputEvent.CTRL_MASK) != 0) {
 
-			IWorldObject wo = getTooltipNode(event);
+			WorldObject wo = getTooltipNode(event);
 			if (wo != null) {
 				setKeyboardTooltipFocus(wo);
 
@@ -66,13 +66,13 @@ public class TooltipPickHandler extends AbstractPickHandler {
 		return myPickDelay;
 	}
 
-	protected IWorldObject getTooltipNode(PInputEvent event) {
+	protected WorldObject getTooltipNode(PInputEvent event) {
 
 		PNode node = event.getPickedNode();
 		while (node != null) {
 
 			if (node instanceof PiccoloNodeInWorld) {
-				IWorldObject wo = ((PiccoloNodeInWorld) node).getWorldObjectParent();
+				WorldObject wo = ((PiccoloNodeInWorld) node).getWorldObject();
 
 				/*
 				 * Do nothing if the mouse is over the controls
@@ -80,7 +80,7 @@ public class TooltipPickHandler extends AbstractPickHandler {
 				if (node == controls) {
 					setKeepPickAlive(true);
 					return null;
-				} else if (wo instanceof IWorldLayer || wo instanceof Window) {
+				} else if (wo instanceof WorldLayer || wo instanceof Window) {
 					break;
 				} else if (wo.getTooltip() != null) {
 					return wo;
@@ -97,7 +97,7 @@ public class TooltipPickHandler extends AbstractPickHandler {
 
 	@Override
 	protected void nodePicked() {
-		IWorldObject node = getPickedNode();
+		WorldObject node = getPickedNode();
 		tooltipFrame.setSelected(node);
 
 		mouseOverTooltip = getWorld().showTooltip(node);
@@ -115,7 +115,7 @@ public class TooltipPickHandler extends AbstractPickHandler {
 
 	@Override
 	protected void processMouseEvent(PInputEvent event) {
-		IWorldObject node = null;
+		WorldObject node = null;
 
 		processKeyboardEvent(event);
 		if (WorldImpl.isTooltipsVisible()) {
@@ -131,7 +131,7 @@ public class TooltipPickHandler extends AbstractPickHandler {
 
 	}
 
-	protected void setKeyboardTooltipFocus(IWorldObject wo) {
+	protected void setKeyboardTooltipFocus(WorldObject wo) {
 		if (wo != keyboardFocusObject) {
 			keyboardFocusObject = wo;
 

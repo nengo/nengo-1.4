@@ -5,13 +5,12 @@ import javax.swing.JPopupMenu;
 import ca.neo.ui.actions.RemoveModelAction;
 import ca.neo.ui.models.tooltips.Tooltip;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.models.tooltips.TooltipTitle;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.Interactable;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.activities.Pulsator;
 import ca.shu.ui.lib.world.elastic.ElasticObject;
 
@@ -32,7 +31,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	/**
 	 * Icon for this model
 	 */
-	private IWorldObject icon;
+	private WorldObject icon;
 
 	/**
 	 * Property Listener which listens to changes of the Icon's bounds and
@@ -54,6 +53,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	public ModelObject() {
 		super();
+		init();
 	}
 
 	/**
@@ -63,9 +63,12 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 *            Model
 	 */
 	public ModelObject(Object model) {
-
 		setModel(model);
+		init();
+	}
 
+	private void init() {
+		setSelectable(true);
 	}
 
 	/**
@@ -89,17 +92,15 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * @param newIcon
 	 *            New Icon
 	 */
-	protected void setIcon(IWorldObject newIcon) {
+	protected void setIcon(WorldObject newIcon) {
 		if (icon != null) {
-			icon.removePropertyChangeListener(EventType.BOUNDS_CHANGED,
-					iconPropertyChangeListener);
+			icon.removePropertyChangeListener(EventType.BOUNDS_CHANGED, iconPropertyChangeListener);
 			icon.removeFromParent();
 		}
 
 		icon = newIcon;
 
 		addChild(icon, 0);
-		icon.setSelectable(false);
 
 		iconPropertyChangeListener = new EventListener() {
 			public void propertyChanged(EventType event) {
@@ -109,8 +110,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		};
 		setBounds(icon.getBounds());
 
-		icon.addPropertyChangeListener(EventType.BOUNDS_CHANGED,
-				iconPropertyChangeListener);
+		icon.addPropertyChangeListener(EventType.BOUNDS_CHANGED, iconPropertyChangeListener);
 
 	}
 
@@ -132,7 +132,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	/**
 	 * @return Icon of this node
 	 */
-	public IWorldObject getIcon() {
+	public WorldObject getIcon() {
 		return icon;
 	}
 
@@ -144,16 +144,16 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	}
 
 	@Override
-	public final IWorldObject getTooltip() {
+	public final WorldObject getTooltip() {
 		String toolTipTitle = getFullName();
 
 		TooltipBuilder tooltipBuilder = new TooltipBuilder(toolTipTitle);
 		if (isModelBusy()) {
 
-			tooltipBuilder.addPart(new TooltipTitle("Currently busy"));
+			tooltipBuilder.addTitle("Currently busy");
 
 		} else if (!isModelExists()) {
-			tooltipBuilder.addPart(new TooltipTitle("Model is not ready"));
+			tooltipBuilder.addTitle("Model is not ready");
 		} else {
 
 			constructTooltips(tooltipBuilder);
@@ -197,9 +197,8 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 			isModelBusy = isBusy;
 
 			if (isModelBusy) {
-				Util
-						.Assert(pulsator == null,
-								"Previous pulsator has not been disposed of properly);");
+				Util.Assert(pulsator == null,
+						"Previous pulsator has not been disposed of properly);");
 				pulsator = new Pulsator(this);
 			} else {
 				if (pulsator != null) {

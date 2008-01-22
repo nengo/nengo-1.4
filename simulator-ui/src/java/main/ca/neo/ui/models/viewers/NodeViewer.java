@@ -2,6 +2,7 @@ package ca.neo.ui.models.viewers;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -23,9 +24,9 @@ import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
-import ca.shu.ui.lib.world.IWorldObject.EventType;
+import ca.shu.ui.lib.world.WorldObject.EventType;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
 import edu.umd.cs.piccolo.activities.PActivity;
@@ -37,8 +38,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  * 
  * @author Shu
  */
-public abstract class NodeViewer extends ElasticWorld implements Interactable,
-		INodeContainer {
+public abstract class NodeViewer extends ElasticWorld implements Interactable, INodeContainer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -57,12 +57,10 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	 *            UI Object containing the Node model
 	 */
 	public NodeViewer(NodeContainer nodeContainer) {
-		super("");
+		super(nodeContainer.getName() + " (" + nodeContainer.getTypeName() + " Viewer)");
 		this.parentOfViewer = nodeContainer;
 
 		setStatusBarHandler(new NodeViewerStatus(this));
-
-		setName(getModel().getName());
 
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
 
@@ -83,16 +81,15 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	 * @param moveCameraToNode
 	 *            whether to move the camera to where the node is
 	 */
-	protected void addNeoNode(UINeoNode node, boolean updateModel,
-			boolean dropInCenterOfCamera, boolean moveCameraToNode) {
+	protected void addNeoNode(UINeoNode node, boolean updateModel, boolean dropInCenterOfCamera,
+			boolean moveCameraToNode) {
 
 		/**
 		 * Moves the camera to where the node is positioned, if it's not dropped
 		 * in the center of the camera
 		 */
 		if (moveCameraToNode) {
-			getWorld().animateToSkyPosition(node.getOffset().getX(),
-					node.getOffset().getY());
+			getWorld().animateToSkyPosition(node.getOffset().getX(), node.getOffset().getY());
 		}
 
 		neoNodesChildren.put(node.getName(), node);
@@ -103,8 +100,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 			getGround().addChild(node);
 		}
 
-		node.addPropertyChangeListener(EventType.DESTROYED,
-				new RemoveNodeListener(node, this));
+		node.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD, new RemoveNodeListener(node,
+				this));
 	}
 
 	@Override
@@ -166,9 +163,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 				public int compare(UINeoNode o1, UINeoNode o2) {
 					if (o1.getClass() != o2.getClass()) {
 
-						return o1.getClass().getSimpleName()
-								.compareToIgnoreCase(
-										o2.getClass().getSimpleName());
+						return o1.getClass().getSimpleName().compareToIgnoreCase(
+								o2.getClass().getSimpleName());
 					} else {
 						return (o1.getName().compareToIgnoreCase(o2.getName()));
 					}
@@ -228,8 +224,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 
 		}
 
-		PBounds fullBounds = new PBounds(startX, startY, endX - startX, endY
-				- startY);
+		PBounds fullBounds = new PBounds(startX, startY, endX - startX, endY - startY);
 		zoomToBounds(fullBounds);
 
 	}
@@ -252,12 +247,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		return parentOfViewer.getModel();
 	}
 
-	@Override
-	public String getName() {
-		return getViewerParent().getName() + " ("
-				+ getViewerParent().getTypeName() + " Viewer)";
-	}
-
 	public UINeoNode getNeoNode(String name) {
 		return neoNodesChildren.get(name);
 	}
@@ -268,8 +257,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	public List<UINeoNode> getNeoNodes() {
 		Enumeration<UINeoNode> en = neoNodesChildren.elements();
 
-		ArrayList<UINeoNode> nodesList = new ArrayList<UINeoNode>(
-				neoNodesChildren.size());
+		ArrayList<UINeoNode> nodesList = new ArrayList<UINeoNode>(neoNodesChildren.size());
 
 		while (en.hasMoreElements()) {
 			nodesList.add(en.nextElement());
@@ -311,18 +299,22 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 	}
 
 	@Override
-	public JPopupMenu showSelectionContextMenu() {
-		ArrayList<ModelObject> models = new ArrayList<ModelObject>(
-				getSelection().size());
+	public JPopupMenu getSelectionMenu(Collection<WorldObject> selection) {
+		ArrayList<ModelObject> models = new ArrayList<ModelObject>(selection.size());
 
-		for (IWorldObject object : getSelection()) {
+		for (WorldObject object : selection) {
 			if (object instanceof ModelObject) {
 				models.add((ModelObject) object);
-
 			}
 		}
 
 		return ModelsContextMenu.getMenu(models);
+	}
+
+	@Override
+	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
+		// TODO Auto-generated method stub
+		super.constructSelectionMenu(selection, menu);
 	}
 
 	/**
@@ -355,8 +347,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable,
 		SortMode sortMode;
 
 		public SortNodesAction(SortMode sortMode) {
-			super(NodeViewer.this, "Sort nodes by " + sortMode.getName(),
-					sortMode.getName());
+			super(NodeViewer.this, "Sort nodes by " + sortMode.getName(), sortMode.getName());
 			this.sortMode = sortMode;
 		}
 
@@ -402,8 +393,7 @@ class NodeViewerStatus extends AbstractStatusHandler {
 
 	@Override
 	protected String getStatusMessage(PInputEvent event) {
-		ModelObject wo = (ModelObject) Util.getNodeFromPickPath(event,
-				ModelObject.class);
+		ModelObject wo = (ModelObject) Util.getNodeFromPickPath(event, ModelObject.class);
 
 		StringBuilder statusStr = new StringBuilder(200);
 		if (getWorld().getGround().isElasticMode()) {
@@ -412,8 +402,7 @@ class NodeViewerStatus extends AbstractStatusHandler {
 		statusStr.append(getWorld().getViewerParent().getFullName() + " -> ");
 
 		if (getWorld().getSelection().size() > 1) {
-			statusStr.append(getWorld().getSelection().size()
-					+ " Objects selected");
+			statusStr.append(getWorld().getSelection().size() + " Objects selected");
 
 		} else {
 

@@ -43,7 +43,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import ca.shu.ui.lib.actions.DragAction;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
@@ -81,7 +81,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	private HashMap<WorldObjectImpl, Boolean> allItems = null; // Used within
 	// drag
 	private Point2D canvasPressPt = null;
-	private boolean deleteKeyActive = true; // True if DELETE key should delete
+	private boolean deleteKeyActive = false; // True if DELETE key should delete
 	private DragAction dragAction;
 	// children can be selected
 	private PPath marquee = null;
@@ -253,14 +253,14 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	protected void dragStandardSelection(PInputEvent e) {
 
-		Iterator<WorldObjectImpl> selectionEn = getSelection().iterator();
+		Iterator<WorldObject> selectionEn = getSelection().iterator();
 
 		if (selectionEn.hasNext()) {
 			e.setHandled(true);
 			PDimension d = e.getDeltaRelativeTo(selectableParent.getPiccolo());
 
 			while (selectionEn.hasNext()) {
-				WorldObjectImpl node = selectionEn.next();
+				WorldObject node = selectionEn.next();
 
 				PDimension gDist = new PDimension();
 				gDist.setSize(d);
@@ -356,7 +356,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 			if (node instanceof PiccoloNodeInWorld) {
 				WorldObjectImpl wo = (WorldObjectImpl) ((PiccoloNodeInWorld) node)
-						.getWorldObjectParent();
+						.getWorldObject();
 				if (wo.isSelectable()) {
 					pressNode = wo;
 					pressNode.moveToFront();
@@ -409,7 +409,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 				startStandardOptionSelection(e);
 			}
 
-			Collection<WorldObjectImpl> nodes = getSelection();
+			Collection<WorldObject> nodes = getSelection();
 			dragAction = new DragAction(nodes);
 
 		}
@@ -487,7 +487,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			PNode next = itemsIt.next();
 			if (next instanceof PiccoloNodeInWorld) {
 				WorldObjectImpl wo = (WorldObjectImpl) ((PiccoloNodeInWorld) next)
-						.getWorldObjectParent();
+						.getWorldObject();
 				allItems.put(wo, Boolean.TRUE);
 			}
 
@@ -523,8 +523,8 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	/**
 	 * Returns a copy of the currently selected nodes.
 	 */
-	public Collection<WorldObjectImpl> getSelection() {
-		ArrayList<WorldObjectImpl> sel = new ArrayList<WorldObjectImpl>(
+	public Collection<WorldObject> getSelection() {
+		ArrayList<WorldObject> sel = new ArrayList<WorldObject>(
 				selection.keySet());
 		return sel;
 	}
@@ -568,7 +568,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 						.iterator();
 				while (selectionEn.hasNext()) {
 					WorldObjectImpl node = selectionEn.next();
-					node.removeFromParent();
+					node.destroy();
 				}
 				selection.clear();
 			}
@@ -686,8 +686,8 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			boolean isMarquee = (node == marquee);
 
 			if (node instanceof PiccoloNodeInWorld) {
-				IWorldObject wo = ((PiccoloNodeInWorld) node)
-						.getWorldObjectParent();
+				WorldObject wo = ((PiccoloNodeInWorld) node)
+						.getWorldObject();
 
 				if (wo.isSelectable()) {
 					return (node.getPickable() && boundsIntersects

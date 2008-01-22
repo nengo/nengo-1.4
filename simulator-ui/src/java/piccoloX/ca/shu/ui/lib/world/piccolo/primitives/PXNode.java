@@ -4,8 +4,8 @@ import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import ca.shu.ui.lib.world.IWorldObject;
 import ca.shu.ui.lib.world.PaintContext;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -16,7 +16,7 @@ import edu.umd.cs.piccolo.util.PUtil;
  */
 public class PXNode extends PNode implements PiccoloNodeInWorld {
 	private static final long serialVersionUID = 1L;
-	public static final String PROPERTY_DESTROYED = "destroyed";
+	public static final String PROPERTY_REMOVED_FROM_WORLD = "destroyed";
 	/**
 	 * The property name that identifies a change in this object's global
 	 * position
@@ -26,13 +26,12 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 	public static final String PROPERTY_PARENT_BOUNDS = "parentBounds";
 
 	private long busyAnimatingUntilTime = 0;
-	private IWorldObject worldObjectParent;
+	private WorldObject worldObjectParent;
 
 	public PXNode() {
 		super();
 
-		addPropertyChangeListener(PNode.PROPERTY_TRANSFORM,
-				new TransformChangeListener());
+		addPropertyChangeListener(PNode.PROPERTY_TRANSFORM, new TransformChangeListener());
 	}
 
 	/**
@@ -51,12 +50,24 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 	}
 
 	@Override
+	protected void paint(PPaintContext paintContext) {
+		super.paint(paintContext);
+		if (worldObjectParent != null) {
+			PaintContext convertedPaintContext = new PaintContext(paintContext.getGraphics(),
+					paintContext.getScale());
+
+			worldObjectParent.paint(convertedPaintContext);
+		}
+	}
+
+	@Override
 	protected final void layoutChildren() {
 		/*
 		 * Delegate layout out children to the WorldObject
 		 */
-		if (worldObjectParent != null)
+		if (worldObjectParent != null) {
 			worldObjectParent.layoutChildren();
+		}
 	}
 
 	/*
@@ -67,8 +78,7 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 	 *      long)
 	 */
 	@Override
-	public PTransformActivity animateToTransform(AffineTransform destTransform,
-			long duration) {
+	public PTransformActivity animateToTransform(AffineTransform destTransform, long duration) {
 		if (duration == 0) {
 			setTransform(destTransform);
 			return null;
@@ -101,16 +111,16 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 		}
 	}
 
-	public void destroy() {
+	public void removeFromWorld() {
 		/*
 		 * Notify edges that this object has been destroyed
 		 */
 		signalGlobalBoundsChanged();
-		firePropertyChange(0, PROPERTY_DESTROYED, null, null);
+		firePropertyChange(0, PROPERTY_REMOVED_FROM_WORLD, null, null);
 		removeFromParent();
 	}
 
-	public IWorldObject getWorldObjectParent() {
+	public WorldObject getWorldObject() {
 		return worldObjectParent;
 	}
 
@@ -167,20 +177,9 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 
 	}
 
-	public void setWorldObjectParent(IWorldObject worldObjectParent) {
+	public void setWorldObject(WorldObject worldObjectParent) {
 		this.worldObjectParent = worldObjectParent;
 
-	}
-
-	@Override
-	protected void paint(PPaintContext paintContext) {
-		super.paint(paintContext);
-		if (worldObjectParent != null) {
-			PaintContext convertedPaintContext = new PaintContext(paintContext
-					.getGraphics(), paintContext.getScale());
-
-			worldObjectParent.paint(convertedPaintContext);
-		}
 	}
 
 	@Override
@@ -188,4 +187,23 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 		firePropertyChange(0, PROPERTY_PARENT_BOUNDS, null, null);
 	}
 
+	@Override
+	public void addChild(int index, PNode child) {
+		super.addChild(index, child);
+		if (worldObjectParent != null && child != null && child instanceof PiccoloNodeInWorld) {
+			worldObjectParent.childAdded(((PiccoloNodeInWorld) child).getWorldObject());
+		}
+
+	}
+
+	@Override
+	public PNode removeChild(int arg0) {
+		PNode node = super.removeChild(arg0);
+
+		if (worldObjectParent != null && node != null && node instanceof PiccoloNodeInWorld) {
+			worldObjectParent.childRemoved(((PiccoloNodeInWorld) node).getWorldObject());
+		}
+
+		return node;
+	}
 }

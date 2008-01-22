@@ -8,12 +8,20 @@ import java.util.Collection;
 
 import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
-public interface IWorldObject extends INamedObject, IDestroyable {
+public interface WorldObject extends NamedObject, Destroyable {
 
-	public void addChild(IWorldObject wo);
+	public void addChild(WorldObject wo);
 
-	public void addPropertyChangeListener(EventType event,
-			EventListener listener);
+	public void addPropertyChangeListener(EventType event, EventListener listener);
+
+	/**
+	 * Sets the rotation of this nodes transform in radians. This will affect
+	 * this node and all its descendents.
+	 * 
+	 * @param theta
+	 *            rotation in radians
+	 */
+	public void setRotation(double theta);
 
 	/**
 	 * Animate this node's bounds from their current location when the activity
@@ -31,8 +39,8 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	 *            amount of time that the animation should take
 	 * @return the newly scheduled activity
 	 */
-	public PInterpolatingActivity animateToBounds(double x, double y,
-			double width, double height, long duration);
+	public PInterpolatingActivity animateToBounds(double x, double y, double width, double height,
+			long duration);
 
 	public void animateToPosition(double x, double y, long duration);
 
@@ -52,8 +60,8 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	 *            final theta value (in radians) for the animation
 	 * @return the newly scheduled activity
 	 */
-	public void animateToPositionScaleRotation(double x, double y,
-			double scale, double theta, long duration);
+	public void animateToPositionScaleRotation(double x, double y, double scale, double theta,
+			long duration);
 
 	/**
 	 * @param scale
@@ -64,16 +72,17 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	public void animateToScale(double scale, long duration);
 
 	/**
-	 * Destroy this object
+	 * This function must be called before the object is removed from the world,
+	 * or placed in a new one
 	 */
-	public void destroy();
+	public void removeFromWorld();
 
 	/**
 	 * Called if this object is double clicked on
 	 */
 	public void doubleClicked();
 
-	public Collection<IWorldObject> findIntersectingNodes(Rectangle2D fullBounds);
+	public Collection<WorldObject> findIntersectingNodes(Rectangle2D fullBounds);
 
 	/**
 	 * Return a copy of this node's bounds. These bounds are stored in the local
@@ -88,7 +97,7 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	 * 
 	 * @return reference to the children list
 	 */
-	public Collection<IWorldObject> getChildren();
+	public Collection<WorldObject> getChildren();
 
 	/**
 	 * Returns the rotation applied by this node's transform in radians. This
@@ -128,7 +137,7 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	 */
 	public Point2D getOffset();
 
-	public IWorldObject getParent();
+	public WorldObject getParent();
 
 	/**
 	 * Return the scale applied by this node's transform. The scale is effecting
@@ -141,7 +150,7 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	/**
 	 * @return Tooltip object, null if there is none
 	 */
-	public IWorldObject getTooltip();
+	public WorldObject getTooltip();
 
 	/**
 	 * Return the transparency used when painting this node. Note that this
@@ -165,12 +174,12 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	/**
 	 * @return World which is an ancestor
 	 */
-	public IWorld getWorld();
+	public World getWorld();
 
 	/**
 	 * @return World layer which is an ancestor
 	 */
-	public IWorldLayer getWorldLayer();
+	public WorldLayer getWorldLayer();
 
 	/**
 	 * Return the x position (in local coords) of this node's bounds.
@@ -213,7 +222,7 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	 */
 	public Rectangle2D globalToLocal(Rectangle2D globalPoint);
 
-	public boolean isAncestorOf(IWorldObject wo);
+	public boolean isAncestorOf(WorldObject wo);
 
 	/**
 	 * @return Whether this node is animating
@@ -359,17 +368,16 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	 * Remove all the children from this node. Node this method is more
 	 * efficient then removing each child individually.
 	 */
-	public void removeAllChildren();
+	public void destroyAllChildren();
 
-	public void removeChild(IWorldObject wo);
+	public void removeChild(WorldObject wo);
 
 	/**
 	 * Delete this node by removing it from its parent's list of children.
 	 */
 	public void removeFromParent();
 
-	public void removePropertyChangeListener(EventType event,
-			EventListener listener);
+	public void removePropertyChangeListener(EventType event, EventListener listener);
 
 	/**
 	 * Mark the area on the screen represented by this nodes full bounds as
@@ -495,7 +503,19 @@ public interface IWorldObject extends INamedObject, IDestroyable {
 	public void translate(double dx, double dy);
 
 	public enum EventType {
-		BOUNDS_CHANGED, DESTROYED, FULL_BOUNDS, GLOBAL_BOUNDS, MODEL_CHANGED, PARENTS_BOUNDS, VIEW_TRANSFORM, WIDGET
+		PARENTS_CHANGED, BOUNDS_CHANGED, REMOVED_FROM_WORLD, FULL_BOUNDS, GLOBAL_BOUNDS, MODEL_CHANGED, PARENTS_BOUNDS, VIEW_TRANSFORM, WIDGET
 	}
+
+	/**
+	 * @param wo
+	 *            Child which has just been removed
+	 */
+	public void childRemoved(WorldObject wo);
+
+	/**
+	 * @param wo
+	 *            Child which has just been added
+	 */
+	public void childAdded(WorldObject wo);
 
 }

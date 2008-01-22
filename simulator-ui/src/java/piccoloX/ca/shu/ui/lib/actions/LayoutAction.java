@@ -3,17 +3,17 @@ package ca.shu.ui.lib.actions;
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.util.WorldLayout;
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldObject;
 
 public abstract class LayoutAction extends ReversableAction {
 	private static final long serialVersionUID = 1L;
 
 	private WorldLayout savedLayout;
 
-	private IWorld world;
+	private World world;
 
-	public LayoutAction(IWorld world, String description, String actionName) {
+	public LayoutAction(World world, String description, String actionName) {
 		super(description, actionName);
 		this.world = world;
 	}
@@ -28,7 +28,7 @@ public abstract class LayoutAction extends ReversableAction {
 
 	protected void restoreNodePositions() {
 
-		for (IWorldObject node : world.getGround().getChildren()) {
+		for (WorldObject node : world.getGround().getChildren()) {
 			Point2D savedPosition = savedLayout.getPosition(node);
 			if (savedPosition != null) {
 				node.setOffset(savedPosition);

@@ -5,7 +5,7 @@ package ca.shu.ui.lib.world;
  * 
  * @author Shu Wu
  */
-public interface INamedObject {
+public interface NamedObject {
 	
 	/**
 	 * @return Name of object

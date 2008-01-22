@@ -16,10 +16,9 @@ public abstract class LineWell extends WorldObjectImpl {
 	public LineWell() {
 		super();
 		myIcon = new LineOriginIcon();
+
 		addChild(myIcon);
 		setBounds(getFullBounds());
-		setSelectable(false);
-		myIcon.setSelectable(false);
 		myIcon.addInputEventListener(new CreateLineEndHandler(this));
 	}
 

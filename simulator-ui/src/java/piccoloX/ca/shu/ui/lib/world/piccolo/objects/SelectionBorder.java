@@ -5,10 +5,10 @@ import java.awt.geom.Rectangle2D;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.IWorld;
-import ca.shu.ui.lib.world.IWorldObject;
-import ca.shu.ui.lib.world.IWorldSky;
-import ca.shu.ui.lib.world.IWorldObject.EventType;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.WorldSky;
+import ca.shu.ui.lib.world.WorldObject.EventType;
 import ca.shu.ui.lib.world.piccolo.primitives.Path;
 
 /**
@@ -24,15 +24,15 @@ public class SelectionBorder implements EventListener {
 
 	private Color frameColor = Style.COLOR_BORDER_SELECTED;
 
-	private IWorldSky frameHolder;
+	private WorldSky frameHolder;
 
-	private IWorldObject selectedObj;
+	private WorldObject selectedObj;
 
 	/**
 	 * @param world
 	 *            World, whose sky, this border shall be added to.
 	 */
-	public SelectionBorder(IWorld world) {
+	public SelectionBorder(World world) {
 		super();
 		init(world);
 
@@ -44,7 +44,7 @@ public class SelectionBorder implements EventListener {
 	 * @param objSelected
 	 *            Object to select initially
 	 */
-	public SelectionBorder(IWorld world, IWorldObject objSelected) {
+	public SelectionBorder(World world, WorldObject objSelected) {
 		super();
 		init(world);
 		setSelected(objSelected);
@@ -56,7 +56,7 @@ public class SelectionBorder implements EventListener {
 	 * @param world
 	 *            World, whose sky, this border shall be added to.
 	 */
-	private void init(IWorld world) {
+	private void init(World world) {
 		this.frameHolder = world.getSky();
 		frame = Path.createRectangle(0f, 0f, 1f, 1f);
 		frame.setPickable(false);
@@ -70,7 +70,7 @@ public class SelectionBorder implements EventListener {
 	 * Updates the bounds of the border to match those of the selected object
 	 */
 	protected void updateBounds() {
-		if (selectedObj != null && !selectedObj.isDestroyed()) {
+		if (selectedObj != null) {
 			if (selectedObj.getVisible()) {
 				Rectangle2D bounds = selectedObj.objectToSky(selectedObj
 						.getBounds());
@@ -104,7 +104,7 @@ public class SelectionBorder implements EventListener {
 		updateBounds();
 	}
 
-	public void setSelected(IWorldObject newSelected) {
+	public void setSelected(WorldObject newSelected) {
 		if (newSelected == selectedObj) {
 			return;
 		}
@@ -112,6 +112,8 @@ public class SelectionBorder implements EventListener {
 		if (selectedObj != null) {
 			selectedObj.removePropertyChangeListener(EventType.GLOBAL_BOUNDS,
 					this);
+			selectedObj.removePropertyChangeListener(
+					EventType.REMOVED_FROM_WORLD, this);
 			selectedObj = null;
 		}
 
@@ -120,6 +122,8 @@ public class SelectionBorder implements EventListener {
 
 			selectedObj
 					.addPropertyChangeListener(EventType.GLOBAL_BOUNDS, this);
+			selectedObj.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD,
+					this);
 
 			frameHolder.addChild(frame);
 			updateBounds();
@@ -131,6 +135,9 @@ public class SelectionBorder implements EventListener {
 	}
 
 	public void propertyChanged(EventType event) {
+		if (event == EventType.REMOVED_FROM_WORLD) {
+			setSelected(null);
+		}
 		updateBounds();
 
 	}

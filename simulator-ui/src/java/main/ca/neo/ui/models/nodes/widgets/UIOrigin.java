@@ -13,7 +13,6 @@ import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -50,13 +49,11 @@ public class UIOrigin extends Widget {
 		icon.configureLabel(false);
 		setIcon(icon);
 
-		this.setSelectable(false);
 		updateModel();
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties)
-			throws ConfigException {
+	protected Object configureModel(PropertySet configuredProperties) throws ConfigException {
 		throw new NotImplementedException();
 	}
 
@@ -64,16 +61,13 @@ public class UIOrigin extends Widget {
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 
-		tooltips.addPart(new TooltipProperty("Dimensions", ""
-				+ getModel().getDimensions()));
+		tooltips.addProperty("Dimensions", "" + getModel().getDimensions());
 
 		try {
 			InstantaneousOutput value = getModel().getValues();
 
-			tooltips
-					.addPart(new TooltipProperty("Time: ", "" + value.getTime()));
-			tooltips.addPart(new TooltipProperty("Units: ", ""
-					+ value.getUnits()));
+			tooltips.addProperty("Time: ", "" + value.getTime());
+			tooltips.addProperty("Units: ", "" + value.getUnits());
 
 		} catch (SimulationException e) {
 		}

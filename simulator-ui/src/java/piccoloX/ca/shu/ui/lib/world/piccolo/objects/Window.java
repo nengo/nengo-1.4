@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import javax.swing.JPopupMenu;
 
@@ -11,7 +12,7 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.handlers.EventConsumer;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
@@ -27,6 +28,9 @@ import edu.umd.cs.piccolox.nodes.PClip;
  * 
  * @author Shu Wu
  */
+/**
+ * @author User
+ */
 public class Window extends WorldObjectImpl implements Interactable {
 	private static final int DEFAULT_HEIGHT = 400;
 
@@ -38,6 +42,22 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.NORMAL;
 
+	/**
+	 * Updates the application title with the top window
+	 */
+	public static void updateAppTitle() {
+		List<Window> windows = UIEnvironment.getInstance().getWorldWindows();
+
+		if (windows.size() > 0) {
+			UIEnvironment.getInstance().setTitle(
+					windows.get(windows.size() - 1).getName() + " - "
+							+ UIEnvironment.getInstance().getAppWindowTitle());
+		} else {
+			UIEnvironment.getInstance().restoreDefaultTitle();
+		}
+
+	}
+
 	private final MenuBar menubar;
 
 	private Border myBorder;
@@ -46,19 +66,19 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 	private final WorldObjectImpl myContent;
 
-	private EventConsumer myEventConsumer;
+	private EventConsumer myEventConsumer;;
 
-	private final WeakReference<WorldObjectImpl> mySourceRef;;
+	private final WeakReference<WorldObjectImpl> mySourceRef;
 
 	private RectangularEdge mySourceShadow = null;
 
 	private WindowState myState = WINDOW_STATE_DEFAULT;
 
-	private WindowState savedWindowState = WINDOW_STATE_DEFAULT;
-
 	private Rectangle2D savedWindowBounds;
 
 	private Point2D savedWindowOffset;
+
+	private WindowState savedWindowState = WINDOW_STATE_DEFAULT;
 
 	/**
 	 * @param source
@@ -69,7 +89,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 	public Window(WorldObjectImpl source, WorldObjectImpl content) {
 		super();
 		mySourceRef = new WeakReference<WorldObjectImpl>(source);
-
+		setSelectable(true);
 		this.myContent = content;
 
 		menubar = new MenuBar(this);
@@ -85,31 +105,13 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 		windowStateChanged();
 
-		addPropertyChangeListener(EventType.PARENTS_BOUNDS,
-				new EventListener() {
-
-					public void propertyChanged(EventType event) {
-						if (myState == WindowState.MAXIMIZED) {
-							maximizeBounds();
-						}
-					}
-
-				});
-
-	}
-
-	@Override
-	public void layoutChildren() {
-		super.layoutChildren();
-
-		menubar.setBounds(0, 0, getWidth(), MENU_BAR_HEIGHT);
-
-		myContent.setBounds(0, 0, getWidth() - 4, getHeight() - 4
-				- MENU_BAR_HEIGHT);
-		myContent.setOffset(2, 2 + MENU_BAR_HEIGHT);
-
-		myClippingRectangle.setPathToRectangle((float) getX(), (float) getY(),
-				(float) getWidth(), (float) getHeight());
+		addPropertyChangeListener(EventType.PARENTS_BOUNDS, new EventListener() {
+			public void propertyChanged(EventType event) {
+				if (myState == WindowState.MAXIMIZED) {
+					maximizeBounds();
+				}
+			}
+		});
 
 	}
 
@@ -139,7 +141,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 				mySourceShadow = null;
 			}
 			myBorder.setVisible(false);
-			UIEnvironment.getInstance().addWindow(this);
+			UIEnvironment.getInstance().addWorldWindow(this);
 
 			if (myEventConsumer == null) {
 				myEventConsumer = new EventConsumer();
@@ -160,8 +162,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 				setWidth(DEFAULT_WIDTH);
 				setHeight(DEFAULT_HEIGHT);
 				if (source != null) {
-					setOffset((getWidth() - source.getWidth()) / -2f, source
-							.getHeight() + 20);
+					setOffset((getWidth() - source.getWidth()) / -2f, source.getHeight() + 20);
 				}
 
 			}
@@ -181,9 +182,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 					source.addChild(mySourceShadow, 0);
 				}
 			} else {
-				Util
-						.Assert(false,
-								"Window still active after source destroyed");
+				Util.Assert(false, "Window still active after source destroyed");
 			}
 
 			break;
@@ -207,6 +206,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 			setChildrenPickable(true);
 			setPickable(true);
 		}
+		updateAppTitle();
 		layoutChildren();
 	}
 
@@ -234,6 +234,13 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 	}
 
+	public JPopupMenu getContextMenu() {
+		if (getWindowContent() instanceof Interactable) {
+			return ((Interactable) (getWindowContent())).getContextMenu();
+		}
+		return null;
+	}
+
 	@Override
 	public String getName() {
 		return myContent.getName();
@@ -242,12 +249,26 @@ public class Window extends WorldObjectImpl implements Interactable {
 	/**
 	 * @return Node representing the contents of the Window
 	 */
-	public IWorldObject getWindowContent() {
+	public WorldObject getWindowContent() {
 		return myContent;
 	}
 
 	public WindowState getWindowState() {
 		return myState;
+	}
+
+	@Override
+	public void layoutChildren() {
+		super.layoutChildren();
+
+		menubar.setBounds(0, 0, getWidth(), MENU_BAR_HEIGHT);
+
+		myContent.setBounds(0, 0, getWidth() - 4, getHeight() - 4 - MENU_BAR_HEIGHT);
+		myContent.setOffset(2, 2 + MENU_BAR_HEIGHT);
+
+		myClippingRectangle.setPathToRectangle((float) getX(), (float) getY(), (float) getWidth(),
+				(float) getHeight());
+
 	}
 
 	@Override
@@ -285,13 +306,6 @@ public class Window extends WorldObjectImpl implements Interactable {
 		}
 	}
 
-	public JPopupMenu getContextMenu() {
-		if (getWindowContent() instanceof Interactable) {
-			return ((Interactable) (getWindowContent())).getContextMenu();
-		}
-		return null;
-	}
-
 	public static enum WindowState {
 		MAXIMIZED, MINIMIZED, NORMAL
 	}
@@ -301,24 +315,16 @@ public class Window extends WorldObjectImpl implements Interactable {
 class MenuBar extends WorldObjectImpl implements PInputEventListener {
 
 	private static final long serialVersionUID = 1L;
-	private AbstractButton maximizeButton, minimizeButton, closeButton,
-			normalButton;
-	private Text title;
-
+	private AbstractButton maximizeButton, minimizeButton, closeButton, normalButton;
 	private Window myWindow;
+
 	private PPath rectangle;
+	private Text title;
 
 	public MenuBar(Window window) {
 		super();
 		this.myWindow = window;
-		setSelectable(false);
 		init();
-	}
-
-	@Override
-	public void setOffset(double arg0, double arg1) {
-		// TODO Auto-generated method stub
-		super.setOffset(arg0, arg1);
 	}
 
 	private void init() {
@@ -331,26 +337,23 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 		title.setFont(Style.FONT_LARGE);
 		addChild(title);
 
-		normalButton = new ImageButton("images/icons/restore.gif",
-				new Runnable() {
-					public void run() {
-						myWindow.setWindowState(Window.WindowState.NORMAL);
-					}
-				});
+		normalButton = new ImageButton("images/icons/restore.gif", new Runnable() {
+			public void run() {
+				myWindow.setWindowState(Window.WindowState.NORMAL);
+			}
+		});
 
-		maximizeButton = new ImageButton("images/icons/maximize.gif",
-				new Runnable() {
-					public void run() {
-						myWindow.setWindowState(Window.WindowState.MAXIMIZED);
-					}
-				});
+		maximizeButton = new ImageButton("images/icons/maximize.gif", new Runnable() {
+			public void run() {
+				myWindow.setWindowState(Window.WindowState.MAXIMIZED);
+			}
+		});
 
-		minimizeButton = new ImageButton("images/icons/minimize.gif",
-				new Runnable() {
-					public void run() {
-						myWindow.setWindowState(Window.WindowState.MINIMIZED);
-					}
-				});
+		minimizeButton = new ImageButton("images/icons/minimize.gif", new Runnable() {
+			public void run() {
+				myWindow.setWindowState(Window.WindowState.MINIMIZED);
+			}
+		});
 
 		closeButton = new ImageButton("images/icons/close.gif", new Runnable() {
 			public void run() {
@@ -364,19 +367,6 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 		addChild(closeButton);
 
 		rectangle.setPaint(Style.COLOR_BACKGROUND2);
-	}
-
-	public void updateButtons() {
-		boolean isWindowMaximized = (myWindow.getWindowState() == Window.WindowState.MAXIMIZED);
-
-		if (isWindowMaximized) {
-			maximizeButton.removeFromParent();
-			addChild(normalButton);
-		} else {
-			normalButton.removeFromParent();
-			addChild(maximizeButton);
-		}
-
 	}
 
 	@Override
@@ -398,6 +388,25 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 		if (type == MouseEvent.MOUSE_CLICKED && event.getClickCount() == 2) {
 			myWindow.cycleVisibleWindowState();
 		}
+	}
+
+	@Override
+	public void setOffset(double arg0, double arg1) {
+		// TODO Auto-generated method stub
+		super.setOffset(arg0, arg1);
+	}
+
+	public void updateButtons() {
+		boolean isWindowMaximized = (myWindow.getWindowState() == Window.WindowState.MAXIMIZED);
+
+		if (isWindowMaximized) {
+			maximizeButton.removeFromParent();
+			addChild(normalButton);
+		} else {
+			normalButton.removeFromParent();
+			addChild(maximizeButton);
+		}
+
 	}
 
 }

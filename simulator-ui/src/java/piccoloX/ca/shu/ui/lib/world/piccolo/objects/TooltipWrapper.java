@@ -4,21 +4,20 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.IWorldObject;
-import ca.shu.ui.lib.world.IWorldSky;
 import ca.shu.ui.lib.world.EventListener;
+import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.WorldSky;
 import ca.shu.ui.lib.world.activities.Fader;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
-import ca.shu.ui.lib.world.piccolo.WorldSkyImpl;
 import edu.umd.cs.piccolo.activities.PActivity;
 
 public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 
 	private static final long serialVersionUID = 1L;
 	private PActivity fadeInActivity, fadeInPhase2Activity;
-	private IWorldObject target;
-	private WorldSkyImpl parent;
-	private IWorldObject tooltip;
+	private WorldObject target;
+	private WorldSky parent;
+	private WorldObject tooltip;
 
 	/**
 	 * @param parent
@@ -28,8 +27,7 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 	 * @param target
 	 *            Target which this tooltip shall be attached to
 	 */
-	public TooltipWrapper(WorldSkyImpl parent, IWorldObject tooltip,
-			IWorldObject target) {
+	public TooltipWrapper(WorldSky parent, WorldObject tooltip, WorldObject target) {
 		super();
 		this.tooltip = tooltip;
 		this.target = target;
@@ -37,7 +35,6 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 
 		parent.addChild(this);
 
-		tooltip.setSelectable(false);
 		addChild(tooltip);
 		setPickable(false);
 		setChildrenPickable(false);
@@ -45,7 +42,6 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 
 		addChild(new Border(this, Style.COLOR_TOOLTIP_BORDER));
 
-		setTransparency(0);
 		updateBounds();
 
 		/*
@@ -75,12 +71,11 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 			return;
 		}
 
-		IWorldSky camera = target.getWorld().getSky();
+		WorldSky camera = target.getWorld().getSky();
 
 		Rectangle2D followBounds = target.objectToSky(target.getBounds());
 
-		double x = followBounds.getX()
-				- ((getWidth() - followBounds.getWidth()) / 2f);
+		double x = followBounds.getX() - ((getWidth() - followBounds.getWidth()) / 2f);
 		double y = followBounds.getY() + followBounds.getHeight();
 
 		if (x + getWidth() > camera.getBounds().getWidth()) {
@@ -121,8 +116,7 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 
 		}
 		if (fadeInPhase2Activity != null) {
-			fadeInPhase2Activity
-					.terminate(PActivity.TERMINATE_WITHOUT_FINISHING);
+			fadeInPhase2Activity.terminate(PActivity.TERMINATE_WITHOUT_FINISHING);
 		}
 
 		getPiccolo().addActivity(fadeOutActivity);
@@ -145,6 +139,7 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 	 * Fades in, in an animated sequence
 	 */
 	public void fadeIn() {
+		setTransparency(0);
 		fadeInActivity = new Fader(this, 100, 1f);
 		getPiccolo().addActivity(fadeInActivity);
 

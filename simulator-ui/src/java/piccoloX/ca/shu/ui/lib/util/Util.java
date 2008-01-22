@@ -12,7 +12,7 @@ import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -75,6 +75,9 @@ public class Util {
 		return sb.toString();
 	}
 
+	public static void Assert(boolean bool) {
+		Assert(bool, "");
+	}
 	public static void Assert(boolean bool, String msg) {
 		if (!bool) {
 			String assertMsg = "ASSERT == FALSE: " + msg;
@@ -175,8 +178,8 @@ public class Util {
 	 *            The type of node to be picked from the pick tree
 	 */
 	@SuppressWarnings("unchecked")
-	public static IWorldObject getNodeFromPickPath(PInputEvent event,
-			Class<? extends IWorldObject> type) {
+	public static WorldObject getNodeFromPickPath(PInputEvent event,
+			Class<? extends WorldObject> type) {
 		PStack nodeStack = event.getPath().getNodeStackReference();
 		ListIterator it = nodeStack.listIterator(nodeStack.size());
 
@@ -184,11 +187,11 @@ public class Util {
 			Object node = it.previous();
 
 			if (node instanceof PiccoloNodeInWorld) {
-				IWorldObject wo = ((PiccoloNodeInWorld) node).getWorldObjectParent();
+				WorldObject wo = ((PiccoloNodeInWorld) node).getWorldObject();
 
 				if (wo != null) {
 					if (type.isInstance(wo)) {
-						return (IWorldObject) wo;
+						return (WorldObject) wo;
 					}
 
 					/*

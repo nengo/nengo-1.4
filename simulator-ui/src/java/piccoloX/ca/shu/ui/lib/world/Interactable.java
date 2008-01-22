@@ -7,7 +7,7 @@ import javax.swing.JPopupMenu;
  * 
  * @author Shu
  */
-public interface Interactable extends IWorldObject {
+public interface Interactable extends WorldObject {
 
 	/**
 	 * @param event

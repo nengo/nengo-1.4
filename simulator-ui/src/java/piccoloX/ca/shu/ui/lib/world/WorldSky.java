@@ -3,7 +3,7 @@ package ca.shu.ui.lib.world;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-public interface IWorldSky extends IWorldLayer {
+public interface WorldSky extends WorldLayer {
 	public static final double MAX_ZOOM_SCALE = 5;
 
 	public static final double MIN_ZOOM_SCALE = 0.05;
@@ -19,8 +19,16 @@ public interface IWorldSky extends IWorldLayer {
 	 * fit fully within the cameras view bounds, else the camera will maintain
 	 * its original scale.
 	 */
-	public void animateViewToCenterBounds(Rectangle2D centerBounds,
-			boolean shouldScaleToFit, long duration);
+	public void animateViewToCenterBounds(Rectangle2D centerBounds, boolean shouldScaleToFit,
+			long duration);
+
+	/**
+	 * Translates and scales the camera's view transform so that the given
+	 * bounds (in camera layer's coordinate system)are centered withing the
+	 * cameras view bounds. Use this method to point the camera at a given
+	 * location.
+	 */
+	public void setViewBounds(Rectangle2D centerBounds);
 
 	/**
 	 * Return the scale applied by the view transform to the layers viewed by

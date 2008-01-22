@@ -1,6 +1,6 @@
 package ca.neo.ui.models.tooltips;
 
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.primitives.Text;
 
 /**
@@ -8,7 +8,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Text;
  * 
  * @author Shu Wu
  */
-public class TooltipTitle implements ITooltipPart {
+class TooltipTitle implements ITooltipPart {
 	String titleName;
 
 	public TooltipTitle(String titleName) {
@@ -21,7 +21,7 @@ public class TooltipTitle implements ITooltipPart {
 	 * 
 	 * @see ca.neo.ui.models.tooltips.ITooltipPart#getTooltipString()
 	 */
-	public IWorldObject toWorldObject(double width) {
+	public WorldObject toWorldObject(double width) {
 		Text propertyText = new Text("*** " + titleName + " ***");
 
 		propertyText.setConstrainWidthToTextWidth(false);

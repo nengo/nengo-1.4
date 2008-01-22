@@ -39,7 +39,6 @@ import ca.neo.ui.models.nodes.widgets.UIStateProbe;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.ui.models.nodes.widgets.Widget;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.neo.util.Probe;
@@ -52,7 +51,7 @@ import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 
 /**
@@ -63,8 +62,8 @@ import ca.shu.ui.lib.world.piccolo.WorldImpl;
 public abstract class UINeoNode extends UIModelConfigurable {
 
 	@SuppressWarnings("unchecked")
-	public static final Class[] NODE_TYPES = { UINetwork.class,
-			UINEFEnsemble.class, UIFunctionInput.class, UINeuron.class };
+	public static final Class[] NODE_TYPES = { UINetwork.class, UINEFEnsemble.class,
+			UIFunctionInput.class, UINeuron.class };
 
 	/**
 	 * Factory method which creates a Node UI object around a Node
@@ -117,14 +116,14 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 *            of the Child
 	 */
 	@SuppressWarnings("unchecked")
-	private IWorldObject getChild(String name, Class type) {
+	private WorldObject getChild(String name, Class type) {
 
 		/*
 		 * Linear search used because there tends to be only a small number of
 		 * widets
 		 */
 
-		for (IWorldObject wo : getChildren()) {
+		for (WorldObject wo : getChildren()) {
 			if (type != null) {
 				if (type.isInstance(wo) && (wo.getName().compareTo(name) == 0)) {
 					return wo;
@@ -196,17 +195,14 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 
-		tooltips.addPart(new TooltipProperty("Documentation", getModel()
-				.getDocumentation()));
-		tooltips.addPart(new TooltipProperty("Simulation mode", getModel()
-				.getMode().toString()));
+		tooltips.addProperty("Documentation", getModel().getDocumentation());
+		tooltips.addProperty("Simulation mode", getModel().getMode().toString());
 
 	}
 
 	protected void constructViewMenu(AbstractMenuBuilder menu) {
 
-		AbstractMenuBuilder originsAndTerminations = menu
-				.addSubMenu("Origins and terminations");
+		AbstractMenuBuilder originsAndTerminations = menu.addSubMenu("Origins and terminations");
 
 		/*
 		 * Build the "show origins" menu
@@ -214,8 +210,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		Origin[] origins = getModel().getOrigins();
 		if (origins.length > 0) {
 
-			AbstractMenuBuilder originsMenu = originsAndTerminations
-					.addSubMenu("Show origin");
+			AbstractMenuBuilder originsMenu = originsAndTerminations.addSubMenu("Show origin");
 
 			for (Origin element : origins) {
 				originsMenu.addAction(new ShowOriginAction(element.getName()));
@@ -233,8 +228,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 					.addSubMenu("Show termination");
 
 			for (Termination element : terminations) {
-				terminationsMenu.addAction(new ShowTerminationAction(element
-						.getName()));
+				terminationsMenu.addAction(new ShowTerminationAction(element.getName()));
 			}
 
 		}
@@ -270,13 +264,12 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		/*
 		 * Lays out origin objects
 		 */
-		for (IWorldObject wo : getChildren()) {
+		for (WorldObject wo : getChildren()) {
 
 			if (wo instanceof UIProbe) {
 				UIProbe probe = (UIProbe) wo;
 
-				probe.setOffset(getWidth() * (1f / 4f), probeY + getHeight()
-						* (1f / 4f));
+				probe.setOffset(getWidth() * (1f / 4f), probeY + getHeight() * (1f / 4f));
 				probeY += probe.getHeight() + 5;
 
 			} else if (wo instanceof Widget) {
@@ -339,7 +332,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		 * Assign the probe to a Origin / Termination
 		 */
 
-		IWorldObject probeHolder = null;
+		WorldObject probeHolder = null;
 
 		Origin origin = null;
 		try {
@@ -439,9 +432,8 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	@SuppressWarnings("unchecked")
 	public void hideAllOandT() {
 
-		for (IWorldObject wo : getChildren()) {
-			if (wo instanceof Widget
-					&& (wo instanceof UITermination || wo instanceof UIOrigin)) {
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof Widget && (wo instanceof UITermination || wo instanceof UIOrigin)) {
 				((Widget) wo).setWidgetVisible(false);
 			}
 
@@ -471,8 +463,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		FileManager fm = new FileManager();
 
 		fm.save(this.getModel(), file);
-		new TransientStatusMessage(this.getFullName() + " was saved to "
-				+ file.toString(), 2500);
+		new TransientStatusMessage(this.getFullName() + " was saved to " + file.toString(), 2500);
 	}
 
 	@Override
@@ -515,7 +506,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * Sets the visibility of widgets
 	 */
 	public void setWidgetsVisible(boolean visible) {
-		for (IWorldObject wo : getChildren()) {
+		for (WorldObject wo : getChildren()) {
 			if (wo instanceof Widget) {
 				((Widget) wo).setWidgetVisible(visible);
 			}
@@ -589,8 +580,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 		UITermination termUI;
 		try {
-			termUI = new UITermination(this, getModel().getTermination(
-					terminationName));
+			termUI = new UITermination(this, getModel().getTermination(terminationName));
 			addWidget(termUI);
 			return termUI;
 		} catch (StructuralException e) {
@@ -642,9 +632,8 @@ public abstract class UINeoNode extends UIModelConfigurable {
 			JTextArea editor = new JTextArea(30, 50);
 			editor.setText(prevDoc);
 
-			int rtnValue = JOptionPane.showOptionDialog(UIEnvironment
-					.getInstance(), editor, getName()
-					+ " - Documenation Editor", JOptionPane.OK_CANCEL_OPTION,
+			int rtnValue = JOptionPane.showOptionDialog(UIEnvironment.getInstance(), editor,
+					getName() + " - Documenation Editor", JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.PLAIN_MESSAGE, null, null, null);
 
 			if (rtnValue == JOptionPane.OK_OPTION) {
@@ -751,9 +740,8 @@ public abstract class UINeoNode extends UIModelConfigurable {
 			editor.setText(getModel().getDocumentation());
 			editor.setEditable(false);
 
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor,
-					getName() + " - Documentation Viewer",
-					JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getName()
+					+ " - Documentation Viewer", JOptionPane.PLAIN_MESSAGE);
 
 		}
 

@@ -1,15 +1,15 @@
 package ca.shu.ui.lib.world.piccolo.primitives;
 
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PLayer;
 
 public class PXLayer extends PLayer implements PiccoloNodeInWorld {
 
 	private static final long serialVersionUID = 1L;
 
-	private IWorldObject wo;
+	private WorldObject wo;
 
-	public IWorldObject getWorldObjectParent() {
+	public WorldObject getWorldObject() {
 		return wo;
 	}
 
@@ -17,7 +17,7 @@ public class PXLayer extends PLayer implements PiccoloNodeInWorld {
 		return false;
 	}
 
-	public void setWorldObjectParent(IWorldObject worldObjectParent) {
+	public void setWorldObject(WorldObject worldObjectParent) {
 		wo = worldObjectParent;
 
 	}

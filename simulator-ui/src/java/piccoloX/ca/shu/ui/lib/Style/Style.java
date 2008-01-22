@@ -30,16 +30,26 @@ public class Style {
 	public static final Color COLOR_BUTTON_SELECTED = Color.gray;
 	public static final Color COLOR_DARKBORDER = Color.darkGray;
 
+	/*
+	 * Other colors
+	 */
 	public static final Color COLOR_DISABLED = Color.gray;
 	public static final Color COLOR_FOREGROUND = Color.white;
+	public static final Color COLOR_ANCHOR = Color.gray;
 	public static final Color COLOR_HIGH_SALIENCE = new Color(150, 0, 0);
 
-	public static final Color COLOR_LIGHT_BLUE = new Color(176, 220, 246);
-	public static final Color COLOR_LIGHT_GREEN = new Color(176, 246, 182);
+	/*
+	 * Search colors
+	 */
+	public static final Color COLOR_SEARCH_BOX_BORDER = Color.green;
+	public static final Color COLOR_SEARCH_BAD_CHAR = Color.red;
+
 	/*
 	 * Named colors
 	 */
 	public static final Color COLOR_LIGHT_PURPLE = new Color(225, 180, 255);
+	public static final Color COLOR_LIGHT_BLUE = new Color(176, 220, 246);
+	public static final Color COLOR_LIGHT_GREEN = new Color(176, 246, 182);
 
 	/*
 	 * Line Colors
@@ -64,21 +74,24 @@ public class Style {
 	public static final Font FONT_BIG = new Font("Helvetica", Font.BOLD, 16);
 
 	public static final Font FONT_BOLD = new Font("Helvetica", Font.BOLD, 14);
-	public static final Font FONT_BUTTONS = new Font("Helvetica", Font.PLAIN,
-			14);
+	public static final Font FONT_BUTTONS = new Font("Helvetica", Font.PLAIN, 14);
 	public static final Font FONT_LARGE = new Font("Helvetica", Font.BOLD, 18);
 	public static final Font FONT_NORMAL = new Font("Helvetica", Font.PLAIN, 14);
 
 	public static final Font FONT_SMALL = new Font("Helvetica", Font.PLAIN, 10);
 
-	public static final Font FONT_WINDOW_BUTTONS = new Font("sansserif",
-			Font.BOLD, 16);
+	public static final Font FONT_WINDOW_BUTTONS = new Font("sansserif", Font.BOLD, 16);
 	public static final Font FONT_XLARGE = new Font("Helvetica", Font.BOLD, 22);
 	public static final Font FONT_XXLARGE = new Font("Helvetica", Font.BOLD, 32);
 
-	public static final Font FONT_MENU_TITLE = new Font("Helvetica", Font.BOLD,
-			13);
+	public static final Font FONT_MENU_TITLE = new Font("Helvetica", Font.BOLD, 13);
 	public static final Font FONT_MENU = new Font("Helvetica", Font.BOLD, 12);
+
+	/*
+	 * Search fonts
+	 */
+	public static final Font FONT_SEARCH_TEXT = new Font("Helvetica", Font.BOLD, 30);
+	public static final Font FONT_SEARCH_RESULT_COUNT = new Font("Helvetica", Font.BOLD, 22);
 
 	public static void applyMenuStyle(JComponent item, boolean isTitle) {
 		item.setOpaque(true);

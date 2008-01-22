@@ -3,7 +3,7 @@ package ca.shu.ui.lib.world.piccolo.objects;
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
 
@@ -43,11 +43,11 @@ class RectangleEdgeNode extends PXEdge {
 	@Override
 	public void updateEdgeBounds() {
 
-		IWorldObject start = getStartNode();
-		IWorldObject end = getEndNode();
+		WorldObject start = getStartNode();
+		WorldObject end = getEndNode();
 
 		if (start.isDestroyed() || end.isDestroyed()) {
-			destroy();
+			removeFromWorld();
 			return;
 		}
 

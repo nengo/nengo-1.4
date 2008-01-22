@@ -8,8 +8,8 @@ import java.util.Collection;
  * 
  * @author Shu Wu
  */
-public interface ICustomDroppable {
+public interface DroppableX {
 
-	public void droppedOnTargets(Collection<IWorldObject> targets);
+	public void droppedOnTargets(Collection<WorldObject> targets);
 
 }

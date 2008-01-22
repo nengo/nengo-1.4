@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import ca.shu.ui.lib.world.IWorldLayer;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.objects.Window;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
-public class WorldLayerImpl extends WorldObjectImpl implements IWorldLayer {
+public class WorldLayerImpl extends WorldObjectImpl implements WorldLayer {
 
 	/**
 	 * World this layer belongs to
@@ -26,9 +26,6 @@ public class WorldLayerImpl extends WorldObjectImpl implements IWorldLayer {
 	 */
 	public WorldLayerImpl(String name, PiccoloNodeInWorld node) {
 		super(name, node);
-
-		this.setSelectable(false);
-
 	}
 
 	public Collection<Window> getAllWindows() {
@@ -36,7 +33,7 @@ public class WorldLayerImpl extends WorldObjectImpl implements IWorldLayer {
 
 			public boolean accept(PNode node) {
 				if (node instanceof PiccoloNodeInWorld) {
-					if (((PiccoloNodeInWorld) node).getWorldObjectParent() instanceof Window) {
+					if (((PiccoloNodeInWorld) node).getWorldObject() instanceof Window) {
 						return true;
 					}
 				}
@@ -54,8 +51,7 @@ public class WorldLayerImpl extends WorldObjectImpl implements IWorldLayer {
 		ArrayList<Window> windows = new ArrayList<Window>(filteredNodes.size());
 
 		for (PNode node : filteredNodes) {
-			windows.add((Window) ((PiccoloNodeInWorld) node)
-					.getWorldObjectParent());
+			windows.add((Window) ((PiccoloNodeInWorld) node).getWorldObject());
 		}
 
 		return windows;
@@ -65,7 +61,7 @@ public class WorldLayerImpl extends WorldObjectImpl implements IWorldLayer {
 	 * Removes and destroys children
 	 */
 	public void clearLayer() {
-		for (IWorldObject wo : getChildren()) {
+		for (WorldObject wo : getChildren()) {
 			wo.destroy();
 		}
 	}

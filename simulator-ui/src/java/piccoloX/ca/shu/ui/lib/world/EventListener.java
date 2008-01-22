@@ -1,6 +1,6 @@
 package ca.shu.ui.lib.world;
 
-import ca.shu.ui.lib.world.IWorldObject.EventType;
+import ca.shu.ui.lib.world.WorldObject.EventType;
 
 /**
  * Listener interface used by WorldObjects

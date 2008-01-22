@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
 import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
@@ -141,7 +141,7 @@ public class ElasticGround extends WorldGroundImpl {
 					elasticLayoutThread.unlockVertex(vertex);
 				}
 			} else {
-				Util.Assert(false, "Vertex not found");
+//				Util.Assert(false, "Vertex not found");
 			}
 		}
 
@@ -170,7 +170,7 @@ public class ElasticGround extends WorldGroundImpl {
 		double endX = Double.NEGATIVE_INFINITY;
 		double endY = Double.NEGATIVE_INFINITY;
 
-		for (IWorldObject child : getChildren()) {
+		for (WorldObject child : getChildren()) {
 			ElasticObject elasticObj = (ElasticObject) (child);
 
 			ElasticVertex vertex = myVertexMap.get(elasticObj);
@@ -254,9 +254,6 @@ public class ElasticGround extends WorldGroundImpl {
 	 * must be synchronized with the Graphical children elements.
 	 */
 	public UpdateGraphResult updateGraph() {
-		// if (!SwingUtilities.isEventDispatchThread()) {
-		// Util.debugMsg("Update not dispatched from Swing thread");
-		// }
 
 		boolean changed = false;
 		if (myGraph == null) {
@@ -272,7 +269,7 @@ public class ElasticGround extends WorldGroundImpl {
 			/**
 			 * Add vertices
 			 */
-			for (IWorldObject wo : getChildren()) {
+			for (WorldObject wo : getChildren()) {
 				ElasticObject obj = (ElasticObject) wo;
 
 				if (!myVertexMap.containsKey(obj)) {
@@ -316,21 +313,30 @@ public class ElasticGround extends WorldGroundImpl {
 
 		for (PXEdge uiEdge : edges) {
 
-			IWorldObject startNode = uiEdge.getStartNode();
-			IWorldObject endNode = uiEdge.getEndNode();
+			WorldObject startNode = uiEdge.getStartNode();
+			WorldObject endNode = uiEdge.getEndNode();
 
 			// Find the Elastic Objects which are ancestors of the start and
 			// end
 			// nodes
 			while (startNode.getParent() != this && startNode != null) {
 				startNode = startNode.getParent();
+				if (startNode == null) {
+					break;
+				}
 			}
 
 			while (endNode.getParent() != this && endNode != null) {
 				endNode = endNode.getParent();
+				if (endNode == null) {
+					break;
+				}
 			}
 
-			if (startNode.getParent() == this && endNode.getParent() == this) {
+			if (startNode == null || endNode == null) {
+				Util.Assert(false, "Edge nodes do not exist on this ground");
+			} else if (startNode.getParent() == this
+					&& endNode.getParent() == this) {
 				ElasticVertex startVertex = myVertexMap.get(startNode);
 				ElasticVertex endVertex = myVertexMap.get(endNode);
 

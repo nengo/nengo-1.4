@@ -36,7 +36,6 @@ public class Border extends WorldObjectImpl implements EventListener {
 		myFrame = Path.createRectangle(0f, 0f, 1f, 1f);
 		setPickable(false);
 		setChildrenPickable(false);
-		setSelectable(false);
 
 		addChild(myFrame);
 
@@ -63,8 +62,8 @@ public class Border extends WorldObjectImpl implements EventListener {
 
 			Rectangle2D bounds = myTarget.getBounds();
 
-			myFrame.setBounds((float) bounds.getX(), (float) bounds.getY(),
-					(float) bounds.getWidth(), (float) bounds.getHeight());
+			myFrame.setBounds((float) bounds.getX(), (float) bounds.getY(), (float) bounds
+					.getWidth(), (float) bounds.getHeight());
 			myFrame.setPaint(null);
 			myFrame.setStrokePaint(myColor);
 		}

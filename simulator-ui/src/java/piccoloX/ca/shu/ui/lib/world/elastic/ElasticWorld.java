@@ -19,7 +19,7 @@ import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.shu.ui.lib.world.piccolo.WorldSkyImpl;
@@ -46,7 +46,7 @@ public class ElasticWorld extends WorldImpl {
 	private static final long serialVersionUID = 1L;
 
 	private final WorldGroundImpl.ChildFilter elasticObjectFilter = new WorldGroundImpl.ChildFilter() {
-		public boolean acceptChild(IWorldObject obj) {
+		public boolean acceptChild(WorldObject obj) {
 			if (obj instanceof ElasticObject) {
 				return true;
 			} else {
@@ -62,6 +62,11 @@ public class ElasticWorld extends WorldImpl {
 
 	public ElasticWorld(String name) {
 		this(name, new WorldSkyImpl(), new ElasticGround());
+	}
+
+	public ElasticWorld(String name, ElasticGround ground) {
+		this(name, new WorldSkyImpl(), ground);
+
 	}
 
 	public ElasticWorld(String name, WorldSkyImpl sky, ElasticGround ground) {

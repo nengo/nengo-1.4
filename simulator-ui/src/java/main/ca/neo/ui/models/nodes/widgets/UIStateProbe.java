@@ -10,11 +10,10 @@ import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
-import ca.neo.ui.actions.PlotTimeSeries;
 import ca.neo.ui.actions.PlotAdvanced;
+import ca.neo.ui.actions.PlotTimeSeries;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UIEnsemble;
-import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.util.Probe;
@@ -37,8 +36,7 @@ public class UIStateProbe extends UIProbe {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public UIStateProbe(UINeoNode nodeAttachedTo, String state)
-			throws SimulationException {
+	public UIStateProbe(UINeoNode nodeAttachedTo, String state) throws SimulationException {
 		super(nodeAttachedTo);
 
 		/*
@@ -48,18 +46,17 @@ public class UIStateProbe extends UIProbe {
 		Probe probe;
 		try {
 			if (nodeAttachedTo.getParentViewer() instanceof EnsembleViewer) {
-				EnsembleViewer ensembleViewer = (EnsembleViewer) nodeAttachedTo
-						.getParentViewer();
+				EnsembleViewer ensembleViewer = (EnsembleViewer) nodeAttachedTo.getParentViewer();
 
 				UIEnsemble ensemble = ensembleViewer.getViewerParent();
 				Network network = ensemble.getParentNetwork();
 
-				probe = network.getSimulator().addProbe(ensemble.getName(),
-						(Probeable) node, state, true);
+				probe = network.getSimulator().addProbe(ensemble.getName(), (Probeable) node,
+						state, true);
 
 			} else {
-				probe = nodeAttachedTo.getParentNetwork().getSimulator()
-						.addProbe(node.getName(), state, true);
+				probe = nodeAttachedTo.getParentNetwork().getSimulator().addProbe(node.getName(),
+						state, true);
 			}
 		} catch (SimulationException exception) {
 			// nodeAttachedTo.popupTransientMsg("Could not add Probe (" + state
@@ -67,8 +64,7 @@ public class UIStateProbe extends UIProbe {
 			throw exception;
 		}
 
-		getProbeParent().showPopupMessage(
-				"Probe (" + state + ") added to Simulator");
+		getProbeParent().showPopupMessage("Probe (" + state + ") added to Simulator");
 
 		setModel(probe);
 
@@ -86,8 +82,7 @@ public class UIStateProbe extends UIProbe {
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new TooltipProperty("Attached to", getModel()
-				.getStateName()));
+		tooltips.addProperty("Attached to", getModel().getStateName());
 	}
 
 	/**
@@ -108,8 +103,7 @@ public class UIStateProbe extends UIProbe {
 		@Override
 		protected void action() throws ActionException {
 
-			name = JOptionPane
-					.showInputDialog("Enter name of file to export to: ");
+			name = JOptionPane.showInputDialog("Enter name of file to export to: ");
 
 			(new TrackedAction("Exporting to matlab") {
 
@@ -131,8 +125,7 @@ public class UIStateProbe extends UIProbe {
 		super.prepareForDestroy();
 
 		try {
-			getProbeParent().getParentNetwork().getSimulator().removeProbe(
-					getModel());
+			getProbeParent().getParentNetwork().getSimulator().removeProbe(getModel());
 			getProbeParent().showPopupMessage("Probe removed from Simulator");
 		} catch (SimulationException e) {
 			UserMessages.showError("Could not remove probe");

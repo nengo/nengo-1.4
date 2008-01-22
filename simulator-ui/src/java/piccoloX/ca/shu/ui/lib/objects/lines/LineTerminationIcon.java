@@ -27,8 +27,6 @@ public class LineTerminationIcon extends WorldObjectImpl {
 	public LineTerminationIcon() {
 		super();
 		this.setBounds(0, 0, LINE_IN_WIDTH, LINE_IN_HEIGHT);
-		this.setSelectable(false);
-
 	}
 
 	@Override

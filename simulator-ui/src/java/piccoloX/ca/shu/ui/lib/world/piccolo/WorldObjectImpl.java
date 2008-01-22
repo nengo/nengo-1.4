@@ -16,8 +16,8 @@ import java.util.Iterator;
 import ca.shu.ui.lib.objects.activities.TransientMessage;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.IWorldLayer;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldLayer;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.PaintContext;
 import ca.shu.ui.lib.world.piccolo.primitives.PXNode;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
@@ -34,7 +34,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  * 
  * @author Shu Wu
  */
-public class WorldObjectImpl implements IWorldObject {
+public class WorldObjectImpl implements WorldObject {
 	private static Hashtable<String, EventType> EVENT_CONVERSION_TABLE_1;
 
 	private static Hashtable<EventType, String> EVENT_CONVERSION_TABLE_2;
@@ -46,7 +46,8 @@ public class WorldObjectImpl implements IWorldObject {
 			{ EventType.PARENTS_BOUNDS, PXNode.PROPERTY_PARENT_BOUNDS },
 			{ EventType.FULL_BOUNDS, PXNode.PROPERTY_FULL_BOUNDS },
 			{ EventType.GLOBAL_BOUNDS, PXNode.PROPERTY_GLOBAL_BOUNDS },
-			{ EventType.VIEW_TRANSFORM, PCamera.PROPERTY_VIEW_TRANSFORM } };
+			{ EventType.VIEW_TRANSFORM, PCamera.PROPERTY_VIEW_TRANSFORM },
+			{ EventType.REMOVED_FROM_WORLD, PXNode.PROPERTY_REMOVED_FROM_WORLD } };
 
 	public static final long TIME_BETWEEN_POPUPS = 1500;
 
@@ -54,8 +55,7 @@ public class WorldObjectImpl implements IWorldObject {
 		if (EVENT_CONVERSION_TABLE_1 == null) {
 			EVENT_CONVERSION_TABLE_1 = new Hashtable<String, EventType>();
 			for (Object[] conversion : CONVERSION_MAP) {
-				EVENT_CONVERSION_TABLE_1.put((String) conversion[1],
-						(EventType) conversion[0]);
+				EVENT_CONVERSION_TABLE_1.put((String) conversion[1], (EventType) conversion[0]);
 
 			}
 
@@ -68,8 +68,7 @@ public class WorldObjectImpl implements IWorldObject {
 		if (EVENT_CONVERSION_TABLE_2 == null) {
 			EVENT_CONVERSION_TABLE_2 = new Hashtable<EventType, String>();
 			for (Object[] conversion : CONVERSION_MAP) {
-				EVENT_CONVERSION_TABLE_2.put((EventType) conversion[0],
-						(String) conversion[1]);
+				EVENT_CONVERSION_TABLE_2.put((EventType) conversion[0], (String) conversion[1]);
 			}
 		}
 		return EVENT_CONVERSION_TABLE_2.get(type);
@@ -125,7 +124,7 @@ public class WorldObjectImpl implements IWorldObject {
 
 		myPNode = (PNode) pNode;
 
-		((PiccoloNodeInWorld) myPNode).setWorldObjectParent(this);
+		((PiccoloNodeInWorld) myPNode).setWorldObject(this);
 
 		init(name);
 	}
@@ -158,11 +157,14 @@ public class WorldObjectImpl implements IWorldObject {
 	 *            Name of this Object
 	 */
 	private void init(String name) {
+		setSelectable(false);
 		this.myName = name;
+	}
 
-		// this.setFrameVisible(false);
-		this.setSelectable(true);
-
+	public void removeFromWorld() {
+		if (myPNode instanceof PXNode) {
+			((PXNode) myPNode).removeFromWorld();
+		}
 	}
 
 	protected void firePropertyChange(EventType event) {
@@ -173,6 +175,7 @@ public class WorldObjectImpl implements IWorldObject {
 					listener.propertyChanged(event);
 				}
 			}
+
 		}
 	}
 
@@ -187,11 +190,11 @@ public class WorldObjectImpl implements IWorldObject {
 		return myPNode.addActivity(arg0);
 	}
 
-	public void addChild(IWorldObject wo) {
+	public void addChild(WorldObject wo) {
 		addChild(wo, -1);
 	}
 
-	public void addChild(IWorldObject wo, int index) {
+	public void addChild(WorldObject wo, int index) {
 		if (wo instanceof WorldObjectImpl) {
 			if (index == -1) {
 				myPNode.addChild(((WorldObjectImpl) wo).myPNode);
@@ -203,12 +206,15 @@ public class WorldObjectImpl implements IWorldObject {
 		}
 	}
 
+	public String toString() {
+		return getName();
+	}
+
 	public void addInputEventListener(PInputEventListener arg0) {
 		myPNode.addInputEventListener(arg0);
 	}
 
-	public void addPropertyChangeListener(EventType eventType,
-			EventListener worldListener) {
+	public void addPropertyChangeListener(EventType eventType, EventListener worldListener) {
 
 		if (eventListenerMap == null) {
 			eventListenerMap = new Hashtable<EventType, HashSet<EventListener>>();
@@ -233,16 +239,15 @@ public class WorldObjectImpl implements IWorldObject {
 				piccoloListeners = new Hashtable<EventListener, PiccoloChangeListener>();
 
 			}
-			PiccoloChangeListener piccoloListener = piccoloListeners
-					.get(worldListener);
+			PiccoloChangeListener piccoloListener = piccoloListeners.get(worldListener);
 
 			if (piccoloListener == null) {
 				piccoloListener = new PiccoloChangeListener(worldListener);
 				piccoloListeners.put(worldListener, piccoloListener);
 			}
 
-			getPiccolo().addPropertyChangeListener(
-					worldEventToPiccoloEvent(eventType), piccoloListener);
+			getPiccolo().addPropertyChangeListener(worldEventToPiccoloEvent(eventType),
+					piccoloListener);
 
 		}
 
@@ -255,12 +260,12 @@ public class WorldObjectImpl implements IWorldObject {
 	 *      double, long)
 	 */
 	public void animateToPosition(double x, double y, long duration) {
-		myPNode.animateToPositionScaleRotation(x, y, myPNode.getScale(),
-				myPNode.getRotation(), duration);
+		myPNode.animateToPositionScaleRotation(x, y, myPNode.getScale(), myPNode.getRotation(),
+				duration);
 	}
 
-	public void animateToPositionScaleRotation(double arg0, double arg1,
-			double arg2, double arg3, long arg4) {
+	public void animateToPositionScaleRotation(double arg0, double arg1, double arg2, double arg3,
+			long arg4) {
 		myPNode.animateToPositionScaleRotation(arg0, arg1, arg2, arg3, arg4);
 	}
 
@@ -270,9 +275,8 @@ public class WorldObjectImpl implements IWorldObject {
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#animateToScale(double, long)
 	 */
 	public void animateToScale(double scale, long duration) {
-		myPNode.animateToPositionScaleRotation(myPNode.getOffset().getX(),
-				myPNode.getOffset().getY(), scale, myPNode.getRotation(),
-				duration);
+		myPNode.animateToPositionScaleRotation(myPNode.getOffset().getX(), myPNode.getOffset()
+				.getY(), scale, myPNode.getRotation(), duration);
 	}
 
 	public final void destroy() {
@@ -285,11 +289,11 @@ public class WorldObjectImpl implements IWorldObject {
 			 * Removes this object from the world and finish any tasks Convert
 			 * to array to allow for concurrent modification
 			 */
-			for (IWorldObject wo : getChildren()) {
+			for (WorldObject wo : getChildren()) {
 				wo.destroy();
 			}
 			if (myPNode instanceof PXNode) {
-				((PXNode) myPNode).destroy();
+				((PXNode) myPNode).removeFromWorld();
 			}
 
 		}
@@ -303,17 +307,16 @@ public class WorldObjectImpl implements IWorldObject {
 	public void doubleClicked() {
 	}
 
-	public Collection<IWorldObject> findIntersectingNodes(Rectangle2D fullBounds) {
+	public Collection<WorldObject> findIntersectingNodes(Rectangle2D fullBounds) {
 		ArrayList<PNode> interesectingNodes = new ArrayList<PNode>();
 		myPNode.findIntersectingNodes(fullBounds, interesectingNodes);
 
-		Collection<IWorldObject> interesectingObjects = new ArrayList<IWorldObject>(
+		Collection<WorldObject> interesectingObjects = new ArrayList<WorldObject>(
 				interesectingNodes.size());
 
 		for (PNode node : interesectingNodes) {
 			if (node instanceof PiccoloNodeInWorld) {
-				interesectingObjects.add(((PiccoloNodeInWorld) node)
-						.getWorldObjectParent());
+				interesectingObjects.add(((PiccoloNodeInWorld) node).getWorldObject());
 			}
 
 		}
@@ -324,16 +327,14 @@ public class WorldObjectImpl implements IWorldObject {
 		return myPNode.getBounds();
 	}
 
-	public Collection<IWorldObject> getChildren() {
-		ArrayList<IWorldObject> objects = new ArrayList<IWorldObject>(
-				getPiccolo().getChildrenCount());
+	public Collection<WorldObject> getChildren() {
+		ArrayList<WorldObject> objects = new ArrayList<WorldObject>(getPiccolo().getChildrenCount());
 
 		Iterator<?> it = getPiccolo().getChildrenIterator();
 		while (it.hasNext()) {
 			Object next = it.next();
 			if (next instanceof PiccoloNodeInWorld) {
-				IWorldObject wo = ((PiccoloNodeInWorld) next)
-						.getWorldObjectParent();
+				WorldObject wo = ((PiccoloNodeInWorld) next).getWorldObject();
 
 				if (wo != null) {
 					objects.add(wo);
@@ -359,11 +360,6 @@ public class WorldObjectImpl implements IWorldObject {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ca.shu.ui.lib.world.NamedObject#getName()
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#getName()
 	 */
 	public String getName() {
@@ -374,10 +370,10 @@ public class WorldObjectImpl implements IWorldObject {
 		return myPNode.getOffset();
 	}
 
-	public IWorldObject getParent() {
+	public WorldObject getParent() {
 		PNode parent = getPiccolo().getParent();
 		if (parent != null) {
-			return ((PiccoloNodeInWorld) parent).getWorldObjectParent();
+			return ((PiccoloNodeInWorld) parent).getWorldObject();
 		} else {
 			return null;
 		}
@@ -396,7 +392,7 @@ public class WorldObjectImpl implements IWorldObject {
 	 * 
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#getTooltip()
 	 */
-	public IWorldObject getTooltip() {
+	public WorldObject getTooltip() {
 		return null;
 	}
 
@@ -434,15 +430,14 @@ public class WorldObjectImpl implements IWorldObject {
 	 * 
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#getWorldLayer()
 	 */
-	public IWorldLayer getWorldLayer() {
+	public WorldLayer getWorldLayer() {
 		PNode node = myPNode;
 
 		while (node != null) {
-			IWorldObject wo = ((PiccoloNodeInWorld) node)
-					.getWorldObjectParent();
+			WorldObject wo = ((PiccoloNodeInWorld) node).getWorldObject();
 
-			if (wo instanceof IWorldLayer) {
-				return (IWorldLayer) wo;
+			if (wo instanceof WorldLayer) {
+				return (WorldLayer) wo;
 			}
 
 			node = (PXNode) node.getParent();
@@ -477,7 +472,7 @@ public class WorldObjectImpl implements IWorldObject {
 		return myPNode.globalToLocal(globalPoint);
 	}
 
-	public boolean isAncestorOf(IWorldObject wo) {
+	public boolean isAncestorOf(WorldObject wo) {
 		return getPiccolo().isAncestorOf(((WorldObjectImpl) wo).getPiccolo());
 	}
 
@@ -542,7 +537,7 @@ public class WorldObjectImpl implements IWorldObject {
 	}
 
 	public void moveToFront() {
-
+		myPNode.moveToFront();
 	}
 
 	/*
@@ -551,7 +546,7 @@ public class WorldObjectImpl implements IWorldObject {
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#objectToGround(java.awt.geom.Point2D)
 	 */
 	public Point2D objectToGround(Point2D position) {
-		IWorldLayer layer = getWorldLayer();
+		WorldLayer layer = getWorldLayer();
 
 		myPNode.localToGlobal(position);
 
@@ -571,7 +566,7 @@ public class WorldObjectImpl implements IWorldObject {
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#objectToGround(java.awt.geom.Rectangle2D)
 	 */
 	public Rectangle2D objectToGround(Rectangle2D rectangle) {
-		IWorldLayer layer = getWorldLayer();
+		WorldLayer layer = getWorldLayer();
 
 		myPNode.localToGlobal(rectangle);
 
@@ -591,7 +586,7 @@ public class WorldObjectImpl implements IWorldObject {
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#objectToSky(java.awt.geom.Point2D)
 	 */
 	public Point2D objectToSky(Point2D position) {
-		IWorldLayer layer = getWorldLayer();
+		WorldLayer layer = getWorldLayer();
 
 		myPNode.localToGlobal(position);
 
@@ -612,19 +607,21 @@ public class WorldObjectImpl implements IWorldObject {
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#objectToSky(java.awt.geom.Rectangle2D)
 	 */
 	public Rectangle2D objectToSky(Rectangle2D rectangle) {
-		IWorldLayer layer = getWorldLayer();
+		WorldLayer layer = getWorldLayer();
 
 		myPNode.localToGlobal(rectangle);
 
-		if (layer instanceof WorldGroundImpl) {
-			layer.getWorld().getSky().viewToLocal(rectangle);
-			return rectangle;
-		} else if (layer instanceof WorldSkyImpl) {
-			return rectangle;
-		} else {
-			throw new InvalidParameterException();
-		}
+		if (layer != null) {
+			if (layer instanceof WorldGroundImpl) {
+				layer.getWorld().getSky().viewToLocal(rectangle);
 
+			} else if (layer instanceof WorldSkyImpl) {
+
+			} else {
+				throw new InvalidParameterException();
+			}
+		}
+		return rectangle;
 	}
 
 	public void offset(double dx, double dy) {
@@ -645,16 +642,23 @@ public class WorldObjectImpl implements IWorldObject {
 		return myPNode.parentToLocal(parentRectangle);
 	}
 
-	public void removeAllChildren() {
-		myPNode.removeAllChildren();
+	public void destroyAllChildren() {
+		for (WorldObject wo : getChildren()) {
+			wo.destroy();
+		}
+
 	}
 
-	public void removeChild(IWorldObject wo) {
+	public void removeChild(WorldObject wo) {
 		if (wo instanceof WorldObjectImpl) {
 			myPNode.removeChild(((WorldObjectImpl) wo).getPiccolo());
 		} else {
 			throw new InvalidParameterException("Invalid child object");
 		}
+	}
+
+	public void childRemoved(WorldObject wo) {
+
 	}
 
 	public void removeFromParent() {
@@ -665,8 +669,7 @@ public class WorldObjectImpl implements IWorldObject {
 		myPNode.removeInputEventListener(arg0);
 	}
 
-	public void removePropertyChangeListener(EventType event,
-			EventListener listener) {
+	public void removePropertyChangeListener(EventType event, EventListener listener) {
 		boolean successfull = false;
 		if (eventListenerMap != null) {
 			HashSet<EventListener> eventListeners = eventListenerMap.get(event);
@@ -678,12 +681,10 @@ public class WorldObjectImpl implements IWorldObject {
 				}
 
 				if (piccoloListeners != null) {
-					PiccoloChangeListener piccoloListener = piccoloListeners
-							.get(listener);
+					PiccoloChangeListener piccoloListener = piccoloListeners.get(listener);
 
 					if (piccoloListener != null) {
-						getPiccolo().removePropertyChangeListener(
-								worldEventToPiccoloEvent(event),
+						getPiccolo().removePropertyChangeListener(worldEventToPiccoloEvent(event),
 								piccoloListener);
 					}
 				}
@@ -816,13 +817,21 @@ public class WorldObjectImpl implements IWorldObject {
 		myPNode.translate(dx, dy);
 	}
 
-	public PInterpolatingActivity animateToBounds(double x, double y,
-			double width, double height, long duration) {
+	public PInterpolatingActivity animateToBounds(double x, double y, double width, double height,
+			long duration) {
 		return myPNode.animateToBounds(x, y, width, height, duration);
 	}
 
 	public double getRotation() {
 		return myPNode.getRotation();
+	}
+
+	public void childAdded(WorldObject wo) {
+
+	}
+
+	public void setRotation(double theta) {
+		myPNode.setRotation(theta);
 	}
 
 }
@@ -841,7 +850,7 @@ class PiccoloChangeListener implements PropertyChangeListener {
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
-		woChangeListener.propertyChanged(WorldObjectImpl
-				.piccoloEventToWorldEvent(evt.getPropertyName()));
+		woChangeListener.propertyChanged(WorldObjectImpl.piccoloEventToWorldEvent(evt
+				.getPropertyName()));
 	}
 }

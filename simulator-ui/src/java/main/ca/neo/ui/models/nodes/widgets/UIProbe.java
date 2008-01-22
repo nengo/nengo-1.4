@@ -23,9 +23,8 @@ public abstract class UIProbe extends ModelObject {
 	}
 
 	private void init(UINeoNode nodeAttachedTo) {
-		// setTransparency(0.5f);
-		this.nodeAttachedTo = nodeAttachedTo;
 		setSelectable(false);
+		this.nodeAttachedTo = nodeAttachedTo;
 		myIcon = new ProbeIcon(this);
 		myIcon.configureLabel(false);
 		myIcon.setLabelVisible(false);

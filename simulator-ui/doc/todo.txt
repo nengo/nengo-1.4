@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+01/20/2008 - Inline search, use 'f' to start.
 01/12/2008 - Use ClassRegistry to register classes in plugins directory
 12/22/2007 - The Java Swing Frame's title is updated with the maximized Window's name
 12/22/2007 - Data List viewer recursively find data nodes and displays the correct number
@@ -16,7 +17,10 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-	
+
+Integrate data list viewer as pane in NeoGraphics
+
+Update the context menu style to be more inline with NeoGraphics colors
 
 Make WorldOBject and interface
 

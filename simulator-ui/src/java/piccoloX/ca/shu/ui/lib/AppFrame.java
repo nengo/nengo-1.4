@@ -21,10 +21,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -41,12 +44,12 @@ import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
-import ca.shu.ui.lib.world.elastic.ElasticGround;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.objects.Window;
-import ca.shu.ui.lib.world.piccolo.primitives.PXCanvas;
 import ca.shu.ui.lib.world.piccolo.primitives.PXGrid;
+import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.util.PDebug;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -65,6 +68,7 @@ public abstract class AppFrame extends JFrame {
 	 */
 	public static final String TIPS = "<B>*** Keyboard Shortcuts ***</B><BR>"
 			+ "Interaction modes: Press 's' to switch modes<BR>"
+			+ "Searching: Press 'f', then start typing.<BR>"
 			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips<BR>"
 			+ "<BR><B>*** Mouse Shortcuts ***</B><BR>"
 			+ "Context menu: Right click opens a context menu on most objects<BR>"
@@ -77,7 +81,7 @@ public abstract class AppFrame extends JFrame {
 
 	private ReversableActionManager actionManager;
 
-	private PXCanvas canvas;
+	private Universe canvas;
 
 	private MenuBuilder editMenu;
 
@@ -110,8 +114,8 @@ public abstract class AppFrame extends JFrame {
 	 *            Title of application
 	 */
 	public AppFrame() {
-		super(GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getDefaultScreenDevice().getDefaultConfiguration());
+		super(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+				.getDefaultConfiguration());
 
 		if (!SwingUtilities.isEventDispatchThread()) {
 			try {
@@ -120,6 +124,8 @@ public abstract class AppFrame extends JFrame {
 						init();
 					}
 				});
+			} catch (InvocationTargetException e) {
+				e.getTargetException().printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -129,13 +135,16 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	public void restoreDefaultTitle() {
+		setTitle(getAppWindowTitle());
+	}
+
 	private void init() {
-		graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getDefaultScreenDevice();
+		graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		loadPreferences();
 		UIEnvironment.setInstance(this);
 
-		setTitle(getAppWindowTitle());
+		restoreDefaultTitle();
 
 		actionManager = new ReversableActionManager(this);
 		getContentPane().setLayout(new BorderLayout());
@@ -152,8 +161,8 @@ public abstract class AppFrame extends JFrame {
 			e.printStackTrace();
 		}
 
-		canvas = new PXCanvas(createGround());
-		canvas.createWorld();
+		canvas = new Universe();
+		canvas.setBackgroundWorld(createWorld());
 		canvas.setFocusable(true);
 		setSelectionMode(false);
 
@@ -177,6 +186,7 @@ public abstract class AppFrame extends JFrame {
 
 		editMenu = new MenuBuilder("Edit");
 		editMenu.getJMenu().setMnemonic(KeyEvent.VK_E);
+
 		menuBar.add(editMenu.getJMenu());
 
 		initViewMenu(menuBar);
@@ -207,7 +217,7 @@ public abstract class AppFrame extends JFrame {
 		statusMessageLabel.setForeground(Style.COLOR_FOREGROUND);
 
 		taskMessagesLabel = new JLabel();
-		taskMessagesLabel.setForeground(Style.COLOR_FOREGROUND);
+		taskMessagesLabel.setForeground(Style.COLOR_LIGHT_BLUE);
 
 		interactionModeLabel = new JLabel();
 		interactionModeLabel.addMouseListener(new MouseListener() {
@@ -260,8 +270,8 @@ public abstract class AppFrame extends JFrame {
 		}
 	}
 
-	protected ElasticGround createGround() {
-		return new ElasticGround();
+	protected ElasticWorld createWorld() {
+		return new ElasticWorld("Top world");
 	}
 
 	protected PCamera createDefaultCamera() {
@@ -397,13 +407,13 @@ public abstract class AppFrame extends JFrame {
 	protected void updateTaskMessages() {
 		StringBuilder strBuff = new StringBuilder("<HTML>");
 		if (taskStatusStrings.size() > 0) {
-			strBuff.append("- MESSAGES -<BR>");
+//			strBuff.append("- MESSAGES -<BR>");
 
 			for (int i = taskStatusStrings.size() - 1; i >= 0; i--) {
 				strBuff.append(taskStatusStrings.get(i) + "<BR>");
 			}
 
-			strBuff.append("<BR>");
+			strBuff.append("---<BR>");
 
 			taskMessagesLabel.setVisible(true);
 		} else {
@@ -501,8 +511,18 @@ public abstract class AppFrame extends JFrame {
 		return message;
 	}
 
-	public void addWindow(Window window) {
-		canvas.addWindow(window);
+	public void addWorldWindow(Window window) {
+		canvas.getWorld().getSky().addChild(window);
+	}
+
+	public List<Window> getWorldWindows() {
+		LinkedList<Window> windows = new LinkedList<Window>();
+		for (WorldObject wo : canvas.getWorld().getSky().getChildren()) {
+			if (wo instanceof Window) {
+				windows.add((Window) wo);
+			}
+		}
+		return new ArrayList<Window>(windows);
 	}
 
 	/**
@@ -528,7 +548,7 @@ public abstract class AppFrame extends JFrame {
 	/**
 	 * @return Canvas which hold the zoomable UI
 	 */
-	public PXCanvas getCanvas() {
+	public Universe getCanvas() {
 		return canvas;
 	}
 
@@ -564,8 +584,7 @@ public abstract class AppFrame extends JFrame {
 	 */
 	public void removeEscapeFullScreenModeListener() {
 		if (escapeFullScreenModeListener != null) {
-			canvas
-					.removeKeyListener((KeyListener) escapeFullScreenModeListener);
+			canvas.removeKeyListener((KeyListener) escapeFullScreenModeListener);
 			escapeFullScreenModeListener = null;
 		}
 	}
@@ -666,8 +685,8 @@ public abstract class AppFrame extends JFrame {
 		@Override
 		protected void action() throws ActionException {
 			JLabel editor = new JLabel("<html>" + getAboutString() + "</html>");
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor,
-					"About " + getAppName(), JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "About "
+					+ getAppName(), JOptionPane.PLAIN_MESSAGE);
 		}
 
 	}
@@ -708,12 +727,9 @@ public abstract class AppFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			getCanvas().setDefaultRenderQuality(
-					PPaintContext.HIGH_QUALITY_RENDERING);
-			getCanvas().setAnimatingRenderQuality(
-					PPaintContext.HIGH_QUALITY_RENDERING);
-			getCanvas().setInteractingRenderQuality(
-					PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
 			updateWorldMenu();
 		}
 
@@ -734,12 +750,9 @@ public abstract class AppFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			getCanvas().setDefaultRenderQuality(
-					PPaintContext.LOW_QUALITY_RENDERING);
-			getCanvas().setAnimatingRenderQuality(
-					PPaintContext.LOW_QUALITY_RENDERING);
-			getCanvas().setInteractingRenderQuality(
-					PPaintContext.LOW_QUALITY_RENDERING);
+			getCanvas().setDefaultRenderQuality(PPaintContext.LOW_QUALITY_RENDERING);
+			getCanvas().setAnimatingRenderQuality(PPaintContext.LOW_QUALITY_RENDERING);
+			getCanvas().setInteractingRenderQuality(PPaintContext.LOW_QUALITY_RENDERING);
 			updateWorldMenu();
 		}
 
@@ -760,12 +773,9 @@ public abstract class AppFrame extends JFrame {
 
 		@Override
 		protected void action() throws ActionException {
-			getCanvas().setDefaultRenderQuality(
-					PPaintContext.HIGH_QUALITY_RENDERING);
-			getCanvas().setAnimatingRenderQuality(
-					PPaintContext.LOW_QUALITY_RENDERING);
-			getCanvas().setInteractingRenderQuality(
-					PPaintContext.LOW_QUALITY_RENDERING);
+			getCanvas().setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+			getCanvas().setAnimatingRenderQuality(PPaintContext.LOW_QUALITY_RENDERING);
+			getCanvas().setInteractingRenderQuality(PPaintContext.LOW_QUALITY_RENDERING);
 			updateWorldMenu();
 		}
 
@@ -927,8 +937,8 @@ public abstract class AppFrame extends JFrame {
 		@Override
 		protected void action() throws ActionException {
 			JLabel editor = new JLabel("<html>" + TIPS + "</html>");
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor,
-					"NeoGraphics Tips", JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "NeoGraphics Tips",
+					JOptionPane.PLAIN_MESSAGE);
 		}
 
 	}

@@ -18,7 +18,6 @@ import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
 import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UITermination;
-import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -40,8 +39,7 @@ public class UINEFEnsemble extends UIEnsemble {
 
 	static final PropertyDescriptor pName = new PString("Name");
 
-	static final PropertyDescriptor pNumOfNeurons = new PInt(
-			"Number of Neurons");
+	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
 
 	static final PropertyDescriptor pStorageName = new PString("Storage Name");
 
@@ -50,8 +48,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	/**
 	 * Config descriptors
 	 */
-	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons, pDim,
-			pStorageName };
+	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons, pDim, pStorageName };
 
 	public UINEFEnsemble() {
 		super();
@@ -80,8 +77,7 @@ public class UINEFEnsemble extends UIEnsemble {
 			Integer dimensions = (Integer) prop.getProperty(pDim);
 			String storageName = (String) prop.getProperty(pStorageName);
 
-			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions,
-					storageName, false);
+			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions, storageName, false);
 
 			return ensemble;
 		} catch (StructuralException e) {
@@ -110,8 +106,7 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		for (Origin element : origins) {
 			if (element instanceof DecodedOrigin) {
-				plotMenu.addAction(new PlotDecodedOriginDistortion(element
-						.getName()));
+				plotMenu.addAction(new PlotDecodedOriginDistortion(element.getName()));
 			}
 		}
 
@@ -123,8 +118,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
-		tooltips.addPart(new TooltipProperty("# Dimension", ""
-				+ getModel().getDimension()));
+		tooltips.addProperty("# Dimension", "" + getModel().getDimension());
 
 	}
 

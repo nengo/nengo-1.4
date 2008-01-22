@@ -1,6 +1,6 @@
 package ca.neo.ui.brainView;
 
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.world.handlers.EventConsumer;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
@@ -60,7 +60,7 @@ public class BrainViewer extends WorldImpl {
 				int x = 0;
 				double maxHeight = 0;
 
-				for (IWorldObject wo : getChildren()) {
+				for (WorldObject wo : getChildren()) {
 
 					if (wo.getHeight() > maxHeight) {
 						maxHeight = wo.getHeight();
@@ -68,7 +68,7 @@ public class BrainViewer extends WorldImpl {
 
 				}
 
-				for (IWorldObject wo : getChildren()) {
+				for (WorldObject wo : getChildren()) {
 
 					wo.setOffset(x, maxHeight - wo.getHeight());
 					x += wo.getWidth() + 10;
@@ -93,7 +93,6 @@ class BrainImageWrapper extends WorldObjectImpl {
 		myLabel = new Text();
 		addChild(myLabel);
 		updateLabel();
-		setSelectable(false);
 
 		addInputEventListener(new EventConsumer());
 		addInputEventListener(new BrainImageMouseHandler());
@@ -105,9 +104,8 @@ class BrainImageWrapper extends WorldObjectImpl {
 	}
 
 	private void updateLabel() {
-		myLabel.setText(myBrainImage.getViewName() + " ("
-				+ myBrainImage.getCoordName() + " coord: "
-				+ myBrainImage.getCoord() + ")");
+		myLabel.setText(myBrainImage.getViewName() + " (" + myBrainImage.getCoordName()
+				+ " coord: " + myBrainImage.getCoord() + ")");
 	}
 
 	@Override
@@ -124,8 +122,7 @@ class BrainImageWrapper extends WorldObjectImpl {
 		@Override
 		protected void dragActivityStep(PInputEvent aEvent) {
 
-			double dx = (aEvent.getCanvasPosition().getX() - getMousePressedCanvasPoint()
-					.getX()) / 30;
+			double dx = (aEvent.getCanvasPosition().getX() - getMousePressedCanvasPoint().getX()) / 30;
 			int dxInteger = (int) dx;
 
 			roundingError += dx - (int) dx;

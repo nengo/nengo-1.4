@@ -5,7 +5,7 @@ import java.awt.geom.Rectangle2D;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.IWorldSky;
+import ca.shu.ui.lib.world.WorldSky;
 import ca.shu.ui.lib.world.handlers.KeyboardFocusHandler;
 import ca.shu.ui.lib.world.handlers.ScrollZoomHandler;
 import ca.shu.ui.lib.world.piccolo.primitives.PXCamera;
@@ -21,11 +21,11 @@ import edu.umd.cs.piccolo.event.PZoomEventHandler;
  * 
  * @author Shu Wu
  */
-public class WorldSkyImpl extends WorldLayerImpl implements IWorldSky {
+public class WorldSkyImpl extends WorldLayerImpl implements WorldSky {
 
 	private static final long serialVersionUID = -7467076877836999849L;
 
-	private PCamera myCamera;
+	private PXCamera myCamera;
 
 	/**
 	 * Create a new sky layer
@@ -36,7 +36,7 @@ public class WorldSkyImpl extends WorldLayerImpl implements IWorldSky {
 	public WorldSkyImpl() {
 		super("Sky", new PXCamera());
 
-		myCamera = (PCamera) getPiccolo();
+		myCamera = (PXCamera) getPiccolo();
 		myCamera.setPaint(Style.COLOR_BACKGROUND);
 
 		/*
@@ -104,10 +104,9 @@ public class WorldSkyImpl extends WorldLayerImpl implements IWorldSky {
 		return myCamera;
 	}
 
-	public void animateViewToCenterBounds(Rectangle2D centerBounds,
-			boolean shouldScaleToFit, long duration) {
-		myCamera.animateViewToCenterBounds(centerBounds, shouldScaleToFit,
-				duration);
+	public void animateViewToCenterBounds(Rectangle2D centerBounds, boolean shouldScaleToFit,
+			long duration) {
+		myCamera.animateViewToCenterBounds(centerBounds, shouldScaleToFit, duration);
 	}
 
 	public void setViewScale(double scale) {
@@ -116,6 +115,11 @@ public class WorldSkyImpl extends WorldLayerImpl implements IWorldSky {
 
 	public Rectangle2D getViewBounds() {
 		return myCamera.getViewBounds();
+	}
+
+	public void setViewBounds(Rectangle2D centerBounds) {
+		myCamera.setViewBounds(centerBounds);
+
 	}
 
 }

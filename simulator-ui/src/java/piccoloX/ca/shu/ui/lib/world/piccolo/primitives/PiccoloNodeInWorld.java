@@ -1,11 +1,11 @@
 package ca.shu.ui.lib.world.piccolo.primitives;
 
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 
 public interface PiccoloNodeInWorld {
-	public IWorldObject getWorldObjectParent();
+	public WorldObject getWorldObject();
 
 	public boolean isAnimating();
 
-	public void setWorldObjectParent(IWorldObject worldObjectParent);
+	public void setWorldObject(WorldObject worldObjectParent);
 }

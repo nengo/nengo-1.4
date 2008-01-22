@@ -8,7 +8,7 @@ import javax.swing.JPopupMenu;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.objects.SelectionBorder;
@@ -79,8 +79,8 @@ public class MouseHandler extends PBasicInputEventHandler {
 			while (node != null) {
 				if (node instanceof PiccoloNodeInWorld) {
 
-					IWorldObject wo = ((PiccoloNodeInWorld) node)
-							.getWorldObjectParent();
+					WorldObject wo = ((PiccoloNodeInWorld) node)
+							.getWorldObject();
 
 					wo.doubleClicked();
 
@@ -116,7 +116,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 				event.getComponent().pushCursor(HAND_CURSOR);
 			}
 
-			frame.setSelected((IWorldObject) obj);
+			frame.setSelected((WorldObject) obj);
 
 		}
 
@@ -145,7 +145,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 		if (((mouseButtonPressed == event.getButton()) && mouseCanvasPositionPressed
 				.distance(event.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
 
-			JPopupMenu menuToShow = world.showSelectionContextMenu();
+			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
 
 			if (menuToShow == null
 					&& (interactableObj != null)

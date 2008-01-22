@@ -13,7 +13,6 @@ import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.FunctionInputIcon;
-import ca.neo.ui.models.tooltips.TooltipProperty;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
@@ -24,8 +23,7 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  */
 public class UIFunctionInput extends UINeoNode {
 
-	private static PropertyDescriptor pFunctions = new PFunctionArray(
-			"Functions Generators", 1);
+	private static PropertyDescriptor pFunctions = new PFunctionArray("Functions Generators", 1);
 
 	private static PropertyDescriptor pName = new PString("Name");
 
@@ -65,8 +63,7 @@ public class UIFunctionInput extends UINeoNode {
 
 		try {
 			// setName((String) getProperty(pName));
-			return new FunctionInput((String) props.getProperty(pName),
-					functions, Units.UNK);
+			return new FunctionInput((String) props.getProperty(pName), functions, Units.UNK);
 		} catch (StructuralException e) {
 			throw new ConfigException(e.getMessage());
 
@@ -80,17 +77,14 @@ public class UIFunctionInput extends UINeoNode {
 		// MenuBuilder plotMenu = menu.createSubMenu("Plot");
 		menu.addSection("Function");
 
-		menu.addAction(new PlotFunctionNodeAction(getName(), "Plot function",
-				getModel()));
+		menu.addAction(new PlotFunctionNodeAction(getName(), "Plot function", getModel()));
 	}
 
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 
-		tooltips.addPart(new TooltipProperty("Dimensions", ""
-				+ getModel().getFunctions().length));
-
+		tooltips.addProperty("Dimensions", "" + getModel().getFunctions().length);
 	}
 
 	@Override

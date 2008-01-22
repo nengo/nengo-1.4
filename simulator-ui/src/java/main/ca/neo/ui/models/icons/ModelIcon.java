@@ -2,7 +2,7 @@ package ca.neo.ui.models.icons;
 
 import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.Text;
 
@@ -19,7 +19,7 @@ public class ModelIcon extends WorldObjectImpl implements EventListener {
 	/**
 	 * The inner icon node which contains the actual icon representation
 	 */
-	private IWorldObject iconReal;
+	private WorldObject iconReal;
 
 	/**
 	 * Label of the icon
@@ -44,28 +44,19 @@ public class ModelIcon extends WorldObjectImpl implements EventListener {
 	 * @param scale
 	 *            Scale of the Icon
 	 */
-	public ModelIcon(ModelObject parent, IWorldObject icon) {
+	public ModelIcon(ModelObject parent, WorldObject icon) {
 		super();
 		this.parent = parent;
 		this.iconReal = icon;
 
-		setSelectable(false);
 		addChild(icon);
-		// icon.setSelectable(false);
-		// icon.setChildrenPickable(false);
 
 		label = new Text();
 		label.setConstrainWidthToTextWidth(true);
 		updateLabel();
 		addChild(label);
 
-		// if (icon instanceof WorldObject) {
-		// ((IWorldObject) icon).setSelectable(false);
-		// }
-
-		// parent.addPropertyChangeListener(PROPERTY_NAME, this);
 		parent.addPropertyChangeListener(EventType.MODEL_CHANGED, this);
-		setSelectable(false);
 
 		/*
 		 * The bounds of this object matches those of the real icon
@@ -81,7 +72,7 @@ public class ModelIcon extends WorldObjectImpl implements EventListener {
 		setBounds(iconReal.localToParent(iconReal.getBounds()));
 	}
 
-	protected IWorldObject getIconReal() {
+	protected WorldObject getIconReal() {
 		return iconReal;
 	}
 

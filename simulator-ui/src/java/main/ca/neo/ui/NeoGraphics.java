@@ -38,7 +38,7 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 
 /**
  * Top level instance of the NeoGraphics application
@@ -192,7 +192,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	@SuppressWarnings("unchecked")
 	protected void promptToSaveModels() {
 
-		for (IWorldObject wo : getWorld().getGround().getChildren()) {
+		for (WorldObject wo : getWorld().getGround().getChildren()) {
 			if (wo instanceof UINeoNode) {
 				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) wo);
 				saveAction.doAction();
@@ -245,7 +245,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	@Override
 	public String getAppName() {
-		return "NeoGraphics";
+		return "NEO Graphics";
 	}
 
 	public String getAppWindowTitle() {

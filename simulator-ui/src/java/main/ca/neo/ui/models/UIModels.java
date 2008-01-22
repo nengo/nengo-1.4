@@ -20,7 +20,7 @@ public class UIModels {
 			Collection<ModelObject> homogeneousModels) {
 
 		menuBuilder.addAction(new RemoveModelsAction(homogeneousModels,
-				typeName));
+				typeName, true));
 
 		if (UINeoNode.class.isAssignableFrom(modelType)) {
 

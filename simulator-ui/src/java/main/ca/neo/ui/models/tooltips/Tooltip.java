@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.IWorldObject;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PText;
 
@@ -49,7 +49,7 @@ public class Tooltip extends WorldObjectImpl {
 
 		while (it.hasNext()) {
 			ITooltipPart part = it.next();
-			IWorldObject wo = part.toWorldObject(tooltipWidth);
+			WorldObject wo = part.toWorldObject(tooltipWidth);
 
 			wo.setOffset(wo.getOffset().getX(), layoutY);
 

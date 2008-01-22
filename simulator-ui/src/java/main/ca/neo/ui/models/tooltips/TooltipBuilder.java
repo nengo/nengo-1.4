@@ -3,10 +3,6 @@ package ca.neo.ui.models.tooltips;
 import java.util.Collection;
 import java.util.Vector;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import ca.shu.ui.lib.world.IWorldObject;
-
 /**
  * Builds tooltips from parts
  * 
@@ -41,15 +37,15 @@ public class TooltipBuilder {
 		return tooltipParts;
 	}
 
-	/**
-	 * @param part
-	 *            Tooltip part to add
-	 */
-	public void addPart(ITooltipPart part) {
-		tooltipParts.add(part);
+	public void addProperty(String propertyName, String propertyValue) {
+		tooltipParts.add(new TooltipProperty(propertyName, propertyValue));
 	}
 
-	public void addCustomPart(IWorldObject obj) {
-		throw new NotImplementedException();
+	public void addTitle(String titleName) {
+		tooltipParts.add(new TooltipTitle(titleName));
+	}
+
+	public void addPart(ITooltipPart obj) {
+		tooltipParts.add(obj);
 	}
 }

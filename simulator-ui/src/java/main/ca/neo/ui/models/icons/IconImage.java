@@ -17,7 +17,6 @@ public class IconImage extends WorldObjectImpl {
 
 	public IconImage(String arg0) {
 		super(new IconImageNode(arg0));
-		setSelectable(false);
 		setPickable(false);
 	}
 
