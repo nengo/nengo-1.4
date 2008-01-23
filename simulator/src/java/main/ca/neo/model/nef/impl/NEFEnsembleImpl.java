@@ -26,7 +26,6 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
-import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFNode;
@@ -491,6 +490,30 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	public void setPlasticityInterval(float time) {
 		myPlasticityInterval = time;
+	}
+	
+	@Override
+	public float getPlasticityInterval() {
+		return myPlasticityInterval;
+	}
+
+	@Override
+	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
+		if (myDecodedTerminations.containsKey(terminationName)) {
+			return myPlasticityRules.get(terminationName);
+		} else {
+			return super.getPlasticityRule(terminationName);			
+		}
+	}
+
+	@Override
+	public String[] getPlasticityRuleNames() {
+		String[] thisNames = myDecodedTerminations.keySet().toArray(new String[0]);
+		String[] superNames = super.getPlasticityRuleNames();
+		String[] result = new String[thisNames.length + superNames.length];
+		System.arraycopy(thisNames, 0, result, 0, thisNames.length);
+		System.arraycopy(superNames, 0, result, thisNames.length, superNames.length);
+		return result;
 	}
 
 	@Override

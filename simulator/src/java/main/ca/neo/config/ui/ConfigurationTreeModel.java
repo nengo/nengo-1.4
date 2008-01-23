@@ -27,21 +27,27 @@ import ca.neo.config.MainHandler;
 import ca.neo.config.NamedValueProperty;
 import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
+import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
+import ca.neo.model.impl.EnsembleImpl;
+import ca.neo.model.impl.MockConfigurable;
+import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.neo.model.nef.impl.NEFEnsembleImpl;
 import ca.neo.model.neuron.impl.LIFSpikeGenerator;
 import ca.neo.model.neuron.impl.LinearSynapticIntegrator;
 import ca.neo.model.neuron.impl.PlasticExpandableSpikingNeuron;
 import ca.neo.model.neuron.impl.SpikingNeuron;
+import ca.neo.util.MU;
 
 /**
  * Data model underlying JTree user interface for a Configurable.
  * 
  * DONE (tuesday) add, remove, set for map parameters; test against plastic 
  * DONE (tuesday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
- * TODO (wed) expand Plastic interface to allow configuration
+ * DONE (wed) expand Plastic interface to allow configuration
  * TODO (wed): support float[] and float[][] size changes
  * TODO (wed): constructor arg names and docs from source
  * TODO (thurs): support primitives in ListProperty or limit Property use to objects 
@@ -397,15 +403,19 @@ public class ConfigurationTreeModel implements TreeModel {
 	public static void main(String[] args) {
 		try {
 			JFrame frame = new JFrame("Tree Test"); 
-//			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
-//			configurable.addMultiValuedField("test1");
-//			configurable.addMultiValuedField("test2");
+			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
+			configurable.addMultiValuedField("test1");
+			configurable.addMultiValuedField("test2");
 //			Object configurable = new SpikingNeuron(new LinearSynapticIntegrator(.001f, Units.ACU), 
 //					new LIFSpikeGenerator(.001f, .02f, .001f), 15, 0, "neuron");
 //			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-//			Object configurable = ef.make("test", 100, 2);
-			Object configurable = new PlasticExpandableSpikingNeuron(
-					new LinearSynapticIntegrator(), new LIFSpikeGenerator(), 1, 0, "foo");
+//			NEFEnsembleImpl configurable = (NEFEnsembleImpl) ef.make("test", 100, 2);
+//			configurable.addDecodedTermination("decoded", MU.I(2), .005f, false);
+//			configurable.addTermination("composite", MU.zero(100, 1), .005f, false);
+//			EnsembleImpl configurable = new EnsembleImpl("test", new Node[]{
+//					new PlasticExpandableSpikingNeuron(new LinearSynapticIntegrator(), new LIFSpikeGenerator(), 1, 0, "foo")
+//			});
+//			configurable.addTermination("term", new float[][]{new float[]{1}}, .005f, false);
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

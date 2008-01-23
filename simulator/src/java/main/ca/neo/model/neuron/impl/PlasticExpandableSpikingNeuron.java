@@ -9,11 +9,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
-import ca.neo.config.NamedValueProperty;
-import ca.neo.config.impl.ConfigurationImpl;
-import ca.neo.config.impl.NamedValuePropertyImpl;
 import ca.neo.model.ExpandableNode;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
@@ -37,7 +32,7 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 	private static Logger ourLogger = Logger.getLogger(PlasticExpandableSpikingNeuron.class);
 
 	private Plastic mySynapticIntegrator;
-	private Map<String, PlasticityRule> myPlasticityRules;
+//	private Map<String, PlasticityRule> myPlasticityRules;
 	
 	/**
 	 * Note: current = scale * (weighted sum of inputs at each termination) * (radial input) + bias.
@@ -63,7 +58,7 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 		}
 		
 		mySynapticIntegrator = (Plastic) integrator;
-		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
+//		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 	}
 	
 	/**
@@ -73,15 +68,30 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 		Origin[] origins = getOrigins();
 		
 		//have to set origins before super runs the synaptic integrator
-		Iterator<PlasticityRule> it = myPlasticityRules.values().iterator();
-		while (it.hasNext()) {
-			PlasticityRule rule = it.next();
-
-			for (int i = 0; i < origins.length; i++) {
-				InstantaneousOutput output = origins[i].getValues();
-				rule.setOriginState(origins[i].getName(), output, endTime);									
+		String[] ruleNames = getPlasticityRuleNames();
+		for (int i = 0; i < ruleNames.length; i++) {
+			PlasticityRule rule;
+			try {
+				rule = getPlasticityRule(ruleNames[i]);
+				if (rule != null) {
+					for (int j = 0; j < origins.length; j++) {
+						InstantaneousOutput output = origins[j].getValues();
+						rule.setOriginState(origins[j].getName(), output, endTime);									
+					}
+				}
+			} catch (StructuralException e) {
+				throw new SimulationException("Expected plasticity rule unavailable: " + ruleNames[i], e);
 			}
 		}
+//		Iterator<PlasticityRule> it = myPlasticityRules.values().iterator();
+//		while (it.hasNext()) {
+//			PlasticityRule rule = it.next();
+//
+//			for (int i = 0; i < origins.length; i++) {
+//				InstantaneousOutput output = origins[i].getValues();
+//				rule.setOriginState(origins[i].getName(), output, endTime);									
+//			}
+//		}
 		
 		super.run(startTime, endTime);		
 	}
@@ -90,7 +100,7 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 	 * @see ca.neo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.neo.model.plasticity.PlasticityRule)
 	 */
 	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
-		myPlasticityRules.put(terminationName, rule);
+//		myPlasticityRules.put(terminationName, rule);
 		mySynapticIntegrator.setPlasticityRule(terminationName, rule);
 	}
 
@@ -131,6 +141,27 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 		}
 		
 		((ExpandableSynapticIntegrator) mySynapticIntegrator).removeTermination(name);
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityInterval()
+	 */
+	public float getPlasticityInterval() {
+		return mySynapticIntegrator.getPlasticityInterval();
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityRule(java.lang.String)
+	 */
+	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
+		return mySynapticIntegrator.getPlasticityRule(terminationName);
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityRuleNames()
+	 */
+	public String[] getPlasticityRuleNames() {
+		return mySynapticIntegrator.getPlasticityRuleNames();
 	}
 
 }

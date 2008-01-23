@@ -34,6 +34,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	
 	private ExpandableNode[] myExpandableNodes;
 	private Map<String, Termination> myExpandedTerminations;
+	private Map<String, PlasticityRule> myPlasticityRules;
 	
 	/**
 	 * @param name Name of Ensemble
@@ -45,7 +46,8 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		super(name, nodes);
 		
 		myExpandableNodes = findExpandable(nodes);
-		myExpandedTerminations = new HashMap<String, Termination>(10);		
+		myExpandedTerminations = new HashMap<String, Termination>(10);	
+		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 	}
 	
 	public EnsembleImpl(String name, NodeFactory factory, int n) throws StructuralException {
@@ -171,6 +173,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 				((Plastic) myExpandableNodes[i]).setPlasticityRule(terminationName, rule);				
 			}
 		}
+		myPlasticityRules.put(terminationName, rule); 
 	}
 
 	/**
@@ -182,6 +185,39 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 				((Plastic) myExpandableNodes[i]).setPlasticityInterval(time);				
 			}
 		}
+	}
+
+	/**
+	 * Returns minimum of plasticity intervals of plastic component nodes, or -1 if 
+	 * none of the component nodes are plastic.  
+	 * 
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityInterval()
+	 */
+	public float getPlasticityInterval() {		
+		float result = -1; 
+
+		for (int i = 0; i < myExpandableNodes.length; i++) {
+			if (myExpandableNodes[i] instanceof Plastic) {
+				float interval = ((Plastic) myExpandableNodes[i]).getPlasticityInterval();
+				if (result < 0 || result > interval) result = interval; 
+			}
+		}
+		
+		return result; 
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityRule(java.lang.String)
+	 */
+	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
+		return myPlasticityRules.get(terminationName);
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityRuleNames()
+	 */
+	public String[] getPlasticityRuleNames() {
+		return myExpandedTerminations.keySet().toArray(new String[0]);
 	}
 
 }

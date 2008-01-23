@@ -281,4 +281,25 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		myNode = node;
 	}
 
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityInterval()
+	 */
+	public float getPlasticityInterval() {
+		return myPlasticityInterval;
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityRule(java.lang.String)
+	 */
+	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
+		return myPlasticityRules.get(terminationName);
+	}
+
+	/**
+	 * @see ca.neo.model.plasticity.Plastic#getPlasticityRuleNames()
+	 */
+	public String[] getPlasticityRuleNames() {
+		return myTerminations.keySet().toArray(new String[0]);
+	}
+
 }

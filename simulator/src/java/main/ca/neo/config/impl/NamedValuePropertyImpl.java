@@ -273,14 +273,15 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	 * @see ca.neo.config.Property#isFixedCardinality()
 	 */
 	public boolean isFixedCardinality() {
-		return !isMutable();
+		return myMapGetter == null 
+			&& (myRemover == null || (myNamedSetter == null && myUnnamedSetter == null));
 	}
 
 	/**
 	 * @see ca.neo.config.impl.AbstractProperty#isMutable()
 	 */
 	public boolean isMutable() {
-		return (myRemover != null && (myNamedSetter != null || myUnnamedSetter != null)) 
+		return (myNamedSetter != null || myUnnamedSetter != null) 
 			|| myMapGetter != null;
 	}
 	

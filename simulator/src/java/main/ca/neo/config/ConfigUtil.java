@@ -93,11 +93,15 @@ public class ConfigUtil {
 			}
 		}
 		
+		//look for additional array, list, and map getters 
 		for (int i = 0; i < methods.length; i++) {
 			Type returnType = methods[i].getGenericReturnType();
 			String propName = getPropertyName(methods[i]);
 			
-			if (isGetter(methods[i]) && !isNamesGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
+			if (isGetter(methods[i]) && !isNamesGetter(methods[i]) && !result.getPropertyNames().contains(propName)
+					&& !result.getPropertyNames().contains(stripSuffix(propName, "s"))
+					&& !result.getPropertyNames().contains(stripSuffix(propName, "es"))) {
+				
 				Property p = null;
 //				System.out.println(returnType instanceof Class);
 //				System.out.println(returnType instanceof Class && ((Class) returnType).isArray());

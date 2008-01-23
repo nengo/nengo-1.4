@@ -18,7 +18,7 @@ public interface Plastic {
 	 * @return A rule that defines how the termination's transformation matrix elements change during simulation
 	 * @throws StructuralException if the named Termination does not exist
 	 */
-//	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException;
+	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException;
 	
 	/**
 	 * @param terminationName Name of termination to which plasticity rule applies.  
@@ -30,7 +30,7 @@ public interface Plastic {
 	/**
 	 * @return Period after which plasticity rules are evaluated (defaults to every time step).
 	 */
-//	public float getPlasticityInterval();
+	public float getPlasticityInterval();
 	
 	/**
 	 * @param time Period after which plasticity rules are evaluated (defaults to every time step).  
@@ -40,6 +40,6 @@ public interface Plastic {
 	/**
 	 * @return Names of Terminations for which plasticity rules can be set 
 	 */
-//	public String[] getPlasticityRuleNames();
+	public String[] getPlasticityRuleNames();
 	
 }
