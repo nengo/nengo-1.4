@@ -45,7 +45,7 @@ public class MatrixEditor extends JPanel {
 		myMatrix = matrix;
 		myTableModel = new MatrixTableModel(matrix);
 		myTable = new JTable(myTableModel);
-		myTable.setMinimumSize(new Dimension(50*matrix[0].length, 16*matrix.length));
+		myTable.setMinimumSize(new Dimension(matrix.length == 0 ? 50 : 50*matrix[0].length, 16*matrix.length));
 		myTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		myTable.setRowSelectionAllowed(false);
 		JScrollPane scroll = new JScrollPane(myTable,  
@@ -101,7 +101,7 @@ public class MatrixEditor extends JPanel {
 		private final float[][] myMatrix;
 
 		public MatrixTableModel(float[][] matrix) {
-			int cols = matrix[0].length;
+			int cols = matrix.length > 0 ? matrix[0].length : 0;
 			for (int i = 1; i < matrix.length; i++) {
 				if (matrix[i].length != cols) {
 					throw new IllegalArgumentException("Matrix must have the same number of columns in each row");
@@ -111,7 +111,7 @@ public class MatrixEditor extends JPanel {
 		}
 
 		public int getColumnCount() {
-			return myMatrix[0].length;
+			return myMatrix.length > 0 ? myMatrix[0].length : 0;
 		}
 
 		@Override

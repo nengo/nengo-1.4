@@ -9,13 +9,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configurable;
 import ca.neo.config.ListProperty;
 import ca.neo.config.MainHandler;
+import ca.neo.config.NamedValueProperty;
 import ca.neo.config.Property;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 import ca.neo.model.StructuralException;
@@ -52,11 +55,22 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					JMenuItem addValueItem = new JMenuItem("Add");
 					addValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent E) {
-							//TODO: how to construct / replace non-configurables? clone?
-							myModel.addValue(this, path, p.getDefaultValue());
+							myModel.addValue(this, path, getValue(p.getType()), null);
 						}
 					});
 					popup.add(addValueItem);				
+				}
+			} else if (path.getLastPathComponent() instanceof NamedValueProperty) {
+				final NamedValueProperty p = (NamedValueProperty) path.getLastPathComponent();
+				if (!p.isFixedCardinality()) {
+					JMenuItem addValueItem = new JMenuItem("Add");
+					addValueItem.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent E) {
+							String name = JOptionPane.showInputDialog(myTree, "Value Name");
+							myModel.addValue(this, path, getValue(p.getType()), name);
+						}
+					});
+					popup.add(addValueItem);
 				}
 			} else if (path.getParentPath() != null && path.getParentPath().getLastPathComponent() instanceof Property) {
 				final Property p = (Property) path.getParentPath().getLastPathComponent();
@@ -78,14 +92,16 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					popup.add(replaceValueItem);									
 				}
 				
-				if (p instanceof ListProperty && !p.isFixedCardinality()) {
-					JMenuItem insertValueItem = new JMenuItem("Insert");
-					insertValueItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							myModel.insertValue(this, path, ((ListProperty) p).getDefaultValue());
-						}
-					}); 
-					popup.add(insertValueItem);				
+				if (!p.isFixedCardinality()) {
+					if (p instanceof ListProperty) {
+						JMenuItem insertValueItem = new JMenuItem("Insert");
+						insertValueItem.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								myModel.insertValue(this, path, getValue(p.getType()));
+							}
+						}); 
+						popup.add(insertValueItem);						
+					}
 					JMenuItem removeValueItem = new JMenuItem("Remove");
 					removeValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
@@ -104,19 +120,26 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 			});
 			popup.add(refreshItem);
 			
-			if (path.getLastPathComponent() instanceof Value) {
-				final Value v = (Value) path.getLastPathComponent();
-				JMenuItem displayItem = new JMenuItem("Display");
-				displayItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						System.out.println("index: " + v.getIndex());
-					}
-				});
-				popup.add(displayItem);
-			}
+//			if (path.getLastPathComponent() instanceof Value) {
+//				final Value v = (Value) path.getLastPathComponent();
+//				JMenuItem displayItem = new JMenuItem("Display");
+//				displayItem.addActionListener(new ActionListener() {
+//					public void actionPerformed(ActionEvent e) {
+//						System.out.println("index: " + v.getIndex());
+//					}
+//				});
+//				popup.add(displayItem);
+//			}
 			popup.show(event.getComponent(), event.getX(), event.getY());
 		}
 	}
 	
+	private Object getValue(Class type) {
+		Object result = ConfigUtil.getDefaultValue(type);
+		if (result == null) {
+			result = NewConfigurableDialog.showDialog(myTree, type, null);
+		}
+		return result;
+	}
 	
 }

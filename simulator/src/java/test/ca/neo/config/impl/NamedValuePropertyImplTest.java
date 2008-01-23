@@ -3,13 +3,27 @@
  */
 package ca.neo.config.impl;
 
+import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
+
 import ca.neo.config.NamedValueProperty;
+import ca.neo.config.ui.ConfigurationTreeCellEditor;
+import ca.neo.config.ui.ConfigurationTreeCellRenderer;
+import ca.neo.config.ui.ConfigurationTreeModel;
+import ca.neo.config.ui.ConfigurationTreePopupListener;
 import ca.neo.model.StructuralException;
+import ca.neo.model.nef.NEFEnsembleFactory;
+import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 
 import junit.framework.TestCase;
 
@@ -267,4 +281,36 @@ public class NamedValuePropertyImplTest extends TestCase {
 		}
 	}
 	
+	public static void main(String[] args) {
+		try {
+			JFrame frame = new JFrame("Tree Test");
+			Object configurable = new MockObject();
+			
+			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
+			JTree tree = new JTree(model);
+			tree.setEditable(true); 
+			tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
+			tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));
+			ConfigurationTreeCellRenderer cellRenderer = new ConfigurationTreeCellRenderer();
+			tree.setCellRenderer(cellRenderer);
+			
+			ToolTipManager.sharedInstance().registerComponent(tree);
+			
+			frame.getContentPane().setLayout(new BorderLayout());
+			frame.getContentPane().add(new JScrollPane(tree), BorderLayout.CENTER);
+			
+			frame.pack();
+			frame.setVisible(true);
+			
+			frame.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent arg0) {
+					System.exit(0);
+				}
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

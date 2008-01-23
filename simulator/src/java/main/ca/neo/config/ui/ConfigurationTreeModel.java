@@ -33,21 +33,21 @@ import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.model.neuron.impl.LIFSpikeGenerator;
 import ca.neo.model.neuron.impl.LinearSynapticIntegrator;
+import ca.neo.model.neuron.impl.PlasticExpandableSpikingNeuron;
 import ca.neo.model.neuron.impl.SpikingNeuron;
 
 /**
  * Data model underlying JTree user interface for a Configurable.
  * 
- * TODO (tuesday) add, remove, set for map parameters; test against plastic 
- * TODO (tuesday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
+ * DONE (tuesday) add, remove, set for map parameters; test against plastic 
+ * DONE (tuesday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
+ * TODO (wed) expand Plastic interface to allow configuration
  * TODO (wed): support float[] and float[][] size changes
  * TODO (wed): constructor arg names and docs from source
  * TODO (thurs): support primitives in ListProperty or limit Property use to objects 
  * TODO (thurs): clean up configuration code  
  * TODO (friday): remove Configurable 
  * TODO (friday): augment model classes with getters
- * TODO (later): register factories and allow factory use for new object creation
- * 
  * 
  * @author Bryan Tripp
  */
@@ -61,7 +61,7 @@ public class ConfigurationTreeModel implements TreeModel {
 		myListeners = new ArrayList<TreeModelListener>(5);
 	}
 	
-	public void addValue(Object source, TreePath parentPath, Object value) {
+	public void addValue(Object source, TreePath parentPath, Object value, String name) {
 		try {
 			Object parent = parentPath.getLastPathComponent();
 			if (parent instanceof ListProperty) {
@@ -72,6 +72,10 @@ public class ConfigurationTreeModel implements TreeModel {
 				for (int i = 0; i <myListeners.size(); i++) {
 					myListeners.get(i).treeNodesInserted(event);
 				}
+			} else if (parent instanceof NamedValueProperty) {
+				NamedValueProperty property = (NamedValueProperty) parent;
+				property.setValue(name, value);
+				refresh(source, parentPath);
 			} else {
 				throw new RuntimeException("Can't add child to a " + parent.getClass().getName());
 			}
@@ -135,6 +139,9 @@ public class ConfigurationTreeModel implements TreeModel {
 				((SingleValuedProperty) parent).setValue(value);
 			} else if (parent instanceof ListProperty) {
 				((ListProperty) parent).setValue(index, value);				
+			} else if (parent instanceof NamedValueProperty) {
+				String name = ((Value) path.getLastPathComponent()).getName();
+				((NamedValueProperty) parent).setValue(name, value);
 			}
 			
 			Value child = (Value) path.getLastPathComponent();
@@ -161,22 +168,31 @@ public class ConfigurationTreeModel implements TreeModel {
 	public void removeValue(Object source, TreePath path) {
 		try {
 			Object parent = path.getParentPath().getLastPathComponent();
-			if (parent instanceof ListProperty && path.getLastPathComponent() instanceof Value) {
-				ListProperty property = (ListProperty) parent;
+			if (path.getLastPathComponent() instanceof Value && (parent instanceof ListProperty || parent instanceof NamedValueProperty)) {
 				Value toRemove = (Value) path.getLastPathComponent();
-				property.remove(toRemove.getIndex());
+				int numValues = 0;
+				
+				if (parent instanceof ListProperty) {
+					ListProperty property = (ListProperty) parent;
+					property.remove(toRemove.getIndex());
+					numValues = property.getNumValues();
+				} else if (parent instanceof NamedValueProperty) {
+					NamedValueProperty property = (NamedValueProperty) parent;
+					property.removeValue(toRemove.getName());
+					numValues = property.getValueNames().size();
+				}
 				
 				TreeModelEvent removeEvent = new TreeModelEvent(source, path.getParentPath(), 
 						new int[]{toRemove.getIndex()}, new Object[]{toRemove});
 				TreeModelEvent changeEvent = getIndexUpdateEvent(source, path.getParentPath(), 
-						toRemove.getIndex(), property.getNumValues());
+						toRemove.getIndex(), numValues);
 				for (int i = 0; i < myListeners.size(); i++) {
 					myListeners.get(i).treeNodesRemoved(removeEvent);
 					myListeners.get(i).treeNodesChanged(changeEvent);					
 				}	
-
 			} else {
-				throw new RuntimeException("Can't set value on child of " + parent.getClass().getName());
+				throw new RuntimeException("Can't remove child of " 
+						+ parent.getClass().getName() + " (this is probably a bug)");
 			}
 		} catch (StructuralException e) {
 			e.printStackTrace();
@@ -275,6 +291,7 @@ public class ConfigurationTreeModel implements TreeModel {
 				NamedValueProperty p = (NamedValueProperty) parent;
 				String name = ((Value) child).getName();				
 				for (int i = 0; i < p.getValueNames().size() && index == -1; i++) {
+					System.out.println(i + " of " + p.getValueNames().size() + " name " + name + ": " + p.getValueNames().get(i));
 					if (p.getValueNames().get(i).equals(name)) index = i;
 				}				
 			}
@@ -385,8 +402,10 @@ public class ConfigurationTreeModel implements TreeModel {
 //			configurable.addMultiValuedField("test2");
 //			Object configurable = new SpikingNeuron(new LinearSynapticIntegrator(.001f, Units.ACU), 
 //					new LIFSpikeGenerator(.001f, .02f, .001f), 15, 0, "neuron");
-			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-			Object configurable = ef.make("test", 100, 2);
+//			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
+//			Object configurable = ef.make("test", 100, 2);
+			Object configurable = new PlasticExpandableSpikingNeuron(
+					new LinearSynapticIntegrator(), new LIFSpikeGenerator(), 1, 0, "foo");
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			JTree tree = new JTree(model);

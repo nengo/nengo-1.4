@@ -9,6 +9,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.NamedValueProperty;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.NamedValuePropertyImpl;
 import ca.neo.model.ExpandableNode;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
@@ -60,7 +65,7 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 		mySynapticIntegrator = (Plastic) integrator;
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 	}
-
+	
 	/**
 	 * @see ca.neo.model.neuron.impl.SpikingNeuron#run(float, float)
 	 */
@@ -95,7 +100,7 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 	public void setPlasticityInterval(float time) {
 		mySynapticIntegrator.setPlasticityInterval(time);
 	}
-
+	
 	/**
 	 * @see ca.neo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */

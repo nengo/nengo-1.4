@@ -4,8 +4,11 @@
 package ca.neo.config;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -73,15 +76,14 @@ public class ConfigUtil {
 			Class returnType = methods[i].getReturnType();
 			String propName = getPropertyName(methods[i]);
 
-			if (isGetter(methods[i]) 
+			if (isSingleValueGetter(methods[i]) 
 					&& !methods[i].getName().equals("getClass")
 					&& !methods[i].getName().equals("getConfiguration")
 					&& !isCounter(methods[i])) {
 				
-				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType); //TODO: need this?
+				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType); 
 				boolean mutable = hasSetter(configurable, methods[i].getName(), returnType);
-				result.defineSingleValuedProperty(getPropertyName(methods[i]), returnTypeWrapped, mutable);				
-				
+				result.defineSingleValuedProperty(propName, returnTypeWrapped, mutable);				
 			} else if (isIndexedGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
 				Property p = ListPropertyImpl.getListProperty(result, propName, returnType);
 				if (p != null) result.defineProperty(p);					
@@ -91,9 +93,33 @@ public class ConfigUtil {
 			}
 		}
 		
+		for (int i = 0; i < methods.length; i++) {
+			Type returnType = methods[i].getGenericReturnType();
+			String propName = getPropertyName(methods[i]);
+			
+			if (isGetter(methods[i]) && !isNamesGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
+				Property p = null;
+//				System.out.println(returnType instanceof Class);
+//				System.out.println(returnType instanceof Class && ((Class) returnType).isArray());
+				if (returnType instanceof Class && ((Class) returnType).isArray()) {
+					p = ListPropertyImpl.getListProperty(result, propName, ((Class) returnType).getComponentType());
+				} else if (returnType instanceof ParameterizedType) {
+					Type rawType = ((ParameterizedType) returnType).getRawType();
+					Type[] typeArgs = ((ParameterizedType) returnType).getActualTypeArguments();
+					if (rawType instanceof Class && List.class.isAssignableFrom((Class) rawType) 
+							&& typeArgs[0] instanceof Class) {
+						p = ListPropertyImpl.getListProperty(result, propName, (Class) typeArgs[0]);
+					} else if (rawType instanceof Class && Map.class.isAssignableFrom((Class) rawType)
+							&& typeArgs[0] instanceof Class && typeArgs[1] instanceof Class) {
+						p = NamedValuePropertyImpl.getNamedValueProperty(result, propName, (Class) typeArgs[1]);						
+					}
+				}
+				if (p != null) result.defineProperty(p);
+			}
+		}
+		
 		//TODO: might be nice to build properties from lone map, list, or array, but 
 		//  1) not sure how to check generic type in map/list
-		//  2) not sure how to check element type in array
 		
 		return result;
 	}
@@ -108,6 +134,23 @@ public class ConfigUtil {
 		}
 	}
 	
+	private static boolean isNamesGetter(Method method) {
+		String name = method.getName();
+		
+		boolean returnsStringArray = method.getReturnType().isArray() 
+			&& String.class.isAssignableFrom(method.getReturnType().getComponentType());
+		boolean returnsStringList = List.class.isAssignableFrom(method.getReturnType()) 
+			&& (method.getGenericReturnType() instanceof ParameterizedType) 
+			&& ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0] instanceof Class
+			&& String.class.isAssignableFrom((Class) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0]);
+		
+		if (name.matches("get.+Names") && (returnsStringArray || returnsStringList)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	private static String getPropertyName(Method method) {
 		String result = method.getName();
 
@@ -115,8 +158,8 @@ public class ConfigUtil {
 		result = stripPrefix(result, "All");
 		result = stripSuffix(result, "Array");
 		result = stripSuffix(result, "List");
-		
-		return Character.toLowerCase(result.charAt(0)) + result.substring(1);
+				
+		return result.length() > 0 ? Character.toLowerCase(result.charAt(0)) + result.substring(1) : "";
 	}
 	
 	private static String stripSuffix(String s, String suffix) {
@@ -135,11 +178,22 @@ public class ConfigUtil {
 		}
 	}
 	
-	private static boolean isGetter(Method m) {
+	private static boolean isSingleValueGetter(Method m) {
 		if (m.getName().startsWith("get") 
 				&& m.getParameterTypes().length == 0
 				&& !Collection.class.isAssignableFrom(m.getReturnType()) 
+				&& !Map.class.isAssignableFrom(m.getReturnType()) 
 				&& !m.getReturnType().isArray()) {
+			System.out.println("single value getter: " + m.getName() + " " + m.getReturnType().getName());
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private static boolean isGetter(Method m) {
+		if (m.getName().startsWith("get") 
+				&& m.getParameterTypes().length == 0) {
 			return true;
 		} else {
 			return false;
@@ -177,32 +231,32 @@ public class ConfigUtil {
 		}		
 	}
 	
-	private static boolean isArrayGetter(Method m) {
-		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
-				&& m.getReturnType().isArray()) {
-			return true;
-		} else {
-			return false;
-		}		
-	}
-	
-	private static boolean isListGetter(Method m) {
-		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
-				&& List.class.isAssignableFrom(m.getReturnType())) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	private static boolean isMapGetter(Method m) {
-		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
-				&& Map.class.isAssignableFrom(m.getReturnType())) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+//	private static boolean isArrayGetter(Method m) {
+//		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
+//				&& m.getReturnType().isArray()) {
+//			return true;
+//		} else {
+//			return false;
+//		}		
+//	}
+//	
+//	private static boolean isListGetter(Method m) {
+//		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
+//				&& List.class.isAssignableFrom(m.getReturnType())) {
+//			return true;
+//		} else {
+//			return false;
+//		}
+//	}
+//	
+//	private static boolean isMapGetter(Method m) {
+//		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
+//				&& Map.class.isAssignableFrom(m.getReturnType())) {
+//			return true;
+//		} else {
+//			return false;
+//		}
+//	}
 	
 	
 //	//TODO: document name pattern
@@ -267,6 +321,39 @@ public class ConfigUtil {
 		}		
 		
 		return c;
+	}
+	
+	public static Object getDefaultValue(Class type) {
+		Object result = null;
+		
+		if (MainHandler.getInstance().canHandle(type)) {
+			result = MainHandler.getInstance().getDefaultValue(type);
+		}
+		
+		if (result == null) {
+			Constructor<?>[] constructors = type.getConstructors();
+			Constructor zeroArgConstructor = null;
+			for (int i = 0; i < constructors.length && zeroArgConstructor == null; i++) {
+				if (constructors[i].getParameterTypes().length == 0) {
+					zeroArgConstructor = constructors[i];
+				}
+			}
+			if (zeroArgConstructor != null) {
+				try {
+					result = zeroArgConstructor.newInstance(new Object[0]);
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}			
+		}
+		
+		return result; 
 	}
 	
 	public static void main(String[] args) {

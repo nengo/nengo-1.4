@@ -6,6 +6,7 @@ package ca.neo.config.impl;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 import ca.neo.config.Configuration;
@@ -307,6 +308,12 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 				myInserter.invoke(myTarget, new Object[]{new Integer(index), value});
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).add(value);
+			} else if (myArrayGetter != null && myArraySetter != null) {
+				Object array = myArrayGetter.invoke(myTarget, new Object[0]);
+				Object newArray = Array.newInstance(array.getClass().getComponentType(), Array.getLength(array) + 1);
+				System.arraycopy(array, 0, newArray, 0, Array.getLength(array));
+				Array.set(newArray, Array.getLength(array), value);
+				myArraySetter.invoke(myTarget, new Object[]{newArray});				
 			} else {
 				if (isFixedCardinality()) {
 					throw new StructuralException("This property has fixed cardinality");					
@@ -333,6 +340,13 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 				myInserter.invoke(myTarget, new Object[]{new Integer(index), value});
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).add(index, value);
+			} else if (myArrayGetter != null && myArraySetter != null) {
+				Object array = myArrayGetter.invoke(myTarget, new Object[0]);
+				Object newArray = Array.newInstance(array.getClass().getComponentType(), Array.getLength(array) + 1);
+				System.arraycopy(array, 0, newArray, 0, index);
+				Array.set(newArray, index, value);
+				System.arraycopy(array, index, newArray, index+1, Array.getLength(array)-index);
+				myArraySetter.invoke(myTarget, new Object[]{newArray});				
 			} else {
 				if (isFixedCardinality()) {
 					throw new StructuralException("This property has fixed cardinality");					
@@ -359,6 +373,12 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 				myRemover.invoke(myTarget, new Object[]{new Integer(index)});
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).remove(index);
+			} else if (myArrayGetter != null && myArraySetter != null) {
+				Object array = myArrayGetter.invoke(myTarget, new Object[0]);
+				Object newArray = Array.newInstance(array.getClass().getComponentType(), Array.getLength(array) - 1);
+				System.arraycopy(array, 0, newArray, 0, index);
+				System.arraycopy(array, index+1, newArray, index, Array.getLength(newArray) - index);				
+				myArraySetter.invoke(myTarget, new Object[]{newArray});
 			} else {
 				if (isFixedCardinality()) {
 					throw new StructuralException("This property has fixed cardinality");					
@@ -392,7 +412,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	 * @see ca.neo.config.Property#isFixedCardinality()
 	 */
 	public boolean isFixedCardinality() {
-		return (myListGetter == null 
+		return (myListGetter == null && (myArrayGetter == null || myArraySetter == null) 
 				&& (myInserter == null || myRemover == null));
 	}
 

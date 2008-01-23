@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -37,16 +38,22 @@ import ca.neo.config.ClassRegistry;
 import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
+import ca.neo.config.ListProperty;
 import ca.neo.config.MainHandler;
 import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
 import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.TemplateArrayProperty;
 import ca.neo.config.impl.TemplateProperty;
 import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
+import ca.neo.math.Function;
+import ca.neo.math.impl.FourierFunction;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.impl.MockConfigurable.MockLittleConfigurable;
+import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.impl.NEFEnsembleImpl;
 import ca.neo.model.neuron.impl.SpikingNeuron;
 
 public class NewConfigurableDialog extends JDialog implements ActionListener {
@@ -282,52 +289,64 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		Class[] types = constructor.getParameterTypes();
 		for (int i = 0; i < types.length; i++) {
 			if (types[i].isPrimitive()) types[i] = ConfigUtil.getPrimitiveWrapperClass(types[i]);
-			TemplateProperty p = new TemplateProperty(result, "arg"+i, types[i], getDefaultValue(types[i]));
+			Property p = null;
+			if (types[i].isArray() && !MainHandler.getInstance().canHandle(types[i])) {
+				p = new TemplateArrayProperty(result, "arg"+i, types[i].getComponentType());
+			} else {
+				p = new TemplateProperty(result, "arg"+i, types[i], ConfigUtil.getDefaultValue(types[i]));				
+			}
 			result.defineProperty(p);
 		}
 		return result;
 	}
 	
-	private static Object getDefaultValue(Class type) {
-		Object result = null;
-		
-//		if (type.isPrimitive()) type = ConfigUtil.getPrimitiveWrapperClass(type);
-		
-		if (MainHandler.getInstance().canHandle(type)) {
-			result = MainHandler.getInstance().getDefaultValue(type);
-		}
-		
-		if (result == null) {
-			Constructor<?>[] constructors = type.getConstructors();
-			Constructor zeroArgConstructor = null;
-			for (int i = 0; i < constructors.length && zeroArgConstructor == null; i++) {
-				if (constructors[i].getParameterTypes().length == 0) {
-					zeroArgConstructor = constructors[i];
-				}
-			}
-			if (zeroArgConstructor != null) {
-				try {
-					result = zeroArgConstructor.newInstance(new Object[0]);
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-				}
-			}			
-		}
-		
-		return result; 
-	}
+//	private static Object getDefaultValue(Class type) {
+//		Object result = null;
+//		
+//		if (MainHandler.getInstance().canHandle(type)) {
+//			result = MainHandler.getInstance().getDefaultValue(type);
+//		}
+//		
+//		if (result == null) {
+//			Constructor<?>[] constructors = type.getConstructors();
+//			Constructor zeroArgConstructor = null;
+//			for (int i = 0; i < constructors.length && zeroArgConstructor == null; i++) {
+//				if (constructors[i].getParameterTypes().length == 0) {
+//					zeroArgConstructor = constructors[i];
+//				}
+//			}
+//			if (zeroArgConstructor != null) {
+//				try {
+//					result = zeroArgConstructor.newInstance(new Object[0]);
+//				} catch (IllegalArgumentException e) {
+//					e.printStackTrace();
+//				} catch (InstantiationException e) {
+//					e.printStackTrace();
+//				} catch (IllegalAccessException e) {
+//					e.printStackTrace();
+//				} catch (InvocationTargetException e) {
+//					e.printStackTrace();
+//				}
+//			}			
+//		}
+//		
+//		return result; 
+//	}
 	
 	private void setResult() throws StructuralException {
 		List<Object> args = new ArrayList<Object>(myConfiguration.getPropertyNames().size());
 		for (Iterator<String> iter = myConfiguration.getPropertyNames().iterator(); iter.hasNext(); ) {
-			SingleValuedProperty p = (SingleValuedProperty) myConfiguration.getProperty(iter.next());
-			args.add(p.getValue());
+			Property p = myConfiguration.getProperty(iter.next());
+			if (p instanceof SingleValuedProperty) {
+				args.add(((SingleValuedProperty) p).getValue());
+			} else if (p instanceof ListProperty) {
+				ListProperty lp = (ListProperty) p;
+				Object array = Array.newInstance(p.getType(), lp.getNumValues());
+				for (int i = 0; i < lp.getNumValues(); i++) {
+					Array.set(array, i, lp.getValue(i));
+				}
+				args.add(array);
+			}
 		}
 		
 		try {
@@ -423,7 +442,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		button.setPreferredSize(new Dimension(200, 50));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object result = showDialog(button, Node.class, SpikingNeuron.class);
+				Object result = showDialog(button, Node.class, NEFEnsembleImpl.class);
 				System.out.println("Result: " + result);
 			}
 		});
