@@ -48,7 +48,7 @@ import ca.neo.util.MU;
  * DONE (tuesday) add, remove, set for map parameters; test against plastic 
  * DONE (tuesday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
  * DONE (wed) expand Plastic interface to allow configuration
- * TODO (wed): support float[] and float[][] size changes
+ * DONE (wed): support float[] and float[][] size changes
  * TODO (wed): constructor arg names and docs from source
  * TODO (thurs): support primitives in ListProperty or limit Property use to objects 
  * TODO (thurs): clean up configuration code  
@@ -403,15 +403,15 @@ public class ConfigurationTreeModel implements TreeModel {
 	public static void main(String[] args) {
 		try {
 			JFrame frame = new JFrame("Tree Test"); 
-			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
-			configurable.addMultiValuedField("test1");
-			configurable.addMultiValuedField("test2");
+//			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
+//			configurable.addMultiValuedField("test1");
+//			configurable.addMultiValuedField("test2");
 //			Object configurable = new SpikingNeuron(new LinearSynapticIntegrator(.001f, Units.ACU), 
 //					new LIFSpikeGenerator(.001f, .02f, .001f), 15, 0, "neuron");
-//			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-//			NEFEnsembleImpl configurable = (NEFEnsembleImpl) ef.make("test", 100, 2);
-//			configurable.addDecodedTermination("decoded", MU.I(2), .005f, false);
-//			configurable.addTermination("composite", MU.zero(100, 1), .005f, false);
+			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
+			NEFEnsembleImpl configurable = (NEFEnsembleImpl) ef.make("test", 100, 2);
+			configurable.addDecodedTermination("decoded", MU.I(2), .005f, false);
+			configurable.addTermination("composite", MU.zero(100, 1), .005f, false);
 //			EnsembleImpl configurable = new EnsembleImpl("test", new Node[]{
 //					new PlasticExpandableSpikingNeuron(new LinearSynapticIntegrator(), new LIFSpikeGenerator(), 1, 0, "foo")
 //			});

@@ -31,12 +31,10 @@ public class VectorHandler extends BaseHandler {
 		float[] copy = new float[vector.length];
 		System.arraycopy(vector, 0, copy, 0, vector.length);
 		
-		final MatrixEditor result = new MatrixEditor(new float[][]{copy});
-		result.setPreferredSize(new Dimension(200, 85));
-		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		final MatrixEditor result = new MatrixEditor(new float[][]{copy}, true, false);
+		result.setPreferredSize(new Dimension(300, 85));
 		JButton okButton = new JButton("OK");
-		controlPanel.add(okButton);
-		result.add(controlPanel, BorderLayout.SOUTH);
+		result.getControlPanel().add(okButton);
 		
 		listener.setProxy(new EditorProxy() {
 			public Object getValue() {

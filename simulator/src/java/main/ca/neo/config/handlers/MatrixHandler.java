@@ -35,12 +35,10 @@ public class MatrixHandler extends BaseHandler {
 			copy[i] = new float[matrix[i].length];
 			System.arraycopy(matrix[i], 0, copy[i], 0, matrix[i].length);
 		}
-		final MatrixEditor me = new MatrixEditor(copy);
-		me.setPreferredSize(new Dimension(200, 150));
-		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		final MatrixEditor me = new MatrixEditor(copy, false, false);
+		me.setPreferredSize(new Dimension(300, 150));
 		JButton okButton = new JButton("OK");
-		controlPanel.add(okButton);
-		me.add(controlPanel, BorderLayout.SOUTH);
+		me.getControlPanel().add(okButton);
 		
 		listener.setProxy(new EditorProxy() {
 			public Object getValue() {
