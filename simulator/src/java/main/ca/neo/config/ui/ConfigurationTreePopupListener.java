@@ -74,7 +74,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 				}
 			} else if (path.getParentPath() != null && path.getParentPath().getLastPathComponent() instanceof Property) {
 				final Property p = (Property) path.getParentPath().getLastPathComponent();
-				if (p.isMutable() /**&& Configurable.class.isAssignableFrom(p.getType())**/) {
+				if (p.isMutable() && !MainHandler.getInstance().canHandle(p.getType())) {
 					final JMenuItem replaceValueItem = new JMenuItem("Replace");
 					replaceValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {

@@ -52,8 +52,8 @@ import ca.neo.util.MU;
  * DONE (tuesday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
  * DONE (wed) expand Plastic interface to allow configuration
  * DONE (wed): support float[] and float[][] size changes
- * TODO (wed): constructor arg names and docs from source
- * TODO (thurs): support primitives in ListProperty or limit Property use to objects 
+ * DONE (wed): constructor arg names and docs from source
+ * DONE (thurs): support primitives in ListProperty or limit Property use to objects 
  * TODO (thurs): clean up configuration code  
  * TODO (friday): remove Configurable 
  * TODO (friday): augment model classes with getters

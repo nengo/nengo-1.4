@@ -11,7 +11,7 @@ import ca.neo.config.Property;
  *  
  * @author Bryan Tripp
  */
-abstract class AbstractProperty implements Property {
+public abstract class AbstractProperty implements Property {
 		
 	private Configuration myConfiguration;
 	private String myName;

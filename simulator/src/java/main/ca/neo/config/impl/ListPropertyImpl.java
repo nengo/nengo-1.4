@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import ca.neo.config.Configuration;
+import ca.neo.config.JavaSourceParser;
 import ca.neo.config.ListProperty;
 import ca.neo.model.StructuralException;
 
@@ -419,6 +420,35 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	@Override
 	public boolean isMutable() {
 		return (mySetter != null || myListGetter != null || myArraySetter != null);
+	}
+
+	@Override
+	public String getDocumentation() {
+		String result = super.getDocumentation();
+		
+		if (result == null) {
+			StringBuffer buf = new StringBuffer("<h1>API methods underlying property <i>" + getName() + "</i></h1>");
+			appendDocs(buf, myGetter);
+			appendDocs(buf, mySetter);
+			appendDocs(buf, myArrayGetter);
+			appendDocs(buf, myArraySetter);
+			appendDocs(buf, myCountGetter);
+			appendDocs(buf, myListGetter);
+			appendDocs(buf, myAdder);
+			appendDocs(buf, myInserter);
+			appendDocs(buf, myRemover);
+			result = buf.toString();
+		}
+			
+		return result;
+	}
+	
+	private static void appendDocs(StringBuffer buf, Method method) {
+		if (method != null) {
+			buf.append("<h2>" + JavaSourceParser.getSignature(method) + "</h2>");
+			String docs = JavaSourceParser.getDocs(method); 
+			if (docs != null) buf.append(docs);			
+		}
 	}
 
 }

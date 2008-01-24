@@ -4,17 +4,30 @@
 package ca.neo.config;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
+import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
+import ca.neo.model.Node;
+import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.model.impl.BasicOrigin;
 import ca.neo.model.impl.NetworkImpl;
+import ca.neo.util.ClassUtils;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.AbstractJavaEntity;
 import com.thoughtworks.qdox.model.DocletTag;
 import com.thoughtworks.qdox.model.JavaClass;
+import com.thoughtworks.qdox.model.JavaField;
 import com.thoughtworks.qdox.model.JavaMethod;
 import com.thoughtworks.qdox.model.JavaParameter;
 
@@ -26,6 +39,7 @@ import com.thoughtworks.qdox.model.JavaParameter;
  */
 public class JavaSourceParser {
 	
+	private static Logger ourLogger = Logger.getLogger(JavaSourceParser.class);
 	private static JavaDocBuilder ourBuilder;
 	
 	static {
@@ -76,12 +90,104 @@ public class JavaSourceParser {
 	}
 	
 	/**
+	 * @param reference An see-tag-style reference, ie fully.qualified.ClassName#methodName(ArgType0, ArgType1) 
+	 * @param referringClassName Name of class on which the see tag is written (used to find default package if
+	 * 		arg types are not qualified, and class if undefined)   
+	 * @return Matching Method if possible, otherwise null
+	 * @throws NoSuchMethodException 
+	 * @throws SecurityException 
+	 * @throws ClassNotFoundException 
+	 */
+	public static Method getMethod(String reference, String referringClassName) 
+			throws SecurityException, NoSuchMethodException, ClassNotFoundException {
+		
+		Method result = null;
+		
+		if (reference.startsWith("@see")) {
+			reference = reference.substring(4);
+		}
+		
+		String className = referringClassName;
+		int index = reference.indexOf("#");
+		if (index > 0) {
+			className = reference.substring(0, index).trim();
+			reference = reference.substring(index+1);
+		}
+		
+		String packageName = referringClassName.substring(0, referringClassName.lastIndexOf('.'));
+		Class type = getType(className, packageName);
+		
+		StringTokenizer tok = new StringTokenizer(reference, "(, )", false);
+		String methodName = tok.hasMoreTokens() ? tok.nextToken() : null;
+
+		if (type != null && methodName != null) {
+			List<Class> argTypes = new ArrayList<Class>(10);
+			while (tok.hasMoreTokens()) {
+				String argTypeName = tok.nextToken();
+				argTypes.add(getType(argTypeName, packageName));
+			}
+			
+			result = type.getMethod(methodName, argTypes.toArray(new Class[0]));
+		}
+
+		return result;
+	}
+	
+	private static Class getType(String name, String packageName) {
+		Class result = null;
+		
+		result = getType(name);
+		if (result == null) getType(packageName + "." + name);
+		if (result == null) getType("java.lang." + name);
+		
+		return result;
+	}
+
+	//eats ClassNotFoundException and returns null
+	private static Class getType(String name) {
+		Class result = null;
+		try {
+			result = ClassUtils.forName(name);
+		} catch (ClassNotFoundException e) {
+			ourLogger.warn("JavaSourceParser.getType(...) can't find type " + name);
+		}
+		return result;		
+	}
+	
+	/**
 	 * @param m A Java method
-	 * @return Method-level documentation if available, otherwise null
+	 * @return Method-level documentation if available, otherwise empty string
 	 */
 	public static String getDocs(Method m) {
 		JavaMethod jm = getJavaMethod(m);
-		return jm.getComment() + getTagText(jm);
+		
+		StringBuffer result = new StringBuffer();		
+		
+		String comment = jm.getComment();
+		if (comment != null) {
+			result.append(comment);
+			result.append("\r\n\r\n");
+		}
+		result.append(getTagText(jm));
+		
+//		Matcher matcher = Pattern.compile("@see .+\\)").matcher(comment);
+//		StringBuffer result = new StringBuffer();
+//		while (matcher.find()) {
+//			String reference = matcher.group();
+//			Method referencedMethod;
+//			try {
+//				referencedMethod = getMethod(reference, m.getDeclaringClass().getName());
+//				String referencedDocs = getDocs(referencedMethod);
+//				matcher.appendReplacement(result, referencedDocs);
+//			} catch (Exception e) {
+//				ourLogger.warn("Can't get docs for referenced method " + matcher.group(), e);
+//				matcher.appendReplacement(result, matcher.group() + " (unavailable)");
+//			}
+//		}
+//		matcher.appendTail(result);
+		
+//		return (comment + "\r\n\r\n" + getTagText(jm)).trim();
+		return result.toString();
 	}
 	
 	//returns concatenated text of doc tag names and values
@@ -90,9 +196,29 @@ public class JavaSourceParser {
 		
 		DocletTag[] tags = entity.getTags();
 		for (int i = 0; i < tags.length; i++) {
-			result.append(tags[i].getName());
-			result.append(": ");
-			result.append(tags[i].getValue());
+			if (tags[i].getName().equals("see")) {
+				String className = ".";
+				if (entity instanceof JavaMethod) {
+					className = ((JavaMethod) entity).getParentClass().getFullyQualifiedName();
+				} else if (entity instanceof JavaClass) {
+					className = ((JavaClass) entity).getFullyQualifiedName();					
+				}
+				try {
+					Method referencedMethod = getMethod(tags[i].getValue(), className);
+					String referencedDocs = getDocs(referencedMethod);
+					result.append("\r\n" + referencedDocs + "\r\n");
+				} catch (Exception e) {
+					ourLogger.warn("Can't get docs for reference " + tags[i].getValue(), e);
+				}
+			} else {
+				result.append("<p>");
+				result.append("<b>");
+				result.append(tags[i].getName());
+				result.append(": </b>");
+				result.append(tags[i].getValue());
+				result.append("</p>");
+				result.append("\r\n");				
+			}
 		}
 		
 		return result.toString();
@@ -134,6 +260,10 @@ public class JavaSourceParser {
 		return getArgDocs(getJavaMethod(m), arg);
 	}
 	
+	public static String getArgDocs(Constructor c, int arg) {
+		return getArgDocs(getJavaMethod(c), arg);
+	}
+	
 	private static String getArgDocs(JavaMethod jm, int arg) {
 		String result = null;
 		
@@ -148,6 +278,27 @@ public class JavaSourceParser {
 		}
 		
 		return result;
+	}
+	
+	public static String getSignature(Method m) {
+		StringBuffer result = new StringBuffer();
+
+		String[] argNames = getArgNames(m);
+		
+		Class returnType = m.getReturnType();
+		if (returnType != null) result.append(ClassUtils.getName(returnType) + " ");
+		result.append(m.getName());
+		result.append("(");
+		Class[] paramTypes = m.getParameterTypes();
+		for (int i = 0; i < paramTypes.length; i++) {
+			result.append(ClassUtils.getName(paramTypes[i]));
+			result.append(" ");
+			result.append(argNames[i]);
+			if (i < paramTypes.length - 1) result.append(", ");
+		}
+		result.append(")");			
+		
+		return result.toString();
 	}
 	
 	//returns source wrapper for given method or null
@@ -217,18 +368,45 @@ public class JavaSourceParser {
 	}
 	
 	public static void main(String[] args) {
+		
+//		try {
+////			Class c = ClassUtils.forName("float");
+////			System.out.println(c.getName());
+//			Method m = getMethod("@see ca.neo.model.Node#run(float, float)", "ca.neo.model.Ensemble");
+//			System.out.println(getDocs(m));
+//			
+//			m = Node.class.getMethod("run", new Class[]{Float.TYPE, Float.TYPE});
+//			System.out.println("\r\n\r\n" + getDocs(m));
+//		} catch (SecurityException e) {
+//			e.printStackTrace();
+//		} catch (NoSuchMethodException e) {
+//			e.printStackTrace();
+//		} catch (ClassNotFoundException e) {
+//			e.printStackTrace();
+//		}
+		
+		try {
+			Method m = AbstractEnsemble.class.getMethod("getName", new Class[0]);
+			System.out.println(getDocs(m));
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+		
+		
 //		addSource(new File("src/java/main"));
 		
-		Network n = new NetworkImpl();
+//		Network n = new NetworkImpl();
 //		System.out.println(getClassDocs(n.getClass()));
-		int num = 2;
+//		int num = 2;
 //		System.out.println(n.getClass().getMethods()[num].getName());
 //		System.out.println(getDocs(n.getClass().getMethods()[num]));	
 //		
-		String[] argNames = getArgNames(BasicOrigin.class.getConstructors()[0]);
-		for (int i = 0; i < argNames.length; i++) {
-			System.out.println(argNames[i]);
-		}
+//		String[] argNames = getArgNames(BasicOrigin.class.getConstructors()[0]);
+//		for (int i = 0; i < argNames.length; i++) {
+//			System.out.println(argNames[i]);
+//		}
 		
 //		System.out.println(getTagText(getJavaMethod(n.getClass().getMethods()[num])));
 //		System.out.println(getArgDocs(n.getClass().getMethods()[num], 0));

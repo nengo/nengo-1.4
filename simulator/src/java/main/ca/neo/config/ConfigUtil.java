@@ -193,7 +193,6 @@ public class ConfigUtil {
 				&& !Collection.class.isAssignableFrom(m.getReturnType()) 
 				&& !Map.class.isAssignableFrom(m.getReturnType()) 
 				&& !m.getReturnType().isArray()) {
-			System.out.println("single value getter: " + m.getName() + " " + m.getReturnType().getName());
 			return true;
 		} else {
 			return false;
@@ -366,7 +365,9 @@ public class ConfigUtil {
 	}
 	
 	public static void showHelp(String text) {
-		JEditorPane pane = new JEditorPane("text/html", text);
+		String document = "<html><head></head><body>" + text + "</body></html>";
+		JEditorPane pane = new JEditorPane("text/html", document);
+		pane.setEditable(false);
 		
 		JFrame frame = new JFrame("Help"); 
 		frame.getContentPane().setLayout(new BorderLayout());

@@ -113,14 +113,23 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 
 	@Override
 	public String getDocumentation() {
-		String result = null;
-		Method getter = getGetter();
-		if (getter != null) {
-			result = JavaSourceParser.getDocs(getter);
+		String result = super.getDocumentation();
+		
+		if (result == null) {
+			StringBuffer buf = new StringBuffer("<h1>API methods underlying property <i>" + getName() + "</i></h1>");
+			appendDocs(buf, getGetter());
+			result = buf.toString();
 		}
+			
 		return result;
 	}
 	
-	
+	private static void appendDocs(StringBuffer buf, Method method) {
+		if (method != null) {
+			buf.append("<h2>" + JavaSourceParser.getSignature(method) + "</h2>");
+			String docs = JavaSourceParser.getDocs(method); 
+			if (docs != null) buf.append(docs);			
+		}
+	}
 	
 }

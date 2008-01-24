@@ -39,7 +39,8 @@ public class ListPropertyImplTest extends TestCase {
 		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "D", String.class));
 		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "E", String.class));
 		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "F", String.class));
-		assertTrue(ListPropertyImpl.getListProperty(myConfiguration, "G", String.class) == null);
+		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "G", Float.TYPE));
+		assertTrue(ListPropertyImpl.getListProperty(myConfiguration, "H", String.class) == null);
 	}
 
 	private ListProperty getProperty(String name) throws StructuralException {
@@ -53,6 +54,7 @@ public class ListPropertyImplTest extends TestCase {
 		assertEquals(2, getProperty("D").getNumValues());
 		assertEquals(1, getProperty("E").getNumValues());
 		assertEquals(1, getProperty("F").getNumValues());
+		assertEquals(2, getProperty("G").getNumValues());
 	}
 
 	public void testGetValue() throws StructuralException {
@@ -63,6 +65,7 @@ public class ListPropertyImplTest extends TestCase {
 		assertEquals("2", getProperty("D").getValue(1));
 		assertEquals("1", getProperty("E").getValue(0));
 		assertEquals("1", getProperty("F").getValue(0));
+		assertEquals(1f, getProperty("G").getValue(0));
 	}
 
 	public void testSetValue() throws StructuralException {
@@ -75,6 +78,10 @@ public class ListPropertyImplTest extends TestCase {
 		assertEquals("1a", getProperty("B").getValue(0));
 		assertEquals("1a", getProperty("E").getValue(0));
 		assertEquals("1a", getProperty("F").getValue(0));
+
+		assertFalse( ((Float) getProperty("G").getValue(0)).floatValue() > 1.5f );
+		getProperty("G").setValue(0, 2f);
+		assertTrue( ((Float) getProperty("G").getValue(0)).floatValue() > 1.5f );
 		
 		try {
 			getProperty("C").setValue(0, "1a");
@@ -113,14 +120,18 @@ public class ListPropertyImplTest extends TestCase {
 			fail("Should have throw exception");
 		} catch (StructuralException e) {}
 		
-		try {
-			getProperty("E").addValue("2");
-			fail("Should have throw exception");
-		} catch (StructuralException e) {}
+		getProperty("E").addValue("2");
+		assertEquals(2, getProperty("E").getNumValues());
+		assertEquals("2", getProperty("E").getValue(1));
 	
 		getProperty("F").addValue("2");
 		assertEquals(2, getProperty("F").getNumValues());
 		assertEquals("2", getProperty("F").getValue(1));
+		
+		try {
+			getProperty("G").addValue(3);
+			fail("Should have throw exception");
+		} catch (StructuralException e) {}
 	}
 
 	public void testInsert() throws StructuralException {
@@ -144,15 +155,20 @@ public class ListPropertyImplTest extends TestCase {
 			fail("Should have throw exception");
 		} catch (StructuralException e) {}
 		
-		try {
-			getProperty("E").insert(0, "2");
-			fail("Should have throw exception");
-		} catch (StructuralException e) {}
+		getProperty("E").insert(0, "2");
+		assertEquals(2, getProperty("E").getNumValues());
+		assertEquals("2", getProperty("E").getValue(0));
+		assertEquals("1", getProperty("E").getValue(1));
 	
 		getProperty("F").insert(0, "2");
 		assertEquals(2, getProperty("F").getNumValues());
 		assertEquals("2", getProperty("F").getValue(0));
 		assertEquals("1", getProperty("F").getValue(1));
+		
+		try {
+			getProperty("G").insert(0, 3);
+			fail("Should have throw exception");
+		} catch (StructuralException e) {}
 	}
 
 	public void testRemove() throws StructuralException {
@@ -174,13 +190,16 @@ public class ListPropertyImplTest extends TestCase {
 			fail("Should have throw exception");
 		} catch (StructuralException e) {}
 		
-		try {
-			getProperty("E").remove(0);
-			fail("Should have throw exception");
-		} catch (StructuralException e) {}
+		getProperty("E").remove(0);
+		assertEquals(0, getProperty("E").getNumValues());
 	
 		getProperty("F").remove(0);
 		assertEquals(0, getProperty("F").getNumValues());
+
+		try {
+			getProperty("G").remove(0);
+			fail("Should have throw exception");
+		} catch (StructuralException e) {}				
 	}
 
 	public void testIsFixedCardinality() throws StructuralException {
@@ -188,7 +207,7 @@ public class ListPropertyImplTest extends TestCase {
 		assertEquals(false, getProperty("B").isFixedCardinality());
 		assertEquals(true, getProperty("C").isFixedCardinality());
 		assertEquals(true, getProperty("D").isFixedCardinality());
-		assertEquals(true, getProperty("E").isFixedCardinality());
+		assertEquals(false, getProperty("E").isFixedCardinality());
 		assertEquals(false, getProperty("F").isFixedCardinality());
 	}
 	
@@ -209,6 +228,7 @@ public class ListPropertyImplTest extends TestCase {
 		private String[] myD; //immutable array
 		private String[] myE; //mutable array
 		private List<String> myF; //exposed list 
+		private float[] myG;
 		
 		public MockObject() {
 			myA = new ArrayList<String>(10);
@@ -225,6 +245,8 @@ public class ListPropertyImplTest extends TestCase {
 			
 			myF = new ArrayList<String>(10);
 			myF.add("1");
+			
+			myG = new float[]{1, 2};
 		}
 		
 		public String getA(int index) {
@@ -293,6 +315,18 @@ public class ListPropertyImplTest extends TestCase {
 		
 		public List<String> getF() {
 			return myF;
+		}
+		
+		public int getNumG() {
+			return myG.length;
+		}
+		
+		public float getG(int index) {
+			return myG[index];
+		}
+		
+		public void setG(int index, float value) {
+			myG[index] = value;
 		}
 		
 	}

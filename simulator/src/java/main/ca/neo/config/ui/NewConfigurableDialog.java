@@ -43,6 +43,7 @@ import ca.neo.config.ListProperty;
 import ca.neo.config.MainHandler;
 import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
+import ca.neo.config.impl.AbstractProperty;
 import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.config.impl.TemplateArrayProperty;
 import ca.neo.config.impl.TemplateProperty;
@@ -290,12 +291,13 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		String[] names = JavaSourceParser.getArgNames(constructor);
 		for (int i = 0; i < types.length; i++) {
 			if (types[i].isPrimitive()) types[i] = ConfigUtil.getPrimitiveWrapperClass(types[i]);
-			Property p = null;
+			AbstractProperty p = null;
 			if (types[i].isArray() && !MainHandler.getInstance().canHandle(types[i])) {
 				p = new TemplateArrayProperty(result, names[i], types[i].getComponentType());
 			} else {
 				p = new TemplateProperty(result, names[i], types[i], ConfigUtil.getDefaultValue(types[i]));				
 			}
+			p.setDocumentation(JavaSourceParser.getArgDocs(constructor, i));
 			result.defineProperty(p);
 		}
 		return result;
