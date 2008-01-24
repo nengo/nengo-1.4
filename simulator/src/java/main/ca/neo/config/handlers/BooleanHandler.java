@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import ca.neo.config.EditorProxy;
 import ca.neo.config.ui.ConfigurationChangeListener;
 
 public class BooleanHandler extends BaseHandler {
@@ -28,7 +27,7 @@ public class BooleanHandler extends BaseHandler {
 		final JCheckBox cb = new JCheckBox("", ((Boolean) o).booleanValue());
 		final JButton button = new JButton("OK");
 		
-		listener.setProxy(new EditorProxy() {
+		listener.setProxy(new ConfigurationChangeListener.EditorProxy() {
 			public Object getValue() {
 				return new Boolean(cb.isSelected());
 			}

@@ -4,35 +4,25 @@
 package ca.neo.config;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import ca.neo.model.Ensemble;
-import ca.neo.model.Network;
-import ca.neo.model.Node;
-import ca.neo.model.impl.AbstractEnsemble;
-import ca.neo.model.impl.BasicOrigin;
-import ca.neo.model.impl.NetworkImpl;
 import ca.neo.util.ClassUtils;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.AbstractJavaEntity;
 import com.thoughtworks.qdox.model.DocletTag;
 import com.thoughtworks.qdox.model.JavaClass;
-import com.thoughtworks.qdox.model.JavaField;
 import com.thoughtworks.qdox.model.JavaMethod;
 import com.thoughtworks.qdox.model.JavaParameter;
 
 /**
- * Utility for extracting data from Java source code files, including 
+ * Utilities for extracting data from Java source code files, including 
  * variable names and documentation.  
  *  
  * @author Bryan Tripp
@@ -44,6 +34,7 @@ public class JavaSourceParser {
 	
 	static {
 		ourBuilder = new JavaDocBuilder();
+		//TODO: make this configurable
 		addSource(new File("src/java/main"));
 	}
 	
@@ -143,7 +134,7 @@ public class JavaSourceParser {
 		return result;
 	}
 
-	//eats ClassNotFoundException and returns null
+	//eats any ClassNotFoundExceptions and returns null
 	private static Class getType(String name) {
 		Class result = null;
 		try {
@@ -170,23 +161,6 @@ public class JavaSourceParser {
 		}
 		result.append(getTagText(jm));
 		
-//		Matcher matcher = Pattern.compile("@see .+\\)").matcher(comment);
-//		StringBuffer result = new StringBuffer();
-//		while (matcher.find()) {
-//			String reference = matcher.group();
-//			Method referencedMethod;
-//			try {
-//				referencedMethod = getMethod(reference, m.getDeclaringClass().getName());
-//				String referencedDocs = getDocs(referencedMethod);
-//				matcher.appendReplacement(result, referencedDocs);
-//			} catch (Exception e) {
-//				ourLogger.warn("Can't get docs for referenced method " + matcher.group(), e);
-//				matcher.appendReplacement(result, matcher.group() + " (unavailable)");
-//			}
-//		}
-//		matcher.appendTail(result);
-		
-//		return (comment + "\r\n\r\n" + getTagText(jm)).trim();
 		return result.toString();
 	}
 	
@@ -196,7 +170,7 @@ public class JavaSourceParser {
 		
 		DocletTag[] tags = entity.getTags();
 		for (int i = 0; i < tags.length; i++) {
-			if (tags[i].getName().equals("see")) {
+			if (tags[i].getName().equals("see")) { //attempt to substitute references docs
 				String className = ".";
 				if (entity instanceof JavaMethod) {
 					className = ((JavaMethod) entity).getParentClass().getFullyQualifiedName();
@@ -239,6 +213,10 @@ public class JavaSourceParser {
 		return result;
 	}
 	
+	/**
+	 * @param c A Java constructor 
+	 * @return Names of constructor arguments if available, otherwise the default {"arg0", "arg1", ...}
+	 */
 	public static String[] getArgNames(Constructor c) {
 		String[] result = new String[c.getParameterTypes().length];
 		
@@ -260,6 +238,11 @@ public class JavaSourceParser {
 		return getArgDocs(getJavaMethod(m), arg);
 	}
 	
+	/**
+	 * @param c A Java constructor 
+	 * @param arg Index of an argument on this constructor
+	 * @return Argument documentation if available, otherwise null
+	 */
 	public static String getArgDocs(Constructor c, int arg) {
 		return getArgDocs(getJavaMethod(c), arg);
 	}
@@ -280,6 +263,10 @@ public class JavaSourceParser {
 		return result;
 	}
 	
+	/**
+	 * @param m A Java method
+	 * @return A text representation of the method signature (for display)
+	 */
 	public static String getSignature(Method m) {
 		StringBuffer result = new StringBuffer();
 
@@ -304,31 +291,9 @@ public class JavaSourceParser {
 	//returns source wrapper for given method or null
 	private static JavaMethod getJavaMethod(Method m) {
 		return getJavaMethod(m.getDeclaringClass().getName(), m.getName(), m.getParameterTypes());
-//		JavaMethod result = null;
-//		
-//		JavaClass sourceClass = ourBuilder.getClassByName(m.getDeclaringClass().getName());
-//		JavaMethod[] sourceMethods = sourceClass.getMethods();
-//		
-//		for (int i = 0; i < sourceMethods.length && result == null; i++) {
-//			JavaParameter[] sourceParams = sourceMethods[i].getParameters();
-//			if (sourceMethods[i].getName().equals(m.getName()) && sourceParams.length == m.getParameterTypes().length) {
-//				boolean matches = true;
-//				for (int j = 0; j < sourceParams.length && matches; j++) {
-//					String sourceParamTypeName = sourceParams[j].getType().getJavaClass().getFullyQualifiedName();										
-//					if (!sourceParamTypeName.equals(m.getParameterTypes()[j].getName())) {
-//						matches = false;
-//					}
-//				}	
-//				
-//				if (matches) {
-//					result = sourceMethods[i];
-//				}
-//			}
-//		}
-//		
-//		return result;
 	}
 	
+	//returns source wrapper for given constructor or null
 	private static JavaMethod getJavaMethod(Constructor c) {
 		return getJavaMethod(c.getDeclaringClass().getName(), c.getDeclaringClass().getSimpleName(), c.getParameterTypes());
 	}
@@ -363,53 +328,8 @@ public class JavaSourceParser {
 	 * @param html Some text 
 	 * @return The same text with HTML tags removed
 	 */
-	public static String removeTags(String html) {
-		return html.replaceAll("<.+>", ""); 
-	}
-	
-	public static void main(String[] args) {
-		
-//		try {
-////			Class c = ClassUtils.forName("float");
-////			System.out.println(c.getName());
-//			Method m = getMethod("@see ca.neo.model.Node#run(float, float)", "ca.neo.model.Ensemble");
-//			System.out.println(getDocs(m));
-//			
-//			m = Node.class.getMethod("run", new Class[]{Float.TYPE, Float.TYPE});
-//			System.out.println("\r\n\r\n" + getDocs(m));
-//		} catch (SecurityException e) {
-//			e.printStackTrace();
-//		} catch (NoSuchMethodException e) {
-//			e.printStackTrace();
-//		} catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
-		
-		try {
-			Method m = AbstractEnsemble.class.getMethod("getName", new Class[0]);
-			System.out.println(getDocs(m));
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-		
-		
-//		addSource(new File("src/java/main"));
-		
-//		Network n = new NetworkImpl();
-//		System.out.println(getClassDocs(n.getClass()));
-//		int num = 2;
-//		System.out.println(n.getClass().getMethods()[num].getName());
-//		System.out.println(getDocs(n.getClass().getMethods()[num]));	
-//		
-//		String[] argNames = getArgNames(BasicOrigin.class.getConstructors()[0]);
-//		for (int i = 0; i < argNames.length; i++) {
-//			System.out.println(argNames[i]);
-//		}
-		
-//		System.out.println(getTagText(getJavaMethod(n.getClass().getMethods()[num])));
-//		System.out.println(getArgDocs(n.getClass().getMethods()[num], 0));
-	}
+//	public static String removeTags(String html) {
+//		return html.replaceAll("<.+>", ""); 
+//	}
 
 }

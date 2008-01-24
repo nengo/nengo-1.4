@@ -5,6 +5,11 @@ package ca.neo.config;
 
 import ca.neo.model.StructuralException;
 
+/**
+ * A Property that can have multiple values, each of which is identified by an integer index. 
+ * 
+ * @author Bryan Tripp
+ */
 public interface ListProperty extends Property {
 
 	/**

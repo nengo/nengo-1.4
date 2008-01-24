@@ -130,6 +130,13 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 		myNameGetterOnType = nameGetterOnType;
 	}
 	
+	/**
+	 * Sets optional methods used to make the property mutable. 
+	 *  
+	 * @param setter A setter method with arg types {String, Object}; {Object} is also OK if the getType() has 
+	 * 		a zero-arg method getName() which returns a String  
+	 * @param remover A method that removes a value by name; arg types {String} 
+	 */
 	public void setModifiers(Method setter, Method remover) {
 		Class[] setterParamTypes = setter.getParameterTypes();
 		if (setterParamTypes.length == 1 && getType().isAssignableFrom(setterParamTypes[1]) && myNameGetterOnType != null) {
@@ -150,28 +157,37 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	}
 
 	/**
+	 * @throws StructuralException 
 	 * @see ca.neo.config.NamedValueProperty#getValue(java.lang.String)
 	 */
-	public Object getValue(String name) {
+	public Object getValue(String name) throws StructuralException {
 		Object result = null;
 		
-		if (myGetter != null) {
-			result = invoke(myTarget, myGetter, new Object[]{name});
-		} else if (myMapGetter != null) {
-			Map map = (Map) invoke(myTarget, myMapGetter, new Object[0]);
-			result = map.get(name);
-		} else if (myArrayGetter != null) {
-			Object array = invoke(myTarget, myArrayGetter, new Object[0]);
-			for (int i = 0; i < Array.getLength(array) && result != null; i++) {
-				Object o = Array.get(array, i);
-				String thisName = (String) invoke(o, myNameGetterOnType, new Object[0]);
-				if (name.equals(thisName)) {
-					result = o;
-				}
-			}
-		} else {
+		if (myGetter == null && myMapGetter == null && (myArrayGetter == null || myNameGetterOnType == null)) {
 			throw new RuntimeException("There is no getter method for property " 
-					+ getName() + " -- this appears to be a bug");
+					+ getName() + " -- this appears to be a bug");			
+		}
+		try {
+			if (myGetter != null) {
+				result = invoke(myTarget, myGetter, new Object[]{name});
+			} else if (myMapGetter != null) {
+				Map map = (Map) invoke(myTarget, myMapGetter, new Object[0]);
+				result = map.get(name);
+			} else if (myArrayGetter != null) {
+				Object array = invoke(myTarget, myArrayGetter, new Object[0]);
+				for (int i = 0; i < Array.getLength(array) && result != null; i++) {
+					Object o = Array.get(array, i);
+					String thisName = (String) invoke(o, myNameGetterOnType, new Object[0]);
+					if (name.equals(thisName)) {
+						result = o;
+					}
+				}
+			} else {
+				throw new RuntimeException("There is no getter method for property " 
+						+ getName() + " -- this appears to be a bug");
+			}					
+		} catch (Exception e) {
+			throw new StructuralException("Can't get value " + name, e);
 		}
 		
 		return result;

@@ -4,7 +4,6 @@
 package ca.neo.config;
 
 import java.awt.BorderLayout;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,6 +30,8 @@ import ca.neo.model.StructuralException;
 public class ConfigUtil {
 	
 	/**
+	 * TODO: remove this method 
+	 * 
 	 * @param properties Configuration from which to extract a property
 	 * @param name Name of property to extact
 	 * @param c Class to which property value must belong 
@@ -46,6 +47,11 @@ public class ConfigUtil {
 		return o;
 	}
 	
+	/**
+	 * @param configurable An object
+	 * @return configurable.getConfiguration() : Configuration if such a method is defined for configurable, 
+	 * 		otherwise ConfigUtil.defaultConfiguration(configurable).  
+	 */
 	public static Configuration getConfiguration(Object configurable) {
 		Configuration result = null;
 		Method[] methods = configurable.getClass().getMethods();
@@ -73,6 +79,11 @@ public class ConfigUtil {
 		return result;
 	}
 	
+	/**
+	 * @param configurable An Object
+	 * @return A default Configuration with properties of the object, based on reflection of the 
+	 * 		object's getters and setters. 
+	 */
 	public static ConfigurationImpl defaultConfiguration(Object configurable) {
 		ConfigurationImpl result = new ConfigurationImpl(configurable);
 		
@@ -108,8 +119,6 @@ public class ConfigUtil {
 					&& !result.getPropertyNames().contains(stripSuffix(propName, "es"))) {
 				
 				Property p = null;
-//				System.out.println(returnType instanceof Class);
-//				System.out.println(returnType instanceof Class && ((Class) returnType).isArray());
 				if (returnType instanceof Class && ((Class) returnType).isArray()) {
 					p = ListPropertyImpl.getListProperty(result, propName, ((Class) returnType).getComponentType());
 				} else if (returnType instanceof ParameterizedType) {
@@ -126,9 +135,6 @@ public class ConfigUtil {
 				if (p != null) result.defineProperty(p);
 			}
 		}
-		
-		//TODO: might be nice to build properties from lone map, list, or array, but 
-		//  1) not sure how to check generic type in map/list
 		
 		return result;
 	}
@@ -239,71 +245,6 @@ public class ConfigUtil {
 		}		
 	}
 	
-//	private static boolean isArrayGetter(Method m) {
-//		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
-//				&& m.getReturnType().isArray()) {
-//			return true;
-//		} else {
-//			return false;
-//		}		
-//	}
-//	
-//	private static boolean isListGetter(Method m) {
-//		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
-//				&& List.class.isAssignableFrom(m.getReturnType())) {
-//			return true;
-//		} else {
-//			return false;
-//		}
-//	}
-//	
-//	private static boolean isMapGetter(Method m) {
-//		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
-//				&& Map.class.isAssignableFrom(m.getReturnType())) {
-//			return true;
-//		} else {
-//			return false;
-//		}
-//	}
-	
-	
-//	//TODO: document name pattern
-//	private static Method getIndexCounter(Object o, String getterName) {
-//		Method result = null;
-//		
-//		String[] counterNames = new String[]{
-//				"getNum" + getterName.substring(3),
-//				"getNum" + getterName.substring(3) + "s"};
-//
-//		Method[] methods = o.getClass().getMethods();
-//		for (int i = 0; i < methods.length && result == null; i++) {
-//			if (methods[i].getParameterTypes().length == 0) {
-//				for (int j = 0; j < counterNames.length && result == null; j++) {
-//					if (methods[i].getName().equals(counterNames[j])) {
-//						result = methods[i];
-//					}
-//				}
-//			}
-//		}
-//		
-//		return result;
-//	}
-//	
-//	private static Method getIndexSetter(Object o, String getterName, Class type) {
-//		Method result = null;
-//		
-//		Method[] methods = o.getClass().getMethods();
-//		for (int i = 0; i < methods.length && result == null; i++) {
-//			if (methods[i].getName().equals("s" + getterName.substring(1))
-//					&& methods[i].getParameterTypes().length == 1
-//					&& methods[i].getParameterTypes()[0].isAssignableFrom(Integer.TYPE)
-//					&& methods[i].getParameterTypes()[1].isAssignableFrom(type)) {
-//				result = methods[i];
-//			}
-//		}
-//		
-//		return result;
-//	}
 	
 	/**
 	 * @param c Any class 
@@ -331,6 +272,12 @@ public class ConfigUtil {
 		return c;
 	}
 	
+	/**
+	 * @param type A class
+	 * @return If there is a ConfigurationHandler for the class, then getDefaultValue() from that 
+	 * 		handler, otherwise if there is a zero-arg constructor then the result of that 
+	 * 		constructor, otherwise null.  
+	 */
 	public static Object getDefaultValue(Class type) {
 		Object result = null;
 		
@@ -364,6 +311,11 @@ public class ConfigUtil {
 		return result; 
 	}
 	
+	/**
+	 * Displays given text in a help window. 
+	 * 
+	 * @param text Help text (html body)
+	 */
 	public static void showHelp(String text) {
 		String document = "<html><head></head><body>" + text + "</body></html>";
 		JEditorPane pane = new JEditorPane("text/html", document);
@@ -377,37 +329,38 @@ public class ConfigUtil {
 		frame.setVisible(true);
 	}
 	
-	public static void main(String[] args) {
-		Object foo = new Object() {
-			public int getFooCount() {
-				return 0;
-			}
-			public int getNumFoo() {
-				return 0;
-			}
-			public int[] getAllFoo() {
-				return new int[0];
-			}
-			public int[] getFooArray() {
-				return new int[0];
-			}
-			public int[] getFooList() {
-				return new int[0];
-			}
-		};
-		
-		try {
-			System.out.println(isCounter(foo.getClass().getMethod("toString", new Class[0])));
-			System.out.println(isCounter(foo.getClass().getMethod("getFooCount", new Class[0])));
-			System.out.println(isCounter(foo.getClass().getMethod("getNumFoo", new Class[0])));
-			
-			System.out.println(getPropertyName(foo.getClass().getMethod("getAllFoo", new Class[0])));
-			System.out.println(getPropertyName(foo.getClass().getMethod("getFooArray", new Class[0])));
-			System.out.println(getPropertyName(foo.getClass().getMethod("getFooList", new Class[0])));
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-	}
+	//functional test code
+//	public static void main(String[] args) {
+//		Object foo = new Object() {
+//			public int getFooCount() {
+//				return 0;
+//			}
+//			public int getNumFoo() {
+//				return 0;
+//			}
+//			public int[] getAllFoo() {
+//				return new int[0];
+//			}
+//			public int[] getFooArray() {
+//				return new int[0];
+//			}
+//			public int[] getFooList() {
+//				return new int[0];
+//			}
+//		};
+//		
+//		try {
+//			System.out.println(isCounter(foo.getClass().getMethod("toString", new Class[0])));
+//			System.out.println(isCounter(foo.getClass().getMethod("getFooCount", new Class[0])));
+//			System.out.println(isCounter(foo.getClass().getMethod("getNumFoo", new Class[0])));
+//			
+//			System.out.println(getPropertyName(foo.getClass().getMethod("getAllFoo", new Class[0])));
+//			System.out.println(getPropertyName(foo.getClass().getMethod("getFooArray", new Class[0])));
+//			System.out.println(getPropertyName(foo.getClass().getMethod("getFooList", new Class[0])));
+//		} catch (SecurityException e) {
+//			e.printStackTrace();
+//		} catch (NoSuchMethodException e) {
+//			e.printStackTrace();
+//		}
+//	}
 }

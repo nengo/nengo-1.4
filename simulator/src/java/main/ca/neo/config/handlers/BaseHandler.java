@@ -14,7 +14,6 @@ import javax.swing.SwingConstants;
 
 import ca.neo.config.IconRegistry;
 import ca.neo.config.ConfigurationHandler;
-import ca.neo.config.EditorProxy;
 import ca.neo.config.ui.ConfigurationChangeListener;
 
 public abstract class BaseHandler implements ConfigurationHandler {
@@ -60,7 +59,7 @@ public abstract class BaseHandler implements ConfigurationHandler {
 		if (result.getPreferredSize().width < 20) 
 			result.setPreferredSize(new Dimension(20, result.getPreferredSize().height));
 
-		listener.setProxy(new EditorProxy() {
+		listener.setProxy(new ConfigurationChangeListener.EditorProxy() {
 			public Object getValue() {
 				return fromString(result.getText());
 			}

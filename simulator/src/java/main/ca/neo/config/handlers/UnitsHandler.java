@@ -7,7 +7,6 @@ import java.awt.Component;
 
 import javax.swing.JComboBox;
 
-import ca.neo.config.EditorProxy;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.model.Units;
 
@@ -43,7 +42,7 @@ public class UnitsHandler extends BaseHandler {
 		final JComboBox result = new JComboBox(myList);
 		result.setSelectedItem(unit);
 		
-		listener.setProxy(new EditorProxy() {
+		listener.setProxy(new ConfigurationChangeListener.EditorProxy() {
 			public Object getValue() {
 				return result.getSelectedItem();
 			}

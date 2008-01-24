@@ -104,17 +104,17 @@ public class ConfigurationImplTest extends TestCase {
 		assertEquals("foo", c.getField());
 	}
 
-	private static class MockListener implements Configuration.Listener {
-
-		private int myValue = 0;
-		
-		public void configurationChange(Event event) {
-			myValue = ((Integer) event.getProperty().getValue()).intValue();
-		}
-		
-		public int getValue() {
-			return myValue;
-		}
-	}
-
+//	private static class MockListener implements Configuration.Listener {
+//
+//		private int myValue = 0;
+//		
+//		public void configurationChange(Event event) {
+//			myValue = ((Integer) event.getProperty().getValue()).intValue();
+//		}
+//		
+//		public int getValue() {
+//			return myValue;
+//		}
+//	}
+//
 }

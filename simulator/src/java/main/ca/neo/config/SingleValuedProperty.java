@@ -5,6 +5,11 @@ package ca.neo.config;
 
 import ca.neo.model.StructuralException;
 
+/**
+ * A Property that has a single value. 
+ * 
+ * @author Bryan Tripp
+ */
 public interface SingleValuedProperty extends Property {
 
 	/**

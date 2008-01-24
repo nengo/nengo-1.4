@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import ca.neo.config.IconRegistry;
-import ca.neo.config.EditorProxy;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.config.ui.MatrixEditor;
 
@@ -36,7 +35,7 @@ public class VectorHandler extends BaseHandler {
 		JButton okButton = new JButton("OK");
 		result.getControlPanel().add(okButton);
 		
-		listener.setProxy(new EditorProxy() {
+		listener.setProxy(new ConfigurationChangeListener.EditorProxy() {
 			public Object getValue() {
 				return result.getMatrix()[0];
 			}

@@ -10,9 +10,14 @@ import javax.swing.JTree;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreePath;
 
-import ca.neo.config.EditorProxy;
-import ca.neo.model.StructuralException;
-
+/**
+ * A listener for changes to Property values. 
+ * 
+ * TODO: is there a better option than EditorProxy? 
+ * TODO: can we avoid references to this class from ca.neo.config? 
+ * 
+ * @author Bryan Tripp
+ */
 public class ConfigurationChangeListener implements ActionListener {
 	
 	private JTree myTree;
@@ -44,6 +49,23 @@ public class ConfigurationChangeListener implements ActionListener {
 			ConfigExceptionHandler.handle(ex, message, myTree);
 		}
 		myEditor.stopCellEditing();
+	}
+	
+	/**
+	 * An editor component (from ConfigurationHandler.getEditor(...)) must implement EditorProxy 
+	 * in order to allow retrieval of a new value when editing is complete. For example if 
+	 * the component is a JTextField, the implementation could be 
+	 * <code>getValue() { jtf.getText(); }</code>. 
+	 *  
+	 * @author Bryan Tripp
+	 */
+	public interface EditorProxy {
+		
+		/**
+		 * @return Current value of edited object 
+		 */
+		public Object getValue();
+		
 	}
 	
 }

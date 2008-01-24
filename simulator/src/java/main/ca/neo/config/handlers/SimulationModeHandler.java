@@ -7,7 +7,6 @@ import java.awt.Component;
 
 import javax.swing.JComboBox;
 
-import ca.neo.config.EditorProxy;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.model.SimulationMode;
 
@@ -31,7 +30,7 @@ public class SimulationModeHandler extends BaseHandler {
 		final JComboBox result = new JComboBox(modes);
 		result.setSelectedItem(mode);
 		
-		listener.setProxy(new EditorProxy() {
+		listener.setProxy(new ConfigurationChangeListener.EditorProxy() {
 			public Object getValue() {
 				return result.getSelectedItem();
 			}

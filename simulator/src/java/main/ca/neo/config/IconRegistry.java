@@ -16,7 +16,8 @@ import org.apache.log4j.Logger;
 
 
 /**
- * 
+ * A registry of graphical Icons that can be used for displaying Property values.
+ *  
  * @author Bryan Tripp
  */
 public class IconRegistry {
@@ -27,6 +28,9 @@ public class IconRegistry {
 	private List<Class> myIconClasses;
 	private List<Icon> myIcons;
 	
+	/**
+	 * @return Singleton instance
+	 */
 	public static IconRegistry getInstance() {
 		if (ourInstance == null) {
 			ourInstance = new IconRegistry();
@@ -57,6 +61,10 @@ public class IconRegistry {
 		myIcons = new ArrayList<Icon>(10);
 	}
 	
+	/**
+	 * @param o An object 
+	 * @return An icon to use in displaying the given object
+	 */
 	public Icon getIcon(Object o) {
 		return (o == null) ? null : getIcon(o.getClass());
 	}
@@ -76,11 +84,20 @@ public class IconRegistry {
 		return result;
 	}
 	
+	/**
+	 * @param c A class
+	 * @param icon An Icon to use for objects of the given class 
+	 */
 	public void setIcon(Class c, Icon icon) {
 		myIconClasses.add(c);
 		myIcons.add(icon);
 	}
 	
+	/**
+	 * @param c A class
+	 * @param path Path to an image file from which to make an Icon for objects of the 
+	 * 		given class
+	 */
 	public void setIcon(Class c, String path) {
 		myIconClasses.add(c);
 		myIcons.add(createImageIcon(path, ""));		
