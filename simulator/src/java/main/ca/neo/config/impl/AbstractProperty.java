@@ -17,6 +17,7 @@ abstract class AbstractProperty implements Property {
 	private String myName;
 	private Class myClass;
 	private boolean myMutable;
+	private String myDocumentation;
 	
 	/**
 	 * @param configuration Configuration to which the Property belongs
@@ -54,6 +55,17 @@ abstract class AbstractProperty implements Property {
 	
 	protected Configuration getConfiguration() {
 		return myConfiguration;
+	}
+
+	/**
+	 * @see ca.neo.config.Property#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	public void setDocumentation(String text) {
+		myDocumentation = text;
 	}
 
 }

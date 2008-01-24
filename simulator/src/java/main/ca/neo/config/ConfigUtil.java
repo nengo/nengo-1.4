@@ -3,6 +3,7 @@
  */
 package ca.neo.config;
 
+import java.awt.BorderLayout;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +13,10 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 
 import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.config.impl.ListPropertyImpl;
@@ -358,6 +363,17 @@ public class ConfigUtil {
 		}
 		
 		return result; 
+	}
+	
+	public static void showHelp(String text) {
+		JEditorPane pane = new JEditorPane("text/html", text);
+		
+		JFrame frame = new JFrame("Help"); 
+		frame.getContentPane().setLayout(new BorderLayout());
+		frame.getContentPane().add(new JScrollPane(pane), BorderLayout.CENTER);
+		
+		frame.pack();
+		frame.setVisible(true);
 	}
 	
 	public static void main(String[] args) {

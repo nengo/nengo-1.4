@@ -137,6 +137,9 @@ public class PostfixFunction implements Function {
 			}
 			public void setValue(Object value) throws StructuralException {
 			}
+			public String getDocumentation() {
+				return null;
+			}
 		};
 		myConfiguration.defineProperty(p);
 	}

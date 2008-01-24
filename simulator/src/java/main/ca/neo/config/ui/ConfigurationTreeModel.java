@@ -4,6 +4,9 @@
 package ca.neo.config.ui;
 
 import java.awt.BorderLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -418,10 +421,20 @@ public class ConfigurationTreeModel implements TreeModel {
 //			configurable.addTermination("term", new float[][]{new float[]{1}}, .005f, false);
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
-			JTree tree = new JTree(model);
+			final JTree tree = new JTree(model);
 			tree.setEditable(true); 
 			tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
 			tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));
+			tree.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					Object selected = (tree.getSelectionPath() == null) ? null : tree.getSelectionPath().getLastPathComponent();
+					if (e.getKeyCode() == 112 && selected instanceof Property) {
+						String documentation = ((Property) selected).getDocumentation(); 
+						if (documentation != null) ConfigUtil.showHelp(documentation);
+					}
+				}
+			});
 			ConfigurationTreeCellRenderer cellRenderer = new ConfigurationTreeCellRenderer();
 			tree.setCellRenderer(cellRenderer);
 			

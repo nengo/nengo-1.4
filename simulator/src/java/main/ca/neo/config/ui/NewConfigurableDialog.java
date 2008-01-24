@@ -38,6 +38,7 @@ import ca.neo.config.ClassRegistry;
 import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
+import ca.neo.config.JavaSourceParser;
 import ca.neo.config.ListProperty;
 import ca.neo.config.MainHandler;
 import ca.neo.config.Property;
@@ -252,7 +253,6 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	}
 	
 	private void setConstructor(int index) {
-		System.out.println("Setting constructor index to " + index);
 		myConstructorIndex = index;
 		Constructor constructor = myConstructors[index];
 		
@@ -287,13 +287,14 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	private static Configuration makeTemplate(Constructor constructor) {
 		ConfigurationImpl result = new ConfigurationImpl(null);
 		Class[] types = constructor.getParameterTypes();
+		String[] names = JavaSourceParser.getArgNames(constructor);
 		for (int i = 0; i < types.length; i++) {
 			if (types[i].isPrimitive()) types[i] = ConfigUtil.getPrimitiveWrapperClass(types[i]);
 			Property p = null;
 			if (types[i].isArray() && !MainHandler.getInstance().canHandle(types[i])) {
-				p = new TemplateArrayProperty(result, "arg"+i, types[i].getComponentType());
+				p = new TemplateArrayProperty(result, names[i], types[i].getComponentType());
 			} else {
-				p = new TemplateProperty(result, "arg"+i, types[i], ConfigUtil.getDefaultValue(types[i]));				
+				p = new TemplateProperty(result, names[i], types[i], ConfigUtil.getDefaultValue(types[i]));				
 			}
 			result.defineProperty(p);
 		}

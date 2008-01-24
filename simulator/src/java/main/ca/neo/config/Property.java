@@ -35,6 +35,8 @@ public interface Property {
 	 */
 	public boolean isFixedCardinality();
 	
+	public String getDocumentation();
+	
 //	/**
 //	 * @return Value (for single-valued properties) or first value (for multi-valued properties)
 //	 */

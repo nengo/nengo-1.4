@@ -4,11 +4,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import ca.neo.config.Configuration;
+import ca.neo.config.JavaSourceParser;
 import ca.neo.config.SingleValuedProperty;
 import ca.neo.model.StructuralException;
 
 /**
- * Default implementation of single-valued Properties. 
+ * Default implementation of single-valued Properties.
+ * 
+ * TODO: is this constructed on demand? 
  * 
  * @author Bryan Tripp
  */
@@ -24,17 +27,45 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	public Object getValue() {
 		Object result = null;
 		
+		Object configurable = getConfiguration().getConfigurable();
+		Method getter = getGetter();
+		if (getter != null) {
+			try {
+				result = getter.invoke(configurable, new Object[0]);
+			} catch (Exception e) {
+				throw new RuntimeException("Can't get property", e);
+			}
+		}
+		
+		return result;
+//		Object result = null;
+//		
+//		Object o = getConfiguration().getConfigurable();
+//		String methodName = "get" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
+//		
+//		try {
+//			Method method = o.getClass().getMethod(methodName, new Class[0]);
+//			result = method.invoke(o, new Object[0]);
+//		} catch (Exception e) {
+//			throw new RuntimeException("Can't get property", e);
+//		}
+//		
+//		return result; 
+	}
+	
+	private Method getGetter() {
+		Method result = null;
+		
 		Object o = getConfiguration().getConfigurable();
 		String methodName = "get" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
 		
 		try {
-			Method method = o.getClass().getMethod(methodName, new Class[0]);
-			result = method.invoke(o, new Object[0]);
+			result = o.getClass().getMethod(methodName, new Class[0]);
 		} catch (Exception e) {
 			throw new RuntimeException("Can't get property", e);
 		}
-		
-		return result; 
+
+		return result;
 	}
 
 	/**
@@ -79,5 +110,17 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 			throw new StructuralException("Value must be of class " + getType().getName());
 		}
 	}
+
+	@Override
+	public String getDocumentation() {
+		String result = null;
+		Method getter = getGetter();
+		if (getter != null) {
+			result = JavaSourceParser.getDocs(getter);
+		}
+		return result;
+	}
+	
+	
 	
 }

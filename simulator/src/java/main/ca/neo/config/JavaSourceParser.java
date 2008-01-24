@@ -4,9 +4,11 @@
 package ca.neo.config;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import ca.neo.model.Network;
+import ca.neo.model.impl.BasicOrigin;
 import ca.neo.model.impl.NetworkImpl;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
@@ -28,6 +30,7 @@ public class JavaSourceParser {
 	
 	static {
 		ourBuilder = new JavaDocBuilder();
+		addSource(new File("src/java/main"));
 	}
 	
 	/**
@@ -109,6 +112,18 @@ public class JavaSourceParser {
 		
 		return result;
 	}
+	
+	public static String[] getArgNames(Constructor c) {
+		String[] result = new String[c.getParameterTypes().length];
+		
+		JavaMethod jm = getJavaMethod(c);
+		System.out.println("jm: " + jm);
+		for (int i = 0; i < result.length; i++) {
+			result[i] = (jm == null) ? "arg"+i : jm.getParameters()[i].getName();
+		}
+		
+		return result;		
+	}
 
 	/**
 	 * @param m A Java method 
@@ -116,9 +131,12 @@ public class JavaSourceParser {
 	 * @return Argument documentation if available, otherwise null
 	 */
 	public static String getArgDocs(Method m, int arg) {
+		return getArgDocs(getJavaMethod(m), arg);
+	}
+	
+	private static String getArgDocs(JavaMethod jm, int arg) {
 		String result = null;
 		
-		JavaMethod jm = getJavaMethod(m);
 		if (jm != null && jm.getParameters().length > arg) {
 			String argName = jm.getParameters()[arg].getName();
 			DocletTag[] tags = jm.getTags();
@@ -128,23 +146,55 @@ public class JavaSourceParser {
 				}
 			}
 		}
+		
 		return result;
 	}
 	
 	//returns source wrapper for given method or null
 	private static JavaMethod getJavaMethod(Method m) {
+		return getJavaMethod(m.getDeclaringClass().getName(), m.getName(), m.getParameterTypes());
+//		JavaMethod result = null;
+//		
+//		JavaClass sourceClass = ourBuilder.getClassByName(m.getDeclaringClass().getName());
+//		JavaMethod[] sourceMethods = sourceClass.getMethods();
+//		
+//		for (int i = 0; i < sourceMethods.length && result == null; i++) {
+//			JavaParameter[] sourceParams = sourceMethods[i].getParameters();
+//			if (sourceMethods[i].getName().equals(m.getName()) && sourceParams.length == m.getParameterTypes().length) {
+//				boolean matches = true;
+//				for (int j = 0; j < sourceParams.length && matches; j++) {
+//					String sourceParamTypeName = sourceParams[j].getType().getJavaClass().getFullyQualifiedName();										
+//					if (!sourceParamTypeName.equals(m.getParameterTypes()[j].getName())) {
+//						matches = false;
+//					}
+//				}	
+//				
+//				if (matches) {
+//					result = sourceMethods[i];
+//				}
+//			}
+//		}
+//		
+//		return result;
+	}
+	
+	private static JavaMethod getJavaMethod(Constructor c) {
+		return getJavaMethod(c.getDeclaringClass().getName(), c.getDeclaringClass().getSimpleName(), c.getParameterTypes());
+	}
+	
+	private static JavaMethod getJavaMethod(String className, String methodName, Class[] paramTypes) {
 		JavaMethod result = null;
 		
-		JavaClass sourceClass = ourBuilder.getClassByName(m.getDeclaringClass().getName());
+		JavaClass sourceClass = ourBuilder.getClassByName(className);
 		JavaMethod[] sourceMethods = sourceClass.getMethods();
 		
 		for (int i = 0; i < sourceMethods.length && result == null; i++) {
 			JavaParameter[] sourceParams = sourceMethods[i].getParameters();
-			if (sourceMethods[i].getName().equals(m.getName()) && sourceParams.length == m.getParameterTypes().length) {
+			if (sourceMethods[i].getName().equals(methodName) && sourceParams.length == paramTypes.length) {
 				boolean matches = true;
 				for (int j = 0; j < sourceParams.length && matches; j++) {
 					String sourceParamTypeName = sourceParams[j].getType().getJavaClass().getFullyQualifiedName();										
-					if (!sourceParamTypeName.equals(m.getParameterTypes()[j].getName())) {
+					if (!sourceParamTypeName.equals(paramTypes[j].getName())) {
 						matches = false;
 					}
 				}	
@@ -167,7 +217,7 @@ public class JavaSourceParser {
 	}
 	
 	public static void main(String[] args) {
-		addSource(new File("src/java/main"));
+//		addSource(new File("src/java/main"));
 		
 		Network n = new NetworkImpl();
 //		System.out.println(getClassDocs(n.getClass()));
@@ -175,13 +225,13 @@ public class JavaSourceParser {
 //		System.out.println(n.getClass().getMethods()[num].getName());
 //		System.out.println(getDocs(n.getClass().getMethods()[num]));	
 //		
-//		String[] argNames = getArgNames(n.getClass().getMethods()[num]);
-//		for (int i = 0; i < argNames.length; i++) {
-//			System.out.println(argNames[i]);
-//		}
+		String[] argNames = getArgNames(BasicOrigin.class.getConstructors()[0]);
+		for (int i = 0; i < argNames.length; i++) {
+			System.out.println(argNames[i]);
+		}
 		
 //		System.out.println(getTagText(getJavaMethod(n.getClass().getMethods()[num])));
-		System.out.println(getArgDocs(n.getClass().getMethods()[num], 0));
+//		System.out.println(getArgDocs(n.getClass().getMethods()[num], 0));
 	}
 
 }
