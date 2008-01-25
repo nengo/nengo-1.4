@@ -18,6 +18,7 @@
 		<pathelement location="${lib}/jfreechart-1.0.1.jar" /> 
 		<pathelement location="${lib}/jmatio.jar" /> 
 		<pathelement location="${lib}/log4j-1.2.14.jar" /> 
+		<pathelement location="${lib}/qdox-1.6.3.jar" /> 
 	</path>
 	
 	
@@ -37,8 +38,8 @@
 	
 	<!-- Compile main and test classes --> 
 	<target name="compile">
-		<mkdir dir="${classes}/main"/>
-		<mkdir dir="${classes}/test"/>
+		<mkdir dir="${classes}"/>
+		<mkdir dir="${test-classes}"/>
 		
 	 	<javac source="1.5" srcdir="${src}/java/main" destdir="${classes}" includes="ca/neo/**" debug="true">
 	        <classpath refid="classpath" />
@@ -46,6 +47,9 @@
 
 	 	<javac source="1.5" srcdir="${src}/java/test" destdir="${test-classes}" includes="ca/neo/**" debug="true">
 	        <classpath refid="classpath" />
+	 		<classpath>
+	 			<pathelement path="${classes}" />
+	 		</classpath>
 	    </javac>
 	</target>
 	
