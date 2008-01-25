@@ -10,10 +10,22 @@ import ca.neo.config.Configuration;
 import ca.neo.config.ListProperty;
 import ca.neo.model.StructuralException;
 
+/**
+ * <p>A ListProperty that is not attached to getter/setter methods on an underlying class, but instead stores 
+ * its values internally. It can be used to manage array or list values of constructor/method arguments 
+ * (rather than multi-valued object properties). Similar to TemplateProperty but multivalued.</p>
+ * 
+ * @author Bryan Tripp
+ */
 public class TemplateArrayProperty extends AbstractProperty implements ListProperty {
 
 	private List<Object> myValues;
 	
+	/**
+	 * @param configuration Configuration to which this Property belongs
+	 * @param name Name of the property 
+	 * @param c Type of the property value
+	 */
 	public TemplateArrayProperty(Configuration configuration, String name, Class c) {
 		super(configuration, name, c, true);
 		myValues = new ArrayList<Object>(10);

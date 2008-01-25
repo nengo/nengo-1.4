@@ -10,6 +10,11 @@ import javax.swing.JComboBox;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.model.Units;
 
+/**
+ * ConfigurationHandler for Units values. 
+ * 
+ * @author Bryan Tripp
+ */
 public class UnitsHandler extends BaseHandler {
 	
 	private static Units[] myList = new Units[]{

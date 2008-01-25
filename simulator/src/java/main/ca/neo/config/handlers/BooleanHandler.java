@@ -13,6 +13,11 @@ import javax.swing.JPanel;
 
 import ca.neo.config.ui.ConfigurationChangeListener;
 
+/**
+ * ConfigurationHandler for Boolean values. 
+ * 
+ * @author Bryan Tripp
+ */
 public class BooleanHandler extends BaseHandler {
 
 	public BooleanHandler() {
@@ -59,6 +64,5 @@ public class BooleanHandler extends BaseHandler {
 	public Object getDefaultValue(Class c) {
 		return new Boolean(false);
 	}
-
 	
 }

@@ -13,11 +13,8 @@ import ca.neo.config.Property;
 import ca.neo.model.StructuralException;
 
 /**
- * <p>Base implementation of Configuration. A Configurable would normally have 
- * an associated implementation of <code>setValue(String, Object)</code> that 
- * maps to the Configurable's native setters.</p>
- * 
- * <p>This implementation reports property names in the order they are defined.</p>
+ * <p>Default implementation of Configuration. This implementation reports property names in 
+ * the order they are defined.</p>
  * 
  * @author Bryan Tripp
  */

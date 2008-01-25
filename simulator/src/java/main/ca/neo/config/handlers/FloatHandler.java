@@ -3,6 +3,11 @@
  */
 package ca.neo.config.handlers;
 
+/**
+ * ConfigurationHandler for Float values. 
+ * 
+ * @author Bryan Tripp
+ */
 public class FloatHandler extends BaseHandler {
 
 	public FloatHandler() {

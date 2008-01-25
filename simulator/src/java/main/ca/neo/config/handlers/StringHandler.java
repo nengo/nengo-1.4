@@ -3,6 +3,11 @@
  */
 package ca.neo.config.handlers;
 
+/**
+ * ConfigurationHandler for String values. 
+ * 
+ * @author Bryan Tripp
+ */
 public class StringHandler extends BaseHandler {
 
 	public StringHandler() {

@@ -16,6 +16,11 @@ import ca.neo.config.IconRegistry;
 import ca.neo.config.ConfigurationHandler;
 import ca.neo.config.ui.ConfigurationChangeListener;
 
+/**
+ * Base class that provides default behaviour for ConfigurationHandlers. 
+ * 
+ * @author Bryan Tripp
+ */
 public abstract class BaseHandler implements ConfigurationHandler {
 
 	private Class<?> myClass;

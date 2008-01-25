@@ -11,8 +11,6 @@ import ca.neo.model.StructuralException;
 /**
  * Default implementation of single-valued Properties.
  * 
- * TODO: is this constructed on demand? 
- * 
  * @author Bryan Tripp
  */
 public class SingleValuedPropertyImpl extends AbstractProperty implements SingleValuedProperty {

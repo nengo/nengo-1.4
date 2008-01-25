@@ -26,7 +26,12 @@ import ca.neo.config.handlers.VectorHandler;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 
-//TODO: make getHandler() private method
+/**
+ * A composite ConfigurationHandler which delegates to other underlying ConfigurationHandlers 
+ * that can handle specific classes.  
+ * 
+ * @author Bryan Tripp
+ */
 public class MainHandler implements ConfigurationHandler {
 	
 	public static String HANDLERS_FILE_PROPERTY = "ca.neo.config.handlers";
@@ -36,6 +41,9 @@ public class MainHandler implements ConfigurationHandler {
 	
 	private List<ConfigurationHandler> myHandlers;
 	
+	/**
+	 * @return Singleton instance
+	 */
 	public static synchronized MainHandler getInstance() {
 		if (ourInstance == null) {
 			ourInstance = new MainHandler();
@@ -87,6 +95,9 @@ public class MainHandler implements ConfigurationHandler {
 		}
 	}
 	
+	/**
+	 * @param handler New handler to which the MainHandler can delegate 
+	 */
 	public void addHandler(ConfigurationHandler handler) {
 		myHandlers.add(handler);
 	}
@@ -109,11 +120,10 @@ public class MainHandler implements ConfigurationHandler {
 	 */
 	public Object fromString(Class c, String s) {
 		Object result = null;
-		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
-			if (myHandlers.get(i).canHandle(c)) {
-				result = myHandlers.get(i).fromString(s);
-			}
-		}
+		
+		ConfigurationHandler handler = getHandler(myHandlers, c);
+		if (handler != null) result = handler.fromString(s);
+		
 		return result;
 	}
 	
@@ -131,11 +141,9 @@ public class MainHandler implements ConfigurationHandler {
 		Component result = null;
 		
 		Class c = o.getClass();
-		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
-			if (myHandlers.get(i).canHandle(c)) {
-				result = myHandlers.get(i).getEditor(o, listener);
-			}
-		}
+		ConfigurationHandler handler = getHandler(myHandlers, c);
+		if (handler != null) result = handler.getEditor(o, listener);
+
 		return result;
 	}
 
@@ -148,11 +156,8 @@ public class MainHandler implements ConfigurationHandler {
 		if (o instanceof NullValue) result = new JLabel("NULL"); 
 			
 		Class c = o.getClass();
-		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
-			if (myHandlers.get(i).canHandle(c)) {
-				result = myHandlers.get(i).getRenderer(o);
-			}
-		}
+		ConfigurationHandler handler = getHandler(myHandlers, c);
+		if (handler != null) result = handler.getRenderer(o);
 		
 		return result;
 	}
@@ -164,11 +169,9 @@ public class MainHandler implements ConfigurationHandler {
 		String result = null;
 		
 		Class c = o.getClass();
-		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
-			if (myHandlers.get(i).canHandle(c)) {
-				result = myHandlers.get(i).toString(o);
-			}
-		}
+		ConfigurationHandler handler = getHandler(myHandlers, c);
+		if (handler != null) result = handler.toString(o);
+
 		return result;
 	}
 
@@ -178,9 +181,18 @@ public class MainHandler implements ConfigurationHandler {
 	public Object getDefaultValue(Class c) {
 		Object result = null;
 		
-		for (int i = myHandlers.size()-1; i >= 0 && result == null; i--) {
-			if (myHandlers.get(i).canHandle(c)) {
-				result = myHandlers.get(i).getDefaultValue(c);
+		ConfigurationHandler handler = getHandler(myHandlers, c);
+		if (handler != null) result = handler.getDefaultValue(c);
+		
+		return result;
+	}
+	
+	//returns last handler that can handle given class 
+	private static ConfigurationHandler getHandler(List<ConfigurationHandler> handlers, Class c) {
+		ConfigurationHandler result = null;
+		for (int i = handlers.size()-1; i >= 0 && result == null; i--) {
+			if (handlers.get(i).canHandle(c)) {
+				result = handlers.get(i);
 			}
 		}
 		return result;

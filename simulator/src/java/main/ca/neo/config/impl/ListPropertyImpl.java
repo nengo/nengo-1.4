@@ -6,7 +6,6 @@ package ca.neo.config.impl;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 
 import ca.neo.config.Configuration;

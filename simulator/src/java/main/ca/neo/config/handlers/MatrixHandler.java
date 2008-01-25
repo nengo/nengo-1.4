@@ -3,7 +3,6 @@
  */
 package ca.neo.config.handlers;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -20,6 +19,11 @@ import ca.neo.config.ui.MatrixEditor;
 import ca.neo.util.MU.MatrixExpander;
 import ca.neo.util.MU.VectorExpander;
 
+/**
+ * ConfigurationHandler for float[][] values. 
+ * 
+ * @author Bryan Tripp
+ */
 public class MatrixHandler extends BaseHandler {
 	
 	public MatrixHandler() {
@@ -63,24 +67,6 @@ public class MatrixHandler extends BaseHandler {
 	@Override
 	public Object fromString(String s) {
 		return fromString(s, ',', "\r\n");
-//		MatrixExpander result = new MatrixExpander();
-//		BufferedReader reader = new BufferedReader(new StringReader(s));
-//		String line = null;
-//		try {
-//			while ((line = reader.readLine()) != null) {
-//				StringTokenizer tok = new StringTokenizer(line, ",", false);
-//				VectorExpander row = new VectorExpander();
-//				while (tok.hasMoreTokens()) {
-//					row.add(Float.parseFloat(tok.nextToken()));
-//				}
-//				result.add(row.toArray());
-//			}
-//		} catch (NumberFormatException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		return result.toArray();
 	}
 
 	@Override
@@ -88,6 +74,12 @@ public class MatrixHandler extends BaseHandler {
 		return toString((float[][]) o, ',', "\r\n");
 	}
 	
+	/**
+	 * @param s A String representation of a matrix, eg from toString(float[][], char, String)  
+	 * @param colDelim The character used to delimit matrix columns in this string
+	 * @param rowDelim The string (can be >1 chars) used to delimit matrix rows in this string 
+	 * @return The matrix represented by the string
+	 */
 	public static float[][] fromString(String s, char colDelim, String rowDelim) {
 		String colDelimString = String.valueOf(colDelim);
 		MatrixExpander result = new MatrixExpander();
@@ -101,25 +93,15 @@ public class MatrixHandler extends BaseHandler {
 			}
 			result.add(row.toArray());
 		}
-//		BufferedReader reader = new BufferedReader(new StringReader(s));
-//		String line = null;
-//		try {
-//			while ((line = reader.readLine()) != null) {
-//				StringTokenizer tok = new StringTokenizer(line, ",", false);
-//				VectorExpander row = new VectorExpander();
-//				while (tok.hasMoreTokens()) {
-//					row.add(Float.parseFloat(tok.nextToken()));
-//				}
-//				result.add(row.toArray());
-//			}
-//		} catch (NumberFormatException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 		return result.toArray();		
 	}
-	
+
+	/**
+	 * @param matrix A matrix  
+	 * @param colDelim A character to be used to delimit matrix columns
+	 * @param rowDelim A String to be used to delimit matrix rows
+	 * @return A String representation of the given matrix using the given delimiters 
+	 */
 	public static String toString(float[][] matrix, char colDelim, String rowDelim) {
 		StringBuffer result = new StringBuffer();
 		for (int i = 0; i < matrix.length; i++) {

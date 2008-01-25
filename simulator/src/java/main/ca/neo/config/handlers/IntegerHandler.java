@@ -3,6 +3,11 @@
  */
 package ca.neo.config.handlers;
 
+/**
+ * ConfigurationHandler for Integer values. 
+ * 
+ * @author Bryan Tripp
+ */
 public class IntegerHandler extends BaseHandler {
 
 	public IntegerHandler() {

@@ -64,6 +64,9 @@ public abstract class AbstractProperty implements Property {
 		return myDocumentation;
 	}
 
+	/**
+	 * @param text New documentation text (can be plain text or HTML)
+	 */
 	public void setDocumentation(String text) {
 		myDocumentation = text;
 	}

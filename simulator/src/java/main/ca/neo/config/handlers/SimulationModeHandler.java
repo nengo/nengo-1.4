@@ -10,6 +10,11 @@ import javax.swing.JComboBox;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.model.SimulationMode;
 
+/**
+ * ConfigurationHandler for SimulationMode values. 
+ * 
+ * @author Bryan Tripp
+ */
 public class SimulationModeHandler extends BaseHandler {
 
 	public SimulationModeHandler() {

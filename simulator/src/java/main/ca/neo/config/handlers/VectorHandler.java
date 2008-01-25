@@ -3,21 +3,23 @@
  */
 package ca.neo.config.handlers;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import ca.neo.config.IconRegistry;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.config.ui.MatrixEditor;
 
+/**
+ * ConfigurationHandler for float[] values. 
+ * 
+ * @author Bryan Tripp
+ */
 public class VectorHandler extends BaseHandler {
 
 	public VectorHandler() {
