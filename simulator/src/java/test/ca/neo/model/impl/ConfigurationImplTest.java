@@ -8,7 +8,6 @@ import java.util.List;
 import ca.neo.TestUtil;
 import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
-import ca.neo.config.Configuration.Event;
 import ca.neo.model.StructuralException;
 import ca.neo.model.impl.MockConfigurable.MockChildConfigurable;
 import junit.framework.TestCase;

@@ -34,7 +34,6 @@ import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.EnsembleImpl;
-import ca.neo.model.impl.MockConfigurable;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;

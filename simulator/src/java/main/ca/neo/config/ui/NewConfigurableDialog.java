@@ -53,7 +53,6 @@ import ca.neo.math.Function;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
-import ca.neo.model.impl.MockConfigurable.MockLittleConfigurable;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.impl.NEFEnsembleImpl;
 import ca.neo.model.neuron.impl.SpikingNeuron;
