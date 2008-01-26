@@ -31,8 +31,8 @@ public class ConstantFunction implements Function {
 		myDimension = dimension;
 		myValue = value;
 		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, true);
-		myConfiguration.defineSingleValuedProperty(VALUE_PROPERTY, Float.class, true);
+		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.TYPE, true);
+		myConfiguration.defineSingleValuedProperty(VALUE_PROPERTY, Float.TYPE, true);
 	}
 
 	/**

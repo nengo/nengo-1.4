@@ -8,11 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
-import ca.neo.config.Property;
-import ca.neo.config.impl.ConfigurationImpl;
-import ca.neo.config.impl.MultiValuedProperty;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.SimulationException;
@@ -56,7 +51,6 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	private Map<String, PlasticityRule> myPlasticityRules;
 	private float myPlasticityInterval;
 	private float myLastPlasticityTime;
-	private ConfigurationImpl myConfiguration;
 
 	/**
 	 * @param maxTimeStep Maximum length of integration time step. Shorter steps may be used to better match
@@ -69,56 +63,16 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		myTerminations = new HashMap<String, LinearExponentialTermination>(10);
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 		myPlasticityInterval = -1;
-		myLastPlasticityTime = 0;
-		
-		myConfiguration = (ConfigurationImpl) ConfigUtil.defaultConfiguration(this);
-		myConfiguration.removeProperty("terminations");
-		
-		Property tp = new MultiValuedProperty(myConfiguration, "terminations", LinearExponentialTermination.class, true) {
-
-			@Override
-			public void addValue(Object value) throws StructuralException {
-			}
-
-			@Override
-			public Object doGetValue(int index) throws StructuralException {
-				return null;
-			}
-
-			@Override
-			public void doInsert(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
-			}
-
-			@Override
-			public void doRemove(int index) throws IndexOutOfBoundsException, StructuralException {
-			}
-
-			@Override
-			public void doSetValue(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
-			}
-
-			@Override
-			public int getNumValues() {
-				return 0;
-			}
-		}; 
-		myConfiguration.defineProperty(tp);
-		
-		//TODO: make terminations configurable, deal with plasticity
-		
+		myLastPlasticityTime = 0;		
 	}
 	
+	/**
+	 * Defaults to max timestep 1ms and units Units.ACU. 
+	 */
 	public LinearSynapticIntegrator() {
 		this(.001f, Units.ACU);
 	}
 	
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @see ca.neo.model.neuron.SynapticIntegrator#run(float, float)
 	 */

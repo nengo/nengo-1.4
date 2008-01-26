@@ -8,11 +8,9 @@ import java.util.List;
 
 import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
-import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
 import ca.neo.config.impl.ConfigurationImpl;
-import ca.neo.config.impl.FixedCardinalityProperty;
-import ca.neo.config.impl.MultiValuedProperty;
+import ca.neo.config.impl.ListPropertyImpl;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
@@ -60,9 +58,9 @@ public class MockConfigurable implements Configurable {
 		myConfiguration = new ConfigurationImpl(this);
 		myConfiguration.defineSingleValuedProperty("immutableField", String.class, false);
 		
-		myConfiguration.defineSingleValuedProperty("intField", Integer.class, true);
-		myConfiguration.defineSingleValuedProperty("floatField", Float.class, true);
-		myConfiguration.defineSingleValuedProperty("booleanField", Boolean.class, true);
+		myConfiguration.defineSingleValuedProperty("intField", Integer.TYPE, true);
+		myConfiguration.defineSingleValuedProperty("floatField", Float.TYPE, true);
+		myConfiguration.defineSingleValuedProperty("booleanField", Boolean.TYPE, true);
 		myConfiguration.defineSingleValuedProperty("stringField", String.class, true);
 		myConfiguration.defineSingleValuedProperty("floatArrayField", float[].class, true);
 		myConfiguration.defineSingleValuedProperty("floatArrayArrayField", float[][].class, true);
@@ -71,60 +69,26 @@ public class MockConfigurable implements Configurable {
 		myConfiguration.defineSingleValuedProperty("configurableField", Configurable.class, true);
 		myConfiguration.defineSingleValuedProperty("immutableField", String.class, false);
 		
-		Property mvp = new MultiValuedProperty(myConfiguration, "multiValuedField", String.class, true) {
-			@Override
-			public void addValue(Object value) throws StructuralException {
-				myMultiValuedField.add((String) value); 
-//				addValueCompleted(value);
-			}
-
-			@Override
-			public void doInsert(int index, Object value) throws StructuralException {
-				myMultiValuedField.add(index, (String) value);
-//				insertCompleted(index, value);
-			}
-
-			@Override
-			public void doRemove(int index) throws StructuralException {
-				myMultiValuedField.remove(index);
-//				removeCompleted(index);
-			}
-
-			@Override
-			public void doSetValue(int index, Object value) throws StructuralException {
-				myMultiValuedField.set(index, (String) value);
-//				setValueCompleted(index, value);
-			}
-
-			@Override
-			public Object doGetValue(int index) throws StructuralException {
-				return myMultiValuedField.get(index);
-			}
-
-			@Override
-			public int getNumValues() {
-				return myMultiValuedField.size();
-			}
-		};
-		myConfiguration.defineProperty(mvp);
-		
-		Property fcp = new FixedCardinalityProperty(myConfiguration, "fixedCardinalityField", String.class, true) {
-			@Override
-			public void doSetValue(int index, Object value) throws StructuralException {
-				myFixedCardinalityField[index] = (String) value;
-			}
-
-			@Override
-			public Object doGetValue(int index) throws StructuralException {
-				return myFixedCardinalityField[index];
-			}
-
-			@Override
-			public int getNumValues() {
-				return myFixedCardinalityField.length;
-			}
-		};
-		myConfiguration.defineProperty(fcp);
+		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "multiValuedField", String.class));
+		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "fixedCardinalityField", String.class));
+//		
+//		Property fcp = new FixedCardinalityProperty(myConfiguration, "fixedCardinalityField", String.class, true) {
+//			@Override
+//			public void doSetValue(int index, Object value) throws StructuralException {
+//				myFixedCardinalityField[index] = (String) value;
+//			}
+//
+//			@Override
+//			public Object doGetValue(int index) throws StructuralException {
+//				return myFixedCardinalityField[index];
+//			}
+//
+//			@Override
+//			public int getNumValues() {
+//				return myFixedCardinalityField.length;
+//			}
+//		};
+//		myConfiguration.defineProperty(fcp);
 		
 	}
 	
@@ -147,7 +111,6 @@ public class MockConfigurable implements Configurable {
 	
 	public void setIntField(int val) {
 		myIntField = val;
-//		myIntProperty.setValueCompleted(val);
 	}
 	
 	public int getIntField() {
@@ -156,7 +119,6 @@ public class MockConfigurable implements Configurable {
 	
 	public void setFloatField(float val) {
 		myFloatField = val;
-//		myFloatProperty.setValueCompleted(val);
 	}
 	
 	public float getFloatField() {
@@ -165,7 +127,6 @@ public class MockConfigurable implements Configurable {
 	
 	public void setBooleanField(boolean val) {
 		myBooleanField = val;
-//		myBooleanProperty.setValueCompleted(val);
 	}
 	
 	public boolean getBooleanField() {
@@ -174,7 +135,6 @@ public class MockConfigurable implements Configurable {
 
 	public void setStringField(String val) {
 		myStringField = val;
-//		myStringProperty.setValueCompleted(val);
 	}
 	
 	public String getStringField() {
@@ -183,7 +143,6 @@ public class MockConfigurable implements Configurable {
 
 	public void setFloatArrayField(float[] val) {
 		myFloatArrayField = val;
-//		myFloatArrayProperty.setValueCompleted(val);
 	}
 	
 	public float[] getFloatArrayField() {
@@ -192,7 +151,6 @@ public class MockConfigurable implements Configurable {
 
 	public void setFloatArrayArrayField(float[][] val) {
 		myFloatArrayArrayField = val;
-//		myFloatArrayArrayProperty.setValueCompleted(val);
 	}
 	
 	public float[][] getFloatArrayArrayField() {
@@ -201,7 +159,6 @@ public class MockConfigurable implements Configurable {
 
 	public void setSimulationModeField(SimulationMode val) {
 		mySimulationModeField = val;
-//		mySimulationModeProperty.setValueCompleted(val);		
 	}
 	
 	public SimulationMode getSimulationModeField() {
@@ -210,7 +167,6 @@ public class MockConfigurable implements Configurable {
 
 	public void setUnitsField(Units val) {
 		myUnitsField = val;
-//		myUnitsProperty.setValueCompleted(val);
 	}
 	
 	public Units getUnitsField() {
@@ -219,7 +175,6 @@ public class MockConfigurable implements Configurable {
 
 	public void setConfigurableField(Configurable val) {
 		myConfigurableField = val;
-//		myConfigurableProperty.setValueCompleted(val);
 	}
 	
 	public Configurable getConfigurableField() {
@@ -232,22 +187,18 @@ public class MockConfigurable implements Configurable {
 	
 	public void setMultiValuedField(int index, String val) {
 		myMultiValuedField.set(index, val);
-//		myMultiValuedProperty.setValueCompleted(index, val);		
 	}
 	
 	public void addMultiValuedField(String val) {
 		myMultiValuedField.add(val);
-//		myMultiValuedProperty.addValueCompleted(val);
 	}
 	
 	public void addMultiValuedField(int index, String val) {
 		myMultiValuedField.add(index, val);
-//		myMultiValuedProperty.insertCompleted(index, val);
 	}
 	
 	public void removeMultiValuedField(int index) {
 		myMultiValuedField.remove(index);
-//		myMultiValuedProperty.removeCompleted(index);
 	}
 	
 	public String[] getFixedCardinalityField() {
@@ -258,7 +209,6 @@ public class MockConfigurable implements Configurable {
 	
 	public void setFixedCardinalityField(int index, String val) {
 		myFixedCardinalityField[index] = val;
-//		myFixedCardinalityProperty.setValueCompleted(index, val);
 	}
 	
 	/**
@@ -326,5 +276,48 @@ public class MockConfigurable implements Configurable {
 		}
 		
 	}
+	
+//	private static class MultiValuedProperty extends AbstractProperty implements ListProperty {
+//		
+//		private List<String> myMultiValuedField;
+//		
+//		public MultiValuedProperty(Configuration configuration, String name, Class c, boolean mutable, List<String> multiValuedField) {
+//			super(configuration, name, c, mutable);
+//			myMultiValuedField = multiValuedField;
+//		}
+//
+//		public void addValue(Object value) throws StructuralException {
+//			myMultiValuedField.add((String) value); 
+//		}
+//
+//		public int getNumValues() {
+//			return myMultiValuedField.size();
+//		}
+//
+//		public boolean isFixedCardinality() {
+//			return false;
+//		}
+//
+//		public Object getDefaultValue() {
+//			return null;
+//		}
+//
+//		public Object getValue(int index) throws StructuralException {
+//			return myMultiValuedField.get(index);
+//		}
+//
+//		public void insert(int index, Object value) throws StructuralException {
+//			myMultiValuedField.add(index, (String) value);
+//		}
+//
+//		public void remove(int index) throws StructuralException {
+//			myMultiValuedField.remove(index);
+//		}
+//
+//		public void setValue(int index, Object value) throws StructuralException {
+//			myMultiValuedField.set(index, (String) value);
+//		}
+//	};
+	
 	
 }

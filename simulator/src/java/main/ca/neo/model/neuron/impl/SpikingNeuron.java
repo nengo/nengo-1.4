@@ -60,10 +60,9 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	 * 		it belongs
 	 */
 	public SpikingNeuron(SynapticIntegrator integrator, SpikeGenerator generator, float scale, float bias, String name) {
-		myIntegrator = integrator;
-		myIntegrator.setNode(this);
-		myGenerator = generator;
-		mySpikeOrigin = new SpikeGeneratorOrigin(this, generator);
+		setIntegrator(integrator);
+		setGenerator(generator);
+		
 		myCurrentOrigin = new BasicOrigin(this, CURRENT, 1, Units.ACU);
 		myCurrentOrigin.setValues(0, 0, new float[]{0});
 		myName = name;
@@ -179,6 +178,13 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public float getScale() {
 		return myScale;
 	}
+	
+	/**
+	 * @param scale New scaling coefficient
+	 */
+	public void setScale(float scale) {
+		myScale = scale;
+	}
 
 	/**
 	 * @return The bias current that models unaccounted-for inputs and/or intrinsic currents 
@@ -188,11 +194,26 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	}
 
 	/**
+	 * @param bias New bias current
+	 */
+	public void setBias(float bias) {
+		myBias = bias;
+	}
+	
+	/**
 	 * @return The SynapticIntegrator used to model dendritic/somatic integration of inputs
 	 * 		to this Neuron
 	 */
 	public SynapticIntegrator getIntegrator() {
 		return myIntegrator;
+	}
+	
+	/**
+	 * @param integrator New synaptic integrator
+	 */
+	public void setIntegrator(SynapticIntegrator integrator) {
+		myIntegrator = integrator;
+		myIntegrator.setNode(this);		
 	}
 
 	/**
@@ -203,6 +224,14 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		return myGenerator;
 	}
 
+	/**
+	 * @param generator New SpikeGenerator 
+	 */
+	public void setGenerator(SpikeGenerator generator) {
+		myGenerator = generator;
+		mySpikeOrigin = new SpikeGeneratorOrigin(this, generator);
+	}
+	
 	/**
 	 * @see ca.neo.model.Node#getTerminations()
 	 */

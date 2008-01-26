@@ -351,6 +351,9 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			}
 		}
 		
+		String errorMessage = "Can't create new " 
+			+ myConstructors[myConstructorIndex].getDeclaringClass().getName() + ". See error log for further detail. ";
+		
 		try {
 			myResult = myConstructors[myConstructorIndex].newInstance(args.toArray(new Object[0]));
 			
@@ -364,13 +367,14 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 
 			myOKButton.setEnabled(true);			
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			ConfigExceptionHandler.handle(e, errorMessage, myConfigurationTree);
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			ConfigExceptionHandler.handle(e, errorMessage, myConfigurationTree);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			ConfigExceptionHandler.handle(e, errorMessage, myConfigurationTree);
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+			ConfigExceptionHandler.handle(e, errorMessage + " (" + e.getCause().getClass().getName() + ")", 
+					myConfigurationTree);
 		}
 		
 //		Constructor<?>[] constructors = myType.getConstructors();
@@ -424,7 +428,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		myDialog.setVisible(false);
 	}
 
-	public static class ConstructionProperties implements Configurable {
+	public static class ConstructionProperties {
 
 		private Configuration myConfiguration;
 		

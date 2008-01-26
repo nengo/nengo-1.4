@@ -3,15 +3,13 @@
  */
 package ca.neo.model;
 
-import ca.neo.config.Configurable;
-
 /**
  * An model of noise that can be explicitly injected into a circuit (e.g. added to 
  * an Origin). 
  *   
  * @author Bryan Tripp
  */
-public interface Noise extends Configurable {
+public interface Noise {
 	
 	public static final String DIMENSION_PROPERTY = "dimension";
 	

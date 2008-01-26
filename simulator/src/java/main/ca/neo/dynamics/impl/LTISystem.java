@@ -3,12 +3,7 @@
  */
 package ca.neo.dynamics.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
-import ca.neo.config.impl.FixedCardinalityProperty;
 import ca.neo.dynamics.LinearSystem;
-import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.util.MU;
 
@@ -23,9 +18,6 @@ import ca.neo.util.MU;
 public class LTISystem implements LinearSystem {
 
 	private static final long serialVersionUID = 1L;
-	private static final String INPUT_DIMENSION_PROPERTY = "inputDimension";
-	private static final String OUTPUT_DIMENSION_PROPERTY = "outputDimension";
-	private static final String STATE_DIMENSION_PROPERTY = "stateDimension";
 	
 	private float[][] A;
 	private float[][] B;
@@ -33,7 +25,6 @@ public class LTISystem implements LinearSystem {
 	private float[][] D;
 	private float[] x;
 	private Units[] myOutputUnits;
-	private ConfigurationImpl myConfiguration; 
 	
 	/**
 	 * Each argument is an array of arrays that represents a matrix. The first 
@@ -59,19 +50,6 @@ public class LTISystem implements LinearSystem {
 		init(A, B, C, D, x0, outputUnits);
 	}
 	
-	public LTISystem(Configuration properties) throws StructuralException {
-		int inputDim = ((Integer) ConfigUtil.get(properties, INPUT_DIMENSION_PROPERTY, Integer.class)).intValue();
-		int outputDim = ((Integer) ConfigUtil.get(properties, OUTPUT_DIMENSION_PROPERTY, Integer.class)).intValue();
-		int stateDim = ((Integer) ConfigUtil.get(properties, STATE_DIMENSION_PROPERTY, Integer.class)).intValue();
-		
-		init(MU.zero(stateDim, stateDim), 
-			MU.zero(stateDim, inputDim), 
-			MU.zero(outputDim, stateDim), 
-			MU.zero(outputDim, inputDim), 
-			new float[stateDim], 
-			Units.uniform(Units.UNK, outputDim));
-	}
-	
 	private void init(float[][] A, float[][] B, float[][] C, float[][] D, float[] x0, Units[] outputUnits) {
 		this.A = A;
 		this.B = B;
@@ -79,49 +57,8 @@ public class LTISystem implements LinearSystem {
 		this.D = D;
 		this.x = x0;
 		this.myOutputUnits = outputUnits;
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(INPUT_DIMENSION_PROPERTY, Integer.class, true);
-		myConfiguration.defineSingleValuedProperty(OUTPUT_DIMENSION_PROPERTY, Integer.class, true);
-		myConfiguration.defineSingleValuedProperty(STATE_DIMENSION_PROPERTY, Integer.class, true);
-		myConfiguration.defineSingleValuedProperty("A", float[][].class, true);
-		myConfiguration.defineSingleValuedProperty("B", float[][].class, true);
-		myConfiguration.defineSingleValuedProperty("C", float[][].class, true);
-		myConfiguration.defineSingleValuedProperty("D", float[][].class, true);
-		myConfiguration.defineSingleValuedProperty("state", float[].class, true);
-		FixedCardinalityProperty p = new FixedCardinalityProperty(myConfiguration, "outputUnits", Units.class, true) {
-			@Override
-			public int getNumValues() {
-				return getOutputDimension();
-			}
-			@Override
-			public void doSetValue(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
-				
-			}
-		
-			@Override
-			public Object doGetValue(int index) throws StructuralException {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		
-		};
-		
 	}
 	
-	public static Configuration getConstructionTemplate() {
-		ConfigurationImpl result = new ConfigurationImpl(null);
-		result.defineTemplateProperty(INPUT_DIMENSION_PROPERTY, Integer.class, new Integer(1));
-		result.defineTemplateProperty(OUTPUT_DIMENSION_PROPERTY, Integer.class, new Integer(1));
-		result.defineTemplateProperty(STATE_DIMENSION_PROPERTY, Integer.class, new Integer(1));
-		return result;	
-	}
-	
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
 
 	//checks that matrices have the dimensions that form a valid state model 
 	private static void checkIsStateModel(float[][] A, float[][] B, float[][] C, float[][] D, float[] x) {

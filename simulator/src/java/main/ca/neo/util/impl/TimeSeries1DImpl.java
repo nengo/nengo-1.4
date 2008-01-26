@@ -4,13 +4,13 @@
 package ca.neo.util.impl;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 
 import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configuration;
-import ca.neo.config.Property;
+import ca.neo.config.SingleValuedProperty;
 import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.config.impl.SingleValuedPropertyImpl;
-import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.util.TimeSeries1D;
 
@@ -22,17 +22,11 @@ import ca.neo.util.TimeSeries1D;
 public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static final String LENGTH_PROPERTY = "length";
-	private static final String TIMES_PROPERTY = "times";
-	private static final String VALUES_PROPERTY = "values";
-	private static final String UNITS_PROPERTY = "units";
-	private static final String LABEL_PROPERTY = "label";	
 	
 	private float[] myTimes;
 	private float[] myValues;
 	private Units myUnits;
 	private String myLabel;
-	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param times @see ca.bpt.cn.util.TimeSeries#getTimes()
@@ -40,45 +34,6 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 	 * @param units @see ca.bpt.cn.util.TimeSeries#getUnits()
 	 */	 
 	public TimeSeries1DImpl(float[] times, float[] values, Units units) {
-		init(times, values, units);
-	}
-	
-	public TimeSeries1DImpl(Configuration properties) throws StructuralException {
-		if (properties.getPropertyNames().contains(LENGTH_PROPERTY)) { //from user
-			int length = ((Integer) ConfigUtil.get(properties, LENGTH_PROPERTY, Integer.class)).intValue();
-			init(new float[length], new float[length], Units.UNK);
-		} else { //from file
-			float[] times = ((float[]) ConfigUtil.get(properties, TIMES_PROPERTY, float[].class));
-			float[] values = ((float[]) ConfigUtil.get(properties, VALUES_PROPERTY, float[].class));					
-			Units units = (Units) ConfigUtil.get(properties, UNITS_PROPERTY, Units.class);
-			init(times, values, units);
-			String label = (String) ConfigUtil.get(properties, LABEL_PROPERTY, String.class);
-			setLabel(label);
-		}
-	}
-	
-	/**
-	 * @return Properties for contruction in UI
-	 */
-	public static Configuration getUserConstructionTemplate() {
-		ConfigurationImpl properties = new ConfigurationImpl(null);
-		properties.defineTemplateProperty(LENGTH_PROPERTY, Integer.class, new Integer(1));
-		return properties;
-	}
-	
-	/**
-	 * @return Properties for contruction from file 
-	 */
-	public static Configuration getConstructionTemplate() {
-		ConfigurationImpl properties = new ConfigurationImpl(null);
-		properties.defineTemplateProperty(TIMES_PROPERTY, float[].class, new float[0]);
-		properties.defineTemplateProperty(VALUES_PROPERTY, float[].class, new float[0]);
-		properties.defineTemplateProperty(UNITS_PROPERTY, Units.class, Units.UNK);
-		properties.defineTemplateProperty(LABEL_PROPERTY, String.class, "label");
-		return properties;
-	}
-	
-	private void init(float[] times, float[] values, Units units) {
 		if (times.length != values.length) {
 			throw new IllegalArgumentException(times.length + " times were given with " + values.length + " values");
 		}
@@ -87,52 +42,54 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 		this.myValues = values;
 		this.myUnits = units;
 		this.myLabel = "1";		
-		
-		myConfiguration = new ConfigurationImpl(this);
-		Property tp = new SingleValuedPropertyImpl(myConfiguration, TIMES_PROPERTY, float[].class, true) {
-			@Override
-			public void setValue(Object value) throws StructuralException {
-				setTimes((float[]) value);
-			}
-		};
-		myConfiguration.defineProperty(tp);
-
-		Property vp = new SingleValuedPropertyImpl(myConfiguration, VALUES_PROPERTY, float[].class, true) {
-			@Override
-			public void setValue(Object value) throws StructuralException {
-				setValues((float[]) value);
-			}
-			@Override
-			public Object getValue() {
-				return myValues;
-			}			
-		};
-		myConfiguration.defineProperty(vp);
-		
-		Property up = new SingleValuedPropertyImpl(myConfiguration, UNITS_PROPERTY, Units.class, true) {
-			@Override
-			public Object getValue() {
-				return getUnits1D();
-			}			
-		};
-		myConfiguration.defineProperty(up);
-		
-		Property lp = new SingleValuedPropertyImpl(myConfiguration, LABEL_PROPERTY, String.class, true) {
-			@Override
-			public Object getValue() {
-				return getLabels()[0];
-			}
-		};
-		myConfiguration.defineProperty(lp);
 	}
-
+	
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return Custom Configuration (to more cleanly handle properties in 1D) 
 	 */
 	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
+		ConfigurationImpl result = ConfigUtil.defaultConfiguration(this);
+		result.removeProperty("units");
+		result.removeProperty("units1D");
+		result.removeProperty("values");
+		result.removeProperty("values1D");
+		result.removeProperty("labels");
+		
+		try {
+			Method unitsGetter = this.getClass().getMethod("getUnits1D", new Class[0]);
+			Method unitsSetter = this.getClass().getMethod("setUnits", new Class[]{Units.class});
+			result.defineProperty(new SingleValuedPropertyImpl(result, "units", Units.class, unitsGetter, unitsSetter));
+			
+			Method valuesGetter = this.getClass().getMethod("getValues1D", new Class[0]);
+			result.defineProperty(new SingleValuedPropertyImpl(result, "values", float[].class, valuesGetter));
 
+			final Method labelGetter = this.getClass().getMethod("getLabels", new Class[0]);
+			Method labelSetter = this.getClass().getMethod("setLabel", new Class[]{String.class});
+			SingleValuedProperty labelProp = new SingleValuedPropertyImpl(result, "label", String.class, labelGetter, labelSetter) {
+
+				@Override
+				public Object getValue() {
+					Object result = null;
+					try {
+						Object configurable = getConfiguration().getConfigurable();
+						String[] labels = (String[]) labelGetter.invoke(configurable, new Object[0]);
+						result = labels[0];
+					} catch (Exception e) {
+						throw new RuntimeException("Can't get label value", e);
+					}
+					return result;
+				}
+				
+			};
+			result.defineProperty(labelProp);
+		} catch (SecurityException e) {
+			throw new RuntimeException("Can't access getter/setter -- this is a bug", e);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException("Can't access getter/setter -- this is a bug", e);
+		}
+		return result;
+	}
+	
 	/**
 	 * @see ca.neo.util.TimeSeries1D#getTimes()
 	 */
@@ -140,9 +97,9 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 		return myTimes;		
 	}
 	
-	private void setTimes(float[] times) {
-		myTimes = times;
-	}
+//	private void setTimes(float[] times) {
+//		myTimes = times;
+//	}
 
 	/**
 	 * @see ca.neo.util.TimeSeries1D#getValues1D()
@@ -178,9 +135,9 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 		return result;
 	}
 	
-	private void setValues(float[] values) {
-		myValues = values;
-	}
+//	private void setValues(float[] values) {
+//		myValues = values;
+//	}
 
 	/**
 	 * @see ca.neo.util.TimeSeries#getUnits()

@@ -22,5 +22,7 @@ public interface Configurable {
 	 * @return This Configurable's Configuration data 
 	 */
 	public Configuration getConfiguration();
+	
+//	public String foo();
 
 }

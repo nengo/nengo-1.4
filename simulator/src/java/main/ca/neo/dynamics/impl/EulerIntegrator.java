@@ -3,8 +3,6 @@
  */
 package ca.neo.dynamics.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.model.Units;
@@ -23,17 +21,16 @@ import ca.neo.util.impl.TimeSeriesImpl;
  */
 public class EulerIntegrator implements Integrator {
 
+	private static final long serialVersionUID = 1L;
+
 	//shrink factor to avoid possible very small step at end due to float comparison 
 	//TODO: solve this problem more robustly
 	private static final float SHRINK = .99999f; 
 	
 	private float h;
-	private ConfigurationImpl myConfiguration;
 	
 	public EulerIntegrator(float stepSize) {
 		h = stepSize;
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty("stepSize", Float.class, true);
 	}
 	
 	/**
@@ -43,13 +40,6 @@ public class EulerIntegrator implements Integrator {
 		this(.0001f);
 	}
 	
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	public float getStepSize() {
 		return h;
 	}

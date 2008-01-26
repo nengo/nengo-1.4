@@ -22,7 +22,7 @@ import java.io.Serializable;
  *    
  * @author Bryan Tripp
  */
-public interface Origin extends Serializable /*, Configurable*/ {
+public interface Origin extends Serializable {
 
 	/**
 	 * @return Name of this Origin (unique in the scope of a source of Origins, eg a Neuron or 

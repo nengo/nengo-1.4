@@ -9,7 +9,7 @@ import java.util.List;
 
 import ca.neo.config.Configuration;
 import ca.neo.config.impl.ConfigurationImpl;
-import ca.neo.config.impl.ListBasedProperty;
+//import ca.neo.config.impl.ListBasedProperty;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
@@ -71,28 +71,12 @@ public class NoiseFactory {
 		return new NoiseImplFunction(functions);
 	}
 	
-	private static class NoiseImplFunction implements Noise {
+	public static class NoiseImplFunction implements Noise {
 				
-//		private Function[] myFunctions;
 		private List<Function> myFunctions;
-		private ConfigurationImpl myConfiguration;
 		
 		public NoiseImplFunction(Function[] functions) {
 			myFunctions = Arrays.asList(functions);
-			myConfiguration = new ConfigurationImpl(this);
-			myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
-//			Property dimProp = new ConfigurationImpl.SingleValuedProperty(myConfiguration, DIMENSION_PROPERTY, Integer.class, true) {
-//				@Override
-//				public void setValue(int index, Object value) throws StructuralException {
-//					if (index == 0 && value instanceof Integer) {
-//						setDimension(((Integer) value).intValue());
-//					}
-//				}				
-//			};
-			myConfiguration.defineProperty(new ListBasedProperty(myConfiguration, "functions", Function.class, myFunctions));
-//			Property funProp = new ConfigurationImpl.MultiValuedProperty(myConfiguration, "functions", Function.class, true) {
-//				
-//			};
 		}
 
 		public NoiseImplFunction() {
@@ -100,25 +84,12 @@ public class NoiseFactory {
 		}
 		
 		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public Configuration getConfiguration() {
-			return myConfiguration;
-		}
-
-		/**
 		 * @see ca.neo.model.Noise#getDimension()
 		 */
 		public int getDimension() {
 			return myFunctions.size();
 		}
 		
-//		private void setDimension(int dimension) {
-//			Function[] f = new Function[dimension];
-//			System.arraycopy(myFunctions, 0, f, 0, Math.min(f.length, myFunctions.length));
-//			myFunctions = f;
-//		}
-
 		/**
 		 * @see ca.neo.model.Noise#getValues(float, float, float[])
 		 */
@@ -134,28 +105,14 @@ public class NoiseFactory {
 		
 	}
 	
-	private static class NoiseImplNull implements Noise {
+	public static class NoiseImplNull implements Noise {
 		
 		private int myDimension;
-		private ConfigurationImpl myConfiguration;
 		
 		public NoiseImplNull(int dimension) {
 			myDimension = dimension;
-			myConfiguration = new ConfigurationImpl(this);
-			myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, true);
 		}
 		
-		public NoiseImplNull() {
-			this(1);
-		}
-
-		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public Configuration getConfiguration() {
-			return myConfiguration;
-		}
-
 		/**
 		 * @see ca.neo.model.Noise#getDimension()
 		 */
@@ -190,7 +147,6 @@ public class NoiseFactory {
 		private float[] myLastRawNoise;
 		private float[] myCurrentRawNoise;
 		private Units[] myUnits;
-		private ConfigurationImpl myConfiguration;
 		
 		/**
 		 * @param frequency Frequency (in simulation time) with which new noise values are drawn from the PDF
@@ -211,24 +167,12 @@ public class NoiseFactory {
 			myDynamics = dynamics;		
 			myIntegrator = integrator;
 			
-			myConfiguration = new ConfigurationImpl(this);
-			myConfiguration.defineSingleValuedProperty("frequency", Float.class, true);
-			myConfiguration.defineSingleValuedProperty("PDF", PDF.class, true);
-			myConfiguration.defineSingleValuedProperty("dynamics", DynamicalSystem.class, true);
-			myConfiguration.defineSingleValuedProperty("integrator", Integrator.class, true);
 		}
 		
 		public NoiseImplPDF() {
 			this(1, new GaussianPDF(0, 1), null, null);
 		}
 		
-		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public Configuration getConfiguration() {
-			return myConfiguration;
-		}
-
 		public float getFrequency() {
 			return 1f /myPeriod;
 		}

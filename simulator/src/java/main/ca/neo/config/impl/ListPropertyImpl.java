@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configuration;
 import ca.neo.config.JavaSourceParser;
 import ca.neo.config.ListProperty;
@@ -62,7 +63,8 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 		
 		String uname = Character.toUpperCase(name.charAt(0)) + name.substring(1);
 		String[] getterNames = new String[]{"get"+uname};
-		String[] setterNames = new String[]{"set"+uname};
+		String[] setterNames = new String[]{"set"+uname, 
+				"set"+ConfigUtil.stripSuffix(uname, "s"), "set"+ConfigUtil.stripSuffix(uname, "es")};
 		String[] countGetterNames = new String[]{"getNum"+uname, "getNum"+uname+"s", "get"+uname+"Count"};
 		String[] arrayGetterNames = new String[]{"get"+uname, "get"+uname+"s", "get"+uname+"Array", "getAll"+uname};
 		String[] arraySetterNames = new String[]{"set"+uname, "set"+uname+"s", "set"+uname+"Array", "setAll"+uname};

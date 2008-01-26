@@ -3,11 +3,7 @@
  */
 package ca.neo.model.plasticity.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.math.impl.ConstantFunction;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SpikeOutput;
@@ -37,8 +33,6 @@ public class SpikePlasticityRule implements PlasticityRule {
 	private boolean[] myOutSpiking;
 	private float myModInput;
 	
-	private ConfigurationImpl myConfiguration;
-
 	/**
 	 * @param origin Name of Origin from which post-synaptic activity is drawn
 	 * @param modTerm Name of the Termination from which modulatory input is drawn (can be null if not used)
@@ -61,21 +55,8 @@ public class SpikePlasticityRule implements PlasticityRule {
 	
 		setTermDim(termDim);
 		setOriginDim(originDim);
-		
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
-	}
-	
-	public SpikePlasticityRule() {
-		this(null, null, 0, new ConstantFunction(3, 0), new ConstantFunction(3, 0), 1, 1);
 	}
 
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
 	/**
 	 * @return Name of Origin from which post-synaptic activity is drawn
 	 */

@@ -5,8 +5,6 @@ package ca.neo.dynamics.impl;
 
 import org.apache.log4j.Logger;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.model.Units;
@@ -30,6 +28,8 @@ import ca.neo.util.impl.TimeSeriesImpl;
  */
 public class RK45Integrator implements Integrator {
 	
+	private static final long serialVersionUID = 1L;
+
 	private static Logger ourLogger = Logger.getLogger(RK45Integrator.class);
 	
 	//The Dormand-Prince 4(5) coefficients:
@@ -52,15 +52,12 @@ public class RK45Integrator implements Integrator {
     //  Society for Industrial and Applied Mathematics (SIAM), Philadelphia, 1998
     private double myPow = 1f/6f; 
     private float myTolerance;
-    private ConfigurationImpl myConfiguration;
     
     /**
      * @param tolerance Error tolerance
      */
     public RK45Integrator(float tolerance) {
     	myTolerance = tolerance;
-    	myConfiguration = new ConfigurationImpl(this);
-    	myConfiguration.defineSingleValuedProperty("tolerance", Float.class, true);
     }
     
     /**
@@ -70,13 +67,6 @@ public class RK45Integrator implements Integrator {
     	this(1e-6f);
     }
     
-    /**
-     * @see ca.neo.config.Configurable#getConfiguration()
-     */
-    public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
      * @return Error tolerance
      */

@@ -36,7 +36,6 @@ public class CompositePlasticityRule implements PlasticityRule {
 	private PlasticityRule myRealRule;
 	private Map<String, InstantaneousOutput> myOriginStates;
 	private Map<String, InstantaneousOutput> myTerminationStates;
-	private Configuration myConfiguration;
 	
 	/**
 	 * @param spikeRule Rule to use when both inputs and outputs are spiking
@@ -47,21 +46,15 @@ public class CompositePlasticityRule implements PlasticityRule {
 		myRealRule = realRule;
 		myOriginStates = new HashMap<String, InstantaneousOutput>(10);
 		myTerminationStates = new HashMap<String, InstantaneousOutput>(10);
-		
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
+	/**
+	 * Defaults to <code>NullRule</code>s.
+	 */
 	public CompositePlasticityRule() {
 		this(new NullRule(), new NullRule());
 	}
 	
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @return Rule to use when both inputs and outputs are spiking
 	 */
@@ -141,8 +134,6 @@ public class CompositePlasticityRule implements PlasticityRule {
 	 */
 	public static class NullRule implements PlasticityRule {
 		
-		private Configuration myConfiguration = new ConfigurationImpl(this);		
-
 		/**
 		 * @return A zero matrix the same size as the given transform
 		 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.neo.model.InstantaneousOutput, float)
@@ -153,13 +144,6 @@ public class CompositePlasticityRule implements PlasticityRule {
 				result[i] = new float[transform[i].length];
 			}
 			return result;
-		}
-
-		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public Configuration getConfiguration() {
-			return myConfiguration;
 		}
 
 		/**

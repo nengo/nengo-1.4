@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.config.impl.ListPropertyImpl;
 import ca.neo.config.impl.NamedValuePropertyImpl;
+import ca.neo.config.impl.SingleValuedPropertyImpl;
 import ca.neo.model.StructuralException;
 
 /**
@@ -97,9 +98,10 @@ public class ConfigUtil {
 					&& !methods[i].getName().equals("getConfiguration")
 					&& !isCounter(methods[i])) {
 				
-				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType); 
-				boolean mutable = hasSetter(configurable, methods[i].getName(), returnType);
-				result.defineSingleValuedProperty(propName, returnTypeWrapped, mutable);				
+//				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType); 
+//				boolean mutable = hasSetter(configurable, methods[i].getName(), returnType);
+//				result.defineSingleValuedProperty(propName, returnTypeWrapped, mutable);	
+				result.defineSingleValuedProperty(propName, returnType, false);
 			} else if (isIndexedGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
 				Property p = ListPropertyImpl.getListProperty(result, propName, returnType);
 				if (p != null) result.defineProperty(p);					
@@ -119,7 +121,10 @@ public class ConfigUtil {
 					&& !result.getPropertyNames().contains(stripSuffix(propName, "es"))) {
 				
 				Property p = null;
-				if (returnType instanceof Class && ((Class) returnType).isArray()) {
+				if (returnType instanceof Class && MainHandler.getInstance().canHandle((Class) returnType)) {
+					p = SingleValuedPropertyImpl.getSingleValuedProperty(result, propName, (Class) returnType);
+//					p = new SingleValuedPropertyImpl(result, propName, (Class) returnType, hasSetter(configurable, methods[i].getName(), (Class) returnType));
+				} else if (returnType instanceof Class && ((Class) returnType).isArray()) {
 					p = ListPropertyImpl.getListProperty(result, propName, ((Class) returnType).getComponentType());
 				} else if (returnType instanceof ParameterizedType) {
 					Type rawType = ((ParameterizedType) returnType).getRawType();
@@ -177,7 +182,12 @@ public class ConfigUtil {
 		return result.length() > 0 ? Character.toLowerCase(result.charAt(0)) + result.substring(1) : "";
 	}
 	
-	private static String stripSuffix(String s, String suffix) {
+	/**
+	 * @param s A String
+	 * @param suffix Something that the string might end with
+	 * @return The string with the given suffix removed (if it was there)
+	 */
+	public static String stripSuffix(String s, String suffix) {
 		if (s.endsWith(suffix)) {
 			return s.substring(0, s.length() - suffix.length());
 		} else {

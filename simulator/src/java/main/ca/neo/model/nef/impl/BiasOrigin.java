@@ -237,22 +237,11 @@ public class BiasOrigin extends DecodedOrigin {
 		private VectorGenerator myVG;
 		private int myDim;
 		private float myBias;
-		private Configuration myConfiguration;
 		
 		public BiasedVG(VectorGenerator vg, int dim, float bias) {
 			myVG = vg;
 			myDim = dim;
 			myBias = bias;
-			
-			// this can be empty because it's never configured (only contructed locally)
-			myConfiguration = new ConfigurationImpl(this); 
-		}
-
-		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public Configuration getConfiguration() {
-			return myConfiguration;
 		}
 
 		/**

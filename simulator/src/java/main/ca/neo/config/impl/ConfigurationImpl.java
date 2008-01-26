@@ -61,8 +61,9 @@ public class ConfigurationImpl implements Configuration {
 		myPropertyNames.remove(name);
 	}
 	
-	public SingleValuedPropertyImpl defineSingleValuedProperty(String name, Class c, boolean mutable) {		
-		SingleValuedPropertyImpl property = new SingleValuedPropertyImpl(this, name, c, mutable);
+	public SingleValuedPropertyImpl defineSingleValuedProperty(String name, Class c, boolean mutable) {				
+		SingleValuedPropertyImpl property 
+			= (SingleValuedPropertyImpl) SingleValuedPropertyImpl.getSingleValuedProperty(this, name, c);
 		defineProperty(property);
 		return property;
 	}

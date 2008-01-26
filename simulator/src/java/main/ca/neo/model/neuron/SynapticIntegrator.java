@@ -22,7 +22,7 @@ import ca.neo.util.TimeSeries1D;
  * 
  * @author Bryan Tripp
  */
-public interface SynapticIntegrator extends Resettable, Serializable, Configurable {
+public interface SynapticIntegrator extends Resettable, Serializable {
 	
 	/**
 	 * @return List of distinct inputs (eg sets of synapses from different ensembles).    

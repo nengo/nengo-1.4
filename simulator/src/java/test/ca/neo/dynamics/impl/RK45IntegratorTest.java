@@ -4,8 +4,6 @@
 package ca.neo.dynamics.impl;
 
 import ca.neo.TestUtil;
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.dynamics.Integrator;
 import ca.neo.model.Units;
 //import ca.neo.plot.Plotter;
@@ -49,24 +47,15 @@ public class RK45IntegratorTest extends TestCase {
 	public static class VanderPol extends AbstractDynamicalSystem {
 
 		private static final long serialVersionUID = 1L;
-		private Configuration myConfiguration;
 
 		public VanderPol(float[] state) {
 			super(state);
-			myConfiguration = new ConfigurationImpl(this);
 		}
 		
 		public VanderPol() {
 			this(new float[2]);
 		}
 		
-		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public Configuration getConfiguration() {
-			return myConfiguration;
-		}
-
 		public float[] f(float t, float[] u) {
 			float[] x = getState();
 			float epsilon = 0.3f;

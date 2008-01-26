@@ -52,33 +52,19 @@ public class ProjectionImplTest extends TestCase {
 		assertEquals(myTermination, myProjection.getTermination());
 	}
 	
-	public static class MockOrigin implements Origin, Configurable {
+	public static class MockOrigin implements Origin {
 
 		private static final long serialVersionUID = 1L;
 		
 		private String myName;
 		private int myDimensions;
-		private ca.neo.config.Configuration myConfiguration;
 		
 		public MockOrigin(String name, int dimensions) {
 			myName = name;
 			myDimensions = dimensions;
 			
-			myConfiguration = ConfigUtil.defaultConfiguration(this);
-			((ConfigurationImpl) myConfiguration).removeProperty("node");
 		}
 		
-		public MockOrigin() {
-			this("mock", 1);
-		}
-
-		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public ca.neo.config.Configuration getConfiguration() {
-			return myConfiguration;
-		}
-
 		public String getName() {
 			return myName;
 		}

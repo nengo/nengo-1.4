@@ -1,6 +1,16 @@
 TODO NOW: 
+- clean up functions, VectorGenerator
+- configuration: for private classes, look for method declaration on public interfaces (eg NoiseFactory); see http://forums.bea.com/thread.jspa?threadID=600004396
+- events for Shu
+- constructor args not appearing for LTISystem (eg NoiseImplDF)
+- make config initialization and factory for UI
+- DONE fix SingleValuedProperty
+
+TODO: 
 - do something about units in relationship between synapticintegrator output and spikegenerator input
 - clean up musculoskeletal code
+
+TODO OLD: 
 - NO unify linear terminations at SynapticIntegrator and NEFEnsemble levels 
 - DONE spike-based learning 
 - DONE revisit LinearSynapticIntegrator (particularly network timestep-period cycles with rate input)
@@ -9,9 +19,6 @@ TODO NOW:
 - DONE documentation wrappers 
 - DONE UI flag for plots
 - DONE metadata for networks
-- events?
-
-TODO OLD: 
 - DONE use cases for Shu
 - DONE allow decoding of arbitrary outputs in NEFEnsembleImpl and DecodedOrigin
 - DONE document and implement NEFEnsembleFactory, remove old EnsembleFactory

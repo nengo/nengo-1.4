@@ -3,7 +3,6 @@
  */
 package ca.neo.model.plasticity;
 
-import ca.neo.config.Configurable;
 import ca.neo.model.InstantaneousOutput;
 
 /**
@@ -14,7 +13,7 @@ import ca.neo.model.InstantaneousOutput;
  * 
  * @author Bryan Tripp
  */
-public interface PlasticityRule extends Configurable {
+public interface PlasticityRule {
 	
 	/**
 	 * Provides potentially modulatory input to the rule.

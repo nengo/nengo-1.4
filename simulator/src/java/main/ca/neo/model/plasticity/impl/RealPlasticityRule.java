@@ -3,10 +3,7 @@
  */
 package ca.neo.model.plasticity.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.math.impl.ConstantFunction;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.RealOutput;
 import ca.neo.model.plasticity.PlasticityRule;
@@ -34,8 +31,6 @@ public class RealPlasticityRule implements PlasticityRule {
 	private float myModInput;
 	private float[] myOriginState;	
 	
-	private ConfigurationImpl myConfiguration;
-	
 	/**
 	 * @param modTermName Name of the Termination from which modulatory input is drawn (can be null if not used)
 	 * @param modTermDim Dimension index of the modulatory input within above Termination 
@@ -50,26 +45,6 @@ public class RealPlasticityRule implements PlasticityRule {
 		setModTermDim(modTermDim);
 		setFunction(function);
 		setOriginName(originName);
-		
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty("modTermName", String.class, true);
-		myConfiguration.defineSingleValuedProperty("modTermDim", Integer.class, true);
-		myConfiguration.defineSingleValuedProperty("function", Function.class, true);
-		myConfiguration.defineSingleValuedProperty("originName", String.class, true);
-	}
-
-	/**
-	 * Uses null defaults, allowing setting of properties after construction
-	 */
-	public RealPlasticityRule() {
-		this(null, 0, new ConstantFunction(4, 0), null);
-	}
-	
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
 	}
 
 	/**

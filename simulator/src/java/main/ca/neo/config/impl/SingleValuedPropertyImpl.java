@@ -1,6 +1,5 @@
 package ca.neo.config.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import ca.neo.config.Configuration;
@@ -15,10 +14,63 @@ import ca.neo.model.StructuralException;
  */
 public class SingleValuedPropertyImpl extends AbstractProperty implements SingleValuedProperty {
 	
-	public SingleValuedPropertyImpl(Configuration configuration, String name, Class c, boolean mutable) {
-		super(configuration, name, c, mutable);
+	private Method myGetter;
+	private Method mySetter;
+
+	/**
+	 * @param configuration Configuration to which this Property belongs
+	 * @param name Parameter name
+	 * @param c Parameter type
+	 * @return Property or null if the necessary methods don't exist on the underlying class  
+	 */
+	public static SingleValuedProperty getSingleValuedProperty(Configuration configuration, String name, Class type) {
+		SingleValuedPropertyImpl result = null;
+		Class targetClass = configuration.getConfigurable().getClass();
+		
+		String uname = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+		String[] getterNames = new String[]{"get"+uname};
+		String[] setterNames = new String[]{"set"+uname}; 
+
+		Method getter = ListPropertyImpl.getMethod(targetClass, getterNames, new Class[0], type);
+		Method setter = ListPropertyImpl.getMethod(targetClass, setterNames, new Class[]{type}, null);
+
+		if (getter != null && setter != null) {
+			result = new SingleValuedPropertyImpl(configuration, name, type, getter, setter);
+		} else if (getter != null) {
+			result = new SingleValuedPropertyImpl(configuration, name, type, getter);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Constructor for immutable single-valued properties. 
+	 * 
+	 * @param configuration Configuration to which this Property belongs
+	 * @param name Parameter name
+	 * @param c Parameter type
+	 * @param getter Zero-arg getter method
+	 */
+	public SingleValuedPropertyImpl(Configuration configuration, String name, Class c, Method getter) {
+		super(configuration, name, c, false);
+		myGetter = getter;
 	}
 
+	/**
+	 * Constructor for mutable single-valued properties. 
+	 * 
+	 * @param configuration Configuration to which this Property belongs
+	 * @param name Parameter name
+	 * @param c Parameter type
+	 * @param getter Zero-arg getter method
+	 * @param setter Single-arg setter method
+	 */
+	public SingleValuedPropertyImpl(Configuration configuration, String name, Class c, Method getter, Method setter) {
+		super(configuration, name, c, true);
+		myGetter = getter;
+		mySetter = setter;
+	}
+	
 	/**
 	 * @see ca.neo.config.Property#getValue()
 	 */
@@ -26,46 +78,15 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 		Object result = null;
 		
 		Object configurable = getConfiguration().getConfigurable();
-		Method getter = getGetter();
-		if (getter != null) {
-			try {
-				result = getter.invoke(configurable, new Object[0]);
-			} catch (Exception e) {
-				throw new RuntimeException("Can't get property", e);
-			}
-		}
-		
-		return result;
-//		Object result = null;
-//		
-//		Object o = getConfiguration().getConfigurable();
-//		String methodName = "get" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
-//		
-//		try {
-//			Method method = o.getClass().getMethod(methodName, new Class[0]);
-//			result = method.invoke(o, new Object[0]);
-//		} catch (Exception e) {
-//			throw new RuntimeException("Can't get property", e);
-//		}
-//		
-//		return result; 
-	}
-	
-	private Method getGetter() {
-		Method result = null;
-		
-		Object o = getConfiguration().getConfigurable();
-		String methodName = "get" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
-		
 		try {
-			result = o.getClass().getMethod(methodName, new Class[0]);
+			result = myGetter.invoke(configurable, new Object[0]);
 		} catch (Exception e) {
 			throw new RuntimeException("Can't get property", e);
 		}
-
+		
 		return result;
 	}
-
+	
 	/**
 	 * @see ca.neo.config.Property#isFixedCardinality()
 	 */
@@ -81,31 +102,12 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	 * @see ca.neo.config.Property#setValue(java.lang.Object)
 	 */
 	public void setValue(Object value) throws StructuralException {
-		if (getType().isAssignableFrom(value.getClass())) {
-			Object o = getConfiguration().getConfigurable();
-			String methodName = "set" + Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
-			Class argClass = getType();
-			//TODO: use handlers? support other primitives?
-			if (argClass.equals(Integer.class)) {
-				argClass = Integer.TYPE;
-			} else if (argClass.equals(Float.class)) {
-				argClass = Float.TYPE;					
-			} else if (argClass.equals(Boolean.class)) {
-				argClass = Boolean.TYPE;					
-			}
-			
-			try {
-				Method method = o.getClass().getMethod(methodName, new Class[]{argClass});
-				method.invoke(o, value);
-			} catch (Exception e) {
-				Throwable t = e;
-				if (t instanceof InvocationTargetException) {
-					t = ((InvocationTargetException) t).getCause();
-				}
-				throw new StructuralException("Can't change property: " + t.getMessage(), t);
-			}
-		} else {
-			throw new StructuralException("Value must be of class " + getType().getName());
+		Object configurable = getConfiguration().getConfigurable();
+		
+		try {
+			mySetter.invoke(configurable, new Object[]{value});
+		} catch (Exception e) {
+			throw new RuntimeException("Can't set property", e);
 		}
 	}
 
@@ -115,7 +117,8 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 		
 		if (result == null) {
 			StringBuffer buf = new StringBuffer("<h1>API methods underlying property <i>" + getName() + "</i></h1>");
-			appendDocs(buf, getGetter());
+			appendDocs(buf, myGetter);
+			appendDocs(buf, mySetter);
 			result = buf.toString();
 		}
 			
