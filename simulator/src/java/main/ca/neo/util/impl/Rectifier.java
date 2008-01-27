@@ -11,15 +11,12 @@ import ca.neo.util.VectorGenerator;
  * Wraps an underlying VectorGenerator, rectifying generated vectors before 
  * they are returned. 
  * 
- * TODO: docs, reconsider default for no-arg constructor
- * 
  * @author Bryan Tripp
  */
 public class Rectifier implements VectorGenerator {
 
 	private VectorGenerator myVG;
 	private boolean myPositiveFlag = true;
-	private Configuration myConfiguration;
 	
 	/**
 	 * @param vg A VectorGenerator to underlie this one (ie to produce non-rectified vectors)
@@ -35,32 +32,33 @@ public class Rectifier implements VectorGenerator {
 	public Rectifier(VectorGenerator vg, boolean positive) {
 		myVG = vg;
 		myPositiveFlag = positive; 
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
-	}
-	
-	public Rectifier() {
-		this(new RandomHypersphereVG(), true);
 	}
 	
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return Underlying vector generator (output of which is rectified)
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
 	public VectorGenerator getRectified() {
 		return myVG;
 	}
 	
+	/**
+	 * 
+	 * @param vg New underlying vector generator (output of which is to be rectified)
+	 */
 	public void setRectified(VectorGenerator vg) {
 		myVG = vg;
 	}
-	
+
+	/**
+	 * @return True if values are rectified to be >= 0; false if rectified to <= 0 
+	 */
 	public boolean getPositive() {
 		return myPositiveFlag;
 	}
 	
+	/**
+	 * @param positive True if values are rectified to be >= 0; false if rectified to <= 0
+	 */
 	public void setPositive(boolean positive) {
 		myPositiveFlag = positive;
 	}

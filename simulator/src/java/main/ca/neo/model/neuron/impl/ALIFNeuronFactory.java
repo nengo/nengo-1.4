@@ -5,8 +5,6 @@ package ca.neo.model.neuron.impl;
 
 import org.apache.log4j.Logger;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.PDF;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.model.Node;
@@ -35,12 +33,10 @@ public class ALIFNeuronFactory implements NodeFactory {
 	private float myTauRC;
 	private float myTauN;
 	
-	private Configuration myConfiguration;
-	
 	/**
 	 * @param maxRate Maximum firing rate distribution (spikes/s)  
 	 * @param intercept Level of summed input at which spiking begins (arbitrary current units) 
-	 * @param incN Increment of adaptation-related ion concentration with each spike(arbitrary units)
+	 * @param incN Increment of adaptation-related ion concentration with each spike (arbitrary units)
 	 * @param tauRef Spike generator refractory time (s)
 	 * @param tauRC Spike generator membrane time constant (s)  
 	 * @param tauN Time constant of adaptation-related ion decay (s)
@@ -52,7 +48,6 @@ public class ALIFNeuronFactory implements NodeFactory {
 		myTauRef = tauRef;
 		myTauRC = tauRC;
 		myTauN = tauN;
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	/**
@@ -63,56 +58,85 @@ public class ALIFNeuronFactory implements NodeFactory {
 	}
 
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return Maximum firing rate distribution (spikes/s)
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	public PDF getMaxRate() {
 		return myMaxRate;
 	}
 	
+	/**
+	 * @param maxRate Maximum firing rate distribution (spikes/s)
+	 */
 	public void setMaxRate(PDF maxRate) {
 		myMaxRate = maxRate;
 	}
 	
+	/**
+	 * @return Level of summed input at which spiking begins (arbitrary current units)
+	 */
 	public PDF getIntercept() {
 		return myIntercept;
 	}
 	
+	/**
+	 * @param intercept Level of summed input at which spiking begins (arbitrary current units)
+	 */
 	public void setIntercept(PDF intercept) {
 		myIntercept = intercept;
 	}
-	
+
+	/**
+	 * @return Increment of adaptation-related ion concentration with each spike (arbitrary units) 
+	 */
 	public PDF getIncN() {
 		return myIncN;
 	}
 	
+	/**
+	 * @param incN Increment of adaptation-related ion concentration with each spike (arbitrary units)
+	 */
 	public void setIncN(PDF incN) {
 		myIncN = incN;
 	}
 	
+	/**
+	 * @return Spike generator refractory time (s)
+	 */
 	public float getTauRef() {
 		return myTauRef;
 	}
 	
+	/**
+	 * @param tauRef Spike generator refractory time (s) 
+	 */
 	public void setTauRef(float tauRef) {
 		myTauRef = tauRef;
 	}
 
+	/**
+	 * @return Spike generator membrane time constant (s)  
+	 */
 	public float getTauRC() {
 		return myTauRC;
 	}
-	
+
+	/**
+	 * @param tauRC Spike generator membrane time constant (s)  
+	 */
 	public void setTauRC(float tauRC) {
 		myTauRC = tauRC;
 	}
 
+	/**
+	 * @return Time constant of adaptation-related ion decay (s)
+	 */
 	public float getTauN() {
 		return myTauN;
 	}
 	
+	/**
+	 * @param tauN Time constant of adaptation-related ion decay (s)
+	 */
 	public void setTauN(float tauN) {
 		myTauN = tauN;
 	}

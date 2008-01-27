@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
 
 /**
@@ -17,12 +15,8 @@ public class IdentityFunction implements Function {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
-	public static final String INDEX_PROPERTY = "identityDimension";
-	
 	private int myDimension;
 	private int myIdentityDimension;
-	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param dimension Dimension of input vector  
@@ -32,25 +26,14 @@ public class IdentityFunction implements Function {
 	public IdentityFunction(int dimension, int i) {
 		setDimension(dimension);
 		setIdentityDimension(i);
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, true);
-		myConfiguration.defineSingleValuedProperty(INDEX_PROPERTY, Integer.class, true);
 	}
 	
 	/**
-	 * Instantiates with default of one dimension. 
+	 * Defaults to one dimension. 
 	 */
 	public IdentityFunction() {
 		this(1, 0);
 	}
-
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @see ca.neo.math.Function#getDimension()
 	 */
@@ -64,6 +47,10 @@ public class IdentityFunction implements Function {
 	public void setDimension(int dimension) {
 		if (dimension <= 0) {
 			throw new IllegalArgumentException("Dimension must be a +ve integer");
+		}
+		if (dimension <= myIdentityDimension) {
+			throw new IllegalArgumentException("Can't have dimension " + dimension 
+					+ " with index of identity dimension set to " + myIdentityDimension);
 		}
 		myDimension = dimension;
 	}

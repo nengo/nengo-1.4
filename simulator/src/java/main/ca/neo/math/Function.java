@@ -5,8 +5,6 @@ package ca.neo.math;
 
 import java.io.Serializable;
 
-import ca.neo.config.Configurable;
-
 /**
  * <p>A mathematical function from an n-D space to a 1-D space. For simplicity we always 
  * map to a 1-D space, and model maps to n-D spaces with n Functions.</p>
@@ -16,7 +14,7 @@ import ca.neo.config.Configurable;
  *  
  * @author Bryan Tripp
  */
-public interface Function extends Serializable, Configurable {
+public interface Function extends Serializable {
 	
 	/**
 	 * @return Dimension of the space that the Function maps from 

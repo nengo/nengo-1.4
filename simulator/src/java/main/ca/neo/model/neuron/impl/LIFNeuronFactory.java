@@ -5,8 +5,6 @@ package ca.neo.model.neuron.impl;
 
 import org.apache.log4j.Logger;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.PDF;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.model.StructuralException;
@@ -29,7 +27,6 @@ public class LIFNeuronFactory implements NodeFactory {
 	private float myTauRef;
 	private PDF myMaxRate;
 	private PDF myIntercept;
-	private Configuration myConfiguration;
 	
 	private static float ourMaxTimeStep = .00025f;
 	private static Units ourCurrentUnits = Units.ACU;
@@ -45,7 +42,6 @@ public class LIFNeuronFactory implements NodeFactory {
 		myTauRef = tauRef;
 		myMaxRate = maxRate;
 		myIntercept = intercept;
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	/**
@@ -56,40 +52,57 @@ public class LIFNeuronFactory implements NodeFactory {
 	}
 	
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return Spike generator refractory time (s)
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
 	public float getTauRef() {
 		return myTauRef;
 	}
 	
+	/**
+	 * @param tauRef Spike generator refractory time (s)
+	 */
 	public void setTauRef(float tauRef) {
 		myTauRef = tauRef;
 	}
-	
+
+	/**
+	 * @return Spike generator membrane time constant (s)  
+	 */
 	public float getTauRC() {
 		return myTauRC;
 	}
 	
+	/**
+	 * @param tauRC Spike generator membrane time constant (s)  
+	 */
 	public void setTauRC(float tauRC) {
 		myTauRC = tauRC;
 	}
 	
+	/**
+	 * @return Maximum firing rate distribution (spikes/s) 
+	 */
 	public PDF getMaxRate() {
 		return myMaxRate;
 	}
 	
+	/**
+	 * @param maxRate Maximum firing rate distribution (spikes/s) 
+	 */
 	public void setMaxRate(PDF maxRate) {
 		myMaxRate = maxRate;
 	}
 
+	/**
+	 * @return Level of summed input at which spiking begins (arbitrary current units)
+	 */
 	public PDF getIntercept() {
 		return myIntercept;
 	}
 	
+	/**
+	 * @param intercept Level of summed input at which spiking begins (arbitrary current units)
+	 */
 	public void setIntercept(PDF intercept) {
 		myIntercept = intercept;
 	}

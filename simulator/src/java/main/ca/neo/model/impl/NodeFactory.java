@@ -3,7 +3,6 @@
  */
 package ca.neo.model.impl;
 
-import ca.neo.config.Configurable;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 
@@ -14,7 +13,7 @@ import ca.neo.model.StructuralException;
  * 
  * @author Bryan Tripp
  */
-public interface NodeFactory extends Configurable {
+public interface NodeFactory {
 
 	/**
 	 * @param name The name of the Node (unique within containing Ensemble or Network)

@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
 import ca.neo.math.FunctionInterpreter;
 
@@ -190,32 +188,42 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		private int myDimension;
 		private boolean myRightAssociative;
 		private int myPrecendence;
-		private ConfigurationImpl myConfiguration;
 		
+		/**
+		 * @param dimension Dimension of the space that the Function maps from 
+		 * @param rightAssociative Evaluated from the right (eg exponent operator)
+		 * @param precedence A code indicating operator precedence relative to other operators
+		 */
 		public AbstractOperator(int dimension, boolean rightAssociative, int precedence) {
 			myDimension = dimension;
 			myRightAssociative = rightAssociative;
 			myPrecendence = precedence;
-			myConfiguration = new ConfigurationImpl(this);
-			//TODO: add immutable properties
-		}
-		
-		public Configuration getConfiguration() {
-			return myConfiguration;
 		}
 
+		/**
+		 * @see ca.neo.math.Function#getDimension()
+		 */
 		public int getDimension() {
 			return myDimension;
 		}
-		
+
+		/**
+		 * @return True if right-associative (evaluated from the right; eg exponent operator)
+		 */
 		public boolean isRightAssociative() {
 			return myRightAssociative;
 		}
 		
+		/**
+		 * @return A code indicating operator precedence relative to other operators
+		 */
 		public int getPrecedence() {
 			return myPrecendence;
 		}
 
+		/**
+		 * @see ca.neo.math.Function#multiMap(float[][])
+		 */
 		public float[] multiMap(float[][] from) {
 			float[] result = new float[from.length];
 			

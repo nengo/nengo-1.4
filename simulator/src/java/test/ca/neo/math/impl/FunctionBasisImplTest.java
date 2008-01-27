@@ -55,10 +55,6 @@ public class FunctionBasisImplTest extends TestCase {
 			myConstantResult = constantResult;
 		}
 		
-		public Configuration getConfiguration() {
-			return null;
-		}
-
 		public int getDimension() {
 			return 1;
 		}

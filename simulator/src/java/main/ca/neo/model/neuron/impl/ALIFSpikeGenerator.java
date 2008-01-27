@@ -5,8 +5,6 @@ package ca.neo.model.neuron.impl;
 
 import java.util.Properties;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 import ca.neo.math.RootFinder;
 import ca.neo.math.impl.AbstractFunction;
@@ -27,7 +25,6 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.SpikeGenerator;
-import ca.neo.model.neuron.SynapticIntegrator;
 import ca.neo.plot.Plotter;
 import ca.neo.util.Probe;
 import ca.neo.util.TimeSeries;
@@ -76,8 +73,6 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 	private float[] myNHistory;
 	private float[] myRateHistory;
 	
-	private Configuration myConfiguration;
-	
 	private static final float[] ourNullTime = new float[0]; 
 	private static final float[] ourNullVHistory = new float[0];	
 	private static final float[] ourNullNHistory = new float[0];	
@@ -101,45 +96,61 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myTauRC = tauRC;
 		myTauN = tauN;
 		setIncN(incN);
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 		reset(false);
 	}
 
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return Refracory period (s)
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	public float getTauRef() {
 		return myTauRef;
 	}
 	
+	/**
+	 * @param tauRef Refracory period (s)
+	 */
 	public void setTauRef(float tauRef) {
 		myTauRef = tauRef;
 	}
-	
+
+	/**
+	 * @return Resistive-capacitive time constant (s) 
+	 */
 	public float getTauRC() {
 		return myTauRC;
 	}
-	
+
+	/**
+	 * @param tauRC Resistive-capacitive time constant (s) 
+	 */
 	public void setTauRC(float tauRC) {
 		myTauRC = tauRC;
 	}
-	
+
+	/**
+	 * @return Time constant of adaptation-related ion
+	 */
 	public float getTauN() {
 		return myTauN;
 	}
-	
+
+	/**
+	 * @param tauN Time constant of adaptation-related ion
+	 */
 	public void setTauN(float tauN) {
 		myTauN = tauN;
 	}
-	
+
+	/**
+	 * @return Increment of adaptation-related ion with each spike
+	 */
 	public float getIncN() {
 		return myIncN;
 	}
-	
+
+	/**
+	 * @param incN Increment of adaptation-related ion with each spike
+	 */
 	public void setIncN(float incN) {
 		myIncN = Math.max(0, incN); //TODO: rethink this (prevents potentiation)
 	}

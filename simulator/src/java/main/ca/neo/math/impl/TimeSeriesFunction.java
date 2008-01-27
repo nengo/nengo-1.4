@@ -38,12 +38,8 @@ public class TimeSeriesFunction extends AbstractFunction {
 	 */
 	public TimeSeriesFunction(TimeSeries series, int dimension) {
 		super(1);
-		myDimension = dimension;
 		setTimeSeries(series);
-	}
-	
-	public TimeSeriesFunction() {
-		this(new TimeSeries1DImpl(new float[0], new float[0], Units.UNK), 0);
+		setSeriesDimension(dimension);
 	}
 	
 	/**
@@ -72,6 +68,9 @@ public class TimeSeriesFunction extends AbstractFunction {
 	 * @param dim Dimension of series on which to base Function output
 	 */
 	public void setSeriesDimension(int dim) {
+		if (dim < 0 || dim >= myTimeSeries.getDimension()) {
+			throw new IllegalArgumentException("Dimension must be between 0 and " + (myTimeSeries.getDimension() -1));
+		}
 		myDimension = dim;
 	}
 

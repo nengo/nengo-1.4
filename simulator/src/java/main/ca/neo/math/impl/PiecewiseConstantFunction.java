@@ -7,6 +7,8 @@ import java.util.Arrays;
 
 import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.SingleValuedPropertyImpl;
 import ca.neo.math.Function;
 import ca.neo.plot.Plotter;
 
@@ -44,8 +46,13 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 		setValues(values);
 	}
 	
-	public PiecewiseConstantFunction() {
-		this(new float[0], new float[]{0});
+	/**
+	 * @return Custom configuration
+	 */
+	public Configuration getConfiguration() {
+		ConfigurationImpl result = ConfigUtil.defaultConfiguration(this);
+		result.defineProperty(SingleValuedPropertyImpl.getSingleValuedProperty(result, "numDiscontinuities", Integer.TYPE));
+		return result;
 	}
 	
 	/**

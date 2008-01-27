@@ -3,12 +3,8 @@
  */
 package ca.neo.model.neuron.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
@@ -50,12 +46,9 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	
 	private float[] myTime;
 	private float[] myVoltageHistory;
-//	private List mySpikeTimes;
 	
 	private SimulationMode myMode;
 	private SimulationMode[] mySupportedModes;
-	
-	private Configuration myConfiguration;
 	
 	private static final float[] ourNullTime = new float[0]; 
 	private static final float[] ourNullVoltageHistory = new float[0];
@@ -79,11 +72,11 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	}
 
 	/**
-	 * @param maxTimeStep maximum integration time step (s). Shorter time steps may be used if a 
+	 * @param maxTimeStep Maximum integration time step (s). Shorter time steps may be used if a 
 	 * 		run(...) is requested with a length that is not an integer multiple of this value.  
-	 * @param tauRC resistive-capacitive time constant (s) 
-	 * @param tauRef refracory period (s)
-	 * @param initialVoltage initial condition on V
+	 * @param tauRC Resistive-capacitive time constant (s) 
+	 * @param tauRef Refracory period (s)
+	 * @param initialVoltage Initial condition on V
 	 */
 	public LIFSpikeGenerator(float maxTimeStep, float tauRC, float tauRef, float initialVoltage) {
 		setMaxTimeStep(maxTimeStep); 
@@ -95,38 +88,47 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myMode = SimulationMode.DEFAULT;
 		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
 
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
-		
 		reset(false);
 	}
 
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return Maximum integration time step (s). 
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
 	public float getMaxTimeStep() {
 		return myMaxTimeStep / ourMaxTimeStepCorrection;
 	}
-	
+
+	/**
+	 * @param max Maximum integration time step (s).
+	 */
 	public void setMaxTimeStep(float max) {
 		myMaxTimeStep = max * ourMaxTimeStepCorrection; //increased slightly because float/float != integer
 	}
-	
+
+	/**
+	 * @return Resistive-capacitive time constant (s)
+	 */
 	public float getTauRC() {
 		return myTauRC;
 	}
-	
+
+	/**
+	 * @param tauRC Resistive-capacitive time constant (s)
+	 */
 	public void setTauRC(float tauRC) {
 		myTauRC = tauRC;
 	}
-	
+
+	/**
+	 * @return Refracory period (s)
+	 */
 	public float getTauRef() {
 		return myTauRef;
 	}
 	
+	/**
+	 * @param tauRef Refracory period (s)
+	 */
 	public void setTauRef(float tauRef) {
 		myTauRef = tauRef;
 	}
@@ -136,7 +138,6 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myVoltage = myInitialVoltage;
 		myTime = ourNullTime;
 		myVoltageHistory = ourNullVoltageHistory;
-//		mySpikeTimes = new ArrayList(10);
 	}		
 
 	/**
@@ -218,14 +219,6 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		
 		if (stateName.equals("V")) {
 			result = new TimeSeries1DImpl(myTime, myVoltageHistory, Units.AVU); 
-//		} else if (stateName.equalsIgnoreCase("spikes")) {
-//			float[] times = new float[mySpikeTimes.size()];
-//			float[] values = new float[mySpikeTimes.size()];
-//			for (int i = 0; i < times.length; i++) {
-//				times[i] = ((Float) mySpikeTimes.get(i)).floatValue();
-//				values[i] = 1;
-//			}
-//			result = new TimeSeries1DImpl(times, values, Units.SPIKES);
 		} else {
 			throw new SimulationException("The state name " + stateName + " is unknown.");
 		}

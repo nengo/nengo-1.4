@@ -6,8 +6,6 @@ package ca.neo.model.neuron.impl;
 import java.util.Arrays;
 import java.util.Properties;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
@@ -53,7 +51,6 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	private boolean myConstantRateFunctionOK; //false if there are relevant configuration changes since function calculated
 	private float[] myCurrents;
 	private float myTransientTime;
-	private Configuration myConfiguration;
 	
 	/**
 	 * @param dynamics A DynamicalSystem that defines the dynamics of spike generation. 
@@ -79,7 +76,6 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	
 		myMode = SimulationMode.DEFAULT;
 		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT};
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	/**
@@ -114,7 +110,6 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	
 		myMode = SimulationMode.DEFAULT;
 		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	/**
@@ -125,34 +120,45 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 	}
 	
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return A DynamicalSystem that defines the dynamics of spike generation. 
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
 	public DynamicalSystem getDynamics() {
 		return myDynamics;
 	}
 	
+	/**
+	 * @param dynamics A DynamicalSystem that defines the dynamics of spike generation. 
+	 */
 	public void setDynamics(DynamicalSystem dynamics) {
 		myDynamics = dynamics;
 		myConstantRateFunctionOK = false;
 	}
-	
+
+	/**
+	 * @return An integrator with which to simulate the DynamicalSystem
+	 */
 	public Integrator getIntegrator() {
 		return myIntegrator;
 	}
-	
+
+	/**
+	 * @param integrator An integrator with which to simulate the DynamicalSystem
+	 */
 	public void setIntegrator(Integrator integrator) {
 		myIntegrator = integrator;
 		myConstantRateFunctionOK = false;
 	}
-	
+
+	/**
+	 * @return Dimension of output that corresponds to membrane potential
+	 */
 	public int getVoltageDim() {
 		return myVDim;
 	}
-	
+
+	/**
+	 * @param dim Dimension of output that corresponds to membrane potential
+	 */
 	public void setVoltageDim(int dim) {
 		if (dim < 0 || dim >= myDynamics.getOutputDimension()) {
 			throw new IllegalArgumentException(dim 
@@ -161,29 +167,49 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 		myVDim = dim;
 		myConstantRateFunctionOK = false;
 	}
-	
+
+	/**
+	 * @return Threshold membrane potential at which a spike is considered to have occurred
+	 */
 	public float getSpikeThreshold() {
 		return mySpikeThreshold;
 	}
-	
+
+	/**
+	 * @param threshold Threshold membrane potential at which a spike is considered to have occurred
+	 */
 	public void setSpikeThreshold(float threshold) {
 		mySpikeThreshold = threshold;
 		myConstantRateFunctionOK = false;
 	}
-	
+
+	/**
+	 * @return Minimum time between spike onsets. If there appears to be a spike onset at the 
+	 * 		beginning of a timestep, this value is used to determine whether this is just the continuation of a spike 
+	 * 		onset that was already registered in the last timestep
+	 */
 	public float getMinIntraSpikeTime() {
 		return myMinIntraSpikeTime;
 	}
-	
+
+	/**
+	 * @param min Minimum time between spike onsets. 
+	 */
 	public void setMinIntraSpikeTime(float min) {
 		myMinIntraSpikeTime = min;
 		myConstantRateFunctionOK = false;
 	}
-	
+
+	/**
+	 * @return Range of driving currents at which to simulate to find steady-state firing rates for CONSTANT_RATE mode
+	 */
 	public float[] getCurrentRange() {
 		return new float[]{myCurrents[0], myCurrents[myCurrents.length - 1]};
 	}
-	
+
+	/**
+	 * @param range Range of driving currents at which to simulate to find steady-state firing rates for CONSTANT_RATE mode
+	 */
 	public void setCurrentRange(float[] range) {
 		if (range.length != 2) {
 			throw new IllegalArgumentException("Expected range of length 2: [low high]");
@@ -192,15 +218,24 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 		myConstantRateFunctionOK = false;
 	}
 
+	/**
+	 * @return Simulation time to ignore before counting spikes when finding steady-state rates 
+	 */
 	public float getTransientTime() {
 		return myTransientTime;
 	}
-	
+
+	/**
+	 * @param transientTime
+	 */
 	public void setTransientTime(float transientTime) {
 		myTransientTime = transientTime;
 		myConstantRateFunctionOK = false;
 	}
-	
+
+	/**
+	 * @return True if this SpikeGenerator supports CONSTANT_RATE simulation mode
+	 */
 	public boolean getConstantRateModeSupported() {
 		return mySupportedModes.length == 2;
 	}

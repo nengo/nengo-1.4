@@ -1,5 +1,6 @@
 package ca.neo.config.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import ca.neo.config.Configuration;
@@ -106,8 +107,10 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 		
 		try {
 			mySetter.invoke(configurable, new Object[]{value});
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException("Can't set " + getName() + ": " + e.getCause().getMessage(), e);
 		} catch (Exception e) {
-			throw new RuntimeException("Can't set property", e);
+			throw new RuntimeException("Can't set " + getName(), e);
 		}
 	}
 

@@ -5,7 +5,6 @@ package ca.neo.model.neuron;
 
 import java.io.Serializable;
 
-import ca.neo.config.Configurable;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Resettable;
 import ca.neo.model.SimulationMode;
@@ -16,7 +15,7 @@ import ca.neo.model.SimulationMode;
  * 
  * @author Bryan Tripp
  */
-public interface SpikeGenerator extends Resettable, Serializable, SimulationMode.ModeConfigurable, Configurable {
+public interface SpikeGenerator extends Resettable, Serializable, SimulationMode.ModeConfigurable {
 
 	/**
 	 * Runs the model for a given time segment. The total time is meant to be 

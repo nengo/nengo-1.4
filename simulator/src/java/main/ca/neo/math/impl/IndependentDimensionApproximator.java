@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
@@ -160,7 +158,6 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		private float myRadius;
 		private VectorGenerator myVG;		
 		private int myPoints;
-		private Configuration myConfiguration;
 		
 		/**
 		 * @param radius As RandomHypersphereGenerator arg
@@ -169,20 +166,8 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		public EvalPointFactory(float radius, int points) {
 			setRadius(radius);
 			myPoints = points;
-			myConfiguration = ConfigUtil.defaultConfiguration(this);
 		}
 		
-		public EvalPointFactory() {
-			this(1, 100);
-		}
-
-		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public Configuration getConfiguration() {
-			return myConfiguration;
-		}
-
 		public float getRadius() {
 			return myRadius;
 		}
@@ -228,27 +213,21 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 
 		private float myRadius;
 		private VectorGenerator myVG;
-		private Configuration myConfiguration;
-		
+	
 		/**
 		 * @param radius As RandomHypersphereGenerator arg
 		 */
 		public EncoderFactory(float radius) {
 			setRadius(radius);
-			myConfiguration = ConfigUtil.defaultConfiguration(this);
 		}
-		
+
+		/**
+		 * Defaults to radius 1.
+		 */
 		public EncoderFactory() {
 			this(1);
 		}
 		
-		/**
-		 * @see ca.neo.config.Configurable#getConfiguration()
-		 */
-		public Configuration getConfiguration() {
-			return myConfiguration;
-		}
-
 		public float getRadius() {
 			return myRadius;
 		}

@@ -71,6 +71,8 @@ public class CompositeApproximator implements LinearApproximator {
 	
 	private static class FunctionWrapper extends AbstractFunction {
 
+		private static final long serialVersionUID = 1L;
+		
 		private Function myFunction;
 		private int[] myDimensions;
 		

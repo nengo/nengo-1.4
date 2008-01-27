@@ -5,13 +5,7 @@ package ca.neo.math.impl;
 
 import java.util.Random;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configurable;
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.model.StructuralException;
-import ca.neo.util.MU;
 
 /**
  * A Function that is composed of a finite number of sinusoids.
@@ -22,16 +16,9 @@ public class FourierFunction implements Function {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
-	public static final String COMPONENTS_PROPERTY = "components";
-	public static final String FREQUENCIES_PROPERTY = "frequencies";
-	public static final String AMPLITUDES_PROPERTY = "amplitudes";
-	public static final String PHASES_PROPERTY = "phases";
-	
 	private float[][] myFrequencies;
 	private float[] myAmplitudes;
 	private float[][] myPhases;
-	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * Creates a 1-dimensional function composed of explicitly defined sinusoids. 
@@ -42,7 +29,7 @@ public class FourierFunction implements Function {
 	 * @param phases The phase lead of each component (from -.5 to .5)
 	 */
 	public FourierFunction(float[] frequencies, float[] amplitudes, float[] phases) {
-		init(new float[][]{frequencies}, amplitudes, new float[][]{phases});
+		set(new float[][]{frequencies}, amplitudes, new float[][]{phases});
 	}
 	
 	/**
@@ -53,7 +40,7 @@ public class FourierFunction implements Function {
 	 * @param phases Lists of phases (length n; ith members define phases of ith component along each dimension)
 	 */
 	public FourierFunction(float[][] frequencies, float[] amplitudes, float[][] phases) {
-		init(frequencies, amplitudes, phases);
+		set(frequencies, amplitudes, phases);
 	}
 	
 	/**
@@ -91,17 +78,7 @@ public class FourierFunction implements Function {
 			amplitudes[i] = amplitudes[i] * rms / (float) unscaledRMS;
 		}
 		
-		init(frequencies, amplitudes, phases);
-	}
-	
-	private void init(float[][] frequencies, float[] amplitudes, float[][] phases) {
 		set(frequencies, amplitudes, phases);
-		myConfiguration = new ConfigurationImpl(this);	
-		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
-		myConfiguration.defineSingleValuedProperty(COMPONENTS_PROPERTY, Integer.class, false);
-		myConfiguration.defineSingleValuedProperty(FREQUENCIES_PROPERTY, float[][].class, true);
-		myConfiguration.defineSingleValuedProperty(AMPLITUDES_PROPERTY, float[].class, true);
-		myConfiguration.defineSingleValuedProperty(PHASES_PROPERTY, float[][].class, true);
 	}
 	
 	private void set(float[][] frequencies, float[] amplitudes, float[][] phases) {
@@ -118,50 +95,6 @@ public class FourierFunction implements Function {
 		myPhases = phases;
 	}
 	
-	/**
-	 * @param properties Construction properties as defined by getConstructionTemplate() or 
-	 * 		getUserConstructionTemplate()
-	 * @throws StructuralException 
-	 */
-	public FourierFunction(Configuration properties) throws StructuralException {
-		if (properties.getPropertyNames().contains(DIMENSION_PROPERTY)) { //looks like user specs
-			int dimension = ((Integer) ConfigUtil.get(properties, DIMENSION_PROPERTY, Integer.class)).intValue();
-			int components = ((Integer) ConfigUtil.get(properties, COMPONENTS_PROPERTY, Integer.class)).intValue();			
-			float[][] frequencies = MU.zero(dimension, components);
-			float[] amplitudes = new float[components];
-			float[][] phases = MU.zero(dimension, components);
-			init(frequencies, amplitudes, phases);
-			
-		} else { //looks like we're loading from a file
-			float[][] frequencies = (float[][]) ConfigUtil.get(properties, FREQUENCIES_PROPERTY, float[][].class);
-			float[] amplitudes = (float[]) ConfigUtil.get(properties, AMPLITUDES_PROPERTY, float[].class);
-			float[][] phases = (float[][]) ConfigUtil.get(properties, PHASES_PROPERTY, float[][].class);			
-			init(frequencies, amplitudes, phases);
-		}
-	}
-	
-	public static Configuration getConstructionTemplate() {
-		ConfigurationImpl result = new ConfigurationImpl(null);
-		result.defineTemplateProperty(FREQUENCIES_PROPERTY, float[][].class, new float[0][]);
-		result.defineTemplateProperty(AMPLITUDES_PROPERTY, float[].class, new float[0]);
-		result.defineTemplateProperty(PHASES_PROPERTY, float[][].class, new float[0][]);
-		return result;
-	}
-	
-	public static Configuration getUserConstructionTemplate() {
-		ConfigurationImpl result = new ConfigurationImpl(null);
-		result.defineTemplateProperty(DIMENSION_PROPERTY, Integer.class, new Integer(1));
-		result.defineTemplateProperty(COMPONENTS_PROPERTY, Integer.class, new Integer(1));
-		return result;
-	}
-
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @see ca.neo.math.Function#getDimension()
 	 */
@@ -183,6 +116,9 @@ public class FourierFunction implements Function {
 		return myFrequencies;
 	}
 	
+	/**
+	 * @param frequencies Lists of frequencies (length n; ith members define frequencies of ith component along each dimension)
+	 */
 	public void setFrequencies(float[][] frequencies) {
 		set(frequencies, getAmplitudes(), getPhases());
 	}
@@ -194,6 +130,9 @@ public class FourierFunction implements Function {
 		return myAmplitudes;
 	}
 	
+	/**
+	 * @param amplitudes The amplitude of each component
+	 */
 	public void setAmplitudes(float[] amplitudes) {
 		set(getFrequencies(), amplitudes, getPhases());
 	}
@@ -205,6 +144,9 @@ public class FourierFunction implements Function {
 		return myPhases;
 	}
 
+	/**
+	 * @param phases Lists of phases (length n; ith members define phases of ith component along each dimension)
+	 */
 	public void setPhases(float[][] phases) {
 		set(getFrequencies(), getAmplitudes(), phases);
 	}

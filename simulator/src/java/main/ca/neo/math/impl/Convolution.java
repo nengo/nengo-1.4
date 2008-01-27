@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 import ca.neo.plot.Plotter;
 
@@ -21,60 +19,77 @@ public class Convolution extends AbstractFunction {
 	
 	private Function myOne;
 	private Function myTwo;
-	private float myTimeStep;
+	private float myStepSize;
 	private float myWindow;
 	
-	private Configuration myConfiguration;
-	
-	public Convolution(Function one, Function two, float timeStep, float window) {
+	/**
+	 * @param one First of two functions to convolve together
+	 * @param two Second of two functions to convolve together
+	 * @param stepSize Step size at which to numerically evaluate convolution integral
+	 * @param window Window over which to evaluate convolution integral
+	 */
+	public Convolution(Function one, Function two, float stepSize, float window) {
 		super(1);		
 		setFunctionOne(one);
 		setFunctionTwo(two);		
-		myTimeStep = timeStep;
+		myStepSize = stepSize;
 		myWindow = window;
-		
-//		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
-	public Convolution() {
-		this(new ConstantFunction(1, 1), new ConstantFunction(1, 1), .001f, 1f);
-	}
-	
-//	@Override
-//	public Configuration getConfiguration() {
-//		return myConfiguration;
-//	}
-
+	/**
+	 * @return First of two functions to convolve together
+	 */
 	public Function getFunctionOne() {
 		return myOne;
 	}
 	
+	/**
+	 * @param function First of two functions to convolve together
+	 */
 	public void setFunctionOne(Function function) {
 		checkDimension(function);
 		myOne = function;
 	}
 	
+	/**
+	 * @return Second of two functions to convolve together
+	 */
 	public Function getFunctionTwo() {
 		return myTwo;
 	}
-	
+
+	/**
+	 * @param function Second of two functions to convolve together
+	 */
 	public void setFunctionTwo(Function function) {
 		checkDimension(function);
 		myTwo = function;
 	}
-	
-	public float getTimeStep() {
-		return myTimeStep;
+
+	/**
+	 * @return Step size at which to numerically evaluate convolution integral
+	 */
+	public float getStepSize() {
+		return myStepSize;
 	}
-	
-	public void setTimeStep(float timeStep) {
-		myTimeStep = timeStep;
+
+	/**
+	 * @param stepSize Step size at which to numerically evaluate convolution integral
+	 */
+	public void setStepSize(float stepSize) {
+		myStepSize = stepSize;
 	}
-	
+
+	/**
+	 * @return Window over which to evaluate convolution integral
+	 */
 	public float getWindow() {
 		return myWindow;
 	}
-	
+
+	/**
+	 * @param window Window over which to evaluate convolution integral
+	 */
 	public void setWindow(float window) {
 		myWindow = window;
 	}
@@ -94,8 +109,8 @@ public class Convolution extends AbstractFunction {
 		float time = from[0];
 		float tau = 0;
 		while (tau <= myWindow) {
-			result += myOne.map(new float[]{time - tau}) * myTwo.map(new float[]{tau}) * myTimeStep;
-			tau += myTimeStep;
+			result += myOne.map(new float[]{time - tau}) * myTwo.map(new float[]{tau}) * myStepSize;
+			tau += myStepSize;
 		}
 		
 		return result;

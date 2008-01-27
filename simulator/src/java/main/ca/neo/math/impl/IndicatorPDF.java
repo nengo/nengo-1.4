@@ -33,9 +33,9 @@ public class IndicatorPDF implements PDF {
 	public IndicatorPDF(float low, float high) {
 		set(low, high);
 		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(LOW_PROPERTY, Float.class, true);
-		myConfiguration.defineSingleValuedProperty(HIGH_PROPERTY, Float.class, true);
-		myConfiguration.defineSingleValuedProperty(DENSITY_PROPERTY, Float.class, false);
+		myConfiguration.defineSingleValuedProperty(LOW_PROPERTY, Float.TYPE, true);
+		myConfiguration.defineSingleValuedProperty(HIGH_PROPERTY, Float.TYPE, true);
+		myConfiguration.defineSingleValuedProperty(DENSITY_PROPERTY, Float.TYPE, false);
 	}
 	
 	/**

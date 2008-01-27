@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 
 /**
@@ -25,10 +23,6 @@ public class Polynomial extends AbstractFunction implements Function {
 	public Polynomial(float[] coefficients) {
 		super(1);
 		myCoefficients = coefficients;
-	}
-	
-	public Polynomial() {
-		this(new float[]{1});
 	}
 	
 	/**

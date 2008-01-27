@@ -1,7 +1,5 @@
 package ca.neo.math.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 
 /**
@@ -17,23 +15,14 @@ public abstract class AbstractFunction implements Function {
 	public static final String DIMENSION_PROPERTY = "dimension";
 	
 	private int myDim;
-	private Configuration myConfiguration;
 	
 	/**
 	 * @param dim Input dimension of the function
 	 */
 	public AbstractFunction(int dim) {
 		myDim = dim;
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @see ca.neo.math.Function#getDimension()
 	 */

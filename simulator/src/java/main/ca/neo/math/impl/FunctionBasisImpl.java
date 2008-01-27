@@ -3,6 +3,12 @@
  */
 package ca.neo.math.impl;
 
+import java.lang.reflect.Method;
+
+import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.ListPropertyImpl;
 import ca.neo.math.Function;
 import ca.neo.math.FunctionBasis;
 
@@ -33,6 +39,22 @@ public class FunctionBasisImpl extends AbstractFunction implements FunctionBasis
 		myFunctions = functions;
 		myCoefficients = new float[functions.length];
 	}
+	
+	/**
+	 * @return Custom configuration 
+	 */
+	public Configuration getConfiguration() {
+		ConfigurationImpl result = ConfigUtil.defaultConfiguration(this);
+		result.removeProperty("basisDimension");
+		try {
+			Method getter = this.getClass().getMethod("getFunction", new Class[]{Integer.TYPE});
+			Method countGetter = this.getClass().getMethod("getBasisDimension", new Class[0]);
+			result.defineProperty(new ListPropertyImpl(result, "functions", Function.class, getter, countGetter));			
+		} catch (Exception e) {
+			throw new RuntimeException("Can't find function-related methods (this is a bug)", e);
+		}
+		return result;
+	}
 
 	/**
 	 * @see ca.neo.math.FunctionBasis#getBasisDimension()
@@ -45,11 +67,11 @@ public class FunctionBasisImpl extends AbstractFunction implements FunctionBasis
 	 * @see ca.neo.math.FunctionBasis#getFunction(int)
 	 */
 	public Function getFunction(int dimension) {
-		if (dimension < 1 || dimension > myFunctions.length) {
+		if (dimension < 0 || dimension >= myFunctions.length) {
 			throw new IllegalArgumentException("Dimension " + dimension + " does not exist");
 		}
 		
-		return myFunctions[dimension-1];
+		return myFunctions[dimension];
 	}
 
 	/**
@@ -59,6 +81,14 @@ public class FunctionBasisImpl extends AbstractFunction implements FunctionBasis
 		if (coefficients.length != myCoefficients.length) {
 			throw new IllegalArgumentException(myCoefficients.length + " coefficients are needed");
 		}
+		myCoefficients = coefficients;
+	}
+	
+	/**
+	 * @return Coefficients with which basis functions are combined
+	 */
+	public float[] getCoefficients() {
+		return myCoefficients;
 	}
 
 	/**

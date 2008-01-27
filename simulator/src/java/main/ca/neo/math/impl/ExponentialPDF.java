@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.PDF;
 import ca.neo.plot.Plotter;
 
@@ -22,19 +20,24 @@ public class ExponentialPDF extends AbstractFunction implements PDF {
 
 	private float myTau;
 	
+	/**
+	 * @param tau Rate parameter of exponential distribution
+	 */
 	public ExponentialPDF(float tau) {
 		super(1);
 		myTau = tau;
 	}
-	
-	public ExponentialPDF(){
-		this(1);
-	}
-	
+
+	/**
+	 * @return Rate parameter of exponential distribution
+	 */
 	public float getTau() {
 		return myTau;
 	}
 	
+	/**
+	 * @param tau Rate parameter of exponential distribution
+	 */
 	public void setTau(float tau) {
 		myTau = tau;
 	}

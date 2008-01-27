@@ -1,7 +1,5 @@
 package ca.neo.model.neuron.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.SigmoidFunction;
@@ -33,7 +31,6 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	private SimulationMode[] mySupportedModes;
 //	private float myRefractoryPeriod;
 //	private float myLastSpikeTime;
-	private Configuration myConfiguration;
 
 	/**
 	 * @param rateFunction Maps input current to Poisson spiking rate
@@ -44,7 +41,6 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE};
 //		myRefractoryPeriod = refractoryPeriod;
 //		myLastSpikeTime = -myRefractoryPeriod;
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	/**
@@ -54,15 +50,16 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		this(new SigmoidFunction(.5f, 10f, 0f, 20f));
 	}
 	
-
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
+	/**
+	 * @return Function that maps input current to Poisson spiking rate
+	 */
 	public Function getRateFunction() {
 		return myRateFunction;
 	}
-	
+
+	/**
+	 * @param function Function that maps input current to Poisson spiking rate
+	 */
 	public void setRateFunction(Function function) {
 		if (function.getDimension() != 1) {
 			throw new IllegalArgumentException("Function must be one-dimensional (mapping from driving current to rate)");

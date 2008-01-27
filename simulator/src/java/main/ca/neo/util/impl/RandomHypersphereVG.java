@@ -3,8 +3,6 @@
  */
 package ca.neo.util.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.util.VectorGenerator;
 
@@ -22,7 +20,6 @@ public class RandomHypersphereVG implements VectorGenerator {
 	private float myAxisClusterFactor;
 	private boolean myAllOnAxes; //true if vectors are all to lie on an axis
 	private float myAxisRatio; //ratio of vector density between cluster-centre axis to other axes
-	private Configuration myConfiguration;
 	
 	/**
 	 * @param surface If true, vectors are generated on surface of hypersphere; if false, throughout
@@ -32,18 +29,9 @@ public class RandomHypersphereVG implements VectorGenerator {
 	 * 		of vectors around axes. 0 means even distribution; 1 means all vectors on axes.  
 	 */
 	public RandomHypersphereVG(boolean surface, float radius, float axisClusterFactor) {
-		if (radius <= 0) {
-			throw new IllegalArgumentException(radius + " is not a valid radius (must be > 0)");
-		}
-		if (axisClusterFactor < 0 || axisClusterFactor > 1) {
-			throw new IllegalArgumentException(axisClusterFactor + " is not a valid cluster factor (must be between 0 and 1)");
-		}
-		
-		mySurface = surface;
-		myRadius = radius;
+		setOnSurface(surface);
+		setRadius(radius);				
 		setAxisClusterFactor(axisClusterFactor);
-		
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
 	}
 	
 	/**
@@ -54,33 +42,53 @@ public class RandomHypersphereVG implements VectorGenerator {
 	}
 	
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return True if generated vectors are on surface of hypersphere
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	public boolean getOnSurface() {
 		return mySurface;
 	}
 	
+	/**
+	 * @param onSurface True if generated vectors are on surface of hypersphere
+	 */
 	public void setOnSurface(boolean onSurface) {
 		mySurface = onSurface;
 	}
-	
+
+	/**
+	 * @return Radius of hypersphere
+	 */
 	public float getRadius() {
 		return myRadius;
 	}
 	
+	/**
+	 * @param radius Radius of hypersphere
+	 */
 	public void setRadius(float radius) {
+		if (radius <= 0) {
+			throw new IllegalArgumentException(radius + " is not a valid radius (must be > 0)");
+		}		
 		myRadius = radius;
 	}
-	
+
+	/**
+	 * @return Value between 0 and 1, with higher values indicating greater clustering
+	 * 		of vectors around axes. 0 means even distribution; 1 means all vectors on axes.  
+	 */
 	public float getAxisClusterFactor() {
 		return myAxisClusterFactor;
 	}
-	
+
+	/**
+	 * @param axisClusterFactor Value between 0 and 1, with higher values indicating greater clustering
+	 * 		of vectors around axes. 0 means even distribution; 1 means all vectors on axes.
+	 */
 	public void setAxisClusterFactor(float axisClusterFactor) {
+		if (axisClusterFactor < 0 || axisClusterFactor > 1) {
+			throw new IllegalArgumentException(axisClusterFactor + " is not a valid cluster factor (must be between 0 and 1)");
+		}
+
 		myAxisClusterFactor = axisClusterFactor;
 		if (axisClusterFactor > .999) {
 			myAllOnAxes = true;

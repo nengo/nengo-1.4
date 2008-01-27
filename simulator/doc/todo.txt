@@ -1,9 +1,11 @@
 TODO NOW: 
-- clean up functions, VectorGenerator
+- fix icons 
+- clean up Function
 - configuration: for private classes, look for method declaration on public interfaces (eg NoiseFactory); see http://forums.bea.com/thread.jspa?threadID=600004396
 - events for Shu
 - constructor args not appearing for LTISystem (eg NoiseImplDF)
 - make config initialization and factory for UI
+- custom popups (e.g. plot function)
 - DONE fix SingleValuedProperty
 
 TODO: 

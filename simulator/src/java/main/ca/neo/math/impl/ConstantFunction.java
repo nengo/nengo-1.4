@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
 
 /**
@@ -16,12 +14,8 @@ public class ConstantFunction implements Function {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
-	public static final String VALUE_PROPERTY = "value";
-	
 	private int myDimension;
 	private float myValue;
-	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param dimension Input dimension of this Function
@@ -30,23 +24,6 @@ public class ConstantFunction implements Function {
 	public ConstantFunction(int dimension, float value) {
 		myDimension = dimension;
 		myValue = value;
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.TYPE, true);
-		myConfiguration.defineSingleValuedProperty(VALUE_PROPERTY, Float.TYPE, true);
-	}
-
-	/**
-	 * Instantiates with defaults one dimension and value 1. 
-	 */
-	public ConstantFunction() {
-		this(1, 1);
-	}
-
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
 	}
 
 	/**

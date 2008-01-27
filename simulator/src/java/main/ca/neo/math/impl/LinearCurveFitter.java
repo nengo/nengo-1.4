@@ -5,6 +5,10 @@ package ca.neo.math.impl;
 
 import java.util.Arrays;
 
+import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configuration;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.SingleValuedPropertyImpl;
 import ca.neo.math.CurveFitter;
 import ca.neo.math.Function;
 
@@ -42,8 +46,8 @@ public class LinearCurveFitter implements CurveFitter {
 		private float[] myY;
 
 		/**
-		 * @param x Example x points 
-		 * @param y Example y points (must be same length as x)
+		 * @param x Known function-argument points to interpolate between 
+		 * @param y Known function-output points to interpolate between (must be same length as x)
 		 */
 		public InterpolatedFunction(float[] x, float[] y) {
 			super(1);
@@ -58,14 +62,28 @@ public class LinearCurveFitter implements CurveFitter {
 			}
 		}
 		
-		public InterpolatedFunction() {
-			this(new float[]{0, 1}, new float[]{0, 0});
+		/**
+		 * @return Custom configuration
+		 */
+		public Configuration getConfiguration() {
+			ConfigurationImpl result = ConfigUtil.defaultConfiguration(this);
+			result.defineProperty(SingleValuedPropertyImpl.getSingleValuedProperty(result, "numPoints", Integer.TYPE));
+			return result;
 		}
-		
+
+		/**
+		 * @return Number of points between which this function interpolates
+		 */
 		public int getNumPoints() {
 			return myX.length;
 		}
 		
+		/**
+		 * If this method is used to increase the number of interpolation points, new points 
+		 * are set to equal what was previously the last point.
+		 *   
+		 * @param num New number of points between which this function interpolates
+		 */
 		public void setNumPoints(int num) {
 			if (num < 2) {
 				throw new IllegalArgumentException("At least two points are needed");
@@ -75,25 +93,43 @@ public class LinearCurveFitter implements CurveFitter {
 			float[] newY = new float[num];
 			System.arraycopy(myX, 0, newX, 0, Math.min(num, myX.length));
 			System.arraycopy(myY, 0, newY, 0, Math.min(num, myY.length));
+			
+			for (int i = myX.length; i < newX.length; i++) {
+				newX[i] = myX[myX.length-1];
+				newY[i] = myY[myY.length-1];
+			}
+			
 			myX = newX;
 			myY = newY;
 		}
 		
+		/**
+		 * @return Known function-argument points to interpolate between
+		 */
 		public float[] getX() {
 			return copy(myX);
 		}
-		
+
+		/**
+		 * @param x Known function-argument points to interpolate between 
+		 */
 		public void setX(float[] x) {
 			if (x.length != myX.length) {
 				throw new IllegalArgumentException("Expected " + myX.length + " values.");
 			}
 			myX = copy(x);
 		}
-		
+
+		/**
+		 * @return Known function-output points to interpolate between 
+		 */
 		public float[] getY() {
 			return copy(myY);
 		}
 		
+		/**
+		 * @param y Known function-output points to interpolate between 
+		 */
 		public void setY(float[] y) {
 			if (y.length != myY.length) {
 				throw new IllegalArgumentException("Expected " + myY.length + " values.");

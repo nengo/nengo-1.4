@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
@@ -33,7 +31,7 @@ import ca.neo.util.impl.TimeSeries1DImpl;
  * u is a membrane recovery variable;
  * a, b, c, and d are modifiable parameters</p>
  * 
- * TODO: write rate mode; fix max step at 1/2 ms
+ * TODO (bryan): write rate mode; fix max step at 1/2 ms; review
  * 
  * @author Hussein
  */
@@ -61,14 +59,10 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	private SimulationMode myMode;
 	private SimulationMode[] mySupportedModes;
 	
-	private Configuration myConfiguration;
-	
 	private static final float[] ourNullTime = new float[0]; 
 	private static final float[] ourNullVoltageHistory = new float[0];
 	
 	/**
-	 * @param maxTimeStep maximum integration time step (s). Shorter time steps may be used if a 
-	 * 		run(...) is requested with a length that is not an integer multiple of this value.  
 	 * Constructor using "default" parameters
 	 */
 	public IzhikevichSpikeGenerator() {
@@ -94,8 +88,6 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		myMode = SimulationMode.DEFAULT;
 		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
 
-		myConfiguration = ConfigUtil.defaultConfiguration(this);
-		
 		reset(false);
 	}
 	
@@ -114,40 +106,57 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	}
 
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @return time scale of recovery variable
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
 	public float getA() {
 		return myA;
 	}
-	
+
+	/**
+	 * @param a time scale of recovery variable
+	 */
 	public void setA(float a) {
 		myA = a;
 	}
-	
+
+	/**
+	 * @return sensitivity of recovery variable
+	 */
 	public float getB() {
 		return myB;
 	}
-	
+
+	/**
+	 * @param b sensitivity of recovery variable
+	 */
 	public void setB(float b) {
 		myB = b;
 	}
-	
+
+	/**
+	 * @return voltage reset value
+	 */
 	public float getC() {
 		return myC;
 	}
-	
+
+	/**
+	 * @param c voltage reset value
+	 */
 	public void setC(float c) {
 		myC = c;
 	}
-	
+
+	/**
+	 * @return recovery variable reset change
+	 */
 	public float getD() {
 		return myD;
 	}
-	
+
+	/**
+	 * @param d recovery variable reset change
+	 */
 	public void setD(float d) {
 		myD = d;
 	}
@@ -217,7 +226,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 				spiking = true;
 				myTimeSinceLastSpike = 0;
 				myVoltage = myC;		
-				myRecovery = myRecovery + myD;
+				myRecovery = myRecovery + myD; 
 				mySpikeTimes.add(new Float(myTime[i]));
 			}
 		}
