@@ -32,15 +32,14 @@ public class RunSimulatorAction extends StandardAction {
 	private static final PropertyDescriptor pEndTime = new PFloat("End time");
 	private static final PropertyDescriptor pShowDataViewer = new PBoolean(
 			"Open data viewer after simulation");
-	private static final PropertyDescriptor pStartTime = new PFloat(
-			"Start time");
+	private static final PropertyDescriptor pStartTime = new PFloat("Start time");
 
 	private static final PropertyDescriptor pStepSize = new PFloat("Step size");
 
 	private static final long serialVersionUID = 1L;
 
-	private static final PropertyDescriptor[] zProperties = { pStartTime,
-			pEndTime, pStepSize, pShowDataViewer };
+	private static final PropertyDescriptor[] zProperties = { pStartTime, pEndTime, pStepSize,
+			pShowDataViewer };
 
 	private UINetwork uiNetwork;
 
@@ -55,26 +54,46 @@ public class RunSimulatorAction extends StandardAction {
 		this.uiNetwork = uiNetwork;
 	}
 
+	private boolean configured = false;
+	private float startTime;
+	private float endTime;
+	private float stepTime;
+	private boolean showDataViewer;
+
+	public RunSimulatorAction(String actionName, UINetwork uiNetwork, float startTime,
+			float endTime, float stepTime) {
+		super("Run simulator", actionName, false);
+		this.uiNetwork = uiNetwork;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.stepTime = stepTime;
+		configured = true;
+
+	}
+
 	@Override
 	protected void action() throws ActionException {
 
 		try {
-			PropertySet properties = ConfigManager.configure(zProperties,
-					"Simulator Runtime Configuration", UIEnvironment
-							.getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
+			if (!configured) {
+				PropertySet properties = ConfigManager.configure(zProperties,
+						"Simulator Runtime Configuration", UIEnvironment.getInstance(),
+						ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
-			float startTime = (Float) properties.getProperty(pStartTime);
-			float endTime = (Float) properties.getProperty(pEndTime);
-			float stepTime = (Float) properties.getProperty(pStepSize);
-			boolean showDataViewer = (Boolean) properties
-					.getProperty(pShowDataViewer);
-			(new RunSimulatorActivity(startTime, endTime, stepTime,
-					showDataViewer)).doAction();
+				startTime = (Float) properties.getProperty(pStartTime);
+				endTime = (Float) properties.getProperty(pEndTime);
+				stepTime = (Float) properties.getProperty(pStepSize);
+				showDataViewer = (Boolean) properties.getProperty(pShowDataViewer);
+			}
+			RunSimulatorActivity simulatorActivity = new RunSimulatorActivity(startTime, endTime,
+					stepTime, showDataViewer);
+			simulatorActivity.doAction();
+			simulatorActivity.blockUntilCompleted();
+
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 
-			throw new ActionException("Simulator configuration not complete",
-					false);
+			throw new ActionException("Simulator configuration not complete", false);
 
 		}
 
@@ -88,8 +107,7 @@ public class RunSimulatorAction extends StandardAction {
 	/**
 	 * @author Shu
 	 */
-	class RunSimulatorActivity extends TrackedAction implements
-			SimulatorListener {
+	class RunSimulatorActivity extends TrackedAction implements SimulatorListener {
 
 		private static final long serialVersionUID = 1L;
 		private float currentProgress = 0;
@@ -101,8 +119,8 @@ public class RunSimulatorAction extends StandardAction {
 
 		private float stepTime;
 
-		public RunSimulatorActivity(float startTime, float endTime,
-				float stepTime, boolean showDataViewer) {
+		public RunSimulatorActivity(float startTime, float endTime, float stepTime,
+				boolean showDataViewer) {
 			super("Simulation started");
 			this.startTime = startTime;
 			this.endTime = endTime;
@@ -123,8 +141,7 @@ public class RunSimulatorAction extends StandardAction {
 				simulator.removeSimulatorListener(this);
 
 				AppFrame frame = UIEnvironment.getInstance();
-				((NeoGraphics) (frame)).captureInDataViewer(uiNetwork
-						.getModel());
+				((NeoGraphics) (frame)).captureInDataViewer(uiNetwork.getModel());
 
 				if (showDataViewer) {
 					((NeoGraphics) (frame)).openDataViewer();
@@ -166,9 +183,8 @@ public class RunSimulatorAction extends StandardAction {
 						if (progressMsg != null) {
 							progressMsg.finished();
 						}
-						progressMsg = new TrackedStatusMsg(
-								(int) (currentProgress * 100)
-										+ "% - simulation running");
+						progressMsg = new TrackedStatusMsg((int) (currentProgress * 100)
+								+ "% - simulation running");
 
 					}
 				});

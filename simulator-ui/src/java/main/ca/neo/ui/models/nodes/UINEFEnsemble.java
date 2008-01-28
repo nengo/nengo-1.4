@@ -128,7 +128,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	 * 
 	 * @return PTermination created, null if not
 	 */
-	public UITermination createDecodedTermintation() {
+	public UITermination addDecodedTermination() {
 		UIDecodedTermination termUI = new UIDecodedTermination(this);
 
 		try {
@@ -145,7 +145,7 @@ public class UINEFEnsemble extends UIEnsemble {
 		return null;
 	}
 
-	public UIOrigin createDecodedOrigin() {
+	public UIOrigin addDecodedOrigin() {
 		UIDecodedOrigin originUI = new UIDecodedOrigin(this);
 
 		addWidget(originUI);
@@ -198,7 +198,7 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		@Override
 		protected void action() throws ActionException {
-			UITermination term = createDecodedTermintation();
+			UITermination term = addDecodedTermination();
 			if (term == null)
 				throw new UserCancelledException();
 			else
@@ -230,7 +230,7 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		@Override
 		protected void action() throws ActionException {
-			UIOrigin origin = createDecodedOrigin();
+			UIOrigin origin = addDecodedOrigin();
 
 			if (origin != null) {
 				addedOrigin = origin;
