@@ -27,6 +27,8 @@ import ca.neo.model.Units;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutableUtils;
 import ca.neo.util.impl.SpikePatternImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
@@ -35,11 +37,7 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * 
  * @author Bryan Tripp
  */
-/**
- * @author Shu
- * 
- */
-public abstract class AbstractEnsemble implements Ensemble, Probeable {
+public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMutable {
 
 	private static Logger ourLogger = Logger.getLogger(AbstractEnsemble.class);
 
@@ -54,6 +52,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 	private SpikePatternImpl mySpikePattern;
 	protected boolean myCollectSpikesFlag;
 	private String myDocumentation;
+	private List<VisiblyMutable.Listener> myListeners;
 
 	/**
 	 * Note that setMode(SimulationMode.DEFAULT) is called at construction time.
@@ -83,6 +82,8 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 
 		myStateNames = findStateNames(nodes);
 
+		myListeners = new ArrayList<Listener>(3);
+		
 		setMode(SimulationMode.DEFAULT);
 	}
 	
@@ -455,6 +456,28 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable {
 		myDocumentation = text;
 	}
 	
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myListeners.remove(listener);
+	}
+	
+	/**
+	 * Called by subclasses when properties have changed in such a way that the 
+	 * display of the ensemble may need updating. 
+	 */
+	protected void fireVisibleChangeEvent() {
+		VisiblyMutableUtils.changed(this, myListeners);
+	}
+
 	/**
 	 * Allows us to run a node in a separate thread. 
 	 *  

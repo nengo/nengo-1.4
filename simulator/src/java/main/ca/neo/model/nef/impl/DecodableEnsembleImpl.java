@@ -126,6 +126,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	 */
 	protected void addDecodedOrigin(String name, DecodedOrigin origin) {
 		myDecodedOrigins.put(name, origin);
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -140,6 +141,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	 */
 	public void removeDecodedOrigin(String name) {
 		myDecodedOrigins.remove(name);
+		fireVisibleChangeEvent();
 	}
 
 	/**

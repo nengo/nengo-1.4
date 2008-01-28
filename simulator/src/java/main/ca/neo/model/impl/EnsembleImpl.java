@@ -101,10 +101,6 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	 * @see ca.neo.model.Ensemble#setMode(ca.neo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-//		if (mode.equals(SimulationMode.DIRECT)) {
-//			mode = mode.getFallbackMode();
-//		}
-		
 		super.setMode(mode);
 	}
 
@@ -138,6 +134,8 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		
 		myExpandedTerminations.put(name, result);
 		
+		fireVisibleChangeEvent();
+		
 		return result;
 	}
 
@@ -146,6 +144,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	 */
 	public synchronized void removeTermination(String name) {
 		myExpandedTerminations.remove(name);
+		fireVisibleChangeEvent();
 	}
 
 	/** 

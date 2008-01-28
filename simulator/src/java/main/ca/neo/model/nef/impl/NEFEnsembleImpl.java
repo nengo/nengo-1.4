@@ -225,7 +225,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			throw new StructuralException("Output dimension " + matrix.length + " doesn't equal ensemble dimension " + myDimension);
 		}
 		myDecodedTerminations.put(name, result);
-		
+		fireVisibleChangeEvent();
 		return result;
 	}
 
@@ -253,7 +253,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			throw new StructuralException("Output dimension " + matrix.length + " doesn't equal ensemble dimension " + myDimension);
 		}
 		myDecodedTerminations.put(name, result);
-		
+		fireVisibleChangeEvent();		
 		return result;
 	}
 
@@ -296,6 +296,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		myDecodedTerminations.put(biasName, biasTermination);
 		myDecodedTerminations.put(interName, interneuronTermination);
+
+		fireVisibleChangeEvent();
 		
 		return new BiasTermination[]{biasTermination, interneuronTermination};
 	}
@@ -305,6 +307,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	public void removeDecodedTermination(String name) {
 		myDecodedTerminations.remove(name);
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -536,7 +539,5 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		}
 		return p;
 	}
-	
-	
 
 }
