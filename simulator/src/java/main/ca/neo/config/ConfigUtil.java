@@ -4,6 +4,13 @@
 package ca.neo.config;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,14 +20,23 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 
 import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.config.impl.ListPropertyImpl;
 import ca.neo.config.impl.NamedValuePropertyImpl;
 import ca.neo.config.impl.SingleValuedPropertyImpl;
+import ca.neo.config.ui.ConfigurationTreeCellEditor;
+import ca.neo.config.ui.ConfigurationTreeCellRenderer;
+import ca.neo.config.ui.ConfigurationTreeModel;
+import ca.neo.config.ui.ConfigurationTreePopupListener;
 import ca.neo.model.StructuralException;
 
 /**
@@ -29,6 +45,56 @@ import ca.neo.model.StructuralException;
  * @author Bryan Tripp
  */
 public class ConfigUtil {
+	
+	/**
+	 * Shows a tree in which object properties can be edited. 
+	 * 
+	 * @param o The Object to configure
+	 */
+	public static void configure(Frame owner, Object o) {
+		
+		final JDialog dialog = new JDialog(owner, o.getClass().getSimpleName() + " Configuration");
+		
+		ConfigurationTreeModel model = new ConfigurationTreeModel(o); 
+		final JTree tree = new JTree(model);
+		tree.setPreferredSize(new Dimension(300, 300));
+		tree.setEditable(true); 
+		tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
+		
+		tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));
+		
+		//shows help when F1 is pressed 
+		tree.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				Object selected = (tree.getSelectionPath() == null) ? null : tree.getSelectionPath().getLastPathComponent();
+				if (e.getKeyCode() == 112 && selected instanceof Property) {
+					String documentation = ((Property) selected).getDocumentation(); 
+					if (documentation != null) ConfigUtil.showHelp(documentation);
+				}
+			}
+		});
+		ConfigurationTreeCellRenderer cellRenderer = new ConfigurationTreeCellRenderer();
+		
+		tree.setCellRenderer(cellRenderer);
+		
+		ToolTipManager.sharedInstance().registerComponent(tree);
+		
+		dialog.getContentPane().setLayout(new BorderLayout());
+		dialog.getContentPane().add(new JScrollPane(tree), BorderLayout.CENTER);
+		
+		JButton doneButton = new JButton("Done");
+		doneButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dialog.setVisible(false);
+			}
+		});
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		buttonPanel.add(doneButton);
+		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+		dialog.pack();
+		dialog.setVisible(true);
+	}
 	
 	/**
 	 * TODO: remove this method 

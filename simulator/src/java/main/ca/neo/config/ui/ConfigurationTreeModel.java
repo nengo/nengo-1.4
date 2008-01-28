@@ -5,6 +5,8 @@ package ca.neo.config.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -409,37 +412,22 @@ public class ConfigurationTreeModel implements TreeModel {
 			return "NULL";
 		}
 	}
-	
+
+	//functional test code
 	public static void main(String[] args) {
 		try {
 			JavaSourceParser.addSource(new File("src/java/main"));
-			JFrame frame = new JFrame("Tree Test"); 
-//			Object configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
-			Object configurable = NoiseFactory.makeRandomNoise(1, new IndicatorPDF());
 			
-			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
-			final JTree tree = new JTree(model);
-			tree.setPreferredSize(new Dimension(300, 300));
-			tree.setEditable(true); 
-			tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
-			tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));
-			tree.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyPressed(KeyEvent e) {
-					Object selected = (tree.getSelectionPath() == null) ? null : tree.getSelectionPath().getLastPathComponent();
-					if (e.getKeyCode() == 112 && selected instanceof Property) {
-						String documentation = ((Property) selected).getDocumentation(); 
-						if (documentation != null) ConfigUtil.showHelp(documentation);
-					}
+			final Object configurable = NoiseFactory.makeRandomNoise(1, new IndicatorPDF());			
+			final JFrame frame = new JFrame("Tree Test");
+			
+			JButton button = new JButton("configure");
+			button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					ConfigUtil.configure(frame, configurable);
 				}
 			});
-			ConfigurationTreeCellRenderer cellRenderer = new ConfigurationTreeCellRenderer();
-			tree.setCellRenderer(cellRenderer);
-			
-			ToolTipManager.sharedInstance().registerComponent(tree);
-			
-			frame.getContentPane().setLayout(new BorderLayout());
-			frame.getContentPane().add(new JScrollPane(tree), BorderLayout.CENTER);
+			frame.getContentPane().add(button);
 			
 			frame.pack();
 			frame.setVisible(true);
