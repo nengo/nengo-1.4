@@ -1,16 +1,20 @@
 TODO NOW: 
-- fix icons 
-- clean up Function
-- configuration: for private classes, look for method declaration on public interfaces (eg NoiseFactory); see http://forums.bea.com/thread.jspa?threadID=600004396
+- clean up config UI code
+- make config initialization and factory for UI
 - events for Shu
 - constructor args not appearing for LTISystem (eg NoiseImplDF)
-- make config initialization and factory for UI
-- custom popups (e.g. plot function)
-- DONE fix SingleValuedProperty
 
 TODO: 
+- expand help in python 
+- python keyword "that"
+- custom popups (e.g. plot function)
+- fix icons 
+- map class names (eg Impl -> default implementation)
+- configuration: for private classes, look for method declaration on public interfaces (eg NoiseFactory); see http://forums.bea.com/thread.jspa?threadID=600004396
 - do something about units in relationship between synapticintegrator output and spikegenerator input
 - clean up musculoskeletal code
+- DONE clean up configuration-related code in API
+- DONE fix SingleValuedProperty
 
 TODO OLD: 
 - NO unify linear terminations at SynapticIntegrator and NEFEnsemble levels 
@@ -92,5 +96,14 @@ NOTES:
 	but the need would probably will arise during non-standard analytical work, where it might be better to 
 	export to Matlab or some other plotting package anyway. We don't have to support every plotting possibility 
 	here.
+- have had problems with simulator-ui not building; this fixes it (from http://forum.java.sun.com/thread.jspa?threadID=688073&messageID=4019106)
+	-Right Click Project you are working on from Package Explorer
+	-Go to Properties
+	-Go to Java Build Path from the right tree structure
+	-Go to Libraries Tab
+	-Choose Add Library Button
+	-Select JRE System Library
+	-Hit Next, the Radio button will prompt the Workspace default JRE, and let it be that way
+	-Hit Finish
 
 	

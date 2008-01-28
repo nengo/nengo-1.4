@@ -20,8 +20,7 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 	private float myHigh;
 	private float myInflection;
 	private float myMultiplier;
-	private Function myDerivative;
-	
+	private Function myDerivative;	
 	
 	/**
 	 * Default parameters (inflection=0; slope=1/4; low=0; high=1). 

@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.PDF;
 
 /**
@@ -16,15 +14,10 @@ public class IndicatorPDF implements PDF {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String LOW_PROPERTY = "low";
-	public static final String HIGH_PROPERTY = "high";
-	public static final String DENSITY_PROPERTY = "density";
-	
 	private float myLow;
 	private float myHigh;
 	private float myDifference;
 	private float myVal;
-	private ConfigurationImpl myConfiguration;
 
 	/**
 	 * @param low Lower limit of range of possible values
@@ -32,10 +25,6 @@ public class IndicatorPDF implements PDF {
 	 */
 	public IndicatorPDF(float low, float high) {
 		set(low, high);
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(LOW_PROPERTY, Float.TYPE, true);
-		myConfiguration.defineSingleValuedProperty(HIGH_PROPERTY, Float.TYPE, true);
-		myConfiguration.defineSingleValuedProperty(DENSITY_PROPERTY, Float.TYPE, false);
 	}
 	
 	/**
@@ -54,13 +43,6 @@ public class IndicatorPDF implements PDF {
 		myHigh = high;
 		myDifference = high - low;
 		myVal = 1f / myDifference;   		
-	}
-
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
 	}
 
 	/**

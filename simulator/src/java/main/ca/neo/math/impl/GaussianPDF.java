@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.PDF;
 
 /**
@@ -16,12 +14,6 @@ public class GaussianPDF implements PDF {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
-	public static final String MEAN_PROPERTY = "mean";
-	public static final String VARIANCE_PROPERTY = "variance";
-	public static final String PEAK_PROPERTY = "peak";
-	public static final String SCALE_PEAK_PROPERTY = "scalePeakWithVariance";
-	
 	private float myMean;
 	private float myVariance;
 	private float mySD;
@@ -29,7 +21,6 @@ public class GaussianPDF implements PDF {
 	private boolean nextAvailable;
 	private float myPeak;
 	private boolean myScalePeakWithVariance;
-	private ConfigurationImpl myConfiguration;	
 	
 	/**
 	 * @param mean Mean of the distribution 
@@ -55,13 +46,6 @@ public class GaussianPDF implements PDF {
 		nextNormal = 0;
 		nextAvailable = false;		
 		myScalePeakWithVariance = false;
-		
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
-		myConfiguration.defineSingleValuedProperty(MEAN_PROPERTY, Float.class, true);
-		myConfiguration.defineSingleValuedProperty(VARIANCE_PROPERTY, Float.class, true);
-		myConfiguration.defineSingleValuedProperty(PEAK_PROPERTY, Float.class, true);
-		myConfiguration.defineSingleValuedProperty(SCALE_PEAK_PROPERTY, Boolean.class, true);
 	}
 
 	/**
@@ -72,21 +56,23 @@ public class GaussianPDF implements PDF {
 	}
 
 	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
+	 * @param mean Mean of the distribution 
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
 	public void setMean(float mean) {
 		myMean = mean;
 		nextAvailable = false;
 	}
 	
+	/**
+	 * @return Mean of the distribution 
+	 */
 	public float getMean() {
 		return myMean;
 	}
 	
+	/**
+	 * @param variance Variance of the distribution
+	 */
 	public void setVariance(float variance) {
 		myVariance = variance;
 		nextAvailable = false;
@@ -95,24 +81,39 @@ public class GaussianPDF implements PDF {
 		}
 	}
 	
+	/**
+	 * @return Variance of the distribution
+	 */
 	public float getVariance() {
 		return myVariance;
 	}
 	
+	/**
+	 * @param peak Maximum value of scaled Gaussian 
+	 */
 	public void setPeak(float peak) {
 		myPeak = peak;
 		nextAvailable = false;
 		myScalePeakWithVariance = false;
 	}
 	
+	/**
+	 * @return Maximum value of scaled Gaussian 
+	 */
 	public float getPeak() {
 		return myPeak;
 	}
 	
+	/**
+	 * @param scale If true, the peak of the distribution scales automatically so that the integral is 1
+	 */
 	public void setScalePeakWithVariance(boolean scale) {
 		myScalePeakWithVariance = scale;
 	}
 	
+	/**
+	 * @return If true, the peak of the distribution scales automatically so that the integral is 1
+	 */
 	public boolean getScalePeakWithVariance() {
 		return myScalePeakWithVariance;
 	}

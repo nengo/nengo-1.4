@@ -21,7 +21,9 @@ import ca.neo.config.MainHandler;
 import ca.neo.config.NamedValueProperty;
 import ca.neo.config.Property;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
+import ca.neo.math.Function;
 import ca.neo.model.StructuralException;
+import ca.neo.plot.Plotter;
 
 public class ConfigurationTreePopupListener extends MouseAdapter {
 	
@@ -120,16 +122,17 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 			});
 			popup.add(refreshItem);
 			
-//			if (path.getLastPathComponent() instanceof Value) {
-//				final Value v = (Value) path.getLastPathComponent();
-//				JMenuItem displayItem = new JMenuItem("Display");
-//				displayItem.addActionListener(new ActionListener() {
+//			if (path.getLastPathComponent() instanceof Value && ((Value) path.getLastPathComponent()).getObject() instanceof Function) {
+//				final Function function = (Function) ((Value) path.getLastPathComponent()).getObject();
+//				JMenuItem plotValueItem = new JMenuItem("Plot");
+//				plotValueItem.addActionListener(new ActionListener() {
 //					public void actionPerformed(ActionEvent e) {
-//						System.out.println("index: " + v.getIndex());
+//						Plotter.plot(function, -1, .001f, 1, "Function");
 //					}
 //				});
-//				popup.add(displayItem);
+//				popup.add(plotValueItem);
 //			}
+			
 			popup.show(event.getComponent(), event.getX(), event.getY());
 		}
 	}

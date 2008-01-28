@@ -35,7 +35,7 @@ public class JavaSourceParser {
 	static {
 		ourBuilder = new JavaDocBuilder();
 		//TODO: make this configurable
-		addSource(new File("src/java/main"));
+//		addSource(new File("src/java/main"));
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class JavaSourceParser {
 		JavaClass[] interfaces = jc.getImplementedInterfaces();
 		
 		StringBuffer docs = new StringBuffer(jc.getName());
-		if (c.getSuperclass() != Object.class) {
+		if (c.getSuperclass() != null && c.getSuperclass() != Object.class) {
 			docs.append(" extends ");
 			docs.append(c.getSuperclass().getSimpleName());
 		} 

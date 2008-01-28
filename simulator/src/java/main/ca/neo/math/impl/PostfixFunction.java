@@ -8,12 +8,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
-import ca.neo.config.Property;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
-import ca.neo.model.StructuralException;
 
 /**
  * <p>A Function based on a mathematical expression and on other functions. The expression 
@@ -37,10 +32,6 @@ public class PostfixFunction implements Function {
 	private static final long serialVersionUID = 1L;
 	private static Logger ourLogger = Logger.getLogger(PostfixFunction.class);
 	
-	public static final String EXPRESSION_PROPERTY = "expression";
-	public static final String EXPRESSION_LIST_PROPERTY = "expressionList";
-	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
-	
 	private List myExpressionList;
 	
 	/**
@@ -48,7 +39,6 @@ public class PostfixFunction implements Function {
 	 */
 	private String myExpression;	
 	private int myDimension;
-	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param expressionList Postfix expression list (as described in class docs)
@@ -57,7 +47,7 @@ public class PostfixFunction implements Function {
 	 * 		placeholders that appear in the expression)
 	 */
 	public PostfixFunction(List expressionList, String expression, int dimension) {
-		init(expressionList, expression, dimension);
+		set(expressionList, expression, dimension);
 	}
 	
 	/**
@@ -66,83 +56,8 @@ public class PostfixFunction implements Function {
 	 * 		placeholders that appear in the expression)
 	 */
 	public PostfixFunction(String expression, int dimension) {
-		init(null, expression, dimension);
+		set(null, expression, dimension);
 	}	
-	
-	/**
-	 * @param properties As defined by getConstructionTemplate() or loaded from disk
-	 * @throws StructuralException
-	 */
-	public PostfixFunction(Configuration properties) throws StructuralException {
-		String expression = (String) ConfigUtil.get(properties, EXPRESSION_PROPERTY, String.class);
-		int dimension = ((Integer) ConfigUtil.get(properties, DIMENSION_PROPERTY, Integer.class)).intValue();
-		
-		List expressionList = null;
-		if (properties.getPropertyNames().contains(EXPRESSION_LIST_PROPERTY)) {
-			expressionList = (List) ConfigUtil.get(properties, EXPRESSION_LIST_PROPERTY, List.class);
-		}
-		
-		init(expressionList, expression, dimension);
-	}
-	
-	public static Configuration getConstructionTemplate() {
-		ConfigurationImpl result = new ConfigurationImpl(null);
-		result.defineTemplateProperty(DIMENSION_PROPERTY, Integer.class, new Integer(1));
-		result.defineTemplateProperty(EXPRESSION_PROPERTY, String.class, "x0");
-		return result;
-	}
-
-	private void init(List expressionList, String expression, int dimension) {
-		set(expressionList, expression, dimension);
-		
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, true);
-		myConfiguration.defineSingleValuedProperty(EXPRESSION_PROPERTY, String.class, true);
-
-		Property p = new Property() {
-			public Object getValue(int index) throws StructuralException {
-				return getExpressionList().get(index);
-			}
-			public void setValue(int index, Object value) throws IndexOutOfBoundsException, StructuralException {
-			}
-			public int getNumValues() {
-				return getExpressionList().size();
-			}			
-			public void addValue(Object value) throws StructuralException {
-			}
-			public Object getDefaultValue() {
-				return null;
-			}
-			public String getName() {
-				return EXPRESSION_LIST_PROPERTY;
-			}
-			public Class getType() {
-				return Object.class;
-			}
-			public Object getValue() {
-				return getExpressionList().get(0);
-			}
-			public void insert(int index, Object value) throws StructuralException {
-			}
-			public boolean isFixedCardinality() {
-				return true;
-			}
-			public boolean isMultiValued() {
-				return true;
-			}
-			public boolean isMutable() {
-				return false;
-			}
-			public void remove(int index) throws StructuralException {
-			}
-			public void setValue(Object value) throws StructuralException {
-			}
-			public String getDocumentation() {
-				return null;
-			}
-		};
-		myConfiguration.defineProperty(p);
-	}
 	
 	private void set(List expressionList, String expression, int dimension) {
 		if (expressionList == null) {
@@ -162,13 +77,6 @@ public class PostfixFunction implements Function {
 		myExpression = expression;
 	}
 	
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */	
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
 	/**
 	 * @return Postfix expression list 
 	 */

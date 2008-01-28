@@ -3,8 +3,6 @@
  */
 package ca.neo.math.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
 
 /**
@@ -18,13 +16,8 @@ public class SineFunction implements Function {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String DIMENSION_PROPERTY = AbstractFunction.DIMENSION_PROPERTY;
-	public static final String OMEGA_PROPERTY = "omega";
-	public static final String AMPLITUDE_PROPERTY = "amplitude";
-	
 	private float myOmega;
 	private float myAmplitude;
-	private ConfigurationImpl myConfiguration;
 
 	/**
 	 * Uses default angular frequency of 2pi and amplitude of 1
@@ -49,17 +42,6 @@ public class SineFunction implements Function {
 	public SineFunction(float omega, float amplitude) {
 		myOmega = omega;
 		myAmplitude = amplitude;
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.defineSingleValuedProperty(DIMENSION_PROPERTY, Integer.class, false);
-		myConfiguration.defineSingleValuedProperty(OMEGA_PROPERTY, Float.class, true);
-		myConfiguration.defineSingleValuedProperty(AMPLITUDE_PROPERTY, Float.class, true);
-	}
-
-	/**
-	 * @see ca.neo.config.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
 	}
 
 	/**

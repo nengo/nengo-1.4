@@ -33,12 +33,20 @@ import ca.neo.math.Function;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.FunctionBasisImpl;
+import ca.neo.math.impl.GaussianPDF;
 import ca.neo.math.impl.IdentityFunction;
+import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.math.impl.LinearCurveFitter;
+import ca.neo.math.impl.NumericallyDifferentiableFunction;
 import ca.neo.math.impl.PiecewiseConstantFunction;
+import ca.neo.math.impl.Polynomial;
+import ca.neo.math.impl.PostfixFunction;
+import ca.neo.math.impl.SigmoidFunction;
+import ca.neo.math.impl.SineFunction;
 import ca.neo.math.impl.TimeSeriesFunction;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
+import ca.neo.model.impl.NoiseFactory;
 import ca.neo.model.neuron.impl.PoissonSpikeGenerator;
 import ca.neo.util.impl.TimeSeries1DImpl;
 
@@ -410,7 +418,7 @@ public class ConfigurationTreeModel implements TreeModel {
 //			NEFEnsembleImpl configurable = (NEFEnsembleImpl) ef.make("test", 100, 2);
 //			configurable.addDecodedTermination("decoded", MU.I(2), .005f, false);
 //			configurable.addTermination("composite", MU.zero(100, 1), .005f, false);
-			Object configurable = new IdentityFunction(2, 1);
+			Object configurable = NoiseFactory.makeRandomNoise(1, new GaussianPDF());
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			final JTree tree = new JTree(model);
