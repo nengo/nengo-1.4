@@ -17,6 +17,7 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Drag and drop UINeoNodes between networks (worlds)
 
 Integrate data list viewer as pane in NeoGraphics
 

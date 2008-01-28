@@ -69,6 +69,22 @@ public abstract class StandardAction implements Serializable {
 	}
 
 	/**
+	 * Blocks the calling thread until this action is completed.
+	 */
+	public void blockUntilCompleted() {
+		while (!actionCompleted) {
+			synchronized (this) {
+				try {
+					this.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+	}
+
+	/**
 	 * Does the work
 	 * 
 	 * @return Whether the action was successful
@@ -112,12 +128,16 @@ public abstract class StandardAction implements Serializable {
 		try {
 			action();
 			postAction();
-			actionCompleted = true;
 		} catch (ActionException e) {
 			e.defaultHandleBehavior();
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			UserMessages.showWarning("Unexpected Exception: " + e.toString());
+		} finally {
+			actionCompleted = true;
+			synchronized (this) {
+				this.notifyAll();
+			}
 		}
 	}
 

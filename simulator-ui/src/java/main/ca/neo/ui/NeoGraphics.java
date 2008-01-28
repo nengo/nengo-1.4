@@ -36,7 +36,6 @@ import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 
@@ -163,7 +162,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 								// '.');
 								Class<?> newClass = urlClassLoader.loadClass(className);
 
-								Util.debugMsg("Registering class: " + newClass.getName());
+								// Util.debugMsg("Registering class: " +
+								// newClass.getName());
 								ClassRegistry.getInstance().register(newClass);
 
 							} catch (ClassNotFoundException e) {

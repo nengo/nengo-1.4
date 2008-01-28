@@ -39,6 +39,17 @@ public class ExampleRunner {
 		});
 	}
 
+	/**
+	 * @param name
+	 *            Name to be given to this instance
+	 * @param network
+	 *            Network to be given to NeoGraphics
+	 */
+	public ExampleRunner(String name, UINetwork network) {
+		this(name, network.getModel());
+		this.networkUI = network;
+	}
+
 	protected void doStuff(UINetwork network) {
 
 	}
@@ -48,16 +59,14 @@ public class ExampleRunner {
 	 */
 	private UINetwork buildUI() {
 
-		NeoGraphics neoGraphics = new NeoGraphics();
-
-		TrackedStatusMsg task = new TrackedStatusMsg(
-				"Creating NEO Network model");
-
-		task.finished();
-
+		TrackedStatusMsg task;
 		task = new TrackedStatusMsg("Creating Model UI");
-		networkUI = new UINetwork(network);
-		neoGraphics.addNeoNode(networkUI);
+		if (networkUI == null) {
+			NeoGraphics neoGraphics = new NeoGraphics();
+
+			networkUI = new UINetwork(network);
+			neoGraphics.addNeoNode(networkUI);
+		}
 
 		processNetwork(networkUI);
 		task.finished();
