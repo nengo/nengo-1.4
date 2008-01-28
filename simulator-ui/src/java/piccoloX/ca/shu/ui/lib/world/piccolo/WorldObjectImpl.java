@@ -16,9 +16,9 @@ import java.util.Iterator;
 import ca.shu.ui.lib.objects.activities.TransientMessage;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.EventListener;
+import ca.shu.ui.lib.world.PaintContext;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.PaintContext;
 import ca.shu.ui.lib.world.piccolo.primitives.PXNode;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import edu.umd.cs.piccolo.PCamera;
@@ -42,6 +42,7 @@ public class WorldObjectImpl implements WorldObject {
 	private static final long serialVersionUID = 1L;
 
 	public static final Object[][] CONVERSION_MAP = new Object[][] {
+			{ EventType.PARENTS_CHANGED, PNode.PROPERTY_PARENT },
 			{ EventType.BOUNDS_CHANGED, PNode.PROPERTY_BOUNDS },
 			{ EventType.PARENTS_BOUNDS, PXNode.PROPERTY_PARENT_BOUNDS },
 			{ EventType.FULL_BOUNDS, PXNode.PROPERTY_FULL_BOUNDS },
@@ -264,9 +265,9 @@ public class WorldObjectImpl implements WorldObject {
 				duration);
 	}
 
-	public void animateToPositionScaleRotation(double arg0, double arg1, double arg2, double arg3,
-			long arg4) {
-		myPNode.animateToPositionScaleRotation(arg0, arg1, arg2, arg3, arg4);
+	public void animateToPositionScaleRotation(double x, double y, double scale, double theta,
+			long duration) {
+		myPNode.animateToPositionScaleRotation(x, y, scale, theta, duration);
 	}
 
 	/*
@@ -327,7 +328,11 @@ public class WorldObjectImpl implements WorldObject {
 		return myPNode.getBounds();
 	}
 
-	public Collection<WorldObject> getChildren() {
+	public Iterable<WorldObject> getChildren() {
+		return getChildrenInternal();
+	}
+
+	private Collection<WorldObject> getChildrenInternal() {
 		ArrayList<WorldObject> objects = new ArrayList<WorldObject>(getPiccolo().getChildrenCount());
 
 		Iterator<?> it = getPiccolo().getChildrenIterator();
@@ -624,7 +629,7 @@ public class WorldObjectImpl implements WorldObject {
 		return rectangle;
 	}
 
-	public void offset(double dx, double dy) {
+	public void dragOffset(double dx, double dy) {
 		Point2D offset = getOffset();
 		offset.setLocation(offset.getX() + dx, offset.getY() + dy);
 		setOffset(offset);
@@ -832,6 +837,10 @@ public class WorldObjectImpl implements WorldObject {
 
 	public void setRotation(double theta) {
 		myPNode.setRotation(theta);
+	}
+
+	public int getChildrenCount() {
+		return getChildrenInternal().size();
 	}
 
 }

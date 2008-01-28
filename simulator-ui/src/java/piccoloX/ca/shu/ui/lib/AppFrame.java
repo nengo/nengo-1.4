@@ -40,6 +40,7 @@ import javax.swing.border.EtchedBorder;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.ExitAction;
 import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
@@ -66,11 +67,11 @@ public abstract class AppFrame extends JFrame {
 	/**
 	 * A String which briefly describes some commands used in this application
 	 */
-	public static final String TIPS = "<B>*** Keyboard Shortcuts ***</B><BR>"
+	public static final String TIPS = "<H3>Keyboard Shortcuts</H3>"
 			+ "Interaction modes: Press 's' to switch modes<BR>"
 			+ "Searching: Press 'f', then start typing.<BR>"
 			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips<BR>"
-			+ "<BR><B>*** Mouse Shortcuts ***</B><BR>"
+			+ "<BR><H3>Mouse Shortcuts</H3>"
 			+ "Context menu: Right click opens a context menu on most objects<BR>"
 			+ "Zooming: Scroll the mouse wheel or right click and drag";
 
@@ -144,6 +145,17 @@ public abstract class AppFrame extends JFrame {
 		loadPreferences();
 		UIEnvironment.setInstance(this);
 
+		if (preferences.isWelcomeScreen()) {
+			preferences.setWelcomeScreen(false);
+
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+
+					(new TipsAction("", true)).doAction();
+				}
+			});
+		}
+
 		restoreDefaultTitle();
 
 		actionManager = new ReversableActionManager(this);
@@ -182,7 +194,11 @@ public abstract class AppFrame extends JFrame {
 		menuBar.setBorder(null);
 		Style.applyMenuStyle(menuBar, true);
 
-		initFileMenu(menuBar);
+		MenuBuilder fileMenu = new MenuBuilder("Start");
+		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_S);
+		initFileMenu(fileMenu);
+		fileMenu.addAction(new ExitAction(this, "Quit"), KeyEvent.VK_P);
+		menuBar.add(fileMenu.getJMenu());
 
 		editMenu = new MenuBuilder("Edit");
 		editMenu.getJMenu().setMnemonic(KeyEvent.VK_E);
@@ -201,7 +217,7 @@ public abstract class AppFrame extends JFrame {
 		MenuBuilder helpMenu = new MenuBuilder("Help");
 		helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
 		menuBar.add(helpMenu.getJMenu());
-		helpMenu.addAction(new TipsAction("Tips and Commands"), KeyEvent.VK_T);
+		helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
 		helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
 
 		menuBar.setVisible(true);
@@ -320,7 +336,7 @@ public abstract class AppFrame extends JFrame {
 	 * @param menuBar
 	 *            is attached to the frame
 	 */
-	protected void initFileMenu(JMenuBar menuBar) {
+	protected void initFileMenu(MenuBuilder menu) {
 
 	}
 
@@ -407,7 +423,7 @@ public abstract class AppFrame extends JFrame {
 	protected void updateTaskMessages() {
 		StringBuilder strBuff = new StringBuilder("<HTML>");
 		if (taskStatusStrings.size() > 0) {
-//			strBuff.append("- MESSAGES -<BR>");
+			// strBuff.append("- MESSAGES -<BR>");
 
 			for (int i = taskStatusStrings.size() - 1; i >= 0; i--) {
 				strBuff.append(taskStatusStrings.get(i) + "<BR>");
@@ -477,7 +493,7 @@ public abstract class AppFrame extends JFrame {
 	/**
 	 * Called when the user closes the Application window
 	 */
-	protected void windowClosing() {
+	public void exitAppFrame() {
 		savePreferences();
 		System.exit(0);
 	}
@@ -717,7 +733,7 @@ public abstract class AppFrame extends JFrame {
 	 * 
 	 * @author Shu Wu
 	 */
-	class HighQualityAction extends StandardAction {
+	protected class HighQualityAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -817,7 +833,7 @@ public abstract class AppFrame extends JFrame {
 		}
 
 		public void windowClosing(WindowEvent arg0) {
-			AppFrame.this.windowClosing();
+			AppFrame.this.exitAppFrame();
 		}
 
 		public void windowDeactivated(WindowEvent arg0) {
@@ -930,17 +946,28 @@ public abstract class AppFrame extends JFrame {
 
 		private static final long serialVersionUID = 1L;
 
-		public TipsAction(String actionName) {
+		private boolean welcome;
+
+		public TipsAction(String actionName, boolean isWelcomeScreen) {
 			super("Show UI tips", actionName);
+
+			this.welcome = isWelcomeScreen;
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			JLabel editor = new JLabel("<html>" + TIPS + "</html>");
+			JLabel editor;
+			if (welcome) {
+				String appendum = "To show this message again, click <b>Help -> Tips and Commands</b>";
+				editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + TIPS
+						+ "<BR><BR>" + appendum + "</html>");
+			} else {
+				editor = new JLabel("<html>" + TIPS + "</html>");
+			}
+
 			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "NeoGraphics Tips",
 					JOptionPane.PLAIN_MESSAGE);
 		}
-
 	}
 
 	/**
@@ -1108,6 +1135,7 @@ class UserPreferences implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private boolean enableTooltips = true;
 	private boolean gridVisible = true;
+	private boolean isWelcomeScreen = true;
 
 	/**
 	 * Applies preferences
@@ -1136,6 +1164,14 @@ class UserPreferences implements Serializable {
 	public void setGridVisible(boolean gridVisible) {
 		this.gridVisible = gridVisible;
 		PXGrid.setGridVisible(gridVisible);
+	}
+
+	public boolean isWelcomeScreen() {
+		return isWelcomeScreen;
+	}
+
+	public void setWelcomeScreen(boolean isWelcomeScreen) {
+		this.isWelcomeScreen = isWelcomeScreen;
 	}
 
 }

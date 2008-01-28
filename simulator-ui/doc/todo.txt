@@ -20,12 +20,8 @@
 
 Integrate data list viewer as pane in NeoGraphics
 
-Update the context menu style to be more inline with NeoGraphics colors
-
-Make WorldOBject and interface
-
-Rename WorldObject interfaces and implementations
-
+Add weak reference to UI Nodes from DataListView
+	Support feature such as focus on node (check node.isDestroyed && node is not hidden)
 
 
 Request:
@@ -38,27 +34,15 @@ Request:
 Add graph updated notificatier so that listeners may know when the graph 
 	has been changed from another thread
 	
-Figure out if directed edge are applying elastic forces in the right direction
-
 	
 Transient messages should not fall off the screen
 	reference tooltips code
 Transient messages should follow the objects
 	reference tooltips code
 
-TODO:
-    * Dynamic class loading
-    * Adding comments to new code
-    * Reversable actions
-
-Doing next:
-
-Add weak reference to UI Nodes from DataListView
-	Support feature such as focus on node (check node.isDestroyed && node is not hidden)
-
-Aggregate actions: actions can be chained, and this chain undone.
-
-Proper labeling for multiple plots 
+Reversable actions
+	Aggregate actions: actions can be chained, and this chain undone.
+	
 
 *******************************************
  Pri 1 - to do

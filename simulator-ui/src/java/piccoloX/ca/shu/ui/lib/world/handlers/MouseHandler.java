@@ -61,8 +61,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 	 * @return Interactable object
 	 */
 	private Interactable getInteractableFromEvent(PInputEvent event) {
-		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
-				Interactable.class);
+		Interactable obj = (Interactable) Util.getNodeFromPickPath(event, Interactable.class);
 
 		if (obj == null || !world.isAncestorOf(obj)) {
 			return null;
@@ -79,12 +78,13 @@ public class MouseHandler extends PBasicInputEventHandler {
 			while (node != null) {
 				if (node instanceof PiccoloNodeInWorld) {
 
-					WorldObject wo = ((PiccoloNodeInWorld) node)
-							.getWorldObject();
+					WorldObject wo = ((PiccoloNodeInWorld) node).getWorldObject();
 
-					wo.doubleClicked();
+					if (wo.isSelectable()) {
+						wo.doubleClicked();
+						break;
+					}
 
-					break;
 				}
 				node = node.getParent();
 			}
@@ -142,15 +142,15 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		super.mouseReleased(event);
 
-		if (((mouseButtonPressed == event.getButton()) && mouseCanvasPositionPressed
-				.distance(event.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
+		if (((mouseButtonPressed == event.getButton()) && mouseCanvasPositionPressed.distance(event
+				.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
 
 			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
 
 			if (menuToShow == null
 					&& (interactableObj != null)
-					&& (interactableObj == (Interactable) Util
-							.getNodeFromPickPath(event, Interactable.class))) {
+					&& (interactableObj == (Interactable) Util.getNodeFromPickPath(event,
+							Interactable.class))) {
 				menuToShow = interactableObj.getContextMenu();
 			}
 
@@ -158,8 +158,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
 
-				menuToShow.show(e.getComponent(), e.getPoint().x,
-						e.getPoint().y);
+				menuToShow.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
 				menuToShow.setVisible(true);
 			}
 		}

@@ -19,9 +19,7 @@ import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
-import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.shu.ui.lib.world.piccolo.WorldSkyImpl;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.FRLayout;
@@ -40,20 +38,9 @@ public class ElasticWorld extends WorldImpl {
 	/**
 	 * Default layout bounds
 	 */
-	private static final Dimension DEFAULT_LAYOUT_BOUNDS = new Dimension(1000,
-			1000);
+	private static final Dimension DEFAULT_LAYOUT_BOUNDS = new Dimension(1000, 1000);
 
 	private static final long serialVersionUID = 1L;
-
-	private final WorldGroundImpl.ChildFilter elasticObjectFilter = new WorldGroundImpl.ChildFilter() {
-		public boolean acceptChild(WorldObject obj) {
-			if (obj instanceof ElasticObject) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	};
 
 	/**
 	 * Layout bounds
@@ -71,7 +58,6 @@ public class ElasticWorld extends WorldImpl {
 
 	public ElasticWorld(String name, WorldSkyImpl sky, ElasticGround ground) {
 		super(name, sky, ground);
-		getGround().setChildFilter(elasticObjectFilter);
 	}
 
 	protected void applyJungLayout(Class<? extends Layout> layoutType) {
@@ -97,18 +83,13 @@ public class ElasticWorld extends WorldImpl {
 
 		MenuBuilder algorithmLayoutMenu = menu.addSubMenu("Algorithm");
 
-		algorithmLayoutMenu.addAction(new JungLayoutAction(FRLayout.class,
-				"Fruchterman-Reingold"));
-		algorithmLayoutMenu.addAction(new JungLayoutAction(KKLayout.class,
-				"Kamada-Kawai"));
-		algorithmLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class,
-				"Circle"));
-		algorithmLayoutMenu.addAction(new JungLayoutAction(ISOMLayout.class,
-				"ISOM"));
+		algorithmLayoutMenu.addAction(new JungLayoutAction(FRLayout.class, "Fruchterman-Reingold"));
+		algorithmLayoutMenu.addAction(new JungLayoutAction(KKLayout.class, "Kamada-Kawai"));
+		algorithmLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class, "Circle"));
+		algorithmLayoutMenu.addAction(new JungLayoutAction(ISOMLayout.class, "ISOM"));
 
 		MenuBuilder layoutSettings = algorithmLayoutMenu.addSubMenu("Settings");
-		layoutSettings.addAction(new SetLayoutBoundsAction(
-				"Set preferred bounds", this));
+		layoutSettings.addAction(new SetLayoutBoundsAction("Set preferred bounds", this));
 
 	}
 
@@ -174,10 +155,11 @@ public class ElasticWorld extends WorldImpl {
 				args[0] = getGround().getGraph();
 				layout = (Layout) ct.newInstance(args);
 
+			} catch (InvocationTargetException e) {
+				e.getTargetException().printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new ActionException("Could not apply layout: "
-						+ e.getMessage());
+				throw new ActionException("Could not apply layout: " + e.getMessage());
 			}
 
 			layout.initialize(getLayoutBounds());
@@ -196,8 +178,7 @@ public class ElasticWorld extends WorldImpl {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						getGround()
-								.updateChildrenFromLayout(layout, true, true);
+						getGround().updateChildrenFromLayout(layout, true, true);
 					}
 				});
 			} catch (InterruptedException e) {
@@ -277,10 +258,8 @@ class SetLayoutBoundsAction extends StandardAction {
 	}
 
 	private void completeConfiguration(PropertySet properties) {
-		parent
-				.setLayoutBounds(new Dimension((Integer) properties
-						.getProperty(pWidth), (Integer) properties
-						.getProperty(pHeight)));
+		parent.setLayoutBounds(new Dimension((Integer) properties.getProperty(pWidth),
+				(Integer) properties.getProperty(pHeight)));
 
 	}
 
@@ -288,9 +267,8 @@ class SetLayoutBoundsAction extends StandardAction {
 	protected void action() throws ActionException {
 
 		try {
-			PropertySet properties = ConfigManager.configure(zProperties,
-					"Layout bounds", UIEnvironment.getInstance(),
-					ConfigMode.TEMPLATE_NOT_CHOOSABLE);
+			PropertySet properties = ConfigManager.configure(zProperties, "Layout bounds",
+					UIEnvironment.getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 			completeConfiguration(properties);
 
 		} catch (ConfigException e) {

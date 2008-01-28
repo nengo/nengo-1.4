@@ -11,7 +11,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
-public class WorldLayerImpl extends WorldObjectImpl implements WorldLayer {
+public abstract class WorldLayerImpl extends WorldObjectImpl implements WorldLayer {
 
 	/**
 	 * World this layer belongs to

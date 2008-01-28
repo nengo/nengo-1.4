@@ -7,11 +7,11 @@ import java.util.Collection;
 
 import javax.swing.JPopupMenu;
 
-import ca.neo.ui.actions.ZoomToFitAction;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.RemoveObjectsAction;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.actions.ZoomToFitAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;

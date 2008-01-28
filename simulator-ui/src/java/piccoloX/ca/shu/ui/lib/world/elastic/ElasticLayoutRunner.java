@@ -7,7 +7,9 @@ import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.util.ElasticLayout;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.util.ElasticLayout.LengthFunction;
 import edu.uci.ics.jung.graph.ArchetypeVertex;
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.SparseGraph;
 
@@ -17,8 +19,8 @@ public class ElasticLayoutRunner {
 	 */
 	public static final double RELAX_DELTA = 2;
 	public static final float SPRING_LAYOUT_FORCE_MULTIPLIER = 1f / 3f;
-	public static final int SPRING_LAYOUT_NODE_DISTANCE = 300;
-	public static final int SPRING_LAYOUT_REPULSION_DISTANCE = 200;
+	public static final int SPRING_LAYOUT_DEFAULT_LENGTH = 300;
+	public static final int SPRING_LAYOUT_DEFAULT_REPULSION_DISTANCE = 200;
 	private int relaxCount;
 	private boolean continueLayout = true;
 
@@ -34,30 +36,45 @@ public class ElasticLayoutRunner {
 		init();
 	}
 
+	class ElasticLengthFunction implements LengthFunction {
+
+		public double getLength(Edge e) {
+			if (e.containsUserDatumKey(ElasticGround.ELASTIC_LENGTH_KEY)) {
+				return (Double) e.getUserDatum(ElasticGround.ELASTIC_LENGTH_KEY);
+			} else {
+				return SPRING_LAYOUT_DEFAULT_LENGTH;
+			}
+		}
+
+		public double getMass(Vertex v) {
+			if (v instanceof ElasticVertex) {
+				return ((ElasticVertex) v).getRepulsionRange();
+			}
+
+			return SPRING_LAYOUT_DEFAULT_REPULSION_DISTANCE;
+		}
+
+	}
+
 	private void init() {
 
 		myParent.updateGraph();
 		myGraph = myParent.getGraph();
-		this.layout = new ElasticLayout(myGraph,
-				new ElasticLayout.UnitLengthFunction(
-						SPRING_LAYOUT_NODE_DISTANCE));
-		layout.setRepulsionRange(SPRING_LAYOUT_REPULSION_DISTANCE);
+		this.layout = new ElasticLayout(myGraph, new ElasticLengthFunction());
 		layout.setForceMultiplier(SPRING_LAYOUT_FORCE_MULTIPLIER);
 		layout.initialize();
 
 		for (Object obj : myGraph.getVertices()) {
 			ElasticVertex vertex = (ElasticVertex) obj;
 			Point2D vertexLocation = vertex.getLocation();
-			layout.forceMove(vertex, vertexLocation.getX(), vertexLocation
-					.getY());
+			layout.forceMove(vertex, vertexLocation.getX(), vertexLocation.getY());
 		}
 
 	}
 
 	private void runLayout() {
 
-		while (!layout.incrementsAreDone() && !myParent.isDestroyed()
-				&& continueLayout) {
+		while (!layout.incrementsAreDone() && !myParent.isDestroyed() && continueLayout) {
 
 			/**
 			 * Layout nodes needs to be done in the Swing dispatcher thread
@@ -82,8 +99,7 @@ public class ElasticLayoutRunner {
 		}
 
 		if (layout.incrementsAreDone()) {
-			Util.Assert(false,
-					"Iterable layout is done, this shouldn't be possible");
+			Util.Assert(false, "Iterable layout is done, this shouldn't be possible");
 		}
 	}
 
@@ -102,8 +118,7 @@ public class ElasticLayoutRunner {
 
 			// update new vertex positions
 			for (ElasticVertex vertex : result.getAddedVertices()) {
-				layout.forceMove(vertex, vertex.getLocation().getX(), vertex
-						.getLocation().getY());
+				layout.forceMove(vertex, vertex.getLocation().getX(), vertex.getLocation().getY());
 			}
 
 			relaxCount = 0;
@@ -126,8 +141,7 @@ public class ElasticLayoutRunner {
 				Point2D vertexLocation = vertex.getLocation();
 				Point2D layoutLocation = layout.getLocation(vertex);
 
-				double delta = Math
-						.abs(vertexLocation.distance(layoutLocation));
+				double delta = Math.abs(vertexLocation.distance(layoutLocation));
 
 				if (delta > maxDelta) {
 					maxDelta = delta;

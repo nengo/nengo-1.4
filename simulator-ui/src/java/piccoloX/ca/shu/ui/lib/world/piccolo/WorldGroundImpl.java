@@ -9,6 +9,8 @@ import java.util.Iterator;
 
 import javax.swing.SwingUtilities;
 
+import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.ObjectSet;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
@@ -27,7 +29,49 @@ public class WorldGroundImpl extends WorldLayerImpl implements WorldLayer {
 
 	private static final long serialVersionUID = 1L;
 
-	private ChildFilter myChildFilter;
+	/**
+	 * Adds a little pizzaz when adding new objects
+	 * 
+	 * @param wo
+	 *            Object to be added
+	 * @param centerCameraPosition
+	 *            whether the object's position should be changed to appear at
+	 *            the center of the camera
+	 */
+	protected static void dropObject(World world, WorldObject parent, WorldObject wo,
+			boolean centerCameraPosition) {
+		parent.addChild(wo);
+
+		Point2D finalPosition;
+		if (centerCameraPosition) {
+			Rectangle2D fullBounds = wo.getFullBounds();
+
+			finalPosition = world.skyToGround(new Point2D.Double(world.getWidth() / 2, world
+					.getHeight() / 2));
+			/*
+			 * The final position is at the center of the full bounds of the
+			 * object to be added.
+			 */
+			finalPosition = new Point2D.Double(finalPosition.getX()
+					- (fullBounds.getX() - wo.getOffset().getX()) - (fullBounds.getWidth() / 2d),
+					finalPosition.getY() - (fullBounds.getY() - wo.getOffset().getY())
+							- (fullBounds.getHeight() / 2d));
+		} else {
+			finalPosition = wo.getOffset();
+
+		}
+		wo.setScale(1 / world.getSky().getViewScale());
+
+		wo.setOffset(finalPosition.getX(), finalPosition.getY()
+				- (100 / world.getSky().getViewScale()));
+
+		wo.animateToPositionScaleRotation(finalPosition.getX(), finalPosition.getY(), 1, 0, 500);
+	}
+
+	/*
+	 * Convenient storage of all children
+	 */
+	private ObjectSet<WorldObject> children = new ObjectSet<WorldObject>();
 
 	private GroundNode myLayerNode;
 
@@ -46,10 +90,6 @@ public class WorldGroundImpl extends WorldLayerImpl implements WorldLayer {
 	@Override
 	public void addChild(WorldObject wo, int index) {
 
-		if (myChildFilter != null && (!myChildFilter.acceptChild(wo))) {
-			throw new InvalidParameterException();
-		}
-
 		super.addChild(wo, index);
 	}
 
@@ -65,56 +105,34 @@ public class WorldGroundImpl extends WorldLayerImpl implements WorldLayer {
 	 */
 	public void addObject(WorldObject wo) {
 		addObject(wo, true);
-
 	}
 
 	public void addObject(WorldObject wo, boolean centerCameraPosition) {
 		dropObject(world, this, wo, centerCameraPosition);
 	}
 
-	/**
-	 * Adds a little pizzaz when adding new objects
-	 * 
-	 * @param wo
-	 *            Object to be added
-	 * @param centerCameraPosition
-	 *            whether the object's position should be changed to appear at
-	 *            the center of the camera
-	 */
-	protected static void dropObject(World world, WorldObject parent,
-			WorldObject wo, boolean centerCameraPosition) {
-		parent.addChild(wo);
+	@Override
+	public void childAdded(WorldObject wo) {
+		super.childAdded(wo);
 
-		Point2D finalPosition;
-		if (centerCameraPosition) {
-			Rectangle2D fullBounds = wo.getFullBounds();
+		children.add(wo);
+	}
 
-			finalPosition = world.skyToGround(new Point2D.Double(world
-					.getWidth() / 2, world.getHeight() / 2));
-			/*
-			 * The final position is at the center of the full bounds of the
-			 * object to be added.
-			 */
-			finalPosition = new Point2D.Double(finalPosition.getX()
-					- (fullBounds.getX() - wo.getOffset().getX())
-					- (fullBounds.getWidth() / 2d), finalPosition.getY()
-					- (fullBounds.getY() - wo.getOffset().getY())
-					- (fullBounds.getHeight() / 2d));
-		} else {
-			finalPosition = wo.getOffset();
-
+	@Override
+	public void childRemoved(WorldObject wo) {
+		super.childRemoved(wo);
+		if (!children.remove(wo)) {
+			Util.Assert(false);
 		}
-		wo.setScale(1 / world.getSky().getViewScale());
-
-		wo.setOffset(finalPosition.getX(), finalPosition.getY()
-				- (100 / world.getSky().getViewScale()));
-
-		wo.animateToPositionScaleRotation(finalPosition.getX(), finalPosition
-				.getY(), 1, 0, 500);
 	}
 
 	public boolean containsEdge(PXEdge edge) {
 		return myLayerNode.containsEdge(edge);
+	}
+
+	@Override
+	public Iterable<WorldObject> getChildren() {
+		return children;
 	}
 
 	public Collection<PXEdge> getEdges() {
@@ -126,10 +144,6 @@ public class WorldGroundImpl extends WorldLayerImpl implements WorldLayer {
 	 */
 	public double getGroundScale() {
 		return world.getSky().getViewScale();
-	}
-
-	public void setChildFilter(ChildFilter childFilter) {
-		myChildFilter = childFilter;
 	}
 
 	public static interface ChildFilter {
@@ -161,8 +175,7 @@ class GroundNode extends PXNode {
 	}
 
 	public Collection<PXEdge> getEdges() {
-		ArrayList<PXEdge> edges = new ArrayList<PXEdge>(edgeHolder
-				.getChildrenCount());
+		ArrayList<PXEdge> edges = new ArrayList<PXEdge>(edgeHolder.getChildrenCount());
 
 		Iterator<?> it = edgeHolder.getChildrenIterator();
 		while (it.hasNext()) {

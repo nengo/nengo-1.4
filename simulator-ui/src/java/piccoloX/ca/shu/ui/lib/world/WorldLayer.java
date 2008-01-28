@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.objects.Window;
+import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
 
 /**
  * A Layer of the world
@@ -16,6 +17,8 @@ public interface WorldLayer extends WorldObject {
 	 *            Child node to add
 	 */
 	public void addChild(WorldObject child);
+
+	public void addEdge(PXEdge edge);
 
 	/**
 	 * @return World which this layer belongs to

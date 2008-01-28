@@ -1,9 +1,8 @@
 package ca.shu.ui.lib.world.elastic;
 
+import java.awt.BasicStroke;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import ca.shu.ui.lib.Style.Style;
@@ -14,7 +13,6 @@ import ca.shu.ui.lib.world.WorldObject.EventType;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.Path;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
-import edu.umd.cs.piccolo.PNode;
 
 public class ElasticObject extends WorldObjectImpl {
 
@@ -24,6 +22,8 @@ public class ElasticObject extends WorldObjectImpl {
 	private ElasticGround elasticGround;
 
 	private boolean isAnchored = false;
+	private static final double DEFAULT_REPULSION_DISTANCE = 150;
+	private double repulsionRange;
 
 	/**
 	 * Counts the number of times the position has been locked
@@ -51,17 +51,34 @@ public class ElasticObject extends WorldObjectImpl {
 	}
 
 	private void init() {
-		getPiccolo().addPropertyChangeListener(new PropertyChangeListener() {
 
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (evt.getPropertyName().equals(PNode.PROPERTY_PARENT)) {
-					if (getParent() instanceof ElasticGround) {
-						elasticGround = (ElasticGround) getParent();
-					}
+		addPropertyChangeListener(EventType.PARENTS_CHANGED, new EventListener() {
+			public void propertyChanged(EventType event) {
+				if (getParent() instanceof ElasticGround) {
+					elasticGround = (ElasticGround) getParent();
 				}
 			}
-
 		});
+
+		addPropertyChangeListener(EventType.BOUNDS_CHANGED, new EventListener() {
+			public void propertyChanged(EventType event) {
+				recalculateRepulsionRange();
+			}
+		});
+		recalculateRepulsionRange();
+	}
+
+	private void recalculateRepulsionRange() {
+		double range = DEFAULT_REPULSION_DISTANCE;
+
+		Rectangle2D bounds = localToGlobal(getBounds());
+
+		double radius = Math.sqrt(bounds.getWidth() * bounds.getWidth() + bounds.getHeight()
+				* bounds.getHeight());
+
+		range += radius;
+
+		this.repulsionRange = range;
 	}
 
 	protected ElasticGround getElasticWorld() {
@@ -105,7 +122,7 @@ public class ElasticObject extends WorldObjectImpl {
 			isAnchored = anchored;
 			if (isAnchored) {
 				if (anchor == null) {
-					anchor = new Anchor(getWorldLayer(), this);
+					anchor = new Anchor(this);
 				}
 
 				setPositionLocked(true);
@@ -180,17 +197,22 @@ public class ElasticObject extends WorldObjectImpl {
 		}
 		super.prepareForDestroy();
 	}
+
+	public double getRepulsionRange() {
+		return repulsionRange;
+	}
+
 }
 
 class Anchor implements Destroyable, EventListener {
 	private ElasticObject obj;
 	private Path border;
 	private Path line;
-	private WorldObjectImpl anchorHolder;
 
-	public Anchor(WorldLayer ground, ElasticObject obj) {
+	public Anchor(ElasticObject obj) {
 		super();
 		this.obj = obj;
+		WorldLayer ground = obj.getWorldLayer();
 
 		border = Path.createRectangle(0, 0, 1, 1);
 		line = new Path();
@@ -198,32 +220,43 @@ class Anchor implements Destroyable, EventListener {
 		border.setPaint(null);
 		line.setPaint(null);
 
+		border.setStroke(new BasicStroke(2f));
+		line.setStroke(new BasicStroke(2f));
 		border.setStrokePaint(Style.COLOR_ANCHOR);
 		line.setStrokePaint(Style.COLOR_ANCHOR);
 
-		anchorHolder = new WorldObjectImpl();
-		obj.addChild(anchorHolder);
-
-		anchorHolder.addChild(line);
-		anchorHolder.addChild(border);
+		ground.addChild(line);
+		ground.addChild(border);
 		updateBounds();
-		obj.addPropertyChangeListener(EventType.BOUNDS_CHANGED, this);
+		obj.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD, this);
+		obj.addPropertyChangeListener(EventType.GLOBAL_BOUNDS, this);
 	}
 
+	private boolean destroyed;
+
 	public void destroy() {
-		obj.removePropertyChangeListener(EventType.BOUNDS_CHANGED, this);
+		if (!destroyed) {
+			line.destroy();
+			border.destroy();
+			destroyed = true;
+			obj.removePropertyChangeListener(EventType.REMOVED_FROM_WORLD, this);
+			obj.removePropertyChangeListener(EventType.GLOBAL_BOUNDS, this);
+		}
 	}
 
 	private static int SIZE_ANCHOR = 15;
 
 	private void updateBounds() {
-		Rectangle2D bounds = obj.getBounds();
+		border.moveToFront();
+		line.moveToFront();
+
+		Rectangle2D bounds = obj.localToGlobal(obj.getBounds());
 		border.setBounds(bounds);
 
 		if (bounds.getWidth() > 0) {
 			ArrayList<Point2D> points = new ArrayList<Point2D>(4);
 			double x = bounds.getCenterX();
-			double y = bounds.getHeight();
+			double y = bounds.getMaxY();
 			points.add(new Point2D.Double(x, y));
 			y += SIZE_ANCHOR * (2f / 3f);
 			points.add(new Point2D.Double(x, y));
@@ -237,6 +270,10 @@ class Anchor implements Destroyable, EventListener {
 	}
 
 	public void propertyChanged(EventType event) {
-		updateBounds();
+		if (event == EventType.REMOVED_FROM_WORLD) {
+			destroy();
+		} else if (event == EventType.GLOBAL_BOUNDS) {
+			updateBounds();
+		}
 	}
 }

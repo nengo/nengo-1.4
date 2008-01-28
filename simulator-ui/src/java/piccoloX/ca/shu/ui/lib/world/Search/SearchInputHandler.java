@@ -46,7 +46,7 @@ public class SearchInputHandler implements Destroyable {
 
 	private boolean isSearching;
 
-	private Collection<WorldObject> objects;
+	private Iterable<WorldObject> objects;
 
 	private StringBuilder searchQuery;
 
@@ -88,7 +88,7 @@ public class SearchInputHandler implements Destroyable {
 	}
 
 	private static Collection<WorldObject> doSearch(WorldImpl world,
-			Collection<WorldObject> objects, String searchTermStr) {
+			Iterable<WorldObject> objects, String searchTermStr) {
 		LinkedList<WorldObject> matchingObjects = new LinkedList<WorldObject>();
 		if (objects != null && searchTermStr.length() > 0) {
 

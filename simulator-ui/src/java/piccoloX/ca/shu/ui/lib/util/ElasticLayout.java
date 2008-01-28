@@ -38,11 +38,9 @@ import edu.uci.ics.jung.visualization.LayoutMutable;
 public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 
 	private static final Object SPRING_KEY = "temp_edu.uci.ics.jung.Spring_Visualization_Key";
-	public static final LengthFunction UNITLENGTHFUNCTION = new UnitLengthFunction(
-			30);
+	public static final LengthFunction UNITLENGTHFUNCTION = new UnitLengthFunction(30);
 	protected double force_multiplier = 1.0 / 3.0;
 	protected LengthFunction lengthFunction;
-	protected int repulsion_range = 100;
 
 	protected double stretch = 0.70;
 
@@ -76,8 +74,7 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 
 	protected void calculateRepulsion() {
 		try {
-			for (Iterator<?> iter = getGraph().getVertices().iterator(); iter
-					.hasNext();) {
+			for (Iterator<?> iter = getGraph().getVertices().iterator(); iter.hasNext();) {
 				Vertex v = (Vertex) iter.next();
 				if (isLocked(v))
 					continue;
@@ -87,8 +84,7 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 					continue;
 				double dx = 0, dy = 0;
 
-				for (Iterator<?> iter2 = getGraph().getVertices().iterator(); iter2
-						.hasNext();) {
+				for (Iterator<?> iter2 = getGraph().getVertices().iterator(); iter2.hasNext();) {
 					Vertex v2 = (Vertex) iter2.next();
 					if (v == v2)
 						continue;
@@ -102,10 +98,15 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 					if (distance == 0) {
 						dx += Math.random();
 						dy += Math.random();
-					} else if (distance < repulsion_range * repulsion_range) {
-						double factor = 1;
-						dx += factor * vx / Math.pow(distance, 2);
-						dy += factor * vy / Math.pow(distance, 2);
+					} else if (distance < lengthFunction.getMass(v2) * lengthFunction.getMass(v)) {
+						double forceFactor = lengthFunction.getMass(v2);
+						
+						//
+						// Normalize the force to a standard mass unit of 200
+						forceFactor /= 200;
+
+						dx += forceFactor * vx / Math.pow(distance, 2);
+						dy += forceFactor * vy / Math.pow(distance, 2);
 					}
 				}
 				double dlen = dx * dx + dy * dy;
@@ -127,8 +128,7 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 
 	protected void initialize_local() {
 		try {
-			for (Iterator<?> iter = getGraph().getEdges().iterator(); iter
-					.hasNext();) {
+			for (Iterator<?> iter = getGraph().getEdges().iterator(); iter.hasNext();) {
 				Edge e = (Edge) iter.next();
 				SpringEdgeData sed = getSpringData(e);
 				if (sed == null) {
@@ -215,9 +215,7 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 
 				// f = f * Math.pow(stretch, (v1.degree() + v2.degree() - 2));
 				// shuwu: reduced the degree attenuation with a sqrt dampener
-				f = f
-						* Math.pow(stretch, Math.sqrt((v1.degree()
-								+ v2.degree() - 2)));
+				f = f * Math.pow(stretch, Math.sqrt((v1.degree() + v2.degree() - 2)));
 
 				// the actual movement distance 'dx' is the force multiplied by
 				// the
@@ -245,8 +243,7 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 	 */
 	public void advancePositions() {
 		try {
-			for (Iterator<?> iter = getVisibleVertices().iterator(); iter
-					.hasNext();) {
+			for (Iterator<?> iter = getVisibleVertices().iterator(); iter.hasNext();) {
 				Vertex v = (Vertex) iter.next();
 				SpringVertexData svd = getSpringData(v);
 				if (svd == null) {
@@ -279,14 +276,6 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 	}
 
 	/* ------------------------- */
-
-	/**
-	 * @return the current value for the node repulsion range
-	 * @see #setRepulsionRange(int)
-	 */
-	public int getRepulsionRange() {
-		return repulsion_range;
-	}
 
 	/* ------------------------- */
 
@@ -363,17 +352,6 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 	}
 
 	/**
-	 * Sets the node repulsion range (in drawing area units) for this instance.
-	 * Outside this range, nodes do not repel each other. The default value is
-	 * 100. Negative values are treated as their positive equivalents.
-	 * 
-	 * @param range
-	 */
-	public void setRepulsionRange(int range) {
-		this.repulsion_range = range;
-	}
-
-	/**
 	 * <p>
 	 * Sets the stretch parameter for this instance. This value specifies how
 	 * much the degrees of an edge's incident vertices should influence how
@@ -400,8 +378,7 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 	 */
 	public void update() {
 		try {
-			for (Iterator<?> iter = getGraph().getVertices().iterator(); iter
-					.hasNext();) {
+			for (Iterator<?> iter = getGraph().getVertices().iterator(); iter.hasNext();) {
 				Vertex v = (Vertex) iter.next();
 				Coordinates coord = (Coordinates) v.getUserDatum(getBaseKey());
 				if (coord == null) {
@@ -461,6 +438,8 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 	public static interface LengthFunction {
 
 		public double getLength(Edge e);
+
+		public double getMass(Vertex v);
 	}
 
 	public class SpringDimensionChecker extends ComponentAdapter {
@@ -485,6 +464,10 @@ public class ElasticLayout extends AbstractLayout implements LayoutMutable {
 
 		public double getLength(Edge e) {
 			return length;
+		}
+
+		public double getMass(Vertex v) {
+			return 100;
 		}
 	}
 

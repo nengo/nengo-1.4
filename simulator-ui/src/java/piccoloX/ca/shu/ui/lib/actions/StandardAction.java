@@ -42,6 +42,10 @@ public abstract class StandardAction implements Serializable {
 
 	}
 
+	public StandardAction(String description, boolean isSwingAction) {
+		this(description, description, isSwingAction);
+	}
+
 	public StandardAction(String description, String actionName) {
 		this(description, actionName, true);
 	}
@@ -53,8 +57,7 @@ public abstract class StandardAction implements Serializable {
 	 *            Name to give to the Swing Action Object
 	 * @param threadType
 	 */
-	public StandardAction(String description, String actionName,
-			boolean isSwingAction) {
+	public StandardAction(String description, String actionName, boolean isSwingAction) {
 		super();
 		if (isSwingAction) {
 			this.runSwingType = RunThreadType.JAVA_SWING;

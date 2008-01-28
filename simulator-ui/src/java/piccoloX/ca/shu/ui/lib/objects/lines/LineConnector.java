@@ -15,6 +15,7 @@ import ca.shu.ui.lib.world.DroppableX;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject.EventType;
+import ca.shu.ui.lib.world.elastic.ElasticEdge;
 import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
@@ -23,8 +24,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * @author Shu
  */
-public abstract class LineConnector extends WorldObjectImpl implements
-		Interactable, DroppableX {
+public abstract class LineConnector extends WorldObjectImpl implements Interactable, DroppableX {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +42,7 @@ public abstract class LineConnector extends WorldObjectImpl implements
 		this.myWell = well;
 
 		setSelectable(true);
-		myEdge = new Edge(well, this);
+		myEdge = new Edge(well, this, 300);
 		myEdge.setPointerVisible(true);
 		((WorldGroundImpl) well.getWorldLayer()).addEdge(myEdge);
 
@@ -53,14 +53,11 @@ public abstract class LineConnector extends WorldObjectImpl implements
 		setBounds(parentToLocal(getFullBounds()));
 		setChildrenPickable(false);
 		myDestroyListener = new DestroyListener(this);
-		myWell
-				.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD,
-						myDestroyListener);
+		myWell.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD, myDestroyListener);
 
 	}
 
-	private boolean tryConnectTo(ILineTermination newTermination,
-			boolean modifyModel) {
+	private boolean tryConnectTo(ILineTermination newTermination, boolean modifyModel) {
 
 		if (newTermination != getTermination()) {
 			if (canConnectTo(newTermination)) {
@@ -125,8 +122,7 @@ public abstract class LineConnector extends WorldObjectImpl implements
 	@Override
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
-		myWell.removePropertyChangeListener(EventType.REMOVED_FROM_WORLD,
-				myDestroyListener);
+		myWell.removePropertyChangeListener(EventType.REMOVED_FROM_WORLD, myDestroyListener);
 	}
 
 	/**
@@ -172,8 +168,7 @@ public abstract class LineConnector extends WorldObjectImpl implements
 
 		if (!success) {
 			updateTermination(null);
-			Point2D position = myWell
-					.globalToLocal(localToGlobal(new Point2D.Double(0, 0)));
+			Point2D position = myWell.globalToLocal(localToGlobal(new Point2D.Double(0, 0)));
 
 			setOffset(position);
 			myWell.addChild(this);
@@ -246,12 +241,12 @@ class DestroyListener implements EventListener {
  * 
  * @author Shu Wu
  */
-class Edge extends PXEdge {
+class Edge extends ElasticEdge {
 
 	private static final long serialVersionUID = 1L;
 
-	public Edge(LineWell startNode, LineConnector endNode) {
-		super(startNode, endNode);
+	public Edge(LineWell startNode, LineConnector endNode, double length) {
+		super(startNode, endNode, length);
 	}
 
 	@Override
@@ -260,8 +255,7 @@ class Edge extends PXEdge {
 		 * Only paint this edge, if the LineEndWell is visible, or the LineEnd
 		 * is connected
 		 */
-		if (getStartNode().getVisible()
-				|| ((LineConnector) getEndNode()).getTermination() != null) {
+		if (getStartNode().getVisible() || ((LineConnector) getEndNode()).getTermination() != null) {
 			super.paint(paintContext);
 		}
 	}

@@ -158,14 +158,12 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 						String fileName = entry.getName();
 						if (fileName.endsWith(".class")) {
 							try {
-								String className = fileName.substring(0,
-										fileName.lastIndexOf('.')).replace('/',
-										'.');// .replace('$', '.');
-								Class<?> newClass = urlClassLoader
-										.loadClass(className);
+								String className = fileName.substring(0, fileName.lastIndexOf('.'))
+										.replace('/', '.');// .replace('$',
+								// '.');
+								Class<?> newClass = urlClassLoader.loadClass(className);
 
-								Util.debugMsg("Registering class: "
-										+ newClass.getName());
+								Util.debugMsg("Registering class: " + newClass.getName());
 								ClassRegistry.getInstance().register(newClass);
 
 							} catch (ClassNotFoundException e) {
@@ -202,11 +200,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	}
 
 	@Override
-	protected void windowClosing() {
-		if (getWorld().getGround().getChildren().size() > 0) {
-			int response = JOptionPane.showConfirmDialog(this,
-					"Save models before closing?", "Exiting " + getAppName(),
-					JOptionPane.YES_NO_CANCEL_OPTION);
+	public void exitAppFrame() {
+		if (getWorld().getGround().getChildrenCount() > 0) {
+			int response = JOptionPane.showConfirmDialog(this, "Save models before closing?",
+					"Exiting " + getAppName(), JOptionPane.YES_NO_CANCEL_OPTION);
 			if (response == JOptionPane.YES_OPTION) {
 
 				promptToSaveModels();
@@ -218,7 +215,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 			}
 		}
 
-		super.windowClosing();
+		super.exitAppFrame();
 	}
 
 	/*
@@ -253,21 +250,15 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	}
 
 	@Override
-	public void initFileMenu(JMenuBar menuBar) {
-		MenuBuilder fileMenu = new MenuBuilder("File");
-		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_F);
-
-		menuBar.add(fileMenu.getJMenu());
+	public void initFileMenu(MenuBuilder fileMenu) {
 
 		MenuBuilder newMenu = fileMenu.addSubMenu("New");
 		newMenu.getJMenu().setMnemonic(KeyEvent.VK_N);
-		newMenu.addAction(new CreateModelAction("Network", this,
-				UINetwork.class), KeyEvent.VK_N);
-		newMenu.addAction(new CreateModelAction("NEFEnsemble", this,
-				UINEFEnsemble.class), KeyEvent.VK_F);
+		newMenu.addAction(new CreateModelAction("Network", this, UINetwork.class), KeyEvent.VK_N);
+		newMenu.addAction(new CreateModelAction("NEFEnsemble", this, UINEFEnsemble.class),
+				KeyEvent.VK_F);
 
-		newMenu.addAction(new CreateModelAction("Ensemble", this,
-				UIEnsemble.class), KeyEvent.VK_E);
+		newMenu.addAction(new CreateModelAction("Ensemble", this, UIEnsemble.class), KeyEvent.VK_E);
 
 		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O);
 
@@ -286,8 +277,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				if (dataViewerDialog == null) {
-					dataViewerDialog = DataListView.createViewer(UIEnvironment
-							.getInstance(), simulationData);
+					dataViewerDialog = DataListView.createViewer(UIEnvironment.getInstance(),
+							simulationData);
 				}
 				dataViewerDialog.setVisible(true);
 			}

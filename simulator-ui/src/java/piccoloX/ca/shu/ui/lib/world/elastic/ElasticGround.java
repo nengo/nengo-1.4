@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.ObjectSet;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
@@ -18,6 +19,7 @@ import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.SparseGraph;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
+import edu.uci.ics.jung.utils.UserData;
 import edu.uci.ics.jung.visualization.Layout;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -48,8 +50,7 @@ public class ElasticGround extends WorldGroundImpl {
 			ElasticVertex vertex = myVertexMap.get(node);
 			if (vertex != null) {
 				if (!elasticLayoutThread.isLocked(vertex)) {
-					return elasticLayoutThread.getLocation(myVertexMap
-							.get(node));
+					return elasticLayoutThread.getLocation(myVertexMap.get(node));
 				}
 			}
 		}
@@ -141,7 +142,7 @@ public class ElasticGround extends WorldGroundImpl {
 					elasticLayoutThread.unlockVertex(vertex);
 				}
 			} else {
-//				Util.Assert(false, "Vertex not found");
+				// Util.Assert(false, "Vertex not found");
 			}
 		}
 
@@ -158,8 +159,31 @@ public class ElasticGround extends WorldGroundImpl {
 		return false;
 	}
 
-	public void updateChildrenFromLayout(Layout layout, boolean animateNodes,
-			boolean zoomToLayout) {
+	private ObjectSet<ElasticObject> elasticChildren = new ObjectSet<ElasticObject>();
+
+	@Override
+	public void childAdded(WorldObject wo) {
+		super.childAdded(wo);
+		if (wo instanceof ElasticObject) {
+			elasticChildren.add((ElasticObject) wo);
+		}
+	}
+
+	public Iterable<ElasticObject> getElasticChildren() {
+		return elasticChildren;
+	}
+
+	@Override
+	public void childRemoved(WorldObject wo) {
+		super.childRemoved(wo);
+		if (wo instanceof ElasticObject) {
+			if (!elasticChildren.remove((ElasticObject) wo)) {
+				Util.Assert(false);
+			}
+		}
+	}
+
+	public void updateChildrenFromLayout(Layout layout, boolean animateNodes, boolean zoomToLayout) {
 		/**
 		 * Layout nodes
 		 */
@@ -170,8 +194,7 @@ public class ElasticGround extends WorldGroundImpl {
 		double endX = Double.NEGATIVE_INFINITY;
 		double endY = Double.NEGATIVE_INFINITY;
 
-		for (WorldObject child : getChildren()) {
-			ElasticObject elasticObj = (ElasticObject) (child);
+		for (ElasticObject elasticObj : getElasticChildren()) {
 
 			ElasticVertex vertex = myVertexMap.get(elasticObj);
 			if (vertex != null) {
@@ -196,8 +219,7 @@ public class ElasticGround extends WorldGroundImpl {
 						x = coord.getX();
 						y = coord.getY();
 						if (animateNodes) {
-							elasticObj.animateToPositionScaleRotation(x, y, 1,
-									0, 1000);
+							elasticObj.animateToPositionScaleRotation(x, y, 1, 0, 1000);
 						} else {
 							elasticObj.setOffsetReal(x, y);
 						}
@@ -221,8 +243,7 @@ public class ElasticGround extends WorldGroundImpl {
 		}
 
 		if (zoomToLayout && foundNode) {
-			PBounds fullBounds = new PBounds(startX, startY, endX - startX,
-					endY - startY);
+			PBounds fullBounds = new PBounds(startX, startY, endX - startX, endY - startY);
 			getWorld().zoomToBounds(fullBounds);
 		}
 
@@ -232,8 +253,7 @@ public class ElasticGround extends WorldGroundImpl {
 		private boolean graphUpdated;
 		private Collection<ElasticVertex> addedVertices;
 
-		public UpdateGraphResult(boolean graphUpdated,
-				Collection<ElasticVertex> addedVertices) {
+		public UpdateGraphResult(boolean graphUpdated, Collection<ElasticVertex> addedVertices) {
 			super();
 			this.graphUpdated = graphUpdated;
 			this.addedVertices = addedVertices;
@@ -248,6 +268,8 @@ public class ElasticGround extends WorldGroundImpl {
 		}
 
 	}
+
+	public static final String ELASTIC_LENGTH_KEY = "elasticLength";
 
 	/**
 	 * This method must be executed from the swing dispatcher thread because it
@@ -269,8 +291,7 @@ public class ElasticGround extends WorldGroundImpl {
 			/**
 			 * Add vertices
 			 */
-			for (WorldObject wo : getChildren()) {
-				ElasticObject obj = (ElasticObject) wo;
+			for (ElasticObject obj : getElasticChildren()) {
 
 				if (!myVertexMap.containsKey(obj)) {
 					ElasticVertex vertex = new ElasticVertex(obj);
@@ -309,83 +330,89 @@ public class ElasticGround extends WorldGroundImpl {
 		/**
 		 * Add edges
 		 */
-		Collection<PXEdge> edges = getEdges();
 
-		for (PXEdge uiEdge : edges) {
+		for (PXEdge uiEdge : getEdges()) {
 
-			WorldObject startNode = uiEdge.getStartNode();
-			WorldObject endNode = uiEdge.getEndNode();
+			if (uiEdge instanceof ElasticEdge) {
+				ElasticEdge elasticEdge = (ElasticEdge) uiEdge;
+				WorldObject startNode = uiEdge.getStartNode();
+				WorldObject endNode = uiEdge.getEndNode();
 
-			// Find the Elastic Objects which are ancestors of the start and
-			// end
-			// nodes
-			while (startNode.getParent() != this && startNode != null) {
-				startNode = startNode.getParent();
-				if (startNode == null) {
-					break;
-				}
-			}
-
-			while (endNode.getParent() != this && endNode != null) {
-				endNode = endNode.getParent();
-				if (endNode == null) {
-					break;
-				}
-			}
-
-			if (startNode == null || endNode == null) {
-				Util.Assert(false, "Edge nodes do not exist on this ground");
-			} else if (startNode.getParent() == this
-					&& endNode.getParent() == this) {
-				ElasticVertex startVertex = myVertexMap.get(startNode);
-				ElasticVertex endVertex = myVertexMap.get(endNode);
-
-				if (!(startVertex != null && endVertex != null)) {
-					Util.Assert(false, "Could not find vertice");
+				// Find the Elastic Objects which are ancestors of the start and
+				// end
+				// nodes
+				while (startNode.getParent() != this && startNode != null) {
+					startNode = startNode.getParent();
+					if (startNode == null) {
+						break;
+					}
 				}
 
-				AbstractSparseEdge jungEdge = myEdgeMap.get(uiEdge);
+				while (endNode.getParent() != this && endNode != null) {
+					endNode = endNode.getParent();
+					if (endNode == null) {
+						break;
+					}
+				}
 
-				boolean createJungEdge = false;
-				if (jungEdge != null) {
-					// find if an existing edge has changed
-					if (jungEdge.getEndpoints().getFirst() != startVertex
-							|| jungEdge.getEndpoints().getSecond() != endVertex) {
+				if (startNode == null || endNode == null) {
+					Util.Assert(false, "Edge nodes do not exist on this ground");
+				} else if (!(startNode instanceof ElasticObject || endNode instanceof ElasticGround)) {
+					/*
+					 * The parent nodes are not elastic, we can ignore them
+					 */
+				} else if (startNode.getParent() == this && endNode.getParent() == this) {
+					ElasticVertex startVertex = myVertexMap.get(startNode);
+					ElasticVertex endVertex = myVertexMap.get(endNode);
 
-						myEdgeMap.remove(uiEdge);
-						myGraph.removeEdge(jungEdge);
-						changed = true;
+					if (!(startVertex != null && endVertex != null)) {
+						Util.Assert(false, "Could not find vertice");
+					}
 
-						// try to add the new changed one
+					AbstractSparseEdge jungEdge = myEdgeMap.get(uiEdge);
+
+					boolean createJungEdge = false;
+					if (jungEdge != null) {
+						// find if an existing edge has changed
+						if (jungEdge.getEndpoints().getFirst() != startVertex
+								|| jungEdge.getEndpoints().getSecond() != endVertex) {
+
+							myEdgeMap.remove(uiEdge);
+							myGraph.removeEdge(jungEdge);
+							changed = true;
+
+							// try to add the new changed one
+							createJungEdge = true;
+						}
+
+					} else {
 						createJungEdge = true;
 					}
 
-				} else {
-					createJungEdge = true;
-				}
+					if (createJungEdge) {
+						// avoid recursive edges
+						if (startVertex != endVertex) {
+							if (uiEdge.isDirected()) {
+								jungEdge = new DirectedSparseEdge(startVertex, endVertex);
+							} else {
+								jungEdge = new UndirectedSparseEdge(startVertex, endVertex);
+							}
 
-				if (createJungEdge) {
-					// avoid recursive edges
-					if (startVertex != endVertex) {
-						if (uiEdge.isDirected()) {
-							jungEdge = new DirectedSparseEdge(startVertex,
-									endVertex);
-						} else {
-							jungEdge = new UndirectedSparseEdge(startVertex,
-									endVertex);
+							jungEdge.addUserDatum(ELASTIC_LENGTH_KEY, new Double(elasticEdge
+									.getLength()), UserData.SHARED);
+
+							myEdgeMap.put(uiEdge, jungEdge);
+
+							myGraph.addEdge(jungEdge);
+
+							changed = true;
 						}
-
-						myEdgeMap.put(uiEdge, jungEdge);
-
-						myGraph.addEdge(jungEdge);
-						changed = true;
 					}
+
+				} else {
+					Util.Assert(false, "Could not find Elastic Nodes of edge");
 				}
-
-			} else {
-				Util.Assert(false, "Could not find Elastic Nodes of edge");
 			}
-
 		}
 		/*
 		 * Remove edges

@@ -1,8 +1,7 @@
 package ca.shu.ui.lib.world.activities;
 
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
-import edu.umd.cs.piccolo.PNode;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
 /**
@@ -12,7 +11,7 @@ import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
  */
 public class Fader extends PInterpolatingActivity {
 
-	private PNode node;
+	private WorldObject node;
 
 	private float startingTransparency;
 
@@ -26,10 +25,10 @@ public class Fader extends PInterpolatingActivity {
 	 * @param finalOpacity
 	 *            Transparency target
 	 */
-	public Fader(WorldObjectImpl target, long duration, float finalOpacity) {
+	public Fader(WorldObject target, long duration, float finalOpacity) {
 		super(duration,
 				(int) (1000 / UIEnvironment.ANIMATION_TARGET_FRAME_RATE));
-		this.node = target.getPiccolo();
+		this.node = target;
 		this.targetTransparency = finalOpacity;
 	}
 

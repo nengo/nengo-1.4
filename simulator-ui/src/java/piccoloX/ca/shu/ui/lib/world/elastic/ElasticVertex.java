@@ -16,4 +16,8 @@ public class ElasticVertex extends SimpleSparseVertex {
 		return myObject.getOffsetReal();
 	}
 
+	public double getRepulsionRange() {
+		return myObject.getRepulsionRange();
+	}
+
 }

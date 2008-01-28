@@ -6,6 +6,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
+import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
 public interface WorldObject extends NamedObject, Destroyable {
@@ -97,7 +98,23 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 * 
 	 * @return reference to the children list
 	 */
-	public Collection<WorldObject> getChildren();
+	public Iterable<WorldObject> getChildren();
+
+	/**
+	 * Schedule the given activity with the root, note that only scheduled
+	 * activities will be stepped. If the activity is successfully added true is
+	 * returned, else false.
+	 * 
+	 * @param activity
+	 *            new activity to schedule
+	 * @return true if the activity is successfully scheduled.
+	 */
+	public boolean addActivity(PActivity activity);
+
+	/**
+	 * @return Number of children
+	 */
+	public int getChildrenCount();
 
 	/**
 	 * Returns the rotation applied by this node's transform in radians. This
@@ -330,7 +347,7 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 * directly adding dx to the m02 position and dy to the m12 position in the
 	 * affine transform.
 	 */
-	public void offset(double dx, double dy);
+	public void dragOffset(double dx, double dy);
 
 	/**
 	 * Paint this node behind any of its children nodes. Subclasses that define
