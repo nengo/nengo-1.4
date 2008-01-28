@@ -3,24 +3,16 @@
  */
 package ca.neo.config.ui;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Polygon;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import ca.neo.config.Configurable;
 import ca.neo.config.IconRegistry;
 import ca.neo.config.MainHandler;
 import ca.neo.config.Property;
-import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 
 /**
@@ -54,7 +46,7 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 			setText(text.toString());
 			
 			setToolTipText(null);
-		} else if (value instanceof Value) {
+		} else if (value instanceof Value) { //with null getConfiguration (a leaf) 
 			Object o = ((Value) value).getObject();
 			Component customRenderer = MainHandler.getInstance().getRenderer(o);
 			
@@ -62,7 +54,7 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 				setText("UNKNOWN TYPE (" + o.toString() + ")"); 
 				setToolTipText(o.getClass().getCanonicalName());			
 			} else {
-				customRenderer.setBackground(sel ? new Color(.1f, .4f, .7f, .2f) : Color.WHITE);
+				customRenderer.setBackground(sel ? this.getBackgroundSelectionColor() : this.getBackgroundNonSelectionColor());
 				result = customRenderer;
 			}				
 		} else {
@@ -73,18 +65,18 @@ public class ConfigurationTreeCellRenderer extends DefaultTreeCellRenderer {
 		if (value instanceof Value && ((Value) value).getName() != null && result instanceof JLabel) {
 			JLabel label = (JLabel) result;
 			label.setText(((Value) value).getName() + ": " + label.getText());
-//			JPanel wrapper = new JPanel(new FlowLayout());
-//			wrapper.add(new JLabel(((Value) value).getName()));
-//			wrapper.add(result);
-//			result = wrapper;
 		}
 		
 		return result;
 	}
 	
 	private Icon getCustomIcon(Object node) {
-		Object value = (node instanceof Value) ? ((Value) node).getObject() : node;
-		return IconRegistry.getInstance().getIcon(value);
+		if (node instanceof Property) {
+			return IconRegistry.getInstance().getIcon(((Property) node).getType());
+		} else {
+			Object value = (node instanceof Value) ? ((Value) node).getObject() : node;
+			return IconRegistry.getInstance().getIcon(value);
+		}
 	}
 	
 }

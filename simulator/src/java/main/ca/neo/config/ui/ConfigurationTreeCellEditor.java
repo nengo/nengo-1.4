@@ -12,18 +12,25 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
-import ca.neo.config.Configurable;
 import ca.neo.config.MainHandler;
 import ca.neo.config.Property;
 import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
 
+/**
+ * TreeCellEditor for configuration trees. Gets editor components for property values from MainHandler.
+ *   
+ * @author Bryan Tripp
+ */
 public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 
 	private static final long serialVersionUID = 1L;
 	
 	private JTree myTree;
 	
+	/**
+	 * @param tree Configuration tree to which this cell editor is to belong
+	 */
 	public ConfigurationTreeCellEditor(JTree tree) {
 		super(new JTextField());
 		myTree = tree;

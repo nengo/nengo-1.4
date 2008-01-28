@@ -221,7 +221,6 @@ public class JavaSourceParser {
 		String[] result = new String[c.getParameterTypes().length];
 		
 		JavaMethod jm = getJavaMethod(c);
-		System.out.println("jm: " + jm);
 		for (int i = 0; i < result.length; i++) {
 			result[i] = (jm == null) ? "arg"+i : jm.getParameters()[i].getName();
 		}
@@ -309,8 +308,9 @@ public class JavaSourceParser {
 			if (sourceMethods[i].getName().equals(methodName) && sourceParams.length == paramTypes.length) {
 				boolean matches = true;
 				for (int j = 0; j < sourceParams.length && matches; j++) {
-					String sourceParamTypeName = sourceParams[j].getType().getJavaClass().getFullyQualifiedName();										
-					if (!sourceParamTypeName.equals(paramTypes[j].getName())) {
+					String typeName = ClassUtils.getName(paramTypes[j]);
+					String sourceTypeName = sourceParams[j].getType().toString();
+					if (!sourceTypeName.equals(typeName)) {
 						matches = false;
 					}
 				}	

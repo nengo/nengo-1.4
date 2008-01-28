@@ -15,21 +15,28 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configurable;
 import ca.neo.config.ListProperty;
 import ca.neo.config.MainHandler;
 import ca.neo.config.NamedValueProperty;
 import ca.neo.config.Property;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
-import ca.neo.math.Function;
 import ca.neo.model.StructuralException;
-import ca.neo.plot.Plotter;
 
+/**
+ * Creates a popup menu for configuration tree nodes, to allow refreshing, adding/setting/removing, etc. 
+ * as appropriate. 
+ * 
+ * @author Bryan Tripp
+ */
 public class ConfigurationTreePopupListener extends MouseAdapter {
 	
 	private JTree myTree;
 	private final ConfigurationTreeModel myModel;
 	
+	/**
+	 * @param tree A tree that displays a Configuration
+	 * @param model TreeModel underlying the above tree
+	 */
 	public ConfigurationTreePopupListener(JTree tree, ConfigurationTreeModel model) {
 		myTree = tree;
 		myModel = model;			
@@ -57,7 +64,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					JMenuItem addValueItem = new JMenuItem("Add");
 					addValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent E) {
-							myModel.addValue(this, path, getValue(p.getType()), null);
+							myModel.addValue(path, getValue(p.getType()), null);
 						}
 					});
 					popup.add(addValueItem);				
@@ -69,7 +76,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					addValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent E) {
 							String name = JOptionPane.showInputDialog(myTree, "Value Name");
-							myModel.addValue(this, path, getValue(p.getType()), name);
+							myModel.addValue(path, getValue(p.getType()), name);
 						}
 					});
 					popup.add(addValueItem);
@@ -84,7 +91,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 							Object o = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), currentType);
 							if (o != null) {
 								try {
-									myModel.setValue(this, path, o);
+									myModel.setValue(path, o);
 								} catch (StructuralException ex) {
 									ConfigExceptionHandler.handle(ex, ex.getMessage(), event.getComponent());
 								}
@@ -99,7 +106,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 						JMenuItem insertValueItem = new JMenuItem("Insert");
 						insertValueItem.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
-								myModel.insertValue(this, path, getValue(p.getType()));
+								myModel.insertValue(path, getValue(p.getType()));
 							}
 						}); 
 						popup.add(insertValueItem);						
@@ -107,7 +114,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					JMenuItem removeValueItem = new JMenuItem("Remove");
 					removeValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							myModel.removeValue(this, path);
+							myModel.removeValue(path);
 						}
 					});
 					popup.add(removeValueItem);				
@@ -117,7 +124,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 			JMenuItem refreshItem = new JMenuItem("Refresh");
 			refreshItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					myModel.refresh(this, path);
+					myModel.refresh(path);
 				}
 			});
 			popup.add(refreshItem);

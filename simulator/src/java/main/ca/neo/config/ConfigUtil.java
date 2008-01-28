@@ -98,9 +98,6 @@ public class ConfigUtil {
 					&& !methods[i].getName().equals("getConfiguration")
 					&& !isCounter(methods[i])) {
 				
-//				Class returnTypeWrapped = getPrimitiveWrapperClass(returnType); 
-//				boolean mutable = hasSetter(configurable, methods[i].getName(), returnType);
-//				result.defineSingleValuedProperty(propName, returnTypeWrapped, mutable);	
 				result.defineSingleValuedProperty(propName, returnType, false);
 			} else if (isIndexedGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
 				Property p = ListPropertyImpl.getListProperty(result, propName, returnType);
@@ -123,7 +120,6 @@ public class ConfigUtil {
 				Property p = null;
 				if (returnType instanceof Class && MainHandler.getInstance().canHandle((Class) returnType)) {
 					p = SingleValuedPropertyImpl.getSingleValuedProperty(result, propName, (Class) returnType);
-//					p = new SingleValuedPropertyImpl(result, propName, (Class) returnType, hasSetter(configurable, methods[i].getName(), (Class) returnType));
 				} else if (returnType instanceof Class && ((Class) returnType).isArray()) {
 					p = ListPropertyImpl.getListProperty(result, propName, ((Class) returnType).getComponentType());
 				} else if (returnType instanceof ParameterizedType) {
@@ -224,19 +220,6 @@ public class ConfigUtil {
 		}
 	}
 	
-	private static boolean hasSetter(Object o, String getterName, Class type) {
-		boolean has = false;
-		Method[] methods = o.getClass().getMethods();
-		for (int i = 0; i < methods.length && !has; i++) {
-			if (methods[i].getName().equals("s" + getterName.substring(1))
-					&& methods[i].getParameterTypes().length == 1
-					&& methods[i].getParameterTypes()[0].isAssignableFrom(type)) {
-				has = true;
-			}
-		}
-		return has;
-	}
-
 	private static boolean isIndexedGetter(Method m) {
 		Class[] paramTypes = m.getParameterTypes();
 		if (m.getName().startsWith("get") && paramTypes.length == 1 && paramTypes[0].equals(Integer.TYPE)) {
@@ -253,8 +236,7 @@ public class ConfigUtil {
 		} else {
 			return false;
 		}		
-	}
-	
+	}	
 	
 	/**
 	 * @param c Any class 

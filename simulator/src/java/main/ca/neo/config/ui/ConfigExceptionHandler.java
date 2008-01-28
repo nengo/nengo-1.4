@@ -26,6 +26,7 @@ public class ConfigExceptionHandler {
 	 * @param parentComponent UI component to which exception is related (can be null)
 	 */
 	public static void handle(Exception e, String userMessage, Component parentComponent) {
+		if (userMessage == null) userMessage = DEFAULT_BUG_MESSAGE;
 		ourLogger.error("User message: " + userMessage, e);
 		JOptionPane.showMessageDialog(parentComponent, userMessage, "Error", JOptionPane.ERROR_MESSAGE);
 	}

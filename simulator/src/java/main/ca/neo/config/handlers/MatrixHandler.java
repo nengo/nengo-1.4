@@ -58,7 +58,7 @@ public class MatrixHandler extends BaseHandler {
 		
 		float[][] matrix = (float[][]) o;
 		String text = toString(matrix, '\t', "\r\n");
-		result.add(new JLabel(IconRegistry.getInstance().getIcon(float[][].class)));
+		result.add(new JLabel(IconRegistry.getInstance().getIcon(o)));
 		result.add(new JTextArea(text));
 
 		return result;

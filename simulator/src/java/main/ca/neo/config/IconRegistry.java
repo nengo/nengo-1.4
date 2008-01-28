@@ -47,7 +47,12 @@ public class IconRegistry {
 					return 16;
 				}
 			});
+			ourInstance.setIcon(Boolean.class, "/ca/neo/config/ui/boolean_icon.GIF");
+			ourInstance.setIcon(Boolean.TYPE, "/ca/neo/config/ui/boolean_icon.GIF");
 			ourInstance.setIcon(Integer.class, "/ca/neo/config/ui/integer_icon.GIF");
+			ourInstance.setIcon(Integer.TYPE, "/ca/neo/config/ui/integer_icon.GIF");
+			ourInstance.setIcon(Float.class, "/ca/neo/config/ui/float_icon.GIF");
+			ourInstance.setIcon(Float.TYPE, "/ca/neo/config/ui/float_icon.GIF");
 			ourInstance.setIcon(float[].class, "/ca/neo/config/ui/float_array_icon.GIF");
 			ourInstance.setIcon(float[][].class, "/ca/neo/config/ui/matrix_icon.GIF");
 			ourInstance.setIcon(String.class, "/ca/neo/config/ui/string_icon.JPG");
@@ -69,7 +74,11 @@ public class IconRegistry {
 		return (o == null) ? null : getIcon(o.getClass());
 	}
 	
-	private Icon getIcon(Class c) {
+	/**
+	 * @param c Class of object
+	 * @return An icon to use in displaying objects of the given class
+	 */
+	public Icon getIcon(Class c) {
 		Icon result = null;
 		for (int i = 0; result == null && i < myIconClasses.size(); i++) {
 			if (myIconClasses.get(i).isAssignableFrom(c)) {

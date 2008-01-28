@@ -10,12 +10,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +21,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -32,11 +28,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import javax.swing.tree.DefaultTreeModel;
 
 import ca.neo.config.ClassRegistry;
 import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
 import ca.neo.config.JavaSourceParser;
 import ca.neo.config.ListProperty;
@@ -49,14 +43,13 @@ import ca.neo.config.impl.TemplateArrayProperty;
 import ca.neo.config.impl.TemplateProperty;
 import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
 import ca.neo.config.ui.ConfigurationTreeModel.Value;
-import ca.neo.math.Function;
-import ca.neo.math.impl.FourierFunction;
-import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
-import ca.neo.model.nef.NEFEnsemble;
-import ca.neo.model.nef.impl.NEFEnsembleImpl;
-import ca.neo.model.neuron.impl.SpikingNeuron;
 
+/**
+ * A dialog box through which the user can construct a new object. 
+ * 
+ * @author Bryan Tripp
+ */
 public class NewConfigurableDialog extends JDialog implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
@@ -65,7 +58,6 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	private static Object myResult;	
 	private static NewConfigurableDialog myDialog;
 	
-//	private Class myType;
 	private Configuration myConfiguration;
 	private JTree myConfigurationTree;
 	private ConfigurationTreePopupListener myPopupListener;
@@ -75,12 +67,22 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	private Constructor[] myConstructors;
 	private int myConstructorIndex;
 	
-	public static Object showDialog(Component comp, Class type, Class currentType) {
+	/**
+	 * Opens a NewConfigurableDialog through which the user can construct a new object, and 
+	 * returns the constructed object. 
+	 *  
+	 * @param comp UI component from which a dialog is to be launched 
+	 * @param type Class of object to be constructed
+	 * @param specificType An optional more specific type to be initially selected (if there is more than 
+	 * 		one implementation of the more general type above)  
+	 * @return User-constructed object (or null if construction aborted)
+	 */
+	public static Object showDialog(Component comp, Class type, Class specificType) {
 		myResult = null;
 		
 		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
-		if (currentType != null && !NullValue.class.isAssignableFrom(currentType) && !types.contains(currentType)) {
-			types.add(0, currentType);
+		if (specificType != null && !NullValue.class.isAssignableFrom(specificType) && !types.contains(specificType)) {
+			types.add(0, specificType);
 		}
 		
 		if (types.size() > 0) {
@@ -151,10 +153,6 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		JPanel typePanel = new JPanel();
 		typePanel.setLayout(new BoxLayout(typePanel, BoxLayout.X_AXIS));
 		
-//		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
-//		if (currentType != null && !NullValue.class.isAssignableFrom(currentType) && !types.contains(currentType)) {
-//			types.add(0, currentType);
-//		}
 		final JComboBox typeBox = new JComboBox(types.toArray());
 		typeBox.setRenderer(new BasicComboBoxRenderer() {
 			private static final long serialVersionUID = 1L;
@@ -202,46 +200,8 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	}
 	
 	private void setSelectedType(Class type) {
-//		myType = type;				
 		myConstructors = type.getConstructors();		
 		setConstructor(0);
-		System.out.println("setting constructors " + myConstructors.length);
-		
-//		Method templateMethod = null;
-//		Method[] methods = type.getDeclaredMethods();
-//		for (int i = 0; i < methods.length; i++) {
-//			if ((methods[i].getName().equals("getUserConstructionTemplate") 
-//						|| (templateMethod == null && methods[i].getName().equals("getConstructionTemplate")))  
-//					&& methods[i].getParameterTypes().length == 0
-//					&& Configuration.class.isAssignableFrom(methods[i].getReturnType())) {
-//				templateMethod = methods[i];
-//			}
-//		}
-//		
-//		if (myPopupListener != null) {
-//			myConfigurationTree.removeMouseListener(myPopupListener);
-//		}
-//		
-//		
-//		if (templateMethod != null) {
-//			try {
-//				myConfiguration = (Configuration) templateMethod.invoke(type, new Object[0]);
-//				ConfigurationTreeModel model = new ConfigurationTreeModel(new ConstructionProperties(myConfiguration)); 
-//				myConfigurationTree.setModel(model);
-//				myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
-//				myConfigurationTree.addMouseListener(myPopupListener);
-//			} catch (IllegalArgumentException e) {
-//				e.printStackTrace();
-//			} catch (IllegalAccessException e) {
-//				e.printStackTrace();
-//			} catch (InvocationTargetException e) {
-//				e.printStackTrace();
-//			}
-//		} else {
-//			myConfiguration = null;
-//			myConfigurationTree.setModel(new DefaultTreeModel(null));
-//		}
-		
 		myOKButton.setEnabled(false);
 	}
 	
@@ -272,16 +232,11 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			myConfigurationTree.removeMouseListener(myPopupListener);
 		}		
 		
-//		if (constructor.getParameterTypes().length > 0) {
-			myConfiguration = makeTemplate(constructor);
-			ConfigurationTreeModel model = new ConfigurationTreeModel(new ConstructionProperties(myConfiguration)); 
-			myConfigurationTree.setModel(model);
-			myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
-			myConfigurationTree.addMouseListener(myPopupListener);
-//		} else {
-//			myConfiguration = null;
-//			myConfigurationTree.setModel(new DefaultTreeModel(null));
-//		}		
+		myConfiguration = makeTemplate(constructor);
+		ConfigurationTreeModel model = new ConfigurationTreeModel(new ConstructionProperties(myConfiguration)); 
+		myConfigurationTree.setModel(model);
+		myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
+		myConfigurationTree.addMouseListener(myPopupListener);
 	}
 	
 	private static Configuration makeTemplate(Constructor constructor) {
@@ -301,39 +256,6 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		}
 		return result;
 	}
-	
-//	private static Object getDefaultValue(Class type) {
-//		Object result = null;
-//		
-//		if (MainHandler.getInstance().canHandle(type)) {
-//			result = MainHandler.getInstance().getDefaultValue(type);
-//		}
-//		
-//		if (result == null) {
-//			Constructor<?>[] constructors = type.getConstructors();
-//			Constructor zeroArgConstructor = null;
-//			for (int i = 0; i < constructors.length && zeroArgConstructor == null; i++) {
-//				if (constructors[i].getParameterTypes().length == 0) {
-//					zeroArgConstructor = constructors[i];
-//				}
-//			}
-//			if (zeroArgConstructor != null) {
-//				try {
-//					result = zeroArgConstructor.newInstance(new Object[0]);
-//				} catch (IllegalArgumentException e) {
-//					e.printStackTrace();
-//				} catch (InstantiationException e) {
-//					e.printStackTrace();
-//				} catch (IllegalAccessException e) {
-//					e.printStackTrace();
-//				} catch (InvocationTargetException e) {
-//					e.printStackTrace();
-//				}
-//			}			
-//		}
-//		
-//		return result; 
-//	}
 	
 	private void setResult() throws StructuralException {
 		List<Object> args = new ArrayList<Object>(myConfiguration.getPropertyNames().size());
@@ -376,46 +298,6 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			ConfigExceptionHandler.handle(e, errorMessage + " (" + e.getCause().getClass().getName() + ")", 
 					myConfigurationTree);
 		}
-		
-//		Constructor<?>[] constructors = myType.getConstructors();
-//		Constructor zeroArgConstructor = null;
-//		Constructor templateConstructor = null;
-//		for (int i = 0; i < constructors.length; i++) {
-//			Class[] paramTypes = constructors[i].getParameterTypes();
-//			if (paramTypes.length == 0) {
-//				zeroArgConstructor = constructors[i];
-//			} else if (paramTypes.length == 1 && Configuration.class.isAssignableFrom(paramTypes[0])) {
-//				templateConstructor = constructors[i];
-//			}
-//		}
-//		
-//		try {
-//			if (templateConstructor != null) {
-//				myResult = (Configurable) templateConstructor.newInstance(new Object[]{myConfiguration});
-//			} else if (zeroArgConstructor != null) {
-//				myResult = (Configurable) zeroArgConstructor.newInstance(new Object[0]);
-//			} else {
-//				throw new StructuralException(myType.getName() + " doesn't have template-arg or zero-arg constructor");
-//			}
-//			
-//			if (myPopupListener != null) {
-//				myConfigurationTree.removeMouseListener(myPopupListener);
-//			}
-//			ConfigurationTreeModel model = new ConfigurationTreeModel(myResult); 
-//			myConfigurationTree.setModel(model);
-//			myPopupListener = new ConfigurationTreePopupListener(myConfigurationTree, model);
-//			myConfigurationTree.addMouseListener(myPopupListener);
-//
-//			myOKButton.setEnabled(true);
-//		} catch (IllegalArgumentException e) {
-//			e.printStackTrace();
-//		} catch (InstantiationException e) {
-//			e.printStackTrace();
-//		} catch (IllegalAccessException e) {
-//			e.printStackTrace();
-//		} catch (InvocationTargetException e) {
-//			e.printStackTrace();
-//		} 		
 	}
 	
 	/**
@@ -442,27 +324,28 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		
 	}
 	
-	public static void main(String[] args) {
-		JFrame frame = new JFrame("Tree Test");
-		final JButton button = new JButton("New");
-		button.setPreferredSize(new Dimension(200, 50));
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Object result = showDialog(button, Node.class, NEFEnsembleImpl.class);
-				System.out.println("Result: " + result);
-			}
-		});
-		frame.getContentPane().add(button);
-		
-		frame.pack();
-		frame.setVisible(true);
-		
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent arg0) {
-				System.exit(0);
-			}
-		});
-	}
+	//functional test code
+//	public static void main(String[] args) {
+//		JFrame frame = new JFrame("Tree Test");
+//		final JButton button = new JButton("New");
+//		button.setPreferredSize(new Dimension(200, 50));
+//		button.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				Object result = showDialog(button, Node.class, NEFEnsembleImpl.class);
+//				System.out.println("Result: " + result);
+//			}
+//		});
+//		frame.getContentPane().add(button);
+//		
+//		frame.pack();
+//		frame.setVisible(true);
+//		
+//		frame.addWindowListener(new WindowAdapter() {
+//			@Override
+//			public void windowClosing(WindowEvent arg0) {
+//				System.exit(0);
+//			}
+//		});
+//	}
 
 }

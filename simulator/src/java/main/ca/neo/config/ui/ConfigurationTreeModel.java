@@ -4,10 +4,12 @@
 package ca.neo.config.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,44 +26,19 @@ import javax.swing.tree.TreePath;
 import ca.neo.config.ConfigUtil;
 import ca.neo.config.Configurable;
 import ca.neo.config.Configuration;
+import ca.neo.config.JavaSourceParser;
 import ca.neo.config.ListProperty;
 import ca.neo.config.MainHandler;
 import ca.neo.config.NamedValueProperty;
 import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
-import ca.neo.math.Function;
-import ca.neo.math.impl.ConstantFunction;
-import ca.neo.math.impl.FourierFunction;
-import ca.neo.math.impl.FunctionBasisImpl;
-import ca.neo.math.impl.GaussianPDF;
-import ca.neo.math.impl.IdentityFunction;
 import ca.neo.math.impl.IndicatorPDF;
-import ca.neo.math.impl.LinearCurveFitter;
-import ca.neo.math.impl.NumericallyDifferentiableFunction;
-import ca.neo.math.impl.PiecewiseConstantFunction;
-import ca.neo.math.impl.Polynomial;
-import ca.neo.math.impl.PostfixFunction;
-import ca.neo.math.impl.SigmoidFunction;
-import ca.neo.math.impl.SineFunction;
-import ca.neo.math.impl.TimeSeriesFunction;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Units;
+import ca.neo.model.impl.MockConfigurable;
 import ca.neo.model.impl.NoiseFactory;
-import ca.neo.model.neuron.impl.PoissonSpikeGenerator;
-import ca.neo.util.impl.TimeSeries1DImpl;
 
 /**
  * Data model underlying JTree user interface for a Configurable.
- * 
- * DONE (tuesday) add, remove, set for map parameters; test against plastic 
- * DONE (tuesday): handle array values in ConfigurationTreeModel & NewConfigurableDialog; default to empty array
- * DONE (wed) expand Plastic interface to allow configuration
- * DONE (wed): support float[] and float[][] size changes
- * DONE (wed): constructor arg names and docs from source
- * DONE (thurs): support primitives in ListProperty or limit Property use to objects 
- * TODO (thurs): clean up configuration code  
- * TODO (friday): remove Configurable 
- * TODO (friday): augment model classes with getters
  * 
  * @author Bryan Tripp
  */
@@ -70,43 +47,57 @@ public class ConfigurationTreeModel implements TreeModel {
 	private Value myRoot;
 	private List<TreeModelListener> myListeners;
 		
+	/**
+	 * @param configurable Root of the configuration tree
+	 */
 	public ConfigurationTreeModel(Object configurable) {
 		myRoot = new Value(0, configurable);
 		myListeners = new ArrayList<TreeModelListener>(5);
 	}
 	
-	public void addValue(Object source, TreePath parentPath, Object value, String name) {
+	/**
+	 * @param parentPath Path in configuration tree of a property to which a value is to be added 
+	 * @param value New value to add
+	 * @param name Name of new value (only used if parent is a NamedValueProperty; can be null otherwise)
+	 */
+	public void addValue(TreePath parentPath, Object value, String name) {
 		try {
 			Object parent = parentPath.getLastPathComponent();
 			if (parent instanceof ListProperty) {
 				ListProperty property = (ListProperty) parent; 
 				property.addValue(value);
 				
-				TreeModelEvent event = new TreeModelEvent(source, parentPath, new int[]{property.getNumValues()-1}, new Object[]{value});
+				TreeModelEvent event = new TreeModelEvent(this, parentPath, new int[]{property.getNumValues()-1}, new Object[]{value});
 				for (int i = 0; i <myListeners.size(); i++) {
 					myListeners.get(i).treeNodesInserted(event);
 				}
 			} else if (parent instanceof NamedValueProperty) {
 				NamedValueProperty property = (NamedValueProperty) parent;
 				property.setValue(name, value);
-				refresh(source, parentPath);
+				refresh(parentPath);
 			} else {
 				throw new RuntimeException("Can't add child to a " + parent.getClass().getName());
 			}
 		} catch (StructuralException e) {
-			e.printStackTrace();
+			ConfigExceptionHandler.handle(e, "Can't add value: " + e.getMessage(), null);
 		}		
 	}
-	
-	public void refresh(Object source, TreePath path) {
-		TreeModelEvent event = new TreeModelEvent(source, path);
+
+	/**
+	 * @param path Path to root of subtree to refresh
+	 */
+	public void refresh(TreePath path) {
+		TreeModelEvent event = new TreeModelEvent(this, path);
 		for (int i = 0; i <myListeners.size(); i++) {
 			myListeners.get(i).treeStructureChanged(event);						
 		}
 	}
 	
-	//path to node to insert before
-	public void insertValue(Object source, TreePath path, Object value) {
+	/**
+	 * @param path Path to the tree node to insert before
+	 * @param value Value to insert
+	 */
+	public void insertValue(TreePath path, Object value) {
 		try {
 			Object parent = path.getParentPath().getLastPathComponent();
 			if (parent instanceof ListProperty && path.getLastPathComponent() instanceof Value) {
@@ -115,9 +106,9 @@ public class ConfigurationTreeModel implements TreeModel {
 				property.insert(toInsertBefore.getIndex(), value);
 				
 				Value node = new Value(toInsertBefore.getIndex(), value);
-				TreeModelEvent insertEvent = new TreeModelEvent(source, path.getParentPath(), 
+				TreeModelEvent insertEvent = new TreeModelEvent(this, path.getParentPath(), 
 						new int[]{toInsertBefore.getIndex()}, new Object[]{node});
-				TreeModelEvent changeEvent = getIndexUpdateEvent(source, path.getParentPath(), 
+				TreeModelEvent changeEvent = getIndexUpdateEvent(this, path.getParentPath(), 
 						toInsertBefore.getIndex()+1, property.getNumValues());
 				for (int i = 0; i <myListeners.size(); i++) {
 					myListeners.get(i).treeNodesInserted(insertEvent);
@@ -125,10 +116,10 @@ public class ConfigurationTreeModel implements TreeModel {
 				}
 				
 			} else {
-				throw new RuntimeException("Can't set value on child of " + parent.getClass().getName());
+				throw new RuntimeException("Can't insert value on child of " + parent.getClass().getName());
 			}
 		} catch (StructuralException e) {
-			e.printStackTrace();
+			ConfigExceptionHandler.handle(e, "Can't insert value: " + e.getMessage(), null);
 		}
 	}	
 
@@ -144,7 +135,12 @@ public class ConfigurationTreeModel implements TreeModel {
 		return new TreeModelEvent(source, parentPath, changedIndices, changedValues);
 	}
 	
-	public void setValue(Object source, TreePath path, Object value) throws StructuralException {
+	/**
+	 * @param path Path to object to be replaced with new value
+	 * @param value New value
+	 * @throws StructuralException
+	 */
+	public void setValue(TreePath path, Object value) throws StructuralException {
 		Object parent = path.getParentPath().getLastPathComponent();
 		if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
 			int index = ((Value) path.getLastPathComponent()).getIndex();
@@ -162,13 +158,13 @@ public class ConfigurationTreeModel implements TreeModel {
 			child.setObject(value);
 			
 			if (child.getObject() instanceof Configurable) {
-				TreeModelEvent event = new TreeModelEvent(source, path);
+				TreeModelEvent event = new TreeModelEvent(this, path);
 				for (int i = 0; i <myListeners.size(); i++) {
 					myListeners.get(i).treeStructureChanged(event);						
 				}
 			} else {
 				TreePath shortPath = new TreePath(new Object[]{parent, child});
-				TreeModelEvent event = new TreeModelEvent(source, shortPath, new int[]{index}, new Object[]{child});
+				TreeModelEvent event = new TreeModelEvent(this, shortPath, new int[]{index}, new Object[]{child});
 				for (int i = 0; i <myListeners.size(); i++) {
 					myListeners.get(i).treeNodesChanged(event);
 				}
@@ -179,7 +175,10 @@ public class ConfigurationTreeModel implements TreeModel {
 		}
 	}
 	
-	public void removeValue(Object source, TreePath path) {
+	/**
+	 * @param path Tree path to property value to remove
+	 */
+	public void removeValue(TreePath path) {
 		try {
 			Object parent = path.getParentPath().getLastPathComponent();
 			if (path.getLastPathComponent() instanceof Value && (parent instanceof ListProperty || parent instanceof NamedValueProperty)) {
@@ -196,9 +195,9 @@ public class ConfigurationTreeModel implements TreeModel {
 					numValues = property.getValueNames().size();
 				}
 				
-				TreeModelEvent removeEvent = new TreeModelEvent(source, path.getParentPath(), 
+				TreeModelEvent removeEvent = new TreeModelEvent(this, path.getParentPath(), 
 						new int[]{toRemove.getIndex()}, new Object[]{toRemove});
-				TreeModelEvent changeEvent = getIndexUpdateEvent(source, path.getParentPath(), 
+				TreeModelEvent changeEvent = getIndexUpdateEvent(this, path.getParentPath(), 
 						toRemove.getIndex(), numValues);
 				for (int i = 0; i < myListeners.size(); i++) {
 					myListeners.get(i).treeNodesRemoved(removeEvent);
@@ -209,7 +208,7 @@ public class ConfigurationTreeModel implements TreeModel {
 						+ parent.getClass().getName() + " (this is probably a bug)");
 			}
 		} catch (StructuralException e) {
-			e.printStackTrace();
+			ConfigExceptionHandler.handle(e, "Can't remove value: " + e.getMessage(), null);
 		}
 	}
 	
@@ -217,8 +216,8 @@ public class ConfigurationTreeModel implements TreeModel {
 	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
 	 */
 	public Object getChild(Object parent, int index) {
-//		System.out.println("called getChild() with " + parent.getClass().getName());
 		Object result = null;
+		
 		try {
 			if (parent instanceof Value) {
 				Configuration c = ((Value) parent).getConfiguration();
@@ -251,7 +250,6 @@ public class ConfigurationTreeModel implements TreeModel {
 			ConfigExceptionHandler.handle(e, ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
 		}
 		
-//		System.out.println("Child " + index + " of " + parent.toString() + ": " + result);
 		return result;
 	}
 
@@ -264,7 +262,6 @@ public class ConfigurationTreeModel implements TreeModel {
 		if (parent instanceof Value) {
 			Configuration configuration = ((Value) parent).getConfiguration(); 
 			if (configuration != null) result = configuration.getPropertyNames().size();
-//			System.out.println("Child count for " + ((Value) parent).getObject().getClass().getName() + ": " + result);
 		} else if (parent instanceof SingleValuedProperty) {
 			result = 1; 
 		} else if (parent instanceof ListProperty) {
@@ -305,7 +302,6 @@ public class ConfigurationTreeModel implements TreeModel {
 				NamedValueProperty p = (NamedValueProperty) parent;
 				String name = ((Value) child).getName();				
 				for (int i = 0; i < p.getValueNames().size() && index == -1; i++) {
-					System.out.println(i + " of " + p.getValueNames().size() + " name " + name + ": " + p.getValueNames().get(i));
 					if (p.getValueNames().get(i).equals(name)) index = i;
 				}				
 			}
@@ -357,6 +353,7 @@ public class ConfigurationTreeModel implements TreeModel {
 		}
 	}
 	
+	//a wrapper for property values: stores index and configuration (if applicable) 
 	public static class Value {
 		
 		private int myIndex;
@@ -402,6 +399,11 @@ public class ConfigurationTreeModel implements TreeModel {
 		}
 	}
 	
+	/**
+	 * For the configuration UI to use in place of a null parameter value.  
+	 * 
+	 * @author Bryan Tripp
+	 */
 	public static class NullValue {
 		public String toString() {
 			return "NULL";
@@ -410,18 +412,14 @@ public class ConfigurationTreeModel implements TreeModel {
 	
 	public static void main(String[] args) {
 		try {
+			JavaSourceParser.addSource(new File("src/java/main"));
 			JFrame frame = new JFrame("Tree Test"); 
-//			MockConfigurable configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
-//			configurable.addMultiValuedField("test1");
-//			configurable.addMultiValuedField("test2");
-//			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-//			NEFEnsembleImpl configurable = (NEFEnsembleImpl) ef.make("test", 100, 2);
-//			configurable.addDecodedTermination("decoded", MU.I(2), .005f, false);
-//			configurable.addTermination("composite", MU.zero(100, 1), .005f, false);
-			Object configurable = NoiseFactory.makeRandomNoise(1, new GaussianPDF());
+//			Object configurable = new MockConfigurable(MockConfigurable.getConstructionTemplate());
+			Object configurable = NoiseFactory.makeRandomNoise(1, new IndicatorPDF());
 			
 			ConfigurationTreeModel model = new ConfigurationTreeModel(configurable); 
 			final JTree tree = new JTree(model);
+			tree.setPreferredSize(new Dimension(300, 300));
 			tree.setEditable(true); 
 			tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
 			tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));

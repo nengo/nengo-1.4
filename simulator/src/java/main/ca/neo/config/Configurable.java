@@ -1,19 +1,10 @@
 package ca.neo.config;
 
 /**
- * <p>An object with parameters that can be written and read in a standard way, through 
- * the Configuration interface. All of the variable parameters of a Configurable object 
- * must be accessible through this interface.</p> 
+ * <p>This interface can be implemented by objects that wish to expose a customized Configuration.
+ * If an object does not implement the getConfiguration() method, its properties are deduced 
+ * by Java reflection.</p>
  * 
- * <p>A Configurable must have a zero-argument constructor or TODO.</p>
- * 
- * <p>The reasons for this interface are 1) to facilitate saving and loading of model elements, 
- * and 2) to simplify graphical user interfaces by allowing the configuration of all model elements 
- * through a common panel.</p>   
- * 
- * TODO: discuss importance of restrictions for robust serialization (not as much for UI) vs bean patterns
- * TODO: contrast with JAXB (generates Java classes from schema)
- *  
  * @author Bryan Tripp
  */
 public interface Configurable {
@@ -23,6 +14,4 @@ public interface Configurable {
 	 */
 	public Configuration getConfiguration();
 	
-//	public String foo();
-
 }

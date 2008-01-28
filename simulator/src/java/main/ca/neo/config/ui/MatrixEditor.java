@@ -9,11 +9,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -30,6 +27,7 @@ import javax.swing.table.TableModel;
  * An UI component for editing matrices.
  * 
  * TODO: don't really need to enforce equal column lengths
+ * TODO: allow copy/paste, allow insert/delete at specific rows/columns
  * 
  * @author Bryan Tripp
  */
@@ -44,7 +42,9 @@ public class MatrixEditor extends JPanel {
 	private JPanel myControlPanel;
 
 	/**
-	 * Creates an editor for the given coupling matrix.
+	 * Creates an editor for the given matrix.
+	 * 
+	 * @param matrix The matrix to be edited
 	 */
 	public MatrixEditor(float[][] matrix) {
 		super(new BorderLayout());
@@ -68,6 +68,11 @@ public class MatrixEditor extends JPanel {
 		this.add(myControlPanel, BorderLayout.SOUTH);
 	}
 	
+	/**
+	 * @param matrix The matrix to be edited
+	 * @param numRowsFixed If false, the user is able to change the number of matrix rows
+	 * @param numColsFixed If false, the user is able to change the number of matrix columns
+	 */
 	public MatrixEditor(float[][] matrix, boolean numRowsFixed, boolean numColsFixed) {
 		this(matrix);
 		
@@ -98,6 +103,9 @@ public class MatrixEditor extends JPanel {
 		}
 	}
 	
+	/**
+	 * @return The panel containing controls (caller can add further controls in a FlowLayout) 
+	 */
 	public JPanel getControlPanel() {
 		return myControlPanel;
 	}
@@ -152,15 +160,13 @@ public class MatrixEditor extends JPanel {
 		myMatrix = newMatrix;
 		myTableModel.setMatrix(myMatrix);
 		
-		System.out.println("cols: " + myTableModel.getColumnCount());
-
-//		myTableModel.fireTableRowsUpdated(0, rows-1);	
 		myTableModel.fireTableStructureChanged();	
 	}
 
 	private static JTable getRowHeaderView(TableModel model) {
-		JTable result = new JTable(model); //labels, new String[]{""});
+		JTable result = new JTable(model); 
 		result.setPreferredScrollableViewportSize(new Dimension(40, 100));
+		
 		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 1L;
 
@@ -182,15 +188,22 @@ public class MatrixEditor extends JPanel {
 		return result;
 	}
 	
+	/**
+	 * @return The matrix being edited 
+	 */
 	public float[][] getMatrix() {
 		return myMatrix;
 	}
 
+	/**
+	 * Stops current cell editing
+	 */
 	public void finishEditing() {
 		if (myTable.getCellEditor() != null)
 			myTable.getCellEditor().stopCellEditing();
 	}
 	
+	//a TableModel for the row header  
 	private class RowHeaderTableModel extends AbstractTableModel {
 		
 		private static final long serialVersionUID = 1L;
@@ -220,6 +233,7 @@ public class MatrixEditor extends JPanel {
 		
 	}
 
+	//a TableModel for the main part of the table
 	private class MatrixTableModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = 1L;		
@@ -274,29 +288,29 @@ public class MatrixEditor extends JPanel {
 		
 	}
 
-	// for testing
-	public static void main(String args[]) {
-		float[][] matrix = new float[][]{new float[3], new float[3], new float[3], new float[3], new float[3]};
-//		float[][] matrix = new float[0][];
-		MatrixEditor editor = new MatrixEditor(matrix, false, false);
-
-		try {
-			JFrame frame = new JFrame("test");
-			frame.getContentPane().add(editor);
-
-			frame.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
-				}
-			});
-
-			frame.pack();
-			frame.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
+	// function test code 
+//	public static void main(String args[]) {
+//		float[][] matrix = new float[][]{new float[3], new float[3], new float[3], new float[3], new float[3]};
+////		float[][] matrix = new float[0][];
+//		MatrixEditor editor = new MatrixEditor(matrix, false, false);
+//
+//		try {
+//			JFrame frame = new JFrame("test");
+//			frame.getContentPane().add(editor);
+//
+//			frame.addWindowListener(new WindowAdapter() {
+//				@Override
+//				public void windowClosing(WindowEvent e) {
+//					System.exit(0);
+//				}
+//			});
+//
+//			frame.pack();
+//			frame.setVisible(true);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 }

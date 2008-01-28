@@ -1,8 +1,8 @@
 TODO NOW: 
-- clean up config UI code
+- DONE clean up config UI code
+- DONE constructor args not appearing for LTISystem (eg NoiseImplDF)
 - make config initialization and factory for UI
 - events for Shu
-- constructor args not appearing for LTISystem (eg NoiseImplDF)
 
 TODO: 
 - expand help in python 

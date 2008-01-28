@@ -33,6 +33,11 @@ public class ConfigurationChangeListener implements ActionListener {
 		myPath = path;
 	}
 	
+	/**
+	 * Called by a ConfigurationHandler's editor. 
+	 * 
+	 * @param proxy Provides access to an updated property value after it is changed by the user 
+	 */
 	public void setProxy(EditorProxy proxy) {
 		myEditorProxy = proxy;
 	}
@@ -42,7 +47,7 @@ public class ConfigurationChangeListener implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		try {
-			myModel.setValue(this, myPath, myEditorProxy.getValue());
+			myModel.setValue(myPath, myEditorProxy.getValue());
 		} catch (Exception ex) {
 			String message = "The new value is invalid. The old value will be retained.";
 			if (ex.getMessage() != null) message = ex.getMessage();
