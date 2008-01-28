@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -33,6 +34,8 @@ import javax.swing.text.StyleContext;
 
 import org.python.util.PythonInterpreter;
 
+import ca.neo.config.JavaSourceParser;
+
 /**
  * A user interface panel for entering script commands. 
  * 
@@ -53,6 +56,7 @@ public class ScriptConsole extends JPanel {
 	public static final String COMMAND_STYLE = "command";
 	public static final String OUTPUT_STYLE = "output";
 	public static final String ERROR_STYLE = "error";
+	public static final String HELP_STYLE = "help";
 	
 	private PythonInterpreter myInterpreter;
 	private JEditorPane myDisplayArea;
@@ -188,12 +192,28 @@ public class ScriptConsole extends JPanel {
 		try {
 			if (text.startsWith("run ")) {
 				myInterpreter.execfile(text.substring(4).trim());
+			} else if (text.startsWith("help ")) {
+				appendText(getHelp(text.substring(5).trim()), HELP_STYLE);
 			} else {
 				myInterpreter.exec(text);						
 			}
 		} catch (RuntimeException e) {
 			appendText(e.toString(), ERROR_STYLE);
 		}
+	}
+	
+	private static String getHelp(String entity) {
+		String result = "No documentation found for " + entity;
+		
+		try {
+			Class c = Class.forName(entity);
+			String docs = JavaSourceParser.getDocs(c);
+			if (docs != null) result = docs;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -380,7 +400,7 @@ public class ScriptConsole extends JPanel {
 	}
 	
 	public static void main(String[] args) {
-		
+		JavaSourceParser.addSource(new File("../simulator/src/java/main"));
 		PythonInterpreter interpreter = new PythonInterpreter();
 		ScriptConsole console = new ScriptConsole(interpreter);
 
