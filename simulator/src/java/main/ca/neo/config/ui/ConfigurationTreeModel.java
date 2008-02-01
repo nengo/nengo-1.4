@@ -37,7 +37,6 @@ import ca.neo.config.Property;
 import ca.neo.config.SingleValuedProperty;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.model.StructuralException;
-import ca.neo.model.impl.MockConfigurable;
 import ca.neo.model.impl.NoiseFactory;
 
 /**
