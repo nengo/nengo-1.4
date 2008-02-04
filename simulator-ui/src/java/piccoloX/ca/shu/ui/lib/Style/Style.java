@@ -1,6 +1,7 @@
 package ca.shu.ui.lib.Style;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Font;
 
 import javax.swing.JComponent;
@@ -92,6 +93,17 @@ public class Style {
 	 */
 	public static final Font FONT_SEARCH_TEXT = new Font("Helvetica", Font.BOLD, 30);
 	public static final Font FONT_SEARCH_RESULT_COUNT = new Font("Helvetica", Font.BOLD, 22);
+
+	public static void applyStyle(JComponent item) {
+		item.setBorder(null);
+		applyStyle((Container) item);
+	}
+
+	public static void applyStyle(Container item) {
+		item.setBackground(Style.COLOR_BACKGROUND);
+		item.setForeground(Style.COLOR_FOREGROUND);
+
+	}
 
 	public static void applyMenuStyle(JComponent item, boolean isTitle) {
 		item.setOpaque(true);

@@ -2,23 +2,20 @@ package ca.neo.ui.models;
 
 import javax.swing.SwingUtilities;
 
+import ca.neo.ui.actions.ConfigureAction;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
-import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.IConfigurable;
+import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.PropertySet;
 import ca.shu.ui.lib.objects.models.ModelObject;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * A UIModel which can be configured through the IConfigurable interface
  * 
  * @author Shu Wu
  */
-public abstract class UIModelConfigurable extends ModelObject implements
-		IConfigurable {
-
-	public void preConfiguration(PropertySet props) throws ConfigException {
-		// do nothing
-	}
+public abstract class UIModelConfigurable extends ModelObject implements IConfigurable {
 
 	public UIModelConfigurable() {
 		super();
@@ -48,13 +45,18 @@ public abstract class UIModelConfigurable extends ModelObject implements
 	protected abstract Object configureModel(PropertySet configuredProperties)
 			throws ConfigException;
 
+	@Override
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
+		menu.addAction(new ConfigureAction("Configure", getModel()));
+	}
+
 	/*
 	 * (non-Javadoc) This function can be safely called from any thread
 	 * 
 	 * @see ca.neo.ui.views.objects.configurable.IConfigurable#completeConfiguration(ca.neo.ui.views.objects.configurable.managers.PropertySet)
 	 */
-	public void completeConfiguration(PropertySet properties)
-			throws ConfigException {
+	public void completeConfiguration(PropertySet properties) throws ConfigException {
 
 		Object model = null;
 
@@ -77,4 +79,11 @@ public abstract class UIModelConfigurable extends ModelObject implements
 	 */
 	public abstract PropertyDescriptor[] getConfigSchema();
 
+	public void preConfiguration(PropertySet props) throws ConfigException {
+		// do nothing
+	}
+
+	public void configure() {
+		(new ConfigureAction("Configure", getModel())).doAction();
+	}
 }

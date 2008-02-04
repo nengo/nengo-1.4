@@ -1,4 +1,4 @@
-package ca.neo.ui;
+package ca.neo.ui.test;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -15,6 +15,7 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.actions.PlotTimeSeries;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.nodes.UIFunctionInput;
@@ -29,7 +30,7 @@ import ca.neo.ui.models.viewers.NodeViewer;
  * 
  * @author Shu Wu
  */
-public class GIntegratorExample {
+public class IntegratorExample {
 	public static float tau = .05f;
 
 	// public static Network createNetwork() throws StructuralException {
@@ -106,12 +107,12 @@ public class GIntegratorExample {
 	private UIStateProbe integratorProbe;
 
 	public static void main(String[] args) {
-		new GIntegratorExample();
+		new IntegratorExample();
 	}
 
 	private UINetwork network;
 
-	public GIntegratorExample() {
+	public IntegratorExample() {
 		try {
 			run();
 		} catch (InterruptedException e) {
@@ -146,6 +147,7 @@ public class GIntegratorExample {
 				plotAction.doAction();
 			}
 		});
+		network = null;
 	}
 
 }

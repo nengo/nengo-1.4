@@ -1,7 +1,11 @@
 package ca.neo.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -9,15 +13,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 import ca.neo.config.ClassRegistry;
+import ca.neo.config.JavaSourceParser;
 import ca.neo.model.Network;
 import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
@@ -33,11 +40,14 @@ import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.AppFrame;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 
 /**
  * Top level instance of the NeoGraphics application
@@ -58,6 +68,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 			+ "Visit http://ctn.uwaterloo.ca/<BR>"
 			+ "<BR> User Interface by Shu Wu (shuwu83@gmail.com)";
 
+	public static final String CONFIG_FILE = "NeoGraphics.config";
+
 	/**
 	 * UI delegate object used to show the FileChooser
 	 */
@@ -68,6 +80,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 */
 	public static final String NEONODE_FILE_EXTENSION = "neonode";
 
+	static final String PLUGIN_DIRECTORY = "plugins";
+
 	/**
 	 * Runs NeoGraphics with a default name
 	 * 
@@ -77,11 +91,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		new NeoGraphics();
 	}
 
-	/**
-	 * Data viewer dialog
-	 */
-	private JDialog dataViewerDialog = null;
+	private Container dataViewerPane;
 
+	private JSplitPane mainPane;
 	/**
 	 * Data viewer data
 	 */
@@ -93,10 +105,15 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 */
 	public NeoGraphics() {
 		super();
+	}
+
+	@Override
+	protected void initialize() {
+		super.initialize();
 
 		UIEnvironment.setDebugEnabled(true);
 
-		simulationData = new SimulatorDataModel();
+		loadConfig();
 
 		if (FileChooser == null) {
 			FileChooser = new NeoFileChooser();
@@ -113,7 +130,43 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		Environment.setUserInterface(true);
 	}
 
-	static final String PLUGIN_DIRECTORY = "plugins";
+	private void initDataViewer(Container dataViewerContainer) {
+		dataViewerContainer.setLayout(new BorderLayout());
+		simulationData = new SimulatorDataModel();
+		JLabel dataViewerLabel = new JLabel("Data viewer");
+		Style.applyStyle(dataViewerLabel);
+		dataViewerLabel.setBackground(Style.COLOR_BACKGROUND2);
+		dataViewerLabel.setOpaque(true);
+
+		dataViewerLabel.setFont(Style.FONT_BIG);
+
+		dataViewerContainer.add(dataViewerLabel, BorderLayout.NORTH);
+		dataViewerContainer.setMinimumSize(new Dimension(200, 200));
+		DataListView dataListViewer = new DataListView(simulationData);
+		Style.applyStyle(dataListViewer);
+
+		dataViewerContainer.add(dataListViewer, BorderLayout.CENTER);
+	}
+
+	private void loadConfig() {
+		String simulatorSource = "../simulator/src/java/main";
+
+		try {
+			FileInputStream fis = new FileInputStream(CONFIG_FILE);
+			Properties props = new Properties();
+			props.load(fis);
+
+			simulatorSource = props.getProperty("simulator_source");
+		} catch (IOException e) {
+			Util.debugMsg("Problem loading config file");
+		}
+		File simulatorSourceFile = new File(simulatorSource);
+		if (!simulatorSourceFile.exists()) {
+			Util.debugMsg("Could not find simulator source files");
+		}
+
+		JavaSourceParser.addSource(simulatorSourceFile);
+	}
 
 	/**
 	 * Register plugins
@@ -183,6 +236,32 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		}
 	}
 
+	@Override
+	protected void initLayout(Universe canvas) {
+
+		mainPane = new JSplitPane();
+		Style.applyStyle(mainPane);
+
+		dataViewerPane = new JPanel();
+
+		Style.applyStyle(dataViewerPane);
+		initDataViewer(dataViewerPane);
+
+		mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, dataViewerPane, canvas);
+		mainPane.setOneTouchExpandable(true);
+		mainPane.setBorder(null);
+
+		mainPane.setDividerSize(2);
+
+		Container cp = getContentPane();
+		// cp.setLayout(new BorderLayout());
+		cp.add(mainPane);
+
+		canvas.requestFocus();
+		setDataViewerVisible(false);
+
+	}
+
 	/**
 	 * Prompt user to save models in NeoGraphics This is most likely called
 	 * right before the application is exiting
@@ -197,6 +276,23 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
+	 */
+	public void addNeoNode(UINeoNode node) {
+		if (node instanceof NodeContainer) {
+			((NodeContainer) (node)).openViewer();
+		}
+		getWorld().getGround().addObject(node);
+
+	}
+
+	public void captureInDataViewer(Network network) {
+		simulationData.captureData(network);
 	}
 
 	@Override
@@ -216,23 +312,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		}
 
 		super.exitAppFrame();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
-	 */
-	public void addNeoNode(UINeoNode node) {
-		if (node instanceof NodeContainer) {
-			((NodeContainer) (node)).openViewer();
-		}
-		getWorld().getGround().addObject(node);
-
-	}
-
-	public void captureInDataViewer(Network network) {
-		simulationData.captureData(network);
 	}
 
 	@Override
@@ -270,33 +349,49 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
 		menuBar.add(viewMenu.getJMenu());
 
-		viewMenu.addAction(new OpenDataViewerAction(), KeyEvent.VK_N);
+		MenuBuilder dataViewerMenu = viewMenu.addSubMenu("Data viewer");
+		dataViewerMenu.addAction(new SetDataViewerVisibleAction("Show data viewer", true),
+				KeyEvent.VK_N);
+
+		dataViewerMenu.addAction(new SetDataViewerVisibleAction("Hide data viewer", false),
+				KeyEvent.VK_N);
+
 	}
 
-	public void openDataViewer() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if (dataViewerDialog == null) {
-					dataViewerDialog = DataListView.createViewer(UIEnvironment.getInstance(),
-							simulationData);
-				}
-				dataViewerDialog.setVisible(true);
+	public boolean isDataViewerVisible() {
+		if (mainPane.getDividerLocation() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void setDataViewerVisible(boolean isVisible) {
+		if (isVisible) {
+			int dividerLocation = mainPane.getDividerLocation();
+			if (dividerLocation < dataViewerPane.getMinimumSize().getWidth()) {
+				mainPane.setDividerLocation((int) dataViewerPane.getMinimumSize().getWidth());
 			}
-		});
-
+			mainPane.setDividerSize(2);
+		} else {
+			mainPane.setDividerLocation(0);
+			mainPane.setDividerSize(0);
+		}
 	}
 
-	public class OpenDataViewerAction extends StandardAction {
+	public class SetDataViewerVisibleAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
+		private boolean visible;
 
-		public OpenDataViewerAction() {
-			super("Open data viewer");
+		public SetDataViewerVisibleAction(String actionName, boolean visible) {
+			super(actionName);
+			this.visible = visible;
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			openDataViewer();
+			setDataViewerVisible(visible);
 		}
 
 	}

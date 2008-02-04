@@ -35,7 +35,7 @@ public class TrackedStatusMsg {
 	}
 
 	private void init() {
-		UIEnvironment.getInstance().addTaskStatusMsg(getTaskName());
+		 UIEnvironment.getInstance().getUniverse().addTaskStatusMsg(getTaskName());
 
 	}
 
@@ -51,7 +51,7 @@ public class TrackedStatusMsg {
 	 * Removes the task message from the application status bar.
 	 */
 	public void finished() {
-		UIEnvironment.getInstance().removeTaskStatusMsg(getTaskName());
+		UIEnvironment.getInstance().getUniverse().removeTaskStatusMsg(getTaskName());
 
 		if (taskText != null) {
 			taskText.removeFromParent();

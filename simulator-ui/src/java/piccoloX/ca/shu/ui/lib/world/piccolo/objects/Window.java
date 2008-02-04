@@ -46,7 +46,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 	 * Updates the application title with the top window
 	 */
 	public static void updateAppTitle() {
-		List<Window> windows = UIEnvironment.getInstance().getWorldWindows();
+		List<Window> windows = UIEnvironment.getInstance().getUniverse().getWorldWindows();
 
 		if (windows.size() > 0) {
 			UIEnvironment.getInstance().setTitle(

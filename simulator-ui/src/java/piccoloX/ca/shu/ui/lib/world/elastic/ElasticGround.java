@@ -28,10 +28,18 @@ public class ElasticGround extends WorldGroundImpl {
 
 	private static final long serialVersionUID = 1L;
 
-	private SparseGraph myGraph;
+	public static final String ELASTIC_LENGTH_KEY = "elasticLength";
+
+	private boolean childrenUpdatedFlag = false;
+	private ObjectSet<ElasticObject> elasticChildren = new ObjectSet<ElasticObject>();
 
 	private ElasticLayoutRunner elasticLayoutThread;
-	private boolean childrenUpdatedFlag = false;
+
+	private Hashtable<PXEdge, AbstractSparseEdge> myEdgeMap = new Hashtable<PXEdge, AbstractSparseEdge>();
+
+	private SparseGraph myGraph;
+
+	private Hashtable<ElasticObject, ElasticVertex> myVertexMap = new Hashtable<ElasticObject, ElasticVertex>();
 
 	public ElasticGround() {
 		super();
@@ -43,6 +51,34 @@ public class ElasticGround extends WorldGroundImpl {
 			}
 
 		});
+	}
+
+	@Override
+	protected void prepareForDestroy() {
+		setElasticEnabled(false);
+		super.prepareForDestroy();
+	}
+
+	@Override
+	public void childAdded(WorldObject wo) {
+		super.childAdded(wo);
+		if (wo instanceof ElasticObject) {
+			elasticChildren.add((ElasticObject) wo);
+		}
+	}
+
+	@Override
+	public void childRemoved(WorldObject wo) {
+		super.childRemoved(wo);
+		if (wo instanceof ElasticObject) {
+			if (!elasticChildren.remove((ElasticObject) wo)) {
+				Util.Assert(false);
+			}
+		}
+	}
+
+	public Iterable<ElasticObject> getElasticChildren() {
+		return elasticChildren;
 	}
 
 	public Point2D getElasticPosition(ElasticObject node) {
@@ -64,10 +100,6 @@ public class ElasticGround extends WorldGroundImpl {
 		return myGraph;
 	}
 
-	private Hashtable<ElasticObject, ElasticVertex> myVertexMap = new Hashtable<ElasticObject, ElasticVertex>();
-
-	private Hashtable<PXEdge, AbstractSparseEdge> myEdgeMap = new Hashtable<PXEdge, AbstractSparseEdge>();
-
 	@Override
 	public ElasticWorld getWorld() {
 		return (ElasticWorld) super.getWorld();
@@ -79,6 +111,17 @@ public class ElasticGround extends WorldGroundImpl {
 		} else {
 			return false;
 		}
+	}
+
+	public boolean isPositionLocked(ElasticObject node) {
+		if (elasticLayoutThread != null) {
+			ElasticVertex vertex = myVertexMap.get(node);
+
+			if (vertex != null) {
+				return elasticLayoutThread.isLocked(vertex);
+			}
+		}
+		return false;
 	}
 
 	public void setElasticEnabled(boolean enabled) {
@@ -148,41 +191,6 @@ public class ElasticGround extends WorldGroundImpl {
 
 	}
 
-	public boolean isPositionLocked(ElasticObject node) {
-		if (elasticLayoutThread != null) {
-			ElasticVertex vertex = myVertexMap.get(node);
-
-			if (vertex != null) {
-				return elasticLayoutThread.isLocked(vertex);
-			}
-		}
-		return false;
-	}
-
-	private ObjectSet<ElasticObject> elasticChildren = new ObjectSet<ElasticObject>();
-
-	@Override
-	public void childAdded(WorldObject wo) {
-		super.childAdded(wo);
-		if (wo instanceof ElasticObject) {
-			elasticChildren.add((ElasticObject) wo);
-		}
-	}
-
-	public Iterable<ElasticObject> getElasticChildren() {
-		return elasticChildren;
-	}
-
-	@Override
-	public void childRemoved(WorldObject wo) {
-		super.childRemoved(wo);
-		if (wo instanceof ElasticObject) {
-			if (!elasticChildren.remove((ElasticObject) wo)) {
-				Util.Assert(false);
-			}
-		}
-	}
-
 	public void updateChildrenFromLayout(Layout layout, boolean animateNodes, boolean zoomToLayout) {
 		/**
 		 * Layout nodes
@@ -248,28 +256,6 @@ public class ElasticGround extends WorldGroundImpl {
 		}
 
 	}
-
-	public static class UpdateGraphResult {
-		private boolean graphUpdated;
-		private Collection<ElasticVertex> addedVertices;
-
-		public UpdateGraphResult(boolean graphUpdated, Collection<ElasticVertex> addedVertices) {
-			super();
-			this.graphUpdated = graphUpdated;
-			this.addedVertices = addedVertices;
-		}
-
-		public boolean isGraphUpdated() {
-			return graphUpdated;
-		}
-
-		public Collection<ElasticVertex> getAddedVertices() {
-			return addedVertices;
-		}
-
-	}
-
-	public static final String ELASTIC_LENGTH_KEY = "elasticLength";
 
 	/**
 	 * This method must be executed from the swing dispatcher thread because it
@@ -440,10 +426,24 @@ public class ElasticGround extends WorldGroundImpl {
 
 	}
 
-	@Override
-	protected void prepareForDestroy() {
-		setElasticEnabled(false);
-		super.prepareForDestroy();
+	public static class UpdateGraphResult {
+		private Collection<ElasticVertex> addedVertices;
+		private boolean graphUpdated;
+
+		public UpdateGraphResult(boolean graphUpdated, Collection<ElasticVertex> addedVertices) {
+			super();
+			this.graphUpdated = graphUpdated;
+			this.addedVertices = addedVertices;
+		}
+
+		public Collection<ElasticVertex> getAddedVertices() {
+			return addedVertices;
+		}
+
+		public boolean isGraphUpdated() {
+			return graphUpdated;
+		}
+
 	}
 
 }

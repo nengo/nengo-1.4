@@ -48,7 +48,8 @@ public class WorldObjectImpl implements WorldObject {
 			{ EventType.FULL_BOUNDS, PXNode.PROPERTY_FULL_BOUNDS },
 			{ EventType.GLOBAL_BOUNDS, PXNode.PROPERTY_GLOBAL_BOUNDS },
 			{ EventType.VIEW_TRANSFORM, PCamera.PROPERTY_VIEW_TRANSFORM },
-			{ EventType.REMOVED_FROM_WORLD, PXNode.PROPERTY_REMOVED_FROM_WORLD } };
+			{ EventType.REMOVED_FROM_WORLD, PXNode.PROPERTY_REMOVED_FROM_WORLD },
+			{ EventType.CHILDREN_CHANGED, PNode.PROPERTY_CHILDREN } };
 
 	public static final long TIME_BETWEEN_POPUPS = 1500;
 

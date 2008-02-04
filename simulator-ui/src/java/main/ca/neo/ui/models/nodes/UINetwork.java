@@ -7,6 +7,7 @@ import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.sim.Simulator;
+import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PString;
@@ -136,7 +137,7 @@ public class UINetwork extends NodeContainer {
 		}
 
 		if (layoutManager == null) {
-			layoutManager = new NetworkViewerConfig(getName() + ".net");
+			layoutManager = new NetworkViewerConfig(getName() +"." + NeoGraphics.NEONODE_FILE_EXTENSION);
 			setUICOnfig(layoutManager);
 		}
 

@@ -1,6 +1,9 @@
 *******************************************
  Done
 *******************************************
+02/03/2008 - Data viewer integrated into NeoGraphics window
+02/03/2008 - Configuration action added to popup menus
+
 01/20/2008 - Inline search, use 'f' to start.
 01/12/2008 - Use ClassRegistry to register classes in plugins directory
 12/22/2007 - The Java Swing Frame's title is updated with the maximized Window's name
@@ -17,6 +20,13 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Add weakreference to nodes in data list viewer, check if not destroyed and still in world
+
+Configuration panel:
+	Scrolling
+
+Notification listener of node changes 
+
 Drag and drop UINeoNodes between networks (worlds)
 
 Integrate data list viewer as pane in NeoGraphics

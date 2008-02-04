@@ -26,7 +26,7 @@ public class TransientStatusMessage {
 			public void run() {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						UIEnvironment.getInstance().addTaskStatusMsg(myMessage);
+						UIEnvironment.getInstance().getUniverse().addTaskStatusMsg(myMessage);
 					}
 				});
 				try {
@@ -37,8 +37,7 @@ public class TransientStatusMessage {
 
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						UIEnvironment.getInstance().removeTaskStatusMsg(
-								myMessage);
+						UIEnvironment.getInstance().getUniverse().removeTaskStatusMsg(myMessage);
 					}
 				});
 

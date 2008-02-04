@@ -15,7 +15,6 @@ import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.neo.ui.models.nodes.UINetwork;
-import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.TrackedAction;
@@ -88,7 +87,6 @@ public class RunSimulatorAction extends StandardAction {
 			RunSimulatorActivity simulatorActivity = new RunSimulatorActivity(startTime, endTime,
 					stepTime, showDataViewer);
 			simulatorActivity.doAction();
-			simulatorActivity.blockUntilCompleted();
 
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
@@ -103,9 +101,6 @@ public class RunSimulatorAction extends StandardAction {
 	 * Activity which will run the simulation
 	 * 
 	 * @author Shu Wu
-	 */
-	/**
-	 * @author Shu
 	 */
 	class RunSimulatorActivity extends TrackedAction implements SimulatorListener {
 
@@ -140,11 +135,16 @@ public class RunSimulatorAction extends StandardAction {
 
 				simulator.removeSimulatorListener(this);
 
-				AppFrame frame = UIEnvironment.getInstance();
-				((NeoGraphics) (frame)).captureInDataViewer(uiNetwork.getModel());
+				((NeoGraphics) (UIEnvironment.getInstance())).captureInDataViewer(uiNetwork
+						.getModel());
 
 				if (showDataViewer) {
-					((NeoGraphics) (frame)).openDataViewer();
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							((NeoGraphics) (UIEnvironment.getInstance())).setDataViewerVisible(true);
+						}
+					});
+
 				}
 
 			} catch (SimulationException e) {

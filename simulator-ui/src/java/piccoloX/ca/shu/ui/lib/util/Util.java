@@ -78,8 +78,9 @@ public class Util {
 	public static void Assert(boolean bool) {
 		Assert(bool, "");
 	}
+
 	public static void Assert(boolean bool, String msg) {
-		if (!bool) {
+		if (!bool && UIEnvironment.isDebugEnabled()) {
 			String assertMsg = "ASSERT == FALSE: " + msg;
 			(new Exception(assertMsg)).printStackTrace();
 			UserMessages.showWarning(assertMsg);
@@ -105,8 +106,7 @@ public class Util {
 			out.writeObject(obj);
 			out.close();
 
-			ByteArrayInputStream bin = new ByteArrayInputStream(bout
-					.toByteArray());
+			ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
 			in = new ObjectInputStream(bin);
 			Object copy = in.readObject();
 
@@ -207,9 +207,8 @@ public class Util {
 	}
 
 	public static boolean isArray(Object obj) {
-		if ((obj instanceof Object[]) || (obj instanceof float[])
-				|| (obj instanceof int[]) || (obj instanceof long[])
-				|| (obj instanceof double[])) {
+		if ((obj instanceof Object[]) || (obj instanceof float[]) || (obj instanceof int[])
+				|| (obj instanceof long[]) || (obj instanceof double[])) {
 			return true;
 		}
 		return false;

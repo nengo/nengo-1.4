@@ -1,7 +1,6 @@
 package ca.neo.ui.dataList;
 
 import java.util.Collections;
-import java.util.Comparator;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -27,12 +26,4 @@ public class SortableMutableTreeNode extends DefaultMutableTreeNode {
 			Collections.sort(children, new NaturalOrderComparator());
 		}
 	}
-}
-
-class NodeComparator implements Comparator<Object> {
-
-	public int compare(Object o1, Object o2) {
-		return (o1.toString().compareTo(o2.toString()));
-	}
-
 }

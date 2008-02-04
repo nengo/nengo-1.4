@@ -13,12 +13,10 @@ import ca.shu.ui.lib.actions.RemoveObjectsAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.ZoomToFitAction;
 import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.World;
-import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.world.handlers.EventConsumer;
@@ -169,13 +167,13 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		/*
 		 * Create the grid
 		 */
-		gridLayer = PXGrid.createGrid(getSky().getCamera(), UIEnvironment.getInstance().getCanvas()
-				.getRoot(), Style.COLOR_DARKBORDER, 1500);
+		gridLayer = PXGrid.createGrid(getSky().getCamera(), UIEnvironment.getInstance()
+				.getUniverse().getRoot(), Style.COLOR_DARKBORDER, 1500);
 
 		/*
 		 * Let the top canvas have a handle on this world
 		 */
-		UIEnvironment.getInstance().getCanvas().addWorld(this);
+		UIEnvironment.getInstance().getUniverse().addWorld(this);
 
 		/*
 		 * Miscellaneous
@@ -191,7 +189,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		 * This world's root is always to top-level root associated with the
 		 * canvas
 		 */
-		return UIEnvironment.getInstance().getCanvas().getRoot();
+		return UIEnvironment.getInstance().getUniverse().getRoot();
 	}
 
 	private void initSelectionMode() {
@@ -221,19 +219,13 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 
 	@Override
 	protected void prepareForDestroy() {
-		UIEnvironment.getInstance().getCanvas().removeWorld(this);
+		UIEnvironment.getInstance().getUniverse().removeWorld(this);
 
 		keyboardHandler.destroy();
 		gridLayer.removeFromParent();
 		layer.removeFromParent();
 
 		super.prepareForDestroy();
-	}
-
-	@Override
-	public void addChild(WorldObject wo, int index) {
-		Util.Assert(wo instanceof WorldLayer, "IWorld child must be a IWorldLayer");
-		super.addChild(wo, index);
 	}
 
 	/**

@@ -40,7 +40,7 @@ public abstract class AbstractStatusHandler extends PBasicInputEventHandler {
 	public void mouseMoved(PInputEvent event) {
 		super.mouseMoved(event);
 
-		UIEnvironment.getInstance().setStatusMessage(getStatusMessage(event));
+		UIEnvironment.getInstance().getUniverse().setStatusMessage(getStatusMessage(event));
 
 	}
 }

@@ -206,7 +206,7 @@ public class ScriptConsole extends JPanel {
 		String result = "No documentation found for " + entity;
 		
 		try {
-			Class c = Class.forName(entity);
+			Class<?> c = Class.forName(entity);
 			String docs = JavaSourceParser.getDocs(c);
 			if (docs != null) result = docs;
 		} catch (ClassNotFoundException e) {

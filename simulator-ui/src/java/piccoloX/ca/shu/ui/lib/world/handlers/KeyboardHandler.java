@@ -39,7 +39,7 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 			searchEnabled = false;
 
 			if (event.getKeyChar() == 's' || event.getKeyChar() == 'S') {
-				UIEnvironment.getInstance().setSelectionMode(!world.isSelectionMode());
+				UIEnvironment.getInstance().getUniverse().setSelectionMode(!world.isSelectionMode());
 			} else if (event.getKeyChar() == 'f' || event.getKeyChar() == 'F') {
 				searchEnabled = !searchEnabled;
 

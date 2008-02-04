@@ -2,7 +2,6 @@ package ca.neo.ui.dataList;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -15,7 +14,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -32,8 +30,9 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import ca.neo.io.DelimitedFileExporter;
-import ca.neo.model.Network;
+import ca.neo.ui.actions.ConfigureAction;
 import ca.neo.ui.util.FileExtensionFilter;
+import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -46,34 +45,6 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 	public static final String DATA_FILE_EXTENSION = "txt";
 
-	static Network myNetwork;
-
-	/**
-	 * Create the GUI and show it. For thread safety, this method should be
-	 * invoked from the event-dispatching thread.
-	 */
-	public static JDialog createViewer(Frame owner,
-			SimulatorDataModel simulatorData) {
-
-		// Create and set up the window.
-		JDialog dialog = new JDialog(owner, "Data Viewer");
-
-		dialog.setPreferredSize(new Dimension(300, 600));
-		dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-
-		// Create and set up the content pane.
-		DataListView newContentPane = new DataListView(simulatorData);
-
-		newContentPane.setOpaque(true); // content panes must be opaque
-		dialog.setContentPane(newContentPane);
-
-		// Display the window.
-		dialog.pack();
-		dialog.setVisible(true);
-
-		return dialog;
-	}
-
 	private SimulatorDataModel dataModel;
 	private JTree tree;
 
@@ -84,9 +55,10 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		// Create a tree that allows one selection at a time.
 		tree = new JTree(dataModel);
+		tree.setBackground(Style.COLOR_BACKGROUND);
+
 		tree.setEditable(true);
-		tree.getSelectionModel().setSelectionMode(
-				TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
 		dataModel.addTreeModelListener(new MyTreeModelListener());
 		tree.addMouseListener(new MyTreeMouseListener());
@@ -95,6 +67,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		tree.addTreeSelectionListener(this);
 
 		JScrollPane scrollPane = new JScrollPane(tree);
+		scrollPane.setBorder(null);
 		add(scrollPane);
 
 		Dimension minimumSize = new Dimension(100, 50);
@@ -141,12 +114,68 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 	private class MyTreeMouseListener implements MouseListener {
 
+		private void ContextMenuEvent(MouseEvent e) {
+
+			JPopupMenu menu = null;
+
+			TreePath[] paths = getTreePaths(e);
+			List<MutableTreeNode> leafNodes = getLeafNodes(paths);
+
+			// Have no idea how many data nodes there are going to be. Might as
+			// well make it proportional to the number of nodes.
+			HashSet<DataTreeNode> dataNodes = new HashSet<DataTreeNode>(leafNodes.size());
+
+			// Find data nodes in tree nodes
+			for (MutableTreeNode treeNode : leafNodes) {
+				RecursiveFindDataNodes(treeNode, dataNodes);
+			}
+
+			if (dataNodes.size() > 0) {
+				PopupMenuBuilder menuBuilder;
+
+				if (leafNodes.size() == 1) {
+					MutableTreeNode leafNode = leafNodes.get(0);
+
+					menuBuilder = new PopupMenuBuilder(leafNode.toString());
+
+					menuBuilder.addAction(new ExportData(DataListView.this, leafNode));
+
+					if (leafNode instanceof NeoTreeNode) {
+						NeoTreeNode neoTreeNode = (NeoTreeNode) leafNode;
+
+						if (neoTreeNode.getNeoNode() != null) {
+							menuBuilder.addAction(new ConfigureAction("Configure", neoTreeNode
+									.getNeoNode()));
+						}
+					}
+
+					if (leafNode instanceof DataTreeNode) {
+						((DataTreeNode) leafNode).constructPopupMenu(menuBuilder, dataModel);
+					}
+
+				} else {
+
+					menuBuilder = new PopupMenuBuilder(dataNodes.size() + " data nodes selected");
+
+					menuBuilder.addAction(new PlotNodesAction(dataNodes));
+
+				}
+
+				menuBuilder.addAction(new RemoveTreeNodes(leafNodes));
+				menu = menuBuilder.toJPopupMenu();
+
+				if (menu != null) {
+					menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+					menu.setVisible(true);
+				}
+			}
+		}
+
 		private void DoubleClickEvent(MouseEvent e) {
 			TreePath[] paths = getTreePaths(e);
 			List<MutableTreeNode> leafNodes = getLeafNodes(paths);
 
-			if (leafNodes.size() == 1
-					&& leafNodes.get(0) instanceof DataTreeNode) {
+			if (leafNodes.size() == 1 && leafNodes.get(0) instanceof DataTreeNode) {
 				DataTreeNode dataNode = (DataTreeNode) (leafNodes.get(0));
 
 				if (dataNode != null) {
@@ -157,8 +186,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		private List<MutableTreeNode> getLeafNodes(TreePath[] treePaths) {
 
-			ArrayList<MutableTreeNode> treeNodes = new ArrayList<MutableTreeNode>(
-					treePaths.length);
+			ArrayList<MutableTreeNode> treeNodes = new ArrayList<MutableTreeNode>(treePaths.length);
 
 			Object treeRoot = dataModel.getRoot();
 
@@ -187,12 +215,10 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		}
 
 		@SuppressWarnings("unchecked")
-		private void RecursiveFindDataNodes(TreeNode topNode,
-				HashSet<DataTreeNode> dataTreeNodes) {
+		private void RecursiveFindDataNodes(TreeNode topNode, HashSet<DataTreeNode> dataTreeNodes) {
 			Enumeration<TreeNode> childEnumerator = topNode.children();
 			while (childEnumerator.hasMoreElements()) {
-				RecursiveFindDataNodes(childEnumerator.nextElement(),
-						dataTreeNodes);
+				RecursiveFindDataNodes(childEnumerator.nextElement(), dataTreeNodes);
 			}
 			if (topNode instanceof DataTreeNode) {
 				if (!dataTreeNodes.contains(topNode)) {
@@ -202,63 +228,10 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		}
 
-		private void ContextMenuEvent(MouseEvent e) {
-
-			JPopupMenu menu = null;
-
-			TreePath[] paths = getTreePaths(e);
-			List<MutableTreeNode> leafNodes = getLeafNodes(paths);
-
-			// Have no idea how many data nodes there are going to be. Might as
-			// well make it proportional to the number of nodes.
-			HashSet<DataTreeNode> dataNodes = new HashSet<DataTreeNode>(
-					leafNodes.size());
-
-			// Find data nodes in tree nodes
-			for (MutableTreeNode treeNode : leafNodes) {
-				RecursiveFindDataNodes(treeNode, dataNodes);
-			}
-
-			if (dataNodes.size() > 0) {
-				PopupMenuBuilder menuBuilder;
-
-				if (leafNodes.size() == 1) {
-					MutableTreeNode leafNode = leafNodes.get(0);
-
-					menuBuilder = new PopupMenuBuilder(leafNode.toString());
-
-					menuBuilder.addAction(new ExportData(DataListView.this,
-							leafNode));
-
-					if (leafNode instanceof DataTreeNode) {
-						((DataTreeNode) leafNode).constructPopupMenu(
-								menuBuilder, dataModel);
-					}
-
-				} else {
-
-					menuBuilder = new PopupMenuBuilder(dataNodes.size()
-							+ " data nodes selected");
-
-					menuBuilder.addAction(new PlotNodesAction(dataNodes));
-
-				}
-
-				menuBuilder.addAction(new RemoveTreeNodes(leafNodes));
-				menu = menuBuilder.toJPopupMenu();
-
-				if (menu != null) {
-					menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
-					menu.setVisible(true);
-				}
-			}
-		}
-
 		public void mouseClicked(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON3) {
 				ContextMenuEvent(e);
-			} else if (e.getClickCount() == 2
-					&& e.getButton() == MouseEvent.BUTTON1) {
+			} else if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
 				DoubleClickEvent(e);
 			}
 
@@ -294,8 +267,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		@Override
 		protected void action() throws ActionException {
-			undoLUT = new Hashtable<MutableTreeNode, UndoInfo>(nodesToRemove
-					.size());
+			undoLUT = new Hashtable<MutableTreeNode, UndoInfo>(nodesToRemove.size());
 
 			for (MutableTreeNode nodeToRemove : nodesToRemove) {
 				TreeNode nodeParent = nodeToRemove.getParent();
@@ -322,8 +294,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 				if (undoInfo != null) {
 					if (undoInfo.nodeParent instanceof MutableTreeNode) {
 						dataModel.insertNodeInto(nodeToRemove,
-								(MutableTreeNode) undoInfo.nodeParent,
-								undoInfo.nodeIndex);
+								(MutableTreeNode) undoInfo.nodeParent, undoInfo.nodeIndex);
 					} else {
 						numOfFailures++;
 					}
@@ -335,8 +306,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			}
 
 			if (numOfFailures > 0) {
-				UserMessages.showWarning("Undo clear failed for "
-						+ numOfFailures + " nodes");
+				UserMessages.showWarning("Undo clear failed for " + numOfFailures + " nodes");
 			}
 
 		}
@@ -355,40 +325,14 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 }
 
-/**
- * Describes how to build a folder structure for a wrapped data node when it is
- * being exported
- * 
- * @author Shu Wu
- */
-class DataFilePath {
-	private DataTreeNode dataNode;
-	private Collection<String> position;
-
-	public DataFilePath(DataTreeNode dataNode, Collection<String> position) {
-		super();
-		this.dataNode = dataNode;
-		this.position = position;
-	}
-
-	public Collection<String> getFolderPath() {
-		return position;
-	}
-
-	public DataTreeNode getDataNode() {
-		return dataNode;
-	}
-
-}
-
 class DataFileChooser extends JFileChooser {
+
+	private static final long serialVersionUID = 1L;
 
 	public DataFileChooser() {
 		super();
 		setAcceptAllFileFilterUsed(false);
 	}
-
-	private static final long serialVersionUID = 1L;
 
 }
 
@@ -409,22 +353,37 @@ class DataFileFilter extends FileExtensionFilter {
 
 }
 
+/**
+ * Describes how to build a folder structure for a wrapped data node when it is
+ * being exported
+ * 
+ * @author Shu Wu
+ */
+class DataFilePath {
+	private DataTreeNode dataNode;
+	private Collection<String> position;
+
+	public DataFilePath(DataTreeNode dataNode, Collection<String> position) {
+		super();
+		this.dataNode = dataNode;
+		this.position = position;
+	}
+
+	public DataTreeNode getDataNode() {
+		return dataNode;
+	}
+
+	public Collection<String> getFolderPath() {
+		return position;
+	}
+
+}
+
 class ExportData extends StandardAction {
 
-	private static final long serialVersionUID = 1L;
-	private MutableTreeNode nodeToExport;
-	private DelimitedFileExporter fileExporter;
-	private static DataFileChooser fileChooser = new DataFileChooser();
-	private Component parent;
 	private static final DataFileFilter DATA_FILE_FILTER = new DataFileFilter();
-
-	public ExportData(Component parent, MutableTreeNode nodeToExport) {
-		super(getActionDescription(nodeToExport));
-		this.nodeToExport = nodeToExport;
-		fileExporter = new DelimitedFileExporter();
-		this.parent = parent;
-
-	}
+	private static DataFileChooser fileChooser = new DataFileChooser();
+	private static final long serialVersionUID = 1L;
 
 	private static String getActionDescription(MutableTreeNode node) {
 		if (isSingleFileExport(node)) {
@@ -439,6 +398,126 @@ class ExportData extends StandardAction {
 			return true;
 		}
 		return false;
+	}
+
+	private DelimitedFileExporter fileExporter;
+
+	private MutableTreeNode nodeToExport;
+
+	private Component parent;
+
+	public ExportData(Component parent, MutableTreeNode nodeToExport) {
+		super(getActionDescription(nodeToExport));
+		this.nodeToExport = nodeToExport;
+		fileExporter = new DelimitedFileExporter();
+		this.parent = parent;
+
+	}
+
+	private void exportAllDataNodes() throws IOException, ActionException {
+
+		/*
+		 * Use recursion to find data items
+		 */
+		File folder = getUserSelectedFolder();
+
+		folder.mkdir();
+		if (folder != null) {
+
+			ArrayList<DataFilePath> dataFilePaths = new ArrayList<DataFilePath>();
+			findDataItemsRecursive(nodeToExport, new ArrayList<String>(), dataFilePaths);
+
+			for (DataFilePath dataPath : dataFilePaths) {
+
+				Collection<String> folderPath = dataPath.getFolderPath();
+				DataTreeNode dataNode = dataPath.getDataNode();
+
+				File dataFile = folder;
+				for (String folderName : folderPath) {
+					dataFile = new File(dataFile, folderName);
+					dataFile.mkdir();
+
+					if (!dataFile.exists()) {
+						throw new ActionException("Problem creating folder: " + dataFile.toString());
+					}
+				}
+
+				dataFile = new File(dataFile, dataNode.toString() + "."
+						+ DataListView.DATA_FILE_EXTENSION);
+
+				exportNode(dataNode, dataFile);
+			}
+
+		}
+
+	}
+
+	private void exportNode(DataTreeNode node, File file) throws IOException, ActionException {
+		if (node instanceof SpikePatternNode) {
+			fileExporter.export((((SpikePatternNode) node).getUserObject()), file);
+		} else if (node instanceof TimeSeriesNode) {
+			fileExporter.export((((TimeSeriesNode) node).getUserObject()), file);
+		} else {
+			throw new ActionException("Could not export node type: "
+					+ node.getClass().getSimpleName());
+		}
+	}
+
+	private void findDataItemsRecursive(MutableTreeNode node, ArrayList<String> position,
+			Collection<DataFilePath> dataItemsPaths) {
+
+		if (node instanceof DataTreeNode) {
+			DataTreeNode dataNode = (DataTreeNode) node;
+
+			if (dataNode.includeInExport()) {
+				DataFilePath dataP = new DataFilePath(dataNode, position);
+				dataItemsPaths.add(dataP);
+			}
+		}
+
+		Enumeration<?> children = node.children();
+		while (children.hasMoreElements()) {
+			Object obj = children.nextElement();
+			if (obj instanceof MutableTreeNode) {
+				MutableTreeNode childNode = (MutableTreeNode) obj;
+
+				@SuppressWarnings("unchecked")
+				ArrayList<String> childStack = (ArrayList<String>) position.clone();
+
+				String childName = childNode.toString();
+				childStack.add(childName);
+
+				findDataItemsRecursive(childNode, childStack, dataItemsPaths);
+
+			}
+		}
+	}
+
+	private File getUserSelectedFile(FileFilter filter) {
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setFileFilter(filter);
+
+		int result = fileChooser.showSaveDialog(parent);
+
+		if (result == JFileChooser.APPROVE_OPTION) {
+			return fileChooser.getSelectedFile();
+		} else {
+			return null;
+		}
+
+	}
+
+	private File getUserSelectedFolder() {
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+		int result = fileChooser.showSaveDialog(parent);
+
+		if (result == JFileChooser.APPROVE_OPTION) {
+			return fileChooser.getSelectedFile();
+		} else {
+			return null;
+		}
+
 	}
 
 	@Override
@@ -462,117 +541,5 @@ class ExportData extends StandardAction {
 			e.printStackTrace();
 			UserMessages.showWarning("Could not export: " + e.getMessage());
 		}
-	}
-
-	private File getUserSelectedFolder() {
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-		int result = fileChooser.showSaveDialog(parent);
-
-		if (result == JFileChooser.APPROVE_OPTION) {
-			return fileChooser.getSelectedFile();
-		} else {
-			return null;
-		}
-
-	}
-
-	private File getUserSelectedFile(FileFilter filter) {
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.setFileFilter(filter);
-
-		int result = fileChooser.showSaveDialog(parent);
-
-		if (result == JFileChooser.APPROVE_OPTION) {
-			return fileChooser.getSelectedFile();
-		} else {
-			return null;
-		}
-
-	}
-
-	private void exportNode(DataTreeNode node, File file) throws IOException,
-			ActionException {
-		if (node instanceof SpikePatternNode) {
-			fileExporter.export((((SpikePatternNode) node).getUserObject()),
-					file);
-		} else if (node instanceof TimeSeriesNode) {
-			fileExporter
-					.export((((TimeSeriesNode) node).getUserObject()), file);
-		} else {
-			throw new ActionException("Could not export node type: "
-					+ node.getClass().getSimpleName());
-		}
-	}
-
-	private void findDataItemsRecursive(MutableTreeNode node,
-			ArrayList<String> position, Collection<DataFilePath> dataItemsPaths) {
-
-		if (node instanceof DataTreeNode) {
-			DataTreeNode dataNode = (DataTreeNode) node;
-
-			if (dataNode.includeInExport()) {
-				DataFilePath dataP = new DataFilePath(dataNode, position);
-				dataItemsPaths.add(dataP);
-			}
-		}
-
-		Enumeration<?> children = node.children();
-		while (children.hasMoreElements()) {
-			Object obj = children.nextElement();
-			if (obj instanceof MutableTreeNode) {
-				MutableTreeNode childNode = (MutableTreeNode) obj;
-
-				@SuppressWarnings("unchecked")
-				ArrayList<String> childStack = (ArrayList<String>) position
-						.clone();
-
-				String childName = childNode.toString();
-				childStack.add(childName);
-
-				findDataItemsRecursive(childNode, childStack, dataItemsPaths);
-
-			}
-		}
-	}
-
-	private void exportAllDataNodes() throws IOException, ActionException {
-
-		/*
-		 * Use recursion to find data items
-		 */
-		File folder = getUserSelectedFolder();
-
-		folder.mkdir();
-		if (folder != null) {
-
-			ArrayList<DataFilePath> dataFilePaths = new ArrayList<DataFilePath>();
-			findDataItemsRecursive(nodeToExport, new ArrayList<String>(),
-					dataFilePaths);
-
-			for (DataFilePath dataPath : dataFilePaths) {
-
-				Collection<String> folderPath = dataPath.getFolderPath();
-				DataTreeNode dataNode = dataPath.getDataNode();
-
-				File dataFile = folder;
-				for (String folderName : folderPath) {
-					dataFile = new File(dataFile, folderName);
-					dataFile.mkdir();
-
-					if (!dataFile.exists()) {
-						throw new ActionException("Problem creating folder: "
-								+ dataFile.toString());
-					}
-				}
-
-				dataFile = new File(dataFile, dataNode.toString() + "."
-						+ DataListView.DATA_FILE_EXTENSION);
-
-				exportNode(dataNode, dataFile);
-			}
-
-		}
-
 	}
 }
