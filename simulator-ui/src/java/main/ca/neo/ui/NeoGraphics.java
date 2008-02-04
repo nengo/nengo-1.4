@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -17,6 +19,7 @@ import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -130,17 +133,56 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		Environment.setUserInterface(true);
 	}
 
+	class HideDataViewerListener implements MouseListener {
+
+		public void mouseClicked(MouseEvent e) {
+			setDataViewerVisible(false);
+		}
+
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		public void mouseExited(MouseEvent e) {
+		}
+
+		public void mousePressed(MouseEvent e) {
+		}
+
+		public void mouseReleased(MouseEvent e) {
+		}
+
+	}
+
 	private void initDataViewer(Container dataViewerContainer) {
 		dataViewerContainer.setLayout(new BorderLayout());
 		simulationData = new SimulatorDataModel();
-		JLabel dataViewerLabel = new JLabel("Data viewer");
-		Style.applyStyle(dataViewerLabel);
-		dataViewerLabel.setBackground(Style.COLOR_BACKGROUND2);
-		dataViewerLabel.setOpaque(true);
 
+		/*
+		 * Create title bar
+		 */
+		JPanel titleBar = new JPanel();
+		titleBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		Style.applyStyle(titleBar);
+		titleBar.setBackground(Style.COLOR_BACKGROUND2);
+		titleBar.setOpaque(true);
+		titleBar.setLayout(new BorderLayout());
+
+		JLabel dataViewerLabel = new JLabel("Data Viewer");
+		titleBar.add(dataViewerLabel, BorderLayout.WEST);
 		dataViewerLabel.setFont(Style.FONT_BIG);
+		Style.applyStyle(dataViewerLabel);
+		JLabel hideButton = new JLabel("<< ");
+		titleBar.add(hideButton, BorderLayout.EAST);
+		Style.applyStyle(hideButton);
+		// hideButton.setForeground(Color.gray);
 
-		dataViewerContainer.add(dataViewerLabel, BorderLayout.NORTH);
+		hideButton.addMouseListener(new HideDataViewerListener());
+
+		dataViewerContainer.add(titleBar, BorderLayout.NORTH);
+
+		/*
+		 * Create data viewer
+		 */
 		dataViewerContainer.setMinimumSize(new Dimension(200, 200));
 		DataListView dataListViewer = new DataListView(simulationData);
 		Style.applyStyle(dataListViewer);
@@ -373,7 +415,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 				mainPane.setDividerLocation((int) dataViewerPane.getMinimumSize().getWidth());
 			}
 			mainPane.setDividerSize(2);
+			dataViewerPane.setVisible(true);
 		} else {
+			dataViewerPane.setVisible(false);
 			mainPane.setDividerLocation(0);
 			mainPane.setDividerSize(0);
 		}

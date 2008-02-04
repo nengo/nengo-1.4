@@ -24,6 +24,7 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -55,9 +56,18 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		// Create a tree that allows one selection at a time.
 		tree = new JTree(dataModel);
+		Style.applyStyle(tree);
+		DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
+		tree.setCellRenderer(treeRenderer);
+		// treeRenderer.setBackground(Style.COLOR_BACKGROUND);
+		treeRenderer.setBackgroundNonSelectionColor(Style.COLOR_BACKGROUND);
+		treeRenderer.setBackgroundSelectionColor(Style.COLOR_BACKGROUND2);
+		treeRenderer.setTextNonSelectionColor(Style.COLOR_FOREGROUND);
+		treeRenderer.setTextSelectionColor(Style.COLOR_FOREGROUND);
+
 		tree.setBackground(Style.COLOR_BACKGROUND);
 
-		tree.setEditable(true);
+		// tree.setEditable(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
 		dataModel.addTreeModelListener(new MyTreeModelListener());

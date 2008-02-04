@@ -17,7 +17,6 @@ import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.models.nodes.UINetwork;
-import ca.shu.ui.lib.world.piccolo.objects.Window;
 
 /**
  * Just a quick check for one type of memory leaks in Network Viewer.
@@ -29,7 +28,7 @@ public class NetworkViewerMemoryTest {
 	private static NeoGraphics neoGraphics;
 	// private static NetworkViewer netView;
 	private static final int NUM_OF_LOOPS = 500;
-	private static Window window;
+//	private static Window window;
 
 	// private static Window[] windows;
 	public static Network createNetwork() throws StructuralException {

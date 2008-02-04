@@ -20,12 +20,8 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Add weakreference to nodes in data list viewer, check if not destroyed and still in world
-
-Configuration panel:
-	Scrolling
-
-Notification listener of node changes 
+Notification listener of node changes
+	Need it for the general case 
 
 Drag and drop UINeoNodes between networks (worlds)
 

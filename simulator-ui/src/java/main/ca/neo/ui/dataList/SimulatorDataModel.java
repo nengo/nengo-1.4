@@ -113,7 +113,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 	private Hashtable<Integer, DefaultMutableTreeNode> topLevelNetworks = new Hashtable<Integer, DefaultMutableTreeNode>();
 
 	public SimulatorDataModel() {
-		super(new DefaultMutableTreeNode("Data List"));
+		super(new DefaultMutableTreeNode("root"));
 	}
 
 	private void addSpikePatterns(DefaultMutableTreeNode top, Network network) {
