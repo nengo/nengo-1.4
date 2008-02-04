@@ -9,12 +9,13 @@ import java.beans.PropertyChangeListener;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 
 import ca.shu.ui.lib.objects.activities.TransientMessage;
 import ca.shu.ui.lib.util.Util;
+import ca.shu.ui.lib.world.Destroyable;
 import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.PaintContext;
 import ca.shu.ui.lib.world.WorldLayer;
@@ -76,7 +77,7 @@ public class WorldObjectImpl implements WorldObject {
 		return EVENT_CONVERSION_TABLE_2.get(type);
 	}
 
-	private Hashtable<EventType, HashSet<EventListener>> eventListenerMap;
+	private Hashtable<EventType, Hashtable<EventListener, ListenerAdapter>> eventListenerMap;
 
 	/**
 	 * Whether this object has been destroyed
@@ -87,6 +88,11 @@ public class WorldObjectImpl implements WorldObject {
 	 * Whether this object is selectable by the Selection handler
 	 */
 	private boolean isSelectable = true;
+
+	/**
+	 * Whether this node is selected by a handler
+	 */
+	private boolean isSelected = false;
 
 	/**
 	 * The last time a popup was created
@@ -102,16 +108,6 @@ public class WorldObjectImpl implements WorldObject {
 	 * Piccolo counterpart of this object
 	 */
 	private PNode myPNode;
-
-	/**
-	 * Listeners attached ot this object
-	 */
-	private Hashtable<EventListener, PiccoloChangeListener> piccoloListeners;
-
-	/**
-	 * Whether this node is selected by a handler
-	 */
-	private boolean isSelected = false;
 
 	protected WorldObjectImpl(String name, PiccoloNodeInWorld pNode) {
 		super();
@@ -152,6 +148,23 @@ public class WorldObjectImpl implements WorldObject {
 		this(name, null);
 	}
 
+	private Collection<WorldObject> getChildrenInternal() {
+		ArrayList<WorldObject> objects = new ArrayList<WorldObject>(getPiccolo().getChildrenCount());
+
+		Iterator<?> it = getPiccolo().getChildrenIterator();
+		while (it.hasNext()) {
+			Object next = it.next();
+			if (next instanceof PiccoloNodeInWorld) {
+				WorldObject wo = ((PiccoloNodeInWorld) next).getWorldObject();
+
+				if (wo != null) {
+					objects.add(wo);
+				}
+			}
+		}
+		return objects;
+	}
+
 	/**
 	 * Initializes this instance
 	 * 
@@ -163,18 +176,13 @@ public class WorldObjectImpl implements WorldObject {
 		this.myName = name;
 	}
 
-	public void removeFromWorld() {
-		if (myPNode instanceof PXNode) {
-			((PXNode) myPNode).removeFromWorld();
-		}
-	}
-
 	protected void firePropertyChange(EventType event) {
 		if (eventListenerMap != null) {
-			HashSet<EventListener> eventListeners = eventListenerMap.get(event);
+			Hashtable<EventListener, ListenerAdapter> eventListeners = eventListenerMap.get(event);
 			if (eventListeners != null) {
-				for (EventListener listener : eventListeners) {
-					listener.propertyChanged(event);
+				Enumeration<EventListener> listeners = eventListeners.keys();
+				while (listeners.hasMoreElements()) {
+					listeners.nextElement().propertyChanged(event);
 				}
 			}
 
@@ -208,10 +216,6 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
-	public String toString() {
-		return getName();
-	}
-
 	public void addInputEventListener(PInputEventListener arg0) {
 		myPNode.addInputEventListener(arg0);
 	}
@@ -219,40 +223,79 @@ public class WorldObjectImpl implements WorldObject {
 	public void addPropertyChangeListener(EventType eventType, EventListener worldListener) {
 
 		if (eventListenerMap == null) {
-			eventListenerMap = new Hashtable<EventType, HashSet<EventListener>>();
+			eventListenerMap = new Hashtable<EventType, Hashtable<EventListener, ListenerAdapter>>();
 		}
 
-		HashSet<EventListener> eventListeners = eventListenerMap.get(eventType);
+		Hashtable<EventListener, ListenerAdapter> eventListeners = eventListenerMap.get(eventType);
 		if (eventListeners == null) {
-			eventListeners = new HashSet<EventListener>();
+			eventListeners = new Hashtable<EventListener, ListenerAdapter>();
 			eventListenerMap.put(eventType, eventListeners);
 		}
 
-		eventListeners.add(worldListener);
+		eventListeners.put(worldListener, new ListenerAdapter(eventType, worldListener));
 
 		/*
 		 * If there is an associated piccolo event, add the listener to the
 		 * piccolo object as well
 		 */
-		String piccoloPropertyName = worldEventToPiccoloEvent(eventType);
-		if (piccoloPropertyName != null) {
 
-			if (piccoloListeners == null) {
-				piccoloListeners = new Hashtable<EventListener, PiccoloChangeListener>();
+		// if (piccoloPropertyName != null) {
+		//
+		// HashSet<PiccoloChangeListener> picoloListenerSet = piccoloListeners
+		// .get(piccoloPropertyName);
+		//
+		// if (picoloListenerSet == null) {
+		// picoloListenerSet = new Hashset<EventListener,
+		// PiccoloChangeListener>();
+		//
+		// }
+		// PiccoloChangeListener piccoloListener =
+		// piccoloListeners.get(worldListener);
+		//
+		// if (piccoloListener == null) {
+		// piccoloListener = new PiccoloChangeListener(worldListener);
+		// piccoloListeners.put(worldListener, piccoloListener);
+		// }
+		//
+		// getPiccolo().addPropertyChangeListener(worldEventToPiccoloEvent(eventType),
+		// piccoloListener);
+		//
+		// }
+	}
 
+	class ListenerAdapter implements Destroyable {
+		private EventListener listener;
+		private PiccoloChangeListener piccoloListener;
+		private EventType eventType;
+
+		public ListenerAdapter(EventType eventType, EventListener listener) {
+			this.listener = listener;
+			this.eventType = eventType;
+
+			String piccoloPropertyName = worldEventToPiccoloEvent(eventType);
+			if (piccoloPropertyName != null) {
+				piccoloListener = new PiccoloChangeListener(listener);
+
+				getPiccolo().addPropertyChangeListener(worldEventToPiccoloEvent(eventType),
+						piccoloListener);
 			}
-			PiccoloChangeListener piccoloListener = piccoloListeners.get(worldListener);
-
-			if (piccoloListener == null) {
-				piccoloListener = new PiccoloChangeListener(worldListener);
-				piccoloListeners.put(worldListener, piccoloListener);
-			}
-
-			getPiccolo().addPropertyChangeListener(worldEventToPiccoloEvent(eventType),
-					piccoloListener);
-
 		}
 
+		public void destroy() {
+			if (piccoloListener != null) {
+				getPiccolo().removePropertyChangeListener(worldEventToPiccoloEvent(eventType),
+						piccoloListener);
+			}
+		}
+
+		public EventListener getListener() {
+			return listener;
+		}
+	}
+
+	public PInterpolatingActivity animateToBounds(double x, double y, double width, double height,
+			long duration) {
+		return myPNode.animateToBounds(x, y, width, height, duration);
 	}
 
 	/*
@@ -281,6 +324,14 @@ public class WorldObjectImpl implements WorldObject {
 				.getY(), scale, myPNode.getRotation(), duration);
 	}
 
+	public void childAdded(WorldObject wo) {
+
+	}
+
+	public void childRemoved(WorldObject wo) {
+
+	}
+
 	public final void destroy() {
 		if (!isDestroyed) {
 			isDestroyed = true;
@@ -301,12 +352,25 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
+	public void destroyAllChildren() {
+		for (WorldObject wo : getChildren()) {
+			wo.destroy();
+		}
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see ca.shu.ui.lib.world.impl.IWorldObject#doubleClicked()
 	 */
 	public void doubleClicked() {
+	}
+
+	public void dragOffset(double dx, double dy) {
+		Point2D offset = getOffset();
+		offset.setLocation(offset.getX() + dx, offset.getY() + dy);
+		setOffset(offset);
 	}
 
 	public Collection<WorldObject> findIntersectingNodes(Rectangle2D fullBounds) {
@@ -333,21 +397,8 @@ public class WorldObjectImpl implements WorldObject {
 		return getChildrenInternal();
 	}
 
-	private Collection<WorldObject> getChildrenInternal() {
-		ArrayList<WorldObject> objects = new ArrayList<WorldObject>(getPiccolo().getChildrenCount());
-
-		Iterator<?> it = getPiccolo().getChildrenIterator();
-		while (it.hasNext()) {
-			Object next = it.next();
-			if (next instanceof PiccoloNodeInWorld) {
-				WorldObject wo = ((PiccoloNodeInWorld) next).getWorldObject();
-
-				if (wo != null) {
-					objects.add(wo);
-				}
-			}
-		}
-		return objects;
+	public int getChildrenCount() {
+		return getChildrenInternal().size();
 	}
 
 	public PBounds getFullBounds() {
@@ -387,6 +438,10 @@ public class WorldObjectImpl implements WorldObject {
 
 	public PNode getPiccolo() {
 		return myPNode;
+	}
+
+	public double getRotation() {
+		return myPNode.getRotation();
 	}
 
 	public double getScale() {
@@ -630,12 +685,6 @@ public class WorldObjectImpl implements WorldObject {
 		return rectangle;
 	}
 
-	public void dragOffset(double dx, double dy) {
-		Point2D offset = getOffset();
-		offset.setLocation(offset.getX() + dx, offset.getY() + dy);
-		setOffset(offset);
-	}
-
 	public void paint(PaintContext paintContext) {
 
 	}
@@ -648,13 +697,6 @@ public class WorldObjectImpl implements WorldObject {
 		return myPNode.parentToLocal(parentRectangle);
 	}
 
-	public void destroyAllChildren() {
-		for (WorldObject wo : getChildren()) {
-			wo.destroy();
-		}
-
-	}
-
 	public void removeChild(WorldObject wo) {
 		if (wo instanceof WorldObjectImpl) {
 			myPNode.removeChild(((WorldObjectImpl) wo).getPiccolo());
@@ -663,12 +705,14 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
-	public void childRemoved(WorldObject wo) {
-
-	}
-
 	public void removeFromParent() {
 		myPNode.removeFromParent();
+	}
+
+	public void removeFromWorld() {
+		if (myPNode instanceof PXNode) {
+			((PXNode) myPNode).removeFromWorld();
+		}
 	}
 
 	public void removeInputEventListener(PInputEventListener arg0) {
@@ -678,21 +722,15 @@ public class WorldObjectImpl implements WorldObject {
 	public void removePropertyChangeListener(EventType event, EventListener listener) {
 		boolean successfull = false;
 		if (eventListenerMap != null) {
-			HashSet<EventListener> eventListeners = eventListenerMap.get(event);
+			Hashtable<EventListener, ListenerAdapter> eventListeners = eventListenerMap.get(event);
 
 			if (eventListeners != null) {
-				if (eventListeners.contains(listener)) {
+
+				if (eventListeners.containsKey(listener)) {
+					ListenerAdapter adapter = eventListeners.get(listener);
+					adapter.destroy();
 					eventListeners.remove(listener);
 					successfull = true;
-				}
-
-				if (piccoloListeners != null) {
-					PiccoloChangeListener piccoloListener = piccoloListeners.get(listener);
-
-					if (piccoloListener != null) {
-						getPiccolo().removePropertyChangeListener(worldEventToPiccoloEvent(event),
-								piccoloListener);
-					}
 				}
 			}
 		}
@@ -745,6 +783,10 @@ public class WorldObjectImpl implements WorldObject {
 
 	public void setPickable(boolean isPickable) {
 		myPNode.setPickable(isPickable);
+	}
+
+	public void setRotation(double theta) {
+		myPNode.setRotation(theta);
 	}
 
 	public void setScale(double arg0) {
@@ -819,29 +861,12 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
+	public String toString() {
+		return getName();
+	}
+
 	public void translate(double dx, double dy) {
 		myPNode.translate(dx, dy);
-	}
-
-	public PInterpolatingActivity animateToBounds(double x, double y, double width, double height,
-			long duration) {
-		return myPNode.animateToBounds(x, y, width, height, duration);
-	}
-
-	public double getRotation() {
-		return myPNode.getRotation();
-	}
-
-	public void childAdded(WorldObject wo) {
-
-	}
-
-	public void setRotation(double theta) {
-		myPNode.setRotation(theta);
-	}
-
-	public int getChildrenCount() {
-		return getChildrenInternal().size();
 	}
 
 }

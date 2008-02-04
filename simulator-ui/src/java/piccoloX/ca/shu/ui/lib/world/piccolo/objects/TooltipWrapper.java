@@ -98,9 +98,9 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 
 	@Override
 	protected void prepareForDestroy() {
+		tooltip.removePropertyChangeListener(EventType.BOUNDS_CHANGED, this);
 		parent.removePropertyChangeListener(EventType.VIEW_TRANSFORM, this);
 		target.removePropertyChangeListener(EventType.FULL_BOUNDS, this);
-
 	}
 
 	/**
