@@ -351,7 +351,8 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 	private void init() {
 		addInputEventListener(this);
 		rectangle = Path.createRectangle(0, 0, 1, 1);
-
+		rectangle.setPaint(Style.COLOR_BACKGROUND2);
+		
 		addChild(rectangle);
 
 		title = new Text(myWindow.getName());
@@ -416,11 +417,11 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 		if (bool || myWindow.getWindowState() == Window.WindowState.MAXIMIZED) {
 			rectangle.setTransparency(1f);
 			buttonHolder.setTransparency(1f);
-			rectangle.setPaint(Style.COLOR_BACKGROUND2);
-			// buttonHolder.setVisible(true);
+			title.setTransparency(1f);
 		} else {
 			rectangle.setTransparency(0.2f);
 			buttonHolder.setTransparency(0.4f);
+			title.setTransparency(0.6f);
 		}
 	}
 

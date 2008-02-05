@@ -1,9 +1,8 @@
 package ca.neo.ui.actions;
 
-import ca.neo.config.ConfigUtil;
+import ca.neo.ui.NeoGraphics;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UIEnvironment;
 
 public class ConfigureAction extends StandardAction {
 
@@ -27,6 +26,6 @@ public class ConfigureAction extends StandardAction {
 
 	@Override
 	protected void action() throws ActionException {
-		ConfigUtil.configure(UIEnvironment.getInstance(), model);
+		NeoGraphics.getInstance().configureObject(model);
 	}
 }

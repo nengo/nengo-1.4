@@ -11,8 +11,6 @@ import ca.neo.model.Probeable;
 import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.ui.actions.CreateModelAction;
-import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UINetwork;
@@ -21,7 +19,6 @@ import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.UIException;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
@@ -150,21 +147,7 @@ public class NetworkViewer extends NodeViewer {
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run", getViewerParent()));
 
-		/*
-		 * Create new models
-		 */
-		menu.addSection("Add model to network");
-		MenuBuilder createNewMenu = menu.addSubMenu("Create new");
-
-		// Nodes
-		for (Class element : UINeoNode.NODE_TYPES) {
-			try {
-				createNewMenu.addAction(new CreateModelAction(this, element));
-			} catch (UIException e) {
-				// swallow this, not all model types can be instantiated
-			}
-		}
-		menu.addAction(new OpenNeoFileAction(this));
+		
 
 		/*
 		 * Origins & Terminations

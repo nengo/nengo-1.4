@@ -61,9 +61,8 @@ import ca.shu.ui.lib.world.piccolo.WorldImpl;
  */
 public abstract class UINeoNode extends UIModelConfigurable {
 
-	@SuppressWarnings("unchecked")
-	public static final Class[] NODE_TYPES = { UINetwork.class, UINEFEnsemble.class,
-			UIFunctionInput.class, UINeuron.class };
+	public static final Class<?>[] UI_NODE_CONFIGURABLE_TYPES = { UINetwork.class,
+			UINEFEnsemble.class, UIFunctionInput.class };
 
 	/**
 	 * Factory method which creates a Node UI object around a Node

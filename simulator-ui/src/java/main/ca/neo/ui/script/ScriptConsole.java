@@ -25,6 +25,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -37,27 +38,22 @@ import org.python.util.PythonInterpreter;
 import ca.neo.config.JavaSourceParser;
 
 /**
- * A user interface panel for entering script commands. 
+ * A user interface panel for entering script commands. TODO: escape not working
+ * all the time import defaults completion for arrays NO (need to catch
+ * exception) default print getting documentation help (see qdox) static
+ * completion
  * 
- * TODO: 
- * escape not working all the time
- * import defaults
- * completion for arrays
- * NO (need to catch exception) default print 
- * getting documentation help (see qdox)
- * static completion
- *  
  * @author Bryan Tripp
  */
 public class ScriptConsole extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String COMMAND_STYLE = "command";
 	public static final String OUTPUT_STYLE = "output";
 	public static final String ERROR_STYLE = "error";
 	public static final String HELP_STYLE = "help";
-	
+
 	private PythonInterpreter myInterpreter;
 	private JEditorPane myDisplayArea;
 	private JTextField myCommandField;
@@ -67,35 +63,50 @@ public class ScriptConsole extends JPanel {
 	private String myTypedText;
 	private int myTypedCaretPosition;
 	private StyleContext myStyleContext;
-	
+	private boolean initalized = false;
+	private JSeparator seperator;
+	private Style rootStyle;
+	private Style commandStyle;
+
 	/**
-	 * @param interpreter The interpreter on which the console runs  
+	 * @param interpreter
+	 *            The interpreter on which the console runs
 	 */
 	public ScriptConsole(PythonInterpreter interpreter) {
 		myInterpreter = interpreter;
-		
+
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
 		myDisplayArea.setMargin(new Insets(5, 5, 5, 5));
 		initStyles();
-		
+
 		myCommandField = new JTextField();
-		
+
 		setLayout(new BorderLayout());
 		JScrollPane displayScroll = new JScrollPane(myDisplayArea);
-		add(displayScroll, BorderLayout.CENTER);
+
+		seperator = new JSeparator(JSeparator.HORIZONTAL);
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		panel.add(displayScroll, BorderLayout.CENTER);
+		panel.add(seperator, BorderLayout.SOUTH);
+
+		add(panel, BorderLayout.CENTER);
 		add(myCommandField, BorderLayout.SOUTH);
-				
+		displayScroll.setBorder(null);
+
 		myCommandField.addKeyListener(new CommandKeyListener(this));
 		myCommandField.addActionListener(new CommandActionListener(this));
 		myCommandField.setFocusTraversalKeysEnabled(false);
-		
+
+		myCommandField.setBorder(null);
+
 		myHistoryCompletor = new HistoryCompletor();
 		myCallChainCompletor = new CallChainCompletor(myInterpreter);
 		myInCallChainCompletionMode = false;
-		myTypedText = "";		
+		myTypedText = "";
 		myTypedCaretPosition = 0;
-		
+
 		try {
 			OutputWriter ow = new OutputWriter(this);
 			interpreter.setOut(ow.getOutputStream());
@@ -104,13 +115,42 @@ public class ScriptConsole extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		initalized = true;
 	}
-	
+
+	@Override
+	public void setBackground(Color fg) {
+		super.setBackground(fg);
+		if (initalized) {
+			setChildrenBackground(fg);
+		}
+	}
+
+	private void setChildrenBackground(Color fg) {
+		myDisplayArea.setBackground(fg);
+		myCommandField.setBackground(fg);
+	}
+
+	private void setChildrenForeground(Color fg) {
+		myDisplayArea.setForeground(fg);
+		myCommandField.setForeground(fg);
+		seperator.setForeground(fg);
+		StyleConstants.setForeground(rootStyle, fg);
+		StyleConstants.setForeground(commandStyle, fg);
+	}
+
+	@Override
+	public void setForeground(Color fg) {
+		super.setForeground(fg);
+		if (initalized) {
+			setChildrenForeground(fg);
+		}
+	}
+
 	private void initStyles() {
 		myStyleContext = new StyleContext();
-		Style rootStyle = myStyleContext.addStyle("root", null);
-		Style commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
+		rootStyle = myStyleContext.addStyle("root", null);
+		commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
 		StyleConstants.setItalic(commandStyle, true);
 		myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
 		Style errorStyle = myStyleContext.addStyle(ERROR_STYLE, rootStyle);
@@ -118,42 +158,50 @@ public class ScriptConsole extends JPanel {
 	}
 
 	/**
-	 * @param name Name of a new Python variable
-	 * @param variable Java object underlying the new variable
+	 * @param name
+	 *            Name of a new Python variable
+	 * @param variable
+	 *            Java object underlying the new variable
 	 */
 	public void addVariable(String name, Object variable) {
 		myInterpreter.set(name, variable);
 	}
-	
+
 	/**
-	 * @param name Name of python variable to delete
+	 * @param name
+	 *            Name of python variable to delete
 	 */
 	public void removeVariable(String name) {
 		if (myInterpreter.get(name) != null) {
-			myInterpreter.exec("del " + name);			
+			myInterpreter.exec("del " + name);
 		}
 	}
-	
+
 	/**
 	 * Sets initial focus (should be called from UI thread)
 	 */
 	public void setFocus() {
 		myCommandField.requestFocus();
 	}
-	
+
 	/**
-	 * @param text Text to append to display
-	 * @param style Name of text style (from class constants) 
+	 * @param text
+	 *            Text to append to display
+	 * @param style
+	 *            Name of text style (from class constants)
 	 */
 	public void appendText(String text, String style) {
 		try {
-			myDisplayArea.getDocument().insertString(myDisplayArea.getDocument().getLength(), text, myStyleContext.getStyle(style));
-			myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength()); //scroll to end
+			myDisplayArea.getDocument().insertString(myDisplayArea.getDocument().getLength(), text,
+					myStyleContext.getStyle(style));
+			myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength()); // scroll
+			// to
+			// end
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Clears the command field
 	 */
@@ -162,8 +210,9 @@ public class ScriptConsole extends JPanel {
 	}
 
 	/**
-	 * @param inMode Sets whether the console is in the mode of completing a call chain 
-	 * 		(otherwise it uses history completion)
+	 * @param inMode
+	 *            Sets whether the console is in the mode of completing a call
+	 *            chain (otherwise it uses history completion)
 	 */
 	public void setInCallChainCompletionMode(boolean inMode) {
 		myInCallChainCompletionMode = inMode;
@@ -174,15 +223,17 @@ public class ScriptConsole extends JPanel {
 	}
 
 	/**
-	 * @return True if command completion is currently based on the call chain that 
-	 * 		the user is typing, false if completion is based on command history
+	 * @return True if command completion is currently based on the call chain
+	 *         that the user is typing, false if completion is based on command
+	 *         history
 	 */
 	public boolean getInCallChainCompletionMode() {
 		return myInCallChainCompletionMode;
 	}
-	
+
 	/**
-	 * @param text Processes the current command in the command field 
+	 * @param text
+	 *            Processes the current command in the command field
 	 */
 	public void enterCommand(String text) {
 		appendText(">>", "root");
@@ -195,44 +246,46 @@ public class ScriptConsole extends JPanel {
 			} else if (text.startsWith("help ")) {
 				appendText(getHelp(text.substring(5).trim()), HELP_STYLE);
 			} else {
-				myInterpreter.exec(text);						
+				myInterpreter.exec(text);
 			}
 		} catch (RuntimeException e) {
 			appendText(e.toString(), ERROR_STYLE);
 		}
 	}
-	
+
 	private static String getHelp(String entity) {
 		String result = "No documentation found for " + entity;
-		
+
 		try {
 			Class<?> c = Class.forName(entity);
 			String docs = JavaSourceParser.getDocs(c);
-			if (docs != null) result = docs;
+			if (docs != null)
+				result = docs;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
-	 * Moves up the command completor list 
+	 * Moves up the command completor list
 	 */
 	public void completorUp() {
 		if (myInCallChainCompletionMode) {
 			String callChain = getCallChain(myTypedText.substring(0, myTypedCaretPosition));
 			String replacement = myCallChainCompletor.previous(callChain);
-			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField.getCaretPosition());
-//			String selection = myCommandField.getSelectedText();
+			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField
+					.getCaretPosition());
+			// String selection = myCommandField.getSelectedText();
 			myCommandField.replaceSelection(replacement);
-			
-//			System.out.println("caret pos: " + myTypedCaretPosition);
-//			System.out.println("call chain: " + callChain);
-//			System.out.println("selection: " + selection);
-//			System.out.println("replacement: " + replacement);
+
+			// System.out.println("caret pos: " + myTypedCaretPosition);
+			// System.out.println("call chain: " + callChain);
+			// System.out.println("selection: " + selection);
+			// System.out.println("replacement: " + replacement);
 		} else {
-			myCommandField.setText(myHistoryCompletor.previous(myTypedText));			
+			myCommandField.setText(myHistoryCompletor.previous(myTypedText));
 		}
 	}
 
@@ -243,23 +296,24 @@ public class ScriptConsole extends JPanel {
 		if (myInCallChainCompletionMode) {
 			String callChain = getCallChain(myTypedText.substring(0, myTypedCaretPosition));
 			String replacement = myCallChainCompletor.next(callChain);
-			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField.getCaretPosition());
-//			String selection = myCommandField.getSelectedText();
+			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField
+					.getCaretPosition());
+			// String selection = myCommandField.getSelectedText();
 			myCommandField.replaceSelection(replacement);
 
-//			System.out.println("call chain: " + callChain);
-//			System.out.println("selection: " + selection);
-//			System.out.println("replacement: " + replacement);
+			// System.out.println("call chain: " + callChain);
+			// System.out.println("selection: " + selection);
+			// System.out.println("replacement: " + replacement);
 		} else {
 			myCommandField.setText(myHistoryCompletor.next(myTypedText));
 		}
 	}
-	
+
 	/**
-	 * Takes note of the text in the command field, as text that the user has typed 
-	 * (as opposed to recalled history). The two types must be distinguished, because 
-	 * we don't want an unselected history item to be used as the basis for subsequent 
-	 * history lookups.  
+	 * Takes note of the text in the command field, as text that the user has
+	 * typed (as opposed to recalled history). The two types must be
+	 * distinguished, because we don't want an unselected history item to be
+	 * used as the basis for subsequent history lookups.
 	 */
 	public void setTypedText() {
 		myTypedText = myCommandField.getText();
@@ -269,25 +323,27 @@ public class ScriptConsole extends JPanel {
 	}
 
 	/**
-	 * Resets command field text to the last text typed by the user (as opposed to 
-	 * autocompleted text). 
+	 * Resets command field text to the last text typed by the user (as opposed
+	 * to autocompleted text).
 	 */
 	public void revertToTypedText() {
 		myCommandField.setText(myTypedText);
 		myCommandField.setCaretPosition(myTypedCaretPosition);
 	}
-	
+
 	/**
-	 * @param command A line of python code 
-	 * @return The segment at the end of the command that looks like a partial 
-	 * 		call chain, eg for command "y.getY(x.get" this method would return 
-	 * 		"x.get" 
+	 * @param command
+	 *            A line of python code
+	 * @return The segment at the end of the command that looks like a partial
+	 *         call chain, eg for command "y.getY(x.get" this method would
+	 *         return "x.get"
 	 */
 	public static String getCallChain(String command) {
-		//note: I tried to do this with a single regex but I can't see how to handle nested brackets properly
-		Pattern pattern = Pattern.compile("\\w||\\."); //word character or dot 
-		
-		char[] cc = command.toCharArray(); //command characters
+		// note: I tried to do this with a single regex but I can't see how to
+		// handle nested brackets properly
+		Pattern pattern = Pattern.compile("\\w||\\."); // word character or dot
+
+		char[] cc = command.toCharArray(); // command characters
 		int brackets = 0;
 		int start = 0;
 		for (int i = cc.length - 1; i >= 0 && start == 0; i--) {
@@ -296,45 +352,45 @@ public class ScriptConsole extends JPanel {
 			} else if (brackets > 0 && cc[i] == '(') {
 				brackets--;
 			} else if (brackets == 0 && !pattern.matcher(String.valueOf(cc[i])).matches()) {
-				start = i+1;
+				start = i + 1;
 			}
 		}
-		
+
 		return command.substring(start);
 	}
-	
+
 	private class CommandActionListener implements ActionListener {
 
 		private ScriptConsole myConsole;
-		
+
 		public CommandActionListener(ScriptConsole console) {
 			myConsole = console;
 		}
-		
+
 		public void actionPerformed(ActionEvent e) {
 			myConsole.enterCommand(e.getActionCommand());
-		}		
+		}
 	}
-	
+
 	private class CommandKeyListener implements KeyListener {
-		
+
 		private ScriptConsole myConsole;
-		
+
 		public CommandKeyListener(ScriptConsole console) {
 			myConsole = console;
-		}		
+		}
 
-		public void keyPressed(KeyEvent e) {			
+		public void keyPressed(KeyEvent e) {
 			int code = e.getKeyCode();
-			if (code == 27 && myConsole.getInCallChainCompletionMode()) { //escape
+			if (code == 27 && myConsole.getInCallChainCompletionMode()) { // escape
 				myConsole.revertToTypedText();
 			} else if (code == 27) {
 				myConsole.clearCommand();
 			} else if (code == 9) { // tab
 				myConsole.setInCallChainCompletionMode(true);
-			} else if (code == 38) { //up arrow
+			} else if (code == 38) { // up arrow
 				myConsole.completorUp();
-			} else if (code == 40) { //down arrow
+			} else if (code == 40) { // down arrow
 				myConsole.completorDown();
 			} else {
 				myConsole.setInCallChainCompletionMode(false);
@@ -344,88 +400,86 @@ public class ScriptConsole extends JPanel {
 		public void keyReleased(KeyEvent e) {
 			int code = e.getKeyCode();
 			if (code != 38 && code != 40) {
-				myConsole.setTypedText();	
-				if (code == 9) myConsole.completorUp();
+				myConsole.setTypedText();
+				if (code == 9)
+					myConsole.completorUp();
 			}
-			
+
 			if (code == 46) { // .
-				myConsole.setInCallChainCompletionMode(true); 
+				myConsole.setInCallChainCompletionMode(true);
 			}
 		}
 
 		public void keyTyped(KeyEvent e) {
 		}
-		
+
 	}
 
 	/**
-	 * Writes interpreter output to console. 
-	 *  
+	 * Writes interpreter output to console.
+	 * 
 	 * @author Bryan Tripp
 	 */
 	private class OutputWriter implements Runnable {
-		
+
 		private ScriptConsole myConsole;
 		private PipedOutputStream myOutput;
 		private Reader myInput;
-		
+
 		public OutputWriter(ScriptConsole console) throws IOException {
 			myConsole = console;
 			myOutput = new PipedOutputStream();
 			myInput = new InputStreamReader(new PipedInputStream(myOutput));
 		}
-		
+
 		/**
-		 * @return An OutputStream to which a PythonInterpreter can write output 
-		 * 		so that it appears in the console display.  
+		 * @return An OutputStream to which a PythonInterpreter can write output
+		 *         so that it appears in the console display.
 		 */
 		public OutputStream getOutputStream() {
 			return myOutput;
 		}
-		
+
 		public void run() {
 			char[] buffer = new char[512];
 			int charsRead = 0;
-			
+
 			try {
 				while (charsRead >= 0) {
 					charsRead = myInput.read(buffer);
-					if (charsRead > 0) myConsole.appendText(String.valueOf(buffer, 0, charsRead), OUTPUT_STYLE);
-				}				
+					if (charsRead > 0)
+						myConsole.appendText(String.valueOf(buffer, 0, charsRead), OUTPUT_STYLE);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public static void main(String[] args) {
 		JavaSourceParser.addSource(new File("../simulator/src/java/main"));
 		PythonInterpreter interpreter = new PythonInterpreter();
 		ScriptConsole console = new ScriptConsole(interpreter);
 
 		JFrame frame = new JFrame("Script Console");
-		frame.getContentPane().add(console); 
-		
-		frame.addWindowListener(
-			new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
-				}
+		frame.getContentPane().add(console);
+
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
 			}
-		);
-		
+		});
+
 		frame.setSize(500, 400);
 		frame.setVisible(true);
-		
+
 		final ScriptConsole c = console;
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				public void run() {
-					c.setFocus();
-				}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				c.setFocus();
 			}
-		);
-		
+		});
+
 	}
 }

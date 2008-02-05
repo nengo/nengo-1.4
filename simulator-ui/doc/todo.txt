@@ -1,6 +1,10 @@
 *******************************************
  Done
 *******************************************
+02/05/2008 - Configuration & Script Console integrated into NeoGraphics
+02/05/2008 - Advanced construct menu in NodeViewer uses NewConfigurableDialog
+ 
+
 02/03/2008 - Data viewer integrated into NeoGraphics window
 02/03/2008 - Configuration action added to popup menus
 
@@ -20,12 +24,24 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+What to do about script editor? Do we need both that and script console?
+How to fit the style of the configuration panel?
+
 Out of heap-space when viewer rasters
 
-Left pane supports script editor / config pane, etc...
-Bottom pane
 
-Change window titlebar color when it gains keyboard focus
+> Would it be possible to fire a generic event whenever the configuration of
+> the model changes? This would force a sync and re-draw of the UI Node when
+> any intrinsic property of the model is changed.
+
+Yes, no problem. Currently all the Ensemble implementations also
+implement ca.neo.util.VisiblyMutable. I think this will do what you
+need, but let me know 1) if anything else is needed on the interface,
+2) if other nodes or model classes should also implement this (aside
+from ensemble).
+
+
+
 
 
 Notification listener of node changes

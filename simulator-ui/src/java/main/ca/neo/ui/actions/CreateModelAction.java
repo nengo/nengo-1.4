@@ -55,8 +55,7 @@ public class CreateModelAction extends ReversableAction {
 	/**
 	 * Type of node to be created
 	 */
-	@SuppressWarnings("unchecked")
-	private Class nodeType;
+	private Class<?> nodeType;
 
 	/**
 	 * @param nodeContainer
@@ -64,8 +63,7 @@ public class CreateModelAction extends ReversableAction {
 	 * @param nodeUIType
 	 *            Type of Node to be create, such as PNetwork
 	 */
-	@SuppressWarnings("unchecked")
-	public CreateModelAction(INodeContainer nodeContainer, Class nodeUIType)
+	public CreateModelAction(INodeContainer nodeContainer, Class<?> nodeUIType)
 			throws UIException {
 		this(getModelName(nodeUIType), nodeContainer, nodeUIType);
 	}

@@ -1,11 +1,7 @@
 package ca.neo.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -13,22 +9,24 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
+import javax.swing.JScrollPane;
+
+import org.python.util.PythonInterpreter;
 
 import ca.neo.config.ClassRegistry;
+import ca.neo.config.ConfigUtil;
 import ca.neo.config.JavaSourceParser;
 import ca.neo.model.Network;
+import ca.neo.model.Node;
 import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.SaveNodeAction;
@@ -40,12 +38,13 @@ import ca.neo.ui.models.nodes.NodeContainer;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
+import ca.neo.ui.script.ScriptConsole;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.AppFrame;
+import ca.shu.ui.lib.AuxillarySplitPane;
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
@@ -94,100 +93,23 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		new NeoGraphics();
 	}
 
-	private Container dataViewerPane;
+	private ConfigurationPane configPane;
+	private AuxillarySplitPane dataViewerPane;
+	private AuxillarySplitPane scriptConsolePane;
 
-	private JSplitPane mainPane;
 	/**
 	 * Data viewer data
 	 */
 	private SimulatorDataModel simulationData;
 
+	private ArrayList<AuxillarySplitPane> splitPanes;
+
 	/**
-	 * @param title
+	 * @param auxTitle
 	 *            Text to be shown in the Title Bar
 	 */
 	public NeoGraphics() {
 		super();
-	}
-
-	@Override
-	protected void initialize() {
-		super.initialize();
-
-		UIEnvironment.setDebugEnabled(true);
-
-		loadConfig();
-
-		if (FileChooser == null) {
-			FileChooser = new NeoFileChooser();
-		}
-
-		/*
-		 * Register plugin classes
-		 */
-		registerPlugins();
-
-		/*
-		 * Set up Environment variables
-		 */
-		Environment.setUserInterface(true);
-	}
-
-	class HideDataViewerListener implements MouseListener {
-
-		public void mouseClicked(MouseEvent e) {
-			setDataViewerVisible(false);
-		}
-
-		public void mouseEntered(MouseEvent e) {
-		}
-
-		public void mouseExited(MouseEvent e) {
-		}
-
-		public void mousePressed(MouseEvent e) {
-		}
-
-		public void mouseReleased(MouseEvent e) {
-		}
-
-	}
-
-	private void initDataViewer(Container dataViewerContainer) {
-		dataViewerContainer.setLayout(new BorderLayout());
-		simulationData = new SimulatorDataModel();
-
-		/*
-		 * Create title bar
-		 */
-		JPanel titleBar = new JPanel();
-		titleBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-		Style.applyStyle(titleBar);
-		titleBar.setBackground(Style.COLOR_BACKGROUND2);
-		titleBar.setOpaque(true);
-		titleBar.setLayout(new BorderLayout());
-
-		JLabel dataViewerLabel = new JLabel("Data Viewer");
-		titleBar.add(dataViewerLabel, BorderLayout.WEST);
-		dataViewerLabel.setFont(Style.FONT_BIG);
-		Style.applyStyle(dataViewerLabel);
-		JLabel hideButton = new JLabel("<< ");
-		titleBar.add(hideButton, BorderLayout.EAST);
-		Style.applyStyle(hideButton);
-		// hideButton.setForeground(Color.gray);
-
-		hideButton.addMouseListener(new HideDataViewerListener());
-
-		dataViewerContainer.add(titleBar, BorderLayout.NORTH);
-
-		/*
-		 * Create data viewer
-		 */
-		dataViewerContainer.setMinimumSize(new Dimension(200, 200));
-		DataListView dataListViewer = new DataListView(simulationData);
-		Style.applyStyle(dataListViewer);
-
-		dataViewerContainer.add(dataListViewer, BorderLayout.CENTER);
 	}
 
 	private void loadConfig() {
@@ -279,28 +201,55 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	}
 
 	@Override
+	protected void initialize() {
+		super.initialize();
+
+		UIEnvironment.setDebugEnabled(true);
+
+		loadConfig();
+
+		if (FileChooser == null) {
+			FileChooser = new NeoFileChooser();
+		}
+
+		/*
+		 * Register plugin classes
+		 */
+		registerPlugins();
+
+		/*
+		 * Set up Environment variables
+		 */
+		Environment.setUserInterface(true);
+	}
+
+	@Override
 	protected void initLayout(Universe canvas) {
+		splitPanes = new ArrayList<AuxillarySplitPane>();
+		simulationData = new SimulatorDataModel();
 
-		mainPane = new JSplitPane();
-		Style.applyStyle(mainPane);
+		ScriptConsole scriptConsole = new ScriptConsole(new PythonInterpreter());
+		Style.applyStyle(scriptConsole);
 
-		dataViewerPane = new JPanel();
+		/*
+		 * Create nested split panes
+		 */
+		configPane = new ConfigurationPane(canvas);
 
-		Style.applyStyle(dataViewerPane);
-		initDataViewer(dataViewerPane);
+		scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
+				"Script Console", AuxillarySplitPane.Orientation.Bottom);
 
-		mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, dataViewerPane, canvas);
-		mainPane.setOneTouchExpandable(true);
-		mainPane.setBorder(null);
+		dataViewerPane = new AuxillarySplitPane(scriptConsolePane,
+				new DataListView(simulationData), "Data Viewer",
+				AuxillarySplitPane.Orientation.Left);
 
-		mainPane.setDividerSize(2);
+		splitPanes.add(scriptConsolePane);
+		splitPanes.add(dataViewerPane);
+		splitPanes.add(configPane.toJComponent());
 
-		Container cp = getContentPane();
-		// cp.setLayout(new BorderLayout());
-		cp.add(mainPane);
+		getContentPane().add(dataViewerPane);
 
 		canvas.requestFocus();
-		setDataViewerVisible(false);
 
 	}
 
@@ -370,6 +319,11 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		return "NEO Workspace";
 	}
 
+	public static NeoGraphics getInstance() {
+		Util.Assert(UIEnvironment.getInstance() instanceof NeoGraphics);
+		return (NeoGraphics) UIEnvironment.getInstance();
+	}
+
 	@Override
 	public void initFileMenu(MenuBuilder fileMenu) {
 
@@ -391,53 +345,60 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
 		menuBar.add(viewMenu.getJMenu());
 
-		MenuBuilder dataViewerMenu = viewMenu.addSubMenu("Data viewer");
-		dataViewerMenu.addAction(new SetDataViewerVisibleAction("Show data viewer", true),
-				KeyEvent.VK_N);
+		for (AuxillarySplitPane splitPane : splitPanes) {
+			MenuBuilder dataViewerMenu = viewMenu.addSubMenu(splitPane.getAuxTitle());
+			dataViewerMenu.addAction(new SetSplitPaneVisibleAction("Show", splitPane, true),
+					KeyEvent.VK_N);
 
-		dataViewerMenu.addAction(new SetDataViewerVisibleAction("Hide data viewer", false),
-				KeyEvent.VK_N);
-
-	}
-
-	public boolean isDataViewerVisible() {
-		if (mainPane.getDividerLocation() > 0) {
-			return true;
-		} else {
-			return false;
+			dataViewerMenu.addAction(new SetSplitPaneVisibleAction("Hide", splitPane, false),
+					KeyEvent.VK_N);
 		}
+
 	}
 
 	public void setDataViewerVisible(boolean isVisible) {
-		if (isVisible) {
-			int dividerLocation = mainPane.getDividerLocation();
-			if (dividerLocation < dataViewerPane.getMinimumSize().getWidth()) {
-				mainPane.setDividerLocation((int) dataViewerPane.getMinimumSize().getWidth());
-			}
-			mainPane.setDividerSize(2);
-			dataViewerPane.setVisible(true);
+		dataViewerPane.setAuxVisible(isVisible);
+	}
+
+	/**
+	 * @param obj
+	 *            Object to configure
+	 */
+	public void configureObject(Object obj) {
+		configPane.configureObj(obj);
+	}
+
+}
+
+class ConfigurationPane {
+	private static final long serialVersionUID = 1L;
+
+	AuxillarySplitPane auxSplitPane;
+
+	public ConfigurationPane(Container mainPanel) {
+		super();
+		auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Configuration",
+				AuxillarySplitPane.Orientation.Right);
+
+	}
+
+	public void configureObj(Object obj) {
+
+		JScrollPane configurationPane = ConfigUtil.createConfigurationPane(obj);
+		String name;
+		if (obj instanceof Node) {
+			name = ((Node) obj).getName();
 		} else {
-			dataViewerPane.setVisible(false);
-			mainPane.setDividerLocation(0);
-			mainPane.setDividerSize(0);
+			name = "Configuration";
 		}
-	}
+		auxSplitPane.setAuxPane(configurationPane, name + " (" + obj.getClass().getSimpleName()
+				+ ")");
 
-	public class SetDataViewerVisibleAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-		private boolean visible;
-
-		public SetDataViewerVisibleAction(String actionName, boolean visible) {
-			super(actionName);
-			this.visible = visible;
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			setDataViewerVisible(visible);
-		}
+		auxSplitPane.setAuxVisible(true);
 
 	}
 
+	public AuxillarySplitPane toJComponent() {
+		return auxSplitPane;
+	}
 }

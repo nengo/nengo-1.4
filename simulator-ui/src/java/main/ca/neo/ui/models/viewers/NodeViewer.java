@@ -11,21 +11,26 @@ import java.util.List;
 
 import javax.swing.JPopupMenu;
 
+import ca.neo.config.ClassRegistry;
 import ca.neo.model.Node;
+import ca.neo.ui.actions.CreateModelAction;
+import ca.neo.ui.actions.CreateModelAdvancedAction;
+import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.ModelsContextMenu;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.actions.LayoutAction;
+import ca.shu.ui.lib.exceptions.UIException;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.WorldObject.EventType;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
@@ -238,6 +243,28 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 		 */
 		menu.addSection("File");
 		menu.addAction(new SaveNodeAction(getViewerParent()));
+
+		/*
+		 * Create new models
+		 */
+		menu.addSection("Add model");
+		MenuBuilder createNewMenu = menu.addSubMenu("Create new (simple)");
+
+		// Nodes
+		for (Class<?> element : UINeoNode.UI_NODE_CONFIGURABLE_TYPES) {
+			try {
+				createNewMenu.addAction(new CreateModelAction(this, element));
+			} catch (UIException e) {
+				// swallow this, not all model types can be instantiated
+			}
+		}
+
+		MenuBuilder createAdvancedMenu = menu.addSubMenu("Create new (advanced)");
+		for (Class<?> element : ClassRegistry.getInstance().getRegisterableTypes()) {
+			createAdvancedMenu.addAction(new CreateModelAdvancedAction(this, element));
+		}
+
+		menu.addAction(new OpenNeoFileAction(this));
 	}
 
 	/**
