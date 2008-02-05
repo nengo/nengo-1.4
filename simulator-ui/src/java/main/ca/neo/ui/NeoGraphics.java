@@ -394,8 +394,6 @@ class ConfigurationPane {
 		auxSplitPane.setAuxPane(configurationPane, name + " (" + obj.getClass().getSimpleName()
 				+ ")");
 
-		auxSplitPane.setAuxVisible(true);
-
 	}
 
 	public AuxillarySplitPane toJComponent() {

@@ -3,6 +3,7 @@ package ca.shu.ui.lib;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -86,20 +87,28 @@ public class AuxillarySplitPane extends JSplitPane {
 		titleBar.setOpaque(true);
 		titleBar.setLayout(new BorderLayout());
 
-		JLabel dataViewerLabel = new JLabel(title);
-		titleBar.add(dataViewerLabel, BorderLayout.WEST);
-		dataViewerLabel.setFont(Style.FONT_BIG);
-		Style.applyStyle(dataViewerLabel);
+		JLabel titleLabel = new JLabel(title);
 
-		String hideButtonTxt = "<< ";
+		titleLabel.setFont(Style.FONT_BIG);
+		Style.applyStyle(titleLabel);
+		titleLabel.setBackground(Style.COLOR_BACKGROUND2);
+		titleLabel.setOpaque(true);
+
+		String hideButtonTxt = " << ";
 		if (orientation == Orientation.Right) {
-			hideButtonTxt = ">>";
+			hideButtonTxt = " >> ";
 		}
 		JLabel hideButton = new JLabel(hideButtonTxt);
-
-		titleBar.add(hideButton, BorderLayout.EAST);
 		Style.applyStyle(hideButton);
-		// hideButton.setForeground(Color.gray);
+		hideButton.setBackground(Style.COLOR_BACKGROUND2);
+		hideButton.setOpaque(true);
+
+		/*
+		 * Keep in this order, Swing puts items added first on top. We want the
+		 * button to be on top
+		 */
+		titleBar.add(hideButton, BorderLayout.EAST);
+		titleBar.add(titleLabel, BorderLayout.WEST);
 
 		hideButton.addMouseListener(new HideDataViewerListener());
 
@@ -152,7 +161,7 @@ public class AuxillarySplitPane extends JSplitPane {
 		this.auxPanelWr = createAuxPanelWrapper(auxPane, title);
 
 		if (auxPane != null) {
-			setAuxVisible(true);
+			setAuxVisible(true, true);
 		} else {
 			setAuxVisible(false);
 		}
@@ -170,6 +179,11 @@ public class AuxillarySplitPane extends JSplitPane {
 	}
 
 	public void setAuxVisible(boolean isVisible) {
+		setAuxVisible(isVisible, false);
+
+	}
+
+	public void setAuxVisible(boolean isVisible, boolean resetDividerLocation) {
 		if (isVisible) {
 			int auxSize = this.getDividerLocation();
 
@@ -184,7 +198,7 @@ public class AuxillarySplitPane extends JSplitPane {
 				minAuxSize = auxPanelWr.getMinimumSize().getWidth();
 			}
 
-			if (auxSize < minAuxSize) {
+			if (auxSize < minAuxSize || resetDividerLocation) {
 				if (orientation == Orientation.Bottom) {
 					setDividerLocation((int) (getHeight() - minAuxSize));
 
@@ -196,10 +210,13 @@ public class AuxillarySplitPane extends JSplitPane {
 
 			}
 			setDividerSize(2);
-			auxPanelWr.setVisible(true);
+			if (!auxPanelWr.isVisible()) {
+				auxPanelWr.setVisible(true);
+			}
 		} else {
 			auxPanelWr.setVisible(false);
-			setDividerLocation(0);
+
+			// setDividerLocation(0);
 			setDividerSize(0);
 		}
 	}
