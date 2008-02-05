@@ -17,7 +17,9 @@ public class Style {
 	 * Colors
 	 */
 	public static final Color COLOR_BACKGROUND = Color.black;
+	public static final Color COLOR_FOREGROUND = Color.white;
 	public static final Color COLOR_BACKGROUND2 = Color.darkGray;
+	public static final Color COLOR_FOREGROUND2 = Color.gray;
 	public static final Color COLOR_BORDER_SELECTED = Color.orange;
 
 	/*
@@ -35,7 +37,6 @@ public class Style {
 	 * Other colors
 	 */
 	public static final Color COLOR_DISABLED = Color.gray;
-	public static final Color COLOR_FOREGROUND = Color.white;
 	public static final Color COLOR_ANCHOR = Color.lightGray;
 	public static final Color COLOR_HIGH_SALIENCE = new Color(150, 0, 0);
 

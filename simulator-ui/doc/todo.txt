@@ -20,6 +20,14 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Out of heap-space when viewer rasters
+
+Left pane supports script editor / config pane, etc...
+Bottom pane
+
+Change window titlebar color when it gains keyboard focus
+
+
 Notification listener of node changes
 	Need it for the general case 
 

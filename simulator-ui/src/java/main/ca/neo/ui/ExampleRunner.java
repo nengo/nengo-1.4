@@ -58,11 +58,11 @@ public class ExampleRunner {
 	 * Builds a NeoGraphics User Interface
 	 */
 	private UINetwork buildUI() {
+		NeoGraphics neoGraphics = new NeoGraphics();
 
 		TrackedStatusMsg task;
 		task = new TrackedStatusMsg("Creating Model UI");
 		if (networkUI == null) {
-			NeoGraphics neoGraphics = new NeoGraphics();
 
 			networkUI = new UINetwork(network);
 			neoGraphics.addNeoNode(networkUI);

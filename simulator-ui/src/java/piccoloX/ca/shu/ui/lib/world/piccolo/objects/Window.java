@@ -12,14 +12,15 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.EventListener;
-import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.handlers.EventConsumer;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.shu.ui.lib.world.piccolo.primitives.Path;
 import ca.shu.ui.lib.world.piccolo.primitives.Text;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventListener;
-import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolox.nodes.PClip;
 
 /**
@@ -105,6 +106,10 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 		windowStateChanged();
 
+		myContent.addInputEventListener(new MenuBarHandler());
+
+		addInputEventListener(new MenuBarHandler());
+
 		addPropertyChangeListener(EventType.PARENTS_BOUNDS, new EventListener() {
 			public void propertyChanged(EventType event) {
 				if (myState == WindowState.MAXIMIZED) {
@@ -149,6 +154,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 			}
 
 			maximizeBounds();
+			menubar.setHighlighted(true);
 
 			BoundsHandle.removeBoundsHandlesFrom(this);
 			break;
@@ -310,15 +316,30 @@ public class Window extends WorldObjectImpl implements Interactable {
 		MAXIMIZED, MINIMIZED, NORMAL
 	}
 
+	class MenuBarHandler extends PBasicInputEventHandler {
+		@Override
+		public void mouseEntered(PInputEvent arg0) {
+			menubar.setHighlighted(true);
+		}
+
+		@Override
+		public void mouseExited(PInputEvent arg0) {
+			menubar.setHighlighted(false);
+		}
+
+	}
+
 }
 
 class MenuBar extends WorldObjectImpl implements PInputEventListener {
 
 	private static final long serialVersionUID = 1L;
+	private WorldObject buttonHolder;
 	private AbstractButton maximizeButton, minimizeButton, closeButton, normalButton;
-	private Window myWindow;
 
-	private PPath rectangle;
+	private Window myWindow;
+	private Path rectangle;
+
 	private Text title;
 
 	public MenuBar(Window window) {
@@ -328,10 +349,10 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 	}
 
 	private void init() {
-		getPiccolo().addInputEventListener(this);
-		rectangle = new PPath(new Rectangle2D.Double(0, 0, 1, 1));
+		addInputEventListener(this);
+		rectangle = Path.createRectangle(0, 0, 1, 1);
 
-		getPiccolo().addChild(rectangle);
+		addChild(rectangle);
 
 		title = new Text(myWindow.getName());
 		title.setFont(Style.FONT_LARGE);
@@ -360,19 +381,20 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 				myWindow.close();
 			}
 		});
+		buttonHolder = new WorldObjectImpl();
+		addChild(buttonHolder);
+		buttonHolder.addChild(maximizeButton);
+		buttonHolder.addChild(normalButton);
+		buttonHolder.addChild(minimizeButton);
+		buttonHolder.addChild(closeButton);
 
-		addChild(maximizeButton);
-		addChild(normalButton);
-		addChild(minimizeButton);
-		addChild(closeButton);
-
-		rectangle.setPaint(Style.COLOR_BACKGROUND2);
+		setHighlighted(false);
 	}
 
 	@Override
 	public void layoutChildren() {
 		super.layoutChildren();
-		title.setBounds(4, 3, getWidth(), getHeight());
+		title.setBounds(3, 3, getWidth(), getHeight());
 
 		double buttonX = getWidth() - closeButton.getWidth();
 		closeButton.setOffset(buttonX, 0);
@@ -390,10 +412,16 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 		}
 	}
 
-	@Override
-	public void setOffset(double arg0, double arg1) {
-		// TODO Auto-generated method stub
-		super.setOffset(arg0, arg1);
+	public void setHighlighted(boolean bool) {
+		if (bool || myWindow.getWindowState() == Window.WindowState.MAXIMIZED) {
+			rectangle.setTransparency(1f);
+			buttonHolder.setTransparency(1f);
+			rectangle.setPaint(Style.COLOR_BACKGROUND2);
+			// buttonHolder.setVisible(true);
+		} else {
+			rectangle.setTransparency(0.2f);
+			buttonHolder.setTransparency(0.4f);
+		}
 	}
 
 	public void updateButtons() {
@@ -401,10 +429,10 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 
 		if (isWindowMaximized) {
 			maximizeButton.removeFromParent();
-			addChild(normalButton);
+			buttonHolder.addChild(normalButton);
 		} else {
 			normalButton.removeFromParent();
-			addChild(maximizeButton);
+			buttonHolder.addChild(maximizeButton);
 		}
 
 	}
