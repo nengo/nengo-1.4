@@ -152,7 +152,8 @@ public class ScriptConsole extends JPanel {
 		rootStyle = myStyleContext.addStyle("root", null);
 		commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
 		StyleConstants.setItalic(commandStyle, true);
-		myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
+		Style outputStyle = myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
+		StyleConstants.setForeground(outputStyle, Color.GRAY);
 		Style errorStyle = myStyleContext.addStyle(ERROR_STYLE, rootStyle);
 		StyleConstants.setForeground(errorStyle, Color.RED);
 	}
