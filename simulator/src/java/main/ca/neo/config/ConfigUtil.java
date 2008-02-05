@@ -47,42 +47,19 @@ import ca.neo.model.StructuralException;
 public class ConfigUtil {
 	
 	/**
-	 * Shows a tree in which object properties can be edited. 
+	 * Shows a tree in which object properties can be edited.
 	 * 
-	 * @param o The Object to configure
+	 * @param o
+	 *            The Object to configure
 	 */
 	public static void configure(Frame owner, Object o) {
-		
+		JScrollPane configuruationPane = createConfigurationPane(o);
+
 		final JDialog dialog = new JDialog(owner, o.getClass().getSimpleName() + " Configuration");
-		
-		ConfigurationTreeModel model = new ConfigurationTreeModel(o); 
-		final JTree tree = new JTree(model);
-		tree.setPreferredSize(new Dimension(300, 300));
-		tree.setEditable(true); 
-		tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
-		
-		tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));
-		
-		//shows help when F1 is pressed 
-		tree.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				Object selected = (tree.getSelectionPath() == null) ? null : tree.getSelectionPath().getLastPathComponent();
-				if (e.getKeyCode() == 112 && selected instanceof Property) {
-					String documentation = ((Property) selected).getDocumentation(); 
-					if (documentation != null) ConfigUtil.showHelp(documentation);
-				}
-			}
-		});
-		ConfigurationTreeCellRenderer cellRenderer = new ConfigurationTreeCellRenderer();
-		
-		tree.setCellRenderer(cellRenderer);
-		
-		ToolTipManager.sharedInstance().registerComponent(tree);
-		
+
 		dialog.getContentPane().setLayout(new BorderLayout());
-		dialog.getContentPane().add(new JScrollPane(tree), BorderLayout.CENTER);
-		
+		dialog.getContentPane().add(configuruationPane, BorderLayout.CENTER);
+
 		JButton doneButton = new JButton("Done");
 		doneButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -94,6 +71,45 @@ public class ConfigUtil {
 		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		dialog.pack();
 		dialog.setVisible(true);
+	}
+
+	/**
+	 * Shows a tree in which object properties can be edited.
+	 * 
+	 * @param o
+	 *            The Object to configure
+	 * @return A Scroll Pane containing the configuration properties
+	 */
+	public static JScrollPane createConfigurationPane(Object o) {
+		ConfigurationTreeModel model = new ConfigurationTreeModel(o);
+
+		final JTree tree = new JTree(model);
+		tree.setPreferredSize(new Dimension(300, 300));
+		tree.setEditable(true);
+		tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
+
+		tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));
+
+		// shows help when F1 is pressed
+		tree.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				Object selected = (tree.getSelectionPath() == null) ? null : tree
+						.getSelectionPath().getLastPathComponent();
+				if (e.getKeyCode() == 112 && selected instanceof Property) {
+					String documentation = ((Property) selected).getDocumentation();
+					if (documentation != null)
+						ConfigUtil.showHelp(documentation);
+				}
+			}
+		});
+		ConfigurationTreeCellRenderer cellRenderer = new ConfigurationTreeCellRenderer();
+
+		tree.setCellRenderer(cellRenderer);
+
+		ToolTipManager.sharedInstance().registerComponent(tree);
+
+		return new JScrollPane(tree);
 	}
 	
 	/**
