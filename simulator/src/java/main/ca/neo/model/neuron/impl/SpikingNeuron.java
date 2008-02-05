@@ -60,7 +60,14 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	 * 		it belongs
 	 */
 	public SpikingNeuron(SynapticIntegrator integrator, SpikeGenerator generator, float scale, float bias, String name) {
+		if (integrator == null) {
+			integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
+		}		
 		setIntegrator(integrator);
+		
+		if (generator == null) {
+			generator = new LIFSpikeGenerator(.001f, .02f, .002f);
+		}
 		setGenerator(generator);
 		
 		myCurrentOrigin = new BasicOrigin(this, CURRENT, 1, Units.ACU);
@@ -211,7 +218,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	/**
 	 * @param integrator New synaptic integrator
 	 */
-	public void setIntegrator(SynapticIntegrator integrator) {
+	public void setIntegrator(SynapticIntegrator integrator) {		
 		myIntegrator = integrator;
 		myIntegrator.setNode(this);		
 	}

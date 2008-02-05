@@ -49,11 +49,11 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 	public PlasticExpandableSpikingNeuron(SynapticIntegrator integrator, SpikeGenerator generator, float scale, float bias, String name) {
 		super(integrator, generator, scale, bias, name);
 		
-		if ( !(integrator instanceof Plastic) ) {
+		if ( !(getIntegrator() instanceof Plastic) ) {
 			throw new IllegalArgumentException("SynapticIntegrator must be Plastic (consider using SpikingNeuron instead)");
 		}
 		
-		if ( !(integrator instanceof ExpandableSynapticIntegrator) ) {
+		if ( !(getIntegrator() instanceof ExpandableSynapticIntegrator) ) {
 			ourLogger.warn("Given SynapticIntegrator is not an ExpandableSynapticIntegrator (expansion-related methods will fail");
 		}
 		
