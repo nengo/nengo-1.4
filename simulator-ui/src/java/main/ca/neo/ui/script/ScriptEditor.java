@@ -355,6 +355,10 @@ public class ScriptEditor extends JPanel {
 	 * @return The new console. 
 	 */
 	public static ScriptConsole openEditor() {
+		return openEditor(false);
+	}
+	
+	private static ScriptConsole openEditor(boolean exitOnWindowClose) {
 		final ScriptEditor editor = new ScriptEditor();
 		editor.setPreferredSize(new Dimension(600, 600));
 		
@@ -428,22 +432,9 @@ public class ScriptEditor extends JPanel {
 
 		menuBar.add(fileMenu);
 		frame.setJMenuBar(menuBar);
-		
+
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		frame.addWindowListener(
-			new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
-					try {
-						if (editor.closeAll()) {
-							e.getWindow().dispose();
-							System.exit(0);							
-						}
-					} catch (IOException ex) {
-						ex.printStackTrace();
-					}
-				}
-			}
-		);
+		frame.addWindowListener(new MyWindowAdapter(editor, exitOnWindowClose));
 		
 		frame.pack();
 		frame.setVisible(true);
@@ -457,12 +448,37 @@ public class ScriptEditor extends JPanel {
 		);
 		
 		return console;
-	}
+	}	
 	
 	public static void main(String[] args) {
-		ScriptConsole console = openEditor();
+		ScriptConsole console = openEditor(true);		
+
 		Environment.setUserInterface(true);
 		
 		console.addVariable("ts", new TimeSeries1DImpl(new float[]{0, 1, 2}, new float[]{1, 0, 3}, Units.UNK));
+	}
+}
+
+class MyWindowAdapter extends WindowAdapter {
+	private boolean exitOnWindowClose;
+	private ScriptEditor editor;
+
+	public MyWindowAdapter(ScriptEditor editor, boolean exitOnWindowClose) {
+		super();
+		this.exitOnWindowClose = exitOnWindowClose;
+		this.editor = editor;
+	}
+
+	public void windowClosing(WindowEvent e) {
+		try {
+			if (editor.closeAll()) {
+				e.getWindow().dispose();
+			}
+			if (exitOnWindowClose) {
+				System.exit(0);
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 }
