@@ -88,7 +88,7 @@ public class OpenNeoFileAction extends StandardAction {
 	/**
 	 * Initializes field variables
 	 */
-	protected void init(INodeContainer nodeContainer) {
+	private void init(INodeContainer nodeContainer) {
 		this.nodeContainer = nodeContainer;
 	}
 
@@ -98,7 +98,7 @@ public class OpenNeoFileAction extends StandardAction {
 	 * @param objLoaded
 	 *            Loaded object
 	 */
-	protected void processLoadedObject(Object objLoaded) {
+	private void processLoadedObject(Object objLoaded) {
 
 		if (objLoaded instanceof Node) {
 			UINeoNode nodeUI = UINeoNode.createNodeUI((Node) objLoaded);

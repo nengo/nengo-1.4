@@ -278,11 +278,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
 	public void addNeoNode(UINeoNode node) {
+		getWorld().getGround().addObject(node);
 		if (node instanceof NodeContainer) {
 			((NodeContainer) (node)).openViewer();
 		}
-		getWorld().getGround().addObject(node);
-
 	}
 
 	public void captureInDataViewer(Network network) {

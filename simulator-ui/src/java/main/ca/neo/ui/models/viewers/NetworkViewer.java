@@ -118,7 +118,6 @@ public class NetworkViewer extends NodeViewer {
 
 		if (updateModel) {
 			node.showPopupMessage("Node " + getName() + " added to Network");
-
 		}
 	}
 
