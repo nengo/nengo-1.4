@@ -3,6 +3,7 @@ package ca.neo.ui.dataList;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -23,7 +25,6 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -31,12 +32,16 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import ca.neo.io.DelimitedFileExporter;
+import ca.neo.io.MatlabExporter;
 import ca.neo.ui.actions.ConfigureAction;
 import ca.neo.ui.util.FileExtensionFilter;
+import ca.neo.util.SpikePattern;
+import ca.neo.util.TimeSeries;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
@@ -45,6 +50,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 	private static final long serialVersionUID = 1L;
 
 	public static final String DATA_FILE_EXTENSION = "txt";
+	public static final String MATLAB_FILE_EXTENSION = "mat";
 
 	private SimulatorDataModel dataModel;
 	private JTree tree;
@@ -86,23 +92,9 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 	/** Required by TreeSelectionListener interface. */
 	public void valueChanged(TreeSelectionEvent e) {
-		// DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-		// .getLastSelectedPathComponent();
-		//
-		// if (node == null)
-		// return;
-		//
-		// Object nodeInfo = node.getUserObject();
-		// if (node.isLeaf()) {
-		//
-		// System.out.println("Leaf Node clicked: " + node.toString());
-		//
-		// } else {
-		// System.out.println("Node clicked: " + node.toString());
-		// }
-		// if (DEBUG) {
-		// System.out.println(nodeInfo.toString());
-		// }
+		/*
+		 * Do nothing
+		 */
 	}
 
 	private class MyTreeModelListener implements TreeModelListener {
@@ -148,7 +140,9 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 					menuBuilder = new PopupMenuBuilder(leafNode.toString());
 
-					menuBuilder.addAction(new ExportData(DataListView.this, leafNode));
+					menuBuilder
+							.addAction(new ExportDelimitedFileAction(DataListView.this, leafNode));
+					menuBuilder.addAction(new ExportMatlabAction(DataListView.this, leafNode));
 
 					if (leafNode instanceof NeoTreeNode) {
 						NeoTreeNode neoTreeNode = (NeoTreeNode) leafNode;
@@ -335,45 +329,17 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 }
 
-class DataFileChooser extends JFileChooser {
-
-	private static final long serialVersionUID = 1L;
-
-	public DataFileChooser() {
-		super();
-		setAcceptAllFileFilterUsed(false);
-	}
-
-}
-
-class DataFileFilter extends FileExtensionFilter {
-
-	@Override
-	public boolean acceptExtension(String extension) {
-		if (extension.compareTo(DataListView.DATA_FILE_EXTENSION) == 0) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public String getDescription() {
-		return "Delimited Text File";
-	}
-
-}
-
 /**
  * Describes how to build a folder structure for a wrapped data node when it is
  * being exported
  * 
  * @author Shu Wu
  */
-class DataFilePath {
+class DataPath {
 	private DataTreeNode dataNode;
 	private Collection<String> position;
 
-	public DataFilePath(DataTreeNode dataNode, Collection<String> position) {
+	public DataPath(DataTreeNode dataNode, Collection<String> position) {
 		super();
 		this.dataNode = dataNode;
 		this.position = position;
@@ -383,104 +349,22 @@ class DataFilePath {
 		return dataNode;
 	}
 
-	public Collection<String> getFolderPath() {
+	public Collection<String> getPath() {
 		return position;
 	}
 
 }
 
-class ExportData extends StandardAction {
-
-	private static final DataFileFilter DATA_FILE_FILTER = new DataFileFilter();
-	private static DataFileChooser fileChooser = new DataFileChooser();
-	private static final long serialVersionUID = 1L;
-
-	private static String getActionDescription(MutableTreeNode node) {
-		if (isSingleFileExport(node)) {
-			return "Export to file";
-		} else {
-			return "Export to folder";
-		}
-	}
-
-	private static boolean isSingleFileExport(MutableTreeNode node) {
-		if (node.getChildCount() == 0 && node instanceof DataTreeNode) {
-			return true;
-		}
-		return false;
-	}
-
-	private DelimitedFileExporter fileExporter;
-
-	private MutableTreeNode nodeToExport;
-
-	private Component parent;
-
-	public ExportData(Component parent, MutableTreeNode nodeToExport) {
-		super(getActionDescription(nodeToExport));
-		this.nodeToExport = nodeToExport;
-		fileExporter = new DelimitedFileExporter();
-		this.parent = parent;
-
-	}
-
-	private void exportAllDataNodes() throws IOException, ActionException {
-
-		/*
-		 * Use recursion to find data items
-		 */
-		File folder = getUserSelectedFolder();
-
-		folder.mkdir();
-		if (folder != null) {
-
-			ArrayList<DataFilePath> dataFilePaths = new ArrayList<DataFilePath>();
-			findDataItemsRecursive(nodeToExport, new ArrayList<String>(), dataFilePaths);
-
-			for (DataFilePath dataPath : dataFilePaths) {
-
-				Collection<String> folderPath = dataPath.getFolderPath();
-				DataTreeNode dataNode = dataPath.getDataNode();
-
-				File dataFile = folder;
-				for (String folderName : folderPath) {
-					dataFile = new File(dataFile, folderName);
-					dataFile.mkdir();
-
-					if (!dataFile.exists()) {
-						throw new ActionException("Problem creating folder: " + dataFile.toString());
-					}
-				}
-
-				dataFile = new File(dataFile, dataNode.toString() + "."
-						+ DataListView.DATA_FILE_EXTENSION);
-
-				exportNode(dataNode, dataFile);
-			}
-
-		}
-
-	}
-
-	private void exportNode(DataTreeNode node, File file) throws IOException, ActionException {
-		if (node instanceof SpikePatternNode) {
-			fileExporter.export((((SpikePatternNode) node).getUserObject()), file);
-		} else if (node instanceof TimeSeriesNode) {
-			fileExporter.export((((TimeSeriesNode) node).getUserObject()), file);
-		} else {
-			throw new ActionException("Could not export node type: "
-					+ node.getClass().getSimpleName());
-		}
-	}
-
-	private void findDataItemsRecursive(MutableTreeNode node, ArrayList<String> position,
-			Collection<DataFilePath> dataItemsPaths) {
+abstract class ExportAction extends StandardAction {
+	private static ExportFileChooser fileChooser = new ExportFileChooser();
+	public static void findDataItemsRecursive(MutableTreeNode node, ArrayList<String> position,
+			Collection<DataPath> dataItemsPaths) {
 
 		if (node instanceof DataTreeNode) {
 			DataTreeNode dataNode = (DataTreeNode) node;
 
 			if (dataNode.includeInExport()) {
-				DataFilePath dataP = new DataFilePath(dataNode, position);
+				DataPath dataP = new DataPath(dataNode, position);
 				dataItemsPaths.add(dataP);
 			}
 		}
@@ -503,29 +387,128 @@ class ExportData extends StandardAction {
 		}
 	}
 
-	private File getUserSelectedFile(FileFilter filter) {
+	private Component parent;
+
+	private final MutableTreeNode rootNode;
+
+	public ExportAction(Component parent, MutableTreeNode rootNodeToExport, String description) {
+		super(description);
+		this.rootNode = rootNodeToExport;
+		this.parent = parent;
+	}
+
+	protected File getUserSelectedFile(ExtensionFileFilter filter) throws UserCancelledException {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setFileFilter(filter);
+		fileChooser.setSelectedFile(new File("unnamed." + filter.getExtension()));
 
 		int result = fileChooser.showSaveDialog(parent);
 
 		if (result == JFileChooser.APPROVE_OPTION) {
+			if (fileChooser.getSelectedFile().exists()) {
+				int response = JOptionPane.showConfirmDialog(fileChooser,
+						"File already exists, replace?", "Warning", JOptionPane.YES_NO_OPTION);
+
+				if (response != JOptionPane.YES_OPTION) {
+					throw new UserCancelledException();
+				}
+			}
+
 			return fileChooser.getSelectedFile();
 		} else {
-			return null;
+			throw new UserCancelledException();
 		}
 
 	}
 
-	private File getUserSelectedFolder() {
+	protected File getUserSelectedFolder() throws UserCancelledException {
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-		int result = fileChooser.showSaveDialog(parent);
+		int result = showSaveDialog();
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			return fileChooser.getSelectedFile();
 		} else {
-			return null;
+			throw new UserCancelledException();
+		}
+
+	}
+
+	public MutableTreeNode getRootNode() {
+		return rootNode;
+	}
+
+	public int showSaveDialog() throws HeadlessException {
+		return fileChooser.showSaveDialog(parent);
+	}
+
+}
+
+class ExportDelimitedFileAction extends ExportAction {
+	private static final ExtensionFileFilter DATA_FILE_FILTER = new ExtensionFileFilter(
+			"Delimited Text File", DataListView.DATA_FILE_EXTENSION);
+
+	private static final long serialVersionUID = 1L;
+
+	private static String getActionDescription(MutableTreeNode node) {
+		if (isSingleFileExport(node)) {
+			return "Export (Text) to file";
+		} else {
+			return "Export (Text) to folder";
+		}
+	}
+
+	private static boolean isSingleFileExport(MutableTreeNode node) {
+		if (node.getChildCount() == 0 && node instanceof DataTreeNode) {
+			return true;
+		}
+		return false;
+	}
+
+	private DelimitedFileExporter fileExporter;
+
+	public ExportDelimitedFileAction(Component parent, MutableTreeNode nodeToExport) {
+		super(parent, nodeToExport, getActionDescription(nodeToExport));
+
+		fileExporter = new DelimitedFileExporter();
+	}
+
+	private void exportAllDataNodes() throws IOException, ActionException {
+
+		/*
+		 * Use recursion to find data items
+		 */
+		File folder = getUserSelectedFolder();
+
+		folder.mkdir();
+
+		ArrayList<DataPath> dataFilePaths = new ArrayList<DataPath>();
+		findDataItemsRecursive(getRootNode(), new ArrayList<String>(), dataFilePaths);
+
+		if (dataFilePaths.size() == 0) {
+			throw new ActionException("Nothing to export");
+		} else {
+			for (DataPath dataPath : dataFilePaths) {
+
+				Collection<String> folderPath = dataPath.getPath();
+				DataTreeNode dataNode = dataPath.getDataNode();
+
+				File dataFile = folder;
+				for (String folderName : folderPath) {
+					dataFile = new File(dataFile, folderName);
+					dataFile.mkdir();
+
+					if (!dataFile.exists()) {
+						throw new ActionException("Problem creating folder: " + dataFile.toString());
+					}
+				}
+
+				dataFile = new File(dataFile, dataNode.toString() + "."
+						+ DataListView.DATA_FILE_EXTENSION);
+
+				exportNode(dataNode, dataFile);
+			}
+
 		}
 
 	}
@@ -533,12 +516,10 @@ class ExportData extends StandardAction {
 	@Override
 	protected void action() throws ActionException {
 		try {
-			if (isSingleFileExport(nodeToExport)) {
+			if (isSingleFileExport(getRootNode())) {
 				File file = getUserSelectedFile(DATA_FILE_FILTER);
 
-				if (file != null) {
-					exportNode((DataTreeNode) nodeToExport, file);
-				}
+				exportNode((DataTreeNode) getRootNode(), file);
 
 				/*
 				 * Export one data item
@@ -552,4 +533,122 @@ class ExportData extends StandardAction {
 			UserMessages.showWarning("Could not export: " + e.getMessage());
 		}
 	}
+
+	protected void exportNode(DataTreeNode node, File file) throws IOException, ActionException {
+		if (node instanceof SpikePatternNode) {
+			fileExporter.export((((SpikePatternNode) node).getUserObject()), file);
+		} else if (node instanceof TimeSeriesNode) {
+			fileExporter.export((((TimeSeriesNode) node).getUserObject()), file);
+		} else {
+			throw new ActionException("Could not export node type: "
+					+ node.getClass().getSimpleName());
+		}
+	}
+
+}
+
+class ExportFileChooser extends JFileChooser {
+
+	private static final long serialVersionUID = 1L;
+
+	public ExportFileChooser() {
+		super();
+		setAcceptAllFileFilterUsed(false);
+	}
+
+}
+
+class ExportMatlabAction extends ExportAction {
+	private static final ExtensionFileFilter MATLAB_FILE_FILTER = new ExtensionFileFilter(
+			"Matlab File", DataListView.MATLAB_FILE_EXTENSION);
+	private static final long serialVersionUID = 1L;
+	private MatlabExporter matlabExporter;
+
+	public ExportMatlabAction(Component parent, MutableTreeNode nodeToExport) {
+		super(parent, nodeToExport, "Export (Matlab) to file");
+		matlabExporter = new MatlabExporter();
+	}
+
+	@Override
+	protected void action() throws ActionException {
+		File file = getUserSelectedFile(MATLAB_FILE_FILTER);
+
+		ArrayList<DataPath> dataPaths = new ArrayList<DataPath>();
+		findDataItemsRecursive(getRootNode(), new ArrayList<String>(), dataPaths);
+
+		if (dataPaths.size() == 0) {
+			throw new ActionException("Nothing to export");
+		} else {
+			for (DataPath dataPath : dataPaths) {
+
+				Collection<String> path = dataPath.getPath();
+				DataTreeNode dataNode = dataPath.getDataNode();
+
+				StringBuilder name = new StringBuilder(200);
+				boolean first = true;
+				for (String nodeName : path) {
+					if (first) {
+						first = false;
+					} else {
+						name.append(".");
+					}
+
+					name.append(nodeName);
+				}
+
+				addNode(dataNode, name.toString());
+			}
+
+			try {
+				matlabExporter.write(file);
+			} catch (IOException e) {
+				throw new ActionException("Error writing file: " + e.getMessage());
+			}
+		}
+
+	}
+
+	protected void addNode(DataTreeNode node, String name) throws ActionException {
+
+		if (node instanceof SpikePatternNode) {
+			SpikePattern spikePattern = ((SpikePatternNode) node).getUserObject();
+			matlabExporter.add(name, spikePattern);
+		} else if (node instanceof TimeSeriesNode) {
+			TimeSeries spikePattern = ((TimeSeriesNode) node).getUserObject();
+			matlabExporter.add(name, spikePattern);
+		} else {
+			throw new ActionException("Could not export node type: "
+					+ node.getClass().getSimpleName());
+		}
+	}
+}
+
+class ExtensionFileFilter extends FileExtensionFilter {
+
+	private String description;
+	private String extension;
+
+	public ExtensionFileFilter(String description, String extension) {
+		super();
+		this.description = description;
+		this.extension = extension;
+	}
+
+	@Override
+	public boolean acceptExtension(String extension) {
+		if (extension.compareTo(extension) == 0) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String getDescription() {
+		return description;
+	}
+
+	public String getExtension() {
+		return extension;
+	}
+
 }

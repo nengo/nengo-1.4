@@ -49,6 +49,7 @@ import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.objects.activities.TransientStatusMessage;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
@@ -194,7 +195,10 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 
-		tooltips.addProperty("Documentation", getModel().getDocumentation());
+		if (getModel().getDocumentation() != null) {
+			tooltips.addProperty("Documentation", Util.truncateString(getModel().getDocumentation(),
+					100));
+		}
 		tooltips.addProperty("Simulation mode", getModel().getMode().toString());
 
 	}

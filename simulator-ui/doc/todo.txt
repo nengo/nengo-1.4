@@ -1,9 +1,10 @@
 *******************************************
  Done
 *******************************************
+02/06/2008 - Matlab exporter added
+
 02/05/2008 - Configuration & Script Console integrated into NeoGraphics
-02/05/2008 - Advanced construct menu in NodeViewer uses NewConfigurableDialog
- 
+02/05/2008 - Advanced construct menu in NodeViewer uses NewConfigurableDialog 
 
 02/03/2008 - Data viewer integrated into NeoGraphics window
 02/03/2008 - Configuration action added to popup menus
@@ -24,10 +25,21 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+
+Script Editor open in new window
+
+Layout not saved when saving networks. Check whether elastic layout parameter is saved
+
+Closing script editor closes application
+
 What to do about script editor? Do we need both that and script console?
 How to fit the style of the configuration panel?
 
-Out of heap-space when viewer rasters
+Configuration ScrollPane dosen't scroll vertically
+
+
+Associate nodes with uiNodes
+
 
 
 > Would it be possible to fire a generic event whenever the configuration of

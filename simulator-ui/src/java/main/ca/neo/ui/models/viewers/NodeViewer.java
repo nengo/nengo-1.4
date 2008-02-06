@@ -248,20 +248,24 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 		 * Create new models
 		 */
 		menu.addSection("Add model");
-		MenuBuilder createNewMenu = menu.addSubMenu("Create new (simple)");
+		MenuBuilder createNewMenu = menu.addSubMenu("Create new");
 
 		// Nodes
 		for (Class<?> element : UINeoNode.UI_NODE_CONFIGURABLE_TYPES) {
 			try {
-				createNewMenu.addAction(new CreateModelAction(this, element));
+				if (UINeoNode.class.isAssignableFrom(element)) {
+					createNewMenu.addAction(new CreateModelAction(this, element));
+				}
 			} catch (UIException e) {
 				// swallow this, not all model types can be instantiated
 			}
 		}
 
-		MenuBuilder createAdvancedMenu = menu.addSubMenu("Create new (advanced)");
+		MenuBuilder createAdvancedMenu = createNewMenu.addSubMenu("Other");
 		for (Class<?> element : ClassRegistry.getInstance().getRegisterableTypes()) {
-			createAdvancedMenu.addAction(new CreateModelAdvancedAction(this, element));
+			if (Node.class.isAssignableFrom(element)) {
+				createAdvancedMenu.addAction(new CreateModelAdvancedAction(this, element));
+			}
 		}
 
 		menu.addAction(new OpenNeoFileAction(this));

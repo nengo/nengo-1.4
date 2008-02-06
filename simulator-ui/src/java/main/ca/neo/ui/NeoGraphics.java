@@ -39,12 +39,15 @@ import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.script.ScriptConsole;
+import ca.neo.ui.script.ScriptEditor;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.AuxillarySplitPane;
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
+import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
@@ -345,6 +348,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
 		menuBar.add(viewMenu.getJMenu());
 
+		viewMenu.addAction(new OpenScriptEditor("Open Script Editor"), KeyEvent.VK_E);
+
 		for (AuxillarySplitPane splitPane : splitPanes) {
 			MenuBuilder dataViewerMenu = viewMenu.addSubMenu(splitPane.getAuxTitle());
 			dataViewerMenu.addAction(new SetSplitPaneVisibleAction("Show", splitPane, true),
@@ -352,6 +357,20 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 			dataViewerMenu.addAction(new SetSplitPaneVisibleAction("Hide", splitPane, false),
 					KeyEvent.VK_N);
+		}
+	}
+
+	class OpenScriptEditor extends StandardAction {
+
+		public OpenScriptEditor(String description) {
+			super(description);
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void action() throws ActionException {
+			ScriptEditor.openEditor();
 		}
 
 	}

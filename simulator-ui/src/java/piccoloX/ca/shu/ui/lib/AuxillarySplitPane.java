@@ -3,7 +3,6 @@ package ca.shu.ui.lib;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -110,7 +109,7 @@ public class AuxillarySplitPane extends JSplitPane {
 		titleBar.add(hideButton, BorderLayout.EAST);
 		titleBar.add(titleLabel, BorderLayout.WEST);
 
-		hideButton.addMouseListener(new HideDataViewerListener());
+		hideButton.addMouseListener(new HideButtonListener(hideButton));
 
 		leftPanel.add(titleBar, BorderLayout.NORTH);
 
@@ -235,16 +234,24 @@ public class AuxillarySplitPane extends JSplitPane {
 		Bottom, Left, Right
 	}
 
-	class HideDataViewerListener implements MouseListener {
+	class HideButtonListener implements MouseListener {
+		private Container hideButton;
+
+		public HideButtonListener(Container hideButton) {
+			super();
+			this.hideButton = hideButton;
+		}
 
 		public void mouseClicked(MouseEvent e) {
 			setAuxVisible(false);
 		}
 
 		public void mouseEntered(MouseEvent e) {
+			hideButton.setBackground(Style.COLOR_FOREGROUND2);
 		}
 
 		public void mouseExited(MouseEvent e) {
+			hideButton.setBackground(null);
 		}
 
 		public void mousePressed(MouseEvent e) {

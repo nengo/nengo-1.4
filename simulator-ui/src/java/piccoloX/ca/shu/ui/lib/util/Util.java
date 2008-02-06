@@ -95,6 +95,21 @@ public class Util {
 
 	}
 
+	public static String truncateString(String input, int maxLength) {
+		String noHTMLString = input.replaceAll("\\<.*?>", "");
+
+		if (maxLength < 3) {
+			maxLength = 3;
+		}
+
+		if (noHTMLString.length() > maxLength) {
+			noHTMLString = noHTMLString.substring(0, noHTMLString.length() - 3) + "...";
+
+		}
+		return noHTMLString;
+
+	}
+
 	public static Object cloneSerializable(Serializable obj) {
 		ObjectOutputStream out = null;
 		ObjectInputStream in = null;
