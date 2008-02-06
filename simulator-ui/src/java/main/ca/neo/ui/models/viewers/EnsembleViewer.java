@@ -1,5 +1,7 @@
 package ca.neo.ui.models.viewers;
 
+import java.security.InvalidParameterException;
+
 import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
 import ca.neo.model.Probeable;
@@ -25,6 +27,16 @@ public class EnsembleViewer extends NodeViewer {
 	 */
 	public EnsembleViewer(UIEnsemble ensembleUI) {
 		super(ensembleUI);
+	}
+
+	@Override
+	public void addNeoNode(UINeoNode node, boolean updateModel, boolean dropInCenterOfCamera,
+			boolean moveCamera) {
+		if (updateModel) {
+			throw new InvalidParameterException("Cannot dynamically add node to ensemble");
+		} else {
+			super.addNeoNode(node, updateModel, dropInCenterOfCamera, moveCamera);
+		}
 	}
 
 	@Override
@@ -63,8 +75,7 @@ public class EnsembleViewer extends NodeViewer {
 
 				addNeoNode(neuronUI, false, false, false);
 			} else {
-				UserMessages.showError("Unsupported node type "
-						+ node.getClass().getSimpleName()
+				UserMessages.showError("Unsupported node type " + node.getClass().getSimpleName()
 						+ " in EnsembleViewer");
 			}
 
@@ -74,8 +85,7 @@ public class EnsembleViewer extends NodeViewer {
 			/*
 			 * Construct probes
 			 */
-			Probe[] probes = getViewerParent().getParentNetwork()
-					.getSimulator().getProbes();
+			Probe[] probes = getViewerParent().getParentNetwork().getSimulator().getProbes();
 
 			for (Probe probe : probes) {
 				Probeable target = probe.getTarget();
@@ -84,8 +94,7 @@ public class EnsembleViewer extends NodeViewer {
 					UserMessages.showError("Unsupported target type for probe");
 				} else {
 
-					if (probe.isInEnsemble()
-							&& probe.getEnsembleName() == getModel().getName()) {
+					if (probe.isInEnsemble() && probe.getEnsembleName() == getModel().getName()) {
 						Node node = (Node) target;
 
 						UINeoNode nodeUI = getNode(node.getName());

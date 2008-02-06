@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JOptionPane;
 
+import ca.neo.config.ClassRegistry;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
@@ -11,6 +12,9 @@ import ca.neo.model.Probeable;
 import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.ui.actions.CreateModelAction;
+import ca.neo.ui.actions.CreateModelAdvancedAction;
+import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UINetwork;
@@ -19,6 +23,7 @@ import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.exceptions.UIException;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
@@ -89,8 +94,7 @@ public class NetworkViewer extends NodeViewer {
 	protected void removeNeoNode(UINeoNode nodeUI) {
 
 		try {
-			nodeUI.showPopupMessage("Node " + nodeUI.getName()
-					+ " removed from Network");
+			nodeUI.showPopupMessage("Node " + nodeUI.getName() + " removed from Network");
 			getNetwork().removeNode(nodeUI.getName());
 
 		} catch (StructuralException e) {
@@ -101,8 +105,8 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	public void addNeoNode(UINeoNode node, boolean updateModel,
-			boolean dropInCenterOfCamera, boolean moveCamera) {
+	public void addNeoNode(UINeoNode node, boolean updateModel, boolean dropInCenterOfCamera,
+			boolean moveCamera) {
 
 		if (updateModel) {
 			try {
@@ -117,7 +121,7 @@ public class NetworkViewer extends NodeViewer {
 		super.addNeoNode(node, updateModel, dropInCenterOfCamera, moveCamera);
 
 		if (updateModel) {
-			node.showPopupMessage("Node " + getName() + " added to Network");
+			node.showPopupMessage("Node " + node.getName() + " added to Network");
 		}
 	}
 
@@ -145,8 +149,32 @@ public class NetworkViewer extends NodeViewer {
 
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run", getViewerParent()));
-
 		
+		/*
+		 * Create new models
+		 */
+		menu.addSection("Add model");
+		MenuBuilder createNewMenu = menu.addSubMenu("Create new");
+
+		// Nodes
+		for (Class<?> element : UINeoNode.UI_NODE_CONFIGURABLE_TYPES) {
+			try {
+				if (UINeoNode.class.isAssignableFrom(element)) {
+					createNewMenu.addAction(new CreateModelAction(this, element));
+				}
+			} catch (UIException e) {
+				// swallow this, not all model types can be instantiated
+			}
+		}
+
+		MenuBuilder createAdvancedMenu = createNewMenu.addSubMenu("Other");
+		for (Class<?> element : ClassRegistry.getInstance().getRegisterableTypes()) {
+			if (Node.class.isAssignableFrom(element)) {
+				createAdvancedMenu.addAction(new CreateModelAdvancedAction(this, element));
+			}
+		}
+
+		menu.addAction(new OpenNeoFileAction(this));
 
 		/*
 		 * Origins & Terminations
@@ -201,8 +229,6 @@ public class NetworkViewer extends NodeViewer {
 		getGround().setElasticEnabled(false);
 		boolean enableElasticMode = layout.elasticModeEnabled();
 
-	
-
 		double startX = Double.MAX_VALUE;
 		double startY = Double.MAX_VALUE;
 		double endX = Double.MIN_VALUE;
@@ -242,8 +268,7 @@ public class NetworkViewer extends NodeViewer {
 		}
 
 		if (foundSavedPosition) {
-			PBounds fullBounds = new PBounds(startX, startY, endX - startX,
-					endY - startY);
+			PBounds fullBounds = new PBounds(startX, startY, endX - startX, endY - startY);
 			zoomToBounds(fullBounds, 700);
 		}
 
@@ -269,8 +294,7 @@ public class NetworkViewer extends NodeViewer {
 
 		NetworkViewerConfig layouts = getConfig();
 		if (layouts != null) {
-			NodeLayout nodeLayout = new NodeLayout(name, this, getGround()
-					.isElasticMode());
+			NodeLayout nodeLayout = new NodeLayout(name, this, getGround().isElasticMode());
 
 			layouts.addLayout(nodeLayout);
 		} else {
@@ -428,8 +452,7 @@ public class NetworkViewer extends NodeViewer {
 
 		@Override
 		protected void action() throws ActionException {
-			String name = JOptionPane.showInputDialog(UIEnvironment
-					.getInstance(), "Name");
+			String name = JOptionPane.showInputDialog(UIEnvironment.getInstance(), "Name");
 
 			if (name != null) {
 				saveNodeLayout(name);

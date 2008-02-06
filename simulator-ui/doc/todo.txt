@@ -28,15 +28,9 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Decrease minimum size for script console
+Adding nodes to an Ensemble should add it to the model as well
 
-What does NEO Stand for?
-
-Configuration ScrollPane dosen't scroll vertically
-
-Associate nodes with uiNodes
-
-
+Model event listener
 > Would it be possible to fire a generic event whenever the configuration of
 > the model changes? This would force a sync and re-draw of the UI Node when
 > any intrinsic property of the model is changed.
@@ -46,6 +40,14 @@ implement ca.neo.util.VisiblyMutable. I think this will do what you
 need, but let me know 1) if anything else is needed on the interface,
 2) if other nodes or model classes should also implement this (aside
 from ensemble).
+
+
+What does NEO Stand for?
+
+Configuration ScrollPane dosen't scroll vertically
+
+Associate nodes with uiNodes
+
 
 
 
