@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+02/06/2008 - Updated style of configuration pane
 02/06/2008 - Script Editor to open in new window
 02/06/2008 - Matlab exporter added
 02/06/2008 - Construct object menu, filter to show only Node
@@ -28,6 +29,7 @@
  Pri 0 - doing next
 *******************************************
 What does NEO Stand for?
+Invert the colors of the icons.
 
 What to do about script editor? Do we need both that and script console?
 How to fit the style of the configuration panel?

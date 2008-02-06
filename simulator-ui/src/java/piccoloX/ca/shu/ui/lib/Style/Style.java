@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Font;
 
 import javax.swing.JComponent;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
  * Style constants used by NEO Graphics
@@ -103,7 +104,13 @@ public class Style {
 	public static void applyStyle(Container item) {
 		item.setBackground(Style.COLOR_BACKGROUND);
 		item.setForeground(Style.COLOR_FOREGROUND);
-
+	}
+	
+	public static void applyStyle(DefaultTreeCellRenderer cellRenderer) {
+		cellRenderer.setBackgroundNonSelectionColor(Style.COLOR_BACKGROUND);
+		cellRenderer.setBackgroundSelectionColor(Style.COLOR_BACKGROUND2);
+		cellRenderer.setTextNonSelectionColor(Style.COLOR_FOREGROUND);
+		cellRenderer.setTextSelectionColor(Style.COLOR_FOREGROUND);
 	}
 
 	public static void applyMenuStyle(JComponent item, boolean isTitle) {

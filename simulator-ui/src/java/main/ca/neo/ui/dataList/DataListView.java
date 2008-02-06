@@ -66,12 +66,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
 		tree.setCellRenderer(treeRenderer);
 		// treeRenderer.setBackground(Style.COLOR_BACKGROUND);
-		treeRenderer.setBackgroundNonSelectionColor(Style.COLOR_BACKGROUND);
-		treeRenderer.setBackgroundSelectionColor(Style.COLOR_BACKGROUND2);
-		treeRenderer.setTextNonSelectionColor(Style.COLOR_FOREGROUND);
-		treeRenderer.setTextSelectionColor(Style.COLOR_FOREGROUND);
-
-		tree.setBackground(Style.COLOR_BACKGROUND);
+		Style.applyStyle(treeRenderer);
 
 		// tree.setEditable(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
