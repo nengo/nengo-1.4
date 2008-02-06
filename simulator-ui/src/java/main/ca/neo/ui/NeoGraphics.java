@@ -402,8 +402,8 @@ class ConfigurationPane {
 	public void configureObj(Object obj) {
 
 		ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
-		Style.applyStyle(configurationPane.getTree());
-		Style.applyStyle(configurationPane.getCellRenderer());
+		// Style.applyStyle(configurationPane.getTree());
+		// Style.applyStyle(configurationPane.getCellRenderer());
 		
 		String name;
 		if (obj instanceof Node) {

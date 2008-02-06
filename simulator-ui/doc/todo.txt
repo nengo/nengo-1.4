@@ -28,17 +28,13 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-What does NEO Stand for?
-Invert the colors of the icons.
+Decrease minimum size for script console
 
-What to do about script editor? Do we need both that and script console?
-How to fit the style of the configuration panel?
+What does NEO Stand for?
 
 Configuration ScrollPane dosen't scroll vertically
 
-
 Associate nodes with uiNodes
-
 
 
 > Would it be possible to fire a generic event whenever the configuration of

@@ -66,8 +66,8 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 	public boolean addActivity(PActivity arg0) {
 		boolean rtnValue = super.addActivity(arg0);
 
-		if (rtnValue) {
-			Util.Assert(false, "Could not add activity");
+		if (!rtnValue) {
+			Util.debugMsg("Could not add activity");
 		}
 
 		return rtnValue;

@@ -105,12 +105,13 @@ public class Style {
 		item.setBackground(Style.COLOR_BACKGROUND);
 		item.setForeground(Style.COLOR_FOREGROUND);
 	}
-	
+
 	public static void applyStyle(DefaultTreeCellRenderer cellRenderer) {
 		cellRenderer.setBackgroundNonSelectionColor(Style.COLOR_BACKGROUND);
 		cellRenderer.setBackgroundSelectionColor(Style.COLOR_BACKGROUND2);
 		cellRenderer.setTextNonSelectionColor(Style.COLOR_FOREGROUND);
 		cellRenderer.setTextSelectionColor(Style.COLOR_FOREGROUND);
+
 	}
 
 	public static void applyMenuStyle(JComponent item, boolean isTitle) {
