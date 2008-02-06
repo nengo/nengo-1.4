@@ -18,7 +18,6 @@ import java.util.jar.JarFile;
 
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 
 import org.python.util.PythonInterpreter;
 
@@ -402,7 +401,10 @@ class ConfigurationPane {
 
 	public void configureObj(Object obj) {
 
-		JScrollPane configurationPane = ConfigUtil.createConfigurationPane(obj);
+		ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
+		Style.applyStyle(configurationPane.getTree());
+		Style.applyStyle(configurationPane.getCellRenderer());
+		
 		String name;
 		if (obj instanceof Node) {
 			name = ((Node) obj).getName();
