@@ -116,7 +116,7 @@ public class AuxillarySplitPane extends JSplitPane {
 		/*
 		 * Create data viewer
 		 */
-		leftPanel.setMinimumSize(new Dimension(200, 200));
+		leftPanel.setMinimumSize(new Dimension(200, 100));
 
 		if (auxPanel != null) {
 			Style.applyStyle(auxPanel);
