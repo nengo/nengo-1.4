@@ -4,9 +4,11 @@ import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.PaintContext;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PUtil;
@@ -16,37 +18,32 @@ import edu.umd.cs.piccolo.util.PUtil;
  */
 public class PXNode extends PNode implements PiccoloNodeInWorld {
 	private static final long serialVersionUID = 1L;
-	public static final String PROPERTY_REMOVED_FROM_WORLD = "destroyed";
+
 	/**
 	 * The property name that identifies a change in this object's global
 	 * position
 	 */
 	public static final String PROPERTY_GLOBAL_BOUNDS = "globalBounds";
-
 	public static final String PROPERTY_PARENT_BOUNDS = "parentBounds";
+	public static final String PROPERTY_REMOVED_FROM_WORLD = "destroyed";
 
 	private long busyAnimatingUntilTime = 0;
-	private WorldObject worldObjectParent;
 
+	private WorldObject worldObjectParent;
 	public PXNode() {
 		super();
 
 		addPropertyChangeListener(PNode.PROPERTY_TRANSFORM, new TransformChangeListener());
 	}
 
-	/**
-	 * Listens for transform changes, and signals that the global bounds for
-	 * this object have changed
-	 * 
-	 * @author Shu Wu
-	 */
-	class TransformChangeListener implements PropertyChangeListener {
-
-		public void propertyChange(PropertyChangeEvent evt) {
-			signalGlobalBoundsChanged();
-
+	@Override
+	protected final void layoutChildren() {
+		/*
+		 * Delegate layout out children to the WorldObject
+		 */
+		if (worldObjectParent != null) {
+			worldObjectParent.layoutChildren();
 		}
-
 	}
 
 	@Override
@@ -61,13 +58,28 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 	}
 
 	@Override
-	protected final void layoutChildren() {
-		/*
-		 * Delegate layout out children to the WorldObject
-		 */
-		if (worldObjectParent != null) {
-			worldObjectParent.layoutChildren();
+	protected void parentBoundsChanged() {
+		firePropertyChange(0, PROPERTY_PARENT_BOUNDS, null, null);
+	}
+
+	@Override
+	public boolean addActivity(PActivity arg0) {
+		boolean rtnValue = super.addActivity(arg0);
+
+		if (rtnValue) {
+			Util.Assert(false, "Could not add activity");
 		}
+
+		return rtnValue;
+	}
+
+	@Override
+	public void addChild(int index, PNode child) {
+		super.addChild(index, child);
+		if (worldObjectParent != null && child != null && child instanceof PiccoloNodeInWorld) {
+			worldObjectParent.childAdded(((PiccoloNodeInWorld) child).getWorldObject());
+		}
+
 	}
 
 	/*
@@ -111,15 +123,6 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 		}
 	}
 
-	public void removeFromWorld() {
-		/*
-		 * Notify edges that this object has been destroyed
-		 */
-		signalGlobalBoundsChanged();
-		firePropertyChange(0, PROPERTY_REMOVED_FROM_WORLD, null, null);
-		removeFromParent();
-	}
-
 	public WorldObject getWorldObject() {
 		return worldObjectParent;
 	}
@@ -130,6 +133,26 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 		} else {
 			return true;
 		}
+	}
+
+	@Override
+	public PNode removeChild(int arg0) {
+		PNode node = super.removeChild(arg0);
+
+		if (worldObjectParent != null && node != null && node instanceof PiccoloNodeInWorld) {
+			worldObjectParent.childRemoved(((PiccoloNodeInWorld) node).getWorldObject());
+		}
+
+		return node;
+	}
+
+	public void removeFromWorld() {
+		/*
+		 * Notify edges that this object has been destroyed
+		 */
+		signalGlobalBoundsChanged();
+		firePropertyChange(0, PROPERTY_REMOVED_FROM_WORLD, null, null);
+		removeFromParent();
 	}
 
 	@Override
@@ -148,6 +171,11 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 	public void setVisible(boolean isVisible) {
 		super.setVisible(isVisible);
 		signalGlobalBoundsChanged();
+	}
+
+	public void setWorldObject(WorldObject worldObjectParent) {
+		this.worldObjectParent = worldObjectParent;
+
 	}
 
 	@Override
@@ -177,33 +205,18 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 
 	}
 
-	public void setWorldObject(WorldObject worldObjectParent) {
-		this.worldObjectParent = worldObjectParent;
+	/**
+	 * Listens for transform changes, and signals that the global bounds for
+	 * this object have changed
+	 * 
+	 * @author Shu Wu
+	 */
+	class TransformChangeListener implements PropertyChangeListener {
 
-	}
+		public void propertyChange(PropertyChangeEvent evt) {
+			signalGlobalBoundsChanged();
 
-	@Override
-	protected void parentBoundsChanged() {
-		firePropertyChange(0, PROPERTY_PARENT_BOUNDS, null, null);
-	}
-
-	@Override
-	public void addChild(int index, PNode child) {
-		super.addChild(index, child);
-		if (worldObjectParent != null && child != null && child instanceof PiccoloNodeInWorld) {
-			worldObjectParent.childAdded(((PiccoloNodeInWorld) child).getWorldObject());
 		}
 
-	}
-
-	@Override
-	public PNode removeChild(int arg0) {
-		PNode node = super.removeChild(arg0);
-
-		if (worldObjectParent != null && node != null && node instanceof PiccoloNodeInWorld) {
-			worldObjectParent.childRemoved(((PiccoloNodeInWorld) node).getWorldObject());
-		}
-
-		return node;
 	}
 }
