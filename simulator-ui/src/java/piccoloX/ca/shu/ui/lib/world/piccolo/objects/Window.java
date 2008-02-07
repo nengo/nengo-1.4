@@ -127,6 +127,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 	@Override
 	protected void prepareForDestroy() {
+		setWindowState(WindowState.MINIMIZED);
 		if (mySourceShadow != null) {
 			mySourceShadow.destroy();
 			mySourceShadow = null;
