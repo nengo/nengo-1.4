@@ -33,21 +33,30 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
+import org.apache.log4j.Logger;
 import org.python.util.PythonInterpreter;
 
 import ca.neo.config.JavaSourceParser;
 
 /**
- * A user interface panel for entering script commands. TODO: escape not working
- * all the time import defaults completion for arrays NO (need to catch
- * exception) default print getting documentation help (see qdox) static
- * completion
+ * A user interface panel for entering script commands. 
+ * 
+ * TODO: 
+ * - talk to Terry re directory defaults (to use with execfile)
+ * - escape not working all the time?
+ * - import defaults 
+ * - completion for arrays 
+ * - getting documentation help (see qdox) 
+ * - static completion; constructor completion
  * 
  * @author Bryan Tripp
  */
 public class ScriptConsole extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final Logger ourLogger = Logger.getLogger(ScriptConsole.class);
+	private static final String CURRENT_VARIABLE_NAME = "that";
 
 	public static final String COMMAND_STYLE = "command";
 	public static final String OUTPUT_STYLE = "output";
@@ -113,7 +122,7 @@ public class ScriptConsole extends JPanel {
 			Thread owThread = new Thread(ow);
 			owThread.start();
 		} catch (IOException e) {
-			e.printStackTrace();
+			ourLogger.error("Problem setting up console output", e);
 		}
 		initalized = true;
 	}
@@ -177,6 +186,13 @@ public class ScriptConsole extends JPanel {
 			myInterpreter.exec("del " + name);
 		}
 	}
+	
+	/**
+	 * @param o The object that is currently selected in the UI. 
+	 */
+	public void setCurrentObject(Object o) {
+		myInterpreter.set(CURRENT_VARIABLE_NAME, o);
+	}
 
 	/**
 	 * Sets initial focus (should be called from UI thread)
@@ -195,11 +211,9 @@ public class ScriptConsole extends JPanel {
 		try {
 			myDisplayArea.getDocument().insertString(myDisplayArea.getDocument().getLength(), text,
 					myStyleContext.getStyle(style));
-			myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength()); // scroll
-			// to
-			// end
+			myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength()); // scroll to end
 		} catch (BadLocationException e) {
-			e.printStackTrace();
+			ourLogger.warn("Scrolling problem", e);
 		}
 	}
 
@@ -208,6 +222,26 @@ public class ScriptConsole extends JPanel {
 	 */
 	public void clearCommand() {
 		myCommandField.setText("");
+	}
+	
+	/**
+	 * @return True iff the user is currently typing a string literal (ie is between single or double quotes)
+	 */
+	public boolean withinString() {
+		char[] typedTextToCaret = myTypedText.substring(0, myTypedCaretPosition).toCharArray();
+		int singles = 0;
+		int doubles = 0;
+		
+		for (int i = 0; i < typedTextToCaret.length; i++) {
+			if (typedTextToCaret[i] == '\'') singles++;
+			if (typedTextToCaret[i] == '"') doubles++;
+		}
+		
+		if (singles % 2 == 1 || doubles % 2 == 1) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -250,6 +284,7 @@ public class ScriptConsole extends JPanel {
 				myInterpreter.exec(text);
 			}
 		} catch (RuntimeException e) {
+			ourLogger.error("Runtime error in interpreter", e);
 			appendText(e.toString(), ERROR_STYLE);
 		}
 	}
@@ -263,7 +298,7 @@ public class ScriptConsole extends JPanel {
 			if (docs != null)
 				result = docs;
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			ourLogger.error("Class not found in help request", e);
 		}
 
 		return result;
@@ -382,33 +417,41 @@ public class ScriptConsole extends JPanel {
 		}
 
 		public void keyPressed(KeyEvent e) {
-			int code = e.getKeyCode();
-			if (code == 27 && myConsole.getInCallChainCompletionMode()) { // escape
-				myConsole.revertToTypedText();
-			} else if (code == 27) {
-				myConsole.clearCommand();
-			} else if (code == 9) { // tab
-				myConsole.setInCallChainCompletionMode(true);
-			} else if (code == 38) { // up arrow
-				myConsole.completorUp();
-			} else if (code == 40) { // down arrow
-				myConsole.completorDown();
-			} else {
-				myConsole.setInCallChainCompletionMode(false);
+			try {
+				int code = e.getKeyCode();
+				if (code == 27 && myConsole.getInCallChainCompletionMode()) { // escape
+					myConsole.revertToTypedText();
+				} else if (code == 27) {
+					myConsole.clearCommand();
+				} else if (code == 9) { // tab
+					myConsole.setInCallChainCompletionMode(true);
+				} else if (code == 38) { // up arrow
+					myConsole.completorUp();
+				} else if (code == 40) { // down arrow
+					myConsole.completorDown();
+				} else {
+					myConsole.setInCallChainCompletionMode(false);
+				}				
+			} catch (RuntimeException ex) {
+				ourLogger.warn("Exception while processing KeyEvent", ex);
 			}
 		}
 
 		public void keyReleased(KeyEvent e) {
-			int code = e.getKeyCode();
-			if (code != 38 && code != 40) {
-				myConsole.setTypedText();
-				if (code == 9)
-					myConsole.completorUp();
-			}
+			try {
+				int code = e.getKeyCode();
+				if (code != 38 && code != 40) {
+					myConsole.setTypedText();
+					if (code == 9)
+						myConsole.completorUp();
+				}
 
-			if (code == 46) { // .
-				myConsole.setInCallChainCompletionMode(true);
-			}
+				if (code == 46 && !myConsole.withinString()) { // .
+					myConsole.setInCallChainCompletionMode(true);
+				}				
+			} catch (RuntimeException ex) {
+				ourLogger.warn("Exception while processing KeyEvent", ex);
+			}			
 		}
 
 		public void keyTyped(KeyEvent e) {
@@ -452,7 +495,7 @@ public class ScriptConsole extends JPanel {
 						myConsole.appendText(String.valueOf(buffer, 0, charsRead), OUTPUT_STYLE);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				ourLogger.error("Problem writing to console", e);
 			}
 		}
 
