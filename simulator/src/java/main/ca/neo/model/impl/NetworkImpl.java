@@ -4,13 +4,13 @@
 package ca.neo.model.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configurable;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
@@ -25,13 +25,15 @@ import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
 import ca.neo.util.Configuration;
 import ca.neo.util.TimeSeries;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutableUtils;
 
 /**
  * Default implementation of Network. 
  *  
  * @author Bryan Tripp
  */
-public class NetworkImpl implements Network {
+public class NetworkImpl implements Network, VisiblyMutable {
 
 	public static final String DEFAULT_NAME = "Network";
 	
@@ -53,6 +55,8 @@ public class NetworkImpl implements Network {
 	private Map myExposedOriginNames;
 	private Map myExposedTerminationNames;
 	
+	private List<VisiblyMutable.Listener> myListeners;
+	
 	public NetworkImpl() {
 		myNodeMap = new HashMap<String, Node>(20);
 		myProjectionMap	= new HashMap(50);
@@ -66,6 +70,7 @@ public class NetworkImpl implements Network {
 		myExposedTerminationNames = new HashMap(10);
 		myMode = SimulationMode.DEFAULT;
 		myMetaData = new HashMap<String, Object>(20);
+		myListeners = new ArrayList<Listener>(10);
 	}
 	
 	/**
@@ -113,7 +118,8 @@ public class NetworkImpl implements Network {
 		
 		myNodeMap.put(node.getName(), node);
 		
-		getSimulator().initialize(this);
+		getSimulator().initialize(this);		
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -144,6 +150,7 @@ public class NetworkImpl implements Network {
 		}
 
 		getSimulator().initialize(this);		
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -162,6 +169,7 @@ public class NetworkImpl implements Network {
 		Projection result = new ProjectionImpl(origin, termination, this);
 		myProjectionMap.put(termination, result);
 		getSimulator().initialize(this);
+		fireVisibleChangeEvent();
 		
 		return result;
 	}
@@ -184,6 +192,7 @@ public class NetworkImpl implements Network {
 		}
 		
 		getSimulator().initialize(this);
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -199,6 +208,7 @@ public class NetworkImpl implements Network {
 	 */
 	public void setName(String name) {
 		myName = name;
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -272,6 +282,7 @@ public class NetworkImpl implements Network {
 	public void exposeOrigin(Origin origin, String name) {
 		myExposedOrigins.put(name, new OriginWrapper(this, origin, name));
 		myExposedOriginNames.put(origin, name);
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -282,6 +293,7 @@ public class NetworkImpl implements Network {
 		if (originWr != null) {
 			myExposedOriginNames.remove(originWr.myWrapped);
 		}
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -314,6 +326,7 @@ public class NetworkImpl implements Network {
 	public void exposeTermination(Termination termination, String name) {
 		myExposedTerminations.put(name, new TerminationWrapper(this, termination, name));
 		myExposedTerminationNames.put(termination, name);
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -324,6 +337,7 @@ public class NetworkImpl implements Network {
 		if (termination != null) {
 			myExposedTerminationNames.remove(termination.myWrapped);
 		}
+		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -497,6 +511,24 @@ public class NetworkImpl implements Network {
 			throw new RuntimeException("Metadata must be serializable");
 		}
 		myMetaData.put(key, value);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myListeners.remove(listener);
+	}
+	
+	private void fireVisibleChangeEvent() {
+		VisiblyMutableUtils.changed(this, myListeners);
 	}
 
 }
