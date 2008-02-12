@@ -1,79 +1,23 @@
 *******************************************
  Done
 *******************************************
-02/06/2008 - Updated style of configuration pane
-02/06/2008 - Script Editor to open in new window
-02/06/2008 - Matlab exporter added
-02/06/2008 - Construct object menu, filter to show only Node
-
-02/05/2008 - Configuration & Script Console integrated into NeoGraphics
-02/05/2008 - Advanced construct menu in NodeViewer uses NewConfigurableDialog 
-
-02/03/2008 - Data viewer integrated into NeoGraphics window
-02/03/2008 - Configuration action added to popup menus
-
-01/20/2008 - Inline search, use 'f' to start.
-01/12/2008 - Use ClassRegistry to register classes in plugins directory
-12/22/2007 - The Java Swing Frame's title is updated with the maximized Window's name
-12/22/2007 - Data List viewer recursively find data nodes and displays the correct number
-12/22/2007 - UpdateGraph() is called from Swing context to avoid synchronization problems 
-
-12/18/2007 - Elastic layout now works with animations
-12/18/2007 - Create graph from ElasticObject and Edge
-12/17/2007 - Spring Layout done
-12/17/2007 - New prettier window icons
-12/17/2007 - Sequential popup messages no longer overlap
-12/17/2007 - Connection code improved
+02/12/2008 - Script console now notified of current object, and top level network add/removes
+02/12/2008 - Hooked up listeners for VisiblyMutuble, however many changes are not reflected in UI yet (such as projection add/removes)
+02/12/2008 - Configuration panel opens in new window
 
 *******************************************
  Pri 0 - doing next
 *******************************************
 Nengo.ca links don't work in IE
 
-Model event listener
-> Would it be possible to fire a generic event whenever the configuration of
-> the model changes? This would force a sync and re-draw of the UI Node when
-> any intrinsic property of the model is changed.
+Projections are not updated in network yet, listener... 
+Only register top level networks (what about other types of nodes??
 
-Yes, no problem. Currently all the Ensemble implementations also
-implement ca.neo.util.VisiblyMutable. I think this will do what you
-need, but let me know 1) if anything else is needed on the interface,
-2) if other nodes or model classes should also implement this (aside
-from ensemble).
+Script console having problem with network with spaces in names.
 
-
-
-
-
-
-
-
-Notification listener of node changes
-	Need it for the general case 
 
 Drag and drop UINeoNodes between networks (worlds)
 
-Integrate data list viewer as pane in NeoGraphics
-
-Add weak reference to UI Nodes from DataListView
-	Support feature such as focus on node (check node.isDestroyed && node is not hidden)
-
-
-Request:
-	ConfigurationImpl is not serializable, breaks the serialization of TimeSeries
-	
-	Create a test which creates a Network via UI and compares results
-		are results deterministic?
-
-
-Add graph updated notificatier so that listeners may know when the graph 
-	has been changed from another thread
-	
-	
-Transient messages should not fall off the screen
-	reference tooltips code
-Transient messages should follow the objects
-	reference tooltips code
 
 Reversable actions
 	Aggregate actions: actions can be chained, and this chain undone.
@@ -134,6 +78,30 @@ Event notifications from Models
 *******************************************
  Previously Done
 *******************************************
+02/06/2008 - Updated style of configuration pane
+02/06/2008 - Script Editor to open in new window
+02/06/2008 - Matlab exporter added
+02/06/2008 - Construct object menu, filter to show only Node
+
+02/05/2008 - Configuration & Script Console integrated into NeoGraphics
+02/05/2008 - Advanced construct menu in NodeViewer uses NewConfigurableDialog 
+
+02/03/2008 - Data viewer integrated into NeoGraphics window
+02/03/2008 - Configuration action added to popup menus
+
+01/20/2008 - Inline search, use 'f' to start.
+01/12/2008 - Use ClassRegistry to register classes in plugins directory
+12/22/2007 - The Java Swing Frame's title is updated with the maximized Window's name
+12/22/2007 - Data List viewer recursively find data nodes and displays the correct number
+12/22/2007 - UpdateGraph() is called from Swing context to avoid synchronization problems 
+
+12/18/2007 - Elastic layout now works with animations
+12/18/2007 - Create graph from ElasticObject and Edge
+12/17/2007 - Spring Layout done
+12/17/2007 - New prettier window icons
+12/17/2007 - Sequential popup messages no longer overlap
+12/17/2007 - Connection code improved
+
 12/15/07 - Updated menu styles, Improved Windowing behavior when overlapped, Aesthetic improvements
 12/15/07 - Support saving/opening of any NEO Node
 12/15/07 - Expose Origin and Expose Termination.

@@ -11,7 +11,6 @@ import javax.swing.JPopupMenu;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.handlers.EventConsumer;
@@ -110,8 +109,8 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 		addInputEventListener(new MenuBarHandler());
 
-		addPropertyChangeListener(EventType.PARENTS_BOUNDS, new EventListener() {
-			public void propertyChanged(EventType event) {
+		addPropertyChangeListener(Property.PARENTS_BOUNDS, new Listener() {
+			public void propertyChanged(Property event) {
 				if (myState == WindowState.MAXIMIZED) {
 					maximizeBounds();
 				}

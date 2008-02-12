@@ -13,7 +13,18 @@ public interface WorldObject extends NamedObject, Destroyable {
 
 	public void addChild(WorldObject wo);
 
-	public void addPropertyChangeListener(EventType event, EventListener listener);
+	public interface Listener {
+		public void propertyChanged(Property event);
+	}
+	public interface ChildListener {
+		public void childAdded(WorldObject wo);
+		public void childRemoved(WorldObject wo);
+	}
+
+	public void addPropertyChangeListener(Property event, Listener listener);
+
+	public void addChildListener(ChildListener listener);
+	public void removeChildListener(ChildListener listener);
 
 	/**
 	 * Sets the rotation of this nodes transform in radians. This will affect
@@ -394,7 +405,7 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 */
 	public void removeFromParent();
 
-	public void removePropertyChangeListener(EventType event, EventListener listener);
+	public void removePropertyChangeListener(Property event, Listener listener);
 
 	/**
 	 * Mark the area on the screen represented by this nodes full bounds as
@@ -519,7 +530,7 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 */
 	public void translate(double dx, double dy);
 
-	public enum EventType {
+	public enum Property {
 		CHILDREN_CHANGED, PARENTS_CHANGED, BOUNDS_CHANGED, REMOVED_FROM_WORLD, FULL_BOUNDS, GLOBAL_BOUNDS, MODEL_CHANGED, PARENTS_BOUNDS, VIEW_TRANSFORM, WIDGET
 	}
 

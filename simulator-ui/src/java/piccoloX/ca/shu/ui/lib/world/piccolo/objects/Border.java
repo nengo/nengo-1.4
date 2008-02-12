@@ -3,7 +3,7 @@ package ca.shu.ui.lib.world.piccolo.objects;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 
-import ca.shu.ui.lib.world.EventListener;
+import ca.shu.ui.lib.world.WorldObject.Listener;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.Path;
 
@@ -12,7 +12,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Path;
  * 
  * @author Shu Wu
  */
-public class Border extends WorldObjectImpl implements EventListener {
+public class Border extends WorldObjectImpl implements Listener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,7 +39,7 @@ public class Border extends WorldObjectImpl implements EventListener {
 
 		addChild(myFrame);
 
-		myTarget.addPropertyChangeListener(EventType.BOUNDS_CHANGED, this);
+		myTarget.addPropertyChangeListener(Property.BOUNDS_CHANGED, this);
 
 		updateBorder();
 	}
@@ -49,7 +49,7 @@ public class Border extends WorldObjectImpl implements EventListener {
 		/*
 		 * Remove listener from target
 		 */
-		myTarget.removePropertyChangeListener(EventType.BOUNDS_CHANGED, this);
+		myTarget.removePropertyChangeListener(Property.BOUNDS_CHANGED, this);
 
 		super.prepareForDestroy();
 	}
@@ -69,7 +69,7 @@ public class Border extends WorldObjectImpl implements EventListener {
 		}
 	}
 
-	public void propertyChanged(EventType event) {
+	public void propertyChanged(Property event) {
 		updateBorder();
 	}
 

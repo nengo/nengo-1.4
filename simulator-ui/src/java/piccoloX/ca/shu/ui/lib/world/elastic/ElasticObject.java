@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.world.Destroyable;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.WorldLayer;
-import ca.shu.ui.lib.world.WorldObject.EventType;
+import ca.shu.ui.lib.world.WorldObject.Listener;
+import ca.shu.ui.lib.world.WorldObject.Property;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.Path;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
@@ -52,16 +52,16 @@ public class ElasticObject extends WorldObjectImpl {
 
 	private void init() {
 
-		addPropertyChangeListener(EventType.PARENTS_CHANGED, new EventListener() {
-			public void propertyChanged(EventType event) {
+		addPropertyChangeListener(Property.PARENTS_CHANGED, new Listener() {
+			public void propertyChanged(Property event) {
 				if (getParent() instanceof ElasticGround) {
 					elasticGround = (ElasticGround) getParent();
 				}
 			}
 		});
 
-		addPropertyChangeListener(EventType.BOUNDS_CHANGED, new EventListener() {
-			public void propertyChanged(EventType event) {
+		addPropertyChangeListener(Property.BOUNDS_CHANGED, new Listener() {
+			public void propertyChanged(Property event) {
 				recalculateRepulsionRange();
 			}
 		});
@@ -204,7 +204,7 @@ public class ElasticObject extends WorldObjectImpl {
 
 }
 
-class Anchor implements Destroyable, EventListener {
+class Anchor implements Destroyable, Listener {
 	private ElasticObject obj;
 	private Path border;
 	private Path line;
@@ -228,8 +228,8 @@ class Anchor implements Destroyable, EventListener {
 		ground.addChild(line);
 		ground.addChild(border);
 		updateBounds();
-		obj.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD, this);
-		obj.addPropertyChangeListener(EventType.GLOBAL_BOUNDS, this);
+		obj.addPropertyChangeListener(Property.REMOVED_FROM_WORLD, this);
+		obj.addPropertyChangeListener(Property.GLOBAL_BOUNDS, this);
 	}
 
 	private boolean destroyed;
@@ -239,8 +239,8 @@ class Anchor implements Destroyable, EventListener {
 			line.destroy();
 			border.destroy();
 			destroyed = true;
-			obj.removePropertyChangeListener(EventType.REMOVED_FROM_WORLD, this);
-			obj.removePropertyChangeListener(EventType.GLOBAL_BOUNDS, this);
+			obj.removePropertyChangeListener(Property.REMOVED_FROM_WORLD, this);
+			obj.removePropertyChangeListener(Property.GLOBAL_BOUNDS, this);
 		}
 	}
 
@@ -269,10 +269,10 @@ class Anchor implements Destroyable, EventListener {
 		}
 	}
 
-	public void propertyChanged(EventType event) {
-		if (event == EventType.REMOVED_FROM_WORLD) {
+	public void propertyChanged(Property event) {
+		if (event == Property.REMOVED_FROM_WORLD) {
 			destroy();
-		} else if (event == EventType.GLOBAL_BOUNDS) {
+		} else if (event == Property.GLOBAL_BOUNDS) {
 			updateBounds();
 		}
 	}

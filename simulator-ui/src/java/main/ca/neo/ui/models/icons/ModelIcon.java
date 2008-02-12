@@ -1,8 +1,8 @@
 package ca.neo.ui.models.icons;
 
 import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.WorldObject.Listener;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.Text;
 
@@ -12,7 +12,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Text;
  * 
  * @author Shu Wu
  */
-public class ModelIcon extends WorldObjectImpl implements EventListener {
+public class ModelIcon extends WorldObjectImpl implements Listener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -56,12 +56,12 @@ public class ModelIcon extends WorldObjectImpl implements EventListener {
 		updateLabel();
 		addChild(label);
 
-		parent.addPropertyChangeListener(EventType.MODEL_CHANGED, this);
+		parent.addPropertyChangeListener(Property.MODEL_CHANGED, this);
 
 		/*
 		 * The bounds of this object matches those of the real icon
 		 */
-		iconReal.addPropertyChangeListener(EventType.FULL_BOUNDS, this);
+		iconReal.addPropertyChangeListener(Property.FULL_BOUNDS, this);
 		updateBounds();
 	}
 
@@ -169,11 +169,11 @@ public class ModelIcon extends WorldObjectImpl implements EventListener {
 		}
 	}
 
-	public void propertyChanged(EventType event) {
+	public void propertyChanged(Property event) {
 
-		if (event == EventType.FULL_BOUNDS) {
+		if (event == Property.FULL_BOUNDS) {
 			updateBounds();
-		} else if (event == EventType.MODEL_CHANGED) {
+		} else if (event == Property.MODEL_CHANGED) {
 			modelUpdated();
 		}
 	}

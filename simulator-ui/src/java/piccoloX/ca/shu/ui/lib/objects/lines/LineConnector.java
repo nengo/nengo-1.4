@@ -10,11 +10,11 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.DroppableX;
-import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
-import ca.shu.ui.lib.world.WorldObject.EventType;
+import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.WorldObject.Listener;
+import ca.shu.ui.lib.world.WorldObject.Property;
 import ca.shu.ui.lib.world.elastic.ElasticEdge;
 import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
@@ -53,7 +53,7 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 		setBounds(parentToLocal(getFullBounds()));
 		setChildrenPickable(false);
 		myDestroyListener = new DestroyListener(this);
-		myWell.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD, myDestroyListener);
+		myWell.addPropertyChangeListener(Property.REMOVED_FROM_WORLD, myDestroyListener);
 
 	}
 
@@ -122,7 +122,7 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 	@Override
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
-		myWell.removePropertyChangeListener(EventType.REMOVED_FROM_WORLD, myDestroyListener);
+		myWell.removePropertyChangeListener(Property.REMOVED_FROM_WORLD, myDestroyListener);
 	}
 
 	/**
@@ -222,7 +222,7 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
  * 
  * @author Shu Wu
  */
-class DestroyListener implements EventListener {
+class DestroyListener implements Listener {
 	private LineConnector parent;
 
 	public DestroyListener(LineConnector parent) {
@@ -230,7 +230,7 @@ class DestroyListener implements EventListener {
 		this.parent = parent;
 	}
 
-	public void propertyChanged(EventType event) {
+	public void propertyChanged(Property event) {
 		parent.destroy();
 	}
 }

@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.WorldSky;
-import ca.shu.ui.lib.world.WorldObject.EventType;
+import ca.shu.ui.lib.world.WorldObject.Listener;
+import ca.shu.ui.lib.world.WorldObject.Property;
 import ca.shu.ui.lib.world.piccolo.primitives.Path;
 
 /**
@@ -19,7 +19,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Path;
  * 
  * @author Shu Wu
  */
-public class SelectionBorder implements EventListener {
+public class SelectionBorder implements Listener {
 	private Path frame;
 
 	private Color frameColor = Style.COLOR_BORDER_SELECTED;
@@ -61,7 +61,7 @@ public class SelectionBorder implements EventListener {
 		frame = Path.createRectangle(0f, 0f, 1f, 1f);
 		frame.setPickable(false);
 
-		frameHolder.addPropertyChangeListener(EventType.VIEW_TRANSFORM, this);
+		frameHolder.addPropertyChangeListener(Property.VIEW_TRANSFORM, this);
 
 		frameHolder.addChild(frame);
 	}
@@ -92,7 +92,7 @@ public class SelectionBorder implements EventListener {
 		setSelected(null);
 
 		frameHolder
-				.removePropertyChangeListener(EventType.VIEW_TRANSFORM, this);
+				.removePropertyChangeListener(Property.VIEW_TRANSFORM, this);
 	}
 
 	public Color getFrameColor() {
@@ -110,10 +110,10 @@ public class SelectionBorder implements EventListener {
 		}
 
 		if (selectedObj != null) {
-			selectedObj.removePropertyChangeListener(EventType.GLOBAL_BOUNDS,
+			selectedObj.removePropertyChangeListener(Property.GLOBAL_BOUNDS,
 					this);
 			selectedObj.removePropertyChangeListener(
-					EventType.REMOVED_FROM_WORLD, this);
+					Property.REMOVED_FROM_WORLD, this);
 			selectedObj = null;
 		}
 
@@ -121,8 +121,8 @@ public class SelectionBorder implements EventListener {
 		if (selectedObj != null) {
 
 			selectedObj
-					.addPropertyChangeListener(EventType.GLOBAL_BOUNDS, this);
-			selectedObj.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD,
+					.addPropertyChangeListener(Property.GLOBAL_BOUNDS, this);
+			selectedObj.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
 					this);
 
 			frameHolder.addChild(frame);
@@ -134,8 +134,8 @@ public class SelectionBorder implements EventListener {
 
 	}
 
-	public void propertyChanged(EventType event) {
-		if (event == EventType.REMOVED_FROM_WORLD) {
+	public void propertyChanged(Property event) {
+		if (event == Property.REMOVED_FROM_WORLD) {
 			setSelected(null);
 		}
 		updateBounds();

@@ -70,7 +70,7 @@ class SearchBox extends WorldObjectImpl {
 	}
 
 	private void focusOnSearchResult(int resultIndex) {
-		if (resultIndex >= searchResults.length || resultIndex < 0) {
+		if ((searchResults == null) || (resultIndex >= searchResults.length || resultIndex < 0)) {
 			/*
 			 * Result is out of bounds
 			 */

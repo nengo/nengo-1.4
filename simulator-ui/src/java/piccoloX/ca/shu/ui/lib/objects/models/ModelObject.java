@@ -8,7 +8,6 @@ import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.activities.Pulsator;
@@ -37,7 +36,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * Property Listener which listens to changes of the Icon's bounds and
 	 * updates this node bounds accordingly
 	 */
-	private EventListener iconPropertyChangeListener;
+	private Listener iconPropertyChangeListener;
 
 	private boolean isModelBusy = false;
 
@@ -86,6 +85,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
 		setModelBusy(false);
+		setModel(null);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	protected void setIcon(WorldObject newIcon) {
 		if (icon != null) {
-			icon.removePropertyChangeListener(EventType.BOUNDS_CHANGED, iconPropertyChangeListener);
+			icon.removePropertyChangeListener(Property.BOUNDS_CHANGED, iconPropertyChangeListener);
 			icon.removeFromParent();
 		}
 
@@ -102,15 +102,15 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 
 		addChild(icon, 0);
 
-		iconPropertyChangeListener = new EventListener() {
-			public void propertyChanged(EventType event) {
+		iconPropertyChangeListener = new Listener() {
+			public void propertyChanged(Property event) {
 				setBounds(icon.getBounds());
 			}
 
 		};
 		setBounds(icon.getBounds());
 
-		icon.addPropertyChangeListener(EventType.BOUNDS_CHANGED, iconPropertyChangeListener);
+		icon.addPropertyChangeListener(Property.BOUNDS_CHANGED, iconPropertyChangeListener);
 
 	}
 
@@ -184,7 +184,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	public void setModel(Object model) {
 		this.model = model;
-		firePropertyChange(EventType.MODEL_CHANGED);
+		firePropertyChange(Property.MODEL_CHANGED);
 	}
 
 	/**
@@ -233,7 +233,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	/**
 	 * Updates the UI from the model
 	 */
-	public final void updateModel() {
+	public final void updateViewFromModel() {
 		if (getModel() != null) {
 			setModel(getModel());
 		}

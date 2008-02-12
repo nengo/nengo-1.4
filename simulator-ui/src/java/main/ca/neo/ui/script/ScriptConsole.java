@@ -39,15 +39,10 @@ import org.python.util.PythonInterpreter;
 import ca.neo.config.JavaSourceParser;
 
 /**
- * A user interface panel for entering script commands. 
- * 
- * TODO: 
- * - talk to Terry re directory defaults (to use with execfile)
- * - escape not working all the time?
- * - import defaults 
- * - completion for arrays 
- * - getting documentation help (see qdox) 
- * - static completion; constructor completion
+ * A user interface panel for entering script commands. TODO: - talk to Terry re
+ * directory defaults (to use with execfile) - escape not working all the time? -
+ * import defaults - completion for arrays - getting documentation help (see
+ * qdox) - static completion; constructor completion
  * 
  * @author Bryan Tripp
  */
@@ -72,7 +67,6 @@ public class ScriptConsole extends JPanel {
 	private String myTypedText;
 	private int myTypedCaretPosition;
 	private StyleContext myStyleContext;
-	private boolean initalized = false;
 	private JSeparator seperator;
 	private Style rootStyle;
 	private Style commandStyle;
@@ -87,7 +81,6 @@ public class ScriptConsole extends JPanel {
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
 		myDisplayArea.setMargin(new Insets(5, 5, 5, 5));
-		initStyles();
 
 		myCommandField = new JTextField();
 
@@ -124,15 +117,8 @@ public class ScriptConsole extends JPanel {
 		} catch (IOException e) {
 			ourLogger.error("Problem setting up console output", e);
 		}
-		initalized = true;
-	}
 
-	@Override
-	public void setBackground(Color fg) {
-		super.setBackground(fg);
-		if (initalized) {
-			setChildrenBackground(fg);
-		}
+		initStyles();
 	}
 
 	private void setChildrenBackground(Color fg) {
@@ -144,27 +130,26 @@ public class ScriptConsole extends JPanel {
 		myDisplayArea.setForeground(fg);
 		myCommandField.setForeground(fg);
 		seperator.setForeground(fg);
-		StyleConstants.setForeground(rootStyle, fg);
-		StyleConstants.setForeground(commandStyle, fg);
-	}
-
-	@Override
-	public void setForeground(Color fg) {
-		super.setForeground(fg);
-		if (initalized) {
-			setChildrenForeground(fg);
-		}
 	}
 
 	private void initStyles() {
 		myStyleContext = new StyleContext();
 		rootStyle = myStyleContext.addStyle("root", null);
+		StyleConstants.setForeground(rootStyle, ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
+
+		setChildrenBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
+		setChildrenForeground(ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
+
 		commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
+		StyleConstants.setForeground(commandStyle, ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
 		StyleConstants.setItalic(commandStyle, true);
 		Style outputStyle = myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
 		StyleConstants.setForeground(outputStyle, Color.GRAY);
 		Style errorStyle = myStyleContext.addStyle(ERROR_STYLE, rootStyle);
 		StyleConstants.setForeground(errorStyle, Color.RED);
+
+		Style helpStyle = myStyleContext.addStyle(HELP_STYLE, rootStyle);
+		StyleConstants.setForeground(helpStyle, ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
 	}
 
 	/**
@@ -186,9 +171,10 @@ public class ScriptConsole extends JPanel {
 			myInterpreter.exec("del " + name);
 		}
 	}
-	
+
 	/**
-	 * @param o The object that is currently selected in the UI. 
+	 * @param o
+	 *            The object that is currently selected in the UI.
 	 */
 	public void setCurrentObject(Object o) {
 		myInterpreter.set(CURRENT_VARIABLE_NAME, o);
@@ -211,7 +197,9 @@ public class ScriptConsole extends JPanel {
 		try {
 			myDisplayArea.getDocument().insertString(myDisplayArea.getDocument().getLength(), text,
 					myStyleContext.getStyle(style));
-			myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength()); // scroll to end
+			myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength()); // scroll
+			// to
+			// end
 		} catch (BadLocationException e) {
 			ourLogger.warn("Scrolling problem", e);
 		}
@@ -223,20 +211,23 @@ public class ScriptConsole extends JPanel {
 	public void clearCommand() {
 		myCommandField.setText("");
 	}
-	
+
 	/**
-	 * @return True iff the user is currently typing a string literal (ie is between single or double quotes)
+	 * @return True iff the user is currently typing a string literal (ie is
+	 *         between single or double quotes)
 	 */
 	public boolean withinString() {
 		char[] typedTextToCaret = myTypedText.substring(0, myTypedCaretPosition).toCharArray();
 		int singles = 0;
 		int doubles = 0;
-		
+
 		for (int i = 0; i < typedTextToCaret.length; i++) {
-			if (typedTextToCaret[i] == '\'') singles++;
-			if (typedTextToCaret[i] == '"') doubles++;
+			if (typedTextToCaret[i] == '\'')
+				singles++;
+			if (typedTextToCaret[i] == '"')
+				doubles++;
 		}
-		
+
 		if (singles % 2 == 1 || doubles % 2 == 1) {
 			return true;
 		} else {
@@ -431,7 +422,7 @@ public class ScriptConsole extends JPanel {
 					myConsole.completorDown();
 				} else {
 					myConsole.setInCallChainCompletionMode(false);
-				}				
+				}
 			} catch (RuntimeException ex) {
 				ourLogger.warn("Exception while processing KeyEvent", ex);
 			}
@@ -448,10 +439,10 @@ public class ScriptConsole extends JPanel {
 
 				if (code == 46 && !myConsole.withinString()) { // .
 					myConsole.setInCallChainCompletionMode(true);
-				}				
+				}
 			} catch (RuntimeException ex) {
 				ourLogger.warn("Exception while processing KeyEvent", ex);
-			}			
+			}
 		}
 
 		public void keyTyped(KeyEvent e) {

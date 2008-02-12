@@ -42,6 +42,8 @@ import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.neo.util.Probe;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutable.Event;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -196,8 +198,8 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		super.constructTooltips(tooltips);
 
 		if (getModel().getDocumentation() != null) {
-			tooltips.addProperty("Documentation", Util.truncateString(getModel().getDocumentation(),
-					100));
+			tooltips.addProperty("Documentation", Util.truncateString(
+					getModel().getDocumentation(), 100));
 		}
 		tooltips.addProperty("Simulation mode", getModel().getMode().toString());
 
@@ -434,12 +436,10 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 */
 	@SuppressWarnings("unchecked")
 	public void hideAllOandT() {
-
 		for (WorldObject wo : getChildren()) {
 			if (wo instanceof Widget && (wo instanceof UITermination || wo instanceof UIOrigin)) {
 				((Widget) wo).setWidgetVisible(false);
 			}
-
 		}
 		layoutChildren();
 	}
@@ -748,5 +748,36 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 		}
 
+	}
+
+	private VisiblyMutable.Listener visiblyMutableListener = new VisiblyMutable.Listener() {
+
+		public void changed(Event e) {
+			
+		}
+	};
+
+	@Override
+	public void setModel(Object model) {
+		//
+		// Remove listener from the current model
+		//
+		if (getModel() != null) {
+			if (getModel() instanceof VisiblyMutable) {
+				VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
+
+				Util.Assert(visiblyMutableListener != null);
+				visiblyMutable.removeChangeListener(visiblyMutableListener);
+			}
+		}
+
+		super.setModel(model);
+
+		if (model != null) {
+			if (model instanceof VisiblyMutable) {
+				VisiblyMutable visiblyMutable = (VisiblyMutable) model;
+				visiblyMutable.addChangeListener(visiblyMutableListener);
+			}
+		}
 	}
 }

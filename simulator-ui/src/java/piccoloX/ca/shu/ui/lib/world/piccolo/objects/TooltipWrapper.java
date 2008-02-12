@@ -4,14 +4,14 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.WorldSky;
+import ca.shu.ui.lib.world.WorldObject.Listener;
 import ca.shu.ui.lib.world.activities.Fader;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.activities.PActivity;
 
-public class TooltipWrapper extends WorldObjectImpl implements EventListener {
+public class TooltipWrapper extends WorldObjectImpl implements Listener {
 
 	private static final long serialVersionUID = 1L;
 	private PActivity fadeInActivity, fadeInPhase2Activity;
@@ -47,9 +47,9 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 		/*
 		 * The tooltip will follow where the object it's attached to goes
 		 */
-		tooltip.addPropertyChangeListener(EventType.BOUNDS_CHANGED, this);
-		parent.addPropertyChangeListener(EventType.VIEW_TRANSFORM, this);
-		target.addPropertyChangeListener(EventType.FULL_BOUNDS, this);
+		tooltip.addPropertyChangeListener(Property.BOUNDS_CHANGED, this);
+		parent.addPropertyChangeListener(Property.VIEW_TRANSFORM, this);
+		target.addPropertyChangeListener(Property.FULL_BOUNDS, this);
 		updatePosition();
 	}
 
@@ -98,9 +98,9 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 
 	@Override
 	protected void prepareForDestroy() {
-		tooltip.removePropertyChangeListener(EventType.BOUNDS_CHANGED, this);
-		parent.removePropertyChangeListener(EventType.VIEW_TRANSFORM, this);
-		target.removePropertyChangeListener(EventType.FULL_BOUNDS, this);
+		tooltip.removePropertyChangeListener(Property.BOUNDS_CHANGED, this);
+		parent.removePropertyChangeListener(Property.VIEW_TRANSFORM, this);
+		target.removePropertyChangeListener(Property.FULL_BOUNDS, this);
 	}
 
 	/**
@@ -156,8 +156,8 @@ public class TooltipWrapper extends WorldObjectImpl implements EventListener {
 	 * Listens for position changes of the target, and view changes of the sky
 	 * which this tooltip is attached to.(non-Javadoc)
 	 */
-	public void propertyChanged(EventType event) {
-		if (event == EventType.BOUNDS_CHANGED) {
+	public void propertyChanged(Property event) {
+		if (event == Property.BOUNDS_CHANGED) {
 			updateBounds();
 		} else {
 			updatePosition();

@@ -47,10 +47,14 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.UIEnvironment;
+import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.WorldObject.Property;
+import ca.shu.ui.lib.world.handlers.SelectionHandler;
 import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 
 /**
@@ -62,12 +66,14 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
  * @author User
  */
 public class NeoGraphics extends AppFrame implements INodeContainer {
+	private static final String APP_NAME = "NEO Graphics V1 Beta";
+
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
 	 */
-	public static final String ABOUT = "NEO Graphics<BR><BR>"
+	public static final String ABOUT = APP_NAME + "<BR><BR>"
 			+ "(c) Copyright Center for Theoretical Neuroscience 2007.  All rights reserved<BR>"
 			+ "Visit http://ctn.uwaterloo.ca/<BR>"
 			+ "<BR> User Interface by Shu Wu (shuwu83@gmail.com)";
@@ -105,6 +111,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	private ConfigurationPane configPane;
 
 	private AuxillarySplitPane dataViewerPane;
+
+	private ScriptConsole scriptConsole;
 
 	private AuxillarySplitPane scriptConsolePane;
 
@@ -232,6 +240,64 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		 * Set up Environment variables
 		 */
 		Environment.setUserInterface(true);
+
+		/*
+		 * Attach listeners for Script Console
+		 */
+		initScriptConsoleListeners();
+
+	}
+
+	private void initScriptConsoleListeners() {
+		SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
+
+			public void singleObjectSelected(WorldObject obj) {
+				while (obj != null && !(obj instanceof ModelObject)) {
+					obj = obj.getParent();
+				}
+
+				if (obj != null) {
+					Object model = ((ModelObject)obj).getModel();
+					scriptConsole.setCurrentObject(model);
+				}
+			}
+		});
+
+		getWorld().getGround().addChildListener(new WorldObject.ChildListener() {
+
+			public void childAdded(WorldObject wo) {
+				if (wo instanceof UINetwork) {
+					final UINetwork networkUI = ((UINetwork) wo);
+					final Network network = networkUI.getModel();
+
+					try {
+						scriptConsole.addVariable(network.getName(), network);
+
+						networkUI.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
+								new WorldObject.Listener() {
+									public void propertyChanged(Property event) {
+										scriptConsole.removeVariable(network.getName());
+										networkUI.removePropertyChangeListener(
+												Property.REMOVED_FROM_WORLD, this);
+									}
+								});
+
+					} catch (Exception e) {
+						UserMessages.showError("Error adding network: " + e.getMessage());
+					}
+				}
+			}
+
+			public void childRemoved(WorldObject wo) {
+				/*
+				 * Do nothing here. We don't remove the variable here directly
+				 * because the network has already been destroyed and no longer
+				 * has a reference to it's model.
+				 */
+			}
+
+		});
+
 	}
 
 	@Override
@@ -239,7 +305,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		splitPanes = new ArrayList<AuxillarySplitPane>();
 		simulationData = new SimulatorDataModel();
 
-		ScriptConsole scriptConsole = new ScriptConsole(new PythonInterpreter());
+		scriptConsole = new ScriptConsole(new PythonInterpreter());
 		Style.applyStyle(scriptConsole);
 
 		/*
@@ -336,7 +402,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	@Override
 	public String getAppName() {
-		return "NEO Graphics";
+		return APP_NAME;
 	}
 
 	public String getAppWindowTitle() {

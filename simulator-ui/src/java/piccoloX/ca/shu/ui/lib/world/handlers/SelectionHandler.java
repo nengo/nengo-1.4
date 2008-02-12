@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -72,12 +73,24 @@ import edu.umd.cs.piccolox.event.PNotificationCenter;
  */
 public class SelectionHandler extends PDragSequenceEventHandler {
 
+	private static HashSet<SelectionListener> selectionListeners = new HashSet<SelectionListener>();
+
 	public static final String SELECTION_CHANGED_NOTIFICATION = "SELECTION_CHANGED_NOTIFICATION";
-
 	public static final String SELECTION_HANDLER_FRAME_ATTR = "SelHandlerFrame";
-	final static int DASH_WIDTH = 5;
 
+	final static int DASH_WIDTH = 5;
 	final static int NUM_STROKES = 10;
+	public static void addSelectionListener(SelectionListener listener) {
+		selectionListeners.add(listener);
+	}
+	public static void removeSelectionListener(SelectionListener listener) {
+		selectionListeners.remove(listener);
+	}
+	public static void singleObjectSelected(WorldObject obj) {
+		for (SelectionListener listener : selectionListeners) {
+			listener.singleObjectSelected(obj);
+		}
+	}
 	private HashMap<WorldObjectImpl, Boolean> allItems = null; // Used within
 	// drag
 	private Point2D canvasPressPt = null;
@@ -95,13 +108,21 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	// as
 	private Paint marqueeStrokePaint;
 	private WorldObjectImpl pressNode = null; // Node pressed on (or null if
+
 	// none)
 	// a
 	// child
 	private Point2D presspt = null;
+
 	// selection
 	private WorldGroundImpl selectableParent = null; // List of nodes whose
+
 	private HashMap<WorldObjectImpl, Boolean> selection = null; // The current
+
+	// /////////////////////////////////////////////////////
+	// Public static methods for manipulating the selection
+	// /////////////////////////////////////////////////////
+
 	private float strokeNum = 0;
 
 	private Stroke[] strokes = null;
@@ -111,10 +132,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	// handler
 
 	WorldImpl world;
-
-	// /////////////////////////////////////////////////////
-	// Public static methods for manipulating the selection
-	// /////////////////////////////////////////////////////
 
 	/**
 	 * Creates a selection event handler.
@@ -293,6 +310,10 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		marquee = null;
 	}
 
+	// //////////////////////////////////////////////////////
+	// The overridden methods from PDragSequenceEventHandler
+	// //////////////////////////////////////////////////////
+
 	protected void endStandardSelection(PInputEvent e) {
 		pressNode = null;
 	}
@@ -331,9 +352,9 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		marqueeMap.clear();
 	}
 
-	// //////////////////////////////////////////////////////
-	// The overridden methods from PDragSequenceEventHandler
-	// //////////////////////////////////////////////////////
+	// //////////////////////////
+	// Additional methods
+	// //////////////////////////
 
 	protected void initializeSelection(PInputEvent pie) {
 		canvasPressPt = pie.getCanvasPosition();
@@ -411,10 +432,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 		}
 	}
-
-	// //////////////////////////
-	// Additional methods
-	// //////////////////////////
 
 	protected void startMarqueeSelection(PInputEvent e) {
 		unselectAll();
@@ -588,6 +605,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		if (internalSelect(node)) {
 			postSelectionChanged();
 		}
+		singleObjectSelected(node);
 	}
 
 	/**
@@ -617,13 +635,13 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		this.marqueePaintTransparency = marqueePaintTransparency;
 	}
 
-	// ////////////////////
-	// Inner classes
-	// ////////////////////
-
 	public void setMarqueeStrokePaint(Paint marqueeStrokePaint) {
 		this.marqueeStrokePaint = marqueeStrokePaint;
 	}
+
+	// ////////////////////
+	// Inner classes
+	// ////////////////////
 
 	public void undecorateSelectedNode(WorldObjectImpl node) {
 
@@ -691,6 +709,10 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			return node == selectableParent.getPiccolo();
 		}
 
+	}
+
+	public static interface SelectionListener {
+		public void singleObjectSelected(WorldObject obj);
 	}
 
 }

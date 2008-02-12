@@ -34,7 +34,7 @@ public class AuxillarySplitPane extends JSplitPane {
 	}
 
 	private int auxPanelSize;
-	private Container auxPanelWr;
+	private JPanel auxPanelWr;
 	private final String auxTitle;
 
 	private Container mainPanel;
@@ -210,6 +210,7 @@ public class AuxillarySplitPane extends JSplitPane {
 			}
 			setDividerSize(2);
 			if (!auxPanelWr.isVisible()) {
+				auxPanelWr.requestFocus();
 				auxPanelWr.setVisible(true);
 			}
 		} else {

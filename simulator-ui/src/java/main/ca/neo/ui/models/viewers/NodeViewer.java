@@ -23,10 +23,10 @@ import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.WorldObject.EventType;
+import ca.shu.ui.lib.world.WorldObject.Listener;
+import ca.shu.ui.lib.world.WorldObject.Property;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
 import edu.umd.cs.piccolo.activities.PActivity;
@@ -100,7 +100,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 			getGround().addChild(node);
 		}
 
-		node.addPropertyChangeListener(EventType.REMOVED_FROM_WORLD, new RemoveNodeListener(node,
+		node.addPropertyChangeListener(Property.REMOVED_FROM_WORLD, new RemoveNodeListener(node,
 				this));
 	}
 
@@ -422,7 +422,7 @@ class NodeViewerStatus extends AbstractStatusHandler {
 	}
 }
 
-class RemoveNodeListener implements EventListener {
+class RemoveNodeListener implements Listener {
 	private UINeoNode node;
 	WeakReference<NodeViewer> nodeViewer;
 
@@ -432,7 +432,7 @@ class RemoveNodeListener implements EventListener {
 		this.nodeViewer = new WeakReference<NodeViewer>(nodeViewer);
 	}
 
-	public void propertyChanged(EventType event) {
+	public void propertyChanged(Property event) {
 		if (nodeViewer.get() != null) {
 
 			nodeViewer.get().removeNeoNode((UINeoNode) node);

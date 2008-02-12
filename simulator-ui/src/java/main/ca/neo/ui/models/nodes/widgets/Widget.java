@@ -96,7 +96,7 @@ public abstract class Widget extends UIModelConfigurable {
 			expose(network, exposedName);
 			showPopupMessage(this.getName() + " is exposed as " + exposedName + " on Network: "
 					+ network.getName());
-			updateModel();
+			updateViewFromModel();
 		} else {
 			UserMessages.showWarning("Cannot expose because no external network is available");
 		}
@@ -127,7 +127,7 @@ public abstract class Widget extends UIModelConfigurable {
 		if (network != null) {
 			unExpose(network);
 			showPopupMessage(this.getName() + " is UN-exposed on Network: " + network.getName());
-			updateModel();
+			updateViewFromModel();
 		} else {
 			UserMessages.showWarning("Cannot expose because no external network is available");
 		}
@@ -170,7 +170,7 @@ public abstract class Widget extends UIModelConfigurable {
 		}
 		setName(name);
 
-		firePropertyChange(EventType.MODEL_CHANGED);
+		firePropertyChange(Property.MODEL_CHANGED);
 
 	}
 
@@ -181,7 +181,7 @@ public abstract class Widget extends UIModelConfigurable {
 	public void setWidgetVisible(boolean isVisible) {
 		this.isWidgetVisible = isVisible;
 
-		firePropertyChange(EventType.WIDGET);
+		firePropertyChange(Property.WIDGET);
 
 		setVisible(isVisible);
 		getPiccolo().invalidateFullBounds();

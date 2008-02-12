@@ -10,9 +10,9 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.Destroyable;
-import ca.shu.ui.lib.world.EventListener;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.WorldObject.EventType;
+import ca.shu.ui.lib.world.WorldObject.Listener;
+import ca.shu.ui.lib.world.WorldObject.Property;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
@@ -94,7 +94,7 @@ public class Universe extends PCanvas implements Destroyable {
 		textLabels = new WorldObjectImpl();
 		textHolder.addChild(textLabels);
 		textLayoutListener = new TextLayoutListener();
-		textHolder.addPropertyChangeListener(EventType.BOUNDS_CHANGED, textLayoutListener);
+		textHolder.addPropertyChangeListener(Property.BOUNDS_CHANGED, textLayoutListener);
 		textLabels.addChild(statusTextBackground);
 		textLabels.addChild(statusMessageLabel);
 		textLabels.addChild(interactionModeLabel);
@@ -112,10 +112,10 @@ public class Universe extends PCanvas implements Destroyable {
 	private WorldObject textLabels;
 	private TextLayoutListener textLayoutListener;
 
-	class TextLayoutListener implements EventListener {
+	class TextLayoutListener implements Listener {
 
-		public void propertyChanged(EventType event) {
-			if (event == EventType.BOUNDS_CHANGED) {
+		public void propertyChanged(Property event) {
+			if (event == Property.BOUNDS_CHANGED) {
 				layoutText();
 			} else {
 				throw new UnsupportedOperationException();
@@ -282,7 +282,7 @@ public class Universe extends PCanvas implements Destroyable {
 
 	public void destroy() {
 		if (textHolder != null) {
-			textHolder.removePropertyChangeListener(EventType.BOUNDS_CHANGED, textLayoutListener);
+			textHolder.removePropertyChangeListener(Property.BOUNDS_CHANGED, textLayoutListener);
 		}
 	}
 
