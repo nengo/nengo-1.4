@@ -27,9 +27,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -40,11 +38,8 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
-import org.python.util.PythonInterpreter;
 
-import ca.neo.model.Units;
 import ca.neo.util.Environment;
-import ca.neo.util.impl.TimeSeries1DImpl;
 
 /**
  * A basic tabbed text editor. 
@@ -75,6 +70,8 @@ public class ScriptEditor extends JPanel {
 		
 		myDirectory = directory;
 		myFilter = new ExtensionFileFilter(new String[]{"py"});
+		
+//		setBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
 	}
 	
 	/**
@@ -212,13 +209,21 @@ public class ScriptEditor extends JPanel {
 	
 	private ScriptData openEditor(File file, boolean saved, String name) {
 		JPanel panel = new JPanel(new BorderLayout());
+		panel.setBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND2);
+		
 		JEditorPane ep = new JEditorPane();
+		
+		ep.setForeground(ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
+		ep.setBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
+		ep.setCaretColor(ca.shu.ui.lib.Style.Style.COLOR_LIGHT_BLUE);
+		
 		final StyledDocument doc = new DefaultStyledDocument();
 		ep.setDocument(doc);
 		JScrollPane scroll = new JScrollPane(ep);
 		panel.add(scroll, BorderLayout.CENTER);
 		
 		final JLabel positionLabel = new JLabel("1 : 1");
+		positionLabel.setForeground(ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
 		panel.add(positionLabel, BorderLayout.SOUTH);
 		
 		ep.addCaretListener(new CaretListener() {
@@ -354,24 +359,20 @@ public class ScriptEditor extends JPanel {
 	 *  
 	 * @return The new console. 
 	 */
-	public static ScriptConsole openEditor() {
-		return openEditor(false);
+	public static void openEditor() {
+		openEditor(false);
 	}
 	
-	private static ScriptConsole openEditor(boolean exitOnWindowClose) {
+	private static void openEditor(boolean exitOnWindowClose) {
 		final ScriptEditor editor = new ScriptEditor();
 		editor.setPreferredSize(new Dimension(600, 600));
 		
-		PythonInterpreter interpreter = new PythonInterpreter();
-		final ScriptConsole console = new ScriptConsole(interpreter);
-		console.setPreferredSize(new Dimension(600, 600));
-		
 		JFrame frame = new JFrame("Script Editor");
-		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, console, editor);
 		frame.getContentPane().setLayout(new BorderLayout());
-		frame.getContentPane().add(split, BorderLayout.CENTER);
+		frame.getContentPane().add(editor, BorderLayout.CENTER);
 		
 		JMenuBar menuBar = new JMenuBar();
+		
 		JMenu fileMenu = new JMenu("File");
 
 		JMenuItem newItem = new JMenuItem("New");
@@ -438,24 +439,11 @@ public class ScriptEditor extends JPanel {
 		
 		frame.pack();
 		frame.setVisible(true);
-		
-		SwingUtilities.invokeLater(
-			new Runnable() {
-				public void run() {
-					console.setFocus();
-				}
-			}
-		);
-		
-		return console;
 	}	
 	
 	public static void main(String[] args) {
-		ScriptConsole console = openEditor(true);		
-
+		openEditor(true);		
 		Environment.setUserInterface(true);
-		
-		console.addVariable("ts", new TimeSeries1DImpl(new float[]{0, 1, 2}, new float[]{1, 0, 3}, Units.UNK));
 	}
 }
 
