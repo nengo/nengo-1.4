@@ -6,8 +6,20 @@ package ca.neo.plot;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.neo.math.Function;
+import ca.neo.math.impl.ConstantFunction;
+import ca.neo.model.Network;
+import ca.neo.model.SimulationException;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
+import ca.neo.model.impl.FunctionInput;
+import ca.neo.model.impl.NetworkImpl;
+import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.NEFEnsembleFactory;
+import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.neo.util.Environment;
 import ca.neo.util.MU;
+import ca.neo.util.Memory;
 import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.TimeSeries1D;
@@ -64,8 +76,46 @@ public class PlotterFunctional {
 		Plotter.plot(series, patterns, "multi series");
 	}
 	
+	public static void rasterMemoryTest() {
+		try {
+			Network network = new NetworkImpl();
+			
+			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
+			final NEFEnsemble ensemble = ef.make("ensemble", 200, 1);
+			ensemble.collectSpikes(true);
+			network.addNode(ensemble);
+			
+			FunctionInput input = new FunctionInput("input", new Function[]{new ConstantFunction(1, 1)}, Units.UNK);
+			network.addNode(input);
+			
+			network.run(0, 1);
+			
+			Environment.setUserInterface(true);
+			Memory.report("Before plots");
+			for (int i = 0; i < 5; i++) {
+				Thread pt = new Thread() {
+					@Override
+					public void run() {
+						Plotter.plot(ensemble.getSpikePattern());
+					}
+				};
+				pt.start();
+				
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {}
+				Memory.report("After plot " + i);
+			}
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		} catch (SimulationException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public static void main(String[] args) {
-		multiTest();
+		rasterMemoryTest();
 	}
 
 }

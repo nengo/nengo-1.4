@@ -21,7 +21,6 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
-import org.jfree.chart.LegendItemSource;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -401,7 +400,7 @@ public class DefaultPlotter extends Plotter {
 	public void doPlot(SpikePattern pattern) {
 		XYSeriesCollection dataset = getDataset(pattern);
 		
-		JFreeChart chart = ChartFactory.createXYLineChart(
+		JFreeChart chart = ChartFactory.createScatterPlot(
 				"Spike Raster",
 				"Time (s)", 
 				"Neuron #", 
@@ -549,13 +548,14 @@ public class DefaultPlotter extends Plotter {
 		JPanel panel = new ChartPanel(chart);
 
 		openingPlot();
-		JFrame frame = new JFrame(title);
+		final JFrame frame = new JFrame(title);
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
 		
 		final Plotter plotter = this;
         frame.addWindowListener(new WindowAdapter() {
         	public void windowClosing(WindowEvent e) {
-        		  plotter.closingPlot();
+        		frame.dispose();
+        		plotter.closingPlot();
             }
         });
 
