@@ -1,16 +1,25 @@
 TODO (release): 
+- DONE (Sunday) make scope test network 
+- DONE (Monday) python keyword "that"; python dictionary of networks
+- DONE (Tuesday) make console names legal python names
+- DONE change cursor colour in script console
+- DONE (Tuesday) clean up script editor window
+- DONE (Tuesday) UI event on add/remove projection/node in network 
+- DONE (Tuesday) memory leak in spike raster? (see email from shu early feb)
+- (Tuesday) remove util configuration/configurable
+- (Tuesday) move configuration UI code to simulator-ui
+
+- do we need a way to create top-level UI objects from scripts?
 - change package names to nengo
-- move configuration UI code to simulator-ui
 - use config matrix editor throughout
-- plot popups from config using UI code
+- plot popups from config using UI code; matlab exports of matrices and vectors
 - add new icons
-- remove util configuration/configurable
 - move to sourceforge
 - tutorials
+- review Izhikevich spike generator and make list of default settings (e.g. custom, adapting, bursting)
 
 TODO: 
 - expand help in python 
-- python keyword "that"
 - custom popups (e.g. plot function)
 - fix icons 
 - map class names (eg Impl -> default implementation)
