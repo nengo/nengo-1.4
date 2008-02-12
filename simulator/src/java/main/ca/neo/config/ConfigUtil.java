@@ -68,8 +68,11 @@ public class ConfigUtil {
 		});
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		buttonPanel.add(doneButton);
+		
+		dialog.setModal(true);
 		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		dialog.pack();
+		dialog.setLocationRelativeTo(owner);// centers on screen
 		dialog.setVisible(true);
 	}
 
