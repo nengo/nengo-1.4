@@ -28,7 +28,7 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Adding nodes to an Ensemble should add it to the model as well
+Nengo.ca links don't work in IE
 
 Model event listener
 > Would it be possible to fire a generic event whenever the configuration of
@@ -42,11 +42,6 @@ need, but let me know 1) if anything else is needed on the interface,
 from ensemble).
 
 
-What does NEO Stand for?
-
-Configuration ScrollPane dosen't scroll vertically
-
-Associate nodes with uiNodes
 
 
 

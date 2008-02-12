@@ -53,6 +53,10 @@ public class PlotFunctionAction extends StandardAction {
 			float start = (Float) properties.getProperty(pStart);
 			float end = (Float) properties.getProperty(pEnd);
 			float increment = (Float) properties.getProperty(pIncrement);
+			
+			if (increment == 0) {
+				throw new ActionException("Please use a non-zero increment");
+			}
 
 			DialogPlotter plotter = new DialogPlotter(dialogParent);
 

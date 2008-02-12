@@ -18,7 +18,6 @@ import ca.neo.ui.configurable.managers.UserConfigurer;
  */
 public abstract class AbstractFn implements IConfigurable {
 
-
 	private UserConfigurer configurer;
 
 	/**
@@ -44,8 +43,7 @@ public abstract class AbstractFn implements IConfigurable {
 		this.functionType = functionType;
 	}
 
-	protected abstract Function createFunction(PropertySet props)
-			throws ConfigException;
+	protected abstract Function createFunction(PropertySet props) throws ConfigException;
 
 	/*
 	 * (non-Javadoc)
@@ -55,12 +53,14 @@ public abstract class AbstractFn implements IConfigurable {
 	 *      passing the user parameters to it
 	 */
 	public void completeConfiguration(PropertySet props) throws ConfigException {
-
-		Function function = createFunction(props);
-
-		setFunction(function);
-
+		try {
+			Function function = createFunction(props);
+			setFunction(function);
+		} catch (Exception e) {
+			throw new ConfigException("Error creating function");
+		}
 	}
+
 	public void configure(JDialog parent) {
 		if (configurer == null) {
 			configurer = new UserConfigurer(this, parent);
@@ -100,10 +100,11 @@ public abstract class AbstractFn implements IConfigurable {
 	/**
 	 * @param function
 	 *            function wrapper
+	 * @throws ConfigException
 	 */
 	public void setFunction(Function function) {
 		if (!getFunctionType().isInstance(function)) {
-			throw new IllegalArgumentException("Invalid function type");
+			throw new IllegalArgumentException("Unexpected function type");
 		} else {
 			this.function = function;
 		}

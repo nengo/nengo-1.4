@@ -29,7 +29,9 @@ import ca.neo.sim.Simulator;
 public class FuzzyLogicExample {
 
 	public static Network createNetwork() throws StructuralException {
-		Network net = new NetworkImpl();
+		NetworkImpl net = new NetworkImpl();
+		net.setName("Fuzzy Logic");
+		
 		Simulator simulator = net.getSimulator();
 		// Rules:
 		// 1) if A and (B or C) then 1

@@ -45,8 +45,7 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	private AbstractFn[] configurableFunctionsList;
 
-	public FunctionPanel(PFunction property,
-			AbstractFn[] functions) {
+	public FunctionPanel(PFunction property, AbstractFn[] functions) {
 		super(property);
 		this.configurableFunctionsList = functions;
 
@@ -59,8 +58,7 @@ public class FunctionPanel extends PropertyInputPanel {
 	protected void previewFunction() {
 
 		if (function != null) {
-			(new PlotFunctionAction("Function preview", function,
-					getDialogParent())).doAction();
+			(new PlotFunctionAction("Function preview", function, getDialogParent())).doAction();
 		} else {
 			UserMessages.showWarning("Please set this function first.");
 		}
@@ -71,8 +69,7 @@ public class FunctionPanel extends PropertyInputPanel {
 	 */
 	protected void setParameters() {
 
-		selectedConfigurableFunction = (AbstractFn) comboBox
-				.getSelectedItem();
+		selectedConfigurableFunction = (AbstractFn) comboBox.getSelectedItem();
 
 		/*
 		 * get the JDialog parent
@@ -100,8 +97,7 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	private void initPanel() {
 		comboBox = new JComboBox(configurableFunctionsList);
-		selectedConfigurableFunction = (AbstractFn) comboBox
-				.getSelectedItem();
+		selectedConfigurableFunction = (AbstractFn) comboBox.getSelectedItem();
 
 		comboBox.addItemListener(new ItemListener() {
 
@@ -125,10 +121,13 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	@Override
 	public boolean isValueSet() {
-		if (function != null
-				&& function.getDimension() == getDescriptor()
-						.getInputDimension()) {
+		if (function != null) {
 
+			if (function.getDimension() != getDescriptor().getInputDimension()) {
+				setStatusMsg("input dimension must be " + getDescriptor().getInputDimension()
+						+ ", it is currently " + function.getDimension());
+				return false;
+			}
 			return true;
 
 		} else {
@@ -152,8 +151,7 @@ public class FunctionPanel extends PropertyInputPanel {
 			 */
 			for (int i = 0; i < configurableFunctionsList.length; i++) {
 
-				if (configurableFunctionsList[i].getFunctionType().isInstance(
-						function)) {
+				if (configurableFunctionsList[i].getFunctionType().isInstance(function)) {
 					selectedConfigurableFunction = configurableFunctionsList[i];
 					selectedConfigurableFunction.setFunction(function);
 

@@ -74,6 +74,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	public static final String CONFIG_FILE = "NeoGraphics.config";
 
+	public static final boolean CONFIGURE_PLANE_ENABLED = false;
+
 	/**
 	 * UI delegate object used to show the FileChooser
 	 */
@@ -86,6 +88,11 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	static final String PLUGIN_DIRECTORY = "plugins";
 
+	public static NeoGraphics getInstance() {
+		Util.Assert(UIEnvironment.getInstance() instanceof NeoGraphics);
+		return (NeoGraphics) UIEnvironment.getInstance();
+	}
+
 	/**
 	 * Runs NeoGraphics with a default name
 	 * 
@@ -96,7 +103,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	}
 
 	private ConfigurationPane configPane;
+
 	private AuxillarySplitPane dataViewerPane;
+
 	private AuxillarySplitPane scriptConsolePane;
 
 	/**
@@ -237,7 +246,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		 * Create nested split panes
 		 */
 		configPane = new ConfigurationPane(canvas);
-
 		scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
 				"Script Console", AuxillarySplitPane.Orientation.Bottom);
 
@@ -247,7 +255,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 		splitPanes.add(scriptConsolePane);
 		splitPanes.add(dataViewerPane);
-		splitPanes.add(configPane.toJComponent());
+
+		if (CONFIGURE_PLANE_ENABLED) {
+			splitPanes.add(configPane.toJComponent());
+		}
 
 		getContentPane().add(dataViewerPane);
 
@@ -287,6 +298,18 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		simulationData.captureData(network);
 	}
 
+	/**
+	 * @param obj
+	 *            Object to configure
+	 */
+	public void configureObject(Object obj) {
+		if (CONFIGURE_PLANE_ENABLED) {
+			configPane.configureObj(obj);
+		} else {
+			ConfigUtil.configure(UIEnvironment.getInstance(), obj);
+		}
+	}
+
 	@Override
 	public void exitAppFrame() {
 		if (getWorld().getGround().getChildrenCount() > 0) {
@@ -320,11 +343,6 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		return "NEO Workspace";
 	}
 
-	public static NeoGraphics getInstance() {
-		Util.Assert(UIEnvironment.getInstance() instanceof NeoGraphics);
-		return (NeoGraphics) UIEnvironment.getInstance();
-	}
-
 	@Override
 	public void initFileMenu(MenuBuilder fileMenu) {
 
@@ -349,40 +367,30 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		viewMenu.addAction(new OpenScriptEditor("Open Script Editor"), KeyEvent.VK_E);
 
 		for (AuxillarySplitPane splitPane : splitPanes) {
-			MenuBuilder dataViewerMenu = viewMenu.addSubMenu(splitPane.getAuxTitle());
-			dataViewerMenu.addAction(new SetSplitPaneVisibleAction("Show", splitPane, true),
-					KeyEvent.VK_N);
 
-			dataViewerMenu.addAction(new SetSplitPaneVisibleAction("Hide", splitPane, false),
-					KeyEvent.VK_N);
+			viewMenu.addAction(new SetSplitPaneVisibleAction("Show " + splitPane.getAuxTitle(),
+					splitPane, true));
+
 		}
-	}
-
-	class OpenScriptEditor extends StandardAction {
-
-		public OpenScriptEditor(String description) {
-			super(description);
-		}
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		protected void action() throws ActionException {
-			ScriptEditor.openEditor();
-		}
-
 	}
 
 	public void setDataViewerVisible(boolean isVisible) {
 		dataViewerPane.setAuxVisible(isVisible);
 	}
 
-	/**
-	 * @param obj
-	 *            Object to configure
-	 */
-	public void configureObject(Object obj) {
-		configPane.configureObj(obj);
+	class OpenScriptEditor extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public OpenScriptEditor(String description) {
+			super(description);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			ScriptEditor.openEditor();
+		}
+
 	}
 
 }
@@ -404,7 +412,7 @@ class ConfigurationPane {
 		ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
 		// Style.applyStyle(configurationPane.getTree());
 		// Style.applyStyle(configurationPane.getCellRenderer());
-		
+
 		String name;
 		if (obj instanceof Node) {
 			name = ((Node) obj).getName();
