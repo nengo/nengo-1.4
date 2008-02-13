@@ -17,6 +17,7 @@
  Pri 0 - doing next
 *******************************************
 AddNeoNode should not modify model
+UIProjection->createProjection(), need more robust way of attaching listeners
 
 UIFunctions should never modify the model. 
 	Model modification should be done externally, UI Picks up on them through listener 

@@ -75,7 +75,7 @@ public class IntegratorExample {
 		return network;
 	}
 
-	private UIStateProbe integratorProbe;
+//	private UIStateProbe integratorProbe;
 
 	public static void main(String[] args) {
 		new IntegratorExample();

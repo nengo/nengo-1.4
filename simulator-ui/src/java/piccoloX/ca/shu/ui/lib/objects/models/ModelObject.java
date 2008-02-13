@@ -90,6 +90,10 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * destroy() + destroy the model
 	 */
 	public final void destroyModel() {
+		for (ModelListener listener : modelListeners) {
+			listener.modelDestroyStarted(getModel());
+		}
+
 		prepareToDestroyModel();
 
 		for (WorldObject wo : getChildren()) {
@@ -101,11 +105,14 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		for (ModelListener listener : modelListeners) {
 			listener.modelDestroyed(getModel());
 		}
+
 		modelListeners.clear();
 		destroy();
 	}
 
 	static public interface ModelListener {
+		public void modelDestroyStarted(Object model);
+
 		public void modelDestroyed(Object model);
 	}
 

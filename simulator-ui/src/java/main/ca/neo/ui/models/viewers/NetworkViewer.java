@@ -26,13 +26,11 @@ import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.exceptions.UIException;
-import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.WorldObject;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.util.PBounds;
 
@@ -58,44 +56,6 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public NetworkViewer(UINetwork pNetwork) {
 		super(pNetwork);
-
-		init();
-	}
-
-	private class MyNodeListener implements ModelObject.ModelListener {
-
-		public void modelDestroyed(Object model) {
-			try {
-				getNetwork().removeNode(((Node) model).getName());
-			} catch (StructuralException e) {
-				e.printStackTrace();
-			}
-		}
-
-	}
-
-	MyNodeListener myNodeListener;
-
-	private void init() {
-		myNodeListener = new MyNodeListener();
-
-		getGround().addChildListener(new WorldObject.ChildListener() {
-
-			public void childAdded(WorldObject wo) {
-
-				if (wo instanceof UINeoNode) {
-					((UINeoNode) wo).addModelListener(myNodeListener);
-				}
-
-			}
-
-			public void childRemoved(WorldObject wo) {
-				if (wo instanceof UINeoNode) {
-					((UINeoNode) wo).removeModelListener(myNodeListener);
-				}
-			}
-
-		});
 
 	}
 
@@ -537,4 +497,17 @@ public class NetworkViewer extends NodeViewer {
 
 	}
 
+	@Override
+	protected void removeChildModel(Node node) {
+		try {
+			getNetwork().removeNode(node.getName());
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	protected boolean canRemoveChildModel(Node node) {
+		return true;
+	}
 }

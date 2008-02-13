@@ -11,6 +11,7 @@ import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UINeuron;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * Viewer for peeking into an Ensemble
@@ -104,7 +105,16 @@ public class EnsembleViewer extends NodeViewer {
 
 			}
 		}
+	}
 
+	@Override
+	protected void removeChildModel(Node node) {
+		Util.Assert(false, "Cannot remove model");
+	}
+
+	@Override
+	protected boolean canRemoveChildModel(Node node) {
+		return false;
 	}
 
 }

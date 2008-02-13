@@ -31,7 +31,10 @@ public class UIProjectionWell extends LineWell {
 		myOrigin.addModelListener(new ModelObject.ModelListener() {
 			public void modelDestroyed(Object model) {
 				projection.disconnectFromTermination();
+			}
 
+			public void modelDestroyStarted(Object model) {
+				// Do nothing
 			}
 		});
 

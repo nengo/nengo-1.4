@@ -38,15 +38,17 @@ import edu.umd.cs.piccolo.util.PBounds;
 public abstract class NodeViewer extends ElasticWorld implements Interactable, INodeContainer {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Children of NEO nodes
-	 */
-	protected final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
+	private MyNodeListener myNodeListener;
 
 	/**
 	 * Viewer Parent
 	 */
 	private final NodeContainer parentOfViewer;;
+
+	/**
+	 * Children of NEO nodes
+	 */
+	protected final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
 
 	/**
 	 * @param nodeContainer
@@ -56,6 +58,12 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 		super(nodeContainer.getName() + " (" + nodeContainer.getTypeName() + " Viewer)");
 		this.parentOfViewer = nodeContainer;
 
+		init();
+	}
+
+	private void init() {
+		initChildModelListener();
+
 		setStatusBarHandler(new NodeViewerStatus(this));
 
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
@@ -64,6 +72,25 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 
 		msg.finished();
 
+	}
+
+	private void initChildModelListener() {
+		myNodeListener = new MyNodeListener();
+
+		getGround().addChildListener(new WorldObject.ChildListener() {
+			public void childAdded(WorldObject wo) {
+
+				if (wo instanceof UINeoNode) {
+					((UINeoNode) wo).addModelListener(myNodeListener);
+				}
+			}
+
+			public void childRemoved(WorldObject wo) {
+				if (wo instanceof UINeoNode) {
+					((UINeoNode) wo).removeModelListener(myNodeListener);
+				}
+			}
+		});
 	}
 
 	/**
@@ -112,6 +139,10 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 		// TODO Auto-generated method stub
 		super.constructSelectionMenu(selection, menu);
 	}
+
+	protected abstract void removeChildModel(Node node);
+
+	protected abstract boolean canRemoveChildModel(Node node);
 
 	/**
 	 * Called when the model changes. Updates the viewer based on the NEO model.
@@ -300,6 +331,21 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 		for (UINeoNode node : getNeoNodes()) {
 			node.setWidgetsVisible(visible);
 		}
+	}
+
+	private class MyNodeListener implements ModelObject.ModelListener {
+
+		public void modelDestroyStarted(Object model) {
+			if (!canRemoveChildModel((Node) model)) {
+				throw new UnsupportedOperationException("Removing nodes not supported here");
+			}
+
+		}
+
+		public void modelDestroyed(Object model) {
+			removeChildModel((Node) model);
+		}
+
 	}
 
 	/**
