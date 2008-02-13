@@ -5,6 +5,7 @@ package ca.neo.ui.script;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -57,7 +59,7 @@ public class ScriptEditor extends JPanel {
 
 	public ScriptEditor() {
 		this(new File("."));
-		setBackground(Style.COLOR_BACKGROUND2);
+		setBackground(Style.COLOR_BACKGROUND);
 		setBorder(null);
 	}
 
@@ -210,7 +212,7 @@ public class ScriptEditor extends JPanel {
 
 	private ScriptData openEditor(File file, boolean saved, String name) {
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.setBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND2);
+		panel.setBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
 
 		JEditorPane ep = new JEditorPane();
 
@@ -221,6 +223,7 @@ public class ScriptEditor extends JPanel {
 		final StyledDocument doc = new DefaultStyledDocument();
 		ep.setDocument(doc);
 		JScrollPane scroll = new JScrollPane(ep);
+		scroll.setBorder(BorderFactory.createEmptyBorder());
 		panel.add(scroll, BorderLayout.CENTER);
 
 		final JLabel positionLabel = new JLabel("1 : 1");
@@ -383,6 +386,7 @@ public class ScriptEditor extends JPanel {
 		frame.setBackground(Style.COLOR_BACKGROUND2);
 
 		MenuBuilder fileMenu = new MenuBuilder("File");
+		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_F);
 
 		fileMenu.addAction(new StandardAction("New") {
 
@@ -392,9 +396,7 @@ public class ScriptEditor extends JPanel {
 			protected void action() throws ActionException {
 				editor.newFile();
 			}
-		});
-
-		;
+		}, KeyEvent.VK_N);
 
 		fileMenu.addAction(new StandardAction("Open") {
 
@@ -408,7 +410,7 @@ public class ScriptEditor extends JPanel {
 					ex.printStackTrace();
 				}
 			}
-		});
+		}, KeyEvent.VK_O);
 
 		fileMenu.addAction(new StandardAction("Save") {
 
@@ -422,7 +424,7 @@ public class ScriptEditor extends JPanel {
 					ex.printStackTrace();
 				}
 			}
-		});
+		}, KeyEvent.VK_S);
 
 		fileMenu.addAction(new StandardAction("Save As...") {
 			private static final long serialVersionUID = 1L;
@@ -435,7 +437,7 @@ public class ScriptEditor extends JPanel {
 					ex.printStackTrace();
 				}
 			}
-		});
+		}, KeyEvent.VK_A);
 
 		fileMenu.addAction(new StandardAction("Close") {
 
@@ -449,7 +451,7 @@ public class ScriptEditor extends JPanel {
 					ex.printStackTrace();
 				}
 			}
-		});
+		}, KeyEvent.VK_C);
 
 		menuBar.add(fileMenu.getJMenu());
 		frame.setJMenuBar(menuBar);
