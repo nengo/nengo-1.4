@@ -1,6 +1,12 @@
 *******************************************
  Done
 *******************************************
+02/12/2008 - Applied style to script editor
+02/12/2008 - Fixed memory leak in window
+02/12/2008 - Renamed to Nengo
+
+
+
 02/12/2008 - Script console now notified of current object, and top level network add/removes
 02/12/2008 - Hooked up listeners for VisiblyMutuble, however many changes are not reflected in UI yet (such as projection add/removes)
 02/12/2008 - Configuration panel opens in new window
@@ -8,6 +14,21 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Scan through nodes in NetworkViewer, adding/ removing nodes
+
+Show popover message when model is updated
+
+Show decoration border around singly selected objects in NeoGraphics
+
+Add alltop-level objects to ScriptConsole
+
+
+Print used memory to UI console
+
+Done - WorldGround is now destroyed upon world destruction, however there are still some memory leaks
+	associated with nested windows.
+	Make more comprehensive memory test, open Ensemble sometimes, open sub windows
+
 Nengo.ca links don't work in IE
 
 Projections are not updated in network yet, listener... 

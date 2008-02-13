@@ -319,17 +319,18 @@ public class WorldObjectImpl implements WorldObject {
 
 			prepareForDestroy();
 
-			/*
-			 * Removes this object from the world and finish any tasks Convert
-			 * to array to allow for concurrent modification
-			 */
-			for (WorldObject wo : getChildren()) {
-				wo.destroy();
-			}
+			destroyChildren();
+
 			if (myPNode instanceof PXNode) {
 				((PXNode) myPNode).removeFromWorld();
 			}
 
+		}
+	}
+
+	protected void destroyChildren() {
+		for (WorldObject wo : getChildren()) {
+			wo.destroy();
 		}
 	}
 

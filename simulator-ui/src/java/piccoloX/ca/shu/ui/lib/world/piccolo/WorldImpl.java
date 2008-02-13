@@ -224,6 +224,9 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		keyboardHandler.destroy();
 		gridLayer.removeFromParent();
 		layer.removeFromParent();
+		
+		getGround().destroy();
+		getSky().destroy();
 
 		super.prepareForDestroy();
 	}

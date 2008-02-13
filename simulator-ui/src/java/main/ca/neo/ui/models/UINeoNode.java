@@ -750,34 +750,29 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 	}
 
-	private VisiblyMutable.Listener visiblyMutableListener = new VisiblyMutable.Listener() {
+	private VisiblyMutable.Listener myMutableListener = new VisiblyMutable.Listener() {
 
 		public void changed(Event e) {
-			
+
 		}
 	};
 
 	@Override
-	public void setModel(Object model) {
-		//
-		// Remove listener from the current model
-		//
-		if (getModel() != null) {
-			if (getModel() instanceof VisiblyMutable) {
-				VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
-
-				Util.Assert(visiblyMutableListener != null);
-				visiblyMutable.removeChangeListener(visiblyMutableListener);
-			}
+	public void attachViewToModel() {
+		if (getModel() instanceof VisiblyMutable) {
+			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
+			visiblyMutable.addChangeListener(myMutableListener);
 		}
+	}
 
-		super.setModel(model);
+	@Override
+	public void detachViewFromModel() {
 
-		if (model != null) {
-			if (model instanceof VisiblyMutable) {
-				VisiblyMutable visiblyMutable = (VisiblyMutable) model;
-				visiblyMutable.addChangeListener(visiblyMutableListener);
-			}
+		if (getModel() instanceof VisiblyMutable) {
+			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
+
+			Util.Assert(myMutableListener != null);
+			visiblyMutable.removeChangeListener(myMutableListener);
 		}
 	}
 }

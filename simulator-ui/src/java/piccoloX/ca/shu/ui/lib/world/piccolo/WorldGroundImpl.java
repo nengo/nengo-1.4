@@ -186,7 +186,7 @@ class GroundNode extends PXNode {
 
 	@Override
 	public void setParent(PNode newParent) {
-		if (!(newParent instanceof PLayer)) {
+		if (newParent != null && !(newParent instanceof PLayer)) {
 			throw new InvalidParameterException();
 		}
 		super.setParent(newParent);

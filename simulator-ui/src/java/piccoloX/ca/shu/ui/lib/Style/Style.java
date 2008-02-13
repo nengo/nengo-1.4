@@ -116,6 +116,7 @@ public class Style {
 
 	public static void applyMenuStyle(JComponent item, boolean isTitle) {
 		item.setOpaque(true);
+//		item.setBorder(null);
 		item.setBackground(Style.COLOR_BACKGROUND);
 		item.setForeground(Style.COLOR_FOREGROUND);
 		if (isTitle) {

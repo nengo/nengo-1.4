@@ -18,6 +18,9 @@ import ca.shu.ui.lib.world.elastic.ElasticObject;
  * 
  * @author Shu Wu
  */
+/**
+ * @author User
+ */
 public abstract class ModelObject extends ElasticObject implements Interactable {
 
 	private static final long serialVersionUID = 1L;
@@ -43,7 +46,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	/**
 	 * Model
 	 */
-	private Object model;
+	private Object myModel;
 
 	private Pulsator pulsator = null;
 
@@ -140,7 +143,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * @return Model
 	 */
 	public Object getModel() {
-		return model;
+		return myModel;
 	}
 
 	@Override
@@ -175,16 +178,29 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * @return Whether the Model exists
 	 */
 	public boolean isModelExists() {
-		return (model != null);
+		return (myModel != null);
 	}
 
 	/**
 	 * @param model
 	 *            New Model
 	 */
-	public void setModel(Object model) {
-		this.model = model;
+	public final void setModel(Object model) {
+		if (myModel == model) {
+			return;
+		}
+
+		if (myModel != null) {
+			detachViewFromModel();
+		}
+
+		myModel = model;
 		firePropertyChange(Property.MODEL_CHANGED);
+
+		if (myModel != null) {
+			attachViewToModel();
+			updateViewFromModel();
+		}
 	}
 
 	/**
@@ -231,12 +247,24 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	}
 
 	/**
-	 * Updates the UI from the model
+	 * Attaches the UI from the model
 	 */
-	public final void updateViewFromModel() {
-		if (getModel() != null) {
-			setModel(getModel());
-		}
+	protected void attachViewToModel() {
+
+	}
+
+	/**
+	 * Updatesthe UI from the model
+	 */
+	protected void updateViewFromModel() {
+
+	}
+
+	/**
+	 * Detaches the UI form the model
+	 */
+	protected void detachViewFromModel() {
+
 	}
 
 }

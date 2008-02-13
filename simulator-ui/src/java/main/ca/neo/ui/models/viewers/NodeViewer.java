@@ -27,6 +27,7 @@ import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.WorldObject.Listener;
 import ca.shu.ui.lib.world.WorldObject.Property;
+import ca.shu.ui.lib.world.elastic.ElasticGround;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
 import edu.umd.cs.piccolo.activities.PActivity;
@@ -39,25 +40,25 @@ import edu.umd.cs.piccolo.util.PBounds;
  * @author Shu
  */
 public abstract class NodeViewer extends ElasticWorld implements Interactable, INodeContainer {
-
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Children of NEO nodes
 	 */
-	private final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();;
+	private final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
 
 	/**
 	 * Viewer Parent
 	 */
-	private final NodeContainer parentOfViewer;
+	private final NodeContainer parentOfViewer;;
 
 	/**
 	 * @param nodeContainer
 	 *            UI Object containing the Node model
 	 */
 	public NodeViewer(NodeContainer nodeContainer) {
-		super(nodeContainer.getName() + " (" + nodeContainer.getTypeName() + " Viewer)");
+		super(nodeContainer.getName() + " (" + nodeContainer.getTypeName() + " Viewer)",
+				new MyGround());
 		this.parentOfViewer = nodeContainer;
 
 		setStatusBarHandler(new NodeViewerStatus(this));
@@ -111,6 +112,22 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
+	}
+
+	@Override
+	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
+		// TODO Auto-generated method stub
+		super.constructSelectionMenu(selection, menu);
+	}
+
+	/**
+	 * Removes a node
+	 * 
+	 * @param node
+	 *            Node to remove
+	 */
+	protected void removeNeoNode(UINeoNode node) {
+		neoNodesChildren.remove(node.getName());
 	}
 
 	/**
@@ -276,29 +293,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 		return neoNodesChildren.get(name);
 	}
 
-	/**
-	 * @return Parent of this viewer
-	 */
-	public NodeContainer getViewerParent() {
-		return parentOfViewer;
-	}
-
-	/**
-	 * Removes a node
-	 * 
-	 * @param node
-	 *            Node to remove
-	 */
-	protected void removeNeoNode(UINeoNode node) {
-		neoNodesChildren.remove(node.getName());
-	}
-
-	public void setOriginsTerminationsVisible(boolean visible) {
-		for (UINeoNode node : getNeoNodes()) {
-			node.setWidgetsVisible(visible);
-		}
-	}
-
 	@Override
 	public JPopupMenu getSelectionMenu(Collection<WorldObject> selection) {
 		ArrayList<ModelObject> models = new ArrayList<ModelObject>(selection.size());
@@ -312,10 +306,17 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 		return ModelsContextMenu.getMenu(models);
 	}
 
-	@Override
-	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
-		// TODO Auto-generated method stub
-		super.constructSelectionMenu(selection, menu);
+	/**
+	 * @return Parent of this viewer
+	 */
+	public NodeContainer getViewerParent() {
+		return parentOfViewer;
+	}
+
+	public void setOriginsTerminationsVisible(boolean visible) {
+		for (UINeoNode node : getNeoNodes()) {
+			node.setWidgetsVisible(visible);
+		}
 	}
 
 	/**
@@ -420,6 +421,7 @@ class NodeViewerStatus extends AbstractStatusHandler {
 	protected NodeViewer getWorld() {
 		return (NodeViewer) super.getWorld();
 	}
+
 }
 
 class RemoveNodeListener implements Listener {
@@ -436,6 +438,35 @@ class RemoveNodeListener implements Listener {
 		if (nodeViewer.get() != null) {
 
 			nodeViewer.get().removeNeoNode((UINeoNode) node);
+		}
+	}
+
+}
+
+class MyGround extends ElasticGround {
+	@Override
+	protected void destroyChildren() {
+		/*
+		 * We don't want to destroy the UINeoNode children because that would
+		 * modify the Network models. Instead, we destroy all the non-NeoNodes
+		 * and NodeViewers to plug memory leaks.
+		 */
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof NodeContainer) {
+				/*
+				 * Close viewers
+				 */
+				((NodeContainer) wo).closeViewer();
+			}
+
+			if (wo instanceof UINeoNode) {
+				/*
+				 * Detach models from UI objects
+				 */
+				((ModelObject) wo).setModel(null);
+			} else {
+				wo.destroy();
+			}
 		}
 	}
 

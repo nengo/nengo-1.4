@@ -170,14 +170,7 @@ public class UIStateProbe extends UIProbe {
 	}
 
 	@Override
-	public void setModel(Object model) {
-		super.setModel(model);
-
-		if (model instanceof Probe) {
-			setName(((Probe) model).getStateName());
-		} else {
-			throw new IllegalArgumentException("Wrong model type");
-		}
+	public void updateViewFromModel() {
+		setName(((Probe) getModel()).getStateName());
 	}
-
 }

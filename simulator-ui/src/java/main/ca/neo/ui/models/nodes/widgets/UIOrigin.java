@@ -49,7 +49,7 @@ public class UIOrigin extends Widget {
 		icon.configureLabel(false);
 		setIcon(icon);
 
-		updateViewFromModel();
+		attachViewToModel();
 	}
 
 	@Override

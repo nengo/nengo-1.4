@@ -119,7 +119,7 @@ public class NetworkViewerMemoryTest {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (InvocationTargetException e) {
-				e.printStackTrace();
+				e.getTargetException().printStackTrace();
 			}
 			printMemoryUsed("Loop # " + i);
 		}

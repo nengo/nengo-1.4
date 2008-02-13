@@ -66,7 +66,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
  * @author User
  */
 public class NeoGraphics extends AppFrame implements INodeContainer {
-	private static final String APP_NAME = "NEO Graphics V1 Beta";
+	private static final String APP_NAME = "NENGO Graphics V1 Beta";
 
 	private static final long serialVersionUID = 1L;
 
@@ -406,7 +406,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	}
 
 	public String getAppWindowTitle() {
-		return "NEO Workspace";
+		return "NENGO Workspace";
 	}
 
 	@Override

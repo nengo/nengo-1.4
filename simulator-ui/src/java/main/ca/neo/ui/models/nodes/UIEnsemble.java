@@ -44,8 +44,7 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties)
-			throws ConfigException {
+	protected Object configureModel(PropertySet configuredProperties) throws ConfigException {
 		throw new NotImplementedException();
 	}
 
@@ -113,9 +112,7 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
-	public void setModel(Object model) {
-		super.setModel(model);
-
+	public void updateViewFromModel() {
 		if (getModel().isCollectingSpikes()) {
 			collectSpikes(true);
 		}

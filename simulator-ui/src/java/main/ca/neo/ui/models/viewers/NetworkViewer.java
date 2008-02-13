@@ -101,6 +101,7 @@ public class NetworkViewer extends NodeViewer {
 			UserMessages.showWarning(e.toString());
 			return;
 		}
+
 		super.removeNeoNode(nodeUI);
 	}
 
@@ -149,7 +150,7 @@ public class NetworkViewer extends NodeViewer {
 
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run", getViewerParent()));
-		
+
 		/*
 		 * Create new models
 		 */

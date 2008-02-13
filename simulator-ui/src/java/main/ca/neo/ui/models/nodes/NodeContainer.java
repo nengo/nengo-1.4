@@ -105,7 +105,7 @@ public abstract class NodeContainer extends UINeoNode {
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					if (viewerWindowRef.get() != null) {
+					if (viewerWindowRef.get() != null && !viewerWindowRef.get().isDestroyed()) {
 						getWorld().zoomToObject(viewerWindowRef.get());
 					}
 

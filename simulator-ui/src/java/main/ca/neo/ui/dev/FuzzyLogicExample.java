@@ -30,7 +30,7 @@ public class FuzzyLogicExample {
 
 	public static Network createNetwork() throws StructuralException {
 		NetworkImpl net = new NetworkImpl();
-		net.setName("Fuzzy Logic");
+		net.setName("FuzzyLogic");
 		
 		Simulator simulator = net.getSimulator();
 		// Rules:
