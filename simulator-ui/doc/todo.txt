@@ -1,6 +1,8 @@
 *******************************************
  Done
 *******************************************
+02/12/2008 - Fixed null listener on VisiblyMutable, (turns out it was a base class intializer calling that funciton before it was intialized)
+02/12/2008 - All top level objects are registered in Script Console
 02/12/2008 - Applied style to script editor
 02/12/2008 - Fixed memory leak in window
 02/12/2008 - Renamed to Nengo
@@ -14,9 +16,20 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+UIFunctions should never modify the model. 
+	Model modification should be done externally, UI Picks up on them through listener 
+	AddNeoNode should be private, as you should never be adding nodes explicitly
+	All UI Changes should occur through UpdateViewFromModel
+
+Detect projection removals, scan through all origins and terminations, 
+	looking for projections, then remove the one's which don't exist anymore
+
 Scan through nodes in NetworkViewer, adding/ removing nodes
 
 Show popover message when model is updated
+	Consolidate all viewer updates in updateModelFromViewer()
+	Show popover message from there	
+
 
 Show decoration border around singly selected objects in NeoGraphics
 

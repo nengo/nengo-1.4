@@ -117,9 +117,15 @@ public class UIOrigin extends Widget {
 	 *            connection
 	 */
 	public void connectTo(UITermination term, boolean modifyModel) {
-		UIProjection lineEnd = lineWell.createAndAddLineEnd();
-		lineEnd.connectTo(term, modifyModel);
+		/*
+		 * Check if we're already connection to that termination
+		 */
+		if (term.getConnector() != null && term.getConnector().getOriginUI() == this) {
+			return;
+		}
 
+		UIProjection lineEnd = lineWell.createProjection();
+		lineEnd.connectTo(term, modifyModel);
 	}
 
 	@Override

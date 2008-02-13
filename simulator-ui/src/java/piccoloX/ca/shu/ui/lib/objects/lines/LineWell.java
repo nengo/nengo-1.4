@@ -31,7 +31,7 @@ public abstract class LineWell extends WorldObjectImpl {
 	 * @return The new LineEnd which has been created and added to the
 	 *         LineEndWell
 	 */
-	protected LineConnector createAndAddLineEnd() {
+	protected LineConnector createProjection() {
 		LineConnector newLineEnd = constructLineEnd();
 		addChild(newLineEnd);
 		return newLineEnd;
@@ -73,7 +73,7 @@ class CreateLineEndHandler extends PBasicInputEventHandler {
 		if (event.getButton() != MouseEvent.BUTTON1)
 			return;
 
-		newLineEnd = lineEndWell.createAndAddLineEnd();
+		newLineEnd = lineEndWell.createProjection();
 
 		PPickPath path = event.getPath();
 

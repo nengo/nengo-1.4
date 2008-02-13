@@ -45,7 +45,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 	/**
 	 * Children of NEO nodes
 	 */
-	private final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
+	protected final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
 
 	/**
 	 * Viewer Parent

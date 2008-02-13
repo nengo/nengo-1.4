@@ -808,7 +808,7 @@ public abstract class AppFrame extends JFrame {
 				editor = new JLabel("<html>" + TIPS + "</html>");
 			}
 
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "NeoGraphics Tips",
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName() + " Tips",
 					JOptionPane.PLAIN_MESSAGE);
 		}
 	}

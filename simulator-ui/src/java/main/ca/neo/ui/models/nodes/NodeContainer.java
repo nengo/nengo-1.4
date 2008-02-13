@@ -31,7 +31,7 @@ public abstract class NodeContainer extends UINeoNode {
 	/**
 	 * Weak reference to the viewer window
 	 */
-	private WeakReference<Window> viewerWindowRef = new WeakReference<Window>(null);
+	private WeakReference<Window> viewerWindowRef;
 
 	public NodeContainer() {
 		super();
@@ -120,6 +120,13 @@ public abstract class NodeContainer extends UINeoNode {
 	}
 
 	@Override
+	protected void initialize() {
+		viewerWindowRef = new WeakReference<Window>(null);
+
+		super.initialize();
+	}
+
+	@Override
 	protected void prepareForDestroy() {
 		closeViewer();
 		super.prepareForDestroy();
@@ -143,6 +150,12 @@ public abstract class NodeContainer extends UINeoNode {
 		new Window(this, brainViewer);
 		// window.setOffset(0, -brainViewer.getHeight());
 		// addChild(brainViewer);
+	}
+
+	@Override
+	public void detachViewFromModel() {
+		closeViewer();
+		super.detachViewFromModel();
 	}
 
 	@Override

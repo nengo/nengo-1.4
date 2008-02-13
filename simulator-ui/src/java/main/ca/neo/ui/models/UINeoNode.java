@@ -95,6 +95,8 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		return nodeUI;
 	}
 
+	private VisiblyMutable.Listener myMutableListener;
+
 	/**
 	 * Attached probes
 	 */
@@ -242,6 +244,158 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 	}
 
+	@Override
+	protected void initialize() {
+		super.initialize();
+		probes = new Vector<UIProbe>();
+		myMutableListener = new VisiblyMutable.Listener() {
+			public void changed(Event e) {
+				updateViewFromModel();
+			}
+		};
+	}
+
+	/**
+	 * Called when a new probe is added
+	 * 
+	 * @param probeUI
+	 *            New probe that was just added
+	 */
+	protected void newProbeAdded(UIProbe probeUI) {
+
+		addChild(probeUI);
+		probes.add(probeUI);
+
+		/*
+		 * Assign the probe to a Origin / Termination
+		 */
+
+		WorldObject probeHolder = null;
+
+		Origin origin = null;
+		try {
+			origin = getModel().getOrigin(probeUI.getName());
+
+		} catch (StructuralException e1) {
+		}
+
+		if (origin != null) {
+			probeHolder = showOrigin(origin.getName());
+		} else if (origin == null) {
+			Termination term = null;
+			try {
+				term = getModel().getTermination(probeUI.getName());
+
+			} catch (StructuralException e) {
+			}
+			if (term != null)
+				probeHolder = showTermination(term.getName());
+		}
+
+		if (probeHolder != null) {
+			probeUI.setOffset(0, probeHolder.getHeight() / 2);
+			probeHolder.addChild(probeUI);
+
+		} else {
+			addChild(probeUI);
+		}
+	}
+
+	/**
+	 * Creates a new probe and adds the UI object to the node
+	 * 
+	 * @param stateName
+	 *            The name of the state variable to probe
+	 */
+	public UIStateProbe addProbe(String stateName) throws SimulationException {
+		UIStateProbe probeUI = new UIStateProbe(this, stateName);
+		newProbeAdded(probeUI);
+		return probeUI;
+	}
+
+	@Override
+	public void attachViewToModel() {
+		if (getModel() instanceof VisiblyMutable) {
+			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
+			visiblyMutable.addChangeListener(myMutableListener);
+		}
+	}
+
+	@Override
+	public void detachViewFromModel() {
+
+		if (getModel() instanceof VisiblyMutable) {
+			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
+
+			Util.Assert(myMutableListener != null);
+			visiblyMutable.removeChangeListener(myMutableListener);
+		}
+	}
+
+	/**
+	 * @return The default file name for this node
+	 */
+	public String getFileName() {
+		return this.getName() + "." + NeoGraphics.NEONODE_FILE_EXTENSION;
+	}
+
+	@Override
+	public Node getModel() {
+		return (Node) super.getModel();
+	}
+
+	@Override
+	public String getName() {
+		if (getModel() != null) {
+			return getModel().getName();
+		} else {
+			return "Model not constructed";
+		}
+	}
+
+	/**
+	 * @return The Network model the Node is attached to
+	 */
+	public Network getParentNetwork() {
+		WorldImpl viewer = getWorld();
+
+		/*
+		 * Can only access parent network if the Node is inside a Network Viewer
+		 */
+		if (viewer instanceof NetworkViewer) {
+			return ((NetworkViewer) viewer).getNetwork();
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return The viewer the node is contained in, this may be a regular world
+	 *         or a specialized viewer such as a NetworkViewer or EnsembleViewer
+	 */
+	public NodeViewer getParentViewer() {
+
+		WorldImpl viewer = getWorld();
+		if (viewer != null && viewer instanceof NodeViewer) {
+			return (NodeViewer) viewer;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Hides all origins and terminations
+	 */
+	@SuppressWarnings("unchecked")
+	public void hideAllOandT() {
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof Widget && (wo instanceof UITermination || wo instanceof UIOrigin)) {
+				((Widget) wo).setWidgetVisible(false);
+			}
+		}
+		layoutChildren();
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void layoutChildren() {
@@ -321,130 +475,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	/**
-	 * Called when a new probe is added
-	 * 
-	 * @param probeUI
-	 *            New probe that was just added
-	 */
-	protected void newProbeAdded(UIProbe probeUI) {
-		if (probes == null)
-			probes = new Vector<UIProbe>();
-
-		addChild(probeUI);
-		probes.add(probeUI);
-
-		/*
-		 * Assign the probe to a Origin / Termination
-		 */
-
-		WorldObject probeHolder = null;
-
-		Origin origin = null;
-		try {
-			origin = getModel().getOrigin(probeUI.getName());
-
-		} catch (StructuralException e1) {
-		}
-
-		if (origin != null) {
-			probeHolder = showOrigin(origin.getName());
-		} else if (origin == null) {
-			Termination term = null;
-			try {
-				term = getModel().getTermination(probeUI.getName());
-
-			} catch (StructuralException e) {
-			}
-			if (term != null)
-				probeHolder = showTermination(term.getName());
-		}
-
-		if (probeHolder != null) {
-			probeUI.setOffset(0, probeHolder.getHeight() / 2);
-			probeHolder.addChild(probeUI);
-
-		} else {
-			addChild(probeUI);
-		}
-	}
-
-	/**
-	 * Creates a new probe and adds the UI object to the node
-	 * 
-	 * @param stateName
-	 *            The name of the state variable to probe
-	 */
-	public UIStateProbe addProbe(String stateName) throws SimulationException {
-		UIStateProbe probeUI = new UIStateProbe(this, stateName);
-		newProbeAdded(probeUI);
-		return probeUI;
-	}
-
-	/**
-	 * @return The default file name for this node
-	 */
-	public String getFileName() {
-		return this.getName() + "." + NeoGraphics.NEONODE_FILE_EXTENSION;
-	}
-
-	@Override
-	public Node getModel() {
-		return (Node) super.getModel();
-	}
-
-	@Override
-	public String getName() {
-		if (getModel() != null) {
-			return getModel().getName();
-		} else {
-			return "Model not constructed";
-		}
-	}
-
-	/**
-	 * @return The Network model the Node is attached to
-	 */
-	public Network getParentNetwork() {
-		WorldImpl viewer = getWorld();
-
-		/*
-		 * Can only access parent network if the Node is inside a Network Viewer
-		 */
-		if (viewer instanceof NetworkViewer) {
-			return ((NetworkViewer) viewer).getNetwork();
-		}
-
-		return null;
-	}
-
-	/**
-	 * @return The viewer the node is contained in, this may be a regular world
-	 *         or a specialized viewer such as a NetworkViewer or EnsembleViewer
-	 */
-	public NodeViewer getParentViewer() {
-
-		WorldImpl viewer = getWorld();
-		if (viewer != null && viewer instanceof NodeViewer) {
-			return (NodeViewer) viewer;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Hides all origins and terminations
-	 */
-	@SuppressWarnings("unchecked")
-	public void hideAllOandT() {
-		for (WorldObject wo : getChildren()) {
-			if (wo instanceof Widget && (wo instanceof UITermination || wo instanceof UIOrigin)) {
-				((Widget) wo).setWidgetVisible(false);
-			}
-		}
-		layoutChildren();
-	}
-
-	/**
 	 * Removes a Probe UI object from node
 	 * 
 	 * @param probe
@@ -478,6 +508,18 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	}
 
 	/**
+	 * Sets the visibility of widgets
+	 */
+	public void setWidgetsVisible(boolean visible) {
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof Widget) {
+				((Widget) wo).setWidgetVisible(visible);
+			}
+		}
+		layoutChildren();
+	}
+
+	/**
 	 * Shows all the origins on the Node model
 	 */
 	public void showAllOrigins() {
@@ -501,18 +543,6 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		for (Termination element : terminations) {
 			UITermination termUI = showTermination(element.getName());
 			termUI.setWidgetVisible(true);
-		}
-		layoutChildren();
-	}
-
-	/**
-	 * Sets the visibility of widgets
-	 */
-	public void setWidgetsVisible(boolean visible) {
-		for (WorldObject wo : getChildren()) {
-			if (wo instanceof Widget) {
-				((Widget) wo).setWidgetVisible(visible);
-			}
 		}
 		layoutChildren();
 	}
@@ -558,6 +588,15 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	 * @return Probe UI Object
 	 */
 	public UIProbe showProbe(Probe probe) {
+		/*
+		 * Check if the probe is already shown
+		 */
+		for (UIProbe probeUI : probes) {
+			if (probeUI.getModel() == probe) {
+				return probeUI;
+			}
+		}
+
 		UIStateProbe probeUI = new UIStateProbe(this, probe);
 		newProbeAdded(probeUI);
 		return probeUI;
@@ -748,31 +787,5 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 		}
 
-	}
-
-	private VisiblyMutable.Listener myMutableListener = new VisiblyMutable.Listener() {
-
-		public void changed(Event e) {
-
-		}
-	};
-
-	@Override
-	public void attachViewToModel() {
-		if (getModel() instanceof VisiblyMutable) {
-			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
-			visiblyMutable.addChangeListener(myMutableListener);
-		}
-	}
-
-	@Override
-	public void detachViewFromModel() {
-
-		if (getModel() instanceof VisiblyMutable) {
-			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
-
-			Util.Assert(myMutableListener != null);
-			visiblyMutable.removeChangeListener(myMutableListener);
-		}
 	}
 }

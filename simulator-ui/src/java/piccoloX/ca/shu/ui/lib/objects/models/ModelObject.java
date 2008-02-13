@@ -55,7 +55,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	public ModelObject() {
 		super();
-		init();
+		initialize();
 	}
 
 	/**
@@ -65,12 +65,16 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 *            Model
 	 */
 	public ModelObject(Object model) {
+		super();
+		initialize();
 		setModel(model);
-		init();
 	}
 
-	private void init() {
-		setSelectable(true);
+	/**
+	 * Attaches the UI from the model
+	 */
+	protected void attachViewToModel() {
+
 	}
 
 	/**
@@ -84,10 +88,21 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		// do nothing
 	}
 
+	/**
+	 * Detaches the UI form the model
+	 */
+	protected void detachViewFromModel() {
+		setModelBusy(false);
+	}
+
+	protected void initialize() {
+		setSelectable(true);
+	}
+
 	@Override
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
-		setModelBusy(false);
+
 		setModel(null);
 	}
 
@@ -118,6 +133,13 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	}
 
 	/**
+	 * Updatesthe UI from the model
+	 */
+	protected void updateViewFromModel() {
+
+	}
+
+	/**
 	 * Called if this object is double clicked on
 	 */
 	@Override
@@ -125,6 +147,26 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		super.doubleClicked();
 		if (getWorld() != null) {
 			getWorld().zoomToObject(this);
+		}
+	}
+
+	/*
+	 * (non-Javadoc) This method is final. To add items to the menu, override
+	 * constructMenu() instead.
+	 * 
+	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
+	 */
+	public final JPopupMenu getContextMenu() {
+		if (isModelBusy()) {
+			return null;
+		} else if (!isModelExists()) {
+			UserMessages.showWarning("This model  is not configured yet");
+			return null;
+		} else {
+			PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
+			constructMenu(menu);
+
+			return menu.toJPopupMenu();
 		}
 	}
 
@@ -224,47 +266,6 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 			}
 
 		}
-	}
-
-	/*
-	 * (non-Javadoc) This method is final. To add items to the menu, override
-	 * constructMenu() instead.
-	 * 
-	 * @see ca.shu.ui.lib.handlers.Interactable#showContextMenu(edu.umd.cs.piccolo.event.PInputEvent)
-	 */
-	public final JPopupMenu getContextMenu() {
-		if (isModelBusy()) {
-			return null;
-		} else if (!isModelExists()) {
-			UserMessages.showWarning("This model  is not configured yet");
-			return null;
-		} else {
-			PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
-			constructMenu(menu);
-
-			return menu.toJPopupMenu();
-		}
-	}
-
-	/**
-	 * Attaches the UI from the model
-	 */
-	protected void attachViewToModel() {
-
-	}
-
-	/**
-	 * Updatesthe UI from the model
-	 */
-	protected void updateViewFromModel() {
-
-	}
-
-	/**
-	 * Detaches the UI form the model
-	 */
-	protected void detachViewFromModel() {
-
 	}
 
 }

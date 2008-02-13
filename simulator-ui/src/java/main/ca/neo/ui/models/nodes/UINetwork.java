@@ -23,7 +23,6 @@ import ca.shu.ui.lib.util.UserMessages;
  * @author Shu Wu
  */
 public class UINetwork extends NodeContainer {
-
 	private static final String LAYOUT_MANAGER_KEY = "layout/manager";
 
 	private static final PropertyDescriptor pName = new PString("Name");
@@ -74,6 +73,15 @@ public class UINetwork extends NodeContainer {
 	}
 
 	@Override
+	protected void updateViewFromModel() {
+		super.updateViewFromModel();
+
+		if (getViewer() != null && !getViewer().isDestroyed()) {
+			getViewer().updateViewFromModel(true);
+		}
+	}
+
+	@Override
 	public NetworkViewer createViewerInstance() {
 		return new NetworkViewer(this);
 	}
@@ -111,18 +119,6 @@ public class UINetwork extends NodeContainer {
 	}
 
 	/**
-	 * @return Simulator
-	 */
-	public Simulator getSimulator() {
-		return getModel().getSimulator();
-	}
-
-	@Override
-	public String getTypeName() {
-		return typeName;
-	}
-
-	/**
 	 * @return UI Configuration manager associated with this network
 	 */
 	public NetworkViewerConfig getSavedConfig() {
@@ -137,11 +133,24 @@ public class UINetwork extends NodeContainer {
 		}
 
 		if (layoutManager == null) {
-			layoutManager = new NetworkViewerConfig(getName() +"." + NeoGraphics.NEONODE_FILE_EXTENSION);
+			layoutManager = new NetworkViewerConfig(getName() + "."
+					+ NeoGraphics.NEONODE_FILE_EXTENSION);
 			setUICOnfig(layoutManager);
 		}
 
 		return layoutManager;
+	}
+
+	/**
+	 * @return Simulator
+	 */
+	public Simulator getSimulator() {
+		return getModel().getSimulator();
+	}
+
+	@Override
+	public String getTypeName() {
+		return typeName;
 	}
 
 	@Override

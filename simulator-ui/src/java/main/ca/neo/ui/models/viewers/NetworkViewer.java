@@ -1,6 +1,8 @@
 package ca.neo.ui.models.viewers;
 
 import java.awt.geom.Point2D;
+import java.util.Enumeration;
+import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 
@@ -26,6 +28,7 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.exceptions.UIException;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
@@ -37,6 +40,8 @@ import edu.umd.cs.piccolo.util.PBounds;
  * @author Shu Wu
  */
 public class NetworkViewer extends NodeViewer {
+	private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
+
 	private static final long serialVersionUID = -3018937112672942653L;
 
 	/**
@@ -125,8 +130,6 @@ public class NetworkViewer extends NodeViewer {
 			node.showPopupMessage("Node " + node.getName() + " added to Network");
 		}
 	}
-
-	private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
 
 	@Override
 	public void applyDefaultLayout() {
@@ -303,27 +306,61 @@ public class NetworkViewer extends NodeViewer {
 		}
 	}
 
+	@Override
+	public void updateViewFromModel() {
+		updateViewFromModel(false);
+	}
+
 	/**
 	 * Construct UI Nodes from the NEO Network model
 	 */
-	@Override
-	public void updateViewFromModel() {
-		getGround().clearLayer();
+	public void updateViewFromModel(boolean dropNewModelsInCenterOfScreen) {
+
+		/*
+		 * Get the current children and map them
+		 */
+		HashMap<Node, UINeoNode> currentNodes = new HashMap<Node, UINeoNode>(getGround()
+				.getChildrenCount());
+
+		Enumeration<UINeoNode> en = neoNodesChildren.elements();
+		while (en.hasMoreElements()) {
+			UINeoNode node = en.nextElement();
+			Util.Assert(node.getModel() != null);
+			currentNodes.put(node.getModel(), node);
+		}
+		neoNodesChildren.clear();
 
 		/*
 		 * Construct Nodes from the Network model
 		 */
-
 		Node[] nodes = getNetwork().getNodes();
 
 		for (Node node : nodes) {
-
-			/*
-			 * only add nodes if they don't already exist
-			 */
 			if (getNode(node.getName()) == null) {
-				UINeoNode nodeUI = UINeoNode.createNodeUI(node);
-				addNeoNode(nodeUI, false, false, false);
+				UINeoNode nodeUI = currentNodes.get(node);
+
+				if (nodeUI == null) {
+					/*
+					 * Create UI Wrappers here
+					 */
+					nodeUI = UINeoNode.createNodeUI(node);
+				}
+
+				addNeoNode(nodeUI, false, dropNewModelsInCenterOfScreen, false);
+			} else {
+				Util.Assert(false, "Trying to add node which already exists");
+			}
+		}
+
+		/*
+		 * Prune existing nodes by deleting them
+		 */
+		for (Node node : currentNodes.keySet()) {
+			// Remove nodes which are no longer referenced by the network model
+			if (getNode(node.getName()) == null) {
+				UINeoNode nodeUI = currentNodes.get(node);
+				nodeUI.detachViewFromModel();
+				nodeUI.removeFromParent();
 			}
 		}
 
@@ -342,7 +379,8 @@ public class NetworkViewer extends NodeViewer {
 			UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
 			UITermination termUI = nodeTerm.showTermination(term.getName());
 
-			// modifyModel is false because the connections already exist in the
+			// modifyModel is false because the connections already exist in
+			// the
 			// NEO Network model
 			originUI.connectTo(termUI, false);
 		}
@@ -370,6 +408,7 @@ public class NetworkViewer extends NodeViewer {
 			}
 
 		}
+
 	}
 
 	/**
@@ -391,29 +430,6 @@ public class NetworkViewer extends NodeViewer {
 		protected void action() throws ActionException {
 			deleteNodeLayout(layoutName);
 		}
-	}
-
-	/**
-	 * Action to hide all widgets
-	 * 
-	 * @author Shu Wu
-	 */
-	class SetOTVisiblityAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		private boolean visible;
-
-		public SetOTVisiblityAction(String actionName, boolean visible) {
-			super(actionName);
-			this.visible = visible;
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			setOriginsTerminationsVisible(visible);
-		}
-
 	}
 
 	/**
@@ -461,6 +477,29 @@ public class NetworkViewer extends NodeViewer {
 				throw new ActionException("Could not get layout name", false);
 			}
 
+		}
+
+	}
+
+	/**
+	 * Action to hide all widgets
+	 * 
+	 * @author Shu Wu
+	 */
+	class SetOTVisiblityAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private boolean visible;
+
+		public SetOTVisiblityAction(String actionName, boolean visible) {
+			super(actionName);
+			this.visible = visible;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			setOriginsTerminationsVisible(visible);
 		}
 
 	}

@@ -15,14 +15,11 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.neo.sim.Simulator;
 import ca.neo.ui.NeoGraphics;
-import ca.neo.ui.actions.PlotTimeSeries;
 import ca.neo.ui.actions.RunSimulatorAction;
-import ca.neo.ui.models.nodes.UIFunctionInput;
-import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.widgets.UIStateProbe;
-import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.ui.models.viewers.NodeViewer;
 
 /**
@@ -33,54 +30,22 @@ import ca.neo.ui.models.viewers.NodeViewer;
 public class IntegratorExample {
 	public static float tau = .05f;
 
-	// public static Network createNetwork() throws StructuralException {
-	//
-	// Network network = new NetworkImpl();
-	//
-	// Function f = new ConstantFunction(1, 1f);
-	// // Function f = new SineFunction();
-	// FunctionInput input = new FunctionInput("input", new Function[] { f },
-	// Units.UNK);
-	// network.addNode(input);
-	//
-	// NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-	//
-	// NEFEnsemble integrator = ef.make("integrator", 500, 1, "integrator1",
-	// false);
-	// network.addNode(integrator);
-	// integrator.collectSpikes(true);
-	//
-	// Termination interm = integrator.addDecodedTermination("input",
-	// new float[][] { new float[] { tau } }, tau, false);
-	// // Termination interm = integrator.addDecodedTermination("input", new
-	// // float[][]{new float[]{1f}}, tau);
-	// network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME),
-	// interm);
-	//
-	// Termination fbterm = integrator.addDecodedTermination("feedback",
-	// new float[][] { new float[] { 1f } }, tau, false);
-	// network.addProjection(integrator.getOrigin(NEFEnsemble.X), fbterm);
-	//
-	// // System.out.println("Network creation: " + (System.currentTimeMillis()
-	// // - start));
-	// return network;
-	// }
-
 	public UINetwork createUINetwork(NeoGraphics neoGraphics) throws StructuralException,
 			SimulationException {
 		NetworkImpl integratorNet = new NetworkImpl();
+		Simulator simulator = integratorNet.getSimulator();
+
 		integratorNet.setName("Integrator");
 
 		UINetwork network = new UINetwork(integratorNet);
 		neoGraphics.addNeoNode(network);
 
 		Function f = new ConstantFunction(1, 1f);
-		UIFunctionInput uiInput = new UIFunctionInput(new FunctionInput("input",
-				new Function[] { f }, Units.UNK));
+		FunctionInput input = new FunctionInput("input", new Function[] { f }, Units.UNK);
 
 		NodeViewer uiViewer = network.openViewer();
 
-		uiViewer.addNeoNode(uiInput);
+		// uiViewer.addNeoNode(uiInput);
 
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 		NEFEnsemble integrator = ef.make("integrator", 500, 1, "integrator1", false);
@@ -89,18 +54,21 @@ public class IntegratorExample {
 		Termination fbterm = integrator.addDecodedTermination("feedback",
 				new float[][] { new float[] { 1f } }, tau, false);
 
-		UINEFEnsemble uiIntegrator = new UINEFEnsemble(integrator);
-		uiViewer.addNeoNode(uiIntegrator);
-		uiIntegrator.collectSpikes(true);
+		integratorNet.addNode(integrator);
+		integratorNet.addNode(input);
+		// UINEFEnsemble uiIntegrator = new UINEFEnsemble(integrator);
+		// uiViewer.addNeoNode(uiIntegrator);
+		// uiIntegrator.collectSpikes(true);
 
-		UITermination uiInterm = uiIntegrator.showTermination(interm.getName());
-		UITermination uiFbterm = uiIntegrator.showTermination(fbterm.getName());
+		// UITermination uiInterm =
+		// uiIntegrator.showTermination(interm.getName());
+		// UITermination uiFbterm =
+		// uiIntegrator.showTermination(fbterm.getName());
 
-		uiInput.showOrigin(FunctionInput.ORIGIN_NAME).connectTo(uiInterm);
-		uiIntegrator.showOrigin(NEFEnsemble.X).connectTo(uiFbterm);
+		integratorNet.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), interm);
+		integratorNet.addProjection(integrator.getOrigin(NEFEnsemble.X), fbterm);
 
-		uiIntegrator.collectSpikes(true);
-		integratorProbe = uiIntegrator.addProbe(NEFEnsemble.X);
+		simulator.addProbe("integrator", NEFEnsemble.X, true);
 
 		uiViewer.getGround().setElasticEnabled(true);
 
@@ -145,9 +113,9 @@ public class IntegratorExample {
 
 		SwingUtilities.invokeAndWait(new Runnable() {
 			public void run() {
-				PlotTimeSeries plotAction = new PlotTimeSeries(
-						integratorProbe.getModel().getData(), integratorProbe.getName());
-				plotAction.doAction();
+//				PlotTimeSeries plotAction = new PlotTimeSeries(
+//						integratorProbe.getModel().getData(), integratorProbe.getName());
+//				plotAction.doAction();
 			}
 		});
 		network = null;

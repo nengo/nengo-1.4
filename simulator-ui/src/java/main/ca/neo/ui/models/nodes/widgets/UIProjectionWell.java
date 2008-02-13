@@ -27,12 +27,21 @@ public class UIProjectionWell extends LineWell {
 	/**
 	 * @return new LineEnd created
 	 */
-	public UIProjection createAndAddLineEnd() {
-		UIProjection lineEnd = new UIProjection(this);
-		addChild(lineEnd);
-		return lineEnd;
+	public UIProjection createProjection() {
+		UIProjection projection = new UIProjection(this);
+		addChild(projection);
+		return projection;
 	}
 
+//	public Iterable<UIProjection> getProjections() {
+//		LinkedList<UIProjection> projections = new LinkedList<UIProjection>();
+//		for (WorldObject wo : getChildren()) {
+//			if (wo instanceof UIProjection) {
+//				projections.add((UIProjection) wo);
+//			}
+//		}
+//		return projections;
+//	}
 
 	protected UIOrigin getOriginUI() {
 		return myOrigin;

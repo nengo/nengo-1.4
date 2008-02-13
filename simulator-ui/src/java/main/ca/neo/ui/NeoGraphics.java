@@ -66,7 +66,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
  * @author User
  */
 public class NeoGraphics extends AppFrame implements INodeContainer {
-	private static final String APP_NAME = "NENGO Graphics V1 Beta";
+	private static final String APP_NAME = "Nengo Graphics V1 Beta";
 
 	private static final long serialVersionUID = 1L;
 
@@ -266,18 +266,19 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		getWorld().getGround().addChildListener(new WorldObject.ChildListener() {
 
 			public void childAdded(WorldObject wo) {
-				if (wo instanceof UINetwork) {
-					final UINetwork networkUI = ((UINetwork) wo);
-					final Network network = networkUI.getModel();
+				if (wo instanceof ModelObject) {
+					final ModelObject modelObject = ((ModelObject) wo);
+					final Object model = modelObject.getModel();
+					final String modelName = modelObject.getName();
 
 					try {
-						scriptConsole.addVariable(network.getName(), network);
+						scriptConsole.addVariable(modelName, model);
 
-						networkUI.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
+						modelObject.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
 								new WorldObject.Listener() {
 									public void propertyChanged(Property event) {
-										scriptConsole.removeVariable(network.getName());
-										networkUI.removePropertyChangeListener(
+										scriptConsole.removeVariable(modelName);
+										modelObject.removePropertyChangeListener(
 												Property.REMOVED_FROM_WORLD, this);
 									}
 								});
@@ -406,7 +407,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	}
 
 	public String getAppWindowTitle() {
-		return "NENGO Workspace";
+		return "Nengo Workspace";
 	}
 
 	@Override

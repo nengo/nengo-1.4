@@ -117,9 +117,7 @@ public class UITermination extends Widget implements ILineTermination {
 			}
 
 		}
-		
-		
-		
+
 	}
 
 	@Override
@@ -155,10 +153,15 @@ public class UITermination extends Widget implements ILineTermination {
 		return null;
 	}
 
-	public LineConnector getConnector() {
+	public UIProjection getConnector() {
 		for (WorldObject wo : getChildren()) {
-			if (wo instanceof LineConnector)
-				return (LineConnector) wo;
+			if (wo instanceof LineConnector) {
+				if (wo instanceof UIProjection) {
+					return (UIProjection) wo;
+				} else {
+					Util.Assert(false, "Unexpected projection type");
+				}
+			}
 		}
 		return null;
 	}
