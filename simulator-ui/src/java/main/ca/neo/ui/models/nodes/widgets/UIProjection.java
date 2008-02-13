@@ -32,10 +32,7 @@ public class UIProjection extends LineConnector {
 			 */
 			UINeoNode nodeParent = getOriginUI().getNodeParent();
 			getEdge().setLineShape(PXEdge.EdgeShape.UPWARD_ARC);
-			getEdge()
-					.setMinArcRadius(
-							nodeParent.localToParent(nodeParent.getBounds())
-									.getWidth());
+			getEdge().setMinArcRadius(nodeParent.localToParent(nodeParent.getBounds()).getWidth());
 			setPointerVisible(false);
 		} else {
 			getEdge().setLineShape(PXEdge.EdgeShape.STRAIGHT);
@@ -69,8 +66,10 @@ public class UIProjection extends LineConnector {
 
 	@Override
 	protected void disconnectFromTermination() {
-		setRecursive(false);
-		getTermination().disconnect();
+		if (getTermination() != null) {
+			setRecursive(false);
+			getTermination().disconnect();
+		}
 	}
 
 	@Override
@@ -84,14 +83,6 @@ public class UIProjection extends LineConnector {
 		} else {
 			return false;
 		}
-	}
-
-	@Override
-	protected void prepareForDestroy() {
-		if (getTermination() != null) {
-			disconnectFromTermination();
-		}
-		super.prepareForDestroy();
 	}
 
 	public UIOrigin getOriginUI() {

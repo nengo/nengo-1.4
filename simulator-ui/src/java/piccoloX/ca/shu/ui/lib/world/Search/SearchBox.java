@@ -161,7 +161,7 @@ class SearchBox extends WorldObjectImpl {
 
 	public void clearSearchResults() {
 		searchResultsText.setText("");
-		searchResultsText.destroyAllChildren();
+		searchResultsText.destroyChildren();
 		searchResultsMap = null;
 		searchQuery = null;
 		searchResults = null;

@@ -26,11 +26,13 @@ import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.exceptions.UIException;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.util.PBounds;
 
@@ -56,6 +58,45 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public NetworkViewer(UINetwork pNetwork) {
 		super(pNetwork);
+
+		init();
+	}
+
+	private class MyNodeListener implements ModelObject.ModelListener {
+
+		public void modelDestroyed(Object model) {
+			try {
+				getNetwork().removeNode(((Node) model).getName());
+			} catch (StructuralException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	MyNodeListener myNodeListener;
+
+	private void init() {
+		myNodeListener = new MyNodeListener();
+
+		getGround().addChildListener(new WorldObject.ChildListener() {
+
+			public void childAdded(WorldObject wo) {
+
+				if (wo instanceof UINeoNode) {
+					((UINeoNode) wo).addModelListener(myNodeListener);
+				}
+
+			}
+
+			public void childRemoved(WorldObject wo) {
+				if (wo instanceof UINeoNode) {
+					((UINeoNode) wo).removeModelListener(myNodeListener);
+				}
+			}
+
+		});
+
 	}
 
 	@Override
@@ -96,22 +137,7 @@ public class NetworkViewer extends NodeViewer {
 	}
 
 	@Override
-	protected void removeNeoNode(UINeoNode nodeUI) {
-
-		try {
-			nodeUI.showPopupMessage("Node " + nodeUI.getName() + " removed from Network");
-			getNetwork().removeNode(nodeUI.getName());
-
-		} catch (StructuralException e) {
-			UserMessages.showWarning(e.toString());
-			return;
-		}
-
-		super.removeNeoNode(nodeUI);
-	}
-
-	@Override
-	public void addNeoNode(UINeoNode node, boolean updateModel, boolean dropInCenterOfCamera,
+	protected void addNeoNode(UINeoNode node, boolean updateModel, boolean dropInCenterOfCamera,
 			boolean moveCamera) {
 
 		if (updateModel) {
@@ -325,8 +351,10 @@ public class NetworkViewer extends NodeViewer {
 		Enumeration<UINeoNode> en = neoNodesChildren.elements();
 		while (en.hasMoreElements()) {
 			UINeoNode node = en.nextElement();
-			Util.Assert(node.getModel() != null);
-			currentNodes.put(node.getModel(), node);
+			if (!node.isDestroyed()) {
+				Util.Assert(node.getModel() != null);
+				currentNodes.put(node.getModel(), node);
+			}
 		}
 		neoNodesChildren.clear();
 
@@ -339,14 +367,16 @@ public class NetworkViewer extends NodeViewer {
 			if (getNode(node.getName()) == null) {
 				UINeoNode nodeUI = currentNodes.get(node);
 
+				boolean newNode = false;
 				if (nodeUI == null) {
 					/*
 					 * Create UI Wrappers here
 					 */
+					newNode = true;
 					nodeUI = UINeoNode.createNodeUI(node);
 				}
 
-				addNeoNode(nodeUI, false, dropNewModelsInCenterOfScreen, false);
+				addNeoNode(nodeUI, false, (dropNewModelsInCenterOfScreen && newNode), false);
 			} else {
 				Util.Assert(false, "Trying to add node which already exists");
 			}
@@ -359,8 +389,8 @@ public class NetworkViewer extends NodeViewer {
 			// Remove nodes which are no longer referenced by the network model
 			if (getNode(node.getName()) == null) {
 				UINeoNode nodeUI = currentNodes.get(node);
-				nodeUI.detachViewFromModel();
-				nodeUI.removeFromParent();
+				nodeUI.showPopupMessage("Node " + nodeUI.getName() + " removed from Network");
+				nodeUI.destroy();
 			}
 		}
 
@@ -402,8 +432,11 @@ public class NetworkViewer extends NodeViewer {
 					Node node = (Node) target;
 
 					UINeoNode nodeUI = getNode(node.getName());
-					nodeUI.showProbe(probe);
-
+					if (nodeUI != null) {
+						nodeUI.showProbe(probe);
+					} else {
+						Util.debugMsg("There is a dangling probe in the Simulator");
+					}
 				}
 			}
 

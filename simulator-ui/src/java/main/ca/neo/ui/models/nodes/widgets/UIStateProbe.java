@@ -120,22 +120,6 @@ public class UIStateProbe extends UIProbe {
 	}
 
 	@Override
-	protected void prepareForDestroy() {
-
-		super.prepareForDestroy();
-
-		try {
-			getProbeParent().getParentNetwork().getSimulator().removeProbe(getModel());
-			getProbeParent().showPopupMessage("Probe removed from Simulator");
-		} catch (SimulationException e) {
-			UserMessages.showError("Could not remove probe");
-		}
-
-		getProbeParent().removeProbe(this);
-
-	}
-
-	@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
 
@@ -172,5 +156,17 @@ public class UIStateProbe extends UIProbe {
 	@Override
 	public void updateViewFromModel() {
 		setName(((Probe) getModel()).getStateName());
+	}
+
+	@Override
+	protected void prepareToDestroyModel() {
+		try {
+			getProbeParent().getParentNetwork().getSimulator().removeProbe(getModel());
+			getProbeParent().showPopupMessage("Probe removed from Simulator");
+		} catch (SimulationException e) {
+			UserMessages.showError("Could not remove probe: " + e.getMessage());
+		}
+
+		super.prepareToDestroyModel();
 	}
 }

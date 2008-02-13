@@ -1,6 +1,5 @@
 package ca.neo.ui.models.viewers;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,9 +24,6 @@ import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
 import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.WorldObject.Listener;
-import ca.shu.ui.lib.world.WorldObject.Property;
-import ca.shu.ui.lib.world.elastic.ElasticGround;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
 import edu.umd.cs.piccolo.activities.PActivity;
@@ -57,8 +53,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 	 *            UI Object containing the Node model
 	 */
 	public NodeViewer(NodeContainer nodeContainer) {
-		super(nodeContainer.getName() + " (" + nodeContainer.getTypeName() + " Viewer)",
-				new MyGround());
+		super(nodeContainer.getName() + " (" + nodeContainer.getTypeName() + " Viewer)");
 		this.parentOfViewer = nodeContainer;
 
 		setStatusBarHandler(new NodeViewerStatus(this));
@@ -101,8 +96,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 			getGround().addChild(node);
 		}
 
-		node.addPropertyChangeListener(Property.REMOVED_FROM_WORLD, new RemoveNodeListener(node,
-				this));
 	}
 
 	@Override
@@ -118,16 +111,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
 		// TODO Auto-generated method stub
 		super.constructSelectionMenu(selection, menu);
-	}
-
-	/**
-	 * Removes a node
-	 * 
-	 * @param node
-	 *            Node to remove
-	 */
-	protected void removeNeoNode(UINeoNode node) {
-		neoNodesChildren.remove(node.getName());
 	}
 
 	/**
@@ -420,54 +403,6 @@ class NodeViewerStatus extends AbstractStatusHandler {
 	@Override
 	protected NodeViewer getWorld() {
 		return (NodeViewer) super.getWorld();
-	}
-
-}
-
-class RemoveNodeListener implements Listener {
-	private UINeoNode node;
-	WeakReference<NodeViewer> nodeViewer;
-
-	public RemoveNodeListener(UINeoNode node, NodeViewer nodeViewer) {
-		super();
-		this.node = node;
-		this.nodeViewer = new WeakReference<NodeViewer>(nodeViewer);
-	}
-
-	public void propertyChanged(Property event) {
-		if (nodeViewer.get() != null) {
-
-			nodeViewer.get().removeNeoNode((UINeoNode) node);
-		}
-	}
-
-}
-
-class MyGround extends ElasticGround {
-	@Override
-	protected void destroyChildren() {
-		/*
-		 * We don't want to destroy the UINeoNode children because that would
-		 * modify the Network models. Instead, we destroy all the non-NeoNodes
-		 * and NodeViewers to plug memory leaks.
-		 */
-		for (WorldObject wo : getChildren()) {
-			if (wo instanceof NodeContainer) {
-				/*
-				 * Close viewers
-				 */
-				((NodeContainer) wo).closeViewer();
-			}
-
-			if (wo instanceof UINeoNode) {
-				/*
-				 * Detach models from UI objects
-				 */
-				((ModelObject) wo).setModel(null);
-			} else {
-				wo.destroy();
-			}
-		}
 	}
 
 }

@@ -1,7 +1,7 @@
 package ca.neo.ui.models.nodes.widgets;
 
-import ca.shu.ui.lib.objects.lines.LineConnector;
 import ca.shu.ui.lib.objects.lines.LineWell;
+import ca.shu.ui.lib.objects.models.ModelObject;
 
 /**
  * LineEndWell for this origin
@@ -18,30 +18,35 @@ public class UIProjectionWell extends LineWell {
 		this.myOrigin = myOrigin;
 	}
 
-	@Override
-	protected LineConnector constructLineEnd() {
-		UIProjection projection = new UIProjection(this);
-		return projection;
-	}
-
 	/**
 	 * @return new LineEnd created
 	 */
 	public UIProjection createProjection() {
-		UIProjection projection = new UIProjection(this);
+		final UIProjection projection = new UIProjection(this);
 		addChild(projection);
+
+		/*
+		 * TODO: Remove listener when not needed
+		 */
+		myOrigin.addModelListener(new ModelObject.ModelListener() {
+			public void modelDestroyed(Object model) {
+				projection.disconnectFromTermination();
+
+			}
+		});
+
 		return projection;
 	}
 
-//	public Iterable<UIProjection> getProjections() {
-//		LinkedList<UIProjection> projections = new LinkedList<UIProjection>();
-//		for (WorldObject wo : getChildren()) {
-//			if (wo instanceof UIProjection) {
-//				projections.add((UIProjection) wo);
-//			}
-//		}
-//		return projections;
-//	}
+	// public Iterable<UIProjection> getProjections() {
+	// LinkedList<UIProjection> projections = new LinkedList<UIProjection>();
+	// for (WorldObject wo : getChildren()) {
+	// if (wo instanceof UIProjection) {
+	// projections.add((UIProjection) wo);
+	// }
+	// }
+	// return projections;
+	// }
 
 	protected UIOrigin getOriginUI() {
 		return myOrigin;

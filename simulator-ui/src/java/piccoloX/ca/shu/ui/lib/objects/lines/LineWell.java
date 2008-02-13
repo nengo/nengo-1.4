@@ -23,16 +23,11 @@ public abstract class LineWell extends WorldObjectImpl {
 	}
 
 	/**
-	 * @return new LineEnd
-	 */
-	protected abstract LineConnector constructLineEnd();
-
-	/**
 	 * @return The new LineEnd which has been created and added to the
 	 *         LineEndWell
 	 */
 	protected LineConnector createProjection() {
-		LineConnector newLineEnd = constructLineEnd();
+		LineConnector newLineEnd = createProjection();
 		addChild(newLineEnd);
 		return newLineEnd;
 	}

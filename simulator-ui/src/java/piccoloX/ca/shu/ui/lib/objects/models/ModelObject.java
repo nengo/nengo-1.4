@@ -1,5 +1,7 @@
 package ca.shu.ui.lib.objects.models;
 
+import java.util.HashSet;
+
 import javax.swing.JPopupMenu;
 
 import ca.neo.ui.actions.RemoveModelAction;
@@ -82,6 +84,43 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	protected void constructMenu(PopupMenuBuilder menu) {
 		menu.addAction(new RemoveModelAction("Remove this", this));
+	}
+
+	/*
+	 * destroy() + destroy the model
+	 */
+	public final void destroyModel() {
+		prepareToDestroyModel();
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof ModelObject) {
+				((ModelObject) wo).destroyModel();
+			}
+		}
+
+		for (ModelListener listener : modelListeners) {
+			listener.modelDestroyed(getModel());
+		}
+		modelListeners.clear();
+		destroy();
+	}
+
+	static public interface ModelListener {
+		public void modelDestroyed(Object model);
+	}
+
+	private HashSet<ModelListener> modelListeners = new HashSet<ModelListener>();
+
+	public void addModelListener(ModelListener listener) {
+		modelListeners.add(listener);
+	}
+
+	public void removeModelListener(ModelListener listener) {
+		modelListeners.remove(listener);
+	}
+
+	protected void prepareToDestroyModel() {
+
 	}
 
 	protected void constructTooltips(TooltipBuilder builder) {

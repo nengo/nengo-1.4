@@ -26,20 +26,6 @@ public class UISpikeProbe extends UIProbe {
 	}
 
 	@Override
-	protected void prepareForDestroy() {
-
-		super.prepareForDestroy();
-
-		getModel().collectSpikes(false);
-
-		getProbeParent().showPopupMessage(
-				"Spike collection stopped on " + getProbeParent().getName());
-
-		getProbeParent().removeProbe(this);
-
-	}
-
-	@Override
 	public Ensemble getModel() {
 		return (Ensemble) super.getModel();
 	}
@@ -61,5 +47,15 @@ public class UISpikeProbe extends UIProbe {
 		if (getModel().getSpikePattern() != null) {
 			menu.addAction(new PlotSpikePattern(getModel().getSpikePattern()));
 		}
+	}
+
+	@Override
+	protected void prepareToDestroyModel() {
+		getModel().collectSpikes(false);
+
+		getProbeParent().showPopupMessage(
+				"Spike collection stopped on " + getProbeParent().getName());
+
+		super.prepareToDestroyModel();
 	}
 }

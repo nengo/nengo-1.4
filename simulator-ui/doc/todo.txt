@@ -16,6 +16,8 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+AddNeoNode should not modify model
+
 UIFunctions should never modify the model. 
 	Model modification should be done externally, UI Picks up on them through listener 
 	AddNeoNode should be private, as you should never be adding nodes explicitly

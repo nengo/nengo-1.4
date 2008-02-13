@@ -139,6 +139,18 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		return null;
 	}
 
+	@Override
+	protected void prepareToDestroyModel() {
+		super.prepareToDestroyModel();
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof UITermination) {
+				((UITermination) wo).disconnect();
+			}
+		}
+
+	}
+
 	/**
 	 * @param widget
 	 *            Widget to be added

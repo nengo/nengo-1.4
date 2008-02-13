@@ -336,7 +336,7 @@ public class UITermination extends Widget implements ILineTermination {
 
 	@Override
 	protected void prepareForDestroy() {
-		disconnect();
+//		disconnect();
 		super.prepareForDestroy();
 	}
 }

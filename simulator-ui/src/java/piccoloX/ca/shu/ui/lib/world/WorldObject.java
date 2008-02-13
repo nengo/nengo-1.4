@@ -16,14 +16,17 @@ public interface WorldObject extends NamedObject, Destroyable {
 	public interface Listener {
 		public void propertyChanged(Property event);
 	}
+
 	public interface ChildListener {
 		public void childAdded(WorldObject wo);
+
 		public void childRemoved(WorldObject wo);
 	}
 
 	public void addPropertyChangeListener(Property event, Listener listener);
 
 	public void addChildListener(ChildListener listener);
+
 	public void removeChildListener(ChildListener listener);
 
 	/**
@@ -392,13 +395,9 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 */
 	public Rectangle2D parentToLocal(Rectangle2D parentRectangle);
 
-	/**
-	 * Remove all the children from this node. Node this method is more
-	 * efficient then removing each child individually.
-	 */
-	public void destroyAllChildren();
-
 	public void removeChild(WorldObject wo);
+
+	public void destroyChildren();
 
 	/**
 	 * Delete this node by removing it from its parent's list of children.

@@ -13,6 +13,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import ca.shu.ui.lib.objects.activities.TransientMessage;
 import ca.shu.ui.lib.util.Util;
@@ -328,17 +329,17 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
-	protected void destroyChildren() {
+	public final void destroyChildren() {
+		/*
+		 * Copy to list to avoid concurrency error
+		 */
+		List<WorldObject> objects = new ArrayList<WorldObject>(getChildrenCount());
 		for (WorldObject wo : getChildren()) {
+			objects.add(wo);
+		}
+		for (WorldObject wo : objects) {
 			wo.destroy();
 		}
-	}
-
-	public void destroyAllChildren() {
-		for (WorldObject wo : getChildren()) {
-			wo.destroy();
-		}
-
 	}
 
 	/*

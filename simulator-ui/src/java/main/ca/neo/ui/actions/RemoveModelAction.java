@@ -29,7 +29,7 @@ public class RemoveModelAction extends StandardAction {
 				"Once an object has been removed, it cannot be undone.",
 				"Are you sure?", JOptionPane.YES_NO_OPTION);
 		if (response == 0) {
-			modelToRemove.destroy();
+			modelToRemove.destroyModel();
 			modelToRemove = null;
 		} else {
 			throw new ActionException("Action cancelled by user", false);

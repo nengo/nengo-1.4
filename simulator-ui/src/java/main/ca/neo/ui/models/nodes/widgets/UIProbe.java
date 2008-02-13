@@ -42,4 +42,10 @@ public abstract class UIProbe extends ModelObject {
 		myIcon.setColor(color);
 	}
 
+	@Override
+	protected void prepareForDestroy() {
+		super.prepareForDestroy();
+		getProbeParent().removeProbe(this);
+	}
+
 }
