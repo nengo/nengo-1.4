@@ -37,7 +37,6 @@ import ca.neo.config.ui.ConfigurationTreeCellEditor;
 import ca.neo.config.ui.ConfigurationTreeCellRenderer;
 import ca.neo.config.ui.ConfigurationTreeModel;
 import ca.neo.config.ui.ConfigurationTreePopupListener;
-import ca.neo.model.StructuralException;
 
 /**
  * Configuration-related utility methods. 
@@ -77,33 +76,37 @@ public class ConfigUtil {
 	}
 
 	public static class ConfigurationPane extends JScrollPane {
-		private Object o;
-		private ConfigurationTreeCellRenderer cellRenderer;
-		private JTree tree;
+		
+		private static final long serialVersionUID = 1L;
+		
+		private ConfigurationTreeCellRenderer myCellRenderer;
+		private JTree myTree;
 
 		public ConfigurationPane(Object o) {
 			super();
-			this.o = o;
-			init();
+			init(o);
+			
+			//note: setting preferred size of tree itself prevents viewport from expanding
+			this.setPreferredSize(new Dimension(300, 300)); 
 		}
 
-		private void init() {
+		private void init(Object o) {
 			ConfigurationTreeModel model = new ConfigurationTreeModel(o);
 
-			tree = new JTree(model);
-			this.setViewportView(tree);
+			myTree = new JTree(model);
+			myTree.setScrollsOnExpand(true);
+			this.setViewportView(myTree);
 			
-			tree.setPreferredSize(new Dimension(300, 300));
-			tree.setEditable(true);
-			tree.setCellEditor(new ConfigurationTreeCellEditor(tree));
+			myTree.setEditable(true);
+			myTree.setCellEditor(new ConfigurationTreeCellEditor(myTree));
 
-			tree.addMouseListener(new ConfigurationTreePopupListener(tree, model));
+			myTree.addMouseListener(new ConfigurationTreePopupListener(myTree, model));
 
 			// shows help when F1 is pressed
-			tree.addKeyListener(new KeyAdapter() {
+			myTree.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyPressed(KeyEvent e) {
-					Object selected = (tree.getSelectionPath() == null) ? null : tree
+					Object selected = (myTree.getSelectionPath() == null) ? null : myTree
 							.getSelectionPath().getLastPathComponent();
 					if (e.getKeyCode() == 112 && selected instanceof Property) {
 						String documentation = ((Property) selected).getDocumentation();
@@ -112,17 +115,19 @@ public class ConfigUtil {
 					}
 				}
 			});
-			cellRenderer = new ConfigurationTreeCellRenderer();
+			myCellRenderer = new ConfigurationTreeCellRenderer();
 
-			tree.setCellRenderer(cellRenderer);
+			myTree.setCellRenderer(myCellRenderer);
 
-			ToolTipManager.sharedInstance().registerComponent(tree);
+			ToolTipManager.sharedInstance().registerComponent(myTree);
 		}
+		
 		public ConfigurationTreeCellRenderer getCellRenderer() {
-			return cellRenderer;
+			return myCellRenderer;
 		}
+		
 		public JTree getTree() {
-			return tree;
+			return myTree;
 		}
 	}
 	
@@ -147,14 +152,14 @@ public class ConfigUtil {
 	 * @return Value
 	 * @throws StructuralException If value doesn't belong to specified class
 	 */
-	public static Object get(Configuration properties, String name, Class c) throws StructuralException {
-		Object o = ((SingleValuedProperty) properties.getProperty(name)).getValue();		
-		if ( !c.isAssignableFrom(o.getClass()) ) {
-			throw new StructuralException("Property " + name 
-					+ " must be of class " + c.getName() + " (was " + o.getClass().getName() + ")");
-		}		
-		return o;
-	}
+//	public static Object get(Configuration properties, String name, Class c) throws StructuralException {
+//		Object o = ((SingleValuedProperty) properties.getProperty(name)).getValue();		
+//		if ( !c.isAssignableFrom(o.getClass()) ) {
+//			throw new StructuralException("Property " + name 
+//					+ " must be of class " + c.getName() + " (was " + o.getClass().getName() + ")");
+//		}		
+//		return o;
+//	}
 	
 	/**
 	 * @param configurable An object

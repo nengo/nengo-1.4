@@ -14,6 +14,14 @@ import javax.swing.ImageIcon;
 
 import org.apache.log4j.Logger;
 
+import ca.neo.dynamics.DynamicalSystem;
+import ca.neo.dynamics.Integrator;
+import ca.neo.model.Noise;
+import ca.neo.model.Origin;
+import ca.neo.model.SimulationMode;
+import ca.neo.model.Termination;
+import ca.neo.model.neuron.SpikeGenerator;
+
 
 /**
  * A registry of graphical Icons that can be used for displaying Property values.
@@ -56,6 +64,14 @@ public class IconRegistry {
 			ourInstance.setIcon(float[].class, "/ca/neo/config/ui/float_array_icon.GIF");
 			ourInstance.setIcon(float[][].class, "/ca/neo/config/ui/matrix_icon.GIF");
 			ourInstance.setIcon(String.class, "/ca/neo/config/ui/string_icon.JPG");
+
+			ourInstance.setIcon(DynamicalSystem.class, "/ca/neo/config/ui/dynamicalsystem01.JPG");
+			ourInstance.setIcon(Integrator.class, "/ca/neo/config/ui/integrator.JPG");
+			ourInstance.setIcon(Noise.class, "/ca/neo/config/ui/noise01.JPG");
+			ourInstance.setIcon(Origin.class, "/ca/neo/config/ui/origin01.JPG");
+			ourInstance.setIcon(SimulationMode.class, "/ca/neo/config/ui/simulationmode.JPG");
+			ourInstance.setIcon(SpikeGenerator.class, "/ca/neo/config/ui/spikegenerator.JPG");
+			ourInstance.setIcon(Termination.class, "/ca/neo/config/ui/termination.JPG");			
 		}
 		
 		return ourInstance;
