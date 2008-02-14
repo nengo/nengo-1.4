@@ -57,14 +57,14 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		super(nodeContainer.getName() + " (" + nodeContainer.getTypeName() + " Viewer)");
 		this.parentOfViewer = nodeContainer;
 
-		init();
+		initialize();
 	}
 
 	public void updateViewFromModel() {
 		updateViewFromModel(false);
 	}
 
-	private void init() {
+	protected void initialize() {
 		initChildModelListener();
 
 		setStatusBarHandler(new NodeViewerStatus(this));

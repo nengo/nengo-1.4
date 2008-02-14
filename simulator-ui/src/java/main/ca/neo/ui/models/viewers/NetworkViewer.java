@@ -62,6 +62,11 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 	}
 
 	@Override
+	protected boolean canRemoveChildModel(Node node) {
+		return true;
+	}
+
+	@Override
 	protected void constructLayoutMenu(MenuBuilder menu) {
 		super.constructLayoutMenu(menu);
 		menu.addSection("File");
@@ -92,10 +97,120 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 	}
 
 	@Override
+	protected void initialize() {
+		super.initialize();
+		updateSimulatorProbes();
+	}
+
+	@Override
 	protected void prepareForDestroy() {
 
 		saveLayoutAsDefault();
 		super.prepareForDestroy();
+	}
+
+	@Override
+	protected void removeChildModel(Node node) {
+		try {
+			getModel().removeNode(node.getName());
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Construct UI Nodes from the NEO Network model
+	 */
+	protected void updateViewFromModel(boolean isFirstUpdate) {
+
+		/*
+		 * Get the current children and map them
+		 */
+		HashMap<Node, UINeoNode> currentNodes = new HashMap<Node, UINeoNode>(getGround()
+				.getChildrenCount());
+
+		Enumeration<UINeoNode> en = neoNodesChildren.elements();
+		while (en.hasMoreElements()) {
+			UINeoNode node = en.nextElement();
+			if (!node.isDestroyed()) {
+				Util.Assert(node.getModel() != null);
+				currentNodes.put(node.getModel(), node);
+			}
+		}
+		neoNodesChildren.clear();
+
+		/*
+		 * Construct Nodes from the Network model
+		 */
+		Node[] nodes = getModel().getNodes();
+
+		for (Node node : nodes) {
+			if (getNode(node.getName()) == null) {
+				UINeoNode nodeUI = currentNodes.get(node);
+
+				if (nodeUI == null) {
+					/*
+					 * Create UI Wrappers here
+					 */
+					nodeUI = UINeoNode.createNodeUI(node);
+
+					boolean centerAndNotify = !isFirstUpdate;
+
+					addChildFancy(nodeUI, centerAndNotify, false);
+					if (centerAndNotify) {
+						nodeUI.showPopupMessage("Node " + node.getName() + " added to Network");
+					}
+				} else {
+					neoNodesChildren.put(nodeUI.getName(), nodeUI);
+				}
+
+			} else {
+				Util.Assert(false, "Trying to add node which already exists");
+			}
+		}
+
+		/*
+		 * Prune existing nodes by deleting them
+		 */
+		for (Node node : currentNodes.keySet()) {
+			// Remove nodes which are no longer referenced by the network model
+			if (getNode(node.getName()) == null) {
+				UINeoNode nodeUI = currentNodes.get(node);
+				nodeUI.showPopupMessage("Node " + nodeUI.getName() + " removed from Network");
+				nodeUI.destroy();
+			}
+		}
+
+		/*
+		 * Construct projections
+		 */
+		Projection[] projections = getModel().getProjections();
+		for (Projection projection : projections) {
+			Origin origin = projection.getOrigin();
+			Termination term = projection.getTermination();
+
+			UINeoNode nodeOrigin = getNode(origin.getNode().getName());
+
+			UINeoNode nodeTerm = getNode(term.getNode().getName());
+
+			UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
+			UITermination termUI = nodeTerm.showTermination(term.getName());
+
+			// modifyModel is false because the connections already exist in
+			// the
+			// NEO Network model
+			originUI.connectTo(termUI, false);
+		}
+
+	}
+
+	public void addNodeModel(Node node) {
+		try {
+			getModel().addNode(node);
+		} catch (StructuralException e) {
+			UserMessages.showWarning(e.toString());
+			return;
+		}
 	}
 
 	@Override
@@ -164,6 +279,11 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 	 */
 	public NetworkViewerConfig getConfig() {
 		return getViewerParent().getSavedConfig();
+	}
+
+	@Override
+	public Network getModel() {
+		return (Network) super.getModel();
 	}
 
 	@Override
@@ -290,92 +410,6 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 	}
 
 	/**
-	 * Construct UI Nodes from the NEO Network model
-	 */
-	protected void updateViewFromModel(boolean isFirstUpdate) {
-
-		/*
-		 * Get the current children and map them
-		 */
-		HashMap<Node, UINeoNode> currentNodes = new HashMap<Node, UINeoNode>(getGround()
-				.getChildrenCount());
-
-		Enumeration<UINeoNode> en = neoNodesChildren.elements();
-		while (en.hasMoreElements()) {
-			UINeoNode node = en.nextElement();
-			if (!node.isDestroyed()) {
-				Util.Assert(node.getModel() != null);
-				currentNodes.put(node.getModel(), node);
-			}
-		}
-		neoNodesChildren.clear();
-
-		/*
-		 * Construct Nodes from the Network model
-		 */
-		Node[] nodes = getModel().getNodes();
-
-		for (Node node : nodes) {
-			if (getNode(node.getName()) == null) {
-				UINeoNode nodeUI = currentNodes.get(node);
-
-				if (nodeUI == null) {
-					/*
-					 * Create UI Wrappers here
-					 */
-					nodeUI = UINeoNode.createNodeUI(node);
-
-					boolean centerAndNotify = !isFirstUpdate;
-
-					addChildFancy(nodeUI, centerAndNotify, false);
-					if (centerAndNotify) {
-						nodeUI.showPopupMessage("Node " + node.getName() + " added to Network");
-					}
-				} else {
-					neoNodesChildren.put(nodeUI.getName(), nodeUI);
-				}
-
-			} else {
-				Util.Assert(false, "Trying to add node which already exists");
-			}
-		}
-
-		/*
-		 * Prune existing nodes by deleting them
-		 */
-		for (Node node : currentNodes.keySet()) {
-			// Remove nodes which are no longer referenced by the network model
-			if (getNode(node.getName()) == null) {
-				UINeoNode nodeUI = currentNodes.get(node);
-				nodeUI.showPopupMessage("Node " + nodeUI.getName() + " removed from Network");
-				nodeUI.destroy();
-			}
-		}
-
-		/*
-		 * Construct projections
-		 */
-		Projection[] projections = getModel().getProjections();
-		for (Projection projection : projections) {
-			Origin origin = projection.getOrigin();
-			Termination term = projection.getTermination();
-
-			UINeoNode nodeOrigin = getNode(origin.getNode().getName());
-
-			UINeoNode nodeTerm = getNode(term.getNode().getName());
-
-			UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
-			UITermination termUI = nodeTerm.showTermination(term.getName());
-
-			// modifyModel is false because the connections already exist in
-			// the
-			// NEO Network model
-			originUI.connectTo(termUI, false);
-		}
-
-	}
-
-	/**
 	 * Action to delete a layout
 	 * 
 	 * @author Shu Wu
@@ -466,33 +500,5 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 			setOriginsTerminationsVisible(visible);
 		}
 
-	}
-
-	@Override
-	protected void removeChildModel(Node node) {
-		try {
-			getModel().removeNode(node.getName());
-		} catch (StructuralException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	protected boolean canRemoveChildModel(Node node) {
-		return true;
-	}
-
-	public void addNodeModel(Node node) {
-		try {
-			getModel().addNode(node);
-		} catch (StructuralException e) {
-			UserMessages.showWarning(e.toString());
-			return;
-		}
-	}
-
-	@Override
-	public Network getModel() {
-		return (Network) super.getModel();
 	}
 }

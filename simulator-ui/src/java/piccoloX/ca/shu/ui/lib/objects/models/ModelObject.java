@@ -45,6 +45,8 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 
 	private boolean isModelBusy = false;
 
+	private HashSet<ModelListener> modelListeners = new HashSet<ModelListener>();
+
 	/**
 	 * Model
 	 */
@@ -80,55 +82,6 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		menu.addAction(new RemoveModelAction("Remove this", this));
 	}
 
-	/*
-	 * destroy() + destroy the model
-	 */
-	public final void destroyModel() {
-		for (ModelListener listener : modelListeners) {
-			listener.modelDestroyStarted(getModel());
-		}
-
-		prepareToDestroyModel();
-
-		for (WorldObject wo : getChildren()) {
-			if (wo instanceof ModelObject) {
-				((ModelObject) wo).destroyModel();
-			}
-		}
-
-		for (ModelListener listener : modelListeners.toArray(new ModelListener[] {})) {
-			listener.modelDestroyed(getModel());
-		}
-
-		destroy();
-	}
-
-	static public interface ModelListener {
-		public void modelDestroyStarted(Object model);
-
-		public void modelDestroyed(Object model);
-	}
-
-	private HashSet<ModelListener> modelListeners = new HashSet<ModelListener>();
-
-	public void addModelListener(ModelListener listener) {
-		if (modelListeners.contains(listener)) {
-			throw new InvalidParameterException();
-		}
-		modelListeners.add(listener);
-	}
-
-	public void removeModelListener(ModelListener listener) {
-		if (!modelListeners.contains(listener)) {
-			throw new InvalidParameterException();
-		}
-		modelListeners.remove(listener);
-	}
-
-	protected void prepareToDestroyModel() {
-
-	}
-
 	protected void constructTooltips(TooltipBuilder builder) {
 		// do nothing
 	}
@@ -144,11 +97,22 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		setSelectable(true);
 	}
 
+	/**
+	 * Updatesthe UI from the model
+	 */
+	protected void modelUpdated() {
+
+	}
+
 	@Override
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
 
 		setModel(null);
+	}
+
+	protected void prepareToDestroyModel() {
+
 	}
 
 	/**
@@ -177,11 +141,34 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 
 	}
 
-	/**
-	 * Updatesthe UI from the model
-	 */
-	protected void modelUpdated() {
+	public void addModelListener(ModelListener listener) {
+		if (modelListeners.contains(listener)) {
+			throw new InvalidParameterException();
+		}
+		modelListeners.add(listener);
+	}
 
+	/*
+	 * destroy() + destroy the model
+	 */
+	public final void destroyModel() {
+		for (ModelListener listener : modelListeners) {
+			listener.modelDestroyStarted(getModel());
+		}
+
+		prepareToDestroyModel();
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof ModelObject) {
+				((ModelObject) wo).destroyModel();
+			}
+		}
+
+		for (ModelListener listener : modelListeners.toArray(new ModelListener[] {})) {
+			listener.modelDestroyed(getModel());
+		}
+
+		destroy();
 	}
 
 	/**
@@ -256,6 +243,13 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		return isModelBusy;
 	}
 
+	public void removeModelListener(ModelListener listener) {
+		if (!modelListeners.contains(listener)) {
+			throw new InvalidParameterException();
+		}
+		modelListeners.remove(listener);
+	}
+
 	/**
 	 * @param model
 	 *            New Model
@@ -299,6 +293,12 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 			}
 
 		}
+	}
+
+	static public interface ModelListener {
+		public void modelDestroyed(Object model);
+
+		public void modelDestroyStarted(Object model);
 	}
 
 }
