@@ -47,6 +47,7 @@ public class LocalSimulator implements Simulator {
 
 	public LocalSimulator() {
 		mySimulatorListeners = new ArrayList<SimulatorListener>(1);
+		myChangeListeners = new ArrayList<Listener>(1);
 	}
 
 	/**
