@@ -26,10 +26,12 @@ public class VisiblyMutableUtils {
 			}
 		};
 		
-		Iterator<VisiblyMutable.Listener> iterator = listeners.iterator();
-		while (iterator.hasNext()) {
-			VisiblyMutable.Listener listener = iterator.next();
-			listener.changed(event);
+		if (listeners != null) {
+			Iterator<VisiblyMutable.Listener> iterator = listeners.iterator();
+			while (iterator.hasNext()) {
+				VisiblyMutable.Listener listener = iterator.next();
+				listener.changed(event);
+			}			
 		}
 	}
 }

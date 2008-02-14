@@ -3,7 +3,10 @@
  */
 package ca.neo.config.impl;
 
+import java.lang.reflect.Method;
+
 import ca.neo.config.Configuration;
+import ca.neo.config.JavaSourceParser;
 import ca.neo.config.Property;
 
 /**
@@ -69,6 +72,31 @@ public abstract class AbstractProperty implements Property {
 	 */
 	public void setDocumentation(String text) {
 		myDocumentation = text;
+	}
+	
+	/**
+	 * @param methods The methods that underlie this property
+	 * @return A default documentation string composed of javadocs for these methods
+	 */
+	protected String getDefaultDocumentation(Method[] methods) {
+		StringBuffer buf = new StringBuffer("<p><small>[Note: No documentation has been written specifically for the property <i>");
+		buf.append(getName());  
+		buf.append("</i>. Documentation for the API methods that support this property is shown below.]</small></p>");
+		
+		for (int i = 0; i < methods.length; i++) {
+			appendDocs(buf, methods[i]);			
+		}
+		
+		return buf.toString();
+	}
+	
+	private static void appendDocs(StringBuffer buf, Method method) {
+		if (method != null) {
+			buf.append("<p><i>" + JavaSourceParser.getSignature(method) + "</i><br>");
+			String docs = JavaSourceParser.getDocs(method); 
+			if (docs != null) buf.append(docs);
+			buf.append("</p>");
+		}
 	}
 
 }

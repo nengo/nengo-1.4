@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -68,7 +69,7 @@ public class ConfigUtil {
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		buttonPanel.add(doneButton);
 		
-		dialog.setModal(true);
+//		dialog.setModal(true); //this prevents help popups
 		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		dialog.pack();
 		dialog.setLocationRelativeTo(owner);// centers on screen
@@ -422,9 +423,11 @@ public class ConfigUtil {
 	 * @param text Help text (html body)
 	 */
 	public static void showHelp(String text) {
-		String document = "<html><head></head><body>" + text + "</body></html>";
+		String document = "<html><head></head><body bgcolor='#000000'><font color='#FFFFFF' face='arial'>" 
+			+ text + "</font></body></html>";
 		JEditorPane pane = new JEditorPane("text/html", document);
 		pane.setEditable(false);
+		pane.setBorder(BorderFactory.createEmptyBorder());
 		
 		JFrame frame = new JFrame("Help"); 
 		frame.getContentPane().setLayout(new BorderLayout());

@@ -29,6 +29,7 @@ import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.VisiblyMutable;
 import ca.neo.util.VisiblyMutableUtils;
+import ca.neo.util.VisiblyMutable.Listener;
 import ca.neo.util.impl.SpikePatternImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
@@ -49,10 +50,10 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	private Map<String, Termination> myTerminations;
 	private Map<String, List<Integer>> myStateNames; // for Probeable
 	private SimulationMode myMode;
-	private SpikePatternImpl mySpikePattern;
+	private transient SpikePatternImpl mySpikePattern;
 	protected boolean myCollectSpikesFlag;
 	private String myDocumentation;
-	private List<VisiblyMutable.Listener> myListeners;
+	private transient List<VisiblyMutable.Listener> myListeners;
 
 	/**
 	 * Note that setMode(SimulationMode.DEFAULT) is called at construction time.
@@ -460,6 +461,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
 	 */
 	public void addChangeListener(Listener listener) {
+		if (myListeners == null) {
+			myListeners = new ArrayList<Listener>(1);
+		}
 		myListeners.add(listener);
 	}
 
@@ -467,7 +471,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
 	 */
 	public void removeChangeListener(Listener listener) {
-		myListeners.remove(listener);
+		if (myListeners != null) myListeners.remove(listener);
 	}
 	
 	/**

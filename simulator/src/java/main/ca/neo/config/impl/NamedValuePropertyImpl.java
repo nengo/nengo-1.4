@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import ca.neo.config.Configuration;
-import ca.neo.config.JavaSourceParser;
 import ca.neo.config.NamedValueProperty;
 import ca.neo.model.StructuralException;
 
@@ -319,26 +318,12 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 		String result = super.getDocumentation();
 		
 		if (result == null) {
-			StringBuffer buf = new StringBuffer("<h1>API methods underlying property <i>" + getName() + "</i></h1>");
-			appendDocs(buf, myGetter);
-			appendDocs(buf, myNamedSetter);
-			appendDocs(buf, myUnnamedSetter);
-			appendDocs(buf, myArrayGetter);
-			appendDocs(buf, myMapGetter);
-			appendDocs(buf, myNamesGetter);
-			appendDocs(buf, myRemover);
-			result = buf.toString();
+			Method[] methods = new Method[]{myGetter, myNamedSetter, myUnnamedSetter, 
+					myArrayGetter, myMapGetter, myNamesGetter, myRemover};
+			result = getDefaultDocumentation(methods);
 		}
 			
 		return result;
 	}
 	
-	private static void appendDocs(StringBuffer buf, Method method) {
-		if (method != null) {
-			buf.append("<h2>" + JavaSourceParser.getSignature(method) + "</h2>");
-			String docs = JavaSourceParser.getDocs(method); 
-			if (docs != null) buf.append(docs);			
-		}
-	}
-
 }

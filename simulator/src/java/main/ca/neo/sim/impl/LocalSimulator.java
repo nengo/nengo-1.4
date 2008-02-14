@@ -37,7 +37,7 @@ public class LocalSimulator implements Simulator {
 	private Node[] myNodes;
 	private Map myNodeMap;
 	private List<Probe> myProbes;
-	private List<VisiblyMutable.Listener> myChangeListeners;
+	private transient List<VisiblyMutable.Listener> myChangeListeners;
 	
 
 	/**
@@ -265,6 +265,9 @@ public class LocalSimulator implements Simulator {
 	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
 	 */
 	public void addChangeListener(Listener listener) {
+		if (myChangeListeners == null) {
+			myChangeListeners = new ArrayList<Listener>(1);
+		}
 		myChangeListeners.add(listener);
 	}
 
@@ -272,7 +275,7 @@ public class LocalSimulator implements Simulator {
 	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
 	 */
 	public void removeChangeListener(Listener listener) {
-		myChangeListeners.remove(listener);
+		if (myChangeListeners != null) myChangeListeners.remove(listener);
 	}
 	
 	private void fireVisibleChangeEvent() {

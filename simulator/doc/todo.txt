@@ -9,6 +9,11 @@ TODO (release):
 - (Tuesday) remove util configuration/configurable
 - (Tuesday) move configuration UI code to simulator-ui
 
+- ctrl shortcut keys for save, open, new
+- DONE make visiblymutable listeners transient
+- fix bug where config window doesn't close
+- improve code completion (particularly static methods and constructors)
+- support name changes in network members
 - do we need a way to create top-level UI objects from scripts?
 - change package names to nengo
 - use config matrix editor throughout

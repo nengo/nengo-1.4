@@ -55,7 +55,7 @@ public class NetworkImpl implements Network, VisiblyMutable {
 	private Map myExposedOriginNames;
 	private Map myExposedTerminationNames;
 	
-	private List<VisiblyMutable.Listener> myListeners;
+	private transient List<VisiblyMutable.Listener> myListeners;
 	
 	public NetworkImpl() {
 		myNodeMap = new HashMap<String, Node>(20);
@@ -517,6 +517,9 @@ public class NetworkImpl implements Network, VisiblyMutable {
 	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
 	 */
 	public void addChangeListener(Listener listener) {
+		if (myListeners == null) {
+			myListeners = new ArrayList<Listener>(1);
+		}
 		myListeners.add(listener);
 	}
 
@@ -524,7 +527,7 @@ public class NetworkImpl implements Network, VisiblyMutable {
 	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
 	 */
 	public void removeChangeListener(Listener listener) {
-		myListeners.remove(listener);
+		if (myListeners != null) myListeners.remove(listener);
 	}
 	
 	private void fireVisibleChangeEvent() {
