@@ -7,13 +7,14 @@ import ca.neo.model.Network;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.util.Probe;
+import ca.neo.util.VisiblyMutable;
 
 /**
  * Runs simulations of a Network. 
  * 
  * @author Bryan Tripp
  */
-public interface Simulator {
+public interface Simulator extends VisiblyMutable {
 
 	/**
 	 * Initializes the Simulator with a given Network, after which changes to the 

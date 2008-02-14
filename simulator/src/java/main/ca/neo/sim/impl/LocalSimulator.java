@@ -21,6 +21,8 @@ import ca.neo.sim.Simulator;
 import ca.neo.sim.SimulatorEvent;
 import ca.neo.sim.SimulatorListener;
 import ca.neo.util.Probe;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutableUtils;
 import ca.neo.util.impl.ProbeImpl;
 
 /**
@@ -35,14 +37,16 @@ public class LocalSimulator implements Simulator {
 	private Node[] myNodes;
 	private Map myNodeMap;
 	private List<Probe> myProbes;
+	private List<VisiblyMutable.Listener> myChangeListeners;
+	
 
 	/**
 	 * Collection of Simulator
 	 */
-	Collection<SimulatorListener> listeners;
+	private Collection<SimulatorListener> mySimulatorListeners;
 
 	public LocalSimulator() {
-		listeners = new ArrayList<SimulatorListener>(1);
+		mySimulatorListeners = new ArrayList<SimulatorListener>(1);
 	}
 
 	/**
@@ -132,7 +136,6 @@ public class LocalSimulator implements Simulator {
 	public Probe addProbe(String nodeName, String state, boolean record)
 			throws SimulationException {
 		Probeable p = getNode(nodeName);
-
 		return addProbe(null, p, state, record);
 	}
 
@@ -143,9 +146,7 @@ public class LocalSimulator implements Simulator {
 	public Probe addProbe(String ensembleName, int neuronIndex, String state,
 			boolean record) throws SimulationException {
 		Probeable p = getNeuron(ensembleName, neuronIndex);
-
 		return addProbe(ensembleName, p, state, record);
-
 	}
 
 	/**
@@ -171,6 +172,7 @@ public class LocalSimulator implements Simulator {
 
 		myProbes.add(result);
 
+		fireVisibleChangeEvent();
 		return result;
 	}
 
@@ -178,10 +180,10 @@ public class LocalSimulator implements Simulator {
 	 * @see ca.neo.sim.Simulator#removeProbe(ca.neo.util.Probe)
 	 */
 	public void removeProbe(Probe probe) throws SimulationException {
-
 		if (!myProbes.remove(probe)) {
 			throw new SimulationException("Probe could not be removed");
 		}
+		fireVisibleChangeEvent();
 	}
 
 	private Probeable getNode(String nodeName) throws SimulationException {
@@ -234,11 +236,11 @@ public class LocalSimulator implements Simulator {
 	 * @see ca.neo.sim.Simulator#addSimulatorListener(ca.neo.sim.SimulatorListener)
 	 */
 	public void addSimulatorListener(SimulatorListener listener) {
-		if (listeners.contains(listener)) {
+		if (mySimulatorListeners.contains(listener)) {
 			System.out
 					.println("Trying to add simulator listener that already exists");
 		} else {
-			listeners.add(listener);
+			mySimulatorListeners.add(listener);
 		}
 	}
 
@@ -246,7 +248,7 @@ public class LocalSimulator implements Simulator {
 	 * @param event
 	 */
 	protected void fireSimulatorEvent(SimulatorEvent event) {
-		for (SimulatorListener listener : listeners) {
+		for (SimulatorListener listener : mySimulatorListeners) {
 			listener.processEvent(event);
 		}
 	}
@@ -255,6 +257,24 @@ public class LocalSimulator implements Simulator {
 	 * @see ca.neo.sim.Simulator#removeSimulatorListener(ca.neo.sim.SimulatorListener)
 	 */
 	public void removeSimulatorListener(SimulatorListener listener) {
-		listeners.remove(listener);
+		mySimulatorListeners.remove(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		myChangeListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myChangeListeners.remove(listener);
+	}
+	
+	private void fireVisibleChangeEvent() {
+		VisiblyMutableUtils.changed(this, myChangeListeners);
 	}
 }
