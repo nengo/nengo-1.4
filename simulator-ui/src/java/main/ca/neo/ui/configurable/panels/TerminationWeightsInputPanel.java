@@ -102,7 +102,7 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 
 		if (parent != null && parent instanceof JDialog) {
 			PropertyDescriptor pCouplingMatrix;
-			if (getValue() != null) {
+			if (isValueSet()) {
 				/*
 				 * Create a property descriptor with a set matrix
 				 */

@@ -8,7 +8,6 @@ import javax.swing.JPopupMenu;
 import ca.neo.ui.actions.RemoveModelAction;
 import ca.neo.ui.models.tooltips.Tooltip;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;
@@ -205,9 +204,6 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	public final JPopupMenu getContextMenu() {
 		if (isModelBusy()) {
 			return null;
-		} else if (!isModelExists()) {
-			UserMessages.showWarning("This model  is not configured yet");
-			return null;
 		} else {
 			PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
 			constructMenu(menu);
@@ -243,8 +239,6 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 
 			tooltipBuilder.addTitle("Currently busy");
 
-		} else if (!isModelExists()) {
-			tooltipBuilder.addTitle("Model is not ready");
 		} else {
 
 			constructTooltips(tooltipBuilder);
@@ -260,13 +254,6 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 
 	public boolean isModelBusy() {
 		return isModelBusy;
-	}
-
-	/**
-	 * @return Whether the Model exists
-	 */
-	public boolean isModelExists() {
-		return (myModel != null);
 	}
 
 	/**

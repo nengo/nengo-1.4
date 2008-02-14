@@ -86,7 +86,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	public UITermination addDecodedTermination() {
 
 		try {
-			Termination term = (Termination) ModelFactory.constructNode(new CDecodedTermination(
+			Termination term = (Termination) ModelFactory.constructNode(this, new CDecodedTermination(
 					getModel()));
 
 			UIDecodedTermination termUI = new UIDecodedTermination(this, term);
@@ -104,15 +104,14 @@ public class UINEFEnsemble extends UIEnsemble {
 	public UIOrigin addDecodedOrigin() {
 
 		try {
-			setModelBusy(true);
 
-			Origin origin = (Origin) ModelFactory.constructNode(new CDecodedOrigin(getModel()));
+			Origin origin = (Origin) ModelFactory.constructNode(this, new CDecodedOrigin(getModel()));
 			UIDecodedOrigin originUI = new UIDecodedOrigin(this, origin);
 
 			addWidget(originUI);
 			showPopupMessage("New decoded ORIGIN added");
 			setModelBusy(false);
-			
+
 			return originUI;
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();

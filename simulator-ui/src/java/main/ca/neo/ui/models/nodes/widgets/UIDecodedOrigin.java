@@ -26,16 +26,6 @@ public class UIDecodedOrigin extends UIOrigin {
 	}
 
 	@Override
-	protected void prepareForDestroy() {
-		if (isModelExists()) {
-			getNodeParent().getModel().removeDecodedTermination(getModel().getName());
-			showPopupMessage("decoded termination removed from ensemble");
-		}
-
-		super.prepareForDestroy();
-	}
-
-	@Override
 	public UINEFEnsemble getNodeParent() {
 		return (UINEFEnsemble) super.getNodeParent();
 	}
@@ -43,6 +33,13 @@ public class UIDecodedOrigin extends UIOrigin {
 	@Override
 	public String getTypeName() {
 		return typeName;
+	}
+
+	@Override
+	protected void prepareToDestroyModel() {
+		getNodeParent().getModel().removeDecodedTermination(getModel().getName());
+		showPopupMessage("decoded termination removed from ensemble");
+		super.prepareToDestroyModel();
 	}
 
 }

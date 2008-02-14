@@ -1,6 +1,7 @@
 *******************************************
  Done
 *******************************************
+02/12/2008 - Fixed bug where decoded termination input dimension couldn't be changed
 
 02/12/2008 - Fixed duplicate nodes on node creation
 
@@ -9,9 +10,6 @@
 02/12/2008 - Applied style to script editor
 02/12/2008 - Fixed memory leak in window
 02/12/2008 - Renamed to Nengo
-
-
-
 02/12/2008 - Script console now notified of current object, and top level network add/removes
 02/12/2008 - Hooked up listeners for VisiblyMutuble, however many changes are not reflected in UI yet (such as projection add/removes)
 02/12/2008 - Configuration panel opens in new window
@@ -19,6 +17,8 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+I noticed that VisiblyMutable listeners aren't transiet. This will cause problems when serializing
+
 Unify type names
 
 Test that probes are updated, run IntegratorExample, look for probes

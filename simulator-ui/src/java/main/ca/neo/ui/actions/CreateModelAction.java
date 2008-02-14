@@ -3,6 +3,7 @@ package ca.neo.ui.actions;
 import javax.swing.SwingUtilities;
 
 import ca.neo.model.Node;
+import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.constructors.Constructable;
@@ -77,6 +78,8 @@ public class CreateModelAction extends ReversableAction {
 				}
 			});
 
+		} catch (ConfigException e) {
+			e.defaultHandleBehavior();
 		} catch (Exception e) {
 			throw new ActionException(e.getMessage());
 		}
