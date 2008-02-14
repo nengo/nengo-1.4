@@ -63,8 +63,7 @@ public class CreateModelAction extends ReversableAction {
 	 * @param nodeUIType
 	 *            Type of Node to be create, such as PNetwork
 	 */
-	public CreateModelAction(INodeContainer nodeContainer, Class<?> nodeUIType)
-			throws UIException {
+	public CreateModelAction(INodeContainer nodeContainer, Class<?> nodeUIType) throws UIException {
 		this(getModelName(nodeUIType), nodeContainer, nodeUIType);
 	}
 
@@ -75,8 +74,7 @@ public class CreateModelAction extends ReversableAction {
 	 *            Type of Node to be create, such as PNetwork
 	 */
 	@SuppressWarnings("unchecked")
-	public CreateModelAction(String modelTypeName,
-			INodeContainer nodeContainer, Class nodeUIType) {
+	public CreateModelAction(String modelTypeName, INodeContainer nodeContainer, Class nodeUIType) {
 		super("Create new " + modelTypeName, modelTypeName, false);
 		this.container = nodeContainer;
 		this.nodeType = nodeUIType;
@@ -86,14 +84,13 @@ public class CreateModelAction extends ReversableAction {
 	protected void action() throws ActionException {
 		try {
 			UINeoNode nodeProxy = (UINeoNode) nodeType.newInstance();
-			UserTemplateConfigurer config = new UserTemplateConfigurer(
-					nodeProxy);
+			UserTemplateConfigurer config = new UserTemplateConfigurer(nodeProxy);
 			try {
 				config.configureAndWait();
 				nodeCreated = nodeProxy;
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						container.addNeoNode(nodeCreated);
+						container.addNodeModel(nodeCreated.getModel());
 
 					}
 				});

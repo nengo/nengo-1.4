@@ -35,7 +35,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  * 
  * @author Shu
  */
-public abstract class NodeViewer extends ElasticWorld implements Interactable, INodeContainer {
+public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	private static final long serialVersionUID = 1L;
 
 	private MyNodeListener myNodeListener;
@@ -77,7 +77,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 	private void initChildModelListener() {
 		myNodeListener = new MyNodeListener();
 
-		getGround().addChildListener(new WorldObject.ChildListener() {
+		getGround().addChildrenListener(new WorldObject.ChildListener() {
 			public void childAdded(WorldObject wo) {
 
 				if (wo instanceof UINeoNode) {
@@ -148,16 +148,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable, I
 	 * Called when the model changes. Updates the viewer based on the NEO model.
 	 */
 	protected abstract void updateViewFromModel();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
-	 */
-	public void addNeoNode(UINeoNode node) {
-		addNeoNode(node, true, true, false);
-
-	}
 
 	/**
 	 * Applies the default layout

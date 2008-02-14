@@ -94,7 +94,7 @@ public class NetworkViewerMemoryTest {
 
 						try {
 							network = new UINetwork(createNetwork());
-							neoGraphics.addNeoNode(network);
+							neoGraphics.getWorld().getGround().addChild(network);
 							network.openViewer();
 							// network.openViewer();
 							//							

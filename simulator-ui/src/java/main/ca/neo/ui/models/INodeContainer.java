@@ -1,5 +1,7 @@
 package ca.neo.ui.models;
 
+import ca.neo.model.Node;
+
 /**
  * A Container of PNeoNode
  * 
@@ -13,6 +15,6 @@ public interface INodeContainer {
 	 * @param node
 	 *            Node to be added
 	 */
-	public void addNeoNode(UINeoNode node);
+	public void addNodeModel(Node node);
 
 }

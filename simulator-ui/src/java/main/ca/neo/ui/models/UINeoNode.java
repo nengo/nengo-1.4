@@ -3,6 +3,7 @@ package ca.neo.ui.models;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
@@ -10,6 +11,7 @@ import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.io.FileManager;
@@ -260,11 +262,29 @@ public abstract class UINeoNode extends UIModelConfigurable {
 	protected void initialize() {
 		super.initialize();
 		probes = new Vector<UIProbe>();
-		myMutableListener = new VisiblyMutable.Listener() {
-			public void changed(Event e) {
+		myMutableListener = new MyMutableListener();
+	}
+
+	class MyMutableListener implements VisiblyMutable.Listener {
+
+		public void changed(Event e) {
+			if (SwingUtilities.isEventDispatchThread()) {
 				updateViewFromModel();
+			} else {
+				try {
+					SwingUtilities.invokeAndWait(new Runnable() {
+						public void run() {
+							updateViewFromModel();
+						}
+					});
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				} catch (InvocationTargetException e1) {
+					e1.getTargetException().printStackTrace();
+				}
 			}
-		};
+		}
+
 	}
 
 	/**
@@ -375,7 +395,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		 * Can only access parent network if the Node is inside a Network Viewer
 		 */
 		if (viewer instanceof NetworkViewer) {
-			return ((NetworkViewer) viewer).getNetwork();
+			return ((NetworkViewer) viewer).getModel();
 		}
 
 		return null;

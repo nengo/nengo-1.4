@@ -10,7 +10,6 @@ import ca.neo.io.FileManager;
 import ca.neo.model.Node;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.models.INodeContainer;
-import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.TrackedAction;
@@ -101,8 +100,7 @@ public class OpenNeoFileAction extends StandardAction {
 	private void processLoadedObject(Object objLoaded) {
 
 		if (objLoaded instanceof Node) {
-			UINeoNode nodeUI = UINeoNode.createNodeUI((Node) objLoaded);
-			nodeContainer.addNeoNode(nodeUI);
+			nodeContainer.addNodeModel((Node) objLoaded);
 		} else {
 			UserMessages.showError("File does not contain a Node");
 		}

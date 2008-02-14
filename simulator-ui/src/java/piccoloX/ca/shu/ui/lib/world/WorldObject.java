@@ -25,9 +25,9 @@ public interface WorldObject extends NamedObject, Destroyable {
 
 	public void addPropertyChangeListener(Property event, Listener listener);
 
-	public void addChildListener(ChildListener listener);
+	public void addChildrenListener(ChildListener listener);
 
-	public void removeChildListener(ChildListener listener);
+	public void removeChildrenListener(ChildListener listener);
 
 	/**
 	 * Sets the rotation of this nodes transform in radians. This will affect

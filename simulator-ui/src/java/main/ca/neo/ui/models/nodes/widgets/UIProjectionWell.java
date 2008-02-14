@@ -2,6 +2,7 @@ package ca.neo.ui.models.nodes.widgets;
 
 import ca.shu.ui.lib.objects.lines.LineWell;
 import ca.shu.ui.lib.objects.models.ModelObject;
+import ca.shu.ui.lib.objects.models.ModelObject.ModelListener;
 
 /**
  * LineEndWell for this origin
@@ -11,7 +12,7 @@ import ca.shu.ui.lib.objects.models.ModelObject;
 public class UIProjectionWell extends LineWell {
 
 	private static final long serialVersionUID = 1L;
-	private UIOrigin myOrigin;
+	private final UIOrigin myOrigin;
 
 	public UIProjectionWell(UIOrigin myOrigin) {
 		super();
@@ -22,23 +23,43 @@ public class UIProjectionWell extends LineWell {
 	 * @return new LineEnd created
 	 */
 	public UIProjection createProjection() {
-		final UIProjection projection = new UIProjection(this);
+		UIProjection projection = new UIProjection(this);
 		addChild(projection);
 
-		/*
-		 * TODO: Remove listener when not needed
-		 */
-		myOrigin.addModelListener(new ModelObject.ModelListener() {
-			public void modelDestroyed(Object model) {
-				projection.disconnectFromTermination();
-			}
+		final RemoveProjectionListener removeProjectionListener = new RemoveProjectionListener(
+				projection);
+		myOrigin.addModelListener(removeProjectionListener);
 
-			public void modelDestroyStarted(Object model) {
-				// Do nothing
+		/*
+		 * Remove the listener when the projection is destroyed
+		 */
+		projection.addPropertyChangeListener(Property.REMOVED_FROM_WORLD, new Listener() {
+
+			public void propertyChanged(Property event) {
+				myOrigin.removeModelListener(removeProjectionListener);
 			}
 		});
 
 		return projection;
+	}
+
+	class RemoveProjectionListener implements ModelListener {
+		private UIProjection projection;
+
+		public RemoveProjectionListener(UIProjection projection) {
+			super();
+			this.projection = projection;
+		}
+
+		public void modelDestroyed(Object model) {
+			projection.disconnectFromTermination();
+			projection.destroy();
+		}
+
+		public void modelDestroyStarted(Object model) {
+			// Do nothing
+		}
+
 	}
 
 	// public Iterable<UIProjection> getProjections() {

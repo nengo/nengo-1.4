@@ -1,6 +1,9 @@
 *******************************************
  Done
 *******************************************
+
+02/12/2008 - Fixed duplicate nodes on node creation
+
 02/12/2008 - Fixed null listener on VisiblyMutable, (turns out it was a base class intializer calling that funciton before it was intialized)
 02/12/2008 - All top level objects are registered in Script Console
 02/12/2008 - Applied style to script editor
@@ -16,8 +19,18 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Hook up simulator listeners 
+
+Configure Objects in seperate ConfigurationUtil, then add them to network.
+	Don't configure them in UI Object. Decouple the two.
+
+Run memory test to find leaks
+
 AddNeoNode should not modify model
 UIProjection->createProjection(), need more robust way of attaching listeners
+
+UIProjections
+	disconnections should be done in UINetwork level through updateViewFromModel()
 
 UIFunctions should never modify the model. 
 	Model modification should be done externally, UI Picks up on them through listener 

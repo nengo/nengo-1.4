@@ -257,13 +257,13 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 				}
 
 				if (obj != null) {
-					Object model = ((ModelObject)obj).getModel();
+					Object model = ((ModelObject) obj).getModel();
 					scriptConsole.setCurrentObject(model);
 				}
 			}
 		});
 
-		getWorld().getGround().addChildListener(new WorldObject.ChildListener() {
+		getWorld().getGround().addChildrenListener(new WorldObject.ChildListener() {
 
 			public void childAdded(WorldObject wo) {
 				if (wo instanceof ModelObject) {
@@ -354,10 +354,12 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * 
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
-	public void addNeoNode(UINeoNode node) {
-		getWorld().getGround().addObject(node);
-		if (node instanceof NodeContainer) {
-			((NodeContainer) (node)).openViewer();
+	public void addNodeModel(Node node) {
+		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
+
+		getWorld().getGround().addObject(nodeUI);
+		if (nodeUI instanceof NodeContainer) {
+			((NodeContainer) (nodeUI)).openViewer();
 		}
 	}
 

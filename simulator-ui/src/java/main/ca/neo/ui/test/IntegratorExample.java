@@ -19,7 +19,6 @@ import ca.neo.sim.Simulator;
 import ca.neo.ui.NeoGraphics;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.nodes.UINetwork;
-import ca.neo.ui.models.nodes.widgets.UIStateProbe;
 import ca.neo.ui.models.viewers.NodeViewer;
 
 /**
@@ -37,8 +36,7 @@ public class IntegratorExample {
 
 		integratorNet.setName("Integrator");
 
-		UINetwork network = new UINetwork(integratorNet);
-		neoGraphics.addNeoNode(network);
+		neoGraphics.addNodeModel(integratorNet);
 
 		Function f = new ConstantFunction(1, 1f);
 		FunctionInput input = new FunctionInput("input", new Function[] { f }, Units.UNK);
@@ -75,7 +73,7 @@ public class IntegratorExample {
 		return network;
 	}
 
-//	private UIStateProbe integratorProbe;
+	// private UIStateProbe integratorProbe;
 
 	public static void main(String[] args) {
 		new IntegratorExample();
@@ -113,9 +111,10 @@ public class IntegratorExample {
 
 		SwingUtilities.invokeAndWait(new Runnable() {
 			public void run() {
-//				PlotTimeSeries plotAction = new PlotTimeSeries(
-//						integratorProbe.getModel().getData(), integratorProbe.getName());
-//				plotAction.doAction();
+				// PlotTimeSeries plotAction = new PlotTimeSeries(
+				// integratorProbe.getModel().getData(),
+				// integratorProbe.getName());
+				// plotAction.doAction();
 			}
 		});
 		network = null;

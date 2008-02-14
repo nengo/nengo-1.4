@@ -21,7 +21,7 @@ public class GFuzzyLogicExample extends ExampleRunner {
 	}
 
 	public GFuzzyLogicExample() throws StructuralException {
-		super("FuzzyLogic Example", FuzzyLogicExample.createNetwork());
+		super(FuzzyLogicExample.createNetwork());
 	}
 
 	@Override

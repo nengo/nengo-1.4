@@ -220,8 +220,11 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
-	public void addChildListener(ChildListener childLoader) {
-		childListeners.add(childLoader);
+	public void addChildrenListener(ChildListener listener) {
+		if (childListeners.contains(listener)) {
+			throw new InvalidParameterException();
+		}
+		childListeners.add(listener);
 	}
 
 	public void addInputEventListener(PInputEventListener arg0) {
@@ -688,7 +691,10 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
-	public void removeChildListener(ChildListener listener) {
+	public void removeChildrenListener(ChildListener listener) {
+		if (!childListeners.contains(listener)) {
+			throw new InvalidParameterException();
+		}
 		childListeners.remove(listener);
 	}
 

@@ -21,7 +21,7 @@ public class BrainViewExample extends ExampleRunner {
 	}
 
 	public BrainViewExample() throws StructuralException {
-		super("Brain View Example (under construction)", new NetworkImpl());
+		super(new NetworkImpl());
 	}
 
 	@Override

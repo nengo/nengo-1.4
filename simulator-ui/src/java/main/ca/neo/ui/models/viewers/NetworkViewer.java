@@ -18,6 +18,7 @@ import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.CreateModelAdvancedAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
+import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
@@ -39,7 +40,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  * 
  * @author Shu Wu
  */
-public class NetworkViewer extends NodeViewer {
+public class NetworkViewer extends NodeViewer implements INodeContainer {
 	private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
 
 	private static final long serialVersionUID = -3018937112672942653L;
@@ -103,7 +104,7 @@ public class NetworkViewer extends NodeViewer {
 		if (updateModel) {
 			try {
 
-				getNetwork().addNode(node.getModel());
+				getModel().addNode(node.getModel());
 
 			} catch (StructuralException e) {
 				UserMessages.showWarning(e.toString());
@@ -189,13 +190,6 @@ public class NetworkViewer extends NodeViewer {
 	 */
 	public NetworkViewerConfig getConfig() {
 		return getViewerParent().getSavedConfig();
-	}
-
-	/**
-	 * @return NEO Network model represented by the viewer
-	 */
-	public Network getNetwork() {
-		return (Network) getModel();
 	}
 
 	@Override
@@ -321,7 +315,7 @@ public class NetworkViewer extends NodeViewer {
 		/*
 		 * Construct Nodes from the Network model
 		 */
-		Node[] nodes = getNetwork().getNodes();
+		Node[] nodes = getModel().getNodes();
 
 		for (Node node : nodes) {
 			if (getNode(node.getName()) == null) {
@@ -357,7 +351,7 @@ public class NetworkViewer extends NodeViewer {
 		/*
 		 * Construct projections
 		 */
-		Projection[] projections = getNetwork().getProjections();
+		Projection[] projections = getModel().getProjections();
 		for (Projection projection : projections) {
 			Origin origin = projection.getOrigin();
 			Termination term = projection.getTermination();
@@ -378,7 +372,7 @@ public class NetworkViewer extends NodeViewer {
 		/*
 		 * Construct probes
 		 */
-		Probe[] probes = getNetwork().getSimulator().getProbes();
+		Probe[] probes = getModel().getSimulator().getProbes();
 
 		for (Probe probe : probes) {
 			Probeable target = probe.getTarget();
@@ -500,7 +494,7 @@ public class NetworkViewer extends NodeViewer {
 	@Override
 	protected void removeChildModel(Node node) {
 		try {
-			getNetwork().removeNode(node.getName());
+			getModel().removeNode(node.getName());
 		} catch (StructuralException e) {
 			e.printStackTrace();
 		}
@@ -509,5 +503,19 @@ public class NetworkViewer extends NodeViewer {
 	@Override
 	protected boolean canRemoveChildModel(Node node) {
 		return true;
+	}
+
+	public void addNodeModel(Node node) {
+		try {
+			getModel().addNode(node);
+		} catch (StructuralException e) {
+			UserMessages.showWarning(e.toString());
+			return;
+		}
+	}
+
+	@Override
+	public Network getModel() {
+		return (Network) super.getModel();
 	}
 }

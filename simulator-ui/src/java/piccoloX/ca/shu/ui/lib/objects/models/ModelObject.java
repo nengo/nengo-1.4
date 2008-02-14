@@ -1,5 +1,6 @@
 package ca.shu.ui.lib.objects.models;
 
+import java.security.InvalidParameterException;
 import java.util.HashSet;
 
 import javax.swing.JPopupMenu;
@@ -119,10 +120,16 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	private HashSet<ModelListener> modelListeners = new HashSet<ModelListener>();
 
 	public void addModelListener(ModelListener listener) {
+		if (modelListeners.contains(listener)) {
+			throw new InvalidParameterException();
+		}
 		modelListeners.add(listener);
 	}
 
 	public void removeModelListener(ModelListener listener) {
+		if (!modelListeners.contains(listener)) {
+			throw new InvalidParameterException();
+		}
 		modelListeners.remove(listener);
 	}
 

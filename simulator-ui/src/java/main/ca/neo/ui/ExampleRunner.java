@@ -22,9 +22,9 @@ public class ExampleRunner {
 	 * @param network
 	 *            Network to be given to NeoGraphics
 	 */
-	public ExampleRunner(String name, Network network) {
+	public ExampleRunner(Network network) {
 		this.network = network;
-		System.out.println("Running example: " + name);
+		System.out.println("Running example: " + network.getName());
 
 		/**
 		 * All UI funcitons and constructors must be invoked from the Swing
@@ -45,8 +45,8 @@ public class ExampleRunner {
 	 * @param network
 	 *            Network to be given to NeoGraphics
 	 */
-	public ExampleRunner(String name, UINetwork network) {
-		this(name, network.getModel());
+	public ExampleRunner(UINetwork network) {
+		this( network.getModel());
 		this.networkUI = network;
 	}
 
@@ -65,7 +65,8 @@ public class ExampleRunner {
 		if (networkUI == null) {
 
 			networkUI = new UINetwork(network);
-			neoGraphics.addNeoNode(networkUI);
+			neoGraphics.getWorld().getGround().addChild(networkUI);
+			networkUI.openViewer();
 		}
 
 		processNetwork(networkUI);
