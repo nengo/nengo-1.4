@@ -1,19 +1,14 @@
 package ca.neo.ui.models.nodes;
 
-import ca.neo.model.Node;
 import ca.neo.model.Origin;
-import ca.neo.model.StructuralException;
+import ca.neo.model.Termination;
 import ca.neo.model.nef.NEFEnsemble;
-import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.DecodedOrigin;
-import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.plot.Plotter;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
-import ca.neo.ui.configurable.descriptors.PInt;
-import ca.neo.ui.configurable.descriptors.PString;
-import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.models.constructors.CDecodedOrigin;
+import ca.neo.ui.models.constructors.CDecodedTermination;
+import ca.neo.ui.models.constructors.ModelFactory;
 import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
 import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
@@ -35,26 +30,7 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 public class UINEFEnsemble extends UIEnsemble {
 	private static final long serialVersionUID = 1L;
 
-	static final PropertyDescriptor pDim = new PInt("Dimensions");
-
-	static final PropertyDescriptor pName = new PString("Name");
-
-	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
-
-	static final PropertyDescriptor pStorageName = new PString("Storage Name");
-
 	static final String typeName = "NEFEnsemble";
-
-	/**
-	 * Config descriptors
-	 */
-	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons, pDim, pStorageName };
-
-	public UINEFEnsemble() {
-		super();
-		init();
-
-	}
 
 	public UINEFEnsemble(NEFEnsemble model) {
 		super(model);
@@ -63,27 +39,6 @@ public class UINEFEnsemble extends UIEnsemble {
 
 	private void init() {
 
-	}
-
-	@Override
-	protected Node configureModel(PropertySet prop) {
-		try {
-
-			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-
-			String name = (String) prop.getProperty(pName);
-
-			Integer numOfNeurons = (Integer) prop.getProperty(pNumOfNeurons);
-			Integer dimensions = (Integer) prop.getProperty(pDim);
-			String storageName = (String) prop.getProperty(pStorageName);
-
-			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions, storageName, false);
-
-			return ensemble;
-		} catch (StructuralException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
@@ -129,12 +84,13 @@ public class UINEFEnsemble extends UIEnsemble {
 	 * @return PTermination created, null if not
 	 */
 	public UITermination addDecodedTermination() {
-		UIDecodedTermination termUI = new UIDecodedTermination(this);
 
 		try {
-			UserTemplateConfigurer config = new UserTemplateConfigurer(termUI);
-			config.configureAndWait();
+			Termination term = (Termination) ModelFactory.constructNode(new CDecodedTermination(
+					getModel()));
 
+			UIDecodedTermination termUI = new UIDecodedTermination(this, term);
+			showPopupMessage("New decoded TERMINATION added");
 			addWidget(termUI);
 			return termUI;
 
@@ -146,29 +102,23 @@ public class UINEFEnsemble extends UIEnsemble {
 	}
 
 	public UIOrigin addDecodedOrigin() {
-		UIDecodedOrigin originUI = new UIDecodedOrigin(this);
-
-		addWidget(originUI);
 
 		try {
-			originUI.setModelBusy(true);
-			UserTemplateConfigurer config = new UserTemplateConfigurer(originUI);
+			setModelBusy(true);
 
-			config.configureAndWait();
+			Origin origin = (Origin) ModelFactory.constructNode(new CDecodedOrigin(getModel()));
+			UIDecodedOrigin originUI = new UIDecodedOrigin(this, origin);
 
-			originUI.setModelBusy(false);
-
+			addWidget(originUI);
+			showPopupMessage("New decoded ORIGIN added");
+			setModelBusy(false);
+			
+			return originUI;
 		} catch (ConfigException e) {
-			originUI.destroy();
 			e.defaultHandleBehavior();
 		}
 
-		return originUI;
-	}
-
-	@Override
-	public PropertyDescriptor[] getConfigSchema() {
-		return zConfig;
+		return null;
 	}
 
 	@Override

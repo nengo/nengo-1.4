@@ -54,14 +54,6 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	private Pulsator pulsator = null;
 
 	/**
-	 * Creates a hollow wrapper without any model
-	 */
-	public ModelObject() {
-		super();
-		initialize();
-	}
-
-	/**
 	 * Create a UI Wrapper around a Model
 	 * 
 	 * @param model
@@ -69,6 +61,8 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	public ModelObject(Object model) {
 		super();
+		Util.Assert(model != null);
+
 		initialize();
 		setModel(model);
 	}
@@ -103,11 +97,10 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 			}
 		}
 
-		for (ModelListener listener : modelListeners) {
+		for (ModelListener listener : modelListeners.toArray(new ModelListener[] {})) {
 			listener.modelDestroyed(getModel());
 		}
 
-		modelListeners.clear();
 		destroy();
 	}
 
@@ -188,7 +181,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	/**
 	 * Updatesthe UI from the model
 	 */
-	protected void updateViewFromModel() {
+	protected void modelUpdated() {
 
 	}
 
@@ -294,7 +287,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 
 		if (myModel != null) {
 			attachViewToModel();
-			updateViewFromModel();
+			modelUpdated();
 		}
 	}
 

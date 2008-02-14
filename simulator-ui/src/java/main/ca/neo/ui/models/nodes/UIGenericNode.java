@@ -1,9 +1,6 @@
 package ca.neo.ui.models.nodes;
 
 import ca.neo.model.Node;
-import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.models.UINeoNode;
 
 /**
@@ -18,17 +15,6 @@ public class UIGenericNode extends UINeoNode {
 
 	public UIGenericNode(Node model) {
 		super(model);
-	}
-
-	@Override
-	protected Object configureModel(PropertySet configuredProperties)
-			throws ConfigException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public PropertyDescriptor[] getConfigSchema() {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override

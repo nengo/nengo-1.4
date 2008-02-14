@@ -19,6 +19,10 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Unify type names
+
+Test that probes are updated, run IntegratorExample, look for probes
+
 Hook up simulator listeners 
 
 Configure Objects in seperate ConfigurationUtil, then add them to network.

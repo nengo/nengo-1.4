@@ -103,11 +103,11 @@ public class WorldGroundImpl extends WorldLayerImpl implements WorldLayer {
 	 * @param wo
 	 *            Object to add to the layer
 	 */
-	public void addObject(WorldObject wo) {
-		addObject(wo, true);
+	public void addChildFancy(WorldObject wo) {
+		addChildFancy(wo, true);
 	}
 
-	public void addObject(WorldObject wo, boolean centerCameraPosition) {
+	public void addChildFancy(WorldObject wo, boolean centerCameraPosition) {
 		dropObject(world, this, wo, centerCameraPosition);
 	}
 

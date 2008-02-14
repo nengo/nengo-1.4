@@ -2,14 +2,10 @@ package ca.neo.ui.models.nodes.widgets;
 
 import java.awt.Color;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
-import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
@@ -32,11 +28,6 @@ public class UIOrigin extends Widget {
 
 	private UIProjectionWell lineWell;
 
-	public UIOrigin(UINeoNode nodeParent) {
-		super(nodeParent);
-		init();
-	}
-
 	public UIOrigin(UINeoNode nodeParent, Origin origin) {
 		super(nodeParent, origin);
 
@@ -50,11 +41,6 @@ public class UIOrigin extends Widget {
 		setIcon(icon);
 
 		attachViewToModel();
-	}
-
-	@Override
-	protected Object configureModel(PropertySet configuredProperties) throws ConfigException {
-		throw new NotImplementedException();
 	}
 
 	@Override
@@ -126,12 +112,6 @@ public class UIOrigin extends Widget {
 
 		UIProjection lineEnd = lineWell.createProjection();
 		lineEnd.connectTo(term, modifyModel);
-	}
-
-	@Override
-	public PropertyDescriptor[] getConfigSchema() {
-		UserMessages.showError("POrigin is not configurable yet");
-		return null;
 	}
 
 	public Color getColor() {

@@ -32,11 +32,12 @@ public class IntegratorExample {
 	public UINetwork createUINetwork(NeoGraphics neoGraphics) throws StructuralException,
 			SimulationException {
 		NetworkImpl integratorNet = new NetworkImpl();
+		network = new UINetwork(integratorNet);
+		neoGraphics.getWorld().getGround().addChild(network);
+
 		Simulator simulator = integratorNet.getSimulator();
 
 		integratorNet.setName("Integrator");
-
-		neoGraphics.addNodeModel(integratorNet);
 
 		Function f = new ConstantFunction(1, 1f);
 		FunctionInput input = new FunctionInput("input", new Function[] { f }, Units.UNK);

@@ -1,7 +1,6 @@
 package ca.neo.ui.models.nodes.widgets;
 
 import ca.shu.ui.lib.objects.lines.LineWell;
-import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.objects.models.ModelObject.ModelListener;
 
 /**
@@ -61,16 +60,6 @@ public class UIProjectionWell extends LineWell {
 		}
 
 	}
-
-	// public Iterable<UIProjection> getProjections() {
-	// LinkedList<UIProjection> projections = new LinkedList<UIProjection>();
-	// for (WorldObject wo : getChildren()) {
-	// if (wo instanceof UIProjection) {
-	// projections.add((UIProjection) wo);
-	// }
-	// }
-	// return projections;
-	// }
 
 	protected UIOrigin getOriginUI() {
 		return myOrigin;

@@ -1,17 +1,12 @@
 package ca.neo.ui.models.nodes;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Ensemble;
-import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.models.icons.EnsembleIcon;
 import ca.neo.ui.models.nodes.widgets.UISpikeProbe;
 import ca.neo.ui.models.viewers.EnsembleViewer;
 import ca.neo.ui.models.viewers.NodeViewer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 
 /**
@@ -25,14 +20,8 @@ public class UIEnsemble extends NodeContainer {
 
 	private UISpikeProbe spikeCollector;
 
-	public UIEnsemble() {
-		super();
-		init();
-	}
-
 	public UIEnsemble(Ensemble model) {
 		super(model);
-
 		init();
 	}
 
@@ -41,11 +30,6 @@ public class UIEnsemble extends NodeContainer {
 	 */
 	private void init() {
 		setIcon(new EnsembleIcon(this));
-	}
-
-	@Override
-	protected Object configureModel(PropertySet configuredProperties) throws ConfigException {
-		throw new NotImplementedException();
 	}
 
 	@Override
@@ -80,12 +64,6 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
-	public PropertyDescriptor[] getConfigSchema() {
-		UserMessages.showError("Ensemble has not been implemented yet");
-		return null;
-	}
-
-	@Override
 	public Ensemble getModel() {
 		return (Ensemble) super.getModel();
 	}
@@ -112,7 +90,7 @@ public class UIEnsemble extends NodeContainer {
 	}
 
 	@Override
-	public void updateViewFromModel() {
+	public void modelUpdated() {
 		if (getModel().isCollectingSpikes()) {
 			collectSpikes(true);
 		}

@@ -5,7 +5,7 @@ import java.awt.Color;
 import javax.swing.JOptionPane;
 
 import ca.neo.model.Network;
-import ca.neo.ui.models.UIModelConfigurable;
+import ca.neo.ui.models.UINeoModel;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.Style.Style;
@@ -24,17 +24,12 @@ import edu.umd.cs.piccolo.nodes.PText;
  * 
  * @author Shu Wu
  */
-public abstract class Widget extends UIModelConfigurable {
+public abstract class Widget extends UINeoModel {
 
 	private boolean isWidgetVisible = true;
 	private ExposedIcon myExposedIcon;
 
 	private UINeoNode parent;
-
-	public Widget(UINeoNode nodeParent) {
-		super();
-		init(nodeParent);
-	}
 
 	public Widget(UINeoNode nodeParent, Object model) {
 		super(model);
@@ -149,7 +144,7 @@ public abstract class Widget extends UIModelConfigurable {
 	}
 
 	@Override
-	public void updateViewFromModel() {
+	public void modelUpdated() {
 
 		String name = getModelName();
 

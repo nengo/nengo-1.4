@@ -36,8 +36,8 @@ public class UIStateProbe extends UIProbe {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public UIStateProbe(UINeoNode nodeAttachedTo, String state) throws SimulationException {
-		super(nodeAttachedTo);
+	private static Probe createProbe(UINeoNode nodeAttachedTo, String state)
+			throws SimulationException {
 
 		/*
 		 * Creates the probe
@@ -54,6 +54,8 @@ public class UIStateProbe extends UIProbe {
 				probe = network.getSimulator().addProbe(ensemble.getName(), (Probeable) node,
 						state, true);
 
+				nodeAttachedTo.showPopupMessage("Probe (" + state + ") added to Simulator");
+
 			} else {
 				probe = nodeAttachedTo.getParentNetwork().getSimulator().addProbe(node.getName(),
 						state, true);
@@ -63,11 +65,67 @@ public class UIStateProbe extends UIProbe {
 			// + ") added to Simulator");
 			throw exception;
 		}
+		return probe;
+	}
 
-		getProbeParent().showPopupMessage("Probe (" + state + ") added to Simulator");
+	public UIStateProbe(UINeoNode nodeAttachedTo, Probe probeModel) {
+		super(nodeAttachedTo, probeModel);
+	}
 
-		setModel(probe);
+	public UIStateProbe(UINeoNode nodeAttachedTo, String state) throws SimulationException {
+		super(nodeAttachedTo, createProbe(nodeAttachedTo, state));
+	}
 
+	@Override
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
+
+		menu.addSection("Probe");
+		MenuBuilder plotMenu = menu.addSubMenu("plot");
+		plotMenu.addAction(new PlotTimeSeries(getModel().getData(), getName()));
+		plotMenu.addAction(new PlotAdvanced(getModel().getData(), getName()));
+
+		MenuBuilder exportMenu = menu.addSubMenu("export data");
+		exportMenu.addAction(new ExportToMatlabAction());
+
+	}
+
+	@Override
+	protected void constructTooltips(TooltipBuilder tooltips) {
+		super.constructTooltips(tooltips);
+		tooltips.addProperty("Attached to", getModel().getStateName());
+	}
+
+	@Override
+	protected void prepareToDestroyModel() {
+		try {
+			getProbeParent().getParentNetwork().getSimulator().removeProbe(getModel());
+			getProbeParent().showPopupMessage("Probe removed from Simulator");
+		} catch (SimulationException e) {
+			UserMessages.showError("Could not remove probe: " + e.getMessage());
+		}
+
+		super.prepareToDestroyModel();
+	}
+
+	/**
+	 * @param name
+	 *            prefix of the fileName to be exported to
+	 * @throws IOException
+	 */
+	public void exportToMatlab(String name) {
+		MatlabExporter me = new MatlabExporter();
+		me.add(getName(), getModel().getData());
+		try {
+			me.write(new File(name + ".mat"));
+		} catch (IOException e) {
+			UserMessages.showError("Could not export file: " + e.toString());
+		}
+	}
+
+	@Override
+	public Probe getModel() {
+		return (Probe) super.getModel();
 	}
 
 	@Override
@@ -75,14 +133,9 @@ public class UIStateProbe extends UIProbe {
 		return "State Probe";
 	}
 
-	public UIStateProbe(UINeoNode nodeAttachedTo, Probe probeModel) {
-		super(nodeAttachedTo, probeModel);
-	}
-
 	@Override
-	protected void constructTooltips(TooltipBuilder tooltips) {
-		super.constructTooltips(tooltips);
-		tooltips.addProperty("Attached to", getModel().getStateName());
+	public void modelUpdated() {
+		setName(((Probe) getModel()).getStateName());
 	}
 
 	/**
@@ -117,56 +170,5 @@ public class UIStateProbe extends UIProbe {
 			}).doAction();
 
 		}
-	}
-
-	@Override
-	protected void constructMenu(PopupMenuBuilder menu) {
-		super.constructMenu(menu);
-
-		menu.addSection("Probe");
-		MenuBuilder plotMenu = menu.addSubMenu("plot");
-		plotMenu.addAction(new PlotTimeSeries(getModel().getData(), getName()));
-		plotMenu.addAction(new PlotAdvanced(getModel().getData(), getName()));
-
-		MenuBuilder exportMenu = menu.addSubMenu("export data");
-		exportMenu.addAction(new ExportToMatlabAction());
-
-	}
-
-	/**
-	 * @param name
-	 *            prefix of the fileName to be exported to
-	 * @throws IOException
-	 */
-	public void exportToMatlab(String name) {
-		MatlabExporter me = new MatlabExporter();
-		me.add(getName(), getModel().getData());
-		try {
-			me.write(new File(name + ".mat"));
-		} catch (IOException e) {
-			UserMessages.showError("Could not export file: " + e.toString());
-		}
-	}
-
-	@Override
-	public Probe getModel() {
-		return (Probe) super.getModel();
-	}
-
-	@Override
-	public void updateViewFromModel() {
-		setName(((Probe) getModel()).getStateName());
-	}
-
-	@Override
-	protected void prepareToDestroyModel() {
-		try {
-			getProbeParent().getParentNetwork().getSimulator().removeProbe(getModel());
-			getProbeParent().showPopupMessage("Probe removed from Simulator");
-		} catch (SimulationException e) {
-			UserMessages.showError("Could not remove probe: " + e.getMessage());
-		}
-
-		super.prepareToDestroyModel();
 	}
 }

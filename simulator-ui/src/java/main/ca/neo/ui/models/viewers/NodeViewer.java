@@ -12,7 +12,6 @@ import javax.swing.JPopupMenu;
 
 import ca.neo.model.Node;
 import ca.neo.ui.actions.SaveNodeAction;
-import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.ModelsContextMenu;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.nodes.NodeContainer;
@@ -61,6 +60,10 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		init();
 	}
 
+	public void updateViewFromModel() {
+		updateViewFromModel(false);
+	}
+
 	private void init() {
 		initChildModelListener();
 
@@ -68,7 +71,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 
 		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
 
-		updateViewFromModel();
+		updateViewFromModel(true);
 
 		msg.finished();
 
@@ -104,7 +107,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	 * @param moveCameraToNode
 	 *            whether to move the camera to where the node is
 	 */
-	protected void addNeoNode(UINeoNode node, boolean updateModel, boolean dropInCenterOfCamera,
+	protected void addChildFancy(UINeoNode node, boolean dropInCenterOfCamera,
 			boolean moveCameraToNode) {
 
 		/**
@@ -118,7 +121,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		neoNodesChildren.put(node.getName(), node);
 
 		if (dropInCenterOfCamera) {
-			getGround().addObject(node, dropInCenterOfCamera);
+			getGround().addChildFancy(node, dropInCenterOfCamera);
 		} else {
 			getGround().addChild(node);
 		}
@@ -147,7 +150,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	/**
 	 * Called when the model changes. Updates the viewer based on the NEO model.
 	 */
-	protected abstract void updateViewFromModel();
+	protected abstract void updateViewFromModel(boolean isFirstUpdate);
 
 	/**
 	 * Applies the default layout

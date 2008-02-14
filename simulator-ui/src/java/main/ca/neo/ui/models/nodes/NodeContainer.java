@@ -33,10 +33,6 @@ public abstract class NodeContainer extends UINeoNode {
 	 */
 	private WeakReference<Window> viewerWindowRef;
 
-	public NodeContainer() {
-		super();
-	}
-
 	public NodeContainer(Node model) {
 		super(model);
 	}

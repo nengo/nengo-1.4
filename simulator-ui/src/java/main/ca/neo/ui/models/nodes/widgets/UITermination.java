@@ -2,7 +2,6 @@ package ca.neo.ui.models.nodes.widgets;
 
 import java.awt.Color;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
@@ -50,11 +49,6 @@ public class UITermination extends Widget implements ILineTermination {
 
 	private LineTerminationIcon myIcon;
 
-	public UITermination(UINeoNode nodeParent) {
-		super(nodeParent);
-		init();
-	}
-
 	public UITermination(UINeoNode nodeParent, Termination term) {
 		super(nodeParent, term);
 		setName(term.getName());
@@ -68,11 +62,6 @@ public class UITermination extends Widget implements ILineTermination {
 		iconWr.configureLabel(false);
 
 		setIcon(iconWr);
-	}
-
-	@Override
-	protected Object configureModel(PropertySet configuredProperties) throws ConfigException {
-		throw new NotImplementedException();
 	}
 
 	@Override
@@ -146,11 +135,6 @@ public class UITermination extends Widget implements ILineTermination {
 
 	public Color getColor() {
 		return myIcon.getColor();
-	}
-
-	@Override
-	public PropertyDescriptor[] getConfigSchema() {
-		return null;
 	}
 
 	public UIProjection getConnector() {
@@ -336,7 +320,7 @@ public class UITermination extends Widget implements ILineTermination {
 
 	@Override
 	protected void prepareForDestroy() {
-//		disconnect();
+		// disconnect();
 		super.prepareForDestroy();
 	}
 }

@@ -33,10 +33,9 @@ import ca.neo.ui.dataList.DataListView;
 import ca.neo.ui.dataList.SimulatorDataModel;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.constructors.Constructable;
+import ca.neo.ui.models.constructors.ModelFactory;
 import ca.neo.ui.models.nodes.NodeContainer;
-import ca.neo.ui.models.nodes.UIEnsemble;
-import ca.neo.ui.models.nodes.UINEFEnsemble;
-import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.script.ScriptConsole;
 import ca.neo.ui.script.ScriptEditor;
 import ca.neo.ui.util.NeoFileChooser;
@@ -357,7 +356,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	public void addNodeModel(Node node) {
 		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
 
-		getWorld().getGround().addObject(nodeUI);
+		getWorld().getGround().addChildFancy(nodeUI);
 		if (nodeUI instanceof NodeContainer) {
 			((NodeContainer) (nodeUI)).openViewer();
 		}
@@ -417,14 +416,12 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 		MenuBuilder newMenu = fileMenu.addSubMenu("New");
 		newMenu.getJMenu().setMnemonic(KeyEvent.VK_N);
-		newMenu.addAction(new CreateModelAction("Network", this, UINetwork.class), KeyEvent.VK_N);
-		newMenu.addAction(new CreateModelAction("NEFEnsemble", this, UINEFEnsemble.class),
-				KeyEvent.VK_F);
 
-		newMenu.addAction(new CreateModelAction("Ensemble", this, UIEnsemble.class), KeyEvent.VK_E);
+		for (Constructable constructable : ModelFactory.getNodeConstructables()) {
+			newMenu.addAction(new CreateModelAction(this, constructable));
+		}
 
 		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O);
-
 	}
 
 	@Override

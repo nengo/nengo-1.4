@@ -8,9 +8,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
@@ -93,6 +95,20 @@ public class Util {
 			System.out.println("DebugMSG: " + msg);
 		}
 
+	}
+
+	public static void runInEventDispathThread(Runnable runnable) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			runnable.run();
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(runnable);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			} catch (InvocationTargetException e1) {
+				e1.getTargetException().printStackTrace();
+			}
+		}
 	}
 
 	public static String truncateString(String input, int maxLength) {

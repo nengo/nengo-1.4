@@ -20,13 +20,14 @@ import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.constructors.Constructable;
+import ca.neo.ui.models.constructors.ModelFactory;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.exceptions.UIException;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
@@ -98,27 +99,6 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 	}
 
 	@Override
-	protected void addNeoNode(UINeoNode node, boolean updateModel, boolean dropInCenterOfCamera,
-			boolean moveCamera) {
-
-		if (updateModel) {
-			try {
-
-				getModel().addNode(node.getModel());
-
-			} catch (StructuralException e) {
-				UserMessages.showWarning(e.toString());
-				return;
-			}
-		}
-		super.addNeoNode(node, updateModel, dropInCenterOfCamera, moveCamera);
-
-		if (updateModel) {
-			node.showPopupMessage("Node " + node.getName() + " added to Network");
-		}
-	}
-
-	@Override
 	public void applyDefaultLayout() {
 		if (getNeoNodes().size() != 0) {
 			if (restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
@@ -148,14 +128,8 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		MenuBuilder createNewMenu = menu.addSubMenu("Create new");
 
 		// Nodes
-		for (Class<?> element : UINeoNode.UI_NODE_CONFIGURABLE_TYPES) {
-			try {
-				if (UINeoNode.class.isAssignableFrom(element)) {
-					createNewMenu.addAction(new CreateModelAction(this, element));
-				}
-			} catch (UIException e) {
-				// swallow this, not all model types can be instantiated
-			}
+		for (Constructable constructable : ModelFactory.getNodeConstructables()) {
+			createNewMenu.addAction(new CreateModelAction(this, constructable));
 		}
 
 		MenuBuilder createAdvancedMenu = createNewMenu.addSubMenu("Other");
@@ -286,15 +260,39 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		}
 	}
 
-	@Override
-	public void updateViewFromModel() {
-		updateViewFromModel(false);
+	public void updateSimulatorProbes() {
+		/*
+		 * Construct probes TODO: Remove unreferenced probes
+		 */
+		Probe[] probes = getModel().getSimulator().getProbes();
+
+		for (Probe probe : probes) {
+			Probeable target = probe.getTarget();
+
+			if (!(target instanceof Node)) {
+				UserMessages.showError("Unsupported target type for probe");
+			} else {
+
+				if (!probe.isInEnsemble()) {
+
+					Node node = (Node) target;
+
+					UINeoNode nodeUI = getNode(node.getName());
+					if (nodeUI != null) {
+						nodeUI.showProbe(probe);
+					} else {
+						Util.debugMsg("There is a dangling probe in the Simulator");
+					}
+				}
+			}
+
+		}
 	}
 
 	/**
 	 * Construct UI Nodes from the NEO Network model
 	 */
-	public void updateViewFromModel(boolean dropNewModelsInCenterOfScreen) {
+	protected void updateViewFromModel(boolean isFirstUpdate) {
 
 		/*
 		 * Get the current children and map them
@@ -321,16 +319,22 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 			if (getNode(node.getName()) == null) {
 				UINeoNode nodeUI = currentNodes.get(node);
 
-				boolean newNode = false;
 				if (nodeUI == null) {
 					/*
 					 * Create UI Wrappers here
 					 */
-					newNode = true;
 					nodeUI = UINeoNode.createNodeUI(node);
+
+					boolean centerAndNotify = !isFirstUpdate;
+
+					addChildFancy(nodeUI, centerAndNotify, false);
+					if (centerAndNotify) {
+						nodeUI.showPopupMessage("Node " + node.getName() + " added to Network");
+					}
+				} else {
+					neoNodesChildren.put(nodeUI.getName(), nodeUI);
 				}
 
-				addNeoNode(nodeUI, false, (dropNewModelsInCenterOfScreen && newNode), false);
 			} else {
 				Util.Assert(false, "Trying to add node which already exists");
 			}
@@ -367,33 +371,6 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 			// the
 			// NEO Network model
 			originUI.connectTo(termUI, false);
-		}
-
-		/*
-		 * Construct probes
-		 */
-		Probe[] probes = getModel().getSimulator().getProbes();
-
-		for (Probe probe : probes) {
-			Probeable target = probe.getTarget();
-
-			if (!(target instanceof Node)) {
-				UserMessages.showError("Unsupported target type for probe");
-			} else {
-
-				if (!probe.isInEnsemble()) {
-
-					Node node = (Node) target;
-
-					UINeoNode nodeUI = getNode(node.getName());
-					if (nodeUI != null) {
-						nodeUI.showProbe(probe);
-					} else {
-						Util.debugMsg("There is a dangling probe in the Simulator");
-					}
-				}
-			}
-
 		}
 
 	}

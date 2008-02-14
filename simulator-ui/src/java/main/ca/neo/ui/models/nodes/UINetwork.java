@@ -4,18 +4,17 @@ import java.io.File;
 import java.io.IOException;
 
 import ca.neo.model.Network;
-import ca.neo.model.Node;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.sim.Simulator;
 import ca.neo.ui.NeoGraphics;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
-import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.models.viewers.NetworkViewerConfig;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutable.Event;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * UI Wrapper for a Network
@@ -25,43 +24,21 @@ import ca.shu.ui.lib.util.UserMessages;
 public class UINetwork extends NodeContainer {
 	private static final String LAYOUT_MANAGER_KEY = "layout/manager";
 
-	private static final PropertyDescriptor pName = new PString("Name");
-
 	private static final long serialVersionUID = 1L;
 
 	private static final String typeName = "Network";
 
-	/**
-	 * Config descriptors
-	 */
-	private static final PropertyDescriptor[] zConfig = { pName };
-
-	public UINetwork() {
-		super();
-		init();
-	}
+	private MySimulatorListener mySimulatorListener;
 
 	public UINetwork(Network model) {
 		super(model);
-		init();
-	}
-
-	/**
-	 * Initializes this instance
-	 */
-	private void init() {
-
 		setIcon(new NetworkIcon(this));
-
 	}
 
-	@Override
-	protected Node configureModel(PropertySet configuredProperties) {
-
-		NetworkImpl network = new NetworkImpl();
-		network.setName((String) configuredProperties.getProperty(pName));
-
-		return network;
+	private void simulatorUpdated() {
+		if (getViewer() != null && !getViewer().isDestroyed()) {
+			getViewer().updateSimulatorProbes();
+		}
 	}
 
 	@Override
@@ -73,12 +50,24 @@ public class UINetwork extends NodeContainer {
 	}
 
 	@Override
-	protected void updateViewFromModel() {
-		super.updateViewFromModel();
+	protected void initialize() {
+		mySimulatorListener = new MySimulatorListener();
+		super.initialize();
+	}
+
+	@Override
+	protected void modelUpdated() {
+		super.modelUpdated();
 
 		if (getViewer() != null && !getViewer().isDestroyed()) {
-			getViewer().updateViewFromModel(true);
+			getViewer().updateViewFromModel();
 		}
+	}
+
+	@Override
+	public void attachViewToModel() {
+		super.attachViewToModel();
+		getModel().getSimulator().addChangeListener(mySimulatorListener);
 	}
 
 	@Override
@@ -87,8 +76,10 @@ public class UINetwork extends NodeContainer {
 	}
 
 	@Override
-	public PropertyDescriptor[] getConfigSchema() {
-		return zConfig;
+	public void detachViewFromModel() {
+		super.detachViewFromModel();
+
+		getModel().getSimulator().removeChangeListener(mySimulatorListener);
 	}
 
 	@Override
@@ -179,6 +170,17 @@ public class UINetwork extends NodeContainer {
 	 */
 	public void setUICOnfig(NetworkViewerConfig config) {
 		getModel().setMetaData(LAYOUT_MANAGER_KEY, config);
+	}
+
+	private class MySimulatorListener implements VisiblyMutable.Listener {
+
+		public void changed(Event e) {
+			Util.runInEventDispathThread(new Runnable() {
+				public void run() {
+					simulatorUpdated();
+				}
+			});
+		}
 	}
 
 }

@@ -1,7 +1,5 @@
 package ca.neo.ui.models.viewers;
 
-import java.security.InvalidParameterException;
-
 import ca.neo.model.Ensemble;
 import ca.neo.model.Node;
 import ca.neo.model.Probeable;
@@ -31,16 +29,6 @@ public class EnsembleViewer extends NodeViewer {
 	}
 
 	@Override
-	public void addNeoNode(UINeoNode node, boolean updateModel, boolean dropInCenterOfCamera,
-			boolean moveCamera) {
-		if (updateModel) {
-			throw new InvalidParameterException("Cannot dynamically add node to ensemble");
-		} else {
-			super.addNeoNode(node, updateModel, dropInCenterOfCamera, moveCamera);
-		}
-	}
-
-	@Override
 	public void applyDefaultLayout() {
 		if (getNeoNodes().size() == 0)
 			return;
@@ -60,7 +48,7 @@ public class EnsembleViewer extends NodeViewer {
 	}
 
 	@Override
-	public void updateViewFromModel() {
+	public void updateViewFromModel(boolean isFirstUpdate) {
 		getGround().clearLayer();
 
 		Node[] nodes = getModel().getNodes();
@@ -74,12 +62,11 @@ public class EnsembleViewer extends NodeViewer {
 
 				UINeuron neuronUI = new UINeuron(neuron);
 
-				addNeoNode(neuronUI, false, false, false);
+				addChildFancy(neuronUI, false, false);
 			} else {
 				UserMessages.showError("Unsupported node type " + node.getClass().getSimpleName()
 						+ " in EnsembleViewer");
 			}
-
 		}
 
 		if (getViewerParent().getParentNetwork() != null) {

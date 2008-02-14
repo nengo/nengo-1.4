@@ -3,7 +3,6 @@ package ca.neo.ui.models;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
@@ -11,7 +10,6 @@ import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.io.FileManager;
@@ -64,10 +62,7 @@ import ca.shu.ui.lib.world.piccolo.WorldImpl;
  * 
  * @author Shu
  */
-public abstract class UINeoNode extends UIModelConfigurable {
-
-	public static final Class<?>[] UI_NODE_CONFIGURABLE_TYPES = { UINetwork.class,
-			UINEFEnsemble.class, UIFunctionInput.class };
+public abstract class UINeoNode extends UINeoModel {
 
 	/**
 	 * Factory method which creates a Node UI object around a Node
@@ -97,16 +92,12 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		return nodeUI;
 	}
 
-	private VisiblyMutable.Listener myMutableListener;
+	private MyMutableListener myMutableListener;
 
 	/**
 	 * Attached probes
 	 */
 	private Vector<UIProbe> probes;
-
-	public UINeoNode() {
-		super();
-	}
 
 	public UINeoNode(Node model) {
 		super(model);
@@ -265,26 +256,15 @@ public abstract class UINeoNode extends UIModelConfigurable {
 		myMutableListener = new MyMutableListener();
 	}
 
-	class MyMutableListener implements VisiblyMutable.Listener {
+	private class MyMutableListener implements VisiblyMutable.Listener {
 
 		public void changed(Event e) {
-			if (SwingUtilities.isEventDispatchThread()) {
-				updateViewFromModel();
-			} else {
-				try {
-					SwingUtilities.invokeAndWait(new Runnable() {
-						public void run() {
-							updateViewFromModel();
-						}
-					});
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				} catch (InvocationTargetException e1) {
-					e1.getTargetException().printStackTrace();
+			Util.runInEventDispathThread(new Runnable() {
+				public void run() {
+					modelUpdated();
 				}
-			}
+			});
 		}
-
 	}
 
 	/**
@@ -347,6 +327,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 	@Override
 	public void attachViewToModel() {
+		super.attachViewToModel();
 		if (getModel() instanceof VisiblyMutable) {
 			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
 			visiblyMutable.addChangeListener(myMutableListener);
@@ -355,7 +336,7 @@ public abstract class UINeoNode extends UIModelConfigurable {
 
 	@Override
 	public void detachViewFromModel() {
-
+		super.detachViewFromModel();
 		if (getModel() instanceof VisiblyMutable) {
 			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
 

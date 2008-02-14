@@ -12,11 +12,6 @@ public abstract class UIProbe extends ModelObject {
 	private ProbeIcon myIcon;
 	private UINeoNode nodeAttachedTo;
 
-	protected UIProbe(UINeoNode nodeAttachedTo) {
-		super();
-		init(nodeAttachedTo);
-	}
-
 	public UIProbe(UINeoNode nodeAttachedTo, Object probeModel) {
 		super(probeModel);
 		init(nodeAttachedTo);
