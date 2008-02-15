@@ -2,7 +2,7 @@ package ca.shu.ui.lib.actions;
 
 import java.awt.geom.Point2D;
 
-import ca.shu.ui.lib.util.WorldLayout;
+import ca.shu.ui.lib.misc.WorldLayout;
 import ca.shu.ui.lib.world.World;
 import ca.shu.ui.lib.world.WorldObject;
 

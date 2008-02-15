@@ -46,6 +46,7 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.misc.ShortcutKey;
 import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;

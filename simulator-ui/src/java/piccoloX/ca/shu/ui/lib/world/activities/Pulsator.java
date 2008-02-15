@@ -1,5 +1,6 @@
 package ca.shu.ui.lib.world.activities;
 
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.activities.PActivity;
@@ -54,7 +55,7 @@ public class Pulsator {
 			}
 			fadeActivity.setDelegate(myFaderDelegate);
 
-			target.addActivity(fadeActivity);
+			UIEnvironment.getInstance().addActivity(fadeActivity);
 		}
 	}
 

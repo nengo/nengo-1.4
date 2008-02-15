@@ -18,6 +18,7 @@ import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.actions.LayoutAction;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.objects.models.ModelObject;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
@@ -382,7 +383,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 
 		public ZoomToFitActivity() {
 			super(0);
-			parentOfViewer.addActivity(this);
+			UIEnvironment.getInstance().addActivity(this);
 		}
 
 		@Override

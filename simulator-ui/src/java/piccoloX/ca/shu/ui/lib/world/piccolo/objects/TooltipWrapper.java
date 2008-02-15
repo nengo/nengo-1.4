@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.WorldSky;
 import ca.shu.ui.lib.world.WorldObject.Listener;
@@ -135,7 +136,7 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 			fadeInPhase2Activity.terminate(PActivity.TERMINATE_WITHOUT_FINISHING);
 		}
 
-		getPiccolo().addActivity(fadeOutActivity);
+		UIEnvironment.getInstance().addActivity(fadeOutActivity);
 
 		PActivity destroyActivity = new PActivity(0) {
 
@@ -146,7 +147,7 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 
 		};
 
-		getPiccolo().addActivity(destroyActivity);
+		UIEnvironment.getInstance().addActivity(destroyActivity);
 		destroyActivity.startAfter(fadeOutActivity);
 
 	}
@@ -157,7 +158,7 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 	public void fadeIn() {
 		setTransparency(0);
 		fadeInActivity = new Fader(this, 100, 1f);
-		getPiccolo().addActivity(fadeInActivity);
+		UIEnvironment.getInstance().addActivity(fadeInActivity);
 
 		// /*
 		// * fade in more slowly in the second phase.

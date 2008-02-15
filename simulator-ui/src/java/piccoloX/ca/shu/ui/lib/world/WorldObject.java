@@ -6,7 +6,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
-import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
 public interface WorldObject extends NamedObject, Destroyable {
@@ -123,7 +122,7 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 *            new activity to schedule
 	 * @return true if the activity is successfully scheduled.
 	 */
-	public boolean addActivity(PActivity activity);
+//	public boolean addActivity(PActivity activity);
 
 	/**
 	 * @return Number of children

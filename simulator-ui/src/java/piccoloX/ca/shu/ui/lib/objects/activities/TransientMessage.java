@@ -3,6 +3,7 @@ package ca.shu.ui.lib.objects.activities;
 import java.awt.geom.Point2D;
 
 import ca.shu.ui.lib.Style.Style;
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.activities.Fader;
 import ca.shu.ui.lib.world.piccolo.primitives.Text;
 import edu.umd.cs.piccolo.activities.PActivity;
@@ -42,7 +43,7 @@ public class TransientMessage extends Text {
 
 				PActivity fadeOutActivity = new Fader(TransientMessage.this,
 						ANIMATE_MSG_DURATION, 0f);
-				addActivity(fadeOutActivity);
+				UIEnvironment.getInstance().addActivity(fadeOutActivity);
 
 				PActivity removeActivity = new PActivity(0) {
 
@@ -53,11 +54,11 @@ public class TransientMessage extends Text {
 
 				};
 				removeActivity.startAfter(fadeOutActivity);
-				addActivity(removeActivity);
+				UIEnvironment.getInstance().addActivity(removeActivity);
 			}
 		};
 		showPopupActivity.setStartTime(startTime);
-		addActivity(showPopupActivity);
+		UIEnvironment.getInstance().addActivity(showPopupActivity);
 
 	}
 }

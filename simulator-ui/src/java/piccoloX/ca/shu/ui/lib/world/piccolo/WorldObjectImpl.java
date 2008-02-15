@@ -26,7 +26,6 @@ import ca.shu.ui.lib.world.piccolo.primitives.PXNode;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -200,9 +199,9 @@ public class WorldObjectImpl implements WorldObject {
 
 	}
 
-	public boolean addActivity(PActivity arg0) {
-		return myPNode.addActivity(arg0);
-	}
+//	public boolean addActivity(PActivity arg0) {
+//		return myPNode.addActivity(arg0);
+//	}
 
 	public void addChild(WorldObject wo) {
 		addChild(wo, -1);

@@ -26,33 +26,13 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Issues:
-	Index exception closing script editor with no scripts opened
-	I cannot edit transform in ConfigDialog for new Decoded Termination I created
-	I get a null pointer exception if I right-click on a node-expansion toggle (the little thing on the right of the node)
-	
-	4) The duplicate-name check for new ensemble (before construction)
-	seems to use storage name rather than name.
-	What does this mean?
-	
-	Thanks, this seems to work quite well. Will you carry on to remove
-	dangling probes & projections? Would it help if I gave you more data
-	in the event?
-	I will do that by early next week.
+I just figured out Java Swing has a built-in way of implementing accelorator keys: http://java.sun.com/docs/books/tutorial/uiswing/components/menu.html. I will leverage that in MenuBuilder.
+Auto-remove dangling probes and projections when a Network is updated
+	Detect projection removals, scan through all origins and terminations, 
+	looking for projections, then remove the one's which don't exist anymore
 
-
-
-Test that probes are updated, run IntegratorExample, look for probes
-
-Hook up simulator listeners 
-
-Configure Objects in seperate ConfigurationUtil, then add them to network.
-	Don't configure them in UI Object. Decouple the two.
 
 Run memory test to find leaks
-
-AddNeoNode should not modify model
-UIProjection->createProjection(), need more robust way of attaching listeners
 
 UIProjections
 	disconnections should be done in UINetwork level through updateViewFromModel()
@@ -62,10 +42,6 @@ UIFunctions should never modify the model.
 	AddNeoNode should be private, as you should never be adding nodes explicitly
 	All UI Changes should occur through UpdateViewFromModel
 
-Detect projection removals, scan through all origins and terminations, 
-	looking for projections, then remove the one's which don't exist anymore
-
-Scan through nodes in NetworkViewer, adding/ removing nodes
 
 Show popover message when model is updated
 	Consolidate all viewer updates in updateModelFromViewer()
@@ -74,33 +50,15 @@ Show popover message when model is updated
 
 Show decoration border around singly selected objects in NeoGraphics
 
-Add alltop-level objects to ScriptConsole
-
-
-Print used memory to UI console
-
-Done - WorldGround is now destroyed upon world destruction, however there are still some memory leaks
-	associated with nested windows.
-	Make more comprehensive memory test, open Ensemble sometimes, open sub windows
-
-Nengo.ca links don't work in IE
-
-Projections are not updated in network yet, listener... 
-Only register top level networks (what about other types of nodes??
-
-Script console having problem with network with spaces in names.
-
-
-Drag and drop UINeoNodes between networks (worlds)
-
-
-Reversable actions
-	Aggregate actions: actions can be chained, and this chain undone.
-	
-
 *******************************************
  Pri 1 - to do
 *******************************************
+Drag and drop UINeoNodes between networks (worlds)
+
+Print used memory to UI console
+
+Reversable actions
+	Aggregate actions: actions can be chained, and this chain undone.
 
 Custom file format
 

@@ -39,6 +39,7 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ExitAction;
 import ca.shu.ui.lib.actions.ReversableActionManager;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.misc.ShortcutKey;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
@@ -47,6 +48,7 @@ import ca.shu.ui.lib.world.piccolo.objects.Window;
 import ca.shu.ui.lib.world.piccolo.primitives.PXGrid;
 import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.util.PDebug;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolo.util.PUtil;
@@ -229,7 +231,7 @@ public abstract class AppFrame extends JFrame {
 		 */
 		FocusManager.getCurrentManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			public boolean dispatchKeyEvent(KeyEvent e) {
-				if (shortcutKeys != null && e.getID() == KeyEvent.KEY_PRESSED) {
+				if (getShortcutKeys() != null && e.getID() == KeyEvent.KEY_PRESSED) {
 					for (ShortcutKey shortcutKey : getShortcutKeys()) {
 						if (shortcutKey.getModifiers() == e.getModifiers()) {
 							if (shortcutKey.getKeyCode() == e.getKeyCode()) {
@@ -495,6 +497,10 @@ public abstract class AppFrame extends JFrame {
 	public ElasticWorld getWorld() {
 		return universe.getWorld();
 	}
+	
+	public boolean addActivity(PActivity activity) {
+		return universe.getRoot().addActivity(activity);
+	}
 
 	/**
 	 * This method removes the escape full screen mode key listener. It will be
@@ -583,32 +589,7 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
-	public static class ShortcutKey {
-
-		private StandardAction action;
-		private int keyCode;
-		private int modifiers;
-
-		public ShortcutKey(int modifiers, int keyCode, StandardAction action) {
-			super();
-			this.modifiers = modifiers;
-			this.keyCode = keyCode;
-			this.action = action;
-		}
-
-		public StandardAction getAction() {
-			return action;
-		}
-
-		public int getKeyCode() {
-			return keyCode;
-		}
-
-		public int getModifiers() {
-			return modifiers;
-		}
-
-	}
+	
 
 	/**
 	 * Action to show the 'about' dialog

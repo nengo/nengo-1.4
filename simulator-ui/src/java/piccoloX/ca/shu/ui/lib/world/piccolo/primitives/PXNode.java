@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.PaintContext;
 import ca.shu.ui.lib.world.WorldObject;
@@ -118,7 +119,7 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 			}
 			busyAnimatingUntilTime += ta.getDuration();
 
-			addActivity(ta);
+			UIEnvironment.getInstance().addActivity(ta);
 			return ta;
 		}
 	}
