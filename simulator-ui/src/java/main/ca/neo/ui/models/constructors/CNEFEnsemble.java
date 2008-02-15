@@ -9,6 +9,7 @@ import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.models.nodes.UINEFEnsemble;
 
 public class CNEFEnsemble extends Constructable {
 	static final PropertyDescriptor pDim = new PInt("Dimensions");
@@ -50,6 +51,6 @@ public class CNEFEnsemble extends Constructable {
 	}
 
 	public String getTypeName() {
-		return "NEFEnsemble";
+		return UINEFEnsemble.typeName;
 	}
 }

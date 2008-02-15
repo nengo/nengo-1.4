@@ -12,7 +12,7 @@ public class UIDecodedTermination extends UITermination {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String typeName = "Decoded Termination";
+	public static final String typeName = "Decoded Termination";
 
 	public UIDecodedTermination(UINEFEnsemble ensembleProxy, Termination term) {
 		super(ensembleProxy, term);

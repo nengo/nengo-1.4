@@ -5,6 +5,7 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.models.nodes.UINetwork;
 
 public class CNetwork extends Constructable {
 	private static final PropertyDescriptor pName = new PString("Name");
@@ -13,6 +14,7 @@ public class CNetwork extends Constructable {
 	 * Config descriptors
 	 */
 	private static final PropertyDescriptor[] zConfig = { pName };
+
 	@Override
 	protected Node configureModel(PropertySet configuredProperties) {
 
@@ -28,6 +30,6 @@ public class CNetwork extends Constructable {
 	}
 
 	public String getTypeName() {
-		return "Network";
+		return UINetwork.typeName;
 	}
 }

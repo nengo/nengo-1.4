@@ -9,6 +9,7 @@ import ca.neo.ui.configurable.descriptors.PBoolean;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.configurable.descriptors.PTerminationWeights;
+import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
 
 public class CDecodedTermination extends Constructable {
 	private static final PropertyDescriptor pIsModulatory = new PBoolean("Is Modulatory");
@@ -53,7 +54,7 @@ public class CDecodedTermination extends Constructable {
 	}
 
 	public String getTypeName() {
-		return "Decoded Termination";
+		return UIDecodedTermination.typeName;
 	}
 
 }

@@ -16,6 +16,7 @@ import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
 
 public class CDecodedOrigin extends Constructable {
 	private static final PropertyDescriptor pName = new PString("Name");
@@ -63,7 +64,7 @@ public class CDecodedOrigin extends Constructable {
 	}
 
 	public String getTypeName() {
-		return "Decoded Origin";
+		return UIDecodedOrigin.typeName;
 	}
 
 }

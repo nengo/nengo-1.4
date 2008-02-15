@@ -10,6 +10,7 @@ import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.models.nodes.UIFunctionInput;
 
 public class CFunctionInput extends Constructable {
 	private static PropertyDescriptor pName = new PString("Name");
@@ -41,6 +42,6 @@ public class CFunctionInput extends Constructable {
 	}
 
 	public String getTypeName() {
-		return "Function Input";
+		return UIFunctionInput.typeName;
 	}
 }

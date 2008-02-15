@@ -26,7 +26,7 @@ public class UINetwork extends NodeContainer {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String typeName = "Network";
+	public static final String typeName = "Network";
 
 	private MySimulatorListener mySimulatorListener;
 

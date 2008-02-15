@@ -14,7 +14,7 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
  */
 public class UIFunctionInput extends UINeoNode {
 
-	private static final String typeName = "Function Input";
+	public static final String typeName = "Function Input";
 	private static final long serialVersionUID = 1L;
 
 	public UIFunctionInput(FunctionInput model) {

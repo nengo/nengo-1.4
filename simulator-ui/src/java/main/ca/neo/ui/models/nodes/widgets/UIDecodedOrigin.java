@@ -12,7 +12,7 @@ public class UIDecodedOrigin extends UIOrigin {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String typeName = "Decoded Origin";
+	public static final String typeName = "Decoded Origin";
 	private int inputDimensions;
 
 	public UIDecodedOrigin(UINEFEnsemble ensembleProxy, Origin origin) {

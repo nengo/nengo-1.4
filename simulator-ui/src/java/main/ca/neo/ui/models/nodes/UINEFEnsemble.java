@@ -30,7 +30,7 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 public class UINEFEnsemble extends UIEnsemble {
 	private static final long serialVersionUID = 1L;
 
-	static final String typeName = "NEFEnsemble";
+	public static final String typeName = "NEFEnsemble";
 
 	public UINEFEnsemble(NEFEnsemble model) {
 		super(model);

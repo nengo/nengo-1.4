@@ -2,7 +2,6 @@
  Done
 *******************************************
 02/12/2008 - Fixed bug where decoded termination input dimension couldn't be changed
-
 02/12/2008 - Fixed duplicate nodes on node creation
 
 02/12/2008 - Fixed null listener on VisiblyMutable, (turns out it was a base class intializer calling that funciton before it was intialized)
@@ -17,9 +16,10 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-I noticed that VisiblyMutable listeners aren't transiet. This will cause problems when serializing
+Index exception closing script editor with no scrips opened
 
-Unify type names
+
+
 
 Test that probes are updated, run IntegratorExample, look for probes
 
