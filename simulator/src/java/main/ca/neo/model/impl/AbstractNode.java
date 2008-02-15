@@ -3,6 +3,7 @@
  */
 package ca.neo.model.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +15,8 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutableUtils;
 
 /**
  * A base implementation of Node. 
@@ -27,6 +30,7 @@ public abstract class AbstractNode implements Node {
 	private Map<String, Origin> myOrigins;
 	private Map<String, Termination> myTerminations;
 	private String myDocumentation;
+	private transient List<VisiblyMutable.Listener> myListeners;
 	
 	/**
 	 * @param name Name of Node
@@ -62,6 +66,14 @@ public abstract class AbstractNode implements Node {
 	 */
 	public String getName() {
 		return myName;
+	}
+	
+	/**
+	 * @param name The new name
+	 */
+	public void setName(String name) throws StructuralException {
+		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+		myName = name;
 	}
 
 	/**
@@ -129,6 +141,21 @@ public abstract class AbstractNode implements Node {
 		myDocumentation = text;
 	}
 	
-	
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		if (myListeners == null) {
+			myListeners = new ArrayList<Listener>(2);
+		}
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myListeners.remove(listener);
+	}
 
 }

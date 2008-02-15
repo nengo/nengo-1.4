@@ -33,41 +33,41 @@ import ca.neo.util.VisiblyMutableUtils;
  *  
  * @author Bryan Tripp
  */
-public class NetworkImpl implements Network, VisiblyMutable {
+public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.Listener {
 
 	public static final String DEFAULT_NAME = "Network";
 	
 	private static final long serialVersionUID = 1L;
 	
 	private Map<String, Node> myNodeMap; //keyed on name
-	private Map myProjectionMap; //keyed on Termination
+	private Map<Termination, Projection> myProjectionMap; //keyed on Termination
 	private String myName;
 	private SimulationMode myMode;
 	private transient Simulator mySimulator;
 	private float myStepSize;
-	private Map myProbeables;
-	private Map myProbeableStates;
-	private Map myExposedOrigins;
-	private Map myExposedTerminations;
+	private Map<String, Probeable> myProbeables;
+	private Map<String, String> myProbeableStates;
+	private Map<String, Origin> myExposedOrigins;
+	private Map<String, Termination> myExposedTerminations;
 	private String myDocumentation;
 	private Map<String, Object> myMetaData;
 
-	private Map myExposedOriginNames;
-	private Map myExposedTerminationNames;
+	private Map<Origin, String> myExposedOriginNames;
+	private Map<Termination, String> myExposedTerminationNames;
 	
 	private transient List<VisiblyMutable.Listener> myListeners;
 	
 	public NetworkImpl() {
 		myNodeMap = new HashMap<String, Node>(20);
-		myProjectionMap	= new HashMap(50);
+		myProjectionMap	= new HashMap<Termination, Projection>(50);
 		myName = DEFAULT_NAME;
 		myStepSize = .001f; 
-		myProbeables = new HashMap(30);
-		myProbeableStates = new HashMap(30);
-		myExposedOrigins = new HashMap(10);
-		myExposedOriginNames = new HashMap(10);
-		myExposedTerminations = new HashMap(10);
-		myExposedTerminationNames = new HashMap(10);
+		myProbeables = new HashMap<String, Probeable>(30);
+		myProbeableStates = new HashMap<String, String>(30);
+		myExposedOrigins = new HashMap<String, Origin>(10);
+		myExposedOriginNames = new HashMap<Origin, String>(10);
+		myExposedTerminations = new HashMap<String, Termination>(10);
+		myExposedTerminationNames = new HashMap<Termination, String>(10);
 		myMode = SimulationMode.DEFAULT;
 		myMetaData = new HashMap<String, Object>(20);
 		myListeners = new ArrayList<Listener>(10);
@@ -117,9 +117,30 @@ public class NetworkImpl implements Network, VisiblyMutable {
 		}
 		
 		myNodeMap.put(node.getName(), node);
+		node.addChangeListener(this);
 		
 		getSimulator().initialize(this);		
 		fireVisibleChangeEvent();
+	}
+	
+	/**
+	 * If the event indicates that a component node's name is changing, 
+	 * checks for name conflicts and throws an exception if there is one, 
+	 * and updates the name reference.  
+	 *  
+	 * @see ca.neo.util.VisiblyMutable.Listener#changed(ca.neo.util.VisiblyMutable.Event)
+	 */
+	public void changed(Event e) throws StructuralException {
+		if (e instanceof VisiblyMutable.NameChangeEvent) {
+			VisiblyMutable.NameChangeEvent ne = (VisiblyMutable.NameChangeEvent) e;
+			
+			if (myNodeMap.containsKey(ne.getNewName()) && !ne.getNewName().equals(ne.getOldName())) {
+				throw new StructuralException("This Network already contains a Node names " + ne.getNewName());
+			}
+			
+			myNodeMap.put(ne.getNewName(), myNodeMap.get(ne.getOldName()));
+			myNodeMap.remove(ne.getOldName());
+		}
 	}
 
 	/**
@@ -144,7 +165,8 @@ public class NetworkImpl implements Network, VisiblyMutable {
 	 */
 	public void removeNode(String name) throws StructuralException {
 		if (myNodeMap.containsKey(name)) {
-			myNodeMap.remove(name);
+			Node node = myNodeMap.remove(name);
+			node.removeChangeListener(this);
 		} else {
 			throw new StructuralException("No Node named " + name + " in this Network");
 		}
@@ -206,9 +228,9 @@ public class NetworkImpl implements Network, VisiblyMutable {
 	 * @param name New name of Network (must be unique within any networks of which this one 
 	 * 		will be a part) 
 	 */
-	public void setName(String name) {
+	public void setName(String name) throws StructuralException {
+		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
 		myName = name;
-		fireVisibleChangeEvent();
 	}
 
 	/**

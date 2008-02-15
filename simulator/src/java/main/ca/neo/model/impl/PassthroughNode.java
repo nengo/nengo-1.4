@@ -3,8 +3,10 @@
  */
 package ca.neo.model.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -21,6 +23,8 @@ import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.util.Configuration;
 import ca.neo.util.MU;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutableUtils;
 import ca.neo.util.impl.ConfigurationImpl;
 
 /**
@@ -34,6 +38,8 @@ import ca.neo.util.impl.ConfigurationImpl;
  */
 public class PassthroughNode implements Node {
 	
+	//implementation note: this class doesn't nicely extend AbstractNode 
+	
 	private static Logger ourLogger = Logger.getLogger(PassthroughNode.class);
 
 	public static final String TERMINATION = "termination";
@@ -46,6 +52,7 @@ public class PassthroughNode implements Node {
 	private Map<String, PassthroughTermination> myTerminations;
 	private BasicOrigin myOrigin;
 	private String myDocumentation;
+	private transient List<VisiblyMutable.Listener> myListeners;
 
 	/**
 	 * Constructor for a simple passthrough with single input. 
@@ -90,6 +97,14 @@ public class PassthroughNode implements Node {
 	 */
 	public String getName() {
 		return myName;
+	}
+
+	/**
+	 * @param name The new name
+	 */
+	public void setName(String name) throws StructuralException {
+		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+		myName = name;
 	}
 
 	/**
@@ -268,6 +283,23 @@ public class PassthroughNode implements Node {
 	 */
 	public void setDocumentation(String text) {
 		myDocumentation = text;
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		if (myListeners == null) {
+			myListeners = new ArrayList<Listener>(2);
+		}
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myListeners.remove(listener);
 	}
 
 }

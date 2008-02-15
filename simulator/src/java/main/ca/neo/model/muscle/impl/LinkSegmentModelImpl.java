@@ -3,7 +3,9 @@
  */
 package ca.neo.model.muscle.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -19,6 +21,7 @@ import ca.neo.model.muscle.LinkSegmentModel;
 import ca.neo.model.muscle.SkeletalMuscle;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
+import ca.neo.util.VisiblyMutable;
 import ca.neo.util.impl.TimeSeries1DImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
@@ -41,6 +44,7 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	private float myTimeStep;
 	private float myTime;
 	private String myDocumentation;
+	private transient List<VisiblyMutable.Listener> myListeners;
 	
 	public LinkSegmentModelImpl(String name, DynamicalSystem dynamics, float timeStep) {
 		myDynamics = dynamics;
@@ -217,6 +221,23 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	 */
 	public void setDocumentation(String text) {
 		myDocumentation = text;
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		if (myListeners == null) {
+			myListeners = new ArrayList<Listener>(2);
+		}
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myListeners.remove(listener);
 	}
 	
 }

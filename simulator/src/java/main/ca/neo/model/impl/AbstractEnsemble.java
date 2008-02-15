@@ -29,7 +29,6 @@ import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.VisiblyMutable;
 import ca.neo.util.VisiblyMutableUtils;
-import ca.neo.util.VisiblyMutable.Listener;
 import ca.neo.util.impl.SpikePatternImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
@@ -118,6 +117,14 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	 */
 	public String getName() {
 		return myName;
+	}
+	
+	/**
+	 * @param name The new name
+	 */
+	public void setName(String name) throws StructuralException {
+		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+		myName = name;
 	}
 
 	/**

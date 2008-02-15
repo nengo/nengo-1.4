@@ -3,10 +3,6 @@
  */
 package ca.neo.model.neuron.impl;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 
 import ca.neo.model.ExpandableNode;

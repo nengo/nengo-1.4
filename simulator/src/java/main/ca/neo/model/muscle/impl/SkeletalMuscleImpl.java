@@ -3,6 +3,8 @@
  */
 package ca.neo.model.muscle.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import ca.neo.dynamics.DynamicalSystem;
@@ -20,6 +22,7 @@ import ca.neo.model.impl.BasicTermination;
 import ca.neo.model.muscle.SkeletalMuscle;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
+import ca.neo.util.VisiblyMutableUtils;
 import ca.neo.util.impl.TimeSeries1DImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
@@ -41,6 +44,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	private Integrator myIntegrator;
 	private float myLength;
 	private String myDocumentation;
+	private transient List<Listener> myListeners;
 	
 	private TimeSeries myActivationHistory; //saved for single timestep to support Probeable
 	private TimeSeries myForceHistory;
@@ -90,6 +94,15 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	 */
 	public String getName() {
 		return myName;
+	}
+
+	/**
+	 * @param name The new name (must be unique within any networks of which this Node 
+	 * 		will be a part) 
+	 */
+	public void setName(String name) throws StructuralException {
+		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+		myName = name;
 	}
 
 	/**
@@ -207,6 +220,23 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	 */
 	public void setDocumentation(String text) {
 		myDocumentation = text;
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		if (myListeners == null) {
+			myListeners = new ArrayList<Listener>(2);
+		}
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myListeners.remove(listener);
 	}
 
 }

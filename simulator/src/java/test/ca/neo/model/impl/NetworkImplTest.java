@@ -3,6 +3,9 @@
  */
 package ca.neo.model.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.NotImplementedException;
 
 import ca.neo.model.Ensemble;
@@ -16,6 +19,8 @@ import ca.neo.model.Termination;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.util.SpikePattern;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutableUtils;
 import junit.framework.TestCase;
 
 public class NetworkImplTest extends TestCase {
@@ -85,12 +90,35 @@ public class NetworkImplTest extends TestCase {
 		myNetwork.removeProjection(t2);
 		assertEquals(t1, myNetwork.getProjections()[0].getTermination());
 	}
+	
+	public void testNodeNameChange() throws StructuralException {
+		MockEnsemble e1 = new MockEnsemble("one");
+		myNetwork.addNode(e1);
+		
+		MockEnsemble e2 = new MockEnsemble("two");
+		myNetwork.addNode(e2);
+		
+		assertTrue(myNetwork.getNode("one") != null);
+		
+		e1.setName("foo");
+		assertTrue(myNetwork.getNode("foo") != null);
+		try {
+			myNetwork.getNode("one");
+			fail("Shouldn't exist any more");
+		} catch (StructuralException e) {}
+		
+		try {
+			e2.setName("foo");
+			fail("Should have thrown exception on duplicate name");
+		} catch (StructuralException e) {}
+	}
 
 	private static class MockEnsemble implements Ensemble {
 
 		private static final long serialVersionUID = 1L;
 
 		private String myName;
+		private transient List<VisiblyMutable.Listener> myListeners;
 
 		public MockEnsemble(String name) {
 			myName = name;
@@ -98,6 +126,11 @@ public class NetworkImplTest extends TestCase {
 
 		public String getName() {
 			return myName;
+		}
+		
+		public void setName(String name) throws StructuralException {
+			VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+			myName = name;
 		}
 
 		public Node[] getNodes() {
@@ -164,6 +197,23 @@ public class NetworkImplTest extends TestCase {
 
 		public boolean isCollectingSpikes() {
 			throw new NotImplementedException("not implemented");
+		}
+
+		/**
+		 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+		 */
+		public void addChangeListener(Listener listener) {
+			if (myListeners == null) {
+				myListeners = new ArrayList<Listener>(2);
+			}
+			myListeners.add(listener);
+		}
+
+		/**
+		 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+		 */
+		public void removeChangeListener(Listener listener) {
+			myListeners.remove(listener);
 		}
 
 	}

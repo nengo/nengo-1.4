@@ -6,14 +6,15 @@ TODO (release):
 - DONE (Tuesday) clean up script editor window
 - DONE (Tuesday) UI event on add/remove projection/node in network 
 - DONE (Tuesday) memory leak in spike raster? (see email from shu early feb)
-- (Tuesday) remove util configuration/configurable
-- (Tuesday) move configuration UI code to simulator-ui
+- DONE make visiblymutable listeners transient
+- DONE support name changes in network members
+- remove util configuration/configurable
+- move configuration UI code to simulator-ui
+- support change of function input dimension
 
 - ctrl shortcut keys for save, open, new
-- DONE make visiblymutable listeners transient
 - fix bug where config window doesn't close
 - improve code completion (particularly static methods and constructors)
-- support name changes in network members
 - do we need a way to create top-level UI objects from scripts?
 - change package names to nengo
 - use config matrix editor throughout

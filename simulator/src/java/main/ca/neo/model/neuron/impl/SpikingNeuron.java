@@ -3,6 +3,8 @@
  */
 package ca.neo.model.neuron.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import ca.neo.model.Origin;
@@ -19,6 +21,8 @@ import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.model.neuron.SynapticIntegrator;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.TimeSeries1D;
+import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutableUtils;
 import ca.neo.util.impl.TimeSeries1DImpl;
 
 /**
@@ -46,6 +50,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	private float myBias;
 	private float myRadialInput;
 	private String myDocumentation;
+	private List<VisiblyMutable.Listener> myListeners;
 
 	/**
 	 * Note: current = scale * (weighted sum of inputs at each termination) * (radial input) + bias.
@@ -180,6 +185,14 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	}
 	
 	/**
+	 * @param name The new name
+	 */
+	public void setName(String name) throws StructuralException {
+		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+		myName = name;
+	}
+
+	/**
 	 * @return The coefficient that scales summed input    
 	 */
 	public float getScale() {
@@ -274,4 +287,20 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		myDocumentation = text;
 	}
 
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		if (myListeners == null) {
+			myListeners = new ArrayList<Listener>(2);
+		}
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myListeners.remove(listener);
+	}
 }

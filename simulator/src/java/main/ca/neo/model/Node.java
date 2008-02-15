@@ -5,13 +5,15 @@ package ca.neo.model;
 
 import java.io.Serializable;
 
+import ca.neo.util.VisiblyMutable;
+
 /**
  * A part of a Network that can be run independently (eg a Neuron). Normally 
  * a source of Origins and/or Terminations.
  * 
  * @author Bryan Tripp
  */
-public interface Node extends Serializable, Resettable, SimulationMode.ModeConfigurable {
+public interface Node extends Serializable, Resettable, SimulationMode.ModeConfigurable, VisiblyMutable {
 
 	/**
 	 * @return Name of Node (must be unique in a Network) 
