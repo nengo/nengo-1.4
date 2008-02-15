@@ -31,8 +31,11 @@ Auto-remove dangling probes and projections when a Network is updated
 	Detect projection removals, scan through all origins and terminations, 
 	looking for projections, then remove the one's which don't exist anymore
 
+Disable zoom & panning while animating camera (use isAnimating())
 
 Run memory test to find leaks
+Create more advanced tests
+	Create, delete, modify nodes
 
 UIProjections
 	disconnections should be done in UINetwork level through updateViewFromModel()
