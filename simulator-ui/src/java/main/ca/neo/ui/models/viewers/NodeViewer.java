@@ -47,7 +47,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	/**
 	 * Children of NEO nodes
 	 */
-	protected final Hashtable<String, UINeoNode> neoNodesChildren = new Hashtable<String, UINeoNode>();
+	protected final Hashtable<Node, UINeoNode> neoNodesChildren = new Hashtable<Node, UINeoNode>();
 
 	/**
 	 * @param nodeContainer
@@ -58,23 +58,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		this.parentOfViewer = nodeContainer;
 
 		initialize();
-	}
-
-	public void updateViewFromModel() {
-		updateViewFromModel(false);
-	}
-
-	protected void initialize() {
-		initChildModelListener();
-
-		setStatusBarHandler(new NodeViewerStatus(this));
-
-		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
-
-		updateViewFromModel(true);
-
-		msg.finished();
-
 	}
 
 	private void initChildModelListener() {
@@ -107,7 +90,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	 * @param moveCameraToNode
 	 *            whether to move the camera to where the node is
 	 */
-	protected void addChildFancy(UINeoNode node, boolean dropInCenterOfCamera,
+	protected void addUINode(UINeoNode node, boolean dropInCenterOfCamera,
 			boolean moveCameraToNode) {
 
 		/**
@@ -118,7 +101,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 			getWorld().animateToSkyPosition(node.getOffset().getX(), node.getOffset().getY());
 		}
 
-		neoNodesChildren.put(node.getName(), node);
+		neoNodesChildren.put(node.getModel(), node);
 
 		if (dropInCenterOfCamera) {
 			getGround().addChildFancy(node, dropInCenterOfCamera);
@@ -127,6 +110,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		}
 
 	}
+
+	protected abstract boolean canRemoveChildModel(Node node);
 
 	@Override
 	protected void constructLayoutMenu(MenuBuilder menu) {
@@ -143,9 +128,20 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		super.constructSelectionMenu(selection, menu);
 	}
 
-	protected abstract void removeChildModel(Node node);
+	protected void initialize() {
+		initChildModelListener();
 
-	protected abstract boolean canRemoveChildModel(Node node);
+		setStatusBarHandler(new NodeViewerStatus(this));
+
+		TrackedStatusMsg msg = new TrackedStatusMsg("Building nodes in Viewer");
+
+		updateViewFromModel(true);
+
+		msg.finished();
+
+	}
+
+	protected abstract void removeChildModel(Node node);
 
 	/**
 	 * Called when the model changes. Updates the viewer based on the NEO model.
@@ -167,7 +163,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	public void applySortLayout(SortMode sortMode) {
 		getGround().setElasticEnabled(false);
 
-		List<UINeoNode> nodes = getNeoNodes();
+		List<UINeoNode> nodes = getUINodes();
 
 		switch (sortMode) {
 		case BY_NAME:
@@ -216,7 +212,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		double endY = Double.MIN_VALUE;
 
 		if (nodes.size() > 0) {
-			for (UINeoNode node : getNeoNodes()) {
+			for (UINeoNode node : nodes) {
 
 				node.animateToPosition(x, y, 1000);
 
@@ -272,14 +268,10 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		return parentOfViewer.getModel();
 	}
 
-	public UINeoNode getNeoNode(String name) {
-		return neoNodesChildren.get(name);
-	}
-
 	/**
 	 * @return A collection of NEO Nodes contained in this viewer
 	 */
-	public List<UINeoNode> getNeoNodes() {
+	public List<UINeoNode> getUINodes() {
 		Enumeration<UINeoNode> en = neoNodesChildren.elements();
 
 		ArrayList<UINeoNode> nodesList = new ArrayList<UINeoNode>(neoNodesChildren.size());
@@ -291,13 +283,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		return nodesList;
 	}
 
-	/**
-	 * @param name
-	 *            Name of Node
-	 * @return Node
-	 */
-	public UINeoNode getNode(String name) {
-		return neoNodesChildren.get(name);
+	public UINeoNode getUINode(Node node) {
+		return neoNodesChildren.get(node);
 	}
 
 	@Override
@@ -321,22 +308,26 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	}
 
 	public void setOriginsTerminationsVisible(boolean visible) {
-		for (UINeoNode node : getNeoNodes()) {
+		for (UINeoNode node : getUINodes()) {
 			node.setWidgetsVisible(visible);
 		}
 	}
 
+	public void updateViewFromModel() {
+		updateViewFromModel(false);
+	}
+
 	private class MyNodeListener implements ModelObject.ModelListener {
+
+		public void modelDestroyed(Object model) {
+			removeChildModel((Node) model);
+		}
 
 		public void modelDestroyStarted(Object model) {
 			if (!canRemoveChildModel((Node) model)) {
 				throw new UnsupportedOperationException("Removing nodes not supported here");
 			}
 
-		}
-
-		public void modelDestroyed(Object model) {
-			removeChildModel((Node) model);
 		}
 
 	}

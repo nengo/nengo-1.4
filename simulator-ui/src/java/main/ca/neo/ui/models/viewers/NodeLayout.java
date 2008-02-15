@@ -49,7 +49,7 @@ public class NodeLayout implements Serializable {
 
 		nodePositions = new Hashtable<String, PointSerializable>();
 
-		for (UINeoNode object : world.getNeoNodes()) {
+		for (UINeoNode object : world.getUINodes()) {
 			addPosition(object, object.getOffset());
 		}
 

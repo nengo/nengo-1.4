@@ -4,12 +4,12 @@ import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.panels.CouplingMatrixPanel;
 
-public/**
-		 * Config Descriptor for a Coupling Matrix
-		 * 
-		 * @author Shu Wu
-		 */
-class PCouplingMatrix extends PropertyDescriptor {
+/**
+ * Config Descriptor for a Coupling Matrix
+ * 
+ * @author Shu Wu
+ */
+public class PCouplingMatrix extends PropertyDescriptor {
 
 	private static final long serialVersionUID = 1L;
 	private int fromSize, toSize;

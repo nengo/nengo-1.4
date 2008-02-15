@@ -18,11 +18,10 @@ public class CNEFEnsemble extends Constructable {
 
 	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
 
-	static final PropertyDescriptor pStorageName = new PString("Storage Name");
 	/**
 	 * Config descriptors
 	 */
-	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons, pDim, pStorageName };
+	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons, pDim };
 
 	@Override
 	protected Node configureModel(PropertySet prop) {
@@ -34,9 +33,8 @@ public class CNEFEnsemble extends Constructable {
 
 			Integer numOfNeurons = (Integer) prop.getProperty(pNumOfNeurons);
 			Integer dimensions = (Integer) prop.getProperty(pDim);
-			String storageName = (String) prop.getProperty(pStorageName);
 
-			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions, storageName, false);
+			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions);
 
 			return ensemble;
 		} catch (StructuralException e) {

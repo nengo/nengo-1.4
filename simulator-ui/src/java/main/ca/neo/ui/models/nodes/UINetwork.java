@@ -3,6 +3,8 @@ package ca.neo.ui.models.nodes;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.SwingUtilities;
+
 import ca.neo.model.Network;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.sim.Simulator;
@@ -14,7 +16,6 @@ import ca.neo.ui.models.viewers.NetworkViewerConfig;
 import ca.neo.util.VisiblyMutable;
 import ca.neo.util.VisiblyMutable.Event;
 import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * UI Wrapper for a Network
@@ -173,13 +174,18 @@ public class UINetwork extends NodeContainer {
 	}
 
 	private class MySimulatorListener implements VisiblyMutable.Listener {
+		private boolean simulatorUpdatePending = false;
 
 		public void changed(Event e) {
-			Util.runInEventDispathThread(new Runnable() {
-				public void run() {
-					simulatorUpdated();
-				}
-			});
+			if (!simulatorUpdatePending) {
+				simulatorUpdatePending = true;
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						simulatorUpdatePending = false;
+						simulatorUpdated();
+					}
+				});
+			}
 		}
 	}
 

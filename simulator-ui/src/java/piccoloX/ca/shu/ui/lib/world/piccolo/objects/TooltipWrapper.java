@@ -10,6 +10,8 @@ import ca.shu.ui.lib.world.WorldObject.Listener;
 import ca.shu.ui.lib.world.activities.Fader;
 import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.activities.PActivity;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
 
 public class TooltipWrapper extends WorldObjectImpl implements Listener {
 
@@ -36,7 +38,7 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 		parent.addChild(this);
 
 		addChild(tooltip);
-		setPickable(false);
+		setPickable(true);
 		setChildrenPickable(false);
 		setPaint(Style.COLOR_BACKGROUND);
 
@@ -50,6 +52,16 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 		tooltip.addPropertyChangeListener(Property.BOUNDS_CHANGED, this);
 		parent.addPropertyChangeListener(Property.VIEW_TRANSFORM, this);
 		target.addPropertyChangeListener(Property.FULL_BOUNDS, this);
+
+		this.addInputEventListener(new PBasicInputEventHandler() {
+
+			@Override
+			public void mouseClicked(PInputEvent arg0) {
+				fadeAndDestroy();
+			}
+
+		});
+
 		updatePosition();
 	}
 
@@ -107,6 +119,10 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 	 * Fades away in an animated sequence, and then destroy itself
 	 */
 	public void fadeAndDestroy() {
+		if (isDestroyed()) {
+			return;
+		}
+
 		PActivity fadeOutActivity = new Fader(this, 500, 0);
 		if (fadeInActivity != null) {
 

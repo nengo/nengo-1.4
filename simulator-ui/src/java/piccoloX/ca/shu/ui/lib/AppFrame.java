@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.KeyEventDispatcher;
 import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -26,6 +27,7 @@ import java.util.Collection;
 import java.util.EventListener;
 import java.util.Iterator;
 
+import javax.swing.FocusManager;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -58,24 +60,22 @@ public abstract class AppFrame extends JFrame {
 	private static final long serialVersionUID = 2769082313231407201L;
 
 	/**
-	 * A String which briefly describes some commands used in this application
-	 */
-	public static final String TIPS = "<H3>Keyboard Shortcuts</H3>"
-			+ "Interaction modes: Press 's' to switch modes<BR>"
-			+ "Searching: Press 'f', then start typing.<BR>"
-			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips<BR>"
-			+ "<BR><H3>Mouse Shortcuts</H3>"
-			+ "Context menu: Right click opens a context menu on most objects<BR>"
-			+ "Zooming: Scroll the mouse wheel or right click and drag";
-
-	/**
 	 * Name of the directory where UI Files are stored
 	 */
 	public static final String USER_FILE_DIR = "UIFiles";
 
-	private ReversableActionManager actionManager;
+	/**
+	 * A String which briefly describes some commands used in this application
+	 */
+	public static final String WORLD_TIPS = "<H3>Keyboard</H3>"
+			+ "Interaction modes: Press 's' to switch modes<BR>"
+			+ "Searching: Press 'f', then start typing.<BR>"
+			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips<BR>"
+			+ "<BR><H3>Mouse</H3>"
+			+ "Context menu: Right click opens a context menu on most objects<BR>"
+			+ "Zooming: Scroll the mouse wheel or right click and drag";
 
-	private Universe universe;
+	private ReversableActionManager actionManager;
 
 	private MenuBuilder editMenu;
 
@@ -86,6 +86,10 @@ public abstract class AppFrame extends JFrame {
 	private boolean isFullScreenMode;
 
 	private UserPreferences preferences;
+
+	private ShortcutKey[] shortcutKeys;
+
+	private Universe universe;
 
 	private MenuBuilder worldMenu;
 
@@ -115,11 +119,130 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
-	public void restoreDefaultTitle() {
-		setTitle(getAppWindowTitle());
+	/**
+	 * Initializes the menu
+	 */
+	private void initMenu() {
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setBorder(null);
+		Style.applyMenuStyle(menuBar, true);
+
+		MenuBuilder fileMenu = new MenuBuilder("Start");
+		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_S);
+		initFileMenu(fileMenu);
+		fileMenu.addAction(new ExitAction(this, "Quit"), KeyEvent.VK_P);
+		menuBar.add(fileMenu.getJMenu());
+
+		editMenu = new MenuBuilder("Edit");
+		editMenu.getJMenu().setMnemonic(KeyEvent.VK_E);
+
+		menuBar.add(editMenu.getJMenu());
+
+		initViewMenu(menuBar);
+
+		worldMenu = new MenuBuilder("Options");
+		worldMenu.getJMenu().setMnemonic(KeyEvent.VK_W);
+		menuBar.add(worldMenu.getJMenu());
+
+		updateWorldMenu();
+		updateEditMenu();
+
+		MenuBuilder helpMenu = new MenuBuilder("Help");
+		helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
+		menuBar.add(helpMenu.getJMenu());
+		helpMenu.addAction(new ShortcutKeysHelpAction("Shortcuts"), KeyEvent.VK_S);
+		helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
+		helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
+
+		menuBar.setVisible(true);
+		this.setJMenuBar(menuBar);
+	}
+
+	protected void chooseBestDisplayMode(GraphicsDevice device) {
+		DisplayMode best = getBestDisplayMode(device);
+		if (best != null) {
+			device.setDisplayMode(best);
+		}
+	}
+
+	protected PCamera createDefaultCamera() {
+		return PUtil.createBasicScenegraph();
+	}
+
+	protected ElasticWorld createWorld() {
+		return new ElasticWorld("Top world");
+	}
+
+	@SuppressWarnings("unchecked")
+	protected DisplayMode getBestDisplayMode(GraphicsDevice device) {
+		Iterator itr = getPreferredDisplayModes(device).iterator();
+		while (itr.hasNext()) {
+			DisplayMode each = (DisplayMode) itr.next();
+			DisplayMode[] modes = device.getDisplayModes();
+			for (DisplayMode element : modes) {
+				if (element.getWidth() == each.getWidth()
+						&& element.getHeight() == each.getHeight()
+						&& element.getBitDepth() == each.getBitDepth()) {
+					return each;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * By default return the current display mode. Subclasses may override this
+	 * method to return other modes in the collection.
+	 */
+	@SuppressWarnings("unchecked")
+	protected Collection getPreferredDisplayModes(GraphicsDevice device) {
+		ArrayList<DisplayMode> result = new ArrayList<DisplayMode>();
+
+		result.add(device.getDisplayMode());
+		/*
+		 * result.add(new DisplayMode(640, 480, 32, 0)); result.add(new
+		 * DisplayMode(640, 480, 16, 0)); result.add(new DisplayMode(640, 480,
+		 * 8, 0));
+		 */
+
+		return result;
+	}
+
+	protected ShortcutKey[] getShortcutKeys() {
+		return shortcutKeys;
+	}
+
+	/**
+	 * Use this function to add menu items to the frame menu bar
+	 * 
+	 * @param menuBar
+	 *            is attached to the frame
+	 */
+	protected void initFileMenu(MenuBuilder menu) {
+
 	}
 
 	protected void initialize() {
+		/*
+		 * Initialize shortcut keys
+		 */
+		FocusManager.getCurrentManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				if (shortcutKeys != null && e.getID() == KeyEvent.KEY_PRESSED) {
+					for (ShortcutKey shortcutKey : getShortcutKeys()) {
+						if (shortcutKey.getModifiers() == e.getModifiers()) {
+							if (shortcutKey.getKeyCode() == e.getKeyCode()) {
+								shortcutKey.getAction().doAction();
+								return true;
+							}
+						}
+					}
+				}
+				return false;
+			}
+		});
+
 		graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		loadPreferences();
 		UIEnvironment.setInstance(this);
@@ -174,105 +297,6 @@ public abstract class AppFrame extends JFrame {
 		cp.add(canvas);
 
 		canvas.requestFocus();
-	}
-
-	/**
-	 * Initializes the menu
-	 */
-	private void initMenu() {
-		JMenuBar menuBar = new JMenuBar();
-		menuBar.setBorder(null);
-		Style.applyMenuStyle(menuBar, true);
-
-		MenuBuilder fileMenu = new MenuBuilder("Start");
-		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_S);
-		initFileMenu(fileMenu);
-		fileMenu.addAction(new ExitAction(this, "Quit"), KeyEvent.VK_P);
-		menuBar.add(fileMenu.getJMenu());
-
-		editMenu = new MenuBuilder("Edit");
-		editMenu.getJMenu().setMnemonic(KeyEvent.VK_E);
-
-		menuBar.add(editMenu.getJMenu());
-
-		initViewMenu(menuBar);
-
-		worldMenu = new MenuBuilder("World");
-		worldMenu.getJMenu().setMnemonic(KeyEvent.VK_W);
-		menuBar.add(worldMenu.getJMenu());
-
-		updateWorldMenu();
-		updateEditMenu();
-
-		MenuBuilder helpMenu = new MenuBuilder("Help");
-		helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
-		menuBar.add(helpMenu.getJMenu());
-		helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
-		helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
-
-		menuBar.setVisible(true);
-		this.setJMenuBar(menuBar);
-	}
-
-	protected void chooseBestDisplayMode(GraphicsDevice device) {
-		DisplayMode best = getBestDisplayMode(device);
-		if (best != null) {
-			device.setDisplayMode(best);
-		}
-	}
-
-	protected ElasticWorld createWorld() {
-		return new ElasticWorld("Top world");
-	}
-
-	protected PCamera createDefaultCamera() {
-		return PUtil.createBasicScenegraph();
-	}
-
-	@SuppressWarnings("unchecked")
-	protected DisplayMode getBestDisplayMode(GraphicsDevice device) {
-		Iterator itr = getPreferredDisplayModes(device).iterator();
-		while (itr.hasNext()) {
-			DisplayMode each = (DisplayMode) itr.next();
-			DisplayMode[] modes = device.getDisplayModes();
-			for (DisplayMode element : modes) {
-				if (element.getWidth() == each.getWidth()
-						&& element.getHeight() == each.getHeight()
-						&& element.getBitDepth() == each.getBitDepth()) {
-					return each;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * By default return the current display mode. Subclasses may override this
-	 * method to return other modes in the collection.
-	 */
-	@SuppressWarnings("unchecked")
-	protected Collection getPreferredDisplayModes(GraphicsDevice device) {
-		ArrayList<DisplayMode> result = new ArrayList<DisplayMode>();
-
-		result.add(device.getDisplayMode());
-		/*
-		 * result.add(new DisplayMode(640, 480, 32, 0)); result.add(new
-		 * DisplayMode(640, 480, 16, 0)); result.add(new DisplayMode(640, 480,
-		 * 8, 0));
-		 */
-
-		return result;
-	}
-
-	/**
-	 * Use this function to add menu items to the frame menu bar
-	 * 
-	 * @param menuBar
-	 *            is attached to the frame
-	 */
-	protected void initFileMenu(MenuBuilder menu) {
-
 	}
 
 	/**
@@ -402,14 +426,6 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
-	 * Called when the user closes the Application window
-	 */
-	public void exitAppFrame() {
-		savePreferences();
-		System.exit(0);
-	}
-
-	/**
 	 * This method adds a key listener that will take this PFrame out of full
 	 * screen mode when the escape key is pressed. This is called for you
 	 * automatically when the frame enters full screen mode.
@@ -429,6 +445,14 @@ public abstract class AppFrame extends JFrame {
 
 	public void addWorldWindow(Window window) {
 		universe.getWorld().getSky().addChild(window);
+	}
+
+	/**
+	 * Called when the user closes the Application window
+	 */
+	public void exitAppFrame() {
+		savePreferences();
+		System.exit(0);
 	}
 
 	/**
@@ -485,6 +509,10 @@ public abstract class AppFrame extends JFrame {
 		}
 	}
 
+	public void restoreDefaultTitle() {
+		setTitle(getAppWindowTitle());
+	}
+
 	/**
 	 * Called when reversable actions have changed. Updates the edit menu.
 	 */
@@ -528,6 +556,60 @@ public abstract class AppFrame extends JFrame {
 		}
 	}
 
+	public void setShortcutKeys(ShortcutKey[] shortcutKeys) {
+		this.shortcutKeys = shortcutKeys;
+	}
+
+	/**
+	 * Action to set rendering mode to high quality.
+	 * 
+	 * @author Shu Wu
+	 */
+	protected class HighQualityAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public HighQualityAction() {
+			super("High Quality");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			getUniverse().setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+			getUniverse().setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+			getUniverse().setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+			updateWorldMenu();
+		}
+
+	}
+
+	public static class ShortcutKey {
+
+		private StandardAction action;
+		private int keyCode;
+		private int modifiers;
+
+		public ShortcutKey(int modifiers, int keyCode, StandardAction action) {
+			super();
+			this.modifiers = modifiers;
+			this.keyCode = keyCode;
+			this.action = action;
+		}
+
+		public StandardAction getAction() {
+			return action;
+		}
+
+		public int getKeyCode() {
+			return keyCode;
+		}
+
+		public int getModifiers() {
+			return modifiers;
+		}
+
+	}
+
 	/**
 	 * Action to show the 'about' dialog
 	 * 
@@ -566,29 +648,6 @@ public abstract class AppFrame extends JFrame {
 		@Override
 		protected void action() throws ActionException {
 			PDebug.debugPrintUsedMemory = false;
-			updateWorldMenu();
-		}
-
-	}
-
-	/**
-	 * Action to set rendering mode to high quality.
-	 * 
-	 * @author Shu Wu
-	 */
-	protected class HighQualityAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public HighQualityAction() {
-			super("High Quality");
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			getUniverse().setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
-			getUniverse().setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
-			getUniverse().setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
 			updateWorldMenu();
 		}
 
@@ -781,6 +840,57 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
+	 * Show shortcut keys
+	 * 
+	 * @author Shu Wu
+	 */
+	/**
+	 * Action to show the 'about' dialog
+	 * 
+	 * @author Shu Wu
+	 */
+	class ShortcutKeysHelpAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ShortcutKeysHelpAction(String actionName) {
+			super("Short shortcut keys", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			StringBuilder shortcutKeysString = new StringBuilder(400);
+
+			shortcutKeysString.append("<h3>" + getAppName() + " Shortcuts</h3>");
+			if (getShortcutKeys().length == 0) {
+				shortcutKeysString.append("No shortcuts available");
+			} else {
+				for (ShortcutKey shortcutKey : getShortcutKeys()) {
+					if ((shortcutKey.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+						shortcutKeysString.append("CTRL ");
+					}
+					if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
+						shortcutKeysString.append("ALT ");
+					}
+					if ((shortcutKey.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
+						shortcutKeysString.append("SHIFT ");
+					}
+
+					shortcutKeysString.append((char) shortcutKey.getKeyCode());
+					shortcutKeysString.append(" >> ");
+					shortcutKeysString.append(shortcutKey.getAction().getDescription());
+					shortcutKeysString.append("<br>");
+				}
+			}
+
+			JLabel editor = new JLabel("<html>" + shortcutKeysString.toString() + "</html>");
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "Shortcuts - "
+					+ getAppName(), JOptionPane.PLAIN_MESSAGE);
+		}
+
+	}
+
+	/**
 	 * Action which shows the tips dialog
 	 * 
 	 * @author Shu Wu
@@ -802,14 +912,14 @@ public abstract class AppFrame extends JFrame {
 			JLabel editor;
 			if (welcome) {
 				String appendum = "To show this message again, click <b>Help -> Tips and Commands</b>";
-				editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + TIPS
+				editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + WORLD_TIPS
 						+ "<BR><BR>" + appendum + "</html>");
 			} else {
-				editor = new JLabel("<html>" + TIPS + "</html>");
+				editor = new JLabel("<html>" + WORLD_TIPS + "</html>");
 			}
 
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName() + " Tips",
-					JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName()
+					+ " Tips", JOptionPane.PLAIN_MESSAGE);
 		}
 	}
 
@@ -999,6 +1109,10 @@ class UserPreferences implements Serializable {
 		return gridVisible;
 	}
 
+	public boolean isWelcomeScreen() {
+		return isWelcomeScreen;
+	}
+
 	public void setEnableTooltips(boolean enableTooltips) {
 		this.enableTooltips = enableTooltips;
 		WorldImpl.setTooltipsVisible(this.enableTooltips);
@@ -1007,10 +1121,6 @@ class UserPreferences implements Serializable {
 	public void setGridVisible(boolean gridVisible) {
 		this.gridVisible = gridVisible;
 		PXGrid.setGridVisible(gridVisible);
-	}
-
-	public boolean isWelcomeScreen() {
-		return isWelcomeScreen;
 	}
 
 	public void setWelcomeScreen(boolean isWelcomeScreen) {

@@ -101,7 +101,7 @@ public abstract class StandardAction implements Serializable {
 	/**
 	 * @return Description of the action.
 	 */
-	protected String getDescription() {
+	public String getDescription() {
 		return description;
 	}
 

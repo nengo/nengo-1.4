@@ -30,7 +30,7 @@ public class EnsembleViewer extends NodeViewer {
 
 	@Override
 	public void applyDefaultLayout() {
-		if (getNeoNodes().size() == 0)
+		if (getUINodes().size() == 0)
 			return;
 
 		applySortLayout(SortMode.BY_NAME);
@@ -62,7 +62,7 @@ public class EnsembleViewer extends NodeViewer {
 
 				UINeuron neuronUI = new UINeuron(neuron);
 
-				addChildFancy(neuronUI, false, false);
+				addUINode(neuronUI, false, false);
 			} else {
 				UserMessages.showError("Unsupported node type " + node.getClass().getSimpleName()
 						+ " in EnsembleViewer");
@@ -85,7 +85,7 @@ public class EnsembleViewer extends NodeViewer {
 					if (probe.isInEnsemble() && probe.getEnsembleName() == getModel().getName()) {
 						Node node = (Node) target;
 
-						UINeoNode nodeUI = getNode(node.getName());
+						UINeoNode nodeUI = getUINode(node);
 						nodeUI.showProbe(probe);
 					}
 				}

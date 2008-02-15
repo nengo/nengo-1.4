@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.neo.io.FileManager;
@@ -92,7 +93,7 @@ public abstract class UINeoNode extends UINeoModel {
 		return nodeUI;
 	}
 
-	private MyMutableListener myMutableListener;
+	private ModelUpdateListener myUpdateListener;
 
 	/**
 	 * Attached probes
@@ -130,18 +131,6 @@ public abstract class UINeoNode extends UINeoModel {
 			}
 		}
 		return null;
-	}
-
-	@Override
-	protected void prepareToDestroyModel() {
-		super.prepareToDestroyModel();
-
-		for (WorldObject wo : getChildren()) {
-			if (wo instanceof UITermination) {
-				((UITermination) wo).disconnect();
-			}
-		}
-
 	}
 
 	/**
@@ -253,18 +242,7 @@ public abstract class UINeoNode extends UINeoModel {
 	protected void initialize() {
 		super.initialize();
 		probes = new Vector<UIProbe>();
-		myMutableListener = new MyMutableListener();
-	}
-
-	private class MyMutableListener implements VisiblyMutable.Listener {
-
-		public void changed(Event e) {
-			Util.runInEventDispathThread(new Runnable() {
-				public void run() {
-					modelUpdated();
-				}
-			});
-		}
+		myUpdateListener = new ModelUpdateListener();
 	}
 
 	/**
@@ -313,6 +291,18 @@ public abstract class UINeoNode extends UINeoModel {
 		}
 	}
 
+	@Override
+	protected void prepareToDestroyModel() {
+		super.prepareToDestroyModel();
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof UITermination) {
+				((UITermination) wo).disconnect();
+			}
+		}
+
+	}
+
 	/**
 	 * Creates a new probe and adds the UI object to the node
 	 * 
@@ -330,7 +320,7 @@ public abstract class UINeoNode extends UINeoModel {
 		super.attachViewToModel();
 		if (getModel() instanceof VisiblyMutable) {
 			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
-			visiblyMutable.addChangeListener(myMutableListener);
+			visiblyMutable.addChangeListener(myUpdateListener);
 		}
 	}
 
@@ -340,8 +330,8 @@ public abstract class UINeoNode extends UINeoModel {
 		if (getModel() instanceof VisiblyMutable) {
 			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
 
-			Util.Assert(myMutableListener != null);
-			visiblyMutable.removeChangeListener(myMutableListener);
+			Util.Assert(myUpdateListener != null);
+			visiblyMutable.removeChangeListener(myUpdateListener);
 		}
 	}
 
@@ -643,6 +633,22 @@ public abstract class UINeoNode extends UINeoModel {
 		}
 		return null;
 
+	}
+
+	private class ModelUpdateListener implements VisiblyMutable.Listener {
+		private boolean modelUpdatePending = false;
+
+		public void changed(Event e) {
+			if (!modelUpdatePending) {
+				modelUpdatePending = true;
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						modelUpdatePending = false;
+						modelUpdated();
+					}
+				});
+			}
+		}
 	}
 
 	/**

@@ -5,6 +5,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -34,8 +36,8 @@ public class AuxillarySplitPane extends JSplitPane {
 	}
 
 	private int auxPanelSize;
-	private JPanel auxPanelWr;
 	private final String auxTitle;
+	private JPanel auxPanelWr;
 
 	private Container mainPanel;
 
@@ -67,12 +69,18 @@ public class AuxillarySplitPane extends JSplitPane {
 		init(auxPanel);
 	}
 
-	private JPanel createAuxPanelWrapper(Container auxPanel, String title) {
+	private JPanel createAuxPanelWrapper(final Container auxPanel, String title) {
 		/*
 		 * Initialize auxillary panel
 		 */
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BorderLayout());
+		leftPanel.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				auxPanel.requestFocusInWindow();
+			}
+		});
 
 		Style.applyStyle(leftPanel);
 
@@ -149,11 +157,7 @@ public class AuxillarySplitPane extends JSplitPane {
 	}
 
 	public boolean isAuxVisible() {
-		if (getDividerLocation() > 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return auxPanelWr.isVisible();
 	}
 
 	public void setAuxPane(Container auxPane, String title) {
@@ -213,6 +217,7 @@ public class AuxillarySplitPane extends JSplitPane {
 				auxPanelWr.requestFocus();
 				auxPanelWr.setVisible(true);
 			}
+			auxPanelWr.requestFocusInWindow();
 		} else {
 			auxPanelWr.setVisible(false);
 

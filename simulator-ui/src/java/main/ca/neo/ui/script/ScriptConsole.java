@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
@@ -118,6 +120,14 @@ public class ScriptConsole extends JPanel {
 			ourLogger.error("Problem setting up console output", e);
 		}
 
+		addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				myCommandField.requestFocusInWindow();
+
+			}
+		});
+
 		initStyles();
 	}
 
@@ -140,7 +150,7 @@ public class ScriptConsole extends JPanel {
 		setChildrenBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
 		setChildrenForeground(ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
 		myCommandField.setCaretColor(ca.shu.ui.lib.Style.Style.COLOR_LIGHT_GREEN);
-		
+
 		commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
 		StyleConstants.setForeground(commandStyle, ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
 		StyleConstants.setItalic(commandStyle, true);
@@ -175,30 +185,30 @@ public class ScriptConsole extends JPanel {
 	}
 
 	private static String makePythonName(String name) {
-		//replace special characters with "_"
+		// replace special characters with "_"
 		Pattern nonPythonChar = Pattern.compile("\\W");
 		name = nonPythonChar.matcher(name).replaceAll("_");
-		
-		//prepend "_" if name starts with a number
+
+		// prepend "_" if name starts with a number
 		if (name.matches("\\A\\d.*")) {
 			name = "_" + name;
 		}
-		
-		//prepend "_" if name is reserved word 
-		String[] reserved = new String[]{"and", "assert", "break", "class", "continue", "def", "del", "elif",    
-		         "else", "except", "exec", "finally", "for", "from", "global", "if",  
-		         "import", "in", "is", "lambda", "not", "or", "pass", "print",  
-		         "raise", "return", "try", "while", "yield"};		
-		
+
+		// prepend "_" if name is reserved word
+		String[] reserved = new String[] { "and", "assert", "break", "class", "continue", "def",
+				"del", "elif", "else", "except", "exec", "finally", "for", "from", "global", "if",
+				"import", "in", "is", "lambda", "not", "or", "pass", "print", "raise", "return",
+				"try", "while", "yield" };
+
 		for (int i = 0; i < reserved.length; i++) {
 			if (name.equals(reserved[i])) {
 				name = "_" + name;
-			}				
+			}
 		}
-		
+
 		return name;
 	}
-	
+
 	/**
 	 * @param o
 	 *            The object that is currently selected in the UI.
@@ -520,10 +530,10 @@ public class ScriptConsole extends JPanel {
 	}
 
 	public static void main(String[] args) {
-//		System.out.println(makePythonName("10balloon"));
-//		System.out.println(makePythonName("assert"));
-//		System.out.println(makePythonName("1 + 1 = 2"));
-		
+		// System.out.println(makePythonName("10balloon"));
+		// System.out.println(makePythonName("assert"));
+		// System.out.println(makePythonName("1 + 1 = 2"));
+
 		JavaSourceParser.addSource(new File("../simulator/src/java/main"));
 		PythonInterpreter interpreter = new PythonInterpreter();
 		ScriptConsole console = new ScriptConsole(interpreter);

@@ -145,7 +145,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		Node[] nodes = getModel().getNodes();
 
 		for (Node node : nodes) {
-			if (getNode(node.getName()) == null) {
+			if (getUINode(node) == null) {
 				UINeoNode nodeUI = currentNodes.get(node);
 
 				if (nodeUI == null) {
@@ -156,12 +156,12 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 
 					boolean centerAndNotify = !isFirstUpdate;
 
-					addChildFancy(nodeUI, centerAndNotify, false);
+					addUINode(nodeUI, centerAndNotify, false);
 					if (centerAndNotify) {
 						nodeUI.showPopupMessage("Node " + node.getName() + " added to Network");
 					}
 				} else {
-					neoNodesChildren.put(nodeUI.getName(), nodeUI);
+					neoNodesChildren.put(nodeUI.getModel(), nodeUI);
 				}
 
 			} else {
@@ -174,7 +174,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		 */
 		for (Node node : currentNodes.keySet()) {
 			// Remove nodes which are no longer referenced by the network model
-			if (getNode(node.getName()) == null) {
+			if (getUINode(node) == null) {
 				UINeoNode nodeUI = currentNodes.get(node);
 				nodeUI.showPopupMessage("Node " + nodeUI.getName() + " removed from Network");
 				nodeUI.destroy();
@@ -189,9 +189,9 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 			Origin origin = projection.getOrigin();
 			Termination term = projection.getTermination();
 
-			UINeoNode nodeOrigin = getNode(origin.getNode().getName());
+			UINeoNode nodeOrigin = getUINode(origin.getNode());
 
-			UINeoNode nodeTerm = getNode(term.getNode().getName());
+			UINeoNode nodeTerm = getUINode(term.getNode());
 
 			UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
 			UITermination termUI = nodeTerm.showTermination(term.getName());
@@ -215,7 +215,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 
 	@Override
 	public void applyDefaultLayout() {
-		if (getNeoNodes().size() != 0) {
+		if (getUINodes().size() != 0) {
 			if (restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
 				return;
 			} else {
@@ -313,7 +313,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		double endY = Double.MIN_VALUE;
 		boolean foundSavedPosition = false;
 
-		for (UINeoNode node : getNeoNodes()) {
+		for (UINeoNode node : getUINodes()) {
 
 			Point2D savedPosition = layout.getPosition(node);
 			if (savedPosition != null) {
@@ -397,7 +397,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 
 					Node node = (Node) target;
 
-					UINeoNode nodeUI = getNode(node.getName());
+					UINeoNode nodeUI = getUINode(node);
 					if (nodeUI != null) {
 						nodeUI.showProbe(probe);
 					} else {

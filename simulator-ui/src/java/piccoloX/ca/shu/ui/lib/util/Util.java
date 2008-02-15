@@ -11,7 +11,6 @@ import java.lang.reflect.Array;
 import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
@@ -94,14 +93,6 @@ public class Util {
 			System.out.println("DebugMSG: " + msg);
 		}
 
-	}
-
-	public static void runInEventDispathThread(Runnable runnable) {
-		if (SwingUtilities.isEventDispatchThread()) {
-			runnable.run();
-		} else {
-			SwingUtilities.invokeLater(runnable);
-		}
 	}
 
 	public static String truncateString(String input, int maxLength) {

@@ -72,10 +72,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
 	 */
-	public static final String ABOUT = APP_NAME + "<BR><BR>"
+	public static final String ABOUT = "<H3>" + APP_NAME + "</H3>"
 			+ "(c) Copyright Center for Theoretical Neuroscience 2007.  All rights reserved<BR>"
-			+ "Visit http://ctn.uwaterloo.ca/<BR>"
-			+ "<BR> User Interface by Shu Wu (shuwu83@gmail.com)";
+			+ "http://ctn.uwaterloo.ca/<BR>" + "<BR> User Interface by Shu Wu (shuwu83@gmail.com)";
 
 	public static final String CONFIG_FILE = "NeoGraphics.config";
 
@@ -128,6 +127,66 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 */
 	public NeoGraphics() {
 		super();
+	}
+
+	private void initScriptConsoleListeners() {
+		SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
+
+			public void singleObjectSelected(WorldObject obj) {
+				while (obj != null && !(obj instanceof ModelObject)) {
+					obj = obj.getParent();
+				}
+
+				if (obj != null) {
+					Object model = ((ModelObject) obj).getModel();
+					scriptConsole.setCurrentObject(model);
+				}
+			}
+		});
+
+		getWorld().getGround().addChildrenListener(new WorldObject.ChildListener() {
+
+			public void childAdded(WorldObject wo) {
+				if (wo instanceof ModelObject) {
+					final ModelObject modelObject = ((ModelObject) wo);
+					final Object model = modelObject.getModel();
+					final String modelName = modelObject.getName();
+
+					try {
+						scriptConsole.addVariable(modelName, model);
+
+						modelObject.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
+								new WorldObject.Listener() {
+									public void propertyChanged(Property event) {
+										scriptConsole.removeVariable(modelName);
+										modelObject.removePropertyChangeListener(
+												Property.REMOVED_FROM_WORLD, this);
+									}
+								});
+
+					} catch (Exception e) {
+						UserMessages.showError("Error adding network: " + e.getMessage());
+					}
+				}
+			}
+
+			public void childRemoved(WorldObject wo) {
+				/*
+				 * Do nothing here. We don't remove the variable here directly
+				 * because the network has already been destroyed and no longer
+				 * has a reference to it's model.
+				 */
+			}
+
+		});
+
+	}
+
+	private void initShortCutKeys() {
+		ShortcutKey[] shortcutKeys = new ShortcutKey[] { new ShortcutKey(KeyEvent.CTRL_MASK,
+				KeyEvent.VK_P, new ToggleScriptPane()) };
+
+		setShortcutKeys(shortcutKeys);
 	}
 
 	private void loadConfig() {
@@ -245,59 +304,10 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		 */
 		initScriptConsoleListeners();
 
-	}
-
-	private void initScriptConsoleListeners() {
-		SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
-
-			public void singleObjectSelected(WorldObject obj) {
-				while (obj != null && !(obj instanceof ModelObject)) {
-					obj = obj.getParent();
-				}
-
-				if (obj != null) {
-					Object model = ((ModelObject) obj).getModel();
-					scriptConsole.setCurrentObject(model);
-				}
-			}
-		});
-
-		getWorld().getGround().addChildrenListener(new WorldObject.ChildListener() {
-
-			public void childAdded(WorldObject wo) {
-				if (wo instanceof ModelObject) {
-					final ModelObject modelObject = ((ModelObject) wo);
-					final Object model = modelObject.getModel();
-					final String modelName = modelObject.getName();
-
-					try {
-						scriptConsole.addVariable(modelName, model);
-
-						modelObject.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
-								new WorldObject.Listener() {
-									public void propertyChanged(Property event) {
-										scriptConsole.removeVariable(modelName);
-										modelObject.removePropertyChangeListener(
-												Property.REMOVED_FROM_WORLD, this);
-									}
-								});
-
-					} catch (Exception e) {
-						UserMessages.showError("Error adding network: " + e.getMessage());
-					}
-				}
-			}
-
-			public void childRemoved(WorldObject wo) {
-				/*
-				 * Do nothing here. We don't remove the variable here directly
-				 * because the network has already been destroyed and no longer
-				 * has a reference to it's model.
-				 */
-			}
-
-		});
-
+		/*
+		 * Initialize shortcut keys
+		 */
+		initShortCutKeys();
 	}
 
 	@Override
@@ -435,13 +445,28 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		for (AuxillarySplitPane splitPane : splitPanes) {
 
 			viewMenu.addAction(new SetSplitPaneVisibleAction("Show " + splitPane.getAuxTitle(),
-					splitPane, true));
+					splitPane, true), splitPane.getAuxTitle().getBytes()[0]);
 
 		}
 	}
 
 	public void setDataViewerVisible(boolean isVisible) {
 		dataViewerPane.setAuxVisible(isVisible);
+	}
+
+	public class ToggleScriptPane extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ToggleScriptPane() {
+			super("Toggle script pane");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			scriptConsolePane.setAuxVisible(!scriptConsolePane.isAuxVisible());
+		}
+
 	}
 
 	class OpenScriptEditor extends StandardAction {

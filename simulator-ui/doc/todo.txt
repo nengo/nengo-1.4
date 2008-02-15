@@ -1,9 +1,19 @@
 *******************************************
  Done
 *******************************************
+02/13/2008 - Shortcut keys can be defined in initShortCutKeys()
+			They are visible in the help menu too: help->shortuts
+02/13/2008 - Sorting fixed 
+02/13/2008 - Fixed concurrency issue whereby two threads tried to add projections at once.
+			 All model update events are executed in a pending thread. 
+			 I didn't do this earlier because I thought I'd move all unify all UI update operations in one function, which I now think is impractical.  
+02/13/2008 - Projection popup messages now have the format NodeName.PortName
+02/13/2008 - Removed StorageName from NEFEnsemble constructor 
+			 Note: you can disable tooltips from showing automatically in the "World" menu. This setting is saved between sessions.
+			 You can force them to show intentially, but holding down the "ctrl" key. 
+
 02/12/2008 - Fixed bug where decoded termination input dimension couldn't be changed
 02/12/2008 - Fixed duplicate nodes on node creation
-
 02/12/2008 - Fixed null listener on VisiblyMutable, (turns out it was a base class intializer calling that funciton before it was intialized)
 02/12/2008 - All top level objects are registered in Script Console
 02/12/2008 - Applied style to script editor
@@ -16,8 +26,19 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Index exception closing script editor with no scrips opened
-
+Issues:
+	Index exception closing script editor with no scripts opened
+	I cannot edit transform in ConfigDialog for new Decoded Termination I created
+	I get a null pointer exception if I right-click on a node-expansion toggle (the little thing on the right of the node)
+	
+	4) The duplicate-name check for new ensemble (before construction)
+	seems to use storage name rather than name.
+	What does this mean?
+	
+	Thanks, this seems to work quite well. Will you carry on to remove
+	dangling probes & projections? Would it help if I gave you more data
+	in the event?
+	I will do that by early next week.
 
 
 
