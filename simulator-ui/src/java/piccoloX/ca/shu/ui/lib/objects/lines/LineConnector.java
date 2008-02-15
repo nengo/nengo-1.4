@@ -60,7 +60,13 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 	private boolean tryConnectTo(ILineTermination newTermination, boolean modifyModel) {
 
 		if (newTermination != getTermination()) {
-			if (canConnectTo(newTermination)) {
+
+			if (newTermination.getConnector() != null) {
+				/*
+				 * There is already something connected to the termination
+				 */
+				newTermination = null;
+			} else if (canConnectTo(newTermination)) {
 				if (!initTarget(newTermination, modifyModel)) {
 					newTermination = null;
 				}
