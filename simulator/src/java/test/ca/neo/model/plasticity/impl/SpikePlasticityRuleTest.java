@@ -236,7 +236,23 @@ public class SpikePlasticityRuleTest extends TestCase {
 		
 		public STDP(boolean positive, float tau) {			
 			super(3);
-			mySign = positive ? 1 : -1;
+			setPositive(positive);
+			myTau = tau;
+		}
+		
+		public boolean getPositive() {
+			return mySign > 1;
+		}
+		
+		public void setPositive(boolean positive) {
+			mySign = positive ? 1 : -1;			
+		}
+		
+		public float getTau() {
+			return myTau;
+		}
+		
+		public void setTau(float tau) {
 			myTau = tau;
 		}
 		
