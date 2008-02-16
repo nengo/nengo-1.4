@@ -45,6 +45,19 @@ public class SimpleLTISystem extends LTISystem {
 	}
 	
 	/**
+	 * Creates an appropriately-dimensioned system with all-zero matrices, so that elements 
+	 * can be changed later. 
+	 *  
+	 * @param stateDim Number of state variables
+	 * @param inputDim Number of inputs
+	 * @param outputDim Number of outputs
+	 */
+	public SimpleLTISystem(int stateDim, int inputDim, int outputDim) {
+		this(new float[stateDim], MU.zero(stateDim, inputDim), MU.zero(outputDim, stateDim), 
+				new float[stateDim], Units.uniform(Units.UNK, outputDim));
+	}
+	
+	/**
 	 * @see ca.neo.dynamics.DynamicalSystem#f(float, float[])
 	 */
 	public float[] f(float t, float[] u) {
