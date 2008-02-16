@@ -75,8 +75,6 @@ public class ScriptEditor extends JPanel {
 
 		myDirectory = directory;
 		myFilter = new ExtensionFileFilter(new String[] { "py" });
-
-		// setBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
 	}
 
 	/**
@@ -95,17 +93,19 @@ public class ScriptEditor extends JPanel {
 	 */
 	public void saveCurrentFile() throws IOException {
 		int index = myTabs.getSelectedIndex();
-		ScriptData sd = myScripts.get(index);
+		if (index >= 0) {
+			ScriptData sd = myScripts.get(index);
 
-		if (sd.getFile() == null) {
-			saveCurrentFileAs();
-		} else {
-			FileWriter writer = new FileWriter(sd.getFile());
-			writer.write(sd.getTextComponent().getText());
-			writer.flush();
-			writer.close();
+			if (sd.getFile() == null) {
+				saveCurrentFileAs();
+			} else {
+				FileWriter writer = new FileWriter(sd.getFile());
+				writer.write(sd.getTextComponent().getText());
+				writer.flush();
+				writer.close();
 
-			sd.setSaved(true);
+				sd.setSaved(true);
+			}
 		}
 	}
 
@@ -116,17 +116,19 @@ public class ScriptEditor extends JPanel {
 	 */
 	public void saveCurrentFileAs() throws IOException {
 		int index = myTabs.getSelectedIndex();
-		ScriptData sd = myScripts.get(index);
+		if (index >= 0) {
+			ScriptData sd = myScripts.get(index);
 
-		JFileChooser fileChooser = new JFileChooser(myDirectory);
-		fileChooser.setFileFilter(myFilter);
-		int selection = fileChooser.showSaveDialog(this);
-		if (selection == JFileChooser.APPROVE_OPTION) {
-			File file = fileChooser.getSelectedFile();
-			sd.setFile(file);
-			sd.setName(file.getName());
-			myTabs.setTitleAt(index, file.getName());
-			saveCurrentFile();
+			JFileChooser fileChooser = new JFileChooser(myDirectory);
+			fileChooser.setFileFilter(myFilter);
+			int selection = fileChooser.showSaveDialog(this);
+			if (selection == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				sd.setFile(file);
+				sd.setName(file.getName());
+				myTabs.setTitleAt(index, file.getName());
+				saveCurrentFile();
+			}			
 		}
 	}
 
@@ -161,22 +163,24 @@ public class ScriptEditor extends JPanel {
 		int result = JOptionPane.YES_OPTION;
 		int index = myTabs.getSelectedIndex();
 
-		if (!myScripts.get(index).isSaved()) {
-			Object[] options = { "Save", "Discard", "Cancel" };
-			int selection = JOptionPane.showOptionDialog(this, "Would you like to save "
-					+ myScripts.get(index).getName() + " before closing?", "Confirm",
-					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
-					options[0]);
-			if (selection == JOptionPane.YES_OPTION) {
-				saveCurrentFile();
-				doClose(index);
-			} else if (selection == JOptionPane.NO_OPTION) {
-				doClose(index);
-			}
+		if (index >= 0) {
+			if (!myScripts.get(index).isSaved()) {
+				Object[] options = { "Save", "Discard", "Cancel" };
+				int selection = JOptionPane.showOptionDialog(this, "Would you like to save "
+						+ myScripts.get(index).getName() + " before closing?", "Confirm",
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
+						options[0]);
+				if (selection == JOptionPane.YES_OPTION) {
+					saveCurrentFile();
+					doClose(index);
+				} else if (selection == JOptionPane.NO_OPTION) {
+					doClose(index);
+				}
 
-			result = selection;
-		} else {
-			doClose(index);
+				result = selection;
+			} else {
+				doClose(index);
+			}			
 		}
 
 		return result;
@@ -291,7 +295,7 @@ public class ScriptEditor extends JPanel {
 	private class ChangeListener implements DocumentListener {
 
 		// TODO: could unregister this after a change and register a new one
-		// with a save
+		// with a save 
 
 		private ScriptData myScript;
 
@@ -371,11 +375,11 @@ public class ScriptEditor extends JPanel {
 		openEditor(false);
 	}
 
-	private static void openEditor(boolean exitOnWindowClose) {
+	private static void openEditor(final boolean exitOnWindowClose) {
 		final ScriptEditor editor = new ScriptEditor();
 		editor.setPreferredSize(new Dimension(600, 600));
 
-		JFrame frame = new JFrame("Script Editor");
+		final JFrame frame = new JFrame("Script Editor");
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.getContentPane().add(editor, BorderLayout.CENTER);
 
@@ -453,6 +457,25 @@ public class ScriptEditor extends JPanel {
 			}
 		}, KeyEvent.VK_C);
 
+		fileMenu.addAction(new StandardAction("Exit") {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void action() throws ActionException {
+				try {
+					if (editor.closeAll()) {
+						frame.dispose();
+					}
+					if (exitOnWindowClose) {
+						System.exit(0);
+					}
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		}, KeyEvent.VK_X);
+		
 		menuBar.add(fileMenu.getJMenu());
 		frame.setJMenuBar(menuBar);
 
