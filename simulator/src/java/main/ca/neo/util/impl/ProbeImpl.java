@@ -37,14 +37,9 @@ public class ProbeImpl implements Probe {
 		myStateName = stateName;
 		myRecord = record;
 		
-		//get units; also if the state is bad, we want to throw an exception now
-		TimeSeries initial = target.getHistory(stateName);  
-		
-		myUnits = new Units[initial.getDimension()];
-		for (int i = 0; i < myUnits.length; i++) {
-			myUnits[i] = initial.getUnits()[i];
-		}
-		
+		//if the state is bad, we want to throw an exception now
+		myTarget.getHistory(myStateName);  
+
 		reset();
 	}
 
@@ -59,6 +54,7 @@ public class ProbeImpl implements Probe {
 	 * @see ca.neo.util.Probe#reset() 
 	 */
 	public void reset() {
+		myUnits = null; //will be reset on first doCollect()
 		myTimes = new float[1000];
 		myValues = new ArrayList<float[]>(1000);
 	}
@@ -106,6 +102,10 @@ public class ProbeImpl implements Probe {
 		
 		for (int i = 0; i < len; i++) {
 			myValues.add(values[i]);
+		}
+		
+		if (myUnits == null) {
+			myUnits = stepData.getUnits();
 		}
 	}
 	

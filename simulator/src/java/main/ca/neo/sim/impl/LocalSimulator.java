@@ -35,7 +35,7 @@ public class LocalSimulator implements Simulator {
 
 	private Projection[] myProjections;
 	private Node[] myNodes;
-	private Map myNodeMap;
+	private Map<String, Node> myNodeMap;
 	private List<Probe> myProbes;
 	private transient List<VisiblyMutable.Listener> myChangeListeners;
 	
@@ -56,7 +56,7 @@ public class LocalSimulator implements Simulator {
 	public synchronized void initialize(Network network) {
 		myNodes = network.getNodes();
 
-		myNodeMap = new HashMap(myNodes.length * 2);
+		myNodeMap = new HashMap<String, Node>(myNodes.length * 2);
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodeMap.put(myNodes[i].getName(), myNodes[i]);
 		}
@@ -71,6 +71,12 @@ public class LocalSimulator implements Simulator {
 	 */
 	public synchronized void run(float startTime, float endTime, float stepSize)
 			throws SimulationException {
+
+		Iterator<Probe> it = myProbes.iterator();
+		while (it.hasNext()) {
+			it.next().reset();
+		}
+		
 		fireSimulatorEvent(new SimulatorEvent(0, SimulatorEvent.Type.STARTED));
 		// for (int i = 0; i < myNodes.length; i++) {
 		// myNodes[i].setMode(mode);
@@ -84,12 +90,9 @@ public class LocalSimulator implements Simulator {
 		float time = startTime;
 
 		int c = 0;
-		while (time < endTime - stepSize / 10000f) { // in case we're very
-			// close with floating
-			// point comparison
+		while (time < endTime - stepSize / 10000f) { // in case we're very close with floating point comparison
 			if (c++ % 100 == 99)
-				System.out.println("Step " + c); // TODO: change this to
-			// listener/progress bar
+				System.out.println("Step " + c); // TODO: change this to listener/progress bar
 			step(time, Math.min(endTime, time + stepSize));
 
 			float currentProgress = (time - startTime) / (endTime - startTime);
@@ -114,10 +117,9 @@ public class LocalSimulator implements Simulator {
 			myNodes[i].run(startTime, endTime);
 		}
 
-		Iterator it = myProbes.iterator();
+		Iterator<Probe> it = myProbes.iterator();
 		while (it.hasNext()) {
-			Probe p = (Probe) it.next();
-			p.collect(endTime);
+			it.next().collect(endTime);
 		}
 	}
 
