@@ -4,8 +4,12 @@
 package ca.neo.model;
 
 /**
- * An model of noise that can be explicitly injected into a circuit (e.g. added to 
- * an Origin). 
+ * <p>An model of noise that can be explicitly injected into a circuit (e.g. added to 
+ * an Origin). </p>
+ * 
+ * <p>Noise may be cloned across independent dimensions of a Noisy. This means that 
+ * either 1) noise parameters can't be changed after construction, or 2) parameters
+ * must be shared or propagated across clones. </p>
  *   
  * @author Bryan Tripp
  */

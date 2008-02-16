@@ -84,11 +84,7 @@ public class NoiseFactory {
 
 		@Override
 		public Noise clone() {
-			try {
-				return (Noise) super.clone();
-			} catch (CloneNotSupportedException e) {
-				throw new RuntimeException(e);
-			}
+			return this; //allows sharing between dimensions
 		}
 		
 	}
@@ -104,11 +100,7 @@ public class NoiseFactory {
 
 		@Override
 		public Noise clone() {
-			try {
-				return (Noise) super.clone();
-			} catch (CloneNotSupportedException e) {
-				throw new RuntimeException(e);
-			}
+			return this; //allows sharing between dimensions
 		}
 		
 	}
@@ -146,15 +138,11 @@ public class NoiseFactory {
 			myIntegrator = integrator;			
 		}
 		
-		public NoiseImplPDF() {
-			this(1, new GaussianPDF(0, 1), null, null);
-		}
-		
 		public float getFrequency() {
 			return 1f /myPeriod;
 		}
 		
-		public void setFrequency(float frequency) {
+		private void setFrequency(float frequency) {
 			myPeriod = 1f / frequency;
 		}
 		
@@ -162,7 +150,7 @@ public class NoiseFactory {
 			return myPDF;
 		}
 		
-		public void setPDF(PDF pdf) {
+		private void setPDF(PDF pdf) {
 			if (myDynamics == null && pdf.getDimension() != 1) {
 				throw new IllegalArgumentException("With null dynamics, the PDF must be defined over one dimension.");	
 			}
@@ -176,7 +164,7 @@ public class NoiseFactory {
 			return myDynamics;
 		}
 		
-		public void setDynamics(DynamicalSystem dynamics) {
+		private void setDynamics(DynamicalSystem dynamics) {
 			if (dynamics != null && dynamics.getOutputDimension() != 1) {
 				throw new IllegalArgumentException("The output of the dynamics must be one-dimensional");
 			}
@@ -186,10 +174,6 @@ public class NoiseFactory {
 		
 		public Integrator getIntegrator() {
 			return myIntegrator;
-		}
-		
-		public void setIntegrator(Integrator integrator) {
-			myIntegrator = integrator;
 		}
 		
 		/**
@@ -219,6 +203,7 @@ public class NoiseFactory {
 
 		@Override
 		public Noise clone() {
+			//must return an independent copy of this Noise since there may be a DynamicalSystem with state
 			try {
 				NoiseImplPDF result = (NoiseImplPDF) super.clone();
 				if (myDynamics != null) {

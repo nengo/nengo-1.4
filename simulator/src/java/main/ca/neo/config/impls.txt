@@ -27,6 +27,8 @@ ca.neo.util.impl.TimeSeries1DImpl
 ca.neo.util.impl.RandomHypersphereVG
 ca.neo.util.impl.Rectifier
 ca.neo.model.impl.NoiseFactory$NoiseImplPDF
+ca.neo.model.impl.NoiseFactory$NoiseImplNull
+ca.neo.model.impl.NoiseFactory$NoiseImplFunction
 ca.neo.model.neuron.impl.SpikingNeuron
 ca.neo.model.neuron.impl.PlasticExpandableSpikingNeuron
 ca.neo.model.neuron.impl.ALIFSpikeGenerator

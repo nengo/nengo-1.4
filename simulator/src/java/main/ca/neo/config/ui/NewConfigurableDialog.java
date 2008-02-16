@@ -55,8 +55,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final String CANCEL_ACTION_COMMAND = "cancel";
 	
-	private static Object myResult;	
-	private static NewConfigurableDialog myDialog;
+	private Object myResult;	
 	
 	private Configuration myConfiguration;
 	private JTree myConfigurationTree;
@@ -78,22 +77,22 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	 * @return User-constructed object (or null if construction aborted)
 	 */
 	public static Object showDialog(Component comp, Class type, Class specificType) {
-		myResult = null;
 		
 		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
 		if (specificType != null && !NullValue.class.isAssignableFrom(specificType) && !types.contains(specificType)) {
 			types.add(0, specificType);
 		}
 		
+		NewConfigurableDialog dialog = null;
 		if (types.size() > 0) {
-			myDialog = new NewConfigurableDialog(comp, type, types);
-			myDialog.setVisible(true);			
+			dialog = new NewConfigurableDialog(comp, type, types);
+			dialog.setVisible(true);			
 		} else {
 			String errorMessage = "There are no registered implementations of type " + type.getName();
 			ConfigExceptionHandler.handle(new RuntimeException(errorMessage), errorMessage, comp);
 		}
 		
-		return myResult;
+		return dialog.getResult();
 	}
 	
 	private NewConfigurableDialog(Component comp, final Class type, List<Class> types) {
@@ -197,6 +196,10 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		
 		pack();
 		setLocationRelativeTo(comp);
+	}
+	
+	public Object getResult() {
+		return myResult;
 	}
 	
 	private void setSelectedType(Class type) {
@@ -307,7 +310,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		if (CANCEL_ACTION_COMMAND.equals(e.getActionCommand())) {
 			myResult = null;
 		}
-		myDialog.setVisible(false);
+		setVisible(false);
 	}
 
 	public static class ConstructionProperties {
