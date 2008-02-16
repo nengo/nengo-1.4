@@ -121,6 +121,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 				}
 				
 			}
+			
 			JMenuItem refreshItem = new JMenuItem("Refresh");
 			refreshItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -128,6 +129,26 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 				}
 			});
 			popup.add(refreshItem);
+			
+			//property help on either property or property value ... 
+			Property property = null;
+			if (path.getParentPath() != null && path.getParentPath().getLastPathComponent() instanceof Property) {
+				property = (Property) path.getParentPath().getLastPathComponent();
+			} else if (path.getLastPathComponent() instanceof Property) {
+				property = (Property) path.getLastPathComponent();
+			}			
+			if (property != null) {
+				JMenuItem helpItem = new JMenuItem("Help");
+				final Property p = property;
+				helpItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						String documentation = p.getDocumentation();
+						if (documentation != null)
+							ConfigUtil.showHelp(documentation);
+					}				
+				});
+				popup.add(helpItem);
+			}
 			
 //			if (path.getLastPathComponent() instanceof Value && ((Value) path.getLastPathComponent()).getObject() instanceof Function) {
 //				final Function function = (Function) ((Value) path.getLastPathComponent()).getObject();

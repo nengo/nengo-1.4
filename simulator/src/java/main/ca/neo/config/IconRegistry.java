@@ -65,7 +65,7 @@ public class IconRegistry {
 			ourInstance.setIcon(float[][].class, "/ca/neo/config/ui/matrix_icon.GIF");
 			ourInstance.setIcon(String.class, "/ca/neo/config/ui/string_icon.JPG");
 
-			ourInstance.setIcon(DynamicalSystem.class, "/ca/neo/config/ui/dynamicalsystem01.JPG");
+			ourInstance.setIcon(DynamicalSystem.class, "/ca/neo/config/ui/dynamicalsystem02.JPG");
 			ourInstance.setIcon(Integrator.class, "/ca/neo/config/ui/integrator.JPG");
 			ourInstance.setIcon(Noise.class, "/ca/neo/config/ui/noise01.JPG");
 			ourInstance.setIcon(Origin.class, "/ca/neo/config/ui/origin01.JPG");
