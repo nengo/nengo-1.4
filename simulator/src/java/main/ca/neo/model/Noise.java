@@ -9,23 +9,19 @@ package ca.neo.model;
  *   
  * @author Bryan Tripp
  */
-public interface Noise {
+public interface Noise extends Cloneable {
 	
 	public static final String DIMENSION_PROPERTY = "dimension";
 	
 	/**
 	 * @param startTime Simulation time at which step starts 
 	 * @param endTime Simulation time at which step ends
-	 * @param input Values which are to be corrupted by noise
+	 * @param input Value which is to be corrupted by noise
 	 * @return The noisy values (inputs corrupted by noise) 
 	 */
-	public float[] getValues(float startTime, float endTime, float[] input);
+	public float getValue(float startTime, float endTime, float input);
 	
-	/**
-	 * @return Dimension of input that can be corrupted by noise
-	 */
-	public int getDimension();
-	
+	public Noise clone();
 	
 	/**
 	 * An object that implements this interface is subject to Noise.  

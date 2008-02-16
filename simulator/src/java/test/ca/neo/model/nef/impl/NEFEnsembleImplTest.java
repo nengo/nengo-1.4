@@ -3,7 +3,6 @@
  */
 package ca.neo.model.nef.impl;
 
-import ca.neo.TestUtil;
 import ca.neo.math.Function;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
@@ -11,7 +10,6 @@ import ca.neo.model.Network;
 import ca.neo.model.Projection;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
-import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;

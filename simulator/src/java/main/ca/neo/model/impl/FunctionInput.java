@@ -36,7 +36,7 @@ public class FunctionInput implements Node, Probeable {
 	
 	private String myName;
 	private Function[] myFunctions;
-	private Units[] myUnits;
+	private Units myUnits;
 	private float myTime;
 //	private float[] myValues;
 	private BasicOrigin myOrigin;
@@ -52,17 +52,11 @@ public class FunctionInput implements Node, Probeable {
 	 * @throws StructuralException 
 	 */
 	public FunctionInput(String name, Function[] functions, Units units) throws StructuralException {
+		myOrigin = new BasicOrigin(this, FunctionInput.ORIGIN_NAME, functions.length, units);		
 		setFunctions(functions);
 		
 		myName = name;
-		
-		//TODO: resolve conflict between single Units in InstantaneousOutput and multiple Units in TimeSeries 
-		myUnits = new Units[functions.length];
-		for (int i = 0; i < myUnits.length; i++) {
-			myUnits[i] = units;
-		}
-		
-		myOrigin = new BasicOrigin(this, FunctionInput.ORIGIN_NAME, functions.length, units);
+		myUnits = units;
 		
 		run(0f, 0f); //set initial state to f(0)
 	}
@@ -82,9 +76,7 @@ public class FunctionInput implements Node, Probeable {
 	 */
 	public void setFunctions(Function[] functions) throws StructuralException {
 		checkFunctionDimension(functions);
-		if (myFunctions != null && myFunctions.length != functions.length) {
-			throw new StructuralException("Can't change dimension of this Node from " + myFunctions.length + " to " + functions.length);
-		}
+		myOrigin.setDimensions(functions.length);
 		myFunctions = functions;
 	}
 
@@ -160,7 +152,7 @@ public class FunctionInput implements Node, Probeable {
 		}
 
 		float[] values = ((RealOutput) myOrigin.getValues()).getValues(); 
-		result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{values}, myUnits);
+		result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{values}, Units.uniform(myUnits, values.length));
 		
 		return result;
 	}

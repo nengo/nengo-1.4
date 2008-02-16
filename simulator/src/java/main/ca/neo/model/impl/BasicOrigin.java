@@ -26,6 +26,7 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	private Units myUnits;
 	private InstantaneousOutput myValues;
 	private Noise myNoise;
+	private Noise[] myNoises; //per output
 
 	/**
 	 * @param node The parent Node
@@ -55,7 +56,11 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 
 		float[] v = values;
 		if (myNoise != null) {
-			v = myNoise.getValues(startTime, endTime, values);
+			v = new float[myDimension];
+			System.arraycopy(values, 0, v, 0, values.length);
+			for (int i = 0; i < myDimension; i++) {
+				v[i] = myNoises[i].getValue(startTime, endTime, values[i]);
+			}
 		}
 		
 		myValues = new RealOutputImpl(v, myUnits, endTime);
@@ -82,6 +87,9 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	
 	public void setDimensions(int dim) {
 		myDimension = dim;
+		if (myNoise != null) {
+			setNoise(myNoise);
+		}
 	}
 
 	/**
@@ -124,6 +132,10 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	 */
 	public void setNoise(Noise noise) {
 		myNoise = noise;
+		myNoises = new Noise[myDimension];
+		for (int i = 0; i < myDimension; i++) {
+			myNoises[i] = myNoise.clone();
+		}
 	}
 
 	/**

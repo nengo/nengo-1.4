@@ -3,22 +3,15 @@
  */
 package ca.neo.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
-//import ca.neo.config.impl.ListBasedProperty;
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
 import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.Function;
 import ca.neo.math.PDF;
+import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.model.Noise;
-import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.plot.Plotter;
 import ca.neo.util.MU;
@@ -56,82 +49,66 @@ public class NoiseFactory {
 	}
 
 	/**
-	 * @param dimension Dimension of the Noise
 	 * @return Zero additive Noise
 	 */
-	public static Noise makeNullNoise(int dimension) {
-		return new NoiseImplNull(dimension);
+	public static Noise makeNullNoise() {
+		return new NoiseImplNull();
 	}
 	
 	/**
-	 * @param functions A list of Noise Functions (one for each noise dimension) 
+	 * @param function A function of time  
 	 * @return Additive Noise where values are given explicit functions of time
 	 */
-	public static Noise makeExplicitNoise(Function[] functions) {
-		return new NoiseImplFunction(functions);
+	public static Noise makeExplicitNoise(Function function) {
+		return new NoiseImplFunction(function);
 	}
 	
 	public static class NoiseImplFunction implements Noise {
 				
-		private List<Function> myFunctions;
+		private Function myFunction;
 		
-		public NoiseImplFunction(Function[] functions) {
-			myFunctions = Arrays.asList(functions);
+		public NoiseImplFunction(Function function) {
+			myFunction = function;
 		}
 
 		public NoiseImplFunction() {
-			myFunctions = new ArrayList<Function>(10);
+			myFunction = new ConstantFunction(1, 0);
 		}
 		
 		/**
-		 * @see ca.neo.model.Noise#getDimension()
+		 * @see ca.neo.model.Noise#getValue(float, float, float)
 		 */
-		public int getDimension() {
-			return myFunctions.size();
+		public float getValue(float startTime, float endTime, float input) {
+			return input + myFunction.map(new float[]{startTime});
 		}
-		
-		/**
-		 * @see ca.neo.model.Noise#getValues(float, float, float[])
-		 */
-		public float[] getValues(float startTime, float endTime, float[] input) {
-			float[] result = new float[myFunctions.size()];
-			
-			for (int i = 0; i < result.length; i++) {
-				result[i] = myFunctions.get(i).map(new float[]{startTime});
+
+		@Override
+		public Noise clone() {
+			try {
+				return (Noise) super.clone();
+			} catch (CloneNotSupportedException e) {
+				throw new RuntimeException(e);
 			}
-			
-			return result;
 		}
 		
 	}
 	
 	public static class NoiseImplNull implements Noise {
 		
-		private int myDimension;
-		
-		public NoiseImplNull(int dimension) {
-			myDimension = dimension;
-		}
-		
 		/**
-		 * @see ca.neo.model.Noise#getDimension()
+		 * @see ca.neo.model.Noise#getValue(float, float, float)
 		 */
-		public int getDimension() {
-			return myDimension;
-		}
-		
-		/**
-		 * @see getDimension()
-		 */
-		public void setDimension(int dimension) {
-			myDimension = dimension;
+		public float getValue(float startTime, float endTime, float input) {
+			return input;
 		}
 
-		/**
-		 * @see ca.neo.model.Noise#getValues(float, float, float[])
-		 */
-		public float[] getValues(float startTime, float endTime, float[] input) {
-			return input;
+		@Override
+		public Noise clone() {
+			try {
+				return (Noise) super.clone();
+			} catch (CloneNotSupportedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		
 	}
@@ -150,23 +127,23 @@ public class NoiseFactory {
 		
 		/**
 		 * @param frequency Frequency (in simulation time) with which new noise values are drawn from the PDF
-		 * @param pdf PDF from which new noise values are drawn. The dimension must equal 
-		 * 		the input dimension of the dynamics. 
+		 * @param pdf PDF from which new noise values are drawn. The dimension of the space over which the PDF is defined  
+		 * 		must equal the input dimension of the dynamics. 
 		 * @param dynamics Dynamics through which raw noise values pass before they are combined with non-noise.
-		 * 		The output dimension must equal the dimension of expected input to getValues(). 
-		 * @param integrator Integrator used to solve dynamics 
+		 * 		The input dimension must match the PDF and the output dimension must equal one. Can be null in which 
+		 * 		case the PDF must be one-dimensional. 
+		 * @param integrator Integrator used to solve dynamics. Can be null if dynamics is null.  
 		 */
 		public NoiseImplPDF(float frequency, PDF pdf, DynamicalSystem dynamics, Integrator integrator) {
 			if (dynamics != null && pdf.getDimension() != dynamics.getInputDimension()) {
 				throw new IllegalArgumentException("PDF dimension (" + pdf.getDimension() + ") must equal dynamics input dimension (" 
 						+ dynamics.getInputDimension() + ")");
 			}
-			
+									
 			setFrequency(frequency);
 			setPDF(pdf);
-			myDynamics = dynamics;		
-			myIntegrator = integrator;
-			
+			setDynamics(dynamics);		
+			myIntegrator = integrator;			
 		}
 		
 		public NoiseImplPDF() {
@@ -186,6 +163,10 @@ public class NoiseFactory {
 		}
 		
 		public void setPDF(PDF pdf) {
+			if (myDynamics == null && pdf.getDimension() != 1) {
+				throw new IllegalArgumentException("With null dynamics, the PDF must be defined over one dimension.");	
+			}
+			
 			myPDF = pdf;
 			myCurrentRawNoise = myPDF.sample();
 			myUnits = Units.uniform(Units.UNK, myCurrentRawNoise.length);
@@ -196,6 +177,10 @@ public class NoiseFactory {
 		}
 		
 		public void setDynamics(DynamicalSystem dynamics) {
+			if (dynamics != null && dynamics.getOutputDimension() != 1) {
+				throw new IllegalArgumentException("The output of the dynamics must be one-dimensional");
+			}
+			
 			myDynamics = dynamics;
 		}
 		
@@ -208,10 +193,10 @@ public class NoiseFactory {
 		}
 		
 		/**
-		 * @see ca.neo.model.Noise#getValues(float, float, float[])
+		 * @see ca.neo.model.Noise#getValue(float, float, float)
 		 */
-		public float[] getValues(float startTime, float endTime, float[] input) {
-			float[] result = null;
+		public float getValue(float startTime, float endTime, float input) {
+			float result = input;
 			
 			myLastRawNoise = myCurrentRawNoise;
 			if (endTime >= myLastGenTime + myPeriod) {
@@ -220,28 +205,31 @@ public class NoiseFactory {
 			}
 
 			if (myDynamics == null) {
-				if (myCurrentRawNoise.length != input.length) {
-					throw new IllegalArgumentException("Expected input of dimension " + myCurrentRawNoise.length);
-				}
-				result = MU.sum(input, myCurrentRawNoise);
+				result = input + myCurrentRawNoise[0];
 			} else {
 				TimeSeries raw = new TimeSeriesImpl(new float[]{myLastDynamicsTime, endTime}, 
 						new float[][]{myLastRawNoise, myCurrentRawNoise}, myUnits);
 				float[][] output = myIntegrator.integrate(myDynamics, raw).getValues();
-				result = MU.sum(input, output[output.length-1]);
+				result = input + output[output.length-1][0];
 				myLastDynamicsTime = endTime;
 			}
 
 			return result;
 		}
-		
-		/**
-		 * @see ca.neo.model.Noise#getDimension()
-		 */
-		public int getDimension() {
-			return myDynamics == null ? myPDF.getDimension() : myDynamics.getOutputDimension();
+
+		@Override
+		public Noise clone() {
+			try {
+				NoiseImplPDF result = (NoiseImplPDF) super.clone();
+				if (myDynamics != null) {
+					result.setDynamics((DynamicalSystem) myDynamics.clone());					
+				}
+				return result;				
+			} catch (CloneNotSupportedException e) {
+				throw new RuntimeException(e);
+			}
 		}
-		
+				
 	}
 	
 	//functional test ... 
@@ -256,12 +244,12 @@ public class NoiseFactory {
 		
 		float elapsedTime = .001f;
 		int steps = 1000;
-		float[][] output = new float[steps][];
+		float[] output = new float[steps];
 		for (int i = 0; i < steps; i++) {
-			output[i] = noise.getValues(i*elapsedTime, (i+1)*elapsedTime, new float[1]);
+			output[i] = noise.getValue(i*elapsedTime, (i+1)*elapsedTime, 1);
 		}
 		
-		Plotter.plot(MU.prod(output, new float[]{1}), "noise");
+		Plotter.plot(output, "noise");
 	}
 
 }

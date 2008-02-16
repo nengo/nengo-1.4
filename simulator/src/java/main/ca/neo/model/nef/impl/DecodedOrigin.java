@@ -40,6 +40,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private SimulationMode myMode;
 	private RealOutput myOutput;
 	private Noise myNoise = null;
+	private Noise[] myNoises = null;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings. 
@@ -130,6 +131,10 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 */
 	public void setNoise(Noise noise) {
 		myNoise = noise;
+		myNoises = new Noise[getDimensions()];
+		for (int i = 0; i < myNoises.length; i++) {
+			myNoises[i] = myNoise.clone();
+		}
 	}
 	
 	/**
@@ -256,8 +261,9 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		}
 		
 		if (myNoise != null) {
-//			values = MU.sum(values, myNoise.getValues(stepSize, values));
-			values = myNoise.getValues(startTime, endTime, values);
+			for (int i = 0; i < values.length; i++) {
+				values[i] = myNoises[i].getValue(startTime, endTime, values[i]);				
+			}
 		}
 		
 		myOutput = new RealOutputImpl(values, Units.UNK, endTime);
