@@ -40,8 +40,6 @@ import ca.neo.util.impl.TimeSeriesImpl;
  * because all inputs to a non-linear dynamical process must be taken into account before
  * the effect of any single input is known.</p>
  * 
- * TODO: test; can this be merged with LinearExponentialTermination?
- * 
  * @author Bryan Tripp
  */
 public class DecodedTermination implements Termination, Resettable, Probeable {
@@ -55,7 +53,9 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	
 	private Node myNode;
 	private String myName;
+	private int myOutputDimension;
 	private float[][] myTransform;
+	private LinearSystem myDynamicsTemplate;
 	private LinearSystem[] myDynamics;
 	private Integrator myIntegrator;
 	private Units[] myNullUnits;
@@ -81,20 +81,19 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	public DecodedTermination(Node node, String name, float[][] transform, LinearSystem dynamics, Integrator integrator) 
 			throws StructuralException {
 		
-		if ( !MU.isMatrix(transform) ) {
-			throw new StructuralException("Given transform is not a matrix");
-		}
-		
 		if (dynamics.getInputDimension() != 1 || dynamics.getOutputDimension() != 1) {
 			throw new StructuralException("Dynamics must be single-input single-output");
 		}
 		
+		myOutputDimension = transform.length;
+		setTransform(transform);
+		
 		myNode = node;
 		myName = name;
-		myTransform = transform;
 		myIntegrator = integrator;		
 		
-		setDynamics(dynamics, transform.length);
+		myDynamicsTemplate = dynamics;
+		setDynamics(transform.length);
 
 		//we save a little time by not reporting units to the dynamical system at each step
 		myNullUnits = new Units[dynamics.getInputDimension()];
@@ -120,15 +119,14 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		}
 		
 		myScalingTermination = null;
-		myStaticBias = new float[transform[0].length];
 	}
 
 	//copies dynamics for to each dimension
-	private synchronized void setDynamics(LinearSystem dynamics, int dimension) {
+	private synchronized void setDynamics(int dimension) {
 		LinearSystem[] newDynamics = new LinearSystem[dimension];
 		for (int i = 0; i < newDynamics.length; i++) {
 			try {
-				newDynamics[i] = (LinearSystem) dynamics.clone();
+				newDynamics[i] = (LinearSystem) myDynamicsTemplate.clone();
 				
 				//maintain state if there is state
 				if (myDynamics != null && myDynamics[i] != null) {
@@ -186,11 +184,20 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 * @throws SimulationException
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
+		if (myDynamics == null) {
+			setDynamics(myOutputDimension);
+		}
+		
 		if (myInputValues == null) {
 			throw new SimulationException("Null input values on termination " + myName);
 		}
-		
-		float[] dynamicsInputs = MU.prod(getTransform(), myInputValues.getValues());
+
+		float[][] transform = getTransform();
+		if (myScalingTermination != null) {
+			float scale = myScalingTermination.getOutput()[0];
+			transform = MU.prod(transform, scale);
+		}
+		float[] dynamicsInputs = MU.prod(transform, myInputValues.getValues());
 		float[] result = new float[dynamicsInputs.length];
 		
 		for (int i = 0; i < myDynamics.length; i++) {
@@ -238,23 +245,43 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 * @see ca.neo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
-		for (int i = 0; i < myDynamics.length; i++) {
+		for (int i = 0; myDynamics != null && i < myDynamics.length; i++) {
 			myDynamics[i].setState(new float[myDynamics[i].getState().length]);			
 		}
 	}
 
 	/**
-	 * TODO: should return a copy here and provide a setter for updates
-	 * 
 	 * @return The matrix that maps input (which has the dimension of this Termination)  
 	 * 		onto the state space represented by the NEFEnsemble to which the Termination belongs
 	 */
 	public float[][] getTransform() {
-		if (myScalingTermination != null) {
-			float scale = myScalingTermination.getOutput()[0];
-			return MU.prod(myTransform, scale);
+		return MU.clone(myTransform);
+	}
+	
+	/**
+	 * @param transform New transform
+	 * @throws StructuralException If the transform is not a matrix or has the wrong size
+	 */
+	public void setTransform(float[][] transform) throws StructuralException {
+		if ( !MU.isMatrix(transform) ) {
+			throw new StructuralException("Given transform is not a matrix");
+		}
+		if (transform.length != myOutputDimension) {
+			throw new StructuralException("This transform must have " + myOutputDimension + " rows");
+		}
+
+		myTransform = transform;
+		
+		if  (myStaticBias == null) {
+			myStaticBias = new float[transform[0].length];					
 		} else {
-			return myTransform;			
+			float[] newStaticBias = new float[transform[0].length];
+			System.arraycopy(myStaticBias, 0, newStaticBias, 0, Math.min(myStaticBias.length, newStaticBias.length));
+			myStaticBias = newStaticBias;
+		}
+		
+		if (myDynamics != null && myDynamics.length != transform.length) {
+			setDynamics(transform.length);
 		}
 	}
 	
@@ -270,13 +297,24 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	}
 	
 	/**
-	 * @return A copy of the dynamics that govern each dimension of this Termination 
+	 * @return The dynamics that govern each dimension of this Termination. Changing the properties 
+	 * 		of the return value will change dynamics of all dimensions, effective next run time. 
 	 */
-	protected LinearSystem getDynamics() {
+	public LinearSystem getDynamics() {
+		myDynamics = null; //caller may change properties so we'll have to re-clone at next run
+		return myDynamicsTemplate;
+	}
+	
+	/**
+	 * @param dynamics New dynamics for each dimension of this Termination (effective immediately). 
+	 * 		This method uses a clone of the given dynamics.  
+	 */
+	public void setDynamics(LinearSystem dynamics) {
 		try {
-			return (LinearSystem) myDynamics[0].clone();
+			myDynamicsTemplate = (LinearSystem) dynamics.clone();
+			setDynamics(myOutputDimension);
 		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException("Termination dynamics don't support clone()", e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -291,8 +329,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			}
 	
 			float tau = ((Float) newValue).floatValue();
-			LTISystem dynamics = CanonicalModel.changeTimeConstant((LTISystem) myDynamics[0], tau);
-			setDynamics(dynamics, myTransform.length);
+			myDynamicsTemplate = CanonicalModel.changeTimeConstant((LTISystem) myDynamics[0], tau);
+			setDynamics(myTransform.length);
 		}
 	}
 
