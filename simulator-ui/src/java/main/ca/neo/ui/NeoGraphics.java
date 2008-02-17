@@ -130,7 +130,26 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		super();
 	}
 
-	private void initScriptConsoleListeners() {
+	public class ScriptWorldWrapper {
+		public void add(Node node) {
+			addNodeModel(node);
+		}
+
+		public void add(Node node, double posX, double posY) {
+			addNodeModel(node, posX, posY);
+		}
+
+		public void remove(Node node) {
+			removeNodeModel(node);
+		}
+	}
+
+	private void initScriptConsole() {
+		scriptConsole.addVariable("world", new ScriptWorldWrapper());
+
+		/*
+		 * Add listeners
+		 */
 		SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
 
 			public void singleObjectSelected(WorldObject obj) {
@@ -185,7 +204,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	private void initShortCutKeys() {
 		ShortcutKey[] shortcutKeys = new ShortcutKey[] { new ShortcutKey(KeyEvent.CTRL_MASK,
-				KeyEvent.VK_P, new ToggleScriptPane()) };
+				KeyEvent.VK_P, new SetSplitPaneVisibleAction("Focus on script console",
+						scriptConsolePane, true)) };
 
 		setShortcutKeys(shortcutKeys);
 	}
@@ -303,7 +323,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		/*
 		 * Attach listeners for Script Console
 		 */
-		initScriptConsoleListeners();
+		initScriptConsole();
 
 		/*
 		 * Initialize shortcut keys
@@ -359,6 +379,13 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		}
 	}
 
+	public void addNodeModel(Node node, double posX, double posY) {
+		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
+		nodeUI.setOffset(posX, posY);
+
+		getWorld().getGround().addChild(nodeUI);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -370,6 +397,26 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		getWorld().getGround().addChildFancy(nodeUI);
 		if (nodeUI instanceof NodeContainer) {
 			((NodeContainer) (nodeUI)).openViewer();
+		}
+	}
+
+	public boolean removeNodeModel(Node node) {
+		ModelObject modelToDestroy = null;
+		for (WorldObject wo : getWorld().getGround().getChildren()) {
+			if (wo instanceof ModelObject) {
+				ModelObject modelObject = (ModelObject) wo;
+
+				if (modelObject.getModel() == node) {
+					modelToDestroy = modelObject;
+					break;
+				}
+			}
+		}
+		if (modelToDestroy != null) {
+			modelToDestroy.destroyModel();
+			return true;
+		} else {
+			return false;
 		}
 	}
 
