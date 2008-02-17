@@ -3,7 +3,9 @@ package ca.neo.ui.models;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.Map.Entry;
@@ -603,6 +605,17 @@ public abstract class UINeoNode extends UINeoModel {
 		UIStateProbe probeUI = new UIStateProbe(this, probe);
 		newProbeAdded(probeUI);
 		return probeUI;
+	}
+
+	public Collection<UITermination> getUITerminations() {
+		LinkedList<UITermination> terminations = new LinkedList<UITermination>();
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof UITermination) {
+				terminations.add((UITermination) wo);
+			}
+		}
+		return terminations;
 	}
 
 	/**

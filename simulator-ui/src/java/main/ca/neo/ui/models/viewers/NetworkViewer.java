@@ -27,6 +27,7 @@ import ca.neo.ui.models.constructors.ModelFactory;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UIProbe;
+import ca.neo.ui.models.nodes.widgets.UIProjection;
 import ca.neo.ui.models.nodes.widgets.UIStateProbe;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.util.Probe;
@@ -186,10 +187,67 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		}
 
 		/*
+		 * Create projection map
+		 */
+		HashSet<Projection> projectionsToAdd = new HashSet<Projection>(
+				getModel().getProjections().length);
+		for (Projection projection : getModel().getProjections()) {
+			projectionsToAdd.add(projection);
+		}
+
+		HashMap<Termination, Projection> projectionMap = new HashMap<Termination, Projection>(
+				projectionsToAdd.size());
+
+		for (Projection projection : projectionsToAdd) {
+			Util.Assert(!projectionMap.containsKey(projection.getTermination()),
+					"More than one projection found per termination");
+
+			projectionMap.put(projection.getTermination(), projection);
+		}
+
+		/*
+		 * Get UI projections
+		 */
+		LinkedList<UIProjection> projectionsToRemove = new LinkedList<UIProjection>();
+
+		for (UINeoNode nodeUI : getUINodes()) {
+			for (UITermination terminationUI : nodeUI.getUITerminations()) {
+				if (terminationUI.getConnector() != null) {
+					UIOrigin originUI = terminationUI.getConnector().getOriginUI();
+
+					Termination termination = terminationUI.getModel();
+					Origin origin = originUI.getModel();
+
+					if (projectionMap.get(termination).getOrigin() == origin) {
+						/*
+						 * Projection already exists
+						 */
+						projectionsToAdd.remove(projectionMap.get(termination));
+
+					} else {
+						projectionsToRemove.add(terminationUI.getConnector());
+					}
+				}
+			}
+		}
+
+		/*
+		 * Destroy unreferenced projections
+		 */
+		for (UIProjection projectionUI : projectionsToRemove) {
+			UITermination terminationUI = projectionUI.getTermination();
+
+			projectionUI.destroy();
+			if (!isFirstUpdate) {
+				terminationUI.showPopupMessage("REMOVED Projection to "
+						+ terminationUI.getNodeParent().getName() + "." + terminationUI.getName());
+			}
+		}
+
+		/*
 		 * Construct projections
 		 */
-		Projection[] projections = getModel().getProjections();
-		for (Projection projection : projections) {
+		for (Projection projection : projectionsToAdd) {
 			Origin origin = projection.getOrigin();
 			Termination term = projection.getTermination();
 
@@ -389,14 +447,14 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		/*
 		 * Construct probes TODO: Remove unreferenced probes
 		 */
-		Probe[] probes = getModel().getSimulator().getProbes();
+		Probe[] probesArray = getModel().getSimulator().getProbes();
 
 		/*
 		 * Hashset of probes
 		 */
-		HashSet<Probe> probeSet = new HashSet<Probe>(probes.length);
-		for (Probe probe : probes) {
-			probeSet.add(probe);
+		HashSet<Probe> probeToAdd = new HashSet<Probe>(probesArray.length);
+		for (Probe probe : probesArray) {
+			probeToAdd.add(probe);
 		}
 
 		/*
@@ -407,8 +465,8 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 			for (UIProbe probeUI : nodeUI.getProbes()) {
 				if (probeUI instanceof UIStateProbe) {
 					UIStateProbe stateProbe = (UIStateProbe) probeUI;
-					if (probeSet.contains(stateProbe.getModel())) {
-						probeSet.remove(stateProbe.getModel());
+					if (probeToAdd.contains(stateProbe.getModel())) {
+						probeToAdd.remove(stateProbe.getModel());
 					} else {
 						probesToDestroy.add(stateProbe);
 
@@ -427,7 +485,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		/*
 		 * Add probes
 		 */
-		for (Probe probe : probeSet) {
+		for (Probe probe : probeToAdd) {
 			Probeable target = probe.getTarget();
 
 			if (!(target instanceof Node)) {
