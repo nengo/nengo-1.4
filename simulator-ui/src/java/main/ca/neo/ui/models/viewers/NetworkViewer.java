@@ -3,6 +3,8 @@ package ca.neo.ui.models.viewers;
 import java.awt.geom.Point2D;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
@@ -24,6 +26,8 @@ import ca.neo.ui.models.constructors.Constructable;
 import ca.neo.ui.models.constructors.ModelFactory;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
+import ca.neo.ui.models.nodes.widgets.UIProbe;
+import ca.neo.ui.models.nodes.widgets.UIStateProbe;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.actions.ActionException;
@@ -387,7 +391,43 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		 */
 		Probe[] probes = getModel().getSimulator().getProbes();
 
+		/*
+		 * Hashset of probes
+		 */
+		HashSet<Probe> probeSet = new HashSet<Probe>(probes.length);
 		for (Probe probe : probes) {
+			probeSet.add(probe);
+		}
+
+		/*
+		 * Get current probes in UI
+		 */
+		LinkedList<UIStateProbe> probesToDestroy = new LinkedList<UIStateProbe>();
+		for (UINeoNode nodeUI : getUINodes()) {
+			for (UIProbe probeUI : nodeUI.getProbes()) {
+				if (probeUI instanceof UIStateProbe) {
+					UIStateProbe stateProbe = (UIStateProbe) probeUI;
+					if (probeSet.contains(stateProbe.getModel())) {
+						probeSet.remove(stateProbe.getModel());
+					} else {
+						probesToDestroy.add(stateProbe);
+
+					}
+				}
+			}
+		}
+
+		/*
+		 * Remove probes
+		 */
+		for (UIStateProbe probeUI : probesToDestroy) {
+			probeUI.destroy();
+		}
+
+		/*
+		 * Add probes
+		 */
+		for (Probe probe : probeSet) {
 			Probeable target = probe.getTarget();
 
 			if (!(target instanceof Node)) {
@@ -406,8 +446,8 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 					}
 				}
 			}
-
 		}
+
 	}
 
 	/**

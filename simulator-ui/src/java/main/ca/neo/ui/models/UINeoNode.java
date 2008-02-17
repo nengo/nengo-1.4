@@ -807,4 +807,8 @@ public abstract class UINeoNode extends UINeoModel {
 		}
 
 	}
+
+	public Vector<UIProbe> getProbes() {
+		return probes;
+	}
 }

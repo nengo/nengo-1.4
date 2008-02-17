@@ -39,6 +39,7 @@ import ca.neo.ui.models.nodes.NodeContainer;
 import ca.neo.ui.script.ScriptConsole;
 import ca.neo.ui.script.ScriptEditor;
 import ca.neo.ui.util.NeoFileChooser;
+import ca.neo.ui.util.ScriptWorldWrapper;
 import ca.neo.util.Environment;
 import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.AuxillarySplitPane;
@@ -130,22 +131,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		super();
 	}
 
-	public class ScriptWorldWrapper {
-		public void add(Node node) {
-			addNodeModel(node);
-		}
-
-		public void add(Node node, double posX, double posY) {
-			addNodeModel(node, posX, posY);
-		}
-
-		public void remove(Node node) {
-			removeNodeModel(node);
-		}
-	}
-
 	private void initScriptConsole() {
-		scriptConsole.addVariable("world", new ScriptWorldWrapper());
+		scriptConsole.addVariable("world", new ScriptWorldWrapper(this));
 
 		/*
 		 * Add listeners

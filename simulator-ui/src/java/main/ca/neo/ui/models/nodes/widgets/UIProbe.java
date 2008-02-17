@@ -18,12 +18,17 @@ public abstract class UIProbe extends ModelObject {
 	}
 
 	private void init(UINeoNode nodeAttachedTo) {
-		setSelectable(false);
+		setSelectable(true);
 		this.nodeAttachedTo = nodeAttachedTo;
 		myIcon = new ProbeIcon(this);
 		myIcon.configureLabel(false);
 		myIcon.setLabelVisible(false);
 		setIcon(myIcon);
+	}
+
+	@Override
+	public void dragOffset(double dx, double dy) {
+		return; // not movable
 	}
 
 	public UINeoNode getProbeParent() {

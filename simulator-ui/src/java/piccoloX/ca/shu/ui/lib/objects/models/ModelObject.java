@@ -254,7 +254,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * @param model
 	 *            New Model
 	 */
-	public final void setModel(Object model) {
+	private final void setModel(Object model) {
 		if (myModel == model) {
 			return;
 		}

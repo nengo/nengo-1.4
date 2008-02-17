@@ -1,9 +1,10 @@
 *******************************************
  Done
 *******************************************
-02/13/2008 - Script world wrapper added to add / remove nodes
+02/14/2008 - Probe removals now event driven
+02/14/2008 - Script world wrapper added to add / remove nodes
 			add(node, posX, posY) allows you to add a node to a specific position
-02/13/2008 - Ctrl-P now opens and focuses the ScriptConsole
+02/14/2008 - Ctrl-P now opens and focuses the ScriptConsole
 			
 02/13/2008 - Shortcut keys can be defined in initShortCutKeys()
 			They are visible in the help menu too: help->shortuts
@@ -30,18 +31,8 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-ConcurrentModification exception here, duplicate array first
-public void removeNodeModel(Node node) {
-		for (WorldObject wo : getWorld().getGround().getChildren()) {
-			if (wo instanceof ModelObject) {
-				ModelObject modelObject = (ModelObject)wo;
-				
-				if (modelObject.getModel() == node) {
-					modelObject.destroyModel();
-				}				
-			}			
-		}		
-	}
+
+Test adding, removing probes
 
 
 NeoGraphics.addNodeModel() should do the trick
