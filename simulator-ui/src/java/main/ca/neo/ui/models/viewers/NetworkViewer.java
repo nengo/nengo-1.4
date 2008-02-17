@@ -196,10 +196,11 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 			UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
 			UITermination termUI = nodeTerm.showTermination(term.getName());
 
-			// modifyModel is false because the connections already exist in
-			// the
-			// NEO Network model
 			originUI.connectTo(termUI, false);
+			if (!isFirstUpdate) {
+				termUI.showPopupMessage("NEW Projection to " + termUI.getName() + "." + getName());
+			}
+
 		}
 
 	}
