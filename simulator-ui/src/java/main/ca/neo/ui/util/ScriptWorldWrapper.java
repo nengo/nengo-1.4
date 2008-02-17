@@ -15,7 +15,7 @@ public class ScriptWorldWrapper {
 		neoGraphics.addNodeModel(node);
 	}
 
-	public void addPos(Node node, double posX, double posY) {
+	public void add(Node node, double posX, double posY) {
 		neoGraphics.addNodeModel(node, posX, posY);
 	}
 
