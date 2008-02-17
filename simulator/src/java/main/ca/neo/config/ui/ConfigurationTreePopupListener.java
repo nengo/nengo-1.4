@@ -53,8 +53,8 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 	}
 	
 	private void maybeShowPopup(final MouseEvent event) {
-		if (event.isPopupTrigger() && event.getComponent().equals(myTree)) {
-			final TreePath path = myTree.getPathForLocation(event.getX(), event.getY());
+		final TreePath path = myTree.getPathForLocation(event.getX(), event.getY());		
+		if (event.isPopupTrigger() && event.getComponent().equals(myTree) && path != null) {
 			myTree.setSelectionPath(path);
 			
 			JPopupMenu popup = new JPopupMenu();

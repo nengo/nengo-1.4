@@ -16,11 +16,16 @@ import org.apache.log4j.Logger;
 
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
+import ca.neo.model.Ensemble;
+import ca.neo.model.Network;
+import ca.neo.model.Node;
 import ca.neo.model.Noise;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.Termination;
+import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
+import ca.neo.model.neuron.SynapticIntegrator;
 
 
 /**
@@ -71,7 +76,13 @@ public class IconRegistry {
 			ourInstance.setIcon(Origin.class, "/ca/neo/config/ui/origin01.JPG");
 			ourInstance.setIcon(SimulationMode.class, "/ca/neo/config/ui/simulationmode.JPG");
 			ourInstance.setIcon(SpikeGenerator.class, "/ca/neo/config/ui/spikegenerator.JPG");
-			ourInstance.setIcon(Termination.class, "/ca/neo/config/ui/termination.JPG");			
+			ourInstance.setIcon(Termination.class, "/ca/neo/config/ui/termination.JPG");		
+			
+			ourInstance.setIcon(Neuron.class, "/ca/neo/config/ui/neuron.jpg");		
+			ourInstance.setIcon(Network.class, "/ca/neo/config/ui/network.jpg");		
+			ourInstance.setIcon(Ensemble.class, "/ca/neo/config/ui/ensemble.jpg");		
+			ourInstance.setIcon(Node.class, "/ca/neo/config/ui/node.jpg");		
+			ourInstance.setIcon(SynapticIntegrator.class, "/ca/neo/config/ui/synintegrator2.jpg");		
 		}
 		
 		return ourInstance;

@@ -153,7 +153,7 @@ public class MainHandler implements ConfigurationHandler {
 	public Component getRenderer(Object o) {
 		Component result = null;
 
-		if (o instanceof NullValue) result = new JLabel("NULL"); 
+		if (o instanceof NullValue) result = new JLabel("EMPTY"); 
 			
 		Class c = o.getClass();
 		ConfigurationHandler handler = getHandler(myHandlers, c);
