@@ -167,7 +167,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	 * @see ca.neo.model.Ensemble#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
-//		System.out.println(this.getName());
+		if (mySpikePattern == null) {
+			mySpikePattern = new SpikePatternImpl(myNodes.length);
+		}
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodes[i].run(startTime, endTime);
 
