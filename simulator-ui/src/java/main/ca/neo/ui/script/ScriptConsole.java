@@ -457,7 +457,7 @@ public class ScriptConsole extends JPanel {
 	public static String getCallChain(String command) {
 		// note: I tried to do this with a single regex but I can't see how to
 		// handle nested brackets properly
-		Pattern pattern = Pattern.compile("\\w||\\.||\\("); // word character or dot or (
+		Pattern pattern = Pattern.compile("\\w||\\."); // word character or dot
 
 		char[] cc = command.toCharArray(); // command characters
 		int brackets = 0;
@@ -467,7 +467,9 @@ public class ScriptConsole extends JPanel {
 				brackets++;
 			} else if (brackets > 0 && cc[i] == '(') {
 				brackets--;
-			} else if (brackets == 0 && !pattern.matcher(String.valueOf(cc[i])).matches()) {
+			} else if (brackets == 0 
+					&& !(i == cc.length-1 && cc[i] == '(') //include opening bracket if last char
+					&& !pattern.matcher(String.valueOf(cc[i])).matches()) {
 				start = i + 1;
 			}
 		}
