@@ -128,7 +128,7 @@ public class CanonicalModel {
 		
 		//may be repeated / complex conjugate so change all slowest real eigenvalues
 		for (int i = 0; i < eigReal.length; i++) {
-			if (Math.abs(eigReal[i] - slowest) < .00001) eigReal[i] = -1d / (double) tau;
+			if (Math.abs(eigReal[i] - slowest) < .0001*Math.abs(slowest)) eigReal[i] = -1d / (double) tau;
 		}
 	
 		//coefficients of new transfer function polynomial ...  
@@ -148,7 +148,10 @@ public class CanonicalModel {
 			units[i] = system.getOutputUnits(i);
 		}
 		
-		return new LTISystem(A, system.getB(0f), system.getC(0f), system.getD(0f), system.getState(), units);
+		//rescale output so that integral of impulse response doesn't change (much; other poles are ignored)
+		float[][] C = MU.prod(system.getC(0f), -1 / (float) slowest / tau);
+		
+		return new LTISystem(A, system.getB(0f), C, system.getD(0f), system.getState(), units);
 	}
 	
 	//product of complex polynomials

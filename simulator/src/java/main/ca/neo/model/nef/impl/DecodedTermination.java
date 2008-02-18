@@ -66,6 +66,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private ConfigurationImpl myConfiguration;
 	private DecodedTermination myScalingTermination;
 	private float[] myStaticBias;
+	private float myTau;
 	
 	/**
 	 * @param Node The parent Node
@@ -92,32 +93,15 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		myName = name;
 		myIntegrator = integrator;		
 		
-		myDynamicsTemplate = dynamics;
-		setDynamics(transform.length);
-
 		//we save a little time by not reporting units to the dynamical system at each step
 		myNullUnits = new Units[dynamics.getInputDimension()];
 		myOutputValues = new float[transform.length];
 		
-		//PSC time constant can be changed online if dynamics are LTI in controllable-canonical form 
-		myTauMutable = (dynamics instanceof LTISystem && CanonicalModel.isControllableCanonical((LTISystem) dynamics)); 
-
 		myConfiguration = new ConfigurationImpl(this);
 		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
 		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, myTransform);
-		
-		//find PSC time constant (slowest dynamic mode) if applicable 
-		if (myTauMutable) {
-			double[] eig = new Matrix(MU.convert(dynamics.getA(0f))).eig().getRealEigenvalues();
-			
-			double slowest = eig[0];
-			for (int i = 1; i < eig.length; i++) {
-				if (Math.abs(eig[i]) < Math.abs(slowest)) slowest = eig[i];
-			}
-			
-			myConfiguration.addProperty(Termination.TAU_PSC, Float.class, new Float(-1f / (float) slowest));
-		}
-		
+				
+		setDynamics(dynamics);
 		myScalingTermination = null;
 	}
 
@@ -314,6 +298,25 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		try {
 			myDynamicsTemplate = (LinearSystem) dynamics.clone();
 			setDynamics(myOutputDimension);
+
+			//PSC time constant can be changed online if dynamics are LTI in controllable-canonical form 
+			myTauMutable = (dynamics instanceof LTISystem && CanonicalModel.isControllableCanonical((LTISystem) dynamics)); 
+			
+			//find PSC time constant (slowest dynamic mode) if applicable 
+			if (dynamics instanceof LTISystem) {
+				double[] eig = new Matrix(MU.convert(dynamics.getA(0f))).eig().getRealEigenvalues();
+				
+				double slowest = eig[0];
+				for (int i = 1; i < eig.length; i++) {
+					if (Math.abs(eig[i]) < Math.abs(slowest)) slowest = eig[i];
+				}
+				
+				myTau = -1f / (float) slowest;
+				myConfiguration.addProperty(Termination.TAU_PSC, Float.class, new Float(myTau));
+			} else {
+				myTau = 0;
+			}
+			
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
@@ -333,6 +336,27 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			myDynamicsTemplate = CanonicalModel.changeTimeConstant((LTISystem) myDynamics[0], tau);
 			setDynamics(myTransform.length);
 		}
+	}
+	
+	/**
+	 * @return Slowest time constant of dynamics, if dynamics are LTI, otherwise 0
+	 */
+	public float getTau() {
+		return myTau;
+	}
+	
+	/**
+	 * @param tau New time constant to replace current slowest time constant of dynamics
+	 * @throws StructuralException if the dynamics of this Termination are not LTI in controllable
+	 * 		canonical form
+	 */
+	public void setTau(float tau) throws StructuralException {
+		if (!myTauMutable) {
+			throw new StructuralException("This Termination has immutable dynamics "
+				+ "(must be LTI in controllable-canonical form to change time constant online");
+		}
+		
+		setDynamics(CanonicalModel.changeTimeConstant((LTISystem) myDynamicsTemplate, tau));
 	}
 
 	/** 
