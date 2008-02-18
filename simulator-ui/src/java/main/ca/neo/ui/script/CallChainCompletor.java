@@ -97,7 +97,7 @@ public class CallChainCompletor extends CommandCompletor {
 		if (pc instanceof PyJavaClass) {
 			String className = ((PyJavaClass) pc).__name__;
 			try {
-				Class c = Class.forName(className);
+				Class<?> c = Class.forName(className);
 				Constructor<?>[] constructors = c.getConstructors();
 				for (int i = 0; i < constructors.length; i++) {
 					int mods = constructors[i].getModifiers();
@@ -105,7 +105,7 @@ public class CallChainCompletor extends CommandCompletor {
 						StringBuffer buf = new StringBuffer(c.getSimpleName());
 						buf.append("(");
 						String[] names = JavaSourceParser.getArgNames(constructors[i]);
-						Class[] types = constructors[i].getParameterTypes();
+						Class<?>[] types = constructors[i].getParameterTypes();
 						for (int j = 0; j < types.length; j++) {
 							buf.append(types[j].getSimpleName());
 							buf.append(" ");
@@ -176,7 +176,7 @@ public class CallChainCompletor extends CommandCompletor {
 	private static String getClassDocs(String className) {
 		String result = null;
 		try {
-			Class c = Class.forName(className);
+			Class<?> c = Class.forName(className);
 			result = JavaSourceParser.getDocs(c);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -204,7 +204,7 @@ public class CallChainCompletor extends CommandCompletor {
 		if (po instanceof PyJavaClass) {
 			String className = ((PyJavaClass) po).__name__;
 			try {
-				Class c = Class.forName(className);
+				Class<?> c = Class.forName(className);
 				
 				Field[] fields = c.getFields();
 				for (int i = 0; i < fields.length; i++) {

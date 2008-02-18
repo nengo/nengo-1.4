@@ -218,7 +218,8 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 					Termination termination = terminationUI.getModel();
 					Origin origin = originUI.getModel();
 
-					if (projectionMap.get(termination).getOrigin() == origin) {
+					Projection projection = projectionMap.get(termination);
+					if (projection != null && projection.getOrigin() == origin) {
 						/*
 						 * Projection already exists
 						 */

@@ -58,4 +58,9 @@ public class UISpikeProbe extends UIProbe {
 
 		super.prepareToDestroyModel();
 	}
+
+	@Override
+	public void doubleClicked() {
+		(new PlotSpikePattern(getModel().getSpikePattern())).doAction();
+	}
 }

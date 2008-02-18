@@ -38,7 +38,9 @@ public class UITermination extends Widget implements ILineTermination {
 
 	}
 
-	private boolean isConnected;
+	public boolean isConnected() {
+		return (getConnector() != null);
+	}
 
 	private LineTerminationIcon myIcon;
 
@@ -63,23 +65,30 @@ public class UITermination extends Widget implements ILineTermination {
 	 * @return true is successfully connected
 	 */
 	protected boolean connect(UIOrigin source, boolean modifyModel) {
-		if (isConnected) {
-			disconnect();
+		if (isConnected()) {
+			/*
+			 * Cannot connect if already connected
+			 */
+			return false;
 		}
-		isConnected = true;
+
+		boolean successful = false;
 		if (modifyModel) {
 			try {
 
 				getNodeParent().getParentNetwork().addProjection(source.getModel(), getModel());
 				getNodeParent().showPopupMessage(
 						"NEW Projection to " + getNodeParent().getName() + "." + getName());
+				successful = true;
 			} catch (StructuralException e) {
-				isConnected = false;
+				disconnect();
 				UserMessages.showWarning("Could not connect: " + e.getMessage());
 			}
+		} else {
+			successful = true;
 		}
 
-		return isConnected;
+		return successful;
 	}
 
 	@Override
@@ -138,10 +147,11 @@ public class UITermination extends Widget implements ILineTermination {
 	 * @return True if successful
 	 */
 	public void disconnect() {
-		if (!isConnected) {
+		if (!isConnected()) {
+			Util.debugMsg("Tryng to disconnect termination which isn't connected");
 			return;
 		}
-		isConnected = false;
+
 		try {
 			getNodeParent().getParentNetwork().removeProjection(getModel());
 			getNodeParent().showPopupMessage(

@@ -1,6 +1,9 @@
 *******************************************
  Done
 *******************************************
+02/15/2008 - Fixed bug with input projection removals from event
+02/15/2008 - Double-cling on probes now open default plot
+
 02/14/2008 - Projection removals now event driven
 02/14/2008 - Probe removals now event driven
 
@@ -33,39 +36,15 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+In ca.neo.ui.test.IntegratorExample, if I run it and disconnect the input projection, the simulator will report an error (as expected)
+	However, if I run a simulation first, then disconnect the input, the simulation runs as normal without and errors
+
+
+
+
+
 Consider wrapping projection models in UIProjection, more consistent with the other pattenrs, easier to search
 	Two classes: UIProjection (contains projection model), and UIProjectionMock
-
-Test adding, removing probes
-
-Clicking on the toggle switch in the configuration dialog (the toggle besides variables)
-	Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
-		at ca.neo.config.ui.ConfigurationTreePopupListener.maybeShowPopup(ConfigurationTreePopupListener.java:61)
-		at ca.neo.config.ui.ConfigurationTreePopupListener.mouseReleased(ConfigurationTreePopupListener.java:52)
-		at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:273)
-		at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:272)
-		at java.awt.Component.processMouseEvent(Component.java:6038)
-		at javax.swing.JComponent.processMouseEvent(JComponent.java:3265)
-		at java.awt.Component.processEvent(Component.java:5803)
-		at java.awt.Container.processEvent(Container.java:2058)
-		at java.awt.Component.dispatchEventImpl(Component.java:4410)
-		at java.awt.Container.dispatchEventImpl(Container.java:2116)
-		at java.awt.Component.dispatchEvent(Component.java:4240)
-		at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4322)
-		at java.awt.LightweightDispatcher.processMouseEvent(Container.java:3986)
-		at java.awt.LightweightDispatcher.dispatchEvent(Container.java:3916)
-		at java.awt.Container.dispatchEventImpl(Container.java:2102)
-		at java.awt.Window.dispatchEventImpl(Window.java:2429)
-		at java.awt.Component.dispatchEvent(Component.java:4240)
-		at java.awt.EventQueue.dispatchEvent(EventQueue.java:599)
-		at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:273)
-		at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:183)
-		at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:173)
-		at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:168)
-		at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:160)
-		at java.awt.EventDispatchThread.run(EventDispatchThread.java:121)
-
-
 
 
 

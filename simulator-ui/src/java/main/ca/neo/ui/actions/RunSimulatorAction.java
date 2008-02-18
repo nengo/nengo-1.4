@@ -130,10 +130,11 @@ public class RunSimulatorAction extends StandardAction {
 
 				simulator.resetNetwork(false);
 				simulator.addSimulatorListener(this);
-
-				simulator.run(startTime, endTime, stepTime);
-
-				simulator.removeSimulatorListener(this);
+				try {
+					simulator.run(startTime, endTime, stepTime);
+				} finally {
+					simulator.removeSimulatorListener(this);
+				}
 
 				((NeoGraphics) (UIEnvironment.getInstance())).captureInDataViewer(uiNetwork
 						.getModel());
@@ -141,7 +142,8 @@ public class RunSimulatorAction extends StandardAction {
 				if (showDataViewer) {
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							((NeoGraphics) (UIEnvironment.getInstance())).setDataViewerVisible(true);
+							((NeoGraphics) (UIEnvironment.getInstance()))
+									.setDataViewerVisible(true);
 						}
 					});
 

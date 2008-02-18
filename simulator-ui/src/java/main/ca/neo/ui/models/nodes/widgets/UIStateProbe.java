@@ -91,6 +91,11 @@ public class UIStateProbe extends UIProbe {
 	}
 
 	@Override
+	public void doubleClicked() {
+		(new PlotTimeSeries(getModel().getData(), getName())).doAction();
+	}
+
+	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 		tooltips.addProperty("Attached to", getModel().getStateName());
