@@ -36,6 +36,10 @@ public abstract class CommandCompletor {
 		myIndex = myOptions.size();
 	}
 	
+	protected int getIndex() {
+		return myIndex;
+	}
+	
 	/**
 	 * @param partial Partial command string 
 	 * @return Next most recent command (from current index in options list) that begins with 

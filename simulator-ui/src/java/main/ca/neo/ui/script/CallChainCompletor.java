@@ -3,14 +3,18 @@
  */
 package ca.neo.ui.script;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.python.core.PyClass;
 import org.python.core.PyFunction;
 import org.python.core.PyInstance;
+import org.python.core.PyJavaClass;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
 import org.python.core.PyMethod;
@@ -19,6 +23,8 @@ import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.core.PyTableCode;
 import org.python.util.PythonInterpreter;
+
+import ca.neo.config.JavaSourceParser;
 
 /**
  * A CommandCompletor that suggests completions based on Python variable names and 
@@ -29,6 +35,7 @@ import org.python.util.PythonInterpreter;
 public class CallChainCompletor extends CommandCompletor {
 	
 	private PythonInterpreter myInterpreter;
+	private List<String> myDocumentation;
 	
 	/**
 	 * @param interpreter The Python interpreter from which variables are gleaned  
@@ -46,15 +53,93 @@ public class CallChainCompletor extends CommandCompletor {
 	 */
 	public void setBase(String callChain) {
 		List<String> options = null;
-		if (callChain.contains(".")) { //the root variable is specified
+		
+		boolean endsWithBracket = callChain.endsWith("(");
+		if (endsWithBracket) callChain = callChain.substring(0, callChain.length()-1);
+		
+		PyClass pc = getKnownClass(callChain);
+		
+		if (callChain.lastIndexOf('.') > 0) { //the root variable is specified
 			String base = callChain.substring(0, callChain.lastIndexOf('.'));
 			options = getMembers(base);
+		} else if (endsWithBracket && pc != null) {
+			options = getConstructors(pc);
+		} else if (endsWithBracket) { 
+			//looks like an unrecognized full class name
+			options = new ArrayList<String>(0);
 		} else {
 			options = getVariables();
 		}
 		getOptions().clear();
 		getOptions().addAll(options);
 		resetIndex();
+	}
+	
+	/**
+	 * @return Documentation for the current completion item if available, otherwise null
+	 */
+	public String getDocumentation() {
+		String result = null;
+		int index = getIndex();
+		if (myDocumentation != null && index >= 0 && index < myDocumentation.size()) {
+			result = myDocumentation.get(index);
+			if (result != null && result.length() == 0) result = null;
+			if (result != null && !result.contains("<html>")) result = "<html>" + result + "</html>";
+			if (result != null) result = result.replaceAll("\n", "<br>").replaceAll("<\\\\p><br>", "<\\p>"); //TODO: allow for whitespace before BR
+		}
+		return result;
+	}
+	
+	public List<String> getConstructors(PyClass pc) {
+		List<String> result = new ArrayList<String>(10);
+		myDocumentation = new ArrayList<String>(10);
+		
+		if (pc instanceof PyJavaClass) {
+			String className = ((PyJavaClass) pc).__name__;
+			try {
+				Class c = Class.forName(className);
+				Constructor<?>[] constructors = c.getConstructors();
+				for (int i = 0; i < constructors.length; i++) {
+					int mods = constructors[i].getModifiers();
+					if (Modifier.isPublic(mods)) {
+						StringBuffer buf = new StringBuffer(c.getSimpleName());
+						buf.append("(");
+						String[] names = JavaSourceParser.getArgNames(constructors[i]);
+						Class[] types = constructors[i].getParameterTypes();
+						for (int j = 0; j < types.length; j++) {
+							buf.append(types[j].getSimpleName());
+							buf.append(" ");
+							buf.append(names[j]);
+							if (j < types.length - 1) buf.append(", ");
+						}
+						buf.append(")");
+						result.add(buf.toString());	
+						
+						myDocumentation.add(JavaSourceParser.getDocs(constructors[i]));						
+					}
+				}
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+	private PyClass getKnownClass(String callChain) {
+		PyClass result = null;
+		
+		PyStringMap map = (PyStringMap) myInterpreter.getLocals();
+		PyList keys = (PyList) map.keys();
+		PyObject iter = keys.__iter__();
+
+		for (PyObject item; (item = iter.__iternext__()) != null && result == null; ) {
+			if (item.toString().equals(callChain) && map.get(item) instanceof PyClass) {
+				result = (PyClass) map.get(item);
+			}
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -66,11 +151,37 @@ public class CallChainCompletor extends CommandCompletor {
 		PyObject iter = keys.__iter__();
 
 		List<String> result = new ArrayList<String>(50);
+		myDocumentation = new ArrayList<String>(50);
 		for (PyObject item; (item = iter.__iternext__()) != null; ) {
 			result.add(item.toString());
+			
+			PyObject po = map.get(item);
+			if (po instanceof PyJavaClass) {
+				myDocumentation.add(getClassDocs(((PyJavaClass) po).__name__));
+			} else if (po instanceof PyJavaInstance) {
+				PyClass pc = ((PyJavaInstance) po).instclass;
+				if (pc instanceof PyJavaClass) {
+					myDocumentation.add(getClassDocs(((PyJavaClass) pc).__name__));					
+				} else {
+					myDocumentation.add("");					
+				}
+			} else {
+				myDocumentation.add("");
+			}
 		}
 		
 		return result;
+	}
+	
+	private static String getClassDocs(String className) {
+		String result = null;
+		try {
+			Class c = Class.forName(className);
+			result = JavaSourceParser.getDocs(c);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return (result == null) ? "" : result;
 	}
 	
 	/**
@@ -89,28 +200,53 @@ public class CallChainCompletor extends CommandCompletor {
 
 		PyObject po = getObject(map, rootVariable);
 		List<String> result = new ArrayList<String>(20);
-		if (po instanceof PyJavaInstance) {
+		myDocumentation = new ArrayList<String>(20);
+		if (po instanceof PyJavaClass) {
+			String className = ((PyJavaClass) po).__name__;
+			try {
+				Class c = Class.forName(className);
+				
+				Field[] fields = c.getFields();
+				for (int i = 0; i < fields.length; i++) {
+					int mods = fields[i].getModifiers();
+					if (Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
+						result.add(fields[i].getName());
+						myDocumentation.add("");						
+					}					
+				}
+				
+				Method[] methods = c.getMethods();
+				for (int i = 0; i < methods.length; i++) {
+					int mods = methods[i].getModifiers();
+					if (Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
+						result.add(getMethodSignature(base, methods[i]));
+						myDocumentation.add(JavaSourceParser.getDocs(methods[i]));								
+					}
+				}
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		} else if (po instanceof PyJavaInstance) {
 			String rootClassName = ((PyJavaInstance) po).instclass.__name__;
 			try {
 				Class<?> c = getReturnClass(rootClassName, base);
 
 				Field[] fields = c.getFields();
 				for (int i = 0; i < fields.length; i++) {
-					result.add(fields[i].getName());
+					int mods = fields[i].getModifiers();
+					if (Modifier.isPublic(mods)) {
+						result.add(fields[i].getName());
+						myDocumentation.add("");						
+					}
 				}
 				
 				Method[] methods = c.getMethods();
 				for (int i = 0; i < methods.length; i++) {
-					StringBuffer buf = new StringBuffer(base + ".");
-					buf.append(methods[i].getName());
-					buf.append('(');
-					Class<?>[] paramTypes = methods[i].getParameterTypes();
-					for (int j = 0; j < paramTypes.length; j++) {
-						buf.append(paramTypes[j].getSimpleName());
-						if (j < paramTypes.length - 1) buf.append(", ");
+					int mods = methods[i].getModifiers();
+					if (Modifier.isPublic(mods)) {
+						result.add(getMethodSignature(base, methods[i]));
+						myDocumentation.add(JavaSourceParser.getDocs(methods[i]));						
 					}
-					buf.append(')');
-					result.add(buf.toString());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -143,6 +279,22 @@ public class CallChainCompletor extends CommandCompletor {
 		}
 		
 		return result;		
+	}
+	
+	private static String getMethodSignature(String base, Method m) {
+		StringBuffer buf = new StringBuffer(base + ".");
+		buf.append(m.getName());
+		buf.append('(');
+		Class<?>[] paramTypes = m.getParameterTypes();
+		String[] paramNames = JavaSourceParser.getArgNames(m);
+		for (int j = 0; j < paramTypes.length; j++) {
+			buf.append(paramTypes[j].getSimpleName());
+			buf.append(" ");
+			buf.append(paramNames[j]);
+			if (j < paramTypes.length - 1) buf.append(", ");
+		}
+		buf.append(')');
+		return buf.toString();
 	}
 	
 	private PyObject getObject(PyStringMap map, String key) {

@@ -23,6 +23,7 @@ import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.util.regex.Pattern;
 
+import javax.swing.Action;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -30,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -41,10 +43,16 @@ import org.python.util.PythonInterpreter;
 import ca.neo.config.JavaSourceParser;
 
 /**
- * A user interface panel for entering script commands. TODO: - talk to Terry re
- * directory defaults (to use with execfile) - escape not working all the time? -
- * import defaults - completion for arrays - getting documentation help (see
- * qdox) - static completion; constructor completion
+ * A user interface panel for entering script commands. 
+ * 
+ * TODO: 
+ * - talk to Terry re directory defaults (to use with execfile) 
+ * - NO import defaults 
+ * - DONE getting documentation help (see qdox) 
+ * - DONE escape not working all the time? 
+ * - DONE completion for arrays 
+ * - DONE static method completion
+ * - DONE constructor completion
  * 
  * @author Bryan Tripp
  */
@@ -72,6 +80,10 @@ public class ScriptConsole extends JPanel {
 	private JSeparator seperator;
 	private Style rootStyle;
 	private Style commandStyle;
+	private boolean myToolTipVisible;
+	private int myDefaultDismissDelay;
+	private long myLastHelpTime = 0;
+	private Action myHideTip;
 
 	/**
 	 * @param interpreter
@@ -85,6 +97,7 @@ public class ScriptConsole extends JPanel {
 		myDisplayArea.setMargin(new Insets(5, 5, 5, 5));
 
 		myCommandField = new JTextField();
+		ToolTipManager.sharedInstance().registerComponent(myCommandField);
 
 		setLayout(new BorderLayout());
 		JScrollPane displayScroll = new JScrollPane(myDisplayArea);
@@ -282,6 +295,8 @@ public class ScriptConsole extends JPanel {
 		if (inMode) {
 			String typedTextToCaret = myTypedText.substring(0, myTypedCaretPosition);
 			myCallChainCompletor.setBase(getCallChain(typedTextToCaret));
+		} else {
+			myCommandField.setToolTipText(null);
 		}
 	}
 
@@ -307,7 +322,7 @@ public class ScriptConsole extends JPanel {
 			if (text.startsWith("run ")) {
 				myInterpreter.execfile(text.substring(4).trim());
 			} else if (text.startsWith("help ")) {
-				appendText(getHelp(text.substring(5).trim()), HELP_STYLE);
+				appendText(JavaSourceParser.removeTags(getHelp(text.substring(5).trim())), HELP_STYLE);
 			} else {
 				myInterpreter.exec(text);
 			}
@@ -343,6 +358,7 @@ public class ScriptConsole extends JPanel {
 					.getCaretPosition());
 			// String selection = myCommandField.getSelectedText();
 			myCommandField.replaceSelection(replacement);
+			myCommandField.setToolTipText(myCallChainCompletor.getDocumentation());
 
 			// System.out.println("caret pos: " + myTypedCaretPosition);
 			// System.out.println("call chain: " + callChain);
@@ -362,15 +378,51 @@ public class ScriptConsole extends JPanel {
 			String replacement = myCallChainCompletor.next(callChain);
 			myCommandField.select(myTypedCaretPosition - callChain.length(), myCommandField
 					.getCaretPosition());
-			// String selection = myCommandField.getSelectedText();
+//			 String selection = myCommandField.getSelectedText();
 			myCommandField.replaceSelection(replacement);
-
-			// System.out.println("call chain: " + callChain);
-			// System.out.println("selection: " + selection);
-			// System.out.println("replacement: " + replacement);
+			myCommandField.setToolTipText(myCallChainCompletor.getDocumentation());
+			
+//			 System.out.println("call chain: " + callChain);
+//			 System.out.println("selection: " + selection);
+//			 System.out.println("replacement: " + replacement);
 		} else {
 			myCommandField.setText(myHistoryCompletor.next(myTypedText));
 		}
+	}
+	
+	public void showToolTip() {
+		if (myToolTipVisible == false && myLastHelpTime > 0 && System.currentTimeMillis() - myLastHelpTime < 500) {
+			appendText(JavaSourceParser.removeTags(myCommandField.getToolTipText()) + "\r\n", HELP_STYLE);
+		} else {
+			final Action showTip = myCommandField.getActionMap().get("postTip");
+			myHideTip = myCommandField.getActionMap().get("hideTip");
+			if (showTip != null && !myToolTipVisible) {
+				final ActionEvent e = new ActionEvent(myCommandField, ActionEvent.ACTION_PERFORMED, "");				
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						showTip.actionPerformed(e);
+					}
+				});
+			}
+			myToolTipVisible = true;
+			myDefaultDismissDelay = ToolTipManager.sharedInstance().getDismissDelay();
+			ToolTipManager.sharedInstance().setDismissDelay(1000*60); //show until hideToolTip(), up to one minute max			
+		}
+		myLastHelpTime = System.currentTimeMillis();
+	}
+	
+	public void hideToolTip() {
+		if (myHideTip != null && myToolTipVisible) {
+			final ActionEvent e = new ActionEvent(myCommandField, ActionEvent.ACTION_PERFORMED, "");
+//			final Action hideTip = myHideTip;
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					myHideTip.actionPerformed(e);
+				}
+			});
+		}
+		myToolTipVisible = false;
+		ToolTipManager.sharedInstance().setDismissDelay(myDefaultDismissDelay);
 	}
 
 	/**
@@ -405,7 +457,7 @@ public class ScriptConsole extends JPanel {
 	public static String getCallChain(String command) {
 		// note: I tried to do this with a single regex but I can't see how to
 		// handle nested brackets properly
-		Pattern pattern = Pattern.compile("\\w||\\."); // word character or dot
+		Pattern pattern = Pattern.compile("\\w||\\.||\\("); // word character or dot or (
 
 		char[] cc = command.toCharArray(); // command characters
 		int brackets = 0;
@@ -449,6 +501,7 @@ public class ScriptConsole extends JPanel {
 				int code = e.getKeyCode();
 				if (code == 27 && myConsole.getInCallChainCompletionMode()) { // escape
 					myConsole.revertToTypedText();
+					myConsole.setInCallChainCompletionMode(false);
 				} else if (code == 27) {
 					myConsole.clearCommand();
 				} else if (code == 9) { // tab
@@ -457,6 +510,8 @@ public class ScriptConsole extends JPanel {
 					myConsole.completorUp();
 				} else if (code == 40) { // down arrow
 					myConsole.completorDown();
+				} else if (code == 17) { //CTRL
+					myConsole.showToolTip();
 				} else {
 					myConsole.setInCallChainCompletionMode(false);
 				}
@@ -468,7 +523,9 @@ public class ScriptConsole extends JPanel {
 		public void keyReleased(KeyEvent e) {
 			try {
 				int code = e.getKeyCode();
-				if (code != 38 && code != 40) {
+				if (code == 17) { //CTRL
+					myConsole.hideToolTip();
+				} else if (code != 38 && code != 40) {
 					myConsole.setTypedText();
 					if (code == 9)
 						myConsole.completorUp();

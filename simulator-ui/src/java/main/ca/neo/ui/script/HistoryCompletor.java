@@ -3,6 +3,14 @@
  */
 package ca.neo.ui.script;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 /**
  * A list of commands that have been entered previously. 
  * 
@@ -10,8 +18,41 @@ package ca.neo.ui.script;
  */
 public class HistoryCompletor extends CommandCompletor {
 
+	public static String HISTORY_LOCATION_PROPERTY = "HistoryCompletor.File";
+
+	private BufferedWriter myWriter;
+	
 	public HistoryCompletor() {
-		//TODO: load saved history of available
+		File f = new File(System.getProperty(HISTORY_LOCATION_PROPERTY, "commandhistory.txt"));
+		if (f.exists() && f.canRead()) {
+			try {
+				BufferedReader r = new BufferedReader(new FileReader(f));
+				String command = null;
+				while ((command = r.readLine()) != null) {
+					getOptions().add(command);
+				}
+				r.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		
+		try {
+			if (!f.exists()) f.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (f.exists() && f.canWrite()) {
+			try {
+				myWriter = new BufferedWriter(new FileWriter(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
 	}
 	
 	/**
@@ -20,10 +61,15 @@ public class HistoryCompletor extends CommandCompletor {
 	public void add(String command) {
 		getOptions().add(command);
 		resetIndex();
+		
+		if (myWriter != null) {
+			try {
+				myWriter.write(command + "\r\n");
+				myWriter.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
-	public void save() {
-		//TODO
-	}
-
 }
