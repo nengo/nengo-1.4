@@ -3,8 +3,6 @@
  */
 package ca.neo.util.impl;
 
-import java.io.Serializable;
-
 import ca.neo.model.Units;
 import ca.neo.util.TimeSeries;
 

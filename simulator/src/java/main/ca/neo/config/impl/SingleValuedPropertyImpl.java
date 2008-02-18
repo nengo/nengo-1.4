@@ -99,7 +99,7 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	 * first letter capitalized) and y is the value (changed to a primitive if it's a primitive wrapper).
 	 * A Configurable that needs different behaviour should override this method.   
 	 *  
-	 * @see ca.neo.config.Property#setValue(java.lang.Object)
+	 * @see ca.neo.config.SingleValuedProperty#setValue(java.lang.Object)
 	 */
 	public void setValue(Object value) throws StructuralException {
 		Object configurable = getConfiguration().getConfigurable();
@@ -107,9 +107,9 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 		try {
 			mySetter.invoke(configurable, new Object[]{value});
 		} catch (InvocationTargetException e) {
-			throw new RuntimeException("Can't set " + getName() + ": " + e.getCause().getMessage(), e);
+			throw new StructuralException("Can't set " + getName() + ": " + e.getCause().getMessage(), e);
 		} catch (Exception e) {
-			throw new RuntimeException("Can't set " + getName(), e);
+			throw new StructuralException("Can't set " + getName(), e);
 		}
 	}
 

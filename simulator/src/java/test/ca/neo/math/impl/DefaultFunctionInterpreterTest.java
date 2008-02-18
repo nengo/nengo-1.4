@@ -318,11 +318,12 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		//dimension ... 
 		f = interpreter.parse("x0", 5);
 		assertEquals(5, f.getDimension());
-		
-		try {
-			interpreter.parse("x5", 1);
-			fail("Should have thrown exception due to index higher than dimension");
-		} catch (Exception e) {} //exception is expected
+
+		//don't need this -- dimension is now adjusted to suit expression
+//		try {
+//			interpreter.parse("x5", 1);
+//			fail("Should have thrown exception due to index higher than dimension");
+//		} catch (Exception e) {} //exception is expected
 		
 		//everything ... 
 		f = interpreter.parse("2*pi + .5*x0 / sin((x1 + x2)^x3)", 4);

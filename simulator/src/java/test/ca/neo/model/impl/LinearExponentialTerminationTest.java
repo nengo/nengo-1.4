@@ -6,8 +6,6 @@ package ca.neo.model.impl;
 import org.apache.log4j.Logger;
 
 import ca.neo.model.SimulationException;
-import ca.neo.model.StructuralException;
-import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.LinearExponentialTermination;
 import ca.neo.model.impl.RealOutputImpl;
@@ -48,29 +46,29 @@ public class LinearExponentialTerminationTest extends TestCase {
 	/*
 	 * Test method for 'ca.bpt.cn.model.impl.LinearExponentialTermination.getProperty(String)'
 	 */
-	public void testGetProperty() throws StructuralException {
-		LinearExponentialTermination let = new LinearExponentialTermination(null, "test", new float[1], 1.5f);
-		
-		assertEquals(3, let.getConfiguration().listPropertyNames().length);
-		assertEquals(Termination.TAU_PSC, let.getConfiguration().listPropertyNames()[0]);
-		
-		Float tau = (Float) let.getConfiguration().getProperty(Termination.TAU_PSC);
-		assertTrue(tau.floatValue() > 1.49 && tau.floatValue() < 1.51);
-		
-		try {
-			let.getConfiguration().setProperty("unknown_property", "1");
-			fail("Should have thrown exception due to unknown property name");
-		} catch (StructuralException e) {} //exception is expected
-
-		try {
-			let.getConfiguration().setProperty(Termination.TAU_PSC, "not a float");
-			fail("Should have thrown exception due to bad property value");
-		} catch (StructuralException e) {} //exception is expected
-		
-		let.getConfiguration().setProperty(Termination.TAU_PSC, new Float(2.5f));
-		tau = (Float) let.getConfiguration().getProperty(Termination.TAU_PSC);
-		assertTrue(tau.floatValue() > 2.49 && tau.floatValue() < 2.51);
-	}
+//	public void testGetProperty() throws StructuralException {
+//		LinearExponentialTermination let = new LinearExponentialTermination(null, "test", new float[1], 1.5f);
+//		
+//		assertEquals(3, let.getConfiguration().listPropertyNames().length);
+//		assertEquals(Termination.TAU_PSC, let.getConfiguration().listPropertyNames()[0]);
+//		
+//		Float tau = (Float) let.getConfiguration().getProperty(Termination.TAU_PSC);
+//		assertTrue(tau.floatValue() > 1.49 && tau.floatValue() < 1.51);
+//		
+//		try {
+//			let.getConfiguration().setProperty("unknown_property", "1");
+//			fail("Should have thrown exception due to unknown property name");
+//		} catch (StructuralException e) {} //exception is expected
+//
+//		try {
+//			let.getConfiguration().setProperty(Termination.TAU_PSC, "not a float");
+//			fail("Should have thrown exception due to bad property value");
+//		} catch (StructuralException e) {} //exception is expected
+//		
+//		let.getConfiguration().setProperty(Termination.TAU_PSC, new Float(2.5f));
+//		tau = (Float) let.getConfiguration().getProperty(Termination.TAU_PSC);
+//		assertTrue(tau.floatValue() > 2.49 && tau.floatValue() < 2.51);
+//	}
 
 	/*
 	 * Test method for 'ca.bpt.cn.model.impl.LinearExponentialTermination.reset(boolean)'

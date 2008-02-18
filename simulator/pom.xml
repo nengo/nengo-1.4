@@ -66,5 +66,10 @@
       <artifactId>jama</artifactId>
       <version>1.0.2</version>
     </dependency>            
+    <dependency>
+      <groupId>qdox</groupId>
+      <artifactId>qdox</artifactId>
+      <version>1.6.3</version>
+    </dependency>            
   </dependencies>
 </project>

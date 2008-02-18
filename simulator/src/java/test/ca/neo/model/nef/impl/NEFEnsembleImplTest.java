@@ -36,7 +36,7 @@ public class NEFEnsembleImplTest extends TestCase {
 		super.setUp();
 	}
 
-	public void testAddBiasOrigin() throws StructuralException, SimulationException {
+	public void functionalTestAddBiasOrigin() throws StructuralException, SimulationException {
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 
 		boolean regenerate = false;
@@ -98,7 +98,7 @@ public class NEFEnsembleImplTest extends TestCase {
 //		Plotter.plot(interProbe.getData(), "interneurons");
 	}
 	
-	public void testBiasOriginError() throws StructuralException, SimulationException {
+	public void functionalTestBiasOriginError() throws StructuralException, SimulationException {
 		float tauPSC = .01f;
 		
 		Network network = new NetworkImpl();
@@ -233,7 +233,7 @@ public class NEFEnsembleImplTest extends TestCase {
 		NEFEnsembleImplTest test = new NEFEnsembleImplTest();
 		try {
 //			test.testAddBiasOrigin();
-			test.testBiasOriginError();
+			test.functionalTestBiasOriginError();
 		} catch (StructuralException e) {
 			e.printStackTrace();
 		} catch (SimulationException e) {

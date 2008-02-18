@@ -123,7 +123,8 @@ public class ProbeImpl implements Probe {
 		System.arraycopy(myTimes, 0, times, 0, myValues.size());
 		
 		float[][] values = myValues.toArray(new float[0][]);
-		return new TimeSeriesImpl(times, values, myUnits);
+		
+		return new TimeSeriesImpl(times, values, (myUnits == null) ? new Units[]{Units.UNK} : myUnits);
 	}
 
 	/**

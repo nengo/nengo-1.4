@@ -5,7 +5,6 @@ package ca.neo.math.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import ca.neo.config.Configuration;
 import ca.neo.math.Function;
 import ca.neo.math.FunctionBasis;
 import ca.neo.math.impl.FunctionBasisImpl;
@@ -41,8 +40,8 @@ public class FunctionBasisImplTest extends TestCase {
 	 */
 	public void testGetFunction() {
 		float[] from = new float[]{0, 0};
-		assertTrue(myFunctionBasis.getFunction(1).map(from) < 0);
-		assertTrue(myFunctionBasis.getFunction(2).map(from) > 0);
+		assertTrue(myFunctionBasis.getFunction(0).map(from) < 0);
+		assertTrue(myFunctionBasis.getFunction(1).map(from) > 0);
 	}
 	
 	private static class MockFunction implements Function {
