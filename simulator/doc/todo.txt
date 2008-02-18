@@ -11,15 +11,17 @@ TODO (release):
 - DONE support change of function input dimension
 - DONE support noise parameter changes
 - DONE fix bug where config window doesn't close
-- improve code completion (particularly static methods and constructors)
+- DONE add exit & remove exception in script editor on (File->close) 
+- DONE make transform configurable for Decoded Termination 
+- DONE help popup
+- DONE improve code completion (particularly static methods and constructors)
+- DONE persist command history 
+- move configuration UI code to simulator-ui
 - plot popups from config using UI code; matlab exports of matrices and vectors
-- help popup
-- add exit & remove exception in script editor on (File->close) 
-- make transform configurable for Decoded Termination 
+- hide config params as needed
 
 - remove util configuration/configurable
-- move configuration UI code to simulator-ui
-- ctrl shortcut keys for save, open, new
+- (wait for Shu to do accelerators) ctrl shortcut keys for save, open, new
 - do we need a way to create top-level UI objects from scripts?
 - change package names to nengo
 - use config matrix editor throughout

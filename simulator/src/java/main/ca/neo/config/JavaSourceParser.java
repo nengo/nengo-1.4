@@ -114,7 +114,7 @@ public class JavaSourceParser {
 		if (type != null && methodName != null) {
 			List<Class> argTypes = new ArrayList<Class>(10);
 			while (tok.hasMoreTokens()) {
-				String argTypeName = tok.nextToken();
+				String argTypeName = tok.nextToken().trim();
 				argTypes.add(getType(argTypeName, packageName));
 			}
 			
@@ -151,15 +151,29 @@ public class JavaSourceParser {
 	 */
 	public static String getDocs(Method m) {
 		JavaMethod jm = getJavaMethod(m);
-		
+		return getDocs(jm);
+	}
+
+	/**
+	 * @param c A Java constructor
+	 * @return Constructor documentation if available, otherwise empty string
+	 */
+	public static String getDocs(Constructor c) {
+		JavaMethod jm = getJavaMethod(c);
+		return getDocs(jm);
+	}
+	
+	private static String getDocs(JavaMethod jm) {
 		StringBuffer result = new StringBuffer();		
 		
-		String comment = jm.getComment();
-		if (comment != null) {
-			result.append(comment);
-			result.append("\r\n\r\n");
+		if (jm != null) {
+			String comment = jm.getComment();
+			if (comment != null) {
+				result.append(comment);
+				result.append("\r\n\r\n");
+			}
+			result.append(getTagText(jm));			
 		}
-		result.append(getTagText(jm));
 		
 		return result.toString();
 	}
@@ -328,8 +342,12 @@ public class JavaSourceParser {
 	 * @param html Some text 
 	 * @return The same text with HTML tags removed
 	 */
-//	public static String removeTags(String html) {
-//		return html.replaceAll("<.+>", ""); 
-//	}
+	public static String removeTags(String html) {
+		if (html == null) {
+			return null;
+		} else {
+			return html.replaceAll("<\\\\p>", "\r\n\r\n").replaceAll("<br>", "\r\n").replaceAll("<.+?>", ""); 			
+		}
+	}
 
 }
