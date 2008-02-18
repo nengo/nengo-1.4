@@ -248,6 +248,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		for (int i = 0; myDynamics != null && i < myDynamics.length; i++) {
 			myDynamics[i].setState(new float[myDynamics[i].getState().length]);			
 		}
+		myInputValues = null;
 	}
 
 	/**

@@ -54,7 +54,5 @@ public class BiasTermination extends DecodedTermination {
 		}
 		return result;
 	}
-	
-	
-	
+		
 }

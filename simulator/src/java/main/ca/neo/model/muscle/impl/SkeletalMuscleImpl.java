@@ -176,6 +176,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	public void reset(boolean randomize) {
 		myEADynamics.setState(new float[]{myEADynamics.getState().length});
 		myAFDynamics.setState(new float[]{myAFDynamics.getState().length});
+		myTermination.reset(randomize);
 	}
 
 	/**

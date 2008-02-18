@@ -8,6 +8,7 @@ import ca.neo.dynamics.Integrator;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.RealOutput;
+import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
@@ -24,7 +25,7 @@ import ca.neo.util.impl.TimeSeriesImpl;
  *    
  * @author Bryan Tripp
  */
-public class BasicTermination implements Termination {
+public class BasicTermination implements Termination, Resettable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -118,6 +119,13 @@ public class BasicTermination implements Termination {
 	 */
 	public Node getNode() {
 		return myNode;
+	}
+
+	/**
+	 * @see ca.neo.model.Resettable#reset(boolean)
+	 */
+	public void reset(boolean randomize) {
+		myInput = null;
 	}
 
 }

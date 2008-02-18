@@ -501,6 +501,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		public Node getNode() {
 			return myNode;
 		}
+
+		/**
+		 * @see ca.neo.model.Resettable#reset(boolean)
+		 */
+		public void reset(boolean randomize) {
+			myWrapped.reset(randomize);
+		}
 		
 	}
 

@@ -5,15 +5,11 @@ package ca.neo.model.impl;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configurable;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.Projection;
 import ca.neo.model.SimulationException;
-import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.impl.ProjectionImpl;
 import ca.neo.util.Configuration;
@@ -125,6 +121,12 @@ public class ProjectionImplTest extends TestCase {
 
 		public Node getNode() {
 			return null;
+		}
+
+		/**
+		 * @see ca.neo.model.Resettable#reset(boolean)
+		 */
+		public void reset(boolean randomize) {
 		}
 		
 	}

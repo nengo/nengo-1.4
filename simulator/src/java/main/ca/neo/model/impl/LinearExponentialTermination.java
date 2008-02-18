@@ -3,7 +3,6 @@ package ca.neo.model.impl;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.RealOutput;
-import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.Termination;
@@ -23,7 +22,7 @@ import ca.neo.util.impl.ConfigurationImpl;
  *  
  * @author Bryan Tripp
  */
-public class LinearExponentialTermination implements Termination, Resettable {
+public class LinearExponentialTermination implements Termination {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -65,6 +64,9 @@ public class LinearExponentialTermination implements Termination, Resettable {
 	 */
 	public void reset(boolean randomize) {
 		myCurrent = 0;
+		myRawInput = null;
+		myNetRealInput = 0;
+		myNetSpikeInput = 0;
 	}
 
 	/**

@@ -12,7 +12,6 @@ import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.util.Configuration;
-import ca.neo.util.MU;
 import ca.neo.util.impl.ConfigurationImpl;
 
 /**
@@ -179,6 +178,15 @@ public class EnsembleTermination implements Termination {
 	 */
 	public Node getNode() {
 		return myNode;
+	}
+
+	/**
+	 * @see ca.neo.model.Resettable#reset(boolean)
+	 */
+	public void reset(boolean randomize) {
+		for (int i = 0; i < myNodeTerminations.length; i++) {
+			myNodeTerminations[i].reset(randomize);
+		}
 	}
 
 }

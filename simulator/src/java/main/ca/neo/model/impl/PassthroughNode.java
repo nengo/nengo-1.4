@@ -268,6 +268,13 @@ public class PassthroughNode implements Node {
 		public Node getNode() {
 			return myNode;
 		}
+
+		/**
+		 * @see ca.neo.model.Resettable#reset(boolean)
+		 */
+		public void reset(boolean randomize) {
+			myValues = null;
+		}
 		
 	}
 

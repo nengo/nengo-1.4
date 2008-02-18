@@ -40,7 +40,7 @@ import ca.neo.util.Configurable;
  *   
  * @author Bryan Tripp
  */
-public interface Termination extends Configurable, Serializable {
+public interface Termination extends Configurable, Serializable, Resettable {
 
 	/**
 	 * Standard name of the post-synaptic current time constant property (most Terminations  
