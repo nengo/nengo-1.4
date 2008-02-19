@@ -59,8 +59,6 @@ public class ScriptEditor extends JPanel {
 
 	public ScriptEditor() {
 		this(new File("."));
-		setBackground(Style.COLOR_BACKGROUND);
-		setBorder(null);
 	}
 
 	/**
@@ -71,10 +69,13 @@ public class ScriptEditor extends JPanel {
 		myScripts = new ArrayList<ScriptData>(10);
 		setLayout(new BorderLayout());
 		myTabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
+		myTabs.setBackground(Style.COLOR_BACKGROUND);
 		add(myTabs, BorderLayout.CENTER);
 
 		myDirectory = directory;
 		myFilter = new ExtensionFileFilter(new String[] { "py" });
+		setBackground(Style.COLOR_BACKGROUND);
+		setBorder(null);
 	}
 
 	/**
