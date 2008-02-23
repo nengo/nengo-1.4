@@ -61,7 +61,7 @@ public class PFunction extends PropertyDescriptor {
 							new PLong("Seed") });
 
 			FnReflective gaussianPDF = new FnReflective(
-					GaussianPDF.class, "Guassian PDF",
+					GaussianPDF.class, "Gaussian PDF",
 					new PropertyDescriptor[] { new PFloat("Mean"),
 							new PFloat("Variance"), new PFloat("Peak") });
 

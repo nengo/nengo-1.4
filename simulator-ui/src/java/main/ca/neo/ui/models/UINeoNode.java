@@ -361,14 +361,14 @@ public abstract class UINeoNode extends UINeoModel {
 	/**
 	 * @return The Network model the Node is attached to
 	 */
-	public Network getParentNetwork() {
+	public UINetwork getNetworkParent() {
 		WorldImpl viewer = getWorld();
 
 		/*
 		 * Can only access parent network if the Node is inside a Network Viewer
 		 */
 		if (viewer instanceof NetworkViewer) {
-			return ((NetworkViewer) viewer).getModel();
+			return ((NetworkViewer) viewer).getViewerParent();
 		}
 
 		return null;

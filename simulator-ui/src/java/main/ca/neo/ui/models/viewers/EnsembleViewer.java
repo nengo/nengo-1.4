@@ -69,11 +69,11 @@ public class EnsembleViewer extends NodeViewer {
 			}
 		}
 
-		if (getViewerParent().getParentNetwork() != null) {
+		if (getViewerParent().getNetworkParent() != null) {
 			/*
 			 * Construct probes
 			 */
-			Probe[] probes = getViewerParent().getParentNetwork().getSimulator().getProbes();
+			Probe[] probes = getViewerParent().getNetworkParent().getSimulator().getProbes();
 
 			for (Probe probe : probes) {
 				Probeable target = probe.getTarget();

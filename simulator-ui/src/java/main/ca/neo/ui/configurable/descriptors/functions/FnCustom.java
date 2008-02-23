@@ -76,8 +76,7 @@ public class FnCustom extends AbstractFn {
 	@Override
 	public void configure(JDialog parent) {
 		if (configurer == null)
-			configurer = new InterpreterFunctionConfigurer(this, parent,
-					interpreter);
+			configurer = new InterpreterFunctionConfigurer(this, parent, interpreter);
 		try {
 			configurer.configureAndWait();
 		} catch (ConfigException e) {
@@ -107,8 +106,7 @@ public class FnCustom extends AbstractFn {
 			pDimensions.setEditable(true);
 		}
 
-		PropertyDescriptor[] props = new PropertyDescriptor[] { pExpression,
-				pDimensions };
+		PropertyDescriptor[] props = new PropertyDescriptor[] { pExpression, pDimensions };
 		return props;
 	}
 
@@ -168,8 +166,8 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 	FunctionInterpreter interpreter;
 	Dialog parent;
 
-	public InterpreterFunctionConfigurer(IConfigurable configurable,
-			Dialog parent, FunctionInterpreter interpreter) {
+	public InterpreterFunctionConfigurer(IConfigurable configurable, Dialog parent,
+			FunctionInterpreter interpreter) {
 		super(configurable, parent);
 		this.interpreter = interpreter;
 		this.parent = parent;
@@ -204,25 +202,20 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 
 			JPanel dropDownPanel = new JCustomPanel();
 
-			Map<String, Function> reigsteredFunctions = interpreter
-					.getRegisteredFunctions();
+			Map<String, Function> reigsteredFunctions = interpreter.getRegisteredFunctions();
 
-			registeredFunctionsList = new JComboBox(reigsteredFunctions
-					.keySet().toArray());
+			registeredFunctionsList = new JComboBox(reigsteredFunctions.keySet().toArray());
 
 			savedFilesPanel.add(new JLabel("Registered Functions"));
 
 			dropDownPanel.add(registeredFunctionsList);
-			dropDownPanel
-					.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+			dropDownPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 			savedFilesPanel.add(dropDownPanel);
 
 			JPanel buttonsPanel = new JCustomPanel();
-			buttonsPanel
-					.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+			buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 			buttonsPanel.add(Box.createHorizontalGlue());
-			buttonsPanel
-					.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 5));
+			buttonsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 5));
 
 			JButton button;
 			button = new JButton("New");
@@ -240,14 +233,12 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 			button.setFont(Style.FONT_SMALL);
 			buttonsPanel.add(button);
 
-			savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10,
-					10, 10));
+			savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 			savedFilesPanel.add(buttonsPanel);
 
 			JPanel wrapperPanel = new JCustomPanel();
-			wrapperPanel.setBorder(BorderFactory
-					.createEtchedBorder(EtchedBorder.LOWERED));
+			wrapperPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			wrapperPanel.add(savedFilesPanel);
 
 			JPanel seperator = new JCustomPanel();
@@ -262,12 +253,10 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					PString pFnName = new PString("Name");
-					PFunction pFunction = new PFunction("New Function", 1,
-							true, null);
+					PFunction pFunction = new PFunction("New Function", 1, true, null);
 
-					PropertySet props = ConfigManager.configure(
-							new PropertyDescriptor[] { pFnName, pFunction },
-							"Register fuction", FunctionDialog.this,
+					PropertySet props = ConfigManager.configure(new PropertyDescriptor[] { pFnName,
+							pFunction }, "Register fuction", FunctionDialog.this,
 							ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
 					String name = (String) props.getProperty(pFnName);
@@ -283,17 +272,14 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 
 		class PreviewFunctionAL implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
-				String functionName = (String) registeredFunctionsList
-						.getSelectedItem();
+				String functionName = (String) registeredFunctionsList.getSelectedItem();
 
 				if (functionName != null) {
-					Function function = interpreter.getRegisteredFunctions()
-							.get(functionName);
+					Function function = interpreter.getRegisteredFunctions().get(functionName);
 
 					if (function != null) {
-						PlotFunctionAction action = new PlotFunctionAction(
-								"Function preview", function,
-								FunctionDialog.this);
+						PlotFunctionAction action = new PlotFunctionAction("Function preview",
+								function, FunctionDialog.this);
 						action.doAction();
 
 					} else {
@@ -306,8 +292,7 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 		class RemoveFunctionAL implements ActionListener {
 
 			public void actionPerformed(ActionEvent e) {
-				String functionName = (String) registeredFunctionsList
-						.getSelectedItem();
+				String functionName = (String) registeredFunctionsList.getSelectedItem();
 				if (functionName != null) {
 					interpreter.removeRegisteredFunction(functionName);
 					registeredFunctionsList.removeItem(functionName);
@@ -339,32 +324,3 @@ class JCustomPanel extends JPanel {
 	}
 
 }
-
-//
-// /**
-// * Used to allow the user to configure a new function to be registered in the
-// * function interpreter.
-// *
-// * @author Shu Wu
-// */
-// public class NewFunction extends PropertyDescriptor {
-//
-// @Override
-// protected PropertyInputPanel createInputPanel() {
-// //
-// return null;
-// }
-//
-// @Override
-// public Class getTypeClass() {
-// //
-// return Function.class;
-// }
-//
-// @Override
-// public String getTypeName() {
-// //
-// return null;
-// }
-//
-// }

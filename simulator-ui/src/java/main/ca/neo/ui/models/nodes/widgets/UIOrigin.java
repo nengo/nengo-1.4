@@ -8,6 +8,7 @@ import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
+import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.util.UserMessages;
 
@@ -61,8 +62,9 @@ public class UIOrigin extends Widget {
 	}
 
 	@Override
-	protected void expose(Network network, String exposedName) {
-		network.exposeOrigin(getModel(), exposedName);
+	protected void expose(UINetwork networkUI, String exposedName) {
+		networkUI.getModel().exposeOrigin(getModel(), exposedName);
+		networkUI.showOrigin(exposedName);
 	}
 
 	@Override

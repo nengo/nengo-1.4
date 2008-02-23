@@ -288,9 +288,11 @@ public abstract class AppFrame extends JFrame {
 
 		universe.setSelectionMode(false);
 
+		initMenu();
 		validate();
 		setFullScreenMode(false);
-		initMenu();
+		
+		
 	}
 
 	protected void initLayout(Universe canvas) {
@@ -386,9 +388,9 @@ public abstract class AppFrame extends JFrame {
 		worldMenu.addAction(new MinimizeAllWindows(), KeyEvent.VK_M);
 
 		if (!isFullScreenMode) {
-			worldMenu.addAction(new TurnOnFullScreen(), KeyEvent.VK_F);
+			// worldMenu.addAction(new TurnOnFullScreen(), KeyEvent.VK_F);
 		} else {
-			worldMenu.addAction(new TurnOffFullScreen(), KeyEvent.VK_F);
+			// worldMenu.addAction(new TurnOffFullScreen(), KeyEvent.VK_F);
 		}
 
 		if (!preferences.isEnableTooltips()) {
@@ -497,7 +499,7 @@ public abstract class AppFrame extends JFrame {
 	public ElasticWorld getWorld() {
 		return universe.getWorld();
 	}
-	
+
 	public boolean addActivity(PActivity activity) {
 		return universe.getRoot().addActivity(activity);
 	}
@@ -588,8 +590,6 @@ public abstract class AppFrame extends JFrame {
 		}
 
 	}
-
-	
 
 	/**
 	 * Action to show the 'about' dialog

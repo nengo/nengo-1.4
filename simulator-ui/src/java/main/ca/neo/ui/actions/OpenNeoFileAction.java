@@ -44,8 +44,7 @@ public class OpenNeoFileAction extends StandardAction {
 		if (response == JFileChooser.APPROVE_OPTION) {
 			file = NeoGraphics.FileChooser.getSelectedFile();
 
-			TrackedAction loadActivity = new TrackedAction(
-					"Loading network") {
+			TrackedAction loadActivity = new TrackedAction("Loading network") {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -64,18 +63,18 @@ public class OpenNeoFileAction extends StandardAction {
 						});
 
 					} catch (IOException e) {
-						e.printStackTrace();
+						UserMessages.showError("IO Exception loading file");
 					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+						UserMessages.showError("Class not found");
 					} catch (ClassCastException e) {
-						e.printStackTrace();
-					} finally {
-						if (objLoaded == null) {
-							UserMessages
-									.showError("Incorrect file type or wrong version");
-						}
+						UserMessages.showError("Incorrect file version");
+					} catch (OutOfMemoryError e) {
+						UserMessages.showError("Out of memory loading file");
+					} catch (Exception e) {
+						UserMessages.showError("Unexpected exception loading file");
 					}
 
+		
 				}
 
 			};

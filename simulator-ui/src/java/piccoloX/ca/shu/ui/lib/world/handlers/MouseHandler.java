@@ -126,15 +126,10 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public void mousePressed(PInputEvent event) {
 		super.mousePressed(event);
 
-		if (event.getButton() == MouseEvent.BUTTON3) {
-			mouseCanvasPositionPressed = event.getCanvasPosition();
+		mouseCanvasPositionPressed = event.getCanvasPosition();
 
-			mouseButtonPressed = event.getButton();
-			interactableObj = getInteractableFromEvent(event);
-		} else {
-			mouseButtonPressed = -1;
-			interactableObj = null;
-		}
+		mouseButtonPressed = event.getButton();
+		interactableObj = getInteractableFromEvent(event);
 
 	}
 
@@ -142,15 +137,13 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		super.mouseReleased(event);
 
-		if (((mouseButtonPressed == event.getButton()) && mouseCanvasPositionPressed.distance(event
-				.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
+		if (((mouseButtonPressed == event.getButton()) && event.isPopupTrigger() && mouseCanvasPositionPressed
+				.distance(event.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
 
 			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
 
-			if (menuToShow == null
-					&& (interactableObj != null)
-					&& (interactableObj == (Interactable) Util.getNodeFromPickPath(event,
-							Interactable.class))) {
+			if (menuToShow == null && (interactableObj != null)
+					&& (interactableObj == getInteractableFromEvent(event))) {
 				menuToShow = interactableObj.getContextMenu();
 			}
 

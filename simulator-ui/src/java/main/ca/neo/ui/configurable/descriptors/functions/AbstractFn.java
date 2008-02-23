@@ -30,7 +30,7 @@ public abstract class AbstractFn implements IConfigurable {
 	 */
 	private String typeName;
 
-	Class<?> functionType;
+	private Class<?> functionType;
 
 	/**
 	 * @param typeName

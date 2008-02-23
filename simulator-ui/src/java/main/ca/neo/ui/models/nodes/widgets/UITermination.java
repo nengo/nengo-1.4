@@ -7,6 +7,7 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
+import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.util.Configuration;
 import ca.shu.ui.lib.actions.ActionException;
@@ -76,7 +77,8 @@ public class UITermination extends Widget implements ILineTermination {
 		if (modifyModel) {
 			try {
 
-				getNodeParent().getParentNetwork().addProjection(source.getModel(), getModel());
+				getNodeParent().getNetworkParent().getModel().addProjection(source.getModel(),
+						getModel());
 				getNodeParent().showPopupMessage(
 						"NEW Projection to " + getNodeParent().getName() + "." + getName());
 				successful = true;
@@ -118,8 +120,9 @@ public class UITermination extends Widget implements ILineTermination {
 	}
 
 	@Override
-	protected void expose(Network network, String exposedName) {
-		network.exposeTermination(getModel(), exposedName);
+	protected void expose(UINetwork networkUI, String exposedName) {
+		networkUI.getModel().exposeTermination(getModel(), exposedName);
+		networkUI.showTermination(exposedName);
 	}
 
 	@Override
@@ -153,7 +156,7 @@ public class UITermination extends Widget implements ILineTermination {
 		}
 
 		try {
-			getNodeParent().getParentNetwork().removeProjection(getModel());
+			getNodeParent().getNetworkParent().getModel().removeProjection(getModel());
 			getNodeParent().showPopupMessage(
 					"REMOVED Projection to " + getNodeParent().getName() + "." + getName());
 

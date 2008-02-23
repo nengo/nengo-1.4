@@ -8,28 +8,27 @@ import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PInt;
-import ca.neo.ui.configurable.descriptors.PString;
+import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 
-public class CNEFEnsemble extends Constructable {
-	static final PropertyDescriptor pDim = new PInt("Dimensions");
+public class CNEFEnsemble extends ConstructableNode {
+	public CNEFEnsemble(INodeContainer nodeContainer) {
+		super(nodeContainer);
+	}
 
-	static final PropertyDescriptor pName = new PString("Name");
+	static final PropertyDescriptor pDim = new PInt("Dimensions");
 
 	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
 
 	/**
 	 * Config descriptors
 	 */
-	static final PropertyDescriptor[] zConfig = { pName, pNumOfNeurons, pDim };
+	static final PropertyDescriptor[] zConfig = { pNumOfNeurons, pDim };
 
-	@Override
-	protected Node configureModel(PropertySet prop) {
+	protected Node createNode(PropertySet prop, String name) {
 		try {
 
 			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-
-			String name = (String) prop.getProperty(pName);
 
 			Integer numOfNeurons = (Integer) prop.getProperty(pNumOfNeurons);
 			Integer dimensions = (Integer) prop.getProperty(pDim);
@@ -44,11 +43,12 @@ public class CNEFEnsemble extends Constructable {
 	}
 
 	@Override
-	public PropertyDescriptor[] getConfigSchema() {
+	public PropertyDescriptor[] getNodeConfigSchema() {
 		return zConfig;
 	}
 
 	public String getTypeName() {
 		return UINEFEnsemble.typeName;
 	}
+
 }

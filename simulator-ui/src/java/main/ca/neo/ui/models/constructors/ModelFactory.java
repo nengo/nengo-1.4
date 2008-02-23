@@ -2,12 +2,14 @@ package ca.neo.ui.models.constructors;
 
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.managers.UserTemplateConfigurer;
+import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 
 public class ModelFactory {
 
-	public static Constructable[] getNodeConstructables() {
-		return new Constructable[] { new CNetwork(), new CNEFEnsemble(), new CFunctionInput() };
+	public static ConstructableNode[] getNodeConstructables(INodeContainer container) {
+		return new ConstructableNode[] { new CNetwork(container), new CNEFEnsemble(container),
+				new CFunctionInput(container) };
 	}
 
 	public static Object constructNode(Constructable configurable) throws ConfigException {

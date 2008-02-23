@@ -4,8 +4,6 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.objects.activities.TrackedAction;
 
 /**
  * A UIModel which can be configured through the IConfigurable interface
@@ -34,24 +32,7 @@ public abstract class Constructable implements IConfigurable {
 
 	public void completeConfiguration(final PropertySet properties) throws ConfigException {
 		model = null;
-
-		TrackedAction trackedAction = new TrackedAction("Constructing new model (" + getTypeName()
-				+ ")") {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void action() throws ActionException {
-				try {
-					model = configureModel(properties);
-				} catch (ConfigException e) {
-					e.printStackTrace();
-				}
-			}
-
-		};
-		trackedAction.doAction();
-		trackedAction.blockUntilCompleted();
+		model = configureModel(properties);
 	}
 
 	public abstract PropertyDescriptor[] getConfigSchema();

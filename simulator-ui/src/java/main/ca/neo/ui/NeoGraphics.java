@@ -33,7 +33,7 @@ import ca.neo.ui.dataList.DataListView;
 import ca.neo.ui.dataList.SimulatorDataModel;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.constructors.Constructable;
+import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
 import ca.neo.ui.models.nodes.NodeContainer;
 import ca.neo.ui.script.ScriptConsole;
@@ -462,7 +462,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		MenuBuilder newMenu = fileMenu.addSubMenu("New");
 		newMenu.getJMenu().setMnemonic(KeyEvent.VK_N);
 
-		for (Constructable constructable : ModelFactory.getNodeConstructables()) {
+		for (ConstructableNode constructable : ModelFactory.getNodeConstructables(this)) {
 			newMenu.addAction(new CreateModelAction(this, constructable));
 		}
 
@@ -517,6 +517,19 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 			ScriptEditor.openEditor();
 		}
 
+	}
+
+	public Node getNodeModel(String name) {
+		for (WorldObject wo : getWorld().getGround().getChildren()) {
+			if (wo instanceof UINeoNode) {
+				UINeoNode nodeUI = (UINeoNode) wo;
+
+				if (nodeUI.getName().equals(name)) {
+					return nodeUI.getModel();
+				}
+			}
+		}
+		return null;
 	}
 
 }

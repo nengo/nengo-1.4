@@ -22,7 +22,7 @@ import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.constructors.Constructable;
+import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
@@ -307,7 +307,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		MenuBuilder createNewMenu = menu.addSubMenu("Create new");
 
 		// Nodes
-		for (Constructable constructable : ModelFactory.getNodeConstructables()) {
+		for (ConstructableNode constructable : ModelFactory.getNodeConstructables(this)) {
 			createNewMenu.addAction(new CreateModelAction(this, constructable));
 		}
 
@@ -600,5 +600,14 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 			setOriginsTerminationsVisible(visible);
 		}
 
+	}
+
+	public Node getNodeModel(String name) {
+		try {
+			return getModel().getNode(name);
+		} catch (StructuralException e) {
+			// Node does not exist
+			return null;
+		}
 	}
 }

@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 import ca.neo.model.Network;
 import ca.neo.ui.models.UINeoModel;
 import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
@@ -77,7 +78,7 @@ public abstract class Widget extends UINeoModel {
 
 	}
 
-	protected abstract void expose(Network network, String exposedName);
+	protected abstract void expose(UINetwork networkUI, String exposedName);
 
 	/**
 	 * Exposes this origin/termination outside the Network
@@ -86,12 +87,14 @@ public abstract class Widget extends UINeoModel {
 	 *            Name of the newly exposed origin/termination
 	 */
 	protected void expose(String exposedName) {
-		Network network = getNodeParent().getParentNetwork();
-		if (network != null) {
-			expose(network, exposedName);
+		UINetwork networkUI = getNodeParent().getNetworkParent();
+
+		if (networkUI != null) {
+			expose(networkUI, exposedName);
+
 			showPopupMessage(this.getName() + " is exposed as " + exposedName + " on Network: "
-					+ network.getName());
-			attachViewToModel();
+					+ networkUI.getName());
+
 		} else {
 			UserMessages.showWarning("Cannot expose because no external network is available");
 		}
@@ -99,7 +102,7 @@ public abstract class Widget extends UINeoModel {
 
 	protected String getExposedName() {
 		if (getNodeParent() != null) {
-			Network network = getNodeParent().getParentNetwork();
+			Network network = getNodeParent().getNetworkParent().getModel();
 			if (network != null) {
 				String exposedName = getExposedName(network);
 				if (exposedName != null) {
@@ -118,11 +121,11 @@ public abstract class Widget extends UINeoModel {
 	 * UnExposes this origin/termination outside the Network
 	 */
 	protected void unExpose() {
-		Network network = getNodeParent().getParentNetwork();
+		UINetwork networkUI = getNodeParent().getNetworkParent();
+		Network network = networkUI.getModel();
 		if (network != null) {
 			unExpose(network);
-			showPopupMessage(this.getName() + " is UN-exposed on Network: " + network.getName());
-			attachViewToModel();
+			showPopupMessage(getName() + " is UN-exposed on Network: " + network.getName());
 		} else {
 			UserMessages.showWarning("Cannot expose because no external network is available");
 		}

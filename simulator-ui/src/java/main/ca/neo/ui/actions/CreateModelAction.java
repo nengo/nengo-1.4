@@ -7,6 +7,7 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.constructors.Constructable;
+import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
@@ -41,7 +42,7 @@ public class CreateModelAction extends ReversableAction {
 	 * @param nodeUIType
 	 *            Type of Node to be create, such as PNetwork
 	 */
-	public CreateModelAction(INodeContainer nodeContainer, Constructable constructable) {
+	public CreateModelAction(INodeContainer nodeContainer, ConstructableNode constructable) {
 		this(constructable.getTypeName(), nodeContainer, constructable);
 	}
 

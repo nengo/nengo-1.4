@@ -16,5 +16,7 @@ public interface INodeContainer {
 	 *            Node to be added
 	 */
 	public void addNodeModel(Node node);
+	
+	public Node getNodeModel(String name);
 
 }

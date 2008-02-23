@@ -49,7 +49,7 @@ public class UIStateProbe extends UIProbe {
 				EnsembleViewer ensembleViewer = (EnsembleViewer) nodeAttachedTo.getParentViewer();
 
 				UIEnsemble ensemble = ensembleViewer.getViewerParent();
-				Network network = ensemble.getParentNetwork();
+				Network network = ensemble.getNetworkParent().getModel();
 
 				probe = network.getSimulator().addProbe(ensemble.getName(), (Probeable) node,
 						state, true);
@@ -57,7 +57,7 @@ public class UIStateProbe extends UIProbe {
 				nodeAttachedTo.showPopupMessage("Probe (" + state + ") added to Simulator");
 
 			} else {
-				probe = nodeAttachedTo.getParentNetwork().getSimulator().addProbe(node.getName(),
+				probe = nodeAttachedTo.getNetworkParent().getSimulator().addProbe(node.getName(),
 						state, true);
 			}
 		} catch (SimulationException exception) {
@@ -104,7 +104,7 @@ public class UIStateProbe extends UIProbe {
 	@Override
 	protected void prepareToDestroyModel() {
 		try {
-			getProbeParent().getParentNetwork().getSimulator().removeProbe(getModel());
+			getProbeParent().getNetworkParent().getSimulator().removeProbe(getModel());
 			getProbeParent().showPopupMessage("Probe removed from Simulator");
 		} catch (SimulationException e) {
 			UserMessages.showError("Could not remove probe: " + e.getMessage());
