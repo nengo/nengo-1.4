@@ -1,8 +1,13 @@
 *******************************************
  Done
 *******************************************
-02/15/2008 - Fixed bug with input projection removals from event
-02/15/2008 - Double-cling on probes now open default plot
+02/22/2008 - Decreased default width of tooltip to 250 pixel
+02/22/2008 - Decreased tooltip fadeout time to 100ms
+02/22/2008 - Tooltips remove immediately on mouseOut
+02/22/2008 - Container Icons are updated when model is updated 
+
+02/17/2008 - Fixed bug with input projection removals from event
+02/17/2008 - Double-cling on probes now open default plot
 
 02/14/2008 - Projection removals now event driven
 02/14/2008 - Probe removals now event driven
@@ -51,6 +56,10 @@ Consider wrapping projection models in UIProjection, more consistent with the ot
 
 
 
+
+- Chris thought the ensemble, network, and function icons were grainy
+-- can these be done in vector graphics (like e.g. the origin icon?
+that one looks nice at any zoom level)\
 
 
 

@@ -17,15 +17,19 @@ public class Tooltip extends WorldObjectImpl {
 	private static final long serialVersionUID = 1L;
 
 	private TooltipBuilder tooltipBuilder;
-	private double tooltipWidth = 400;
+	private double tooltipWidth;
+	public static final double DEFAULT_WIDTH = 250;
 
 	public Tooltip(TooltipBuilder tooltipBuilder) {
+		this(tooltipBuilder, DEFAULT_WIDTH);
+	}
+
+	public Tooltip(TooltipBuilder tooltipBuilder, double width) {
 		super();
 
 		this.tooltipBuilder = tooltipBuilder;
-
+		this.tooltipWidth = width;
 		init();
-
 	}
 
 	private void init() {

@@ -657,7 +657,8 @@ public abstract class UINeoNode extends UINeoModel {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						modelUpdatePending = false;
-						modelUpdated();
+						firePropertyChange(Property.MODEL_CHANGED);
+						modelUpdated();						
 					}
 				});
 			}

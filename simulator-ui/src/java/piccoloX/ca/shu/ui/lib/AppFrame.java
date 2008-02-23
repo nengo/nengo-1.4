@@ -143,7 +143,7 @@ public abstract class AppFrame extends JFrame {
 		initViewMenu(menuBar);
 
 		worldMenu = new MenuBuilder("Options");
-		worldMenu.getJMenu().setMnemonic(KeyEvent.VK_W);
+		worldMenu.getJMenu().setMnemonic(KeyEvent.VK_O);
 		menuBar.add(worldMenu.getJMenu());
 
 		updateWorldMenu();

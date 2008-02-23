@@ -69,6 +69,28 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	}
 
 	/**
+	 * @param model
+	 *            New Model
+	 */
+	private final void setModel(Object model) {
+		if (myModel == model) {
+			return;
+		}
+
+		if (myModel != null) {
+			detachViewFromModel();
+		}
+
+		myModel = model;
+		firePropertyChange(Property.MODEL_CHANGED);
+
+		if (myModel != null) {
+			attachViewToModel();
+			modelUpdated();
+		}
+	}
+
+	/**
 	 * Attaches the UI from the model
 	 */
 	protected void attachViewToModel() {
@@ -248,28 +270,6 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 			throw new InvalidParameterException();
 		}
 		modelListeners.remove(listener);
-	}
-
-	/**
-	 * @param model
-	 *            New Model
-	 */
-	private final void setModel(Object model) {
-		if (myModel == model) {
-			return;
-		}
-
-		if (myModel != null) {
-			detachViewFromModel();
-		}
-
-		myModel = model;
-		firePropertyChange(Property.MODEL_CHANGED);
-
-		if (myModel != null) {
-			attachViewToModel();
-			modelUpdated();
-		}
 	}
 
 	/**

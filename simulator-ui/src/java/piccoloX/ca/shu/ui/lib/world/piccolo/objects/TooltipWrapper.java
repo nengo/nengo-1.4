@@ -124,7 +124,7 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 			return;
 		}
 
-		PActivity fadeOutActivity = new Fader(this, 500, 0);
+		PActivity fadeOutActivity = new Fader(this, 100, 0);
 		if (fadeInActivity != null) {
 
 			if ((fadeInActivity.getStartTime() + fadeInActivity.getDuration()) > System

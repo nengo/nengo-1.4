@@ -147,7 +147,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		panHandler = new PPanEventHandler();
 		keyboardHandler = new KeyboardHandler(this);
 		mySky.getCamera().addInputEventListener(keyboardHandler);
-		mySky.getCamera().addInputEventListener(new TooltipPickHandler(this, 1000, 1500));
+		mySky.getCamera().addInputEventListener(new TooltipPickHandler(this, 1000, 0));
 		mySky.getCamera().addInputEventListener(new MouseHandler(this));
 
 		selectionEventHandler = new SelectionHandler(this);
