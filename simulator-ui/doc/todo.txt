@@ -20,10 +20,7 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Requests:
-	Currently, origins and terminations are shown on icons only when they are attached to projections,
-	or the user has invoked "show all" through the menu. Do we want this to change? 
-	
+Requests:	
 
 	Origins and Terminations can be exposed by right clicking on them 
 	How do I know if an Origin/Termination is exposed?
@@ -36,7 +33,7 @@ Copy & Paste
 	Paste -> add clone to new container
 	
 
-Remove origins/terminations from Nodes if they have been removed
+Synchronize Widgets - origins/terminations - on modelChanged()
 
 - While waiting for an ensemble or origin to build, is it possible to
 animate something, to convince the user there hasn't been a crash?
