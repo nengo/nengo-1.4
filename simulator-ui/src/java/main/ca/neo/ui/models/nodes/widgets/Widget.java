@@ -3,6 +3,7 @@ package ca.neo.ui.models.nodes.widgets;
 import java.awt.Color;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import ca.neo.model.Network;
 import ca.neo.ui.models.UINeoModel;
@@ -26,6 +27,7 @@ import edu.umd.cs.piccolo.nodes.PText;
  * @author Shu Wu
  */
 public abstract class Widget extends UINeoModel {
+	public static final Color EXPOSED_COLOR = Color.yellow;
 
 	private boolean isWidgetVisible = true;
 	private ExposedIcon myExposedIcon;
@@ -37,10 +39,24 @@ public abstract class Widget extends UINeoModel {
 		init(nodeParent);
 	}
 
-	private void init(UINeoNode nodeParent) {
+	private void init(final UINeoNode nodeParent) {
 		setSelectable(false);
+
+		// Invoke later so that the node parent is set
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (getExposedName() != null) {
+					setExposed(true);
+				} else {
+					setExposed(false);
+				}
+			}
+		});
+
 		this.parent = nodeParent;
 	}
+
+	protected abstract void setExposed(boolean isExposed);
 
 	@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
@@ -66,7 +82,9 @@ public abstract class Widget extends UINeoModel {
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 		tooltips.addProperty("Attached to", parent.getName());
-		tooltips.addProperty("Exposed as", getExposedName());
+		if (getExposedName() != null) {
+			tooltips.addProperty("Exposed as", getExposedName());
+		}
 	}
 
 	/**
@@ -78,7 +96,7 @@ public abstract class Widget extends UINeoModel {
 
 	}
 
-	protected abstract void expose(UINetwork networkUI, String exposedName);
+	protected abstract void exposeModel(UINetwork networkUI, String exposedName);
 
 	/**
 	 * Exposes this origin/termination outside the Network
@@ -90,7 +108,7 @@ public abstract class Widget extends UINeoModel {
 		UINetwork networkUI = getNodeParent().getNetworkParent();
 
 		if (networkUI != null) {
-			expose(networkUI, exposedName);
+			exposeModel(networkUI, exposedName);
 
 			showPopupMessage(this.getName() + " is exposed as " + exposedName + " on Network: "
 					+ networkUI.getName());
@@ -101,7 +119,7 @@ public abstract class Widget extends UINeoModel {
 	}
 
 	protected String getExposedName() {
-		if (getNodeParent() != null) {
+		if (getNodeParent() != null && getNodeParent().getNetworkParent() != null) {
 			Network network = getNodeParent().getNetworkParent().getModel();
 			if (network != null) {
 				String exposedName = getExposedName(network);

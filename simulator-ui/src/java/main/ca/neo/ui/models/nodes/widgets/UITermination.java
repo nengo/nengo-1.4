@@ -39,11 +39,11 @@ public class UITermination extends Widget implements ILineTermination {
 
 	}
 
-	public boolean isConnected() {
-		return (getConnector() != null);
-	}
+	private boolean isExposed = false;
 
 	private LineTerminationIcon myIcon;
+
+	private Color myIconDefaultColor;
 
 	public UITermination(UINeoNode nodeParent, Termination term) {
 		super(nodeParent, term);
@@ -54,6 +54,7 @@ public class UITermination extends Widget implements ILineTermination {
 
 	private void init() {
 		myIcon = new LineTerminationIcon();
+		myIconDefaultColor = myIcon.getColor();
 		ModelIcon iconWr = new ModelIcon(this, myIcon);
 		iconWr.configureLabel(false);
 
@@ -109,7 +110,6 @@ public class UITermination extends Widget implements ILineTermination {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void constructWidgetMenu(AbstractMenuBuilder menu) {
 		super.constructWidgetMenu(menu);
@@ -120,7 +120,7 @@ public class UITermination extends Widget implements ILineTermination {
 	}
 
 	@Override
-	protected void expose(UINetwork networkUI, String exposedName) {
+	protected void exposeModel(UINetwork networkUI, String exposedName) {
 		networkUI.getModel().exposeTermination(getModel(), exposedName);
 		networkUI.showTermination(exposedName);
 	}
@@ -197,6 +197,25 @@ public class UITermination extends Widget implements ILineTermination {
 	 */
 	public float[][] getWeights() {
 		return (float[][]) getModel().getConfiguration().getProperty(Termination.WEIGHTS);
+	}
+
+	public boolean isConnected() {
+		return (getConnector() != null);
+	}
+
+	@Override
+	public void setExposed(boolean isExposed) {
+		if (this.isExposed == isExposed) {
+			return;
+		}
+		this.isExposed = isExposed;
+		if (isExposed) {
+			myIcon.setColor(Widget.EXPOSED_COLOR);
+			myIcon.moveToFront();
+		} else {
+			myIcon.setColor(myIconDefaultColor);
+			myIcon.moveToBack();
+		}
 	}
 
 }

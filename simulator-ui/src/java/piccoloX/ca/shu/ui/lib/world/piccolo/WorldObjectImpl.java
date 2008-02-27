@@ -582,6 +582,10 @@ public class WorldObjectImpl implements WorldObject {
 		return myPNode.localToParent(localRectangle);
 	}
 
+	public void moveToBack() {
+		myPNode.moveToBack();
+	}
+
 	public void moveToFront() {
 		myPNode.moveToFront();
 	}

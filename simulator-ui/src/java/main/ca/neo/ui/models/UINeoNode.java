@@ -607,7 +607,7 @@ public abstract class UINeoNode extends UINeoModel {
 		return probeUI;
 	}
 
-	public Collection<UITermination> getUITerminations() {
+	public Collection<UITermination> getVisibleTerminations() {
 		LinkedList<UITermination> terminations = new LinkedList<UITermination>();
 
 		for (WorldObject wo : getChildren()) {
@@ -618,6 +618,19 @@ public abstract class UINeoNode extends UINeoModel {
 		return terminations;
 	}
 
+
+	public Collection<UIOrigin> getVisibleOrigins() {
+		LinkedList<UIOrigin> origins = new LinkedList<UIOrigin>();
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof UIOrigin) {
+				origins.add((UIOrigin) wo);
+			}
+		}
+		return origins;
+	}
+
+	
 	/**
 	 * @param layoutName
 	 *            Name of an Termination on the Node model

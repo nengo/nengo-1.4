@@ -51,8 +51,8 @@ public class LineOriginIcon extends WorldObjectImpl {
 			Color bright1 = Style.colorAdd(color,
 					new Color(0.15f, 0.15f, 0.15f));
 
-			Color hilite = Style.colorAdd(Style.colorTimes(color, 0.05),
-					new Color(0.8f, 0.8f, 0.8f));
+			Color hilite = Style.colorAdd(Style.colorTimes(color, 0.5),
+					new Color(0.5f, 0.5f, 0.5f));
 
 			g2.setColor(dark);
 			g2.fillOval(0, 0, _LINE_END_WIDTH, _LINE_END_HEIGHT);

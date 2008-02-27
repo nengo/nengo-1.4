@@ -1,6 +1,11 @@
 *******************************************
  Done
 *******************************************
+02/26/2008 - Exposed terminations & origins are now yellow
+			You can see their exposed name in the tooltip
+			Be careful, projections cover the exposed terminations' color 
+			(is this ok? since only one projection is allowed per termination anyways)
+
 02/22/2008 - Context menu now triggered by event.isPopupTrigger()
 02/22/2008 - Disabling full-screen mode until issues resolved\
 02/22/2008 - Exposing origin/ terminations sets them to visible in the Icon
@@ -21,16 +26,13 @@
  Pri 0 - doing next
 *******************************************
 Requests:	
-
 	Origins and Terminations can be exposed by right clicking on them 
 	How do I know if an Origin/Termination is exposed?
 	I know it explicitly if a Network is
 	
 Copy & Paste
-	clone() - clone "core" of Node. ignores projections, etc...
-	Cut -> clone, destroy original
-	Copy -> clone, keep original
-	Paste -> add clone to new container
+	Need: A way to rename cloned nodes 
+	
 	
 
 Synchronize Widgets - origins/terminations - on modelChanged()

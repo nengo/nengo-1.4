@@ -12,30 +12,9 @@ public interface WorldObject extends NamedObject, Destroyable {
 
 	public void addChild(WorldObject wo);
 
-	public interface Listener {
-		public void propertyChanged(Property event);
-	}
-
-	public interface ChildListener {
-		public void childAdded(WorldObject wo);
-
-		public void childRemoved(WorldObject wo);
-	}
-
-	public void addPropertyChangeListener(Property event, Listener listener);
-
 	public void addChildrenListener(ChildListener listener);
 
-	public void removeChildrenListener(ChildListener listener);
-
-	/**
-	 * Sets the rotation of this nodes transform in radians. This will affect
-	 * this node and all its descendents.
-	 * 
-	 * @param theta
-	 *            rotation in radians
-	 */
-	public void setRotation(double theta);
+	public void addPropertyChangeListener(Property event, Listener listener);
 
 	/**
 	 * Animate this node's bounds from their current location when the activity
@@ -86,15 +65,31 @@ public interface WorldObject extends NamedObject, Destroyable {
 	public void animateToScale(double scale, long duration);
 
 	/**
-	 * This function must be called before the object is removed from the world,
-	 * or placed in a new one
+	 * @param wo
+	 *            Child which has just been added
 	 */
-	public void removeFromWorld();
+	public void childAdded(WorldObject wo);
+
+	/**
+	 * @param wo
+	 *            Child which has just been removed
+	 */
+	public void childRemoved(WorldObject wo);
+
+	public void destroyChildren();
 
 	/**
 	 * Called if this object is double clicked on
 	 */
 	public void doubleClicked();
+
+	/**
+	 * Offset this node relative to the parents coordinate system, and is NOT
+	 * effected by this nodes current scale or rotation. This is implemented by
+	 * directly adding dx to the m02 position and dy to the m12 position in the
+	 * affine transform.
+	 */
+	public void dragOffset(double dx, double dy);
 
 	public Collection<WorldObject> findIntersectingNodes(Rectangle2D fullBounds);
 
@@ -122,21 +117,11 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 *            new activity to schedule
 	 * @return true if the activity is successfully scheduled.
 	 */
-//	public boolean addActivity(PActivity activity);
-
+	// public boolean addActivity(PActivity activity);
 	/**
 	 * @return Number of children
 	 */
 	public int getChildrenCount();
-
-	/**
-	 * Returns the rotation applied by this node's transform in radians. This
-	 * rotation affects this node and all its descendents. The value returned
-	 * will be between 0 and 2pi radians.
-	 * 
-	 * @return rotation in radians.
-	 */
-	public double getRotation();
 
 	/**
 	 * Return a copy of this node's full bounds. These bounds are stored in the
@@ -168,6 +153,15 @@ public interface WorldObject extends NamedObject, Destroyable {
 	public Point2D getOffset();
 
 	public WorldObject getParent();
+
+	/**
+	 * Returns the rotation applied by this node's transform in radians. This
+	 * rotation affects this node and all its descendents. The value returned
+	 * will be between 0 and 2pi radians.
+	 * 
+	 * @return rotation in radians.
+	 */
+	public double getRotation();
 
 	/**
 	 * Return the scale applied by this node's transform. The scale is effecting
@@ -322,6 +316,12 @@ public interface WorldObject extends NamedObject, Destroyable {
 
 	/**
 	 * Change the order of this node in its parent's children list so that it
+	 * will draw in back of all of its other sibling nodes.
+	 */
+	public void moveToBack();
+
+	/**
+	 * Change the order of this node in its parent's children list so that it
 	 * will draw after the given sibling node.
 	 */
 	public void moveToFront();
@@ -353,14 +353,6 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 * @return relative to World's sky layer
 	 */
 	public Rectangle2D objectToSky(Rectangle2D rectangle);
-
-	/**
-	 * Offset this node relative to the parents coordinate system, and is NOT
-	 * effected by this nodes current scale or rotation. This is implemented by
-	 * directly adding dx to the m02 position and dy to the m12 position in the
-	 * affine transform.
-	 */
-	public void dragOffset(double dx, double dy);
 
 	/**
 	 * Paint this node behind any of its children nodes. Subclasses that define
@@ -396,12 +388,18 @@ public interface WorldObject extends NamedObject, Destroyable {
 
 	public void removeChild(WorldObject wo);
 
-	public void destroyChildren();
+	public void removeChildrenListener(ChildListener listener);
 
 	/**
 	 * Delete this node by removing it from its parent's list of children.
 	 */
 	public void removeFromParent();
+
+	/**
+	 * This function must be called before the object is removed from the world,
+	 * or placed in a new one
+	 */
+	public void removeFromWorld();
 
 	public void removePropertyChangeListener(Property event, Listener listener);
 
@@ -487,6 +485,15 @@ public interface WorldObject extends NamedObject, Destroyable {
 	public void setPickable(boolean isPickable);
 
 	/**
+	 * Sets the rotation of this nodes transform in radians. This will affect
+	 * this node and all its descendents.
+	 * 
+	 * @param theta
+	 *            rotation in radians
+	 */
+	public void setRotation(double theta);
+
+	/**
 	 * Set the scale of this node's transform. The scale will affect this node
 	 * and all its descendents.
 	 * 
@@ -528,20 +535,18 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 */
 	public void translate(double dx, double dy);
 
-	public enum Property {
-		CHILDREN_CHANGED, PARENTS_CHANGED, BOUNDS_CHANGED, REMOVED_FROM_WORLD, FULL_BOUNDS, GLOBAL_BOUNDS, MODEL_CHANGED, PARENTS_BOUNDS, VIEW_TRANSFORM, WIDGET
+	public interface ChildListener {
+		public void childAdded(WorldObject wo);
+
+		public void childRemoved(WorldObject wo);
 	}
 
-	/**
-	 * @param wo
-	 *            Child which has just been removed
-	 */
-	public void childRemoved(WorldObject wo);
+	public interface Listener {
+		public void propertyChanged(Property event);
+	}
 
-	/**
-	 * @param wo
-	 *            Child which has just been added
-	 */
-	public void childAdded(WorldObject wo);
+	public enum Property {
+		BOUNDS_CHANGED, CHILDREN_CHANGED, FULL_BOUNDS, GLOBAL_BOUNDS, MODEL_CHANGED, PARENTS_BOUNDS, PARENTS_CHANGED, REMOVED_FROM_WORLD, VIEW_TRANSFORM, WIDGET
+	}
 
 }

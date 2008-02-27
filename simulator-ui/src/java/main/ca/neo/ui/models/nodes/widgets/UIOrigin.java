@@ -27,7 +27,11 @@ public class UIOrigin extends Widget {
 
 	private static final String typeName = "Origin";
 
+	private boolean isExposed = false;
+
 	private UIProjectionWell lineWell;
+
+	private Color lineWellDefaultColor;
 
 	public UIOrigin(UINeoNode nodeParent, Origin origin) {
 		super(nodeParent, origin);
@@ -37,6 +41,7 @@ public class UIOrigin extends Widget {
 
 	private void init() {
 		lineWell = new UIProjectionWell(this);
+		lineWellDefaultColor = lineWell.getColor();
 		ModelIcon icon = new ModelIcon(this, lineWell);
 		icon.configureLabel(false);
 		setIcon(icon);
@@ -62,7 +67,7 @@ public class UIOrigin extends Widget {
 	}
 
 	@Override
-	protected void expose(UINetwork networkUI, String exposedName) {
+	protected void exposeModel(UINetwork networkUI, String exposedName) {
 		networkUI.getModel().exposeOrigin(getModel(), exposedName);
 		networkUI.showOrigin(exposedName);
 	}
@@ -128,6 +133,21 @@ public class UIOrigin extends Widget {
 	@Override
 	public String getTypeName() {
 		return typeName;
+	}
+
+	@Override
+	public void setExposed(boolean isExposed) {
+		if (this.isExposed == isExposed) {
+			return;
+		}
+		this.isExposed = isExposed;
+
+		if (isExposed) {
+			lineWell.setColor(Widget.EXPOSED_COLOR);
+		} else {
+			lineWell.setColor(lineWellDefaultColor);
+		}
+
 	}
 
 	@Override

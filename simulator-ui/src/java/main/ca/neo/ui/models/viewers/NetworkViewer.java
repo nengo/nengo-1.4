@@ -16,6 +16,7 @@ import ca.neo.model.Probeable;
 import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.model.impl.NetworkImpl;
 import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.CreateModelAdvancedAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
@@ -38,6 +39,7 @@ import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import ca.shu.ui.lib.world.WorldObject;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.util.PBounds;
 
@@ -101,8 +103,14 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 
 	}
 
+	private HashSet<Origin> exposedOrigins;
+	private HashSet<Termination> exposedTerminations;
+
 	@Override
 	protected void initialize() {
+		exposedOrigins = new HashSet<Origin>(getModel().getOrigins().length);
+		exposedTerminations = new HashSet<Termination>(getModel().getTerminations().length);
+
 		super.initialize();
 		updateSimulatorProbes();
 	}
@@ -211,7 +219,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		LinkedList<UIProjection> projectionsToRemove = new LinkedList<UIProjection>();
 
 		for (UINeoNode nodeUI : getUINodes()) {
-			for (UITermination terminationUI : nodeUI.getUITerminations()) {
+			for (UITermination terminationUI : nodeUI.getVisibleTerminations()) {
 				if (terminationUI.getConnector() != null) {
 					UIOrigin originUI = terminationUI.getConnector().getOriginUI();
 
@@ -266,6 +274,96 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 
 		}
 
+		updateViewExposed();
+	}
+
+	private void updateViewExposed() {
+		/*
+		 * Get exposed Origins and Terminations
+		 */
+		HashSet<Origin> exposedOriginsTemp = new HashSet<Origin>(getModel().getOrigins().length);
+		HashSet<Termination> exposedTerminationsTemp = new HashSet<Termination>(getModel()
+				.getTerminations().length);
+
+		for (Origin origin : getModel().getOrigins()) {
+			if (origin instanceof NetworkImpl.OriginWrapper) {
+				NetworkImpl.OriginWrapper originWr = (NetworkImpl.OriginWrapper) origin;
+				exposedOriginsTemp.add(originWr.getWrappedOrigin());
+			}
+		}
+
+		for (Termination termination : getModel().getTerminations()) {
+			if (termination instanceof NetworkImpl.TerminationWrapper) {
+				NetworkImpl.TerminationWrapper terminationWr = (NetworkImpl.TerminationWrapper) termination;
+				exposedTerminationsTemp.add(terminationWr.getWrappedTermination());
+			}
+		}
+
+		/*
+		 * Check to see if terminations have been added or removed
+		 */
+		boolean exposedOriginsChanged = false;
+		if (exposedOriginsTemp.size() != exposedOrigins.size()) {
+			exposedOriginsChanged = true;
+		} else {
+			/*
+			 * Iterate through origins to see if any have changed
+			 */
+			for (Origin origin : exposedOriginsTemp) {
+				if (!exposedOrigins.contains(origin)) {
+					break;
+				}
+				exposedOriginsChanged = true;
+			}
+		}
+		// Copy changed exposed origins if needed
+		if (exposedOriginsChanged) {
+			exposedOrigins = exposedOriginsTemp;
+		}
+
+		boolean exposedTerminationsChanged = false;
+		if (exposedTerminationsTemp.size() != exposedTerminations.size()) {
+			exposedTerminationsChanged = true;
+		} else {
+			/*
+			 * Iterate through Termination to see if any have changed
+			 */
+			for (Termination termination : exposedTerminationsTemp) {
+				if (!exposedTerminations.contains(termination)) {
+					break;
+				}
+				exposedTerminationsChanged = true;
+			}
+		}
+		// Copy changed exposed terminations if needed
+		if (exposedTerminationsChanged) {
+			exposedTerminations = exposedTerminationsTemp;
+		}
+
+		if (exposedTerminationsChanged || exposedOriginsChanged) {
+			/*
+			 * Update exposed terminations and origins
+			 */
+			for (WorldObject wo : getGround().getChildren()) {
+				if (wo instanceof UINeoNode) {
+					UINeoNode nodeUI = (UINeoNode) wo;
+
+					if (exposedOriginsChanged) {
+						for (UIOrigin originUI : nodeUI.getVisibleOrigins()) {
+							boolean isExposed = exposedOrigins.contains(originUI.getModel());
+							originUI.setExposed(isExposed);
+						}
+					}
+					if (exposedTerminationsChanged) {
+						for (UITermination terminationUI : nodeUI.getVisibleTerminations()) {
+							boolean isExposed = exposedTerminations.contains(terminationUI
+									.getModel());
+							terminationUI.setExposed(isExposed);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public void addNodeModel(Node node) {
@@ -446,7 +544,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 
 	public void updateSimulatorProbes() {
 		/*
-		 * Construct probes TODO: Remove unreferenced probes
+		 * Construct probes
 		 */
 		Probe[] probesArray = getModel().getSimulator().getProbes();
 
@@ -610,4 +708,5 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 			return null;
 		}
 	}
+
 }

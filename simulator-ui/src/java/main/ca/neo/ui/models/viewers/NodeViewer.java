@@ -61,6 +61,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		initialize();
 	}
 
+	
 	private void initChildModelListener() {
 		myNodeListener = new MyNodeListener();
 
@@ -91,8 +92,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	 * @param moveCameraToNode
 	 *            whether to move the camera to where the node is
 	 */
-	protected void addUINode(UINeoNode node, boolean dropInCenterOfCamera,
-			boolean moveCameraToNode) {
+	protected void addUINode(UINeoNode node, boolean dropInCenterOfCamera, boolean moveCameraToNode) {
 
 		/**
 		 * Moves the camera to where the node is positioned, if it's not dropped
