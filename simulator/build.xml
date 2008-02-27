@@ -1,13 +1,16 @@
 <project name="NEO" default="dist" basedir=".">
 
-	<property name="releasename" value="nengo-0.1" />
+	<property name="releasename" value="nengo-1.0" />
+	<property name="base-ui" value="../simulator-ui" />
 	<property name="src" value="${basedir}/src" />
+	<property name="src-ui" value="${base-ui}/src" />	
 	<property name="build" value="${basedir}/target" />
 	<property name="classes" value="${build}/classes" />
 	<property name="test-classes" value="${build}/test-classes" />
 	<property name="docs" value="${build}/javadoc" />
 	<property name="dist" value="${build}" />
 	<property name="lib" value="${basedir}/lib" />
+	<property name="lib-ui" value="${base-ui}/lib" />
 
 	<path id="classpath">
 		<pathelement path="${src}" />
@@ -19,6 +22,12 @@
 		<pathelement location="${lib}/jmatio.jar" /> 
 		<pathelement location="${lib}/log4j-1.2.14.jar" /> 
 		<pathelement location="${lib}/qdox-1.6.3.jar" /> 
+		<pathelement location="${lib-ui}/jython.jar" /> 
+		<pathelement location="${lib-ui}/jung-1.7.6.jar" /> 
+		<pathelement location="${lib-ui}/piccolo.jar" /> 
+		<pathelement location="${lib-ui}/piccolox.jar" /> 
+		<pathelement location="${lib-ui}/commons-collections-3.2.jar" /> 
+		<pathelement location="${lib-ui}/colt.jar" /> 
 	</path>
 	
 	
@@ -51,17 +60,46 @@
 	 			<pathelement path="${classes}" />
 	 		</classpath>
 	    </javac>
+		
+	 	<javac source="1.5" srcdir="${src-ui}/java/main:${src-ui}/java/piccoloX" destdir="${classes}" includes="ca/**" debug="true">
+	        <classpath refid="classpath" />
+	 		<classpath>
+	 			<pathelement path="${classes}" />
+	 		</classpath>
+	    </javac>
+
+	    <copy todir="${classes}/ca/neo/config">
+	        <fileset dir="${src}/java/main/ca/neo/config">
+	            <include name="*.txt"/>
+	    	</fileset>
+	    </copy>    
+
+	    <copy todir="${classes}/ca/neo/config/ui">
+	        <fileset dir="${src}/java/main/ca/neo/config/ui">
+	            <include name="*.jpg"/>
+	            <include name="*.JPG"/>
+	            <include name="*.gif"/>
+	            <include name="*.GIF"/>
+	    	</fileset>
+	    </copy>    
+
 	</target>
 	
 	
 	<!-- Creates JAR --> 
 	<target name="jar" depends="compile">
-		<jar jarfile="${dist}/${releasename}.jar" basedir="${classes}/main" />
+		<jar jarfile="${dist}/${releasename}.jar" basedir="${classes}" />
 	</target>
 
-	
+	<!-- Zips JAR and dependencies -->
+	<target name="zip" depends="jar">
+		<zip zipfile="${dist}/${releasename}.zip" basedir="${lib}" />
+		<zip update="true" zipfile="${dist}/${releasename}.zip" basedir="${lib-ui}"/> 
+		<zip update="true" zipfile="${dist}/${releasename}.zip" basedir="${dist}" includes="${releasename}.jar"/> 
+	</target>
+		
 	<!-- Creates source, doc, and release zip files -->
-	<target name="dist" depends="doc,jar">
+	<target name="dist" depends="doc,jar,zip">
 		<mkdir dir="${dist}"/>
 
 	    <!-- Make source zip file -->
@@ -70,8 +108,6 @@
 		<!-- Make doc zip file --> 
 		<zip zipfile="${dist}/${releasename}_docs.zip" basedir="${docs}"/>	
 		
-		<zip zipfile="${dist}/${releasename}.zip" basedir="${lib}" />
-		<zip update="true" zipfile="${dist}/${releasename}.zip" basedir="${dist}" includes="${releasename}.jar"/> 
 	</target>
 	
 	
