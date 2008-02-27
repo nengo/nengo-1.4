@@ -70,19 +70,19 @@ public class IconRegistry {
 			ourInstance.setIcon(float[][].class, "/ca/neo/config/ui/matrix_icon.GIF");
 			ourInstance.setIcon(String.class, "/ca/neo/config/ui/string_icon.JPG");
 
-			ourInstance.setIcon(DynamicalSystem.class, "/ca/neo/config/ui/dynamicalsystem02.JPG");
-			ourInstance.setIcon(Integrator.class, "/ca/neo/config/ui/integrator.JPG");
-			ourInstance.setIcon(Noise.class, "/ca/neo/config/ui/noise01.JPG");
-			ourInstance.setIcon(Origin.class, "/ca/neo/config/ui/origin01.JPG");
-			ourInstance.setIcon(SimulationMode.class, "/ca/neo/config/ui/simulationmode.JPG");
-			ourInstance.setIcon(SpikeGenerator.class, "/ca/neo/config/ui/spikegenerator.JPG");
-			ourInstance.setIcon(Termination.class, "/ca/neo/config/ui/termination.JPG");		
+			ourInstance.setIcon(DynamicalSystem.class, "/ca/neo/config/ui/dynamicalsystem02.jpg");
+			ourInstance.setIcon(Integrator.class, "/ca/neo/config/ui/integrator.jpg");
+			ourInstance.setIcon(Noise.class, "/ca/neo/config/ui/noise01.jpg");
+			ourInstance.setIcon(Origin.class, "/ca/neo/config/ui/origin01.jpg");
+			ourInstance.setIcon(SimulationMode.class, "/ca/neo/config/ui/simulationmode.jpg");
+			ourInstance.setIcon(SpikeGenerator.class, "/ca/neo/config/ui/spikegenerator.jpg");
+			ourInstance.setIcon(Termination.class, "/ca/neo/config/ui/termination.jpg");		
 			
 			ourInstance.setIcon(Neuron.class, "/ca/neo/config/ui/neuron.jpg");		
 			ourInstance.setIcon(Network.class, "/ca/neo/config/ui/network.jpg");		
 			ourInstance.setIcon(Ensemble.class, "/ca/neo/config/ui/ensemble.jpg");		
 			ourInstance.setIcon(Node.class, "/ca/neo/config/ui/node.jpg");		
-			ourInstance.setIcon(SynapticIntegrator.class, "/ca/neo/config/ui/synintegrator2.jpg");		
+			ourInstance.setIcon(SynapticIntegrator.class, "/ca/neo/config/ui/synintegrator2.JPG");		
 		}
 		
 		return ourInstance;
