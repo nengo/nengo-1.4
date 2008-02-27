@@ -1,5 +1,3 @@
-ca.neo.model.impl.MockConfigurable
-ca.neo.model.impl.MockConfigurable$MockChildConfigurable
 ca.neo.model.plasticity.impl.CompositePlasticityRule
 ca.neo.model.plasticity.impl.RealPlasticityRule
 ca.neo.model.plasticity.impl.SpikePlasticityRule
