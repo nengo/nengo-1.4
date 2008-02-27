@@ -407,7 +407,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 *  
 	 * @author Bryan Tripp
 	 */
-	private class OriginWrapper implements Origin {
+	public class OriginWrapper implements Origin {
 		
 		private static final long serialVersionUID = 1L;
 		
@@ -464,7 +464,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 *  
 	 * @author Bryan Tripp
 	 */
-	private class TerminationWrapper implements Termination {
+	public class TerminationWrapper implements Termination {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -476,6 +476,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			myNode = node;
 			myWrapped = wrapped;
 			myName = name;
+		}
+		
+		public Termination getWrappedTermination() {
+			return myWrapped;
 		}
 		
 		public String getName() {
