@@ -76,7 +76,12 @@ public class UITermination extends Widget implements ILineTermination {
 
 		boolean successful = false;
 		if (modifyModel) {
+
 			try {
+				if (getNodeParent().getNetworkParent() == null) {
+					throw new StructuralException(
+							"Can't create projection because termination is not within the scope of a Network");
+				}
 
 				getNodeParent().getNetworkParent().getModel().addProjection(source.getModel(),
 						getModel());

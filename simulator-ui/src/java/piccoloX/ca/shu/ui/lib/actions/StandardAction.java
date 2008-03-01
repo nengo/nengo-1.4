@@ -129,7 +129,6 @@ public abstract class StandardAction implements Serializable {
 			action();
 			postAction();
 		} catch (ActionException e) {
-			e.printStackTrace();
 			e.defaultHandleBehavior();
 		} catch (RuntimeException e) {
 			e.printStackTrace();

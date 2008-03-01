@@ -1,6 +1,9 @@
 *******************************************
  Done
 *******************************************
+02/26/2008 - Added debug messages for Context Menu troubleshooting, disabled same-key check
+02/26/2008 - Added error handling when user adds projection outside the scope of a network
+
 02/26/2008 - Exposed terminations & origins are now yellow
 			You can see their exposed name in the tooltip
 			Be careful, projections cover the exposed terminations' color 
@@ -25,11 +28,6 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Requests:	
-	Origins and Terminations can be exposed by right clicking on them 
-	How do I know if an Origin/Termination is exposed?
-	I know it explicitly if a Network is
-	
 Copy & Paste
 	Need: A way to rename cloned nodes 
 	

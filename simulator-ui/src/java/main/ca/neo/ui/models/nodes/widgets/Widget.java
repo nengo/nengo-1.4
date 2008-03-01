@@ -14,6 +14,7 @@ import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
+import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
@@ -217,7 +218,7 @@ public abstract class Widget extends UINeoModel {
 			if (name != null && name.compareTo("") != 0) {
 				expose(name);
 			} else {
-				throw new ActionException("Invalid name");
+				throw new UserCancelledException();
 			}
 
 		}

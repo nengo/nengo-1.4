@@ -6,6 +6,8 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
+import com.sun.corba.se.impl.orbutil.concurrent.DebugMutex;
+
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.WorldObject;
@@ -137,9 +139,9 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		super.mouseReleased(event);
 
-		if (((mouseButtonPressed == event.getButton()) && event.isPopupTrigger() && mouseCanvasPositionPressed
-				.distance(event.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
-
+		if ((event.isPopupTrigger() && mouseCanvasPositionPressed.distance(event
+				.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
+			Util.debugMsg("Context Menu: Popup Trigger detected");
 			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
 
 			if (menuToShow == null && (interactableObj != null)
@@ -148,11 +150,13 @@ public class MouseHandler extends PBasicInputEventHandler {
 			}
 
 			if (menuToShow != null) {
-
+				Util.debugMsg("Context Menu: shown");
 				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
 
 				menuToShow.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
 				menuToShow.setVisible(true);
+			} else {
+				Util.debugMsg("Context Menu: Unable to find menu to show");
 			}
 		}
 
