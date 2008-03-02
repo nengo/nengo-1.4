@@ -44,7 +44,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	private Interactable interactableObj;
 
-//	private int mouseButtonPressed = -1;
+	// private int mouseButtonPressed = -1;
 
 	private Point2D mouseCanvasPositionPressed;
 
@@ -68,6 +68,34 @@ public class MouseHandler extends PBasicInputEventHandler {
 		} else {
 			return obj;
 		}
+	}
+
+	/**
+	 * @param event
+	 * @return Was Popup Triggered?
+	 */
+	private boolean maybeTriggerPopup(PInputEvent event) {
+		if (event.isPopupTrigger()) {
+			Util.debugMsg("Context Menu: Popup Trigger detected");
+			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
+
+			if (menuToShow == null && (interactableObj != null)
+					&& (interactableObj == getInteractableFromEvent(event))) {
+				menuToShow = interactableObj.getContextMenu();
+			}
+
+			if (menuToShow != null) {
+				Util.debugMsg("Context Menu: shown");
+				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
+
+				menuToShow.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+				menuToShow.setVisible(true);
+			} else {
+				Util.debugMsg("Context Menu: Unable to find menu to show");
+			}
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -127,35 +155,20 @@ public class MouseHandler extends PBasicInputEventHandler {
 		super.mousePressed(event);
 
 		mouseCanvasPositionPressed = event.getCanvasPosition();
-
-//		mouseButtonPressed = event.getButton();
 		interactableObj = getInteractableFromEvent(event);
 
+		maybeTriggerPopup(event);
 	}
 
 	@Override
 	public void mouseReleased(PInputEvent event) {
 		super.mouseReleased(event);
 
-		if ((event.isPopupTrigger() && mouseCanvasPositionPressed.distance(event
-				.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE)) {
-			Util.debugMsg("Context Menu: Popup Trigger detected");
-			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
-
-			if (menuToShow == null && (interactableObj != null)
-					&& (interactableObj == getInteractableFromEvent(event))) {
-				menuToShow = interactableObj.getContextMenu();
-			}
-
-			if (menuToShow != null) {
-				Util.debugMsg("Context Menu: shown");
-				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
-
-				menuToShow.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
-				menuToShow.setVisible(true);
-			} else {
-				Util.debugMsg("Context Menu: Unable to find menu to show");
-			}
+		/*
+		 * Check the mouse hasn't moved too far off from it's pressed position
+		 */
+		if (mouseCanvasPositionPressed.distance(event.getCanvasPosition()) < MAX_CONTEXT_MENU_DRAG_DISTANCE) {
+			maybeTriggerPopup(event);
 		}
 
 	}

@@ -1,11 +1,11 @@
 *******************************************
  Done
 *******************************************
+03/01/2008 - Popup check in mousePressed(), before it was checked in mouseReleased() only.
+
 03/01/2008 - Mock copy & paste functionality added
 03/01/2008 - Added accelorator keys for Menu items
-03/01/2008 - Renamed NeoGraphics class to NengoGraphics 
-
-
+03/01/2008 - Renamed NeoGraphics class to NengoGraphics
 03/01/2008 - Added debug messages for Context Menu troubleshooting, disabled same-key check
 03/01/2008 - Added error handling when user adds projection outside the scope of a network
 
