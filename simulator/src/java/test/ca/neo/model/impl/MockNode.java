@@ -136,7 +136,7 @@ public class MockNode implements Node, Cloneable {
 		}
 	}
 
-	public void setMyName(String myName) {
+	public void setName(String myName) {
 		this.myName = myName;
 	}
 
