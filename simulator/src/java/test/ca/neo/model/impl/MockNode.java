@@ -11,23 +11,23 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 
 /**
- * A Cloneable Node for testing copy&paste / drag&drop.  
+ * A Cloneable Node for testing copy&paste / drag&drop.
  * 
  * @author Bryan Tripp
  */
 public class MockNode implements Node, Cloneable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String myDocumentation;
 	private String myName;
 	private SimulationMode myMode;
-	
+
 	public MockNode(String name) {
 		myName = name;
 		myMode = SimulationMode.DEFAULT;
 	}
-	
+
 	/**
 	 * @see ca.neo.model.Node#getDocumentation()
 	 */
@@ -114,7 +114,7 @@ public class MockNode implements Node, Cloneable {
 	 */
 	public void removeChangeListener(Listener listener) {
 	}
-	
+
 	@Override
 	public MockNode clone() throws CloneNotSupportedException {
 		return (MockNode) super.clone();
@@ -124,16 +124,20 @@ public class MockNode implements Node, Cloneable {
 		MockNode node = new MockNode("test");
 		node.setDocumentation("documentation");
 		node.setMode(SimulationMode.APPROXIMATE);
-		
+
 		try {
 			MockNode other = (MockNode) node.clone();
 			System.out.println("equals? " + (node == other));
 			System.out.println(other.getName());
 			System.out.println(other.getDocumentation());
-			System.out.println(other.getMode());			
+			System.out.println(other.getMode());
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public void setMyName(String myName) {
+		this.myName = myName;
+	}
+
 }
