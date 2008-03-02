@@ -81,6 +81,9 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final int VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK = ActionEvent.SHIFT_MASK
+			| ActionEvent.CTRL_MASK;
+
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
 	 */
@@ -123,8 +126,8 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	private ConfigurationPane configPane;
 
 	private AuxillarySplitPane dataViewerPane;
-
 	private SelectionBorder objectSelectedBorder;
+
 	private ScriptConsole scriptConsole;
 
 	private AuxillarySplitPane scriptConsolePane;
@@ -562,16 +565,20 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 
 	@Override
 	public void initViewMenu(JMenuBar menuBar) {
+
 		MenuBuilder viewMenu = new MenuBuilder("View");
 		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
 		menuBar.add(viewMenu.getJMenu());
 
-		viewMenu.addAction(new OpenScriptEditor("Open Script Editor"), KeyEvent.VK_E);
+		viewMenu.addAction(new OpenScriptEditor("Open Script Editor"), KeyEvent.VK_E, KeyStroke
+				.getKeyStroke(KeyEvent.VK_E, VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK));
 
 		for (AuxillarySplitPane splitPane : splitPanes) {
-
-			viewMenu.addAction(new SetSplitPaneVisibleAction("Show " + splitPane.getAuxTitle(),
-					splitPane, true), splitPane.getAuxTitle().getBytes()[0]);
+			byte shortCutChar = splitPane.getAuxTitle().getBytes()[0];
+			viewMenu.addAction(
+					new ToggleScriptPane("Toggle " + splitPane.getAuxTitle(), splitPane),
+					shortCutChar, KeyStroke.getKeyStroke(shortCutChar,
+							VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK));
 
 		}
 	}
@@ -600,17 +607,25 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		dataViewerPane.setAuxVisible(isVisible);
 	}
 
+	@Override
+	public void setTopWindow(Window window) {
+		super.setTopWindow(window);
+		updateEditMenu();
+	}
+
 	public class ToggleScriptPane extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
+		private AuxillarySplitPane splitPane;
 
-		public ToggleScriptPane() {
-			super("Toggle script pane");
+		public ToggleScriptPane(String description, AuxillarySplitPane spliPane) {
+			super(description);
+			this.splitPane = spliPane;
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			scriptConsolePane.setAuxVisible(!scriptConsolePane.isAuxVisible());
+			splitPane.setAuxVisible(!splitPane.isAuxVisible());
 		}
 
 	}
@@ -628,12 +643,6 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 			ScriptEditor.openEditor();
 		}
 
-	}
-
-	@Override
-	public void setTopWindow(Window window) {
-		super.setTopWindow(window);
-		updateEditMenu();
 	}
 }
 
