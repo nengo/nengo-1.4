@@ -5,6 +5,7 @@ package ca.neo.ui.script;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -26,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -129,7 +131,7 @@ public class ScriptEditor extends JPanel {
 				sd.setName(file.getName());
 				myTabs.setTitleAt(index, file.getName());
 				saveCurrentFile();
-			}			
+			}
 		}
 	}
 
@@ -169,8 +171,8 @@ public class ScriptEditor extends JPanel {
 				Object[] options = { "Save", "Discard", "Cancel" };
 				int selection = JOptionPane.showOptionDialog(this, "Would you like to save "
 						+ myScripts.get(index).getName() + " before closing?", "Confirm",
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
-						options[0]);
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+						options, options[0]);
 				if (selection == JOptionPane.YES_OPTION) {
 					saveCurrentFile();
 					doClose(index);
@@ -181,7 +183,7 @@ public class ScriptEditor extends JPanel {
 				result = selection;
 			} else {
 				doClose(index);
-			}			
+			}
 		}
 
 		return result;
@@ -296,7 +298,7 @@ public class ScriptEditor extends JPanel {
 	private class ChangeListener implements DocumentListener {
 
 		// TODO: could unregister this after a change and register a new one
-		// with a save 
+		// with a save
 
 		private ScriptData myScript;
 
@@ -401,7 +403,7 @@ public class ScriptEditor extends JPanel {
 			protected void action() throws ActionException {
 				editor.newFile();
 			}
-		}, KeyEvent.VK_N);
+		}, KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 
 		fileMenu.addAction(new StandardAction("Open") {
 
@@ -415,7 +417,7 @@ public class ScriptEditor extends JPanel {
 					ex.printStackTrace();
 				}
 			}
-		}, KeyEvent.VK_O);
+		}, KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 
 		fileMenu.addAction(new StandardAction("Save") {
 
@@ -429,7 +431,7 @@ public class ScriptEditor extends JPanel {
 					ex.printStackTrace();
 				}
 			}
-		}, KeyEvent.VK_S);
+		}, KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 
 		fileMenu.addAction(new StandardAction("Save As...") {
 			private static final long serialVersionUID = 1L;
@@ -476,7 +478,7 @@ public class ScriptEditor extends JPanel {
 				}
 			}
 		}, KeyEvent.VK_X);
-		
+
 		menuBar.add(fileMenu.getJMenu());
 		frame.setJMenuBar(menuBar);
 
@@ -484,11 +486,11 @@ public class ScriptEditor extends JPanel {
 		frame.addWindowListener(new MyWindowAdapter(editor, exitOnWindowClose));
 
 		frame.pack();
-		
+
 		if (UIEnvironment.getInstance() != null) {
 			frame.setLocationRelativeTo(UIEnvironment.getInstance());
 		}
-		
+
 		frame.setVisible(true);
 	}
 

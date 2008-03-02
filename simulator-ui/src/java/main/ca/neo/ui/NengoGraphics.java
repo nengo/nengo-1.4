@@ -1,6 +1,7 @@
 package ca.neo.ui;
 
 import java.awt.Container;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +19,7 @@ import java.util.jar.JarFile;
 
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import org.python.util.PythonInterpreter;
 
@@ -26,8 +28,12 @@ import ca.neo.config.ConfigUtil;
 import ca.neo.config.JavaSourceParser;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
+import ca.neo.model.impl.MockNode;
+import ca.neo.ui.actions.CopyAction;
 import ca.neo.ui.actions.CreateModelAction;
+import ca.neo.ui.actions.CutAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
+import ca.neo.ui.actions.PasteAction;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.dataList.DataListView;
 import ca.neo.ui.dataList.SimulatorDataModel;
@@ -38,6 +44,7 @@ import ca.neo.ui.models.constructors.ModelFactory;
 import ca.neo.ui.models.nodes.NodeContainer;
 import ca.neo.ui.script.ScriptConsole;
 import ca.neo.ui.script.ScriptEditor;
+import ca.neo.ui.util.NengoClipboard;
 import ca.neo.ui.util.NeoFileChooser;
 import ca.neo.ui.util.ScriptWorldWrapper;
 import ca.neo.util.Environment;
@@ -45,6 +52,7 @@ import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.AuxillarySplitPane;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.MockAction;
 import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.misc.ShortcutKey;
@@ -56,6 +64,8 @@ import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.WorldObject.Property;
 import ca.shu.ui.lib.world.handlers.SelectionHandler;
+import ca.shu.ui.lib.world.piccolo.objects.SelectionBorder;
+import ca.shu.ui.lib.world.piccolo.objects.Window;
 import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 
 /**
@@ -66,7 +76,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 /**
  * @author User
  */
-public class NeoGraphics extends AppFrame implements INodeContainer {
+public class NengoGraphics extends AppFrame implements INodeContainer {
 	private static final String APP_NAME = "Nengo Graphics V1 Beta";
 
 	private static final long serialVersionUID = 1L;
@@ -78,7 +88,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 			+ "(c) Copyright Center for Theoretical Neuroscience 2007.  All rights reserved<BR>"
 			+ "http://ctn.uwaterloo.ca/<BR>" + "<BR> User Interface by Shu Wu (shuwu83@gmail.com)";
 
-	public static final String CONFIG_FILE = "NeoGraphics.config";
+	public static final String CONFIG_FILE = "NengoGraphics.config";
 
 	public static final boolean CONFIGURE_PLANE_ENABLED = false;
 
@@ -94,9 +104,9 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	static final String PLUGIN_DIRECTORY = "plugins";
 
-	public static NeoGraphics getInstance() {
-		Util.Assert(UIEnvironment.getInstance() instanceof NeoGraphics);
-		return (NeoGraphics) UIEnvironment.getInstance();
+	public static NengoGraphics getInstance() {
+		Util.Assert(UIEnvironment.getInstance() instanceof NengoGraphics);
+		return (NengoGraphics) UIEnvironment.getInstance();
 	}
 
 	/**
@@ -105,16 +115,21 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new NeoGraphics();
+		new NengoGraphics();
 	}
+
+	private NengoClipboard clipboard;
 
 	private ConfigurationPane configPane;
 
 	private AuxillarySplitPane dataViewerPane;
 
+	private SelectionBorder objectSelectedBorder;
 	private ScriptConsole scriptConsole;
 
 	private AuxillarySplitPane scriptConsolePane;
+
+	private UINeoNode selectedNode;
 
 	/**
 	 * Data viewer data
@@ -127,7 +142,7 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 	 * @param auxTitle
 	 *            Text to be shown in the Title Bar
 	 */
-	public NeoGraphics() {
+	public NengoGraphics() {
 		super();
 	}
 
@@ -139,15 +154,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		 */
 		SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
 
-			public void singleObjectSelected(WorldObject obj) {
-				while (obj != null && !(obj instanceof ModelObject)) {
-					obj = obj.getParent();
-				}
-
-				if (obj != null) {
-					Object model = ((ModelObject) obj).getModel();
-					scriptConsole.setCurrentObject(model);
-				}
+			public void objectFocused(WorldObject obj) {
+				objectSelected(obj);
 			}
 		});
 
@@ -215,6 +223,32 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		}
 
 		JavaSourceParser.addSource(simulatorSourceFile);
+	}
+
+	private void objectSelected(WorldObject obj) {
+		while (obj != null && !(obj instanceof ModelObject)) {
+			obj = obj.getParent();
+		}
+
+		if (obj != null) {
+			if (obj instanceof UINeoNode) {
+				selectedNode = (UINeoNode) obj;
+			} else {
+				selectedNode = null;
+			}
+
+			if (objectSelectedBorder != null) {
+				objectSelectedBorder.destroy();
+			}
+
+			objectSelectedBorder = new SelectionBorder(obj.getWorld(), obj);
+
+			Object model = ((ModelObject) obj).getModel();
+			scriptConsole.setCurrentObject(model);
+		} else {
+			selectedNode = null;
+		}
+		updateEditMenu();
 	}
 
 	/**
@@ -287,6 +321,15 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	@Override
 	protected void initialize() {
+		clipboard = new NengoClipboard();
+		clipboard.addClipboardListener(new NengoClipboard.ClipboardListener() {
+
+			public void clipboardChanged() {
+				updateEditMenu();
+			}
+
+		});
+
 		super.initialize();
 
 		UIEnvironment.setDebugEnabled(true);
@@ -366,11 +409,54 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		}
 	}
 
-	public void addNodeModel(Node node, double posX, double posY) {
-		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
-		nodeUI.setOffset(posX, posY);
+	@Override
+	protected void updateEditMenu() {
+		super.updateEditMenu();
 
-		getWorld().getGround().addChild(nodeUI);
+		StandardAction copyAction = null;
+		StandardAction cutAction = null;
+		StandardAction pasteAction = null;
+
+		if (selectedNode != null) {
+			cutAction = new CutAction("Cut", selectedNode);
+			copyAction = new CopyAction("Copy", selectedNode);
+		} else {
+			cutAction = new MockAction("Cut");
+			copyAction = new MockAction("Copy");
+		}
+
+		MockNode node = getClipboard().getContents();
+		if (node != null) {
+
+			Window window = getTopWindow();
+			INodeContainer nodeContainer = null;
+
+			if (window != null) {
+				WorldObject wo = window.getContents();
+				if (wo instanceof INodeContainer) {
+					nodeContainer = (INodeContainer) wo;
+				}
+			} else {
+				nodeContainer = this;
+			}
+
+			if (nodeContainer != null) {
+
+				pasteAction = new PasteAction("Paste", getClipboard().getContents(), nodeContainer);
+			}
+		}
+
+		if (pasteAction == null) {
+			pasteAction = new MockAction("Paste");
+		}
+
+		editMenu.addAction(copyAction, KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C,
+				ActionEvent.CTRL_MASK));
+		editMenu.addAction(cutAction, KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X,
+				ActionEvent.CTRL_MASK));
+		editMenu.addAction(pasteAction, KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V,
+				ActionEvent.CTRL_MASK));
+
 	}
 
 	/*
@@ -387,24 +473,11 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		}
 	}
 
-	public boolean removeNodeModel(Node node) {
-		ModelObject modelToDestroy = null;
-		for (WorldObject wo : getWorld().getGround().getChildren()) {
-			if (wo instanceof ModelObject) {
-				ModelObject modelObject = (ModelObject) wo;
+	public void addNodeModel(Node node, double posX, double posY) {
+		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
+		nodeUI.setOffset(posX, posY);
 
-				if (modelObject.getModel() == node) {
-					modelToDestroy = modelObject;
-					break;
-				}
-			}
-		}
-		if (modelToDestroy != null) {
-			modelToDestroy.destroyModel();
-			return true;
-		} else {
-			return false;
-		}
+		getWorld().getGround().addChild(nodeUI);
 	}
 
 	public void captureInDataViewer(Network network) {
@@ -456,6 +529,23 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 		return "Nengo Workspace";
 	}
 
+	public NengoClipboard getClipboard() {
+		return clipboard;
+	}
+
+	public Node getNodeModel(String name) {
+		for (WorldObject wo : getWorld().getGround().getChildren()) {
+			if (wo instanceof UINeoNode) {
+				UINeoNode nodeUI = (UINeoNode) wo;
+
+				if (nodeUI.getName().equals(name)) {
+					return nodeUI.getModel();
+				}
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public void initFileMenu(MenuBuilder fileMenu) {
 
@@ -466,7 +556,8 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 			newMenu.addAction(new CreateModelAction(this, constructable));
 		}
 
-		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O);
+		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O, KeyStroke.getKeyStroke(
+				KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 	}
 
 	@Override
@@ -482,6 +573,26 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 			viewMenu.addAction(new SetSplitPaneVisibleAction("Show " + splitPane.getAuxTitle(),
 					splitPane, true), splitPane.getAuxTitle().getBytes()[0]);
 
+		}
+	}
+
+	public boolean removeNodeModel(Node node) {
+		ModelObject modelToDestroy = null;
+		for (WorldObject wo : getWorld().getGround().getChildren()) {
+			if (wo instanceof ModelObject) {
+				ModelObject modelObject = (ModelObject) wo;
+
+				if (modelObject.getModel() == node) {
+					modelToDestroy = modelObject;
+					break;
+				}
+			}
+		}
+		if (modelToDestroy != null) {
+			modelToDestroy.destroyModel();
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -519,19 +630,11 @@ public class NeoGraphics extends AppFrame implements INodeContainer {
 
 	}
 
-	public Node getNodeModel(String name) {
-		for (WorldObject wo : getWorld().getGround().getChildren()) {
-			if (wo instanceof UINeoNode) {
-				UINeoNode nodeUI = (UINeoNode) wo;
-
-				if (nodeUI.getName().equals(name)) {
-					return nodeUI.getModel();
-				}
-			}
-		}
-		return null;
+	@Override
+	public void setTopWindow(Window window) {
+		super.setTopWindow(window);
+		updateEditMenu();
 	}
-
 }
 
 class ConfigurationPane {

@@ -169,7 +169,7 @@ public abstract class NodeContainer extends UINeoNode {
 	 */
 	public NodeViewer getViewer() {
 		if (viewerWindowRef.get() != null) {
-			return (NodeViewer) viewerWindowRef.get().getWindowContent();
+			return (NodeViewer) viewerWindowRef.get().getContents();
 		}
 		return null;
 	}
@@ -185,7 +185,7 @@ public abstract class NodeContainer extends UINeoNode {
 			viewerWindow.restoreSavedWindow();
 
 		}
-		return (NodeViewer) viewerWindow.getWindowContent();
+		return (NodeViewer) viewerWindow.getContents();
 
 	}
 

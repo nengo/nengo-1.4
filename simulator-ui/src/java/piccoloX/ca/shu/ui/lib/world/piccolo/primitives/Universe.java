@@ -11,6 +11,7 @@ import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.Destroyable;
 import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.WorldObject.ChildListener;
 import ca.shu.ui.lib.world.WorldObject.Listener;
 import ca.shu.ui.lib.world.WorldObject.Property;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
@@ -239,6 +240,22 @@ public class Universe extends PCanvas implements Destroyable {
 		} else {
 			throw new UnsupportedOperationException("Can only initialize once");
 		}
+
+		getWorld().getSky().addChildrenListener(new ChildListener() {
+
+			public void childAdded(WorldObject wo) {
+				if (wo instanceof Window) {
+					UIEnvironment.getInstance().setTopWindow((Window) wo);
+				}
+
+			}
+
+			public void childRemoved(WorldObject wo) {
+				if (wo instanceof Window) {
+					UIEnvironment.getInstance().setTopWindow(null);
+				}
+			}
+		});
 	}
 
 	@Override

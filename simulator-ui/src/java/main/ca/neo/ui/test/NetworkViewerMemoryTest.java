@@ -15,7 +15,7 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.nodes.UINetwork;
 
 /**
@@ -25,7 +25,7 @@ import ca.neo.ui.models.nodes.UINetwork;
  */
 public class NetworkViewerMemoryTest {
 	private static int i;
-	private static NeoGraphics neoGraphics;
+	private static NengoGraphics neoGraphics;
 	// private static NetworkViewer netView;
 	private static final int NUM_OF_LOOPS = 500;
 //	private static Window window;
@@ -82,7 +82,7 @@ public class NetworkViewerMemoryTest {
 	public static void main(String[] args) {
 
 		printMemoryUsed("Start");
-		neoGraphics = new NeoGraphics();
+		neoGraphics = new NengoGraphics();
 
 		// Window windows = new Window[NUM_OF_LOOPS];
 		for (i = 0; i < NUM_OF_LOOPS; i++) {

@@ -1,6 +1,6 @@
 package ca.neo.ui.actions;
 
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 
@@ -26,6 +26,6 @@ public class ConfigureAction extends StandardAction {
 
 	@Override
 	protected void action() throws ActionException {
-		NeoGraphics.getInstance().configureObject(model);
+		NengoGraphics.getInstance().configureObject(model);
 	}
 }

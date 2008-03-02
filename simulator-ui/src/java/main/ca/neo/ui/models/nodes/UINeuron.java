@@ -2,7 +2,7 @@ package ca.neo.ui.models.nodes;
 
 import ca.neo.model.neuron.Neuron;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.icons.NeuronIcon;
+import ca.neo.ui.models.icons.NodeIcon;
 
 /**
  * UI Wrapper for a Neuron
@@ -19,8 +19,7 @@ public class UINeuron extends UINeoNode {
 	}
 
 	private void init() {
-
-		setIcon(new NeuronIcon(this));
+		setIcon(new NodeIcon(this));
 	}
 
 	@Override

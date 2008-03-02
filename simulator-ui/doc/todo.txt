@@ -1,37 +1,24 @@
 *******************************************
  Done
 *******************************************
-02/26/2008 - Added debug messages for Context Menu troubleshooting, disabled same-key check
-02/26/2008 - Added error handling when user adds projection outside the scope of a network
-
-02/26/2008 - Exposed terminations & origins are now yellow
-			You can see their exposed name in the tooltip
-			Be careful, projections cover the exposed terminations' color 
-			(is this ok? since only one projection is allowed per termination anyways)
-
-02/22/2008 - Context menu now triggered by event.isPopupTrigger()
-02/22/2008 - Disabling full-screen mode until issues resolved\
-02/22/2008 - Exposing origin/ terminations sets them to visible in the Icon
-			Before, they were added, but were hidden until explicitly shown.
-02/22/2008 - Gaussian function name typo fixed
-02/22/2008 - Duplicate Name check on Node Containers before Node models are created
-02/22/2008 - Specialized Error messages for file loading
+03/01/2008 - Mock copy & paste functionality added
+03/01/2008 - Added accelorator keys for Menu items
+03/01/2008 - Renamed NeoGraphics class to NengoGraphics 
 
 
-02/22/2008 - Decreased default width of tooltip to 250 pixel
-02/22/2008 - Decreased tooltip fadeout time to 100ms
-02/22/2008 - Tooltips remove immediately on mouseOut
-02/22/2008 - Container Icons are updated when model is updated 
-
-
+03/01/2008 - Added debug messages for Context Menu troubleshooting, disabled same-key check
+03/01/2008 - Added error handling when user adds projection outside the scope of a network
 
 *******************************************
  Pri 0 - doing next
 *******************************************
 Copy & Paste
-	Need: A way to rename cloned nodes 
+	Add paste action to NetworkViewer
+	Shortcut keys 
 	
 	
+
+Update ensemble, network, and function icons to be Vector
 
 Synchronize Widgets - origins/terminations - on modelChanged()
 
@@ -46,20 +33,8 @@ Consider wrapping projection models in UIProjection, more consistent with the ot
 
 
 
-
-
-
-
-- Chris thought the ensemble, network, and function icons were grainy
--- can these be done in vector graphics (like e.g. the origin icon?
-that one looks nice at any zoom level)\
-
-
-
-
 Elastic forces should be assynmetrical between two objects ( proportional to weight of base object )
 
-I just figured out Java Swing has a built-in way of implementing accelorator keys: http://java.sun.com/docs/books/tutorial/uiswing/components/menu.html. I will leverage that in MenuBuilder.
 Auto-remove dangling probes and projections when a Network is updated
 	Detect projection removals, scan through all origins and terminations, 
 	looking for projections, then remove the one's which don't exist anymore
@@ -67,16 +42,12 @@ Auto-remove dangling probes and projections when a Network is updated
 Disable zoom & panning while animating camera (use isAnimating())
 
 Run memory test to find leaks
+
 Create more advanced tests
 	Create, delete, modify nodes
 
 UIProjections
 	disconnections should be done in UINetwork level through updateViewFromModel()
-
-UIFunctions should never modify the model. 
-	Model modification should be done externally, UI Picks up on them through listener 
-	AddNeoNode should be private, as you should never be adding nodes explicitly
-	All UI Changes should occur through UpdateViewFromModel
 
 
 Show popover message when model is updated
@@ -84,7 +55,6 @@ Show popover message when model is updated
 	Show popover message from there	
 
 
-Show decoration border around singly selected objects in NeoGraphics
 
 *******************************************
  Pri 1 - to do
@@ -147,6 +117,25 @@ Event notifications from Models
 *******************************************
  Previously Done
 *******************************************
+02/26/2008 - Exposed terminations & origins are now yellow
+			You can see their exposed name in the tooltip
+			Be careful, projections cover the exposed terminations' color 
+			(is this ok? since only one projection is allowed per termination anyways)
+
+02/22/2008 - Context menu now triggered by event.isPopupTrigger()
+02/22/2008 - Disabling full-screen mode until issues resolved\
+02/22/2008 - Exposing origin/ terminations sets them to visible in the Icon
+			Before, they were added, but were hidden until explicitly shown.
+02/22/2008 - Gaussian function name typo fixed
+02/22/2008 - Duplicate Name check on Node Containers before Node models are created
+02/22/2008 - Specialized Error messages for file loading
+
+
+02/22/2008 - Decreased default width of tooltip to 250 pixel
+02/22/2008 - Decreased tooltip fadeout time to 100ms
+02/22/2008 - Tooltips remove immediately on mouseOut
+02/22/2008 - Container Icons are updated when model is updated 
+
 02/17/2008 - Fixed bug with input projection removals from event
 02/17/2008 - Double-cling on probes now open default plot
 02/14/2008 - Projection removals now event driven

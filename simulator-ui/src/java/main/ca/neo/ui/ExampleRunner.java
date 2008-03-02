@@ -58,7 +58,7 @@ public class ExampleRunner {
 	 * Builds a NeoGraphics User Interface
 	 */
 	private UINetwork buildUI() {
-		NeoGraphics neoGraphics = new NeoGraphics();
+		NengoGraphics neoGraphics = new NengoGraphics();
 
 		TrackedStatusMsg task;
 		task = new TrackedStatusMsg("Creating Model UI");

@@ -80,7 +80,6 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 		if (worldObjectParent != null && child != null && child instanceof PiccoloNodeInWorld) {
 			worldObjectParent.childAdded(((PiccoloNodeInWorld) child).getWorldObject());
 		}
-
 	}
 
 	/*

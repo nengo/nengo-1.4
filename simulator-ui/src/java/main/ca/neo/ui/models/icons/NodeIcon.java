@@ -9,10 +9,10 @@ import ca.shu.ui.lib.world.piccolo.primitives.Path;
  * 
  * @author Shu Wu
  */
-public class NeuronIcon extends ModelIcon {
+public class NodeIcon extends ModelIcon {
 	private static final long serialVersionUID = 1L;
 
-	public NeuronIcon(ModelObject parent) {
+	public NodeIcon(ModelObject parent) {
 		super(parent, Path.createEllipse(0, 0, 50, 50));
 		getIconReal().setPaint(Style.COLOR_FOREGROUND);
 		configureLabel(false);

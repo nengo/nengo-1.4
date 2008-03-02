@@ -6,6 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -27,7 +28,25 @@ public class MenuBuilder extends AbstractMenuBuilder {
 
 	@Override
 	public void addAction(StandardAction action) {
-		addAction(action, -1);
+		addAction(action, -1, null);
+	}
+
+	public void addAction(StandardAction action, KeyStroke accelorator) {
+		addAction(action, -1, accelorator);
+	}
+
+	public void addAction(StandardAction action, int mnemonic, KeyStroke accelorator) {
+		JMenuItem item = new JMenuItem(action.toSwingAction());
+		if (accelorator != null) {
+			item.setAccelerator(accelorator);
+		}
+		if (mnemonic != -1) {
+			item.setMnemonic(mnemonic);
+		}
+
+		style(item);
+		menu.add(item);
+
 	}
 
 	/**
@@ -37,13 +56,7 @@ public class MenuBuilder extends AbstractMenuBuilder {
 	 *            Mnemonic to assign to this action
 	 */
 	public void addAction(StandardAction action, int mnemonic) {
-		JMenuItem item = new JMenuItem(action.toSwingAction());
-		if (mnemonic != -1) {
-			item.setMnemonic(mnemonic);
-		}
-
-		style(item);
-		menu.add(item);
+		addAction(action, mnemonic, null);
 	}
 
 	@Override

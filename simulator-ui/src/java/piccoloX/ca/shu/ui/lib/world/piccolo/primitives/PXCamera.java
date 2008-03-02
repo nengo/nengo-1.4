@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 
 import ca.shu.ui.lib.world.WorldObject;
 import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.activities.PTransformActivity;
 import edu.umd.cs.piccolo.util.PUtil;
@@ -15,6 +16,24 @@ public class PXCamera extends PCamera implements PiccoloNodeInWorld {
 	private PTransformActivity currentActivity;
 
 	private WorldObject wo;
+
+	@Override
+	public void addChild(int index, PNode child) {
+		super.addChild(index, child);
+		if (wo != null && child != null && child instanceof PiccoloNodeInWorld) {
+			wo.childAdded(((PiccoloNodeInWorld) child).getWorldObject());
+		}
+	}
+
+	public PNode removeChild(int arg0) {
+		PNode node = super.removeChild(arg0);
+
+		if (wo != null && node != null && node instanceof PiccoloNodeInWorld) {
+			wo.childRemoved(((PiccoloNodeInWorld) node).getWorldObject());
+		}
+
+		return node;
+	}
 
 	/*
 	 * Modification to PNode's animateToTransform. This animation is sequenced

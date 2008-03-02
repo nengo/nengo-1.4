@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 import ca.neo.model.Network;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.sim.Simulator;
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkViewer;
@@ -126,7 +126,7 @@ public class UINetwork extends NodeContainer {
 
 		if (layoutManager == null) {
 			layoutManager = new NetworkViewerConfig(getName() + "."
-					+ NeoGraphics.NEONODE_FILE_EXTENSION);
+					+ NengoGraphics.NEONODE_FILE_EXTENSION);
 			setUICOnfig(layoutManager);
 		}
 

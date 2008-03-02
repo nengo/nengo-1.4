@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import javax.swing.JFileChooser;
 
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -42,12 +42,12 @@ public class SaveNodeAction extends StandardAction {
 	protected void action() throws ActionException {
 		int returnVal = JFileChooser.CANCEL_OPTION;
 
-		NeoGraphics.FileChooser.setSelectedFile(new File(nodeUI.getFileName()));
+		NengoGraphics.FileChooser.setSelectedFile(new File(nodeUI.getFileName()));
 
-		returnVal = NeoGraphics.FileChooser.showSaveDialog();
+		returnVal = NengoGraphics.FileChooser.showSaveDialog();
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			file = NeoGraphics.FileChooser.getSelectedFile();
+			file = NengoGraphics.FileChooser.getSelectedFile();
 
 			TrackedAction task = new TrackedAction("Saving model") {
 

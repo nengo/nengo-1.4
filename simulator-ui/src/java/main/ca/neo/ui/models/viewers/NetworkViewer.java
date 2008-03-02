@@ -16,10 +16,13 @@ import ca.neo.model.Probeable;
 import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.model.impl.MockNode;
 import ca.neo.model.impl.NetworkImpl;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.CreateModelAdvancedAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
+import ca.neo.ui.actions.PasteAction;
 import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
@@ -394,6 +397,11 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 	@Override
 	public void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
+
+		MockNode clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
+		if (clipboardNode != null) {
+			menu.addAction(new PasteAction("Paste", clipboardNode, this));
+		}
 
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run", getViewerParent()));

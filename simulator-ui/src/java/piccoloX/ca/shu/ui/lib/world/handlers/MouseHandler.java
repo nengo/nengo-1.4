@@ -6,12 +6,10 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
-import com.sun.corba.se.impl.orbutil.concurrent.DebugMutex;
-
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.Interactable;
+import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.shu.ui.lib.world.piccolo.objects.Window;
@@ -46,7 +44,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	private Interactable interactableObj;
 
-	private int mouseButtonPressed = -1;
+//	private int mouseButtonPressed = -1;
 
 	private Point2D mouseCanvasPositionPressed;
 
@@ -130,7 +128,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 		mouseCanvasPositionPressed = event.getCanvasPosition();
 
-		mouseButtonPressed = event.getButton();
+//		mouseButtonPressed = event.getButton();
 		interactableObj = getInteractableFromEvent(event);
 
 	}

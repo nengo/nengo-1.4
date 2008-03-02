@@ -8,6 +8,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyEventDispatcher;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -32,6 +33,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import ca.shu.ui.lib.Style.Style;
@@ -79,8 +81,6 @@ public abstract class AppFrame extends JFrame {
 
 	private ReversableActionManager actionManager;
 
-	private MenuBuilder editMenu;
-
 	private EventListener escapeFullScreenModeListener;
 
 	private GraphicsDevice graphicsDevice;
@@ -91,9 +91,13 @@ public abstract class AppFrame extends JFrame {
 
 	private ShortcutKey[] shortcutKeys;
 
+	private Window topWindow;
+
 	private Universe universe;
 
 	private MenuBuilder worldMenu;
+
+	protected MenuBuilder editMenu;
 
 	/**
 	 * @param title
@@ -291,8 +295,7 @@ public abstract class AppFrame extends JFrame {
 		initMenu();
 		validate();
 		setFullScreenMode(false);
-		
-		
+
 	}
 
 	protected void initLayout(Universe canvas) {
@@ -374,9 +377,11 @@ public abstract class AppFrame extends JFrame {
 	protected void updateEditMenu() {
 		editMenu.reset();
 
-		editMenu.addAction(new UndoAction(), KeyEvent.VK_U);
+		editMenu.addAction(new UndoAction(), KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+				ActionEvent.CTRL_MASK));
 
-		editMenu.addAction(new RedoAction(), KeyEvent.VK_R);
+		editMenu.addAction(new RedoAction(), KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y,
+				ActionEvent.CTRL_MASK));
 
 	}
 
@@ -429,6 +434,10 @@ public abstract class AppFrame extends JFrame {
 		}
 	}
 
+	public boolean addActivity(PActivity activity) {
+		return universe.getRoot().addActivity(activity);
+	}
+
 	/**
 	 * This method adds a key listener that will take this PFrame out of full
 	 * screen mode when the escape key is pressed. This is called for you
@@ -479,6 +488,10 @@ public abstract class AppFrame extends JFrame {
 
 	public abstract String getAppWindowTitle();
 
+	public Window getTopWindow() {
+		return topWindow;
+	}
+
 	/**
 	 * @return Canvas which hold the zoomable UI
 	 */
@@ -498,10 +511,6 @@ public abstract class AppFrame extends JFrame {
 	 */
 	public ElasticWorld getWorld() {
 		return universe.getWorld();
-	}
-
-	public boolean addActivity(PActivity activity) {
-		return universe.getRoot().addActivity(activity);
 	}
 
 	/**
@@ -566,6 +575,15 @@ public abstract class AppFrame extends JFrame {
 
 	public void setShortcutKeys(ShortcutKey[] shortcutKeys) {
 		this.shortcutKeys = shortcutKeys;
+	}
+
+	public void setTopWindow(Window window) {
+		topWindow = window;
+		if (topWindow != null) {
+			setTitle(window.getName() + " - " + getAppWindowTitle());
+		} else {
+			UIEnvironment.getInstance().restoreDefaultTitle();
+		}
 	}
 
 	/**
@@ -758,6 +776,57 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
+	 * Show shortcut keys
+	 * 
+	 * @author Shu Wu
+	 */
+	/**
+	 * Action to show the 'about' dialog
+	 * 
+	 * @author Shu Wu
+	 */
+	class ShortcutKeysHelpAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ShortcutKeysHelpAction(String actionName) {
+			super("Short shortcut keys", actionName);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			StringBuilder shortcutKeysString = new StringBuilder(400);
+
+			shortcutKeysString.append("<h3>" + getAppName() + " Shortcuts</h3>");
+			if (getShortcutKeys().length == 0) {
+				shortcutKeysString.append("No shortcuts available");
+			} else {
+				for (ShortcutKey shortcutKey : getShortcutKeys()) {
+					if ((shortcutKey.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+						shortcutKeysString.append("CTRL ");
+					}
+					if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
+						shortcutKeysString.append("ALT ");
+					}
+					if ((shortcutKey.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
+						shortcutKeysString.append("SHIFT ");
+					}
+
+					shortcutKeysString.append((char) shortcutKey.getKeyCode());
+					shortcutKeysString.append(" >> ");
+					shortcutKeysString.append(shortcutKey.getAction().getDescription());
+					shortcutKeysString.append("<br>");
+				}
+			}
+
+			JLabel editor = new JLabel("<html>" + shortcutKeysString.toString() + "</html>");
+			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "Shortcuts - "
+					+ getAppName(), JOptionPane.PLAIN_MESSAGE);
+		}
+
+	}
+
+	/**
 	 * Action to enable the printing of memory usage messages to the console
 	 * 
 	 * @author Shu Wu
@@ -816,57 +885,6 @@ public abstract class AppFrame extends JFrame {
 		protected void action() throws ActionException {
 			universe.setSelectionMode(true);
 			updateWorldMenu();
-		}
-
-	}
-
-	/**
-	 * Show shortcut keys
-	 * 
-	 * @author Shu Wu
-	 */
-	/**
-	 * Action to show the 'about' dialog
-	 * 
-	 * @author Shu Wu
-	 */
-	class ShortcutKeysHelpAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ShortcutKeysHelpAction(String actionName) {
-			super("Short shortcut keys", actionName);
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			StringBuilder shortcutKeysString = new StringBuilder(400);
-
-			shortcutKeysString.append("<h3>" + getAppName() + " Shortcuts</h3>");
-			if (getShortcutKeys().length == 0) {
-				shortcutKeysString.append("No shortcuts available");
-			} else {
-				for (ShortcutKey shortcutKey : getShortcutKeys()) {
-					if ((shortcutKey.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
-						shortcutKeysString.append("CTRL ");
-					}
-					if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
-						shortcutKeysString.append("ALT ");
-					}
-					if ((shortcutKey.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-						shortcutKeysString.append("SHIFT ");
-					}
-
-					shortcutKeysString.append((char) shortcutKey.getKeyCode());
-					shortcutKeysString.append(" >> ");
-					shortcutKeysString.append(shortcutKey.getAction().getDescription());
-					shortcutKeysString.append("<br>");
-				}
-			}
-
-			JLabel editor = new JLabel("<html>" + shortcutKeysString.toString() + "</html>");
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "Shortcuts - "
-					+ getAppName(), JOptionPane.PLAIN_MESSAGE);
 		}
 
 	}

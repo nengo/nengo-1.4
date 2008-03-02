@@ -27,8 +27,10 @@ import ca.neo.model.Termination;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.neuron.Neuron;
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.actions.AddProbeAction;
+import ca.neo.ui.actions.CopyAction;
+import ca.neo.ui.actions.CutAction;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UIFunctionInput;
@@ -66,7 +68,6 @@ import ca.shu.ui.lib.world.piccolo.WorldImpl;
  * @author Shu
  */
 public abstract class UINeoNode extends UINeoModel {
-
 	/**
 	 * Factory method which creates a Node UI object around a Node
 	 * 
@@ -176,6 +177,9 @@ public abstract class UINeoNode extends UINeoModel {
 	@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
+
+		menu.addAction(new CopyAction("Copy", this));
+		menu.addAction(new CutAction("Cut", this));
 
 		menu.addSection("File");
 		menu.addAction(new SaveNodeAction(this));
@@ -341,7 +345,7 @@ public abstract class UINeoNode extends UINeoModel {
 	 * @return The default file name for this node
 	 */
 	public String getFileName() {
-		return this.getName() + "." + NeoGraphics.NEONODE_FILE_EXTENSION;
+		return this.getName() + "." + NengoGraphics.NEONODE_FILE_EXTENSION;
 	}
 
 	@Override
@@ -618,7 +622,6 @@ public abstract class UINeoNode extends UINeoModel {
 		return terminations;
 	}
 
-
 	public Collection<UIOrigin> getVisibleOrigins() {
 		LinkedList<UIOrigin> origins = new LinkedList<UIOrigin>();
 
@@ -630,7 +633,6 @@ public abstract class UINeoNode extends UINeoModel {
 		return origins;
 	}
 
-	
 	/**
 	 * @param layoutName
 	 *            Name of an Termination on the Node model
@@ -671,7 +673,7 @@ public abstract class UINeoNode extends UINeoModel {
 					public void run() {
 						modelUpdatePending = false;
 						firePropertyChange(Property.MODEL_CHANGED);
-						modelUpdated();						
+						modelUpdated();
 					}
 				});
 			}

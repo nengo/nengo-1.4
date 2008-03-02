@@ -6,7 +6,7 @@ import ca.neo.model.SimulationException;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.SimulatorEvent;
 import ca.neo.sim.SimulatorListener;
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
@@ -136,13 +136,13 @@ public class RunSimulatorAction extends StandardAction {
 					simulator.removeSimulatorListener(this);
 				}
 
-				((NeoGraphics) (UIEnvironment.getInstance())).captureInDataViewer(uiNetwork
+				((NengoGraphics) (UIEnvironment.getInstance())).captureInDataViewer(uiNetwork
 						.getModel());
 
 				if (showDataViewer) {
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							((NeoGraphics) (UIEnvironment.getInstance()))
+							((NengoGraphics) (UIEnvironment.getInstance()))
 									.setDataViewerVisible(true);
 						}
 					});

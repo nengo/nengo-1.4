@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import javax.swing.JPopupMenu;
 
@@ -41,22 +40,6 @@ public class Window extends WorldObjectImpl implements Interactable {
 	private static final long serialVersionUID = 1L;
 
 	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.NORMAL;
-
-	/**
-	 * Updates the application title with the top window
-	 */
-	public static void updateAppTitle() {
-		List<Window> windows = UIEnvironment.getInstance().getUniverse().getWorldWindows();
-
-		if (windows.size() > 0) {
-			UIEnvironment.getInstance().setTitle(
-					windows.get(windows.size() - 1).getName() + " - "
-							+ UIEnvironment.getInstance().getAppWindowTitle());
-		} else {
-			UIEnvironment.getInstance().restoreDefaultTitle();
-		}
-
-	}
 
 	private final MenuBar menubar;
 
@@ -212,7 +195,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 			setChildrenPickable(true);
 			setPickable(true);
 		}
-		updateAppTitle();
+
 		layoutChildren();
 	}
 
@@ -241,8 +224,8 @@ public class Window extends WorldObjectImpl implements Interactable {
 	}
 
 	public JPopupMenu getContextMenu() {
-		if (getWindowContent() instanceof Interactable) {
-			return ((Interactable) (getWindowContent())).getContextMenu();
+		if (getContents() instanceof Interactable) {
+			return ((Interactable) (getContents())).getContextMenu();
 		}
 		return null;
 	}
@@ -255,7 +238,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 	/**
 	 * @return Node representing the contents of the Window
 	 */
-	public WorldObject getWindowContent() {
+	public WorldObject getContents() {
 		return myContent;
 	}
 
@@ -352,7 +335,7 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 		addInputEventListener(this);
 		rectangle = Path.createRectangle(0, 0, 1, 1);
 		rectangle.setPaint(Style.COLOR_BACKGROUND2);
-		
+
 		addChild(rectangle);
 
 		title = new Text(myWindow.getName());

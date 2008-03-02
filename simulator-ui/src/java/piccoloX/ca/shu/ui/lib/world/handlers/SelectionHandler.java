@@ -88,7 +88,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 	public static void singleObjectSelected(WorldObject obj) {
 		for (SelectionListener listener : selectionListeners) {
-			listener.singleObjectSelected(obj);
+			listener.objectFocused(obj);
 		}
 	}
 	private HashMap<WorldObjectImpl, Boolean> allItems = null; // Used within
@@ -712,7 +712,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 
 	public static interface SelectionListener {
-		public void singleObjectSelected(WorldObject obj);
+		public void objectFocused(WorldObject obj);
 	}
 
 }

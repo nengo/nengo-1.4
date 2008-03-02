@@ -15,7 +15,7 @@ import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.util.Probe;
 import ca.shu.ui.lib.util.Util;
@@ -30,7 +30,7 @@ public class IntegratorExample {
 
 	private UINetwork network;
 
-	public void createUINetwork(NeoGraphics neoGraphics) throws StructuralException,
+	public void createUINetwork(NengoGraphics neoGraphics) throws StructuralException,
 			SimulationException {
 
 		network = new UINetwork(new NetworkImpl());
@@ -164,7 +164,7 @@ public class IntegratorExample {
 		SwingUtilities.invokeAndWait(new Runnable() {
 			public void run() {
 				try {
-					createUINetwork(new NeoGraphics());
+					createUINetwork(new NengoGraphics());
 				} catch (StructuralException e) {
 					e.printStackTrace();
 				} catch (SimulationException e) {

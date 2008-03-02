@@ -1,12 +1,12 @@
 package ca.neo.ui.util;
 
 import ca.neo.model.Node;
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 
 public class ScriptWorldWrapper {
-	private NeoGraphics neoGraphics;
+	private NengoGraphics neoGraphics;
 	
-	public ScriptWorldWrapper(NeoGraphics neoGraphics) {
+	public ScriptWorldWrapper(NengoGraphics neoGraphics) {
 		super();
 		this.neoGraphics = neoGraphics;
 	}

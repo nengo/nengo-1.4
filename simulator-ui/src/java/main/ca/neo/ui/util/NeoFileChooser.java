@@ -6,7 +6,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.shu.ui.lib.util.UIEnvironment;
 
 /**
@@ -85,7 +85,7 @@ class AllNeoFiles extends FileExtensionFilter {
 	@Override
 	public boolean acceptExtension(String str) {
 
-		return (str.equals(NeoGraphics.NEONODE_FILE_EXTENSION));
+		return (str.equals(NengoGraphics.NEONODE_FILE_EXTENSION));
 	}
 
 	@Override
@@ -104,7 +104,7 @@ class NodeFileFilter extends FileExtensionFilter {
 
 	@Override
 	public boolean acceptExtension(String str) {
-		return (str.equals(NeoGraphics.NEONODE_FILE_EXTENSION));
+		return (str.equals(NengoGraphics.NEONODE_FILE_EXTENSION));
 	}
 
 	@Override

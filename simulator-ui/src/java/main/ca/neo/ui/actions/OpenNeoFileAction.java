@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 
 import ca.neo.io.FileManager;
 import ca.neo.model.Node;
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.INodeContainer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -40,9 +40,9 @@ public class OpenNeoFileAction extends StandardAction {
 
 	@Override
 	protected void action() throws ActionException {
-		int response = NeoGraphics.FileChooser.showOpenDialog();
+		int response = NengoGraphics.FileChooser.showOpenDialog();
 		if (response == JFileChooser.APPROVE_OPTION) {
-			file = NeoGraphics.FileChooser.getSelectedFile();
+			file = NengoGraphics.FileChooser.getSelectedFile();
 
 			TrackedAction loadActivity = new TrackedAction("Loading network") {
 				private static final long serialVersionUID = 1L;

@@ -15,7 +15,7 @@ import java.io.ObjectOutputStream;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 
-import ca.neo.ui.NeoGraphics;
+import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertyDescriptor;
@@ -32,7 +32,7 @@ public abstract class ConfigManager {
 	/**
 	 * Name of directory where to store saved configuration
 	 */
-	static final String SAVED_CONFIG_DIR = NeoGraphics.USER_FILE_DIR
+	static final String SAVED_CONFIG_DIR = NengoGraphics.USER_FILE_DIR
 			+ "/Config";
 
 	/**
