@@ -13,7 +13,7 @@ public class CutAction extends CopyAction {
 	@Override
 	protected void processNodeUI(UINeoNode nodeUI) {
 		super.processNodeUI(nodeUI);
-		nodeUI.destroy();
+		nodeUI.destroyModel();
 	}
 
 }
