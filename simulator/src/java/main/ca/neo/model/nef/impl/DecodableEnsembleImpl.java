@@ -216,7 +216,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	 * @see ca.neo.model.Probeable#listStates()
 	 */
 	public Properties listStates() {
-		Properties result = new Properties();
+		Properties result = super.listStates();
 		
 		Iterator it = myDecodedOrigins.keySet().iterator();
 		while (it.hasNext()) {

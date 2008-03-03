@@ -7,14 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Origin;
 import ca.neo.model.Probeable;
+import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
+import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.BasicOrigin;
+import ca.neo.model.impl.RealOutputImpl;
+import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
@@ -157,6 +162,16 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		TimeSeries result = null;
 		if (stateName.equals("I")) {
 			result = myCurrent; 
+		} else if (stateName.equals("rate")) {
+			InstantaneousOutput output = mySpikeOrigin.getValues();
+			float[] times = myCurrent.getTimes();
+			float rate = 0;
+			if (output instanceof RealOutput) {
+				rate = ((RealOutput) output).getValues()[0];
+			} else if (output instanceof SpikeOutput) {
+				rate = ((SpikeOutput) output).getValues()[0] ? 1/(times[times.length-1]-times[0]) : 0;
+			}
+			result = new TimeSeries1DImpl(new float[]{times[times.length-1]}, new float[]{rate}, Units.SPIKES_PER_S);				
 		} else if (stateName.equals(CURRENT)) {
 			float[] times = myCurrent.getTimes();
 			result = new TimeSeries1DImpl(new float[]{times[times.length-1]}, new float[]{myUnscaledCurrent}, Units.ACU);
@@ -174,6 +189,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public Properties listStates() {
 		Properties p = (myGenerator instanceof Probeable) ? ((Probeable) myGenerator).listStates() : new Properties();
 		p.setProperty("I", "Net current (arbitrary units)");
+		p.setProperty("rate", "Firing rate");
 		return p;
 	}
 
