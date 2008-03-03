@@ -61,7 +61,8 @@ public class MouseHandler extends PBasicInputEventHandler {
 	 * @return Interactable object
 	 */
 	private Interactable getInteractableFromEvent(PInputEvent event) {
-		Interactable obj = (Interactable) Util.getNodeFromPickPath(event, Interactable.class);
+		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
+				Interactable.class);
 
 		if (obj == null || !world.isAncestorOf(obj)) {
 			return null;
@@ -76,8 +77,8 @@ public class MouseHandler extends PBasicInputEventHandler {
 	 */
 	private boolean maybeTriggerPopup(PInputEvent event) {
 		if (event.isPopupTrigger()) {
-			Util.debugMsg("Context Menu: Popup Trigger detected");
-			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
+			JPopupMenu menuToShow = world
+					.getSelectionMenu(world.getSelection());
 
 			if (menuToShow == null && (interactableObj != null)
 					&& (interactableObj == getInteractableFromEvent(event))) {
@@ -85,13 +86,11 @@ public class MouseHandler extends PBasicInputEventHandler {
 			}
 
 			if (menuToShow != null) {
-				Util.debugMsg("Context Menu: shown");
 				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
 
-				menuToShow.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+				menuToShow.show(e.getComponent(), e.getPoint().x,
+						e.getPoint().y);
 				menuToShow.setVisible(true);
-			} else {
-				Util.debugMsg("Context Menu: Unable to find menu to show");
 			}
 			return true;
 		}
@@ -106,7 +105,8 @@ public class MouseHandler extends PBasicInputEventHandler {
 			while (node != null) {
 				if (node instanceof PiccoloNodeInWorld) {
 
-					WorldObject wo = ((PiccoloNodeInWorld) node).getWorldObject();
+					WorldObject wo = ((PiccoloNodeInWorld) node)
+							.getWorldObject();
 
 					if (wo.isSelectable()) {
 						wo.doubleClicked();
@@ -131,7 +131,8 @@ public class MouseHandler extends PBasicInputEventHandler {
 		 * Show cursor and frame around interactable objects NOTE: Do not show
 		 * cursor and frame around Windows or Worlds
 		 */
-		if (obj == null || (obj instanceof Window) || (obj instanceof WorldImpl)) {
+		if (obj == null || (obj instanceof Window)
+				|| (obj instanceof WorldImpl)) {
 			if (handCursorShown) {
 				handCursorShown = false;
 				event.getComponent().popCursor();

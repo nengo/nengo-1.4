@@ -4,6 +4,8 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
+import ca.shu.ui.lib.exceptions.UIException;
+
 /**
  * Displays messages to the user through a popup dialog.
  * 
@@ -12,6 +14,29 @@ import javax.swing.JOptionPane;
 public class UserMessages {
 	public static void showError(String msg) {
 		showError(msg, UIEnvironment.getInstance());
+	}
+
+	public static String askDialog(String dialogMessage) throws DialogException {
+		String userName = JOptionPane.showInputDialog(UIEnvironment
+				.getInstance(), dialogMessage);
+
+		if (userName == null || userName.compareTo("") == 0) {
+			throw new DialogException();
+		}
+		return userName;
+	}
+
+	public static class DialogException extends UIException {
+
+		private static final long serialVersionUID = 1L;
+
+		public DialogException() {
+			super("Dialog cancelled");
+		}
+
+		public DialogException(String arg0) {
+			super(arg0);
+		}
 	}
 
 	public static void showError(String msg, Component parent) {
