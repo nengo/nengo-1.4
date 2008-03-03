@@ -206,6 +206,10 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public Termination addDecodedTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory) 
 			throws StructuralException {
 		
+		if (myDecodedTerminations.containsKey(name)) {
+			throw new StructuralException("The ensemble already contains a termination named " + name);
+		}
+		
 		float scale = 1 / tauPSC; //output scaling to make impulse integral = 1
 
 		LinearSystem dynamics = new SimpleLTISystem(
