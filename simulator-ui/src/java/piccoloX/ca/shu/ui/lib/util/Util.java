@@ -103,11 +103,19 @@ public class Util {
 		}
 
 		if (noHTMLString.length() > maxLength) {
-			noHTMLString = noHTMLString.substring(0, noHTMLString.length() - 3) + "...";
+			noHTMLString = noHTMLString.substring(0, maxLength - 3) + "...";
 
 		}
 		return noHTMLString;
 
+	}
+
+	public static void sleep(long time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static Object cloneSerializable(Serializable obj) {

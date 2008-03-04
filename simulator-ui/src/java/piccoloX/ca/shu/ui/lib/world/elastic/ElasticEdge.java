@@ -28,4 +28,8 @@ public class ElasticEdge extends PXEdge {
 		return length;
 	}
 
+	public void setLength(double length) {
+		this.length = length;
+	}
+
 }

@@ -80,17 +80,21 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	final static int DASH_WIDTH = 5;
 	final static int NUM_STROKES = 10;
+
 	public static void addSelectionListener(SelectionListener listener) {
 		selectionListeners.add(listener);
 	}
+
 	public static void removeSelectionListener(SelectionListener listener) {
 		selectionListeners.remove(listener);
 	}
+
 	public static void singleObjectSelected(WorldObject obj) {
 		for (SelectionListener listener : selectionListeners) {
 			listener.objectFocused(obj);
 		}
 	}
+
 	private HashMap<WorldObjectImpl, Boolean> allItems = null; // Used within
 	// drag
 	private Point2D canvasPressPt = null;
@@ -280,7 +284,8 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 					PDimension gDist = new PDimension();
 					gDist.setSize(d);
 
-					node.getParent().globalToLocal(gDist);
+					node.localToParent(node.globalToLocal(gDist));
+
 					node.dragOffset(gDist.getWidth(), gDist.getHeight());
 				}
 			}

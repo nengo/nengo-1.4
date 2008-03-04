@@ -53,6 +53,29 @@ public class ElasticGround extends WorldGroundImpl {
 		});
 	}
 
+	public void modifyEdgeDistances(ElasticObject obj, double delta) {
+		for (PXEdge edge : getEdges()) {
+			if (edge instanceof ElasticEdge) {
+				ElasticEdge elasticEdge = (ElasticEdge) edge;
+
+				if (obj == elasticEdge.getStartNode() || obj == elasticEdge.getEndNode()) {
+
+					double distance = elasticEdge.getLength() + delta;
+
+					if (distance < 100) {
+						distance = 100;
+					}
+
+					elasticEdge.setLength(distance);
+
+				}
+
+			}
+
+		}
+
+	}
+
 	@Override
 	protected void prepareForDestroy() {
 		setElasticEnabled(false);
@@ -263,9 +286,9 @@ public class ElasticGround extends WorldGroundImpl {
 	 */
 	public UpdateGraphResult updateGraph() {
 
-		boolean changed = false;
+		boolean graphChanged = false;
 		if (myGraph == null) {
-			changed = true;
+			graphChanged = true;
 			childrenUpdatedFlag = true;
 			myGraph = new SparseGraph();
 		}
@@ -285,7 +308,7 @@ public class ElasticGround extends WorldGroundImpl {
 					myVertexMap.put(obj, vertex);
 					addedVertexes.add(vertex);
 
-					changed = true;
+					graphChanged = true;
 				}
 			}
 
@@ -302,7 +325,7 @@ public class ElasticGround extends WorldGroundImpl {
 			for (ElasticObject elasticObj : elasticObjToRemove) {
 				myGraph.removeVertex(myVertexMap.get(elasticObj));
 				myVertexMap.remove(elasticObj);
-				changed = true;
+				graphChanged = true;
 			}
 		}
 
@@ -360,15 +383,26 @@ public class ElasticGround extends WorldGroundImpl {
 					boolean createJungEdge = false;
 					if (jungEdge != null) {
 						// find if an existing edge has changed
-						if (jungEdge.getEndpoints().getFirst() != startVertex
-								|| jungEdge.getEndpoints().getSecond() != endVertex) {
+						boolean edgeChanged = false;
 
+						if (uiEdge instanceof ElasticEdge) {
+							Double length = (Double) jungEdge.getUserDatum(ELASTIC_LENGTH_KEY);
+							if (length != ((ElasticEdge) uiEdge).getLength()) {
+								edgeChanged = true;
+							}
+						} else if (jungEdge.getEndpoints().getFirst() != startVertex
+								|| jungEdge.getEndpoints().getSecond() != endVertex) {
+							edgeChanged = true;
+						}
+
+						if (edgeChanged) {
 							myEdgeMap.remove(uiEdge);
 							myGraph.removeEdge(jungEdge);
-							changed = true;
+							graphChanged = true;
 
 							// try to add the new changed one
 							createJungEdge = true;
+
 						}
 
 					} else {
@@ -391,7 +425,7 @@ public class ElasticGround extends WorldGroundImpl {
 
 							myGraph.addEdge(jungEdge);
 
-							changed = true;
+							graphChanged = true;
 						}
 					}
 
@@ -412,7 +446,7 @@ public class ElasticGround extends WorldGroundImpl {
 		}
 		for (PXEdge uiEdge : edgesToRemove) {
 			AbstractSparseEdge jungEdge = myEdgeMap.get(uiEdge);
-			changed = true;
+			graphChanged = true;
 			// have to check if the edge is still there because it might have
 			// been removed when the vertice was removed
 			if (myGraph.getEdges().contains(jungEdge)) {
@@ -422,7 +456,7 @@ public class ElasticGround extends WorldGroundImpl {
 		}
 
 		// Return whether the graph changed
-		return new UpdateGraphResult(changed, addedVertexes);
+		return new UpdateGraphResult(graphChanged, addedVertexes);
 
 	}
 

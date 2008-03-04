@@ -199,9 +199,9 @@ public class WorldObjectImpl implements WorldObject {
 
 	}
 
-//	public boolean addActivity(PActivity arg0) {
-//		return myPNode.addActivity(arg0);
-//	}
+	// public boolean addActivity(PActivity arg0) {
+	// return myPNode.addActivity(arg0);
+	// }
 
 	public void addChild(WorldObject wo) {
 		addChild(wo, -1);
@@ -353,9 +353,11 @@ public class WorldObjectImpl implements WorldObject {
 	}
 
 	public void dragOffset(double dx, double dy) {
-		Point2D offset = getOffset();
-		offset.setLocation(offset.getX() + dx, offset.getY() + dy);
-		setOffset(offset);
+		if (isDraggable()) {
+			Point2D offset = getOffset();
+			offset.setLocation(offset.getX() + dx, offset.getY() + dy);
+			setOffset(offset);
+		}
 	}
 
 	public Collection<WorldObject> findIntersectingNodes(Rectangle2D fullBounds) {
@@ -893,6 +895,23 @@ public class WorldObjectImpl implements WorldObject {
 		public Listener getListener() {
 			return listener;
 		}
+	}
+
+	private boolean draggable = true;
+
+	@Override
+	public boolean isDraggable() {
+		return draggable;
+	}
+
+	@Override
+	public void setDraggable(boolean draggable) {
+		this.draggable = draggable;
+	}
+
+	@Override
+	public Dimension2D localToParent(Dimension2D localRectangle) {
+		return myPNode.localToParent(localRectangle);
 	}
 
 }

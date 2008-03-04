@@ -1,5 +1,6 @@
 package ca.shu.ui.lib.world.piccolo;
 
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.security.InvalidParameterException;
@@ -148,6 +149,11 @@ public class WorldGroundImpl extends WorldLayerImpl implements WorldLayer {
 
 	public static interface ChildFilter {
 		public boolean acceptChild(WorldObject obj);
+	}
+
+	@Override
+	public Dimension2D localToParent(Dimension2D localRectangle) {
+		return getPiccolo().localToParent(localRectangle);
 	}
 }
 

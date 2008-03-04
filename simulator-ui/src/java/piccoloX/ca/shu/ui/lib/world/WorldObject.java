@@ -10,6 +10,10 @@ import edu.umd.cs.piccolo.activities.PInterpolatingActivity;
 
 public interface WorldObject extends NamedObject, Destroyable {
 
+	public boolean isDraggable();
+
+	public void setDraggable(boolean draggable);
+
 	public void addChild(WorldObject wo);
 
 	public void addChildrenListener(ChildListener listener);
@@ -32,8 +36,8 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 *            amount of time that the animation should take
 	 * @return the newly scheduled activity
 	 */
-	public PInterpolatingActivity animateToBounds(double x, double y, double width, double height,
-			long duration);
+	public PInterpolatingActivity animateToBounds(double x, double y,
+			double width, double height, long duration);
 
 	public void animateToPosition(double x, double y, long duration);
 
@@ -53,8 +57,8 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 *            final theta value (in radians) for the animation
 	 * @return the newly scheduled activity
 	 */
-	public void animateToPositionScaleRotation(double x, double y, double scale, double theta,
-			long duration);
+	public void animateToPositionScaleRotation(double x, double y,
+			double scale, double theta, long duration);
 
 	/**
 	 * @param scale
@@ -313,6 +317,8 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 * @return rectangle in parent's local coordinate system
 	 */
 	public Rectangle2D localToParent(Rectangle2D localRectangle);
+	
+	public Dimension2D localToParent(Dimension2D localRectangle);
 
 	/**
 	 * Change the order of this node in its parent's children list so that it

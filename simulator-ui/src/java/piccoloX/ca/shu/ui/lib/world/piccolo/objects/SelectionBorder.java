@@ -35,7 +35,6 @@ public class SelectionBorder implements Listener {
 	public SelectionBorder(World world) {
 		super();
 		init(world);
-
 	}
 
 	/**
@@ -72,11 +71,10 @@ public class SelectionBorder implements Listener {
 	protected void updateBounds() {
 		if (selectedObj != null) {
 			if (selectedObj.getVisible()) {
-				Rectangle2D bounds = selectedObj.objectToSky(selectedObj
-						.getBounds());
+				Rectangle2D bounds = selectedObj.objectToSky(selectedObj.getBounds());
 
-				frame.setBounds((float) bounds.getX(), (float) bounds.getY(),
-						(float) bounds.getWidth(), (float) bounds.getHeight());
+				frame.setBounds((float) bounds.getX(), (float) bounds.getY(), (float) bounds
+						.getWidth(), (float) bounds.getHeight());
 				frame.setPaint(null);
 				frame.setStrokePaint(frameColor);
 				frame.setVisible(true);
@@ -91,12 +89,19 @@ public class SelectionBorder implements Listener {
 	public void destroy() {
 		setSelected(null);
 
-		frameHolder
-				.removePropertyChangeListener(Property.VIEW_TRANSFORM, this);
+		frameHolder.removePropertyChangeListener(Property.VIEW_TRANSFORM, this);
 	}
 
 	public Color getFrameColor() {
 		return frameColor;
+	}
+
+	public void propertyChanged(Property event) {
+		if (event == Property.REMOVED_FROM_WORLD) {
+			setSelected(null);
+		}
+		updateBounds();
+
 	}
 
 	public void setFrameColor(Color frameColor) {
@@ -110,20 +115,16 @@ public class SelectionBorder implements Listener {
 		}
 
 		if (selectedObj != null) {
-			selectedObj.removePropertyChangeListener(Property.GLOBAL_BOUNDS,
-					this);
-			selectedObj.removePropertyChangeListener(
-					Property.REMOVED_FROM_WORLD, this);
+			selectedObj.removePropertyChangeListener(Property.GLOBAL_BOUNDS, this);
+			selectedObj.removePropertyChangeListener(Property.REMOVED_FROM_WORLD, this);
 			selectedObj = null;
 		}
 
 		selectedObj = newSelected;
 		if (selectedObj != null) {
 
-			selectedObj
-					.addPropertyChangeListener(Property.GLOBAL_BOUNDS, this);
-			selectedObj.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
-					this);
+			selectedObj.addPropertyChangeListener(Property.GLOBAL_BOUNDS, this);
+			selectedObj.addPropertyChangeListener(Property.REMOVED_FROM_WORLD, this);
 
 			frameHolder.addChild(frame);
 			updateBounds();
@@ -131,14 +132,6 @@ public class SelectionBorder implements Listener {
 
 			frame.removeFromParent();
 		}
-
-	}
-
-	public void propertyChanged(Property event) {
-		if (event == Property.REMOVED_FROM_WORLD) {
-			setSelected(null);
-		}
-		updateBounds();
 
 	}
 
