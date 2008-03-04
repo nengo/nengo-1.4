@@ -277,8 +277,14 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 							+ getName());
 				}
 			} else {
-				Util.Assert(false,
-						"Could not find a Origin or Termination attached to a projection");
+				if (nodeOrigin == null) {
+					Util.Assert(false, "Could not find a Origin attached to a projection: "
+							+ origin.getNode().getName());
+				}
+				if (nodeTerm == null) {
+					Util.Assert(false, "Could not find a Termination attached to a projection: "
+							+ term.getNode().getName());
+				}
 			}
 
 		}
