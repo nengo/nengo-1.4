@@ -65,6 +65,7 @@ public class OpenNeoFileAction extends StandardAction {
 					} catch (IOException e) {
 						UserMessages.showError("IO Exception loading file");
 					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
 						UserMessages.showError("Class not found");
 					} catch (ClassCastException e) {
 						UserMessages.showError("Incorrect file version");
