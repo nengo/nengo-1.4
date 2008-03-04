@@ -267,12 +267,18 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 
 			UINeoNode nodeTerm = getUINode(term.getNode());
 
-			UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
-			UITermination termUI = nodeTerm.showTermination(term.getName());
+			if (nodeOrigin != null && nodeTerm != null) {
+				UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
+				UITermination termUI = nodeTerm.showTermination(term.getName());
 
-			originUI.connectTo(termUI, false);
-			if (!isFirstUpdate) {
-				termUI.showPopupMessage("NEW Projection to " + termUI.getName() + "." + getName());
+				originUI.connectTo(termUI, false);
+				if (!isFirstUpdate) {
+					termUI.showPopupMessage("NEW Projection to " + termUI.getName() + "."
+							+ getName());
+				}
+			} else {
+				Util.Assert(false,
+						"Could not find a Origin or Termination attached to a projection");
 			}
 
 		}
