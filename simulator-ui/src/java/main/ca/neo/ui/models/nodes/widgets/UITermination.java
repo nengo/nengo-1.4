@@ -67,7 +67,7 @@ public class UITermination extends Widget implements ILineTermination {
 	 * @return true is successfully connected
 	 */
 	protected boolean connect(UIOrigin source, boolean modifyModel) {
-		if (isConnected()) {
+		if (getConnector() != null) {
 			/*
 			 * Cannot connect if already connected
 			 */
@@ -155,18 +155,20 @@ public class UITermination extends Widget implements ILineTermination {
 	 * @return True if successful
 	 */
 	public void disconnect() {
-		if (!isConnected()) {
-			Util.debugMsg("Tryng to disconnect termination which isn't connected");
-			return;
-		}
-
-		try {
-			getNodeParent().getNetworkParent().getModel().removeProjection(getModel());
-			getNodeParent().showPopupMessage(
-					"REMOVED Projection to " + getNodeParent().getName() + "." + getName());
-
-		} catch (StructuralException e) {
-			UserMessages.showWarning("Problem trying to disconnect: " + e.toString());
+		if (getConnector() != null) {
+			try {
+				getNodeParent().getNetworkParent().getModel().removeProjection(getModel());
+				getNodeParent().showPopupMessage(
+						"REMOVED Projection to " + getNodeParent().getName() + "." + getName());
+				
+				getConnector().destroy();
+			} catch (StructuralException e) {
+				UserMessages.showWarning("Problem trying to disconnect: " + e.toString());
+			}
+		} else {
+			/*
+			 * Not connected
+			 */
 		}
 	}
 
@@ -202,10 +204,6 @@ public class UITermination extends Widget implements ILineTermination {
 	 */
 	public float[][] getWeights() {
 		return (float[][]) getModel().getConfiguration().getProperty(Termination.WEIGHTS);
-	}
-
-	public boolean isConnected() {
-		return (getConnector() != null);
 	}
 
 	@Override

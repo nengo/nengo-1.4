@@ -80,6 +80,8 @@ public class WorldObjectImpl implements WorldObject {
 
 	private HashSet<ChildListener> childListeners = new HashSet<ChildListener>();
 
+	private boolean draggable = true;
+
 	private Hashtable<Property, Hashtable<Listener, ListenerAdapter>> eventListenerMap;
 
 	/**
@@ -192,16 +194,16 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
+	// public boolean addActivity(PActivity arg0) {
+	// return myPNode.addActivity(arg0);
+	// }
+
 	/**
 	 * Perform any operations before being destroyed
 	 */
 	protected void prepareForDestroy() {
 
 	}
-
-	// public boolean addActivity(PActivity arg0) {
-	// return myPNode.addActivity(arg0);
-	// }
 
 	public void addChild(WorldObject wo) {
 		addChild(wo, -1);
@@ -546,6 +548,10 @@ public class WorldObjectImpl implements WorldObject {
 		return isDestroyed;
 	}
 
+	public boolean isDraggable() {
+		return draggable;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -574,6 +580,10 @@ public class WorldObjectImpl implements WorldObject {
 
 	public Rectangle2D localToGlobal(Rectangle2D arg0) {
 		return myPNode.localToGlobal(arg0);
+	}
+
+	public Dimension2D localToParent(Dimension2D localRectangle) {
+		return myPNode.localToParent(localRectangle);
 	}
 
 	public Point2D localToParent(Point2D localPoint) {
@@ -754,6 +764,10 @@ public class WorldObjectImpl implements WorldObject {
 
 	}
 
+	public void setDraggable(boolean draggable) {
+		this.draggable = draggable;
+	}
+
 	public boolean setHeight(double height) {
 		return myPNode.setHeight(height);
 	}
@@ -895,23 +909,6 @@ public class WorldObjectImpl implements WorldObject {
 		public Listener getListener() {
 			return listener;
 		}
-	}
-
-	private boolean draggable = true;
-
-	@Override
-	public boolean isDraggable() {
-		return draggable;
-	}
-
-	@Override
-	public void setDraggable(boolean draggable) {
-		this.draggable = draggable;
-	}
-
-	@Override
-	public Dimension2D localToParent(Dimension2D localRectangle) {
-		return myPNode.localToParent(localRectangle);
 	}
 
 }

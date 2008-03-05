@@ -1,8 +1,10 @@
 *******************************************
  Done
 *******************************************
-03/01/2008 - Popup check in mousePressed(), before it was checked in mouseReleased() only.
+03/05/2008 - Terminations and origins are removed from the UI on VisiblyMutable event
+03/05/2008 - Fixed bug where a removing a node with a recursive connection caused an exception
 
+03/01/2008 - Popup check in mousePressed(), before it was checked in mouseReleased() only.
 03/01/2008 - Mock copy & paste functionality added
 03/01/2008 - Added accelorator keys for Menu items
 03/01/2008 - Renamed NeoGraphics class to NengoGraphics
@@ -12,6 +14,8 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+GetTermination(String) and GetTerminations() work on different sets for NEFEnsembleImpl
+
 Copy & Paste
 	Add paste action to NetworkViewer
 	Shortcut keys 

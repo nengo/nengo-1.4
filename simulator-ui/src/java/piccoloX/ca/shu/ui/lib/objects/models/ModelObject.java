@@ -120,7 +120,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	}
 
 	/**
-	 * Updatesthe UI from the model
+	 * Updates the UI from the model
 	 */
 	protected void modelUpdated() {
 

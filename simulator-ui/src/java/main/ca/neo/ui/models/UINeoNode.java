@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
@@ -54,6 +55,7 @@ import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.objects.activities.TransientStatusMessage;
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
@@ -303,7 +305,8 @@ public abstract class UINeoNode extends UINeoModel {
 
 		for (WorldObject wo : getChildren()) {
 			if (wo instanceof UITermination) {
-				((UITermination) wo).disconnect();
+				UITermination term = (UITermination)wo;
+				term .disconnect();
 			}
 		}
 
@@ -673,10 +676,50 @@ public abstract class UINeoNode extends UINeoModel {
 					public void run() {
 						modelUpdatePending = false;
 						firePropertyChange(Property.MODEL_CHANGED);
-						modelUpdated();
+						if (getModel() != null) {
+							modelUpdated();
+						}
 					}
 				});
 			}
+		}
+	}
+
+	@Override
+	protected void modelUpdated() {
+		super.modelUpdated();
+
+		Origin[] modelOrigins = getModel().getOrigins();
+		HashSet<Origin> modelOriginSet = new HashSet<Origin>(modelOrigins.length);
+		for (Origin origin : modelOrigins) {
+			modelOriginSet.add(origin);
+		}
+
+		Termination[] modelTerminations = getModel().getTerminations();
+		HashSet<Termination> modelTerminationSet = new HashSet<Termination>(
+				modelTerminations.length);
+		for (Termination term : modelTerminations) {
+			modelTerminationSet.add(term);
+		}
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof ModelObject) {
+				Object model = ((ModelObject) wo).getModel();
+
+				if (model instanceof Termination) {
+					if (!modelTerminationSet.contains(model)) {
+						wo.destroy();
+						this.showPopupMessage("Termination removed: " + wo.getName());
+					}
+				}
+				if (wo instanceof Origin) {
+					if (!modelOriginSet.contains(model)) {
+						wo.destroy();
+						this.showPopupMessage("Origin removed: " + wo.getName());
+					}
+				}
+			}
+
 		}
 	}
 

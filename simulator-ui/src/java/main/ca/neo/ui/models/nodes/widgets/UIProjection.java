@@ -42,29 +42,6 @@ public class UIProjection extends LineConnector {
 	}
 
 	@Override
-	protected boolean canConnectTo(ILineTermination target) {
-		if ((target instanceof UITermination)) {
-			if (!((UITermination) target).isModelBusy()) {
-				return true;
-			} else {
-				return false;
-			}
-		} else
-			return false;
-
-	}
-
-	@Override
-	protected void connectToTermination() {
-		/*
-		 * Detect recurrent connections
-		 */
-		if ((getTermination()).getNodeParent() == getOriginUI().getNodeParent()) {
-			setRecursive(true);
-		}
-	}
-
-	@Override
 	protected void disconnectFromTermination() {
 		if (getTermination() != null) {
 			setRecursive(false);
@@ -78,7 +55,17 @@ public class UIProjection extends LineConnector {
 			return false;
 		}
 
-		if (((UITermination) target).connect(getOriginUI(), modifyModel)) {
+		UITermination term = ((UITermination) target);
+
+		if (term.isModelBusy()) {
+			return false;
+		}
+
+		if (term.connect(getOriginUI(), modifyModel)) {
+			if (term.getNodeParent() == getOriginUI().getNodeParent()) {
+				setRecursive(true);
+			}
+
 			return true;
 		} else {
 			return false;

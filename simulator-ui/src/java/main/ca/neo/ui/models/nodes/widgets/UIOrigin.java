@@ -118,7 +118,10 @@ public class UIOrigin extends Widget {
 		}
 
 		UIProjection lineEnd = lineWell.createProjection();
-		lineEnd.connectTo(term, modifyModel);
+
+		if (!lineEnd.tryConnectTo(term, modifyModel)) {
+			UserMessages.showWarning("Could not connect");
+		}
 	}
 
 	public Color getColor() {

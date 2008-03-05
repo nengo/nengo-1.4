@@ -91,6 +91,7 @@ public class UIEnsemble extends NodeContainer {
 
 	@Override
 	public void modelUpdated() {
+		super.modelUpdated();
 		if (getModel().isCollectingSpikes()) {
 			collectSpikes(true);
 		}

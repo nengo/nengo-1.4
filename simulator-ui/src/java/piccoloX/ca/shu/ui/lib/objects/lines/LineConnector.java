@@ -1,6 +1,5 @@
 package ca.shu.ui.lib.objects.lines;
 
-import java.awt.geom.Point2D;
 import java.util.Collection;
 
 import javax.swing.JPopupMenu;
@@ -8,7 +7,6 @@ import javax.swing.JPopupMenu;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.DroppableX;
 import ca.shu.ui.lib.world.Interactable;
@@ -57,7 +55,10 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 
 	}
 
-	private boolean tryConnectTo(ILineTermination newTermination, boolean modifyModel) {
+	public boolean tryConnectTo(ILineTermination newTermination, boolean modifyModel) {
+		if (getTermination() != null) {
+			return false;
+		}
 
 		if (newTermination != getTermination()) {
 
@@ -65,38 +66,24 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 				/*
 				 * There is already something connected to the termination
 				 */
-				newTermination = null;
-			} else if (canConnectTo(newTermination)) {
-				if (!initTarget(newTermination, modifyModel)) {
-					newTermination = null;
+			} else if (initTarget(newTermination, modifyModel)) {
+
+				if (getTermination() != null) {
+					disconnectFromTermination();
+					destroy();
+				} else {
+
 				}
+				this.setOffset(0, 0);
+				myTermination = newTermination;
+				((WorldObject) newTermination).addChild(this);
+
+				return true;
 			}
 		}
-		updateTermination(newTermination);
+		return false;
 
-		return (newTermination != null);
 	}
-
-	private void updateTermination(ILineTermination term) {
-		if (term != null) {
-			this.setOffset(0, 0);
-		}
-
-		if (term != myTermination) {
-			if (myTermination != null) {
-				disconnectFromTermination();
-			}
-
-			myTermination = term;
-
-			if (term != null) {
-				((WorldObject) term).addChild(this);
-				connectToTermination();
-			}
-		}
-	}
-
-	protected abstract boolean canConnectTo(ILineTermination termination);
 
 	protected PXEdge getEdge() {
 		return myEdge;
@@ -116,11 +103,6 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 	}
 
 	/**
-	 * Called when the LineEnd is first connected to a Line end holder
-	 */
-	protected abstract void connectToTermination();
-
-	/**
 	 * Called when the LineEnd is first disconnected from a Line end holder
 	 */
 	protected abstract void disconnectFromTermination();
@@ -131,28 +113,40 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 		myWell.removePropertyChangeListener(Property.REMOVED_FROM_WORLD, myDestroyListener);
 	}
 
-	/**
-	 * @param newTarget
-	 *            Target to connect to
-	 * @param modifyModel
-	 *            Whether to modify the model represented by the connection
-	 */
-	public void connectTo(ILineTermination newTarget, boolean modifyModel) {
-		boolean success = tryConnectTo(newTarget, modifyModel);
-
-		if (!success) {
-			UserMessages.showWarning("Could not connect");
-		}
-
-	}
-
 	public ILineTermination getTermination() {
 		return myTermination;
 	}
 
 	public void droppedOnTargets(Collection<WorldObject> targets) {
+
+		for (WorldObject target : targets) {
+			if (target == getTermination()) {
+				/*
+				 * Don't do anything if the target is the same, except move it
+				 * back into position
+				 */
+				this.setOffset(0, 0);
+				return;
+			}
+		}
 		boolean success = false;
 		boolean attemptedConnection = false;
+
+		/*
+		 * If already connected, destroy current connection and delegate the targets to a new
+		 * connector
+		 */
+		if (getTermination() != null) {
+			LineConnector newConnector = getWell().createProjection();
+			newConnector.setOffset(newConnector.localToParent(newConnector
+					.globalToLocal(localToGlobal(parentToLocal(getOffset())))));
+
+			disconnectFromTermination();
+			destroy();
+
+			newConnector.droppedOnTargets(targets);
+			return;
+		}
 
 		for (WorldObject target : targets) {
 			if (target == getWell()) {
@@ -162,28 +156,23 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 			}
 
 			if (target instanceof ILineTermination) {
-				if (canConnectTo((ILineTermination) target)) {
-					attemptedConnection = true;
-					success = tryConnectTo((ILineTermination) target, true);
-					if (success) {
-						break;
-					}
+				attemptedConnection = true;
+				if (tryConnectTo((ILineTermination) target, true)) {
+					success = true;
+					break;
 				}
 			}
-		}
-
-		if (!success) {
-			updateTermination(null);
-			Point2D position = myWell.globalToLocal(localToGlobal(new Point2D.Double(0, 0)));
-
-			setOffset(position);
-			myWell.addChild(this);
-
-			if (attemptedConnection) {
-				translate(-40, -20);
-			}
 
 		}
+
+		/*
+		 * If not successful and tried to connect, nudge the connector away to
+		 * indicate failure
+		 */
+		if (!success && attemptedConnection) {
+			translate(-40, -20);
+		}
+
 	}
 
 	/**
