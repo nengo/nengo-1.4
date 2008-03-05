@@ -18,6 +18,7 @@ import ca.neo.model.Units;
 import ca.neo.model.impl.LinearExponentialTermination;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.neuron.ExpandableSynapticIntegrator;
+import ca.neo.model.neuron.SynapticIntegrator;
 import ca.neo.model.plasticity.Plastic;
 import ca.neo.model.plasticity.PlasticityRule;
 import ca.neo.util.TimeSeries1D;
@@ -254,6 +255,55 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	 */
 	public String[] getPlasticityRuleNames() {
 		return myTerminations.keySet().toArray(new String[0]);
+	}
+	
+	public static class Factory implements SynapticIntegratorFactory {
+
+		private Units myUnits;
+		private float myMaxTimeStep;
+		
+		public Factory() {
+			myUnits = Units.ACU;
+			myMaxTimeStep = .0005f;
+		}
+		
+		/**
+		 * @return Units of output current value 
+		 */
+		public Units getUnits() {
+			return myUnits;
+		}
+		
+		/**
+		 * @param units Units of output current value 
+		 */
+		public void setUnits(Units units){
+			myUnits = units;
+		}
+		
+		/**
+		 * @return Maximum time step taken by the synaptic integrators produced here, 
+		 * 		regardless of network time step
+		 */
+		public float getMaxTimeStep() {
+			return myMaxTimeStep;
+		}
+		
+		/**
+		 * @param maxTimeStep Maximum time step taken by the synaptic integrators produced here, 
+		 * 		regardless of network time step
+		 */
+		public void setMaxTimeStep(float maxTimeStep) {
+			myMaxTimeStep = maxTimeStep;
+		}
+		
+		/**
+		 * @see ca.neo.model.neuron.impl.SynapticIntegratorFactory#make()
+		 */
+		public SynapticIntegrator make() {
+			return new LinearSynapticIntegrator(myMaxTimeStep, myUnits);
+		}
+		
 	}
 
 }

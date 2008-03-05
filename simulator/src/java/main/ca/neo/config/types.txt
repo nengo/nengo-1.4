@@ -13,3 +13,5 @@ ca.neo.model.neuron.SynapticIntegrator
 ca.neo.model.neuron.SpikeGenerator
 ca.neo.model.neuron.Neuron
 ca.neo.model.nef.NEFNode
+ca.neo.model.neuron.impl.SpikeGeneratorFactory
+ca.neo.model.neuron.impl.SynapticIntegratorFactory

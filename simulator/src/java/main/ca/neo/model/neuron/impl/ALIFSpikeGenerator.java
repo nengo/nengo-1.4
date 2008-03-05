@@ -6,6 +6,7 @@ package ca.neo.model.neuron.impl;
 import java.util.Properties;
 
 import ca.neo.math.Function;
+import ca.neo.math.PDF;
 import ca.neo.math.RootFinder;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.IndicatorPDF;
@@ -292,6 +293,89 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		p.setProperty("N", "Concentration of adaptation-related ion (arbitrary units)");
 		p.setProperty("rate", "Firing rate (only available in rate mode) (spikes/s)");
 		return p;
+	}
+	
+	/**
+	 * Creates ALIFSpikeGenerators. 
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class Factory implements SpikeGeneratorFactory {
+
+		private PDF myTauRef;
+		private PDF myTauRC;
+		private PDF myTauN;
+		private PDF myIncN;
+
+		public Factory() {
+			myTauRef = new IndicatorPDF(.002f);
+			myTauRC = new IndicatorPDF(.02f);
+			myTauN = new IndicatorPDF(.2f);
+			myIncN = new IndicatorPDF(.1f);
+		}
+		
+		/**
+		 * @return PDF of refractory periods (s)
+		 */
+		public PDF getTauRef() {
+			return myTauRef;
+		}
+		
+		/**
+		 * @param tauRef PDF of refractory periods (s)
+		 */
+		public void setTauRef(PDF tauRef) {
+			myTauRef = tauRef;
+		}
+		
+		/**
+		 * @return PDF of membrane time constants (s)
+		 */
+		public PDF getTauRC() {
+			return myTauRC;
+		}
+		
+		/**
+		 * @param tauRC PDF of membrane time constants (s)
+		 */
+		public void setTauRC(PDF tauRC) {
+			myTauRC = tauRC;
+		}
+		
+		/**
+		 * @return PDF of time constants of the adaptation variable (s)
+		 */
+		public PDF getTauN() {
+			return myTauN;
+		}
+		
+		/**
+		 * @param tauN PDF of time constants of the adaptation variable (s)
+		 */
+		public void setTauN(PDF tauN) {
+			myTauN = tauN;
+		}
+		
+		/**
+		 * @return PDF of increments of the adaptation variable
+		 */
+		public PDF getIncN() {
+			return myIncN;
+		}
+		
+		/**
+		 * @param incN PDF of increments of the adaptation variable
+		 */
+		public void setIncN(PDF incN) {
+			myIncN = incN;
+		}
+		
+		/**
+		 * @see ca.neo.model.neuron.impl.SpikeGeneratorFactory#make()
+		 */
+		public SpikeGenerator make() {
+			return new ALIFSpikeGenerator(myTauRef.sample()[0], myTauRC.sample()[0], myTauN.sample()[0], myIncN.sample()[0]);
+		}	
 	}
 	
 	

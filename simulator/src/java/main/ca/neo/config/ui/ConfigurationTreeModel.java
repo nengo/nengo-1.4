@@ -417,7 +417,7 @@ public class ConfigurationTreeModel implements TreeModel {
 		try {
 			JavaSourceParser.addSource(new File("src/java/main"));
 			
-			final Object configurable = NoiseFactory.makeRandomNoise(1, new IndicatorPDF());			
+			final Object configurable = NoiseFactory.makeRandomNoise(1, new IndicatorPDF(0, 1));			
 			final JFrame frame = new JFrame("Tree Test");
 			
 			JButton button = new JButton("configure");

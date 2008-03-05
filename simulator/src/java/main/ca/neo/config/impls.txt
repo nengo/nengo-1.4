@@ -36,5 +36,8 @@ ca.neo.model.neuron.impl.HodgkinHuxleySpikeGenerator
 ca.neo.model.neuron.impl.IzhikevichSpikeGenerator
 ca.neo.model.neuron.impl.PoissonSpikeGenerator
 ca.neo.model.neuron.impl.LinearSynapticIntegrator
-
-
+ca.neo.model.neuron.impl.LinearSynapticIntegrator$Factory
+ca.neo.model.neuron.impl.LIFSpikeGenerator$Factory
+ca.neo.model.neuron.impl.ALIFSpikeGenerator$Factory
+ca.neo.model.neuron.impl.PoissonSpikeGenerator$LinearFactory
+ca.neo.model.neuron.impl.PoissonSpikeGenerator$SigmoidFactory

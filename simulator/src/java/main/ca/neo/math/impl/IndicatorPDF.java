@@ -18,7 +18,7 @@ public class IndicatorPDF implements PDF {
 	private float myHigh;
 	private float myDifference;
 	private float myVal;
-
+	
 	/**
 	 * @param low Lower limit of range of possible values
 	 * @param high Upper limit of range of possible values
@@ -28,35 +28,39 @@ public class IndicatorPDF implements PDF {
 	}
 	
 	/**
-	 * Instantiates with default range [0,1]. 
+	 * @param exact A value at which the PDF is infinity (zero at other values) 
 	 */
-	public IndicatorPDF() {
-		this(0, 1);
+	public IndicatorPDF(float exact) {
+		set(exact, exact);
 	}
 	
 	private void set(float low, float high) {
-		if (high <= low) {
-			throw new IllegalArgumentException("High value must be greater than low value");
+		if (high < low) {
+			throw new IllegalArgumentException("High value must be greater than or equal to low value");
 		}
 		
 		myLow = low;
 		myHigh = high;
 		myDifference = high - low;
-		myVal = 1f / myDifference;   		
+		if (high == low) {
+			myVal = Float.POSITIVE_INFINITY;
+		} else {
+			myVal = 1f / myDifference;   					
+		}
 	}
-
+	
 	/**
 	 * @param low Lower limit of range of possible values
 	 */
 	public void setLow(float low) {
-		set(low, myHigh);
+		set(low, myHigh);					
 	}
 
 	/**
 	 * @param high Upper limit of range of possible values
 	 */
 	public void setHigh(float high) {
-		set(myLow, high);
+		set(myLow, high);			
 	}
 	
 	/**
@@ -84,7 +88,11 @@ public class IndicatorPDF implements PDF {
 	 * @see ca.neo.math.PDF#sample()
 	 */
 	public float[] sample() {
-		return new float[] {myLow + myDifference * (float) Math.random()};
+		if (myLow == myHigh) {
+			return new float[]{myLow};
+		} else {
+			return new float[] {myLow + myDifference * (float) Math.random()};			
+		}
 	}
 
 	/**

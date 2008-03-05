@@ -21,5 +21,9 @@ public interface NodeFactory {
 	 * @throws StructuralException for any problem that prevents construction  
 	 */
 	public Node make(String name) throws StructuralException;
-	
+
+	/**
+	 * @return A short description of the type of Node created by this factory
+	 */
+	public String getTypeDescription();
 }

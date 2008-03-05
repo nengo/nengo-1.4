@@ -3,8 +3,6 @@
  */
 package ca.neo.util.impl;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
 import ca.neo.util.VectorGenerator;
 
 /**

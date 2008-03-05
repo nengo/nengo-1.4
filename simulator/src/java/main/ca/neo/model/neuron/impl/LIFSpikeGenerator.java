@@ -5,6 +5,8 @@ package ca.neo.model.neuron.impl;
 
 import java.util.Properties;
 
+import ca.neo.math.PDF;
+import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
@@ -247,6 +249,60 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	 */
 	public void setMode(SimulationMode mode) {
 		myMode = SimulationMode.getClosestMode(mode, mySupportedModes);
+	}
+
+	/**
+	 * Creates LIFSpikeGenerators. 
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class Factory implements SpikeGeneratorFactory {
+
+		private static float ourMaxTimeStep = .00025f;
+
+		private PDF myTauRC;
+		private PDF myTauRef;
+		
+		public Factory() {
+			myTauRef = new IndicatorPDF(.002f);
+			myTauRC = new IndicatorPDF(.02f);
+		}
+		
+		/**
+		 * @return PDF of refractory periods (s)
+		 */
+		public PDF getTauRef() {
+			return myTauRef;
+		}
+		
+		/**
+		 * @param tauRef PDF of refractory periods (s)
+		 */
+		public void setTauRef(PDF tauRef) {
+			myTauRef = tauRef;
+		}
+		
+		/**
+		 * @return PDF of membrane time constants (s)
+		 */
+		public PDF getTauRC() {
+			return myTauRC;
+		}
+		
+		/**
+		 * @param tauRC PDF of membrane time constants (s)
+		 */
+		public void setTauRC(PDF tauRC) {
+			myTauRC = tauRC;
+		}
+		
+		/**
+		 * @see ca.neo.model.neuron.impl.SpikeGeneratorFactory#make()
+		 */
+		public SpikeGenerator make() {
+			return new LIFSpikeGenerator(ourMaxTimeStep, myTauRC.sample()[0], myTauRef.sample()[0]);
+		}
+		
 	}
 
 }

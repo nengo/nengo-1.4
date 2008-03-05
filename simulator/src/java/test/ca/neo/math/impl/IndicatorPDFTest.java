@@ -24,6 +24,9 @@ public class IndicatorPDFTest extends TestCase {
 			assertEquals(1, s.length);
 			assertTrue(s[0] > -1 && s[0] < 1);
 		}
+		
+		pdf = new IndicatorPDF(0, 0);
+		assertEquals(0f, pdf.sample()[0]);
 	}
 
 	/*
@@ -43,6 +46,9 @@ public class IndicatorPDFTest extends TestCase {
 		assertClose(.5f, pdf.map(new float[]{-0.5f}));
 		assertClose(.5f, pdf.map(new float[]{0.5f}));
 		assertClose(0f, pdf.map(new float[]{1.5f}));
+		
+		pdf = new IndicatorPDF(5, 5);
+		assertEquals(Float.POSITIVE_INFINITY, pdf.map(new float[]{5}));
 	}
 
 	/*

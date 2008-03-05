@@ -3,8 +3,6 @@
  */
 package ca.neo.model.nef.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.math.Function;
 import ca.neo.math.PDF;
 import ca.neo.math.impl.AbstractFunction;
@@ -145,7 +143,8 @@ public class BiasOrigin extends DecodedOrigin {
 		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.15f, .5f) : new IndicatorPDF(-1.2f, .1f); //was -.5f, .75f for excitatory
 		PDF maxRatePDF = excitatoryProjection ? new IndicatorPDF(200f, 500f) : new IndicatorPDF(400f, 800f);
 		ef.setNodeFactory(new LIFNeuronFactory(.02f, .0001f, maxRatePDF, interceptPDF));
-		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(new CoefficientsSameSign(excitatoryProjection), false)); 
+		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(
+				new GradientDescentApproximator.CoefficientsSameSign(excitatoryProjection), false)); 
 		
 		return ef.make(name, num, 1);
 	}
@@ -158,37 +157,6 @@ public class BiasOrigin extends DecodedOrigin {
 		return myInterneurons;
 	}
 
-	/**
-	 * Forces all decoding coefficients to be >= 0. 
-	 * 
-	 * @author Bryan Tripp
-	 */
-	public static class CoefficientsSameSign implements GradientDescentApproximator.Constraints {
-		
-		private static final long serialVersionUID = 1L;
-		
-		private boolean mySignPositive;
-		
-		public CoefficientsSameSign(boolean positive) {
-			mySignPositive = positive;
-		}
-		
-		/**
-		 * @see ca.neo.math.impl.GradientDescentApproximator.Constraints#correct(float[])
-		 */
-		public boolean correct(float[] coefficients) {
-			boolean allCorrected = true;
-			for (int i = 0; i < coefficients.length; i++) {
-				if ( (mySignPositive && coefficients[i] < 0) || (!mySignPositive && coefficients[i] > 0)) {
-					coefficients[i] = 0;
-				} else {
-					allCorrected = false;
-				}
-			}
-			return allCorrected;
-		}
-	}
-	
 	private static class BiasEncodersMaintained implements GradientDescentApproximator.Constraints {
 
 		private static final long serialVersionUID = 1L;

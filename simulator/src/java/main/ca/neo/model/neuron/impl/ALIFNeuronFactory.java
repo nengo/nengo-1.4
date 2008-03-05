@@ -167,4 +167,11 @@ public class ALIFNeuronFactory implements NodeFactory {
 		return new PlasticExpandableSpikingNeuron(integrator, generator, scale, bias, name);		
 	}
 
+	/**
+	 * @see ca.neo.model.impl.NodeFactory#getTypeDescription()
+	 */
+	public String getTypeDescription() {
+		return "Adapting LIF Neuron";
+	}
+
 }

@@ -217,4 +217,35 @@ public class GradientDescentApproximator implements LinearApproximator {
 		}
 		
 	}
+
+	/**
+	 * Forces all decoding coefficients to be >= 0. 
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class CoefficientsSameSign implements Constraints {
+		
+		private static final long serialVersionUID = 1L;
+		
+		private boolean mySignPositive;
+		
+		public CoefficientsSameSign(boolean positive) {
+			mySignPositive = positive;
+		}
+		
+		/**
+		 * @see Constraints#correct(float[])
+		 */
+		public boolean correct(float[] coefficients) {
+			boolean allCorrected = true;
+			for (int i = 0; i < coefficients.length; i++) {
+				if ( (mySignPositive && coefficients[i] < 0) || (!mySignPositive && coefficients[i] > 0)) {
+					coefficients[i] = 0;
+				} else {
+					allCorrected = false;
+				}
+			}
+			return allCorrected;
+		}
+	}
 }

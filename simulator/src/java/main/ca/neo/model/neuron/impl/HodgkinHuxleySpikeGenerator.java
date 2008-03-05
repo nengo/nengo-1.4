@@ -7,11 +7,15 @@ import ca.neo.config.Configuration;
 import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.dynamics.impl.AbstractDynamicalSystem;
 import ca.neo.dynamics.impl.RK45Integrator;
+import ca.neo.model.Node;
+import ca.neo.model.StructuralException;
+import ca.neo.model.Units;
+import ca.neo.model.impl.NodeFactory;
+import ca.neo.model.neuron.SpikeGenerator;
 
 /**
  * A SpikeGenerator based on the Hodgkin-Huxley model.
  * 
- * TODO: factory
  * TODO: unit test
  * 
  * @author Bryan Tripp
@@ -101,6 +105,31 @@ public class HodgkinHuxleySpikeGenerator extends DynamicalSystemSpikeGenerator {
 			return 4;
 		}
 		
+	}
+
+	/**
+	 * A factory of neurons with linear synaptic integration and Hodgkin-Huxley spike 
+	 * generation. 
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class HodgkinHuxleyNeuronFactory implements NodeFactory {
+
+		/** 
+		 * @see ca.neo.model.impl.NodeFactory#make(java.lang.String)
+		 */
+		public Node make(String name) throws StructuralException {
+			LinearSynapticIntegrator integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
+			SpikeGenerator sg = new HodgkinHuxleySpikeGenerator();
+			return new PlasticExpandableSpikingNeuron(integrator, sg, 10, 0, name);
+		}
+
+		/**
+		 * @see ca.neo.model.impl.NodeFactory#getTypeDescription()
+		 */
+		public String getTypeDescription() {
+			return "Hodgkin-Huxley Neuron";
+		}
 	}
 	
 	//functional test
