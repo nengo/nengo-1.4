@@ -168,5 +168,10 @@ public class RK45Integrator implements Integrator {
 		
 		return new TimeSeriesImpl(times.toArray(), values.toArray(), units);
 	}
+
+	@Override
+	public Integrator clone() throws CloneNotSupportedException {
+		return (Integrator) super.clone();
+	}
 	
 }
