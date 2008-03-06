@@ -70,6 +70,6 @@ public interface DynamicalSystem extends Serializable, Cloneable {
 	 * 
 	 * @see java.lang.Object#clone()
 	 */
-	public Object clone() throws CloneNotSupportedException;
+	public DynamicalSystem clone() throws CloneNotSupportedException;
 	
 }

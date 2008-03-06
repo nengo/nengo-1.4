@@ -241,7 +241,7 @@ public class HillMuscle extends SkeletalMuscleImpl {
 		/**
 		 * @see ca.neo.dynamics.DynamicalSystem#clone()
 		 */
-		public Object clone() throws CloneNotSupportedException {
+		public DynamicalSystem clone() throws CloneNotSupportedException {
 			boolean torque = myUnits[0].equals(Units.Nm);
 			return new Dynamics(myTauEA, myMaxIsometricForce, myCEForceLength, myCEForceVelocity, mySEForceLength, torque);
 		}

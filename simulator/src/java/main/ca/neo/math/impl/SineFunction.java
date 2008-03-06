@@ -104,4 +104,8 @@ public class SineFunction implements Function {
 		return amplitude * (float) Math.sin(from[0] * omega);
 	}
 
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		return (Function) super.clone();
+	}
 }

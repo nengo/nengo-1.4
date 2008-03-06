@@ -69,9 +69,9 @@ public abstract class AbstractDynamicalSystem implements DynamicalSystem {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public DynamicalSystem clone() throws CloneNotSupportedException {
 		try {
-			return this.getClass().getConstructor(new Class[]{float[].class}).newInstance(new Object[]{myState});
+			return (DynamicalSystem) this.getClass().getConstructor(new Class[]{float[].class}).newInstance(new Object[]{myState});
 		} catch (SecurityException e) {
 			ourLogger.error("Default clone implementation failed.", e);
 			throw new CloneNotSupportedException("Default clone implementation doesn't work with this DynamicalSystem: " 

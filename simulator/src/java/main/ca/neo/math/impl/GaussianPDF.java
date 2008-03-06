@@ -201,4 +201,9 @@ public class GaussianPDF implements PDF {
 		return (float) result;
 	}
 
+	@Override
+	public PDF clone() throws CloneNotSupportedException {
+		return (PDF) super.clone();
+	}
+	
 }

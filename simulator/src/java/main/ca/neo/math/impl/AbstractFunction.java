@@ -48,4 +48,12 @@ public abstract class AbstractFunction implements Function {
 		return result;
 	}
 	
+	/**
+	 * @throws CloneNotSupportedException 
+	 * @see java.lang.Object#clone()
+	 */
+	public Function clone() throws CloneNotSupportedException {
+		return (Function) super.clone();
+	}
+	
 }

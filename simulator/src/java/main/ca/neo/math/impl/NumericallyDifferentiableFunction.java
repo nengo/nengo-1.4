@@ -107,6 +107,14 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 		return myFunction.multiMap(from);
 	}
 
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		NumericallyDifferentiableFunction result = (NumericallyDifferentiableFunction) super.clone();
+		result.myDerivative = (NumericalDerivative) myDerivative.clone();
+		result.myFunction = myFunction.clone();
+		return result;
+	}
+
 	/**
 	 * @author Bryan Tripp
 	 */
@@ -202,6 +210,13 @@ public class NumericallyDifferentiableFunction implements DifferentiableFunction
 				result[i] = map(from[i]);
 			}
 			
+			return result;
+		}
+		
+		@Override
+		public Function clone() throws CloneNotSupportedException {
+			NumericalDerivative result = (NumericalDerivative) super.clone();
+			result.myFunction = this.myFunction.clone();
 			return result;
 		}
 		

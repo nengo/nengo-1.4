@@ -119,6 +119,13 @@ public class SigmoidFunction extends AbstractFunction implements DifferentiableF
 		return myLow + (myHigh-myLow) * ( 1f / (1f + (float) Math.exp(-myMultiplier*(from[0]-myInflection))) ) ;
 	}
 	
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		SigmoidFunction result = (SigmoidFunction) super.clone();
+		result.myDerivative = myDerivative.clone();
+		return result;
+	}
+
 	/**
 	 * Derivative of a sigmoid. 
 	 * 

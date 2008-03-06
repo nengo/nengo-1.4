@@ -161,5 +161,5 @@ public class LinearCurveFitter implements CurveFitter {
 			return myY[index-1] + (myY[index] - myY[index-1]) * dx / (myX[index] - myX[index-1]); 
 		}
 	}
-		
+	
 }

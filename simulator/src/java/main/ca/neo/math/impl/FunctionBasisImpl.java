@@ -104,4 +104,15 @@ public class FunctionBasisImpl extends AbstractFunction implements FunctionBasis
 		return result;
 	}
 
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		Function[] functions = new Function[myFunctions.length];
+		for (int i = 0; i < functions.length; i++) {
+			functions[i] = myFunctions[i].clone();
+		}
+		FunctionBasisImpl result = new FunctionBasisImpl(functions);
+		result.setCoefficients(myCoefficients.clone());
+		return result;
+	}
+
 }

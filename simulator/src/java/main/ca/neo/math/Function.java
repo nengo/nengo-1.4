@@ -14,7 +14,7 @@ import java.io.Serializable;
  *  
  * @author Bryan Tripp
  */
-public interface Function extends Serializable {
+public interface Function extends Serializable, Cloneable {
 	
 	/**
 	 * @return Dimension of the space that the Function maps from 
@@ -32,5 +32,7 @@ public interface Function extends Serializable {
 	 * @return Array of results of function operation on each arg
 	 */
 	public float[] multiMap(float[][] from);
+	
+	public Function clone() throws CloneNotSupportedException;
 	
 }

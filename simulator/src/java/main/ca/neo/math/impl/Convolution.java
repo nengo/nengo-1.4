@@ -116,6 +116,11 @@ public class Convolution extends AbstractFunction {
 		return result;
 	}
 	
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		return new Convolution(myOne.clone(), myTwo.clone(), myStepSize, myWindow);
+	}
+
 	//functional test
 	public static void main(String[] args) {
 		Function one = new PiecewiseConstantFunction(new float[]{0.1f}, new float[]{0, 1});

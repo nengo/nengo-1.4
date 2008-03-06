@@ -3,6 +3,7 @@
  */
 package ca.neo.dynamics.impl;
 
+import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.LinearSystem;
 import ca.neo.model.Units;
 import ca.neo.util.MU;
@@ -283,7 +284,7 @@ public class LTISystem implements LinearSystem {
 	/**
 	 * @see ca.neo.dynamics.DynamicalSystem#clone()
 	 */
-	public Object clone() throws CloneNotSupportedException {
+	public DynamicalSystem clone() throws CloneNotSupportedException {
 		LTISystem result = (LTISystem) super.clone();
 		
 		float[] state = new float[result.getState().length];

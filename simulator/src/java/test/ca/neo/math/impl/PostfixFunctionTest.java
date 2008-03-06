@@ -61,5 +61,13 @@ public class PostfixFunctionTest extends TestCase {
 		TestUtil.assertClose(1f, values[0], .0001f);
 		TestUtil.assertClose(2f, values[1], .0001f);
 	}
+	
+	public void testClone() throws CloneNotSupportedException {
+		PostfixFunction f1 = new PostfixFunction("x0 + x1^2", 2);
+		PostfixFunction f2 = (PostfixFunction) f1.clone();
+		f2.setExpression("x1"); 
+		assertEquals("x0 + x1^2", f1.getExpression());
+		assertTrue(f1.map(new float[]{0, 2}) - f2.map(new float[]{0, 2}) > 1);
+	}
 
 }

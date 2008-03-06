@@ -127,4 +127,9 @@ public class IndicatorPDF implements PDF {
 		return (from >= low && from <= high) ? val : 0f;
 	}
 
+	@Override
+	public PDF clone() throws CloneNotSupportedException {
+		return (PDF) super.clone();
+	}
+	
 }

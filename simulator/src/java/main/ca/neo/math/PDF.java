@@ -15,4 +15,5 @@ public interface PDF extends Function {
 	 */
 	public float[] sample();
 	
+	public PDF clone() throws CloneNotSupportedException;
 }

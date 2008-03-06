@@ -149,6 +149,11 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 		return y;
 	}
 	
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		return new PiecewiseConstantFunction(myDiscontinuities.clone(), myValues.clone());
+	}
+
 	public static void main(String args[]) {
 //		Function f = new PiecewiseConstantFunction(new float[]{0, 1, 3, 7}, new float[]{5, 2});
 //		Function f = new PiecewiseConstantFunction(new float[]{0, 1, 3, 7}, new float[]{5, 2, -3, 6, 7});

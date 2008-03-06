@@ -185,4 +185,9 @@ public class FourierFunction implements Function {
 		return result;
 	}
 	
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		return new FourierFunction(myFrequencies.clone(), myAmplitudes.clone(), myPhases.clone());		
+	}
+	
 }

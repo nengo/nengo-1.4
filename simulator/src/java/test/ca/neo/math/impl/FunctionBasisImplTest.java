@@ -66,6 +66,11 @@ public class FunctionBasisImplTest extends TestCase {
 			throw new NotImplementedException("not implemented");
 		}
 		
+		@Override
+		public Function clone() throws CloneNotSupportedException {
+			return (Function) super.clone();
+		}
+		
 	}
 
 }

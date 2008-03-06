@@ -232,7 +232,13 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 			}
 			
 			return result;
-		}		
+		}
+
+		@Override
+		public AbstractOperator clone() throws CloneNotSupportedException {
+			return (AbstractOperator) super.clone();
+		}
+
 	}
 	
 	private static class ExponentOperator extends AbstractOperator {

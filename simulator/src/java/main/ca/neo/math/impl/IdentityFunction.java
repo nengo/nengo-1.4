@@ -93,4 +93,9 @@ public class IdentityFunction implements Function {
 		return result;
 	}
 	
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		return (Function) super.clone();
+	}
+	
 }

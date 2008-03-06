@@ -61,6 +61,11 @@ public class ExponentialPDF extends AbstractFunction implements PDF {
 		return new float[]{myTau * (float) -Math.log(x)}; 
 	}
 	
+	@Override
+	public PDF clone() throws CloneNotSupportedException {
+		return (PDF) super.clone();
+	}
+	
 	//functional test ... 
 	public static void main(String[] args) {
 		PDF pdf = new ExponentialPDF(.1f);

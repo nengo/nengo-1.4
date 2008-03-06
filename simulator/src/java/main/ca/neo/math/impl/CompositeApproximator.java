@@ -93,6 +93,11 @@ public class CompositeApproximator implements LinearApproximator {
 			return myFunction.map(projection);
 		}
 
+		@Override
+		public Function clone() throws CloneNotSupportedException {
+			return new FunctionWrapper(myFunction.clone(), myDimensions.clone());
+		}
+
 	}
 
 }

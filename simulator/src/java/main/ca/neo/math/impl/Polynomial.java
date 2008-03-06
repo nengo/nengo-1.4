@@ -71,4 +71,9 @@ public class Polynomial extends AbstractFunction implements Function {
 		return result;
 	}
 
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		return new Polynomial(myCoefficients.clone());
+	}
+
 }

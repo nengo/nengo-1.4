@@ -76,4 +76,9 @@ public class ConstantFunction implements Function {
 		return myValue;
 	}
 
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		return (Function) super.clone();
+	}
+	
 }

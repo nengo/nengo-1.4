@@ -5,8 +5,10 @@ package ca.neo.math.impl;
 
 import ca.neo.math.Function;
 import ca.neo.math.CurveFitter;
+import ca.neo.math.impl.LinearCurveFitter.InterpolatedFunction;
 import ca.neo.TestUtil;
 import ca.neo.plot.Plotter;
+import ca.neo.util.MU;
 import junit.framework.TestCase;
 
 /*
@@ -40,5 +42,15 @@ public class LinearCurveFitterTest extends TestCase {
 			TestUtil.assertClose(targetVal, fittedVal, 15f);
 		}
 	
+	}
+	
+	public void testCloneInterpolatedFunction() throws CloneNotSupportedException {
+		float[] x = new float[]{0, 1};
+		float[] y = new float[]{1, 2};
+		
+		InterpolatedFunction f = new InterpolatedFunction(x, y);
+		InterpolatedFunction f2 = (InterpolatedFunction) f.clone();
+		f.setX(new float[]{0, 5});
+		assertTrue(f2.getX()[1] < 2);
 	}
 }

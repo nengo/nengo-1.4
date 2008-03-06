@@ -70,6 +70,15 @@ public class FourierFunctionTest extends TestCase {
 		}
 	}
 	
+	public void testClone() throws CloneNotSupportedException {
+		FourierFunction f1 = new FourierFunction(new float[]{1.5f}, new float[]{5f}, new float[]{.2f});
+		FourierFunction f2 = (FourierFunction) f1.clone();
+		f2.setFrequencies(new float[][]{new float[]{2f}});
+		assertClose(0.0000f, f1.map(new float[]{.2f}));
+		assertClose(1.5451f, f1.map(new float[]{1.5f}));
+		assertClose(2.9389f, f1.map(new float[]{2.8f}));
+	}
+	
 	public static void main(String[] args) {
 //		FourierFunctionTest test = new FourierFunctionTest();
 //		test.testFourierFunctionFloatFloatFloat();

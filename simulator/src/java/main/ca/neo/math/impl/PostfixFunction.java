@@ -3,6 +3,8 @@
  */
 package ca.neo.math.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -195,6 +197,29 @@ public class PostfixFunction implements Function {
 		}
 		
 		return highest;
+	}
+
+	@Override
+	public Function clone() throws CloneNotSupportedException {
+		PostfixFunction result = (PostfixFunction) super.clone();
+		
+		List list = new ArrayList(this.myExpressionList.size());
+		Iterator it = myExpressionList.iterator();
+		while (it.hasNext()) {
+			Object o = it.next();
+			if (o instanceof Float) {
+				list.add(new Float(((Float) o).floatValue()));
+			} else if (o instanceof Integer) {
+				list.add(new Integer(((Integer) o).intValue()));				
+			} else if (o instanceof Function) {
+				list.add(((Function) o).clone());
+			} else {
+				throw new RuntimeException("Expression list contains unexpected type " + o.getClass().getName());
+			}
+		}
+		result.myExpressionList = list;
+		
+		return result;
 	}
 
 }

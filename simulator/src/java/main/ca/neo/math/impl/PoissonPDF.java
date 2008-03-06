@@ -76,4 +76,8 @@ public class PoissonPDF extends AbstractFunction implements PDF {
 		return result;
 	}
 		
+	@Override
+	public PDF clone() throws CloneNotSupportedException {
+		return (PDF) super.clone();
+	}
 }
