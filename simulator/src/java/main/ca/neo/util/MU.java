@@ -635,6 +635,21 @@ public class MU {
 
 	/**
 	 * @param vector Any vector
+	 * @param index Index of last element to include in sum
+	 * @return Sum of elements
+	 */
+	public static float sumToIndex(float[] vector, int index) {
+		float result = 0f;
+		
+		for (int i = 0; i < index+1; i++) {
+			result += vector[i];
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * @param vector Any vector
 	 * @return Mean of vector elements
 	 */
 	public static float mean(float[] vector) {

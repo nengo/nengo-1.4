@@ -18,5 +18,7 @@ public interface IndexFinder {
 	 * 		the 'value' arg
 	 */
 	public int findIndexBelow(float value);
+	
+	public IndexFinder clone() throws CloneNotSupportedException;
 		
 }

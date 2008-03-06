@@ -74,4 +74,14 @@ public class LinearInterpolatorND implements InterpolatorND {
 		return new StatefulIndexFinder(times);
 	}
 
+	@Override
+	protected LinearInterpolatorND clone() throws CloneNotSupportedException {
+		LinearInterpolatorND result = new LinearInterpolatorND(mySeries.clone());
+		result.myTimes = myTimes.clone();
+		result.myFinder = myFinder.clone();
+		return result;
+	}
+	
+	
+
 }

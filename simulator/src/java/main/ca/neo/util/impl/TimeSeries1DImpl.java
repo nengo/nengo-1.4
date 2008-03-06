@@ -166,4 +166,10 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 	public void setLabel(String label) {
 		myLabel = label;
 	}
+
+	@Override
+	public TimeSeries1D clone() throws CloneNotSupportedException {
+		return (TimeSeries1D) super.clone();
+	}
+	
 }

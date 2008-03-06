@@ -121,5 +121,22 @@ public class TimeSeriesImpl implements TimeSeries {
 	public void setLabel(int index, String label) {
 		myLabels[index] = label;
 	}
+
+	@Override
+	public TimeSeries clone() throws CloneNotSupportedException {
+		Units[] units = new Units[myUnits.length];
+		for (int i = 0; i < units.length; i++) {
+			units[i] = myUnits[i];
+		}
+		String[] labels = new String[myLabels.length];
+		for (int i = 0; i < labels.length; i++) {
+			labels[i] = myLabels[i];			
+		}
+		TimeSeries result = new TimeSeriesImpl(myTimes.clone(), myValues.clone(), units, labels);
+
+		return result;
+	}
+	
+	
 	
 }

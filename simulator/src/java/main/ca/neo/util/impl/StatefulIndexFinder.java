@@ -4,6 +4,7 @@
 package ca.neo.util.impl;
 
 import ca.neo.util.IndexFinder;
+import ca.neo.util.Interpolator;
 
 /**
  * An IndexFinder that searches linearly, starting where the last answer was. This is 
@@ -54,6 +55,13 @@ public class StatefulIndexFinder implements IndexFinder {
 			}
 		}
 		
+		return result;
+	}
+
+	@Override
+	public StatefulIndexFinder clone() throws CloneNotSupportedException {
+		StatefulIndexFinder result = new StatefulIndexFinder(myValues.clone());
+		result.myIndex = myIndex;
 		return result;
 	}
 

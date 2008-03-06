@@ -40,4 +40,6 @@ public interface TimeSeries extends Serializable {
 	 */
 	public String[] getLabels();
 	
+	public TimeSeries clone() throws CloneNotSupportedException;
+	
 }

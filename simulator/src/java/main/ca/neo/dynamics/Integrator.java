@@ -5,6 +5,7 @@ package ca.neo.dynamics;
 
 import java.io.Serializable;
 
+import ca.neo.util.IndexFinder;
 import ca.neo.util.TimeSeries;
 
 /**
@@ -25,5 +26,8 @@ public interface Integrator extends Serializable {
 	 * @return Time series of output vector
 	 */
 	public TimeSeries integrate(DynamicalSystem system, TimeSeries input);
+	
+	public Integrator clone() throws CloneNotSupportedException;
+
 	
 }

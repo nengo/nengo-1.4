@@ -84,5 +84,11 @@ public class EulerIntegrator implements Integrator {
 		
 		return new TimeSeriesImpl(times, values, units);
 	}
+
+	@Override
+	public Integrator clone() throws CloneNotSupportedException {
+		return (Integrator) super.clone();
+	}
+	
 	
 }

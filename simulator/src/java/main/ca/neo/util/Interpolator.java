@@ -17,4 +17,7 @@ public interface Interpolator extends Serializable {
 	
 	public float interpolate(float time);
 	
+	public Interpolator clone() throws CloneNotSupportedException;
+
+	
 }
