@@ -129,12 +129,10 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 				return;
 			}
 		}
-		boolean success = false;
-		boolean attemptedConnection = false;
 
 		/*
-		 * If already connected, destroy current connection and delegate the targets to a new
-		 * connector
+		 * If already connected, destroy current connection and delegate the
+		 * targets to a new connector
 		 */
 		if (getTermination() != null) {
 			LineConnector newConnector = getWell().createProjection();
@@ -145,34 +143,35 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 			destroy();
 
 			newConnector.droppedOnTargets(targets);
-			return;
-		}
 
-		for (WorldObject target : targets) {
-			if (target == getWell()) {
-				// Connector has been receded back into the origin
-				destroy();
-				target = null;
-			}
+		} else {
+			boolean success = false;
+			boolean attemptedConnection = false;
+			
+			for (WorldObject target : targets) {
+				if (target == getWell()) {
+					// Connector has been receded back into the origin
+					destroy();
+					target = null;
+				}
 
-			if (target instanceof ILineTermination) {
-				attemptedConnection = true;
-				if (tryConnectTo((ILineTermination) target, true)) {
-					success = true;
-					break;
+				if (target instanceof ILineTermination) {
+					attemptedConnection = true;
+					if (tryConnectTo((ILineTermination) target, true)) {
+						success = true;
+						break;
+					}
 				}
 			}
 
+			/*
+			 * If not successful and tried to connect, nudge the connector away
+			 * to indicate failure
+			 */
+			if (!success && attemptedConnection) {
+				translate(-40, -20);
+			}
 		}
-
-		/*
-		 * If not successful and tried to connect, nudge the connector away to
-		 * indicate failure
-		 */
-		if (!success && attemptedConnection) {
-			translate(-40, -20);
-		}
-
 	}
 
 	/**
