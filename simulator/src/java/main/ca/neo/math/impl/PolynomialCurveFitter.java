@@ -74,6 +74,11 @@ public class PolynomialCurveFitter implements CurveFitter {
 		return myOrder;
 	}
 
+	@Override
+	public CurveFitter clone() throws CloneNotSupportedException {
+		return (CurveFitter) super.clone();
+	}
+
 	//test code (to move to unit test)
 	public static void main(String[] args) {
 		PolynomialCurveFitter fitter = new PolynomialCurveFitter(2);

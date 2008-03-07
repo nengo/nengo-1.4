@@ -169,6 +169,29 @@ public class GradientDescentApproximator implements LinearApproximator {
 		return result;
 	}
 
+	@Override
+	public LinearApproximator clone() throws CloneNotSupportedException {
+		GradientDescentApproximator result = (GradientDescentApproximator) super.clone();
+		
+		result.myStartingCoefficients = myStartingCoefficients.clone();
+		
+		result.myConstraints = myConstraints.clone();
+		
+		float[][] evalPoints = new float[myEvalPoints.length][];
+		for (int i = 0; i < evalPoints.length; i++) {
+			evalPoints[i] = myEvalPoints[i].clone();
+		}
+		result.myEvalPoints = evalPoints;
+		
+		float[][] values = new float[myValues.length][];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = myValues[i].clone();
+		}
+		result.myValues = values;
+		
+		return result;
+	}
+
 	/**
 	 * Enforces constraints on coefficients. 
 	 * 
@@ -176,7 +199,7 @@ public class GradientDescentApproximator implements LinearApproximator {
 	 * 
 	 * @author Bryan Tripp 
 	 */
-	public static interface Constraints extends Serializable {
+	public static interface Constraints extends Serializable, Cloneable {
 		
 		/**
 		 * @param coefficients A set of coefficients which may violate constraints (they 
@@ -186,6 +209,8 @@ public class GradientDescentApproximator implements LinearApproximator {
 		 * 		is possible in the attempted direction)
 		 */
 		boolean correct(float[] coefficients);
+		
+		public Constraints clone() throws CloneNotSupportedException;
 	}
 	
 	/**
@@ -214,6 +239,11 @@ public class GradientDescentApproximator implements LinearApproximator {
 		 */
 		public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
 			return new GradientDescentApproximator(evalPoints, values, myConstraints, myIgnoreBiasFlag);
+		}
+
+		@Override
+		public ApproximatorFactory clone() throws CloneNotSupportedException {
+			return new Factory(myConstraints.clone(), myIgnoreBiasFlag);
 		}
 		
 	}
@@ -247,5 +277,11 @@ public class GradientDescentApproximator implements LinearApproximator {
 			}
 			return allCorrected;
 		}
+
+		@Override
+		public Constraints clone() throws CloneNotSupportedException {
+			return (Constraints) super.clone();
+		}		
+		
 	}
 }

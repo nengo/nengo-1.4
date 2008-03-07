@@ -9,6 +9,7 @@ import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.ConstantFunction;
 import ca.neo.math.impl.GradientDescentApproximator;
 import ca.neo.math.impl.IndicatorPDF;
+import ca.neo.math.impl.GradientDescentApproximator.Constraints;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.nef.NEFEnsemble;
@@ -191,6 +192,11 @@ public class BiasOrigin extends DecodedOrigin {
 			}
 			
 			return allCorrected;
+		}
+
+		@Override
+		public Constraints clone() throws CloneNotSupportedException {
+			return new BiasEncodersMaintained(MU.clone(myBaseWeights), myBiasEncoders.clone());
 		}
 		
 	}

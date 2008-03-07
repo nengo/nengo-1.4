@@ -10,7 +10,7 @@ package ca.neo.math;
  *  
  * @author Bryan Tripp
  */
-public interface CurveFitter {
+public interface CurveFitter extends Cloneable {
 
 	/**
 	 * @param x Example x points 
@@ -18,5 +18,7 @@ public interface CurveFitter {
 	 * @return A Function that approximates the mapping Y=f(X) exemplified by x and y.   
 	 */
 	public Function fit(float[] x, float[] y);
+	
+	public CurveFitter clone() throws CloneNotSupportedException;
 	
 }

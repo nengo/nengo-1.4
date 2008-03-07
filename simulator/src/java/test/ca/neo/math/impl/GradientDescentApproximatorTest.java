@@ -1,6 +1,7 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.Function;
+import ca.neo.math.impl.GradientDescentApproximator.Constraints;
 import ca.neo.model.Units;
 import ca.neo.plot.Plotter;
 import ca.neo.util.MU;
@@ -57,6 +58,9 @@ public class GradientDescentApproximatorTest extends TestCase {
 				}
 				return allCorrected;
 			}
+			public Constraints clone() throws CloneNotSupportedException {
+				return (Constraints) super.clone();
+			}
 		};
 		
 		GradientDescentApproximator approximator = new GradientDescentApproximator(evalPoints, values, constraints, true);
@@ -89,6 +93,9 @@ public class GradientDescentApproximatorTest extends TestCase {
 			public boolean correct(float[] coefficients) {
 				return true;
 			}
+			public Constraints clone() throws CloneNotSupportedException {
+				return (Constraints) super.clone();
+			}			
 		};
 		
 		GradientDescentApproximator approximator = new GradientDescentApproximator(new float[][]{{1f},{2f},{3f}}, new float[][]{{1f},{2f},{3f}}, constraints, true);
@@ -106,6 +113,9 @@ public class GradientDescentApproximatorTest extends TestCase {
 		GradientDescentApproximator.Constraints constraints = new GradientDescentApproximator.Constraints() {
 			public boolean correct(float[] coefficients) {
 				return true;
+			}
+			public Constraints clone() throws CloneNotSupportedException {
+				return (Constraints) super.clone();
 			}
 		};
 		

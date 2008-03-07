@@ -32,6 +32,11 @@ public class LinearCurveFitter implements CurveFitter {
 	public Function fit(float[] x, float[] y) {
 		return new InterpolatedFunction(x, y);
 	}
+	
+	@Override
+	public CurveFitter clone() throws CloneNotSupportedException {
+		return (CurveFitter) super.clone();
+	}
 
 	/**
 	 * A 1-D Function based on interpolation between known points.  
@@ -160,6 +165,12 @@ public class LinearCurveFitter implements CurveFitter {
 			float dx = x - myX[index-1];
 			return myY[index-1] + (myY[index] - myY[index-1]) * dx / (myX[index] - myX[index-1]); 
 		}
+
+		@Override
+		public Function clone() throws CloneNotSupportedException {
+			return new InterpolatedFunction(myX.clone(), myY.clone());
+		}
+		
 	}
 	
 }

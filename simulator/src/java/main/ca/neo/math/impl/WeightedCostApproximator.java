@@ -202,6 +202,22 @@ public class WeightedCostApproximator implements LinearApproximator {
 		return result;
 	}
 	
+	@Override
+	public LinearApproximator clone() throws CloneNotSupportedException {
+		WeightedCostApproximator result = (WeightedCostApproximator) super.clone();
+		
+		result.myCostFunction = myCostFunction.clone();
+		result.myEvalPoints = MU.clone(myEvalPoints);
+		result.myValues = MU.clone(myValues);
+		
+		result.myGammaInverse = new double[myGammaInverse.length][];
+		for (int i = 0; i < myGammaInverse.length; i++) {
+			result.myGammaInverse[i] = myGammaInverse[i].clone();
+		}
+		
+		return result;
+	}
+
 	/**
 	 * An ApproximatorFactory that produces WeightedCostApproximators. 
 	 * 
@@ -209,6 +225,8 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 */
 	public static class Factory implements ApproximatorFactory {
 
+		private static final long serialVersionUID = -3390244062379730498L;
+		
 		private float myNoise;
 		
 		/**
@@ -234,6 +252,11 @@ public class WeightedCostApproximator implements LinearApproximator {
 		 */
 		public Function getCostFunction(int dimension) {
 			return new ConstantFunction(dimension, 1); 
+		}
+
+		@Override
+		public ApproximatorFactory clone() throws CloneNotSupportedException {
+			return (ApproximatorFactory) super.clone();
 		}
 		
 	}

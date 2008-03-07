@@ -100,4 +100,23 @@ public class CompositeApproximator implements LinearApproximator {
 
 	}
 
+	@Override
+	public LinearApproximator clone() throws CloneNotSupportedException {
+		CompositeApproximator result = (CompositeApproximator) super.clone();
+		
+		LinearApproximator[] components = new LinearApproximator[myComponents.length];
+		for (int i = 0; i < components.length; i++) {
+			components[i] = myComponents[i].clone();
+		}
+		result.myComponents = components;
+		
+		int[][] dimensions = new int[myDimensions.length][];
+		for (int i = 0; i < dimensions.length; i++) {
+			dimensions[i] = myDimensions[i].clone();
+		}
+		result.myDimensions = dimensions;
+		
+		return result;
+	}
+
 }

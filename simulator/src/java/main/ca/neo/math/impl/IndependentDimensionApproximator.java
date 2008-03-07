@@ -88,6 +88,27 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		return result;
 	}
 
+	@Override
+	public LinearApproximator clone() throws CloneNotSupportedException {
+		IndependentDimensionApproximator result = (IndependentDimensionApproximator) super.clone();
+		
+		result.myDimensions = myDimensions.clone();
+		
+		LinearApproximator[] approximators = new LinearApproximator[myApproximators.length];
+		for (int i = 0; i < approximators.length; i++) {
+			approximators[i] = myApproximators[i].clone();
+		}
+		result.myApproximators = approximators;
+		
+		int[][] indices = new int[myIndices.length][];
+		for (int i = 0; i < indices.length; i++) {
+			indices[i] = myIndices[i].clone();
+		}
+		result.myIndices = indices;
+		
+		return result;
+	}
+
 	/**
 	 * Factory for IndependentDimensionApproximators. 
 	 *  
@@ -139,6 +160,11 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 
 			Function costWeight = new ConstantFunction(1, 1);
 			return new IndependentDimensionApproximator(oneDimEvalPoints, values, indepDims, dimensions, costWeight, .1f);
+		}
+
+		@Override
+		public ApproximatorFactory clone() throws CloneNotSupportedException {
+			return (ApproximatorFactory) super.clone();
 		}
 		
 	}

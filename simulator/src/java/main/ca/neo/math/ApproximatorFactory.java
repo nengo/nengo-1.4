@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public interface ApproximatorFactory extends Serializable {
+public interface ApproximatorFactory extends Serializable, Cloneable {
 	
 	/**
 	 * @param evalPoints Points at which component functions are evaluated. These should 
@@ -25,5 +25,7 @@ public interface ApproximatorFactory extends Serializable {
 	 * 		sum of the given components.  
 	 */
 	public LinearApproximator getApproximator(float[][] evalPoints, float[][] values);
+	
+	public ApproximatorFactory clone() throws CloneNotSupportedException;
 	
 }

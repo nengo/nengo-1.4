@@ -15,7 +15,7 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public interface LinearApproximator extends Serializable {
+public interface LinearApproximator extends Serializable, Cloneable {
 
 	/**
 	 * Note: more information is needed than the arguments provide (for example 
@@ -28,5 +28,7 @@ public interface LinearApproximator extends Serializable {
 	 * 		target
 	 */
 	public float[] findCoefficients(Function target);
+	
+	public LinearApproximator clone() throws CloneNotSupportedException;
 	
 }
