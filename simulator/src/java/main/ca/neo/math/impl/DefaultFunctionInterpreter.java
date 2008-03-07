@@ -42,8 +42,20 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 	
 	public DefaultFunctionInterpreter() {
 		myFunctions = new HashMap<String, Function>(20);
-		myFunctions.put("sin", new SineFunction(1));
-		//TODO: other standard functions
+		myFunctions.put("sin", new SimpleFunctions.Sin());
+		myFunctions.put("cos", new SimpleFunctions.Cos());
+		myFunctions.put("tan", new SimpleFunctions.Tan());
+		myFunctions.put("asin", new SimpleFunctions.Asin());
+		myFunctions.put("acos", new SimpleFunctions.Acos());
+		myFunctions.put("atan", new SimpleFunctions.Atan());
+		myFunctions.put("exp", new SimpleFunctions.Exp());
+		myFunctions.put("log2", new SimpleFunctions.Log2());
+		myFunctions.put("log10", new SimpleFunctions.Log10());
+		myFunctions.put("ln", new SimpleFunctions.Ln());
+		myFunctions.put("pow", new SimpleFunctions.Pow());
+		myFunctions.put("sqrt", new SimpleFunctions.Sqrt());
+		myFunctions.put("max", new SimpleFunctions.Max());
+		myFunctions.put("min", new SimpleFunctions.Min());
 
 		myOperators = new HashMap<String, AbstractOperator>(20);
 		myOperators.put("^", new ExponentOperator());
