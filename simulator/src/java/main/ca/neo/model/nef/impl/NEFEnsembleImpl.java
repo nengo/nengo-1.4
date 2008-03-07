@@ -55,8 +55,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private Map<String, PlasticityRule> myPlasticityRules;
 	private float myPlasticityInterval;
 	private float myLastPlasticityTime;	
-	private Map<String, LinearApproximator> myDecodingApproximators;
+	private Map<String, LinearApproximator> myDecodingApproximators;	
 	private ApproximatorFactory myApproximatorFactory;
+	private boolean myReuseApproximators;
 	private float[][] myEvalPoints;	
 
 	/**
@@ -90,6 +91,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myLastPlasticityTime = 0;		
 		myApproximatorFactory = factory;
 		myDecodingApproximators = new HashMap<String, LinearApproximator>(10);
+		myReuseApproximators = true;
 		myEvalPoints = evalPoints;
 	}
 	
@@ -167,12 +169,26 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public float[][] getEncoders() {
 		return myEncoders;
 	}
+	
+	/**
+	 * @return True if LinearApproximators for a Node Origin are re-used for decoding multiple decoded Origins. 
+	 */
+	public boolean getReuseApproximators() {
+		return myReuseApproximators;
+	}
+	
+	/**
+	 * @param reuse True if LinearApproximators for a Node Origin are re-used for decoding multiple decoded Origins.
+	 */
+	public void setReuseApproximators(boolean reuse) {
+		myReuseApproximators = reuse;
+	}
 
 	/**
 	 * @see ca.neo.model.nef.NEFEnsemble#addDecodedOrigin(java.lang.String, Function[], String)
 	 */
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {		
-		if (!myDecodingApproximators.containsKey(nodeOrigin)) {
+		if (!myReuseApproximators || !myDecodingApproximators.containsKey(nodeOrigin)) {
 			float[][] outputs = getConstantOutputs(myEvalPoints, nodeOrigin);
 			LinearApproximator approximator = myApproximatorFactory.getApproximator(myEvalPoints, outputs);
 			myDecodingApproximators.put(nodeOrigin, approximator);
@@ -528,6 +544,13 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		System.arraycopy(thisNames, 0, result, 0, thisNames.length);
 		System.arraycopy(superNames, 0, result, thisNames.length, superNames.length);
 		return result;
+	}
+	
+	/**
+	 * @return The source of LinearApproximators for this ensemble (used to find linear decoding vectors). 
+	 */
+	public ApproximatorFactory getApproximatorFactory() {
+		return myApproximatorFactory;
 	}
 
 	@Override

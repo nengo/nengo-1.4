@@ -22,8 +22,10 @@ public class WeightedCostApproximatorTest extends TestCase {
 	 * Test method for 'ca.neo.math.impl.WeightedCostApproximator.pseudoInverse()'
 	 */
 	public void testPseudoInverse() {
-		WeightedCostApproximator a = new WeightedCostApproximator(new float[][]{new float[]{0f},new float[]{1f},new float[]{2f}}, new float[][]{new float[]{3f,2f,3f},new float[]{1f,2f,3f}}, new ConstantFunction(1,1f), 0.02f);
-		double[][] ps = a.pseudoInverse(new double[][]{new double[]{1,2},new double[]{3,4}}, 0f);
+		WeightedCostApproximator a = new WeightedCostApproximator(new float[][]{new float[]{0f},new float[]{1f},new float[]{2f}}, 
+				new float[][]{new float[]{3f,2f,3f},new float[]{1f,2f,3f}}, 
+				new ConstantFunction(1,1f), 0.02f, -1);
+		double[][] ps = a.pseudoInverse(new double[][]{new double[]{1,2},new double[]{3,4}}, 0f, -1);
 		Matrix psM = new Matrix(ps);
 		Matrix aM = new Matrix(new double[][]{new double[]{1,2},new double[]{3,4}});
 		Matrix apsaM = aM.times(psM.times(aM));

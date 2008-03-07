@@ -51,13 +51,13 @@ public class CompositeApproximatorTest extends TestCase {
 			values[1][i+99] = polys[1].map(evalPoints[i+99]);
 			values[2][i+99] = polys[3].map(evalPoints[i+99]);
 		}
-		comps[0] = new WeightedCostApproximator(evalPoints, values, new ConstantFunction(1,1f), 0f);
+		comps[0] = new WeightedCostApproximator(evalPoints, values, new ConstantFunction(1,1f), 0f, -1);
 		for (int i=-99; i<100; i++) {
 			values[0][i+99] = polys[1].map(evalPoints[i+99]);
 			values[1][i+99] = polys[2].map(evalPoints[i+99]);
 			values[2][i+99] = polys[4].map(evalPoints[i+99]);
 		}
-		comps[1] = new WeightedCostApproximator(evalPoints, values, new ConstantFunction(1,1f), 0f);
+		comps[1] = new WeightedCostApproximator(evalPoints, values, new ConstantFunction(1,1f), 0f, -1);
 		
 		LinearApproximator approximator = new CompositeApproximator(comps, new int[][]{{0},{0}});
 		Function target = new Polynomial(new float[]{3f,2f,-2f});
@@ -85,7 +85,7 @@ public class CompositeApproximatorTest extends TestCase {
 				values2[1][i*20+j] = posts[1].map(evalPoints2[i*20+j]);
 			}
 		}
-		comps[0] = new WeightedCostApproximator(evalPoints2, values2, new ConstantFunction(1,1f), 0f);
+		comps[0] = new WeightedCostApproximator(evalPoints2, values2, new ConstantFunction(1,1f), 0f, -1);
 		for (int i=0; i<=19; i++) {
 			for (int j=0; j<=19; j++) {
 				evalPoints2[i*20+j] = new float[]{i-9,j-9};
@@ -93,7 +93,7 @@ public class CompositeApproximatorTest extends TestCase {
 				values2[1][i*20+j] = posts[0].map(evalPoints2[i*20+j]);
 			}
 		}
-		comps[1] = new WeightedCostApproximator(evalPoints2, values2, new ConstantFunction(1,1f), 0f);
+		comps[1] = new WeightedCostApproximator(evalPoints2, values2, new ConstantFunction(1,1f), 0f, -1);
 		
 		approximator = new CompositeApproximator(comps, new int[][]{{0,1},{0,1}});
 		l = new ArrayList();

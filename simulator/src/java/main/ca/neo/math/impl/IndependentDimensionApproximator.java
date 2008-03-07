@@ -61,7 +61,7 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 			for (int j = 0; j < dimCount[i]; j++) {
 				dimValues[j] = values[myIndices[i][j]];
 			}
-			myApproximators[i] = new WeightedCostApproximator(ep, dimValues, costFunction, noise);			
+			myApproximators[i] = new WeightedCostApproximator(ep, dimValues, costFunction, noise, -1);			
 		}
 		
 		myDimensions = dimensions;

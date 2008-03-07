@@ -61,7 +61,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 * 		sensitivity to simulation noise) as a proportion of the maximum absolute 
 	 * 		value over all values  
 	 */
-	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise) {
+	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise, int nSV) {
 		assert MU.isMatrix(evaluationPoints);
 		assert MU.isMatrix(values);
 		assert evaluationPoints.length == values[0].length;
@@ -76,7 +76,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		
 		double[][] gamma = findGamma();
 		Memory.report("before inverse");
-		myGammaInverse = pseudoInverse(gamma, absNoiseSD*absNoiseSD);
+		myGammaInverse = pseudoInverse(gamma, absNoiseSD*absNoiseSD, nSV);
 		Memory.report("after inverse");
 		
 		//testPlot(evaluationPoints, values);
@@ -131,9 +131,10 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 *    
 	 * @param matrix Any matrix
 	 * @param minSV Hint as to smallest singular value to use 
+	 * @param nSV Max number of singular values to use
 	 * @return The pseudoinverse of the given matrix
 	 */
-	public double[][] pseudoInverse(double[][] matrix, float minSV) {
+	public double[][] pseudoInverse(double[][] matrix, float minSV, int nSV) {
 		double[][] result;
 		
 		Matrix m = new Matrix(matrix);
@@ -141,7 +142,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		Matrix sInv = svd.getS().inverse();
 
 		int i = 0; 
-		while (i < svd.getS().getRowDimension() && svd.getS().get(i, i) > minSV) i++;
+		while (i < svd.getS().getRowDimension() && svd.getS().get(i, i) > minSV && (nSV <= 0 || i < nSV)) i++;
 
 		ourLogger.info("Using " + i + " singular values for pseudo-inverse");
 		
@@ -228,19 +229,51 @@ public class WeightedCostApproximator implements LinearApproximator {
 		private static final long serialVersionUID = -3390244062379730498L;
 		
 		private float myNoise;
+		private int myNSV;
 		
 		/**
 		 * @param noise Random noise to add to component functions (proportion of largest value over all functions) 
 		 */
 		public Factory(float noise) {
 			myNoise = noise;
+			myNSV = -1;
+		}
+		
+		/**
+		 * @return Random noise to add to component functions (proportion of largest value over all functions)
+		 */
+		public float getNoise() {
+			return myNoise;
+		}
+
+		/**
+		 * @param noise Random noise to add to component functions (proportion of largest value over all functions)
+		 */
+		public void setNoise(float noise) {
+			myNoise = noise;
+		}
+		
+		/**
+		 * @return Maximum number of singular values to use in psuedoinverse of correlation matrix (zero or less means 
+		 * 		use as many as possible to a threshold magnitude determined by noise).   
+		 */
+		public int getNSV() {
+			return myNSV;
+		}
+
+		/**
+		 * @param nSV Maximum number of singular values to use in psuedoinverse of correlation matrix (zero or less means 
+		 * 		use as many as possible to a threshold magnitude determined by noise).
+		 */
+		public void setNSV(int nSV) {
+			myNSV = nSV;
 		}
 
 		/**
 		 * @see ca.neo.math.ApproximatorFactory#getApproximator(float[][], float[][])
 		 */
 		public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
-			return new WeightedCostApproximator(evalPoints, values, getCostFunction(evalPoints[0].length), myNoise);
+			return new WeightedCostApproximator(evalPoints, values, getCostFunction(evalPoints[0].length), myNoise, myNSV);
 		}
 
 		/**
