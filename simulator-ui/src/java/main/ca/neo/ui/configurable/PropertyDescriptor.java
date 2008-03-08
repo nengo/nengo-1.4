@@ -82,8 +82,7 @@ public abstract class PropertyDescriptor implements Serializable {
 	/**
 	 * @return Class type that this parameter's value must be
 	 */
-	@SuppressWarnings("unchecked")
-	public abstract Class getTypeClass();
+	public abstract Class<?> getTypeClass();
 
 	/**
 	 * @return A name given to the Class type of this parameter's value

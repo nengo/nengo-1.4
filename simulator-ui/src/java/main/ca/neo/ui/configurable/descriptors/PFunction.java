@@ -29,22 +29,17 @@ public class PFunction extends PropertyDescriptor {
 		this(name, inputDimension, false, null);
 	}
 
-	public PFunction(String name, int inputDimension,
-			boolean isInputDimensionEditable, Function defaultValue) {
+	public PFunction(String name, int inputDimension, boolean isInputDimensionEditable,
+			Function defaultValue) {
 		super(name, defaultValue);
 		this.myInputDimension = inputDimension;
 		this.isInputDimensionEditable = isInputDimensionEditable;
 	}
 
-	// public PFunction(String name, Object defaultValue) {
-	// super(name, defaultValue);
-	// }
-
 	private AbstractFn[] createConfigurableFunctions() {
 		Vector<AbstractFn> functions = new Vector<AbstractFn>();
 
-		functions
-				.add(new FnConstant(myInputDimension, isInputDimensionEditable));
+		functions.add(new FnConstant(myInputDimension, isInputDimensionEditable));
 
 		FnCustom interpreterFunction = new FnCustom(myInputDimension, false);
 
@@ -54,16 +49,13 @@ public class PFunction extends PropertyDescriptor {
 		 * These functions can only have a input dimension of 1
 		 */
 		if (myInputDimension == 1) {
-			FnReflective fourierFunction = new FnReflective(
-					FourierFunction.class, "Fourier Function",
-					new PropertyDescriptor[] { new PFloat("Fundamental"),
-							new PFloat("Cutoff"), new PFloat("RMS"),
-							new PLong("Seed") });
+			FnReflective fourierFunction = new FnReflective(FourierFunction.class,
+					"Fourier Function", new PropertyDescriptor[] { new PFloat("Fundamental"),
+							new PFloat("Cutoff"), new PFloat("RMS"), new PLong("Seed") });
 
-			FnReflective gaussianPDF = new FnReflective(
-					GaussianPDF.class, "Gaussian PDF",
-					new PropertyDescriptor[] { new PFloat("Mean"),
-							new PFloat("Variance"), new PFloat("Peak") });
+			FnReflective gaussianPDF = new FnReflective(GaussianPDF.class, "Gaussian PDF",
+					new PropertyDescriptor[] { new PFloat("Mean"), new PFloat("Variance"),
+							new PFloat("Peak") });
 
 			functions.add(fourierFunction);
 			functions.add(gaussianPDF);

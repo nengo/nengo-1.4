@@ -81,9 +81,17 @@ public class Util {
 
 	public static void Assert(boolean bool, String msg) {
 		if (!bool && UIEnvironment.isDebugEnabled()) {
-			String assertMsg = "ASSERT == FALSE: " + msg;
-			(new Exception(assertMsg)).printStackTrace();
-			UserMessages.showWarning(assertMsg);
+			StringBuilder assertMsg = new StringBuilder("<h3>ASSERT == FALSE<br>");
+			if (msg != null && !"".equals(msg)) {
+				assertMsg.append(msg + "<br>");
+			}
+			assertMsg.append("Report this error to shuwu83@gmail.com</h3><br>");
+			StackTraceElement[] stackEls = (new Exception()).getStackTrace();
+			for (StackTraceElement el : stackEls) {
+				assertMsg.append(el.toString() + "<br>");
+			}
+
+			UserMessages.showWarning(assertMsg.toString());
 		}
 
 	}

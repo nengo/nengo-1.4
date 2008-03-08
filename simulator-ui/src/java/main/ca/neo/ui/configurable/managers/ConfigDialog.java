@@ -62,8 +62,7 @@ public class ConfigDialog extends JDialog {
 	 *            Component this dialog shall be added to
 	 */
 	public ConfigDialog(UserConfigurer configManager, Dialog owner) {
-		super(owner, "Configuring "
-				+ configManager.getConfigurable().getTypeName());
+		super(owner, "Configuring " + configManager.getConfigurable().getTypeName());
 
 		init(configManager, owner);
 
@@ -75,8 +74,7 @@ public class ConfigDialog extends JDialog {
 	 *            set
 	 * @return Whether the user has set all the values on the dialog correctly
 	 */
-	private boolean processPropertiesInternal(boolean setPropertyFields,
-			boolean showMessage) {
+	private boolean processPropertiesInternal(boolean setPropertyFields, boolean showMessage) {
 		Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 
 		while (it.hasNext()) {
@@ -86,13 +84,11 @@ public class ConfigDialog extends JDialog {
 			if (inputPanel.isValueSet()) {
 				if (setPropertyFields) {
 
-					myConfigurer.setProperty(property.getName(), inputPanel
-							.getValue());
+					myConfigurer.setProperty(property.getName(), inputPanel.getValue());
 				}
 			} else {
 				if (showMessage) {
-					UserMessages.showWarning(property.getName()
-							+ " is not set or is incomplete");
+					UserMessages.showWarning(property.getName() + " is not set or is incomplete");
 				}
 				return false;
 			}
@@ -109,8 +105,7 @@ public class ConfigDialog extends JDialog {
 
 		setVisible(false);
 
-		myConfigurer
-				.dialogConfigurationFinished(new ConfigDialogClosedException());
+		myConfigurer.dialogConfigurationFinished(new ConfigDialogClosedException());
 		super.dispose();
 	}
 
@@ -168,6 +163,7 @@ public class ConfigDialog extends JDialog {
 		panel = new JCustomPanel();
 		panel.setVisible(true);
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
 		initPanelTop(panel);
 
 		createPropertiesDialog(panel);
@@ -194,8 +190,7 @@ public class ConfigDialog extends JDialog {
 		if (applyProperties()) {
 			boolean preConfigurationSuccess = true;
 			try {
-				PropertySet properties = new PropertySet(myConfigurer
-						.getProperties());
+				PropertySet properties = new PropertySet(myConfigurer.getProperties());
 				myConfigurer.getConfigurable().preConfiguration(properties);
 			} catch (ConfigException e1) {
 				e1.defaultHandleBehavior();
@@ -206,8 +201,7 @@ public class ConfigDialog extends JDialog {
 				setVisible(false);
 				dispose();
 
-				(new TrackedAction("Configuring "
-						+ myConfigurer.getConfigurable().getTypeName()) {
+				(new TrackedAction("Configuring " + myConfigurer.getConfigurable().getTypeName()) {
 
 					private static final long serialVersionUID = 1L;
 
@@ -222,8 +216,7 @@ public class ConfigDialog extends JDialog {
 
 						}
 
-						myConfigurer
-								.dialogConfigurationFinished(configException);
+						myConfigurer.dialogConfigurationFinished(configException);
 
 					}
 				}).doAction();
@@ -257,10 +250,8 @@ public class ConfigDialog extends JDialog {
 	 */
 
 	protected void createPropertiesDialog(JPanel panel) {
-		PropertyDescriptor[] propDescriptors = myConfigurer.getConfigurable()
-				.getConfigSchema();
-		propertyInputPanels = new Vector<PropertyInputPanel>(
-				propDescriptors.length);
+		PropertyDescriptor[] propDescriptors = myConfigurer.getConfigurable().getConfigSchema();
+		propertyInputPanels = new Vector<PropertyInputPanel>(propDescriptors.length);
 
 		MutableAttributeSet properties = myConfigurer.getProperties();
 
