@@ -36,7 +36,7 @@ public class IntegerPanel extends PropertyInputPanel {
 	private void initPanel() {
 		tf = new JTextField(10);
 
-		addToPanel(tf);
+		add(tf);
 
 	}
 	

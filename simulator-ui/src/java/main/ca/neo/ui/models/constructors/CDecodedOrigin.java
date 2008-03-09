@@ -89,7 +89,7 @@ class OriginInputPanel extends PropertyInputPanel {
 		this.origins = originNames;
 
 		comboBox = new JComboBox(origins);
-		addToPanel(comboBox);
+		add(comboBox);
 	}
 
 	@Override

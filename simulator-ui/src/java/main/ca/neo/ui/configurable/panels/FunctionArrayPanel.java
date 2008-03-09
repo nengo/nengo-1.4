@@ -59,7 +59,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 		/*
 		 * get the JDialog parent
 		 */
-		Container parent = getParent();
+		Container parent = getJPanel().getParent();
 		while (parent != null) {
 			if (parent instanceof JDialog)
 				break;
@@ -70,8 +70,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 			ConfigurableFunctionArray configurableFunctions = new ConfigurableFunctionArray(
 					getInputDimension(), getOutputDimension(), getValue());
 
-			UserConfigurer config = new UserConfigurer(configurableFunctions,
-					(JDialog) parent);
+			UserConfigurer config = new UserConfigurer(configurableFunctions, (JDialog) parent);
 			try {
 				config.configureAndWait();
 				setValue(configurableFunctions.getFunctions());
@@ -105,12 +104,12 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 	private void initPanel() {
 		JLabel dimensions = new JLabel("Output Dimensions: ");
 		tf = new JTextField(10);
-		addToPanel(dimensions);
-		addToPanel(tf);
+		add(dimensions);
+		add(tf);
 
 		JButton configureFunction = new JButton(new EditFunctions());
-		addToPanel(tf);
-		addToPanel(configureFunction);
+		add(tf);
+		add(configureFunction);
 
 	}
 
@@ -136,8 +135,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
 	@Override
 	public boolean isValueSet() {
-		if (myFunctionsWr != null
-				&& (myFunctionsWr.length == getOutputDimension())) {
+		if (myFunctionsWr != null && (myFunctionsWr.length == getOutputDimension())) {
 			return true;
 		} else {
 			setStatusMsg("Functions not set");
@@ -165,8 +163,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 		 */
 		for (int i = 0; i < functions.length; i++) {
 			if (functions[i].getDimension() != getInputDimension()) {
-				Util
-						.debugMsg("Saved functions are of a different dimension, they can't be used");
+				Util.debugMsg("Saved functions are of a different dimension, they can't be used");
 				return;
 			}
 		}
@@ -263,8 +260,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 	public void completeConfiguration(PropertySet properties) {
 		myFunctions = new Function[outputDimension];
 		for (int i = 0; i < outputDimension; i++) {
-			myFunctions[i] = ((Function) properties
-					.getProperty("Function " + i));
+			myFunctions[i] = ((Function) properties.getProperty("Function " + i));
 
 		}
 
@@ -282,13 +278,11 @@ class ConfigurableFunctionArray implements IConfigurable {
 
 			Function defaultValue = null;
 
-			if (defaultValues != null && i < defaultValues.length
-					&& defaultValues[i] != null) {
+			if (defaultValues != null && i < defaultValues.length && defaultValues[i] != null) {
 				defaultValue = defaultValues[i];
 
 			}
-			PFunction function = new PFunction("Function " + i, inputDimension,
-					false, defaultValue);
+			PFunction function = new PFunction("Function " + i, inputDimension, false, defaultValue);
 
 			props[i] = function;
 		}

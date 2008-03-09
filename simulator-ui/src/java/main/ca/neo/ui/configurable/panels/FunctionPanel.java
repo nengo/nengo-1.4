@@ -111,11 +111,11 @@ public class FunctionPanel extends PropertyInputPanel {
 		});
 		JButton configureBtn = new JButton(new SetParametersAction());
 
-		addToPanel(comboBox);
-		addToPanel(configureBtn);
+		add(comboBox);
+		add(configureBtn);
 
 		previewBtn = new JButton(new PreviewFunctionAction());
-		addToPanel(previewBtn);
+		add(previewBtn);
 
 	}
 

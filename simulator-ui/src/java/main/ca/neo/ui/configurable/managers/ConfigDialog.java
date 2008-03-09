@@ -258,7 +258,7 @@ public class ConfigDialog extends JDialog {
 		for (PropertyDescriptor property : propDescriptors) {
 
 			PropertyInputPanel inputPanel = property.getInputPanel();
-			panel.add(inputPanel);
+			panel.add(inputPanel.getJPanel());
 
 			/*
 			 * Try to get the configurer's current value and apply it to the

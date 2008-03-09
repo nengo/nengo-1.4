@@ -101,7 +101,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * @return Constructed Context Menu
 	 */
 	protected void constructMenu(PopupMenuBuilder menu) {
-		menu.addAction(new RemoveModelAction("Remove this", this));
+		menu.addAction(new RemoveModelAction("Remove model", this));
 	}
 
 	protected void constructTooltips(TooltipBuilder builder) {
@@ -130,7 +130,8 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	protected void prepareForDestroy() {
 		super.prepareForDestroy();
 
-		setModel(null);
+		detachViewFromModel();
+		firePropertyChange(Property.MODEL_CHANGED);
 	}
 
 	protected void prepareToDestroyModel() {

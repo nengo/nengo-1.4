@@ -1,14 +1,16 @@
 package ca.neo.ui.models.constructors;
 
-import java.awt.Component;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.security.InvalidParameterException;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.impl.GradientDescentApproximator;
@@ -33,7 +35,8 @@ public class CNEFEnsemble extends ConstructableNode {
 
 	static final PropertyDescriptor pDim = new PInt("Dimensions");
 
-	static final PropertyDescriptor pEncodingDistribution = new PEncodingDistribution("Encoding");
+	static final PropertyDescriptor pEncodingDistribution = new PEncodingDistribution(
+			"Encoding Distribution");
 	static final PropertyDescriptor pEncodingSign = new PSign("Encoding");
 	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
 
@@ -101,7 +104,7 @@ class PEncodingDistribution extends PropertyDescriptor {
 	private static final long serialVersionUID = 1L;
 
 	public PEncodingDistribution(String name) {
-		super(name);
+		super(name, (Float) 0f);
 	}
 
 	@Override
@@ -116,27 +119,56 @@ class PEncodingDistribution extends PropertyDescriptor {
 
 	@Override
 	public String getTypeName() {
-		return "Distribution";
+		return "Slider";
 	}
 
 	static class Slider extends PropertyInputPanel {
 		private static final int NUMBER_OF_TICKS = 1000;
 		private static final long serialVersionUID = 1L;
 
-		JSlider sliderSwing;
+		private JSlider sliderSwing;
+		private JLabel sliderValueLabel;
 
 		public Slider(PropertyDescriptor property) {
 			super(property);
-			sliderSwing = new JSlider(0, NUMBER_OF_TICKS);
-			Dictionary<Integer, Component> labelDict = new Hashtable<Integer, Component>(2);
-			labelDict.put(new Integer(0), new JLabel("evenly distributed"));
-			labelDict.put(new Integer(NUMBER_OF_TICKS), new JLabel("clustered on axis"));
 
-			sliderSwing.setLabelTable(labelDict);
-			sliderSwing.setPaintLabels(true);
+			JPanel sliderPanel = new JPanel();
+			sliderPanel.setLayout(new BorderLayout());
+			add(sliderPanel);
+
+			sliderSwing = new JSlider(0, NUMBER_OF_TICKS);
+
+			/*
+			 * Add labels
+			 */
 			sliderSwing.setPreferredSize(new Dimension(400, (int) sliderSwing.getPreferredSize()
 					.getHeight()));
-			addToPanel(sliderSwing);
+			sliderPanel.add(sliderSwing, BorderLayout.NORTH);
+
+			JPanel labelsPanel = new JPanel();
+			sliderPanel.add(labelsPanel, BorderLayout.SOUTH);
+
+			labelsPanel.setLayout(new BorderLayout());
+			labelsPanel.add(new JLabel("0.0 - Evenly Distributed"), BorderLayout.WEST);
+			sliderValueLabel = new JLabel();
+			sliderValueLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			sliderValueLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+			labelsPanel.add(sliderValueLabel, BorderLayout.CENTER);
+			labelsPanel.add(new JLabel("Clustered on Axis - 1.0"), BorderLayout.EAST);
+			updateSliderLabel();
+
+			sliderSwing.addChangeListener(new ChangeListener() {
+
+				public void stateChanged(ChangeEvent e) {
+					updateSliderLabel();
+				}
+
+			});
+
+		}
+
+		private void updateSliderLabel() {
+			sliderValueLabel.setText(" -" + getValue().toString() + "- ");
 		}
 
 		@Override
@@ -201,7 +233,7 @@ class PSign extends PropertyDescriptor {
 		public Panel(PropertyDescriptor property) {
 			super(property);
 			comboBox = new JComboBox(items);
-			addToPanel(comboBox);
+			add(comboBox);
 		}
 
 		@Override

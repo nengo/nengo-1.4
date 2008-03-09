@@ -93,7 +93,7 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 		/*
 		 * get the JDialog parent
 		 */
-		Container parent = getParent();
+		Container parent = getJPanel().getParent();
 		while (parent != null) {
 			if (parent instanceof JDialog)
 				break;
@@ -111,17 +111,15 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 				/*
 				 * Create a property descriptor with no default value
 				 */
-				pCouplingMatrix = new PCouplingMatrix(getFromSize(),
-						getToSize());
+				pCouplingMatrix = new PCouplingMatrix(getFromSize(), getToSize());
 			}
 
-			String configName = getFromSize() + " to " + getToSize()
-					+ " Coupling Matrix";
+			String configName = getFromSize() + " to " + getToSize() + " Coupling Matrix";
 
 			try {
 				PropertySet result = ConfigManager.configure(
-						new PropertyDescriptor[] { pCouplingMatrix },
-						configName, parent, ConfigManager.ConfigMode.STANDARD);
+						new PropertyDescriptor[] { pCouplingMatrix }, configName, parent,
+						ConfigManager.ConfigMode.STANDARD);
 
 				setValue((float[][]) result.getProperty(pCouplingMatrix));
 			} catch (ConfigException e) {
@@ -151,13 +149,13 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 	private void initPanel() {
 		JLabel dimensions = new JLabel("Input Dim: ");
 		tf = new JTextField(10);
-		addToPanel(dimensions);
-		addToPanel(tf);
+		add(dimensions);
+		add(tf);
 
 		JButton configureFunction = new JButton(new EditMatrixAction());
 
-		addToPanel(tf);
-		addToPanel(configureFunction);
+		add(tf);
+		add(configureFunction);
 	}
 
 	@Override
@@ -189,8 +187,7 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 			if (isValueSet())
 				setStatusMsg("");
 		} else {
-			Util
-					.debugMsg("Saved termination weights don't fit, they will be replaced");
+			Util.debugMsg("Saved termination weights don't fit, they will be replaced");
 		}
 	}
 

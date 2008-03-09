@@ -23,7 +23,7 @@ public class FloatPanel extends PropertyInputPanel {
 		super(property);
 
 		tf = new JTextField(10);
-		addToPanel(tf);
+		add(tf);
 	}
 
 	@Override

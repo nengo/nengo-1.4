@@ -32,7 +32,7 @@ public class BooleanPanel extends PropertyInputPanel {
 	private void initPanel() {
 		checkBox = new JCheckBox();
 		checkBox.setSelected(false);
-		addToPanel(checkBox);
+		add(checkBox);
 
 	}
 

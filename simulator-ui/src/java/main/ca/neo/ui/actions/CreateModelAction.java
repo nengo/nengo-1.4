@@ -82,6 +82,7 @@ public class CreateModelAction extends ReversableAction {
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ActionException(e.getMessage());
 		}
 	}

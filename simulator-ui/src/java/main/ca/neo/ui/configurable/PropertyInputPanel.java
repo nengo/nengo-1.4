@@ -16,8 +16,9 @@ import ca.shu.ui.lib.Style.Style;
  * 
  * @author Shu
  */
-public abstract class PropertyInputPanel extends JPanel {
+public abstract class PropertyInputPanel {
 	private final JPanel innerPanel;
+	private final JPanel outerPanel;
 
 	private PropertyDescriptor propDescriptor;
 
@@ -30,26 +31,36 @@ public abstract class PropertyInputPanel extends JPanel {
 	public PropertyInputPanel(PropertyDescriptor property) {
 		super();
 		this.propDescriptor = property;
+		outerPanel = new JPanel();
+		outerPanel.setName(property.getName());
 
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		setAlignmentY(TOP_ALIGNMENT);
+		outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
+		outerPanel.setAlignmentY(JPanel.TOP_ALIGNMENT);
 
-		setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		outerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-		JLabel label = new JLabel(property.getName() + " ("
-				+ property.getTypeName() + ")");
-		add(label);
+		JLabel label = new JLabel(property.getName() + " (" + property.getTypeName() + ")");
+		outerPanel.add(label);
 
 		innerPanel = new JPanel();
 		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
-		innerPanel.setAlignmentX(LEFT_ALIGNMENT);
+		innerPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
-		add(innerPanel);
+		outerPanel.add(innerPanel);
 
 		statusMessage = new JLabel("");
 		statusMessage.setForeground(Style.COLOR_HIGH_SALIENCE);
 
-		add(statusMessage);
+		outerPanel.add(statusMessage);
+
+	}
+
+	/**
+	 * @param comp
+	 *            Component to be added to the input panel
+	 */
+	protected void add(Component comp) {
+		innerPanel.add(comp);
 
 	}
 
@@ -60,7 +71,7 @@ public abstract class PropertyInputPanel extends JPanel {
 		/*
 		 * get the JDialog parent
 		 */
-		Container parent = getParent();
+		Container parent = outerPanel.getParent();
 		while (parent != null) {
 			if (parent instanceof JDialog) {
 				return (JDialog) parent;
@@ -69,15 +80,6 @@ public abstract class PropertyInputPanel extends JPanel {
 		}
 
 		throw new RuntimeException("Input panel does not have a dialog parent");
-
-	}
-
-	/**
-	 * @param comp
-	 *            Component to be added to the input panel
-	 */
-	protected void addToPanel(Component comp) {
-		innerPanel.add(comp);
 
 	}
 
@@ -103,9 +105,12 @@ public abstract class PropertyInputPanel extends JPanel {
 		return propDescriptor;
 	}
 
-	@Override
+	public JPanel getJPanel() {
+		return outerPanel;
+	}
+
 	public String getName() {
-		return propDescriptor.getName();
+		return outerPanel.getName();
 	}
 
 	/**
@@ -113,10 +118,18 @@ public abstract class PropertyInputPanel extends JPanel {
 	 */
 	public abstract Object getValue();
 
+	public boolean isEnabled() {
+		return innerPanel.isEnabled();
+	}
+
 	/**
 	 * @return True if configuration parameter is set
 	 */
 	public abstract boolean isValueSet();
+
+	public void setEnabled(boolean enabled) {
+		innerPanel.setEnabled(enabled);
+	}
 
 	/**
 	 * @param value

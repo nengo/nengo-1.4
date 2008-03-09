@@ -29,7 +29,7 @@ class CouplingMatrixPanel extends PropertyInputPanel {
 		couplingMatrix = new CouplingMatrixImpl(fromSize, toSize);
 		editor = new MatrixEditor(couplingMatrix);
 
-		addToPanel(editor);
+		add(editor);
 	}
 
 	@Override
