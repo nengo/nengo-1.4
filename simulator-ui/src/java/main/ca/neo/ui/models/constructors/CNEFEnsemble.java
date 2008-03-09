@@ -3,6 +3,7 @@ package ca.neo.ui.models.constructors;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.security.InvalidParameterException;
+import java.text.DecimalFormat;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -168,7 +169,9 @@ class PEncodingDistribution extends PropertyDescriptor {
 		}
 
 		private void updateSliderLabel() {
-			sliderValueLabel.setText(" -" + getValue().toString() + "- ");
+			DecimalFormat df = new DecimalFormat("0.000");
+
+			sliderValueLabel.setText(" -" + df.format(getValue()) + "- ");
 		}
 
 		@Override
