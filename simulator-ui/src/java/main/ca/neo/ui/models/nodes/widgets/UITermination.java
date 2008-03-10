@@ -120,7 +120,7 @@ public class UITermination extends Widget implements ILineTermination {
 		super.constructWidgetMenu(menu);
 
 		if (getConnector() != null) {
-			menu.addAction(new RemoveConnectionAction("Disconnect", getConnector()));
+			menu.addAction(new DisconnectAction("Disconnect"));
 		}
 	}
 
@@ -160,7 +160,7 @@ public class UITermination extends Widget implements ILineTermination {
 				getNodeParent().getNetworkParent().getModel().removeProjection(getModel());
 				getNodeParent().showPopupMessage(
 						"REMOVED Projection to " + getNodeParent().getName() + "." + getName());
-				
+
 				getConnector().destroy();
 			} catch (StructuralException e) {
 				UserMessages.showWarning("Problem trying to disconnect: " + e.toString());
@@ -221,25 +221,22 @@ public class UITermination extends Widget implements ILineTermination {
 		}
 	}
 
-}
+	/**
+	 * Action for removing attached connection from the termination
+	 * 
+	 * @author Shu Wu
+	 */
+	class DisconnectAction extends StandardAction {
+		private static final long serialVersionUID = 1L;
 
-/**
- * Action for removing attached connection from the termination
- * 
- * @author Shu Wu
- */
-class RemoveConnectionAction extends StandardAction {
-	private static final long serialVersionUID = 1L;
-	private LineConnector lineEndToRemove;
+		public DisconnectAction(String actionName) {
+			super("Remove connection from Termination", actionName);
+		}
 
-	public RemoveConnectionAction(String actionName, LineConnector lineEndToRemove) {
-		super("Remove connection from Termination", actionName);
-		this.lineEndToRemove = lineEndToRemove;
+		@Override
+		protected void action() throws ActionException {
+			disconnect();
+		}
 	}
 
-	@Override
-	protected void action() throws ActionException {
-		lineEndToRemove.destroy();
-		lineEndToRemove = null;
-	}
 }
