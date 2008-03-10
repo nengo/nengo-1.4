@@ -54,9 +54,9 @@ public class NodeFactoryPanel extends PropertyInputPanel {
 
 		try {
 			NodeFactory model = (NodeFactory) ModelFactory.constructModel(selectedItem);
-
 			setValue(model);
-
+		} catch (ConfigException e) {
+			e.defaultHandleBehavior();
 		} catch (Exception e) {
 			UserMessages.showError("Could not configure Node Factory: " + e.getMessage());
 		}
