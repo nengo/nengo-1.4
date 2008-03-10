@@ -16,6 +16,8 @@ import org.apache.log4j.Logger;
 
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
+import ca.neo.math.Function;
+import ca.neo.math.PDF;
 import ca.neo.model.Ensemble;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
@@ -23,9 +25,12 @@ import ca.neo.model.Noise;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.Termination;
+import ca.neo.model.Units;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.model.neuron.SynapticIntegrator;
+import ca.neo.model.plasticity.PlasticityRule;
+import ca.neo.util.SpikePattern;
 
 
 /**
@@ -72,17 +77,22 @@ public class IconRegistry {
 
 			ourInstance.setIcon(DynamicalSystem.class, "/ca/neo/config/ui/dynamicalsystem02.jpg");
 			ourInstance.setIcon(Integrator.class, "/ca/neo/config/ui/integrator.jpg");
+//			ourInstance.setIcon(PDF.class, "/ca/neo/config/ui/pdf.jpg");
+			ourInstance.setIcon(Function.class, "/ca/neo/config/ui/function.jpg");
 			ourInstance.setIcon(Noise.class, "/ca/neo/config/ui/noise01.jpg");
-			ourInstance.setIcon(Origin.class, "/ca/neo/config/ui/origin01.jpg");
+			ourInstance.setIcon(Origin.class, "/ca/neo/config/ui/origin4.jpg");
 			ourInstance.setIcon(SimulationMode.class, "/ca/neo/config/ui/simulationmode.jpg");
 			ourInstance.setIcon(SpikeGenerator.class, "/ca/neo/config/ui/spikegenerator.jpg");
-			ourInstance.setIcon(Termination.class, "/ca/neo/config/ui/termination.jpg");		
+//			ourInstance.setIcon(Units.class, "/ca/neo/config/ui/units.jpg");
+			ourInstance.setIcon(SpikePattern.class, "/ca/neo/config/ui/spikepattern.jpg");
+			ourInstance.setIcon(PlasticityRule.class, "/ca/neo/config/ui/plasticityrule.jpg");
+			ourInstance.setIcon(Termination.class, "/ca/neo/config/ui/termination4.jpg");		
 			
 			ourInstance.setIcon(Neuron.class, "/ca/neo/config/ui/neuron.jpg");		
 			ourInstance.setIcon(Network.class, "/ca/neo/config/ui/network.jpg");		
-			ourInstance.setIcon(Ensemble.class, "/ca/neo/config/ui/ensemble.jpg");		
+			ourInstance.setIcon(Ensemble.class, "/ca/neo/config/ui/ensemble2.jpg");		
 			ourInstance.setIcon(Node.class, "/ca/neo/config/ui/node.jpg");		
-			ourInstance.setIcon(SynapticIntegrator.class, "/ca/neo/config/ui/synintegrator2.JPG");		
+			ourInstance.setIcon(SynapticIntegrator.class, "/ca/neo/config/ui/synintegrator3.jpg");		
 		}
 		
 		return ourInstance;
