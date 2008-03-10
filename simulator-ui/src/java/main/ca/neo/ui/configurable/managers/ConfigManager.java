@@ -32,8 +32,7 @@ public abstract class ConfigManager {
 	/**
 	 * Name of directory where to store saved configuration
 	 */
-	static final String SAVED_CONFIG_DIR = NengoGraphics.USER_FILE_DIR
-			+ "/Config";
+	static final String SAVED_CONFIG_DIR = NengoGraphics.USER_FILE_DIR + "/Config";
 
 	/**
 	 * Creates a saved objects folder if it isn't already there
@@ -51,17 +50,16 @@ public abstract class ConfigManager {
 		STANDARD, TEMPLATE_NOT_CHOOSABLE, TEMPLATE_CHOOSABLE
 	}
 
-	public static Object configure(PropertyDescriptor prop, String typeName,
-			Container parent) throws ConfigException {
+	public static Object configure(PropertyDescriptor prop, String typeName, Container parent)
+			throws ConfigException {
 
-		PropertySet properties = configure(new PropertyDescriptor[] { prop },
-				typeName, parent, ConfigMode.TEMPLATE_NOT_CHOOSABLE);
+		PropertySet properties = configure(new PropertyDescriptor[] { prop }, typeName, parent,
+				ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 		return properties.getProperty(prop);
 	}
 
-	public static PropertySet configure(PropertyDescriptor[] props,
-			String typeName, Container parent, ConfigMode configMode)
-			throws ConfigException {
+	public static PropertySet configure(PropertyDescriptor[] props, String typeName,
+			Container parent, ConfigMode configMode) throws ConfigException {
 
 		Configureable configurable = new Configureable(props, typeName);
 
@@ -124,8 +122,7 @@ public abstract class ConfigManager {
 	 *            filename prefix
 	 */
 	protected void deletePropertiesFile(String name) {
-		File file = new File(getSavedObjectsFolder(),
-				getFileNamePrefix(configurable) + name);
+		File file = new File(getSavedObjectsFolder(), getFileNamePrefix(configurable) + name);
 
 		System.gc();
 		if (file.exists()) {
@@ -174,8 +171,7 @@ public abstract class ConfigManager {
 		 */
 		String[] files0 = new String[files.length];
 		for (int i = 0; i < files.length; i++) {
-			files0[i] = files[i].replaceFirst(getFileNamePrefix(configurable),
-					"");
+			files0[i] = files[i].replaceFirst(getFileNamePrefix(configurable), "");
 		}
 		return files0;
 
@@ -190,8 +186,8 @@ public abstract class ConfigManager {
 		FileInputStream f_in;
 
 		try {
-			f_in = new FileInputStream(SAVED_CONFIG_DIR + "/"
-					+ getFileNamePrefix(configurable) + name);
+			f_in = new FileInputStream(SAVED_CONFIG_DIR + "/" + getFileNamePrefix(configurable)
+					+ name);
 
 			ObjectInputStream obj_in = new ObjectInputStream(f_in);
 
@@ -214,8 +210,7 @@ public abstract class ConfigManager {
 		} catch (InvalidClassException e) {
 			System.out.println("Invalid class exception");
 		} catch (NotSerializableException e) {
-			Util.debugMsg("Loading properties not serializable: "
-					+ e.getMessage());
+			Util.debugMsg("Loading properties not serializable: " + e.getMessage());
 		} catch (IOException e) {
 			Util.debugMsg("IO Error serializing properties: " + e.getMessage());
 		}
@@ -231,8 +226,7 @@ public abstract class ConfigManager {
 		FileOutputStream f_out;
 		try {
 			File objectsFolder = getSavedObjectsFolder();
-			File file = new File(objectsFolder, getFileNamePrefix(configurable)
-					+ name);
+			File file = new File(objectsFolder, getFileNamePrefix(configurable) + name);
 
 			if (file.exists()) {
 				Util.debugMsg("Replaced existing file: " + file.getName());
@@ -245,6 +239,8 @@ public abstract class ConfigManager {
 
 			f_out.close();
 
+		} catch (NotSerializableException e) {
+			Util.debugMsg("Did not save settings to template because " + e.getMessage());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

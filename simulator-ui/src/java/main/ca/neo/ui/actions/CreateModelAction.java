@@ -64,7 +64,7 @@ public class CreateModelAction extends ReversableAction {
 	protected void action() throws ActionException {
 		try {
 
-			Object model = ModelFactory.constructNode(constructable);
+			Object model = ModelFactory.constructModel(constructable);
 
 			if (model instanceof Node) {
 				nodeCreated = UINeoNode.createNodeUI((Node) model);

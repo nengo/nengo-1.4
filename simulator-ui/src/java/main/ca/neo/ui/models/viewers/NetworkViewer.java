@@ -405,12 +405,12 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void constructMenu(PopupMenuBuilder menu) {
 		MockNode clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
 		if (clipboardNode != null) {
-			menu.addAction(new PasteAction("Paste node here", clipboardNode, this));
+			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here",
+					clipboardNode, this));
 		}
 
 		super.constructMenu(menu);

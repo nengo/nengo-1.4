@@ -17,6 +17,7 @@ import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.impl.GradientDescentApproximator;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
+import ca.neo.model.impl.NodeFactory;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
@@ -24,6 +25,7 @@ import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PInt;
+import ca.neo.ui.configurable.descriptors.PNodeFactory;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.constructors.PSign.SignType;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
@@ -40,12 +42,13 @@ public class CNEFEnsemble extends ConstructableNode {
 			"Encoding Distribution");
 	static final PropertyDescriptor pEncodingSign = new PSign("Encoding");
 	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
+	static final PropertyDescriptor pNodeFactory = new PNodeFactory("Factory");
 
 	/**
 	 * Config descriptors
 	 */
 	static final PropertyDescriptor[] zConfig = { pNumOfNeurons, pDim, pDecodingSign,
-			pEncodingDistribution, pEncodingSign };
+			pEncodingDistribution, pEncodingSign, pNodeFactory };
 
 	public CNEFEnsemble(INodeContainer nodeContainer) {
 		super(nodeContainer);
@@ -58,7 +61,11 @@ public class CNEFEnsemble extends ConstructableNode {
 			Integer numOfNeurons = (Integer) prop.getProperty(pNumOfNeurons);
 			Integer dimensions = (Integer) prop.getProperty(pDim);
 			SignType decodingSign = (SignType) prop.getProperty(pDecodingSign);
+			NodeFactory nodeFactory = (NodeFactory) prop.getProperty(pNodeFactory);
 
+			/*
+			 * Set the decoding sign
+			 */
 			if (decodingSign == SignType.Positive || decodingSign == SignType.Negative) {
 				boolean positive = true;
 				if (decodingSign == SignType.Negative) {
@@ -69,6 +76,9 @@ public class CNEFEnsemble extends ConstructableNode {
 				ef.setApproximatorFactory(approxFactory);
 			}
 
+			/*
+			 * Set the encoding sign and distribution
+			 */
 			SignType encodingSign = (SignType) prop.getProperty(pEncodingSign);
 			Float encodingDistribution = (Float) prop.getProperty(pEncodingDistribution);
 
@@ -79,6 +89,11 @@ public class CNEFEnsemble extends ConstructableNode {
 				vectorGen = new Rectifier(vectorGen, false);
 			}
 			ef.setEncoderFactory(vectorGen);
+
+			/*
+			 * Sets the Node Factory
+			 */
+			ef.setNodeFactory(nodeFactory);
 
 			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions);
 
@@ -199,9 +214,6 @@ class PEncodingDistribution extends PropertyDescriptor {
 
 class PSign extends PropertyDescriptor {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public PSign(String name) {

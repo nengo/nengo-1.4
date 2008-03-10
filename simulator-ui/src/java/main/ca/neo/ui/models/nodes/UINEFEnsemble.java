@@ -86,7 +86,7 @@ public class UINEFEnsemble extends UIEnsemble {
 	public UITermination addDecodedTermination() {
 
 		try {
-			Termination term = (Termination) ModelFactory.constructNode(this, new CDecodedTermination(
+			Termination term = (Termination) ModelFactory.constructModel(this, new CDecodedTermination(
 					getModel()));
 
 			UIDecodedTermination termUI = new UIDecodedTermination(this, term);
@@ -105,7 +105,7 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		try {
 
-			Origin origin = (Origin) ModelFactory.constructNode(this, new CDecodedOrigin(getModel()));
+			Origin origin = (Origin) ModelFactory.constructModel(this, new CDecodedOrigin(getModel()));
 			UIDecodedOrigin originUI = new UIDecodedOrigin(this, origin);
 
 			addWidget(originUI);

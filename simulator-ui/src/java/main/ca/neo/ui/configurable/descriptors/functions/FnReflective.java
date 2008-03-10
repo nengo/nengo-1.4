@@ -13,19 +13,15 @@ import ca.neo.ui.configurable.PropertySet;
  * 
  * @author Shu Wu
  */
-public class FnReflective extends
-		AbstractFn {
+public class FnReflective extends AbstractFn {
 	private PropertyDescriptor[] myProperties;
 
-
-	public FnReflective(Class<?> functionClass,
-			String typeName, PropertyDescriptor[] propStruct) {
+	public FnReflective(Class<?> functionClass, String typeName, PropertyDescriptor[] propStruct) {
 		super(typeName, functionClass);
 
 		this.myProperties = propStruct;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Function createFunction(PropertySet props) throws ConfigException {
 		PropertyDescriptor[] metaProperties = getConfigSchema();
@@ -65,15 +61,11 @@ public class FnReflective extends
 
 		} catch (SecurityException e) {
 			e.printStackTrace();
-			throw new ConfigException("Could not configure function: "
-					+ e.getMessage());
+			throw new ConfigException("Could not configure function: " + e.getMessage());
 		} catch (NoSuchMethodException e) {
-			throw new ConfigException(
-					"Could not configure function, no suitable constructor found");
+			throw new ConfigException("Could not configure function, no suitable constructor found");
 		}
 	}
-
-
 
 	public PropertyDescriptor[] getConfigSchema() {
 		return myProperties;
