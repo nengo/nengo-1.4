@@ -34,7 +34,7 @@ public class ModelIcon extends WorldObjectImpl implements Listener {
 	/**
 	 * Whether to show the type of model in the label
 	 */
-	private boolean showTypeInLabel = true;
+	private boolean showTypeInLabel = false;
 
 	/**
 	 * @param parent
