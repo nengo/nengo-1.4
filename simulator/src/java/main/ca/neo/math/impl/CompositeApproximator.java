@@ -51,6 +51,20 @@ public class CompositeApproximator implements LinearApproximator {
 	}
 
 	/**
+	 * @see ca.neo.math.LinearApproximator#getEvalPoints()
+	 */
+	public float[][] getEvalPoints() {
+		throw new RuntimeException("This method has not yet been implemented for CompositeApproximator");
+	}
+
+	/**
+	 * @see ca.neo.math.LinearApproximator#getValues()
+	 */
+	public float[][] getValues() {
+		throw new RuntimeException("This method has not yet been implemented for CompositeApproximator");
+	}
+
+	/**
 	 * @see ca.neo.math.LinearApproximator#findCoefficients(ca.neo.math.Function)
 	 */
 	public float[] findCoefficients(Function target) {

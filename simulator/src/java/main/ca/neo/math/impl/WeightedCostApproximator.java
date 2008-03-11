@@ -101,6 +101,20 @@ public class WeightedCostApproximator implements LinearApproximator {
 		
 		return SD;
 	}
+
+	/**
+	 * @see ca.neo.math.LinearApproximator#getEvalPoints()
+	 */
+	public float[][] getEvalPoints() {
+		return myEvalPoints;
+	}
+
+	/**
+	 * @see ca.neo.math.LinearApproximator#getValues()
+	 */
+	public float[][] getValues() {
+		return myValues;
+	}
 	
 //	private static void testPlot(float[][] evaluationPoints, float[][] values) {
 //		XYSeriesCollection dataset = new XYSeriesCollection();
@@ -125,6 +139,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 //        frame.pack();
 //        frame.setVisible(true);		
 //	}
+
 	
 	/**
 	 * Override this method to use a different pseudoinverse implementation (eg clustered).
@@ -293,5 +308,5 @@ public class WeightedCostApproximator implements LinearApproximator {
 		}
 		
 	}
-	
+
 }

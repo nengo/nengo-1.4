@@ -25,6 +25,8 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 	private LinearApproximator[] myApproximators; //for each dimension
 	private int[][] myIndices; //values indices for each dimension  
 	private int[] myDimensions; //dimension for each neuron
+	private float[][] myEvalPoints;
+	private float[][] myValues;
 	
 	/**
 	 * @param evaluationPoints Points of evaluation of source functions, in the dimension along which they vary
@@ -66,6 +68,21 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		
 		myDimensions = dimensions;
 	}
+	
+	/**
+	 * @see ca.neo.math.LinearApproximator#getEvalPoints()
+	 */
+	public float[][] getEvalPoints() {
+		return myEvalPoints;
+	}
+
+	/**
+	 * @see ca.neo.math.LinearApproximator#getValues()
+	 */
+	public float[][] getValues() {
+		return myValues;
+	}
+
 
 	/**
 	 * @see ca.neo.math.LinearApproximator#findCoefficients(ca.neo.math.Function)

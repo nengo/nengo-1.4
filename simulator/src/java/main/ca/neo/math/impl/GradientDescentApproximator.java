@@ -65,6 +65,20 @@ public class GradientDescentApproximator implements LinearApproximator {
 	}
 	
 	/**
+	 * @see ca.neo.math.LinearApproximator#getEvalPoints()
+	 */
+	public float[][] getEvalPoints() {
+		return myEvalPoints;
+	}
+
+	/**
+	 * @see ca.neo.math.LinearApproximator#getValues()
+	 */
+	public float[][] getValues() {
+		return myValues;
+	}
+
+	/**
 	 * @param coefficients Coefficients at which to start the optimization
 	 */
 	public void setStartingCoefficients(float[] coefficients) {

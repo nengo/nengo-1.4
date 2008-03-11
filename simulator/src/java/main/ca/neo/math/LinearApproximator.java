@@ -31,4 +31,18 @@ public interface LinearApproximator extends Serializable, Cloneable {
 	
 	public LinearApproximator clone() throws CloneNotSupportedException;
 	
+	/**
+	 * @return Points at which target functions are evaluated. Each row (or float[]) corresponds to  
+	 *  	a single evaluation point. These points should usually be uniformly distributed, because 
+	 *  	the sum of error at these points is treated as an integral over the domain of interest. 
+	 */
+	public float[][] getEvalPoints();
+
+	/**
+	 * @return The values of component functions at the evaluation points. The first dimension 
+	 * 		makes up the list of functions, and the second the values of these functions at each 
+	 * 		evaluation point.
+	 */
+	public float[][] getValues();
+	
 }

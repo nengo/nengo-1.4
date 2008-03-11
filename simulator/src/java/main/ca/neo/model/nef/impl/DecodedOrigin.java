@@ -17,6 +17,7 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
+import ca.neo.model.nef.NEFNode;
 import ca.neo.util.MU;
 
 /**
@@ -41,6 +42,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private RealOutput myOutput;
 	private Noise myNoise = null;
 	private Noise[] myNoises = null;
+	private LinearApproximator myApproximator;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings. 
@@ -69,6 +71,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myFunctions = functions; 
 		myDecoders = findDecoders(nodes, functions, approximator);  
 		myMode = SimulationMode.DEFAULT;
+		myApproximator = approximator;
 		
 		reset(false);
 	}
@@ -124,6 +127,24 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myMode = SimulationMode.DEFAULT;
 		
 		reset(false);
+	}
+	
+	public float[] getError() {
+		float[] result = new float[getDimensions()];
+		
+		if (myApproximator != null) {
+			float[][] estimate = MU.transpose(MU.prod(MU.transpose(myApproximator.getValues()), getDecoders()));
+			for (int i = 0; i < myFunctions.length; i++) {
+				float[] actual = myFunctions[i].multiMap(myApproximator.getEvalPoints());
+				System.out.println(actual.length);
+				float[] error = MU.difference(estimate[i], actual);
+				System.out.println(MU.toString(new float[][]{estimate[i]}, 5));
+				System.out.println(MU.toString(new float[][]{actual}, 5));
+				result[i] = MU.prod(error, error) / (float) actual.length;
+			}
+		}
+		
+		return result;
 	}
 	
 	/**
