@@ -3,6 +3,8 @@
  */
 package ca.neo.model.neuron.impl;
 
+import java.io.Serializable;
+
 import ca.neo.model.neuron.SynapticIntegrator;
 
 /**
@@ -12,7 +14,7 @@ import ca.neo.model.neuron.SynapticIntegrator;
  * 
  * @author Bryan Tripp
  */
-public interface SynapticIntegratorFactory {
+public interface SynapticIntegratorFactory extends Serializable {
 
 	public SynapticIntegrator make();
 	

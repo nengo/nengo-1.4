@@ -3,6 +3,8 @@
  */
 package ca.neo.model.impl;
 
+import java.io.Serializable;
+
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 
@@ -13,7 +15,7 @@ import ca.neo.model.StructuralException;
  * 
  * @author Bryan Tripp
  */
-public interface NodeFactory {
+public interface NodeFactory extends Serializable {
 
 	/**
 	 * @param name The name of the Node (unique within containing Ensemble or Network)

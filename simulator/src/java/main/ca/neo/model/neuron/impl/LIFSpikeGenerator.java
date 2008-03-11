@@ -259,6 +259,8 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	 */
 	public static class Factory implements SpikeGeneratorFactory {
 
+		private static final long serialVersionUID = 1L;
+
 		private static float ourMaxTimeStep = .00025f;
 
 		private PDF myTauRC;

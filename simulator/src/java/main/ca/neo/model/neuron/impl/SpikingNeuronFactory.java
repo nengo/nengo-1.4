@@ -22,6 +22,8 @@ import ca.neo.model.plasticity.Plastic;
  */
 public class SpikingNeuronFactory implements NodeFactory {
 
+	private static final long serialVersionUID = 1L;
+	
 	private SynapticIntegratorFactory myIntegratorFactory;
 	private SpikeGeneratorFactory myGeneratorFactory;
 	private PDF myScale;

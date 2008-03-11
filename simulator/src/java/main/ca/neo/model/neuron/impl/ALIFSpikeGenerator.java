@@ -303,6 +303,8 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 	 */
 	public static class Factory implements SpikeGeneratorFactory {
 
+		private static final long serialVersionUID = 1L;
+		
 		private PDF myTauRef;
 		private PDF myTauRC;
 		private PDF myTauN;

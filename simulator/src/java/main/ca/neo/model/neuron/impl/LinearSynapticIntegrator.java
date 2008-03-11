@@ -259,6 +259,8 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	
 	public static class Factory implements SynapticIntegratorFactory {
 
+		private static final long serialVersionUID = 1L;
+		
 		private Units myUnits;
 		private float myMaxTimeStep;
 		

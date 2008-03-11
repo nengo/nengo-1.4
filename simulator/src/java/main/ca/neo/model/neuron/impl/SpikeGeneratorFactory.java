@@ -3,6 +3,8 @@
  */
 package ca.neo.model.neuron.impl;
 
+import java.io.Serializable;
+
 import ca.neo.model.neuron.SpikeGenerator;
 
 /**
@@ -12,7 +14,7 @@ import ca.neo.model.neuron.SpikeGenerator;
  * 
  * @author Bryan Tripp
  */
-public interface SpikeGeneratorFactory {
+public interface SpikeGeneratorFactory extends Serializable {
 
 	public SpikeGenerator make();
 }

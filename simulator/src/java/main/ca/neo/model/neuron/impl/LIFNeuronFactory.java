@@ -21,6 +21,8 @@ import ca.neo.model.neuron.SynapticIntegrator;
  */
 public class LIFNeuronFactory implements NodeFactory {
 
+	private static final long serialVersionUID = 1L;
+
 	private static Logger ourLogger = Logger.getLogger(LIFNeuronFactory.class);
 	
 	private float myTauRC;

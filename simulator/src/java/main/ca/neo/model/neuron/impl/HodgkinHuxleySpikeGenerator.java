@@ -115,6 +115,8 @@ public class HodgkinHuxleySpikeGenerator extends DynamicalSystemSpikeGenerator {
 	 */
 	public static class HodgkinHuxleyNeuronFactory implements NodeFactory {
 
+		private static final long serialVersionUID = 1L;
+
 		/** 
 		 * @see ca.neo.model.impl.NodeFactory#make(java.lang.String)
 		 */

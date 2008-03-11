@@ -149,6 +149,8 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	 */
 	public static class LinearFactory implements SpikeGeneratorFactory {
 
+		private static final long serialVersionUID = 1L;
+		
 		PDF myMaxRate;
 		PDF myIntercept;
 		boolean myRectified;
@@ -223,6 +225,8 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	 */
 	public static class LinearNeuronFactory implements NodeFactory {
 
+		private static final long serialVersionUID = 1L;
+		
 		private static float ourMaxTimeStep = .0005f;
 		private static Units ourCurrentUnits = Units.ACU;
 
@@ -255,6 +259,8 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	
 	public static class SigmoidFactory implements SpikeGeneratorFactory {
 
+		private static final long serialVersionUID = 1L;
+		
 		private PDF mySlope;
 		private PDF myInflection;
 		private PDF myMaxRate;
@@ -325,6 +331,8 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	 * @author Bryan Tripp
 	 */
 	public static class SigmoidNeuronFactory implements NodeFactory {
+		
+		private static final long serialVersionUID = 1L;
 		
 		private static float ourMaxTimeStep = .0005f;
 		private static Units ourCurrentUnits = Units.ACU;

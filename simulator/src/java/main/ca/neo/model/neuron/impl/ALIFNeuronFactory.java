@@ -21,6 +21,8 @@ import ca.neo.model.neuron.SynapticIntegrator;
  */
 public class ALIFNeuronFactory implements NodeFactory {
 
+	private static final long serialVersionUID = 1L;
+
 	private static Logger ourLogger = Logger.getLogger(ALIFNeuronFactory.class);
 	
 	private static float ourMaxTimeStep = 0.001f;
