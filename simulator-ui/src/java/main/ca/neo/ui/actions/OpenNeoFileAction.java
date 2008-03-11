@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import org.python.util.PythonInterpreter;
 import org.python.util.PythonObjectInputStream;
+import org.python.core.PyClass;
 import ca.neo.model.Node;
 import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.INodeContainer;
@@ -80,6 +81,38 @@ public class OpenNeoFileAction extends StandardAction {
 						UserMessages.showError("Incorrect file version");
 					} catch (OutOfMemoryError e) {
 						UserMessages.showError("Out of memory loading file");
+					} catch (org.python.core.PyException e) {
+						PyClass pyClass=(PyClass)e.type;
+						String value=e.value.toString();
+						if (pyClass.__name__.equals("ImportError")) {
+							if (value.equals("no module named main")) {
+								UserMessages.showError("Error: this file was "+
+									"built using Python class definitions that "+
+									"cannot be found.<br>To fix this problem, "+
+									"make a 'main.py' file in 'simulator-ui/lib/Lib' "+
+									"<br>and place the required python class definitions "+
+									"inside.");				
+							} else if (value.startsWith("no module named ")) {
+								UserMessages.showError("Error: this file was "+
+									"built using Python class definitions in <br>a file "+
+									"named "+value.substring(16)+", which"+
+									"cannot be found.<br>To fix this problem, please "+
+									"place this file in 'simulator-ui/lib/Lib'.");								
+							} else {
+								UserMessages.showError("Python error interpretting file:<br>"+e);
+							}
+						} else if (pyClass.__name__.equals("AttributeError")) {
+							String attr=value.substring(value.lastIndexOf(' ')+1);
+							UserMessages.showError("Error: this file uses a Python "+
+								"definition of the class "+attr+", but this definition "+
+								"cannot be found.<br>If this class was defined in a "+
+								"separate .py file, please place this file in "+
+								"'simulator-ui/lib/Lib'.<br>Otherwise, please place the "+
+								"class definition in 'simulator-ui/lib/Lib/main.py' "+
+								"and restart the simulator.");
+						} else {							
+							UserMessages.showError("Python error interpretting file:<br>"+e);
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						UserMessages.showError("Unexpected exception loading file");
