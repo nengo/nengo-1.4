@@ -1,12 +1,14 @@
 package ca.neo.ui.actions;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
-import ca.neo.io.FileManager;
+import org.python.util.PythonInterpreter;
+import org.python.util.PythonObjectInputStream;
 import ca.neo.model.Node;
 import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.INodeContainer;
@@ -49,9 +51,16 @@ public class OpenNeoFileAction extends StandardAction {
 
 				@Override
 				protected void action() throws ActionException {
-					FileManager fm = new FileManager();
-					try {
-						objLoaded = fm.load(file);
+					try {										
+						// loading Python-based objects requires using a
+						//  PythonObjectInputStream from within a PythonInterpreter.						
+						// loading sometimes fails if a new interpreter is created, so
+						//  we use the one from the NengoGraphics.
+						PythonInterpreter pi=NengoGraphics.getInstance().getPythonInterpreter();
+						pi.set("___inStream", new PythonObjectInputStream(new FileInputStream(file)));
+						org.python.core.PyObject obj=pi.eval("___inStream.readObject()");
+						objLoaded=obj.__tojava__(Class.forName("ca.neo.model.Node"));					
+						pi.exec("del ___inStream");
 
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
@@ -72,6 +81,7 @@ public class OpenNeoFileAction extends StandardAction {
 					} catch (OutOfMemoryError e) {
 						UserMessages.showError("Out of memory loading file");
 					} catch (Exception e) {
+						e.printStackTrace();
 						UserMessages.showError("Unexpected exception loading file");
 					}
 
