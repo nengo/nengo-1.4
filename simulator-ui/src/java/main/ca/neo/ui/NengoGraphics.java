@@ -128,6 +128,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	private AuxillarySplitPane dataViewerPane;
 	private SelectionBorder objectSelectedBorder;
 
+	private PythonInterpreter pythonInterpreter;
 	private ScriptConsole scriptConsole;
 
 	private AuxillarySplitPane scriptConsolePane;
@@ -369,7 +370,8 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		splitPanes = new ArrayList<AuxillarySplitPane>();
 		simulationData = new SimulatorDataModel();
 
-		scriptConsole = new ScriptConsole(new PythonInterpreter());
+		pythonInterpreter=new PythonInterpreter();
+		scriptConsole = new ScriptConsole(pythonInterpreter);
 		Style.applyStyle(scriptConsole);
 
 		/*
@@ -534,6 +536,10 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 
 	public NengoClipboard getClipboard() {
 		return clipboard;
+	}
+	
+	public PythonInterpreter getPythonInterpreter() {
+		return pythonInterpreter;
 	}
 
 	public Node getNodeModel(String name) {
