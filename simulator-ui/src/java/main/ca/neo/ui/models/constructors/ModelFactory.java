@@ -12,7 +12,7 @@ public class ModelFactory {
 				new CFunctionInput(container) };
 	}
 
-	public static Object constructModel(Constructable configurable) throws ConfigException {
+	public static Object constructModel(AbstractConstructable configurable) throws ConfigException {
 		return constructModel(null, configurable);
 	}
 
@@ -23,7 +23,7 @@ public class ModelFactory {
 	 * @return
 	 * @throws ConfigException
 	 */
-	public static Object constructModel(UINeoNode nodeParent, Constructable configurable)
+	public static Object constructModel(UINeoNode nodeParent, AbstractConstructable configurable)
 			throws ConfigException {
 
 		if (nodeParent != null) {

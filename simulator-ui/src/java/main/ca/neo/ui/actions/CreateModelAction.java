@@ -6,7 +6,7 @@ import ca.neo.model.Node;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.constructors.Constructable;
+import ca.neo.ui.models.constructors.AbstractConstructable;
 import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
 import ca.shu.ui.lib.actions.ActionException;
@@ -34,7 +34,7 @@ public class CreateModelAction extends ReversableAction {
 	/**
 	 * Node constructable
 	 */
-	private Constructable constructable;
+	private AbstractConstructable constructable;
 
 	/**
 	 * @param nodeContainer
@@ -54,7 +54,7 @@ public class CreateModelAction extends ReversableAction {
 	 */
 	@SuppressWarnings("unchecked")
 	public CreateModelAction(String modelTypeName, INodeContainer nodeContainer,
-			Constructable constructable) {
+			AbstractConstructable constructable) {
 		super("Create new " + modelTypeName, modelTypeName, false);
 		this.container = nodeContainer;
 		this.constructable = constructable;

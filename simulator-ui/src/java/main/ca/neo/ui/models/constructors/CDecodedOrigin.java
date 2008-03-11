@@ -18,7 +18,7 @@ import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
 
-public class CDecodedOrigin extends Constructable {
+public class CDecodedOrigin extends AbstractConstructable {
 	private static final PropertyDescriptor pName = new PString("Name");
 
 	private NEFEnsemble enfEnsembleParent;

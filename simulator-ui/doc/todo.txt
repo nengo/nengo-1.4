@@ -1,11 +1,13 @@
-*******************************************
+******************************************
  Done
 *******************************************
+03/10/2007 - Added SpikingNeuronFactory to options for NEFEnsemble Constructable Dialog
 03/09/2008 - Added Node Factory selection options NEFEnsemble Constructable Dialog
 	- "Linear Neuron" (use PoissonSpikeGenerator.LinearNeuronFactory)
 	- "Sigmoid Neuron" (use PoissonSpikeGenerator.SigmoidNeuronFactory)
 	- "LIF Neuron" (use LIFNeuronFactory)
 	- "Adapting LIF Neuron" (use ALIFNeuronFactory)
+	- Added Sliders and Signs for Encoding and Decoding vectors
 
 03/05/2008 - Terminations and origins are removed from the UI on VisiblyMutable event
 03/05/2008 - Fixed bug where a removing a node with a recursive connection caused an exception
@@ -19,28 +21,19 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Requests:
-	Make NeuronFactories serializable so that the settings can be saved in Templates?
-	You can change the description of the panels in NodeFactoryPanel.java
-		Be careful if you ever change the order of parameters in the Constructors of these Nodes
+Add ability to surface DataType and Description for Fields of PropertyInputPanel
 
-GetTermination(String) and GetTerminations() work on different sets for NEFEnsembleImpl
+Scroll the other way when a mouse is dragged off the screen
 
-	
 
 Update ensemble, network, and function icons to be Vector
 
-Synchronize Widgets - origins/terminations - on modelChanged()
 
 - While waiting for an ensemble or origin to build, is it possible to
 animate something, to convince the user there hasn't been a crash?
 Maybe the flashing effect like while the add origin/termination
 dialogs are up?
 	V2 Feature
-
-Consider wrapping projection models in UIProjection, more consistent with the other pattenrs, easier to search
-	Two classes: UIProjection (contains projection model), and UIProjectionMock
-
 
 
 Elastic forces should be assynmetrical between two objects ( proportional to weight of base object )

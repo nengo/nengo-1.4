@@ -10,11 +10,11 @@ import ca.neo.ui.configurable.PropertySet;
  * 
  * @author Shu Wu
  */
-public abstract class Constructable implements IConfigurable {
+public abstract class AbstractConstructable implements IConfigurable {
 
 	private Object model;
 
-	public Constructable() {
+	public AbstractConstructable() {
 		super();
 	}
 

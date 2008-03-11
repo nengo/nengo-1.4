@@ -11,7 +11,7 @@ import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.configurable.descriptors.PTerminationWeights;
 import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
 
-public class CDecodedTermination extends Constructable {
+public class CDecodedTermination extends AbstractConstructable {
 	private static final PropertyDescriptor pIsModulatory = new PBoolean("Is Modulatory");
 
 	private static final PropertyDescriptor pName = new PString("Name");

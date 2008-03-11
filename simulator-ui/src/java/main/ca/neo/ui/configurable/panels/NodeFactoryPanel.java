@@ -3,6 +3,7 @@ package ca.neo.ui.configurable.panels;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.lang.reflect.Constructor;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -10,11 +11,15 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import ca.neo.config.ClassRegistry;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.model.impl.NodeFactory;
 import ca.neo.model.neuron.impl.ALIFNeuronFactory;
 import ca.neo.model.neuron.impl.LIFNeuronFactory;
 import ca.neo.model.neuron.impl.PoissonSpikeGenerator;
+import ca.neo.model.neuron.impl.SpikeGeneratorFactory;
+import ca.neo.model.neuron.impl.SpikingNeuronFactory;
+import ca.neo.model.neuron.impl.SynapticIntegratorFactory;
 import ca.neo.model.neuron.impl.PoissonSpikeGenerator.LinearNeuronFactory;
 import ca.neo.model.neuron.impl.PoissonSpikeGenerator.SigmoidNeuronFactory;
 import ca.neo.ui.configurable.ConfigException;
@@ -23,7 +28,7 @@ import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PBoolean;
 import ca.neo.ui.configurable.descriptors.PFloat;
-import ca.neo.ui.models.constructors.Constructable;
+import ca.neo.ui.models.constructors.AbstractConstructable;
 import ca.neo.ui.models.constructors.ModelFactory;
 import ca.shu.ui.lib.util.UserMessages;
 
@@ -36,7 +41,7 @@ public class NodeFactoryPanel extends PropertyInputPanel {
 
 	private static ConstructableNodeFactory[] NodeFactoryItems = new ConstructableNodeFactory[] {
 			new CLinearNeuronFactory(), new CSigmoidNeuronFactory(), new CLIFNeuronFactory(),
-			new CALIFNeuronFactory() };
+			new CALIFNeuronFactory(), new CSpikingNeuronFactory() };
 
 	private JComboBox factorySelector;
 
@@ -137,7 +142,6 @@ public class NodeFactoryPanel extends PropertyInputPanel {
 			throw new IllegalArgumentException("Value is not a Node Factory");
 		}
 	}
-
 }
 
 class CALIFNeuronFactory extends ConstructableNodeFactory {
@@ -240,7 +244,7 @@ class CLinearNeuronFactory extends ConstructableNodeFactory {
 
 }
 
-abstract class ConstructableNodeFactory extends Constructable {
+abstract class ConstructableNodeFactory extends AbstractConstructable {
 	private String name;
 	private Class<? extends NodeFactory> type;
 
@@ -261,7 +265,8 @@ abstract class ConstructableNodeFactory extends Constructable {
 		}
 	}
 
-	abstract protected NodeFactory createNodeFactory(PropertySet configuredProperties);
+	abstract protected NodeFactory createNodeFactory(PropertySet configuredProperties)
+			throws ConfigException;
 
 	public Class<? extends NodeFactory> getType() {
 		return type;
@@ -304,6 +309,119 @@ class CSigmoidNeuronFactory extends ConstructableNodeFactory {
 		return zConfig;
 	}
 
+}
+
+/**
+ * Customizable Neuron Factory Description Schema
+ * 
+ * @author Shu Wu
+ */
+class CSpikingNeuronFactory extends ConstructableNodeFactory {
+	private static final PropertyDescriptor pBias = new PIndicatorPDF("bias");
+	private static final PropertyDescriptor pScale = new PIndicatorPDF("scale");
+
+	private static PListSelector getClassSelector(String selectorName, Class<?>[] classes) {
+		ClassWrapper[] classWrappers = new ClassWrapper[classes.length];
+
+		for (int i = 0; i < classes.length; i++) {
+			classWrappers[i] = new ClassWrapper(classes[i]);
+		}
+
+		return new PListSelector(selectorName, classWrappers);
+	}
+
+	private PropertyDescriptor pSpikeGenerator;
+
+	private PropertyDescriptor pSynapticIntegrator;
+
+	public CSpikingNeuronFactory() {
+		super("Customizable Neuron", SpikingNeuronFactory.class);
+	}
+
+	private Object constructFromClass(Class<?> type) throws ConfigException {
+		try {
+			Constructor<?> ct = type.getConstructor();
+			try {
+				return ct.newInstance();
+			} catch (Exception e) {
+				throw new ConfigException("Error constructing " + type.getSimpleName() + ": "
+						+ e.getMessage());
+			}
+		} catch (SecurityException e1) {
+			e1.printStackTrace();
+			throw new ConfigException("Security Exception");
+		} catch (NoSuchMethodException e1) {
+			throw new ConfigException("Cannot find zero-arg constructor for: "
+					+ type.getSimpleName());
+		}
+	}
+
+	@Override
+	protected NodeFactory createNodeFactory(PropertySet configuredProperties)
+			throws ConfigException {
+		Class<?> synapticIntegratorClass = ((ClassWrapper) configuredProperties
+				.getProperty(pSynapticIntegrator)).getWrapped();
+		Class<?> spikeGeneratorClass = ((ClassWrapper) configuredProperties
+				.getProperty(pSpikeGenerator)).getWrapped();
+
+		IndicatorPDF scale = (IndicatorPDF) configuredProperties.getProperty(pScale);
+		IndicatorPDF bias = (IndicatorPDF) configuredProperties.getProperty(pBias);
+
+		/*
+		 * Construct Objects from Classes
+		 */
+		SynapticIntegratorFactory synapticIntegratorFactory = (SynapticIntegratorFactory) constructFromClass(synapticIntegratorClass);
+		SpikeGeneratorFactory spikeGeneratorFactory = (SpikeGeneratorFactory) constructFromClass(spikeGeneratorClass);
+
+		return new SpikingNeuronFactory(synapticIntegratorFactory, spikeGeneratorFactory, scale,
+				bias);
+	}
+
+	@Override
+	public PropertyDescriptor[] getConfigSchema() {
+		/*
+		 * Generate these descriptors Just-In-Time, to show all possible
+		 * implementations in ClassRegistry
+		 */
+		pSynapticIntegrator = getClassSelector("Synaptic Integrator", ClassRegistry.getInstance()
+				.getImplementations(SynapticIntegratorFactory.class).toArray(new Class<?>[] {}));
+		pSpikeGenerator = getClassSelector("Spike Generator", ClassRegistry.getInstance()
+				.getImplementations(SpikeGeneratorFactory.class).toArray(new Class<?>[] {}));
+
+		return new PropertyDescriptor[] { pSynapticIntegrator, pSpikeGenerator, pScale, pBias };
+	}
+
+	/**
+	 * Wraps a Class as a list item
+	 */
+	private static class ClassWrapper {
+		Class<?> type;
+
+		public ClassWrapper(Class<?> type) {
+			super();
+			this.type = type;
+		}
+
+		public Class<?> getWrapped() {
+			return type;
+		}
+
+		@Override
+		public String toString() {
+			/*
+			 * Return a name string that is at most two atoms long
+			 */
+			String canonicalName = type.getCanonicalName();
+			String[] nameAtoms = canonicalName.split("\\.");
+			if (nameAtoms.length > 2) {
+				return nameAtoms[nameAtoms.length - 2] + "." + nameAtoms[nameAtoms.length - 1];
+
+			} else {
+				return canonicalName;
+			}
+
+		}
+	}
 }
 
 class PIndicatorPDF extends PropertyDescriptor {
@@ -384,6 +502,60 @@ class PIndicatorPDF extends PropertyDescriptor {
 				highValue.setText((new Float(pdf.getHigh())).toString());
 			}
 		}
+	}
+
+}
+
+class PListSelector extends PropertyDescriptor {
+	private static final long serialVersionUID = 1L;
+
+	private Object[] items;
+
+	public PListSelector(String name, Object[] items) {
+		super(name);
+		this.items = items;
+
+	}
+
+	@Override
+	protected PropertyInputPanel createInputPanel() {
+		return new Panel(this, items);
+	}
+
+	@Override
+	public Class<Object> getTypeClass() {
+		return Object.class;
+	}
+
+	@Override
+	public String getTypeName() {
+		return "List";
+	}
+
+	private static class Panel extends PropertyInputPanel {
+		private JComboBox comboBox;
+
+		public Panel(PropertyDescriptor property, Object[] items) {
+			super(property);
+			comboBox = new JComboBox(items);
+			add(comboBox);
+		}
+
+		@Override
+		public Object getValue() {
+			return comboBox.getSelectedItem();
+		}
+
+		@Override
+		public boolean isValueSet() {
+			return true;
+		}
+
+		@Override
+		public void setValue(Object value) {
+			comboBox.setSelectedItem(value);
+		}
+
 	}
 
 }

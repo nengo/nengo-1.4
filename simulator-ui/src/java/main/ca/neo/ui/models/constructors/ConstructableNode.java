@@ -6,7 +6,7 @@ import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.INodeContainer;
 
-public abstract class ConstructableNode extends Constructable {
+public abstract class ConstructableNode extends AbstractConstructable {
 	private static final PropertyDescriptor pName = new PString("Name");
 
 	private INodeContainer nodeContainer;
