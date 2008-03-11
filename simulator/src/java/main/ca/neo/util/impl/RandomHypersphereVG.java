@@ -3,6 +3,7 @@
  */
 package ca.neo.util.impl;
 
+import ca.neo.math.PDFTools;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.util.VectorGenerator;
 
@@ -123,15 +124,15 @@ public class RandomHypersphereVG implements VectorGenerator {
 	
 	private static float genScalar(float radius, boolean surface) {
 		if (surface) {
-			return Math.random() > .5 ? radius : -radius;
+			return PDFTools.random() > .5 ? radius : -radius;
 		} else {
-			return 2f * (float) (Math.random() - .5) * radius;
+			return 2f * (float) (PDFTools.random() - .5) * radius;
 		}		
 	}
 	
 	private static float[] genOnAxes(int dimension, float radius, boolean surface) {
 		float[] result = new float[dimension];			
-		int axis = (int) Math.floor(Math.random() * dimension); 
+		int axis = (int) Math.floor(PDFTools.random() * dimension); 
 
 		for (int i = 0; i < dimension; i++) {
 			result[i] = (i == axis) ? genScalar(radius, surface) : 0f;
@@ -142,9 +143,9 @@ public class RandomHypersphereVG implements VectorGenerator {
 	
 	private float[] genOffAxes(int dimension, float radius, boolean surface) {
 		float[] result = new float[dimension];			
-		int axis = (int) Math.floor(Math.random() * dimension); 
+		int axis = (int) Math.floor(PDFTools.random() * dimension); 
 		
-		float scale = mySurface ? 1f : (float) Math.pow(Math.random(), 1d / ((double) dimension));
+		float scale = mySurface ? 1f : (float) Math.pow(PDFTools.random(), 1d / ((double) dimension));
 
 		for (int i = 0; i < dimension; i = i + 2) { //note the increment by 2 
 			float[] samples = GaussianPDF.doSample();

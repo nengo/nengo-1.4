@@ -23,6 +23,7 @@ import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.impl.LIFNeuronFactory;
+import ca.neo.util.MU;
 import ca.neo.util.VectorGenerator;
 import ca.neo.util.impl.RandomHypersphereVG;
 
@@ -80,7 +81,15 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 	 * @see ca.neo.model.nef.NEFEnsembleFactory#make(java.lang.String, int, int)
 	 */
 	public NEFEnsemble make(String name, int n, int dim) throws StructuralException {
-		return doMake(name, n, dim);
+		float[] radii = MU.uniform(1, dim, 1)[0];
+		return doMake(name, n, radii);
+	}
+
+	/**
+	 * @see ca.neo.model.nef.NEFEnsembleFactory#make(java.lang.String, int, float[])
+	 */
+	public NEFEnsemble make(String name, int n, float[] radii) throws StructuralException {
+		return doMake(name, n, radii);
 	}
 
 	/**
@@ -101,7 +110,8 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 		}
 		
 		if (result == null) {
-			result = doMake(name, n, dim);
+			float[] radii = MU.uniform(1, dim, 1)[0];
+			result = doMake(name, n, radii);
 			
 			try {
 				fm.save(result, ensembleFile);
@@ -142,9 +152,9 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 	}
 	
 	//common make(...) implementation 
-	private NEFEnsemble doMake(String name, int n, int dim) 
-			throws StructuralException {
+	private NEFEnsemble doMake(String name, int n, float[] radii) throws StructuralException {
 		
+		int dim = radii.length;
 		NEFNode[] nodes = new NEFNode[n];
 		
 		for (int i = 0; i < n; i++) {
@@ -163,10 +173,8 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 		}
 
 		float[][] encoders = myEncoderFactory.genVectors(n, dim);
-		
 		float[][] evalPoints = getEvalPointFactory().genVectors(getNumEvalPoints(dim), dim);
-		
-		NEFEnsemble result = construct(name, nodes, encoders, myApproximatorFactory, evalPoints);
+		NEFEnsemble result = construct(name, nodes, encoders, myApproximatorFactory, evalPoints, radii);
 		
 		addDefaultOrigins(result);
 		
@@ -192,12 +200,13 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 	 * @param encoders Encoding vector for each Node
 	 * @param af Factory that produces LinearApproximators for decoding Ensemble output
 	 * @param evalPoints States at which Node output is evaluated for decoding purposes
+	 * @param radii Radius of encoded area in each dimension
 	 * @return New NEFEnsemble with given parameters
 	 * @throws StructuralException 
 	 */
-	protected NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory af, float[][] evalPoints) 
+	protected NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory af, float[][] evalPoints, float[] radii) 
 			throws StructuralException {
-		return new NEFEnsembleImpl(name, nodes, encoders, af, evalPoints);
+		return new NEFEnsembleImpl(name, nodes, encoders, af, evalPoints, radii);
 	}
 
 	/**

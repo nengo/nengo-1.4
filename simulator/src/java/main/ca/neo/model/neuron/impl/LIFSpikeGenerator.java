@@ -6,6 +6,7 @@ package ca.neo.model.neuron.impl;
 import java.util.Properties;
 
 import ca.neo.math.PDF;
+import ca.neo.math.PDFTools;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
@@ -196,7 +197,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 				spiking = true;
 				myTimeSinceLastSpike = 0;
 				myVoltage = 0;		
-				myTauRefNext = myTauRef + myMaxTimeStep - 2 * (float) Math.random() * myMaxTimeStep;
+				myTauRefNext = myTauRef + myMaxTimeStep - 2 * (float) PDFTools.random() * myMaxTimeStep;
 //				mySpikeTimes.add(new Float(myTime[i]));
 			}
 		}

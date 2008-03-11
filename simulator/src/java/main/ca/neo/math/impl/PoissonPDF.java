@@ -4,6 +4,7 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.PDF;
+import ca.neo.math.PDFTools;
 
 /**
  * A Poisson distribution. 
@@ -49,7 +50,7 @@ public class PoissonPDF extends AbstractFunction implements PDF {
 
 	    do {
 	    	k = k + 1;
-	    	double u = Math.random();
+	    	double u = PDFTools.random();
 	    	p = p * u;
 	    } while (p >= L);
 		

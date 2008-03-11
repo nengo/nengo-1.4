@@ -69,6 +69,15 @@ public interface NEFEnsembleFactory {
 	public NEFEnsemble make(String name, int n, int dim) throws StructuralException;
 	
 	/**
+	 * @param name Name of the NEFEnsemble
+	 * @param n Number of neurons in the ensemble
+	 * @param radii Radius of encoded region in each dimension 
+	 * @return NEFEnsemble containing Neurons generated with the default NeuronFactory   
+	 * @throws StructuralException if there is any error attempting to create the ensemble
+	 */
+	public NEFEnsemble make(String name, int n, float[] radii) throws StructuralException;
+	
+	/**
 	 * Loads an NEFEnsemble, or creates and saves it.
 	 *   
 	 * @param name Name of the NEFEnsemble

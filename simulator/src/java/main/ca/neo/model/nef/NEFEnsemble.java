@@ -39,6 +39,11 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	public float[][] getEncoders();
 
 	/**
+	 * @return Radius of encoded region in each dimension
+	 */
+	public float[] getRadii();
+	
+	/**
 	 * Adds an Origin that corresponds to a decoding of the activities of Nodes in this Ensemble. 
 	 *   
 	 * @param name Name of decoding 

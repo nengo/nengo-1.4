@@ -44,6 +44,7 @@ import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.nef.impl.NEFEnsembleImpl;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.plot.Plotter;
+import ca.neo.util.MU;
 import ca.neo.util.SpikePattern;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.TimeSeries1D;
@@ -232,7 +233,7 @@ public class DefaultPlotter extends Plotter {
 				throw new RuntimeException("Distortion error can not be plotted for multi-dimensional NEFEnsembles");
 			}
 			
-			float[][] encoders = ensemble.getEncoders();
+//			float[][] encoders = ensemble.getEncoders();
 
 			float[] x = new float[101]; 
 			float[][] idealOutput = new float[x.length][];
@@ -241,8 +242,9 @@ public class DefaultPlotter extends Plotter {
 			NEFNode[] nodes = (NEFNode[]) ensemble.getNodes();
 			
 			SimulationMode mode = ensemble.getMode();
+			float radius = ensemble.getRadii()[0];
 			for (int i = 0; i < x.length; i++) {
-				x[i] = -1f + (float) i * (2f / (float) x.length);
+				x[i] = -radius + (float) i * (2f*radius / (float) (x.length-1));
 								
 				ensemble.setMode(SimulationMode.CONSTANT_RATE);
 				for (int j = 0; j < nodes.length; j++) {
@@ -274,6 +276,8 @@ public class DefaultPlotter extends Plotter {
 	private static float getRadialInput(NEFEnsemble ensemble, int node, float radius) {
 		//plot along preferred direction for multi-dimensional ensembles
 		float radialInput = radius; 
+		
+		//plot along positive axis for one-dimensional ensembles
 		if (ensemble.getDimension() == 1) {
 			if (ensemble instanceof NEFEnsembleImpl) {
 				radialInput = ((NEFEnsembleImpl) ensemble).getRadialInput(new float[]{radius}, node);
@@ -311,8 +315,10 @@ public class DefaultPlotter extends Plotter {
 		);
 		
 		XYSeries errorSeries = new XYSeries("Error");
+		float[][] error = MU.difference(actual, ideal);
 		for (int i = 0; i < x.length; i++) {
-			errorSeries.add(x[i], actual[i][dim] - ideal[i][dim]);
+//			errorSeries.add(x[i], actual[i][dim] - ideal[i][dim]);
+			errorSeries.add(x[i], error[i][dim]);
 		}
 		XYSeriesCollection errorDataset = new XYSeriesCollection();
 		errorDataset.addSeries(errorSeries);
@@ -325,7 +331,9 @@ public class DefaultPlotter extends Plotter {
 		XYItemRenderer renderer = new XYLineAndShapeRenderer(true, false);
 		plot.setRenderer(1, renderer);
 		
-		showChart(chart, "Distortion Error Plot");
+		float[] err = MU.transpose(error)[dim]; 
+		float mse = MU.prod(err, err) / (float) err.length;
+		showChart(chart, "Distortion Error Plot (MSE=" + mse + ")");
 	}
 
 	/**
@@ -337,7 +345,7 @@ public class DefaultPlotter extends Plotter {
 
 		float[] x = new float[101];
 		for (int i = 0; i < x.length; i++) {
-			x[i] = -1f + (float) i * (2f / (float) x.length);
+			x[i] = -1f + (float) i * (2f / (float) (x.length-1));
 		}
 		
 		SimulationMode mode = ensemble.getMode();
@@ -347,18 +355,22 @@ public class DefaultPlotter extends Plotter {
 		
 		float[][] rates = new float[nodes.length][];
 		for (int i = 0; i < nodes.length; i++) {
+
+			//radius of encoded space in direction of this encoder
+			float radius = MU.pnorm(MU.prodElementwise(encoders[i], ensemble.getRadii()), 2);
+			
 			XYSeries series = new XYSeries("Neuron " + i);
 			rates[i] = new float[x.length];
 			
 			for (int j = 0; j < x.length; j++) {
-//				float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j];
-				float radialInput = getRadialInput(ensemble, i, x[j]);
+				float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j];
+//				float radialInput = getRadialInput(ensemble, i, x[j]);
 				
 				((NEFNode) nodes[i]).setRadialInput(radialInput);
 				try {
 					nodes[i].run(0f, 0f);
 					RealOutput output = (RealOutput) nodes[i].getOrigin(Neuron.AXON).getValues();
-					series.add(x[j], output.getValues()[0]);
+					series.add(x[j]*radius, output.getValues()[0]);
 					rates[i][j] = output.getValues()[0];
 				} catch (SimulationException e) {
 					throw new RuntimeException("Can't plot activities: error running neurons", e);
@@ -371,14 +383,14 @@ public class DefaultPlotter extends Plotter {
 			
 			dataset.addSeries(series);
 		}
-		MatlabExporter exporter = new MatlabExporter();
-		exporter.add("x", new float[][]{x});
-		exporter.add("rates", rates);
-		try {
-			exporter.write(new File("activities.mat"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		MatlabExporter exporter = new MatlabExporter();
+//		exporter.add("x", new float[][]{x});
+//		exporter.add("rates", rates);
+//		try {
+//			exporter.write(new File("activities.mat"));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 		ensemble.setMode(mode);
 		

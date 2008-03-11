@@ -58,7 +58,11 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private Map<String, LinearApproximator> myDecodingApproximators;	
 	private ApproximatorFactory myApproximatorFactory;
 	private boolean myReuseApproximators;
+	private float[][] myUnscaledEvalPoints;
 	private float[][] myEvalPoints;	
+	private float[] myRadii;
+	private float[] myInverseRadii;
+	private boolean myRadiiAreOne;
 
 	/**
 	 * @param name Unique name of Ensemble
@@ -69,7 +73,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @throws StructuralException if there	are a different number of Nodes than encoding vectors or if not 
 	 * 		all encoders have the same length
 	 */
-	public NEFEnsembleImpl(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory factory, float[][] evalPoints) throws StructuralException {
+	public NEFEnsembleImpl(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory factory, float[][] evalPoints, float[] radii) 
+			throws StructuralException {
+		
 		super(name, nodes, factory);
 		
 		if (nodes.length != encoders.length) {
@@ -91,10 +97,53 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myLastPlasticityTime = 0;		
 		myApproximatorFactory = factory;
 		myDecodingApproximators = new HashMap<String, LinearApproximator>(10);
-		myReuseApproximators = true;
-		myEvalPoints = evalPoints;
+		myReuseApproximators = true;		
+		myUnscaledEvalPoints = evalPoints;
+		setRadii(radii);
 	}
 	
+	/**
+	 * @see ca.neo.model.nef.NEFEnsemble#getRadii()
+	 */
+	public float[] getRadii() {
+		return myRadii.clone();
+	}
+	
+	/**
+	 * @param radii A list of radii of encoded area along each dimension; uniform 
+	 * 		radius along each dimension can be specified with a list of length 1
+	 */
+	public void setRadii(float[] radii) {
+		if (radii.length != getDimension() && radii.length != 1) {
+			throw new IllegalArgumentException("radius vector must have length " + getDimension() 
+					+ " or 1 (for uniform radius)");
+		}
+		
+		if (radii.length == 1 && getDimension() != 1) {
+			float uniformRadius = radii[0];
+			radii = MU.uniform(1, getDimension(), uniformRadius)[0];			
+		}
+		
+		myRadii = radii;
+		
+		myInverseRadii = new float[radii.length];
+		myRadiiAreOne = true;
+		for (int i = 0; i < radii.length; i++) {
+			myInverseRadii[i] = 1f / radii[i];
+			if (Math.abs(radii[i]-1f) > 1e-10) myRadiiAreOne = false;
+		}
+		
+		myEvalPoints = new float[myUnscaledEvalPoints.length][];
+		for (int i = 0; i < myUnscaledEvalPoints.length; i++) {
+			myEvalPoints[i] = new float[myUnscaledEvalPoints[i].length];
+			for (int j = 0; j < myUnscaledEvalPoints[i].length; j++) {
+				myEvalPoints[i][j] = myUnscaledEvalPoints[i][j] * myRadii[j];
+			}
+		}
+		
+		myDecodingApproximators.clear();
+	}
+
 	/**
 	 * @param evalPoints Vector points at which to find output (each one must have same dimension as
 	 * 		encoder)
@@ -458,6 +507,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @return Radial input to the given node 
 	 */
 	public float getRadialInput(float[] state, int node) {
+		//scale state to unit circle if necessary
+		if (!myRadiiAreOne) state = MU.prodElementwise(state, myInverseRadii);
 		return MU.prod(state, myEncoders[node]);
 	}
 	

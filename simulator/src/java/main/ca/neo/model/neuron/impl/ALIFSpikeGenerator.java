@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import ca.neo.math.Function;
 import ca.neo.math.PDF;
+import ca.neo.math.PDFTools;
 import ca.neo.math.RootFinder;
 import ca.neo.math.impl.AbstractFunction;
 import ca.neo.math.impl.IndicatorPDF;
@@ -180,7 +181,7 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 				myTimeSinceLastSpike = 0;
 				myN += myIncN; 
 				myV = 0;		
-				myTauRefNext = myTauRef + dt - 2 * (float) Math.random() * dt;
+				myTauRefNext = myTauRef + dt - 2 * (float) PDFTools.random() * dt;
 			}
 			
 			myRateHistory = new float[]{spiking ? 1f/dt : 0};

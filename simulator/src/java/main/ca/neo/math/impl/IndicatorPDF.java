@@ -4,6 +4,7 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.PDF;
+import ca.neo.math.PDFTools;
 
 /**
  * Uniform probability between upper and lower limits, zero elsewhere.
@@ -91,7 +92,7 @@ public class IndicatorPDF implements PDF {
 		if (myLow == myHigh) {
 			return new float[]{myLow};
 		} else {
-			return new float[] {myLow + myDifference * (float) Math.random()};			
+			return new float[] {myLow + myDifference * (float) PDFTools.random()};			
 		}
 	}
 

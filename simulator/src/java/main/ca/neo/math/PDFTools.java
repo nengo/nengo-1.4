@@ -3,12 +3,16 @@
  */
 package ca.neo.math;
 
+import java.util.Random;
+
 /**
  * Convenience methods for using PDFs. 
  * 
  * @author Bryan Tripp
  */
 public class PDFTools {
+	
+	private static final Random ourRandom = new Random();
 
 	/**
 	 * Note: PDF treated as univariate (only first dimension considered). 
@@ -39,6 +43,23 @@ public class PDFTools {
 	 */
 	public static float sampleFloat(PDF pdf) {
 		return pdf.sample()[0];
+	}
+	
+	/**
+	 * Use this rather than Math.random(), to allow user to reproduce random results
+	 * by setting the seed. 
+	 * 
+	 * @return A random sample between 0 and 1
+	 */
+	public static double random() {
+		return ourRandom.nextDouble();
+	}
+	
+	/**
+	 * @param seed New random seed for random()
+	 */
+	public static void setSeed(long seed) {
+		ourRandom.setSeed(seed);
 	}
 	
 }

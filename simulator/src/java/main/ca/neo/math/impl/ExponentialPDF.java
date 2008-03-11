@@ -4,6 +4,7 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.PDF;
+import ca.neo.math.PDFTools;
 import ca.neo.plot.Plotter;
 
 /**
@@ -55,7 +56,7 @@ public class ExponentialPDF extends AbstractFunction implements PDF {
 	public float[] sample() {
 		double x = 0;
 		do {
-			x = Math.random();
+			x = PDFTools.random();
 		} while (x == 0);
 		
 		return new float[]{myTau * (float) -Math.log(x)}; 

@@ -3,6 +3,10 @@
  */
 package ca.neo.model.nef.impl;
 
+import java.io.File;
+import java.io.IOException;
+
+import ca.neo.io.MatlabExporter;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.model.InstantaneousOutput;
@@ -129,18 +133,35 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		reset(false);
 	}
 	
+	/**
+	 * @return Mean-squared error of this origin over points evaluated by the LinearApproximator 
+	 */
 	public float[] getError() {
 		float[] result = new float[getDimensions()];
 		
 		if (myApproximator != null) {
+			MatlabExporter exporter = new MatlabExporter();
 			float[][] estimate = MU.transpose(MU.prod(MU.transpose(myApproximator.getValues()), getDecoders()));
+			float[][] actuals = new float[myFunctions.length][];
+			float[][] errors = new float[myFunctions.length][];
 			for (int i = 0; i < myFunctions.length; i++) {
 				float[] actual = myFunctions[i].multiMap(myApproximator.getEvalPoints());
-				System.out.println(actual.length);
 				float[] error = MU.difference(estimate[i], actual);
-				System.out.println(MU.toString(new float[][]{estimate[i]}, 5));
-				System.out.println(MU.toString(new float[][]{actual}, 5));
-				result[i] = MU.prod(error, error) / (float) actual.length;
+				actuals[i] = actual;
+				errors[i] = error;
+//				System.out.println(MU.toString(new float[][]{estimate[i]}, 5));
+//				System.out.println(MU.toString(new float[][]{actual}, 5));
+				result[i] = MU.prod(error, error) / (float) error.length;
+			}
+			System.out.println(MU.toString(myApproximator.getEvalPoints(), 5));
+			exporter.add("actual", actuals);
+			exporter.add("error", errors);
+			exporter.add("evalPoints", myApproximator.getEvalPoints());
+			exporter.add("estimate", estimate);
+			try {
+				exporter.write(new File("evalpoints.mat"));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		

@@ -2,6 +2,7 @@ package ca.neo.model.neuron.impl;
 
 import ca.neo.math.Function;
 import ca.neo.math.PDF;
+import ca.neo.math.PDFTools;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.math.impl.LinearFunction;
@@ -103,7 +104,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 				
 				float rate = myRateFunction.map(new float[]{current[i]});						
 				double probNoSpikes = Math.exp(-rate*timeSpan);
-				spike = (Math.random() > probNoSpikes);
+				spike = (PDFTools.random() > probNoSpikes);
 			}
 			
 			result = new SpikeOutputImpl(new boolean[]{spike}, Units.SPIKES, time[time.length-1]); 

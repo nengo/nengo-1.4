@@ -4,6 +4,7 @@
 package ca.neo.math.impl;
 
 import ca.neo.math.PDF;
+import ca.neo.math.PDFTools;
 
 /**
  * Univariate Gaussian probability density function. 
@@ -151,8 +152,8 @@ public class GaussianPDF implements PDF {
 		float x1, x2, w, y1, y2;
 		 
 		do {
-			x1 = 2f * (float) Math.random() - 1f;
-        	x2 = 2f * (float) Math.random() - 1f;
+			x1 = 2f * (float) PDFTools.random() - 1f;
+        	x2 = 2f * (float) PDFTools.random() - 1f;
         	w = x1 * x1 + x2 * x2;
         } while ( w >= 1f );
 

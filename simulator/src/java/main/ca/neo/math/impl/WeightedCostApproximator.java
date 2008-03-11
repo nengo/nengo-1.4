@@ -42,6 +42,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 	
 	private float[][] myEvalPoints;
 	private float[][] myValues;
+	private float[][] myNoisyValues;
 	private Function myCostFunction;
 	
 	private double[][] myGammaInverse; 
@@ -67,8 +68,9 @@ public class WeightedCostApproximator implements LinearApproximator {
 		assert evaluationPoints.length == values[0].length;
 
 		myEvalPoints = evaluationPoints;
-		myValues = values;
-		float absNoiseSD = addNoise(myValues, noise);
+		myValues = MU.clone(values);
+		myNoisyValues = MU.clone(values);
+		float absNoiseSD = addNoise(myNoisyValues, noise);
 		
 		myCostFunction = costFunction;
 		
@@ -184,17 +186,17 @@ public class WeightedCostApproximator implements LinearApproximator {
 			targetValues[i] = target.map(myEvalPoints[i]);
 		}
 		
-		float[] upsilon = new float[myValues.length];
-		for (int i = 0; i < myValues.length; i++) {
+		float[] upsilon = new float[myNoisyValues.length];
+		for (int i = 0; i < myNoisyValues.length; i++) {
 			for (int j = 0; j < myEvalPoints.length; j++) {
-				upsilon[i] += myValues[i][j] * targetValues[j] * myCostFunction.map(myEvalPoints[j]);
+				upsilon[i] += myNoisyValues[i][j] * targetValues[j] * myCostFunction.map(myEvalPoints[j]);
 			}
 			upsilon[i] = upsilon[i] / myEvalPoints.length;
 		}
 		
-		float[] result = new float[myValues.length];
-		for (int i = 0; i < myValues.length; i++) {
-			for (int j = 0; j < myValues.length; j++) {
+		float[] result = new float[myNoisyValues.length];
+		for (int i = 0; i < myNoisyValues.length; i++) {
+			for (int j = 0; j < myNoisyValues.length; j++) {
 				result[i] += myGammaInverse[i][j] * upsilon[j];
 			}
 		}
@@ -203,13 +205,13 @@ public class WeightedCostApproximator implements LinearApproximator {
 	}
 	
 	private double[][] findGamma() {
-		double[][] result = new double[myValues.length][];
+		double[][] result = new double[myNoisyValues.length][];
 		
 		for (int i = 0; i < result.length; i++) {
-			result[i] = new double[myValues.length];
+			result[i] = new double[myNoisyValues.length];
 			for (int j = 0; j < result[i].length; j++) {
 				for (int k = 0; k < myEvalPoints.length; k++) {
-					result[i][j] += myValues[i][k] * myValues[j][k] * myCostFunction.map(myEvalPoints[k]);						
+					result[i][j] += myNoisyValues[i][k] * myNoisyValues[j][k] * myCostFunction.map(myEvalPoints[k]);						
 				}
 				result[i][j] = result[i][j] / myEvalPoints.length;
 			}
@@ -224,7 +226,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		
 		result.myCostFunction = myCostFunction.clone();
 		result.myEvalPoints = MU.clone(myEvalPoints);
-		result.myValues = MU.clone(myValues);
+		result.myNoisyValues = MU.clone(myNoisyValues);
 		
 		result.myGammaInverse = new double[myGammaInverse.length][];
 		for (int i = 0; i < myGammaInverse.length; i++) {
