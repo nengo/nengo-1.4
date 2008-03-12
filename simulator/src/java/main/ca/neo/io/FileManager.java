@@ -50,14 +50,11 @@ public class FileManager {
 		saveObject(timeSeries, destination);
 	}
 	
-	private static void saveObject(Object object, File destination) throws IOException {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(bos);
-		oos.writeObject(object);
-		
+	private static void saveObject(Object object, File destination) throws IOException {		
 		FileOutputStream fos = new FileOutputStream(destination);
-		fos.write(bos.toByteArray());
-		fos.flush();
+		ObjectOutputStream oos = new ObjectOutputStream(fos);
+		oos.writeObject(object);
+		oos.flush();
 		fos.close();
 	}
 	
