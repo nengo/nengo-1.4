@@ -3,10 +3,8 @@
  */
 package ca.neo.model.nef.impl;
 
-import java.io.File;
-import java.io.IOException;
+import org.apache.log4j.Logger;
 
-import ca.neo.io.MatlabExporter;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
 import ca.neo.model.InstantaneousOutput;
@@ -21,8 +19,10 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
-import ca.neo.model.nef.NEFNode;
+import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.util.MU;
+import ca.neo.util.VectorGenerator;
+import ca.neo.util.impl.RandomHypersphereVG;
 
 /**
  * An Origin of functions of the state variables of an NEFEnsemble. 
@@ -36,6 +36,8 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 
 	private static final long serialVersionUID = 1L;
 	
+	private static Logger ourLogger = Logger.getLogger(DecodedOrigin.class);
+	
 	private Node myNode; //parent node
 	private String myName;
 	private Node[] myNodes;
@@ -46,12 +48,11 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private RealOutput myOutput;
 	private Noise myNoise = null;
 	private Noise[] myNoises = null;
-	private LinearApproximator myApproximator;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings. 
 	 *  
-	 * @param Node The parent Node
+	 * @param node The parent Node
 	 * @param name Name of this Origin
 	 * @param nodes Nodes that belong to the NEFEnsemble from which this Origin arises
 	 * @param nodeOrigin Name of the Origin on each given node from which output is to be decoded  
@@ -75,7 +76,6 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myFunctions = functions; 
 		myDecoders = findDecoders(nodes, functions, approximator);  
 		myMode = SimulationMode.DEFAULT;
-		myApproximator = approximator;
 		
 		reset(false);
 	}
@@ -91,7 +91,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	/**
 	 * With this constructor decoding vectors are specified by the caller. 
 	 * 
-	 * @param Node The parent Node
+	 * @param node The parent Node
 	 * @param name As in other constructor
 	 * @param nodes As in other constructor
 	 * @param nodeOrigin Name of the Origin on each given node from which output is to be decoded  
@@ -134,35 +134,30 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	}
 	
 	/**
-	 * @return Mean-squared error of this origin over points evaluated by the LinearApproximator 
+	 * @return Mean-squared error of this origin over randomly selected points  
 	 */
 	public float[] getError() {
 		float[] result = new float[getDimensions()];
 		
-		if (myApproximator != null) {
-			MatlabExporter exporter = new MatlabExporter();
-			float[][] estimate = MU.transpose(MU.prod(MU.transpose(myApproximator.getValues()), getDecoders()));
-			float[][] actuals = new float[myFunctions.length][];
-			float[][] errors = new float[myFunctions.length][];
-			for (int i = 0; i < myFunctions.length; i++) {
-				float[] actual = myFunctions[i].multiMap(myApproximator.getEvalPoints());
-				float[] error = MU.difference(estimate[i], actual);
-				actuals[i] = actual;
-				errors[i] = error;
-//				System.out.println(MU.toString(new float[][]{estimate[i]}, 5));
-//				System.out.println(MU.toString(new float[][]{actual}, 5));
-				result[i] = MU.prod(error, error) / (float) error.length;
+		if (myNode instanceof NEFEnsemble) {
+			NEFEnsemble ensemble = (NEFEnsemble) myNode;
+			
+			VectorGenerator vg = new RandomHypersphereVG(false, 1, 0);			
+			float[][] unscaled = vg.genVectors(500, ensemble.getDimension());
+			float[][] input = new float[unscaled.length][];
+			for (int i = 0; i < input.length; i++) {
+				input[i] = MU.prodElementwise(unscaled[i], ensemble.getRadii());
 			}
-			System.out.println(MU.toString(myApproximator.getEvalPoints(), 5));
-			exporter.add("actual", actuals);
-			exporter.add("error", errors);
-			exporter.add("evalPoints", myApproximator.getEvalPoints());
-			exporter.add("estimate", estimate);
-			try {
-				exporter.write(new File("evalpoints.mat"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			
+			float[][] idealOutput = NEFUtil.getOutput(this, input, SimulationMode.DIRECT);
+			float[][] actualOutput = NEFUtil.getOutput(this, input, SimulationMode.CONSTANT_RATE);
+			
+			float[][] error = MU.transpose(MU.difference(actualOutput, idealOutput));
+			for (int i = 0; i < error.length; i++) {
+				result[i] = MU.prod(error[i], error[i]) / (float) error[i].length;
+			}			
+		} else {
+			ourLogger.warn("Can't calculate error of a DecodedOrigin unless it belongs to an NEFEnsemble");
 		}
 		
 		return result;

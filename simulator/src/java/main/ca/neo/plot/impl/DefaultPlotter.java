@@ -8,8 +8,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -31,7 +29,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.util.ShapeUtilities;
 
-import ca.neo.io.MatlabExporter;
 import ca.neo.math.Function;
 import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
