@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import ca.neo.config.ConfigUtil;
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.plasticity.PlasticityRule;
@@ -32,6 +29,8 @@ import ca.neo.model.plasticity.PlasticityRule;
  */
 public class CompositePlasticityRule implements PlasticityRule {
 
+	private static final long serialVersionUID = 1L;
+	
 	private PlasticityRule mySpikeRule;
 	private PlasticityRule myRealRule;
 	private Map<String, InstantaneousOutput> myOriginStates;
@@ -134,6 +133,8 @@ public class CompositePlasticityRule implements PlasticityRule {
 	 */
 	public static class NullRule implements PlasticityRule {
 		
+		private static final long serialVersionUID = 1L;
+
 		/**
 		 * @return A zero matrix the same size as the given transform
 		 * @see ca.neo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.neo.model.InstantaneousOutput, float)

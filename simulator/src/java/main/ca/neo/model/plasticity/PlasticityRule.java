@@ -3,6 +3,8 @@
  */
 package ca.neo.model.plasticity;
 
+import java.io.Serializable;
+
 import ca.neo.model.InstantaneousOutput;
 
 /**
@@ -13,7 +15,7 @@ import ca.neo.model.InstantaneousOutput;
  * 
  * @author Bryan Tripp
  */
-public interface PlasticityRule {
+public interface PlasticityRule extends Serializable, Cloneable {
 	
 	/**
 	 * Provides potentially modulatory input to the rule.

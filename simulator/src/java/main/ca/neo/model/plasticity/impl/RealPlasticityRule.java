@@ -23,6 +23,8 @@ import ca.neo.model.plasticity.PlasticityRule;
  */
 public class RealPlasticityRule implements PlasticityRule {
 
+	private static final long serialVersionUID = 1L;
+	
 	private String myModTermName;
 	private int myModTermDim;
 	private Function myFunction;

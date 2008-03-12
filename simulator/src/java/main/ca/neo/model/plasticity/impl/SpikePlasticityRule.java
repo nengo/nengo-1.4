@@ -21,6 +21,8 @@ import ca.neo.util.MU;
  */
 public class SpikePlasticityRule implements PlasticityRule {
 	
+	private static final long serialVersionUID = 1L;
+	
 	private String myOriginName;
 	private String myModTermName;
 	private int myModTermDim;
