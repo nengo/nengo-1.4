@@ -6,6 +6,7 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
 import ca.neo.model.Origin;
 import ca.neo.model.SimulationException;
+import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.nodes.UINetwork;
@@ -21,7 +22,25 @@ import ca.shu.ui.lib.util.UserMessages;
 /**
  * @author Shu
  */
-public class UIOrigin extends Widget {
+public abstract class UIOrigin extends Widget {
+
+	/**
+	 * Factory method for creating a UI Wrapper around a origin
+	 * 
+	 * @param uiNodeParent
+	 *            UINeoNode to attach the UITermination object to the right
+	 *            parent.
+	 * @param origin
+	 * @return UI Origin Wrapper
+	 */
+	public static UIOrigin createOriginUI(UINeoNode uiNodeParent, Origin origin) {
+
+		if (origin instanceof DecodedOrigin) {
+			return new UIDecodedOrigin(uiNodeParent, (DecodedOrigin) origin);
+		} else {
+			return new UIGenericOrigin(uiNodeParent, origin);
+		}
+	}
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,7 +52,7 @@ public class UIOrigin extends Widget {
 
 	private Color lineWellDefaultColor;
 
-	public UIOrigin(UINeoNode nodeParent, Origin origin) {
+	protected UIOrigin(UINeoNode nodeParent, Origin origin) {
 		super(nodeParent, origin);
 
 		init();
@@ -66,6 +85,11 @@ public class UIOrigin extends Widget {
 
 	}
 
+	/**
+	 * Destroys the Origin model
+	 */
+	protected abstract void destroyOriginModel();
+
 	@Override
 	protected void exposeModel(UINetwork networkUI, String exposedName) {
 		networkUI.getModel().exposeOrigin(getModel(), exposedName);
@@ -80,6 +104,12 @@ public class UIOrigin extends Widget {
 	@Override
 	protected String getModelName() {
 		return getModel().getName();
+	}
+
+	@Override
+	protected final void prepareToDestroyModel() {
+		destroyOriginModel();
+		super.prepareToDestroyModel();
 	}
 
 	@Override
@@ -159,4 +189,17 @@ public class UIOrigin extends Widget {
 
 		lineWell.setVisible(isVisible);
 	}
+}
+
+class UIGenericOrigin extends UIOrigin {
+
+	protected UIGenericOrigin(UINeoNode nodeParent, Origin origin) {
+		super(nodeParent, origin);
+	}
+
+	@Override
+	protected void destroyOriginModel() {
+		UserMessages.showWarning("This origin model could not be removed, it will only be hidden.");
+	}
+
 }

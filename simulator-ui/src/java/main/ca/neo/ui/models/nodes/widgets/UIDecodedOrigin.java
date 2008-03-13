@@ -1,7 +1,9 @@
 package ca.neo.ui.models.nodes.widgets;
 
-import ca.neo.model.Origin;
-import ca.neo.ui.models.nodes.UINEFEnsemble;
+import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.impl.DecodedOrigin;
+import ca.neo.ui.models.UINeoNode;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * UI Wrapper for a Decoded Termination
@@ -13,21 +15,14 @@ public class UIDecodedOrigin extends UIOrigin {
 	private static final long serialVersionUID = 1L;
 
 	public static final String typeName = "Decoded Origin";
-	private int inputDimensions;
 
-	public UIDecodedOrigin(UINEFEnsemble ensembleProxy, Origin origin) {
+	protected UIDecodedOrigin(UINeoNode ensembleProxy, DecodedOrigin origin) {
 		super(ensembleProxy, origin);
 		setName(origin.getName());
-		this.inputDimensions = ensembleProxy.getModel().getDimension();
 	}
 
 	protected int getInputDimensions() {
-		return inputDimensions;
-	}
-
-	@Override
-	public UINEFEnsemble getNodeParent() {
-		return (UINEFEnsemble) super.getNodeParent();
+		return getModel().getDimensions();
 	}
 
 	@Override
@@ -36,10 +31,12 @@ public class UIDecodedOrigin extends UIOrigin {
 	}
 
 	@Override
-	protected void prepareToDestroyModel() {
-		getNodeParent().getModel().removeDecodedTermination(getModel().getName());
-		showPopupMessage("decoded termination removed from ensemble");
-		super.prepareToDestroyModel();
+	protected void destroyOriginModel() {
+		if (getModel().getNode() instanceof NEFEnsemble) {
+			((NEFEnsemble) (getModel().getNode())).removeDecodedTermination(getModel().getName());
+			showPopupMessage("decoded termination removed from ensemble");
+		} else {
+			Util.Assert(false, "Decoded Origin not attached to NEFEnsemble");
+		}
 	}
-
 }

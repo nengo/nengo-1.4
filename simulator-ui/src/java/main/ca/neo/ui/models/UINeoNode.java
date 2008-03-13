@@ -581,11 +581,11 @@ public abstract class UINeoNode extends UINeoModel {
 		try {
 			Origin originModel = getModel().getOrigin(originName);
 			if (originModel != null) {
-				originUI = new UIOrigin(this, originModel);
+				originUI = UIOrigin.createOriginUI(this, originModel);
 				addWidget(originUI);
 				return originUI;
 			} else {
-				Util.debugMsg("Could not find origin: " + originName);
+				Util.Assert(false, "Could not find origin: " + originName);
 			}
 
 		} catch (StructuralException e) {
@@ -660,14 +660,16 @@ public abstract class UINeoNode extends UINeoModel {
 
 		UITermination termUI;
 		try {
+
 			Termination termModel = getModel().getTermination(terminationName);
 			if (termModel != null) {
-				termUI = new UITermination(this, termModel);
+				termUI = UITermination.createTerminationUI(this, termModel);
 				addWidget(termUI);
 				return termUI;
 			} else {
-				Util.debugMsg("Could not find termination: " + terminationName);
+				Util.Assert(false, "Could not find termination: " + terminationName);
 			}
+
 		} catch (StructuralException e) {
 			UserMessages.showError(e.toString());
 		}

@@ -1,6 +1,10 @@
 ******************************************
  Done
 *******************************************
+03/12/2007 - UIOrigin and UITermination objects are now created through factory methods,
+	to ensure that the correct wrapper is used.
+
+
 03/10/2007 - Added SpikingNeuronFactory to options for NEFEnsemble Constructable Dialog
 03/09/2008 - Added Node Factory selection options NEFEnsemble Constructable Dialog
 	- "Linear Neuron" (use PoissonSpikeGenerator.LinearNeuronFactory)

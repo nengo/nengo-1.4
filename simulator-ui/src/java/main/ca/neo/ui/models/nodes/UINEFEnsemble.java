@@ -9,8 +9,6 @@ import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.models.constructors.CDecodedOrigin;
 import ca.neo.ui.models.constructors.CDecodedTermination;
 import ca.neo.ui.models.constructors.ModelFactory;
-import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
-import ca.neo.ui.models.nodes.widgets.UIDecodedTermination;
 import ca.neo.ui.models.nodes.widgets.UIOrigin;
 import ca.neo.ui.models.nodes.widgets.UITermination;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
@@ -86,10 +84,10 @@ public class UINEFEnsemble extends UIEnsemble {
 	public UITermination addDecodedTermination() {
 
 		try {
-			Termination term = (Termination) ModelFactory.constructModel(this, new CDecodedTermination(
-					getModel()));
+			Termination term = (Termination) ModelFactory.constructModel(this,
+					new CDecodedTermination(getModel()));
 
-			UIDecodedTermination termUI = new UIDecodedTermination(this, term);
+			UITermination termUI = UITermination.createTerminationUI(this, term);
 			showPopupMessage("New decoded TERMINATION added");
 			addWidget(termUI);
 			return termUI;
@@ -105,8 +103,9 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		try {
 
-			Origin origin = (Origin) ModelFactory.constructModel(this, new CDecodedOrigin(getModel()));
-			UIDecodedOrigin originUI = new UIDecodedOrigin(this, origin);
+			Origin origin = (Origin) ModelFactory.constructModel(this, new CDecodedOrigin(
+					getModel()));
+			UIOrigin originUI = UIOrigin.createOriginUI(this, origin);
 
 			addWidget(originUI);
 			showPopupMessage("New decoded ORIGIN added");

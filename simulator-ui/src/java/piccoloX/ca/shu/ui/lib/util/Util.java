@@ -87,8 +87,15 @@ public class Util {
 			}
 			assertMsg.append("Report this error to shuwu83@gmail.com</h3><br>");
 			StackTraceElement[] stackEls = (new Exception()).getStackTrace();
+
+			int i = 0;
 			for (StackTraceElement el : stackEls) {
+				if (i > 10) {
+					assertMsg.append("...");
+					break;
+				}
 				assertMsg.append(el.toString() + "<br>");
+				i++;
 			}
 
 			UserMessages.showWarning(assertMsg.toString());

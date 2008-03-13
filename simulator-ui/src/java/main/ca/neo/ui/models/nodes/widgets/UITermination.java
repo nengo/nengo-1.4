@@ -5,6 +5,7 @@ import java.awt.Color;
 import ca.neo.model.Network;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
+import ca.neo.model.nef.impl.DecodedTermination;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.nodes.UINetwork;
@@ -25,8 +26,7 @@ import ca.shu.ui.lib.world.WorldObject;
  * 
  * @author Shu Wu
  */
-public class UITermination extends Widget implements ILineTermination {
-
+public abstract class UITermination extends Widget implements ILineTermination {
 	private static final long serialVersionUID = 1L;
 
 	private static String objToString(Object configValue) {
@@ -39,13 +39,30 @@ public class UITermination extends Widget implements ILineTermination {
 
 	}
 
+	/**
+	 * Factory method for creating a UI Wrapper around a termination
+	 * 
+	 * @param uiNodeParent
+	 *            UINeoNode to attach the UITermination object to the right
+	 *            parent.
+	 * @param termination
+	 * @return UI Termination Wrapper
+	 */
+	public static UITermination createTerminationUI(UINeoNode uiNodeParent, Termination termination) {
+		if (termination instanceof DecodedTermination) {
+			return new UIDecodedTermination(uiNodeParent, (DecodedTermination) termination);
+		} else {
+			return new UIGenericTermination(uiNodeParent, termination);
+		}
+	}
+
 	private boolean isExposed = false;
 
 	private LineTerminationIcon myIcon;
 
 	private Color myIconDefaultColor;
 
-	public UITermination(UINeoNode nodeParent, Termination term) {
+	protected UITermination(UINeoNode nodeParent, Termination term) {
 		super(nodeParent, term);
 		setName(term.getName());
 		init();
@@ -124,6 +141,11 @@ public class UITermination extends Widget implements ILineTermination {
 		}
 	}
 
+	/**
+	 * Destroys the termination model
+	 */
+	protected abstract void destroyTerminationModel();
+
 	@Override
 	protected void exposeModel(UINetwork networkUI, String exposedName) {
 		networkUI.getModel().exposeTermination(getModel(), exposedName);
@@ -138,6 +160,13 @@ public class UITermination extends Widget implements ILineTermination {
 	@Override
 	protected String getModelName() {
 		return getModel().getName();
+	}
+
+	@Override
+	protected final void prepareToDestroyModel() {
+		disconnect();
+		destroyTerminationModel();
+		super.prepareToDestroyModel();
 	}
 
 	@Override
@@ -237,6 +266,20 @@ public class UITermination extends Widget implements ILineTermination {
 		protected void action() throws ActionException {
 			disconnect();
 		}
+	}
+}
+
+class UIGenericTermination extends UITermination implements ILineTermination {
+
+	protected UIGenericTermination(UINeoNode nodeParent, Termination term) {
+		super(nodeParent, term);
+	}
+
+	@Override
+	protected void destroyTerminationModel() {
+		UserMessages
+				.showWarning("This termination model could not be removed, it will only be hidden.");
+
 	}
 
 }

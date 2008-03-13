@@ -1,7 +1,9 @@
 package ca.neo.ui.models.nodes.widgets;
 
-import ca.neo.model.Termination;
-import ca.neo.ui.models.nodes.UINEFEnsemble;
+import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.model.nef.impl.DecodedTermination;
+import ca.neo.ui.models.UINeoNode;
+import ca.shu.ui.lib.util.Util;
 
 /**
  * UI Wrapper for a Decoded Termination
@@ -14,26 +16,24 @@ public class UIDecodedTermination extends UITermination {
 
 	public static final String typeName = "Decoded Termination";
 
-	public UIDecodedTermination(UINEFEnsemble ensembleProxy, Termination term) {
+	protected UIDecodedTermination(UINeoNode ensembleProxy, DecodedTermination term) {
 		super(ensembleProxy, term);
 		setName(term.getName());
 	}
 
 	@Override
-	protected void prepareToDestroyModel() {
-		getNodeParent().getModel().removeDecodedTermination(getModel().getName());
-		showPopupMessage("decoded termination removed from ensemble");
-		super.prepareToDestroyModel();
-	}
-
-	@Override
-	public UINEFEnsemble getNodeParent() {
-		return (UINEFEnsemble) super.getNodeParent();
-	}
-
-	@Override
 	public String getTypeName() {
 		return typeName;
+	}
+
+	@Override
+	protected void destroyTerminationModel() {
+		if (getModel().getNode() instanceof NEFEnsemble) {
+			((NEFEnsemble) getModel().getNode()).removeDecodedTermination(getModel().getName());
+			showPopupMessage("decoded termination removed from ensemble");
+		} else {
+			Util.Assert(false, "Decoded Termination not attached to NEFEnsemble");
+		}
 	}
 
 }
