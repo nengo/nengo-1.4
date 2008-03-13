@@ -219,7 +219,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 
 			simulatorSource = props.getProperty("simulator_source");
 		} catch (IOException e) {
-			Util.debugMsg("Problem loading config file");
+			Util.debugMsg("Problem loading config file: " + e.getMessage());
 		}
 		File simulatorSourceFile = new File(simulatorSource);
 		if (!simulatorSourceFile.exists()) {
