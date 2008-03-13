@@ -109,6 +109,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private class MyTreeMouseListener implements MouseListener {
 
 		private void ContextMenuEvent(MouseEvent e) {
@@ -160,7 +161,21 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 				}
 
-				menuBuilder.addAction(new RemoveTreeNodes(leafNodes));
+				// make sure we don't remove the node representing the network
+				List<MutableTreeNode> removeNodes= new ArrayList<MutableTreeNode>();
+				TreeNode root=(TreeNode)dataModel.getRoot();
+				for (MutableTreeNode node : leafNodes) {
+					if (node.getParent()==root) {
+						Enumeration<MutableTreeNode> childEnumerator = node.children();
+						while (childEnumerator.hasMoreElements()) {
+							removeNodes.add(childEnumerator.nextElement());
+						}
+					} else {
+						removeNodes.add(node);
+					}
+				}				
+				
+				menuBuilder.addAction(new RemoveTreeNodes(removeNodes));
 				menu = menuBuilder.toJPopupMenu();
 
 				if (menu != null) {
