@@ -3,6 +3,7 @@ package ca.neo.ui.models.constructors;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.nef.NEFEnsemble;
+import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PBoolean;
@@ -27,9 +28,21 @@ public class CDecodedTermination extends AbstractConstructable {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties) {
-		Termination term = null;
+	protected Object configureModel(PropertySet configuredProperties) throws ConfigException {
+		
+		// make sure the name isn't a duplicate
+		String name=(String)configuredProperties.getProperty(pName);
+		Termination oldTerm;
+		try {
+			oldTerm=nefEnsembleParent.getTermination(name);
+		} catch (StructuralException e) {
+			oldTerm=null;
+		}
+		if (oldTerm!=null) {
+			throw new ConfigException("A termination with the name '"+name+"' already exists");
+		}		
 
+		Termination term = null;
 		try {
 			term = nefEnsembleParent.addDecodedTermination((String) configuredProperties
 					.getProperty(pName), (float[][]) configuredProperties
