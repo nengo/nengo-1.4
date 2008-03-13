@@ -31,8 +31,9 @@ import ca.neo.util.impl.ProbeImpl;
  * 
  * @author Bryan Tripp
  */
-public class LocalSimulator implements Simulator {
-
+public class LocalSimulator implements Simulator, java.io.Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private Projection[] myProjections;
 	private Node[] myNodes;
 	private Map<String, Node> myNodeMap;

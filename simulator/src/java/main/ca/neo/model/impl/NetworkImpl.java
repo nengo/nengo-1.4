@@ -43,7 +43,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	private Map<Termination, Projection> myProjectionMap; //keyed on Termination
 	private String myName;
 	private SimulationMode myMode;
-	private transient Simulator mySimulator;
+	private Simulator mySimulator;
 	private float myStepSize;
 	private Map<String, Probeable> myProbeables;
 	private Map<String, String> myProbeableStates;
