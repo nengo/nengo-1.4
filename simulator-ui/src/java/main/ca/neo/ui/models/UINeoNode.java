@@ -305,8 +305,8 @@ public abstract class UINeoNode extends UINeoModel {
 
 		for (WorldObject wo : getChildren()) {
 			if (wo instanceof UITermination) {
-				UITermination term = (UITermination)wo;
-				term .disconnect();
+				UITermination term = (UITermination) wo;
+				term.disconnect();
 			}
 		}
 
@@ -568,9 +568,9 @@ public abstract class UINeoNode extends UINeoModel {
 		/*
 		 * Try to find if the origin has already been created
 		 */
-		Object origin = getChild(originName, UIOrigin.class);
-		if (origin != null) {
-			return (UIOrigin) origin;
+		Object childOrigin = getChild(originName, UIOrigin.class);
+		if (childOrigin != null) {
+			return (UIOrigin) childOrigin;
 		}
 
 		/*
@@ -579,10 +579,14 @@ public abstract class UINeoNode extends UINeoModel {
 
 		UIOrigin originUI;
 		try {
-			originUI = new UIOrigin(this, getModel().getOrigin(originName));
-			addWidget(originUI);
-
-			return originUI;
+			Origin originModel = getModel().getOrigin(originName);
+			if (originModel != null) {
+				originUI = new UIOrigin(this, originModel);
+				addWidget(originUI);
+				return originUI;
+			} else {
+				Util.debugMsg("Could not find origin: " + originName);
+			}
 
 		} catch (StructuralException e) {
 			UserMessages.showError(e.toString());
@@ -639,7 +643,7 @@ public abstract class UINeoNode extends UINeoModel {
 	/**
 	 * @param layoutName
 	 *            Name of an Termination on the Node model
-	 * @return the POrigin shown
+	 * @return
 	 */
 	public UITermination showTermination(String terminationName) {
 		/*
@@ -656,9 +660,14 @@ public abstract class UINeoNode extends UINeoModel {
 
 		UITermination termUI;
 		try {
-			termUI = new UITermination(this, getModel().getTermination(terminationName));
-			addWidget(termUI);
-			return termUI;
+			Termination termModel = getModel().getTermination(terminationName);
+			if (termModel != null) {
+				termUI = new UITermination(this, termModel);
+				addWidget(termUI);
+				return termUI;
+			} else {
+				Util.debugMsg("Could not find termination: " + terminationName);
+			}
 		} catch (StructuralException e) {
 			UserMessages.showError(e.toString());
 		}
