@@ -50,4 +50,6 @@ public interface PlasticityRule extends Serializable, Cloneable {
 	 */
 	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time); 
 	
+	public PlasticityRule clone() throws CloneNotSupportedException;
+	
 }

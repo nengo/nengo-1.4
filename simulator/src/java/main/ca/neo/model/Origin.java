@@ -22,7 +22,7 @@ import java.io.Serializable;
  *    
  * @author Bryan Tripp
  */
-public interface Origin extends Serializable {
+public interface Origin extends Serializable, Cloneable {
 
 	/**
 	 * @return Name of this Origin (unique in the scope of a source of Origins, eg a Neuron or 
@@ -47,5 +47,7 @@ public interface Origin extends Serializable {
 	 * @return The Node to which the Origin belongs
 	 */
 	public Node getNode();
+	
+	public Origin clone() throws CloneNotSupportedException;
 	
 }

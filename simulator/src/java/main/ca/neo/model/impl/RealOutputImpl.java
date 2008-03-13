@@ -58,4 +58,9 @@ public class RealOutputImpl implements RealOutput {
 		return myTime;
 	}
 
+	@Override
+	public RealOutput clone() throws CloneNotSupportedException {
+		return new RealOutputImpl(myValues.clone(), myUnits, myTime);
+	}
+
 }

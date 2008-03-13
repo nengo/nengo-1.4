@@ -148,5 +148,13 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	public void setNode(Node node) {
 		myNode = node;
 	}
+
+	@Override
+	public Origin clone() throws CloneNotSupportedException {
+		BasicOrigin result = (BasicOrigin) super.clone();
+		result.setNoise(myNoise.clone());
+		result.setValues(myValues.clone());
+		return result;
+	}
 	
 }

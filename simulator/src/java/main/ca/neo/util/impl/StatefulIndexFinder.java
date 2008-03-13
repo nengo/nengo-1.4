@@ -4,7 +4,6 @@
 package ca.neo.util.impl;
 
 import ca.neo.util.IndexFinder;
-import ca.neo.util.Interpolator;
 
 /**
  * An IndexFinder that searches linearly, starting where the last answer was. This is 

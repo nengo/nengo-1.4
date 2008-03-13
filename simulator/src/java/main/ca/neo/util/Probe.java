@@ -14,7 +14,6 @@ import ca.neo.model.SimulationException;
  */
 public interface Probe {
 
-
 	/**
 	 * @param ensembleName
 	 *            Name of the Ensemble the target object belongs to. Null, if
@@ -87,4 +86,5 @@ public interface Probe {
 	 *         in. Null if it's not in one
 	 */
 	public String getEnsembleName();
+	
 }

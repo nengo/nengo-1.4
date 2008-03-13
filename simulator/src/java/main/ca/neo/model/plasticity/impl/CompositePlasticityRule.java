@@ -125,6 +125,14 @@ public class CompositePlasticityRule implements PlasticityRule {
 		myTerminationStates.put(name, state);
 	}
 
+	@Override
+	public PlasticityRule clone() throws CloneNotSupportedException {
+		CompositePlasticityRule result = (CompositePlasticityRule) super.clone();
+		result.myRealRule = myRealRule.clone();
+		result.mySpikeRule = mySpikeRule.clone();
+		return result;
+	}
+
 	/**
 	 * A null plasticity rule that always returns zeros from getDerivative(). This can be used within a 
 	 * composite rule if learning is to occur only in spiking modes, or only in rate modes.  
@@ -161,7 +169,13 @@ public class CompositePlasticityRule implements PlasticityRule {
 		 * @see ca.neo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.neo.model.InstantaneousOutput, float)
 		 */
 		public void setTerminationState(String name, InstantaneousOutput state, float time) {
-		}		
+		}
+
+		@Override
+		public PlasticityRule clone() throws CloneNotSupportedException {
+			return (PlasticityRule) super.clone();
+		}	
+		
 	}
 
 }

@@ -10,7 +10,7 @@ package ca.neo.util;
  * 
  * @author Bryan Tripp
  */
-public interface IndexFinder {
+public interface IndexFinder extends Cloneable {
 
 	/**
 	 * @param value A floating-point value that the list is expected to span 

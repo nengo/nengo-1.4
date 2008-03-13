@@ -58,4 +58,9 @@ public class SpikeOutputImpl implements SpikeOutput {
 		return myTime;
 	}
 
+	@Override
+	public SpikeOutput clone() throws CloneNotSupportedException {
+		return new SpikeOutputImpl(myValues.clone(), myUnits, myTime);
+	}
+
 }

@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public interface SpikePattern extends Serializable {
+public interface SpikePattern extends Serializable, Cloneable {
 
 	/**
 	 * @return Number of neurons in the ensemble 
@@ -22,4 +22,7 @@ public interface SpikePattern extends Serializable {
 	 * @return Times at which neuron spiked since the Ensemble was last reset
 	 */
 	public float[] getSpikeTimes(int neuron);
+	
+	public SpikePattern clone() throws CloneNotSupportedException;
+	
 }

@@ -128,4 +128,12 @@ public class BasicTermination implements Termination, Resettable {
 		myInput = null;
 	}
 
+	@Override
+	public Termination clone() throws CloneNotSupportedException {
+		BasicTermination result = new BasicTermination(myNode, myDynamics.clone(), myIntegrator.clone(), myName);
+		result.myInput = myInput.clone();
+		result.myOutput = myOutput.clone();
+		return result;
+	}
+
 }

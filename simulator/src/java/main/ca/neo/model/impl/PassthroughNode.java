@@ -275,6 +275,13 @@ public class PassthroughNode implements Node {
 		public void reset(boolean randomize) {
 			myValues = null;
 		}
+
+		@Override
+		public Termination clone() throws CloneNotSupportedException {
+			PassthroughTermination result = new PassthroughTermination(myNode, myName, myDimension, MU.clone(myTransform));
+			result.myValues = myValues.clone();
+			return result;
+		}
 		
 	}
 

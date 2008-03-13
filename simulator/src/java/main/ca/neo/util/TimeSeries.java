@@ -12,7 +12,7 @@ import ca.neo.model.Units;
  * 
  * @author Bryan Tripp
  */
-public interface TimeSeries extends Serializable {
+public interface TimeSeries extends Serializable, Cloneable {
 
 	/**
 	 * @return Times for which values are available

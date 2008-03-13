@@ -83,4 +83,11 @@ public class SpikeGeneratorOrigin implements Origin {
 		return myNode;
 	}
 
+	@Override
+	public Origin clone() throws CloneNotSupportedException {
+		SpikeGeneratorOrigin result = (SpikeGeneratorOrigin) super.clone();
+		result.myOutput = myOutput.clone();
+		return result;
+	}
+
 }

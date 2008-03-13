@@ -11,13 +11,12 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public interface Interpolator extends Serializable {
+public interface Interpolator extends Serializable, Cloneable {
 
 	public void setTimeSeries(TimeSeries1D series);
 	
 	public float interpolate(float time);
 	
 	public Interpolator clone() throws CloneNotSupportedException;
-
 	
 }

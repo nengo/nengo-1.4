@@ -120,4 +120,16 @@ public class EnsembleOrigin implements Origin {
 		return myNode;
 	}
 
+	/**
+	 * Note: the clone references the same copies of the underlying node origins. This 
+	 * will work if the intent is to duplicate an EnsembleOrigin on the same Ensemble. 
+	 * More work is needed if this clone is part of an Ensemble clone, since the cloned
+	 * EnsembleOrigin should then reference the new node origins, which we don't have 
+	 * access to here.   
+	 */
+	@Override
+	public Origin clone() throws CloneNotSupportedException {
+		return new EnsembleOrigin(myNode, myName, myNodeOrigins);
+	}
+
 }

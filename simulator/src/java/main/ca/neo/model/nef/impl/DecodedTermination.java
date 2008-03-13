@@ -58,14 +58,14 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private LinearSystem myDynamicsTemplate;
 	private LinearSystem[] myDynamics;
 	private Integrator myIntegrator;
-	private Units[] myNullUnits;
+	private Units[] myNullUnits;	
 	private RealOutput myInputValues; 
 	private float myTime;
-	private float[] myOutputValues;
-	private boolean myTauMutable;
-	private ConfigurationImpl myConfiguration;
+	private float[] myOutputValues;	
+	private boolean myTauMutable;	
+	private ConfigurationImpl myConfiguration;	
 	private DecodedTermination myScalingTermination;
-	private float[] myStaticBias;
+	private float[] myStaticBias;	
 	private float myTau;
 	
 	/**
@@ -384,6 +384,22 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 */
 	public Node getNode() {
 		return myNode;
+	}
+
+	@Override
+	public Termination clone() throws CloneNotSupportedException {
+		try {
+			DecodedTermination result = new DecodedTermination(myNode, myName, MU.clone(myTransform), 
+					(LinearSystem) myDynamicsTemplate.clone(), myIntegrator.clone());
+			result.myInputValues = (RealOutput) myInputValues.clone();
+			result.myOutputValues = myOutputValues.clone();
+			result.myTime = myTime;
+			result.myScalingTermination = myScalingTermination; //refer to same copy
+			result.myStaticBias = myStaticBias.clone();
+			return result;
+		} catch (StructuralException e) {
+			throw new CloneNotSupportedException("Problem trying to clone: " + e.getMessage());
+		}
 	}
 
 }

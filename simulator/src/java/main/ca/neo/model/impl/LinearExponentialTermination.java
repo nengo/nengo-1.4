@@ -215,4 +215,14 @@ public class LinearExponentialTermination implements Termination {
 		return myNode;
 	}
 
+	@Override
+	public Termination clone() throws CloneNotSupportedException {
+		LinearExponentialTermination result = new LinearExponentialTermination(myNode, myName, myWeights.clone(), myTauPSC);
+		result.myCurrent = myCurrent;
+		result.myNetRealInput = myNetRealInput;
+		result.myNetSpikeInput = myNetSpikeInput;
+		result.myRawInput = myRawInput.clone();
+		return result;
+	}
+
 }

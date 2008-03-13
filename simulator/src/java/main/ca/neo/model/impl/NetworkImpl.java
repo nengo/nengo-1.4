@@ -456,6 +456,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		public void setNode(Node node) {
 			myNode = node;
 		}
+
+		@Override
+		public Origin clone() throws CloneNotSupportedException {
+			return (Origin) super.clone();
+		}
 		
 	}
 	
@@ -511,6 +516,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		 */
 		public void reset(boolean randomize) {
 			myWrapped.reset(randomize);
+		}
+
+		@Override
+		public Termination clone() throws CloneNotSupportedException {
+			return (Termination) super.clone();
 		}
 		
 	}

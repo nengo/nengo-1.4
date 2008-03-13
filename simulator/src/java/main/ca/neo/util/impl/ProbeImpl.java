@@ -26,7 +26,6 @@ public class ProbeImpl implements Probe {
 	private float myLastSampleTime = -100000;
 	private String myEnsembleName = null;
 
-
 	/**
 	 * @see ca.neo.util.Probe#connect(java.lang.String, ca.neo.model.Probeable, java.lang.String, boolean)
 	 */

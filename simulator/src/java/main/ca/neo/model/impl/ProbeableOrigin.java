@@ -118,5 +118,10 @@ public class ProbeableOrigin implements Origin {
 	public Node getNode() {
 		return myNode;
 	}
+
+	@Override
+	public Origin clone() throws CloneNotSupportedException {
+		return (Origin) super.clone();
+	}
 	
 }

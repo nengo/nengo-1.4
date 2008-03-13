@@ -3,6 +3,7 @@
  */
 package ca.neo.util.impl;
 
+import ca.neo.util.MU;
 import ca.neo.util.SpikePattern;
 
 /**
@@ -64,6 +65,14 @@ public class SpikePatternImpl implements SpikePattern {
 	private static float[] contract(float[] list, int index) {
 		float[] result = new float[index];
 		System.arraycopy(list, 0, result, 0, index);
+		return result;
+	}
+
+	@Override
+	public SpikePattern clone() throws CloneNotSupportedException {
+		SpikePatternImpl result = (SpikePatternImpl) super.clone();
+		result.myIndices = myIndices.clone();
+		result.mySpikeTimes = MU.clone(mySpikeTimes);
 		return result;
 	}
 

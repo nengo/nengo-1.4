@@ -155,4 +155,12 @@ public class RealPlasticityRule implements PlasticityRule {
 		}
 	}
 
+	@Override
+	public PlasticityRule clone() throws CloneNotSupportedException {
+		RealPlasticityRule result = (RealPlasticityRule) super.clone();
+		result.myFunction = myFunction.clone();
+		result.myOriginState = myOriginState.clone();
+		return result;
+	}
+	
 }

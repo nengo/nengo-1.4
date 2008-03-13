@@ -19,7 +19,7 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public interface InstantaneousOutput extends Serializable {
+public interface InstantaneousOutput extends Serializable, Cloneable {
 
 	/**
 	 * @return Units in which output is expressed. 
@@ -35,6 +35,8 @@ public interface InstantaneousOutput extends Serializable {
 	 * @return Time at which output is produced. 
 	 */
 	public float getTime();
+
+	public InstantaneousOutput clone() throws CloneNotSupportedException;
 	
 }
 

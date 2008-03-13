@@ -84,6 +84,11 @@ public class ProjectionImplTest extends TestCase {
 		public Node getNode() {
 			return null;
 		}
+
+		@Override
+		public Origin clone() throws CloneNotSupportedException {
+			return (Origin) super.clone();
+		}
 		
 	}
 	
@@ -127,6 +132,11 @@ public class ProjectionImplTest extends TestCase {
 		 * @see ca.neo.model.Resettable#reset(boolean)
 		 */
 		public void reset(boolean randomize) {
+		}
+
+		@Override
+		public Termination clone() throws CloneNotSupportedException {
+			return (Termination) super.clone();
 		}
 		
 	}

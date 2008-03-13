@@ -189,4 +189,13 @@ public class EnsembleTermination implements Termination {
 		}
 	}
 
+	@Override
+	public Termination clone() throws CloneNotSupportedException {
+		try {
+			return new EnsembleTermination(myNode, myName, myNodeTerminations);
+		} catch (StructuralException e) {
+			throw new CloneNotSupportedException("Error trying to clone: " + e.getMessage());
+		}
+	}
+
 }

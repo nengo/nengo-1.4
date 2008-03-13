@@ -406,7 +406,12 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 			}
 			public float[] getSpikeTimes(int neuron) {
 				return spikeTimesTrimmed;
+			}
+			@Override
+			public SpikePattern clone() throws CloneNotSupportedException {
+				return (SpikePattern) super.clone();
 			}			
+			
 		};
 		
 		Plotter.plot(rate, -1, .001f, 1, "rate");

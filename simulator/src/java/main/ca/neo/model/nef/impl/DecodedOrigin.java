@@ -334,4 +334,21 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		return myNode;
 	}
 
+	@Override
+	public Origin clone() throws CloneNotSupportedException {
+		Function[] functions = new Function[myFunctions.length];
+		for (int i = 0; i < functions.length; i++) {
+			functions[i] = myFunctions[i].clone();
+		}
+		try {
+			DecodedOrigin result = new DecodedOrigin(myNode, myName, myNodes, myNodeOrigin, functions, MU.clone(myDecoders));
+			result.myOutput = (RealOutput) myOutput.clone();
+			result.setNoise(myNoise.clone());
+			result.setMode(myMode);
+			return result;
+		} catch (StructuralException e) {
+			throw new CloneNotSupportedException("Error trying to clone: " + e.getMessage());
+		}
+	}
+
 }

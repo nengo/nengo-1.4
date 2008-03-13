@@ -40,7 +40,7 @@ import ca.neo.util.Configurable;
  *   
  * @author Bryan Tripp
  */
-public interface Termination extends Configurable, Serializable, Resettable {
+public interface Termination extends Configurable, Serializable, Resettable, Cloneable {
 
 	/**
 	 * Standard name of the post-synaptic current time constant property (most Terminations  
@@ -89,5 +89,7 @@ public interface Termination extends Configurable, Serializable, Resettable {
 	 * @return The Node to which this Termination belongs 
 	 */
 	public Node getNode();
+	
+	public Termination clone() throws CloneNotSupportedException;
 	
 }

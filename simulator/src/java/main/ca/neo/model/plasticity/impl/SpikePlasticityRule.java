@@ -233,6 +233,18 @@ public class SpikePlasticityRule implements PlasticityRule {
 		}
 	}
 
+	@Override
+	public PlasticityRule clone() throws CloneNotSupportedException {
+		SpikePlasticityRule result = (SpikePlasticityRule) super.clone();
+		result.myInSpiking = myInSpiking.clone();
+		result.myLastInSpike = myLastInSpike.clone();
+		result.myLastOutSpike = myLastOutSpike.clone();
+		result.myOnInSpikeFunction = myOnInSpikeFunction.clone();
+		result.myOnOutSpikeFunction = myOnOutSpikeFunction.clone();
+		result.myOutSpiking = myOutSpiking.clone();
+		return result;
+	}
+
 //	private static float[] initialize(int dim) {
 //		float[] result = new float[dim];
 //		for (int i = 0; i < dim; i++) {
