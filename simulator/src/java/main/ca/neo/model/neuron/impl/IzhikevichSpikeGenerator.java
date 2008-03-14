@@ -38,6 +38,9 @@ import ca.neo.util.impl.TimeSeries1DImpl;
 public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static SimulationMode[] ourSupportedModes 
+		= new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
 
 	private float myMaxTimeStep;
 	
@@ -54,10 +57,9 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	
 	private float[] myTime;
 	private float[] myVoltageHistory;
-	private List mySpikeTimes;
+	private List<Float> mySpikeTimes;
 	
 	private SimulationMode myMode;
-	private SimulationMode[] mySupportedModes;
 	
 	private static final float[] ourNullTime = new float[0]; 
 	private static final float[] ourNullVoltageHistory = new float[0];
@@ -86,7 +88,6 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		myD = d;
 		
 		myMode = SimulationMode.DEFAULT;
-		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
 
 		reset(false);
 	}
@@ -167,7 +168,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		myRecovery = 0f;
 		myTime = ourNullTime;
 		myVoltageHistory = ourNullVoltageHistory;
-		mySpikeTimes = new ArrayList(10);
+		mySpikeTimes = new ArrayList<Float>(10);
 	}		
 
 	/**
@@ -199,7 +200,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		
 		myTime = new float[steps];
 		myVoltageHistory = new float[steps];
-		mySpikeTimes = new ArrayList(10);
+		mySpikeTimes = new ArrayList<Float>(10);
 		
 		int inputIndex = 0;
 
@@ -287,7 +288,16 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 * @see ca.neo.model.SimulationMode.ModeConfigurable#setMode(ca.neo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		myMode = SimulationMode.getClosestMode(mode, mySupportedModes);
+		myMode = SimulationMode.getClosestMode(mode, ourSupportedModes);
+	}
+
+	@Override
+	public SpikeGenerator clone() throws CloneNotSupportedException {
+		IzhikevichSpikeGenerator result = (IzhikevichSpikeGenerator) super.clone();
+		result.mySpikeTimes = new ArrayList<Float>(mySpikeTimes);
+		result.myTime = myTime.clone();
+		result.myVoltageHistory = myVoltageHistory.clone();
+		return result;
 	}
 
 }

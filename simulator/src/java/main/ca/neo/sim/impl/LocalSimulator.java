@@ -38,8 +38,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	private Node[] myNodes;
 	private Map<String, Node> myNodeMap;
 	private List<Probe> myProbes;
-	private transient List<VisiblyMutable.Listener> myChangeListeners;
-	
+	private transient List<VisiblyMutable.Listener> myChangeListeners;	
 
 	/**
 	 * Collection of Simulator
@@ -284,4 +283,10 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	private void fireVisibleChangeEvent() {
 		VisiblyMutableUtils.changed(this, myChangeListeners);
 	}
+
+	@Override
+	public Simulator clone() throws CloneNotSupportedException {
+		return new LocalSimulator();
+	}
+	
 }

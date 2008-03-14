@@ -4,6 +4,7 @@
 package ca.neo.model.impl;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
+import ca.neo.model.Ensemble;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
@@ -24,6 +28,7 @@ import ca.neo.model.Termination;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
 import ca.neo.util.Configuration;
+import ca.neo.util.Probe;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.VisiblyMutable;
 import ca.neo.util.VisiblyMutableUtils;
@@ -38,6 +43,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public static final String DEFAULT_NAME = "Network";
 	
 	private static final long serialVersionUID = 1L;
+	private static Logger ourLogger = Logger.getLogger(NetworkImpl.class);
 	
 	private Map<String, Node> myNodeMap; //keyed on name
 	private Map<Termination, Projection> myProjectionMap; //keyed on Termination
@@ -575,6 +581,82 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	
 	private void fireVisibleChangeEvent() {
 		VisiblyMutableUtils.changed(this, myListeners);
+	}
+
+	@Override
+	public Network clone() throws CloneNotSupportedException {
+		NetworkImpl result = (NetworkImpl) super.clone();
+		
+//		result.myExposedOriginNames
+//		result.myExposedOrigins
+//		result.myExposedTerminationNames
+//		result.myExposedTerminations
+		result.myListeners = new ArrayList<Listener>(5);
+		
+		result.myMetaData = new HashMap<String, Object>(10);
+		for (String key : myMetaData.keySet()) {
+			Object o = myMetaData.get(key);
+			if (o instanceof Cloneable) {
+				Object copy = tryToClone((Cloneable) o);
+				result.myMetaData.put(key, copy);
+			} else {
+				result.myMetaData.put(key, o);
+			}
+		}
+		
+//		result.myNodeMap
+//		result.myProbeables
+//		result.myProbeableStates
+//		result.myProjectionMap
+		
+		//TODO: take another look at Probe design (maybe Probeables reference Probes?)  
+		result.mySimulator = mySimulator.clone();
+		result.mySimulator.initialize(result);
+		Probe[] oldProbes = mySimulator.getProbes();
+		for (int i = 0; i < oldProbes.length; i++) {
+			Probeable target = oldProbes[i].getTarget();
+			if (target instanceof Node) {
+				Node oldNode = (Node) target;
+				if (oldProbes[i].isInEnsemble()) {
+					try {
+						Ensemble oldEnsemble = (Ensemble) getNode(oldProbes[i].getEnsembleName());
+						int neuronIndex = -1;
+						for (int j = 0; j < oldEnsemble.getNodes().length && neuronIndex < 0; j++) {
+							if (oldNode == oldEnsemble.getNodes()[j]) neuronIndex = j;
+						}
+						result.mySimulator.addProbe(oldProbes[i].getEnsembleName(), neuronIndex, oldProbes[i].getStateName(), true);						
+					} catch (SimulationException e) {
+						ourLogger.warn("Problem copying Probe", e);
+					} catch (StructuralException e) {
+						ourLogger.warn("Problem copying Probe", e);
+					}
+				} else {
+					try {
+						result.mySimulator.addProbe(oldNode.getName(), oldProbes[i].getStateName(), true);
+					} catch (SimulationException e) {
+						ourLogger.warn("Problem copying Probe", e);
+					}
+				}
+			} else {
+				ourLogger.warn("Can't copy Probe on type " + target.getClass().getName() 
+						+ " (to be addressed in a future release)");
+			}
+		}
+
+		return result;
+	}
+	
+	private static Object tryToClone(Cloneable o) {
+		Object result = null;
+		
+		try {
+			Method cloneMethod = o.getClass().getMethod("clone", new Class[0]);
+			result = cloneMethod.invoke(o, new Object[0]);
+		} catch (Exception e) {
+			ourLogger.warn("Couldn't clone data of type " + o.getClass().getName(), e);
+		} 
+		
+		return result;
 	}
 
 }

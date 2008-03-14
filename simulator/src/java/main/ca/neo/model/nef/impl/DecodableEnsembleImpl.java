@@ -189,6 +189,13 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	}
 
 	/**
+	 * @return The source of LinearApproximators for this ensemble (used to find linear decoding vectors). 
+	 */
+	public ApproximatorFactory getApproximatorFactory() {
+		return myApproximatorFactory;
+	}
+
+	/**
 	 * @see ca.neo.model.Probeable#getHistory(java.lang.String)
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
@@ -220,6 +227,41 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 		while (it.hasNext()) {
 			String name = it.next().toString();
 			result.setProperty(name, "Function of NEFEnsemble state"); //TODO: could put function.toString() here
+		}
+		
+		return result;
+	}
+
+	@Override
+	public DecodableEnsemble clone() throws CloneNotSupportedException {
+		DecodableEnsembleImpl result = (DecodableEnsembleImpl) super.clone();
+		
+		result.myApproximatorFactory = myApproximatorFactory.clone();
+		result.myApproximators = new HashMap<String, LinearApproximator>(5);
+		
+		result.myDecodedOrigins = new HashMap<String, DecodedOrigin>(5);
+		for (DecodedOrigin oldOrigin : myDecodedOrigins.values()) {
+			Function[] oldFunctions = oldOrigin.getFunctions();
+			Function[] newFunctions = new Function[oldFunctions.length];
+			for (int i = 0; i < newFunctions.length; i++) {
+				newFunctions[i] = oldFunctions[i].clone(); 
+			}
+			
+			try {
+				DecodedOrigin newOrigin = new DecodedOrigin(
+						result, 
+						oldOrigin.getName(), 
+						result.getNodes(), 
+						oldOrigin.getNodeOrigin(), 
+						newFunctions, 
+						MU.clone(oldOrigin.getDecoders()));
+				newOrigin.setNoise(oldOrigin.getNoise());
+				newOrigin.setMode(oldOrigin.getMode());
+				result.addDecodedOrigin(newOrigin.getName(), newOrigin);				
+				newOrigin.reset(false);
+			} catch (StructuralException e) {
+				throw new CloneNotSupportedException("Problem cloneing DecodedOrigin: " + e.getMessage());
+			}
 		}
 		
 		return result;

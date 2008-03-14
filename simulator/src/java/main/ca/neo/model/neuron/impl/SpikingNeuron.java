@@ -18,8 +18,6 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.BasicOrigin;
-import ca.neo.model.impl.RealOutputImpl;
-import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.nef.NEFNode;
 import ca.neo.model.neuron.Neuron;
 import ca.neo.model.neuron.SpikeGenerator;
@@ -319,4 +317,24 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public void removeChangeListener(Listener listener) {
 		myListeners.remove(listener);
 	}
+
+	@Override
+	public SpikingNeuron clone() throws CloneNotSupportedException {
+		SpikingNeuron result = (SpikingNeuron) super.clone();
+		result.myCurrent = (TimeSeries1D) myCurrent.clone();
+		
+		result.myCurrentOrigin = (BasicOrigin) myCurrentOrigin.clone();
+		result.myCurrentOrigin.setNode(result);
+			
+		result.myGenerator = myGenerator.clone();
+		
+		result.myIntegrator = myIntegrator.clone();
+		result.myIntegrator.setNode(result);
+		
+		result.myListeners = new ArrayList<Listener>(5);
+		result.mySpikeOrigin = new SpikeGeneratorOrigin(result, result.myGenerator);
+		
+		return result;
+	}
+	
 }

@@ -353,5 +353,20 @@ public class DynamicalSystemSpikeGenerator implements SpikeGenerator, Probeable 
 		result.setProperty(DYNAMICS, "Result of spike generation dynamics");
 		return result;
 	}
+
+	@Override
+	public SpikeGenerator clone() throws CloneNotSupportedException {
+		DynamicalSystemSpikeGenerator result = (DynamicalSystemSpikeGenerator) super.clone();
+		result.myConstantRateFunction = myConstantRateFunction.clone();
+		result.myCurrents = myCurrents.clone();
+		result.myDynamics = myDynamics.clone();
+		result.myDynamicsOutput = myDynamicsOutput.clone();
+		result.myIntegrator = myIntegrator.clone();
+		
+		result.mySupportedModes = new SimulationMode[mySupportedModes.length];
+		System.arraycopy(mySupportedModes, 0, result.mySupportedModes, 0, mySupportedModes.length);
+		
+		return result;
+	}
 	
 }

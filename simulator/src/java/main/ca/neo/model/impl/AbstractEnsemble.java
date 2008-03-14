@@ -40,13 +40,14 @@ import ca.neo.util.impl.TimeSeriesImpl;
 public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMutable {
 
 	private static Logger ourLogger = Logger.getLogger(AbstractEnsemble.class);
+	private static int numNodeRunners = 10;
 
 	private String myName;
 	private Node[] myNodes;
 	private NodeRunner[] myNodeRunners;
 	transient private Thread[] myThreads;
 	private Map<String, Origin> myOrigins;
-	private Map<String, Termination> myTerminations;
+	private Map<String, EnsembleTermination> myTerminations;
 	private Map<String, List<Integer>> myStateNames; // for Probeable
 	private SimulationMode myMode;
 	private transient SpikePatternImpl mySpikePattern;
@@ -66,25 +67,29 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		mySpikePattern = new SpikePatternImpl(nodes.length);
 		myCollectSpikesFlag = false;
 		
-		setupNodeRunners(10);
+		init();
+		
+		setMode(SimulationMode.DEFAULT);
+	}
+	
+	private void init() {
+		setupNodeRunners(numNodeRunners);
 		
 		myOrigins = new HashMap<String, Origin>(10);
-		Origin[] origins = findOrigins(this, nodes);
+		Origin[] origins = findOrigins(this, myNodes);
 		for (int i = 0; i < origins.length; i++) {
 			myOrigins.put(origins[i].getName(), origins[i]);
 		}
 		
-		myTerminations = new HashMap<String, Termination>(10);
-		Termination[] terminations = findTerminations(this, nodes);
+		myTerminations = new HashMap<String, EnsembleTermination>(10);
+		EnsembleTermination[] terminations = findTerminations(this, myNodes);
 		for (int i = 0; i < terminations.length; i++) {
 			myTerminations.put(terminations[i].getName(), terminations[i]);
 		}
 
-		myStateNames = findStateNames(nodes);
+		myStateNames = findStateNames(myNodes);
 
 		myListeners = new ArrayList<Listener>(3);
-		
-		setMode(SimulationMode.DEFAULT);
 	}
 	
 	private void setupNodeRunners(int n) {
@@ -400,7 +405,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	 * @param nodes Nodes on which to look for Terminations
 	 * @return Ensemble Terminations encompassing Node-level Terminations 
 	 */
-	private static Termination[] findTerminations(Node parent, Node[] nodes) {
+	private static EnsembleTermination[] findTerminations(Node parent, Node[] nodes) {
 		Map<String, List<Termination>> groups = new HashMap<String, List<Termination>>(10);
 		
 		for (int i = 0; i < nodes.length; i++) {
@@ -418,7 +423,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		}
 		
 		Iterator<String> it = groups.keySet().iterator();
-		List<Termination> result = new ArrayList<Termination>(10);
+		List<EnsembleTermination> result = new ArrayList<EnsembleTermination>(10);
 		while (it.hasNext()) {
 			String name = it.next();
 			List<Termination> group = groups.get(name);
@@ -429,7 +434,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 			}
 		}
 		
-		return result.toArray(new Termination[0]);
+		return result.toArray(new EnsembleTermination[0]);
 	}
 	
 	private static Map<String, List<Integer>> findStateNames(Node[] nodes) {
@@ -489,6 +494,22 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	 */
 	protected void fireVisibleChangeEvent() {
 		VisiblyMutableUtils.changed(this, myListeners);
+	}
+	
+	public Ensemble clone() throws CloneNotSupportedException {
+		AbstractEnsemble result = (AbstractEnsemble) super.clone();
+		
+		Node[] oldNodes = getNodes();
+		Node[] nodes = new Node[oldNodes.length];
+		for (int i = 0; i < nodes.length; i++) {
+			nodes[i] = oldNodes[i].clone();
+		}
+		result.myNodes = nodes;
+		
+		result.init();
+		result.mySpikePattern = (SpikePatternImpl) mySpikePattern.clone();
+		
+		return result;
 	}
 
 	/**

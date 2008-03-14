@@ -14,7 +14,7 @@ import ca.neo.util.VisiblyMutable;
  * 
  * @author Bryan Tripp
  */
-public interface Simulator extends VisiblyMutable {
+public interface Simulator extends VisiblyMutable, Cloneable {
 
 	/**
 	 * Initializes the Simulator with a given Network, after which changes to the 
@@ -117,4 +117,10 @@ public interface Simulator extends VisiblyMutable {
 	 */
 	public void removeSimulatorListener(SimulatorListener listener);
 	
+	/**
+	 * @return An independent copy of the Simulator. The copy has the same type and parameters, 
+	 * 		but doesn't reference any Network, contain any Probes, or have any SimulatorListeners  
+	 * @throws CloneNotSupportedException
+	 */
+	public Simulator clone() throws CloneNotSupportedException;
 }

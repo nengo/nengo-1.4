@@ -240,4 +240,19 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 		myListeners.remove(listener);
 	}
 
+	@Override
+	public SkeletalMuscle clone() throws CloneNotSupportedException {
+		try {
+			SkeletalMuscleImpl result = new SkeletalMuscleImpl(myName, myAFDynamics.clone());
+			result.setLength(myLength);
+			result.setDocumentation(myDocumentation);
+			result.myActivationHistory = myActivationHistory.clone();
+			result.myForceHistory = myForceHistory.clone();
+			result.myLengthHistory = myLengthHistory.clone();
+			return result;
+		} catch (StructuralException e) {
+			throw new CloneNotSupportedException("Problem trying to clone: " + e.getMessage());
+		}
+	}
+
 }

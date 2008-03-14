@@ -200,6 +200,61 @@ public class PassthroughNode implements Node {
 	public void setMode(SimulationMode mode) {
 	}
 	
+	/**
+	 * @see ca.neo.model.Node#getDocumentation()
+	 */
+	public String getDocumentation() {
+		return myDocumentation;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
+	 */
+	public void setDocumentation(String text) {
+		myDocumentation = text;
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void addChangeListener(Listener listener) {
+		if (myListeners == null) {
+			myListeners = new ArrayList<Listener>(2);
+		}
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
+	 */
+	public void removeChangeListener(Listener listener) {
+		myListeners.remove(listener);
+	}
+
+	@Override
+	public Node clone() throws CloneNotSupportedException {
+		PassthroughNode result = (PassthroughNode) super.clone();
+
+		result.myOrigin = new BasicOrigin(result, FunctionInput.ORIGIN_NAME, myDimension, myOrigin.getUnits());
+		result.myOrigin.setNoise(myOrigin.getNoise().clone());
+		try {
+			result.myOrigin.setValues(myOrigin.getValues());
+		} catch (SimulationException e) {
+			throw new CloneNotSupportedException("Problem copying origin values: " + e.getMessage());
+		}
+		
+		result.myTerminations = new HashMap<String, PassthroughTermination>(10);
+		for (PassthroughTermination oldTerm : myTerminations.values()) {
+			PassthroughTermination newTerm = new PassthroughTermination(result, oldTerm.getName(), 
+					oldTerm.getDimensions(), MU.clone(oldTerm.getTransform()));
+			result.myTerminations.put(newTerm.getName(), newTerm);
+		}
+		
+		result.myListeners = new ArrayList<Listener>(5);
+		
+		return result;
+	}
+
 	private static class PassthroughTermination implements Termination {
 		
 		private static final long serialVersionUID = 1L;
@@ -268,6 +323,10 @@ public class PassthroughNode implements Node {
 		public Node getNode() {
 			return myNode;
 		}
+		
+		public float[][] getTransform() {
+			return myTransform;
+		}
 
 		/**
 		 * @see ca.neo.model.Resettable#reset(boolean)
@@ -283,37 +342,6 @@ public class PassthroughNode implements Node {
 			return result;
 		}
 		
-	}
-
-	/**
-	 * @see ca.neo.model.Node#getDocumentation()
-	 */
-	public String getDocumentation() {
-		return myDocumentation;
-	}
-
-	/**
-	 * @see ca.neo.model.Node#setDocumentation(java.lang.String)
-	 */
-	public void setDocumentation(String text) {
-		myDocumentation = text;
-	}
-
-	/**
-	 * @see ca.neo.util.VisiblyMutable#addChangeListener(ca.neo.util.VisiblyMutable.Listener)
-	 */
-	public void addChangeListener(Listener listener) {
-		if (myListeners == null) {
-			myListeners = new ArrayList<Listener>(2);
-		}
-		myListeners.add(listener);
-	}
-
-	/**
-	 * @see ca.neo.util.VisiblyMutable#removeChangeListener(ca.neo.util.VisiblyMutable.Listener)
-	 */
-	public void removeChangeListener(Listener listener) {
-		myListeners.remove(listener);
 	}
 
 }

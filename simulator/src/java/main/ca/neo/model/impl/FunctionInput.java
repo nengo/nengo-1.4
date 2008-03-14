@@ -228,5 +228,28 @@ public class FunctionInput implements Node, Probeable {
 	public void removeChangeListener(Listener listener) {
 		myListeners.remove(listener);
 	}
+
+	@Override
+	public Node clone() throws CloneNotSupportedException {
+		FunctionInput result = (FunctionInput) super.clone();
+		
+		Function[] functions = new Function[myFunctions.length];
+		for (int i = 0; i < functions.length; i++) {
+			functions[i] = myFunctions[i].clone();
+		}
+		result.myFunctions = functions;
+		
+		result.myOrigin = new BasicOrigin(result, FunctionInput.ORIGIN_NAME, functions.length, myUnits);
+		result.myOrigin.setNoise(myOrigin.getNoise().clone());
+		try {
+			result.myOrigin.setValues(myOrigin.getValues());
+		} catch (SimulationException e) {
+			throw new CloneNotSupportedException("Problem copying origin values: " + e.getMessage());
+		}
+		
+		result.myListeners = new ArrayList<Listener>(5);
+		
+		return result;
+	}
 	
 }

@@ -37,7 +37,6 @@ import ca.neo.util.TimeSeries;
  * Default implementation of NEFEnsemble. 
  * 
  * TODO: links to NEF documentation
- * TODO: allow user to specify radius
  * TODO: test
  * 
  * @author Bryan Tripp
@@ -56,7 +55,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private float myPlasticityInterval;
 	private float myLastPlasticityTime;	
 	private Map<String, LinearApproximator> myDecodingApproximators;	
-	private ApproximatorFactory myApproximatorFactory;
+//	private ApproximatorFactory myApproximatorFactory;
 	private boolean myReuseApproximators;
 	private float[][] myUnscaledEvalPoints;
 	private float[][] myEvalPoints;	
@@ -95,7 +94,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 		myPlasticityInterval = -1;
 		myLastPlasticityTime = 0;		
-		myApproximatorFactory = factory;
+//		myApproximatorFactory = factory;
 		myDecodingApproximators = new HashMap<String, LinearApproximator>(10);
 		myReuseApproximators = true;		
 		myUnscaledEvalPoints = evalPoints;
@@ -239,7 +238,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {		
 		if (!myReuseApproximators || !myDecodingApproximators.containsKey(nodeOrigin)) {
 			float[][] outputs = getConstantOutputs(myEvalPoints, nodeOrigin);
-			LinearApproximator approximator = myApproximatorFactory.getApproximator(myEvalPoints, outputs);
+			LinearApproximator approximator = getApproximatorFactory().getApproximator(myEvalPoints, outputs);
 			myDecodingApproximators.put(nodeOrigin, approximator);
 		}		
 		
@@ -597,13 +596,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		return result;
 	}
 	
-	/**
-	 * @return The source of LinearApproximators for this ensemble (used to find linear decoding vectors). 
-	 */
-	public ApproximatorFactory getApproximatorFactory() {
-		return myApproximatorFactory;
-	}
-
 	@Override
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		DecodedTermination t = myDecodedTerminations.get(stateName);
@@ -625,4 +617,30 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		return p;
 	}
 
+	public NEFEnsemble clone() throws CloneNotSupportedException {
+		NEFEnsembleImpl result = (NEFEnsembleImpl) super.clone();
+		
+		result.myEncoders = MU.clone(myEncoders);
+
+		result.myDecodedTerminations = new HashMap<String, DecodedTermination>(10);
+		result.myPlasticityRules = new HashMap<String, PlasticityRule>(10);
+		for (String key : myDecodedTerminations.keySet()) {
+			DecodedTermination t = (DecodedTermination) myDecodedTerminations.get(key).clone(); 
+			t.setNode(result);
+			result.myDecodedTerminations.put(key, t);
+			
+			PlasticityRule r = myPlasticityRules.get(key);
+			if (r != null) {
+				result.myPlasticityRules.put(key, r.clone());
+			}
+		}
+		
+		result.myDecodingApproximators = new HashMap<String, LinearApproximator>(5);
+		result.myEncoders = MU.clone(myEncoders);
+		result.myEvalPoints = MU.clone(myEvalPoints);
+		result.myInverseRadii = myInverseRadii.clone();
+		result.myRadii = myRadii.clone();
+		result.myUnscaledEvalPoints = MU.clone(myUnscaledEvalPoints);
+		return result;
+	}
 }

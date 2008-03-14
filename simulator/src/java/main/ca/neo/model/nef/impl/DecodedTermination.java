@@ -97,12 +97,16 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		myNullUnits = new Units[dynamics.getInputDimension()];
 		myOutputValues = new float[transform.length];
 		
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
-		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, myTransform);
+		initConfiguration();
 				
 		setDynamics(dynamics);
 		myScalingTermination = null;
+	}
+	
+	private void initConfiguration() {
+		myConfiguration = new ConfigurationImpl(this);
+		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
+		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, myTransform);
 	}
 
 	//copies dynamics for to each dimension
@@ -385,15 +389,20 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	public Node getNode() {
 		return myNode;
 	}
+	
+	protected void setNode(Node node) {
+		myNode = node;
+	}
 
 	@Override
 	public Termination clone() throws CloneNotSupportedException {
 		try {
-			DecodedTermination result = new DecodedTermination(myNode, myName, MU.clone(myTransform), 
-					(LinearSystem) myDynamicsTemplate.clone(), myIntegrator.clone());
+			DecodedTermination result = (DecodedTermination) clone();
+			result.setTransform(MU.clone(myTransform));
+			result.setDynamics((LinearSystem) myDynamicsTemplate.clone());
+			result.myIntegrator = myIntegrator.clone();
 			result.myInputValues = (RealOutput) myInputValues.clone();
 			result.myOutputValues = myOutputValues.clone();
-			result.myTime = myTime;
 			result.myScalingTermination = myScalingTermination; //refer to same copy
 			result.myStaticBias = myStaticBias.clone();
 			return result;

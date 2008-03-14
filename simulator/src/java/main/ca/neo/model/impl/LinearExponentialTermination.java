@@ -214,6 +214,10 @@ public class LinearExponentialTermination implements Termination {
 	public Node getNode() {
 		return myNode;
 	}
+	
+	public void setNode(Node node) {
+		myNode = node;
+	}
 
 	@Override
 	public Termination clone() throws CloneNotSupportedException {

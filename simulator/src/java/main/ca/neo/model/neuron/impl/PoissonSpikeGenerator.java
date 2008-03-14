@@ -45,9 +45,11 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static SimulationMode[] ourSupportedModes 
+		= new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
+	
 	private Function myRateFunction;
 	private SimulationMode myMode;
-	private SimulationMode[] mySupportedModes;
 
 	/**
 	 * @param rateFunction Maps input current to Poisson spiking rate
@@ -55,7 +57,6 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	public PoissonSpikeGenerator(Function rateFunction) {
 		setRateFunction(rateFunction);
 		myMode = SimulationMode.DEFAULT;
-		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
 	}
 	
 	/**
@@ -124,7 +125,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	 * @see ca.neo.model.SimulationMode.ModeConfigurable#setMode(ca.neo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		myMode = SimulationMode.getClosestMode(mode, mySupportedModes);
+		myMode = SimulationMode.getClosestMode(mode, ourSupportedModes);
 	}
 
 	/**
@@ -142,6 +143,13 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 	public void reset(boolean randomize) {
 	}
 	
+	@Override
+	public SpikeGenerator clone() throws CloneNotSupportedException {
+		PoissonSpikeGenerator result = (PoissonSpikeGenerator) super.clone();
+		result.myRateFunction = myRateFunction.clone();
+		return result;
+	}
+
 	/**
 	 * Creates PoissonSpikeGenerators with linear response functions. 
 	 * 

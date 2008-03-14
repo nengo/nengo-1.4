@@ -158,4 +158,16 @@ public abstract class AbstractNode implements Node {
 		myListeners.remove(listener);
 	}
 
+	/**
+	 * Performs a shallow copy. Origins and Terminations are not cloned, because generally they 
+	 * will have to be reparameterized, at least to point to the new Node. 
+	 * 
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Node clone() throws CloneNotSupportedException {
+		Node result = (Node) super.clone();
+		return result;
+	}
+
 }

@@ -3,8 +3,6 @@
  */
 package ca.neo.model.neuron.impl;
 
-import ca.neo.config.Configuration;
-import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.dynamics.impl.AbstractDynamicalSystem;
 import ca.neo.dynamics.impl.RK45Integrator;
 import ca.neo.model.Node;
@@ -24,15 +22,8 @@ public class HodgkinHuxleySpikeGenerator extends DynamicalSystemSpikeGenerator {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Configuration myConfiguration;
-	
 	public HodgkinHuxleySpikeGenerator() {
 		super(new HodgkinHuxleySystem(new float[4]), new RK45Integrator(), 0, 30f, .002f);
-		myConfiguration = new ConfigurationImpl(null);
-	}
-	
-	public Configuration getConfiguration() {
-		return myConfiguration;
 	}
 	
 	/**

@@ -216,6 +216,11 @@ public class NetworkImplTest extends TestCase {
 			myListeners.remove(listener);
 		}
 
+		@Override
+		public Node clone() throws CloneNotSupportedException {
+			return (Node) super.clone();
+		}
+
 	}
 
 }

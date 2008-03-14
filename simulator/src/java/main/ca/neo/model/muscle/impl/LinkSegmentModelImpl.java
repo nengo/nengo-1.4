@@ -239,5 +239,42 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	public void removeChangeListener(Listener listener) {
 		myListeners.remove(listener);
 	}
+
+	@Override
+	public LinkSegmentModel clone() throws CloneNotSupportedException {
+		LinkSegmentModelImpl result = (LinkSegmentModelImpl) super.clone();
+		result.myDynamics = myDynamics.clone();
+		
+		Map<String, Function[]> jointDefs = new HashMap<String, Function[]>(10);
+		for (String key : myJointDefinitions.keySet()) {
+			Function[] functions  = new Function[myJointDefinitions.get(key).length];
+			for (int i = 0; i < functions.length; i++) {
+				functions[i] = myJointDefinitions.get(key)[i];
+			}
+			jointDefs.put(key, functions);
+		}
+		result.myJointDefinitions = jointDefs;
+		
+		Function[] lengths = new Function[myLengths.length];
+		for (int i = 0; i < lengths.length; i++) {
+			lengths[i] = myLengths[i].clone();
+		}
+		result.myLengths = lengths;
+		
+		Function[] momentArms = new Function[myMomentArms.length];
+		for (int i = 0; i < momentArms.length; i++) {
+			momentArms[i] = myMomentArms[i].clone();
+		}		
+		result.myMomentArms = momentArms;
+		
+		SkeletalMuscle[] muscles = new SkeletalMuscle[myMuscles.length];
+		for (int i = 0; i < muscles.length; i++) {
+			muscles[i] = (SkeletalMuscle) myMuscles[i].clone();
+		}
+		result.myMuscles = muscles;
+		
+		result.myStates = (Properties) myStates.clone();
+		return result;
+	}
 	
 }

@@ -234,6 +234,10 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	 */
 	public void setNode(Node node) {
 		myNode = node;
+		
+		for (LinearExponentialTermination t : myTerminations.values()) {
+			t.setNode(myNode);
+		}		
 	}
 
 	/**
@@ -256,7 +260,28 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	public String[] getPlasticityRuleNames() {
 		return myTerminations.keySet().toArray(new String[0]);
 	}
+		
+	@Override
+	public SynapticIntegrator clone() throws CloneNotSupportedException {
+		LinearSynapticIntegrator result = (LinearSynapticIntegrator) super.clone();
+		
+		result.myTerminations = new HashMap<String, LinearExponentialTermination>(10);
+		result.myPlasticityRules = new HashMap<String, PlasticityRule>(10);
+		for (LinearExponentialTermination oldTerm : myTerminations.values()) {
+			String name = oldTerm.getName();
+			LinearExponentialTermination newTerm = (LinearExponentialTermination) oldTerm.clone();
+			newTerm.setNode(result.myNode);
+			result.myTerminations.put(name, newTerm);
+			
+			if (myPlasticityRules.containsKey(name)) {
+				result.myPlasticityRules.put(name, myPlasticityRules.get(name).clone());
+			}
+		}
+		
+		return result;
+	}
 	
+
 	public static class Factory implements SynapticIntegratorFactory {
 
 		private static final long serialVersionUID = 1L;

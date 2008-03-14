@@ -15,7 +15,7 @@ import ca.neo.model.SimulationMode;
  * 
  * @author Bryan Tripp
  */
-public interface SpikeGenerator extends Resettable, Serializable, SimulationMode.ModeConfigurable {
+public interface SpikeGenerator extends Resettable, Serializable, SimulationMode.ModeConfigurable, Cloneable {
 
 	/**
 	 * Runs the model for a given time segment. The total time is meant to be 
@@ -37,5 +37,7 @@ public interface SpikeGenerator extends Resettable, Serializable, SimulationMode
 	 * @return true If there is a spike between the first and last times, false otherwise
 	 */
 	public InstantaneousOutput run(float[] time, float[] current); 
+	
+	public SpikeGenerator clone() throws CloneNotSupportedException;
 	
 }

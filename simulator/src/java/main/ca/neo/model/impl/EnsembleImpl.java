@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import ca.neo.model.Ensemble;
 import ca.neo.model.ExpandableNode;
 import ca.neo.model.Node;
 import ca.neo.model.SimulationMode;
@@ -140,11 +141,23 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	}
 
 	/**
+	 * @throws StructuralException 
 	 * @see ca.neo.model.ExpandableNode#removeTermination(java.lang.String)
 	 */
-	public synchronized void removeTermination(String name) {
-		myExpandedTerminations.remove(name);
-		fireVisibleChangeEvent();
+	public synchronized void removeTermination(String name) throws StructuralException {
+		if (myExpandedTerminations.containsKey(name)) {
+			myExpandedTerminations.remove(name);
+			for (int i = 0; i < myExpandableNodes.length; i++) {
+				myExpandableNodes[i].removeTermination(name);
+			}
+			
+			fireVisibleChangeEvent();			
+		} else if (getTermination(name) != null){
+			throw new StructuralException("Can't remove Termination " + name 
+					+ ". It consists of terminations on underlying nodes that existed before this ensemble was created.");
+		} else {
+			throw new StructuralException("Termination " + name + " does not exist");
+		}
 	}
 
 	/** 
@@ -219,4 +232,23 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		return myExpandedTerminations.keySet().toArray(new String[0]);
 	}
 
+	@Override
+	public Ensemble clone() throws CloneNotSupportedException {
+		try {
+			EnsembleImpl result = (EnsembleImpl) super.clone();
+			
+			for (String key : myPlasticityRules.keySet()) {
+				result.setPlasticityRule(key, myPlasticityRules.get(key).clone());
+			}
+			
+			for (String key : myExpandedTerminations.keySet()) {
+				result.removeTermination(key); //has been seen on nodes by AbstractEnsemble
+				result.myExpandedTerminations.put(key, myExpandedTerminations.get(key));
+			}
+			return result;			
+		} catch (StructuralException e) {
+			throw new CloneNotSupportedException("Problem making clone: " + e.getMessage());
+		}
+	}
+	
 }

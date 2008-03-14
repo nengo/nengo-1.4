@@ -103,6 +103,11 @@ public class SpikeGeneratorOriginTest extends TestCase {
 		public void setMode(SimulationMode mode) {
 			myMode = mode;
 		}
+
+		@Override
+		public SpikeGenerator clone() throws CloneNotSupportedException {
+			return (SpikeGenerator) super.clone();
+		}
 		
 	}
 

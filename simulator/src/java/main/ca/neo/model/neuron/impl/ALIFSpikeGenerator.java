@@ -296,6 +296,16 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		return p;
 	}
 	
+	@Override
+	public SpikeGenerator clone() throws CloneNotSupportedException {
+		ALIFSpikeGenerator result = (ALIFSpikeGenerator) super.clone();
+		result.myNHistory = myNHistory.clone();
+		result.myRateHistory = myRateHistory.clone();
+		result.myTime = myTime.clone();
+		result.myVHistory = myVHistory.clone();
+		return result;
+	}
+
 	/**
 	 * Creates ALIFSpikeGenerators. 
 	 * 

@@ -252,6 +252,16 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myMode = SimulationMode.getClosestMode(mode, mySupportedModes);
 	}
 
+	@Override
+	public SpikeGenerator clone() throws CloneNotSupportedException {
+		LIFSpikeGenerator result = (LIFSpikeGenerator) super.clone();
+		result.mySupportedModes = new SimulationMode[mySupportedModes.length];
+		System.arraycopy(mySupportedModes, 0, result.mySupportedModes, 0, mySupportedModes.length);
+		result.myTime = myTime.clone();
+		result.myVoltageHistory = myVoltageHistory.clone();
+		return result;
+	}
+
 	/**
 	 * Creates LIFSpikeGenerators. 
 	 * 

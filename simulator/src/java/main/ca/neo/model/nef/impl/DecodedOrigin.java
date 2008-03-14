@@ -28,7 +28,7 @@ import ca.neo.util.impl.RandomHypersphereVG;
  * An Origin of functions of the state variables of an NEFEnsemble. 
  * 
  * TODO: how do units fit in. define in constructor? ignore?
- * TODO: user-specified node origin, select nodes make up decoded origin 
+ * TODO: select nodes make up decoded origin 
  * 
  * @author Bryan Tripp
  */

@@ -13,7 +13,7 @@ import ca.neo.util.VisiblyMutable;
  * 
  * @author Bryan Tripp
  */
-public interface Node extends Serializable, Resettable, SimulationMode.ModeConfigurable, VisiblyMutable {
+public interface Node extends Serializable, Resettable, SimulationMode.ModeConfigurable, VisiblyMutable, Cloneable {
 
 	/**
 	 * @return Name of Node (must be unique in a Network) 
@@ -66,4 +66,9 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	 */
 	public void setDocumentation(String text);
 	
+	/**
+	 * @return An independent copy of the Node
+	 * @throws CloneNotSupportedException
+	 */
+	public Node clone() throws CloneNotSupportedException;
 }
