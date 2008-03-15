@@ -18,6 +18,7 @@ import ca.neo.dynamics.impl.SimpleLTISystem;
 import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.Function;
 import ca.neo.math.LinearApproximator;
+import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
@@ -436,9 +437,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				setTime(endTime);
 			} else {
 				//multiply state by encoders (cosine tuning), set radial input of each Neuron and run ...
-				NEFNode[] nodes = (NEFNode[]) getNodes();
+				Node[] nodes = getNodes();
 				for (int i = 0; i < nodes.length; i++) {
-					nodes[i].setRadialInput(getRadialInput(state, i) + getBiasInput(bias, myDecodedTerminations, i));
+					((NEFNode) nodes[i]).setRadialInput(getRadialInput(state, i) + getBiasInput(bias, myDecodedTerminations, i));
 				}
 				super.run(startTime, endTime);
 			}

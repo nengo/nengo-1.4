@@ -3,17 +3,12 @@
  */
 package ca.neo.model.impl;
 
-import ca.neo.dynamics.Integrator;
-import ca.neo.dynamics.impl.CanonicalModel;
-import ca.neo.dynamics.impl.EulerIntegrator;
-import ca.neo.dynamics.impl.LTISystem;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.model.Units;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.impl.BiasOrigin;
 import ca.neo.model.nef.impl.BiasTermination;
@@ -21,8 +16,6 @@ import ca.neo.model.nef.impl.DecodedOrigin;
 import ca.neo.model.nef.impl.DecodedTermination;
 import ca.neo.plot.Plotter;
 import ca.neo.util.MU;
-import ca.neo.util.TimeSeries;
-import ca.neo.util.impl.TimeSeries1DImpl;
 
 /**
  * Default implementation of <code>Projection</code>.

@@ -61,5 +61,5 @@ public interface Projection extends Serializable {
 	 * @return Matrix of weights in this Projection (if there are neurons on each end, then these are synaptic weights) 
 	 */
 	public float[][] getWeights();
-		
+	
 }

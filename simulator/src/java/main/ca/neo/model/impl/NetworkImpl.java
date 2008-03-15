@@ -587,10 +587,55 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public Network clone() throws CloneNotSupportedException {
 		NetworkImpl result = (NetworkImpl) super.clone();
 		
-//		result.myExposedOriginNames
-//		result.myExposedOrigins
-//		result.myExposedTerminationNames
-//		result.myExposedTerminations
+		result.myNodeMap = new HashMap<String, Node>(10);
+		for (Node oldNode : myNodeMap.values()) {
+			Node newNode = oldNode.clone();
+			result.myNodeMap.put(newNode.getName(), newNode);
+			newNode.addChangeListener(result);
+		}
+		
+		//TODO: Exposed states aren't handled currently, pending redesign of Probes (it should be possible 
+		//		to probe things that are nested deeply, in which case exposing state woulnd't be necessary) 
+//		result.myProbeables
+//		result.myProbeableStates
+		
+		//TODO: this works with a single Projection impl & no params; should add Projection.copy(Origin, Termination, Network)?  
+		result.myProjectionMap = new HashMap<Termination, Projection>(10);
+		for (Projection oldProjection : getProjections()) {
+			try {
+				Origin newOrigin = result.getNode(oldProjection.getOrigin().getNode().getName())
+					.getOrigin(oldProjection.getOrigin().getName());
+				Termination newTermination = result.getNode(oldProjection.getTermination().getNode().getName())
+					.getTermination(oldProjection.getTermination().getName());
+				Projection newProjection = new ProjectionImpl(newOrigin, newTermination, result);
+				result.myProjectionMap.put(newTermination, newProjection);
+			} catch (StructuralException e) {
+				throw new CloneNotSupportedException("Problem copying Projectio: " + e.getMessage());
+			}
+		}
+		
+		for (Origin exposed : getOrigins()) {
+			String name = exposed.getName();
+			Origin wrapped = ((OriginWrapper) exposed).getWrappedOrigin();
+			try {
+				Origin toExpose = result.getNode(wrapped.getNode().getName()).getOrigin(wrapped.getName());
+				result.exposeOrigin(toExpose, name);				
+			} catch (StructuralException e) {
+				throw new CloneNotSupportedException("Problem exposing Origin: " + e.getMessage());
+			}
+		}
+
+		for (Termination exposed : getTerminations()) {
+			String name = exposed.getName();
+			Termination wrapped = ((TerminationWrapper) exposed).getWrappedTermination();
+			try {
+				Termination toExpose = result.getNode(wrapped.getNode().getName()).getTermination(wrapped.getName());
+				result.exposeTermination(toExpose, name);
+			} catch (StructuralException e) {
+				throw new CloneNotSupportedException("Problem exposing Termination: " + e.getMessage());
+			}
+		}
+
 		result.myListeners = new ArrayList<Listener>(5);
 		
 		result.myMetaData = new HashMap<String, Object>(10);
@@ -603,11 +648,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 				result.myMetaData.put(key, o);
 			}
 		}
-		
-//		result.myNodeMap
-//		result.myProbeables
-//		result.myProbeableStates
-//		result.myProjectionMap
 		
 		//TODO: take another look at Probe design (maybe Probeables reference Probes?)  
 		result.mySimulator = mySimulator.clone();

@@ -255,7 +255,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 						oldOrigin.getNodeOrigin(), 
 						newFunctions, 
 						MU.clone(oldOrigin.getDecoders()));
-				newOrigin.setNoise(oldOrigin.getNoise());
+				if (oldOrigin.getNoise() != null) newOrigin.setNoise(oldOrigin.getNoise());
 				newOrigin.setMode(oldOrigin.getMode());
 				result.addDecodedOrigin(newOrigin.getName(), newOrigin);				
 				newOrigin.reset(false);

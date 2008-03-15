@@ -152,7 +152,7 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 	@Override
 	public Origin clone() throws CloneNotSupportedException {
 		BasicOrigin result = (BasicOrigin) super.clone();
-		result.setNoise(myNoise.clone());
+		if (myNoise != null) result.setNoise(myNoise.clone());
 		result.setValues(myValues.clone());
 		return result;
 	}

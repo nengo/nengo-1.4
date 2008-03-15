@@ -240,7 +240,7 @@ public class FunctionInput implements Node, Probeable {
 		result.myFunctions = functions;
 		
 		result.myOrigin = new BasicOrigin(result, FunctionInput.ORIGIN_NAME, functions.length, myUnits);
-		result.myOrigin.setNoise(myOrigin.getNoise().clone());
+		if (myOrigin.getNoise() != null) result.myOrigin.setNoise(myOrigin.getNoise().clone());
 		try {
 			result.myOrigin.setValues(myOrigin.getValues());
 		} catch (SimulationException e) {

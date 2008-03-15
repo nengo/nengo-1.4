@@ -507,7 +507,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		result.myNodes = nodes;
 		
 		result.init();
-		result.mySpikePattern = (SpikePatternImpl) mySpikePattern.clone();
+		if (mySpikePattern != null) result.mySpikePattern = (SpikePatternImpl) mySpikePattern.clone();
 		
 		return result;
 	}

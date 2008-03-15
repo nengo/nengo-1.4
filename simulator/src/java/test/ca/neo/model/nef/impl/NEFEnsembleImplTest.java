@@ -229,14 +229,25 @@ public class NEFEnsembleImplTest extends TestCase {
 		return biasEncoders;
 	}
 	
+	public void testClone() throws StructuralException, CloneNotSupportedException {
+		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
+		NEFEnsemble ensemble = ef.make("test", 100, 1);
+		long startTime = System.currentTimeMillis();
+		ensemble.clone();
+		System.out.println(System.currentTimeMillis() - startTime);
+	}
+	
 	public static void main(String[] args) {
 		NEFEnsembleImplTest test = new NEFEnsembleImplTest();
 		try {
 //			test.testAddBiasOrigin();
-			test.functionalTestBiasOriginError();
+//			test.functionalTestBiasOriginError();
+			test.testClone();
 		} catch (StructuralException e) {
 			e.printStackTrace();
-		} catch (SimulationException e) {
+//		} catch (SimulationException e) {
+//			e.printStackTrace();
+		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
 	}

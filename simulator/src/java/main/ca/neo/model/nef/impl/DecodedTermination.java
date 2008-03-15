@@ -397,7 +397,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	@Override
 	public Termination clone() throws CloneNotSupportedException {
 		try {
-			DecodedTermination result = (DecodedTermination) clone();
+			DecodedTermination result = (DecodedTermination) super.clone();
 			result.setTransform(MU.clone(myTransform));
 			result.setDynamics((LinearSystem) myDynamicsTemplate.clone());
 			result.myIntegrator = myIntegrator.clone();
