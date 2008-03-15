@@ -187,6 +187,13 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	public void reset(boolean randomize) {
 		float time = (myOutput == null) ? 0 : myOutput.getTime();
 		myOutput = new RealOutputImpl(new float[myFunctions.length], Units.UNK, time);
+		
+		if (myNoise != null) myNoise.reset(randomize);
+		if (myNoises != null) {
+			for (int i = 0; i < myNoises.length; i++) {
+				myNoises[i].reset(randomize);
+			}
+		}
 	}
 
 	private static float[][] findDecoders(Node[] nodes, Function[] functions, LinearApproximator approximator)  {

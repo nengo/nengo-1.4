@@ -183,6 +183,7 @@ public class PassthroughNode implements Node {
 			ourLogger.warn("Exception getting time from existing output during reset", e);
 		}
 		myOrigin.setValues(new RealOutputImpl(new float[myOrigin.getDimensions()], Units.UNK, time));
+		myOrigin.reset(randomize);
 	}
 
 	/**

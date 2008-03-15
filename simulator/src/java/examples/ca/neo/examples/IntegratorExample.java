@@ -40,7 +40,7 @@ public class IntegratorExample {
 		
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 		
-		NEFEnsemble integrator = ef.make("integrator", 500, 1, "integrator1", false);  
+		NEFEnsemble integrator = ef.make("integrator", 500, 1, "integrator1", true);  
 		network.addNode(integrator);
 		integrator.collectSpikes(true);
 

@@ -3,6 +3,8 @@
  */
 package ca.neo.model;
 
+import java.io.Serializable;
+
 /**
  * <p>An model of noise that can be explicitly injected into a circuit (e.g. added to 
  * an Origin). </p>
@@ -13,7 +15,7 @@ package ca.neo.model;
  *   
  * @author Bryan Tripp
  */
-public interface Noise extends Cloneable {
+public interface Noise extends Cloneable, Resettable, Serializable {
 	
 	public static final String DIMENSION_PROPERTY = "dimension";
 	

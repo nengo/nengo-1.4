@@ -62,17 +62,38 @@ public class NoiseFactory {
 	public static Noise makeExplicitNoise(Function function) {
 		return new NoiseImplFunction(function);
 	}
-	
+
+	/**
+	 * Note: there are no public setters here for the same reason as in NoiseImplPDF. 
+	 * 
+	 * @author Bryan Tripp
+	 *
+	 */
 	public static class NoiseImplFunction implements Noise {
 				
+		private static final long serialVersionUID = 1L;
+		
 		private Function myFunction;
 		
+		/**
+		 * @param function A function of time that explicitly defines the noise
+		 */
 		public NoiseImplFunction(Function function) {
 			myFunction = function;
 		}
 
+		/**
+		 * Default zero noise.  
+		 */
 		public NoiseImplFunction() {
 			myFunction = new ConstantFunction(1, 0);
+		}
+		
+		/**
+		 * @return The function of time that explicitly defines the noise
+		 */
+		public Function getFunction() {
+			return myFunction;
 		}
 		
 		/**
@@ -84,13 +105,27 @@ public class NoiseFactory {
 
 		@Override
 		public Noise clone() {
-			return this; //allows sharing between dimensions
+			try {
+				NoiseImplFunction result = (NoiseImplFunction) super.clone();
+				result.myFunction = myFunction.clone();
+				return result;
+			} catch (CloneNotSupportedException e) {
+				throw new RuntimeException(e);
+			} 
+		}
+
+		/**
+		 * @see ca.neo.model.Resettable#reset(boolean)
+		 */
+		public void reset(boolean randomize) {
 		}
 		
 	}
 	
 	public static class NoiseImplNull implements Noise {
 		
+		private static final long serialVersionUID = 1L;
+
 		/**
 		 * @see ca.neo.model.Noise#getValue(float, float, float)
 		 */
@@ -102,10 +137,25 @@ public class NoiseFactory {
 		public Noise clone() {
 			return this; //allows sharing between dimensions
 		}
+
+		/**
+		 * @see ca.neo.model.Resettable#reset(boolean)
+		 */
+		public void reset(boolean randomize) {
+		}
 		
 	}
 
+	/**
+	 * Note: setters are private, because Origins typically make copies for each output dimension, 
+	 * which would then not be updated with changes to the original. So to change noise properties 
+	 * the Noise object must be replaced. 
+	 * 
+	 * @author Bryan Tripp
+	 */
 	public static class NoiseImplPDF implements Noise {
+		
+		private static final long serialVersionUID = 1L;
 		
 		private float myPeriod;
 		private PDF myPDF;
@@ -116,6 +166,7 @@ public class NoiseFactory {
 		private float[] myLastRawNoise;
 		private float[] myCurrentRawNoise;
 		private Units[] myUnits;
+		private float[] myInitialState;
 		
 		/**
 		 * @param frequency Frequency (in simulation time) with which new noise values are drawn from the PDF
@@ -138,18 +189,32 @@ public class NoiseFactory {
 			myIntegrator = integrator;			
 		}
 		
+		/**
+		 * @return Frequency (in simulation time) with which new noise values are drawn from the PDF
+		 */
 		public float getFrequency() {
 			return 1f /myPeriod;
 		}
 		
+		/**
+		 * @param frequency Frequency (in simulation time) with which new noise values are drawn from the PDF
+		 */
 		private void setFrequency(float frequency) {
 			myPeriod = 1f / frequency;
 		}
 		
+		/**
+		 * @return PDF from which new noise values are drawn. The dimension of the space over which the PDF is defined  
+		 * 		must equal the input dimension of the dynamics.
+		 */
 		public PDF getPDF() {
 			return myPDF;
 		}
 		
+		/**
+		 * @param pdf PDF from which new noise values are drawn. The dimension of the space over which the PDF is defined  
+		 * 		must equal the input dimension of the dynamics.
+		 */
 		private void setPDF(PDF pdf) {
 			if (myDynamics == null && pdf.getDimension() != 1) {
 				throw new IllegalArgumentException("With null dynamics, the PDF must be defined over one dimension.");	
@@ -160,18 +225,32 @@ public class NoiseFactory {
 			myUnits = Units.uniform(Units.UNK, myCurrentRawNoise.length);
 		}
 		
+		/**
+		 * @return Dynamics through which raw noise values pass before they are combined with non-noise.
+		 * 		The input dimension must match the PDF and the output dimension must equal one. Can be null in which 
+		 * 		case the PDF must be one-dimensional.
+		 */
 		public DynamicalSystem getDynamics() {
 			return myDynamics;
 		}
 		
+		/**
+		 * @param dynamics Dynamics through which raw noise values pass before they are combined with non-noise.
+		 * 		The input dimension must match the PDF and the output dimension must equal one. Can be null in which 
+		 * 		case the PDF must be one-dimensional.
+		 */
 		private void setDynamics(DynamicalSystem dynamics) {
 			if (dynamics != null && dynamics.getOutputDimension() != 1) {
 				throw new IllegalArgumentException("The output of the dynamics must be one-dimensional");
 			}
 			
 			myDynamics = dynamics;
+			if (myDynamics != null) myInitialState = dynamics.getState();
 		}
 		
+		/**
+		 * @return Integrator used to solve dynamics. Can be null if dynamics is null.
+		 */
 		public Integrator getIntegrator() {
 			return myIntegrator;
 		}
@@ -183,7 +262,7 @@ public class NoiseFactory {
 			float result = input;
 			
 			myLastRawNoise = myCurrentRawNoise;
-			if (endTime >= myLastGenTime + myPeriod) {
+			if (endTime >= myLastGenTime + myPeriod || endTime < myLastGenTime) {
 				myCurrentRawNoise = myPDF.sample();
 				myLastGenTime = endTime;
 			}
@@ -213,6 +292,15 @@ public class NoiseFactory {
 			} catch (CloneNotSupportedException e) {
 				throw new RuntimeException(e);
 			}
+		}
+
+		/**
+		 * @see ca.neo.model.Resettable#reset(boolean)
+		 */
+		public void reset(boolean randomize) {
+			if (myDynamics != null) myDynamics.setState(myInitialState);
+			myLastDynamicsTime = 0;
+			myLastGenTime = 0;
 		}
 				
 	}

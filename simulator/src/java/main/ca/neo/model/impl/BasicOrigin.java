@@ -7,6 +7,7 @@ import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.Noise;
 import ca.neo.model.Origin;
+import ca.neo.model.Resettable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.Units;
 
@@ -16,7 +17,7 @@ import ca.neo.model.Units;
  * 
  * @author Bryan Tripp
  */
-public class BasicOrigin implements Origin, Noise.Noisy {
+public class BasicOrigin implements Origin, Noise.Noisy, Resettable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -155,6 +156,18 @@ public class BasicOrigin implements Origin, Noise.Noisy {
 		if (myNoise != null) result.setNoise(myNoise.clone());
 		result.setValues(myValues.clone());
 		return result;
+	}
+
+	/**
+	 * @see ca.neo.model.Resettable#reset(boolean)
+	 */
+	public void reset(boolean randomize) {
+		if (myNoise != null) myNoise.reset(randomize);
+		if (myNoises != null) {
+			for (int i = 0; i < myNoises.length; i++) {
+				myNoises[i].reset(randomize);
+			}
+		}
 	}
 	
 }

@@ -148,6 +148,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public void reset(boolean randomize) {
 		myIntegrator.reset(randomize);
 		myGenerator.reset(randomize);
+		myCurrentOrigin.reset(randomize);
 	}
 
 	/**

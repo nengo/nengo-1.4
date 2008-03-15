@@ -122,6 +122,7 @@ public class FunctionInput implements Node, Probeable {
 	 * @see ca.neo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
+		myOrigin.reset(randomize);
 	}
 
 	/**
