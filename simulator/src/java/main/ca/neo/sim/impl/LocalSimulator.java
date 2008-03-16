@@ -87,19 +87,24 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		// myNodes[i].run(startTime, startTime);
 		// }
 		//		
-		float time = startTime;
+		double time = startTime;
+		double thisStepSize = stepSize;
 
 		int c = 0;
-		while (time < endTime - stepSize / 10000f) { // in case we're very close with floating point comparison
+		while (time < endTime) { 
 			if (c++ % 100 == 99)
-				System.out.println("Step " + c); // TODO: change this to listener/progress bar
-			step(time, Math.min(endTime, time + stepSize));
+				System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize)); 
+			
+			if (time + 1.5*thisStepSize > endTime) { //fudge step size to hit end exactly
+				thisStepSize = endTime - time;
+			}
+			step((float) time, (float) (time+thisStepSize));
 
-			float currentProgress = (time - startTime) / (endTime - startTime);
+			float currentProgress = ((float) time - startTime) / (endTime - startTime);
 			fireSimulatorEvent(new SimulatorEvent(currentProgress,
 					SimulatorEvent.Type.STEP_TAKEN));
 
-			time += stepSize;
+			time += thisStepSize;
 		}
 		fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
 	}
