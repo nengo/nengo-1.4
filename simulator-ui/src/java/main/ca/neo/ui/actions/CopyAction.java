@@ -5,7 +5,6 @@ import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.UINeoNode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UserMessages;
 
 public class CopyAction extends StandardAction {
 
@@ -19,11 +18,15 @@ public class CopyAction extends StandardAction {
 
 	@Override
 	protected final void action() throws ActionException {
-		Node node = nodeUI.getModel();
-		UserMessages.showWarning("This is Copy & Paste mock functionality");
+		Node originalNode = nodeUI.getModel();
 
-		NengoGraphics.getInstance().getClipboard().setContents(node);
-		processNodeUI(nodeUI);
+		try {
+			Node copiedNode = originalNode.clone();
+			NengoGraphics.getInstance().getClipboard().setContents(copiedNode);
+			processNodeUI(nodeUI);
+		} catch (CloneNotSupportedException e) {
+			throw new ActionException("Could not clone node");
+		}
 	}
 
 	protected void processNodeUI(UINeoNode nodeUI) {

@@ -6,11 +6,13 @@ import ca.neo.model.Node;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
+import ca.neo.ui.models.INodeContainer.ContainerException;
 import ca.neo.ui.models.constructors.AbstractConstructable;
 import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Creates a new NEO model
@@ -74,7 +76,11 @@ public class CreateModelAction extends ReversableAction {
 
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {
-					container.addNodeModel(nodeCreated.getModel());
+					try {
+						container.addNodeModel(nodeCreated.getModel());
+					} catch (ContainerException e) {
+						UserMessages.showWarning("Could not add node" + e.getMessage());
+					}
 
 				}
 			});

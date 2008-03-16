@@ -16,7 +16,6 @@ import ca.neo.model.Probeable;
 import ca.neo.model.Projection;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.model.impl.MockNode;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.actions.CreateModelAction;
@@ -381,12 +380,11 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		}
 	}
 
-	public void addNodeModel(Node node) {
+	public void addNodeModel(Node node) throws ContainerException {
 		try {
 			getModel().addNode(node);
 		} catch (StructuralException e) {
-			UserMessages.showWarning(e.toString());
-			return;
+			throw new ContainerException(e.toString());
 		}
 	}
 
@@ -407,7 +405,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 
 	@Override
 	public void constructMenu(PopupMenuBuilder menu) {
-		MockNode clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
+		Node clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
 		if (clipboardNode != null) {
 			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here",
 					clipboardNode, this));

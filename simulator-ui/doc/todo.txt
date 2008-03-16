@@ -1,37 +1,29 @@
 ******************************************
  Done
 *******************************************
-03/12/2007 - UIOrigin and UITermination objects are now created through factory methods,
-	to ensure that the correct wrapper is used.
-
-
-03/10/2007 - Added SpikingNeuronFactory to options for NEFEnsemble Constructable Dialog
-03/09/2008 - Added Node Factory selection options NEFEnsemble Constructable Dialog
-	- "Linear Neuron" (use PoissonSpikeGenerator.LinearNeuronFactory)
-	- "Sigmoid Neuron" (use PoissonSpikeGenerator.SigmoidNeuronFactory)
-	- "LIF Neuron" (use LIFNeuronFactory)
-	- "Adapting LIF Neuron" (use ALIFNeuronFactory)
-	- Added Sliders and Signs for Encoding and Decoding vectors
-
-03/05/2008 - Terminations and origins are removed from the UI on VisiblyMutable event
-03/05/2008 - Fixed bug where a removing a node with a recursive connection caused an exception
-03/01/2008 - Popup check in mousePressed(), before it was checked in mouseReleased() only.
-03/01/2008 - Mock copy & paste functionality added
-03/01/2008 - Added accelorator keys for Menu items
-03/01/2008 - Renamed NeoGraphics class to NengoGraphics
-03/01/2008 - Added debug messages for Context Menu troubleshooting, disabled same-key check
-03/01/2008 - Added error handling when user adds projection outside the scope of a network
+03/16/2008 - Limited drag & drop functionality added. Can only drag-drop top->down. 
+			Cannot drag & drop from inside to outside of a Container			
+03/16/2008 - Cut & Paste moves the model, Copy & Paste uses cloning
+03/16/2008 - Modified paste functionality to paste into the NodeContainer at the center of the screen
+			before, it was whichever NodeContainer was maximized
 
 *******************************************
  Pri 0 - doing next
 *******************************************
+Requests:
+	Need setName() on Node
+	Exception while cloning NEFEnsemble
+		java.lang.NullPointerException
+		at ca.neo.model.nef.impl.DecodedTermination.clone(DecodedTermination.java:404)
+		at ca.neo.model.nef.impl.NEFEnsembleImpl.clone(NEFEnsembleImpl.java:629)
+		at ca.neo.model.nef.impl.NEFEnsembleImpl.clone(NEFEnsembleImpl.java:1)
+		at ca.neo.ui.actions.CopyAction.action(CopyAction.java:24)
+
 Add ability to surface DataType and Description for Fields of PropertyInputPanel
 
 Scroll the other way when a mouse is dragged off the screen
 
-
 Update ensemble, network, and function icons to be Vector
-
 
 - While waiting for an ensemble or origin to build, is it possible to
 animate something, to convince the user there hasn't been a crash?
@@ -124,6 +116,25 @@ Event notifications from Models
 *******************************************
  Previously Done
 *******************************************
+03/12/2007 - UIOrigin and UITermination objects are now created through factory methods,
+	to ensure that the correct wrapper is used.
+03/10/2007 - Added SpikingNeuronFactory to options for NEFEnsemble Constructable Dialog
+03/09/2008 - Added Node Factory selection options NEFEnsemble Constructable Dialog
+	- "Linear Neuron" (use PoissonSpikeGenerator.LinearNeuronFactory)
+	- "Sigmoid Neuron" (use PoissonSpikeGenerator.SigmoidNeuronFactory)
+	- "LIF Neuron" (use LIFNeuronFactory)
+	- "Adapting LIF Neuron" (use ALIFNeuronFactory)
+	- Added Sliders and Signs for Encoding and Decoding vectors
+
+03/05/2008 - Terminations and origins are removed from the UI on VisiblyMutable event
+03/05/2008 - Fixed bug where a removing a node with a recursive connection caused an exception
+03/01/2008 - Popup check in mousePressed(), before it was checked in mouseReleased() only.
+03/01/2008 - Mock copy & paste functionality added
+03/01/2008 - Added accelorator keys for Menu items
+03/01/2008 - Renamed NeoGraphics class to NengoGraphics
+03/01/2008 - Added debug messages for Context Menu troubleshooting, disabled same-key check
+03/01/2008 - Added error handling when user adds projection outside the scope of a network
+
 02/26/2008 - Exposed terminations & origins are now yellow
 			You can see their exposed name in the tooltip
 			Be careful, projections cover the exposed terminations' color 

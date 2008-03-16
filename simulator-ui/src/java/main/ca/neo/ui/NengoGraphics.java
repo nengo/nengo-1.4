@@ -28,7 +28,6 @@ import ca.neo.config.ConfigUtil;
 import ca.neo.config.JavaSourceParser;
 import ca.neo.model.Network;
 import ca.neo.model.Node;
-import ca.neo.model.impl.MockNode;
 import ca.neo.ui.actions.CopyAction;
 import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.CutAction;
@@ -52,6 +51,7 @@ import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.AuxillarySplitPane;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
+import ca.shu.ui.lib.actions.DragAction;
 import ca.shu.ui.lib.actions.MockAction;
 import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -370,7 +370,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		splitPanes = new ArrayList<AuxillarySplitPane>();
 		simulationData = new SimulatorDataModel();
 
-		pythonInterpreter=new PythonInterpreter();
+		pythonInterpreter = new PythonInterpreter();
 		scriptConsole = new ScriptConsole(pythonInterpreter);
 		Style.applyStyle(scriptConsole);
 
@@ -430,7 +430,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 			copyAction = new MockAction("Copy");
 		}
 
-		MockNode node = getClipboard().getContents();
+		Node node = getClipboard().getContents();
 		if (node != null) {
 
 			Window window = getTopWindow();
@@ -470,19 +470,25 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
 	public void addNodeModel(Node node) {
-		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
-
-		getWorld().getGround().addChildFancy(nodeUI);
-		if (nodeUI instanceof NodeContainer) {
-			((NodeContainer) (nodeUI)).openViewer();
-		}
+		addNodeModel(node, null, null);
 	}
 
-	public void addNodeModel(Node node, double posX, double posY) {
+	public void addNodeModel(Node node, Double posX, Double posY) {
 		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
-		nodeUI.setOffset(posX, posY);
 
-		getWorld().getGround().addChild(nodeUI);
+		if (posX != null && posY != null) {
+			nodeUI.setOffset(posX, posY);
+
+			getWorld().getGround().addChild(nodeUI);
+		} else {
+			getWorld().getGround().addChildFancy(nodeUI);
+
+			if (nodeUI instanceof NodeContainer) {
+				((NodeContainer) (nodeUI)).openViewer();
+			}
+		}
+
+		DragAction.dropNode(nodeUI);
 	}
 
 	public void captureInDataViewer(Network network) {
@@ -537,7 +543,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	public NengoClipboard getClipboard() {
 		return clipboard;
 	}
-	
+
 	public PythonInterpreter getPythonInterpreter() {
 		return pythonInterpreter;
 	}

@@ -4,11 +4,10 @@ import java.security.InvalidParameterException;
 import java.util.LinkedList;
 
 import ca.neo.model.Node;
-import ca.neo.model.impl.MockNode;
 
 public class NengoClipboard {
 
-	private MockNode selectedObj;
+	private Node selectedObj;
 
 	public static interface ClipboardListener {
 		public void clipboardChanged();
@@ -30,10 +29,7 @@ public class NengoClipboard {
 	}
 
 	public void setContents(Node node) {
-		/*
-		 * TODO: Replace mock node with real node
-		 */
-		selectedObj = new MockNode(node.getName());
+		selectedObj = node;
 		fireChanged();
 	}
 
@@ -43,7 +39,7 @@ public class NengoClipboard {
 		}
 	}
 
-	public MockNode getContents() {
+	public Node getContents() {
 		return selectedObj;
 	}
 

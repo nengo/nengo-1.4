@@ -33,6 +33,7 @@ import ca.neo.ui.actions.AddProbeAction;
 import ca.neo.ui.actions.CopyAction;
 import ca.neo.ui.actions.CutAction;
 import ca.neo.ui.actions.SaveNodeAction;
+import ca.neo.ui.models.INodeContainer.ContainerException;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UIFunctionInput;
 import ca.neo.ui.models.nodes.UIGenericNode;
@@ -61,6 +62,7 @@ import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import ca.shu.ui.lib.world.DroppableX;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 
@@ -69,7 +71,7 @@ import ca.shu.ui.lib.world.piccolo.WorldImpl;
  * 
  * @author Shu
  */
-public abstract class UINeoNode extends UINeoModel {
+public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	/**
 	 * Factory method which creates a Node UI object around a Node
 	 * 
@@ -253,6 +255,44 @@ public abstract class UINeoNode extends UINeoModel {
 		myUpdateListener = new ModelUpdateListener();
 	}
 
+	@Override
+	protected void modelUpdated() {
+		super.modelUpdated();
+
+		Origin[] modelOrigins = getModel().getOrigins();
+		HashSet<Origin> modelOriginSet = new HashSet<Origin>(modelOrigins.length);
+		for (Origin origin : modelOrigins) {
+			modelOriginSet.add(origin);
+		}
+
+		Termination[] modelTerminations = getModel().getTerminations();
+		HashSet<Termination> modelTerminationSet = new HashSet<Termination>(
+				modelTerminations.length);
+		for (Termination term : modelTerminations) {
+			modelTerminationSet.add(term);
+		}
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof ModelObject) {
+				Object model = ((ModelObject) wo).getModel();
+
+				if (model instanceof Termination) {
+					if (!modelTerminationSet.contains(model)) {
+						wo.destroy();
+						this.showPopupMessage("Termination removed: " + wo.getName());
+					}
+				}
+				if (wo instanceof Origin) {
+					if (!modelOriginSet.contains(model)) {
+						wo.destroy();
+						this.showPopupMessage("Origin removed: " + wo.getName());
+					}
+				}
+			}
+
+		}
+	}
+
 	/**
 	 * Called when a new probe is added
 	 * 
@@ -344,6 +384,35 @@ public abstract class UINeoNode extends UINeoModel {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ca.shu.ui.lib.world.DroppableX#droppedOnTargets(java.util.Collection)
+	 */
+	public void droppedOnTargets(Collection<WorldObject> targets) {
+		for (WorldObject wo : targets) {
+			/*
+			 * Move to new container
+			 */
+			if (wo instanceof INodeContainer) {
+				INodeContainer nodeContainer = (INodeContainer) wo;
+
+				try {
+					nodeContainer.addNodeModel(getModel());
+
+					/*
+					 * This removes the node from it's parent and externalities
+					 */
+					destroyModel();
+				} catch (ContainerException e) {
+					UserMessages.showWarning("Could not drop into container: " + e.getMessage());
+				}
+
+				return;
+			}
+		}
+	}
+
 	/**
 	 * @return The default file name for this node
 	 */
@@ -393,6 +462,32 @@ public abstract class UINeoNode extends UINeoModel {
 		} else {
 			return null;
 		}
+	}
+
+	public Vector<UIProbe> getProbes() {
+		return probes;
+	}
+
+	public Collection<UIOrigin> getVisibleOrigins() {
+		LinkedList<UIOrigin> origins = new LinkedList<UIOrigin>();
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof UIOrigin) {
+				origins.add((UIOrigin) wo);
+			}
+		}
+		return origins;
+	}
+
+	public Collection<UITermination> getVisibleTerminations() {
+		LinkedList<UITermination> terminations = new LinkedList<UITermination>();
+
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof UITermination) {
+				terminations.add((UITermination) wo);
+			}
+		}
+		return terminations;
 	}
 
 	/**
@@ -618,28 +713,6 @@ public abstract class UINeoNode extends UINeoModel {
 		return probeUI;
 	}
 
-	public Collection<UITermination> getVisibleTerminations() {
-		LinkedList<UITermination> terminations = new LinkedList<UITermination>();
-
-		for (WorldObject wo : getChildren()) {
-			if (wo instanceof UITermination) {
-				terminations.add((UITermination) wo);
-			}
-		}
-		return terminations;
-	}
-
-	public Collection<UIOrigin> getVisibleOrigins() {
-		LinkedList<UIOrigin> origins = new LinkedList<UIOrigin>();
-
-		for (WorldObject wo : getChildren()) {
-			if (wo instanceof UIOrigin) {
-				origins.add((UIOrigin) wo);
-			}
-		}
-		return origins;
-	}
-
 	/**
 	 * @param layoutName
 	 *            Name of an Termination on the Node model
@@ -693,44 +766,6 @@ public abstract class UINeoNode extends UINeoModel {
 					}
 				});
 			}
-		}
-	}
-
-	@Override
-	protected void modelUpdated() {
-		super.modelUpdated();
-
-		Origin[] modelOrigins = getModel().getOrigins();
-		HashSet<Origin> modelOriginSet = new HashSet<Origin>(modelOrigins.length);
-		for (Origin origin : modelOrigins) {
-			modelOriginSet.add(origin);
-		}
-
-		Termination[] modelTerminations = getModel().getTerminations();
-		HashSet<Termination> modelTerminationSet = new HashSet<Termination>(
-				modelTerminations.length);
-		for (Termination term : modelTerminations) {
-			modelTerminationSet.add(term);
-		}
-
-		for (WorldObject wo : getChildren()) {
-			if (wo instanceof ModelObject) {
-				Object model = ((ModelObject) wo).getModel();
-
-				if (model instanceof Termination) {
-					if (!modelTerminationSet.contains(model)) {
-						wo.destroy();
-						this.showPopupMessage("Termination removed: " + wo.getName());
-					}
-				}
-				if (wo instanceof Origin) {
-					if (!modelOriginSet.contains(model)) {
-						wo.destroy();
-						this.showPopupMessage("Origin removed: " + wo.getName());
-					}
-				}
-			}
-
 		}
 	}
 
@@ -889,9 +924,5 @@ public abstract class UINeoNode extends UINeoModel {
 
 		}
 
-	}
-
-	public Vector<UIProbe> getProbes() {
-		return probes;
 	}
 }

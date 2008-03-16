@@ -3,6 +3,7 @@ package ca.neo.ui.actions;
 import ca.neo.config.ui.NewConfigurableDialog;
 import ca.neo.model.Node;
 import ca.neo.ui.models.INodeContainer;
+import ca.neo.ui.models.INodeContainer.ContainerException;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
@@ -29,7 +30,11 @@ public class CreateModelAdvancedAction extends StandardAction {
 		if (obj == null) {
 			throw new UserCancelledException();
 		} else if (obj instanceof Node) {
-			container.addNodeModel((Node) obj);
+			try {
+				container.addNodeModel((Node) obj);
+			} catch (ContainerException e) {
+				throw new ActionException(e.getMessage());
+			}
 		} else {
 			throw new ActionException(
 					"Sorry we do not support adding that type of object into NeoGraphics yet");

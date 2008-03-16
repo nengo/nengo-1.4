@@ -1,6 +1,7 @@
 package ca.neo.ui.models;
 
 import ca.neo.model.Node;
+import ca.shu.ui.lib.exceptions.UIException;
 
 /**
  * A Container of PNeoNode
@@ -15,8 +16,21 @@ public interface INodeContainer {
 	 * @param node
 	 *            Node to be added
 	 */
-	public void addNodeModel(Node node);
-	
+	public void addNodeModel(Node node) throws ContainerException;
+
 	public Node getNodeModel(String name);
+
+	public static class ContainerException extends UIException {
+		private static final long serialVersionUID = 1L;
+
+		public ContainerException() {
+			super();
+		}
+
+		public ContainerException(String arg0) {
+			super(arg0);
+		}
+
+	}
 
 }

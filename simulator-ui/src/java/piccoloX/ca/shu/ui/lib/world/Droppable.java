@@ -1,7 +1,8 @@
 package ca.shu.ui.lib.world;
 
-
 /**
+ * An object which can be dropped by a handler
+ * 
  * @author Shu Wu
  */
 public interface Droppable {

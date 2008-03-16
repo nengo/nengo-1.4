@@ -132,7 +132,7 @@ public abstract class StandardAction implements Serializable {
 			e.defaultHandleBehavior();
 		} catch (RuntimeException e) {
 			e.printStackTrace();
-			UserMessages.showWarning("Unexpected Exception: " + e.toString());
+			UserMessages.showWarning("Could not perform action: " + e.toString());
 		} finally {
 			actionCompleted = true;
 			synchronized (this) {
