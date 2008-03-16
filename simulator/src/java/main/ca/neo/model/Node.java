@@ -21,6 +21,11 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	public String getName();
 	
 	/**
+	 * @param name The new name
+	 */
+	public void setName(String name) throws StructuralException;
+	
+	/**
 	 * Runs the Node (including all its components), updating internal state and outputs as needed.  
 	 * Runs should be short (eg 1ms), because inputs can not be changed during a run, and outputs
 	 * will only be communicated to other Nodes after a run.   

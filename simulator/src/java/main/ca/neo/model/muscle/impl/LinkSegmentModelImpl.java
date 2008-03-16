@@ -22,6 +22,7 @@ import ca.neo.model.muscle.SkeletalMuscle;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.VisiblyMutable;
+import ca.neo.util.VisiblyMutableUtils;
 import ca.neo.util.impl.TimeSeries1DImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
@@ -106,6 +107,14 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	 */
 	public String getName() {
 		return myName;
+	}
+
+	/**
+	 * @see ca.neo.model.Node#setName(java.lang.String)
+	 */
+	public void setName(String name) throws StructuralException {
+		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+		myName = name;
 	}
 
 	/** 
