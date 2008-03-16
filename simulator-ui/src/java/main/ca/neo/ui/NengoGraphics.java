@@ -223,7 +223,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		}
 		File simulatorSourceFile = new File(simulatorSource);
 		if (!simulatorSourceFile.exists()) {
-			Util.debugMsg("Could not find simulator source files");
+			Util.debugMsg("Could not find simulator source files at " + simulatorSourceFile.getAbsoluteFile().toString());
 		}
 
 		JavaSourceParser.addSource(simulatorSourceFile);
