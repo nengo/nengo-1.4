@@ -277,6 +277,10 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	public void setScaling(DecodedTermination t) {
 		myScalingTermination = t;
 	}
+	
+	public DecodedTermination getScaling() {
+		return myScalingTermination;
+	}
 
 	/** 
 	 * @see ca.neo.util.Configurable#getConfiguration()
@@ -401,8 +405,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			result.setTransform(MU.clone(myTransform));
 			result.setDynamics((LinearSystem) myDynamicsTemplate.clone());
 			result.myIntegrator = myIntegrator.clone();
-			result.myInputValues = (RealOutput) myInputValues.clone();
-			result.myOutputValues = myOutputValues.clone();
+			if (myInputValues != null) result.myInputValues = (RealOutput) myInputValues.clone();
+			if (myOutputValues != null) result.myOutputValues = myOutputValues.clone();
 			result.myScalingTermination = myScalingTermination; //refer to same copy
 			result.myStaticBias = myStaticBias.clone();
 			return result;

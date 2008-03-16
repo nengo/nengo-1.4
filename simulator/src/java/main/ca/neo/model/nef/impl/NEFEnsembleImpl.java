@@ -634,8 +634,16 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			if (r != null) {
 				result.myPlasticityRules.put(key, r.clone());
 			}
-		}
+		}		
 		
+		//change scaling terminations references to the new copies 
+		for (String key : result.myDecodedTerminations.keySet()) {
+			DecodedTermination t = result.myDecodedTerminations.get(key);
+			if (t.getScaling() != null) {
+				t.setScaling(result.myDecodedTerminations.get(t.getScaling().getName()));
+			}			
+		}
+
 		result.myDecodingApproximators = new HashMap<String, LinearApproximator>(5);
 		result.myEncoders = MU.clone(myEncoders);
 		result.myEvalPoints = MU.clone(myEvalPoints);
