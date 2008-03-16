@@ -42,7 +42,7 @@ public class CNEFEnsemble extends ConstructableNode {
 			"Encoding Distribution");
 	static final PropertyDescriptor pEncodingSign = new PSign("Encoding");
 	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
-	static final PropertyDescriptor pNodeFactory = new PNodeFactory("Factory");
+	static final PropertyDescriptor pNodeFactory = new PNodeFactory("Node Type");
 
 	/**
 	 * Config descriptors
