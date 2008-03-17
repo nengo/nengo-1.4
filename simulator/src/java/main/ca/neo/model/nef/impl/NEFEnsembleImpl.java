@@ -216,7 +216,18 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @see ca.neo.model.nef.NEFEnsemble#getEncoders()
 	 */
 	public float[][] getEncoders() {
-		return myEncoders;
+		return MU.clone(myEncoders);
+	}
+	
+	/**
+	 * @param encoders New encoding vectors (row per Node)
+	 */
+	public void setEncoders(float[][] encoders) {
+		assert MU.isMatrix(encoders);
+		assert encoders.length == getNodes().length;
+		assert encoders[0].length == getDimension();
+		
+		myEncoders = encoders;
 	}
 	
 	/**

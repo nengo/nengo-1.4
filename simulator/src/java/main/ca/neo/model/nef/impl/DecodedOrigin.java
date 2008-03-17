@@ -80,14 +80,6 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		reset(false);
 	}
 	
-	protected void setDecoders(float[][] decoders) {
-		assert MU.isMatrix(decoders);
-		assert myDecoders.length == decoders.length;
-		assert myDecoders[0].length == decoders[0].length;
-		
-		myDecoders = decoders;
-	}
-	
 	/**
 	 * With this constructor decoding vectors are specified by the caller. 
 	 * 
@@ -240,6 +232,17 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 */
 	public float[][] getDecoders() {
 		return myDecoders;
+	}
+
+	/**
+	 * @param decoders New decoding vectors (row per Node)
+	 */
+	public void setDecoders(float[][] decoders) {
+		assert MU.isMatrix(decoders);
+		assert myDecoders.length == decoders.length;
+		assert myDecoders[0].length == decoders[0].length;
+		
+		myDecoders = decoders;
 	}
 	
 	/**
