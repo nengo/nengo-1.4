@@ -3,6 +3,8 @@
  */
 package ca.neo.model.neuron.impl;
 
+import java.awt.Frame;
+
 import ca.neo.config.ConfigUtil;
 import ca.neo.math.PDF;
 import ca.neo.math.impl.IndicatorPDF;
@@ -86,7 +88,7 @@ public class SpikingNeuronFactory implements NodeFactory {
 				new IndicatorPDF(1), 
 				new IndicatorPDF(0));
 		
-		ConfigUtil.configure(null, factory);
+		ConfigUtil.configure((Frame) null, factory);
 	}
 
 }
