@@ -4,6 +4,7 @@
 package ca.neo.config;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -40,22 +41,35 @@ import ca.neo.config.ui.ConfigurationTreeModel;
 import ca.neo.config.ui.ConfigurationTreePopupListener;
 
 /**
- * Configuration-related utility methods. 
+ * Configuration-related utility methods.
  * 
  * @author Bryan Tripp
  */
 public class ConfigUtil {
-	
+
+	public static void configure(Dialog owner, Object o) {
+		configure(null, owner, o);
+	}
+
+	public static void configure(Frame owner, Object o) {
+		configure(owner, null, o);
+	}
+
 	/**
 	 * Shows a tree in which object properties can be edited.
 	 * 
 	 * @param o
 	 *            The Object to configure
 	 */
-	public static void configure(Frame owner, Object o) {
+	private static void configure(Frame owner, Dialog owner2, Object o) {
 		JScrollPane configuruationPane = createConfigurationPane(o);
 
-		final JDialog dialog = new JDialog(owner, o.getClass().getSimpleName() + " Configuration");
+		final JDialog dialog;
+		if (owner != null) {
+			dialog = new JDialog(owner, o.getClass().getSimpleName() + " Configuration");
+		} else {
+			dialog = new JDialog(owner2, o.getClass().getSimpleName() + " Configuration");
+		}
 
 		dialog.getContentPane().setLayout(new BorderLayout());
 		dialog.getContentPane().add(configuruationPane, BorderLayout.CENTER);
@@ -68,27 +82,32 @@ public class ConfigUtil {
 		});
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		buttonPanel.add(doneButton);
-		
-//		dialog.setModal(true); //this prevents help popups
+
+		// dialog.setModal(true); //this prevents help popups
 		dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		dialog.pack();
-		dialog.setLocationRelativeTo(owner);// centers on screen
+		if (owner != null) {
+			dialog.setLocationRelativeTo(owner);// centers on screen
+		} else {
+			dialog.setLocationRelativeTo(owner2);// centers on screen
+		}
 		dialog.setVisible(true);
 	}
 
 	public static class ConfigurationPane extends JScrollPane {
-		
+
 		private static final long serialVersionUID = 1L;
-		
+
 		private ConfigurationTreeCellRenderer myCellRenderer;
 		private JTree myTree;
 
 		public ConfigurationPane(Object o) {
 			super();
 			init(o);
-			
-			//note: setting preferred size of tree itself prevents viewport from expanding
-			this.setPreferredSize(new Dimension(300, 300)); 
+
+			// note: setting preferred size of tree itself prevents viewport
+			// from expanding
+			this.setPreferredSize(new Dimension(300, 300));
 		}
 
 		private void init(Object o) {
@@ -97,7 +116,7 @@ public class ConfigUtil {
 			myTree = new JTree(model);
 			myTree.setScrollsOnExpand(true);
 			this.setViewportView(myTree);
-			
+
 			myTree.setEditable(true);
 			myTree.setCellEditor(new ConfigurationTreeCellEditor(myTree));
 
@@ -122,16 +141,16 @@ public class ConfigUtil {
 
 			ToolTipManager.sharedInstance().registerComponent(myTree);
 		}
-		
+
 		public ConfigurationTreeCellRenderer getCellRenderer() {
 			return myCellRenderer;
 		}
-		
+
 		public JTree getTree() {
 			return myTree;
 		}
 	}
-	
+
 	/**
 	 * Shows a tree in which object properties can be edited.
 	 * 
@@ -140,32 +159,40 @@ public class ConfigUtil {
 	 * @return A Scroll Pane containing the configuration properties
 	 */
 	public static ConfigurationPane createConfigurationPane(Object o) {
-		
+
 		return new ConfigurationPane(o);
 	}
-	
+
 	/**
-	 * TODO: remove this method 
+	 * TODO: remove this method
 	 * 
-	 * @param properties Configuration from which to extract a property
-	 * @param name Name of property to extact
-	 * @param c Class to which property value must belong 
+	 * @param properties
+	 *            Configuration from which to extract a property
+	 * @param name
+	 *            Name of property to extact
+	 * @param c
+	 *            Class to which property value must belong
 	 * @return Value
-	 * @throws StructuralException If value doesn't belong to specified class
+	 * @throws StructuralException
+	 *             If value doesn't belong to specified class
 	 */
-//	public static Object get(Configuration properties, String name, Class c) throws StructuralException {
-//		Object o = ((SingleValuedProperty) properties.getProperty(name)).getValue();		
-//		if ( !c.isAssignableFrom(o.getClass()) ) {
-//			throw new StructuralException("Property " + name 
-//					+ " must be of class " + c.getName() + " (was " + o.getClass().getName() + ")");
-//		}		
-//		return o;
-//	}
-	
+	// public static Object get(Configuration properties, String name, Class c)
+	// throws StructuralException {
+	// Object o = ((SingleValuedProperty)
+	// properties.getProperty(name)).getValue();
+	// if ( !c.isAssignableFrom(o.getClass()) ) {
+	// throw new StructuralException("Property " + name
+	// + " must be of class " + c.getName() + " (was " + o.getClass().getName()
+	// + ")");
+	// }
+	// return o;
+	// }
 	/**
-	 * @param configurable An object
-	 * @return configurable.getConfiguration() : Configuration if such a method is defined for configurable, 
-	 * 		otherwise ConfigUtil.defaultConfiguration(configurable).  
+	 * @param configurable
+	 *            An object
+	 * @return configurable.getConfiguration() : Configuration if such a method
+	 *         is defined for configurable, otherwise
+	 *         ConfigUtil.defaultConfiguration(configurable).
 	 */
 	public static Configuration getConfiguration(Object configurable) {
 		Configuration result = null;
@@ -174,7 +201,7 @@ public class ConfigUtil {
 			if (methods[i].getName().equals("getConfiguration")
 					&& methods[i].getParameterTypes().length == 0
 					&& Configuration.class.isAssignableFrom(methods[i].getReturnType())) {
-				
+
 				try {
 					result = (Configuration) methods[i].invoke(configurable, new Object[0]);
 				} catch (IllegalArgumentException e) {
@@ -186,101 +213,111 @@ public class ConfigUtil {
 				}
 			}
 		}
-		
+
 		if (result == null) {
 			result = defaultConfiguration(configurable);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
-	 * @param configurable An Object
-	 * @return A default Configuration with properties of the object, based on reflection of the 
-	 * 		object's getters and setters. 
+	 * @param configurable
+	 *            An Object
+	 * @return A default Configuration with properties of the object, based on
+	 *         reflection of the object's getters and setters.
 	 */
 	public static ConfigurationImpl defaultConfiguration(Object configurable) {
 		ConfigurationImpl result = new ConfigurationImpl(configurable);
-		
+
 		Method[] methods = configurable.getClass().getMethods();
 		for (int i = 0; i < methods.length; i++) {
 			Class returnType = methods[i].getReturnType();
 			String propName = getPropertyName(methods[i]);
 
-			if (isSingleValueGetter(methods[i]) 
-					&& !methods[i].getName().equals("getClass")
-					&& !methods[i].getName().equals("getConfiguration")
-					&& !isCounter(methods[i])) {
-				
+			if (isSingleValueGetter(methods[i]) && !methods[i].getName().equals("getClass")
+					&& !methods[i].getName().equals("getConfiguration") && !isCounter(methods[i])) {
+
 				result.defineSingleValuedProperty(propName, returnType, false);
 			} else if (isIndexedGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
 				Property p = ListPropertyImpl.getListProperty(result, propName, returnType);
-				if (p != null) result.defineProperty(p);					
+				if (p != null)
+					result.defineProperty(p);
 			} else if (isNamedGetter(methods[i]) && !result.getPropertyNames().contains(propName)) {
-				Property p = NamedValuePropertyImpl.getNamedValueProperty(result, propName, returnType);
-				if (p != null) result.defineProperty(p);									
+				Property p = NamedValuePropertyImpl.getNamedValueProperty(result, propName,
+						returnType);
+				if (p != null)
+					result.defineProperty(p);
 			}
 		}
-		
-		//look for additional array, list, and map getters 
+
+		// look for additional array, list, and map getters
 		for (int i = 0; i < methods.length; i++) {
 			Type returnType = methods[i].getGenericReturnType();
 			String propName = getPropertyName(methods[i]);
-			
-			if (isGetter(methods[i]) && !isNamesGetter(methods[i]) && !result.getPropertyNames().contains(propName)
+
+			if (isGetter(methods[i]) && !isNamesGetter(methods[i])
+					&& !result.getPropertyNames().contains(propName)
 					&& !result.getPropertyNames().contains(stripSuffix(propName, "s"))
 					&& !result.getPropertyNames().contains(stripSuffix(propName, "es"))) {
-				
+
 				Property p = null;
-				if (returnType instanceof Class && MainHandler.getInstance().canHandle((Class) returnType)) {
-					p = SingleValuedPropertyImpl.getSingleValuedProperty(result, propName, (Class) returnType);
+				if (returnType instanceof Class
+						&& MainHandler.getInstance().canHandle((Class) returnType)) {
+					p = SingleValuedPropertyImpl.getSingleValuedProperty(result, propName,
+							(Class) returnType);
 				} else if (returnType instanceof Class && ((Class) returnType).isArray()) {
-					p = ListPropertyImpl.getListProperty(result, propName, ((Class) returnType).getComponentType());
+					p = ListPropertyImpl.getListProperty(result, propName, ((Class) returnType)
+							.getComponentType());
 				} else if (returnType instanceof ParameterizedType) {
 					Type rawType = ((ParameterizedType) returnType).getRawType();
 					Type[] typeArgs = ((ParameterizedType) returnType).getActualTypeArguments();
-					if (rawType instanceof Class && List.class.isAssignableFrom((Class) rawType) 
+					if (rawType instanceof Class && List.class.isAssignableFrom((Class) rawType)
 							&& typeArgs[0] instanceof Class) {
 						p = ListPropertyImpl.getListProperty(result, propName, (Class) typeArgs[0]);
-					} else if (rawType instanceof Class && Map.class.isAssignableFrom((Class) rawType)
+					} else if (rawType instanceof Class
+							&& Map.class.isAssignableFrom((Class) rawType)
 							&& typeArgs[0] instanceof Class && typeArgs[1] instanceof Class) {
-						p = NamedValuePropertyImpl.getNamedValueProperty(result, propName, (Class) typeArgs[1]);						
+						p = NamedValuePropertyImpl.getNamedValueProperty(result, propName,
+								(Class) typeArgs[1]);
 					}
 				}
-				if (p != null) result.defineProperty(p);
+				if (p != null)
+					result.defineProperty(p);
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	private static boolean isCounter(Method method) {
-		String name = method.getName(); 
-		if (method.getReturnType().equals(Integer.TYPE) 
-				&& (name.matches("getNum.+") || name.matches("get.+Count")) ) {
+		String name = method.getName();
+		if (method.getReturnType().equals(Integer.TYPE)
+				&& (name.matches("getNum.+") || name.matches("get.+Count"))) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	private static boolean isNamesGetter(Method method) {
 		String name = method.getName();
-		
-		boolean returnsStringArray = method.getReturnType().isArray() 
-			&& String.class.isAssignableFrom(method.getReturnType().getComponentType());
-		boolean returnsStringList = List.class.isAssignableFrom(method.getReturnType()) 
-			&& (method.getGenericReturnType() instanceof ParameterizedType) 
-			&& ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0] instanceof Class
-			&& String.class.isAssignableFrom((Class) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0]);
-		
+
+		boolean returnsStringArray = method.getReturnType().isArray()
+				&& String.class.isAssignableFrom(method.getReturnType().getComponentType());
+		boolean returnsStringList = List.class.isAssignableFrom(method.getReturnType())
+				&& (method.getGenericReturnType() instanceof ParameterizedType)
+				&& ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0] instanceof Class
+				&& String.class.isAssignableFrom((Class) ((ParameterizedType) method
+						.getGenericReturnType()).getActualTypeArguments()[0]);
+
 		if (name.matches("get.+Names") && (returnsStringArray || returnsStringList)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	private static String getPropertyName(Method method) {
 		String result = method.getName();
 
@@ -288,13 +325,16 @@ public class ConfigUtil {
 		result = stripPrefix(result, "All");
 		result = stripSuffix(result, "Array");
 		result = stripSuffix(result, "List");
-				
-		return result.length() > 0 ? Character.toLowerCase(result.charAt(0)) + result.substring(1) : "";
+
+		return result.length() > 0 ? Character.toLowerCase(result.charAt(0)) + result.substring(1)
+				: "";
 	}
-	
+
 	/**
-	 * @param s A String
-	 * @param suffix Something that the string might end with
+	 * @param s
+	 *            A String
+	 * @param suffix
+	 *            Something that the string might end with
 	 * @return The string with the given suffix removed (if it was there)
 	 */
 	public static String stripSuffix(String s, String suffix) {
@@ -304,7 +344,7 @@ public class ConfigUtil {
 			return s;
 		}
 	}
-	
+
 	private static String stripPrefix(String s, String prefix) {
 		if (s.startsWith(prefix)) {
 			return s.substring(prefix.length());
@@ -312,49 +352,50 @@ public class ConfigUtil {
 			return s;
 		}
 	}
-	
+
 	private static boolean isSingleValueGetter(Method m) {
-		if (m.getName().startsWith("get") 
-				&& m.getParameterTypes().length == 0
-				&& !Collection.class.isAssignableFrom(m.getReturnType()) 
-				&& !Map.class.isAssignableFrom(m.getReturnType()) 
-				&& !m.getReturnType().isArray()) {
+		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0
+				&& !Collection.class.isAssignableFrom(m.getReturnType())
+				&& !Map.class.isAssignableFrom(m.getReturnType()) && !m.getReturnType().isArray()) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	private static boolean isGetter(Method m) {
-		if (m.getName().startsWith("get") 
-				&& m.getParameterTypes().length == 0) {
+		if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	private static boolean isIndexedGetter(Method m) {
 		Class[] paramTypes = m.getParameterTypes();
-		if (m.getName().startsWith("get") && paramTypes.length == 1 && paramTypes[0].equals(Integer.TYPE)) {
+		if (m.getName().startsWith("get") && paramTypes.length == 1
+				&& paramTypes[0].equals(Integer.TYPE)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	private static boolean isNamedGetter(Method m) {
 		Class[] paramTypes = m.getParameterTypes();
-		if (m.getName().startsWith("get") && paramTypes.length == 1 && paramTypes[0].equals(String.class)) {
+		if (m.getName().startsWith("get") && paramTypes.length == 1
+				&& paramTypes[0].equals(String.class)) {
 			return true;
 		} else {
 			return false;
-		}		
-	}	
-	
+		}
+	}
+
 	/**
-	 * @param c Any class 
-	 * @return Either c or if c is a primitive class (eg Integer.TYPE), the corresponding wrapper class 
+	 * @param c
+	 *            Any class
+	 * @return Either c or if c is a primitive class (eg Integer.TYPE), the
+	 *         corresponding wrapper class
 	 */
 	public static Class getPrimitiveWrapperClass(Class c) {
 		if (Integer.TYPE.isAssignableFrom(c)) {
@@ -373,24 +414,26 @@ public class ConfigUtil {
 			c = Byte.class;
 		} else if (Short.TYPE.isAssignableFrom(c)) {
 			c = Short.class;
-		}		
-		
+		}
+
 		return c;
 	}
-	
+
 	/**
-	 * @param type A class
-	 * @return If there is a ConfigurationHandler for the class, then getDefaultValue() from that 
-	 * 		handler, otherwise if there is a zero-arg constructor then the result of that 
-	 * 		constructor, otherwise null.  
+	 * @param type
+	 *            A class
+	 * @return If there is a ConfigurationHandler for the class, then
+	 *         getDefaultValue() from that handler, otherwise if there is a
+	 *         zero-arg constructor then the result of that constructor,
+	 *         otherwise null.
 	 */
 	public static Object getDefaultValue(Class type) {
 		Object result = null;
-		
+
 		if (MainHandler.getInstance().canHandle(type)) {
 			result = MainHandler.getInstance().getDefaultValue(type);
 		}
-		
+
 		if (result == null) {
 			Constructor<?>[] constructors = type.getConstructors();
 			Constructor zeroArgConstructor = null;
@@ -411,64 +454,71 @@ public class ConfigUtil {
 				} catch (InvocationTargetException e) {
 					e.printStackTrace();
 				}
-			}			
+			}
 		}
-		
-		return result; 
+
+		return result;
 	}
-	
+
 	/**
-	 * Displays given text in a help window. 
+	 * Displays given text in a help window.
 	 * 
-	 * @param text Help text (html body)
+	 * @param text
+	 *            Help text (html body)
 	 */
 	public static void showHelp(String text) {
-		String document = "<html><head></head><body bgcolor='#000000'><font color='#FFFFFF' face='arial'>" 
-			+ text + "</font></body></html>";
+		String document = "<html><head></head><body bgcolor='#000000'><font color='#FFFFFF' face='arial'>"
+				+ text + "</font></body></html>";
 		JEditorPane pane = new JEditorPane("text/html", document);
 		pane.setEditable(false);
 		pane.setBorder(BorderFactory.createEmptyBorder());
-		
-		JFrame frame = new JFrame("Help"); 
+
+		JFrame frame = new JFrame("Help");
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.getContentPane().add(new JScrollPane(pane), BorderLayout.CENTER);
-		
+
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
-	//functional test code
-//	public static void main(String[] args) {
-//		Object foo = new Object() {
-//			public int getFooCount() {
-//				return 0;
-//			}
-//			public int getNumFoo() {
-//				return 0;
-//			}
-//			public int[] getAllFoo() {
-//				return new int[0];
-//			}
-//			public int[] getFooArray() {
-//				return new int[0];
-//			}
-//			public int[] getFooList() {
-//				return new int[0];
-//			}
-//		};
-//		
-//		try {
-//			System.out.println(isCounter(foo.getClass().getMethod("toString", new Class[0])));
-//			System.out.println(isCounter(foo.getClass().getMethod("getFooCount", new Class[0])));
-//			System.out.println(isCounter(foo.getClass().getMethod("getNumFoo", new Class[0])));
-//			
-//			System.out.println(getPropertyName(foo.getClass().getMethod("getAllFoo", new Class[0])));
-//			System.out.println(getPropertyName(foo.getClass().getMethod("getFooArray", new Class[0])));
-//			System.out.println(getPropertyName(foo.getClass().getMethod("getFooList", new Class[0])));
-//		} catch (SecurityException e) {
-//			e.printStackTrace();
-//		} catch (NoSuchMethodException e) {
-//			e.printStackTrace();
-//		}
-//	}
+
+	// functional test code
+	// public static void main(String[] args) {
+	// Object foo = new Object() {
+	// public int getFooCount() {
+	// return 0;
+	// }
+	// public int getNumFoo() {
+	// return 0;
+	// }
+	// public int[] getAllFoo() {
+	// return new int[0];
+	// }
+	// public int[] getFooArray() {
+	// return new int[0];
+	// }
+	// public int[] getFooList() {
+	// return new int[0];
+	// }
+	// };
+	//		
+	// try {
+	// System.out.println(isCounter(foo.getClass().getMethod("toString", new
+	// Class[0])));
+	// System.out.println(isCounter(foo.getClass().getMethod("getFooCount", new
+	// Class[0])));
+	// System.out.println(isCounter(foo.getClass().getMethod("getNumFoo", new
+	// Class[0])));
+	//			
+	// System.out.println(getPropertyName(foo.getClass().getMethod("getAllFoo",
+	// new Class[0])));
+	// System.out.println(getPropertyName(foo.getClass().getMethod("getFooArray",
+	// new Class[0])));
+	// System.out.println(getPropertyName(foo.getClass().getMethod("getFooList",
+	// new Class[0])));
+	// } catch (SecurityException e) {
+	// e.printStackTrace();
+	// } catch (NoSuchMethodException e) {
+	// e.printStackTrace();
+	// }
+	// }
 }
