@@ -35,6 +35,7 @@ import ca.neo.config.impl.ConfigurationImpl;
 import ca.neo.config.impl.ListPropertyImpl;
 import ca.neo.config.impl.NamedValuePropertyImpl;
 import ca.neo.config.impl.SingleValuedPropertyImpl;
+import ca.neo.config.ui.AquaTreeUI;
 import ca.neo.config.ui.ConfigurationTreeCellEditor;
 import ca.neo.config.ui.ConfigurationTreeCellRenderer;
 import ca.neo.config.ui.ConfigurationTreeModel;
@@ -113,6 +114,13 @@ public class ConfigUtil {
 			ConfigurationTreeModel model = new ConfigurationTreeModel(o);
 
 			myTree = new JTree(model);
+
+			if (myTree.getUI().getClass().getName().equals("apple.laf.AquaTreeUI")) {
+				AquaTreeUI aui = new AquaTreeUI();
+				myTree.setUI(aui);
+				aui.setRowHeight(-1); //must be done after setUI(...)
+			}
+			
 			myTree.setScrollsOnExpand(true);
 			this.setViewportView(myTree);
 			

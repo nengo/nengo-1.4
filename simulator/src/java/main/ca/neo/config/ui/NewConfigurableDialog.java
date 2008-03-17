@@ -27,7 +27,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.plaf.metal.MetalTreeUI;
 
 import ca.neo.config.ClassRegistry;
 import ca.neo.config.ConfigUtil;
@@ -125,6 +128,13 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		buttonPanel.add(myOKButton);
 		
 		myConfigurationTree = new JTree(new Object[0]);
+		
+		if (myConfigurationTree.getUI().getClass().getName().equals("apple.laf.AquaTreeUI")) {
+			AquaTreeUI aui = new AquaTreeUI();
+			myConfigurationTree.setUI(aui);
+			aui.setRowHeight(-1); //must be done after setUI(...)
+		}
+		
 		myConfigurationTree.setEditable(true); 
 		myConfigurationTree.setRootVisible(true);
 		myConfigurationTree.setCellEditor(new ConfigurationTreeCellEditor(myConfigurationTree));
@@ -146,7 +156,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			
 		};
 		myConfigurationTree.setCellRenderer(cellRenderer);
-		
+
 		JScrollPane treeScroll = new JScrollPane(myConfigurationTree);
 		
 		JPanel typePanel = new JPanel();

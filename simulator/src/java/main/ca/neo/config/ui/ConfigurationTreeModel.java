@@ -39,7 +39,7 @@ import ca.neo.math.impl.IndicatorPDF;
 import ca.neo.model.StructuralException;
 import ca.neo.model.impl.NoiseFactory;
 
-/**
+/** 
  * Data model underlying JTree user interface for a Configurable.
  * 
  * @author Bryan Tripp
