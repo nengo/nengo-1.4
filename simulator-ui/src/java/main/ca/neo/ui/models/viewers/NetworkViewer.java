@@ -431,7 +431,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		 * Origins & Terminations
 		 */
 		menu.addSection("Origins and Terminations");
-		menu.addAction(new SetOTVisiblityAction("Show all", true));
+		menu.addAction(new SetOTVisiblityAction("Unhide all", true));
 		menu.addAction(new SetOTVisiblityAction("Hide all", false));
 
 	}
