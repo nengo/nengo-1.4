@@ -39,7 +39,7 @@ public class MatrixHandler extends BaseHandler {
 			System.arraycopy(matrix[i], 0, copy[i], 0, matrix[i].length);
 		}
 		final MatrixEditor me = new MatrixEditor(copy, false, false);
-		me.setPreferredSize(new Dimension(300, 150));
+		me.setPreferredSize(new Dimension(400, 150));
 		JButton okButton = new JButton("OK");
 		me.getControlPanel().add(okButton);
 		

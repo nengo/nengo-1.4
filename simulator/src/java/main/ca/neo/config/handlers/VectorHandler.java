@@ -33,7 +33,7 @@ public class VectorHandler extends BaseHandler {
 		System.arraycopy(vector, 0, copy, 0, vector.length);
 		
 		final MatrixEditor result = new MatrixEditor(new float[][]{copy}, true, false);
-		result.setPreferredSize(new Dimension(300, 85));
+		result.setPreferredSize(new Dimension(400, 85));
 		JButton okButton = new JButton("OK");
 		result.getControlPanel().add(okButton);
 		
