@@ -33,7 +33,7 @@ public class UIDecodedOrigin extends UIOrigin {
 	@Override
 	protected void destroyOriginModel() {
 		if (getModel().getNode() instanceof NEFEnsemble) {
-			((NEFEnsemble) (getModel().getNode())).removeDecodedTermination(getModel().getName());
+			((NEFEnsemble) (getModel().getNode())).removeDecodedOrigin(getModel().getName());
 			showPopupMessage("decoded termination removed from ensemble");
 		} else {
 			Util.Assert(false, "Decoded Origin not attached to NEFEnsemble");
