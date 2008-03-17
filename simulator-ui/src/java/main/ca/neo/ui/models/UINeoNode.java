@@ -701,33 +701,31 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 * @return the POrigin shown
 	 */
 	public UIOrigin showOrigin(String originName) {
-		/*
-		 * Try to find if the origin has already been created
-		 */
-		Object childOrigin = getChild(originName, UIOrigin.class);
-		if (childOrigin != null) {
-			return (UIOrigin) childOrigin;
-		}
-
-		/*
-		 * Otherwise try to create it
-		 */
 
 		UIOrigin originUI;
-		try {
-			Origin originModel = getModel().getOrigin(originName);
-			if (originModel != null) {
-				originUI = UIOrigin.createOriginUI(this, originModel);
-				addWidget(originUI);
-				return originUI;
-			} else {
-				Util.Assert(false, "Could not find origin: " + originName);
-			}
 
-		} catch (StructuralException e) {
-			UserMessages.showError(e.toString());
+		// Try to find if the origin has already been created
+		originUI = (UIOrigin) getChild(originName, UIOrigin.class);
+		if (originUI == null) {
+			// try to create it
+			try {
+				Origin originModel = getModel().getOrigin(originName);
+				if (originModel != null) {
+					originUI = UIOrigin.createOriginUI(this, originModel);
+					addWidget(originUI);
+				} else {
+					Util.Assert(false, "Could not find origin: " + originName);
+				}
+
+			} catch (StructuralException e) {
+				UserMessages.showError(e.toString());
+			}
 		}
-		return null;
+
+		if (originUI != null) {
+			originUI.setWidgetVisible(true);
+		}
+		return originUI;
 
 	}
 
@@ -760,34 +758,30 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 * @return
 	 */
 	public UITermination showTermination(String terminationName) {
-		/*
-		 * Try to find if the origin has already been created
-		 */
-		Object term = getChild(terminationName, UITermination.class);
-		if (term != null) {
-			return (UITermination) term;
-		}
-
-		/*
-		 * Otherwise try to create it
-		 */
-
 		UITermination termUI;
-		try {
 
-			Termination termModel = getModel().getTermination(terminationName);
-			if (termModel != null) {
-				termUI = UITermination.createTerminationUI(this, termModel);
-				addWidget(termUI);
-				return termUI;
-			} else {
-				Util.Assert(false, "Could not find termination: " + terminationName);
+		// Try to find if the origin has already been created
+		termUI = (UITermination) getChild(terminationName, UITermination.class);
+		if (termUI == null) {
+			// Otherwise try to create it
+			try {
+
+				Termination termModel = getModel().getTermination(terminationName);
+				if (termModel != null) {
+					termUI = UITermination.createTerminationUI(this, termModel);
+					addWidget(termUI);
+				} else {
+					Util.Assert(false, "Could not find termination: " + terminationName);
+				}
+
+			} catch (StructuralException e) {
+				UserMessages.showError(e.toString());
 			}
-
-		} catch (StructuralException e) {
-			UserMessages.showError(e.toString());
 		}
-		return null;
+		if (termUI != null) {
+			termUI.setWidgetVisible(true);
+		}
+		return termUI;
 
 	}
 
