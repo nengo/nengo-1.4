@@ -1,12 +1,13 @@
 package ca.neo.ui.configurable.descriptors.functions;
 
-import javax.swing.JDialog;
+import java.awt.Dialog;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
 import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.managers.UserConfigurer;
+import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Describes how to configure a function through the IConfigurable interface.
@@ -16,7 +17,7 @@ import ca.neo.ui.configurable.managers.UserConfigurer;
 /**
  * @author User
  */
-public abstract class AbstractFn implements IConfigurable {
+public abstract class AbstractFn implements IConfigurable, ConfigurableFunction {
 
 	private UserConfigurer configurer;
 
@@ -30,13 +31,13 @@ public abstract class AbstractFn implements IConfigurable {
 	 */
 	private String typeName;
 
-	private Class<?> functionType;
+	private Class<? extends Function> functionType;
 
 	/**
 	 * @param typeName
 	 * @param functionType
 	 */
-	public AbstractFn(String typeName, Class<?> functionType) {
+	public AbstractFn(String typeName, Class<? extends Function> functionType) {
 		super();
 
 		this.typeName = typeName;
@@ -61,18 +62,6 @@ public abstract class AbstractFn implements IConfigurable {
 		}
 	}
 
-	public void configure(JDialog parent) {
-		if (configurer == null) {
-			configurer = new UserConfigurer(this, parent);
-		}
-		try {
-			configurer.configureAndWait();
-		} catch (ConfigException e) {
-			e.defaultHandleBehavior();
-		}
-
-	}
-
 	/**
 	 * @return The function created
 	 */
@@ -80,7 +69,7 @@ public abstract class AbstractFn implements IConfigurable {
 		return function;
 	}
 
-	public Class<?> getFunctionType() {
+	public Class<? extends Function> getFunctionType() {
 		return functionType;
 	}
 
@@ -97,16 +86,38 @@ public abstract class AbstractFn implements IConfigurable {
 		// do nothing
 	}
 
+	public Function configureFunction(Dialog parent) {
+		if (parent != null) {
+
+			if (configurer == null) {
+				configurer = new UserConfigurer(this, parent);
+			}
+			try {
+				configurer.configureAndWait();
+				return getFunction();
+			} catch (ConfigException e) {
+				e.defaultHandleBehavior();
+			}
+		} else {
+			UserMessages.showError("Could not attach properties dialog");
+		}
+		return null;
+	}
+
 	/**
 	 * @param function
 	 *            function wrapper
 	 * @throws ConfigException
 	 */
-	public void setFunction(Function function) {
-		if (!getFunctionType().isInstance(function)) {
-			throw new IllegalArgumentException("Unexpected function type");
+	public final void setFunction(Function function) {
+		if (function != null) {
+			if (!getFunctionType().isInstance(function)) {
+				throw new IllegalArgumentException("Unexpected function type");
+			} else {
+				this.function = function;
+			}
 		} else {
-			this.function = function;
+			this.function = null;
 		}
 	}
 

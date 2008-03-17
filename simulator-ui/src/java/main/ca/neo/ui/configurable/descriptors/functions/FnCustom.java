@@ -10,7 +10,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
@@ -74,15 +73,16 @@ public class FnCustom extends AbstractFn {
 	}
 
 	@Override
-	public void configure(JDialog parent) {
+	public Function configureFunction(Dialog parent) {
 		if (configurer == null)
 			configurer = new InterpreterFunctionConfigurer(this, parent, interpreter);
 		try {
 			configurer.configureAndWait();
+			return getFunction();
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 		}
-
+		return null;
 	}
 
 	public PropertyDescriptor[] getConfigSchema() {

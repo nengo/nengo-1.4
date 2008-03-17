@@ -16,7 +16,7 @@ import ca.neo.ui.configurable.PropertySet;
 public class FnReflective extends AbstractFn {
 	private PropertyDescriptor[] myProperties;
 
-	public FnReflective(Class<?> functionClass, String typeName, PropertyDescriptor[] propStruct) {
+	public FnReflective(Class<? extends Function> functionClass, String typeName, PropertyDescriptor[] propStruct) {
 		super(typeName, functionClass);
 
 		this.myProperties = propStruct;

@@ -14,6 +14,7 @@ import ca.neo.ui.actions.PlotFunctionAction;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.descriptors.PFunction;
 import ca.neo.ui.configurable.descriptors.functions.AbstractFn;
+import ca.neo.ui.configurable.descriptors.functions.ConfigurableFunction;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -39,13 +40,13 @@ public class FunctionPanel extends PropertyInputPanel {
 	/**
 	 * Currently selected item in the comboBox
 	 */
-	private AbstractFn selectedConfigurableFunction;
+	private ConfigurableFunction selectedConfigurableFunction;
 
 	private JButton previewBtn;
 
-	private AbstractFn[] configurableFunctionsList;
+	private ConfigurableFunction[] configurableFunctionsList;
 
-	public FunctionPanel(PFunction property, AbstractFn[] functions) {
+	public FunctionPanel(PFunction property, ConfigurableFunction[] functions) {
 		super(property);
 		this.configurableFunctionsList = functions;
 
@@ -66,10 +67,14 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	/**
 	 * Sets up the function using the configurable Function wrapper
+	 * 
+	 * @param resetValue
+	 *            Whether to reset the ConfigurableFunction's value before
+	 *            editing
 	 */
-	protected void setParameters() {
+	protected void setParameters(boolean resetValue) {
 
-		selectedConfigurableFunction = (AbstractFn) comboBox.getSelectedItem();
+		selectedConfigurableFunction = (ConfigurableFunction) comboBox.getSelectedItem();
 
 		/*
 		 * get the JDialog parent
@@ -77,16 +82,19 @@ public class FunctionPanel extends PropertyInputPanel {
 		JDialog parent = getDialogParent();
 
 		if (parent != null) {
+			if (resetValue) {
+				selectedConfigurableFunction.setFunction(null);
+			}
+
 			/*
 			 * Configure the function
 			 */
-			// selectedType.setFunction(null);
-			selectedConfigurableFunction.configure(parent);
+			Function function = selectedConfigurableFunction.configureFunction(parent);
 
+			setValue(function);
 		} else {
 			UserMessages.showError("Could not attach properties dialog");
 		}
-		setValue(selectedConfigurableFunction.getFunction());
 
 	}
 
@@ -100,23 +108,23 @@ public class FunctionPanel extends PropertyInputPanel {
 		selectedConfigurableFunction = (AbstractFn) comboBox.getSelectedItem();
 
 		comboBox.addItemListener(new ItemListener() {
-
 			public void itemStateChanged(ItemEvent e) {
 				if (comboBox.getSelectedItem() != selectedConfigurableFunction) {
 					setValue(null);
 				}
-
 			}
-
 		});
-		JButton configureBtn = new JButton(new SetParametersAction());
 
 		add(comboBox);
+
+		JButton newBtn = new JButton(new NewParametersAction());
+		add(newBtn);
+
+		JButton configureBtn = new JButton(new SetParametersAction());
 		add(configureBtn);
 
 		previewBtn = new JButton(new PreviewFunctionAction());
 		add(previewBtn);
-
 	}
 
 	@Override
@@ -175,7 +183,7 @@ public class FunctionPanel extends PropertyInputPanel {
 	}
 
 	/**
-	 * Set up the parameters of the function
+	 * Set up the parameters of the existing function
 	 * 
 	 * @author Shu Wu
 	 */
@@ -184,11 +192,30 @@ public class FunctionPanel extends PropertyInputPanel {
 		private static final long serialVersionUID = 1L;
 
 		public SetParametersAction() {
-			super("Set");
+			super("Edit");
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			setParameters();
+			setParameters(false);
+		}
+
+	}
+
+	/**
+	 * Set up the parameters of a new function
+	 * 
+	 * @author Shu Wu
+	 */
+	class NewParametersAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public NewParametersAction() {
+			super("New");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setParameters(true);
 		}
 
 	}

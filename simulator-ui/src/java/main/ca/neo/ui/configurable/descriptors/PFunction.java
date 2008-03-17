@@ -2,11 +2,13 @@ package ca.neo.ui.configurable.descriptors;
 
 import java.util.Vector;
 
+import ca.neo.config.ClassRegistry;
 import ca.neo.math.Function;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
 import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.descriptors.functions.AbstractFn;
+import ca.neo.ui.configurable.descriptors.functions.ConfigurableFunction;
+import ca.neo.ui.configurable.descriptors.functions.FnAdvanced;
 import ca.neo.ui.configurable.descriptors.functions.FnConstant;
 import ca.neo.ui.configurable.descriptors.functions.FnCustom;
 import ca.neo.ui.configurable.descriptors.functions.FnReflective;
@@ -36,8 +38,9 @@ public class PFunction extends PropertyDescriptor {
 		this.isInputDimensionEditable = isInputDimensionEditable;
 	}
 
-	private AbstractFn[] createConfigurableFunctions() {
-		Vector<AbstractFn> functions = new Vector<AbstractFn>();
+	@SuppressWarnings("unchecked")
+	private ConfigurableFunction[] createConfigurableFunctions() {
+		Vector<ConfigurableFunction> functions = new Vector<ConfigurableFunction>();
 
 		functions.add(new FnConstant(myInputDimension, isInputDimensionEditable));
 
@@ -61,12 +64,18 @@ public class PFunction extends PropertyDescriptor {
 			functions.add(gaussianPDF);
 		}
 
-		return functions.toArray(new AbstractFn[0]);
+		for (Class<?> type : ClassRegistry.getInstance().getRegisterableTypes()) {
+			if (Function.class.isAssignableFrom(type)) {
+				functions.add(new FnAdvanced((Class<? extends Function>) type));
+			}
+		}
+
+		return functions.toArray(new ConfigurableFunction[0]);
 	}
 
 	@Override
 	protected FunctionPanel createInputPanel() {
-		AbstractFn[] functions = createConfigurableFunctions();
+		ConfigurableFunction[] functions = createConfigurableFunctions();
 		return new FunctionPanel(this, functions);
 	}
 
