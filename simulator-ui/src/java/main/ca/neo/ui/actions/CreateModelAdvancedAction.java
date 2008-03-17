@@ -3,7 +3,9 @@ package ca.neo.ui.actions;
 import ca.neo.config.ui.NewConfigurableDialog;
 import ca.neo.model.Node;
 import ca.neo.ui.models.INodeContainer;
+import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.INodeContainer.ContainerException;
+import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
@@ -31,7 +33,10 @@ public class CreateModelAdvancedAction extends StandardAction {
 			throw new UserCancelledException();
 		} else if (obj instanceof Node) {
 			try {
-				container.addNodeModel((Node) obj);
+				UINeoNode nodeUI = container.addNodeModel((Node) obj);
+				if (nodeUI instanceof NodeContainer) {
+					((NodeContainer) (nodeUI)).openViewer();
+				}
 			} catch (ContainerException e) {
 				throw new ActionException(e.getMessage());
 			}

@@ -1,5 +1,6 @@
 package ca.neo.ui.models.viewers;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,7 +62,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 		initialize();
 	}
 
-	
 	private void initChildModelListener() {
 		myNodeListener = new MyNodeListener();
 
@@ -110,6 +110,12 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 			getGround().addChild(node);
 		}
 
+	}
+
+	public Point2D localToView(Point2D localPoint) {		
+		localPoint = getSky().parentToLocal(localPoint);
+		localPoint = getSky().localToView(localPoint);
+		return localPoint;
 	}
 
 	protected abstract boolean canRemoveChildModel(Node node);

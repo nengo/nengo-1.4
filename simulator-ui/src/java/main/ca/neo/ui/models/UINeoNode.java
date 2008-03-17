@@ -1,5 +1,6 @@
 package ca.neo.ui.models;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,10 @@ import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.actions.AddProbeAction;
 import ca.neo.ui.actions.CopyAction;
 import ca.neo.ui.actions.CutAction;
+import ca.neo.ui.actions.PasteAction;
 import ca.neo.ui.actions.SaveNodeAction;
+import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.UserDialogs;
 import ca.neo.ui.models.INodeContainer.ContainerException;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UIFunctionInput;
@@ -178,6 +182,28 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	}
 
+	class RenameNodeAction extends StandardAction {
+		private static final long serialVersionUID = 1L;
+
+		public RenameNodeAction(String description) {
+			super(description);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			try {
+				String newName = UserDialogs.showDialogString("Enter name", getName());
+
+				getModel().setName(newName);
+			} catch (ConfigException e) {
+				throw new UserCancelledException();
+			} catch (StructuralException e) {
+				UserMessages.showWarning("Could not rename: " + e.getMessage());
+			}
+		}
+
+	}
+
 	@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
@@ -187,6 +213,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 		menu.addSection("File");
 		menu.addAction(new SaveNodeAction(this));
+		menu.addAction(new RenameNodeAction("Rename"));
 
 		menu.addSection("View");
 		AbstractMenuBuilder docMenu = menu.addSubMenu("Documentation");
@@ -398,12 +425,26 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 				INodeContainer nodeContainer = (INodeContainer) wo;
 
 				try {
-					nodeContainer.addNodeModel(getModel());
+					Node node = getModel();
+					Point2D newPosition = localToGlobal(new Point2D.Double(0, 0));
+					newPosition = wo.globalToLocal(newPosition);
+					newPosition = nodeContainer.localToView(newPosition);
 
 					/*
 					 * This removes the node from it's parent and externalities
 					 */
 					destroyModel();
+
+					/*
+					 * Adds node
+					 */
+					try {
+						PasteAction.ensureNonConflictingName(node, nodeContainer);
+						nodeContainer.addNodeModel(getModel(), newPosition.getX(), newPosition
+								.getY());
+					} catch (UserCancelledException e) {
+						e.defaultHandleBehavior();
+					}
 				} catch (ContainerException e) {
 					UserMessages.showWarning("Could not drop into container: " + e.getMessage());
 				}

@@ -7,13 +7,16 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
+import org.python.core.PyClass;
 import org.python.util.PythonInterpreter;
 import org.python.util.PythonObjectInputStream;
-import org.python.core.PyClass;
+
 import ca.neo.model.Node;
 import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.models.INodeContainer;
+import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.INodeContainer.ContainerException;
+import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.TrackedAction;
@@ -154,7 +157,10 @@ public class OpenNeoFileAction extends StandardAction {
 
 		if (objLoaded instanceof Node) {
 			try {
-				nodeContainer.addNodeModel((Node) objLoaded);
+				UINeoNode nodeUI = nodeContainer.addNodeModel((Node) objLoaded);
+				if (nodeUI instanceof NodeContainer) {
+					((NodeContainer) (nodeUI)).openViewer();
+				}
 			} catch (ContainerException e) {
 				throw new ActionException(e.getMessage());
 			}

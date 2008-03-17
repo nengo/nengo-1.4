@@ -40,7 +40,22 @@ public class NengoClipboard {
 	}
 
 	public Node getContents() {
-		return selectedObj;
+		if (selectedObj != null) {
+			Node currentObj = selectedObj;
+
+			/*
+			 * If the object supports cloning, use it to make another model
+			 */
+			try {
+				selectedObj = selectedObj.clone();
+			} catch (CloneNotSupportedException e) {
+				selectedObj = null;
+			}
+
+			return currentObj;
+		} else {
+			return null;
+		}
 	}
 
 }

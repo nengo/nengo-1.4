@@ -380,14 +380,6 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		}
 	}
 
-	public void addNodeModel(Node node) throws ContainerException {
-		try {
-			getModel().addNode(node);
-		} catch (StructuralException e) {
-			throw new ContainerException(e.toString());
-		}
-	}
-
 	@Override
 	public void applyDefaultLayout() {
 		if (getUINodes().size() != 0) {
@@ -407,8 +399,7 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 	public void constructMenu(PopupMenuBuilder menu) {
 		Node clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
 		if (clipboardNode != null) {
-			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here",
-					clipboardNode, this));
+			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here", this));
 		}
 
 		super.constructMenu(menu);
@@ -724,6 +715,28 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		} catch (StructuralException e) {
 			// Node does not exist
 			return null;
+		}
+	}
+
+	public UINeoNode addNodeModel(Node node) throws ContainerException {
+		return addNodeModel(node, null, null);
+	}
+
+	public UINeoNode addNodeModel(Node node, Double posX, Double posY) throws ContainerException {
+		try {
+			getModel().addNode(node);
+
+			UINeoNode nodeUI = UINeoNode.createNodeUI(node);
+
+			if (posX != null && posY != null) {
+				nodeUI.setOffset(posX, posY);
+				addUINode(nodeUI, false, false);
+			} else {
+				addUINode(nodeUI, true, false);
+			}
+			return nodeUI;
+		} catch (StructuralException e) {
+			throw new ContainerException(e.toString());
 		}
 	}
 

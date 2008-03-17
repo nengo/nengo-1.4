@@ -1,6 +1,9 @@
 ******************************************
  Done
 *******************************************
+03/16/2008 - Added rename to Node menu
+03/16/2008 - Name conflicts are resolved on paste, and drag-drop
+
 03/16/2008 - Limited drag & drop functionality added. Can only drag-drop top->down. 
 			Cannot drag & drop from inside to outside of a Container			
 03/16/2008 - Cut & Paste moves the model, Copy & Paste uses cloning
@@ -10,14 +13,7 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Requests:
-	Need setName() on Node
-	Exception while cloning NEFEnsemble
-		java.lang.NullPointerException
-		at ca.neo.model.nef.impl.DecodedTermination.clone(DecodedTermination.java:404)
-		at ca.neo.model.nef.impl.NEFEnsembleImpl.clone(NEFEnsembleImpl.java:629)
-		at ca.neo.model.nef.impl.NEFEnsembleImpl.clone(NEFEnsembleImpl.java:1)
-		at ca.neo.ui.actions.CopyAction.action(CopyAction.java:24)
+Add target argument to ActionExceptions, if no target, then create a mockTarget
 
 Add ability to surface DataType and Description for Fields of PropertyInputPanel
 

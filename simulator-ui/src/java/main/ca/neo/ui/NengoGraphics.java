@@ -3,6 +3,7 @@ package ca.neo.ui;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -40,7 +41,6 @@ import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
-import ca.neo.ui.models.nodes.NodeContainer;
 import ca.neo.ui.script.ScriptConsole;
 import ca.neo.ui.script.ScriptEditor;
 import ca.neo.ui.util.NengoClipboard;
@@ -447,7 +447,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 
 			if (nodeContainer != null) {
 
-				pasteAction = new PasteAction("Paste", getClipboard().getContents(), nodeContainer);
+				pasteAction = new PasteAction("Paste", nodeContainer);
 			}
 		}
 
@@ -469,11 +469,11 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	 * 
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
-	public void addNodeModel(Node node) {
-		addNodeModel(node, null, null);
+	public UINeoNode addNodeModel(Node node) {
+		return addNodeModel(node, null, null);
 	}
 
-	public void addNodeModel(Node node, Double posX, Double posY) {
+	public UINeoNode addNodeModel(Node node, Double posX, Double posY) {
 		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
 
 		if (posX != null && posY != null) {
@@ -482,13 +482,10 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 			getWorld().getGround().addChild(nodeUI);
 		} else {
 			getWorld().getGround().addChildFancy(nodeUI);
-
-			if (nodeUI instanceof NodeContainer) {
-				((NodeContainer) (nodeUI)).openViewer();
-			}
 		}
 
 		DragAction.dropNode(nodeUI);
+		return nodeUI;
 	}
 
 	public void captureInDataViewer(Network network) {
@@ -655,6 +652,12 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 			ScriptEditor.openEditor();
 		}
 
+	}
+
+	public Point2D localToView(Point2D localPoint) {
+		localPoint = getWorld().getSky().parentToLocal(localPoint);
+		localPoint = getWorld().getSky().localToView(localPoint);
+		return localPoint;
 	}
 }
 

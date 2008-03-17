@@ -10,6 +10,7 @@ import ca.neo.ui.models.INodeContainer.ContainerException;
 import ca.neo.ui.models.constructors.AbstractConstructable;
 import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
+import ca.neo.ui.models.nodes.NodeContainer;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.util.UserMessages;
@@ -77,7 +78,10 @@ public class CreateModelAction extends ReversableAction {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {
 					try {
-						container.addNodeModel(nodeCreated.getModel());
+						UINeoNode nodeUI = container.addNodeModel(nodeCreated.getModel());
+						if (nodeUI instanceof NodeContainer) {
+							((NodeContainer) (nodeUI)).openViewer();
+						}
 					} catch (ContainerException e) {
 						UserMessages.showWarning("Could not add node" + e.getMessage());
 					}
