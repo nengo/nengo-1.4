@@ -33,7 +33,7 @@ public class SaveNodeAction extends StandardAction {
 	 *            Node to be saved
 	 */
 	public SaveNodeAction(UINeoNode nodeUI) {
-		super("Save");
+		super("Save "+nodeUI.getName());
 
 		this.nodeUI = nodeUI;
 	}
