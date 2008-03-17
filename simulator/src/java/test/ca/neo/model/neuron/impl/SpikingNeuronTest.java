@@ -76,7 +76,7 @@ public class SpikingNeuronTest extends TestCase {
 		assertEquals(SimulationMode.DEFAULT, myNeuron.getMode());
 		
 		myNeuron.setMode(SimulationMode.PRECISE);
-		assertEquals(SimulationMode.DEFAULT, myNeuron.getMode());
+		assertEquals(SimulationMode.PRECISE, myNeuron.getMode());
 		
 		myNeuron.setMode(SimulationMode.CONSTANT_RATE);
 		assertEquals(SimulationMode.CONSTANT_RATE, myNeuron.getMode());

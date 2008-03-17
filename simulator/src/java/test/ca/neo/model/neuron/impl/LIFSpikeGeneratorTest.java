@@ -113,13 +113,13 @@ public class LIFSpikeGeneratorTest extends TestCase {
 
 		LIFSpikeGenerator sg = new LIFSpikeGenerator(maxTimeStep, tauRC[0], tauRef[0]);
 		assertSpikesCloseToRate(sg, current[0], 1);
-		assertSpikesCloseToRate(sg, current[1], 3);
+		assertSpikesCloseToRate(sg, current[1], 4);
 		assertSpikesCloseToRate(sg, current[2], 5);
 				
 		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[0], tauRef[1]);
 		assertSpikesCloseToRate(sg, current[0], 1);
 		assertSpikesCloseToRate(sg, current[1], 4);
-		assertSpikesCloseToRate(sg, current[2], 3);
+		assertSpikesCloseToRate(sg, current[2], 4);
 				
 		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[1], tauRef[0]);
 		assertSpikesCloseToRate(sg, current[0], 1);
@@ -131,28 +131,75 @@ public class LIFSpikeGeneratorTest extends TestCase {
 		assertSpikesCloseToRate(sg, current[1], 1);
 		assertSpikesCloseToRate(sg, current[2], 10);
 	}
+		
+		
+public void testRunPrecise() throws SimulationException {
+		LIFSpikeGenerator sg = new LIFSpikeGenerator(0.001f, 0.02f, 0.002f);
+
+		assertSpikesCloseToRate(sg, 1.46335061f, 1, SimulationMode.DEFAULT);
+		assertSpikesCloseToRate(sg, 1.46335061f, 1, SimulationMode.PRECISE);
+
+		assertSpikesCloseToRate(sg, 4.80514111f, 10, SimulationMode.DEFAULT);		
+		assertSpikesCloseToRate(sg, 4.80514111f, 4, SimulationMode.PRECISE);		
+
+		
+		float maxTimeStep = .0005f;
+		float[] current = new float[]{0f, 2f, 5f};
+		float[] tauRC = new float[]{0.01f, .02f};
+		float[] tauRef = new float[]{.001f, .002f};
+
+		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[0], tauRef[0]);
+		//assertSpikesCloseToRate(sg, current[0], 1, SimulationMode.PRECISE);
+		assertSpikesCloseToRate(sg, current[1], 2, SimulationMode.PRECISE);
+		assertSpikesCloseToRate(sg, current[2], 5, SimulationMode.PRECISE);
+				
+		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[0], tauRef[1]);
+		assertSpikesCloseToRate(sg, current[0], 1, SimulationMode.PRECISE);
+		assertSpikesCloseToRate(sg, current[1], 3, SimulationMode.PRECISE);
+		assertSpikesCloseToRate(sg, current[2], 3, SimulationMode.PRECISE);
+				
+		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[1], tauRef[0]);
+		assertSpikesCloseToRate(sg, current[0], 1, SimulationMode.PRECISE);
+		assertSpikesCloseToRate(sg, current[1], 1, SimulationMode.PRECISE);
+		assertSpikesCloseToRate(sg, current[2], 2, SimulationMode.PRECISE);
+
+		sg = new LIFSpikeGenerator(maxTimeStep, tauRC[1], tauRef[1]);
+		assertSpikesCloseToRate(sg, current[0], 1, SimulationMode.PRECISE);
+		assertSpikesCloseToRate(sg, current[1], 1, SimulationMode.PRECISE);
+		assertSpikesCloseToRate(sg, current[2], 2, SimulationMode.PRECISE);
+		
+		
+
+}
 
 	private static void assertBetween(float value, float low, float high) {
 		assertTrue(value + " is out of range", value > low && value < high);
 	}
-	
+
 	private static void assertSpikesCloseToRate(LIFSpikeGenerator sg, float current, float tolerance) throws SimulationException {
+		assertSpikesCloseToRate(sg,current,tolerance,SimulationMode.DEFAULT);
+	}
+	
+	
+	private static void assertSpikesCloseToRate(LIFSpikeGenerator sg, float current, float tolerance, SimulationMode mode) throws SimulationException {
 		float stepSize = .001f;
 		int steps = 1000;
 		sg.setMode(SimulationMode.CONSTANT_RATE);
+		sg.reset(false);
 		float rate = ((RealOutput) sg.run(new float[1], new float[]{current})).getValues()[0];
 		
 		int spikeCount = 0;
-		sg.setMode(SimulationMode.DEFAULT);
+		sg.setMode(mode);
+		sg.reset(false);
 		for (int i = 0; i < steps; i++) {
 			boolean spike = ((SpikeOutput) sg.run(new float[]{stepSize * (float) i, stepSize * (float) (i+1)}, 
 					new float[]{current, current})).getValues()[0];
-			
 			if (spike) {
 				spikeCount++;
 			}
 		}
 		
+		//System.out.println(spikeCount + " spikes in simulation, " + rate + " expected");
 		assertTrue(spikeCount + " spikes in simulation, " + rate + " expected", 
 				spikeCount > rate-tolerance && spikeCount < rate+tolerance);
 	}

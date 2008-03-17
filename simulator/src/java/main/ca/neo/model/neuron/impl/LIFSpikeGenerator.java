@@ -15,6 +15,7 @@ import ca.neo.model.SimulationMode;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.impl.SpikeOutputImpl;
+import ca.neo.model.impl.PreciseSpikeOutputImpl;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.TimeSeries1D;
@@ -45,7 +46,9 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	
 	private float myVoltage;
 	private float myTimeSinceLastSpike;
-	private float myTauRefNext; //varies randomly to avoid bias and synchronized variations due to floating point comparisons 
+	private float myTauRefNext; //varies randomly to avoid bias and synchronized variations due to floating point comparisons
+	
+	private float myPreviousVoltage; //for linear interpolation of when spike occurs
 	
 	private float[] myTime;
 	private float[] myVoltageHistory;
@@ -87,9 +90,10 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myTauRef = tauRef;
 		myTauRefNext = tauRef;
 		myInitialVoltage = initialVoltage;
+		myPreviousVoltage = myInitialVoltage;
 		
 		myMode = SimulationMode.DEFAULT;
-		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
+		mySupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE, SimulationMode.PRECISE};
 
 		reset(false);
 	}
@@ -141,6 +145,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		myVoltage = myInitialVoltage;
 		myTime = ourNullTime;
 		myVoltageHistory = ourNullVoltageHistory;
+		myPreviousVoltage = myInitialVoltage;
 	}		
 
 	/**
@@ -151,8 +156,11 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		
 		if (myMode.equals(SimulationMode.CONSTANT_RATE) || myMode.equals(SimulationMode.RATE)) {
 			result = new RealOutputImpl(new float[]{doConstantRateRun(time[0], current[0])}, Units.SPIKES_PER_S, time[time.length-1]);
+		} else if (myMode.equals(SimulationMode.PRECISE)) {
+			result = new PreciseSpikeOutputImpl(new float[]{doPreciseSpikingRun(time, current)}, Units.SPIKES, time[time.length-1]);
 		} else {
-			result = new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES, time[time.length-1]);
+			//result = new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES, time[time.length-1]);
+			result = new SpikeOutputImpl(new boolean[]{doPreciseSpikingRun(time, current)>=0}, Units.SPIKES, time[time.length-1]);
 		}
 		
 		return result;
@@ -204,6 +212,62 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		
 		return spiking;	
 	}
+
+	private float doPreciseSpikingRun(float[] time, float[] current) {
+		if (time.length < 2) {
+			throw new IllegalArgumentException("Arg time must have length at least 2");
+		}
+		if (time.length != current.length) {
+			throw new IllegalArgumentException("Args time and current must have equal length");
+		}
+		
+		float len = time[time.length - 1] - time[0];
+		int steps = (int) Math.ceil(len / myMaxTimeStep);
+		float dt = len / steps;
+		
+		myTime = new float[steps];
+		myVoltageHistory = new float[steps];
+//		mySpikeTimes = new ArrayList(10);
+		
+		int inputIndex = 0;
+
+		float spikeTimeFromLastTimeStep=-1;
+		for (int i = 0; i < steps; i++) {
+			myTime[i] = time[0] + i*dt;
+
+			while (time[inputIndex+1] <= myTime[i]) {
+				inputIndex++; 
+			}			 
+			float I = current[inputIndex];
+			   
+			float dV = (1 / myTauRC) * (I*R - myVoltage);			 
+			myTimeSinceLastSpike = myTimeSinceLastSpike + dt;
+			if (myTimeSinceLastSpike < myTauRef) {
+				dV = 0;
+			} else if (myTimeSinceLastSpike < myTauRef+dt) {
+				dV*=(myTimeSinceLastSpike-myTauRef)/dt;				
+			}
+			myPreviousVoltage = myVoltage;
+			myVoltage = Math.max(0, myVoltage + dt*dV);
+			myVoltageHistory[i] = myVoltage;
+			
+			if (myVoltage >= Vth) {
+				float dSpike=(Vth-myPreviousVoltage)*dt/(myVoltage-myPreviousVoltage);
+				myTimeSinceLastSpike = dt-dSpike;
+
+				spikeTimeFromLastTimeStep=i*dt+dSpike;				
+				myVoltage = 0;		
+			}
+		}
+		
+		return spikeTimeFromLastTimeStep;	
+	}
+	
+	public float getVoltage() {
+		return myVoltage;
+	}
+	
+	
 	
 	//Note that no voltage history is available after a constant-rate run.
 	private float doConstantRateRun(float time, float current) {
