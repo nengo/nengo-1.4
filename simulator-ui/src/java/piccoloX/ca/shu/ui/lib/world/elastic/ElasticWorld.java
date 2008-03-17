@@ -159,7 +159,7 @@ public class ElasticWorld extends WorldImpl {
 				e.getTargetException().printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new ActionException("Could not apply layout: " + e.getMessage());
+				throw new ActionException("Could not apply layout: " + e.getMessage(), e);
 			}
 
 			layout.initialize(getLayoutBounds());

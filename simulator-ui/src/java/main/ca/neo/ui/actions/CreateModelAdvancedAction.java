@@ -38,7 +38,7 @@ public class CreateModelAdvancedAction extends StandardAction {
 					((NodeContainer) (nodeUI)).openViewer();
 				}
 			} catch (ContainerException e) {
-				throw new ActionException(e.getMessage());
+				throw new ActionException(e.getMessage(), e);
 			}
 		} else {
 			throw new ActionException(

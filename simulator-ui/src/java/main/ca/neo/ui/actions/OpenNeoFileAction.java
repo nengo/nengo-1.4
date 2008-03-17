@@ -162,7 +162,7 @@ public class OpenNeoFileAction extends StandardAction {
 					((NodeContainer) (nodeUI)).openViewer();
 				}
 			} catch (ContainerException e) {
-				throw new ActionException(e.getMessage());
+				throw new ActionException(e);
 			}
 		} else {
 			UserMessages.showError("File does not contain a Node");

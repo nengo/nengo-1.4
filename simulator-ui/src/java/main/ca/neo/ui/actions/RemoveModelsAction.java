@@ -51,7 +51,7 @@ public class RemoveModelsAction extends StandardAction {
 					model.destroyModel();
 				}
 			} catch (Exception e) {
-				throw new ActionException("Could not remove all objects: " + e.getMessage());
+				throw new ActionException("Could not remove all objects: " + e.getMessage(), e);
 			}
 		} else {
 			throw new ActionException("Action cancelled by user", false);

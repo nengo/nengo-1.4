@@ -91,7 +91,7 @@ public class RunSimulatorAction extends StandardAction {
 		} catch (ConfigException e) {
 			e.defaultHandleBehavior();
 
-			throw new ActionException("Simulator configuration not complete", false);
+			throw new ActionException("Simulator configuration not complete", false, e);
 
 		}
 

@@ -612,7 +612,7 @@ class ExportMatlabAction extends ExportAction {
 			try {
 				matlabExporter.write(file);
 			} catch (IOException e) {
-				throw new ActionException("Error writing file: " + e.getMessage());
+				throw new ActionException("Error writing file: " + e.getMessage(), e);
 			}
 		}
 

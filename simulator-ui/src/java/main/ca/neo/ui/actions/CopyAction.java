@@ -25,7 +25,7 @@ public class CopyAction extends StandardAction {
 			NengoGraphics.getInstance().getClipboard().setContents(copiedNode);
 			processNodeUI(nodeUI);
 		} catch (CloneNotSupportedException e) {
-			throw new ActionException("Could not clone node");
+			throw new ActionException("Could not clone node", e);
 		}
 	}
 

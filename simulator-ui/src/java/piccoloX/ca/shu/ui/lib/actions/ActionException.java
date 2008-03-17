@@ -17,16 +17,22 @@ public class ActionException extends UIException {
 	 */
 	private final boolean showWarning;
 
+	private Exception targetException;
+
 	public ActionException(Exception e) {
-		this(e.getMessage(), true);
+		this(e.getMessage(), true, e);
 	}
 
-	/**
-	 * @param description
-	 *            Description of the exception
-	 */
 	public ActionException(String description) {
-		this(description, true);
+		this(description, true, null);
+	}
+
+	public ActionException(String description, Exception e) {
+		this(description, true, e);
+	}
+
+	public ActionException(String description, boolean showWarningPopup) {
+		this(description, showWarningPopup, null);
 	}
 
 	/**
@@ -34,9 +40,13 @@ public class ActionException extends UIException {
 	 *            Description of the exception
 	 * @param showWarningPopup
 	 *            If true, a warning should be shown to the user
+	 * @param targetException
+	 *            Target exception
 	 */
-	public ActionException(String description, boolean showWarningPopup) {
+	public ActionException(String description, boolean showWarningPopup, Exception targetException) {
 		super(description);
+
+		this.targetException = targetException;
 
 		this.showWarning = showWarningPopup;
 
@@ -52,6 +62,13 @@ public class ActionException extends UIException {
 		} else {
 			Util.debugMsg("Action Exception: " + toString());
 		}
+	}
+
+	/**
+	 * @return Target Exception. Null, if it dosen't exist
+	 */
+	public Exception getTargetException() {
+		return targetException;
 	}
 
 }

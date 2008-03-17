@@ -35,7 +35,7 @@ public class AddProbeAction extends ReversableAction {
 		try {
 			probeCreated = myNode.addProbe(state.getKey());
 		} catch (SimulationException e) {
-			throw new ActionException("Probe could not be added: " + e.getMessage(), true);
+			throw new ActionException("Probe could not be added: " + e.getMessage(), true, e);
 		}
 	}
 
