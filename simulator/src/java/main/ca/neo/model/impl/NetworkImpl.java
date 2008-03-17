@@ -144,8 +144,14 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 				throw new StructuralException("This Network already contains a Node names " + ne.getNewName());
 			}
 			
-			myNodeMap.put(ne.getNewName(), myNodeMap.get(ne.getOldName()));
-			myNodeMap.remove(ne.getOldName());
+			/*
+			 * Only do the swap if the name has changed. 
+			 * Otherwise, the node will be dereferenced from the map. 
+			 */
+			if (!ne.getOldName().equals(ne.getNewName())) {
+				myNodeMap.put(ne.getNewName(), myNodeMap.get(ne.getOldName()));
+				myNodeMap.remove(ne.getOldName());
+			}
 		}
 	}
 
