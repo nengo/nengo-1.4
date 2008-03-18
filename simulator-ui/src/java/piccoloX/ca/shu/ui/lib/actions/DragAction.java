@@ -34,16 +34,13 @@ public class DragAction extends ReversableAction {
 	public DragAction(Collection<WorldObject> selectedObjects) {
 		super("Drag operation");
 
-		selectedObjectsRef = new ArrayList<WeakReference<WorldObject>>(
-				selectedObjects.size());
+		selectedObjectsRef = new ArrayList<WeakReference<WorldObject>>(selectedObjects.size());
 
-		objectStates = new HashMap<WeakReference<WorldObject>, ObjectState>(
-				selectedObjects.size());
+		objectStates = new HashMap<WeakReference<WorldObject>, ObjectState>(selectedObjects.size());
 
 		for (WorldObject wo : selectedObjects) {
 
-			WeakReference<WorldObject> woRef = new WeakReference<WorldObject>(
-					wo);
+			WeakReference<WorldObject> woRef = new WeakReference<WorldObject>(wo);
 			selectedObjectsRef.add(woRef);
 
 			ObjectState state = new ObjectState(wo.getParent(), wo.getOffset());
@@ -110,17 +107,28 @@ public class DragAction extends ReversableAction {
 		if (node instanceof DroppableX || node instanceof Droppable) {
 			WorldObject worldLayer = node.getWorldLayer();
 
-			Collection<WorldObject> targets = worldLayer
-					.findIntersectingNodes(node.localToGlobal(node.getBounds()));
+			Collection<WorldObject> allTargets = worldLayer.findIntersectingNodes(node
+					.localToGlobal(node.getBounds()));
+
+			Collection<WorldObject> goodTargets = new ArrayList<WorldObject>(allTargets.size());
+
+			/*
+			 * Do not allow a Node to be dropped on a child of itself
+			 */
+			for (WorldObject target : allTargets) {
+				if (!node.isAncestorOf(target)) {
+					goodTargets.add(target);
+				}
+			}
 
 			if (node instanceof DroppableX) {
 				DroppableX droppable = (DroppableX) node;
-				droppable.droppedOnTargets(targets);
+				droppable.droppedOnTargets(goodTargets);
 			}
 			if (node instanceof Droppable) {
 				Droppable droppable = (Droppable) node;
 				WorldObject target = null;
-				for (WorldObject potentialTarget : targets) {
+				for (WorldObject potentialTarget : goodTargets) {
 					if (droppable.acceptTarget(potentialTarget)) {
 						target = potentialTarget;
 					}
@@ -131,8 +139,8 @@ public class DragAction extends ReversableAction {
 					}
 				}
 				if (target != null) {
-					Point2D position = target.globalToLocal(node
-							.localToGlobal(new Point2D.Double(0, 0)));
+					Point2D position = target.globalToLocal(node.localToGlobal(new Point2D.Double(
+							0, 0)));
 
 					node.setOffset(position);
 					target.addChild(node);

@@ -1,6 +1,5 @@
 package ca.shu.ui.lib.world.piccolo;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -8,8 +7,6 @@ import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.objects.Window;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PNodeFilter;
 
 public abstract class WorldLayerImpl extends WorldObjectImpl implements WorldLayer {
 
@@ -28,32 +25,13 @@ public abstract class WorldLayerImpl extends WorldObjectImpl implements WorldLay
 		super(name, node);
 	}
 
-	public Collection<Window> getAllWindows() {
-		PNodeFilter filter = new PNodeFilter() {
-
-			public boolean accept(PNode node) {
-				if (node instanceof PiccoloNodeInWorld) {
-					if (((PiccoloNodeInWorld) node).getWorldObject() instanceof Window) {
-						return true;
-					}
-				}
-				return false;
+	public Collection<Window> getWindows() {
+		LinkedList<Window> windows = new LinkedList<Window>();
+		for (WorldObject wo : getChildren()) {
+			if (wo instanceof Window) {
+				windows.add((Window) wo);
 			}
-
-			public boolean acceptChildrenOf(PNode node) {
-				return accept(node);
-			}
-
-		};
-		LinkedList<PNode> filteredNodes = new LinkedList<PNode>();
-		getPiccolo().getAllNodes(filter, filteredNodes);
-
-		ArrayList<Window> windows = new ArrayList<Window>(filteredNodes.size());
-
-		for (PNode node : filteredNodes) {
-			windows.add((Window) ((PiccoloNodeInWorld) node).getWorldObject());
 		}
-
 		return windows;
 	}
 

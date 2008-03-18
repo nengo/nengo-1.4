@@ -259,8 +259,8 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * @return A collection of all the windows in this world
 	 */
 	public Collection<Window> getAllWindows() {
-		Collection<Window> skyWindows = getSky().getAllWindows();
-		Collection<Window> groundWindows = getGround().getAllWindows();
+		Collection<Window> skyWindows = getSky().getWindows();
+		Collection<Window> groundWindows = getGround().getWindows();
 
 		ArrayList<Window> allWindows = new ArrayList<Window>(skyWindows.size()
 				+ groundWindows.size());
