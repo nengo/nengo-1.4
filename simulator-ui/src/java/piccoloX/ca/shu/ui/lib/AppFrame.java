@@ -133,7 +133,7 @@ public abstract class AppFrame extends JFrame {
 		menuBar.setBorder(null);
 		Style.applyMenuStyle(menuBar, true);
 
-		MenuBuilder fileMenu = new MenuBuilder("Start");
+		MenuBuilder fileMenu = new MenuBuilder("File");
 		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_S);
 		initFileMenu(fileMenu);
 		fileMenu.addAction(new ExitAction(this, "Quit"), KeyEvent.VK_P);

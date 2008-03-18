@@ -118,16 +118,10 @@ public class ModelIcon extends WorldObjectImpl implements Listener {
 		parent.doubleClicked();
 	}
 
-	// @Override
-	// public void signalBoundsChanged() {
-	//
-	// super.signalBoundsChanged();
-	//
-	// /*
-	// * Pass on the message to icon
-	// */
-	// iconReal.signalBoundsChanged();
-	// }
+	@Override
+	public void altClicked() {
+		parent.altClicked();
+	}
 
 	/**
 	 * @return the name of the label
@@ -159,8 +153,7 @@ public class ModelIcon extends WorldObjectImpl implements Listener {
 			if (parent.getName().compareTo("") == 0)
 				label.setText("unnamed " + parent.getTypeName());
 			else
-				label.setText(parent.getName() + " (" + parent.getTypeName()
-						+ ")");
+				label.setText(parent.getName() + " (" + parent.getTypeName() + ")");
 		} else {
 			if (parent.getName().compareTo("") == 0)
 				label.setText("unnamed");

@@ -25,4 +25,9 @@ public abstract class UINeoModel extends ModelObject {
 		super.constructMenu(menu);
 		menu.addAction(new ConfigureAction("Configure", getModel()));
 	}
+
+	@Override
+	public void altClicked() {
+		(new ConfigureAction("Configure", getModel())).doAction();
+	}
 }

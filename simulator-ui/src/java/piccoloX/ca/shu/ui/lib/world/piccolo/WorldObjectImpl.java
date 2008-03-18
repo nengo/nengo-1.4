@@ -911,6 +911,10 @@ public class WorldObjectImpl implements WorldObject {
 		}
 	}
 
+	public void altClicked() {
+		// override this to implement action
+	}
+
 }
 
 /**

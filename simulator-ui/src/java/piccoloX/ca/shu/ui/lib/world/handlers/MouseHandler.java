@@ -61,8 +61,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 	 * @return Interactable object
 	 */
 	private Interactable getInteractableFromEvent(PInputEvent event) {
-		Interactable obj = (Interactable) Util.getNodeFromPickPath(event,
-				Interactable.class);
+		Interactable obj = (Interactable) Util.getNodeFromPickPath(event, Interactable.class);
 
 		if (obj == null || !world.isAncestorOf(obj)) {
 			return null;
@@ -77,8 +76,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 	 */
 	private boolean maybeTriggerPopup(PInputEvent event) {
 		if (event.isPopupTrigger()) {
-			JPopupMenu menuToShow = world
-					.getSelectionMenu(world.getSelection());
+			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
 
 			if (menuToShow == null && (interactableObj != null)
 					&& (interactableObj == getInteractableFromEvent(event))) {
@@ -88,8 +86,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 			if (menuToShow != null) {
 				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
 
-				menuToShow.show(e.getComponent(), e.getPoint().x,
-						e.getPoint().y);
+				menuToShow.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
 				menuToShow.setVisible(true);
 			}
 			return true;
@@ -99,24 +96,35 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	@Override
 	public void mouseClicked(PInputEvent event) {
-		if (event.getClickCount() == 2) {
-			PNode node = event.getPickedNode();
+		boolean altClicked = false;
+		boolean doubleClicked = false;
 
+		if (event.isAltDown()) {
+			altClicked = true;
+		} else if (event.getClickCount() == 2) {
+			doubleClicked = true;
+		}
+
+		if (altClicked || doubleClicked) {
+			PNode node = event.getPickedNode();
 			while (node != null) {
 				if (node instanceof PiccoloNodeInWorld) {
 
-					WorldObject wo = ((PiccoloNodeInWorld) node)
-							.getWorldObject();
+					WorldObject wo = ((PiccoloNodeInWorld) node).getWorldObject();
 
 					if (wo.isSelectable()) {
-						wo.doubleClicked();
+						if (doubleClicked) {
+							wo.doubleClicked();
+						}
+						if (altClicked) {
+							wo.altClicked();
+						}
 						break;
 					}
 
 				}
 				node = node.getParent();
 			}
-
 		}
 		super.mouseClicked(event);
 
@@ -131,8 +139,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 		 * Show cursor and frame around interactable objects NOTE: Do not show
 		 * cursor and frame around Windows or Worlds
 		 */
-		if (obj == null || (obj instanceof Window)
-				|| (obj instanceof WorldImpl)) {
+		if (obj == null || (obj instanceof Window) || (obj instanceof WorldImpl)) {
 			if (handCursorShown) {
 				handCursorShown = false;
 				event.getComponent().popCursor();

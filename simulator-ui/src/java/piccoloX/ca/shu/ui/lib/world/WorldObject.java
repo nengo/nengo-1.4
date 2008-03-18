@@ -86,6 +86,11 @@ public interface WorldObject extends NamedObject, Destroyable {
 	 * Called if this object is double clicked on
 	 */
 	public void doubleClicked();
+	
+	/**
+	 * Called if this object is clicked on with the 'alt' key held
+	 */
+	public void altClicked();
 
 	/**
 	 * Offset this node relative to the parents coordinate system, and is NOT

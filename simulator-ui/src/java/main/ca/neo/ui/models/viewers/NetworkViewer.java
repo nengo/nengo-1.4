@@ -405,7 +405,8 @@ public class NetworkViewer extends NodeViewer implements INodeContainer {
 		super.constructMenu(menu);
 
 		menu.addSection("Simulator");
-		menu.addAction(new RunSimulatorAction("Run "+getViewerParent().getName(), getViewerParent()));
+		menu.addAction(new RunSimulatorAction("Run " + getViewerParent().getName(),
+				getViewerParent()));
 
 		/*
 		 * Create new models

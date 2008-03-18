@@ -9,13 +9,16 @@ import ca.neo.model.Network;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.sim.Simulator;
 import ca.neo.ui.NengoGraphics;
+import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.NetworkIcon;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
 import ca.neo.ui.models.viewers.NetworkViewer;
 import ca.neo.ui.models.viewers.NetworkViewerConfig;
+import ca.neo.ui.models.viewers.NodeViewer;
 import ca.neo.util.VisiblyMutable;
 import ca.neo.util.VisiblyMutable.Event;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.world.WorldObject;
 
 /**
  * UI Wrapper for a Network
@@ -28,6 +31,28 @@ public class UINetwork extends NodeContainer {
 	private static final long serialVersionUID = 1L;
 
 	public static final String typeName = "Network";
+
+	/**
+	 * @param wo
+	 *            WorldObject
+	 * @return The closest parent Network to wo
+	 */
+	public static UINetwork getClosestNetwork(WorldObject wo) {
+		if (wo == null) {
+			return null;
+		}
+
+		if (wo instanceof UINetwork) {
+			return (UINetwork) wo;
+		} else if (wo instanceof NodeViewer) {
+			return getClosestNetwork(((NodeViewer) wo).getViewerParent());
+		} else if (wo instanceof UINeoNode) {
+			return getClosestNetwork(((UINeoNode) wo).getNetworkParent());
+		} else {
+			return getClosestNetwork(wo.getParent());
+		}
+
+	}
 
 	private MySimulatorListener mySimulatorListener;
 

@@ -147,7 +147,7 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 		} else {
 			boolean success = false;
 			boolean attemptedConnection = false;
-			
+
 			for (WorldObject target : targets) {
 				if (target == getWell()) {
 					// Connector has been receded back into the origin
@@ -181,6 +181,16 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 	 */
 	public void setPointerVisible(boolean visible) {
 		myEdge.setPointerVisible(visible);
+	}
+
+	@Override
+	public void altClicked() {
+		/*
+		 * Delegate to the termination, if it exists
+		 */
+		if (myTermination != null && myTermination instanceof WorldObject) {
+			((WorldObject) myTermination).altClicked();
+		}
 	}
 
 	public JPopupMenu getContextMenu() {

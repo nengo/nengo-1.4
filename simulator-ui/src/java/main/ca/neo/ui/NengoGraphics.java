@@ -34,6 +34,7 @@ import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.CutAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.PasteAction;
+import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.dataList.DataListView;
 import ca.neo.ui.dataList.SimulatorDataModel;
@@ -41,6 +42,7 @@ import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
+import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.script.ScriptConsole;
 import ca.neo.ui.script.ScriptEditor;
 import ca.neo.ui.util.NengoClipboard;
@@ -103,7 +105,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	/**
 	 * File extension for Neo Nodes
 	 */
-	public static final String NEONODE_FILE_EXTENSION = "neonode";
+	public static final String NEONODE_FILE_EXTENSION = "nengo";
 
 	static final String PLUGIN_DIRECTORY = "plugins";
 
@@ -133,7 +135,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 
 	private AuxillarySplitPane scriptConsolePane;
 
-	private UINeoNode selectedNode;
+	private WorldObject selectedObj;
 
 	/**
 	 * Data viewer data
@@ -223,7 +225,8 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		}
 		File simulatorSourceFile = new File(simulatorSource);
 		if (!simulatorSourceFile.exists()) {
-			Util.debugMsg("Could not find simulator source files at " + simulatorSourceFile.getAbsoluteFile().toString());
+			Util.debugMsg("Could not find simulator source files at "
+					+ simulatorSourceFile.getAbsoluteFile().toString());
 		}
 
 		JavaSourceParser.addSource(simulatorSourceFile);
@@ -235,11 +238,8 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		}
 
 		if (obj != null) {
-			if (obj instanceof UINeoNode) {
-				selectedNode = (UINeoNode) obj;
-			} else {
-				selectedNode = null;
-			}
+
+			selectedObj = obj;
 
 			if (objectSelectedBorder != null) {
 				objectSelectedBorder.destroy();
@@ -250,7 +250,7 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 			Object model = ((ModelObject) obj).getModel();
 			scriptConsole.setCurrentObject(model);
 		} else {
-			selectedNode = null;
+			selectedObj = null;
 		}
 		updateEditMenu();
 	}
@@ -422,9 +422,9 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		StandardAction cutAction = null;
 		StandardAction pasteAction = null;
 
-		if (selectedNode != null) {
-			cutAction = new CutAction("Cut", selectedNode);
-			copyAction = new CopyAction("Copy", selectedNode);
+		if (selectedObj != null && selectedObj instanceof UINeoNode) {
+			cutAction = new CutAction("Cut", (UINeoNode) selectedObj);
+			copyAction = new CopyAction("Copy", (UINeoNode) selectedObj);
 		} else {
 			cutAction = new MockAction("Cut");
 			copyAction = new MockAction("Copy");
@@ -570,6 +570,11 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 
 		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O, KeyStroke.getKeyStroke(
 				KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+
+		fileMenu.addAction(new SaveNetworkAction("Save"), KeyEvent.VK_S, KeyStroke.getKeyStroke(
+				KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		fileMenu.addAction(new RunNetworkAction("Run"), KeyEvent.VK_R, KeyStroke.getKeyStroke(
+				KeyEvent.VK_R, ActionEvent.CTRL_MASK));
 	}
 
 	@Override
@@ -659,6 +664,10 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		localPoint = getWorld().getSky().localToView(localPoint);
 		return localPoint;
 	}
+
+	public WorldObject getSelectedObj() {
+		return selectedObj;
+	}
 }
 
 class ConfigurationPane {
@@ -692,5 +701,65 @@ class ConfigurationPane {
 
 	public AuxillarySplitPane toJComponent() {
 		return auxSplitPane;
+	}
+}
+
+/**
+ * Runs the closest network to the currently selected obj
+ * 
+ * @author Shu Wu
+ */
+class RunNetworkAction extends StandardAction {
+
+	public RunNetworkAction(String description) {
+		super(description);
+
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	protected void action() throws ActionException {
+		WorldObject selectedNode = NengoGraphics.getInstance().getSelectedObj();
+
+		UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
+		if (selectedNetwork != null) {
+
+			RunSimulatorAction runAction = new RunSimulatorAction("run", selectedNetwork);
+			runAction.doAction();
+
+		} else {
+			throw new ActionException("No parent network to run, please select a node");
+		}
+	}
+
+}
+
+/**
+ * Saves the closest network to the currently selected object
+ * 
+ * @author Shu Wu
+ */
+class SaveNetworkAction extends StandardAction {
+
+	private static final long serialVersionUID = 1L;
+
+	public SaveNetworkAction(String description) {
+		super(description);
+	}
+
+	@Override
+	protected void action() throws ActionException {
+		WorldObject selectedNode = NengoGraphics.getInstance().getSelectedObj();
+
+		UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
+		if (selectedNetwork != null) {
+
+			SaveNodeAction saveNodeAction = new SaveNodeAction(selectedNetwork);
+			saveNodeAction.doAction();
+
+		} else {
+			throw new ActionException("No parent network to save, please select a node");
+		}
 	}
 }
