@@ -114,8 +114,22 @@ public class PlotterFunctional {
 		
 	}
 	
+	public static void closeAllTest() {
+		Plotter.plot(new float[]{1, 2, 3}, "a");
+		Plotter.plot(new float[]{3, 2, 1}, "b");
+		Plotter.plot(new float[]{3, 2, 3}, "c");
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		Plotter.closeAll();
+	}
+	
 	public static void main(String[] args) {
-		rasterMemoryTest();
+		closeAllTest();
 	}
 
 }

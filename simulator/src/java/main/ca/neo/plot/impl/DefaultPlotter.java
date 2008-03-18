@@ -4,13 +4,9 @@
 package ca.neo.plot.impl;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.jfree.chart.ChartColor;
@@ -555,21 +551,7 @@ public class DefaultPlotter extends Plotter {
 	//shows a chart in a new window 
 	protected void showChart(JFreeChart chart, String title) {
 		JPanel panel = new ChartPanel(chart);
-
-		openingPlot();
-		final JFrame frame = new JFrame(title);
-		frame.getContentPane().add(panel, BorderLayout.CENTER);
-		
-		final Plotter plotter = this;
-        frame.addWindowListener(new WindowAdapter() {
-        	public void windowClosing(WindowEvent e) {
-        		frame.dispose();
-        		plotter.closingPlot();
-            }
-        });
-
-        frame.pack();
-        frame.setVisible(true);		
+		showPlot(panel, title);
 	}
 
 	/**

@@ -3,7 +3,16 @@
  */
 package ca.neo.plot;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.impl.EulerIntegrator;
@@ -25,7 +34,11 @@ public abstract class Plotter {
 	
 	private static Plotter ourInstance;
 	
-	private int myOpenPlots;
+	private List<Frame> myPlotFrames;
+	
+	public Plotter() {
+		myPlotFrames = new ArrayList<Frame>(10);
+	}
 	
 	private synchronized static Plotter getInstance() {
 		if (ourInstance == null) {
@@ -35,26 +48,60 @@ public abstract class Plotter {
 		
 		return ourInstance;
 	}
-	
+
 	/**
-	 * Plotters should call this method when they are opening a new plot
+	 * Display a new plot. 
+	 * 
+	 * @param plotPanel A panel containng the plot image
+	 * @param title The plot title 
 	 */
-	public void openingPlot() {
-		myOpenPlots++;
+	public void showPlot(JPanel plotPanel, String title) {
+		final JFrame frame = new JFrame(title);
+		frame.getContentPane().add(plotPanel, BorderLayout.CENTER);
+		myPlotFrames.add(frame);
+		
+		final Plotter plotter = this;
+        frame.addWindowListener(new WindowAdapter() {
+        	public void windowClosing(WindowEvent e) {
+        		plotter.closeAndDiscard(frame);
+            }
+        });
+
+        frame.pack();
+        frame.setVisible(true);		
 	}
 	
-	/**
-	 * Plots should call this method when they are closed by the user. If there are 
-	 * no plots remaining, the JVM is closed.  
-	 */
-	public void closingPlot() {
-		myOpenPlots--;
+	private void closeAndDiscard(Frame plotFrame) {
+		closePlot(plotFrame);
+		myPlotFrames.remove(plotFrame);
 		
-		if (myOpenPlots <= 0 && !Environment.inUserInterface()) {
+		if (myPlotFrames.size() == 0 && !Environment.inUserInterface()) {
 			System.exit(0); 
 		}
 	}
+
+	//this part is separated from above to allow discarding via iterator in closeAll() 
+	private void closePlot(Frame plotFrame) {
+		if (plotFrame.isVisible()) {
+			plotFrame.setVisible(false);
+		}		
+		plotFrame.dispose();
+	}
+
+	/**
+	 * Close all open plots
+	 */
+	public static void closeAll() {
+		getInstance().doCloseAll();
+	}
 	
+	private void doCloseAll() {
+		Iterator<Frame> it = myPlotFrames.iterator();
+		while (it.hasNext()) {
+			closePlot(it.next());		
+			it.remove();
+		}
+	}
 	
 	/**
 	 * Static convenience method for producing a TimeSeries plot.
