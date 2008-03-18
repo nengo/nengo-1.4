@@ -239,7 +239,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	protected void drag(PInputEvent e) {
 		super.drag(e);
 
-		if (isMarqueeSelection(e)) {
+		if (isMarqueeSelection()) {
 			updateMarquee(e);
 
 			if (!isOptionSelection(e)) {
@@ -294,32 +294,34 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	protected void endDrag(PInputEvent e) {
 		super.endDrag(e);
+		endSelection();
+	}
 
-		if (isMarqueeSelection(e)) {
-			endMarqueeSelection(e);
-		} else {
-			dragAction.setFinalPositions();
-			dragAction.doAction();
-			dragAction = null;
+	public void endSelection() {
+		if (marquee != null) {
+			// Remove marquee
+			marquee.removeFromParent();
+			marquee = null;
+		}
+		if (!isMarqueeSelection()) {
+			if (dragAction != null) {
+				dragAction.setFinalPositions();
+				dragAction.doAction();
+				dragAction = null;
+			}
 
 			if (getSelection().size() == 1) {
 				unselectAll();
 			}
-			endStandardSelection(e);
+			endStandardSelection();
 		}
-	}
-
-	protected void endMarqueeSelection(PInputEvent e) {
-		// Remove marquee
-		marquee.removeFromParent();
-		marquee = null;
 	}
 
 	// //////////////////////////////////////////////////////
 	// The overridden methods from PDragSequenceEventHandler
 	// //////////////////////////////////////////////////////
 
-	protected void endStandardSelection(PInputEvent e) {
+	protected void endStandardSelection() {
 		pressNode = null;
 	}
 
@@ -345,7 +347,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 
 	protected void initializeMarquee(PInputEvent e) {
-
 		marquee = PPath.createRectangle((float) presspt.getX(), (float) presspt.getY(), 0, 0);
 		marquee.setPaint(marqueePaint);
 		marquee.setTransparency(marqueePaintTransparency);
@@ -393,7 +394,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	}
 
-	protected boolean isMarqueeSelection(PInputEvent pie) {
+	protected boolean isMarqueeSelection() {
 		return (pressNode == null && world.isSelectionMode());
 	}
 
@@ -417,7 +418,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 		initializeSelection(e);
 
-		if (isMarqueeSelection(e)) {
+		if (isMarqueeSelection()) {
 			initializeMarquee(e);
 
 			if (!isOptionSelection(e)) {

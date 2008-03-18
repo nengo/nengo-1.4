@@ -224,7 +224,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		keyboardHandler.destroy();
 		gridLayer.removeFromParent();
 		layer.removeFromParent();
-		
+
 		getGround().destroy();
 		getSky().destroy();
 
@@ -370,6 +370,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		if (isSelectionMode != enabled) {
 			isSelectionMode = enabled;
 			mySky.getCamera().removeInputEventListener(selectionEventHandler);
+			selectionEventHandler.endSelection();
 			if (!isSelectionMode) {
 				initSelectionMode();
 			} else {
