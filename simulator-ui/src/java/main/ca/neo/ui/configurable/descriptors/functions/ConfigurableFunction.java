@@ -18,6 +18,8 @@ public interface ConfigurableFunction {
 	 */
 	public void setFunction(Function function);
 
+	public Function getFunction();
+
 	/**
 	 * Configures the function
 	 * 
@@ -26,4 +28,5 @@ public interface ConfigurableFunction {
 	 * @return Configured function
 	 */
 	public Function configureFunction(Dialog parent);
+
 }

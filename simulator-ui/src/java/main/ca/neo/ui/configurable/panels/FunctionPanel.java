@@ -15,6 +15,7 @@ import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.descriptors.PFunction;
 import ca.neo.ui.configurable.descriptors.functions.AbstractFn;
 import ca.neo.ui.configurable.descriptors.functions.ConfigurableFunction;
+import ca.neo.ui.configurable.descriptors.functions.FnAdvanced;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
@@ -32,25 +33,65 @@ public class FunctionPanel extends PropertyInputPanel {
 	 */
 	private JComboBox comboBox;
 
+	private ConfigurableFunction[] configurableFunctionsList;
+
 	/**
 	 * Function
 	 */
 	private Function function = null;
 
+	private JButton newBtn;
+
+	private JButton previewBtn;
+	private JButton configureBtn;
 	/**
 	 * Currently selected item in the comboBox
 	 */
 	private ConfigurableFunction selectedConfigurableFunction;
-
-	private JButton previewBtn;
-
-	private ConfigurableFunction[] configurableFunctionsList;
 
 	public FunctionPanel(PFunction property, ConfigurableFunction[] functions) {
 		super(property);
 		this.configurableFunctionsList = functions;
 
 		initPanel();
+	}
+
+	private void initPanel() {
+		comboBox = new JComboBox(configurableFunctionsList);
+		selectedConfigurableFunction = (AbstractFn) comboBox.getSelectedItem();
+
+		comboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (comboBox.getSelectedItem() != selectedConfigurableFunction) {
+					setValue(null);
+					updateSelection(comboBox.getSelectedItem());
+				}
+			}
+		});
+
+		add(comboBox);
+
+		newBtn = new JButton(new NewParametersAction());
+		add(newBtn);
+
+		configureBtn = new JButton(new EditAction());
+		add(configureBtn);
+
+		previewBtn = new JButton(new PreviewFunctionAction());
+		add(previewBtn);
+
+		updateSelection(comboBox.getSelectedItem());
+	}
+
+	private void updateSelection(Object selectedItem) {
+		selectedConfigurableFunction = (ConfigurableFunction) comboBox.getSelectedItem();
+
+		if (selectedItem instanceof FnAdvanced) {
+			newBtn.setEnabled(true);
+		} else {
+			newBtn.setEnabled(false);
+		}
+
 	}
 
 	/**
@@ -73,8 +114,6 @@ public class FunctionPanel extends PropertyInputPanel {
 	 *            editing
 	 */
 	protected void setParameters(boolean resetValue) {
-
-		selectedConfigurableFunction = (ConfigurableFunction) comboBox.getSelectedItem();
 
 		/*
 		 * get the JDialog parent
@@ -99,32 +138,13 @@ public class FunctionPanel extends PropertyInputPanel {
 	}
 
 	@Override
-	public Function getValue() {
-		return function;
+	public PFunction getDescriptor() {
+		return (PFunction) super.getDescriptor();
 	}
 
-	private void initPanel() {
-		comboBox = new JComboBox(configurableFunctionsList);
-		selectedConfigurableFunction = (AbstractFn) comboBox.getSelectedItem();
-
-		comboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (comboBox.getSelectedItem() != selectedConfigurableFunction) {
-					setValue(null);
-				}
-			}
-		});
-
-		add(comboBox);
-
-		JButton newBtn = new JButton(new NewParametersAction());
-		add(newBtn);
-
-		JButton configureBtn = new JButton(new SetParametersAction());
-		add(configureBtn);
-
-		previewBtn = new JButton(new PreviewFunctionAction());
-		add(previewBtn);
+	@Override
+	public Function getValue() {
+		return function;
 	}
 
 	@Override
@@ -183,25 +203,6 @@ public class FunctionPanel extends PropertyInputPanel {
 	}
 
 	/**
-	 * Set up the parameters of the existing function
-	 * 
-	 * @author Shu Wu
-	 */
-	class SetParametersAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public SetParametersAction() {
-			super("Edit");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			setParameters(false);
-		}
-
-	}
-
-	/**
 	 * Set up the parameters of a new function
 	 * 
 	 * @author Shu Wu
@@ -239,9 +240,23 @@ public class FunctionPanel extends PropertyInputPanel {
 
 	}
 
-	@Override
-	public PFunction getDescriptor() {
-		return (PFunction) super.getDescriptor();
+	/**
+	 * Set up the parameters of the existing function
+	 * 
+	 * @author Shu Wu
+	 */
+	class EditAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public EditAction() {
+			super("Set");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setParameters(false);
+		}
+
 	}
 
 }

@@ -17,7 +17,7 @@ public class FnAdvanced implements ConfigurableFunction {
 
 	public Function configureFunction(Dialog parent) {
 		if (myFunction == null) {
-			myFunction = (Function) NewConfigurableDialog.showDialog(parent, type, null);
+			myFunction = (Function) NewConfigurableDialog.showDialog(parent, type, type);
 		} else {
 			ConfigUtil.configure(parent, myFunction);
 		}
@@ -40,6 +40,10 @@ public class FnAdvanced implements ConfigurableFunction {
 
 	@Override
 	public String toString() {
-		return type.getSimpleName() + " (advanced)";
+		return "~" + type.getSimpleName();
+	}
+
+	public Function getFunction() {
+		return myFunction;
 	}
 }

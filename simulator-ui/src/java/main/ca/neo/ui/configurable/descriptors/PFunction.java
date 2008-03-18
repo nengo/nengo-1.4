@@ -64,7 +64,7 @@ public class PFunction extends PropertyDescriptor {
 			functions.add(gaussianPDF);
 		}
 
-		for (Class<?> type : ClassRegistry.getInstance().getRegisterableTypes()) {
+		for (Class<?> type : ClassRegistry.getInstance().getImplementations(Function.class)) {
 			if (Function.class.isAssignableFrom(type)) {
 				functions.add(new FnAdvanced((Class<? extends Function>) type));
 			}
