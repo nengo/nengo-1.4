@@ -510,8 +510,10 @@ public class ScriptConsole extends JPanel {
 					myConsole.setInCallChainCompletionMode(true);
 				} else if (code == 38) { // up arrow
 					myConsole.completorUp();
+					e.consume();
 				} else if (code == 40) { // down arrow
 					myConsole.completorDown();
+					e.consume();
 				} else if (code == 17) { //CTRL
 					myConsole.showToolTip();
 				} else {
