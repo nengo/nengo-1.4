@@ -39,6 +39,8 @@ import ca.neo.util.impl.TimeSeriesImpl;
  */
 public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMutable {
 
+	private static final long serialVersionUID = -5498397418584843304L;
+	
 	private static Logger ourLogger = Logger.getLogger(AbstractEnsemble.class);
 	private static int numNodeRunners = 10;
 
