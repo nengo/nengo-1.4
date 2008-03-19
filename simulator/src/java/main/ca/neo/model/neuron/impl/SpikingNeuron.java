@@ -53,7 +53,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	private float myBias;
 	private float myRadialInput;
 	private String myDocumentation;
-	private List<VisiblyMutable.Listener> myListeners;
+	private transient List<VisiblyMutable.Listener> myListeners;
 
 	/**
 	 * Note: current = scale * (weighted sum of inputs at each termination) * (radial input) + bias.
