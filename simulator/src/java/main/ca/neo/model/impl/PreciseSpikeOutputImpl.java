@@ -1,7 +1,6 @@
 package ca.neo.model.impl;
 
 import ca.neo.model.PreciseSpikeOutput;
-import ca.neo.model.SpikeOutput;
 import ca.neo.model.Units;
 
 public class PreciseSpikeOutputImpl implements PreciseSpikeOutput {
