@@ -9,6 +9,7 @@ import ca.neo.model.Origin;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SpikeOutput;
+import ca.neo.model.PreciseSpikeOutput;
 import ca.neo.model.Units;
 
 /**
@@ -70,6 +71,8 @@ public class EnsembleOrigin implements Origin {
 		
 		if (myNodeOrigins[0].getValues() instanceof RealOutput) {
 			result = composeRealOutput(myNodeOrigins, units);
+		} else if (myNodeOrigins[0].getValues() instanceof PreciseSpikeOutput) {
+			result = composePreciseSpikeOutput(myNodeOrigins, units);			
 		} else if (myNodeOrigins[0].getValues() instanceof SpikeOutput) {
 			result = composeSpikeOutput(myNodeOrigins, units);			
 		}
@@ -113,6 +116,26 @@ public class EnsembleOrigin implements Origin {
 		return new SpikeOutputImpl(values, units, origins[0].getValues().getTime());
 	}
 
+	private static PreciseSpikeOutput composePreciseSpikeOutput(Origin[] origins, Units units) throws SimulationException {
+		float[] values = new float[origins.length];
+		
+		for (int i = 0; i < origins.length; i++) {
+			InstantaneousOutput o = origins[i].getValues();
+			if ( !(o instanceof PreciseSpikeOutput) ) {
+				throw new SimulationException("Some of the Node Origins are not producing precise spiking output");
+			}
+			if ( !o.getUnits().equals(units) ) {
+				throw new SimulationException("Some of the Node Origins are producing outputs with non-matching units");
+			}
+			
+			values[i] = ((PreciseSpikeOutput) o).getSpikeTimes()[0];
+		}
+		
+		return new PreciseSpikeOutputImpl(values, units, origins[0].getValues().getTime());
+	}
+	
+	
+	
 	/**
 	 * @see ca.neo.model.Origin#getNode()
 	 */
