@@ -372,7 +372,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		if (stateName.equals(OUTPUT)) {
-			return new TimeSeriesImpl(new float[]{myTime}, new float[][]{myOutputValues}, Units.uniform(Units.UNK, myOutputValues.length));			
+			return new TimeSeriesImpl(new float[]{myTime}, 
+					new float[][]{myOutputValues}, Units.uniform(Units.UNK, myOutputValues.length));
 		} else {
 			throw new SimulationException("The state '" + stateName + "' is unknown");
 		}

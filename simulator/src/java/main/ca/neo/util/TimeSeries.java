@@ -15,6 +15,11 @@ import ca.neo.model.Units;
 public interface TimeSeries extends Serializable, Cloneable {
 
 	/**
+	 * @return Name of the TimeSeries
+	 */
+	public String getName();
+
+	/**
 	 * @return Times for which values are available
 	 */
 	public float[] getTimes();
@@ -41,5 +46,5 @@ public interface TimeSeries extends Serializable, Cloneable {
 	public String[] getLabels();
 	
 	public TimeSeries clone() throws CloneNotSupportedException;
-	
+		
 }

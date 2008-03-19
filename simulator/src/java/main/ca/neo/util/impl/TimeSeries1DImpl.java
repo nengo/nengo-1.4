@@ -27,6 +27,7 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 	private float[] myValues;
 	private Units myUnits;
 	private String myLabel;
+	private String myName;
 	
 	/**
 	 * @param times @see ca.bpt.cn.util.TimeSeries#getTimes()
@@ -90,6 +91,20 @@ public class TimeSeries1DImpl implements TimeSeries1D, Serializable {
 		return result;
 	}
 	
+	/**
+	 * @see ca.neo.util.TimeSeries#getName()
+	 */
+	public String getName() {
+		return myName;
+	}
+	
+	/**
+	 * @param name Name of the TimeSeries
+	 */
+	public void setName(String name) {
+		myName = name;
+	}
+
 	/**
 	 * @see ca.neo.util.TimeSeries1D#getTimes()
 	 */

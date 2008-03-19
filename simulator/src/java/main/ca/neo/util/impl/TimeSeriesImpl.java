@@ -19,6 +19,7 @@ public class TimeSeriesImpl implements TimeSeries {
 	private float[][] myValues;
 	private Units[] myUnits;
 	private String[] myLabels;
+	private String myName;
 	
 	/**
 	 * @param times @see ca.bpt.cn.util.TimeSeries#getTimes()
@@ -61,6 +62,20 @@ public class TimeSeriesImpl implements TimeSeries {
 			throw new IllegalArgumentException("Values have dimension " + values[0].length
 					+ " but there are " + units.length + " units");
 		}
+	}
+
+	/**
+	 * @see ca.neo.util.TimeSeries#getName()
+	 */
+	public String getName() {
+		return myName;
+	}
+	
+	/**
+	 * @param name Name of the TimeSeries
+	 */
+	public void setName(String name) {
+		myName = name;
 	}
 
 	/**

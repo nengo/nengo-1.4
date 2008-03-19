@@ -3,6 +3,7 @@ package ca.neo.util.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.neo.model.Node;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.Units;
@@ -124,7 +125,9 @@ public class ProbeImpl implements Probe, java.io.Serializable {
 		
 		float[][] values = myValues.toArray(new float[0][]);
 		
-		return new TimeSeriesImpl(times, values, (myUnits == null) ? new Units[]{Units.UNK} : myUnits);
+		TimeSeriesImpl result = new TimeSeriesImpl(times, values, (myUnits == null) ? new Units[]{Units.UNK} : myUnits);
+		result.setName(((myTarget instanceof Node) ? ((Node) myTarget).getName()+":" : "") + myStateName);
+		return result;
 	}
 
 	/**

@@ -137,7 +137,10 @@ public class DefaultPlotter extends Plotter {
 			renderer.setPaint(getColor(i));
 			plot.setRenderer(i, renderer);
 						
-			revisedItems.add(getCopy(plot.getLegendItems().get(legendItemIndex), "Series " + i));
+			String seriesName = series.get(i).getName();
+			if (seriesName == null) seriesName = "Time Series " + i;
+			
+			revisedItems.add(getCopy(plot.getLegendItems().get(legendItemIndex), seriesName));
 			legendItemIndex += series.get(i).getDimension();
 		}
 		
