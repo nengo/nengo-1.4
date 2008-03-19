@@ -5,9 +5,11 @@ import ca.neo.model.Node;
 import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SpikeOutput;
+import ca.neo.model.PreciseSpikeOutput;
 import ca.neo.model.Termination;
 import ca.neo.util.Configuration;
 import ca.neo.util.impl.ConfigurationImpl;
+
 
 /**
  * <p>A Termination at which incoming spikes induce exponentially decaying post-synaptic 
@@ -34,6 +36,9 @@ public class LinearExponentialTermination implements Termination {
 	private float myCurrent = 0;
 	private float myNetSpikeInput;
 	private float myNetRealInput;
+	private float[] myPreciseSpikeInputTimes;
+	private float myIntegrationTime; // for keeping track of how far into the integration we are, so
+									// we know which precise spikes have and have not been dealt with 
 	private InstantaneousOutput myRawInput;
 	
 	private ConfigurationImpl myConfiguration;
@@ -67,6 +72,8 @@ public class LinearExponentialTermination implements Termination {
 		myRawInput = null;
 		myNetRealInput = 0;
 		myNetSpikeInput = 0;
+		myPreciseSpikeInputTimes=null;
+		myIntegrationTime = 0;
 	}
 
 	/**
@@ -115,7 +122,19 @@ public class LinearExponentialTermination implements Termination {
 		
 		myRawInput = values;
 
-		myNetSpikeInput = (values instanceof SpikeOutput) ? combineSpikes((SpikeOutput) values, myWeights) : 0;
+		myPreciseSpikeInputTimes = (values instanceof PreciseSpikeOutput) ? ((PreciseSpikeOutput)values).getSpikeTimes() : null;
+		myIntegrationTime = 0; // start at the beginning of these spike times (given as an offset increasing from the previous time step)		
+		myNetSpikeInput = (values instanceof SpikeOutput && myPreciseSpikeInputTimes==null) ? combineSpikes((SpikeOutput) values, myWeights) : 0;
+		
+		// convert precise spike times that happen right at the beginning of the time window
+		//  to be handled separately (we really don't need this, but I'm paranoid about losing
+		//  single spikes that happen right at the step boundaries)
+		if (myPreciseSpikeInputTimes!=null) {
+			for (int i=0; i<myPreciseSpikeInputTimes.length; i++) {
+				if (myPreciseSpikeInputTimes[i]==0f) myNetSpikeInput+=myWeights[i];		
+			}
+		}
+		
 		myNetRealInput = (values instanceof RealOutput) ? combineReals((RealOutput) values, myWeights) : 0;
 	}
 	
@@ -156,6 +175,9 @@ public class LinearExponentialTermination implements Termination {
 			//TODO: is there a correction we can do here when tau isn't much larger than the timestep? (will decay to zero if tau=step)   
 			myCurrent = myCurrent - myCurrent * ( 1f/myTauPSC ) * decayTime;
 		}
+		if (myPreciseSpikeInputTimes!=null) {
+			updatePreciseSpikeCurrent(integrationTime);
+		}		
 		
 		if (applySpikes) {
 			myCurrent = myCurrent + myNetSpikeInput / myTauPSC; //normalized so that unweighted PSC integral is 1
@@ -166,6 +188,23 @@ public class LinearExponentialTermination implements Termination {
 		}
 		
 		return myCurrent;
+	}
+	
+	/**
+	 * 
+	 * @param integrationTime The amount of time covered by this integration step.
+	 */
+	private void updatePreciseSpikeCurrent(float integrationTime) {
+		float endTime=myIntegrationTime+integrationTime;
+		float epsilon=0.0000001f;
+		for (int i=0; i<myPreciseSpikeInputTimes.length; i++)
+		{
+			float time=myPreciseSpikeInputTimes[i];
+			if (time>myIntegrationTime && (time<=endTime+epsilon)) { 
+				myCurrent+=myWeights[i]*(1f/myTauPSC-((endTime-time)/(myTauPSC*myTauPSC)));
+			}
+		}
+		myIntegrationTime=endTime;
 	}
 
 	/** 
@@ -182,7 +221,7 @@ public class LinearExponentialTermination implements Termination {
 		if (propertyName.equals(Termination.TAU_PSC)) {
 			myTauPSC = ((Float) newValue).floatValue();
 		} 		
-	}
+	}	
 	
 	private static float combineSpikes(SpikeOutput input, float[] weights) {
 		float result = 0;

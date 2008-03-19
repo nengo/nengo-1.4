@@ -7,8 +7,10 @@ import org.apache.log4j.Logger;
 
 import ca.neo.model.SimulationException;
 import ca.neo.model.Units;
+import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.impl.LinearExponentialTermination;
 import ca.neo.model.impl.RealOutputImpl;
+import ca.neo.model.impl.PreciseSpikeOutputImpl;
 import junit.framework.TestCase;
 
 /**
@@ -152,6 +154,69 @@ public class LinearExponentialTerminationTest extends TestCase {
 		assertClose(10f, current, tol);		
 	}
 
+	public void testPreciseUpdateCurrent() throws SimulationException {
+		float tauPSC = .01f;
+		int steps=9;
+		float time=0.001f;
+		
+		LinearExponentialTermination let = new LinearExponentialTermination(null, "test", new float[]{1f}, tauPSC);
+		PreciseSpikeOutputImpl spikeAt0=new PreciseSpikeOutputImpl(new float[]{0f},Units.SPIKES,0);
+		PreciseSpikeOutputImpl spikeAtHalf=new PreciseSpikeOutputImpl(new float[]{time/2},Units.SPIKES,0);
+		PreciseSpikeOutputImpl spikeAt1=new PreciseSpikeOutputImpl(new float[]{time},Units.SPIKES,0);
+		PreciseSpikeOutputImpl spikeNever=new PreciseSpikeOutputImpl(new float[]{-1f},Units.SPIKES,0);
+		
+		SpikeOutputImpl simpleSpikeYes=new SpikeOutputImpl(new boolean[]{true},Units.SPIKES,0);
+		SpikeOutputImpl simpleSpikeNo=new SpikeOutputImpl(new boolean[]{false},Units.SPIKES,0);
+		
+		
+		
+		let.reset(false);
+		float[] currents1=getCurrents(let,simpleSpikeYes,time,steps);
+		let.reset(false);
+		float[] currents2=getCurrents(let,spikeAt0,time,steps);
+				
+		assertTrue(currents1[0]==currents2[0]);
+		assertTrue(currents1[1]==currents2[1]);
+		assertTrue(currents1[steps-1]==currents2[steps-1]);
+
+
+		let.reset(false);
+		currents1=getCurrents(let,simpleSpikeNo,time,steps);
+		currents1=getCurrents(let,simpleSpikeYes,time,steps);
+		
+		let.reset(false);
+		currents2=getCurrents(let,spikeAt1,time,steps);
+		currents2=getCurrents(let,spikeNever,time,steps);
+				
+		assertTrue(currents1[1]==currents2[1]);
+		assertTrue(currents1[steps-1]==currents2[steps-1]);
+		
+		
+		steps=1;
+		let.reset(false);
+		currents1=getCurrents(let,spikeAt0,time,steps);
+		let.reset(false);
+		currents2=getCurrents(let,spikeAtHalf,time,steps);
+		
+		assertTrue(currents1[0]>currents2[1]);
+		assertTrue(currents2[1]>currents1[1]);
+		
+	}	
+	
+	private float[] getCurrents(LinearExponentialTermination let, InstantaneousOutput values, float time, int steps) 
+					throws SimulationException {
+		let.setValues(values);
+
+		float dt=time/steps;		
+		float[] currents=new float[steps+1];
+		
+		currents[0]=let.updateCurrent(true,0,0);
+		for (int i=0; i<steps; i++) {
+			currents[i+1]=let.updateCurrent(false,dt,dt);
+		}
+		return currents;
+	}
+	
 	//approximate assertEquals for floats
 	private void assertClose(float target, float value, float tolerance) {
 		assertTrue(value > target - tolerance && value < target + tolerance);
