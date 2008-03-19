@@ -3,6 +3,8 @@
  */
 package ca.neo.util;
 
+import java.text.NumberFormat;
+
 import org.apache.log4j.Logger;
 
 import ca.neo.math.PDF;
@@ -735,41 +737,36 @@ public class MU {
 	public static String toString(float[][] matrix, int decimalPlaces) {
 		StringBuffer buf = new StringBuffer();
 		
-		float max = 0f;
+		NumberFormat nf = NumberFormat.getInstance();
+		if (nf.getMinimumFractionDigits() > decimalPlaces) nf.setMinimumFractionDigits(decimalPlaces);
+		nf.setMinimumFractionDigits(decimalPlaces);
+
+		String[][] strings = new String[matrix.length][];
+		int maxLength = 0;
 		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[i].length; j++) {
-				if (Math.abs(matrix[i][j]) > max) max = Math.abs(matrix[i][j]);
+			strings[i] = new String[matrix[i].length];
+			for (int j = 0; j < matrix[i].length; j++) {				
+				strings[i][j] = nf.format(matrix[i][j]);
+				if (strings[i][j].length() > maxLength) maxLength = strings[i][j].length();  
 			}
 		}
-		String maxString = String.valueOf(max);
-		int pre = maxString.length();
-		if (maxString.indexOf(".") > 0) pre = maxString.indexOf(".");
 		
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
-				buf.append(format(matrix[i][j], pre+2, decimalPlaces));
+				appendSpaces(buf, 1 + maxLength - strings[i][j].length());
+				buf.append(strings[i][j]);
 			}
 			buf.append(System.getProperty("line.separator"));
 		}
 		
+		
 		return buf.toString();
 	}
 	
-	//used by toString(...) 
-	private static String format(float f, int pre, int post) {
-		String s = String.valueOf(f);
-		int index = s.indexOf(".");
-		
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < pre-index; i++) {
-			buf.append(" ");
-		}		
-		buf.append(s.substring(0, Math.min(s.length(), index + post + 1)));
-		for (int i = 0; i < index + post + 1 - s.length(); i++) {
+	private static void appendSpaces(StringBuffer buf, int n) {
+		for (int i = 0; i < n; i++) {
 			buf.append(" ");
 		}
-		
-		return buf.toString();
 	}
 	
 	/**
