@@ -51,7 +51,8 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	private Map<String, List<Integer>> myStateNames; // for Probeable
 	private SimulationMode myMode;
 	private transient SpikePatternImpl mySpikePattern;
-	protected boolean myCollectSpikesFlag;
+	private boolean myCollectSpikesFlag;	
+	private int myCollectSpikesRatio = 1;
 	private String myDocumentation;
 	private transient List<VisiblyMutable.Listener> myListeners;
 
@@ -178,7 +179,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodes[i].run(startTime, endTime);
 
-			if (myCollectSpikesFlag) {
+			if (myCollectSpikesFlag && (myCollectSpikesRatio == 1 || i % myCollectSpikesRatio == 0)) {
 				try {
 					InstantaneousOutput output = myNodes[i].getOrigin(Neuron.AXON).getValues();
 					if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
@@ -273,6 +274,20 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	 */
 	public boolean isCollectingSpikes() {
 		return myCollectSpikesFlag;
+	}
+	
+	/**
+	 * @return Inverse of the proportion of nodes from which to collect spikes 
+	 */
+	public int getCollectSpikesRatio() {
+		return myCollectSpikesRatio;
+	}
+	
+	/**
+	 * @param n Inverse of the proportion of nodes from which to collect spikes
+	 */
+	public void setCollectSpikesRatio(int n) {
+		myCollectSpikesRatio = n;
 	}
 
 	/**
