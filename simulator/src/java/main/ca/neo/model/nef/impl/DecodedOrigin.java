@@ -326,7 +326,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	/**
 	 * @return List of Functions approximated by this DecodedOrigin
 	 */
-	protected Function[] getFunctions() {
+	public Function[] getFunctions() {
 		return myFunctions;
 	}
 
