@@ -3,16 +3,14 @@
  */
 package ca.neo.model.neuron.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
+import ca.neo.math.impl.LinearCurveFitter;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
 import ca.neo.model.Units;
-import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.impl.SpikeOutputImpl;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.util.TimeSeries;
@@ -20,18 +18,17 @@ import ca.neo.util.TimeSeries1D;
 import ca.neo.util.impl.TimeSeries1DImpl;
 
 /**
- * <p>A simple but powerful spiking model; simplified from Hodgkin-Huxley
- * models using bifurcation methodologies. From Izhikevich, 2003, the model
- * is: v' = 0.04v*v + 5v + 140 - u + I. 
- *     u' = a(bv - u) 
- *     if v >= 30 mV, then v := c and u := u + d (reset after spike)
- * </p>
+ * <p>From Izhikevich, 2003, the model is:<br> 
+ * v' = 0.04v*v + 5v + 140 - u + I <br>
+ * u' = a(bv - u) </p>
+ *  
+ * <p>If v >= 30 mV, then v := c and u := u + d (reset after spike)</p>
  * 
  * <p>v represents the membrane potential;
  * u is a membrane recovery variable;
  * a, b, c, and d are modifiable parameters</p>
  * 
- * TODO (bryan): write rate mode; fix max step at 1/2 ms; review
+ * TODO (bryan): test
  * 
  * @author Hussein
  */
@@ -39,57 +36,55 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static SimulationMode[] ourSupportedModes 
-		= new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.CONSTANT_RATE, SimulationMode.RATE};
+	/**
+	 * Voltage state variable 
+	 */
+	public static final String V = "V";
+	
+	/**
+	 * Recovery state variable 
+	 */
+	public static final String U = "U";
+	
+	private static SimulationMode[] ourSupportedModes = new SimulationMode[]{SimulationMode.DEFAULT};
 
-	private float myMaxTimeStep;
+	private static float myMaxTimeStep = .0005f;
+	private static float Vth = 30;
 	
 	private float myA;
 	private float myB;
 	private float myC;
 	private float myD;
 	private float myInitialVoltage;
-	private float Vth = 30;
 	
 	private float myVoltage;
 	private float myRecovery;
-	private float myTimeSinceLastSpike; 
 	
 	private float[] myTime;
 	private float[] myVoltageHistory;
-	private List<Float> mySpikeTimes;
+	private float[] myRecoveryHistory;
 	
 	private SimulationMode myMode;
 	
 	private static final float[] ourNullTime = new float[0]; 
 	private static final float[] ourNullVoltageHistory = new float[0];
+	private static final float[] ourNullRecoveryHistory = new float[0];
 	
 	/**
 	 * Constructor using "default" parameters
 	 */
 	public IzhikevichSpikeGenerator() {
-		this(.0005f, 0.02f, .2f, -65f, 2f);
+		this(0.02f, .2f, -65f, 2f);
 	}
 
 	/**
-	 * @param maxTimeStep maximum integration time step (s). Shorter time steps may be used if a 
-	 * 		run(...) is requested with a length that is not an integer multiple of this value.  
 	 * @param a time scale of recovery variable 
 	 * @param b sensitivity of recovery variable
 	 * @param c voltage reset value
 	 * @param d recovery variable reset change
 	 */
-	public IzhikevichSpikeGenerator(float maxTimeStep, float a, float b, float c, float d) {
-		myMaxTimeStep = maxTimeStep; 
-		myInitialVoltage = -65f;
-		myA = a;
-		myB = b;
-		myC = c;
-		myD = d;
-		
-		myMode = SimulationMode.DEFAULT;
-
-		reset(false);
+	public IzhikevichSpikeGenerator(float a, float b, float c, float d) {
+		this(a, b, c, d, -65);
 	}
 	
 	/**
@@ -99,11 +94,19 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 * @param b sensitivity of recovery variable
 	 * @param c voltage reset value
 	 * @param d recovery variable reset change
-	 * @param initialVoltage initial voltage value
+	 * @param initialVoltage initial voltage value (varying across neurons can prevent synchrony 
+	 * 		at start of simulation)
 	 */
-	public IzhikevichSpikeGenerator(float maxTimeStep, float a, float b, float c, float d, float initialVoltage) {
-		this(maxTimeStep, a, b, c, d);
+	public IzhikevichSpikeGenerator(float a, float b, float c, float d, float initialVoltage) {
+		myA = a;
+		myB = b;
+		myC = c;
+		myD = d;
 		myInitialVoltage = initialVoltage;
+		
+		myMode = SimulationMode.DEFAULT;
+
+		reset(false);
 	}
 
 	/**
@@ -162,104 +165,69 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		myD = d;
 	}
 	
+	/**
+	 * @see ca.neo.model.Resettable#reset(boolean)
+	 */
 	public void reset(boolean randomize) {
-		myTimeSinceLastSpike = 0f;
 		myVoltage = myInitialVoltage;
 		myRecovery = 0f;
 		myTime = ourNullTime;
 		myVoltageHistory = ourNullVoltageHistory;
-		mySpikeTimes = new ArrayList<Float>(10);
+		myRecoveryHistory = ourNullRecoveryHistory;
 	}		
 
 	/**
 	 * @see ca.neo.model.neuron.SpikeGenerator#run(float[], float[])
 	 */
 	public InstantaneousOutput run(float[] time, float[] current) {
-		InstantaneousOutput result = null;
+		assert time.length >= 2;
+		assert time.length == current.length;
 		
-		if (myMode.equals(SimulationMode.CONSTANT_RATE) || myMode.equals(SimulationMode.RATE)) {
-			result = new RealOutputImpl(new float[]{doConstantRateRun(time[0], current[0])}, Units.SPIKES_PER_S, time[time.length-1]);
-		} else {
-			result = new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES, time[time.length-1]);
-		}
-		
-		return result;
+		return new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES, time[time.length-1]);
 	}
 	
 	private boolean doSpikingRun(float[] time, float[] current) {
-		if (time.length < 2) {
-			throw new IllegalArgumentException("Arg time must have length at least 2");
-		}
-		if (time.length != current.length) {
-			throw new IllegalArgumentException("Args time and current must have equal length");
-		}
-		
 		float len = time[time.length - 1] - time[0];
 		int steps = (int) Math.ceil(len / myMaxTimeStep);
 		float dt = len / steps;
 		
 		myTime = new float[steps];
 		myVoltageHistory = new float[steps];
-		mySpikeTimes = new ArrayList<Float>(10);
+		myRecoveryHistory = new float[steps];
 		
-		int inputIndex = 0;
-
 		boolean spiking = false;
 		for (int i = 0; i < steps; i++) {
 			myTime[i] = time[0] + i*dt;
-
-			while (time[inputIndex+1] <= myTime[i]) {
-				inputIndex++; 
-			}			 
-			float I = current[inputIndex];
-			   
-			float dv = 0.04f*myVoltage*myVoltage + 5*myVoltage + 140 - myRecovery + I;			 
-						
-			myVoltage = Math.max(0, myVoltage + dt*dv);
+			float I = LinearCurveFitter.InterpolatedFunction.interpolate(time, current, myTime[i]+dt/2f);
+			
+			float dv = 0.04f*myVoltage*myVoltage + 5*myVoltage + 140 - myRecovery + I;					
+			myVoltage += 1000*dt*dv;
 			myVoltageHistory[i] = myVoltage;
 			
 			float du = myA*(myB*myVoltage - myRecovery);
-			myRecovery = Math.max(0, myRecovery + dt*du);
-			
-			myTimeSinceLastSpike = myTimeSinceLastSpike + dt;
+			myRecovery = myRecovery + 1000*dt*du;
+			myRecoveryHistory[i] = myRecovery;
 			
 			if (myVoltage >= Vth) {
 				spiking = true;
-				myTimeSinceLastSpike = 0;
 				myVoltage = myC;		
 				myRecovery = myRecovery + myD; 
-				mySpikeTimes.add(new Float(myTime[i]));
 			}
 		}
 		
 		return spiking;	
 	}
 	
-	//Note that no voltage history is available after a constant-rate run.
-	private float doConstantRateRun(float time, float current) {
-		myTime = ourNullTime;
-		myVoltageHistory = ourNullVoltageHistory;
-		
-		//implicitly Vth == R == 1		
-		return current > 1 ? 1f : 0; //TODO: this isn't right
-	}
-
 	/**
 	 * @see Probeable#getHistory(String) 
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		TimeSeries1D result = null;
 		
-		if (stateName.equals("V")) {
-			result = new TimeSeries1DImpl(myTime, myVoltageHistory, Units.AVU); 
-		} else if (stateName.equalsIgnoreCase("spikes")) {
-			float[] times = new float[mySpikeTimes.size()];
-			float[] values = new float[mySpikeTimes.size()];
-			for (int i = 0; i < times.length; i++) {
-				times[i] = ((Float) mySpikeTimes.get(i)).floatValue();
-				values[i] = 1;
-			}
-			result = new TimeSeries1DImpl(times, values, Units.SPIKES);
+		if (stateName.equals(V)) {
+			result = new TimeSeries1DImpl(myTime, myVoltageHistory, Units.AVU);
+		} else if (stateName.equals(U)){
+			result = new TimeSeries1DImpl(myTime, myRecoveryHistory, Units.UNK);
 		} else {
 			throw new SimulationException("The state name " + stateName + " is unknown.");
 		}
@@ -272,8 +240,8 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 */
 	public Properties listStates() {
 		Properties p = new Properties();
-		p.setProperty("v", "membrane potential (arbitrary units)");
-		p.setProperty("u", "membrane recovery variable (arbitrary units)");
+		p.setProperty(V, "Membrane potential (arbitrary units)");
+		p.setProperty(U, "Recovery variable (arbitrary units)");
 		return p;
 	}
 
@@ -294,9 +262,9 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	@Override
 	public SpikeGenerator clone() throws CloneNotSupportedException {
 		IzhikevichSpikeGenerator result = (IzhikevichSpikeGenerator) super.clone();
-		result.mySpikeTimes = new ArrayList<Float>(mySpikeTimes);
 		result.myTime = myTime.clone();
 		result.myVoltageHistory = myVoltageHistory.clone();
+		result.myRecoveryHistory = myRecoveryHistory.clone();
 		return result;
 	}
 
