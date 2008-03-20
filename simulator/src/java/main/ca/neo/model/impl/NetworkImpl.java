@@ -401,7 +401,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	/**
 	 * @see ca.neo.model.Network#exposeState(ca.neo.model.Probeable, java.lang.String, java.lang.String)
 	 */
-	public void exposeState(Probeable probeable, String stateName, String name) {
+	public void exposeState(Probeable probeable, String stateName, String name) throws StructuralException {
+		if (probeable.listStates().get(stateName) == null) {
+			throw new StructuralException("The state " + stateName + " does not exist");
+		}
+		
 		myProbeables.put(name, probeable);
 		myProbeableStates.put(name, stateName);
 	}
