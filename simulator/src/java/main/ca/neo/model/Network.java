@@ -135,8 +135,9 @@ public interface Network extends Node, Probeable {
 	 * @param probeable A Probeable within this Network. 
 	 * @param stateName A state of the given Probeable
 	 * @param name A new name with which to access this state via Network.getHistory
+	 * @throws StructuralException 
 	 */
-	public void exposeState(Probeable probeable, String stateName, String name);
+	public void exposeState(Probeable probeable, String stateName, String name) throws StructuralException;
 	
 	/**
 	 * Undoes exposeState(x, x, name). 
