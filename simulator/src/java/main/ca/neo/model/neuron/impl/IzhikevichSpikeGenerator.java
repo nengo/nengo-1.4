@@ -28,13 +28,54 @@ import ca.neo.util.impl.TimeSeries1DImpl;
  * u is a membrane recovery variable;
  * a, b, c, and d are modifiable parameters</p>
  * 
- * TODO (bryan): test
- * 
- * @author Hussein
+ * @author Hussein, Bryan 
  */
 public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Preset parameter values corresponding to different cell types. 
+	 *  
+	 * @author Bryan Tripp
+	 */
+	public static enum Preset {
+		
+		CUSTOM(0f, 0f, 0f, 0f), 
+		DEFAULT(0.02f, .2f, -65f, 2f), 
+		REGULAR_SPIKING(0.02f, .2f, -65f, 8f), 
+		INTRINSICALLY_BURSTING(0.02f, .2f, -55f, 4f), 
+		CHATTERING(0.02f, .2f, -50f, 2f), 
+		FAST_SPIKING(.1f, .2f, -65f, 2f), 
+		//LOW_THRESHOLD_SPIKING(0.02f, .25f, -65f, 2f), //only b param given by Izhikevich 
+		//THALAMO_CORTICAL(0.02f, .2f, -65f, 2f), //parameters not given (two regimes) 
+		RESONATOR(0.1f, .26f, -65f, 2f);
+		
+		float myA;
+		float myB;
+		float myC;
+		float myD;
+		
+		private Preset(float a, float b, float c, float d) {
+			myA = a; myB = b; myC = c; myD = d;
+		}
+		
+		public float getA() {
+			return myA;
+		}
+		
+		public float getB() {
+			return myB;
+		}
+		
+		public float getC() {
+			return myC;
+		}
+		
+		public float getD() {
+			return myD;
+		}		
+	}
 	
 	/**
 	 * Voltage state variable 
@@ -48,17 +89,18 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	
 	private static SimulationMode[] ourSupportedModes = new SimulationMode[]{SimulationMode.DEFAULT};
 
-	private static float myMaxTimeStep = .0005f;
+	private static float myMaxTimeStep = .001f;
 	private static float Vth = 30;
 	
-	private float myA;
-	private float myB;
-	private float myC;
-	private float myD;
-	private float myInitialVoltage;
+	private double myA;
+	private double myB;
+	private double myC;
+	private double myD;
+	private double myInitialVoltage;
+	private Preset myPreset;
 	
-	private float myVoltage;
-	private float myRecovery;
+	private double myVoltage;
+	private double myRecovery;
 	
 	private float[] myTime;
 	private float[] myVoltageHistory;
@@ -78,6 +120,14 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	}
 
 	/**
+	 * @param preset A set of parameter values corresponding to a predefined cell type
+	 */
+	public IzhikevichSpikeGenerator(Preset preset) {
+		this(preset.getA(), preset.getB(), preset.getC(), preset.getD());
+		myPreset = preset;
+	}
+
+	/**
 	 * @param a time scale of recovery variable 
 	 * @param b sensitivity of recovery variable
 	 * @param c voltage reset value
@@ -88,8 +138,6 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	}
 	
 	/**
-	 * @param maxTimeStep maximum integration time step (s). Shorter time steps may be used if a 
-	 * 		run(...) is requested with a length that is not an integer multiple of this value.  
 	 * @param a time scale of recovery variable 
 	 * @param b sensitivity of recovery variable
 	 * @param c voltage reset value
@@ -105,21 +153,41 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		myInitialVoltage = initialVoltage;
 		
 		myMode = SimulationMode.DEFAULT;
-
+		myPreset = Preset.CUSTOM;
+		
 		reset(false);
+	}
+	
+	/**
+	 * @return An enumerated parameter value preset
+	 */
+	public Preset getPreset() {
+		return myPreset;
+	}
+	
+	/**
+	 * @param preset An enumerated parameter value preset
+	 */
+	public void setPreset(Preset preset) {
+		myPreset = preset;
+		myA = preset.getA();
+		myB = preset.getB();
+		myC = preset.getC();
+		myD = preset.getD();
 	}
 
 	/**
 	 * @return time scale of recovery variable
 	 */
 	public float getA() {
-		return myA;
+		return (float) myA;
 	}
 
 	/**
 	 * @param a time scale of recovery variable
 	 */
 	public void setA(float a) {
+		if (a != myA) myPreset = Preset.CUSTOM;
 		myA = a;
 	}
 
@@ -127,13 +195,14 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 * @return sensitivity of recovery variable
 	 */
 	public float getB() {
-		return myB;
+		return (float) myB;
 	}
 
 	/**
 	 * @param b sensitivity of recovery variable
 	 */
 	public void setB(float b) {
+		if (b != myB) myPreset = Preset.CUSTOM;
 		myB = b;
 	}
 
@@ -141,13 +210,14 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 * @return voltage reset value
 	 */
 	public float getC() {
-		return myC;
+		return (float) myC;
 	}
 
 	/**
 	 * @param c voltage reset value
 	 */
 	public void setC(float c) {
+		if (c != myC) myPreset = Preset.CUSTOM;
 		myC = c;
 	}
 
@@ -155,13 +225,14 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 * @return recovery variable reset change
 	 */
 	public float getD() {
-		return myD;
+		return (float) myD;
 	}
 
 	/**
 	 * @param d recovery variable reset change
 	 */
 	public void setD(float d) {
+		if (d != myD) myPreset = Preset.CUSTOM;
 		myD = d;
 	}
 	
@@ -170,7 +241,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 */
 	public void reset(boolean randomize) {
 		myVoltage = myInitialVoltage;
-		myRecovery = 0f;
+		myRecovery = myB*myVoltage;
 		myTime = ourNullTime;
 		myVoltageHistory = ourNullVoltageHistory;
 		myRecoveryHistory = ourNullRecoveryHistory;
@@ -188,7 +259,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	
 	private boolean doSpikingRun(float[] time, float[] current) {
 		float len = time[time.length - 1] - time[0];
-		int steps = (int) Math.ceil(len / myMaxTimeStep);
+		int steps = (int) Math.ceil((len - 1e-5) / myMaxTimeStep);
 		float dt = len / steps;
 		
 		myTime = new float[steps];
@@ -198,21 +269,20 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		boolean spiking = false;
 		for (int i = 0; i < steps; i++) {
 			myTime[i] = time[0] + i*dt;
-			float I = LinearCurveFitter.InterpolatedFunction.interpolate(time, current, myTime[i]+dt/2f);
-			
-			float dv = 0.04f*myVoltage*myVoltage + 5*myVoltage + 140 - myRecovery + I;					
-			myVoltage += 1000*dt*dv;
-			myVoltageHistory[i] = myVoltage;
-			
-			float du = myA*(myB*myVoltage - myRecovery);
-			myRecovery = myRecovery + 1000*dt*du;
-			myRecoveryHistory[i] = myRecovery;
+			double I = LinearCurveFitter.InterpolatedFunction.interpolate(time, current, myTime[i]+dt/2f);
 			
 			if (myVoltage >= Vth) {
 				spiking = true;
 				myVoltage = myC;		
 				myRecovery = myRecovery + myD; 
 			}
+			
+			myVoltage += 500 * dt * (0.04*myVoltage*myVoltage + 5*myVoltage + 140 - myRecovery + I);
+			myVoltage += 500 * dt * (0.04*myVoltage*myVoltage + 5*myVoltage + 140 - myRecovery + I);
+			myVoltageHistory[i] = (float) myVoltage;
+			
+			myRecovery += 1000 * dt * (myA*(myB*myVoltage - myRecovery));
+			myRecoveryHistory[i] = (float) myRecovery;			
 		}
 		
 		return spiking;	
