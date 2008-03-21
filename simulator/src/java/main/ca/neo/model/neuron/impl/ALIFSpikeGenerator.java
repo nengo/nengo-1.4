@@ -26,6 +26,7 @@ import ca.neo.model.impl.FunctionInput;
 import ca.neo.model.impl.NetworkImpl;
 import ca.neo.model.impl.RealOutputImpl;
 import ca.neo.model.impl.SpikeOutputImpl;
+import ca.neo.model.impl.PreciseSpikeOutputImpl;
 import ca.neo.model.neuron.SpikeGenerator;
 import ca.neo.plot.Plotter;
 import ca.neo.util.Probe;
@@ -67,7 +68,6 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 	
 	private float myV;
 	private float myN;	
-	private float myTauRefNext;
 	private float myTimeSinceLastSpike;
 	
 	private float[] myTime;
@@ -170,22 +170,34 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		float I = I_in - G_N*myN; 
 		
 		InstantaneousOutput result = null;
-		if (myMode.equals(SimulationMode.DEFAULT)) {
+		if (myMode.equals(SimulationMode.DEFAULT) || myMode.equals(SimulationMode.PRECISE)) {
 			myTimeSinceLastSpike = myTimeSinceLastSpike + dt;
 
-			float dV = (myTimeSinceLastSpike > myTauRefNext) ? (1 / myTauRC) * (I*R - myV) : 0;
-			myV = Math.max(0, myV + dt*dV);
-
-			boolean spiking = (myV > Vth);
-			if (spiking) {
-				myTimeSinceLastSpike = 0;
-				myN += myIncN; 
-				myV = 0;		
-				myTauRefNext = myTauRef + dt - 2 * (float) PDFTools.random() * dt;
+			float dV = (1 / myTauRC) * (I*R - myV);			 
+			if (myTimeSinceLastSpike < myTauRef) {
+				dV = 0;
+			} else if (myTimeSinceLastSpike < myTauRef+dt) {
+				dV*=(myTimeSinceLastSpike-myTauRef)/dt;				
 			}
 			
-			myRateHistory = new float[]{spiking ? 1f/dt : 0};
-			result = new SpikeOutputImpl(new boolean[]{spiking}, Units.SPIKES, time[time.length-1]);
+			float prevV=myV;
+			myV = Math.max(0, myV + dt*dV);
+
+			float spikeTime=-1f;
+			if (myV >= Vth) {
+				spikeTime=(Vth-prevV)*dt/(myV-prevV);
+				myTimeSinceLastSpike = dt-spikeTime;
+
+				myN += myIncN; 
+				myV = 0;		
+			}
+			
+			myRateHistory = new float[]{spikeTime>=0 ? 1f/dt : 0};
+			
+			if (myMode.equals(SimulationMode.DEFAULT))
+				result = new SpikeOutputImpl(new boolean[]{spikeTime>=0f}, Units.SPIKES, time[time.length-1]);
+			else
+				result = new PreciseSpikeOutputImpl(new float[]{spikeTime}, Units.SPIKES, time[time.length-1]);
 		} else if (myMode.equals(SimulationMode.RATE)) {
 			float rate = I > 1 ? 1f / ( myTauRef - myTauRC * ((float) Math.log(1f - 1f/I)) ) : 0;
 			myN += (rate * dt) * myIncN; //analog of # spikes X increment 
