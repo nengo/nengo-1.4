@@ -17,6 +17,7 @@ import ca.neo.model.Ensemble;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.Origin;
+import ca.neo.model.PreciseSpikeOutput;
 import ca.neo.model.Probeable;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SimulationMode;
@@ -184,7 +185,12 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 			if (myCollectSpikesFlag && (myCollectSpikesRatio == 1 || i % myCollectSpikesRatio == 0)) {
 				try {
 					InstantaneousOutput output = myNodes[i].getOrigin(Neuron.AXON).getValues();
-					if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
+					if (output instanceof PreciseSpikeOutput) {
+						PreciseSpikeOutput precise=((PreciseSpikeOutput) output);						
+						if (precise.getValues()[0]) {
+							mySpikePattern.addSpike(i, endTime+precise.getSpikeTimes()[0]);
+						}
+					} else if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
 						mySpikePattern.addSpike(i, endTime);
 					}				
 				} catch (StructuralException e) {
