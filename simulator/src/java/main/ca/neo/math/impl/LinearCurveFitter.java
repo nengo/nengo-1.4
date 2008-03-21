@@ -152,18 +152,38 @@ public class LinearCurveFitter implements CurveFitter {
 		 * @see ca.neo.math.impl.AbstractFunction#map(float[])
 		 */
 		public float map(float[] from) {
-			float x = from[0];
-			
-			//find index of lowest myX that is >= x
-			int index = Arrays.binarySearch(myX, x);
+			return interpolate(myX, myY, from[0]);
+//			float x = from[0];
+//			
+//			//find index of lowest myX that is >= x
+//			int index = Arrays.binarySearch(myX, x);
+//			if (index < 0) index = - index - 1; 		
+//			
+//			//use last interval on each end for extrapolation
+//			if (index == 0) index = 1; 
+//			if (index == myX.length) index = index - 1;
+//			
+//			float dx = x - myX[index-1];
+//			return myY[index-1] + (myY[index] - myY[index-1]) * dx / (myX[index] - myX[index-1]); 
+		}
+		
+		/**
+		 * @param xs List of x values
+		 * @param ys List of y values that x values map onto 
+		 * @param x An x value at which to interpolate this mapping
+		 * @return The interpolated y value
+		 */
+		public static float interpolate(float[] xs, float[] ys, float x) {
+			//find index of lowest xs that is >= x
+			int index = Arrays.binarySearch(xs, x);
 			if (index < 0) index = - index - 1; 		
 			
 			//use last interval on each end for extrapolation
 			if (index == 0) index = 1; 
-			if (index == myX.length) index = index - 1;
+			if (index == xs.length) index = index - 1;
 			
-			float dx = x - myX[index-1];
-			return myY[index-1] + (myY[index] - myY[index-1]) * dx / (myX[index] - myX[index-1]); 
+			float dx = x - xs[index-1];
+			return ys[index-1] + (ys[index] - ys[index-1]) * dx / (xs[index] - xs[index-1]); 			
 		}
 
 		@Override
