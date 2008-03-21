@@ -77,13 +77,13 @@ public class IconRegistry {
 
 			ourInstance.setIcon(DynamicalSystem.class, "/ca/neo/config/ui/dynamicalsystem02.jpg");
 			ourInstance.setIcon(Integrator.class, "/ca/neo/config/ui/integrator.jpg");
-//			ourInstance.setIcon(PDF.class, "/ca/neo/config/ui/pdf.jpg");
+			ourInstance.setIcon(PDF.class, "/ca/neo/config/ui/pdf.jpg");
 			ourInstance.setIcon(Function.class, "/ca/neo/config/ui/function.jpg");
 			ourInstance.setIcon(Noise.class, "/ca/neo/config/ui/noise01.jpg");
 			ourInstance.setIcon(Origin.class, "/ca/neo/config/ui/origin4.jpg");
 			ourInstance.setIcon(SimulationMode.class, "/ca/neo/config/ui/simulationmode.jpg");
 			ourInstance.setIcon(SpikeGenerator.class, "/ca/neo/config/ui/spikegenerator.jpg");
-//			ourInstance.setIcon(Units.class, "/ca/neo/config/ui/units.jpg");
+			ourInstance.setIcon(Units.class, "/ca/neo/config/ui/units.jpg");
 			ourInstance.setIcon(SpikePattern.class, "/ca/neo/config/ui/spikepattern.jpg");
 			ourInstance.setIcon(PlasticityRule.class, "/ca/neo/config/ui/plasticityrule.jpg");
 			ourInstance.setIcon(Termination.class, "/ca/neo/config/ui/termination4.jpg");		
