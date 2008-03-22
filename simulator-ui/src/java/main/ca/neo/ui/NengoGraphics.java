@@ -1,6 +1,7 @@
 package ca.neo.ui;
 
 import java.awt.Container;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
@@ -18,6 +19,8 @@ import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
@@ -122,7 +125,14 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new NengoGraphics();
+		JFrame frame = new NengoGraphics();
+		
+		try {
+			Image image = ImageIO.read(frame.getClass().getClassLoader().getResource("ca/neo/ui/spikepattern-black.png"));
+			frame.setIconImage(image);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private NengoClipboard clipboard;
