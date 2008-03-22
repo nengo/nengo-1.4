@@ -3,6 +3,14 @@
  */
 package ca.neo.model.impl;
 
+import org.apache.log4j.Logger;
+
+import ca.neo.config.ConfigUtil;
+import ca.neo.config.Configurable;
+import ca.neo.config.Configuration;
+import ca.neo.config.Property;
+import ca.neo.config.impl.ConfigurationImpl;
+import ca.neo.config.impl.SingleValuedPropertyImpl;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.Noise;
@@ -17,9 +25,11 @@ import ca.neo.model.Units;
  * 
  * @author Bryan Tripp
  */
-public class BasicOrigin implements Origin, Noise.Noisy, Resettable {
+public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurable {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static Logger ourLogger = Logger.getLogger(BasicOrigin.class);
 
 	private Node myNode;
 	private String myName;
@@ -28,6 +38,7 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable {
 	private InstantaneousOutput myValues;
 	private Noise myNoise;
 	private Noise[] myNoises; //per output
+	private ConfigurationImpl myConfiguration;
 
 	/**
 	 * @param node The parent Node
@@ -39,7 +50,29 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable {
 		myName = name;
 		myDimension = dimension;
 		myUnits = units;
-		myValues = new RealOutputImpl(new float[dimension], units, 0);
+		myValues = new RealOutputImpl(new float[dimension], units, 0);		
+	}
+	
+	private void initConfiguration() {
+		myConfiguration = ConfigUtil.defaultConfiguration(this);
+		myConfiguration.removeProperty("dimensions");
+		try {
+			Property p = new SingleValuedPropertyImpl(myConfiguration, "dimensions", Integer.TYPE, 
+					this.getClass().getMethod("getDimensions", new Class[0])); 
+			myConfiguration.defineProperty(p);		
+		} catch (Exception e) {
+			ourLogger.warn("Can't define property 'dimensions'", e);
+		}		
+	}
+	
+	/**
+	 * @see ca.neo.config.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		if (myConfiguration == null) {
+			initConfiguration();
+		}
+		return myConfiguration;
 	}
 	
 	/**
@@ -91,6 +124,7 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable {
 		if (myNoise != null) {
 			setNoise(myNoise);
 		}
+		reset(false);
 	}
 
 	/**
@@ -168,6 +202,7 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable {
 				myNoises[i].reset(randomize);
 			}
 		}
+		myValues = new RealOutputImpl(new float[myDimension], myUnits, 0);		
 	}
 	
 }
