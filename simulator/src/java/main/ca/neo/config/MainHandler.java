@@ -19,12 +19,14 @@ import ca.neo.config.handlers.BooleanHandler;
 import ca.neo.config.handlers.FloatHandler;
 import ca.neo.config.handlers.IntegerHandler;
 import ca.neo.config.handlers.MatrixHandler;
-import ca.neo.config.handlers.SimulationModeHandler;
+import ca.neo.config.handlers.EnumHandler;
 import ca.neo.config.handlers.StringHandler;
-import ca.neo.config.handlers.UnitsHandler;
 import ca.neo.config.handlers.VectorHandler;
 import ca.neo.config.ui.ConfigurationChangeListener;
 import ca.neo.config.ui.ConfigurationTreeModel.NullValue;
+import ca.neo.model.SimulationMode;
+import ca.neo.model.Units;
+import ca.neo.model.neuron.impl.IzhikevichSpikeGenerator;
 
 /**
  * A composite ConfigurationHandler which delegates to other underlying ConfigurationHandlers 
@@ -74,8 +76,9 @@ public class MainHandler implements ConfigurationHandler {
 		addHandler(new BooleanHandler());
 		addHandler(new VectorHandler());
 		addHandler(new MatrixHandler());
-		addHandler(new SimulationModeHandler());
-		addHandler(new UnitsHandler());
+		addHandler(new EnumHandler(SimulationMode.class, SimulationMode.DEFAULT));
+		addHandler(new EnumHandler(Units.class, Units.UNK));
+		addHandler(new EnumHandler(IzhikevichSpikeGenerator.Preset.class, IzhikevichSpikeGenerator.Preset.DEFAULT));
 	}
 	
 	private void loadHandlers(File file) throws IOException {

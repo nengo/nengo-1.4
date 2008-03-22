@@ -1,7 +1,5 @@
 package ca.neo.model;
 
-import java.io.Serializable;
-
 /**
  * A SimulationMode is a way in which a Neuron or Ensemble can be simulated.  
  * Different modes trade off between performance and realism. All Neurons and 
@@ -12,15 +10,13 @@ import java.io.Serializable;
  * 
  * @author Bryan Tripp
  */
-public class SimulationMode implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public enum SimulationMode {
 
 	/**
 	 * The normal level of detail at which a Neuron/Ensemble runs (all Neuron/Ensembles must support 
 	 * this mode).  
 	 */
-	public static final SimulationMode DEFAULT = new SimulationMode(null, "DEFAULT");
+	DEFAULT(null),
 	
 	/**
 	 * A spiking mode in which some precision is sacrificed for improved performance. For 
@@ -28,12 +24,12 @@ public class SimulationMode implements Serializable {
 	 * for subthreshold operation, but switch to a stereotyped template for spike generation,  
 	 * to avoid the shorter time steps that are typically needed to model spiking.     
 	 */
-	public static final SimulationMode APPROXIMATE = new SimulationMode(DEFAULT, "APPROXIMATE");
+	APPROXIMATE(DEFAULT),
 	
 	/**
 	 * Outputs that spike by default are instead expressed in terms of firing rates. 
 	 */
-	public static final SimulationMode RATE = new SimulationMode(APPROXIMATE, "RATE");
+	RATE(APPROXIMATE),
 
 	/**
 	 * Outputs that spike by default are expressed as rates that are constant for a 
@@ -41,13 +37,13 @@ public class SimulationMode implements Serializable {
 	 * decoders (see NEFEnsemble). If a Neuron can not run in this mode, then in order to find decoders, 
 	 * simulations must be performed to see how the Neuron responds to various inputs.
 	 */
-	public static final SimulationMode CONSTANT_RATE = new SimulationMode(RATE, "CONSTANT_RATE");
+	CONSTANT_RATE(RATE),
 	
 	/**
 	 * Neurons are not used. Ensembles process represented variables directly rather than  
 	 * approximations based on neural activity.   
 	 */
-	public static final SimulationMode DIRECT = new SimulationMode(RATE, "DIRECT");
+	DIRECT(RATE),
 	
 	/**
 	 * A higher level of precision than DEFAULT. The default level should be accurate for most purposes, 
@@ -56,14 +52,12 @@ public class SimulationMode implements Serializable {
 	 * what is deemed necessary). Another way to increase precision, independently of using PRECISE mode, is 
 	 * to simulate with a shorter network time step. 
 	 */
-	public static final SimulationMode PRECISE = new SimulationMode(DEFAULT, "PRECISE");
+	PRECISE(DEFAULT);
 	
 	private SimulationMode myFallbackMode;
-	private String myName;
 	
-	private SimulationMode(SimulationMode fallbackMode, String name) {
+	private SimulationMode(SimulationMode fallbackMode) {
 		myFallbackMode = fallbackMode;
-		myName = name;
 	}
 	
 	/**
@@ -79,20 +73,6 @@ public class SimulationMode implements Serializable {
 		}
 		
 		return myFallbackMode;
-	}
-
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object o) {
-		return (o instanceof SimulationMode && this.toString().equals(o.toString()));
-	}
-
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return myName;
 	}
 
 	/**

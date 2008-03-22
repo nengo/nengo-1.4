@@ -3,45 +3,49 @@
  */
 package ca.neo.model;
 
-import org.apache.commons.lang.enums.Enum;
-
 /**
  * Models units for physical quantities. We use this class to model both fundamental units 
  * (e.g. 's') and composite units (e.g. 'spikes/s').
  *    
  * @author  Bryan Tripp
  */
-public class Units extends Enum {
+public enum Units {
 
-	private static final long serialVersionUID = 1L;
-	
-	public static final Units S = new Units("s"); //seconds
+	S("s"), //seconds
 	
 	//Neural 
-	public static final Units mV = new Units("mV"); //millivolts
-	public static final Units uA = new Units("uA"); //micro-amps
-	public static final Units uAcm2 = new Units("uA/cm^2"); //micro-amps per cm^2
-	public static final Units ACU = new Units("ACU"); //arbitrary current units 
-	public static final Units AVU = new Units("AVU"); //arbitrary voltage units
-	public static final Units UNK = new Units("UNK"); //unknown units
-	public static final Units SPIKES = new Units("spikes"); //spikes (count)
-	public static final Units SPIKES_PER_S = new Units("spikes/s"); //spike rate
+	mV("mV"), //millivolts
+	uA("uA"), //micro-amps
+	uAcm2("uA/cm^2"), //micro-amps per cm^2
+	ACU("ACU"), //arbitrary current units 
+	AVU("AVU"), //arbitrary voltage units
+	UNK("UNK"), //unknown units
+	SPIKES("spikes"), //spikes (count)
+	SPIKES_PER_S("spikes/s"), //spike rate
 
 	//Mechanical
-	public static final Units N = new Units("N"); //Newtons
-	public static final Units Nm = new Units("Nm"); //Newton metres
-	public static final Units M = new Units("m"); //metres 
-	public static final Units RAD = new Units("rad"); //radians 
-	public static final Units M_PER_S = new Units("m/s"); //metres per second
-	public static final Units RAD_PER_S = new Units("rad/s"); //radians per second
+	N("N"), //Newtons
+	Nm("Nm"), //Newton metres
+	M("m"), //metres 
+	RAD("rad"), //radians 
+	M_PER_S("m/s"), //metres per second
+	RAD_PER_S("rad/s"); //radians per second
+	
+	public String myName;
 	
 	/**
 	 * @param name Standard name of units
 	 */
 	private Units(String name) {
-		super(name);
+		myName = name;
 	}
 	
+	
+	@Override
+	public String toString() {
+		return myName;
+	}
+
 	/**
 	 * Returns an array of Units in which all Units are the same. 
 	 * 
