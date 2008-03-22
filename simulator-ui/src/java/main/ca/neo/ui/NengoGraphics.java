@@ -573,10 +573,10 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O, KeyStroke.getKeyStroke(
 				KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 
-		fileMenu.addAction(new SaveNetworkAction("Save"), KeyEvent.VK_S, KeyStroke.getKeyStroke(
-				KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-		fileMenu.addAction(new RunNetworkAction("Run"), KeyEvent.VK_R, KeyStroke.getKeyStroke(
-				KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+		fileMenu.addAction(new SaveNetworkAction("Save Network"), KeyEvent.VK_S, KeyStroke
+				.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		fileMenu.addAction(new RunNetworkAction("Run Network"), KeyEvent.VK_R, KeyStroke
+				.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
 	}
 
 	@Override

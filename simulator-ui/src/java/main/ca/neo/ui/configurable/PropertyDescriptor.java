@@ -14,28 +14,34 @@ public abstract class PropertyDescriptor implements Serializable {
 
 	private Object defaultValue = null;
 
-	private boolean isEditable = true;
+	private String description;
 
+	private boolean isEditable = true;
 	private String name;
 
-	/**
-	 * @param name
-	 *            Name to be given to the parameter
-	 */
 	public PropertyDescriptor(String name) {
-		super();
-		this.name = name;
+		this(name, null, null);
+	}
 
+	public PropertyDescriptor(String name, Object defaultValue) {
+		this(name, null, defaultValue);
+	}
+
+	public PropertyDescriptor(String name, String description) {
+		this(name, description, null);
 	}
 
 	/**
 	 * @param name
 	 *            Name to be given to the parameter
+	 * @param description
+	 *            Description of the parameter
 	 * @param defaultValue
 	 *            Default value of this parameter
 	 */
-	public PropertyDescriptor(String name, Object defaultValue) {
+	public PropertyDescriptor(String name, String description, Object defaultValue) {
 		super();
+		this.description = description;
 		this.defaultValue = defaultValue;
 		this.name = name;
 
@@ -52,6 +58,10 @@ public abstract class PropertyDescriptor implements Serializable {
 	 */
 	public Object getDefaultValue() {
 		return defaultValue;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	/**
@@ -79,6 +89,16 @@ public abstract class PropertyDescriptor implements Serializable {
 		return name;
 	}
 
+	public String getTooltip() {
+		String nodeDescription = "Type: " + getTypeName();
+
+		if (description != null) {
+			return nodeDescription + "\n" + description;
+		} else {
+			return nodeDescription;
+		}
+	}
+
 	/**
 	 * @return Class type that this parameter's value must be
 	 */
@@ -93,6 +113,14 @@ public abstract class PropertyDescriptor implements Serializable {
 		return isEditable;
 	}
 
+	public void setDefaultValue(Object defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	/**
 	 * Sets whether this property can be changed from its default value
 	 * 
@@ -105,10 +133,6 @@ public abstract class PropertyDescriptor implements Serializable {
 	@Override
 	public String toString() {
 		return getTypeName();
-	}
-
-	public void setDefaultValue(Object defaultValue) {
-		this.defaultValue = defaultValue;
 	}
 
 }

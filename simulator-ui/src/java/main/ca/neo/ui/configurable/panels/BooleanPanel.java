@@ -1,6 +1,7 @@
 package ca.neo.ui.configurable.panels;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
 import ca.neo.ui.configurable.PropertyDescriptor;
 import ca.neo.ui.configurable.PropertyInputPanel;
@@ -33,7 +34,7 @@ public class BooleanPanel extends PropertyInputPanel {
 		checkBox = new JCheckBox();
 		checkBox.setSelected(false);
 		add(checkBox);
-
+		add(new JLabel("Enable"));
 	}
 
 	@Override

@@ -33,19 +33,19 @@ public abstract class PropertyInputPanel {
 		this.propDescriptor = property;
 		outerPanel = new JPanel();
 		outerPanel.setName(property.getName());
+		outerPanel.setToolTipText(property.getTooltip());
 
 		outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
 		outerPanel.setAlignmentY(JPanel.TOP_ALIGNMENT);
 
 		outerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-		JLabel label = new JLabel(property.getName() + " (" + property.getTypeName() + ")");
+		JLabel label = new JLabel(property.getName());
 		outerPanel.add(label);
 
 		innerPanel = new JPanel();
 		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
 		innerPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-
 		outerPanel.add(innerPanel);
 
 		statusMessage = new JLabel("");

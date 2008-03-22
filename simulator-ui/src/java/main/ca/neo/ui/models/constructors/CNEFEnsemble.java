@@ -34,15 +34,15 @@ import ca.neo.util.impl.RandomHypersphereVG;
 import ca.neo.util.impl.Rectifier;
 
 public class CNEFEnsemble extends ConstructableNode {
-	static final PropertyDescriptor pDecodingSign = new PSign("Decoding");
+	static final PropertyDescriptor pDecodingSign = new PSign("Decoding Sign");
 
 	static final PropertyDescriptor pDim = new PInt("Dimensions");
 
 	static final PropertyDescriptor pEncodingDistribution = new PEncodingDistribution(
 			"Encoding Distribution");
-	static final PropertyDescriptor pEncodingSign = new PSign("Encoding");
+	static final PropertyDescriptor pEncodingSign = new PSign("Encoding Sign");
 	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
-	static final PropertyDescriptor pNodeFactory = new PNodeFactory("Node Type");
+	static final PropertyDescriptor pNodeFactory = new PNodeFactory("Node Factory");
 
 	/**
 	 * Config descriptors

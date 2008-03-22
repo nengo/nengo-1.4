@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -33,13 +32,11 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
 	private JComboBox templateList;
 
-	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
-			Dialog owner) {
+	public ConfigTemplateDialog(UserTemplateConfigurer configManager, Dialog owner) {
 		super(configManager, owner);
 	}
 
-	public ConfigTemplateDialog(UserTemplateConfigurer configManager,
-			Frame owner) {
+	public ConfigTemplateDialog(UserTemplateConfigurer configManager, Frame owner) {
 		super(configManager, owner);
 	}
 
@@ -47,8 +44,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	protected void completeConfiguration() throws ConfigException {
 		super.completeConfiguration();
 
-		getConfigurer().savePropertiesFile(
-				UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
+		getConfigurer().savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
 
 	}
 
@@ -73,7 +69,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 				}
 			}
 
-//			updateDialogFromFile();
+			// updateDialogFromFile();
 		}
 	}
 
@@ -86,9 +82,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
 		templateList = new JComboBox(files);
 
-		JPanel savedFilesPanel = new JCustomPanel();
-
-		JPanel dropDownPanel = new JCustomPanel();
+		JPanel savedFilesPanel = new VerticalLayoutPanel();
 
 		templateList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -98,14 +92,13 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		});
 
 		savedFilesPanel.add(new JLabel("Templates"));
-		dropDownPanel.add(templateList);
-		dropDownPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		savedFilesPanel.add(dropDownPanel);
 
-		JPanel buttonsPanel = new JCustomPanel();
+		savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
-		buttonsPanel.add(Box.createHorizontalGlue());
-		buttonsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 5));
+		buttonsPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+		buttonsPanel.add(templateList);
 
 		JButton button;
 		button = new JButton("New");
@@ -117,12 +110,10 @@ public class ConfigTemplateDialog extends ConfigDialog {
 					if (name != null && name.compareTo("") != 0) {
 						getConfigurer().savePropertiesFile(name);
 						templateList.addItem(name);
-						templateList.setSelectedIndex(templateList
-								.getItemCount() - 1);
+						templateList.setSelectedIndex(templateList.getItemCount() - 1);
 					}
 				} else {
-					UserMessages
-							.showWarning("Cannot create template with incomplete properties");
+					UserMessages.showWarning("Cannot create template with incomplete properties");
 				}
 			}
 		});
@@ -144,17 +135,15 @@ public class ConfigTemplateDialog extends ConfigDialog {
 		button.setFont(Style.FONT_SMALL);
 		buttonsPanel.add(button);
 
-		savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10,
-				10));
+		savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		savedFilesPanel.add(buttonsPanel);
 
-		JPanel wrapperPanel = new JCustomPanel();
-		wrapperPanel.setBorder(BorderFactory
-				.createEtchedBorder(EtchedBorder.LOWERED));
+		JPanel wrapperPanel = new VerticalLayoutPanel();
+		wrapperPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		wrapperPanel.add(savedFilesPanel);
 
-		JPanel seperator = new JCustomPanel();
+		JPanel seperator = new VerticalLayoutPanel();
 		seperator.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
 		if (getConfigurer().isTemplateEditable()) {
@@ -170,15 +159,12 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	protected void updateDialogFromFile() {
 		try {
 			if (templateList.getSelectedItem() != null) {
-				getConfigurer().loadPropertiesFromFile(
-						(String) templateList.getSelectedItem());
-				Iterator<PropertyInputPanel> it = propertyInputPanels
-						.iterator();
+				getConfigurer().loadPropertiesFromFile((String) templateList.getSelectedItem());
+				Iterator<PropertyInputPanel> it = propertyInputPanels.iterator();
 				while (it.hasNext()) {
 					PropertyInputPanel panel = it.next();
 
-					Object currentValue = getConfigurer().getProperty(
-							panel.getName());
+					Object currentValue = getConfigurer().getProperty(panel.getName());
 					if (currentValue != null && panel.isEnabled()) {
 						panel.setValue(currentValue);
 					}
@@ -186,8 +172,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 				}
 			}
 		} catch (ClassCastException e) {
-			Util
-					.debugMsg("Saved template has incompatible data, it will be ignored");
+			Util.debugMsg("Saved template has incompatible data, it will be ignored");
 		}
 	}
 
@@ -203,11 +188,11 @@ public class ConfigTemplateDialog extends ConfigDialog {
  * 
  * @author Shu
  */
-class JCustomPanel extends JPanel {
+class VerticalLayoutPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	public JCustomPanel() {
+	public VerticalLayoutPanel() {
 		super();
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

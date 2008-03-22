@@ -2,6 +2,7 @@ package ca.neo.ui.configurable.managers;
 
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -113,7 +114,7 @@ public class ConfigDialog extends JDialog {
 	 * Creates ok, cancel buttons on the dialog
 	 */
 	private void createButtons(JPanel panel) {
-		JPanel buttonsPanel = new JCustomPanel();
+		JPanel buttonsPanel = new VerticalLayoutPanel();
 		buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
 		buttonsPanel.add(Box.createHorizontalGlue());
 		buttonsPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 5, 5));
@@ -160,7 +161,8 @@ public class ConfigDialog extends JDialog {
 		setResizable(false);
 		setModal(true);
 
-		panel = new JCustomPanel();
+		panel = new VerticalLayoutPanel();
+
 		panel.setVisible(true);
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -174,6 +176,7 @@ public class ConfigDialog extends JDialog {
 
 		add(panel);
 		pack();
+		setMinimumSize(new Dimension(300, this.getHeight()));
 		setLocationRelativeTo(owner);
 		this.setVisible(true);
 	}
