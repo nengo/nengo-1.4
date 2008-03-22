@@ -1,6 +1,8 @@
 ******************************************
  Done
 *******************************************
+03/22/2008 - Request ID 1915622: Added noise and singular values selection to unconstrained decoders
+
 03/22/2008 - Added rename logic to node creation code paths
 03/22/2008 - Creating nodes through File->New now places them in the top container
 03/22/2008 - Tweaked look-and-feel of ConfigDialogs

@@ -111,6 +111,7 @@ public class Util {
 		if (msg == null || "".equals(msg)) {
 			msg = "Exception";
 		}
+		
 		UserMessages.showTextDialog(msg, assertMsg.toString(), JOptionPane.ERROR_MESSAGE);
 
 	}

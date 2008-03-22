@@ -55,7 +55,7 @@ public class UserMessages {
 		JTextArea editor = new JTextArea(30, 50);
 		editor.setText(msg);
 		editor.setEditable(false);
-
+		editor.setCaretPosition(0);
 		JOptionPane.showMessageDialog(UIEnvironment.getInstance(), new JScrollPane(editor), title,
 				messageType);
 	}

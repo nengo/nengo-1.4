@@ -2,9 +2,13 @@ package ca.neo.ui.models.constructors;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,40 +19,45 @@ import javax.swing.event.ChangeListener;
 
 import ca.neo.math.ApproximatorFactory;
 import ca.neo.math.impl.GradientDescentApproximator;
+import ca.neo.math.impl.WeightedCostApproximator;
 import ca.neo.model.Node;
 import ca.neo.model.StructuralException;
 import ca.neo.model.impl.NodeFactory;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.ConfigSchemaImpl;
 import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
+import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PNodeFactory;
-import ca.neo.ui.models.constructors.PSign.SignType;
+import ca.neo.ui.configurable.managers.UserConfigurer;
+import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.util.VectorGenerator;
 import ca.neo.util.impl.RandomHypersphereVG;
 import ca.neo.util.impl.Rectifier;
+import ca.shu.ui.lib.util.Util;
 
 public class CNEFEnsemble extends ConstructableNode {
-	static final Property pDecodingSign = new PSign("Decoding Sign");
+	static final Property pApproximator = new PApproximator("Decoding Sign");
 
 	static final Property pDim = new PInt("Dimensions");
 
 	static final Property pEncodingDistribution = new PEncodingDistribution("Encoding Distribution");
 	static final Property pEncodingSign = new PSign("Encoding Sign");
-	static final Property pNumOfNeurons = new PInt("Number of Neurons");
 	static final Property pNodeFactory = new PNodeFactory("Node Factory");
+	static final Property pNumOfNodes = new PInt("Number of Nodes");
 
 	/**
 	 * Config descriptors
 	 */
-	static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(new Property[] { pNumOfNeurons,
-			pDim }, new Property[] { pDecodingSign, pEncodingDistribution, pEncodingSign,
-			pNodeFactory });
+	static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(
+			new Property[] { pNumOfNodes, pDim }, new Property[] { pApproximator,
+					pEncodingDistribution, pEncodingSign, pNodeFactory });
 
 	public CNEFEnsemble() {
 		super();
@@ -58,31 +67,23 @@ public class CNEFEnsemble extends ConstructableNode {
 		try {
 
 			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-			Integer numOfNeurons = (Integer) prop.getValue(pNumOfNeurons);
+			Integer numOfNeurons = (Integer) prop.getValue(pNumOfNodes);
 			Integer dimensions = (Integer) prop.getValue(pDim);
 
 			/*
 			 * Advanced properties, these may not necessarily be configued, so
 			 */
-			SignType decodingSign = (SignType) prop.getValue(pDecodingSign);
+			ApproximatorFactory approxFactory = (ApproximatorFactory) prop.getValue(pApproximator);
 			NodeFactory nodeFactory = (NodeFactory) prop.getValue(pNodeFactory);
-			SignType encodingSign = (SignType) prop.getValue(pEncodingSign);
+			Sign encodingSign = (Sign) prop.getValue(pEncodingSign);
 			Float encodingDistribution = (Float) prop.getValue(pEncodingDistribution);
-
-			if (decodingSign != null) {
-				if (decodingSign == SignType.Positive || decodingSign == SignType.Negative) {
-					boolean positive = true;
-					if (decodingSign == SignType.Negative) {
-						positive = false;
-					}
-					ApproximatorFactory approxFactory = new GradientDescentApproximator.Factory(
-							new GradientDescentApproximator.CoefficientsSameSign(positive), false);
-					ef.setApproximatorFactory(approxFactory);
-				}
-			}
 
 			if (nodeFactory != null) {
 				ef.setNodeFactory(nodeFactory);
+			}
+
+			if (approxFactory != null) {
+				ef.setApproximatorFactory(approxFactory);
 			}
 
 			if (encodingSign != null) {
@@ -90,9 +91,9 @@ public class CNEFEnsemble extends ConstructableNode {
 					encodingDistribution = 0f;
 				}
 				VectorGenerator vectorGen = new RandomHypersphereVG(true, 1, encodingDistribution);
-				if (encodingSign == SignType.Positive) {
+				if (encodingSign == Sign.Positive) {
 					vectorGen = new Rectifier(vectorGen, true);
-				} else if (encodingSign == SignType.Negative) {
+				} else if (encodingSign == Sign.Negative) {
 					vectorGen = new Rectifier(vectorGen, false);
 				}
 				ef.setEncoderFactory(vectorGen);
@@ -114,6 +115,133 @@ public class CNEFEnsemble extends ConstructableNode {
 
 	public String getTypeName() {
 		return UINEFEnsemble.typeName;
+	}
+
+}
+
+class PApproximator extends Property {
+
+	private static final long serialVersionUID = 1L;
+
+	private static final String TYPE_NAME = "Approximator Factory";
+
+	public PApproximator(String name) {
+		super(name);
+	}
+
+	@Override
+	protected PropertyInputPanel createInputPanel() {
+		return new Panel(this);
+	}
+
+	@Override
+	public Class<?> getTypeClass() {
+		return ApproximatorFactory.class;
+	}
+
+	@Override
+	public String getTypeName() {
+		return TYPE_NAME;
+	}
+
+	private static class Panel extends PropertyInputPanel {
+		private static SignItem unconstrained = new SignItem("Unconstrained", Sign.Unconstrained);
+		private static SignItem positive = new SignItem("Positive", Sign.Positive);
+		private static SignItem negative = new SignItem("Negative", Sign.Negative);
+
+		private static SignItem[] items = { unconstrained, positive, negative };
+
+		private static final long serialVersionUID = 1L;
+
+		private JComboBox comboBox;
+		private JButton setButton;
+
+		public Panel(Property property) {
+			super(property);
+			comboBox = new JComboBox(items);
+			setButton = new JButton(new AbstractAction("Set") {
+				private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent e) {
+					configure();
+				}
+			});
+
+			add(comboBox);
+			add(setButton);
+
+			comboBox.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					updateApproximator();
+				}
+			});
+			updateApproximator();
+		}
+
+		private void updateApproximator() {
+			Sign sign = ((SignItem) comboBox.getSelectedItem()).getSign();
+
+			if (sign != null) {
+				if (sign == Sign.Positive || sign == Sign.Negative) {
+					setButton.setEnabled(false);
+					boolean positive = true;
+					if (sign == Sign.Negative) {
+						positive = false;
+					}
+					approximator = new GradientDescentApproximator.Factory(
+							new GradientDescentApproximator.CoefficientsSameSign(positive), false);
+
+				} else if (sign == Sign.Unconstrained) {
+					setButton.setEnabled(true);
+					approximator = new WeightedCostApproximator.Factory(noiseLevel, NSV);
+				} else {
+					Util.Assert(false, "Unsupported item");
+				}
+
+			}
+		}
+
+		/*
+		 * These values are used to configure a WeightedCostApproximator
+		 */
+		private float noiseLevel = 0.1f;
+		private int NSV = -1;
+
+		private void configure() {
+			try {
+				Property pNoiseLevel = new PFloat("Noise level", noiseLevel);
+				Property pNSV = new PInt("Number of Singular Values", NSV);
+				ConfigResult result = UserConfigurer.configure(
+						new Property[] { pNoiseLevel, pNSV }, TYPE_NAME, this.getDialogParent(),
+						ConfigMode.STANDARD);
+
+				noiseLevel = (Float) result.getValue(pNoiseLevel);
+				NSV = (Integer) result.getValue(pNSV);
+				updateApproximator();
+
+			} catch (ConfigException e) {
+				e.defaultHandleBehavior();
+			}
+
+		}
+
+		@Override
+		public ApproximatorFactory getValue() {
+			return approximator;
+		}
+
+		@Override
+		public boolean isValueSet() {
+			return (getValue() != null);
+		}
+
+		private ApproximatorFactory approximator;
+
+		@Override
+		public void setValue(Object value) {
+			// do nothing, values can't be set on this property
+		}
+
 	}
 
 }
@@ -215,6 +343,10 @@ class PEncodingDistribution extends Property {
 
 }
 
+enum Sign {
+	Negative, Positive, Unconstrained
+}
+
 class PSign extends Property {
 
 	private static final long serialVersionUID = 1L;
@@ -230,7 +362,7 @@ class PSign extends Property {
 
 	@Override
 	public Class<?> getTypeClass() {
-		return SignType.class;
+		return Sign.class;
 	}
 
 	@Override
@@ -240,9 +372,8 @@ class PSign extends Property {
 
 	private static class Panel extends PropertyInputPanel {
 
-		private static SignItem[] items = { new SignItem("Unconstrained", SignType.Unconstrained),
-				new SignItem("Positive", SignType.Positive),
-				new SignItem("Negative", SignType.Negative) };
+		private static SignItem[] items = { new SignItem("Unconstrained", Sign.Unconstrained),
+				new SignItem("Positive", Sign.Positive), new SignItem("Negative", Sign.Negative) };
 
 		private static final long serialVersionUID = 1L;
 
@@ -255,8 +386,8 @@ class PSign extends Property {
 		}
 
 		@Override
-		public SignType getValue() {
-			return ((SignItem) comboBox.getSelectedItem()).getType();
+		public Sign getValue() {
+			return ((SignItem) comboBox.getSelectedItem()).getSign();
 		}
 
 		@Override
@@ -267,37 +398,32 @@ class PSign extends Property {
 		@Override
 		public void setValue(Object value) {
 			for (SignItem item : items) {
-				if (value == item.getType()) {
+				if (value == item.getSign()) {
 					comboBox.setSelectedItem(item);
 				}
 			}
 		}
-
-		private static class SignItem {
-			String name;
-			SignType type;
-
-			public SignItem(String name, SignType type) {
-				super();
-				this.name = name;
-				this.type = type;
-			}
-
-			public SignType getType() {
-				return type;
-			}
-
-			@Override
-			public String toString() {
-				return name;
-			}
-
-		}
-
 	}
 
-	public enum SignType {
-		Negative, Positive, Unconstrained
+}
+
+class SignItem {
+	String name;
+	Sign type;
+
+	public SignItem(String name, Sign type) {
+		super();
+		this.name = name;
+		this.type = type;
+	}
+
+	public Sign getSign() {
+		return type;
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 
 }
