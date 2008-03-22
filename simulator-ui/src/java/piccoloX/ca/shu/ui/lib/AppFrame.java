@@ -71,13 +71,12 @@ public abstract class AppFrame extends JFrame {
 	/**
 	 * A String which briefly describes some commands used in this application
 	 */
-	public static final String WORLD_TIPS = "<H3>Keyboard</H3>"
+	public static final String WORLD_TIPS = "<H3>Mouse</H3>"
+			+ "Context menu: Right click opens a context menu on most objects<BR>"
+			+ "Zooming: Scroll the mouse wheel or right click and drag" + "<H3>Keyboard</H3>"
 			+ "Interaction modes: Press 's' to switch modes<BR>"
 			+ "Searching: Press 'f', then start typing.<BR>"
-			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips<BR>"
-			+ "<BR><H3>Mouse</H3>"
-			+ "Context menu: Right click opens a context menu on most objects<BR>"
-			+ "Zooming: Scroll the mouse wheel or right click and drag";
+			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips<BR>";
 
 	private ReversableActionManager actionManager;
 
@@ -156,7 +155,7 @@ public abstract class AppFrame extends JFrame {
 		MenuBuilder helpMenu = new MenuBuilder("Help");
 		helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
 		menuBar.add(helpMenu.getJMenu());
-		helpMenu.addAction(new ShortcutKeysHelpAction("Shortcuts"), KeyEvent.VK_S);
+
 		helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
 		helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
 
@@ -776,57 +775,6 @@ public abstract class AppFrame extends JFrame {
 	}
 
 	/**
-	 * Show shortcut keys
-	 * 
-	 * @author Shu Wu
-	 */
-	/**
-	 * Action to show the 'about' dialog
-	 * 
-	 * @author Shu Wu
-	 */
-	class ShortcutKeysHelpAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		public ShortcutKeysHelpAction(String actionName) {
-			super("Short shortcut keys", actionName);
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			StringBuilder shortcutKeysString = new StringBuilder(400);
-
-			shortcutKeysString.append("<h3>" + getAppName() + " Shortcuts</h3>");
-			if (getShortcutKeys().length == 0) {
-				shortcutKeysString.append("No shortcuts available");
-			} else {
-				for (ShortcutKey shortcutKey : getShortcutKeys()) {
-					if ((shortcutKey.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
-						shortcutKeysString.append("CTRL ");
-					}
-					if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
-						shortcutKeysString.append("ALT ");
-					}
-					if ((shortcutKey.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-						shortcutKeysString.append("SHIFT ");
-					}
-
-					shortcutKeysString.append((char) shortcutKey.getKeyCode());
-					shortcutKeysString.append(" >> ");
-					shortcutKeysString.append(shortcutKey.getAction().getDescription());
-					shortcutKeysString.append("<br>");
-				}
-			}
-
-			JLabel editor = new JLabel("<html>" + shortcutKeysString.toString() + "</html>");
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "Shortcuts - "
-					+ getAppName(), JOptionPane.PLAIN_MESSAGE);
-		}
-
-	}
-
-	/**
 	 * Action to enable the printing of memory usage messages to the console
 	 * 
 	 * @author Shu Wu
@@ -909,17 +857,46 @@ public abstract class AppFrame extends JFrame {
 		@Override
 		protected void action() throws ActionException {
 			JLabel editor;
+
 			if (welcome) {
 				String appendum = "To show this message again, click <b>Help -> Tips and Commands</b>";
 				editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + WORLD_TIPS
 						+ "<BR><BR>" + appendum + "</html>");
 			} else {
-				editor = new JLabel("<html>" + WORLD_TIPS + "</html>");
+				editor = new JLabel("<html>" + WORLD_TIPS + "<BR>" + getShortcutKeysHelp()
+						+ "</html>");
 			}
 
 			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName()
 					+ " Tips", JOptionPane.PLAIN_MESSAGE);
 		}
+	}
+
+	private String getShortcutKeysHelp() {
+		StringBuilder shortcutKeysString = new StringBuilder(400);
+
+		shortcutKeysString.append("<h3>Additional Shortcuts</h3>");
+		if (getShortcutKeys().length == 0) {
+			shortcutKeysString.append("No shortcuts available");
+		} else {
+			for (ShortcutKey shortcutKey : getShortcutKeys()) {
+				if ((shortcutKey.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+					shortcutKeysString.append("CTRL ");
+				}
+				if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
+					shortcutKeysString.append("ALT ");
+				}
+				if ((shortcutKey.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
+					shortcutKeysString.append("SHIFT ");
+				}
+
+				shortcutKeysString.append((char) shortcutKey.getKeyCode());
+				shortcutKeysString.append(" >> ");
+				shortcutKeysString.append(shortcutKey.getAction().getDescription());
+				shortcutKeysString.append("<br>");
+			}
+		}
+		return shortcutKeysString.toString();
 	}
 
 	/**
