@@ -11,10 +11,12 @@ import javax.swing.JTextField;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.ConfigSchema;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.descriptors.PFunction;
 import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.managers.UserConfigurer;
@@ -257,10 +259,10 @@ class ConfigurableFunctionArray implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#completeConfiguration(ca.neo.ui.configurable.ConfigParam)
 	 */
-	public void completeConfiguration(PropertySet properties) {
+	public void completeConfiguration(ConfigResult properties) {
 		myFunctions = new Function[outputDimension];
 		for (int i = 0; i < outputDimension; i++) {
-			myFunctions[i] = ((Function) properties.getProperty("Function " + i));
+			myFunctions[i] = ((Function) properties.getValue("Function " + i));
 
 		}
 
@@ -271,8 +273,8 @@ class ConfigurableFunctionArray implements IConfigurable {
 	 * 
 	 * @see ca.neo.ui.configurable.IConfigurable#getConfigSchema()
 	 */
-	public PropertyDescriptor[] getConfigSchema() {
-		PropertyDescriptor[] props = new PropertyDescriptor[outputDimension];
+	public ConfigSchema getSchema() {
+		Property[] props = new Property[outputDimension];
 
 		for (int i = 0; i < outputDimension; i++) {
 
@@ -287,7 +289,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 			props[i] = function;
 		}
 
-		return props;
+		return new ConfigSchemaImpl(props);
 	}
 
 	/**
@@ -306,7 +308,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 		return outputDimension + "x Functions";
 	}
 
-	public void preConfiguration(PropertySet props) throws ConfigException {
+	public void preConfiguration(ConfigResult props) throws ConfigException {
 		// do nothing
 	}
 

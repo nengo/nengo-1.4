@@ -14,7 +14,7 @@ import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
  * 
  * @author Shu
  */
-public class UIEnsemble extends NodeContainer {
+public class UIEnsemble extends UINodeViewable {
 
 	private static final long serialVersionUID = 1L;
 

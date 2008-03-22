@@ -4,18 +4,18 @@ import java.io.Serializable;
 
 import javax.swing.text.MutableAttributeSet;
 
-public class PropertySet implements Serializable {
+public class ConfigResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	MutableAttributeSet properties;
+	private final MutableAttributeSet properties;
 
-	public PropertySet(MutableAttributeSet properties) {
+	public ConfigResult(MutableAttributeSet properties) {
 		super();
 		this.properties = properties;
 	}
 
-	public Object getProperty(PropertyDescriptor obj) {
-		return getProperty(obj.getName());
+	public Object getValue(Property obj) {
+		return getValue(obj.getName());
 	}
 
 	/**
@@ -23,7 +23,7 @@ public class PropertySet implements Serializable {
 	 *            of property
 	 * @return the value of that property
 	 */
-	public Object getProperty(String name) {
+	public Object getValue(String name) {
 		return properties.getAttribute(name);
 	}
 

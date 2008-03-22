@@ -65,9 +65,8 @@ public class UserConfigurer extends ConfigManager {
 		} else if (parent instanceof Dialog) {
 			return new ConfigDialog(this, (Dialog) parent);
 		} else {
-			Util
-					.Assert(false,
-							"Could not create config dialog because parent type if not supported");
+			Util.Assert(false,
+					"Could not create config dialog because parent type if not supported");
 
 		}
 		return null;
@@ -92,7 +91,8 @@ public class UserConfigurer extends ConfigManager {
 			configLock = new Object();
 		}
 
-		createConfigDialog();
+		ConfigDialog dialog = createConfigDialog();
+		dialog.setVisible(true);
 
 		/*
 		 * Block until configuration has completed

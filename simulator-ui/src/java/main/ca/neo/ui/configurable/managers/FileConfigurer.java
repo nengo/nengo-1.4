@@ -1,7 +1,7 @@
 package ca.neo.ui.configurable.managers;
 
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.IConfigurable;
 
 /**
@@ -42,7 +42,7 @@ public class FileConfigurer extends ConfigManager {
 	public void configureAndWait() throws ConfigException {
 		loadPropertiesFromFile(configFileName);
 		getConfigurable().completeConfiguration(
-				new PropertySet(getProperties()));
+				new ConfigResult(getProperties()));
 	}
 
 }

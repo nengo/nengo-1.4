@@ -10,7 +10,7 @@ import ca.shu.ui.lib.exceptions.UIException;
  * 
  * @author Shu Wu
  */
-public interface INodeContainer {
+public interface NodeContainer {
 
 	/**
 	 * Adds a child node to the container

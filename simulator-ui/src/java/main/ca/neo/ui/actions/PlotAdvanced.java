@@ -2,8 +2,8 @@ package ca.neo.ui.actions;
 
 import ca.neo.plot.Plotter;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.Property;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.managers.UserConfigurer;
@@ -42,15 +42,15 @@ public class PlotAdvanced extends StandardAction {
 					"Time constant of display filter [0 = off] ");
 			PInt pSubSampling = new PInt("Subsampling [0 = off]");
 
-			PropertySet result;
+			ConfigResult result;
 			try {
-				result = UserConfigurer.configure(new PropertyDescriptor[] {
+				result = UserConfigurer.configure(new Property[] {
 						pTauFilter, pSubSampling }, "Plot Options",
 						UIEnvironment.getInstance(),
 						ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
-				float tauFilter = (Float) result.getProperty(pTauFilter);
-				int subSampling = (Integer) result.getProperty(pSubSampling);
+				float tauFilter = (Float) result.getValue(pTauFilter);
+				int subSampling = (Integer) result.getValue(pSubSampling);
 
 				TimeSeries timeSeriesToShow;
 

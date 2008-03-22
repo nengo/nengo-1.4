@@ -10,7 +10,7 @@ import ca.shu.ui.lib.util.Util;
 /**
  * @author Shu
  */
-public abstract class PropertyDescriptor implements Serializable {
+public abstract class Property implements Serializable {
 
 	private Object defaultValue = null;
 
@@ -19,15 +19,15 @@ public abstract class PropertyDescriptor implements Serializable {
 	private boolean isEditable = true;
 	private String name;
 
-	public PropertyDescriptor(String name) {
+	public Property(String name) {
 		this(name, null, null);
 	}
 
-	public PropertyDescriptor(String name, Object defaultValue) {
+	public Property(String name, Object defaultValue) {
 		this(name, null, defaultValue);
 	}
 
-	public PropertyDescriptor(String name, String description) {
+	public Property(String name, String description) {
 		this(name, description, null);
 	}
 
@@ -39,7 +39,7 @@ public abstract class PropertyDescriptor implements Serializable {
 	 * @param defaultValue
 	 *            Default value of this parameter
 	 */
-	public PropertyDescriptor(String name, String description, Object defaultValue) {
+	public Property(String name, String description, Object defaultValue) {
 		super();
 		this.description = description;
 		this.defaultValue = defaultValue;

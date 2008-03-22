@@ -38,13 +38,13 @@ public class UserDialogs {
 	}
 
 	public static Object showDialog(String dialogName,
-			PropertyDescriptor descriptor) throws ConfigException {
-		return showDialog(dialogName, new PropertyDescriptor[] { descriptor })
-				.getProperty(descriptor);
+			Property descriptor) throws ConfigException {
+		return showDialog(dialogName, new Property[] { descriptor })
+				.getValue(descriptor);
 	}
 
-	public static PropertySet showDialog(String dialogName,
-			PropertyDescriptor[] descriptors) throws ConfigException {
+	public static ConfigResult showDialog(String dialogName,
+			Property[] descriptors) throws ConfigException {
 		UserMultiPropDialog dialog = new UserMultiPropDialog(dialogName,
 				descriptors);
 
@@ -59,17 +59,17 @@ public class UserDialogs {
  * @author Shu Wu
  */
 class UserMultiPropDialog {
-	private PropertyDescriptor[] configParameters;
-	private PropertySet configResults;
+	private Property[] propertiesSchema;
+	private ConfigResult configResults;
 	private String dialogName;
 
 	public UserMultiPropDialog(String dialogName,
-			PropertyDescriptor[] configParameters) {
+			Property[] configParameters) {
 		this.dialogName = dialogName;
-		this.configParameters = configParameters;
+		this.propertiesSchema = configParameters;
 	}
 
-	public PropertySet configureAndGetResult() throws ConfigException {
+	public ConfigResult configureAndGetResult() throws ConfigException {
 
 		Configr myConfigurable = new Configr();
 		UserConfigurer userConfigurer = new UserConfigurer(myConfigurable);
@@ -80,20 +80,20 @@ class UserMultiPropDialog {
 
 	private class Configr implements IConfigurable {
 
-		public void completeConfiguration(PropertySet configParameters)
+		public void completeConfiguration(ConfigResult configParameters)
 				throws ConfigException {
 			configResults = configParameters;
 		}
 
-		public PropertyDescriptor[] getConfigSchema() {
-			return configParameters;
+		public ConfigSchema getSchema() {
+			return new ConfigSchemaImpl(propertiesSchema);
 		}
 
 		public String getTypeName() {
 			return dialogName;
 		}
 
-		public void preConfiguration(PropertySet props) throws ConfigException {
+		public void preConfiguration(ConfigResult props) throws ConfigException {
 			// do nothing
 		}
 

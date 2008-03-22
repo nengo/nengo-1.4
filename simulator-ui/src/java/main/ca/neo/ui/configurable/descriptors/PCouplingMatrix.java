@@ -1,6 +1,6 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.panels.CouplingMatrixPanel;
 
@@ -9,7 +9,7 @@ import ca.neo.ui.configurable.panels.CouplingMatrixPanel;
  * 
  * @author Shu Wu
  */
-public class PCouplingMatrix extends PropertyDescriptor {
+public class PCouplingMatrix extends Property {
 
 	private static final long serialVersionUID = 1L;
 	private int fromSize, toSize;

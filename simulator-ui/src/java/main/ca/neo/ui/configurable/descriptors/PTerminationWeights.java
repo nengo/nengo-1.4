@@ -1,6 +1,6 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.panels.TerminationWeightsInputPanel;
 
 /**
@@ -9,7 +9,7 @@ import ca.neo.ui.configurable.panels.TerminationWeightsInputPanel;
  * @author Shu Wu
  * 
  */
-public class PTerminationWeights extends PropertyDescriptor {
+public class PTerminationWeights extends Property {
 
 	private static final long serialVersionUID = 1L;
 	/**

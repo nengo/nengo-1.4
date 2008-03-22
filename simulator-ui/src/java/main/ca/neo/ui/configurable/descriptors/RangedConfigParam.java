@@ -1,13 +1,13 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 
 /**
  * A Config Descriptor which can have a confined integer range
  * 
  * @author Shu Wu
  */
-public abstract class RangedConfigParam extends PropertyDescriptor {
+public abstract class RangedConfigParam extends Property {
 	/**
 	 * Whether to check the range of the Integer value
 	 */

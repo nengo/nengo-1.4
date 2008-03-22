@@ -1,47 +1,45 @@
 package ca.neo.ui.models.constructors;
 
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
+import ca.neo.ui.configurable.ConfigSchema;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.descriptors.PString;
-import ca.neo.ui.models.INodeContainer;
 
 public abstract class ConstructableNode extends AbstractConstructable {
-	private static final PropertyDescriptor pName = new PString("Name");
+	private static final Property pName = new PString("Name");
 
-	private INodeContainer nodeContainer;
-
-	public ConstructableNode(INodeContainer nodeContainer) {
+	public ConstructableNode() {
 		super();
-		this.nodeContainer = nodeContainer;
 	}
 
 	@Override
-	protected final Object configureModel(PropertySet configuredProperties) throws ConfigException {
-		String name = (String) configuredProperties.getProperty(pName);
+	protected final Object configureModel(ConfigResult configuredProperties) throws ConfigException {
+		String name = (String) configuredProperties.getValue(pName);
 
-		if (nodeContainer.getNodeModel(name) != null) {
-			throw new ConfigException("A node with the same name already exists");
-		}
+		// if (nodeContainer.getNodeModel(name) != null) {
+		// throw new ConfigException("A node with the same name already
+		// exists");
+		// }
 
 		return createNode(configuredProperties, name);
 	}
 
-	protected abstract Object createNode(PropertySet configuredProperties, String name)
+	protected abstract Object createNode(ConfigResult configuredProperties, String name)
 			throws ConfigException;
 
-	public final PropertyDescriptor[] getConfigSchema() {
-		PropertyDescriptor[] nodeConfigSchema = getNodeConfigSchema();
+	public final ConfigSchema getSchema() {
+		ConfigSchema nodeConfigSchema = getNodeConfigSchema();
 
-		PropertyDescriptor[] config = new PropertyDescriptor[nodeConfigSchema.length + 1];
-		config[0] = pName;
+		ConfigSchemaImpl newConfigSchema = new ConfigSchemaImpl(nodeConfigSchema.getProperties()
+				.toArray(new Property[] {}), nodeConfigSchema.getAdvancedProperties().toArray(
+				new Property[] {}));
 
-		for (int i = 0; i < nodeConfigSchema.length; i++) {
-			config[i + 1] = nodeConfigSchema[i];
-		}
+		newConfigSchema.addProperty(pName, 0);
 
-		return config;
+		return newConfigSchema;
 	}
 
-	public abstract PropertyDescriptor[] getNodeConfigSchema();
+	public abstract ConfigSchema getNodeConfigSchema();
 }

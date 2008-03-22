@@ -23,7 +23,7 @@ import ca.neo.ui.actions.CreateModelAdvancedAction;
 import ca.neo.ui.actions.OpenNeoFileAction;
 import ca.neo.ui.actions.PasteAction;
 import ca.neo.ui.actions.RunSimulatorAction;
-import ca.neo.ui.models.INodeContainer;
+import ca.neo.ui.models.NodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
@@ -50,7 +50,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  * 
  * @author Shu Wu
  */
-public class NetworkViewer extends NodeViewer implements INodeContainer {
+public class NetworkViewer extends NodeViewer implements NodeContainer {
 	private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
 
 	private static final long serialVersionUID = -3018937112672942653L;

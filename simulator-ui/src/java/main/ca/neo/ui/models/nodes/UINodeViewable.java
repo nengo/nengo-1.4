@@ -20,11 +20,9 @@ import ca.shu.ui.lib.world.piccolo.objects.Window.WindowState;
 /**
  * UI Wrapper for Node Containers such as Ensembles and Networks.
  * 
- */
-/**
  * @author Shu
  */
-public abstract class NodeContainer extends UINeoNode {
+public abstract class UINodeViewable extends UINeoNode {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,7 +31,7 @@ public abstract class NodeContainer extends UINeoNode {
 	 */
 	private WeakReference<Window> viewerWindowRef;
 
-	public NodeContainer(Node model) {
+	public UINodeViewable(Node model) {
 		super(model);
 	}
 
@@ -101,10 +99,11 @@ public abstract class NodeContainer extends UINeoNode {
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					if (viewerWindowRef.get() != null && !viewerWindowRef.get().isDestroyed()) {
-						getWorld().zoomToObject(viewerWindowRef.get());
+					if (getWorld() != null) {
+						if (viewerWindowRef.get() != null && !viewerWindowRef.get().isDestroyed()) {
+							getWorld().zoomToObject(viewerWindowRef.get());
+						}
 					}
-
 				}
 			});
 

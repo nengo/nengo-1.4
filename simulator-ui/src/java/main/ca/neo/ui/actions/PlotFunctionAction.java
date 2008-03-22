@@ -4,8 +4,8 @@ import javax.swing.JDialog;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.Property;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
@@ -22,11 +22,11 @@ import ca.shu.ui.lib.util.UIEnvironment;
 public class PlotFunctionAction extends StandardAction {
 	private static final long serialVersionUID = 1L;
 
-	static final PropertyDescriptor pEnd = new PFloat("End");
-	static final PropertyDescriptor pIncrement = new PFloat("Increment");
-	static final PropertyDescriptor pStart = new PFloat("Start");
+	static final Property pEnd = new PFloat("End");
+	static final Property pIncrement = new PFloat("Increment");
+	static final Property pStart = new PFloat("Start");
 
-	static final PropertyDescriptor[] propD = { pStart, pIncrement, pEnd };
+	static final Property[] propD = { pStart, pIncrement, pEnd };
 	private Function function;
 
 	private String plotName;
@@ -45,14 +45,14 @@ public class PlotFunctionAction extends StandardAction {
 	protected void action() throws ActionException {
 
 		try {
-			PropertySet properties = ConfigManager.configure(propD,
+			ConfigResult properties = ConfigManager.configure(propD,
 					"Function Node plotter", UIEnvironment.getInstance(),
 					ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 			String title = plotName + " - Function Plot";
 
-			float start = (Float) properties.getProperty(pStart);
-			float end = (Float) properties.getProperty(pEnd);
-			float increment = (Float) properties.getProperty(pIncrement);
+			float start = (Float) properties.getValue(pStart);
+			float end = (Float) properties.getValue(pEnd);
+			float increment = (Float) properties.getValue(pIncrement);
 			
 			if (increment == 0) {
 				throw new ActionException("Please use a non-zero increment");

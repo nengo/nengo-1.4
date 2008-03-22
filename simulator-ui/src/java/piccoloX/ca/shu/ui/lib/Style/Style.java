@@ -22,6 +22,7 @@ public class Style {
 	public static final Color COLOR_BACKGROUND2 = Color.darkGray;
 	public static final Color COLOR_FOREGROUND2 = Color.gray;
 	public static final Color COLOR_BORDER_SELECTED = Color.orange;
+	public static final Color COLOR_DARK_BLUE = new Color(0, 0, 80);
 
 	/*
 	 * Button Colors
@@ -116,7 +117,7 @@ public class Style {
 
 	public static void applyMenuStyle(JComponent item, boolean isTitle) {
 		item.setOpaque(true);
-//		item.setBorder(null);
+		// item.setBorder(null);
 		item.setBackground(Style.COLOR_BACKGROUND);
 		item.setForeground(Style.COLOR_FOREGROUND);
 		if (isTitle) {

@@ -57,7 +57,12 @@ public class ActionException extends UIException {
 
 		if (showWarning) {
 			Util.debugMsg("Action Exception: " + toString());
-			UserMessages.showWarning(getMessage());
+
+			if (getMessage() != null) {
+				UserMessages.showWarning(getMessage());
+			} else {
+				Util.showException(this);
+			}
 
 		} else {
 			Util.debugMsg("Action Exception: " + toString());
@@ -69,6 +74,16 @@ public class ActionException extends UIException {
 	 */
 	public Exception getTargetException() {
 		return targetException;
+	}
+
+	@Override
+	public String getMessage() {
+
+		String message = super.getMessage();
+		if (message == null && targetException != null) {
+			message = targetException.getMessage();
+		}
+		return message;
 	}
 
 }

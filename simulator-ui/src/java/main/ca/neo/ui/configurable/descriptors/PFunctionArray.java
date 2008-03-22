@@ -1,7 +1,7 @@
 package ca.neo.ui.configurable.descriptors;
 
 import ca.neo.math.Function;
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.panels.FunctionArrayPanel;
 
@@ -10,7 +10,7 @@ import ca.neo.ui.configurable.panels.FunctionArrayPanel;
  * 
  * @author Shu Wu
  */
-public class PFunctionArray extends PropertyDescriptor {
+public class PFunctionArray extends Property {
 
 	private static final long serialVersionUID = 1L;
 

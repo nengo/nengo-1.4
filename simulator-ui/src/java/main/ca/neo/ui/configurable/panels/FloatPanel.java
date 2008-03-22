@@ -2,7 +2,7 @@ package ca.neo.ui.configurable.panels;
 
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
@@ -19,7 +19,7 @@ public class FloatPanel extends PropertyInputPanel {
 	 */
 	private JTextField tf;
 
-	public FloatPanel(PropertyDescriptor property) {
+	public FloatPanel(Property property) {
 		super(property);
 
 		tf = new JTextField(10);

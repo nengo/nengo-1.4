@@ -1,6 +1,6 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.panels.FloatPanel;
 
@@ -11,7 +11,7 @@ import ca.neo.ui.configurable.panels.FloatPanel;
  * @author Shu Wu
  * 
  */
-public class PFloat extends PropertyDescriptor {
+public class PFloat extends Property {
 
 	private static final long serialVersionUID = 1L;
 

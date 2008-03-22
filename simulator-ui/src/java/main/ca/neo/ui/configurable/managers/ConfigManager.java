@@ -17,9 +17,11 @@ import javax.swing.text.SimpleAttributeSet;
 
 import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.ConfigSchema;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.Property;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.Util;
 
@@ -50,18 +52,27 @@ public abstract class ConfigManager {
 		STANDARD, TEMPLATE_NOT_CHOOSABLE, TEMPLATE_CHOOSABLE
 	}
 
-	public static Object configure(PropertyDescriptor prop, String typeName, Container parent)
+	public static Object configure(Property prop, String typeName, Container parent)
 			throws ConfigException {
 
-		PropertySet properties = configure(new PropertyDescriptor[] { prop }, typeName, parent,
+		ConfigResult properties = configure(new ConfigSchemaImpl(prop), typeName, parent,
 				ConfigMode.TEMPLATE_NOT_CHOOSABLE);
-		return properties.getProperty(prop);
+		return properties.getValue(prop);
 	}
 
-	public static PropertySet configure(PropertyDescriptor[] props, String typeName,
-			Container parent, ConfigMode configMode) throws ConfigException {
+	/**
+	 * Convenient function to automatically wrap the PropertyDescriptors with a
+	 * default Config schema
+	 */
+	public static ConfigResult configure(Property[] schema, String typeName, Container parent,
+			ConfigMode configMode) throws ConfigException {
+		return configure(new ConfigSchemaImpl(schema), typeName, parent, configMode);
+	}
 
-		Configureable configurable = new Configureable(props, typeName);
+	public static ConfigResult configure(ConfigSchema schema, String typeName, Container parent,
+			ConfigMode configMode) throws ConfigException {
+
+		Configureable configurable = new Configureable(schema, typeName);
 
 		UserConfigurer configurer;
 
@@ -166,6 +177,7 @@ public abstract class ConfigManager {
 		 * Gets a list of property files
 		 */
 		String[] files = file.list(new ConfigFilesFilter(configurable));
+
 		/*
 		 * Return the file names without the prefix
 		 */
@@ -280,27 +292,26 @@ class ConfigFilesFilter implements FilenameFilter {
 
 class Configureable implements IConfigurable {
 
-	private PropertySet properties;
+	private ConfigResult properties;
 
-	private PropertyDescriptor[] props;
+	private ConfigSchema schema;
 	private String typeName;
 
-	public Configureable(PropertyDescriptor[] props, String typeName) {
+	public Configureable(ConfigSchema configSchema, String typeName) {
 		super();
-		this.props = props;
+		this.schema = configSchema;
 		this.typeName = typeName;
 	}
 
-	public void completeConfiguration(PropertySet props) throws ConfigException {
+	public void completeConfiguration(ConfigResult props) throws ConfigException {
 		properties = props;
-
 	}
 
-	public PropertyDescriptor[] getConfigSchema() {
-		return props;
+	public ConfigSchema getSchema() {
+		return schema;
 	}
 
-	public PropertySet getProperties() {
+	public ConfigResult getProperties() {
 		return properties;
 	}
 
@@ -308,7 +319,7 @@ class Configureable implements IConfigurable {
 		return typeName;
 	}
 
-	public void preConfiguration(PropertySet props) throws ConfigException {
+	public void preConfiguration(ConfigResult props) throws ConfigException {
 		// do nothing
 	}
 

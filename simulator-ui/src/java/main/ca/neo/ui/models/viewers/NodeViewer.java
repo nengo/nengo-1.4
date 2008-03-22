@@ -15,7 +15,7 @@ import ca.neo.model.Node;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.models.ModelsContextMenu;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.nodes.NodeContainer;
+import ca.neo.ui.models.nodes.UINodeViewable;
 import ca.shu.ui.lib.actions.LayoutAction;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.shu.ui.lib.objects.models.ModelObject;
@@ -44,7 +44,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	/**
 	 * Viewer Parent
 	 */
-	private final NodeContainer parentOfViewer;;
+	private final UINodeViewable parentOfViewer;;
 
 	/**
 	 * Children of NEO nodes
@@ -55,7 +55,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	 * @param nodeContainer
 	 *            UI Object containing the Node model
 	 */
-	public NodeViewer(NodeContainer nodeContainer) {
+	public NodeViewer(UINodeViewable nodeContainer) {
 		super(nodeContainer.getName() + " (" + nodeContainer.getTypeName() + " Viewer)");
 		this.parentOfViewer = nodeContainer;
 
@@ -310,7 +310,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	/**
 	 * @return Parent of this viewer
 	 */
-	public NodeContainer getViewerParent() {
+	public UINodeViewable getViewerParent() {
 		return parentOfViewer;
 	}
 

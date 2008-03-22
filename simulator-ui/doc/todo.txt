@@ -1,6 +1,15 @@
 ******************************************
  Done
 *******************************************
+03/22/2008 - Added rename logic to node creation code paths
+03/22/2008 - Creating nodes through File->New now places them in the top container
+03/22/2008 - Tweaked look-and-feel of ConfigDialogs
+
+03/22/2008 - PropertyDescriptors (used to construct a ConfigDialog) now have a setDescription and 
+				getDescription which affects the tooltip. You can also pass in the Description via the constructor.
+				PropertyTypes are now not shown in the Dialog, you can hover over the property to see that.
+				
+
 03/16/2008 - Added rename to Node menu
 03/16/2008 - Name conflicts are resolved on paste, and drag-drop
 
@@ -13,7 +22,9 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
-Add target argument to ActionExceptions, if no target, then create a mockTarget
+Need to create UIFiles directory
+
+Add listener to catch name changes of the children of NengoGraphics
 
 Add ability to surface DataType and Description for Fields of PropertyInputPanel
 
@@ -52,11 +63,9 @@ Show popover message when model is updated
 
 
 *******************************************
- Pri 1 - to do
+ Pri 1 - Postponed
 *******************************************
 Drag and drop UINeoNodes between networks (worlds)
-
-Print used memory to UI console
 
 Reversable actions
 	Aggregate actions: actions can be chained, and this chain undone.

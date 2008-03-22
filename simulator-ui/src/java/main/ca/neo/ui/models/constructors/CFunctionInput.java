@@ -6,29 +6,24 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Units;
 import ca.neo.model.impl.FunctionInput;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.descriptors.PFunctionArray;
-import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.nodes.UIFunctionInput;
 
 public class CFunctionInput extends ConstructableNode {
 
-	public CFunctionInput(INodeContainer nodeContainer) {
-		super(nodeContainer);
+	public CFunctionInput() {
+		super();
 	}
 
-	private static PropertyDescriptor pFunctions = new PFunctionArray("Functions Generators", 1);
-
-	/**
-	 * Config Descriptors
-	 */
-	private static PropertyDescriptor[] zConfig = { pFunctions };
+	private static Property pFunctions = new PFunctionArray("Functions Generators", 1);
 
 	@Override
-	protected Node createNode(PropertySet props, String name) throws ConfigException {
+	protected Node createNode(ConfigResult props, String name) throws ConfigException {
 
-		Function[] functions = (Function[]) props.getProperty(pFunctions);
+		Function[] functions = (Function[]) props.getValue(pFunctions);
 
 		try {
 			// setName((String) getProperty(pName));
@@ -41,8 +36,8 @@ public class CFunctionInput extends ConstructableNode {
 	}
 
 	@Override
-	public PropertyDescriptor[] getNodeConfigSchema() {
-		return zConfig;
+	public ConfigSchemaImpl getNodeConfigSchema() {
+		return new ConfigSchemaImpl(pFunctions);
 	}
 
 	public String getTypeName() {

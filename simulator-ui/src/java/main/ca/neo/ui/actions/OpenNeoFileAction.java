@@ -13,10 +13,10 @@ import org.python.util.PythonObjectInputStream;
 
 import ca.neo.model.Node;
 import ca.neo.ui.NengoGraphics;
-import ca.neo.ui.models.INodeContainer;
+import ca.neo.ui.models.NodeContainer;
 import ca.neo.ui.models.UINeoNode;
-import ca.neo.ui.models.INodeContainer.ContainerException;
-import ca.neo.ui.models.nodes.NodeContainer;
+import ca.neo.ui.models.NodeContainer.ContainerException;
+import ca.neo.ui.models.nodes.UINodeViewable;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.activities.TrackedAction;
@@ -31,7 +31,7 @@ public class OpenNeoFileAction extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
 	private File file;
-	private INodeContainer nodeContainer;
+	private NodeContainer nodeContainer;
 	private Object objLoaded;
 
 	/**
@@ -40,7 +40,7 @@ public class OpenNeoFileAction extends StandardAction {
 	 * @param nodeContainer
 	 *            Container to which the loaded model shall be added to
 	 */
-	public OpenNeoFileAction(INodeContainer nodeContainer) {
+	public OpenNeoFileAction(NodeContainer nodeContainer) {
 		super("Open from file");
 		init(nodeContainer);
 	}
@@ -142,7 +142,7 @@ public class OpenNeoFileAction extends StandardAction {
 	/**
 	 * Initializes field variables
 	 */
-	private void init(INodeContainer nodeContainer) {
+	private void init(NodeContainer nodeContainer) {
 		this.nodeContainer = nodeContainer;
 	}
 
@@ -158,8 +158,8 @@ public class OpenNeoFileAction extends StandardAction {
 		if (objLoaded instanceof Node) {
 			try {
 				UINeoNode nodeUI = nodeContainer.addNodeModel((Node) objLoaded);
-				if (nodeUI instanceof NodeContainer) {
-					((NodeContainer) (nodeUI)).openViewer();
+				if (nodeUI instanceof UINodeViewable) {
+					((UINodeViewable) (nodeUI)).openViewer();
 				}
 			} catch (ContainerException e) {
 				throw new ActionException(e);

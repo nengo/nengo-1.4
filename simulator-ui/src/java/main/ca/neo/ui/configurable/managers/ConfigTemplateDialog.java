@@ -1,6 +1,7 @@
 package ca.neo.ui.configurable.managers;
 
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,23 +35,15 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
 	public ConfigTemplateDialog(UserTemplateConfigurer configManager, Dialog owner) {
 		super(configManager, owner);
+		init();
 	}
 
 	public ConfigTemplateDialog(UserTemplateConfigurer configManager, Frame owner) {
 		super(configManager, owner);
+		init();
 	}
 
-	@Override
-	protected void completeConfiguration() throws ConfigException {
-		super.completeConfiguration();
-
-		getConfigurer().savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
-
-	}
-
-	@Override
-	protected void createPropertiesDialog(JPanel panel) {
-		super.createPropertiesDialog(panel);
+	private void init() {
 
 		if (checkPropreties()) {
 			/*
@@ -74,26 +67,31 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	}
 
 	@Override
+	protected void completeConfiguration() throws ConfigException {
+		super.completeConfiguration();
+
+		getConfigurer().savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
+
+	}
+
+	@Override
 	protected void initPanelTop(JPanel panel) {
 		/*
 		 * Add existing templates
 		 */
 		String[] files = getConfigurer().getPropertyFiles();
+		JPanel templatesPanel = new VerticalLayoutPanel();
+		templatesPanel.add(new JLabel("Templates"));
+		templatesPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
 		templateList = new JComboBox(files);
-
-		JPanel savedFilesPanel = new VerticalLayoutPanel();
-
 		templateList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateDialogFromFile();
+				updateFromTemplate();
 			}
-
 		});
-
-		savedFilesPanel.add(new JLabel("Templates"));
-
-		savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		templateList.setMaximumSize(new Dimension(300, 100));
+		templateList.setPreferredSize(new Dimension(100, templateList.getHeight()));
 
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
@@ -117,6 +115,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 				}
 			}
 		});
+
 		button.setFont(Style.FONT_SMALL);
 		buttonsPanel.add(button);
 
@@ -129,19 +128,19 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
 				getConfigurer().deletePropertiesFile(selectedFile);
 
-				updateDialogFromFile();
+				updateFromTemplate();
 			}
 		});
 		button.setFont(Style.FONT_SMALL);
 		buttonsPanel.add(button);
 
-		savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		templatesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		savedFilesPanel.add(buttonsPanel);
+		templatesPanel.add(buttonsPanel);
 
 		JPanel wrapperPanel = new VerticalLayoutPanel();
 		wrapperPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		wrapperPanel.add(savedFilesPanel);
+		wrapperPanel.add(templatesPanel);
 
 		JPanel seperator = new VerticalLayoutPanel();
 		seperator.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
@@ -156,7 +155,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	 * Loads the properties associated with the item selected in the file drop
 	 * down list
 	 */
-	protected void updateDialogFromFile() {
+	protected void updateFromTemplate() {
 		try {
 			if (templateList.getSelectedItem() != null) {
 				getConfigurer().loadPropertiesFromFile((String) templateList.getSelectedItem());

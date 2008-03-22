@@ -1,6 +1,6 @@
 package ca.neo.ui.models.icons;
 
-import ca.neo.ui.models.nodes.NodeContainer;
+import ca.neo.ui.models.nodes.UINodeViewable;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.primitives.Text;
@@ -23,7 +23,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 	private final Text sizeLabel;
 
-	public NodeContainerIcon(NodeContainer parent, WorldObject icon) {
+	public NodeContainerIcon(UINodeViewable parent, WorldObject icon) {
 		super(parent, icon);
 		sizeLabel = new Text("");
 		sizeLabel.setFont(Style.FONT_SMALL);
@@ -81,9 +81,9 @@ public abstract class NodeContainerIcon extends ModelIcon {
 	}
 
 	@Override
-	public NodeContainer getModelParent() {
+	public UINodeViewable getModelParent() {
 
-		return (NodeContainer) super.getModelParent();
+		return (UINodeViewable) super.getModelParent();
 	}
 
 }

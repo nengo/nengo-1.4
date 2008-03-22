@@ -10,9 +10,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.descriptors.PCouplingMatrix;
 import ca.neo.ui.configurable.descriptors.PTerminationWeights;
 import ca.neo.ui.configurable.managers.ConfigManager;
@@ -101,7 +101,7 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 		}
 
 		if (parent != null && parent instanceof JDialog) {
-			PropertyDescriptor pCouplingMatrix;
+			Property pCouplingMatrix;
 			if (isValueSet()) {
 				/*
 				 * Create a property descriptor with a set matrix
@@ -117,11 +117,11 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 			String configName = getFromSize() + " to " + getToSize() + " Coupling Matrix";
 
 			try {
-				PropertySet result = ConfigManager.configure(
-						new PropertyDescriptor[] { pCouplingMatrix }, configName, parent,
+				ConfigResult result = ConfigManager.configure(
+						new Property[] { pCouplingMatrix }, configName, parent,
 						ConfigManager.ConfigMode.STANDARD);
 
-				setValue((float[][]) result.getProperty(pCouplingMatrix));
+				setValue((float[][]) result.getValue(pCouplingMatrix));
 			} catch (ConfigException e) {
 				e.defaultHandleBehavior();
 			}

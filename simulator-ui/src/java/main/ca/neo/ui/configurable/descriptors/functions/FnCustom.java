@@ -20,10 +20,12 @@ import ca.neo.math.impl.DefaultFunctionInterpreter;
 import ca.neo.math.impl.PostfixFunction;
 import ca.neo.ui.actions.PlotFunctionAction;
 import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.ConfigSchema;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.descriptors.PFunction;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PString;
@@ -42,7 +44,7 @@ public class FnCustom extends AbstractFn {
 	private static DefaultFunctionInterpreter interpreter = new DefaultFunctionInterpreter();
 
 	private int myInputDimensions;
-	private PropertyDescriptor pExpression;
+	private Property pExpression;
 	InterpreterFunctionConfigurer configurer;
 	boolean isInputDimEditable;
 
@@ -53,9 +55,9 @@ public class FnCustom extends AbstractFn {
 
 	}
 
-	private Function parseFunction(PropertySet props) throws ConfigException {
-		String expression = (String) props.getProperty(pExpression);
-		int dimensions = (Integer) props.getProperty(DIMENSION_STR);
+	private Function parseFunction(ConfigResult props) throws ConfigException {
+		String expression = (String) props.getValue(pExpression);
+		int dimensions = (Integer) props.getValue(DIMENSION_STR);
 
 		Function function;
 		try {
@@ -68,7 +70,7 @@ public class FnCustom extends AbstractFn {
 	}
 
 	@Override
-	protected Function createFunction(PropertySet props) throws ConfigException {
+	protected Function createFunction(ConfigResult props) throws ConfigException {
 		return parseFunction(props);
 	}
 
@@ -85,7 +87,7 @@ public class FnCustom extends AbstractFn {
 		return null;
 	}
 
-	public PropertyDescriptor[] getConfigSchema() {
+	public ConfigSchema getSchema() {
 		String expression = null;
 		int dim = myInputDimensions;
 
@@ -99,15 +101,15 @@ public class FnCustom extends AbstractFn {
 		}
 
 		pExpression = new PString(EXPRESSION_STR, expression);
-		PropertyDescriptor pDimensions = new PInt(DIMENSION_STR, dim);
+		Property pDimensions = new PInt(DIMENSION_STR, dim);
 
 		if (isInputDimEditable) {
 
 			pDimensions.setEditable(true);
 		}
 
-		PropertyDescriptor[] props = new PropertyDescriptor[] { pExpression, pDimensions };
-		return props;
+		Property[] props = new Property[] { pExpression, pDimensions };
+		return new ConfigSchemaImpl(props);
 	}
 
 	@Override
@@ -116,7 +118,7 @@ public class FnCustom extends AbstractFn {
 	}
 
 	@Override
-	public void preConfiguration(PropertySet props) throws ConfigException {
+	public void preConfiguration(ConfigResult props) throws ConfigException {
 		/*
 		 * Try to parse the expression and throw an exception if it dosen't
 		 * succeed
@@ -255,12 +257,12 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 					PString pFnName = new PString("Name");
 					PFunction pFunction = new PFunction("New Function", 1, true, null);
 
-					PropertySet props = ConfigManager.configure(new PropertyDescriptor[] { pFnName,
+					ConfigResult props = ConfigManager.configure(new Property[] { pFnName,
 							pFunction }, "Register fuction", FunctionDialog.this,
 							ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
-					String name = (String) props.getProperty(pFnName);
-					Function fn = (Function) props.getProperty(pFunction);
+					String name = (String) props.getValue(pFnName);
+					Function fn = (Function) props.getValue(pFunction);
 
 					interpreter.registerFunction(name, fn);
 					registeredFunctionsList.addItem(name);

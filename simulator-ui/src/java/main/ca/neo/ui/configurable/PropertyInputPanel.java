@@ -20,7 +20,7 @@ public abstract class PropertyInputPanel {
 	private final JPanel innerPanel;
 	private final JPanel outerPanel;
 
-	private PropertyDescriptor propDescriptor;
+	private Property propDescriptor;
 
 	private JLabel statusMessage;
 
@@ -28,7 +28,7 @@ public abstract class PropertyInputPanel {
 	 * @param property
 	 *            A description of the Configuration parameter to be configured
 	 */
-	public PropertyInputPanel(PropertyDescriptor property) {
+	public PropertyInputPanel(Property property) {
 		super();
 		this.propDescriptor = property;
 		outerPanel = new JPanel();
@@ -41,6 +41,8 @@ public abstract class PropertyInputPanel {
 		outerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
 		JLabel label = new JLabel(property.getName());
+		label.setForeground(Style.COLOR_DARK_BLUE);
+		label.setFont(Style.FONT_BOLD);
 		outerPanel.add(label);
 
 		innerPanel = new JPanel();
@@ -101,7 +103,7 @@ public abstract class PropertyInputPanel {
 	/**
 	 * @return Descriptor of the configuration parameter
 	 */
-	public PropertyDescriptor getDescriptor() {
+	public Property getDescriptor() {
 		return propDescriptor;
 	}
 

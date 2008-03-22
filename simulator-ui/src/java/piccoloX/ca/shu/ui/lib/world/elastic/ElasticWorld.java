@@ -7,8 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
 
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.Property;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.managers.ConfigManager;
 import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
@@ -245,10 +245,10 @@ public class ElasticWorld extends WorldImpl {
  */
 class SetLayoutBoundsAction extends StandardAction {
 
-	private static final PropertyDescriptor pHeight = new PInt("Height");
-	private static final PropertyDescriptor pWidth = new PInt("Width");
+	private static final Property pHeight = new PInt("Height");
+	private static final Property pWidth = new PInt("Width");
 	private static final long serialVersionUID = 1L;
-	private static final PropertyDescriptor[] zProperties = { pWidth, pHeight };
+	private static final Property[] zProperties = { pWidth, pHeight };
 
 	private ElasticWorld parent;
 
@@ -257,9 +257,9 @@ class SetLayoutBoundsAction extends StandardAction {
 		this.parent = parent;
 	}
 
-	private void completeConfiguration(PropertySet properties) {
-		parent.setLayoutBounds(new Dimension((Integer) properties.getProperty(pWidth),
-				(Integer) properties.getProperty(pHeight)));
+	private void completeConfiguration(ConfigResult properties) {
+		parent.setLayoutBounds(new Dimension((Integer) properties.getValue(pWidth),
+				(Integer) properties.getValue(pHeight)));
 
 	}
 
@@ -267,7 +267,7 @@ class SetLayoutBoundsAction extends StandardAction {
 	protected void action() throws ActionException {
 
 		try {
-			PropertySet properties = ConfigManager.configure(zProperties, "Layout bounds",
+			ConfigResult properties = ConfigManager.configure(zProperties, "Layout bounds",
 					UIEnvironment.getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 			completeConfiguration(properties);
 

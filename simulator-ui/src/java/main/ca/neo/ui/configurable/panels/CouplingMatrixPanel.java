@@ -1,6 +1,6 @@
 package ca.neo.ui.configurable.panels;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.matrixEditor.CouplingMatrixImpl;
 import ca.neo.ui.configurable.matrixEditor.MatrixEditor;
@@ -22,7 +22,7 @@ class CouplingMatrixPanel extends PropertyInputPanel {
 	 */
 	private MatrixEditor editor;
 
-	public CouplingMatrixPanel(PropertyDescriptor property, int fromSize,
+	public CouplingMatrixPanel(Property property, int fromSize,
 			int toSize) {
 		super(property);
 

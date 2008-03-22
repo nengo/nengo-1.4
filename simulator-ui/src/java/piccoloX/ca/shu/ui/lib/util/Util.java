@@ -13,6 +13,7 @@ import java.util.ListIterator;
 import javax.swing.JOptionPane;
 
 import ca.neo.ui.NengoGraphics;
+import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
@@ -82,32 +83,50 @@ public class Util {
 
 	public static void Assert(boolean bool, String msg) {
 		if (!bool && UIEnvironment.isDebugEnabled()) {
+			showException(new Exception("ASSERT == FALSE, " + msg));
+		}
+	}
 
-			StringBuilder assertMsg = new StringBuilder(
-					"An unexpected error has occured \n"
-							+ "Please report this log at: http://sourceforge.net/tracker/?atid=1036998&group_id=216267\nIf possible, please include a record of what you were doing preceding this screen \n\n");
-			assertMsg.append("*** " + NengoGraphics.APP_NAME + " ***\n");
+	public static void showException(Exception exception) {
+		String msg = exception.getMessage();
+		StringBuilder assertMsg = new StringBuilder(
+				"An unexpected error has occured \n"
+						+ "Please report this log at: http://sourceforge.net/tracker/?atid=1036998&group_id=216267\nIf possible, please include a record of what you were doing preceding this screen \n\n");
+		assertMsg.append("*** " + NengoGraphics.APP_NAME + " ***\n");
 
-			if (msg != null && !"".equals(msg)) {
-				assertMsg.append(msg + "\n");
-			}
-			StackTraceElement[] stackEls = (new Exception()).getStackTrace();
-
-			int i = 0;
-			assertMsg.append("*** Stack Trace *** \n");
-			for (StackTraceElement el : stackEls) {
-				if (i > 200) {
-					assertMsg.append("...");
-					break;
-				}
-				assertMsg.append(el.toString() + "\n");
-				i++;
-			}
-
-			UserMessages.showTextDialog("ASSERT == FALSE, " + msg, assertMsg.toString(),
-					JOptionPane.ERROR_MESSAGE);
+		if (msg != null && !"".equals(msg)) {
+			assertMsg.append(msg + "\n");
 		}
 
+		assertMsg.append("*** Stack Trace *** \n");
+		exceptionToString(assertMsg, exception);
+		if (exception instanceof ActionException) {
+			ActionException actionException = (ActionException) exception;
+			if (actionException.getTargetException() != null) {
+				assertMsg.append("*** Target Exception *** \n");
+				exceptionToString(assertMsg, actionException.getTargetException());
+			}
+		}
+
+		if (msg == null || "".equals(msg)) {
+			msg = "Exception";
+		}
+		UserMessages.showTextDialog(msg, assertMsg.toString(), JOptionPane.ERROR_MESSAGE);
+
+	}
+
+	private static void exceptionToString(StringBuilder strBuilder, Exception e) {
+		StackTraceElement[] stackEls = e.getStackTrace();
+		int i = 0;
+		strBuilder.append(e.getMessage() + "\n");
+		for (StackTraceElement el : stackEls) {
+			if (i > 200) {
+				strBuilder.append("...");
+				break;
+			}
+			strBuilder.append(el.toString() + "\n");
+			i++;
+		}
 	}
 
 	public static void debugMsg(String msg) {

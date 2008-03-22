@@ -5,7 +5,7 @@ import java.awt.Dialog;
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.managers.UserConfigurer;
 import ca.shu.ui.lib.util.UserMessages;
 
@@ -44,7 +44,7 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
 		this.functionType = functionType;
 	}
 
-	protected abstract Function createFunction(PropertySet props) throws ConfigException;
+	protected abstract Function createFunction(ConfigResult props) throws ConfigException;
 
 	/*
 	 * (non-Javadoc)
@@ -53,7 +53,7 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
 	 *      Creates the function through reflection of its constructor and
 	 *      passing the user parameters to it
 	 */
-	public void completeConfiguration(PropertySet props) throws ConfigException {
+	public void completeConfiguration(ConfigResult props) throws ConfigException {
 		try {
 			Function function = createFunction(props);
 			setFunction(function);
@@ -82,7 +82,7 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
 		return typeName;
 	}
 
-	public void preConfiguration(PropertySet props) throws ConfigException {
+	public void preConfiguration(ConfigResult props) throws ConfigException {
 		// do nothing
 	}
 

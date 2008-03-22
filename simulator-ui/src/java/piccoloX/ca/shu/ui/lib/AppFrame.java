@@ -76,7 +76,7 @@ public abstract class AppFrame extends JFrame {
 			+ "Zooming: Scroll the mouse wheel or right click and drag" + "<H3>Keyboard</H3>"
 			+ "Interaction modes: Press 's' to switch modes<BR>"
 			+ "Searching: Press 'f', then start typing.<BR>"
-			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips<BR>";
+			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips";
 
 	private ReversableActionManager actionManager;
 
@@ -319,7 +319,11 @@ public abstract class AppFrame extends JFrame {
 	 * Loads saved preferences related to the application
 	 */
 	protected void loadPreferences() {
-		File preferencesFile = new File(getUserFileDirectory(), "userSettings");
+		File file = new File(USER_FILE_DIR);
+		if (!file.exists())
+			file.mkdir();
+
+		File preferencesFile = new File(USER_FILE_DIR, "userSettings");
 
 		if (preferencesFile.exists()) {
 			FileInputStream fis;
@@ -348,11 +352,11 @@ public abstract class AppFrame extends JFrame {
 	 * Save preferences to file
 	 */
 	protected void savePreferences() {
-		File file = new File(getUserFileDirectory());
+		File file = new File(USER_FILE_DIR);
 		if (!file.exists())
 			file.mkdir();
 
-		File preferencesFile = new File(getUserFileDirectory(), "userSettings");
+		File preferencesFile = new File(USER_FILE_DIR, "userSettings");
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutputStream oos;
@@ -496,13 +500,6 @@ public abstract class AppFrame extends JFrame {
 	 */
 	public Universe getUniverse() {
 		return universe;
-	}
-
-	/**
-	 * @return Name of the directory to store user files
-	 */
-	public String getUserFileDirectory() {
-		return USER_FILE_DIR;
 	}
 
 	/**
@@ -837,6 +834,10 @@ public abstract class AppFrame extends JFrame {
 
 	}
 
+	protected String getHelp() {
+		return WORLD_TIPS + "<BR>" + getShortcutHelp();
+	}
+
 	/**
 	 * Action which shows the tips dialog
 	 * 
@@ -860,11 +861,10 @@ public abstract class AppFrame extends JFrame {
 
 			if (welcome) {
 				String appendum = "To show this message again, click <b>Help -> Tips and Commands</b>";
-				editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + WORLD_TIPS
+				editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + getHelp()
 						+ "<BR><BR>" + appendum + "</html>");
 			} else {
-				editor = new JLabel("<html>" + WORLD_TIPS + "<BR>" + getShortcutKeysHelp()
-						+ "</html>");
+				editor = new JLabel("<html>" + getHelp() + "</html>");
 			}
 
 			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName()
@@ -872,7 +872,7 @@ public abstract class AppFrame extends JFrame {
 		}
 	}
 
-	private String getShortcutKeysHelp() {
+	private String getShortcutHelp() {
 		StringBuilder shortcutKeysString = new StringBuilder(400);
 
 		shortcutKeysString.append("<h3>Additional Shortcuts</h3>");

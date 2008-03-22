@@ -21,12 +21,12 @@ import ca.neo.model.impl.NodeFactory;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.model.nef.NEFEnsembleFactory;
 import ca.neo.model.nef.impl.NEFEnsembleFactoryImpl;
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.ConfigResult;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.PropertySet;
 import ca.neo.ui.configurable.descriptors.PInt;
 import ca.neo.ui.configurable.descriptors.PNodeFactory;
-import ca.neo.ui.models.INodeContainer;
 import ca.neo.ui.models.constructors.PSign.SignType;
 import ca.neo.ui.models.nodes.UINEFEnsemble;
 import ca.neo.util.VectorGenerator;
@@ -34,66 +34,69 @@ import ca.neo.util.impl.RandomHypersphereVG;
 import ca.neo.util.impl.Rectifier;
 
 public class CNEFEnsemble extends ConstructableNode {
-	static final PropertyDescriptor pDecodingSign = new PSign("Decoding Sign");
+	static final Property pDecodingSign = new PSign("Decoding Sign");
 
-	static final PropertyDescriptor pDim = new PInt("Dimensions");
+	static final Property pDim = new PInt("Dimensions");
 
-	static final PropertyDescriptor pEncodingDistribution = new PEncodingDistribution(
-			"Encoding Distribution");
-	static final PropertyDescriptor pEncodingSign = new PSign("Encoding Sign");
-	static final PropertyDescriptor pNumOfNeurons = new PInt("Number of Neurons");
-	static final PropertyDescriptor pNodeFactory = new PNodeFactory("Node Factory");
+	static final Property pEncodingDistribution = new PEncodingDistribution("Encoding Distribution");
+	static final Property pEncodingSign = new PSign("Encoding Sign");
+	static final Property pNumOfNeurons = new PInt("Number of Neurons");
+	static final Property pNodeFactory = new PNodeFactory("Node Factory");
 
 	/**
 	 * Config descriptors
 	 */
-	static final PropertyDescriptor[] zConfig = { pNumOfNeurons, pDim, pDecodingSign,
-			pEncodingDistribution, pEncodingSign, pNodeFactory };
+	static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(new Property[] { pNumOfNeurons,
+			pDim }, new Property[] { pDecodingSign, pEncodingDistribution, pEncodingSign,
+			pNodeFactory });
 
-	public CNEFEnsemble(INodeContainer nodeContainer) {
-		super(nodeContainer);
+	public CNEFEnsemble() {
+		super();
 	}
 
-	protected Node createNode(PropertySet prop, String name) {
+	protected Node createNode(ConfigResult prop, String name) {
 		try {
 
 			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-			Integer numOfNeurons = (Integer) prop.getProperty(pNumOfNeurons);
-			Integer dimensions = (Integer) prop.getProperty(pDim);
-			SignType decodingSign = (SignType) prop.getProperty(pDecodingSign);
-			NodeFactory nodeFactory = (NodeFactory) prop.getProperty(pNodeFactory);
+			Integer numOfNeurons = (Integer) prop.getValue(pNumOfNeurons);
+			Integer dimensions = (Integer) prop.getValue(pDim);
 
 			/*
-			 * Set the decoding sign
+			 * Advanced properties, these may not necessarily be configued, so
 			 */
-			if (decodingSign == SignType.Positive || decodingSign == SignType.Negative) {
-				boolean positive = true;
-				if (decodingSign == SignType.Negative) {
-					positive = false;
+			SignType decodingSign = (SignType) prop.getValue(pDecodingSign);
+			NodeFactory nodeFactory = (NodeFactory) prop.getValue(pNodeFactory);
+			SignType encodingSign = (SignType) prop.getValue(pEncodingSign);
+			Float encodingDistribution = (Float) prop.getValue(pEncodingDistribution);
+
+			if (decodingSign != null) {
+				if (decodingSign == SignType.Positive || decodingSign == SignType.Negative) {
+					boolean positive = true;
+					if (decodingSign == SignType.Negative) {
+						positive = false;
+					}
+					ApproximatorFactory approxFactory = new GradientDescentApproximator.Factory(
+							new GradientDescentApproximator.CoefficientsSameSign(positive), false);
+					ef.setApproximatorFactory(approxFactory);
 				}
-				ApproximatorFactory approxFactory = new GradientDescentApproximator.Factory(
-						new GradientDescentApproximator.CoefficientsSameSign(positive), false);
-				ef.setApproximatorFactory(approxFactory);
 			}
 
-			/*
-			 * Set the encoding sign and distribution
-			 */
-			SignType encodingSign = (SignType) prop.getProperty(pEncodingSign);
-			Float encodingDistribution = (Float) prop.getProperty(pEncodingDistribution);
-
-			VectorGenerator vectorGen = new RandomHypersphereVG(true, 1, encodingDistribution);
-			if (encodingSign == SignType.Positive) {
-				vectorGen = new Rectifier(vectorGen, true);
-			} else if (encodingSign == SignType.Negative) {
-				vectorGen = new Rectifier(vectorGen, false);
+			if (nodeFactory != null) {
+				ef.setNodeFactory(nodeFactory);
 			}
-			ef.setEncoderFactory(vectorGen);
 
-			/*
-			 * Sets the Node Factory
-			 */
-			ef.setNodeFactory(nodeFactory);
+			if (encodingSign != null) {
+				if (encodingDistribution == null) {
+					encodingDistribution = 0f;
+				}
+				VectorGenerator vectorGen = new RandomHypersphereVG(true, 1, encodingDistribution);
+				if (encodingSign == SignType.Positive) {
+					vectorGen = new Rectifier(vectorGen, true);
+				} else if (encodingSign == SignType.Negative) {
+					vectorGen = new Rectifier(vectorGen, false);
+				}
+				ef.setEncoderFactory(vectorGen);
+			}
 
 			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions);
 
@@ -105,7 +108,7 @@ public class CNEFEnsemble extends ConstructableNode {
 	}
 
 	@Override
-	public PropertyDescriptor[] getNodeConfigSchema() {
+	public ConfigSchemaImpl getNodeConfigSchema() {
 		return zConfig;
 	}
 
@@ -115,7 +118,7 @@ public class CNEFEnsemble extends ConstructableNode {
 
 }
 
-class PEncodingDistribution extends PropertyDescriptor {
+class PEncodingDistribution extends Property {
 
 	private static final long serialVersionUID = 1L;
 
@@ -145,7 +148,7 @@ class PEncodingDistribution extends PropertyDescriptor {
 		private JSlider sliderSwing;
 		private JLabel sliderValueLabel;
 
-		public Slider(PropertyDescriptor property) {
+		public Slider(Property property) {
 			super(property);
 
 			JPanel sliderPanel = new JPanel();
@@ -212,7 +215,7 @@ class PEncodingDistribution extends PropertyDescriptor {
 
 }
 
-class PSign extends PropertyDescriptor {
+class PSign extends Property {
 
 	private static final long serialVersionUID = 1L;
 
@@ -245,7 +248,7 @@ class PSign extends PropertyDescriptor {
 
 		private JComboBox comboBox;
 
-		public Panel(PropertyDescriptor property) {
+		public Panel(Property property) {
 			super(property);
 			comboBox = new JComboBox(items);
 			add(comboBox);

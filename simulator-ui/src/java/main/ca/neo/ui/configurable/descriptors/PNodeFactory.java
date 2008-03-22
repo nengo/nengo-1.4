@@ -1,11 +1,11 @@
 package ca.neo.ui.configurable.descriptors;
 
 import ca.neo.model.impl.NodeFactory;
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.panels.NodeFactoryPanel;
 
-public class PNodeFactory extends PropertyDescriptor {
+public class PNodeFactory extends Property {
 
 	private static final long serialVersionUID = 1L;
 

@@ -2,7 +2,7 @@ package ca.neo.ui.configurable.panels;
 
 import javax.swing.JTextField;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
@@ -16,7 +16,7 @@ public class StringPanel extends PropertyInputPanel {
 
 	private JTextField tf;
 
-	public StringPanel(PropertyDescriptor property) {
+	public StringPanel(Property property) {
 		super(property);
 		initPanel();
 	}

@@ -1,6 +1,6 @@
 package ca.neo.ui.configurable.descriptors;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 import ca.neo.ui.configurable.panels.StringPanel;
 
@@ -10,7 +10,7 @@ import ca.neo.ui.configurable.panels.StringPanel;
  * @author Shu Wu
  * 
  */
-public class PString extends PropertyDescriptor {
+public class PString extends Property {
 
 	private static final long serialVersionUID = 1L;
 

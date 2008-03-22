@@ -41,7 +41,7 @@ import ca.neo.ui.actions.RunSimulatorAction;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.dataList.DataListView;
 import ca.neo.ui.dataList.SimulatorDataModel;
-import ca.neo.ui.models.INodeContainer;
+import ca.neo.ui.models.NodeContainer;
 import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.constructors.ConstructableNode;
 import ca.neo.ui.models.constructors.ModelFactory;
@@ -81,16 +81,13 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 /**
  * @author User
  */
-public class NengoGraphics extends AppFrame implements INodeContainer {
-	public static final double VERSION = 1.0;
-
-	public static final String APP_NAME = "Nengo Graphics V" + VERSION;
-
+public class NengoGraphics extends AppFrame implements NodeContainer {
 	private static final long serialVersionUID = 1L;
-
+	public static final double VERSION = 1.0;
 	private static final int VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK = ActionEvent.SHIFT_MASK
 			| ActionEvent.CTRL_MASK;
-
+	
+	public static final String APP_NAME = "Nengo Graphics V" + VERSION;
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
 	 */
@@ -126,9 +123,10 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	 */
 	public static void main(String[] args) {
 		JFrame frame = new NengoGraphics();
-		
+
 		try {
-			Image image = ImageIO.read(frame.getClass().getClassLoader().getResource("ca/neo/ui/spikepattern-black.png"));
+			Image image = ImageIO.read(frame.getClass().getClassLoader().getResource(
+					"ca/neo/ui/spikepattern-black.png"));
 			frame.setIconImage(image);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -162,6 +160,26 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	 */
 	public NengoGraphics() {
 		super();
+	}
+
+	/**
+	 * @returns Top Node Container available in the Application Window. Null, if
+	 *          the Top Window is not a Node Container
+	 */
+	private NodeContainer getTopNodeContainer() {
+		Window window = getTopWindow();
+		NodeContainer nodeContainer = null;
+
+		if (window != null) {
+			WorldObject wo = window.getContents();
+			if (wo instanceof NodeContainer) {
+				nodeContainer = (NodeContainer) wo;
+			}
+		} else {
+			nodeContainer = this;
+		}
+
+		return nodeContainer;
 	}
 
 	private void initScriptConsole() {
@@ -446,19 +464,18 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		if (node != null) {
 
 			Window window = getTopWindow();
-			INodeContainer nodeContainer = null;
+			NodeContainer nodeContainer = null;
 
 			if (window != null) {
 				WorldObject wo = window.getContents();
-				if (wo instanceof INodeContainer) {
-					nodeContainer = (INodeContainer) wo;
+				if (wo instanceof NodeContainer) {
+					nodeContainer = (NodeContainer) wo;
 				}
 			} else {
 				nodeContainer = this;
 			}
 
 			if (nodeContainer != null) {
-
 				pasteAction = new PasteAction("Paste", nodeContainer);
 			}
 		}
@@ -481,23 +498,32 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 	 * 
 	 * @see ca.neo.ui.models.INodeContainer#addNeoNode(ca.neo.ui.models.UINeoNode)
 	 */
-	public UINeoNode addNodeModel(Node node) {
+	public UINeoNode addNodeModel(Node node) throws ContainerException {
 		return addNodeModel(node, null, null);
 	}
 
-	public UINeoNode addNodeModel(Node node, Double posX, Double posY) {
-		UINeoNode nodeUI = UINeoNode.createNodeUI(node);
+	public UINeoNode addNodeModel(Node node, Double posX, Double posY) throws ContainerException {
+		NodeContainer nodeContainer = getTopNodeContainer();
+		if (nodeContainer != this && nodeContainer != null) {
+			// Delegate to the top Node Container in the Application
+			return nodeContainer.addNodeModel(node, posX, posY);
+		} else if (nodeContainer == this) {
 
-		if (posX != null && posY != null) {
-			nodeUI.setOffset(posX, posY);
+			UINeoNode nodeUI = UINeoNode.createNodeUI(node);
 
-			getWorld().getGround().addChild(nodeUI);
+			if (posX != null && posY != null) {
+				nodeUI.setOffset(posX, posY);
+
+				getWorld().getGround().addChild(nodeUI);
+			} else {
+				getWorld().getGround().addChildFancy(nodeUI);
+			}
+
+			DragAction.dropNode(nodeUI);
+			return nodeUI;
 		} else {
-			getWorld().getGround().addChildFancy(nodeUI);
+			throw new ContainerException("There are no containers to put this node");
 		}
-
-		DragAction.dropNode(nodeUI);
-		return nodeUI;
 	}
 
 	public void captureInDataViewer(Network network) {
@@ -553,21 +579,31 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		return clipboard;
 	}
 
-	public PythonInterpreter getPythonInterpreter() {
-		return pythonInterpreter;
-	}
-
 	public Node getNodeModel(String name) {
-		for (WorldObject wo : getWorld().getGround().getChildren()) {
-			if (wo instanceof UINeoNode) {
-				UINeoNode nodeUI = (UINeoNode) wo;
+		NodeContainer nodeContainer = getTopNodeContainer();
+		if (nodeContainer != this && nodeContainer != null) {
+			// Delegate to the top Node Container in the Application
+			return nodeContainer.getNodeModel(name);
+		} else if (nodeContainer == this) {
+			for (WorldObject wo : getWorld().getGround().getChildren()) {
+				if (wo instanceof UINeoNode) {
+					UINeoNode nodeUI = (UINeoNode) wo;
 
-				if (nodeUI.getName().equals(name)) {
-					return nodeUI.getModel();
+					if (nodeUI.getName().equals(name)) {
+						return nodeUI.getModel();
+					}
 				}
 			}
 		}
 		return null;
+	}
+
+	public PythonInterpreter getPythonInterpreter() {
+		return pythonInterpreter;
+	}
+
+	public WorldObject getSelectedObj() {
+		return selectedObj;
 	}
 
 	@Override
@@ -607,6 +643,12 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 							VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK));
 
 		}
+	}
+
+	public Point2D localToView(Point2D localPoint) {
+		localPoint = getWorld().getSky().parentToLocal(localPoint);
+		localPoint = getWorld().getSky().localToView(localPoint);
+		return localPoint;
 	}
 
 	public boolean removeNodeModel(Node node) {
@@ -670,16 +712,6 @@ public class NengoGraphics extends AppFrame implements INodeContainer {
 		}
 
 	}
-
-	public Point2D localToView(Point2D localPoint) {
-		localPoint = getWorld().getSky().parentToLocal(localPoint);
-		localPoint = getWorld().getSky().localToView(localPoint);
-		return localPoint;
-	}
-
-	public WorldObject getSelectedObj() {
-		return selectedObj;
-	}
 }
 
 class ConfigurationPane {
@@ -723,12 +755,12 @@ class ConfigurationPane {
  */
 class RunNetworkAction extends StandardAction {
 
+	private static final long serialVersionUID = 1L;
+
 	public RunNetworkAction(String description) {
 		super(description);
 
 	}
-
-	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected void action() throws ActionException {

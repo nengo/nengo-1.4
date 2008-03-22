@@ -2,11 +2,14 @@ package ca.neo.ui.configurable.descriptors.functions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import ca.neo.math.Function;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.ConfigSchema;
+import ca.neo.ui.configurable.Property;
+import ca.neo.ui.configurable.ConfigResult;
 
 /**
  * Function instances are created through reflection.
@@ -14,35 +17,35 @@ import ca.neo.ui.configurable.PropertySet;
  * @author Shu Wu
  */
 public class FnReflective extends AbstractFn {
-	private PropertyDescriptor[] myProperties;
+	private Property[] myProperties;
 
-	public FnReflective(Class<? extends Function> functionClass, String typeName, PropertyDescriptor[] propStruct) {
+	public FnReflective(Class<? extends Function> functionClass, String typeName,
+			Property[] propStruct) {
 		super(typeName, functionClass);
 
 		this.myProperties = propStruct;
 	}
 
 	@Override
-	protected Function createFunction(PropertySet props) throws ConfigException {
-		PropertyDescriptor[] metaProperties = getConfigSchema();
+	protected Function createFunction(ConfigResult props) throws ConfigException {
+		List<Property> metaProperties = getSchema().getProperties();
 
 		/*
 		 * Create function using Java reflection, function parameter are
 		 * configured via the IConfigurable interface
 		 */
-		Class<?> partypes[] = new Class[metaProperties.length];
-		for (int i = 0; i < metaProperties.length; i++) {
-
-			partypes[i] = metaProperties[i].getTypeClass();
+		Class<?> partypes[] = new Class[metaProperties.size()];
+		for (int i = 0; i < metaProperties.size(); i++) {
+			partypes[i] = metaProperties.get(i).getTypeClass();
 
 		}
 		Constructor<?> ct = null;
 		try {
 			ct = getFunctionType().getConstructor(partypes);
 
-			Object arglist[] = new Object[metaProperties.length];
-			for (int i = 0; i < metaProperties.length; i++) {
-				arglist[i] = props.getProperty(metaProperties[i].getName());
+			Object arglist[] = new Object[metaProperties.size()];
+			for (int i = 0; i < metaProperties.size(); i++) {
+				arglist[i] = props.getValue(metaProperties.get(i).getName());
 			}
 			Object retobj = null;
 			try {
@@ -67,8 +70,8 @@ public class FnReflective extends AbstractFn {
 		}
 	}
 
-	public PropertyDescriptor[] getConfigSchema() {
-		return myProperties;
+	public ConfigSchema getSchema() {
+		return new ConfigSchemaImpl(myProperties);
 	}
 
 }

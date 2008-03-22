@@ -11,21 +11,23 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.impl.AbstractEnsemble;
 import ca.neo.model.nef.NEFEnsemble;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.ConfigSchema;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.descriptors.PFunctionArray;
 import ca.neo.ui.configurable.descriptors.PString;
 import ca.neo.ui.models.nodes.widgets.UIDecodedOrigin;
 
 public class CDecodedOrigin extends AbstractConstructable {
-	private static final PropertyDescriptor pName = new PString("Name");
+	private static final Property pName = new PString("Name");
 
 	private NEFEnsemble enfEnsembleParent;
 
-	private PropertyDescriptor pFunctions;
+	private Property pFunctions;
 
-	private PropertyDescriptor pNodeOrigin;
+	private Property pNodeOrigin;
 
 	public CDecodedOrigin(NEFEnsemble enfEnsembleParent) {
 		super();
@@ -33,13 +35,13 @@ public class CDecodedOrigin extends AbstractConstructable {
 	}
 
 	@Override
-	protected Object configureModel(PropertySet configuredProperties) throws ConfigException {
+	protected Object configureModel(ConfigResult configuredProperties) throws ConfigException {
 		Origin origin = null;
 
 		try {
 			origin = enfEnsembleParent.addDecodedOrigin((String) configuredProperties
-					.getProperty(pName), (Function[]) configuredProperties.getProperty(pFunctions),
-					(String) configuredProperties.getProperty(pNodeOrigin));
+					.getValue(pName), (Function[]) configuredProperties.getValue(pFunctions),
+					(String) configuredProperties.getValue(pNodeOrigin));
 
 		} catch (StructuralException e) {
 			throw new ConfigException(e.getMessage());
@@ -49,7 +51,7 @@ public class CDecodedOrigin extends AbstractConstructable {
 	}
 
 	@Override
-	public PropertyDescriptor[] getConfigSchema() {
+	public ConfigSchema getSchema() {
 		pFunctions = new PFunctionArray("Functions", enfEnsembleParent.getDimension());
 
 		// Find common nodes
@@ -58,8 +60,8 @@ public class CDecodedOrigin extends AbstractConstructable {
 
 		pNodeOrigin = new OriginSelector("Node Origin Name", commonNodes.toArray(new String[0]));
 
-		PropertyDescriptor[] zProperties = { pName, pFunctions, pNodeOrigin };
-		return zProperties;
+		Property[] zProperties = { pName, pFunctions, pNodeOrigin };
+		return new ConfigSchemaImpl(zProperties);
 
 	}
 
@@ -124,7 +126,7 @@ class OriginInputPanel extends PropertyInputPanel {
  * 
  * @author Shu Wu
  */
-class OriginSelector extends PropertyDescriptor {
+class OriginSelector extends Property {
 
 	private static final long serialVersionUID = 1L;
 	String[] origins;

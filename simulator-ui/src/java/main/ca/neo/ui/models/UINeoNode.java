@@ -33,12 +33,12 @@ import ca.neo.model.neuron.Neuron;
 import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.actions.AddProbeAction;
 import ca.neo.ui.actions.CopyAction;
+import ca.neo.ui.actions.CreateModelAction;
 import ca.neo.ui.actions.CutAction;
-import ca.neo.ui.actions.PasteAction;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.configurable.ConfigException;
 import ca.neo.ui.configurable.UserDialogs;
-import ca.neo.ui.models.INodeContainer.ContainerException;
+import ca.neo.ui.models.NodeContainer.ContainerException;
 import ca.neo.ui.models.nodes.UIEnsemble;
 import ca.neo.ui.models.nodes.UIFunctionInput;
 import ca.neo.ui.models.nodes.UIGenericNode;
@@ -422,8 +422,8 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 			/*
 			 * Move to new container
 			 */
-			if (wo instanceof INodeContainer) {
-				INodeContainer nodeContainer = (INodeContainer) wo;
+			if (wo instanceof NodeContainer) {
+				NodeContainer nodeContainer = (NodeContainer) wo;
 
 				try {
 					Node node = getModel();
@@ -440,7 +440,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 					 * Adds node
 					 */
 					try {
-						PasteAction.ensureNonConflictingName(node, nodeContainer);
+						CreateModelAction.ensureNonConflictingName(node, nodeContainer);
 						nodeContainer.addNodeModel(getModel(), newPosition.getX(), newPosition
 								.getY());
 					} catch (UserCancelledException e) {

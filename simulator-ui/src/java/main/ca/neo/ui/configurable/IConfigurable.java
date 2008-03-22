@@ -13,7 +13,7 @@ public interface IConfigurable {
 	 * @param props
 	 *            A set of properties
 	 */
-	public void completeConfiguration(PropertySet props) throws ConfigException;
+	public void completeConfiguration(ConfigResult props) throws ConfigException;
 
 	/**
 	 * Called before full configuration to initialize and find errors.
@@ -22,13 +22,13 @@ public interface IConfigurable {
 	 *             Exception thrown if there is an error during
 	 *             pre-configuration.
 	 */
-	public void preConfiguration(PropertySet props) throws ConfigException;
+	public void preConfiguration(ConfigResult props) throws ConfigException;
 
 	/**
 	 * @return An array of objects which describe what needs to be configured in
 	 *         this object
 	 */
-	public PropertyDescriptor[] getConfigSchema();
+	public ConfigSchema getSchema();
 
 	/**
 	 * @return Name given to this type of object

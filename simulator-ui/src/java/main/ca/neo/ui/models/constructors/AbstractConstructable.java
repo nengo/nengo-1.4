@@ -1,9 +1,9 @@
 package ca.neo.ui.models.constructors;
 
 import ca.neo.ui.configurable.ConfigException;
+import ca.neo.ui.configurable.ConfigSchema;
 import ca.neo.ui.configurable.IConfigurable;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.ConfigResult;
 
 /**
  * A UIModel which can be configured through the IConfigurable interface
@@ -27,21 +27,21 @@ public abstract class AbstractConstructable implements IConfigurable {
 	 * @param configuredProperties
 	 *            the configured properties
 	 */
-	protected abstract Object configureModel(PropertySet configuredProperties)
+	protected abstract Object configureModel(ConfigResult configuredProperties)
 			throws ConfigException;
 
-	public void completeConfiguration(final PropertySet properties) throws ConfigException {
+	public void completeConfiguration(final ConfigResult properties) throws ConfigException {
 		model = null;
 		model = configureModel(properties);
 	}
 
-	public abstract PropertyDescriptor[] getConfigSchema();
+	public abstract ConfigSchema getSchema();
 
 	public Object getModel() {
 		return model;
 	}
 
-	public void preConfiguration(PropertySet props) throws ConfigException {
+	public void preConfiguration(ConfigResult props) throws ConfigException {
 		// do nothing
 	}
 }

@@ -6,7 +6,7 @@ import ca.neo.config.ClassRegistry;
 import ca.neo.math.Function;
 import ca.neo.math.impl.FourierFunction;
 import ca.neo.math.impl.GaussianPDF;
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.descriptors.functions.ConfigurableFunction;
 import ca.neo.ui.configurable.descriptors.functions.FnAdvanced;
 import ca.neo.ui.configurable.descriptors.functions.FnConstant;
@@ -19,7 +19,7 @@ import ca.neo.ui.configurable.panels.FunctionPanel;
  * 
  * @author Shu Wu
  */
-public class PFunction extends PropertyDescriptor {
+public class PFunction extends Property {
 
 	private static final long serialVersionUID = 1L;
 
@@ -53,11 +53,11 @@ public class PFunction extends PropertyDescriptor {
 		 */
 		if (myInputDimension == 1) {
 			FnReflective fourierFunction = new FnReflective(FourierFunction.class,
-					"Fourier Function", new PropertyDescriptor[] { new PFloat("Fundamental"),
+					"Fourier Function", new Property[] { new PFloat("Fundamental"),
 							new PFloat("Cutoff"), new PFloat("RMS"), new PLong("Seed") });
 
 			FnReflective gaussianPDF = new FnReflective(GaussianPDF.class, "Gaussian PDF",
-					new PropertyDescriptor[] { new PFloat("Mean"), new PFloat("Variance"),
+					new Property[] { new PFloat("Mean"), new PFloat("Variance"),
 							new PFloat("Peak") });
 
 			functions.add(fourierFunction);

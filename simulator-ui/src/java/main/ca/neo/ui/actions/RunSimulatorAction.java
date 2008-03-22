@@ -8,8 +8,8 @@ import ca.neo.sim.SimulatorEvent;
 import ca.neo.sim.SimulatorListener;
 import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.PropertyDescriptor;
-import ca.neo.ui.configurable.PropertySet;
+import ca.neo.ui.configurable.Property;
+import ca.neo.ui.configurable.ConfigResult;
 import ca.neo.ui.configurable.descriptors.PBoolean;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.ConfigManager;
@@ -28,16 +28,16 @@ import ca.shu.ui.lib.util.UserMessages;
  * @author Shu Wu
  */
 public class RunSimulatorAction extends StandardAction {
-	private static final PropertyDescriptor pEndTime = new PFloat("End time");
-	private static final PropertyDescriptor pShowDataViewer = new PBoolean(
+	private static final Property pEndTime = new PFloat("End time");
+	private static final Property pShowDataViewer = new PBoolean(
 			"Open data viewer after simulation");
-	private static final PropertyDescriptor pStartTime = new PFloat("Start time");
+	private static final Property pStartTime = new PFloat("Start time");
 
-	private static final PropertyDescriptor pStepSize = new PFloat("Step size");
+	private static final Property pStepSize = new PFloat("Step size");
 
 	private static final long serialVersionUID = 1L;
 
-	private static final PropertyDescriptor[] zProperties = { pStartTime, pEndTime, pStepSize,
+	private static final Property[] zProperties = { pStartTime, pEndTime, pStepSize,
 			pShowDataViewer };
 
 	private UINetwork uiNetwork;
@@ -75,14 +75,14 @@ public class RunSimulatorAction extends StandardAction {
 
 		try {
 			if (!configured) {
-				PropertySet properties = ConfigManager.configure(zProperties,
+				ConfigResult properties = ConfigManager.configure(zProperties,
 						"Simulator Runtime Configuration", UIEnvironment.getInstance(),
 						ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
-				startTime = (Float) properties.getProperty(pStartTime);
-				endTime = (Float) properties.getProperty(pEndTime);
-				stepTime = (Float) properties.getProperty(pStepSize);
-				showDataViewer = (Boolean) properties.getProperty(pShowDataViewer);
+				startTime = (Float) properties.getValue(pStartTime);
+				endTime = (Float) properties.getValue(pEndTime);
+				stepTime = (Float) properties.getValue(pStepSize);
+				showDataViewer = (Boolean) properties.getValue(pShowDataViewer);
 			}
 			RunSimulatorActivity simulatorActivity = new RunSimulatorActivity(startTime, endTime,
 					stepTime, showDataViewer);

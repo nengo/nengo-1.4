@@ -3,7 +3,7 @@ package ca.neo.ui.configurable.panels;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
-import ca.neo.ui.configurable.PropertyDescriptor;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.PropertyInputPanel;
 
 /**
@@ -19,7 +19,7 @@ public class BooleanPanel extends PropertyInputPanel {
 
 	JCheckBox checkBox;
 
-	public BooleanPanel(PropertyDescriptor property) {
+	public BooleanPanel(Property property) {
 		super(property);
 		initPanel();
 	}
