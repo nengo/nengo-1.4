@@ -5,12 +5,15 @@ package ca.neo.plot;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -59,6 +62,13 @@ public abstract class Plotter {
 		final JFrame frame = new JFrame(title);
 		frame.getContentPane().add(plotPanel, BorderLayout.CENTER);
 		myPlotFrames.add(frame);
+		
+		try {
+			Image image = ImageIO.read(this.getClass().getClassLoader().getResource("ca/neo/plot/spikepattern-grey.png"));
+			frame.setIconImage(image);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		final Plotter plotter = this;
         frame.addWindowListener(new WindowAdapter() {
