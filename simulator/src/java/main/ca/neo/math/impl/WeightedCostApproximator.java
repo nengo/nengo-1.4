@@ -252,6 +252,10 @@ public class WeightedCostApproximator implements LinearApproximator {
 		 * @param noise Random noise to add to component functions (proportion of largest value over all functions) 
 		 */
 		public Factory(float noise) {
+			this(noise, -1);
+		}
+
+		public Factory(float noise, int NSV) {
 			myNoise = noise;
 			myNSV = -1;
 		}
