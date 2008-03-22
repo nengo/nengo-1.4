@@ -13,6 +13,7 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
@@ -846,9 +847,9 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 			JTextArea editor = new JTextArea(30, 50);
 			editor.setText(prevDoc);
 
-			int rtnValue = JOptionPane.showOptionDialog(UIEnvironment.getInstance(), editor,
-					getName() + " - Documenation Editor", JOptionPane.OK_CANCEL_OPTION,
-					JOptionPane.PLAIN_MESSAGE, null, null, null);
+			int rtnValue = JOptionPane.showOptionDialog(UIEnvironment.getInstance(),
+					new JScrollPane(editor), getName() + " - Documenation Editor",
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
 
 			if (rtnValue == JOptionPane.OK_OPTION) {
 				String text = editor.getText();
@@ -949,14 +950,8 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 		@Override
 		protected void action() throws ActionException {
-
-			JTextArea editor = new JTextArea(30, 50);
-			editor.setText(getModel().getDocumentation());
-			editor.setEditable(false);
-
-			JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getName()
-					+ " - Documentation Viewer", JOptionPane.PLAIN_MESSAGE);
-
+			UserMessages.showTextDialog(getName() + " - Documentation Viewer", getModel()
+					.getDocumentation());
 		}
 
 	}

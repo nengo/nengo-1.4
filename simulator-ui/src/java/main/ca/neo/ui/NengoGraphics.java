@@ -79,7 +79,9 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
  * @author User
  */
 public class NengoGraphics extends AppFrame implements INodeContainer {
-	private static final String APP_NAME = "Nengo Graphics V1 Beta";
+	public static final double VERSION = 1.0;
+
+	public static final String APP_NAME = "Nengo Graphics V" + VERSION;
 
 	private static final long serialVersionUID = 1L;
 

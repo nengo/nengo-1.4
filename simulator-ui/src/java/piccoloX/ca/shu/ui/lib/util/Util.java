@@ -12,6 +12,7 @@ import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
+import ca.neo.ui.NengoGraphics;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
@@ -81,24 +82,30 @@ public class Util {
 
 	public static void Assert(boolean bool, String msg) {
 		if (!bool && UIEnvironment.isDebugEnabled()) {
-			StringBuilder assertMsg = new StringBuilder("<h3>ASSERT == FALSE<br>");
+
+			StringBuilder assertMsg = new StringBuilder(
+					"An unexpected error has occured \n"
+							+ "Please report this log at: http://sourceforge.net/tracker/?atid=1036998&group_id=216267\nIf possible, please include a record of what you were doing preceding this screen \n\n");
+			assertMsg.append("*** " + NengoGraphics.APP_NAME + " ***\n");
+
 			if (msg != null && !"".equals(msg)) {
-				assertMsg.append(msg + "<br>");
+				assertMsg.append(msg + "\n");
 			}
-			assertMsg.append("Report this error to shuwu83@gmail.com</h3><br>");
 			StackTraceElement[] stackEls = (new Exception()).getStackTrace();
 
 			int i = 0;
+			assertMsg.append("*** Stack Trace *** \n");
 			for (StackTraceElement el : stackEls) {
-				if (i > 10) {
+				if (i > 200) {
 					assertMsg.append("...");
 					break;
 				}
-				assertMsg.append(el.toString() + "<br>");
+				assertMsg.append(el.toString() + "\n");
 				i++;
 			}
 
-			UserMessages.showWarning(assertMsg.toString());
+			UserMessages.showTextDialog("ASSERT == FALSE, " + msg, assertMsg.toString(),
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
