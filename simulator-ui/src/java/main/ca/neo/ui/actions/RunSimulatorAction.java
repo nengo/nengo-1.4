@@ -75,8 +75,8 @@ public class RunSimulatorAction extends StandardAction {
 
 		try {
 			if (!configured) {
-				ConfigResult properties = ConfigManager.configure(zProperties,
-						"Simulator Runtime Configuration", UIEnvironment.getInstance(),
+				ConfigResult properties = ConfigManager.configure(zProperties, "Run "
+						+ uiNetwork.getFullName(), UIEnvironment.getInstance(),
 						ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
 				startTime = (Float) properties.getValue(pStartTime);
