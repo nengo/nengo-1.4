@@ -76,7 +76,11 @@ public class MouseHandler extends PBasicInputEventHandler {
 	 */
 	private boolean maybeTriggerPopup(PInputEvent event) {
 		if (event.isPopupTrigger()) {
-			JPopupMenu menuToShow = world.getSelectionMenu(world.getSelection());
+			JPopupMenu menuToShow = null;
+
+			if (world.getSelection().size() > 1) {
+				menuToShow = world.getSelectionMenu(world.getSelection());
+			}
 
 			if (menuToShow == null && (interactableObj != null)
 					&& (interactableObj == getInteractableFromEvent(event))) {

@@ -2,6 +2,7 @@ package ca.shu.ui.lib.world.piccolo;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -12,6 +13,7 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.RemoveObjectsAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.ZoomToFitAction;
+import ca.shu.ui.lib.actions.ZoomToFitObjects;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
@@ -52,6 +54,43 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * Whether tooltips are enabled
 	 */
 	private static boolean tooltipsEnabled = true;
+
+	public static Rectangle2D getObjectBounds(Collection<WorldObject> objects) {
+		double startX = Double.POSITIVE_INFINITY;
+		double startY = Double.POSITIVE_INFINITY;
+		double endX = Double.NEGATIVE_INFINITY;
+		double endY = Double.NEGATIVE_INFINITY;
+
+		for (WorldObject wo : objects) {
+			Point2D position = wo.localToGlobal(new Point2D.Double(0, 0));
+			Rectangle2D bounds = wo.localToGlobal(wo.getBounds());
+
+			double x = position.getX();
+			double y = position.getY();
+
+			if (x < startX) {
+				startX = x;
+			}
+			if (x + bounds.getWidth() > endX) {
+				endX = x + bounds.getWidth();
+			}
+
+			if (y < startY) {
+				startY = y;
+			}
+			if (y + bounds.getHeight() > endY) {
+				endY = y + bounds.getHeight();
+			}
+
+		}
+
+		if (objects.size() > 0) {
+			return new Rectangle2D.Double(startX, startY, endX - startX, endY - startY);
+		} else {
+			throw new InvalidParameterException("no objects");
+		}
+
+	}
 
 	public static boolean isTooltipsVisible() {
 		return tooltipsEnabled;
@@ -213,8 +252,8 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	}
 
 	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
-		menu.addAction(new RemoveObjectsAction(selection, "Remove"));
-
+		menu.addAction(new ZoomToFitObjects("Zoom to fit", this, selection));
+		menu.addAction(new RemoveObjectsAction(selection, "Remove selected"));
 	}
 
 	@Override
@@ -307,7 +346,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * @return Context menu for currently selected items, null is none is to be
 	 *         shown
 	 */
-	public JPopupMenu getSelectionMenu(Collection<WorldObject> selection) {
+	public final JPopupMenu getSelectionMenu(Collection<WorldObject> selection) {
 
 		if (selection.size() > 1) {
 

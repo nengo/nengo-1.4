@@ -9,8 +9,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.JPopupMenu;
-
 import ca.neo.model.Node;
 import ca.neo.ui.actions.SaveNodeAction;
 import ca.neo.ui.models.ModelsContextMenu;
@@ -112,7 +110,7 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 
 	}
 
-	public Point2D localToView(Point2D localPoint) {		
+	public Point2D localToView(Point2D localPoint) {
 		localPoint = getSky().parentToLocal(localPoint);
 		localPoint = getSky().localToView(localPoint);
 		return localPoint;
@@ -127,12 +125,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
 		sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
-	}
-
-	@Override
-	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
-		// TODO Auto-generated method stub
-		super.constructSelectionMenu(selection, menu);
 	}
 
 	protected void initialize() {
@@ -295,7 +287,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	}
 
 	@Override
-	public JPopupMenu getSelectionMenu(Collection<WorldObject> selection) {
+	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
+		super.constructSelectionMenu(selection, menu);
 		ArrayList<ModelObject> models = new ArrayList<ModelObject>(selection.size());
 
 		for (WorldObject object : selection) {
@@ -304,7 +297,8 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 			}
 		}
 
-		return ModelsContextMenu.getMenu(models);
+		ModelsContextMenu.constructMenu(menu, models);
+
 	}
 
 	/**

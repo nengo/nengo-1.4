@@ -1,6 +1,7 @@
 ******************************************
  Done
 *******************************************
+03/22/2008 - Zoom to fit selected objects 
 03/22/2008 - Request ID 1915622: Added noise and singular values selection to unconstrained decoders
 
 03/22/2008 - Added rename logic to node creation code paths

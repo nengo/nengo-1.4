@@ -23,33 +23,22 @@ public class ModelsContextMenu {
 	 *            Selected objects which a popup menu is created for
 	 * @return Context menu for selected objects
 	 */
-	public static JPopupMenu getMenu(Collection<ModelObject> selectedObjects) {
-		if (selectedObjects.size() == 0)
-			return null;
-		else if (selectedObjects.size() == 1) {
-			return selectedObjects.iterator().next().getContextMenu();
-			
-		} else {
-			ModelsContextMenu instance = new ModelsContextMenu(selectedObjects);
+	public static void constructMenu(PopupMenuBuilder menuBuilder,
+			Collection<ModelObject> selectedObjects) {
 
-			return instance.getMenu();
-		}
+		new ModelsContextMenu(menuBuilder, selectedObjects);
 	}
-
-	private JPopupMenu menu;
 
 	private Collection<ModelObject> selectedObjects;
 
 	private HashMap<Class<? extends ModelObject>, LinkedList<ModelObject>> selectionMap = new HashMap<Class<? extends ModelObject>, LinkedList<ModelObject>>();
+	private PopupMenuBuilder menuBuilder;
 
-	protected ModelsContextMenu(Collection<ModelObject> models) {
+	protected ModelsContextMenu(PopupMenuBuilder menuBuilder, Collection<ModelObject> models) {
 		super();
+		this.menuBuilder = menuBuilder;
 		this.selectedObjects = models;
 		init();
-	}
-
-	private JPopupMenu getMenu() {
-		return menu;
 	}
 
 	private void init() {
@@ -69,8 +58,7 @@ public class ModelsContextMenu {
 			if (object instanceof ModelObject) {
 				ModelObject modelUI = (ModelObject) object;
 
-				LinkedList<ModelObject> objects = selectionMap.get(modelUI
-						.getClass());
+				LinkedList<ModelObject> objects = selectionMap.get(modelUI.getClass());
 
 				if (objects == null) {
 					objects = new LinkedList<ModelObject>();
@@ -86,20 +74,12 @@ public class ModelsContextMenu {
 	}
 
 	protected void constructMenu() {
-		PopupMenuBuilder menuBuilder = null;
-		if (selectionMap.keySet().size() > 1) {
-
-			menuBuilder = new PopupMenuBuilder("Selected Objects");
-		}
-
-		for (Class<? extends ModelObject> type : selectionMap.keySet().toArray(
-				new Class[0])) {
+		for (Class<? extends ModelObject> type : selectionMap.keySet().toArray(new Class[0])) {
 
 			LinkedList<ModelObject> homogeneousModels = selectionMap.get(type);
 			String typeName = homogeneousModels.getFirst().getTypeName();
 
-			String typeMenuName = homogeneousModels.size() + " " + typeName
-					+ "s";
+			String typeMenuName = homogeneousModels.size() + " " + typeName + "s";
 
 			AbstractMenuBuilder typeMenu;
 			if (menuBuilder == null) {
@@ -110,11 +90,8 @@ public class ModelsContextMenu {
 
 			}
 
-			UIModels.constructMenuForModels(typeMenu, type, typeName,
-					homogeneousModels);
+			UIModels.constructMenuForModels(typeMenu, type, typeName, homogeneousModels);
 
 		}
-
-		menu = menuBuilder.toJPopupMenu();
 	}
 }
