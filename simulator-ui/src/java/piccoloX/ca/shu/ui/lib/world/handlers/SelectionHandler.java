@@ -543,7 +543,31 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	 */
 	public Collection<WorldObject> getSelection() {
 		ArrayList<WorldObject> sel = new ArrayList<WorldObject>(selection.keySet());
-		return sel;
+
+		int destroyedCount = 0;
+		for (WorldObject wo : sel) {
+			if (wo.isDestroyed()) {
+				destroyedCount++;
+			}
+		}
+
+		if (destroyedCount > 0) {
+			// filter the selection to only return the non-destroyed objects
+			ArrayList<WorldObject> filteredSel = new ArrayList<WorldObject>(sel.size()
+					- destroyedCount);
+
+			for (WorldObject wo : sel) {
+				if (!wo.isDestroyed()) {
+					filteredSel.add(wo);
+				} else {
+					//remove the destroyed objects
+					unselect((WorldObjectImpl)wo);
+				}
+			}
+			return filteredSel;
+		} else {
+			return sel;
+		}
 	}
 
 	/**

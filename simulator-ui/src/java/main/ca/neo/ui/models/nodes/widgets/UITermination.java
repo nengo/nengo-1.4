@@ -276,10 +276,15 @@ class UIGenericTermination extends UITermination implements ILineTermination {
 	}
 
 	@Override
-	protected void destroyTerminationModel() {
-		UserMessages
-				.showWarning("This termination model could not be removed, it will only be hidden.");
+	protected boolean showRemoveModelAction() {
+		return false;
+	}
 
+	@Override
+	protected void destroyTerminationModel() {
+		/*
+		 * Do nothing
+		 */
 	}
 
 }

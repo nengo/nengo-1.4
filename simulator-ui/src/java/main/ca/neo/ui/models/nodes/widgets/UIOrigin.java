@@ -198,8 +198,15 @@ class UIGenericOrigin extends UIOrigin {
 	}
 
 	@Override
+	protected boolean showRemoveModelAction() {
+		return false;
+	}
+
+	@Override
 	protected void destroyOriginModel() {
-		UserMessages.showWarning("This origin model could not be removed, it will only be hidden.");
+		/*
+		 * Do nothing
+		 */
 	}
 
 }

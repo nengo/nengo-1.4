@@ -26,6 +26,9 @@
 *******************************************
  Pri 0 - doing next
 *******************************************
+Events to pass more information like the node it occured one. 
+	Selectionhandler should attach on destroy events to remove item from selection 
+
 Need to create UIFiles directory
 
 Add listener to catch name changes of the children of NengoGraphics

@@ -333,8 +333,6 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	}
 
 	/**
-	 * Returns a copy of currently selected nodes
-	 * 
 	 * @return Selection Currently Selected nodes
 	 */
 	public Collection<WorldObject> getSelection() {

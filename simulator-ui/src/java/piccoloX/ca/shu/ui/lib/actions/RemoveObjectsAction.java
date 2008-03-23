@@ -2,6 +2,7 @@ package ca.shu.ui.lib.actions;
 
 import java.util.Collection;
 
+import ca.shu.ui.lib.objects.models.ModelObject;
 import ca.shu.ui.lib.world.WorldObject;
 
 public class RemoveObjectsAction extends StandardAction {
@@ -9,8 +10,7 @@ public class RemoveObjectsAction extends StandardAction {
 	private static final long serialVersionUID = 1L;
 	private Collection<WorldObject> objectsToRemove;
 
-	public RemoveObjectsAction(Collection<WorldObject> objectsToRemove,
-			String actionName) {
+	public RemoveObjectsAction(Collection<WorldObject> objectsToRemove, String actionName) {
 		super(actionName);
 		this.objectsToRemove = objectsToRemove;
 	}
@@ -18,7 +18,17 @@ public class RemoveObjectsAction extends StandardAction {
 	@Override
 	protected void action() throws ActionException {
 		for (WorldObject wo : objectsToRemove) {
-			wo.destroy();
+			if (wo instanceof ModelObject) {
+				/*
+				 * If it's a model, make sure that's destroyed as well
+				 */
+				((ModelObject) wo).destroyModel();
+			} else {
+				/*
+				 * Just destroy the UI representation
+				 */
+				wo.destroy();
+			}
 		}
 
 	}

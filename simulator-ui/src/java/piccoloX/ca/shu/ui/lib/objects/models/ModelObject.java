@@ -101,7 +101,13 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 * @return Constructed Context Menu
 	 */
 	protected void constructMenu(PopupMenuBuilder menu) {
-		menu.addAction(new RemoveModelAction("Remove model", this));
+		if (showRemoveModelAction()) {
+			menu.addAction(new RemoveModelAction("Remove model", this));
+		}
+	}
+
+	protected boolean showRemoveModelAction() {
+		return true;
 	}
 
 	protected void constructTooltips(TooltipBuilder builder) {
@@ -215,7 +221,7 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 		if (isModelBusy()) {
 			return null;
 		} else {
-			PopupMenuBuilder menu = new PopupMenuBuilder("Model: " + getName());
+			PopupMenuBuilder menu = new PopupMenuBuilder(getFullName());
 			constructMenu(menu);
 
 			return menu.toJPopupMenu();
