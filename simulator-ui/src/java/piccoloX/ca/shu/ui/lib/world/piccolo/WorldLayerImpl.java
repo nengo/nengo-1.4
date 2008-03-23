@@ -1,7 +1,7 @@
 package ca.shu.ui.lib.world.piccolo;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
@@ -25,8 +25,8 @@ public abstract class WorldLayerImpl extends WorldObjectImpl implements WorldLay
 		super(name, node);
 	}
 
-	public Collection<Window> getWindows() {
-		LinkedList<Window> windows = new LinkedList<Window>();
+	public List<Window> getWindows() {
+		ArrayList<Window> windows = new ArrayList<Window>(5);
 		for (WorldObject wo : getChildren()) {
 			if (wo instanceof Window) {
 				windows.add((Window) wo);

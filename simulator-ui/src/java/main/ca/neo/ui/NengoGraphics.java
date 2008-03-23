@@ -57,7 +57,7 @@ import ca.shu.ui.lib.AuxillarySplitPane;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.DragAction;
-import ca.shu.ui.lib.actions.MockAction;
+import ca.shu.ui.lib.actions.DisabledAction;
 import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.misc.ShortcutKey;
@@ -456,32 +456,15 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			cutAction = new CutAction("Cut", (UINeoNode) selectedObj);
 			copyAction = new CopyAction("Copy", (UINeoNode) selectedObj);
 		} else {
-			cutAction = new MockAction("Cut");
-			copyAction = new MockAction("Copy");
+			cutAction = new DisabledAction("Cut", "No object selected");
+			copyAction = new DisabledAction("Copy", "No object selected");
 		}
 
 		Node node = getClipboard().getContents();
 		if (node != null) {
-
-			Window window = getTopWindow();
-			NodeContainer nodeContainer = null;
-
-			if (window != null) {
-				WorldObject wo = window.getContents();
-				if (wo instanceof NodeContainer) {
-					nodeContainer = (NodeContainer) wo;
-				}
-			} else {
-				nodeContainer = this;
-			}
-
-			if (nodeContainer != null) {
-				pasteAction = new PasteAction("Paste", nodeContainer);
-			}
-		}
-
-		if (pasteAction == null) {
-			pasteAction = new MockAction("Paste");
+			pasteAction = new PasteAction("Paste", this);
+		} else {
+			pasteAction = new DisabledAction("Paste", "No object is in the clipboard");
 		}
 
 		editMenu.addAction(copyAction, KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C,
@@ -673,12 +656,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	public void setDataViewerVisible(boolean isVisible) {
 		dataViewerPane.setAuxVisible(isVisible);
-	}
-
-	@Override
-	public void setTopWindow(Window window) {
-		super.setTopWindow(window);
-		updateEditMenu();
 	}
 
 	public class ToggleScriptPane extends StandardAction {

@@ -370,7 +370,7 @@ public class WorldObjectImpl implements WorldObject {
 				interesectingNodes.size());
 
 		for (PNode node : interesectingNodes) {
-			if (node instanceof PiccoloNodeInWorld) {
+			if (node instanceof PiccoloNodeInWorld && node.getVisible()) {
 				interesectingObjects.add(((PiccoloNodeInWorld) node).getWorldObject());
 			}
 

@@ -181,9 +181,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 				mySourceShadow.destroy();
 				mySourceShadow = null;
 			}
-			if (mySourceRef.get() != null) {
-				mySourceRef.get().addChild(this);
-			}
+			removeFromParent();
 			break;
 		}
 		if (myState == WindowState.MINIMIZED) {

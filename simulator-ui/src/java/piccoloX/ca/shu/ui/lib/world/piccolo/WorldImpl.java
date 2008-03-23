@@ -288,7 +288,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * Closes all windows which exist in this world
 	 */
 	public void closeAllWindows() {
-		for (Window window : getAllWindows()) {
+		for (Window window : getWindows()) {
 			window.close();
 		}
 
@@ -297,7 +297,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	/**
 	 * @return A collection of all the windows in this world
 	 */
-	public Collection<Window> getAllWindows() {
+	public Collection<Window> getWindows() {
 		Collection<Window> skyWindows = getSky().getWindows();
 		Collection<Window> groundWindows = getGround().getWindows();
 
@@ -391,7 +391,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * Minimizes all windows that exist in this world
 	 */
 	public void minimizeAllWindows() {
-		for (Window window : getAllWindows()) {
+		for (Window window : getWindows()) {
 			window.setWindowState(Window.WindowState.MINIMIZED);
 		}
 	}
