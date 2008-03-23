@@ -5,7 +5,6 @@ package ca.neo.ui.script;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -39,6 +38,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
 import ca.neo.util.Environment;
+import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
@@ -403,7 +403,7 @@ public class ScriptEditor extends JPanel {
 			protected void action() throws ActionException {
 				editor.newFile();
 			}
-		}, KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+		}, KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, AppFrame.MENU_SHORTCUT_KEY_MASK));
 
 		fileMenu.addAction(new StandardAction("Open") {
 
@@ -417,7 +417,7 @@ public class ScriptEditor extends JPanel {
 					ex.printStackTrace();
 				}
 			}
-		}, KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+		}, KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, AppFrame.MENU_SHORTCUT_KEY_MASK));
 
 		fileMenu.addAction(new StandardAction("Save") {
 
@@ -431,7 +431,7 @@ public class ScriptEditor extends JPanel {
 					ex.printStackTrace();
 				}
 			}
-		}, KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		}, KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, AppFrame.MENU_SHORTCUT_KEY_MASK));
 
 		fileMenu.addAction(new StandardAction("Save As...") {
 			private static final long serialVersionUID = 1L;

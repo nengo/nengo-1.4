@@ -1,7 +1,6 @@
 package ca.shu.ui.lib.world.handlers;
 
-import java.awt.event.InputEvent;
-
+import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.world.WorldLayer;
 import ca.shu.ui.lib.world.WorldObject;
@@ -43,7 +42,7 @@ public class TooltipPickHandler extends AbstractPickHandler {
 	}
 
 	private void processKeyboardEvent(PInputEvent event) {
-		if ((event.getModifiers() & InputEvent.CTRL_MASK) != 0) {
+		if ((event.getModifiers() & AppFrame.MENU_SHORTCUT_KEY_MASK) != 0) {
 
 			WorldObject wo = getTooltipNode(event);
 			if (wo != null) {

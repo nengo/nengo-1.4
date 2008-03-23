@@ -85,8 +85,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	private static final long serialVersionUID = 1L;
 	public static final double VERSION = 1.0;
 	private static final int VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK = ActionEvent.SHIFT_MASK
-			| ActionEvent.CTRL_MASK;
-	
+			| MENU_SHORTCUT_KEY_MASK;
+
 	public static final String APP_NAME = "Nengo Graphics V" + VERSION;
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
@@ -234,7 +234,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	private void initShortCutKeys() {
-		ShortcutKey[] shortcutKeys = new ShortcutKey[] { new ShortcutKey(KeyEvent.CTRL_MASK,
+		ShortcutKey[] shortcutKeys = new ShortcutKey[] { new ShortcutKey(MENU_SHORTCUT_KEY_MASK,
 				KeyEvent.VK_P, new SetSplitPaneVisibleAction("Focus on script console",
 						scriptConsolePane, true)) };
 
@@ -485,11 +485,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		}
 
 		editMenu.addAction(copyAction, KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C,
-				ActionEvent.CTRL_MASK));
+				MENU_SHORTCUT_KEY_MASK));
 		editMenu.addAction(cutAction, KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X,
-				ActionEvent.CTRL_MASK));
+				MENU_SHORTCUT_KEY_MASK));
 		editMenu.addAction(pasteAction, KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V,
-				ActionEvent.CTRL_MASK));
+				MENU_SHORTCUT_KEY_MASK));
 
 	}
 
@@ -617,12 +617,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		}
 
 		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O, KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+				KeyEvent.VK_O, MENU_SHORTCUT_KEY_MASK));
 
 		fileMenu.addAction(new SaveNetworkAction("Save Network"), KeyEvent.VK_S, KeyStroke
-				.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+				.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_KEY_MASK));
 		fileMenu.addAction(new RunNetworkAction("Run Network"), KeyEvent.VK_R, KeyStroke
-				.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+				.getKeyStroke(KeyEvent.VK_R, MENU_SHORTCUT_KEY_MASK));
 	}
 
 	@Override

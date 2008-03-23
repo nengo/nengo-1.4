@@ -8,7 +8,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyEventDispatcher;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
+import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -62,6 +62,8 @@ import edu.umd.cs.piccolo.util.PUtil;
  */
 public abstract class AppFrame extends JFrame {
 	private static final long serialVersionUID = 2769082313231407201L;
+
+	public static int MENU_SHORTCUT_KEY_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
 	/**
 	 * Name of the directory where UI Files are stored
@@ -381,10 +383,10 @@ public abstract class AppFrame extends JFrame {
 		editMenu.reset();
 
 		editMenu.addAction(new UndoAction(), KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
-				ActionEvent.CTRL_MASK));
+				MENU_SHORTCUT_KEY_MASK));
 
 		editMenu.addAction(new RedoAction(), KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y,
-				ActionEvent.CTRL_MASK));
+				MENU_SHORTCUT_KEY_MASK));
 
 	}
 
@@ -880,8 +882,8 @@ public abstract class AppFrame extends JFrame {
 			shortcutKeysString.append("No shortcuts available");
 		} else {
 			for (ShortcutKey shortcutKey : getShortcutKeys()) {
-				if ((shortcutKey.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
-					shortcutKeysString.append("CTRL ");
+				if ((shortcutKey.getModifiers() & MENU_SHORTCUT_KEY_MASK) != 0) {
+					shortcutKeysString.append("CTRL/CMD ");
 				}
 				if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
 					shortcutKeysString.append("ALT ");
