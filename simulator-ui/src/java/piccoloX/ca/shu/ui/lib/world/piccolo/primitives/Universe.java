@@ -278,7 +278,10 @@ public class Universe extends PCanvas implements Destroyable {
 	 *            True if selection mode is enabled, False if navigation
 	 */
 	public void setSelectionMode(boolean enabled) {
-
+		if (selectionModeEnabled == enabled) {
+			return;
+		}
+		
 		selectionModeEnabled = enabled;
 		if (selectionModeEnabled) {
 			interactionModeLabel.setText("Selection Mode");

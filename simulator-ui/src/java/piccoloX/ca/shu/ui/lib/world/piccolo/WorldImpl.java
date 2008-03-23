@@ -13,7 +13,6 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.RemoveObjectsAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.ZoomToFitAction;
-import ca.shu.ui.lib.actions.ZoomToFitObjects;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
@@ -252,7 +251,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	}
 
 	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
-		menu.addAction(new ZoomToFitObjects("Zoom to fit", this, selection));
+		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
 		menu.addAction(new RemoveObjectsAction(selection, "Remove selected"));
 	}
 
@@ -489,7 +488,12 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	}
 
 	public void zoomToFit() {
-		zoomToBounds(getGround().getPiccolo().getUnionOfChildrenBounds(null));
+		if (getSelection().size() > 0) {
+			Rectangle2D bounds = WorldImpl.getObjectBounds(getSelection());
+			zoomToBounds(bounds);
+		} else {
+			zoomToBounds(getGround().getPiccolo().getUnionOfChildrenBounds(null));
+		}
 
 	}
 

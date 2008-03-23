@@ -2,7 +2,6 @@ package ca.neo.ui;
 
 import java.awt.Container;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -56,8 +55,8 @@ import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.AuxillarySplitPane;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.DragAction;
 import ca.shu.ui.lib.actions.DisabledAction;
+import ca.shu.ui.lib.actions.DragAction;
 import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.misc.ShortcutKey;
@@ -84,8 +83,6 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 public class NengoGraphics extends AppFrame implements NodeContainer {
 	private static final long serialVersionUID = 1L;
 	public static final double VERSION = 1.0;
-	private static final int VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK = ActionEvent.SHIFT_MASK
-			| MENU_SHORTCUT_KEY_MASK;
 
 	public static final String APP_NAME = "Nengo Graphics V" + VERSION;
 	/**
@@ -233,12 +230,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	}
 
-	private void initShortCutKeys() {
-		ShortcutKey[] shortcutKeys = new ShortcutKey[] { new ShortcutKey(MENU_SHORTCUT_KEY_MASK,
-				KeyEvent.VK_P, new SetSplitPaneVisibleAction("Focus on script console",
-						scriptConsolePane, true)) };
+	@Override
+	protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
+		super.constructShortcutKeys(shortcuts);
+		shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_P,
+				new SetSplitPaneVisibleAction("Focus on script console", scriptConsolePane, true)));
 
-		setShortcutKeys(shortcutKeys);
 	}
 
 	private void loadConfig() {
@@ -389,10 +386,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		 */
 		initScriptConsole();
 
-		/*
-		 * Initialize shortcut keys
-		 */
-		initShortCutKeys();
 	}
 
 	@Override
@@ -616,14 +609,15 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		menuBar.add(viewMenu.getJMenu());
 
 		viewMenu.addAction(new OpenScriptEditor("Open Script Editor"), KeyEvent.VK_E, KeyStroke
-				.getKeyStroke(KeyEvent.VK_E, VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK));
+				.getKeyStroke(KeyEvent.VK_E, MENU_SHORTCUT_KEY_MASK));
 
+		int count = 1;
 		for (AuxillarySplitPane splitPane : splitPanes) {
 			byte shortCutChar = splitPane.getAuxTitle().getBytes()[0];
+
 			viewMenu.addAction(
 					new ToggleScriptPane("Toggle " + splitPane.getAuxTitle(), splitPane),
-					shortCutChar, KeyStroke.getKeyStroke(shortCutChar,
-							VIEW_SHORTCUT_SHORTCUTMODIFIERS_MASK));
+					shortCutChar, KeyStroke.getKeyStroke(0x30 + count++, MENU_SHORTCUT_KEY_MASK));
 
 		}
 	}

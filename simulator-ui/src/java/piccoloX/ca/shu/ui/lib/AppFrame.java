@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.swing.FocusManager;
 import javax.swing.JFrame;
@@ -44,6 +45,9 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.misc.ShortcutKey;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
+import ca.shu.ui.lib.world.World;
+import ca.shu.ui.lib.world.WorldObject;
+import ca.shu.ui.lib.world.Search.SearchInputHandler;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;
 import ca.shu.ui.lib.world.piccolo.objects.Window;
@@ -73,12 +77,10 @@ public abstract class AppFrame extends JFrame {
 	/**
 	 * A String which briefly describes some commands used in this application
 	 */
-	public static final String WORLD_TIPS = "<H3>Mouse</H3>"
-			+ "Context menu: Right click opens a context menu on most objects<BR>"
-			+ "Zooming: Scroll the mouse wheel or right click and drag" + "<H3>Keyboard</H3>"
-			+ "Interaction modes: Press 's' to switch modes<BR>"
-			+ "Searching: Press 'f', then start typing.<BR>"
-			+ "Tooltips: Mouse over a node and hold down 'ctrl' to view tooltips";
+	public static final String WORLD_TIPS = "<H3>Mouse</H3>" + "Right Click >> Object menus<BR>"
+			+ "Right Click + Drag >> Zoom" + "Mouse Scroll >> Zoom" + "<H3>Keyboard</H3>"
+			+ "CTRL F >> Search the current window<BR>" + "Hold SHIFT >> Marquee select<BR>"
+			+ "Hold CTRL >> Hover over objects for tooltips";
 
 	private ReversableActionManager actionManager;
 
@@ -135,7 +137,7 @@ public abstract class AppFrame extends JFrame {
 		Style.applyMenuStyle(menuBar, true);
 
 		MenuBuilder fileMenu = new MenuBuilder("File");
-		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_S);
+		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_F);
 		initFileMenu(fileMenu);
 		fileMenu.addAction(new ExitAction(this, "Quit"), KeyEvent.VK_P);
 		menuBar.add(fileMenu.getJMenu());
@@ -294,9 +296,62 @@ public abstract class AppFrame extends JFrame {
 		universe.setSelectionMode(false);
 
 		initMenu();
+
+		/*
+		 * Initialize shortcut keys
+		 */
+		LinkedList<ShortcutKey> shortcuts = new LinkedList<ShortcutKey>();
+		constructShortcutKeys(shortcuts);
+		this.shortcutKeys = shortcuts.toArray(new ShortcutKey[] {});
+
 		validate();
 		setFullScreenMode(false);
 
+	}
+
+	private SearchInputHandler searchHandler;
+
+	public void setSearchEnabled(boolean enabled) {
+		if (searchHandler != null) {
+			searchHandler.destroy();
+		}
+
+	}
+
+	protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
+		shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, new ZoomToFitAction(
+				"Zoom to fit")));
+	}
+
+	class ZoomToFitAction extends StandardAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public ZoomToFitAction(String description) {
+			super(description);
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			World world = getTopWorld();
+			if (world != null) {
+				world.zoomToFit();
+			}
+		}
+	}
+
+	private World getTopWorld() {
+		Window window = getTopWindow();
+		if (window != null) {
+			WorldObject wo = window.getContents();
+			if (wo instanceof World) {
+				return (World) wo;
+			} else {
+				return null;
+			}
+		} else {
+			return getWorld();
+		}
 	}
 
 	protected void initLayout(Universe canvas) {
@@ -569,10 +624,6 @@ public abstract class AppFrame extends JFrame {
 			validate();
 			setVisible(true);
 		}
-	}
-
-	public void setShortcutKeys(ShortcutKey[] shortcutKeys) {
-		this.shortcutKeys = shortcutKeys;
 	}
 
 	public void setTopWindow(Window window) {

@@ -1,5 +1,8 @@
 package ca.shu.ui.lib.world.handlers;
 
+import java.awt.event.KeyEvent;
+
+import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.util.UIEnvironment;
 import ca.shu.ui.lib.world.Destroyable;
 import ca.shu.ui.lib.world.Search.SearchInputHandler;
@@ -17,31 +20,17 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 
 	private final SearchInputHandler searchHandler;
 
-	private WorldImpl world;
-
 	public KeyboardHandler(WorldImpl world) {
 		super();
-		this.world = world;
 		this.searchHandler = new SearchInputHandler(world);
 	}
 
 	@Override
 	public void keyPressed(PInputEvent event) {
-		if (searchEnabled && searchHandler.isSearching()) {
-			searchHandler.keyPressed(event.getKeyCode());
-
-		}
-	}
-
-	@Override
-	public void keyTyped(PInputEvent event) {
-		if (!searchEnabled || !searchHandler.isSearching()) {
-			searchEnabled = false;
-
-			if (event.getKeyChar() == 's' || event.getKeyChar() == 'S') {
-				UIEnvironment.getInstance().getUniverse().setSelectionMode(!world.isSelectionMode());
-			} else if (event.getKeyChar() == 'f' || event.getKeyChar() == 'F') {
-				searchEnabled = !searchEnabled;
+		// control down
+		if ((event.getModifiers() & AppFrame.MENU_SHORTCUT_KEY_MASK) != 0) {
+			if (event.getKeyCode() == KeyEvent.VK_F) {
+				searchEnabled = !isSearchEnabled();
 
 				if (searchEnabled) {
 					searchHandler.beginSearch();
@@ -49,12 +38,33 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 					searchHandler.finishSearch();
 				}
 			}
-		} else {
-
-			searchHandler.keyTyped(event.getKeyChar());
 
 		}
+		// shift down
+		else if (event.isShiftDown()) {
+			UIEnvironment.getInstance().getUniverse().setSelectionMode(true);
 
+		} else if (searchEnabled && searchHandler.isSearching()) {
+			searchHandler.keyPressed(event.getKeyCode());
+
+		}
+	}
+
+	private boolean isSearchEnabled() {
+		return searchEnabled && searchHandler.isSearching();
+	}
+
+	@Override
+	public void keyReleased(PInputEvent event) {
+		if (!event.isShiftDown()) {
+			UIEnvironment.getInstance().getUniverse().setSelectionMode(false);
+		}
+		super.keyReleased(event);
+	}
+
+	@Override
+	public void keyTyped(PInputEvent event) {
+		searchHandler.keyTyped(event.getKeyChar());
 	}
 
 	public void destroy() {

@@ -239,7 +239,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	protected void drag(PInputEvent e) {
 		super.drag(e);
 
-		if (isMarqueeSelection()) {
+		if (shouldStartMarqueeMode() && marquee != null) {
 			updateMarquee(e);
 
 			if (!isOptionSelection(e)) {
@@ -303,7 +303,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			marquee.removeFromParent();
 			marquee = null;
 		}
-		if (!isMarqueeSelection()) {
+		if (!shouldStartMarqueeMode()) {
 			if (dragAction != null) {
 				dragAction.setFinalPositions();
 				dragAction.doAction();
@@ -394,7 +394,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	}
 
-	protected boolean isMarqueeSelection() {
+	protected boolean shouldStartMarqueeMode() {
 		return (pressNode == null && world.isSelectionMode());
 	}
 
@@ -418,7 +418,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 		initializeSelection(e);
 
-		if (isMarqueeSelection()) {
+		if (shouldStartMarqueeMode()) {
 			initializeMarquee(e);
 
 			if (!isOptionSelection(e)) {
