@@ -78,9 +78,9 @@ public abstract class AppFrame extends JFrame {
 	 * A String which briefly describes some commands used in this application
 	 */
 	public static final String WORLD_TIPS = "<H3>Mouse</H3>" + "Right Click >> Object menus<BR>"
-			+ "Right Click + Drag >> Zoom" + "Mouse Scroll >> Zoom" + "<H3>Keyboard</H3>"
-			+ "CTRL F >> Search the current window<BR>" + "Hold SHIFT >> Marquee select<BR>"
-			+ "Hold CTRL >> Hover over objects for tooltips";
+			+ "Right Click + Drag >> Zoom<BR>" + "Scroll Wheel >> Zoom" + "<H3>Keyboard</H3>"
+			+ "CTRL/CMD F >> Search the current window<BR>" + "Hold SHIFT >> Marquee select<BR>"
+			+ "Hold CTRL/CMD >> Hover over objects for tooltips";
 
 	private ReversableActionManager actionManager;
 
