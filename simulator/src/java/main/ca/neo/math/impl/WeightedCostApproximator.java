@@ -257,7 +257,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 		public Factory(float noise, int NSV) {
 			myNoise = noise;
-			myNSV = -1;
+			myNSV = NSV;
 		}
 		
 		/**
