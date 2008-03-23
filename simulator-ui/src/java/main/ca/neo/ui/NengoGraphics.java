@@ -104,7 +104,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	/**
 	 * File extension for Neo Nodes
 	 */
-	public static final String NEONODE_FILE_EXTENSION = "nengo";
+	public static final String NEONODE_FILE_EXTENSION = "nef";
 
 	static final String PLUGIN_DIRECTORY = "plugins";
 

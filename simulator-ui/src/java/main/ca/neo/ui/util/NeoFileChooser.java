@@ -17,7 +17,7 @@ import ca.shu.ui.lib.util.UIEnvironment;
 public class NeoFileChooser {
 	private static final long serialVersionUID = 1L;
 
-	private FileFilter allFileFilter, nodeFileFilter;
+	private FileFilter allFileFilter;
 
 	/**
 	 * Swing File Chooser component
@@ -29,10 +29,10 @@ public class NeoFileChooser {
 		fileChooser = new JFileChooser();
 
 		allFileFilter = new AllNeoFiles();
-		nodeFileFilter = new NodeFileFilter();
+//		nodeFileFilter = new NodeFileFilter();
 
-		fileChooser.addChoosableFileFilter(allFileFilter);
-		fileChooser.addChoosableFileFilter(nodeFileFilter);
+//		fileChooser.addChoosableFileFilter(allFileFilter);
+//		fileChooser.addChoosableFileFilter(nodeFileFilter);
 		fileChooser.setFileFilter(allFileFilter);
 	}
 
@@ -69,7 +69,7 @@ public class NeoFileChooser {
 	 * @throws HeadlessException
 	 */
 	public int showSaveDialog() throws HeadlessException {
-		fileChooser.setFileFilter(nodeFileFilter);
+		fileChooser.setFileFilter(allFileFilter);
 		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
 	}
 
@@ -90,7 +90,7 @@ class AllNeoFiles extends FileExtensionFilter {
 
 	@Override
 	public String getDescription() {
-		return "All Nengo Files";
+		return "Nengo Files";
 	}
 
 }
@@ -100,16 +100,16 @@ class AllNeoFiles extends FileExtensionFilter {
  * 
  * @author Shu Wu
  */
-class NodeFileFilter extends FileExtensionFilter {
-
-	@Override
-	public boolean acceptExtension(String str) {
-		return (str.equals(NengoGraphics.NEONODE_FILE_EXTENSION));
-	}
-
-	@Override
-	public String getDescription() {
-		return "NEO Node";
-	}
-
-}
+//class NodeFileFilter extends FileExtensionFilter {
+//
+//	@Override
+//	public boolean acceptExtension(String str) {
+//		return (str.equals(NengoGraphics.NEONODE_FILE_EXTENSION));
+//	}
+//
+//	@Override
+//	public String getDescription() {
+//		return "Nengo Node";
+//	}
+//
+//}
