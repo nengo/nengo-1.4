@@ -93,7 +93,7 @@ public abstract class Property implements Serializable {
 		String nodeDescription = "Type: " + getTypeName();
 
 		if (description != null) {
-			return nodeDescription + "\n" + description;
+			return "<html><b>" + nodeDescription + "</b><br>" + description + "</html>";
 		} else {
 			return nodeDescription;
 		}

@@ -8,7 +8,6 @@ import ca.neo.ui.configurable.panels.StringPanel;
  * Config Descriptor for Strings
  * 
  * @author Shu Wu
- * 
  */
 public class PString extends Property {
 
@@ -18,8 +17,8 @@ public class PString extends Property {
 		super(name);
 	}
 
-	public PString(String name, String defaultValue) {
-		super(name, defaultValue);
+	public PString(String name, String description, String defaultValue) {
+		super(name, description, defaultValue);
 	}
 
 	@Override

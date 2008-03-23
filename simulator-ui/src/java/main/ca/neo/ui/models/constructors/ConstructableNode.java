@@ -8,7 +8,7 @@ import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.descriptors.PString;
 
 public abstract class ConstructableNode extends AbstractConstructable {
-	private static final Property pName = new PString("Name");
+	private static final Property pName = new PString("Name", "Name of the model", "");
 
 	public ConstructableNode() {
 		super();

@@ -100,7 +100,7 @@ public class FnCustom extends AbstractFn {
 				dim = function.getDimension();
 		}
 
-		pExpression = new PString(EXPRESSION_STR, expression);
+		pExpression = new PString(EXPRESSION_STR, null, expression);
 		Property pDimensions = new PInt(DIMENSION_STR, dim);
 
 		if (isInputDimEditable) {
