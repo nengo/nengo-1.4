@@ -64,7 +64,9 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 
 	@Override
 	public void keyTyped(PInputEvent event) {
-		searchHandler.keyTyped(event.getKeyChar());
+		if (searchEnabled) {
+			searchHandler.keyTyped(event.getKeyChar());
+		}
 	}
 
 	public void destroy() {

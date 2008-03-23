@@ -68,9 +68,11 @@ public class SearchInputHandler implements Destroyable {
 	private Collection<WorldObject> searchResults;
 
 	private void addChar(char keyChar) {
-		searchQuery.append(keyChar);
-		boolean successfull = searchAndUpdateResults();
-		searchUI.addSearchChar(keyChar, successfull);
+		if (isSearching) {
+			searchQuery.append(keyChar);
+			boolean successfull = searchAndUpdateResults();
+			searchUI.addSearchChar(keyChar, successfull);
+		}
 
 	}
 
@@ -87,8 +89,8 @@ public class SearchInputHandler implements Destroyable {
 		searchUI.restoreView();
 	}
 
-	private static Collection<WorldObject> doSearch(WorldImpl world,
-			Iterable<WorldObject> objects, String searchTermStr) {
+	private static Collection<WorldObject> doSearch(WorldImpl world, Iterable<WorldObject> objects,
+			String searchTermStr) {
 		LinkedList<WorldObject> matchingObjects = new LinkedList<WorldObject>();
 		if (objects != null && searchTermStr.length() > 0) {
 
