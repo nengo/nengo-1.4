@@ -88,6 +88,10 @@ class UserMultiPropDialog {
 			// do nothing
 		}
 
+		public String getDescription() {
+			return getTypeName();
+		}
+
 	}
 
 }

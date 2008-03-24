@@ -8,8 +8,9 @@ import ca.neo.sim.SimulatorEvent;
 import ca.neo.sim.SimulatorListener;
 import ca.neo.ui.NengoGraphics;
 import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.ConfigResult;
+import ca.neo.ui.configurable.ConfigSchemaImpl;
+import ca.neo.ui.configurable.Property;
 import ca.neo.ui.configurable.descriptors.PBoolean;
 import ca.neo.ui.configurable.descriptors.PFloat;
 import ca.neo.ui.configurable.managers.ConfigManager;
@@ -37,8 +38,8 @@ public class RunSimulatorAction extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Property[] zProperties = { pStartTime, pEndTime, pStepSize,
-			pShowDataViewer };
+	private static final ConfigSchemaImpl zProperties = new ConfigSchemaImpl(new Property[] {
+			pStartTime, pEndTime, pStepSize, pShowDataViewer });
 
 	private UINetwork uiNetwork;
 
@@ -75,9 +76,9 @@ public class RunSimulatorAction extends StandardAction {
 
 		try {
 			if (!configured) {
-				ConfigResult properties = ConfigManager.configure(zProperties, "Run "
-						+ uiNetwork.getFullName(), UIEnvironment.getInstance(),
-						ConfigMode.TEMPLATE_NOT_CHOOSABLE);
+				ConfigResult properties = ConfigManager.configure(zProperties, uiNetwork
+						.getTypeName(), "Run " + uiNetwork.getFullName(), UIEnvironment
+						.getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
 				startTime = (Float) properties.getValue(pStartTime);
 				endTime = (Float) properties.getValue(pEndTime);

@@ -55,7 +55,7 @@ public abstract class ConfigManager {
 	public static Object configure(Property prop, String typeName, Container parent)
 			throws ConfigException {
 
-		ConfigResult properties = configure(new ConfigSchemaImpl(prop), typeName, parent,
+		ConfigResult properties = configure(new ConfigSchemaImpl(prop), typeName, null, parent,
 				ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 		return properties.getValue(prop);
 	}
@@ -66,13 +66,15 @@ public abstract class ConfigManager {
 	 */
 	public static ConfigResult configure(Property[] schema, String typeName, Container parent,
 			ConfigMode configMode) throws ConfigException {
-		return configure(new ConfigSchemaImpl(schema), typeName, parent, configMode);
+		return configure(new ConfigSchemaImpl(schema), typeName, null, parent, configMode);
 	}
 
-	public static ConfigResult configure(ConfigSchema schema, String typeName, Container parent,
-			ConfigMode configMode) throws ConfigException {
-
-		Configureable configurable = new Configureable(schema, typeName);
+	public static ConfigResult configure(ConfigSchema schema, String typeName, String description,
+			Container parent, ConfigMode configMode) throws ConfigException {
+		if (description == null) {
+			description = typeName;
+		}
+		Configureable configurable = new Configureable(schema, typeName, description);
 
 		UserConfigurer configurer;
 
@@ -81,7 +83,7 @@ public abstract class ConfigManager {
 		} else if (configMode == ConfigMode.TEMPLATE_NOT_CHOOSABLE) {
 			configurer = new UserTemplateConfigurer(configurable, parent, false);
 		} else if (configMode == ConfigMode.TEMPLATE_CHOOSABLE) {
-			configurer = new UserTemplateConfigurer(configurable, parent, false);
+			configurer = new UserTemplateConfigurer(configurable, parent, true);
 		} else {
 			throw new IllegalArgumentException("Unsupported config mode");
 		}
@@ -183,7 +185,8 @@ public abstract class ConfigManager {
 		 */
 		String[] files0 = new String[files.length];
 		for (int i = 0; i < files.length; i++) {
-			files0[i] = files[i].replaceFirst(getFileNamePrefix(configurable), "");
+			files0[i] = files[i].substring(getFileNamePrefix(configurable).length(), files[i]
+					.length());
 		}
 		return files0;
 
@@ -296,11 +299,13 @@ class Configureable implements IConfigurable {
 
 	private ConfigSchema schema;
 	private String typeName;
+	private String description;
 
-	public Configureable(ConfigSchema configSchema, String typeName) {
+	public Configureable(ConfigSchema configSchema, String typeName, String description) {
 		super();
 		this.schema = configSchema;
 		this.typeName = typeName;
+		this.description = description;
 	}
 
 	public void completeConfiguration(ConfigResult props) throws ConfigException {
@@ -321,6 +326,10 @@ class Configureable implements IConfigurable {
 
 	public void preConfiguration(ConfigResult props) throws ConfigException {
 		// do nothing
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 }

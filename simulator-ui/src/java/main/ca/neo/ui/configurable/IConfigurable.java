@@ -34,5 +34,10 @@ public interface IConfigurable {
 	 * @return Name given to this type of object
 	 */
 	public String getTypeName();
+	
+	/**
+	 * @return Name given to this type of object
+	 */
+	public String getDescription();
 
 }

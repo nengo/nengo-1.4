@@ -52,7 +52,7 @@ public class ConfigDialog extends JDialog {
 	 *            Component this dialog shall be added to
 	 */
 	public ConfigDialog(UserConfigurer configManager, Frame owner) {
-		super(owner, configManager.getConfigurable().getTypeName());
+		super(owner, configManager.getConfigurable().getDescription());
 
 		initialize(configManager, owner);
 
@@ -65,7 +65,7 @@ public class ConfigDialog extends JDialog {
 	 *            Component this dialog shall be added to
 	 */
 	public ConfigDialog(UserConfigurer configManager, Dialog owner) {
-		super(owner, "Configuring " + configManager.getConfigurable().getTypeName());
+		super(owner, configManager.getConfigurable().getDescription());
 
 		initialize(configManager, owner);
 

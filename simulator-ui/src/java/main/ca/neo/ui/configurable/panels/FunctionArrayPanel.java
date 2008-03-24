@@ -312,4 +312,8 @@ class ConfigurableFunctionArray implements IConfigurable {
 		// do nothing
 	}
 
+	public String getDescription() {
+		return getTypeName();
+	}
+
 }

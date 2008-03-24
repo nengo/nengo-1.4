@@ -35,11 +35,15 @@ public abstract class AbstractConstructable implements IConfigurable {
 		model = configureModel(properties);
 	}
 
-	public abstract ConfigSchema getSchema();
+	public String getDescription() {
+		return getTypeName() + " Constructor";
+	}
 
 	public Object getModel() {
 		return model;
 	}
+
+	public abstract ConfigSchema getSchema();
 
 	public void preConfiguration(ConfigResult props) throws ConfigException {
 		// do nothing

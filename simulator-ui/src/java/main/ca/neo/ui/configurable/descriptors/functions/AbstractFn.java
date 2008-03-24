@@ -26,12 +26,12 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
 	 */
 	private Function function;
 
+	private Class<? extends Function> functionType;
+
 	/**
 	 * What the type of function to be created is called
 	 */
 	private String typeName;
-
-	private Class<? extends Function> functionType;
 
 	/**
 	 * @param typeName
@@ -62,6 +62,28 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
 		}
 	}
 
+	public Function configureFunction(Dialog parent) {
+		if (parent != null) {
+
+			if (configurer == null) {
+				configurer = new UserConfigurer(this, parent);
+			}
+			try {
+				configurer.configureAndWait();
+				return getFunction();
+			} catch (ConfigException e) {
+				e.defaultHandleBehavior();
+			}
+		} else {
+			UserMessages.showError("Could not attach properties dialog");
+		}
+		return null;
+	}
+
+	public String getDescription() {
+		return getTypeName();
+	}
+
 	/**
 	 * @return The function created
 	 */
@@ -84,24 +106,6 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
 
 	public void preConfiguration(ConfigResult props) throws ConfigException {
 		// do nothing
-	}
-
-	public Function configureFunction(Dialog parent) {
-		if (parent != null) {
-
-			if (configurer == null) {
-				configurer = new UserConfigurer(this, parent);
-			}
-			try {
-				configurer.configureAndWait();
-				return getFunction();
-			} catch (ConfigException e) {
-				e.defaultHandleBehavior();
-			}
-		} else {
-			UserMessages.showError("Could not attach properties dialog");
-		}
-		return null;
 	}
 
 	/**

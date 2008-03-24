@@ -62,7 +62,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 				}
 			}
 
-			// updateDialogFromFile();
+//			updateFromTemplate();
 		}
 	}
 
@@ -149,6 +149,8 @@ public class ConfigTemplateDialog extends ConfigDialog {
 			panel.add(wrapperPanel);
 			panel.add(seperator);
 		}
+		
+
 	}
 
 	/**

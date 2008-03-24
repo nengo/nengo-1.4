@@ -28,16 +28,6 @@ import ca.shu.ui.lib.world.WorldObject;
 public abstract class UITermination extends Widget implements ILineTermination {
 	private static final long serialVersionUID = 1L;
 
-	private static String objToString(Object configValue) {
-
-		if (Util.isArray(configValue)) {
-			return Util.arrayToString(configValue);
-		} else {
-			return configValue.toString();
-		}
-
-	}
-
 	/**
 	 * Factory method for creating a UI Wrapper around a termination
 	 * 
@@ -121,7 +111,7 @@ public abstract class UITermination extends Widget implements ILineTermination {
 
 		tooltips.addProperty("Dimensions", "" + getModel().getDimensions());
 
-//		tooltips.addTitle("Configuration");
+		// tooltips.addTitle("Configuration");
 		tooltips.addProperty("Time Constant", String.valueOf(getModel().getTau()));
 		tooltips.addProperty("Modulatory", String.valueOf(getModel().getModulatory()));
 	}
@@ -225,10 +215,10 @@ public abstract class UITermination extends Widget implements ILineTermination {
 	/**
 	 * @return Termination weights matrix
 	 */
-//	public float[][] getWeights() {
-//		return (float[][]) getModel().getConfiguration().getProperty(Termination.WEIGHTS);
-//	}
-
+	// public float[][] getWeights() {
+	// return (float[][])
+	// getModel().getConfiguration().getProperty(Termination.WEIGHTS);
+	// }
 	@Override
 	public void setExposed(boolean isExposed) {
 		if (this.isExposed == isExposed) {
