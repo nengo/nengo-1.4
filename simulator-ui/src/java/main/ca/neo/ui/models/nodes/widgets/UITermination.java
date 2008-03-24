@@ -10,7 +10,6 @@ import ca.neo.ui.models.UINeoNode;
 import ca.neo.ui.models.icons.ModelIcon;
 import ca.neo.ui.models.nodes.UINetwork;
 import ca.neo.ui.models.tooltips.TooltipBuilder;
-import ca.neo.util.Configuration;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.objects.lines.ILineTermination;
@@ -122,14 +121,9 @@ public abstract class UITermination extends Widget implements ILineTermination {
 
 		tooltips.addProperty("Dimensions", "" + getModel().getDimensions());
 
-		tooltips.addTitle("Configuration");
-		Configuration config = getModel().getConfiguration();
-		String[] configProperties = config.listPropertyNames();
-		for (String element : configProperties) {
-			Object propertyValue = config.getProperty(element);
-
-			tooltips.addProperty(element, objToString(propertyValue));
-		}
+//		tooltips.addTitle("Configuration");
+		tooltips.addProperty("Time Constant", String.valueOf(getModel().getTau()));
+		tooltips.addProperty("Modulatory", String.valueOf(getModel().getModulatory()));
 	}
 
 	@Override
@@ -231,9 +225,9 @@ public abstract class UITermination extends Widget implements ILineTermination {
 	/**
 	 * @return Termination weights matrix
 	 */
-	public float[][] getWeights() {
-		return (float[][]) getModel().getConfiguration().getProperty(Termination.WEIGHTS);
-	}
+//	public float[][] getWeights() {
+//		return (float[][]) getModel().getConfiguration().getProperty(Termination.WEIGHTS);
+//	}
 
 	@Override
 	public void setExposed(boolean isExposed) {
