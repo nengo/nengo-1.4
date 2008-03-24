@@ -128,11 +128,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 			components[i] = myExpandableNodes[i].addTermination(name, new float[][]{weights[i]}, tauPSC, modulatory);
 		}
 		
-		Termination result = new EnsembleTermination(this, name, components);
-		if (modulatory) {
-			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
-		}
-		
+		EnsembleTermination result = new EnsembleTermination(this, name, components);
 		myExpandedTerminations.put(name, result);
 		
 		fireVisibleChangeEvent();

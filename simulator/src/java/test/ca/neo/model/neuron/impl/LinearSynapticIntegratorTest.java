@@ -36,7 +36,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		assertEquals(1, si.getTerminations().length);
 		assertEquals("test1", si.getTerminations()[0].getName());
 		assertEquals(2, si.getTerminations()[0].getDimensions());
-		assertEquals(new Float(1), si.getTerminations()[0].getConfiguration().getProperty(Termination.TAU_PSC));
+		assertEquals(1f, si.getTerminations()[0].getTau());
 		
 		si.addTermination("test2", new float[0], 1f, false);
 		assertEquals(2, si.getTerminations().length);
@@ -57,6 +57,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(.001f, Units.ACU);
 		si.addTermination("one", new float[]{1f}, 1f, false);
 		si.addTermination("two", new float[]{1f}, 1f, false);
+		si.addTermination("three", new float[]{1f}, 1f, true);
 
 		Termination[] t = si.getTerminations();
 		
@@ -64,6 +65,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		
 		t[0].setValues(spike);
 		t[1].setValues(spike);
+		t[2].setValues(spike);
 		
 		TimeSeries1D current = si.run(0f, .01f); 
 		assertEquals(11, current.getTimes().length);

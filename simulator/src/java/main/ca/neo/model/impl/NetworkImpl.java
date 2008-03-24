@@ -27,7 +27,6 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.sim.Simulator;
 import ca.neo.sim.impl.LocalSimulator;
-import ca.neo.util.Configuration;
 import ca.neo.util.Probe;
 import ca.neo.util.TimeSeries;
 import ca.neo.util.VisiblyMutable;
@@ -515,16 +514,24 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			myWrapped.setValues(values);
 		}
 
-		public Configuration getConfiguration() {
-			return myWrapped.getConfiguration();
-		}
-
-		public void propertyChange(String propertyName, Object newValue) throws StructuralException {
-			myWrapped.propertyChange(propertyName, newValue);
-		}
-
 		public Node getNode() {
 			return myNode;
+		}
+
+		public boolean getModulatory() {
+			return myWrapped.getModulatory();
+		}
+
+		public float getTau() {
+			return myWrapped.getTau();
+		}
+
+		public void setModulatory(boolean modulatory) {
+			myWrapped.setModulatory(modulatory);
+		}
+
+		public void setTau(float tau) throws StructuralException {
+			myWrapped.setTau(tau);
 		}
 
 		/**

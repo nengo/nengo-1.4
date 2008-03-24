@@ -3,8 +3,12 @@
  */
 package ca.neo.model.impl;
 
+import org.apache.log4j.Logger;
+
 import ca.neo.dynamics.DynamicalSystem;
 import ca.neo.dynamics.Integrator;
+import ca.neo.dynamics.impl.CanonicalModel;
+import ca.neo.dynamics.impl.LTISystem;
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.RealOutput;
@@ -14,9 +18,7 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
-import ca.neo.util.Configuration;
 import ca.neo.util.TimeSeries;
-import ca.neo.util.impl.ConfigurationImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
 /**
@@ -29,20 +31,22 @@ public class BasicTermination implements Termination, Resettable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static Logger ourLogger = Logger.getLogger(BasicTermination.class);
+	
 	private Node myNode;
 	private DynamicalSystem myDynamics;
 	private Integrator myIntegrator;
 	private String myName;
-	private Configuration myConfiguration;
 	private InstantaneousOutput myInput;
 	public TimeSeries myOutput;
+	public boolean myModulatory;
 	
 	public BasicTermination(Node node, DynamicalSystem dynamics, Integrator integrator, String name) {
 		myNode = node;
 		myDynamics = dynamics;
 		myIntegrator = integrator;
 		myName = name;
-		myConfiguration = new ConfigurationImpl(this);
+		myModulatory = false;
 	}
 	
 	/**
@@ -101,20 +105,6 @@ public class BasicTermination implements Termination, Resettable {
 	}
 
 	/**
-	 * @see ca.neo.util.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
-	/**
-	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
-	 */
-	public void propertyChange(String propertyName, Object newValue) throws StructuralException {
-		//TODO: new dynamics on TAU_PSC property change? 
-	}
-
-	/**
 	 * @see ca.neo.model.Termination#getNode()
 	 */
 	public Node getNode() {
@@ -128,9 +118,48 @@ public class BasicTermination implements Termination, Resettable {
 		myInput = null;
 	}
 
+	/**
+	 * @see ca.neo.model.Termination#getModulatory()
+	 */
+	public boolean getModulatory() {
+		return myModulatory;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#getTau()
+	 */
+	public float getTau() {
+		if (myDynamics instanceof LTISystem) {
+			return CanonicalModel.getDominantTimeConstant((LTISystem) myDynamics);
+		} else {
+			ourLogger.warn("Can't get time constant for non-LTI dynamics. Returning 0.");
+			return 0;
+		}
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#setModulatory(boolean)
+	 */
+	public void setModulatory(boolean modulatory) {
+		myModulatory = modulatory;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#setTau(float)
+	 */
+	public void setTau(float tau) throws StructuralException {
+		if (myDynamics instanceof LTISystem) {
+			CanonicalModel.changeTimeConstant((LTISystem) myDynamics, tau);	
+		} else {
+			throw new StructuralException("Can't set time constant of non-LTI dynamics");
+		}
+	}
+
 	@Override
 	public Termination clone() throws CloneNotSupportedException {
-		BasicTermination result = new BasicTermination(myNode, myDynamics.clone(), myIntegrator.clone(), myName);
+		BasicTermination result = (BasicTermination) super.clone();
+		result.myDynamics = myDynamics.clone();
+		result.myIntegrator = myIntegrator.clone();
 		result.myInput = myInput.clone();
 		result.myOutput = myOutput.clone();
 		return result;

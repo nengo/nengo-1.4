@@ -56,7 +56,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private float myPlasticityInterval;
 	private float myLastPlasticityTime;	
 	private Map<String, LinearApproximator> myDecodingApproximators;	
-//	private ApproximatorFactory myApproximatorFactory;
 	private boolean myReuseApproximators;
 	private float[][] myUnscaledEvalPoints;
 	private float[][] myEvalPoints;	
@@ -95,7 +94,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 		myPlasticityInterval = -1;
 		myLastPlasticityTime = 0;		
-//		myApproximatorFactory = factory;
 		myDecodingApproximators = new HashMap<String, LinearApproximator>(10);
 		myReuseApproximators = true;		
 		myUnscaledEvalPoints = evalPoints;
@@ -300,7 +298,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		DecodedTermination result = new DecodedTermination(this, name, matrix, dynamics, integrator);
 		if (isModulatory) {
-			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
+			result.setModulatory(isModulatory);
 		} else if (matrix.length != myDimension) {
 			throw new StructuralException("Output dimension " + matrix.length + " doesn't equal ensemble dimension " + myDimension);
 		}
@@ -328,7 +326,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		DecodedTermination result = new DecodedTermination(this, name, matrix, dynamics, integrator);
 		if (isModulatory) {
-			result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(true));
+			result.setModulatory(isModulatory);
 		} else if (matrix.length != myDimension) {
 			throw new StructuralException("Output dimension " + matrix.length + " doesn't equal ensemble dimension " + myDimension);
 		}
@@ -353,7 +351,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			biasEncoders[j] = max;
 		}
 		
-		float baseTauPSC = ((Float) baseTermination.getConfiguration().getProperty(Termination.TAU_PSC)).floatValue();
+		float baseTauPSC = baseTermination.getTau();
 		EulerIntegrator integrator = new EulerIntegrator(Math.min(interneuronTauPSC, baseTauPSC) / 10f);
 		
 		float scale = 1 / interneuronTauPSC; //output scaling to make impulse integral = 1		
@@ -377,9 +375,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		}
 		BiasTermination interneuronTermination = new BiasTermination(this, interName, baseTermination.getName(), interneuronDynamics, integrator, biasEncoders, true);
 		
-		Boolean modulatory = (Boolean) baseTermination.getConfiguration().getProperty(Termination.MODULATORY);
-		biasTermination.getConfiguration().setProperty(Termination.MODULATORY, modulatory);
-		interneuronTermination.getConfiguration().setProperty(Termination.MODULATORY, modulatory);
+		biasTermination.setModulatory(baseTermination.getModulatory());
+		interneuronTermination.setModulatory(baseTermination.getModulatory());
 		
 		myDecodedTerminations.put(biasName, biasTermination);
 		myDecodedTerminations.put(interName, interneuronTermination);
@@ -426,7 +423,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				t.run(startTime, endTime);
 				float[] output = t.getOutput();
 				
-				boolean isModulatory = ((Boolean) t.getConfiguration().getProperty(Termination.MODULATORY)).booleanValue();
+				boolean isModulatory = t.getModulatory();
 				//TODO: handle modulatory bias input
 				if (t instanceof BiasTermination) {
 					String baseName = ((BiasTermination) t).getBaseTerminationName();

@@ -2,8 +2,6 @@ package ca.neo.model.nef.impl;
 
 import java.util.Properties;
 
-import Jama.Matrix;
-
 import ca.neo.dynamics.Integrator;
 import ca.neo.dynamics.LinearSystem;
 import ca.neo.dynamics.impl.CanonicalModel;
@@ -18,10 +16,8 @@ import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
 import ca.neo.model.impl.RealOutputImpl;
-import ca.neo.util.Configuration;
 import ca.neo.util.MU;
 import ca.neo.util.TimeSeries;
-import ca.neo.util.impl.ConfigurationImpl;
 import ca.neo.util.impl.TimeSeriesImpl;
 
 /**
@@ -63,10 +59,10 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private float myTime;
 	private float[] myOutputValues;	
 	private boolean myTauMutable;	
-	private ConfigurationImpl myConfiguration;	
 	private DecodedTermination myScalingTermination;
 	private float[] myStaticBias;	
 	private float myTau;
+	private boolean myModulatory;
 	
 	/**
 	 * @param Node The parent Node
@@ -97,18 +93,10 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		myNullUnits = new Units[dynamics.getInputDimension()];
 		myOutputValues = new float[transform.length];
 		
-		initConfiguration();
-				
 		setDynamics(dynamics);
 		myScalingTermination = null;
 	}
 	
-	private void initConfiguration() {
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
-		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, myTransform);
-	}
-
 	//copies dynamics for to each dimension
 	private synchronized void setDynamics(int dimension) {
 		LinearSystem[] newDynamics = new LinearSystem[dimension];
@@ -282,13 +270,6 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		return myScalingTermination;
 	}
 
-	/** 
-	 * @see ca.neo.util.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-	
 	/**
 	 * @return The dynamics that govern each dimension of this Termination. Changing the properties 
 	 * 		of the return value will change dynamics of all dimensions, effective next run time. 
@@ -312,15 +293,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			
 			//find PSC time constant (slowest dynamic mode) if applicable 
 			if (dynamics instanceof LTISystem) {
-				double[] eig = new Matrix(MU.convert(dynamics.getA(0f))).eig().getRealEigenvalues();
-				
-				double slowest = eig[0];
-				for (int i = 1; i < eig.length; i++) {
-					if (Math.abs(eig[i]) < Math.abs(slowest)) slowest = eig[i];
-				}
-				
-				myTau = -1f / (float) slowest;
-				myConfiguration.addProperty(Termination.TAU_PSC, Float.class, new Float(myTau));
+				myTau = CanonicalModel.getDominantTimeConstant((LTISystem) dynamics); 
 			} else {
 				myTau = 0;
 			}
@@ -330,22 +303,6 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		}
 	}
 
-	/** 
-	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
-	 */
-	public void propertyChange(String propertyName, Object newValue) throws StructuralException {
-		if (propertyName.equals(Termination.TAU_PSC)) {
-			if (!myTauMutable) {
-				throw new StructuralException("This Termination has immutable dynamics "
-					+ "(must be LTI in controllable-canonical form to change time constant online");
-			}
-	
-			float tau = ((Float) newValue).floatValue();
-			myDynamicsTemplate = CanonicalModel.changeTimeConstant((LTISystem) myDynamics[0], tau);
-			setDynamics(myTransform.length);
-		}
-	}
-	
 	/**
 	 * @return Slowest time constant of dynamics, if dynamics are LTI, otherwise 0
 	 */
@@ -365,6 +322,20 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		}
 		
 		setDynamics(CanonicalModel.changeTimeConstant((LTISystem) myDynamicsTemplate, tau));
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#getModulatory()
+	 */
+	public boolean getModulatory() {
+		return myModulatory;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#setModulatory(boolean)
+	 */
+	public void setModulatory(boolean modulatory) {
+		myModulatory = modulatory;
 	}
 
 	/** 

@@ -146,8 +146,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		while (it.hasNext()) {
 			LinearExponentialTermination t = it.next();
 			float current = t.updateCurrent(spikes, intTime, decayTime);
-			Boolean isModulatory = (Boolean) t.getConfiguration().getProperty(Termination.MODULATORY);
-			if (!isModulatory.booleanValue()) result += current;
+			if (!t.getModulatory()) result += current;
 		}
 		
 		return result;
@@ -195,7 +194,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		}
 		
 		LinearExponentialTermination result = new LinearExponentialTermination(myNode, name, weights, tauPSC); 
-		result.getConfiguration().setProperty(Termination.MODULATORY, new Boolean(modulatory));
+		result.setModulatory(modulatory);
 		myTerminations.put(name, result);
 		
 		return result;

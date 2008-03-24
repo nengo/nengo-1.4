@@ -181,4 +181,19 @@ public class CanonicalModel {
 		return new float[]{a0*b0 - a1*b1, a0*b1 + a1*b0};
 	}
 
+	/**
+	 * @param dynamics A linear time-invariant dynamical system
+	 * @return Time constant associated with the system's dominant eigenvalue
+	 */
+	public static float getDominantTimeConstant(LTISystem dynamics) {
+		double[] eig = new Matrix(MU.convert(dynamics.getA(0f))).eig().getRealEigenvalues();
+		
+		double slowest = eig[0];
+		for (int i = 1; i < eig.length; i++) {
+			if (Math.abs(eig[i]) < Math.abs(slowest)) slowest = eig[i];
+		}
+		
+		return -1f / (float) slowest;
+	}
+
 }

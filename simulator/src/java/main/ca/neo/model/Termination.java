@@ -5,8 +5,6 @@ package ca.neo.model;
 
 import java.io.Serializable;
 
-import ca.neo.util.Configurable;
-
 /**
  * <p>An destination for information in a circuit model. A Termination is normally associated 
  * with a neural Ensemble or an individual Neuron, although other terminations could be modelled 
@@ -40,31 +38,31 @@ import ca.neo.util.Configurable;
  *   
  * @author Bryan Tripp
  */
-public interface Termination extends Configurable, Serializable, Resettable, Cloneable {
+public interface Termination extends Serializable, Resettable, Cloneable {
 
 	/**
 	 * Standard name of the post-synaptic current time constant property (most Terminations  
 	 * have this property). 
 	 */
-	public static final String TAU_PSC = "tauPSC";
+//	public static final String TAU_PSC = "tauPSC";
 	
 	/**
 	 * A modulatory termination does not induce current directly but may influence membrane properties or 
 	 * excitability: Boolean(true) means modulatory; Boolean(false) means not modulatory.  
 	 */
-	public static final String MODULATORY = "MODULATORY";
+//	public static final String MODULATORY = "MODULATORY";
 	
 	/**
 	 * Standard name of synaptic weights property (a float[][]) 
 	 */
-	public static final String WEIGHTS = "WEIGHTS";
+//	public static final String WEIGHTS = "WEIGHTS";
 	
 	/**
 	 * A property value for Terminations that are composed of multiple underlying 
 	 * Terminations. This property value indicates that different underlying Terminations 
 	 * report different values for the requested property.  
 	 */
-	public static final String MIXED_VALUE = "MIXED VALUE";
+//	public static final String MIXED_VALUE = "MIXED VALUE";
 	
 	/**
 	 * @return Name of this Termination (unique in the scope of the object the which the Termination 
@@ -89,6 +87,29 @@ public interface Termination extends Configurable, Serializable, Resettable, Clo
 	 * @return The Node to which this Termination belongs 
 	 */
 	public Node getNode();
+	
+	/**
+	 * @return Time constant of dominant dynamics
+	 */
+	public float getTau();
+	
+	/**
+	 * @param tau Time constant of dominant dynamics
+	 * @throws StructuralException if the time constant cannot be changed
+	 */
+	public void setTau(float tau) throws StructuralException;
+	
+	/**
+	 * @return Whether the Termination is modulatory, in the sense of neuromodulation, ie true if 
+	 * 		input via this Termination is not summed to drive a node, but influences node activity 
+	 * 		in some other way 
+	 */
+	public boolean getModulatory();
+	
+	/**
+	 * @param modulatory True if the Termination is to be modulatory
+	 */
+	public void setModulatory(boolean modulatory);
 	
 	public Termination clone() throws CloneNotSupportedException;
 	

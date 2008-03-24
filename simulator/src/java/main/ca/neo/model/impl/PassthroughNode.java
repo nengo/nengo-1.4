@@ -21,11 +21,9 @@ import ca.neo.model.SpikeOutput;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.Units;
-import ca.neo.util.Configuration;
 import ca.neo.util.MU;
 import ca.neo.util.VisiblyMutable;
 import ca.neo.util.VisiblyMutableUtils;
-import ca.neo.util.impl.ConfigurationImpl;
 
 /**
  * <p>A Node that passes values through unaltered.</p>
@@ -264,14 +262,12 @@ public class PassthroughNode implements Node {
 		private String myName;
 		private int myDimension;
 		private float[][] myTransform;
-		private Configuration myConfiguration;
 		private InstantaneousOutput myValues;
 		
 		public PassthroughTermination(Node node, String name, int dimension) {
 			myNode = node;
 			myName = name;
 			myDimension = dimension;
-			myConfiguration = new ConfigurationImpl(this);
 		}
 		
 		public PassthroughTermination(Node node, String name, int dimension, float[][] transform) {
@@ -282,7 +278,6 @@ public class PassthroughNode implements Node {
 			myName = name;
 			myDimension = transform[0].length;
 			myTransform = transform;
-			myConfiguration = new ConfigurationImpl(this);
 		}
 
 		public int getDimensions() {
@@ -314,10 +309,6 @@ public class PassthroughNode implements Node {
 			return myValues;
 		}
 
-		public Configuration getConfiguration() {
-			return myConfiguration;
-		}
-
 		public void propertyChange(String propertyName, Object newValue) throws StructuralException {
 		}
 
@@ -327,6 +318,22 @@ public class PassthroughNode implements Node {
 		
 		public float[][] getTransform() {
 			return myTransform;
+		}
+
+		public boolean getModulatory() {
+			return false;
+		}
+
+		public float getTau() {
+			return 0;
+		}
+
+		public void setModulatory(boolean modulatory) {
+			throw new RuntimeException("A termination on a passthrough node is never modulatory");
+		}
+
+		public void setTau(float tau) throws StructuralException {
+			throw new StructuralException("A termination on a passthrough node has no dynamics");
 		}
 
 		/**

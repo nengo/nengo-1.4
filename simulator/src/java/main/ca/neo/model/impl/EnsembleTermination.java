@@ -3,16 +3,11 @@
  */
 package ca.neo.model.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import ca.neo.model.InstantaneousOutput;
 import ca.neo.model.Node;
 import ca.neo.model.SimulationException;
 import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.util.Configuration;
-import ca.neo.util.impl.ConfigurationImpl;
 
 /**
  * <p>A Termination that is composed of Terminations onto multiple Nodes. 
@@ -37,7 +32,6 @@ public class EnsembleTermination implements Termination {
 	private Node myNode;
 	private String myName;
 	private Termination[] myNodeTerminations;
-	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param node The parent Node
@@ -51,25 +45,6 @@ public class EnsembleTermination implements Termination {
 		myNode = node;
 		myName = name;
 		myNodeTerminations = nodeTerminations;
-		
-		myConfiguration = new ConfigurationImpl(this);
-		refreshProperties();
-	}
-	
-	public void refreshProperties() {
-		String[] propertyNames = findSharedProperties(myNodeTerminations);
-		for (int i = 0; i < propertyNames.length; i++) {
-			//not strict on type at this level (may be different types in components)
-			myConfiguration.addProperty(propertyNames[i], Object.class, getProperty(propertyNames[i]));
-		}	
-		
-		float[][] weights = new float[myNodeTerminations.length][];
-		for (int i = 0; i < weights.length; i++) {
-			Object o = myNodeTerminations[i].getConfiguration().getProperty(Termination.WEIGHTS);
-			weights[i] = (o != null && o instanceof float[][]) ? ((float[][]) o)[0] : new float[myNodeTerminations[i].getDimensions()]; 
-		}
-//		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, MU.transpose(weights));
-		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, weights);
 	}
 	
 	private static void checkSameDimension(Termination[] terminations, String name) throws StructuralException {
@@ -81,44 +56,6 @@ public class EnsembleTermination implements Termination {
 		}
 	}
 	
-	//return property names shared by all given terminations
-	private static String[] findSharedProperties(Termination[] terminations) {
-		Set<String> result = copyIntoSet(terminations[0].getConfiguration().listPropertyNames());		
-		
-		for (int i = 1; i < terminations.length; i++) {
-			Set comparison = copyIntoSet(terminations[i].getConfiguration().listPropertyNames());
-			result.retainAll(comparison);
-		}
-		
-		return result.toArray(new String[0]);
-	}
-	
-	//used above
-	private static Set<String> copyIntoSet(String[] things) {
-		Set<String> result = new HashSet<String>(things.length * 2);
-		for (int i = 0; i < things.length; i++) {
-			result.add(things[i]);
-		}
-		return result;
-	}
-
-	private Object getProperty(String name) {
-		Object result = myNodeTerminations[0].getConfiguration().getProperty(name);
-		
-		boolean mixed = false;
-		for (int i = 1; i < myNodeTerminations.length && !mixed; i++) {
-			if ( !myNodeTerminations[i].getConfiguration().getProperty(name).equals(result) ) {
-				mixed = true;
-			}
-		}
-		
-		if (mixed) {
-			result = Termination.MIXED_VALUE;
-		}
-		
-		return result;
-	}
-
 	/**
 	 * @see ca.neo.model.Termination#getName()
 	 */
@@ -146,27 +83,54 @@ public class EnsembleTermination implements Termination {
 		}
 	}
 
-	/** 
-	 * @see ca.neo.util.Configurable#getConfiguration()
+	/**
+	 * Returns true if more than half of node terminations are modulatory. 
+	 * @see ca.neo.model.Termination#getModulatory()
 	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
+	public boolean getModulatory() {
+		int nModulatory = 0;
+		for (int i = 0; i < myNodeTerminations.length; i++) {
+			if (myNodeTerminations[i].getModulatory()) nModulatory++;
+		}
+		return nModulatory > myNodeTerminations.length/2;
 	}
 
-	/** 
-	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
+	/**
+	 * Returns the average. 
+	 * 
+	 * @see ca.neo.model.Termination#getTau()
 	 */
-	public void propertyChange(String propertyName, Object newValue) throws StructuralException {
-		Object[] oldValues = new Object[myNodeTerminations.length];
+	public float getTau() {
+		float sumTau = 0;
+		for (int i = 0; i < myNodeTerminations.length; i++) {
+			sumTau += myNodeTerminations[i].getTau();
+		}
+		return sumTau / (float) myNodeTerminations.length;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#setModulatory(boolean)
+	 */
+	public void setModulatory(boolean modulatory) {
+		for (int i = 0; i < myNodeTerminations.length; i++) {
+			myNodeTerminations[i].setModulatory(modulatory);
+		}
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#setTau(float)
+	 */
+	public void setTau(float tau) throws StructuralException {
+		float[] oldValues = new float[myNodeTerminations.length];
 		
 		for (int i = 0; i < myNodeTerminations.length; i++) {
-			oldValues[i] = myNodeTerminations[i].getConfiguration().getProperty(propertyName);
+			oldValues[i] = myNodeTerminations[i].getTau();
 			try {
-				myNodeTerminations[i].getConfiguration().setProperty(propertyName, newValue);
+				myNodeTerminations[i].setTau(tau);
 			} catch (StructuralException e) {
 				//roll back changes
 				for (int j = 0; j < i; j++) {
-					myNodeTerminations[j].getConfiguration().setProperty(propertyName, oldValues[j]); 
+					myNodeTerminations[j].setTau(oldValues[j]); 
 				}
 				throw new StructuralException(e);
 			}

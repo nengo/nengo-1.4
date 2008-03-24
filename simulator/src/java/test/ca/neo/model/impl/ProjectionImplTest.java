@@ -10,9 +10,9 @@ import ca.neo.model.Node;
 import ca.neo.model.Origin;
 import ca.neo.model.Projection;
 import ca.neo.model.SimulationException;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
 import ca.neo.model.impl.ProjectionImpl;
-import ca.neo.util.Configuration;
 import junit.framework.TestCase;
 
 /**
@@ -116,16 +116,26 @@ public class ProjectionImplTest extends TestCase {
 			throw new NotImplementedException("not implemented");
 		}
 
-		public Configuration getConfiguration() {
-			throw new NotImplementedException("not implemented");
-		}
-
 		public void propertyChange(String propertyName, Object newValue) {
 			throw new NotImplementedException("not implemented");
 		}
 
 		public Node getNode() {
 			return null;
+		}
+
+		public boolean getModulatory() {
+			return false;
+		}
+
+		public float getTau() {
+			return 0;
+		}
+
+		public void setModulatory(boolean modulatory) {
+		}
+
+		public void setTau(float tau) throws StructuralException {
 		}
 
 		/**

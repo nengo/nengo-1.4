@@ -6,9 +6,8 @@ import ca.neo.model.RealOutput;
 import ca.neo.model.SimulationException;
 import ca.neo.model.SpikeOutput;
 import ca.neo.model.PreciseSpikeOutput;
+import ca.neo.model.StructuralException;
 import ca.neo.model.Termination;
-import ca.neo.util.Configuration;
-import ca.neo.util.impl.ConfigurationImpl;
 
 
 /**
@@ -32,6 +31,7 @@ public class LinearExponentialTermination implements Termination {
 	private String myName;
 	private float[] myWeights;
 	private float myTauPSC;
+	private boolean myModulatory;
 	
 	private float myCurrent = 0;
 	private float myNetSpikeInput;
@@ -40,8 +40,6 @@ public class LinearExponentialTermination implements Termination {
 	private float myIntegrationTime; // for keeping track of how far into the integration we are, so
 									// we know which precise spikes have and have not been dealt with 
 	private InstantaneousOutput myRawInput;
-	
-	private ConfigurationImpl myConfiguration;
 	
 	/**
 	 * @param node The parent Node
@@ -55,11 +53,7 @@ public class LinearExponentialTermination implements Termination {
 		myName = name;
 		myWeights = weights;
 		myTauPSC = tauPSC;
-		
-		myConfiguration = new ConfigurationImpl(this);
-		myConfiguration.addProperty(Termination.TAU_PSC, Float.class, new Float(tauPSC));
-		myConfiguration.addProperty(Termination.MODULATORY, Boolean.class, new Boolean(false));
-		myConfiguration.addProperty(Termination.WEIGHTS, float[][].class, new float[][]{myWeights});
+		myModulatory = false;
 	}
 	
 	/**
@@ -207,22 +201,6 @@ public class LinearExponentialTermination implements Termination {
 		myIntegrationTime=endTime;
 	}
 
-	/** 
-	 * @see ca.neo.util.Configurable#getConfiguration()
-	 */
-	public Configuration getConfiguration() {
-		return myConfiguration;
-	}
-
-	/** 
-	 * @see ca.neo.util.Configurable#propertyChange(java.lang.String, java.lang.Object)
-	 */
-	public void propertyChange(String propertyName, Object newValue) {
-		if (propertyName.equals(Termination.TAU_PSC)) {
-			myTauPSC = ((Float) newValue).floatValue();
-		} 		
-	}	
-	
 	private static float combineSpikes(SpikeOutput input, float[] weights) {
 		float result = 0;
 		boolean[] spikes = input.getValues();
@@ -253,9 +231,40 @@ public class LinearExponentialTermination implements Termination {
 	public Node getNode() {
 		return myNode;
 	}
-	
+
+	/**
+	 * @param node
+	 */
 	public void setNode(Node node) {
 		myNode = node;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#getModulatory()
+	 */
+	public boolean getModulatory() {
+		return myModulatory;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#getTau()
+	 */
+	public float getTau() {
+		return myTauPSC;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#setModulatory(boolean)
+	 */
+	public void setModulatory(boolean modulatory) {
+		myModulatory = modulatory;
+	}
+
+	/**
+	 * @see ca.neo.model.Termination#setTau(float)
+	 */
+	public void setTau(float tau) throws StructuralException {
+		myTauPSC = tau;
 	}
 
 	@Override

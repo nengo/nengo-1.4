@@ -3,7 +3,6 @@
  */
 package ca.neo.io;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,9 +24,7 @@ import ca.neo.util.TimeSeries;
  */
 public class FileManager {
 
-	public static final String NETWORK_EXTENSION = "neonetwork";
-	public static final String ENSEMBLE_EXTENSION = "neoensemble";
-	public static final String NEURON_EXTENSION = "neoneuron";	
+	public static final String ENSEMBLE_EXTENSION = "nef";
 	
 	private static File ourDefaultLocation = new File("./work");
 	static {
