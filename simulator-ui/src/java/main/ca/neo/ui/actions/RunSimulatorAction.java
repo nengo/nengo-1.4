@@ -39,7 +39,7 @@ public class RunSimulatorAction extends StandardAction {
 	private static final long serialVersionUID = 1L;
 
 	private static final ConfigSchemaImpl zProperties = new ConfigSchemaImpl(new Property[] {
-			pStartTime, pEndTime, pStepSize, pShowDataViewer });
+			pStartTime, pStepSize, pEndTime, pShowDataViewer });
 
 	private UINetwork uiNetwork;
 
