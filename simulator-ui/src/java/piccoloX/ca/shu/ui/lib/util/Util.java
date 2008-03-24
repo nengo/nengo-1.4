@@ -12,7 +12,7 @@ import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
-import ca.neo.ui.NengoGraphics;
+import ca.nengo.ui.NengoGraphics;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.piccolo.WorldImpl;

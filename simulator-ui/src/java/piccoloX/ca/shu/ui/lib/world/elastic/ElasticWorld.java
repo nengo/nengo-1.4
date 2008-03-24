@@ -6,12 +6,12 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-import ca.neo.ui.configurable.ConfigException;
-import ca.neo.ui.configurable.Property;
-import ca.neo.ui.configurable.ConfigResult;
-import ca.neo.ui.configurable.descriptors.PInt;
-import ca.neo.ui.configurable.managers.ConfigManager;
-import ca.neo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.configurable.ConfigException;
+import ca.nengo.ui.configurable.ConfigResult;
+import ca.nengo.ui.configurable.Property;
+import ca.nengo.ui.configurable.descriptors.PInt;
+import ca.nengo.ui.configurable.managers.ConfigManager;
+import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.LayoutAction;
 import ca.shu.ui.lib.actions.StandardAction;

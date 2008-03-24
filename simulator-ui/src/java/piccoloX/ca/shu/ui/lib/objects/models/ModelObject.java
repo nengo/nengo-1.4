@@ -5,9 +5,9 @@ import java.util.HashSet;
 
 import javax.swing.JPopupMenu;
 
-import ca.neo.ui.actions.RemoveModelAction;
-import ca.neo.ui.models.tooltips.Tooltip;
-import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.nengo.ui.actions.RemoveModelAction;
+import ca.nengo.ui.models.tooltips.Tooltip;
+import ca.nengo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.Interactable;

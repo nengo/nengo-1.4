@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Stack;
 
-import ca.neo.ui.models.tooltips.Tooltip;
-import ca.neo.ui.models.tooltips.TooltipBuilder;
+import ca.nengo.ui.models.tooltips.Tooltip;
+import ca.nengo.ui.models.tooltips.TooltipBuilder;
 import ca.shu.ui.lib.Style.Style;
 import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.world.Searchable;
