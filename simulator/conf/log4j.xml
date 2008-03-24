@@ -52,7 +52,7 @@
   <!--       Define Loggers           -->
   <!-- ============================== -->
 
-  <logger name="ca.neo" additivity="false">
+  <logger name="ca.nengo" additivity="false">
         <level value="INFO"/>
 	    <appender-ref ref="CONSOLE"/>
     	<!--<appender-ref ref="FILE"/>-->

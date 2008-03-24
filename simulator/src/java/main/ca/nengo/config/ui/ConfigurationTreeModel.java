@@ -1,0 +1,446 @@
+/*
+ * Created on 9-Dec-07
+ */
+package ca.nengo.config.ui;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+
+import ca.nengo.config.ConfigUtil;
+import ca.nengo.config.Configurable;
+import ca.nengo.config.Configuration;
+import ca.nengo.config.JavaSourceParser;
+import ca.nengo.config.ListProperty;
+import ca.nengo.config.MainHandler;
+import ca.nengo.config.NamedValueProperty;
+import ca.nengo.config.Property;
+import ca.nengo.config.SingleValuedProperty;
+import ca.nengo.math.impl.IndicatorPDF;
+import ca.nengo.model.StructuralException;
+import ca.nengo.model.impl.NoiseFactory;
+
+/** 
+ * Data model underlying JTree user interface for a Configurable.
+ * 
+ * @author Bryan Tripp
+ */
+public class ConfigurationTreeModel implements TreeModel {
+
+	private Value myRoot;
+	private List<TreeModelListener> myListeners;
+		
+	/**
+	 * @param configurable Root of the configuration tree
+	 */
+	public ConfigurationTreeModel(Object configurable) {
+		myRoot = new Value(0, configurable);
+		myListeners = new ArrayList<TreeModelListener>(5);
+	}
+	
+	/**
+	 * @param parentPath Path in configuration tree of a property to which a value is to be added 
+	 * @param value New value to add
+	 * @param name Name of new value (only used if parent is a NamedValueProperty; can be null otherwise)
+	 */
+	public void addValue(TreePath parentPath, Object value, String name) {
+		try {
+			Object parent = parentPath.getLastPathComponent();
+			if (parent instanceof ListProperty) {
+				ListProperty property = (ListProperty) parent; 
+				property.addValue(value);
+				
+				TreeModelEvent event = new TreeModelEvent(this, parentPath, new int[]{property.getNumValues()-1}, new Object[]{value});
+				for (int i = 0; i <myListeners.size(); i++) {
+					myListeners.get(i).treeNodesInserted(event);
+				}
+			} else if (parent instanceof NamedValueProperty) {
+				NamedValueProperty property = (NamedValueProperty) parent;
+				property.setValue(name, value);
+				refresh(parentPath);
+			} else {
+				throw new RuntimeException("Can't add child to a " + parent.getClass().getName());
+			}
+		} catch (StructuralException e) {
+			ConfigExceptionHandler.handle(e, "Can't add value: " + e.getMessage(), null);
+		}		
+	}
+
+	/**
+	 * @param path Path to root of subtree to refresh
+	 */
+	public void refresh(TreePath path) {
+		TreeModelEvent event = new TreeModelEvent(this, path);
+		for (int i = 0; i <myListeners.size(); i++) {
+			myListeners.get(i).treeStructureChanged(event);						
+		}
+	}
+	
+	/**
+	 * @param path Path to the tree node to insert before
+	 * @param value Value to insert
+	 */
+	public void insertValue(TreePath path, Object value) {
+		try {
+			Object parent = path.getParentPath().getLastPathComponent();
+			if (parent instanceof ListProperty && path.getLastPathComponent() instanceof Value) {
+				ListProperty property = (ListProperty) parent;
+				Value toInsertBefore = (Value) path.getLastPathComponent();
+				property.insert(toInsertBefore.getIndex(), value);
+				
+				Value node = new Value(toInsertBefore.getIndex(), value);
+				TreeModelEvent insertEvent = new TreeModelEvent(this, path.getParentPath(), 
+						new int[]{toInsertBefore.getIndex()}, new Object[]{node});
+				TreeModelEvent changeEvent = getIndexUpdateEvent(this, path.getParentPath(), 
+						toInsertBefore.getIndex()+1, property.getNumValues());
+				for (int i = 0; i <myListeners.size(); i++) {
+					myListeners.get(i).treeNodesInserted(insertEvent);
+					myListeners.get(i).treeNodesChanged(changeEvent);
+				}
+				
+			} else {
+				throw new RuntimeException("Can't insert value on child of " + parent.getClass().getName());
+			}
+		} catch (StructuralException e) {
+			ConfigExceptionHandler.handle(e, "Can't insert value: " + e.getMessage(), null);
+		}
+	}	
+
+	//creates an event to update a range of child indices with given parent    
+	private TreeModelEvent getIndexUpdateEvent(Object source, TreePath parentPath, int fromIndex, int toIndex) {
+		Object parent = parentPath.getLastPathComponent();
+		int[] changedIndices = new int[toIndex-fromIndex];
+		Object[] changedValues = new Object[changedIndices.length];
+		for (int i = 0; i < changedIndices.length; i++) {
+			changedIndices[i] = fromIndex + i;
+			changedValues[i] = getChild(parent, changedIndices[i]); //creates new Value object with correct index
+		}
+		return new TreeModelEvent(source, parentPath, changedIndices, changedValues);
+	}
+	
+	/**
+	 * @param path Path to object to be replaced with new value
+	 * @param value New value
+	 * @throws StructuralException
+	 */
+	public void setValue(TreePath path, Object value) throws StructuralException {
+		Object parent = path.getParentPath().getLastPathComponent();
+		if (parent instanceof Property && path.getLastPathComponent() instanceof Value) {
+			int index = ((Value) path.getLastPathComponent()).getIndex();
+			
+			if (parent instanceof SingleValuedProperty) {
+				((SingleValuedProperty) parent).setValue(value);
+			} else if (parent instanceof ListProperty) {
+				((ListProperty) parent).setValue(index, value);				
+			} else if (parent instanceof NamedValueProperty) {
+				String name = ((Value) path.getLastPathComponent()).getName();
+				((NamedValueProperty) parent).setValue(name, value);
+			}
+			
+			Value child = (Value) path.getLastPathComponent();
+			child.setObject(value);
+			
+			if (child.getObject() instanceof Configurable) {
+				TreeModelEvent event = new TreeModelEvent(this, path);
+				for (int i = 0; i <myListeners.size(); i++) {
+					myListeners.get(i).treeStructureChanged(event);						
+				}
+			} else {
+				TreePath shortPath = new TreePath(new Object[]{parent, child});
+				TreeModelEvent event = new TreeModelEvent(this, shortPath, new int[]{index}, new Object[]{child});
+				for (int i = 0; i <myListeners.size(); i++) {
+					myListeners.get(i).treeNodesChanged(event);
+				}
+			}
+		} else {
+			throw new RuntimeException("Can't set value on child of " 
+					+ parent.getClass().getName() + " (this is probably a bug).");
+		}
+	}
+	
+	/**
+	 * @param path Tree path to property value to remove
+	 */
+	public void removeValue(TreePath path) {
+		try {
+			Object parent = path.getParentPath().getLastPathComponent();
+			if (path.getLastPathComponent() instanceof Value && (parent instanceof ListProperty || parent instanceof NamedValueProperty)) {
+				Value toRemove = (Value) path.getLastPathComponent();
+				int numValues = 0;
+				
+				if (parent instanceof ListProperty) {
+					ListProperty property = (ListProperty) parent;
+					property.remove(toRemove.getIndex());
+					numValues = property.getNumValues();
+				} else if (parent instanceof NamedValueProperty) {
+					NamedValueProperty property = (NamedValueProperty) parent;
+					property.removeValue(toRemove.getName());
+					numValues = property.getValueNames().size();
+				}
+				
+				TreeModelEvent removeEvent = new TreeModelEvent(this, path.getParentPath(), 
+						new int[]{toRemove.getIndex()}, new Object[]{toRemove});
+				TreeModelEvent changeEvent = getIndexUpdateEvent(this, path.getParentPath(), 
+						toRemove.getIndex(), numValues);
+				for (int i = 0; i < myListeners.size(); i++) {
+					myListeners.get(i).treeNodesRemoved(removeEvent);
+					myListeners.get(i).treeNodesChanged(changeEvent);					
+				}	
+			} else {
+				throw new RuntimeException("Can't remove child of " 
+						+ parent.getClass().getName() + " (this is probably a bug)");
+			}
+		} catch (StructuralException e) {
+			ConfigExceptionHandler.handle(e, "Can't remove value: " + e.getMessage(), null);
+		}
+	}
+	
+	/**
+	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
+	 */
+	public Object getChild(Object parent, int index) {
+		Object result = null;
+		
+		try {
+			if (parent instanceof Value) {
+				Configuration c = ((Value) parent).getConfiguration();
+				if (c != null) {
+					List<String> propertyNames = c.getPropertyNames();
+					Collections.sort(propertyNames);
+					result = c.getProperty(propertyNames.get(index));
+				}
+			} else if (parent instanceof ListProperty) {
+				ListProperty p = (ListProperty) parent;
+				Object o = p.getValue(index);
+				result = new Value(index, o); 
+			} else if (parent instanceof NamedValueProperty) {
+				NamedValueProperty p = (NamedValueProperty) parent;
+				String name = p.getValueNames().get(index);
+				Object o = p.getValue(name);
+				result = new Value(index, o);
+				((Value) result).setName(name);
+			} else if (parent instanceof SingleValuedProperty) {
+				if (index == 0) {
+					Object o = ((SingleValuedProperty) parent).getValue();
+					result = new Value(index, o);
+				} else {
+					ConfigExceptionHandler.handle(
+							new StructuralException("SingleValuedProperty doesn't have child " + index), 
+							ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
+				}
+			}
+		} catch (StructuralException e) {
+			ConfigExceptionHandler.handle(e, ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
+		}
+		
+		return result;
+	}
+
+	/**
+	 * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
+	 */
+	public int getChildCount(Object parent) {		
+		int result = 0;
+		
+		if (parent instanceof Value) {
+			Configuration configuration = ((Value) parent).getConfiguration(); 
+			if (configuration != null) result = configuration.getPropertyNames().size();
+		} else if (parent instanceof SingleValuedProperty) {
+			result = 1; 
+		} else if (parent instanceof ListProperty) {
+			result = ((ListProperty) parent).getNumValues();
+		} else if (parent instanceof NamedValueProperty) {
+			result = ((NamedValueProperty) parent).getValueNames().size();
+		}
+		
+		return result;
+	}
+
+	/**
+	 * @see javax.swing.tree.TreeModel#getIndexOfChild(java.lang.Object, java.lang.Object)
+	 */
+	public int getIndexOfChild(Object parent, Object child) {
+		int index = -1;
+		
+		try {
+			if (child instanceof Property) {
+				Configuration c = ((Value) parent).getConfiguration();
+				Property p = (Property) child;
+				List<String> propertyNames = c.getPropertyNames();
+				Collections.sort(propertyNames);
+				index = propertyNames.indexOf(p.getName());
+			} else if (parent instanceof SingleValuedProperty) {
+				SingleValuedProperty p = (SingleValuedProperty) parent;
+				Value v = (Value) child;
+				if (p.getValue() != null && p.getValue().equals(v.getObject())) {
+					index = 0;
+				}
+			} else if (parent instanceof ListProperty) {
+				ListProperty p = (ListProperty) parent;
+				Value v = (Value) child;
+				for (int i = 0; i < p.getNumValues() && index == -1; i++) {
+					if (p.getValue(i) != null && p.getValue(i).equals(v.getObject())) index = i;
+				}
+			} else if (parent instanceof NamedValueProperty) {
+				NamedValueProperty p = (NamedValueProperty) parent;
+				String name = ((Value) child).getName();				
+				for (int i = 0; i < p.getValueNames().size() && index == -1; i++) {
+					if (p.getValueNames().get(i).equals(name)) index = i;
+				}				
+			}
+		} catch (StructuralException e) {
+			ConfigExceptionHandler.handle(e, ConfigExceptionHandler.DEFAULT_BUG_MESSAGE, null);
+		}
+		
+		return index;
+	}
+
+	/**
+	 * @see javax.swing.tree.TreeModel#getRoot()
+	 */
+	public Object getRoot() {
+		return myRoot;
+	}
+
+	/**
+	 * @see javax.swing.tree.TreeModel#isLeaf(java.lang.Object)
+	 */
+	public boolean isLeaf(Object o) {
+		return ( !(o instanceof Value && ((Value) o).getConfiguration() != null) && !(o instanceof Property) );
+	}
+
+	/**
+	 * @see javax.swing.tree.TreeModel#addTreeModelListener(javax.swing.event.TreeModelListener)
+	 */
+	public void addTreeModelListener(TreeModelListener listener) {
+		myListeners.add(listener);
+	}
+
+	/**
+	 * @see javax.swing.tree.TreeModel#removeTreeModelListener(javax.swing.event.TreeModelListener)
+	 */
+	public void removeTreeModelListener(TreeModelListener listener) {
+		myListeners.remove(listener);
+	}
+
+	/**
+	 * @see javax.swing.tree.TreeModel#valueForPathChanged(javax.swing.tree.TreePath, java.lang.Object)
+	 */
+	public void valueForPathChanged(TreePath path, Object newValue) {
+		if (newValue instanceof Value) {
+			TreeModelEvent event = new TreeModelEvent(null, path.getParentPath(), 
+					new int[]{((Value) newValue).getIndex()}, new Object[]{newValue});
+			for (int i = 0; i < myListeners.size(); i++) {
+				myListeners.get(i).treeNodesChanged(event);
+			}
+		}
+	}
+	
+	//a wrapper for property values: stores index and configuration (if applicable) 
+	public static class Value {
+		
+		private int myIndex;
+		private Object myObject;
+		private String myName;
+		private Configuration myConfiguration;
+		
+		public Value(int index, Object object) {
+			myIndex = index;
+			myObject = (object == null) ? new NullValue() : object;
+			
+			if (object != null && !MainHandler.getInstance().canHandle(object.getClass())) {
+				myConfiguration = ConfigUtil.getConfiguration(object);
+			}
+		}
+		
+		public int getIndex() {
+			return myIndex;
+		}
+		
+		public void setIndex(int index) {
+			myIndex = index;
+		}
+		
+		public void setObject(Object o) {
+			myObject = o;
+		}
+		
+		public Object getObject() {
+			return myObject;
+		}
+		
+		public String getName() {
+			return myName;
+		}
+		
+		public void setName(String name) {
+			myName = name;
+		}
+		
+		public Configuration getConfiguration() {
+			return myConfiguration;
+		}
+	}
+	
+	/**
+	 * For the configuration UI to use in place of a null parameter value.  
+	 * 
+	 * @author Bryan Tripp
+	 */
+	public static class NullValue {
+		public String toString() {
+			return "NULL";
+		}
+	}
+
+	//functional test code
+	public static void main(String[] args) {
+		try {
+			JavaSourceParser.addSource(new File("src/java/main"));
+			
+			final Object configurable = NoiseFactory.makeRandomNoise(1, new IndicatorPDF(0, 1));			
+			final JFrame frame = new JFrame("Tree Test");
+			
+			JButton button = new JButton("configure");
+			button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					ConfigUtil.configure(frame, configurable);
+				}
+			});
+			frame.getContentPane().add(button);
+			
+			frame.pack();
+			frame.setVisible(true);
+			
+			frame.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent arg0) {
+					System.exit(0);
+				}
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}

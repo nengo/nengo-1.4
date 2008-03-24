@@ -117,7 +117,7 @@ NOTES:
 	.project, and make new project
 - The matlab-java interface prefers to convert an nX1 matrix to a 1-d array rather than a 2-d array, so 
 	if a class has methods of the same name but one with float[] arg and the other with float[][] arg, there 
-	doesn't seem to be a way call the latter with a float[n][1]. No remaining cases of this in neo presently, 
+	doesn't seem to be a way call the latter with a float[n][1]. No remaining cases of this in nengo presently, 
 	Possible future case if MU.clone() is implemented for vectors as well as matrices. 
 - Plotting: JFreeChart produces nice graphs and supports a variety of export formats, but doesn't support 3D 
 	plots. JMathPlot does support 3D, but doesn't seem to support export at all, and needs JDK 1.5 (although 
