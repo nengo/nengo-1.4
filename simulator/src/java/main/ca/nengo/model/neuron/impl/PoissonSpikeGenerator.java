@@ -128,12 +128,9 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		myMode = SimulationMode.getClosestMode(mode, ourSupportedModes);
 	}
 
-	/**
-	 * @see ca.nengo.model.neuron.SpikeGenerator#runConstantRate(float, float)
-	 */
-	public float runConstantRate(float time, float current) throws SimulationException {
-		return myRateFunction.map(new float[]{current});
-	}
+//	public float runConstantRate(float time, float current) throws SimulationException {
+//		return myRateFunction.map(new float[]{current});
+//	}
 
 	/**
 	 * This method does nothing, because a Poisson process is stateless. 
