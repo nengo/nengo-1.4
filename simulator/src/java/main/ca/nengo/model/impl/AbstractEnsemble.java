@@ -50,7 +50,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	private NodeRunner[] myNodeRunners;
 	transient private Thread[] myThreads;
 	private Map<String, Origin> myOrigins;
-	private Map<String, EnsembleTermination> myTerminations;
+	protected Map<String, EnsembleTermination> myTerminations;
 	private Map<String, List<Integer>> myStateNames; // for Probeable
 	private SimulationMode myMode;
 	private transient SpikePatternImpl mySpikePattern;

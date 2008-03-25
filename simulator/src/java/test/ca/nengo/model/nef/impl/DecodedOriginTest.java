@@ -35,7 +35,7 @@ public class DecodedOriginTest extends TestCase {
 		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
 		NEFEnsemble ensemble = ef.make("test", 100, 1);
 		myOrigin = (DecodedOrigin) ensemble.getOrigin(NEFEnsemble.X);
-		Plotter.plot(ensemble, NEFEnsemble.X);
+//		Plotter.plot(ensemble, NEFEnsemble.X);
 	}
 
 	/**
@@ -45,13 +45,13 @@ public class DecodedOriginTest extends TestCase {
 		System.out.println(MU.toString(new float[][]{myOrigin.getError()}, 10));
 	}
 	
-	public static void main(String[] args) {
-		DecodedOriginTest test = new DecodedOriginTest("");
-		try {
-			test.setUp();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		DecodedOriginTest test = new DecodedOriginTest("");
+//		try {
+//			test.setUp();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 }

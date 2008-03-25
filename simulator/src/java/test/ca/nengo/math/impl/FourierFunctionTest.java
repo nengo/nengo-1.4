@@ -37,7 +37,7 @@ public class FourierFunctionTest extends TestCase {
 		}
 		float[] result = f.multiMap(from);
 		
-		Plotter.plot(f, 0, .001f, 1, "fourier");
+//		Plotter.plot(f, 0, .001f, 1, "fourier");
 	}
 
 	/*
@@ -80,16 +80,16 @@ public class FourierFunctionTest extends TestCase {
 		assertClose(2.9389f, f1.map(new float[]{2.8f}));
 	}
 	
-	public static void main(String[] args) {
-//		FourierFunctionTest test = new FourierFunctionTest();
-//		test.testFourierFunctionFloatFloatFloat();
-		
-		float[][] frequencies = new float[][]{new float[]{1, 1}, new float[]{1, 3.5f}};
-		float[] amplitudes = new float[]{1, 1};
-		float[][] phases = new float[][]{new float[]{0, 0}, new float[]{0, 0}};
-		FourierFunction f = new FourierFunction(frequencies, amplitudes, phases);
-		
-		Plotter.plot(f, 0, .01f, 1, "foo");
-	}
+//	public static void main(String[] args) {
+////		FourierFunctionTest test = new FourierFunctionTest();
+////		test.testFourierFunctionFloatFloatFloat();
+//		
+//		float[][] frequencies = new float[][]{new float[]{1, 1}, new float[]{1, 3.5f}};
+//		float[] amplitudes = new float[]{1, 1};
+//		float[][] phases = new float[][]{new float[]{0, 0}, new float[]{0, 0}};
+//		FourierFunction f = new FourierFunction(frequencies, amplitudes, phases);
+//		
+//		Plotter.plot(f, 0, .01f, 1, "foo");
+//	}
 
 }

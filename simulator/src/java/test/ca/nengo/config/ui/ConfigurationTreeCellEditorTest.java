@@ -16,6 +16,9 @@ public class ConfigurationTreeCellEditorTest extends TestCase {
 		super.setUp();
 	}
 	
+	public void testNothing() {		
+	}
+	
 	public static void main(String[] args) {
 		NewConfigurableDialog.showDialog(null, LTISystem.class, SimpleLTISystem.class);
 	}

@@ -14,19 +14,17 @@ import junit.framework.TestCase;
 /**
  * Unit tests for GradientDescentApproximator. 
  * 
- * TODO: this is written as a functional test ... translate to unit test
- * 
  * @author Bryan Tripp
  */
 public class GradientDescentApproximatorTest extends TestCase {
 
-//	public GradientDescentApproximatorTest(String arg0) {
-//		super(arg0);
-//	}
-//
-//	protected void setUp() throws Exception {
-//		super.setUp();
-//	}
+	public GradientDescentApproximatorTest(String arg0) {
+		super(arg0);
+	}
+
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
 	public void testFindCoefficients() {
 		float[] frequencies = new float[]{1, 5, 8};

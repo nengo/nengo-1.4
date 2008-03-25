@@ -237,11 +237,19 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 				result.setPlasticityRule(key, myPlasticityRules.get(key).clone());
 			}
 			
+			//Note: at this point, AbstractEnsemble.clone() has called its init() method,
+			//which sets up EnsembleTerminations based on existing node terminations. Since 
+			//the nodes have been cloned, this includes any "expanded terminations" created 
+			//on this EnsembleImpl. We now move these terminations from AbstractEnsemble
+			//EnsembleImpl, where they belong ... 
+			
+			result.myExpandedTerminations = new HashMap<String, Termination>(10);
 			for (String key : myExpandedTerminations.keySet()) {
-				result.removeTermination(key); //has been seen on nodes by AbstractEnsemble
-				result.myExpandedTerminations.put(key, myExpandedTerminations.get(key));
+				EnsembleTermination et = result.myTerminations.remove(key);
+				result.myExpandedTerminations.put(key, et);
 			}
-			return result;			
+			
+			return result;	
 		} catch (StructuralException e) {
 			throw new CloneNotSupportedException("Problem making clone: " + e.getMessage());
 		}

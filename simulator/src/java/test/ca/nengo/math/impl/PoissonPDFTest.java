@@ -47,7 +47,7 @@ public class PoissonPDFTest extends TestCase {
 		doTestMap(30, 0, 9.35762296884019E-14f);
 	}
 	
-	private void doTestMap(float rate, float observation, float probability) {
+	private static void doTestMap(float rate, float observation, float probability) {
 		float tolerance = .00001f;
 		PoissonPDF pdf = new PoissonPDF(rate);
 		float result = pdf.map(new float[]{observation});
@@ -67,7 +67,7 @@ public class PoissonPDFTest extends TestCase {
 		doTestSample(100);
 	}
 	
-	public void doTestSample(float rate) {
+	private static void doTestSample(float rate) {
 		PoissonPDF pdf = new PoissonPDF(rate);
 		int n = 1000;
 		int[] bins = new int[100];
@@ -81,8 +81,4 @@ public class PoissonPDFTest extends TestCase {
 		
 	}
 	
-	public static void main(String[] args) {
-		
-	}
-
 }

@@ -258,7 +258,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		l = ((PostfixFunction) f).getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
-		assertTrue(l.get(2) instanceof SineFunction);
+		assertTrue(l.get(2) instanceof SimpleFunctions.Sin);
 		assertEquals("+", l.get(3).toString());
 		TestUtil.assertClose(2f, f.map(new float[]{2f, (float) Math.PI, 1f, 1f}), tolerance);
 		
@@ -268,7 +268,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(new Integer(2), l.get(2));
 		assertEquals("+", l.get(3).toString());
-		assertTrue(l.get(4) instanceof SineFunction);
+		assertTrue(l.get(4) instanceof SimpleFunctions.Sin);
 		assertEquals("+", l.get(5).toString());
 		TestUtil.assertClose(2f, f.map(new float[]{2f, (float) Math.PI / 2f, (float) Math.PI / 2f, 1f}), tolerance);
 		
@@ -346,7 +346,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		assertEquals("+", l.get(8).toString());
 		assertEquals(new Integer(3), l.get(9));
 		assertEquals("^", l.get(10).toString());
-		assertTrue(l.get(11) instanceof SineFunction);		
+		assertTrue(l.get(11) instanceof SimpleFunctions.Sin);		
 		assertEquals("/", l.get(12).toString());
 		assertEquals("+", l.get(13).toString());
 		TestUtil.assertClose(2f * (float) Math.PI - 1 / .13235175f, f.map(new float[]{2f, 2f, 3f, 2f}), tolerance);
