@@ -1,4 +1,4 @@
-package ca.nengo.ui;
+package ca.nengo.ui.dev;
 
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.impl.NetworkImpl;

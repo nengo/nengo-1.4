@@ -1,8 +1,9 @@
-package ca.nengo.ui;
+package ca.nengo.ui.dev;
 
 import javax.swing.SwingUtilities;
 
 import ca.nengo.model.Network;
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 

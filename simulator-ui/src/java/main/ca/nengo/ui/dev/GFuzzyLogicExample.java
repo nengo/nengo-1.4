@@ -1,7 +1,6 @@
 package ca.nengo.ui.dev;
 
 import ca.nengo.model.StructuralException;
-import ca.nengo.ui.ExampleRunner;
 import ca.nengo.ui.models.nodes.UINetwork;
 
 /**
