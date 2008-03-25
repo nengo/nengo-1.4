@@ -84,13 +84,16 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	private static final long serialVersionUID = 1L;
 	public static final double VERSION = 1.0;
 
-	public static final String APP_NAME = "Nengo Graphics V" + VERSION;
+	public static final String APP_NAME = "Nengo V" + VERSION;
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
 	 */
 	public static final String ABOUT = "<H3>" + APP_NAME + "</H3>"
-			+ "(c) Copyright Center for Theoretical Neuroscience 2007.  All rights reserved<BR>"
-			+ "http://ctn.uwaterloo.ca/<BR>" + "<BR> User Interface by Shu Wu (shuwu83@gmail.com)";
+			+ "<p>(c) Copyright Bryan Tripp & Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2008.  All rights reserved.<BR><BR>"
+			+ "User Interface by Shu Wu (shuwu83@gmail.com) <BR><BR>"
+			+ "This product contains several open-source libraries (copyright their respective authors). "
+			+ "For more information, consult lib/library-licenses.txt in the installation directory.<BR> "
+			+ "This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
 
 	public static final String CONFIG_FILE = "NengoGraphics.config";
 
