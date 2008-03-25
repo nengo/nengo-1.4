@@ -13,7 +13,7 @@ public class PreciseSpikeOutputImpl implements PreciseSpikeOutput {
 	private float myTime;
 
 	/**
-	 * @param values @see #getValues()
+	 * @param spikeTimes @see #getSpikeTimes()
 	 * @param units @see #getUnits()
 	 * @param time @see #getTime()
 	 */

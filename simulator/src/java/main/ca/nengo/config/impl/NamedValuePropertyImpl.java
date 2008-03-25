@@ -19,7 +19,7 @@ import ca.nengo.model.StructuralException;
  * <p>Default implementation of NamedValueProperty. This implementation uses reflection to call methods on an 
  * underlying configurable object in order to get and set multiple property values.</p>
  * 
- * <p>Use of this class is analogous to {@link ca.nengo.config.impl ListPropertyImpl}. See 
+ * <p>Use of this class is analogous to {@link ca.nengo.config.impl.ListPropertyImpl}. See 
  * ListPropertyImpl docs for more information.</p>
  *  
  * @author Bryan Tripp
@@ -40,7 +40,7 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	/**
 	 * @param configuration Configuration to which this Property belongs
 	 * @param name Parameter name
-	 * @param c Parameter type
+	 * @param type Parameter type
 	 * @return Property or null if the necessary methods don't exist on the underlying class  
 	 */
 	public static NamedValueProperty getNamedValueProperty(Configuration configuration, String name, Class type) {		

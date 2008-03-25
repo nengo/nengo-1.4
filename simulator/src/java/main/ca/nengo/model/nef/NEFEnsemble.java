@@ -118,7 +118,7 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	 *   
 	 * @param baseTermination The Termination that is to be biased (so that projections to it consist of weights of a single sign) 
 	 * @param interneuronTauPSC Time constant of post-synaptic current decay  of inhibitory termination from interneurons onto this ensemble 
-	 * @param biasDecoders The decoding weights of the associated BiasOrigin  
+	 * @param biasDecoder The decoding weights of the associated BiasOrigin  
 	 * @param functionDecoders The decoding vectors of the BiasOrigin's associated base origin
 	 * @return A pair of BiasTerminations: the first is to receive direct input from a BiasOrigin and the second is to receive input from 
 	 * 		the interneuron ensemble associated with the BiasOrigin (see BiasOrigin.getInterneurons()) 

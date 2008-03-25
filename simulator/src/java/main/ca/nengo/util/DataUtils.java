@@ -145,8 +145,7 @@ public class DataUtils {
 	 * Attempts to sort a SpikePattern by properties of the associated neurons. 
 	 * 
 	 * @param pattern A SpikePattern
-	 * @param neurons The neurons from which the pattern originates
-	 * @param encoders Encoding vectors for each neuron (can be null)
+	 * @param ensemble Ensemble from which spikes come
 	 * @return A SpikePattern that is re-ordered according to neuron properties, if possible
 	 */
 	public static SpikePattern sort(SpikePattern pattern, Ensemble ensemble) {

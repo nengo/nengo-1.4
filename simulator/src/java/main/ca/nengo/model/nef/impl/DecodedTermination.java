@@ -65,7 +65,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private boolean myModulatory;
 	
 	/**
-	 * @param Node The parent Node
+	 * @param node The parent Node
 	 * @param name The name of this Termination
 	 * @param transform A matrix that maps input (which has the dimension of this Termination)  
 	 * 		onto the state space represented by the NEFEnsemble to which the Termination belongs

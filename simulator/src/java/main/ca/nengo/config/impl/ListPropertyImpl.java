@@ -53,7 +53,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	/**
 	 * @param configuration Configuration to which this Property belongs
 	 * @param name Parameter name
-	 * @param c Parameter type
+	 * @param type Parameter type
 	 * @return Property or null if the necessary methods don't exist on the underlying class  
 	 */
 	public static ListProperty getListProperty(Configuration configuration, String name, Class type) {

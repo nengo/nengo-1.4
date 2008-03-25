@@ -308,7 +308,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	}
 
 	/**
-	 * @see ca.nengo.model.nef.NEFEnsemble#addDecodedTermination(java.lang.String, float[][], float[], float[], boolean)
+	 * @see ca.nengo.model.nef.NEFEnsemble#addDecodedTermination(java.lang.String, float[][], float[], float[], float, boolean)
 	 */
 	public Termination addDecodedTermination(String name, float[][] matrix, float[] tfNumerator, float[] tfDenominator, 
 			float passthrough, boolean isModulatory) throws StructuralException {

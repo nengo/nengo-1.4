@@ -64,15 +64,14 @@ public interface Probe {
 	 * @return All collected data since last reset()
 	 */
 	public TimeSeries getData();
-	
+
 	/**
-	 * @param target The object about which state history is to be collected 
+	 * @return The object about which state history is to be collected
 	 */
 	public Probeable getTarget();
 
 	/**
-	 * @param stateName
-	 *            The name of the state variable to collect
+	 * @return The name of the state variable to collect
 	 */
 	public String getStateName();
 

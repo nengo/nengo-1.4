@@ -29,7 +29,7 @@ public class TemplateProperty extends AbstractProperty implements SingleValuedPr
 	}
 
 	/**
-	 * @see ca.nengo.config.Property#getValue()
+	 * @see ca.nengo.config.SingleValuedProperty#getValue()
 	 */
 	public Object getValue() {
 		return myValue;
@@ -43,7 +43,7 @@ public class TemplateProperty extends AbstractProperty implements SingleValuedPr
 	}
 
 	/**
-	 * @see ca.nengo.config.Property#setValue(java.lang.Object)
+	 * @see ca.nengo.config.SingleValuedProperty#setValue(java.lang.Object)
 	 */
 	public void setValue(Object value) throws StructuralException {
 		checkClass(value);

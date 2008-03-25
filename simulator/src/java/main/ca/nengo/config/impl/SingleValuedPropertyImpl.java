@@ -20,7 +20,7 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	/**
 	 * @param configuration Configuration to which this Property belongs
 	 * @param name Parameter name
-	 * @param c Parameter type
+	 * @param type Parameter type
 	 * @return Property or null if the necessary methods don't exist on the underlying class  
 	 */
 	public static SingleValuedProperty getSingleValuedProperty(Configuration configuration, String name, Class type) {
@@ -70,9 +70,9 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 		myGetter = getter;
 		mySetter = setter;
 	}
-	
+
 	/**
-	 * @see ca.nengo.config.Property#getValue()
+	 * @see ca.nengo.config.SingleValuedProperty#getValue()
 	 */
 	public Object getValue() {
 		Object result = null;

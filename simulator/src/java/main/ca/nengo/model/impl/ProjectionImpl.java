@@ -42,7 +42,7 @@ public class ProjectionImpl implements Projection {
 	/**
 	 * @param origin  The Origin at the start of this Projection
 	 * @param termination  The Termination at the end of this Projection
-	 * @param Network The Network of which this Projection is a part 
+	 * @param network The Network of which this Projection is a part 
 	 */
 	public ProjectionImpl(Origin origin, Termination termination, Network network) {
 		myOrigin = origin;
