@@ -69,14 +69,14 @@ public abstract class UINodeViewable extends UINeoNode {
 
 		}
 
-		menu.addAction(new StandardAction("Brain View (under construction)") {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void action() throws ActionException {
-				createBrainViewer();
-			}
-		});
+//		menu.addAction(new StandardAction("Brain View (under construction)") {
+//			private static final long serialVersionUID = 1L;
+//
+//			@Override
+//			protected void action() throws ActionException {
+//				createBrainViewer();
+//			}
+//		});
 	}
 
 	/**
