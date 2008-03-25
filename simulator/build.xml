@@ -70,13 +70,13 @@
 	    </javac>
 
 	    <copy todir="${classes}/ca/nengo/config">
-	        <fileset dir="${src}/java/main/ca/nengo/config">
+	        <fileset dir="${src}/resources/ca/nengo/config">
 	            <include name="*.txt"/>
 	    	</fileset>
 	    </copy>    
 
 	    <copy todir="${classes}/ca/nengo/config/ui">
-	        <fileset dir="${src}/java/main/ca/nengo/config/ui">
+	        <fileset dir="${src}/resources/ca/nengo/config/ui">
 	            <include name="*.jpg"/>
 	            <include name="*.JPG"/>
 	            <include name="*.gif"/>
@@ -84,6 +84,18 @@
 	    	</fileset>
 	    </copy>    
 
+	    <copy todir="${classes}/ca/nengo/plot">
+	        <fileset dir="${src}/resources/ca/nengo/plot">
+	            <include name="*.png"/>
+	    	</fileset>
+	    </copy>    
+		
+	    <copy todir="${classes}/ca/nengo/ui">
+	        <fileset dir="${src}/resources/ca/nengo/ui">
+	            <include name="*.png"/>
+	    	</fileset>
+	    </copy>    
+		
 	</target>
 	
 	
