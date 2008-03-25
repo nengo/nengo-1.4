@@ -55,9 +55,9 @@ public class CNEFEnsemble extends ConstructableNode {
 	/**
 	 * Config descriptors
 	 */
-	static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(
-			new Property[] { pNumOfNodes, pDim }, new Property[] { pApproximator,
-					pEncodingDistribution, pEncodingSign, pNodeFactory });
+	static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(new Property[] { pNumOfNodes,
+			pDim, pNodeFactory }, new Property[] { pApproximator, pEncodingDistribution,
+			pEncodingSign });
 
 	public CNEFEnsemble() {
 		super();
