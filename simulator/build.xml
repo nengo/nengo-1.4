@@ -65,7 +65,7 @@
 	        <classpath refid="classpath" />
 	 		<classpath>
 	 			<pathelement path="${classes}" />
-	 			<pathelement path="${test-classes}" />
+	 			<!--<pathelement path="${test-classes}" />-->
 	 		</classpath>
 	    </javac>
 
