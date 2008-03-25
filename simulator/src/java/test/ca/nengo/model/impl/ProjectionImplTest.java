@@ -3,8 +3,6 @@
  */
 package ca.nengo.model.impl;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -78,7 +76,7 @@ public class ProjectionImplTest extends TestCase {
 		}
 
 		public InstantaneousOutput getValues() {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public Node getNode() {
@@ -113,11 +111,11 @@ public class ProjectionImplTest extends TestCase {
 		}
 
 		public void setValues(InstantaneousOutput values) throws SimulationException {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public void propertyChange(String propertyName, Object newValue) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public Node getNode() {

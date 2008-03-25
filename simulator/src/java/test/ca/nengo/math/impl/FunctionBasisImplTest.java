@@ -3,8 +3,6 @@
  */
 package ca.nengo.math.impl;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import ca.nengo.math.Function;
 import ca.nengo.math.FunctionBasis;
 import ca.nengo.math.impl.FunctionBasisImpl;
@@ -63,7 +61,7 @@ public class FunctionBasisImplTest extends TestCase {
 		}
 
 		public float[] multiMap(float[][] from) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 		
 		@Override

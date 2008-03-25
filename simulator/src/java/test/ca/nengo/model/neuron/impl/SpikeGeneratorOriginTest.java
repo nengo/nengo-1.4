@@ -1,7 +1,5 @@
 package ca.nengo.model.neuron.impl;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
@@ -93,7 +91,7 @@ public class SpikeGeneratorOriginTest extends TestCase {
 		}
 
 		public void reset(boolean randomize) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public SimulationMode getMode() {

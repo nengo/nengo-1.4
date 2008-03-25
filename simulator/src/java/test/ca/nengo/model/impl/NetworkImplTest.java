@@ -6,8 +6,6 @@ package ca.nengo.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
@@ -134,69 +132,69 @@ public class NetworkImplTest extends TestCase {
 		}
 
 		public Node[] getNodes() {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public void addNeuron(Neuron neuron) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public void removeNeuron(int index) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public Origin[] getOrigins() {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public Termination[] getTerminations() {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public void setMode(SimulationMode mode) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public SimulationMode getMode() {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public void run(float startTime, float endTime)
 				throws SimulationException {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public void reset(boolean randomize) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public Origin getOrigin(String name) throws StructuralException {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public Termination getTermination(String name)
 				throws StructuralException {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public SpikePattern getSpikePattern() {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public void collectSpikes(boolean collect) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public String getDocumentation() {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public void setDocumentation(String text) {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		public boolean isCollectingSpikes() {
-			throw new NotImplementedException("not implemented");
+			throw new RuntimeException("not implemented");
 		}
 
 		/**
