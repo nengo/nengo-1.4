@@ -57,7 +57,7 @@ public class TimeSeriesFunction extends AbstractFunction {
 	
 	private int myDimension;
 	private TimeSeries myTimeSeries;
-	private InterpolatorND myInterpolator;
+	private transient InterpolatorND myInterpolator;
 	
 	/**
 	 * @param series TimeSeries from which to obtain Function of time 
@@ -105,6 +105,7 @@ public class TimeSeriesFunction extends AbstractFunction {
 	 * @see ca.nengo.math.impl.AbstractFunction#map(float[])
 	 */
 	public float map(float[] from) {
+		if (myInterpolator == null) myInterpolator = new LinearInterpolatorND(myTimeSeries);
 		return myInterpolator.interpolate(from[0])[myDimension];
 	}
 
