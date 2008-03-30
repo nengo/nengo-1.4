@@ -153,7 +153,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		
 		myConfigurationTree = new JTree(new Object[0]);
 		
-		if (myConfigurationTree.getUI().getClass().getName().equals("apple.laf.AquaTreeUI")) {
+		if (myConfigurationTree.getUI().getClass().getName().contains("apple.laf")) {
 			AquaTreeUI aui = new AquaTreeUI();
 			myConfigurationTree.setUI(aui);
 			aui.setRowHeight(-1); //must be done after setUI(...)

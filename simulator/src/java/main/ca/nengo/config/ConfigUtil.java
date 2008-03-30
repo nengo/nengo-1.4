@@ -139,7 +139,7 @@ public class ConfigUtil {
 
 			myTree = new JTree(model);
 
-			if (myTree.getUI().getClass().getName().equals("apple.laf.AquaTreeUI")) {
+			if (myTree.getUI().getClass().getName().contains("apple.laf")) {
 				AquaTreeUI aui = new AquaTreeUI();
 				myTree.setUI(aui);
 				aui.setRowHeight(-1); //must be done after setUI(...)

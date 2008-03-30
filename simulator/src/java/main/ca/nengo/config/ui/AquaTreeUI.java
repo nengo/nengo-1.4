@@ -31,7 +31,7 @@ package ca.nengo.config.ui;
 import javax.swing.plaf.basic.BasicTreeUI;
 
 /**
- * To be used in place of the Mac look & feel AquaTreeUI, which seems not to  
+ * To be used in place of the Mac look & feel apple.laf.AquaTreeUI (and CUIAquaTree), which seem not to  
  * respect differences in tree cell size, or to expand tree cells when they change size.  
  * 
  * @author Bryan Tripp
