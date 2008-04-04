@@ -87,6 +87,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private float[] myStaticBias;	
 	private float myTau;
 	private boolean myModulatory;
+	private float[][] myInitialState;
 	
 	/**
 	 * @param node The parent Node
@@ -118,7 +119,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		myOutputValues = new float[transform.length];
 		
 		setDynamics(dynamics);
-		myScalingTermination = null;
+		myScalingTermination = null;				
 	}
 	
 	//copies dynamics for to each dimension
@@ -135,6 +136,10 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			} catch (CloneNotSupportedException e) {
 				throw new Error("The clone() operation is not supported by the given dynamics object");
 			}
+		}
+		//zero corresponding initial state if necessary
+		if (myInitialState == null || myInitialState[0].length != newDynamics[0].getState().length) {
+			initInitialState();					
 		}
 		
 		myDynamics = newDynamics;
@@ -177,7 +182,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		RealOutput ro = (RealOutput) values;
 		myInputValues = new RealOutputImpl(MU.sum(ro.getValues(), myStaticBias), ro.getUnits(), ro.getTime());
 	}
-	
+		
 	/**
 	 * @param startTime Simulation time at which running is to start
 	 * @param endTime Simulation time at which running is to end
@@ -246,9 +251,39 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 */
 	public void reset(boolean randomize) {
 		for (int i = 0; myDynamics != null && i < myDynamics.length; i++) {
-			myDynamics[i].setState(new float[myDynamics[i].getState().length]);			
+			float[] state = myInitialState != null ? myInitialState[i] : new float[myDynamics[i].getState().length];  
+			myDynamics[i].setState(state);			
 		}
 		myInputValues = null;
+	}
+	
+	/**
+	 * @return Initial states of dynamics (one row per output dimension)
+	 */
+	public float[][] getInitialState() {
+		if (myInitialState == null) initInitialState();
+		return MU.clone(myInitialState);
+	}
+
+	/**
+	 * @param state Initial state of dynamics (dimension of termination output X dimension of dynamics state)
+	 */
+	public void setInitialState(float[][] state) {
+		if (state.length != myDynamics.length) {
+			throw new IllegalArgumentException("Must give one state vector for each output dimension");
+		}
+		if (!MU.isMatrix(state) || state[0].length != myDynamicsTemplate.getState().length) {
+			throw new IllegalArgumentException("Each state vector must be length " + myDynamicsTemplate.getState().length);
+		}
+		
+		myInitialState = state;
+	}
+	
+	private void initInitialState() {
+		myInitialState = new float[myOutputDimension][];
+		for (int i = 0; i < myOutputDimension; i++) {
+			myInitialState[i] = new float[myDynamics[i].getState().length];
+		}
 	}
 
 	/**
