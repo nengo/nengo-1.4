@@ -137,12 +137,12 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 				throw new Error("The clone() operation is not supported by the given dynamics object");
 			}
 		}
+		myDynamics = newDynamics;
+		
 		//zero corresponding initial state if necessary
 		if (myInitialState == null || myInitialState[0].length != newDynamics[0].getState().length) {
 			initInitialState();					
-		}
-		
-		myDynamics = newDynamics;
+		}		
 	}
 
 	/**
