@@ -549,7 +549,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		AbstractEnsemble result = (AbstractEnsemble) super.clone();
 		
 		Node[] oldNodes = getNodes();
-		Node[] nodes = new Node[oldNodes.length];
+		Node[] nodes = oldNodes.clone(); //use clone rather than new Node[] to retain array type, e.g. NEFNode[]
 		for (int i = 0; i < nodes.length; i++) {
 			nodes[i] = oldNodes[i].clone();
 		}
