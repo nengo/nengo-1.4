@@ -77,6 +77,21 @@ public class MU {
 	}
 	
 	/**
+	 * @param matrix Any matrix
+	 * @return An identical but independent copy of the given matrix
+	 */
+	public static double[][] clone(double[][] matrix) {
+		double[][] result = new double[matrix.length][];
+		
+		for (int i = 0; i < matrix.length; i++) {
+			result[i] = new double[matrix[i].length];
+			System.arraycopy(matrix[i], 0, result[i], 0, matrix[i].length);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Unlike System.arraycopy, this function copies the source matrix into the destination
 	 * while preserving the original row length. It copies the full source.
 	 * 
@@ -686,6 +701,24 @@ public class MU {
 		}
 		
 		return sum / (float) vector.length;
+	}
+	
+	/**
+	 * @param matrix Any matrix
+	 * @return Mean of matrix elements
+	 */
+	public static float mean(float[][] matrix) {
+		float sum = 0f;
+		float count = 0f;
+		
+		for (int i = 1; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				sum += matrix[i][j];
+				count++;
+			}
+		}
+		
+		return sum/count;
 	}
 	
 	/**

@@ -84,10 +84,11 @@ public class BiasOrigin extends DecodedOrigin {
 	 * 
 	 * @param baseWeights Matrix of synaptic weights in the unbiased projection (ie the weights of mixed sign)  
 	 * @param biasEncoders Encoders of the bias dimension on the post-synaptic ensemble 
+	 * @param excitatory If true, weights are to be kept positive (otherwise negative)
 	 */
-	public void optimizeDecoders(float[][] baseWeights, float[] biasEncoders) {
+	public void optimizeDecoders(float[][] baseWeights, float[] biasEncoders, boolean excitatory) {
 		float[][] evalPoints = MU.transpose(new float[][]{new float[myConstantOutputs[0].length]}); //can use anything here because target function is constant
-		GradientDescentApproximator.Constraints constraints = new BiasEncodersMaintained(baseWeights, biasEncoders);
+		GradientDescentApproximator.Constraints constraints = new BiasEncodersMaintained(baseWeights, biasEncoders, excitatory);
 		GradientDescentApproximator approximator = new GradientDescentApproximator(evalPoints, MU.clone(myConstantOutputs), constraints, true);
 		approximator.setStartingCoefficients(MU.transpose(getDecoders())[0]);
 		float[] newDecoders = approximator.findCoefficients(new ConstantFunction(1, 0));
@@ -106,9 +107,13 @@ public class BiasOrigin extends DecodedOrigin {
 		float[] range = this.getRange();
 		range[0] = range[0] - .25f * (range[1] - range[0]); //avoid distorted area near zero in interneurons 
 		interneuronTermination.setStaticBias(new float[]{-range[0]});
-		interneuronTermination.getTransform()[0][0] = 1f / (range[1] - range[0]);
-		biasTermination.setStaticBias(new float[]{range[0]/(range[1] - range[0])});
-		biasTermination.getTransform()[0][0] = -(range[1] - range[0]);				
+		biasTermination.setStaticBias(MU.sum(biasTermination.getStaticBias(), new float[]{range[0]/(range[1] - range[0])}));
+		try {
+			interneuronTermination.setTransform(new float[][]{new float[]{1f / (range[1] - range[0])}});
+			biasTermination.setTransform(new float[][]{new float[]{-(range[1] - range[0])}});				
+		} catch (StructuralException e) {
+			throw new RuntimeException("Problem parameterizing termination",  e);
+		}
 	}
 	
 	/**
@@ -147,21 +152,18 @@ public class BiasOrigin extends DecodedOrigin {
 		if (excitatoryProjection) {
 			ef = new NEFEnsembleFactoryImpl();
 		} else {
-			ef = new NEFEnsembleFactoryImpl() {
+			ef = new NEFEnsembleFactoryImpl() { //TODO: somebody's holding onto this and it prevents serialization
 				protected void addDefaultOrigins(NEFEnsemble ensemble) throws StructuralException {
 					Function f = new AbstractFunction(1) {
 						private static final long serialVersionUID = 1L;
 						public float map(float[] from) {
-							return -1 - from[0];
+							return 1 + from[0];
 						}
 					};
 					ensemble.addDecodedOrigin(NEFEnsemble.X, new Function[]{f}, Neuron.AXON);
 				}
 			};
 		}
-		//TODO: handle additional bias in inhibitory case 
-		
-		new NEFEnsembleFactoryImpl();
 		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory(), true));
 		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? .5f : -.5f));
 		
@@ -170,7 +172,7 @@ public class BiasOrigin extends DecodedOrigin {
 		PDF maxRatePDF = excitatoryProjection ? new IndicatorPDF(200f, 500f) : new IndicatorPDF(400f, 800f);
 		ef.setNodeFactory(new LIFNeuronFactory(.02f, .0001f, maxRatePDF, interceptPDF));
 		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(
-				new GradientDescentApproximator.CoefficientsSameSign(excitatoryProjection), false)); 
+				new GradientDescentApproximator.CoefficientsSameSign(true), false)); 
 		
 		return ef.make(name, num, 1);
 	}
@@ -187,12 +189,14 @@ public class BiasOrigin extends DecodedOrigin {
 
 		private static final long serialVersionUID = 1L;
 		
-		private float[][] myBaseWeights;
-		private float[] myBiasEncoders; 
+		private double[][] myBaseWeights;
+		private double[] myBiasEncoders; 
+		private boolean myExcitatory;
 		
-		public BiasEncodersMaintained(float[][] baseWeights, float[] biasEncoders) {
-			myBaseWeights = baseWeights;
-			myBiasEncoders = biasEncoders;
+		public BiasEncodersMaintained(float[][] baseWeights, float[] biasEncoders, boolean excitatory) {
+			myBaseWeights = MU.convert(baseWeights);
+			myBiasEncoders = MU.convert(biasEncoders);
+			myExcitatory = excitatory;
 		}
 		
 		public boolean correct(float[] coefficients) {
@@ -201,27 +205,33 @@ public class BiasOrigin extends DecodedOrigin {
 			for (int i = 0; i < coefficients.length; i++) {
 				boolean corrected = false;
 
-				if (coefficients[i] < 0) { //next correction will fail
+				if (myExcitatory && coefficients[i] < 0) { //next correction will fail
 					coefficients[i] = Float.MIN_VALUE; 
 					corrected = true;
+				} else if (!myExcitatory && coefficients[i] > 0) {
+					coefficients[i] = - Float.MIN_VALUE; 
+					corrected = true;						
 				}
 				
 				for (int j = 0; j < myBiasEncoders.length; j++) {
 					if ( - myBaseWeights[j][i] / coefficients[i] > myBiasEncoders[j] )  {
-						coefficients[i] = - myBaseWeights[j][i] / myBiasEncoders[j];
+						coefficients[i] = - (float) (myBaseWeights[j][i] / myBiasEncoders[j]);
 						corrected = true;
 					}
 				}
 				
 				if (!corrected) allCorrected = false;
-			}
+			}				
 			
 			return allCorrected;
 		}
 
 		@Override
 		public Constraints clone() throws CloneNotSupportedException {
-			return new BiasEncodersMaintained(MU.clone(myBaseWeights), myBiasEncoders.clone());
+			BiasEncodersMaintained result = (BiasEncodersMaintained) super.clone();
+			result.myBaseWeights = MU.clone(myBaseWeights);
+			result.myBiasEncoders = myBiasEncoders.clone();
+			return result;
 		}
 		
 	}

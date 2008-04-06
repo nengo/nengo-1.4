@@ -42,7 +42,6 @@ import ca.nengo.model.nef.impl.BiasOrigin;
 import ca.nengo.model.nef.impl.BiasTermination;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.DecodedTermination;
-import ca.nengo.plot.Plotter;
 import ca.nengo.util.MU;
 
 /**
@@ -138,11 +137,11 @@ public class ProjectionImpl implements Projection {
 				
 		myBiasOrigin = pre.addBiasOrigin(baseOrigin, numInterneurons, getUniqueNodeName(post.getName() + ":" + baseTermination.getName()), excitatory);
 		myInterneurons = myBiasOrigin.getInterneurons();
-		Plotter.plot(myInterneurons, NEFEnsemble.X);
 		myNetwork.addNode(myInterneurons);		
 		BiasTermination[] bt = post.addBiasTerminations(baseTermination, tauBias, myBiasOrigin.getDecoders(), baseOrigin.getDecoders());
 		myDirectBT = bt[0];
 		myIndirectBT = bt[1];
+		if (!excitatory) myIndirectBT.setStaticBias(new float[]{-1}); 
 		float[][] tf = new float[][]{new float[]{0, 1/tauInterneurons/tauInterneurons}, new float[]{2/tauInterneurons, 1/tauInterneurons/tauInterneurons}};
 		myInterneuronTermination = (DecodedTermination) myInterneurons.addDecodedTermination("bias", MU.I(1), tf[0], tf[1], 0, false); 
 		
@@ -152,7 +151,7 @@ public class ProjectionImpl implements Projection {
 		
 		if (optimize) {
 			float[][] baseWeights = MU.prod(post.getEncoders(), MU.prod(baseTermination.getTransform(), MU.transpose(baseOrigin.getDecoders())));			
-			myBiasOrigin.optimizeDecoders(baseWeights, myDirectBT.getBiasEncoders());
+			myBiasOrigin.optimizeDecoders(baseWeights, myDirectBT.getBiasEncoders(), excitatory);
 			myBiasOrigin.optimizeInterneuronDomain(myInterneuronTermination, myIndirectBT);
 		}
 		
