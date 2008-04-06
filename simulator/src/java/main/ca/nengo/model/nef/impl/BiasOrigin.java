@@ -152,14 +152,14 @@ public class BiasOrigin extends DecodedOrigin {
 		if (excitatoryProjection) {
 			ef = new NEFEnsembleFactoryImpl();
 		} else {
-			ef = new NEFEnsembleFactoryImpl() { //TODO: somebody's holding onto this and it prevents serialization
+			final Function f = new AbstractFunction(1) {
+				private static final long serialVersionUID = 1L;
+				public float map(float[] from) {
+					return 1 + from[0];
+				}
+			};
+			ef = new NEFEnsembleFactoryImpl() { 
 				protected void addDefaultOrigins(NEFEnsemble ensemble) throws StructuralException {
-					Function f = new AbstractFunction(1) {
-						private static final long serialVersionUID = 1L;
-						public float map(float[] from) {
-							return 1 + from[0];
-						}
-					};
 					ensemble.addDecodedOrigin(NEFEnsemble.X, new Function[]{f}, Neuron.AXON);
 				}
 			};
@@ -176,7 +176,7 @@ public class BiasOrigin extends DecodedOrigin {
 		
 		return ef.make(name, num, 1);
 	}
-
+	
 	/**
 	 * @return An ensemble of interneurons through which this Origin must project (in parallel with its 
 	 * 		direct projection) to compensate for the bias introduced by making all weights the same sign.  
