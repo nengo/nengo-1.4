@@ -70,6 +70,7 @@ public class JavaSourceParser {
 	 */
 	public static void addSource(File baseDir) {
 		ourBuilder.addSourceTree(baseDir);
+		ourLogger.debug("Adding source tree: " + baseDir.getAbsolutePath());
 	}
 	
 	/**
