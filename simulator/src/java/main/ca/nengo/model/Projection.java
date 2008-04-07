@@ -58,7 +58,7 @@ public interface Projection extends Serializable {
 	 * of interneurons. See Parisien, Anderson & Eliasmith, 2007, Neural Computation for more detail.  
 	 *   
 	 * @param numInterneurons Number of interneurons through which bias function is projected
-	 * @param tauInterneurons Time constant of post-synaptic current in projection from presynaptic ensemble to interneurons
+	 * @param tauInterneurons Time constant of post-synaptic current in projection from presynaptic ensemble to interneurons (typically short)
 	 * @param tauBias Time constant of post-synaptic current in projection from interneurons to postsynaptic ensemble
 	 * @param excitatory If true, synapses in main projection are made excitatory; if false, inhibitory 
 	 * @param optimize If true, performs optimizations to minimize distortion in the parallel projection through interneurons
