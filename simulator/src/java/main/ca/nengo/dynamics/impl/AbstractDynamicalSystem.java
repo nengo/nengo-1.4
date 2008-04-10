@@ -27,10 +27,6 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.dynamics.impl;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.apache.log4j.Logger;
-
 import ca.nengo.dynamics.DynamicalSystem;
 import ca.nengo.model.Units;
 
@@ -41,8 +37,6 @@ import ca.nengo.model.Units;
  */
 public abstract class AbstractDynamicalSystem implements DynamicalSystem {
 
-	private static Logger ourLogger = Logger.getLogger(AbstractDynamicalSystem.class);
-	
 	private float[] myState;
 	
 	public AbstractDynamicalSystem(float[] state) {
@@ -94,33 +88,9 @@ public abstract class AbstractDynamicalSystem implements DynamicalSystem {
 
 	@Override
 	public DynamicalSystem clone() throws CloneNotSupportedException {
-		try {
-			return (DynamicalSystem) this.getClass().getConstructor(new Class[]{float[].class}).newInstance(new Object[]{myState});
-		} catch (SecurityException e) {
-			ourLogger.error("Default clone implementation failed.", e);
-			throw new CloneNotSupportedException("Default clone implementation doesn't work with this DynamicalSystem: " 
-					+ e.getMessage());
-		} catch (NoSuchMethodException e) {
-			ourLogger.error("Default clone implementation failed.", e);
-			throw new CloneNotSupportedException("Default clone implementation doesn't work with this DynamicalSystem: " 
-					+ e.getMessage());
-		} catch (IllegalArgumentException e) {
-			ourLogger.error("Default clone implementation failed.", e);
-			throw new CloneNotSupportedException("Default clone implementation doesn't work with this DynamicalSystem: " 
-					+ e.getMessage());
-		} catch (InstantiationException e) {
-			ourLogger.error("Default clone implementation failed.", e);
-			throw new CloneNotSupportedException("Default clone implementation doesn't work with this DynamicalSystem: " 
-					+ e.getMessage());
-		} catch (IllegalAccessException e) {
-			ourLogger.error("Default clone implementation failed.", e);
-			throw new CloneNotSupportedException("Default clone implementation doesn't work with this DynamicalSystem: " 
-					+ e.getMessage());
-		} catch (InvocationTargetException e) {
-			ourLogger.error("Default clone implementation failed.", e);
-			throw new CloneNotSupportedException("Default clone implementation doesn't work with this DynamicalSystem: " 
-					+ e.getMessage());
-		}
+		AbstractDynamicalSystem result = (AbstractDynamicalSystem) super.clone();
+		result.myState = myState.clone();
+		return result;
 	}
 	
 }

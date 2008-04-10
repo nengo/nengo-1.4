@@ -29,6 +29,13 @@ package ca.nengo.model.nef.impl;
 
 import org.apache.log4j.Logger;
 
+import ca.nengo.config.ConfigUtil;
+import ca.nengo.config.Configurable;
+import ca.nengo.config.Configuration;
+import ca.nengo.config.impl.ConfigurationImpl;
+import ca.nengo.dynamics.DynamicalSystem;
+import ca.nengo.dynamics.Integrator;
+import ca.nengo.dynamics.impl.EulerIntegrator;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
 import ca.nengo.model.InstantaneousOutput;
@@ -45,8 +52,10 @@ import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.util.MU;
+import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VectorGenerator;
 import ca.nengo.util.impl.RandomHypersphereVG;
+import ca.nengo.util.impl.TimeSeries1DImpl;
 
 /**
  * An Origin of functions of the state variables of an NEFEnsemble. 
@@ -56,7 +65,7 @@ import ca.nengo.util.impl.RandomHypersphereVG;
  * 
  * @author Bryan Tripp
  */
-public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeConfigurable, Noise.Noisy {
+public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeConfigurable, Noise.Noisy, Configurable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -72,6 +81,9 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private RealOutput myOutput;
 	private Noise myNoise = null;
 	private Noise[] myNoises = null;
+	private DynamicalSystem mySTPDynamicsTemplate;
+	private DynamicalSystem[] mySTPDynamics;
+	private Integrator myIntegrator;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings. 
@@ -100,6 +112,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myFunctions = functions; 
 		myDecoders = findDecoders(nodes, functions, approximator);  
 		myMode = SimulationMode.DEFAULT;
+		myIntegrator = new EulerIntegrator(.001f);
 		
 		reset(false);
 	}
@@ -145,8 +158,18 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myFunctions = functions;
 		myDecoders = decoders;
 		myMode = SimulationMode.DEFAULT;
+		myIntegrator = new EulerIntegrator(.001f);
 		
 		reset(false);
+	}
+	
+	/**
+	 * @see ca.nengo.config.Configurable#getConfiguration()
+	 */
+	public Configuration getConfiguration() {
+		ConfigurationImpl result = (ConfigurationImpl) ConfigUtil.defaultConfiguration(this);
+		result.renameProperty("sTPDynamics", "STPDynamics");
+		return result;
 	}
 	
 	/**
@@ -258,6 +281,34 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		return myDecoders;
 	}
 
+	public DynamicalSystem getSTPDynamics() {
+		try {
+			return mySTPDynamicsTemplate == null ? null : mySTPDynamicsTemplate.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void setSTPDynamics(DynamicalSystem dynamics) {
+		if (dynamics == null) {
+			mySTPDynamics = new DynamicalSystem[myNodes.length];			
+		} else {
+			if (dynamics.getInputDimension() != 1 || dynamics.getOutputDimension() != 1) {
+				throw new IllegalArgumentException("Short-term-plasticity dynamics must be single-input-single-output");
+			}
+			
+			mySTPDynamics = new DynamicalSystem[myNodes.length];
+			try {
+				mySTPDynamicsTemplate = dynamics.clone();
+				for (int i = 0; i < mySTPDynamics.length; i++) {
+					mySTPDynamics[i] = mySTPDynamicsTemplate.clone();
+				}
+			} catch (CloneNotSupportedException e) {
+				throw new RuntimeException(e);
+			}			
+		}
+	}
+	
 	/**
 	 * @param decoders New decoding vectors (row per Node)
 	 */
@@ -321,7 +372,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 							+ ". DecodedOrigin can only deal with RealOutput and SpikeOutput, so it apparently has to be updated");
 					}
 					
-					float[] decoder = myDecoders[i];
+					float[] decoder = getDynamicDecoder(i, val, startTime, endTime);					
 					for (int j = 0; j < values.length; j++) {
 						values[j] += val * decoder[j];
 					}
@@ -338,6 +389,18 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		}
 		
 		myOutput = new RealOutputImpl(values, Units.UNK, endTime);
+	}
+	
+	private float[] getDynamicDecoder(int i, float input, float startTime, float endTime) {
+		float[] result = myDecoders[i];
+		if (mySTPDynamicsTemplate != null) { //TODO: could use a NullDynamics here instead of null (to allow nulling in config tree)
+			//TODO: could recycle a mutable time series here to avoid object creation
+			TimeSeries inputSeries = new TimeSeries1DImpl(new float[]{startTime, endTime}, new float[]{input, input}, Units.UNK);
+			TimeSeries outputSeries = myIntegrator.integrate(mySTPDynamics[i], inputSeries);
+			float scaleFactor = outputSeries.getValues()[outputSeries.getValues().length-1][0];
+			result = MU.prod(result, scaleFactor);
+		}
+		return result;
 	}
 	
 	/**
