@@ -85,6 +85,23 @@ public class ConfigurationImpl implements Configuration {
 		myPropertyNames.remove(name);
 	}
 	
+	/**
+	 * @param oldName The existing name of the Property
+	 * @param newName The replacement name of the Property
+	 */
+	public void renameProperty(String oldName, String newName) {
+		if (myPropertyNames.contains(oldName)) {
+			int index = myPropertyNames.indexOf(oldName);
+			myPropertyNames.remove(index);
+			myPropertyNames.add(index, newName);
+			Property p = myProperties.remove(oldName);
+			p.setName(newName);
+			myProperties.put(newName, p);
+		} else {
+			throw new IllegalArgumentException("There is no Property named " + oldName);
+		}
+	}
+	
 	public SingleValuedPropertyImpl defineSingleValuedProperty(String name, Class c, boolean mutable) {				
 		SingleValuedPropertyImpl property 
 			= (SingleValuedPropertyImpl) SingleValuedPropertyImpl.getSingleValuedProperty(this, name, c);

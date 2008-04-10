@@ -37,6 +37,11 @@ public interface Property {
 	public String getName();
 	
 	/**
+	 * @param name New Property name
+	 */
+	public void setName(String name);
+	
+	/**
 	 * @return Class to which values belong
 	 */
 	public Class getType();

@@ -67,6 +67,13 @@ public abstract class AbstractProperty implements Property {
 	}
 	
 	/**
+	 * @see ca.nengo.config.Property#setName(java.lang.String)
+	 */
+	public void setName(String name) {
+		myName = name;
+	}
+
+	/**
 	 * @see ca.nengo.config.Property#getType()
 	 */
 	public Class getType() {
