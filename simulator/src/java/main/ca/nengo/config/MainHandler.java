@@ -44,6 +44,7 @@ import ca.nengo.config.handlers.BooleanHandler;
 import ca.nengo.config.handlers.EnumHandler;
 import ca.nengo.config.handlers.FloatHandler;
 import ca.nengo.config.handlers.IntegerHandler;
+import ca.nengo.config.handlers.LongHandler;
 import ca.nengo.config.handlers.MatrixHandler;
 import ca.nengo.config.handlers.StringHandler;
 import ca.nengo.config.handlers.VectorHandler;
@@ -98,6 +99,7 @@ public class MainHandler implements ConfigurationHandler {
 		addHandler(new FloatHandler());
 		addHandler(new StringHandler());
 		addHandler(new IntegerHandler());
+		addHandler(new LongHandler());
 		addHandler(new BooleanHandler());
 		addHandler(new VectorHandler());
 		addHandler(new MatrixHandler());
