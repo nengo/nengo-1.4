@@ -51,6 +51,7 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.nef.NEFEnsemble;
+import ca.nengo.model.plasticity.ShortTermPlastic;
 import ca.nengo.util.MU;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VectorGenerator;
@@ -65,7 +66,7 @@ import ca.nengo.util.impl.TimeSeries1DImpl;
  * 
  * @author Bryan Tripp
  */
-public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeConfigurable, Noise.Noisy, Configurable {
+public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeConfigurable, Noise.Noisy, Configurable, ShortTermPlastic {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -281,6 +282,9 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		return myDecoders;
 	}
 
+	/**
+	 * @see ca.nengo.model.plasticity.ShortTermPlastic#getSTPDynamics()
+	 */
 	public DynamicalSystem getSTPDynamics() {
 		try {
 			return mySTPDynamicsTemplate == null ? null : mySTPDynamicsTemplate.clone();
@@ -289,6 +293,20 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		}
 	}
 	
+	/**
+	 * Provides access to copy of dynamics for an individual node, to allow node-by-node 
+	 * parameterization. 
+	 * 
+	 * @param i Node number 
+	 * @return Dynamics of short-term plasticity for the specified node 
+	 */
+	public DynamicalSystem getSTPDynamics(int i) {
+		return mySTPDynamics[i];
+	}
+
+	/**
+	 * @see ca.nengo.model.plasticity.ShortTermPlastic#setSTPDynamics(ca.nengo.dynamics.DynamicalSystem)
+	 */
 	public void setSTPDynamics(DynamicalSystem dynamics) {
 		if (dynamics == null) {
 			mySTPDynamics = new DynamicalSystem[myNodes.length];			
