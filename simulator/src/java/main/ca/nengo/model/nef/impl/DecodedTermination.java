@@ -26,6 +26,8 @@ package ca.nengo.model.nef.impl;
 
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import ca.nengo.dynamics.Integrator;
 import ca.nengo.dynamics.LinearSystem;
 import ca.nengo.dynamics.impl.CanonicalModel;
@@ -66,6 +68,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private static Logger ourLogger = Logger.getLogger(DecodedTermination.class);
+	
 	/**
 	 * Name of Probeable output state. 
 	 */
@@ -88,6 +92,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private float myTau;
 	private boolean myModulatory;
 	private float[][] myInitialState;
+	private boolean myValuesSet;
 	
 	/**
 	 * @param node The parent Node
@@ -181,6 +186,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 
 		RealOutput ro = (RealOutput) values;
 		myInputValues = new RealOutputImpl(MU.sum(ro.getValues(), myStaticBias), ro.getUnits(), ro.getTime());
+		
+		if (!myValuesSet) myValuesSet = false;
 	}
 		
 	/**
@@ -193,8 +200,9 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			setDynamics(myOutputDimension);
 		}
 		
-		if (myInputValues == null) {
-			throw new SimulationException("Null input values on termination " + myName);
+		if (!myValuesSet) {
+			ourLogger.warn("Input values not set on termination " + myName);
+			myValuesSet = true; //don't want this warning every time step
 		}
 
 		float[][] transform = getTransform();
@@ -254,7 +262,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			float[] state = myInitialState != null ? myInitialState[i] : new float[myDynamics[i].getState().length];  
 			myDynamics[i].setState(state);			
 		}
-		myInputValues = null;
+		myInputValues = new RealOutputImpl(new float[getDimensions()], Units.UNK, 0);
+		myValuesSet = false;
 	}
 	
 	/**
