@@ -5,6 +5,8 @@ package ca.nengo.plot;
 
 import java.awt.BorderLayout;
 import java.awt.Image;
+import java.awt.Color;
+import java.awt.geom.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -19,6 +21,8 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.Range;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -61,6 +65,8 @@ public class ScopeExample {
 			Probe p = network.getSimulator().addProbe(name, FunctionInput.STATE_NAME, true);			
 			network.run(0, 10);
 			
+			animPlotVector(p.getData(), "vector plot", true, 30);
+
 			//... and plot the probed data from the simulation ... 
 			//Plotter.plot(p.getData(), "function output");
 			
@@ -69,8 +75,6 @@ public class ScopeExample {
 			Function g2 = new GaussianPDF(0.5f, 1);			
 			FunctionBasis gaussianBasis = new FunctionBasisImpl(new Function[]{g1, g2});
 			
-			animPlot(p.getData(), gaussianBasis, -3, .001f, 3, "gaussian basis plot");
-
 			//here is a plot of the probed vector X the gaussian basis (value at time 4.5s) ... 			
 			gaussianBasis.setCoefficients(p.getData().getValues()[4500]);
 			//Plotter.plot(gaussianBasis, -3, .001f, 3, "gaussian basis plot");
@@ -91,48 +95,69 @@ public class ScopeExample {
 		}
 	}
 	
-	private static void animPlot(TimeSeries timeSeries, 
-			FunctionBasis functionBasis, float start, float increment, float end, String title) 
-			throws Exception {
-		if (functionBasis.getDimension() > 1) {
-			throw new IllegalArgumentException("Only 1-D functions can be plotted with this method.  "
-					+"There may or may not be a good reason for this.");
-		}
-		
-		final JFrame frame = new JFrame(title);
-		
-		try {
-			Image image = ImageIO.read(ScopeExample.class.getClassLoader().getResource("ca/nengo/plot/spikepattern-grey.png"));
-			frame.setIconImage(image);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        
-        List<ChartPanel> chartPanels = new Vector<ChartPanel>();
-        for(int i=0; i<timeSeries.getValues().length; i+=100) {
+	private static JFrame makeAnimPlotFrame(String title) throws IOException {
+		JFrame r = new JFrame(title);
+		Image image = ImageIO.read(ScopeExample.class.getClassLoader().getResource("ca/nengo/plot/spikepattern-grey.png"));
+		r.setIconImage(image);
+        r.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        r.setVisible(true);
+        return r;
+	}
+	
+	private static List<ChartPanel> makeAnimPlotVectorChartPanels(TimeSeries timeSeries, 
+			boolean scaleRangAxisConstant, int trailLength) {
+        List<ChartPanel> r = new Vector<ChartPanel>();
+        float[][] values = timeSeries.getValues();
+        final int timeInc = 100;
+        for(int curTime=0; curTime<values.length; curTime+=timeInc) {
 	        XYSeriesCollection dataset = new XYSeriesCollection();
-			XYSeries series = new XYSeries("Function");
-			functionBasis.setCoefficients(timeSeries.getValues()[i]);
-			
-			float x = start;
-			while (x <= end) {
-				float y = functionBasis.map(new float[]{x});
-				series.add(x, y);
-				x += increment;
-			}
-			
-			dataset.addSeries(series);
-			
-			JFreeChart chart = ChartFactory.createXYLineChart("Function", "Input", "Output", 
+	        for(int trailPosTime=curTime; 
+	        		trailPosTime>=curTime-trailLength*timeInc && trailPosTime>=0; 
+	        		trailPosTime-=timeInc) {
+				XYSeries series = new XYSeries("trail "+trailPosTime);
+				for(int vecDim=0; vecDim<values[trailPosTime].length; ++vecDim) {
+					series.add(trailPosTime, values[trailPosTime][vecDim]);
+				}
+				dataset.addSeries(series);
+	        }
+			JFreeChart chart = ChartFactory.createScatterPlot("Function", "Input", "Output",
 					dataset, PlotOrientation.VERTICAL, false, false, false);
-			
-			chartPanels.add(new ChartPanel(chart));
+			animPlotVectorSetupRenderer(chart.getXYPlot().getRenderer(), trailLength);
+			r.add(new ChartPanel(chart));
         }
-        
-        long t0 = System.currentTimeMillis();
+        if(scaleRangAxisConstant) {
+        	scaleChartPanelsRangeAxisToConstant(r);
+        }
+        return r;
+	}
+	
+	private static void animPlotVectorSetupRenderer(XYItemRenderer renderer, int trailLength) {
+		for(int i=0; i<=trailLength; ++i) {
+			int c = 255*i/trailLength;
+			renderer.setSeriesPaint(i, new Color(c, c, c));
+			renderer.setSeriesShape(i, new Ellipse2D.Float(-3, -3, 6, 6));
+		}
+	}
+	
+	private static void scaleChartPanelsRangeAxisToConstant(List<ChartPanel> chartPanels) {
+		double min=Double.MAX_VALUE, max=Double.MIN_VALUE;
+        for(Iterator<ChartPanel> it=chartPanels.iterator(); it.hasNext(); ) {
+        	final ChartPanel curPanel = it.next();
+        	Range curRange = curPanel.getChart().getXYPlot().getRangeAxis().getRange();
+        	if(min > curRange.getLowerBound()) {
+        		min = curRange.getLowerBound();
+        	}
+        	if(max < curRange.getUpperBound()) {
+        		max = curRange.getUpperBound();
+        	}
+        }
+        for(Iterator<ChartPanel> it=chartPanels.iterator(); it.hasNext(); ) {
+        	final ChartPanel curPanel = it.next();
+        	curPanel.getChart().getXYPlot().getRangeAxis().setRange(min, max);
+        }        
+	}
+	
+	private static void animPlotShowChartPanels(final JFrame frame, List<ChartPanel> chartPanels) {
         int i=0;
         for(Iterator<ChartPanel> it=chartPanels.iterator(); it.hasNext(); ) {
         	final ChartPanel panel = it.next();
@@ -145,14 +170,23 @@ public class ScopeExample {
 				} else {
 					frame.validate();
 				}
+				//System.out.println(panel.getChart().getXYPlot().getRenderer().getSeriesPaint(2)); 
         	}});
 			try {
 				Thread.sleep(100);
 			} catch(InterruptedException e) {}
-        	System.out.println(i++);
         }
-        System.out.println(System.currentTimeMillis()-t0);
-
-
+	}
+	
+	private static void animPlotVector(TimeSeries timeSeries, String title, 
+			boolean scaleRangAxisConstant, int trailLength) throws IOException {
+		assert trailLength >= 0;
+		List<ChartPanel> chartPanels = makeAnimPlotVectorChartPanels(timeSeries, 
+				scaleRangAxisConstant, trailLength);
+		animPlotShowChartPanels(makeAnimPlotFrame(title), chartPanels);
+	}
+	
+	private static Vector v(float[] a_) {
+		return new Vector(Arrays.asList(a_));
 	}
 }
