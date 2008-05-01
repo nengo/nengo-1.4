@@ -112,8 +112,22 @@ public class MatlabExporter {
 		if (!MU.isMatrix(data)) {
 			throw new IllegalArgumentException("Data must be a matrix (same number of columns in each row)");
 		}
+		name=makeVariableNameValid(name);
 		MLDouble mld = new MLDouble(name, MU.convert(data));	
 		myData.put(name, mld);
+	}
+	
+	public static String makeVariableNameValid(String name) {
+		// replace all invalid characters with underscores
+		name=name.replaceAll("[^a-zA-Z0-9_]","_");		
+		
+		// make sure the variable name starts with a letter
+		if (name.length()==0) {
+			name="data";
+		} else if (name.matches("[^a-zA-Z].*")) {
+			name="data"+name;
+		}
+		return name;
 	}
 	
 	/**
