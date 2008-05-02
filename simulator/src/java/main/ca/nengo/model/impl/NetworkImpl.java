@@ -339,6 +339,15 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public void exposeOrigin(Origin origin, String name) {
 		myExposedOrigins.put(name, new OriginWrapper(this, origin, name));
 		myExposedOriginNames.put(origin, name);
+		
+		// automatically add exposed origin to exposed states
+		if (origin.getNode() instanceof Probeable) {
+			Probeable p=(Probeable)(origin.getNode());			
+			try {
+				exposeState(p,origin.getName(),name);
+			} catch (StructuralException e) {					
+			}
+		}
 		fireVisibleChangeEvent();
 	}
 
@@ -349,7 +358,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		OriginWrapper originWr = (OriginWrapper)myExposedOrigins.remove(name);
 		if (originWr != null) {
 			myExposedOriginNames.remove(originWr.myWrapped);
+			
+			// remove the automatically exposed state
+			if (originWr.myWrapped.getNode() instanceof Probeable) {
+				this.hideState(name);				
+			}
 		}
+		
 		fireVisibleChangeEvent();
 	}
 
