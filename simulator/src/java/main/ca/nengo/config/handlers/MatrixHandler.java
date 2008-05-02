@@ -72,6 +72,14 @@ public class MatrixHandler extends BaseHandler {
 				return me.getMatrix();
 			}
 		});
+		
+		// make sure the last edit gets recorded before leaving the editor
+		okButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+					me.finishEditing();
+				}			
+			});
+		
 		okButton.addActionListener(listener);
 		return me;
 	}

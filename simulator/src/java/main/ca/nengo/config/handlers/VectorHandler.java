@@ -66,6 +66,14 @@ public class VectorHandler extends BaseHandler {
 				return result.getMatrix()[0];
 			}
 		});
+		
+		// make sure the last edit gets recorded before leaving the editor
+		okButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+					result.finishEditing();
+				}			
+			});
+		
 		okButton.addActionListener(listener);
 		
 		return result;
