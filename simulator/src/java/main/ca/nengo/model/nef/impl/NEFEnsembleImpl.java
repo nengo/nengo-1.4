@@ -277,6 +277,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		}		
 		
 		DecodedOrigin result = new DecodedOrigin(this, name, (NEFNode[]) getNodes(), nodeOrigin, functions, myDecodingApproximators.get(nodeOrigin));
+		result.setMode(getMode());
 		super.addDecodedOrigin(name, result);
 		
 		return result;
@@ -293,7 +294,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		DecodedOrigin o = (DecodedOrigin) existing;
 		BiasOrigin result = new BiasOrigin(this, name, getNodes(), o.getNodeOrigin(), 
 				getConstantOutputs(myEvalPoints, o.getNodeOrigin()), numInterneurons, excitatory);
-		
+		result.setMode(getMode());
 		addDecodedOrigin(result.getName(), result);
 		return result;
 	}
