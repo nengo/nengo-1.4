@@ -350,11 +350,13 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 						JarEntry entry = entries.nextElement();
 						String fileName = entry.getName();
 						if (fileName.endsWith(".class")) {
+							String className="";
 							try {
-								String className = fileName.substring(0, fileName.lastIndexOf('.'))
+								className = fileName.substring(0, fileName.lastIndexOf('.'))
 										.replace('/', '.');// .replace('$',
 								// '.');
 								Class<?> newClass = urlClassLoader.loadClass(className);
+							
 
 								// Util.debugMsg("Registering class: " +
 								// newClass.getName());
@@ -362,6 +364,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 							} catch (ClassNotFoundException e) {
 								e.printStackTrace();
+							} catch (NoClassDefFoundError e) {
+								// this only occurs for nested classes (i.e. those with dollar signs in class name),
+								// and perhaps only on the Mac
+								
+								//System.out.println(className);
+								//e.printStackTrace();
 							}
 						}
 					}
@@ -398,10 +406,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			FileChooser = new NeoFileChooser();
 		}
 
-		/*
-		 * Register plugin classes
-		 */
-		registerPlugins();
 
 		/*
 		 * Set up Environment variables
@@ -413,6 +417,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		 */
 		initScriptConsole();
 
+		/*
+		 * Register plugin classes
+		 */
+		registerPlugins();
+		
 	}
 
 	@Override
