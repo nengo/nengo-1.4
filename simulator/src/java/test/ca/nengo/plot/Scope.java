@@ -1,3 +1,6 @@
+/* 
+ * */
+
 package ca.nengo.plot;
 
 import java.awt.BorderLayout;
@@ -47,7 +50,8 @@ public class Scope {
 	private java.util.Timer _workerTimer = new java.util.Timer();
 	private JSlider _slider;
 	
-	private boolean _playing = false;
+	/** non-null when playing (or fast-forwarding, or rewinding). */
+	private volatile SimpleRecurController _curRecurController;
 	private int _curTime = 0;
 	private int _timeStep, _trailLength;
 	private boolean _scalingToExtrema = false;
@@ -66,12 +70,15 @@ public class Scope {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() { public void run() {
 				_graphPanel = new JPanel();
-				advance(0, 0, false);
 				initCtrlPanel();
 			}});
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
+		showGraphPanel(getChartPanelForCurTime());
+		
+		// hack for pack():  (TODO: fix)  
+		try { Thread.sleep(1000); } catch(InterruptedException e) {}
 	}
 	
 	private void resetExtrema() {
@@ -81,49 +88,48 @@ public class Scope {
 	private void initCtrlPanel() {
 		_ctrlPanel = new JPanel();
 		
-		JButton playButton = new JButton("Play");
+		JButton playButton = new JButton(">");
 		playButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				_playing = true;
-				advance(0, 1, true);
+				pause();
+				_curRecurController = new SimpleRecurController();
+				move(0, _timeStep, false, _curRecurController, true);
 			}});
 		
 		JButton pauseButton = new JButton("II");
 		pauseButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				_playing = false;
+				pause();
 			}});
 		
-		JButton stepBackButton = new JButton("<");
+		JButton stepBackButton = new JButton("|<");
 		stepBackButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				advance(0, -1, false);
+				move(0, -_timeStep, false, null, true);
 			}});
-		JButton stepForwardButton = new JButton(">");
+		JButton stepForwardButton = new JButton(">|");
 		stepForwardButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				advance(0, 1, false);
+				move(0, _timeStep, false, null, true);
 			}});
 		
-		JButton goToStartButton = new JButton("|<");
+		JButton goToStartButton = new JButton("|<<");
 		goToStartButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				_curTime = 0;
-				advance(0, 0, false);
+				move(0, 0, true, null, true);
 			}});
-		JButton goToEndButton = new JButton(">|");
+		JButton goToEndButton = new JButton(">>|");
 		goToEndButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				// round down from the end to the last time step: 
-				_curTime = ((_probeValues.length-1)/_timeStep)*_timeStep;
-				advance(0, 0, false);
+				move(0, _probeValues.length-1, true, null, true);
 			}});
 		
-		_slider = new JSlider(0, _probeValues.length-1, 0);
+		_slider = new JSlider(0, _probeValues.length-1, _curTime);
 		_slider.addChangeListener(new ChangeListener() { 
 				public void stateChanged(ChangeEvent e) {
-					_curTime = _slider.getValue();
-					advance(0, 0, false);
+					// rounding down to time step: 
+					int newTime = (_slider.getValue()/_timeStep)*_timeStep;
+					move(0, newTime, true, null, false);
 				}
 			});
 		
@@ -137,14 +143,16 @@ public class Scope {
 		JButton fastForwardButton = new JButton(">>");
 		fastForwardButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				_playing = true;
-				advance(0, 3, true);
+				pause();
+				_curRecurController = new SimpleRecurController();
+				move(0, 3*_timeStep, false, _curRecurController, true);
 			}});
 		JButton rewindButton = new JButton("<<");
 		rewindButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				_playing = true;
-				advance(0, -3, true);
+				pause();
+				_curRecurController = new SimpleRecurController();
+				move(0, -3*_timeStep, false, _curRecurController, true);
 			}});
 		
 		_ctrlPanel.add(goToStartButton);
@@ -160,32 +168,72 @@ public class Scope {
 		
 	}
 	
-	private void advance(final int delayTimeMillis_, final int numTimeSteps_, final boolean recurring_) {
+	private void pause() {
+		if(_curRecurController!=null) {
+			_curRecurController._recur = false;
+			_curRecurController = null;
+		}
+	}
+	
+	private static interface RecurController {
+		public boolean shouldRecur();
+	}
+	
+	private static class SimpleRecurController implements RecurController {
+		public volatile boolean _recur = true;
+		
+		public boolean shouldRecur() {
+			return _recur;
+		}
+	}
+	
+	private void move(final int delayTimeMillis_, 
+			final int pos_, final boolean posIsAbsoluteAsOpposedToRelative_,  
+			final RecurController recurController_, final boolean adjustSliderToMatch_) {
 		TimerTask t = new TimerTask() { public void run() {
-			int wouldBeCurTime = _curTime + numTimeSteps_*_timeStep;
-			if(0 <= wouldBeCurTime && wouldBeCurTime <  _probeValues.length) {
-				_curTime = wouldBeCurTime;
-				long t0 = System.currentTimeMillis();
-				final JPanel panel = getChartPanelForCurTime();
-				long timeTheWorkTook = System.currentTimeMillis() - t0;
-				long timeToSleep = delayTimeMillis_ - timeTheWorkTook;
-				if(timeToSleep > 0) {
-					try { Thread.sleep(timeToSleep); } catch(InterruptedException e) {}
+			int wouldBeCurTime = (posIsAbsoluteAsOpposedToRelative_ 
+					? pos_ : _curTime + pos_);
+			wouldBeCurTime = reinIn(wouldBeCurTime, 0, _probeValues.length-1);
+			if(wouldBeCurTime != _curTime) {
+				if(recurController_!=null && recurController_.shouldRecur()) {
+					move(100, pos_, posIsAbsoluteAsOpposedToRelative_, recurController_, 
+						adjustSliderToMatch_);
 				}
-		    	SwingUtilities.invokeLater(new Runnable() { public void run() {
-		    		_slider.setValue(_curTime);
-					_graphPanel.removeAll();
-					_graphPanel.add(panel, BorderLayout.CENTER);
-					_graphPanel.validate();
-					if(_playing && recurring_) {
-						advance(250, numTimeSteps_, recurring_);
-					}
-		    	}});
+				_curTime = wouldBeCurTime;
+				showGraphPanel(getChartPanelForCurTime());
+				if(adjustSliderToMatch_) {
+			    	SwingUtilities.invokeLater(new Runnable() { public void run() {
+			    			setValueNoFire(_slider, _curTime);
+			    		}});
+				}
 			} else {
-				_playing = false;
+				_curRecurController = null;
 			}
 		}};
-		_workerTimer.schedule(t, 0);
+		_workerTimer.schedule(t, delayTimeMillis_);
+	}
+	
+	private static void setValueNoFire(JSlider slider_, int value_) {
+		ChangeListener[] listeners = slider_.getChangeListeners();
+		for(int i=0; i<listeners.length; ++i) {
+			slider_.removeChangeListener(listeners[i]);
+		}
+		slider_.setValue(value_);
+		for(int i=0; i<listeners.length; ++i) {
+			slider_.addChangeListener(listeners[i]);
+		}
+	}
+	
+	private void showGraphPanel(final JPanel panel_) {
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() { public void run() {
+				_graphPanel.removeAll();
+				_graphPanel.add(panel_);
+				_graphPanel.validate();
+	    	}});
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private ChartPanel getChartPanelForCurTime() {
@@ -260,7 +308,17 @@ public class Scope {
 	}
 	
 	private static int fadeColorCompToWhite(int comp, float percent) {
-		return (int)(comp + (255-comp)*percent);
+		return reinIn((int)(comp + (255-comp)*percent), 0, 255);
+	}
+	
+	private static int reinIn(int x_, int lowerBound_, int upperBound_) {
+		if(x_ < lowerBound_) {
+			return lowerBound_;
+		} else if(x_ > upperBound_) {
+			return upperBound_;
+		} else {
+			return x_;
+		}
 	}
 	
 	public JPanel getGraphPanel() { return _graphPanel; }
