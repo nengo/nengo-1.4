@@ -70,7 +70,7 @@ public class ScopeExample {
 			
 			JFrame frame = makeAnimPlotFrame("vector plot");
 			frame.setLayout(new BorderLayout());
-			Scope scope = new Scope(p, 100, 20);
+			Scope scope = new Scope(p);
 			frame.getContentPane().add(scope.getGraphPanel(), BorderLayout.CENTER);
 			frame.getContentPane().add(scope.getCtrlPanel(), BorderLayout.SOUTH);
 			//frame.setSize(900, 600);

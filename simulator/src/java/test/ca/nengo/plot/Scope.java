@@ -1,9 +1,14 @@
-/* 
+/*
+ * 
+ *  TODO: give 'scale to extrema' some headroom. 
  * */
 
 package ca.nengo.plot;
 
+import com.jeta.forms.components.panel.FormPanel;
 import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.Image;
 import java.awt.Color;
 import java.awt.geom.*;
@@ -53,19 +58,17 @@ public class Scope {
 	/** non-null when playing (or fast-forwarding, or rewinding). */
 	private volatile SimpleRecurController _curRecurController;
 	private int _curTime = 0;
-	private int _timeStep, _trailLength;
+	private int _timeStep=100, _trailLength=20;
 	private boolean _scalingToExtrema = false;
 	/** [min, max] */
 	private float[] _extrema;
 	
 	private JPanel _graphPanel, _ctrlPanel;
 	
-	public Scope(Probe probe_, int timeStep_, int trailLength_) {
+	public Scope(Probe probe_) {
 		assert probe_!=null;
 		_probe = probe_;
 		_probeValues = _probe.getData().getValues();
-		_timeStep = timeStep_;
-		_trailLength = trailLength_;
 		resetExtrema();
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() { public void run() {
@@ -75,7 +78,7 @@ public class Scope {
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
-		showGraphPanel(getChartPanelForCurTime());
+		showChartPanelForCurTime(true);
 		
 		// hack for pack():  (TODO: fix)  
 		try { Thread.sleep(1000); } catch(InterruptedException e) {}
@@ -86,14 +89,14 @@ public class Scope {
 	}
 	
 	private void initCtrlPanel() {
-		_ctrlPanel = new JPanel();
+		_ctrlPanel = new JPanel(new GridBagLayout());
 		
 		JButton playButton = new JButton(">");
 		playButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
 				pause();
 				_curRecurController = new SimpleRecurController();
-				move(0, _timeStep, false, _curRecurController, true);
+				move(0, 1, false, _curRecurController, true);
 			}});
 		
 		JButton pauseButton = new JButton("II");
@@ -105,12 +108,12 @@ public class Scope {
 		JButton stepBackButton = new JButton("|<");
 		stepBackButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				move(0, -_timeStep, false, null, true);
+				move(0, -1, false, null, true);
 			}});
 		JButton stepForwardButton = new JButton(">|");
 		stepForwardButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
-				move(0, _timeStep, false, null, true);
+				move(0, 1, false, null, true);
 			}});
 		
 		JButton goToStartButton = new JButton("|<<");
@@ -137,7 +140,10 @@ public class Scope {
 		scaleToExtremaCheckbox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				_scalingToExtrema = scaleToExtremaCheckbox.isSelected();
-				resetExtrema();  
+				resetExtrema();
+				if(!isPlaying()) {
+					showChartPanelForCurTime(true);
+				}
 			}});
 		
 		JButton fastForwardButton = new JButton(">>");
@@ -145,27 +151,73 @@ public class Scope {
 			public void actionPerformed(ActionEvent e) {
 				pause();
 				_curRecurController = new SimpleRecurController();
-				move(0, 3*_timeStep, false, _curRecurController, true);
+				move(0, 3, false, _curRecurController, true);
 			}});
 		JButton rewindButton = new JButton("<<");
 		rewindButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent e) {
 				pause();
 				_curRecurController = new SimpleRecurController();
-				move(0, -3*_timeStep, false, _curRecurController, true);
+				move(0, -3, false, _curRecurController, true);
 			}});
 		
-		_ctrlPanel.add(goToStartButton);
-		_ctrlPanel.add(rewindButton);
-		_ctrlPanel.add(stepBackButton);
-		_ctrlPanel.add(playButton);
-		_ctrlPanel.add(pauseButton);
-		_ctrlPanel.add(stepForwardButton);
-		_ctrlPanel.add(fastForwardButton);
-		_ctrlPanel.add(goToEndButton);
-		_ctrlPanel.add(_slider);
-		_ctrlPanel.add(scaleToExtremaCheckbox);
+		final JSpinner timeStepSpinner = new JSpinner(
+				new SpinnerNumberModel(_timeStep, 1, Integer.MAX_VALUE, 1));
+		timeStepSpinner.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+					_timeStep = (Integer)(timeStepSpinner.getValue());
+					if(!isPlaying()) {
+						showChartPanelForCurTime(true);
+					}
+				}
+			});
 		
+		final JSpinner trailLengthSpinner = new JSpinner(
+				new SpinnerNumberModel(_trailLength, 0, Integer.MAX_VALUE, 1));
+		trailLengthSpinner.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+					_trailLength = (Integer)(trailLengthSpinner.getValue());
+					if(!isPlaying()) {
+						showChartPanelForCurTime(true);
+					}
+				}
+			});
+		
+		GridBagConstraints c = new GridBagConstraints();
+		JPanel vcrCtrls = new JPanel();
+		vcrCtrls.add(goToStartButton);
+		vcrCtrls.add(rewindButton);
+		vcrCtrls.add(stepBackButton);
+		vcrCtrls.add(playButton);
+		vcrCtrls.add(pauseButton);
+		vcrCtrls.add(stepForwardButton);
+		vcrCtrls.add(fastForwardButton);
+		vcrCtrls.add(goToEndButton);
+		c.gridy = 0;
+		_ctrlPanel.add(vcrCtrls);
+		
+		c.gridy = 1;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		_ctrlPanel.add(_slider, c);
+		
+		JPanel scaleCtrls = new JPanel();
+		
+		JPanel incCtrls = new JPanel();
+		incCtrls.add(scaleToExtremaCheckbox);
+		incCtrls.add(new JLabel("time step (milliseconds):"));
+		incCtrls.add(timeStepSpinner);
+		incCtrls.add(new JLabel("trail length (in time steps):"));
+		incCtrls.add(trailLengthSpinner);
+		c.gridy++;
+		c.fill = GridBagConstraints.NONE;
+		_ctrlPanel.add(incCtrls, c);
+		
+	}
+	
+	/** this is not probably not accurate.  
+	 * but then it is not used for anything that requires it to be accurate.  */
+	private boolean isPlaying() {
+		return _curRecurController!=null;
 	}
 	
 	private void pause() {
@@ -187,20 +239,24 @@ public class Scope {
 		}
 	}
 	
+	/** @param x_  if posIsAbsoluteAsOpposedToRelative_ is true then this is an absolute 
+	 * location (index in _probeValues) 
+	 * else this is relative, units = multiples of _timeStep, and represents a 'delta' 
+	 * 	in a _probeValues index.  (also, can be negative). */ 
 	private void move(final int delayTimeMillis_, 
-			final int pos_, final boolean posIsAbsoluteAsOpposedToRelative_,  
+			final int x_, final boolean posIsAbsoluteAsOpposedToRelative_,  
 			final RecurController recurController_, final boolean adjustSliderToMatch_) {
 		TimerTask t = new TimerTask() { public void run() {
 			int wouldBeCurTime = (posIsAbsoluteAsOpposedToRelative_ 
-					? pos_ : _curTime + pos_);
+					? x_ : _curTime + x_*_timeStep);
 			wouldBeCurTime = reinIn(wouldBeCurTime, 0, _probeValues.length-1);
 			if(wouldBeCurTime != _curTime) {
 				if(recurController_!=null && recurController_.shouldRecur()) {
-					move(100, pos_, posIsAbsoluteAsOpposedToRelative_, recurController_, 
+					move(100, x_, posIsAbsoluteAsOpposedToRelative_, recurController_, 
 						adjustSliderToMatch_);
 				}
 				_curTime = wouldBeCurTime;
-				showGraphPanel(getChartPanelForCurTime());
+				showChartPanelForCurTime(false);
 				if(adjustSliderToMatch_) {
 			    	SwingUtilities.invokeLater(new Runnable() { public void run() {
 			    			setValueNoFire(_slider, _curTime);
@@ -224,16 +280,25 @@ public class Scope {
 		}
 	}
 	
-	private void showGraphPanel(final JPanel panel_) {
-		try {
-			SwingUtilities.invokeAndWait(new Runnable() { public void run() {
-				_graphPanel.removeAll();
-				_graphPanel.add(panel_);
-				_graphPanel.validate();
-	    	}});
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
+	private void showChartPanelForCurTime(boolean invokeLater_) {
+		showChartPanel(getChartPanelForCurTime(), invokeLater_);
+	}
+	
+	private void showChartPanel(final JPanel panel_, boolean invokeLater_) {
+		Runnable r = new Runnable() { public void run() {
+			_graphPanel.removeAll();
+			_graphPanel.add(panel_);
+			_graphPanel.validate();
+    	}};
+    	if(invokeLater_) {
+    		SwingUtilities.invokeLater(r);
+    	} else {
+    		try {
+    			SwingUtilities.invokeAndWait(r);
+    		} catch(Exception e) {
+    			throw new RuntimeException(e);
+    		}
+    	}
 	}
 	
 	private ChartPanel getChartPanelForCurTime() {
