@@ -165,6 +165,22 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		myDecodingApproximators.clear();
 	}
+	
+	/**
+	 * Note: by-products of decoding are sometimes cached, so if these are changed it may be 
+	 * necessary to call setReuseApproximators(false) for the change to take effect. 
+	 * 
+	 * @param evalPoints Points in the encoded space at which node outputs are evaluated for 
+	 * 		establishing new DecodedOrigins. 
+	 */
+	public void setEvalPoints(float[][] evalPoints) {
+		if (!MU.isMatrix(evalPoints) || evalPoints[0].length != getDimension()) {
+			throw new IllegalArgumentException("Expected eval points of length " 
+					+ getDimension() + " (was " + evalPoints[0].length + ")");
+		}
+		
+		myEvalPoints = evalPoints;
+	}
 
 	/**
 	 * @param evalPoints Vector points at which to find output (each one must have same dimension as
