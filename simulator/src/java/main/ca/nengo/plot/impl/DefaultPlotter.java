@@ -249,9 +249,9 @@ public class DefaultPlotter extends Plotter {
 			
 			DecodedOrigin origin = (DecodedOrigin) o;
 			
-			if (ensemble.getDimension() != 1) {
-				throw new RuntimeException("Distortion error can not be plotted for multi-dimensional NEFEnsembles");
-			}
+//			if (ensemble.getDimension() != 1) {
+//				throw new RuntimeException("Distortion error can not be plotted for multi-dimensional NEFEnsembles");
+//			}
 			
 //			float[][] encoders = ensemble.getEncoders();
 
@@ -276,7 +276,9 @@ public class DefaultPlotter extends Plotter {
 				actualOutput[i] = ((RealOutput) origin.getValues()).getValues();
 				
 				ensemble.setMode(SimulationMode.DIRECT);
-				origin.run(new float[]{x[i]}, 0f, 1f);
+				float[] state = new float[ensemble.getDimension()];
+				state[0] = x[i];
+				origin.run(state, 0f, 1f);
 				idealOutput[i] = ((RealOutput) origin.getValues()).getValues();
 			}
 			ensemble.setMode(mode);
@@ -289,6 +291,7 @@ public class DefaultPlotter extends Plotter {
 		} catch (StructuralException e) {
 			throw new RuntimeException("Can't plot origin error", e);
 		} catch (SimulationException e) {
+			e.printStackTrace();
 			throw new RuntimeException("Can't plot origin error", e);
 		}
 	}
@@ -304,6 +307,10 @@ public class DefaultPlotter extends Plotter {
 			} else {
 				radialInput = radius*ensemble.getEncoders()[node][0];
 			}
+		} else if (ensemble instanceof NEFEnsembleImpl) {
+			float[] state = new float[ensemble.getDimension()];
+			state[0] = radius;
+			radialInput = ((NEFEnsembleImpl) ensemble).getRadialInput(state, node);
 		}
 		
 		return radialInput;
