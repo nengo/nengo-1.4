@@ -4,11 +4,22 @@
 package ca.nengo.model.neuron.impl;
 
 import ca.nengo.TestUtil;
+import ca.nengo.math.Function;
+import ca.nengo.math.impl.PiecewiseConstantFunction;
+import ca.nengo.math.impl.SineFunction;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.SpikeOutput;
+import ca.nengo.model.StructuralException;
+import ca.nengo.model.Termination;
+import ca.nengo.model.Units;
+import ca.nengo.model.impl.FunctionInput;
+import ca.nengo.model.impl.NetworkImpl;
+import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.impl.ALIFSpikeGenerator;
+import ca.nengo.plot.Plotter;
+import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
 import junit.framework.TestCase;
 
@@ -121,16 +132,89 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 				spikeCount > rate-tolerance && spikeCount < rate+tolerance);
 	}
 	
+	public void testAdaptation() throws StructuralException, SimulationException {
+		NetworkImpl network = new NetworkImpl();
+		LinearSynapticIntegrator integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
+		Termination t = integrator.addTermination("input", new float[]{1}, .005f, false);
+		ALIFSpikeGenerator generator = new ALIFSpikeGenerator(.0005f, .02f, .2f, .05f);
+		SpikingNeuron neuron = new SpikingNeuron(integrator, generator, 2, 5, "neuron");
+		network.addNode(neuron);
+		
+		Function f = new PiecewiseConstantFunction(new float[]{1, 2}, new float[]{0, 1, -1});
+//		Function f = new SineFunction((float) Math.PI, 1f / (float) Math.PI);
+		Plotter.plot(f, 0, .01f, 3, "input");
+		FunctionInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
+		network.addNode(input);
+		
+		network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), t);
+		
+		Probe rate = network.getSimulator().addProbe("neuron", "rate", true);
+		Probe N = network.getSimulator().addProbe("neuron", "N", true);
+//		Probe dNdt = network.getSimulator().addProbe("neuron", "dNdt", true);
+//		Probe I = network.getSimulator().addProbe("neuron", "I", true);
+		
+		setTau(neuron, .1f);
+		network.setMode(SimulationMode.RATE);
+		network.run(0, 3);
+		
+//		Plotter.plot(rate.getData(), "rate");
+//		Plotter.plot(N.getData(), "N");
+	}
+	
+	private void setTau(SpikingNeuron neuron, float tau) {
+		float g_N = 1; 
+		float alpha = getSlope(neuron) / neuron.getScale();
+		float b = neuron.getBias();
+		float c = neuron.getScale();
+		
+		float tauN = tau/2 * (b/c + 1);
+		float A_N = (1/tau - 1/tauN) / alpha;
+		
+		//optimal A_N to maximize adaptation range with reasonable tau (see notes 14 April)
+//		float A_N = (1/tau - 1e-2f) / alpha;
+		((ALIFSpikeGenerator) neuron.getGenerator()).setIncN(A_N);
+		
+//		if (tau >= 1/(g_N * A_N * alpha)) {
+//			throw new IllegalArgumentException("The requested time constant is too long (can't be supported by other neuron params)");
+//		}
+		
+//		float tauN = tau / (1 - g_N*A_N*alpha*tau);
+		((ALIFSpikeGenerator) neuron.getGenerator()).setTauN(tauN);	
+	}
+	
+	private static float getSlope(SpikingNeuron neuron) {
+		SimulationMode mode = neuron.getMode();
+		float slope = 0;
+		
+		try {
+			neuron.setMode(SimulationMode.CONSTANT_RATE);
+			neuron.setRadialInput(-1);
+			neuron.run(0, 0);
+			RealOutput low = (RealOutput) neuron.getOrigin(Neuron.AXON).getValues();
+			neuron.setRadialInput(1);
+			neuron.run(0, 0);
+			RealOutput high = (RealOutput) neuron.getOrigin(Neuron.AXON).getValues();
+			slope = (high.getValues()[0] - low.getValues()[0]) / 2f; 
+			System.out.println("high: " + high.getValues()[0] + " low: " + low.getValues()[0] + " slope: " + slope);
+			neuron.setMode(mode);
+		} catch (SimulationException e) {
+			throw new RuntimeException(e);
+		} catch (StructuralException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return slope;
+	}
 	
 	
 	public static void main(String[] args) {
 		ALIFSpikeGeneratorTest test = new ALIFSpikeGeneratorTest();
 		try {
-			test.testGetAdaptedRate();
+			test.testAdaptation();
 		} catch (SimulationException e) {
+			e.printStackTrace();
+		} catch (StructuralException e) {
 			e.printStackTrace();
 		}
 	}
 }
-
-
