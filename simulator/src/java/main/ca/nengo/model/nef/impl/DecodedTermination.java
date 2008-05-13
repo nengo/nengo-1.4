@@ -258,12 +258,16 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 * @see ca.nengo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
+		resetInitialState();
+		myInputValues = new RealOutputImpl(new float[getDimensions()], Units.UNK, 0);
+		myValuesSet = false;
+	}
+	
+	private void resetInitialState() {
 		for (int i = 0; myDynamics != null && i < myDynamics.length; i++) {
 			float[] state = myInitialState != null ? myInitialState[i] : new float[myDynamics[i].getState().length];  
 			myDynamics[i].setState(state);			
-		}
-		myInputValues = new RealOutputImpl(new float[getDimensions()], Units.UNK, 0);
-		myValuesSet = false;
+		}		
 	}
 	
 	/**
@@ -286,6 +290,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		}
 		
 		myInitialState = state;
+		resetInitialState();
 	}
 	
 	private void initInitialState() {
