@@ -109,7 +109,7 @@ public class BiasOrigin extends DecodedOrigin {
 	 */
 	public void optimizeInterneuronDomain(DecodedTermination interneuronTermination, DecodedTermination biasTermination) {
 		float[] range = this.getRange();
-		range[0] = range[0] - .25f * (range[1] - range[0]); //avoid distorted area near zero in interneurons 
+		range[0] = range[0] - .4f * (range[1] - range[0]); //avoid distorted area near zero in interneurons 
 		interneuronTermination.setStaticBias(new float[]{-range[0]});
 		biasTermination.setStaticBias(MU.sum(biasTermination.getStaticBias(), new float[]{range[0]/(range[1] - range[0])}));
 		try {
@@ -171,7 +171,7 @@ public class BiasOrigin extends DecodedOrigin {
 		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? .5f : -.5f));
 		
 //		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.5f, .75f) : new IndicatorPDF(-.99f, .35f);
-		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.15f, .5f) : new IndicatorPDF(-1.2f, .1f); //was -.5f, .75f for excitatory
+		PDF interceptPDF = excitatoryProjection ? new IndicatorPDF(-.15f, .9f) : new IndicatorPDF(-1.2f, .1f); //was -.5f, .75f for excitatory
 		PDF maxRatePDF = excitatoryProjection ? new IndicatorPDF(200f, 500f) : new IndicatorPDF(400f, 800f);
 		ef.setNodeFactory(new LIFNeuronFactory(.02f, .0001f, maxRatePDF, interceptPDF));
 		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(
