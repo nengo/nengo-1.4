@@ -33,6 +33,7 @@ import ca.nengo.math.PDF;
 import ca.nengo.math.impl.AbstractFunction;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.math.impl.GradientDescentApproximator;
+import ca.nengo.math.impl.IdentityFunction;
 import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.GradientDescentApproximator.Constraints;
 import ca.nengo.model.Node;
@@ -41,6 +42,7 @@ import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.impl.LIFNeuronFactory;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
 import ca.nengo.util.MU;
 import ca.nengo.util.VectorGenerator;
 import ca.nengo.util.impl.RandomHypersphereVG;
@@ -150,22 +152,21 @@ public class BiasOrigin extends DecodedOrigin {
 	}
 	
 	private NEFEnsemble createInterneurons(String name, int num, boolean excitatoryProjection) throws StructuralException {
-		NEFEnsembleFactory ef = null;
+		final Function f;
 		if (excitatoryProjection) {
-			ef = new NEFEnsembleFactoryImpl();
+			f = new IdentityFunction(1, 0);
 		} else {
-			final Function f = new AbstractFunction(1) {
+			f = new AbstractFunction(1) {
 				private static final long serialVersionUID = 1L;
 				public float map(float[] from) {
 					return 1 + from[0];
 				}
 			};
-			ef = new NEFEnsembleFactoryImpl() { 
-				protected void addDefaultOrigins(NEFEnsemble ensemble) throws StructuralException {
-					ensemble.addDecodedOrigin(NEFEnsemble.X, new Function[]{f}, Neuron.AXON);
-				}
-			};
 		}
+		
+		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl() { 
+			protected void addDefaultOrigins(NEFEnsemble ensemble) {} //wait until some neurons are adjusted
+		};
 		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory(), true));
 		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? .5f : -.5f));
 		
@@ -176,7 +177,25 @@ public class BiasOrigin extends DecodedOrigin {
 		ef.setApproximatorFactory(new GradientDescentApproximator.Factory(
 				new GradientDescentApproximator.CoefficientsSameSign(true), false)); 
 		
-		return ef.make(name, num, 1);
+		NEFEnsemble result = ef.make(name, num, 1);
+
+		//TODO: bounding neurons for inhibitory projection
+		//set intercepts of first few neurons to 1 (outside normal range)
+		int n = 10;
+		for (int i = 0; i < n; i++) {
+			SpikingNeuron neuron = (SpikingNeuron) result.getNodes()[i];
+			neuron.setBias(1-neuron.getScale());
+		}
+		
+		DecodedOrigin o = (DecodedOrigin) result.addDecodedOrigin(NEFEnsemble.X, new Function[]{f}, Neuron.AXON);
+		
+		float[][] decoders = o.getDecoders();
+		for (int i = 0; i < n; i++) {
+			decoders[i] = new float[]{1f / (float) n / 300};
+		}
+		o.setDecoders(decoders);
+		
+		return result;
 	}
 	
 	/**
