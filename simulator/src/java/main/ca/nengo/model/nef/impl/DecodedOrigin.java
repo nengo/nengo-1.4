@@ -57,6 +57,7 @@ import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VectorGenerator;
 import ca.nengo.util.impl.RandomHypersphereVG;
 import ca.nengo.util.impl.TimeSeries1DImpl;
+import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
  * An Origin of functions of the state variables of an NEFEnsemble. 
@@ -85,6 +86,8 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private DynamicalSystem mySTPDynamicsTemplate;
 	private DynamicalSystem[] mySTPDynamics;
 	private Integrator myIntegrator;
+	private float[] mySTPHistory;
+	private float myTime;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings. 
@@ -234,6 +237,8 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 				myNoises[i].reset(randomize);
 			}
 		}
+		
+		mySTPHistory = new float[myNodes.length];
 	}
 
 	private static float[][] findDecoders(Node[] nodes, Function[] functions, LinearApproximator approximator)  {
@@ -371,6 +376,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		float[] values = new float[myFunctions.length];
 		float stepSize = endTime - startTime;
 		
+		mySTPHistory = new float[myNodes.length];
 		if (myMode == SimulationMode.DIRECT) {
 			for (int i = 0; i < values.length; i++) {
 				values[i] = myFunctions[i].map(state);
@@ -406,6 +412,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 			}
 		}
 		
+		myTime = endTime;		
 		myOutput = new RealOutputImpl(values, Units.UNK, endTime);
 	}
 	
@@ -416,9 +423,15 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 			TimeSeries inputSeries = new TimeSeries1DImpl(new float[]{startTime, endTime}, new float[]{input, input}, Units.UNK);
 			TimeSeries outputSeries = myIntegrator.integrate(mySTPDynamics[i], inputSeries);
 			float scaleFactor = outputSeries.getValues()[outputSeries.getValues().length-1][0];
+			mySTPHistory[i] = scaleFactor;
 			result = MU.prod(result, scaleFactor);
 		}
 		return result;
+	}
+	
+	protected TimeSeries getSTPHistory() {
+		if (mySTPHistory == null) mySTPHistory = new float[myNodes.length];
+		return new TimeSeriesImpl(new float[]{myTime}, new float[][]{mySTPHistory}, Units.uniform(Units.UNK, mySTPHistory.length));
 	}
 	
 	/**

@@ -650,7 +650,17 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		DecodedTermination t = myDecodedTerminations.get(stateName);
 		if (t == null) {
-			return super.getHistory(stateName);			
+			if (stateName.endsWith(":STP")) {
+				String originName = stateName.substring(0,stateName.length()-4);
+				try {
+					DecodedOrigin o = (DecodedOrigin) getOrigin(originName);
+					return o.getSTPHistory();
+				} catch (StructuralException e) {
+					throw new SimulationException(e);
+				}
+			} else {
+				return super.getHistory(stateName);							
+			}
 		} else {
 			return t.getHistory(DecodedTermination.OUTPUT);
 		}
@@ -664,6 +674,13 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			String termName = it.next();
 			p.setProperty(termName, "Output of Termination " + termName);
 		}
+		
+		for (Origin o : getOrigins()) {
+			if (o instanceof DecodedOrigin) {
+				p.setProperty(o.getName() + ":STP", "Decoder scaling due to short-term plasticity");
+			}
+		}
+		
 		return p;
 	}
 
