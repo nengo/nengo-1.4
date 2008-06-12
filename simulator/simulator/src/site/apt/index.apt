@@ -1,0 +1,23 @@
+ Nengo is a software package that makes it easy to develop
+sophisticated models of neuronal circuits. It is intended for modelling large 
+networks of neurons (typically hundreds or thousands), using spiking point-neuron models.
+
+ Nengo is designed around the neural engineering framework (NEF). This
+is a mathematical framework that describes how neurons interact to
+represent information, perform computations, and behave dynamically.
+This framework has been used to develop sophisticated models of
+spatial working memory, probabilistic sound localization, and lamprey
+locomotion, among others.
+
+ Nengo makes it easy for beginners to develop models using 
+the NEF. If you accept defaults for
+spiking models, tuning curves, firing rates, etc. then you can have a
+rough approximation of a complex system assembled and running in
+minutes. This provides a working starting point from which to build.
+
+ Nengo also makes it easy for experts to do advanced work with the
+NEF. The design carefully encapsulates separable aspects of
+model behaviour, so that it is highly customizable and easy to extend. 
+
+[images/mainscreen.jpg]
+
