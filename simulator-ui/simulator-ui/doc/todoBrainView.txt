@@ -1,0 +1,47 @@
+Hi Shu,
+
+I found some free data for the brain image which looks good. It's from
+a fake brain used for MRI system testing:
+http://www.bic.mni.mcgill.ca/brainweb/
+
+The nice thing is that it's in 3D volume coordinates, so this means
+you can let the user choose slice angles. There is a raw data format
+in which each byte represents a 3D pixel (there is also a 2-byte-per
+pixel option, but I don't think we need this). The default image
+download options are appropriate. In the raw file, it looks like each
+byte corresponds to the brightness you would show at a certain
+location. The locations are in mm coordinates. The pixels make up a
+cube. They are ordered so that first row of pixels is given
+corresponding to an edge of the cube, then another row, one in from
+the edge, and so on until the whole face is complete. Then the next
+plane in from the face is given in the same manner. The volume of the
+cube with 1mm pixels is 181x217x181, with starting coordinates -72,
+-126, -90 (this is in order z y x, but I don't know which anatomical
+directions this reference frame corresponds to).
+
+By the way, how will you do this? I don't have any experience with
+graphics, but I was poking around the Java API and
+java.awt.image.Raster looked like a good option to me (you would use
+SampleModel and DataBuffer to create an image by interpolating the
+downloaded data based on slice depth and angle). Does this make sense
+or is there a better way to do it?
+
+Bryan
+
+
+References for BrainView data:
+    * http://www.bic.mni.mcgill.ca/brainweb/
+    * C.A. Cocosco, V. Kollokian, R.K.-S. Kwan, A.C. Evans : "BrainWeb: Online Interface to a 3D MRI Simulated Brain Database"
+      NeuroImage, vol.5, no.4, part 2/4, S425, 1997 -- Proceedings of 3-rd International Conference on Functional Mapping of the Human Brain, Copenhagen, May 1997.
+          o abstract available in [html], [pdf (500Kb)], or [gnuzip-ed postscript (500Kb)].
+          o poster available in [pdf (1.1Mb)], or [gnuzip-ed postscript (850Kb)]. 
+    * R.K.-S. Kwan, A.C. Evans, G.B. Pike : "MRI simulation-based evaluation of image-processing and classification methods"
+      IEEE Transactions on Medical Imaging. 18(11):1085-97, Nov 1999.
+    * R.K.-S. Kwan, A.C. Evans, G.B. Pike : "An Extensible MRI Simulator for Post-Processing Evaluation"
+      Visualization in Biomedical Computing (VBC'96). Lecture Notes in Computer Science, vol. 1131. Springer-Verlag, 1996. 135-140.
+          o paper available in [html], [postscript (1Mb)], or [gnuzip-ed postscript (380Kb)].
+          o poster available in [grey-scale postscript (5.3Mb)], [grey-scale, gnuzip-ed postscript (536Kb)], or [colour, gnuzip-ed postscript (597Kb)]. 
+    * D.L. Collins, A.P. Zijdenbos, V. Kollokian, J.G. Sled, N.J. Kabani, C.J. Holmes, A.C. Evans : "Design and Construction of a Realistic Digital Brain Phantom"
+      IEEE Transactions on Medical Imaging, vol.17, No.3, p.463--468, June 1998.
+          o paper available in [html]. 
+
