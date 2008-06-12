@@ -34,6 +34,8 @@ import java.util.Properties;
 
 import Jama.Matrix;
 
+import ca.nengo.dynamics.DynamicalSystem;
+import ca.nengo.dynamics.Integrator;
 import ca.nengo.dynamics.LinearSystem;
 import ca.nengo.dynamics.impl.CanonicalModel;
 import ca.nengo.dynamics.impl.EulerIntegrator;
@@ -57,6 +59,7 @@ import ca.nengo.model.nef.NEFNode;
 import ca.nengo.model.plasticity.PlasticityRule;
 import ca.nengo.util.MU;
 import ca.nengo.util.TimeSeries;
+import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
  * Default implementation of NEFEnsemble. 
@@ -86,6 +89,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private float[] myRadii;
 	private float[] myInverseRadii;
 	private boolean myRadiiAreOne;
+	private DynamicalSystem myDirectModeDynamics;
+	private Integrator myDirectModeIntegrator;
 
 	/**
 	 * @param name Unique name of Ensemble
@@ -122,6 +127,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myReuseApproximators = true;		
 		myUnscaledEvalPoints = evalPoints;
 		setRadii(radii);
+		
+		myDirectModeIntegrator = new EulerIntegrator(.001f);
 	}
 	
 	/**
@@ -182,6 +189,32 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myEvalPoints = evalPoints;
 	}
 
+	/**
+	 * @param dynamics DynamicalSystem that models internal neuron dynamics at the ensemble level, when 
+	 * 		the ensemble runs in direct mode. The input and output dimensions must equal the dimension of the 
+	 * 		ensemble. 
+	 */
+	public void setDirectModeDynamics(DynamicalSystem dynamics) {
+		if (dynamics != null && 
+				(dynamics.getInputDimension() != getDimension() || dynamics.getOutputDimension() != getDimension())) {
+			throw new IllegalArgumentException("Input and output dimensions must be " + getDimension());
+		}
+		
+		myDirectModeDynamics = dynamics;
+	}
+	
+	public DynamicalSystem getDirectModeDynamics() {
+		return myDirectModeDynamics;
+	}
+	
+	public Integrator getDirectModeIntegrator() {
+		return myDirectModeIntegrator;
+	}
+	
+	public void setDirectModeIntegrator(Integrator integrator) {
+		myDirectModeIntegrator = integrator;		
+	}
+	
 	/**
 	 * @param evalPoints Vector points at which to find output (each one must have same dimension as
 	 * 		encoder)
@@ -477,6 +510,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			}
 
 			if ( getMode().equals(SimulationMode.DIRECT) ) {
+				//run ensemble dynamics if they exist (e.g. to model adaptation)
+				if (myDirectModeDynamics != null) {
+					TimeSeries dynamicsInput = new TimeSeriesImpl(new float[]{startTime, endTime}, 
+							new float[][]{state, state}, Units.uniform(Units.UNK, state.length));
+					TimeSeries dynamicsOutput = myDirectModeIntegrator.integrate(myDirectModeDynamics, dynamicsInput);
+					state = dynamicsOutput.getValues()[dynamicsOutput.getValues().length-1];
+				}
+				
 				Origin[] origins = getOrigins();
 				for (int i = 0; i < origins.length; i++) {
 					if (origins[i] instanceof DecodedOrigin) {
@@ -599,6 +640,10 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			if (origins[i] instanceof DecodedOrigin) {
 				((DecodedOrigin) origins[i]).reset(randomize);
 			}
+		}
+		
+		if (myDirectModeDynamics != null) {
+			myDirectModeDynamics.setState(new float[myDirectModeDynamics.getState().length]);
 		}
 	}
 
