@@ -51,6 +51,9 @@ public class SaveNodeAction extends StandardAction {
 	 * File to be saved to
 	 */
 	private File file;
+	
+	private boolean blocking;  // if blocking, then saving occurs in the same thread before
+	                           // returning
 
 	private UINeoNode nodeUI;
 
@@ -62,6 +65,20 @@ public class SaveNodeAction extends StandardAction {
 		super("Save "+nodeUI.getName());
 
 		this.nodeUI = nodeUI;
+		
+		this.blocking = false;
+	}
+	
+	/**
+	 * A blocking save will perform the save before returning, rather than saving in a
+	 * separate thread.  This is useful on exit, when we want to be sure the save has
+	 * finished before leaving Nengo.
+	 * 
+	 * @param value
+	 * 				Whether or not the save should be blocking
+	 */
+	public void setBlocking(boolean value) {
+		this.blocking = value;
 	}
 
 	@Override
@@ -74,29 +91,42 @@ public class SaveNodeAction extends StandardAction {
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			file = NengoGraphics.FileChooser.getSelectedFile();
-
-			TrackedAction task = new TrackedAction("Saving model") {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				protected void action() throws ActionException {
-					try {
-
-						nodeUI.saveModel(file);
-
-					} catch (IOException e) {
-						UserMessages.showError("Could not save file: "
-								+ e.toString());
-					} catch (OutOfMemoryError e) {
-						UserMessages
-								.showError("Out of memory, please increase memory size: "
-										+ e.toString());
-					}
-
+			
+			if (blocking) {
+				try {
+					nodeUI.saveModel(file);
+				} catch (IOException e) {
+					UserMessages.showError("Could not save file: " + e.toString());
+				} catch (OutOfMemoryError e) {
+					UserMessages
+							.showError("Out of memory, please increase memory size: "
+									+ e.toString());
 				}
-			};
-			task.doAction();
+			} else {
+	
+				TrackedAction task = new TrackedAction("Saving model") {
+	
+					private static final long serialVersionUID = 1L;
+	
+					@Override
+					protected void action() throws ActionException {
+						try {
+	
+							nodeUI.saveModel(file);
+	
+						} catch (IOException e) {
+							UserMessages.showError("Could not save file: "
+									+ e.toString());
+						} catch (OutOfMemoryError e) {
+							UserMessages
+									.showError("Out of memory, please increase memory size: "
+											+ e.toString());
+						}
+	
+					}
+				};
+				task.doAction();
+			}
 
 		} else {
 			throw new UserCancelledException();

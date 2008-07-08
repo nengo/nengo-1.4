@@ -467,8 +467,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		for (WorldObject wo : getWorld().getGround().getChildren()) {
 			if (wo instanceof UINeoNode) {
 				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) wo);
+				saveAction.setBlocking(true);
 				saveAction.doAction();
-
 			}
 		}
 	}
