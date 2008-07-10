@@ -62,7 +62,7 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurabl
 	private InstantaneousOutput myValues;
 	private Noise myNoise;
 	private Noise[] myNoises; //per output
-	private ConfigurationImpl myConfiguration;
+	private transient ConfigurationImpl myConfiguration;
 
 	/**
 	 * @param node The parent Node

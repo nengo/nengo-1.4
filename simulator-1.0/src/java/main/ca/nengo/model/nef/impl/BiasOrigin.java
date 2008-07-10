@@ -70,8 +70,10 @@ public class BiasOrigin extends DecodedOrigin {
 	private NEFEnsemble myInterneurons;
 	private float[][] myConstantOutputs;
 	
-	public BiasOrigin(Node node, String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
-		super(node, name, nodes, nodeOrigin, new Function[]{new ConstantFunction(1, 0f)}, getUniformBiasDecoders(constantOutputs, excitatory));		
+	public BiasOrigin(NEFEnsemble ensemble, String name, Node[] nodes, String nodeOrigin, float[][] constantOutputs, int numInterneurons, boolean excitatory) throws StructuralException {
+		super(ensemble, name, nodes, nodeOrigin, 
+				new Function[]{new ConstantFunction(ensemble.getDimension(), 0f)}, 
+				getUniformBiasDecoders(constantOutputs, excitatory));		
 		
 		myInterneurons = createInterneurons(name + ":interneurons", numInterneurons, excitatory);
 		myConstantOutputs = constantOutputs;
@@ -147,21 +149,18 @@ public class BiasOrigin extends DecodedOrigin {
 		if (excitatoryProjection) {
 			ef = new NEFEnsembleFactoryImpl();
 		} else {
-			ef = new NEFEnsembleFactoryImpl() {
+			final Function f = new AbstractFunction(1) {
+				private static final long serialVersionUID = 1L;
+				public float map(float[] from) {
+					return 1 + from[0];
+				}
+			};
+			ef = new NEFEnsembleFactoryImpl() { 
 				protected void addDefaultOrigins(NEFEnsemble ensemble) throws StructuralException {
-					Function f = new AbstractFunction(1) {
-						private static final long serialVersionUID = 1L;
-						public float map(float[] from) {
-							return -1 - from[0];
-						}
-					};
 					ensemble.addDecodedOrigin(NEFEnsemble.X, new Function[]{f}, Neuron.AXON);
 				}
 			};
-		}
-		//TODO: handle additional bias in inhibitory case 
-		
-		new NEFEnsembleFactoryImpl();
+		}		
 		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory(), true));
 		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? .5f : -.5f));
 		

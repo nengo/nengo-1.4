@@ -99,7 +99,8 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 		
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, valuesT);
 		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, approximator);
-
+		result.setMode(getMode());
+		
 		addDecodedOrigin(name, result);
 		return result;
 	}
@@ -138,6 +139,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 		
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, values);
 		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, approximator);
+		result.setMode(getMode());
 		addDecodedOrigin(name, result);
 		return result;		
 	}
