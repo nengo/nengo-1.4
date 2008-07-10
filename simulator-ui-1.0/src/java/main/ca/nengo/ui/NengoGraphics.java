@@ -362,6 +362,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 							} catch (ClassNotFoundException e) {
 								e.printStackTrace();
+							} catch (NoClassDefFoundError e) {
+								// this only occurs for nested classes (i.e. those with dollar signs in class name),
+								// and perhaps only on the Mac
+								
+								//System.out.println(className);
+								//e.printStackTrace();			
 							}
 						}
 					}
@@ -399,11 +405,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		}
 
 		/*
-		 * Register plugin classes
-		 */
-		registerPlugins();
-
-		/*
 		 * Set up Environment variables
 		 */
 		Environment.setUserInterface(true);
@@ -412,6 +413,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		 * Attach listeners for Script Console
 		 */
 		initScriptConsole();
+
+		/*
+		 * Register plugin classes
+		 */
+		registerPlugins();
 
 	}
 
@@ -458,6 +464,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		for (WorldObject wo : getWorld().getGround().getChildren()) {
 			if (wo instanceof UINeoNode) {
 				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) wo);
+				saveAction.setBlocking(true);
 				saveAction.doAction();
 
 			}
