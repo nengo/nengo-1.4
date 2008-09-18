@@ -48,6 +48,7 @@ import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.math.Function;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.plot.impl.DefaultPlotter;
+import ca.nengo.util.DataUtils;
 import ca.nengo.util.Environment;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.TimeSeries;
@@ -167,22 +168,7 @@ public abstract class Plotter {
 	 * @return Filtered TimeSeries
 	 */
 	public static TimeSeries filter(TimeSeries series, float tauFilter) {
-		Integrator integrator = new EulerIntegrator(.0005f);
-		
-		int dim = series.getDimension();
-		float[] A = new float[dim];
-		float[][] B = new float[dim][];
-		float[][] C = new float[dim][];
-		for (int i = 0; i < dim; i++) {
-			A[i] = -1f / tauFilter;
-			B[i] = new float[dim];
-			B[i][i] = 1f;
-			C[i] = new float[dim];
-			C[i][i] = 1f / tauFilter;
-		}		
-		LTISystem filter = new SimpleLTISystem(A, B, C, new float[dim], series.getUnits());
-		
-		return integrator.integrate(filter, series);		
+		return DataUtils.filter(series, tauFilter);
 	}
 
 	/**

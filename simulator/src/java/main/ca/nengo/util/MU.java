@@ -376,6 +376,20 @@ public class MU {
 		
 		return result;
 	}
+	
+	/**
+	 * @param X Any vector 
+	 * @return X(2:end) - X(1:end-1)
+	 */
+	public static float[] difference(float[] X) {
+		float[] result = new float[X.length - 1];
+		
+		for (int i = 2; i < X.length; i++) {
+			result[i] = X[i] - X[i-1];
+		}
+		
+		return result;
+	} 
 
 	/**
 	 * @param matrix An array of float arrays (normally a matrix but can have rows of different length)

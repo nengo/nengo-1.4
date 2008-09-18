@@ -60,7 +60,11 @@ public class DataUtils {
 	 * @return Filtered TimeSeries
 	 */
 	public static TimeSeries filter(TimeSeries series, float tau) {
-		Integrator integrator = new EulerIntegrator(.0005f);
+		float[] times = series.getTimes();
+		float meanStepSize = (times[times.length-1] - times[1]) / times.length;
+		float integrationStepSize = Math.min(meanStepSize/2f, tau/2f);
+		
+		Integrator integrator = new EulerIntegrator(integrationStepSize);
 		
 		int dim = series.getDimension();
 		float[] A = new float[dim];
