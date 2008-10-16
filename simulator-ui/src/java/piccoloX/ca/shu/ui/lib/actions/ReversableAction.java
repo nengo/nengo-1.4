@@ -12,6 +12,8 @@ import ca.shu.ui.lib.util.UserMessages;
  */
 public abstract class ReversableAction extends StandardAction {
 
+	private static final long serialVersionUID = 1L;
+
 	public ReversableAction(String description) {
 		super(description);
 	}

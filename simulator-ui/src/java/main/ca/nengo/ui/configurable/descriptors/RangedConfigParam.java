@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.configurable.descriptors;
 
@@ -34,6 +34,9 @@ import ca.nengo.ui.configurable.Property;
  * @author Shu Wu
  */
 public abstract class RangedConfigParam extends Property {
+
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Whether to check the range of the Integer value
 	 */

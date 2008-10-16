@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.configurable;
 
@@ -35,6 +35,8 @@ import ca.shu.ui.lib.util.Util;
  * @author Shu
  */
 public abstract class Property implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private Object defaultValue = null;
 
@@ -117,7 +119,8 @@ public abstract class Property implements Serializable {
 		String nodeDescription = "Type: " + getTypeName();
 
 		if (description != null) {
-			return "<html><b>" + nodeDescription + "</b><br>" + description + "</html>";
+			return "<html><b>" + nodeDescription + "</b><br>" + description
+					+ "</html>";
 		} else {
 			return nodeDescription;
 		}

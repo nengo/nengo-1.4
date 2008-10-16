@@ -184,7 +184,6 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 	 * @param sortMode
 	 *            Type of sort layout to use
 	 */
-	@SuppressWarnings("unchecked")
 	public void applySortLayout(SortMode sortMode) {
 		getGround().setElasticEnabled(false);
 

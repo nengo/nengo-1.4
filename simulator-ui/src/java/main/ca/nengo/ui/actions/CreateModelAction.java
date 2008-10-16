@@ -116,7 +116,6 @@ public class CreateModelAction extends ReversableAction {
 	 * @param nodeUIType
 	 *            Type of Node to be create, such as PNetwork
 	 */
-	@SuppressWarnings("unchecked")
 	public CreateModelAction(String modelTypeName, NodeContainer nodeContainer,
 			AbstractConstructable constructable) {
 		super("Create new " + modelTypeName, modelTypeName, false);

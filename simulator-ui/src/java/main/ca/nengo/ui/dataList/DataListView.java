@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.dataList;
 
@@ -186,10 +186,10 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 				}
 
 				// make sure we don't remove the node representing the network
-				List<MutableTreeNode> removeNodes= new ArrayList<MutableTreeNode>();
-				TreeNode root=(TreeNode)dataModel.getRoot();
+				List<MutableTreeNode> removeNodes = new ArrayList<MutableTreeNode>();
+				TreeNode root = (TreeNode) dataModel.getRoot();
 				for (MutableTreeNode node : leafNodes) {
-					if (node.getParent()==root) {
+					if (node.getParent() == root) {
 						Enumeration<MutableTreeNode> childEnumerator = node.children();
 						while (childEnumerator.hasMoreElements()) {
 							removeNodes.add(childEnumerator.nextElement());
@@ -197,8 +197,8 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 					} else {
 						removeNodes.add(node);
 					}
-				}				
-				
+				}
+
 				menuBuilder.addAction(new RemoveTreeNodes(removeNodes));
 				menu = menuBuilder.toJPopupMenu();
 
@@ -252,7 +252,6 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			return paths;
 		}
 
-		@SuppressWarnings("unchecked")
 		private void RecursiveFindDataNodes(TreeNode topNode, HashSet<DataTreeNode> dataTreeNodes) {
 			Enumeration<TreeNode> childEnumerator = topNode.children();
 			while (childEnumerator.hasMoreElements()) {
@@ -390,7 +389,11 @@ class DataPath {
 }
 
 abstract class ExportAction extends StandardAction {
+
+	private static final long serialVersionUID = 1L;
+
 	private static ExportFileChooser fileChooser = new ExportFileChooser();
+
 	public static void findDataItemsRecursive(MutableTreeNode node, ArrayList<String> position,
 			Collection<DataPath> dataItemsPaths) {
 

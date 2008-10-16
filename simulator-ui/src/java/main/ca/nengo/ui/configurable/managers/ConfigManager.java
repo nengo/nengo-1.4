@@ -122,7 +122,6 @@ public abstract class ConfigManager {
 	/**
 	 * @returns the file name prefix given per class
 	 */
-	@SuppressWarnings("unchecked")
 	protected static String getFileNamePrefix(IConfigurable obj) {
 
 		return obj.getTypeName() + "_Props_";

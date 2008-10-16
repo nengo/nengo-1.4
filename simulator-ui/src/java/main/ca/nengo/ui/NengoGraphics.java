@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui;
 
@@ -106,13 +106,16 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
  */
 public class NengoGraphics extends AppFrame implements NodeContainer {
 	private static final long serialVersionUID = 1L;
+
 	public static final double VERSION = 1.0;
 
 	public static final String APP_NAME = "Nengo V" + VERSION;
 	/**
 	 * Description of NeoGraphics to be shown in the "About" Dialog box
 	 */
-	public static final String ABOUT = "<H3>" + APP_NAME + "</H3>"
+	public static final String ABOUT = "<H3>"
+			+ APP_NAME
+			+ "</H3>"
 			+ "<p>(c) Copyright Bryan Tripp & Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2008.  All rights reserved.<BR><BR>"
 			+ "User Interface by Shu Wu (shuwu83@gmail.com) <BR><BR>"
 			+ "This product contains several open-source libraries (copyright their respective authors). "
@@ -162,11 +165,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	private ConfigurationPane configPane;
 
 	private AuxillarySplitPane dataViewerPane;
+
 	private SelectionBorder objectSelectedBorder;
 
 	private PythonInterpreter pythonInterpreter;
-	private ScriptConsole scriptConsole;
 
+	private ScriptConsole scriptConsole;
 	private AuxillarySplitPane scriptConsolePane;
 
 	private WorldObject selectedObj;
@@ -257,14 +261,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	}
 
-	@Override
-	protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
-		super.constructShortcutKeys(shortcuts);
-		shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_P,
-				new SetSplitPaneVisibleAction("Focus on script console", scriptConsolePane, true)));
-
-	}
-
 	private void loadConfig() {
 		String simulatorSource = "../simulator/src/java/main";
 
@@ -350,13 +346,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 						JarEntry entry = entries.nextElement();
 						String fileName = entry.getName();
 						if (fileName.endsWith(".class")) {
-							String className="";
+							String className = "";
 							try {
 								className = fileName.substring(0, fileName.lastIndexOf('.'))
 										.replace('/', '.');// .replace('$',
 								// '.');
 								Class<?> newClass = urlClassLoader.loadClass(className);
-							
 
 								// Util.debugMsg("Registering class: " +
 								// newClass.getName());
@@ -365,11 +360,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 							} catch (ClassNotFoundException e) {
 								e.printStackTrace();
 							} catch (NoClassDefFoundError e) {
-								// this only occurs for nested classes (i.e. those with dollar signs in class name),
+								// this only occurs for nested classes (i.e.
+								// those with dollar signs in class name),
 								// and perhaps only on the Mac
-								
-								//System.out.println(className);
-								//e.printStackTrace();
+
+								// System.out.println(className);
+								// e.printStackTrace();
 							}
 						}
 					}
@@ -383,6 +379,14 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
+		super.constructShortcutKeys(shortcuts);
+		shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_P,
+				new SetSplitPaneVisibleAction("Focus on script console", scriptConsolePane, true)));
+
 	}
 
 	@Override
@@ -406,7 +410,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			FileChooser = new NeoFileChooser();
 		}
 
-
 		/*
 		 * Set up Environment variables
 		 */
@@ -421,7 +424,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		 * Register plugin classes
 		 */
 		registerPlugins();
-		
+
 	}
 
 	@Override
@@ -461,7 +464,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	 * Prompt user to save models in NeoGraphics This is most likely called
 	 * right before the application is exiting
 	 */
-	@SuppressWarnings("unchecked")
 	protected void promptToSaveModels() {
 
 		for (WorldObject wo : getWorld().getGround().getChildren()) {
@@ -508,7 +510,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ca.nengo.ui.models.INodeContainer#addNeoNode(ca.nengo.ui.models.UINeoNode)
+	 * @see
+	 * ca.nengo.ui.models.INodeContainer#addNeoNode(ca.nengo.ui.models.UINeoNode
+	 * )
 	 */
 	public UINeoNode addNodeModel(Node node) throws ContainerException {
 		return addNodeModel(node, null, null);
@@ -684,6 +688,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		}
 	}
 
+	public void setDataViewerPaneVisible(boolean visible) {
+		if (dataViewerPane.isAuxVisible() != visible) {
+			(new ToggleScriptPane(null, dataViewerPane)).doAction();
+		}
+	}
+
 	public void setDataViewerVisible(boolean isVisible) {
 		dataViewerPane.setAuxVisible(isVisible);
 	}
@@ -705,6 +715,41 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	}
 
+	class ConfigurationPane {
+		private static final long serialVersionUID = 1L;
+
+		AuxillarySplitPane auxSplitPane;
+
+		public ConfigurationPane(Container mainPanel) {
+			super();
+			auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Configuration",
+					AuxillarySplitPane.Orientation.Right);
+
+		}
+
+		public void configureObj(Object obj) {
+
+			ConfigUtil.ConfigurationPane configurationPane = ConfigUtil
+					.createConfigurationPane(obj);
+			// Style.applyStyle(configurationPane.getTree());
+			// Style.applyStyle(configurationPane.getCellRenderer());
+
+			String name;
+			if (obj instanceof Node) {
+				name = ((Node) obj).getName();
+			} else {
+				name = "Configuration";
+			}
+			auxSplitPane.setAuxPane(configurationPane, name + " (" + obj.getClass().getSimpleName()
+					+ ")");
+
+		}
+
+		public AuxillarySplitPane toJComponent() {
+			return auxSplitPane;
+		}
+	}
+
 	class OpenScriptEditor extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
@@ -718,40 +763,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			ScriptEditor.openEditor();
 		}
 
-	}
-}
-
-class ConfigurationPane {
-	private static final long serialVersionUID = 1L;
-
-	AuxillarySplitPane auxSplitPane;
-
-	public ConfigurationPane(Container mainPanel) {
-		super();
-		auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Configuration",
-				AuxillarySplitPane.Orientation.Right);
-
-	}
-
-	public void configureObj(Object obj) {
-
-		ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
-		// Style.applyStyle(configurationPane.getTree());
-		// Style.applyStyle(configurationPane.getCellRenderer());
-
-		String name;
-		if (obj instanceof Node) {
-			name = ((Node) obj).getName();
-		} else {
-			name = "Configuration";
-		}
-		auxSplitPane.setAuxPane(configurationPane, name + " (" + obj.getClass().getSimpleName()
-				+ ")");
-
-	}
-
-	public AuxillarySplitPane toJComponent() {
-		return auxSplitPane;
 	}
 }
 

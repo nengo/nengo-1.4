@@ -14,6 +14,8 @@ import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
  */
 public abstract class TrackedAction extends StandardAction {
 
+	private static final long serialVersionUID = 1L;
+
 	private String taskName;
 
 	private TrackedStatusMsg trackedMsg;

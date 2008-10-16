@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models;
 
@@ -441,7 +441,8 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ca.shu.ui.lib.world.DroppableX#droppedOnTargets(java.util.Collection)
+	 * @see
+	 * ca.shu.ui.lib.world.DroppableX#droppedOnTargets(java.util.Collection)
 	 */
 	public void droppedOnTargets(Collection<WorldObject> targets) {
 		for (WorldObject wo : targets) {
@@ -561,7 +562,6 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	/**
 	 * Hides all origins and terminations
 	 */
-	@SuppressWarnings("unchecked")
 	public void hideAllOandT() {
 		for (WorldObject wo : getChildren()) {
 			if (wo instanceof Widget && (wo instanceof UITermination || wo instanceof UIOrigin)) {
@@ -571,7 +571,6 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		layoutChildren();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void layoutChildren() {
 		super.layoutChildren();
