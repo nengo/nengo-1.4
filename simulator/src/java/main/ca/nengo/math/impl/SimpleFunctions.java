@@ -142,6 +142,24 @@ public class SimpleFunctions {
 		}
 	}
 	
+	/**
+	 * Computes the image of x0 \in \mathbb{R} in the quotient group \mathbb{R}/\mathbb{Z}. 
+	 * The representative is in (-1/2,1/2].
+	 * 
+	 * @author Lloyd Elliott
+	 */
+	public static class Fold extends AbstractFunction {
+		private static final long serialVersionUID = 1L;
+
+		public Fold() {
+			super(1);
+		}
+
+		@Override
+		public float map(float[] from) {
+			return (float) (from[0] - Math.ceil(from[0] - 0.5f));
+		}
+	}
 	public static class Exp extends AbstractFunction {
 		private static final long serialVersionUID = 1L;
 
