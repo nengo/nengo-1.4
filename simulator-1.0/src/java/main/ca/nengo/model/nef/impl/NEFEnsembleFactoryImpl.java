@@ -128,6 +128,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 		if (!overwrite && ensembleFile.exists() && ensembleFile.canRead()) {
 			try {
 				result = (NEFEnsemble) fm.load(ensembleFile);
+				result.setName(name);		  // so that the name is consistent regardless of the data file		
 			} catch (Exception e) {
 				ourLogger.error("Failed to load file " + ensembleFile.getAbsolutePath() + ". New ensemble will be created.", e);
 			}
@@ -135,8 +136,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 		
 		if (result == null) {
 			float[] radii = MU.uniform(1, dim, 1)[0];
-			result = doMake(name, n, radii);
-			
+			result = doMake(name, n, radii);			
 			try {
 				fm.save(result, ensembleFile);
 			} catch (IOException e) {
@@ -178,31 +178,36 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 	//common make(...) implementation 
 	private NEFEnsemble doMake(String name, int n, float[] radii) throws StructuralException {
 		
-		int dim = radii.length;
-		NEFNode[] nodes = new NEFNode[n];
-		
-		for (int i = 0; i < n; i++) {
-			Node node = myNodeFactory.make("node" + i);
-			if ( !(node instanceof NEFNode) ) {
-				throw new StructuralException("Nodes must be NEFNodes");
-			}
-			nodes[i] = (NEFNode) node;
+		try {
+			int dim = radii.length;
+			NEFNode[] nodes = new NEFNode[n];
 			
-			nodes[i].setMode(SimulationMode.CONSTANT_RATE);
-			if ( !nodes[i].getMode().equals(SimulationMode.CONSTANT_RATE) ) {
-				throw new StructuralException("Neurons in an NEFEnsemble must support CONSTANT_RATE mode");
+			for (int i = 0; i < n; i++) {
+				Node node = myNodeFactory.make("node" + i);
+				if ( !(node instanceof NEFNode) ) {
+					throw new StructuralException("Nodes must be NEFNodes");
+				}
+				nodes[i] = (NEFNode) node;
+				
+				nodes[i].setMode(SimulationMode.CONSTANT_RATE);
+				if ( !nodes[i].getMode().equals(SimulationMode.CONSTANT_RATE) ) {
+					throw new StructuralException("Neurons in an NEFEnsemble must support CONSTANT_RATE mode");
+				}
+				
+				nodes[i].setMode(SimulationMode.DEFAULT);
 			}
+	
+			float[][] encoders = myEncoderFactory.genVectors(n, dim);
+			float[][] evalPoints = getEvalPointFactory().genVectors(getNumEvalPoints(dim), dim);
+			NEFEnsemble result = construct(name, nodes, encoders, myApproximatorFactory, evalPoints, radii);
 			
-			nodes[i].setMode(SimulationMode.DEFAULT);
+			addDefaultOrigins(result);
+			return result;
+		} catch (RuntimeException e) {
+			// a singular gamma matrix can produce a runtime exception.  If this occurs,
+			// call make again.
+			return doMake(name,n,radii);			
 		}
-
-		float[][] encoders = myEncoderFactory.genVectors(n, dim);
-		float[][] evalPoints = getEvalPointFactory().genVectors(getNumEvalPoints(dim), dim);
-		NEFEnsemble result = construct(name, nodes, encoders, myApproximatorFactory, evalPoints, radii);
-		
-		addDefaultOrigins(result);
-		
-		return result;
 	}
 
 	/**
