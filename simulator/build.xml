@@ -22,6 +22,7 @@
 		<pathelement location="${lib}/jmatio.jar" /> 
 		<pathelement location="${lib}/log4j-1.2.14.jar" /> 
 		<pathelement location="${lib}/qdox-1.6.3.jar" /> 
+		<pathelement location="${lib}/formsrt.jar" /> 
 		<pathelement location="${lib-ui}/jython.jar" /> 
 		<pathelement location="${lib-ui}/jung-1.7.6.jar" /> 
 		<pathelement location="${lib-ui}/piccolo.jar" /> 
