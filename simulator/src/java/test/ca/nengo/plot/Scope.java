@@ -3,8 +3,6 @@
  *  TODO: give range on 'scale to extrema' some headroom.
  *  
  *   think about rounding to time step
- *   
- *  trail length of 0 loses color / shape. 
  * */
 
 package ca.nengo.plot;
@@ -55,6 +53,7 @@ public class Scope {
 	private float[] _yAxisSeenMinMax;
 	/** [min, max].  only used when _yAxisScaling == Y_AXIS_SCALING_CUSTOM. */
 	private double[] _yAxisCustomMinMax = new double[]{-1, 1};
+	private Color[] _dimensionColors;
 
 	private JPanel _graphPanel;
 	private FormPanel _ctrlPanel;
@@ -64,22 +63,34 @@ public class Scope {
 		_probe = probe_;
 		_probeValues = _probe.getData().getValues();
 		resetMinMaxSeen();
+		initDimensionColorsToSomeDefaults();
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() {
 					_graphPanel = new JPanel();
 					initCtrlPanel();
+					showChartPanelForCurTime(true);
 				}
 			});
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		showChartPanelForCurTime(true);
 
 		// hack for pack(): (TODO: fix)
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
+		}
+	}
+	
+	private void initDimensionColorsToSomeDefaults() {
+		assert _probeValues!=null;
+		_dimensionColors = new Color[numDimensions()];
+		for(int i=0; i<_dimensionColors.length; ++i) {
+			final Color[] basicColors = { Color.RED, Color.GREEN, Color.BLUE, Color.CYAN,
+					Color.MAGENTA, Color.ORANGE, Color.YELLOW, Color.PINK,
+					Color.BLACK, Color.GRAY };
+			_dimensionColors[i] = basicColors[i % basicColors.length];
 		}
 	}
 
@@ -222,7 +233,7 @@ public class Scope {
 			(JSpinner)(_ctrlPanel.getComponentByName("range.custom.min.spinner")), 
 			(JSpinner)(_ctrlPanel.getComponentByName("range.custom.max.spinner"))};
 		rangeCustomSpinners[0].setModel(
-			new SpinnerNumberModel(_yAxisCustomMinMax[0], -999999999999999999999999.0, 999999999999999999999999.0, 0.1));
+			new SpinnerNumberModel(_yAxisCustomMinMax[0], null, null, 0.1));
 		rangeCustomSpinners[0].addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				_yAxisCustomMinMax[0] = (Double) (rangeCustomSpinners[0].getValue());
@@ -232,7 +243,7 @@ public class Scope {
 			}
 		});
 		rangeCustomSpinners[1].setModel(
-			new SpinnerNumberModel(_yAxisCustomMinMax[1], -999999999999999999999999.0, 999999999999999999999999.0, 0.1));
+			new SpinnerNumberModel(_yAxisCustomMinMax[1], null, null, 0.1));
 		rangeCustomSpinners[1].addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				_yAxisCustomMinMax[1] = (Double) (rangeCustomSpinners[1].getValue());
@@ -265,6 +276,44 @@ public class Scope {
 				}
 			}
 		});
+		
+		final JButton changeColorsButton  
+			= (JButton)(_ctrlPanel.getComponentByName("change.colors.button"));
+		changeColorsButton.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				makeColorChangeDimensionChooserPopupMenu().show(changeColorsButton, e.getX(), e.getY());
+			}
+		});
+	}
+	
+	private JPopupMenu makeColorChangeDimensionChooserPopupMenu() {
+		JPopupMenu popupMenu = new JPopupMenu();
+		for(int i=0; i<numDimensions(); ++i) {
+			JMenuItem menuItem = new JMenuItem("dimension "+i, 
+					new SolidColorIcon(_dimensionColors[i], 10, 10));
+			menuItem.addActionListener(new ColorChangeDimensionChooserPopupMenuItemListener(i));
+			popupMenu.add(menuItem);
+		}
+		return popupMenu;
+	}
+	
+	private class ColorChangeDimensionChooserPopupMenuItemListener implements ActionListener {
+		private int _dimensionNum;
+		
+		ColorChangeDimensionChooserPopupMenuItemListener(int dimensionNum_) {
+			_dimensionNum = dimensionNum_;
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			Color newColor = JColorChooser.showDialog(_ctrlPanel, 
+					"Choose Color for Dimension", _dimensionColors[_dimensionNum]);
+			if(newColor != null) {
+				_dimensionColors[_dimensionNum] = newColor;
+				if (!isPlaying()) {
+					showChartPanelForCurTime(true);
+				}
+			}
+		}
 	}
 
 	/**
@@ -368,10 +417,13 @@ public class Scope {
 		}
 	}
 
+	private int numDimensions() {
+		return _probeValues[0].length;
+	}
+	
 	private ChartPanel getChartPanelForCurTime() {
 		XYSeriesCollection dataset = new XYSeriesCollection();
-		int numDimensions = _probeValues[0].length;
-		for (int dim = 0; dim < numDimensions; ++dim) {
+		for (int dim = 0; dim < numDimensions(); ++dim) {
 			XYSeries series = new XYSeries("dimension " + dim);
 			for (int trailPosTime = _curTime; trailPosTime >= _curTime
 					- _trailLength * _timeStep; trailPosTime -= _timeStep) {
@@ -404,7 +456,7 @@ public class Scope {
 		_yAxisSeenMinMax[1] = Math.max(_yAxisSeenMinMax[1], v_);
 	}
 
-	private static void animPlotVectorSetupRenderer(XYPlot plot,
+	private void animPlotVectorSetupRenderer(XYPlot plot,
 			final int trailLength) {
 		final XYLineAndShapeRenderer origRenderer = (XYLineAndShapeRenderer) (plot
 				.getRenderer());
@@ -418,9 +470,10 @@ public class Scope {
 					throws Throwable {
 				if (method.getName().equals("drawItem")) {
 					int series = (Integer) (args[8]), item = (Integer) (args[9]);
-					Color color = getColorForSeriesIdx(series);
-					color = fadeToWhite(color, (trailLength - item)
-							/ (float) trailLength);
+					Color color = _dimensionColors[series];
+					if(trailLength>0) {
+						color = fadeToWhite(color, (trailLength - item)/(float)trailLength);
+					}
 					origRenderer.setSeriesPaint(series, color, false);
 				}
 				return method.invoke(origRenderer, args);
@@ -431,13 +484,6 @@ public class Scope {
 						new Class[] { XYItemRenderer.class }, handler);
 
 		plot.setRenderer(wrappingRenderer);
-	}
-
-	private static Color getColorForSeriesIdx(int seriesIdx) {
-		Color[] colors = { Color.RED, Color.GREEN, Color.BLUE, Color.CYAN,
-				Color.MAGENTA, Color.ORANGE, Color.YELLOW, Color.PINK,
-				Color.BLACK, Color.GRAY };
-		return colors[seriesIdx % colors.length];
 	}
 
 	private static Color fadeToWhite(Color c, float percent) {
