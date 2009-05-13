@@ -153,6 +153,48 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	}
 	
 	/**
+	 * @see ca.nengo.model.Network#addNode(ca.nengo.model.Node)
+	 */
+	public void addNode(Node node, boolean includeProbes) throws StructuralException {
+		if (myNodeMap.containsKey(node.getName())) {
+			throw new StructuralException("This Network already contains a Node named " + node.getName());
+		}
+		
+		myNodeMap.put(node.getName(), node);
+		node.addChangeListener(this);
+		
+		
+		if(includeProbes && node instanceof Network)
+		{
+			Network tmp = (Network) node;
+			Probe[] networkProbes = tmp.getSimulator().getProbes();
+			
+			
+			
+			System.out.println("adding network " + tmp.getName());
+			for(int i = 0; i < networkProbes.length; i++)
+			{
+				String ensembleName = "";
+				if(networkProbes[i].getEnsembleName() != null)
+					ensembleName = " " + networkProbes[i].getEnsembleName();
+				
+				try
+				{
+					getSimulator().addProbe("[" + tmp.getName() + ensembleName + "]", networkProbes[i].getTarget(), 
+							networkProbes[i].getStateName(), true);
+				}
+				catch(SimulationException se)
+				{
+					System.err.println("Error adding probe on " + networkProbes[i].getStateName() + " from network " + tmp.getName());
+				}
+			}
+		}
+		
+		getSimulator().initialize(this);		
+		fireVisibleChangeEvent();
+	}
+	
+	/**
 	 * If the event indicates that a component node's name is changing, 
 	 * checks for name conflicts and throws an exception if there is one, 
 	 * and updates the name reference.  
