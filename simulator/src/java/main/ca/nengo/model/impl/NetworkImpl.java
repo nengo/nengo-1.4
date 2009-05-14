@@ -152,8 +152,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		fireVisibleChangeEvent();
 	}
 	
-	/**
-	 * @see ca.nengo.model.Network#addNode(ca.nengo.model.Node)
+	 /**
+	 * @param node Node to add to the Network 
+	 * @param includeProbes if true, when the node being added is a network any probes in that network will also be added
+	 * @throws StructuralException if the Network already contains a Node of the same name
 	 */
 	public void addNode(Node node, boolean includeProbes) throws StructuralException {
 		if (myNodeMap.containsKey(node.getName())) {
@@ -168,8 +170,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		{
 			Network tmp = (Network) node;
 			Probe[] networkProbes = tmp.getSimulator().getProbes();
-			
-			
 			
 			System.out.println("adding network " + tmp.getName());
 			for(int i = 0; i < networkProbes.length; i++)
