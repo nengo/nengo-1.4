@@ -187,7 +187,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		RealOutput ro = (RealOutput) values;
 		myInputValues = new RealOutputImpl(MU.sum(ro.getValues(), myStaticBias), ro.getUnits(), ro.getTime());
 		
-		if (!myValuesSet) myValuesSet = false;
+		if (!myValuesSet) myValuesSet = true;
 	}
 		
 	/**
