@@ -128,6 +128,14 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 		if (!overwrite && ensembleFile.exists() && ensembleFile.canRead()) {
 			try {
 				result = (NEFEnsemble) fm.load(ensembleFile);
+				
+				//---added by daniel rasmussen----
+				result.setName(name);
+				if(result.getNodes().length != n)
+					ourLogger.warn("Number of nodes in ensemble loaded from file does not match requested number of nodes");
+				if(result.getDimension() != dim)
+					ourLogger.warn("Dimension of ensemble loaded from file does not match requested dimension");
+				//--------------------------------
 			} catch (Exception e) {
 				ourLogger.error("Failed to load file " + ensembleFile.getAbsolutePath() + ". New ensemble will be created.", e);
 			}
@@ -182,6 +190,9 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 		{
 			int dim = radii.length;
 			NEFNode[] nodes = new NEFNode[n];
+			
+			if(n < 1)
+				ourLogger.warn("Calling doMake with n = " + n);
 			
 			for (int i = 0; i < n; i++) {
 				Node node = myNodeFactory.make("node" + i);
