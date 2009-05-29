@@ -129,13 +129,11 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 			try {
 				result = (NEFEnsemble) fm.load(ensembleFile);
 				
-				//---added by daniel rasmussen----
 				result.setName(name);
 				if(result.getNodes().length != n)
 					ourLogger.warn("Number of nodes in ensemble loaded from file does not match requested number of nodes");
 				if(result.getDimension() != dim)
 					ourLogger.warn("Dimension of ensemble loaded from file does not match requested dimension");
-				//--------------------------------
 			} catch (Exception e) {
 				ourLogger.error("Failed to load file " + ensembleFile.getAbsolutePath() + ". New ensemble will be created.", e);
 			}
