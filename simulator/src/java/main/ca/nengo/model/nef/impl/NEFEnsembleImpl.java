@@ -142,7 +142,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @param radii A list of radii of encoded area along each dimension; uniform 
 	 * 		radius along each dimension can be specified with a list of length 1
 	 */
-	public void setRadii(float[] radii) {
+	public void setRadii(float[] radii) throws StructuralException {
 		if (radii.length != getDimension() && radii.length != 1) {
 			throw new IllegalArgumentException("radius vector must have length " + getDimension() 
 					+ " or 1 (for uniform radius)");
@@ -152,6 +152,25 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			float uniformRadius = radii[0];
 			radii = MU.uniform(1, getDimension(), uniformRadius)[0];			
 		}
+
+		myEvalPoints = new float[myUnscaledEvalPoints.length][];
+		for (int i = 0; i < myUnscaledEvalPoints.length; i++) {
+			myEvalPoints[i] = new float[myUnscaledEvalPoints[i].length];
+			for (int j = 0; j < myUnscaledEvalPoints[i].length; j++) {
+				myEvalPoints[i][j] = myUnscaledEvalPoints[i][j] * radii[j];
+			}
+		}
+	
+		
+		
+		float[] oldRadii=null;
+		if (myRadii!=null) {
+			oldRadii=new float[radii.length];
+			for (int i=0; i<radii.length; i++) {
+				oldRadii[i]=myRadii[i];
+			}
+		}
+		
 		
 		myRadii = radii;
 		
@@ -161,16 +180,36 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			myInverseRadii[i] = 1f / radii[i];
 			if (Math.abs(radii[i]-1f) > 1e-10) myRadiiAreOne = false;
 		}
+
+		myDecodingApproximators.clear();
 		
-		myEvalPoints = new float[myUnscaledEvalPoints.length][];
-		for (int i = 0; i < myUnscaledEvalPoints.length; i++) {
-			myEvalPoints[i] = new float[myUnscaledEvalPoints[i].length];
-			for (int j = 0; j < myUnscaledEvalPoints[i].length; j++) {
-				myEvalPoints[i][j] = myUnscaledEvalPoints[i][j] * myRadii[j];
+		// update the decoders for any existing origins
+		Origin[] origins = getOrigins();
+		for (int i = 0; i < origins.length; i++) {
+			if (origins[i] instanceof DecodedOrigin) {
+				DecodedOrigin origin=((DecodedOrigin) origins[i]);
+				if (oldRadii!=null && origin.getName().equals(NEFEnsemble.X)) {
+					// Just rescale the X origin
+					float scale[]=new float[radii.length];
+					for (int j=0; j<radii.length; j++) {
+						scale[j]=myRadii[j]/oldRadii[j];
+					}
+					origin.rescaleDecoders(scale);
+				} else {
+					String nodeOrigin=origin.getNodeOrigin();
+					// recalculate the decoders
+					if (!myReuseApproximators || !myDecodingApproximators.containsKey(nodeOrigin)) {
+						float[][] outputs = getConstantOutputs(myEvalPoints, nodeOrigin);
+						LinearApproximator approximator = getApproximatorFactory().getApproximator(myEvalPoints, outputs);
+						myDecodingApproximators.put(nodeOrigin, approximator);
+					}		
+					
+					origin.rebuildDecoder(myDecodingApproximators.get(nodeOrigin));
+				}
 			}
 		}
 		
-		myDecodingApproximators.clear();
+		
 	}
 	
 	/**
