@@ -75,12 +75,13 @@ public class CNEFEnsemble extends ConstructableNode {
 	static final Property pEncodingSign = new PSign("Encoding Sign");
 	static final Property pNodeFactory = new PNodeFactory("Node Factory");
 	static final Property pNumOfNodes = new PInt("Number of Nodes");
+	static final Property pRadius = new PFloat("Radius");
 
 	/**
 	 * Config descriptors
 	 */
 	static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(new Property[] { pNumOfNodes,
-			pDim, pNodeFactory }, new Property[] { pApproximator, pEncodingDistribution,
+			pDim, pNodeFactory, pRadius }, new Property[] { pApproximator, pEncodingDistribution,
 			pEncodingSign });
 
 	public CNEFEnsemble() {
@@ -101,6 +102,7 @@ public class CNEFEnsemble extends ConstructableNode {
 			NodeFactory nodeFactory = (NodeFactory) prop.getValue(pNodeFactory);
 			Sign encodingSign = (Sign) prop.getValue(pEncodingSign);
 			Float encodingDistribution = (Float) prop.getValue(pEncodingDistribution);
+			Float radius = (Float) prop.getValue(pRadius);
 
 			if (nodeFactory != null) {
 				ef.setNodeFactory(nodeFactory);
@@ -123,9 +125,15 @@ public class CNEFEnsemble extends ConstructableNode {
 				ef.setEncoderFactory(vectorGen);
 			}
 
-			NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions);
-
-			return ensemble;
+			if (radius==null) {
+				NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions);
+				return ensemble;
+			} else {
+				float[] radii=new float[dimensions];
+				for (int i=0; i<dimensions; i++) radii[i]=radius.floatValue();
+				NEFEnsemble ensemble = ef.make(name, numOfNeurons, radii);
+				return ensemble;
+			}
 		} catch (StructuralException e) {
 			e.printStackTrace();
 		}
