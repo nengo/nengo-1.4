@@ -479,4 +479,25 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		}
 	}
 
+	/**
+	 * Rescales the decoders.  Useful if the radius changes but you don't want to regenerate the decoders. 
+	 * 
+	 * @param scale vector to multiply each decoder by 
+	 */ 
+	public void rescaleDecoders(float[] scale) {
+		for (int i=0;i<myDecoders.length; i++) {
+			for (int j=0; j<scale.length; j++) {
+				myDecoders[i][j]*=scale[j];
+			}
+		}
+	}
+	
+	/**
+	 * Recalculates the decoders
+	 */
+	public void rebuildDecoder(LinearApproximator approximator) {
+		myDecoders = findDecoders(myNodes, myFunctions, approximator);  		
+	}
+	
+
 }
