@@ -76,13 +76,14 @@ public class CNEFEnsemble extends ConstructableNode {
 	static final Property pNodeFactory = new PNodeFactory("Node Factory");
 	static final Property pNumOfNodes = new PInt("Number of Nodes");
 	static final Property pRadius = new PFloat("Radius");
+	static final Property pNoise = new PFloat("Noise");
 
 	/**
 	 * Config descriptors
 	 */
 	static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(new Property[] { pNumOfNodes,
 			pDim, pNodeFactory, pRadius }, new Property[] { pApproximator, pEncodingDistribution,
-			pEncodingSign });
+			pEncodingSign, pNoise });
 
 	public CNEFEnsemble() {
 		super();
@@ -103,6 +104,7 @@ public class CNEFEnsemble extends ConstructableNode {
 			Sign encodingSign = (Sign) prop.getValue(pEncodingSign);
 			Float encodingDistribution = (Float) prop.getValue(pEncodingDistribution);
 			Float radius = (Float) prop.getValue(pRadius);
+			Float noise = (Float) prop.getValue(pNoise);
 
 			if (nodeFactory != null) {
 				ef.setNodeFactory(nodeFactory);
@@ -110,6 +112,12 @@ public class CNEFEnsemble extends ConstructableNode {
 
 			if (approxFactory != null) {
 				ef.setApproximatorFactory(approxFactory);
+			}
+			if (noise != null) {
+				ApproximatorFactory f=ef.getApproximatorFactory();
+				if (f instanceof WeightedCostApproximator.Factory) {
+					((WeightedCostApproximator.Factory)f).setNoise(noise);
+				}
 			}
 
 			if (encodingSign != null) {
