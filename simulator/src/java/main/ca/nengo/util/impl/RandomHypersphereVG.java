@@ -38,8 +38,10 @@ import ca.nengo.util.VectorGenerator;
  * 
  * @author Bryan Tripp
  */
-public class RandomHypersphereVG implements VectorGenerator {
+public class RandomHypersphereVG implements VectorGenerator, java.io.Serializable {
+	private static final long serialVersionUID = 1L;
 
+	
 	private boolean mySurface;
 	private float myRadius;
 	private float myAxisClusterFactor;

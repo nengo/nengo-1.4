@@ -34,6 +34,7 @@ package ca.nengo.model.nef;
 
 import ca.nengo.math.Function;
 import ca.nengo.model.Origin;
+import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.nef.impl.BiasOrigin;
@@ -160,5 +161,22 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	 * @param name Name of Termination to remove. 
 	 */
 	public void removeDecodedTermination(String name);
+	
+
+	/**
+	 * Gives the ensemble a reference to the factory used to created it (useful for adding more neurons later)
+	 * @param factory
+	 */
+	
+	public void setEnsembleFactory(NEFEnsembleFactory factory);
+	public NEFEnsembleFactory getEnsembleFactory();
+	
+	/**
+	 * For changing the number of neurons in the ensemble
+	 */
+	public int getNodeCount();
+	public void setNodeCount(int value) throws StructuralException;
+		
+		
 	
 }

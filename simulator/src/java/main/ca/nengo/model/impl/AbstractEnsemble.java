@@ -121,6 +121,16 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 
 		myListeners = new ArrayList<Listener>(3);
 	}
+
+	/**
+	 * Replaces the set of nodes inside the Ensemble
+	 */
+	public void redefineNodes(Node[] nodes) {
+		myNodes=nodes;
+		mySpikePattern = new SpikePatternImpl(myNodes.length);
+		setupNodeRunners(numNodeRunners);
+	}
+	
 	
 	private void setupNodeRunners(int n) {
 		myNodeRunners = new NodeRunner[n];
@@ -560,6 +570,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		
 		return result;
 	}
+	
+	
+	
 
 	/**
 	 * Allows us to run a node in a separate thread. 

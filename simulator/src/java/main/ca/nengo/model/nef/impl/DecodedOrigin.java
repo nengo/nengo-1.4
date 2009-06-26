@@ -499,5 +499,12 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myDecoders = findDecoders(myNodes, myFunctions, approximator);  		
 	}
 	
+	/**
+	 * Changes the set of nodes and recalculates the decoders 
+	 */
+	public void redefineNodes(Node[] nodes, LinearApproximator approximator) {
+		myNodes=nodes;
+		rebuildDecoder(approximator);
+	}
 
 }

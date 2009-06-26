@@ -100,4 +100,9 @@ public interface Ensemble extends Node {
 	 * @return true if the spike pattern will be recorded in subsequen runs
 	 */
 	public boolean isCollectingSpikes();
+	
+	/**
+	 * Replaces the set of nodes inside the Ensemble
+	 */
+	public void redefineNodes(Node[] nodes); 
 }

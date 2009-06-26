@@ -56,15 +56,17 @@ import ca.nengo.util.impl.RandomHypersphereVG;
  * 
  * @author Bryan Tripp
  */
-public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
+public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private static Logger ourLogger = Logger.getLogger(NEFEnsembleFactoryImpl.class);
 	
 	private ApproximatorFactory myApproximatorFactory;
 	private VectorGenerator myEncoderFactory;
 	private VectorGenerator myEvalPointFactory;
 	private NodeFactory myNodeFactory;
-	private File myDatabase;	
+	private transient File myDatabase;	
 	
 	public NEFEnsembleFactoryImpl() {
 		myApproximatorFactory = new WeightedCostApproximator.Factory(0.1f);
@@ -213,6 +215,8 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 			
 			addDefaultOrigins(result);
 			
+			result.setEnsembleFactory(this);
+			
 			return result;
 		}
 		catch(RuntimeException re)
@@ -230,7 +234,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory {
 	 * @return The number of points at which to approximate decoded functions  
 	 */
 	protected int getNumEvalPoints(int dim) {
-		int[] pointsPerDim = new int[]{0, 300, 1000}; 
+		int[] pointsPerDim = new int[]{0, 1000, 1000}; 
 		return (dim < pointsPerDim.length) ? pointsPerDim[dim] : dim*500;		
 	}
 	

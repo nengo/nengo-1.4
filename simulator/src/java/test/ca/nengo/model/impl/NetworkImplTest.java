@@ -197,6 +197,10 @@ public class NetworkImplTest extends TestCase {
 			throw new RuntimeException("not implemented");
 		}
 
+		public void redefineNodes(Node[] nodes) {
+			throw new RuntimeException("not implemented");			
+		}
+
 		/**
 		 * @see ca.nengo.util.VisiblyMutable#addChangeListener(ca.nengo.util.VisiblyMutable.Listener)
 		 */
@@ -218,6 +222,7 @@ public class NetworkImplTest extends TestCase {
 		public Node clone() throws CloneNotSupportedException {
 			return (Node) super.clone();
 		}
+		
 
 	}
 

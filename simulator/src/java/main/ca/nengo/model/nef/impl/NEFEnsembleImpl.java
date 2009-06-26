@@ -54,7 +54,9 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
+import ca.nengo.model.impl.NodeFactory;
 import ca.nengo.model.nef.NEFEnsemble;
+import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.NEFNode;
 import ca.nengo.model.plasticity.PlasticityRule;
 import ca.nengo.util.MU;
@@ -91,6 +93,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private boolean myRadiiAreOne;
 	private DynamicalSystem myDirectModeDynamics;
 	private Integrator myDirectModeIntegrator;
+	
+	private NEFEnsembleFactory myEnsembleFactory;
 
 	/**
 	 * @param name Unique name of Ensemble
@@ -710,6 +714,77 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public float getPlasticityInterval() {
 		return myPlasticityInterval;
 	}
+	
+	
+	public void setEnsembleFactory(NEFEnsembleFactory factory) {
+		myEnsembleFactory=factory;
+	}
+	public NEFEnsembleFactory getEnsembleFactory() {
+		return myEnsembleFactory;
+	}
+	
+	public int getNodeCount() {
+		return getNodes().length;
+	}
+	public void setNodeCount(int n) throws StructuralException {
+		if (myEnsembleFactory==null) {
+			throw new StructuralException("Error changing node count: EnsembleFactory has not been set");
+		}
+		if (n<1) {
+			throw new StructuralException("Error changing node count: Cannot have "+n+" neurons");
+		}
+		if (n==getNodeCount()) {
+			return;
+		}
+
+		
+		NEFNode[] nodes = new NEFNode[n];
+		
+		NodeFactory nodeFactory=myEnsembleFactory.getNodeFactory();
+		
+		for (int i = 0; i < n; i++) {
+			Node node = nodeFactory.make("node" + i);
+			if ( !(node instanceof NEFNode) ) {
+				throw new StructuralException("Nodes must be NEFNodes");
+			}
+			nodes[i] = (NEFNode) node;
+			
+			nodes[i].setMode(SimulationMode.CONSTANT_RATE);
+			if ( !nodes[i].getMode().equals(SimulationMode.CONSTANT_RATE) ) {
+				throw new StructuralException("Neurons in an NEFEnsemble must support CONSTANT_RATE mode");
+			}
+			
+			nodes[i].setMode(getMode());
+		}
+		redefineNodes(nodes);
+
+		myEncoders = myEnsembleFactory.getEncoderFactory().genVectors(n, getDimension());
+
+		
+		myDecodingApproximators.clear();
+		
+		// update the decoders for any existing origins
+		Origin[] origins = getOrigins();
+		for (int i = 0; i < origins.length; i++) {
+			if (origins[i] instanceof DecodedOrigin) {
+				DecodedOrigin origin=((DecodedOrigin) origins[i]);
+				String nodeOrigin=origin.getNodeOrigin();
+				// recalculate the decoders
+				if (!myReuseApproximators || !myDecodingApproximators.containsKey(nodeOrigin)) {
+					float[][] outputs = getConstantOutputs(myEvalPoints, nodeOrigin);
+					LinearApproximator approximator = getApproximatorFactory().getApproximator(myEvalPoints, outputs);
+					myDecodingApproximators.put(nodeOrigin, approximator);
+				}		
+				
+				origin.redefineNodes(nodes,myDecodingApproximators.get(nodeOrigin));
+			}
+		}
+		
+		fireVisibleChangeEvent();
+		
+		
+	}
+	
 
 	@Override
 	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
@@ -802,4 +877,13 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		result.myUnscaledEvalPoints = MU.clone(myUnscaledEvalPoints);
 		return result;
 	}
+	
+	
+	/**
+	 * TODO: figure out why I have to add these so that it will show up in the Configure menu
+	 *     (nodeCount doens't appear for some reason) 
+	 */
+	public void setNeurons(int count) throws StructuralException {setNodeCount(count);}
+	public int getNeurons() {return getNodeCount();}
+	
 }
