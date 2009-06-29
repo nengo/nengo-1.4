@@ -242,7 +242,29 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 */
 	public void removeNode(String name) throws StructuralException {
 		if (myNodeMap.containsKey(name)) {
-			Node node = myNodeMap.remove(name);
+			Node node = myNodeMap.get(name);
+			
+			if(node instanceof Network)
+			{
+				Network net = (Network)node;
+				Probe[] probes = net.getSimulator().getProbes();
+				for(int i = 0; i < probes.length; i++)
+					try
+					{
+						net.getSimulator().removeProbe(probes[i]);
+					}
+					catch(SimulationException se)
+					{
+						System.err.println(se);
+						return;
+					}
+				
+				Node[] nodes = net.getNodes();
+				for(int i = 0; i < nodes.length; i++)
+					net.removeNode(nodes[i].getName());
+			}
+			
+			myNodeMap.remove(name);
 			node.removeChangeListener(this);
 		} else {
 			throw new StructuralException("No Node named " + name + " in this Network");
