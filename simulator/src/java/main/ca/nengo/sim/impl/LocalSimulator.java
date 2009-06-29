@@ -96,6 +96,14 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	 */
 	public synchronized void run(float startTime, float endTime, float stepSize)
 			throws SimulationException {
+        this.run(startTime, endTime, stepSize, true);
+    }
+    
+    /**
+	 * Run function with option to display (or not) the progress in the console
+	 */
+	public synchronized void run(float startTime, float endTime, float stepSize, boolean dispProgress)
+			throws SimulationException {
 
 		Iterator<Probe> it = myProbes.iterator();
 		while (it.hasNext()) {
@@ -117,7 +125,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
 		int c = 0;
 		while (time < endTime) { 
-			if (c++ % 100 == 99)
+			if (c++ % 100 == 99 && dispProgress)
 				System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize)); 
 			
 			if (time + 1.5*thisStepSize > endTime) { //fudge step size to hit end exactly
