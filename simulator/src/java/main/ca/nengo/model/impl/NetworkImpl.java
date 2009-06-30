@@ -166,8 +166,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		node.addChangeListener(this);
 		
 		
-		if(includeProbes && node instanceof Network)
+		if(includeProbes && node instanceof NetworkImpl)
 		{
+			collectProbes((NetworkImpl)node);
+			/*
 			Network tmp = (Network) node;
 			Probe[] networkProbes = tmp.getSimulator().getProbes();
 			
@@ -188,10 +190,62 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 					System.err.println("Error adding probe on " + networkProbes[i].getStateName() + " from network " + tmp.getName());
 				}
 			}
+			*/
 		}
+		
+		
+		
 		
 		getSimulator().initialize(this);		
 		fireVisibleChangeEvent();
+	}
+	
+	
+	/**
+	 * Removes all the probes from the specified network (recursively including subnetworks)
+	 * and adds them to this network.
+	 * 
+	 * @param network the network to collect probes from
+	 * 
+	 */
+	public void collectProbes(NetworkImpl network)
+	{
+		network.collectAllProbes();
+		
+		Probe[] networkProbes = network.getSimulator().getProbes();
+		for(int j = 0; j < networkProbes.length; j++)
+		{
+			try
+			{
+				network.getSimulator().removeProbe(networkProbes[j]);
+				
+				String ensembleName = "";
+				if(networkProbes[j].getEnsembleName() != null)
+					ensembleName = " " + networkProbes[j].getEnsembleName();
+			
+				getSimulator().addProbe("[" + network.getName() + ensembleName + "]", networkProbes[j].getTarget(), 
+						networkProbes[j].getStateName(), true);
+			}
+			catch(SimulationException se)
+			{
+				System.err.println("Error adding probe on " + networkProbes[j].getStateName() + " from network " + network.getName());
+			}
+		}
+	}
+	
+	/**
+	 * Collects probes from every node in this network.
+	 * 
+	 */
+	public void collectAllProbes()
+	{
+		Node[] nodes = getNodes();
+		
+		for(int i = 0; i < nodes.length; i++)
+		{
+			if(nodes[i] instanceof NetworkImpl)
+				collectProbes((NetworkImpl)nodes[i]);
+		}
 	}
 	
 	/**
