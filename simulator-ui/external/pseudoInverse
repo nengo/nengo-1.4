@@ -1,0 +1,19 @@
+#!/usr/bin/python
+import sys
+import scipy
+import scipy.linalg
+
+dtype=scipy.dtype('float32').newbyteorder('S')
+
+m=scipy.fromfile(sys.argv[1],dtype=dtype)
+m.shape=scipy.sqrt(m.shape),scipy.sqrt(m.shape)
+
+minSV=float(sys.argv[3])
+nSV=int(sys.argv[4])
+
+pinv=scipy.linalg.pinv2(m)
+
+output=scipy.memmap(sys.argv[2],dtype=dtype,mode='w+',shape=pinv.shape)
+output[:]=pinv[:]
+
+
