@@ -140,7 +140,11 @@ public class CreateModelAction extends ReversableAction {
 							try {
 								nodeCreated = container.addNodeModel(node);
 								if (nodeCreated instanceof UINodeViewable) {
-									((UINodeViewable) (nodeCreated)).openViewer();
+									 if (nodeCreated instanceof ca.nengo.ui.models.nodes.UINEFEnsemble) {
+										 // don't open NEFEnsembles
+									 } else {
+										 ((UINodeViewable) (nodeCreated)).openViewer();
+									 }
 								}
 							} catch (ContainerException e) {
 								UserMessages.showWarning("Could not add node: " + e.getMessage());
