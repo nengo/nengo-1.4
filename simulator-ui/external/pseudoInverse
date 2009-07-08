@@ -2,14 +2,31 @@
 import sys
 import scipy
 import scipy.linalg
+from scipy import dot
 
-dtype=scipy.dtype('float32').newbyteorder('S')
+dtype=scipy.dtype('float32').newbyteorder('B')
 
 m=scipy.fromfile(sys.argv[1],dtype=dtype)
 m.shape=scipy.sqrt(m.shape),scipy.sqrt(m.shape)
 
 minSV=float(sys.argv[3])
 nSV=int(sys.argv[4])
+
+#TODO: change this so it doesn't calculate the full SVD and then throw away most of it
+
+u,s,v=scipy.linalg.svd(m)
+sInv=1.0/s
+
+
+i=0 
+while i<m.shape[0] and s[i]>minSV and (nSV <= 0 or i < nSV):
+    i+=1
+print 'using',i,'singular values for pseudo-inverse'
+for j in range(i,m.shape[0]):
+    sInv[j]=0
+    
+pinv=dot(dot(v.T,scipy.diag(sInv)),v)
+
 
 pinv=scipy.linalg.pinv2(m)
 
