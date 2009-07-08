@@ -41,6 +41,7 @@ import ca.nengo.model.nef.impl.BiasOrigin;
 import ca.nengo.model.nef.impl.BiasTermination;
 import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.plasticity.Plastic;
+import ca.nengo.util.Memory;
 
 /**
  * <p>A group of Nodes that represent a scalar, vector, or function, as 
@@ -177,6 +178,9 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	public int getNodeCount();
 	public void setNodeCount(int value) throws StructuralException;
 		
-		
+	/**
+	 * Releases any memory that can be freed.  Should be called after all origins are created for this ensemble
+	 */
+	public void releaseMemory();		
 	
 }

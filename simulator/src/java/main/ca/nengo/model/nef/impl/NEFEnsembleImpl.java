@@ -32,6 +32,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import Jama.Matrix;
 
 import ca.nengo.dynamics.DynamicalSystem;
@@ -60,6 +62,7 @@ import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.NEFNode;
 import ca.nengo.model.plasticity.PlasticityRule;
 import ca.nengo.util.MU;
+import ca.nengo.util.Memory;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
@@ -73,6 +76,9 @@ import ca.nengo.util.impl.TimeSeriesImpl;
  */
 public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsemble {
 
+	private static Logger ourLogger = Logger.getLogger(NEFEnsembleImpl.class);
+
+	
 	private static final long serialVersionUID = 1L;
 	
 	public static String BIAS_SUFFIX = ":bias";
@@ -878,6 +884,15 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		return result;
 	}
 	
+	/**
+	 * Releases any memory that can be freed.  Should be called after all origins are created for this ensemble
+	 */
+	public void releaseMemory() {
+		Memory.report("releasing");
+		myDecodingApproximators.clear();
+		System.gc();
+		Memory.report("released");
+	}
 	
 	/**
 	 * TODO: figure out why I have to add these so that it will show up in the Configure menu
