@@ -177,22 +177,71 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 * @return The pseudoinverse of the given matrix
 	 */
 	public double[][] pseudoInverse(double[][] matrix, float minSV, int nSV) {
-		double[][] result;
+		double[][] result=null;
 		
-		Matrix m = new Matrix(matrix);
-		SingularValueDecomposition svd = m.svd();
-		Matrix sInv = svd.getS().inverse();
+		Runtime runtime=Runtime.getRuntime();
+		int hashCode=java.util.Arrays.hashCode(matrix);
+		try {
+			// TODO: separate this out into a helper method, so we can do this sort of thing for other calculations as well
+			String parent=System.getProperty("user.dir");
+			java.io.File path=new java.io.File(parent,"external");
+			String filename="matrix";
+			
+			java.io.File file=new java.io.File(path,filename);
+			if (file.canRead()) file.delete();
+			java.io.File file2=new java.io.File(path,filename+".inv");
+			if (file2.canRead()) file2.delete();
+			
+			java.nio.channels.FileChannel channel=new java.io.RandomAccessFile(file,"rw").getChannel();			
+			java.nio.ByteBuffer buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_WRITE, 0, matrix.length*matrix.length*4);	
+			buffer.order(java.nio.ByteOrder.BIG_ENDIAN);
+			for (int i=0; i<matrix.length; i++) {
+				for (int j=0; j<matrix.length; j++) {
+					buffer.putFloat((float)(matrix[i][j]));
+				}
+			}
+			
+			channel.force(true);			
+			Process process=runtime.exec("./pseudoInverse "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
+			process.waitFor();
+			
 
-		int i = 0; 
-		while (i < svd.getS().getRowDimension() && svd.getS().get(i, i) > minSV && (nSV <= 0 || i < nSV)) i++;
+			channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
+			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);			
+			double[][] inv=new double[matrix.length][];
+			for (int i=0; i<matrix.length; i++) {
+				double[] row=new double[matrix.length];
+				for (int j=0; j<matrix.length; j++) {
+					row[j]=buffer.getFloat();
+				}
+				inv[i]=row;
+			}
+			result=inv;
 
-		ourLogger.info("Using " + i + " singular values for pseudo-inverse");
-		
-		for (int j = i; j < matrix.length; j++) {
-			sInv.set(j, j, 0d);
+		} catch (java.io.IOException e) {
+			//e.printStackTrace();			
+		} catch (InterruptedException e) {
+			//e.printStackTrace();		
 		}
-		
-		result = svd.getV().times(sInv).times(svd.getU().transpose()).getArray();
+				
+		if (result==null) {
+			
+			Matrix m = new Matrix(matrix);		
+			SingularValueDecomposition svd = m.svd();
+			Matrix sInv = svd.getS().inverse();
+	
+			int i = 0; 
+			while (i < svd.getS().getRowDimension() && svd.getS().get(i, i) > minSV && (nSV <= 0 || i < nSV)) i++;
+	
+			ourLogger.info("Using " + i + " singular values for pseudo-inverse");
+			
+			for (int j = i; j < matrix.length; j++) {
+				sInv.set(j, j, 0d);
+			}
+			
+			result = svd.getV().times(sInv).times(svd.getU().transpose()).getArray();
+						
+		}
 		
 		return result;
 	}
