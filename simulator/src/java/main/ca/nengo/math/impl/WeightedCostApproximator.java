@@ -202,7 +202,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 			}
 			
 			channel.force(true);			
-			Process process=runtime.exec("./pseudoInverse "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
+			Process process=runtime.exec("."+java.io.File.separatorChar+"pseudoInverse "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
 			process.waitFor();
 			
 
