@@ -102,6 +102,16 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	public NodeFactory getNodeFactory() {
 		return myNodeFactory;
 	}
+	
+	/**
+	 * Stops the factory from printing out information to console during make process.
+	 */
+	public void beQuiet() {
+		if(myApproximatorFactory instanceof WeightedCostApproximator.Factory)
+			((WeightedCostApproximator.Factory)myApproximatorFactory).setQuiet(true);
+		else
+			System.out.println("beQuiet() not supported by this approximator factory");
+	}
 
 	/**
 	 * @see ca.nengo.model.nef.NEFEnsembleFactory#make(java.lang.String, int, int)
@@ -192,7 +202,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 			NEFNode[] nodes = new NEFNode[n];
 			
 			if(n < 1)
-				ourLogger.warn("Calling doMake with n = " + n);
+				ourLogger.error("Calling doMake with n = " + n);
 			
 			for (int i = 0; i < n; i++) {
 				Node node = myNodeFactory.make("node" + i);
@@ -223,7 +233,13 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 		{
 			// a singular gamma matrix can produce a runtime exception.  If this occurs,
 			// call make again.
-			return doMake(name,n,radii);	
+			if(re.getMessage() != null && re.getMessage().equals("Matrix is singular."))
+				return doMake(name,n,radii);
+			else
+			{
+				System.err.println(re);
+				return(null);
+			}
 		}
 	}
 

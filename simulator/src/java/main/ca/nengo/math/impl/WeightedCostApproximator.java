@@ -69,6 +69,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 	private float[][] myValues;
 	private float[][] myNoisyValues;
 	private Function myCostFunction;
+	private boolean myQuiet;
 	
 	private double[][] myGammaInverse; 
 	
@@ -87,26 +88,33 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 * 		sensitivity to simulation noise) as a proportion of the maximum absolute 
 	 * 		value over all values  
 	 */
-	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise, int nSV) {
+	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise, int nSV, boolean quiet) {
 		assert MU.isMatrix(evaluationPoints);
 		assert MU.isMatrix(values);
 		assert evaluationPoints.length == values[0].length;
-
+		
 		myEvalPoints = evaluationPoints;
 		myValues = MU.clone(values);
 		myNoisyValues = MU.clone(values);
+		myQuiet = quiet;
 		float absNoiseSD = addNoise(myNoisyValues, noise);
 		
 		myCostFunction = costFunction;
 		
-		Memory.report("before gamma");
+		if(!myQuiet)
+			Memory.report("before gamma");
 		
 		double[][] gamma = findGamma();
-		Memory.report("before inverse");
+		if(!myQuiet)
+			Memory.report("before inverse");
 		myGammaInverse = pseudoInverse(gamma, absNoiseSD*absNoiseSD, nSV);
-		Memory.report("after inverse");
+		if(!myQuiet)
+			Memory.report("after inverse");
 		
 		//testPlot(evaluationPoints, values);
+	}
+	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise, int nSV) {
+		this(evaluationPoints, values, costFunction, noise, nSV, false);
 	}
 	
 	private float addNoise(float[][] values, float noise) {
@@ -233,7 +241,8 @@ public class WeightedCostApproximator implements LinearApproximator {
 			int i = 0; 
 			while (i < svd.getS().getRowDimension() && svd.getS().get(i, i) > minSV && (nSV <= 0 || i < nSV)) i++;
 	
-			ourLogger.info("Using " + i + " singular values for pseudo-inverse");
+			if(!myQuiet)
+				ourLogger.info("Using " + i + " singular values for pseudo-inverse");
 			
 			for (int j = i; j < matrix.length; j++) {
 				sInv.set(j, j, 0d);
@@ -321,18 +330,29 @@ public class WeightedCostApproximator implements LinearApproximator {
 		
 		private float myNoise;
 		private int myNSV;
+		private boolean myQuiet;
 		
 		/**
 		 * @param noise Random noise to add to component functions (proportion of largest value over all functions) 
 		 */
 		public Factory(float noise) {
-			this(noise, -1);
+			this(noise, -1, false);
+		}
+		
+		public Factory(float noise, boolean quiet) {
+			this(noise, -1, quiet);
 		}
 
 		public Factory(float noise, int NSV) {
+			this(noise, NSV, false);
+		}
+		
+		public Factory(float noise, int NSV, boolean quiet) {
 			myNoise = noise;
 			myNSV = NSV;
+			myQuiet = quiet;
 		}
+		
 		
 		/**
 		 * @return Random noise to add to component functions (proportion of largest value over all functions)
@@ -349,7 +369,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		}
 		
 		/**
-		 * @return Maximum number of singular values to use in psuedoinverse of correlation matrix (zero or less means 
+		 * @return Maximum number of singular values to use in pseudoinverse of correlation matrix (zero or less means 
 		 * 		use as many as possible to a threshold magnitude determined by noise).   
 		 */
 		public int getNSV() {
@@ -357,18 +377,35 @@ public class WeightedCostApproximator implements LinearApproximator {
 		}
 
 		/**
-		 * @param nSV Maximum number of singular values to use in psuedoinverse of correlation matrix (zero or less means 
+		 * @param nSV Maximum number of singular values to use in pseudoinverse of correlation matrix (zero or less means 
 		 * 		use as many as possible to a threshold magnitude determined by noise).
 		 */
 		public void setNSV(int nSV) {
 			myNSV = nSV;
 		}
-
+		
+		/**
+		 * @return Whether or not information will be printed out to console during make process.
+		 * 
+		 */
+		public boolean getQuiet() {
+			return(myQuiet);
+		}
+		
+		/**
+		 * @param quiet Controls whether or not information will be printed out to console during make process.
+		 * 
+		 */
+		public void setQuiet(boolean quiet) {
+			myQuiet = quiet;
+		}
+		
+		
 		/**
 		 * @see ca.nengo.math.ApproximatorFactory#getApproximator(float[][], float[][])
 		 */
 		public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
-			return new WeightedCostApproximator(evalPoints, values, getCostFunction(evalPoints[0].length), myNoise, myNSV);
+			return new WeightedCostApproximator(evalPoints, values, getCostFunction(evalPoints[0].length), myNoise, myNSV, myQuiet);
 		}
 
 		/**
