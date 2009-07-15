@@ -739,9 +739,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		if (n<1) {
 			throw new StructuralException("Error changing node count: Cannot have "+n+" neurons");
 		}
-		if (n==getNodeCount()) {
-			return;
-		}
 
 		
 		NEFNode[] nodes = new NEFNode[n];
