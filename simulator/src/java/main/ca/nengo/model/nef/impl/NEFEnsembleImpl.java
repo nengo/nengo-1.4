@@ -238,6 +238,10 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myEvalPoints = evalPoints;
 	}
 
+    public float[][] getEvalPoints(){
+        return myEvalPoints.clone();
+    }
+
 	/**
 	 * @param dynamics DynamicalSystem that models internal neuron dynamics at the ensemble level, when 
 	 * 		the ensemble runs in direct mode. The input and output dimensions must equal the dimension of the 
