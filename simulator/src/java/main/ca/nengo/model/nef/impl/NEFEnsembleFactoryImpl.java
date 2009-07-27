@@ -132,11 +132,21 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	 * @see ca.nengo.model.nef.NEFEnsembleFactory#make(java.lang.String, int, int, java.lang.String, boolean)
 	 */
 	public NEFEnsemble make(String name, int n, int dim, String storageName, boolean overwrite) throws StructuralException {
+        float[] radii = MU.uniform(1, dim, 1)[0];
+        return make(name, n, radii, storageName, overwrite);
+    }
+
+	/**
+	 * @see ca.nengo.model.nef.NEFEnsembleFactory#make(java.lang.String, int, int, java.lang.String, boolean)
+	 */
+	public NEFEnsemble make(String name, int n, float[] radii, String storageName, boolean overwrite) throws StructuralException {
+        int dim = radii.length;
 		NEFEnsemble result = null;
 		
 		File ensembleFile = new File(myDatabase, storageName + "." + FileManager.ENSEMBLE_EXTENSION);
 		
 		FileManager fm = new FileManager();
+
 		if (!overwrite && ensembleFile.exists() && ensembleFile.canRead()) {
 			try {
 				result = (NEFEnsemble) fm.load(ensembleFile);
@@ -152,7 +162,6 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 		}
 		
 		if (result == null) {
-			float[] radii = MU.uniform(1, dim, 1)[0];
 			result = doMake(name, n, radii);
 			
 			try {
