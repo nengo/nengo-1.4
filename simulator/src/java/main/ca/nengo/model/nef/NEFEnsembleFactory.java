@@ -106,7 +106,7 @@ public interface NEFEnsembleFactory {
 	 *   
 	 * @param name Name of the NEFEnsemble
 	 * @param n Number of neurons in the ensemble
-	 * @param dim Dimension of the ensemble. 
+	 * @param radii Radius of encoded region in each dimension.
 	 * @param storageName Name for storage (eg filename, db key; may have to be more fully qualified than 
 	 * 		name param, if ensembles belonging to multiple networks are stored in the same place)
 	 * @param overwrite If false, loads the ensemble if it can be found in storage. 
@@ -115,6 +115,21 @@ public interface NEFEnsembleFactory {
 	 * 		a previously-created ensemble loaded from storage   
 	 * @throws StructuralException if there is any error attempting to create the ensemble
 	 */
-	public NEFEnsemble make(String name, int n, int dim, String storageName, boolean overwrite) throws StructuralException;	
+	public NEFEnsemble make(String name, int n, float[] radii, String storageName, boolean overwrite) throws StructuralException;
 	
+	/**
+	 * Loads an NEFEnsemble, or creates and saves it.
+	 *
+	 * @param name Name of the NEFEnsemble
+	 * @param n Number of neurons in the ensemble
+	 * @param dim Dimension of the ensemble.
+	 * @param storageName Name for storage (eg filename, db key; may have to be more fully qualified than
+	 * 		name param, if ensembles belonging to multiple networks are stored in the same place)
+	 * @param overwrite If false, loads the ensemble if it can be found in storage.
+	 * 		If true, creates a new ensemble regardless and overwrites any existing ensemble.
+	 * @return Either new NEFEnsemble generated according to specs and with default NeuronFactory, or
+	 * 		a previously-created ensemble loaded from storage
+	 * @throws StructuralException if there is any error attempting to create the ensemble
+	 */
+	public NEFEnsemble make(String name, int n, int dim, String storageName, boolean overwrite) throws StructuralException;
 }
