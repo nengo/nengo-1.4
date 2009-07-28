@@ -165,12 +165,19 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 			result = doMake(name, n, radii);
 			
 			try {
+                // Set the ensemble's factory to null to allow saving with customized ensemble factories
+                result.setEnsembleFactory(null);
 				fm.save(result, ensembleFile);
 			} catch (IOException e) {
 				ourLogger.error("Failed to save file " + ensembleFile.getAbsolutePath(), e);
 			}
 		}
-		
+
+        // Set the resulting ensemble's factory to this. It must be noted that this can be a good thing or
+        // bad thing. It is possible that you want the original ensemble factory, in which case this will
+        // fail. Although, with this implementation, it is possible to change the ensemble factory of the
+        // ensemble after loading, which might be a good thing.
+		result.setEnsembleFactory(this);
 		return result;
 	}
 
