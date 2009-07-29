@@ -209,11 +209,12 @@ public class WeightedCostApproximator implements LinearApproximator {
 				}
 			}
 			
-			channel.force(true);			
+			channel.force(true);
+            channel.close();
+            
 			Process process=runtime.exec("."+java.io.File.separatorChar+"pseudoInverse "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
 			process.waitFor();
 			
-
 			channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
 			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);			
 			double[][] inv=new double[matrix.length][];
@@ -226,8 +227,11 @@ public class WeightedCostApproximator implements LinearApproximator {
 			}
 			result=inv;
 
+            // Close all file handles
+            channel.close();
 		} catch (java.io.IOException e) {
-			//e.printStackTrace();			
+			//e.printStackTrace();
+            System.err.println("WCA IO Error! - " + e);
 		} catch (InterruptedException e) {
 			//e.printStackTrace();		
 		}
