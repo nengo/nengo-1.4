@@ -28,6 +28,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.nef.impl;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -62,6 +63,8 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	private static final long serialVersionUID = 1L;
 	
 	private Map<String, DecodedOrigin> myDecodedOrigins;
+	private LinkedList <DecodedOrigin> OrderedOrigins;
+		
 	private ApproximatorFactory myApproximatorFactory;
 	private Map<String, LinearApproximator> myApproximators;
 	private float myTime; //used to support Probeable	
@@ -76,6 +79,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 		super(name, nodes);
 		
 		myDecodedOrigins = new HashMap<String, DecodedOrigin>(10);
+		OrderedOrigins = new LinkedList <DecodedOrigin> ();
 		myApproximatorFactory = factory;
 		myApproximators = new HashMap<String, LinearApproximator>(10);
 		myTime = 0;
@@ -150,6 +154,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	 */
 	protected void addDecodedOrigin(String name, DecodedOrigin origin) {
 		myDecodedOrigins.put(name, origin);
+		OrderedOrigins.add(origin);
 		fireVisibleChangeEvent();
 	}
 
@@ -163,7 +168,8 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	/**
 	 * @see ca.nengo.model.nef.DecodableEnsemble#removeDecodedOrigin(java.lang.String)
 	 */
-	public void removeDecodedOrigin(String name) {
+	public void removeDecodedOrigin(String name) {		
+		OrderedOrigins.remove(myDecodedOrigins.get(name));
 		myDecodedOrigins.remove(name);
 		fireVisibleChangeEvent();
 	}
@@ -179,12 +185,20 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	 * @see ca.nengo.model.Ensemble#getOrigins()
 	 */
 	public Origin[] getOrigins() {		
-		Origin[] decoded = (myDecodedOrigins == null) ? new Origin[0] : myDecodedOrigins.values().toArray(new Origin[0]);
+		
+		Origin[] decoded;		
+	
+		decoded = (OrderedOrigins != null) ? (Origin[])OrderedOrigins.toArray(new Origin[0]) : new Origin[0];
 		Origin[] composites = super.getOrigins();
 		
 		Origin[] all = new Origin[decoded.length + composites.length];
-		System.arraycopy(decoded, 0, all, 0, decoded.length);
-		System.arraycopy(composites, 0, all, decoded.length, composites.length);
+		System.arraycopy(composites, 0, all, 0, composites.length);
+		System.arraycopy(decoded, 0, all, composites.length, decoded.length);
+		
+		/*
+			System.arraycopy(decoded, 0, all, 0, decoded.length);
+			System.arraycopy(composites, 0, all, decoded.length, composites.length);
+		*/
 		
 		return all;
 	}
@@ -266,6 +280,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 		result.myApproximators = new HashMap<String, LinearApproximator>(5);
 		
 		result.myDecodedOrigins = new HashMap<String, DecodedOrigin>(5);
+		result.OrderedOrigins = new LinkedList <DecodedOrigin> ();
 		for (DecodedOrigin oldOrigin : myDecodedOrigins.values()) {
 			Function[] oldFunctions = oldOrigin.getFunctions();
 			Function[] newFunctions = new Function[oldFunctions.length];

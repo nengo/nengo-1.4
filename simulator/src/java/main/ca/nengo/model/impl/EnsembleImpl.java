@@ -33,6 +33,8 @@ package ca.nengo.model.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedList;
+import java.util.Iterator;
 
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.ExpandableNode;
@@ -62,6 +64,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	
 	private ExpandableNode[] myExpandableNodes;
 	private Map<String, Termination> myExpandedTerminations;
+	private LinkedList <Termination> OrderedTerminations;
 	private Map<String, PlasticityRule> myPlasticityRules;
 	
 	/**
@@ -74,7 +77,8 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		super(name, nodes);
 		
 		myExpandableNodes = findExpandable(nodes);
-		myExpandedTerminations = new HashMap<String, Termination>(10);	
+		myExpandedTerminations = new HashMap<String, Termination>(10);
+		OrderedTerminations = new LinkedList <Termination> ();
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 	}
 	
@@ -82,7 +86,8 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		super(name, make(factory, n));
 		
 		myExpandableNodes = findExpandable(getNodes());
-		myExpandedTerminations = new HashMap<String, Termination>(10);				
+		myExpandedTerminations = new HashMap<String, Termination>(10);
+		OrderedTerminations = new LinkedList <Termination> ();
 	}
 	
 	private static Node[] make(NodeFactory factory, int n) throws StructuralException {
@@ -113,13 +118,19 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	 */
 	public Termination[] getTerminations() {
 		ArrayList<Termination> result = new ArrayList<Termination>(10);
-		result.addAll(myExpandedTerminations.values());
-
+		//result.addAll(myExpandedTerminations.values());
+				
 		Termination[] composites = super.getTerminations();
 		for (int i = 0; i < composites.length; i++) {
 			result.add(composites[i]);
 		}
+						
+		Iterator<Termination> itr = OrderedTerminations.iterator();
+		while(itr.hasNext()){
+		    result.add((Termination) itr.next());
+		}				
 		
+
 		return result.toArray(new Termination[0]);
 	}
 
@@ -157,6 +168,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		
 		EnsembleTermination result = new EnsembleTermination(this, name, components);
 		myExpandedTerminations.put(name, result);
+		OrderedTerminations.add(result);
 		
 		fireVisibleChangeEvent();
 		
@@ -170,6 +182,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	public synchronized void removeTermination(String name) throws StructuralException {
 		if (myExpandedTerminations.containsKey(name)) {
 			myExpandedTerminations.remove(name);
+			OrderedTerminations.remove(myExpandedTerminations.get(name));
 			for (int i = 0; i < myExpandableNodes.length; i++) {
 				myExpandableNodes[i].removeTermination(name);
 			}

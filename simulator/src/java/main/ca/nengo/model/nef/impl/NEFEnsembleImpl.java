@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
@@ -87,6 +88,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private int myDimension;
 	private float[][] myEncoders;
 	private Map<String, DecodedTermination> myDecodedTerminations;
+	private LinkedList <DecodedTermination> OrderedTerminations;
 	private Map<String, PlasticityRule> myPlasticityRules;
 	private float myPlasticityInterval;
 	private float myLastPlasticityTime;	
@@ -130,6 +132,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myEncoders = encoders;
 		
 		myDecodedTerminations = new HashMap<String, DecodedTermination>(10);
+		OrderedTerminations = new LinkedList <DecodedTermination> ();
 		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 		myPlasticityInterval = -1;
 		myLastPlasticityTime = 0;		
@@ -430,6 +433,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			throw new StructuralException("Output dimension " + matrix.length + " doesn't equal ensemble dimension " + myDimension);
 		}
 		myDecodedTerminations.put(name, result);
+		OrderedTerminations.add (result);
 		fireVisibleChangeEvent();
 		return result;
 	}
@@ -458,6 +462,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			throw new StructuralException("Output dimension " + matrix.length + " doesn't equal ensemble dimension " + myDimension);
 		}
 		myDecodedTerminations.put(name, result);
+		OrderedTerminations.add(result);
 		fireVisibleChangeEvent();		
 		return result;
 	}
@@ -507,6 +512,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		myDecodedTerminations.put(biasName, biasTermination);
 		myDecodedTerminations.put(interName, interneuronTermination);
+		OrderedTerminations.add(biasTermination);
+		OrderedTerminations.add(interneuronTermination);
 
 		fireVisibleChangeEvent();
 		
@@ -517,6 +524,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @see ca.nengo.model.nef.NEFEnsemble#removeDecodedTermination(java.lang.String)
 	 */
 	public void removeDecodedTermination(String name) {
+		OrderedTerminations.remove(myDecodedTerminations.get(name));		
 		myDecodedTerminations.remove(name);
 		fireVisibleChangeEvent();
 	}
@@ -525,12 +533,15 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @see ca.nengo.model.Ensemble#getTerminations()
 	 */
 	public Termination[] getTerminations() {
-		Termination[] decoded = myDecodedTerminations.values().toArray(new Termination[0]);
+		Termination[] decoded = (OrderedTerminations != null) ? (Termination[])OrderedTerminations.toArray(new Termination[0]) : new Termination[0];		
 		Termination[] composites = super.getTerminations();
 		
 		Termination[] all = new Termination[decoded.length + composites.length];
-		System.arraycopy(decoded, 0, all, 0, decoded.length);
-		System.arraycopy(composites, 0, all, decoded.length, composites.length);
+		System.arraycopy(composites, 0, all, 0, composites.length);
+		System.arraycopy(decoded, 0, all, composites.length, decoded.length);	
+		
+		//System.arraycopy(decoded, 0, all, 0, decoded.length);
+		//System.arraycopy(composites, 0, all, decoded.length, composites.length);
 		
 		return all;
 	}

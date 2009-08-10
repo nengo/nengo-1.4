@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
@@ -75,9 +76,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	private Simulator mySimulator;
 	private float myStepSize;
 	private Map<String, Probeable> myProbeables;
-	private Map<String, String> myProbeableStates;
+	private Map<String, String> myProbeableStates;	
 	private Map<String, Origin> myExposedOrigins;
 	private Map<String, Termination> myExposedTerminations;
+	
+	private LinkedList <Origin> OrderedExposedOrigins;
+	private LinkedList <Termination> OrderedExposedTerminations; 
+	
 	private String myDocumentation;
 	private Map<String, Object> myMetaData;
 
@@ -100,6 +105,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		myMode = SimulationMode.DEFAULT;
 		myMetaData = new HashMap<String, Object>(20);
 		myListeners = new ArrayList<Listener>(10);
+		
+		
+		OrderedExposedOrigins = new LinkedList <Origin> ();
+		OrderedExposedTerminations = new LinkedList <Termination> ();
 	}
 	
 	/**
@@ -455,9 +464,12 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 *      java.lang.String)
 	 */
 	public void exposeOrigin(Origin origin, String name) {
-		myExposedOrigins.put(name, new OriginWrapper(this, origin, name));
-		myExposedOriginNames.put(origin, name);
+		OriginWrapper temp = new OriginWrapper(this, origin, name); 
 		
+		myExposedOrigins.put(name, temp );
+		myExposedOriginNames.put(origin, name);		
+		OrderedExposedOrigins.add(temp);
+				
 		// automatically add exposed origin to exposed states
 		if (origin.getNode() instanceof Probeable) {
 			Probeable p=(Probeable)(origin.getNode());			
@@ -473,9 +485,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#hideOrigin(java.lang.String)
 	 */
 	public void hideOrigin(String name) {
+		OrderedExposedOrigins.remove(myExposedOrigins.get(name));
 		OriginWrapper originWr = (OriginWrapper)myExposedOrigins.remove(name);
+
+				
 		if (originWr != null) {
 			myExposedOriginNames.remove(originWr.myWrapped);
+					
 			
 			// remove the automatically exposed state
 			if (originWr.myWrapped.getNode() instanceof Probeable) {
@@ -507,15 +523,20 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#getOrigins()
 	 */
 	public Origin[] getOrigins() {
-		return (Origin[]) myExposedOrigins.values().toArray(new Origin[0]);
+		if (myExposedOrigins.values().size() == 0)
+			return (Origin[]) myExposedOrigins.values().toArray(new Origin[0]);	
+		return (Origin[]) OrderedExposedOrigins.toArray(new Origin [0]);			
 	}
 
 	/**
 	 * @see ca.nengo.model.Network#exposeTermination(ca.nengo.model.Termination, java.lang.String)
 	 */
 	public void exposeTermination(Termination termination, String name) {
-		myExposedTerminations.put(name, new TerminationWrapper(this, termination, name));
-		myExposedTerminationNames.put(termination, name);
+		TerminationWrapper term = new TerminationWrapper(this, termination, name);
+		
+		myExposedTerminations.put(name, term);
+		myExposedTerminationNames.put(termination, name);		
+		OrderedExposedTerminations.add(term);
 		fireVisibleChangeEvent();
 	}
 
@@ -523,8 +544,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#hideTermination(java.lang.String)
 	 */
 	public void hideTermination(String name) {
+		OrderedExposedTerminations.remove(myExposedTerminations.get(name));
 		TerminationWrapper termination = (TerminationWrapper)myExposedTerminations.remove(name);
-		if (termination != null) {
+		if (termination != null) {			
 			myExposedTerminationNames.remove(termination.myWrapped);
 		}
 		fireVisibleChangeEvent();
@@ -551,7 +573,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#getTerminations()
 	 */
 	public Termination[] getTerminations() {
-		return (Termination[]) myExposedTerminations.values().toArray(new Termination[0]);
+		if (myExposedTerminations.values().size() == 0)
+			return (Termination[]) myExposedTerminations.values().toArray(new Termination[0]);
+		return (Termination[])OrderedExposedTerminations.toArray(new Termination[0]);
 	}
 
 	/**

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedList;
 
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -52,6 +53,7 @@ public abstract class AbstractNode implements Node {
 	private String myName;
 	private SimulationMode myMode;
 	private Map<String, Origin> myOrigins;
+	private LinkedList<String> myOriginNames;	
 	private Map<String, Termination> myTerminations;
 	private String myDocumentation;
 	private transient List<VisiblyMutable.Listener> myListeners;
@@ -69,6 +71,7 @@ public abstract class AbstractNode implements Node {
 		for (Iterator<Origin> it = origins.iterator(); it.hasNext(); ) {
 			Origin o = it.next();
 			myOrigins.put(o.getName(), o);
+			myOriginNames.add(o.getName());
 		}
 		
 		myTerminations = new HashMap<String, Termination>(10);
@@ -110,8 +113,9 @@ public abstract class AbstractNode implements Node {
 	/**
 	 * @see ca.nengo.model.Node#getOrigins()
 	 */
-	public Origin[] getOrigins() {
-		return myOrigins.values().toArray(new Origin[0]);
+	public Origin[] getOrigins() 
+	{
+		return myOrigins.values().toArray(new Origin[0]);					
 	}
 
 	/**
