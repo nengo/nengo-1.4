@@ -183,5 +183,9 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 	public String[] getPlasticityRuleNames() {
 		return mySynapticIntegrator.getPlasticityRuleNames();
 	}
+	
+	public Plastic getSynapticIntegrator() {
+		return mySynapticIntegrator;
+	}
 
 }
