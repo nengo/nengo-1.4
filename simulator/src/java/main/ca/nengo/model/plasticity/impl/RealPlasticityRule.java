@@ -55,6 +55,7 @@ public class RealPlasticityRule implements PlasticityRule {
 	private String myOriginName;
 	
 	private float myModInput;
+	private float[] myModInputArray;
 	private float[] myOriginState;	
 	
 	/**
@@ -113,9 +114,9 @@ public class RealPlasticityRule implements PlasticityRule {
 	 * @param function Four-dimensional function defining the rate of change of transformation matrix weights (as in constructor)
 	 */
 	public void setFunction(Function function) {
-		if (function.getDimension() != 4) {
+		if (function.getDimension() != 7) {
 			throw new IllegalArgumentException("Learning rate function has dimension " 
-					+ function.getDimension() + " (should be 4)");
+					+ function.getDimension() + " (should be 7)");
 		}
 		
 		myFunction = function;
@@ -141,7 +142,8 @@ public class RealPlasticityRule implements PlasticityRule {
 	public void setTerminationState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myModTermName)) {
 			checkType(state);
-			myModInput = ((RealOutput) state).getValues()[myModTermDim];
+			myModInputArray=((RealOutput) state).getValues();
+			myModInput = myModInputArray[myModTermDim];
 		}
 	}
 
@@ -166,7 +168,7 @@ public class RealPlasticityRule implements PlasticityRule {
 			result[i] = new float[transform[i].length];
 			for (int j = 0; j < transform[i].length; j++) {
 				float os = (myOriginState != null) ? myOriginState[i] : 0;
-				result[i][j] = myFunction.map(new float[]{values[j], os, transform[i][j], myModInput});
+				result[i][j] = myFunction.map(new float[]{values[j], os, transform[i][j], myModInput,i,j,myModInputArray[i]});
 			}
 		}
 		
