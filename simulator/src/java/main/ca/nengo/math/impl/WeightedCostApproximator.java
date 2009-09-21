@@ -40,6 +40,8 @@ package ca.nengo.math.impl;
 //import org.jfree.data.xy.XYSeries;
 //import org.jfree.data.xy.XYSeriesCollection;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 
 import Jama.Matrix;
@@ -187,13 +189,15 @@ public class WeightedCostApproximator implements LinearApproximator {
 	public double[][] pseudoInverse(double[][] matrix, float minSV, int nSV) {
 		double[][] result=null;
 		
+		Random random=new Random();
+		
 		Runtime runtime=Runtime.getRuntime();
 		int hashCode=java.util.Arrays.hashCode(matrix);
 		try {
 			// TODO: separate this out into a helper method, so we can do this sort of thing for other calculations as well
 			String parent=System.getProperty("user.dir");
 			java.io.File path=new java.io.File(parent,"external");
-			String filename="matrix";
+			String filename="matrix_"+random.nextLong();
 			
 			java.io.File file=new java.io.File(path,filename);
 			if (file.canRead()) file.delete();
@@ -208,12 +212,16 @@ public class WeightedCostApproximator implements LinearApproximator {
 					buffer.putFloat((float)(matrix[i][j]));
 				}
 			}
-			
 			channel.force(true);
             channel.close();
             
-			Process process=runtime.exec("."+java.io.File.separatorChar+"pseudoInverse "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
-			process.waitFor();
+			if (System.getProperty("os.name").startsWith("Windows")) {
+				Process process=runtime.exec("cmd /c pseudoInverse.bat "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
+				process.waitFor();
+			} else {
+				Process process=runtime.exec("."+java.io.File.separatorChar+"pseudoInverse "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
+				process.waitFor();
+			}
 			
 			channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
 			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);			
@@ -227,6 +235,11 @@ public class WeightedCostApproximator implements LinearApproximator {
 			}
 			result=inv;
 
+			file=new java.io.File(path,filename);
+			if (file.canRead()) file.delete();
+			file2=new java.io.File(path,filename+".inv");
+			if (file2.canRead()) file2.delete();
+			
             // Close all file handles
             channel.close();
 		} catch (java.io.IOException e) {
