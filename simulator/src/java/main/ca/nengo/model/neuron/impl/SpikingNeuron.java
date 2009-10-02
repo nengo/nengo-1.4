@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Properties;
 
 import ca.nengo.model.InstantaneousOutput;
+import ca.nengo.model.Noise;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.RealOutput;
@@ -78,7 +79,9 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	private float myRadialInput;
 	private String myDocumentation;
 	private transient List<VisiblyMutable.Listener> myListeners;
+	private Noise myNoise = null;
 
+	
 	/**
 	 * Note: current = scale * (weighted sum of inputs at each termination) * (radial input) + bias.
 	 * 
@@ -123,7 +126,11 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		for (int i = 0; i < integratorOutput.length; i++) {
 			myUnscaledCurrent = (myRadialInput + integratorOutput[i]);
 			generatorInput[i] = myBias + myScale * myUnscaledCurrent;
+			if (myNoise != null) {
+				generatorInput[i] = myNoise.getValue(startTime, endTime, generatorInput[i]);
+			}
 		}
+		
 		myCurrent = new TimeSeries1DImpl(current.getTimes(), generatorInput, Units.UNK);
 		
 		mySpikeOrigin.run(myCurrent.getTimes(), generatorInput);
@@ -173,6 +180,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		myIntegrator.reset(randomize);
 		myGenerator.reset(randomize);
 		myCurrentOrigin.reset(randomize);
+		if (myNoise != null) myNoise.reset(randomize);
 	}
 
 	/**
@@ -358,8 +366,18 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		
 		result.myListeners = new ArrayList<Listener>(5);
 		result.mySpikeOrigin = new SpikeGeneratorOrigin(result, result.myGenerator);
+
+		if (myNoise!=null) result.setNoise(myNoise.clone());
 		
 		return result;
 	}
+
+	public void setNoise(Noise noise) {
+		myNoise = noise;
+	}
+	public Noise getNoise() {
+		return myNoise;
+	}
+	
 	
 }
