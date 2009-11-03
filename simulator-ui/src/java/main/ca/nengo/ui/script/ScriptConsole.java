@@ -116,6 +116,8 @@ public class ScriptConsole extends JPanel {
 	public ScriptConsole(PythonInterpreter interpreter) {
 		myInterpreter = interpreter;
 		interpreter.exec("import ca.nengo");
+		interpreter.exec("import sys");
+		interpreter.exec("sys.path.append('.')");
 
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
