@@ -68,15 +68,16 @@ public class FourierFunction implements Function {
 	public FourierFunction(float[][] frequencies, float[] amplitudes, float[][] phases) {
 		set(frequencies, amplitudes, phases);
 	}
-	
 	/**
-	 * Creates a 1-dimensional band-limited pink noise function with specified parameters. 
+	 * Creates a 1-dimensional band-limited noise function with specified parameters. 
 	 *  
 	 * @param fundamental The fundamental frequency (Hz)
 	 * @param cutoff The high-frequency limit (Hz)
 	 * @param rms The root-mean-squared function amplitude
+	 * @param seed Random seed
+	 * @param type The type of noise: 0 = white; 1 = pink; 
 	 */
-	public FourierFunction(float fundamental, float cutoff, float rms, long seed) {
+	public FourierFunction(float fundamental, float cutoff, float rms, long seed, int type) {
 		int n = (int) Math.floor(cutoff / fundamental);
 		
 		float[][] frequencies = new float[][]{new float[n]};
@@ -86,7 +87,14 @@ public class FourierFunction implements Function {
 		
 		for (int i = 0; i < n; i++) {
 			frequencies[0][i] = fundamental * (i+1);
-			amplitudes[i] = (float) random.nextFloat() * fundamental / frequencies[0][i]; //decreasing amplitude = pink noise
+			
+			if (type == 1) {
+				amplitudes[i] = (float) random.nextFloat() * fundamental / frequencies[0][i]; //decreasing amplitude = pink noise
+			} else if (type == 2) {
+				amplitudes[i]	= (float) random.nextFloat(); //constant amplitude = white noise
+			} else {
+				throw new IllegalArgumentException("FourierFunction noise type is invalid");
+			}
 			phases[0][i] = -.5f + 2f * (float) random.nextFloat();
 		}
 		
@@ -103,8 +111,18 @@ public class FourierFunction implements Function {
 		for (int i = 0; i < n; i++) {
 			amplitudes[i] = amplitudes[i] * rms / (float) unscaledRMS;
 		}
-		
-		set(frequencies, amplitudes, phases);
+				set(frequencies, amplitudes, phases);
+	}
+	/**
+	 * Creates a 1-dimensional band-limited pink noise function with specified parameters. 
+	 *  
+	 * @param fundamental The fundamental frequency (Hz)
+	 * @param cutoff The high-frequency limit (Hz)
+	 * @param rms The root-mean-squared function amplitude
+	 * 	@param seed Random seed
+	 */
+	public FourierFunction(float fundamental, float cutoff, float rms, long seed) {
+		new FourierFunction(fundamental, cutoff, rms, seed, 1);
 	}
 	
 	private void set(float[][] frequencies, float[] amplitudes, float[][] phases) {
