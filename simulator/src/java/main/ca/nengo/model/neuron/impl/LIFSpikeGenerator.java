@@ -301,6 +301,10 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		//implicitly Vth == R == 1		
 		return current > 1 ? 1f / ( myTauRef - myTauRC * ((float) Math.log(1 - 1/current)) ) : 0;
 	}
+	
+	public float constantRateRun(float current) {
+		return current > 1 ? 1f / ( myTauRef - myTauRC * ((float) Math.log(1 - 1/current)) ) : 0;
+	}
 
 	/**
 	 * @see Probeable#getHistory(String) 
