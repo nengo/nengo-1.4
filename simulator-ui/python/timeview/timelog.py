@@ -1,0 +1,94 @@
+import math
+
+class TimeLogItem:
+    def __init__(self,func,type=None,offset=0):
+        self.func=func
+        self.data=[]
+        self.filtered={}
+        self.offset=offset
+        self.type=type
+        self.tick()
+    def tick(self,limit=None):
+        self.data.append(self.func())
+        if limit is not None and len(self.data)>limit:
+            delta=len(self.data)-limit
+            self.offset+=delta
+            self.data=self.data[delta:]
+            for k,v in self.filtered.items():
+                if len(v)<=delta: del self.filtered[k]
+                else:
+                    try:
+                        self.filtered[k]=v[delta:]
+                    except:
+                        del self.filtered[k]
+    def reset(self):
+        del self.data[:]
+        self.filtered={}
+        self.offset=0
+        self.tick()
+
+
+    def update_filter(self,dt_tau):
+        if dt_tau not in self.filtered:
+            f=[[x*dt_tau for x in self.data[0]]]
+            #f=[self.data[0]*dt_tau]
+            self.filtered[dt_tau]=f
+        else:
+            f=self.filtered[dt_tau]
+        if len(f)<len(self.data):
+            v=f[-1][:]
+            d=self.data
+            decay=math.exp(-dt_tau)
+            n=len(self.data[0])
+            for i in range(len(f),len(d)):
+                for j in range(n):
+                    v[j]=v[j]*decay+d[i][j]*dt_tau
+                #v=v*decay+d[i]*scale
+                f.append(v[:])
+        return f        
+
+    def get(self,start=None,count=None,dt_tau=None):
+        if dt_tau is None:
+            d=self.data
+        else:
+            d=self.update_filter(dt_tau)
+        off=self.offset
+        if start is None: start=0
+        if count is None: count=len(d)+off
+        if off>start+count:
+            r=[]
+        elif off>start:
+            r=[None]*(off-start)
+            r+=d[:count-off+start]
+        else:
+            r=d[start-off:start-off+count]
+        if len(r)<count:
+            r+=[None]*(count-len(r))
+        return r
+
+    def get_first(self):
+        return self.data[0]
+
+class TimeLog:
+    def __init__(self):
+        self.items=[]
+        self.tick_count=0
+        self.tick_limit=10001
+    
+    def add(self,func,type=None):
+        item=TimeLogItem(func,type=type,offset=self.tick_count)
+        self.items.append(item)
+        return item
+    
+    def remove(self,item):
+        self.items.remove(item)    
+        
+    def tick(self):
+        for item in self.items: item.tick(limit=self.tick_limit)
+        self.tick_count+=1
+        
+    def reset(self):
+        for item in self.items: item.reset()
+        self.tick_count=0
+            
+    
