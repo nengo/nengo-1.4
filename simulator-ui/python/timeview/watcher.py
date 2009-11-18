@@ -27,7 +27,7 @@ class Watcher:
         obj=self.objects[name]
         for w in self.watches:
             if w.check(obj):
-                r.extend(w.views())
+                r.extend(w.views(obj))
         return r
 
     def reset(self):

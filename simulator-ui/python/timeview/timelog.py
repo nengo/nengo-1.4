@@ -73,7 +73,7 @@ class TimeLog:
     def __init__(self):
         self.items=[]
         self.tick_count=0
-        self.tick_limit=10001
+        self.tick_limit=4001
     
     def add(self,func,type=None):
         item=TimeLogItem(func,type=type,offset=self.tick_count)

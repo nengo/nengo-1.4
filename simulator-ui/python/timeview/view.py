@@ -14,25 +14,50 @@ from java.awt.event import *
 from ca.nengo.model.nef import *
 from ca.nengo.model.impl import *
 from ca.nengo.math.impl import *
+from ca.nengo.model import Node
+
 
 class EnsembleWatch:
     def check(self,obj):
         return isinstance(obj,NEFEnsemble)
-    def value(self,obj):
-        return obj.getOrigin('X').values.values
     def voltage(self,obj):
         return [n.generator.voltage for n in obj.nodes]
     def spikes(self,obj):
         return obj.getOrigin('AXON').values.values
     def encoder(self,obj):
         return [x[0] for x in obj.encoders]
-    def views(self):
+    def views(self,obj):
         return [
-            ('value',lambda view,name: components.Graph(view,name,self.value)),
             ('voltage',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes)),
+            ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=0.2,filter=True)),       
             ('encoders',lambda view,name: components.Grid(view,name,self.encoder,min=-1,max=1)),
-            ('current',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=0.2,filter=True)),       
             ]
+
+class NodeWatch:
+    def check(self,obj):
+        return isinstance(obj,Node)
+    def value(self,obj,origin):
+        return obj.getOrigin(origin).values.values
+    def views(self,obj):
+        origins=[o.name for o in obj.origins]
+        
+        default=None
+        if isinstance(obj,NEFEnsemble): default='X'
+        elif isinstance(obj,FunctionInput): default='origin'
+        
+        if default in origins:
+            origins.remove(default)
+            origins=[default]+origins
+        
+        r=[]
+        for name in origins:
+            if name in ('AXON','current'): continue
+            if name==default: text='value'
+            else: text='value: '+name
+            r.append((text,lambda view,name,origin=name: components.Graph(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin))))
+        return r    
+
+
 
 class InputWatch:
     def check(self,obj):
@@ -43,7 +68,7 @@ class InputWatch:
         return False
     def constantFuncs(self,obj):
         return [x.value for x in obj.functions]
-    def views(self):
+    def views(self,obj):
         return [
             ('control',lambda view,name: components.Input(view,name,self.constantFuncs)),
             ]
@@ -59,6 +84,7 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
         self.timelog=timelog.TimeLog()
         self.network=network
         self.watcher=watcher.Watcher(self.timelog)
+        self.watcher.add_watch(NodeWatch())
         self.watcher.add_watch(EnsembleWatch())
         self.watcher.add_watch(InputWatch())
         
@@ -116,8 +142,11 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
             self.network.simulator.resetNetwork(True)
             self.watcher.reset()
             now=0
+            self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
+            self.time_control.set_max_time(self.timelog.tick_count)                
+            self.area.repaint()
             while True:
-                while self.paused:
+                while self.paused and not self.restart:
                     java.lang.Thread.sleep(10)
                 if self.restart:
                     self.restart=False
@@ -170,7 +199,7 @@ class TimeControl(JPanel,ChangeListener):
 
         self.buttons.add(JButton('restart',actionPerformed=self.start))
 
-        self.buttons.add(JButton('pause',actionPerformed=self.pause))
+        self.buttons.add(JButton('continue',actionPerformed=self.pause))
         
         spin=JPanel(layout=BorderLayout())
         spin.add(JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.tau_filter))
@@ -195,9 +224,12 @@ class TimeControl(JPanel,ChangeListener):
         self.view.area.repaint()
     def start(self,event):
         self.view.restart=True
-        self.view.paused=False
     def pause(self,event):
         self.view.paused=not self.view.paused
+        if self.view.paused:
+            event.source.text='continue'
+        else:
+            event.source.text=' pause '    
     def tau_filter(self,event):
         self.view.tau_filter=float(event.source.value)
         self.view.area.repaint()
