@@ -43,6 +43,7 @@ import ca.nengo.model.Projection;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
+import ca.nengo.plot.Plotter;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CreateModelAdvancedAction;
@@ -70,6 +71,7 @@ import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.util.PBounds;
+import org.python.util.PythonInterpreter;
 
 /**
  * Viewer for peeking into a Network
@@ -433,6 +435,23 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run " + getViewerParent().getName(),
 				getViewerParent()));
+		
+		StandardAction action=new StandardAction("Run interactive mode","Interactive Mode") {
+			private static final long serialVersionUID = 1L;
+			UINetwork uiNetwork; 
+			{
+				uiNetwork=getViewerParent();
+			}
+			protected void action() throws ActionException {
+				PythonInterpreter pi=NengoGraphics.getInstance().getPythonInterpreter();
+				pi.set("_interactive_network",uiNetwork.getModel());
+				pi.exec("import timeview");
+				pi.exec("timeview.View(_interactive_network)");
+				pi.exec("del _interactive_network");
+			}
+			
+		};		
+		menu.addAction(action);
 
 		/*
 		 * Create new models
