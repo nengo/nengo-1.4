@@ -29,7 +29,7 @@ class EnsembleWatch:
     def views(self,obj):
         return [
             ('voltage',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes)),
-            ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=0.2,filter=True)),       
+            ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
             ('encoders',lambda view,name: components.Grid(view,name,self.encoder,min=-1,max=1)),
             ]
 
@@ -77,6 +77,7 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
     def __init__(self,network,size=None,ui=None):
         self.dt=0.001
         self.tau_filter=0.03
+        self.delay=10
         self.current_tick=0
         self.time_shown=0.5
         
@@ -148,19 +149,27 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
         pass
     def mouseReleased(self, event):        
         pass
+    def set_target_rate(self,value):
+        if value=='fastest': self.delay=0
+        elif value.endswith('x'):
+            r=float(value[:-1])
+            self.delay=self.dt*1000/r
+        
 
     def run(self):
-        while True:
+        while self.frame.visible:
             self.network.simulator.resetNetwork(True)
             self.watcher.reset()
             now=0
             self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
             self.time_control.set_max_time(self.timelog.tick_count)                
             self.area.repaint()
-            while True:
-                while self.paused and not self.restart:
+            last_frame_time=None
+            counter=0
+            while self.frame.visible:
+                while self.paused and not self.restart and self.frame.visible:
                     java.lang.Thread.sleep(10)
-                if self.restart:
+                if self.restart or not self.frame.visible:
                     self.restart=False
                     break
                 self.network.simulator.run(now,now+self.dt,self.dt)
@@ -171,7 +180,14 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
                 if self.current_tick==self.timelog.tick_count-1:
                     self.time_control.slider.value=self.timelog.tick_count
                 self.area.repaint()
-                java.lang.Thread.sleep(10)
+                this_frame_time=java.lang.System.currentTimeMillis()
+                if last_frame_time is not None:
+                    delta=this_frame_time-last_frame_time
+                    sleep=self.delay-delta
+                    if sleep<1:
+                        sleep=1
+                    java.lang.Thread.sleep(int(sleep))
+                last_frame_time=this_frame_time
         
     
 class TimeControl(JPanel,ChangeListener,ActionListener):
@@ -209,17 +225,24 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         cb.setSelectedItem(0)
         self.view.dt=float(cb.getSelectedItem())
         cb.addActionListener(self)
-        self.dt_combobox=cb
-        
+        self.dt_combobox=cb        
         dt.add(cb)
-        #dt.add(JSpinner(SpinnerNumberModel(self.view.dt,0.0001,0.01,0.0001),stateChanged=self.dt))
         dt.add(JLabel('time step'),BorderLayout.SOUTH)
         self.buttons.add(dt)
 
+        rate=JPanel(layout=BorderLayout())
+        self.rate_combobox=JComboBox(['fastest','1x','0.5x','0.2x','0.1x','0.05x','0.02x','0.01x','0.005x','0.002x','0.001x'])
+        self.rate_combobox.setSelectedItem(0)
+        self.view.set_target_rate(self.rate_combobox.getSelectedItem())
+        self.rate_combobox.addActionListener(self)
+        rate.add(self.rate_combobox)
+        rate.add(JLabel('speed'),BorderLayout.SOUTH)
+        self.buttons.add(rate)
 
 
         spin=JPanel(layout=BorderLayout())
-        spin.add(JSpinner(SpinnerNumberModel((self.view.timelog.tick_limit-1)*self.view.dt,1,100,1),stateChanged=self.tick_limit))
+        self.record_time_spinner=JSpinner(SpinnerNumberModel((self.view.timelog.tick_limit-1)*self.view.dt,0.1,100,1),stateChanged=self.tick_limit)
+        spin.add(self.record_time_spinner)
         spin.add(JLabel('recording time'),BorderLayout.SOUTH)
         self.buttons.add(spin)
 
@@ -265,7 +288,12 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.view.time_shown=float(event.source.value)
         self.view.area.repaint()
     def actionPerformed(self,event):
-        self.view.dt=float(self.dt_combobox.getSelectedItem())
-        self.view.restart=True
+        dt=float(self.dt_combobox.getSelectedItem())
+        if dt!=self.view.dt:
+            self.view.dt=dt
+            self.record_time_spinner.value=(self.view.timelog.tick_limit-1)*self.view.dt
+            self.dt_combobox.repaint()
+            self.view.restart=True
+        self.view.set_target_rate(self.rate_combobox.getSelectedItem())
     def tick_limit(self,event):
         self.view.timelog.tick_limit=int(event.source.value/self.view.dt)+1

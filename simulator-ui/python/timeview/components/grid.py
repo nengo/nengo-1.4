@@ -35,21 +35,24 @@ class Grid(core.DataViewComponent):
         
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
+        x0=self.margin/2.0
+        y0=self.margin/2.0
+        g.color=Color.black
+        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.margin)+1)
         
         dt_tau=None
         if self.filter and self.view.tau_filter>0:
             dt_tau=self.view.dt/self.view.tau_filter
-        data=self.data.get(start=self.view.current_tick,count=1,dt_tau=dt_tau)[0]
+        try:    
+            data=self.data.get(start=self.view.current_tick,count=1,dt_tau=dt_tau)[0]
+        except:
+            return
         if self.sfunc is not None:
             sdata=self.sdata.get(start=self.view.current_tick,count=1)[0]
         else:
             sdata=None
 
 
-        x0=self.margin/2.0
-        y0=self.margin/2.0
-        g.color=Color.black
-        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.margin)+1)
         
         if data is None: 
             return
@@ -64,6 +67,11 @@ class Grid(core.DataViewComponent):
         if self.map is None:
             self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)
         
+
+        max=self.max
+        if callable(max): max=max()
+        min=self.min
+        if callable(min): min=min()
             
         dx=float(self.size.width-self.margin)/cols
         dy=float(self.size.height-self.margin)/rows
@@ -74,7 +82,7 @@ class Grid(core.DataViewComponent):
                     if sdata is not None and self.view.current_tick>0 and sdata[index]:
                         g.color=Color.yellow
                     else:
-                        c=(float(data[index])-self.min)/(self.max-self.min)
+                        c=(float(data[index])-min)/(max-min)
                         if c<0: c=0.0
                         if c>1: c=1.0
                         g.color=Color(c,c,c)

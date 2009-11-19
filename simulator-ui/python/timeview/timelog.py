@@ -17,10 +17,7 @@ class TimeLogItem:
             for k,v in self.filtered.items():
                 if len(v)<=delta: del self.filtered[k]
                 else:
-                    try:
-                        self.filtered[k]=v[delta:]
-                    except:
-                        del self.filtered[k]
+                    self.filtered[k]=v[delta:]
     def reset(self):
         del self.data[:]
         self.filtered={}
