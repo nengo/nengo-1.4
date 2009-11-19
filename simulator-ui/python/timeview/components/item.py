@@ -18,7 +18,7 @@ class Item(core.DataViewComponent):
         
         self.popup.add(JPopupMenu.Separator())
         for (name,func) in self.view.watcher.list(name):
-            self.popup.add(JMenuItem(name,actionPerformed=lambda event,self=self,func=func: self.add_component(func(self.view,self.name))))
+            self.popup.add(JMenuItem(name,actionPerformed=lambda event,self=self,func=func: self.add_component(func)))
             
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
@@ -30,9 +30,11 @@ class Item(core.DataViewComponent):
         bounds=g.font.getStringBounds(self.name,g.fontRenderContext)
         g.drawString(self.name,self.size.width/2-bounds.width/2,self.size.height/2+bounds.height/2)    
     
-    def add_component(self,component,location=None,size=(200,200)):
+    def add_component(self,func,location=None,size=(200,200)):
+        component=func(self.view,self.name)
         self.view.area.add(component)
-        if location is None: location=(self.mouse_pressed_x,self.mouse_pressed_y)
+        if location is None: location=(self.mouse_pressed_x+self.x,self.mouse_pressed_y+self.y)
         component.setLocation(*location)        
         component.setSize(*size)
                     
+

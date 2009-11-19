@@ -75,7 +75,7 @@ class InputWatch:
 
   
 class View(MouseListener, ActionListener, java.lang.Runnable):
-    def __init__(self,network,size=(800,600)):
+    def __init__(self,network,size=None,ui=None):
         self.dt=0.001
         self.tau_filter=0.03
         self.current_tick=0
@@ -87,6 +87,7 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
         self.watcher.add_watch(NodeWatch())
         self.watcher.add_watch(EnsembleWatch())
         self.watcher.add_watch(InputWatch())
+        
         
         self.frame=JFrame(network.name)
         self.frame.visible=True
@@ -101,7 +102,11 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
         self.time_control=TimeControl(self)
         self.frame.add(self.time_control,BorderLayout.SOUTH)
         
-        self.frame.size=size        
+        if size is None:
+            if ui is None: size=(800,600)
+            else: size=(int(ui.width),int(ui.height))
+        
+        self.frame.size=(size[0],size[1]+100)        
        
         self.popup=JPopupMenu()
         self.area.add(self.popup)
@@ -111,8 +116,16 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
         
         for i,(name,n) in enumerate(names):
             self.watcher.add_object(name,n)
-            self.add_item(name,location=(100+i*110,100))
             self.popup.add(JMenuItem(name,actionPerformed=lambda event,self=self,name=name: self.add_item(name,self.mouse_click_location)))
+        
+        if ui is not None:
+            p0=ui.localToView(java.awt.geom.Point2D.Double(0,0))
+            p1=ui.localToView(java.awt.geom.Point2D.Double(ui.width,ui.height))
+            
+            for n in ui.UINodes:
+                x=(n.offset.x-p0.x)/(p1.x-p0.x)*size[0]
+                y=(n.offset.y-p0.y)/(p1.y-p0.y)*size[1]
+                self.add_item(n.name,location=(int(x),int(y)))
 
         self.restart=False
         self.paused=True
@@ -167,7 +180,6 @@ class TimeControl(JPanel,ChangeListener):
         JPanel.__init__(self)
         self.view=view
         self.layout=BorderLayout()
-        self.background=Color.blue  
         self.slider=JSlider(0,1,0)          
         self.slider.snapToTicks=True
         self.add(self.slider)

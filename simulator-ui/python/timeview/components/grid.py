@@ -44,6 +44,12 @@ class Grid(core.DataViewComponent):
             sdata=self.sdata.get(start=self.view.current_tick,count=1)[0]
         else:
             sdata=None
+
+
+        x0=self.margin/2.0
+        y0=self.margin/2.0
+        g.color=Color.black
+        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.margin)+1)
         
         if data is None: 
             return
@@ -61,8 +67,6 @@ class Grid(core.DataViewComponent):
             
         dx=float(self.size.width-self.margin)/cols
         dy=float(self.size.height-self.margin)/rows
-        x0=self.margin/2.0
-        y0=self.margin/2.0
         for y in range(rows):
             for x in range(cols):                
                 if x+y*cols<len(data):
@@ -75,6 +79,8 @@ class Grid(core.DataViewComponent):
                         if c>1: c=1.0
                         g.color=Color(c,c,c)
                     g.fillRect(int(x0+dx*x),int(y0+dy*y),int(dx+1),int(dy+1))
+        g.color=Color.black
+        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.margin)+1)
 
         if self.requested_improvements>1:    
             self.map.improve()

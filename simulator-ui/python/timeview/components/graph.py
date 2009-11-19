@@ -27,13 +27,13 @@ def safe_get_index(x,i):
 
 
 class Graph(core.DataViewComponent):
-    def __init__(self,view,obj,func):
+    def __init__(self,view,name,func):
         core.DataViewComponent.__init__(self)
         self.view=view
-        self.obj=obj
+        self.name=name
         self.func=func
         self.indices=None
-        self.data=self.view.watcher.watch(obj,func)
+        self.data=self.view.watcher.watch(name,func)
         self.border_left=40
         self.border_right=20
         self.border_bottom=20

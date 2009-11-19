@@ -5,6 +5,10 @@ from java.awt.event import *
 
 
 class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionListener, ActionListener):
+    hover_border=BorderFactory.createLineBorder(Color.black,2);
+    item_hover_border=BorderFactory.createLineBorder(Color(0.5,0.5,0.5),1);
+    default_border=BorderFactory.createEmptyBorder()
+    
     def __init__(self):
         JPanel.__init__(self)
         self.addMouseListener(self)
@@ -15,11 +19,13 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.min_height=20
         self.resize_border=20
         self.popup=JPopupMenu()
-        self.popup.add(JMenuItem('delete',actionPerformed=self.actionPerformed))
+        self.popup.add(JMenuItem('hide',actionPerformed=self.actionPerformed))
         self.add(self.popup)
         self.setSize(100,50)
+        self.border=self.default_border
+        
     def actionPerformed(self,event):
-        if event.actionCommand=='delete':
+        if event.actionCommand=='hide':
             parent=self.parent
             self.parent.remove(self) 
             parent.repaint()
@@ -44,10 +50,16 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         if event.button==MouseEvent.BUTTON3:
             self.popup.show(self,event.x-5,event.y-5)   
     def mouseEntered(self, event):
-        self.hover=True
+        self.border=self.hover_border
+        for n in self.view.area.components:
+            if n is not self and hasattr(n,'name') and n.name==self.name:
+                n.border=n.item_hover_border
         self.repaint()
     def mouseExited(self, event):        
-        self.hover=False
+        self.border=self.default_border
+        for n in self.view.area.components:
+            if n is not self and hasattr(n,'name') and n.name==self.name:
+                n.border=n.default_border
         self.repaint()
     def mousePressed(self, event):  
         self.mouse_pressed_x=event.x
@@ -56,7 +68,6 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
     def mouseReleased(self, event):        
         pass
     def mouseDragged(self, event):                
-        self.hover=True
         if self.cursor.type==Cursor.HAND_CURSOR:
             self.setLocation(self.x+event.x-self.mouse_pressed_x,self.y+event.y-self.mouse_pressed_y)
         if self.cursor.type in [Cursor.W_RESIZE_CURSOR,Cursor.NW_RESIZE_CURSOR,Cursor.SW_RESIZE_CURSOR]:
@@ -103,10 +114,11 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
             else:    
                 self.cursor=Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
     def paintComponent(self,g):
-        if self.hover:
-            g.color=Color(0.9,0.9,0.9)
-        else:
-            g.color=Color(1.0,1.0,1.0)    
+        #if self.hover:
+        #    g.color=Color(0.9,0.9,0.9)
+        #    g.fillRect(0,0,self.size.width,self.size.height)
+        #else:
+        g.color=Color(1.0,1.0,1.0)    
         g.fillRect(0,0,self.size.width,self.size.height)
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
