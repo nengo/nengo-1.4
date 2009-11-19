@@ -51,7 +51,6 @@ class NodeWatch:
         
         r=[]
         for name in origins:
-            if name in ('AXON','current'): continue
             if name==default: text='value'
             else: text='value: '+name
             r.append((text,lambda view,name,origin=name: components.Graph(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin))))
@@ -175,7 +174,7 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
                 java.lang.Thread.sleep(10)
         
     
-class TimeControl(JPanel,ChangeListener):
+class TimeControl(JPanel,ChangeListener,ActionListener):
     def __init__(self,view):
         JPanel.__init__(self)
         self.view=view
@@ -204,6 +203,21 @@ class TimeControl(JPanel,ChangeListener):
 
         self.buttons=JPanel()
 
+
+        dt=JPanel(layout=BorderLayout())
+        cb=JComboBox(['0.001','0.0005','0.0002','0.0001'])
+        cb.setSelectedItem(0)
+        self.view.dt=float(cb.getSelectedItem())
+        cb.addActionListener(self)
+        self.dt_combobox=cb
+        
+        dt.add(cb)
+        #dt.add(JSpinner(SpinnerNumberModel(self.view.dt,0.0001,0.01,0.0001),stateChanged=self.dt))
+        dt.add(JLabel('time step'),BorderLayout.SOUTH)
+        self.buttons.add(dt)
+
+
+
         spin=JPanel(layout=BorderLayout())
         spin.add(JSpinner(SpinnerNumberModel((self.view.timelog.tick_limit-1)*self.view.dt,1,100,1),stateChanged=self.tick_limit))
         spin.add(JLabel('recording time'),BorderLayout.SOUTH)
@@ -219,9 +233,11 @@ class TimeControl(JPanel,ChangeListener):
         self.buttons.add(spin)
 
         spin=JPanel(layout=BorderLayout())
-        spin.add(JSpinner(SpinnerNumberModel(self.view.time_shown,0.1,50,0.1),stateChanged=self.time_shown))
+        spin.add(JSpinner(SpinnerNumberModel(self.view.time_shown,0.01,50,0.1),stateChanged=self.time_shown))
         spin.add(JLabel('time shown'),BorderLayout.SOUTH)
         self.buttons.add(spin)
+
+
 
 
         self.add(self.buttons,BorderLayout.SOUTH)
@@ -248,5 +264,8 @@ class TimeControl(JPanel,ChangeListener):
     def time_shown(self,event):
         self.view.time_shown=float(event.source.value)
         self.view.area.repaint()
+    def actionPerformed(self,event):
+        self.view.dt=float(self.dt_combobox.getSelectedItem())
+        self.view.restart=True
     def tick_limit(self,event):
         self.view.timelog.tick_limit=int(event.source.value/self.view.dt)+1

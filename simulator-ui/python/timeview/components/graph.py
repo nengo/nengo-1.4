@@ -5,22 +5,6 @@ from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
 
-import math
-def filter(data,index,dt,tau):
-    if tau<=0: return [x[index] for x in data]
-    scale=dt/tau
-    decay=math.exp(-dt/tau)
-    r=[0]*len(data)
-    v=0
-    for i,x in enumerate(data):
-        if x is None: 
-            v=0
-            r[i]=None
-        else: 
-            v=decay*v+x[index]*scale
-            r[i]=v
-    return r
-
 def safe_get_index(x,i):
     if x is None: return None
     return x[i]
@@ -57,13 +41,14 @@ class Graph(core.DataViewComponent):
             else:        
                 mn,mx=5*v,10*v
         if sign<0:
-            mn,mx=-mx,-mn
+            mn,mx=-mx,-mn            
         return mn,mx
         
     def fix_popup(self):
         self.popup.add(JPopupMenu.Separator())
         for i,draw in enumerate(self.indices):
-            self.popup.add(JCheckBoxMenuItem('%s[%d]'%('v',i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state)))
+            if i<30:
+                self.popup.add(JCheckBoxMenuItem('%s[%d]'%('v',i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state)))
         
         
         
@@ -117,7 +102,6 @@ class Graph(core.DataViewComponent):
         filtered=[]
         for i,draw in enumerate(self.indices):
             if draw:
-                #fdata=filter(data,index=i,dt=self.view.dt,tau=self.view.tau_filter)
                 fdata=[safe_get_index(x,i) for x in data]
                 fdata=fdata[extrapts:]
                 trimmed=[x for x in fdata if x is not None]
@@ -131,11 +115,13 @@ class Graph(core.DataViewComponent):
                 filtered.append(fdata)
             
             
+        if maxy<1: maxy=1.0
+        if miny>-1: miny=-1.0    
         if maxy==miny: yscale=0
         else: yscale=float(self.size.height-self.border_bottom)/(maxy-miny)
 
 
-        colors=[Color.black,Color.blue,Color.red,Color.green]
+        colors=[Color.black,Color.blue,Color.red,Color.green,Color.magenta,Color.cyan,Color.yellow]
         for i,fdata in enumerate(filtered):
             g.color=colors[i%len(colors)]
             for i in range(len(fdata)-1):
