@@ -444,9 +444,9 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 			}
 			protected void action() throws ActionException {
 				PythonInterpreter pi=NengoGraphics.getInstance().getPythonInterpreter();
-				pi.set("_interactive_network",uiNetwork.getModel());
+				pi.set("_interactive_network",uiNetwork);
 				pi.exec("import timeview");
-				pi.exec("timeview.View(_interactive_network)");
+				pi.exec("timeview.View(_interactive_network.model,ui=_interactive_network.viewer)");
 				pi.exec("del _interactive_network");
 			}
 			

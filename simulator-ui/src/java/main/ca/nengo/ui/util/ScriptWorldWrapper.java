@@ -47,4 +47,9 @@ public class ScriptWorldWrapper {
 	public void remove(Node node) {
 		nengoGraphics.removeNodeModel(node);
 	}
+
+	public void getNode(String name) {
+		nengoGraphics.getNodeModel(name);
+	}
+
 }
