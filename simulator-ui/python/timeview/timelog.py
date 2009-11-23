@@ -1,7 +1,10 @@
 import math
+import threading
 
 class TimeLogItem:
-    def __init__(self,func,type=None,offset=0):
+    def __init__(self,parent,func,type=None,offset=0):
+        self.semaphore=threading.Semaphore()
+        self.parent=parent
         self.func=func
         self.data=[]
         self.filtered={}
@@ -9,6 +12,7 @@ class TimeLogItem:
         self.type=type
         self.tick()
     def tick(self,limit=None):
+        self.semaphore.acquire()
         self.data.append(self.func())
         if limit is not None and len(self.data)>limit:
             delta=len(self.data)-limit
@@ -18,14 +22,19 @@ class TimeLogItem:
                 if len(v)<=delta: del self.filtered[k]
                 else:
                     self.filtered[k]=v[delta:]
+        self.semaphore.release()
     def reset(self):
+        self.semaphore.acquire()
         del self.data[:]
         self.filtered={}
         self.offset=0
+        self.semaphore.release()
         self.tick()
 
 
     def update_filter(self,dt_tau):
+        self.semaphore.acquire()
+        self.parent.processing=True
         if dt_tau not in self.filtered:
             f=[[x*dt_tau for x in self.data[0]]]
             #f=[self.data[0]*dt_tau]
@@ -42,13 +51,18 @@ class TimeLogItem:
                     v[j]=v[j]*decay+d[i][j]*dt_tau
                 #v=v*decay+d[i]*scale
                 f.append(v[:])
+        self.parent.processing=False
+        self.semaphore.release()
         return f        
 
     def get(self,start=None,count=None,dt_tau=None):
+        self.semaphore.acquire()
         if dt_tau is None:
             d=self.data
         else:
+            self.semaphore.release()
             d=self.update_filter(dt_tau)
+            self.semaphore.acquire()
         off=self.offset
         if start is None: start=0
         if count is None: count=len(d)+off
@@ -61,6 +75,7 @@ class TimeLogItem:
             r=d[start-off:start-off+count]
         if len(r)<count:
             r+=[None]*(count-len(r))
+        self.semaphore.release()
         return r
 
     def get_first(self):
@@ -71,9 +86,10 @@ class TimeLog:
         self.items=[]
         self.tick_count=0
         self.tick_limit=4001
+        self.processing=False
     
     def add(self,func,type=None):
-        item=TimeLogItem(func,type=type,offset=self.tick_count)
+        item=TimeLogItem(self,func,type=type,offset=self.tick_count)
         self.items.append(item)
         return item
     
