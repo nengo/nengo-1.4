@@ -17,6 +17,16 @@ from ca.nengo.math.impl import *
 from ca.nengo.model import Node
 
 
+class Icon:
+    pass
+class ShadedIcon:
+    pass    
+    
+for name in 'pause play configure end start backward forward restart'.split():
+    setattr(Icon,name,ImageIcon('python/images/%s.png'%name))
+    setattr(ShadedIcon,name,ImageIcon('python/images/%s-pressed.png'%name))
+
+
 class EnsembleWatch:
     def check(self,obj):
         return isinstance(obj,NEFEnsemble)
@@ -129,7 +139,9 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
 
         self.restart=False
         self.paused=True
-        java.lang.Thread(self).start()
+        th=java.lang.Thread(self)
+        th.priority=java.lang.Thread.MIN_PRIORITY
+        th.start()
 
     def add_item(self,name,location):
         g=components.Item(self,name)
@@ -167,25 +179,29 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
             last_frame_time=None
             counter=0
             while self.frame.visible:
-                while self.paused and not self.restart and self.frame.visible:
+                while (self.paused or self.timelog.processing) and not self.restart and self.frame.visible:
                     java.lang.Thread.sleep(10)
                 if self.restart or not self.frame.visible:
                     self.restart=False
                     break
-                self.network.simulator.run(now,now+self.dt,self.dt)
-                now+=self.dt
-                self.timelog.tick()                
-                self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
-                self.time_control.set_max_time(self.timelog.tick_count)                
-                if self.current_tick==self.timelog.tick_count-1:
+                    
+                if self.current_tick>=self.timelog.tick_count-1:    
+                    self.network.simulator.run(now,now+self.dt,self.dt)
+                    now+=self.dt
+                    self.timelog.tick()                
+                    self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
+                    self.time_control.set_max_time(self.timelog.tick_count)                
                     self.time_control.slider.value=self.timelog.tick_count
+                else:
+                    self.time_control.slider.value=self.current_tick+1
                 self.area.repaint()
                 this_frame_time=java.lang.System.currentTimeMillis()
                 if last_frame_time is not None:
                     delta=this_frame_time-last_frame_time
                     sleep=self.delay-delta
-                    if sleep<1:
-                        sleep=1
+                    if sleep<0: sleep=0
+                    #if sleep<1:
+                    #    sleep=1
                     java.lang.Thread.sleep(int(sleep))
                 last_frame_time=this_frame_time
         
@@ -205,19 +221,27 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.max_time=JLabel(' 0.0000 ',opaque=True)
         
         self.left_panel=JPanel()
+        self.left_panel.add(JButton(Icon.restart,rolloverIcon=ShadedIcon.restart,toolTipText='restart',actionPerformed=self.start))
         self.left_panel.add(self.min_time)
-        self.left_panel.add(JButton('<',actionPerformed=lambda x: self.slider.setValue(self.slider.value-1)))
+        #self.left_panel.add(JButton(icon=Icon.backward,rolloverIcon=ShadedIcon.backward,toolTipText='backward one frame',actionPerformed=self.backward_one_frame))
+        self.left_panel.add(JButton(icon=Icon.start,rolloverIcon=ShadedIcon.start,toolTipText='jump to beginning',actionPerformed=lambda x: self.slider.setValue(self.slider.minimum)))
                             
         self.right_panel=JPanel()
-        self.right_panel.add(JButton('>',actionPerformed=lambda x: self.slider.setValue(self.slider.value+1)))
-        self.right_panel.add(JButton('>|',actionPerformed=lambda x: self.slider.setValue(self.slider.maximum)))
+        #self.right_panel.add(JButton(icon=Icon.forward,rolloverIcon=ShadedIcon.forward,toolTipText='forward one frame',actionPerformed=self.forward_one_frame))
+        self.right_panel.add(JButton(icon=Icon.end,rolloverIcon=ShadedIcon.end,toolTipText='jump to end',actionPerformed=lambda x: self.slider.setValue(self.slider.maximum)))
         self.right_panel.add(self.max_time)
+        self.right_panel.add(JButton(Icon.play,actionPerformed=self.pause,rolloverIcon=ShadedIcon.play,toolTipText='continue'))
+
+
+
                              
         self.add(self.left_panel,BorderLayout.WEST)
         self.add(self.right_panel,BorderLayout.EAST)
 
 
         self.buttons=JPanel()
+        self.buttons.background=Color(0.8,0.8,0.8)
+
 
 
         dt=JPanel(layout=BorderLayout())
@@ -246,9 +270,6 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         spin.add(JLabel('recording time'),BorderLayout.SOUTH)
         self.buttons.add(spin)
 
-        self.buttons.add(JButton('restart',actionPerformed=self.start))
-
-        self.buttons.add(JButton('continue',actionPerformed=self.pause))
         
         spin=JPanel(layout=BorderLayout())
         spin.add(JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.tau_filter))
@@ -264,6 +285,11 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
 
         self.add(self.buttons,BorderLayout.SOUTH)
+    def forward_one_frame(self,event):
+        self.slider.setValue(self.slider.value+1)            
+    def backward_one_frame(self,event):
+        self.slider.setValue(self.slider.value-1)            
+        
     def set_max_time(self,maximum):
         self.slider.maximum=maximum
         self.max_time.text=' %1.4f '%(self.view.dt*maximum)
@@ -278,9 +304,13 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
     def pause(self,event):
         self.view.paused=not self.view.paused
         if self.view.paused:
-            event.source.text='continue'
+            event.source.icon=Icon.play
+            event.source.rolloverIcon=ShadedIcon.play
+            event.source.toolTipText='continue'
         else:
-            event.source.text=' pause '    
+            event.source.icon=Icon.pause
+            event.source.rolloverIcon=ShadedIcon.pause
+            event.source.toolTipText='pause'
     def tau_filter(self,event):
         self.view.tau_filter=float(event.source.value)
         self.view.area.repaint()

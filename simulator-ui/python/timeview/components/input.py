@@ -48,7 +48,7 @@ class Input(core.DataViewComponent,ComponentListener):
         core.DataViewComponent.paintComponent(self,g)    
         
         
-        self.active=self.view.current_tick==self.view.timelog.tick_count
+        self.active=self.view.current_tick>=self.view.timelog.tick_count
             
 
         data=self.data.get(start=self.view.current_tick,count=1)[0]
