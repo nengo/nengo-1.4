@@ -61,6 +61,7 @@ class NodeWatch:
         
         r=[]
         for name in origins:
+            if name in ['AXON','current']: continue
             if name==default: text='value'
             else: text='value: '+name
             r.append((text,lambda view,name,origin=name: components.Graph(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin))))
@@ -211,6 +212,13 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         JPanel.__init__(self)
         self.view=view
         self.background=Color.white
+        
+        """
+        self.splitPane=JSplitPane(JSplitPane.VERTICAL_SPLIT,mainPanel,configPanel)
+        
+        mainPanel=JPanel(background=self.background,layout=BorderLayou
+        """
+        
         self.layout=BorderLayout()
         self.slider=JSlider(0,1,0,background=self.background)          
         self.slider.snapToTicks=True
