@@ -45,7 +45,7 @@ public class PlotTimeSeries extends StandardAction {
 	public PlotTimeSeries(TimeSeries data, String plotName) {
 		super("Plot");
 		this.data = data;
-		this.plotName = plotName;
+		this.plotName = plotName + "  [ " + data.getName() + " ]";
 	}
 
 	@Override

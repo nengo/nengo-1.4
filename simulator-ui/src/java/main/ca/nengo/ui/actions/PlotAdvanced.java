@@ -55,7 +55,7 @@ public class PlotAdvanced extends StandardAction {
 	public PlotAdvanced(TimeSeries timeSeries, String plotName) {
 		super("Plot with options", "Plot w/ options");
 		this.timeSeries = timeSeries;
-		this.plotName = plotName;
+		this.plotName = plotName + "  [ " + timeSeries.getName() + " ]";
 	}
 
 	@Override
