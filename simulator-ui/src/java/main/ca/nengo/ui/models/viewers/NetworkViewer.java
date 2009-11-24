@@ -414,7 +414,8 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 			if (restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
 				return;
 			} else {
-				applyJungLayout(KKLayout.class);
+                applySortLayout(SortMode.BY_NAME);
+                //applyJungLayout(KKLayout.class);
 			}
 		}
 		if (ELASTIC_LAYOUT_ENABLED_DEFAULT) {
