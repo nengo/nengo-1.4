@@ -7,6 +7,7 @@ reload(timelog)
 
 
 import java
+import javax
 from javax.swing import *
 from javax.swing.event import *
 from java.awt import *
@@ -216,6 +217,19 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
                     #    sleep=1
                     java.lang.Thread.sleep(int(sleep))
                 last_frame_time=this_frame_time
+    
+    
+class RoundedBorder(javax.swing.border.AbstractBorder):
+    def __init__(self):
+        self.color=Color(0.7,0.7,0.7)
+    def getBorderInsets(self,component):
+        return java.awt.Insets(5,5,5,5)
+    def paintBorder(self,c,g,x,y,width,height):
+        g.color=self.color
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g.drawRoundRect(x,y,width-1,height-1,10,10)
+        
+
         
     
 class TimeControl(JPanel,ChangeListener,ActionListener):
@@ -224,16 +238,26 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.view=view
         self.background=Color.white
         
-        """
-        self.splitPane=JSplitPane(JSplitPane.VERTICAL_SPLIT,mainPanel,configPanel)
         
-        mainPanel=JPanel(background=self.background,layout=BorderLayou
-        """
         
+        mainPanel=JPanel(background=self.background,layout=BorderLayout())
+        mainPanel.border=RoundedBorder()
+        configPanel=JPanel(background=self.background)
+
+
         self.layout=BorderLayout()
+        self.add(mainPanel)        
+        self.add(configPanel,BorderLayout.SOUTH)
+        
+        self.configPanel=configPanel
+
+        #self.splitPane=JSplitPane(JSplitPane.VERTICAL_SPLIT,mainPanel,configPanel)
+        #self.add(self.splitPane)
+        
+        
         self.slider=JSlider(0,1,0,background=self.background)          
         self.slider.snapToTicks=True
-        self.add(self.slider)
+        mainPanel.add(self.slider)
         self.slider.addChangeListener(self)
 
 
@@ -241,6 +265,8 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.max_time=JLabel(' 0.0000 ',opaque=True,background=self.background)
         
         self.left_panel=JPanel(background=self.background)
+        self.config_button=JButton(Icon.configure,rolloverIcon=ShadedIcon.configure,toolTipText='configure',actionPerformed=self.configure,borderPainted=False,focusPainted=False,contentAreaFilled=False)
+        self.left_panel.add(self.config_button)
         self.left_panel.add(JButton(Icon.restart,rolloverIcon=ShadedIcon.restart,toolTipText='restart',actionPerformed=self.start,borderPainted=False,focusPainted=False,contentAreaFilled=False))
         self.left_panel.add(self.min_time)
         #self.left_panel.add(JButton(icon=Icon.backward,rolloverIcon=ShadedIcon.backward,toolTipText='backward one frame',actionPerformed=self.backward_one_frame))
@@ -255,12 +281,10 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
 
                              
-        self.add(self.left_panel,BorderLayout.WEST)
-        self.add(self.right_panel,BorderLayout.EAST)
+        mainPanel.add(self.left_panel,BorderLayout.WEST)
+        mainPanel.add(self.right_panel,BorderLayout.EAST)
 
 
-        self.buttons=JPanel()
-        #self.buttons.background=Color(0.8,0.8,0.8)
 
 
 
@@ -272,7 +296,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.dt_combobox=cb        
         dt.add(cb)
         dt.add(JLabel('time step'),BorderLayout.SOUTH)
-        self.buttons.add(dt)
+        configPanel.add(dt)
 
         rate=JPanel(layout=BorderLayout())
         self.rate_combobox=JComboBox(['fastest','1x','0.5x','0.2x','0.1x','0.05x','0.02x','0.01x','0.005x','0.002x','0.001x'])
@@ -281,30 +305,31 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.rate_combobox.addActionListener(self)
         rate.add(self.rate_combobox)
         rate.add(JLabel('speed'),BorderLayout.SOUTH)
-        self.buttons.add(rate)
+        configPanel.add(rate)
 
 
         spin=JPanel(layout=BorderLayout())
         self.record_time_spinner=JSpinner(SpinnerNumberModel((self.view.timelog.tick_limit-1)*self.view.dt,0.1,100,1),stateChanged=self.tick_limit)
         spin.add(self.record_time_spinner)
         spin.add(JLabel('recording time'),BorderLayout.SOUTH)
-        self.buttons.add(spin)
+        configPanel.add(spin)
 
         
         spin=JPanel(layout=BorderLayout())
         spin.add(JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.tau_filter))
         spin.add(JLabel('filter'),BorderLayout.SOUTH)
-        self.buttons.add(spin)
+        configPanel.add(spin)
 
         spin=JPanel(layout=BorderLayout())
         spin.add(JSpinner(SpinnerNumberModel(self.view.time_shown,0.01,50,0.1),stateChanged=self.time_shown))
         spin.add(JLabel('time shown'),BorderLayout.SOUTH)
-        self.buttons.add(spin)
+        configPanel.add(spin)
+
+        configPanel.minimumSize=(0,0)
+        
 
 
 
-
-        self.add(self.buttons,BorderLayout.SOUTH)
     def forward_one_frame(self,event):
         self.slider.setValue(self.slider.value+1)            
     def backward_one_frame(self,event):
@@ -321,6 +346,13 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.view.area.repaint()
     def start(self,event):
         self.view.restart=True
+    def configure(self,event):
+        if self.configPanel.visible:
+            self.view.frame.setSize(self.view.frame.width,self.view.frame.height-self.configPanel.height)
+            self.configPanel.visible=False
+        else:    
+            self.view.frame.setSize(self.view.frame.width,self.view.frame.height+self.configPanel.height)
+            self.configPanel.visible=True
     def pause(self,event):
         self.view.paused=not self.view.paused
         if self.view.paused:
