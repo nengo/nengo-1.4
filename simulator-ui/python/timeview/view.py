@@ -40,7 +40,7 @@ class EnsembleWatch:
         return [
             ('voltage',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes)),
             ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
-            ('encoders',lambda view,name: components.Grid(view,name,self.encoder,min=-1,max=1)),
+            #('encoders',lambda view,name: components.Grid(view,name,self.encoder,min=-1,max=1)),
             ]
 
 class NodeWatch:
