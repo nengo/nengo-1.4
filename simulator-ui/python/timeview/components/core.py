@@ -118,7 +118,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         #    g.color=Color(0.9,0.9,0.9)
         #    g.fillRect(0,0,self.size.width,self.size.height)
         #else:
-        g.color=Color(1.0,1.0,1.0)    
+        g.color=Color.white
         g.fillRect(0,0,self.size.width,self.size.height)
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 

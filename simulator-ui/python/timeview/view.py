@@ -24,7 +24,7 @@ class Icon:
 class ShadedIcon:
     pass    
     
-for name in 'pause play configure end start backward forward restart'.split():
+for name in 'pause play configure end start backward forward restart arrowup arrowdown'.split():
     setattr(Icon,name,ImageIcon('python/images/%s.png'%name))
     setattr(ShadedIcon,name,ImageIcon('python/images/%s-pressed.png'%name))
 
@@ -95,6 +95,34 @@ class InputWatch:
             ('control',lambda view,name: components.Input(view,name,self.constantFuncs)),
             ]
 
+class ViewPanel(JPanel):
+    def __init__(self,network):
+        JPanel.__init__(self)
+        self.network=network
+        self.nodes={}
+    def paintComponent(self,g):
+        g.color=Color.white
+        g.fillRect(0,0,self.width,self.height)
+        
+        g.color=Color.black
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        
+        for p in self.network.projections:
+            oname=p.origin.node.name
+            tname=p.termination.node.name 
+            if oname in self.nodes and tname in self.nodes:
+                c1=self.nodes[oname]
+                c2=self.nodes[tname]
+                if c1.visible and c2.visible:
+                    x1=c1.x+c1.width/2
+                    x2=c2.x+c2.width/2
+                    y1=c1.y+c1.height/2
+                    y2=c2.y+c2.height/2
+                    
+                
+                    g.drawLine(x1,y1,x2,y2)
+        
+
   
 class View(MouseListener, ActionListener, java.lang.Runnable):
     def __init__(self,network,size=None,ui=None):
@@ -116,7 +144,7 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
         self.frame.visible=True
         self.frame.layout=BorderLayout()
         
-        self.area=JPanel()
+        self.area=ViewPanel(network)
         self.area.background=Color.white
         self.area.layout=None
         self.area.addMouseListener(self)
@@ -158,6 +186,7 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
 
     def add_item(self,name,location):
         g=components.Item(self,name)
+        self.area.nodes[name]=g
         g.setLocation(*location)
         self.area.add(g)
             
@@ -237,22 +266,26 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         JPanel.__init__(self)
         self.view=view
         self.background=Color.white
+        self.config_panel_height=60
         
         
         
         mainPanel=JPanel(background=self.background,layout=BorderLayout())
         mainPanel.border=RoundedBorder()
-        configPanel=JPanel(background=self.background)
+        configPanel=JPanel(background=self.background,visible=False)
+        
 
 
         self.layout=BorderLayout()
-        self.add(mainPanel)        
+        self.add(mainPanel,BorderLayout.NORTH)        
         self.add(configPanel,BorderLayout.SOUTH)
+
+        self.config_button=JButton(Icon.arrowdown,rolloverIcon=ShadedIcon.arrowdown,toolTipText='configure',actionPerformed=self.configure,borderPainted=False,focusPainted=False,contentAreaFilled=False)
+        self.add(self.config_button)
+
         
         self.configPanel=configPanel
-
-        #self.splitPane=JSplitPane(JSplitPane.VERTICAL_SPLIT,mainPanel,configPanel)
-        #self.add(self.splitPane)
+        
         
         
         self.slider=JSlider(0,1,0,background=self.background)          
@@ -265,8 +298,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.max_time=JLabel(' 0.0000 ',opaque=True,background=self.background)
         
         self.left_panel=JPanel(background=self.background)
-        self.config_button=JButton(Icon.configure,rolloverIcon=ShadedIcon.configure,toolTipText='configure',actionPerformed=self.configure,borderPainted=False,focusPainted=False,contentAreaFilled=False)
-        self.left_panel.add(self.config_button)
+        #self.config_button=JButton(Icon.configure,rolloverIcon=ShadedIcon.configure,toolTipText='configure',actionPerformed=self.configure,borderPainted=False,focusPainted=False,contentAreaFilled=False)
         self.left_panel.add(JButton(Icon.restart,rolloverIcon=ShadedIcon.restart,toolTipText='restart',actionPerformed=self.start,borderPainted=False,focusPainted=False,contentAreaFilled=False))
         self.left_panel.add(self.min_time)
         #self.left_panel.add(JButton(icon=Icon.backward,rolloverIcon=ShadedIcon.backward,toolTipText='backward one frame',actionPerformed=self.backward_one_frame))
@@ -288,44 +320,55 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
 
 
-        dt=JPanel(layout=BorderLayout())
+        dt=JPanel(layout=BorderLayout(),opaque=False)
         cb=JComboBox(['0.001','0.0005','0.0002','0.0001'])
-        cb.setSelectedItem(0)
+        cb.setSelectedIndex(0)
         self.view.dt=float(cb.getSelectedItem())
         cb.addActionListener(self)
         self.dt_combobox=cb        
         dt.add(cb)
-        dt.add(JLabel('time step'),BorderLayout.SOUTH)
+        dt.add(JLabel('time step'),BorderLayout.NORTH)
+        dt.maximumSize=dt.preferredSize
         configPanel.add(dt)
 
-        rate=JPanel(layout=BorderLayout())
+        rate=JPanel(layout=BorderLayout(),opaque=False)
         self.rate_combobox=JComboBox(['fastest','1x','0.5x','0.2x','0.1x','0.05x','0.02x','0.01x','0.005x','0.002x','0.001x'])
-        self.rate_combobox.setSelectedItem(0)
+        self.rate_combobox.setSelectedIndex(4)
         self.view.set_target_rate(self.rate_combobox.getSelectedItem())
         self.rate_combobox.addActionListener(self)
         rate.add(self.rate_combobox)
-        rate.add(JLabel('speed'),BorderLayout.SOUTH)
+        rate.add(JLabel('speed'),BorderLayout.NORTH)
+        rate.maximumSize=rate.preferredSize
         configPanel.add(rate)
 
 
-        spin=JPanel(layout=BorderLayout())
+        spin1=JPanel(layout=BorderLayout(),opaque=False)
         self.record_time_spinner=JSpinner(SpinnerNumberModel((self.view.timelog.tick_limit-1)*self.view.dt,0.1,100,1),stateChanged=self.tick_limit)
-        spin.add(self.record_time_spinner)
-        spin.add(JLabel('recording time'),BorderLayout.SOUTH)
-        configPanel.add(spin)
+        spin1.add(self.record_time_spinner)
+        spin1.add(JLabel('recording time'),BorderLayout.NORTH)
+        spin1.maximumSize=spin1.preferredSize
+        configPanel.add(spin1)
 
         
-        spin=JPanel(layout=BorderLayout())
-        spin.add(JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.tau_filter))
-        spin.add(JLabel('filter'),BorderLayout.SOUTH)
-        configPanel.add(spin)
+        spin2=JPanel(layout=BorderLayout(),opaque=False)
+        spin2.add(JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.tau_filter))
+        spin2.add(JLabel('filter'),BorderLayout.NORTH)
+        spin2.maximumSize=spin2.preferredSize
+        configPanel.add(spin2)
 
-        spin=JPanel(layout=BorderLayout())
-        spin.add(JSpinner(SpinnerNumberModel(self.view.time_shown,0.01,50,0.1),stateChanged=self.time_shown))
-        spin.add(JLabel('time shown'),BorderLayout.SOUTH)
-        configPanel.add(spin)
+        spin3=JPanel(layout=BorderLayout(),opaque=False)
+        spin3.add(JSpinner(SpinnerNumberModel(self.view.time_shown,0.01,50,0.1),stateChanged=self.time_shown))
+        spin3.add(JLabel('time shown'),BorderLayout.NORTH)
+        spin3.maximumSize=spin3.preferredSize
+        configPanel.add(spin3)
 
-        configPanel.minimumSize=(0,0)
+        configPanel.setPreferredSize(java.awt.Dimension(20,self.config_panel_height))
+        configPanel.visible=False
+        
+        
+        for c in [dt,rate,spin1,spin2,spin3]:
+            c.border=javax.swing.border.EmptyBorder(0,10,0,10)
+        
         
 
 
@@ -348,11 +391,17 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.view.restart=True
     def configure(self,event):
         if self.configPanel.visible:
-            self.view.frame.setSize(self.view.frame.width,self.view.frame.height-self.configPanel.height)
+            self.view.frame.setSize(self.view.frame.width,self.view.frame.height-self.config_panel_height)
             self.configPanel.visible=False
+            self.config_button.icon=Icon.arrowdown
+            self.config_button.rolloverIcon=ShadedIcon.arrowdown
+            self.config_button.toolTipText='configure'
         else:    
-            self.view.frame.setSize(self.view.frame.width,self.view.frame.height+self.configPanel.height)
+            self.view.frame.setSize(self.view.frame.width,self.view.frame.height+self.config_panel_height)
             self.configPanel.visible=True
+            self.config_button.icon=Icon.arrowup
+            self.config_button.rolloverIcon=ShadedIcon.arrowup
+            self.config_button.toolTipText='hide configuration'
     def pause(self,event):
         self.view.paused=not self.view.paused
         if self.view.paused:

@@ -23,8 +23,8 @@ class Item(core.DataViewComponent):
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
         
-        g.color=Color(0.8,0.8,0.8)
-        g.fillRoundRect(self.border_size,self.border_size,self.size.width-self.border_size*2,self.size.height-self.border_size*2,self.arc_size,self.arc_size)
+        #g.color=Color(0.8,0.8,0.8)
+        #g.fillRoundRect(self.border_size,self.border_size,self.size.width-self.border_size*2,self.size.height-self.border_size*2,self.arc_size,self.arc_size)
         g.color=Color.black
         g.font=self.label_font
         bounds=g.font.getStringBounds(self.name,g.fontRenderContext)
@@ -37,4 +37,7 @@ class Item(core.DataViewComponent):
         component.setLocation(*location)        
         component.setSize(*size)
                     
+    def mouseDragged(self, event):                
+        core.DataViewComponent.mouseDragged(self,event)
+        self.view.frame.repaint()
 
