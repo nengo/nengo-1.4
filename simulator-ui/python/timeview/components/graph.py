@@ -114,7 +114,8 @@ class Graph(core.DataViewComponent):
                 if miny is None or fminy<miny: miny=fminy
                 filtered.append(fdata)
             
-            
+        if maxy is None: maxy=1.0
+        if miny is None: miny=-1.0    
         if maxy<1: maxy=1.0
         if miny>-1: miny=-1.0    
         if maxy==miny: yscale=0

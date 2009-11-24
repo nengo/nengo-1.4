@@ -210,27 +210,28 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
     def __init__(self,view):
         JPanel.__init__(self)
         self.view=view
+        self.background=Color.white
         self.layout=BorderLayout()
-        self.slider=JSlider(0,1,0)          
+        self.slider=JSlider(0,1,0,background=self.background)          
         self.slider.snapToTicks=True
         self.add(self.slider)
         self.slider.addChangeListener(self)
 
 
-        self.min_time=JLabel(' 0.0000 ',opaque=True)
-        self.max_time=JLabel(' 0.0000 ',opaque=True)
+        self.min_time=JLabel(' 0.0000 ',opaque=True,background=self.background)
+        self.max_time=JLabel(' 0.0000 ',opaque=True,background=self.background)
         
-        self.left_panel=JPanel()
-        self.left_panel.add(JButton(Icon.restart,rolloverIcon=ShadedIcon.restart,toolTipText='restart',actionPerformed=self.start))
+        self.left_panel=JPanel(background=self.background)
+        self.left_panel.add(JButton(Icon.restart,rolloverIcon=ShadedIcon.restart,toolTipText='restart',actionPerformed=self.start,borderPainted=False,focusPainted=False,contentAreaFilled=False))
         self.left_panel.add(self.min_time)
         #self.left_panel.add(JButton(icon=Icon.backward,rolloverIcon=ShadedIcon.backward,toolTipText='backward one frame',actionPerformed=self.backward_one_frame))
-        self.left_panel.add(JButton(icon=Icon.start,rolloverIcon=ShadedIcon.start,toolTipText='jump to beginning',actionPerformed=lambda x: self.slider.setValue(self.slider.minimum)))
+        self.left_panel.add(JButton(icon=Icon.start,rolloverIcon=ShadedIcon.start,toolTipText='jump to beginning',actionPerformed=lambda x: self.slider.setValue(self.slider.minimum),borderPainted=False,focusPainted=False,contentAreaFilled=False))
                             
-        self.right_panel=JPanel()
+        self.right_panel=JPanel(background=self.background)
         #self.right_panel.add(JButton(icon=Icon.forward,rolloverIcon=ShadedIcon.forward,toolTipText='forward one frame',actionPerformed=self.forward_one_frame))
-        self.right_panel.add(JButton(icon=Icon.end,rolloverIcon=ShadedIcon.end,toolTipText='jump to end',actionPerformed=lambda x: self.slider.setValue(self.slider.maximum)))
+        self.right_panel.add(JButton(icon=Icon.end,rolloverIcon=ShadedIcon.end,toolTipText='jump to end',actionPerformed=lambda x: self.slider.setValue(self.slider.maximum),borderPainted=False,focusPainted=False,contentAreaFilled=False))
         self.right_panel.add(self.max_time)
-        self.right_panel.add(JButton(Icon.play,actionPerformed=self.pause,rolloverIcon=ShadedIcon.play,toolTipText='continue'))
+        self.right_panel.add(JButton(Icon.play,actionPerformed=self.pause,rolloverIcon=ShadedIcon.play,toolTipText='continue',borderPainted=False,focusPainted=False,contentAreaFilled=False))
 
 
 
@@ -240,7 +241,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
 
         self.buttons=JPanel()
-        self.buttons.background=Color(0.8,0.8,0.8)
+        #self.buttons.background=Color(0.8,0.8,0.8)
 
 
 
