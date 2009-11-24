@@ -16,6 +16,7 @@ from ca.nengo.model.impl import *
 from ca.nengo.math.impl import *
 from ca.nengo.model import Node
 
+from java.lang.System.err import println
 
 class Icon:
     pass
@@ -52,8 +53,12 @@ class NodeWatch:
         origins=[o.name for o in obj.origins]
         
         default=None
-        if isinstance(obj,NEFEnsemble): default='X'
-        elif isinstance(obj,FunctionInput): default='origin'
+        if isinstance(obj,NEFEnsemble): 
+            default='X'
+            max_radii = max(obj.radii)
+        elif isinstance(obj,FunctionInput): 
+            default='origin'
+            max_radii = 1
         
         if default in origins:
             origins.remove(default)
@@ -62,9 +67,15 @@ class NodeWatch:
         r=[]
         for name in origins:
             if name in ['AXON','current']: continue
-            if name==default: text='value'
-            else: text='value: '+name
+            if name == default: 
+                text='value'
+                text_grid = 'value (grid)'
+            else: 
+                text='value: '+name
+                text_grid='value (grid): ' + name
+            
             r.append((text,lambda view,name,origin=name: components.Graph(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin))))
+            r.append((text_grid,lambda view,name,origin=name: components.VectorGrid(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin), -max_radii, max_radii)))
         return r    
 
 
