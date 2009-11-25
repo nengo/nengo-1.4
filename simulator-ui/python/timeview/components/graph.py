@@ -61,8 +61,6 @@ class Graph(core.DataViewComponent):
         g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
 
         pts=int(self.view.time_shown/self.view.dt)
-        extrapts=int(self.view.tau_filter*5/self.view.dt)
-        extrapts=0
 
         start=self.view.current_tick-pts+1
         if start<0: start=0
@@ -84,8 +82,10 @@ class Graph(core.DataViewComponent):
         if self.filter and self.view.tau_filter>0:
             dt_tau=self.view.dt/self.view.tau_filter
 
-        data=self.data.get(start=start-extrapts,count=pts+extrapts,dt_tau=dt_tau)
+        data=self.data.get(start=start,count=pts,dt_tau=dt_tau)
         now=self.view.current_tick-start
+        for i in range(now+1,len(data)):
+            data[i]=None
         
         if self.indices is None:
             for x in data:
@@ -105,7 +105,6 @@ class Graph(core.DataViewComponent):
         for i,draw in enumerate(self.indices):
             if draw:
                 fdata=[safe_get_index(x,i) for x in data]
-                fdata=fdata[extrapts:]
                 trimmed=[x for x in fdata if x is not None]
                 if len(trimmed)==0: continue
                 fmaxy=max(trimmed)
@@ -133,18 +132,6 @@ class Graph(core.DataViewComponent):
                     y2=self.size.height-(fdata[i+1]-miny)*yscale-self.border_bottom
                     g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1)*dx+self.border_left),int(y2))
 
-
-        if 0<=now<len(data) and data[now] is not None:
-            g.color=Color.blue
-            g.drawLine(int(now*dx+self.border_left),0,int(now*dx+self.border_left),self.size.height-self.border_bottom)
-            """
-            label="%6g"%data[now]
-            if now<pts/2:
-                g.drawString(label,int(now*dx+self.border_left)+5,int(self.size.height-(data[now]-miny)*yscale-self.border_bottom)+5)
-            else:    
-                bounds=g.font.getStringBounds(label,g.fontRenderContext)
-                g.drawString(label,int(now*dx+self.border_left)-bounds.width-5,int(self.size.height-(data[now]-miny)*yscale-self.border_bottom)+5)
-            """    
 
    
         if maxy is not None: g.drawString('%6g'%maxy,0,10)
