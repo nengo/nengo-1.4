@@ -129,6 +129,19 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		myNodes=nodes;
 		mySpikePattern = new SpikePatternImpl(myNodes.length);
 		setupNodeRunners(numNodeRunners);
+		
+		myOrigins = new HashMap<String, Origin>(10);
+		Origin[] origins = findOrigins(this, myNodes);
+		for (int i = 0; i < origins.length; i++) {
+			myOrigins.put(origins[i].getName(), origins[i]);
+		}
+		
+		myTerminations = new HashMap<String, EnsembleTermination>(10);
+		EnsembleTermination[] terminations = findTerminations(this, myNodes);
+		for (int i = 0; i < terminations.length; i++) {
+			myTerminations.put(terminations[i].getName(), terminations[i]);
+		}
+		
 	}
 	
 	
