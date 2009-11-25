@@ -68,6 +68,9 @@ import ca.nengo.util.impl.TimeSeries1DImpl;
  * input currents, Neural Computation 16, 2101-24. This form of adaptation (as opposed to variation in firing 
  * threshold or membrane time constant) is convenient because it allows a rate model as well as a spiking model.</p>
  * 
+ * <p> Some example parameter values are the same as a standard LIF, plus TauN = .2; incN = .05 - .2. for
+ * greater amounts of differing adaptation, increase the range of incN</p>
+ * 
  * TODO: unit tests (particularly verify numbers of spikes and rate match in various cases -- they seem to)
  * 
  * @author Bryan Tripp
