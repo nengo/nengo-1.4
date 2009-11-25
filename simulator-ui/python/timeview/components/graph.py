@@ -18,6 +18,7 @@ class Graph(core.DataViewComponent):
         self.func=func
         self.indices=None
         self.data=self.view.watcher.watch(name,func)
+        self.border_top=10
         self.border_left=40
         self.border_right=20
         self.border_bottom=20
@@ -57,7 +58,7 @@ class Graph(core.DataViewComponent):
         core.DataViewComponent.paintComponent(self,g)
 
         g.color=Color(0.8,0.8,0.8)
-        g.drawLine(self.border_left,0,self.border_left,self.size.height-self.border_bottom)
+        g.drawLine(self.border_left,self.border_top,self.border_left,self.size.height-self.border_bottom)
         g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
 
         pts=int(self.view.time_shown/self.view.dt)
@@ -120,21 +121,28 @@ class Graph(core.DataViewComponent):
         if maxy<1: maxy=1.0
         if miny>-1: miny=-1.0    
         if maxy==miny: yscale=0
-        else: yscale=float(self.size.height-self.border_bottom)/(maxy-miny)
+        else: yscale=float(self.size.height-self.border_bottom-self.border_top)/(maxy-miny)
 
 
         colors=[Color.black,Color.blue,Color.red,Color.green,Color.magenta,Color.cyan,Color.yellow]
-        for i,fdata in enumerate(filtered):
-            g.color=colors[i%len(colors)]
-            for i in range(len(fdata)-1):
-                if fdata[i] is not None and fdata[i+1] is not None:
+        for j,fdata in enumerate(filtered):
+            skip=(len(fdata)/(self.size.width-self.border_left-self.border_right))-1
+            if self.filter and self.view.tau_filter==0:
+                skip-=1     # special case to make unfiltered recoded value graphs look as expected
+            if skip<0: skip=0
+            #skip=0
+                        
+            offset=start%(skip+1)            
+            g.color=colors[j%len(colors)]
+            for i in range(len(fdata)-1-skip):
+                if skip==0 or (i+offset)%(skip+1)==0:
+                  if fdata[i] is not None and fdata[i+1+skip] is not None:
                     y1=self.size.height-(fdata[i]-miny)*yscale-self.border_bottom
-                    y2=self.size.height-(fdata[i+1]-miny)*yscale-self.border_bottom
-                    g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1)*dx+self.border_left),int(y2))
+                    y2=self.size.height-(fdata[i+1+skip]-miny)*yscale-self.border_bottom
+                    g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1+skip)*dx+self.border_left),int(y2))
 
-
-   
-        if maxy is not None: g.drawString('%6g'%maxy,0,10)
+        g.color=Color.black   
+        if maxy is not None: g.drawString('%6g'%maxy,0,10+self.border_top)
         if miny is not None: g.drawString('%6g'%miny,0,self.size.height-self.border_bottom)
 
 
