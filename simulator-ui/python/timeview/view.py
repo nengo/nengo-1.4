@@ -1,9 +1,6 @@
 import watcher
-reload(watcher)
 import components
-reload(components)
 import timelog
-reload(timelog)
 
 
 import java

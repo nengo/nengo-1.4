@@ -5,7 +5,6 @@ from java.awt.event import *
 
 import core
 import neuronmap
-reload(neuronmap)
 
 from math import sqrt
 class Grid(core.DataViewComponent):
