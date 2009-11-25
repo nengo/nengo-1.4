@@ -399,6 +399,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             self.config_button.icon=Icon.arrowup
             self.config_button.rolloverIcon=ShadedIcon.arrowup
             self.config_button.toolTipText='hide configuration'
+        self.view.frame.repaint()    
     def pause(self,event):
         self.view.paused=not self.view.paused
         if self.view.paused:
