@@ -20,7 +20,6 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.resize_border=20
         self.popup=JPopupMenu()
         self.popup.add(JMenuItem('hide',actionPerformed=self.actionPerformed))
-        self.add(self.popup)
         self.setSize(100,50)
         self.border=self.default_border
         
@@ -48,6 +47,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.setSize(w,h)
     def mouseClicked(self, event):     
         if event.button==MouseEvent.BUTTON3:
+            self.parent.add(self.popup)
             self.popup.show(self,event.x-5,event.y-5)   
     def mouseEntered(self, event):
         self.border=self.hover_border
