@@ -57,6 +57,8 @@ class NodeWatch:
         elif isinstance(obj,FunctionInput): 
             default='origin'
             max_radii = 1
+        else:
+            max_radii = 1
         
         if default in origins:
             origins.remove(default)
