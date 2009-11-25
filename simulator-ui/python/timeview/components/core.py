@@ -2,11 +2,32 @@ from javax.swing import *
 from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
+import javax
+import java
+
+class RoundedBorder(javax.swing.border.AbstractBorder):
+    def __init__(self,color,thickness=1):
+        self.color=color
+        self.stroke=java.awt.BasicStroke(thickness)
+        
+    def getBorderInsets(self,component):
+        return java.awt.Insets(15,15,15,15)
+    def paintBorder(self,c,g,x,y,width,height):
+        g.color=self.color
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g.stroke=self.stroke
+        g.drawRoundRect(x,y,width-1,height-1,10,10)
+
 
 
 class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionListener, ActionListener):
-    hover_border=BorderFactory.createLineBorder(Color.black,2);
-    item_hover_border=BorderFactory.createLineBorder(Color(0.5,0.5,0.5),1);
+    #hover_border=BorderFactory.createLineBorder(Color.black,2);
+    #item_hover_border=BorderFactory.createLineBorder(Color(0.5,0.5,0.5),1);
+    
+    hover_border=RoundedBorder(Color.black,thickness=2);
+    item_hover_border=RoundedBorder(Color(0.7,0.7,0.7))
+    
+    
     default_border=BorderFactory.createEmptyBorder()
     
     def __init__(self):

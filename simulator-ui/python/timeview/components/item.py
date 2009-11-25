@@ -11,10 +11,14 @@ class Item(core.DataViewComponent):
         core.DataViewComponent.__init__(self)
         self.view=view
         self.name=name
-        self.resize_border=10
+        self.resize_border=0
+        self.min_width=5
+        self.min_height=5
         self.border_size=5
         self.arc_size=20
         self.label_font=Font.decode('Arial-20') 
+        
+        self.descent=None
         
         self.popup.add(JPopupMenu.Separator())
         for (name,func) in self.view.watcher.list(name):
@@ -23,12 +27,19 @@ class Item(core.DataViewComponent):
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
         
-        #g.color=Color(0.8,0.8,0.8)
-        #g.fillRoundRect(self.border_size,self.border_size,self.size.width-self.border_size*2,self.size.height-self.border_size*2,self.arc_size,self.arc_size)
         g.color=Color.black
         g.font=self.label_font
-        bounds=g.font.getStringBounds(self.name,g.fontRenderContext)
-        g.drawString(self.name,self.size.width/2-bounds.width/2,self.size.height/2+bounds.height/2)    
+        
+        margin=5
+        
+        if self.descent is None:
+            bounds=g.font.getStringBounds(self.name,g.fontRenderContext)
+            lm=g.font.getLineMetrics(self.name,g.fontRenderContext)
+            self.descent=lm.descent
+            self.setSize(int(bounds.width+margin*2),int(bounds.height+margin*2))
+        
+        g.drawString(self.name,margin,self.size.height-margin-self.descent)    
+        
     
     def add_component(self,func,location=None,size=(200,200)):
         component=func(self.view,self.name)
