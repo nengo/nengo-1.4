@@ -94,6 +94,7 @@ class InputWatch:
             ('control',lambda view,name: components.Input(view,name,self.constantFuncs)),
             ]
 
+import math
 class ViewPanel(JPanel):
     def __init__(self,network):
         JPanel.__init__(self)
@@ -105,6 +106,10 @@ class ViewPanel(JPanel):
         
         g.color=Color.black
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+
+        arrowsize=7.0
+        sin60=-math.sqrt(3)/2
+        cos60=-0.5
         
         for p in self.network.projections:
             oname=p.origin.node.name
@@ -113,13 +118,42 @@ class ViewPanel(JPanel):
                 c1=self.nodes[oname]
                 c2=self.nodes[tname]
                 if c1.visible and c2.visible:
-                    x1=c1.x+c1.width/2
-                    x2=c2.x+c2.width/2
-                    y1=c1.y+c1.height/2
-                    y2=c2.y+c2.height/2
+                    if c1 is c2:
+                        scale=0.1
+                        x=c1.x+c1.width/2
+                        y=c1.y+c2.height/2
+                        g.drawOval(int(c1.x-c1.width*scale),int(c1.y-c1.height/2-c1.height*scale),int(c1.width*(1+scale*2)),int(c2.height*(1+scale*2)))
+                        xc=x
+                        yc=y-c1.height-c1.height*scale
+                        xa=-arrowsize
+                        ya=0.0
+                    else:                
+                        x1=c1.x+c1.width/2
+                        x2=c2.x+c2.width/2
+                        y1=c1.y+c1.height/2
+                        y2=c2.y+c2.height/2
+                        g.drawLine(x1,y1,x2,y2)
+                        
+                        xc=(x1+x2)/2.0+0.5
+                        yc=(y1+y2)/2.0+0.5
+                        
+                        
+                        length=math.sqrt(float((x2-x1)**2+(y2-y1)**2))
+                        if length==0:
+                            xa=arrowsize
+                            ya=0.0
+                        else:
+                            xa=(x2-x1)*arrowsize/length
+                            ya=(y2-y1)*arrowsize/length
+                        
+                    g.fillPolygon([int(xc+xa),int(xc+cos60*xa-sin60*ya),int(xc+cos60*xa+sin60*ya)],
+                                      [int(yc+ya),int(yc+sin60*xa+cos60*ya),int(yc-sin60*xa+cos60*ya)],
+                                      3)
+                    
                     
                 
-                    g.drawLine(x1,y1,x2,y2)
+                    
+                    
         
 
   
