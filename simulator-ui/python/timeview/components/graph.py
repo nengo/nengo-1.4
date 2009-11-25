@@ -11,7 +11,7 @@ def safe_get_index(x,i):
 
 
 class Graph(core.DataViewComponent):
-    def __init__(self,view,name,func):
+    def __init__(self,view,name,func,filter=True):
         core.DataViewComponent.__init__(self)
         self.view=view
         self.name=name
@@ -21,6 +21,7 @@ class Graph(core.DataViewComponent):
         self.border_left=40
         self.border_right=20
         self.border_bottom=20
+        self.filter=filter
         
         
         
@@ -78,8 +79,9 @@ class Graph(core.DataViewComponent):
         g.drawString(txt,self.border_left-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
 
 
+
         dt_tau=None
-        if self.view.tau_filter>0:
+        if self.filter and self.view.tau_filter>0:
             dt_tau=self.view.dt/self.view.tau_filter
 
         data=self.data.get(start=start-extrapts,count=pts+extrapts,dt_tau=dt_tau)

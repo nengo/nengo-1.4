@@ -51,12 +51,14 @@ class NodeWatch:
         origins=[o.name for o in obj.origins]
         
         default=None
+        filter=True
         if isinstance(obj,NEFEnsemble): 
             default='X'
             max_radii = max(obj.radii)
         elif isinstance(obj,FunctionInput): 
             default='origin'
             max_radii = 1
+            filter=False
         else:
             max_radii = 1
         
@@ -74,7 +76,7 @@ class NodeWatch:
                 text='value: '+name
                 text_grid='value (grid): ' + name
             
-            r.append((text,lambda view,name,origin=name: components.Graph(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin))))
+            r.append((text,lambda view,name,origin=name: components.Graph(view,name,(lambda obj,self=self,origin=origin: self.value(obj,origin)),filter=filter)))
             
             if len(obj.getOrigin(name).values.values)>8:
                 r.append((text_grid,lambda view,name,origin=name: components.VectorGrid(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin), -max_radii, max_radii)))
