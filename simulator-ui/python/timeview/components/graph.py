@@ -19,11 +19,11 @@ class Graph(core.DataViewComponent):
         self.indices=None
         self.data=self.view.watcher.watch(name,func)
         self.border_top=10
-        self.border_left=40
-        self.border_right=20
+        self.border_left=30
+        self.border_right=30
         self.border_bottom=20
         self.filter=filter
-        self.setSize(200,200)
+        self.setSize(300,200)
         
         
         
