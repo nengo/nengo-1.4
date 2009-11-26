@@ -46,7 +46,7 @@ class Item(core.DataViewComponent):
         self.view.area.add(component)
         if location is None: location=(self.mouse_pressed_x+self.x,self.mouse_pressed_y+self.y)
         component.setLocation(*location)        
-        component.setSize(*size)
+        #component.setSize(*size)
                     
     def mouseDragged(self, event):                
         core.DataViewComponent.mouseDragged(self,event)

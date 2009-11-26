@@ -18,6 +18,7 @@ class VectorGrid(core.DataViewComponent):
         self.min=min
         self.max=max
         self.filter=filter
+        self.setSize(200,200)
                 
         
     def paintComponent(self,g):

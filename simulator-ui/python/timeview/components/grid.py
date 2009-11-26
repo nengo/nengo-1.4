@@ -27,6 +27,7 @@ class Grid(core.DataViewComponent):
         self.popup.add(JPopupMenu.Separator())
         self.popup.add(JMenuItem('improve layout',actionPerformed=self.improve_layout))
         self.filter=filter
+        self.setSize(200,200)
         
     def improve_layout(self,event):
         self.requested_improvements+=20

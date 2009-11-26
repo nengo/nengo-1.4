@@ -23,6 +23,7 @@ class Graph(core.DataViewComponent):
         self.border_right=20
         self.border_bottom=20
         self.filter=filter
+        self.setSize(200,200)
         
         
         

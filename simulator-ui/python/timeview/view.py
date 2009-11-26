@@ -58,7 +58,14 @@ class NodeWatch:
         elif isinstance(obj,FunctionInput): 
             default='origin'
             max_radii = 1
+            
             filter=False
+            for f in obj.functions:
+                if not isinstance(f,ConstantFunction):
+                    break
+            else:
+                filter=True
+                
         else:
             max_radii = 1
         

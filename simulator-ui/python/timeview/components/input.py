@@ -28,9 +28,11 @@ class Input(core.DataViewComponent,ComponentListener):
             label=JLabel('0.00')
             self.add(label)
             self.labels.append(label)
-            
+        
+        self.setSize(len(values)*40,200)    
         self.addComponentListener(self)
         self.componentResized(None)
+        
     
     def slider_moved(self,index):
         try:

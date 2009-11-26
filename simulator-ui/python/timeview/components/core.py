@@ -17,6 +17,7 @@ class RoundedBorder(javax.swing.border.AbstractBorder):
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.stroke=self.stroke
         g.drawRoundRect(x,y,width-1,height-1,10,10)
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF)
 
 
 
