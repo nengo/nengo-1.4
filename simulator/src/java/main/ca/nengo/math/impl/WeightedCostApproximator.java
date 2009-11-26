@@ -219,8 +219,18 @@ public class WeightedCostApproximator implements LinearApproximator {
 				Process process=runtime.exec("cmd /c pseudoInverse.bat "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
 				process.waitFor();
 			} else {
-				Process process=runtime.exec("."+java.io.File.separatorChar+"pseudoInverse "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
+				Process process=runtime.exec("external"+java.io.File.separatorChar+"pseudoInverse external/"+filename+" external/"+filename+".inv"+" "+minSV+" "+nSV,null,null);
 				process.waitFor();
+				System.out.println("stream1:");
+				java.io.InputStream s=process.getErrorStream();
+				while (s.available()>0) {
+					System.out.write(s.read());
+				}
+				System.out.println("stream2:");
+				java.io.InputStream s2=process.getInputStream();
+				while (s2.available()>0) {
+					System.out.write(s2.read());
+				}
 			}
 			
 			channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
