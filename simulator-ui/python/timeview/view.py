@@ -39,6 +39,7 @@ class EnsembleWatch:
         return [
             ('voltage',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes)),
             ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
+            ('spike raster',lambda view,name: components.SpikeRaster(view,name,self.spikes)),
             #('encoders',lambda view,name: components.Grid(view,name,self.encoder,min=-1,max=1)),
             ]
 
@@ -457,6 +458,11 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             self.config_button.icon=Icon.arrowup
             self.config_button.rolloverIcon=ShadedIcon.arrowup
             self.config_button.toolTipText='hide configuration'
+        self.frame.layout.layoutContainer(self.frame)    
+        self.layout.layoutContainer(self)    
+        self.frame.layout.layoutContainer(self.frame)    
+        self.layout.layoutContainer(self)    
+        self.frame.layout.layoutContainer(self.frame)    
         self.view.frame.repaint()    
     def pause(self,event):
         self.view.paused=not self.view.paused

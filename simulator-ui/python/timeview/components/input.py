@@ -12,7 +12,7 @@ class Input(core.DataViewComponent,ComponentListener):
         self.view=view
         self.name=name
         self.func=func
-        self.resize_border=10
+        self.resize_border=2
 
         self.data=self.view.watcher.watch(name,func)
 
