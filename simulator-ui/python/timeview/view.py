@@ -168,7 +168,7 @@ class ViewPanel(JPanel):
         
 
   
-class View(MouseListener, ActionListener, java.lang.Runnable):
+class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable):
     def __init__(self,network,size=None,ui=None):
         self.dt=0.001
         self.tau_filter=0.03
@@ -192,6 +192,7 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
         self.area.background=Color.white
         self.area.layout=None
         self.area.addMouseListener(self)
+        self.area.addMouseMotionListener(self)
         self.frame.add(self.area)
 
         self.time_control=TimeControl(self)
@@ -244,7 +245,7 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
     def mouseExited(self, event):        
         pass
     def mousePressed(self, event):  
-        pass
+        self.drag_start=event.x,event.y
     def mouseReleased(self, event):        
         pass
     def set_target_rate(self,value):
@@ -252,6 +253,16 @@ class View(MouseListener, ActionListener, java.lang.Runnable):
         elif value.endswith('x'):
             r=float(value[:-1])
             self.delay=self.dt*1000/r
+    def mouseDragged(self, event):                
+        dx=event.x-self.drag_start[0]
+        dy=event.y-self.drag_start[1]
+        
+        for c in self.area.components:
+            c.setLocation(c.x+dx,c.y+dy)
+        self.drag_start=event.x,event.y 
+        
+    def mouseMoved(self, event):      
+        pass
         
 
     def run(self):
