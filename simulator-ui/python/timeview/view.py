@@ -92,19 +92,16 @@ class NodeWatch:
 
 
 
-class InputWatch:
+class FunctionWatch:
     def check(self,obj):
-        if isinstance(obj,FunctionInput):
-            for x in obj.functions:
-                if not isinstance(x,ConstantFunction): return False
-            return True
-        return False
-    def constantFuncs(self,obj):
-        return [x.value for x in obj.functions]
+        return isinstance(obj,FunctionInput)
+    def funcOrigin(self,obj):
+        return obj.getOrigin('origin').values.values
     def views(self,obj):
         return [
-            ('control',lambda view,name: components.Input(view,name,self.constantFuncs)),
+            ('control',lambda view,name: components.FunctionControl(view,name,self.funcOrigin)),
             ]
+
 
 import math
 class ViewPanel(JPanel):
@@ -182,7 +179,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.watcher=watcher.Watcher(self.timelog)
         self.watcher.add_watch(NodeWatch())
         self.watcher.add_watch(EnsembleWatch())
-        self.watcher.add_watch(InputWatch())
+        self.watcher.add_watch(FunctionWatch())
         
         
         self.frame=JFrame(network.name)
@@ -198,6 +195,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
         self.time_control=TimeControl(self)
         self.frame.add(self.time_control,BorderLayout.SOUTH)
+        
+        self.forced_origins={}
         
         if size is None:
             if ui is None: size=(800,600)
@@ -265,15 +264,25 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
     def mouseMoved(self, event):      
         pass
         
+    def force_origins(self):
+        for (name,origin,index),value in self.forced_origins.items():
+            origin=self.watcher.objects[name].getOrigin(origin)
+            v=origin.values.values
+            v[index]=value
+            origin.setValues(0,origin.values.time,v)
+            
+        
 
     def run(self):
         while self.frame.visible:
             self.network.simulator.resetNetwork(True)
+            now=0.0000000000001  
+            self.network.simulator.run(0,now,now)   # run the simulation a bit so initial values of functioninputs get to the origins
             self.watcher.reset()
-            now=0
             self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
             self.time_control.set_max_time(self.timelog.tick_count)                
             self.area.repaint()
+            self.forced_origins={}
             last_frame_time=None
             counter=0
             while self.frame.visible:
@@ -285,6 +294,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     
                 if self.current_tick>=self.timelog.tick_count-1:    
                     self.network.simulator.run(now,now+self.dt,self.dt)
+                    self.force_origins()
                     now+=self.dt
                     self.timelog.tick()                
                     self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
@@ -458,11 +468,11 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             self.config_button.icon=Icon.arrowup
             self.config_button.rolloverIcon=ShadedIcon.arrowup
             self.config_button.toolTipText='hide configuration'
-        self.frame.layout.layoutContainer(self.frame)    
+        self.view.frame.layout.layoutContainer(self.view.frame)    
         self.layout.layoutContainer(self)    
-        self.frame.layout.layoutContainer(self.frame)    
+        self.view.frame.layout.layoutContainer(self.view.frame)    
         self.layout.layoutContainer(self)    
-        self.frame.layout.layoutContainer(self.frame)    
+        self.view.frame.layout.layoutContainer(self.view.frame)    
         self.view.frame.repaint()    
     def pause(self,event):
         self.view.paused=not self.view.paused

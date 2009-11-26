@@ -6,7 +6,7 @@ from java.awt import *
 from java.awt.event import *
 
 
-class Input(core.DataViewComponent,ComponentListener):
+class FunctionControl(core.DataViewComponent,ComponentListener):
     def __init__(self,view,name,func):
         core.DataViewComponent.__init__(self)
         self.view=view
@@ -28,37 +28,37 @@ class Input(core.DataViewComponent,ComponentListener):
             label=JLabel('0.00')
             self.add(label)
             self.labels.append(label)
+            
         
-        self.setSize(len(values)*40,200)    
+        self.setSize(len(values)*40+20,200)    
         self.addComponentListener(self)
         self.componentResized(None)
         
     
     def slider_moved(self,index):
-        try:
+        if self.sliders[index].valueIsAdjusting:   # if I moved it
             v=self.sliders[index].value*0.01
             self.labels[index].text='%1.2f'%v
             self.data.data[-1][index]=v
-            self.view.watcher.objects[self.name].functions[index].value=v
-            
-        except:
-            pass
+            self.view.forced_origins[(self.name,'origin',index)]=v
         
    
     def paintComponent(self,g):
-        #self.panel.setSize(self.width-self.resize_border,self.height-self.resize_border)
-        #self.panel.layoutComponents(self.panel)
         core.DataViewComponent.paintComponent(self,g)    
         
         
         self.active=self.view.current_tick>=self.view.timelog.tick_count-1
-            
-
+        
         data=self.data.get(start=self.view.current_tick,count=1)[0]
-        if data is None: data=[0]*len(self.sliders)
+        if data is None: 
+            data=self.data.get_first()
         
         for i,v in enumerate(data):
-            self.sliders[i].value=int(v*100)
+            sv=int(v*100)
+            if sv>100: sv=100
+            if sv<-100: sv=-100
+        
+            self.sliders[i].value=sv
             self.labels[i].text='%1.2f'%v
             self.sliders[i].enabled=self.active
             
