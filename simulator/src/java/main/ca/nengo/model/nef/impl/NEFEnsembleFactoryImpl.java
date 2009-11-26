@@ -142,36 +142,40 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	public NEFEnsemble make(String name, int n, float[] radii, String storageName, boolean overwrite) throws StructuralException {
         int dim = radii.length;
 		NEFEnsemble result = null;
-		
-		File ensembleFile = new File(myDatabase, storageName + "." + FileManager.ENSEMBLE_EXTENSION);
-		
-		FileManager fm = new FileManager();
 
-		if (!overwrite && ensembleFile.exists() && ensembleFile.canRead()) {
-			try {
-				result = (NEFEnsemble) fm.load(ensembleFile);
-				
-				result.setName(name);
-				if(result.getNodes().length != n)
-					ourLogger.warn("Number of nodes in ensemble loaded from file does not match requested number of nodes");
-				if(result.getDimension() != dim)
-					ourLogger.warn("Dimension of ensemble loaded from file does not match requested dimension");
-			} catch (Exception e) {
-				ourLogger.error("Failed to load file " + ensembleFile.getAbsolutePath() + ". New ensemble will be created.", e);
-			}
+        if( storageName.length() > 0 ){
+            File ensembleFile = new File(myDatabase, storageName + "." + FileManager.ENSEMBLE_EXTENSION);
+
+            FileManager fm = new FileManager();
+
+            if (!overwrite && ensembleFile.exists() && ensembleFile.canRead()) {
+                try {
+                    result = (NEFEnsemble) fm.load(ensembleFile);
+
+                    result.setName(name);
+                    if(result.getNodes().length != n)
+                        ourLogger.warn("Number of nodes in ensemble loaded from file does not match requested number of nodes");
+                    if(result.getDimension() != dim)
+                        ourLogger.warn("Dimension of ensemble loaded from file does not match requested dimension");
+                } catch (Exception e) {
+                    ourLogger.error("Failed to load file " + ensembleFile.getAbsolutePath() + ". New ensemble will be created.", e);
+                }
+            }
+            if (result == null) {
+                result = doMake(name, n, radii);
+
+                try {
+                    // Set the ensemble's factory to null to allow saving with customized ensemble factories
+                    result.setEnsembleFactory(null);
+                    fm.save(result, ensembleFile);
+                } catch (IOException e) {
+                    ourLogger.error("Failed to save file " + ensembleFile.getAbsolutePath(), e);
+                }
+            }
 		}
-		
-		if (result == null) {
-			result = doMake(name, n, radii);
-			
-			try {
-                // Set the ensemble's factory to null to allow saving with customized ensemble factories
-                result.setEnsembleFactory(null);
-				fm.save(result, ensembleFile);
-			} catch (IOException e) {
-				ourLogger.error("Failed to save file " + ensembleFile.getAbsolutePath(), e);
-			}
-		}
+        else{
+            result = doMake(name, n, radii);
+        }
 
         // Set the resulting ensemble's factory to this. It must be noted that this can be a good thing or
         // bad thing. It is possible that you want the original ensemble factory, in which case this will
