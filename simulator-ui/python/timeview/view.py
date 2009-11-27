@@ -95,7 +95,7 @@ class NodeWatch:
                 text_grid='value (grid): ' + name
                 label=obj.name+': '+name
             
-            r.append((text,lambda view,name,origin=name: components.Graph(view,name,(lambda obj,self=self,origin=origin: self.value(obj,origin)),filter=filter,label=label)))
+            r.append((text,lambda view,name,origin=name,label=label: components.Graph(view,name,(lambda obj,self=self,origin=origin: self.value(obj,origin)),filter=filter,label=label)))
             
             if len(obj.getOrigin(name).values.values)>8:
                 r.append((text_grid,lambda view,name,origin=name: components.VectorGrid(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin), -max_radii, max_radii)))
