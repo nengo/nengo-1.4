@@ -14,7 +14,7 @@ def safe_get_index(x,i):
 
 
 class Graph(core.DataViewComponent):
-    def __init__(self,view,name,func,filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False):
+    def __init__(self,view,name,func,filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None):
         core.DataViewComponent.__init__(self)
         self.view=view
         self.name=name
@@ -32,6 +32,8 @@ class Graph(core.DataViewComponent):
         self.neuronmapped=neuronmapped
         
         self.map=None
+        self.label=label
+        self.show_label=False
 
     def initialize_map(self):
         data=self.data.get_first()
@@ -62,7 +64,12 @@ class Graph(core.DataViewComponent):
             mn,mx=-mx,-mn            
         return mn,mx
         
+    def toggle_label(self,event):
+        self.show_label=event.source.state
+        
     def fix_popup(self):
+        if self.label is not None:
+            self.popup.add(JCheckBoxMenuItem('label',False,stateChanged=self.toggle_label))
         self.popup.add(JPopupMenu.Separator())
         for i,draw in enumerate(self.indices):
             if i<30:
@@ -79,6 +86,11 @@ class Graph(core.DataViewComponent):
         g.color=Color(0.8,0.8,0.8)
         g.drawLine(self.border_left,self.border_top,self.border_left,self.size.height-self.border_bottom)
         g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
+        
+        if self.show_label:
+            g.color=Color(0.3,0.3,0.3)
+            bounds=g.font.getStringBounds(self.label,g.fontRenderContext)
+            g.drawString(self.label,self.size.width-bounds.width,bounds.height)
 
         pts=int(self.view.time_shown/self.view.dt)
 
@@ -144,7 +156,7 @@ class Graph(core.DataViewComponent):
         if miny>self.ylimits[0]: miny=float(self.ylimits[0])
         if maxy==miny: yscale=0
         else: yscale=float(self.size.height-self.border_bottom-self.border_top)/(maxy-miny)
-        if self.split: 
+        if self.split and len(filtered)>0: 
             yscale=yscale/len(filtered)
             split_step=float(self.size.height-self.border_bottom-self.border_top)/len(filtered)
             

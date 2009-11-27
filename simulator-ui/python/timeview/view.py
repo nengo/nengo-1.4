@@ -50,7 +50,7 @@ class EnsembleWatch:
     def views(self,obj):
         return [
             ('voltage grid',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes_only)),
-            ('voltage graph',lambda view,name: components.Graph(view,name,self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True)),
+            ('voltage graph',lambda view,name: components.Graph(view,name,self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
             ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
             ('spike raster',lambda view,name: components.SpikeRaster(view,name,self.spikes)),
             
@@ -89,11 +89,13 @@ class NodeWatch:
             if name == default: 
                 text='value'
                 text_grid = 'value (grid)'
+                label=obj.name
             else: 
                 text='value: '+name
                 text_grid='value (grid): ' + name
+                label=obj.name+': '+name
             
-            r.append((text,lambda view,name,origin=name: components.Graph(view,name,(lambda obj,self=self,origin=origin: self.value(obj,origin)),filter=filter)))
+            r.append((text,lambda view,name,origin=name: components.Graph(view,name,(lambda obj,self=self,origin=origin: self.value(obj,origin)),filter=filter,label=label)))
             
             if len(obj.getOrigin(name).values.values)>8:
                 r.append((text_grid,lambda view,name,origin=name: components.VectorGrid(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin), -max_radii, max_radii)))
@@ -270,6 +272,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         for c in self.area.components:
             c.setLocation(c.x+dx,c.y+dy)
         self.drag_start=event.x,event.y 
+        self.area.repaint()
         
     def mouseMoved(self, event):      
         pass
