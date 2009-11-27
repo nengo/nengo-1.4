@@ -141,7 +141,7 @@ class Graph(core.DataViewComponent):
         if maxy is None: maxy=1.0
         if miny is None: miny=-1.0    
         if maxy<self.ylimits[1]: maxy=float(self.ylimits[1])
-        if miny>self.ylimits[0]: miny=-float(self.ylimits[0])
+        if miny>self.ylimits[0]: miny=float(self.ylimits[0])
         if maxy==miny: yscale=0
         else: yscale=float(self.size.height-self.border_bottom-self.border_top)/(maxy-miny)
         if self.split: 
