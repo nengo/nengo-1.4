@@ -12,7 +12,7 @@ from java.awt.event import *
 from ca.nengo.model.nef import *
 from ca.nengo.model.impl import *
 from ca.nengo.math.impl import *
-from ca.nengo.model import Node
+from ca.nengo.model import Node,SimulationMode
 
 from java.lang.System.err import println
 import math
@@ -31,14 +31,25 @@ class EnsembleWatch:
     def check(self,obj):
         return isinstance(obj,NEFEnsemble)
     def voltage(self,obj):
-        return [n.generator.voltage for n in obj.nodes]
+        if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
+            return [n.getOrigin('AXON').values.values[0]*0.005 for n in obj.nodes]
+        else:
+            return [n.generator.voltage for n in obj.nodes]
     def spikes(self,obj):
-        return obj.getOrigin('AXON').values.values
+        if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
+            return [n.getOrigin('AXON').values.values[0]*0.005 for n in obj.nodes]
+        else:
+            return obj.getOrigin('AXON').values.values
+    def spikes_only(self,obj):
+        if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
+            return [0]*obj.neurons
+        else:
+            return obj.getOrigin('AXON').values.values
     def encoder(self,obj):
         return [x[0] for x in obj.encoders]
     def views(self,obj):
         return [
-            ('voltage',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes)),
+            ('voltage',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes_only)),
             ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
             ('spike raster',lambda view,name: components.SpikeRaster(view,name,self.spikes)),
             #('encoders',lambda view,name: components.Grid(view,name,self.encoder,min=-1,max=1)),
