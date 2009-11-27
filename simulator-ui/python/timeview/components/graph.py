@@ -1,9 +1,12 @@
 import core
+import neuronmap
 
 from javax.swing import *
 from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
+
+from math import sqrt
 
 def safe_get_index(x,i):
     if x is None: return None
@@ -11,7 +14,7 @@ def safe_get_index(x,i):
 
 
 class Graph(core.DataViewComponent):
-    def __init__(self,view,name,func,filter=True):
+    def __init__(self,view,name,func,filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False):
         core.DataViewComponent.__init__(self)
         self.view=view
         self.name=name
@@ -24,7 +27,19 @@ class Graph(core.DataViewComponent):
         self.border_bottom=20
         self.filter=filter
         self.setSize(300,200)
+        self.ylimits=ylimits
+        self.split=split
+        self.neuronmapped=neuronmapped
         
+        self.map=None
+
+    def initialize_map(self):
+        data=self.data.get_first()
+        rows=int(sqrt(len(data)))
+        cols=len(data)/rows
+        if rows*cols<len(data): cols+=1
+            
+        self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)
         
         
     def round(self,x):
@@ -57,6 +72,9 @@ class Graph(core.DataViewComponent):
         
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
+
+        if self.neuronmapped and self.map is None:
+            self.initialize_map()
 
         g.color=Color(0.8,0.8,0.8)
         g.drawLine(self.border_left,self.border_top,self.border_left,self.size.height-self.border_bottom)
@@ -106,7 +124,10 @@ class Graph(core.DataViewComponent):
         filtered=[]
         for i,draw in enumerate(self.indices):
             if draw:
-                fdata=[safe_get_index(x,i) for x in data]
+                if self.neuronmapped:
+                    fdata=[safe_get_index(x,self.map.map[i]) for x in data]
+                else:
+                    fdata=[safe_get_index(x,i) for x in data]
                 trimmed=[x for x in fdata if x is not None]
                 if len(trimmed)==0: continue
                 fmaxy=max(trimmed)
@@ -119,13 +140,18 @@ class Graph(core.DataViewComponent):
             
         if maxy is None: maxy=1.0
         if miny is None: miny=-1.0    
-        if maxy<1: maxy=1.0
-        if miny>-1: miny=-1.0    
+        if maxy<self.ylimits[1]: maxy=float(self.ylimits[1])
+        if miny>self.ylimits[0]: miny=-float(self.ylimits[0])
         if maxy==miny: yscale=0
         else: yscale=float(self.size.height-self.border_bottom-self.border_top)/(maxy-miny)
+        if self.split: 
+            yscale=yscale/len(filtered)
+            split_step=float(self.size.height-self.border_bottom-self.border_top)/len(filtered)
+            
 
 
         colors=[Color.black,Color.blue,Color.red,Color.green,Color.magenta,Color.cyan,Color.yellow]
+        g.color=Color.blue
         for j,fdata in enumerate(filtered):
             skip=(len(fdata)/(self.size.width-self.border_left-self.border_right))-1
             if self.filter and self.view.tau_filter==0:
@@ -134,16 +160,20 @@ class Graph(core.DataViewComponent):
             #skip=0
                         
             offset=start%(skip+1)            
-            g.color=colors[j%len(colors)]
+            if not self.split:
+                g.color=colors[j%len(colors)]
             for i in range(len(fdata)-1-skip):
                 if skip==0 or (i+offset)%(skip+1)==0:
                   if fdata[i] is not None and fdata[i+1+skip] is not None:
                     y1=self.size.height-(fdata[i]-miny)*yscale-self.border_bottom
                     y2=self.size.height-(fdata[i+1+skip]-miny)*yscale-self.border_bottom
+                    if self.split:
+                        y1-=(len(filtered)-1-j)*split_step
+                        y2-=(len(filtered)-1-j)*split_step
                     g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1+skip)*dx+self.border_left),int(y2))
-
-        g.color=Color.black   
-        if maxy is not None: g.drawString('%6g'%maxy,0,10+self.border_top)
-        if miny is not None: g.drawString('%6g'%miny,0,self.size.height-self.border_bottom)
+        if not self.split:
+            g.color=Color.black   
+            if maxy is not None: g.drawString('%6g'%maxy,0,10+self.border_top)
+            if miny is not None: g.drawString('%6g'%miny,0,self.size.height-self.border_bottom)
 
 

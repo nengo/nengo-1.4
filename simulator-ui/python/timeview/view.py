@@ -49,9 +49,11 @@ class EnsembleWatch:
         return [x[0] for x in obj.encoders]
     def views(self,obj):
         return [
-            ('voltage',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes_only)),
+            ('voltage grid',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes_only)),
+            ('voltage graph',lambda view,name: components.Graph(view,name,self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True)),
             ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
             ('spike raster',lambda view,name: components.SpikeRaster(view,name,self.spikes)),
+            
             #('encoders',lambda view,name: components.Grid(view,name,self.encoder,min=-1,max=1)),
             ]
 
