@@ -311,7 +311,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             last_frame_time=None
             counter=0
             while self.frame.visible:
-                while (self.paused or self.timelog.processing) and not self.restart and self.frame.visible:
+                while (self.paused or self.timelog.processing or self.time_control.slider.valueIsAdjusting) and not self.restart and self.frame.visible:
                     java.lang.Thread.sleep(10)
                 if self.restart or not self.frame.visible:
                     self.restart=False
