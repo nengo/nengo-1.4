@@ -15,6 +15,7 @@ from ca.nengo.math.impl import *
 from ca.nengo.model import Node
 
 from java.lang.System.err import println
+import math
 
 class Icon:
     pass
@@ -61,11 +62,6 @@ class NodeWatch:
             max_radii = 1
             
             filter=False
-            for f in obj.functions:
-                if not isinstance(f,ConstantFunction):
-                    break
-            else:
-                filter=True
                 
         else:
             max_radii = 1
@@ -197,6 +193,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.frame.add(self.time_control,BorderLayout.SOUTH)
         
         self.forced_origins={}
+        self.forced_origins_prev={}
         
         if size is None:
             if ui is None: size=(800,600)
@@ -265,10 +262,19 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         pass
         
     def force_origins(self):
-        for (name,origin,index),value in self.forced_origins.items():
+        dt_tau=self.dt/0.01
+        decay=math.exp(-dt_tau)
+        for key,value in self.forced_origins.items():
+            (name,origin,index)=key
             origin=self.watcher.objects[name].getOrigin(origin)
             v=origin.values.values
-            v[index]=value
+
+            prev=self.forced_origins_prev.get(key,None)
+            if prev is None: prev=v[index]
+
+            v[index]=prev*decay+value*dt_tau
+            self.forced_origins_prev[key]=v[index]
+
             origin.setValues(0,origin.values.time,v)
             
         

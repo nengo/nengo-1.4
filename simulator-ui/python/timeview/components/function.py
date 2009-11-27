@@ -39,7 +39,10 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         if self.sliders[index].valueIsAdjusting:   # if I moved it
             v=self.sliders[index].value*0.01
             self.labels[index].text='%1.2f'%v
-            self.data.data[-1][index]=v
+            if self.view.paused:  # change immediately, bypassing filter
+                self.data.data[-1][index]=v
+                self.view.forced_origins_prev[(self.name,'origin',index)]=v
+                
             self.view.forced_origins[(self.name,'origin',index)]=v
         
    
@@ -57,8 +60,8 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             sv=int(v*100)
             if sv>100: sv=100
             if sv<-100: sv=-100
-        
-            self.sliders[i].value=sv
+            if not self.sliders[i].valueIsAdjusting:
+                self.sliders[i].value=sv    
             self.labels[i].text='%1.2f'%v
             self.sliders[i].enabled=self.active
             
