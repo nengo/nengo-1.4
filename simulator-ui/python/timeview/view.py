@@ -154,8 +154,11 @@ class ViewPanel(JPanel):
                         y2=c2.y+c2.height/2
                         g.drawLine(x1,y1,x2,y2)
                         
-                        xc=(x1+x2)/2.0+0.5
-                        yc=(y1+y2)/2.0+0.5
+                        
+                        place=0.4
+                        
+                        xc=(x1*place+x2*(1-place))+0.5
+                        yc=(y1*place+y2*(1-place))+0.5
                         
                         
                         length=math.sqrt(float((x2-x1)**2+(y2-y1)**2))

@@ -90,7 +90,7 @@ class Graph(core.DataViewComponent):
         if self.show_label:
             g.color=Color(0.3,0.3,0.3)
             bounds=g.font.getStringBounds(self.label,g.fontRenderContext)
-            g.drawString(self.label,self.size.width-bounds.width,bounds.height)
+            g.drawString(self.label,self.size.width-bounds.width-5,bounds.height)
 
         pts=int(self.view.time_shown/self.view.dt)
 
