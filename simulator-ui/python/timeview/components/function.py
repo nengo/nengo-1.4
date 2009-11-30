@@ -7,7 +7,7 @@ from java.awt.event import *
 
 
 class FunctionControl(core.DataViewComponent,ComponentListener):
-    def __init__(self,view,name,func):
+    def __init__(self,view,name,display_type, func):
         core.DataViewComponent.__init__(self)
         self.view=view
         self.name=name

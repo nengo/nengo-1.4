@@ -2,10 +2,12 @@ import math
 import threading
 
 class TimeLogItem:
-    def __init__(self,parent,func,type=None,offset=0):
+    def __init__(self,parent,func,args=(),kwargs={},type=None,offset=0):
         self.semaphore=threading.Semaphore()
         self.parent=parent
         self.func=func
+        self.args=args
+        self.kwargs=kwargs
         self.data=[]
         self.filtered={}
         self.offset=offset
@@ -13,7 +15,12 @@ class TimeLogItem:
         self.tick()
     def tick(self,limit=None):
         self.semaphore.acquire()
-        self.data.append(self.func())
+        try:
+            v=self.func(*self.args,**self.kwargs)
+        except Exception,e:
+            java.lang.System.out.println("Tick error: %s %s %s\n%s"%(self.func,self.args,self.kwargs,e))
+            v=None
+        self.data.append(v)
         if limit is not None and len(self.data)>limit:
             delta=len(self.data)-limit
             self.offset+=delta
@@ -88,8 +95,8 @@ class TimeLog:
         self.tick_limit=4001
         self.processing=False
     
-    def add(self,func,type=None):
-        item=TimeLogItem(self,func,type=type,offset=self.tick_count)
+    def add(self,func,args=(),kwargs={},type=None):
+        item=TimeLogItem(self,func,args=args,kwargs={},type=type,offset=self.tick_count)
         self.items.append(item)
         return item
     

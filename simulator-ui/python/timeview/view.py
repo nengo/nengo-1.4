@@ -17,6 +17,8 @@ from ca.nengo.model import Node,SimulationMode
 from java.lang.System.err import println
 import math
 
+import shelve
+
 class Icon:
     pass
 class ShadedIcon:
@@ -49,12 +51,14 @@ class EnsembleWatch:
         return [x[0] for x in obj.encoders]
     def views(self,obj):
         return [
-            ('voltage grid',lambda view,name: components.Grid(view,name,self.voltage,sfunc=self.spikes_only)),
-            ('voltage graph',lambda view,name: components.Graph(view,name,self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
-            ('firing rate',lambda view,name: components.Grid(view,name,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
-            ('spike raster',lambda view,name: components.SpikeRaster(view,name,self.spikes)),
-            
-            #('encoders',lambda view,name: components.Grid(view,name,self.encoder,min=-1,max=1)),
+            ('voltage grid',components.Grid,dict(func=self.voltage,sfunc=self.spikes_only)),
+            ('voltage graph',components.Graph,dict(func=self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
+            ('firing rate',components.Grid,dict(func=self.spikes,min=0,max=lambda self: 200*self.view.dt,filter=True)),       
+            ('spike raster',components.SpikeRaster,dict(func=self.spikes)),
+            #('voltage grid',lambda view,name,type: components.Grid(view,name,type,self.voltage,sfunc=self.spikes_only)),
+            #('voltage graph',lambda view,name,type: components.Graph(view,name,type,self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
+            #('firing rate',lambda view,name,type: components.Grid(view,name,type,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
+            #('spike raster',lambda view,name,type: components.SpikeRaster(view,name,type,self.spikes)),
             ]
 
 class NodeWatch:
@@ -95,10 +99,10 @@ class NodeWatch:
                 text_grid='value (grid): ' + name
                 label=obj.name+': '+name
             
-            r.append((text,lambda view,name,origin=name,label=label: components.Graph(view,name,(lambda obj,self=self,origin=origin: self.value(obj,origin)),filter=filter,label=label)))
+            r.append((text,components.Graph,dict(func=self.value,args=(name,),filter=filter,label=label)))
             
             if len(obj.getOrigin(name).values.values)>8:
-                r.append((text_grid,lambda view,name,origin=name: components.VectorGrid(view,name,lambda obj,self=self,origin=origin: self.value(obj,origin), -max_radii, max_radii)))
+                r.append((text_grid,components.VectorGrid,dict(func=self.value,args=(name,), min=-max_radii, max=max_radii)))
         return r    
 
 
@@ -110,7 +114,7 @@ class FunctionWatch:
         return obj.getOrigin('origin').values.values
     def views(self,obj):
         return [
-            ('control',lambda view,name: components.FunctionControl(view,name,self.funcOrigin)),
+            ('control',components.FunctionControl,dict(func=self.funcOrigin)),
             ]
 
 
@@ -228,15 +232,17 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         for i,(name,n) in enumerate(names):
             self.watcher.add_object(name,n)
             self.popup.add(JMenuItem(name,actionPerformed=lambda event,self=self,name=name: self.add_item(name,self.mouse_click_location)))
-        
-        if ui is not None:
-            p0=ui.localToView(java.awt.geom.Point2D.Double(0,0))
-            p1=ui.localToView(java.awt.geom.Point2D.Double(ui.width,ui.height))
-            
-            for n in ui.UINodes:
-                x=(n.offset.x-p0.x)/(p1.x-p0.x)*size[0]
-                y=(n.offset.y-p0.y)/(p1.y-p0.y)*size[1]
-                self.add_item(n.name,location=(int(x),int(y)))
+
+        restored=self.restore()        
+        if not restored:
+            if ui is not None:
+                p0=ui.localToView(java.awt.geom.Point2D.Double(0,0))
+                p1=ui.localToView(java.awt.geom.Point2D.Double(ui.width,ui.height))
+                
+                for n in ui.UINodes:
+                    x=(n.offset.x-p0.x)/(p1.x-p0.x)*size[0]
+                    y=(n.offset.y-p0.y)/(p1.y-p0.y)*size[1]
+                    self.add_item(n.name,location=(int(x),int(y)))
 
         self.restart=False
         self.paused=True
@@ -244,11 +250,18 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         th.priority=java.lang.Thread.MIN_PRIORITY
         th.start()
 
-    def add_item(self,name,location):
+    def add_item(self,name,location=None):
         g=components.Item(self,name)
         self.area.nodes[name]=g
-        g.setLocation(*location)
+        if location is not None:
+            g.setLocation(*location)
         self.area.add(g)
+        return g
+    def clear_all(self):
+        self.area.nodes={}
+        for item in self.area.components:
+            if isinstance(item,components.core.DataViewComponent):
+                self.area.remove(item)
             
     def mouseClicked(self, event):     
         self.mouse_click_location=event.x,event.y
@@ -295,6 +308,44 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             self.forced_origins_prev[key]=v[index]
 
             origin.setValues(0,origin.values.time,v)
+
+    def save(self):
+        db=shelve.open('python/timeview/layout.db')
+        key=self.network.name
+        layout=[]
+        for comp in self.area.components:
+            if isinstance(comp,components.core.DataViewComponent):
+                layout.append((comp.name,comp.type,comp.save()))
+        db[key]=self.view_save(),layout
+        db.close()
+
+    def restore(self):
+        db=shelve.open('python/timeview/layout.db')
+        key=self.network.name
+        
+        if key not in db.keys(): return False
+        view_data,layout=db[key]
+        self.clear_all()
+        for name,type,data in layout:
+            if type is None:
+                c=self.add_item(name)
+            else:
+                for (t,klass,args) in self.watcher.list(name):
+                    if t==type:
+                        c=klass(self,name,**args)
+                        c.type=type
+                        self.area.add(c)
+            c.restore(data)    
+        self.view_restore(view_data)
+        db.close()
+        self.area.repaint()
+        return True
+    def view_save(self):
+        return dict(width=self.frame.width,height=self.frame.height)
+    
+    def view_restore(self,d):
+        self.frame.setSize(d['width'],d['height'])
+        
             
         
 
@@ -452,6 +503,11 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         spin3.add(JLabel('time shown'),BorderLayout.NORTH)
         spin3.maximumSize=spin3.preferredSize
         configPanel.add(spin3)
+        
+        
+        configPanel.add(JButton('save',actionPerformed=self.save))
+        configPanel.add(JButton('restore',actionPerformed=self.restore))
+        
 
         configPanel.setPreferredSize(java.awt.Dimension(20,self.config_panel_height))
         configPanel.visible=False
@@ -461,7 +517,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             c.border=javax.swing.border.EmptyBorder(0,10,0,10)
         
         
-
+        
 
 
     def forward_one_frame(self,event):
@@ -525,3 +581,10 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.view.set_target_rate(self.rate_combobox.getSelectedItem())
     def tick_limit(self,event):
         self.view.timelog.tick_limit=int(event.source.value/self.view.dt)+1
+        
+    def save(self,event):
+        self.view.save()
+
+    def restore(self,event):
+        self.view.restore()
+

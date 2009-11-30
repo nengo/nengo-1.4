@@ -7,12 +7,13 @@ import core
 
 from math import sqrt
 class VectorGrid(core.DataViewComponent):
-    def __init__(self,view,name,func,min=-1,max=1,rows=None,filter=True):
+    def __init__(self,view,name,func,args=(),min=-1,max=1,rows=None,filter=True):
         core.DataViewComponent.__init__(self)
         self.view=view
         self.name=name
         self.func=func
-        self.data=self.view.watcher.watch(name,func)
+        self.args=args
+        self.data=self.view.watcher.watch(name,func,args=args)
         self.rows=rows
         self.margin=10
         self.min=min

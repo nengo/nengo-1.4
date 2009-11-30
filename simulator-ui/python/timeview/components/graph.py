@@ -14,13 +14,13 @@ def safe_get_index(x,i):
 
 
 class Graph(core.DataViewComponent):
-    def __init__(self,view,name,func,filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None):
+    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None):
         core.DataViewComponent.__init__(self)
         self.view=view
         self.name=name
         self.func=func
         self.indices=None
-        self.data=self.view.watcher.watch(name,func)
+        self.data=self.view.watcher.watch(name,func,args=args)
         self.border_top=10
         self.border_left=30
         self.border_right=30
@@ -34,6 +34,8 @@ class Graph(core.DataViewComponent):
         self.map=None
         self.label=label
         self.show_label=False
+        if self.label is not None:
+            self.popup.add(JCheckBoxMenuItem('label',False,stateChanged=self.toggle_label))
 
     def initialize_map(self):
         data=self.data.get_first()
@@ -68,8 +70,6 @@ class Graph(core.DataViewComponent):
         self.show_label=event.source.state
         
     def fix_popup(self):
-        if self.label is not None:
-            self.popup.add(JCheckBoxMenuItem('label',False,stateChanged=self.toggle_label))
         self.popup.add(JPopupMenu.Separator())
         for i,draw in enumerate(self.indices):
             if i<30:
@@ -165,6 +165,8 @@ class Graph(core.DataViewComponent):
         colors=[Color.black,Color.blue,Color.red,Color.green,Color.magenta,Color.cyan,Color.yellow]
         g.color=Color.blue
         for j,fdata in enumerate(filtered):
+            if (self.size.width-self.border_left-self.border_right)<=0:
+                break
             skip=(len(fdata)/(self.size.width-self.border_left-self.border_right))-1
             if self.filter and self.view.tau_filter==0:
                 skip-=1     # special case to make unfiltered recoded value graphs look as expected

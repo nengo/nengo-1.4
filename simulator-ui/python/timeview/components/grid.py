@@ -8,15 +8,15 @@ import neuronmap
 
 from math import sqrt
 class Grid(core.DataViewComponent):
-    def __init__(self,view,name,func,sfunc=None,min=0,max=1,rows=None,filter=False):
+    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,filter=False):
         core.DataViewComponent.__init__(self)
         self.view=view
         self.name=name
         self.func=func
         self.sfunc=sfunc
-        self.data=self.view.watcher.watch(name,func)
+        self.data=self.view.watcher.watch(name,func,args=args)
         if sfunc is not None:
-            self.sdata=self.view.watcher.watch(name,sfunc)
+            self.sdata=self.view.watcher.watch(name,sfunc,args=sargs)
         self.rows=rows
         self.margin=10
         self.min=min
@@ -69,9 +69,9 @@ class Grid(core.DataViewComponent):
         
 
         max=self.max
-        if callable(max): max=max()
+        if callable(max): max=max(self)
         min=self.min
-        if callable(min): min=min()
+        if callable(min): min=min(self)
             
         dx=float(self.size.width-self.margin)/cols
         dy=float(self.size.height-self.margin)/rows

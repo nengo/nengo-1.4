@@ -13,12 +13,15 @@ class Watcher:
     def add_watch(self,watch):
         self.watches.append(watch)
 
-    def watch(self,name,func):
-        if (name,func) not in self.active:
-            w=self.timelog.add(lambda self=self,name=name,func=func: func(self.objects[name]))
+    def watch(self,name,func,args=()):
+        for key in self.active.keys():
+            if (name,func,args)==key:
+                w=self.active[key]
+                break
+        else:
+            w=self.timelog.add(func,args=tuple([self.objects[name]]+list(args)))
             w.watch_count=0
-            self.active[(name,func)]=w
-        w=self.active[(name,func)]
+            self.active[(name,func,args)]=w
         w.watch_count+=1
         return w
 

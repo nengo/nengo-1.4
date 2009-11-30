@@ -45,6 +45,13 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.setSize(100,50)
         self.border=self.default_border
         
+    def save(self):
+        return dict(x=self.x,y=self.y,width=self.width,height=self.height)
+    
+    def restore(self,d):
+        self.setLocation(d['x'],d['y'])
+        self.setSize(d['width'],d['height'])
+        
     def actionPerformed(self,event):
         if event.actionCommand=='hide':
             parent=self.parent

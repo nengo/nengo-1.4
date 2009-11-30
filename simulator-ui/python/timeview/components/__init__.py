@@ -6,6 +6,7 @@ import input
 import item
 import spike_raster
 import function
+
 from grid import Grid
 from item import Item
 from graph import Graph
