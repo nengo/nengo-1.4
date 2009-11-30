@@ -67,6 +67,7 @@ import ca.nengo.ui.dataList.SimulatorDataModel;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.constructors.ConstructableNode;
+import ca.nengo.ui.models.constructors.CNetwork;
 import ca.nengo.ui.models.constructors.ModelFactory;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.script.ScriptConsole;
@@ -619,13 +620,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	@Override
 	public void initFileMenu(MenuBuilder fileMenu) {
 
-		MenuBuilder newMenu = fileMenu.addSubMenu("New");
-		newMenu.getJMenu().setMnemonic(KeyEvent.VK_N);
-
-		for (ConstructableNode constructable : ModelFactory.getNodeConstructables(this)) {
-			newMenu.addAction(new CreateModelAction(this, constructable));
-		}
-
+		fileMenu.addAction(new CreateModelAction("New Network", this, new CNetwork()));
+		
 		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O, KeyStroke.getKeyStroke(
 				KeyEvent.VK_O, MENU_SHORTCUT_KEY_MASK));
 
