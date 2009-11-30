@@ -193,6 +193,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		
 		Runtime runtime=Runtime.getRuntime();
 		int hashCode=java.util.Arrays.hashCode(matrix);
+		int testpos = 0;
 		try {
 			// TODO: separate this out into a helper method, so we can do this sort of thing for other calculations as well
 			String parent=System.getProperty("user.dir");
@@ -205,13 +206,20 @@ public class WeightedCostApproximator implements LinearApproximator {
 			if (file2.canRead()) file2.delete();
 			
 			java.nio.channels.FileChannel channel=new java.io.RandomAccessFile(file,"rw").getChannel();			
-			java.nio.ByteBuffer buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_WRITE, 0, matrix.length*matrix.length*4);	
+//			java.nio.ByteBuffer buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_WRITE, 0, matrix.length*matrix.length*4);
+			java.nio.ByteBuffer buffer= java.nio.ByteBuffer.allocate(matrix.length*matrix.length*4);
+			buffer.rewind();
+			
+			
 			buffer.order(java.nio.ByteOrder.BIG_ENDIAN);
 			for (int i=0; i<matrix.length; i++) {
 				for (int j=0; j<matrix.length; j++) {
 					buffer.putFloat((float)(matrix[i][j]));
 				}
 			}
+			buffer.rewind();
+			
+			channel.write(buffer);
 			channel.force(true);
             channel.close();
             
@@ -239,8 +247,13 @@ public class WeightedCostApproximator implements LinearApproximator {
 			}
 			
 			channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
-			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);			
+//			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);
+			buffer= java.nio.ByteBuffer.allocate(matrix.length*matrix.length*4);
+			channel.read(buffer);
+			buffer.rewind();
+			
 			double[][] inv=new double[matrix.length][];
+			
 			for (int i=0; i<matrix.length; i++) {
 				double[] row=new double[matrix.length];
 				for (int j=0; j<matrix.length; j++) {
@@ -249,23 +262,27 @@ public class WeightedCostApproximator implements LinearApproximator {
 				inv[i]=row;
 			}
 			result=inv;
-
-			file=new java.io.File(path,filename);
-			if (file.canRead()) file.delete();
-			file2=new java.io.File(path,filename+".inv");
-			if (file2.canRead()) file2.delete();
 			
-            // Close all file handles
+			// Close all file handles
             channel.close();
+            
+			file=new java.io.File(path,filename);
+			if (file.canRead()) 
+				file.delete();
+			file2=new java.io.File(path,filename+".inv");
+			if (file2.canRead()) 
+				file2.delete();
+			
+            
 		} catch (java.io.IOException e) {
-			//e.printStackTrace();
+			e.printStackTrace();
             System.err.println("WeightedCostApproximator.pseudoInverse() - IO Exception: " + e);
 		} catch (InterruptedException e) {
             System.err.println("WeightedCostApproximator.pseudoInverse() - Interrupted: " + e);
 			//e.printStackTrace();		
 		} catch (Exception e){
             System.err.println("WeightedCostApproximator.pseudoInverse() - Gen Exception: " + e);
-            //e.printStackTrave();
+            e.printStackTrace();
         }
 				
 		if (result==null) {
