@@ -74,6 +74,7 @@ import ca.nengo.ui.script.ScriptEditor;
 import ca.nengo.ui.util.NengoClipboard;
 import ca.nengo.ui.util.NeoFileChooser;
 import ca.nengo.ui.util.ScriptWorldWrapper;
+import ca.nengo.ui.world.NengoWorld;
 import ca.nengo.util.Environment;
 import ca.shu.ui.lib.AppFrame;
 import ca.shu.ui.lib.AuxillarySplitPane;
@@ -91,6 +92,7 @@ import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.WorldObject.Property;
+import ca.shu.ui.lib.world.elastic.ElasticWorld;
 import ca.shu.ui.lib.world.handlers.SelectionHandler;
 import ca.shu.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.shu.ui.lib.world.piccolo.objects.Window;
@@ -380,6 +382,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			e.printStackTrace();
 		}
 	}
+	
+	protected NengoWorld getNengoWorld() {
+		return (NengoWorld)getWorld();
+	}
 
 	@Override
 	protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
@@ -507,6 +513,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	}
 
+
+	@Override
+	protected ElasticWorld createWorld() {
+		return new NengoWorld();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -524,17 +536,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			// Delegate to the top Node Container in the Application
 			return nodeContainer.addNodeModel(node, posX, posY);
 		} else if (nodeContainer == this) {
-
-			UINeoNode nodeUI = UINeoNode.createNodeUI(node);
-
-			if (posX != null && posY != null) {
-				nodeUI.setOffset(posX, posY);
-
-				getWorld().getGround().addChild(nodeUI);
-			} else {
-				getWorld().getGround().addChildFancy(nodeUI);
-			}
-
+			UINeoNode nodeUI = getNengoWorld().addNodeModel(node, posX, posY);
 			DragAction.dropNode(nodeUI);
 			return nodeUI;
 		} else {
@@ -601,15 +603,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			// Delegate to the top Node Container in the Application
 			return nodeContainer.getNodeModel(name);
 		} else if (nodeContainer == this) {
-			for (WorldObject wo : getWorld().getGround().getChildren()) {
-				if (wo instanceof UINeoNode) {
-					UINeoNode nodeUI = (UINeoNode) wo;
-
-					if (nodeUI.getName().equals(name)) {
-						return nodeUI.getModel();
-					}
-				}
-			}
+			return getNengoWorld().getNodeModel(name);
 		}
 		return null;
 	}
@@ -663,9 +657,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	public Point2D localToView(Point2D localPoint) {
-		localPoint = getWorld().getSky().parentToLocal(localPoint);
-		localPoint = getWorld().getSky().localToView(localPoint);
-		return localPoint;
+		return getNengoWorld().localToView(localPoint);
 	}
 
 	public boolean removeNodeModel(Node node) {
@@ -764,6 +756,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		}
 
 	}
+
 }
 
 /**

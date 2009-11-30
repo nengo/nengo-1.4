@@ -178,9 +178,7 @@ public abstract class AppFrame extends JFrame {
 		return PUtil.createBasicScenegraph();
 	}
 
-	protected ElasticWorld createWorld() {
-		return new ElasticWorld("Top world");
-	}
+	protected abstract ElasticWorld createWorld();
 
 	@SuppressWarnings("unchecked")
 	protected DisplayMode getBestDisplayMode(GraphicsDevice device) {
