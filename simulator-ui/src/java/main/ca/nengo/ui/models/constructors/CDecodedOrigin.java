@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models.constructors;
 
@@ -46,7 +46,7 @@ import ca.nengo.ui.configurable.descriptors.PFunctionArray;
 import ca.nengo.ui.configurable.descriptors.PString;
 import ca.nengo.ui.models.nodes.widgets.UIDecodedOrigin;
 
-public class CDecodedOrigin extends AbstractConstructable {
+public class CDecodedOrigin extends ProjectionConstructor {
 	private static final Property pName = new PString("Name");
 
 	private NEFEnsemble enfEnsembleParent;
@@ -58,22 +58,6 @@ public class CDecodedOrigin extends AbstractConstructable {
 	public CDecodedOrigin(NEFEnsemble enfEnsembleParent) {
 		super();
 		this.enfEnsembleParent = enfEnsembleParent;
-	}
-
-	@Override
-	protected Object configureModel(ConfigResult configuredProperties) throws ConfigException {
-		Origin origin = null;
-
-		try {
-			origin = enfEnsembleParent.addDecodedOrigin((String) configuredProperties
-					.getValue(pName), (Function[]) configuredProperties.getValue(pFunctions),
-					(String) configuredProperties.getValue(pNodeOrigin));
-
-		} catch (StructuralException e) {
-			throw new ConfigException(e.getMessage());
-		}
-
-		return origin;
 	}
 
 	@Override
@@ -95,6 +79,31 @@ public class CDecodedOrigin extends AbstractConstructable {
 		return UIDecodedOrigin.typeName;
 	}
 
+	@Override
+	protected boolean IsNameAvailable(String name) {
+		try {
+			return enfEnsembleParent.getOrigin(name) == null;
+		} catch (StructuralException e) {
+			return false;
+		}
+	}
+
+	@Override
+	protected Object createModel(ConfigResult configuredProperties, String uniqueName) throws ConfigException {
+		Origin origin = null;
+
+		try {
+			origin = enfEnsembleParent.addDecodedOrigin(uniqueName, (Function[]) configuredProperties
+					.getValue(pFunctions), (String) configuredProperties.getValue(pNodeOrigin));
+
+		} catch (StructuralException e) {
+			throw new ConfigException(e.getMessage());
+		}
+
+		return origin;
+	}
+
+	
 }
 
 /**

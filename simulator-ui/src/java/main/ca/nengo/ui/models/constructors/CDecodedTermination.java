@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models.constructors;
 
@@ -38,10 +38,8 @@ import ca.nengo.ui.configurable.descriptors.PString;
 import ca.nengo.ui.configurable.descriptors.PTerminationWeights;
 import ca.nengo.ui.models.nodes.widgets.UIDecodedTermination;
 
-public class CDecodedTermination extends AbstractConstructable {
+public class CDecodedTermination extends ProjectionConstructor {
 	private static final Property pIsModulatory = new PBoolean("Is Modulatory");
-
-	private static final Property pName = new PString("Name");
 
 	private static final Property pTauPSC = new PFloat("tauPSC");
 	private NEFEnsemble nefEnsembleParent;
@@ -51,36 +49,6 @@ public class CDecodedTermination extends AbstractConstructable {
 	public CDecodedTermination(NEFEnsemble nefEnsembleParent) {
 		super();
 		this.nefEnsembleParent = nefEnsembleParent;
-	}
-
-	@Override
-	protected Object configureModel(ConfigResult configuredProperties) throws ConfigException {
-
-		// make sure the name isn't a duplicate
-		String name = (String) configuredProperties.getValue(pName);
-		Termination oldTerm;
-		try {
-			oldTerm = nefEnsembleParent.getTermination(name);
-		} catch (StructuralException e) {
-			oldTerm = null;
-		}
-		if (oldTerm != null) {
-			throw new ConfigException("A termination with the name '" + name + "' already exists");
-		}
-
-		Termination term = null;
-		try {
-			term = nefEnsembleParent.addDecodedTermination((String) configuredProperties
-					.getValue(pName), (float[][]) configuredProperties
-					.getValue(pTransformMatrix), (Float) configuredProperties
-					.getValue(pTauPSC), (Boolean) configuredProperties
-					.getValue(pIsModulatory));
-
-		} catch (StructuralException e) {
-			e.printStackTrace();
-		}
-
-		return term;
 	}
 
 	@Override
@@ -94,6 +62,32 @@ public class CDecodedTermination extends AbstractConstructable {
 
 	public String getTypeName() {
 		return UIDecodedTermination.typeName;
+	}
+
+	@Override
+	protected boolean IsNameAvailable(String name) {
+		try {
+			return nefEnsembleParent.getTermination(name) == null;
+		} catch (StructuralException e) {
+			return false;
+		}
+	}
+
+	@Override
+	protected Object createModel(ConfigResult configuredProperties, String uniqueName) throws ConfigException {
+				
+
+		Termination term = null;
+		try {
+			term = nefEnsembleParent.addDecodedTermination(uniqueName,
+					(float[][]) configuredProperties.getValue(pTransformMatrix), (Float) configuredProperties
+							.getValue(pTauPSC), (Boolean) configuredProperties.getValue(pIsModulatory));
+
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		}
+
+		return term;
 	}
 
 }
