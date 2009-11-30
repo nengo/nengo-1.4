@@ -24,7 +24,7 @@ class Icon:
 class ShadedIcon:
     pass    
     
-for name in 'pause play configure end start backward forward restart arrowup arrowdown'.split():
+for name in 'pause play configure end start backward forward restart arrowup arrowdown save restore'.split():
     setattr(Icon,name,ImageIcon('python/images/%s.png'%name))
     setattr(ShadedIcon,name,ImageIcon('python/images/%s-pressed.png'%name))
 
@@ -505,8 +505,13 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         configPanel.add(spin3)
         
         
-        configPanel.add(JButton('save',actionPerformed=self.save))
-        configPanel.add(JButton('restore',actionPerformed=self.restore))
+        layout=JPanel(layout=BorderLayout(),opaque=False)
+        layout.add(JButton(icon=Icon.save,rolloverIcon=ShadedIcon.save,actionPerformed=self.save,borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0)),BorderLayout.WEST)
+        layout.add(JButton(icon=Icon.restore,rolloverIcon=ShadedIcon.restore,actionPerformed=self.restore,borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0)),BorderLayout.EAST)
+        layout.add(JLabel('layout',horizontalAlignment=javax.swing.SwingConstants.CENTER),BorderLayout.NORTH)
+        layout.maximumSize=layout.preferredSize
+        configPanel.add(layout)
+        
         
 
         configPanel.setPreferredSize(java.awt.Dimension(20,self.config_panel_height))
