@@ -317,7 +317,12 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
+			if ((e.getCause() instanceof StructuralException)) {
+				throw (StructuralException) e.getCause();
+			}
+			else {
+				throw new RuntimeException(e);
+			}
 		}		
 	}
 
