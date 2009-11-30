@@ -135,7 +135,9 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	private ArrayList<WorldObjectImpl> unselectList = null; // Used within drag
 	// handler
 
-	WorldImpl world;
+	private WorldImpl world;
+
+	private PanEventHandler panHandler;
 
 	/**
 	 * Creates a selection event handler.
@@ -147,10 +149,11 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	 *            The node whose children will be selected by this event
 	 *            handler.
 	 */
-	public SelectionHandler(WorldImpl world) {
+	public SelectionHandler(WorldImpl world, PanEventHandler panHandler) {
 		this.world = world;
 		this.marqueeParent = world.getSky();
 		this.selectableParent = world.getGround();
+		this.panHandler = panHandler;
 		setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
 		init();
 	}
@@ -294,6 +297,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	protected void endDrag(PInputEvent e) {
 		super.endDrag(e);
+		panHandler.setInverted(false);
 		endSelection();
 	}
 
@@ -336,8 +340,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		float[] dash = { DASH_WIDTH, DASH_WIDTH };
 		strokes = new Stroke[NUM_STROKES];
 		for (int i = 0; i < NUM_STROKES; i++) {
-			strokes[i] = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, dash,
-					i);
+			strokes[i] = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, dash, i);
 		}
 
 		selection = new HashMap<WorldObjectImpl, Boolean>();
@@ -434,7 +437,10 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			}
 
 			Collection<WorldObject> nodes = getSelection();
-			dragAction = new DragAction(nodes);
+			if (nodes.size() > 0) {
+				dragAction = new DragAction(nodes);
+				panHandler.setInverted(true);
+			}
 
 		}
 	}
@@ -491,8 +497,8 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		marqueeParent.viewToLocal(marqueeBounds);
 
 		// marquee.globalToLocal(b);
-		marquee.setPathToRectangle((float) marqueeBounds.x, (float) marqueeBounds.y,
-				(float) marqueeBounds.width, (float) marqueeBounds.height);
+		marquee.setPathToRectangle((float) marqueeBounds.x, (float) marqueeBounds.y, (float) marqueeBounds.width,
+				(float) marqueeBounds.height);
 
 		allItems.clear();
 		PNodeFilter filter = createNodeFilter(b);
@@ -553,15 +559,14 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 		if (destroyedCount > 0) {
 			// filter the selection to only return the non-destroyed objects
-			ArrayList<WorldObject> filteredSel = new ArrayList<WorldObject>(sel.size()
-					- destroyedCount);
+			ArrayList<WorldObject> filteredSel = new ArrayList<WorldObject>(sel.size() - destroyedCount);
 
 			for (WorldObject wo : sel) {
 				if (!wo.isDestroyed()) {
 					filteredSel.add(wo);
 				} else {
-					//remove the destroyed objects
-					unselect((WorldObjectImpl)wo);
+					// remove the destroyed objects
+					unselect((WorldObjectImpl) wo);
 				}
 			}
 			return filteredSel;

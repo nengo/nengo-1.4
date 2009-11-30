@@ -23,6 +23,7 @@ import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
 import ca.shu.ui.lib.world.handlers.EventConsumer;
 import ca.shu.ui.lib.world.handlers.KeyboardHandler;
 import ca.shu.ui.lib.world.handlers.MouseHandler;
+import ca.shu.ui.lib.world.handlers.PanEventHandler;
 import ca.shu.ui.lib.world.handlers.SelectionHandler;
 import ca.shu.ui.lib.world.handlers.TooltipPickHandler;
 import ca.shu.ui.lib.world.handlers.TopWorldStatusHandler;
@@ -32,7 +33,6 @@ import ca.shu.ui.lib.world.piccolo.primitives.PXGrid;
 import ca.shu.ui.lib.world.piccolo.primitives.PXLayer;
 import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
@@ -130,7 +130,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	/**
 	 * Panning handler
 	 */
-	private final PPanEventHandler panHandler;
+	private final PanEventHandler panHandler;
 
 	/**
 	 * Selection handler
@@ -182,13 +182,13 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		/*
 		 * Create handlers
 		 */
-		panHandler = new PPanEventHandler();
+		panHandler = new PanEventHandler();
 		keyboardHandler = new KeyboardHandler(this);
 		mySky.getCamera().addInputEventListener(keyboardHandler);
 		mySky.getCamera().addInputEventListener(new TooltipPickHandler(this, 1000, 0));
 		mySky.getCamera().addInputEventListener(new MouseHandler(this));
 
-		selectionEventHandler = new SelectionHandler(this);
+		selectionEventHandler = new SelectionHandler(this, panHandler);
 		selectionEventHandler.setMarqueePaint(Style.COLOR_BORDER_SELECTED);
 		selectionEventHandler.setMarqueeStrokePaint(Style.COLOR_BORDER_SELECTED);
 		selectionEventHandler.setMarqueePaintTransparency(0.1f);
