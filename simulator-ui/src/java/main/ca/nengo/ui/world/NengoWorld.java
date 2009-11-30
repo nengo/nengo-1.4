@@ -32,12 +32,12 @@ public class NengoWorld extends ElasticWorld implements NodeContainer {
 		menu.addAction(new CreateModelAction("New Network", this, new CNetwork()));
 	}
 
-	@Override
+
 	public UINeoNode addNodeModel(Node node) throws ContainerException {
 		return addNodeModel(node, null, null);
 	}
 
-	@Override
+
 	public UINeoNode addNodeModel(Node node, Double posX, Double posY) throws ContainerException {
 		if (!(node instanceof Network)) {
 			throw new ContainerException("Only Networks are allowed to be added to the top-level Window");
@@ -56,7 +56,7 @@ public class NengoWorld extends ElasticWorld implements NodeContainer {
 		return nodeUI;
 	}
 
-	@Override
+
 	public Node getNodeModel(String name) {
 		for (WorldObject wo : getGround().getChildren()) {
 			if (wo instanceof UINeoNode) {
@@ -70,7 +70,6 @@ public class NengoWorld extends ElasticWorld implements NodeContainer {
 		return null;
 	}
 
-	@Override
 	public Point2D localToView(Point2D localPoint) {
 		localPoint = getSky().parentToLocal(localPoint);
 		localPoint = getSky().localToView(localPoint);
