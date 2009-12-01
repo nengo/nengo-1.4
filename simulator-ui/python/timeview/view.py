@@ -327,15 +327,18 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         view_data,layout=db[key]
         self.clear_all()
         for name,type,data in layout:
-            if type is None:
-                c=self.add_item(name)
-            else:
-                for (t,klass,args) in self.watcher.list(name):
-                    if t==type:
-                        c=klass(self,name,**args)
-                        c.type=type
-                        self.area.add(c)
-            c.restore(data)    
+            if name in self.watcher.objects.keys():
+                if type is None:
+                    c=self.add_item(name)
+                    c.restore(data)    
+                else:
+                    for (t,klass,args) in self.watcher.list(name):
+                        if t==type:
+                            c=klass(self,name,**args)
+                            c.type=type
+                            c.restore(data)    
+                            self.area.add(c)
+                            break
         self.view_restore(view_data)
         db.close()
         self.area.repaint()
@@ -506,8 +509,8 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         
         
         layout=JPanel(layout=BorderLayout(),opaque=False)
-        layout.add(JButton(icon=Icon.save,rolloverIcon=ShadedIcon.save,actionPerformed=self.save,borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0)),BorderLayout.WEST)
-        layout.add(JButton(icon=Icon.restore,rolloverIcon=ShadedIcon.restore,actionPerformed=self.restore,borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0)),BorderLayout.EAST)
+        layout.add(JButton(icon=Icon.save,rolloverIcon=ShadedIcon.save,actionPerformed=self.save,borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),toolTipText='save layout'),BorderLayout.WEST)
+        layout.add(JButton(icon=Icon.restore,rolloverIcon=ShadedIcon.restore,actionPerformed=self.restore,borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),toolTipText='restore layout'),BorderLayout.EAST)
         layout.add(JLabel('layout',horizontalAlignment=javax.swing.SwingConstants.CENTER),BorderLayout.NORTH)
         layout.maximumSize=layout.preferredSize
         configPanel.add(layout)
