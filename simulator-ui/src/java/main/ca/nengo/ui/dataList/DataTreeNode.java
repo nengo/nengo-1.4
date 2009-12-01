@@ -22,15 +22,15 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.dataList;
 
+import java.util.Collection;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import ca.nengo.ui.actions.PlotAdvanced;
 import ca.nengo.ui.actions.PlotSpikePattern;
-import ca.nengo.ui.actions.PlotTimeSeries;
 import ca.nengo.util.DataUtils;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.TimeSeries;
@@ -51,8 +51,7 @@ public abstract class DataTreeNode extends SortableMutableTreeNode {
 		super(userObject);
 	}
 
-	public abstract void constructPopupMenu(PopupMenuBuilder menu,
-			SimulatorDataModel dataModel);
+	public abstract void constructPopupMenu(PopupMenuBuilder menu, SimulatorDataModel dataModel);
 
 	public abstract StandardAction getDefaultAction();
 
@@ -70,8 +69,8 @@ class ProbeDataNode extends TimeSeriesNode {
 
 	private static final long serialVersionUID = 1L;
 
-	public ProbeDataNode(TimeSeries userObject, String stateName) {
-		super(userObject, stateName);
+	public ProbeDataNode(TimeSeries userObject, String stateName, boolean applyFilterByDefault) {
+		super(userObject, stateName, applyFilterByDefault);
 	}
 
 	@Override
@@ -95,8 +94,8 @@ class ProbeDataExpandedNode extends TimeSeriesNode {
 
 	private static final long serialVersionUID = 1L;
 
-	public ProbeDataExpandedNode(TimeSeries userObject, int dim) {
-		super(userObject, "" + dim);
+	public ProbeDataExpandedNode(TimeSeries userObject, int dim, boolean applyFilterByDefault) {
+		super(userObject, "" + dim, applyFilterByDefault);
 	}
 
 	@Override
@@ -123,8 +122,7 @@ class SpikePatternNode extends DataTreeNode {
 		super(spikePattern);
 	}
 
-	public void constructPopupMenu(PopupMenuBuilder menu,
-			SimulatorDataModel dataModel) {
+	public void constructPopupMenu(PopupMenuBuilder menu, SimulatorDataModel dataModel) {
 		menu.addAction(getDefaultAction());
 	}
 
@@ -158,17 +156,22 @@ abstract class TimeSeriesNode extends DataTreeNode {
 	private static final long serialVersionUID = 1L;
 
 	protected String name;
+	private boolean applyFilterByDefault;
 
-	public TimeSeriesNode(TimeSeries userObject, String name) {
+	public TimeSeriesNode(TimeSeries userObject, String name, boolean applyFilterByDefault) {
 		super(userObject);
 		this.name = name;
+		this.applyFilterByDefault = applyFilterByDefault;
 	}
 
-	public void constructPopupMenu(PopupMenuBuilder menu,
-			SimulatorDataModel dataModel) {
-		menu.addAction(getDefaultAction());
-		menu.addAction(new PlotAdvanced((TimeSeries) getUserObject(),
-				"Probe data: " + name));
+	public void constructPopupMenu(PopupMenuBuilder menu, SimulatorDataModel dataModel) {
+		Collection<StandardAction> actions = ProbePlotHelper.getInstance().getPlotActions(getUserObject(),
+				getPlotName());
+
+		for (StandardAction action : actions) {
+			menu.addAction(action);
+		}
+
 		menu.addAction(new ExtractDimenmsions(dataModel));
 	}
 
@@ -194,11 +197,10 @@ abstract class TimeSeriesNode extends DataTreeNode {
 			 * Extract dimensions
 			 */
 			for (int dimCount = 0; dimCount < probeData.getDimension(); dimCount++) {
-				TimeSeries oneDimData = DataUtils.extractDimension(probeData,
-						dimCount);
+				TimeSeries oneDimData = DataUtils.extractDimension(probeData, dimCount);
 
-				DefaultMutableTreeNode stateDimNode = new ProbeDataExpandedNode(
-						oneDimData, dimCount);
+				DefaultMutableTreeNode stateDimNode = new ProbeDataExpandedNode(oneDimData,
+						dimCount, applyFilterByDefault);
 				add(stateDimNode);
 			}
 		}
@@ -206,7 +208,13 @@ abstract class TimeSeriesNode extends DataTreeNode {
 
 	@Override
 	public StandardAction getDefaultAction() {
-		return new PlotTimeSeries(getUserObject(), "Probe data: " + name);
+		return ProbePlotHelper.getInstance().getDefaultAction(getUserObject(),
+				getPlotName(),
+				applyFilterByDefault);
+	}
+
+	private String getPlotName() {
+		return "Probe data: " + name;
 	}
 
 	@Override

@@ -36,14 +36,14 @@ import ca.shu.ui.lib.actions.StandardAction;
  * 
  * @author Shu Wu
  */
-public class PlotTimeSeries extends StandardAction {
+public class PlotTimeSeriesRaw extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
 	private TimeSeries data;
 	private String plotName;
 
-	public PlotTimeSeries(TimeSeries data, String plotName) {
-		super("Plot");
+	public PlotTimeSeriesRaw(TimeSeries data, String plotName) {
+		super("Plot raw data");
 		this.data = data;
 		this.plotName = plotName + "  [ " + data.getName() + " ]";
 	}

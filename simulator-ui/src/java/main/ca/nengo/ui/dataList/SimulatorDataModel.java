@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.dataList;
 
@@ -46,6 +46,7 @@ import ca.shu.ui.lib.util.Util;
 public class SimulatorDataModel extends DefaultTreeModel {
 
 	private static final long serialVersionUID = 1L;
+	private ProbePlotHelper plotterStrategy;
 
 	/**
 	 * Creates a new node in the parent only if a node with the same name does
@@ -56,7 +57,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 	 */
 	private static SortableMutableTreeNode createSortableNode(DefaultMutableTreeNode parent,
 			Node neoNode) {
-		String name = neoNode.getName(); 
+		String name = neoNode.getName();
 
 		if (neoNode instanceof Network) {
 			name += " (Network)";
@@ -138,6 +139,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 	public SimulatorDataModel() {
 		super(new DefaultMutableTreeNode("root"));
+		plotterStrategy = ProbePlotHelper.getInstance();
 	}
 
 	private void addSpikePatterns(DefaultMutableTreeNode top, Network network) {
@@ -153,8 +155,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 					/*
 					 * Make a clone of the data
 					 */
-					SpikePattern spikePattern = (SpikePattern) Util.cloneSerializable(ensemble
-							.getSpikePattern());
+					SpikePattern spikePattern = (SpikePattern) Util.cloneSerializable(ensemble.getSpikePattern());
 					DefaultMutableTreeNode spNode = new SpikePatternNode(spikePattern);
 					ensNode.add(spNode);
 				}
@@ -174,8 +175,8 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			DefaultMutableTreeNode top0 = top;
 
 			if (probe.getEnsembleName() != null && !probe.getEnsembleName().equals("")) {
-				SortableMutableTreeNode ensembleNode = createSortableNode(top0, probe
-						.getEnsembleName());
+				SortableMutableTreeNode ensembleNode = createSortableNode(top0,
+						probe.getEnsembleName());
 				top0 = ensembleNode;
 			}
 
@@ -188,17 +189,15 @@ public class SimulatorDataModel extends DefaultTreeModel {
 				 */
 				TimeSeries probeData = (TimeSeries) Util.cloneSerializable(probe.getData());
 
-				DefaultMutableTreeNode stateNode = new ProbeDataNode(probeData, probe
-						.getStateName());
+				DefaultMutableTreeNode stateNode = new ProbeDataNode(probeData,
+						probe.getStateName(), plotterStrategy.isApplyTauFilterByDefault(probe));
 
 				targetNode.add(stateNode);
 
 			} else {
 				Util.Assert(false, "Probe target is not a node");
 			}
-
 		}
-
 	}
 
 	/**
@@ -206,14 +205,14 @@ public class SimulatorDataModel extends DefaultTreeModel {
 	 * data tree
 	 */
 	public void captureData(Network network) {
-		
+
 		Util.Assert(network.getSimulator() != null, "No simulator available for data view");
 
 		DefaultMutableTreeNode networkNode = topLevelNetworks.get(network.hashCode());
 
 		if (networkNode == null) {
 			String originalName = network.getName();
-			
+
 			String name = originalName;
 
 			/*

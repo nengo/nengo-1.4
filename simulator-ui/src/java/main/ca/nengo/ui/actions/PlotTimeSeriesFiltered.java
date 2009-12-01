@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.actions;
 
@@ -34,6 +34,7 @@ import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.dataList.ProbePlotHelper;
 import ca.nengo.util.DataUtils;
 import ca.nengo.util.TimeSeries;
 import ca.shu.ui.lib.actions.ActionException;
@@ -46,59 +47,73 @@ import ca.shu.ui.lib.util.UserMessages;
  * 
  * @author Shu Wu
  */
-public class PlotAdvanced extends StandardAction {
+public class PlotTimeSeriesFiltered extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
 	private TimeSeries timeSeries;
 	private String plotName;
+	private boolean showUserConfigDialog = false;
+	private float tauFilter;
+	private int subSampling;
 
-	public PlotAdvanced(TimeSeries timeSeries, String plotName) {
+	public PlotTimeSeriesFiltered(TimeSeries timeSeries,
+			String plotName,
+			boolean showUserConfigDialog,
+			float defaultTau,
+			int defaultSubSampling) {
 		super("Plot with options", "Plot w/ options");
 		this.timeSeries = timeSeries;
+		this.showUserConfigDialog = showUserConfigDialog;
 		this.plotName = plotName + "  [ " + timeSeries.getName() + " ]";
+		this.tauFilter = defaultTau;
+		this.subSampling = defaultSubSampling;
 	}
 
 	@Override
 	protected void action() throws ActionException {
 		try {
-			// float tauFilter = new Float(JOptionPane
-			// .showInputDialog("Time constant of display filter (s): "));
+			PFloat pTauFilter = new PFloat("Time constant of display filter [0 = off]", tauFilter);
+			PInt pSubSampling = new PInt("Subsampling [0 = off]", subSampling);
 
-			PFloat pTauFilter = new PFloat(
-					"Time constant of display filter [0 = off] ");
-			PInt pSubSampling = new PInt("Subsampling [0 = off]");
+			if (showUserConfigDialog) {
+				ConfigResult result;
+				try {
+					result = UserConfigurer.configure(new Property[] { pTauFilter, pSubSampling },
+							"Plot Options",
+							UIEnvironment.getInstance(),
+							ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
-			ConfigResult result;
-			try {
-				result = UserConfigurer.configure(new Property[] {
-						pTauFilter, pSubSampling }, "Plot Options",
-						UIEnvironment.getInstance(),
-						ConfigMode.TEMPLATE_NOT_CHOOSABLE);
+					tauFilter = (Float) result.getValue(pTauFilter);
+					subSampling = (Integer) result.getValue(pSubSampling);
 
-				float tauFilter = (Float) result.getValue(pTauFilter);
-				int subSampling = (Integer) result.getValue(pSubSampling);
+					ProbePlotHelper.getInstance().setDefaultTauFilter(tauFilter);
+					ProbePlotHelper.getInstance().setDefaultSubSampling(subSampling);
 
-				TimeSeries timeSeriesToShow;
-
-				if (subSampling != 0) {
-					timeSeriesToShow = DataUtils.subsample(timeSeries,
-							subSampling);
-				} else {
-					timeSeriesToShow = timeSeries;
+				} catch (ConfigException e) {
+					e.defaultHandleBehavior();
 				}
 
-				if (tauFilter != 0) {
-					Plotter.plot(timeSeriesToShow, tauFilter, plotName);
-				} else {
-					Plotter.plot(timeSeriesToShow, plotName);
-				}
-			} catch (ConfigException e) {
-				e.defaultHandleBehavior();
+			}
+
+			TimeSeries timeSeriesToShow;
+
+			if (subSampling != 0) {
+				timeSeriesToShow = DataUtils.subsample(timeSeries, subSampling);
+			} else {
+				timeSeriesToShow = timeSeries;
+			}
+
+			if (tauFilter != 0) {
+				Plotter.plot(timeSeriesToShow, tauFilter, plotName);
+			} else {
+				Plotter.plot(timeSeriesToShow, plotName);
 			}
 
 		} catch (java.lang.NumberFormatException exception) {
+			exception.printStackTrace();
 			UserMessages.showWarning("Could not parse number");
 		}
 
 	}
+
 }

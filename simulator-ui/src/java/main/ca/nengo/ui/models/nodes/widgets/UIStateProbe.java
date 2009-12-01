@@ -22,12 +22,13 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models.nodes.widgets;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.swing.JOptionPane;
 
@@ -36,8 +37,7 @@ import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
-import ca.nengo.ui.actions.PlotAdvanced;
-import ca.nengo.ui.actions.PlotTimeSeries;
+import ca.nengo.ui.dataList.ProbePlotHelper;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.nodes.UIEnsemble;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
@@ -77,16 +77,20 @@ public class UIStateProbe extends UIProbe {
 				UIEnsemble ensemble = ensembleViewer.getViewerParent();
 				Network network = ensemble.getNetworkParent().getModel();
 
-				probe = network.getSimulator().addProbe(ensemble.getName(), (Probeable) node,
-						state, true);
+				probe = network.getSimulator().addProbe(ensemble.getName(),
+						(Probeable) node,
+						state,
+						true);
 
 				nodeAttachedTo.showPopupMessage("Probe (" + state + ") added to Simulator");
 
-			} else if (nodeAttachedTo.getNetworkParent()==null) {
-				throw new SimulationException("Cannot add a probe to a node that is not inside a Network");
+			} else if (nodeAttachedTo.getNetworkParent() == null) {
+				throw new SimulationException(
+						"Cannot add a probe to a node that is not inside a Network");
 			} else {
 				probe = nodeAttachedTo.getNetworkParent().getSimulator().addProbe(node.getName(),
-						state, true);
+						state,
+						true);
 			}
 		} catch (SimulationException exception) {
 			// nodeAttachedTo.popupTransientMsg("Could not add Probe (" + state
@@ -110,8 +114,13 @@ public class UIStateProbe extends UIProbe {
 
 		menu.addSection("Probe");
 		MenuBuilder plotMenu = menu.addSubMenu("plot");
-		plotMenu.addAction(new PlotTimeSeries(getModel().getData(), getName()));
-		plotMenu.addAction(new PlotAdvanced(getModel().getData(), getName()));
+
+		Collection<StandardAction> actions = ProbePlotHelper.getInstance().getPlotActions(getModel().getData(),
+				getName());
+
+		for (StandardAction action : actions) {
+			plotMenu.addAction(action);
+		}
 
 		MenuBuilder exportMenu = menu.addSubMenu("export data");
 		exportMenu.addAction(new ExportToMatlabAction());
@@ -120,7 +129,7 @@ public class UIStateProbe extends UIProbe {
 
 	@Override
 	public void doubleClicked() {
-		(new PlotTimeSeries(getModel().getData(), getName())).doAction();
+		ProbePlotHelper.getInstance().getDefaultAction(getModel(), getName()).doAction();
 	}
 
 	@Override
