@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.util;
 
@@ -33,6 +33,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.shu.ui.lib.util.UIEnvironment;
 
 /**
@@ -54,11 +55,12 @@ public class NeoFileChooser {
 		super();
 		fileChooser = new JFileChooser();
 
-		allFileFilter = new AllNeoFiles();
-//		nodeFileFilter = new NodeFileFilter();
+		String workingDirectory = NengoConfigManager.getUserProperty(UserProperties.ModelWorkingLocation);
+		if (workingDirectory != null) {
+			fileChooser.setCurrentDirectory(new File(workingDirectory));
+		}
 
-//		fileChooser.addChoosableFileFilter(allFileFilter);
-//		fileChooser.addChoosableFileFilter(nodeFileFilter);
+		allFileFilter = new AllNeoFiles();
 		fileChooser.setFileFilter(allFileFilter);
 	}
 
@@ -85,7 +87,10 @@ public class NeoFileChooser {
 	 */
 	public int showOpenDialog() throws HeadlessException {
 		fileChooser.setFileFilter(allFileFilter);
-		return fileChooser.showOpenDialog(UIEnvironment.getInstance());
+
+		int response = fileChooser.showOpenDialog(UIEnvironment.getInstance());
+		saveWorkingLocation();
+		return response;
 	}
 
 	/**
@@ -96,9 +101,19 @@ public class NeoFileChooser {
 	 */
 	public int showSaveDialog() throws HeadlessException {
 		fileChooser.setFileFilter(allFileFilter);
-		return fileChooser.showSaveDialog(UIEnvironment.getInstance());
+
+		int response = fileChooser.showSaveDialog(UIEnvironment.getInstance());
+		saveWorkingLocation();
+		return response;
 	}
 
+	/**
+	 * Saves the current working directory
+	 */
+	private void saveWorkingLocation() {
+		String currentDirectory = fileChooser.getCurrentDirectory().toString();
+		NengoConfigManager.saveUserProperty(UserProperties.ModelWorkingLocation, currentDirectory);
+	}
 }
 
 /**
@@ -120,22 +135,3 @@ class AllNeoFiles extends FileExtensionFilter {
 	}
 
 }
-
-/**
- * File filter which only allows Ensemble files
- * 
- * @author Shu Wu
- */
-//class NodeFileFilter extends FileExtensionFilter {
-//
-//	@Override
-//	public boolean acceptExtension(String str) {
-//		return (str.equals(NengoGraphics.NEONODE_FILE_EXTENSION));
-//	}
-//
-//	@Override
-//	public String getDescription() {
-//		return "Nengo Node";
-//	}
-//
-//}

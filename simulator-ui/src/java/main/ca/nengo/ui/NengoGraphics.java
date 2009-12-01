@@ -29,7 +29,6 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -38,7 +37,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -66,12 +64,11 @@ import ca.nengo.ui.dataList.DataListView;
 import ca.nengo.ui.dataList.SimulatorDataModel;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
-import ca.nengo.ui.models.constructors.ConstructableNode;
 import ca.nengo.ui.models.constructors.CNetwork;
-import ca.nengo.ui.models.constructors.ModelFactory;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.script.ScriptConsole;
 import ca.nengo.ui.script.ScriptEditor;
+import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoClipboard;
 import ca.nengo.ui.util.NeoFileChooser;
 import ca.nengo.ui.util.ScriptWorldWrapper;
@@ -124,8 +121,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			+ "This product contains several open-source libraries (copyright their respective authors). "
 			+ "For more information, consult lib/library-licenses.txt in the installation directory.<BR> "
 			+ "This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
-
-	public static final String CONFIG_FILE = "NengoGraphics.config";
 
 	public static final boolean CONFIGURE_PLANE_ENABLED = false;
 
@@ -264,18 +259,14 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	}
 
-	private void loadConfig() {
-		String simulatorSource = "../simulator/src/java/main";
+	private void initializeSimulatorSourceFiles() {
 
-		try {
-			FileInputStream fis = new FileInputStream(CONFIG_FILE);
-			Properties props = new Properties();
-			props.load(fis);
+		String savedSourceLocation = NengoConfigManager.getNengoConfig().getProperty(
+				"simulator_source");
 
-			simulatorSource = props.getProperty("simulator_source");
-		} catch (IOException e) {
-			Util.debugMsg("Problem loading config file: " + e.getMessage());
-		}
+		String simulatorSource = (savedSourceLocation != null) ? savedSourceLocation
+				: "../simulator/src/java/main";
+
 		File simulatorSourceFile = new File(simulatorSource);
 		if (!simulatorSourceFile.exists()) {
 			Util.debugMsg("Could not find simulator source files at "
@@ -383,9 +374,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected NengoWorld getNengoWorld() {
-		return (NengoWorld)getWorld();
+		return (NengoWorld) getWorld();
 	}
 
 	@Override
@@ -411,7 +402,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 		UIEnvironment.setDebugEnabled(true);
 
-		loadConfig();
+		initializeSimulatorSourceFiles();
 
 		if (FileChooser == null) {
 			FileChooser = new NeoFileChooser();
@@ -475,8 +466,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 		for (WorldObject wo : getWorld().getGround().getChildren()) {
 			if (wo instanceof UINeoNode) {
-				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) wo);
-				saveAction.setBlocking(true);
+				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) wo, true);
 				saveAction.doAction();
 			}
 		}
@@ -514,12 +504,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	}
 
-
 	@Override
 	protected ElasticWorld createWorld() {
 		return new NengoWorld();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -576,7 +565,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 				return;
 			}
 		}
-
+		NengoConfigManager.saveUserConfig();
 		super.exitAppFrame();
 	}
 
@@ -621,7 +610,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	public void initFileMenu(MenuBuilder fileMenu) {
 
 		fileMenu.addAction(new CreateModelAction("New Network", this, new CNetwork()));
-		
+
 		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O, KeyStroke.getKeyStroke(
 				KeyEvent.VK_O, MENU_SHORTCUT_KEY_MASK));
 

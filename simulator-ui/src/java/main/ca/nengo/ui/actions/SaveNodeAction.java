@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.actions;
 
@@ -40,7 +40,7 @@ import ca.shu.ui.lib.objects.activities.TrackedAction;
 import ca.shu.ui.lib.util.UserMessages;
 
 /**
- * Saves a PNodeContainer
+ * Saves a nodeUI
  * 
  * @author Shu Wu
  */
@@ -51,9 +51,11 @@ public class SaveNodeAction extends StandardAction {
 	 * File to be saved to
 	 */
 	private File file;
-	
-	private boolean blocking;  // if blocking, then saving occurs in the same thread before
-	                           // returning
+
+	/**
+	 * if blocking, then saving occurs in the same thread before returning
+	 */
+	private boolean blocking;
 
 	private UINeoNode nodeUI;
 
@@ -62,23 +64,25 @@ public class SaveNodeAction extends StandardAction {
 	 *            Node to be saved
 	 */
 	public SaveNodeAction(UINeoNode nodeUI) {
-		super("Save "+nodeUI.getName());
-
-		this.nodeUI = nodeUI;
-		
-		this.blocking = false;
+		this(nodeUI, false);
 	}
-	
+
 	/**
-	 * A blocking save will perform the save before returning, rather than saving in a
-	 * separate thread.  This is useful on exit, when we want to be sure the save has
-	 * finished before leaving Nengo.
+	 * @param nodeUI
+	 *            Node to be saved
 	 * 
 	 * @param value
-	 * 				Whether or not the save should be blocking
+	 *            Whether or not the save should be blocking. A blocking save
+	 *            will perform the save before returning, rather than saving in
+	 *            a separate thread. This is useful on exit, when we want to be
+	 *            sure the save has finished before leaving Nengo.
 	 */
-	public void setBlocking(boolean value) {
-		this.blocking = value;
+	public SaveNodeAction(UINeoNode nodeUI, boolean isBlocking) {
+		super("Save " + nodeUI.getName());
+
+		this.nodeUI = nodeUI;
+
+		this.blocking = isBlocking;
 	}
 
 	@Override
@@ -91,46 +95,32 @@ public class SaveNodeAction extends StandardAction {
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			file = NengoGraphics.FileChooser.getSelectedFile();
-			
+
 			if (blocking) {
-				try {
-					nodeUI.saveModel(file);
-				} catch (IOException e) {
-					UserMessages.showError("Could not save file: " + e.toString());
-				} catch (OutOfMemoryError e) {
-					UserMessages
-							.showError("Out of memory, please increase memory size: "
-									+ e.toString());
-				}
+				saveModel();
 			} else {
-	
-				TrackedAction task = new TrackedAction("Saving model") {
-	
+				new TrackedAction("Saving model") {
 					private static final long serialVersionUID = 1L;
-	
+
 					@Override
 					protected void action() throws ActionException {
-						try {
-	
-							nodeUI.saveModel(file);
-	
-						} catch (IOException e) {
-							UserMessages.showError("Could not save file: "
-									+ e.toString());
-						} catch (OutOfMemoryError e) {
-							UserMessages
-									.showError("Out of memory, please increase memory size: "
-											+ e.toString());
-						}
-	
+						saveModel();
 					}
-				};
-				task.doAction();
+				}.doAction();
 			}
 
 		} else {
 			throw new UserCancelledException();
 		}
+	}
 
+	private void saveModel() {
+		try {
+			nodeUI.saveModel(file);
+		} catch (IOException e) {
+			UserMessages.showError("Could not save file: " + e.toString());
+		} catch (OutOfMemoryError e) {
+			UserMessages.showError("Out of memory, please increase memory size: " + e.toString());
+		}
 	}
 }
