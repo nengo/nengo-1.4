@@ -140,6 +140,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 	public SimulatorDataModel() {
 		super(new DefaultMutableTreeNode("root"));
 		plotterStrategy = ProbePlotHelper.getInstance();
+		this.setRoot(new DefaultMutableTreeNode("Results"));
 	}
 
 	private void addSpikePatterns(DefaultMutableTreeNode top, Network network) {
@@ -204,11 +205,19 @@ public class SimulatorDataModel extends DefaultTreeModel {
 	 * Captures the current data from a network and copies it to this simulator
 	 * data tree
 	 */
-	public void captureData(Network network) {
+	public SortableMutableTreeNode captureData(Network network) {
 
 		Util.Assert(network.getSimulator() != null, "No simulator available for data view");
 
 		DefaultMutableTreeNode networkNode = topLevelNetworks.get(network.hashCode());
+
+		if (networkNode != null && networkNode.getParent() == null) {
+			// Node has already been removed from the tree by the user
+			//
+			topLevelNetworks.remove(network.hashCode());
+			nameLUT.remove(network.getName());
+			networkNode = null;
+		}
 
 		if (networkNode == null) {
 			String originalName = network.getName();
@@ -222,14 +231,12 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			while (nameLUT.contains(name)) {
 				name = String.format("%s (%d)", originalName, i++);
 			}
-
 			nameLUT.add(name);
 
 			networkNode = new DefaultMutableTreeNode(name);
 			topLevelNetworks.put(network.hashCode(), networkNode);
 
 			this.insertNodeInto(networkNode, ((MutableTreeNode) getRoot()), 0);
-			// add(networkNode);
 		}
 
 		Calendar cal = new GregorianCalendar();
@@ -248,6 +255,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		}
 
 		this.insertNodeInto(captureNode, networkNode, 0);
+		return captureNode;
 	}
 
 }

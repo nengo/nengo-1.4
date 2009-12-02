@@ -135,7 +135,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	 */
 	public static final String NEONODE_FILE_EXTENSION = "nef";
 
-	static final String PLUGIN_DIRECTORY = "plugins";
+	public static final String PLUGIN_DIRECTORY = "plugins";
 
 	public static NengoGraphics getInstance() {
 		Util.Assert(UIEnvironment.getInstance() instanceof NengoGraphics);
@@ -159,25 +159,13 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	private NengoClipboard clipboard;
-
 	private ConfigurationPane configPane;
-
 	private AuxillarySplitPane dataViewerPane;
-
 	private SelectionBorder objectSelectedBorder;
-
 	private PythonInterpreter pythonInterpreter;
-
 	private ScriptConsole scriptConsole;
 	private AuxillarySplitPane scriptConsolePane;
-
-	private WorldObject selectedObj;
-
-	/**
-	 * Data viewer data
-	 */
-	private SimulatorDataModel simulationData;
-
+	private WorldObject selectedObj;	private DataListView dataListViewer;
 	private ArrayList<AuxillarySplitPane> splitPanes;
 
 	/**
@@ -427,7 +415,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	@Override
 	protected void initLayout(Universe canvas) {
 		splitPanes = new ArrayList<AuxillarySplitPane>();
-		simulationData = new SimulatorDataModel();
 
 		pythonInterpreter = new PythonInterpreter();
 		scriptConsole = new ScriptConsole(pythonInterpreter);
@@ -440,8 +427,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
 				"Script Console", AuxillarySplitPane.Orientation.Bottom);
 
-		dataViewerPane = new AuxillarySplitPane(scriptConsolePane,
-				new DataListView(simulationData), "Data Viewer",
+		dataListViewer = new DataListView(new SimulatorDataModel());
+
+		dataViewerPane = new AuxillarySplitPane(scriptConsolePane, dataListViewer, "Data Viewer",
 				AuxillarySplitPane.Orientation.Left);
 
 		splitPanes.add(scriptConsolePane);
@@ -541,7 +529,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	public void captureInDataViewer(Network network) {
-		simulationData.captureData(network);
+		dataListViewer.captureSimulationData(network);
 	}
 
 	/**

@@ -45,8 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -57,6 +56,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import ca.nengo.io.DelimitedFileExporter;
 import ca.nengo.io.MatlabExporter;
+import ca.nengo.model.Network;
 import ca.nengo.ui.actions.ConfigureAction;
 import ca.nengo.ui.util.FileExtensionFilter;
 import ca.nengo.util.SpikePattern;
@@ -95,7 +95,6 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		// tree.setEditable(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
-		dataModel.addTreeModelListener(new MyTreeModelListener());
 		tree.addMouseListener(new MyTreeMouseListener());
 
 		// Listen for when the selection changes.
@@ -116,21 +115,19 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		 */
 	}
 
-	private class MyTreeModelListener implements TreeModelListener {
+	public void captureSimulationData(Network network) {
+		final SortableMutableTreeNode newNode = dataModel.captureData(network);
 
-		public void treeNodesChanged(TreeModelEvent e) {
+		if (newNode != null) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					TreePath path = new TreePath(newNode.getPath());
+					tree.scrollPathToVisible(path);
+					tree.setSelectionPath(path);
+					tree.expandPath(path);
+				}
+			});
 		}
-
-		public void treeNodesInserted(TreeModelEvent e) {
-			tree.scrollPathToVisible(e.getTreePath());
-		}
-
-		public void treeNodesRemoved(TreeModelEvent e) {
-		}
-
-		public void treeStructureChanged(TreeModelEvent e) {
-		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -160,16 +157,15 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 					menuBuilder = new PopupMenuBuilder(leafNode.toString());
 
-					menuBuilder
-							.addAction(new ExportDelimitedFileAction(DataListView.this, leafNode));
+					menuBuilder.addAction(new ExportDelimitedFileAction(DataListView.this, leafNode));
 					menuBuilder.addAction(new ExportMatlabAction(DataListView.this, leafNode));
 
 					if (leafNode instanceof NeoTreeNode) {
 						NeoTreeNode neoTreeNode = (NeoTreeNode) leafNode;
 
 						if (neoTreeNode.getNeoNode() != null) {
-							menuBuilder.addAction(new ConfigureAction("Configure", neoTreeNode
-									.getNeoNode()));
+							menuBuilder.addAction(new ConfigureAction("Configure",
+									neoTreeNode.getNeoNode()));
 						}
 					}
 
@@ -293,13 +289,15 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		private static final long serialVersionUID = 1L;
 
 		private List<MutableTreeNode> nodesToRemove;
+		private List<MutableTreeNode> nodesRemoved;
 
-		Hashtable<MutableTreeNode, UndoInfo> undoLUT;
+		private Hashtable<MutableTreeNode, UndoInfo> undoLUT;
 
 		public RemoveTreeNodes(List<MutableTreeNode> nodesToRemove) {
 			super("Clear data");
 
 			this.nodesToRemove = nodesToRemove;
+			this.nodesRemoved = new ArrayList<MutableTreeNode>((int) (nodesToRemove.size() * 1.2f));
 		}
 
 		@Override
@@ -307,12 +305,44 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			undoLUT = new Hashtable<MutableTreeNode, UndoInfo>(nodesToRemove.size());
 
 			for (MutableTreeNode nodeToRemove : nodesToRemove) {
-				TreeNode nodeParent = nodeToRemove.getParent();
+				TreeNode parentNode = nodeToRemove.getParent();
+				removeNodeFromParent(nodeToRemove);
+				ensureNoOrphans(parentNode);
+			}
+		}
+
+		/**
+		 * Removes the node from the tree
+		 * 
+		 * @param nodeToRemove
+		 */
+		private void removeNodeFromParent(MutableTreeNode nodeToRemove) {
+			TreeNode nodeParent = nodeToRemove.getParent();
+
+			if (nodeParent != null) {
 				int nodeIndex = nodeParent.getIndex(nodeToRemove);
 
 				undoLUT.put(nodeToRemove, new UndoInfo(nodeParent, nodeIndex));
-
 				dataModel.removeNodeFromParent(nodeToRemove);
+				nodesRemoved.add(nodeToRemove);
+			}
+		}
+
+		/**
+		 * Walks up the node tree ensuring no orphan nodes are left
+		 * 
+		 * @param node
+		 */
+		private void ensureNoOrphans(TreeNode node) {
+			if (node instanceof MutableTreeNode && node.getChildCount() == 0) {
+				MutableTreeNode nodeToRemove = (MutableTreeNode) node;
+				TreeNode nodeParent = nodeToRemove.getParent();
+
+				removeNodeFromParent(nodeToRemove);
+
+				if (nodeParent != null) {
+					ensureNoOrphans(nodeParent);
+				}
 			}
 		}
 
@@ -324,14 +354,15 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			 * To maintain same node order as before the removal. we add back in
 			 * the reverse order we remove them.
 			 */
-			for (int i = nodesToRemove.size() - 1; i >= 0; i--) {
-				MutableTreeNode nodeToRemove = nodesToRemove.get(i);
+			for (int i = nodesRemoved.size() - 1; i >= 0; i--) {
+				MutableTreeNode nodeToRemove = nodesRemoved.get(i);
 
 				UndoInfo undoInfo = undoLUT.get(nodeToRemove);
 				if (undoInfo != null) {
 					if (undoInfo.nodeParent instanceof MutableTreeNode) {
 						dataModel.insertNodeInto(nodeToRemove,
-								(MutableTreeNode) undoInfo.nodeParent, undoInfo.nodeIndex);
+								(MutableTreeNode) undoInfo.nodeParent,
+								undoInfo.nodeIndex);
 					} else {
 						numOfFailures++;
 					}
@@ -394,7 +425,8 @@ abstract class ExportAction extends StandardAction {
 
 	private static ExportFileChooser fileChooser = new ExportFileChooser();
 
-	public static void findDataItemsRecursive(MutableTreeNode node, ArrayList<String> position,
+	public static void findDataItemsRecursive(MutableTreeNode node,
+			ArrayList<String> position,
 			Collection<DataPath> dataItemsPaths) {
 
 		if (node instanceof DataTreeNode) {
@@ -444,7 +476,9 @@ abstract class ExportAction extends StandardAction {
 		if (result == JFileChooser.APPROVE_OPTION) {
 			if (fileChooser.getSelectedFile().exists()) {
 				int response = JOptionPane.showConfirmDialog(fileChooser,
-						"File already exists, replace?", "Warning", JOptionPane.YES_NO_OPTION);
+						"File already exists, replace?",
+						"Warning",
+						JOptionPane.YES_NO_OPTION);
 
 				if (response != JOptionPane.YES_OPTION) {
 					throw new UserCancelledException();
