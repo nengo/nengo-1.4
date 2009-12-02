@@ -39,6 +39,7 @@ class Graph(core.DataViewComponent):
         if self.label is not None:
             self.popup.add(JCheckBoxMenuItem('label',False,stateChanged=self.toggle_label))
 
+
     def initialize_map(self):
         data=self.data.get_first()
         rows=int(sqrt(len(data)))
