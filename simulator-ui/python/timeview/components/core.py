@@ -117,7 +117,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
             h=self.mouse_pressed_size.height+event.y-self.mouse_pressed_y
             if h<self.min_height: h=self.min_height
             self.setSize(self.size.width,h)
-        self.repaint()    
+        self.view.area.repaint()    
             
     def mouseMoved(self, event):      
         size=self.resize_border
