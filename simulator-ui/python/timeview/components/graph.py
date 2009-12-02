@@ -7,6 +7,8 @@ from java.awt import *
 from java.awt.event import *
 
 from math import sqrt
+from math import log
+from math import ceil
 
 def safe_get_index(x,i):
     if x is None: return None
@@ -64,7 +66,8 @@ class Graph(core.DataViewComponent):
         core.DataViewComponent.restore(self,d)
         
         data_dim = len(self.data.get_first())       # Get dimensionality of data
-        self.indices = [False] * min(self.max_show_dim, data_dim)
+        #self.indices = [False] * min(self.max_show_dim, data_dim)
+        self.indices = [False] * data_dim
         
         if( 'sel_dim' in d.keys() ):
             sel_dim = d['sel_dim']
@@ -102,11 +105,21 @@ class Graph(core.DataViewComponent):
         
     def fix_popup(self):
         self.popup.add(JPopupMenu.Separator())
+        
+        # Calculate number of submenu layers needed
+        max_ind = len(self.indices)
+        num_sub = int(ceil(log(max_ind) / log(self.max_show_dim)))
+        max_sub = [self.max_show_dim ** (num_sub - i) for i in range(num_sub)]
+        sub_menus = [self.popup] * num_sub
+        
         for i,draw in enumerate(self.indices):
-            if i<self.max_show_dim:
-                self.popup.add(JCheckBoxMenuItem('%s[%d]'%('v',i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state)))
-        
-        
+            if( i % self.max_show_dim == 0 ):
+                for n in range(num_sub-1):
+                    if( i % max_sub[n+1] == 0 ):
+                        new_menu = JMenu("%s[%d:%d]" % ('v', i, min(max_ind, i + max_sub[n+1]) - 1))
+                        sub_menus[n].add(new_menu)
+                        sub_menus[n+1] = new_menu
+            sub_menus[num_sub-1].add(JCheckBoxMenuItem('%s[%d]'%('v',i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state)))
         
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
@@ -153,7 +166,8 @@ class Graph(core.DataViewComponent):
         if self.indices is None:
             for x in data:
                 if x is not None:
-                    self.indices=[False]*min(self.max_show_dim,len(x))
+                    #self.indices=[False]*min(self.max_show_dim,len(x))
+                    self.indices=[False]*len(x)
                     for i in range(self.default_selected): 
                         if i<len(x): self.indices[i]=True
                     self.fix_popup()    
