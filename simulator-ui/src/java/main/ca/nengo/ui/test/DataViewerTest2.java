@@ -7,8 +7,8 @@ Software distributed under the License is distributed on an "AS IS" basis, WITHO
 WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
 language governing rights and limitations under the License.
 
-The Original Code is "PlotTimeSeries.java". Description: 
-"Action for Plotting
+The Original Code is "GFuzzyLogicExample.java". Description: 
+"In this example, a Fuzzy Logic network is constructed
   
   @author Shu Wu"
 
@@ -22,37 +22,41 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
-package ca.nengo.ui.actions;
+package ca.nengo.ui.test;
 
-import ca.nengo.plot.Plotter;
-import ca.nengo.util.TimeSeries;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
+import ca.nengo.model.StructuralException;
+import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.actions.RunSimulatorAction;
+import ca.nengo.ui.dev.ExampleRunner;
+import ca.nengo.ui.dev.FuzzyLogicExample;
+import ca.nengo.ui.models.nodes.UINetwork;
 
 /**
- * Action for Plotting
+ * Creates a Fuzzy Network, and runs it for 1 second
  * 
  * @author Shu Wu
  */
-public class PlotTimeSeriesRaw extends StandardAction {
+public class DataViewerTest2 extends ExampleRunner {
 
-	private static final long serialVersionUID = 1L;
-	private TimeSeries data;
-	private String plotName;
+	public static void main(String[] args) {
 
-	public PlotTimeSeriesRaw(TimeSeries data, String plotName) {
-		super("Plot raw data");
-		this.data = data;
-		this.plotName = plotName + "  [ " + data.getName() + " ]";
+		try {
+			new DataViewerTest2();
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public DataViewerTest2() throws StructuralException {
+		super(FuzzyLogicExample.createNetwork());
 	}
 
 	@Override
-	protected void action() throws ActionException {
-
-		Plotter.plot(data, plotName);
-
+	protected void doStuff(UINetwork network) {
+		(new RunSimulatorAction("Run", network, 0f, 1f, 0.002f)).doAction();
+		NengoGraphics.getInstance().setDataViewerPaneVisible(true);
 	}
 
 }

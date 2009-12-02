@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import ca.nengo.ui.actions.PlotTimeSeriesFiltered;
-import ca.nengo.ui.actions.PlotTimeSeriesRaw;
+import ca.nengo.ui.actions.PlotTimeSeries;
 import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.nengo.util.Probe;
@@ -58,10 +57,10 @@ public class ProbePlotHelper {
 			boolean applyFilterByDefault) {
 
 		if (applyFilterByDefault) {
-			return new PlotTimeSeriesFiltered(data, plotName, false, getDefaultTauFilter(),
-					getDefaultSubSampling());
+			return new PlotTimeSeries("Plot w/ filter", data, plotName, false,
+					getDefaultTauFilter(), getDefaultSubSampling());
 		} else {
-			return new PlotTimeSeriesRaw(data, plotName);
+			return new PlotTimeSeries("Plot raw data", data, plotName, false, 0, 0);
 		}
 
 	}
@@ -81,9 +80,9 @@ public class ProbePlotHelper {
 	public Collection<StandardAction> getPlotActions(TimeSeries data, String plotName) {
 		List<StandardAction> actions = new ArrayList<StandardAction>(2);
 
-		actions.add(new PlotTimeSeriesRaw(data, plotName));
-		actions.add(new PlotTimeSeriesFiltered(data, plotName, true, getDefaultTauFilter(),
-				getDefaultSubSampling()));
+		actions.add(new PlotTimeSeries("Plot raw data", data, plotName, false, 0, 0));
+		actions.add(new PlotTimeSeries("Plot w/ options", data, plotName, true,
+				getDefaultTauFilter(), getDefaultSubSampling()));
 		return actions;
 	}
 

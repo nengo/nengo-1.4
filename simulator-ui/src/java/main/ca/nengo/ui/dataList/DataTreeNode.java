@@ -206,6 +206,10 @@ abstract class TimeSeriesNode extends DataTreeNode {
 		}
 	}
 
+	public boolean isApplyFilterByDefault() {
+		return applyFilterByDefault;
+	}
+
 	@Override
 	public StandardAction getDefaultAction() {
 		return ProbePlotHelper.getInstance().getDefaultAction(getUserObject(),

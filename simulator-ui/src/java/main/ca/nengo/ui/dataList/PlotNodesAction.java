@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.dataList;
 
@@ -31,6 +31,7 @@ import java.util.List;
 import javax.swing.tree.MutableTreeNode;
 
 import ca.nengo.plot.Plotter;
+import ca.nengo.util.DataUtils;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.TimeSeries;
 import ca.shu.ui.lib.actions.ActionException;
@@ -40,7 +41,7 @@ public class PlotNodesAction extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
 
-	Collection<DataTreeNode> nodes;
+	private Collection<DataTreeNode> nodes;
 
 	public PlotNodesAction(Collection<DataTreeNode> nodes) {
 		super("Plot data together");
@@ -52,15 +53,24 @@ public class PlotNodesAction extends StandardAction {
 		/*
 		 * Get nodes to be plotted together
 		 */
-		List<TimeSeries> timeSeries = new ArrayList<TimeSeries>(nodes.size());
-		List<SpikePattern> spikePatterns = new ArrayList<SpikePattern>(nodes
-				.size());
+		List<TimeSeries> timeSeriesList = new ArrayList<TimeSeries>(nodes.size());
+		List<SpikePattern> spikePatterns = new ArrayList<SpikePattern>(nodes.size());
 
 		for (MutableTreeNode node : nodes) {
 			if (node instanceof SpikePatternNode) {
 				spikePatterns.add(((SpikePatternNode) node).getUserObject());
 			} else if (node instanceof TimeSeriesNode) {
-				timeSeries.add(((TimeSeriesNode) node).getUserObject());
+				TimeSeriesNode timeSeriesNode = (TimeSeriesNode) node;
+
+				TimeSeries timeSeries = timeSeriesNode.getUserObject();
+
+				float tauFilter = ProbePlotHelper.getInstance().getDefaultTauFilter();
+
+				if (tauFilter != 0 && timeSeriesNode.isApplyFilterByDefault()) {
+					timeSeries = DataUtils.filter(timeSeries, tauFilter);
+				}
+
+				timeSeriesList.add(timeSeries);
 			} else {
 				throw new UnsupportedOperationException(
 						"This type of data node is not supported for plotting together");
@@ -68,6 +78,6 @@ public class PlotNodesAction extends StandardAction {
 
 		}
 
-		Plotter.plot(timeSeries, spikePatterns, "Data Plot");
+		Plotter.plot(timeSeriesList, spikePatterns, "Data Plot");
 	}
 }

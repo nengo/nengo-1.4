@@ -55,8 +55,8 @@ public class DataViewerTest {
 		network.openViewer();
 		network.getViewer().getGround().setElasticEnabled(true);
 
-		(new Thread(new Runnable() {
 
+		(new Thread(new Runnable() {
 			public void run() {
 				try {
 					buildNetwork(network.getModel());

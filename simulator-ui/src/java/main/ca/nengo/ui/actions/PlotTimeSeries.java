@@ -47,7 +47,7 @@ import ca.shu.ui.lib.util.UserMessages;
  * 
  * @author Shu Wu
  */
-public class PlotTimeSeriesFiltered extends StandardAction {
+public class PlotTimeSeries extends StandardAction {
 
 	private static final long serialVersionUID = 1L;
 	private TimeSeries timeSeries;
@@ -56,12 +56,14 @@ public class PlotTimeSeriesFiltered extends StandardAction {
 	private float tauFilter;
 	private int subSampling;
 
-	public PlotTimeSeriesFiltered(TimeSeries timeSeries,
+	public PlotTimeSeries(
+			String actionName, 
+			TimeSeries timeSeries,
 			String plotName,
 			boolean showUserConfigDialog,
 			float defaultTau,
 			int defaultSubSampling) {
-		super("Plot with options", "Plot w/ options");
+		super(actionName);
 		this.timeSeries = timeSeries;
 		this.showUserConfigDialog = showUserConfigDialog;
 		this.plotName = plotName + "  [ " + timeSeries.getName() + " ]";
@@ -95,19 +97,17 @@ public class PlotTimeSeriesFiltered extends StandardAction {
 
 			}
 
-			TimeSeries timeSeriesToShow;
+			TimeSeries timeSeriesToShow = timeSeries;
 
 			if (subSampling != 0) {
-				timeSeriesToShow = DataUtils.subsample(timeSeries, subSampling);
-			} else {
-				timeSeriesToShow = timeSeries;
+				timeSeriesToShow = DataUtils.subsample(timeSeriesToShow, subSampling);
 			}
 
 			if (tauFilter != 0) {
-				Plotter.plot(timeSeriesToShow, tauFilter, plotName);
-			} else {
-				Plotter.plot(timeSeriesToShow, plotName);
+				timeSeriesToShow = DataUtils.filter(timeSeriesToShow, tauFilter);
 			}
+
+			Plotter.plot(timeSeriesToShow, plotName);
 
 		} catch (java.lang.NumberFormatException exception) {
 			exception.printStackTrace();
