@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import ca.nengo.model.SimulationMode;
+import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.ui.actions.PlotTimeSeries;
 import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
@@ -93,12 +95,13 @@ public class ProbePlotHelper {
 	 */
 	public boolean isApplyTauFilterByDefault(Probe probe) {
 
-		// Ex.
-		// if (probe.getTarget() instanceof Ensemble) {
-		// return ((Ensemble) probe).isCollectingSpikes();
-		// }
-
-		return true;
+		if (probe.getTarget() instanceof NEFEnsemble) {
+			NEFEnsemble e = (NEFEnsemble) probe.getTarget();
+			if ((e.getMode() == SimulationMode.DEFAULT )|| (e.getMode() == SimulationMode.PRECISE)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setDefaultSubSampling(int value) {
