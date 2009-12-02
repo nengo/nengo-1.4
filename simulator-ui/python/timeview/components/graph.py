@@ -25,6 +25,7 @@ class Graph(core.DataViewComponent):
         self.border_left=30
         self.border_right=30
         self.border_bottom=20
+        self.default_selected=5     # The default number of selected display dimensions
         self.filter=filter
         self.setSize(300,200)
         self.ylimits=ylimits
@@ -44,7 +45,30 @@ class Graph(core.DataViewComponent):
         if rows*cols<len(data): cols+=1
             
         self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)
+
+    def save(self):
+        save_info = core.DataViewComponent.save(self)
         
+        for n in range(len(self.indices)):          # Save the checkbox states
+            save_info['cb#'+str(n)] = self.indices[n]
+        
+        return save_info            
+    
+    def restore(self,d):
+        core.DataViewComponent.restore(self,d)
+        
+        data_dim = len(self.data.get_first())       # Get dimensionality of data
+        self.indices = [False] * data_dim           # Initialize indices       
+        
+        for n in range(data_dim):                   # Iterate and restore the saved state
+            try:                                    # Ignore entries that cannot be found
+                self.indices[n] = d['cb#'+str(n)]
+            except:
+                if( n < self.default_selected ):
+                    self.indices[n] = True          # Default setting (first five selected)
+                pass
+                
+        self.fix_popup()                            # Update the pop-up box
         
     def round(self,x):
         sign=1
@@ -123,7 +147,7 @@ class Graph(core.DataViewComponent):
             for x in data:
                 if x is not None:
                     self.indices=[False]*len(x)
-                    for i in range(5): 
+                    for i in range(self.default_selected): 
                         if i<len(x): self.indices[i]=True
                     self.fix_popup()    
                     break
