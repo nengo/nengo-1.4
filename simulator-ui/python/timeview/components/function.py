@@ -13,7 +13,7 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         self.name=name
         self.func=func
         self.resize_border=2
-        self.range=2.0
+        self.range=1.0
         self.popup.add(JMenuItem('increase range',actionPerformed=self.increase_range))
         self.popup.add(JMenuItem('decrease range',actionPerformed=self.decrease_range))
 
