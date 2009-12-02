@@ -36,7 +36,7 @@ class View3D(core.DataViewComponent,ComponentListener,KeyListener):
     def componentShown(self,event):
         pass
     def keyPressed(self,event):
-        java.lang.System.out.println("key: "%event.keyCode)
+        #java.lang.System.out.println("key: "%event.keyCode)
         if event.keyCode==KeyEvent.VK_W:
             camera=self.view.watcher.objects[self.name]._simulator.model.world.camera
             camera.moveCamera(camera.getZAxis(),1)
@@ -59,7 +59,7 @@ class View3D(core.DataViewComponent,ComponentListener,KeyListener):
             dy=event.y-self.mouse_pressed_y
             self.mouse_pressed_x=event.x
             self.mouse_pressed_y=event.y
-            java.lang.System.out.println("event %s "%(event))
+            #java.lang.System.out.println("event %s "%(event))
             if event.modifiersEx & InputEvent.BUTTON3_DOWN_MASK:
                 camera.rotateCameraAxis(SimpleVector(-dy,dx,0),0.003)            
                 #camera.align(self.view.watcher.objects[self.name]._simulator.model.room)
