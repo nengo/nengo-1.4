@@ -66,7 +66,6 @@ class Graph(core.DataViewComponent):
         core.DataViewComponent.restore(self,d)
         
         data_dim = len(self.data.get_first())       # Get dimensionality of data
-        #self.indices = [False] * min(self.max_show_dim, data_dim)
         self.indices = [False] * data_dim
         
         if( 'sel_dim' in d.keys() ):
@@ -166,7 +165,6 @@ class Graph(core.DataViewComponent):
         if self.indices is None:
             for x in data:
                 if x is not None:
-                    #self.indices=[False]*min(self.max_show_dim,len(x))
                     self.indices=[False]*len(x)
                     for i in range(self.default_selected): 
                         if i<len(x): self.indices[i]=True
