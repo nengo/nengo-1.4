@@ -50,7 +50,7 @@ class EnsembleWatch:
     def encoder(self,obj):
         return [x[0] for x in obj.encoders]
     def views(self,obj):
-        return [
+        r=[
             ('voltage grid',components.Grid,dict(func=self.voltage,sfunc=self.spikes_only)),
             ('voltage graph',components.Graph,dict(func=self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
             ('firing rate',components.Grid,dict(func=self.spikes,min=0,max=lambda self: 200*self.view.dt,filter=True)),       
@@ -60,6 +60,12 @@ class EnsembleWatch:
             #('firing rate',lambda view,name,type: components.Grid(view,name,type,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
             #('spike raster',lambda view,name,type: components.SpikeRaster(view,name,type,self.spikes)),
             ]
+        if obj.dimension==2:
+          r+=[    
+            ('preferred directions',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 500*self.view.dt,filter=True)),       
+            #('decoders',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 0.1*self.view.dt,filter=True,decoders=True)),       
+             ]
+        return r   
 
 class NodeWatch:
     def check(self,obj):
