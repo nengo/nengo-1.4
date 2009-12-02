@@ -317,6 +317,14 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             if isinstance(comp,components.core.DataViewComponent):
                 layout.append((comp.name,comp.type,comp.save()))
         db[key]=self.view_save(),layout
+        
+        # Save time control settings
+        db['sim_spd'] = self.time_control.rate_combobox.getSelectedIndex()
+        db['dt'] = self.time_control.dt_combobox.getSelectedIndex()
+        db['rcd_time'] = self.time_control.record_time_spinner.getValue()
+        db['filter'] = self.time_control.filter_spinner.getValue()
+        db['show_time'] = self.time_control.time_shown_spinner.getValue()
+        
         db.close()
 
     def restore(self):
@@ -324,6 +332,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         key=self.network.name
         
         if key not in db.keys(): return False
+        db_keys = db.keys()
         view_data,layout=db[key]
         self.clear_all()
         for name,type,data in layout:
@@ -339,6 +348,19 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                             c.restore(data)    
                             self.area.add(c)
                             break
+        
+        # Restore time control settings
+        if( 'sim_spd' in db_keys ):
+            self.time_control.rate_combobox.setSelectedIndex(db['sim_spd'])
+        if( 'dt' in db_keys ):
+            self.time_control.dt_combobox.setSelectedIndex(db['dt'])
+        if( 'rcd_time' in db_keys ):
+            self.time_control.record_time_spinner.setValue(db['rcd_time'])
+        if( 'filter' in db_keys ):
+            self.time_control.filter_spinner.setValue(db['filter'])
+        if( 'show_time' in db_keys ):
+            self.time_control.time_shown_spinner.setValue(db['show_time'])
+                            
         self.view_restore(view_data)
         db.close()
         self.area.repaint()
@@ -496,13 +518,15 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
         
         spin2=JPanel(layout=BorderLayout(),opaque=False)
-        spin2.add(JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.tau_filter))
+        self.filter_spinner = JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.tau_filter)
+        spin2.add(self.filter_spinner)
         spin2.add(JLabel('filter'),BorderLayout.NORTH)
         spin2.maximumSize=spin2.preferredSize
         configPanel.add(spin2)
 
         spin3=JPanel(layout=BorderLayout(),opaque=False)
-        spin3.add(JSpinner(SpinnerNumberModel(self.view.time_shown,0.01,50,0.1),stateChanged=self.time_shown))
+        self.time_shown_spinner = JSpinner(SpinnerNumberModel(self.view.time_shown,0.01,50,0.1),stateChanged=self.time_shown)
+        spin3.add(self.time_shown_spinner)
         spin3.add(JLabel('time shown'),BorderLayout.NORTH)
         spin3.maximumSize=spin3.preferredSize
         configPanel.add(spin3)
