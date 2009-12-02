@@ -82,16 +82,17 @@ public class UIStateProbe extends UIProbe {
 						state,
 						true);
 
-				nodeAttachedTo.showPopupMessage("Probe (" + state + ") added to Simulator");
-
-			} else if (nodeAttachedTo.getNetworkParent() == null) {
-				throw new SimulationException(
-						"Cannot add a probe to a node that is not inside a Network");
-			} else {
+			} else if (nodeAttachedTo.getNetworkParent() != null) {
 				probe = nodeAttachedTo.getNetworkParent().getSimulator().addProbe(node.getName(),
 						state,
 						true);
+			} else {
+				throw new SimulationException(
+						"Cannot add a probe to a node that is not inside a Network");
 			}
+			
+			nodeAttachedTo.showPopupMessage("Probe (" + state + ") added");
+
 		} catch (SimulationException exception) {
 			// nodeAttachedTo.popupTransientMsg("Could not add Probe (" + state
 			// + ") added to Simulator");

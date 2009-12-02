@@ -258,8 +258,8 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		super.constructTooltips(tooltips);
 
 		if (getModel().getDocumentation() != null) {
-			tooltips.addProperty("Documentation", Util.truncateString(
-					getModel().getDocumentation(), 100));
+			tooltips.addProperty("Documentation",
+					Util.truncateString(getModel().getDocumentation(), 100));
 		}
 		tooltips.addProperty("Simulation mode", getModel().getMode().toString());
 
@@ -289,8 +289,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		Termination[] terminations = getModel().getTerminations();
 		if (terminations.length > 0) {
 
-			AbstractMenuBuilder terminationsMenu = originsAndTerminations
-					.addSubMenu("Show termination");
+			AbstractMenuBuilder terminationsMenu = originsAndTerminations.addSubMenu("Show termination");
 
 			for (Termination element : terminations) {
 				terminationsMenu.addAction(new ShowTerminationAction(element.getName()));
@@ -468,8 +467,9 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 					 */
 					try {
 						CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-						nodeContainer.addNodeModel(getModel(), newPosition.getX(), newPosition
-								.getY());
+						nodeContainer.addNodeModel(getModel(),
+								newPosition.getX(),
+								newPosition.getY());
 					} catch (UserCancelledException e) {
 						e.defaultHandleBehavior();
 					}
@@ -507,13 +507,22 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 * @return The Network model the Node is attached to
 	 */
 	public UINetwork getNetworkParent() {
-		WorldImpl viewer = getWorld();
+		NodeViewer viewer = getParentViewer();
 
 		/*
 		 * Can only access parent network if the Node is inside a Network Viewer
 		 */
 		if (viewer instanceof NetworkViewer) {
 			return ((NetworkViewer) viewer).getViewerParent();
+		} else if (viewer != null) {
+			// Found the parent viewer, but it's not a network viewer
+			// Recursively iterate up the view graph until we find the NetworkViewer or not
+			//
+			WorldObject viewerParent = viewer.getViewerParent();
+
+			if (viewerParent instanceof UINeoNode) {
+				return ((UINeoNode) viewerParent).getNetworkParent();
+			}
 		}
 
 		return null;
@@ -873,8 +882,13 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 			editor.setText(prevDoc);
 
 			int rtnValue = JOptionPane.showOptionDialog(UIEnvironment.getInstance(),
-					new JScrollPane(editor), getName() + " - Documenation Editor",
-					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+					new JScrollPane(editor),
+					getName() + " - Documenation Editor",
+					JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE,
+					null,
+					null,
+					null);
 
 			if (rtnValue == JOptionPane.OK_OPTION) {
 				String text = editor.getText();
@@ -975,8 +989,8 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 		@Override
 		protected void action() throws ActionException {
-			UserMessages.showTextDialog(getName() + " - Documentation Viewer", getModel()
-					.getDocumentation());
+			UserMessages.showTextDialog(getName() + " - Documentation Viewer",
+					getModel().getDocumentation());
 		}
 
 	}
