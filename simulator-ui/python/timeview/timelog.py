@@ -18,6 +18,7 @@ class TimeLogItem:
         try:
             v=self.func(*self.args,**self.kwargs)
         except Exception,e:
+            import java
             java.lang.System.out.println("Tick error: %s %s %s\n%s"%(self.func,self.args,self.kwargs,e))
             v=None
         self.data.append(v)

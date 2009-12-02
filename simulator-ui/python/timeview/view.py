@@ -117,6 +117,22 @@ class FunctionWatch:
             ('control',components.FunctionControl,dict(func=self.funcOrigin)),
             ]
 
+import space
+import ccm.nengo
+class RoomWatch:
+    def check(self,obj):
+        if isinstance(obj,ccm.nengo.CCMModelNetwork):
+            if isinstance(obj._simulator.model,space.Room):
+                return True
+        return False
+    def physics(self,obj):
+        return obj._simulator.model.physics_dump()
+    def views(self,obj):
+        return [
+            ('3D view',components.View3D,dict(func=self.physics)),
+            ]
+
+
 
 import math
 class ViewPanel(JPanel):
@@ -198,6 +214,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.watcher.add_watch(NodeWatch())
         self.watcher.add_watch(EnsembleWatch())
         self.watcher.add_watch(FunctionWatch())
+        self.watcher.add_watch(RoomWatch())
         
         
         self.frame=JFrame(network.name)
@@ -377,6 +394,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
     def run(self):
         while self.frame.visible:
             self.network.simulator.resetNetwork(True)
+            for n in self.network.nodes:
+                if hasattr(n,'simulator'): n.simulator.resetNetwork(True)
             now=0.0000000000001  
             self.network.simulator.run(0,now,now)   # run the simulation a bit so initial values of functioninputs get to the origins
             self.watcher.reset()
