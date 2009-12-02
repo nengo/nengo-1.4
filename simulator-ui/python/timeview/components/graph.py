@@ -50,8 +50,12 @@ class Graph(core.DataViewComponent):
     def save(self):
         save_info = core.DataViewComponent.save(self)
         
-        for n in range(len(self.indices)):          # Save the checkbox states
-            save_info['cb#'+str(n)] = self.indices[n]
+        sel_dim = []
+        for n in range(len(self.indices)):          # Get the checkbox states
+            if( self.indices[n] ):
+                sel_dim += [n]
+            
+        save_info['sel_dim'] = sel_dim              # Save the checkbox states
         
         return save_info            
     
@@ -61,13 +65,14 @@ class Graph(core.DataViewComponent):
         data_dim = len(self.data.get_first())       # Get dimensionality of data
         self.indices = [False] * min(self.max_show_dim, data_dim)
         
-        for n in range(data_dim):                   # Iterate and restore the saved state
-            try:                                    # Ignore entries that cannot be found
-                self.indices[n] = d['cb#'+str(n)]
-            except:
-                if( n < self.default_selected ):
-                    self.indices[n] = True          # Default setting (first five selected)
-                pass
+        if( 'sel_dim' in d.keys() ):
+            sel_dim = d['sel_dim']
+        else:
+            sel_dim = range(min(data_dim, self.default_selected))
+        
+        for dim in sel_dim:                         # Iterate and restore the saved state
+            if( dim < data_dim ):
+                self.indices[dim] = True
                 
         self.fix_popup()                            # Update the pop-up box
         
