@@ -107,7 +107,7 @@ class Graph(core.DataViewComponent):
         
         # Calculate number of submenu layers needed
         max_ind = len(self.indices)
-        num_sub = int(ceil(log(max_ind) / log(self.max_show_dim)))
+        num_sub = max(1,int(ceil(log(max_ind) / log(self.max_show_dim))))
         max_sub = [self.max_show_dim ** (num_sub - i) for i in range(num_sub)]
         sub_menus = [self.popup] * num_sub
         
