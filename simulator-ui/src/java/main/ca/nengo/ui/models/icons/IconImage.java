@@ -61,7 +61,7 @@ class IconImageNode extends PXImage {
 	private static final long serialVersionUID = 1L;
 	private static final Ellipse2D.Float TEMP_ELLIPSE = new Ellipse2D.Float();
 
-	public static final boolean ENABLE_SEMANTIC_ZOOM = false;
+	public static boolean ENABLE_SEMANTIC_ZOOM = false;
 
 	private transient GeneralPath path;
 

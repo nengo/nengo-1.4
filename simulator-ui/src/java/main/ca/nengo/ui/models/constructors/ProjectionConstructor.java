@@ -1,12 +1,9 @@
 package ca.nengo.ui.models.constructors;
 
-import javax.swing.JOptionPane;
-
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PString;
-import ca.shu.ui.lib.util.UIEnvironment;
 
 public abstract class ProjectionConstructor extends AbstractConstructable {
 	protected static final Property pName = new PString("Name");

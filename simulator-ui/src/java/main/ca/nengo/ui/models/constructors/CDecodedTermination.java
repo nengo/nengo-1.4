@@ -34,7 +34,6 @@ import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PBoolean;
 import ca.nengo.ui.configurable.descriptors.PFloat;
-import ca.nengo.ui.configurable.descriptors.PString;
 import ca.nengo.ui.configurable.descriptors.PTerminationWeights;
 import ca.nengo.ui.models.nodes.widgets.UIDecodedTermination;
 

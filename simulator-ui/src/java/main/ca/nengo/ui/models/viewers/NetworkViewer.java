@@ -34,6 +34,8 @@ import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
+import org.python.util.PythonInterpreter;
+
 import ca.nengo.config.ClassRegistry;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
@@ -43,7 +45,6 @@ import ca.nengo.model.Projection;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.plot.Plotter;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CreateModelAdvancedAction;
@@ -69,9 +70,7 @@ import ca.shu.ui.lib.util.Util;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
-import edu.uci.ics.jung.visualization.contrib.KKLayout;
 import edu.umd.cs.piccolo.util.PBounds;
-import org.python.util.PythonInterpreter;
 
 /**
  * Viewer for peeking into a Network

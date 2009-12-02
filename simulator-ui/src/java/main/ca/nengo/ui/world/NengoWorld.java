@@ -4,12 +4,10 @@ import java.awt.geom.Point2D;
 
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
-import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.constructors.CNetwork;
-import ca.shu.ui.lib.actions.DragAction;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 import ca.shu.ui.lib.world.elastic.ElasticWorld;
