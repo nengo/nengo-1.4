@@ -13,6 +13,9 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         self.name=name
         self.func=func
         self.resize_border=2
+        self.range=2.0
+        self.popup.add(JMenuItem('increase range',actionPerformed=self.increase_range))
+        self.popup.add(JMenuItem('decrease range',actionPerformed=self.decrease_range))
 
         self.data=self.view.watcher.watch(name,func)
 
@@ -21,7 +24,10 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         self.sliders=[]
         self.labels=[]
         for i,v in enumerate(values):
-            slider=JSlider(JSlider.VERTICAL,-100,100,int(v*100),stateChanged=lambda event,index=i: self.slider_moved(index))
+            vv=int(v*100/self.range)
+            if vv>100: vv=100
+            if vv<-100: vv=-100
+            slider=JSlider(JSlider.VERTICAL,-100,100,vv,stateChanged=lambda event,index=i: self.slider_moved(index))
             slider.background=Color.white
             self.add(slider)
             self.sliders.append(slider)
@@ -34,10 +40,17 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         self.addComponentListener(self)
         self.componentResized(None)
         
+    def increase_range(self,event):
+        self.range*=2.0
+        self.repaint()
+    def decrease_range(self,event):
+        self.range*=0.5
+        self.repaint()
+            
     
     def slider_moved(self,index):
         if self.sliders[index].valueIsAdjusting:   # if I moved it
-            v=self.sliders[index].value*0.01
+            v=self.sliders[index].value*0.01*self.range
             self.labels[index].text='%1.2f'%v
             if self.view.paused:  # change immediately, bypassing filter
                 self.data.data[-1][index]=v
@@ -57,7 +70,7 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             data=self.data.get_first()
         
         for i,v in enumerate(data):
-            sv=int(v*100)
+            sv=int(v*100.0/self.range)
             if sv>100: sv=100
             if sv<-100: sv=-100
             if not self.sliders[i].valueIsAdjusting:
@@ -87,3 +100,12 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
     def componentShown(self,e):
         pass
         
+    def save(self):
+        info = core.DataViewComponent.save(self)
+        info['range']=self.range
+        return info
+    
+    def restore(self,d):
+        core.DataViewComponent.restore(self,d)
+        self.range=d.get('range',1.0)
+
