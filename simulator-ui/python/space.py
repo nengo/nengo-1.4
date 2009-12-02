@@ -1,9 +1,8 @@
 from __future__ import generators
 
 import sys
-sys.path.append('python/jar/jpct.jar')
-sys.path.append('python/jar/jbullet.jar')
-sys.path.append('python/jar/vecmath.jar')
+for p in ['python/jar/jpct.jar','python/jar/jbullet.jar','python/jar/vecmath.jar']:
+    if p not in sys.path: sys.path.append(p)
 
 import java
 from javax.swing import *
@@ -92,7 +91,7 @@ class Room(ccm.Model):
         self.world.setAmbientLight(brightness, brightness, brightness)
         self.world.addLight(SimpleVector(2, 2, 5), 10,10,10)
         self.world.camera.setPosition(*camera)
-        self.world.camera.lookAt(SimpleVector(0, 0, 0))
+        self.world.camera.setOrientation(SimpleVector(0,0,-1),SimpleVector(0,-1,0))
 
         self.objects=[]
 
@@ -348,12 +347,27 @@ class Box(ccm.Model):
         self.extra_shapes.append((s,x,y,z))
         room.world.addObject(s)
         
+        
 class Sphere(ccm.Model):      
-    def __init__(self, r, mass=1):
+    def __init__(self, r, mass=1,color=Color.red):
+        colorname='sphere_%d'%id(self)
         self.shape=Primitives.getSphere(r)
-        TextureManager.getInstance().addTexture('red',Texture(1, 1, Color.red))
-        self.shape.setTexture('red')
+        TextureManager.getInstance().addTexture(colorname,Texture(1, 1, color))
+        self.shape.setTexture(colorname)
         self.shape.build()
+        
+        shape=BoxShape(Vector3f(r/2.0,r/2.0,r/2.0))
+
+        inertia=Vector3f(0,0,0)
+        shape.calculateLocalInertia(mass,inertia)
+
+        t=Transform()
+        t.setIdentity()
+        
+        ms=DefaultMotionState(t)
+        rb=RigidBodyConstructionInfo(mass,ms,shape,inertia)
+        self.physics=RigidBody(rb)
+        
 
 import math
 class MD2(ccm.Model):
