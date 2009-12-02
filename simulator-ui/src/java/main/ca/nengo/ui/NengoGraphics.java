@@ -58,6 +58,7 @@ import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
 import ca.nengo.ui.actions.PasteAction;
+import ca.nengo.ui.actions.RemoveModelAction;
 import ca.nengo.ui.actions.RunSimulatorAction;
 import ca.nengo.ui.actions.SaveNodeAction;
 import ca.nengo.ui.dataList.DataListView;
@@ -150,8 +151,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		JFrame frame = new NengoGraphics();
 
 		try {
-			Image image = ImageIO.read(frame.getClass().getClassLoader().getResource(
-					"ca/nengo/ui/spikepattern-black.png"));
+			Image image = ImageIO.read(frame.getClass().getClassLoader().getResource("ca/nengo/ui/spikepattern-black.png"));
 			frame.setIconImage(image);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -236,8 +236,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 								new WorldObject.Listener() {
 									public void propertyChanged(Property event) {
 										scriptConsole.removeVariable(modelName);
-										modelObject.removePropertyChangeListener(
-												Property.REMOVED_FROM_WORLD, this);
+										modelObject.removePropertyChangeListener(Property.REMOVED_FROM_WORLD,
+												this);
 									}
 								});
 
@@ -261,8 +261,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	private void initializeSimulatorSourceFiles() {
 
-		String savedSourceLocation = NengoConfigManager.getNengoConfig().getProperty(
-				"simulator_source");
+		String savedSourceLocation = NengoConfigManager.getNengoConfig().getProperty("simulator_source");
 
 		String simulatorSource = (savedSourceLocation != null) ? savedSourceLocation
 				: "../simulator/src/java/main";
@@ -342,8 +341,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 						if (fileName.endsWith(".class")) {
 							String className = "";
 							try {
-								className = fileName.substring(0, fileName.lastIndexOf('.'))
-										.replace('/', '.');// .replace('$',
+								className = fileName.substring(0, fileName.lastIndexOf('.')).replace('/',
+										'.');// .replace('$',
 								// '.');
 								Class<?> newClass = urlClassLoader.loadClass(className);
 
@@ -479,13 +478,18 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		StandardAction copyAction = null;
 		StandardAction cutAction = null;
 		StandardAction pasteAction = null;
+		StandardAction removeAction = null;
 
 		if (selectedObj != null && selectedObj instanceof UINeoNode) {
+			UINeoNode neoNode = (UINeoNode) selectedObj;
+
 			cutAction = new CutAction("Cut", (UINeoNode) selectedObj);
 			copyAction = new CopyAction("Copy", (UINeoNode) selectedObj);
+			removeAction = new RemoveModelAction("Remove", neoNode);
 		} else {
 			cutAction = new DisabledAction("Cut", "No object selected");
 			copyAction = new DisabledAction("Copy", "No object selected");
+			removeAction = new DisabledAction("Copy", "No objects to remove");
 		}
 
 		Node node = getClipboard().getContents();
@@ -501,6 +505,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 				MENU_SHORTCUT_KEY_MASK));
 		editMenu.addAction(pasteAction, KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V,
 				MENU_SHORTCUT_KEY_MASK));
+		editMenu.addAction(removeAction, KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,
+				0));
 
 	}
 
@@ -553,8 +559,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	@Override
 	public void exitAppFrame() {
 		if (getWorld().getGround().getChildrenCount() > 0) {
-			int response = JOptionPane.showConfirmDialog(this, "Save models before closing?",
-					"Exiting " + getAppName(), JOptionPane.YES_NO_CANCEL_OPTION);
+			int response = JOptionPane.showConfirmDialog(this,
+					"Save models before closing?",
+					"Exiting " + getAppName(),
+					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (response == JOptionPane.YES_OPTION) {
 
 				promptToSaveModels();
@@ -611,13 +619,16 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 		fileMenu.addAction(new CreateModelAction("New Network", this, new CNetwork()));
 
-		fileMenu.addAction(new OpenNeoFileAction(this), KeyEvent.VK_O, KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, MENU_SHORTCUT_KEY_MASK));
+		fileMenu.addAction(new OpenNeoFileAction(this),
+				KeyEvent.VK_O,
+				KeyStroke.getKeyStroke(KeyEvent.VK_O, MENU_SHORTCUT_KEY_MASK));
 
-		fileMenu.addAction(new SaveNetworkAction("Save Network"), KeyEvent.VK_S, KeyStroke
-				.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_KEY_MASK));
-		fileMenu.addAction(new RunNetworkAction("Run Network"), KeyEvent.VK_R, KeyStroke
-				.getKeyStroke(KeyEvent.VK_R, MENU_SHORTCUT_KEY_MASK));
+		fileMenu.addAction(new SaveNetworkAction("Save Network"),
+				KeyEvent.VK_S,
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_KEY_MASK));
+		fileMenu.addAction(new RunNetworkAction("Run Network"),
+				KeyEvent.VK_R,
+				KeyStroke.getKeyStroke(KeyEvent.VK_R, MENU_SHORTCUT_KEY_MASK));
 	}
 
 	@Override
@@ -627,16 +638,17 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
 		menuBar.add(viewMenu.getJMenu());
 
-		viewMenu.addAction(new OpenScriptEditor("Open Script Editor"), KeyEvent.VK_E, KeyStroke
-				.getKeyStroke(KeyEvent.VK_E, MENU_SHORTCUT_KEY_MASK));
+		viewMenu.addAction(new OpenScriptEditor("Open Script Editor"),
+				KeyEvent.VK_E,
+				KeyStroke.getKeyStroke(KeyEvent.VK_E, MENU_SHORTCUT_KEY_MASK));
 
 		int count = 1;
 		for (AuxillarySplitPane splitPane : splitPanes) {
 			byte shortCutChar = splitPane.getAuxTitle().getBytes()[0];
 
-			viewMenu.addAction(
-					new ToggleScriptPane("Toggle " + splitPane.getAuxTitle(), splitPane),
-					shortCutChar, KeyStroke.getKeyStroke(0x30 + count++, MENU_SHORTCUT_KEY_MASK));
+			viewMenu.addAction(new ToggleScriptPane("Toggle " + splitPane.getAuxTitle(), splitPane),
+					shortCutChar,
+					KeyStroke.getKeyStroke(0x30 + count++, MENU_SHORTCUT_KEY_MASK));
 
 		}
 	}
@@ -706,8 +718,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 		public void configureObj(Object obj) {
 
-			ConfigUtil.ConfigurationPane configurationPane = ConfigUtil
-					.createConfigurationPane(obj);
+			ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
 			// Style.applyStyle(configurationPane.getTree());
 			// Style.applyStyle(configurationPane.getCellRenderer());
 
