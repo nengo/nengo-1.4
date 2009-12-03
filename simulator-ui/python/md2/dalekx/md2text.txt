@@ -1,0 +1,109 @@
+created 27 July 1998
+last updated 17 December 1998
+
+================================================================
+
+Model Name              : DalekX
+
+installation directory  : quake2/baseq2/players/dalekx
+
+Author                  : James G Watt
+
+Skin Author		: James G Watt
+
+Additional Skins (imperial and supreme) : ZAXXON < ZaXXoN@mars-command.demon.co.uk >
+
+
+Email Address           : jim@kinetic-arts.demon.co.uk
+
+
+
+Model description       : A DALEK. Terry Nations terrifying creation 
+for the BBC T.V. show DrWho. This is my first quake model and I've 
+tried to create something quite close to the original dalek.
+
+
+Other info              : This is not only my first ever quake2 model but it's also my
+   first ever 3DstudioMAX model. I picked a dalek because I didn't
+   know how difficult it would be to create and animate a quake2 
+   model so a Dalek would be a simple first project. It turned
+   out to be quite easy so I'm going to attempt something a little
+   more ambitious next (something with arms and legs).
+
+
+
+
+Additional Credits to   : id Software, the BBC.
+
+
+
+Thanks to               : Ewan and Marcus for playtesting :-)
+
+================================================================
+
+* Play Information *
+
+
+
+New Sounds              : YES
+
+3 team CTF Skin         : YES
+
+VWEP Support            : YES
+
+
+
+
+
+* Construction *
+
+Poly Count              : 466  was originally 518
+
+Vert Count              : 287  was originally 311
+
+Wasted Space 		: 6%   was originally 62%
+
+Skin Count              : 13
+
+Base                    : Original DalekX
+
+Editor used             : MAX q2model editor
+
+Known Bugs              : All Bugs EXTERMINATED (I think)
+
+Build/Animation time    : originally 6 days but I've put in more 
+                          time than that now
+
+
+
+
+
+* How to use this model *
+
+
+
+Copy the directory called DALEKX and its content to your 
+quake2\baseq2\players\
+directory.
+
+
+
+* Copyright / Permissions *
+
+You may freely distribute this archive, as long as it remains
+intact. If you want to add a skin then go for it but send me 
+a copy. You may not use these files for commercial purposes 
+without my permission (and probably that of the BBC and ID). 
+If you do so you will be EXTERMINATED. 
+I retain all copyrights.
+
+
+QUAKE(R) and QUAKE II(R) are registered trademarks of id Software, Inc.
+
+
+
+I will not take responsibility for anything bad. Use at you 
+own risk bla de bla.
+
+Enjoy.
+

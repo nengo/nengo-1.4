@@ -1,0 +1,47 @@
+==================================================================
+ DalekX V_WEP (Viewable weapons for Dalekx)                v1.40
+ by J. G. Watt                                  17 December 1998
+ 
+..................................................................
+
+==================================================================
+Title                   : Quake2 DalekX Player Model V_WEP add-on
+Author                  : J.G.Watt, aka Jimbo of Dteam 
+Homepage                : http://www.kinetic-arts.demon.co.uk
+			  http://www.captured.com/dteam
+Email Address           : jim@kinetic-arts.demon.co.uk
+			  
+
+
+
+Build Time              : Not Long
+==================================================================
+
+
+DESCRIPTION
+
+   Having trouble conquering the galaxy? People not take you 
+   seriously when you declare that you are the supreme beings of
+   the universe? Maybe the problem is that puny Dalek Gun. Why
+   not try a beefy new set of weapons with this simple add on.
+
+   This is a set of viewable weapons for my DalekX quake2 player 
+   model.
+
+
+Tools used (in order of importance):
+
+   Quake2
+   Quake 2 Modeller 0.90b by Phillip Martin (martinp1@topaz.cqu.edu.au)
+   SkinView Mod (http://telefragged.com/skinview/)
+
+
+WHAT'S NEW?
+   v-wep was redone to fit the new animations in dalekX v1.4
+   I reduced the length of some of the weapons so they're now 
+   only absurdly huge an opposed to insanely gigantic.
+
+TO DO:
+    Something else.
+
+E-X-T-E-R-M-I-N-A-T-E
