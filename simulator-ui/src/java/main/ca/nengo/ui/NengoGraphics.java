@@ -69,8 +69,8 @@ import ca.nengo.ui.models.constructors.CNetwork;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.script.ScriptConsole;
 import ca.nengo.ui.script.ScriptEditor;
-import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoClipboard;
+import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NeoFileChooser;
 import ca.nengo.ui.util.ScriptWorldWrapper;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
@@ -149,14 +149,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		JFrame frame = new NengoGraphics();
-
-		try {
-			Image image = ImageIO.read(frame.getClass().getClassLoader().getResource("ca/nengo/ui/spikepattern-black.png"));
-			frame.setIconImage(image);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new NengoGraphics();
 	}
 
 	private NengoClipboard clipboard;
@@ -176,6 +169,15 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	 */
 	public NengoGraphics() {
 		super();
+
+		// Setup icon
+		//
+		try {
+			Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/spikepattern-black.png"));
+			setIconImage(image);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
