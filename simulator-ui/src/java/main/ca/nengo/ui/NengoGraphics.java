@@ -73,6 +73,7 @@ import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoClipboard;
 import ca.nengo.ui.util.NeoFileChooser;
 import ca.nengo.ui.util.ScriptWorldWrapper;
+import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.nengo.ui.world.NengoWorld;
 import ca.nengo.util.Environment;
 import ca.shu.ui.lib.AppFrame;
@@ -165,7 +166,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	private PythonInterpreter pythonInterpreter;
 	private ScriptConsole scriptConsole;
 	private AuxillarySplitPane scriptConsolePane;
-	private WorldObject selectedObj;	private DataListView dataListViewer;
+	private WorldObject selectedObj;
+	private DataListView dataListViewer;
 	private ArrayList<AuxillarySplitPane> splitPanes;
 
 	/**
@@ -410,6 +412,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		 */
 		registerPlugins();
 
+		setExtendedState(NengoConfigManager.getUserInteger(UserProperties.IsNengoWindowMaximized,
+				JFrame.MAXIMIZED_BOTH));
 	}
 
 	@Override
@@ -561,8 +565,16 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 				return;
 			}
 		}
-		NengoConfigManager.saveUserConfig();
+
+		saveUserConfig();
 		super.exitAppFrame();
+	}
+
+	private void saveUserConfig() {
+		NengoConfigManager.setUserProperty(UserProperties.IsNengoWindowMaximized,
+				getExtendedState());
+
+		NengoConfigManager.saveUserConfig();
 	}
 
 	@Override

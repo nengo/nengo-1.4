@@ -112,7 +112,7 @@ public class NeoFileChooser {
 	 */
 	private void saveWorkingLocation() {
 		String currentDirectory = fileChooser.getCurrentDirectory().toString();
-		NengoConfigManager.saveUserProperty(UserProperties.ModelWorkingLocation, currentDirectory);
+		NengoConfigManager.setUserProperty(UserProperties.ModelWorkingLocation, currentDirectory);
 	}
 }
 

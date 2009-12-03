@@ -105,12 +105,12 @@ public class ProbePlotHelper {
 	}
 
 	public void setDefaultSubSampling(int value) {
-		NengoConfigManager.saveUserProperty(UserProperties.PlotterDefaultSubSampling,
+		NengoConfigManager.setUserProperty(UserProperties.PlotterDefaultSubSampling,
 				Integer.toString(value));
 	}
 
 	public void setDefaultTauFilter(float value) {
-		NengoConfigManager.saveUserProperty(UserProperties.PlotterDefaultTauFilter,
+		NengoConfigManager.setUserProperty(UserProperties.PlotterDefaultTauFilter,
 				Float.toString(value));
 	}
 

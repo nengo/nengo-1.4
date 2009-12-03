@@ -17,9 +17,7 @@ public class NengoConfigManager {
 	private static Properties userConfig;
 
 	public enum UserProperties {
-		ModelWorkingLocation,
-		PlotterDefaultTauFilter,
-		PlotterDefaultSubSampling
+		ModelWorkingLocation, PlotterDefaultTauFilter, PlotterDefaultSubSampling, IsNengoWindowMaximized
 	}
 
 	public static Properties getNengoConfig() {
@@ -42,8 +40,28 @@ public class NengoConfigManager {
 		return getUserConfig().getProperty(property.toString());
 	}
 
-	public static void saveUserProperty(UserProperties property, String value) {
+	public static boolean getUserBoolean(UserProperties property, boolean defaultvalue) {
+		String value = getUserProperty(property);
+
+		return value != null ? Boolean.parseBoolean(value) : defaultvalue;
+	}
+
+	public static int getUserInteger(UserProperties property, int defaultvalue) {
+		String value = getUserProperty(property);
+
+		return value != null ? Integer.parseInt(value) : defaultvalue;
+	}
+
+	public static void setUserProperty(UserProperties property, String value) {
 		getUserConfig().setProperty(property.toString(), value);
+	}
+
+	public static void setUserProperty(UserProperties property, boolean value) {
+		setUserProperty(property, Boolean.toString(value));
+	}
+
+	public static void setUserProperty(UserProperties property, int value) {
+		setUserProperty(property, Integer.toString(value));
 	}
 
 	public static void saveUserConfig() {

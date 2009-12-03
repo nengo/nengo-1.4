@@ -86,6 +86,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		// Create a tree that allows one selection at a time.
 		tree = new JTree(dataModel);
+		tree.setRootVisible(false);
 		Style.applyStyle(tree);
 		DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
 		tree.setCellRenderer(treeRenderer);
