@@ -4,7 +4,7 @@ from javax.swing import *
 from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
-
+import java
 
 class FunctionControl(core.DataViewComponent,ComponentListener):
     def __init__(self,view,name,func):
@@ -39,7 +39,7 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
 
             
         
-        self.setSize(len(values)*40+20,200)    
+        self.setSize(len(values)*40+40,200)    
         self.addComponentListener(self)
         self.componentResized(None)
         
@@ -71,6 +71,10 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         data=self.data.get(start=self.view.current_tick,count=1)[0]
         if data is None: 
             data=self.data.get_first()
+
+        for i,v in enumerate(data):
+            while v>self.range*1.1: self.range*=2
+            while v<-self.range*1.1: self.range*=2
         
         for i,v in enumerate(data):
             sv=int(v*100.0/self.range)
