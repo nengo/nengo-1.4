@@ -6,8 +6,8 @@ from java.awt import *
 from java.awt.event import *
 import java
 
-#from com.threed.jpct import *
-#from com.threed.jpct.util import *
+from com.threed.jpct import *
+from com.threed.jpct.util import *
 
 
 class View3D(core.DataViewComponent,ComponentListener,KeyListener):
