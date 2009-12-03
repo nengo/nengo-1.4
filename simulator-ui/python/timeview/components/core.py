@@ -55,6 +55,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
     def actionPerformed(self,event):
         if event.actionCommand=='hide':
             parent=self.parent
+            self.visible=False
             self.parent.remove(self) 
             parent.repaint()
     def mouseWheelMoved(self,event):  

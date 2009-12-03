@@ -59,6 +59,7 @@ class View3D(core.DataViewComponent,ComponentListener,KeyListener):
             self.mouse_pressed_y=event.y
             #java.lang.System.out.println("event %s "%(event))
             if event.modifiersEx & InputEvent.BUTTON3_DOWN_MASK:
+                from com.threed.jpct import SimpleVector
                 camera.rotateCameraAxis(SimpleVector(-dy,dx,0),0.003)            
                 #camera.align(self.view.watcher.objects[self.name]._simulator.model.room)
                 #camera.setOrientation(camera.getDirection(),SimpleVector(0,0,1))

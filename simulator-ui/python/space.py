@@ -2,7 +2,8 @@ from __future__ import generators
 
 import sys
 for p in ['python/jar/jpct.jar','python/jar/jbullet.jar','python/jar/vecmath.jar']:
-    if p not in sys.path: sys.path.append(p)
+    if p not in sys.path: 
+        sys.path.append(p)
 
 import java
 from javax.swing import *
@@ -83,10 +84,11 @@ def createBoxPieces(x,y,z):
 
 
 class Room(ccm.Model):
-    def __init__(self, x, y, z=1,gravity=10,color=Color.blue,camera=(0,0,10)):
+    def __init__(self, x, y, z=1,gravity=10,color=[Color(0xFFFFFF),Color(0xFFFFFF),Color(0xEEEEEE),Color(0xDDDDDD),Color(0xCCCCCC),Color(0xBBBBBB)],camera=(0,0,10),dt=0.0001):
         ccm.Model.__init__(self)
         self.size=(x, y, z)
         self.world=World()
+        self.dt=dt
         brightness=180
         self.world.setAmbientLight(brightness, brightness, brightness)
         self.world.addLight(SimpleVector(2, 2, 5), 10,10,10)
@@ -187,7 +189,7 @@ class Room(ccm.Model):
             
 
     def start(self):
-        dt=0.0001
+        dt=self.dt
         while True:
             p=self.physics_dump()
             #self.update_shapes(p)
@@ -198,7 +200,7 @@ class Room(ccm.Model):
                         obj.vehicle.applyEngineForce(w.force,i)
                         #obj.vehicle.setBrake(w.brake,i)
 
-            self.physics.stepSimulation(dt,10,0.00001)    
+            self.physics.stepSimulation(dt,10,dt*0.1)    
             yield dt
     def physics_dump(self):
         d={}
@@ -305,7 +307,7 @@ class RangeSensor(ccm.Model):
     
         
 class Box(ccm.Model):      
-    def __init__(self, x, y, z, mass=1,scale=1, draw_as_cylinder=False,color=Color.blue,overdraw_length=1,overdraw_radius=1):
+    def __init__(self, x, y, z, mass=1,scale=1, draw_as_cylinder=False,color=Color.blue,overdraw_length=1,overdraw_radius=1,flat_shading=False):
         
         if draw_as_cylinder:
             if y is max(x,y,z):
@@ -318,6 +320,8 @@ class Box(ccm.Model):
                 self.shape.rotateMesh()
         else:
             self.shape=createBox(x/2.0*scale, y/2.0*scale, z/2.0*scale)
+        if flat_shading: self.shape.shadingMode=Object3D.SHADING_FAKED_FLAT
+            
         colorname='box%d'%id(self)
         TextureManager.getInstance().addTexture(colorname,Texture(1, 1, color))
         self.shape.setTexture(colorname)
@@ -372,7 +376,7 @@ class Sphere(ccm.Model):
 import math
 class MD2(ccm.Model):
     _shapes={}
-    def __init__(self, filename, texture, scale=1.0, mass=1):        
+    def __init__(self, filename, texture, scale=1.0, mass=1,overdraw_scale=1.0):        
         if not TextureManager.getInstance().containsTexture(texture):
             TextureManager.getInstance().addTexture(texture,Texture(texture))
         if (filename,scale) not in MD2._shapes:
@@ -388,7 +392,7 @@ class MD2(ccm.Model):
         self.shape.build()
         self.shape.setTexture(texture)
         minx,maxx,miny,maxy,minz,maxz=self.shape.mesh.boundingBox
-        shape=BoxShape(Vector3f((maxx-minx)/2.0,(maxy-miny)/2.0,(maxz-minz)/2.0))
+        shape=BoxShape(Vector3f((maxx-minx)/overdraw_scale/2.0,(maxy-miny)/overdraw_scale/2.0,(maxz-minz)/2.0))
         t=Transform()
         t.setIdentity()
         t.origin.x=(maxx+minx)/2
