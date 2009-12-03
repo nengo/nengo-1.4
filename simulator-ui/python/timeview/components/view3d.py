@@ -6,9 +6,6 @@ from java.awt import *
 from java.awt.event import *
 import java
 
-from com.threed.jpct import *
-from com.threed.jpct.util import *
-
 
 class View3D(core.DataViewComponent,ComponentListener,KeyListener):
     def __init__(self,view,name,func,args=()):
@@ -25,6 +22,7 @@ class View3D(core.DataViewComponent,ComponentListener,KeyListener):
         self.initialize()
         
     def initialize(self):
+        from com.threed.jpct import FrameBuffer
         self.buffer=FrameBuffer(self.width,self.height, FrameBuffer.SAMPLINGMODE_NORMAL)
 
     def componentHidden(self,event):        
