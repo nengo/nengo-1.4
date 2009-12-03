@@ -14,6 +14,27 @@ def safe_get_index(x,i):
     if x is None: return None
     return x[i]
 
+def round(x):
+    sign=1
+    if x<0:
+        sign=-1
+        x=-x
+    v=1e-30
+    if v>x: mn,mx=0,v
+    else:
+        while v*10<x: 
+            v*=10
+        if v*2>x:
+            mn,mx=v,2*v
+        elif v*5>x:
+            mn,mx=2*v,5*v
+        else:        
+            mn,mx=5*v,10*v
+    if sign<0:
+        mn,mx=-mx,-mn            
+    return mn,mx
+
+
 
 class Graph(core.DataViewComponent):
     def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None):
@@ -79,25 +100,6 @@ class Graph(core.DataViewComponent):
                 
         self.fix_popup()                            # Update the pop-up box
         
-    def round(self,x):
-        sign=1
-        if x<0:
-            sign=-1
-            x=-x
-        v=1e-30
-        if v>x: mn,mx=0,v
-        else:
-            while v*10<x: 
-                v*=10
-            if v*2>x:
-                mn,mx=v,2*v
-            elif v*5>x:
-                mn,mx=2*v,5*v
-            else:        
-                mn,mx=5*v,10*v
-        if sign<0:
-            mn,mx=-mx,-mn            
-        return mn,mx
         
     def toggle_label(self,event):
         self.show_label=event.source.state
@@ -187,8 +189,8 @@ class Graph(core.DataViewComponent):
                 if len(trimmed)==0: continue
                 fmaxy=max(trimmed)
                 fminy=min(trimmed)
-                fmaxy=self.round(fmaxy)[1]
-                fminy=self.round(fminy)[0]
+                fmaxy=round(fmaxy)[1]
+                fminy=round(fminy)[0]
                 if maxy is None or fmaxy>maxy: maxy=fmaxy
                 if miny is None or fminy<miny: miny=fminy
                 filtered.append(fdata)
