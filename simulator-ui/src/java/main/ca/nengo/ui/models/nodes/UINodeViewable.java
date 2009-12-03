@@ -211,7 +211,6 @@ public abstract class UINodeViewable extends UINeoNode {
 
 		}
 		return (NodeViewer) viewerWindow.getContents();
-
 	}
 
 	/**

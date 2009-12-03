@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models.viewers;
 
@@ -33,8 +33,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
-
-import org.python.util.PythonInterpreter;
 
 import ca.nengo.config.ClassRegistry;
 import ca.nengo.model.Network;
@@ -50,7 +48,6 @@ import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CreateModelAdvancedAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
 import ca.nengo.ui.actions.PasteAction;
-import ca.nengo.ui.actions.RunSimulatorAction;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.constructors.ConstructableNode;
@@ -168,8 +165,8 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 		/*
 		 * Get the current children and map them
 		 */
-		HashMap<Node, UINeoNode> currentNodes = new HashMap<Node, UINeoNode>(getGround()
-				.getChildrenCount());
+		HashMap<Node, UINeoNode> currentNodes = new HashMap<Node, UINeoNode>(
+				getGround().getChildrenCount());
 
 		Enumeration<UINeoNode> en = neoNodesChildren.elements();
 		while (en.hasMoreElements()) {
@@ -323,8 +320,8 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 		 * Get exposed Origins and Terminations
 		 */
 		HashSet<Origin> exposedOriginsTemp = new HashSet<Origin>(getModel().getOrigins().length);
-		HashSet<Termination> exposedTerminationsTemp = new HashSet<Termination>(getModel()
-				.getTerminations().length);
+		HashSet<Termination> exposedTerminationsTemp = new HashSet<Termination>(
+				getModel().getTerminations().length);
 
 		for (Origin origin : getModel().getOrigins()) {
 			if (origin instanceof NetworkImpl.OriginWrapper) {
@@ -397,8 +394,7 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 					}
 					if (exposedTerminationsChanged) {
 						for (UITermination terminationUI : nodeUI.getVisibleTerminations()) {
-							boolean isExposed = exposedTerminations.contains(terminationUI
-									.getModel());
+							boolean isExposed = exposedTerminations.contains(terminationUI.getModel());
 							terminationUI.setExposed(isExposed);
 						}
 					}
@@ -413,8 +409,8 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 			if (restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
 				return;
 			} else {
-                applySortLayout(SortMode.BY_NAME);
-                //applyJungLayout(KKLayout.class);
+				applySortLayout(SortMode.BY_NAME);
+				// applyJungLayout(KKLayout.class);
 			}
 		}
 		if (ELASTIC_LAYOUT_ENABLED_DEFAULT) {
@@ -432,27 +428,10 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 
 		super.constructMenu(menu);
 
-		menu.addSection("Simulator");
-		menu.addAction(new RunSimulatorAction("Run " + getViewerParent().getName(),
-				getViewerParent()));
-		
-		StandardAction action=new StandardAction("Run interactive plots","Interactive Plots") {
-			private static final long serialVersionUID = 1L;
-			UINetwork uiNetwork; 
-			{
-				uiNetwork=getViewerParent();
-			}
-			protected void action() throws ActionException {
-				PythonInterpreter pi=NengoGraphics.getInstance().getPythonInterpreter();
-				pi.set("_interactive_network",uiNetwork);
-				pi.exec("import timeview");
-				pi.exec("reload(timeview)");
-				pi.exec("timeview.View(_interactive_network.model,ui=_interactive_network.viewer)");
-				pi.exec("del _interactive_network");
-			}
-			
-		};		
-		menu.addAction(action);
+		/*
+		 * Construct simulator menu
+		 */
+		UINetwork.constructSimulatorMenu(menu, getViewerParent());
 
 		/*
 		 * Create new models

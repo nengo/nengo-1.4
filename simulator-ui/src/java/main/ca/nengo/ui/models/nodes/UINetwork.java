@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models.nodes;
 
@@ -35,6 +35,8 @@ import ca.nengo.model.Network;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.sim.Simulator;
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.actions.RunInteractivePlotstAction;
+import ca.nengo.ui.actions.RunSimulatorAction;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.NetworkIcon;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
@@ -44,6 +46,7 @@ import ca.nengo.ui.models.viewers.NodeViewer;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutable.Event;
 import ca.shu.ui.lib.util.UserMessages;
+import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 import ca.shu.ui.lib.world.WorldObject;
 
 /**
@@ -52,11 +55,34 @@ import ca.shu.ui.lib.world.WorldObject;
  * @author Shu Wu
  */
 public class UINetwork extends UINodeViewable {
+	private class MySimulatorListener implements VisiblyMutable.Listener {
+		private boolean simulatorUpdatePending = false;
+
+		public void changed(Event e) {
+			if (!simulatorUpdatePending) {
+				simulatorUpdatePending = true;
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						simulatorUpdatePending = false;
+						simulatorUpdated();
+					}
+				});
+			}
+		}
+	}
+
 	private static final String LAYOUT_MANAGER_KEY = "layout/manager";
 
 	private static final long serialVersionUID = 1L;
 
 	public static final String typeName = "Network";
+
+	public static void constructSimulatorMenu(PopupMenuBuilder menu, UINetwork network) {
+		menu.addSection("Simulator");
+		menu.addAction(new RunSimulatorAction("Run " + network.getName(), network));
+		menu.addAction(new RunInteractivePlotstAction(network));
+
+	}
 
 	/**
 	 * @param wo
@@ -77,7 +103,6 @@ public class UINetwork extends UINodeViewable {
 		} else {
 			return getClosestNetwork(wo.getParent());
 		}
-
 	}
 
 	private MySimulatorListener mySimulatorListener;
@@ -87,39 +112,23 @@ public class UINetwork extends UINodeViewable {
 		setIcon(new NetworkIcon(this));
 	}
 
-	private void simulatorUpdated() {
-		if (getViewer() != null && !getViewer().isDestroyed()) {
-			getViewer().updateSimulatorProbes();
-		}
+	@Override
+	public void attachViewToModel() {
+		super.attachViewToModel();
+		getModel().getSimulator().addChangeListener(mySimulatorListener);
+	}
+
+	@Override
+	protected void constructMenu(PopupMenuBuilder menu) {
+		super.constructMenu(menu);
+		constructSimulatorMenu(menu, this);
 	}
 
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {
 		super.constructTooltips(tooltips);
 		tooltips.addProperty("# Projections", "" + getModel().getProjections().length);
-
 		tooltips.addProperty("Simulator", "" + getSimulator().getClass().getSimpleName());
-	}
-
-	@Override
-	protected void initialize() {
-		mySimulatorListener = new MySimulatorListener();
-		super.initialize();
-	}
-
-	@Override
-	protected void modelUpdated() {
-		super.modelUpdated();
-
-		if (getViewer() != null && !getViewer().isDestroyed()) {
-			getViewer().updateViewFromModel();
-		}
-	}
-
-	@Override
-	public void attachViewToModel() {
-		super.attachViewToModel();
-		getModel().getSimulator().addChangeListener(mySimulatorListener);
 	}
 
 	@Override
@@ -130,7 +139,6 @@ public class UINetwork extends UINodeViewable {
 	@Override
 	public void detachViewFromModel() {
 		super.detachViewFromModel();
-
 		getModel().getSimulator().removeChangeListener(mySimulatorListener);
 	}
 
@@ -201,13 +209,34 @@ public class UINetwork extends UINodeViewable {
 		return (NetworkViewer) super.getViewer();
 	}
 
+	/**
+	 * @return Gets the existing viewer, if it exists. Otherwise, open it.
+	 */
+	public NodeViewer getViewerEnsured() {
+		NetworkViewer viewer = getViewer();
+		return viewer != null ? viewer : openViewer();
+	}
+
+	@Override
+	protected void initialize() {
+		mySimulatorListener = new MySimulatorListener();
+		super.initialize();
+	}
+
+	@Override
+	protected void modelUpdated() {
+		super.modelUpdated();
+
+		if (getViewer() != null && !getViewer().isDestroyed()) {
+			getViewer().updateViewFromModel();
+		}
+	}
+
 	@Override
 	public void saveContainerConfig() {
-
 		if (getViewer() != null) {
 			getViewer().saveLayoutAsDefault();
 		}
-
 	}
 
 	@Override
@@ -224,19 +253,9 @@ public class UINetwork extends UINodeViewable {
 		getModel().setMetaData(LAYOUT_MANAGER_KEY, config);
 	}
 
-	private class MySimulatorListener implements VisiblyMutable.Listener {
-		private boolean simulatorUpdatePending = false;
-
-		public void changed(Event e) {
-			if (!simulatorUpdatePending) {
-				simulatorUpdatePending = true;
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						simulatorUpdatePending = false;
-						simulatorUpdated();
-					}
-				});
-			}
+	private void simulatorUpdated() {
+		if (getViewer() != null && !getViewer().isDestroyed()) {
+			getViewer().updateSimulatorProbes();
 		}
 	}
 
