@@ -35,6 +35,8 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             label=JLabel('0.00')
             self.add(label)
             self.labels.append(label)
+            slider.addMouseListener(self)  
+
             
         
         self.setSize(len(values)*40+20,200)    
