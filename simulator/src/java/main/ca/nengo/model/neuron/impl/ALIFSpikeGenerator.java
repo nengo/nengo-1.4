@@ -324,6 +324,11 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		return result;
 	}
 
+	public float getVoltage() {
+		return myV;
+	}
+
+	
 	/**
 	 * @see ca.nengo.model.Probeable#listStates()
 	 */
