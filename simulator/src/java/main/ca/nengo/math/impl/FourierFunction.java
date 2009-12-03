@@ -122,7 +122,7 @@ public class FourierFunction implements Function {
 	 * 	@param seed Random seed
 	 */
 	public FourierFunction(float fundamental, float cutoff, float rms, long seed) {
-		new FourierFunction(fundamental, cutoff, rms, seed, 1);
+		this(fundamental, cutoff, rms, seed, 1);
 	}
 	
 	private void set(float[][] frequencies, float[] amplitudes, float[][] phases) {
