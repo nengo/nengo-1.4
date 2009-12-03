@@ -100,15 +100,21 @@ class NodeWatch:
                 text='value'
                 text_grid = 'value (grid)'
                 label=obj.name
+                xy='XY plot'
             else: 
                 text='value: '+name
                 text_grid='value (grid): ' + name
                 label=obj.name+': '+name
+                xy='XY plot: '+name
             
             r.append((text,components.Graph,dict(func=self.value,args=(name,),filter=filter,label=label)))
             
             if len(obj.getOrigin(name).values.values)>8:
                 r.append((text_grid,components.VectorGrid,dict(func=self.value,args=(name,), min=-max_radii, max=max_radii)))
+
+            if len(obj.getOrigin(name).values.values)==2:
+                r.append((xy,components.XYPlot,dict(func=self.value,args=(name,),filter=filter,label=label)))
+                
         return r    
 
 
