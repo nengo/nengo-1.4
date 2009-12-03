@@ -150,9 +150,9 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 				RecursiveFindDataNodes(treeNode, dataNodes);
 			}
 
-			if (dataNodes.size() > 0) {
-				PopupMenuBuilder menuBuilder;
+			PopupMenuBuilder menuBuilder;
 
+			if (dataNodes.size() > 0) {
 				if (leafNodes.size() == 1) {
 					MutableTreeNode leafNode = leafNodes.get(0);
 
@@ -175,35 +175,37 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 					}
 
 				} else {
-
 					menuBuilder = new PopupMenuBuilder(dataNodes.size() + " data nodes selected");
-
 					menuBuilder.addAction(new PlotNodesAction(dataNodes));
-
 				}
+			} else if (leafNodes.size() == 1) {
+				menuBuilder = new PopupMenuBuilder(leafNodes.get(0).toString());
+			} else {
+				menuBuilder = new PopupMenuBuilder(leafNodes.size() + " nodes selected");
+			}
 
-				// make sure we don't remove the node representing the network
-				List<MutableTreeNode> removeNodes = new ArrayList<MutableTreeNode>();
-				TreeNode root = (TreeNode) dataModel.getRoot();
-				for (MutableTreeNode node : leafNodes) {
-					if (node.getParent() == root) {
-						Enumeration<MutableTreeNode> childEnumerator = node.children();
-						while (childEnumerator.hasMoreElements()) {
-							removeNodes.add(childEnumerator.nextElement());
-						}
-					} else {
-						removeNodes.add(node);
+			// make sure we don't remove the node representing the network
+			List<MutableTreeNode> removeNodes = new ArrayList<MutableTreeNode>();
+			TreeNode root = (TreeNode) dataModel.getRoot();
+			for (MutableTreeNode node : leafNodes) {
+				if (node.getParent() == root) {
+					Enumeration<MutableTreeNode> childEnumerator = node.children();
+					while (childEnumerator.hasMoreElements()) {
+						removeNodes.add(childEnumerator.nextElement());
 					}
-				}
-
-				menuBuilder.addAction(new RemoveTreeNodes(removeNodes));
-				menu = menuBuilder.toJPopupMenu();
-
-				if (menu != null) {
-					menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
-					menu.setVisible(true);
+				} else {
+					removeNodes.add(node);
 				}
 			}
+
+			menuBuilder.addAction(new RemoveTreeNodes(removeNodes));
+			menu = menuBuilder.toJPopupMenu();
+
+			if (menu != null) {
+				menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+				menu.setVisible(true);
+			}
+
 		}
 
 		private void DoubleClickEvent(MouseEvent e) {
@@ -295,7 +297,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		private Hashtable<MutableTreeNode, UndoInfo> undoLUT;
 
 		public RemoveTreeNodes(List<MutableTreeNode> nodesToRemove) {
-			super("Clear data");
+			super("Remove data");
 
 			this.nodesToRemove = nodesToRemove;
 			this.nodesRemoved = new ArrayList<MutableTreeNode>((int) (nodesToRemove.size() * 1.2f));
