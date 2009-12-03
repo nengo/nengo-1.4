@@ -26,7 +26,7 @@ import ca.shu.ui.lib.Style.Style;
 public class AuxillarySplitPane extends JSplitPane {
 
 	private static final long serialVersionUID = 1L;
-	public static final int MINIMUM_WIDTH = 200;
+	public static final int MINIMUM_WIDTH = 300;
 	public static final int MINIMUM_HEIGHT = 200;
 
 	private static int getJSplitPaneOrientation(Orientation orientation) {
