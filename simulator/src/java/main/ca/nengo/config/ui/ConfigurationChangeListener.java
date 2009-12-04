@@ -86,6 +86,9 @@ public class ConfigurationChangeListener implements ActionListener {
 	}
 
 	public void commitChanges() {
+		if (isChangeCommited)
+			return;
+		
 		try {
 			myModel.setValue(myPath, myEditorProxy.getValue());
 		} catch (Exception ex) {
@@ -99,6 +102,9 @@ public class ConfigurationChangeListener implements ActionListener {
 	}
 
 	public void cancelChanges() {
+		if (isChangeCancelled)
+			return;
+		
 		myEditor.cancelCellEditing();
 		isChangeCancelled = true;
 	}
