@@ -80,6 +80,7 @@ class Graph(core.DataViewComponent):
                 sel_dim += [n]
             
         save_info['sel_dim'] = sel_dim              # Save the checkbox states
+        save_info['label']=self.show_label
         
         return save_info            
     
@@ -99,6 +100,7 @@ class Graph(core.DataViewComponent):
                 self.indices[dim] = True
                 
         self.fix_popup()                            # Update the pop-up box
+        self.show_label=d.get('label',False)
         
         
     def toggle_label(self,event):
@@ -128,14 +130,21 @@ class Graph(core.DataViewComponent):
         if self.neuronmapped and self.map is None:
             self.initialize_map()
 
-        g.color=Color(0.8,0.8,0.8)
-        g.drawLine(self.border_left,self.border_top,self.border_left,self.size.height-self.border_bottom)
-        g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
-        
         if self.show_label:
+            self.border_top=20
             g.color=Color(0.3,0.3,0.3)
             bounds=g.font.getStringBounds(self.label,g.fontRenderContext)
-            g.drawString(self.label,self.size.width-bounds.width-5,bounds.height)
+            g.drawString(self.label,self.size.width/2-bounds.width/2,bounds.height)
+        else:
+            self.border_top=10    
+
+        g.color=Color(0.8,0.8,0.8)
+        g.drawRect(self.border_left,self.border_top,self.width-self.border_left-self.border_right,self.size.height-self.border_top-self.border_bottom)
+
+        g.color=Color(0.8,0.8,0.8)
+        g.drawLine(self.border_left,self.border_top,self.border_left,self.size.height-self.border_bottom)
+        #g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
+
 
         pts=int(self.view.time_shown/self.view.dt)
 
@@ -199,12 +208,18 @@ class Graph(core.DataViewComponent):
         if miny is None: miny=-1.0    
         if maxy<self.ylimits[1]: maxy=float(self.ylimits[1])
         if miny>self.ylimits[0]: miny=float(self.ylimits[0])
+        if maxy>-miny: miny=-maxy
+        if miny<-maxy: maxy=-miny
         if maxy==miny: yscale=0
         else: yscale=float(self.size.height-self.border_bottom-self.border_top)/(maxy-miny)
         if self.split and len(filtered)>0: 
             yscale=yscale/len(filtered)
             split_step=float(self.size.height-self.border_bottom-self.border_top)/len(filtered)
             
+        # draw zero line
+        g.color=Color(0.8,0.8,0.8)
+        y0=int(self.size.height-(0-miny)*yscale-self.border_bottom)
+        g.drawLine(self.border_left,y0,self.width-self.border_right,y0)
 
 
         colors=[Color.black,Color.blue,Color.red,Color.green,Color.magenta,Color.cyan,Color.yellow]
