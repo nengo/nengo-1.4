@@ -49,6 +49,7 @@ import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
+import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
@@ -118,6 +119,8 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		} else if (node instanceof Ensemble) {
 			if (node instanceof NEFEnsemble) {
 				nodeUI = new UINEFEnsemble((NEFEnsemble) node);
+				nodeUI.showAllTerminations();
+				nodeUI.showAllDecodedOrigins();
 			} else {
 				nodeUI = new UIEnsemble((Ensemble) node);
 			}
@@ -716,6 +719,23 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		layoutChildren();
 	}
 
+	/**
+	 * Shows all the origins on the Node model
+	 */
+	public void showAllDecodedOrigins() {
+
+		Origin[] origins = getModel().getOrigins();
+
+		for (Origin element : origins) {
+			if (element instanceof DecodedOrigin) {
+				UIOrigin originUI = showOrigin(element.getName());
+				originUI.setWidgetVisible(true);
+			}
+		}
+		layoutChildren();
+	}
+	
+	
 	/**
 	 * Shows all the terminations on the Node model
 	 */
