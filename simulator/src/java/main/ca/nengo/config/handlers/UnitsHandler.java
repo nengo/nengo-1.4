@@ -30,6 +30,7 @@ package ca.nengo.config.handlers;
 import java.awt.Component;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
 import ca.nengo.config.ui.ConfigurationChangeListener;
 import ca.nengo.model.Units;
@@ -65,7 +66,7 @@ public class UnitsHandler extends BaseHandler {
 	}
 
 	@Override
-	public Component getEditor(Object o, ConfigurationChangeListener listener) {
+	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		Units unit = (Units) o;
 		
 		final JComboBox result = new JComboBox(myList);

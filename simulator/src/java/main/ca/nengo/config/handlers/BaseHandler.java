@@ -32,6 +32,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -83,7 +84,7 @@ public abstract class BaseHandler implements ConfigurationHandler {
 	 *   
 	 * @see ca.nengo.config.ConfigurationHandler#getEditor(java.lang.Object, ConfigurationChangeListener)
 	 */
-	public Component getEditor(Object o, ConfigurationChangeListener listener) {
+	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		final JTextField result = new JTextField(toString(o));
 		if (result.getPreferredSize().width < 20) 
 			result.setPreferredSize(new Dimension(20, result.getPreferredSize().height));

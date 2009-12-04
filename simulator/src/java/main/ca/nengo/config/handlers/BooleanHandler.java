@@ -33,6 +33,7 @@ import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import ca.nengo.config.ui.ConfigurationChangeListener;
@@ -49,7 +50,7 @@ public class BooleanHandler extends BaseHandler {
 	}
 
 	@Override
-	public Component getEditor(Object o, ConfigurationChangeListener listener) {
+	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		JPanel result = new JPanel(new FlowLayout());
 		result.setBackground(Color.WHITE);
 		

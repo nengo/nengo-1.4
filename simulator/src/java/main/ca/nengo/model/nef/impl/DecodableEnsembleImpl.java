@@ -28,8 +28,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.nef.impl;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 
@@ -151,8 +151,13 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	/**
 	 * @param name The name of a new DecodedOrigin
 	 * @param origin The new Origin
+	 * @throws StructuralException 
 	 */
-	protected void addDecodedOrigin(String name, DecodedOrigin origin) {
+	protected void addDecodedOrigin(String name, DecodedOrigin origin) throws StructuralException {
+		if (myDecodedOrigins.containsKey(name)) {
+			throw new StructuralException("The ensemble already contains a origin named " + name);
+		}
+		
 		myDecodedOrigins.put(name, origin);
 		OrderedOrigins.add(origin);
 		fireVisibleChangeEvent();

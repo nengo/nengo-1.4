@@ -32,6 +32,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
@@ -51,7 +52,7 @@ public class VectorHandler extends BaseHandler {
 	}
 
 	@Override
-	public Component getEditor(Object o, ConfigurationChangeListener listener) {
+	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		float[] vector = (float[]) o;
 		float[] copy = new float[vector.length];
 		System.arraycopy(vector, 0, copy, 0, vector.length);

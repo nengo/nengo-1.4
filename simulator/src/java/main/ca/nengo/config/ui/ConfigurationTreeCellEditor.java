@@ -108,7 +108,7 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 			}
 			
 			ConfigurationChangeListener listener = new ConfigurationChangeListener(tree, path);
-			Component customEditor = MainHandler.getInstance().getEditor(o, listener);
+			Component customEditor = MainHandler.getInstance().getEditor(o, listener, myTree);
 			if (customEditor != null) result = customEditor;
 		}
 		

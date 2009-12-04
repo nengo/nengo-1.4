@@ -33,6 +33,8 @@ package ca.nengo.config;
 
 import java.awt.Component;
 
+import javax.swing.JComponent;
+
 import ca.nengo.config.ui.ConfigurationChangeListener;
 
 /**
@@ -74,7 +76,7 @@ public interface ConfigurationHandler {
 	 * 		object's value. If null, the calling property editor will attempt 
 	 * 		to create a default editor, possibly using fromString(...).   
 	 */
-	public Component getEditor(Object o, ConfigurationChangeListener listener);
+	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent);
 	
 	/**
 	 * @param o An object for which canHandle(o.getClass()) == true 

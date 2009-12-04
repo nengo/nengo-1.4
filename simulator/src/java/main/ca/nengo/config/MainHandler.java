@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.apache.log4j.Logger;
@@ -167,12 +168,12 @@ public class MainHandler implements ConfigurationHandler {
 	/**
 	 * @see ca.nengo.config.ConfigurationHandler#getEditor(Object, ConfigurationChangeListener)
 	 */
-	public Component getEditor(Object o, ConfigurationChangeListener listener) {
+	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		Component result = null;
 		
 		Class c = o.getClass();
 		ConfigurationHandler handler = getHandler(myHandlers, c);
-		if (handler != null) result = handler.getEditor(o, listener);
+		if (handler != null) result = handler.getEditor(o, listener, parent);
 
 		return result;
 	}

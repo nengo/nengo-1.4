@@ -33,6 +33,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
 import ca.nengo.config.ui.ConfigurationChangeListener;
 
@@ -62,7 +63,7 @@ public class EnumHandler extends BaseHandler {
 	}
 
 	@Override
-	public Component getEditor(Object o, ConfigurationChangeListener listener) {
+	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		Enum mode = (Enum) o;
 		List<? extends Enum> all = new ArrayList<Enum>(EnumSet.allOf(mode.getClass()));
 		

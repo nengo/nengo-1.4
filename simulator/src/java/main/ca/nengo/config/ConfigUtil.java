@@ -98,7 +98,8 @@ public class ConfigUtil {
 
 		dialog.getContentPane().setLayout(new BorderLayout());
 		dialog.getContentPane().add(configuruationPane, BorderLayout.CENTER);
-
+		dialog.setPreferredSize(new Dimension(400, 600));
+		
 		JButton doneButton = new JButton("Done");
 		doneButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
