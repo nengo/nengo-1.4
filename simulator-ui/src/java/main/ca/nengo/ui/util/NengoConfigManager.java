@@ -17,7 +17,7 @@ public class NengoConfigManager {
 	private static Properties userConfig;
 
 	public enum UserProperties {
-		ModelWorkingLocation, PlotterDefaultTauFilter, PlotterDefaultSubSampling, IsNengoWindowMaximized
+		ModelWorkingLocation, PlotterDefaultTauFilter, PlotterDefaultSubSampling, NengoWindowExtendedState
 	}
 
 	public static Properties getNengoConfig() {
