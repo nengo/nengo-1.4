@@ -27,6 +27,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.ui.models.nodes;
 
 import ca.nengo.model.Origin;
+import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.impl.DecodedOrigin;
@@ -62,7 +63,13 @@ public class UINEFEnsemble extends UIEnsemble {
 	}
 
 	private void init() {
-
+		try {
+			if (getModel().getOrigin(NEFEnsemble.X) != null) {
+				showOrigin(NEFEnsemble.X);
+			}
+		} catch (StructuralException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
