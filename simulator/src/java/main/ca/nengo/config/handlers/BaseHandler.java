@@ -30,6 +30,8 @@ package ca.nengo.config.handlers;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
@@ -84,10 +86,21 @@ public abstract class BaseHandler implements ConfigurationHandler {
 	 *   
 	 * @see ca.nengo.config.ConfigurationHandler#getEditor(java.lang.Object, ConfigurationChangeListener)
 	 */
-	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
+	public Component getEditor(Object o, final ConfigurationChangeListener listener, JComponent parent) {
 		final JTextField result = new JTextField(toString(o));
 		if (result.getPreferredSize().width < 20) 
 			result.setPreferredSize(new Dimension(20, result.getPreferredSize().height));
+		
+		// Commit changes when focus is lost
+		//
+		result.addFocusListener(new FocusListener() {			
+			public void focusLost(FocusEvent e) {
+				listener.commitChanges();				
+			}
+			
+			public void focusGained(FocusEvent e) {			
+			}
+		});
 
 		listener.setProxy(new ConfigurationChangeListener.EditorProxy() {
 			public Object getValue() {
