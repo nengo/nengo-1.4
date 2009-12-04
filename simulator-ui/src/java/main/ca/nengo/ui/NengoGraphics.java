@@ -391,7 +391,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 		super.initialize();
 
-		UIEnvironment.setDebugEnabled(true);
+		//UIEnvironment.setDebugEnabled(true);
 
 		initializeSimulatorSourceFiles();
 
@@ -414,7 +414,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		 */
 		registerPlugins();
 
-		setExtendedState(NengoConfigManager.getUserInteger(UserProperties.IsNengoWindowMaximized,
+		setExtendedState(NengoConfigManager.getUserInteger(UserProperties.NengoWindowExtendedState,
 				JFrame.MAXIMIZED_BOTH));
 	}
 
@@ -573,7 +573,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	private void saveUserConfig() {
-		NengoConfigManager.setUserProperty(UserProperties.IsNengoWindowMaximized,
+		NengoConfigManager.setUserProperty(UserProperties.NengoWindowExtendedState,
 				getExtendedState());
 
 		NengoConfigManager.saveUserConfig();
