@@ -54,13 +54,19 @@ class Graph(core.DataViewComponent):
         self.setSize(300,200)
         self.ylimits=ylimits
         self.split=split
+        self.autozoom=True
+        self.last_maxy=None
         self.neuronmapped=neuronmapped
         
         self.map=None
         self.label=label
         self.show_label=False
+        self.popup.add(JPopupMenu.Separator())
         if self.label is not None:
-            self.popup.add(JCheckBoxMenuItem('label',False,stateChanged=self.toggle_label))
+            self.popup_label=JCheckBoxMenuItem('label',self.show_label,stateChanged=self.toggle_label)
+            self.popup.add(self.popup_label)
+        self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
+        self.popup.add(self.popup_zoom)
 
 
     def initialize_map(self):
@@ -81,6 +87,8 @@ class Graph(core.DataViewComponent):
             
         save_info['sel_dim'] = sel_dim              # Save the checkbox states
         save_info['label']=self.show_label
+        save_info['autozoom']=self.autozoom
+        save_info['last_maxy']=self.last_maxy
         
         return save_info            
     
@@ -101,10 +109,20 @@ class Graph(core.DataViewComponent):
                 
         self.fix_popup()                            # Update the pop-up box
         self.show_label=d.get('label',False)
+        self.popup_label.state=self.show_label
+        self.autozoom=d.get('autozoom',True)
+        self.popup_zoom.state=self.autozoom
+        self.last_maxy=d.get('last_maxy',None)
+        
+        
         
         
     def toggle_label(self,event):
         self.show_label=event.source.state
+        self.repaint()
+    def toggle_autozoom(self,event):
+        self.autozoom=event.source.state
+        self.repaint()
         
     def fix_popup(self):
         self.popup.add(JPopupMenu.Separator())
@@ -210,16 +228,38 @@ class Graph(core.DataViewComponent):
         if miny>self.ylimits[0]: miny=float(self.ylimits[0])
         if maxy>-miny: miny=-maxy
         if miny<-maxy: maxy=-miny
+
+        if not self.autozoom and self.last_maxy is not None and maxy<self.last_maxy:
+            maxy=self.last_maxy
+            miny=-maxy
+
+        self.last_maxy=maxy
+
         if maxy==miny: yscale=0
         else: yscale=float(self.size.height-self.border_bottom-self.border_top)/(maxy-miny)
         if self.split and len(filtered)>0: 
             yscale=yscale/len(filtered)
             split_step=float(self.size.height-self.border_bottom-self.border_top)/len(filtered)
             
+            
+
+            
         # draw zero line
         g.color=Color(0.8,0.8,0.8)
         y0=int(self.size.height-(0-miny)*yscale-self.border_bottom)
         g.drawLine(self.border_left,y0,self.width-self.border_right,y0)
+        
+        # draw ticks
+        tick_count=10
+        if ('%f'%maxy)[0]=='2': tick_count=8
+        
+        tick_span=maxy*2.0/tick_count
+        tick_size=3
+        for i in range(1,tick_count):
+            yt=int(self.size.height-(i*tick_span)*yscale-self.border_bottom)
+            g.drawLine(self.border_left,yt,self.border_left+tick_size,yt)
+            g.drawLine(self.width-self.border_right,yt,self.width-self.border_right-tick_size,yt)
+        
 
 
         colors=[Color.black,Color.blue,Color.red,Color.green,Color.magenta,Color.cyan,Color.yellow]
