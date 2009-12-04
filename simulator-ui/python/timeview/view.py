@@ -538,7 +538,20 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         mainPanel.add(self.right_panel,BorderLayout.EAST)
 
 
-
+        mode=JPanel(layout=BorderLayout(),opaque=False)
+        cb=JComboBox(['default','rate','direct'])
+        if self.view.network.mode in [SimulationMode.DEFAULT,SimulationMode.PRECISE]:
+            cb.setSelectedIndex(0)
+        elif self.view.network.mode in [SimulationMode.RATE]:
+            cb.setSelectedIndex(1)
+        elif self.view.network.mode in [SimulationMode.DIRECT,SimulationMode.APPROXIMATE]:
+            cb.setSelectedIndex(2)
+        cb.addActionListener(self)
+        self.mode_combobox=cb        
+        mode.add(cb)
+        mode.add(JLabel('mode'),BorderLayout.NORTH)
+        mode.maximumSize=mode.preferredSize
+        configPanel.add(mode)
 
 
         dt=JPanel(layout=BorderLayout(),opaque=False)
@@ -665,6 +678,10 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             self.dt_combobox.repaint()
             self.view.restart=True
         self.view.set_target_rate(self.rate_combobox.getSelectedItem())
+        mode=self.mode_combobox.getSelectedItem()
+        if mode=='default': self.view.network.mode=SimulationMode.DEFAULT
+        elif mode=='rate': self.view.network.mode=SimulationMode.RATE
+        elif mode=='direct': self.view.network.mode=SimulationMode.DIRECT
     def tick_limit(self,event):
         self.view.timelog.tick_limit=int(event.source.value/self.view.dt)+1
         
