@@ -40,6 +40,7 @@ package ca.nengo.math.impl;
 //import org.jfree.data.xy.XYSeries;
 //import org.jfree.data.xy.XYSeriesCollection;
 
+import java.io.FileNotFoundException;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -272,8 +273,9 @@ public class WeightedCostApproximator implements LinearApproximator {
 			file2=new java.io.File(path,filename+".inv");
 			if (file2.canRead()) 
 				file2.delete();
-			
-            
+
+		} catch (FileNotFoundException e) {
+			System.err.println("File not found: " + e);
 		} catch (java.io.IOException e) {
 			e.printStackTrace();
             System.err.println("WeightedCostApproximator.pseudoInverse() - IO Exception: " + e);
