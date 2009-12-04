@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 /*
  * Created on Jan 30, 2004
@@ -30,14 +30,18 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.ui.configurable.matrixEditor;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.EventObject;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
@@ -48,10 +52,40 @@ import javax.swing.table.TableModel;
  */
 public class MatrixEditor extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+
+	private class MyCellEditor extends DefaultCellEditor {
+		private static final long serialVersionUID = 7289808186710531L;
+		private JTextField myTextField;
+
+		public MyCellEditor() {
+			super(new JTextField());
+			myTextField = (JTextField) this.getComponent();
+		}
+
+		@Override
+		public Component getTableCellEditorComponent(JTable table,
+				Object value,
+				boolean isSelected,
+				int row,
+				int column) {
+
+			Component component = super.getTableCellEditorComponent(table,
+					value,
+					isSelected,
+					row,
+					column);
+
+			myTextField.selectAll();
+			return component;
+		}
+
+		@Override
+		public boolean isCellEditable(EventObject anEvent) {
+			// TODO Auto-generated method stub
+			return super.isCellEditable(anEvent);
+		}
+	}
 
 	// for testing
 	public static void main(String args[]) {
@@ -87,6 +121,7 @@ public class MatrixEditor extends JPanel {
 		super(new BorderLayout());
 		myTableModel = new MatrixTableModel(theMatrix);
 		myTable = new JTable(myTableModel);
+		myTable.setDefaultEditor(Object.class, new MyCellEditor());
 		JScrollPane scroll = new JScrollPane(myTable);
 		this.add(scroll, BorderLayout.CENTER);
 	}
@@ -144,8 +179,10 @@ public class MatrixEditor extends JPanel {
 				float val = Float.parseFloat(theValue.toString());
 				myMatrix.setElement(val, theRow + 1, theColumn + 1);
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(null, "Please enter a number",
-						"Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						"Please enter a number",
+						"Error",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
