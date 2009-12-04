@@ -345,14 +345,16 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         for comp in self.area.components:
             if isinstance(comp,components.core.DataViewComponent):
                 layout.append((comp.name,comp.type,comp.save()))
-        db[key]=self.view_save(),layout
-        
+                
         # Save time control settings
-        db['sim_spd'] = self.time_control.rate_combobox.getSelectedIndex()
-        db['dt'] = self.time_control.dt_combobox.getSelectedIndex()
-        db['rcd_time'] = self.time_control.record_time_spinner.getValue()
-        db['filter'] = self.time_control.filter_spinner.getValue()
-        db['show_time'] = self.time_control.time_shown_spinner.getValue()
+        controls = dict()
+        controls['sim_spd'] = self.time_control.rate_combobox.getSelectedIndex()
+        controls['dt'] = self.time_control.dt_combobox.getSelectedIndex()
+        controls['rcd_time'] = self.time_control.record_time_spinner.getValue()
+        controls['filter'] = self.time_control.filter_spinner.getValue()
+        controls['show_time'] = self.time_control.time_shown_spinner.getValue()
+        
+        db[key]=self.view_save(),layout,controls
         
         db.close()
 
@@ -361,8 +363,39 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         key=self.network.name
         
         if key not in db.keys(): return False
-        db_keys = db.keys()
-        view_data,layout=db[key]
+        
+        saved_info = db[key]
+        
+        if( len( saved_info ) == 2 ):   # Old control saving format - control saves global
+            view_data,layout = saved_info
+
+            db_keys = db.keys()
+            if( 'sim_spd' in db_keys ):
+                self.time_control.rate_combobox.setSelectedIndex(db['sim_spd'])
+            if( 'dt' in db_keys ):
+                self.time_control.dt_combobox.setSelectedIndex(db['dt'])
+            if( 'rcd_time' in db_keys ):
+                self.time_control.record_time_spinner.setValue(db['rcd_time'])
+            if( 'filter' in db_keys ):
+                self.time_control.filter_spinner.setValue(db['filter'])
+            if( 'show_time' in db_keys ):
+                self.time_control.time_shown_spinner.setValue(db['show_time'])
+                
+        else:                           # New control saving format - control saves tied to network name
+            view_data,layout,controls = saved_info 
+            
+            control_keys = controls.keys()   
+            if( 'sim_spd' in control_keys ):
+                self.time_control.rate_combobox.setSelectedIndex(controls['sim_spd'])
+            if( 'dt' in control_keys ):
+                self.time_control.dt_combobox.setSelectedIndex(controls['dt'])
+            if( 'rcd_time' in control_keys ):
+                self.time_control.record_time_spinner.setValue(controls['rcd_time'])
+            if( 'filter' in control_keys ):
+                self.time_control.filter_spinner.setValue(controls['filter'])
+            if( 'show_time' in control_keys ):
+                self.time_control.time_shown_spinner.setValue(controls['show_time'])
+
         self.clear_all()
         for name,type,data in layout:
             if name in self.watcher.objects.keys():
@@ -379,16 +412,6 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                             break
         
         # Restore time control settings
-        if( 'sim_spd' in db_keys ):
-            self.time_control.rate_combobox.setSelectedIndex(db['sim_spd'])
-        if( 'dt' in db_keys ):
-            self.time_control.dt_combobox.setSelectedIndex(db['dt'])
-        if( 'rcd_time' in db_keys ):
-            self.time_control.record_time_spinner.setValue(db['rcd_time'])
-        if( 'filter' in db_keys ):
-            self.time_control.filter_spinner.setValue(db['filter'])
-        if( 'show_time' in db_keys ):
-            self.time_control.time_shown_spinner.setValue(db['show_time'])
                             
         self.view_restore(view_data)
         db.close()
