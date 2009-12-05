@@ -24,13 +24,34 @@ class Grid(core.DataViewComponent):
         self.map=None
         self.requested_improvements=0
         
+        
         self.popup.add(JPopupMenu.Separator())
         self.popup.add(JMenuItem('improve layout',actionPerformed=self.improve_layout))
+        self.auto_improve=False
+        self.popup_auto=JCheckBoxMenuItem('auto-improve',self.auto_improve,stateChanged=self.toggle_auto_improve)
+        self.popup.add(self.popup_auto)
+        
         self.filter=filter
         self.setSize(200,200)
+      
+    def toggle_auto_improve(self,event):
+        self.auto_improve=event.source.state
+        if self.auto_improve and self.requested_improvements<20: 
+            self.requested_improvements=20
+      
+    def save(self):
+        d=core.DataViewComponent.save(self)
+        d['auto_improve']=self.auto_improve
+        return d
+    
+    def restore(self,d):
+        core.DataViewComponent.restore(self,d)
+        self.auto_improve=d.get('auto_improve',False)
+        self.popup_auto.state=self.auto_improve
+        if self.auto_improve: self.requested_improvements=20
         
     def improve_layout(self,event):
-        self.requested_improvements+=20
+        self.requested_improvements=self.map.improvements+20
         
         
     def paintComponent(self,g):
@@ -90,7 +111,6 @@ class Grid(core.DataViewComponent):
         g.color=Color.black
         g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.margin)+1)
 
-        if self.requested_improvements>1:    
+        if self.requested_improvements>self.map.improvements:    
             self.map.improve()
-            self.requested_improvements-=1
             self.parent.repaint()
