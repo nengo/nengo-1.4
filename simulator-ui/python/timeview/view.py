@@ -52,7 +52,7 @@ class EnsembleWatch:
     def views(self,obj):
         r=[
             ('voltage grid',components.Grid,dict(func=self.voltage,sfunc=self.spikes_only)),
-            ('voltage graph',components.Graph,dict(func=self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
+            ('voltage graph',components.Graph,dict(func=self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=obj.name)),
             ('firing rate',components.Grid,dict(func=self.spikes,min=0,max=lambda self: 200*self.view.dt,filter=True)),       
             ('spike raster',components.SpikeRaster,dict(func=self.spikes)),
             #('voltage grid',lambda view,name,type: components.Grid(view,name,type,self.voltage,sfunc=self.spikes_only)),
@@ -112,7 +112,7 @@ class NodeWatch:
             if len(obj.getOrigin(name).values.values)>8:
                 r.append((text_grid,components.VectorGrid,dict(func=self.value,args=(name,), min=-max_radii, max=max_radii)))
 
-            if len(obj.getOrigin(name).values.values)==2:
+            if len(obj.getOrigin(name).values.values)>=2:
                 r.append((xy,components.XYPlot,dict(func=self.value,args=(name,),filter=filter,label=label)))
                 
         return r    
