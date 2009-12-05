@@ -40,6 +40,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.min_width=20
         self.min_height=20
         self.resize_border=20
+        self.max_show_dim=30        # The maximum number of display dimensions to show in the popup menu
         self.popup=JPopupMenu()
         self.popup.add(JMenuItem('hide',actionPerformed=self.actionPerformed))
         self.setSize(100,50)

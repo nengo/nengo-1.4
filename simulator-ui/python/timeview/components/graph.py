@@ -49,7 +49,6 @@ class Graph(core.DataViewComponent):
         self.border_right=30
         self.border_bottom=20
         self.default_selected=5     # The default number of selected display dimensions
-        self.max_show_dim=30        # The maximum number of display dimensions to show in the popup menu
         self.filter=filter
         self.setSize(300,200)
         self.ylimits=ylimits
