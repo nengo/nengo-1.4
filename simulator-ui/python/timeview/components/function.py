@@ -4,22 +4,39 @@ from javax.swing import *
 from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
+from java.util import Hashtable
+
+from math import floor
+from math import ceil
+
 import java
 
 class FunctionControl(core.DataViewComponent,ComponentListener):
-    def __init__(self,view,name,func):
-        core.DataViewComponent.__init__(self)
+    def __init__(self,view,name,func,label=None):
+        core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
+        self.label_height = 18
         self.resize_border=2
-        self.range=1.0
+
+        self.popup_hide_limit = JCheckBoxMenuItem('auto-hide limits', True, actionPerformed=self.pin_limits)
+        self.popup.add(self.popup_hide_limit)
+        self.show_limits = False
+        self.auto_hide_limits = True
+        self.limits_font = Font("Dialog", Font.PLAIN, 10)
+        self.limit_width = 0
+        self.limit_hide_delay = 1000
+        self.limit_hide_timer = Timer(self.limit_hide_delay, None, actionPerformed=self.hide_limits)
+        self.limit_hide_timer.setRepeats(False)
+
         self.popup.add(JPopupMenu.Separator())        
         self.popup.add(JMenuItem('increase range',actionPerformed=self.increase_range))
         self.popup.add(JMenuItem('decrease range',actionPerformed=self.decrease_range))
+        self.scale_factor = 0.01
+        self.range=1.0
 
         self.data=self.view.watcher.watch(name,func)
-
 
         values=self.data.get_first()
         self.sliders=[]
@@ -35,7 +52,7 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             label=JLabel('0.00')
             self.add(label)
             self.labels.append(label)
-            slider.addMouseListener(self)  
+            slider.addMouseListener(self)
 
             
         
@@ -53,7 +70,7 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
     
     def slider_moved(self,index):
         if self.sliders[index].valueIsAdjusting:   # if I moved it
-            v=self.sliders[index].value*0.01*self.range
+            v=self.sliders[index].value*self.scale_factor*self.range
             self.labels[index].text='%1.2f'%v
             if self.view.paused:  # change immediately, bypassing filter
                 self.data.data[-1][index]=v
@@ -63,8 +80,15 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         
    
     def paintComponent(self,g):
+        temp = self.show_label
+        self.show_label = False
         core.DataViewComponent.paintComponent(self,g)    
+        self.show_label = temp
         
+        if self.show_label:
+            g.color=Color(0.3,0.3,0.3)
+            bounds=g.font.getStringBounds(self.label,g.fontRenderContext)
+            g.drawString(self.label,(self.size.width-self.limit_width)/2-bounds.width/2+self.limit_width,bounds.height)        
         
         self.active=self.view.current_tick>=self.view.timelog.tick_count-1
         
@@ -72,6 +96,21 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         if data is None: 
             data=self.data.get_first()
 
+        if( self.show_limits ):
+            g.color = Color(0.3,0.3,0.3)
+            txt_min = "%1.2f"%(-self.range)        
+            txt_max = "%1.2f"%(self.range)
+            
+            temp_font = g.font
+            g.font = self.limits_font
+            
+            bounds_min = g.font.getStringBounds(txt_min, g.fontRenderContext)
+            bounds_max = g.font.getStringBounds(txt_max, g.fontRenderContext)            
+            g.drawString(txt_max,10+bounds_min.width-bounds_max.width,self.resize_border+self.label_offset+bounds_max.height)
+            g.drawString(txt_min,10,self.height-self.resize_border-self.labels[0].getPreferredSize().height-bounds_min.height)
+            
+            g.font = temp_font
+            
         for i,v in enumerate(data):
             while v>self.range*1.1: self.range*=2
             while v<-self.range*1.1: self.range*=2
@@ -85,18 +124,16 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             self.labels[i].text='%1.2f'%v
             self.sliders[i].enabled=self.active
             
-            
-            
         self.componentResized(None)    
 
 
     def componentResized(self,e):
-        w=self.width-self.resize_border*2
+        w=self.width-self.resize_border*2-self.limit_width
         dw=w/len(self.sliders)
         x=(dw-self.sliders[0].minimumSize.width)/2
         for i,slider in enumerate(self.sliders):
-            slider.setSize(slider.minimumSize.width,self.height-self.resize_border*2-20)
-            slider.setLocation(self.resize_border+x+i*dw,self.resize_border)
+            slider.setLocation(self.limit_width+self.resize_border+x+i*dw,self.resize_border+self.label_offset)
+            slider.setSize(slider.minimumSize.width,self.height-self.resize_border*2-20-self.label_offset)
             self.labels[i].setLocation(slider.x+slider.width/2-self.labels[i].width/2,slider.y+slider.height)
             
     
@@ -109,10 +146,56 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         
     def save(self):
         info = core.DataViewComponent.save(self)
+        
+        if( self.auto_hide_limits ):
+            self.hide_limits(None)
+        
+        info['x']=self.x            # Overwrite x and width to account for removed limits
+        info['width']=self.width
         info['range']=self.range
+        info['limits']=self.auto_hide_limits
+        info['limits_w']=self.limit_width
         return info
     
     def restore(self,d):
         core.DataViewComponent.restore(self,d)
         self.range=d.get('range',1.0)
+        self.auto_hide_limits = d.get('limits',True)
+        self.limit_width = d.get('limits_w',0)
+        self.popup_hide_limit.state = self.auto_hide_limits
+        self.show_limits = not self.auto_hide_limits
 
+    def mouseEntered(self, event):
+        if( self.auto_hide_limits ):
+            self.limit_hide_timer.stop()
+            self.disp_limits()
+        core.DataViewComponent.mouseEntered(self, event)
+    
+    def mouseExited(self, event):
+        if( self.auto_hide_limits ):
+            self.limit_hide_timer.start()
+        core.DataViewComponent.mouseExited(self, event)
+    
+    def pin_limits(self, event):
+        self.auto_hide_limits = event.source.state
+        if( self.auto_hide_limits ):
+            self.limit_hide_timer.start()
+        else:
+            self.limit_hide_timer.stop()
+            self.disp_limits()
+    
+    def disp_limits(self):
+        if( not self.show_limits ):
+            limit_label = JLabel(("-%1.2f"%(self.range)))
+            self.limit_width = limit_label.getPreferredSize().width - self.sliders[0].width / 2
+            self.setSize(self.size.width+self.limit_width,self.size.height)
+            self.setLocation(self.x-self.limit_width, self.y)
+        self.show_limits = True
+    
+    def hide_limits(self, event):
+        if( self.show_limits ):
+            self.setSize(self.size.width-self.limit_width,self.size.height)
+            self.setLocation(self.x+self.limit_width, self.y)
+            self.limit_width = 0
+        self.show_limits = False
+        self.repaint()

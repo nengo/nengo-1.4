@@ -9,12 +9,13 @@ import neuronmap
 from math import sqrt
 
 class SpikeRaster(core.DataViewComponent):
-    def __init__(self,view,name,func):
-        core.DataViewComponent.__init__(self)
+    def __init__(self,view,name,func,label=None):
+        core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
         self.data=self.view.watcher.watch(name,func)
+        self.label_height=10
         self.border_top=10
         self.border_left=30
         self.border_right=30
@@ -38,6 +39,8 @@ class SpikeRaster(core.DataViewComponent):
         
         if self.map is None:
             self.initialize_map()
+        
+        border_top = self.border_top + self.label_offset
         
         g.color=Color(0.8,0.8,0.8)
         g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
@@ -64,7 +67,7 @@ class SpikeRaster(core.DataViewComponent):
         for i in range(now+1,len(data)):
             data[i]=None
             
-        dy=float(self.size.height-self.border_bottom-self.border_top)/self.neurons
+        dy=float(self.size.height-self.border_bottom-border_top)/self.neurons
         dx=float(self.size.width-self.border_left-self.border_right-1)/(pts-1)
         
         for i,d in enumerate(data):
@@ -73,7 +76,7 @@ class SpikeRaster(core.DataViewComponent):
                 spike=d[self.map.map[j]]
                 if spike:
                     x=int(i*dx+self.border_left)
-                    y=int(j*dy+self.border_top)
+                    y=int(j*dy+border_top)
                     
                     w=int(dy)-1
                     h=int(dy)-1

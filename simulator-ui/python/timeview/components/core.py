@@ -31,7 +31,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
     
     default_border=BorderFactory.createEmptyBorder()
     
-    def __init__(self):
+    def __init__(self, label=None):
         JPanel.__init__(self)
         self.addMouseListener(self)
         self.addMouseWheelListener(self)  
@@ -41,17 +41,34 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.min_height=20
         self.resize_border=20
         self.max_show_dim=30        # The maximum number of display dimensions to show in the popup menu
-        self.popup=JPopupMenu()
-        self.popup.add(JMenuItem('hide',actionPerformed=self.actionPerformed))
         self.setSize(100,50)
         self.border=self.default_border
+
+        self.popup=JPopupMenu()
+        self.popup.add(JMenuItem('hide',actionPerformed=self.hideme))
+
+        self.show_label=False
+        self.label = label
+        if self.label is not None:
+            self.popup.add(JPopupMenu.Separator())
+            self.popup_label=JCheckBoxMenuItem('label',self.show_label,actionPerformed=self.toggle_label)
+            self.popup.add(self.popup_label)
+            self.label_height = 15
+        else:
+            self.label_height = 0
+        self.label_offset = 0
         
     def save(self):
-        return dict(x=self.x,y=self.y,width=self.width,height=self.height)
+        return dict(x=self.x,y=self.y,width=self.width,height=self.height,label=self.show_label)
     
     def restore(self,d):
         self.setLocation(d['x'],d['y'])
         self.setSize(d['width'],d['height'])
+        self.show_label = d.get('label',False)
+        if self.label is not None:
+            self.popup_label.state = self.show_label
+        self.label_offset = self.label_height * self.show_label
+        
     
     def do_hide(self):
         parent=self.parent
@@ -59,9 +76,26 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.parent.remove(self) 
         parent.repaint()
         
-    def actionPerformed(self,event):
+    def hideme(self,event):
         if event.actionCommand=='hide':
             self.do_hide()
+
+    def toggle_label(self,event):
+        self.show_label=event.source.state
+        self.update_label()
+
+    def update_label(self):
+        if( self.show_label ):
+            self.setLocation(self.x, self.y-self.label_height)
+            self.setSize(self.size.width, self.size.height + self.label_height)
+            self.label_offset = self.label_height
+        else:
+            self.setLocation(self.x, self.y+self.label_height)
+            self.setSize(self.size.width, self.size.height - self.label_height)
+            self.label_offset = 0
+            
+        self.repaint()
+            
     def mouseWheelMoved(self,event):  
         delta=event.wheelRotation
         scale=0.9
@@ -156,3 +190,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         g.fillRect(0,0,self.size.width,self.size.height)
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
+        if self.show_label:
+            g.color=Color(0.3,0.3,0.3)
+            bounds=g.font.getStringBounds(self.label,g.fontRenderContext)
+            g.drawString(self.label,self.size.width/2-bounds.width/2,bounds.height)

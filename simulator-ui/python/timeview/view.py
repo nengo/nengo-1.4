@@ -51,10 +51,12 @@ class EnsembleWatch:
         return [x[0] for x in obj.encoders]
     def views(self,obj):
         r=[
-            ('voltage grid',components.Grid,dict(func=self.voltage,sfunc=self.spikes_only)),
+            (None, None, None),
+            # Note that the above tuple is to reset popup menu to main popup menu in item.py
+            ('voltage grid',components.Grid,dict(func=self.voltage,sfunc=self.spikes_only,label=obj.name)),
             ('voltage graph',components.Graph,dict(func=self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=obj.name)),
-            ('firing rate',components.Grid,dict(func=self.spikes,min=0,max=lambda self: 200*self.view.dt,filter=True)),       
-            ('spike raster',components.SpikeRaster,dict(func=self.spikes)),
+            ('firing rate',components.Grid,dict(func=self.spikes,min=0,max=lambda self: 200*self.view.dt,filter=True,label=obj.name)),       
+            ('spike raster',components.SpikeRaster,dict(func=self.spikes,label=obj.name)),
             #('voltage grid',lambda view,name,type: components.Grid(view,name,type,self.voltage,sfunc=self.spikes_only)),
             #('voltage graph',lambda view,name,type: components.Graph(view,name,type,self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
             #('firing rate',lambda view,name,type: components.Grid(view,name,type,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),       
@@ -62,7 +64,7 @@ class EnsembleWatch:
             ]
         if obj.dimension==2:
           r+=[    
-            ('preferred directions',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 500*self.view.dt,filter=True)),       
+            ('preferred directions',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 500*self.view.dt,filter=True,label=obj.name)),       
             #('decoders',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 0.1*self.view.dt,filter=True,decoders=True)),       
              ]
         return r   
@@ -74,6 +76,7 @@ class NodeWatch:
         return obj.getOrigin(origin).values.values
     def views(self,obj):
         origins=[o.name for o in obj.origins]
+        ignored_origins = ['AXON','current']
         
         default=None
         filter=True
@@ -89,28 +92,38 @@ class NodeWatch:
         else:
             max_radii = 1
         
+        for ignored in ignored_origins:
+            if( ignored in origins ):
+                origins.remove(ignored)
+        
+        origins.sort()
+        num_origins = len(origins)
+
         if default in origins:
             origins.remove(default)
             origins=[default]+origins
         
         r=[]
         for name in origins:
-            if name in ['AXON','current']: continue
-            if name == default: 
-                text='value'
-                text_grid = 'value (grid)'
-                label=obj.name
-                xy='XY plot'
-            else: 
-                text='value: '+name
-                text_grid='value (grid): ' + name
-                label=obj.name+': '+name
-                xy='XY plot: '+name
+            #if name == default: 
+            text='value'
+            text_grid = 'value (grid)'
+            label=obj.name
+            xy='XY plot'
+            #else: 
+            #    text='value: '+name
+            #    text_grid='value (grid): ' + name
+            #    label=obj.name+': '+name
+            #    xy='XY plot: '+name
+            
+            if( num_origins > 1 ):
+                label=obj.name+": "+name
+                r.append((name, JMenu, JMenu(name)))
             
             r.append((text,components.Graph,dict(func=self.value,args=(name,),filter=filter,label=label)))
             
             if len(obj.getOrigin(name).values.values)>8:
-                r.append((text_grid,components.VectorGrid,dict(func=self.value,args=(name,), min=-max_radii, max=max_radii)))
+                r.append((text_grid,components.VectorGrid,dict(func=self.value,args=(name,), min=-max_radii, max=max_radii,label=label)))
 
             if len(obj.getOrigin(name).values.values)>=2:
                 r.append((xy,components.XYPlot,dict(func=self.value,args=(name,),filter=filter,label=label)))
@@ -126,7 +139,7 @@ class FunctionWatch:
         return obj.getOrigin('origin').values.values
     def views(self,obj):
         return [
-            ('control',components.FunctionControl,dict(func=self.funcOrigin)),
+            ('control',components.FunctionControl,dict(func=self.funcOrigin,label=obj.name)),
             ]
 
 import space
@@ -421,12 +434,11 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.area.repaint()
         return True
     def view_save(self):
-        return dict(width=self.frame.width,height=self.frame.height)
+        return dict(width=self.frame.width,height=self.frame.height,state=self.frame.getExtendedState())
     
     def view_restore(self,d):
         self.frame.setSize(d['width'],d['height'])
-        
-            
+        self.frame.setExtendedState(d.get('state',self.frame.NORMAL))            
         
 
     def run(self):
@@ -639,6 +651,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
     def start(self,event):
         self.view.restart=True
     def configure(self,event):
+        view_state = self.view.frame.getExtendedState()
         if self.configPanel.visible:
             self.view.frame.setSize(self.view.frame.width,self.view.frame.height-self.config_panel_height)
             self.configPanel.visible=False
@@ -651,6 +664,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             self.config_button.icon=Icon.arrowup
             self.config_button.rolloverIcon=ShadedIcon.arrowup
             self.config_button.toolTipText='hide configuration'
+        self.view.frame.setExtendedState(view_state)
         self.view.frame.layout.layoutContainer(self.view.frame)    
         self.layout.layoutContainer(self)    
         self.view.frame.layout.layoutContainer(self.view.frame)    

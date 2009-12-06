@@ -21,9 +21,18 @@ class Item(core.DataViewComponent):
         
         self.descent=None
         
-        self.popup.add(JPopupMenu.Separator())
+        if( len(self.view.watcher.list(name)) > 0 ):
+            self.popup.add(JPopupMenu.Separator())
+        
+        popup_menu = self.popup
         for (type,klass,args) in self.view.watcher.list(name):
-            self.popup.add(JMenuItem(type,actionPerformed=lambda event,self=self,klass=klass,args=args,type=type: self.add_component(type,klass,args)))
+            if( klass is JMenu ):
+                popup_menu = args
+                self.popup.add(popup_menu)
+            elif( klass is None ):
+                popup_menu = self.popup
+            else:
+                popup_menu.add(JMenuItem(type,actionPerformed=lambda event,self=self,klass=klass,args=args,type=type: self.add_component(type,klass,args)))
             
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)

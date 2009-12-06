@@ -13,14 +13,18 @@ from math import ceil
 
 class XYPlot(core.DataViewComponent):
     def __init__(self,view,name,func,args=(),filter=None,label=None):
-        core.DataViewComponent.__init__(self)
+        core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
         self.indices=None
         self.data=self.view.watcher.watch(name,func,args=args)
         self.margin=10
-        self.label=label
+        
+        self.autozoom=True
+        self.last_maxy=None
+        self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
+        self.popup.add(self.popup_zoom)
         
         self.filter=filter
         self.setSize(200,200)
@@ -28,15 +32,21 @@ class XYPlot(core.DataViewComponent):
     def save(self):
         save_info = core.DataViewComponent.save(self)
         save_info['sel_dim'] = self.indices
+        save_info['autozoom']=self.autozoom
+        save_info['last_maxy']=self.last_maxy
         return save_info
 
     def restore(self, d):
         core.DataViewComponent.restore(self, d)
-        if( 'sel_dim' in d.keys() ):
-            self.indices = d['sel_dim']
-        else:
-            self.indices = [0,1]
+        self.indices = d.get('sel_dim', [0,1])
+        self.autozoom=d.get('autozoom',True)
+        self.popup_zoom.state=self.autozoom
+        self.last_maxy=d.get('last_maxy',None)        
         self.fix_popup()
+
+    def toggle_autozoom(self,event):
+        self.autozoom=event.source.state
+        self.repaint()
 
     def fix_popup(self):
         self.popup.add(JPopupMenu.Separator())
@@ -81,13 +91,13 @@ class XYPlot(core.DataViewComponent):
         core.DataViewComponent.paintComponent(self,g)
         
         xc=self.width/2
-        yc=self.height/2
+        yc=(self.height-self.label_offset)/2
         x0=self.margin/2.0
         y0=self.margin/2.0
         g.color=Color(0.8,0.8,0.8)
-        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.margin)+1)
-        g.drawLine(xc,self.margin,xc,self.height-self.margin)
-        g.drawLine(self.margin,yc,self.width-self.margin,yc)
+        g.drawRect(int(x0)-1,int(y0+self.label_offset)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.label_offset-self.margin)+1)
+        g.drawLine(xc,self.margin+self.label_offset,xc,self.height-self.margin)
+        g.drawLine(self.margin,yc+self.label_offset,self.width-self.margin,yc+self.label_offset)
         
         dt_tau=None
         if self.filter and self.view.tau_filter>0:
@@ -113,31 +123,36 @@ class XYPlot(core.DataViewComponent):
             mx=round(mx)[1]
             if mx<1.0: mx=1.0
         else:
-            mx=1.0    
+            mx=1.0
+        
+        if( not self.autozoom and self.last_maxy is not None and mx < self.last_maxy ):
+            mx = self.last_maxy
+        
+        self.last_maxy = mx
         
         g.color=Color.black
 
         txt='%g'%mx
         bounds=g.font.getStringBounds(txt,g.fontRenderContext)
         #g.drawString(txt,xc+self.margin,bounds.height)
-        g.drawString(txt,xc+x0,bounds.height+self.margin)
-        g.drawString(txt,self.width-self.margin-bounds.width,yc+bounds.height)
+        g.drawString(txt,xc+x0,bounds.height+self.margin+self.label_offset)
+        g.drawString(txt,self.width-self.margin-bounds.width,yc+bounds.height+self.label_offset)
 
         txt='%g'%(-mx)
         #g.drawString(txt,xc+self.margin,self.height-self.margin)
         g.drawString(txt,xc+x0,self.height-self.margin)
-        g.drawString(txt,self.margin,yc+bounds.height)
+        g.drawString(txt,self.margin,yc+bounds.height+self.label_offset)
         
         txt = '%s[%d]'%('v',self.indices[0])
         boundsl = g.font.getStringBounds(txt,g.fontRenderContext)
-        g.drawString(txt,self.width-self.margin-boundsl.width,yc-y0)
+        g.drawString(txt,self.width-self.margin-boundsl.width,yc-y0+self.label_offset)
         
         txt = '%s[%d]'%('v',self.indices[1])
         boundsl = g.font.getStringBounds(txt,g.fontRenderContext)
-        g.drawString(txt,xc-x0-boundsl.width,bounds.height+self.margin)
+        g.drawString(txt,xc-x0-boundsl.width,bounds.height+self.margin+self.label_offset)
 
         sx=(self.width/2-self.margin)/mx
-        sy=(self.height/2-self.margin)/mx
+        sy=(yc-self.margin)/mx
         for i in range(pts-1):
             if data[i] is not None and data[i+1] is not None:
                 x0=data[i][self.indices[0]]
@@ -148,5 +163,5 @@ class XYPlot(core.DataViewComponent):
                 c=1.0-i/float(pts-1)
                 g.color=Color(c,c,c)
                 
-                g.drawLine(int(xc+x0*sx),int(yc-y0*sy),int(xc+x1*sx),int(yc-y1*sy))
+                g.drawLine(int(xc+x0*sx),int(yc-y0*sy+self.label_offset),int(xc+x1*sx),int(yc-y1*sy+self.label_offset))
 

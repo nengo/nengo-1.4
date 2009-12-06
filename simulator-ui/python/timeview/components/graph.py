@@ -38,7 +38,7 @@ def round(x):
 
 class Graph(core.DataViewComponent):
     def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None):
-        core.DataViewComponent.__init__(self)
+        core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
@@ -50,6 +50,7 @@ class Graph(core.DataViewComponent):
         self.border_bottom=20
         self.default_selected=5     # The default number of selected display dimensions
         self.filter=filter
+        self.label_height = 10
         self.setSize(300,200)
         self.ylimits=ylimits
         self.split=split
@@ -58,12 +59,6 @@ class Graph(core.DataViewComponent):
         self.neuronmapped=neuronmapped
         
         self.map=None
-        self.label=label
-        self.show_label=False
-        self.popup.add(JPopupMenu.Separator())
-        if self.label is not None:
-            self.popup_label=JCheckBoxMenuItem('label',self.show_label,stateChanged=self.toggle_label)
-            self.popup.add(self.popup_label)
         self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
         self.popup.add(self.popup_zoom)
 
@@ -85,7 +80,6 @@ class Graph(core.DataViewComponent):
                 sel_dim += [n]
             
         save_info['sel_dim'] = sel_dim              # Save the checkbox states
-        save_info['label']=self.show_label
         save_info['autozoom']=self.autozoom
         save_info['last_maxy']=self.last_maxy
         
@@ -97,28 +91,17 @@ class Graph(core.DataViewComponent):
         data_dim = len(self.data.get_first())       # Get dimensionality of data
         self.indices = [False] * data_dim
         
-        if( 'sel_dim' in d.keys() ):
-            sel_dim = d['sel_dim']
-        else:
-            sel_dim = range(min(data_dim, self.default_selected))
+        sel_dim = d.get('sel_dim', range(min(data_dim, self.default_selected)))
         
         for dim in sel_dim:                         # Iterate and restore the saved state
             if( dim < data_dim ):
                 self.indices[dim] = True
                 
         self.fix_popup()                            # Update the pop-up box
-        self.show_label=d.get('label',False)
-        self.popup_label.state=self.show_label
         self.autozoom=d.get('autozoom',True)
         self.popup_zoom.state=self.autozoom
         self.last_maxy=d.get('last_maxy',None)
         
-        
-        
-        
-    def toggle_label(self,event):
-        self.show_label=event.source.state
-        self.repaint()
     def toggle_autozoom(self,event):
         self.autozoom=event.source.state
         self.repaint()
@@ -147,19 +130,13 @@ class Graph(core.DataViewComponent):
         if self.neuronmapped and self.map is None:
             self.initialize_map()
 
-        if self.show_label:
-            self.border_top=20
-            g.color=Color(0.3,0.3,0.3)
-            bounds=g.font.getStringBounds(self.label,g.fontRenderContext)
-            g.drawString(self.label,self.size.width/2-bounds.width/2,bounds.height)
-        else:
-            self.border_top=10    
+        border_top = self.border_top + self.label_offset
 
         g.color=Color(0.8,0.8,0.8)
-        g.drawRect(self.border_left,self.border_top,self.width-self.border_left-self.border_right,self.size.height-self.border_top-self.border_bottom)
+        g.drawRect(self.border_left,border_top,self.width-self.border_left-self.border_right,self.size.height-border_top-self.border_bottom)
 
         g.color=Color(0.8,0.8,0.8)
-        g.drawLine(self.border_left,self.border_top,self.border_left,self.size.height-self.border_bottom)
+        g.drawLine(self.border_left,border_top,self.border_left,self.size.height-self.border_bottom)
         #g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
 
 
@@ -235,31 +212,31 @@ class Graph(core.DataViewComponent):
         self.last_maxy=maxy
 
         if maxy==miny: yscale=0
-        else: yscale=float(self.size.height-self.border_bottom-self.border_top)/(maxy-miny)
+        else: yscale=float(self.size.height-self.border_bottom-border_top)/(maxy-miny)
         if self.split and len(filtered)>0: 
             yscale=yscale/len(filtered)
-            split_step=float(self.size.height-self.border_bottom-self.border_top)/len(filtered)
+            split_step=float(self.size.height-self.border_bottom-border_top)/len(filtered)
             
             
 
             
-        # draw zero line
-        g.color=Color(0.8,0.8,0.8)
-        y0=int(self.size.height-(0-miny)*yscale-self.border_bottom)
-        g.drawLine(self.border_left,y0,self.width-self.border_right,y0)
+        if( not self.neuronmapped ):
+            # draw zero line
+            g.color=Color(0.8,0.8,0.8)
+            y0=int(self.size.height-(0-miny)*yscale-self.border_bottom)
+            g.drawLine(self.border_left,y0,self.width-self.border_right,y0)
+            
+            # draw ticks
+            tick_count=10
+            if ('%f'%maxy)[0]=='2': tick_count=8
+            
+            tick_span=maxy*2.0/tick_count
+            tick_size=3
+            for i in range(1,tick_count):
+                yt=int(self.size.height-(i*tick_span)*yscale-self.border_bottom)
+                g.drawLine(self.border_left,yt,self.border_left+tick_size,yt)
+                g.drawLine(self.width-self.border_right,yt,self.width-self.border_right-tick_size,yt)
         
-        # draw ticks
-        tick_count=10
-        if ('%f'%maxy)[0]=='2': tick_count=8
-        
-        tick_span=maxy*2.0/tick_count
-        tick_size=3
-        for i in range(1,tick_count):
-            yt=int(self.size.height-(i*tick_span)*yscale-self.border_bottom)
-            g.drawLine(self.border_left,yt,self.border_left+tick_size,yt)
-            g.drawLine(self.width-self.border_right,yt,self.width-self.border_right-tick_size,yt)
-        
-
 
         colors=[Color.black,Color.blue,Color.red,Color.green,Color.magenta,Color.cyan,Color.yellow]
         g.color=Color.blue
@@ -286,7 +263,7 @@ class Graph(core.DataViewComponent):
                     g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1+skip)*dx+self.border_left),int(y2))
         if not self.split:
             g.color=Color.black   
-            if maxy is not None: g.drawString('%6g'%maxy,0,10+self.border_top)
+            if maxy is not None: g.drawString('%6g'%maxy,0,10+border_top)
             if miny is not None: g.drawString('%6g'%miny,0,self.size.height-self.border_bottom)
 
 

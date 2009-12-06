@@ -8,8 +8,8 @@ import neuronmap
 
 from math import sqrt
 class Grid(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,filter=False):
-        core.DataViewComponent.__init__(self)
+    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,filter=False,label=None):
+        core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
@@ -23,8 +23,7 @@ class Grid(core.DataViewComponent):
         self.max=max
         self.map=None
         self.requested_improvements=0
-        
-        
+                
         self.popup.add(JPopupMenu.Separator())
         self.popup.add(JMenuItem('improve layout',actionPerformed=self.improve_layout))
         self.auto_improve=False
@@ -57,9 +56,9 @@ class Grid(core.DataViewComponent):
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
         x0=self.margin/2.0
-        y0=self.margin/2.0
+        y0=self.margin/2.0+self.label_offset
         g.color=Color.black
-        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.margin)+1)
+        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.label_offset-self.margin)+1)
         
         dt_tau=None
         if self.filter and self.view.tau_filter>0:
@@ -95,7 +94,7 @@ class Grid(core.DataViewComponent):
         if callable(min): min=min(self)
             
         dx=float(self.size.width-self.margin)/cols
-        dy=float(self.size.height-self.margin)/rows
+        dy=float(self.size.height-self.label_offset-self.margin)/rows
         for y in range(rows):
             for x in range(cols):                
                 if x+y*cols<len(data):
@@ -108,8 +107,8 @@ class Grid(core.DataViewComponent):
                         if c>1: c=1.0
                         g.color=Color(c,c,c)
                     g.fillRect(int(x0+dx*x),int(y0+dy*y),int(dx+1),int(dy+1))
-        g.color=Color.black
-        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.margin)+1)
+        #g.color=Color.black
+        #g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.label_offset-self.margin)+1)
 
         if self.requested_improvements>self.map.improvements:    
             self.map.improve()
