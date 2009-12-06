@@ -503,7 +503,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         self.view=view
         self.background=Color.white
         self.config_panel_height=60
-        
+        #self.config_panel_width = 675 
         
         
         mainPanel=JPanel(background=self.background,layout=BorderLayout())
@@ -621,8 +621,6 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         layout.maximumSize=layout.preferredSize
         configPanel.add(layout)
         
-        
-
         configPanel.setPreferredSize(java.awt.Dimension(20,self.config_panel_height))
         configPanel.visible=False
         
@@ -659,7 +657,10 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             self.config_button.rolloverIcon=ShadedIcon.arrowdown
             self.config_button.toolTipText='configure'
         else:    
-            self.view.frame.setSize(self.view.frame.width,self.view.frame.height+self.config_panel_height)
+            if( view_state & self.view.frame.MAXIMIZED_BOTH == self.view.frame.MAXIMIZED_BOTH ):
+                self.view.frame.setSize(self.view.frame.width,self.view.frame.height)
+            else:
+                self.view.frame.setSize(self.view.frame.width,self.view.frame.height+self.config_panel_height)                
             self.configPanel.visible=True
             self.config_button.icon=Icon.arrowup
             self.config_button.rolloverIcon=ShadedIcon.arrowup
