@@ -139,6 +139,8 @@ class FunctionWatch:
         return obj.getOrigin('origin').values.values
     def views(self,obj):
         return [
+            (None, None, None),
+            # Note that the above tuple is to reset popup menu to main popup menu in item.py
             ('control',components.FunctionControl,dict(func=self.funcOrigin,label=obj.name)),
             ]
 
@@ -154,6 +156,8 @@ class RoomWatch:
         return obj._simulator.model.physics_dump()
     def views(self,obj):
         return [
+            (None, None, None),
+            # Note that the above tuple is to reset popup menu to main popup menu in item.py
             ('3D view',components.View3D,dict(func=self.physics)),
             ]
 
