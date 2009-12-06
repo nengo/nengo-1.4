@@ -281,10 +281,13 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
     def add_item(self,name,location=None):
         g=components.Item(self,name)
+        if name in self.area.nodes:
+            self.area.nodes[name].do_hide()
         self.area.nodes[name]=g
         if location is not None:
             g.setLocation(*location)
         self.area.add(g)
+        self.area.repaint()
         return g
     def clear_all(self):
         self.area.nodes={}

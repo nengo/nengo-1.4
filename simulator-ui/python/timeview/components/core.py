@@ -52,13 +52,16 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
     def restore(self,d):
         self.setLocation(d['x'],d['y'])
         self.setSize(d['width'],d['height'])
+    
+    def do_hide(self):
+        parent=self.parent
+        self.visible=False
+        self.parent.remove(self) 
+        parent.repaint()
         
     def actionPerformed(self,event):
         if event.actionCommand=='hide':
-            parent=self.parent
-            self.visible=False
-            self.parent.remove(self) 
-            parent.repaint()
+            self.do_hide()
     def mouseWheelMoved(self,event):  
         delta=event.wheelRotation
         scale=0.9
