@@ -77,7 +77,7 @@ public abstract class MatrixHandlerBase extends BaseHandler {
 				// Set preferred size
 				{
 					int desiredWidth = Math.min(matrixEditor.getColumnCount() * 70 + 100, 1024);
-					desiredWidth = Math.max(desiredWidth, 400);
+					desiredWidth = Math.max(desiredWidth, 600);
 
 					int desiredHeight = Math.min(matrixEditor.getRowCount() * 30 + 150, 768);
 					dialog.setPreferredSize(new Dimension(desiredWidth, desiredHeight));
