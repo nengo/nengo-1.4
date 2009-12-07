@@ -72,6 +72,8 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		myFunctions.put("asin", new SimpleFunctions.Asin());
 		myFunctions.put("acos", new SimpleFunctions.Acos());
 		myFunctions.put("atan", new SimpleFunctions.Atan());
+        myFunctions.put("InverseNormal", new SimpleFunctions.InverseNormal());
+        myFunctions.put("Normal", new SimpleFunctions.Normal());
 
 		myFunctions.put("fold", new SimpleFunctions.Fold());
 		myFunctions.put("exp", new SimpleFunctions.Exp());
