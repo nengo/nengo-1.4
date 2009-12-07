@@ -115,7 +115,8 @@ public class MatrixEditor extends JPanel {
 	 *            The matrix to be edited
 	 */
 	public MatrixEditor(float[][] matrix) {
-		super(new BorderLayout());
+		super(new BorderLayout());	
+		
 		myMatrix = matrix;
 		myTableModel = new MatrixTableModel(matrix);
 		myTable = new JTable(myTableModel);
@@ -137,6 +138,14 @@ public class MatrixEditor extends JPanel {
 
 		myControlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		this.add(myControlPanel, BorderLayout.SOUTH);
+	}
+
+	public int getColumnCount() {
+		return myTable.getColumnCount();
+	}
+
+	public int getRowCount() {
+		return myTable.getRowCount();
 	}
 
 	/**

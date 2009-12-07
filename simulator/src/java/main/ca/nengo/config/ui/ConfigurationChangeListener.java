@@ -117,8 +117,8 @@ public class ConfigurationChangeListener implements ActionListener {
 	 * 
 	 * @author Bryan Tripp
 	 */
-	public interface EditorProxy {
 
+	public interface EditorProxy {
 		/**
 		 * @return Current value of edited object
 		 */

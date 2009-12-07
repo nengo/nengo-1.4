@@ -61,17 +61,14 @@ import ca.nengo.util.MU.VectorExpander;
  * 
  * @author Bryan Tripp
  */
-public class MatrixHandler extends BaseHandler {
+public class MatrixHandler extends MatrixHandlerBase {
 
 	public MatrixHandler() {
 		super(float[][].class);
 	}
 
-	@Override
-	public Component getEditor(Object o,
-			final ConfigurationChangeListener configListener,
-			final JComponent parent) {
-
+	public MatrixEditor CreateMatrixEditor(Object o,
+			final ConfigurationChangeListener configListener) {
 		/*
 		 * The Matrix editor is created in a new JDialog.
 		 */
@@ -98,91 +95,7 @@ public class MatrixHandler extends BaseHandler {
 				}
 			});
 		}
-
-		// Create asynchronous modal dialog to edit the matrix
-		//
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				final JDialog dialog = createDialog(parent, matrixEditor);
-
-				// Create buttons
-				//
-				// The matrix editor will not use the configListener as a
-				// listener, but
-				// conversely notify it of changes. This is because the Config
-				// listener only support
-				// one type of "save" event.
-				//
-				JButton okButton, cancelButton;
-				{
-					matrixEditor.getControlPanel().add(new JSeparator(JSeparator.VERTICAL));
-
-					okButton = new JButton("Save Changes");
-					matrixEditor.getControlPanel().add(okButton);
-					okButton.addActionListener(new java.awt.event.ActionListener() {
-						public void actionPerformed(java.awt.event.ActionEvent e) {
-							matrixEditor.finishEditing();
-							configListener.commitChanges();
-							dialog.setVisible(false);
-						}
-					});
-
-					cancelButton = new JButton("Cancel");
-					matrixEditor.getControlPanel().add(cancelButton);
-					cancelButton.addActionListener(new java.awt.event.ActionListener() {
-						public void actionPerformed(java.awt.event.ActionEvent e) {
-							configListener.cancelChanges();
-							dialog.setVisible(false);
-						}
-					});
-				}
-
-				// Set dialog model
-				//
-				dialog.setModal(true);
-				dialog.setVisible(true);
-				int desiredWidth = Math.max(matrix[0].length * 80 + 100, 1024);
-				desiredWidth = Math.min(desiredWidth, 400);
-				dialog.setPreferredSize(new Dimension(desiredWidth, 600));
-
-				// Handle dialog close
-				//
-				if (!configListener.isChangeCommited() && !configListener.isChangeCancelled()) {
-					configListener.cancelChanges();
-				}
-			}
-		});
-
-		return new JTextField("Editing...");
-	}
-
-	/**
-	 * Shows a tree in which object properties can be edited.
-	 * 
-	 * @param o
-	 *            The Object to configure
-	 */
-	private static JDialog createDialog(JComponent parent, JPanel panel) {
-		final JDialog dialog;
-
-		Container parentContainer = parent.getRootPane().getParent();
-
-		if (parentContainer instanceof Frame) {
-			dialog = new JDialog((Frame) parentContainer, panel.getName());
-		} else if (parentContainer instanceof Dialog) {
-			dialog = new JDialog((Dialog) parentContainer, panel.getName());
-		} else {
-			dialog = new JDialog((JDialog) null, panel.getName());
-		}
-
-		dialog.getContentPane().setLayout(new BorderLayout());
-		dialog.getContentPane().add(panel, BorderLayout.CENTER);
-		dialog.pack();
-
-		if (parentContainer != null) {
-			dialog.setLocationRelativeTo(parentContainer);// centers on screen
-		}
-		return dialog;
+		return matrixEditor;
 	}
 
 	@Override
