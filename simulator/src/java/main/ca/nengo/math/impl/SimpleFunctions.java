@@ -27,6 +27,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.math.impl;
 
+import umontreal.iro.lecuyer.probdist.NormalDist;
+
 /**
  * A collection of Functions that do not have parameters. 
  *  
@@ -160,6 +162,33 @@ public class SimpleFunctions {
 			return (float) (from[0] - Math.ceil(from[0] - 0.5f));
 		}
 	}
+	
+	public static class InverseNormal extends AbstractFunction {
+		private static final long serialVersionUID = 1L;
+
+		public InverseNormal() {
+			super(3);
+		}
+
+		@Override
+		public float map(float[] from) {
+			return (float) (NormalDist.inverseF(from[0],from[1],from[2]));
+		}
+	}
+	
+	public static class Normal extends AbstractFunction {
+		private static final long serialVersionUID = 1L;
+
+		public Normal() {
+			super(3);
+		}
+
+		@Override
+		public float map(float[] from) {
+			return (float) (NormalDist.cdf(from[0],from[1],from[2]));
+		}
+	}
+	
 	public static class Exp extends AbstractFunction {
 		private static final long serialVersionUID = 1L;
 
