@@ -164,13 +164,23 @@ public class RealPlasticityRule implements PlasticityRule {
 		checkType(input);
 		float[] values = ((RealOutput) input).getValues();
 		float[][] result = new float[transform.length][];
-		for (int i = 0; i < transform.length; i++) {
-			result[i] = new float[transform[i].length];
-			for (int j = 0; j < transform[i].length; j++) {
-				float os = (myOriginState != null) ? myOriginState[i] : 0;
-				result[i][j] = myFunction.map(new float[]{values[j], os, transform[i][j], myModInput,i,j,myModInputArray[i]});
+		if (myModInputArray != null) {
+			for (int i = 0; i < transform.length; i++) {
+				result[i] = new float[transform[i].length];
+				for (int j = 0; j < transform[i].length; j++) {
+					float os = (myOriginState != null) ? myOriginState[i] : 0;
+					result[i][j] = myFunction.map(new float[]{values[j], os, transform[i][j], myModInput,i,j,myModInputArray[i]});
+				}
 			}
-		}
+		} else {
+			for (int i = 0; i < transform.length; i++) {
+				result[i] = new float[transform[i].length];
+					for (int j = 0; j < transform[i].length; j++) {
+						float os = (myOriginState != null) ? myOriginState[i] : 0;
+						result[i][j] = myFunction.map(new float[]{values[j], os, transform[i][j], myModInput,i,j,0});
+					}
+				}	
+			}
 		
 		return result;
 	}

@@ -50,6 +50,7 @@ public class SpikePlasticityRule implements PlasticityRule {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private String myTerminationName;
 	private String myOriginName;
 	private String myModTermName;
 	private int myModTermDim;
@@ -61,6 +62,9 @@ public class SpikePlasticityRule implements PlasticityRule {
 	private boolean[] myInSpiking;
 	private boolean[] myOutSpiking;
 	private float myModInput;
+	private float[] myModInputArray;
+	private float[] myOriginState;	
+	private float[] myTerminationState;	
 	
 	/**
 	 * @param origin Name of Origin from which post-synaptic activity is drawn
@@ -75,8 +79,9 @@ public class SpikePlasticityRule implements PlasticityRule {
 	 * @param termDim Dimension of Termination this rule applies to 
 	 * @param originDim Dimension of post-synaptic activity (eg number of neurons if rule belongs to an Ensemble) 
 	 */
-	public SpikePlasticityRule(String origin, String modTerm, int modTermDim, Function onInSpike, Function onOutSpike, int termDim, int originDim) {
+	public SpikePlasticityRule(String termination, String origin, String modTerm, int modTermDim, Function onInSpike, Function onOutSpike, int termDim, int originDim) {
 		setOriginName(origin);
+		setTerminationName(termination);
 		setModTermName(modTerm);
 		myModTermDim = modTermDim;
 		setOnInSpike(onInSpike);
@@ -101,6 +106,21 @@ public class SpikePlasticityRule implements PlasticityRule {
 		myOriginName = (name == null) ? "" : name;
 	}
 
+	/**
+	 * @return Name of Origin from which post-synaptic activity is drawn
+	 */
+	public String getTerminationName() {
+		return myTerminationName;
+	}
+	
+	/**
+	 * 
+	 * @param name Name of Origin from which post-synaptic activity is drawn
+	 */
+	public void setTerminationName(String name) {
+		myTerminationName = (name == null) ? "" : name;
+	}
+	
 	/**
 	 * @return Name of the Termination from which modulatory input is drawn (can be null if not used)
 	 */
@@ -142,7 +162,7 @@ public class SpikePlasticityRule implements PlasticityRule {
 	 * @param function Function defining synaptic weight change when there is an <bold>incoming</bold> spike. 
 	 */
 	public void setOnInSpike(Function function) {
-		if (function.getDimension() != 3) {
+		if (function.getDimension() != 6) {
 			throw new IllegalArgumentException("Function must have three dimensions: " +
 					"1) time since last post-synaptic spike; 2) existing weight; 3) modulatory input.");
 		}
@@ -161,7 +181,7 @@ public class SpikePlasticityRule implements PlasticityRule {
 	 * @param function Function defining synaptic weight change when there is an <bold>outgoing</bold> spike.
 	 */
 	public void setOnOutSpike(Function function) {
-		if (function.getDimension() != 3) {
+		if (function.getDimension() != 6) {
 			throw new IllegalArgumentException("Function must have three dimensions: " +
 					"1) time since last post-synaptic spike; 2) existing weight; 3) modulatory input.");
 		}
@@ -204,7 +224,11 @@ public class SpikePlasticityRule implements PlasticityRule {
 	 */
 	public void setOriginState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myOriginName)) {
-			update(myLastOutSpike, myOutSpiking, state, time);
+			if (state instanceof SpikeOutput) {
+				update(myLastOutSpike, myOutSpiking, state, time);
+			} else if (state instanceof RealOutput) {
+				myOriginState = ((RealOutput) state).getValues();
+			}			
 		}
 	}
 
@@ -213,7 +237,11 @@ public class SpikePlasticityRule implements PlasticityRule {
 	 */
 	public void setTerminationState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myModTermName)) {
-			myModInput = ((RealOutput) state).getValues()[myModTermDim];
+			checkType(state);
+			myModInputArray=((RealOutput) state).getValues();
+			myModInput = myModInputArray[myModTermDim];
+		} else if (name.equals(myTerminationName)) {
+			myTerminationState = ((RealOutput) state).getValues();
 		}
 	}
 
@@ -221,18 +249,21 @@ public class SpikePlasticityRule implements PlasticityRule {
 	 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float)
 	 */
 	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) {
-		update(myLastInSpike, myInSpiking, input, time);
+		if (input instanceof SpikeOutput) {
+			update(myLastInSpike, myInSpiking, input, time);
+		} 
 		
 		float[][] result = new float[transform.length][];
 		for (int i = 0; i < transform.length; i++) {
 			result[i] = new float[transform[i].length];
 			for (int j = 0; j < transform[i].length; j++) {
-				if (myInSpiking[j] && myLastOutSpike[i] >= 0) {
-					result[i][j] += myOnInSpikeFunction.map(new float[]{time - myLastOutSpike[i], transform[i][j], myModInput});					
-				}
-				if (myOutSpiking[i] && myLastInSpike[j] >= 0) {
-					result[i][j] += myOnOutSpikeFunction.map(new float[]{time - myLastInSpike[j], transform[i][j], myModInput});
-				}
+				float os = (myOriginState != null) ? myOriginState[i] : 0;
+				//if (myInSpiking[j] && myLastOutSpike[i] >= 0) {
+					result[i][j] += myOnInSpikeFunction.map(new float[]{os, myTerminationState[i], time - myLastOutSpike[i], transform[i][j], myModInput, myModInputArray[i]});					
+				//}
+				//if (myOutSpiking[i] && myLastInSpike[j] >= 0) {
+				//	result[i][j] += myOnOutSpikeFunction.map(new float[]{os, myTerminationState[i], time - myLastInSpike[j], transform[i][j], myModInput, myModInputArray[i]});
+				//}
 			}
 		}
 		return result;
@@ -259,7 +290,13 @@ public class SpikePlasticityRule implements PlasticityRule {
 			}
 		}
 	}
-
+	
+	private static void checkType(InstantaneousOutput state) {
+		if (!(state instanceof RealOutput)) {
+			throw new IllegalArgumentException("This rule does not support input of type " + state.getClass().getName());
+		}
+	}
+	
 	@Override
 	public PlasticityRule clone() throws CloneNotSupportedException {
 		SpikePlasticityRule result = (SpikePlasticityRule) super.clone();

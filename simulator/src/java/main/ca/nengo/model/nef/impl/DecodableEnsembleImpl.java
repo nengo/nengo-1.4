@@ -37,6 +37,7 @@ import ca.nengo.math.ApproximatorFactory;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
 import ca.nengo.math.impl.ConstantFunction;
+import ca.nengo.math.impl.TimeSeriesFunction;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -49,6 +50,7 @@ import ca.nengo.model.impl.EnsembleImpl;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.nef.DecodableEnsemble;
 import ca.nengo.util.MU;
+import ca.nengo.util.DataUtils;
 import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.TimeSeriesImpl;
@@ -148,6 +150,65 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 		return result;		
 	}
 	
+	/**
+	 * @see ca.nengo.model.nef.DecodableEnsemble#addDecodedOrigin(java.lang.String, ca.nengo.math.Function[], java.lang.String, ca.nengo.model.Network, ca.nengo.util.Probe, float, float, float)
+	 * 
+	 *  Lloyd Elliot's decodable origin for decoding band-limited noise using a psc optimized decoder
+	 */
+	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment, 
+			Probe probe, Probe state, float startTime, float endTime, float tau) throws StructuralException, SimulationException {
+
+		probe.reset();
+		state.reset();
+		environment.run(startTime, endTime);
+
+		float [][]values;
+		float []time;
+		if(true)
+		{
+			TimeSeries filtered = DataUtils.filter(probe.getData(),tau);
+			values = filtered.getValues();
+			time = filtered.getTimes();
+		}
+		else
+		{
+			values = probe.getData().getValues();
+			time = probe.getData().getTimes();
+		}
+		int t0 = (int)(Math.ceil((double)time.length/2d));
+		int t1 = time.length;
+		int k;
+		
+		float[][] valuesT = new float[values[0].length][t1-t0];
+		TimeSeries stateData = state.getData();
+		
+		int d = stateData.getValues()[0].length;
+		TimeSeriesFunction []evalPointsFunction = new TimeSeriesFunction[d];
+		
+		float [][]evalPoints = new float[t1-t0][d];
+		
+		for(int i=0;i<d;i++)
+		{
+			evalPointsFunction[i] = new TimeSeriesFunction(state.getData(),i);
+			
+			for(k=0;k<t1-t0;k++)
+			{
+				evalPoints[k][i] = evalPointsFunction[i].map(new float[]{time[k+t0]});
+				for(int j=0;j<values[0].length;j++)
+				{
+					valuesT[j][k] = values[k+t0][j];
+				}
+			}
+		}
+		
+		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, valuesT);
+		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, approximator);
+		result.setMode(getMode());
+
+		addDecodedOrigin(name, result);
+		return result;
+	}
+
 	/**
 	 * @param name The name of a new DecodedOrigin
 	 * @param origin The new Origin

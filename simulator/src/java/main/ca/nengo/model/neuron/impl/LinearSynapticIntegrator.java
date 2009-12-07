@@ -149,19 +149,21 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 			LinearExponentialTermination termination = myTerminations.get(name);
 			PlasticityRule rule = myPlasticityRules.get(name);
 			
-			Iterator termIter = myTerminations.keySet().iterator();
-			while (termIter.hasNext()) {
-				LinearExponentialTermination t = myTerminations.get(termIter.next());
-				InstantaneousOutput input = new RealOutputImpl(new float[]{t.getOutput()}, Units.UNK, endTime);
-				rule.setTerminationState(t.getName(), input, endTime);					
+			if (rule != null) {
+				Iterator termIter = myTerminations.keySet().iterator();
+				while (termIter.hasNext()) {
+					LinearExponentialTermination t = myTerminations.get(termIter.next());
+					InstantaneousOutput input = new RealOutputImpl(new float[]{t.getOutput()}, Units.UNK, endTime);
+					rule.setTerminationState(t.getName(), input, endTime);					
+				}
+				
+				float[] weights = termination.getWeights();
+				float[][] derivative = rule.getDerivative(new float[][]{weights}, termination.getInput(), endTime);
+				float scale = (termination.getInput() instanceof SpikeOutput) ? 1 : (endTime - startTime); 			
+				for (int i = 0; i < weights.length; i++) {
+					weights[i] += derivative[0][i] * scale;
+				}			
 			}
-			
-			float[] weights = termination.getWeights();
-			float[][] derivative = rule.getDerivative(new float[][]{weights}, termination.getInput(), endTime);
-			float scale = (termination.getInput() instanceof SpikeOutput) ? 1 : (endTime - startTime); 			
-			for (int i = 0; i < weights.length; i++) {
-				weights[i] += derivative[0][i] * scale;
-			}			
 		}
 	}
 
