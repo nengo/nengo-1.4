@@ -52,16 +52,17 @@ public class VectorHandler extends MatrixHandlerBase {
 
 	@Override
 	public Component getRenderer(Object o) {
-		JLabel result = new JLabel(MatrixHandler.toString(new float[][] { (float[]) o },
-				' ',
-				"\r\n"), IconRegistry.getInstance().getIcon(o), SwingConstants.LEFT);
+		JLabel result = new JLabel(MatrixHandler.toString(
+				new float[][] { (float[]) o }, ' ', "\r\n"), IconRegistry
+				.getInstance().getIcon(o), SwingConstants.LEFT);
 		result.setFont(result.getFont().deriveFont(Font.PLAIN));
 		return result;
 	}
 
 	@Override
 	public String toString(Object o) {
-		return MatrixHandler.toString(new float[][] { (float[]) o }, ',', "\r\n");
+		return MatrixHandler.toString(new float[][] { (float[]) o }, ',',
+				"\r\n");
 	}
 
 	@Override
@@ -77,7 +78,8 @@ public class VectorHandler extends MatrixHandlerBase {
 	}
 
 	@Override
-	public MatrixEditor CreateMatrixEditor(Object o, ConfigurationChangeListener configListener) {
+	public MatrixEditor CreateMatrixEditor(Object o,
+			ConfigurationChangeListener configListener) {
 		final MatrixEditor matrixEditor;
 		{
 			float[] copy;
@@ -89,15 +91,12 @@ public class VectorHandler extends MatrixHandlerBase {
 
 			matrixEditor = new MatrixEditor(new float[][] { copy }, true, false);
 
-			matrixEditor.setPreferredSize(new Dimension(400, 85));
-			JButton okButton = new JButton("OK");
-			matrixEditor.getControlPanel().add(okButton);
-
-			configListener.setProxy(new ConfigurationChangeListener.EditorProxy() {
-				public Object getValue() {
-					return matrixEditor.getMatrix()[0];
-				}
-			});
+			configListener
+					.setProxy(new ConfigurationChangeListener.EditorProxy() {
+						public Object getValue() {
+							return matrixEditor.getMatrix()[0];
+						}
+					});
 
 			return matrixEditor;
 		}
