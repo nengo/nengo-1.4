@@ -20,14 +20,17 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         self.label_height = 18
         self.resize_border=2
 
-        self.popup_hide_limit = JCheckBoxMenuItem('auto-hide limits', True, actionPerformed=self.pin_limits)
+        self.popup_hide_limit = JCheckBoxMenuItem('auto-hide limits', True, actionPerformed=self.toggle_autohide)
         self.popup.add(self.popup_hide_limit)
         self.show_limits = False
         self.auto_hide_limits = True
         self.limits_font = Font("Dialog", Font.PLAIN, 10)
         self.limit_width = 0
         self.limit_hide_delay = 1000
-        self.limit_hide_timer = Timer(self.limit_hide_delay, None, actionPerformed=self.hide_limits)
+        self.limit_color_def = 0.3
+        self.limit_color_val = self.limit_color_def
+        self.limit_color_step = (1 - self.limit_color_def) / 10
+        self.limit_hide_timer = Timer(self.limit_hide_delay / 10, None, actionPerformed=self.hide_limits)
         self.limit_hide_timer.setRepeats(False)
 
         self.popup.add(JPopupMenu.Separator())        
@@ -62,11 +65,21 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         
     def increase_range(self,event):
         self.range*=2.0
+        self.check_label_size()
         self.repaint()
     def decrease_range(self,event):
         self.range*=0.5
+        self.check_label_size()
         self.repaint()
+    def check_label_size(self):
+        if( self.show_limits ):
+            limit_label = JLabel(("-%1.2f"%(self.range)))
+            limit_width = limit_label.getPreferredSize().width - self.sliders[0].width / 2
             
+            if( limit_width != self.limit_width ):
+                self.setSize(self.size.width + limit_width - self.limit_width,self.size.height)
+                self.setLocation(self.x - limit_width + self.limit_width, self.y)
+                self.limit_width = limit_width
     
     def slider_moved(self,index):
         if self.sliders[index].valueIsAdjusting:   # if I moved it
@@ -97,7 +110,7 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             data=self.data.get_first()
 
         if( self.show_limits ):
-            g.color = Color(0.3,0.3,0.3)
+            g.color = Color(self.limit_color_val,self.limit_color_val,self.limit_color_val)
             txt_min = "%1.2f"%(-self.range)        
             txt_max = "%1.2f"%(self.range)
             
@@ -167,7 +180,6 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
 
     def mouseEntered(self, event):
         if( self.auto_hide_limits ):
-            self.limit_hide_timer.stop()
             self.disp_limits()
         core.DataViewComponent.mouseEntered(self, event)
     
@@ -176,12 +188,11 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             self.limit_hide_timer.start()
         core.DataViewComponent.mouseExited(self, event)
     
-    def pin_limits(self, event):
+    def toggle_autohide(self, event):
         self.auto_hide_limits = event.source.state
         if( self.auto_hide_limits ):
             self.limit_hide_timer.start()
         else:
-            self.limit_hide_timer.stop()
             self.disp_limits()
     
     def disp_limits(self):
@@ -190,12 +201,22 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             self.limit_width = limit_label.getPreferredSize().width - self.sliders[0].width / 2
             self.setSize(self.size.width+self.limit_width,self.size.height)
             self.setLocation(self.x-self.limit_width, self.y)
+
+        self.limit_hide_timer.stop()
+        self.limit_color_val = self.limit_color_def
         self.show_limits = True
+        self.repaint()
     
     def hide_limits(self, event):
         if( self.show_limits ):
-            self.setSize(self.size.width-self.limit_width,self.size.height)
-            self.setLocation(self.x+self.limit_width, self.y)
-            self.limit_width = 0
-        self.show_limits = False
+            if( self.limit_color_val >= 1 - self.limit_color_step ):
+                self.limit_hide_timer.stop()
+                self.setSize(self.size.width-self.limit_width,self.size.height)
+                self.setLocation(self.x+self.limit_width, self.y)
+                self.limit_width = 0
+                self.show_limits = False
+            else:
+                self.limit_color_val += self.limit_color_step
+                self.limit_color_val = min(self.limit_color_val,1.0)
+                self.limit_hide_timer.start()
         self.repaint()

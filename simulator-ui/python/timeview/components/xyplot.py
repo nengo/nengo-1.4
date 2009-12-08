@@ -26,6 +26,18 @@ class XYPlot(core.DataViewComponent):
         self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
         self.popup.add(self.popup_zoom)
         
+        self.autohide = True
+        self.show_axes_labels = True
+        self.popup_hide = JCheckBoxMenuItem('auto-hide axis labels', True, actionPerformed=self.toggle_autohide)
+        self.popup.add(self.popup_hide)
+        
+        self.axes_label_init_clr = 0.3
+        self.axes_label_clr_val = self.axes_label_init_clr
+        self.axes_label_clr_step = (1 - self.axes_label_init_clr) / 10
+        
+        self.axes_label_hide_dly = 1000
+        self.axes_label_hide_tmr = Timer(self.axes_label_hide_dly / 10, None, actionPerformed = self.fade_axes_labels)
+        
         self.filter=filter
         self.setSize(200,200)
     
@@ -34,19 +46,33 @@ class XYPlot(core.DataViewComponent):
         save_info['sel_dim'] = self.indices
         save_info['autozoom']=self.autozoom
         save_info['last_maxy']=self.last_maxy
+        save_info['autohide']=self.autohide
         return save_info
 
     def restore(self, d):
         core.DataViewComponent.restore(self, d)
         self.indices = d.get('sel_dim', [0,1])
+        
         self.autozoom=d.get('autozoom',True)
         self.popup_zoom.state=self.autozoom
         self.last_maxy=d.get('last_maxy',None)        
+        
+        self.autohide = d.get('autohide', True)
+        self.popup_hide.state = self.autohide
+        self.show_axes_labels = not self.autohide
+        
         self.fix_popup()
 
     def toggle_autozoom(self,event):
         self.autozoom=event.source.state
         self.repaint()
+        
+    def toggle_autohide(self, event):
+        self.autohide = event.source.state
+        if( self.autohide ):
+            self.axes_label_hide_tmr.start()
+        else:
+            self.disp_axes_labels()
 
     def fix_popup(self):
         self.popup.add(JPopupMenu.Separator())
@@ -86,7 +112,34 @@ class XYPlot(core.DataViewComponent):
             
             x_subs[num_sub-1].add(x_radio)
             y_subs[num_sub-1].add(y_radio)
+
+    def mouseEntered(self, event):
+        if( self.autohide ):
+            self.disp_axes_labels()
+        core.DataViewComponent.mouseEntered(self, event)
+
+    def mouseExited(self, event):
+        if( self.autohide ):
+            self.axes_label_hide_tmr.start()
+        core.DataViewComponent.mouseExited(self, event)
         
+    def disp_axes_labels(self):
+        self.axes_label_clr_val = self.axes_label_init_clr
+        self.show_axes_labels = True
+        self.axes_label_hide_tmr.stop()    
+        self.repaint()
+    
+    def fade_axes_labels(self, event):
+        if( self.show_axes_labels ):
+            if( self.axes_label_clr_val >= 1 - self.axes_label_clr_step ):
+                self.axes_label_hide_tmr.stop()
+                self.show_axes_labels = False
+            else:
+                self.axes_label_clr_val += self.axes_label_clr_step
+                self.axes_label_clr_val = min(1, self.axes_label_clr_val)
+                self.axes_label_hide_tmr.start()
+        self.repaint()
+
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
         
@@ -129,7 +182,7 @@ class XYPlot(core.DataViewComponent):
             mx = self.last_maxy
         
         self.last_maxy = mx
-        
+
         g.color=Color.black
 
         txt='%g'%mx
@@ -143,14 +196,19 @@ class XYPlot(core.DataViewComponent):
         g.drawString(txt,xc+x0,self.height-self.margin)
         g.drawString(txt,self.margin,yc+bounds.height+self.label_offset)
         
-        txt = '%s[%d]'%('v',self.indices[0])
-        boundsl = g.font.getStringBounds(txt,g.fontRenderContext)
-        g.drawString(txt,self.width-self.margin-boundsl.width,yc-y0+self.label_offset)
+        if( self.show_axes_labels ):
+            g.color = Color(self.axes_label_clr_val, self.axes_label_clr_val, self.axes_label_clr_val)
+            txt = '%s[%d]'%('v',self.indices[0])
+            boundsl = g.font.getStringBounds(txt,g.fontRenderContext)
+            g.drawString(txt,self.width-self.margin-boundsl.width,yc-y0+self.label_offset)
         
-        txt = '%s[%d]'%('v',self.indices[1])
-        boundsl = g.font.getStringBounds(txt,g.fontRenderContext)
-        g.drawString(txt,xc-x0-boundsl.width,bounds.height+self.margin+self.label_offset)
+            txt = '%s[%d]'%('v',self.indices[1])
+            boundsl = g.font.getStringBounds(txt,g.fontRenderContext)
+            g.drawString(txt,xc-x0-boundsl.width,bounds.height+self.margin+self.label_offset)
 
+
+        g.color=Color.black
+        
         sx=(self.width/2-self.margin)/mx
         sy=(yc-self.margin)/mx
         for i in range(pts-1):
