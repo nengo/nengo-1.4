@@ -41,6 +41,7 @@ public class SpikePlasticityRuleTest extends TestCase {
 
 	private static final String ORIGIN = Neuron.AXON;
 	private static final String MOD_TERMINATION = "mod";
+        private static final String TERM_NAME = "test";
 	private Function myOnInSpike;
 	private Function myOnOutSpike;
 	private PlasticityRule myRule;
@@ -50,7 +51,7 @@ public class SpikePlasticityRuleTest extends TestCase {
 
 		myOnOutSpike = new STDP(true, .005f); 
 		myOnInSpike = new STDP(false, .005f);
-		myRule = new SpikePlasticityRule(ORIGIN, MOD_TERMINATION, 0, myOnInSpike, myOnOutSpike, 1, 1);		
+		myRule = new SpikePlasticityRule(TERM_NAME, ORIGIN, MOD_TERMINATION, 0, myOnInSpike, myOnOutSpike, 1, 1);
 	}
 
 	public void testGetDerivative() throws StructuralException {
@@ -88,7 +89,7 @@ public class SpikePlasticityRuleTest extends TestCase {
 	public void testMultiDim() {
 		int inDim = 2;
 		int outDim = 3;
-		PlasticityRule rule = new SpikePlasticityRule(ORIGIN, MOD_TERMINATION, 0, myOnInSpike, myOnOutSpike, inDim, outDim);
+		PlasticityRule rule = new SpikePlasticityRule(TERM_NAME, ORIGIN, MOD_TERMINATION, 0, myOnInSpike, myOnOutSpike, inDim, outDim);
 		
 		rule.setOriginState(ORIGIN, new SpikeOutputImpl(new boolean[]{false, true, false}, Units.SPIKES, 2f), 2f);
 		rule.setOriginState(ORIGIN, new SpikeOutputImpl(new boolean[]{false, false, false}, Units.SPIKES, 2.005f), 2.005f);
@@ -164,7 +165,7 @@ public class SpikePlasticityRuleTest extends TestCase {
 		post.collectSpikes(true);
 		float[][] weights = new float[][]{new float[]{0, 0}, new float[]{0, 0}};
 		post.addTermination("in", weights, .005f, false);
-		SpikePlasticityRule rule = new SpikePlasticityRule(Neuron.AXON, MOD_TERMINATION, 0, myOnInSpike, myOnOutSpike, 2, 1); //output dimension matches neuron
+		SpikePlasticityRule rule = new SpikePlasticityRule(TERM_NAME, Neuron.AXON, MOD_TERMINATION, 0, myOnInSpike, myOnOutSpike, 2, 1); //output dimension matches neuron
 		post.setPlasticityRule("in", rule);
 		post.addTermination("mod", new float[][]{new float[]{1}, new float[]{1}}, .005f, true);
 		network.addNode(post);
