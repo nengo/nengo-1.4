@@ -270,8 +270,11 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	 * @return The number of points at which to approximate decoded functions  
 	 */
 	protected int getNumEvalPoints(int dim) {
-		int[] pointsPerDim = new int[]{0, 1000, 1000}; 
-		return (dim < pointsPerDim.length) ? pointsPerDim[dim] : dim*500;		
+		int[] pointsPerDim = new int[]{0, 1000, 1000};
+		int pts=(dim < pointsPerDim.length) ? pointsPerDim[dim] : dim*500;
+		if (pts>5000) pts=5000;  // there seems to be no advantage to going to more than 1000 points, 
+		                         //  even for high dimensions (~500), but let's go with 5000 to be sure
+		return pts;
 	}
 	
 	/**
