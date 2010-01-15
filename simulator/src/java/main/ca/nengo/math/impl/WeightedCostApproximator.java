@@ -201,78 +201,83 @@ public class WeightedCostApproximator implements LinearApproximator {
 			java.io.File path=new java.io.File(parent,"external");
 			String filename="matrix_"+random.nextLong();
 			
-			java.io.File file=new java.io.File(path,filename);
-			if (file.canRead()) file.delete();
-			java.io.File file2=new java.io.File(path,filename+".inv");
-			if (file2.canRead()) file2.delete();
+			java.io.File pinvfile = new java.io.File(path,"pseudoInverse");
+			if(pinvfile.exists())
+			{
 			
-			java.nio.channels.FileChannel channel=new java.io.RandomAccessFile(file,"rw").getChannel();			
-//			java.nio.ByteBuffer buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_WRITE, 0, matrix.length*matrix.length*4);
-			java.nio.ByteBuffer buffer= java.nio.ByteBuffer.allocate(matrix.length*matrix.length*4);
-			buffer.rewind();
-			
-			
-			buffer.order(java.nio.ByteOrder.BIG_ENDIAN);
-			for (int i=0; i<matrix.length; i++) {
-				for (int j=0; j<matrix.length; j++) {
-					buffer.putFloat((float)(matrix[i][j]));
-				}
-			}
-			buffer.rewind();
-			
-			channel.write(buffer);
-			channel.force(true);
-            channel.close();
-            
-			if (System.getProperty("os.name").startsWith("Windows")) {
-				Process process=runtime.exec("cmd /c pseudoInverse.bat "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
-				process.waitFor();
-			} else {
-				Process process=runtime.exec("external"+java.io.File.separatorChar+"pseudoInverse external/"+filename+" external/"+filename+".inv"+" "+minSV+" "+nSV,null,null);
-				process.waitFor();
+				java.io.File file=new java.io.File(path,filename);
+				if (file.canRead()) file.delete();
+				java.io.File file2=new java.io.File(path,filename+".inv");
+				if (file2.canRead()) file2.delete();
 				
-				java.io.InputStream s=process.getErrorStream();
-				if (s.available()>0) {
-					System.out.println("external error:");
-					while (s.available()>0) {
-						System.out.write(s.read());
+				java.nio.channels.FileChannel channel=new java.io.RandomAccessFile(file,"rw").getChannel();			
+	//			java.nio.ByteBuffer buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_WRITE, 0, matrix.length*matrix.length*4);
+				java.nio.ByteBuffer buffer= java.nio.ByteBuffer.allocate(matrix.length*matrix.length*4);
+				buffer.rewind();
+				
+				
+				buffer.order(java.nio.ByteOrder.BIG_ENDIAN);
+				for (int i=0; i<matrix.length; i++) {
+					for (int j=0; j<matrix.length; j++) {
+						buffer.putFloat((float)(matrix[i][j]));
 					}
 				}
-				java.io.InputStream s2=process.getInputStream();
-				if (s2.available()>0) {
-					System.out.println("external output:");
-					while (s2.available()>0) {
-						System.out.write(s2.read());
+				buffer.rewind();
+				
+				channel.write(buffer);
+				channel.force(true);
+	            channel.close();
+	            
+				if (System.getProperty("os.name").startsWith("Windows")) {
+					Process process=runtime.exec("cmd /c pseudoInverse.bat "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
+					process.waitFor();
+				} else {
+					Process process=runtime.exec("external"+java.io.File.separatorChar+"pseudoInverse external/"+filename+" external/"+filename+".inv"+" "+minSV+" "+nSV,null,null);
+					process.waitFor();
+					
+					java.io.InputStream s=process.getErrorStream();
+					if (s.available()>0) {
+						System.out.println("external error:");
+						while (s.available()>0) {
+							System.out.write(s.read());
+						}
+					}
+					java.io.InputStream s2=process.getInputStream();
+					if (s2.available()>0) {
+						System.out.println("external output:");
+						while (s2.available()>0) {
+							System.out.write(s2.read());
+						}
 					}
 				}
-			}
-			
-			channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
-//			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);
-			buffer= java.nio.ByteBuffer.allocate(matrix.length*matrix.length*4);
-			channel.read(buffer);
-			buffer.rewind();
-			
-			double[][] inv=new double[matrix.length][];
-			
-			for (int i=0; i<matrix.length; i++) {
-				double[] row=new double[matrix.length];
-				for (int j=0; j<matrix.length; j++) {
-					row[j]=buffer.getFloat();
+				
+				channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
+	//			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);
+				buffer= java.nio.ByteBuffer.allocate(matrix.length*matrix.length*4);
+				channel.read(buffer);
+				buffer.rewind();
+				
+				double[][] inv=new double[matrix.length][];
+				
+				for (int i=0; i<matrix.length; i++) {
+					double[] row=new double[matrix.length];
+					for (int j=0; j<matrix.length; j++) {
+						row[j]=buffer.getFloat();
+					}
+					inv[i]=row;
 				}
-				inv[i]=row;
+				result=inv;
+				
+				// Close all file handles
+	            channel.close();
+	            
+				file=new java.io.File(path,filename);
+				if (file.canRead()) 
+					file.delete();
+				file2=new java.io.File(path,filename+".inv");
+				if (file2.canRead()) 
+					file2.delete();
 			}
-			result=inv;
-			
-			// Close all file handles
-            channel.close();
-            
-			file=new java.io.File(path,filename);
-			if (file.canRead()) 
-				file.delete();
-			file2=new java.io.File(path,filename+".inv");
-			if (file2.canRead()) 
-				file2.delete();
 
 		} catch (FileNotFoundException e) {
 			System.err.println("File not found: " + e);
