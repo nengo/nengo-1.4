@@ -176,31 +176,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		
 		
 		if(includeProbes && node instanceof NetworkImpl)
-		{
 			collectProbes((NetworkImpl)node);
-			/*
-			Network tmp = (Network) node;
-			Probe[] networkProbes = tmp.getSimulator().getProbes();
-			
-			System.out.println("adding network " + tmp.getName());
-			for(int i = 0; i < networkProbes.length; i++)
-			{
-				String ensembleName = "";
-				if(networkProbes[i].getEnsembleName() != null)
-					ensembleName = " " + networkProbes[i].getEnsembleName();
-				
-				try
-				{
-					getSimulator().addProbe("[" + tmp.getName() + ensembleName + "]", networkProbes[i].getTarget(), 
-							networkProbes[i].getStateName(), true);
-				}
-				catch(SimulationException se)
-				{
-					System.err.println("Error adding probe on " + networkProbes[i].getStateName() + " from network " + tmp.getName());
-				}
-			}
-			*/
-		}
 		
 		
 		
@@ -405,6 +381,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		while (it.hasNext()) {
 			it.next().setMode(mode);
 		}
+	}
+	protected void setMyMode(SimulationMode mode) {
+		myMode = mode;
 	}
 
 	/**
