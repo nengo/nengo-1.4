@@ -48,6 +48,7 @@ import ca.nengo.sim.SimulatorListener;
 import ca.nengo.util.Probe;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
 
 /**
@@ -63,7 +64,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	private Node[] myNodes;
 	private Map<String, Node> myNodeMap;
 	private List<Probe> myProbes;
-	private transient List<VisiblyMutable.Listener> myChangeListeners;	
+	private transient List<VisiblyMutable.Listener> myChangeListeners;
+	private transient NodeThreadPool myNodeThreadPool;
 
 	/**
 	 * Collection of Simulator
@@ -104,7 +106,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	 */
 	public synchronized void run(float startTime, float endTime, float stepSize, boolean dispProgress)
 			throws SimulationException {
-
+		
 		Iterator<Probe> it = myProbes.iterator();
 		while (it.hasNext()) {
 			it.next().reset();
@@ -122,9 +124,17 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		//		
 		double time = startTime;
 		double thisStepSize = stepSize;
-
+		
+		if(NodeThreadPool.isMultithreading()){
+			myNodeThreadPool = new NodeThreadPool();
+		}else{
+			myNodeThreadPool = null;
+		}
+		
 		int c = 0;
-		while (time < endTime) { 
+		while (time < endTime) {
+			
+			
 			if (c++ % 100 == 99 && dispProgress)
 				System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize)); 
 			
@@ -139,7 +149,13 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
 			time += thisStepSize;
 		}
+		
 		fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
+		
+		if(myNodeThreadPool != null){
+			myNodeThreadPool.kill();
+			myNodeThreadPool = null;
+		}
 	}
 
 	private void step(float startTime, float endTime)
@@ -150,11 +166,15 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 					.getValues();
 			myProjections[i].getTermination().setValues(values);
 		}
-
-		for (int i = 0; i < myNodes.length; i++) {
-			myNodes[i].run(startTime, endTime);
+		
+		if(myNodeThreadPool != null){
+			myNodeThreadPool.run(myNodes, startTime, endTime);
+		}else{
+			for (int i = 0; i < myNodes.length; i++) {
+				myNodes[i].run(startTime, endTime);
+			}	
 		}
-
+		
 		Iterator<Probe> it = myProbes.iterator();
 		while (it.hasNext()) {
 			it.next().collect(endTime);
