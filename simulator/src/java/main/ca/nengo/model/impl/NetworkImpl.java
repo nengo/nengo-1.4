@@ -73,6 +73,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	private Map<Termination, Projection> myProjectionMap; //keyed on Termination
 	private String myName;
 	private SimulationMode myMode;
+	private boolean myModeFixed;
 	private Simulator mySimulator;
 	private float myStepSize;
 	private Map<String, Probeable> myProbeables;
@@ -103,6 +104,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		myExposedTerminations = new HashMap<String, Termination>(10);
 		myExposedTerminationNames = new HashMap<Termination, String>(10);
 		myMode = SimulationMode.DEFAULT;
+		myModeFixed = false;
 		myMetaData = new HashMap<String, Object>(20);
 		myListeners = new ArrayList<Listener>(10);
 		
@@ -375,15 +377,28 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Node#setMode(ca.nengo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		myMode = mode;
-
-		Iterator<Node> it = myNodeMap.values().iterator();
-		while (it.hasNext()) {
-			it.next().setMode(mode);
+		if(!myModeFixed)
+		{
+			myMode = mode;
+	
+			Iterator<Node> it = myNodeMap.values().iterator();
+			while (it.hasNext()) {
+				it.next().setMode(mode);
+			}
 		}
+//		else
+//			System.err.println("Warning, trying to change mode on fixedmode network " + myName);
 	}
 	protected void setMyMode(SimulationMode mode) {
-		myMode = mode;
+		if(!myModeFixed)
+			myMode = mode;
+//		else
+//			System.err.println("Warning, trying to change mode on fixedmode network " + myName);
+	}
+	
+	public void fixMode()
+	{
+		myModeFixed = true;
 	}
 
 	/**
