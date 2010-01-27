@@ -79,7 +79,6 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	protected Map<String, EnsembleTermination> myTerminations;
 	private Map<String, List<Integer>> myStateNames; // for Probeable
 	private SimulationMode myMode;
-	private boolean myModeFixed;
 	private transient SpikePatternImpl mySpikePattern;
 	private boolean myCollectSpikesFlag;	
 	private int myCollectSpikesRatio = 1;
@@ -101,7 +100,6 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		init();
 		
 		setMode(SimulationMode.DEFAULT);
-		myModeFixed = false;
 	}
 	
 	private void init() {
@@ -203,26 +201,13 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	 * @see ca.nengo.model.Ensemble#setMode(ca.nengo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		if(!myModeFixed)
-		{
-			myMode = mode;
-			
-			for (int i = 0; i < myNodes.length; i++) {
-				myNodes[i].setMode(mode);
-			}
+		myMode = mode;
+		
+		for (int i = 0; i < myNodes.length; i++) {
+			myNodes[i].setMode(mode);
 		}
-//		else
-//			System.err.println("Warning, trying to change mode on fixed-mode ensemble " + myName);
 	}
 	
-	/**
-	 * When this method is called, the mode of this node is fixed and cannot be changed by
-	 * subsequent setMode(...) calls.
-	 */
-	public void fixMode()
-	{
-		myModeFixed = true;
-	}
 
 	/**
 	 * Note that this reflects the latest mode requested of the Ensemble, and that individual 

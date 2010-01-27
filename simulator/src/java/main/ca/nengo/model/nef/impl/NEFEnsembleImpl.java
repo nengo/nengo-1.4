@@ -101,6 +101,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private boolean myRadiiAreOne;
 	private DynamicalSystem myDirectModeDynamics;
 	private Integrator myDirectModeIntegrator;
+	private boolean myModeFixed;
 	
 	private NEFEnsembleFactory myEnsembleFactory;
 
@@ -140,6 +141,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myReuseApproximators = true;		
 		myUnscaledEvalPoints = evalPoints;
 		setRadii(radii);
+		myModeFixed = false;
 		
 		myDirectModeIntegrator = new EulerIntegrator(.001f);
 	}
@@ -677,14 +679,26 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @see ca.nengo.model.Ensemble#setMode(ca.nengo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		super.setMode(mode);
-		
-		Origin[] origins = getOrigins();
-		for (int i = 0; i < origins.length; i++) {
-			if (origins[i] instanceof DecodedOrigin) {
-				((DecodedOrigin) origins[i]).setMode(mode);
+		if(!myModeFixed)
+		{
+			super.setMode(mode);
+			
+			Origin[] origins = getOrigins();
+			for (int i = 0; i < origins.length; i++) {
+				if (origins[i] instanceof DecodedOrigin) {
+					((DecodedOrigin) origins[i]).setMode(mode);
+				}
 			}
 		}
+	}
+	
+	/**
+	 * When this method is called, the mode of this node is fixed and cannot be changed by
+	 * subsequent setMode(...) calls.
+	 */
+	public void fixMode()
+	{
+		myModeFixed = true;
 	}
 
 	/**
@@ -904,10 +918,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * Releases any memory that can be freed.  Should be called after all origins are created for this ensemble
 	 */
 	public void releaseMemory() {
-		Memory.report("releasing");
 		myDecodingApproximators.clear();
-		System.gc();
-		Memory.report("released");
 	}
 	
 	/**
