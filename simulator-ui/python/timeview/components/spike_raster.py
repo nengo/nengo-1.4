@@ -22,8 +22,30 @@ class SpikeRaster(core.DataViewComponent):
         self.border_bottom=20
         self.setSize(300,200)
         self.neurons=len(self.data.get_first())
+        self.sample=10
+        self.popup.add(JPopupMenu.Separator())
+        self.popup.add(JMenuItem('show all',actionPerformed=lambda x: self.set_sample(1)))
+        self.popup.add(JMenuItem('show 50%',actionPerformed=lambda x: self.set_sample(2)))
+        self.popup.add(JMenuItem('show 33%',actionPerformed=lambda x: self.set_sample(3)))
+        self.popup.add(JMenuItem('show 25%',actionPerformed=lambda x: self.set_sample(4)))
+        self.popup.add(JMenuItem('show 20%',actionPerformed=lambda x: self.set_sample(5)))
+        self.popup.add(JMenuItem('show 10%',actionPerformed=lambda x: self.set_sample(10)))
+        
         
         self.map=None
+
+    def set_sample(self,x):
+        self.sample=x
+
+    def save(self):
+        d=core.DataViewComponent.save(self)
+        d['sample']=self.sample
+        return d
+    
+    def restore(self,d):
+        core.DataViewComponent.restore(self,d)
+        self.sample=d.get('sample',1)
+
 
     def initialize_map(self):
         data=self.data.get_first()
@@ -67,18 +89,18 @@ class SpikeRaster(core.DataViewComponent):
         for i in range(now+1,len(data)):
             data[i]=None
             
-        dy=float(self.size.height-self.border_bottom-border_top)/self.neurons
+        dy=float(self.size.height-self.border_bottom-border_top)/(self.neurons/self.sample)
         dx=float(self.size.width-self.border_left-self.border_right-1)/(pts-1)
         
         for i,d in enumerate(data):
             if d is None: continue
-            for j in range(len(d)):
-                spike=d[self.map.map[j]]
+            for j in range(len(d)/self.sample):
+                spike=d[self.map.map[j*self.sample]]
                 if spike:
                     x=int(i*dx+self.border_left)
                     y=int(j*dy+border_top)
                     
-                    w=int(dy)-1
+                    w=int(dx)-1
                     h=int(dy)-1
                     
                     if w<1: w=1
@@ -87,7 +109,7 @@ class SpikeRaster(core.DataViewComponent):
                     if w<=1 and h<=1:
                         g.drawLine(x,y,x,y)
                     else:
-                        g.fillOval(x,y,w,h)
+                        g.fillRect(x,y,w,h)
                     
                     
         
