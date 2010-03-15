@@ -48,8 +48,8 @@ public class ScriptWorldWrapper {
 		nengoGraphics.removeNodeModel(node);
 	}
 
-	public void getNode(String name) {
-		nengoGraphics.getNodeModel(name);
+	public Node getNode(String name) {
+		return nengoGraphics.getNodeModel(name);
 	}
 
 }
