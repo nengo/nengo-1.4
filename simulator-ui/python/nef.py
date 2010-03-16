@@ -7,7 +7,20 @@ from ca.nengo.model.neuron import *
 from ca.nengo.util import *
 from ca.nengo.math.impl import ConstantFunction,IndicatorPDF,AbstractFunction
 
+class FixedVectorGenerator(VectorGenerator):
+    serialVersionUID=1
+    def __init__(self,basis):
+        self.basis=basis
+        
+    def genVectors(self,number,dimensions):        
+        vectors=[]
+        while len(vectors)<number:
+            vectors.extend(self.basis)    
+        return vectors
+
+
 class PythonFunction(AbstractFunction):
+    serialVersionUID=1    
     def __init__(self,func):
         AbstractFunction.__init__(self,1)
         self.func=func
@@ -24,12 +37,17 @@ class Network:
         if n is not None: world.remove(n)
         world.add(self.network)
         
-    def make(self,name,neurons,dimensions,tau_rc=0.02,tau_ref=0.002,rate=(200,400),intercept=(-1,1),radius=1):
+    def make(self,name,neurons,dimensions,tau_rc=0.02,tau_ref=0.002,max_rate=(200,400),intercept=(-1,1),radius=1,basis=None,noise=None,noise_frequency=1000):
         ef=NEFEnsembleFactoryImpl()
         ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc, tauRef=tau_ref,
-                                maxRate=IndicatorPDF(rate[0],rate[1]),
+                                maxRate=IndicatorPDF(max_rate[0],max_rate[1]),
                                 intercept=IndicatorPDF(intercept[0],intercept[1]))
+        if basis is not None:
+            ef.encoderFactory=FixedVectorGenerator(basis)            
         n=ef.make(name,neurons,dimensions)
+        if noise is not None:
+            for nn in n.nodes:
+                nn.noise=NoiseFactory.makeRandomNoise(noise_frequency,IndicatorPDF(-noise,noise))            
         if radius!=1:
             n.radii=[radius]*dimensions
         self.network.addNode(n)
