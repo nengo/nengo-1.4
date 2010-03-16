@@ -88,7 +88,9 @@ class SpikeRaster(core.DataViewComponent):
         now=self.view.current_tick-start
         for i in range(now+1,len(data)):
             data[i]=None
-            
+        
+        if self.neurons<self.sample:
+            self.sample=self.neurons
         dy=float(self.size.height-self.border_bottom-border_top)/(self.neurons/self.sample)
         dx=float(self.size.width-self.border_left-self.border_right-1)/(pts-1)
         
