@@ -251,6 +251,11 @@ public class WeightedCostApproximator implements LinearApproximator {
 					}
 				}
 				
+				//cleanup the matrix file
+				file=new java.io.File(path,filename);
+				if (file.canRead()) 
+					file.delete();
+				
 				channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
 	//			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);
 				buffer= java.nio.ByteBuffer.allocate(matrix.length*matrix.length*4);
@@ -271,9 +276,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 				// Close all file handles
 	            channel.close();
 	            
-				file=new java.io.File(path,filename);
-				if (file.canRead()) 
-					file.delete();
+	            //cleanup the inv file
 				file2=new java.io.File(path,filename+".inv");
 				if (file2.canRead()) 
 					file2.delete();
