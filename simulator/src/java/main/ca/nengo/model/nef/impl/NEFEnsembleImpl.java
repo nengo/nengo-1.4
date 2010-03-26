@@ -679,15 +679,12 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @see ca.nengo.model.Ensemble#setMode(ca.nengo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		if(!myModeFixed)
-		{
-			super.setMode(mode);
-			
-			Origin[] origins = getOrigins();
-			for (int i = 0; i < origins.length; i++) {
-				if (origins[i] instanceof DecodedOrigin) {
-					((DecodedOrigin) origins[i]).setMode(mode);
-				}
+		super.setMode(mode);
+		
+		Origin[] origins = getOrigins();
+		for (int i = 0; i < origins.length; i++) {
+			if (origins[i] instanceof DecodedOrigin) {
+				((DecodedOrigin) origins[i]).setMode(mode);
 			}
 		}
 	}
@@ -699,6 +696,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public void fixMode()
 	{
 		myModeFixed = true;
+	}
+	
+	/**
+	 * @return whether or not the mode for this ensemble has been fixed
+	 */
+	public boolean getModeFixed()
+	{
+		return myModeFixed;
 	}
 
 	/**
