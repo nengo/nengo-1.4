@@ -385,8 +385,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			while (it.hasNext()) {
 				Node node = it.next();
 				if(node instanceof ca.nengo.model.nef.impl.NEFEnsembleImpl)
+				{
 					if(!((ca.nengo.model.nef.impl.NEFEnsembleImpl)node).getModeFixed())
 						node.setMode(mode);
+				}
 				else
 					node.setMode(mode);
 			}
