@@ -61,7 +61,7 @@ class Network:
         self.network.addNode(input)
         return input
         
-    def connect(self,pre,post,transform=None,index_pre=None,index_post=None,pstc=0.01,func=None):
+    def connect(self,pre,post,transform=None,index_pre=None,index_post=None,pstc=0.01,func=None,weight_func=None):
         if type(pre) is str: pre=self.network.getNode(pre)
         if type(post) is str: post=self.network.getNode(post)
         
@@ -95,6 +95,14 @@ class Network:
         if isinstance(transform[0],(int,float)):
             transform=[transform]        
         
-        term=post.addDecodedTermination(pre.name,transform,pstc,False)
-        self.network.addProjection(origin,term)
+        if weight_func is not None:
+            decoder=origin.decoders
+            encoder=post.encoders
+            w=MU.prod(encoder,MU.transpose(decoder))   #gain elsewhere
+            w=weight_func(w)
+            term=post.addTermination(pre.name,w,pstc,False)
+            self.network.addProjection(pre.getOrigin('AXON'),term)
+        else:
+            term=post.addDecodedTermination(pre.name,transform,pstc,False)
+            self.network.addProjection(origin,term)
         
