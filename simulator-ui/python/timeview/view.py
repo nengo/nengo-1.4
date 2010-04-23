@@ -34,12 +34,12 @@ class EnsembleWatch:
         return isinstance(obj,NEFEnsemble)
     def voltage(self,obj):
         if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
-            return [n.getOrigin('AXON').values.values[0]*0.005 for n in obj.nodes]
+            return [n.getOrigin('AXON').values.values[0]*0.0005 for n in obj.nodes]
         else:
             return [n.generator.voltage for n in obj.nodes]
     def spikes(self,obj):
         if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
-            return [n.getOrigin('AXON').values.values[0]*0.005 for n in obj.nodes]
+            return [n.getOrigin('AXON').values.values[0]*0.0005 for n in obj.nodes]
         else:
             return obj.getOrigin('AXON').values.values
     def spikes_only(self,obj):
@@ -139,8 +139,6 @@ class FunctionWatch:
         return obj.getOrigin('origin').values.values
     def views(self,obj):
         return [
-            (None, None, None),
-            # Note that the above tuple is to reset popup menu to main popup menu in item.py
             ('control',components.FunctionControl,dict(func=self.funcOrigin,label=obj.name)),
             ]
 
@@ -156,8 +154,6 @@ class RoomWatch:
         return obj._simulator.model.physics_dump()
     def views(self,obj):
         return [
-            (None, None, None),
-            # Note that the above tuple is to reset popup menu to main popup menu in item.py
             ('3D view',components.View3D,dict(func=self.physics)),
             ]
 
@@ -240,10 +236,10 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.timelog=timelog.TimeLog()
         self.network=network
         self.watcher=watcher.Watcher(self.timelog)
+        self.watcher.add_watch(RoomWatch())
         self.watcher.add_watch(NodeWatch())
         self.watcher.add_watch(EnsembleWatch())
         self.watcher.add_watch(FunctionWatch())
-        self.watcher.add_watch(RoomWatch())
         
         
         self.frame=JFrame(network.name)
@@ -266,6 +262,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         if size is None:
             if ui is None: size=(800,600)
             else: size=(int(ui.width),int(ui.height))
+            if size[0]<700: size=(700,size[1])
         
         self.frame.size=(size[0],size[1]+100)        
        
@@ -438,10 +435,12 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.area.repaint()
         return True
     def view_save(self):
-        return dict(width=self.frame.width,height=self.frame.height,state=self.frame.getExtendedState())
+        return dict(width=self.frame.width,height=self.frame.height,state=self.frame.getExtendedState(),x=self.frame.x,y=self.frame.y)
     
     def view_restore(self,d):
         self.frame.setSize(d['width'],d['height'])
+        if 'x' in d and 'y' in d:
+            self.frame.setLocation(d['x'],d['y'])
         self.frame.setExtendedState(d.get('state',self.frame.NORMAL))            
         
 
@@ -557,20 +556,23 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         mainPanel.add(self.right_panel,BorderLayout.EAST)
 
 
-        mode=JPanel(layout=BorderLayout(),opaque=False)
-        cb=JComboBox(['default','rate','direct'])
-        if self.view.network.mode in [SimulationMode.DEFAULT,SimulationMode.PRECISE]:
-            cb.setSelectedIndex(0)
-        elif self.view.network.mode in [SimulationMode.RATE]:
-            cb.setSelectedIndex(1)
-        elif self.view.network.mode in [SimulationMode.DIRECT,SimulationMode.APPROXIMATE]:
-            cb.setSelectedIndex(2)
-        cb.addActionListener(self)
-        self.mode_combobox=cb        
-        mode.add(cb)
-        mode.add(JLabel('mode'),BorderLayout.NORTH)
-        mode.maximumSize=mode.preferredSize
-        configPanel.add(mode)
+        if self.view.network.mode!=SimulationMode.DIRECT:            
+            mode=JPanel(layout=BorderLayout(),opaque=False)
+            cb=JComboBox(['default','rate','direct'])
+            if self.view.network.mode in [SimulationMode.DEFAULT,SimulationMode.PRECISE]:
+                cb.setSelectedIndex(0)
+            elif self.view.network.mode in [SimulationMode.RATE]:
+                cb.setSelectedIndex(1)
+            elif self.view.network.mode in [SimulationMode.DIRECT,SimulationMode.APPROXIMATE]:
+                cb.setSelectedIndex(2)
+            cb.addActionListener(self)
+            self.mode_combobox=cb        
+            mode.add(cb)
+            mode.add(JLabel('mode'),BorderLayout.NORTH)
+            mode.maximumSize=mode.preferredSize
+            configPanel.add(mode)
+        else:
+            self.mode_combobox=None
 
 
         dt=JPanel(layout=BorderLayout(),opaque=False)
@@ -700,10 +702,14 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             self.dt_combobox.repaint()
             self.view.restart=True
         self.view.set_target_rate(self.rate_combobox.getSelectedItem())
-        mode=self.mode_combobox.getSelectedItem()
-        if mode=='default': self.view.network.mode=SimulationMode.DEFAULT
-        elif mode=='rate': self.view.network.mode=SimulationMode.RATE
-        elif mode=='direct': self.view.network.mode=SimulationMode.DIRECT
+
+        if self.mode_combobox is not None:
+            mode=self.mode_combobox.getSelectedItem()
+            if mode=='default': requested=SimulationMode.DEFAULT
+            elif mode=='rate': requested=SimulationMode.RATE
+            elif mode=='direct': requested=SimulationMode.DIRECT
+            if requested!=self.view.network.mode:
+                self.view.network.mode=requested
     def tick_limit(self,event):
         self.view.timelog.tick_limit=int(event.source.value/self.view.dt)+1
         
