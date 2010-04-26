@@ -74,6 +74,12 @@ class NodeWatch:
         return isinstance(obj,Node)
     def value(self,obj,origin):
         return obj.getOrigin(origin).values.values
+    def weights(self,obj,termination):
+        v=[]
+        for n in obj.nodes:
+            w=n.getTermination(termination).weights
+            v.extend(w)
+        return v
     def views(self,obj):
         origins=[o.name for o in obj.origins]
         ignored_origins = ['AXON','current']
@@ -127,8 +133,18 @@ class NodeWatch:
 
             if len(obj.getOrigin(name).values.values)>=2:
                 r.append((xy,components.XYPlot,dict(func=self.value,args=(name,),filter=filter,label=label)))
+        
+        if isinstance(obj,NEFEnsemble):
+            terminations=[t.name for t in obj.nodes[0].terminations]
+            
+            if len(terminations)>0:
+                r.append(('connection weights', JMenu, JMenu('connection weights')))
                 
-        return r    
+                for name in terminations:
+                    label=obj.name+": "+name
+                    r.append((name,components.Grid,dict(func=self.weights,args=(name,),label=label,min=-0.01,max=0.01,improvable=False)))
+            
+        return r
 
 
 

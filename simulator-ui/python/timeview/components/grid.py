@@ -8,7 +8,7 @@ import neuronmap
 
 from math import sqrt
 class Grid(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,filter=False,label=None):
+    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,filter=False,label=None,improvable=True):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
@@ -23,34 +23,40 @@ class Grid(core.DataViewComponent):
         self.max=max
         self.map=None
         self.requested_improvements=0
-                
-        self.popup.add(JPopupMenu.Separator())
-        self.popup.add(JMenuItem('improve layout',actionPerformed=self.improve_layout))
         self.auto_improve=False
-        self.popup_auto=JCheckBoxMenuItem('auto-improve',self.auto_improve,stateChanged=self.toggle_auto_improve)
-        self.popup.add(self.popup_auto)
+        self.improvable=improvable
+        
+        if self.improvable:
+            self.popup.add(JPopupMenu.Separator())
+            self.popup.add(JMenuItem('improve layout',actionPerformed=self.improve_layout))
+            self.popup_auto=JCheckBoxMenuItem('auto-improve',self.auto_improve,stateChanged=self.toggle_auto_improve)
+            self.popup.add(self.popup_auto)
         
         self.filter=filter
         self.setSize(200,200)
       
     def toggle_auto_improve(self,event):
-        self.auto_improve=event.source.state
-        if self.auto_improve and self.requested_improvements<20: 
-            self.requested_improvements=20
+        if self.improvable:
+            self.auto_improve=event.source.state
+            if self.auto_improve and self.requested_improvements<20: 
+                self.requested_improvements=20
       
     def save(self):
         d=core.DataViewComponent.save(self)
-        d['auto_improve']=self.auto_improve
+        if self.improvable:
+            d['auto_improve']=self.auto_improve
         return d
     
     def restore(self,d):
         core.DataViewComponent.restore(self,d)
-        self.auto_improve=d.get('auto_improve',False)
-        self.popup_auto.state=self.auto_improve
-        if self.auto_improve: self.requested_improvements=20
+        if self.improvable:
+            self.auto_improve=d.get('auto_improve',False)
+            self.popup_auto.state=self.auto_improve
+            if self.auto_improve: self.requested_improvements=20
         
     def improve_layout(self,event):
-        self.requested_improvements=self.map.improvements+20
+        if self.improvable:
+            self.requested_improvements=self.map.improvements+20
         
         
     def paintComponent(self,g):
@@ -84,7 +90,7 @@ class Grid(core.DataViewComponent):
         cols=len(data)/rows
         if rows*cols<len(data): cols+=1
             
-        if self.map is None:
+        if self.map is None and self.improvable:
             self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)
         
 
@@ -92,24 +98,34 @@ class Grid(core.DataViewComponent):
         if callable(max): max=max(self)
         min=self.min
         if callable(min): min=min(self)
-            
+        
         dx=float(self.size.width-self.margin)/cols
         dy=float(self.size.height-self.label_offset-self.margin)/rows
         for y in range(rows):
             for x in range(cols):                
                 if x+y*cols<len(data):
-                    index=self.map.map[x+y*cols]
+                    if self.improvable:
+                        index=self.map.map[x+y*cols]
+                    else:
+                        index=x+y*cols
                     if sdata is not None and self.view.current_tick>0 and sdata[index]:
                         g.color=Color.yellow
                     else:
-                        c=(float(data[index])-min)/(max-min)
-                        if c<0: c=0.0
-                        if c>1: c=1.0
-                        g.color=Color(c,c,c)
+                        if min>=0:
+                            c=(float(data[index])-min)/(max-min)
+                            if c<0: c=0.0
+                            if c>1: c=1.0
+                            g.color=Color(c,c,c)
+                        else:
+                            c=(float(data[index])-min)/(max-min)
+                            c=c*0.5
+                            if c<-1: c=-1.0
+                            if c>1 : c=1.0
+                            if c<0 : g.color = Color(1.0+c,1.0+c,1.0)
+                            else   : g.color = Color(1.0,1.0-c,1.0-c)
+                                
                     g.fillRect(int(x0+dx*x),int(y0+dy*y),int(dx+1),int(dy+1))
-        #g.color=Color.black
-        #g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.label_offset-self.margin)+1)
 
-        if self.requested_improvements>self.map.improvements:    
+        if self.improvable and self.requested_improvements>self.map.improvements:    
             self.map.improve()
             self.parent.repaint()
