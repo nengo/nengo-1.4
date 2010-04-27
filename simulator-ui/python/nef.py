@@ -29,27 +29,133 @@ from ca.nengo.model.neuron.impl import *
 from ca.nengo.model.neuron import *
 from ca.nengo.util import *
 from ca.nengo.math.impl import ConstantFunction,IndicatorPDF,AbstractFunction
+import java
 
-__all__=['Network']
+__all__=['Network','EnsembleArray']
 
 class FixedVectorGenerator(VectorGenerator):
     serialVersionUID=1
-    def __init__(self,basis):
-        self.basis=basis
+    def __init__(self,vectors):
+        self.vectors=vectors
         
     def genVectors(self,number,dimensions):        
         vectors=[]
         while len(vectors)<number:
-            vectors.extend(self.basis)    
-        return vectors
+            vectors.extend(self.vectors)    
+        return vectors[:number]
 
+
+# keep the functions outside of the class, since they can't be serialized in the
+#  current version of Jython
+transientFunctions={}
 class PythonFunction(AbstractFunction):
-    serialVersionUID=1    
     def __init__(self,func):
         AbstractFunction.__init__(self,1)
-        self.func=func
+        transientFunctions[self]=func
     def map(self,x):
-        return self.func(x)
+        if self in transientFunctions:
+            return transientFunctions[self](x)        
+        else:
+            raise Exception('Python Functions are not kept when saving/loading networks')
+
+
+class BaseNode(Node):
+    def __init__(self,name):
+        self.listeners=[]
+        self._origins={}
+        self._terminations={}    
+        self._name=name
+        self._states=java.util.Properties()
+        self.setMode(SimulationMode.DEFAULT)
+        
+
+    def reset(self,randomize=False):
+        pass
+    def getName(self):
+        return self._name
+    def setName(self,name):
+        VisiblyMutableUtils.nameChanged(self, self.getName(), name, self.listeners)
+        self._name=name
+
+    def addChangeListener(self,listener):
+        self.listeners.append(listener)
+    def removeChangeListener(self,listener):
+        self.listeners.remove(listener)
+
+    def run(self,start,end):
+        pass
+
+    def getOrigins(self):
+        return self._origins.values()
+    def getOrigin(self,name):
+        return self._origins.get(name,None)
+
+    def getTerminations(self):
+        return self._terminations.values()
+    def getTermination(self,name):
+        return self._terminations.get(name,None)
+
+    def getDocumentation(self):
+        return ""
+
+    def clone(self):
+        raise java.lang.CloneNotSupportedException()
+
+    def setMode(self,mode):
+        self._mode=mode
+    def getMode(self):
+        return self._mode
+
+    def listStates(self):
+        return self._states
+
+
+class BaseEnsemble(BaseNode,Ensemble):
+    def __init__(self,name,nodes):
+        BaseNode.__init__(self,name)
+        self._nodes=nodes
+    def getNodes(self):
+        return self._nodes
+    def getSpikePattern(self):
+        return None
+    def collectSpikes(self,collect):
+        return
+    def isCollectingSpikes(self):
+        return False
+    def redefineNodes(nodes):
+        assert False
+    def run(self,start,end):
+        for n in self._nodes:
+            n.run(start,end)
+        
+
+
+class EnsembleArray(BaseEnsemble):
+    """Collects a set of NEFEnsembles into a single group."""
+    def __init__(self,name,nodes):
+        """Create an ensemble array from the given nodes."""        
+        BaseEnsemble.__init__(self,name,nodes)
+        self._origins['X']=EnsembleOrigin(self,'X',[n.getOrigin('X') for n in nodes])
+        self.dimension=len(self._nodes)
+    def getDimension(self):
+        return len(self._nodes)    
+    def addDecodedOrigin(self,name,functions,nodeOrigin):
+        """Create a new origin.  A new origin is created on each of the 
+        ensembles, and these are grouped together to create an output. The 
+        function must be one-dimensional."""
+        if name in self._origins: raise StructuralException('Node already has an origin called "%s"'%name)
+        if len(functions)!=1: raise StructuralException('Functions on EnsembleArrays must be one-dimensional')
+        origins=[n.addDecodedOrigin(name,functions,nodeOrigin) for n in self._nodes]
+        self._origins[name]=EnsembleOrigin(self,name,origins)
+        return self._origins[name]        
+    def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
+        """Create a new termination.  A new termination is created on each
+        of the ensembles, which are then grouped together."""
+        if name in self._terminations: raise StructuralException('Node already has a termination called "%s"'%name)
+        terminations=[n.addDecodedTermination(name,[matrix[i]],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]
+        self._terminations[name]=EnsembleTermination(self,name,terminations)
+        return self._terminations[name]
+
 
 
 class Network:
@@ -74,13 +180,21 @@ class Network:
         """
         self.network.addNode(node)
         return node
+    
+    def make_array(self,name,neurons,length,**args):
+        """Create and return an array of ensembles.  Each ensemble will be
+        1-dimensional.  All of the parameters from Network.make() can be
+        used."""
+        ensemble=EnsembleArray(name,[self.make('%d'%i,neurons,1,add_to_network=False,**args) for i in range(length)])
+        self.network.addNode(ensemble)
+        return ensemble
         
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
                   max_rate=(200,400),intercept=(-1,1),
-                  radius=1,basis=None,
+                  radius=1,encoders=None,
                   noise=None,noise_frequency=1000,
-                  mode='spike'):
+                  mode='spike',add_to_network=True):
         """Create and return an ensemble of LIF neurons.
 
         Keyword arguments:
@@ -89,7 +203,7 @@ class Network:
         max_rate -- range for uniform selection of maximum firing rate
         intercept -- range for uniform selection of tuning curve x-intercept
         radius -- representational range
-        basis -- list of encoder vectors to use (if None, uniform distribution)
+        encoders -- list of encoder vectors to use (if None, uniform distribution)
         noise -- current noise to inject, chosen uniformly from (-noise,noise)
         noise_frequency -- sampling rate (how quickly the noise changes)
         mode -- simulation mode ('direct', 'rate', or 'spike')
@@ -98,8 +212,8 @@ class Network:
         ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc, tauRef=tau_ref,
                           maxRate=IndicatorPDF(max_rate[0],max_rate[1]),
                           intercept=IndicatorPDF(intercept[0],intercept[1]))
-        if basis is not None:
-            ef.encoderFactory=FixedVectorGenerator(basis)            
+        if encoders is not None:
+            ef.encoderFactory=FixedVectorGenerator(encoders)            
         n=ef.make(name,neurons,dimensions)
         if noise is not None:
             for nn in n.nodes:
@@ -110,7 +224,7 @@ class Network:
             n.mode=SimulationMode.RATE
         elif mode=='direct':
             n.mode=SimulationMode.DIRECT
-        self.network.addNode(n)
+        if add_to_network: self.network.addNode(n)
         return n
     
     def make_input(self,name,values):
@@ -132,7 +246,7 @@ class Network:
         elif isinstance(pre,FunctionInput):
             assert func==None
             return pre.getOrigin('origin')
-        elif isinstance(pre,NEFEnsemble):
+        elif isinstance(pre,NEFEnsemble) or (hasattr(pre,'getOrigin') and hasattr(pre,'addDecodedOrigin')):
             if func is not None:
                 fname=func.__name__
                 origin=pre.getOrigin(fname)
