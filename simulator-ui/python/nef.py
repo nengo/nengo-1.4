@@ -33,7 +33,7 @@ import java
 
 __all__=['Network','EnsembleArray']
 
-class FixedVectorGenerator(VectorGenerator):
+class FixedVectorGenerator(VectorGenerator,java.io.Serializable):
     serialVersionUID=1
     def __init__(self,vectors):
         self.vectors=vectors
