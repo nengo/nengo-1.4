@@ -29,9 +29,11 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.sim.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,12 +44,15 @@ import ca.nengo.model.Node;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.impl.NetworkImpl;
+import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.SimulatorEvent;
 import ca.nengo.sim.SimulatorListener;
 import ca.nengo.util.Probe;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.GPUNodeThreadPool;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
 
@@ -107,12 +112,24 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	public synchronized void run(float startTime, float endTime, float stepSize, boolean dispProgress)
 			throws SimulationException {
 		
+		float pre_time = System.nanoTime();
+		
+		if(GPUNodeThreadPool.myUseGPU){
+			myNodeThreadPool = new GPUNodeThreadPool(myNodes);
+		}else if(NodeThreadPool.isMultithreading()){
+			myNodeThreadPool = new NodeThreadPool(myNodes);
+		}else{
+			myNodeThreadPool = null;
+		}
+
+		
 		Iterator<Probe> it = myProbes.iterator();
 		while (it.hasNext()) {
 			it.next().reset();
 		}
 		
 		fireSimulatorEvent(new SimulatorEvent(0, SimulatorEvent.Type.STARTED));
+		
 		// for (int i = 0; i < myNodes.length; i++) {
 		// myNodes[i].setMode(mode);
 		// }
@@ -122,18 +139,14 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		// myNodes[i].run(startTime, startTime);
 		// }
 		//		
+		
 		double time = startTime;
 		double thisStepSize = stepSize;
 		
-		if(NodeThreadPool.isMultithreading()){
-			myNodeThreadPool = new NodeThreadPool();
-		}else{
-			myNodeThreadPool = null;
-		}
+		
 		
 		int c = 0;
 		while (time < endTime) {
-			
 			
 			if (c++ % 100 == 99 && dispProgress)
 				System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize)); 
@@ -156,23 +169,27 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			myNodeThreadPool.kill();
 			myNodeThreadPool = null;
 		}
+		
+		System.out.println("Time for run: " + Float.toString( System.nanoTime() - pre_time) );
 	}
 
 	private void step(float startTime, float endTime)
 			throws SimulationException {
+		
+		//System.out.println("java step: " + Float.toString(startTime) + " " + Float.toString(endTime) );
 
+		float[] temp;
 		for (int i = 0; i < myProjections.length; i++) {
-			InstantaneousOutput values = myProjections[i].getOrigin()
-					.getValues();
+			InstantaneousOutput values = myProjections[i].getOrigin().getValues();
 			myProjections[i].getTermination().setValues(values);
 		}
 		
 		if(myNodeThreadPool != null){
-			myNodeThreadPool.run(myNodes, startTime, endTime);
+			myNodeThreadPool.step(startTime, endTime);
 		}else{
 			for (int i = 0; i < myNodes.length; i++) {
 				myNodes[i].run(startTime, endTime);
-			}	
+			}
 		}
 		
 		Iterator<Probe> it = myProbes.iterator();
