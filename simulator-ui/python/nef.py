@@ -36,7 +36,10 @@ __all__=['Network','EnsembleArray']
 class FixedVectorGenerator(VectorGenerator,java.io.Serializable):
     serialVersionUID=1
     def __init__(self,vectors):
-        self.vectors=vectors
+        self.vectors=[]
+        for v in vectors:
+            length=math.sqrt(sum([x*x for x in v]))
+            self.vectors.append([x/length for x in v])
         
     def genVectors(self,number,dimensions):        
         vectors=[]
@@ -49,6 +52,7 @@ class FixedVectorGenerator(VectorGenerator,java.io.Serializable):
 #  current version of Jython
 transientFunctions={}
 class PythonFunction(AbstractFunction):
+    serialVersionUID=1
     def __init__(self,func):
         AbstractFunction.__init__(self,1)
         transientFunctions[self]=func
@@ -60,6 +64,7 @@ class PythonFunction(AbstractFunction):
 
 
 class BaseNode(Node):
+    serialVersionUID=1
     def __init__(self,name):
         self.listeners=[]
         self._origins={}
@@ -111,6 +116,7 @@ class BaseNode(Node):
 
 
 class BaseEnsemble(BaseNode,Ensemble):
+    serialVersionUID=1
     def __init__(self,name,nodes):
         BaseNode.__init__(self,name)
         self._nodes=nodes
@@ -132,6 +138,7 @@ class BaseEnsemble(BaseNode,Ensemble):
 
 class EnsembleArray(BaseEnsemble):
     """Collects a set of NEFEnsembles into a single group."""
+    serialVersionUID=1
     def __init__(self,name,nodes):
         """Create an ensemble array from the given nodes."""        
         BaseEnsemble.__init__(self,name,nodes)
@@ -160,6 +167,7 @@ class EnsembleArray(BaseEnsemble):
 
 class Network:
     """Wraps a Nengo network with a set of helper functions."""
+    serialVersionUID=1
     def __init__(self,name):
         self.network=NetworkImpl()
         self.network.name=name
