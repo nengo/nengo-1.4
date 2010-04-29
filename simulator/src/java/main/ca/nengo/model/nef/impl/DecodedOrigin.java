@@ -441,6 +441,11 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		return myOutput;
 	}
 	
+	public void setValues(RealOutput ro) throws SimulationException {
+		myOutput = ro;
+		myTime = ro.getTime();
+	}
+	
 	/**
 	 * @return List of Functions approximated by this DecodedOrigin
 	 */
