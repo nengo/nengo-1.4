@@ -106,6 +106,10 @@ public class SpikeGeneratorOrigin implements Origin {
 	public Node getNode() {
 		return myNode;
 	}
+	
+	public SpikeGenerator getGenerator(){
+		return myGenerator;
+	}
 
 	@Override
 	public Origin clone() throws CloneNotSupportedException {
