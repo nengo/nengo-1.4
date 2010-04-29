@@ -27,6 +27,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.nef.impl;
 
+import java.io.ObjectStreamClass;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -61,6 +62,10 @@ import ca.nengo.model.impl.NodeFactory;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.NEFNode;
+import ca.nengo.model.neuron.Neuron;
+import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
+import ca.nengo.model.neuron.impl.SpikeGeneratorOrigin;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
 import ca.nengo.model.plasticity.PlasticityRule;
 import ca.nengo.util.MU;
 import ca.nengo.util.Memory;
@@ -101,6 +106,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private boolean myRadiiAreOne;
 	private DynamicalSystem myDirectModeDynamics;
 	private Integrator myDirectModeIntegrator;
+	private boolean myUseGPU = false;
 	private boolean myModeFixed;
 	
 	private NEFEnsembleFactory myEnsembleFactory;
@@ -116,7 +122,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	public NEFEnsembleImpl(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory factory, float[][] evalPoints, float[] radii) 
 			throws StructuralException {
-		
+
 		super(name, nodes, factory);
 		
 		if (nodes.length != encoders.length) {
@@ -158,6 +164,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * 		radius along each dimension can be specified with a list of length 1
 	 */
 	public void setRadii(float[] radii) throws StructuralException {
+
 		if (radii.length != getDimension() && radii.length != 1) {
 			throw new IllegalArgumentException("radius vector must have length " + getDimension() 
 					+ " or 1 (for uniform radius)");
@@ -547,12 +554,29 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		return all;
 	}
+	
+	/**
+   * Used to get decoded terminations to give to GPU.
+	 */
+	public DecodedTermination[] getDecodedTerminations(){
+		return myDecodedTerminations.values().toArray(new DecodedTermination[0]);
+		//return (OrderedTerminations != null) ? (DecodedTermination[])OrderedTerminations.toArray(new DecodedTermination[0]) : new DecodedTermination[0];
+	}
+	
+	/**
+   * Used to get decoded origins to give to GPU.
+	 */
+	public DecodedOrigin[] getDecodedOrigins(){
+		return myDecodedOrigins.values().toArray(new DecodedOrigin[0]);
+		//return (OrderedOrigins != null) ? (DecodedOrigin[])OrderedOrigins.toArray(new DecodedOrigin[0]) : new DecodedOrigin[0];	
+	}
 
 	/**
 	 * @see ca.nengo.model.Ensemble#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
-		try {
+
+		try{
 			float[] state = new float[myDimension];
 			Map<String, Float> bias = new HashMap<String, Float>(5);
 
@@ -574,7 +598,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				}
 				
 			}
-
+			
 			if ( getMode().equals(SimulationMode.DIRECT) ) {
 				//run ensemble dynamics if they exist (e.g. to model adaptation)
 				if (myDirectModeDynamics != null) {
@@ -812,8 +836,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 					LinearApproximator approximator = getApproximatorFactory().getApproximator(myEvalPoints, outputs);
 					myDecodingApproximators.put(nodeOrigin, approximator);
 				}		
-				
-				origin.redefineNodes(nodes,myDecodingApproximators.get(nodeOrigin));
+					origin.redefineNodes(nodes,myDecodingApproximators.get(nodeOrigin));
 			}
 		}
 		
@@ -932,5 +955,57 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	public void setNeurons(int count) throws StructuralException {setNodeCount(count);}
 	public int getNeurons() {return getNodeCount();}
+
+
+	/**
+   *  Used to get static neuron data (data that doesn't change each step) and give it to the GPU.
+   *  Data is returned in an array.
+   *  neuronData[0] = numNeurons
+   *  neuronData[1] = tauRC
+   *  neuronData[2] = tauRef
+   *  neuronData[3] = maxTimeStep
+   *  neuronData[4 ... 3 + numNeurons] = bias for each neuron
+   *  neuronData[4 + numNeurons ... 4 + 2 * numNeurons] = scale for each neuron
+	 */
+	public float[] getStaticNeuronData(){
+		
+		int numNeurons = getNeurons();
+		
+		float[] neuronData = new float[4 + 2 * numNeurons];
+		neuronData[0] = numNeurons;
+		
+		SpikingNeuron neuron = (SpikingNeuron) getNodes()[0];
+		SpikeGeneratorOrigin origin;
+		try {
+			origin = (SpikeGeneratorOrigin) neuron.getOrigin(Neuron.AXON);
+		} catch (StructuralException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		LIFSpikeGenerator generator = (LIFSpikeGenerator) origin.getGenerator();
+		
+		neuronData[1] = generator.getTauRC();
+		neuronData[2] = generator.getTauRef();
+		neuronData[3] = generator.getMaxTimeStep();
+
+		int i = 0;
+		for(; i < numNeurons; i++)
+		{
+			neuronData[i + 4] = ((SpikingNeuron) myNodes[i]).getBias();
+			neuronData[i + 4 + numNeurons] = ((SpikingNeuron) myNodes[i]).getScale();
+		}
+
+		return neuronData;
+	}
 	
+  // Check whether this node is to be run on GPU
+	public boolean isGPUNode(){
+		return myUseGPU;
+	}
+	
+  // Set whether this node is to be run on GPU
+	public void setGPU(boolean useGPU){
+		myUseGPU = useGPU;
+	}
 }
