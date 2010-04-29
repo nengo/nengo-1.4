@@ -1,6 +1,9 @@
 package ca.nengo.util.impl;
 
 import ca.nengo.model.Node;
+import ca.nengo.model.impl.NetworkImpl;
+
+import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -11,19 +14,21 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Eric Crawford
  */
 public class NodeThreadPool{
-	private static final int defaultNumThreads = 0;
+	protected static final int defaultNumThreads = 0;
 	
 	// numThreads can change throughout a simulation run. Therefore, it should not be used during a run,
 	// only at the beginning of a run to create the threads. During a run, use myThreads.length.
-	private static int myNumThreads = defaultNumThreads;
-	private NodeThread[] myNodeThreads;
-	private Object myLock;
-	private LinkedBlockingQueue<Node> myNodes;
-	private int myNumNodesRequired;
-	private int myNumNodesProcessed;
-	private volatile float myStartTime;
-	private volatile float myEndTime;
-	private volatile boolean isSleeping;
+	protected static int myNumThreads = defaultNumThreads;
+	protected NodeThread[] myNodeThreads;
+	protected Object myLock;
+	protected LinkedBlockingQueue<Node> myNodes;
+	protected Node[] myNodeArray;
+	protected int myNumNodesRequired;
+	protected int myNumNodesProcessed;
+	protected volatile float myStartTime;
+	protected volatile float myEndTime;
+	protected volatile boolean isSleeping;
+	protected volatile boolean myKill = false;
 	
 	public static int getNumThreads(){
 		return myNumThreads;
@@ -56,12 +61,22 @@ public class NodeThreadPool{
 		}
 	}
 
-	public NodeThreadPool(){
+	// Dummy default constructor. Use at your own risk.
+	protected NodeThreadPool(){
+	}
+	
+	public NodeThreadPool(Node[] nodes){
+		Initialize(nodes);
+	}
+	
+	protected void Initialize(Node[] nodes){
 		myNodes = new LinkedBlockingQueue<Node>();
 		myLock = new Object();
+
+		myNodeArray = nodes;
 		
-		myNumNodesRequired = 1;
 		myNumNodesProcessed = 0;
+		myNumNodesRequired = myNodeArray.length;
 		
 		myNodeThreads = new NodeThread[myNumThreads];
 		
@@ -71,29 +86,28 @@ public class NodeThreadPool{
 			myNodeThreads[i].start();
 		}
 		
-		Thread.yield();
+		Thread.yield();	
 	}
 	
 	// Execute the run method of an array of nodes
-	public void run(Node[] nodes, float startTime, float endTime){
+	public void step(float startTime, float endTime){
 		int oldPriority = Thread.currentThread().getPriority();
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		myStartTime = startTime;
 		myEndTime = endTime;
 		myNumNodesProcessed = 0;
-		myNumNodesRequired = nodes.length;
-		
-		for(int i = 0; i < nodes.length; i++){
-			myNodes.offer(nodes[i]);
+
+		for(int i = 0; i < myNodeArray.length; i++){
+			myNodes.offer(myNodeArray[i]);
 		}
 		
 		waitForThreads();
 		Thread.currentThread().setPriority(oldPriority);
 	}
 	
-	// Called from within the node pool. Waits until all the nodes in the run have been
-	// executed.
-	private void waitForThreads(){
+	
+	// Called from within the node pool. Waits until all the nodes in the run have been executed.
+	protected void waitForThreads(){
 		synchronized(myLock){
 			if(!finishedRun()){
 				try{
@@ -109,6 +123,7 @@ public class NodeThreadPool{
 	// Kill the threads by interrupting them. 
 	// Each thread will handle it accordingly by ending its run method.
 	public void kill(){
+		myKill = true;
 		for(int i = 0; i < myNodeThreads.length; i++){
 			myNodeThreads[i].interrupt();
 		}
@@ -133,5 +148,4 @@ public class NodeThreadPool{
 			}
 		}
 	}
-
 }
