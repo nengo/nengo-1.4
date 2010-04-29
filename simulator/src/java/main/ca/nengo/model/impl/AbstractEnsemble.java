@@ -69,12 +69,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	private static final long serialVersionUID = -5498397418584843304L;
 	
 	private static Logger ourLogger = Logger.getLogger(AbstractEnsemble.class);
-	private static int numNodeRunners = 10;
 
 	private String myName;
-	private Node[] myNodes;
-	private NodeRunner[] myNodeRunners;
-	transient private Thread[] myThreads;
+	protected Node[] myNodes;
 	private Map<String, Origin> myOrigins;
 	protected Map<String, EnsembleTermination> myTerminations;
 	private Map<String, List<Integer>> myStateNames; // for Probeable
@@ -103,7 +100,6 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	}
 	
 	private void init() {
-		setupNodeRunners(numNodeRunners);
 		
 		myOrigins = new HashMap<String, Origin>(10);
 		Origin[] origins = findOrigins(this, myNodes);
@@ -128,7 +124,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	public void redefineNodes(Node[] nodes) {
 		myNodes=nodes;
 		mySpikePattern = new SpikePatternImpl(myNodes.length);
-		setupNodeRunners(numNodeRunners);
+		//setupNodeRunners(numNodeRunners);
 		
 		myOrigins = new HashMap<String, Origin>(10);
 		Origin[] origins = findOrigins(this, myNodes);
@@ -142,32 +138,6 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 			myTerminations.put(terminations[i].getName(), terminations[i]);
 		}
 		
-	}
-	
-	
-	private void setupNodeRunners(int n) {
-		myNodeRunners = new NodeRunner[n];
-			
-		List[] nodeLists = new ArrayList[n];
-		for (int i = 0; i < n; i++) {
-			nodeLists[i] = new ArrayList<Node>(50);
-		}
-		
-		for (int i = 0; i < myNodes.length; i++) {
-			int runner = i % myNodeRunners.length;	
-			nodeLists[runner].add(myNodes[i]);
-		}
-		
-		for (int i = 0; i < n; i++) {
-			myNodeRunners[i] = new NodeRunner((Node[]) nodeLists[i].toArray(new Node[0]));
-		}
-	}
-	
-	private void setupThreads() {
-		myThreads = new Thread[myNodeRunners.length];
-		for (int i = 0; i < myNodeRunners.length; i++) {
-			myThreads[i] = new Thread(myNodeRunners[i]);			
-		}
 	}
 
 	/**
@@ -229,9 +199,10 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		if (mySpikePattern == null) {
 			mySpikePattern = new SpikePatternImpl(myNodes.length);
 		}
+		
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodes[i].run(startTime, endTime);
-
+			
 			if (myCollectSpikesFlag && (myCollectSpikesRatio == 1 || i % myCollectSpikesRatio == 0)) {
 				try {
 					InstantaneousOutput output = myNodes[i].getOrigin(Neuron.AXON).getValues();
@@ -240,43 +211,14 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 						if (precise.getValues()[0]) {
 							mySpikePattern.addSpike(i, endTime+precise.getSpikeTimes()[0]);
 						}
-					} else if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
+	;				} else if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
 						mySpikePattern.addSpike(i, endTime);
 					}				
 				} catch (StructuralException e) {
 					ourLogger.warn("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
 				}
 			}
-		}
-
-//		if (myThreads == null) setupThreads();
-//		for (int i = 0; i < myNodeRunners.length; i++) {
-//			myNodeRunners[i].setTime(startTime, endTime);
-//			myThreads[i].run();
-//		}
-//		
-//		for (int i = 0; i < myThreads.length; i++) {
-//			try {
-//				myThreads[i].join();
-//			} catch (InterruptedException e) {
-//				throw new SimulationException(e);
-//			}
-//			
-//			if (myNodeRunners[i].getException() != null) throw myNodeRunners[i].getException();			
-//		}
-//		
-//		for (int i = 0; i < myNodes.length; i++) {
-//			if (myCollectSpikesFlag) {
-//				try {
-//					InstantaneousOutput output = myNodes[i].getOrigin(Neuron.AXON).getValues();
-//					if (output instanceof SpikeOutput && ((SpikeOutput) output).getValues()[0]) {
-//						mySpikePattern.addSpike(i, endTime);
-//					}				
-//				} catch (StructuralException e) {
-//					ourLogger.warn("Ensemble has been set to collect spikes, but not all components have Origin Neuron.AXON", e);
-//				}
-//			}
-//		}				
+		}			
 	}	
 	
 	/**
@@ -356,6 +298,25 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		return mySpikePattern;
 	}
 		
+	public void setSpikePattern(float[] spikes, float endTime)
+	{
+		if(myCollectSpikesFlag)
+		{
+			if (mySpikePattern == null) {
+				mySpikePattern = new SpikePatternImpl(myNodes.length);
+			}
+			
+			for(int i = 0; i < myNodes.length; i++){
+				
+				if(myCollectSpikesRatio == 1 || i % myCollectSpikesRatio == 0){
+					if(spikes[i] != 0.0f){
+						mySpikePattern.addSpike(i, endTime);
+					}
+				}
+			}	
+		}
+	}
+	
 	/**
 	 * @return Composite of Node states by given name. States of different nodes may be defined at different 
 	 * 		times, so only the states at the end of the most recent step are given. Only the first 
@@ -368,7 +329,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		}
 		
 		List<Integer> nodeNumbers = myStateNames.get(stateName);
-		float[] firstNodeTimes = ((Probeable) myNodes[nodeNumbers.get(0).intValue()]).getHistory(stateName).getTimes();		
+		float[] firstNodeTimes = ((Probeable) myNodes[nodeNumbers.get(0).intValue()]).getHistory(stateName).getTimes();	
 
 		float[] times = new float[0];
 		float[][] values = new float[0][];
@@ -584,61 +545,4 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		
 		return result;
 	}
-	
-	
-	
-
-	/**
-	 * Allows us to run a node in a separate thread. 
-	 *  
-	 * @author Bryan Tripp
-	 */
-	private static class NodeRunner implements Runnable, Serializable {
-
-		private static final long serialVersionUID = 1L;
-		
-		private Node[] myNodes;
-		private float myStartTime;
-		private float myEndTime;
-		private SimulationException myException;
-
-		/**
-		 * @param nodes The Nodes that will be run by this runner. 
-		 */
-		public NodeRunner(Node[] nodes) {
-			myNodes = nodes;
-		}
-
-		/**
-		 * @param start Simulation time at next run is to start
-		 * @param end Simulation time at which next run is to end
-		 */
-		public void setTime(float start, float end) {
-			myStartTime = start;
-			myEndTime = end;
-		}
-
-		/**
-		 * @return The exception thrown in the last run, if any, otherwise null.   
-		 */
-		public SimulationException getException() {
-			return myException;
-		}
-
-		/**
-		 * @see java.lang.Runnable#run()
-		 */
-		public void run() {
-			myException = null;
-			try {
-				for (int i = 0; i < myNodes.length; i++) {
-					myNodes[i].run(myStartTime, myEndTime);					
-				}
-			} catch (SimulationException e) {
-				myException = e;
-			}
-		}
-		
-	}
-	
 }
