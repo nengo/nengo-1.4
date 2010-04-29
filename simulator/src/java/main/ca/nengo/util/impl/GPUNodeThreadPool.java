@@ -23,15 +23,17 @@ public class GPUNodeThreadPool extends NodeThreadPool {
 	// if it has, it shouldn't sleep, because it will never be woken up
 	protected int mySignal;
 	
+	// load the shared library that contains the native functions
 	static{
 		System.loadLibrary("NengoGPU");
 	}
 	
-	
+	// set whether or not to use the GPU
 	public static void setUseGPU(boolean value){
 		myUseGPU = value;
 	}
 	
+	// get whether or not to use the GPU
 	public static boolean getUseGPU(){
 		return myUseGPU;
 	}
@@ -40,6 +42,8 @@ public class GPUNodeThreadPool extends NodeThreadPool {
 		Initialize(nodes);
 	}
 	
+	// Called by the GPUThread after completing a step. Wait for the main thread to wake this thread up again to
+	// process another step.
 	public void Sleep(){
 		myGPUThreadLock.lock();
 		
@@ -99,6 +103,7 @@ public class GPUNodeThreadPool extends NodeThreadPool {
 		Thread.yield();
 	}
 	
+	// Tell the processing threads and GPU threads to take a step
 	public void step(float startTime, float endTime){
 		int oldPriority = Thread.currentThread().getPriority();
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -124,6 +129,12 @@ public class GPUNodeThreadPool extends NodeThreadPool {
 	// Each thread will handle it accordingly by ending its run method.
 	public void kill(){
 		super.kill();
+		
+		if(oldNumThreads == 0)
+		{
+			myNumThreads = 0;
+		}
+		
 		myNativeThread.interrupt();
 	}
 	
