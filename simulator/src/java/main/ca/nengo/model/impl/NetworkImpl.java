@@ -372,6 +372,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
 		myName = name;
 	}
+	
 
 	/**
 	 * @see ca.nengo.model.Node#setMode(ca.nengo.model.SimulationMode)
