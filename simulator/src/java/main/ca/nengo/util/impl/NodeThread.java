@@ -5,23 +5,27 @@ import ca.nengo.model.SimulationException;
 
 public class NodeThread extends Thread {
 	
-	private NodeThreadPool myNodePool;
+	private NodeThreadPool myNodeThreadPool;
 	
 	public NodeThread(NodeThreadPool nodePool){
-		myNodePool = nodePool;
+		myNodeThreadPool = nodePool;
+	}
+	
+	private Node getNextNode(){
+		return myNodeThreadPool.getNextNode();
 	}
 	
 	public void run(){
 		Node workingNode;
 
-		workingNode = myNodePool.getNextNode();
+		workingNode = myNodeThreadPool.getNextNode();
 			
 		while(workingNode != null)
 		{
 			try {
-				workingNode.run(myNodePool.getStartTime(), myNodePool.getEndTime());
+				workingNode.run(myNodeThreadPool.getStartTime(), myNodeThreadPool.getEndTime());
 				
-				myNodePool.finishedANode();
+				myNodeThreadPool.finishedANode();
 
 				Thread.yield();
 			} catch (SimulationException e) {
@@ -32,7 +36,7 @@ public class NodeThread extends Thread {
 				return;
 			}
 			
-			if((workingNode = myNodePool.getNextNode()) == null){
+			if((workingNode = getNextNode()) == null){
 				return;
 			}
 		}
