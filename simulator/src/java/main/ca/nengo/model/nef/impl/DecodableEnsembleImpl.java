@@ -64,8 +64,8 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 
 	private static final long serialVersionUID = 1L;
 	
-	private Map<String, DecodedOrigin> myDecodedOrigins;
-	private LinkedList <DecodedOrigin> OrderedOrigins;
+	protected Map<String, DecodedOrigin> myDecodedOrigins;
+	protected LinkedList <DecodedOrigin> OrderedOrigins;
 		
 	private ApproximatorFactory myApproximatorFactory;
 	private Map<String, LinearApproximator> myApproximators;
@@ -290,7 +290,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	 * 
 	 * @param time Simulation time
 	 */
-	protected void setTime(float time) {
+	public void setTime(float time) {	
 		myTime = time;
 	}
 
