@@ -4,7 +4,7 @@ extern "C"{
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <cutil.h>
+//#include <cutil.h>
 #include <cuda_runtime.h>
 
 #include "NengoGPU.h"
