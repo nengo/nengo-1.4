@@ -10,7 +10,7 @@ import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 // node processing itself, but handles interaction with native code so that GPU nodes and normal nodes
 // can be executed in parallel
 public class GPUNodeThreadPool extends NodeThreadPool {
-	public static boolean myUseGPU = true;
+	public static boolean myUseGPU = false;
 	protected GPUThread myNativeThread;
 	protected Lock myGPUThreadLock;
 	protected Condition myGPUThreadCondition;
@@ -25,7 +25,11 @@ public class GPUNodeThreadPool extends NodeThreadPool {
 	
 	// load the shared library that contains the native functions
 	static{
-		System.loadLibrary("NengoGPU");
+		try {
+			System.loadLibrary("NengoGPU");
+		} catch (java.lang.UnsatisfiedLinkError e) {
+			myUseGPU=false;
+		}
 	}
 	
 	// set whether or not to use the GPU
