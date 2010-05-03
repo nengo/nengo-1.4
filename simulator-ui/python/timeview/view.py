@@ -34,19 +34,19 @@ class EnsembleWatch:
         return isinstance(obj,NEFEnsemble)
     def voltage(self,obj):
         if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
-            return [n.getOrigin('AXON').values.values[0]*0.0005 for n in obj.nodes]
+            return [n.getOrigin('AXON').getValues().values[0]*0.0005 for n in obj.nodes]
         else:
             return [n.generator.voltage for n in obj.nodes]
     def spikes(self,obj):
         if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
-            return [n.getOrigin('AXON').values.values[0]*0.0005 for n in obj.nodes]
+            return [n.getOrigin('AXON').getValues().values[0]*0.0005 for n in obj.nodes]
         else:
-            return obj.getOrigin('AXON').values.values
+            return obj.getOrigin('AXON').getValues().values
     def spikes_only(self,obj):
         if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
             return [0]*obj.neurons
         else:
-            return obj.getOrigin('AXON').values.values
+            return obj.getOrigin('AXON').getValues().values
     def encoder(self,obj):
         return [x[0] for x in obj.encoders]
     def views(self,obj):
@@ -73,7 +73,7 @@ class NodeWatch:
     def check(self,obj):
         return isinstance(obj,Node)
     def value(self,obj,origin):
-        return obj.getOrigin(origin).values.values
+        return obj.getOrigin(origin).getValues().values
     def weights(self,obj,termination):
         v=[]
         for n in obj.nodes:
@@ -128,10 +128,10 @@ class NodeWatch:
             
             r.append((text,components.Graph,dict(func=self.value,args=(name,),filter=filter,label=label)))
             
-            if len(obj.getOrigin(name).values.values)>8:
+            if len(obj.getOrigin(name).getValues().values)>8:
                 r.append((text_grid,components.VectorGrid,dict(func=self.value,args=(name,), min=-max_radii, max=max_radii,label=label)))
 
-            if len(obj.getOrigin(name).values.values)>=2:
+            if len(obj.getOrigin(name).getValues().values)>=2:
                 r.append((xy,components.XYPlot,dict(func=self.value,args=(name,),filter=filter,label=label)))
         
         if isinstance(obj,NEFEnsemble):
@@ -152,7 +152,7 @@ class FunctionWatch:
     def check(self,obj):
         return isinstance(obj,FunctionInput)
     def funcOrigin(self,obj):
-        return obj.getOrigin('origin').values.values
+        return obj.getOrigin('origin').getValues().values
     def views(self,obj):
         return [
             ('control',components.FunctionControl,dict(func=self.funcOrigin,label=obj.name)),
@@ -361,7 +361,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         for key,value in self.forced_origins.items():
             (name,origin,index)=key
             origin=self.watcher.objects[name].getOrigin(origin)
-            v=origin.values.values
+            v=origin.getValues().values
 
             prev=self.forced_origins_prev.get(key,None)
             if prev is None: prev=v[index]
@@ -369,7 +369,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             v[index]=prev*decay+value*dt_tau
             self.forced_origins_prev[key]=v[index]
 
-            origin.setValues(0,origin.values.time,v)
+            origin.setValues(0,origin.getValues().time,v)
 
     def save(self):
         db=shelve.open('python/timeview/layout.db')
