@@ -170,7 +170,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			myNodeThreadPool = null;
 		}
 		
-		System.out.println("Time for run: " + Float.toString( System.nanoTime() - pre_time) );
+		//System.out.println("Time for run: " + Float.toString( System.nanoTime() - pre_time) );
 	}
 
 	private void step(float startTime, float endTime)
