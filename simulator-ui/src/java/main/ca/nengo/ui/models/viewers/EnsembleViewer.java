@@ -89,6 +89,10 @@ public class EnsembleViewer extends NodeViewer {
 				UINeuron neuronUI = new UINeuron(neuron);
 
 				addUINode(neuronUI, false, false);
+			} else if (node instanceof Ensemble) {
+				Ensemble ensemble = (Ensemble)node;
+				UIEnsemble ensembleUI = new UIEnsemble(ensemble);
+				addUINode(ensembleUI,false,false);
 			} else {
 				UserMessages.showError("Unsupported node type " + node.getClass().getSimpleName()
 						+ " in EnsembleViewer");
