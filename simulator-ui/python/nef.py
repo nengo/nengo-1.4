@@ -28,6 +28,7 @@ from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import *
 from ca.nengo.model.neuron import *
 from ca.nengo.util import *
+from ca.nengo.util.impl import TimeSeriesImpl
 from ca.nengo.math.impl import ConstantFunction,IndicatorPDF,AbstractFunction
 import java
 
@@ -137,7 +138,7 @@ class BaseEnsemble(BaseNode,Ensemble):
         
 
 
-class EnsembleArray(BaseEnsemble):
+class EnsembleArray(BaseEnsemble,Probeable):
     """Collects a set of NEFEnsembles into a single group."""
     serialVersionUID=1
     def __init__(self,name,nodes):
@@ -163,6 +164,22 @@ class EnsembleArray(BaseEnsemble):
         terminations=[n.addDecodedTermination(name,[matrix[i]],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]
         self._terminations[name]=EnsembleTermination(self,name,terminations)
         return self._terminations[name]
+        
+    def listStates(self):
+        return self._nodes[0].listStates()
+
+    def getHistory(self,stateName):
+        times=None
+        values=[None]*len(self._nodes)
+        units=[None]*len(self._nodes)
+        for i,n in enumerate(self._nodes):
+            data=n.getHistory(stateName)
+            if i==0: times=data.getTimes()
+            units[i]=data.getUnits()[0]
+            values[i]=data.getValues()[0][0]
+        return TimeSeriesImpl(times,[values],units)
+            
+
 
 
 
