@@ -216,8 +216,7 @@ public class PyMultiarray extends PySequence {
 
     /** Create a new multiarray of zeros with shape <code>shape</code> with type inferenced from shape.*/
     public static PyMultiarray zeros(PyObject shape) {
-	//return zeros(objectToInts(shape, true), asarray(shape).typecode());  //TCS
-	return zeros(objectToInts(shape, true), 'f');
+	return zeros(objectToInts(shape, true), asarray(shape).typecode());
     }
 
     /** Create a range of numbers in [start, stop) with the given step and typecode.*/

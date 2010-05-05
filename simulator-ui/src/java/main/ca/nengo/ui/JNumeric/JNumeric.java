@@ -477,13 +477,13 @@ class TakeFunction extends KeywordFunction {
 }
 class TraceFunction extends KeywordFunction {
 	TraceFunction() {
-		docString = "trace(a, offset=0, axis1=-2, axis1=-1)"; 
-		argNames = new String[] {"a", "offset", "axis1", "axis2"};
-		defaultArgs = new PyObject [] {null, null, Py.newInteger(-2), Py.newInteger(-1)};
+		docString = "trace(a, offset=0, axis=-1)"; 
+		argNames = new String[] {"a", "offset", "axis"};
+		defaultArgs = new PyObject [] {null, Py.Zero, Py.newInteger(-1)};
 	}
 	public PyObject _call(PyObject args[]) {
 		return Umath.add.reduce(
-			JNumeric.diagonal.__call__(args[0], args[1], args[2], args[3]), -1);
+			JNumeric.diagonal.__call__(args[0], args[1], args[2]), -1);
 	} 
 }
 class TransposeFunction extends KeywordFunction {

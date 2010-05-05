@@ -75,7 +75,7 @@ public class JN_FFT extends PyObject {
 		return _fft(o, false);
 	}
 
-	static public PyMultiarray inverse_fft(PyObject o) {
+	static public PyMultiarray ifft(PyObject o) {
 		return _fft(o, true);
 	}
 }
