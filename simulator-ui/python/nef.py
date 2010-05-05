@@ -75,7 +75,7 @@ class BaseNode(Node):
         self._terminations={}    
         self._name=name
         self._states=java.util.Properties()
-        self.setMode(SimulationMode.DEFAULT)
+        self._mode=SimulationMode.DEFAULT
         
 
     def reset(self,randomize=False):
@@ -142,8 +142,10 @@ class BaseEnsemble(BaseNode,Ensemble):
     def run(self,start,end):
         for n in self._nodes:
             n.run(start,end)
-        
-
+    def setMode(self,mode):
+        BaseNode.setMode(self,mode)
+        for n in self._nodes:
+            n.setMode(mode)        
 
 class EnsembleArray(BaseEnsemble,Probeable):
     """Collects a set of NEFEnsembles into a single group."""
