@@ -138,7 +138,7 @@ class BaseEnsemble(BaseNode,Ensemble):
         assert False
     def reset(self,randomize=False):
         for n in self._nodes:
-            n.reset(randomize=randomize)
+            n.reset()
     def run(self,start,end):
         for n in self._nodes:
             n.run(start,end)
