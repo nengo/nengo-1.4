@@ -65,10 +65,12 @@ class PythonFunction(AbstractFunction):
             raise Exception('Python Functions are not kept when saving/loading networks')
 
 
+
 class BaseNode(Node):
     serialVersionUID=1
+    listeners={}   # kept outside of instances so it doesn't get serialized
+    
     def __init__(self,name):
-        self.listeners=[]
         self._origins={}
         self._terminations={}    
         self._name=name
@@ -81,13 +83,15 @@ class BaseNode(Node):
     def getName(self):
         return self._name
     def setName(self,name):
-        VisiblyMutableUtils.nameChanged(self, self.getName(), name, self.listeners)
+        VisiblyMutableUtils.nameChanged(self, self.getName(), name, BaseNode.listeners.get(self,[]))
         self._name=name
 
     def addChangeListener(self,listener):
-        self.listeners.append(listener)
+        if self not in BaseNode.listeners: BaseNode.listeners[self]=[listener]
+        else: BaseNode.listeners[self].append(listener)
     def removeChangeListener(self,listener):
-        self.listeners.remove(listener)
+        if self in BaseNode.listeners:
+            BaseNode.listeners[self].remove(listener)
 
     def run(self,start,end):
         pass
@@ -132,6 +136,9 @@ class BaseEnsemble(BaseNode,Ensemble):
         return False
     def redefineNodes(nodes):
         assert False
+    def reset(self,randomize=False):
+        for n in self._nodes:
+            n.reset(randomize=randomize)
     def run(self,start,end):
         for n in self._nodes:
             n.run(start,end)
