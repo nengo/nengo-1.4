@@ -143,7 +143,11 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		double time = startTime;
 		double thisStepSize = stepSize;
 		
+		// Casting the float to a double above causes some unexpected rounding.  To avoid this
+		//  we force the stepSize to be divisible by 0.000001 (1 microsecond)
 		
+		thisStepSize=Math.round(thisStepSize*1000000)/1000000.0;
+		if (thisStepSize<0.000001) thisStepSize=0.000001;
 		
 		int c = 0;
 		while (time < endTime) {
@@ -173,7 +177,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		//System.out.println("Time for run: " + Float.toString( System.nanoTime() - pre_time) );
 	}
 
-	private void step(float startTime, float endTime)
+	public void step(float startTime, float endTime)
 			throws SimulationException {
 		
 		//System.out.println("java step: " + Float.toString(startTime) + " " + Float.toString(endTime) );
