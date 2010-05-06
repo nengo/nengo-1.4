@@ -1,6 +1,7 @@
 import watcher
 import components
 import timelog
+import data
 
 
 import java
@@ -24,7 +25,7 @@ class Icon:
 class ShadedIcon:
     pass    
     
-for name in 'pause play configure end start backward forward restart arrowup arrowdown save restore'.split():
+for name in 'pause play configure end start backward forward restart arrowup arrowdown save restore refresh data'.split():
     setattr(Icon,name,ImageIcon('python/images/%s.png'%name))
     setattr(ShadedIcon,name,ImageIcon('python/images/%s-pressed.png'%name))
 
@@ -583,6 +584,14 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         mainPanel.add(self.left_panel,BorderLayout.WEST)
         mainPanel.add(self.right_panel,BorderLayout.EAST)
 
+        
+        
+        data=JPanel(layout=BorderLayout(),opaque=False)
+        data.add(JButton(Icon.data,rolloverIcon=ShadedIcon.data,toolTipText='examine data',actionPerformed=self.show_data,borderPainted=False,focusPainted=False,contentAreaFilled=False))
+        data.add(JLabel('data',horizontalAlignment=javax.swing.SwingConstants.CENTER),BorderLayout.NORTH)
+        data.maximumSize=data.preferredSize
+        configPanel.add(data)
+
 
         mode=JPanel(layout=BorderLayout(),opaque=False)
         cb=JComboBox(['default','rate','direct'])
@@ -601,7 +610,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
 
         dt=JPanel(layout=BorderLayout(),opaque=False)
-        cb=JComboBox(['0.001','0.0005','0.0002','0.0001','0.01','0.005'])
+        cb=JComboBox(['0.001','0.0005','0.0002','0.0001'])
         cb.setSelectedIndex(0)
         self.view.dt=float(cb.getSelectedItem())
         cb.addActionListener(self)
@@ -652,7 +661,8 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         layout.add(JLabel('layout',horizontalAlignment=javax.swing.SwingConstants.CENTER),BorderLayout.NORTH)
         layout.maximumSize=layout.preferredSize
         configPanel.add(layout)
-        configPanel.add(JButton("data",actionPerformed=self.show_data))
+
+
         
         configPanel.setPreferredSize(java.awt.Dimension(20,self.config_panel_height))
         configPanel.visible=False
@@ -662,35 +672,10 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             c.border=javax.swing.border.EmptyBorder(0,10,0,10)
         
     def show_data(self,event):
-        self.frame=JFrame('Data')
-        self.frame.visible=True
-
-        start_time=max(0,self.view.timelog.tick_count-self.view.timelog.tick_limit+1)*self.view.dt
-        
-        data=[]
-        title=['t']
-        for key,watch in self.view.watcher.active.items():
-            name,func,args=key
-            d=watch.get()
-            n=len(watch.get_first())
-            while len(data)<len(d): 
-                data.append(['%0.4f'%(start_time+(len(data)+0)*self.view.dt)])
-            
-            for i in range(n):
-                title.append('%s.%s%s[%d]'%(name,func.__name__,args,i))
-                for j in range(len(d)):
-                    dd=d[j]
-                    if dd is None: data[j].append(None)
-                    else: data[j].append('%1.10f'%dd[i])
-            
-        
-        #table=JTable([[1,2],[3,4]],["a","b"])
-        table=JTable(data,title)
-        #table.autoResizeMode=JTable.AUTO_RESIZE_OFF
-        self.frame.add(JScrollPane(table))
-        self.frame.size=(300,400)
-        
-        
+        frame=JFrame('%s Data'%self.view.network.name)
+        frame.visible=True
+        frame.add(data.DataPanel(self.view))
+        frame.size=(500,600)
 
 
     def forward_one_frame(self,event):
