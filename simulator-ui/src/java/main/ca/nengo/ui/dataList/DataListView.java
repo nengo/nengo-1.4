@@ -68,7 +68,7 @@ import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
 import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-
+import ca.nengo.ui.script.ScriptConsole;
 public class DataListView extends JPanel implements TreeSelectionListener {
 
 	private static final long serialVersionUID = 1L;
@@ -78,8 +78,10 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 	private SimulatorDataModel dataModel;
 	private JTree tree;
+	
+	private ScriptConsole scriptConsole;
 
-	public DataListView(SimulatorDataModel data) {
+	public DataListView(SimulatorDataModel data, ScriptConsole scriptConsole) {
 		super(new GridLayout(1, 0));
 
 		this.dataModel = data;
@@ -107,6 +109,8 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 
 		Dimension minimumSize = new Dimension(100, 50);
 		scrollPane.setMinimumSize(minimumSize);
+		
+		this.scriptConsole=scriptConsole;
 	}
 
 	/** Required by TreeSelectionListener interface. */
@@ -270,6 +274,20 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 			} else if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
 				DoubleClickEvent(e);
 			}
+
+			if (e.getButton() == MouseEvent.BUTTON1) {
+				TreePath[] paths = getTreePaths(e);
+				List<MutableTreeNode> leafNodes = getLeafNodes(paths);
+	
+				if (leafNodes.size() == 1 && leafNodes.get(0) instanceof DataTreeNode) {
+					DataTreeNode dataNode = (DataTreeNode) (leafNodes.get(0));
+	
+					if (dataNode != null && scriptConsole!=null) {
+						scriptConsole.setCurrentData(dataNode.getUserObject());
+					}
+				}
+			}
+			
 
 		}
 

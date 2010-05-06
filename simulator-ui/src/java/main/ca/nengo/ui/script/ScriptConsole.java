@@ -86,6 +86,8 @@ public class ScriptConsole extends JPanel {
 
 	private static final Logger ourLogger = Logger.getLogger(ScriptConsole.class);
 	private static final String CURRENT_VARIABLE_NAME = "that";
+	private static final String CURRENT_DATA_NAME = "data";
+	
 
 	public static final String COMMAND_STYLE = "command";
 	public static final String OUTPUT_STYLE = "output";
@@ -260,6 +262,16 @@ public class ScriptConsole extends JPanel {
 		myInterpreter.set(CURRENT_VARIABLE_NAME, o);
 	}
 
+	/**
+	 * @param o
+	 *            The data that is currently selected in the UI.
+	 */
+	public void setCurrentData(Object o) {
+		myInterpreter.set(CURRENT_DATA_NAME, o);
+		// convert the TimeSeriesData into a numeric array
+		myInterpreter.exec(CURRENT_DATA_NAME+"=array("+CURRENT_DATA_NAME+".values).T");
+	}
+	
 	/**
 	 * Sets initial focus (should be called from UI thread)
 	 */

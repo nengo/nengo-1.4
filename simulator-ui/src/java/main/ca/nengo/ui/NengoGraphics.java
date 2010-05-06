@@ -109,7 +109,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 public class NengoGraphics extends AppFrame implements NodeContainer {
 	private static final long serialVersionUID = 1L;
 
-	public static final double VERSION = 1.0;
+	public static final double VERSION = 1.1;
 
 	public static final String APP_NAME = "Nengo V" + VERSION;
 	/**
@@ -118,7 +118,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	public static final String ABOUT = "<H3>"
 			+ APP_NAME
 			+ "</H3>"
-			+ "<p>(c) Copyright Bryan Tripp & Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2008.  All rights reserved.<BR><BR>"
+			+ "<p>(c) Copyright Bryan Tripp & Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2009.<BR><BR>"
 			+ "User Interface by Shu Wu (shuwu83@gmail.com) <BR><BR>"
 			+ "This product contains several open-source libraries (copyright their respective authors). "
 			+ "For more information, consult lib/library-licenses.txt in the installation directory.<BR> "
@@ -433,7 +433,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
 				"Script Console", AuxillarySplitPane.Orientation.Bottom);
 
-		dataListViewer = new DataListView(new SimulatorDataModel());
+		dataListViewer = new DataListView(new SimulatorDataModel(),scriptConsole);
 
 		dataViewerPane = new AuxillarySplitPane(scriptConsolePane, dataListViewer, "Data Viewer",
 				AuxillarySplitPane.Orientation.Left);
