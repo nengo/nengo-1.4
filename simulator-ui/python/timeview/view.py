@@ -584,23 +584,20 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         mainPanel.add(self.right_panel,BorderLayout.EAST)
 
 
-        if self.view.network.mode!=SimulationMode.DIRECT:            
-            mode=JPanel(layout=BorderLayout(),opaque=False)
-            cb=JComboBox(['default','rate','direct'])
-            if self.view.network.mode in [SimulationMode.DEFAULT,SimulationMode.PRECISE]:
-                cb.setSelectedIndex(0)
-            elif self.view.network.mode in [SimulationMode.RATE]:
-                cb.setSelectedIndex(1)
-            elif self.view.network.mode in [SimulationMode.DIRECT,SimulationMode.APPROXIMATE]:
-                cb.setSelectedIndex(2)
-            cb.addActionListener(self)
-            self.mode_combobox=cb        
-            mode.add(cb)
-            mode.add(JLabel('mode'),BorderLayout.NORTH)
-            mode.maximumSize=mode.preferredSize
-            configPanel.add(mode)
-        else:
-            self.mode_combobox=None
+        mode=JPanel(layout=BorderLayout(),opaque=False)
+        cb=JComboBox(['default','rate','direct'])
+        if self.view.network.mode in [SimulationMode.DEFAULT,SimulationMode.PRECISE]:
+            cb.setSelectedIndex(0)
+        elif self.view.network.mode in [SimulationMode.RATE]:
+            cb.setSelectedIndex(1)
+        elif self.view.network.mode in [SimulationMode.DIRECT,SimulationMode.APPROXIMATE]:
+            cb.setSelectedIndex(2)
+        cb.addActionListener(self)
+        self.mode_combobox=cb        
+        mode.add(cb)
+        mode.add(JLabel('mode'),BorderLayout.NORTH)
+        mode.maximumSize=mode.preferredSize
+        configPanel.add(mode)
 
 
         dt=JPanel(layout=BorderLayout(),opaque=False)
