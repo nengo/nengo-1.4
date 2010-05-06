@@ -462,12 +462,15 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
     def run(self):
         while self.frame.visible:
-            self.network.simulator.resetNetwork(True)
+            self.network.simulator.resetNetwork(False)                   
+            # run the network for an instant so that FunctionInputs have values at their Origin so they can be read
             for n in self.network.nodes:
-                if hasattr(n,'simulator'): n.simulator.resetNetwork(True)
-            now=0.0000000000001  
-            self.network.simulator.run(0,now,now)   # run the simulation a bit so initial values of functioninputs get to the origins
+                if isinstance(n,FunctionInput):
+                    n.run(0,0)
+                    
+            now=0
             self.watcher.reset()
+            
             self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
             self.time_control.set_max_time(self.timelog.tick_count)                
             self.area.repaint()
@@ -481,8 +484,15 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     self.restart=False
                     break
                     
+                if now==0:
+                    # reset the FunctionInputs so that they don't pass their information too soon after being run previously
+                    for n in self.network.nodes:
+                        if isinstance(n,FunctionInput):
+                            n.reset(False)
+                    
                 if self.current_tick>=self.timelog.tick_count-1:    
-                    self.network.simulator.run(now,now+self.dt,self.dt)
+                    #self.network.simulator.run(now,now+self.dt,self.dt)
+                    self.network.simulator.step(now,now+self.dt)
                     self.force_origins()
                     now+=self.dt
                     self.timelog.tick()                
@@ -501,6 +511,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     #    sleep=1
                     java.lang.Thread.sleep(int(sleep))
                 last_frame_time=this_frame_time
+
+
     
     
 class RoundedBorder(javax.swing.border.AbstractBorder):
@@ -592,7 +604,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
 
         dt=JPanel(layout=BorderLayout(),opaque=False)
-        cb=JComboBox(['0.001','0.0005','0.0002','0.0001'])
+        cb=JComboBox(['0.001','0.0005','0.0002','0.0001','0.01','0.005'])
         cb.setSelectedIndex(0)
         self.view.dt=float(cb.getSelectedItem())
         cb.addActionListener(self)
@@ -639,9 +651,11 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         layout=JPanel(layout=BorderLayout(),opaque=False)
         layout.add(JButton(icon=Icon.save,rolloverIcon=ShadedIcon.save,actionPerformed=self.save,borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),toolTipText='save layout'),BorderLayout.WEST)
         layout.add(JButton(icon=Icon.restore,rolloverIcon=ShadedIcon.restore,actionPerformed=self.restore,borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),toolTipText='restore layout'),BorderLayout.EAST)
+        
         layout.add(JLabel('layout',horizontalAlignment=javax.swing.SwingConstants.CENTER),BorderLayout.NORTH)
         layout.maximumSize=layout.preferredSize
         configPanel.add(layout)
+        configPanel.add(JButton("data",actionPerformed=self.show_data))
         
         configPanel.setPreferredSize(java.awt.Dimension(20,self.config_panel_height))
         configPanel.visible=False
@@ -650,6 +664,34 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         for c in [dt,rate,spin1,spin2,spin3]:
             c.border=javax.swing.border.EmptyBorder(0,10,0,10)
         
+    def show_data(self,event):
+        self.frame=JFrame('Data')
+        self.frame.visible=True
+
+        start_time=max(0,self.view.timelog.tick_count-self.view.timelog.tick_limit+1)*self.view.dt
+        
+        data=[]
+        title=['t']
+        for key,watch in self.view.watcher.active.items():
+            name,func,args=key
+            d=watch.get()
+            n=len(watch.get_first())
+            while len(data)<len(d): 
+                data.append(['%0.4f'%(start_time+(len(data)+0)*self.view.dt)])
+            
+            for i in range(n):
+                title.append('%s.%s%s[%d]'%(name,func.__name__,args,i))
+                for j in range(len(d)):
+                    dd=d[j]
+                    if dd is None: data[j].append(None)
+                    else: data[j].append('%1.10f'%dd[i])
+            
+        
+        #table=JTable([[1,2],[3,4]],["a","b"])
+        table=JTable(data,title)
+        #table.autoResizeMode=JTable.AUTO_RESIZE_OFF
+        self.frame.add(JScrollPane(table))
+        self.frame.size=(300,400)
         
         
 
