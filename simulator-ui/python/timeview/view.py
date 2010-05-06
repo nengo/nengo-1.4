@@ -451,7 +451,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.area.repaint()
         return True
     def view_save(self):
-        return dict(width=self.frame.width,height=self.frame.height,state=self.frame.getExtendedState(),x=self.frame.x,y=self.frame.y)
+        return dict(width=self.frame.width,height=self.frame.height-self.time_control.config_panel_height,state=self.frame.getExtendedState(),x=self.frame.x,y=self.frame.y)
     
     def view_restore(self,d):
         self.frame.setSize(d['width'],d['height'])
