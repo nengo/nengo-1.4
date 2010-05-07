@@ -410,7 +410,4 @@ def test():
     assert m==[[1,0],[1,0],[1,0],[1,0]]
     m=net.compute_transform(2,4,index_post=[2,1])
     assert m==[[0,0],[0,1],[1,0],[0,0]]
-    m=net.compute_transform(3,4,index_pre=[1,2],index_post=[2,1])
-    assert m==[[0,0,0],[0,0,1],[0,1,0],[0,0,0]]    
-    print 'tests passed'
-        
+    m=net.compute_transform(3,4,index_pre=[1,2],inde
