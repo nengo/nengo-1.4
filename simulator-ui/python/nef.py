@@ -49,6 +49,16 @@ class FixedVectorGenerator(VectorGenerator,java.io.Serializable):
             vectors.extend(self.vectors)    
         return vectors[:number]
 
+class FixedEvalPointGenerator(VectorGenerator,java.io.Serializable):
+    serialVersionUID=1
+    def __init__(self,points):
+        self.points=[]
+        
+    def genVectors(self,number,dimensions):        
+        points=[]
+        while len(points)<number:
+            points.extend(self.points)    
+        return points[:number]
 
 # keep the functions outside of the class, since they can't be serialized in the
 #  current version of Jython
@@ -228,6 +238,7 @@ class Network:
                   tau_rc=0.02,tau_ref=0.002,
                   max_rate=(200,400),intercept=(-1,1),
                   radius=1,encoders=None,
+                  eval_points=None,
                   noise=None,noise_frequency=1000,
                   mode='spike',add_to_network=True):
         """Create and return an ensemble of LIF neurons.
@@ -249,6 +260,8 @@ class Network:
                           intercept=IndicatorPDF(intercept[0],intercept[1]))
         if encoders is not None:
             ef.encoderFactory=FixedVectorGenerator(encoders)            
+        if eval_points is not None:
+            ef.evalPointFactory=FixedEvalPointGenerator(eval_points)            
         n=ef.make(name,neurons,dimensions)
         if noise is not None:
             for nn in n.nodes:
@@ -410,4 +423,7 @@ def test():
     assert m==[[1,0],[1,0],[1,0],[1,0]]
     m=net.compute_transform(2,4,index_post=[2,1])
     assert m==[[0,0],[0,1],[1,0],[0,0]]
-    m=net.compute_transform(3,4,index_pre=[1,2],inde
+    m=net.compute_transform(3,4,index_pre=[1,2],index_post=[2,1])
+    assert m==[[0,0,0],[0,0,1],[0,1,0],[0,0,0]]    
+    print 'tests passed'
+        
