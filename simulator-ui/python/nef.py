@@ -52,12 +52,12 @@ class FixedVectorGenerator(VectorGenerator,java.io.Serializable):
 class FixedEvalPointGenerator(VectorGenerator,java.io.Serializable):
     serialVersionUID=1
     def __init__(self,points):
-        self.points=[]
+        self.points=points
         
     def genVectors(self,number,dimensions):        
         points=[]
         while len(points)<number:
-            points.extend(self.points)    
+            points.extend(self.points)
         return points[:number]
 
 # keep the functions outside of the class, since they can't be serialized in the
