@@ -2,13 +2,19 @@ import java
 import javax
 from javax.swing import *
 from javax.swing.table import DefaultTableModel
-from javax.swing.filechooser import FileNameExtensionFilter
 from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
 from java.io import *
+from javax.swing.filechooser import FileFilter
 
 import view
+
+class CSVFilter(FileFilter):
+    def accept(self,f):
+        return f.name.endswith('.csv')
+    def getDescription(self):
+        return 'comma-separated values'
 
 class DataPanel(JPanel):
     def __init__(self,view):
@@ -24,7 +30,7 @@ class DataPanel(JPanel):
         self.add(JScrollPane(self.table))        
 
         self.fileChooser=JFileChooser()
-        self.fileChooser.setFileFilter(FileNameExtensionFilter('Comma-separated values',['csv']))
+        self.fileChooser.setFileFilter(CSVFilter())
         self.fileChooser.setSelectedFile(File('%s.csv'%self.view.network.name))
         
         
