@@ -246,10 +246,11 @@ class Network:
         Keyword arguments:
         tau_rc -- membrane time constant
         tau_ref -- refractory period
-        max_rate -- range for uniform selection of maximum firing rate
-        intercept -- range for uniform selection of tuning curve x-intercept
+        max_rate -- range for uniform selection of maximum firing rate in Hz
+        intercept -- normalized range for uniform selection of tuning curve x-intercept
         radius -- representational range
-        encoders -- list of encoder vectors to use (if None, uniform distribution)
+        encoders -- list of encoder vectors to use (if None, uniform distribution around unit sphere)
+        eval_points -- list of points within unit sphere to do optimization over
         noise -- current noise to inject, chosen uniformly from (-noise,noise)
         noise_frequency -- sampling rate (how quickly the noise changes)
         mode -- simulation mode ('direct', 'rate', or 'spike')
@@ -405,7 +406,7 @@ class Network:
             term=post.addTermination(pre.name,w,pstc,False)
             self.network.addProjection(pre.getOrigin('AXON'),term)
         else:
-            term=post.addDecodedTermination(pre.name,transform,pstc,False)
+            term=post.addDecodedTermination(pre.name+"1",transform,pstc,False)
             self.network.addProjection(origin,term)
         
 
