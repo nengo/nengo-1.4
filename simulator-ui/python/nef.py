@@ -406,7 +406,7 @@ class Network:
             term=post.addTermination(pre.name,w,pstc,False)
             self.network.addProjection(pre.getOrigin('AXON'),term)
         else:
-            term=post.addDecodedTermination(pre.name+"1",transform,pstc,False)
+            term=post.addDecodedTermination(pre.name,transform,pstc,False)
             self.network.addProjection(origin,term)
         
 
