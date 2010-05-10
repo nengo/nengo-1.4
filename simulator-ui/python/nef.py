@@ -281,7 +281,8 @@ class Network:
                   decoder_noise=0.1,
                   eval_points=None,
                   noise=None,noise_frequency=1000,
-                  mode='spike',add_to_network=True):
+                  mode='spike',add_to_network=True,
+                  quick=False,storage_code=''):
         """Create and return an ensemble of LIF neurons.
 
         Keyword arguments:
@@ -296,6 +297,11 @@ class Network:
         noise_frequency -- sampling rate (how quickly the noise changes)
         mode -- simulation mode ('direct', 'rate', or 'spike')
         """
+        if quick: 
+            storage_name='quick_%s_%d_%d_%1.3f_%1.3f_%1.1f_%1.1f_%1.3f_%1.3f_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref,max_rate[0],max_rate[1],intercept[0],intercept[1],radius,decoder_noise)
+            assert encoders is None and eval_points is None
+        else:
+            storage_name=''
         ef=NEFEnsembleFactoryImpl()
         ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc, tauRef=tau_ref,
                           maxRate=IndicatorPDF(max_rate[0],max_rate[1]),
@@ -305,12 +311,13 @@ class Network:
         ef.approximatorFactory.noise=decoder_noise
         if eval_points is not None:
             ef.evalPointFactory=FixedEvalPointGenerator(eval_points)            
-        n=ef.make(name,neurons,dimensions)
+        n=ef.make(name,neurons,dimensions,storage_name,False)
+        if radius!=1:
+            n.radii=[radius]*dimensions
         if noise is not None:
             for nn in n.nodes:
                 nn.noise=NoiseFactory.makeRandomNoise(noise_frequency,IndicatorPDF(-noise,noise))            
-        if radius!=1:
-            n.radii=[radius]*dimensions
+                
         if mode=='rate':
             n.mode=SimulationMode.RATE
         elif mode=='direct':
