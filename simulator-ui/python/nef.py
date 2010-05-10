@@ -187,7 +187,47 @@ class EnsembleArray(BaseEnsemble,Probeable):
     def listStates(self):
         return self._nodes[0].listStates()
 
+
+
+class NetworkArray(NetworkImpl):
+    """Collects a set of NEFEnsembles into a single network."""
+    serialVersionUID=1
+    def __init__(self,name,nodes):
+        """Create a network holding an array of the given nodes."""        
+        NetworkImpl.__init__(self)
+        self.name=name
+        self.dimension=len(nodes)
+        self._nodes=nodes
+        self._origins={}
+        for n in nodes:
+            self.addNode(n)
+        self.createEnsembleOrigin('X')
+    def createEnsembleOrigin(self,name):
+        self._origins[name]=EnsembleOrigin(self,name,[n.getOrigin(name) for n in self._nodes])
+        self.exposeOrigin(self._origins[name],name)
+            
+    def addDecodedOrigin(self,name,functions,nodeOrigin):
+        """Create a new origin.  A new origin is created on each of the 
+        ensembles, and these are grouped together to create an output. The 
+        function must be one-dimensional."""
+        if len(functions)!=1: raise StructuralException('Functions on EnsembleArrays must be one-dimensional')
+        origins=[n.addDecodedOrigin(name,functions,nodeOrigin) for n in self._nodes]
+        self.createEnsembleOrigin(name)
+        return self.getOrigin(name)
+    def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
+        """Create a new termination.  A new termination is created on each
+        of the ensembles, which are then grouped together."""
+        terminations=[n.addDecodedTermination(name,[matrix[i]],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]
+        termination=EnsembleTermination(self,name,terminations)
+        self.exposeTermination(termination,name)
+        return self.getTermination(name)
+        
+    def listStates(self):
+        """List the items that are probeable."""
+        return self._nodes[0].listStates()
+
     def getHistory(self,stateName):
+        """Extract probeable data from the sub-ensembles and combine them together."""
         times=None
         values=[None]*len(self._nodes)
         units=[None]*len(self._nodes)
@@ -197,8 +237,6 @@ class EnsembleArray(BaseEnsemble,Probeable):
             units[i]=data.getUnits()[0]
             values[i]=data.getValues()[0][0]
         return TimeSeriesImpl(times,[values],units)
-            
-
 
 
 
@@ -230,14 +268,17 @@ class Network:
         """Create and return an array of ensembles.  Each ensemble will be
         1-dimensional.  All of the parameters from Network.make() can be
         used."""
-        ensemble=EnsembleArray(name,[self.make('%d'%i,neurons,1,add_to_network=False,**args) for i in range(length)])
+        #ensemble=EnsembleArray(name,[self.make('%d'%i,neurons,1,add_to_network=False,**args) for i in range(length)])
+        ensemble=NetworkArray(name,[self.make('%d'%i,neurons,1,add_to_network=False,**args) for i in range(length)])
         self.network.addNode(ensemble)
+        ensemble.mode=ensemble.nodes[0].mode
         return ensemble
         
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
                   max_rate=(200,400),intercept=(-1,1),
                   radius=1,encoders=None,
+                  decoder_noise=0.1,
                   eval_points=None,
                   noise=None,noise_frequency=1000,
                   mode='spike',add_to_network=True):
@@ -249,7 +290,7 @@ class Network:
         max_rate -- range for uniform selection of maximum firing rate in Hz
         intercept -- normalized range for uniform selection of tuning curve x-intercept
         radius -- representational range
-        encoders -- list of encoder vectors to use (if None, uniform distribution around unit sphere)
+        encoders -- list of encoder vectors to use (if None, uniform distribution around unit sphere)        decoder_noise -- amount of noise to assume when calculating decoders
         eval_points -- list of points within unit sphere to do optimization over
         noise -- current noise to inject, chosen uniformly from (-noise,noise)
         noise_frequency -- sampling rate (how quickly the noise changes)
@@ -261,6 +302,7 @@ class Network:
                           intercept=IndicatorPDF(intercept[0],intercept[1]))
         if encoders is not None:
             ef.encoderFactory=FixedVectorGenerator(encoders)            
+        ef.approximatorFactory.noise=decoder_noise
         if eval_points is not None:
             ef.evalPointFactory=FixedEvalPointGenerator(eval_points)            
         n=ef.make(name,neurons,dimensions)
@@ -363,7 +405,10 @@ class Network:
         If func is not None, a new Origin will be created on the pre-synaptic
         ensemble that will compute the provided function.  This must be an
         N->1 function at the moment (a single output value, as many
-        input values as desired).
+        input values as desired).  The name of this origin will taken from
+        the name of the function, or origin_name, if provided.  If an
+        origin with that name already exists, it will be used, rather than
+        creating a new one.
 
         If weight_func is not None, the connection will be made using a
         synaptic connection weight matric rather than a DecodedOrigin and
