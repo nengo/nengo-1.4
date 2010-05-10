@@ -116,6 +116,8 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		UINeoNode nodeUI = null;
 		if (node instanceof Network) {
 			nodeUI = new UINetwork((Network) node);
+			nodeUI.showAllTerminations();
+			nodeUI.showAllOrigins();
 		} else if (node instanceof Ensemble) {
 			if (node instanceof NEFEnsemble) {
 				nodeUI = new UINEFEnsemble((NEFEnsemble) node);
