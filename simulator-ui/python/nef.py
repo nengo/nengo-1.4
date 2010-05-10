@@ -288,7 +288,7 @@ class Network:
         return input
 
 
-    def _parse_pre(self,pre,func):
+    def _parse_pre(self,pre,func,origin_name):
         if isinstance(pre,Origin):
             assert func==None
             return pre
@@ -297,7 +297,8 @@ class Network:
             return pre.getOrigin('origin')
         elif isinstance(pre,NEFEnsemble) or (hasattr(pre,'getOrigin') and hasattr(pre,'addDecodedOrigin')):
             if func is not None:
-                fname=func.__name__
+                if origin_name is None: fname=func.__name__
+                else: fname=origin_name
                 origin=pre.getOrigin(fname)
                 if origin is None:
                     origin=pre.addDecodedOrigin(fname,[PythonFunction(func)],'AXON')
@@ -336,7 +337,7 @@ class Network:
         
     def connect(self,pre,post,
                 transform=None,weight=1,index_pre=None,index_post=None,
-                pstc=0.01,func=None,weight_func=None):
+                pstc=0.01,func=None,weight_func=None,origin_name=None):
         """Connect two nodes in the network.
 
         pre and post can be strings giving the names of the nodes, or they
@@ -377,7 +378,7 @@ class Network:
             post=self.network.getNode(post)            
 
         # determine the origin and its dimensions
-        origin=self._parse_pre(pre,func)
+        origin=self._parse_pre(pre,func,origin_name)
         dim_pre=origin.dimensions
 
         # check for the special case of being given a pre-existing termination
