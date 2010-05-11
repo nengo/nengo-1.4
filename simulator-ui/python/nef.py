@@ -29,6 +29,7 @@ from ca.nengo.model.neuron.impl import *
 from ca.nengo.model.neuron import *
 from ca.nengo.util import *
 from ca.nengo.util.impl import TimeSeriesImpl
+from ca.nengo.math import PDF
 from ca.nengo.math.impl import ConstantFunction,IndicatorPDF,AbstractFunction
 import java
 
@@ -74,6 +75,19 @@ class PythonFunction(AbstractFunction):
         else:
             raise Exception('Python Functions are not kept when saving/loading networks')
 
+class ListPDF(PDF):
+    serialVersionUID=1
+    def __init__(self,values):
+        self.values=values
+        self.index=0
+    def sample(self):
+        s=self.values[self.index]
+        self.index=(self.index+1)%len(self.values)
+        return [s]
+    def clone(self):
+        c=ListPDF(self.values)
+        c.index=self.index
+        return c
 
 
 class BaseNode(Node):
@@ -288,8 +302,10 @@ class Network:
         Keyword arguments:
         tau_rc -- membrane time constant
         tau_ref -- refractory period
-        max_rate -- range for uniform selection of maximum firing rate in Hz
-        intercept -- normalized range for uniform selection of tuning curve x-intercept
+        max_rate -- range for uniform selection of maximum firing rate in Hz (as a 2-tuple)
+                    or a list of maximum rate values to use
+        intercept -- normalized range for uniform selection of tuning curve x-intercept (as 2-tuple)
+                     or a list of intercept values to use
         radius -- representational range
         encoders -- list of encoder vectors to use (if None, uniform distribution around unit sphere)        decoder_noise -- amount of noise to assume when calculating decoders
         eval_points -- list of points within unit sphere to do optimization over
@@ -298,14 +314,32 @@ class Network:
         mode -- simulation mode ('direct', 'rate', or 'spike')
         """
         if quick: 
-            storage_name='quick_%s_%d_%d_%1.3f_%1.3f_%1.1f_%1.1f_%1.3f_%1.3f_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref,max_rate[0],max_rate[1],intercept[0],intercept[1],radius,decoder_noise)
-            assert encoders is None and eval_points is None
+            storage_name='quick_%s_%d_%d_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref)
+            if type(max_rate) is tuple and len(max_rate)==2:
+                storage_name+='_%1.1f_%1.1f'%max_rate
+            else:
+                storage_name+='_%08x'%hash(tuple(max_rate))
+            if type(intercept) is tuple and len(intercept)==2:
+                storage_name+='_%1.3f_%1.3f'%intercept
+            else:
+                storage_name+='_%08x'%hash(tuple(intercept))
+            storage_name+='_%1.3f_%1.3f'%(radius,decoder_noise)
+            if encoders is not None:
+                storage_name+='_enc%08x'%hash(tuple([tuple(x) for x in encoders]))
+            if eval_points is not None:
+                storage_name+='_eval%08x'%hash(tuple([tuple(x) for x in eval_points]))
         else:
             storage_name=''
         ef=NEFEnsembleFactoryImpl()
-        ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc, tauRef=tau_ref,
-                          maxRate=IndicatorPDF(max_rate[0],max_rate[1]),
-                          intercept=IndicatorPDF(intercept[0],intercept[1]))
+        if type(max_rate) is tuple and len(max_rate)==2:
+            mr=IndicatorPDF(max_rate[0],max_rate[1])
+        else:
+            mr=ListPDF(max_rate)
+        if type(intercept) is tuple and len(intercept)==2:
+            it=IndicatorPDF(intercept[0],intercept[1])
+        else:
+            it=ListPDF(intercept)
+        ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)                          
         if encoders is not None:
             ef.encoderFactory=FixedVectorGenerator(encoders)            
         ef.approximatorFactory.noise=decoder_noise
