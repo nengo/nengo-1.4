@@ -10,6 +10,7 @@ import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.PlasticExpandableSpikingNeuron;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
+import ca.nengo.util.MU;
 
 public class GPUThread extends NodeThread {
 	private GPUNodeThreadPool myGPUNodeThreadPool;
@@ -33,6 +34,7 @@ public class GPUThread extends NodeThread {
 	static native void nativeKill();
 
 	public void run() {
+		if (myGPUNodes.length==0) return;
 
 		int i = 0, j = 0, numEnsemblesCollectingSpikes = 0;
 		NEFEnsembleImpl workingNode;
@@ -81,6 +83,11 @@ public class GPUThread extends NodeThread {
 			}
 
 			encoders[i] = workingNode.getEncoders();
+			float[] radii=workingNode.getRadii();
+			for (j=0; j<encoders[i].length; j++) {
+				for (int k=0; k<encoders[i][j].length; k++)
+					encoders[i][j][k]=encoders[i][j][k]/radii[k];
+			}
 
 			origins = workingNode.getDecodedOrigins();
 
@@ -163,8 +170,7 @@ public class GPUThread extends NodeThread {
 					count = terminations.length;
 
 					for (j = 0; j < count; j++) {
-						representedInputValues[i][j] = terminations[j]
-								.getInput().getValues();
+						representedInputValues[i][j] = terminations[j].getInput().getValues();
 					}
 				}
 
