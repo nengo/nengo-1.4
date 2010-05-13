@@ -63,11 +63,19 @@ class FixedEvalPointGenerator(VectorGenerator,java.io.Serializable):
 
 # keep the functions outside of the class, since they can't be serialized in the
 #  current version of Jython
+import inspect
+
+def find_parameter(func,param,default):
+    args,varags,varkw,defaults=inspect.getargspec(func)
+    for i in range(len(defaults)):
+        if args[-i-1]==param: return defaults[-i-1]
+    return default
+
 transientFunctions={}
 class PythonFunction(AbstractFunction):
     serialVersionUID=1
     def __init__(self,func):
-        AbstractFunction.__init__(self,1)
+        AbstractFunction.__init__(self,find_parameter(func,'dimensions',1))
         transientFunctions[self]=func
     def map(self,x):
         if self in transientFunctions:
@@ -215,6 +223,7 @@ class NetworkArray(NetworkImpl):
         self._origins={}
         for n in nodes:
             self.addNode(n)
+        self.multidimensional=nodes[0].dimension>1
         self.createEnsembleOrigin('X')
     def createEnsembleOrigin(self,name):
         self._origins[name]=EnsembleOrigin(self,name,[n.getOrigin(name) for n in self._nodes])
@@ -231,7 +240,10 @@ class NetworkArray(NetworkImpl):
     def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
         """Create a new termination.  A new termination is created on each
         of the ensembles, which are then grouped together."""
-        terminations=[n.addDecodedTermination(name,[matrix[i]],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]
+        if self.multidimensional:
+            terminations=[n.addDecodedTermination(name,matrix[i],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]  
+        else:
+            terminations=[n.addDecodedTermination(name,[matrix[i]],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]  
         termination=EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
@@ -278,12 +290,12 @@ class Network:
         self.network.addNode(node)
         return node
     
-    def make_array(self,name,neurons,length,**args):
+    def make_array(self,name,neurons,length,dimensions=1,**args):
         """Create and return an array of ensembles.  Each ensemble will be
         1-dimensional.  All of the parameters from Network.make() can be
         used."""
-        #ensemble=EnsembleArray(name,[self.make('%d'%i,neurons,1,add_to_network=False,**args) for i in range(length)])
-        ensemble=NetworkArray(name,[self.make('%d'%i,neurons,1,add_to_network=False,**args) for i in range(length)])
+        #ensemble=EnsembleArray(name,[self.make('%d'%i,neurons,dimensions,add_to_network=False,**args) for i in range(length)])
+        ensemble=NetworkArray(name,[self.make('%d'%i,neurons,dimensions,add_to_network=False,**args) for i in range(length)])
         self.network.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
         return ensemble
@@ -382,7 +394,10 @@ class Network:
             if func is not None:
                 if origin_name is None: fname=func.__name__
                 else: fname=origin_name
-                origin=pre.getOrigin(fname)
+                try:
+                    origin=pre.getOrigin(fname)
+                except StructuralException:
+                    origin=None
                 if origin is None:
                     origin=pre.addDecodedOrigin(fname,[PythonFunction(func)],'AXON')
                 return origin
