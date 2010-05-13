@@ -2,6 +2,7 @@ import watcher
 import components
 import timelog
 import data
+import simulator
 
 
 import java
@@ -258,6 +259,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.watcher.add_watch(EnsembleWatch())
         self.watcher.add_watch(FunctionWatch())
         
+        self.requested_mode=None
+        
         
         self.frame=JFrame(network.name)
         self.frame.visible=True
@@ -462,8 +465,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         
 
     def run(self):
+        sim=simulator.Simulator(self.network)
         while self.frame.visible:
-            self.network.simulator.resetNetwork(False)                   
+            sim.reset(False)                   
             # run the network for an instant so that FunctionInputs have values at their Origin so they can be read
             for n in self.network.nodes:
                 if isinstance(n,FunctionInput):
@@ -481,6 +485,12 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             while self.frame.visible:
                 while (self.paused or self.timelog.processing or self.time_control.slider.valueIsAdjusting) and not self.restart and self.frame.visible:
                     java.lang.Thread.sleep(10)
+                    if self.requested_mode is not None:
+                        self.network.mode=self.requested_mode
+                        self.requested_mode=None
+                if self.requested_mode is not None:
+                    self.network.mode=self.requested_mode
+                    self.requested_mode=None
                 if self.restart or not self.frame.visible:
                     self.restart=False
                     break
@@ -493,7 +503,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     
                 if self.current_tick>=self.timelog.tick_count-1:    
                     #self.network.simulator.run(now,now+self.dt,self.dt)
-                    self.network.simulator.step(now,now+self.dt)
+                    sim.step(now,now+self.dt)
                     self.force_origins()
                     now+=self.dt
                     self.timelog.tick()                
@@ -749,7 +759,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             elif mode=='rate': requested=SimulationMode.RATE
             elif mode=='direct': requested=SimulationMode.DIRECT
             if requested!=self.view.network.mode:
-                self.view.network.mode=requested
+                self.view.requested_mode=requested
     def tick_limit(self,event):
         self.view.timelog.tick_limit=int(event.source.value/self.view.dt)+1
         
