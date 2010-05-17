@@ -67,8 +67,9 @@ import inspect
 
 def find_parameter(func,param,default):
     args,varags,varkw,defaults=inspect.getargspec(func)
-    for i in range(len(defaults)):
-        if args[-i-1]==param: return defaults[-i-1]
+    if defaults is not None:
+        for i in range(len(defaults)):
+            if args[-i-1]==param: return defaults[-i-1]
     return default
 
 transientFunctions={}
