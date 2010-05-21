@@ -26,6 +26,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.nodes;
 
+import java.util.List;
+
 import ca.nengo.model.Origin;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
@@ -92,7 +94,10 @@ public class UINEFEnsemble extends UIEnsemble {
 
 		for (Origin element : origins) {
 			if (element instanceof DecodedOrigin) {
-				plotMenu.addAction(new PlotDecodedOriginDistortion(element.getName()));
+				if(getModel().getDimension() > 1)
+					plotMenu.addAction(new PlotDecodedOriginMSE(element.getName()));
+				else
+					plotMenu.addAction(new PlotDecodedOriginDistortion(element.getName()));
 			}
 		}
 
@@ -237,20 +242,35 @@ public class UINEFEnsemble extends UIEnsemble {
 		String decodedOriginName;
 
 		public PlotDecodedOriginDistortion(String decodedOriginName) {
-			super("Plot distortion: " + decodedOriginName);
+			super("Plot distortion: " + decodedOriginName,false);
 			this.decodedOriginName = decodedOriginName;
 		}
 
 		@Override
 		protected void action() throws ActionException {
-			if (getModel().getDimension() > 1) {
-				UserMessages
-						.showWarning("Distortion cannot be plotted for multi-dimensional NEFEnsemble");
-			} else
 				Plotter.plot(getModel(), decodedOriginName);
-
 		}
-
 	}
 
+	/**
+	 * Action for plotting the mean squared error for a decoded origin of an ensemble with multiple dimensions.
+	 * 
+	 * @author Steven Leigh
+	 */
+	class PlotDecodedOriginMSE extends StandardAction {
+		private static final long serialVersionUID = 1L;
+		String decodedOriginName;
+
+		public PlotDecodedOriginMSE(String decodedOriginName) {
+			super("Plot MSE: " + decodedOriginName,false);
+			this.decodedOriginName = decodedOriginName;
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			Plotter.plot(getModel(), decodedOriginName);
+
+		}
+	}
+	
 }
