@@ -177,16 +177,25 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	}
 	
 	/**
-	 * @return Mean-squared error of this origin over randomly selected points  
+	 * @return Mean-squared error of this origin over 500 randomly selected points  
 	 */
 	public float[] getError() {
+		return getError(500);
+	}
+	
+	/**
+	 * @param samples The number of input vectors the error is sampled over
+	 * @return Mean-squared error of this origin over randomly selected points  
+	 */
+	
+	public float[] getError(int samples){
 		float[] result = new float[getDimensions()];
 		
 		if (myNode instanceof NEFEnsemble) {
 			NEFEnsemble ensemble = (NEFEnsemble) myNode;
 			
 			VectorGenerator vg = new RandomHypersphereVG(false, 1, 0);			
-			float[][] unscaled = vg.genVectors(500, ensemble.getDimension());
+			float[][] unscaled = vg.genVectors(samples, ensemble.getDimension()); 
 			float[][] input = new float[unscaled.length][];
 			for (int i = 0; i < input.length; i++) {
 				input[i] = MU.prodElementwise(unscaled[i], ensemble.getRadii());
@@ -511,5 +520,4 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myNodes=nodes;
 		rebuildDecoder(approximator);
 	}
-
 }

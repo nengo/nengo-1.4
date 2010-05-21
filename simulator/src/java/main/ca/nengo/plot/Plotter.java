@@ -84,8 +84,18 @@ public abstract class Plotter {
 	 * @param title The plot title 
 	 */
 	public void showPlot(JPanel plotPanel, String title) {
-		final JFrame frame = new JFrame(title);
+		final JFrame frame = createFrame();	
+		frame.setTitle(title);
 		frame.getContentPane().add(plotPanel, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
+	}
+	
+	/**
+	 * @return A new JFrame to hold a plot
+	 */
+	public JFrame createFrame(){
+		final JFrame frame = new JFrame();
 		myPlotFrames.add(frame);
 		
 		try {
@@ -101,10 +111,10 @@ public abstract class Plotter {
         		plotter.closeAndDiscard(frame);
             }
         });
-
-        frame.pack();
-        frame.setVisible(true);		
+        	
+        return frame;
 	}
+	
 	
 	private void closeAndDiscard(Frame plotFrame) {
 		closePlot(plotFrame);

@@ -50,6 +50,7 @@ public class NEFUtil {
 	 * @return Outputs from the given Origin for given inputs
 	 */
 	public static float[][] getOutput(DecodedOrigin origin, float[][] input, SimulationMode mode) {
+		
 		float[][] output = null;
 		
 		try {
@@ -64,37 +65,38 @@ public class NEFUtil {
 
 			NEFNode[] nodes = (NEFNode[]) ensemble.getNodes();
 			
-			SimulationMode oldMode = ensemble.getMode();			
-			ensemble.setMode(mode);
-			for (int i = 0; i < input.length; i++) {
-				if (mode.equals(SimulationMode.CONSTANT_RATE)) {
-					for (int j = 0; j < nodes.length; j++) {
-						float radialInput = 0;
-						if (ensemble instanceof NEFEnsembleImpl) {
-							NEFEnsembleImpl impl = (NEFEnsembleImpl) ensemble;
-							radialInput = impl.getRadialInput(input[i], j);
-						} else {
-							radialInput = MU.prod(input[i], encoders[j]);
+			synchronized (ensemble){
+				SimulationMode oldMode = ensemble.getMode();			
+				ensemble.setMode(mode);
+				
+				for (int i = 0; i < input.length; i++) {
+					if (mode.equals(SimulationMode.CONSTANT_RATE)) {
+						for (int j = 0; j < nodes.length; j++) {
+							float radialInput = 0;
+							if (ensemble instanceof NEFEnsembleImpl) {
+								NEFEnsembleImpl impl = (NEFEnsembleImpl) ensemble;
+								radialInput = impl.getRadialInput(input[i], j);
+							} else {
+								radialInput = MU.prod(input[i], encoders[j]);
+							}
+							((NEFNode) nodes[j]).setRadialInput(radialInput);
+							nodes[j].run(0f, 0f);					
 						}
-						((NEFNode) nodes[j]).setRadialInput(radialInput);
-						nodes[j].run(0f, 0f);					
-					}
-					origin.run(null, 0f, 1f);
-					output[i] = ((RealOutput) origin.getValues()).getValues();					
-				} else if (mode.equals(SimulationMode.DIRECT)) {
-					origin.run(input[i], 0f, 1f);
-					output[i] = ((RealOutput) origin.getValues()).getValues();					
-				} else {
-					throw new SimulationException("Instantaneous input-output mapping can only be done in DIRECT or CONSTANT_RATE simulation mode");
-				}				
+						origin.run(null, 0f, 1f);
+						output[i] = ((RealOutput) origin.getValues()).getValues();					
+					} else if (mode.equals(SimulationMode.DIRECT)) {
+						origin.run(input[i], 0f, 1f);
+						output[i] = ((RealOutput) origin.getValues()).getValues();					
+					} else {
+						throw new SimulationException("Instantaneous input-output mapping can only be done in DIRECT or CONSTANT_RATE simulation mode");
+					}				
+				}
+				ensemble.setMode(oldMode);
 			}
-			ensemble.setMode(oldMode);
 			
 		} catch (SimulationException e) {
 			throw new RuntimeException("Can't plot origin error", e);
 		}
-		
 		return output;
 	}
-	
 }

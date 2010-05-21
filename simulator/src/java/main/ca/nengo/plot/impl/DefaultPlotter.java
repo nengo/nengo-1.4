@@ -28,9 +28,11 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.plot.impl;
 
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.jfree.chart.ChartColor;
@@ -72,7 +74,7 @@ import ca.nengo.util.TimeSeries1D;
  * @author Bryan Tripp
  */
 public class DefaultPlotter extends Plotter {
-	
+		
 	private static Color[] ourColors = {
 		ChartColor.BLACK, 
 		ChartColor.LIGHT_GRAY, 
@@ -249,9 +251,11 @@ public class DefaultPlotter extends Plotter {
 			
 			DecodedOrigin origin = (DecodedOrigin) o;
 			
-//			if (ensemble.getDimension() != 1) {
-//				throw new RuntimeException("Distortion error can not be plotted for multi-dimensional NEFEnsembles");
-//			}
+			if (ensemble.getDimension()>1){
+				doPlotMSE(ensemble,origin,name);
+				return;
+			}
+			
 			
 //			float[][] encoders = ensemble.getEncoders();
 
@@ -295,6 +299,41 @@ public class DefaultPlotter extends Plotter {
 			throw new RuntimeException("Can't plot origin error", e);
 		}
 	}
+	
+	//plots MSE for each dimension of an Origin
+	public void doPlotMSE(NEFEnsemble ensemble, DecodedOrigin origin, String name) {
+		float [] error=new float[origin.getDimensions()] ;
+		float mseAvg;  //MSE for all of the dimensions of the origin together
+		
+		JPanel panel= new JPanel();
+		JFrame frame=createFrame();
+		frame.setVisible(true);
+		long time=System.currentTimeMillis()-21;
+
+
+		//plot MSE on continuously updating graph as more samples are used in the calculation
+		for (int i=1;i==1 || frame.isVisible();i++){  //will crash if runtime exceeds 4.1 years
+			//synchronized(ensemble){
+				error=MU.sum(MU.prod(error, ((i-1f)/i)), MU.prod(origin.getError(1),1f/i));
+			//}
+			mseAvg = MU.mean(error);
+			if((System.currentTimeMillis()-time)>20l){  //frame limiter
+				panel = getBarChart(error,"MSE per Dimension for Origin: "+origin.getName());
+				frame.getContentPane().removeAll();
+				frame.getContentPane().add(panel, BorderLayout.CENTER);
+				frame.setTitle("Origin MSE Plot (Overall MSE=" + mseAvg + ")");
+				frame.validate();
+				
+				time=System.currentTimeMillis();
+			}
+			if (i==1){
+				frame.pack();
+				frame.setVisible(true);
+			}
+		}
+	}
+	
+
 	
 	private static float getRadialInput(NEFEnsemble ensemble, int node, float radius) {
 		//plot along preferred direction for multi-dimensional ensembles
@@ -367,59 +406,63 @@ public class DefaultPlotter extends Plotter {
 	 * @see ca.nengo.plot.Plotter#doPlot(ca.nengo.model.nef.NEFEnsemble)
 	 */
 	public void doPlot(NEFEnsemble ensemble) {
-		float[][] encoders = ensemble.getEncoders();
-		NEFNode[] nodes = (NEFNode[]) ensemble.getNodes();
-
-		float[] x = new float[101];
-		for (int i = 0; i < x.length; i++) {
-			x[i] = -1f + (float) i * (2f / (float) (x.length-1));
-		}
-		
-		SimulationMode mode = ensemble.getMode();
-		ensemble.setMode(SimulationMode.CONSTANT_RATE);
-		
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		
-		float[][] rates = new float[nodes.length][];
-		for (int i = 0; i < nodes.length; i++) {
-
-			//radius of encoded space in direction of this encoder
-			float radius = MU.pnorm(MU.prodElementwise(encoders[i], ensemble.getRadii()), 2);
-			
-			XYSeries series = new XYSeries("Neuron " + i);
-			rates[i] = new float[x.length];
-			
-			for (int j = 0; j < x.length; j++) {
-				float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j];
-//				float radialInput = getRadialInput(ensemble, i, x[j]);
-				
-				((NEFNode) nodes[i]).setRadialInput(radialInput);
-				try {
-					nodes[i].run(0f, 0f);
-					RealOutput output = (RealOutput) nodes[i].getOrigin(Neuron.AXON).getValues();
-					series.add(x[j]*radius, output.getValues()[0]);
-					rates[i][j] = output.getValues()[0];
-				} catch (SimulationException e) {
-					throw new RuntimeException("Can't plot activities: error running neurons", e);
-				} catch (ClassCastException e) {
-					throw new RuntimeException("Can't plot activities: neurons producing spike output", e);					
-				} catch (StructuralException e) {
-					throw new RuntimeException("Can't plot activities: error running neurons", e);
-				}
+		synchronized(ensemble){
+			float[][] encoders = ensemble.getEncoders();
+			NEFNode[] nodes = (NEFNode[]) ensemble.getNodes();
+	
+			float[] x = new float[101];
+			for (int i = 0; i < x.length; i++) {
+				x[i] = -1f + (float) i * (2f / (float) (x.length-1));
 			}
 			
-			dataset.addSeries(series);
+			SimulationMode mode = ensemble.getMode();
+			ensemble.setMode(SimulationMode.CONSTANT_RATE);
+			
+			
+			
+			float[][] rates = new float[nodes.length][];
+			for (int i = 0; i < nodes.length; i++) {
+	
+				//radius of encoded space in direction of this encoder
+				float radius = MU.pnorm(MU.prodElementwise(encoders[i], ensemble.getRadii()), 2);
+				
+				XYSeries series = new XYSeries("Neuron " + i);
+				rates[i] = new float[x.length];
+				
+				for (int j = 0; j < x.length; j++) {
+					float radialInput = (ensemble.getDimension() == 1) ? x[j]*encoders[i][0] : x[j];
+	//				float radialInput = getRadialInput(ensemble, i, x[j]);
+					
+					((NEFNode) nodes[i]).setRadialInput(radialInput);
+					try {
+						nodes[i].run(0f, 0f);
+						RealOutput output = (RealOutput) nodes[i].getOrigin(Neuron.AXON).getValues();
+						series.add(x[j]*radius, output.getValues()[0]);
+						rates[i][j] = output.getValues()[0];
+					} catch (SimulationException e) {
+						throw new RuntimeException("Can't plot activities: error running neurons", e);
+					} catch (ClassCastException e) {
+						throw new RuntimeException("Can't plot activities: neurons producing spike output", e);					
+					} catch (StructuralException e) {
+						throw new RuntimeException("Can't plot activities: error running neurons", e);
+					}
+				}
+				
+				dataset.addSeries(series);
+			}
+	//		MatlabExporter exporter = new MatlabExporter();
+	//		exporter.add("x", new float[][]{x});
+	//		exporter.add("rates", rates);
+	//		try {
+	//			exporter.write(new File("activities.mat"));
+	//		} catch (IOException e) {
+	//			e.printStackTrace();
+	//		}
+			
+			ensemble.setMode(mode);
 		}
-//		MatlabExporter exporter = new MatlabExporter();
-//		exporter.add("x", new float[][]{x});
-//		exporter.add("rates", rates);
-//		try {
-//			exporter.write(new File("activities.mat"));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-		
-		ensemble.setMode(mode);
 		
 		JFreeChart chart = ChartFactory.createXYLineChart(
 				"Activities",
@@ -552,7 +595,34 @@ public class DefaultPlotter extends Plotter {
 		
 		showChart(chart, title);
 	}
+	
+	//creates a bar chart for origin MSE plots
+	public ChartPanel getBarChart(float[] vector, String title) {
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		XYSeries series = new XYSeries("MSE Error Plot");
 
+		for (int i = 0; i < vector.length; i++) {
+			series.add(i, vector[i]); 
+		}
+
+		dataset.addSeries(series);
+
+		JFreeChart chart = ChartFactory.createXYBarChart(
+				title,
+				"Origin Dimension", 
+				false,
+				"Error", 
+				dataset, 
+				PlotOrientation.VERTICAL, 
+				false, false, false
+		);
+		
+		chart.getXYPlot().getDomainAxis().setStandardTickUnits(org.jfree.chart.axis.NumberAxis.createIntegerTickUnits());
+
+		return new ChartPanel(chart);			
+	}
+	
+	
 	/**
 	 * @see ca.nengo.plot.Plotter#doPlot(float[], float[], java.lang.String)
 	 */
@@ -578,7 +648,7 @@ public class DefaultPlotter extends Plotter {
 				PlotOrientation.VERTICAL, 
 				false, false, false
 		);
-		
+
 		showChart(chart, title);
 	}
 	

@@ -575,64 +575,65 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @see ca.nengo.model.Ensemble#run(float, float)
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
+		synchronized (this){
+			try{
+				float[] state = new float[myDimension];
+				Map<String, Float> bias = new HashMap<String, Float>(5);
 
-		try{
-			float[] state = new float[myDimension];
-			Map<String, Float> bias = new HashMap<String, Float>(5);
-
-			//run terminations and sum state ...
-			Iterator it = myDecodedTerminations.values().iterator();
-			while (it.hasNext()) {
-				DecodedTermination t = (DecodedTermination) it.next();
-				t.run(startTime, endTime);
-				float[] output = t.getOutput();
-				
-				boolean isModulatory = t.getModulatory();
-				//TODO: handle modulatory bias input
-				if (t instanceof BiasTermination) {
-					String baseName = ((BiasTermination) t).getBaseTerminationName();
-					if (!bias.containsKey(baseName)) bias.put(baseName, new Float(0));					
-					if (!isModulatory) bias.put(baseName, new Float(bias.get(baseName).floatValue() + output[0]));
-				} else {
-					if (!isModulatory) state = MU.sum(state, output);					
-				}
-				
-			}
-			
-			if ( getMode().equals(SimulationMode.DIRECT) ) {
-				//run ensemble dynamics if they exist (e.g. to model adaptation)
-				if (myDirectModeDynamics != null) {
-					TimeSeries dynamicsInput = new TimeSeriesImpl(new float[]{startTime, endTime}, 
-							new float[][]{state, state}, Units.uniform(Units.UNK, state.length));
-					TimeSeries dynamicsOutput = myDirectModeIntegrator.integrate(myDirectModeDynamics, dynamicsInput);
-					state = dynamicsOutput.getValues()[dynamicsOutput.getValues().length-1];
-				}
-				
-				Origin[] origins = getOrigins();
-				for (int i = 0; i < origins.length; i++) {
-					if (origins[i] instanceof DecodedOrigin) {
-						((DecodedOrigin) origins[i]).run(state, startTime, endTime);
+				//run terminations and sum state ...
+				Iterator it = myDecodedTerminations.values().iterator();
+				while (it.hasNext()) {
+					DecodedTermination t = (DecodedTermination) it.next();
+					t.run(startTime, endTime);
+					float[] output = t.getOutput();
+					
+					boolean isModulatory = t.getModulatory();
+					//TODO: handle modulatory bias input
+					if (t instanceof BiasTermination) {
+						String baseName = ((BiasTermination) t).getBaseTerminationName();
+						if (!bias.containsKey(baseName)) bias.put(baseName, new Float(0));					
+						if (!isModulatory) bias.put(baseName, new Float(bias.get(baseName).floatValue() + output[0]));
+					} else {
+						if (!isModulatory) state = MU.sum(state, output);					
 					}
+					
 				}
-				setTime(endTime);
-			} else {
-				//multiply state by encoders (cosine tuning), set radial input of each Neuron and run ...
-				Node[] nodes = getNodes();
-				for (int i = 0; i < nodes.length; i++) {
-					((NEFNode) nodes[i]).setRadialInput(getRadialInput(state, i) + getBiasInput(bias, myDecodedTerminations, i));
+				
+				if ( getMode().equals(SimulationMode.DIRECT) ) {
+					//run ensemble dynamics if they exist (e.g. to model adaptation)
+					if (myDirectModeDynamics != null) {
+						TimeSeries dynamicsInput = new TimeSeriesImpl(new float[]{startTime, endTime}, 
+								new float[][]{state, state}, Units.uniform(Units.UNK, state.length));
+						TimeSeries dynamicsOutput = myDirectModeIntegrator.integrate(myDirectModeDynamics, dynamicsInput);
+						state = dynamicsOutput.getValues()[dynamicsOutput.getValues().length-1];
+					}
+					
+					Origin[] origins = getOrigins();
+					for (int i = 0; i < origins.length; i++) {
+						if (origins[i] instanceof DecodedOrigin) {
+							((DecodedOrigin) origins[i]).run(state, startTime, endTime);
+						}
+					}
+					setTime(endTime);
+				} else {
+					//multiply state by encoders (cosine tuning), set radial input of each Neuron and run ...
+					Node[] nodes = getNodes();
+					for (int i = 0; i < nodes.length; i++) {
+						((NEFNode) nodes[i]).setRadialInput(getRadialInput(state, i) + getBiasInput(bias, myDecodedTerminations, i));
+					}
+					super.run(startTime, endTime);
 				}
-				super.run(startTime, endTime);
-			}
-			if (myPlasticityInterval <= 0) {
-				learn(startTime, endTime);				
-			} else if (endTime >= myLastPlasticityTime + myPlasticityInterval) {
-				learn(myLastPlasticityTime, endTime);
-				myLastPlasticityTime = endTime;
-			}
+				if (myPlasticityInterval <= 0) {
+					learn(startTime, endTime);				
+				} else if (endTime >= myLastPlasticityTime + myPlasticityInterval) {
+					learn(myLastPlasticityTime, endTime);
+					myLastPlasticityTime = endTime;
+				}
 
-		} catch (SimulationException e) {
-			e.setEnsemble(getName());
-			throw e;
+			} catch (SimulationException e) {
+				e.setEnsemble(getName());
+				throw e;
+			}
 		}
 	}
 	
