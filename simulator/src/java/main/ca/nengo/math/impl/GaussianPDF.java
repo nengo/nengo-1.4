@@ -101,6 +101,7 @@ public class GaussianPDF implements PDF {
 	public void setVariance(float variance) {
 		myVariance = variance;
 		nextAvailable = false;
+		mySD = (float) Math.sqrt(variance);
 		if (myScalePeakWithVariance) {
 			myPeak = 1f / (float) Math.pow(variance * 2f * Math.PI, .5);
 		}
