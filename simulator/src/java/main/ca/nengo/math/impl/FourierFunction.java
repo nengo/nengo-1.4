@@ -71,7 +71,7 @@ public class FourierFunction implements Function {
 	/**
 	 * Creates a 1-dimensional band-limited noise function with specified parameters. 
 	 *  
-	 * @param fundamental The fundamental frequency (Hz)
+	 * @param fundamental The fundamental frequency (Hz), i.e., frequency step size.
 	 * @param cutoff The high-frequency limit (Hz)
 	 * @param rms The root-mean-squared function amplitude
 	 * @param seed Random seed
@@ -116,7 +116,7 @@ public class FourierFunction implements Function {
 	/**
 	 * Creates a 1-dimensional band-limited pink noise function with specified parameters. 
 	 *  
-	 * @param fundamental The fundamental frequency (Hz)
+	 * @param fundamental The fundamental frequency (Hz), i.e., frequency step size.
 	 * @param cutoff The high-frequency limit (Hz)
 	 * @param rms The root-mean-squared function amplitude
 	 * 	@param seed Random seed
