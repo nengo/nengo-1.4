@@ -63,20 +63,12 @@ class FixedEvalPointGenerator(VectorGenerator,java.io.Serializable):
 
 # keep the functions outside of the class, since they can't be serialized in the
 #  current version of Jython
-import inspect
-
-def find_parameter(func,param,default):
-    args,varags,varkw,defaults=inspect.getargspec(func)
-    if defaults is not None:
-        for i in range(len(defaults)):
-            if args[-i-1]==param: return defaults[-i-1]
-    return default
 
 transientFunctions={}
 class PythonFunction(AbstractFunction):
     serialVersionUID=1
-    def __init__(self,func):
-        AbstractFunction.__init__(self,find_parameter(func,'dimensions',1))
+    def __init__(self,func,dimensions=1):
+        AbstractFunction.__init__(self,dimensions)
         transientFunctions[self]=func
     def map(self,x):
         if self in transientFunctions:
@@ -400,7 +392,11 @@ class Network:
                 except StructuralException:
                     origin=None
                 if origin is None:
-                    origin=pre.addDecodedOrigin(fname,[PythonFunction(func)],'AXON')
+                    if isinstance(pre,NetworkArray):
+                        dim=pre._nodes[0].dimension
+                    else:
+                        dim=pre.dimension
+                    origin=pre.addDecodedOrigin(fname,[PythonFunction(func,dim)],'AXON')
                 return origin
             else:
                 return pre.getOrigin('X')
