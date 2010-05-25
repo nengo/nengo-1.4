@@ -90,7 +90,7 @@ public class FourierFunction implements Function {
 			
 			if (type == 1) {
 				amplitudes[i] = (float) random.nextFloat() * fundamental / frequencies[0][i]; //decreasing amplitude = pink noise
-			} else if (type == 2) {
+			} else if (type == 0) {
 				amplitudes[i]	= (float) random.nextFloat(); //constant amplitude = white noise
 			} else {
 				throw new IllegalArgumentException("FourierFunction noise type is invalid");
