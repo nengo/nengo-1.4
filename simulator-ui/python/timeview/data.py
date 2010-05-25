@@ -58,6 +58,11 @@ class DataPanel(JPanel):
         return panel
         
     def extract_data(self):
+        pause_state=self.view.paused
+        self.view.paused=True
+        
+        while self.view.simulating:
+            java.lang.Thread.sleep(10)
     
         tau=float(self.filter.value)
         dt=self.view.dt
@@ -67,23 +72,29 @@ class DataPanel(JPanel):
         decimals=int(self.decimals.value)
         format='%%1.%df'%decimals
     
-        start_time=max(0,self.view.timelog.tick_count-self.view.timelog.tick_limit+1)*self.view.dt
+        start_index=max(0,self.view.timelog.tick_count-self.view.timelog.tick_limit+1)
+        count=min(self.view.timelog.tick_limit,self.view.timelog.tick_count)
+        start_time=start_index*self.view.dt
         
-        data=[]
+        data=None
         title=['t']
         for key,watch in self.view.watcher.active.items():
             name,func,args=key
-            d=watch.get(dt_tau=dt_tau)
+            d=watch.get(dt_tau=dt_tau,start=start_index,count=count)
             n=len(watch.get_first())
-            while len(data)<len(d): 
-                data.append(['%0.4f'%(start_time+(len(data)+0)*self.view.dt)])
+            if data is None:
+                data=[]
+                while len(data)<len(d): 
+                    data.append(['%0.4f'%(start_time+(len(data)+0)*self.view.dt)])
             
             for i in range(n):
                 title.append('%s.%s%s[%d]'%(name,func.__name__,args,i))
-                for j in range(len(d)):
+                for j in range(len(data)):
                     dd=d[j]
-                    if dd is None: data[j].append(None)
+                    if dd is None: data[j].append('')
                     else: data[j].append(format%dd[i])
+        
+        self.view.paused=pause_state            
         return data,title
         
         
