@@ -227,7 +227,7 @@ public class NoiseFactory {
 		/**
 		 * @param frequency Frequency (in simulation time) with which new noise values are drawn from the PDF
 		 */
-		private void setFrequency(float frequency) {
+		public void setFrequency(float frequency) {
 			myPeriod = 1f / frequency;
 		}
 		
