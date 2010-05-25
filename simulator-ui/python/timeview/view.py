@@ -309,6 +309,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
         self.restart=False
         self.paused=True
+        self.simulating=False
         th=java.lang.Thread(self)
         th.priority=java.lang.Thread.MIN_PRIORITY
         th.start()
@@ -503,7 +504,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     
                 if self.current_tick>=self.timelog.tick_count-1:    
                     #self.network.simulator.run(now,now+self.dt,self.dt)
+                    self.simulating=True
                     sim.step(now,now+self.dt)
+                    self.simulating=False
                     self.force_origins()
                     now+=self.dt
                     self.timelog.tick()                
