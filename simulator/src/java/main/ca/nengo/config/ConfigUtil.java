@@ -339,8 +339,18 @@ public class ConfigUtil {
 		result = stripPrefix(result, "All");
 		result = stripSuffix(result, "Array");
 		result = stripSuffix(result, "List");
-				
-		return result.length() > 0 ? Character.toLowerCase(result.charAt(0)) + result.substring(1) : "";
+		
+		if (result.length()>0) {
+			
+			// don't do a lower case for methods like getPDF()
+			if (result.length()>1 && Character.isUpperCase(result.charAt(1))) {
+				return result;				
+			}
+			
+			return Character.toLowerCase(result.charAt(0)) + result.substring(1);
+			
+		}
+		return "";
 	}
 	
 	/**
