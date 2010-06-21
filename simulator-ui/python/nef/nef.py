@@ -31,6 +31,7 @@ from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFu
 from ca.nengo.model import StructuralException
 import java
 
+import pdfs
 import generators
 import functions
 import array
@@ -41,15 +42,15 @@ class Network:
     def __init__(self,name):
         self.network=NetworkImpl()
         self.network.name=name
-        
+
     def add_to(self,world):
         """Add the network to the given Nengo world object.  If there is a
         network with that name already there, remove the old one.
-        """        
+        """
         n=world.getNode(self.network.name)
         if n is not None: world.remove(n)
         world.add(self.network)
-        
+
     def add(self,node):
         """Add the node to the network.
 
@@ -58,7 +59,7 @@ class Network:
         """
         self.network.addNode(node)
         return node
-    
+
     def make_array(self,name,neurons,length,dimensions=1,**args):
         """Create and return an array of ensembles.  Each ensemble will be
         1-dimensional.  All of the parameters from Network.make() can be
@@ -73,7 +74,7 @@ class Network:
         self.network.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
         return ensemble
-        
+
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
                   max_rate=(200,400),intercept=(-1,1),
@@ -99,7 +100,7 @@ class Network:
         noise_frequency -- sampling rate (how quickly the noise changes)
         mode -- simulation mode ('direct', 'rate', or 'spike')
         """
-        if quick: 
+        if quick:
             storage_name='quick_%s_%d_%d_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref)
             if type(max_rate) is tuple and len(max_rate)==2:
                 storage_name+='_%1.1f_%1.1f'%max_rate
@@ -125,24 +126,24 @@ class Network:
             it=IndicatorPDF(intercept[0],intercept[1])
         else:
             it=pdfs.ListPDF(intercept)
-        ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)                          
+        ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
         if encoders is not None:
-            ef.encoderFactory=generators.FixedVectorGenerator(encoders)            
+            ef.encoderFactory=generators.FixedVectorGenerator(encoders)
         ef.approximatorFactory.noise=decoder_noise
         if eval_points is not None:
-            ef.evalPointFactory=generators.FixedEvalPointGenerator(eval_points)            
+            ef.evalPointFactory=generators.FixedEvalPointGenerator(eval_points)
         n=ef.make(name,neurons,[radius]*dimensions,storage_name,False)
         if noise is not None:
             for nn in n.nodes:
-                nn.noise=NoiseFactory.makeRandomNoise(noise_frequency,IndicatorPDF(-noise,noise))            
-                
+                nn.noise=NoiseFactory.makeRandomNoise(noise_frequency,IndicatorPDF(-noise,noise))
+
         if mode=='rate':
             n.mode=SimulationMode.RATE
         elif mode=='direct':
             n.mode=SimulationMode.DIRECT
         if add_to_network: self.network.addNode(n)
         return n
-    
+
     def make_input(self,name,values,zero_after_time=None):
         """Create and return a FunctionInput of dimensionality len(values)
         with those values as its constants.
@@ -152,7 +153,7 @@ class Network:
             if zero_after_time is None:
                 f=ConstantFunction(1,v)
             else:
-                f=PiecewiseConstantFunction([zero_after_time],[v,0])    
+                f=PiecewiseConstantFunction([zero_after_time],[v,0])
             funcs.append(f)
         input=FunctionInput(name,funcs,Units.UNK)
         self.network.addNode(input)
@@ -212,7 +213,7 @@ class Network:
             post=index_post[i%len(index_post)]
             t[post][pre]=weight
         return t
-        
+
     def connect(self,pre,post,
                 transform=None,weight=1,index_pre=None,index_post=None,
                 pstc=0.01,func=None,weight_func=None,origin_name=None):
@@ -256,7 +257,7 @@ class Network:
         if isinstance(pre,str):
             pre=self.network.getNode(pre)
         if isinstance(post,str):
-            post=self.network.getNode(post)            
+            post=self.network.getNode(post)
 
         # determine the origin and its dimensions
         origin=self._parse_pre(pre,func,origin_name)
@@ -300,10 +301,10 @@ class Network:
                     suffix='(%d)'%attempts
             else:
                 raise exception#StructuralException('cannot create termination %s'%pre.name)
-                    
-                    
+
+
             self.network.addProjection(origin,term)
-                        
+
 
 def test():
     net=Network('Test')
@@ -320,6 +321,6 @@ def test():
     m=net.compute_transform(2,4,index_post=[2,1])
     assert m==[[0,0],[0,1],[1,0],[0,0]]
     m=net.compute_transform(3,4,index_pre=[1,2],index_post=[2,1])
-    assert m==[[0,0,0],[0,0,1],[0,1,0],[0,0,0]]    
+    assert m==[[0,0,0],[0,0,1],[0,1,0],[0,0,0]]
     print 'tests passed'
-        
+
