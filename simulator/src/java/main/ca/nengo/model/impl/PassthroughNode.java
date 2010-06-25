@@ -282,7 +282,7 @@ public class PassthroughNode implements Node {
 		return result;
 	}
 
-	private static class PassthroughTermination implements Termination {
+	public static class PassthroughTermination implements Termination {
 		
 		private static final long serialVersionUID = 1L;
 		
