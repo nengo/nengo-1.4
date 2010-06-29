@@ -172,7 +172,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 */
 	public Configuration getConfiguration() {
 		ConfigurationImpl result = (ConfigurationImpl) ConfigUtil.defaultConfiguration(this);
-		result.renameProperty("sTPDynamics", "STPDynamics");
+		//result.renameProperty("sTPDynamics", "STPDynamics");
 		return result;
 	}
 	
