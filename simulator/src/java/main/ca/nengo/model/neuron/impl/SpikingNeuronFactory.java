@@ -39,7 +39,6 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.impl.NodeFactory;
 import ca.nengo.model.neuron.SpikeGenerator;
 import ca.nengo.model.neuron.SynapticIntegrator;
-import ca.nengo.model.plasticity.Plastic;
 
 /**
  * Creates spiking neurons by delegating to a SynapticIntegratorFactory and a 
@@ -97,8 +96,8 @@ public class SpikingNeuronFactory implements NodeFactory {
 		
 		Node result = null;
 		
-		if (integrator instanceof ExpandableNode && integrator instanceof Plastic) {
-			result = new PlasticExpandableSpikingNeuron(integrator, generator, scale, bias, name);
+		if (integrator instanceof ExpandableNode) {
+			result = new ExpandableSpikingNeuron(integrator, generator, scale, bias, name);
 		} else {
 			result = new SpikingNeuron(integrator, generator, scale, bias, name);
 		}

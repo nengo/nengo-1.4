@@ -31,8 +31,10 @@ import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.SimulationMode;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.SpikeOutputImpl;
+import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.SpikeGenerator;
 
@@ -109,6 +111,20 @@ public class SpikeGeneratorOrigin implements Origin {
 	
 	public SpikeGenerator getGenerator(){
 		return myGenerator;
+	}
+	
+	/**
+	 * Need this to fix bug where the generator's mode is changed, but
+	 * myOutput is still of the type of the old mode
+	 * 
+	 * @see ca.nengo.model.neuron.Neuron#setMode(ca.nengo.model.SimulationMode)
+	 */
+	public void setMode(SimulationMode mode) {
+		if (mode == SimulationMode.CONSTANT_RATE || mode == SimulationMode.RATE){
+			myOutput = new RealOutputImpl(new float[]{0.0f}, Units.SPIKES_PER_S, 0);
+		} else {
+			myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES, 0);
+		}
 	}
 
 	@Override

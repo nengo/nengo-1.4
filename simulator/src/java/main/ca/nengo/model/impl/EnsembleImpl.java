@@ -42,8 +42,6 @@ import ca.nengo.model.Node;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
-import ca.nengo.model.plasticity.Plastic;
-import ca.nengo.model.plasticity.PlasticityRule;
 
 /**
  * <p>Default implementation of Ensemble.</p>
@@ -58,14 +56,13 @@ import ca.nengo.model.plasticity.PlasticityRule;
  * 
  * @author Bryan Tripp
  */
-public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Plastic {
+public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 
 	private static final long serialVersionUID = 1L;
 	
-	private ExpandableNode[] myExpandableNodes;
-	private Map<String, Termination> myExpandedTerminations;
-	private LinkedList <Termination> OrderedTerminations;
-	private Map<String, PlasticityRule> myPlasticityRules;
+	protected ExpandableNode[] myExpandableNodes;
+	protected Map<String, Termination> myExpandedTerminations;
+	protected LinkedList <Termination> OrderedTerminations;
 	
 	/**
 	 * @param name Name of Ensemble
@@ -79,7 +76,6 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		myExpandableNodes = findExpandable(nodes);
 		myExpandedTerminations = new HashMap<String, Termination>(10);
 		OrderedTerminations = new LinkedList <Termination> ();
-		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 	}
 	
 	public EnsembleImpl(String name, NodeFactory factory, int n) throws StructuralException {
@@ -119,7 +115,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 	public Termination[] getTerminations() {
 		ArrayList<Termination> result = new ArrayList<Termination>(10);
 		//result.addAll(myExpandedTerminations.values());
-				
+		
 		Termination[] composites = super.getTerminations();
 		for (int i = 0; i < composites.length; i++) {
 			result.add(composites[i]);
@@ -210,89 +206,22 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode, Pl
 		return myExpandedTerminations.containsKey(name) ? myExpandedTerminations.get(name) : super.getTermination(name);
 	}
 
-	/**
-	 * Sets the given plasticity rule for all Plastic Nodes in the Ensemble.
-	 *  
-	 * @see ca.nengo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.nengo.model.plasticity.PlasticityRule)
-	 */
-	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
-		for (int i = 0; i < myExpandableNodes.length; i++) {
-			if (myExpandableNodes[i] instanceof Plastic) {
-				((Plastic) myExpandableNodes[i]).setPlasticityRule(terminationName, rule);				
-			}
-		}
-		myPlasticityRules.put(terminationName, rule); 
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#setPlasticityInterval(float)
-	 */
-	public void setPlasticityInterval(float time) {
-		for (int i = 0; i < myExpandableNodes.length; i++) {
-			if (myExpandableNodes[i] instanceof Plastic) {
-				((Plastic) myExpandableNodes[i]).setPlasticityInterval(time);				
-			}
-		}
-	}
-
-	/**
-	 * Returns minimum of plasticity intervals of plastic component nodes, or -1 if 
-	 * none of the component nodes are plastic.  
-	 * 
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityInterval()
-	 */
-	public float getPlasticityInterval() {		
-		float result = -1; 
-
-		for (int i = 0; i < myExpandableNodes.length; i++) {
-			if (myExpandableNodes[i] instanceof Plastic) {
-				float interval = ((Plastic) myExpandableNodes[i]).getPlasticityInterval();
-				if (result < 0 || result > interval) result = interval; 
-			}
-		}
-		
-		return result; 
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityRule(java.lang.String)
-	 */
-	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
-		return myPlasticityRules.get(terminationName);
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityRuleNames()
-	 */
-	public String[] getPlasticityRuleNames() {
-		return myExpandedTerminations.keySet().toArray(new String[0]);
-	}
-
 	@Override
 	public Ensemble clone() throws CloneNotSupportedException {
-		try {
-			EnsembleImpl result = (EnsembleImpl) super.clone();
-			
-			for (String key : myPlasticityRules.keySet()) {
-				result.setPlasticityRule(key, myPlasticityRules.get(key).clone());
-			}
-			
-			//Note: at this point, AbstractEnsemble.clone() has called its init() method,
-			//which sets up EnsembleTerminations based on existing node terminations. Since 
-			//the nodes have been cloned, this includes any "expanded terminations" created 
-			//on this EnsembleImpl. We now move these terminations from AbstractEnsemble
-			//EnsembleImpl, where they belong ... 
-			
-			result.myExpandedTerminations = new HashMap<String, Termination>(10);
-			for (String key : myExpandedTerminations.keySet()) {
-				EnsembleTermination et = result.myTerminations.remove(key);
-				result.myExpandedTerminations.put(key, et);
-			}
-			
-			return result;	
-		} catch (StructuralException e) {
-			throw new CloneNotSupportedException("Problem making clone: " + e.getMessage());
+		EnsembleImpl result = (EnsembleImpl) super.clone();
+		
+		//Note: at this point, AbstractEnsemble.clone() has called its init() method,
+		//which sets up EnsembleTerminations based on existing node terminations. Since 
+		//the nodes have been cloned, this includes any "expanded terminations" created 
+		//on this EnsembleImpl. We now move these terminations from AbstractEnsemble
+		//EnsembleImpl, where they belong ... 
+		
+		result.myExpandedTerminations = new HashMap<String, Termination>(10);
+		for (String key : myExpandedTerminations.keySet()) {
+			EnsembleTermination et = result.myTerminations.remove(key);
+			result.myExpandedTerminations.put(key, et);
 		}
-	}
-	
+		
+		return result;	
+	}	
 }

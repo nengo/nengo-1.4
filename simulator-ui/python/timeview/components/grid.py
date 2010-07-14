@@ -77,8 +77,6 @@ class Grid(core.DataViewComponent):
             sdata=self.sdata.get(start=self.view.current_tick,count=1)[0]
         else:
             sdata=None
-
-
         
         if data is None: 
             return
@@ -89,7 +87,7 @@ class Grid(core.DataViewComponent):
             rows=self.rows    
         cols=len(data)/rows
         if rows*cols<len(data): cols+=1
-            
+        
         if self.map is None and self.improvable:
             self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)
         
@@ -104,6 +102,7 @@ class Grid(core.DataViewComponent):
         for y in range(rows):
             for x in range(cols):                
                 if x+y*cols<len(data):
+                    
                     if self.improvable:
                         index=self.map.map[x+y*cols]
                     else:
@@ -111,17 +110,17 @@ class Grid(core.DataViewComponent):
                     if sdata is not None and self.view.current_tick>0 and sdata[index]:
                         g.color=Color.yellow
                     else:
-                        if min>=0:
+                        if min>=0.0:
                             c=(float(data[index])-min)/(max-min)
                             if c<0: c=0.0
                             if c>1: c=1.0
                             g.color=Color(c,c,c)
                         else:
                             c=(float(data[index])-min)/(max-min)
-                            c=c*0.5
+                            c=(c-0.5)*2
                             if c<-1: c=-1.0
                             if c>1 : c=1.0
-                            if c<0 : g.color = Color(1.0+c,1.0+c,1.0)
+                            if c<0.0 : g.color = Color(1.0+c,1.0+c,1.0)
                             else   : g.color = Color(1.0,1.0-c,1.0-c)
                                 
                     g.fillRect(int(x0+dx*x),int(y0+dy*y),int(dx+1),int(dy+1))

@@ -1,16 +1,13 @@
 package ca.nengo.util.impl;
 
 import ca.nengo.model.Node;
-import ca.nengo.model.SimulationException;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
-import ca.nengo.model.neuron.impl.PlasticExpandableSpikingNeuron;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
-import ca.nengo.util.MU;
 
 public class GPUThread extends NodeThread {
 	private GPUNodeThreadPool myGPUNodeThreadPool;
@@ -159,7 +156,7 @@ public class GPUThread extends NodeThread {
 		// Now wait until we get the signal to step from the main thread
 		myGPUNodeThreadPool.Sleep();
 		
-		int step = 0;
+		// int step = 0;
 		while (!myGPUNodeThreadPool.myKill) {
 			try {
 

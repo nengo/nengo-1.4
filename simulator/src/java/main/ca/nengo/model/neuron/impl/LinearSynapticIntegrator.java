@@ -35,19 +35,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.SimulationException;
-import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.LinearExponentialTermination;
-import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.neuron.ExpandableSynapticIntegrator;
 import ca.nengo.model.neuron.SynapticIntegrator;
-import ca.nengo.model.plasticity.Plastic;
-import ca.nengo.model.plasticity.PlasticityRule;
 import ca.nengo.util.TimeSeries1D;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 
@@ -66,7 +61,7 @@ import ca.nengo.util.impl.TimeSeries1DImpl;
  *  
  * @author Bryan Tripp
  */
-public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, Plastic {
+public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -76,9 +71,6 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	private float myMaxTimeStep;
 	private Units myCurrentUnits;
 	private Map<String, LinearExponentialTermination> myTerminations;	
-	private Map<String, PlasticityRule> myPlasticityRules;
-	private float myPlasticityInterval;
-	private float myLastPlasticityTime;
 
 	/**
 	 * @param maxTimeStep Maximum length of integration time step. Shorter steps may be used to better match
@@ -89,9 +81,6 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		myMaxTimeStep = maxTimeStep * 1.01f; //increased slightly because float/float != integer 
 		myCurrentUnits = currentUnits;
 		myTerminations = new HashMap<String, LinearExponentialTermination>(10);
-		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
-		myPlasticityInterval = -1;
-		myLastPlasticityTime = 0;		
 	}
 	
 	/**
@@ -131,42 +120,9 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 			}			
 		}
 		
-		if (myPlasticityInterval <= 0) {
-			learn(startTime, endTime);			
-		} else if (endTime >= myLastPlasticityTime + myPlasticityInterval) {
-			learn(myLastPlasticityTime, endTime);
-			myLastPlasticityTime = endTime;
-		}
-				
 		return new TimeSeries1DImpl(times, currents, myCurrentUnits);
 	}
 	
-	//run plasticity rules (assume constant input/state over given elapsed time)
-	private void learn(float startTime, float endTime) throws SimulationException {
-		Iterator ruleIter = myPlasticityRules.keySet().iterator();
-		while (ruleIter.hasNext()) {
-			String name = (String) ruleIter.next();
-			LinearExponentialTermination termination = myTerminations.get(name);
-			PlasticityRule rule = myPlasticityRules.get(name);
-			
-			if (rule != null) {
-				Iterator termIter = myTerminations.keySet().iterator();
-				while (termIter.hasNext()) {
-					LinearExponentialTermination t = myTerminations.get(termIter.next());
-					InstantaneousOutput input = new RealOutputImpl(new float[]{t.getOutput()}, Units.UNK, endTime);
-					rule.setTerminationState(t.getName(), input, endTime);					
-				}
-				
-				float[] weights = termination.getWeights();
-				float[][] derivative = rule.getDerivative(new float[][]{weights}, termination.getInput(), endTime);
-				float scale = (termination.getInput() instanceof SpikeOutput) ? 1 : (endTime - startTime); 			
-				for (int i = 0; i < weights.length; i++) {
-					weights[i] += derivative[0][i] * scale;
-				}			
-			}
-		}
-	}
-
 	//update current in all Terminations 
 	private static float update(Collection<LinearExponentialTermination> terminations, boolean spikes, float intTime, float decayTime) {
 		float result = 0f;
@@ -242,20 +198,6 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 	public Termination getTermination(String name) throws StructuralException {
 		return myTerminations.get(name);
 	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.nengo.model.plasticity.PlasticityRule)
-	 */
-	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
-		myPlasticityRules.put(terminationName, rule);
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#setPlasticityInterval(float)
-	 */
-	public void setPlasticityInterval(float time) {
-		myPlasticityInterval = time;
-	}
 	
 	/**
 	 * @param node The parent node (Terminations need a reference to this)
@@ -268,42 +210,16 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator, P
 		}		
 	}
 
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityInterval()
-	 */
-	public float getPlasticityInterval() {
-		return myPlasticityInterval;
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityRule(java.lang.String)
-	 */
-	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
-		return myPlasticityRules.get(terminationName);
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityRuleNames()
-	 */
-	public String[] getPlasticityRuleNames() {
-		return myTerminations.keySet().toArray(new String[0]);
-	}
-		
 	@Override
 	public SynapticIntegrator clone() throws CloneNotSupportedException {
 		LinearSynapticIntegrator result = (LinearSynapticIntegrator) super.clone();
 		
 		result.myTerminations = new HashMap<String, LinearExponentialTermination>(10);
-		result.myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 		for (LinearExponentialTermination oldTerm : myTerminations.values()) {
 			String name = oldTerm.getName();
 			LinearExponentialTermination newTerm = (LinearExponentialTermination) oldTerm.clone();
 			newTerm.setNode(result.myNode);
 			result.myTerminations.put(name, newTerm);
-			
-			if (myPlasticityRules.containsKey(name)) {
-				result.myPlasticityRules.put(name, myPlasticityRules.get(name).clone());
-			}
 		}
 		
 		return result;

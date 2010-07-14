@@ -79,6 +79,14 @@ public class CompositePlasticityRule implements PlasticityRule {
 	}
 	
 	/**
+	 * @see ca.nengo.model.Resettable#reset(boolean)
+	 */
+	public void reset(boolean randomize) {
+		mySpikeRule.reset(randomize);
+		myRealRule.reset(randomize);
+	}
+	
+	/**
 	 * @return Rule to use when both inputs and outputs are spiking
 	 */
 	public PlasticityRule getSpikeRule() {
@@ -115,7 +123,7 @@ public class CompositePlasticityRule implements PlasticityRule {
 		Iterator<InstantaneousOutput> it = myOriginStates.values().iterator();
 		while (it.hasNext() && !spikingOutput) {
 			if (it.next() instanceof SpikeOutput) spikingOutput = true;
-		}		
+		}
 		boolean spikingInput = (input instanceof SpikeOutput);
 		
 		PlasticityRule rule = (spikingInput && spikingOutput) ? mySpikeRule : myRealRule; 
@@ -129,7 +137,7 @@ public class CompositePlasticityRule implements PlasticityRule {
 		Iterator<String> terminations = myTerminationStates.keySet().iterator();
 		while (terminations.hasNext()) {
 			String name = terminations.next();
-			rule.setTerminationState(name, myTerminationStates.get(name), time);
+			rule.setModTerminationState(name, myTerminationStates.get(name), time);
 		}
 		
 		return rule.getDerivative(transform, input, time);
@@ -145,7 +153,7 @@ public class CompositePlasticityRule implements PlasticityRule {
 	/**
 	 * @see ca.nengo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
 	 */
-	public void setTerminationState(String name, InstantaneousOutput state, float time) {
+	public void setModTerminationState(String name, InstantaneousOutput state, float time) {
 		myTerminationStates.put(name, state);
 	}
 
@@ -178,22 +186,25 @@ public class CompositePlasticityRule implements PlasticityRule {
 			}
 			return result;
 		}
+		
+		/**
+		 * @see ca.nengo.model.Resettable#reset(boolean)
+		 */
+		public void reset(boolean randomize) {}
 
 		/**
 		 * Does nothing. 
 		 * 
 		 * @see ca.nengo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
 		 */
-		public void setOriginState(String name, InstantaneousOutput state, float time) {
-		}
+		public void setOriginState(String name, InstantaneousOutput state, float time) {}
 
 		/**
 		 * Does nothing. 
 		 * 
 		 * @see ca.nengo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
 		 */
-		public void setTerminationState(String name, InstantaneousOutput state, float time) {
-		}
+		public void setModTerminationState(String name, InstantaneousOutput state, float time) {}
 
 		@Override
 		public PlasticityRule clone() throws CloneNotSupportedException {

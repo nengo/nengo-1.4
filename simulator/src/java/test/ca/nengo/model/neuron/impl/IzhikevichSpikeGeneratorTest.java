@@ -19,7 +19,7 @@ import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.neuron.impl.IzhikevichSpikeGenerator;
 import ca.nengo.model.neuron.impl.LinearSynapticIntegrator;
-import ca.nengo.model.neuron.impl.PlasticExpandableSpikingNeuron;
+import ca.nengo.model.neuron.impl.ExpandableSpikingNeuron;
 import ca.nengo.plot.Plotter;
 import ca.nengo.util.MU;
 import ca.nengo.util.Probe;
@@ -88,7 +88,7 @@ public class IzhikevichSpikeGeneratorTest extends TestCase {
 		
 		LinearSynapticIntegrator integrator = new LinearSynapticIntegrator();
 		IzhikevichSpikeGenerator generator = new IzhikevichSpikeGenerator(IzhikevichSpikeGenerator.Preset.REGULAR_SPIKING);
-		PlasticExpandableSpikingNeuron neuron = new PlasticExpandableSpikingNeuron(integrator, generator, 1, 0, "neuron");		
+		ExpandableSpikingNeuron neuron = new ExpandableSpikingNeuron(integrator, generator, 1, 0, "neuron");		
 		Termination t = neuron.addTermination("input", MU.I(1), .001f, false);
 		
 		FunctionInput input = new FunctionInput("input", new Function[]{new ConstantFunction(1, I)}, Units.UNK);

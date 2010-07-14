@@ -15,6 +15,7 @@ from ca.nengo.model.nef import *
 from ca.nengo.model.impl import *
 from ca.nengo.math.impl import *
 from ca.nengo.model import Node,SimulationMode
+from ca.nengo.model.plasticity.impl import SpikePlasticityRule
 
 from java.lang.System.err import println
 import math
@@ -65,11 +66,11 @@ class EnsembleWatch:
             #('spike raster',lambda view,name,type: components.SpikeRaster(view,name,type,self.spikes)),
             ]
         if obj.dimension==2:
-          r+=[    
+          r+=[
             ('preferred directions',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 500*self.view.dt,filter=True,label=obj.name)),       
             #('decoders',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 0.1*self.view.dt,filter=True,decoders=True)),       
              ]
-        return r   
+        return r
 
 class NodeWatch:
     def check(self,obj):
@@ -82,6 +83,17 @@ class NodeWatch:
             w=n.getTermination(termination).weights
             v.extend(w)
         return v
+    def in_spikes(self,obj,name):
+        term=obj.getTermination(name)
+        if isinstance(term, PlasticEnsembleTermination) and term.getInput() is not None:
+            return term.getInput().getValues()
+        else:
+            return [0]*obj.neurons
+    def out_spikes(self,obj):
+        if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
+            return [0]*obj.neurons
+        else:
+            return obj.getOrigin('AXON').values.values
     def views(self,obj):
         origins=[o.name for o in obj.origins]
         ignored_origins = ['AXON','current']
@@ -145,10 +157,14 @@ class NodeWatch:
                 for name in terminations:
                     label=obj.name+": "+name
                     r.append((name,components.Grid,dict(func=self.weights,args=(name,),label=label,min=-0.01,max=0.01,improvable=False)))
-            
+                    
+                    rule = obj.getPlasticityRule(name)
+                    
+                    if rule is not None and isinstance(rule,SpikePlasticityRule):
+                        r.append((name+' detail',components.SpikeLineOverlay,dict(
+                                  infunc=self.in_spikes,inargs=(name,),outfunc=self.out_spikes,
+                                  lfunc=self.weights,largs=(name,),label=label)))
         return r
-
-
 
 class FunctionWatch:
     def check(self,obj):

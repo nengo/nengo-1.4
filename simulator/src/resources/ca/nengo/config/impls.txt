@@ -28,7 +28,7 @@ ca.nengo.model.impl.NoiseFactory$NoiseImplPDF
 ca.nengo.model.impl.NoiseFactory$NoiseImplNull
 ca.nengo.model.impl.NoiseFactory$NoiseImplFunction
 ca.nengo.model.neuron.impl.SpikingNeuron
-ca.nengo.model.neuron.impl.PlasticExpandableSpikingNeuron
+ca.nengo.model.neuron.impl.ExpandableSpikingNeuron
 ca.nengo.model.neuron.impl.ALIFSpikeGenerator
 ca.nengo.model.neuron.impl.LIFSpikeGenerator
 ca.nengo.model.neuron.impl.DynamicalSystemSpikeGenerator

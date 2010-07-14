@@ -28,9 +28,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.nef;
 
 import ca.nengo.math.Function;
-import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
 import ca.nengo.model.Origin;
+import ca.nengo.model.PlasticEnsemble;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
@@ -50,7 +50,7 @@ import ca.nengo.util.Probe;
  * 
  * @author Bryan Tripp
  */
-public interface DecodableEnsemble extends Ensemble, Probeable {
+public interface DecodableEnsemble extends PlasticEnsemble, Probeable {
 
 	/**
 	 * Adds an Origin that corresponds to a decoding of the activities of Nodes in this Ensemble. The decoding 
@@ -73,7 +73,6 @@ public interface DecodableEnsemble extends Ensemble, Probeable {
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment, 
 			Probe probe, float startTime, float endTime) throws StructuralException, SimulationException;
 	
-
 	/**
 	 * Adds an Origin that corresponds to a decoding of the activities of Nodes in this Ensemble. The decoding 
 	 * is found by running the Ensemble repeatedly with different inputs, and using the steady-state output 

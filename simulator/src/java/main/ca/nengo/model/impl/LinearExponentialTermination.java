@@ -54,9 +54,11 @@ public class LinearExponentialTermination implements Termination {
 	
 	private Node myNode;
 	private String myName;
-	private float[] myWeights;
 	private float myTauPSC;
 	private boolean myModulatory;
+	
+	private float[] myInitialWeights;
+	private float[] myWeights;
 	
 	private float myCurrent = 0;
 	private float myNetSpikeInput;
@@ -77,6 +79,7 @@ public class LinearExponentialTermination implements Termination {
 		myNode = node;
 		myName = name;
 		myWeights = weights;
+		myInitialWeights = weights.clone();
 		myTauPSC = tauPSC;
 		myModulatory = false;
 	}
@@ -93,6 +96,7 @@ public class LinearExponentialTermination implements Termination {
 		myNetSpikeInput = 0;
 		myPreciseSpikeInputTimes=null;
 		myIntegrationTime = 0;
+		myWeights = myInitialWeights.clone();
 	}
 
 	/**

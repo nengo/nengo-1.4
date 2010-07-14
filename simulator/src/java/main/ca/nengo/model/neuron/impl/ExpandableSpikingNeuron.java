@@ -7,8 +7,8 @@ Software distributed under the License is distributed on an "AS IS" basis, WITHO
 WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
 language governing rights and limitations under the License.
 
-The Original Code is "PlasticExpandableSpikingNeuron.java". Description: 
-"A SpikingNeuron with an ExpandableSynapticIntegrator that is Plastic"
+The Original Code is "ExpandableSpikingNeuron.java". Description: 
+"A SpikingNeuron with an ExpandableSynapticIntegrator."
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
@@ -30,29 +30,23 @@ package ca.nengo.model.neuron.impl;
 import org.apache.log4j.Logger;
 
 import ca.nengo.model.ExpandableNode;
-import ca.nengo.model.InstantaneousOutput;
-import ca.nengo.model.Origin;
-import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.neuron.ExpandableSynapticIntegrator;
 import ca.nengo.model.neuron.SpikeGenerator;
 import ca.nengo.model.neuron.SynapticIntegrator;
-import ca.nengo.model.plasticity.Plastic;
-import ca.nengo.model.plasticity.PlasticityRule;
 
 /**
- * A SpikingNeuron with an ExpandableSynapticIntegrator that is Plastic. 
+ * A SpikingNeuron with an ExpandableSynapticIntegrator.
  * 
  * @author Bryan Tripp
  */
-public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Plastic, ExpandableNode {
+public class ExpandableSpikingNeuron extends SpikingNeuron implements ExpandableNode {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger ourLogger = Logger.getLogger(PlasticExpandableSpikingNeuron.class);
+	private static Logger ourLogger = Logger.getLogger(ExpandableSpikingNeuron.class);
 
-	private Plastic mySynapticIntegrator;
-//	private Map<String, PlasticityRule> myPlasticityRules;
+	private ExpandableSynapticIntegrator mySynapticIntegrator;
 	
 	/**
 	 * Note: current = scale * (weighted sum of inputs at each termination) * (radial input) + bias.
@@ -66,69 +60,14 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 	 * @param name A unique name for this neuron in the context of the Network or Ensemble to which 
 	 * 		it belongs
 	 */	
-	public PlasticExpandableSpikingNeuron(SynapticIntegrator integrator, SpikeGenerator generator, float scale, float bias, String name) {
+	public ExpandableSpikingNeuron(SynapticIntegrator integrator, SpikeGenerator generator, float scale, float bias, String name) {
 		super(integrator, generator, scale, bias, name);
-		
-		if ( !(getIntegrator() instanceof Plastic) ) {
-			throw new IllegalArgumentException("SynapticIntegrator must be Plastic (consider using SpikingNeuron instead)");
-		}
 		
 		if ( !(getIntegrator() instanceof ExpandableSynapticIntegrator) ) {
 			ourLogger.warn("Given SynapticIntegrator is not an ExpandableSynapticIntegrator (expansion-related methods will fail");
 		}
 		
-		mySynapticIntegrator = (Plastic) integrator;
-//		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
-	}
-	
-	/**
-	 * @see ca.nengo.model.neuron.impl.SpikingNeuron#run(float, float)
-	 */
-	public void run(float startTime, float endTime) throws SimulationException {
-		Origin[] origins = getOrigins();
-		
-		//have to set origins before super runs the synaptic integrator
-		String[] ruleNames = getPlasticityRuleNames();
-		for (int i = 0; i < ruleNames.length; i++) {
-			PlasticityRule rule;
-			try {
-				rule = getPlasticityRule(ruleNames[i]);
-				if (rule != null) {
-					for (int j = 0; j < origins.length; j++) {
-						InstantaneousOutput output = origins[j].getValues();
-						rule.setOriginState(origins[j].getName(), output, endTime);									
-					}
-				}
-			} catch (StructuralException e) {
-				throw new SimulationException("Expected plasticity rule unavailable: " + ruleNames[i], e);
-			}
-		}
-//		Iterator<PlasticityRule> it = myPlasticityRules.values().iterator();
-//		while (it.hasNext()) {
-//			PlasticityRule rule = it.next();
-//
-//			for (int i = 0; i < origins.length; i++) {
-//				InstantaneousOutput output = origins[i].getValues();
-//				rule.setOriginState(origins[i].getName(), output, endTime);									
-//			}
-//		}
-		
-		super.run(startTime, endTime);		
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.nengo.model.plasticity.PlasticityRule)
-	 */
-	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
-//		myPlasticityRules.put(terminationName, rule);
-		mySynapticIntegrator.setPlasticityRule(terminationName, rule);
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#setPlasticityInterval(float)
-	 */
-	public void setPlasticityInterval(float time) {
-		mySynapticIntegrator.setPlasticityInterval(time);
+		mySynapticIntegrator = (ExpandableSynapticIntegrator) integrator;
 	}
 	
 	/**
@@ -162,29 +101,8 @@ public class PlasticExpandableSpikingNeuron extends SpikingNeuron implements Pla
 		
 		((ExpandableSynapticIntegrator) mySynapticIntegrator).removeTermination(name);
 	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityInterval()
-	 */
-	public float getPlasticityInterval() {
-		return mySynapticIntegrator.getPlasticityInterval();
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityRule(java.lang.String)
-	 */
-	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
-		return mySynapticIntegrator.getPlasticityRule(terminationName);
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#getPlasticityRuleNames()
-	 */
-	public String[] getPlasticityRuleNames() {
-		return mySynapticIntegrator.getPlasticityRuleNames();
-	}
 	
-	public Plastic getSynapticIntegrator() {
+	public ExpandableSynapticIntegrator getSynapticIntegrator() {
 		return mySynapticIntegrator;
 	}
 

@@ -142,7 +142,7 @@ public class HodgkinHuxleySpikeGenerator extends DynamicalSystemSpikeGenerator {
 		public Node make(String name) throws StructuralException {
 			LinearSynapticIntegrator integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
 			SpikeGenerator sg = new HodgkinHuxleySpikeGenerator();
-			return new PlasticExpandableSpikingNeuron(integrator, sg, 10, 0, name);
+			return new ExpandableSpikingNeuron(integrator, sg, 10, 0, name);
 		}
 
 		/**

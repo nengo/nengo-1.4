@@ -27,14 +27,13 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.nef.impl;
 
-import java.io.ObjectStreamClass;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 import Jama.Matrix;
 
@@ -53,11 +52,9 @@ import ca.nengo.model.Origin;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
-import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.impl.NodeFactory;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
@@ -66,9 +63,7 @@ import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikeGeneratorOrigin;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
-import ca.nengo.model.plasticity.PlasticityRule;
 import ca.nengo.util.MU;
-import ca.nengo.util.Memory;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
@@ -82,8 +77,7 @@ import ca.nengo.util.impl.TimeSeriesImpl;
  */
 public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsemble {
 
-	private static Logger ourLogger = Logger.getLogger(NEFEnsembleImpl.class);
-
+	//private static Logger ourLogger = Logger.getLogger(NEFEnsembleImpl.class);
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -94,9 +88,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private float[][] myEncoders;
 	private Map<String, DecodedTermination> myDecodedTerminations;
 	private LinkedList <DecodedTermination> OrderedTerminations;
-	private Map<String, PlasticityRule> myPlasticityRules;
-	private float myPlasticityInterval;
-	private float myLastPlasticityTime;	
 	private Map<String, LinearApproximator> myDecodingApproximators;	
 	private boolean myReuseApproximators;
 	private float[][] myUnscaledEvalPoints;
@@ -140,9 +131,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		myDecodedTerminations = new HashMap<String, DecodedTermination>(10);
 		OrderedTerminations = new LinkedList <DecodedTermination> ();
-		myPlasticityRules = new HashMap<String, PlasticityRule>(10);
-		myPlasticityInterval = -1;
-		myLastPlasticityTime = 0;		
 		myDecodingApproximators = new HashMap<String, LinearApproximator>(10);
 		myReuseApproximators = true;		
 		myUnscaledEvalPoints = evalPoints;
@@ -419,6 +407,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public Termination addDecodedTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory) 
 			throws StructuralException {
 		
+		// TODO Should this also check non-decoded terminations?
 		if (myDecodedTerminations.containsKey(name)) {
 			throw new StructuralException("The ensemble already contains a termination named " + name);
 		}
@@ -581,7 +570,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 				Map<String, Float> bias = new HashMap<String, Float>(5);
 
 				//run terminations and sum state ...
-				Iterator it = myDecodedTerminations.values().iterator();
+				Iterator<DecodedTermination> it = myDecodedTerminations.values().iterator();
 				while (it.hasNext()) {
 					DecodedTermination t = (DecodedTermination) it.next();
 					t.run(startTime, endTime);
@@ -615,6 +604,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 						}
 					}
 					setTime(endTime);
+					// TODO Have plasticity work in DIRECT mode
 				} else {
 					//multiply state by encoders (cosine tuning), set radial input of each Neuron and run ...
 					Node[] nodes = getNodes();
@@ -623,13 +613,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 					}
 					super.run(startTime, endTime);
 				}
-				if (myPlasticityInterval <= 0) {
-					learn(startTime, endTime);				
-				} else if (endTime >= myLastPlasticityTime + myPlasticityInterval) {
-					learn(myLastPlasticityTime, endTime);
-					myLastPlasticityTime = endTime;
-				}
-
 			} catch (SimulationException e) {
 				e.setEnsemble(getName());
 				throw e;
@@ -648,38 +631,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 			sumBias += netBias * biasEncoder;
 		}
 		return sumBias;
-	}
-	
-	//run ensemble plasticity rules (assume constant input/state over given elapsed time)
-	private void learn(float startTime, float endTime) throws SimulationException {
-		Iterator ruleIter = myPlasticityRules.keySet().iterator();
-		while (ruleIter.hasNext()) {
-			String name = (String) ruleIter.next();
-			DecodedTermination termination = myDecodedTerminations.get(name);
-			PlasticityRule rule = myPlasticityRules.get(name);
-			
-			Iterator termIter = myDecodedTerminations.keySet().iterator();
-			while (termIter.hasNext()) {
-				DecodedTermination t = myDecodedTerminations.get(termIter.next());
-				rule.setTerminationState(t.getName(), new RealOutputImpl(t.getOutput(), Units.UNK, endTime), endTime);
-			}
-			
-			Origin[] origins = getOrigins();
-			for (int i = 0; i < origins.length; i++) {
-				if (origins[i] instanceof DecodedOrigin) {
-					rule.setOriginState(origins[i].getName(), origins[i].getValues(), endTime);
-				}
-			}
-			
-			float[][] transform = termination.getTransform();
-			float[][] derivative = rule.getDerivative(transform, termination.getInput(), endTime);
-			float scale = (termination.getInput() instanceof SpikeOutput) ? 1 : (endTime - startTime); 
-			for (int i = 0; i < transform.length; i++) {
-				for (int j = 0; j < transform[i].length; j++) {
-					transform[i][j] += derivative[i][j] * scale;
-				}
-			}	
-		}
 	}
 	
 	/**
@@ -737,7 +688,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public void reset(boolean randomize) {
 		super.reset(randomize);
 		
-		Iterator it = myDecodedTerminations.keySet().iterator();		
+		Iterator<String> it = myDecodedTerminations.keySet().iterator();		
 		while (it.hasNext()) {
 			DecodedTermination t = (DecodedTermination) myDecodedTerminations.get(it.next());
 			t.reset(randomize);
@@ -755,32 +706,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		}
 	}
 
-	/**
-	 * TODO: should there be a pass-through option as in EnsembleImpl? 
-	 * 
-	 * @see ca.nengo.model.plasticity.Plastic#setPlasticityRule(java.lang.String, ca.nengo.model.plasticity.PlasticityRule)
-	 */
-	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException {
-		if (myDecodedTerminations.containsKey(terminationName)) {
-			myPlasticityRules.put(terminationName, rule);
-		} else {
-			super.setPlasticityRule(terminationName, rule);
-		} 
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.Plastic#setPlasticityInterval(float)
-	 */
-	public void setPlasticityInterval(float time) {
-		myPlasticityInterval = time;
-	}
-	
-	@Override
-	public float getPlasticityInterval() {
-		return myPlasticityInterval;
-	}
-	
-	
 	public void setEnsembleFactory(NEFEnsembleFactory factory) {
 		myEnsembleFactory=factory;
 	}
@@ -846,26 +771,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 	}
 	
-
-	@Override
-	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException {
-		if (myDecodedTerminations.containsKey(terminationName)) {
-			return myPlasticityRules.get(terminationName);
-		} else {
-			return super.getPlasticityRule(terminationName);			
-		}
-	}
-
-	@Override
-	public String[] getPlasticityRuleNames() {
-		String[] thisNames = myDecodedTerminations.keySet().toArray(new String[0]);
-		String[] superNames = super.getPlasticityRuleNames();
-		String[] result = new String[thisNames.length + superNames.length];
-		System.arraycopy(thisNames, 0, result, 0, thisNames.length);
-		System.arraycopy(superNames, 0, result, thisNames.length, superNames.length);
-		return result;
-	}
-	
 	@Override
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		DecodedTermination t = myDecodedTerminations.get(stateName);
@@ -910,16 +815,10 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		result.myEncoders = MU.clone(myEncoders);
 
 		result.myDecodedTerminations = new HashMap<String, DecodedTermination>(10);
-		result.myPlasticityRules = new HashMap<String, PlasticityRule>(10);
 		for (String key : myDecodedTerminations.keySet()) {
 			DecodedTermination t = (DecodedTermination) myDecodedTerminations.get(key).clone(); 
 			t.setNode(result);
 			result.myDecodedTerminations.put(key, t);
-			
-			PlasticityRule r = myPlasticityRules.get(key);
-			if (r != null) {
-				result.myPlasticityRules.put(key, r.clone());
-			}
 		}		
 		
 		//change scaling terminations references to the new copies 

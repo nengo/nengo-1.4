@@ -190,7 +190,7 @@ public class ALIFNeuronFactory implements NodeFactory {
 		SynapticIntegrator integrator = new LinearSynapticIntegrator(ourMaxTimeStep, ourCurrentUnits);
 		SpikeGenerator generator = new ALIFSpikeGenerator(myTauRef, myTauRC, myTauN, myIncN.sample()[0]);
 		
-		return new PlasticExpandableSpikingNeuron(integrator, generator, scale, bias, name);		
+		return new ExpandableSpikingNeuron(integrator, generator, scale, bias, name);		
 	}
 
 	/**

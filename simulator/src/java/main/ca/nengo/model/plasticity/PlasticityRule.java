@@ -8,10 +8,8 @@ WARRANTY OF ANY KIND, either express or implied. See the License for the specifi
 language governing rights and limitations under the License.
 
 The Original Code is "PlasticityRule.java". Description: 
-"Specifies how the termination weights of an NEFEnsemble are modified depending 
-  on presynaptic and postsynaptic state.
-  
-  TODO: the setters introduce state in a way that may not be necessary -- remove them or clone in EnsembleImpl.setPlasticityRule(...)
+"Specifies how the termination weights of a PlasticEnsemble are modified depending 
+on presynaptic and postsynaptic state.
   
   @author Bryan Tripp"
 
@@ -33,18 +31,16 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.plasticity;
 
 import java.io.Serializable;
-
 import ca.nengo.model.InstantaneousOutput;
+import ca.nengo.model.Resettable;
 
 /**
- * Specifies how the termination weights of an NEFEnsemble are modified depending 
+ * Specifies how the termination weights of a PlasticEnsemble are modified depending
  * on presynaptic and postsynaptic state.
- * 
- * TODO: the setters introduce state in a way that may not be necessary -- remove them or clone in EnsembleImpl.setPlasticityRule(...)
  * 
  * @author Bryan Tripp
  */
-public interface PlasticityRule extends Serializable, Cloneable {
+public interface PlasticityRule extends Resettable, Serializable, Cloneable {
 	
 	/**
 	 * Provides potentially modulatory input to the rule.
@@ -58,7 +54,7 @@ public interface PlasticityRule extends Serializable, Cloneable {
 	 * 		from its input in terms of dynamics and dimension)
 	 * @param time Simulation time at which state arrives at site of plasticity 
 	 */
-	public void setTerminationState(String name, InstantaneousOutput state, float time);
+	public void setModTerminationState(String name, InstantaneousOutput state, float time);
 	
 	/**
 	 * Provides state or functional output, which may serve as an indication of 

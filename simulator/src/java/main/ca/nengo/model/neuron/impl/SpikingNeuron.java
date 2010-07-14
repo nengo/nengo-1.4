@@ -164,6 +164,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	 */
 	public void setMode(SimulationMode mode) {
 		myGenerator.setMode(mode);
+		mySpikeOrigin.setMode(mode);
 	}
 
 	/**

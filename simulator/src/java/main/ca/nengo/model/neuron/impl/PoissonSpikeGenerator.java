@@ -275,7 +275,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		public Node make(String name) throws StructuralException {
 			SynapticIntegrator integrator = new LinearSynapticIntegrator(ourMaxTimeStep, ourCurrentUnits);
 			SpikeGenerator generator = mySpikeGeneratorFactory.make();			
-			return new PlasticExpandableSpikingNeuron(integrator, generator, 1, 0, name);		
+			return new ExpandableSpikingNeuron(integrator, generator, 1, 0, name);		
 		}
 
 		/**
@@ -391,7 +391,7 @@ public class PoissonSpikeGenerator implements SpikeGenerator {
 		public Neuron make(String name) throws StructuralException {			
 			SynapticIntegrator integrator = new LinearSynapticIntegrator(ourMaxTimeStep, ourCurrentUnits);
 			SpikeGenerator generator = mySigmoidFactory.make();			
-			return new PlasticExpandableSpikingNeuron(integrator, generator, 1, 0, name);		
+			return new ExpandableSpikingNeuron(integrator, generator, 1, 0, name);		
 		}
 
 		/**

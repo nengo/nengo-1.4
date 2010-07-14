@@ -46,7 +46,7 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.EnsembleImpl;
+import ca.nengo.model.impl.PlasticEnsembleImpl;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.nef.DecodableEnsemble;
 import ca.nengo.util.MU;
@@ -60,7 +60,7 @@ import ca.nengo.util.impl.TimeSeriesImpl;
  * 
  * @author Bryan Tripp
  */
-public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnsemble {
+public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements DecodableEnsemble {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -164,17 +164,17 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 
 		float [][]values;
 		float []time;
-		if(true)
-		{
+//		if(true)
+//		{
 			TimeSeries filtered = DataUtils.filter(probe.getData(),tau);
 			values = filtered.getValues();
 			time = filtered.getTimes();
-		}
-		else
-		{
-			values = probe.getData().getValues();
-			time = probe.getData().getTimes();
-		}
+//		}
+//		else
+//		{
+//			values = probe.getData().getValues();
+//			time = probe.getData().getTimes();
+//		}
 		int t0 = (int)(Math.ceil((double)time.length/2d));
 		int t1 = time.length;
 		int k;
@@ -329,7 +329,7 @@ public class DecodableEnsembleImpl extends EnsembleImpl implements DecodableEnse
 	public Properties listStates() {
 		Properties result = super.listStates();
 		
-		Iterator it = myDecodedOrigins.keySet().iterator();
+		Iterator<String> it = myDecodedOrigins.keySet().iterator();
 		while (it.hasNext()) {
 			String name = it.next().toString();
 			result.setProperty(name, "Function of NEFEnsemble state"); //TODO: could put function.toString() here

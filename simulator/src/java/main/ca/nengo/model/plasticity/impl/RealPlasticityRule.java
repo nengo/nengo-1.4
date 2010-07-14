@@ -8,7 +8,7 @@ WARRANTY OF ANY KIND, either express or implied. See the License for the specifi
 language governing rights and limitations under the License.
 
 The Original Code is "RealPlasticityRule.java". Description: 
-"A basic implementation of EnsemblePlasticityRule"
+"A basic implementation of PlasticityRule for real valued input"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
@@ -27,19 +27,19 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
-import ca.nengo.math.Function;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.plasticity.PlasticityRule;
 
 /**
- * A basic implementation of EnsemblePlasticityRule. The learning rate is defined by a function of four inputs: 
- * a presynaptic variable, a postsynaptic variable, a transformation weight, and a single modulatory input. The  
- * function is user-defined and may ignore any of these inputs. This learning rate function is applied to each 
- * element of the transformation matrix of the Termination to which this rule applies. In each case, the presynaptic-variable 
+ * A basic implementation of PlasticityRule for real valued input.
+ * 
+ * The learning rate is defined by an AbstractRealLearningFunction (see its declaration for
+ * the inputs it receives). This learning rate function is applied to each In each case, the presynaptic-variable 
  * input to the function is the corresponding dimension of input to the Termination. The postsynaptic variable is taken 
  * as the corresponding dimension of the Origin NEFEnsemble.X. This implementation supports only a single separate 
- * modulatory variable. This is also user-defined, as one dimension of some other Termination onto the same NEFEnsemble.   
+ * modulatory variable, though it can be multi-dimensional. This is also user-defined, as some other Termination
+ * onto the same NEFEnsemble.   
  * 
  * TODO: test
  * 
@@ -49,29 +49,31 @@ public class RealPlasticityRule implements PlasticityRule {
 
 	private static final long serialVersionUID = 1L;
 	
+	private AbstractRealLearningFunction myFunction;
+	
 	private String myModTermName;
-	private int myModTermDim;
-	private Function myFunction;
 	private String myOriginName;
 	
-	private float myModInput;
 	private float[] myModInputArray;
-	private float[] myOriginState;	
+	private float[] myOriginState;
 	
 	/**
-	 * @param modTermName Name of the Termination from which modulatory input is drawn (can be null if not used)
-	 * @param modTermDim Dimension index of the modulatory input within above Termination 
-	 * @param function Four-dimensional function defining the rate of change of transformation matrix weights. The (scalar) 
-	 * 		inputs are presynaptic state, postsynaptic state, existing weight, and modulatory input. This function is 
-	 * 		applied to each element of the transformation matrix on the Termination to which this PlastityRule applies.
-	 * 		See class documentation for more details.     
+	 * @param function AbstractRealLearningFunction defining the rate of change of transformation matrix weights.
 	 * @param originName Name of Origin from which post-synaptic activity is drawn
+	 * @param modTermName Name of the Termination from which modulatory input is drawn (can be null if not used)
 	 */
-	public RealPlasticityRule(String modTermName, int modTermDim, Function function, String originName) {
-		setModTermName(modTermName);
-		setModTermDim(modTermDim);
+	public RealPlasticityRule(AbstractRealLearningFunction function, String originName, String modTermName) {
 		setFunction(function);
 		setOriginName(originName);
+		setModTermName(modTermName);
+	}
+	
+	/**
+	 * @see ca.nengo.model.Resettable#reset(boolean)
+	 */
+	public void reset(boolean randomize) {
+		myOriginState = null;
+		myModInputArray = null;
 	}
 
 	/**
@@ -89,36 +91,17 @@ public class RealPlasticityRule implements PlasticityRule {
 	}
 
 	/**
-	 * @return Dimension index of the modulatory input within above Termination
+	 * @return AbstractRealLearningFunction defining the rate of change of transformation matrix weights.
 	 */
-	public int getModTermDim() {
-		return myModTermDim;
-	}
-	
-	/**
-	 * @param dim Dimension index of the modulatory input within above Termination 
-	 */
-	public void setModTermDim(int dim) {
-		myModTermDim = dim;
-	}
-
-	/**
-	 * @return Four-dimensional function defining the rate of change of transformation matrix weights.
-	 */
-	public Function getFunction() {
+	public AbstractRealLearningFunction getFunction() {
 		return myFunction;
 	}
 	
 	/**
 	 * 
-	 * @param function Four-dimensional function defining the rate of change of transformation matrix weights (as in constructor)
+	 * @param function AbstractRealLearningFunction defining the rate of change of transformation matrix weights (as in constructor)
 	 */
-	public void setFunction(Function function) {
-		if (function.getDimension() != 7) {
-			throw new IllegalArgumentException("Learning rate function has dimension " 
-					+ function.getDimension() + " (should be 7)");
-		}
-		
+	public void setFunction(AbstractRealLearningFunction function) {
 		myFunction = function;
 	}
 	
@@ -137,13 +120,12 @@ public class RealPlasticityRule implements PlasticityRule {
 	}
 	
 	/**
-	 * @see ca.nengo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
+	 * @see ca.nengo.model.plasticity.PlasticityRule#setModTerminationState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
 	 */
-	public void setTerminationState(String name, InstantaneousOutput state, float time) {
+	public void setModTerminationState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myModTermName)) {
 			checkType(state);
 			myModInputArray=((RealOutput) state).getValues();
-			myModInput = myModInputArray[myModTermDim];
 		}
 	}
 
@@ -164,27 +146,34 @@ public class RealPlasticityRule implements PlasticityRule {
 		checkType(input);
 		float[] values = ((RealOutput) input).getValues();
 		float[][] result = new float[transform.length][];
+		
 		if (myModInputArray != null) {
 			for (int i = 0; i < transform.length; i++) {
 				result[i] = new float[transform[i].length];
 				for (int j = 0; j < transform[i].length; j++) {
-					float os = (myOriginState != null) ? myOriginState[i] : 0;
-					result[i][j] = myFunction.map(new float[]{values[j], os, transform[i][j], myModInput,i,j,myModInputArray[i]});
+					for (int k = 0; k < myModInputArray.length; k++) {
+						float os = (myOriginState != null && myOriginState.length > k) ? myOriginState[k] : 0;
+						result[i][j] = myFunction.map(new float[]{values[j],time,
+								transform[i][j],myModInputArray[k],os,i,j,k});
+						
+					}
 				}
 			}
 		} else {
 			for (int i = 0; i < transform.length; i++) {
 				result[i] = new float[transform[i].length];
-					for (int j = 0; j < transform[i].length; j++) {
-						float os = (myOriginState != null) ? myOriginState[i] : 0;
-						result[i][j] = myFunction.map(new float[]{values[j], os, transform[i][j], myModInput,i,j,0});
-					}
-				}	
-			}
+				for (int j = 0; j < transform[i].length; j++) {
+					float os = (myOriginState != null) ? myOriginState[0] : 0;
+					result[i][j] = myFunction.map(new float[]{values[j],time,
+						transform[i][j],os,0,i,j,0});
+				}
+			}	
+		}
 		
 		return result;
 	}
 	
+	// Ensure that InstantaneousOutput is real, not spiking
 	private static void checkType(InstantaneousOutput state) {
 		if (!(state instanceof RealOutput)) {
 			throw new IllegalArgumentException("This rule does not support input of type " + state.getClass().getName());
@@ -195,7 +184,6 @@ public class RealPlasticityRule implements PlasticityRule {
 	public PlasticityRule clone() throws CloneNotSupportedException {
 		RealPlasticityRule result = (RealPlasticityRule) super.clone();
 		result.myFunction = myFunction.clone();
-		result.myOriginState = myOriginState.clone();
 		return result;
 	}
 	

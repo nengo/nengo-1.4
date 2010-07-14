@@ -42,7 +42,7 @@ import ca.nengo.model.Termination;
  * from as many as n of these axons (zero weight is equivalent to no 
  * connection). Sometimes we deal with this set of axons only in terms 
  * of the branches they send to one specific Neuron (a Node-level Termination)
- * but here we deal with all branches (an Emsemble-level Termination). 
+ * but here we deal with all branches (an Ensemble-level Termination). 
  * In either case the spikes transmitted by the axons are the same.</p>  
  * 
  * TODO: test
@@ -55,7 +55,7 @@ public class EnsembleTermination implements Termination {
 	
 	private Node myNode;
 	private String myName;
-	private Termination[] myNodeTerminations;
+	protected Termination[] myNodeTerminations;
 	
 	/**
 	 * @param node The parent Node

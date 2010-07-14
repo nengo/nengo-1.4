@@ -34,14 +34,11 @@ package ca.nengo.model.nef;
 
 import ca.nengo.math.Function;
 import ca.nengo.model.Origin;
-import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.nef.impl.BiasOrigin;
 import ca.nengo.model.nef.impl.BiasTermination;
 import ca.nengo.model.nef.impl.DecodedTermination;
-import ca.nengo.model.plasticity.Plastic;
-import ca.nengo.util.Memory;
 
 /**
  * <p>A group of Nodes that represent a scalar, vector, or function, as 
@@ -51,7 +48,7 @@ import ca.nengo.util.Memory;
  * 
  * @author Bryan Tripp
  */
-public interface NEFEnsemble extends DecodableEnsemble, Plastic {
+public interface NEFEnsemble extends DecodableEnsemble {
 	
 	/**
 	 * Standard name for the Origin corresponding to the decoded estimate of the state variables 
@@ -162,7 +159,6 @@ public interface NEFEnsemble extends DecodableEnsemble, Plastic {
 	 * @param name Name of Termination to remove. 
 	 */
 	public void removeDecodedTermination(String name);
-	
 
 	/**
 	 * Gives the ensemble a reference to the factory used to created it (useful for adding more neurons later)

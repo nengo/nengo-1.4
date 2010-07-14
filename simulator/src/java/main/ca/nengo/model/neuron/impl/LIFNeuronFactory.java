@@ -156,7 +156,7 @@ public class LIFNeuronFactory implements NodeFactory {
 		SynapticIntegrator integrator = new LinearSynapticIntegrator(ourMaxTimeStep, ourCurrentUnits);
 		SpikeGenerator generator = new LIFSpikeGenerator(ourMaxTimeStep, myTauRC, myTauRef);
 		
-		return new PlasticExpandableSpikingNeuron(integrator, generator, scale, bias, name);		
+		return new ExpandableSpikingNeuron(integrator, generator, scale, bias, name);		
 	}
 
 	/**
