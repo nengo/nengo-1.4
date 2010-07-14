@@ -437,6 +437,7 @@ public class DefaultPlotter extends Plotter {
 					
 					((NEFNode) nodes[i]).setRadialInput(radialInput);
 					try {
+						nodes[i].reset(false);
 						nodes[i].run(0f, 0f);
 						RealOutput output = (RealOutput) nodes[i].getOrigin(Neuron.AXON).getValues();
 						series.add(x[j]*radius, output.getValues()[0]);
