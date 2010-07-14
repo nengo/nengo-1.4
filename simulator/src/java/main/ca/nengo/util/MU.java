@@ -245,6 +245,27 @@ public class MU {
 	
 	/**
 	 * @param A Any matrix
+	 * @param B Any matrix the same dimensions as A
+	 * @return A .* B
+	 */
+	public static float[][] prodElementwise(float[][] A, float[][] B) {
+		assert A.length==B.length;
+		assert A[0].length==B[0].length;
+		
+		float[][] result = new float[A.length][];
+		
+		for (int i = 0; i < result.length; i++) {
+			result[i] = new float[B[0].length];
+			for (int j = 0; j < result[i].length; j++) {
+				result[i][j] = A[i][j]*B[i][j];
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * @param A Any matrix
 	 * @param a Any scalar
 	 * @return aA (each element of matrix multiplied by scalar)
 	 */
