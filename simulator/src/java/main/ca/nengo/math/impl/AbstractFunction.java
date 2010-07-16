@@ -36,6 +36,8 @@ import ca.nengo.math.Function;
  */
 public abstract class AbstractFunction implements Function {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String DIMENSION_PROPERTY = "dimension";
 	
 	private int myDim;

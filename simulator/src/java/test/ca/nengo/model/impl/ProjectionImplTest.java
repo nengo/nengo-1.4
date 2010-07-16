@@ -175,8 +175,8 @@ public class ProjectionImplTest extends TestCase {
 		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) > -1e-10);		
 		network.run(-1.5f, 1);
 		Plotter.plot(probe.getData(), "positive non-optimal");
-		float[] positiveNonOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-		float error = getError(reference, positiveNonOptimal);
+//		float[] positiveNonOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
+//		float error = getError(reference, positiveNonOptimal);
 //		assertTrue(error > 1e-10 && error < 5e-4);
 		p.removeBias();	
 		
@@ -186,8 +186,8 @@ public class ProjectionImplTest extends TestCase {
 		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) > -1e-10);		
 		network.run(-1.5f, 1);
 		Plotter.plot(probe.getData(), "positive optimal");
-		float[] positiveOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-		float error2 = getError(reference, positiveOptimal);
+//		float[] positiveOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
+//		float error2 = getError(reference, positiveOptimal);
 //		assertTrue(error2 > 1e-10 && error2 < 2.5e-4 && error2 < error);
 		p.removeBias();				
 	}

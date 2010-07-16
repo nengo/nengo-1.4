@@ -4,14 +4,14 @@
 package ca.nengo.math.impl;
 
 import ca.nengo.TestUtil;
-import ca.nengo.math.CurveFitter;
+//import ca.nengo.math.CurveFitter;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.Polynomial;
 import ca.nengo.math.impl.PolynomialCurveFitter;
-import ca.nengo.model.Units;
-import ca.nengo.plot.Plotter;
-import ca.nengo.util.TimeSeries1D;
-import ca.nengo.util.impl.TimeSeries1DImpl;
+//import ca.nengo.model.Units;
+//import ca.nengo.plot.Plotter;
+//import ca.nengo.util.TimeSeries1D;
+//import ca.nengo.util.impl.TimeSeries1DImpl;
 import junit.framework.TestCase;
 
 /*
@@ -67,8 +67,8 @@ public class PolynomialCurveFitterTest extends TestCase {
 			y[i] = fitted.map(new float[]{x[i]});
 		}
 		
-		TimeSeries1D approx = new TimeSeries1DImpl(x, y, Units.UNK);
-		TimeSeries1D actual = new TimeSeries1DImpl(examplex, exampley, Units.UNK);
+//		TimeSeries1D approx = new TimeSeries1DImpl(x, y, Units.UNK);
+//		TimeSeries1D actual = new TimeSeries1DImpl(examplex, exampley, Units.UNK);
 		
 		for (int i = 0; i < examplex.length; i++) {
 			TestUtil.assertClose(exampley[i], fitted.map(new float[]{examplex[i]}), 0.5f);

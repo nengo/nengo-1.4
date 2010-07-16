@@ -204,7 +204,7 @@ public class ConfigUtil {
 	 * @return Value
 	 * @throws StructuralException If value doesn't belong to specified class
 	 */
-//	public static Object get(Configuration properties, String name, Class c) throws StructuralException {
+//	public static Object get(Configuration properties, String name, Class<?> c) throws StructuralException {
 //		Object o = ((SingleValuedProperty) properties.getProperty(name)).getValue();		
 //		if ( !c.isAssignableFrom(o.getClass()) ) {
 //			throw new StructuralException("Property " + name 
@@ -255,7 +255,7 @@ public class ConfigUtil {
 		
 		Method[] methods = configurable.getClass().getMethods();
 		for (int i = 0; i < methods.length; i++) {
-			Class returnType = methods[i].getReturnType();
+			Class<?> returnType = methods[i].getReturnType();
 			String propName = getPropertyName(methods[i]);
 
 			if (isSingleValueGetter(methods[i]) 
@@ -283,19 +283,19 @@ public class ConfigUtil {
 					&& !result.getPropertyNames().contains(stripSuffix(propName, "es"))) {
 				
 				Property p = null;
-				if (returnType instanceof Class && MainHandler.getInstance().canHandle((Class) returnType)) {
-					p = SingleValuedPropertyImpl.getSingleValuedProperty(result, propName, (Class) returnType);
-				} else if (returnType instanceof Class && ((Class) returnType).isArray()) {
-					p = ListPropertyImpl.getListProperty(result, propName, ((Class) returnType).getComponentType());
+				if (returnType instanceof Class<?> && MainHandler.getInstance().canHandle((Class<?>) returnType)) {
+					p = SingleValuedPropertyImpl.getSingleValuedProperty(result, propName, (Class<?>) returnType);
+				} else if (returnType instanceof Class<?> && ((Class<?>) returnType).isArray()) {
+					p = ListPropertyImpl.getListProperty(result, propName, ((Class<?>) returnType).getComponentType());
 				} else if (returnType instanceof ParameterizedType) {
 					Type rawType = ((ParameterizedType) returnType).getRawType();
 					Type[] typeArgs = ((ParameterizedType) returnType).getActualTypeArguments();
-					if (rawType instanceof Class && List.class.isAssignableFrom((Class) rawType) 
-							&& typeArgs[0] instanceof Class) {
-						p = ListPropertyImpl.getListProperty(result, propName, (Class) typeArgs[0]);
-					} else if (rawType instanceof Class && Map.class.isAssignableFrom((Class) rawType)
-							&& typeArgs[0] instanceof Class && typeArgs[1] instanceof Class) {
-						p = NamedValuePropertyImpl.getNamedValueProperty(result, propName, (Class) typeArgs[1]);						
+					if (rawType instanceof Class<?> && List.class.isAssignableFrom((Class<?>) rawType) 
+							&& typeArgs[0] instanceof Class<?>) {
+						p = ListPropertyImpl.getListProperty(result, propName, (Class<?>) typeArgs[0]);
+					} else if (rawType instanceof Class<?> && Map.class.isAssignableFrom((Class<?>) rawType)
+							&& typeArgs[0] instanceof Class<?> && typeArgs[1] instanceof Class<?>) {
+						p = NamedValuePropertyImpl.getNamedValueProperty(result, propName, (Class<?>) typeArgs[1]);						
 					}
 				}
 				if (p != null) result.defineProperty(p);
@@ -322,8 +322,8 @@ public class ConfigUtil {
 			&& String.class.isAssignableFrom(method.getReturnType().getComponentType());
 		boolean returnsStringList = List.class.isAssignableFrom(method.getReturnType()) 
 			&& (method.getGenericReturnType() instanceof ParameterizedType) 
-			&& ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0] instanceof Class
-			&& String.class.isAssignableFrom((Class) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0]);
+			&& ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0] instanceof Class<?>
+			&& String.class.isAssignableFrom((Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0]);
 		
 		if (name.matches("get.+Names") && (returnsStringArray || returnsStringList)) {
 			return true;
@@ -396,7 +396,7 @@ public class ConfigUtil {
 	}
 	
 	private static boolean isIndexedGetter(Method m) {
-		Class[] paramTypes = m.getParameterTypes();
+		Class<?>[] paramTypes = m.getParameterTypes();
 		if (m.getName().startsWith("get") && paramTypes.length == 1 && paramTypes[0].equals(Integer.TYPE)) {
 			return true;
 		} else {
@@ -405,7 +405,7 @@ public class ConfigUtil {
 	}
 	
 	private static boolean isNamedGetter(Method m) {
-		Class[] paramTypes = m.getParameterTypes();
+		Class<?>[] paramTypes = m.getParameterTypes();
 		if (m.getName().startsWith("get") && paramTypes.length == 1 && paramTypes[0].equals(String.class)) {
 			return true;
 		} else {
@@ -417,7 +417,7 @@ public class ConfigUtil {
 	 * @param c Any class 
 	 * @return Either c or if c is a primitive class (eg Integer.TYPE), the corresponding wrapper class 
 	 */
-	public static Class getPrimitiveWrapperClass(Class c) {
+	public static Class<?> getPrimitiveWrapperClass(Class<?> c) {
 		if (Integer.TYPE.isAssignableFrom(c)) {
 			c = Integer.class;
 		} else if (Float.TYPE.isAssignableFrom(c)) {
@@ -445,7 +445,7 @@ public class ConfigUtil {
 	 * 		handler, otherwise if there is a zero-arg constructor then the result of that 
 	 * 		constructor, otherwise null.  
 	 */
-	public static Object getDefaultValue(Class type) {
+	public static Object getDefaultValue(Class<?> type) {
 		Object result = null;
 		
 		if (MainHandler.getInstance().canHandle(type)) {
@@ -454,7 +454,7 @@ public class ConfigUtil {
 		
 		if (result == null) {
 			Constructor<?>[] constructors = type.getConstructors();
-			Constructor zeroArgConstructor = null;
+			Constructor<?> zeroArgConstructor = null;
 			for (int i = 0; i < constructors.length && zeroArgConstructor == null; i++) {
 				if (constructors[i].getParameterTypes().length == 0) {
 					zeroArgConstructor = constructors[i];
@@ -519,13 +519,13 @@ public class ConfigUtil {
 //		};
 //		
 //		try {
-//			System.out.println(isCounter(foo.getClass().getMethod("toString", new Class[0])));
-//			System.out.println(isCounter(foo.getClass().getMethod("getFooCount", new Class[0])));
-//			System.out.println(isCounter(foo.getClass().getMethod("getNumFoo", new Class[0])));
+//			System.out.println(isCounter(foo.getClass().getMethod("toString", new Class<?>[0])));
+//			System.out.println(isCounter(foo.getClass().getMethod("getFooCount", new Class<?>[0])));
+//			System.out.println(isCounter(foo.getClass().getMethod("getNumFoo", new Class<?>[0])));
 //			
-//			System.out.println(getPropertyName(foo.getClass().getMethod("getAllFoo", new Class[0])));
-//			System.out.println(getPropertyName(foo.getClass().getMethod("getFooArray", new Class[0])));
-//			System.out.println(getPropertyName(foo.getClass().getMethod("getFooList", new Class[0])));
+//			System.out.println(getPropertyName(foo.getClass().getMethod("getAllFoo", new Class<?>[0])));
+//			System.out.println(getPropertyName(foo.getClass().getMethod("getFooArray", new Class<?>[0])));
+//			System.out.println(getPropertyName(foo.getClass().getMethod("getFooList", new Class<?>[0])));
 //		} catch (SecurityException e) {
 //			e.printStackTrace();
 //		} catch (NoSuchMethodException e) {

@@ -31,7 +31,7 @@ import java.util.Properties;
 
 import ca.nengo.math.Function;
 import ca.nengo.math.PDF;
-import ca.nengo.math.PDFTools;
+//import ca.nengo.math.PDFTools;
 import ca.nengo.math.RootFinder;
 import ca.nengo.math.impl.AbstractFunction;
 import ca.nengo.math.impl.IndicatorPDF;

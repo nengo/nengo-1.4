@@ -7,22 +7,22 @@
 
 package ca.nengo.plot;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Image;
+//import java.awt.BorderLayout;
+//import java.awt.GridBagLayout;
+//import java.awt.GridBagConstraints;
+//import java.awt.Image;
 import java.awt.Color;
 import java.awt.geom.*;
 import java.awt.event.*;
-import java.io.IOException;
+//import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.JFrame;
+//import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.imageio.ImageIO;
+//import javax.imageio.ImageIO;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;

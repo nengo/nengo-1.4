@@ -28,10 +28,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.config.handlers;
 
 import java.awt.Component;
-import java.awt.Dimension;
+//import java.awt.Dimension;
 import java.awt.Font;
 
-import javax.swing.JButton;
+//import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
@@ -73,7 +73,7 @@ public class VectorHandler extends MatrixHandlerBase {
 	/**
 	 * @see ca.nengo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
 	 */
-	public Object getDefaultValue(Class c) {
+	public Object getDefaultValue(Class<?> c) {
 		return new float[0];
 	}
 

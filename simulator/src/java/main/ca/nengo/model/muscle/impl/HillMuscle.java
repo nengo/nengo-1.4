@@ -202,6 +202,8 @@ public class HillMuscle extends SkeletalMuscleImpl {
 			//find velocity corresponding to this multiplier
 			final Function fv = myCEForceVelocity;
 			Function f = new AbstractFunction(1) {
+				private static final long serialVersionUID = 1L;
+
 				public float map(float[] from) {
 					float result = fv.map(from) - vm; 
 					//System.out.println("from: " + from[0] + " result: " + result);

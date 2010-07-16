@@ -67,9 +67,9 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	 * @param type Parameter type
 	 * @return Property or null if the necessary methods don't exist on the underlying class  
 	 */
-	public static NamedValueProperty getNamedValueProperty(Configuration configuration, String name, Class type) {		
+	public static NamedValueProperty getNamedValueProperty(Configuration configuration, String name, Class<?> type) {		
 		NamedValuePropertyImpl result = null;
-		Class targetClass = configuration.getConfigurable().getClass();
+		Class<?> targetClass = configuration.getConfigurable().getClass();
 		
 		String uname = Character.toUpperCase(name.charAt(0)) + name.substring(1);
 		String[] getterNames = new String[]{"get"+uname};
@@ -107,7 +107,7 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	}
 
 	//constructor used by factory method
-	private NamedValuePropertyImpl(Configuration configuration, String name, Class c) {
+	private NamedValuePropertyImpl(Configuration configuration, String name, Class<?> c) {
 		super(configuration, name, c, false);
 		myTarget = configuration.getConfigurable();
 	}
@@ -119,7 +119,7 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	 * @param getter A method on type c with a String argument that returns the named property value 
 	 * @param namesGetter A zero-argument method on type c that returns a String array with names of the property values 
 	 */
-	public NamedValuePropertyImpl(Configuration configuration, String name, Class c, Method getter, Method namesGetter) {
+	public NamedValuePropertyImpl(Configuration configuration, String name, Class<?> c, Method getter, Method namesGetter) {
 		this(configuration, name, c);
 		myGetter = getter;
 		myNamesGetter = namesGetter;
@@ -133,7 +133,7 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	 * @param c Parameter type
 	 * @param mapGetter A zero-argument method on type c that returns a Map<String, c> containing values of the property
 	 */
-	public NamedValuePropertyImpl(Configuration configuration, String name, Class c, Method mapGetter) {
+	public NamedValuePropertyImpl(Configuration configuration, String name, Class<?> c, Method mapGetter) {
 		this(configuration, name, c);
 		myMapGetter = mapGetter;
 		
@@ -161,7 +161,7 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	 * @param remover A method that removes a value by name; arg types {String} 
 	 */
 	public void setModifiers(Method setter, Method remover) {
-		Class[] setterParamTypes = setter.getParameterTypes();
+		Class<?>[] setterParamTypes = setter.getParameterTypes();
 		if (setterParamTypes.length == 1 && getType().isAssignableFrom(setterParamTypes[1]) && myNameGetterOnType != null) {
 			myUnnamedSetter = setter;
 		} else if (setterParamTypes.length == 2 && String.class.isAssignableFrom(setterParamTypes[0]) 
@@ -194,7 +194,7 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 			if (myGetter != null) {
 				result = invoke(myTarget, myGetter, new Object[]{name});
 			} else if (myMapGetter != null) {
-				Map map = (Map) invoke(myTarget, myMapGetter, new Object[0]);
+				Map<?,?> map = (Map<?,?>) invoke(myTarget, myMapGetter, new Object[0]);
 				result = map.get(name);
 			} else if (myArrayGetter != null) {
 				Object array = invoke(myTarget, myArrayGetter, new Object[0]);
@@ -219,6 +219,7 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 	/**
 	 * @see ca.nengo.config.NamedValueProperty#getValueNames()
 	 */
+	@SuppressWarnings("unchecked")
 	public List<String> getValueNames() {
 		List<String> result = new ArrayList<String>(10);
 		
@@ -263,7 +264,7 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 		if (myRemover != null) {
 			invoke(myTarget, myRemover, new Object[]{name});
 		} else if (myMapGetter != null) {
-			Map map = (Map) invoke(myTarget, myMapGetter, new Object[0]);
+			Map<?,?> map = (Map<?,?>) invoke(myTarget, myMapGetter, new Object[0]);
 			map.remove(name);
 		} else {
 			if (!isMutable()) {
@@ -275,11 +276,12 @@ public class NamedValuePropertyImpl extends AbstractProperty implements NamedVal
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setValue(String name, Object value) throws StructuralException {
 		if (myNamedSetter != null) {
 			invoke(myTarget, myNamedSetter, new Object[]{name, value});
 		} else if (myMapGetter != null) {
-			Map map = (Map) invoke(myTarget, myMapGetter, new Object[0]);
+			Map<String, Object> map = (Map<String, Object>) invoke(myTarget, myMapGetter, new Object[0]);
 			map.put(name, value);
 		} else if (myUnnamedSetter != null) {
 			invoke(myTarget, myUnnamedSetter, new Object[]{value});

@@ -48,7 +48,7 @@ public class TemplateProperty extends AbstractProperty implements SingleValuedPr
 	 * @param c Type of the property value
 	 * @param defaultValue Default property value
 	 */
-	public TemplateProperty(Configuration configuration, String name, Class c, Object defaultValue) {
+	public TemplateProperty(Configuration configuration, String name, Class<?> c, Object defaultValue) {
 		super(configuration, name, c, true);
 		myValue = defaultValue;
 	}

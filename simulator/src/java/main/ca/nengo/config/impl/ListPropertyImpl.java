@@ -80,9 +80,9 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	 * @param type Parameter type
 	 * @return Property or null if the necessary methods don't exist on the underlying class  
 	 */
-	public static ListProperty getListProperty(Configuration configuration, String name, Class type) {
+	public static ListProperty getListProperty(Configuration configuration, String name, Class<?> type) {
 		ListPropertyImpl result = null;
-		Class targetClass = configuration.getConfigurable().getClass();
+		Class<?> targetClass = configuration.getConfigurable().getClass();
 		
 		String uname = Character.toUpperCase(name.charAt(0)) + name.substring(1);
 		String[] getterNames = new String[]{"get"+uname};
@@ -118,7 +118,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	}
 	
 	//looks for defined method; returns null if no match (no exception thrown)
-	public static Method getMethod(Class c, String[] names, Class[] argTypes, Class returnType) {
+	public static Method getMethod(Class<?> c, String[] names, Class<?>[] argTypes, Class<?> returnType) {
 		Method result = null;
 		
 		Method[] methods = c.getMethods();
@@ -136,7 +136,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	}
 	
 	//checks that two lists of classes are the same
-	private static boolean typesCompatible(Class[] a, Class[] b) {
+	private static boolean typesCompatible(Class<?>[] a, Class<?>[] b) {
 		boolean match = a.length == b.length;
 		
 		for (int i = 0; i < a.length && match; i++) {
@@ -149,7 +149,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	}
 	
 	//used by factory method
-	private ListPropertyImpl(Configuration configuration, String name, Class c) {
+	private ListPropertyImpl(Configuration configuration, String name, Class<?> c) {
 		super(configuration, name, c, false);
 		myTarget = configuration.getConfigurable();
 	}
@@ -161,7 +161,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	 * @param listGetter A method on the underlying class (the configuration target; not c) that 
 	 * 		returns multiple values of the property, as either an array of c or a list of c.   
 	 */
-	public ListPropertyImpl(Configuration configuration, String name, Class c, Method listGetter) {
+	public ListPropertyImpl(Configuration configuration, String name, Class<?> c, Method listGetter) {
 		super(configuration, name, c, false);
 		myTarget = configuration.getConfigurable();
 		
@@ -181,7 +181,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	 * @param countGetter A method on the underlying class that returns the number of 
 	 * 		values of the property
 	 */
-	public ListPropertyImpl(Configuration configuration, String name, Class c, Method getter, Method countGetter) {
+	public ListPropertyImpl(Configuration configuration, String name, Class<?> c, Method getter, Method countGetter) {
 		super(configuration, name, c, false);
 		myTarget = configuration.getConfigurable();
 		myGetter = getter;
@@ -426,9 +426,10 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 		}		
 	}
 
-	private static List getList(Object target, Method listGetter) {
+	@SuppressWarnings("unchecked")
+	private static List<Object> getList(Object target, Method listGetter) {
 		try {
-			return (List) listGetter.invoke(target, new Object[0]);
+			return (List<Object>) listGetter.invoke(target, new Object[0]);
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {

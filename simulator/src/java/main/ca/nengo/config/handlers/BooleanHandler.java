@@ -86,7 +86,7 @@ public class BooleanHandler extends BaseHandler {
 	/**
 	 * @see ca.nengo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
 	 */
-	public Object getDefaultValue(Class c) {
+	public Object getDefaultValue(Class<?> c) {
 		return new Boolean(false);
 	}
 	

@@ -37,6 +37,8 @@ import ca.nengo.model.Units;
  */
 public abstract class AbstractDynamicalSystem implements DynamicalSystem {
 
+	private static final long serialVersionUID = 1L;
+	
 	private float[] myState;
 	
 	public AbstractDynamicalSystem(float[] state) {

@@ -20,7 +20,7 @@ import ca.nengo.config.ui.MatrixEditor;
 
 public abstract class MatrixHandlerBase extends BaseHandler {
 
-	public MatrixHandlerBase(Class c) {
+	public MatrixHandlerBase(Class<?> c) {
 		super(c);
 	}
 

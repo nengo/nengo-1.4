@@ -12,7 +12,7 @@ import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
 import ca.nengo.model.SimulationException;
-import ca.nengo.model.SimulationMode;
+//import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
@@ -23,7 +23,7 @@ import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.plot.Plotter;
 import ca.nengo.sim.Simulator;
-import ca.nengo.sim.impl.LocalSimulator;
+//import ca.nengo.sim.impl.LocalSimulator;
 import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
 

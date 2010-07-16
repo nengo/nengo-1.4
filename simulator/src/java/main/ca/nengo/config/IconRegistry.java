@@ -69,7 +69,7 @@ public class IconRegistry {
 	private static Logger ourLogger = Logger.getLogger(IconRegistry.class);
 	private static IconRegistry ourInstance;
 	
-	private List<Class> myIconClasses;
+	private List<Class<?>> myIconClasses;
 	private List<Icon> myIcons;
 	
 	/**
@@ -126,7 +126,7 @@ public class IconRegistry {
 	}
 	
 	private IconRegistry() {
-		myIconClasses = new ArrayList<Class>(10);
+		myIconClasses = new ArrayList<Class<?>>(10);
 		myIcons = new ArrayList<Icon>(10);
 	}
 	
@@ -142,7 +142,7 @@ public class IconRegistry {
 	 * @param c Class of object
 	 * @return An icon to use in displaying objects of the given class
 	 */
-	public Icon getIcon(Class c) {
+	public Icon getIcon(Class<?> c) {
 		Icon result = null;
 		for (int i = 0; result == null && i < myIconClasses.size(); i++) {
 			if (myIconClasses.get(i).isAssignableFrom(c)) {
@@ -161,7 +161,7 @@ public class IconRegistry {
 	 * @param c A class
 	 * @param icon An Icon to use for objects of the given class 
 	 */
-	public void setIcon(Class c, Icon icon) {
+	public void setIcon(Class<?> c, Icon icon) {
 		myIconClasses.add(c);
 		myIcons.add(icon);
 	}
@@ -171,7 +171,7 @@ public class IconRegistry {
 	 * @param path Path to an image file from which to make an Icon for objects of the 
 	 * 		given class
 	 */
-	public void setIcon(Class c, String path) {
+	public void setIcon(Class<?> c, String path) {
 		myIconClasses.add(c);
 		myIcons.add(createImageIcon(path, ""));		
 	}

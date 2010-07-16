@@ -165,6 +165,7 @@ public class BiasOrigin extends DecodedOrigin {
 		}
 		
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl() { 
+			private static final long serialVersionUID = 1L;
 			protected void addDefaultOrigins(NEFEnsemble ensemble) {} //wait until some neurons are adjusted
 		};
 		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory(), true));

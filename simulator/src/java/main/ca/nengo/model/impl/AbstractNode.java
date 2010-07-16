@@ -50,6 +50,8 @@ import ca.nengo.util.VisiblyMutableUtils;
  */
 public abstract class AbstractNode implements Node {
 
+	private static final long serialVersionUID = 1L;
+	
 	private String myName;
 	private SimulationMode myMode;
 	private Map<String, Origin> myOrigins;

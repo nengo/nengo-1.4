@@ -5,7 +5,7 @@ package ca.nengo.math.impl;
 
 import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
-import ca.nengo.math.RootFinder;
+//import ca.nengo.math.RootFinder;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.math.impl.FourierFunction;
 import ca.nengo.math.impl.IdentityFunction;

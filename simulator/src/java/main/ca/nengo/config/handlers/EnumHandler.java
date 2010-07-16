@@ -44,7 +44,7 @@ import ca.nengo.config.ui.ConfigurationChangeListener;
  */
 public class EnumHandler extends BaseHandler {
 
-	private Enum myDefaultValue;
+	private Enum<?> myDefaultValue;
 	
 	/**
 	 * Defaults to type Enum with null default value. 
@@ -57,15 +57,16 @@ public class EnumHandler extends BaseHandler {
 	 * @param type Type handled by this handler
 	 * @param defaultValue Default value for this handler
 	 */
-	public EnumHandler(Class type, Enum defaultValue) {
+	public EnumHandler(Class<?> type, Enum<?> defaultValue) {
 		super(type);
 		myDefaultValue = defaultValue;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
-		Enum mode = (Enum) o;
-		List<? extends Enum> all = new ArrayList<Enum>(EnumSet.allOf(mode.getClass()));
+		Enum<?> mode = (Enum<?>) o;
+		List<? extends Enum<?>> all = new ArrayList<Enum<?>>(EnumSet.allOf(mode.getClass()));
 		
 		final JComboBox result = new JComboBox(all.toArray());
 		result.setSelectedItem(mode);
@@ -88,7 +89,7 @@ public class EnumHandler extends BaseHandler {
 	/**
 	 * @see ca.nengo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
 	 */
-	public Object getDefaultValue(Class c) {
+	public Object getDefaultValue(Class<?> c) {
 		return myDefaultValue;
 	}
 

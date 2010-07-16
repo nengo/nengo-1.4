@@ -111,7 +111,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 					final JMenuItem replaceValueItem = new JMenuItem("Replace");
 					replaceValueItem.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							Class currentType = ((Value) path.getLastPathComponent()).getObject().getClass();
+							Class<?> currentType = ((Value) path.getLastPathComponent()).getObject().getClass();
 							Object o = NewConfigurableDialog.showDialog(replaceValueItem, p.getType(), currentType);
 							if (o != null) {
 								try {
@@ -189,7 +189,7 @@ public class ConfigurationTreePopupListener extends MouseAdapter {
 		}
 	}
 	
-	private Object getValue(Class type) {
+	private Object getValue(Class<?> type) {
 		Object result = ConfigUtil.getDefaultValue(type);
 		if (result == null) {
 			result = NewConfigurableDialog.showDialog(myTree, type, null);

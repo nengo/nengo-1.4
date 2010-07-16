@@ -3,7 +3,7 @@
  */
 package ca.nengo.model.muscle.impl;
 
-import ca.nengo.dynamics.impl.AbstractDynamicalSystem;
+//import ca.nengo.dynamics.impl.AbstractDynamicalSystem;
 import junit.framework.TestCase;
 
 /**
@@ -20,36 +20,37 @@ public class LinkSegmentModelImplTest extends TestCase {
 		
 	}
 	
-	private static class UpperLimbDynamics extends AbstractDynamicalSystem {
-
-		public UpperLimbDynamics() {
-			super(new float[]{0, 0});
-		}		
-		
-
-		public float[] f(float t, float[] u) {
-			return null;
-		}
-
-		public float[] g(float t, float[] u) {
-			return null;
-		}
-
-		/**
-		 * shoulder flexor; shoulder extensor; elbow flexor; elbow extensor 
-		 */
-		public int getInputDimension() {
-			return 4;
-		}
-
-		/**
-		 * shoulder angle from vertical; elbow angle from straight 
-		 */
-		public int getOutputDimension() {
-			return 2;
-		}
-		
-	}
+//	private static class UpperLimbDynamics extends AbstractDynamicalSystem {
+//		private static final long serialVersionUID = 1L;
+//
+//		public UpperLimbDynamics() {
+//			super(new float[]{0, 0});
+//		}		
+//		
+//
+//		public float[] f(float t, float[] u) {
+//			return null;
+//		}
+//
+//		public float[] g(float t, float[] u) {
+//			return null;
+//		}
+//
+//		/**
+//		 * shoulder flexor; shoulder extensor; elbow flexor; elbow extensor 
+//		 */
+//		public int getInputDimension() {
+//			return 4;
+//		}
+//
+//		/**
+//		 * shoulder angle from vertical; elbow angle from straight 
+//		 */
+//		public int getOutputDimension() {
+//			return 2;
+//		}
+//		
+//	}
 	
 	public static void main(String[] args) {
 		(new LinkSegmentModelImplTest()).testRun();

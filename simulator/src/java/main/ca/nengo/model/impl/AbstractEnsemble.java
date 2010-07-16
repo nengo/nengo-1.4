@@ -29,7 +29,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
-import java.io.Serializable;
+//import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -378,7 +378,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		while (it.hasNext()) {
 			String name = it.next();
 			List<Origin> group = groups.get(name);
-			result.add(new EnsembleOrigin(parent, name, (Origin[]) group.toArray(new Origin[0])));
+			result.add(new EnsembleOrigin(parent, name, group.toArray(new Origin[0])));
 		}
 		
 		return result.toArray(new Origin[0]);
@@ -477,7 +477,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		for (int i = 0; i < nodes.length; i++) {
 			if (nodes[i] instanceof Probeable) {
 				Properties p = ((Probeable) nodes[i]).listStates();
-				Iterator keys = p.keySet().iterator();
+				Iterator<Object> keys = p.keySet().iterator();
 				while (keys.hasNext()) {
 					String key = keys.next().toString();
 					if (!result.containsKey(key)) {

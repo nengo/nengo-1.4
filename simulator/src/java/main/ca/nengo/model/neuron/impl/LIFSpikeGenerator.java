@@ -30,7 +30,7 @@ package ca.nengo.model.neuron.impl;
 import java.util.Properties;
 
 import ca.nengo.math.PDF;
-import ca.nengo.math.PDFTools;
+//import ca.nengo.math.PDFTools;
 import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Probeable;
@@ -70,7 +70,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 	
 	private float myVoltage;
 	private float myTimeSinceLastSpike;
-	private float myTauRefNext; //varies randomly to avoid bias and synchronized variations due to floating point comparisons
+//	private float myTauRefNext; //varies randomly to avoid bias and synchronized variations due to floating point comparisons
 	
 	private float myPreviousVoltage; //for linear interpolation of when spike occurs
 	
@@ -112,7 +112,7 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		setMaxTimeStep(maxTimeStep); 
 		myTauRC = tauRC;
 		myTauRef = tauRef;
-		myTauRefNext = tauRef;
+//		myTauRefNext = tauRef;
 		myInitialVoltage = initialVoltage;
 		myPreviousVoltage = myInitialVoltage;
 		
@@ -190,52 +190,52 @@ public class LIFSpikeGenerator implements SpikeGenerator, Probeable {
 		return result;
 	}
 	
-	private boolean doSpikingRun(float[] time, float[] current) {
-		if (time.length < 2) {
-			throw new IllegalArgumentException("Arg time must have length at least 2");
-		}
-		if (time.length != current.length) {
-			throw new IllegalArgumentException("Args time and current must have equal length");
-		}
-		
-		float len = time[time.length - 1] - time[0];
-		int steps = (int) Math.ceil(len / myMaxTimeStep);
-		float dt = len / steps;
-		
-		myTime = new float[steps];
-		myVoltageHistory = new float[steps];
-//		mySpikeTimes = new ArrayList(10);
-		
-		int inputIndex = 0;
-
-		boolean spiking = false;
-		for (int i = 0; i < steps; i++) {
-			myTime[i] = time[0] + i*dt;
-
-			while (time[inputIndex+1] <= myTime[i]) {
-				inputIndex++; 
-			}			 
-			float I = current[inputIndex];
-			   
-			float dV = (1 / myTauRC) * (I*R - myVoltage);			 
-			myTimeSinceLastSpike = myTimeSinceLastSpike + dt;
-			if (myTimeSinceLastSpike < myTauRefNext) {
-				dV = 0;
-			}			
-			myVoltage = Math.max(0, myVoltage + dt*dV);
-			myVoltageHistory[i] = myVoltage;
-			
-			if (myVoltage > Vth) {
-				spiking = true;
-				myTimeSinceLastSpike = 0;
-				myVoltage = 0;		
-				myTauRefNext = myTauRef + myMaxTimeStep - 2 * (float) PDFTools.random() * myMaxTimeStep;
-//				mySpikeTimes.add(new Float(myTime[i]));
-			}
-		}
-		
-		return spiking;	
-	}
+//	private boolean doSpikingRun(float[] time, float[] current) {
+//		if (time.length < 2) {
+//			throw new IllegalArgumentException("Arg time must have length at least 2");
+//		}
+//		if (time.length != current.length) {
+//			throw new IllegalArgumentException("Args time and current must have equal length");
+//		}
+//		
+//		float len = time[time.length - 1] - time[0];
+//		int steps = (int) Math.ceil(len / myMaxTimeStep);
+//		float dt = len / steps;
+//		
+//		myTime = new float[steps];
+//		myVoltageHistory = new float[steps];
+////		mySpikeTimes = new ArrayList(10);
+//		
+//		int inputIndex = 0;
+//
+//		boolean spiking = false;
+//		for (int i = 0; i < steps; i++) {
+//			myTime[i] = time[0] + i*dt;
+//
+//			while (time[inputIndex+1] <= myTime[i]) {
+//				inputIndex++; 
+//			}			 
+//			float I = current[inputIndex];
+//			   
+//			float dV = (1 / myTauRC) * (I*R - myVoltage);			 
+//			myTimeSinceLastSpike = myTimeSinceLastSpike + dt;
+//			if (myTimeSinceLastSpike < myTauRefNext) {
+//				dV = 0;
+//			}			
+//			myVoltage = Math.max(0, myVoltage + dt*dV);
+//			myVoltageHistory[i] = myVoltage;
+//			
+//			if (myVoltage > Vth) {
+//				spiking = true;
+//				myTimeSinceLastSpike = 0;
+//				myVoltage = 0;		
+//				myTauRefNext = myTauRef + myMaxTimeStep - 2 * (float) PDFTools.random() * myMaxTimeStep;
+////				mySpikeTimes.add(new Float(myTime[i]));
+//			}
+//		}
+//		
+//		return spiking;	
+//	}
 
 	private float doPreciseSpikingRun(float[] time, float[] current) {
 		if (time.length < 2) {

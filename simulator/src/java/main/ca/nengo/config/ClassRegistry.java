@@ -58,7 +58,7 @@ public class ClassRegistry {
 	public static final String TYPES_LOCATION_PROPERTY = "ca.nengo.config.types";
 	public static final String IMPLS_LOCATION_PROPERTY = "ca.nengo.config.implementations";
 	
-	private Map<Class, List<Class>> myImplementations; 
+	private Map<Class<?>, List<Class<?>>> myImplementations; 
 	
 	/**
 	 * @return Shared instance
@@ -71,12 +71,12 @@ public class ClassRegistry {
 	}
 	
 	private ClassRegistry() {
-		myImplementations = new HashMap<Class, List<Class>>(100);
+		myImplementations = new HashMap<Class<?>, List<Class<?>>>(100);
 
 		String[] types = loadList(System.getProperty(TYPES_LOCATION_PROPERTY, "ca/nengo/config/types.txt"));
 		for (int i = 0; i < types.length; i++) {
 			try {
-				Class type = Class.forName(types[i]);
+				Class<?> type = Class.forName(types[i]);
 				addRegisterableType(type);
 			} catch (ClassNotFoundException e) {
 				ourLogger.warn("Can't add type " + types[i], e);
@@ -120,8 +120,8 @@ public class ClassRegistry {
 	 *   
 	 * @param type Type at bottom of hierarchy 
 	 */
-	public void addHierarchy(Class type) {
-		Class c = type;
+	public void addHierarchy(Class<?> type) {
+		Class<?> c = type;
 		while (c != null) {
 			addRegisterableType(c);
 			c = c.getSuperclass();
@@ -134,16 +134,16 @@ public class ClassRegistry {
 	 * 
 	 * @param type Type to add to list of registerable types
 	 */
-	public void addRegisterableType(Class type) {
+	public void addRegisterableType(Class<?> type) {
 		if (!myImplementations.containsKey(type)) {
-			myImplementations.put(type, new ArrayList<Class>(10));
+			myImplementations.put(type, new ArrayList<Class<?>>(10));
 		}
 	}
 	
 	/**
 	 * @return The list of types whose implementations can be registered
 	 */
-	public Class[] getRegisterableTypes() {
+	public Class<?>[] getRegisterableTypes() {
 		return myImplementations.keySet().toArray(new Class[0]);
 	}
 	
@@ -153,12 +153,12 @@ public class ClassRegistry {
 	 * 
 	 * @param implementation Class to register as an implementation of matching registerable types
 	 */
-	public void register(Class implementation) {
+	public void register(Class<?> implementation) {
 		int mods = implementation.getModifiers();
 		if (!Modifier.isAbstract(mods) && !Modifier.isPrivate(mods)) {
-			Iterator<Class> knownTypes = myImplementations.keySet().iterator();
+			Iterator<Class<?>> knownTypes = myImplementations.keySet().iterator();
 			while (knownTypes.hasNext()) {
-				Class knownType = knownTypes.next();
+				Class<?> knownType = knownTypes.next();
 				if (knownType.isAssignableFrom(implementation)) {
 					myImplementations.get(knownType).add(implementation);
 				}
@@ -173,7 +173,7 @@ public class ClassRegistry {
 	 * @throws ClassNotFoundException
 	 */
 	public void register(String implementationName) throws ClassNotFoundException {
-		Class implementation = Class.forName(implementationName);
+		Class<?> implementation = Class.forName(implementationName);
 		register(implementation);
 	}
 	
@@ -201,8 +201,8 @@ public class ClassRegistry {
 	 * @param type A registerable type
 	 * @return A list of registered implementations of the given type (empty if type is unknown)
 	 */
-	public List<Class> getImplementations(Class type) {
-		List<Class> result = new ArrayList<Class>(20);
+	public List<Class<?>> getImplementations(Class<?> type) {
+		List<Class<?>> result = new ArrayList<Class<?>>(20);
 		
 		if (myImplementations.containsKey(type)) {
 			result.addAll(myImplementations.get(type));

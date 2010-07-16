@@ -5,10 +5,10 @@ import ca.nengo.math.Function;
 import ca.nengo.math.impl.FourierFunction;
 import ca.nengo.math.impl.GradientDescentApproximator;
 import ca.nengo.math.impl.GradientDescentApproximator.Constraints;
-import ca.nengo.model.Units;
-import ca.nengo.plot.Plotter;
-import ca.nengo.util.MU;
-import ca.nengo.util.impl.TimeSeries1DImpl;
+//import ca.nengo.model.Units;
+//import ca.nengo.plot.Plotter;
+//import ca.nengo.util.MU;
+//import ca.nengo.util.impl.TimeSeries1DImpl;
 import junit.framework.TestCase;
 
 /**
@@ -47,6 +47,7 @@ public class GradientDescentApproximatorTest extends TestCase {
 		}
 		
 		GradientDescentApproximator.Constraints constraints = new GradientDescentApproximator.Constraints() {
+			private static final long serialVersionUID = 1L;
 			public boolean correct(float[] coefficients) {
 				boolean allCorrected = true;
 				for (int i = 0; i < coefficients.length; i++) {
@@ -90,6 +91,7 @@ public class GradientDescentApproximatorTest extends TestCase {
 	public void testMaxIterations() {
 		
 		GradientDescentApproximator.Constraints constraints = new GradientDescentApproximator.Constraints() {
+			private static final long serialVersionUID = 1L;
 			public boolean correct(float[] coefficients) {
 				return true;
 			}
@@ -111,6 +113,7 @@ public class GradientDescentApproximatorTest extends TestCase {
 	public void testTolerance() {
 		
 		GradientDescentApproximator.Constraints constraints = new GradientDescentApproximator.Constraints() {
+			private static final long serialVersionUID = 1L;
 			public boolean correct(float[] coefficients) {
 				return true;
 			}

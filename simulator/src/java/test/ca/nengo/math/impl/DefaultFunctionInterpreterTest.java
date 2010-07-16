@@ -3,6 +3,7 @@
  */
 package ca.nengo.math.impl;
 
+import java.io.Serializable;
 import java.util.List;
 
 import ca.nengo.TestUtil;
@@ -10,7 +11,7 @@ import ca.nengo.math.Function;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.math.impl.DefaultFunctionInterpreter;
 import ca.nengo.math.impl.PostfixFunction;
-import ca.nengo.math.impl.SineFunction;
+//import ca.nengo.math.impl.SineFunction;
 
 import junit.framework.TestCase;
 
@@ -24,7 +25,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		DefaultFunctionInterpreter interpreter = new DefaultFunctionInterpreter();
 		interpreter.registerFunction("const", c);
 		PostfixFunction f = (PostfixFunction) interpreter.parse("const(x0, x1)", 2);
-		List l = f.getExpressionList();
+		List<Serializable> l = f.getExpressionList();
 		assertEquals(new Integer(0), l.get(0));
 		assertEquals(new Integer(1), l.get(1));
 		assertEquals(c, l.get(2));
@@ -42,7 +43,7 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		float tolerance = .0001f;
 		DefaultFunctionInterpreter interpreter = new DefaultFunctionInterpreter();
 		Function f = null;
-		List l = null;
+		List<Serializable> l = null;
 		
 		// basic binary cases ...
 		f = interpreter.parse("x0 + x1", 2);

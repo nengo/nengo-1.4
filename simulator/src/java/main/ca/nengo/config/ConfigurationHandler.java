@@ -56,7 +56,7 @@ public interface ConfigurationHandler {
 	 * @param c A Class 
 	 * @return True if this handler can handle values of the given class
 	 */
-	public boolean canHandle(Class c);
+	public boolean canHandle(Class<?> c);
 	
 	/**
 	 * @param o An object for which canHandle(o.getClass()) == true 
@@ -95,6 +95,6 @@ public interface ConfigurationHandler {
 	 * @param c A class for which canHandle(c) == true
 	 * @return A default value of the given class
 	 */
-	public Object getDefaultValue(Class c);
+	public Object getDefaultValue(Class<?> c);
 
 }

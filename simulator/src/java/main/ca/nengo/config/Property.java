@@ -44,7 +44,7 @@ public interface Property {
 	/**
 	 * @return Class to which values belong
 	 */
-	public Class getType();
+	public Class<?> getType();
 	
 	/**
 	 * @return True if values can be changed after construction of the Configurable

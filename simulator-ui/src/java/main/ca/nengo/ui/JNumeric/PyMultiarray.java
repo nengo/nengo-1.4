@@ -9,10 +9,11 @@
 */
 
 package ca.nengo.ui.JNumeric;
+
 import org.python.core.*;
 import java.lang.reflect.Array;
 import java.lang.Math;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.Comparator;
 import java.io.UnsupportedEncodingException;
 
@@ -115,7 +116,7 @@ public class PyMultiarray extends PySequence {
     }
 
 
-    private static char arrayClassToType(Class klass) {
+    private static char arrayClassToType(Class<?> klass) {
 	if (klass.isArray())
 	    return arrayClassToType(klass.getComponentType());
 	return classToType(klass);
@@ -123,7 +124,7 @@ public class PyMultiarray extends PySequence {
 
     private static int [] arrayDataToShape(Object data, int depth) {
 	int length = Array.getLength(data);
-	Class klass = data.getClass().getComponentType();
+	Class<?> klass = data.getClass().getComponentType();
 	// If data is an array of arrays:
 	if (length != 0 && klass.isArray()) {
 	    int [] shape = arrayDataToShape(Array.get(data, 0), depth+1);
@@ -146,7 +147,7 @@ public class PyMultiarray extends PySequence {
     }
 
     private static int arrayDataToFlat(Object data, Object flat, int offset) {
-	Class klass = data.getClass().getComponentType();
+    	Class<?> klass = data.getClass().getComponentType();
 	int length = Array.getLength(data);
 	if (klass.isArray()) {
 	    for (int i = 0; i < length; i++)
@@ -276,7 +277,7 @@ public class PyMultiarray extends PySequence {
 	PyMultiarray flatResult = reshape(result, new int [] {-1});
 	PyObject [] args = new PyObject[0];
 	String [] keywords = new String[0];
-	Class objectArray = args.getClass();
+	Class<?> objectArray = args.getClass();
 	for (int i = 0; i < flatResult.dimensions[0]; i++) {
 	    args = (PyObject[])((PyMultiarray)flatIndex.get(i)).tolist().__tojava__(objectArray);
 	    flatResult.set(i, function.__call__(args, keywords));
@@ -462,10 +463,8 @@ public class PyMultiarray extends PySequence {
 	for (int j = 0; j < stride; j++)
 	    ia[j] = new IndexedArray();
 	// Create a comparator that sorts an IndexArray
-	Comparator comp = new Comparator() {
-		public int compare(Object o1, Object o2) {
-		    IndexedArray ia1 = (IndexedArray) o1;
-		    IndexedArray ia2 = (IndexedArray) o2;
+	Comparator<IndexedArray> comp = new Comparator<IndexedArray>() {
+		public int compare(IndexedArray ia1, IndexedArray ia2) {
 		    if (ia1.item.equals(ia2.item)) return 0;
 		    double d1 = ia1.item.doubleValue();
 		    double d2 = ia2.item.doubleValue();
@@ -1010,7 +1009,7 @@ public class PyMultiarray extends PySequence {
     }
 
     /** Return a Java Class that matches typecode.*/
-    private final static Class typeToClass(char typecode) {
+    private final static Class<?> typeToClass(char typecode) {
 	switch (typecode) {
 	case '1': return Byte.TYPE;
 	case 's': return Short.TYPE;
@@ -1027,7 +1026,7 @@ public class PyMultiarray extends PySequence {
     }
 
     /** Return a typecode that matches the given Java class*/
-    private final static char classToType(Class klass) {
+    private final static char classToType(Class<?> klass) {
 	if (klass.equals(Byte.TYPE)) return '1';
 	if (klass.equals(Short.TYPE)) return 's';
 	if (klass.equals(Integer.TYPE)) return 'i';
@@ -1200,8 +1199,9 @@ public class PyMultiarray extends PySequence {
     //
 
     /** Convert <code>this</code> to a java object of Class <code>c</code>.*/
-    public Object __tojava__(Class c) {
-	Class type = typeToClass(_typecode);
+    @SuppressWarnings("unchecked")
+	public Object __tojava__(Class c) {
+    	Class<?> type = typeToClass(_typecode);
 	if (dimensions.length == 0 || _typecode == 'F' || _typecode == 'D')
 	    return super.__tojava__(c); // Punt!
 	if (c == Object.class || (c.isArray() && c.getComponentType().isAssignableFrom(type))) {
@@ -4588,7 +4588,7 @@ public class PyMultiarray extends PySequence {
     PyMultiarray __abs__(PyMultiarray a) {
 	if (!a.isContiguous) 
 	    throw Py.ValueError("internal __abs__ requires contiguous matrix as argument");
-	int maxI = a.start + shapeToNItems(a.dimensions);
+//	int maxI = a.start + shapeToNItems(a.dimensions);
 	switch (a._typecode) {
 	case '1':
 	    byte aData1[] = (byte []) a.data;
@@ -4644,7 +4644,7 @@ public class PyMultiarray extends PySequence {
     PyMultiarray __neg__(PyMultiarray a) {
 	if (!a.isContiguous) 
 	    throw Py.ValueError("internal __neg__ requires contiguous matrix as argument");
-	int maxI = a.start + shapeToNItems(a.dimensions);
+//	int maxI = a.start + shapeToNItems(a.dimensions);
 	switch (a._typecode) {
 	case '1':
 	    byte aData1[] = (byte []) a.data;
@@ -4700,7 +4700,7 @@ public class PyMultiarray extends PySequence {
     PyMultiarray __not__(PyMultiarray a) {
 	if (!a.isContiguous) 
 	    throw Py.ValueError("internal __not__ requires contiguous matrix as argument");
-	int maxI = a.start + shapeToNItems(a.dimensions);
+//	int maxI = a.start + shapeToNItems(a.dimensions);
 	switch (a._typecode) {
 	case '1':
 	    byte aData1[] = (byte []) a.data;

@@ -10,10 +10,11 @@
 
 package ca.nengo.ui.JNumeric;
 import org.python.core.*;
-import java.lang.reflect.Array;
+//import java.lang.reflect.Array;
 
 
 
+@SuppressWarnings("deprecation")
 public class Umath implements InitModule {
 
 	public void initModule(PyObject dict) {

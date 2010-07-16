@@ -4,7 +4,7 @@
 package ca.nengo.math.impl;
 
 import ca.nengo.math.impl.FourierFunction;
-import ca.nengo.plot.Plotter;
+//import ca.nengo.plot.Plotter;
 import junit.framework.TestCase;
 
 public class FourierFunctionTest extends TestCase {
@@ -25,7 +25,7 @@ public class FourierFunctionTest extends TestCase {
 	 * TODO: make this self-verifying 
 	 */
 	public void testFourierFunctionFloatFloatFloat() {
-		FourierFunction f = new FourierFunction(1, 20, 1, (long) Math.random());
+//		FourierFunction f = new FourierFunction(1, 20, 1, (long) Math.random());
 		
 		int n = 100;
 		float[][] from = new float[n][];
@@ -35,7 +35,7 @@ public class FourierFunctionTest extends TestCase {
 			from[i] = new float[]{x};
 			from2[i] = x;
 		}
-		float[] result = f.multiMap(from);
+//		float[] result = f.multiMap(from);
 		
 //		Plotter.plot(f, 0, .001f, 1, "fourier");
 	}

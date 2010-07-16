@@ -42,7 +42,7 @@ public abstract class AbstractProperty implements Property {
 		
 	private Configuration myConfiguration;
 	private String myName;
-	private Class myClass;
+	private Class<?> myClass;
 	private boolean myMutable;
 	private String myDocumentation;
 	
@@ -52,7 +52,7 @@ public abstract class AbstractProperty implements Property {
 	 * @param c Type of the Property
 	 * @param mutable Whether the Property value(s) can be modified
 	 */
-	public AbstractProperty(Configuration configuration, String name, Class c, boolean mutable) {
+	public AbstractProperty(Configuration configuration, String name, Class<?> c, boolean mutable) {
 		myConfiguration = configuration;
 		myName = name;
 		myClass = c;	
@@ -76,7 +76,7 @@ public abstract class AbstractProperty implements Property {
 	/**
 	 * @see ca.nengo.config.Property#getType()
 	 */
-	public Class getType() {
+	public Class<?> getType() {
 		return myClass;
 	}
 

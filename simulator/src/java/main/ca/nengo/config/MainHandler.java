@@ -136,7 +136,7 @@ public class MainHandler implements ConfigurationHandler {
 	/**
 	 * @see ca.nengo.config.ConfigurationHandler#canHandle(java.lang.Class)
 	 */
-	public boolean canHandle(Class c) {
+	public boolean canHandle(Class<?> c) {
 		boolean result = false;
 		for (int i = myHandlers.size()-1; i >= 0 && !result; i--) {
 			if (myHandlers.get(i).canHandle(c)) result = true;
@@ -149,7 +149,7 @@ public class MainHandler implements ConfigurationHandler {
 	 * @param s A String representation of an object
 	 * @return x.fromString(s), where x is a handler appropriate for the class c  
 	 */
-	public Object fromString(Class c, String s) {
+	public Object fromString(Class<?> c, String s) {
 		Object result = null;
 		
 		ConfigurationHandler handler = getHandler(myHandlers, c);
@@ -171,7 +171,7 @@ public class MainHandler implements ConfigurationHandler {
 	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		Component result = null;
 		
-		Class c = o.getClass();
+		Class<?> c = o.getClass();
 		ConfigurationHandler handler = getHandler(myHandlers, c);
 		if (handler != null) result = handler.getEditor(o, listener, parent);
 
@@ -186,7 +186,7 @@ public class MainHandler implements ConfigurationHandler {
 
 		if (o instanceof NullValue) result = new JLabel("EMPTY"); 
 			
-		Class c = o.getClass();
+		Class<?> c = o.getClass();
 		ConfigurationHandler handler = getHandler(myHandlers, c);
 		if (handler != null) result = handler.getRenderer(o);
 		
@@ -199,7 +199,7 @@ public class MainHandler implements ConfigurationHandler {
 	public String toString(Object o) {
 		String result = null;
 		
-		Class c = o.getClass();
+		Class<?> c = o.getClass();
 		ConfigurationHandler handler = getHandler(myHandlers, c);
 		if (handler != null) result = handler.toString(o);
 
@@ -209,7 +209,7 @@ public class MainHandler implements ConfigurationHandler {
 	/**
 	 * @see ca.nengo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
 	 */
-	public Object getDefaultValue(Class c) {
+	public Object getDefaultValue(Class<?> c) {
 		Object result = null;
 		
 		ConfigurationHandler handler = getHandler(myHandlers, c);
@@ -219,7 +219,7 @@ public class MainHandler implements ConfigurationHandler {
 	}
 	
 	//returns last handler that can handle given class 
-	private static ConfigurationHandler getHandler(List<ConfigurationHandler> handlers, Class c) {
+	private static ConfigurationHandler getHandler(List<ConfigurationHandler> handlers, Class<?> c) {
 		ConfigurationHandler result = null;
 		for (int i = handlers.size()-1; i >= 0 && result == null; i--) {
 			if (handlers.get(i).canHandle(c)) {

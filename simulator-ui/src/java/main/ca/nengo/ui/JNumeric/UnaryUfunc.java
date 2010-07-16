@@ -22,8 +22,8 @@ import java.lang.reflect.Array;
 // XXX Change __call__ signature to official JPython call signature.
 
 public class UnaryUfunc extends PyObject {
-	
-    static final public UnaryFunction arccos = new Arccos();
+	private static final long serialVersionUID = 1L;
+	static final public UnaryFunction arccos = new Arccos();
     static final public UnaryFunction arccosh = new Arccosh();
     static final public UnaryFunction arcsin = new Arcsin();
     static final public UnaryFunction arcsinh = new Arcsinh();

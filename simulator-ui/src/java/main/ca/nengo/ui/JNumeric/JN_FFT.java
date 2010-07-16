@@ -10,12 +10,14 @@
 
 package ca.nengo.ui.JNumeric;
 import org.python.core.*;
-import java.lang.*;
-import java.util.*;
+//import java.lang.*;
+//import java.util.*;
  
 // There are faster ways to do much of this, but I'm writing the simplest possible FFT.
 
 public class JN_FFT extends PyObject {
+
+	private static final long serialVersionUID = 1L;
 
 	static PyMultiarray _fft(PyObject o, boolean inverse) {
 		PyMultiarray a = PyMultiarray.asarray(o, 'D');

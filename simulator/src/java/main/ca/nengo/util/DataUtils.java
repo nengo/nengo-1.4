@@ -199,7 +199,7 @@ public class DataUtils {
 	 * For sorting. We try to extract encoding vectors and certain properties of 
 	 * common SpikeGenerators for ordering. 
 	 */
-	private static class ComparableNodeWrapper implements Comparable {
+	private static class ComparableNodeWrapper implements Comparable<ComparableNodeWrapper> {
 		
 		private int myIndex;
 		private float myFirstDimEncoder;
@@ -238,16 +238,15 @@ public class DataUtils {
 		/**
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
-		public int compareTo(Object o) {
+		public int compareTo(ComparableNodeWrapper o) {
 			int result = 0;			
-			if (o instanceof ComparableNodeWrapper) {
-				ComparableNodeWrapper c = (ComparableNodeWrapper) o;
-				if (getOrderingMetric() > c.getOrderingMetric()) {
-					result = 1;
-				} else if (getOrderingMetric() < c.getOrderingMetric()) {
-					result = -1;
-				}
-			}			
+
+			ComparableNodeWrapper c = (ComparableNodeWrapper) o;
+			if (getOrderingMetric() > c.getOrderingMetric()) {
+				result = 1;
+			} else if (getOrderingMetric() < c.getOrderingMetric()) {
+				result = -1;
+			}
 			return result;
 		}		
 	}

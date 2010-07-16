@@ -41,10 +41,10 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ca.nengo.dynamics.Integrator;
-import ca.nengo.dynamics.impl.EulerIntegrator;
-import ca.nengo.dynamics.impl.LTISystem;
-import ca.nengo.dynamics.impl.SimpleLTISystem;
+//import ca.nengo.dynamics.Integrator;
+//import ca.nengo.dynamics.impl.EulerIntegrator;
+//import ca.nengo.dynamics.impl.LTISystem;
+//import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.math.Function;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.plot.impl.DefaultPlotter;

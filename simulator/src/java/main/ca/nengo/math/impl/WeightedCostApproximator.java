@@ -193,8 +193,8 @@ public class WeightedCostApproximator implements LinearApproximator {
 		Random random=new Random();
 		
 		Runtime runtime=Runtime.getRuntime();
-		int hashCode=java.util.Arrays.hashCode(matrix);
-		int testpos = 0;
+//		int hashCode=java.util.Arrays.hashCode(matrix);
+//		int testpos = 0;
 		try {
 			// TODO: separate this out into a helper method, so we can do this sort of thing for other calculations as well
 			String parent=System.getProperty("user.dir");

@@ -99,7 +99,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		myOperators.put("|", new OrOperator());
 		
 		StringBuffer buf = new StringBuffer();
-		Iterator it = myOperators.keySet().iterator();
+		Iterator<String> it = myOperators.keySet().iterator();
 		while (it.hasNext()) {
 			buf.append(it.next());
 		}
@@ -124,6 +124,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 	/**
 	 * @see ca.nengo.math.FunctionInterpreter#parse(java.lang.String, int)
 	 */
+	@SuppressWarnings("unchecked")
 	public Function parse(String expression, int dimension) {
 		List postfix = getPostfixList(expression);		
 		return new PostfixFunction(postfix, expression, dimension);
@@ -133,6 +134,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 	 * @param expression Mathematical expression, as in parse(...) 
 	 * @return List of operators and operands in postfix order
 	 */
+	@SuppressWarnings("unchecked")
 	public List getPostfixList(String expression) {
 		//Dijkstra's shunting yard algorithm to convert infix to postfix
 		// see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
@@ -181,7 +183,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 					stack.push(myFunctions.get(token));
 					negativeUnary = false;
 				} else if (myOperators.get(token) != null) {
-					AbstractOperator op = (AbstractOperator) myOperators.get(token);
+					AbstractOperator op = myOperators.get(token);
 					
 					oploop: while ( !stack.isEmpty() && isOperator(stack.peek()) ) {
 						AbstractOperator op2 = (AbstractOperator) stack.peek();
@@ -225,6 +227,8 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 	
 	private abstract static class AbstractOperator implements Function {
 
+		private static final long serialVersionUID = 1L;
+		
 		private int myDimension;
 		private boolean myRightAssociative;
 		private int myPrecendence;

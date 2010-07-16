@@ -24,8 +24,8 @@ import ca.nengo.config.ui.ConfigurationTreeCellRenderer;
 import ca.nengo.config.ui.ConfigurationTreeModel;
 import ca.nengo.config.ui.ConfigurationTreePopupListener;
 import ca.nengo.model.StructuralException;
-import ca.nengo.model.nef.NEFEnsembleFactory;
-import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
+//import ca.nengo.model.nef.NEFEnsembleFactory;
+//import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 
 import junit.framework.TestCase;
 
@@ -197,86 +197,86 @@ public class NamedValuePropertyImplTest extends TestCase {
 			myE.put("1", "1");
 		}
 		
-		public String getA(String name) {
-			return myA.get(name);
-		}
+//		public String getA(String name) {
+//			return myA.get(name);
+//		}
 		
-		public String[] getANames() {
-			return myA.keySet().toArray(new String[0]);
-		}
+//		public String[] getANames() {
+//			return myA.keySet().toArray(new String[0]);
+//		}
 		
-		public MockNamedObject getB(String name) {
-			MockNamedObject result = null;
-			for (int i = 0; i < myB.size() && result == null; i++) {
-				if (myB.get(i).getName().equals(name)) result = myB.get(i);
-			}
-			return result;
-		}
+//		public MockNamedObject getB(String name) {
+//			MockNamedObject result = null;
+//			for (int i = 0; i < myB.size() && result == null; i++) {
+//				if (myB.get(i).getName().equals(name)) result = myB.get(i);
+//			}
+//			return result;
+//		}
 		
-		public MockNamedObject[] getB() {
-			return myB.toArray(new MockNamedObject[0]);
-		}
+//		public MockNamedObject[] getB() {
+//			return myB.toArray(new MockNamedObject[0]);
+//		}
 		
-		public String getC(String name) {
-			return myC.get(name);
-		}
+//		public String getC(String name) {
+//			return myC.get(name);
+//		}
 		
-		public String[] getCNames() {
-			return myC.keySet().toArray(new String[0]);
-		}
+//		public String[] getCNames() {
+//			return myC.keySet().toArray(new String[0]);
+//		}
 		
-		public void setC(String name, String value) {
-			myC.put(name, value);
-		}
+//		public void setC(String name, String value) {
+//			myC.put(name, value);
+//		}
 		
-		public void removeC(String name) {
-			myC.remove(name);
-		}
+//		public void removeC(String name) {
+//			myC.remove(name);
+//		}
 		
-		public MockNamedObject getD(String name) {
-			MockNamedObject result = null;
-			
-			for (int i = 0; i < myD.size() && result == null; i++) {
-				if (myD.get(i).getName().equals(name)) result = myD.get(i);
-			}
-			
-			return result;
-		}
+//		public MockNamedObject getD(String name) {
+//			MockNamedObject result = null;
+//			
+//			for (int i = 0; i < myD.size() && result == null; i++) {
+//				if (myD.get(i).getName().equals(name)) result = myD.get(i);
+//			}
+//			
+//			return result;
+//		}
 		
-		public MockNamedObject[] getD() {			
-			return myD.toArray(new MockNamedObject[0]);
-		}
+//		public MockNamedObject[] getD() {			
+//			return myD.toArray(new MockNamedObject[0]);
+//		}
 		
-		public void setD(MockNamedObject value) {
-			removeD(value.getName());
-			myD.add(value);
-		}
+//		public void setD(MockNamedObject value) {
+//			removeD(value.getName());
+//			myD.add(value);
+//		}
 		
-		public void removeD(String name) {
-			for (int i = 0; i < myD.size(); i++) {
-				if (myD.get(i).getName().equals(name)) myD.remove(i);
-			}
-		}
+//		public void removeD(String name) {
+//			for (int i = 0; i < myD.size(); i++) {
+//				if (myD.get(i).getName().equals(name)) myD.remove(i);
+//			}
+//		}
 		
-		public Map<String, String> getE() {
-			return myE;
-		}
+//		public Map<String, String> getE() {
+//			return myE;
+//		}
 		
 	}
 	
 	private static class MockNamedObject {
 		
-		private String myName;
+//		private String myName;
 		private String myValue;
 		
 		public MockNamedObject(String name, String value) {
-			myName = name;
+//			myName = name;
 			myValue = value;
 		}
 		
-		public String getName() {
-			return myName;
-		}
+//		public String getName() {
+//			return myName;
+//		}
 		
 		public String getValue() {
 			return myValue;

@@ -43,11 +43,11 @@ public class ClassUtils {
 	 * @return Named Class 
 	 * @throws ClassNotFoundException
 	 */
-	public static Class forName(String name) throws ClassNotFoundException {
-		Class result = null;
+	public static Class<?> forName(String name) throws ClassNotFoundException {
+		Class<?> result = null;
 		
 		if (name.endsWith("[]")) {
-			Class baseClass = forName(name.substring(0, name.length()-2));
+			Class<?> baseClass = forName(name.substring(0, name.length()-2));
 			result = Array.newInstance(baseClass, 0).getClass();
 		} else if (name.equals("byte")) {
 			result = Byte.TYPE;
@@ -76,7 +76,7 @@ public class ClassUtils {
 	 * @param c A Class
 	 * @return The class name, with arrays identified with trailing "[]"
 	 */
-	public static String getName(Class c) {
+	public static String getName(Class<?> c) {
 		if (c.isArray()) {
 			return getName(c.getComponentType()) + "[]";
 		} else {

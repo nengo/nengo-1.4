@@ -8,7 +8,7 @@ import ca.nengo.math.Function;
 import ca.nengo.math.impl.TimeSeriesFunction;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.FunctionInput;
+//import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 import junit.framework.TestCase;
@@ -43,7 +43,7 @@ public class TimeSeriesFunctionTest extends TestCase {
 		TimeSeries ts = new TimeSeries1DImpl(new float[]{ 0.0f, 0.5f, 1.0f}, 
 				new float[]{0.0f, 0.5f, 1.0f}, Units.UNK);
 		Function f = new TimeSeriesFunction(ts , 0);
-		FunctionInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
+//		FunctionInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
 		
 		//now for a little test
 		TestUtil.assertClose(.2f, f.map(new float[]{.2f}), .00001f);

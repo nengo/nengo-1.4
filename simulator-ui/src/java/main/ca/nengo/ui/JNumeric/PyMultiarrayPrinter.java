@@ -10,7 +10,7 @@
 
 package ca.nengo.ui.JNumeric;
 import org.python.core.*;
-import java.lang.reflect.Array;
+//import java.lang.reflect.Array;
 
 
 
@@ -89,7 +89,7 @@ class FormatFloat extends FormatFunction {
 					pad[i] = ' ';
 				return s.substring(0,zeros) + suffix + new String(pad);
 			}
-			return s + suffix;
+//			return s + suffix;
 		default:
 			return format.__mod__(o).toString() + suffix;
 		}

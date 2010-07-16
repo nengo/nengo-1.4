@@ -5,7 +5,7 @@ package ca.nengo.model.nef.impl;
 
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.AbstractFunction;
-import ca.nengo.math.impl.ConstantFunction;
+//import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.model.Network;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
@@ -16,8 +16,8 @@ import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.impl.BiasOrigin;
-import ca.nengo.model.nef.impl.DecodedOrigin;
-import ca.nengo.model.nef.impl.DecodedTermination;
+//import ca.nengo.model.nef.impl.DecodedOrigin;
+//import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.plot.Plotter;
 import ca.nengo.util.MU;
@@ -54,7 +54,7 @@ public class NEFEnsembleImplTest extends TestCase {
 			}
 		};
 		FunctionInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
-		FunctionInput zero = new FunctionInput("zero", new Function[]{new ConstantFunction(1, 0f)}, Units.UNK);
+//		FunctionInput zero = new FunctionInput("zero", new Function[]{new ConstantFunction(1, 0f)}, Units.UNK);
 		
 		Network network = new NetworkImpl();
 		network.addNode(input);
@@ -69,11 +69,11 @@ public class NEFEnsembleImplTest extends TestCase {
 //		Plotter.plot(bo.getInterneurons());
 //		Plotter.plot(bo.getInterneurons(), NEFEnsemble.X);
 		
-		DecodedTermination t = (DecodedTermination) dest.addDecodedTermination("source", MU.I(1), .005f, false);
+//		DecodedTermination t = (DecodedTermination) dest.addDecodedTermination("source", MU.I(1), .005f, false);
 //**		BiasTermination[] bt = dest.addBiasTerminations(t, .002f, bo.getDecoders()[0][0], ((DecodedOrigin) source.getOrigin(NEFEnsemble.X)).getDecoders());
 //**		bt[1].setStaticBias(-1); //creates intrinsic current needed to counteract interneuron activity at 0
 		
-		float[][] weights = MU.prod(dest.getEncoders(), MU.transpose(((DecodedOrigin) source.getOrigin(NEFEnsemble.X)).getDecoders()));
+//		float[][] weights = MU.prod(dest.getEncoders(), MU.transpose(((DecodedOrigin) source.getOrigin(NEFEnsemble.X)).getDecoders()));
 //*		float[][] biasEncoders = MU.transpose(new float[][]{bt[0].getBiasEncoders()});
 //*		float[][] biasDecoders = MU.transpose(bo.getDecoders());
 //*		float[][] weightBiases = MU.prod(biasEncoders, biasDecoders);
@@ -91,9 +91,9 @@ public class NEFEnsembleImplTest extends TestCase {
 //*		network.addProjection(bo.getInterneurons().getOrigin(NEFEnsemble.X), bt[1]);
 //		network.addProjection(zero.getOrigin(FunctionInput.ORIGIN_NAME), bt[1]);
 		
-		Probe sourceProbe = network.getSimulator().addProbe("source", NEFEnsemble.X, true);
-		Probe destProbe = network.getSimulator().addProbe("dest", NEFEnsemble.X, true);
-		Probe interProbe = network.getSimulator().addProbe("source_X_bias_interneurons", NEFEnsemble.X, true);
+//		Probe sourceProbe = network.getSimulator().addProbe("source", NEFEnsemble.X, true);
+//		Probe destProbe = network.getSimulator().addProbe("dest", NEFEnsemble.X, true);
+//		Probe interProbe = network.getSimulator().addProbe("source_X_bias_interneurons", NEFEnsemble.X, true);
 		
 		network.run(0, 2);
 		
@@ -120,11 +120,11 @@ public class NEFEnsembleImplTest extends TestCase {
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 		NEFEnsemble pre = ef.make("pre", 400, 1, "nefe_pre", false);
 		pre.addDecodedTermination("input", MU.I(1), tauPSC, false);
-		DecodedOrigin baseOrigin = (DecodedOrigin) pre.getOrigin(NEFEnsemble.X);
+//		DecodedOrigin baseOrigin = (DecodedOrigin) pre.getOrigin(NEFEnsemble.X);
 		network.addNode(pre);
 		
 		NEFEnsemble post = ef.make("post", 200, 1, "nefe_post", false);
-		DecodedTermination baseTermination = (DecodedTermination) post.addDecodedTermination("pre", MU.I(1), tauPSC, false);
+//		DecodedTermination baseTermination = (DecodedTermination) post.addDecodedTermination("pre", MU.I(1), tauPSC, false);
 		network.addNode(post);
 		
 		network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), pre.getTermination("input"));
@@ -218,20 +218,20 @@ public class NEFEnsembleImplTest extends TestCase {
 ////		Plotter.plot(pT.getData(), .005f, "base termination");
 	}
 	
-	private float[] findBiasEncoders(float[][] baseWeights, float[] biasDecoders) {
-		float[] biasEncoders = new float[baseWeights.length];
-		
-		for (int j = 0; j < biasEncoders.length; j++) {
-			float max = 0;
-			for (int i = 0; i < biasDecoders.length; i++) {
-				float x = - baseWeights[j][i] / biasDecoders[i];
-				if (x > max) max = x;
-			}			
-			biasEncoders[j] = max;
-		}
-		
-		return biasEncoders;
-	}
+//	private float[] findBiasEncoders(float[][] baseWeights, float[] biasDecoders) {
+//		float[] biasEncoders = new float[baseWeights.length];
+//		
+//		for (int j = 0; j < biasEncoders.length; j++) {
+//			float max = 0;
+//			for (int i = 0; i < biasDecoders.length; i++) {
+//				float x = - baseWeights[j][i] / biasDecoders[i];
+//				if (x > max) max = x;
+//			}			
+//			biasEncoders[j] = max;
+//		}
+//		
+//		return biasEncoders;
+//	}
 	
 	public void testClone() throws StructuralException, CloneNotSupportedException {
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();

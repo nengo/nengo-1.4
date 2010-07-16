@@ -26,6 +26,7 @@ public class CompositeApproximatorTest extends TestCase {
 	/* 
 	 * Test method for 'ca.nengo.math.impl.CompositeApproximator.findCoefficients()'
 	 */
+	@SuppressWarnings("unchecked")
 	public void testFindCoefficients() {
 		float[][] polyCoeffs = new float[][]{{0f,1f},{0f,0f,1f},{1f},{1f,1f,1f},{0f,-1f,1f}};
 		Function[] polys = new Polynomial[polyCoeffs.length];

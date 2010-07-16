@@ -49,9 +49,9 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	 * @param type Parameter type
 	 * @return Property or null if the necessary methods don't exist on the underlying class  
 	 */
-	public static SingleValuedProperty getSingleValuedProperty(Configuration configuration, String name, Class type) {
+	public static SingleValuedProperty getSingleValuedProperty(Configuration configuration, String name, Class<?> type) {
 		SingleValuedPropertyImpl result = null;
-		Class targetClass = configuration.getConfigurable().getClass();
+		Class<?> targetClass = configuration.getConfigurable().getClass();
 		
 		String uname = Character.toUpperCase(name.charAt(0)) + name.substring(1);
 		String[] getterNames = new String[]{"get"+uname};
@@ -77,7 +77,7 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	 * @param c Parameter type
 	 * @param getter Zero-arg getter method
 	 */
-	public SingleValuedPropertyImpl(Configuration configuration, String name, Class c, Method getter) {
+	public SingleValuedPropertyImpl(Configuration configuration, String name, Class<?> c, Method getter) {
 		super(configuration, name, c, false);
 		myGetter = getter;
 	}
@@ -91,7 +91,7 @@ public class SingleValuedPropertyImpl extends AbstractProperty implements Single
 	 * @param getter Zero-arg getter method
 	 * @param setter Single-arg setter method
 	 */
-	public SingleValuedPropertyImpl(Configuration configuration, String name, Class c, Method getter, Method setter) {
+	public SingleValuedPropertyImpl(Configuration configuration, String name, Class<?> c, Method getter, Method setter) {
 		super(configuration, name, c, true);
 		myGetter = getter;
 		mySetter = setter;

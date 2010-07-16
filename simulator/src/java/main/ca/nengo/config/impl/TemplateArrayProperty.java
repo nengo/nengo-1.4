@@ -51,7 +51,7 @@ public class TemplateArrayProperty extends AbstractProperty implements ListPrope
 	 * @param name Name of the property 
 	 * @param c Type of the property value
 	 */
-	public TemplateArrayProperty(Configuration configuration, String name, Class c) {
+	public TemplateArrayProperty(Configuration configuration, String name, Class<?> c) {
 		super(configuration, name, c, true);
 		myValues = new ArrayList<Object>(10);
 	}

@@ -12,7 +12,8 @@ package ca.nengo.ui.JNumeric;
 import org.python.core.*;
 
 abstract public class KeywordFunction extends PyObject {
-    protected String docString;
+	private static final long serialVersionUID = 1L;
+	protected String docString;
     protected String [] argNames;
     protected PyObject [] defaultArgs;
 

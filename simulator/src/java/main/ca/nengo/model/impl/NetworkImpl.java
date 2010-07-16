@@ -340,7 +340,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#getProjections()
 	 */
 	public Projection[] getProjections() {
-		return (Projection[]) myProjectionMap.values().toArray(new Projection[0]);
+		return myProjectionMap.values().toArray(new Projection[0]);
 	}
 
 	/**
@@ -427,9 +427,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
-		Iterator it = myNodeMap.keySet().iterator();
+		Iterator<String> it = myNodeMap.keySet().iterator();
 		while (it.hasNext()) {
-			Node n = (Node) myNodeMap.get(it.next());
+			Node n = myNodeMap.get(it.next());
 			n.reset(randomize);
 		}
 	}
@@ -438,8 +438,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Probeable#getHistory(java.lang.String)
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
-		Probeable p = (Probeable) myProbeables.get(stateName);
-		String n = (String) myProbeableStates.get(stateName);
+		Probeable p = myProbeables.get(stateName);
+		String n = myProbeableStates.get(stateName);
 		
 		return p.getHistory(n);
 	}
@@ -450,11 +450,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public Properties listStates() {
 		Properties result = new Properties();
 
-		Iterator it = myProbeables.keySet().iterator();
+		Iterator<String> it = myProbeables.keySet().iterator();
 		while (it.hasNext()) {
-			String key = (String) it.next();
-			Probeable p = (Probeable) myProbeables.get(key);
-			String n = (String) myProbeableStates.get(key);
+			String key = it.next();
+			Probeable p = myProbeables.get(key);
+			String n = myProbeableStates.get(key);
 			result.put(key, p.listStates().getProperty(n));
 		}
 		
@@ -508,7 +508,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#getExposedOriginName(ca.nengo.model.Origin)
 	 */
 	public String getExposedOriginName(Origin insideOrigin) {
-		return (String)myExposedOriginNames.get(insideOrigin);
+		return myExposedOriginNames.get(insideOrigin);
 	}
 
 	/**
@@ -518,7 +518,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		if ( !myExposedOrigins.containsKey(name) ) {
 			throw new StructuralException("There is no exposed Origin named " + name);
 		}
-		return (Origin) myExposedOrigins.get(name);
+		return myExposedOrigins.get(name);
 	}
 
 	/**
@@ -526,8 +526,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 */
 	public Origin[] getOrigins() {
 		if (myExposedOrigins.values().size() == 0)
-			return (Origin[]) myExposedOrigins.values().toArray(new Origin[0]);	
-		return (Origin[]) OrderedExposedOrigins.toArray(new Origin [0]);			
+			return myExposedOrigins.values().toArray(new Origin[0]);	
+		return OrderedExposedOrigins.toArray(new Origin [0]);			
 	}
 
 	/**
@@ -558,7 +558,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#getExposedTerminationName(ca.nengo.model.Termination)
 	 */
 	public String getExposedTerminationName(Termination insideTermination) {
-		return (String)myExposedTerminationNames.get(insideTermination);
+		return myExposedTerminationNames.get(insideTermination);
 	}	
 
 	/**
@@ -568,7 +568,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		if ( !myExposedTerminations.containsKey(name) ) {
 			throw new StructuralException("There is no exposed Termination named " + name);
 		}
-		return (Termination) myExposedTerminations.get(name);
+		return myExposedTerminations.get(name);
 	}
 
 	/**
@@ -576,8 +576,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 */
 	public Termination[] getTerminations() {
 		if (myExposedTerminations.values().size() == 0)
-			return (Termination[]) myExposedTerminations.values().toArray(new Termination[0]);
-		return (Termination[])OrderedExposedTerminations.toArray(new Termination[0]);
+			return myExposedTerminations.values().toArray(new Termination[0]);
+		return OrderedExposedTerminations.toArray(new Termination[0]);
 	}
 
 	/**

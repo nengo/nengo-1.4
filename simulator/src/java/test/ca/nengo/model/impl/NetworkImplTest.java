@@ -15,7 +15,7 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.model.neuron.Neuron;
+//import ca.nengo.model.neuron.Neuron;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
@@ -135,13 +135,13 @@ public class NetworkImplTest extends TestCase {
 			throw new RuntimeException("not implemented");
 		}
 
-		public void addNeuron(Neuron neuron) {
-			throw new RuntimeException("not implemented");
-		}
+//		public void addNeuron(Neuron neuron) {
+//			throw new RuntimeException("not implemented");
+//		}
 
-		public void removeNeuron(int index) {
-			throw new RuntimeException("not implemented");
-		}
+//		public void removeNeuron(int index) {
+//			throw new RuntimeException("not implemented");
+//		}
 
 		public Origin[] getOrigins() {
 			throw new RuntimeException("not implemented");

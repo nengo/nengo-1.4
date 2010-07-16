@@ -29,11 +29,11 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.sim.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+//import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +44,8 @@ import ca.nengo.model.Node;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
-import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.model.impl.RealOutputImpl;
+//import ca.nengo.model.impl.NetworkImpl;
+//import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.SimulatorEvent;
 import ca.nengo.sim.SimulatorListener;
@@ -112,7 +112,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	public synchronized void run(float startTime, float endTime, float stepSize, boolean dispProgress)
 			throws SimulationException {
 		
-		float pre_time = System.nanoTime();
+//		float pre_time = System.nanoTime();
 		
 		if(GPUNodeThreadPool.myUseGPU){
 			myNodeThreadPool = new GPUNodeThreadPool(myNodes);
@@ -182,7 +182,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		
 		//System.out.println("java step: " + Float.toString(startTime) + " " + Float.toString(endTime) );
 
-		float[] temp;
+//		float[] temp;
 		for (int i = 0; i < myProjections.length; i++) {
 			InstantaneousOutput values = myProjections[i].getOrigin().getValues();
 			myProjections[i].getTermination().setValues(values);

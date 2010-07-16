@@ -6,7 +6,7 @@ package ca.nengo.model.neuron.impl;
 import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.PiecewiseConstantFunction;
-import ca.nengo.math.impl.SineFunction;
+//import ca.nengo.math.impl.SineFunction;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
@@ -19,7 +19,7 @@ import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.impl.ALIFSpikeGenerator;
 import ca.nengo.plot.Plotter;
-import ca.nengo.util.Probe;
+//import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
 import junit.framework.TestCase;
 
@@ -148,8 +148,8 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 		
 		network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), t);
 		
-		Probe rate = network.getSimulator().addProbe("neuron", "rate", true);
-		Probe N = network.getSimulator().addProbe("neuron", "N", true);
+//		Probe rate = network.getSimulator().addProbe("neuron", "rate", true);
+//		Probe N = network.getSimulator().addProbe("neuron", "N", true);
 //		Probe dNdt = network.getSimulator().addProbe("neuron", "dNdt", true);
 //		Probe I = network.getSimulator().addProbe("neuron", "I", true);
 		
@@ -162,7 +162,7 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 	}
 	
 	private void setTau(SpikingNeuron neuron, float tau) {
-		float g_N = 1; 
+//		float g_N = 1; 
 		float alpha = getSlope(neuron) / neuron.getScale();
 		float b = neuron.getBias();
 		float c = neuron.getScale();

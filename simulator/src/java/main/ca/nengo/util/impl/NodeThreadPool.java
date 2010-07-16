@@ -1,9 +1,9 @@
 package ca.nengo.util.impl;
 
 import ca.nengo.model.Node;
-import ca.nengo.model.impl.NetworkImpl;
+//import ca.nengo.model.impl.NetworkImpl;
 
-import java.util.LinkedList;
+//import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 

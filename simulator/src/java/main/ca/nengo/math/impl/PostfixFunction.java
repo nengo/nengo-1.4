@@ -27,6 +27,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.math.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,7 +59,7 @@ public class PostfixFunction implements Function {
 	private static final long serialVersionUID = 1L;
 	private static Logger ourLogger = Logger.getLogger(PostfixFunction.class);
 	
-	private List myExpressionList;
+	private List<Serializable> myExpressionList;
 	
 	/**
 	 * A human-readable string representation of the function
@@ -72,7 +73,7 @@ public class PostfixFunction implements Function {
 	 * @param dimension Dimension of the function (must be at least as great as any operand 
 	 * 		placeholders that appear in the expression)
 	 */
-	public PostfixFunction(List expressionList, String expression, int dimension) {
+	public PostfixFunction(List<Serializable> expressionList, String expression, int dimension) {
 		set(expressionList, expression, dimension);
 	}
 	
@@ -85,7 +86,8 @@ public class PostfixFunction implements Function {
 		set(null, expression, dimension);
 	}	
 	
-	private void set(List expressionList, String expression, int dimension) {
+	@SuppressWarnings("unchecked")
+	private void set(List<Serializable> expressionList, String expression, int dimension) {
 		if (expressionList == null) {
 			expressionList = DefaultFunctionInterpreter.sharedInstance().getPostfixList(expression);
 		} else {
@@ -106,7 +108,7 @@ public class PostfixFunction implements Function {
 	/**
 	 * @return Postfix expression list 
 	 */
-	protected List getExpressionList() {
+	protected List<Serializable> getExpressionList() {
 		return myExpressionList;
 	}
 	
@@ -163,7 +165,7 @@ public class PostfixFunction implements Function {
 		return result;
 	}
 	
-	private static float doMap(List expression, int dimension, float[] from) {
+	private static float doMap(List<Serializable> expression, int dimension, float[] from) {
 		if (dimension != from.length) {
 			throw new IllegalArgumentException("Input dimension " + from.length + ", expected " + dimension);
 		}
@@ -172,7 +174,7 @@ public class PostfixFunction implements Function {
 		int i = 0;
 		
 		try {
-			Stack stack = new Stack();
+			Stack<Object> stack = new Stack<Object>();
 			
 			for ( ; i < expression.size(); i++) {
 				Object o = expression.get(i);
@@ -204,7 +206,7 @@ public class PostfixFunction implements Function {
 	}
 	
 	//and check everything is a Float, Integer, or Function while we're at it
-	private static int findHighestDimension(List expression) {
+	private static int findHighestDimension(List<Serializable> expression) {
 		int highest = -1;
 		
 		for (int i = 0; i < expression.size(); i++) {
@@ -227,8 +229,8 @@ public class PostfixFunction implements Function {
 	public Function clone() throws CloneNotSupportedException {
 		PostfixFunction result = (PostfixFunction) super.clone();
 		
-		List list = new ArrayList(this.myExpressionList.size());
-		Iterator it = myExpressionList.iterator();
+		List<Serializable> list = new ArrayList<Serializable>(this.myExpressionList.size());
+		Iterator<Serializable> it = myExpressionList.iterator();
 		while (it.hasNext()) {
 			Object o = it.next();
 			if (o instanceof Float) {

@@ -26,7 +26,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.nodes;
 
-import java.util.List;
+//import java.util.List;
 
 import ca.nengo.model.Origin;
 import ca.nengo.model.StructuralException;
@@ -45,7 +45,7 @@ import ca.shu.ui.lib.actions.ActionException;
 import ca.shu.ui.lib.actions.ReversableAction;
 import ca.shu.ui.lib.actions.StandardAction;
 import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.util.UserMessages;
+//import ca.shu.ui.lib.util.UserMessages;
 import ca.shu.ui.lib.util.menus.MenuBuilder;
 import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 

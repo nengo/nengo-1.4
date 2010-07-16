@@ -51,10 +51,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.plaf.TreeUI;
+//import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.plaf.metal.MetalTreeUI;
+//import javax.swing.plaf.basic.BasicTreeUI;
+//import javax.swing.plaf.metal.MetalTreeUI;
 
 import ca.nengo.config.ClassRegistry;
 import ca.nengo.config.ConfigUtil;
@@ -90,7 +90,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	private JButton myPreviousButton;
 	private JButton myNextButton;
 	private JButton myOKButton;
-	private Constructor[] myConstructors;
+	private Constructor<?>[] myConstructors;
 	private int myConstructorIndex;
 	
 	/**
@@ -103,9 +103,9 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	 * 		one implementation of the more general type above)  
 	 * @return User-constructed object (or null if construction aborted)
 	 */
-	public static Object showDialog(Component comp, Class type, Class specificType) {
+	public static Object showDialog(Component comp, Class<?> type, Class<?> specificType) {
 		
-		List<Class> types = ClassRegistry.getInstance().getImplementations(type);
+		List<Class<?>> types = ClassRegistry.getInstance().getImplementations(type);
 		if (specificType != null && !NullValue.class.isAssignableFrom(specificType) && !types.contains(specificType)) {
 			types.add(0, specificType);
 		}
@@ -122,7 +122,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		return dialog.getResult();
 	}
 	
-	private NewConfigurableDialog(Component comp, final Class type, List<Class> types) {
+	private NewConfigurableDialog(Component comp, final Class<?> type, List<Class<?>> types) {
 		super(JOptionPane.getFrameForComponent(comp), "New " + type.getSimpleName(), true);
 		
 		JButton cancelButton = new JButton("Cancel");
@@ -192,7 +192,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				Component result = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				((JLabel) result).setText(((Class) value).getSimpleName());
+				((JLabel) result).setText(((Class<?>) value).getSimpleName());
 				return result;
 			}
 		});
@@ -215,7 +215,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 
 		typeBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				NewConfigurableDialog.this.setSelectedType((Class) typeBox.getSelectedItem());
+				NewConfigurableDialog.this.setSelectedType((Class<?>) typeBox.getSelectedItem());
 			}
 		});
 		
@@ -236,7 +236,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		return myResult;
 	}
 	
-	private void setSelectedType(Class type) {
+	private void setSelectedType(Class<?> type) {
 		myConstructors = type.getConstructors();		
 		setConstructor(0);
 		myOKButton.setEnabled(false);
@@ -251,7 +251,7 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 	
 	private void setConstructor(int index) {
 		myConstructorIndex = index;
-		Constructor constructor = myConstructors[index];
+		Constructor<?> constructor = myConstructors[index];
 		
 		if (myConstructorIndex == 0) {
 			myPreviousButton.setEnabled(false);
@@ -276,9 +276,9 @@ public class NewConfigurableDialog extends JDialog implements ActionListener {
 		myConfigurationTree.addMouseListener(myPopupListener);
 	}
 	
-	private static Configuration makeTemplate(Constructor constructor) {
+	private static Configuration makeTemplate(Constructor<?> constructor) {
 		ConfigurationImpl result = new ConfigurationImpl(null);
-		Class[] types = constructor.getParameterTypes();
+		Class<?>[] types = constructor.getParameterTypes();
 		String[] names = JavaSourceParser.getArgNames(constructor);
 		for (int i = 0; i < types.length; i++) {
 			if (types[i].isPrimitive()) types[i] = ConfigUtil.getPrimitiveWrapperClass(types[i]);

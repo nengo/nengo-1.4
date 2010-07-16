@@ -77,7 +77,7 @@ public class JavaSourceParser {
 	 * @param c A Java class
 	 * @return Class-level documentation if available, othewise null 
 	 */
-	public static String getDocs(Class c) {
+	public static String getDocs(Class<?> c) {
 		JavaClass jc = ourBuilder.getClassByName(c.getName());
 		JavaClass[] interfaces = jc.getImplementedInterfaces();
 		
@@ -132,13 +132,13 @@ public class JavaSourceParser {
 		}
 		
 		String packageName = referringClassName.substring(0, referringClassName.lastIndexOf('.'));
-		Class type = getType(className, packageName);
+		Class<?> type = getType(className, packageName);
 		
 		StringTokenizer tok = new StringTokenizer(reference, "(, )", false);
 		String methodName = tok.hasMoreTokens() ? tok.nextToken() : null;
 
 		if (type != null && methodName != null) {
-			List<Class> argTypes = new ArrayList<Class>(10);
+			List<Class<?>> argTypes = new ArrayList<Class<?>>(10);
 			while (tok.hasMoreTokens()) {
 				String argTypeName = tok.nextToken().trim();
 				argTypes.add(getType(argTypeName, packageName));
@@ -150,8 +150,8 @@ public class JavaSourceParser {
 		return result;
 	}
 	
-	private static Class getType(String name, String packageName) {
-		Class result = null;
+	private static Class<?> getType(String name, String packageName) {
+		Class<?> result = null;
 		
 		result = getType(name);
 		if (result == null) getType(packageName + "." + name);
@@ -161,8 +161,8 @@ public class JavaSourceParser {
 	}
 
 	//eats any ClassNotFoundExceptions and returns null
-	private static Class getType(String name) {
-		Class result = null;
+	private static Class<?> getType(String name) {
+		Class<?> result = null;
 		try {
 			result = ClassUtils.forName(name);
 		} catch (ClassNotFoundException e) {
@@ -184,7 +184,7 @@ public class JavaSourceParser {
 	 * @param c A Java constructor
 	 * @return Constructor documentation if available, otherwise empty string
 	 */
-	public static String getDocs(Constructor c) {
+	public static String getDocs(Constructor<?> c) {
 		JavaMethod jm = getJavaMethod(c);
 		return getDocs(jm);
 	}
@@ -257,7 +257,7 @@ public class JavaSourceParser {
 	 * @param c A Java constructor 
 	 * @return Names of constructor arguments if available, otherwise the default {"arg0", "arg1", ...}
 	 */
-	public static String[] getArgNames(Constructor c) {
+	public static String[] getArgNames(Constructor<?> c) {
 		String[] result = new String[c.getParameterTypes().length];
 		
 		JavaMethod jm = getJavaMethod(c);
@@ -282,7 +282,7 @@ public class JavaSourceParser {
 	 * @param arg Index of an argument on this constructor
 	 * @return Argument documentation if available, otherwise null
 	 */
-	public static String getArgDocs(Constructor c, int arg) {
+	public static String getArgDocs(Constructor<?> c, int arg) {
 		return getArgDocs(getJavaMethod(c), arg);
 	}
 	
@@ -311,11 +311,11 @@ public class JavaSourceParser {
 
 		String[] argNames = getArgNames(m);
 		
-		Class returnType = m.getReturnType();
+		Class<?> returnType = m.getReturnType();
 		if (returnType != null) result.append(ClassUtils.getName(returnType) + " ");
 		result.append(m.getName());
 		result.append("(");
-		Class[] paramTypes = m.getParameterTypes();
+		Class<?>[] paramTypes = m.getParameterTypes();
 		for (int i = 0; i < paramTypes.length; i++) {
 			result.append(ClassUtils.getName(paramTypes[i]));
 			result.append(" ");
@@ -333,11 +333,11 @@ public class JavaSourceParser {
 	}
 	
 	//returns source wrapper for given constructor or null
-	private static JavaMethod getJavaMethod(Constructor c) {
+	private static JavaMethod getJavaMethod(Constructor<?> c) {
 		return getJavaMethod(c.getDeclaringClass().getName(), c.getDeclaringClass().getSimpleName(), c.getParameterTypes());
 	}
 	
-	private static JavaMethod getJavaMethod(String className, String methodName, Class[] paramTypes) {
+	private static JavaMethod getJavaMethod(String className, String methodName, Class<?>[] paramTypes) {
 		JavaMethod result = null;
 		
 		JavaClass sourceClass = ourBuilder.getClassByName(className);

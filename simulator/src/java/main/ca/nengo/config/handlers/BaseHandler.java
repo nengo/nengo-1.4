@@ -55,7 +55,7 @@ public abstract class BaseHandler implements ConfigurationHandler {
 	/**
 	 * @param c Class of objects handled by this handler
 	 */
-	public BaseHandler(Class c) {
+	public BaseHandler(Class<?> c) {
 		myClass = c;
 	}
 	
@@ -63,7 +63,7 @@ public abstract class BaseHandler implements ConfigurationHandler {
 	 * @return true if arg matches class given in constructor
 	 * @see ca.nengo.config.ConfigurationHandler#canHandle(java.lang.Class)
 	 */
-	public boolean canHandle(Class c) {
+	public boolean canHandle(Class<?> c) {
 		return myClass.isAssignableFrom(c);
 	}
 

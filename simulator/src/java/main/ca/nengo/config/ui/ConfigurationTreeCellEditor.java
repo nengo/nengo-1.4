@@ -70,7 +70,7 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 				TreePath path = myTree.getPathForLocation(me.getX(), me.getY()); 
 				if (path.getLastPathComponent() instanceof Value) {
 					Object o = ((Value) path.getLastPathComponent()).getObject();
-					Class c = o.getClass();
+					Class<?> c = o.getClass();
 					
 					Object parent = null;
 					if (path.getPath().length > 1) {
@@ -103,7 +103,7 @@ public class ConfigurationTreeCellEditor extends DefaultCellEditor {
 			Object o = node.getObject();
 			
 			if (o instanceof NullValue) {
-				Class type = ((Property) path.getParentPath().getLastPathComponent()).getType();
+				Class<?> type = ((Property) path.getParentPath().getLastPathComponent()).getType();
 				o = MainHandler.getInstance().getDefaultValue(type);
 			}
 			

@@ -27,28 +27,28 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.config.handlers;
 
-import java.awt.BorderLayout;
+//import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Dimension;
+//import java.awt.Container;
+//import java.awt.Dialog;
+//import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+//import java.awt.Frame;
+//import java.awt.event.ActionEvent;
+//import java.awt.event.ActionListener;
 import java.util.StringTokenizer;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
+//import javax.swing.JButton;
+//import javax.swing.JComponent;
+//import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+//import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
+//import javax.swing.JSeparator;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
+//import javax.swing.JTextField;
+//import javax.swing.SwingUtilities;
+//import javax.swing.border.EmptyBorder;
 
 import ca.nengo.config.IconRegistry;
 import ca.nengo.config.ui.ConfigurationChangeListener;
@@ -175,7 +175,7 @@ public class MatrixHandler extends MatrixHandlerBase {
 	/**
 	 * @see ca.nengo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
 	 */
-	public Object getDefaultValue(Class c) {
+	public Object getDefaultValue(Class<?> c) {
 		return new float[0][];
 	}
 

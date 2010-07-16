@@ -5,29 +5,29 @@ package ca.nengo.plot;
 
 import java.awt.BorderLayout;
 import java.awt.Image;
-import java.awt.Color;
-import java.awt.geom.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+//import java.awt.Color;
+//import java.awt.geom.*;
+//import java.awt.event.WindowAdapter;
+//import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.lang.reflect.*;
-import java.util.*;
+//import java.lang.reflect.*;
+//import java.util.*;
 
-import javax.swing.SwingUtilities;
+//import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+//import javax.swing.JPanel;
 import javax.imageio.ImageIO;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.Range;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
+//import org.jfree.chart.ChartFactory;
+//import org.jfree.chart.ChartPanel;
+//import org.jfree.chart.JFreeChart;
+//import org.jfree.chart.plot.*;
+//import org.jfree.chart.renderer.xy.*;
+//import org.jfree.data.Range;
+//import org.jfree.data.xy.XYSeries;
+//import org.jfree.data.xy.XYSeriesCollection;
 
-import ca.nengo.util.*;
+//import ca.nengo.util.*;
 import ca.nengo.math.Function;
 import ca.nengo.math.FunctionBasis;
 import ca.nengo.math.impl.FunctionBasisImpl;
@@ -40,7 +40,7 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.plot.Plotter;
+//import ca.nengo.plot.Plotter;
 import ca.nengo.util.Probe;
 
 /**

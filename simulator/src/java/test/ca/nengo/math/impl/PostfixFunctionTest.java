@@ -3,6 +3,7 @@
  */
 package ca.nengo.math.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import ca.nengo.TestUtil;
@@ -23,7 +24,7 @@ public class PostfixFunctionTest extends TestCase {
 	 */
 	public void testGetDimension() {
 		int dim = 10;
-		PostfixFunction f = new PostfixFunction(new ArrayList(), "", dim);
+		PostfixFunction f = new PostfixFunction(new ArrayList<Serializable>(), "", dim);
 		assertEquals(dim, f.getDimension());
 	}
 
@@ -35,7 +36,7 @@ public class PostfixFunctionTest extends TestCase {
 		//some basic tests follow, and a more exhaustive list is included in DefaultFunctionInterpreterTest 
 		PostfixFunction f = null; 
 		
-		ArrayList l = new ArrayList();
+		ArrayList<Serializable> l = new ArrayList<Serializable>();
 		l.add(new Float(5.5f));
 		f = new PostfixFunction(l, "", 0);
 		TestUtil.assertClose(5.5f, f.map(new float[0]), .0001f);
@@ -56,7 +57,7 @@ public class PostfixFunctionTest extends TestCase {
 	 * Test method for 'ca.nengo.math.impl.PostfixFunction.multiMap(float[][])'
 	 */
 	public void testMultiMap() {
-		ArrayList l = new ArrayList();
+		ArrayList<Serializable> l = new ArrayList<Serializable>();
 		l.add(new Integer(0));
 		PostfixFunction f = new PostfixFunction(l, "", 1);
 		float[] values = f.multiMap(new float[][]{new float[]{1f}, new float[]{2f}});
