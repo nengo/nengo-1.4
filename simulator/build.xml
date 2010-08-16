@@ -1,136 +1,86 @@
-<project name="Nengo" default="dist" basedir=".">
-
-	<property name="releasename" value="nengo-1.0" />
-	<property name="base-ui" value="../simulator-ui" />
-	<property name="src" value="${basedir}/src" />
-	<property name="src-ui" value="${base-ui}/src" />	
-	<property name="build" value="${basedir}/target" />
-	<property name="classes" value="${build}/classes" />
-	<property name="test-classes" value="${build}/test-classes" />
-	<property name="docs" value="${build}/javadoc" />
-	<property name="dist" value="${build}" />
-	<property name="lib" value="${basedir}/lib" />
-	<property name="lib-ui" value="${base-ui}/lib" />
-
-	<path id="classpath">
-		<pathelement path="${src}" />
-		<pathelement location="${lib}/commons-lang-2.1.jar" /> 
-		<pathelement location="${lib}/Jama-1.0.2.jar" /> 		
-		<pathelement location="${lib}/junit.jar" /> 		
-		<pathelement location="${lib}/jcommon-1.0.0.jar" /> 		
-		<pathelement location="${lib}/jfreechart-1.0.1.jar" /> 
-		<pathelement location="${lib}/jmatio.jar" /> 
-		<pathelement location="${lib}/log4j-1.2.14.jar" /> 
-		<pathelement location="${lib}/qdox-1.6.3.jar" /> 
-		<pathelement location="${lib}/formsrt.jar" /> 
-		<pathelement location="${lib-ui}/jython.jar" /> 
-		<pathelement location="${lib-ui}/jung-1.7.6.jar" /> 
-		<pathelement location="${lib-ui}/piccolo.jar" /> 
-		<pathelement location="${lib-ui}/piccolox.jar" /> 
-		<pathelement location="${lib-ui}/commons-collections-3.2.jar" /> 
-		<pathelement location="${lib-ui}/colt.jar" /> 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="nengo-sim">
+    <property environment="env"/>
+    <property file="build.properties"/>
+    <path id="classpath.simulator">
+        <pathelement location="${dest.build}"/>
+    	<fileset dir="${src.lib}">
+    		<include name="*.jar"/>
+    		<exclude name="junit.jar"/>
+    	</fileset>
+    </path>
+	<path id="classpath.test">
+		<path refid="classpath.simulator"/>
+		<pathelement location="${dest.test}"/>
+      	<pathelement location="${src.lib}/junit.jar"/>
 	</path>
-	
-	
-	<!-- Creates JavaDoc documentation -->
-	<target name="doc">
-		<mkdir dir="${docs}"/>
-		
-	    <!-- Note: if this fails because of the source attribute, you need ant 1.4 -->
-	    <javadoc packagenames="ca.nengo.*"
-	        source="1.5"
-	        classpathref="classpath"
-	        sourcepath="${src}/java/main"
-	        destdir="${docs}"
-	        windowtitle="NENGO Documentation"/>  
+    <target name="init">
+    	<mkdir dir="${dest.artifacts}"/>
+    	<mkdir dir="${dest.build}"/>
+        <copy includeemptydirs="false" todir="${dest.build}">
+            <fileset dir="${src.main}">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="${dest.build}">
+            <fileset dir="${src.resources}">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+	<target name="init-test">
+		<mkdir dir="${dest.artifacts}"/>
+		<mkdir dir="${dest.artifacts.reports}"/>
+		<mkdir dir="${dest.test}"/>
+        <copy includeemptydirs="false" todir="${dest.test}">
+            <fileset dir="${src.test}">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
 	</target>
-	
-	
-	<!-- Compile main and test classes --> 
-	<target name="compile">
-		<mkdir dir="${classes}"/>
-		<mkdir dir="${test-classes}"/>
-		
-	 	<javac source="1.5" srcdir="${src}/java/main" destdir="${classes}" includes="ca/nengo/**" debug="true">
-	        <classpath refid="classpath" />
-	    </javac>
-
-	 	<javac source="1.5" srcdir="${src}/java/test" destdir="${test-classes}" includes="ca/nengo/**" debug="true">
-	        <classpath refid="classpath" />
-	 		<classpath>
-	 			<pathelement path="${classes}" />
-	 		</classpath>
-	    </javac>
-		
-	 	<javac source="1.5" srcdir="${src-ui}/java/main:${src-ui}/java/piccoloX" destdir="${classes}" includes="ca/**" debug="true">
-	        <classpath refid="classpath" />
-	 		<classpath>
-	 			<pathelement path="${classes}" />
-	 			<!--<pathelement path="${test-classes}" />-->
-	 		</classpath>
-	    </javac>
-
-	    <copy todir="${classes}/ca/nengo/config">
-	        <fileset dir="${src}/resources/ca/nengo/config">
-	            <include name="*.txt"/>
-	    	</fileset>
-	    </copy>    
-
-	    <copy todir="${classes}/ca/nengo/config/ui">
-	        <fileset dir="${src}/resources/ca/nengo/config/ui">
-	            <include name="*.jpg"/>
-	            <include name="*.JPG"/>
-	            <include name="*.gif"/>
-	            <include name="*.GIF"/>
-	    	</fileset>
-	    </copy>    
-
-	    <copy todir="${classes}/ca/nengo/plot">
-	        <fileset dir="${src}/resources/ca/nengo/plot">
-	            <include name="*.png"/>
-	    	</fileset>
-	    </copy>    
-		
-	    <copy todir="${classes}/ca/nengo/ui">
-	        <fileset dir="${src}/resources/ca/nengo/ui">
-	            <include name="*.png"/>
-	    	</fileset>
-	    </copy>    
-		
+    <target name="clean">
+    	<delete dir="${dest.artifacts}"/>
+        <delete dir="${dest.build}"/>
+    	<delete dir="${dest.test}"/>
+    </target>
+    <target description="Build simulator. Produces .class files in the ${dest.build} directory."
+			depends="init" name="build">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
+            <src path="${src.main}"/>
+            <classpath refid="classpath.simulator"/>
+        </javac>
+    </target>
+	<target description="Run JUnit tests and produce reports."
+			depends="init-test,build" name="test">
+		<javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.test}" source="${java.source}" target="${java.target}">
+	        <src path="${src.test}"/>
+            <classpath refid="classpath.test"/>
+        </javac>
+		<junit fork="yes" printsummary="no" haltonfailure="no">
+			<batchtest fork="yes" todir="${dest.artifacts.reports}" >
+				<fileset dir="${dest.test}">
+			    	<include name="**/*Test.class" />
+			    </fileset>
+			</batchtest>
+			<formatter type="xml"/>
+			<classpath refid="classpath.test"/>
+		</junit>
+		<junitreport todir="${dest.artifacts.reports}">
+			<fileset dir="${dest.artifacts.reports}">
+		    	<include name="TEST-*.xml" />
+		    </fileset>
+		    <report todir="${dest.artifacts.reports}" />
+		</junitreport>
 	</target>
-	
-	
-	<!-- Creates JAR --> 
-	<target name="jar" depends="compile">
-		<jar jarfile="${dist}/${releasename}.jar" basedir="${classes}" />
+	<target description="Generate JavaDoc." name="javadoc">
+		<mkdir dir="${dest.artifacts.javadoc}"/>
+		<javadoc sourcepath="${src.main}" destdir="${dest.artifacts.javadoc}"
+			author="true" version="true" windowtitle="Nengo API"/>
 	</target>
-
-	<!-- Zips JAR and dependencies -->
-	<target name="zip" depends="jar">
-		<zip zipfile="${dist}/${releasename}.zip" basedir="${lib}" />
-		<zip update="true" zipfile="${dist}/${releasename}.zip" basedir="${lib-ui}"/> 
-		<zip update="true" zipfile="${dist}/${releasename}.zip" basedir="${dist}" includes="${releasename}.jar"/> 
-	</target>
-		
-	<!-- Creates source, doc, and release zip files -->
-	<target name="dist" depends="doc,jar,zip">
-		<mkdir dir="${dist}"/>
-
-	    <!-- Make source zip file -->
-	    <zip zipfile="${dist}/${releasename}_source.zip" basedir="${src}/java/main" includes="ca/nengo/**/*.java"/>
-
-		<!-- Make doc zip file --> 
-		<zip zipfile="${dist}/${releasename}_docs.zip" basedir="${docs}"/>	
-		
-	</target>
-	
-	
-	<!-- Deletes all build products --> 
-	<target name="clean">
-		<delete><fileset dir="${classes}" /></delete>
-		<delete><fileset dir="${test-classes}" /></delete>
-		<delete><fileset dir="${docs}" /></delete>
-	</target>
-	
-	
+	<target description="Generate all artifacts: javadoc, and test reports."
+			depends="test,javadoc" name="all"/>
 </project>

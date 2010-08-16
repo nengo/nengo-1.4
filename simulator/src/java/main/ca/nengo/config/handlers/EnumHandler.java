@@ -29,6 +29,7 @@ package ca.nengo.config.handlers;
 
 import java.awt.Component;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -66,8 +67,7 @@ public class EnumHandler extends BaseHandler {
 	@Override
 	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		Enum<?> mode = (Enum<?>) o;
-		List<? extends Enum<?>> all = new ArrayList<Enum<?>>(EnumSet.allOf(mode.getClass()));
-		
+		List<? extends Enum<?>> all = new ArrayList<Enum<?>>((Collection<? extends Enum<?>>) EnumSet.allOf(mode.getClass()));
 		final JComboBox result = new JComboBox(all.toArray());
 		result.setSelectedItem(mode);
 		
