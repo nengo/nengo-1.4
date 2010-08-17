@@ -38,6 +38,7 @@
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
+    	<exec executable="svnversion" spawn="false" dir="${basedir}" outputproperty="buildnumber"/>
     </target>
 	<target name="init-test">
 		<mkdir dir="${dest.artifacts}"/>
@@ -101,6 +102,7 @@
 	</target>
 	<target description="Create a distribution folder."
 		depends="build" name="dist">
+		<property name="dist.dir" value="../nengo-${buildnumber}"/>
 		<ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
 		<copy includeemptydirs="false" todir="${dest.build}">
 	        <fileset dir="${dir.simulator}/${dest.build}">
@@ -110,13 +112,13 @@
 	    </copy>
 		<delete dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}"/>
-		<jar destfile="${dist.jar}" basedir="${dest.build}">
+		<jar destfile="${dist.dir}/nengo-${buildnumber}.jar" basedir="${dest.build}">
 	    	<manifest>
 		    	<attribute name="Main-Class" value="ca.nengo.ui.NengoGraphics" />
 			  	<attribute name="Built-By" value="${user.name}"/>
 			  	<attribute name="Implementation-Vendor" value="Centre for Theoretical Neuroscience @ UWaterloo"/>
 			  	<attribute name="Implementation-Title" value="Nengo Graphical Simulator"/>
-			  	<attribute name="Implementation-Version" value="1.2-SNAPSHOT"/>
+			  	<attribute name="Implementation-Version" value="Build ${buildnumber}"/>
 	    	</manifest>
 		</jar>
 		<mkdir dir="${dist.dir}/api"/>
@@ -140,6 +142,10 @@
 			</fileset>
 			<fileset dir="${src.dist}"/>
 		</copy>
+		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildnumber}">
+			<include name="nengo"/>
+			<include name="nengo.bat"/>
+		</replace>
 		<chmod perm="a+x" verbose="true">
 			<fileset dir="${dist.dir}">
 				<include name="nengo"/>
