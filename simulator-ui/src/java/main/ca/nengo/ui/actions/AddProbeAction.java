@@ -29,10 +29,10 @@ package ca.nengo.ui.actions;
 import java.util.Map.Entry;
 
 import ca.nengo.model.SimulationException;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.ReversableAction;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.nodes.widgets.UIProbe;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
 
 /**
  * Action for adding probes

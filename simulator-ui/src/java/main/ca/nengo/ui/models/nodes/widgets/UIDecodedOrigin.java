@@ -28,8 +28,8 @@ package ca.nengo.ui.models.nodes.widgets;
 
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.impl.DecodedOrigin;
+import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.models.UINeoNode;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * UI Wrapper for a Decoded Termination

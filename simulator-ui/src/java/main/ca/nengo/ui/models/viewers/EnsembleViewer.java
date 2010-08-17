@@ -30,12 +30,12 @@ import ca.nengo.model.Ensemble;
 import ca.nengo.model.Node;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.neuron.Neuron;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.nodes.UIEnsemble;
 import ca.nengo.ui.models.nodes.UINeuron;
 import ca.nengo.util.Probe;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * Viewer for peeking into an Ensemble

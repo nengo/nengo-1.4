@@ -42,8 +42,8 @@ import ca.nengo.ui.configurable.descriptors.PFunction;
 import ca.nengo.ui.configurable.descriptors.functions.AbstractFn;
 import ca.nengo.ui.configurable.descriptors.functions.ConfigurableFunction;
 import ca.nengo.ui.configurable.descriptors.functions.FnAdvanced;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * Input Panel for editing an individual Function

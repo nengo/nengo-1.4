@@ -26,10 +26,10 @@ package ca.nengo.ui.actions;
 
 import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.NodeContainer.ContainerException;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
 
 public class PasteAction extends StandardAction {
 

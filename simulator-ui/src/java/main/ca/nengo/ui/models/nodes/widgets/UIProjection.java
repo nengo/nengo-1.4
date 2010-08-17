@@ -26,10 +26,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.nodes.widgets;
 
+import ca.nengo.ui.lib.objects.lines.ILineTermination;
+import ca.nengo.ui.lib.objects.lines.LineConnector;
+import ca.nengo.ui.lib.world.piccolo.primitives.PXEdge;
 import ca.nengo.ui.models.UINeoNode;
-import ca.shu.ui.lib.objects.lines.ILineTermination;
-import ca.shu.ui.lib.objects.lines.LineConnector;
-import ca.shu.ui.lib.world.piccolo.primitives.PXEdge;
 
 /**
  * Line Ends for this origin

@@ -37,6 +37,9 @@ import ca.nengo.sim.Simulator;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.RunInteractivePlotstAction;
 import ca.nengo.ui.actions.RunSimulatorAction;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
+import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.NetworkIcon;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
@@ -45,9 +48,6 @@ import ca.nengo.ui.models.viewers.NetworkViewerConfig;
 import ca.nengo.ui.models.viewers.NodeViewer;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutable.Event;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.WorldObject;
 
 /**
  * UI Wrapper for a Network

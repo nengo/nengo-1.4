@@ -26,9 +26,9 @@ package ca.nengo.ui.actions;
 
 import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.models.UINeoNode;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
 
 public class CutAction extends StandardAction {
 	private UINeoNode nodeUI;

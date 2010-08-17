@@ -28,8 +28,8 @@ package ca.nengo.ui.configurable;
 
 import javax.swing.SwingUtilities;
 
-import ca.shu.ui.lib.exceptions.UIException;
-import ca.shu.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.exceptions.UIException;
+import ca.nengo.ui.lib.util.UserMessages;
 
 /**
  * Exception to be thrown is if there is an error during Configuration

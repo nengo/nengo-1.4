@@ -42,8 +42,8 @@ import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PCouplingMatrix;
 import ca.nengo.ui.configurable.descriptors.PTerminationWeights;
 import ca.nengo.ui.configurable.managers.ConfigManager;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * Input panel for Termination Weights Matrix

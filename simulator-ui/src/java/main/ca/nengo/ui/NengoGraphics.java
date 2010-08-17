@@ -29,16 +29,16 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FilenameFilter;
+//import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+//import java.net.MalformedURLException;
+//import java.net.URL;
+//import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Enumeration;
+//import java.util.Enumeration;
 import java.util.LinkedList;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+//import java.util.jar.JarEntry;
+//import java.util.jar.JarFile;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -48,7 +48,7 @@ import javax.swing.KeyStroke;
 
 import org.python.util.PythonInterpreter;
 
-import ca.nengo.config.ClassRegistry;
+//import ca.nengo.config.ClassRegistry;
 import ca.nengo.config.ConfigUtil;
 import ca.nengo.config.JavaSourceParser;
 import ca.nengo.model.Network;
@@ -63,6 +63,27 @@ import ca.nengo.ui.actions.RunSimulatorAction;
 import ca.nengo.ui.actions.SaveNodeAction;
 import ca.nengo.ui.dataList.DataListView;
 import ca.nengo.ui.dataList.SimulatorDataModel;
+import ca.nengo.ui.lib.AppFrame;
+import ca.nengo.ui.lib.AuxillarySplitPane;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.DisabledAction;
+import ca.nengo.ui.lib.actions.DragAction;
+import ca.nengo.ui.lib.actions.SetSplitPaneVisibleAction;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.misc.ShortcutKey;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.menus.MenuBuilder;
+import ca.nengo.ui.lib.world.WorldObject;
+import ca.nengo.ui.lib.world.WorldObject.Property;
+import ca.nengo.ui.lib.world.elastic.ElasticWorld;
+import ca.nengo.ui.lib.world.handlers.SelectionHandler;
+import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
+import ca.nengo.ui.lib.world.piccolo.objects.Window;
+import ca.nengo.ui.lib.world.piccolo.primitives.Universe;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.constructors.CNetwork;
@@ -76,27 +97,6 @@ import ca.nengo.ui.util.ScriptWorldWrapper;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.nengo.ui.world.NengoWorld;
 import ca.nengo.util.Environment;
-import ca.shu.ui.lib.AppFrame;
-import ca.shu.ui.lib.AuxillarySplitPane;
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.DisabledAction;
-import ca.shu.ui.lib.actions.DragAction;
-import ca.shu.ui.lib.actions.SetSplitPaneVisibleAction;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.misc.ShortcutKey;
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.util.menus.MenuBuilder;
-import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.WorldObject.Property;
-import ca.shu.ui.lib.world.elastic.ElasticWorld;
-import ca.shu.ui.lib.world.handlers.SelectionHandler;
-import ca.shu.ui.lib.world.piccolo.objects.SelectionBorder;
-import ca.shu.ui.lib.world.piccolo.objects.Window;
-import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 
 /**
  * Top level instance of the NeoGraphics application
@@ -109,7 +109,7 @@ import ca.shu.ui.lib.world.piccolo.primitives.Universe;
 public class NengoGraphics extends AppFrame implements NodeContainer {
 	private static final long serialVersionUID = 1L;
 
-	public static final double VERSION = 1.1;
+	public static final double VERSION = 1.2;
 
 	public static final String APP_NAME = "Nengo V" + VERSION;
 	/**
@@ -136,7 +136,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	 */
 	public static final String NEONODE_FILE_EXTENSION = "nef";
 
-	public static final String PLUGIN_DIRECTORY = "plugins";
+//	public static final String PLUGIN_DIRECTORY = "plugins";
 
 	public static NengoGraphics getInstance() {
 		Util.Assert(UIEnvironment.getInstance() instanceof NengoGraphics);
@@ -293,78 +293,78 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	/**
 	 * Register plugins
 	 */
-	private void registerPlugins() {
-		try {
-			LinkedList<URL> pluginUrls = new LinkedList<URL>();
-			LinkedList<JarFile> pluginJars = new LinkedList<JarFile>();
-
-			File pluginDir = new File(PLUGIN_DIRECTORY);
-			pluginUrls.add(pluginDir.toURI().toURL());
-
-			File[] pluginJarFiles = pluginDir.listFiles(new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					if (name.endsWith("jar")) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-			});
-
-			for (File jarFile : pluginJarFiles) {
-				pluginUrls.add(jarFile.toURI().toURL());
-			}
-
-			URL[] pluginUrlsArray = pluginUrls.toArray(new URL[] {});
-
-			URLClassLoader urlClassLoader = new URLClassLoader(pluginUrlsArray);
-
-			/*
-			 * Loads all classes in each plugin jar
-			 */
-			for (File jarFile : pluginJarFiles) {
-				try {
-					JarFile jar = new JarFile(jarFile);
-					pluginJars.add(jar);
-					Enumeration<JarEntry> entries = jar.entries();
-					while (entries.hasMoreElements()) {
-						JarEntry entry = entries.nextElement();
-						String fileName = entry.getName();
-						if (fileName.endsWith(".class")) {
-							String className = "";
-							try {
-								className = fileName.substring(0, fileName.lastIndexOf('.')).replace('/',
-										'.');// .replace('$',
-								// '.');
-								Class<?> newClass = urlClassLoader.loadClass(className);
-
-								// Util.debugMsg("Registering class: " +
-								// newClass.getName());
-								ClassRegistry.getInstance().register(newClass);
-
-							} catch (ClassNotFoundException e) {
-								e.printStackTrace();
-							} catch (NoClassDefFoundError e) {
-								// this only occurs for nested classes (i.e.
-								// those with dollar signs in class name),
-								// and perhaps only on the Mac
-
-								// System.out.println(className);
-								// e.printStackTrace();
-							}
-						}
-					}
-
-					pluginUrls.add(jarFile.toURI().toURL());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-	}
+//	private void registerPlugins() {
+//		try {
+//			LinkedList<URL> pluginUrls = new LinkedList<URL>();
+//			LinkedList<JarFile> pluginJars = new LinkedList<JarFile>();
+//
+//			File pluginDir = new File(PLUGIN_DIRECTORY);
+//			pluginUrls.add(pluginDir.toURI().toURL());
+//
+//			File[] pluginJarFiles = pluginDir.listFiles(new FilenameFilter() {
+//				public boolean accept(File dir, String name) {
+//					if (name.endsWith("jar")) {
+//						return true;
+//					} else {
+//						return false;
+//					}
+//				}
+//			});
+//
+//			for (File jarFile : pluginJarFiles) {
+//				pluginUrls.add(jarFile.toURI().toURL());
+//			}
+//
+//			URL[] pluginUrlsArray = pluginUrls.toArray(new URL[] {});
+//
+//			URLClassLoader urlClassLoader = new URLClassLoader(pluginUrlsArray);
+//
+//			/*
+//			 * Loads all classes in each plugin jar
+//			 */
+//			for (File jarFile : pluginJarFiles) {
+//				try {
+//					JarFile jar = new JarFile(jarFile);
+//					pluginJars.add(jar);
+//					Enumeration<JarEntry> entries = jar.entries();
+//					while (entries.hasMoreElements()) {
+//						JarEntry entry = entries.nextElement();
+//						String fileName = entry.getName();
+//						if (fileName.endsWith(".class")) {
+//							String className = "";
+//							try {
+//								className = fileName.substring(0, fileName.lastIndexOf('.')).replace('/',
+//										'.');// .replace('$',
+//								// '.');
+//								Class<?> newClass = urlClassLoader.loadClass(className);
+//
+//								// Util.debugMsg("Registering class: " +
+//								// newClass.getName());
+//								ClassRegistry.getInstance().register(newClass);
+//
+//							} catch (ClassNotFoundException e) {
+//								e.printStackTrace();
+//							} catch (NoClassDefFoundError e) {
+//								// this only occurs for nested classes (i.e.
+//								// those with dollar signs in class name),
+//								// and perhaps only on the Mac
+//
+//								// System.out.println(className);
+//								// e.printStackTrace();
+//							}
+//						}
+//					}
+//
+//					pluginUrls.add(jarFile.toURI().toURL());
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//
+//		} catch (MalformedURLException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	protected NengoWorld getNengoWorld() {
 		return (NengoWorld) getWorld();
@@ -412,7 +412,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		/*
 		 * Register plugin classes
 		 */
-		registerPlugins();
+//		registerPlugins();
 
 		setExtendedState(NengoConfigManager.getUserInteger(UserProperties.NengoWindowExtendedState,
 				JFrame.MAXIMIZED_BOTH));

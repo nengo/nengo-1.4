@@ -48,9 +48,9 @@ import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.objects.activities.TrackedAction;
-import ca.shu.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.objects.activities.TrackedAction;
+import ca.nengo.ui.lib.util.UserMessages;
 
 /**
  * Configuration dialog

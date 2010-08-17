@@ -33,8 +33,8 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
-import ca.shu.ui.lib.util.UIEnvironment;
 
 /**
  * File chooser used for NEO Model files.

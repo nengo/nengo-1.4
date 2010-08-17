@@ -32,12 +32,12 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.objects.activities.TrackedAction;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.models.UINeoNode;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.objects.activities.TrackedAction;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Saves a nodeUI

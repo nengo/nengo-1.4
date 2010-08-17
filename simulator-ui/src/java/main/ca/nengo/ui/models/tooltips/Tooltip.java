@@ -29,9 +29,9 @@ package ca.nengo.ui.models.tooltips;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.world.WorldObject;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PText;
 
 /**

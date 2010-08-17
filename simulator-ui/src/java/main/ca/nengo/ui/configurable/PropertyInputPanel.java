@@ -35,7 +35,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import ca.shu.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.Style;
 
 /**
  * Swing Input panel to be used to enter in the value for a ConfigParam

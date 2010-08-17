@@ -31,8 +31,8 @@ import javax.swing.SwingUtilities;
 
 import ca.nengo.model.Network;
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.nengo.ui.models.nodes.UINetwork;
-import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
 
 /**
  * Used to conveniently create a NeoGraphics instance with an existing Network

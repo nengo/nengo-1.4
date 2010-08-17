@@ -35,10 +35,10 @@ import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.util.DialogPlotter;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UIEnvironment;
 
 /**
  * Plots a function node, which can contain multiple functions

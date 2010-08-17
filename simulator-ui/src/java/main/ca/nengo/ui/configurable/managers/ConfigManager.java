@@ -48,8 +48,8 @@ import ca.nengo.ui.configurable.ConfigSchema;
 import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.IConfigurable;
 import ca.nengo.ui.configurable.Property;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * Configuration Manager used to configure IConfigurable objects

@@ -24,10 +24,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.icons;
 
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.world.WorldObject;
+import ca.nengo.ui.lib.world.piccolo.primitives.Text;
 import ca.nengo.ui.models.nodes.UINodeViewable;
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.piccolo.primitives.Text;
 
 /**
  * Icon for a Node Container. The size of this icon scales depending on the

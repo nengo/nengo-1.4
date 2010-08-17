@@ -29,7 +29,7 @@ package ca.nengo.ui.models;
 import java.awt.geom.Point2D;
 
 import ca.nengo.model.Node;
-import ca.shu.ui.lib.exceptions.UIException;
+import ca.nengo.ui.lib.exceptions.UIException;
 
 /**
  * A Container of PNeoNode

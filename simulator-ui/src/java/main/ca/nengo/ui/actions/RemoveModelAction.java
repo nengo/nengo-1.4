@@ -28,10 +28,10 @@ package ca.nengo.ui.actions;
 
 import javax.swing.JOptionPane;
 
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.util.UIEnvironment;
 
 /**
  * Action for removing this UI Wrapper and the model

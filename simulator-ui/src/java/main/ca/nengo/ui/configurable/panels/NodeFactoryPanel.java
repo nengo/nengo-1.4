@@ -56,9 +56,9 @@ import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PBoolean;
 import ca.nengo.ui.configurable.descriptors.PFloat;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.models.constructors.AbstractConstructable;
 import ca.nengo.ui.models.constructors.ModelFactory;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Input Panel for selecting and configuring a Node Factory

@@ -42,9 +42,9 @@ import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.util.Probe;
-import ca.shu.ui.lib.util.Util;
 
 /**
  * In this example, an Integrator network is constructed

@@ -30,6 +30,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.lang.UnsupportedOperationException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,7 +44,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import ca.nengo.io.FileManager;
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
@@ -65,6 +65,20 @@ import ca.nengo.ui.actions.CutAction;
 import ca.nengo.ui.actions.SaveNodeAction;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.UserDialogs;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.ReversableAction;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.objects.activities.TransientStatusMessage;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
+import ca.nengo.ui.lib.world.DroppableX;
+import ca.nengo.ui.lib.world.WorldObject;
+import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.models.NodeContainer.ContainerException;
 import ca.nengo.ui.models.nodes.UIEnsemble;
 import ca.nengo.ui.models.nodes.UIFunctionInput;
@@ -83,20 +97,6 @@ import ca.nengo.ui.models.viewers.NodeViewer;
 import ca.nengo.util.Probe;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutable.Event;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.objects.activities.TransientStatusMessage;
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.DroppableX;
-import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.piccolo.WorldImpl;
 
 /**
  * UI Wrapper for a NEO Node Model
@@ -692,7 +692,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		/*
 		 * Set name is disabled, the Name is automatically retrieved from model
 		 */
-		throw new NotImplementedException();
+		throw new UnsupportedOperationException();
 	}
 
 	/**

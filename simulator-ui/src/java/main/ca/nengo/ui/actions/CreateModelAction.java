@@ -32,6 +32,11 @@ import javax.swing.SwingUtilities;
 import ca.nengo.model.Node;
 import ca.nengo.model.StructuralException;
 import ca.nengo.ui.configurable.ConfigException;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.ReversableAction;
+import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.NodeContainer.ContainerException;
@@ -39,11 +44,6 @@ import ca.nengo.ui.models.constructors.AbstractConstructable;
 import ca.nengo.ui.models.constructors.ConstructableNode;
 import ca.nengo.ui.models.constructors.ModelFactory;
 import ca.nengo.ui.models.nodes.UINodeViewable;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Creates a new NEO model

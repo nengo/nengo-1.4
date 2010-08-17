@@ -26,9 +26,9 @@ package ca.nengo.ui.models.nodes.widgets;
 
 import ca.nengo.model.Ensemble;
 import ca.nengo.ui.actions.PlotSpikePattern;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.models.nodes.UIEnsemble;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 public class UISpikeProbe extends UIProbe {
 

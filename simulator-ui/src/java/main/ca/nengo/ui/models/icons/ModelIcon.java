@@ -24,11 +24,11 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.icons;
 
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.WorldObject.Listener;
-import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
-import ca.shu.ui.lib.world.piccolo.primitives.Text;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.world.WorldObject;
+import ca.nengo.ui.lib.world.WorldObject.Listener;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.nengo.ui.lib.world.piccolo.primitives.Text;
 
 /**
  * An Icon which has a representation and an label. It is used to represent NEO

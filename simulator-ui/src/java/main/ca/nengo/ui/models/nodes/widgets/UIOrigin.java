@@ -31,11 +31,11 @@ import ca.nengo.model.Network;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.nef.impl.DecodedOrigin;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.ModelIcon;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * UI Wrapper for an Origin

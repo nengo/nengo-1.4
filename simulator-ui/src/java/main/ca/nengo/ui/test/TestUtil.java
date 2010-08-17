@@ -11,8 +11,8 @@ import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.nengo.ui.lib.util.Util;
 import ca.nengo.util.Probe;
-import ca.shu.ui.lib.util.Util;
 
 
 public class TestUtil {

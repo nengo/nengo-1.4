@@ -26,8 +26,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.nodes.widgets;
 
-import ca.shu.ui.lib.objects.lines.LineWell;
-import ca.shu.ui.lib.objects.models.ModelObject.ModelListener;
+import ca.nengo.ui.lib.objects.lines.LineWell;
+import ca.nengo.ui.lib.objects.models.ModelObject.ModelListener;
 
 /**
  * LineEndWell for this origin

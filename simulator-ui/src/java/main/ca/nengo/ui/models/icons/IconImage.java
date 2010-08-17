@@ -30,10 +30,10 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.net.URL;
 
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
-import ca.shu.ui.lib.world.piccolo.primitives.PXImage;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.nengo.ui.lib.world.piccolo.primitives.PXImage;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
 

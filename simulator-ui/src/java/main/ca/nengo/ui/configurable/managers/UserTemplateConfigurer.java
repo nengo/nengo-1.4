@@ -32,7 +32,7 @@ import java.awt.Dialog;
 import java.awt.Frame;
 
 import ca.nengo.ui.configurable.IConfigurable;
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * A lot like UserConfigurer, except it allows the user to use templates to save

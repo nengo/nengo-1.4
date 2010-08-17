@@ -32,19 +32,19 @@ import ca.nengo.model.Network;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.nef.impl.DecodedTermination;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.objects.lines.ILineTermination;
+import ca.nengo.ui.lib.objects.lines.LineConnector;
+import ca.nengo.ui.lib.objects.lines.LineTerminationIcon;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
+import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.ModelIcon;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.lines.ILineTermination;
-import ca.shu.ui.lib.objects.lines.LineConnector;
-import ca.shu.ui.lib.objects.lines.LineTerminationIcon;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
-import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
-import ca.shu.ui.lib.world.WorldObject;
 
 /**
  * UI Wrapper for a Termination

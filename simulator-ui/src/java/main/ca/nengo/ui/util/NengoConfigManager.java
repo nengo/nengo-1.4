@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.Util;
 
 public class NengoConfigManager {
 

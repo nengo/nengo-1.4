@@ -34,9 +34,9 @@ import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.util.UIEnvironment;
 
 public class PlotFunctionNodeAction extends StandardAction {
 	private static final long serialVersionUID = 1L;

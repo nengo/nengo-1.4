@@ -38,10 +38,10 @@ import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Probeable;
+import ca.nengo.ui.lib.util.Util;
 import ca.nengo.util.Probe;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.TimeSeries;
-import ca.shu.ui.lib.util.Util;
 
 public class SimulatorDataModel extends DefaultTreeModel {
 

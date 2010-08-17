@@ -28,10 +28,10 @@ package ca.nengo.ui.models.nodes;
 
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.ui.actions.PlotFunctionNodeAction;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.FunctionInputIcon;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper of FunctionInput

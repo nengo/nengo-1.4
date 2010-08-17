@@ -1,0 +1,1077 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+
+<title>CogSci 2010 Workshop Hands-on Activities</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!-- base href="http://arts.uwaterloo.ca/~cnrglab/" -->
+<style type="text/css">
+@import url(misc/print.css);
+</style>
+</head><body>
+<div class="section-1">
+<div id="node-650" class="section-2">
+<h1 class="book-heading">CogSci 2010 Workshop Hands-on Activities</h1>
+<p>These pages provide a step-by-step tutorial on the use of Nengo, our
+software for cognitive modelling using the Neural Engineering
+Framework. You can download this software at <a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/nengo.zip">http://ctn.uwaterloo.ca/~cnrglab/f/nengo.zip</a>.  This tutorial is available online at <a href="http://ctn.uwaterloo.ca/%7Ecnrglab/?q=node/650">http://ctn.uwaterloo.ca/~cnrglab/?q=node/650</a>.</p>
+
+<p>For further information, the slides that accompany this tutorial are also here.</p>
+
+<h2>Slides</h2>
+
+<ul>
+ <li><a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/Nengo1-1DRepresentation.pdf">1D Representation</a>
+ </li><li><a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/Nengo2-LinearTransformations.pdf">Linear Transformations</a>
+ </li><li><a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/Nengo3-NonlinearTransformations.pdf">Nonlinear Transformations</a>
+ </li><li><a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/Nengo4-Dynamics.pdf">Dynamics</a>
+ </li><li><a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/Nengo5-CognitiveModelling.pdf">Cognitive Modelling</a>
+ </li><li><a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/Nengo6-FurtherApplications.pdf">Further Applications</a>
+</li></ul>
+
+<h2>On-line Tutorials</h2>
+<div id="node-651" class="section-3">
+<h1 class="book-heading">Part One: One-Dimensional Representation</h1>
+<h2>Installing and Running Nengo</h2>
+
+<ul>
+<li>Install Nengo from the provided USB keys.  Do this by copying the nengo directory onto your computer.
+<ul><li>Alternatively, download it from <a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/nengo.zip">http://ctn.uwaterloo.ca/~cnrglab/f/nengo.zip</a></li>
+<li>You must also have Java installed on your computer</li>
+<li>Nengo will run faster if you also have Python installed along with
+the NumPy and SciPy libraries. Versions of these for Windows can be
+found in the windows directory</li></ul></li>
+<li>To run Nengo, either:
+<ul><li>Double-click on nengo.bat (in Windows)</li>
+<li>run ./nengo (in OS X and Linux)</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_031.png" alt="p1-1.png" title="p1-1.png" class="inline"></p>
+
+<h2>Creating Networks</h2>
+
+<ul>
+<li>When creating an NEF model, the first step is to create a Network.
+This will contain all of the neural ensembles and any needed inputs to
+the system.
+<ul><li>File-&gt;New Network</li>
+<li>Give the network a name</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_051.png" alt="p1-2.png" title="p1-2.png" class="inline"></p>
+
+<ul>
+<li>You can create networks inside of other networks.  This can be useful for hierarchical organization of models.</li>
+</ul>
+
+<h2>Creating an Ensemble</h2>
+
+<ul>
+<li>Ensembles must be placed inside networks in order to be used</li>
+<li>Right-click inside a network
+<ul><li>Create New-&gt;NEF Ensemble</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_023.png" alt="p1-3.png" title="p1-3.png" class="inline"></p>
+
+<ul>
+<li>Here the basic features of the ensemble can be configured
+<ul><li>Name</li>
+<li>Number of nodes (i.e. neurons)</li>
+<li>Dimensions (the number of values in the vector encoded by these neurons; leave at 1 for now)</li>
+<li>Radius (the range of values that can be encoded; for example, a
+value of 100 means the ensemble can encode numbers between -100 and 100)</li></ul></li>
+<li>Node Factory (the type of neuron to use)</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_003.png" alt="p1-4.png" title="p1-4.png" class="inline"></p>
+
+<ul>
+<li>For this tutorial (and for the majority of our research), we use
+LIF Neuron, the standard Leaky-Integrate-and-Fire neuron. Clicking on
+Set allows for the neuron parameters to be configured</li>
+<li>tauRC (RC time constant for the neuron membrane; usually 0.02)</li>
+<li>tauRef (absolute refractory period for the neuron; usually 0.002)</li>
+<li>Max rate (the maximum firing rate for the neurons; each neuron will
+have a maximum firing rate chosen from a uniform distribution between
+low and high)</li>
+<li>Intercept (the range of possible x-intercepts on the tuning curve graph; normally set to -1 and 1)
+<ul><li>Because there are many parameters to set and we often choose
+similar values, Nengo will remember your previous settings. Also, you
+can save templates by setting up the parameters as you like them and
+clicking on New in the Templates box. You will then be able to go back
+to these settings by choosing the template from the drop-down box.</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_021.png" alt="p1-5.png" title="p1-5.png" class="inline"></p>
+
+<ul>
+<li>You can double-click on an ensemble to view the individual neurons within it</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_019.png" alt="p1-5b.png" title="p1-5b.png" class="inline"></p>
+
+<h2>Plotting Tuning Curves</h2>
+
+<ul>
+<li>This shows the behaviour of each neuron when it is representing different values (i.e. the tuning curves for the neurons)</li>
+<li>Right-click on the ensemble, select Plot-&gt;Constant Rate Responses</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_033.png" alt="p1-6.png" title="p1-6.png" class="inline"></p>
+
+<ul>
+<li>tauRC affects the linearity of the neurons (smaller values are more linear)</li>
+<li>Max rate affects the height of the curves at the left and right sides</li>
+<li>Intercept affects where the curves hit the x-axis (i.e. the value where the neuron starts firing)</li>
+</ul>
+
+<h2>Plotting Representation Error</h2>
+
+<ul>
+<li>We often want to determine the accuracy of a neural ensemble.</li>
+<li>Right-click on the ensemble, select Plot-&gt;Plot Distortion:X</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_060.png" alt="p1-7.png" title="p1-7.png" class="inline"></p>
+
+<ul>
+<li>Mean Squared Error (MSE) is also shown (at the top)</li>
+<li>MSE decreases as the square of the number of neurons (so RMSE is proportional to 1/N)</li>
+<li>Can also affect representation accuracy by adjusting the range of
+intercepts. This will cause the system to be more accurate in the
+middle of the range and less accurate at the edges.</li>
+</ul>
+
+<h2>Adjusting an Ensemble</h2>
+
+<ul>
+<li>After an ensemble is created, we can inspect and modify many of its parameters</li>
+<li>Right-click on an ensemble and select Configure</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_025.png" alt="p1-8.png" title="p1-8.png" class="inline"></p>
+
+<ul>
+<li>neurons (number of neurons; this will rebuild the whole ensemble)</li>
+<li>radii (the range of values that can be encoded; can be different for different dimensions)</li>
+<li>encoders (preferred direction vectors for each neuron)</li>
+</ul>
+
+<h3>The Script Console</h3>
+
+<ul>
+<li>Nengo also allows users to interact with the model via a scripting
+interface using the Python language. This can be useful for writing
+scripts to create components of models that you use often.</li>
+<li>You can also use it to inspect and modify various aspects of the model.</li>
+<li>Press Ctrl-P or choose View-&gt;Toggle Script Console to show the script interface
+<ul><li>The full flexibility of the Python programming language is
+available in this console. It interfaces to the underlying Java code of
+the simulation using Jython, making all Java methods available.</li></ul></li>
+<li>If you click on an object in the GUI (so that it is highlighted in
+yellow), this same object is available by the name “that” in the script
+console.
+<ul><li>Click on an ensemble</li>
+<li>Open the script console</li>
+<li>type “print that.neurons”</li>
+<li>type “that.neurons=50”</li></ul></li>
+<li>You can also run scripts by typing “run [scriptname.py]”</li>
+</ul>
+</div>
+<div id="node-652" class="section-3">
+<h1 class="book-heading">Part Two: Linear Transformations</h1>
+<h2>Creating Terminations</h2>
+
+<ul>
+<li>Connections between ensembles are built using Origins and
+Terminations. The Origin from one ensemble can be connected to the
+Termination on the next ensemble</li>
+<li>Create two ensembles. They can have different neural properties and
+different numbers of neurons, but for now make sure they are both
+one-dimensional.</li>
+<li>Right-click on the second ensemble and select Add Decoded Termination
+<ul><li>Provide a name (for example, “input”)</li>
+<li>Set the input dimension to 1 and use Set Weights to set the connection weight to 1</li>
+<li>Set tauPSC to 0.01 (this synaptic time constant differs according
+to which neurotransmitter is involved. 10ms is the time constant for
+AMPA (5-10ms).</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_004.png" alt="p2-1.png" title="p2-1.png" class="inline"> <img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_022.png" alt="p2-2.png" title="p2-2.png" class="inline"></p>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_043.png" alt="p2-3.png" title="p2-3.png" class="inline"></p>
+
+<h2>Creating Projections</h2>
+
+<ul>
+<li>We can now connect the two neural ensembles.</li>
+<li>Every ensemble automatically has an origin called X. This is an
+origin suitable for building any linear transformation. In Part Three
+we will show how to create origins for non-linear transformations.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_046.png" alt="p2-4.png" title="p2-4.png" class="inline"></p>
+
+<ul>
+<li>Click and drag from the origin to the termination.  This will create the desired projection.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_066.png" alt="p2-5.png" title="p2-5.png" class="inline"></p>
+
+<h2>Adding Inputs</h2>
+
+<ul>
+<li>In order to test that this projection works, we need to set the
+value encoded by the first neural ensemble. We do this by creating an
+input to the system. This is how all external inputs to Nengo models
+are specified.</li>
+<li>Right-click inside the Network and choose Create New-&gt;Function Input.</li>
+<li>Give it a name (for example, “external input”)</li>
+<li>Set its output dimensions to 1</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_011.png" alt="p2-6.png" title="p2-6.png" class="inline"></p>
+
+<ul>
+<li>Press Set Function to define the behaviour of this input</li>
+<li>Select Constant Function from the drop-down list and then press Set to define the value itself. For this model, set it to 0.5.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_036.png" alt="p2-7.png" title="p2-7.png" class="inline"><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a.png" alt="p2-8.png" title="p2-8.png" class="inline"></p>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_016.png" alt="p2-9.png" title="p2-9.png" class="inline"></p>
+
+<ul>
+<li>Add a termination on the first neural ensemble and create a projection from the new input to that ensemble.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_028.png" alt="p2-10.png" title="p2-10.png" class="inline"></p>
+
+<h2>Interactive Plots</h2>
+
+<ul>
+<li>To observe the performance of this model, we now switch over to
+Interactive Plots. This allows us to both graph the performance of the
+model and adjust its inputs on-the-fly to see how this affects
+behaviour.</li>
+<li>Start Interactive Plots by right-clicking inside the Network and selecting Interactive Plots</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_024.png" alt="p2-101.png" title="p2-101.png" class="inline"></p>
+
+<ul>
+<li>The text shows the various components of your model, and the arrows indicate the synaptic connections between them.
+<ul><li>You can move the components by left-click dragging them, and you can move all the components by dragging the background.</li>
+<li>You can hide a component by right-clicking on it and selecting “hide”</li>
+<li>To show a hidden component, right click on the background and select the component by name</li></ul></li>
+<li>The bottom of the window shows the controls for running the simulation.
+<ul><li>The simulation can be started and stopped by pressing the Play
+or Pause button at the bottom right. Doing this right now will run the
+simulation, but no data will be displayed since we don’t have any
+graphs open yet!</li>
+<li>The reset button on the far left clears all the data from the simulation and puts it back to the beginning.</li>
+<li>In the middle is a slider that shows the current time in the
+simulation. Once a simulation has been run, we can slide this back and
+forth to observe data from different times in the simulation.</li></ul></li>
+<li>Right-clicking on a component also allows us to select a type of data to show about that component.
+<ul><li>Right-click on A and select “value”. This creates a graph that
+shows the value being represented by the neuron in ensemble A. You can
+move the graph by left-click dragging it, and you can resize it by
+dragging near the corners or using a mouse scroll wheel. </li>
+<li>Press the Play button at the bottom-right or the window and confirm
+that this group of neurons successfully represents its input value,
+which we previously set to be 0.5.</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_064.png" alt="p2-102.png" title="p2-102.png" class="inline"></p>
+
+<ul>
+<li>Now let us see what happens if we change the input. Right-click on
+the input and select “control”. This lets us vary the input while the
+simulation is running.</li>
+<li>Drag the slider up and down while the simulation is running (press
+Play again if it is paused). The neurons in ensemble A should be able
+to successfully represent the changing values.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_029.png" alt="p2-103.png" title="p2-103.png" class="inline"></p>
+
+<ul>
+<li>We can also view what the individual neurons are doing during the
+simulation. Right-click on A and choose “spike raster”. This shows the
+individual spikes coming from the neurons. Since there are 100 neurons
+in ensemble A, the spikes from only a sub-set of these are shown. You
+can right-click on the spike raster graph and adjust the proportion of
+spikes shown. Change it to 50%.</li>
+<li>Run the simulation and change the input.  This will affect the neuron firing patterns.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_057.png" alt="p2-104.png" title="p2-104.png" class="inline"></p>
+
+<ul>
+<li>We can also see the voltage levels of all the individual neurons.
+Right-click on A and choose “voltage grid”. Each neuron is shown as a
+square and the shading of that square indicates the voltage of that
+neuron’s cell membrane, from black (resting potential) to white (firing
+threshold). Yellow indicates a spike.</li>
+<li>The neurons are initially randomly ordered. You can change this by
+right-clicking on the voltage grid and selecting “improve layout”. This
+will attempt to re-order the neurons so that neurons with similar
+firing patterns are near each other, as they are in the brain. This
+does not otherwise affect the simulation in any way.</li>
+<li>Run the simulation and change the input.  This will affect the neuron voltage.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_055.png" alt="p2-105.png" title="p2-105.png" class="inline"></p>
+
+<ul>
+<li>So far, we have just been graphing information about neural
+ensemble A. We have shown that these 100 neurons can accurately
+represent a value that is directly input to them.</li>
+<li>For this to be useful for constructing cognitive models, we need to
+also show that the spiking output from this group of neurons can be
+used to transfer this information from one neural group to another.
+<ul><li>In other words, we want to show that B can represent the same
+thing as A, where B’s only input is the neural firing from group A. For
+this to happen, the correct synaptic connection weights between A and B
+(as per the Neural Engineering Framework) must be calculated.</li>
+<li>Nengo automatically calculates these weights whenever an origin is created.</li></ul></li>
+<li>We can see that this communication is successful by creating graphs for ensemble B.<br>
+<ul><li>Do this by right-clicking on B and selecting “value”, and then right-clicking on B again and selecting “voltage grid”.</li>
+<li>To aid in identifying which graph goes with which ensemble, right click on a graph and select “label”.</li>
+<li>Graphs can be moved (by dragging) and resized (by dragging near the edges and corners or by the mouse scroll wheel) as desired.</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_062.png" alt="p2-106.png" title="p2-106.png" class="inline"></p>
+
+<ul>
+<li>Notice that the neural ensembles can be representing the same value, but have a different firing pattern.</li>
+<li>Close the Interactive Plots when you are finished.</li>
+</ul>
+
+<h2>Adding Scalars</h2>
+
+<ul>
+<li>If we want to add two values, we can simply add another termination to the final ensemble and project to it as well.</li>
+<li>Create a termination on the second ensemble called “input 2”</li>
+<li>Create a new ensemble</li>
+<li>Create a projection from the X origin to input 2</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_034.png" alt="p2-19.png" title="p2-19.png" class="inline"></p>
+
+<ul>
+<li>Create a new Function input and set its value to -0.7</li>
+<li>Add the required termination and projection to connect it to the new ensemble</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_006.png" alt="p2-20.png" title="p2-20.png" class="inline"></p>
+
+<ul>
+<li>Switch to Interactive Plots.</li>
+<li>Show the controls for the two inputs</li>
+<li>Create value graphs for the three neural ensembles</li>
+<li>Press Play to start the simulation.  The value for the final ensemble should be 0.5-0.7=-0.2</li>
+<li>Use the control sliders to adjust the input.  The output should still be the sum of the inputs.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_020.png" alt="p2-107.png" title="p2-107.png" class="inline"></p>
+
+<ul>
+<li>This will be true for most values. However, if the sum is outside
+of the radius that was set when the neural group was formed (in this
+case, from -1 to 1), then the neurons may not be able to fire fast
+enough to represent that value (i.e. they will saturate). Try this by
+computing 1+1. The result will only be around 1.3.</li>
+<li>To accurately represent values outside of the range -1 to 1, we
+need to change the radius of the output ensemble. Return to the
+standard black editing mode and right-click on ensemble B. Select
+“Configure” and change its radii to 2. Now return to the Interactive
+Plots. The network should now accurately compute that 1+1=2.</li>
+</ul>
+
+<h2>Adjusting Transformations</h2>
+
+<ul>
+<li>So far, we have only considered projections that do not adjust the
+values being represented in any way. However, due to the NEF derivation
+of the synaptic weights between neurons, we can adjust these to create
+arbitrary linear transformations (i.e. we can multiply any represented
+value by a matrix).</li>
+<li>Each termination in Nengo has an associated transformation matrix.
+This can be adjusted as desired. In this case, we will double the
+weight of the original value, so instead of computing x+y, the network
+will compute 2x+y.</li>
+<li>Right-click on the first termination in the ensemble that has two
+projections coming into it. Select Configure. Double-click on transform.</li>
+<li>Double-click on the 1.0 and change it to 2.0</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_040.png" alt="p2-22.png" title="p2-22.png" class="inline"></p>
+
+<ul>
+<li>Click on OK and then Done</li>
+<li>Now run the simulation.  The final result should be 2(0.5)-0.7=0.3</li>
+</ul>
+
+<h2>Multiple Dimensions</h2>
+
+<ul>
+<li>Everything discussed above also applies to ensembles that represent more than one dimension.</li>
+<li>To create these, set the number of dimensions to 2 when creating the ensemble</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_067.png" alt="p2-24.png" title="p2-24.png" class="inline"></p>
+
+<ul>
+<li>When adding a termination, the input dimension can be adjusted.
+This defines the shape of the transformation matrix for the
+termination, allowing for projections that change the dimension of the
+data</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_015.png" alt="p2-25.png" title="p2-25.png" class="inline"></p>
+
+<ul>
+<li><p>For example, two 1-dimensional values can be combined into a
+single two-dimensional ensemble. This would be done with two
+terminations: one with a transformation (or coupling) matrix of [1 0]
+and the other with [0 1]. If the two inputs are called a and b, this
+will result in the following calculation:</p>
+
+<ul><li>a*[1 0] + b*[0 1] = [a 0] + [0 b] = [a b]</li>
+<li>This will be useful for creating non-linear transformations, as discussed further in the next section.</li></ul></li>
+<li><p>There are additional ways to view 2D representations in the interactive plots</p>
+
+<ul><li>Including plotting the activity of the neurons along their preferred direction vectors</li>
+<li>Plotting the 2D decoded value of the representation</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_049.png" alt="p2-108.png" title="p2-108.png" class="inline"></p>
+
+<h2>Scripting</h2>
+
+<ul>
+<li>Along with the ability to construct models using this
+point-and-click interface, Nengo also provides a Python scripting
+language interface for model creation. These examples can be seen in
+the “demo” directory.</li>
+<li>To create the communication channel through the scripting interface, go to the Script Console (Ctrl-P) and type</li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/communication.py</pre></div>
+
+<ul>
+<li>The actual code for this can be seen by opening the communication.py file in the demo directory.</li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-python"><span style="color: rgb(255, 119, 0); font-weight: bold;">import</span> nef
+&nbsp;
+net=nef.<span style="color: black;">Network</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'Communications Channel'</span><span style="color: black;">)</span>
+<span style="color: rgb(0, 128, 0);">input</span>=net.<span style="color: black;">make_input</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'input'</span>,<span style="color: black;">[</span><span style="color: rgb(255, 69, 0);">0.5</span><span style="color: black;">]</span><span style="color: black;">)</span>
+A=net.<span style="color: black;">make</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'A'</span>,<span style="color: rgb(255, 69, 0);">100</span>,<span style="color: rgb(255, 69, 0);">1</span><span style="color: black;">)</span>
+B=net.<span style="color: black;">make</span><span style="color: black;">(</span><span style="color: rgb(72, 61, 139);">'B'</span>,<span style="color: rgb(255, 69, 0);">100</span>,<span style="color: rgb(255, 69, 0);">1</span><span style="color: black;">)</span>
+net.<span style="color: black;">connect</span><span style="color: black;">(</span><span style="color: rgb(0, 128, 0);">input</span>,A<span style="color: black;">)</span>
+net.<span style="color: black;">connect</span><span style="color: black;">(</span>A,B<span style="color: black;">)</span>
+net.<span style="color: black;">add_to</span><span style="color: black;">(</span>world<span style="color: black;">)</span></pre></div>
+
+<ul>
+<li>The following demo scripts create models similar to those seen in this part of the tutorial:
+<ul><li><span class="geshifilter"><code class="geshifilter-text">demo/singleneuron.py</code></span> shows what happens with an ensemble with only a single neuron on it (poor representation)</li>
+<li><span class="geshifilter"><code class="geshifilter-text">demo/twoneurons.py</code></span> shows two neurons working together to represent</li>
+<li><span class="geshifilter"><code class="geshifilter-text">demo/manyneurons.py</code></span> shows a standard ensemble of 100 neurons representing a value</li>
+<li><span class="geshifilter"><code class="geshifilter-text">demo/communication.py</code></span> shows a communication channel</li>
+<li><span class="geshifilter"><code class="geshifilter-text">demo/addition.py</code></span> shows adding two numbers</li>
+<li><span class="geshifilter"><code class="geshifilter-text">demo/2drepresentation.py</code></span> shows 100 neurons representing a 2-D vector</li>
+<li><span class="geshifilter"><code class="geshifilter-text">demo/combining.py</code></span> shows two separate values being combined into a 2-D vector</li></ul></li>
+</ul>
+</div>
+<div id="node-654" class="section-3">
+<h1 class="book-heading">Part Three: Non-Linear Transformations</h1>
+<h2>Functions of one variable</h2>
+
+<ul>
+<li>We now turn to creating nonlinear transformations in Nengo. The
+main idea here is that instead of using the X origin, we will create a
+new origin that estimates some arbitrary function of X. This will allow
+us to estimate any desired function.
+<ul><li>The accuracy of this estimate will, of course, be dependent on the properties of the neurons.</li></ul></li>
+<li><p>For one-dimensional ensembles, we can calculate various 1-dimensional functions:</p>
+
+<ul><li>f(x)=x<sup>2</sup></li>
+<li>f(x)=θ(x) (thresholding)</li>
+<li>f(x)=√x</li></ul></li>
+<li><p>To perform a non-linear operation, we need to define a new origin</p>
+
+<ul><li>The X origin just uses f(x)=x.</li>
+<li>Create a new ensemble and a function input. The ensemble should be
+one-dimensional with 100 neurons and a radius of 1. Use a Constant
+Function input set two 0.5.</li>
+<li>Create a termination on the ensemble and connect the function input to it</li>
+<li>Now create a new origin that will estimate the square of the value.
+<ul><li>Right-click on the combined ensemble and select Add decoded origin</li>
+<li>Set the name to “square”</li>
+<li>Click on Set Functions</li>
+<li>Select User-defined Function and press Set</li>
+<li>For the Expression, enter “x0*x0”. We refer to the value as x0
+because when we extend this to multiple dimensions, we will refer to
+them as x0, x1, x2, and so on.</li>
+<li>Press OK, OK, and OK.</li></ul></li>
+<li>You can now generate a plot that shows how good the ensemble is at
+calculating the non-linearity. Right-click on the ensemble and select
+Plot-&gt;Plot distortion:square.</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_056.png" alt="p3-9b.png" title="p3-9b.png" class="inline"></p>
+
+<ul>
+<li>Start Interactive Plots.  </li>
+<li>Create a control for the input, so you can adjust it while the model runs (right-click on the input and select “control”)</li>
+<li>Create a graph of the “square” value from the ensemble. Do this by
+right-clicking on the ensemble in the Interactive Plots window and
+selecting “square-&gt;value”.</li>
+<li>For comparison, also create a graph for the standard X origin byt
+right-clicking on the ensemble and selecting “X-&gt;value”. This is the
+standard value graph that just shows the value being represented by
+this ensemble.</li>
+<li>Press Play to run the simulation. With the default input of 0.5,
+the squared value should be near 0.25. Use the control to adjust the
+input. The output should be the square of the input.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_068.png" alt="p3-101.png" title="p3-101.png" class="inline"></p>
+
+<ul>
+<li>You can also run this example using scripting</li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/squaring.py</pre></div>
+
+<h2>Functions of multiple variables</h2>
+
+<ul>
+<li>Since X (the value being represented by an ensemble) can also be
+multidimensional, we can also calculate these sorts of functions
+<ul><li>f(x)=x<sub>0</sub>*x<sub>1</sub></li>
+<li>f(x)=max(x<sub>0</sub>,x<sub>1</sub>)</li></ul></li>
+<li>To begin, we create two ensembles and two function inputs.  These will represent the two values we wish to multiply together.
+<ul><li>The ensembles should be one-dimensional, use 100 neurons and
+have a radius of 10 (so they can represent values between -10 and 10)</li>
+<li>The two function inputs should be constants set to 8 and 5</li>
+<li>The terminations you create to connect them should have time constants of 0.01 (AMPA)</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_047.png" alt="p3-1.png" title="p3-1.png" class="inline"></p>
+
+<ul>
+<li>Now create a two-dimensional neural ensemble with a radius of 15 called Combined
+<ul><li>Since it needs to represent multiple values, we increase the number of neurons it contains to 200</li></ul></li>
+<li>Add two terminations to Combined
+<ul><li>For each one, the input dimensions are 1</li>
+<li>For the first one, use Set Weights to make the transformation be [1 0]</li>
+<li>For the second one, use Set Weights to make the transformation be [0 1]</li></ul></li>
+<li>Connect the two other ensembles to the Combined one</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_065.png" alt="p3-2.png" title="p3-2.png" class="inline"></p>
+
+<ul>
+<li>Next, create an ensemble to store the result. It should have a
+radius of 100, since it will need to represent values from -100 to 100.
+Give it a single one-dimensional termination with a weight of 1.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_012.png" alt="p3-3.png" title="p3-3.png" class="inline"></p>
+
+<ul>
+<li>Now we need to create a new origin that will estimate the product between the two values stored in the combined ensemble.
+<ul><li>Right-click on the combined ensemble and select Add decoded origin.</li>
+<li>Set the name to “product”</li>
+<li>Set Output dimensions to 1</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_018.png" alt="p3-4.png" title="p3-4.png" class="inline"></p>
+
+<ul>
+<li>Click on Set Functions</li>
+<li>Select User-defined Function and press Set.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_042.png" alt="p3-5.png" title="p3-5.png" class="inline"></p>
+
+<ul>
+<li>For the Expression, enter x0*x1</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_058.png" alt="p3-6.png" title="p3-6.png" class="inline"></p>
+
+<ul>
+<li>Press OK, OK, and OK to finish creating the origin
+<ul><li>Connect the new origin to the termination on the result ensemble</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_007.png" alt="p3-7.png" title="p3-7.png" class="inline"></p>
+
+<ul>
+<li>Add a probe to the result ensemble and run the simulation</li>
+<li>The result should be approximately 40.</li>
+<li>Adjust the input controls to multiple different numbers together.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_041.png" alt="p3-102.png" title="p3-102.png" class="inline"></p>
+
+<ul>
+<li>You can also run this example using scripting</li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/multiplication.py</pre></div>
+
+<h2>Combined approaches</h2>
+
+<ul>
+<li>We can combine these two approaches in order to compute more complex funxtions, such as x<sup>2</sup>y.
+<ul><li>Right-click on the ensemble representing the first of the two values and select Add decoded origin.</li>
+<li>Give it the name “square”, set its output dimensions to 1, and press Set Functions.</li>
+<li>As before, select the User-defined Function and press Set.</li>
+<li>Set the Expression to be “x0*x0”.  </li>
+<li>Press OK, OK, and OK to finish creating the origin.</li>
+<li>This new origin will calculate the square of the value represented by this ensemble.</li>
+<li>If you connect this new origin to the Combined ensemble instead of the standard X origin, the network will calculate x<sup>2</sup>y instead of xy.</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_044.png" alt="p3-9a.png" title="p3-9a.png" class="inline"></p>
+</div>
+<div id="node-655" class="section-3">
+<h1 class="book-heading">Part Four: Feedback and Dynamics</h1>
+<h2>Storing Information Over Time: Constructing an Integrator</h2>
+
+<ul>
+<li>The basis of many of our cognitive models is the integrator.
+Mathematically, the output of this network should be the integral of
+the inputs to this network.
+<ul><li>Practically speaking, this means that if the input to the
+network is zero, then its output will stay at whatever value it is
+currently at. This makes it the basis of a neural memory system, as a
+representation can be stored over time.</li>
+<li>Integrators are also often used in sensorimotor systems, such as eye control</li></ul></li>
+<li>For an integrator, a neural ensemble needs to connect to itself
+with a transformation weight of 1, and have an input with a weight of
+τ, which is the same as the synaptic time constant of the
+neurotransmitter used.</li>
+<li>Create a one-dimensional ensemble called Integrator.  Use 100 neurons and a radius of 1.</li>
+<li>Add two terminations with synaptic time constants of 0.1s. Call the
+first one “input” and give it a weight of 0.1. Call the second one
+“feedback” and give it a weight of 1.</li>
+<li>Create a new Function input using a Constant Function with a value of 1.</li>
+<li>Connect the Function input to the input termination</li>
+<li>Connect the X origin of the ensemble back to its own feedback termination.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_045.png" alt="p4-101.png" title="p4-101.png" class="inline"></p>
+
+<ul>
+<li>Go to Interactive Plots.  Create a graph for the value of the ensemble (right-click on the ensemble and select “value”).</li>
+<li>Press Play to run the simulation. The value stored in the ensemble
+should linearly increase, reaching a value of 1 after approximately 1
+second.
+<ul><li>You can increase the amount of time shown on the graphs in
+Interactive Plots. Do this by clicking on the small downwards-pointing
+arrow at the bottom of the window. This will reveal a variety of
+settings for Interactive Plots. Change the “time shown” to 1.</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_027.png" alt="p4-102.png" title="p4-102.png" class="inline"></p>
+
+<h2>Representation Range</h2>
+
+<ul>
+<li>What happens if the previous simulation runs for longer than one second?</li>
+<li>The value stored in the ensemble does not increase after a certain
+point. This is because all neural ensembles have a range of values they
+can represent (the radius), and cannot accurately represent outside of
+that range.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_050.png" alt="p4-103.png" title="p4-103.png" class="inline"></p>
+
+<ul>
+<li>Adjust the radius of the ensemble to 1.5 using either the Configure
+interface or the script console (that.radii=[1.5]). Run the model
+again. It should now accurately integrate up to a maximum of 1.5.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_005.png" alt="p4-104.png" title="p4-104.png" class="inline"></p>
+
+<h2>Complex Input</h2>
+
+<ul>
+<li>We can also run the model with a more complex input. Change the
+Function input using the following command from the script console
+(after clicking on it in the black model editing mode interface). Press
+Ctrl-P to show the script console.</li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-python">that.<span style="color: black;">functions</span>=<span style="color: black;">[</span>ca.<span style="color: black;">nengo</span>.<span style="color: rgb(220, 20, 60);">math</span>.<span style="color: black;">impl</span>.<span style="color: black;">PiecewiseConstantFunction</span><span style="color: black;">(</span><span style="color: black;">[</span><span style="color: rgb(255, 69, 0);">0.2</span>,<span style="color: rgb(255, 69, 0);">0.3</span>,<span style="color: rgb(255, 69, 0);">0.44</span>,<span style="color: rgb(255, 69, 0);">0.54</span>,<span style="color: rgb(255, 69, 0);">0.8</span>,<span style="color: rgb(255, 69, 0);">0.9</span><span style="color: black;">]</span>,<span style="color: black;">[</span><span style="color: rgb(255, 69, 0);">0</span>,<span style="color: rgb(255, 69, 0);">5</span>,<span style="color: rgb(255, 69, 0);">0</span>,<span style="color: rgb(255, 69, 0);">-10</span>,<span style="color: rgb(255, 69, 0);">0</span>,<span style="color: rgb(255, 69, 0);">5</span>,<span style="color: rgb(255, 69, 0);">0</span><span style="color: black;">]</span><span style="color: black;">)</span><span style="color: black;">]</span></pre></div>
+
+<ul>
+<li>You can see what this function looks like by right-clicking on it in the editing interface and selecting “Plot”.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_013.png" alt="p4-5.png" title="p4-5.png" class="inline"></p>
+
+<ul>
+<li>Return to Interactive Plots and run the simulation.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_048.png" alt="p4-105.png" title="p4-105.png" class="inline"></p>
+
+<h2>Adjusting Synaptic Time Constants</h2>
+
+<ul>
+<li>You can adjust the accuracy of an integrator by using different neurotransmitters.</li>
+<li>Change the input termination to have a tau of 0.01 (10ms: GABA) and
+a transform to be 0.01. Also change the feedback termination to have a
+tau of 0.01 (but leave its transform at 1).</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_008.png" alt="p4-106.png" title="p4-106.png" class="inline"></p>
+
+<ul>
+<li>By using a shorter time constant, the network dynamics are more sensitive to small-scale variation (i.e. noise).</li>
+<li><p>This indicates how important the use of a particular
+neurotransmitter is, and why there are so many different types with
+vastly differing time constants.</p>
+
+<ul><li>AMPA: 2-10ms</li>
+<li>GABA<sub>A</sub>: 10-20ms</li>
+<li>NMDA: 20-150ms</li>
+<li>The actual details of these time constants vary across the brain as
+well. We are collecting empirical data on these from various sources at
+<a href="http://ctn.uwaterloo.ca/%7Ecnrglab/?q=node/505">http://ctn.uwaterloo.ca/~cnrglab/?q=node/505</a></li></ul></li>
+<li><p>You can also run this example using scripting</p></li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/integrator.py</pre></div>
+
+<h2>Controlled Integrator</h2>
+
+<ul>
+<li>We can also build an integrator where the feedback transformation (1 in the previous model) can be controlled.
+<ul><li>This allows us to build a tunable filter.</li></ul></li>
+<li>This requires the use of multiplication, since we need to multiply
+two stored values together. This was covered in the previous part of
+the tutorial.</li>
+<li>We can efficiently implement this by using a two-dimensional
+ensemble. One dimension will hold the value being represented, and the
+other dimension will hold the transformation weight.</li>
+<li>Create a two-dimensional neural ensemble with 225 neurons and a radius of 1.5.</li>
+<li>Create the following three terminations:
+<ul><li>“input”: time constant of 0.1, 1 dimensional, with a
+transformation matrix of [0.1 0]. This acts the same as the input in
+the previous model, but only affects the first dimension.</li>
+<li>“control”: time constant of 0.1, 1 dimensional, with a
+transformation matrix of [0 1]. This stores the input control signal
+into the second dimension of the ensemble.</li>
+<li>“feedback”: time constant of 0.1, 1 dimensional, with a
+transformation matrix of [1 0]. This will be used in the same manner as
+the feedback termination in the previous model.</li></ul></li>
+<li>Create a new origin that multiplies the values in the vector together
+<ul><li>This is exactly the same as the multiplier in the previous part of this tutorial</li>
+<li>This is a 1 dimensional output, with a User-defined Function of x0*x1</li></ul></li>
+<li>Create two function inputs called “input” and “control”.   Start with Constant functions with a value of 1
+<ul><li>Use the script console to set the “input” function by clicking on it and entering the same input function as used above.</li></ul></li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-python">that.<span style="color: black;">functions</span>=<span style="color: black;">[</span>ca.<span style="color: black;">nengo</span>.<span style="color: rgb(220, 20, 60);">math</span>.<span style="color: black;">impl</span>.<span style="color: black;">PiecewiseConstantFunction</span><span style="color: black;">(</span><span style="color: black;">[</span><span style="color: rgb(255, 69, 0);">0.2</span>,<span style="color: rgb(255, 69, 0);">0.3</span>,<span style="color: rgb(255, 69, 0);">0.44</span>,<span style="color: rgb(255, 69, 0);">0.54</span>,<span style="color: rgb(255, 69, 0);">0.8</span>,<span style="color: rgb(255, 69, 0);">0.9</span><span style="color: black;">]</span>,<span style="color: black;">[</span><span style="color: rgb(255, 69, 0);">0</span>,<span style="color: rgb(255, 69, 0);">5</span>,<span style="color: rgb(255, 69, 0);">0</span>,<span style="color: rgb(255, 69, 0);">-10</span>,<span style="color: rgb(255, 69, 0);">0</span>,<span style="color: rgb(255, 69, 0);">5</span>,<span style="color: rgb(255, 69, 0);">0</span><span style="color: black;">]</span><span style="color: black;">)</span><span style="color: black;">]</span></pre></div>
+
+<ul>
+<li>Connect the input function to the input termination, the control
+function to the control termination, and the product origin to the
+feedback termination.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_061.png" alt="p4-9.png" title="p4-9.png" class="inline"></p>
+
+<ul>
+<li>Go to Interactive Plots and show a graph for the value of the
+ensemble (right-click-&gt;X-&gt;value). If you run the simulation, this
+graph will show the values of both variables stored in this ensemble
+(the integrated value and the control signal). For clarity, turn off
+the display of the cotrol signal by right-clicking on the graph and
+removing the checkmark beside “v[1]”.</li>
+<li>The performance of this model should be similar to that of the non-controlled integrator.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_035.png" alt="p4-107.png" title="p4-107.png" class="inline"></p>
+
+<ul>
+<li>Now adjust the control input to be 0.3 instead of 1. This will make
+the integrator into a leaky integrator. This value adjusts how quickly
+the integrator forgets over time.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_039.png" alt="p4-108.png" title="p4-108.png" class="inline"></p>
+
+<ul>
+<li>You can also run this example using scripting</li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/controlledintegrator.py</pre></div>
+</div>
+<div id="node-656" class="section-3">
+<h1 class="book-heading">Part Five: Cognitive Models</h1>
+<h2>Larger Systems</h2>
+
+<ul>
+<li>So far, we’ve seen how to implement the various basic components
+<ul><li>representations</li>
+<li>linear transformation</li>
+<li>non-linear transformation</li>
+<li>feedback</li></ul></li>
+<li>The goal is to use these components to build full cognitive models using spiking neurons
+<ul><li>Constrained by the actual properties of real neurons in real brains (numbers of neurons, connectivity, neurotransmitters, etc)</li>
+<li>Should be able to produce behavioural predictions in terms of timing, accuracy, lesion effects, drug treatments, etc</li></ul></li>
+<li>Some simple examples
+<ul><li>Motor control
+<ul><li>take an existing engineering control model for what angles to move joints to to place the hand at a particular position</li></ul></li></ul></li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/armcontrol.py</pre></div>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_017.png" alt="p5-101.png" title="p5-101.png" class="inline"></p>
+
+<ul>
+<li>Braitenberg vehicle
+<ul><li>connect range sensors to opposite motors on a wheeled robot</li></ul></li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/vehicle.py</pre></div>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_059.png" alt="p5-102.png" title="p5-102.png" class="inline"></p>
+
+<h2>Binding Semantic Pointers (SPs)</h2>
+
+<ul>
+<li>We want to manipulate sophisticated representational states (this
+is the purpose of describing the semantic pointer architecture (SPA)) </li>
+<li>The main operation to manipulate representations in the SPA is circular convolution (for binding)</li>
+<li><p>Let’s explore a binding circuit for semantic pointers</p></li>
+<li><p>Input: Two semantic pointers (high-dimensional vectors)</p></li>
+<li><p>Output: One semantic pointer (binding the original two)</p></li>
+<li><p>Implementation: element-wise multiplication of DFT (as described in slides)</p></li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/convolve.py</pre></div>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_032.png" alt="p5-201.png" title="p5-201.png" class="inline"></p>
+
+<ul>
+<li>To deal with high-dimensional vectors, we don’t want to have to set each individual value for each vector
+<ul><li>would need 100 controls to configure a single 100-dimensional vector</li></ul></li>
+<li><p>Nengo has a specialized “semantic pointer” graph for these high-dimensional cases</p>
+
+<ul><li>Instead of showing the value of each element in the vector (as
+with a normal graph), it shows the similarity between the currently
+represented vector and all the known vectors</li>
+<li>“How much like CAT is this?  How much like DOG?  How much like RED?  How much like TRIANGLE?”</li>
+<li>You can configure which comparisons are shown using the right-click menu</li>
+<li>You can also use it to <em>set</em> the contents of a neural group
+by right-clicking and choosing “set value”. This will force the neurons
+to represent the given semantic pointer. You can go back to normal
+behaviour by selecting “release value”.</li></ul></li>
+<li><p>Use the right-click menu to set the input values to “a” and “b”.  The output should be similar to “a*b”.</p>
+
+<ul><li>This shows that the network is capable of computing the
+circular convolution operation, which binds two semantic pointers to
+create a third one.</li></ul></li>
+<li>Use the right-click menu to set the input values to “a” and “~a*b”.  The output should be similar to “b”.
+<ul><li>This shows that convolution can be used to transform representations via binding and unbinding, since “a<em>(~a</em>b)” is approximately “b”.</li></ul></li>
+</ul>
+
+<h2>Control and Action Selection: Basal Ganglia</h2>
+
+<ul>
+<li>Pretty much every cognitive model has an action selection component
+<ul><li>Out of many possible things you could do right now, pick one</li>
+<li>Usually mapped on to the basal ganglia</li>
+<li>Some sort of winner-take-all calculation based on how suitable the various possible actions are to the current situation</li></ul></li>
+<li>Input: A vector representing how good each action is (for example, [0.2, 0.3, 0.9, 0.1, 0.7])</li>
+<li><p>Output: Which action to take ([0, 0, 1, 0, 0])</p>
+
+<ul><li>Actually, the output from the basal ganglia is inhibitory, so the output is more like [1, 1, 0, 1, 1]</li></ul></li>
+<li><p>Implementation</p>
+
+<ul><li>Could try doing it as a direct function
+<ul><li>Highly non-linear function</li>
+<li>Low accuracy</li></ul></li>
+<li>Could do it by setting up inhibitory interconnections
+<ul><li>Like the integrator, but any value above zero would also act to decrease the others</li>
+<li>Often used in non-spiking neural networks (e.g. PDP++) to do k-winner-take-all</li>
+<li>But, you have to wait for the network to settle, so it can be rather slow</li></ul></li>
+<li>Gurney, Prescott, &amp; Redgrave (2001)
+<ul><li>Model of action selection constrained by the connectivity of the basal ganglia</li></ul></li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_038.png" alt="p5-103.png" title="p5-103.png" class="inline"></p>
+
+<ul>
+<li>Each component computes the following function</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_037.png" alt="p5-104.png" title="p5-104.png" class="inline"></p>
+
+<ul>
+<li>Their model uses unrealistic rate neurons with that function for an output</li>
+<li>We can use populations of spiking neurons and compute that function</li>
+<li>We can also use correct timing values for the neurotransmitters involved</li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/basalganglia.py</pre></div>
+
+<ul>
+<li>Adjust the input controls to change the five utility values being selected between</li>
+<li>Graph shows the output from the basal ganglia (each line shows a different action)</li>
+<li>The selected action is the one set to zero </li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_009.png" alt="p5-105.png" title="p5-105.png" class="inline"></p>
+
+<ul>
+<li>Comparison to neural data
+<ul><li>Ryan &amp; Clark, 1991</li>
+<li>Stimulate regions in medial orbitofrontal cortex, measure from GPi, see how long it takes for a response to occur</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_054.png" alt="p5-106.png" title="p5-106.png" class="inline"></p>
+
+<ul>
+<li>To replicate
+<ul><li>Set the inputs to [0, 0, 0.6, 0, 0]</li>
+<li>Run simulation for a bit, then pause it</li>
+<li>Set the inputs to [0, 0, 0.6, 1, 0]</li>
+<li>Continue simulation</li>
+<li>Measure how long it takes for the neurons for the fourth action to stop firing</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_053.png" alt="p5-107.png" title="p5-107.png" class="inline"></p>
+
+<ul>
+<li>In rats: 14-17ms.  In model: 14ms (or more if the injected current isn’t extremely large)</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_026.png" alt="p5-108.png" title="p5-108.png" class="inline"></p>
+
+<h2>Sequences of Actions</h2>
+
+<ul>
+<li>To do something useful with the action selection system we need two things
+<ul><li>A way to determine the utility of each action given the current context</li>
+<li>A way to take the output from the action selection and have it affect behaviour</li></ul></li>
+<li>We do this using the representations of the semantic pointer architecture
+<ul><li>Any cognitive state is represented as a high-dimensional vector (a semantic pointer)</li>
+<li>Working memory stores semantic pointers (using an integrator)</li>
+<li>Calculate the utility of an action by computing the dot product
+between the current state and the state for the action (i.e. the IF
+portion of an IF-THEN production rule)
+<ul><li>This is a linear operation, so we can directly compute it using the connection weights between the cortex and the basal ganglia</li></ul></li>
+<li>The THEN portion of a rule says what semantic pointers to send to
+what areas of the brain. This is again a linear operation that can be
+computed on the output of the thalamus using the output from the basal
+ganglia</li></ul></li>
+<li>Simple example: 
+<ul><li>Five possible states: A, B, C, D, and E</li>
+<li>Rules for IF A THEN B, IF B THEN C, IF C THEN D, IF D THEN E, IF E THEN A</li>
+<li>Five `production rules’ (semantic pointer mappings) cycling through the five states</li></ul></li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/sequence.py</pre></div>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_030.png" alt="p5-109.png" title="p5-109.png" class="inline"> </p>
+
+<ul>
+<li>Can set the contents of working memory in Interactive Plots by
+opening an SP graph, right-clicking on it, and choosing “set value”
+(use “release value” to allow the model to change the contents)</li>
+<li>Cycle time is around 40ms, slightly faster than the standard 50ms value used in ACT-R, Soar, EPIC, etc.
+<ul><li>This depends on the time constant for the neurotransmitter GABA</li></ul></li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_010.png" alt="p5-110.png" title="p5-110.png" class="inline"> </p>
+
+<h2>Routing of Information</h2>
+
+<ul>
+<li>What about more complex actions?
+<ul><li>Same model as above, be we want visual input to be able to control where we start the sequence</li>
+<li>Simple approach: add a visual buffer and connect it to the working memory</li></ul></li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/sequencenogate.py</pre></div>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_052.png" alt="p5-113.png" title="p5-113.png" class="inline"> </p>
+
+<ul>
+<li><p>Problem: If this connection always exists, then the visual input
+will always override what’s in working memory. this connection needs to
+be controllable</p></li>
+<li><p>Solution</p>
+
+<ul><li>Actions need to be able to control the flow of information between cortical areas.</li>
+<li>Instead of sending a particular SP to working memory, we need “IF X
+THEN transfer the pattern in cortex area Y to cortex area Z”?</li>
+<li>In this case, we add a rule that says “IF it contains a letter, transfer the data from the visual area to working memory”
+<ul><li>We make the utility of the rule lower than the utility of the
+sequence rules, so that it will only transfer that information (open
+that gate) when no other action applies.</li></ul></li></ul></li>
+</ul>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/sequencerouted.py</pre></div>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_014.png" alt="p5-112.png" title="p5-112.png" class="inline"> </p>
+
+<ul>
+<li>The pattern in the visual buffer is successfully transferred to working memory, then the sequence is continued from that letter.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_063.png" alt="p5-111.png" title="p5-111.png" class="inline"> </p>
+
+<ul>
+<li>Takes longer (60-70ms) for these more complex productions to occur</li>
+</ul>
+
+<h2>Question Answering</h2>
+
+<ul>
+<li>The control signal in the previous network can also be another
+semantic pointer that binds/unbinds the contents of the visual buffer
+(instead of just a gating signal)
+<ul><li>This more flexible control does not add processing time</li>
+<li>Allows processing the representations while routing them</li></ul></li>
+<li>This allows us to perform arbitrary symbol manipulation such as
+“take the contents of buffer X, unbind it with buffer Y, and place the
+results in buffer Z”</li>
+<li>Example: Question answering
+<ul><li>System is presented with a statement such as “red triangle and blue circle”
+<ul><li>a semantic pointer representing this statement is placed in the visual cortical area</li>
+<li>“statement+red*triangle+blue*circle” </li></ul></li>
+<li>Statement is removed after a period of time</li>
+<li>Now a question is presented, such as “What was Red?”
+<ul><li>“question+red” is presented to the same visual cortical area as before</li></ul></li>
+<li>Goal is to place the correct answer in a motor cortex area (in this case, “triangle”)</li></ul></li>
+<li>This is achieved by creating two action rules:
+<ul><li>If a statement is in the visual area, move it to working memory (as in the previous example)</li>
+<li>If a question is in the visual area, unbind it with working memory and place the result in the motor area</li></ul></li>
+<li>This example requires a much larger simulation than any of the
+others in this tutorial (more than 50,000 neurons). If you run this
+script, Nengo may take a long time (hours!) to solve for the decoders
+and neural connection weights needed. We have pre-computed the larger
+of these networks for you, and they can be downloaded at <a href="http://ctn.uwaterloo.ca/%7Ecnrglab/f/question.zip">http://ctn.uwaterloo.ca/~cnrglab/f/question.zip</a>.</li>
+</ul>
+
+<p><img src="CogSci%202010%20Workshop%20Hands-on%20Activities_files/a_002.png" alt="p5-202.png" title="p5-202.png" class="inline"></p>
+
+<div class="geshifilter"><pre class="geshifilter-text">run demo/question.py</pre></div>
+</div>
+</div>
+</div>
+
+</body></html>

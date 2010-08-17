@@ -26,9 +26,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.icons;
 
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.world.piccolo.primitives.Path;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.world.piccolo.primitives.Path;
 
 /**
  * Icon for a neuron

@@ -35,12 +35,12 @@ import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.nengo.ui.dataList.ProbePlotHelper;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.util.DataUtils;
 import ca.nengo.util.TimeSeries;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Action for Plotting with additional options

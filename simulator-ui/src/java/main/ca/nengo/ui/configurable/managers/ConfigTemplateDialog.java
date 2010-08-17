@@ -44,9 +44,9 @@ import javax.swing.border.EtchedBorder;
 
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * A Configuration dialog which allows the user to manage templates

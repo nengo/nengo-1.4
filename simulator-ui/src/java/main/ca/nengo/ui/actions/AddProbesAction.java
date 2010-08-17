@@ -32,13 +32,13 @@ import java.util.HashMap;
 import javax.swing.JOptionPane;
 
 import ca.nengo.model.SimulationException;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.ReversableAction;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.nodes.widgets.UIProbe;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Action for adding probes to a collection of nodes

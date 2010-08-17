@@ -39,14 +39,14 @@ import org.python.util.PythonObjectInputStream;
 
 import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.objects.activities.TrackedAction;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.NodeContainer.ContainerException;
 import ca.nengo.ui.models.nodes.UINodeViewable;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.activities.TrackedAction;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Action used to open a Neo model from file

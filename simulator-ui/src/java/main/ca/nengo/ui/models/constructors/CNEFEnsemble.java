@@ -60,11 +60,11 @@ import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.descriptors.PNodeFactory;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.models.nodes.UINEFEnsemble;
 import ca.nengo.util.VectorGenerator;
 import ca.nengo.util.impl.RandomHypersphereVG;
 import ca.nengo.util.impl.Rectifier;
-import ca.shu.ui.lib.util.Util;
 
 public class CNEFEnsemble extends ConstructableNode {
 	static final Property pApproximator = new PApproximator("Decoding Sign");

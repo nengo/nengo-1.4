@@ -33,8 +33,8 @@ import java.awt.Frame;
 
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.IConfigurable;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * Configuration Manager which creates a dialog and let's the user enter

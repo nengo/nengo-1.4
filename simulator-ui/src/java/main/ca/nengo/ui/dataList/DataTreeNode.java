@@ -31,12 +31,12 @@ import java.util.Collection;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import ca.nengo.ui.actions.PlotSpikePattern;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.util.DataUtils;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.TimeSeries;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * Tree Node with NEO Data

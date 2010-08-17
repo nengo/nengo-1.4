@@ -38,17 +38,17 @@ import ca.nengo.model.Node;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
 import ca.nengo.ui.dataList.ProbePlotHelper;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.objects.activities.TrackedAction;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.menus.MenuBuilder;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.nodes.UIEnsemble;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
 import ca.nengo.ui.models.viewers.EnsembleViewer;
 import ca.nengo.util.Probe;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.activities.TrackedAction;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.menus.MenuBuilder;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * UI Wrapper for a Simulator Probe

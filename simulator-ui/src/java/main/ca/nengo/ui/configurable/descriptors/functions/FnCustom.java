@@ -59,8 +59,8 @@ import ca.nengo.ui.configurable.managers.ConfigDialog;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
 import ca.nengo.ui.configurable.panels.StringPanel;
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.util.UserMessages;
 
 public class FnCustom extends AbstractFn {
 

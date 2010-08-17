@@ -63,13 +63,13 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
+import ca.nengo.ui.lib.AppFrame;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.util.Environment;
-import ca.shu.ui.lib.AppFrame;
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.menus.MenuBuilder;
 
 /**
  * A basic tabbed text editor.
@@ -245,13 +245,13 @@ public class ScriptEditor extends JPanel {
 
 	private ScriptData openEditor(File file, boolean saved, String name) {
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.setBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
+		panel.setBackground(ca.nengo.ui.lib.Style.Style.COLOR_BACKGROUND);
 
 		JEditorPane ep = new JEditorPane();
 
-		ep.setForeground(ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
-		ep.setBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
-		ep.setCaretColor(ca.shu.ui.lib.Style.Style.COLOR_LIGHT_BLUE);
+		ep.setForeground(ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
+		ep.setBackground(ca.nengo.ui.lib.Style.Style.COLOR_BACKGROUND);
+		ep.setCaretColor(ca.nengo.ui.lib.Style.Style.COLOR_LIGHT_BLUE);
 
 		final StyledDocument doc = new DefaultStyledDocument();
 		ep.setDocument(doc);
@@ -260,7 +260,7 @@ public class ScriptEditor extends JPanel {
 		panel.add(scroll, BorderLayout.CENTER);
 
 		final JLabel positionLabel = new JLabel("1 : 1");
-		positionLabel.setForeground(ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
+		positionLabel.setForeground(ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
 		panel.add(positionLabel, BorderLayout.SOUTH);
 
 		ep.addCaretListener(new CaretListener() {

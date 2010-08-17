@@ -28,10 +28,10 @@ package ca.nengo.ui.models.icons;
 
 import java.awt.Color;
 
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
-import ca.shu.ui.lib.world.piccolo.primitives.PXPath;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.nengo.ui.lib.world.piccolo.primitives.PXPath;
 
 /**
  * Icon for a Simulator Probe

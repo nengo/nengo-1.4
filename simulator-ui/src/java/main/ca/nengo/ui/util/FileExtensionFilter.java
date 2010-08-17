@@ -30,7 +30,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * Filters files based on file extension.

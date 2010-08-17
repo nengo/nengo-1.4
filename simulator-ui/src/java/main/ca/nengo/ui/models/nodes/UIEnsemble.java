@@ -27,13 +27,13 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.ui.models.nodes;
 
 import ca.nengo.model.Ensemble;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.ReversableAction;
+import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.nengo.ui.models.icons.EnsembleIcon;
 import ca.nengo.ui.models.nodes.widgets.UISpikeProbe;
 import ca.nengo.ui.models.viewers.EnsembleViewer;
 import ca.nengo.ui.models.viewers.NodeViewer;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
 
 /**
  * UI Wrapper for an Ensemble

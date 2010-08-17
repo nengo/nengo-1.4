@@ -31,7 +31,7 @@ import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.IConfigurable;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
-import ca.shu.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.UserMessages;
 
 /**
  * Describes how to configure a function through the IConfigurable interface.

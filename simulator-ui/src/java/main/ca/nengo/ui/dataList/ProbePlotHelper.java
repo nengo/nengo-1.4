@@ -7,11 +7,11 @@ import java.util.List;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.ui.actions.PlotTimeSeries;
+import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
-import ca.shu.ui.lib.actions.StandardAction;
 
 /**
  * Helps plot probes

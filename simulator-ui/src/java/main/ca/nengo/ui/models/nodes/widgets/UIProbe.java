@@ -26,9 +26,9 @@ package ca.nengo.ui.models.nodes.widgets;
 
 import java.awt.Color;
 
+import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.ProbeIcon;
-import ca.shu.ui.lib.objects.models.ModelObject;
 
 public abstract class UIProbe extends ModelObject {
 

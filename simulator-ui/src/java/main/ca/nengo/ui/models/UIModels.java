@@ -31,8 +31,8 @@ import java.util.Collection;
 
 import ca.nengo.ui.actions.AddProbesAction;
 import ca.nengo.ui.actions.RemoveModelsAction;
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
 
 /**
  * Contains static members which reveal what sort of Nodes can be created by the

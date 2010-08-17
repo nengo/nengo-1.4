@@ -31,11 +31,11 @@ import java.util.List;
 import javax.swing.tree.MutableTreeNode;
 
 import ca.nengo.plot.Plotter;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.util.DataUtils;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.TimeSeries;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
 
 public class PlotNodesAction extends StandardAction {
 

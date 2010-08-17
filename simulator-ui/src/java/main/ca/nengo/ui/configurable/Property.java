@@ -26,7 +26,7 @@ package ca.nengo.ui.configurable;
 
 import java.io.Serializable;
 
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * Describes a configuration parameter of a IConfigurable object

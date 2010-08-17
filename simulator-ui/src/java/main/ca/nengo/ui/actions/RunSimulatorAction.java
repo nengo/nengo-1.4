@@ -41,13 +41,13 @@ import ca.nengo.ui.configurable.descriptors.PBoolean;
 import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.objects.activities.TrackedAction;
+import ca.nengo.ui.lib.objects.activities.TrackedStatusMsg;
+import ca.nengo.ui.lib.util.UIEnvironment;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.models.nodes.UINetwork;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.objects.activities.TrackedAction;
-import ca.shu.ui.lib.objects.activities.TrackedStatusMsg;
-import ca.shu.ui.lib.util.UIEnvironment;
-import ca.shu.ui.lib.util.UserMessages;
 
 /**
  * Runs the Simulator

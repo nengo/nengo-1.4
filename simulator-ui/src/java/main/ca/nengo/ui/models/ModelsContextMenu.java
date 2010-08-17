@@ -32,10 +32,10 @@ import java.util.LinkedList;
 
 import javax.swing.JPopupMenu;
 
-import ca.shu.ui.lib.objects.models.ModelObject;
-import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
-import ca.shu.ui.lib.world.WorldObject;
+import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
+import ca.nengo.ui.lib.world.WorldObject;
 
 /**
  * Creates a Popup menu which applies to a collection of models

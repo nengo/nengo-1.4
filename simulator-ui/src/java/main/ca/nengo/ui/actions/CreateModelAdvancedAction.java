@@ -26,14 +26,14 @@ package ca.nengo.ui.actions;
 
 import ca.nengo.config.ui.NewConfigurableDialog;
 import ca.nengo.model.Node;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.NodeContainer.ContainerException;
 import ca.nengo.ui.models.nodes.UINodeViewable;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.util.UIEnvironment;
 
 public class CreateModelAdvancedAction extends StandardAction {
 	private Class<?> objType;

@@ -34,14 +34,14 @@ import javax.swing.SwingUtilities;
 
 import ca.nengo.model.Node;
 import ca.nengo.ui.brainView.BrainViewer;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
+import ca.nengo.ui.lib.world.piccolo.objects.Window;
+import ca.nengo.ui.lib.world.piccolo.objects.Window.WindowState;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
 import ca.nengo.ui.models.viewers.NodeViewer;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.util.menus.AbstractMenuBuilder;
-import ca.shu.ui.lib.world.piccolo.objects.Window;
-import ca.shu.ui.lib.world.piccolo.objects.Window.WindowState;
 
 /**
  * UI Wrapper for Node Containers such as Ensembles and Networks.

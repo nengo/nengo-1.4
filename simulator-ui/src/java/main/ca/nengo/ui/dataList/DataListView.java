@@ -61,13 +61,13 @@ import ca.nengo.ui.actions.ConfigureAction;
 import ca.nengo.ui.util.FileExtensionFilter;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.TimeSeries;
-import ca.shu.ui.lib.Style.Style;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.actions.UserCancelledException;
-import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.ReversableAction;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.script.ScriptConsole;
 public class DataListView extends JPanel implements TreeSelectionListener {
 

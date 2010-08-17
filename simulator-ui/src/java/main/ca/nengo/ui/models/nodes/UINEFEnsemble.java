@@ -35,19 +35,19 @@ import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.plot.Plotter;
 import ca.nengo.ui.configurable.ConfigException;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.ReversableAction;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.util.menus.MenuBuilder;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.models.constructors.CDecodedOrigin;
 import ca.nengo.ui.models.constructors.CDecodedTermination;
 import ca.nengo.ui.models.constructors.ModelFactory;
 import ca.nengo.ui.models.nodes.widgets.UIOrigin;
 import ca.nengo.ui.models.nodes.widgets.UITermination;
 import ca.nengo.ui.models.tooltips.TooltipBuilder;
-import ca.shu.ui.lib.actions.ActionException;
-import ca.shu.ui.lib.actions.ReversableAction;
-import ca.shu.ui.lib.actions.StandardAction;
-import ca.shu.ui.lib.actions.UserCancelledException;
 //import ca.shu.ui.lib.util.UserMessages;
-import ca.shu.ui.lib.util.menus.MenuBuilder;
-import ca.shu.ui.lib.util.menus.PopupMenuBuilder;
 
 /**
  * A UI object for NEFEnsemble

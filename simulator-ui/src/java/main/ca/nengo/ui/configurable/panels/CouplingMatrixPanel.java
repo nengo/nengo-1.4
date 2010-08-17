@@ -30,7 +30,7 @@ import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.matrixEditor.CouplingMatrixImpl;
 import ca.nengo.ui.configurable.matrixEditor.MatrixEditor;
-import ca.shu.ui.lib.util.Util;
+import ca.nengo.ui.lib.util.Util;
 
 public/**
 		 * Input panel for a matrix

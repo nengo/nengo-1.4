@@ -190,14 +190,14 @@ public class ScriptConsole extends JPanel {
 	private void initStyles() {
 		myStyleContext = new StyleContext();
 		rootStyle = myStyleContext.addStyle("root", null);
-		StyleConstants.setForeground(rootStyle, ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
+		StyleConstants.setForeground(rootStyle, ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
 
-		setChildrenBackground(ca.shu.ui.lib.Style.Style.COLOR_BACKGROUND);
-		setChildrenForeground(ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
-		myCommandField.setCaretColor(ca.shu.ui.lib.Style.Style.COLOR_LIGHT_GREEN);
+		setChildrenBackground(ca.nengo.ui.lib.Style.Style.COLOR_BACKGROUND);
+		setChildrenForeground(ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
+		myCommandField.setCaretColor(ca.nengo.ui.lib.Style.Style.COLOR_LIGHT_GREEN);
 
 		commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
-		StyleConstants.setForeground(commandStyle, ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
+		StyleConstants.setForeground(commandStyle, ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
 		StyleConstants.setItalic(commandStyle, true);
 		Style outputStyle = myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
 		StyleConstants.setForeground(outputStyle, Color.GRAY);
@@ -205,7 +205,7 @@ public class ScriptConsole extends JPanel {
 		StyleConstants.setForeground(errorStyle, Color.RED);
 
 		Style helpStyle = myStyleContext.addStyle(HELP_STYLE, rootStyle);
-		StyleConstants.setForeground(helpStyle, ca.shu.ui.lib.Style.Style.COLOR_FOREGROUND);
+		StyleConstants.setForeground(helpStyle, ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
 	}
 
 	/**

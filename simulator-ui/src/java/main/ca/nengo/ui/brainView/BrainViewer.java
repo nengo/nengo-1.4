@@ -24,14 +24,14 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.brainView;
 
-import ca.shu.ui.lib.world.WorldObject;
-import ca.shu.ui.lib.world.handlers.AbstractStatusHandler;
-import ca.shu.ui.lib.world.handlers.EventConsumer;
-import ca.shu.ui.lib.world.piccolo.WorldImpl;
-import ca.shu.ui.lib.world.piccolo.WorldGroundImpl;
-import ca.shu.ui.lib.world.piccolo.WorldObjectImpl;
-import ca.shu.ui.lib.world.piccolo.primitives.PXImage;
-import ca.shu.ui.lib.world.piccolo.primitives.Text;
+import ca.nengo.ui.lib.world.WorldObject;
+import ca.nengo.ui.lib.world.handlers.AbstractStatusHandler;
+import ca.nengo.ui.lib.world.handlers.EventConsumer;
+import ca.nengo.ui.lib.world.piccolo.WorldGroundImpl;
+import ca.nengo.ui.lib.world.piccolo.WorldImpl;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.nengo.ui.lib.world.piccolo.primitives.PXImage;
+import ca.nengo.ui.lib.world.piccolo.primitives.Text;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
