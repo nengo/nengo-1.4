@@ -30,6 +30,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
+import ca.nengo.model.Node;
+import ca.nengo.model.nef.impl.NEFEnsembleImpl;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
+
 /**
  * A learning function that uses information from the ensemble to modulate the rate
  * of synaptic change.
@@ -39,7 +43,6 @@ package ca.nengo.model.plasticity.impl;
 public class ErrorLearningFunction extends AbstractRealLearningFunction {
 	
 	private static final long serialVersionUID = 1L;
-	private static final float LEARNING_RATE = 6e-6f;
 	
 	private float[] myGain;
 	private float[][] myEncoders;
@@ -58,12 +61,27 @@ public class ErrorLearningFunction extends AbstractRealLearningFunction {
 	}
 	
 	/**
+	 *  Extracts information from the post population to modulate learning.
+	 *  
+	 * @param ens Post population
+	 */
+	public ErrorLearningFunction(NEFEnsembleImpl ens){
+		Node[] nodes = ens.getNodes();
+		myGain = new float[nodes.length];
+		for (int i=0;i<nodes.length;i++){
+			myGain[i]=((SpikingNeuron) nodes[i]).getScale();
+		}
+		myEncoders=ens.getEncoders();
+	}
+	
+
+	/**
 	 * @see ca.nengo.model.plasticity.impl.AbstractRealLearningFunction#deltaOmega(float,float,float,float,float,int,int,int)
 	 */
 	protected float deltaOmega(float input, float time, float currentWeight,
 			float modInput, float originState, int postIndex, int preIndex, int dim) {
 		// With Oja smoothing
-		return LEARNING_RATE * (input * modInput * myEncoders[postIndex][dim] * myGain[postIndex]  - (input*input*currentWeight));
+		return myLearningRate * (input * modInput * myEncoders[postIndex][dim] * myGain[postIndex]  - (originState*originState*currentWeight));
 	}
 	
 	@Override

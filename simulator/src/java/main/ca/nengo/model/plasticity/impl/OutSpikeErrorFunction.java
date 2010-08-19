@@ -30,6 +30,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
+import ca.nengo.model.Node;
+import ca.nengo.model.nef.impl.NEFEnsembleImpl;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
+
 /**
  * A learning function that uses information from the ensemble to modulate the rate
  * of synaptic change.
@@ -39,14 +43,14 @@ package ca.nengo.model.plasticity.impl;
 public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	
 	private static final long serialVersionUID = 1L;
-	private static final float LEARNING_RATE = 1e-4f;
 	
 	private float[] myGain;
 	private float[][] myEncoders;
-	private float myA2Plus;
-	private float myA3Plus;
-	private float myTauPlus;
-	private float myTauY;
+	//default values (from Pfister & Gerstner 2006)
+	private float myA2Plus = 8.8e-11f;
+	private float myA3Plus = 5.3e-2f;
+	private float myTauPlus = 0.0168f;
+	private float myTauY = 0.04f;
 
 	/**
 	 * Requires information from the post population to modulate learning.
@@ -78,15 +82,24 @@ public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	public OutSpikeErrorFunction(float[] gain, float[][] encoders) {
 		super();
 		
-		// Set default values (from Pfister & Gerstner 2006)
 		myGain = gain;
 		myEncoders = encoders;
-		myA2Plus = 8.8e-11f;
-		myA3Plus = 5.3e-2f;
-		myTauPlus = 0.0168f;
-		myTauY = 0.04f;
 	}
 
+	/**
+	 *  Extracts information from the post population to modulate learning.
+	 *  
+	 * @param ens Post population
+	 */
+	public OutSpikeErrorFunction(NEFEnsembleImpl ens){
+		Node[] nodes = ens.getNodes();
+		myGain = new float[nodes.length];
+		for (int i=0;i<nodes.length;i++){
+			myGain[i]=((SpikingNeuron) nodes[i]).getScale();
+		}
+		myEncoders=ens.getEncoders();
+	}
+	
 	/**
 	 * @see ca.nengo.model.plasticity.impl.AbstractSpikeLearningFunction#deltaOmega(float,float,float,float,int,int,int)
 	 */
@@ -109,7 +122,7 @@ public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 		
 		result = r1 * (myA2Plus + o2 * myA3Plus);
 
-		return LEARNING_RATE * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
+		return myLearningRate * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
 	}
 	
 	@Override

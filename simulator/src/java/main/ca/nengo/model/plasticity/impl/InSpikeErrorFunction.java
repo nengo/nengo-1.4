@@ -30,6 +30,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
+import ca.nengo.model.Node;
+import ca.nengo.model.nef.impl.NEFEnsembleImpl;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
+
 /**
  * A learning function that uses information from the ensemble to modulate the rate
  * of synaptic change.
@@ -39,14 +43,14 @@ package ca.nengo.model.plasticity.impl;
 public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	
 	private static final long serialVersionUID = 1L;
-	private static final float LEARNING_RATE = 1e-4f;
 	
 	private float[] myGain;
 	private float[][] myEncoders;
-	private float myA2Minus;
-	private float myA3Minus;
-	private float myTauMinus;
-	private float myTauX;
+	// default values (from Pfister & Gerstner 2006)
+	private float myA2Minus = 6.6e-3f;
+	private float myA3Minus = 3.1e-3f;
+	private float myTauMinus = 0.0337f;
+	private float myTauX = 0.714f;
 
 	/**
 	 * Requires information from the post population to modulate learning.
@@ -77,14 +81,23 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	 */
 	public InSpikeErrorFunction(float[] gain, float[][] encoders) {
 		super();
-		
-		// Set default values (from Pfister & Gerstner 2006)
+
 		myGain = gain;
 		myEncoders = encoders;
-		myA2Minus = 6.6e-3f;
-		myA3Minus = 3.1e-3f;
-		myTauMinus = 0.0337f;
-		myTauX = 0.714f;
+	}
+	
+	/**
+	 *  Extracts information from the post population to modulate learning.
+	 *  
+	 * @param ens Post population
+	 */
+	public InSpikeErrorFunction(NEFEnsembleImpl ens){
+		Node[] nodes = ens.getNodes();
+		myGain = new float[nodes.length];
+		for (int i=0;i<nodes.length;i++){
+			myGain[i]=((SpikingNeuron) nodes[i]).getScale();
+		}
+		myEncoders=ens.getEncoders();
 	}
 
 	/**
@@ -109,7 +122,7 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 		
 		result = o1 * (myA2Minus + r2 * myA3Minus);
 
-		return LEARNING_RATE * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
+		return myLearningRate * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
 	}
 	
 	@Override

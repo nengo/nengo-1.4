@@ -40,6 +40,7 @@ import ca.nengo.math.impl.AbstractFunction;
 public abstract class AbstractSpikeLearningFunction extends AbstractFunction {
 	
 	private static final long serialVersionUID = 1L;
+	protected float myLearningRate=1e-4f;
 
 	/**
 	 * Ensures that the function is of the correct dimension.
@@ -91,5 +92,19 @@ public abstract class AbstractSpikeLearningFunction extends AbstractFunction {
 	
 	public AbstractSpikeLearningFunction clone() throws CloneNotSupportedException {
 		return (AbstractSpikeLearningFunction) super.clone();
+	}
+	
+	/**
+	 * @param rate New learning rate
+	 */
+	public void setLearningRate(float rate){
+		myLearningRate = rate;
+	}
+	
+	/**
+	 * @returns The current learning rate
+	 */
+	public float getLearningRate(){
+		return myLearningRate;
 	}
 }

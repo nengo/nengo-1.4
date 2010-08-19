@@ -169,7 +169,6 @@ public class RealPlasticityRule implements PlasticityRule {
 				}
 			}	
 		}
-		
 		return result;
 	}
 	

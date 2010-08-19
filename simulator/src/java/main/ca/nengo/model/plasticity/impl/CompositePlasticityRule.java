@@ -39,7 +39,7 @@ import ca.nengo.model.plasticity.PlasticityRule;
  * <p>A PlasticityRule that delegates to underlying spike-based and rate-based rules.  
  * This enables switching between rate and spiking modes in simulations with plasticity.
  * The spike-based rule is used whenever activity at both the plastic termination and 
- * at least one origin are of type SpikeOutput. Is either none of the origins has spiking 
+ * at least one origin are of type SpikeOutput. If either none of the origins has spiking 
  * activity, or the plastic termination doesn't receive spiking input, or both, then the 
  * rate-based rule is used. The type of input to other (potentially modulatory) 
  * terminations is not considered.</p>
