@@ -6,17 +6,42 @@
         <pathelement location="${dest.build}"/>
     	<fileset dir="${src.lib}">
     		<include name="*.jar"/>
-    		<exclude name="junit.jar"/>
     	</fileset>
     </path>
 	<path id="classpath.test">
 		<path refid="classpath.simulator"/>
 		<pathelement location="${dest.test}"/>
-      	<pathelement location="${src.lib}/junit.jar"/>
+		<fileset dir="${src.lib.analysis}">
+			<include name="*.jar"/>
+		</fileset>
 	</path>
+	
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+		classpath="${analysis.findbugs}/lib/findbugs-ant.jar"/>
+	<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask"
+		classpath="${analysis.pmd}/lib/pmd-4.2.5.jar"/>
+	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
+		classpath="${analysis.pmd}/lib/pmd-4.2.5.jar"/>
+	<taskdef resource="checkstyletask.properties"
+		classpath="${analysis.checkstyle}/checkstyle-all-5.1.jar"/>
+	
+	<path id="classpath.cobertura">
+		<fileset dir="${analysis.cobertura}">
+			<include name="cobertura.jar"/>
+			<include name="lib/**/*.jar"/>
+		</fileset>
+	</path>
+	<path id="classpath.coveragetest">
+		<pathelement location="${dest.instrumented}"/>
+		<path refid="classpath.test"/>
+		<path refid="classpath.cobertura"/>
+	</path>
+	<taskdef classpathref="classpath.cobertura" resource="tasks.properties" />
+	
     <target name="init">
     	<mkdir dir="${dest.artifacts}"/>
     	<mkdir dir="${dest.build}"/>
+		<mkdir dir="${dest.test}"/>
         <copy includeemptydirs="false" todir="${dest.build}">
             <fileset dir="${src.main}">
                 <exclude name="**/*.launch"/>
@@ -29,39 +54,58 @@
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
-    </target>
-	<target name="init-test">
-		<mkdir dir="${dest.artifacts}"/>
-		<mkdir dir="${dest.artifacts.reports}"/>
-		<mkdir dir="${dest.test}"/>
         <copy includeemptydirs="false" todir="${dest.test}">
             <fileset dir="${src.test}">
                 <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
-	</target>
+    </target>
+    
     <target name="clean">
     	<delete dir="${dest.artifacts}"/>
         <delete dir="${dest.build}"/>
+    	<delete dir="${dest.instrumented}"/>
     	<delete dir="${dest.test}"/>
     </target>
+
+	<target description="Generate JavaDoc." name="javadoc">
+		<delete dir="${dest.artifacts.javadoc}"/>
+		<mkdir dir="${dest.artifacts.javadoc}"/>
+		<javadoc sourcepath="${src.main}" destdir="${dest.artifacts.javadoc}"
+			author="true" version="true" windowtitle="Nengo API"/>
+	</target>
+	
     <target description="Build simulator. Produces .class files in the ${dest.build} directory."
 			depends="init" name="build">
-        <echo message="${ant.project.name}: ${ant.file}"/>
+    	<!-- Path testing
+    	<pathconvert property="simpath" pathsep="${line.separator}          " refid="classpath.simulator" />
+    	<echo message="${simpath}" />
+    		Path testing -->
         <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
             <src path="${src.main}"/>
             <classpath refid="classpath.simulator"/>
+        	<compilerarg value="-Xlint"/>
         </javac>
     </target>
+	
 	<target description="Run JUnit tests and produce reports."
-			depends="init-test,build" name="test">
+			depends="init,build" name="test">
+		<!-- Path testing
+    	<pathconvert property="testpath" pathsep="${line.separator}          " refid="classpath.test" />
+    	<echo message="${testpath}" />
+			Path testing -->
+		<delete dir="${dest.artifacts.junit.xml}"/>
+		<delete dir="${dest.artifacts.junit.html}"/>
+		<mkdir dir="${dest.artifacts.junit.xml}"/>
+		<mkdir dir="${dest.artifacts.junit.html}"/>
 		<javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.test}" source="${java.source}" target="${java.target}">
 	        <src path="${src.test}"/>
             <classpath refid="classpath.test"/>
+			<compilerarg value="-Xlint"/>
         </javac>
 		<junit fork="yes" printsummary="no" haltonfailure="no">
-			<batchtest fork="yes" todir="${dest.artifacts.reports}" >
+			<batchtest fork="yes" todir="${dest.artifacts.junit.xml}" >
 				<fileset dir="${dest.test}">
 			    	<include name="**/*Test.class" />
 			    </fileset>
@@ -69,18 +113,115 @@
 			<formatter type="xml"/>
 			<classpath refid="classpath.test"/>
 		</junit>
-		<junitreport todir="${dest.artifacts.reports}">
-			<fileset dir="${dest.artifacts.reports}">
+		<junitreport todir="${dest.artifacts.junit.html}">
+			<fileset dir="${dest.artifacts.junit.xml}">
 		    	<include name="TEST-*.xml" />
 		    </fileset>
-		    <report todir="${dest.artifacts.reports}" />
+		    <report todir="${dest.artifacts.junit.html}" />
 		</junitreport>
 	</target>
-	<target description="Generate JavaDoc." name="javadoc">
-		<mkdir dir="${dest.artifacts.javadoc}"/>
-		<javadoc sourcepath="${src.main}" destdir="${dest.artifacts.javadoc}"
-			author="true" version="true" windowtitle="Nengo API"/>
+	
+	<target description="Run the FindBugs code analysis tool."
+		depends="init,build" name="findbugs">
+		<mkdir dir="${dest.artifacts.analysis}"/>
+		<findbugs home="${analysis.findbugs}" output="xml:withMessages"
+				reportLevel="low" effort="max" jvmargs="-Xms100m -Xmx800m"
+				outputFile="${dest.artifacts.analysis}/findbugs.xml">
+	    	<sourcePath path="${src.main}"/>
+	    	<class location="${dest.build}"/>
+			<auxClasspath refid="classpath.simulator"/>
+	    </findbugs>
+		<findbugs home="${analysis.findbugs}" output="xml:withMessages"
+				reportLevel="low" effort="max" jvmargs="-Xms100m -Xmx800m"
+				outputFile="${dest.artifacts.analysis}/findbugs-test.xml">
+	    	<sourcePath path="${src.test}"/>
+	    	<class location="${dest.test}"/>
+			<auxClasspath refid="classpath.test"/>
+	    </findbugs>
 	</target>
-	<target description="Generate all artifacts: javadoc, and test reports."
-			depends="test,javadoc" name="all"/>
+	
+	<target description="Run the Copy-Paste Detector code analysis tool." name="cpd">
+		<mkdir dir="${dest.artifacts.analysis}"/>
+		<cpd minimumTokenCount="100" format="xml"
+			outputFile="${dest.artifacts.analysis}/cpd.xml">
+		    <fileset dir="${src.main}">
+		        <include name="**/*.java"/>
+		    </fileset>
+		</cpd>
+		<cpd minimumTokenCount="100" format="xml"
+			outputFile="${dest.artifacts.analysis}/cpd-test.xml">
+		    <fileset dir="${src.test}">
+		        <include name="**/*.java"/>
+		    </fileset>
+		</cpd>
+	</target>
+	
+	<target description="Run the PMD code analysis tool." name="pmd">
+		<mkdir dir="${dest.artifacts.analysis}"/>
+		<pmd rulesetfiles="basic,braces,clone,codesize,controversial,coupling,design,finalizers,imports,logging-java,naming,optimizations,strictexception,strings,sunsecure,typeresolution,unusedcode">
+			<formatter type="xml" toFile="${dest.artifacts.analysis}/pmd.xml"/>
+			<fileset dir="${src.main}">
+				<include name="**/*.java"/>
+			</fileset>
+	    </pmd>
+		<pmd rulesetfiles="basic,braces,clone,codesize,controversial,coupling,design,finalizers,imports,junit,logging-java,naming,optimizations,strictexception,strings,sunsecure,typeresolution,unusedcode">
+			<formatter type="xml" toFile="${dest.artifacts.analysis}/pmd-test.xml"/>
+			<fileset dir="${src.test}">
+				<include name="**/*.java"/>
+			</fileset>
+	    </pmd>
+	</target>
+	
+	<target description="Run the CheckStyle analysis tool." name="checkstyle">
+		<mkdir dir="${dest.artifacts.analysis}"/>
+		<checkstyle config="${analysis.checkstyle}/sun_checks.xml" failOnViolation="false">
+			<formatter type="xml" tofile="${dest.artifacts.analysis}/checkstyle.xml"/>
+			<fileset dir="${src.main}">
+				<include name="**/*.java"/>
+			</fileset>
+		</checkstyle>
+		<checkstyle config="${analysis.checkstyle}/sun_checks.xml" failOnViolation="false">
+			<formatter type="xml" tofile="${dest.artifacts.analysis}/checkstyle-test.xml"/>
+			<fileset dir="${src.test}">
+				<include name="**/*.java"/>
+			</fileset>
+		</checkstyle>
+	</target>
+	
+	<target description="Do unit testing and generate Cobertura code coverage reports."
+		depends="init,build" name="cobertura">
+		<mkdir dir="${dest.artifacts.analysis}"/>
+		<delete dir="${dest.artifacts.junit.xml}"/>
+		<mkdir dir="${dest.artifacts.junit.xml}"/>
+		<mkdir dir="${dest.artifacts.cobertura}"/>
+	
+		<delete file="cobertura.ser" />
+		<javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.test}" source="${java.source}" target="${java.target}">
+	        <src path="${src.test}"/>
+            <classpath refid="classpath.test"/>
+			<compilerarg value="-Xlint"/>
+        </javac>
+		<cobertura-instrument todir="${dest.instrumented}">
+			<includeClasses regex="ca.nengo.*"/>
+			<instrumentationClasspath>
+				<path refid="classpath.simulator" />
+			</instrumentationClasspath>
+		</cobertura-instrument>
+		<junit fork="once" printsummary="no" haltonfailure="no" maxmemory="1024m">
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="${basedir}/cobertura.ser" />
+			<formatter type="xml"/>
+			<classpath refid="classpath.coveragetest"/>
+			<batchtest fork="once" todir="${dest.artifacts.junit.xml}" >
+				<fileset dir="${dest.test}">
+			    	<include name="**/*Test.class" />
+			    </fileset>
+			</batchtest>
+		</junit>
+		<cobertura-report format="xml" destdir="${dest.artifacts.analysis}" srcdir="${src.main}" />
+		<cobertura-report format="html" destdir="${dest.artifacts.cobertura}" srcdir="${src.main}" />
+		<delete file="cobertura.ser" />
+	</target>
+	
+	<target description="Generate all artifacts: javadoc, junit tests, FindBugs, CPD, PMD, CheckStyle, and Cobertura." name="all"
+			depends="javadoc,test,findbugs,cpd,pmd,checkstyle,cobertura" />
 </project>
