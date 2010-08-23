@@ -16,18 +16,26 @@ class CSVFilter(FileFilter):
     def getDescription(self):
         return 'comma-separated values'
 
-class DataPanel(JPanel):
+class DataPanel(JPanel,MouseListener):
     def __init__(self,view):
         JPanel.__init__(self)
         self.view=view
         self.background=Color.white        self.layout=BorderLayout()
+
+        self.popup=JPopupMenu()
+        self.popup_items={}
 
         self.add(self.make_controls(),BorderLayout.SOUTH)
         
         data,title=self.extract_data()
         self.table=JTable(DefaultTableModel(data,title))
         
-        self.add(JScrollPane(self.table))        
+        scroll=JScrollPane(self.table)
+        self.add(scroll)        
+
+        scroll.addMouseListener(self)
+        self.table.tableHeader.addMouseListener(self)
+        self.table.addMouseListener(self)
 
         self.fileChooser=JFileChooser()
         self.fileChooser.setFileFilter(CSVFilter())
@@ -80,6 +88,17 @@ class DataPanel(JPanel):
         title=['t']
         for key,watch in self.view.watcher.active.items():
             name,func,args=key
+            
+            code='%s.%s%s'%(name,func.__name__,args)
+            if code not in self.popup_items:
+                state=True
+                if 'spike' in func.__name__: state=False
+                if 'voltage' in func.__name__: state=False
+                self.popup_items[code]=JCheckBoxMenuItem(code,state,stateChanged=self.refresh)
+                self.popup.add(self.popup_items[code])
+            
+            if self.popup_items[code].state is False: continue
+                
             d=watch.get(dt_tau=dt_tau,start=start_index,count=count)
             n=len(watch.get_first())
             if data is None:
@@ -87,13 +106,14 @@ class DataPanel(JPanel):
                 while len(data)<len(d): 
                     data.append(['%0.4f'%(start_time+(len(data)+0)*self.view.dt)])
             
+            
             for i in range(n):
-                title.append('%s.%s%s[%d]'%(name,func.__name__,args,i))
+                title.append('%s[%d]'%(code,i))
                 for j in range(len(data)):
                     dd=d[j]
                     if dd is None: data[j].append('')
                     else: data[j].append(format%dd[i])
-        
+
         self.view.paused=pause_state            
         return data,title
         
@@ -115,4 +135,17 @@ class DataPanel(JPanel):
         self.table.model.setDataVector(data,title)
         
         
+    def mouseClicked(self, event):     
+        if event.button==MouseEvent.BUTTON3 or (event.button==MouseEvent.BUTTON1 and event.isControlDown()):
+            if self.popup is not None:
+                self.popup.show(event.source,event.x-5,event.y-5)   
+            
+    def mouseEntered(self, event):
+        pass
+    def mouseExited(self, event):        
+        pass
+    def mousePressed(self, event):  
+        pass
+    def mouseReleased(self, event):        
+        pass
     

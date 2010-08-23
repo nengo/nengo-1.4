@@ -32,7 +32,9 @@ class Item(core.DataViewComponent):
             elif( klass is None ):
                 popup_menu = self.popup
             else:
-                popup_menu.add(JMenuItem(type,actionPerformed=lambda event,self=self,klass=klass,args=args,type=type: self.add_component(type,klass,args)))
+                if '|' in type: text=type.split('|',1)[0]
+                else: text=type
+                popup_menu.add(JMenuItem(text,actionPerformed=lambda event,self=self,klass=klass,args=args,type=type: self.add_component(type,klass,args)))
             
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
@@ -47,6 +49,7 @@ class Item(core.DataViewComponent):
             lm=g.font.getLineMetrics(self.name,g.fontRenderContext)
             self.descent=lm.descent
             self.setSize(int(bounds.width+margin*2),int(bounds.height+margin*2))
+            self.view.area.repaint()
         
         g.drawString(self.name,margin,self.size.height-margin-self.descent)    
         

@@ -54,7 +54,7 @@ class Graph(core.DataViewComponent):
         self.setSize(300,200)
         self.ylimits=ylimits
         self.split=split
-        self.autozoom=True
+        self.autozoom=False
         self.last_maxy=None
         self.neuronmapped=neuronmapped
         
@@ -106,6 +106,9 @@ class Graph(core.DataViewComponent):
         self.autozoom=event.source.state
         self.repaint()
         
+    def label_for_index(self,index):
+        return 'v[%d]'%index    
+        
     def fix_popup(self):
         self.popup.add(JPopupMenu.Separator())
         
@@ -122,7 +125,7 @@ class Graph(core.DataViewComponent):
                         new_menu = JMenu("%s[%d:%d]" % ('v', i, min(max_ind, i + max_sub[n+1]) - 1))
                         sub_menus[n].add(new_menu)
                         sub_menus[n+1] = new_menu
-            sub_menus[num_sub-1].add(JCheckBoxMenuItem('%s[%d]'%('v',i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state)))
+            sub_menus[num_sub-1].add(JCheckBoxMenuItem(self.label_for_index(i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state)))
         
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)

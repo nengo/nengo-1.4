@@ -3,7 +3,8 @@ import components
 import timelog
 import data
 import simulator
-
+import hrr
+from nef.array import NetworkArray
 
 import java
 import javax
@@ -94,6 +95,9 @@ class NodeWatch:
             return [0]*obj.neurons
         else:
             return obj.getOrigin('AXON').values.values
+            
+
+
     def views(self,obj):
         origins=[o.name for o in obj.origins]
         ignored_origins = ['AXON','current']
@@ -140,13 +144,15 @@ class NodeWatch:
                 label=obj.name+": "+name
                 r.append((name, JMenu, JMenu(name)))
             
-            r.append((text,components.Graph,dict(func=self.value,args=(name,),filter=filter,label=label)))
+            r.append((text+'|'+name,components.Graph,dict(func=self.value,args=(name,),filter=filter,label=label)))
             
             if len(obj.getOrigin(name).getValues().values)>8:
-                r.append((text_grid,components.VectorGrid,dict(func=self.value,args=(name,), min=-max_radii, max=max_radii,label=label)))
+                r.append((text_grid+'|'+name,components.VectorGrid,dict(func=self.value,args=(name,), min=-max_radii, max=max_radii,label=label)))
 
             if len(obj.getOrigin(name).getValues().values)>=2:
-                r.append((xy,components.XYPlot,dict(func=self.value,args=(name,),filter=filter,label=label)))
+                r.append((xy+'|'+name,components.XYPlot,dict(func=self.value,args=(name,),filter=filter,label=label)))
+        if num_origins>1:
+            r.append((None,None,None))  # reset to top level of popup menu        
         
         if isinstance(obj,NEFEnsemble):
             terminations=[t.name for t in obj.nodes[0].terminations]
@@ -164,17 +170,65 @@ class NodeWatch:
                         r.append((name+' detail',components.SpikeLineOverlay,dict(
                                   infunc=self.in_spikes,inargs=(name,),outfunc=self.out_spikes,
                                   lfunc=self.weights,largs=(name,),label=label)))
+        
         return r
 
 class FunctionWatch:
     def check(self,obj):
-        return isinstance(obj,FunctionInput)
+        return isinstance(obj,FunctionInput) 
     def funcOrigin(self,obj):
         return obj.getOrigin('origin').getValues().values
     def views(self,obj):
         return [
             ('control',components.FunctionControl,dict(func=self.funcOrigin,label=obj.name)),
             ]
+
+class HRRWatch:
+    def check(self,obj):
+        return isinstance(obj,NEFEnsemble) and obj.dimension in hrr.Vocabulary.defaults
+    def value(self,obj):
+        return obj.getOrigin('X').getValues().getValues()
+    def value_normalized(self,obj):
+        v=self.value(obj)
+        length=0
+        for i in range(len(v)): length+=v[i]*v[i]
+        length=math.sqrt(length)
+        if length>0.1:
+            v=[x/length for x in v]
+        return v    
+    def hrr_dot(self,obj):
+        v=self.value(obj)
+        vocab=hrr.Vocabulary.defaults[obj.dimension]
+        return list(vocab.dot(v))+list(vocab.dot_pairs(v))
+    def hrr_angle(self,obj):
+        v=self.value_normalized(obj)
+        vocab=hrr.Vocabulary.defaults[obj.dimension]
+        return list(vocab.dot(v))+list(vocab.dot_pairs(v))
+    def views(self,obj):
+        return [
+            ('semantic pointer',components.HRRGraph,dict(func=self.hrr_angle,value_func=self.value_normalized,label=obj.name)),
+#            ('semantic pointer',components.HRRGraph,dict(func=self.hrr_dot,value_func=self.value,label=obj.name)),
+            ]
+
+
+class ArrayWatch:
+    def check(self,obj):
+        return isinstance(obj,NetworkArray)
+    
+    def spike_array(self,obj):
+        r=[]
+        for n in obj._nodes:
+            r.extend(n.getOrigin('AXON').getValues().values)
+        return r
+    
+    def views(self,obj):
+        return [
+            ('firing rate',components.Grid,dict(func=self.spike_array,min=0,max=lambda self: 200*self.view.dt,filter=True,label=obj.name,improvable=False)),       
+            ('spike raster',components.SpikeRaster,dict(func=self.spike_array,label=obj.name,usemap=False)),
+            ]
+            
+
+
 
 import space
 import ccm.nengo
@@ -274,6 +328,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.watcher.add_watch(NodeWatch())
         self.watcher.add_watch(EnsembleWatch())
         self.watcher.add_watch(FunctionWatch())
+        self.watcher.add_watch(HRRWatch())
+        self.watcher.add_watch(ArrayWatch())
         
         self.requested_mode=None
         
@@ -296,9 +352,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.forced_origins_prev={}
         
         if size is None:
-            if ui is None: size=(800,600)
+            if ui is None: size=(900,600)
             else: size=(int(ui.width),int(ui.height))
-            if size[0]<700: size=(700,size[1])
+            if size[0]<700: size=(800,size[1])
         
         self.frame.size=(size[0],size[1]+100)        
        
@@ -348,7 +404,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             
     def mouseClicked(self, event):     
         self.mouse_click_location=event.x,event.y
-        if event.button==MouseEvent.BUTTON3:
+        if event.button==MouseEvent.BUTTON3 or (event.button==MouseEvent.BUTTON1 and event.isControlDown()):
             self.popup.show(self.area,event.x-5,event.y-5)   
             
     def mouseEntered(self, event):
@@ -382,15 +438,22 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         for key,value in self.forced_origins.items():
             (name,origin,index)=key
             origin=self.watcher.objects[name].getOrigin(origin)
-            v=origin.getValues().values
+            
+            ov=origin.getValues()
+            
+            v=ov.getValues()
+            
+            if index is not None:
+                prev=self.forced_origins_prev.get(key,None)
+                if prev is None: prev=v[index]
 
-            prev=self.forced_origins_prev.get(key,None)
-            if prev is None: prev=v[index]
+                v[index]=prev*decay+value*dt_tau
+                self.forced_origins_prev[key]=v[index]
+            else:
+                v=value    
 
-            v[index]=prev*decay+value*dt_tau
-            self.forced_origins_prev[key]=v[index]
-
-            origin.setValues(0,origin.getValues().time,v)
+            
+            origin.setValues(RealOutputImpl(v,ov.getUnits(),ov.getTime()))
 
     def save(self):
         db=shelve.open('python/timeview/layout.db')

@@ -73,8 +73,9 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
     def do_hide(self):
         parent=self.parent
         self.visible=False
-        self.parent.remove(self) 
-        parent.repaint()
+        if self.parent is not None:
+            self.parent.remove(self) 
+            parent.repaint()
         
     def hideme(self,event):
         if event.actionCommand=='hide':
@@ -114,7 +115,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.setLocation(int(self.x-(w-self.size.width)/2),int(self.y-(h-self.size.height)/2))
         self.setSize(w,h)
     def mouseClicked(self, event):     
-        if event.button==MouseEvent.BUTTON3:
+        if event.button==MouseEvent.BUTTON3 or (event.button==MouseEvent.BUTTON1 and event.isControlDown()):
             self.parent.add(self.popup)
             self.popup.show(self,event.x-5,event.y-5)   
     def mouseEntered(self, event):

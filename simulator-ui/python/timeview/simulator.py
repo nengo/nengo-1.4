@@ -25,7 +25,7 @@ class Simulator:
             self.thread_pool=None
     def initialize(self,network):
         for n in network.nodes:
-            if isinstance(n,Network):
+            if isinstance(n,Network) and not n.__class__.__name__=='CCMModelNetwork':
                 self.initialize(n)
             else:
                 self.nodes.append(n)

@@ -9,7 +9,7 @@ import neuronmap
 from math import sqrt
 
 class SpikeRaster(core.DataViewComponent):
-    def __init__(self,view,name,func,label=None):
+    def __init__(self,view,name,func,label=None,usemap=True):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
@@ -30,6 +30,8 @@ class SpikeRaster(core.DataViewComponent):
         self.popup.add(JMenuItem('show 25%',actionPerformed=lambda x: self.set_sample(4)))
         self.popup.add(JMenuItem('show 20%',actionPerformed=lambda x: self.set_sample(5)))
         self.popup.add(JMenuItem('show 10%',actionPerformed=lambda x: self.set_sample(10)))
+        self.popup.add(JMenuItem('show 5%',actionPerformed=lambda x: self.set_sample(20)))
+        self.usemap=usemap
         
         
         self.map=None
@@ -59,7 +61,7 @@ class SpikeRaster(core.DataViewComponent):
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
         
-        if self.map is None:
+        if self.usemap and self.map is None:
             self.initialize_map()
         
         border_top = self.border_top + self.label_offset
@@ -97,7 +99,11 @@ class SpikeRaster(core.DataViewComponent):
         for i,d in enumerate(data):
             if d is None: continue
             for j in range(len(d)/self.sample):
-                spike=d[self.map.map[j*self.sample]]
+                if self.usemap:
+                    spike=d[self.map.map[j*self.sample]]
+                else:
+                    spike=d[j*self.sample]
+                    
                 if spike:
                     x=int(i*dx+self.border_left)
                     y=int(j*dy+border_top)

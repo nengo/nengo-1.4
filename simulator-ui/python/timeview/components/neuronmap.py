@@ -1,7 +1,7 @@
 cache={}   
 
 import random
-
+import time
 
 def dist(x1,x2):
     return sum([(x1[i]-x2[i])**2 for i in range(len(x2))])        
@@ -19,11 +19,15 @@ class Map:
         self.improvements+=1
         if self.N<=1: return 0
         total=0
+        quit_time=time.clock()+0.5
+        count=0
         for i in range(self.N):
+            count+=1
             j=random.randrange(self.N)
             if i!=j: 
                 total+=self.swap_if_better(i,j)
-        return total/float(self.N-1)
+            if time.clock()>quit_time: break    
+        return total/count
         
     def swap_if_better(self,i,j):
         N=self.N

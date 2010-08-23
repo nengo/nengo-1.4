@@ -9,6 +9,7 @@ import function
 import view3d
 import preferred
 import xyplot
+import hrrgraph
 
 from grid import Grid
 from item import Item
@@ -18,3 +19,4 @@ from spike_line_overlay import SpikeLineOverlayfrom function import FunctionCon
 from view3d import View3D
 from preferred import PreferredDirection
 from xyplot import XYPlot
+from hrrgraph import HRRGraph

@@ -12,6 +12,7 @@ class TimeLogItem:
         self.filtered={}
         self.offset=offset
         self.type=type
+        self.length=None
         self.tick()
     def tick(self,limit=None):
         self.semaphore.acquire()
@@ -21,6 +22,10 @@ class TimeLogItem:
             import java
             java.lang.System.out.println("Tick error: %s %s %s\n%s"%(self.func,self.args,self.kwargs,e))
             v=None
+        if self.length is None: self.length=len(v)
+        else:
+            if len(v)<self.length: v=v+[0]*(self.length-len(v))
+            elif len(v)>self.length: v=v[:self.length]    
         self.data.append(v)
         if limit is not None and len(self.data)>limit:
             delta=len(self.data)-limit

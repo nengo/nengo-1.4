@@ -1,7 +1,8 @@
-import nef
 import generators
 import pdfs
 import functions
 import array
-from nef import Network
+import convolution
+from nef_core import Network
+from simplenode import SimpleNode
 
