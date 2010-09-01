@@ -145,8 +145,13 @@ public class Convolution extends AbstractFunction {
 	}
 	
 	@Override
-	public Function clone() throws CloneNotSupportedException {
-		return new Convolution(myOne.clone(), myTwo.clone(), myStepSize, myWindow);
+	public Convolution clone() throws CloneNotSupportedException {
+		final Convolution result = (Convolution) super.clone();
+		result.setFunctionOne(myOne.clone());
+		result.setFunctionTwo(myTwo.clone());
+		result.myStepSize = myStepSize;
+		result.myWindow = myWindow;
+		return result;
 	}
 
 	//functional test

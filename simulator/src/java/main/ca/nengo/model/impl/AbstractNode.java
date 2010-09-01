@@ -70,6 +70,7 @@ public abstract class AbstractNode implements Node {
 		myMode = SimulationMode.DEFAULT;
 		
 		myOrigins = new HashMap<String, Origin>(10);
+		myOriginNames = new LinkedList<String>();
 		for (Iterator<Origin> it = origins.iterator(); it.hasNext(); ) {
 			Origin o = it.next();
 			myOrigins.put(o.getName(), o);
@@ -139,8 +140,7 @@ public abstract class AbstractNode implements Node {
 	 * 
 	 * @see ca.nengo.model.Node#run(float, float)
 	 */
-	public void run(float startTime, float endTime) throws SimulationException {
-	}
+	public abstract void run(float startTime, float endTime) throws SimulationException;
 
 	/**
 	 * @see ca.nengo.model.Node#setMode(ca.nengo.model.SimulationMode)
@@ -154,8 +154,7 @@ public abstract class AbstractNode implements Node {
 	 * 
 	 * @see ca.nengo.model.Resettable#reset(boolean)
 	 */
-	public void reset(boolean randomize) {
-	}
+	public abstract void reset(boolean randomize);
 
 	/**
 	 * @see ca.nengo.model.Node#getDocumentation()

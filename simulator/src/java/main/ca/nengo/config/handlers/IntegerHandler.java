@@ -42,7 +42,7 @@ public class IntegerHandler extends BaseHandler {
 	 * @see ca.nengo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
 	 */
 	public Object getDefaultValue(Class<?> c) {
-		return new Integer(0);
+		return Integer.valueOf(0);
 	}
 
 }

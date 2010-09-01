@@ -43,12 +43,12 @@ public class GPUNodeThreadPool extends NodeThreadPool {
 	}
 	
 	public GPUNodeThreadPool(Node[] nodes){
-		Initialize(nodes);
+		initialize(nodes);
 	}
 	
 	// Called by the GPUThread after completing a step. Wait for the main thread to wake this thread up again to
 	// process another step.
-	public void Sleep(){
+	public void sleep(){
 		myGPUThreadLock.lock();
 		
 		if(mySignal == 0)
@@ -64,7 +64,7 @@ public class GPUNodeThreadPool extends NodeThreadPool {
 		myGPUThreadLock.unlock();
 	}
 	
-	protected void Initialize(Node[] nodes){
+	protected void initialize(Node[] nodes){
 		myGPUThreadLock = new ReentrantLock();
 		myGPUThreadCondition = myGPUThreadLock.newCondition();
 		myNumGPUNodes = 0;
@@ -101,7 +101,7 @@ public class GPUNodeThreadPool extends NodeThreadPool {
 			myNumThreads = 1;
 		}
 		
-		super.Initialize(nodeList.toArray(nodes));
+		super.initialize(nodeList.toArray(nodes));
 		myNumNodesRequired += myNumGPUNodes;
 		
 		Thread.yield();

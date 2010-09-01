@@ -213,10 +213,10 @@ public abstract class Plotter {
 	 */
 	public static void plot(TimeSeries ideal, TimeSeries actual, float tauFilter, String title) {
 		//ideal = filter(ideal, tauFilter);
-		actual = filter(actual, tauFilter);
-		getInstance().doPlot(ideal, actual, title);
+		final TimeSeries filtActual = filter(actual, tauFilter);
+		getInstance().doPlot(ideal, filtActual, title);
 	}
-	
+
 	/**
 	 * @param series TimeSeries to plot
 	 * @param title Plot title

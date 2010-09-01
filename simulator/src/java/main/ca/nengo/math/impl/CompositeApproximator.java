@@ -134,7 +134,10 @@ public class CompositeApproximator implements LinearApproximator {
 
 		@Override
 		public Function clone() throws CloneNotSupportedException {
-			return new FunctionWrapper(myFunction.clone(), myDimensions.clone());
+			final FunctionWrapper result = (FunctionWrapper) super.clone();
+			result.myFunction = myFunction.clone();
+			result.myDimensions = myDimensions.clone();
+			return result;
 		}
 
 	}

@@ -61,7 +61,7 @@ import ca.nengo.model.neuron.impl.IzhikevichSpikeGenerator;
  * 
  * @author Bryan Tripp
  */
-public class MainHandler implements ConfigurationHandler {
+public final class MainHandler implements ConfigurationHandler {
 	
 	public static String HANDLERS_FILE_PROPERTY = "ca.nengo.config.handlers";
 	

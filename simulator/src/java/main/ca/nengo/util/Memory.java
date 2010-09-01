@@ -42,7 +42,7 @@ public class Memory {
 	 * Prints a message to the console regarding current memory usage. 
 	 */
 	public static void report(String context) {
-		System.gc();
+		//System.gc();
 		long free = Runtime.getRuntime().freeMemory();
 		long total = Runtime.getRuntime().totalMemory();
 		long max = Runtime.getRuntime().maxMemory();

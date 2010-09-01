@@ -227,10 +227,10 @@ public class ListPropertyImplTest extends TestCase {
 		private List<String> myA; //fixed cardinality
 		private List<String> myB; //not fixed cardinality
 		private List<String> myC; //immutable
-//		private String[] myD; //immutable array
-//		private String[] myE; //mutable array
+		private String[] myD; //immutable array
+		private String[] myE; //mutable array
 		private List<String> myF; //exposed list 
-//		private float[] myG;
+		private float[] myG;
 		
 		public MockObject() {
 			myA = new ArrayList<String>(10);
@@ -242,94 +242,94 @@ public class ListPropertyImplTest extends TestCase {
 			myC = new ArrayList<String>(10);
 			myC.add("1");
 
-//			myD = new String[]{"1", "2"};
-//			myE = new String[]{"1"};
+			myD = new String[]{"1", "2"};
+			myE = new String[]{"1"};
 			
 			myF = new ArrayList<String>(10);
 			myF.add("1");
 			
-//			myG = new float[]{1, 2};
+			myG = new float[]{1, 2};
 		}
 		
-//		public String getA(int index) {
-//			return myA.get(index);
-//		}
+		public String getA(int index) {
+			return myA.get(index);
+		}
 		
-//		public void setA(int index, String val) {
-//			myA.set(index, val);
-//		}
+		public void setA(int index, String val) {
+			myA.set(index, val);
+		}
 		
-//		public int getNumA() {
-//			return myA.size();
-//		}
+		public int getNumA() {
+			return myA.size();
+		}
 		
-//		public String getB(int index) {
-//			return myB.get(index);
-//		}
+		public String getB(int index) {
+			return myB.get(index);
+		}
 		
-//		public void setB(int index, String val) {
-//			myB.set(index, val);
-//		}
+		public void setB(int index, String val) {
+			myB.set(index, val);
+		}
 		
-//		public int getNumB() {
-//			return myB.size();
-//		}
+		public int getNumB() {
+			return myB.size();
+		}
 		
-//		public void addB(String val) {
-//			myB.add(val);
-//		}
+		public void addB(String val) {
+			myB.add(val);
+		}
 		
-//		public void removeB(int index) {
-//			myB.remove(index);
-//		}
+		public void removeB(int index) {
+			myB.remove(index);
+		}
 		
-//		public void insertB(int index, String val) {
-//			myB.add(index, val);
-//		}
+		public void insertB(int index, String val) {
+			myB.add(index, val);
+		}
 		
-//		public String getC(int index) {
-//			return myC.get(index);
-//		}
+		public String getC(int index) {
+			return myC.get(index);
+		}
 		
-//		public int getNumC() {
-//			return myC.size();
-//		}
+		public int getNumC() {
+			return myC.size();
+		}
 		
-//		public String getD(int index) {
-//			return myD[index];
-//		}
+		public String getD(int index) {
+			return myD[index];
+		}
 		
-//		public String[] getAllD() {
-//			return myD;
-//		}
+		public String[] getAllD() {
+			return myD;
+		}
 		
-//		public String getE(int index) {
-//			return myE[index];
-//		}
+		public String getE(int index) {
+			return myE[index];
+		}
 		
-//		public String[] getEs() {
-//			return myE;
-//		}
+		public String[] getEs() {
+			return myE;
+		}
 		
-//		public void setEs(String[] vals) {
-//			myE = vals;
-//		}
+		public void setEs(String[] vals) {
+			myE = vals;
+		}
 		
-//		public List<String> getF() {
-//			return myF;
-//		}
+		public List<String> getF() {
+			return myF;
+		}
 		
-//		public int getNumG() {
-//			return myG.length;
-//		}
+		public int getNumG() {
+			return myG.length;
+		}
 		
-//		public float getG(int index) {
-//			return myG[index];
-//		}
+		public float getG(int index) {
+			return myG[index];
+		}
 		
-//		public void setG(int index, float value) {
-//			myG[index] = value;
-//		}
+		public void setG(int index, float value) {
+			myG[index] = value;
+		}
 		
 	}
 

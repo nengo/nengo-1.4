@@ -17,7 +17,7 @@ public class LongHandler extends BaseHandler {
 	 * @see ca.nengo.config.ConfigurationHandler#getDefaultValue(java.lang.Class)
 	 */
 	public Object getDefaultValue(Class<?> c) {
-		return new Long(0);
+		return Long.valueOf(0);
 	}
 
 }

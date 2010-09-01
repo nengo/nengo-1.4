@@ -120,7 +120,7 @@ public class LTISystem implements LinearSystem {
 	public float[] f(float t, float[] u) {
 		assert u.length == getInputDimension();		
 		
-		return A1x1plusA2x2(A, x, B, u);
+		return a1x1plusa2x2(A, x, B, u);
 	}
 
 	/**
@@ -131,11 +131,11 @@ public class LTISystem implements LinearSystem {
 	public float[] g(float t, float[] u) {
 		assert u.length == getInputDimension(); 
 		
-		return A1x1plusA2x2(C, x, D, u);
+		return a1x1plusa2x2(C, x, D, u);
 	}
 	
 	//does not check dimensions -- we leave this to prior assertion of dimensionsOK(...) 
-	private static float[] A1x1plusA2x2(float[][] A1, float[] x1, float[][] A2, float[] x2) {
+	private static float[] a1x1plusa2x2(float[][] A1, float[] x1, float[][] A2, float[] x2) {
 		float[] result = new float[A1.length];
 		
 		for (int i = 0; i < A1.length; i++) {

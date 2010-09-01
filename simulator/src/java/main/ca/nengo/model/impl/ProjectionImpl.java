@@ -137,7 +137,7 @@ public class ProjectionImpl implements Projection {
 				
 		myBiasOrigin = pre.addBiasOrigin(baseOrigin, numInterneurons, getUniqueNodeName(post.getName() + ":" + baseTermination.getName()), excitatory);
 		myInterneurons = myBiasOrigin.getInterneurons();
-		myNetwork.addNode(myInterneurons);		
+		myNetwork.addNode(myInterneurons);
 		BiasTermination[] bt = post.addBiasTerminations(baseTermination, tauBias, myBiasOrigin.getDecoders(), baseOrigin.getDecoders());
 		myDirectBT = bt[0];
 		myIndirectBT = bt[1];
@@ -180,10 +180,20 @@ public class ProjectionImpl implements Projection {
 	 */
 	public void removeBias() {
 		try {
+			DecodedOrigin baseOrigin = (DecodedOrigin) myOrigin;
+			DecodedTermination baseTermination = (DecodedTermination) myTermination;
+			NEFEnsemble pre = (NEFEnsemble) baseOrigin.getNode();
+			NEFEnsemble post = (NEFEnsemble) baseTermination.getNode();
+			
 			myNetwork.removeProjection(myDirectBT);
 			myNetwork.removeProjection(myIndirectBT);
 			myNetwork.removeProjection(myInterneuronTermination);
 			myNetwork.removeNode(myInterneurons.getName());
+			
+			pre.removeDecodedOrigin(myBiasOrigin.getName());
+			post.removeDecodedTermination(myDirectBT.getName());
+			post.removeDecodedTermination(myIndirectBT.getName());
+			
 			myBiasIsEnabled = false;
 		} catch (StructuralException e) {
 			throw new RuntimeException("Error while trying to remove bias (this is probably a bug in ProjectionImpl)", e);

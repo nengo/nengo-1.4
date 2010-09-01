@@ -236,7 +236,7 @@ public class PostfixFunction implements Function {
 			if (o instanceof Float) {
 				list.add(new Float(((Float) o).floatValue()));
 			} else if (o instanceof Integer) {
-				list.add(new Integer(((Integer) o).intValue()));				
+				list.add(Integer.valueOf(((Integer) o).intValue()));				
 			} else if (o instanceof Function) {
 				list.add(((Function) o).clone());
 			} else {

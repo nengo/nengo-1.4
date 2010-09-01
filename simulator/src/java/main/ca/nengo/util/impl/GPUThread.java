@@ -154,7 +154,7 @@ public class GPUThread extends NodeThread {
 		
 
 		// Now wait until we get the signal to step from the main thread
-		myGPUNodeThreadPool.Sleep();
+		myGPUNodeThreadPool.sleep();
 		
 		// int step = 0;
 		while (!myGPUNodeThreadPool.myKill) {
@@ -205,7 +205,7 @@ public class GPUThread extends NodeThread {
 			}
 			
 			// sleep until we are told by the main thread to take another step (or to end the run)
-			myGPUNodeThreadPool.Sleep();
+			myGPUNodeThreadPool.sleep();
 		}
 
 		nativeKill();

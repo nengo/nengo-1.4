@@ -36,15 +36,15 @@ public class CompositeApproximatorTest extends TestCase {
 		Function[] posts = new PostfixFunction[2];
 		
 		ArrayList l = new ArrayList();
-		l.add(new Integer(0));
+		l.add(Integer.valueOf(0));
 		l.add(polys[0]);
-		l.add(new Integer(1));
+		l.add(Integer.valueOf(1));
 		l.add(polys[1]);
 		posts[0] = new PostfixFunction(l, "", 2);
 		l = new ArrayList();
-		l.add(new Integer(0));
+		l.add(Integer.valueOf(0));
 		l.add(polys[1]);
-		l.add(new Integer(1));
+		l.add(Integer.valueOf(1));
 		l.add(polys[0]);
 		posts[1] = new PostfixFunction(l, "", 2);
 		
@@ -103,9 +103,9 @@ public class CompositeApproximatorTest extends TestCase {
 		
 		approximator = new CompositeApproximator(comps, new int[][]{{0,1},{0,1}});
 		l = new ArrayList();
-		l.add(new Integer(0));
+		l.add(Integer.valueOf(0));
 		l.add(new Polynomial(new float[]{0f,-2f}));
-		l.add(new Integer(1));
+		l.add(Integer.valueOf(1));
 		l.add(new Polynomial(new float[]{0f,0f,3f}));
 		target = new PostfixFunction(l, "", 2);
 		

@@ -340,7 +340,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 
 			values = new float[][]{new float[myNodes.length]};
 			for (int i = 0; i < myNodes.length; i++) {
-				if (nodeNumbers.contains(new Integer(i))) {
+				if (nodeNumbers.contains(Integer.valueOf(i))) {
 					TimeSeries history = ((Probeable) myNodes[i]).getHistory(stateName);
 					int index = history.getTimes().length - 1;
 					values[0][i] = history.getValues()[index][0];
@@ -483,7 +483,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 					if (!result.containsKey(key)) {
 						result.put(key, new ArrayList<Integer>(10));
 					}
-					result.get(key).add(new Integer(i));
+					result.get(key).add(Integer.valueOf(i));
 				}
 			}
 		}

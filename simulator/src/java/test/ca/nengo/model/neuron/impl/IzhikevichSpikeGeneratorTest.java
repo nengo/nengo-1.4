@@ -68,10 +68,10 @@ public class IzhikevichSpikeGeneratorTest extends TestCase {
 		List<Integer> firings2 = new ArrayList<Integer>(10); 
 		for (int i = 0; i < 1000; i++) {
 			SpikeOutput o1 = (SpikeOutput) rs.run(new float[]{i/1000f, (i+1)/1000f}, new float[]{I, I});
-			if (o1.getValues()[0]) firings1.add(new Integer(i));
+			if (o1.getValues()[0]) firings1.add(Integer.valueOf(i));
 			
 			SpikeOutput o2 = (SpikeOutput) fs.run(new float[]{i/1000f, (i+1)/1000f}, new float[]{I, I});
-			if (o2.getValues()[0]) firings2.add(new Integer(i));
+			if (o2.getValues()[0]) firings2.add(Integer.valueOf(i));
 		}
 		
 		assertEquals(10, firings1.size());

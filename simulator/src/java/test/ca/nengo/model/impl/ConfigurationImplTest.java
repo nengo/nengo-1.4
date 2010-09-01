@@ -41,7 +41,7 @@ public class ConfigurationImplTest extends TestCase {
 		assertEquals(myConfigurable.getIntField(), ((Integer) getSVProperty("intField").getValue()).intValue());
 		myConfigurable.setIntField(2);
 		assertEquals(2, ((Integer) getSVProperty("intField").getValue()).intValue());
-		getSVProperty("intField").setValue(new Integer(3));
+		getSVProperty("intField").setValue(Integer.valueOf(3));
 		assertEquals(3, myConfigurable.getIntField());
 		
 		try {
@@ -62,7 +62,7 @@ public class ConfigurationImplTest extends TestCase {
 		assertEquals(myConfigurable.getBooleanField(), ((Boolean) getSVProperty("booleanField").getValue()).booleanValue());
 		myConfigurable.setBooleanField(false);
 		assertEquals(false, ((Boolean) getSVProperty("booleanField").getValue()).booleanValue());
-		getSVProperty("booleanField").setValue(new Boolean(true));
+		getSVProperty("booleanField").setValue(Boolean.valueOf(true));
 		assertEquals(true, myConfigurable.getBooleanField());
 	}
 	

@@ -50,7 +50,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Bryan Tripp
  */
-public class ClassRegistry {
+public final class ClassRegistry {
 
 	private static Logger ourLogger = Logger.getLogger(ClassRegistry.class);
 	private static ClassRegistry ourInstance;

@@ -11,6 +11,7 @@ import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.model.ExpandableNode;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
+import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.AbstractNode;
@@ -95,7 +96,13 @@ public class EnsembleImplTest extends TestCase {
 			System.arraycopy(super.getTerminations(), 0, result, i++, super.getTerminations().length);
 			
 			return result;
-		}		
+		}
+
+		@Override
+		public void run(float startTime, float endTime) {	}
+
+		@Override
+		public void reset(boolean randomize) {}		
 		
 	}
 

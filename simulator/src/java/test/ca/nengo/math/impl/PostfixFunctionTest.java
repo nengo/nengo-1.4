@@ -42,12 +42,12 @@ public class PostfixFunctionTest extends TestCase {
 		TestUtil.assertClose(5.5f, f.map(new float[0]), .0001f);
 
 		l.clear();
-		l.add(new Integer(0));
+		l.add(Integer.valueOf(0));
 		f = new PostfixFunction(l, "", 1);
 		TestUtil.assertClose(1f, f.map(new float[]{1f}), .0001f);
 
 		l.clear();
-		l.add(new Integer(0));
+		l.add(Integer.valueOf(0));
 		l.add(new SineFunction(1));
 		f = new PostfixFunction(l, "", 1);
 		TestUtil.assertClose(0f, f.map(new float[]{(float) Math.PI}), .0001f);
@@ -58,7 +58,7 @@ public class PostfixFunctionTest extends TestCase {
 	 */
 	public void testMultiMap() {
 		ArrayList<Serializable> l = new ArrayList<Serializable>();
-		l.add(new Integer(0));
+		l.add(Integer.valueOf(0));
 		PostfixFunction f = new PostfixFunction(l, "", 1);
 		float[] values = f.multiMap(new float[][]{new float[]{1f}, new float[]{2f}});
 		TestUtil.assertClose(1f, values[0], .0001f);

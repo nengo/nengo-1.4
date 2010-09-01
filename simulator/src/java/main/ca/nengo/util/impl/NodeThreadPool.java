@@ -66,10 +66,10 @@ public class NodeThreadPool{
 	}
 	
 	public NodeThreadPool(Node[] nodes){
-		Initialize(nodes);
+		initialize(nodes);
 	}
 	
-	protected void Initialize(Node[] nodes){
+	protected void initialize(Node[] nodes){
 		myNodes = new LinkedBlockingQueue<Node>();
 		myLock = new Object();
 

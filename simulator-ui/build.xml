@@ -59,7 +59,6 @@
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
-    	<exec executable="svnversion" spawn="false" dir="${basedir}" outputproperty="buildnumber"/>
     </target>
 	
     <target name="clean">
@@ -244,6 +243,7 @@
 
 	<target description="Create a distribution folder."
 		depends="build" name="dist">
+    	<exec executable="svnversion" spawn="false" dir="${basedir}" outputproperty="buildnumber"/>
 		<property name="dist.dir" value="../nengo-${buildnumber}"/>
 		<ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
 		<copy includeemptydirs="false" todir="${dest.build}">

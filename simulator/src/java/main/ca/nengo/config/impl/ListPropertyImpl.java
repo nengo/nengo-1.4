@@ -274,7 +274,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 		
 		try {
 			if (myGetter != null) {
-				result = myGetter.invoke(myTarget, new Object[]{new Integer(index)});
+				result = myGetter.invoke(myTarget, new Object[]{Integer.valueOf(index)});
 			} else if (myArrayGetter != null) {
 				Object array = myArrayGetter.invoke(myTarget, new Object[0]);
 				result = Array.get(array, index);
@@ -298,7 +298,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	public void setValue(int index, Object value) throws StructuralException {
 		try {
 			if (mySetter != null) {
-				mySetter.invoke(myTarget, new Object[]{new Integer(index), value});
+				mySetter.invoke(myTarget, new Object[]{Integer.valueOf(index), value});
 			} else if (myArrayGetter != null && myArraySetter != null) {
 				Object array = myArrayGetter.invoke(myTarget, new Object[0]);
 				Array.set(array, index, value);
@@ -335,7 +335,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 				myAdder.invoke(myTarget, new Object[]{value});
 			} else if (myInserter != null) {
 				int index = getNumValues();
-				myInserter.invoke(myTarget, new Object[]{new Integer(index), value});
+				myInserter.invoke(myTarget, new Object[]{Integer.valueOf(index), value});
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).add(value);
 			} else if (myArrayGetter != null && myArraySetter != null) {
@@ -367,7 +367,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	public void insert(int index, Object value) throws StructuralException {
 		try {
 			if (myInserter != null) {
-				myInserter.invoke(myTarget, new Object[]{new Integer(index), value});
+				myInserter.invoke(myTarget, new Object[]{Integer.valueOf(index), value});
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).add(index, value);
 			} else if (myArrayGetter != null && myArraySetter != null) {
@@ -400,7 +400,7 @@ public class ListPropertyImpl extends AbstractProperty implements ListProperty {
 	public void remove(int index) throws StructuralException {
 		try {
 			if (myRemover != null) {
-				myRemover.invoke(myTarget, new Object[]{new Integer(index)});
+				myRemover.invoke(myTarget, new Object[]{Integer.valueOf(index)});
 			} else if (myListGetter != null) {
 				getList(myTarget, myListGetter).remove(index);
 			} else if (myArrayGetter != null && myArraySetter != null) {

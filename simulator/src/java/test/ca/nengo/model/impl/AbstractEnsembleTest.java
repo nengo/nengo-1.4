@@ -8,6 +8,7 @@ import java.util.List;
 
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
+import ca.nengo.model.SimulationException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.AbstractEnsemble;
@@ -41,11 +42,32 @@ public class AbstractEnsembleTest extends TestCase {
 		
 		Node[] nodes = new Node[3];
 		nodes[0] = new AbstractNode("a", shared, new ArrayList<Termination>(1)) {
-			private static final long serialVersionUID = 1L;};		
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void run(float startTime, float endTime)
+					throws SimulationException {}
+
+			@Override
+			public void reset(boolean randomize) {}};		
 		nodes[1] = new AbstractNode("b", shared, new ArrayList<Termination>(1)) {
-			private static final long serialVersionUID = 1L;};		
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void run(float startTime, float endTime)
+					throws SimulationException {}
+
+			@Override
+			public void reset(boolean randomize) {}};		
 		nodes[2] = new AbstractNode("c", notshared, new ArrayList<Termination>(1)) {
-			private static final long serialVersionUID = 1L;};
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void run(float startTime, float endTime)
+					throws SimulationException {}
+
+			@Override
+			public void reset(boolean randomize) {}};
 		
 		List<String> origins = AbstractEnsemble.findCommon1DOrigins(nodes);
 		assertEquals(2, origins.size());
