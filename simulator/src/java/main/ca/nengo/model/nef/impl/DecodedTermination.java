@@ -79,7 +79,6 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	private String myName;
 	private int myOutputDimension;
 	private float[][] myTransform;
-	private float[][] myInitialTransform;
 	private LinearSystem myDynamicsTemplate;
 	private LinearSystem[] myDynamics;
 	private Integrator myIntegrator;
@@ -115,7 +114,6 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		
 		myOutputDimension = transform.length;
 		setTransform(transform);
-		myInitialTransform = myTransform.clone();
 		
 		myNode = node;
 		myName = name;
@@ -263,8 +261,6 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		resetInitialState();
 		myInputValues = new RealOutputImpl(new float[getDimensions()], Units.UNK, 0);
 		myValuesSet = false;
-		// This should be enough for the transform -- may need to use setTransform?
-		myTransform = myInitialTransform.clone();
 	}
 	
 	private void resetInitialState() {

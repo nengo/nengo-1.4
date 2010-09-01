@@ -41,9 +41,11 @@ import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
+import ca.nengo.model.PlasticTermination;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.Termination;
 //import ca.nengo.model.impl.NetworkImpl;
 //import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.sim.Simulator;
@@ -205,7 +207,20 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	/**
 	 * @see ca.nengo.sim.Simulator#resetNetwork(boolean)
 	 */
-	public synchronized void resetNetwork(boolean randomize) {
+	public synchronized void resetNetwork(boolean randomize,
+											 boolean saveWeights) {
+		if (saveWeights) {
+			Termination[] terms;
+			for (int i = 0; i < myNodes.length; i++) {
+				terms = myNodes[i].getTerminations();
+				for (int j = 0; j < terms.length; j++) {
+					if (terms[j] instanceof PlasticTermination) {
+						((PlasticTermination) terms[j]).saveTransform();
+					}
+				}
+			}
+		}
+		
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodes[i].reset(randomize);
 		}

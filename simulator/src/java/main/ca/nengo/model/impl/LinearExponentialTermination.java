@@ -79,7 +79,7 @@ public class LinearExponentialTermination implements Termination {
 		myNode = node;
 		myName = name;
 		myWeights = weights;
-		myInitialWeights = weights.clone();
+		saveWeights();
 		myTauPSC = tauPSC;
 		myModulatory = false;
 	}
@@ -97,6 +97,10 @@ public class LinearExponentialTermination implements Termination {
 		myPreciseSpikeInputTimes=null;
 		myIntegrationTime = 0;
 		myWeights = myInitialWeights.clone();
+	}
+	
+	public void saveWeights() {
+		myInitialWeights = myWeights.clone();
 	}
 
 	/**

@@ -47,6 +47,11 @@ public interface PlasticTermination extends Termination {
 	 */
 	public InstantaneousOutput getInput();
 	
+	/**
+	 * Save the current transformation, for resetting purposes.
+	 */
+	public void saveTransform();
+	
 	public PlasticTermination clone() throws CloneNotSupportedException;
 	
 }

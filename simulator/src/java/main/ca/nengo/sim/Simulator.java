@@ -51,7 +51,7 @@ public interface Simulator extends VisiblyMutable, Cloneable {
 	 * changes should be performed by the Ensembles or Neurons themselves, i.e. they 
 	 * should be an explicit part of the model.   
 	 * 
-	 * @param network Network to set up for simulation 
+	 * @param network Network to set up for simulation
 	 */
 	public void initialize(Network network);
 	
@@ -59,9 +59,11 @@ public interface Simulator extends VisiblyMutable, Cloneable {
 	 * Resets all Nodes in the simulated Network.
 	 *  
 	 * @param randomize True indicates reset to random initial condition (see 
-	 * 		Resettable.reset(boolean)). 
+	 * 		Resettable.reset(boolean)).
+	 * @param saveWeights True indicates that the weights on
+	 * 		LinearExponentialTerminations should be saved rather than reset
 	 */
-	public void resetNetwork(boolean randomize);
+	public void resetNetwork(boolean randomize, boolean saveWeights);
 
 	/**
 	 * @param nodeName Name of a Probeable Node from which state is to be probed

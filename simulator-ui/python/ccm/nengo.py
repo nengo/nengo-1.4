@@ -88,11 +88,11 @@ class CCMSimulator(LocalSimulator):
         self._network=network
         LocalSimulator.initialize(self,network)
 
-    def resetNetwork(self,randomize=False):
+    def resetNetwork(self,randomize=False,saveWeights=True):
         java.lang.System.out.println('resetting')
         self.model=self._model_class()
         self.model.run(limit=0)
-        LocalSimulator.resetNetwork(self,randomize)
+        LocalSimulator.resetNetwork(self,randomize,saveWeights)
 
     def run(self,startTime,endTime,stepSize):
         for it in self.probes:

@@ -142,7 +142,7 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 		
 		Function f = new PiecewiseConstantFunction(new float[]{1, 2}, new float[]{0, 1, -1});
 //		Function f = new SineFunction((float) Math.PI, 1f / (float) Math.PI);
-		Plotter.plot(f, 0, .01f, 3, "input");
+//		Plotter.plot(f, 0, .01f, 3, "input");
 		FunctionInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
 		network.addNode(input);
 		

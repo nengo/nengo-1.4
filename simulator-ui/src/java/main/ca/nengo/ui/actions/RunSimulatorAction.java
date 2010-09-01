@@ -155,7 +155,7 @@ public class RunSimulatorAction extends StandardAction {
 			try {
 				Simulator simulator = uiNetwork.getSimulator();
 
-				simulator.resetNetwork(false);
+				simulator.resetNetwork(false, true);
 				simulator.addSimulatorListener(this);
 				try {
 					simulator.run(startTime, endTime, stepTime);

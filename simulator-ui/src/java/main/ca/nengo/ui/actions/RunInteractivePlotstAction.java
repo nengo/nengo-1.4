@@ -2,6 +2,7 @@ package ca.nengo.ui.actions;
 
 import org.python.util.PythonInterpreter;
 
+import ca.nengo.sim.Simulator;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
@@ -17,7 +18,10 @@ public class RunInteractivePlotstAction extends StandardAction {
 	}
 
 	protected void action() throws ActionException {
+		Simulator simulator = uiNetwork.getSimulator();
 		PythonInterpreter pi = NengoGraphics.getInstance().getPythonInterpreter();
+		
+		simulator.resetNetwork(false, true);
 		pi.set("_interactive_network", uiNetwork);
 		pi.exec("import timeview");
 		pi.exec("reload(timeview)");
