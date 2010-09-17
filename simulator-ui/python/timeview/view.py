@@ -245,6 +245,7 @@ class RoomWatch:
             ('3D view',components.View3D,dict(func=self.physics)),
             ]
 
+watches=[RoomWatch(),NodeWatch(),EnsembleWatch(),FunctionWatch(),HRRWatch(),ArrayWatch()]
 
 
 import math
@@ -324,12 +325,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.timelog=timelog.TimeLog()
         self.network=network
         self.watcher=watcher.Watcher(self.timelog)
-        self.watcher.add_watch(RoomWatch())
-        self.watcher.add_watch(NodeWatch())
-        self.watcher.add_watch(EnsembleWatch())
-        self.watcher.add_watch(FunctionWatch())
-        self.watcher.add_watch(HRRWatch())
-        self.watcher.add_watch(ArrayWatch())
+        for w in watches:
+            self.watcher.add_watch(w)
         
         self.requested_mode=None
         
