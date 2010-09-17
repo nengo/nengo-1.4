@@ -94,7 +94,8 @@ class Network:
         intercept -- normalized range for uniform selection of tuning curve x-intercept (as 2-tuple)
                      or a list of intercept values to use
         radius -- representational range
-        encoders -- list of encoder vectors to use (if None, uniform distribution around unit sphere)        decoder_noise -- amount of noise to assume when calculating decoders
+        encoders -- list of encoder vectors to use (if None, uniform distribution around unit sphere)
+        decoder_noise -- amount of noise to assume when calculating decoders
         eval_points -- list of points within unit sphere to do optimization over
         noise -- current noise to inject, chosen uniformly from (-noise,noise)
         noise_frequency -- sampling rate (how quickly the noise changes)
@@ -146,15 +147,32 @@ class Network:
 
     def make_input(self,name,values,zero_after_time=None):
         """Create and return a FunctionInput of dimensionality len(values)
-        with those values as its constants.
+        with those values as its constants.  Python functions can be provided
+        instead of values (either as a single function that returns a value or
+        array of values, or an array of functions).
+
+        Keyword arguments:
+        zero_after_time -- sets constant values to zero after this
+                           amount of time has elapsed
         """
+
         funcs=[]
-        for v in values:
-            if zero_after_time is None:
-                f=ConstantFunction(1,v)
+        if callable(values):
+            d=values(0)
+            if isinstance(d,(tuple,list)):
+                for i in range(len(d)):
+                    funcs.append(functions.PythonFunction(lambda x,i=i:values(x)[i],time=True))
             else:
-                f=PiecewiseConstantFunction([zero_after_time],[v,0])
-            funcs.append(f)
+                funcs.append(functions.PythonFunction(lambda x:values(x),time=True))
+        else:
+            for v in values:
+                if callable(v):
+                    f=functions.PythonFunction(v,time=True)
+                elif zero_after_time is None:
+                    f=ConstantFunction(1,v)
+                else:
+                    f=PiecewiseConstantFunction([zero_after_time],[v,0])
+                funcs.append(f)
         input=FunctionInput(name,funcs,Units.UNK)
         self.network.addNode(input)
         return input
