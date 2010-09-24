@@ -111,7 +111,10 @@ class Network:
                 storage_name+='_%1.3f_%1.3f'%intercept
             else:
                 storage_name+='_%08x'%hash(tuple(intercept))
-            storage_name+='_%1.3f_%1.3f'%(radius,decoder_noise)
+            if isinstance(radius,list):
+                storage_name+='_(%s)_%1.3f'%(''.join(['%1.3f'%x for x in radius]),decoder_noise)
+            else:
+                storage_name+='_%1.3f_%1.3f'%(radius,decoder_noise)
             if encoders is not None:
                 storage_name+='_enc%08x'%hash(tuple([tuple(x) for x in encoders]))
             if eval_points is not None:
@@ -133,7 +136,11 @@ class Network:
         ef.approximatorFactory.noise=decoder_noise
         if eval_points is not None:
             ef.evalPointFactory=generators.FixedEvalPointGenerator(eval_points)
-        n=ef.make(name,neurons,[radius]*dimensions,storage_name,False)
+        if isinstance(radius,list):
+            r=radius
+        else:
+            r=[radius]*dimensions
+        n=ef.make(name,neurons,r,storage_name,False)
         if noise is not None:
             for nn in n.nodes:
                 nn.noise=NoiseFactory.makeRandomNoise(noise_frequency,IndicatorPDF(-noise,noise))
