@@ -328,7 +328,7 @@ class Network:
                 raise exception#StructuralException('cannot create termination %s'%pre.name)
 
 
-            self.network.addProjection(origin,term)
+            return self.network.addProjection(origin,term)
 
 
 def test():
