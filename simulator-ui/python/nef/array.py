@@ -1,6 +1,56 @@
-from ca.nengo.model.impl import NetworkImpl, EnsembleOrigin, EnsembleTermination
-from ca.nengo.model import StructuralException
+from ca.nengo.model.impl import NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl
+from ca.nengo.model import StructuralException, Origin
 from ca.nengo.util.impl import TimeSeriesImpl
+
+
+class ArrayOrigin(Origin):
+    serialVersionUID=1
+    def __init__(self,parent,name,origins):
+        self._parent=parent
+        self._name=name
+        self._origins=origins
+        self._dimensions=sum([o.getDimensions() for o in origins])
+
+    def getName(self):
+        return self._name
+
+    def getDimensions(self):
+        return self._dimensions
+
+    def setValues(self,values):
+        t=values.getTime()
+        u=values.getUnits()
+        v=values.getValues()
+
+        d=0
+        for o in self._origins:
+            dim=o.getDimensions()
+            o.setValues(RealOutputImpl(v[d:d+dim],u,t))
+            d+=dim
+        
+
+    def getValues(self):
+        v0=self._origins[0].getValues()
+        
+        units=v0.getUnits()
+
+        v=[]
+        if isinstance(v0,PreciseSpikeOutputImpl):
+            for o in self._origins: v.extend(o.getValues().getSpikeTimes())
+            return PreciseSpikeOutputImpl(v,units,v0.getTime())
+        elif isinstance(v0,SpikeOutputImpl):    
+            for o in self._origins: v.extend(o.getValues().getValues())
+            return SpikeOutputImpl(v,units,v0.getTime())
+        elif isinstance(v0,RealOutputImpl):    
+            for o in self._origins: v.extend(o.getValues().getValues())
+            return RealOutputImpl(v,units,v0.getTime())
+
+    def getNode(self):
+        return self._parent
+
+    def clone(self):
+        return ArrayOrigin(self._parent,self._name,self._origins)
+    
 
 
 class NetworkArray(NetworkImpl):
@@ -10,7 +60,7 @@ class NetworkArray(NetworkImpl):
         """Create a network holding an array of the given nodes."""        
         NetworkImpl.__init__(self)
         self.name=name
-        self.dimension=len(nodes)
+        self.dimension=len(nodes)*nodes[0].dimension
         self._nodes=nodes
         self._origins={}
         for n in nodes:
@@ -18,7 +68,7 @@ class NetworkArray(NetworkImpl):
         self.multidimensional=nodes[0].dimension>1
         self.createEnsembleOrigin('X')
     def createEnsembleOrigin(self,name):
-        self._origins[name]=EnsembleOrigin(self,name,[n.getOrigin(name) for n in self._nodes])
+        self._origins[name]=ArrayOrigin(self,name,[n.getOrigin(name) for n in self._nodes])
         self.exposeOrigin(self._origins[name],name)
             
     def addDecodedOrigin(self,name,functions,nodeOrigin):
@@ -39,10 +89,19 @@ class NetworkArray(NetworkImpl):
     def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
         """Create a new termination.  A new termination is created on each
         of the ensembles, which are then grouped together."""
-        if self.multidimensional:
-            terminations=[n.addDecodedTermination(name,matrix[i],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]  
-        else:
-            terminations=[n.addDecodedTermination(name,[matrix[i]],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]  
+        terminations=[]
+        d=0
+        for n in self._nodes:
+            dim=n.getDimension()
+            t=n.addDecodedTermination(name,matrix[d:d+dim],tauPSC,isModulatory)
+            terminations.append(t)
+            d+=dim
+            
+            
+        #if self.multidimensional:
+        #    terminations=[n.addDecodedTermination(name,matrix[i],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]  
+        #else:
+        #    terminations=[n.addDecodedTermination(name,[matrix[i]],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]  
         termination=EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)

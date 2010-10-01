@@ -112,8 +112,16 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
             else:    
                 return array([zeros(dimensions),row.imag])
 
-        self.connect(A,D,transform=[makeA2(i) for i in range((dimensions/2+1)*4)],pstc=pstc_in)
-        self.connect(B,D,transform=[makeB2(i) for i in range((dimensions/2+1)*4)],pstc=pstc_in)
+        A2=[]
+        B2=[]
+        for i in range((dimensions/2+1)*4):
+            A2.extend(makeA2(i))
+            B2.extend(makeB2(i))
+
+        #self.connect(A,D,transform=[makeA2(i) for i in range((dimensions/2+1)*4)],pstc=pstc_in)
+        #self.connect(B,D,transform=[makeB2(i) for i in range((dimensions/2+1)*4)],pstc=pstc_in)
+        self.connect(A,D,transform=A2,pstc=pstc_in)
+        self.connect(B,D,transform=B2,pstc=pstc_in)
         
         def makeifftrow(D,i):
             if i==0 or i*2==D: return ifft[i]
