@@ -4,7 +4,7 @@ import math
 
 import nef.simplenode
 class DirectConvolution(nef.simplenode.SimpleNode):
-    def __init__(self,name,dimensions,invert_first=False,invert_second=False):
+    def __init__(self,name,dimensions,invert_first=False,invert_second=False,pstc_gate=0.01,pstc_input=0):
         self.invert_first=invert_first
         self.invert_second=invert_second        
         self.A=[0]*dimensions
@@ -13,7 +13,10 @@ class DirectConvolution(nef.simplenode.SimpleNode):
         nef.simplenode.SimpleNode.__init__(self,name)
         self.getTermination('A').setDimensions(dimensions)
         self.getTermination('B').setDimensions(dimensions)
-        self.getTermination('gate').setTau(0.01)
+        self.getTermination('gate').setTau(pstc_gate)
+        if pstc_input>0:
+            self.getTermination('A').setTau(pstc_input)
+            self.getTermination('B').setTau(pstc_input)
     def termination_gate(self,value):
         self.gate=value    
     def termination_A(self,value):
@@ -67,7 +70,7 @@ def complex_exp(z):
 def product(x):
     return x[0]*x[1]
 
-def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],pstc_out=0.01,pstc_in=0.01,invert_first=False,invert_second=False,mode='default'):
+def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],pstc_out=0.01,pstc_in=0.01,pstc_gate=0.01,invert_first=False,invert_second=False,mode='default'):
     if isinstance(A,str):
         A=self.network.getNode(A)
     if isinstance(B,str):
@@ -84,6 +87,7 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
         self.add(D)
         D.getTermination('A').setTau(pstc_in)
         D.getTermination('B').setTau(pstc_in)
+        D.getTermination('gate').setTau(pstc_gate)
         self.connect(A,D.getTermination('A'))
         self.connect(B,D.getTermination('B'))
         self.connect(D.getOrigin('C'),C,pstc=pstc_out)
