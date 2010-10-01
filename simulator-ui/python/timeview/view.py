@@ -185,7 +185,7 @@ class FunctionWatch:
 
 class HRRWatch:
     def check(self,obj):
-        return isinstance(obj,NEFEnsemble) and obj.dimension in hrr.Vocabulary.defaults
+        return (isinstance(obj,NEFEnsemble) or isinstance(obj,NetworkArray)) and obj.dimension in hrr.Vocabulary.defaults
     def value(self,obj):
         return obj.getOrigin('X').getValues().getValues()
     def value_normalized(self,obj):
@@ -435,6 +435,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         for key,value in self.forced_origins.items():
             (name,origin,index)=key
             origin=self.watcher.objects[name].getOrigin(origin)
+            if hasattr(origin,'getWrappedOrigin'): origin=origin.getWrappedOrigin()
             
             ov=origin.getValues()
             
@@ -449,7 +450,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             else:
                 v=value    
 
-            
+
             origin.setValues(RealOutputImpl(v,ov.getUnits(),ov.getTime()))
 
     def save(self):
