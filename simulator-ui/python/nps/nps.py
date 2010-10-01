@@ -142,11 +142,34 @@ class ProductionSet:
                 r.append([-1])
         return numeric.array(r).T        
 
+
+class DirectChannel(nef.simplenode.SimpleNode):
+    def __init__(self,name,dimensions,pstc_gate,pstc_input):
+        self.X=[0]*dimensions
+        self.gate=0
+        nef.simplenode.SimpleNode.__init__(self,name)
+        self.getTermination('input').setDimensions(dimensions)
+        self.getTermination('input').setTau(pstc_input)        
+        self.getTermination('gate').setTau(pstc_gate)
+    def termination_gate(self,value):
+        self.gate=value    
+    def termination_input(self,value):
+        self.X=value
+    def origin_X(self):
+        if self.gate>0.1:
+            return [0]*len(self.X)
+        else:
+            return self.X
+    def reset(self,randomize=False):
+        self.X=[0]*len(self.X)
+        self.gate=0
+    
                 
 
 class NPS:
-    def __init__(self,net,productions,dimensions,neurons_buffer=40,neurons_bg=40,neurons_product=300,tau_gaba=0.008,tau_ampa=0.002,noise=None,align_hrr=False,direct_convolution=False,direct_buffer=False):
-        if dimensions in hrr.Vocabulary.defaults:
+    def __init__(self,net,productions,dimensions,neurons_buffer=40,neurons_bg=40,neurons_product=300,tau_gaba=0.008,tau_ampa=0.002,noise=None,
+                 align_hrr=False,direct_convolution=False,direct_buffer=False,direct_gate=False):
+        if dimensions in hrr.Vocabulary.defaults and hrr.Vocabulary.defaults[dimensions].randomize!=align_hrr:
             vocab=hrr.Vocabulary.defaults[dimensions]
         else:
             vocab=hrr.Vocabulary(dimensions,randomize=not align_hrr)
@@ -156,6 +179,7 @@ class NPS:
         
         self.direct_convolution=direct_convolution
         self.direct_buffer=direct_buffer
+        self.direct_gate=direct_gate
 
         D=len(productions.productions)        
         bias=net.make_input('prod_bias',[1])
@@ -208,8 +232,10 @@ class NPS:
         
 
         for k in productions.get_direct_actions():
-        #for k in productions.rhs_keys:    
-            net.make('thal_'+k,neurons_buffer*dimensions,dimensions,quick=True)
+            if self.direct_buffer:
+                net.make('thal_'+k,1,dimensions,quick=True,mode='direct')
+            else:    
+                net.make('thal_'+k,neurons_buffer*dimensions,dimensions,quick=True)
             net.connect('thal_'+k,'buffer_'+k,pstc=tau_ampa)
             net.connect(prod,'thal_'+k,transform=productions.calc_output_transform(k,vocab),pstc=tau_ampa)
             
@@ -227,10 +253,16 @@ class NPS:
         for k in productions.get_gate_actions():
             a,b=k.split('_to_',1)
 
-            c=net.make('channel_%s_to_%s'%(a,b),neurons_buffer*dimensions,dimensions,quick=True)
-            net.connect('buffer_'+a,c)
-            net.connect(c,'buffer_'+b)
-            c.addTermination('gate',[[-100.0]]*(neurons_buffer*dimensions),tau_gaba,False)
+            if self.direct_gate:
+                c=DirectChannel('channel_%s_to_%s'%(a,b),dimensions,pstc_gate=tau_gaba,pstc_input=tau_ampa)
+                net.add(c)
+                net.connect('buffer_'+a,c.getTermination('input'))
+                net.connect(c.getOrigin('X'),'buffer_'+b,pstc=tau_ampa)
+            else:
+                c=net.make('channel_%s_to_%s'%(a,b),neurons_buffer*dimensions,dimensions,quick=True)
+                net.connect('buffer_'+a,c,pstc=tau_ampa)
+                net.connect(c,'buffer_'+b,pstc=tau_ampa)
+                c.addTermination('gate',[[-100.0]]*(neurons_buffer*dimensions),tau_gaba,False)
 
             name='gate_%s_%s'%(a,b)
             net.make(name,neurons_buffer,1,quick=True,encoders=[[1]],intercept=(0.3,1))
@@ -243,9 +275,9 @@ class NPS:
             a,b=a.split('_deconv_',1)
             
             if self.direct_convolution:
-                conv=nef.convolution.make_convolution(net,'%s_deconv_%s_to_%s'%(a,b,c),'buffer_'+a,'buffer_'+b,'buffer_'+c,1,quick=True,invert_second=True,mode='direct')
+                conv=nef.convolution.make_convolution(net,'%s_deconv_%s_to_%s'%(a,b,c),'buffer_'+a,'buffer_'+b,'buffer_'+c,1,quick=True,invert_second=True,mode='direct',pstc_in=tau_ampa,pstc_out=tau_ampa,pstc_gate=tau_gaba)
             else:
-                conv=nef.convolution.make_convolution(net,'%s_deconv_%s_to_%s'%(a,b,c),'buffer_'+a,'buffer_'+b,'buffer_'+c,neurons_product,quick=True,invert_second=True)
+                conv=nef.convolution.make_convolution(net,'%s_deconv_%s_to_%s'%(a,b,c),'buffer_'+a,'buffer_'+b,'buffer_'+c,neurons_product,quick=True,invert_second=True,pstc_in=tau_ampa,pstc_out=tau_ampa)
                 conv.addTermination('gate',[[[-100.0]]*neurons_product]*conv.dimension,tau_gaba,False)
 
             name='gate_%s_%s_%s'%(a,b,c)
@@ -271,7 +303,6 @@ class NPS:
             self.net.connect('buffer_'+k,'buffer_'+k,weight=v,pstc=pstc)
 
             
-    
         
         
 
