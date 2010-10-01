@@ -9,7 +9,6 @@ from ca.nengo.util.impl import NodeThreadPool, GPUNodeThreadPool
 
 class Simulator:
     def __init__(self,network):
-        self.projections=[]
         self.nodes=[]
         self.network=network
         self.initialize(network)
@@ -29,12 +28,10 @@ class Simulator:
                 self.initialize(n)
             else:
                 self.nodes.append(n)
-        for p in network.projections:
-            self.projections.append(p)
     def reset(self,randomize=False):
         for n in self.nodes: n.reset(randomize)
     def step(self,start,end):
-        for p in self.projections:
+        for p in self.network.projections:
             p.termination.setValues(p.origin.getValues())
         if self.thread_pool is not None:
             self.thread_pool.step(start,end)
