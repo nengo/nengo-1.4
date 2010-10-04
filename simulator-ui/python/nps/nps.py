@@ -167,12 +167,14 @@ class DirectChannel(nef.simplenode.SimpleNode):
                 
 
 class NPS:
-    def __init__(self,net,productions,dimensions,neurons_buffer=40,neurons_bg=40,neurons_product=300,tau_gaba=0.008,tau_ampa=0.002,noise=None,
+    def __init__(self,net,productions,dimensions,neurons_buffer=40,neurons_bg=40,neurons_product=300,subdimensions=None,
+                 tau_gaba=0.008,tau_ampa=0.002,noise=None,vocab=None,
                  align_hrr=False,direct_convolution=False,direct_buffer=False,direct_gate=False):
-        if dimensions in hrr.Vocabulary.defaults and hrr.Vocabulary.defaults[dimensions].randomize!=align_hrr:
-            vocab=hrr.Vocabulary.defaults[dimensions]
-        else:
-            vocab=hrr.Vocabulary(dimensions,randomize=not align_hrr)
+        if vocab is None:
+            if dimensions in hrr.Vocabulary.defaults and hrr.Vocabulary.defaults[dimensions].randomize!=align_hrr:
+                vocab=hrr.Vocabulary.defaults[dimensions]
+            else:
+                vocab=hrr.Vocabulary(dimensions,randomize=not align_hrr)
         self.vocab=vocab
         self.net=net
         self.production_count=len(productions.productions)
@@ -192,7 +194,10 @@ class NPS:
             if self.direct_buffer is True or (isinstance(self.direct_buffer,list) and k in self.direct_buffer):
                 buffer=net.make('buffer_'+k,1,dimensions,quick=True,mode='direct')
             else:
-                buffer=net.make('buffer_'+k,neurons_buffer*dimensions,dimensions,quick=True)
+                if subdimensions!=None:
+                    buffer=net.make_array('buffer_'+k,neurons_buffer*subdimensions,dimensions/subdimensions,dimensions=subdimensions,quick=True,mode='rate')
+                else:
+                    buffer=net.make('buffer_'+k,neurons_buffer*dimensions,dimensions,quick=True,mode='rate')
             input.append(buffer)
             transform.append(productions.calc_input_transform(k,vocab))        
 
