@@ -175,7 +175,7 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		 */
 		public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
 			int dimensions = evalPoints[0].length; //OK
-			int nodes = values[0].length;
+			int nodes = values.length;
 			int nodesPerDim = nodes / dimensions;
 			if (nodes % dimensions != 0) {
 				throw new IllegalArgumentException("Expected # nodes (" + nodes + ") to be evenly divisible by # dimensions (" + dimensions + ")");
@@ -308,11 +308,13 @@ public class IndependentDimensionApproximator implements LinearApproximator {
 		 * @see ca.nengo.util.VectorGenerator#genVectors(int, int)
 		 */
 		public float[][] genVectors(int number, int dimension) {
+			float neuronsPerDim=number/dimension;
 			float[][] oneDimensional = myVG.genVectors(number, 1);
 			float[][] result = new float[number][];
-			for (int i = 0; i < number; i++) {
-				result[i] = new float[dimension];
-				result[i][i % dimension] = oneDimensional[i][0];
+			for (int neuron = 0; neuron < number; neuron++) {
+				result[neuron] = new float[dimension];
+				result[neuron][(int)(neuron/neuronsPerDim)] = oneDimensional[neuron][0];
+				//result[i][i % dimension] = oneDimensional[i][0];
 			}
 			return result;
 		}
