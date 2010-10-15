@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.LinkedList;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -50,6 +51,7 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.impl.LocalSimulator;
 import ca.nengo.util.Probe;
@@ -234,6 +236,53 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 				collectProbes((NetworkImpl)nodes[i]);
 		}
 	}
+	
+	/***
+	 * Kills a certain percentage of neurons in the network (recursively including subnetworks).
+	 * 
+	 * @param killrate the percentage (0.0 to 1.0) of neurons to kill
+	 */
+	public void killNeurons(float killrate)
+	{
+		killNeurons(killrate, false);
+	}
+	
+	/***
+	 * Kills a certain percentage of neurons in the network (recursively including subnetworks).
+	 * 
+	 * @param killrate the percentage (0.0 to 1.0) of neurons to kill
+	 * @param saveRelays if true, exempt populations with only one node from the slaughter
+	 */
+	public void killNeurons(float killrate, boolean saveRelays)
+	{	
+		Node[] nodes = getNodes();
+		for(int i = 0; i < nodes.length; i++)
+		{
+			if(nodes[i] instanceof NetworkImpl)
+				((NetworkImpl)nodes[i]).killNeurons(killrate, saveRelays);
+			else if(nodes[i] instanceof NEFEnsembleImpl)
+				((NEFEnsembleImpl)nodes[i]).killNeurons(killrate, saveRelays);
+		}
+		
+	}
+	
+//	/**
+//	 * Kills a certain percentage of the dendritic inputs in the network (recursively including subnetworks).
+//	 * 
+//	 * @param killrate the percentage (0.0 to 1.0) of dendritic inputs to kill
+//	 */
+//	public void killDendrites(float killrate)
+//	{
+//		Node[] nodes = getNodes();
+//		for(int i = 0; i < nodes.length; i++)
+//		{
+//			if(nodes[i] instanceof NetworkImpl)
+//				((NetworkImpl)nodes[i]).killDendrites(killrate);
+//			else if(nodes[i] instanceof NEFEnsembleImpl)
+//				((NEFEnsembleImpl)nodes[i]).killDendrites(killrate);
+//		}
+//		
+//	}
 	
 	/**
 	 * If the event indicates that a component node's name is changing, 

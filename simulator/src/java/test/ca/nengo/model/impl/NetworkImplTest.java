@@ -15,6 +15,9 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
+import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.nengo.model.nef.impl.NEFEnsembleImpl;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
 //import ca.nengo.model.neuron.Neuron;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.VisiblyMutable;
@@ -23,7 +26,7 @@ import junit.framework.TestCase;
 
 public class NetworkImplTest extends TestCase {
 
-	private Network myNetwork;
+	private NetworkImpl myNetwork;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -109,6 +112,66 @@ public class NetworkImplTest extends TestCase {
 			e2.setName("foo");
 			fail("Should have thrown exception on duplicate name");
 		} catch (StructuralException e) {}
+	}
+	
+	public void testKillNeurons() throws StructuralException
+	{
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl nef1 = (NEFEnsembleImpl)ef.make("nef1", 1000, 1);
+		NEFEnsembleImpl nef2 = (NEFEnsembleImpl)ef.make("nef2", 1000, 1);
+		NEFEnsembleImpl nef3 = (NEFEnsembleImpl)ef.make("nef3", 1, 1);
+		NetworkImpl net = new NetworkImpl();
+		
+		net.addNode(nef1);
+		myNetwork.addNode(net);
+		myNetwork.addNode(nef2);
+		myNetwork.addNode(nef3);
+		
+		myNetwork.killNeurons(0.0f,true);
+		int numDead = countDeadNeurons(nef1);
+		if(numDead != 0)
+			fail("Number of dead neurons outside expected range");
+		numDead = countDeadNeurons(nef2);
+		if(numDead != 0)
+			fail("Number of dead neurons outside expected range");
+		
+		myNetwork.killNeurons(0.5f,true);
+		numDead = countDeadNeurons(nef1);
+		if(numDead < 400 || numDead > 600)
+			fail("Number of dead neurons outside expected range");
+		numDead = countDeadNeurons(nef2);
+		if(numDead < 400 || numDead > 600)
+			fail("Number of dead neurons outside expected range");
+		
+		myNetwork.killNeurons(1.0f,true);
+		numDead = countDeadNeurons(nef1);
+		if(numDead != 1000)
+			fail("Number of dead neurons outside expected range");
+		numDead = countDeadNeurons(nef2);
+		if(numDead != 1000)
+			fail("Number of dead neurons outside expected range");
+		
+		numDead = countDeadNeurons(nef3);
+		if(numDead != 0)
+			fail("Relay protection did not work");
+		myNetwork.killNeurons(1.0f,false);
+		numDead = countDeadNeurons(nef3);
+		if(numDead != 1)
+			fail("Number of dead neurons outside expected range");
+	}
+	private int countDeadNeurons(NEFEnsembleImpl pop)
+	{
+		Node[] neurons = pop.getNodes();
+		int numDead = 0;
+		
+		for(int i = 0; i < neurons.length; i++)
+		{
+			SpikingNeuron n = (SpikingNeuron)neurons[i];
+			if(n.getBias() == 0.0f && n.getScale() == 0.0f)
+				numDead++;
+		}
+		
+		return numDead;
 	}
 
 	private static class MockEnsemble implements Ensemble {

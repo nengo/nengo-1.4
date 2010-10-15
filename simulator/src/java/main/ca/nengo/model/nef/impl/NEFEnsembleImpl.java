@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.LinkedList;
+import java.util.Random;
 
 //import org.apache.log4j.Logger;
 
@@ -59,6 +60,7 @@ import ca.nengo.model.impl.NodeFactory;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.NEFNode;
+import ca.nengo.model.neuron.ExpandableSynapticIntegrator;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikeGeneratorOrigin;
@@ -908,4 +910,69 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public void setGPU(boolean useGPU){
 		myUseGPU = useGPU;
 	}
+	
+	/**
+	 * Stops a given percentage of neurons in this population from firing.
+	 * 
+	 * @param killrate the percentage of neurons to stop firing
+	 * @param saveRelays if true, do nothing if there is only one node in this population
+	 */
+	public void killNeurons(float killrate, boolean saveRelays)
+	{
+		Random rand = new Random();
+		
+		Node[] neurons = getNodes();
+		
+		if(saveRelays && (neurons.length == 1))
+			return;
+		
+		for(int j = 0; j < neurons.length; j++)
+		{
+			if(rand.nextFloat() < killrate)
+			{
+				SpikingNeuron n = (SpikingNeuron)neurons[j];
+				n.setBias(0.0f);
+				n.setScale(0.0f);
+			}
+		}
+	}
+	
+//	/**
+//	 * Blocks the input from a given percentage of dendrites in the population.
+//	 * 
+//	 * @param killrate the percentage of dendrates to block
+//	 */
+//	public void killDendrites(float killrate)
+//	{
+//		Random rand = new Random();
+//		
+//		Node[] neurons = getNodes();
+//		
+//		for(int i = 0; i < neurons.length; i++)
+//		{
+//			System.out.println("checking neuron");
+//			SpikingNeuron n = (SpikingNeuron)neurons[i];
+//			ExpandableSynapticIntegrator integrator = (ExpandableSynapticIntegrator)n.getIntegrator();
+//			Termination[] inputs = integrator.getTerminations();
+//			for(int j = 0; j < inputs.length; j++)
+//			{
+//				System.out.println("checking dendrite");
+//				if(rand.nextFloat() < killrate)
+//				{
+//					System.out.println("killing dendrite");
+//					try
+//					{
+//						integrator.removeTermination(inputs[j].getName());
+//					}
+//					catch(StructuralException se)
+//					{
+//						System.err.println("Error in killDendrites, trying to remove a termination that doesn't exist.");
+//					}
+//					
+//				}
+//			}
+//		}
+//	}
+	 
+	
 }

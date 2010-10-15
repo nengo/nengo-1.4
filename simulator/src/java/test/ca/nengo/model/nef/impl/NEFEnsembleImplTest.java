@@ -7,6 +7,7 @@ import ca.nengo.math.Function;
 import ca.nengo.math.impl.AbstractFunction;
 //import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.model.Network;
+import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
@@ -19,6 +20,7 @@ import ca.nengo.model.nef.impl.BiasOrigin;
 //import ca.nengo.model.nef.impl.DecodedOrigin;
 //import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
 import ca.nengo.plot.Plotter;
 import ca.nengo.util.MU;
 import ca.nengo.util.Probe;
@@ -254,6 +256,52 @@ public class NEFEnsembleImplTest extends TestCase {
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void testKillNeurons() throws StructuralException
+	{
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl nef1 = (NEFEnsembleImpl)ef.make("nef1", 1000, 1);
+		
+		nef1.killNeurons(0.0f,true);
+		int numDead = countDeadNeurons(nef1);
+		if(numDead != 0)
+			fail("Number of dead neurons outside expected range");
+		
+		nef1.killNeurons(0.5f,true);
+		numDead = countDeadNeurons(nef1);
+		if(numDead < 400 || numDead > 600)
+			fail("Number of dead neurons outside expected range");
+		
+		nef1.killNeurons(1.0f,true);
+		numDead = countDeadNeurons(nef1);
+		if(numDead != 1000)
+			fail("Number of dead neurons outside expected range");
+		
+		NEFEnsembleImpl nef2 = (NEFEnsembleImpl)ef.make("nef2", 1, 1);
+		nef2.killNeurons(1.0f,true);
+		numDead = countDeadNeurons(nef2);
+		if(numDead != 0)
+			fail("Relay protection did not work");
+		nef2.killNeurons(1.0f,false);
+		numDead = countDeadNeurons(nef2);
+		if(numDead != 1)
+			fail("Number of dead neurons outside expected range");
+
+	}
+	private int countDeadNeurons(NEFEnsembleImpl pop)
+	{
+		Node[] neurons = pop.getNodes();
+		int numDead = 0;
+		
+		for(int i = 0; i < neurons.length; i++)
+		{
+			SpikingNeuron n = (SpikingNeuron)neurons[i];
+			if(n.getBias() == 0.0f && n.getScale() == 0.0f)
+				numDead++;
+		}
+		
+		return numDead;
 	}
 
 }
