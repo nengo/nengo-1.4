@@ -187,10 +187,12 @@ class Network:
 
     def _parse_pre(self,pre,func,origin_name):
         if isinstance(pre,Origin):
-            assert func==None
+            if func is not None:
+                raise Exception('Cannot compute a function from a specified Origin')
             return pre
         elif isinstance(pre,FunctionInput):
-            assert func==None
+            if func is not None:
+                raise Exception('Cannot compute a function from a FunctionInput')
             return pre.getOrigin('origin')
         elif isinstance(pre,NEFEnsemble) or (hasattr(pre,'getOrigin') and hasattr(pre,'addDecodedOrigin')):
             if func is not None:
@@ -205,7 +207,13 @@ class Network:
                         dim=pre._nodes[0].dimension
                     else:
                         dim=pre.dimension
-                    origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
+
+                    value=func([0]*dim)
+                    if isinstance(value,(int,float)):
+                        origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
+                    else:
+                        funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
+                        origin=pre.addDecodedOrigin(fname,funcs,'AXON')
                 return origin
             else:
                 return pre.getOrigin('X')
