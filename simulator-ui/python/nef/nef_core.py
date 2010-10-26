@@ -249,7 +249,8 @@ class Network:
 
     def connect(self,pre,post,
                 transform=None,weight=1,index_pre=None,index_post=None,
-                pstc=0.01,func=None,weight_func=None,origin_name=None):
+                pstc=0.01,func=None,weight_func=None,origin_name=None,
+                modulatory=False):
         """Connect two nodes in the network.
 
         pre and post can be strings giving the names of the nodes, or they
@@ -326,7 +327,7 @@ class Network:
             attempts=1
             while attempts<100:
                 try:
-                    term=post.addDecodedTermination(pre.name+suffix,transform,pstc,False)
+                    term=post.addDecodedTermination(pre.name+suffix,transform,pstc,modulatory)
                     break
                 except StructuralException,e:
                     exception=e
