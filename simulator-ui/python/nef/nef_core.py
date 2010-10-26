@@ -132,7 +132,10 @@ class Network:
             it=pdfs.ListPDF(intercept)
         ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
         if encoders is not None:
-            ef.encoderFactory=generators.FixedVectorGenerator(encoders)
+            try:
+                ef.encoderFactory=generators.FixedVectorGenerator(encoders)
+            except:
+                raise Exception('encoders must be a matrix where each row is a non-zero preferred direction vector')
         ef.approximatorFactory.noise=decoder_noise
         if eval_points is not None:
             ef.evalPointFactory=generators.FixedEvalPointGenerator(eval_points)
@@ -313,6 +316,8 @@ class Network:
                 elif dim_post==1: transform=[transform]
                 else:
                     raise Exception("Don't know how to turn %s into a %sx%s matrix"%(transform,dim_pre,dim_post))
+            elif len(transform)!=dim_post and len(transform[0])!=dim_pre:
+                raise Exception("transform must be a %dx%d matrix"%(dim_pre,dim_post))
 
         if weight_func is not None:
             # calculate weights and pass them to the given function
