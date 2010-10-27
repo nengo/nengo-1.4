@@ -28,6 +28,7 @@ from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
 from ca.nengo.util import MU
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction
+from ca.nengo.math import Function
 from ca.nengo.model import StructuralException
 import java
 
@@ -199,24 +200,32 @@ class Network:
             return pre.getOrigin('origin')
         elif isinstance(pre,NEFEnsemble) or (hasattr(pre,'getOrigin') and hasattr(pre,'addDecodedOrigin')):
             if func is not None:
-                if origin_name is None: fname=func.__name__
-                else: fname=origin_name
-                try:
-                    origin=pre.getOrigin(fname)
-                except StructuralException:
-                    origin=None
-                if origin is None:
-                    if isinstance(pre,array.NetworkArray):
-                        dim=pre._nodes[0].dimension
-                    else:
-                        dim=pre.dimension
+                if isinstance(func,Function):
+                    if origin_name is None:
+                        fname=func.__class__.__name__
+                        if '.' in fname: fname=fname.split('.')[-1]
+                    else: fname=origin_name
+                    origin=pre.addDecodedOrigin(fname,[func],'AXON')
+                else:
+                    if origin_name is None: fname=func.__name__
+                    else: fname=origin_name
+                    try:
+                        origin=pre.getOrigin(fname)
+                    except StructuralException:
+                        origin=None
+                    if origin is None:
+                        if isinstance(pre,array.NetworkArray):
+                            dim=pre._nodes[0].dimension
+                        else:
+                            dim=pre.dimension
 
-                    value=func([0]*dim)
-                    if isinstance(value,(int,float)):
-                        origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
-                    else:
-                        funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
-                        origin=pre.addDecodedOrigin(fname,funcs,'AXON')
+                        value=func([0]*dim)
+                        if isinstance(value,(int,float)):
+                            origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
+                        else:
+                            funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
+                            origin=pre.addDecodedOrigin(fname,funcs,'AXON')
+                            
                 return origin
             else:
                 return pre.getOrigin('X')
