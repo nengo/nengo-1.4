@@ -66,6 +66,7 @@ class SimpleOrigin(BasicOrigin):
         self.values=RealOutputImpl(self.func(),Units.UNK,end)
 
 class SimpleNode(Node,Probeable):
+    pstc=0
     def __init__(self,name):
         self._name=name
         self.listeners=[]
@@ -84,7 +85,7 @@ class SimpleNode(Node,Probeable):
     def create_origin(self,name,func):
         self.addOrigin(SimpleOrigin(name,self,func))
     def create_termination(self,name,func):
-        self.addTermination(SimpleTermination(name,self,func))
+        self.addTermination(SimpleTermination(name,self,func,tau=self.pstc))
         
     def reset(self,randomize=False):
         pass
@@ -100,12 +101,15 @@ class SimpleNode(Node,Probeable):
     def removeChangeListener(self,listener):
         self.listeners.remove(listener)
 
+    def tick(self):
+        pass
     def run(self,start,end):
         if start<self.t_start: self.reset()
         self.t_start=start
         self.t_end=end
         for t in self.getTerminations():
             t.run(start,end)
+        self.tick()    
         for o in self.getOrigins():
             o.run(start,end)
 
