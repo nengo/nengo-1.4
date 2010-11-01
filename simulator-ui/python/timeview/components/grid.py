@@ -31,6 +31,8 @@ class Grid(core.DataViewComponent):
             self.popup.add(JMenuItem('improve layout',actionPerformed=self.improve_layout))
             self.popup_auto=JCheckBoxMenuItem('auto-improve',self.auto_improve,stateChanged=self.toggle_auto_improve)
             self.popup.add(self.popup_auto)
+
+        self.popup.add(JMenuItem('set # of rows',actionPerformed=self.setRows))
         
         self.filter=filter
         self.setSize(200,200)
@@ -40,15 +42,24 @@ class Grid(core.DataViewComponent):
             self.auto_improve=event.source.state
             if self.auto_improve and self.requested_improvements<20: 
                 self.requested_improvements=20
+    def setRows(self,event):
+        try:
+            text=JOptionPane.showInputDialog(self.view.frame,'Specify the number of rows in the grid:',"Set row count",JOptionPane.PLAIN_MESSAGE,None,None,None)
+            self.rows=int(text)
+            if self.rows<1: self.rows=1
+        except:
+            pass
       
     def save(self):
         d=core.DataViewComponent.save(self)
         if self.improvable:
             d['auto_improve']=self.auto_improve
+        d['rows']=self.rows    
         return d
     
     def restore(self,d):
         core.DataViewComponent.restore(self,d)
+        self.rows=d.get('rows',self.rows)
         if self.improvable:
             self.auto_improve=d.get('auto_improve',False)
             self.popup_auto.state=self.auto_improve
