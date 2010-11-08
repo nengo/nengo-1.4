@@ -126,7 +126,7 @@ class AllNeoFiles extends FileExtensionFilter {
 	@Override
 	public boolean acceptExtension(String str) {
 
-		return (str.equals(NengoGraphics.NEONODE_FILE_EXTENSION));
+		return (str.equals(NengoGraphics.NEONODE_FILE_EXTENSION) || str.equals("py"));
 	}
 
 	@Override

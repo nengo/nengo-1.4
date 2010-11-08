@@ -76,12 +76,19 @@ public class OpenNeoFileAction extends StandardAction {
 		int response = NengoGraphics.FileChooser.showOpenDialog();
 		if (response == JFileChooser.APPROVE_OPTION) {
 			file = NengoGraphics.FileChooser.getSelectedFile();
+			
 
 			TrackedAction loadActivity = new TrackedAction("Loading network") {
 				private static final long serialVersionUID = 1L;
 
 				@Override
 				protected void action() throws ActionException {
+
+					if (file.getName().endsWith(".py")) {
+						NengoGraphics.getInstance().getPythonInterpreter().execfile(file.getPath());
+						return;
+					}
+					
 					try {
 						// loading Python-based objects requires using a
 						// PythonObjectInputStream from within a
