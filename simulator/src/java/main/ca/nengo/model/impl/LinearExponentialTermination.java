@@ -125,6 +125,20 @@ public class LinearExponentialTermination implements Termination {
 	}
 	
 	/**
+	 * @param weights The new synaptic weights for each input channel
+	 */
+	public void setWeights(float[] weights) {
+		if(weights.length != myInitialWeights.length)
+		{
+			System.err.println("Error, dimensions don't match in setWeights, ignoring new weights");
+			return;
+		}
+		
+		myInitialWeights = weights;
+		myWeights = weights;
+	}
+	
+	/**
 	 * @return The most recent input to the Termination
 	 */
 	public InstantaneousOutput getInput() {

@@ -43,6 +43,12 @@ public interface PlasticTermination extends Termination {
 	public float[][] getTransform();
 	
 	/**
+	 * @param transform The new connection weight matrix relating input from the pre-population to
+	 * 		the output produced by the post-population.
+	 */
+	public void setTransform(float[][] transform);
+	
+	/**
 	 * @return The input coming from the pre-population. Needed to run plasticity rules.
 	 */
 	public InstantaneousOutput getInput();

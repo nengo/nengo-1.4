@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import ca.nengo.TestUtil;
 import ca.nengo.model.InstantaneousOutput;
+import ca.nengo.model.Node;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
@@ -195,6 +196,38 @@ public class LinearExponentialTerminationTest extends TestCase {
 		
 	}	
 	
+	public void testGetWeights()
+	{
+		float[] weights = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+		LinearExponentialTermination term = new LinearExponentialTermination(null, "test", weights, 0.0f);
+		
+		float[] retweights = term.getWeights();
+		
+		assertTrue(weights.length == retweights.length);
+		
+		for(int i = 0; i < weights.length; i++)
+			assertTrue(weights[i] == retweights[i]);
+	}
+	
+	public void testSetWeights()
+	{
+		float[] weights = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+		float[] newweights = new float[]{0.0f, 0.0f, 0.0f, 0.0f};
+		LinearExponentialTermination term = new LinearExponentialTermination(null, "test", weights, 0.0f);
+		term.setWeights(newweights);
+		
+		float[] retweights = term.getWeights();
+		
+		for(int i = 0; i < retweights.length; i++)
+			assertTrue(newweights[i] == retweights[i]);
+		
+		float[] badweights = new float[]{0.5f};
+		term.setWeights(badweights);
+		
+		for(int i = 0; i < retweights.length; i++)
+			assertTrue(newweights[i] == retweights[i]);
+	}
+	
 	private float[] getCurrents(LinearExponentialTermination let, InstantaneousOutput values, float time, int steps) 
 					throws SimulationException {
 		let.setValues(values);
@@ -213,5 +246,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 	private void assertClose(float target, float value, float tolerance) {
 		assertTrue(value > target - tolerance && value < target + tolerance);
 	}
+	
+	
 
 }

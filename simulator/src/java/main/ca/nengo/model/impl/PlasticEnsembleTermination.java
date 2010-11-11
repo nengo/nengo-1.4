@@ -77,6 +77,19 @@ public class PlasticEnsembleTermination extends EnsembleTermination implements P
 	}
 	
 	/**
+	 * @see ca.nengo.model.PlasticTermination#setTransform(float[][] transform)
+	 */
+	public void setTransform(float[][] transform) 
+	{
+		for(int i = 0; i < myNodeTerminations.length; i++)
+		{
+			LinearExponentialTermination let = (LinearExponentialTermination) myNodeTerminations[i];
+			let.setWeights(transform[i]);
+		}
+	}
+		
+	
+	/**
 	 * @see ca.nengo.model.PlasticTermination#getInput()
 	 */
 	public InstantaneousOutput getInput() {
