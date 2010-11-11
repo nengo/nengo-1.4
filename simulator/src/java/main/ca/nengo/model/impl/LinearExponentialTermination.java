@@ -134,8 +134,8 @@ public class LinearExponentialTermination implements Termination {
 			return;
 		}
 		
-		myInitialWeights = weights;
 		myWeights = weights;
+		saveWeights();
 	}
 	
 	/**

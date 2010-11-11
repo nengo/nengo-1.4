@@ -231,7 +231,7 @@ public class SpikePlasticityRule implements PlasticityRule {
 				for (int j = 0; j < transform[i].length; j++) {
 					if (myInSpiking[j]) {
 						result[i][j] += myOnInSpikeFunction.map(new float[]{time - myOutSpikeHistory[0][i],
-							time - myInSpikeHistory[1][i], transform[i][j], 0, i, j, 0});
+							time - myInSpikeHistory[1][j], transform[i][j], 0, i, j, 0});
 					}
 					if (myOutSpiking[i]) {
 						result[i][j] += myOnOutSpikeFunction.map(new float[]{time - myInSpikeHistory[0][j],

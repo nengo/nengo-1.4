@@ -56,6 +56,17 @@ public class PlasticEnsembleTerminationTest extends TestCase {
 			for(int j = 0; j < newtransform[i].length; j++)
 				assertTrue(rettransform[i][j] == newtransform[i][j]);
 		}
+		
+		term.reset(false);
+		rettransform = term.getTransform();
+		
+        assertTrue(rettransform.length == newtransform.length);
+		
+		for(int i = 0; i < newtransform.length; i++)
+		{
+			assertTrue(rettransform[i].length == newtransform[i].length);
+			for(int j = 0; j < newtransform[i].length; j++)
+				assertTrue(rettransform[i][j] == newtransform[i][j]);
+		}
 	}
-
 }

@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 
 import ca.nengo.TestUtil;
 import ca.nengo.model.InstantaneousOutput;
-import ca.nengo.model.Node;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
@@ -78,7 +77,7 @@ public class LinearExponentialTerminationTest extends TestCase {
 		let.reset(false);
 		
 		current = let.updateCurrent(false, 0, 0);
-		assertTrue(current < .01f);	
+		assertTrue(current < .01f);
 	}
 
 	/*
@@ -223,6 +222,12 @@ public class LinearExponentialTerminationTest extends TestCase {
 		
 		float[] badweights = new float[]{0.5f};
 		term.setWeights(badweights);
+		
+		for(int i = 0; i < retweights.length; i++)
+			assertTrue(newweights[i] == retweights[i]);
+		
+		term.reset(false);
+		retweights = term.getWeights();
 		
 		for(int i = 0; i < retweights.length; i++)
 			assertTrue(newweights[i] == retweights[i]);
