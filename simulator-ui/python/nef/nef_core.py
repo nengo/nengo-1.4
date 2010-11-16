@@ -332,7 +332,7 @@ class Network:
             # calculate weights and pass them to the given function
             decoder=origin.decoders
             encoder=post.encoders
-            w=MU.prod(encoder,MU.transpose(decoder))   #gain is handled elsewhere
+            w=MU.prod(encoder,MU.prod(transform,MU.transpose(decoder)))   #gain is handled elsewhere
             w=weight_func(w)
             term=post.addTermination(pre.name,w,pstc,False)
             self.network.addProjection(pre.getOrigin('AXON'),term)
