@@ -23,6 +23,12 @@ import math
 
 import shelve
 
+# for save_pdf
+import sys
+if 'lib/iText-5.0.5.jar' not in sys.path:
+    sys.path.append('lib/iText-5.0.5.jar')
+
+
 class Icon:
     pass
 class ShadedIcon:
@@ -674,7 +680,14 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         mainPanel.add(self.left_panel,BorderLayout.WEST)
         mainPanel.add(self.right_panel,BorderLayout.EAST)
 
-        
+
+
+        pdf=JPanel(layout=BorderLayout(),opaque=False)
+        pdf.add(JButton(Icon.save,rolloverIcon=ShadedIcon.save,toolTipText='save pdf',actionPerformed=self.save_pdf,borderPainted=False,focusPainted=False,contentAreaFilled=False))
+        pdf.add(JLabel('pdf',horizontalAlignment=javax.swing.SwingConstants.CENTER),BorderLayout.NORTH)
+        pdf.maximumSize=pdf.preferredSize
+        configPanel.add(pdf)
+
         
         data=JPanel(layout=BorderLayout(),opaque=False)
         data.add(JButton(Icon.data,rolloverIcon=ShadedIcon.data,toolTipText='examine data',actionPerformed=self.show_data,borderPainted=False,focusPainted=False,contentAreaFilled=False))
@@ -751,6 +764,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         layout.add(JLabel('layout',horizontalAlignment=javax.swing.SwingConstants.CENTER),BorderLayout.NORTH)
         layout.maximumSize=layout.preferredSize
         configPanel.add(layout)
+
 
 
         
@@ -848,4 +862,33 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
     def restore(self,event):
         self.view.restore()
+        
+        
+    def save_pdf(self,event):
+        from com.itextpdf.text.pdf import PdfWriter
+        from com.itextpdf.text import Document
+        
+        fileChooser=JFileChooser()
+        fileChooser.setSelectedFile(java.io.File('%s.pdf'%self.view.network.name))
+        if fileChooser.showSaveDialog(self)==JFileChooser.APPROVE_OPTION:
+            f=fileChooser.getSelectedFile()
+        
+            doc=Document()
+            writer=PdfWriter.getInstance(doc,file(f.absolutePath,'wb'))
+            doc.open()
+            cb=writer.getDirectContent()
+            w=self.view.area.size.width
+            h=self.view.area.size.height
+            pw=550
+            ph=800
+            tp=cb.createTemplate(pw,ph)
+            g2=tp.createGraphicsShapes(pw,ph)
+            at = java.awt.geom.AffineTransform()        
+            s=min(float(pw)/w,float(ph)/h)        
+            at.scale(s,s)
+            g2.transform(at)
+            self.view.area.paint(g2)
+            g2.dispose()
+            cb.addTemplate(tp,20,0)
+            doc.close()
 
