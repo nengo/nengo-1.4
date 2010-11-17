@@ -874,7 +874,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             f=fileChooser.getSelectedFile()
         
             doc=Document()
-            writer=PdfWriter.getInstance(doc,file(f.absolutePath,'wb'))
+            writer=PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
             doc.open()
             cb=writer.getDirectContent()
             w=self.view.area.size.width
