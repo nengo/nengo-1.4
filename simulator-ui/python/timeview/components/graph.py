@@ -243,6 +243,13 @@ class Graph(core.DataViewComponent):
 
         colors=[Color.black,Color.blue,Color.red,Color.green,Color.magenta,Color.cyan,Color.yellow]
         g.color=Color.blue
+
+        pdftemplate=getattr(self.view.area,'pdftemplate',None)
+        if pdftemplate is not None:
+            pdf,scale=pdftemplate
+            pdf.setLineWidth(0.5)
+            pdf_line_started=False
+        
         for j,fdata in enumerate(filtered):
             if (self.size.width-self.border_left-self.border_right)<=0:
                 break
@@ -250,7 +257,8 @@ class Graph(core.DataViewComponent):
             if self.filter and self.view.tau_filter==0:
                 skip-=1     # special case to make unfiltered recoded value graphs look as expected
             if skip<0: skip=0
-            #skip=0
+            if pdftemplate is not None:   # draw every point for pdf rendering
+                skip=0
                         
             offset=start%(skip+1)            
             if not self.split:
@@ -263,10 +271,25 @@ class Graph(core.DataViewComponent):
                     if self.split:
                         y1-=(len(filtered)-1-j)*split_step
                         y2-=(len(filtered)-1-j)*split_step
-                    g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1+skip)*dx+self.border_left),int(y2))
+
+                    if pdftemplate is None:                        
+                        g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1+skip)*dx+self.border_left),int(y2))
+                    else:
+                        x=(self.x+i*dx+self.border_left)*scale
+                        y=800-(self.y+y1)*scale
+                        if not pdf_line_started:
+                            pdf.moveTo(x,y)
+                            pdf_line_started=True
+                        else:
+                            pdf.lineTo(x,y)
+            if pdftemplate is not None and pdf_line_started:
+                pdf.setRGBColorStroke(g.color.red,g.color.green,g.color.blue)
+                pdf.stroke()
+                pdf_line_started=False
         if not self.split:
             g.color=Color.black   
             if maxy is not None: g.drawString('%6g'%maxy,0,10+border_top)
             if miny is not None: g.drawString('%6g'%miny,0,self.size.height-self.border_bottom)
+
 
 

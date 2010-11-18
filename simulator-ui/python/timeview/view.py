@@ -887,8 +887,11 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             s=min(float(pw)/w,float(ph)/h)        
             at.scale(s,s)
             g2.transform(at)
+            self.view.area.pdftemplate=tp,s
             self.view.area.paint(g2)
+            self.view.area.pdftemplate=None
             g2.dispose()
+
             cb.addTemplate(tp,20,0)
             doc.close()
 
