@@ -213,6 +213,7 @@ class XYPlot(core.DataViewComponent):
         if pdftemplate is not None:
             pdf,scale=pdftemplate
             pdf.setLineWidth(0.5)
+            last_color=None
             
         
         
@@ -231,10 +232,19 @@ class XYPlot(core.DataViewComponent):
                 if pdftemplate is None:
                     g.drawLine(int(xc+x0*sx),int(yc-y0*sy+self.label_offset),int(xc+x1*sx),int(yc-y1*sy+self.label_offset))
                 else:
-                    pdf.setRGBColorStroke(g.color.red,g.color.green,g.color.blue)
-                    pdf.moveTo(((xc+x0*sx)+self.x)*scale,800-(self.y+yc-y0*sy+self.label_offset)*scale)
+                    c=int(c*32)*8
+                    if c>255: c=255
+                    if c!=last_color:
+                        if last_color is not None:
+                            pdf.setRGBColorStroke(last_color,last_color,last_color)
+                            pdf.stroke()
+                        pdf.moveTo(((xc+x0*sx)+self.x)*scale,800-(self.y+yc-y0*sy+self.label_offset)*scale)
+                        last_color=c
                     pdf.lineTo(((xc+x1*sx)+self.x)*scale,800-(self.y+yc-y1*sy+self.label_offset)*scale)
-                    pdf.stroke()
+                    
+        if pdftemplate is not None:
+            pdf.setRGBColorStroke(last_color,last_color,last_color)
+            pdf.stroke()
                     
                     
 
