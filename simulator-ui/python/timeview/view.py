@@ -46,7 +46,12 @@ class EnsembleWatch:
         if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
             return [n.getOrigin('AXON').getValues().values[0]*0.0005 for n in obj.nodes]
         else:
-            return [n.generator.voltage for n in obj.nodes]
+            s=obj.getOrigin('AXON').getValues().values
+            v=[n.generator.voltage for n in obj.nodes]    
+            for i,ss in enumerate(s):   # check if there's a spike here
+                if ss: v[i]=1.0
+            return v
+            
     def spikes(self,obj):
         if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
             return [n.getOrigin('AXON').getValues().values[0]*0.0005 for n in obj.nodes]
