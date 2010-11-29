@@ -326,12 +326,14 @@ class ViewPanel(JPanel):
 
   
 class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable):
-    def __init__(self,network,size=None,ui=None):
+    def __init__(self,network,size=None,ui=None,play=False):
         self.dt=0.001
         self.tau_filter=0.03
         self.delay=10
         self.current_tick=0
         self.time_shown=0.5
+
+        self.autopause_at=None
         
         self.timelog=timelog.TimeLog()
         self.network=network
@@ -393,6 +395,11 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         th=java.lang.Thread(self)
         th.priority=java.lang.Thread.MIN_PRIORITY
         th.start()
+
+        if play is True or play>0:
+            if isinstance(play,(int,float)):
+                self.autopause_at=play
+            self.time_control.pause(None)
 
     def add_item(self,name,location=None):
         g=components.Item(self,name)
@@ -597,6 +604,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     self.simulating=False
                     self.force_origins()
                     now+=self.dt
+                    if self.autopause_at is not None and now>self.autopause_at:
+                        self.time_control.pause(None)
+                        self.autopause_at=None
                     self.timelog.tick()                
                     self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
                     self.time_control.set_max_time(self.timelog.tick_count)                
@@ -677,7 +687,8 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
         #self.right_panel.add(JButton(icon=Icon.forward,rolloverIcon=ShadedIcon.forward,toolTipText='forward one frame',actionPerformed=self.forward_one_frame))
         self.right_panel.add(JButton(icon=Icon.end,rolloverIcon=ShadedIcon.end,toolTipText='jump to end',actionPerformed=lambda x: self.slider.setValue(self.slider.maximum),borderPainted=False,focusPainted=False,contentAreaFilled=False))
         self.right_panel.add(self.max_time)
-        self.right_panel.add(JButton(Icon.play,actionPerformed=self.pause,rolloverIcon=ShadedIcon.play,toolTipText='continue',borderPainted=False,focusPainted=False,contentAreaFilled=False))
+        self.playpause_button=JButton(Icon.play,actionPerformed=self.pause,rolloverIcon=ShadedIcon.play,toolTipText='continue',borderPainted=False,focusPainted=False,contentAreaFilled=False)
+        self.right_panel.add(self.playpause_button)
 
 
 
@@ -830,13 +841,13 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
     def pause(self,event):
         self.view.paused=not self.view.paused
         if self.view.paused:
-            event.source.icon=Icon.play
-            event.source.rolloverIcon=ShadedIcon.play
-            event.source.toolTipText='continue'
+            self.playpause_button.icon=Icon.play
+            self.playpause_button.rolloverIcon=ShadedIcon.play
+            self.playpause_button.toolTipText='continue'
         else:
-            event.source.icon=Icon.pause
-            event.source.rolloverIcon=ShadedIcon.pause
-            event.source.toolTipText='pause'
+            self.playpause_button.icon=Icon.pause
+            self.playpause_button.rolloverIcon=ShadedIcon.pause
+            self.playpause_button.toolTipText='pause'
     def tau_filter(self,event):
         self.view.tau_filter=float(event.source.value)
         self.view.area.repaint()

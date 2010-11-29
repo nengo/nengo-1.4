@@ -37,6 +37,8 @@ import generators
 import functions
 import array
 
+import timeview
+
 class Network:
     """Wraps a Nengo network with a set of helper functions."""
     serialVersionUID=1
@@ -51,6 +53,10 @@ class Network:
         n=world.getNode(self.network.name)
         if n is not None: world.remove(n)
         world.add(self.network)
+
+    def view(self,play=False):
+        timeview.View(self.network,play=play)
+        
 
     def add(self,node):
         """Add the node to the network.
