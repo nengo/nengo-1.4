@@ -30,6 +30,7 @@ from ca.nengo.util import MU
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction
 from ca.nengo.math import Function
 from ca.nengo.model import StructuralException
+from ca.nengo.io import FileManager
 import java
 
 import pdfs
@@ -126,7 +127,7 @@ class Network:
                 storage_name+='_enc%08x'%hash(tuple([tuple(x) for x in encoders]))
             if eval_points is not None:
                 storage_name+='_eval%08x'%hash(tuple([tuple(x) for x in eval_points]))
-            if not java.io.File(storage_name+'.nef').exists():
+            if not java.io.File(storage_name+'.'+FileManager.ENSEMBLE_EXTENSION).exists():
                 dir=java.io.File('quick')
                 if not dir.exists(): dir.mkdirs()
                 storage_name='quick'+java.io.File.pathSeparator+storage_name
