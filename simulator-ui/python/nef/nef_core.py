@@ -126,6 +126,10 @@ class Network:
                 storage_name+='_enc%08x'%hash(tuple([tuple(x) for x in encoders]))
             if eval_points is not None:
                 storage_name+='_eval%08x'%hash(tuple([tuple(x) for x in eval_points]))
+            if not java.io.File(storage_name+'.nef').exists():
+                dir=java.io.File('quick')
+                if not dir.exists(): dir.mkdirs()
+                storage_name='quick'+java.io.File.pathSeparator+storage_name
         else:
             storage_name=''
         ef=NEFEnsembleFactoryImpl()
