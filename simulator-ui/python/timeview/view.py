@@ -472,7 +472,12 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             origin.setValues(RealOutputImpl(v,ov.getUnits(),ov.getTime()))
 
     def save(self):
-        db=shelve.open('python/timeview/layout.db')
+        dir=java.io.File('layouts')
+        if not dir.exists(): dir.mkdirs()
+        try:
+            db=shelve.open('layouts/'+self.network.name)
+        except:    
+            db=shelve.open('python/timeview/layout.db')
         key=self.network.name
         layout=[]
         for comp in self.area.components:
@@ -492,7 +497,17 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         db.close()
 
     def restore(self):
-        db=shelve.open('python/timeview/layout.db')
+      try:  
+        dir=java.io.File('layouts')
+        if not dir.exists(): dir.mkdirs()
+
+        filenames=['layouts/'+self.network.name,self.network.name]
+        for fn in filenames:
+            if java.io.File(fn+'.dat').exists() and java.io.File(fn+'.dir').exists() and java.io.File(fn+'.bak').exists():
+                db=shelve.open(fn)
+                break
+        else:
+            db=shelve.open('python/timeview/layout.db')
         key=self.network.name
         
         if key not in db.keys(): return False
@@ -550,6 +565,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         db.close()
         self.area.repaint()
         return True
+      except:
+          print 'Error restoring layout file'
+          return False
     def view_save(self):
         return dict(width=self.frame.width,height=self.frame.height-self.time_control.config_panel_height,state=self.frame.getExtendedState(),x=self.frame.x,y=self.frame.y)
     
