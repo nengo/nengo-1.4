@@ -54,6 +54,11 @@ public interface PlasticTermination extends Termination {
 	public InstantaneousOutput getInput();
 	
 	/**
+	 * @return The currents currently output from the terminations in the population.
+	 */
+	public float[] getCurrents();
+	
+	/**
 	 * Save the current transformation, for resetting purposes.
 	 */
 	public void saveTransform();

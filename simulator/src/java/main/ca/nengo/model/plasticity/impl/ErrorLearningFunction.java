@@ -44,6 +44,7 @@ public class ErrorLearningFunction extends AbstractRealLearningFunction {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private boolean myOja = true; // Apply Oja smoothing?
 	private float[] myGain;
 	private float[][] myEncoders;
 	
@@ -58,6 +59,20 @@ public class ErrorLearningFunction extends AbstractRealLearningFunction {
 		
 		myGain = gain;
 		myEncoders = encoders;
+	}
+	
+	/**
+	 * Requires information from the post population to modulate learning.
+	 * 
+	 * @param gain Gain (scale) of the neurons in the post population
+	 * @param encoders Encoders (phi tilde) of the neurons in the post population
+	 */
+	public ErrorLearningFunction(float[] gain, float[][] encoders, boolean oja) {
+		super();
+		
+		myGain = gain;
+		myEncoders = encoders;
+		myOja = oja;
 	}
 	
 	/**
@@ -80,8 +95,11 @@ public class ErrorLearningFunction extends AbstractRealLearningFunction {
 	 */
 	protected float deltaOmega(float input, float time, float currentWeight,
 			float modInput, float originState, int postIndex, int preIndex, int dim) {
-		// With Oja smoothing
-		return myLearningRate * (input * modInput * myEncoders[postIndex][dim] * myGain[postIndex]  - (originState*originState*currentWeight));
+		
+		float oja = myOja ?
+				myLearningRate*originState*originState*currentWeight : 0;
+		
+		return myLearningRate * input * modInput * myEncoders[postIndex][dim] * myGain[postIndex]  - oja;
 	}
 	
 	@Override

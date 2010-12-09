@@ -29,6 +29,7 @@ package ca.nengo.model.plasticity.impl;
 
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.RealOutput;
+import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.plasticity.PlasticityRule;
 
 /**
@@ -56,6 +57,7 @@ public class RealPlasticityRule implements PlasticityRule {
 	
 	private float[] myModInputArray;
 	private float[] myOriginState;
+	private float[] myFilteredInput;
 	
 	/**
 	 * @param function AbstractRealLearningFunction defining the rate of change of transformation matrix weights.
@@ -134,8 +136,16 @@ public class RealPlasticityRule implements PlasticityRule {
 	 */
 	public void setOriginState(String name, InstantaneousOutput state, float time) {
 		if (name.equals(myOriginName)) {
-			checkType(state);
-			myOriginState = ((RealOutput) state).getValues();
+			//checkType(state);
+			if (state instanceof RealOutput) {
+				myOriginState = ((RealOutput) state).getValues();
+			} else if (state instanceof SpikeOutput) {
+				boolean[] vals=((SpikeOutput) state).getValues();
+				if (myOriginState==null) myOriginState=new float[vals.length];
+				for (int i=0; i<vals.length; i++) {
+					myOriginState[i]=vals[i]?0.001f:0;
+				}
+			}
 		}
 	}
 
@@ -143,9 +153,37 @@ public class RealPlasticityRule implements PlasticityRule {
 	 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float)
 	 */
 	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) {
-		checkType(input);
-		float[] values = ((RealOutput) input).getValues();
+		//checkType(input);
+		
 		float[][] result = new float[transform.length][];
+		
+		float integrationTime = 0.001f;
+		float tauPSC = 0.005f;
+		
+		if (input instanceof RealOutput) {
+			float[] values = ((RealOutput) input).getValues();
+			
+			if (myFilteredInput == null) {
+				myFilteredInput = new float[values.length];
+			}
+		
+			for (int i=0; i < values.length; i++) {
+				myFilteredInput[i] *= 1.0f - integrationTime / tauPSC;
+				myFilteredInput[i] += values[i] * integrationTime / tauPSC;
+			}
+		} else {
+			boolean[] values = ((SpikeOutput) input).getValues();
+			
+			if (myFilteredInput == null) {
+				myFilteredInput = new float[values.length];
+			}
+			
+			for (int i=0; i < values.length; i++) {
+				myFilteredInput[i] *= 1.0f - integrationTime / tauPSC;
+				myFilteredInput[i] += values[i] ? 
+						integrationTime / tauPSC : 0;
+			}
+		}
 		
 		if (myModInputArray != null) {
 			for (int i = 0; i < transform.length; i++) {
@@ -153,7 +191,7 @@ public class RealPlasticityRule implements PlasticityRule {
 				for (int j = 0; j < transform[i].length; j++) {
 					for (int k = 0; k < myModInputArray.length; k++) {
 						float os = (myOriginState != null && myOriginState.length > k) ? myOriginState[k] : 0;
-						result[i][j] = myFunction.map(new float[]{values[j],time,
+						result[i][j] += myFunction.map(new float[]{myFilteredInput[j],time,
 								transform[i][j],myModInputArray[k],os,i,j,k});
 						
 					}
@@ -164,7 +202,7 @@ public class RealPlasticityRule implements PlasticityRule {
 				result[i] = new float[transform[i].length];
 				for (int j = 0; j < transform[i].length; j++) {
 					float os = (myOriginState != null) ? myOriginState[0] : 0;
-					result[i][j] = myFunction.map(new float[]{values[j],time,
+					result[i][j] += myFunction.map(new float[]{myFilteredInput[j],time,
 						transform[i][j],os,0,i,j,0});
 				}
 			}	

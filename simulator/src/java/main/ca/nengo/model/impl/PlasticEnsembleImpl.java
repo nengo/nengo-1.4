@@ -35,6 +35,7 @@ import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
+import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
@@ -60,6 +61,7 @@ public class PlasticEnsembleImpl extends EnsembleImpl {
     
     private float myPlasticityInterval;
     private float myLastPlasticityTime;
+    private boolean myLearning = true;
     
     /**
      * @param name Name of Ensemble
@@ -90,6 +92,13 @@ public class PlasticEnsembleImpl extends EnsembleImpl {
 			rule.reset(randomize);
 		}
 		super.reset(randomize);
+	}
+	
+	/**
+	 * @see ca.nengo.model.Resettable#reset(boolean)
+	 */
+	public void setLearning(boolean learning) {
+		myLearning = learning;
 	}
     
 	/**
@@ -190,9 +199,9 @@ public class PlasticEnsembleImpl extends EnsembleImpl {
      */
     public void run(float startTime, float endTime) throws SimulationException {
         super.run(startTime, endTime);
-        if (myPlasticityInterval <= 0) {
+        if (myPlasticityInterval <= 0 && myLearning) {
             learn(startTime, endTime);
-        } else if (endTime >= myLastPlasticityTime + myPlasticityInterval) {
+        } else if (myLearning && endTime >= myLastPlasticityTime + myPlasticityInterval) {
             learn(myLastPlasticityTime, endTime);
             myLastPlasticityTime = endTime;
         }
