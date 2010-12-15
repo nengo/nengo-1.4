@@ -130,7 +130,7 @@ class Network:
             if not java.io.File(storage_name+'.'+FileManager.ENSEMBLE_EXTENSION).exists():
                 dir=java.io.File('quick')
                 if not dir.exists(): dir.mkdirs()
-                storage_name='quick'+java.io.File.pathSeparator+storage_name
+                storage_name='quick'+java.io.File.separator+storage_name
         else:
             storage_name=''
         ef=NEFEnsembleFactoryImpl()
