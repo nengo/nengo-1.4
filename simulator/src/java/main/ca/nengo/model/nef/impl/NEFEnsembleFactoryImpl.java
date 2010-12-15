@@ -144,16 +144,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 		NEFEnsemble result = null;
 
         if( storageName.length() > 0 ){
-        	
-        	// modified to handle paths in the ensemble string name
-        	File database=myDatabase;
-        	while (storageName.contains(File.pathSeparator)) {
-        		int index=storageName.indexOf(File.pathSeparatorChar);
-        		database=new File(database,storageName.substring(0,index));
-        		storageName=storageName.substring(index+1);
-        		
-        	}
-            File ensembleFile = new File(database, storageName + "." + FileManager.ENSEMBLE_EXTENSION);
+            File ensembleFile = new File(myDatabase, storageName + "." + FileManager.ENSEMBLE_EXTENSION);
 
             FileManager fm = new FileManager();
 
