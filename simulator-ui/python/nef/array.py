@@ -105,7 +105,13 @@ class NetworkArray(NetworkImpl):
         termination=EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
-        
+    
+    def exposeAxons(self):
+        i=0
+        for n in self._nodes:
+            self.exposeOrigin(n.getOrigin('AXON'),'AXON_'+str(i))
+            i+=1
+
     def listStates(self):
         """List the items that are probeable."""
         return self._nodes[0].listStates()

@@ -34,7 +34,7 @@ def ifft(x):
     
 _circconv_cache={}    
 def circconv(a,b):
-    if len(b)!=len(b): raise Exception('Vectors must be of same length to circconv: (%d!=%d)'%(len(a),len(b)))
+    if len(a)!=len(b): raise Exception('Vectors must be of same length to circconv: (%d!=%d)'%(len(a),len(b)))
     return ifft(fft(a)*fft(b)).real
         
     
