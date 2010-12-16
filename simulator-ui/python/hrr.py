@@ -22,6 +22,13 @@ class HRR:
         if N is None: N=len(self.v)
         self.v=array([random.gauss(0,1) for i in range(N)])
         self.normalize()
+    def make_unitary(self):
+        fft_val = numeric.fft(self.v)
+        fft_imag = fft_val.imag
+        fft_real = fft_val.real
+        fft_norms = [sqrt(fft_imag[n]**2 + fft_real[n]**2) for n in range(len(self.v))]
+        fft_unit = fft_val / fft_norms
+        self.v = (numeric.ifft(fft_unit)).real
     def __add__(self,other):
         return HRR(data=self.v+other.v)
     def __iadd__(self,other):
@@ -80,9 +87,10 @@ from math import sin,pi,acos
 class Vocabulary:
     defaults={}
     
-    def __init__(self,dimensions,randomize=True,max_similarity=0.2):
+    def __init__(self,dimensions,randomize=True,unitary=False,max_similarity=0.2,include_pairs=False):
         self.dimensions=dimensions
         self.randomize=randomize
+        self.unitary=unitary
         self.max_similarity=max_similarity
         self.hrr={}
         self.hrr['I']=HRR(data=numeric.eye(dimensions)[0])
@@ -90,7 +98,9 @@ class Vocabulary:
         self.key_pairs=[]
         self.vectors=None
         self.vector_pairs=None
+        self.include_pairs=include_pairs
         Vocabulary.defaults[dimensions]=self
+
     def __getitem__(self,key):
         if key not in self.hrr:
             if self.randomize:  
@@ -104,26 +114,42 @@ class Vocabulary:
                     count+=1
                 if count>=100:        
                     print 'Warning: Could not create an HRR with max_similarity=%1.2f (D=%d, M=%d)'%(self.max_similarity,self.dimensions,len(self.hrr))
-                self.hrr[key]=v
+                
+                # Check and make HRR vector unitary if needed
+                if self.unitary is True or (isinstance(self.unitary,list) and key in self.unitary):
+                    v.make_unitary()
             else:
-                v=[0]*self.dimensions
-                v[len(self.hrr)]=1.0
-                self.hrr[key]=HRR(data=v)    
+                ov=[0]*self.dimensions
+                ov[len(self.hrr)]=1.0
+                v = HRR(data = ov)
+
+            self.add(key,v)
+        return self.hrr[key]        
+
+    def add(self,key,v):
+        # Perform checks
+        if(isinstance(v,HRR)):
+            self.hrr[key] = v
             self.keys.append(key)
             if self.vectors is None:
                 self.vectors=numeric.array([self.hrr[key].v])
             else:
                 self.vectors=numeric.resize(self.vectors,(len(self.keys),self.dimensions))
                 self.vectors[-1,:]=self.hrr[key].v
-            for k in self.keys[:-1]:
-                self.key_pairs.append('%s*%s'%(k,key))
-                v=(self.hrr[k]*self.hrr[key]).v
-                if self.vector_pairs is None:
-                    self.vector_pairs=numeric.array([v])
-                else:    
-                    self.vector_pairs=numeric.resize(self.vector_pairs,(len(self.key_pairs),self.dimensions))
-                    self.vector_pairs[-1,:]=v
-        return self.hrr[key]        
+            
+            # Generate vector pairs 
+            if(self.include_pairs):
+                for k in self.keys[:-1]:
+                    self.key_pairs.append('%s*%s'%(k,key))
+                    v=(self.hrr[k]*self.hrr[key]).v
+                    if self.vector_pairs is None:
+                        self.vector_pairs=numeric.array([v])
+                    else:    
+                        self.vector_pairs=numeric.resize(self.vector_pairs,(len(self.key_pairs),self.dimensions))
+                        self.vector_pairs[-1,:]=v
+        else:
+            raise TypeError('hrr.Vocabulary.add() Type error: Argument provided not of HRR type')
+
     def parse(self,text):
         return eval(text,{},self)
         
@@ -131,7 +157,7 @@ class Vocabulary:
         if isinstance(v,HRR): v=v.v
         m=numeric.dot(self.vectors,v)
         matches=[(m[i],self.keys[i]) for i in range(len(m))]
-        if include_pairs:
+        if include_pairs and self.include_pairs:
             m2=numeric.dot(self.vector_pairs,v)
             matches.extend([(m2[i],self.key_pairs[i]) for i in range(len(m2))])
         matches.sort()
@@ -144,16 +170,17 @@ class Vocabulary:
             else: break
             
         return join.join(['%0.2f%s'%(c,k) for (c,k) in r])
+
     def dot(self,v):
         if isinstance(v,HRR): v=v.v
         return numeric.dot(self.vectors,v)
+
     def dot_pairs(self,v):
         if isinstance(v,HRR): v=v.v
-        return numeric.dot(self.vector_pairs,v)
-        
-            
-         
-         
+        if self.include_pairs:
+            return numeric.dot(self.vector_pairs,v)
+        else:
+            return None
         
     def prob_cleanup(self,compare,vocab_size,steps=10000):
         # see http://yamlb.wordpress.com/2008/05/20/why-2-random-vectors-are-orthogonal-in-high-dimention/ 

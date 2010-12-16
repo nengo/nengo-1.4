@@ -210,11 +210,19 @@ class HRRWatch:
     def hrr_dot(self,obj):
         v=self.value(obj)
         vocab=hrr.Vocabulary.defaults[obj.dimension]
-        return list(vocab.dot(v))+list(vocab.dot_pairs(v))
+        ret_val = list(vocab.dot(v))
+        if(vocab.include_pairs):
+            return ret_val + list(vocab.dot_pairs(v))
+        else:
+            return ret_val
     def hrr_angle(self,obj):
         v=self.value_normalized(obj)
         vocab=hrr.Vocabulary.defaults[obj.dimension]
-        return list(vocab.dot(v))+list(vocab.dot_pairs(v))
+        ret_val = list(vocab.dot(v))
+        if(vocab.include_pairs):
+            return ret_val + list(vocab.dot_pairs(v))
+        else:
+            return ret_val
     def views(self,obj):
         return [
             ('semantic pointer',components.HRRGraph,dict(func=self.hrr_angle,value_func=self.value_normalized,label=obj.name)),
