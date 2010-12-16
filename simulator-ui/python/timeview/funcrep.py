@@ -70,22 +70,47 @@ class FunctionRepresentation(core.DataViewComponent):
         except:
             return
 
-
         g.color=Color.black
-        dx=float(maxx-minx)/(width-1)
-        px,py=None,None
-        for i in range(width):
-            x=minx+i*dx
-            value=sum([f(j,x)*d for j,d in enumerate(data)])
+        
+        pdftemplate=getattr(self.view.area,'pdftemplate',None)
+        if pdftemplate is not None:
+            pdf,scale=pdftemplate
+            pdf.setLineWidth(0.5)
 
-            y=int((value-miny)*height/(maxy-miny))
+            steps=100
 
-            xx=self.border_left+i
-            yy=self.height-self.border_bottom-y
+            dx=float(maxx-minx)/(width*steps)
 
-            if px is not None and miny<value<maxy:
-                g.drawLine(px,py,xx,yy)
-            px,py=xx,yy    
+            for i in range(width*steps):
+                x=minx+i*dx
+                value=sum([f(j,x)*d for j,d in enumerate(data)])
+                y=float((value-miny)*height/(maxy-miny))
+                
+                xx=self.border_left+i/float(steps)
+                yy=self.height-self.border_bottom-y
+
+                if i==0:
+                    pdf.moveTo((self.x+xx)*scale,800-(self.y+yy)*scale)
+                else:
+                    if 0<y<height:
+                        pdf.lineTo((self.x+xx)*scale,800-(self.y+yy)*scale)
+            pdf.setRGBColorStroke(g.color.red,g.color.green,g.color.blue)        
+            pdf.stroke()        
+        else:
+            dx=float(maxx-minx)/(width-1)
+            px,py=None,None
+            for i in range(width):
+                x=minx+i*dx
+                value=sum([f(j,x)*d for j,d in enumerate(data)])
+
+                y=int((value-miny)*height/(maxy-miny))
+
+                xx=self.border_left+i
+                yy=self.height-self.border_bottom-y
+
+                if px is not None and miny<value<maxy:
+                    g.drawLine(px,py,xx,yy)
+                px,py=xx,yy    
 
 
             
