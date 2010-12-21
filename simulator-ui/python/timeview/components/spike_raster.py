@@ -95,6 +95,11 @@ class SpikeRaster(core.DataViewComponent):
             self.sample=self.neurons
         dy=float(self.size.height-self.border_bottom-border_top)/(self.neurons/self.sample)
         dx=float(self.size.width-self.border_left-self.border_right-1)/(pts-1)
+
+        pdftemplate=getattr(self.view.area,'pdftemplate',None)
+        if pdftemplate is not None:
+            pdf,scale=pdftemplate
+            pdf.setLineWidth(0)
         
         for i,d in enumerate(data):
             if d is None: continue
@@ -105,20 +110,30 @@ class SpikeRaster(core.DataViewComponent):
                     spike=d[j*self.sample]
                     
                 if spike:
-                    x=int(i*dx+self.border_left)
-                    y=int(j*dy+border_top)
-                    
-                    w=int(dx)-1
-                    h=int(dy)-1
-                    
-                    if w<1: w=1
-                    if h<1: h=1
-                    
-                    if w<=1 and h<=1:
-                        g.drawLine(x,y,x,y)
+                    if pdftemplate is not None:
+                        x=(self.x+i*dx+self.border_left)*scale
+                        y=800-(self.y+j*dy+border_top)*scale
+                        pdf.rectangle(x,y,dx*scale,-dy*scale)
+                        pdf.fill()
+                        
                     else:
-                        g.fillRect(x,y,w,h)
+                        x=int(i*dx+self.border_left)
+                        y=int(j*dy+border_top)
+                        
+                        w=int(dx)-1
+                        h=int(dy)-1
+                        
+                        if w<1: w=1
+                        if h<1: h=1
+                        
+                        if w<=1 and h<=1:
+                            g.drawLine(x,y,x,y)
+                        else:
+                            g.fillRect(x,y,w,h)
+                        
                     
+        if pdftemplate is not None:
+            pdf.setLineWidth(1)
                     
         
         
