@@ -37,13 +37,17 @@ def round(x):
 
 
 class Graph(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None):
+    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None,data=None,x_labels=None,show_negative=True):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
         self.indices=None
-        self.data=self.view.watcher.watch(name,func,args=args)
+        if func is not None:
+            self.data=self.view.watcher.watch(name,func,args=args)
+        else:
+            self.rawdata=data
+            self.data=None
         self.border_top=10
         self.border_left=30
         self.border_right=30
@@ -57,6 +61,8 @@ class Graph(core.DataViewComponent):
         self.autozoom=False
         self.last_maxy=None
         self.neuronmapped=neuronmapped
+        self.x_labels=x_labels
+        self.show_negative=show_negative
         
         self.map=None
         self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
@@ -87,8 +93,11 @@ class Graph(core.DataViewComponent):
     
     def restore(self,d):
         core.DataViewComponent.restore(self,d)
-        
-        data_dim = len(self.data.get_first())       # Get dimensionality of data
+
+        if self.data is not None:
+            data_dim = len(self.data.get_first())       # Get dimensionality of data
+        else:
+            data_dim = len(self.rawdata[0])
         self.indices = [False] * data_dim
         
         sel_dim = d.get('sel_dim', range(min(data_dim, self.default_selected)))
@@ -111,12 +120,17 @@ class Graph(core.DataViewComponent):
         
     def fix_popup(self):
         self.popup.add(JPopupMenu.Separator())
+
+        self.popup.add(JMenuItem('select all',actionPerformed=self.select_all))
+        self.popup.add(JMenuItem('select none',actionPerformed=self.select_none))
         
         # Calculate number of submenu layers needed
         max_ind = len(self.indices)
         num_sub = max(1,int(ceil(log(max_ind) / log(self.max_show_dim))))
         max_sub = [self.max_show_dim ** (num_sub - i) for i in range(num_sub)]
         sub_menus = [self.popup] * num_sub
+
+        self.selection_menu_items=[]
         
         for i,draw in enumerate(self.indices):
             if( i % self.max_show_dim == 0 ):
@@ -125,7 +139,17 @@ class Graph(core.DataViewComponent):
                         new_menu = JMenu("%s[%d:%d]" % ('v', i, min(max_ind, i + max_sub[n+1]) - 1))
                         sub_menus[n].add(new_menu)
                         sub_menus[n+1] = new_menu
-            sub_menus[num_sub-1].add(JCheckBoxMenuItem(self.label_for_index(i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state)))
+            menu_item=JCheckBoxMenuItem(self.label_for_index(i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state))
+            self.selection_menu_items.append(menu_item)
+            sub_menus[num_sub-1].add(menu_item)
+    def select_all(self,event):
+        for item in self.selection_menu_items:
+            item.setState(True)
+    def select_none(self,event):
+        for item in self.selection_menu_items:
+            item.setState(False)
+        
+
         
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
@@ -142,6 +166,10 @@ class Graph(core.DataViewComponent):
         g.drawLine(self.border_left,border_top,self.border_left,self.size.height-self.border_bottom)
         #g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
 
+        dt_tau=None
+        if self.filter and self.view.tau_filter>0:
+            dt_tau=self.view.dt/self.view.tau_filter
+
 
         pts=int(self.view.time_shown/self.view.dt)
 
@@ -150,25 +178,49 @@ class Graph(core.DataViewComponent):
         if start<=self.view.timelog.tick_count-self.view.timelog.tick_limit:
             start=self.view.timelog.tick_count-self.view.timelog.tick_limit+1
 
+
+        if self.data is not None:
+            data=self.data.get(start=start,count=pts,dt_tau=dt_tau)
+            now=self.view.current_tick-start
+            for i in range(now+1,len(data)):
+                data[i]=None
+        else:
+            data=self.rawdata
+            pts=len(self.rawdata)
+
+
+        maxy=None
+        miny=None
+        dx=float(self.size.width-self.border_left-self.border_right-1)/(pts-1)
+
+
+
+        if self.x_labels is None:
+            x_labels=dict()
+            x_labels[0]='%4g'%((start)*self.view.dt)
+            x_labels[pts]='%4g'%((start+pts)*self.view.dt)
+        else:
+            x_labels=self.x_labels
+
         g.color=Color.black
-        txt='%4g'%((start+pts)*self.view.dt)
-        bounds=g.font.getStringBounds(txt,g.fontRenderContext)
-        g.drawString(txt,self.size.width-self.border_right-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
-
-        txt='%4g'%((start)*self.view.dt)
-        bounds=g.font.getStringBounds(txt,g.fontRenderContext)
-        g.drawString(txt,self.border_left-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
+        for i,txt in x_labels.items():
+            bounds=g.font.getStringBounds(txt,g.fontRenderContext)
+            g.drawString(txt,self.border_left-bounds.width/2+int(i*dx),self.size.height-self.border_bottom+bounds.height)
+            
+            
 
 
+#                        txt='%4g'%((start+pts)*self.view.dt)
+#                        bounds=g.font.getStringBounds(txt,g.fontRenderContext)
+#                        g.drawString(txt,self.size.width-self.border_right-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
 
-        dt_tau=None
-        if self.filter and self.view.tau_filter>0:
-            dt_tau=self.view.dt/self.view.tau_filter
+ #                       txt='%4g'%((start)*self.view.dt)
+ #                       bounds=g.font.getStringBounds(txt,g.fontRenderContext)
+ #                       g.drawString(txt,self.border_left-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
+                        
 
-        data=self.data.get(start=start,count=pts,dt_tau=dt_tau)
-        now=self.view.current_tick-start
-        for i in range(now+1,len(data)):
-            data[i]=None
+
+
         
         if self.indices is None:
             for x in data:
@@ -181,9 +233,6 @@ class Graph(core.DataViewComponent):
             else:
                 return
 
-        maxy=None
-        miny=None
-        dx=float(self.size.width-self.border_left-self.border_right-1)/(pts-1)
         filtered=[]
         for i,draw in enumerate(self.indices):
             if draw:
@@ -213,6 +262,8 @@ class Graph(core.DataViewComponent):
             miny=-maxy
 
         self.last_maxy=maxy
+
+        if not self.show_negative: miny=0
 
         if maxy==miny: yscale=0
         else: yscale=float(self.size.height-self.border_bottom-border_top)/(maxy-miny)
