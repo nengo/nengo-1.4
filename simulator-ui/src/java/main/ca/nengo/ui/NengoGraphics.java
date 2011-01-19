@@ -124,7 +124,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			+ "For more information, consult lib/library-licenses.txt in the installation directory.<BR> "
 			+ "This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
 
-	public static final boolean CONFIGURE_PLANE_ENABLED = false;
+	public static final boolean CONFIGURE_PLANE_ENABLED = true;
 
 	/**
 	 * UI delegate object used to show the FileChooser
@@ -615,6 +615,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	public WorldObject getSelectedObj() {
 		return selectedObj;
 	}
+	
+	public ConfigurationPane getConfigPane() {
+		return configPane;
+	}
 
 	@Override
 	public void initFileMenu(MenuBuilder fileMenu) {
@@ -710,28 +714,46 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		private static final long serialVersionUID = 1L;
 
 		AuxillarySplitPane auxSplitPane;
+		Object currentObj;
 
 		public ConfigurationPane(Container mainPanel) {
 			super();
 			auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Configuration",
 					AuxillarySplitPane.Orientation.Right);
-
+			currentObj=null;
+		}
+		
+		public Object getCurrentObj() {
+			return currentObj;
 		}
 
 		public void configureObj(Object obj) {
-
-			ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
-			// Style.applyStyle(configurationPane.getTree());
-			// Style.applyStyle(configurationPane.getCellRenderer());
-
-			String name;
-			if (obj instanceof Node) {
-				name = ((Node) obj).getName();
+			if (obj==currentObj) return;
+			currentObj=obj;
+			
+			int location=auxSplitPane.getDividerLocation();
+			
+			if (obj==null) {
+				auxSplitPane.setAuxPane(null,"Configuration");
 			} else {
-				name = "Configuration";
+				
+
+				ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
+				
+				
+				// Style.applyStyle(configurationPane.getTree());
+				// Style.applyStyle(configurationPane.getCellRenderer());
+	
+				String name;
+				if (obj instanceof Node) {
+					name = ((Node) obj).getName();
+				} else {
+					name = "Configuration";
+				}
+				auxSplitPane.setAuxPane(configurationPane, name + " (" + obj.getClass().getSimpleName()
+						+ ")");
 			}
-			auxSplitPane.setAuxPane(configurationPane, name + " (" + obj.getClass().getSimpleName()
-					+ ")");
+			auxSplitPane.setDividerLocation(location);
 
 		}
 

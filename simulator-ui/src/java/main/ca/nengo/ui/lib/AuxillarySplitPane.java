@@ -80,7 +80,7 @@ public class AuxillarySplitPane extends JSplitPane {
 		leftPanel.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				auxPanel.requestFocusInWindow();
+				if (auxPanel!=null) auxPanel.requestFocusInWindow();
 			}
 		});
 
