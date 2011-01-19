@@ -123,6 +123,7 @@ public class ScriptConsole extends JPanel {
 		interpreter.exec("sys.path.append('.')");
 		interpreter.exec("sys.path.append('python')");
 		interpreter.exec("from numeric import *");
+		interpreter.exec("import toolbar");
 
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
