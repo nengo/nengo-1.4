@@ -17,7 +17,7 @@ public class MenuBuilder extends AbstractMenuBuilder {
 	JMenu menu;
 
 	public MenuBuilder(String label) {
-		this(label, true);
+		this(label, false);
 	}
 
 	public MenuBuilder(String label, boolean applyCustomStyle) {

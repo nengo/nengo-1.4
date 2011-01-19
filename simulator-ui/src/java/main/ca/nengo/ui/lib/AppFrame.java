@@ -134,7 +134,7 @@ public abstract class AppFrame extends JFrame {
 	private void initMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBorder(null);
-		Style.applyMenuStyle(menuBar, true);
+		//Style.applyMenuStyle(menuBar, true);
 
 		MenuBuilder fileMenu = new MenuBuilder("File");
 		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_F);
