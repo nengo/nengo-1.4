@@ -568,18 +568,17 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 					"Exiting " + getAppName(),
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (response == JOptionPane.YES_OPTION) {
-
 				promptToSaveModels();
-			} else if (response == JOptionPane.CANCEL_OPTION) {
+			}else if (response == JOptionPane.CANCEL_OPTION ||response == JOptionPane.CLOSED_OPTION) {
 				/*
 				 * Cancel exit
 				 */
 				return;
 			}
 		}
-
+		
 		saveUserConfig();
-		super.exitAppFrame();
+		super.exitAppFrame();			
 	}
 
 	private void saveUserConfig() {

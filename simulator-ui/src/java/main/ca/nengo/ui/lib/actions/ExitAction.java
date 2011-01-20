@@ -18,7 +18,7 @@ public class ExitAction extends StandardAction {
 	@Override
 	protected void action() throws ActionException {
 		appFrame.exitAppFrame();
-		appFrame.dispose();
+//		appFrame.dispose();  //do not want to always close frame in case user selected to cancel exit operation.
 	}
 
 }
