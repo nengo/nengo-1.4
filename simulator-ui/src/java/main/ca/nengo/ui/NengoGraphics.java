@@ -619,6 +619,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	public ConfigurationPane getConfigPane() {
 		return configPane;
 	}
+	
+	public AuxillarySplitPane getScriptConsolePane() {
+		return this.scriptConsolePane;
+	}
 
 	@Override
 	public void initFileMenu(MenuBuilder fileMenu) {

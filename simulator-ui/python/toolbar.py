@@ -22,9 +22,15 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar.add(self.button_run)
         self.toolbar.add(self.button_pdf)
         self.toolbar.add(self.make_button('inspect',self.do_inspect,'inspect'))
+        self.toolbar.add(self.make_button('console',self.do_console,'toggle console'))
 
         ca.nengo.ui.lib.world.handlers.SelectionHandler.addSelectionListener(self)
         self.ng.getWorld().getGround().addChildrenListener(self)
+
+        self.ng.getContentPane().add(self.toolbar,BorderLayout.PAGE_START)
+
+        
+        
 
     def make_button(self,icon,func,tip,**args):
         return JButton(icon=ImageIcon('python/images/%s.png'%icon),rolloverIcon=ImageIcon('python/images/%s-pressed.png'%icon),
@@ -46,9 +52,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         if self.selection is not None and self.ng.configPane.toJComponent().isAuxVisible():
             self.ng.configPane.configureObj(self.selection.model)
         
-            
-
-
         net=self.get_current_network()
         if net is None:
             self.button_run.enabled=False
@@ -69,15 +72,14 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
                     break
         return network        
         
+    def do_console(self,event):
+        pane=self.ng.scriptConsolePane
+        pane.auxVisible=not pane.auxVisible
+
 
     def do_inspect(self,event):
         pane=self.ng.configPane.toJComponent()
-        pane.setAuxVisible(not pane.isAuxVisible())
-        
-        #self.inspect.visible=not self.inspect.visible
-        #size=self.ng.size
-        #self.ng.pack()
-        #self.ng.size=size
+        pane.auxVisible=not pane.auxVisible
         
     def do_open(self,event):
         ca.nengo.ui.actions.OpenNeoFileAction(ng).doAction()
@@ -122,17 +124,13 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             doc.close()
         
 
-    def init(self,frame):
-        size=frame.size
-        frame.getContentPane().add(self.toolbar,BorderLayout.PAGE_START)
-        frame.pack()
-        frame.size=size
 
 
         
 
-
-toolbar=ToolBar()
 ng=ca.nengo.ui.NengoGraphics.getInstance()
-toolbar.init(ng)
+size=ng.size
+toolbar=ToolBar()
+ng.pack()
+ng.size=size
 
