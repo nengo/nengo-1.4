@@ -93,6 +93,7 @@ public class PlotTimeSeries extends StandardAction {
 
 				} catch (ConfigException e) {
 					e.defaultHandleBehavior();
+					return;
 				}
 
 			}
