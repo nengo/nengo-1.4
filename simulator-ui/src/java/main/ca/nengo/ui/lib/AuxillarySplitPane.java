@@ -157,6 +157,10 @@ public class AuxillarySplitPane extends JSplitPane {
 	public String getAuxTitle() {
 		return auxTitle;
 	}
+	
+	public JPanel getAuxPaneWrapper() {
+		return auxPanelWr;
+	}
 
 	public boolean isAuxVisible() {
 		return auxPanelWr.isVisible();

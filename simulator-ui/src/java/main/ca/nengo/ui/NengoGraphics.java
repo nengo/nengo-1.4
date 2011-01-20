@@ -24,6 +24,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -53,6 +54,8 @@ import ca.nengo.config.ConfigUtil;
 import ca.nengo.config.JavaSourceParser;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
+import ca.nengo.model.Origin;
+import ca.nengo.model.Termination;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
@@ -284,9 +287,16 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 			Object model = ((ModelObject) obj).getModel();
 			scriptConsole.setCurrentObject(model);
+
+			if (configPane.toJComponent().isAuxVisible()) {
+				configPane.configureObj(model);
+			}
+			
 		} else {
 			selectedObj = null;
 		}
+		
+		
 		updateEditMenu();
 	}
 
@@ -724,6 +734,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			super();
 			auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Configuration",
 					AuxillarySplitPane.Orientation.Right);
+			auxSplitPane.getAuxPaneWrapper().setBackground(Style.COLOR_CONFIGURE_BACKGROUND);
 			currentObj=null;
 		}
 		
@@ -743,6 +754,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 				
 
 				ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
+				configurationPane.getTree().setBackground(Style.COLOR_CONFIGURE_BACKGROUND);
 				
 				
 				// Style.applyStyle(configurationPane.getTree());
@@ -751,6 +763,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 				String name;
 				if (obj instanceof Node) {
 					name = ((Node) obj).getName();
+				} else if (obj instanceof Termination) {
+					name = ((Termination) obj).getName();
+				} else if (obj instanceof Origin) {
+					name = ((Origin) obj).getName();
 				} else {
 					name = "Configuration";
 				}

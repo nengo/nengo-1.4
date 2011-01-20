@@ -23,6 +23,8 @@ public class Style {
 	public static final Color COLOR_FOREGROUND2 = Color.gray;
 	public static final Color COLOR_BORDER_SELECTED = Color.orange;
 	public static final Color COLOR_DARK_BLUE = new Color(0, 0, 80);
+	
+	public static final Color COLOR_CONFIGURE_BACKGROUND = Color.white;
 
 	/*
 	 * Button Colors

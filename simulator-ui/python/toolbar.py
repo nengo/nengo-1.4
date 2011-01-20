@@ -13,7 +13,6 @@ if 'lib/iText-5.0.5.jar' not in sys.path:
 class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,ca.nengo.ui.lib.world.WorldObject.ChildListener):
     def __init__(self):
         self.ng=ca.nengo.ui.NengoGraphics.getInstance()
-        self.selection=self.ng.getSelectedObj()
         self.toolbar=JToolBar("Nengo actions",floatable=False)
         
         self.button_run=self.make_button('play',self.do_run,'run',enabled=False)
@@ -47,11 +46,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.update()
         
     def update(self):
-        self.selection=self.ng.getSelectedObj()
-
-        if self.selection is not None and self.ng.configPane.toJComponent().isAuxVisible():
-            self.ng.configPane.configureObj(self.selection.model)
-        
         net=self.get_current_network()
         if net is None:
             self.button_run.enabled=False
@@ -61,9 +55,9 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             self.button_run.toolTipText='run '+net.name
         
     def get_current_network(self):
-        network=self.selection
+        network=self.ng.getSelectedObj()
         if network is not None:
-            if network.networkParent is not None:
+            if hasattr(network,'networkParent') and network.networkParent is not None:
                 network=network.networkParent
         else:
             for wo in ng.world.ground.children:
@@ -123,8 +117,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             cb.addTemplate(tp,20,0)
             doc.close()
         
-
-
 
         
 
