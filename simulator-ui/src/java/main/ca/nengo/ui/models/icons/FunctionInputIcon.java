@@ -39,7 +39,8 @@ import ca.nengo.ui.lib.world.piccolo.primitives.Text;
  * @author Shu Wu
  */
 public class FunctionInputIcon extends ModelIcon {
-	public static final Font FONT = new Font(Font.SERIF, Font.ITALIC, 45);
+	// Using "Serif" because Font.SERIF is not in Java 1.5 - TWB
+	public static final Font FONT = new Font("Serif", Font.ITALIC, 45);
 	public static final String TEXT = "f(x)";
 	private static final int PADDING = 10;
 
