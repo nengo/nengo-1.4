@@ -785,6 +785,24 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		return originUI;
 
 	}
+	
+	/**
+	 * @param layoutName
+	 *            Name of an Origin on the Node model
+	 * @return the POrigin hidden
+	 */
+	public UIOrigin hideOrigin(String originName) {
+
+		UIOrigin originUI;
+
+		originUI = (UIOrigin) getChild(originName, UIOrigin.class);
+
+		if (originUI != null) {
+			originUI.setWidgetVisible(false);
+		}
+		return originUI;
+
+	}
 
 	/**
 	 * Call this function if the probe already exists in the simulator and only

@@ -30,6 +30,7 @@ import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Network;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.StructuralException;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.models.UINeoNode;
@@ -139,11 +140,26 @@ public abstract class UIOrigin extends Widget {
 	@Override
 	protected void unExpose(Network network) {
 
-		if (getExposedName() != null) {
-			network.hideOrigin(getExposedName());
-		} else {
+		try
+		{
+			String exposedName = getExposedName();
+			if (exposedName != null)
+			{
+				//remove the origin from UI
+				getNodeParent().getNetworkParent().hideOrigin(exposedName);
+				
+				//remove the origin from actual network
+				network.hideOrigin(exposedName);
+			}
+			else
+				UserMessages.showWarning("Could not unexpose this origin");
+		}
+		catch(StructuralException se)
+		{
 			UserMessages.showWarning("Could not unexpose this origin");
 		}
+				
+		
 	}
 
 	/**

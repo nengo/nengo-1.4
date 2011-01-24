@@ -124,7 +124,7 @@ public interface Network extends Node, Probeable {
 	 * 
 	 * @param name Name of Origin to unexpose. 
 	 */
-	public void hideOrigin(String name);
+	public void hideOrigin(String name) throws StructuralException;
 
 	/**
 	 * Declares the given Termination as available for connection from outside the Network

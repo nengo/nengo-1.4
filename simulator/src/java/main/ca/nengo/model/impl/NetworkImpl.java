@@ -52,6 +52,7 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
+import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.impl.LocalSimulator;
 import ca.nengo.util.Probe;
@@ -266,11 +267,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		
 	}
 	
-//	/**
-//	 * Kills a certain percentage of the dendritic inputs in the network (recursively including subnetworks).
-//	 * 
-//	 * @param killrate the percentage (0.0 to 1.0) of dendritic inputs to kill
-//	 */
+	/**
+	 * Kills a certain percentage of the dendritic inputs in the network (recursively including subnetworks).
+	 * 
+	 * @param killrate the percentage (0.0 to 1.0) of dendritic inputs to kill
+	 */
 //	public void killDendrites(float killrate)
 //	{
 //		Node[] nodes = getNodes();
@@ -352,6 +353,17 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 				Node[] nodes = net.getNodes();
 				for(int i = 0; i < nodes.length; i++)
 					net.removeNode(nodes[i].getName());
+			}
+			else if(node instanceof DecodableEnsembleImpl)
+			{
+				NEFEnsembleImpl pop = (NEFEnsembleImpl)node;
+				Origin[] origins = pop.getOrigins();
+				for(int i = 0; i < origins.length; i++)
+				{
+					String exposedName = getExposedOriginName(origins[i]);
+					if(exposedName != null)
+						hideOrigin(exposedName);
+				}
 			}
 			
 			myNodeMap.remove(name);
@@ -535,7 +547,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	/**
 	 * @see ca.nengo.model.Network#hideOrigin(java.lang.String)
 	 */
-	public void hideOrigin(String name) {
+	public void hideOrigin(String name) throws StructuralException {
+		if(myExposedOrigins.get(name) == null)
+			throw new StructuralException("No origin named " + name + " exists");
+		
 		OrderedExposedOrigins.remove(myExposedOrigins.get(name));
 		OriginWrapper originWr = (OriginWrapper)myExposedOrigins.remove(name);
 
