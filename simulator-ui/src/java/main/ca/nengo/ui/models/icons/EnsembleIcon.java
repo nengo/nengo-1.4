@@ -22,10 +22,15 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models.icons;
 
+import java.awt.Graphics2D;
+
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.world.PaintContext;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.models.nodes.UIEnsemble;
 
 /**
@@ -38,7 +43,7 @@ public class EnsembleIcon extends NodeContainerIcon {
 
 	public EnsembleIcon(UIEnsemble parent) {
 
-		super(parent, new IconImage("images/nengoIcons/EnsembleIcon.gif"));
+		super(parent, new VectorIcon());
 
 	}
 
@@ -47,4 +52,32 @@ public class EnsembleIcon extends NodeContainerIcon {
 		return 1000;
 	}
 
+	private static class VectorIcon extends WorldObjectImpl {
+
+		private static final int CircleDiameter = 16;
+		private static final int Padding = 4;
+
+		public VectorIcon() {
+			super();
+			int iconSize = 44 + CircleDiameter + Padding * 2;
+			this.setBounds(0, 0, iconSize, iconSize);
+		}
+
+		@Override
+		public void paint(PaintContext paintContext) {
+			super.paint(paintContext);
+
+			Graphics2D g2 = paintContext.getGraphics();
+
+			g2.setColor(Style.COLOR_FOREGROUND);
+			g2.translate(Padding, Padding);
+
+			g2.fillOval(2, 9, CircleDiameter, CircleDiameter);
+			g2.fillOval(1, 34, CircleDiameter, CircleDiameter);
+			g2.fillOval(26, 0, CircleDiameter, CircleDiameter);
+			g2.fillOval(22, 22, CircleDiameter, CircleDiameter);
+			g2.fillOval(44, 21, CircleDiameter, CircleDiameter);
+			g2.fillOval(28, 44, CircleDiameter, CircleDiameter);
+		}
+	}
 }

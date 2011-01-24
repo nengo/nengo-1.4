@@ -22,10 +22,16 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other 
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models.icons;
 
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+
+import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.world.PaintContext;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.models.nodes.UINetwork;
 
 /**
@@ -37,8 +43,8 @@ public class NetworkIcon extends NodeContainerIcon {
 	private static final long serialVersionUID = 1L;
 
 	public NetworkIcon(UINetwork parent) {
-		super(parent, new IconImage(
-				"images/nengoIcons/NetworkIcon.gif"));
+		super(parent, new VectorIcon());
+
 	}
 
 	@Override
@@ -46,4 +52,53 @@ public class NetworkIcon extends NodeContainerIcon {
 		return 20;
 	}
 
+	private static class VectorIcon extends WorldObjectImpl {
+		private static final int NumberOfNodeColumns = 2;
+		private static final int NumberOfNodeRows = 3;
+		private static final int LineWidth = 4;
+		private static final int CircleDiameter = 18;
+		private static int CircleRadius = CircleDiameter / 2;
+		private static final int RowHeight = 30;
+		private static final int ColumnWidth = 75;
+		private static final int Padding = 4;
+
+		public VectorIcon() {
+			super();
+			this.setBounds(0, 0, Padding * 2 + CircleDiameter + (NumberOfNodeColumns - 1) * ColumnWidth, Padding * 2
+					+ CircleDiameter + (NumberOfNodeRows - 1) * RowHeight);
+		}
+
+		@Override
+		public void paint(PaintContext paintContext) {
+			super.paint(paintContext);
+
+			Graphics2D g2 = paintContext.getGraphics();
+			g2.setStroke(new BasicStroke(LineWidth));
+			g2.setColor(Style.COLOR_FOREGROUND);
+			g2.translate(Padding, Padding);
+
+			// Draw grid
+			for (int rowCount = 0; rowCount < NumberOfNodeRows; rowCount++) {
+				int yPosition = rowCount * RowHeight;
+
+				g2.drawLine(CircleRadius, yPosition + CircleRadius, ColumnWidth + CircleRadius, yPosition
+						+ CircleRadius);
+
+				for (int columnCount = 0; columnCount < NumberOfNodeColumns; columnCount++) {
+
+					g2.fillOval(columnCount * ColumnWidth, yPosition, CircleDiameter, CircleDiameter);
+
+				}
+			}
+
+			// Draw diagonal line: top-left to bottom-right
+			g2.drawLine(CircleRadius, CircleRadius, CircleRadius + ColumnWidth * (NumberOfNodeColumns - 1),
+					CircleRadius + RowHeight * (NumberOfNodeRows - 1));
+
+			// Draw diagonal line: bottom-left to top-right
+			g2.drawLine(CircleRadius, CircleRadius + RowHeight * (NumberOfNodeRows - 1), CircleRadius + ColumnWidth
+					* (NumberOfNodeColumns - 1), CircleRadius);
+
+		}
+	}
 }
