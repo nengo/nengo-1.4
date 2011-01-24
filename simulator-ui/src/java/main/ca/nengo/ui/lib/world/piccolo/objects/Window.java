@@ -14,6 +14,11 @@ import ca.nengo.ui.lib.world.Interactable;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.handlers.EventConsumer;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.nengo.ui.lib.world.piccolo.objects.icons.CloseIcon;
+import ca.nengo.ui.lib.world.piccolo.objects.icons.MaximizeIcon;
+import ca.nengo.ui.lib.world.piccolo.objects.icons.MinimizeIcon;
+import ca.nengo.ui.lib.world.piccolo.objects.icons.RestoreIcon;
+import ca.nengo.ui.lib.world.piccolo.primitives.Image;
 import ca.nengo.ui.lib.world.piccolo.primitives.Path;
 import ca.nengo.ui.lib.world.piccolo.primitives.Text;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -253,8 +258,7 @@ public class Window extends WorldObjectImpl implements Interactable {
 		myContent.setBounds(0, 0, getWidth() - 4, getHeight() - 4 - MENU_BAR_HEIGHT);
 		myContent.setOffset(2, 2 + MENU_BAR_HEIGHT);
 
-		myClippingRectangle.setPathToRectangle((float) getX(), (float) getY(), (float) getWidth(),
-				(float) getHeight());
+		myClippingRectangle.setPathToRectangle((float) getX(), (float) getY(), (float) getWidth(), (float) getHeight());
 
 	}
 
@@ -315,9 +319,10 @@ public class Window extends WorldObjectImpl implements Interactable {
 class MenuBar extends WorldObjectImpl implements PInputEventListener {
 
 	private static final long serialVersionUID = 1L;
+	private static final int BUTTON_SIZE = 26;
+
 	private WorldObject buttonHolder;
 	private AbstractButton maximizeButton, minimizeButton, closeButton, normalButton;
-
 	private Window myWindow;
 	private Path rectangle;
 
@@ -340,25 +345,25 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 		title.setFont(Style.FONT_LARGE);
 		addChild(title);
 
-		normalButton = new ImageButton("images/icons/restore.gif", new Runnable() {
+		normalButton = new Button(new RestoreIcon(BUTTON_SIZE), new Runnable() {
 			public void run() {
 				myWindow.setWindowState(Window.WindowState.NORMAL);
 			}
 		});
 
-		maximizeButton = new ImageButton("images/icons/maximize.gif", new Runnable() {
+		maximizeButton = new Button(new MaximizeIcon(BUTTON_SIZE), new Runnable() {
 			public void run() {
 				myWindow.setWindowState(Window.WindowState.MAXIMIZED);
 			}
 		});
 
-		minimizeButton = new ImageButton("images/icons/minimize.gif", new Runnable() {
+		minimizeButton = new Button(new MinimizeIcon(BUTTON_SIZE), new Runnable() {
 			public void run() {
 				myWindow.setWindowState(Window.WindowState.MINIMIZED);
 			}
 		});
 
-		closeButton = new ImageButton("images/icons/close.gif", new Runnable() {
+		closeButton = new Button(new CloseIcon(BUTTON_SIZE), new Runnable() {
 			public void run() {
 				myWindow.close();
 			}

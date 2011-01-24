@@ -1,34 +1,32 @@
 package ca.nengo.ui.lib.world.piccolo.objects;
 
 import ca.nengo.ui.lib.Style.Style;
-import ca.nengo.ui.lib.world.piccolo.primitives.Image;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.primitives.Path;
 
 /**
- * A button which uses an image as an representation
+ * A button which draws itself as a WorldObject
  * 
  * @author Shu Wu
  */
-public class ImageButton extends AbstractButton {
+public class Button extends AbstractButton {
 
 	private static final long serialVersionUID = 1L;
 
 	private Path buttonCover;
 
-	public ImageButton(String imgPath, Runnable action) {
+	public Button(WorldObjectImpl worldObject, Runnable action) {
 		super(action);
 
-		Image buttonImg = new Image(imgPath);
-		addChild(buttonImg);
+		addChild(worldObject);
 
-		buttonCover = Path.createRectangle(0f, 0f, (float) buttonImg
-				.getWidth(), (float) buttonImg.getHeight());
+		buttonCover = Path.createRectangle(0f, 0f, (float) worldObject.getWidth(), (float) worldObject.getHeight());
 		buttonCover.setPaint(Style.COLOR_FOREGROUND);
 		addChild(buttonCover);
 
 		initDefaultState();
-		this.setWidth(buttonImg.getWidth());
-		this.setHeight(buttonImg.getHeight());
+		this.setWidth(worldObject.getWidth());
+		this.setHeight(worldObject.getHeight());
 	}
 
 	private void initDefaultState() {
