@@ -288,7 +288,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	/**
 	 * If the event indicates that a component node's name is changing, 
 	 * checks for name conflicts and throws an exception if there is one, 
-	 * and updates the name reference.  
+	 * and updates the name reference.  Otherwise, checks to see if any
+	 * of the projections in this network contain references to origins
+	 * or terminations that no longer exist, and removes any such defunct
+	 * projections.
 	 *  
 	 * @see ca.nengo.util.VisiblyMutable.Listener#changed(ca.nengo.util.VisiblyMutable.Event)
 	 */
@@ -297,7 +300,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			VisiblyMutable.NameChangeEvent ne = (VisiblyMutable.NameChangeEvent) e;
 			
 			if (myNodeMap.containsKey(ne.getNewName()) && !ne.getNewName().equals(ne.getOldName())) {
-				throw new StructuralException("This Network already contains a Node names " + ne.getNewName());
+				throw new StructuralException("This Network already contains a Node named " + ne.getNewName());
 			}
 			
 			/*
@@ -309,6 +312,56 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 				myNodeMap.remove(ne.getOldName());
 			}
 		}
+		else
+		{
+			//then we need to check if any of the origins or terminations involved in projections have been removed
+			Projection[] projections = getProjections();
+			ArrayList<Termination> nodeTerms = getNodeTerminations();
+			ArrayList<Origin> nodeOrigs = getNodeOrigins();
+			for(int i = 0; i < projections.length; i++)
+			{
+				if(!nodeTerms.contains(projections[i].getTermination()) || !nodeOrigs.contains(projections[i].getOrigin()))
+					removeProjection(projections[i].getTermination());
+			}
+		}
+	}
+	
+	/**
+	 * Gathers all the terminations of nodes contained in this network.
+	 * 
+	 * @return arraylist of terminations
+	 */
+	public ArrayList<Termination> getNodeTerminations()
+	{
+		ArrayList<Termination> nodeTerminations = new ArrayList<Termination>();
+		Node[] nodes = getNodes();
+		for(int i = 0; i < nodes.length; i++)
+		{
+			Termination[] terms = nodes[i].getTerminations();
+			for(int j = 0; j < terms.length; j++)
+				nodeTerminations.add(terms[j]);
+		}
+		
+		return nodeTerminations;
+	}
+	
+	/**
+	 * Gathers all the origins of nodes contained in this network.
+	 * 
+	 * @return arraylist of origins
+	 */
+	public ArrayList<Origin> getNodeOrigins()
+	{
+		ArrayList<Origin> nodeOrigins = new ArrayList<Origin>();
+		Node[] nodes = getNodes();
+		for(int i = 0; i < nodes.length; i++)
+		{
+			Origin[] origs = nodes[i].getOrigins();
+			for(int j = 0; j < origs.length; j++)
+				nodeOrigins.add(origs[j]);
+		}
+		
+		return nodeOrigins;
 	}
 
 	/**
