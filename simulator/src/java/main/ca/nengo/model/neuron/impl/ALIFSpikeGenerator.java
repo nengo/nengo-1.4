@@ -62,7 +62,7 @@ import ca.nengo.util.impl.TimeSeries1DImpl;
  * <p>An adapting leaky-integrate-and-fire model of spike generation. The mechanism of adaptation is 
  * a current I_ahp that is related to firing frequency. This current is proportional to the 
  * concentration of an ion species N, as I_ahp = -g_N * [N]. [N] increases with every spike and 
- * decays between spikes, as follows: d[N]/dt = -[N]/tau_N + A_N sum_k(delta(t-t_k). </p> 
+ * decays between spikes, as follows: d[N]/dt = -[N]/tau_N + inc_N sum_k(delta(t-t_k). </p> 
  * 
  * <p>This form is taken from La Camera et al. (2004) Minimal models of adapted neuronal response to in vivo-like
  * input currents, Neural Computation 16, 2101-24. This form of adaptation (as opposed to variation in firing 
