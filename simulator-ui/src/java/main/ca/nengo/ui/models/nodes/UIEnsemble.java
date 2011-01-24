@@ -83,7 +83,7 @@ public class UIEnsemble extends UINodeViewable {
 			}
 		} else {
 			if (spikeCollector != null) {
-				spikeCollector.destroy();
+				spikeCollector.destroyModel();
 				spikeCollector = null;
 			}
 		}
