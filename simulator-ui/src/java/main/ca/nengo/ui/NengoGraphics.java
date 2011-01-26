@@ -24,7 +24,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -46,6 +46,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 
 import org.python.util.PythonInterpreter;
 
@@ -147,7 +148,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	/**
-	 * Runs NeoGraphics with a default name
+	 * Runs NengoGraphics with a default name
 	 * 
 	 * @param args
 	 */
@@ -166,10 +167,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	private DataListView dataListViewer;
 	private ArrayList<AuxillarySplitPane> splitPanes;
 
-	/**
-	 * @param auxTitle
-	 *            Text to be shown in the Title Bar
-	 */
 	public NengoGraphics() {
 		super();
 
@@ -184,7 +181,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	/**
-	 * @returns Top Node Container available in the Application Window. Null, if
+	 * @return Top Node Container available in the Application Window. Null, if
 	 *          the Top Window is not a Node Container
 	 */
 	private NodeContainer getTopNodeContainer() {
@@ -300,9 +297,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		updateEditMenu();
 	}
 
-	/**
-	 * Register plugins
-	 */
+//	/**
+//	 * Register plugins
+//	 */
 //	private void registerPlugins() {
 //		try {
 //			LinkedList<URL> pluginUrls = new LinkedList<URL>();
@@ -430,6 +427,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	@Override
 	protected void initLayout(Universe canvas) {
+		try {  
+		  //Tell the UIManager to use the platform look and feel  
+		  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch(Exception e) { /*Do nothing*/ }
+		System.setProperty("swing.aatext", "true");
+		
 		splitPanes = new ArrayList<AuxillarySplitPane>();
 
 		pythonInterpreter = new PythonInterpreter();
@@ -462,8 +465,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	/**
-	 * Prompt user to save models in NeoGraphics This is most likely called
-	 * right before the application is exiting
+	 * Prompt user to save models in NengoGraphics.
+	 * This is most likely called right before the application is exiting.
 	 */
 	protected void promptToSaveModels() {
 
@@ -519,12 +522,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 		return new NengoWorld();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ca.nengo.ui.models.INodeContainer#addNeoNode(ca.nengo.ui.models.UINeoNode
-	 * )
+	/**
+	 * @see ca.nengo.ui.models.INodeContainer#addNeoNode(ca.nengo.ui.models.UINeoNode)
 	 */
 	public UINeoNode addNodeModel(Node node) throws ContainerException {
 		return addNodeModel(node, null, null);
@@ -549,8 +548,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	/**
-	 * @param obj
-	 *            Object to configure
+	 * @param obj Object to configure
 	 */
 	public void configureObject(Object obj) {
 		if (CONFIGURE_PLANE_ENABLED) {

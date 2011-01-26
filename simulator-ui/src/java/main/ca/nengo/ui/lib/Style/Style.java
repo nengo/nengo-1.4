@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Font;
 
 import javax.swing.JComponent;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
@@ -77,27 +78,29 @@ public class Style {
 	/*
 	 * Fonts
 	 */
-	public static final Font FONT_BIG = new Font("Helvetica", Font.BOLD, 16);
+	public static final String FONT_FAMILY =
+		UIManager.getDefaults().getFont("TabbedPane.font").getFamily();
 
-	public static final Font FONT_BOLD = new Font("Helvetica", Font.BOLD, 14);
-	public static final Font FONT_BUTTONS = new Font("Helvetica", Font.PLAIN, 14);
-	public static final Font FONT_LARGE = new Font("Helvetica", Font.BOLD, 18);
-	public static final Font FONT_NORMAL = new Font("Helvetica", Font.PLAIN, 14);
+	public static final Font FONT_BOLD = new Font(FONT_FAMILY, Font.BOLD, 14);
+	public static final Font FONT_BUTTONS = new Font(FONT_FAMILY, Font.PLAIN, 14);
+	public static final Font FONT_LARGE = new Font(FONT_FAMILY, Font.BOLD, 18);
+	public static final Font FONT_NORMAL = new Font(FONT_FAMILY, Font.PLAIN, 14);
 
-	public static final Font FONT_SMALL = new Font("Helvetica", Font.PLAIN, 10);
+	public static final Font FONT_SMALL = new Font(FONT_FAMILY, Font.PLAIN, 10);
+	public static final Font FONT_BIG = new Font(FONT_FAMILY, Font.BOLD, 16);
 
 	public static final Font FONT_WINDOW_BUTTONS = new Font("sansserif", Font.BOLD, 16);
-	public static final Font FONT_XLARGE = new Font("Helvetica", Font.BOLD, 22);
-	public static final Font FONT_XXLARGE = new Font("Helvetica", Font.BOLD, 32);
+	public static final Font FONT_XLARGE = new Font(FONT_FAMILY, Font.BOLD, 22);
+	public static final Font FONT_XXLARGE = new Font(FONT_FAMILY, Font.BOLD, 32);
 
-	public static final Font FONT_MENU_TITLE = new Font("Helvetica", Font.BOLD, 13);
-	public static final Font FONT_MENU = new Font("Helvetica", Font.BOLD, 12);
+	public static final Font FONT_MENU_TITLE = new Font(FONT_FAMILY, Font.BOLD, 13);
+	public static final Font FONT_MENU = new Font(FONT_FAMILY, Font.BOLD, 12);
 
 	/*
 	 * Search fonts
 	 */
-	public static final Font FONT_SEARCH_TEXT = new Font("Helvetica", Font.BOLD, 30);
-	public static final Font FONT_SEARCH_RESULT_COUNT = new Font("Helvetica", Font.BOLD, 22);
+	public static final Font FONT_SEARCH_TEXT = new Font(FONT_FAMILY, Font.BOLD, 30);
+	public static final Font FONT_SEARCH_RESULT_COUNT = new Font(FONT_FAMILY, Font.BOLD, 22);
 
 	public static void applyStyle(JComponent item) {
 		item.setBorder(null);
@@ -148,7 +151,7 @@ public class Style {
 	}
 
 	public static Font createFont(int size, boolean isBold) {
-		return new Font("Arial", Font.BOLD, size);
+		return new Font(FONT_FAMILY, Font.BOLD, size);
 
 	}
 }
