@@ -56,6 +56,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -110,6 +111,8 @@ public class ScriptConsole extends JPanel {
 	private int myDefaultDismissDelay;
 	private long myLastHelpTime = 0;
 	private Action myHideTip;
+	private boolean gtk = UIManager.getSystemLookAndFeelClassName().equals(
+			"com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 
 	/**
 	 * @param interpreter
@@ -149,7 +152,7 @@ public class ScriptConsole extends JPanel {
 		myCommandField.addActionListener(new CommandActionListener(this));
 		myCommandField.setFocusTraversalKeysEnabled(false);
 
-		myCommandField.setBorder(null);
+		if(!gtk) {myCommandField.setBorder(null);}
 
 		myHistoryCompletor = new HistoryCompletor();
 		myCallChainCompletor = new CallChainCompletor(myInterpreter);
@@ -179,23 +182,26 @@ public class ScriptConsole extends JPanel {
 
 	private void setChildrenBackground(Color fg) {
 		myDisplayArea.setBackground(fg);
-		myCommandField.setBackground(fg);
+		if(!gtk) {myCommandField.setBackground(fg);}
 	}
 
 	private void setChildrenForeground(Color fg) {
 		myDisplayArea.setForeground(fg);
-		myCommandField.setForeground(fg);
+		if(!gtk) {myCommandField.setForeground(fg);}
 		seperator.setForeground(fg);
 	}
 
 	private void initStyles() {
+		// Some are commented out because of inconsistencies with what
+		// different platforms do with background and foreground colour.
+		
 		myStyleContext = new StyleContext();
 		rootStyle = myStyleContext.addStyle("root", null);
 		StyleConstants.setForeground(rootStyle, ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
 
 		setChildrenBackground(ca.nengo.ui.lib.Style.Style.COLOR_BACKGROUND);
 		setChildrenForeground(ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
-		myCommandField.setCaretColor(ca.nengo.ui.lib.Style.Style.COLOR_LIGHT_GREEN);
+		if(!gtk) {myCommandField.setCaretColor(ca.nengo.ui.lib.Style.Style.COLOR_LIGHT_GREEN);}
 
 		commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
 		StyleConstants.setForeground(commandStyle, ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
