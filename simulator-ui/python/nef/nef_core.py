@@ -26,6 +26,8 @@ from ca.nengo.model import SimulationMode, Origin, Units, Termination
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
+from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
+    OutSpikeErrorFunction, RealPlasticityRule, SpikePlasticityRule
 from ca.nengo.util import MU
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction
 from ca.nengo.math import Function
@@ -363,7 +365,55 @@ class Network:
 
 
             return self.network.addProjection(origin,term)
-
+    def learn(self,post,learn_term,mod_term,
+                rate=1e-5,stdp=False):
+        """Apply a learning rule to a termination of a population.
+        
+        post can be either a string or an actual PlasticEnsemble.
+        It is the population whose termination will be learned.
+        
+        learn_term can be either a string or a Termination. It
+        is the termination whose transformation will be modified
+        by the learning rule.
+        
+        mod_term can be either a string or a Termination. It is
+        the modulatory input to the learning rule; while this
+        is technically not required by the plasticity functions
+        in Nengo, currently there are no learning rules implemented
+        that do not require modulatory input. If this changes,
+        this function should change to reflect that.
+        
+        rate is the learning rate that will be used in the learning
+        fuctions. (Possible enhancement: make this 2D for stdp
+        mode, different rates for in_fcn and out_fcn?)
+        
+        stdp is a boolean that signifies whether to use the STDP
+        based error-modulated learning rule. If it is True, then
+        the SpikePlasticityRule will be used, and the post
+        ensemble must be in DEFAULT (spiking) mode.
+        If it is False, then the RealPlasticityRule will be used,
+        and post can be either in RATE or DEFAULT mode.
+        """
+        
+        if isinstance(post,str):
+            post=self.network.getNode(post)
+        if isinstance(learn_term,Termination):
+            learn_term=learn_term.getName()
+        if isinstance(mod_term,Termination):
+            mod_term=mod_term.getName()
+        
+        if stdp:
+            inFcn = InSpikeErrorFunction([n.scale for n in post.nodes],post.encoders);
+            inFcn.setLearningRate(rate)
+            outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders);
+            outFcn.setLearningRate(rate)
+            rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', mod_term)
+            post.setPlasticityRule(learn_term,rule)
+        else:
+            learnFcn = ErrorLearningFunction([n.scale for n in post.nodes],post.encoders)
+            learnFcn.setLearningRate(rate)
+            rule=RealPlasticityRule(learnFcn, 'X', mod_term)
+            post.setPlasticityRule(learn_term,rule)
 
 def test():
     net=Network('Test')
