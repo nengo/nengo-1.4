@@ -173,6 +173,214 @@ public class NetworkImplTest extends TestCase {
 		
 		return numDead;
 	}
+	
+	public void testAddNode() throws StructuralException
+	{
+		Ensemble a = new MockEnsemble("a");
+		
+		try
+		{
+			myNetwork.getNode("a");
+			fail("Node is present in network when it shouldn't be");
+		}
+		catch(StructuralException se)
+		{
+		}
+			
+		
+		myNetwork.addNode(a);
+		
+		if(myNetwork.getNode("a") != a)
+			fail("Ensemble not added correctly");
+		
+		NetworkImpl b = new NetworkImpl();
+		b.setName("b");
+		myNetwork.addNode(b);
+		
+		if(myNetwork.getNode("b") != b)
+			fail("Network not added correctly");
+		
+	}
+	
+	public void testRemoveNode() throws StructuralException, SimulationException
+	{
+		Ensemble a = new MockEnsemble("a");
+		
+		myNetwork.addNode(a);
+		if(myNetwork.getNode("a") == null)
+			fail("Node not added");
+		
+		myNetwork.removeNode("a");
+		try
+		{
+			myNetwork.getNode("a");
+			fail("Node not removed");
+		}
+		catch(StructuralException se)
+		{
+		}
+			
+		NetworkImpl b = new NetworkImpl();
+		b.setName("b");
+		myNetwork.addNode(b);
+		
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
+		b.addNode(c);
+		b.getSimulator().addProbe("c", "X", true);
+		
+		b.exposeOrigin(c.getOrigin("X"), "exposed");
+		
+		if(!b.getExposedOriginName(c.getOrigin("X")).equals("exposed"))
+			fail("Origin not exposed correctly");
+		
+		if(myNetwork.getNode("b") == null)
+			fail("Network not added");
+		
+		myNetwork.removeNode("b");
+		
+		try
+		{
+			myNetwork.getNode("b");
+			fail("Network not removed");
+		}
+		catch(StructuralException se)
+		{
+		}
+		
+		try
+		{
+			b.getNode("c");
+			fail("Ensemble not recursively removed from network");
+		}
+		catch(StructuralException se)
+		{
+		}
+
+		if(b.getSimulator().getProbes().length != 0)
+			fail("Probes not removed correctly");
+		
+		if(b.getExposedOriginName(c.getOrigin("X")) != null)
+			fail("Origin not unexposed correctly");
+	}
+	
+	public void testExposeOrigin() throws StructuralException
+	{
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
+		
+		myNetwork.addNode(a);
+		
+		myNetwork.exposeOrigin(a.getOrigin("X"), "test");
+		
+		try
+		{
+			myNetwork.getOrigin("test");
+		}
+		catch(StructuralException se)
+		{
+			fail("Origin not exposed");
+		}
+		
+		if(myNetwork.getExposedOriginName(a.getOrigin("X")) != "test")
+			fail("Origin not exposed with correct name");
+		
+		myNetwork.removeNode("a");
+	}
+	
+	public void testHideOrigin() throws StructuralException
+	{
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
+		
+		myNetwork.addNode(a);
+		
+		myNetwork.exposeOrigin(a.getOrigin("X"), "test");
+		
+		myNetwork.hideOrigin("test");
+		
+		if(myNetwork.getExposedOriginName(a.getOrigin("X")) != null)
+			fail("Origin name not removed");
+		
+		try
+		{
+			myNetwork.getOrigin("test");
+			fail("Origin not removed");
+		}
+		catch(StructuralException se)
+		{
+		}
+		
+		myNetwork.removeNode("a");
+	}
+	
+	public void testChanged() throws StructuralException
+	{
+		NetworkImpl b = new NetworkImpl();
+		b.setName("b");
+		myNetwork.addNode(b);
+		
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
+		b.addNode(a);
+		
+		b.exposeOrigin(a.getOrigin("X"), "exposed");
+		
+		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
+		float[][] tmp = new float[1][1];
+		tmp[0][0] = 1;
+		c.addDecodedTermination("in", tmp, 0.007f, false);
+		myNetwork.addNode(c);
+		
+		myNetwork.addProjection(b.getOrigin("exposed"), c.getTermination("in"));
+		
+		if(myNetwork.getProjections().length != 1)
+			fail("Projection not created properly");
+		
+		b.hideOrigin("exposed");
+		
+		if(myNetwork.getProjections().length != 0)
+			fail("Projection not removed");
+		
+		myNetwork.removeNode("b");
+		myNetwork.removeNode("c");
+	}
+	
+	public void testGetNodeTerminations() throws StructuralException
+	{
+		NetworkImpl net = new NetworkImpl();
+		
+		if(net.getNodeTerminations().size() != 0)
+			fail("Network has terminations when it shouldn't");
+		
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
+		float[][] tmp = new float[1][1];
+		tmp[0][0] = 1;
+		a.addDecodedTermination("in", tmp, 0.007f, false);
+		
+		net.addNode(a);
+		
+		if(net.getNodeTerminations().size() != 1)
+			fail("Network hasn't found node termination");
+	}
+	
+	public void testGetNodeOrigins() throws StructuralException
+	{
+		NetworkImpl net = new NetworkImpl();
+		
+		if(net.getNodeOrigins().size() != 0)
+			fail("Network has origins when it shouldn't");
+		
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
+		
+		net.addNode(a);
+		
+		if(net.getNodeOrigins().size() != a.getOrigins().length)
+			fail("Network hasn't found node origin");
+		
+	}
 
 	private static class MockEnsemble implements Ensemble {
 
