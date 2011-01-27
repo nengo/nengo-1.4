@@ -1,25 +1,27 @@
 package ca.nengo.ui.actions;
 
-import ca.nengo.model.impl.NetworkImpl;
+//import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.models.nodes.UINetwork;
 
 public class CollectProbesAction extends StandardAction {
 	
 	private static final long serialVersionUID = 1L;
 	
-	NetworkImpl myNetwork;
+	UINetwork myNetwork;
 	
-	public CollectProbesAction(NetworkImpl network)
+	public CollectProbesAction(UINetwork uinetwork)
 	{
 		super("Collect probes from subnetworks", "Collect subnetwork probes", false);
-		myNetwork = network;
+		myNetwork = uinetwork;
 	}
 
 	@Override
 	protected void action() throws ActionException 
 	{
-		myNetwork.collectAllProbes();
+		myNetwork.getModel().collectAllProbes();
+		myNetwork.showPopupMessage("Probes collected");
 	}
 
 }

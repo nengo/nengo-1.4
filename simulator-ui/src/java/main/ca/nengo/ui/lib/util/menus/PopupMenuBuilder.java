@@ -1,5 +1,6 @@
 package ca.nengo.ui.lib.util.menus;
 
+import java.awt.Component;
 import java.awt.Font;
 
 import javax.swing.JLabel;
@@ -34,11 +35,33 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 	@Override
 	public void addAction(StandardAction standardAction) {
+		
+		addAction(standardAction, menu.getComponentCount());
+	}
+	
+	public void addAction(StandardAction standardAction, int index)
+	{
 		JMenuItem item;
 		item = new JMenuItem(standardAction.toSwingAction());
 		style(item);
-		menu.add(item);
-
+		menu.insert(item, index);
+	}
+	
+	public void addAction(String section, StandardAction action)
+	{
+		Component[] comps = menu.getComponents(); 
+		int index = -1;
+		for(int i = 0; i < comps.length; i++)
+		{
+			if(comps[i] instanceof JLabel)
+			{
+				if(((JLabel)comps[i]).getText().equals(section))
+					index = i+1;
+			}
+		}
+		if(index == -1)
+			index = comps.length;
+		addAction(action, index);
 	}
 
 	public void addSection(String name) {

@@ -55,12 +55,10 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.FunctionInput;
-import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.AddProbeAction;
-import ca.nengo.ui.actions.CollectProbesAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
@@ -208,11 +206,6 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 				probesMenu.addAction(new AddProbeAction(this, el));
 
 			}
-		}
-		
-		if (getModel() instanceof NetworkImpl)
-		{
-			menu.addAction(new CollectProbesAction((NetworkImpl)getModel()));
 		}
 
 		if (!somethingFound) {
