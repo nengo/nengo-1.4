@@ -24,6 +24,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.dataList;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -143,7 +144,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		this.setRoot(new DefaultMutableTreeNode("Results"));
 	}
 
-	private void addSpikePatterns(DefaultMutableTreeNode top, Network network) {
+	private boolean addSpikePatterns(DefaultMutableTreeNode top, Network network) {
 		Node[] nodes = network.getNodes();
 
 		for (Node node : nodes) {
@@ -159,26 +160,46 @@ public class SimulatorDataModel extends DefaultTreeModel {
 					SpikePattern spikePattern = (SpikePattern) Util.cloneSerializable(ensemble.getSpikePattern());
 					DefaultMutableTreeNode spNode = new SpikePatternNode(spikePattern);
 					ensNode.add(spNode);
+					
+					return true;
 				}
 
 			} else if (node instanceof Network) {
 				Network subNet = (Network) node;
 
-				DefaultMutableTreeNode netNode = createSortableNode(top, subNet);
+				DefaultMutableTreeNode netNode = createSortableNode(top, subNet.getName());
 
-				addSpikePatterns(netNode, subNet);
+				boolean childCollecting = addSpikePatterns(netNode, subNet);
+				if(!childCollecting)
+					top.remove(top.getIndex(netNode));
+				
+				return childCollecting;
 			}
 		}
+		return false;
 	}
 
 	private void addTimeSeries(DefaultMutableTreeNode top, Probe[] probes) {
 		for (Probe probe : probes) {
 			DefaultMutableTreeNode top0 = top;
-
-			if (probe.getEnsembleName() != null && !probe.getEnsembleName().equals("")) {
-				SortableMutableTreeNode ensembleNode = createSortableNode(top0,
-						probe.getEnsembleName());
-				top0 = ensembleNode;
+			
+			String ensName = probe.getEnsembleName();
+			if(ensName != null)
+			{
+				if(ensName.contains("["))
+				{
+					//then this is a probe that has been collected from a lower level network
+					String[] nameList = parseEnsembleName(ensName).toArray(new String[0]);
+					for(int i = 0; i < nameList.length; i++)
+						top0 = createSortableNode(top0, nameList[i]);
+				}
+				else if (!ensName.equals("")) 
+				{
+					//then this is just a regular probe on an node in this network
+					SortableMutableTreeNode ensembleNode = createSortableNode(top0,
+							ensName);
+					top0 = ensembleNode;
+				}
 			}
 
 			Probeable target = probe.getTarget();
@@ -256,6 +277,30 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 		this.insertNodeInto(captureNode, networkNode, 0);
 		return captureNode;
+	}
+	
+	ArrayList<String> parseEnsembleName(String name)
+	{
+		ArrayList<String> result = new ArrayList<String>();
+		String net_name;
+		
+		name = name.substring(1, name.length()-1);
+		try
+		{
+			net_name = name.substring(0, name.indexOf("["));
+		}
+		catch(IndexOutOfBoundsException ioobe)
+		{
+			result.add(name);
+			return result;
+		}
+		String recur_name = name.substring(name.indexOf("["));
+		
+		result.add(net_name);
+		result.addAll(parseEnsembleName(recur_name));
+		return result;
+		
+		
 	}
 
 }
