@@ -39,6 +39,7 @@ import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Probeable;
+import ca.nengo.model.impl.AbstractEnsemble;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.util.Probe;
 import ca.nengo.util.SpikePattern;
@@ -64,13 +65,13 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			name += " (Network)";
 		}
 
-		SortableMutableTreeNode newNode = findInDirectChildren(parent, neoNode.getName());
+		SortableMutableTreeNode newNode = findInDirectChildren(parent, name);
 
 		if (newNode == null) {
 			newNode = new NeoTreeNode(name, neoNode);
 			parent.add(newNode);
 		}
-
+		
 		return newNode;
 	}
 
@@ -96,7 +97,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 	 */
 	private static SortableMutableTreeNode findInDirectChildren(DefaultMutableTreeNode parent,
 			String name) {
-
+			
 		Enumeration<?> enumeration = parent.children();
 		SortableMutableTreeNode targetNode = null;
 
@@ -179,46 +180,75 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		return false;
 	}
 
-	private void addTimeSeries(DefaultMutableTreeNode top, Probe[] probes) {
+	/**
+	 * Recursively searches down Node hierarchy looking for a specific Node.  
+	 * Returns a direct child of currentNode that is an ancestor of targetNode.  
+	 * If targetNode could not be found then null is returned.
+	 * 
+	 * @param currentNode The root Node to begin searching from.
+	 * @param targetNode The Node that is being looked for.
+	 * @return Node The child of currentNode that is an ancestor of targetNode.
+	 * @author Steven Leigh
+	 */
+	private Node findNodeAncestor (Node currentNode, Node targetNode){
+		Node[] nodes;
+		
+		if (currentNode instanceof Network){
+			nodes=((Network) currentNode).getNodes();
+		}else if (currentNode instanceof AbstractEnsemble){
+			nodes=((AbstractEnsemble) currentNode).getNodes();
+		}else {
+			return null;
+		}
+		
+		for (Node node : nodes){
+			if (node.equals(targetNode)){
+				return node;  //target node was found so begin propagating back up hierarchy			
+			}else{
+				if (findNodeAncestor(node,targetNode)!=null){  
+					return node;  //target node was found and we are now propagating back up hierarchy
+				}
+			}
+		}
+		return null;  //target node was not found in this branch
+		
+	}
+	
+	private void addTimeSeries(DefaultMutableTreeNode top, Probe[] probes,Network network) {
 		for (Probe probe : probes) {
 			DefaultMutableTreeNode top0 = top;
 			
-			String ensName = probe.getEnsembleName();
-			if(ensName != null)
-			{
-				if(ensName.contains("["))
-				{
-					//then this is a probe that has been collected from a lower level network
-					String[] nameList = parseEnsembleName(ensName).toArray(new String[0]);
-					for(int i = 0; i < nameList.length; i++)
-						top0 = createSortableNode(top0, nameList[i]);
-				}
-				else if (!ensName.equals("")) 
-				{
-					//then this is just a regular probe on an node in this network
-					SortableMutableTreeNode ensembleNode = createSortableNode(top0,
-							ensName);
-					top0 = ensembleNode;
-				}
-			}
-
 			Probeable target = probe.getTarget();
-			if (target instanceof Node) {
-				SortableMutableTreeNode targetNode = createSortableNode(top0, (Node) target);
-
-				/*
-				 * Make a clone of the data
-				 */
-				TimeSeries probeData = (TimeSeries) Util.cloneSerializable(probe.getData());
-
-				DefaultMutableTreeNode stateNode = new ProbeDataNode(probeData,
-						probe.getStateName(), plotterStrategy.isApplyTauFilterByDefault(probe));
-
-				targetNode.add(stateNode);
-
-			} else {
+			if (!(target instanceof Node)) {
 				Util.Assert(false, "Probe target is not a node");
+				continue;
 			}
+			
+			//create branch down to target node
+			Node ancestor=findNodeAncestor(network, (Node)target);
+			while(ancestor!=null && !(ancestor.equals(target))){
+				top0=createSortableNode(top0, ancestor);
+				ancestor=findNodeAncestor(ancestor, (Node)target);
+			}
+			
+			if(ancestor==null || !(ancestor.equals(target))){
+				Util.Assert(false, "Probe target could not be found in Network");
+				continue;
+			}
+			
+
+			SortableMutableTreeNode targetNode = createSortableNode(top0, (Node) target);
+
+			/*
+			 * Make a clone of the data
+			 */
+			TimeSeries probeData = (TimeSeries) Util.cloneSerializable(probe.getData());
+
+			DefaultMutableTreeNode stateNode = new ProbeDataNode(probeData,
+					probe.getStateName(), plotterStrategy.isApplyTauFilterByDefault(probe));
+
+			targetNode.add(stateNode);
+
 		}
 	}
 
@@ -268,7 +298,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 				+ cal.get(Calendar.DATE) + "D");
 
 		addSpikePatterns(captureNode, network);
-		addTimeSeries(captureNode, network.getSimulator().getProbes());
+		addTimeSeries(captureNode, network.getSimulator().getProbes(),network);
 		sortTree(captureNode);
 
 		if (captureNode.getChildCount() == 0) {
