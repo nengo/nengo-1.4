@@ -22,7 +22,7 @@ public class ScriptConsoleTest extends TestCase {
 				ScriptConsole.getCallChain("x."));
 		assertEquals("x.getX", 
 				ScriptConsole.getCallChain("x.getX"));
-		assertEquals("", 
+		assertEquals("x.getX(", 
 				ScriptConsole.getCallChain("x.getX("));
 		assertEquals("y", 
 				ScriptConsole.getCallChain("x.getX(y"));

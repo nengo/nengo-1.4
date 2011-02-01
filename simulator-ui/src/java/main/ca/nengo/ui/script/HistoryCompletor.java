@@ -34,6 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A list of commands that have been entered previously. 
@@ -44,7 +45,10 @@ public class HistoryCompletor extends CommandCompletor {
 
 	public static String HISTORY_LOCATION_PROPERTY = "HistoryCompletor.File";
 
+	private final int NUM_COMMANDS_SAVED = 1000;
+	
 	private BufferedWriter myWriter;
+	
 	
 	public HistoryCompletor() {
 		File f = new File(System.getProperty(HISTORY_LOCATION_PROPERTY, "commandhistory.txt"));
@@ -65,14 +69,25 @@ public class HistoryCompletor extends CommandCompletor {
 
 		
 		try {
-			if (!f.exists()) f.createNewFile();
+			if (!f.exists())
+				f.createNewFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		if (f.exists() && f.canWrite()) {
 			try {
-				myWriter = new BufferedWriter(new FileWriter(f));
+				List<String> commands = getOptions();
+				int size = commands.size();
+				if(size > NUM_COMMANDS_SAVED)
+				{
+					myWriter = new BufferedWriter(new FileWriter(f));
+					for(int i = size-(NUM_COMMANDS_SAVED/2); i < size; i++)
+						myWriter.write(commands.get(i) + "\r\n");
+					myWriter.flush();
+				}
+				else
+					myWriter = new BufferedWriter(new FileWriter(f, true));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}			

@@ -75,18 +75,18 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		return newNode;
 	}
 
-	private static SortableMutableTreeNode createSortableNode(DefaultMutableTreeNode parent,
-			String name) {
-
-		SortableMutableTreeNode newNode = findInDirectChildren(parent, name);
-
-		if (newNode == null) {
-			newNode = new SortableMutableTreeNode(name);
-			parent.add(newNode);
-		}
-
-		return newNode;
-	}
+//	private static SortableMutableTreeNode createSortableNode(DefaultMutableTreeNode parent,
+//			String name) {
+//
+//		SortableMutableTreeNode newNode = findInDirectChildren(parent, name);
+//
+//		if (newNode == null) {
+//			newNode = new SortableMutableTreeNode(name);
+//			parent.add(newNode);
+//		}
+//
+//		return newNode;
+//	}
 
 	/**
 	 * Using O(n) search. Performance can be improved here.
@@ -147,13 +147,13 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 	private boolean addSpikePatterns(DefaultMutableTreeNode top, Network network) {
 		Node[] nodes = network.getNodes();
-
+		
+		boolean childCollecting = false;
 		for (Node node : nodes) {
 			if (node instanceof Ensemble) {
 				Ensemble ensemble = (Ensemble) node;
 
 				if (ensemble.isCollectingSpikes()) {
-
 					SortableMutableTreeNode ensNode = createSortableNode(top, ensemble);
 					/*
 					 * Make a clone of the data
@@ -162,22 +162,22 @@ public class SimulatorDataModel extends DefaultTreeModel {
 					DefaultMutableTreeNode spNode = new SpikePatternNode(spikePattern);
 					ensNode.add(spNode);
 					
-					return true;
+					childCollecting = true;
 				}
 
 			} else if (node instanceof Network) {
 				Network subNet = (Network) node;
 
-				DefaultMutableTreeNode netNode = createSortableNode(top, subNet.getName());
+				DefaultMutableTreeNode netNode = createSortableNode(top, subNet);
 
-				boolean childCollecting = addSpikePatterns(netNode, subNet);
-				if(!childCollecting)
+				if(!addSpikePatterns(netNode, subNet))
 					top.remove(top.getIndex(netNode));
+				else
+					childCollecting = true;
 				
-				return childCollecting;
 			}
 		}
-		return false;
+		return childCollecting;
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		
 	}
 	
-	private void addTimeSeries(DefaultMutableTreeNode top, Probe[] probes,Network network) {
+	private void addTimeSeries(DefaultMutableTreeNode top, Probe[] probes, Network network) {
 		for (Probe probe : probes) {
 			DefaultMutableTreeNode top0 = top;
 			
