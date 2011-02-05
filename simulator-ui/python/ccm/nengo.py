@@ -278,6 +278,9 @@ class CCMModelNetwork(NetworkImpl):
         self.build(self)
     def getSimulator(self):
         return self._simulator
+    def reset(self,randomize=False):
+        NetworkImpl.reset(self,randomize)
+        self._simulator.resetNetwork(randomize=randomize)
 
     def build(self,network,model=None,path=[]):
         if model is None:
