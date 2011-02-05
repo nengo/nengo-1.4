@@ -27,14 +27,22 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.ui.script;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import ca.nengo.ui.lib.util.Util;
 
 /**
  * A list of commands that have been entered previously. 
@@ -44,71 +52,84 @@ import java.util.List;
 public class HistoryCompletor extends CommandCompletor {
 
 	public static String HISTORY_LOCATION_PROPERTY = "HistoryCompletor.File";
-
+	
+	private File myFile;
 	private final int NUM_COMMANDS_SAVED = 1000;
 	
-	private BufferedWriter myWriter;
-	
-	
 	public HistoryCompletor() {
-		File f = new File(System.getProperty(HISTORY_LOCATION_PROPERTY, "commandhistory.txt"));
-		if (f.exists() && f.canRead()) {
-			try {
-				BufferedReader r = new BufferedReader(new FileReader(f));
-				String command = null;
-				while ((command = r.readLine()) != null) {
-					getOptions().add(command);
-				}
-				r.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		
-		try {
-			if (!f.exists())
-				f.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		if (f.exists() && f.canWrite()) {
-			try {
-				List<String> commands = getOptions();
-				int size = commands.size();
-				if(size > NUM_COMMANDS_SAVED)
-				{
-					myWriter = new BufferedWriter(new FileWriter(f));
-					for(int i = size-(NUM_COMMANDS_SAVED/2); i < size; i++)
-						myWriter.write(commands.get(i) + "\r\n");
-					myWriter.flush();
-				}
-				else
-					myWriter = new BufferedWriter(new FileWriter(f, true));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}			
-		}
+		myFile = new File(System.getProperty(HISTORY_LOCATION_PROPERTY, "commandhistory.dat"));
+		if(readFile()==null)
+			return;
+		getOptions().addAll(readFile());  //read in past commands from file and add them to the options
+		resetIndex();
 	}
 	
 	/**
-	 * @param command New command to add to the history
+	 * Add command string to CommandCompletor and update commandhistory file
 	 */
-	public void add(String command) {
+	public void add(String command){
 		getOptions().add(command);
 		resetIndex();
-		
-		if (myWriter != null) {
-			try {
-				myWriter.write(command + "\r\n");
-				myWriter.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		List<String> commands = getOptions();
+		overwriteFile(commands);
 	}
 	
+	/**
+	 * Read commandhistory file.
+	 * @return A list of strings from the commandhistory file
+	 */
+	private List<String> readFile (){
+		List<String> commands=null;
+
+		if (!myFile.exists() || !myFile.canRead())
+			return null;
+
+		try {
+			ObjectInput input = new ObjectInputStream (new BufferedInputStream(new FileInputStream(myFile)));
+			commands = (List<String>)input.readObject();
+			input.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return commands;
+	}
+	
+	/**
+	 * Overwrite commandhistory file with specified list of command strings.
+	 * @param commands: a list of commands to write to file
+	 */
+	private void overwriteFile (List<String> commands){
+		List <String> commandsCopy=new ArrayList<String>(commands);
+		Collections.copy(commandsCopy, commands);
+		
+		while (commandsCopy.size()>NUM_COMMANDS_SAVED) //limit the maximum # of commands saved
+			commandsCopy.remove(0);
+		
+		try {
+			if (!myFile.exists())
+				myFile.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if (!myFile.exists() || !myFile.canWrite()){
+			Util.Assert(false, "Trouble writing console command history to file");
+			return;
+		}
+		
+		try {
+			ObjectOutput output = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(myFile)));
+			output.writeObject(commandsCopy);
+			output.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

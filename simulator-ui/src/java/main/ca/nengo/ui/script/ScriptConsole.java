@@ -31,7 +31,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -53,7 +52,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -97,7 +96,7 @@ public class ScriptConsole extends JPanel {
 
 	private PythonInterpreter myInterpreter;
 	private JEditorPane myDisplayArea;
-	private JTextField myCommandField;
+	private JTextArea myCommandField;
 	private HistoryCompletor myHistoryCompletor;
 	private CallChainCompletor myCallChainCompletor;
 	private boolean myInCallChainCompletionMode;
@@ -132,7 +131,7 @@ public class ScriptConsole extends JPanel {
 		myDisplayArea.setEditable(false);
 		myDisplayArea.setMargin(new Insets(5, 5, 5, 5));
 
-		myCommandField = new JTextField();
+		myCommandField = new JTextArea();
 		ToolTipManager.sharedInstance().registerComponent(myCommandField);
 
 		setLayout(new BorderLayout());
@@ -149,7 +148,6 @@ public class ScriptConsole extends JPanel {
 		displayScroll.setBorder(null);
 
 		myCommandField.addKeyListener(new CommandKeyListener(this));
-		myCommandField.addActionListener(new CommandActionListener(this));
 		myCommandField.setFocusTraversalKeysEnabled(false);
 
 		if(!gtk) {myCommandField.setBorder(null);}
@@ -372,6 +370,7 @@ public class ScriptConsole extends JPanel {
 				myInterpreter.execfile(text.substring(4).trim());
 			} else if (text.startsWith("help ")) {
 				appendText(JavaSourceParser.removeTags(getHelp(text.substring(5).trim())), HELP_STYLE);
+				appendText("\n","root");
 			} else {
 				myInterpreter.exec(text);
 			}
@@ -526,18 +525,7 @@ public class ScriptConsole extends JPanel {
 		return command.substring(start);
 	}
 
-	private class CommandActionListener implements ActionListener {
 
-		private ScriptConsole myConsole;
-
-		public CommandActionListener(ScriptConsole console) {
-			myConsole = console;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			myConsole.enterCommand(e.getActionCommand());
-		}
-	}
 
 	private class CommandKeyListener implements KeyListener {
 
@@ -555,6 +543,8 @@ public class ScriptConsole extends JPanel {
 					myConsole.setInCallChainCompletionMode(false);
 				} else if (code == 27) {
 					myConsole.clearCommand();
+				} else if (code == 9 && e.isShiftDown()) { // shift-tab
+					myCommandField.append("\t");
 				} else if (code == 9) { // tab
 					myConsole.setInCallChainCompletionMode(true);
 				} else if (code == 38) { // up arrow
@@ -565,6 +555,12 @@ public class ScriptConsole extends JPanel {
 					e.consume();
 				} else if (code == 17) { //CTRL
 					myConsole.showToolTip();
+				} else if (code == 10 && e.isShiftDown()) { //shift-enter
+					//allow a new line to be entered
+					myCommandField.append("\n");
+				} else if (code == 10) { //enter.  execute code.
+					e.consume();
+					myConsole.enterCommand(myCommandField.getText());
 				} else {
 					myConsole.setInCallChainCompletionMode(false);
 				}
