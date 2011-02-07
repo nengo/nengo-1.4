@@ -314,7 +314,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		}
 		else
 		{
-			//then we need to check if any of the origins or terminations involved in projections have been removed
+			//check if any of the origins or terminations involved in projections have been removed
 			Projection[] projections = getProjections();
 			ArrayList<Termination> nodeTerms = getNodeTerminations();
 			ArrayList<Origin> nodeOrigs = getNodeOrigins();
@@ -322,6 +322,29 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			{
 				if(!nodeTerms.contains(projections[i].getTermination()) || !nodeOrigs.contains(projections[i].getOrigin()))
 					removeProjection(projections[i].getTermination());
+			}
+			
+			//check if any of the probes are no longer connected to anything (i.e. the population they
+			//were pointing to has been removed)
+			Probe[] probes = mySimulator.getProbes();
+			for(Probe probe : probes)
+			{
+				try
+				{
+					probe.getTarget().getHistory(probe.getStateName());
+				}
+				catch(SimulationException se1)
+				{
+					try
+					{
+						mySimulator.removeProbe(probe);
+					}
+					catch(SimulationException se2)
+					{
+						System.err.println("Error removing unconnected probe");
+						System.err.println(se2);
+					}
+				}
 			}
 		}
 	}
