@@ -51,7 +51,7 @@ class DropHandler(TransferHandler):
         for n in nodes:
             if isinstance(n,ca.nengo.ui.models.NodeContainer):
                 action=ca.nengo.ui.actions.CreateModelAction(n,constructor())
-                pos=n.localToView(support.dropLocation.dropPoint)
+                pos=n.localToView(n.globalToLocal(ng.world.localToView(support.dropLocation.dropPoint)))
                 action.setPosition(pos.x,pos.y)
                 action.doAction()
                 break
