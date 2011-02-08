@@ -2,7 +2,7 @@ package ca.nengo.ui.lib.util.menus;
 
 import javax.swing.JComponent;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.StandardAction;
 
 /**
@@ -37,7 +37,7 @@ public abstract class AbstractMenuBuilder {
 
 	public void style(JComponent item, boolean isTitle) {
 		if (applyStyle) {
-			Style.applyMenuStyle(item, isTitle);
+			NengoStyle.applyMenuStyle(item, isTitle);
 		}
 	}
 }

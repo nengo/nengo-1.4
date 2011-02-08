@@ -37,7 +37,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import ca.nengo.ui.lib.Style.Style;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;
@@ -180,9 +179,8 @@ public abstract class AppFrame extends JFrame {
 
 	protected abstract ElasticWorld createWorld();
 
-	@SuppressWarnings("unchecked")
 	protected DisplayMode getBestDisplayMode(GraphicsDevice device) {
-		Iterator itr = getPreferredDisplayModes(device).iterator();
+		Iterator<DisplayMode> itr = getPreferredDisplayModes(device).iterator();
 		while (itr.hasNext()) {
 			DisplayMode each = (DisplayMode) itr.next();
 			DisplayMode[] modes = device.getDisplayModes();
@@ -202,8 +200,7 @@ public abstract class AppFrame extends JFrame {
 	 * By default return the current display mode. Subclasses may override this
 	 * method to return other modes in the collection.
 	 */
-	@SuppressWarnings("unchecked")
-	protected Collection getPreferredDisplayModes(GraphicsDevice device) {
+	protected Collection<DisplayMode> getPreferredDisplayModes(GraphicsDevice device) {
 		ArrayList<DisplayMode> result = new ArrayList<DisplayMode>();
 
 		result.add(device.getDisplayMode());

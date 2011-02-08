@@ -3,7 +3,7 @@ package ca.nengo.ui.lib.world.piccolo.objects;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.World;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.WorldSky;
@@ -22,7 +22,7 @@ import ca.nengo.ui.lib.world.piccolo.primitives.Path;
 public class SelectionBorder implements Listener {
 	private Path frame;
 
-	private Color frameColor = Style.COLOR_BORDER_SELECTED;
+	private Color frameColor = NengoStyle.COLOR_BORDER_SELECTED;
 
 	private WorldSky frameHolder;
 

@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Stack;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.world.Searchable;
 import ca.nengo.ui.lib.world.World;
@@ -46,15 +46,15 @@ class SearchBox extends WorldObjectImpl {
 		this.world = world;
 		searchingText = new Text("Searching: ");
 
-		searchingText.setFont(Style.FONT_SEARCH_TEXT);
+		searchingText.setFont(NengoStyle.FONT_SEARCH_TEXT);
 		searchResultsText = new Text("");
-		searchResultsText.setFont(Style.FONT_SEARCH_RESULT_COUNT);
+		searchResultsText.setFont(NengoStyle.FONT_SEARCH_RESULT_COUNT);
 
 		rectangle = Path.createRectangle(0, 0, 1, 1);
 
-		rectangle.setStrokePaint(Style.COLOR_SEARCH_BOX_BORDER);
+		rectangle.setStrokePaint(NengoStyle.COLOR_SEARCH_BOX_BORDER);
 		rectangle.setStroke(new BasicStroke(2f));
-		rectangle.setPaint(Style.COLOR_FOREGROUND);
+		rectangle.setPaint(NengoStyle.COLOR_FOREGROUND);
 		rectangle.setTransparency(0.2f);
 
 		addChild(rectangle);
@@ -144,9 +144,9 @@ class SearchBox extends WorldObjectImpl {
 
 	public void addSearchChar(char keyChar, boolean isSearchSuccessfull) {
 		Text textChar = new Text("" + keyChar);
-		textChar.setFont(Style.FONT_SEARCH_TEXT);
+		textChar.setFont(NengoStyle.FONT_SEARCH_TEXT);
 		if (!isSearchSuccessfull) {
-			textChar.setTextPaint(Style.COLOR_SEARCH_BAD_CHAR);
+			textChar.setTextPaint(NengoStyle.COLOR_SEARCH_BAD_CHAR);
 		}
 
 		textStack.push(textChar);

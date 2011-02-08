@@ -30,7 +30,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.net.URL;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXImage;
@@ -120,7 +120,7 @@ class IconImageNode extends PXImage {
 
 				updatePath(1 / delta);
 			}
-			g2.setPaint(Style.COLOR_FOREGROUND);
+			g2.setPaint(NengoStyle.COLOR_FOREGROUND);
 			g2.fill(path);
 
 			// g2.fill(getBoundsReference());

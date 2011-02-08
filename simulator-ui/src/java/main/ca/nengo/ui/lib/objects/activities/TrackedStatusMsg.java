@@ -1,6 +1,6 @@
 package ca.nengo.ui.lib.objects.activities;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.primitives.Text;
@@ -23,7 +23,7 @@ public class TrackedStatusMsg {
 
 		if (wo != null) {
 			taskText = new Text(taskName);
-			taskText.setPaint(Style.COLOR_NOTIFICATION);
+			taskText.setPaint(NengoStyle.COLOR_NOTIFICATION);
 			taskText.setOffset(0, -taskText.getHeight());
 			wo.addChild(taskText);
 

@@ -2,7 +2,7 @@ package ca.nengo.ui.lib.objects.activities;
 
 import java.awt.geom.Point2D;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.world.activities.Fader;
 import ca.nengo.ui.lib.world.piccolo.primitives.Text;
@@ -20,8 +20,8 @@ public class TransientMessage extends Text {
 
 	public TransientMessage(String text) {
 		super(text);
-		setFont(Style.FONT_BOLD);
-		setTextPaint(Style.COLOR_NOTIFICATION);
+		setFont(NengoStyle.FONT_BOLD);
+		setTextPaint(NengoStyle.COLOR_NOTIFICATION);
 		setConstrainWidthToTextWidth(true);
 		setPickable(false);
 		setChildrenPickable(false);

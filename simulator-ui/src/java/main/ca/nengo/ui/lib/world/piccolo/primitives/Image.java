@@ -2,7 +2,7 @@ package ca.nengo.ui.lib.world.piccolo.primitives;
 
 import java.net.URL;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 
 public class Image extends WorldObjectImpl {
@@ -20,7 +20,7 @@ public class Image extends WorldObjectImpl {
 
 	public void init() {
 		imageNode = (PXImage) getPiccolo();
-		setPaint(Style.COLOR_BACKGROUND2);
+		setPaint(NengoStyle.COLOR_BACKGROUND2);
 		setPickable(false);
 	}
 

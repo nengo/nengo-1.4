@@ -28,7 +28,7 @@ package ca.nengo.ui.models.icons;
 
 import java.awt.Color;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXPath;
@@ -40,7 +40,7 @@ import ca.nengo.ui.lib.world.piccolo.primitives.PXPath;
  */
 public class ProbeIcon extends ModelIcon {
 
-	public static Color DEFAULT_COLOR = Style.COLOR_LIGHT_PURPLE;
+	public static Color DEFAULT_COLOR = NengoStyle.COLOR_LIGHT_PURPLE;
 
 	private static final long serialVersionUID = 1L;
 
@@ -86,7 +86,7 @@ class Triangle extends PXPath {
 		lineTo(x, y);
 		closePath();
 
-		setPaint(Style.COLOR_LIGHT_PURPLE);
+		setPaint(NengoStyle.COLOR_LIGHT_PURPLE);
 
 	}
 

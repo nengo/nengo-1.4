@@ -13,7 +13,10 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * 
  * @author Shu Wu
  */
-public class Style {
+public class NengoStyle {
+	public static boolean GTK = UIManager.getSystemLookAndFeelClassName().
+		equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+	
 	public static final int ANIMATION_DROP_IN_WORLD_MS = 200;
 	/*
 	 * Colors
@@ -108,27 +111,27 @@ public class Style {
 	}
 
 	public static void applyStyle(Container item) {
-		item.setBackground(Style.COLOR_BACKGROUND);
-		item.setForeground(Style.COLOR_FOREGROUND);
+		item.setBackground(NengoStyle.COLOR_BACKGROUND);
+		item.setForeground(NengoStyle.COLOR_FOREGROUND);
 	}
 
 	public static void applyStyle(DefaultTreeCellRenderer cellRenderer) {
-		cellRenderer.setBackgroundNonSelectionColor(Style.COLOR_BACKGROUND);
-		cellRenderer.setBackgroundSelectionColor(Style.COLOR_BACKGROUND2);
-		cellRenderer.setTextNonSelectionColor(Style.COLOR_FOREGROUND);
-		cellRenderer.setTextSelectionColor(Style.COLOR_FOREGROUND);
+		cellRenderer.setBackgroundNonSelectionColor(NengoStyle.COLOR_BACKGROUND);
+		cellRenderer.setBackgroundSelectionColor(NengoStyle.COLOR_BACKGROUND2);
+		cellRenderer.setTextNonSelectionColor(NengoStyle.COLOR_FOREGROUND);
+		cellRenderer.setTextSelectionColor(NengoStyle.COLOR_FOREGROUND);
 
 	}
 
 	public static void applyMenuStyle(JComponent item, boolean isTitle) {
 		item.setOpaque(true);
 		// item.setBorder(null);
-		item.setBackground(Style.COLOR_BACKGROUND);
-		item.setForeground(Style.COLOR_FOREGROUND);
+		item.setBackground(NengoStyle.COLOR_BACKGROUND);
+		item.setForeground(NengoStyle.COLOR_FOREGROUND);
 		if (isTitle) {
-			item.setFont(Style.FONT_MENU_TITLE);
+			item.setFont(NengoStyle.FONT_MENU_TITLE);
 		} else {
-			item.setFont(Style.FONT_MENU);
+			item.setFont(NengoStyle.FONT_MENU);
 		}
 	}
 

@@ -1,7 +1,7 @@
 package ca.nengo.ui.lib.world.handlers;
 
 import ca.nengo.ui.lib.AppFrame;
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.WorldLayer;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
@@ -37,7 +37,7 @@ public class TooltipPickHandler extends AbstractPickHandler {
 		myPickDelay = pickDelay;
 		myKeepPickDelay = keepPickDelay;
 		tooltipFrame = new SelectionBorder(world);
-		tooltipFrame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
+		tooltipFrame.setFrameColor(NengoStyle.COLOR_TOOLTIP_BORDER);
 
 	}
 

@@ -65,6 +65,7 @@ import org.apache.log4j.Logger;
 import org.python.util.PythonInterpreter;
 
 import ca.nengo.config.JavaSourceParser;
+import ca.nengo.ui.lib.Style.NengoStyle;
 
 /**
  * A user interface panel for entering script commands. 
@@ -110,8 +111,6 @@ public class ScriptConsole extends JPanel {
 	private int myDefaultDismissDelay;
 	private long myLastHelpTime = 0;
 	private Action myHideTip;
-	private boolean gtk = UIManager.getSystemLookAndFeelClassName().equals(
-			"com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 
 	/**
 	 * @param interpreter
@@ -150,7 +149,7 @@ public class ScriptConsole extends JPanel {
 		myCommandField.addKeyListener(new CommandKeyListener(this));
 		myCommandField.setFocusTraversalKeysEnabled(false);
 
-		if(!gtk) {myCommandField.setBorder(null);}
+		if(!NengoStyle.GTK) {myCommandField.setBorder(null);}
 
 		myHistoryCompletor = new HistoryCompletor();
 		myCallChainCompletor = new CallChainCompletor(myInterpreter);
@@ -180,12 +179,12 @@ public class ScriptConsole extends JPanel {
 
 	private void setChildrenBackground(Color fg) {
 		myDisplayArea.setBackground(fg);
-		if(!gtk) {myCommandField.setBackground(fg);}
+		if(!NengoStyle.GTK) {myCommandField.setBackground(fg);}
 	}
 
 	private void setChildrenForeground(Color fg) {
 		myDisplayArea.setForeground(fg);
-		if(!gtk) {myCommandField.setForeground(fg);}
+		if(!NengoStyle.GTK) {myCommandField.setForeground(fg);}
 		seperator.setForeground(fg);
 	}
 
@@ -195,14 +194,14 @@ public class ScriptConsole extends JPanel {
 		
 		myStyleContext = new StyleContext();
 		rootStyle = myStyleContext.addStyle("root", null);
-		StyleConstants.setForeground(rootStyle, ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
+		StyleConstants.setForeground(rootStyle, ca.nengo.ui.lib.Style.NengoStyle.COLOR_FOREGROUND);
 
-		setChildrenBackground(ca.nengo.ui.lib.Style.Style.COLOR_BACKGROUND);
-		setChildrenForeground(ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
-		if(!gtk) {myCommandField.setCaretColor(ca.nengo.ui.lib.Style.Style.COLOR_LIGHT_GREEN);}
+		setChildrenBackground(ca.nengo.ui.lib.Style.NengoStyle.COLOR_BACKGROUND);
+		setChildrenForeground(ca.nengo.ui.lib.Style.NengoStyle.COLOR_FOREGROUND);
+		if(!NengoStyle.GTK) {myCommandField.setCaretColor(ca.nengo.ui.lib.Style.NengoStyle.COLOR_LIGHT_GREEN);}
 
 		commandStyle = myStyleContext.addStyle(COMMAND_STYLE, rootStyle);
-		StyleConstants.setForeground(commandStyle, ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
+		StyleConstants.setForeground(commandStyle, ca.nengo.ui.lib.Style.NengoStyle.COLOR_FOREGROUND);
 		StyleConstants.setItalic(commandStyle, true);
 		Style outputStyle = myStyleContext.addStyle(OUTPUT_STYLE, rootStyle);
 		StyleConstants.setForeground(outputStyle, Color.GRAY);
@@ -210,7 +209,7 @@ public class ScriptConsole extends JPanel {
 		StyleConstants.setForeground(errorStyle, Color.RED);
 
 		Style helpStyle = myStyleContext.addStyle(HELP_STYLE, rootStyle);
-		StyleConstants.setForeground(helpStyle, ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
+		StyleConstants.setForeground(helpStyle, ca.nengo.ui.lib.Style.NengoStyle.COLOR_FOREGROUND);
 	}
 
 	/**

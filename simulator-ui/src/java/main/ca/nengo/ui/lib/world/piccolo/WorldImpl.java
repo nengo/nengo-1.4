@@ -8,7 +8,7 @@ import java.util.Collection;
 
 import javax.swing.JPopupMenu;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.RemoveObjectsAction;
 import ca.nengo.ui.lib.actions.StandardAction;
@@ -189,8 +189,8 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		mySky.getCamera().addInputEventListener(new MouseHandler(this));
 
 		selectionEventHandler = new SelectionHandler(this, panHandler);
-		selectionEventHandler.setMarqueePaint(Style.COLOR_BORDER_SELECTED);
-		selectionEventHandler.setMarqueeStrokePaint(Style.COLOR_BORDER_SELECTED);
+		selectionEventHandler.setMarqueePaint(NengoStyle.COLOR_BORDER_SELECTED);
+		selectionEventHandler.setMarqueeStrokePaint(NengoStyle.COLOR_BORDER_SELECTED);
 		selectionEventHandler.setMarqueePaintTransparency(0.1f);
 
 		getPiccolo().addInputEventListener(new EventConsumer());
@@ -206,7 +206,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		 * Create the grid
 		 */
 		gridLayer = PXGrid.createGrid(getSky().getCamera(), UIEnvironment.getInstance()
-				.getUniverse().getRoot(), Style.COLOR_DARKBORDER, 1500);
+				.getUniverse().getRoot(), NengoStyle.COLOR_DARKBORDER, 1500);
 
 		/*
 		 * Let the top canvas have a handle on this world

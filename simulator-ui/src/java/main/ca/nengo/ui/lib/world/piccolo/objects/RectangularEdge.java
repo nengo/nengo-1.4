@@ -2,7 +2,7 @@ package ca.nengo.ui.lib.world.piccolo.objects;
 
 import java.awt.geom.Point2D;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXEdge;
@@ -35,7 +35,7 @@ class RectangleEdgeNode extends PXEdge {
 
 	public RectangleEdgeNode(WorldObjectImpl startNode, WorldObjectImpl endNode) {
 		super(startNode, endNode);
-		setDefaultColor(Style.colorTimes(Style.COLOR_FOREGROUND, 0.2f));
+		setDefaultColor(NengoStyle.colorTimes(NengoStyle.COLOR_FOREGROUND, 0.2f));
 		setPaint(getDefaultColor());
 		updateEdgeBounds();
 	}

@@ -8,7 +8,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.StandardAction;
 
 /**
@@ -29,7 +29,7 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 		style(menu);
 
 		if (label != null && label.compareTo("") != 0) {
-			addSection(label, Style.FONT_LARGE);
+			addSection(label, NengoStyle.FONT_LARGE);
 		}
 	}
 
@@ -65,7 +65,7 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 	}
 
 	public void addSection(String name) {
-		addSection(name, Style.FONT_BOLD);
+		addSection(name, NengoStyle.FONT_BOLD);
 	}
 
 	/**

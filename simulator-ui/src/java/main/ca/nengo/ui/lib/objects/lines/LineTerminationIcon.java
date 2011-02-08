@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.PaintContext;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 
@@ -22,7 +22,7 @@ public class LineTerminationIcon extends WorldObjectImpl {
 
 	static final int LINE_IN_WIDTH = 30;
 
-	private Color myColor = Style.COLOR_LINEIN;
+	private Color myColor = NengoStyle.COLOR_LINEIN;
 
 	public LineTerminationIcon() {
 		super();

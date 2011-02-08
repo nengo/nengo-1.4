@@ -1,6 +1,6 @@
 package ca.nengo.ui.lib.world.piccolo.objects;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.primitives.Path;
 
@@ -21,7 +21,7 @@ public class Button extends AbstractButton {
 		addChild(worldObject);
 
 		buttonCover = Path.createRectangle(0f, 0f, (float) worldObject.getWidth(), (float) worldObject.getHeight());
-		buttonCover.setPaint(Style.COLOR_FOREGROUND);
+		buttonCover.setPaint(NengoStyle.COLOR_FOREGROUND);
 		addChild(buttonCover);
 
 		initDefaultState();

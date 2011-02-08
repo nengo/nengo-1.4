@@ -40,7 +40,7 @@ import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.ArrayList;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 
 import edu.umd.cs.piccolo.util.PPaintContext;
 /**
@@ -100,8 +100,8 @@ class PXText extends PXNode {
 		setGreekThreshold(4);
 		setConstrainWidthToTextWidth(true);
 
-		setFont(Style.FONT_NORMAL);
-		setTextPaint(Style.COLOR_FOREGROUND);
+		setFont(NengoStyle.FONT_NORMAL);
+		setTextPaint(NengoStyle.COLOR_FOREGROUND);
 	}
 
 	// provided in case someone needs to override the way that lines are

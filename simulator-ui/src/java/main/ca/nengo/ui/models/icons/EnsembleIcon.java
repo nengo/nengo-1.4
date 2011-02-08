@@ -28,7 +28,7 @@ package ca.nengo.ui.models.icons;
 
 import java.awt.Graphics2D;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.PaintContext;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.models.nodes.UIEnsemble;
@@ -69,7 +69,7 @@ public class EnsembleIcon extends NodeContainerIcon {
 
 			Graphics2D g2 = paintContext.getGraphics();
 
-			g2.setColor(Style.COLOR_FOREGROUND);
+			g2.setColor(NengoStyle.COLOR_FOREGROUND);
 			g2.translate(Padding, Padding);
 
 			g2.fillOval(2, 9, CircleDiameter, CircleDiameter);

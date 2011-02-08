@@ -44,7 +44,7 @@ import javax.swing.border.EtchedBorder;
 
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 
@@ -142,7 +142,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 			}
 		});
 
-		button.setFont(Style.FONT_SMALL);
+		button.setFont(NengoStyle.FONT_SMALL);
 		buttonsPanel.add(button);
 
 		button = new JButton("Remove");
@@ -157,7 +157,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 				updateFromTemplate();
 			}
 		});
-		button.setFont(Style.FONT_SMALL);
+		button.setFont(NengoStyle.FONT_SMALL);
 		buttonsPanel.add(button);
 
 		templatesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

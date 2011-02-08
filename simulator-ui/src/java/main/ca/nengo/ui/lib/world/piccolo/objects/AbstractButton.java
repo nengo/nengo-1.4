@@ -5,7 +5,7 @@ import java.awt.Cursor;
 
 import javax.swing.SwingUtilities;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -19,15 +19,15 @@ public abstract class AbstractButton extends WorldObjectImpl {
 
 	private static final long serialVersionUID = 1L;
 
-	private Color defaultColor = Style.COLOR_BUTTON_BACKGROUND;
+	private Color defaultColor = NengoStyle.COLOR_BUTTON_BACKGROUND;
 
-	private Color highlightColor = Style.COLOR_BUTTON_HIGHLIGHT;
+	private Color highlightColor = NengoStyle.COLOR_BUTTON_HIGHLIGHT;
 
 	private Runnable myAction;
 
 	private ButtonState myState = ButtonState.DEFAULT;
 
-	private Color selectedColor = Style.COLOR_BUTTON_SELECTED;
+	private Color selectedColor = NengoStyle.COLOR_BUTTON_SELECTED;
 
 	/**
 	 * @param action

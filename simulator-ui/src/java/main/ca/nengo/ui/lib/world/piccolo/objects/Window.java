@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference;
 
 import javax.swing.JPopupMenu;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.world.Interactable;
@@ -84,8 +84,8 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 		myClippingRectangle = new PClip();
 		myClippingRectangle.addChild(content.getPiccolo());
-		myClippingRectangle.setPaint(Style.COLOR_BACKGROUND);
-		myBorder = new Border(this, Style.COLOR_FOREGROUND);
+		myClippingRectangle.setPaint(NengoStyle.COLOR_BACKGROUND);
+		myBorder = new Border(this, NengoStyle.COLOR_FOREGROUND);
 
 		getPiccolo().addChild(myClippingRectangle);
 		addChild(menubar);
@@ -337,12 +337,12 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 	private void init() {
 		addInputEventListener(this);
 		rectangle = Path.createRectangle(0, 0, 1, 1);
-		rectangle.setPaint(Style.COLOR_BACKGROUND2);
+		rectangle.setPaint(NengoStyle.COLOR_BACKGROUND2);
 
 		addChild(rectangle);
 
 		title = new Text(myWindow.getName());
-		title.setFont(Style.FONT_LARGE);
+		title.setFont(NengoStyle.FONT_LARGE);
 		addChild(title);
 
 		normalButton = new Button(new RestoreIcon(BUTTON_SIZE), new Runnable() {

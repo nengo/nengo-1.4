@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.world.Destroyable;
 import ca.nengo.ui.lib.world.WorldObject;
@@ -31,7 +31,7 @@ public class PXEdge extends PXPath implements PropertyChangeListener, Destroyabl
 	/**
 	 * Color of the line by default
 	 */
-	private Color defaultColor = Style.COLOR_LINE;
+	private Color defaultColor = NengoStyle.COLOR_LINE;
 
 	/**
 	 * Whether this edge is hidden in its default state
@@ -41,7 +41,7 @@ public class PXEdge extends PXPath implements PropertyChangeListener, Destroyabl
 	/**
 	 * Color of the line when it is highlighted
 	 */
-	private Color highlightColor = Style.COLOR_LINE_HIGHLIGHT;
+	private Color highlightColor = NengoStyle.COLOR_LINE_HIGHLIGHT;
 
 	private boolean isDirected;
 
@@ -446,7 +446,7 @@ class PointerTriangle extends PXEdge {
 	 */
 	public PointerTriangle(PXEdge edge) {
 		super(edge.getStartNode(), edge.getEndNode());
-		setPaint(Style.COLOR_LINEEND);
+		setPaint(NengoStyle.COLOR_LINEEND);
 
 		setBounds(-TRIANGLE_EDGE_LENGTH / 2, -TRIANGLE_EDGE_LENGTH / 2, TRIANGLE_EDGE_LENGTH,
 				TRIANGLE_EDGE_LENGTH);

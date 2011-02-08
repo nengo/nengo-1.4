@@ -3,7 +3,7 @@ package ca.nengo.ui.lib.world.piccolo.objects;
 import java.awt.Font;
 import java.awt.Paint;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.piccolo.primitives.Path;
 import ca.nengo.ui.lib.world.piccolo.primitives.Text;
 
@@ -35,11 +35,11 @@ public class TextButton extends AbstractButton {
 
 		myTextNode = new Text("");
 		myTextNode.setOffset(BORDER_WIDTH, BORDER_HEIGHT);
-		myTextNode.setFont(Style.FONT_BUTTONS);
-		myTextNode.setTextPaint(Style.COLOR_FOREGROUND);
+		myTextNode.setFont(NengoStyle.FONT_BUTTONS);
+		myTextNode.setTextPaint(NengoStyle.COLOR_FOREGROUND);
 
 		frame = Path.createRectangle(0, 0, 100, 100);
-		frame.setStrokePaint(Style.COLOR_BUTTON_BORDER);
+		frame.setStrokePaint(NengoStyle.COLOR_BUTTON_BORDER);
 
 		addChild(frame);
 		addChild(myTextNode);

@@ -3,7 +3,7 @@ package ca.nengo.ui.lib.world.piccolo.objects;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.WorldSky;
@@ -41,9 +41,9 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 		addChild(tooltip);
 		setPickable(true);
 		setChildrenPickable(false);
-		setPaint(Style.COLOR_BACKGROUND);
+		setPaint(NengoStyle.COLOR_BACKGROUND);
 
-		addChild(new Border(this, Style.COLOR_TOOLTIP_BORDER));
+		addChild(new Border(this, NengoStyle.COLOR_TOOLTIP_BORDER));
 
 		updateBounds();
 

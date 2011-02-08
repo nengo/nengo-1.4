@@ -33,7 +33,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import ca.nengo.model.Network;
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ReversableAction;
 import ca.nengo.ui.lib.actions.StandardAction;
@@ -323,7 +323,7 @@ class ExposedIcon extends PText {
 		super("E");
 
 		setTextPaint(color);
-		setFont(Style.FONT_XLARGE);
+		setFont(NengoStyle.FONT_XLARGE);
 	}
 
 }

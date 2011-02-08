@@ -69,7 +69,7 @@ import ca.nengo.ui.dataList.DataListView;
 import ca.nengo.ui.dataList.SimulatorDataModel;
 import ca.nengo.ui.lib.AppFrame;
 import ca.nengo.ui.lib.AuxillarySplitPane;
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.DisabledAction;
 import ca.nengo.ui.lib.actions.DragAction;
@@ -437,7 +437,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 		pythonInterpreter = new PythonInterpreter();
 		scriptConsole = new ScriptConsole(pythonInterpreter);
-		Style.applyStyle(scriptConsole);
+		NengoStyle.applyStyle(scriptConsole);
 
 		/*
 		 * Create nested split panes
@@ -731,7 +731,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 			super();
 			auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Configuration",
 					AuxillarySplitPane.Orientation.Right);
-			auxSplitPane.getAuxPaneWrapper().setBackground(Style.COLOR_CONFIGURE_BACKGROUND);
+			auxSplitPane.getAuxPaneWrapper().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);
 			currentObj=null;
 		}
 		
@@ -751,7 +751,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 				
 
 				ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
-				configurationPane.getTree().setBackground(Style.COLOR_CONFIGURE_BACKGROUND);
+				configurationPane.getTree().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);
 				
 				
 				// Style.applyStyle(configurationPane.getTree());

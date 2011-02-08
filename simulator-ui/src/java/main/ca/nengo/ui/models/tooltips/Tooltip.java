@@ -29,7 +29,7 @@ package ca.nengo.ui.models.tooltips;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import edu.umd.cs.piccolo.nodes.PText;
@@ -61,8 +61,8 @@ public class Tooltip extends WorldObjectImpl {
 	private void init() {
 		PText tag = new PText(tooltipBuilder.getName());
 		tag.setConstrainWidthToTextWidth(false);
-		tag.setTextPaint(Style.COLOR_FOREGROUND);
-		tag.setFont(Style.FONT_LARGE);
+		tag.setTextPaint(NengoStyle.COLOR_FOREGROUND);
+		tag.setFont(NengoStyle.FONT_LARGE);
 		tag.setWidth(tooltipWidth);
 		int layoutY = 0;
 		getPiccolo().addChild(tag);

@@ -5,7 +5,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.Destroyable;
 import ca.nengo.ui.lib.world.WorldLayer;
 import ca.nengo.ui.lib.world.WorldObject.Listener;
@@ -222,8 +222,8 @@ class Anchor implements Destroyable, Listener {
 
 		border.setStroke(new BasicStroke(2f));
 		line.setStroke(new BasicStroke(2f));
-		border.setStrokePaint(Style.COLOR_ANCHOR);
-		line.setStrokePaint(Style.COLOR_ANCHOR);
+		border.setStrokePaint(NengoStyle.COLOR_ANCHOR);
+		line.setStrokePaint(NengoStyle.COLOR_ANCHOR);
 
 		ground.addChild(line);
 		ground.addChild(border);

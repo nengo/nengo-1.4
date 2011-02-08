@@ -35,7 +35,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 
 /**
  * Swing Input panel to be used to enter in the value for a ConfigParam
@@ -67,8 +67,8 @@ public abstract class PropertyInputPanel {
 		outerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
 		JLabel label = new JLabel(property.getName());
-		label.setForeground(Style.COLOR_DARK_BLUE);
-		label.setFont(Style.FONT_BOLD);
+		label.setForeground(NengoStyle.COLOR_DARK_BLUE);
+		label.setFont(NengoStyle.FONT_BOLD);
 		outerPanel.add(label);
 
 		innerPanel = new JPanel();
@@ -77,7 +77,7 @@ public abstract class PropertyInputPanel {
 		outerPanel.add(innerPanel);
 
 		statusMessage = new JLabel("");
-		statusMessage.setForeground(Style.COLOR_HIGH_SALIENCE);
+		statusMessage.setForeground(NengoStyle.COLOR_HIGH_SALIENCE);
 
 		outerPanel.add(statusMessage);
 

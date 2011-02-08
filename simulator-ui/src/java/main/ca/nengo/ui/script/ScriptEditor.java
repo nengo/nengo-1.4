@@ -64,7 +64,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
 import ca.nengo.ui.lib.AppFrame;
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
@@ -97,12 +97,12 @@ public class ScriptEditor extends JPanel {
 		myScripts = new ArrayList<ScriptData>(10);
 		setLayout(new BorderLayout());
 		myTabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
-		myTabs.setBackground(Style.COLOR_BACKGROUND);
+		myTabs.setBackground(NengoStyle.COLOR_BACKGROUND);
 		add(myTabs, BorderLayout.CENTER);
 
 		myDirectory = directory;
 		myFilter = new ExtensionFileFilter(new String[] { "py" });
-		setBackground(Style.COLOR_BACKGROUND);
+		setBackground(NengoStyle.COLOR_BACKGROUND);
 		setBorder(null);
 	}
 
@@ -245,13 +245,13 @@ public class ScriptEditor extends JPanel {
 
 	private ScriptData openEditor(File file, boolean saved, String name) {
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.setBackground(ca.nengo.ui.lib.Style.Style.COLOR_BACKGROUND);
+		panel.setBackground(ca.nengo.ui.lib.Style.NengoStyle.COLOR_BACKGROUND);
 
 		JEditorPane ep = new JEditorPane();
 
-		ep.setForeground(ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
-		ep.setBackground(ca.nengo.ui.lib.Style.Style.COLOR_BACKGROUND);
-		ep.setCaretColor(ca.nengo.ui.lib.Style.Style.COLOR_LIGHT_BLUE);
+		ep.setForeground(ca.nengo.ui.lib.Style.NengoStyle.COLOR_FOREGROUND);
+		ep.setBackground(ca.nengo.ui.lib.Style.NengoStyle.COLOR_BACKGROUND);
+		ep.setCaretColor(ca.nengo.ui.lib.Style.NengoStyle.COLOR_LIGHT_BLUE);
 
 		final StyledDocument doc = new DefaultStyledDocument();
 		ep.setDocument(doc);
@@ -260,7 +260,7 @@ public class ScriptEditor extends JPanel {
 		panel.add(scroll, BorderLayout.CENTER);
 
 		final JLabel positionLabel = new JLabel("1 : 1");
-		positionLabel.setForeground(ca.nengo.ui.lib.Style.Style.COLOR_FOREGROUND);
+		positionLabel.setForeground(ca.nengo.ui.lib.Style.NengoStyle.COLOR_FOREGROUND);
 		panel.add(positionLabel, BorderLayout.SOUTH);
 
 		ep.addCaretListener(new CaretListener() {
@@ -414,9 +414,9 @@ public class ScriptEditor extends JPanel {
 
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBorder(null);
-		Style.applyMenuStyle(menuBar, true);
+		NengoStyle.applyMenuStyle(menuBar, true);
 
-		frame.setBackground(Style.COLOR_BACKGROUND2);
+		frame.setBackground(NengoStyle.COLOR_BACKGROUND2);
 
 		MenuBuilder fileMenu = new MenuBuilder("File");
 		fileMenu.getJMenu().setMnemonic(KeyEvent.VK_F);

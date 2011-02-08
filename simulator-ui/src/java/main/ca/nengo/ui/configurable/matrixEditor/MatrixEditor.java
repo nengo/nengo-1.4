@@ -42,8 +42,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+
+import ca.nengo.ui.lib.Style.NengoStyle;
 
 /**
  * An UI component for editing matrices.
@@ -89,6 +92,11 @@ public class MatrixEditor extends JPanel {
 
 	// for testing
 	public static void main(String args[]) {
+		try {  
+			 //Tell the UIManager to use the platform look and feel  
+			 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch(Exception e) { /*Do nothing*/ }
+		
 		CouplingMatrix matrix = new CouplingMatrixImpl(5, 3);
 		MatrixEditor editor = new MatrixEditor(matrix);
 
@@ -121,6 +129,9 @@ public class MatrixEditor extends JPanel {
 		super(new BorderLayout());
 		myTableModel = new MatrixTableModel(theMatrix);
 		myTable = new JTable(myTableModel);
+		if (NengoStyle.GTK) {
+			myTable.setRowHeight(24);
+		}
 		myTable.setDefaultEditor(Object.class, new MyCellEditor());
 		JScrollPane scroll = new JScrollPane(myTable);
 		this.add(scroll, BorderLayout.CENTER);

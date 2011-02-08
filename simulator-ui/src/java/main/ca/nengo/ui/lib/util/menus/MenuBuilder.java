@@ -8,7 +8,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.StandardAction;
 
 public class MenuBuilder extends AbstractMenuBuilder {
@@ -67,7 +67,7 @@ public class MenuBuilder extends AbstractMenuBuilder {
 	}
 
 	public void addSection(String name) {
-		addSection(name, Style.FONT_BOLD);
+		addSection(name, NengoStyle.FONT_BOLD);
 	}
 
 	/**

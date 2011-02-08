@@ -15,7 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 
 /**
  * Customized split pane implementation which holds main and an auxillary
@@ -84,23 +84,23 @@ public class AuxillarySplitPane extends JSplitPane {
 			}
 		});
 
-		Style.applyStyle(leftPanel);
+		NengoStyle.applyStyle(leftPanel);
 
 		/*
 		 * Create auxillary panel's title bar
 		 */
 		JPanel titleBar = new JPanel();
 		titleBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-		Style.applyStyle(titleBar);
-		titleBar.setBackground(Style.COLOR_BACKGROUND2);
+		NengoStyle.applyStyle(titleBar);
+		titleBar.setBackground(NengoStyle.COLOR_BACKGROUND2);
 		titleBar.setOpaque(true);
 		titleBar.setLayout(new BorderLayout());
 
 		JLabel titleLabel = new JLabel(title);
 
-		titleLabel.setFont(Style.FONT_BIG);
-		Style.applyStyle(titleLabel);
-		titleLabel.setBackground(Style.COLOR_BACKGROUND2);
+		titleLabel.setFont(NengoStyle.FONT_BIG);
+		NengoStyle.applyStyle(titleLabel);
+		titleLabel.setBackground(NengoStyle.COLOR_BACKGROUND2);
 		titleLabel.setOpaque(true);
 
 		String hideButtonTxt = " << ";
@@ -108,8 +108,8 @@ public class AuxillarySplitPane extends JSplitPane {
 			hideButtonTxt = " >> ";
 		}
 		JLabel hideButton = new JLabel(hideButtonTxt);
-		Style.applyStyle(hideButton);
-		hideButton.setBackground(Style.COLOR_BACKGROUND2);
+		NengoStyle.applyStyle(hideButton);
+		hideButton.setBackground(NengoStyle.COLOR_BACKGROUND2);
 		hideButton.setOpaque(true);
 
 		/*
@@ -129,7 +129,7 @@ public class AuxillarySplitPane extends JSplitPane {
 		leftPanel.setMinimumSize(new Dimension(MINIMUM_WIDTH, MINIMUM_HEIGHT));
 
 		if (auxPanel != null) {
-			Style.applyStyle(auxPanel);
+			NengoStyle.applyStyle(auxPanel);
 			leftPanel.add(auxPanel, BorderLayout.CENTER);
 		}
 
@@ -137,7 +137,7 @@ public class AuxillarySplitPane extends JSplitPane {
 	}
 
 	private void init(Container auxillaryPanel) {
-		Style.applyStyle(this);
+		NengoStyle.applyStyle(this);
 		setOneTouchExpandable(true);
 		setBorder(null);
 
@@ -259,7 +259,7 @@ public class AuxillarySplitPane extends JSplitPane {
 		}
 
 		public void mouseEntered(MouseEvent e) {
-			hideButton.setBackground(Style.COLOR_FOREGROUND2);
+			hideButton.setBackground(NengoStyle.COLOR_FOREGROUND2);
 		}
 
 		public void mouseExited(MouseEvent e) {

@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.world.Destroyable;
@@ -69,13 +69,13 @@ public class Universe extends PCanvas implements Destroyable {
 	 */
 	private void initStatusPanel() {
 		statusTextBackground = Path.createRectangle(0, 0, 1, 1);
-		statusTextBackground.setPaint(Style.COLOR_BACKGROUND);
+		statusTextBackground.setPaint(NengoStyle.COLOR_BACKGROUND);
 		statusTextBackground.setTransparency(0.7f);
 
 		statusMessageLabel = new Text("welcome to " + UIEnvironment.getInstance().getAppName());
 
 		taskMessagesLabel = new Text();
-		taskMessagesLabel.setTextPaint(Style.COLOR_LIGHT_BLUE);
+		taskMessagesLabel.setTextPaint(NengoStyle.COLOR_LIGHT_BLUE);
 
 		interactionModeLabel = new Text();
 		interactionModeLabel.setPickable(true);
@@ -103,9 +103,9 @@ public class Universe extends PCanvas implements Destroyable {
 
 		taskMessagesLabel.setVisible(false);
 
-		statusMessageLabel.setFont(Style.FONT_MENU);
-		interactionModeLabel.setFont(Style.FONT_MENU);
-		taskMessagesLabel.setFont(Style.FONT_MENU);
+		statusMessageLabel.setFont(NengoStyle.FONT_MENU);
+		interactionModeLabel.setFont(NengoStyle.FONT_MENU);
+		taskMessagesLabel.setFont(NengoStyle.FONT_MENU);
 
 		layoutText();
 	}

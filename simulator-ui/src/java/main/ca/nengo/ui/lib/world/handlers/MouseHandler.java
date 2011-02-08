@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.world.Interactable;
 import ca.nengo.ui.lib.world.WorldObject;
@@ -53,7 +53,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public MouseHandler(WorldImpl world) {
 		super();
 		frame = new SelectionBorder(world);
-		frame.setFrameColor(Style.COLOR_TOOLTIP_BORDER);
+		frame.setFrameColor(NengoStyle.COLOR_TOOLTIP_BORDER);
 		this.world = world;
 	}
 

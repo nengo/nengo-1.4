@@ -61,7 +61,7 @@ import ca.nengo.ui.actions.ConfigureAction;
 import ca.nengo.ui.util.FileExtensionFilter;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.TimeSeries;
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ReversableAction;
 import ca.nengo.ui.lib.actions.StandardAction;
@@ -89,11 +89,11 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 		// Create a tree that allows one selection at a time.
 		tree = new JTree(dataModel);
 		tree.setRootVisible(false);
-		Style.applyStyle(tree);
+		NengoStyle.applyStyle(tree);
 		DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
 		tree.setCellRenderer(treeRenderer);
 		// treeRenderer.setBackground(Style.COLOR_BACKGROUND);
-		Style.applyStyle(treeRenderer);
+		NengoStyle.applyStyle(treeRenderer);
 
 		// tree.setEditable(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);

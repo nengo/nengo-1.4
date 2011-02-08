@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.UnsupportedOperationException;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.WorldSky;
 import ca.nengo.ui.lib.world.handlers.KeyboardFocusHandler;
 import ca.nengo.ui.lib.world.handlers.ScrollZoomHandler;
@@ -37,7 +37,7 @@ public class WorldSkyImpl extends WorldLayerImpl implements WorldSky {
 		super("Sky", new PXCamera());
 
 		myCamera = (PXCamera) getPiccolo();
-		myCamera.setPaint(Style.COLOR_BACKGROUND);
+		myCamera.setPaint(NengoStyle.COLOR_BACKGROUND);
 
 		/*
 		 * Attach handlers

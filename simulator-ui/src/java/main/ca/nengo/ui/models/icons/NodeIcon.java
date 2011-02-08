@@ -26,7 +26,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.icons;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.world.piccolo.primitives.Path;
 
@@ -40,7 +40,7 @@ public class NodeIcon extends ModelIcon {
 
 	public NodeIcon(ModelObject parent) {
 		super(parent, Path.createEllipse(0, 0, 50, 50));
-		getIconReal().setPaint(Style.COLOR_FOREGROUND);
+		getIconReal().setPaint(NengoStyle.COLOR_FOREGROUND);
 		configureLabel(false);
 
 	}

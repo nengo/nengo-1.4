@@ -59,7 +59,7 @@ import ca.nengo.ui.configurable.managers.ConfigDialog;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
 import ca.nengo.ui.configurable.panels.StringPanel;
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UserMessages;
 
 public class FnCustom extends AbstractFn {
@@ -248,17 +248,17 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
 			JButton button;
 			button = new JButton("New");
 			button.addActionListener(new NewFunctionAL());
-			button.setFont(Style.FONT_SMALL);
+			button.setFont(NengoStyle.FONT_SMALL);
 			buttonsPanel.add(button);
 
 			button = new JButton("Remove");
 			button.addActionListener(new RemoveFunctionAL());
-			button.setFont(Style.FONT_SMALL);
+			button.setFont(NengoStyle.FONT_SMALL);
 			buttonsPanel.add(button);
 
 			button = new JButton("Preview");
 			button.addActionListener(new PreviewFunctionAL());
-			button.setFont(Style.FONT_SMALL);
+			button.setFont(NengoStyle.FONT_SMALL);
 			buttonsPanel.add(button);
 
 			savedFilesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

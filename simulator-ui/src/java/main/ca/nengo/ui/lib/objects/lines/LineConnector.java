@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import javax.swing.JPopupMenu;
 
-import ca.nengo.ui.lib.Style.Style;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
@@ -45,7 +45,7 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 		((WorldGroundImpl) well.getWorldLayer()).addEdge(myEdge);
 
 		myIcon = new LineOriginIcon();
-		myIcon.setColor(Style.COLOR_LINEEND);
+		myIcon.setColor(NengoStyle.COLOR_LINEEND);
 		addChild(myIcon);
 
 		setBounds(parentToLocal(getFullBounds()));
