@@ -36,8 +36,9 @@ import ca.nengo.util.VectorGenerator;
  * 
  * @author Bryan Tripp
  */
-public class Rectifier implements VectorGenerator {
+public class Rectifier implements VectorGenerator, java.io.Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private VectorGenerator myVG;
 	private boolean myPositiveFlag = true;
 	
