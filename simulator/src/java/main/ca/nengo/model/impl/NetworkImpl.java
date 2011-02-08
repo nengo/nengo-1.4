@@ -286,12 +286,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 //	}
 	
 	/**
-	 * If the event indicates that a component node's name is changing, 
-	 * checks for name conflicts and throws an exception if there is one, 
-	 * and updates the name reference.  Otherwise, checks to see if any
-	 * of the projections in this network contain references to origins
-	 * or terminations that no longer exist, and removes any such defunct
-	 * projections.
+	 * Handles any changes/errors that may arise from objects within the network changing.
 	 *  
 	 * @see ca.nengo.util.VisiblyMutable.Listener#changed(ca.nengo.util.VisiblyMutable.Event)
 	 */
@@ -312,28 +307,37 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 				myNodeMap.remove(ne.getOldName());
 			}
 		}
-		else
+		else if(e instanceof VisiblyMutable.NodeRemovedEvent)
 		{
-			//check if any of the origins or terminations involved in projections have been removed
-			Projection[] projections = getProjections();
-			ArrayList<Termination> nodeTerms = getNodeTerminations();
-			ArrayList<Origin> nodeOrigs = getNodeOrigins();
-			for(int i = 0; i < projections.length; i++)
-			{
-				if(!nodeTerms.contains(projections[i].getTermination()) || !nodeOrigs.contains(projections[i].getOrigin()))
-					removeProjection(projections[i].getTermination());
-			}
+			Node n = ((NodeRemovedEvent)e).getNode();
+//			//check if any of the origins or terminations involved in projections have been removed
+//			Projection[] projections = getProjections();
+//			Termination[] nodeTerms = n.getTerminations();
+//			Origin[] nodeOrigs = n.getOrigins();
+//			System.out.println(n.getName());
+//			for(int i = 0; i < projections.length; i++)
+//			{
+//				boolean found = false;
+//				for(Termination term : nodeTerms)
+//				{
+//					if(term == projections[i].getTermination())
+//						found = true;
+//				}
+//				for(Origin orig : nodeOrigs)
+//				{
+//					if(orig == projections[i].getOrigin())
+//						found = true;
+//				}
+//				if(found)
+//					removeProjection(projections[i].getTermination());
+//			}
 			
 			//check if any of the probes are no longer connected to anything (i.e. the population they
 			//were pointing to has been removed)
 			Probe[] probes = mySimulator.getProbes();
 			for(Probe probe : probes)
 			{
-				try
-				{
-					probe.getTarget().getHistory(probe.getStateName());
-				}
-				catch(SimulationException se1)
+				if(probe.getTarget() == n)
 				{
 					try
 					{
@@ -444,6 +448,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			
 			myNodeMap.remove(name);
 			node.removeChangeListener(this);
+			VisiblyMutableUtils.nodeRemoved(this, node, myListeners);
 		} else {
 			throw new StructuralException("No Node named " + name + " in this Network");
 		}

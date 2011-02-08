@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import ca.nengo.model.Node;
 import ca.nengo.model.StructuralException;
 
 /**
@@ -63,6 +64,7 @@ public class VisiblyMutableUtils {
 			throw new RuntimeException(e);
 		}
 	}
+	
 
 	/**
 	 * @param vm The changed VisiblyMutable object
@@ -94,6 +96,33 @@ public class VisiblyMutableUtils {
 			fire(event, listeners);			
 		} catch (RuntimeException e) {
 			throw new StructuralException(e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * Notifies listeners that a node has been removed within the given object.  
+	 * 
+	 * @param vm The changed VisiblyMutable object
+	 * @param n The node that was removed
+	 * @param listeners List of things listening for changes
+	 */
+	public static void nodeRemoved(final VisiblyMutable vm, final Node n, List<VisiblyMutable.Listener> listeners) {
+		VisiblyMutable.NodeRemovedEvent event = new VisiblyMutable.NodeRemovedEvent() {
+			public VisiblyMutable getObject() {
+				return vm;
+			}
+			
+			public Node getNode()
+			{
+				return n;
+			}
+		};
+		
+		try {
+			fire(event, listeners);
+		} catch (StructuralException e) {
+			ourLogger.error(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

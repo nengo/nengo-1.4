@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.nengo.model.Ensemble;
-import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
@@ -314,7 +313,7 @@ public class NetworkImplTest extends TestCase {
 		myNetwork.removeNode("a");
 	}
 	
-	public void testChanged() throws StructuralException
+	public void testChanged() throws StructuralException, SimulationException
 	{
 		NetworkImpl b = new NetworkImpl();
 		b.setName("b");
@@ -324,26 +323,39 @@ public class NetworkImplTest extends TestCase {
 		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
 		b.addNode(a);
 		
-		b.exposeOrigin(a.getOrigin("X"), "exposed");
+//		b.exposeOrigin(a.getOrigin("X"), "exposed");
+//		
+//		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
+//		float[][] tmp = new float[1][1];
+//		tmp[0][0] = 1;
+//		c.addDecodedTermination("in", tmp, 0.007f, false);
+//		myNetwork.addNode(c);
+//		
+//		myNetwork.addProjection(b.getOrigin("exposed"), c.getTermination("in"));
+//		
+//		if(myNetwork.getProjections().length != 1)
+//			fail("Projection not created properly");
+//		
+//		b.hideOrigin("exposed");
+//		
+//		if(myNetwork.getProjections().length != 0)
+//			fail("Projection not removed");
+//		
+//		myNetwork.removeNode("b");
+//		myNetwork.removeNode("c");
 		
-		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
-		float[][] tmp = new float[1][1];
-		tmp[0][0] = 1;
-		c.addDecodedTermination("in", tmp, 0.007f, false);
-		myNetwork.addNode(c);
+		b.getSimulator().addProbe("a", "X", true);
+		myNetwork.collectAllProbes();
 		
-		myNetwork.addProjection(b.getOrigin("exposed"), c.getTermination("in"));
+		if(myNetwork.getSimulator().getProbes().length != 1)
+			fail("Probe not added");
 		
-		if(myNetwork.getProjections().length != 1)
-			fail("Projection not created properly");
+		b.removeNode("a");
 		
-		b.hideOrigin("exposed");
-		
-		if(myNetwork.getProjections().length != 0)
-			fail("Projection not removed");
+		if(myNetwork.getSimulator().getProbes().length != 0)
+			fail("Probe not removed when node removed");
 		
 		myNetwork.removeNode("b");
-		myNetwork.removeNode("c");
 	}
 	
 	public void testGetNodeTerminations() throws StructuralException

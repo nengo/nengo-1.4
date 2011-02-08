@@ -28,6 +28,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.util;
 
+import ca.nengo.model.Node;
 import ca.nengo.model.StructuralException;
 
 /**
@@ -76,6 +77,7 @@ public interface VisiblyMutable {
 		 * @return An object that has changed in some way 
 		 */
 		public VisiblyMutable getObject();		
+
 	}
 	
 	/**
@@ -95,6 +97,16 @@ public interface VisiblyMutable {
 		 * @return The new name of the object
 		 */
 		public String getNewName();
+	}
+	
+	/**
+	 * Encapsulates a "node removed" change in the VisiblyMutable object.
+	 */
+	public static interface NodeRemovedEvent extends Event {
+		/**
+		 * @return the node that has been removed
+		 */
+		public Node getNode();
 	}
 	
 }
