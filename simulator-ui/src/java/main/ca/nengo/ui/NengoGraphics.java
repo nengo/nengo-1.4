@@ -468,14 +468,18 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	 * Prompt user to save models in NengoGraphics.
 	 * This is most likely called right before the application is exiting.
 	 */
-	protected void promptToSaveModels() {
-
+	protected boolean promptToSaveModels() {
+		boolean saveSuccessful = true;
+		
 		for (WorldObject wo : getWorld().getGround().getChildren()) {
 			if (wo instanceof UINeoNode) {
 				SaveNodeAction saveAction = new SaveNodeAction((UINeoNode) wo, true);
 				saveAction.doAction();
+				saveSuccessful = saveSuccessful && saveAction.getSaveSuccessful();
 			}
 		}
+		
+		return saveSuccessful;
 	}
 
 	@Override
@@ -560,14 +564,19 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	@Override
 	public void exitAppFrame() {
-		if (getWorld().getGround().getChildrenCount() > 0) {
+		if (getWorld().getGround().getChildrenCount() > 0) 
+		{
 			int response = JOptionPane.showConfirmDialog(this,
-					"Save models before closing?",
+					"Save models?",
 					"Exiting " + getAppName(),
 					JOptionPane.YES_NO_CANCEL_OPTION);
-			if (response == JOptionPane.YES_OPTION) {
-				promptToSaveModels();
-			}else if (response == JOptionPane.CANCEL_OPTION ||response == JOptionPane.CLOSED_OPTION) {
+			if (response == JOptionPane.YES_OPTION) 
+			{
+				if (!promptToSaveModels())
+					return;
+			}
+			else if (response == JOptionPane.CANCEL_OPTION ||response == JOptionPane.CLOSED_OPTION) 
+			{
 				/*
 				 * Cancel exit
 				 */

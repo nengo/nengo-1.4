@@ -58,6 +58,11 @@ public class SaveNodeAction extends StandardAction {
 	private boolean blocking;
 
 	private UINeoNode nodeUI;
+	
+	/**
+	 * Whether or not the last save attempt was successful.
+	 */
+	private boolean saveSuccessful;
 
 	/**
 	 * @param nodeUI
@@ -87,6 +92,7 @@ public class SaveNodeAction extends StandardAction {
 
 	@Override
 	protected void action() throws ActionException {
+		saveSuccessful = false;
 		int returnVal = JFileChooser.CANCEL_OPTION;
 
 		NengoGraphics.FileChooser.setSelectedFile(new File(nodeUI.getFileName()));
@@ -97,30 +103,39 @@ public class SaveNodeAction extends StandardAction {
 			file = NengoGraphics.FileChooser.getSelectedFile();
 
 			if (blocking) {
-				saveModel();
+				saveSuccessful = saveModel();
 			} else {
 				new TrackedAction("Saving model") {
 					private static final long serialVersionUID = 1L;
 
 					@Override
 					protected void action() throws ActionException {
-						saveModel();
+						saveSuccessful = saveModel();
 					}
 				}.doAction();
 			}
+			
 
 		} else {
 			throw new UserCancelledException();
 		}
 	}
 
-	private void saveModel() {
+	private boolean saveModel() {
 		try {
 			nodeUI.saveModel(file);
 		} catch (IOException e) {
 			UserMessages.showError("Could not save file: " + e.toString());
+			return false;
 		} catch (OutOfMemoryError e) {
 			UserMessages.showError("Out of memory, please increase memory size: " + e.toString());
+			return false;
 		}
+		return true;
+	}
+	
+	public boolean getSaveSuccessful()
+	{
+		return saveSuccessful;
 	}
 }
