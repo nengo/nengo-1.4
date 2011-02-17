@@ -83,6 +83,7 @@ public class ElasticWorld extends WorldImpl {
 
 		MenuBuilder algorithmLayoutMenu = menu.addSubMenu("Algorithm");
 
+		algorithmLayoutMenu.addAction(new JungLayoutAction(FeedForwardLayout.class, "Feed-Forward"));
 		algorithmLayoutMenu.addAction(new JungLayoutAction(FRLayout.class, "Fruchterman-Reingold"));
 		algorithmLayoutMenu.addAction(new JungLayoutAction(KKLayout.class, "Kamada-Kawai"));
 		algorithmLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class, "Circle"));
