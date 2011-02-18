@@ -28,12 +28,10 @@ public class FeedForwardLayout extends AbstractLayout {
 		super(g);
 	}
 
-	@Override
 	public boolean incrementsAreDone() {
 		return false;
 	}
 
-	@Override
 	public boolean isIncremental() {
 		return false;
 	}
@@ -69,7 +67,7 @@ public class FeedForwardLayout extends AbstractLayout {
 		Vertex v;
 		LinkedList<Vertex> vertices;
 		while (!sortedVertices.isEmpty()) {
-			vertices = sortedVertices.pop();
+			vertices = sortedVertices.removeFirst();
 			lengthH = vertices.size();
 			dH = height / (lengthH + 1);
 			x -= dW;
@@ -78,7 +76,7 @@ public class FeedForwardLayout extends AbstractLayout {
 			//down to each level of vertices
 			while (!vertices.isEmpty()) {
 				y += dH;
-				v = vertices.pop();
+				v = vertices.removeFirst();
 				coord = this.getCoordinates(v);
 				coord.setX(x);
 				coord.setY(y);
