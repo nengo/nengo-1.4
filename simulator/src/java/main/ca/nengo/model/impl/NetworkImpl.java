@@ -166,78 +166,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		fireVisibleChangeEvent();
 	}
 	
-	 /**
-	 * @param node Node to add to the Network 
-	 * @param includeProbes if true, when the node being added is a network any probes in that network will also be added
-	 * @throws StructuralException if the Network already contains a Node of the same name
-	 */
-	public void addNode(Node node, boolean includeProbes) throws StructuralException {
-		if (myNodeMap.containsKey(node.getName())) {
-			throw new StructuralException("This Network already contains a Node named " + node.getName());
-		}
-		
-		myNodeMap.put(node.getName(), node);
-		node.addChangeListener(this);
-		
-		
-		if(includeProbes && node instanceof NetworkImpl)
-			collectProbes((NetworkImpl)node);
-		
-		
-		
-		
-		getSimulator().initialize(this);		
-		fireVisibleChangeEvent();
-	}
-	
-	
-	/**
-	 * Removes all the probes from the specified network (recursively including subnetworks)
-	 * and adds them to this network.
-	 * 
-	 * @param network the network to collect probes from
-	 * 
-	 */
-	public void collectProbes(NetworkImpl network)
-	{
-		network.collectAllProbes();
-		
-		Probe[] networkProbes = network.getSimulator().getProbes();
-		for(int j = 0; j < networkProbes.length; j++)
-		{
-			try
-			{
-				network.getSimulator().removeProbe(networkProbes[j]);
-				
-				String ensembleName = "";
-				if(networkProbes[j].getEnsembleName() != null)
-					ensembleName = " " + networkProbes[j].getEnsembleName();
-			
-				getSimulator().addProbe("[" + network.getName() + ensembleName + "]", networkProbes[j].getTarget(), 
-						networkProbes[j].getStateName(), true);
-			}
-			catch(SimulationException se)
-			{
-				System.err.println("Error adding probe on " + networkProbes[j].getStateName() + " from network " + network.getName());
-			}
-		}
-	}
-	
-	/**
-	 * Collects probes from every node in this network.
-	 * 
-	 */
-	public void collectAllProbes()
-	{
-		Node[] nodes = getNodes();
-		
-		for(int i = 0; i < nodes.length; i++)
-		{
-			if(nodes[i] instanceof NetworkImpl)
-				collectProbes((NetworkImpl)nodes[i]);
-		}
-	}
-	
 	/***
 	 * Kills a certain percentage of neurons in the network (recursively including subnetworks).
 	 * 
@@ -305,50 +233,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			if (!ne.getOldName().equals(ne.getNewName())) {
 				myNodeMap.put(ne.getNewName(), myNodeMap.get(ne.getOldName()));
 				myNodeMap.remove(ne.getOldName());
-			}
-		}
-		else if(e instanceof VisiblyMutable.NodeRemovedEvent)
-		{
-			Node n = ((NodeRemovedEvent)e).getNode();
-//			//check if any of the origins or terminations involved in projections have been removed
-//			Projection[] projections = getProjections();
-//			Termination[] nodeTerms = n.getTerminations();
-//			Origin[] nodeOrigs = n.getOrigins();
-//			System.out.println(n.getName());
-//			for(int i = 0; i < projections.length; i++)
-//			{
-//				boolean found = false;
-//				for(Termination term : nodeTerms)
-//				{
-//					if(term == projections[i].getTermination())
-//						found = true;
-//				}
-//				for(Origin orig : nodeOrigs)
-//				{
-//					if(orig == projections[i].getOrigin())
-//						found = true;
-//				}
-//				if(found)
-//					removeProjection(projections[i].getTermination());
-//			}
-			
-			//check if any of the probes are no longer connected to anything (i.e. the population they
-			//were pointing to has been removed)
-			Probe[] probes = mySimulator.getProbes();
-			for(Probe probe : probes)
-			{
-				if(probe.getTarget() == n)
-				{
-					try
-					{
-						mySimulator.removeProbe(probe);
-					}
-					catch(SimulationException se2)
-					{
-						System.err.println("Error removing unconnected probe");
-						System.err.println(se2);
-					}
-				}
 			}
 		}
 	}
@@ -448,7 +332,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			
 			myNodeMap.remove(name);
 			node.removeChangeListener(this);
-			VisiblyMutableUtils.nodeRemoved(this, node, myListeners);
+//			VisiblyMutableUtils.nodeRemoved(this, node, myListeners);
 		} else {
 			throw new StructuralException("No Node named " + name + " in this Network");
 		}
@@ -563,6 +447,16 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
 		getSimulator().run(startTime, endTime, myStepSize);
+	}
+	
+	/**
+	 * Runs the model with the optional parameter topLevel.
+	 * 
+	 * @param topLevel true if the network being run is the top level network, false if it is a subnetwork
+	 */
+	public void run(float startTime, float endTime, boolean topLevel) throws SimulationException
+	{
+		getSimulator().run(startTime, endTime, myStepSize, topLevel);
 	}
 
 	/**

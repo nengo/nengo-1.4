@@ -97,7 +97,7 @@ public interface Ensemble extends Node {
 
 	/**
 	 * 
-	 * @return true if the spike pattern will be recorded in subsequen runs
+	 * @return true if the spike pattern will be recorded in subsequent runs
 	 */
 	public boolean isCollectingSpikes();
 	

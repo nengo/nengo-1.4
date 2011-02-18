@@ -46,6 +46,7 @@ import ca.nengo.model.Probeable;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.Termination;
+import ca.nengo.model.impl.NetworkImpl;
 //import ca.nengo.model.impl.NetworkImpl;
 //import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.sim.Simulator;
@@ -71,6 +72,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	private Node[] myNodes;
 	private Map<String, Node> myNodeMap;
 	private List<Probe> myProbes;
+	private boolean myDisplayProgress;
 	private transient List<VisiblyMutable.Listener> myChangeListeners;
 	private transient NodeThreadPool myNodeThreadPool;
 
@@ -82,6 +84,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	public LocalSimulator() {
 		mySimulatorListeners = new ArrayList<SimulatorListener>(1);
 		myChangeListeners = new ArrayList<Listener>(1);
+		myDisplayProgress = true;
 	}
 
 	/**
@@ -99,6 +102,23 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		if (myProbes == null)
 			myProbes = new ArrayList<Probe>(20);
 	}
+	
+	/**
+	 * @see ca.nengo.sim.Simulator#resetProbes()
+	 */
+	public void resetProbes()
+	{
+		Iterator<Probe> it = myProbes.iterator();
+		while (it.hasNext()) {
+			it.next().reset();
+		}
+		
+		for(Node node : myNodes)
+		{
+			if(node instanceof Network)
+				((Network)node).getSimulator().resetProbes();
+		}
+	}
 
 	/**
 	 * @see ca.nengo.sim.Simulator#run(float, float, float)
@@ -111,7 +131,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     /**
 	 * Run function with option to display (or not) the progress in the console
 	 */
-	public synchronized void run(float startTime, float endTime, float stepSize, boolean dispProgress)
+	public synchronized void run(float startTime, float endTime, float stepSize, boolean topLevel)
 			throws SimulationException {
 		
 //		float pre_time = System.nanoTime();
@@ -125,9 +145,9 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		}
 
 		
-		Iterator<Probe> it = myProbes.iterator();
-		while (it.hasNext()) {
-			it.next().reset();
+		if(topLevel)
+		{
+			resetProbes();
 		}
 		
 		fireSimulatorEvent(new SimulatorEvent(0, SimulatorEvent.Type.STARTED));
@@ -154,7 +174,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		int c = 0;
 		while (time < endTime) {
 			
-			if (c++ % 100 == 99 && dispProgress)
+			if (c++ % 100 == 99 && myDisplayProgress)
 				System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize)); 
 			
 			if (time + 1.5*thisStepSize > endTime) { //fudge step size to hit end exactly
@@ -194,7 +214,10 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			myNodeThreadPool.step(startTime, endTime);
 		}else{
 			for (int i = 0; i < myNodes.length; i++) {
-				myNodes[i].run(startTime, endTime);
+				if(myNodes[i] instanceof NetworkImpl)
+					((NetworkImpl)myNodes[i]).run(startTime, endTime, false);
+				else
+					myNodes[i].run(startTime, endTime);
 			}
 		}
 		
@@ -327,6 +350,11 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	 */
 	public Probe[] getProbes() {
 		return myProbes.toArray(new Probe[0]);
+	}
+	
+	public void setDisplayProgress(boolean display)
+	{
+		myDisplayProgress = display;
 	}
 
 	/**

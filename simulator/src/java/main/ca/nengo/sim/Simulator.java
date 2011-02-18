@@ -113,6 +113,12 @@ public interface Simulator extends VisiblyMutable, Cloneable {
 	 */
 	public void removeProbe(Probe probe) throws SimulationException;
 	
+	
+	/**
+	 * Resets all probes in the network, recursively including subnetworks.
+	 */
+	public void resetProbes();
+	
 	/**
 	 * Runs the Network for the given time range. The states of all components of the 
 	 * Network are assumed to be consistent with the given start time. So, you could 
@@ -127,6 +133,23 @@ public interface Simulator extends VisiblyMutable, Cloneable {
 	 * @throws SimulationException if a problem is encountered while trying to run
 	 */
 	public void run(float startTime, float endTime, float stepSize) throws SimulationException;
+	
+	/**
+	 * Runs the Network for the given time range. The states of all components of the 
+	 * Network are assumed to be consistent with the given start time. So, you could 
+	 * reset to the t=0 state, and then immediately start running from t=100, but the 
+	 * results may not make sense. 
+	 * 
+	 * @param startTime Simulation time at which running starts
+	 * @param endTime Simulation time at which running stops
+	 * @param stepSize Length of time step at which the Network is run. This determines the 
+	 * 		frequency with which outputs are passed between Ensembles, but individual 
+	 * 		Neurons may run with different and/or variable time steps.
+	 * @param topLevel true if the network being run is the top level network, false if it 
+	 * 		is a subnetwork
+	 * @throws SimulationException if a problem is encountered while trying to run
+	 */
+	public void run(float startTime, float endTime, float stepSize, boolean topLevel) throws SimulationException;
 	
 	/**
 	 * @return List of Probes that have been added to this Simulator.  

@@ -313,50 +313,50 @@ public class NetworkImplTest extends TestCase {
 		myNetwork.removeNode("a");
 	}
 	
-	public void testChanged() throws StructuralException, SimulationException
-	{
-		NetworkImpl b = new NetworkImpl();
-		b.setName("b");
-		myNetwork.addNode(b);
-		
-		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
-		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
-		b.addNode(a);
-		
-//		b.exposeOrigin(a.getOrigin("X"), "exposed");
+//	public void testChanged() throws StructuralException, SimulationException
+//	{
+//		NetworkImpl b = new NetworkImpl();
+//		b.setName("b");
+//		myNetwork.addNode(b);
 //		
-//		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
-//		float[][] tmp = new float[1][1];
-//		tmp[0][0] = 1;
-//		c.addDecodedTermination("in", tmp, 0.007f, false);
-//		myNetwork.addNode(c);
+//		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+//		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
+//		b.addNode(a);
 //		
-//		myNetwork.addProjection(b.getOrigin("exposed"), c.getTermination("in"));
+////		b.exposeOrigin(a.getOrigin("X"), "exposed");
+////		
+////		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
+////		float[][] tmp = new float[1][1];
+////		tmp[0][0] = 1;
+////		c.addDecodedTermination("in", tmp, 0.007f, false);
+////		myNetwork.addNode(c);
+////		
+////		myNetwork.addProjection(b.getOrigin("exposed"), c.getTermination("in"));
+////		
+////		if(myNetwork.getProjections().length != 1)
+////			fail("Projection not created properly");
+////		
+////		b.hideOrigin("exposed");
+////		
+////		if(myNetwork.getProjections().length != 0)
+////			fail("Projection not removed");
+////		
+////		myNetwork.removeNode("b");
+////		myNetwork.removeNode("c");
 //		
-//		if(myNetwork.getProjections().length != 1)
-//			fail("Projection not created properly");
+//		b.getSimulator().addProbe("a", "X", true);
+//		myNetwork.collectAllProbes();
 //		
-//		b.hideOrigin("exposed");
+//		if(myNetwork.getSimulator().getProbes().length != 1)
+//			fail("Probe not added");
 //		
-//		if(myNetwork.getProjections().length != 0)
-//			fail("Projection not removed");
+//		b.removeNode("a");
+//		
+//		if(myNetwork.getSimulator().getProbes().length != 0)
+//			fail("Probe not removed when node removed");
 //		
 //		myNetwork.removeNode("b");
-//		myNetwork.removeNode("c");
-		
-		b.getSimulator().addProbe("a", "X", true);
-		myNetwork.collectAllProbes();
-		
-		if(myNetwork.getSimulator().getProbes().length != 1)
-			fail("Probe not added");
-		
-		b.removeNode("a");
-		
-		if(myNetwork.getSimulator().getProbes().length != 0)
-			fail("Probe not removed when node removed");
-		
-		myNetwork.removeNode("b");
-	}
+//	}
 	
 	public void testGetNodeTerminations() throws StructuralException
 	{

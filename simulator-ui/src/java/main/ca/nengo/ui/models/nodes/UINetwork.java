@@ -35,7 +35,6 @@ import ca.nengo.model.Network;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.sim.Simulator;
 import ca.nengo.ui.NengoGraphics;
-import ca.nengo.ui.actions.CollectProbesAction;
 import ca.nengo.ui.actions.RunInteractivePlotstAction;
 import ca.nengo.ui.actions.RunSimulatorAction;
 import ca.nengo.ui.lib.util.UserMessages;
@@ -123,8 +122,6 @@ public class UINetwork extends UINodeViewable {
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
 		constructSimulatorMenu(menu, this);
-		
-		menu.addAction("Data Collection", new CollectProbesAction((UINetwork)this));
 	}
 
 	@Override

@@ -214,7 +214,8 @@ public class SimulatorDataModel extends DefaultTreeModel {
 		
 	}
 	
-	private void addTimeSeries(DefaultMutableTreeNode top, Probe[] probes, Network network) {
+	private void addTimeSeries(DefaultMutableTreeNode top, Network topnetwork, Network probenetwork) {
+		Probe[] probes = probenetwork.getSimulator().getProbes();
 		for (Probe probe : probes) {
 			DefaultMutableTreeNode top0 = top;
 			
@@ -225,7 +226,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 			}
 			
 			//create branch down to target node
-			Node ancestor=findNodeAncestor(network, (Node)target);
+			Node ancestor=findNodeAncestor(topnetwork, (Node)target);
 			while(ancestor!=null && !(ancestor.equals(target))){
 				top0=createSortableNode(top0, ancestor);
 				ancestor=findNodeAncestor(ancestor, (Node)target);
@@ -249,6 +250,13 @@ public class SimulatorDataModel extends DefaultTreeModel {
 
 			targetNode.add(stateNode);
 
+		}
+		
+		Node[] nodes = probenetwork.getNodes();
+		for(Node node : nodes)
+		{
+			if(node instanceof Network)
+				addTimeSeries(top, topnetwork, (Network)node);
 		}
 	}
 
@@ -298,7 +306,7 @@ public class SimulatorDataModel extends DefaultTreeModel {
 				+ cal.get(Calendar.DATE) + "D");
 
 		addSpikePatterns(captureNode, network);
-		addTimeSeries(captureNode, network.getSimulator().getProbes(),network);
+		addTimeSeries(captureNode, network, network);
 		sortTree(captureNode);
 
 		if (captureNode.getChildCount() == 0) {
