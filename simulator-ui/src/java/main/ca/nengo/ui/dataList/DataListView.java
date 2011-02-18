@@ -48,6 +48,7 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -66,6 +67,7 @@ import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ReversableAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.script.ScriptConsole;
@@ -161,10 +163,15 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 					MutableTreeNode leafNode = leafNodes.get(0);
 
 					menuBuilder = new PopupMenuBuilder(leafNode.toString());
-
+					
+					if(leafNode instanceof DefaultMutableTreeNode && 
+							((DefaultMutableTreeNode)leafNode).getUserObject() instanceof String)
+						menuBuilder.addAction(new RenameAction((DefaultMutableTreeNode)leafNode));
+					
 					menuBuilder.addAction(new ExportDelimitedFileAction(DataListView.this, leafNode));
 					menuBuilder.addAction(new ExportMatlabAction(DataListView.this, leafNode));
 
+					
 					if (leafNode instanceof NeoTreeNode) {
 						NeoTreeNode neoTreeNode = (NeoTreeNode) leafNode;
 
@@ -438,6 +445,27 @@ class DataPath {
 		return position;
 	}
 
+}
+
+class RenameAction extends StandardAction {
+	private static final long serialVersionUID = 1L;
+	
+	DefaultMutableTreeNode myNode;
+	
+	public RenameAction(DefaultMutableTreeNode node)
+	{
+		super("Change label");
+		myNode = node;
+	}
+	
+	protected void action()
+	{
+		String newName = (String)myNode.getUserObject();
+		newName = JOptionPane.showInputDialog(UIEnvironment.getInstance(),
+				"Enter new label", newName);
+		if(newName != null)
+			myNode.setUserObject(newName);
+	}
 }
 
 abstract class ExportAction extends StandardAction {
