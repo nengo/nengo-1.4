@@ -22,11 +22,9 @@ import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.WorldSkyImpl;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.visualization.FRLayout;
 import edu.uci.ics.jung.visualization.ISOMLayout;
 import edu.uci.ics.jung.visualization.Layout;
 import edu.uci.ics.jung.visualization.contrib.CircleLayout;
-import edu.uci.ics.jung.visualization.contrib.KKLayout;
 
 /**
  * A World which supports Spring layout. Objects within this world attract and
@@ -84,8 +82,7 @@ public class ElasticWorld extends WorldImpl {
 		MenuBuilder algorithmLayoutMenu = menu.addSubMenu("Algorithm");
 
 		algorithmLayoutMenu.addAction(new JungLayoutAction(FeedForwardLayout.class, "Feed-Forward"));
-		algorithmLayoutMenu.addAction(new JungLayoutAction(FRLayout.class, "Fruchterman-Reingold"));
-		algorithmLayoutMenu.addAction(new JungLayoutAction(KKLayout.class, "Kamada-Kawai"));
+		algorithmLayoutMenu.addAction(new JungLayoutAction(StretchedFeedForwardLayout.class, "Streched Feed-Forward"));
 		algorithmLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class, "Circle"));
 		algorithmLayoutMenu.addAction(new JungLayoutAction(ISOMLayout.class, "ISOM"));
 
