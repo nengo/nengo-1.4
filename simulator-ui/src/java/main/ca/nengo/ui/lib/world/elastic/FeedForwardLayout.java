@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import ca.nengo.ui.lib.world.elastic.StretchedFeedForwardLayout.VoidVertex;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.visualization.AbstractLayout;
@@ -17,7 +18,7 @@ import edu.uci.ics.jung.visualization.Coordinates;
  * Arrange the layout of neural network according to signal flow. 
  * 
  * @author Yan Wu
- *
+ * @version 1.0.1
  */
 public class FeedForwardLayout extends AbstractLayout {
 
@@ -77,16 +78,19 @@ public class FeedForwardLayout extends AbstractLayout {
 			while (!vertices.isEmpty()) {
 				y += dH;
 				v = vertices.removeFirst();
-				coord = this.getCoordinates(v);
-				coord.setX(x);
-				coord.setY(y);
+				// VoidVertex serves as place holder in LinkedList
+				if (!(v instanceof VoidVertex)) {
+					coord = this.getCoordinates(v);
+					coord.setX(x);
+					coord.setY(y);
+				}
 			}
 		}
 	}
 
 	
 
-	private LinkedList<LinkedList<Vertex>> sortVertices() {
+	protected LinkedList<LinkedList<Vertex>> sortVertices() {
 		LinkedList<LinkedList<Vertex>> sortedVertices = new LinkedList<LinkedList<Vertex>>();
 		@SuppressWarnings("unchecked")
 		Vertex[] vArray = (Vertex[]) this.getVisibleVertices().toArray(new Vertex[0]);
@@ -95,7 +99,7 @@ public class FeedForwardLayout extends AbstractLayout {
 		
 		
 		/**
-		 * Find ending vertices
+		 * Find ending and starting vertices
 		 */
 		int minimalOutDegree = 999;
 		int outDegree;
@@ -105,38 +109,53 @@ public class FeedForwardLayout extends AbstractLayout {
 				minimalOutDegree = outDegree;
 		} 
 		
+		LinkedList<Vertex> startingVertices = new LinkedList<Vertex>();
 		sortedVertices.add(new LinkedList<Vertex>());
 		for (Iterator<Vertex> iV = verticesLeft.iterator(); iV.hasNext(); ){
 			v = iV.next();
+			// find ending vertices
 			if (v.outDegree() == minimalOutDegree) {
 				sortedVertices.getFirst().add(v);
+				iV.remove();
+			} 
+			// find starting vertices
+			else if (v.inDegree() == 0) {
+				startingVertices.add(v);
 				iV.remove();
 			}
 		}
 		
 		/**
-		 * Construct levels from end to begin iteratively
+		 * Construct layers from end to begin iteratively
 		 */
 		Vertex vEnd = null;
-		LinkedList<Vertex> lastLevel = sortedVertices.getFirst();
-		LinkedList<Vertex> newLevel = null;
+		LinkedList<Vertex> lastLayer = sortedVertices.getFirst();
+		LinkedList<Vertex> newLayer = null;
 		while (!verticesLeft.isEmpty()) {
-			//initialize a new level
-			newLevel = new LinkedList<Vertex>();
-			sortedVertices.add(newLevel);
-			for (int i = 0; i < lastLevel.size(); i++) {
-				vEnd = lastLevel.get(i);
+			//initialize a new layer
+			newLayer = new LinkedList<Vertex>();
+			sortedVertices.add(newLayer);
+			for (int i = 0; i < lastLayer.size(); i++) {
+				vEnd = lastLayer.get(i);
 				for (Iterator<Vertex> iV = verticesLeft.iterator(); iV.hasNext(); ){
 					v = iV.next();
 					if (v.isPredecessorOf(vEnd)){
-						newLevel.add(v);
+						newLayer.add(v);
 					    iV.remove();
 					}
 				}
 			}
 			
-			lastLevel = newLevel;
+			// append starting vertices
+			if (verticesLeft.isEmpty() && !(startingVertices==null)) {
+				verticesLeft = startingVertices;
+				startingVertices = null;
+			}
+			
+			lastLayer = newLayer;
 		}
+		
+		
 		
 		return sortedVertices;
 	}
