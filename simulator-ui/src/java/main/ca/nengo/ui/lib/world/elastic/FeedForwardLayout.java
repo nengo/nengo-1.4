@@ -131,10 +131,17 @@ public class FeedForwardLayout extends AbstractLayout {
 		Vertex vEnd = null;
 		LinkedList<Vertex> lastLayer = sortedVertices.getFirst();
 		LinkedList<Vertex> newLayer = null;
-		while (!verticesLeft.isEmpty()) {
+		while (startingVertices != null) {
 			//initialize a new layer
 			newLayer = new LinkedList<Vertex>();
 			sortedVertices.add(newLayer);
+			
+			// append starting vertices
+			if (verticesLeft.isEmpty()) {
+				verticesLeft = startingVertices;
+				startingVertices = null;
+			}
+			
 			for (int i = 0; i < lastLayer.size(); i++) {
 				vEnd = lastLayer.get(i);
 				for (Iterator<Vertex> iV = verticesLeft.iterator(); iV.hasNext(); ){
@@ -146,16 +153,10 @@ public class FeedForwardLayout extends AbstractLayout {
 				}
 			}
 			
-			// append starting vertices
-			if (verticesLeft.isEmpty() && !(startingVertices==null)) {
-				verticesLeft = startingVertices;
-				startingVertices = null;
-			}
+			
 			
 			lastLayer = newLayer;
 		}
-		
-		
 		
 		return sortedVertices;
 	}
