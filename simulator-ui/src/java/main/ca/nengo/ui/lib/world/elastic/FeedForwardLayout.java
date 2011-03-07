@@ -113,16 +113,17 @@ public class FeedForwardLayout extends AbstractLayout {
 		sortedVertices.add(new LinkedList<Vertex>());
 		for (Iterator<Vertex> iV = verticesLeft.iterator(); iV.hasNext(); ){
 			v = iV.next();
-			// find ending vertices
-			if (v.outDegree() == minimalOutDegree) {
-				sortedVertices.getFirst().add(v);
-				iV.remove();
-			} 
+			
 			// find starting vertices
-			else if (v.inDegree() == 0) {
+			if (v.inDegree() == 0) {
 				startingVertices.add(v);
 				iV.remove();
 			}
+			// find ending vertices
+			else if (v.outDegree() == minimalOutDegree) {
+				sortedVertices.getFirst().add(v);
+				iV.remove();
+			} 
 		}
 		
 		/**
