@@ -556,6 +556,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	 */
 	public void configureObject(Object obj) {
 		if (CONFIGURE_PLANE_ENABLED) {
+			configPane.toJComponent().setAuxVisible(true);
 			configPane.configureObj(obj);
 		} else {
 			ConfigUtil.configure(UIEnvironment.getInstance(), obj);
