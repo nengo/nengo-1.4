@@ -41,6 +41,49 @@ class SimulationModeComboBox(JComboBox):
         elif mode=='direct': self.node.model.mode=SimulationMode.DIRECT
         else: self.node.model.mode=SimulationMode.DEFAULT
         self.set_node(self.node)
+
+
+from ca.nengo.ui.configurable.descriptors import *
+from ca.nengo.ui.configurable import *
+
+class ParisianTransform(IConfigurable):
+    p_num_interneurons=PInt('Number of interneurons')
+    p_tau_interneurons=PFloat('Post-synaptic time constant of interneurons')
+    p_excitatory=PBoolean('Excitatory')
+    p_optimize=PBoolean('Optimize bias function')
+    properties=[p_num_interneurons,p_tau_interneurons,p_excitatory,p_optimize]
+
+    def __init__(self):
+        self.button=make_button('parisian',self.do_transform,'create interneurons')
+        self.projection=None
+        self.button.enabled=False
+
+    def set_projection(self,projection):
+        self.projection=projection
+        self.button.enabled=projection is not None
+
+    def do_transform(self,event):
+        uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(self)
+        uc.configureAndWait()
+    
+    def completeConfiguration(self,props):
+        if self.projection is not None:
+            self.projection.addBias(props.getValue(self.p_num_interneurons),props.getValue(self.p_tau_interneurons),self.projection.termination.tau,props.getValue(self.p_excitatory),props.getValue(self.p_optimize))
+    def preConfiguration(self,props):
+        pass
+    def getSchema(self):
+        return ConfigSchemaImpl(self.properties,[])
+    def getTypeName(self):
+        return 'ParisianTransform'
+    def getDescription(self):
+        return 'Create Interneurons'
+
+
+def make_button(icon,func,tip,**args):
+    return JButton(icon=ImageIcon('python/images/%s.png'%icon),rolloverIcon=ImageIcon('python/images/%s-pressed.png'%icon),
+                   actionPerformed=func,toolTipText=tip,
+                   borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),
+                   verticalTextPosition=AbstractButton.BOTTOM,horizontalTextPosition=AbstractButton.CENTER,**args)
     
 
 
@@ -48,18 +91,20 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def __init__(self):
         self.ng=ca.nengo.ui.NengoGraphics.getInstance()
         self.toolbar=JToolBar("Nengo actions",floatable=False)
-        self.toolbar.add(self.make_button('open',self.do_open,'open file'))
-        self.toolbar.add(self.make_button('pdf',self.do_pdf,'save as pdf'))
+        self.toolbar.add(make_button('open',self.do_open,'open file'))
+        self.toolbar.add(make_button('pdf',self.do_pdf,'save as pdf'))
 
         self.toolbar.add(Box.createHorizontalGlue())
         
         self.mode_combobox=SimulationModeComboBox()
         self.toolbar.add(self.mode_combobox)
+        self.parisian=ParisianTransform()
+        self.toolbar.add(self.parisian.button)
 
         self.toolbar.add(Box.createHorizontalGlue())
-        self.toolbar.add(self.make_button('inspect',self.do_inspect,'inspect'))
-        self.toolbar.add(self.make_button('console',self.do_console,'toggle console'))
-        self.button_run=self.make_button('interactive',self.do_run,'interactive plots',enabled=False)
+        self.toolbar.add(make_button('inspect',self.do_inspect,'inspect'))
+        self.toolbar.add(make_button('console',self.do_console,'toggle console'))
+        self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
         self.toolbar.add(self.button_run)
 
         ca.nengo.ui.lib.world.handlers.SelectionHandler.addSelectionListener(self)
@@ -77,11 +122,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         
         
 
-    def make_button(self,icon,func,tip,**args):
-        return JButton(icon=ImageIcon('python/images/%s.png'%icon),rolloverIcon=ImageIcon('python/images/%s-pressed.png'%icon),
-                       actionPerformed=func,toolTipText=tip,
-                       borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),
-                       verticalTextPosition=AbstractButton.BOTTOM,horizontalTextPosition=AbstractButton.CENTER,**args)
 
 
     def childAdded(self,obj):
@@ -92,8 +132,20 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.update()
         
     def update(self):
+        selected=self.ng.getSelectedObj()
+        self.mode_combobox.set_node(selected)
+
+        projection=None
+        if selected is not None and isinstance(selected.model,ca.nengo.model.Termination):
+            term=selected.model
+            network=selected.nodeParent.networkParent.model
+            for p in network.getProjections():
+                if p.termination==term:
+                    projection=p
+                    break
+        self.parisian.set_projection(projection)
+
         net=self.get_current_network()
-        self.mode_combobox.set_node(self.ng.getSelectedObj())
         if net is None:
             self.button_run.enabled=False
             self.button_run.toolTipText='run'
@@ -101,10 +153,14 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             self.button_run.enabled=True
             self.button_run.toolTipText='run '+net.name
         
+        
+        
     def get_current_network(self):
         network=self.ng.getSelectedObj()
         if network is not None:
-            if hasattr(network,'networkParent') and network.networkParent is not None:
+            while hasattr(network,'nodeParent') and network.nodeParent is not None:
+                network=network.nodeParent
+            while hasattr(network,'networkParent') and network.networkParent is not None:
                 network=network.networkParent
         else:
             for wo in ng.world.ground.children:
@@ -167,6 +223,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
 
             cb.addTemplate(tp,20,0)
             doc.close()
+        
         
 
         
