@@ -399,6 +399,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		BiasOrigin result = new BiasOrigin(this, name, getNodes(), o.getNodeOrigin(), 
 				getConstantOutputs(myEvalPoints, o.getNodeOrigin()), numInterneurons, excitatory);
 		result.setMode(getMode());
+		if (getOrigin(name)!=null) {
+			removeDecodedOrigin(name);
+		}
 		addDecodedOrigin(result.getName(), result);
 		return result;
 	}
