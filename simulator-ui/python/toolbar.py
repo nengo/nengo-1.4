@@ -7,6 +7,7 @@ import sys
 if 'lib/iText-5.0.5.jar' not in sys.path:
     sys.path.append('lib/iText-5.0.5.jar')
 
+import template
 
 from ca.nengo.model import SimulationMode
 class SimulationModeComboBox(JComboBox):
@@ -102,6 +103,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar.add(self.parisian.button)
 
         self.toolbar.add(Box.createHorizontalGlue())
+        self.toolbar.add(make_button('templates',lambda event: template.template.toggle_visible(),'toggle templates'))
         self.toolbar.add(make_button('inspect',self.do_inspect,'inspect'))
         self.toolbar.add(make_button('console',self.do_console,'toggle console'))
         self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
@@ -173,6 +175,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def do_console(self,event):
         pane=self.ng.scriptConsolePane
         pane.auxVisible=not pane.auxVisible
+
+        
 
 
     def do_inspect(self,event):

@@ -101,6 +101,8 @@ class TemplateBar(TransferHandler):
     def createTransferable(self,component):
         return TemplateTransferable(self.templates[component])
 
+    def toggle_visible(self):
+        self.visible(not self.scrollPane.visible)
     def visible(self,visible):
         ng=ca.nengo.ui.NengoGraphics.getInstance()
         self.scrollPane.visible=visible
@@ -172,5 +174,5 @@ class TemplateTransferable(java.awt.datatransfer.Transferable):
         
 
 template=TemplateBar()
-template.visible(True)
+template.visible(False)
 
