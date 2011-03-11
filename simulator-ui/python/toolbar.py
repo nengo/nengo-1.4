@@ -136,12 +136,13 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.mode_combobox.set_node(selected)
 
         projection=None
-        if selected is not None and isinstance(selected.model,ca.nengo.model.Termination):
+        if selected is not None and isinstance(selected.model,ca.nengo.model.nef.impl.DecodedTermination):
             term=selected.model
             network=selected.nodeParent.networkParent.model
             for p in network.getProjections():
                 if p.termination==term:
-                    projection=p
+                    if isinstance(p.origin,ca.nengo.model.nef.impl.DecodedOrigin):
+                        projection=p
                     break
         self.parisian.set_projection(projection)
 
