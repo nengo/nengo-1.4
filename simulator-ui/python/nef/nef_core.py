@@ -22,7 +22,7 @@ ensemble factories, and so on.
 """
 
 from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput
-from ca.nengo.model import SimulationMode, Origin, Units, Termination
+from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
@@ -46,8 +46,11 @@ class Network:
     """Wraps a Nengo network with a set of helper functions."""
     serialVersionUID=1
     def __init__(self,name):
-        self.network=NetworkImpl()
-        self.network.name=name
+        if isinstance(name,NetworkImpl):
+            self.network=name
+        else:
+            self.network=NetworkImpl()
+            self.network.name=name
 
     def add_to(self,world):
         """Add the network to the given Nengo world object.  If there is a
@@ -93,6 +96,7 @@ class Network:
                   eval_points=None,
                   noise=None,noise_frequency=1000,
                   mode='spike',add_to_network=True,
+                  node_factory=None,
                   quick=False,storage_code=''):
         """Create and return an ensemble of LIF neurons.
 
@@ -136,15 +140,18 @@ class Network:
         else:
             storage_name=''
         ef=NEFEnsembleFactoryImpl()
-        if type(max_rate) is tuple and len(max_rate)==2:
-            mr=IndicatorPDF(max_rate[0],max_rate[1])
+        if node_factory is not None:
+            ef.nodeFactory=node_factory
         else:
-            mr=pdfs.ListPDF(max_rate)
-        if type(intercept) is tuple and len(intercept)==2:
-            it=IndicatorPDF(intercept[0],intercept[1])
-        else:
-            it=pdfs.ListPDF(intercept)
-        ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
+            if type(max_rate) is tuple and len(max_rate)==2:
+                mr=IndicatorPDF(max_rate[0],max_rate[1])
+            else:
+                mr=pdfs.ListPDF(max_rate)
+            if type(intercept) is tuple and len(intercept)==2:
+                it=IndicatorPDF(intercept[0],intercept[1])
+            else:
+                it=pdfs.ListPDF(intercept)
+            ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
         if encoders is not None:
             try:
                 ef.encoderFactory=generators.FixedVectorGenerator(encoders)
