@@ -125,6 +125,7 @@ public class ScriptConsole extends JPanel {
 		interpreter.exec("sys.path.append('python')");
 		interpreter.exec("from numeric import *");
 		interpreter.exec("import toolbar");
+		interpreter.exec("import template");
 
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
