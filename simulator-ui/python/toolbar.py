@@ -230,8 +230,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         
 
 ng=ca.nengo.ui.NengoGraphics.getInstance()
-size=ng.size
 toolbar=ToolBar()
-ng.pack()
-ng.size=size
+ng.contentPane.revalidate()
 
