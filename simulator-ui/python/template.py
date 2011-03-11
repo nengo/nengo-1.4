@@ -67,9 +67,9 @@ class TemplateBar(TransferHandler):
         self.ng=ca.nengo.ui.NengoGraphics.getInstance()
         self.ng.universe.transferHandler=DropHandler()
         
-        self.add_template('Network',ca.nengo.ui.models.constructors.CNetwork(),'images/nengoIcons/NetworkIcon.gif')
-        self.add_template('Ensemble',ca.nengo.ui.models.constructors.CNEFEnsemble(),'images/nengoIcons/EnsembleIcon.gif')
-        self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput(),'images/nengoIcons/FunctionIcon.gif')
+        self.add_template('Network',ca.nengo.ui.models.constructors.CNetwork(),'images/nengoIcons/network.gif')
+        self.add_template('Ensemble',ca.nengo.ui.models.constructors.CNEFEnsemble(),'images/nengoIcons/ensemble.gif')
+        self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput(),'images/nengoIcons/input.gif')
 
         for template in nef.templates.templates:
             self.add_template(getattr(template,'title'),TemplateConstructor(template),'images/nengoIcons/'+getattr(template,'icon'))
