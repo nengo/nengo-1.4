@@ -53,6 +53,10 @@ import ca.nengo.ui.models.nodes.UINodeViewable;
 public class CreateModelAction extends ReversableAction {
 
 	private static final long serialVersionUID = 1L;
+	
+	private Double posX;
+	private Double posY;
+	
 
 	/**
 	 * Prompts the user to select a non-conflicting name
@@ -138,7 +142,7 @@ public class CreateModelAction extends ReversableAction {
 						try {
 							ensureNonConflictingName(node, container);
 							try {
-								nodeCreated = container.addNodeModel(node);
+								nodeCreated = container.addNodeModel(node,posX,posY);
 								if (nodeCreated instanceof UINodeViewable) {
 									 if (nodeCreated instanceof ca.nengo.ui.models.nodes.UINEFEnsemble) {
 										 // don't open NEFEnsembles
@@ -167,6 +171,11 @@ public class CreateModelAction extends ReversableAction {
 			e.printStackTrace();
 			throw new ActionException(e.getMessage(), e);
 		}
+	}
+	
+	public void setPosition(double x, double y) {
+		posX=new Double(x);
+		posY=new Double(y);
 	}
 
 	@Override
