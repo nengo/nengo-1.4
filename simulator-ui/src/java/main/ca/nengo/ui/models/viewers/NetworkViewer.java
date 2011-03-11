@@ -156,6 +156,15 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	protected Double newItemPositionX;
+	protected Double newItemPositionY;
+	public void setNewItemPosition(Double x, Double y) {
+		newItemPositionX=x;
+		newItemPositionY=y;
+	}
+	
 
 	/**
 	 * Construct UI Nodes from the NEO Network model
@@ -193,11 +202,18 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 					 */
 					nodeUI = UINeoNode.createNodeUI(node);
 
-					boolean centerAndNotify = !isFirstUpdate;
+					
+					if (newItemPositionX != null && newItemPositionY != null) {
+						nodeUI.setOffset(newItemPositionX, newItemPositionY);
+						neoNodesChildren.put(nodeUI.getModel(), nodeUI);
+						getGround().addChildFancy(nodeUI, false);
 
-					addUINode(nodeUI, centerAndNotify, false);
-					if (centerAndNotify) {
-						nodeUI.showPopupMessage("Node " + node.getName() + " added to Network");
+					} else {
+						boolean centerAndNotify = !isFirstUpdate;
+						addUINode(nodeUI, centerAndNotify, false);
+						if (centerAndNotify) {
+							nodeUI.showPopupMessage("Node " + node.getName() + " added to Network");
+						}
 					}
 				} else {
 					neoNodesChildren.put(nodeUI.getModel(), nodeUI);
@@ -207,6 +223,10 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 				Util.Assert(false, "Trying to add node which already exists");
 			}
 		}
+		
+		newItemPositionX=null;
+		newItemPositionY=null;
+
 
 		/*
 		 * Prune existing nodes by deleting them
