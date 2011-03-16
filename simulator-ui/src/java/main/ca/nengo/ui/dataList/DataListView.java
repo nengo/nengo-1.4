@@ -286,8 +286,8 @@ public class DataListView extends JPanel implements TreeSelectionListener {
 				TreePath[] paths = getTreePaths(e);
 				List<MutableTreeNode> leafNodes = getLeafNodes(paths);
 	
-				if (leafNodes.size() == 1 && leafNodes.get(0) instanceof DataTreeNode) {
-					DataTreeNode dataNode = (DataTreeNode) (leafNodes.get(0));
+				if (leafNodes.size() == 1 && leafNodes.get(0) instanceof TimeSeriesNode) {
+					TimeSeriesNode dataNode = (TimeSeriesNode) (leafNodes.get(0));
 	
 					if (dataNode != null && scriptConsole!=null) {
 						scriptConsole.setCurrentData(dataNode.getUserObject());
