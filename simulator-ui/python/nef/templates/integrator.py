@@ -1,4 +1,5 @@
 title='Integrator'
+label='Integrator'
 icon='integrator.png'
 
 params=[
