@@ -34,7 +34,7 @@ class Icon:
 class ShadedIcon:
     pass    
     
-for name in 'pause play configure end start backward forward restart arrowup arrowdown save restore refresh data'.split():
+for name in 'pause play configure end start backward forward restart arrowup arrowdown save restore refresh data pdf'.split():
     setattr(Icon,name,ImageIcon('python/images/%s.png'%name))
     setattr(ShadedIcon,name,ImageIcon('python/images/%s-pressed.png'%name))
 
@@ -47,7 +47,10 @@ class EnsembleWatch:
             return [n.getOrigin('AXON').getValues().values[0]*0.0005 for n in obj.nodes]
         else:
             s=obj.getOrigin('AXON').getValues().values
-            v=[n.generator.voltage for n in obj.nodes]    
+            try:
+                v=[n.generator.voltage for n in obj.nodes]
+            except:
+                v=[n.generator.dynamics.state[0] for n in obj.nodes]
             for i,ss in enumerate(s):   # check if there's a spike here
                 if ss: v[i]=1.0
             return v
@@ -204,7 +207,7 @@ class HRRWatch:
         length=0
         for i in range(len(v)): length+=v[i]*v[i]
         length=math.sqrt(length)
-        if length>0.1:
+        if length>0:
             v=[x/length for x in v]
         return v    
     def hrr_dot(self,obj):
@@ -273,6 +276,76 @@ class ViewPanel(JPanel):
         JPanel.__init__(self)
         self.network=network
         self.nodes={}
+
+    def paintProjection(self,oname,tname,g):
+        if oname in self.nodes and tname in self.nodes:
+            c1=self.nodes[oname]
+            c2=self.nodes[tname]
+            if c1.visible and c2.visible:
+
+                arrowsize=7.0
+                sin60=-math.sqrt(3)/2
+                cos60=-0.5
+                
+                if c1 is c2:
+                    scale=0.1
+                    x=c1.x+c1.width/2
+                    y=c1.y+c2.height/2
+                    g.drawOval(int(c1.x-c1.width*scale),int(c1.y-c1.height/2-c1.height*scale),int(c1.width*(1+scale*2)),int(c2.height*(1+scale*2)))
+                    xc=x
+                    yc=y-c1.height-c1.height*scale
+                    xa=-arrowsize
+                    ya=0.0
+                else:                
+                    x1=c1.x+c1.width/2
+                    x2=c2.x+c2.width/2
+                    y1=c1.y+c1.height/2
+                    y2=c2.y+c2.height/2
+                    g.drawLine(x1,y1,x2,y2)
+                    
+                    
+                    place=0.4
+                    
+                    xc=(x1*place+x2*(1-place))+0.5
+                    yc=(y1*place+y2*(1-place))+0.5
+                    
+                    
+                    length=math.sqrt(float((x2-x1)**2+(y2-y1)**2))
+                    if length==0:
+                        xa=arrowsize
+                        ya=0.0
+                    else:
+                        xa=(x2-x1)*arrowsize/length
+                        ya=(y2-y1)*arrowsize/length
+                    
+                g.fillPolygon([int(xc+xa),int(xc+cos60*xa-sin60*ya),int(xc+cos60*xa+sin60*ya)],
+                                  [int(yc+ya),int(yc+sin60*xa+cos60*ya),int(yc-sin60*xa+cos60*ya)],
+                                  3)
+
+    def paintProjections(self,network,g,prefix=""):
+        for p in network.projections:
+            origin=p.origin
+            termination=p.termination
+            
+            oname=prefix+origin.node.name
+            tname=prefix+termination.node.name
+
+            self.paintProjection(oname,tname,g)
+            if isinstance(termination.node,NetworkImpl):
+                self.paintProjection(oname,tname+':'+termination.wrappedTermination.node.name,g)
+                if isinstance(origin.node,NetworkImpl):
+                    self.paintProjection(oname+':'+origin.wrappedOrigin.name,tname+':'+termination.wrappedTermination.name,g)
+            if isinstance(origin.node,NetworkImpl):
+                self.paintProjection(oname+':'+origin.wrappedOrigin.node.name,tname,g)
+            
+        for n in network.nodes:
+            if isinstance(n,NetworkImpl):
+                self.paintProjections(n,g,prefix=prefix+n.name+':')
+                    
+                    
+                    
+        
+        
     def paintComponent(self,g):
         g.color=Color.white
         g.fillRect(0,0,self.width,self.height)
@@ -280,51 +353,8 @@ class ViewPanel(JPanel):
         g.color=Color.black
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
-        arrowsize=7.0
-        sin60=-math.sqrt(3)/2
-        cos60=-0.5
-        
-        for p in self.network.projections:
-            oname=p.origin.node.name
-            tname=p.termination.node.name 
-            if oname in self.nodes and tname in self.nodes:
-                c1=self.nodes[oname]
-                c2=self.nodes[tname]
-                if c1.visible and c2.visible:
-                    if c1 is c2:
-                        scale=0.1
-                        x=c1.x+c1.width/2
-                        y=c1.y+c2.height/2
-                        g.drawOval(int(c1.x-c1.width*scale),int(c1.y-c1.height/2-c1.height*scale),int(c1.width*(1+scale*2)),int(c2.height*(1+scale*2)))
-                        xc=x
-                        yc=y-c1.height-c1.height*scale
-                        xa=-arrowsize
-                        ya=0.0
-                    else:                
-                        x1=c1.x+c1.width/2
-                        x2=c2.x+c2.width/2
-                        y1=c1.y+c1.height/2
-                        y2=c2.y+c2.height/2
-                        g.drawLine(x1,y1,x2,y2)
-                        
-                        
-                        place=0.4
-                        
-                        xc=(x1*place+x2*(1-place))+0.5
-                        yc=(y1*place+y2*(1-place))+0.5
-                        
-                        
-                        length=math.sqrt(float((x2-x1)**2+(y2-y1)**2))
-                        if length==0:
-                            xa=arrowsize
-                            ya=0.0
-                        else:
-                            xa=(x2-x1)*arrowsize/length
-                            ya=(y2-y1)*arrowsize/length
-                        
-                    g.fillPolygon([int(xc+xa),int(xc+cos60*xa-sin60*ya),int(xc+cos60*xa+sin60*ya)],
-                                      [int(yc+ya),int(yc+sin60*xa+cos60*ya),int(yc-sin60*xa+cos60*ya)],
-                                      3)
+
+        self.paintProjections(self.network,g)
                     
                     
                 
@@ -378,13 +408,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
        
         self.popup=JPopupMenu()
         self.area.add(self.popup)
+
+        self.process_nodes(network.nodes,self.popup)
        
-        names=[(n.name,n) for n in network.nodes]
-        names.sort()
-        
-        for i,(name,n) in enumerate(names):
-            self.watcher.add_object(name,n)
-            self.popup.add(JMenuItem(name,actionPerformed=lambda event,self=self,name=name: self.add_item(name,self.mouse_click_location)))
 
         restored=self.restore()        
         if not restored:
@@ -408,6 +434,24 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             if isinstance(play,(int,float)):
                 self.autopause_at=play
             self.time_control.pause(None)
+
+    def process_nodes(self,nodes,popup,prefix=""):
+        names=[(n.name,n) for n in nodes]
+        names.sort()
+        
+        for i,(name,n) in enumerate(names):
+            self.watcher.add_object(prefix+name,n)
+
+            if isinstance(n,NetworkImpl):
+                def click_func(event,self=self,name=prefix+name):
+                    self.add_item(name,self.mouse_click_location)
+                    self.popup.visible=False
+                menu=JMenu(prefix+name,mouseClicked=click_func)
+                popup.add(menu)
+                self.process_nodes(n.nodes,prefix=prefix+name+":",popup=menu)
+            else:
+                popup.add(JMenuItem(prefix+name,actionPerformed=lambda event,self=self,name=prefix+name: self.add_item(name,self.mouse_click_location)))
+        
 
     def add_item(self,name,location=None):
         g=components.Item(self,name)
@@ -505,7 +549,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         db.close()
 
     def restore(self):
-      try:  
+ #     try:  
         dir=java.io.File('layouts')
         if not dir.exists(): dir.mkdirs()
 
@@ -573,9 +617,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         db.close()
         self.area.repaint()
         return True
-      except:
-          print 'Error restoring layout file'
-          return False
+#      except Exception:
+#          print 'Error restoring layout file'
+#          return False
     def view_save(self):
         return dict(width=self.frame.width,height=self.frame.height-self.time_control.config_panel_height,state=self.frame.getExtendedState(),x=self.frame.x,y=self.frame.y)
     
@@ -725,7 +769,7 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
 
         pdf=JPanel(layout=BorderLayout(),opaque=False)
-        pdf.add(JButton(Icon.save,rolloverIcon=ShadedIcon.save,toolTipText='save pdf',actionPerformed=self.save_pdf,borderPainted=False,focusPainted=False,contentAreaFilled=False))
+        pdf.add(JButton(Icon.pdf,rolloverIcon=ShadedIcon.pdf,toolTipText='save pdf',actionPerformed=self.save_pdf,borderPainted=False,focusPainted=False,contentAreaFilled=False))
         pdf.add(JLabel('pdf',horizontalAlignment=javax.swing.SwingConstants.CENTER),BorderLayout.NORTH)
         pdf.maximumSize=pdf.preferredSize
         configPanel.add(pdf)
