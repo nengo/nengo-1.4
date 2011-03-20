@@ -74,6 +74,8 @@ class TemplateBar(TransferHandler):
         self.add_template('Network',ca.nengo.ui.models.constructors.CNetwork(),'images/nengoIcons/network.gif')
         self.add_template('Ensemble',ca.nengo.ui.models.constructors.CNEFEnsemble(),'images/nengoIcons/ensemble.gif')
         self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput(),'images/nengoIcons/input.png')
+        self.add_template('Origin',ca.nengo.ui.models.constructors.CDecodedOrigin,'images/nengoIcons/origin.png')
+        self.add_template('Termination',ca.nengo.ui.models.constructors.CDecodedTermination,'images/nengoIcons/termination.png')
 
         for template in nef.templates.templates:
             self.add_template(getattr(template,'label'),TemplateConstructor(template),'images/nengoIcons/'+getattr(template,'icon'))
@@ -143,12 +145,26 @@ class DropHandler(TransferHandler):
     def canImport(self,support):
         constructor=support.getTransferable().getTransferData(TemplateTransferable.flavor)
         if isinstance(constructor,ca.nengo.ui.models.constructors.CNetwork): return True
+
+        drop_on_ensemble=False
+        if constructor is ca.nengo.ui.models.constructors.CDecodedOrigin: drop_on_ensemble=True
+        if constructor is ca.nengo.ui.models.constructors.CDecodedTermination: drop_on_ensemble=True
         
         ng=ca.nengo.ui.NengoGraphics.getInstance()
         pos=ng.world.localToView(support.dropLocation.dropPoint)
         nodes=ng.world.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
         for n in nodes:
             if isinstance(n,ca.nengo.ui.models.NodeContainer):
+                if drop_on_ensemble:
+                    pos=n.localToView(n.globalToLocal(pos))
+                    nodes2=n.getUINodes()
+                    for n2 in nodes2:
+                        for n3 in n2.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                            if isinstance(n3,ca.nengo.ui.models.nodes.UINEFEnsemble):
+                                return True
+                    return False
+                else:
+                    return True
                 return True
         else:
             return False
@@ -157,6 +173,10 @@ class DropHandler(TransferHandler):
         try:
             constructor=support.getTransferable().getTransferData(TemplateTransferable.flavor)
 
+            drop_on_ensemble=False
+            if constructor is ca.nengo.ui.models.constructors.CDecodedOrigin: drop_on_ensemble=True
+            if constructor is ca.nengo.ui.models.constructors.CDecodedTermination: drop_on_ensemble=True
+
             
             ng=ca.nengo.ui.NengoGraphics.getInstance()
             pos=ng.world.localToView(support.dropLocation.dropPoint)
@@ -164,19 +184,44 @@ class DropHandler(TransferHandler):
 
             for n in nodes:
                 if isinstance(n,ca.nengo.ui.models.NodeContainer):
-                    pos=n.localToView(n.globalToLocal(ng.world.localToView(support.dropLocation.dropPoint)))
-                    self.create(constructor,n,pos)
+                    if drop_on_ensemble:
+                        pos=n.localToView(n.globalToLocal(pos))
+                        nodes2=n.getUINodes()
+                        node=None
+                        for n2 in nodes2:
+                            if node is not None: break
+                            for n3 in n2.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                                if isinstance(n3,ca.nengo.ui.models.nodes.UINEFEnsemble):
+                                    constructor=constructor(n3.model)
+                                    node=n3
+                                    break
+                        if node is not None:
+                            self.create(constructor,n,position=None,node=node)
+                    else:
+                        pos=n.localToView(n.globalToLocal(pos))
+                        self.create(constructor,n,pos)
                     break
             else:
                 self.create(constructor,ng,pos)
         except Exception, e:
             print e
 
-    def create(self,constructor,nodeContainer,position):
+    def create(self,constructor,nodeContainer,position,node=None):
         if isinstance(constructor,ca.nengo.ui.models.constructors.ConstructableNode):
             action=ca.nengo.ui.actions.CreateModelAction(nodeContainer,constructor)
             action.setPosition(position.x,position.y)
             action.doAction()
+        elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedOrigin):
+            uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
+            uc.configureAndWait()
+            if constructor.model is not None:
+                node.showOrigin(constructor.model.name)
+        elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedTermination):
+            uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
+            uc.configureAndWait()
+            if constructor.model is not None:
+                node.showTermination(constructor.model.name)
+            
         elif isinstance(constructor,IConfigurable):
             assert isinstance(nodeContainer,ca.nengo.ui.models.viewers.NetworkViewer)
             nodeContainer.setNewItemPosition(position.x,position.y)
@@ -184,6 +229,7 @@ class DropHandler(TransferHandler):
             constructor.set_network(nodeContainer.getModel())
             uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
             uc.configureAndWait()
+            
             
     
     
