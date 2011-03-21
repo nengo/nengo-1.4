@@ -157,7 +157,21 @@ class DropHandler(TransferHandler):
                     net=nn
                     netpos=p
         return net,netpos
-                
+
+    def find_target(self,point):
+        ng=ca.nengo.ui.NengoGraphics.getInstance()
+        top=ng.getTopWindow()
+        if top is None:
+            top=ng.world
+            pos=top.localToView(point)
+            net,pos=self.find_at(top.ground,pos)
+            if net is top.ground: net=top
+        else:
+            pos=top.globalToLocal(point)
+            nodes=top.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+            net,pos=self.find_at(top,pos)
+        return net,pos
+        
 
 
     def canImport(self,support):
@@ -167,20 +181,11 @@ class DropHandler(TransferHandler):
         drop_on_ensemble=False
         if constructor is ca.nengo.ui.models.constructors.CDecodedOrigin: drop_on_ensemble=True
         if constructor is ca.nengo.ui.models.constructors.CDecodedTermination: drop_on_ensemble=True
-        
-        ng=ca.nengo.ui.NengoGraphics.getInstance()
-        top=ng.getTopWindow()
-        if top is None:
-            top=ng.world
-            pos=top.localToView(support.dropLocation.dropPoint)
-            net,pos=self.find_at(top.ground,pos)
-            if net is top.ground:
-                return False
-        else:
-            pos=top.globalToLocal(support.dropLocation.dropPoint)
-            nodes=top.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
-            net,pos=self.find_at(top,pos)
 
+        net,pos=self.find_target(support.dropLocation.dropPoint)
+
+        if net is ca.nengo.ui.NengoGraphics.getInstance().world:
+            return False
 
         if drop_on_ensemble:
             for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
@@ -196,21 +201,8 @@ class DropHandler(TransferHandler):
             drop_on_ensemble=False
             if constructor is ca.nengo.ui.models.constructors.CDecodedOrigin: drop_on_ensemble=True
             if constructor is ca.nengo.ui.models.constructors.CDecodedTermination: drop_on_ensemble=True
-
             
-            ng=ca.nengo.ui.NengoGraphics.getInstance()
-            top=ng.getTopWindow()
-            if top is None:
-                top=ng.world
-                pos=top.localToView(support.dropLocation.dropPoint)
-                net,pos=self.find_at(top.ground,pos)
-                if net is top.ground: net=top
-            else:
-                pos=top.globalToLocal(support.dropLocation.dropPoint)
-                nodes=top.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
-                net,pos=self.find_at(top,pos)
-
-
+            net,pos=self.find_target(support.dropLocation.dropPoint)
 
             if drop_on_ensemble:
                 node=None
