@@ -71,14 +71,14 @@ class TemplateBar(TransferHandler):
         self.ng=ca.nengo.ui.NengoGraphics.getInstance()
         self.ng.universe.transferHandler=DropHandler()
         
-        self.add_template('Network',ca.nengo.ui.models.constructors.CNetwork(),'images/nengoIcons/network.gif')
-        self.add_template('Ensemble',ca.nengo.ui.models.constructors.CNEFEnsemble(),'images/nengoIcons/ensemble.gif')
-        self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput(),'images/nengoIcons/input.png')
+        self.add_template('Network',ca.nengo.ui.models.constructors.CNetwork,'images/nengoIcons/network.gif')
+        self.add_template('Ensemble',ca.nengo.ui.models.constructors.CNEFEnsemble,'images/nengoIcons/ensemble.gif')
+        self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput,'images/nengoIcons/input.png')
         self.add_template('Origin',ca.nengo.ui.models.constructors.CDecodedOrigin,'images/nengoIcons/origin.png')
         self.add_template('Termination',ca.nengo.ui.models.constructors.CDecodedTermination,'images/nengoIcons/termination.png')
 
         for template in nef.templates.templates:
-            self.add_template(getattr(template,'label'),TemplateConstructor(template),'images/nengoIcons/'+getattr(template,'icon'))
+            self.add_template(getattr(template,'label'),template,'images/nengoIcons/'+getattr(template,'icon'))
 
         #for i in range(20):
         #    self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput(),'images/nengoIcons/input.gif')
@@ -176,7 +176,7 @@ class DropHandler(TransferHandler):
 
     def canImport(self,support):
         constructor=support.getTransferable().getTransferData(TemplateTransferable.flavor)
-        if isinstance(constructor,ca.nengo.ui.models.constructors.CNetwork): return True
+        if constructor is ca.nengo.ui.models.constructors.CNetwork: return True
 
         drop_on_ensemble=False
         if constructor is ca.nengo.ui.models.constructors.CDecodedOrigin: drop_on_ensemble=True
@@ -214,6 +214,10 @@ class DropHandler(TransferHandler):
                 if node is not None:
                     self.create(constructor,net,position=None,node=node)
             else:
+                if hasattr(constructor,'make'):
+                    constructor=TemplateConstructor(constructor)
+                else:
+                    constructor=constructor()
                 self.create(constructor,net,position=pos)
             return
         except Exception, e:
