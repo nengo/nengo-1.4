@@ -142,6 +142,24 @@ class TemplateBar(TransferHandler):
         ca.nengo.ui.NengoGraphics.getInstance().contentPane.revalidate()
 
 class DropHandler(TransferHandler):
+
+    def find_at(self,container,pos):
+        nodes=container.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+        net=container
+        netpos=pos
+        for n in nodes:
+            if isinstance(n,ca.nengo.ui.models.viewers.NetworkViewer):
+                net=n
+                netpos=n.localToView(n.globalToLocal(pos))
+
+                nn,p=self.find_at(n.ground,netpos)
+                if nn is not n.ground:
+                    net=nn
+                    netpos=p
+        return net,netpos
+                
+
+
     def canImport(self,support):
         constructor=support.getTransferable().getTransferData(TemplateTransferable.flavor)
         if isinstance(constructor,ca.nengo.ui.models.constructors.CNetwork): return True
@@ -155,26 +173,21 @@ class DropHandler(TransferHandler):
         if top is None:
             top=ng.world
             pos=top.localToView(support.dropLocation.dropPoint)
-            nodes=top.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+            net,pos=self.find_at(top.ground,pos)
+            if net is top.ground:
+                return False
         else:
             pos=top.globalToLocal(support.dropLocation.dropPoint)
             nodes=top.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
-            
-        for n in nodes:
-            if isinstance(n,ca.nengo.ui.models.NodeContainer):
-                if drop_on_ensemble:
-                    pos=n.localToView(n.globalToLocal(pos))
-                    nodes2=n.getUINodes()
-                    for n2 in nodes2:
-                        for n3 in n2.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
-                            if isinstance(n3,ca.nengo.ui.models.nodes.UINEFEnsemble):
-                                return True
-                    return False
-                else:
+            net,pos=self.find_at(top,pos)
+
+
+        if drop_on_ensemble:
+            for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                if isinstance(n3,ca.nengo.ui.models.nodes.UINEFEnsemble):
                     return True
-                return True
-        else:
-            return isinstance(top,ca.nengo.ui.models.viewers.NetworkViewer)
+            return False
+        return True
 
     def importData(self,support):
         try:
@@ -190,34 +203,31 @@ class DropHandler(TransferHandler):
             if top is None:
                 top=ng.world
                 pos=top.localToView(support.dropLocation.dropPoint)
-                nodes=top.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+                net,pos=self.find_at(top.ground,pos)
+                if net is top.ground: net=top
             else:
                 pos=top.globalToLocal(support.dropLocation.dropPoint)
                 nodes=top.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+                net,pos=self.find_at(top,pos)
 
-            for n in nodes:
-                if isinstance(n,ca.nengo.ui.models.NodeContainer):
-                    if drop_on_ensemble:
-                        pos=n.localToView(n.globalToLocal(pos))
-                        nodes2=n.getUINodes()
-                        node=None
-                        for n2 in nodes2:
-                            if node is not None: break
-                            for n3 in n2.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
-                                if isinstance(n3,ca.nengo.ui.models.nodes.UINEFEnsemble):
-                                    constructor=constructor(n3.model)
-                                    node=n3
-                                    break
-                        if node is not None:
-                            self.create(constructor,n,position=None,node=node)
-                    else:
-                        pos=n.localToView(n.globalToLocal(pos))
-                        self.create(constructor,n,pos)
-                    break
+
+
+            if drop_on_ensemble:
+                node=None
+                for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                    if isinstance(n3,ca.nengo.ui.models.nodes.UINEFEnsemble):
+                        constructor=constructor(n3.model)
+                        node=n3
+                        break
+                if node is not None:
+                    self.create(constructor,net,position=None,node=node)
             else:
-                self.create(constructor,ng,pos)
+                self.create(constructor,net,position=pos)
+            return
         except Exception, e:
             print e
+
+        
 
     def create(self,constructor,nodeContainer,position,node=None):
         if isinstance(constructor,ca.nengo.ui.models.constructors.ConstructableNode):
