@@ -151,8 +151,15 @@ class DropHandler(TransferHandler):
         if constructor is ca.nengo.ui.models.constructors.CDecodedTermination: drop_on_ensemble=True
         
         ng=ca.nengo.ui.NengoGraphics.getInstance()
-        pos=ng.world.localToView(support.dropLocation.dropPoint)
-        nodes=ng.world.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+        top=ng.getTopWindow()
+        if top is None:
+            top=ng.world
+            pos=top.localToView(support.dropLocation.dropPoint)
+            nodes=top.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+        else:
+            pos=top.globalToLocal(support.dropLocation.dropPoint)
+            nodes=top.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+            
         for n in nodes:
             if isinstance(n,ca.nengo.ui.models.NodeContainer):
                 if drop_on_ensemble:
@@ -167,7 +174,7 @@ class DropHandler(TransferHandler):
                     return True
                 return True
         else:
-            return False
+            return isinstance(top,ca.nengo.ui.models.viewers.NetworkViewer)
 
     def importData(self,support):
         try:
@@ -179,8 +186,14 @@ class DropHandler(TransferHandler):
 
             
             ng=ca.nengo.ui.NengoGraphics.getInstance()
-            pos=ng.world.localToView(support.dropLocation.dropPoint)
-            nodes=ng.world.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+            top=ng.getTopWindow()
+            if top is None:
+                top=ng.world
+                pos=top.localToView(support.dropLocation.dropPoint)
+                nodes=top.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
+            else:
+                pos=top.globalToLocal(support.dropLocation.dropPoint)
+                nodes=top.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
 
             for n in nodes:
                 if isinstance(n,ca.nengo.ui.models.NodeContainer):
