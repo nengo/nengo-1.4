@@ -78,7 +78,7 @@ class TemplateBar(TransferHandler):
         self.add_template('Termination',ca.nengo.ui.models.constructors.CDecodedTermination,'images/nengoIcons/termination.png')
 
         for template in nef.templates.templates:
-            self.add_template(getattr(template,'label'),template,'images/nengoIcons/'+getattr(template,'icon'))
+            self.add_template(getattr(template,'label'),template.__name__,'images/nengoIcons/'+getattr(template,'icon'))
 
         #for i in range(20):
         #    self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput(),'images/nengoIcons/input.gif')
@@ -214,7 +214,11 @@ class DropHandler(TransferHandler):
                 if node is not None:
                     self.create(constructor,net,position=None,node=node)
             else:
-                if hasattr(constructor,'make'):
+                if isinstance(constructor,str):
+                    if constructor.startswith('nef.templates'):
+                        constructor=constructor[len('nef.templates')+1:]
+                    constructor=TemplateConstructor(getattr(nef.templates,constructor))
+                elif hasattr(constructor,'make'):
                     constructor=TemplateConstructor(constructor)
                 else:
                     constructor=constructor()
