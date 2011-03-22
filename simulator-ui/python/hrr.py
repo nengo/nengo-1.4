@@ -181,6 +181,15 @@ class Vocabulary:
             return numeric.dot(self.vector_pairs,v)
         else:
             return None
+
+    def transform_to(self,other,keys=None):
+        if keys is None: keys=self.keys
+        t=numeric.zeros((other.dimensions,self.dimensions),typecode='f')
+        for k in keys:
+            a=self.hrr[k].v
+            b=other.hrr[k].v
+            t+=array([a*bb for bb in b])
+        return t
         
     def prob_cleanup(self,compare,vocab_size,steps=10000):
         # see http://yamlb.wordpress.com/2008/05/20/why-2-random-vectors-are-orthogonal-in-high-dimention/ 
