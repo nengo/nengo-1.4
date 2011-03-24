@@ -57,6 +57,7 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.NodeFactory;
+import ca.nengo.model.impl.PlasticEnsembleTermination;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.NEFNode;
@@ -549,16 +550,34 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		return all;
 	}
 	
-	/**
-   * Used to get decoded terminations to give to GPU.
+	/*
+     * Used to get non-decoded terminations to give to GPU.
+	 */
+	public PlasticEnsembleTermination[] getPlasticEnsembleTerminations(){
+		Termination[] nonDecodedTerminations = super.getTerminations();
+		
+		LinkedList<PlasticEnsembleTermination> terminationList = new LinkedList<PlasticEnsembleTermination>();
+
+		for(int i = 0; i < nonDecodedTerminations.length; i++)
+		{
+			if(nonDecodedTerminations[i] instanceof PlasticEnsembleTermination)
+			{
+				terminationList.add((PlasticEnsembleTermination) nonDecodedTerminations[i]);
+			}
+		}
+		return (PlasticEnsembleTermination[]) terminationList.toArray(new PlasticEnsembleTermination[0]);
+	}
+	
+	/*
+     * Used to get decoded terminations to give to GPU.
 	 */
 	public DecodedTermination[] getDecodedTerminations(){
 		return myDecodedTerminations.values().toArray(new DecodedTermination[0]);
 		//return (OrderedTerminations != null) ? (DecodedTermination[])OrderedTerminations.toArray(new DecodedTermination[0]) : new DecodedTermination[0];
 	}
 	
-	/**
-   * Used to get decoded origins to give to GPU.
+	/*
+     * Used to get decoded origins to give to GPU.
 	 */
 	public DecodedOrigin[] getDecodedOrigins(){
 		return myDecodedOrigins.values().toArray(new DecodedOrigin[0]);
@@ -868,15 +887,16 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
    *  neuronData[0] = numNeurons
    *  neuronData[1] = tauRC
    *  neuronData[2] = tauRef
-   *  neuronData[3] = maxTimeStep
-   *  neuronData[4 ... 3 + numNeurons] = bias for each neuron
-   *  neuronData[4 + numNeurons ... 4 + 2 * numNeurons] = scale for each neuron
+   *  neuronData[3] = tauPSC
+   *  neuronData[4] = maxTimeStep
+   *  neuronData[5 ... 4 + numNeurons] = bias for each neuron
+   *  neuronData[5 + numNeurons ... 4 + 2 * numNeurons] = scale for each neuron
 	 */
 	public float[] getStaticNeuronData(){
 		
 		int numNeurons = getNeurons();
 		
-		float[] neuronData = new float[4 + 2 * numNeurons];
+		float[] neuronData = new float[5 + 2 * numNeurons];
 		neuronData[0] = numNeurons;
 		
 		SpikingNeuron neuron = (SpikingNeuron) getNodes()[0];
@@ -892,13 +912,21 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		
 		neuronData[1] = generator.getTauRC();
 		neuronData[2] = generator.getTauRef();
-		neuronData[3] = generator.getMaxTimeStep();
+		if(getPlasticEnsembleTerminations().length > 0)
+		{
+			neuronData[3] = ((SpikingNeuron) myNodes[0]).getTerminations()[0].getTau();
+		}
+		else
+		{
+			neuronData[3] = 0;
+		}
+		neuronData[4] = generator.getMaxTimeStep();
 
 		int i = 0;
 		for(; i < numNeurons; i++)
 		{
-			neuronData[i + 4] = ((SpikingNeuron) myNodes[i]).getBias();
-			neuronData[i + 4 + numNeurons] = ((SpikingNeuron) myNodes[i]).getScale();
+			neuronData[i + 5] = ((SpikingNeuron) myNodes[i]).getBias();
+			neuronData[i + 5 + numNeurons] = ((SpikingNeuron) myNodes[i]).getScale();
 		}
 
 		return neuronData;
