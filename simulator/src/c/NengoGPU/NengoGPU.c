@@ -1,4 +1,5 @@
 #ifdef __cplusplus
+  irintf("about to move input to device\n");
 extern "C"{
 #endif
 
@@ -17,7 +18,7 @@ int totalNumEnsembles = 0;
 int* deviceForEnsemble;
 
 // The data for each device.
-NengoGPUData** nengoData;
+NengoGPUData** nengoDataArray;
 float startTime = 0, endTime = 0;
 volatile int myCVsignal = 0;
 int numDevices = 0;
@@ -140,29 +141,55 @@ void run_start()
   int i = 0;
   for(;i < numDevices; i++)
   {
-    currentData = nengoData[i];
+    currentData = nengoDataArray[i];
 
-    pthread_create(current_thread, NULL, &run_nodes, (void*)currentData);
+    pthread_create(current_thread, NULL, &start_GPU_thread, (void*)currentData);
   }
 
+  pthread_mutex_lock(mutex);
+  while(myCVsignal < numDevices)
+  {
+    pthread_cond_wait(cv_JNI, mutex);
+  }
+  myCVsignal = 0;
+  pthread_cond_broadcast(cv_GPUThreads);
+  pthread_mutex_unlock(mutex);
+  
   free(current_thread);
 
   sched_yield();
 }
 
-// This is the entry point for each processing thread. Its input is the NengoGPUData structure that it is to process. The behaviour of this function is: wait until we get the call to step, process the NengoGPUData structure for one step with run_NEFEnsembles, wait again. Eventually manipulateKill(0) will return true, meaning the run is finished and the function will break out of the loop and free its resources.
-void* run_nodes(void* arg)
+// Called once per GPU device per simulation. This is the entry point for each processing thread. Its input is the
+// NengoGPUData structure that it is to process. The behaviour of this function is: wait until we get the signal to step
+// (from nativeStep in NengoGPU_JNI.c), process the NengoGPUData structure for one step with run_NEFEnsembles, wait again.
+// Eventually manipulateKill(0) will return true, meaning the run is finished and the function will break out of the loop 
+// and free its resources.
+void* start_GPU_thread(void* arg)
 {
   NengoGPUData* nengoData = (NengoGPUData*) arg;
 
   int numDevicesFinished;
 
+  printf("Thread %d: about to aquire device\n", nengoData->device);
   initGPUDevice(nengoData->device);
-  
-  // Put everything on the GPU and keep it there throughout the run. (unless we run out of space...)
-  moveToDeviceNengoGPUData(nengoData);
-  //printNengoGPUData(nengoData);
+  printf("Thread %d: done aquiring device\n", nengoData->device);
 
+  moveToDeviceNengoGPUData(nengoData);
+  printf("Thread %d: done movin data to device\n", nengoData->device);
+
+  //printNengoGPUData(nengoData);
+  //printDynamicNengoGPUData(nengoData);
+
+  pthread_mutex_lock(mutex);
+  myCVsignal++;
+  if(myCVsignal == numDevices)
+  {
+    pthread_cond_broadcast(cv_JNI);
+  }
+  pthread_cond_wait(cv_GPUThreads, mutex);
+  pthread_mutex_unlock(mutex);
+  
   // Wait for the signal to step. If that signal has already come, then myCVsignal == 1. In that case, we don't wait (if we did, we'd wait forever).
   pthread_mutex_lock(mutex);
   if(myCVsignal == 0)
@@ -178,7 +205,6 @@ void* run_nodes(void* arg)
 
     // signal that this device is finished processing for the step
     numDevicesFinished = manipulateNumDevicesFinished(2, 0);
-
 
     pthread_mutex_lock(mutex);
     // Wakeup the main thread if all devices are finished running
@@ -214,7 +240,7 @@ void run_kill()
   manipulateKill(1);
   manipulateNumDevicesFinished(-1, 0);
 
-  // Wakeup threads so they can free their resources
+  // Wakeup GPU threads so they can free their resources
   pthread_mutex_lock(mutex);
   myCVsignal = 0;
   pthread_cond_broadcast(cv_GPUThreads);
@@ -222,7 +248,7 @@ void run_kill()
   pthread_mutex_unlock(mutex);
 
   // Once the threads are done, free shared resources and quit
-  free(nengoData);
+  free(nengoDataArray);
   free(deviceForEnsemble);
 
   pthread_mutex_destroy(mutex);
