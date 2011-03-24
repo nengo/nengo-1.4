@@ -1,10 +1,15 @@
 package ca.nengo.util.impl;
 
+import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
-//import ca.nengo.model.impl.NetworkImpl;
+import ca.nengo.model.Projection;
+import ca.nengo.model.SimulationException;
 
-//import java.util.LinkedList;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.lang.Math;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+
 
 
 /**
@@ -14,21 +19,23 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Eric Crawford
  */
 public class NodeThreadPool{
-	protected static final int defaultNumThreads = 0;
+	protected static final int defaultNumThreads = 8;
+
 	
 	// numThreads can change throughout a simulation run. Therefore, it should not be used during a run,
 	// only at the beginning of a run to create the threads. During a run, use myThreads.length.
 	protected static int myNumThreads = defaultNumThreads;
-	protected NodeThread[] myNodeThreads;
+	protected NodeThread[] myThreads;
 	protected Object myLock;
-	protected LinkedBlockingQueue<Node> myNodes;
-	protected Node[] myNodeArray;
-	protected int myNumNodesRequired;
-	protected int myNumNodesProcessed;
-	protected volatile float myStartTime;
-	protected volatile float myEndTime;
-	protected volatile boolean isSleeping;
-	protected volatile boolean myKill = false;
+	
+	protected Node[] myNodes;
+	protected Projection[] myProjections;
+	
+	protected volatile int numThreadsComplete;
+	
+	protected volatile boolean threadsRunning;
+	protected float myStartTime;
+	protected float myEndTime;
 	
 	public static int getNumThreads(){
 		return myNumThreads;
@@ -46,7 +53,7 @@ public class NodeThreadPool{
 	public static void turnOffMultithreading(){
 		myNumThreads = 0;
 	}
-
+	
 	public float getStartTime(){
 		return myStartTime;
 	}
@@ -55,97 +62,131 @@ public class NodeThreadPool{
 		return myEndTime;
 	}
 	
-	public boolean finishedRun(){
-		synchronized(myLock){
-			return myNumNodesProcessed == myNumNodesRequired;
-		}
-	}
-
-	// Dummy default constructor. Use at your own risk.
+	// Dummy default constructor.
 	protected NodeThreadPool(){
 	}
 	
-	public NodeThreadPool(Node[] nodes){
-		initialize(nodes);
+	public NodeThreadPool(Node[] nodes, Projection[] projections){
+		initialize(nodes, projections);
 	}
 	
-	protected void initialize(Node[] nodes){
-		myNodes = new LinkedBlockingQueue<Node>();
+	protected void initialize(Node[] nodes, Projection[] projections){
 		myLock = new Object();
-
-		myNodeArray = nodes;
+		myNodes = nodes;
+		myProjections = projections;
 		
-		myNumNodesProcessed = 0;
-		myNumNodesRequired = myNodeArray.length;
+		myThreads = new NodeThread[myNumThreads];
 		
-		myNodeThreads = new NodeThread[myNumThreads];
+		threadsRunning = false;
+		
+		int nodesPerThread = (int) Math.ceil((float) myNodes.length / (float) myNumThreads);
+		int projectionsPerThread = (int) Math.ceil((float) myProjections.length / (float) myNumThreads);
+		
+		int nodeOffset = 0;
+		int projectionOffset = 0;
+		
+		Node[] nodesForCurThread;
+		Projection[] projectionsForCurThread;
 		
 		for(int i = 0; i < myNumThreads; i++){
-			myNodeThreads[i] = new NodeThread(this);
-			myNodeThreads[i].setPriority(Thread.MAX_PRIORITY - 1);
-			myNodeThreads[i].start();
+			
+			if(myNodes.length - nodeOffset >= nodesPerThread) {
+				
+				nodesForCurThread = Arrays.copyOfRange(myNodes, 
+						nodeOffset, nodeOffset + nodesPerThread);
+				nodeOffset += nodesPerThread;
+				
+			} else {
+				nodesForCurThread = Arrays.copyOfRange(myNodes, 
+						nodeOffset, myNodes.length);
+			}
+				
+			if(myProjections.length - projectionOffset >= projectionsPerThread) {
+				
+				projectionsForCurThread = Arrays.copyOfRange(myProjections, 
+						projectionOffset, projectionOffset + projectionsPerThread);
+				projectionOffset += projectionsPerThread;
+				
+			} else {
+				projectionsForCurThread = Arrays.copyOfRange(myProjections, 
+						projectionOffset, myProjections.length);
+				
+			}
+			
+			myThreads[i] = new NodeThread(this, nodesForCurThread, projectionsForCurThread);
+			myThreads[i].setPriority(Thread.MAX_PRIORITY);
+			myThreads[i].start();
 		}
-		
-		Thread.yield();	
 	}
 	
 	// Execute the run method of an array of nodes
 	public void step(float startTime, float endTime){
-		int oldPriority = Thread.currentThread().getPriority();
-		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		myStartTime = startTime;
 		myEndTime = endTime;
-		myNumNodesProcessed = 0;
-
-		for(int i = 0; i < myNodeArray.length; i++){
-			myNodes.offer(myNodeArray[i]);
-		}
 		
-		waitForThreads();
-		Thread.currentThread().setPriority(oldPriority);
+		try
+		{
+			int oldPriority = Thread.currentThread().getPriority();
+			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+			
+			// start the projection processing
+			startThreads();
+			
+			// start the node processing
+			startThreads();
+			
+			Thread.currentThread().setPriority(oldPriority);
+		}
+		catch(Exception e)
+		{}
+	}
+	
+	private void startThreads() throws InterruptedException {
+		synchronized(myLock){
+			numThreadsComplete = 0;
+			threadsRunning = true;
+			
+			myLock.notifyAll();
+			myLock.wait();
+		}
 	}
 	
 	
-	// Called from within the node pool. Waits until all the nodes in the run have been executed.
-	protected void waitForThreads(){
+	public void threadWait() throws InterruptedException{
 		synchronized(myLock){
-			if(!finishedRun()){
-				try{
-					isSleeping = true;
-					myLock.wait();
-				}catch(InterruptedException e){
-					e.printStackTrace();
-				}
-			}
+			while(!threadsRunning)
+				myLock.wait();
+		}
+	}
+	
+	// Used by the threads of this pool to signal that they are done 
+	// running their nodes for the current step
+	public void threadFinished() throws InterruptedException{
+		synchronized(myLock){
+			numThreadsComplete++;
+				
+			if(numThreadsComplete == myThreads.length){
+				threadsRunning = false;
+				myLock.notifyAll();
+			}	
+			
+			myLock.wait();
+			
+			threadWait();
 		}
 	}
 
 	// Kill the threads by interrupting them. 
 	// Each thread will handle it accordingly by ending its run method.
 	public void kill(){
-		myKill = true;
-		for(int i = 0; i < myNodeThreads.length; i++){
-			myNodeThreads[i].interrupt();
-		}
-	}
-	
-	// To be called by the threads of this node pool. Give returns the next node to be processed.
-	// myNodes.take will cause the thread to wait until there is a node to be processed.
-	public Node getNextNode(){
-		try{
-			return myNodes.take();
-		}catch(InterruptedException e){
-			return null;
-		}
-	}
-	
-	// Called by the threads of this node pool to signal that they have completed a node.
-	public void finishedANode(){
-		synchronized(myLock){
-			myNumNodesProcessed++;
-			if(finishedRun() && isSleeping){
-				myLock.notify();
+		synchronized(myLock)
+		{
+			for(int i = 0; i < myThreads.length; i++){
+				myThreads[i].interrupt();
 			}
+			
+			threadsRunning = true;
+			myLock.notifyAll();
 		}
 	}
 }
