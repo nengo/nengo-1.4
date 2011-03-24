@@ -30,12 +30,17 @@ package ca.nengo.sim.impl;
 
 import java.util.ArrayList;
 //import java.util.Arrays;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 //import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
@@ -55,7 +60,7 @@ import ca.nengo.sim.SimulatorListener;
 import ca.nengo.util.Probe;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.impl.GPUNodeThreadPool;
+import ca.nengo.util.impl.NEF_GPU_Interface;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
 
@@ -68,12 +73,15 @@ import ca.nengo.util.impl.ProbeImpl;
 public class LocalSimulator implements Simulator, java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	public boolean myUseGPU;
+	
 	private Projection[] myProjections;
 	private Node[] myNodes;
 	private Map<String, Node> myNodeMap;
 	private List<Probe> myProbes;
 	private boolean myDisplayProgress;
 	private transient List<VisiblyMutable.Listener> myChangeListeners;
+	private transient NEF_GPU_Interface myNEF_GPU_Interface;
 	private transient NodeThreadPool myNodeThreadPool;
 
 	/**
@@ -99,6 +107,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		}
 
 		myProjections = network.getProjections();
+		
 		if (myProbes == null)
 			myProbes = new ArrayList<Probe>(20);
 	}
@@ -136,14 +145,31 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		
 //		float pre_time = System.nanoTime();
 		
-		if(GPUNodeThreadPool.myUseGPU){
-			myNodeThreadPool = new GPUNodeThreadPool(myNodes);
+		double time = startTime;
+		double thisStepSize = stepSize;
+	
+		
+		/* If we are using the GPU for this network, then we have to bring
+		 *  the non-network nodes up to the top level so that we don't
+		 * run multiple simulators.
+		 */
+		myNEF_GPU_Interface = null;
+		myNodeThreadPool = null;
+		
+		if(NEF_GPU_Interface.myUseGPU){
+			System.out.print("using gpu");
+			
+			Node[] nodesForGPU = collectNodes();
+			Projection[] projectionsForGPU = collectProjections();
+			
+			myNEF_GPU_Interface = new NEF_GPU_Interface(nodesForGPU, projectionsForGPU);
 		}else if(NodeThreadPool.isMultithreading()){
-			myNodeThreadPool = new NodeThreadPool(myNodes);
-		}else{
-			myNodeThreadPool = null;
+			Node[] nodesForMultithreading = collectNodes();
+			Projection[] projectionsForMultithreading = collectProjections();
+			
+			myNodeThreadPool = 
+				new NodeThreadPool(nodesForMultithreading, projectionsForMultithreading);
 		}
-
 		
 		if(topLevel)
 		{
@@ -162,8 +188,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		// }
 		//		
 		
-		double time = startTime;
-		double thisStepSize = stepSize;
+
 		
 		// Casting the float to a double above causes some unexpected rounding.  To avoid this
 		//  we force the stepSize to be divisible by 0.000001 (1 microsecond)
@@ -180,7 +205,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			if (time + 1.5*thisStepSize > endTime) { //fudge step size to hit end exactly
 				thisStepSize = endTime - time;
 			}
-			step((float) time, (float) (time+thisStepSize));
+			
+			step((float) time, (float) (time+thisStepSize));				
 
 			float currentProgress = ((float) time - startTime) / (endTime - startTime);
 			fireSimulatorEvent(new SimulatorEvent(currentProgress,
@@ -191,28 +217,36 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		
 		fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
 		
-		if(myNodeThreadPool != null){
+		
+		if(myNEF_GPU_Interface != null){
+			
+			myNEF_GPU_Interface.kill();
+			myNEF_GPU_Interface = null;
+			
+		}else if(myNodeThreadPool != null){
+			
 			myNodeThreadPool.kill();
 			myNodeThreadPool = null;
+			
 		}
 		
-		//System.out.println("Time for run: " + Float.toString( System.nanoTime() - pre_time) );
 	}
 
 	public void step(float startTime, float endTime)
 			throws SimulationException {
 		
-		//System.out.println("java step: " + Float.toString(startTime) + " " + Float.toString(endTime) );
-
-//		float[] temp;
-		for (int i = 0; i < myProjections.length; i++) {
-			InstantaneousOutput values = myProjections[i].getOrigin().getValues();
-			myProjections[i].getTermination().setValues(values);
-		}
 		
-		if(myNodeThreadPool != null){
+		if(myNEF_GPU_Interface != null){
+			myNEF_GPU_Interface.step(startTime, endTime);
+		}
+		else if(myNodeThreadPool != null){
 			myNodeThreadPool.step(startTime, endTime);
 		}else{
+			for (int i = 0; i < myProjections.length; i++) {
+				InstantaneousOutput values = myProjections[i].getOrigin().getValues();
+				myProjections[i].getTermination().setValues(values);
+			}
+			
 			for (int i = 0; i < myNodes.length; i++) {
 				if(myNodes[i] instanceof NetworkImpl)
 					((NetworkImpl)myNodes[i]).run(startTime, endTime, false);
@@ -411,4 +445,53 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		return new LocalSimulator();
 	}
 	
+	private Node[] collectNodes(){
+
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		
+		LinkedList<Node> nodesToProcess = new LinkedList<Node>();
+		nodesToProcess.addAll(Arrays.asList(myNodes));
+		
+		Node workingNode;
+		
+		while(nodesToProcess.size() != 0)
+		{
+			workingNode = nodesToProcess.poll();
+			
+			if(workingNode instanceof Network 
+				|| workingNode.getClass().getCanonicalName() == 
+				"org.python.proxies.nef.array$NetworkArray$6") 
+			{
+				nodesToProcess.addAll(Arrays.asList(((Network) workingNode).getNodes()));
+			}
+			else
+			{
+				nodes.add(workingNode);
+			}
+		}
+		
+		return nodes.toArray(new Node[0]);	
+	}
+	
+	private Projection[] collectProjections(){
+
+		ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(myProjections));
+		
+		LinkedList<Node> nodesToProcess = new LinkedList<Node>();
+		nodesToProcess.addAll(Arrays.asList(myNodes));
+		
+		Node workingNode;
+		
+		while(nodesToProcess.size() != 0)
+		{
+			workingNode = nodesToProcess.poll();
+			
+			if(workingNode instanceof Network) {
+				nodesToProcess.addAll(Arrays.asList(((Network) workingNode).getNodes()));
+				projections.addAll(Arrays.asList(((Network) workingNode).getProjections()));
+			}
+		}
+		
+		return projections.toArray(new Projection[0]);
+	}
 }
