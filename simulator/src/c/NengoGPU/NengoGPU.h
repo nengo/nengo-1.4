@@ -10,7 +10,7 @@ extern "C"{
 
 extern int totalNumEnsembles;
 extern int* deviceForEnsemble;
-extern NengoGPUData** nengoData;
+extern NengoGPUData** nengoDataArray;
 extern int numDevices;
 extern float startTime;
 extern float endTime;
@@ -23,7 +23,7 @@ extern FILE* fp;
 int manipulateNumNodesProcessed(int action, int value);
 int manipulateKill(int action);
 
-void* run_nodes(void* arg);
+void* start_GPU_thread(void* arg);
 void run_start();
 void run_kill();
 
