@@ -1,14 +1,15 @@
 package ca.nengo.util.impl;
 
-import ca.nengo.model.InstantaneousOutput;
+//import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
-import ca.nengo.model.SimulationException;
+//import ca.nengo.model.SimulationException;
 
 import java.lang.Math;
-import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
+import java.lang.reflect.Array;
+//import java.util.Arrays;
+//import java.util.concurrent.Executors;
+//import java.util.concurrent.ExecutorService;
 
 
 
@@ -18,7 +19,7 @@ import java.util.concurrent.ExecutorService;
  * 
  * @author Eric Crawford
  */
-public class NodeThreadPool{
+public class NodeThreadPool {
 	protected static final int defaultNumThreads = 8;
 
 	
@@ -70,6 +71,21 @@ public class NodeThreadPool{
 		initialize(nodes, projections);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static <T> T[] copyOfRange(T[] original, int start, int end) {	
+		if (original.length >= start && 0 <= start) {
+			if (start <= end) {
+				int length = end - start;
+				int copyLength = Math.min(length, original.length - start);
+				T[] copy = (T[]) Array.newInstance(original.getClass().getComponentType(), length);
+				System.arraycopy(original, start, copy, 0, copyLength);
+				return copy;
+			}
+			throw new IllegalArgumentException();
+		}
+		throw new ArrayIndexOutOfBoundsException();
+	}
+	
 	protected void initialize(Node[] nodes, Projection[] projections){
 		myLock = new Object();
 		myNodes = nodes;
@@ -92,23 +108,23 @@ public class NodeThreadPool{
 			
 			if(myNodes.length - nodeOffset >= nodesPerThread) {
 				
-				nodesForCurThread = Arrays.copyOfRange(myNodes, 
+				nodesForCurThread = NodeThreadPool.copyOfRange(myNodes, 
 						nodeOffset, nodeOffset + nodesPerThread);
-				nodeOffset += nodesPerThread;
+
 				
 			} else {
-				nodesForCurThread = Arrays.copyOfRange(myNodes, 
+				nodesForCurThread = NodeThreadPool.copyOfRange(myNodes, 
 						nodeOffset, myNodes.length);
 			}
 				
 			if(myProjections.length - projectionOffset >= projectionsPerThread) {
 				
-				projectionsForCurThread = Arrays.copyOfRange(myProjections, 
+				projectionsForCurThread = NodeThreadPool.copyOfRange(myProjections, 
 						projectionOffset, projectionOffset + projectionsPerThread);
 				projectionOffset += projectionsPerThread;
 				
 			} else {
-				projectionsForCurThread = Arrays.copyOfRange(myProjections, 
+				projectionsForCurThread = NodeThreadPool.copyOfRange(myProjections, 
 						projectionOffset, myProjections.length);
 				
 			}
