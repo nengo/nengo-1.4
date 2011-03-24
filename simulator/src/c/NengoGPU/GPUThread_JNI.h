@@ -19,7 +19,7 @@ extern "C" {
  * Signature: ([[[[F[[F[[[F[[[[F[[FZ[[I)V
  */
 JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeSetupRun
-  (JNIEnv *, jclass, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jbooleanArray, jobjectArray, jfloat);
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jintArray, jfloat);
 
 /*
  * Class:     ca_nengo_util_impl_GPUThread
