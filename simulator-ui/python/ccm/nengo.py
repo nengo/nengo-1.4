@@ -244,7 +244,6 @@ class ModelNetwork(NetworkImpl):
         for p in self._path: model=getattr(model,p)        
         for (trans,origin) in self._translatedOrigins.values():
             origin.setValues(start,end,trans.convertToVector(model))
-        NetworkImpl.run(self,start,end)
         for (trans,termination) in self._translatedTerminations.values():
             trans.applyVector(model,termination.getOutput())
                 
