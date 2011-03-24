@@ -52,7 +52,7 @@ struct NengoGPUData_t{
 
 
   float* input;
-  int* inputIndices;
+  int* inputIndexor;
 
   float* terminationTransforms;
   int* terminationTransformIndices;
