@@ -456,6 +456,19 @@ public class MU {
 	}
 	
 	/**
+	 * @param vector Any vector
+	 * @return The transpose of the vector (i.e. a column vector instead of a row vector)
+	 */
+	public static float[][] transpose(float[] vector) {		
+		float[][] result = new float[1][vector.length];
+		
+		for (int i = 0; i < vector.length; i++) {
+			result[0][i] = vector[i];
+		}
+		return result;
+	}
+	
+	/**
 	 * @param matrix Any matrix
 	 * @return The transpose of the matrix
 	 */
@@ -970,6 +983,5 @@ public class MU {
 			System.arraycopy(myValues, 0, result, 0, myIndex);
 			return result;
 		}
-	}	
-	
+	}
 }
