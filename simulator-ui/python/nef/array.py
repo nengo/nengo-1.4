@@ -79,11 +79,39 @@ class NetworkArray(NetworkImpl):
         origins=[n.addDecodedOrigin(name,functions,nodeOrigin) for n in self._nodes]
         self.createEnsembleOrigin(name)
         return self.getOrigin(name)
-    def addTermination(self,name,matrix,tauPSC,isModulatory):    
+    def addTermination(self,name,matrix,tauPSC,isModulatory):
         """Create a new termination.  A new termination is created on each
-        of the ensembles, which are then grouped together."""
-        terminations=[n.addTermination(name,matrix[i],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]  
-        termination=EnsembleTermination(self,name,terminations)
+        of the ensembles, which are then grouped together.
+        
+        What is this for?  Is it ever used and does it work?
+        """
+        terminations = [n.addTermination(name,matrix[i],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]
+        termination = EnsembleTermination(self,name,terminations)
+        self.exposeTermination(termination,name)
+        return self.getTermination(name)
+    def addPlasticTermination(self,name,matrix,tauPSC,decoder,weight_func=None):
+        """Create a new termination.  A new termination is created on each
+        of the ensembles, which are then grouped together.
+        
+        If decoders are not known at the time the termination is created,
+        then pass in an array of zeros of the appropriate size (i.e. however
+        many neurons will be in the population projecting to the termination)."""
+        terminations = []
+        d = 0
+        #w = MU.prod(encoder,MU.prod(matrix,MU.transpose(decoder)))
+        for n in self._nodes:
+            encoder = n.encoders
+            #print "matrix",matrix
+            #print "encoder",encoder
+
+            #print "decoder_trans",MU.transpose(decoder)
+            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d]])
+            if weight_func is not None:
+                w = weight_func(w)
+            t = n.addTermination(name,w,tauPSC,False)
+            terminations.append(t)
+            d += 1
+        termination = EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
     def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
@@ -127,4 +155,19 @@ class NetworkArray(NetworkImpl):
             units[i]=data.getUnits()[0]
             values[i]=data.getValues()[0][0]
         return TimeSeriesImpl(times,[values],units)
+    
+    def setPlasticityRule(self,learn_term,mod_term,rate,stdp):
+        for n in self._nodes:
+            if stdp:
+                inFcn = InSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders);
+                inFcn.setLearningRate(rate)
+                outFcn = OutSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders);
+                outFcn.setLearningRate(rate)
+                rule = SpikePlasticityRule(inFcn,outFcn,'AXON',mod_term)
+                n.setPlasticityRule(learn_term,rule)
+            else:
+                learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders)
+                learnFcn.setLearningRate(rate)
+                rule = RealPlasticityRule(learnFcn,'X',mod_term)
+                n.setPlasticityRule(learn_term,rule)
 
