@@ -110,7 +110,7 @@ public class NodeThreadPool {
 				
 				nodesForCurThread = NodeThreadPool.copyOfRange(myNodes, 
 						nodeOffset, nodeOffset + nodesPerThread);
-
+				nodeOffset += nodesPerThread;
 				
 			} else {
 				nodesForCurThread = NodeThreadPool.copyOfRange(myNodes, 
