@@ -282,7 +282,7 @@ class Network:
     def connect(self,pre,post,
                 transform=None,weight=1,index_pre=None,index_post=None,
                 pstc=0.01,func=None,weight_func=None,origin_name=None,
-                modulatory=False):
+                modulatory=False,plastic_array=False):
         """Connect two nodes in the network.
 
         pre and post can be strings giving the names of the nodes, or they
@@ -347,7 +347,22 @@ class Network:
                     raise Exception("Don't know how to turn %s into a %sx%s matrix"%(transform,dim_pre,dim_post))
             elif len(transform)!=dim_post and len(transform[0])!=dim_pre:
                 raise Exception("transform must be a %dx%d matrix"%(dim_pre,dim_post))
-
+        
+        if plastic_array:
+            suffix = ''
+            attempts = 1
+            while attempts < 100:
+                try:
+                    term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,weight_func)
+                    break
+                except StructuralException,e:
+                    exception = e
+                    attempts += 1
+                    suffix = '(%d)' % attempts
+            else:
+                raise exception#StructuralException('cannot create termination %s'%pre.name)
+            return self.network.addProjection(pre.getOrigin('AXON'),term)
+        
         if weight_func is not None:
             # calculate weights and pass them to the given function
             decoder=origin.decoders
