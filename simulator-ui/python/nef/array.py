@@ -1,7 +1,9 @@
-from ca.nengo.model.impl import NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl
 from ca.nengo.model import StructuralException, Origin
+from ca.nengo.model.impl import NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl
+from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
+    OutSpikeErrorFunction, RealPlasticityRule, SpikePlasticityRule
+from ca.nengo.util import MU
 from ca.nengo.util.impl import TimeSeriesImpl
-
 
 class ArrayOrigin(Origin):
     serialVersionUID=1
