@@ -207,7 +207,7 @@ class HRRWatch:
         length=0
         for i in range(len(v)): length+=v[i]*v[i]
         length=math.sqrt(length)
-        if length>0:
+        if length>0.0001:
             v=[x/length for x in v]
         return v    
     def hrr_dot(self,obj):
