@@ -437,6 +437,45 @@ class Network:
             rule=RealPlasticityRule(learnFcn, 'X', mod_term)
             post.setPlasticityRule(learn_term,rule)
 
+    def learn_array(self,array,learn_term,mod_term,rate=1e-5,stdp=False):
+        """Apply a learning rule to a termination of a NetworkArray.
+        
+        array is the NetworkArray to have learning applied to it.
+        The nodes contained within must all be PlasticEnsembleImpls.
+        Or a string with its name, either way.
+        
+        learn_term can be either a string or a Termination. It
+        is the termination whose transformation will be modified
+        by the learning rule.
+        
+        mod_term can be either a string or a Termination. It is
+        the modulatory input to the learning rule; while this
+        is technically not required by the plasticity functions
+        in Nengo, currently there are no learning rules implemented
+        that do not require modulatory input. If this changes,
+        this function should change to reflect that.
+        
+        rate is the learning rate that will be used in the learning
+        fuctions. (Possible enhancement: make this 2D for stdp
+        mode, different rates for in_fcn and out_fcn?)
+        
+        stdp is a boolean that signifies whether to use the STDP
+        based error-modulated learning rule. If it is True, then
+        the SpikePlasticityRule will be used, and the post
+        ensemble must be in DEFAULT (spiking) mode.
+        If it is False, then the RealPlasticityRule will be used,
+        and post can be either in RATE or DEFAULT mode.
+        """
+
+        if isinstance(array,str):
+            array = self.network.getNode(array)
+        if isinstance(learn_term,Termination):
+            learn_term = learn_term.getName()
+        if isinstance(mod_term,Termination):
+            mod_term = mod_term.getName()
+
+        array.setPlasticityRule(learn_term,mod_term,rate,stdp)
+
 def test():
     net=Network('Test')
     m=net.compute_transform(3,3,weight=1)
