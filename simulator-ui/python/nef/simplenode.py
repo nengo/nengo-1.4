@@ -17,7 +17,7 @@ class SimpleTermination(Termination):
         self._tau=tau
         self._modulatory=False
         self._func=func
-        self.setDimensions(1)
+        self.setDimensions(dimensions)
 
     def getName(self):
         return self._name
@@ -85,7 +85,14 @@ class SimpleNode(Node,Probeable):
     def create_origin(self,name,func):
         self.addOrigin(SimpleOrigin(name,self,func))
     def create_termination(self,name,func):
-        self.addTermination(SimpleTermination(name,self,func,tau=self.pstc))
+        dimensions=1
+        a,va,k,d=inspect.getargspec(func)
+        if 'dimensions' in a:
+            index=a.index('dimensions')-len(a)
+            dimensions=d[index]
+        self.addTermination(SimpleTermination(name,self,func,tau=self.pstc,dimensions=dimensions))
+            
+            
         
     def reset(self,randomize=False):
         pass
