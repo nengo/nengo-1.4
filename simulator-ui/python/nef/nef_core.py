@@ -45,17 +45,27 @@ import timeview
 class Network:
     """Wraps a Nengo network with a set of helper functions."""
     serialVersionUID=1
-    def __init__(self,name):
+    def __init__(self,name,quick=False):
         if isinstance(name,NetworkImpl):
             self.network=name
         else:
             self.network=NetworkImpl()
             self.network.name=name
+        self.defaults=dict(quick=quick)
 
-    def add_to(self,world):
+    def add_to(self,world=None):
         """Add the network to the given Nengo world object.  If there is a
-        network with that name already there, remove the old one.
+        network with that name already there, remove the old one.  If world is
+        None, it will attempt to find a running version of Nengo to add to.
         """
+
+        if world is None:
+            import ca.nengo.ui.NengoGraphics
+            ng=ca.nengo.ui.NengoGraphics.getInstance()
+            world=ca.nengo.ui.util.ScriptWorldWrapper(ng)
+        if world is None: return
+
+        
         n=world.getNode(self.network.name)
         if n is not None: world.remove(n)
         world.add(self.network)
@@ -97,7 +107,7 @@ class Network:
                   noise=None,noise_frequency=1000,
                   mode='spike',add_to_network=True,
                   node_factory=None,
-                  quick=False,storage_code=''):
+                  quick=None,storage_code=''):
         """Create and return an ensemble of LIF neurons.
 
         Keyword arguments:
@@ -115,6 +125,7 @@ class Network:
         noise_frequency -- sampling rate (how quickly the noise changes)
         mode -- simulation mode ('direct', 'rate', or 'spike')
         """
+        if quick is None: quick=self.defaults['quick']
         if quick:
             storage_name='quick_%s_%d_%d_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref)
             if type(max_rate) is tuple and len(max_rate)==2:
