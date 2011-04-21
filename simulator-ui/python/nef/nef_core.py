@@ -84,8 +84,8 @@ class Network:
         return node
 
     def make_array(self,name,neurons,length,dimensions=1,**args):
-        """Create and return an array of ensembles.  Each ensemble will be
-        1-dimensional.  All of the parameters from Network.make() can be
+        """Create and return an array of ensembles.  All of the parameters
+        from Network.make() can be
         used."""
         nodes=[]
         storage_code=args.get('storage_code','')
