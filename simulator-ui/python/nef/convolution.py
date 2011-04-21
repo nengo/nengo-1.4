@@ -70,7 +70,7 @@ def complex_exp(z):
 def product(x):
     return x[0]*x[1]
 
-def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],pstc_out=0.01,pstc_in=0.01,pstc_gate=0.01,invert_first=False,invert_second=False,mode='default'):
+def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],pstc_out=0.01,pstc_in=0.01,pstc_gate=0.01,invert_first=False,invert_second=False,mode='default',output_scale=1):
     if isinstance(A,str):
         A=self.network.getNode(A)
     if isinstance(B,str):
@@ -90,7 +90,7 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
         D.getTermination('gate').setTau(pstc_gate)
         self.connect(A,D.getTermination('A'))
         self.connect(B,D.getTermination('B'))
-        self.connect(D.getOrigin('C'),C,pstc=pstc_out)
+        self.connect(D.getOrigin('C'),C,pstc=pstc_out,weight=output_scale)
     else:
         D=self.make_array(name,N_per_D,(dimensions/2+1)*4,dimensions=2,quick=quick,encoders=encoders,radius=3)
         
@@ -141,7 +141,7 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
             ifftm2.append(-ifftm[i].imag)
         ifftm2=array(ifftm2)    
         
-        self.connect(D,C,func=product,transform=ifftm2.T,pstc=pstc_out)
+        self.connect(D,C,func=product,transform=ifftm2.T*output_scale,pstc=pstc_out)
         
     return D
 
