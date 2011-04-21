@@ -83,9 +83,8 @@ class NetworkArray(NetworkImpl):
         return self.getOrigin(name)
     def addTermination(self,name,matrix,tauPSC,isModulatory):
         """Create a new termination.  A new termination is created on each
-        of the ensembles, which are then grouped together.
-        
-        What is this for?  Is it ever used and does it work?
+        of the ensembles, which are then grouped together.  Useful for adding
+        inhibitory terminations to turn off the whole array.
         """
         terminations = [n.addTermination(name,matrix[i],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]
         termination = EnsembleTermination(self,name,terminations)
