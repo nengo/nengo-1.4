@@ -75,6 +75,7 @@ class SimpleNode(Node,Probeable):
         self._states=java.util.Properties()
         self.setMode(SimulationMode.DEFAULT)
         self.t_start=0
+        self.t_end=0
 
         for name,method in inspect.getmembers(self,inspect.ismethod):
             if name.startswith('origin_'):
