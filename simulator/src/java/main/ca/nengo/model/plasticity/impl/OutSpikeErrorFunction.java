@@ -46,11 +46,14 @@ public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	
 	private float[] myGain;
 	private float[][] myEncoders;
+	private float[][] myR1;
+	private float[][] myO2;
 	//default values (from Pfister & Gerstner 2006)
+	// These need to be in ms!
 	private float myA2Plus = 8.8e-11f;
 	private float myA3Plus = 5.3e-2f;
-	private float myTauPlus = 0.0168f;
-	private float myTauY = 0.04f;
+	private float myTauPlus = 16.8f;
+	private float myTauY = 125.0f;
 
 	/**
 	 * Requires information from the post population to modulate learning.
@@ -99,30 +102,47 @@ public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 		}
 		myEncoders=ens.getEncoders();
 	}
+
+	@Override
+	public void initActivityTraces(int postLength, int preLength) {
+		myR1 = new float[postLength][preLength];
+		myO2 = new float[postLength][preLength];
+	}
 	
+	@Override
+	public void beforeDOmega(boolean[] preSpiking) {
+		for (int j = 0; j < myR1.length; j++) {
+			for (int i = 0; i < myR1[0].length; i++) {
+				if (preSpiking[i]) {
+					myR1[j][i] += 1.0f;
+				}
+				myR1[j][i] -= myR1[j][i] / myTauPlus;
+				if (myR1[j][i] < 0.0f) {myR1[j][i] = 0.0f;}
+			}
+		}
+	}
+
 	/**
 	 * @see ca.nengo.model.plasticity.impl.AbstractSpikeLearningFunction#deltaOmega(float,float,float,float,int,int,int)
 	 */
 	protected float deltaOmega(float timeSinceDifferent, float timeSinceSame,
 			float currentWeight, float modInput, int postIndex, int preIndex, int dim) {
-		float r1, o2;
-		float result;
-		
-		if (timeSinceDifferent < myTauPlus) {
-			r1 = (float)Math.exp(-timeSinceDifferent/myTauPlus);
-		} else {
-			r1 = 0.0f;
-		}
-		
-		if (timeSinceSame < myTauY) {
-			o2 = (float)Math.exp(-timeSinceSame/myTauY);
-		} else {
-			o2 = 0.0f;
-		}
-		
-		result = r1 * (myA2Plus + o2 * myA3Plus);
+		float result = myR1[postIndex][preIndex] * (myA2Plus + myO2[postIndex][preIndex] * myA3Plus);
 
 		return myLearningRate * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
+	}
+	
+	@Override
+	public void afterDOmega(boolean[] postSpiking) {
+		for (int j = 0; j < myO2.length; j++) {
+			for (int i = 0; i < myO2[0].length; i++) {
+				if (postSpiking[j]) {
+					myO2[j][i] += 1.0f;
+				}
+				myO2[j][i] -= myO2[j][i] / myTauY;
+				if (myO2[j][i] < 0.0f) {myO2[j][i] = 0.0f;}
+			}
+		}
 	}
 	
 	@Override

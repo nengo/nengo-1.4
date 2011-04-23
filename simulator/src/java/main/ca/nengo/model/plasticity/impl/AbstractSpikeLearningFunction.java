@@ -90,6 +90,29 @@ public abstract class AbstractSpikeLearningFunction extends AbstractFunction {
 	protected abstract float deltaOmega(float timeSinceDifferent, float timeSinceSame,
 			float currentWeight, float modInput, int postIndex, int preIndex, int dim);
 	
+	/**
+	 * A function that is called before deltaOmega is evaluated.
+	 * Useful if certain variables or activity traces need to be updated.
+	 * 
+	 * @param spiking An array representing whether or not neurons in the
+	 *  population of interest are spiking.
+	 */
+	public void beforeDOmega(boolean[] spiking) {}
+	
+	/**
+	 * A function that is called after deltaOmega is evaluated.
+	 * Useful if certain variables or activity traces need to be updated.
+	 * 
+	 * @param spiking An array representing whether or not neurons in the
+	 *  population of interest are spiking.
+	 */
+	public void afterDOmega(boolean[] spiking) {}
+	
+	/**
+	 * Initializes activity traces in the rule, if any exist.
+	 */
+	public void initActivityTraces(int postLength, int preLength) {}
+	
 	public AbstractSpikeLearningFunction clone() throws CloneNotSupportedException {
 		return (AbstractSpikeLearningFunction) super.clone();
 	}

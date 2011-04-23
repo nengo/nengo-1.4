@@ -63,6 +63,11 @@ public class SpikePlasticityRule implements PlasticityRule {
 	
 	private float[] myModInputArray;
 	
+	private boolean myDecaying = false;
+	private float myDecayAmount = 1e-8f;
+	private boolean myHomeostatic = true;
+	private float myStableVal = 0.03f;
+	
 	/**
 	 * @param onInSpike AbstractSpikeLearningFunction defining synaptic weight change when there is an <bold>incoming</bold> spike.
 	 * @param onOutSpike AbstractSpikeLearningFunction defining synaptic weight change when there is an <bold>outgoing</bold> spike.
@@ -93,6 +98,7 @@ public class SpikePlasticityRule implements PlasticityRule {
 	private void setTermDim(int dim) {
 		myInSpikeHistory = MU.uniform(HISTORY_LENGTH, dim, -1);
 		myInSpiking = new boolean[dim];
+		myStableVal = 0.008f * dim;
 	}
 	
 	// Sets up the out spiking arrays
@@ -199,6 +205,8 @@ public class SpikePlasticityRule implements PlasticityRule {
 	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) {
 		if (myInSpiking == null) {
 			setTermDim(input.getDimension());
+			myOnInSpikeFunction.initActivityTraces(transform.length, transform[0].length);
+			myOnOutSpikeFunction.initActivityTraces(transform.length, transform[0].length);
 		}
 		if (input.getDimension() != myInSpiking.length) {
 			throw new IllegalArgumentException("Termination dimensions have changed; should be " 
@@ -206,6 +214,9 @@ public class SpikePlasticityRule implements PlasticityRule {
 		}
 		
 		update(myInSpikeHistory, myInSpiking, input, time);
+		
+		myOnInSpikeFunction.beforeDOmega(myOutSpiking);
+		myOnOutSpikeFunction.beforeDOmega(myInSpiking);
 		
 		// i is post, j is pre
 		float[][] result = new float[transform.length][];
@@ -240,6 +251,39 @@ public class SpikePlasticityRule implements PlasticityRule {
 				}
 			}
 		}
+		
+		if (myDecaying) {
+			for (int i = 0; i < result.length; i++) {
+				for (int j = 0; j < result[i].length; j++) {
+					if (transform[i][j] > 0.0) {
+						result[i][j] -= myDecayAmount;
+					} else {
+						result[i][j] += myDecayAmount;
+					}
+				}
+			}
+		}
+		
+		if (myHomeostatic) {
+			for (int i = 0; i < transform.length; i++) {
+				float sum_i = 0.0f;
+				for (int j = 0; j < transform[i].length; j++) {
+					sum_i += Math.abs(transform[i][j]);
+				}
+				
+				if (Math.abs(sum_i - myStableVal) > 1e-8f) {
+					float ratio = myStableVal / sum_i;
+					
+					for (int j = 0; j < transform[i].length; j++) {
+						result[i][j] += (transform[i][j] * ratio) - transform[i][j];
+					}
+				}
+			}
+		}
+		
+		myOnInSpikeFunction.afterDOmega(myInSpiking);
+		myOnOutSpikeFunction.afterDOmega(myOutSpiking);
+		
 		return result;
 	}
 	

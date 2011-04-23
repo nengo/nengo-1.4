@@ -46,11 +46,14 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	
 	private float[] myGain;
 	private float[][] myEncoders;
+	private float[][] myO1;
+	private float[][] myR2;
 	// default values (from Pfister & Gerstner 2006)
+	// These need to be in ms!
 	private float myA2Minus = 6.6e-3f;
 	private float myA3Minus = 3.1e-3f;
-	private float myTauMinus = 0.0337f;
-	private float myTauX = 0.714f;
+	private float myTauMinus = 33.7f;
+	private float myTauX = 101.0f;
 
 	/**
 	 * Requires information from the post population to modulate learning.
@@ -92,6 +95,8 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	 * @param ens Post population
 	 */
 	public InSpikeErrorFunction(NEFEnsembleImpl ens){
+		super();
+		
 		Node[] nodes = ens.getNodes();
 		myGain = new float[nodes.length];
 		for (int i=0;i<nodes.length;i++){
@@ -99,30 +104,47 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 		}
 		myEncoders=ens.getEncoders();
 	}
+	
+	@Override
+	public void initActivityTraces(int postLength, int preLength) {
+		myO1 = new float[postLength][preLength];
+		myR2 = new float[postLength][preLength];
+	}
+	
+	@Override
+	public void beforeDOmega(boolean[] postSpiking) {
+		for (int j = 0; j < myO1.length; j++) {
+			for (int i = 0; i < myO1[0].length; i++) {
+				if (postSpiking[j]) {
+					myO1[j][i] += 1.0f;
+				}
+				myO1[j][i] -= myO1[j][i] / myTauMinus;
+				if (myO1[j][i] < 0.0f) {myO1[j][i] = 0.0f;}
+			}
+		}
+	}
 
 	/**
 	 * @see ca.nengo.model.plasticity.impl.AbstractSpikeLearningFunction#deltaOmega(float,float,float,float,int,int,int)
 	 */
 	protected float deltaOmega(float timeSinceDifferent, float timeSinceSame,
 			float currentWeight, float modInput, int postIndex, int preIndex, int dim) {
-		float o1, r2;
-		float result;
-		
-		if (timeSinceDifferent < myTauMinus) {
-			o1 = (float)Math.exp(-timeSinceDifferent/myTauMinus);
-		} else {
-			o1 = 0.0f;
-		}
-		
-		if (timeSinceSame < myTauX) {
-			r2 = (float)Math.exp(-timeSinceSame/myTauX);
-		} else {
-			r2 = 0.0f;
-		}
-		
-		result = o1 * (myA2Minus + r2 * myA3Minus);
+		float result = myO1[postIndex][preIndex] * (myA2Minus + myR2[postIndex][preIndex] * myA3Minus);
 
 		return myLearningRate * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
+	}
+	
+	@Override
+	public void afterDOmega(boolean[] preSpiking) {
+		for (int j = 0; j < myR2.length; j++) {
+			for (int i = 0; i < myR2[0].length; i++) {
+				if (preSpiking[i]) {
+					myR2[j][i] += 1.0f;
+				}
+				myR2[j][i] -= myR2[j][i] / myTauX;
+				if (myR2[j][i] < 0.0f) {myR2[j][i] = 0.0f;}
+			}
+		}
 	}
 	
 	@Override
