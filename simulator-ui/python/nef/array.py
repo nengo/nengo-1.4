@@ -157,13 +157,30 @@ class NetworkArray(NetworkImpl):
             values[i]=data.getValues()[0][0]
         return TimeSeriesImpl(times,[values],units)
     
-    def setPlasticityRule(self,learn_term,mod_term,rate,stdp):
+    def setPlasticityRule(self,learn_term,mod_term,rate,stdp,**kwargs):
+        in_args = {'a2Minus':  6.6e-3,
+                   'a3Minus':  3.1e-3,
+                   'tauMinus': 33.7,
+                   'tauX':     101.0}
+        for key in in_args.keys():
+            if kwargs.has_key(key):
+                in_args[key] = kwargs[key]
+        
+        out_args = {'a2Plus':  8.8e-11,
+                    'a3Plus':  5.3e-2,
+                    'tauPlus': 16.8,
+                    'tauY':    125.0}
+        for key in out_args.keys():
+            if kwargs.has_key(key):
+                out_args[key] = kwargs[key]
+        
         for n in self._nodes:
             if stdp:
-                inFcn = InSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders);
+                inFcn = InSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
+                                             in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
                 inFcn.setLearningRate(rate)
-                outFcn = OutSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders);
-                outFcn.setLearningRate(rate)
+                outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
+                                               out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);                outFcn.setLearningRate(rate)
                 rule = SpikePlasticityRule(inFcn,outFcn,'AXON',mod_term)
                 n.setPlasticityRule(learn_term,rule)
             else:

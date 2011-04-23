@@ -398,8 +398,8 @@ class Network:
 
 
             return self.network.addProjection(origin,term)
-    def learn(self,post,learn_term,mod_term,
-                rate=1e-5,stdp=False):
+    
+    def learn(self,post,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
         """Apply a learning rule to a termination of a population.
         
         post can be either a string or an actual PlasticEnsemble.
@@ -426,6 +426,9 @@ class Network:
         ensemble must be in DEFAULT (spiking) mode.
         If it is False, then the RealPlasticityRule will be used,
         and post can be either in RATE or DEFAULT mode.
+        
+        **kwargs are any addition arguments to be passed to the
+        error functions and/or plasticity rules.
         """
         
         if isinstance(post,str):
@@ -436,9 +439,28 @@ class Network:
             mod_term=mod_term.getName()
         
         if stdp:
-            inFcn = InSpikeErrorFunction([n.scale for n in post.nodes],post.encoders);
+            in_args = {'a2Minus':  6.6e-3,
+                       'a3Minus':  3.1e-3,
+                       'tauMinus': 33.7,
+                       'tauX':     101.0}
+            for key in in_args.keys():
+                if kwargs.has_key(key):
+                    in_args[key] = kwargs[key]
+            
+            inFcn = InSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
+                                         in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
             inFcn.setLearningRate(rate)
-            outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders);
+            
+            out_args = {'a2Plus':  8.8e-11,
+                        'a3Plus':  5.3e-2,
+                        'tauPlus': 16.8,
+                        'tauY':    125.0}
+            for key in out_args.keys():
+                if kwargs.has_key(key):
+                    out_args[key] = kwargs[key]
+            
+            outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
+                                           out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);
             outFcn.setLearningRate(rate)
             rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', mod_term)
             post.setPlasticityRule(learn_term,rule)
@@ -448,7 +470,7 @@ class Network:
             rule=RealPlasticityRule(learnFcn, 'X', mod_term)
             post.setPlasticityRule(learn_term,rule)
 
-    def learn_array(self,array,learn_term,mod_term,rate=1e-5,stdp=False):
+    def learn_array(self,array,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
         """Apply a learning rule to a termination of a NetworkArray.
         
         array is the NetworkArray to have learning applied to it.
@@ -476,6 +498,9 @@ class Network:
         ensemble must be in DEFAULT (spiking) mode.
         If it is False, then the RealPlasticityRule will be used,
         and post can be either in RATE or DEFAULT mode.
+        
+        kwargs are any additional arguments that should be passed
+        to the plasticity rule or error functions.
         """
 
         if isinstance(array,str):
@@ -484,8 +509,8 @@ class Network:
             learn_term = learn_term.getName()
         if isinstance(mod_term,Termination):
             mod_term = mod_term.getName()
-
-        array.setPlasticityRule(learn_term,mod_term,rate,stdp)
+        
+        array.setPlasticityRule(learn_term,mod_term,rate,stdp,**kwargs)
 
 def test():
     net=Network('Test')

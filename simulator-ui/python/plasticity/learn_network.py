@@ -129,20 +129,21 @@ class SensoryInfo(nef.SimpleNode):
         for line in self.data_log:
             print line
 
-def make_learn_network(net,func,in_dim,out_dim,NperD=35,train_len=2.0,stdp=False,rate=1e-7,learning=True):
+def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False,rate=5e-7,learning=True,**kwargs):
     """Creates a network that will learn the function passed as func.
     That function is some transformation from a vector of length in_dim to
     a vector of length out_dim.
     
     Keyword arguments:
-    NperD -- number of neurons per dimension
     train_len -- length of the training phase. Learning only happens
       during the training phase.
+    NperD -- number of neurons per dimension
     stdp -- set to True to use the spiking plasticity rule, False to
       use the real plasticity rule
     rate -- learning rate (kappa)
     learning -- set to True to have learning enabled, False to create
       a control network that can be used for comparison
+    kwargs -- additional arguments to pass to nef.learn
     """
     
     pre_neurons = in_dim*NperD
@@ -163,7 +164,7 @@ def make_learn_network(net,func,in_dim,out_dim,NperD=35,train_len=2.0,stdp=False
     def rand_weights(w):
         for i in range(len(w)):
             for j in range(len(w[0])):
-                w[i][j] = random.uniform(-1e-4,1e-4)
+                w[i][j] = random.uniform(-1e-3,1e-3)
         return w
     
     net.connect(senses.getOrigin('X'),pre)
@@ -179,36 +180,32 @@ def make_learn_network(net,func,in_dim,out_dim,NperD=35,train_len=2.0,stdp=False
     net.connect(error,post,modulatory=True)
     
     if learning:
-        net.learn(post,'pre','error',rate=rate,stdp=stdp)
+        net.learn(post,'pre','error',rate=rate,stdp=stdp,**kwargs)
     
     senses.getTermination('error').setDimensions(out_dim)
     net.connect(error,senses.getTermination('error'))
 
-def run_experiment(name,func,in_dim,out_dim,train_len=2.0,stdp=False,rate=1e-7,NperD=35,length=2.0,learning=True,directory=None):
+def run_experiment(name,func,in_dim,out_dim,train_len=2.0,length=2.0,directory=None,**ln_args):
     """Sets up and optionally runs a learning experiment.
     A network is created to learn func, with the given dimensions.
     
     Keyword arguments:
     train_len -- length of the training phase. Learning only happens
       during the training phase.
-    stdp -- set to True to use the spiking plasticity rule, False to
-      use the real plasticity rule
-    rate -- learning rate (kappa)
-    NperD -- number of neurons per dimension
     length -- the amount of time that the network will learn. Note
       that because of the alternating training and testing phases,
       the actual amount of time that the network runs will be much
       larger (depending on train_len)
-    learning -- set to True to have learning enabled, False to create
-      a control network that can be used for comparison
     directory -- the directory in which to store the results of the
       experiment. If directory is None, then the network will not
       be run. Since the function returns the created network, a calling
       script can then add the network to the world and look at its
       interactive plots, and the like.
+    ln_args -- Arguments to pass on to make_learning_net but not used
+      in this function.
     """
     net = nef.Network(name)
-    make_learn_network(net,func,in_dim,out_dim,train_len=train_len,stdp=stdp,rate=rate,NperD=NperD,learning=learning)
+    make_learn_network(net,func,in_dim,out_dim,train_len=train_len,**ln_args)
     senses = net.network.getNode('SensoryInfo')
     
     if directory != None:
@@ -219,9 +216,11 @@ def run_experiment(name,func,in_dim,out_dim,train_len=2.0,stdp=False,rate=1e-7,N
         
         now = datetime.datetime.now()
         f_name = os.path.join(directory,  name+'-'+now.strftime("%Y-%m-%d_%H-%M")+'.csv')
-        f = open(f_name, 'w')
-        f.write('Parameters:\nname=%s\nstdp=%s\nrate=%f\nNperD=%d\n' % (name,str(stdp),rate,NperD))
-        f.close()
+        #f = open(f_name+'.params', 'w')
+        #f.write('Parameters:\nname=%s\n' % name)
+        #for k,v in ln_args.items():
+        #    f.write("%s = %s\n" % (k,v))
+        #f.close()
         senses.write_data_log(f_name)
     
     return net
