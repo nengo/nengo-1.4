@@ -165,14 +165,18 @@
 			<fileset dir="${src.dist}"/>
 		</copy>
 		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildnumber}">
-			<include name="nengo"/>
-			<include name="nengo.bat"/>
+			<include name="nengo-ui"/>
+			<include name="nengo-cl"/>
+			<include name="nengo-ui.bat"/>
+			<include name="nengo-cl.bat"/>
 		</replace>
+		<!-- The following doesn't seem to work properly, or not every time...
 		<chmod perm="a+x" verbose="true">
 			<fileset dir="${dist.dir}">
 				<include name="nengo"/>
 				<include name="external/pseudoInverse"/>
 			</fileset>
 		</chmod>
+		!-->
 	</target>
 </project>
