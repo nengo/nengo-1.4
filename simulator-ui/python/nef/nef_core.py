@@ -293,7 +293,7 @@ class Network:
     def connect(self,pre,post,
                 transform=None,weight=1,index_pre=None,index_post=None,
                 pstc=0.01,func=None,weight_func=None,origin_name=None,
-                modulatory=False,plastic_array=False):
+                modulatory=False,plastic_array=False,create_projection=True):
         """Connect two nodes in the network.
 
         pre and post can be strings giving the names of the nodes, or they
@@ -381,6 +381,7 @@ class Network:
             w=MU.prod(encoder,MU.prod(transform,MU.transpose(decoder)))   #gain is handled elsewhere
             w=weight_func(w)
             term=post.addTermination(pre.name,w,pstc,False)
+            if not create_projection: return pre.getOrigin('AXON'),term
             self.network.addProjection(pre.getOrigin('AXON'),term)
         else:
             suffix=''
@@ -397,6 +398,7 @@ class Network:
                 raise exception#StructuralException('cannot create termination %s'%pre.name)
 
 
+            if not create_projection: return origin,term
             return self.network.addProjection(origin,term)
     
     def learn(self,post,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
