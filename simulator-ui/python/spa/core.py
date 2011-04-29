@@ -8,13 +8,16 @@ class SPA:
         if name is None: name=self.__class__.__name__
         self._net=nef.Network(name)
         self._net.add_to()
+        self._scalar_sources={}
         self._sources={}
         self._sinks={}
         self._sink_parents={}
         self._components={}
         self._vocab={}
+        self._vocab_default={}
 
         self.structure()
+        self.initialize()
         self.connect()
     def __setattr__(self,k,v):
         self.__dict__[k]=v
@@ -27,12 +30,18 @@ class SPA:
         for c in self._components.values():
             if hasattr(c,'connect_NCA'):
                 c.connect_NCA(self)
+    def initialize(self):
+        for c in self._components.values():
+            if hasattr(c,'init_NCA'):
+                c.init_NCA(self)
 
     def set_vocab(self,name,vocab=None,aligned=False):
         if hasattr(name,'name'): name=name.name
         if vocab is None:
             dim=self.get_dimension(name)
-            vocab=hrr.Vocabulary(dim,randomize=not aligned)
+            if not self._vocab_default.has_key(dim):
+                self._vocab_default[dim]=hrr.Vocabulary(dim,randomize=not aligned)
+            vocab=self._vocab_default[dim]
         self._vocab[name]=vocab
 
     def get_dimension(self,name):
@@ -54,8 +63,14 @@ class SPA:
 
         sources=component.getOrigins()
         for s in sources:
-            self._sources['%s_%s'%(component.name,s.name)]=s
-            if s.name=='value' or len(sources)==1:
+            if s.name=='value':
+                sname=component.name
+            else:
+                sname='%s_%s'%(component.name,s.name)
+                
+            if s.dimensions==1:
+                self._scalar_sources[sname]=s,None
+            else:
                 self._sources[component.name]=s
 
         if hasattr(component,'get_sinks'):

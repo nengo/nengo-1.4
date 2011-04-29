@@ -38,6 +38,12 @@ class Rules:
             for k in r.lhs.keys():
                 if k not in keys: keys.append(k)
         return keys
+    def _rhs_set_keys(self):
+        keys=[]
+        for r in self._rules.values():
+            for k in r.rhs_set.keys():
+                if k not in keys: keys.append(k)
+        return keys
 
     def _make_lhs_transform(self,key,vocab):
         t=[]
@@ -54,3 +60,12 @@ class Rules:
             if key not in rhs: t.append([0]*vocab.dimensions)
             else: t.append(vocab.parse(rhs[key]).v)
         return numeric.array(t).T
+
+    def _make_lhs_scalar_transform(self,key):
+        t=[]
+        for n in self._names:
+            lhs=self._rules[n].lhs
+            if key not in lhs: t.append([0])
+            else: t.append([lhs[key]])
+        return t
+            

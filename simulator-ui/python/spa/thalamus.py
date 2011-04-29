@@ -29,7 +29,7 @@ class Thalamus(ca.nengo.model.impl.NetworkImpl):
     def connect_NCA(self,nca):
         nca._net.network.addProjection(self.bg.getOrigin('output'),self.getTermination('bg'))
         
-        for k in self.bg.rules._lhs_keys():
+        for k in self.bg.rules._rhs_set_keys():
             t=self.bg.rules._make_rhs_set_transform(k,nca.vocab(k))
             nca.connect_to_sink(self.getOrigin('rules'),k,t,self.pstc_output)
         

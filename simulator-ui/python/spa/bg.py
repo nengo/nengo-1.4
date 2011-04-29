@@ -43,3 +43,9 @@ class BasalGanglia(ca.nengo.model.impl.NetworkImpl):
         for k in self.rules._lhs_keys():
             if k in nca._sources.keys():
                 self.add_input(nca,nca._sources[k],self.rules._make_lhs_transform(k,nca.vocab(k)))
+            elif k in nca._scalar_sources.keys():
+                s,t1=nca._scalar_sources[k]
+                t=self.rules._make_lhs_scalar_transform(k)
+                if t1 is not None:
+                    t=numeric.dot(t,t1)
+                self.add_input(nca,s,t)
