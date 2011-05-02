@@ -115,7 +115,7 @@ class SensoryInfo(nef.SimpleNode):
         the contents of self.data_log are printed to console instead.
         """
         try:
-            f = open(filename, 'a+')
+            f = open(filename, 'w')
         except:
             print "Error opening %s" % filename
             return self.print_data_log()
@@ -215,12 +215,7 @@ def run_experiment(name,func,in_dim,out_dim,train_len=2.0,length=2.0,directory=N
         net.network.run(0,run_length)
         
         now = datetime.datetime.now()
-        f_name = os.path.join(directory,  name+'-'+now.strftime("%Y-%m-%d_%H-%M")+'.csv')
-        #f = open(f_name+'.params', 'w')
-        #f.write('Parameters:\nname=%s\n' % name)
-        #for k,v in ln_args.items():
-        #    f.write("%s = %s\n" % (k,v))
-        #f.close()
+        f_name = os.path.join(directory, name+'-'+now.strftime("%Y-%m-%d_%H-%M")+'.csv')
         senses.write_data_log(f_name)
     
     return net

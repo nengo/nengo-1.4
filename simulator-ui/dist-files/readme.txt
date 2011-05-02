@@ -18,6 +18,9 @@ This can be done by executing the following command from a terminal in the
 main nengo directory.
  chmod +x external/pseudoInverse
 
+You may also need to mark nengo-ui and nengo-cl as executable.
+ chmod +x nengo nengo-cl
+
                        =======
                        =USAGE=
                        =======
@@ -41,9 +44,9 @@ Beginning users and those who aren't sure what to use should use the graphical
 interface. To start it:
 
 (Windows)
-run nengo-ui.bat
+run nengo.bat
 (Linux, Mac OS X)
-run nengo-ui
+run nengo
 
 ==============
 =COMMAND-LINE=
