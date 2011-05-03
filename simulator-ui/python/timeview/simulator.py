@@ -31,8 +31,8 @@ class Simulator:
           self.projections.append(p);
 
         for n in network.nodes:
-            if n.__class__.__name__=='NetworkImpl' or n.__class__.__name__=='NetworkArray':
-            #if isinstance(n,Network) and not n.__class__.__name__ in ['CCMModelNetwork','PyramidalNetwork']:
+            #if n.__class__.__name__=='NetworkImpl' or n.__class__.__name__=='NetworkArray':
+            if isinstance(n,Network) and not n.__class__.__name__ in ['CCMModelNetwork','PyramidalNetwork']:
                 self.initialize(n)
             else:
                 self.nodes.append(n)
