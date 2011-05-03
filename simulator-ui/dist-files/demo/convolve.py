@@ -4,7 +4,7 @@ import hrr
 
 D=10
 
-vocab=hrr.Vocabulary(D)
+vocab=hrr.Vocabulary(D, include_pairs=True)
 vocab.parse('a+b+c+d+e')
 
 net=nef.Network('Convolution')
