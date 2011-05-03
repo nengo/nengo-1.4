@@ -323,8 +323,11 @@ class Graph(core.DataViewComponent):
                         y1-=(len(filtered)-1-j)*split_step
                         y2-=(len(filtered)-1-j)*split_step
 
-                    if pdftemplate is None:                        
-                        g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1+skip)*dx+self.border_left),int(y2))
+                    if pdftemplate is None:
+                        try:
+                            g.drawLine(int(i*dx+self.border_left),int(y1),int((i+1+skip)*dx+self.border_left),int(y2))
+                        except OverflowError:
+                            pass
                     else:
                         x=(self.x+i*dx+self.border_left)*scale
                         y=800-(self.y+y1)*scale
