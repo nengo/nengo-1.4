@@ -56,6 +56,9 @@ class SPA:
         if name not in self._vocab.keys():
             self.set_vocab(name)
         return self._vocab[name]
+
+    def add_scalar_source(self,name,origin,transform=None):
+        self._scalar_sources[name]=origin,transform
         
     def add(self,component):
         self._net.add(component)
@@ -69,7 +72,7 @@ class SPA:
                 sname='%s_%s'%(component.name,s.name)
                 
             if s.dimensions==1:
-                self._scalar_sources[sname]=s,None
+                self.add_scalar_source(sname,s)
             else:
                 self._sources[component.name]=s
 

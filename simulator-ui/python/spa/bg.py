@@ -11,7 +11,7 @@ class BasalGanglia(ca.nengo.model.impl.NetworkImpl):
         self.name=name
         self.rules=rules
         net=nef.Network(self)
-        nef.templates.basalganglia.make(None,dimensions=len(self.rules._rules),netbg=net)
+        nef.templates.basalganglia.make(None,dimensions=rules._rule_count,netbg=net)
         self.hideOrigin('output')
         self.removeNode('output')
         self.hideTermination('input')
@@ -38,6 +38,8 @@ class BasalGanglia(ca.nengo.model.impl.NetworkImpl):
         self.exposeTermination(t1,tname)
         nca._net.network.addProjection(o1,self.getTermination(tname))
 
+    def init_NCA(self,nca):
+        self.rules._initialize(sources=nca._sources.keys(),sinks=nca._sinks.keys())
         
     def connect_NCA(self,nca):
         for k in self.rules._lhs_keys():

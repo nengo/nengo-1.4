@@ -23,15 +23,16 @@ class DotProduct(ca.nengo.model.impl.NetworkImpl):
 
         net=nef.Network(self)
         self.inputs=net.make_array('inputs',self.N*2,dim,dimensions=2,encoders=[[1,1],[1,-1],[-1,-1],[-1,1]],quick=True)
-        self.dp=net.make('dp',self.N,1,quick=True)
+        #self.dp=net.make('dp',self.N,1,quick=True)
+
+        
 
         def product(x):
             return x[0]*x[1]
-        net.connect(self.inputs,self.dp,func=product,transform=[[1]*dim],pstc=self.pstc)
-
-        #self.exposeOrigin(self.dp.getOrigin('X'),'value')
+        self.inputs.addDecodedOrigin('product',[nef.functions.PythonFunction(product,dim)],'AXON')
+                            
         self.exposeOrigin(self.inputs.getOrigin('product'),'product')
-        nca._scalar_sources[self.name]=self.getOrigin('product'),numeric.ones((1,dim),'f')
+        nca.add_scalar_source(self.name,self.getOrigin('product'),numeric.ones((1,dim),'f'))
                         
 
         t1=numeric.zeros((dim*2,dim),typecode='f')
