@@ -1,6 +1,7 @@
 import nef
 import ca.nengo
 import numeric
+import spa.view
 
 class Thalamus(ca.nengo.model.impl.NetworkImpl):
     def __init__(self,bg,name='BG',neurons=40,rule_threshold=0.2,bg_output_weight=-3,pstc_output=0.002,mutual_inhibit=1,pstc_inhibit=0.008,pstc_to_gate=0.002,pstc_gate=0.008,N_per_D=30,pstc_route_input=0.002):
@@ -27,7 +28,8 @@ class Thalamus(ca.nengo.model.impl.NetworkImpl):
 
         if mutual_inhibit>0:
             net.connect(self.rules,self.rules,(numeric.eye(D)-1)*mutual_inhibit,pstc=pstc_inhibit)
-            
+
+        spa.view.rule_watch.add(self)
 
 
     def connect_NCA(self,nca):
