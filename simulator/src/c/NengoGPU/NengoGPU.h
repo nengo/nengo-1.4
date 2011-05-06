@@ -20,6 +20,9 @@ extern pthread_cond_t* cv_GPUThreads;
 extern pthread_cond_t* cv_JNI;
 extern FILE* fp;
 
+extern float* sharedInput;
+extern int sharedInputSize;
+
 int manipulateNumNodesProcessed(int action, int value);
 int manipulateKill(int action);
 

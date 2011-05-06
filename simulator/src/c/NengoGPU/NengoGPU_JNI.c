@@ -1,3 +1,4 @@
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -6,17 +7,21 @@ extern "C"{
 #include <jni.h>
 #include <pthread.h>
 #include <string.h>
+#include <limits.h>
+#include <math.h>
 #include <sys/timeb.h>
+#include <assert.h>
 
-#include "GPUThread_JNI.h"
+#include "NEFGPUInterface_JNI.h"
 #include "NengoGPU.h"
 #include "NengoGPU_CUDA.h"
 #include "NengoGPUData.h"
+#include "GraphTheoryRoutines.h"
 
 
-// returns not the sort array but the indices of the values in the sorted order. So return[0] is the index of 
-// the largest element in values, return[1] is the index of the second largest, etc.
-int* sort(int* values, int length)
+// returns not the sort array but the indices of the values in the sorted order. So newOrder[0] is the index of 
+// the largest element in values, newOrder[1] is the index of the second largest, etc.
+int* sort(int* values, int length, int order)
 {
   int* newOrder = (int*) malloc( length * sizeof(int));
   int* scratch = (int*) malloc( length * sizeof(int));
@@ -27,7 +32,7 @@ int* sort(int* values, int length)
   for(i = 0; i < length; i++)
   {
     j = i;
-    while(j > 0 && values[i] > scratch[j - 1])
+    while(j > 0 && ((order && values[i] > scratch[j - 1]) || (!order && values[i] < scratch[j-1])))
     {
       scratch[j] = scratch[j-1];
       newOrder[j] = newOrder[j-1];
@@ -43,26 +48,265 @@ int* sort(int* values, int length)
   return newOrder;
 }
 
-// this has to assign each projection to a GPU. If we are using multiple GPUs, its likely that some of the projections
-// will have to cross GPUs, though we will try to minimize this. Those projections will be handled on the Java side for now.
-// For now, none of this is actually true, we'll just use one GPU so we can get the rest of the code running
-void distributeEnsemblesToDevices(int numDevices, int numEnsembles, int numProjections, projection* projections, int* deviceForEnsemble)
+
+int* partitionNetwork(int* adjacencyMatrix, int numNeurons, int* ensembleNumNeurons, int numEnsembles)
 {
-  if(!(numDevices == 1))
-  {
-    //error
-    printf("just use one device for now!\n");
-  }
+  if(numEnsembles == 0)
+    return NULL;
 
-  int i;
-  for(i = 0; i < numProjections; i++)
-  {
-    projections[i].device = 0;
-  }
+  int* partitionArray = NULL;
 
+  if(numEnsembles == 1)
+    partitionArray = (int*)malloc(numEnsembles * sizeof(int));
+    partitionArray[0] = 0;
+    return partitionArray;
+
+  if(numEnsembles == 2)
+    partitionArray = (int*)malloc(numEnsembles * sizeof(int));
+    partitionArray[0] = 0;
+    partitionArray[1] = 1;
+    return partitionArray;
+
+  Graph* G = convertAdjacencyMatrixToGraph(adjacencyMatrix, numEnsembles);  
+
+  int *cutValues, **cutPartition, i, j;
+
+  stoerWagner_allPairsMinCut(G, &cutValues, &cutPartition);
+
+  int* order = sort(cutValues, numEnsembles-1, 0);
+
+  int num_neurons_set_one, num_neurons_set_two, index;
+  
+  i = 0;
+  do
+  {
+    index = order[i];
+
+    num_neurons_set_one = num_neurons_set_two = 0;
+    for(j = 0; j < numEnsembles; j++)
+    {
+      if(cutPartition[index][j])
+      {
+        num_neurons_set_one += ensembleNumNeurons[j];
+      }
+      else
+      {
+        num_neurons_set_two += ensembleNumNeurons[j];
+      }
+    }
+    
+    //printf("num neurons set one : %d, num neurons set 2: %d, cut val: %d\n", num_neurons_set_one, num_neurons_set_two, cutValues[index]);
+
+    i++;
+  }while((num_neurons_set_one < numNeurons / 4 || num_neurons_set_two < numNeurons / 4) && i < numEnsembles-1);
+
+  free(order);
+
+  // if we failed to find a cut with a good balance, we just take the minimum cut, whatever its balance is
+  int chosen_index = (i == numEnsembles-1) ? 0 : index;
+
+/*
   for(i = 0; i < numEnsembles; i++)
   {
-    deviceForEnsemble[i] = 0;
+    printf("%d, ", cutPartition[chosen_index][j]);
+  }
+
+  //printf("\nset one neurons: %d, set two neurons: %d, cut value: %d\n", set_one_neurons, set_two_neurons, cutValues[i]);
+  */
+
+  partitionArray = (int*)malloc(numEnsembles * sizeof(int));
+
+  memcpy(partitionArray, cutPartition[chosen_index], numEnsembles * sizeof(int));
+
+  free_stoerWagnerResults(cutValues, cutPartition, numEnsembles);
+  free_graph(G);
+
+  return partitionArray;
+}
+
+
+int* createSubgraphAdjacencyMatrix(int* originalAdjacencyMatrix, int originalSize, int newSize, int* partition, int flag)
+{
+  int* newAdjacency = (int*)malloc(newSize * newSize * sizeof(int));
+  memset(newAdjacency, '\0', newSize * newSize * sizeof(int));
+  int p = 0, q = 0, i, j;
+
+  for(i = 0; i < originalSize; i++)
+  {
+    if(partition[i] == flag)
+    {
+      q = 0;
+      for(j = 0; j < i; j++)
+      {
+        if(partition[j] == flag)
+        {
+          newAdjacency[p * newSize + q] = originalAdjacencyMatrix[i * originalSize + j]; 
+          q++;
+        }
+      }
+
+      p++;
+    }
+  }
+
+  return newAdjacency;
+}
+
+// Assign ensembles and projections to the devices. We employ a simple algorithm to limit the data being passed between devices.
+// Basically, choose an arbitary first ensemble, assign it to the first device, then perform breadth first search, assigning to
+// the first device until we run out of space on that device. 
+void generateNengoGPUDeviceConfiguration(int totalNumNeurons, int* numNeurons, int numProjections, projection* projections, int* adjacencyMatrix, int* deviceForEnsemble)
+{
+  int i, j;
+  memset(deviceForEnsemble, '\0', totalNumEnsembles * sizeof(int));
+
+  if(numDevices > 1)
+  {
+    // partition the network. Uses a mincut-finding algorithm to ensure as little communication takes place between GPUs as possible
+    int* partition = partitionNetwork(adjacencyMatrix, totalNumNeurons, numNeurons, totalNumEnsembles);
+
+    // find number of ensembles on each side of partition
+    int set_one_ensembles = 0, set_two_ensembles = 0;
+    for(i = 0; i < totalNumEnsembles; i++)
+    {
+      partition[i] ? set_one_ensembles++ : set_two_ensembles++;
+    }
+
+    memcpy(deviceForEnsemble, partition, totalNumEnsembles * sizeof(int));
+
+    int cutValue = 0;
+    for(i = 0; i < totalNumEnsembles; i++)
+    {
+      for(j = 0; j < i; j++)
+      {
+        if(partition[i] != partition[j])
+          cutValue += adjacencyMatrix[i * totalNumEnsembles + j];
+      }
+    }
+
+    // partition one of the partitions
+    if(numDevices > 2)
+    {
+      // create an adjacency matrix containing only vertices in one of the partitions we made earlier
+      int* newAdjacency = createSubgraphAdjacencyMatrix(adjacencyMatrix, totalNumEnsembles, set_one_ensembles, partition, 1);
+
+      int* numNeurons_set_one = (int*)malloc(set_one_ensembles * sizeof(int));
+      int totalNumNeurons_set_one = 0;
+
+      // create the numNeurons array for the current subgraph
+      j = 0;
+      for(i = 0; i < totalNumEnsembles; i++)
+      {
+        if(partition[i])
+        {
+          numNeurons_set_one[j++] = numNeurons[i];
+          totalNumNeurons_set_one += numNeurons[i];
+        }
+      }
+
+      // partition the subgraph via a minimum cut
+      int* partition_two = partitionNetwork(newAdjacency, totalNumNeurons_set_one, numNeurons_set_one, set_one_ensembles);
+      
+      free(numNeurons_set_one);
+      free(newAdjacency);
+
+      // assign ensembles that fall on different sides of the subgraph partition to different devices
+      j = 0;
+      for(i = 0; i < totalNumEnsembles; i++)
+      {
+        if(partition[i])
+        {
+          if(partition_two[j])
+          {
+            deviceForEnsemble[i] = 1;
+          }
+          else
+          {
+            deviceForEnsemble[i] = 2;
+          }
+
+          j++;
+        }
+      }
+      
+      free(partition_two);
+    }
+
+    // we do the same as above except we work on the other subgraph created by the partition
+    if(numDevices > 3)
+    {
+      int* newAdjacency = createSubgraphAdjacencyMatrix(adjacencyMatrix, totalNumEnsembles, set_two_ensembles, partition, 0);
+
+      int* numNeurons_set_two = (int*)malloc(set_two_ensembles * sizeof(int));
+      int totalNumNeurons_set_two = 0;
+
+      j = 0;
+      for(i = 0; i < totalNumEnsembles; i++)
+      {
+        if(!partition[i])
+        {
+          numNeurons_set_two[j++] = numNeurons[i];
+          totalNumNeurons_set_two += numNeurons[i];
+        }
+      }
+
+      int* partition_three = partitionNetwork(newAdjacency, totalNumNeurons_set_two, numNeurons_set_two, set_two_ensembles);
+
+      free(numNeurons_set_two);
+      free(newAdjacency);
+
+      j = 0;
+      for(i = 0; i < totalNumEnsembles; i++)
+      {
+        if(!partition[i])
+        {
+          if(partition_three[j])
+          {
+            deviceForEnsemble[i] = 0;
+          }
+          else
+          {
+            deviceForEnsemble[i] = 3;
+          }
+
+          j++;
+        }
+      }
+
+      free(partition_three);
+    }
+
+    free(partition);
+  }
+
+  printf("device for ensemble:\n");
+  for(i = 0; i < totalNumEnsembles; i++)
+  {
+    printf("%d ", deviceForEnsemble[i]);
+  }
+  printf("\n");
+
+  int originNodeIndex, termNodeIndex;
+  for(i = 0; i < numProjections; i++)
+  {
+    originNodeIndex = projections[i].sourceEnsemble;
+    termNodeIndex = projections[i].destinationEnsemble;
+
+    projections[i].sourceDevice = deviceForEnsemble[originNodeIndex];
+    projections[i].destDevice = deviceForEnsemble[termNodeIndex];
+  }
+}
+
+void adjustProjections(int numProjections, projection* projections, int* ensembleJavaIndexToDeviceIndex)
+{
+  int i;
+  projection* p;
+  for(i = 0; i < numProjections; i++)
+  {
+    p = (projections + i);
+
+    p->sourceEnsemble = ensembleJavaIndexToDeviceIndex[p->sourceEnsemble];
+    p->destinationEnsemble = ensembleJavaIndexToDeviceIndex[p->destinationEnsemble];
   }
 }
 
@@ -83,7 +327,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
 
   int* isDecodedTermination  = (int*)malloc(currentData->numTerminations * sizeof(int));
   
-  int ensembleIndex;
+  int ensembleIndex = 0;
   int NDterminationIndex = 0;
   int terminationIndex = 0;
   int transformRowIndex = 0;
@@ -93,7 +337,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
   {
     ensembleIndex = intArrayGetElement(currentData->ensembleIndexInJavaArray, i);
 
-    intArraySetElement(currentData->NDterminationEnsembleOffset, ensembleIndex, NDterminationIndex);
+    intArraySetElement(currentData->NDterminationEnsembleOffset, i, NDterminationIndex);
 
     transformsForCurrentEnsemble_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, transforms_JAVA, ensembleIndex);
     numTerminationsForCurrentEnsemble = (int) (*env)->GetArrayLength(env, transformsForCurrentEnsemble_JAVA);
@@ -110,7 +354,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
       exit(EXIT_FAILURE);
     }
 
-    // get the array that says whether an ensemble is decoded for the current ensemble
+    // get the array that says whether a termination is decoded for the current ensemble
     tempIntArray_JAVA = (jintArray)(*env)->GetObjectArrayElement(env, isDecodedTermination_JAVA, ensembleIndex);
     (*env)->GetIntArrayRegion(env, tempIntArray_JAVA, 0, numTerminationsForCurrentEnsemble, isDecodedTermination);
 
@@ -143,7 +387,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
           transformRowIndex++;
         }
 
-        intArraySetElement(currentData->inputDimensions, terminationIndex, dimensionOfCurrentTermination);
+        intArraySetElement(currentData->terminationDimension, terminationIndex, dimensionOfCurrentTermination);
       }
       else
       {
@@ -155,7 +399,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
 
         floatArraySetElement(currentData->NDterminationWeights, NDterminationIndex, currentTransformRow[0]);
         intArraySetElement(currentData->NDterminationInputIndexor, NDterminationIndex, terminationIndex);
-        intArraySetElement(currentData->inputDimensions, terminationIndex, 1);
+        intArraySetElement(currentData->terminationDimension, terminationIndex, 1);
 
         NDterminationIndex++;
       }
@@ -198,13 +442,6 @@ void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, NengoGPUData* cu
       floatArraySetElement(currentData->ensembleTauRC, ensembleIndex, neuronDataForCurrentEnsemble[1]);
       floatArraySetElement(currentData->ensembleTauRef, ensembleIndex, neuronDataForCurrentEnsemble[2]);
 
-      /*
-      if(currentData->numNonDecodedTerminations > 0)
-      {
-        currentData->tauPSC[ensembleIndex] = neuronData[3];
-      }
-      */
-
       intArraySetElement(currentData->ensembleOffsetInNeurons, ensembleIndex, neuronIndex);
 
       for(j = 0; j < currentNumNeurons; j++)
@@ -234,12 +471,12 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
   jobjectArray encoderForCurrentEnsemble_JAVA;
   jfloatArray currentEncoderRow_JAVA;
 
-  // get encoders for this device out of encoders java array
   float* temp_encoders = (float*) malloc(currentData->totalEncoderSize * sizeof(float));
   int* temp_encoder_offset = (int*)malloc(currentData->numEnsembles * sizeof(int));
 
   int offset = 0;
   // totalNumEnsembles is a global variable denoting the number of ensembles in the entire run, not just those allocated to this device
+  // here we get encoders for this device out of encoders java array, but they're not in the order we want
   for(i = 0; i < totalNumEnsembles; i++)
   {
     if(deviceForEnsemble[i] == currentData->device)
@@ -266,10 +503,9 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
 
 
   // order ensembles by decreasing dimension
-  
   char* name = "ensembleOrderInEncoders";
   currentData->ensembleOrderInEncoders = newIntArray(currentData->numEnsembles, name);
-  int* temp = sort(currentData->ensembleDimension->array, currentData->numEnsembles);
+  int* temp = sort(currentData->ensembleDimension->array, currentData->numEnsembles, 1);
   intArraySetData(currentData->ensembleOrderInEncoders, temp, currentData->numEnsembles);
   free(temp);
 
@@ -319,46 +555,31 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
       rowOffset += intArrayGetElement(currentData->encoderStride,k);
     }
 
-    intArraySetElement(currentData->ensembleOffsetInEncoders, ensembleIndex, neuronOffset);
     neuronOffset += numNeuronsForCurrentEnsemble;
   }
 
   free(temp_encoder_offset);
   free(temp_encoders);
- 
 
-  // figure out how many CUDA blocks to use for encoding
-  j = 0;
+
+
+  // construct array encoderRowToEnsembleIndexor which maintains, for each row encoder row, which ensemble it belongs to
+  int encoderRowIndex = 0, ensembleOffsetInNeurons;
   for(i = 0; i < currentData->numEnsembles; i++)
   {
-    numNeuronsForCurrentEnsemble = intArrayGetElement(currentData->ensembleNumNeurons, i);
+    ensembleIndex = intArrayGetElement(currentData->ensembleOrderInEncoders, i);
 
-    while(numNeuronsForCurrentEnsemble > 0)
+    numNeurons = intArrayGetElement(currentData->ensembleNumNeurons, ensembleIndex);
+    ensembleOffsetInNeurons = intArrayGetElement(currentData->ensembleOffsetInNeurons, ensembleIndex);
+
+    for(j = 0; j < numNeurons; j++)
     {
-      numNeuronsForCurrentEnsemble -= currentData->blockSizeForEncode;
-      j++;
+      intArraySetElement(currentData->encoderRowToEnsembleIndexor, encoderRowIndex, ensembleIndex); 
+      intArraySetElement(currentData->encoderRowToNeuronIndexor, encoderRowIndex, ensembleOffsetInNeurons + j); 
+      encoderRowIndex++;
     }
   }
 
-  currentData->numBlocksForEncode = j;
-
-  name = "blockToEnsembleMapForEncode";
-  currentData->blockToEnsembleMapForEncode = newIntArray(j,name);
-
-  // then populate currentData->blockToEnsembleMapForEncode
-  j = 0;
-  for(i = 0; i < currentData->numEnsembles; i++)
-  {
-    numNeuronsForCurrentEnsemble = intArrayGetElement(currentData->ensembleNumNeurons, i);
-    intArraySetElement(currentData->ensembleIndexOfFirstBlockForEncode, i, j);
-
-    while(numNeuronsForCurrentEnsemble > 0)
-    {
-      intArraySetElement(currentData->blockToEnsembleMapForEncode, j, i);
-      numNeuronsForCurrentEnsemble -= currentData->blockSizeForEncode;
-      j++;
-    }
-  }
 }
 
 void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* currentData, int* deviceForEnsemble)
@@ -370,8 +591,11 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
   jfloatArray currentDecoderRow_JAVA;
   int decoderIndex = 0, dimensionOfCurrentDecoder, numDecodersForCurrentEnsemble, ensembleIndexInJavaArray;
 
-  // setup ensembleOutputSize and ensembleOffsetInOutput
-  int outputSize, outputOffset = 0;
+  int* ensembleOutputSize = (int*)malloc(currentData->numEnsembles * sizeof(int)); 
+  int* ensembleOffsetInOutput = (int*)malloc(currentData->numEnsembles * sizeof(int)); 
+
+  // populate currentData->originOffsetInOutput and ensembleOutputSize
+  int outputSize, originOffsetInOutput = 0;
   decoderIndex = 0;
   for(j = 0; j < currentData->numEnsembles; j++)
   {
@@ -382,7 +606,7 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
 
     outputSize = 0;
 
-    intArraySetElement(currentData->ensembleOffsetInOutput, j, outputOffset);
+    ensembleOffsetInOutput[j] = originOffsetInOutput;
 
     for(k = 0; k < numDecodersForCurrentEnsemble; k++)
     {
@@ -394,15 +618,15 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
 
       outputSize += dimensionOfCurrentDecoder;
 
-      intArraySetElement(currentData->outputOffset,decoderIndex, outputOffset);
-      outputOffset += dimensionOfCurrentDecoder;
+      intArraySetElement(currentData->originOffsetInOutput, decoderIndex, originOffsetInOutput);
+      originOffsetInOutput += dimensionOfCurrentDecoder;
       decoderIndex++;
     }
 
-    intArraySetElement(currentData->ensembleOutputSize,j, outputSize);
+    ensembleOutputSize[j] = outputSize;
   }
 
-  // setup decoderStride
+  // populate decoder stride
   int numOutputs;
   for(i = 1; i <= currentData->maxNumNeurons; i++)
   {
@@ -412,7 +636,7 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
     {
       if(intArrayGetElement(currentData->ensembleNumNeurons,j) >= i)
       {
-        numOutputs += intArrayGetElement(currentData->ensembleOutputSize, j);
+        numOutputs += ensembleOutputSize[j]; 
       }
     }
 
@@ -422,7 +646,7 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
   // sort the ensembles in order of decreasing number of neurons
   char* name = "ensembleOrderInDecoders";
   currentData->ensembleOrderInDecoders = newIntArray(currentData->numEnsembles, name); 
-  int* temp = sort(currentData->ensembleNumNeurons->array, currentData->numEnsembles);
+  int* temp = sort(currentData->ensembleNumNeurons->array, currentData->numEnsembles, 1);
   intArraySetData(currentData->ensembleOrderInDecoders, temp, currentData->numEnsembles);
   free(temp);
 
@@ -430,13 +654,10 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
 
   int ensembleIndex = 0;
   int numNeuronsForCurrentEnsemble;
-  int offsetInEnsemble = 0;
+  int decoderRowIndex = 0;
   int offset = 0;
   int rowOffset = 0;
 
-
-  // setup decoders using the ordering found above (decreasing number of neurons)
-  // also setup ensembleNumOrigins
   for(i = 0; i < currentData->numEnsembles; i++)
   {
     ensembleIndex = intArrayGetElement(currentData->ensembleOrderInDecoders,i);
@@ -447,13 +668,13 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
     decodersForCurrentEnsemble_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, decoders_JAVA, ensembleIndexInJavaArray);
     numDecodersForCurrentEnsemble = (int) (*env)->GetArrayLength(env, decodersForCurrentEnsemble_JAVA);
 
-    intArraySetElement(currentData->ensembleNumOrigins,ensembleIndex, numDecodersForCurrentEnsemble);
+    intArraySetElement(currentData->ensembleNumOrigins, ensembleIndex, numDecodersForCurrentEnsemble);
 
     rowOffset = 0;
 
     for(j = 0; j < numNeuronsForCurrentEnsemble; j++)
     {
-      offsetInEnsemble = offset;
+      decoderRowIndex = offset;
       for(k = 0; k < numDecodersForCurrentEnsemble; k++)
       {
         currentDecoder_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, decodersForCurrentEnsemble_JAVA, k);
@@ -461,9 +682,9 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
         
         dimensionOfCurrentDecoder = (*env)->GetArrayLength(env, currentDecoderRow_JAVA);
 
-        if(rowOffset + offsetInEnsemble + dimensionOfCurrentDecoder <= currentData->totalDecoderSize)
+        if(rowOffset + decoderRowIndex + dimensionOfCurrentDecoder <= currentData->totalDecoderSize)
         {
-          (*env)->GetFloatArrayRegion(env, currentDecoderRow_JAVA, 0, dimensionOfCurrentDecoder, currentData->decoders->array + rowOffset + offsetInEnsemble);
+          (*env)->GetFloatArrayRegion(env, currentDecoderRow_JAVA, 0, dimensionOfCurrentDecoder, currentData->decoders->array + rowOffset + decoderRowIndex);
         }
         else
         {
@@ -471,247 +692,324 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
           exit(EXIT_FAILURE);
         }
 
-        offsetInEnsemble += dimensionOfCurrentDecoder;
+        decoderRowIndex += dimensionOfCurrentDecoder;
       }
 
       rowOffset += intArrayGetElement(currentData->decoderStride,j);
     }
     
-    intArraySetElement(currentData->ensembleOffsetInDecoders, ensembleIndex, offset);
-    offset = offsetInEnsemble;
+    offset = decoderRowIndex;
   }
-  
 
-  // setup block related data
-  // figure out how many blocks to use for decoding
-  j = 0;
+
+  int offsetInOutput;
+  decoderRowIndex = 0;
+
+  // set decoderRowIndexors. Tells each decoder which ensemble it belongs to and where to put its output
   for(i = 0; i < currentData->numEnsembles; i++)
   {
-    outputSize = intArrayGetElement(currentData->ensembleOutputSize, i);
+    ensembleIndex = intArrayGetElement(currentData->ensembleOrderInDecoders, i);
 
-    while(outputSize > 0)
+    outputSize = ensembleOutputSize[ensembleIndex]; 
+    offsetInOutput = ensembleOffsetInOutput[ensembleIndex];
+
+    for(j = 0; j < outputSize; j++)
     {
-      outputSize -= currentData->blockSizeForDecode;
-      j++;
+      intArraySetElement(currentData->decoderRowToEnsembleIndexor, decoderRowIndex, ensembleIndex); 
+      intArraySetElement(currentData->decoderRowToOutputIndexor, decoderRowIndex, offsetInOutput + j); 
+      decoderRowIndex++;
     }
   }
 
-  currentData->numBlocksForDecode = j;
-
-  name = "blockToEnsembleMapForDecode";
-  currentData->blockToEnsembleMapForDecode = newIntArray(j,name);
-
-  // then populate currentData->blockToEnsembleMapForEncode
-  j = 0;
-  for(i = 0; i < currentData->numEnsembles; i++)
-  {
-    outputSize = intArrayGetElement(currentData->ensembleOutputSize,i);
-
-    intArraySetElement(currentData->ensembleIndexOfFirstBlockForDecode, i, j);
-
-    while(outputSize > 0)
-    {
-      intArraySetElement(currentData->blockToEnsembleMapForDecode, j, i);
-      outputSize -= currentData->blockSizeForDecode;
-      j++;
-    }
-  }
+  free(ensembleOutputSize);
+  free(ensembleOffsetInOutput);
 }
 
 
-void assignEnsembleToDevice(int* GPUData, NengoGPUData* currentData)
+void assignEnsembleToDevice(int* ensembleData, NengoGPUData* currentData)
 {
   currentData->numEnsembles++;
-  currentData->numNeurons += GPUData[NENGO_GPU_DATA_NUM_NEURONS];
+  currentData->numNeurons += ensembleData[NENGO_ENSEMBLE_DATA_NUM_NEURONS];
 
-  currentData->numDecodedTerminations += GPUData[NENGO_GPU_DATA_NUM_DECODED_TERMINATIONS];
-  currentData->totalInputSize += GPUData[NENGO_GPU_DATA_TOTAL_INPUT_SIZE];
-  currentData->totalNumTransformRows += GPUData[NENGO_GPU_DATA_NUM_DECODED_TERMINATIONS] * GPUData[NENGO_GPU_DATA_DIMENSION];
+  currentData->numDecodedTerminations += ensembleData[NENGO_ENSEMBLE_DATA_NUM_DECODED_TERMINATIONS];
+  currentData->totalInputSize += ensembleData[NENGO_ENSEMBLE_DATA_TOTAL_INPUT_SIZE];
+  currentData->totalNumTransformRows += ensembleData[NENGO_ENSEMBLE_DATA_NUM_DECODED_TERMINATIONS] * ensembleData[NENGO_ENSEMBLE_DATA_DIMENSION];
   
-  if(GPUData[NENGO_GPU_DATA_NUM_DECODED_TERMINATIONS] > currentData->maxNumDecodedTerminations)
+  if(ensembleData[NENGO_ENSEMBLE_DATA_NUM_DECODED_TERMINATIONS] > currentData->maxNumDecodedTerminations)
   {
-    currentData->maxNumDecodedTerminations = GPUData[NENGO_GPU_DATA_NUM_DECODED_TERMINATIONS];
+    currentData->maxNumDecodedTerminations = ensembleData[NENGO_ENSEMBLE_DATA_NUM_DECODED_TERMINATIONS];
   }
 
-  if(GPUData[NENGO_GPU_DATA_MAX_TRANSFORM_DIMENSION] > currentData->maxDecodedTerminationDimension)
+  if(ensembleData[NENGO_ENSEMBLE_DATA_MAX_TRANSFORM_DIMENSION] > currentData->maxDecodedTerminationDimension)
   {
-    currentData->maxDecodedTerminationDimension = GPUData[NENGO_GPU_DATA_MAX_TRANSFORM_DIMENSION];
-  }
-  
-  currentData->totalEncoderSize += GPUData[NENGO_GPU_DATA_NUM_NEURONS] * GPUData[NENGO_GPU_DATA_DIMENSION];
-
-  currentData->numOrigins += GPUData[NENGO_GPU_DATA_NUM_ORIGINS];
-  currentData->totalOutputSize += GPUData[NENGO_GPU_DATA_TOTAL_OUTPUT_SIZE];
-  currentData->totalDecoderSize += GPUData[NENGO_GPU_DATA_TOTAL_OUTPUT_SIZE] * GPUData[NENGO_GPU_DATA_NUM_NEURONS];
-  
-  if(GPUData[NENGO_GPU_DATA_MAX_DECODER_DIMENSION] > currentData->maxOriginDimension)
-  {
-    currentData->maxOriginDimension = GPUData[NENGO_GPU_DATA_MAX_DECODER_DIMENSION];
-  }
-
-  currentData->totalEnsembleDimension += GPUData[NENGO_GPU_DATA_DIMENSION];
-
-  if(GPUData[NENGO_GPU_DATA_DIMENSION] > currentData->maxDimension)
-  {
-    currentData->maxDimension = GPUData[NENGO_GPU_DATA_DIMENSION];
-  }
-
-  if(GPUData[NENGO_GPU_DATA_NUM_NEURONS] > currentData->maxNumNeurons)
-  {
-    currentData->maxNumNeurons = GPUData[NENGO_GPU_DATA_NUM_NEURONS];
+    currentData->maxDecodedTerminationDimension = ensembleData[NENGO_ENSEMBLE_DATA_MAX_TRANSFORM_DIMENSION];
   }
   
-  currentData->numNDterminations += GPUData[NENGO_GPU_DATA_NUM_NON_DECODED_TERMINATIONS];
+  currentData->totalEncoderSize += ensembleData[NENGO_ENSEMBLE_DATA_NUM_NEURONS] * ensembleData[NENGO_ENSEMBLE_DATA_DIMENSION];
+
+  currentData->numOrigins += ensembleData[NENGO_ENSEMBLE_DATA_NUM_ORIGINS];
+  currentData->totalOutputSize += ensembleData[NENGO_ENSEMBLE_DATA_TOTAL_OUTPUT_SIZE];
+  currentData->totalDecoderSize += ensembleData[NENGO_ENSEMBLE_DATA_TOTAL_OUTPUT_SIZE] * ensembleData[NENGO_ENSEMBLE_DATA_NUM_NEURONS];
+  
+  if(ensembleData[NENGO_ENSEMBLE_DATA_MAX_DECODER_DIMENSION] > currentData->maxOriginDimension)
+  {
+    currentData->maxOriginDimension = ensembleData[NENGO_ENSEMBLE_DATA_MAX_DECODER_DIMENSION];
+  }
+
+  currentData->totalEnsembleDimension += ensembleData[NENGO_ENSEMBLE_DATA_DIMENSION];
+
+  if(ensembleData[NENGO_ENSEMBLE_DATA_DIMENSION] > currentData->maxDimension)
+  {
+    currentData->maxDimension = ensembleData[NENGO_ENSEMBLE_DATA_DIMENSION];
+  }
+
+  if(ensembleData[NENGO_ENSEMBLE_DATA_NUM_NEURONS] > currentData->maxNumNeurons)
+  {
+    currentData->maxNumNeurons = ensembleData[NENGO_ENSEMBLE_DATA_NUM_NEURONS];
+  }
+  
+  currentData->numNDterminations += ensembleData[NENGO_ENSEMBLE_DATA_NUM_NON_DECODED_TERMINATIONS];
 }
 
 void setupInput(int numProjections, projection* projections, NengoGPUData* currentData)
 {
   int i, j;
-  int currentDimension, GPUInputSize = 0, ensembleIndex = 0, indexInEnsemble = 0;
-  int currentNumObjects;
+  int currentDimension, ensembleIndex = -1, terminationIndexInEnsemble = -1;
+  int projectionMatches, currentNumTerminations = 0; 
 
   int* flattenedProjections = (int*) malloc(2 * numProjections * sizeof(int));
 
+  int JavaInputIndex = 0, GPUInputIndex = 0, CPUInputIndex = 0;
+  
+  // 0 = GPU, 1 = Java, 2 = CPU
+  int* terminationLocation = (int*)malloc(currentData->numTerminations * sizeof(int));
   // flatten the termination side of the projection array
   for(i = 0; i < currentData->numTerminations; i++)
   {
-    if(indexInEnsemble == 0)
+    terminationIndexInEnsemble++;
+    while(terminationIndexInEnsemble == currentNumTerminations)
     {
-      currentNumObjects = intArrayGetElement(currentData->ensembleNumTerminations, ensembleIndex);
+      ensembleIndex++;
+      terminationIndexInEnsemble = 0;
+      currentNumTerminations = intArrayGetElement(currentData->ensembleNumTerminations, ensembleIndex);
     }
 
-    currentDimension = intArrayGetElement(currentData->inputDimensions, i);
+    currentDimension = intArrayGetElement(currentData->terminationDimension, i);
+
+    // find a GPU projection that terminates at the current termination. We can stop as soon as we find
+    // one because terminations can only be involved in one projection
     j = 0;
-    while(j < numProjections && (projections[j].destinationEnsemble != ensembleIndex || projections[j].destinationTermination != indexInEnsemble))
+    projectionMatches = 0;
+    while(!projectionMatches && j < numProjections)
     {
+      projectionMatches = projections[j].destDevice == currentData->device
+                    && projections[j].destinationEnsemble == ensembleIndex
+                    && projections[j].destinationTermination == terminationIndexInEnsemble;
+
+      if(projectionMatches)
+        break;
+
       j++;
     }
 
-    if(j < numProjections)
+    // if we found one then we have to see whether that projection is inter or intra device
+    if(!projectionMatches)
     {
-      GPUInputSize += currentDimension;
-      flattenedProjections[2 * j] = i;
+      intArraySetElement(currentData->terminationOffsetInInput, i, JavaInputIndex);
+      JavaInputIndex += currentDimension;
+      terminationLocation[i] = 1;
     }
-    
-    indexInEnsemble++;
-
-    if(indexInEnsemble == currentNumObjects)
+    else
     {
-      ensembleIndex++;
-      indexInEnsemble = 0;
+      flattenedProjections[2 * j] = i;
+
+      if(projections[j].sourceDevice == currentData->device)
+      {
+        intArraySetElement(currentData->terminationOffsetInInput, i, GPUInputIndex);
+        GPUInputIndex += currentDimension;
+        terminationLocation[i] = 0;
+      }
+      else
+      {
+        intArraySetElement(currentData->terminationOffsetInInput, i, CPUInputIndex);
+        CPUInputIndex += currentDimension;
+        terminationLocation[i] = 2;
+      }
     }
   }
 
   // find the size of input that stays on the gpu
-  currentData->GPUInputSize = GPUInputSize;
-  currentData->CPUInputSize = currentData->totalInputSize - GPUInputSize;
+  currentData->GPUInputSize = GPUInputIndex;
+  currentData->CPUInputSize = CPUInputIndex;
+  currentData->JavaInputSize = JavaInputIndex;
 
+  assert(GPUInputIndex + CPUInputIndex + JavaInputIndex == currentData->totalInputSize);
+
+  // adjust the terminationOffsets to reflect the location of each termination (GPU, Java or CPU)
+  // can only be done once we know the size of each location
+  int oldVal, location;
+  for(i = 0; i < currentData->numTerminations; i++)
+  {
+    oldVal = intArrayGetElement(currentData->terminationOffsetInInput, i);
+    
+    location = terminationLocation[i];
+
+    switch(location)
+    {
+      case 0:
+        break;
+      case 1:
+        intArraySetElement(currentData->terminationOffsetInInput, i, oldVal + currentData->GPUInputSize);
+        break;
+      case 2:
+        intArraySetElement(currentData->terminationOffsetInInput, i, oldVal + currentData->GPUInputSize + currentData->JavaInputSize);
+        break;
+    }
+  }
+
+  free(terminationLocation);
+
+
+  /*
+  These are arrays whose size relies on GPUInputSize, CPUInputSize or JavaInput size, and thus cannot be made until we have those
+  values. Because of this, we cannot create these arrays in the function initializeNengoGPUData like we do with all the other arrays
+  */
   char* name = "GPUTerminationToOriginMap";
   currentData->GPUTerminationToOriginMap = newIntArray(currentData->GPUInputSize, name);
 
-  // create the inputHost array. only as large as the number of CPU inputs
-  // since GPU inputs are supposed to stay on the device
   name = "inputHost";
-  currentData->inputHost = newFloatArray(currentData->CPUInputSize, name);
+  currentData->inputHost = newFloatArray(currentData->JavaInputSize, name);
 
   
   // flatten the origin side of the projection array. This is slightly different than flattening the termination side
   // because any one termination can only be involved in one projection whereas any origin can be involved in any number of projections.
   // Effectively this means we have to scan the entire projection array for each origin, we can't stop as soon as we find one.
-  ensembleIndex = 0;
-  indexInEnsemble = 0;
+  ensembleIndex = -1;
+  int originIndexInEnsemble = -1, currentNumOrigins = 0, CPUOutputSize = 0;
 
   for(i = 0; i < currentData->numOrigins; i++)
   {
-    if(indexInEnsemble == 0)
+    originIndexInEnsemble++;
+
+    if(originIndexInEnsemble == currentNumOrigins)
     {
-      currentNumObjects = intArrayGetElement(currentData->ensembleNumOrigins, ensembleIndex);
+      ensembleIndex++;
+      originIndexInEnsemble = 0;
+      currentNumOrigins = intArrayGetElement(currentData->ensembleNumOrigins, ensembleIndex);
     }
 
     for(j = 0; j < numProjections; j++)
     {
-      if(projections[j].sourceEnsemble == ensembleIndex && projections[j].sourceOrigin == indexInEnsemble)
+      projectionMatches = projections[j].sourceDevice == currentData->device
+                      && projections[j].sourceEnsemble == ensembleIndex
+                      && projections[j].sourceOrigin == originIndexInEnsemble;
+
+      if(projectionMatches)
       {
         flattenedProjections[2 * j + 1] = i;
+
+        if(projections[j].destDevice != currentData->device)
+        {
+          CPUOutputSize += projections[j].size;
+        }
       }
     }
-
-    indexInEnsemble++;
-
-    if(indexInEnsemble == currentNumObjects)
-    {
-      ensembleIndex++;
-      indexInEnsemble = 0;
-    }
   }
 
-  int CPUInputIndex = 0, GPUInputIndex = 0;
-  // setup the array of offsets into input. Note that all GPU inputs come before
-  // any CPU inputs in the input array.
-  for( i = 0; i < currentData->numTerminations; i++)
-  {
-    currentDimension = intArrayGetElement(currentData->inputDimensions,i);
+  currentData->CPUOutputSize = CPUOutputSize;
 
-    j = 0;
-    while(j < numProjections && flattenedProjections[2 * j] != i)
-    {
-      j++;
-    }
+  name = "sharedData_outputIndex";
+  currentData->sharedData_outputIndex = newIntArray(currentData->CPUOutputSize, name);
 
-    if(j == numProjections)
-    {
-      intArraySetElement(currentData->inputOffset, i, GPUInputSize + CPUInputIndex);
-      CPUInputIndex += currentDimension;
-    }
-    else
-    {
-      intArraySetElement(currentData->inputOffset, i, GPUInputIndex);
-      GPUInputIndex += currentDimension;
-    }
-  }
+  name = "sharedData_sharedIndex";
+  currentData->sharedData_sharedIndex = newIntArray(currentData->CPUOutputSize, name);
 
   // Use the flattened projections to create a map from the input to the output following the projections
   // This way we can launch a kernel for each projection on the GPU, have it look up where it gets its output from
   // fetch it from the output array and put it in the input array
-  int terminationIndexOnDevice, originIndexOnDevice, inputOffset, outputOffset;
+  int terminationIndexOnDevice, originIndexOnDevice, terminationOffsetInInput, originOffsetInOutput;
   for(i = 0; i < numProjections; i++)
   {
-    if(projections[i].device == currentData->device)
+    if(projections[i].sourceDevice == currentData->device && projections[i].destDevice == currentData->device)
     {
       terminationIndexOnDevice = flattenedProjections[i * 2];
       originIndexOnDevice = flattenedProjections[i * 2 + 1];
 
-      inputOffset = intArrayGetElement(currentData->inputOffset,terminationIndexOnDevice);
-      outputOffset = intArrayGetElement(currentData->outputOffset,originIndexOnDevice);
-      currentDimension = intArrayGetElement(currentData->inputDimensions,terminationIndexOnDevice);
+      terminationOffsetInInput = intArrayGetElement(currentData->terminationOffsetInInput, terminationIndexOnDevice);
+      originOffsetInOutput = intArrayGetElement(currentData->originOffsetInOutput, originIndexOnDevice);
+      currentDimension = intArrayGetElement(currentData->terminationDimension, terminationIndexOnDevice);
 
       for(j = 0; j < currentDimension; j++)
       {
-        intArraySetElement(currentData->GPUTerminationToOriginMap,inputOffset + j, outputOffset + j);
+        intArraySetElement(currentData->GPUTerminationToOriginMap, terminationOffsetInInput + j, originOffsetInOutput + j);
+      }
+    }
+    else if(projections[i].sourceDevice == currentData->device && projections[i].destDevice != currentData->device)
+    {
+      originIndexOnDevice = flattenedProjections[i * 2 + 1];
+      projections[i].offsetInSource = intArrayGetElement(currentData->originOffsetInOutput, originIndexOnDevice);
+    }
+    else if(projections[i].destDevice == currentData->device && projections[i].sourceDevice != currentData->device)
+    {
+      terminationIndexOnDevice = flattenedProjections[i * 2];
+      projections[i].offsetInDestination = intArrayGetElement(currentData->terminationOffsetInInput, terminationIndexOnDevice) - currentData->GPUInputSize - currentData->JavaInputSize + currentData->offsetInSharedInput;
+    }
+  }
+
+  free(flattenedProjections);
+}
+
+void createSharedMemoryMaps(int numProjections, projection* projections)
+{
+  int i, j, sharedIndex = 0, indexInProjection;
+  projection* p;
+  NengoGPUData* currentData;
+
+  for(j = 0; j < numDevices; j++)
+  {
+    currentData = nengoDataArray[j];
+    sharedIndex = 0;
+    for(i = 0; i < numProjections; i++)
+    {
+      p = projections + i;
+
+      if(p->sourceDevice == currentData->device && p->destDevice != currentData->device)
+      {
+        for(indexInProjection = 0; indexInProjection < p->size; indexInProjection++)
+        {
+          intArraySetElement(currentData->sharedData_outputIndex, sharedIndex, p->offsetInSource + indexInProjection);
+          intArraySetElement(currentData->sharedData_sharedIndex, sharedIndex, p->offsetInDestination + indexInProjection);
+          sharedIndex++;
+        }
       }
     }
   }
-  
-  free(flattenedProjections);
 }
 
 // This function takes as arguments all the information required by the ensembles to run that won't change from step to step: decoders, encoders, transformations.
 // This is called only once, at the beginning of a run (specifically, when the GPUNodeThreadPool is created). 
-JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeSetupRun
-  (JNIEnv *env, jclass class, jobjectArray terminationTransforms_JAVA, jobjectArray isDecodedTermination_JAVA, jobjectArray terminationTau_JAVA, jobjectArray encoders_JAVA, jobjectArray decoders_JAVA, jobjectArray neuronData_JAVA, jobjectArray projections_JAVA, jobjectArray GPUData_JAVA, jintArray projectionOnGPU_JAVA, jfloat maxTimeStep)
+JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
+  (JNIEnv *env, jclass class, jobjectArray terminationTransforms_JAVA, jobjectArray isDecodedTermination_JAVA, 
+  jobjectArray terminationTau_JAVA, jobjectArray encoders_JAVA, jobjectArray decoders_JAVA, 
+  jobjectArray neuronData_JAVA, jobjectArray projections_JAVA, jobjectArray ensembleData_JAVA, 
+  jobjectArray adjacencyMatrix_JAVA, jfloat maxTimeStep, jint numDevicesRequested)
 {
   printf("NengoGPU: SETUP\n");
   int i, j, k;
 
-  //numDevices = getGPUDeviceCount();
-  numDevices = 1;
   
   nengoDataArray = (NengoGPUData**) malloc(sizeof(NengoGPUData*) * numDevices);
 
   totalNumEnsembles = (int) (*env)->GetArrayLength(env, neuronData_JAVA);
 
-  deviceForEnsemble = (int*) malloc(totalNumEnsembles * sizeof(int));
+  int numAvailableDevices = getGPUDeviceCount();
+  
+  // make sure the num devices we use isn't bigger than the number of devices available or the number of ensembles we are processing
+  numDevices = numAvailableDevices < numDevicesRequested ? numAvailableDevices : numDevicesRequested;
+  numDevices = totalNumEnsembles < numDevices ? totalNumEnsembles : numDevicesRequested;
+  printf("Using %d devices. %d available\n", numDevices, numAvailableDevices);
 
+  deviceForEnsemble = (int*) malloc(totalNumEnsembles * sizeof(int));
 
   jintArray tempIntArray_JAVA;
 
@@ -736,40 +1034,60 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeSetupRun
   }
   free(currentProjection);
 
-  // The distributes the ensembles to the devices. Right now it tries to maximize the number of GPU projections
-  // so the amount of data being passed to the GPU every step is minimized.
-  distributeEnsemblesToDevices(numDevices, totalNumEnsembles, numProjections, projections, deviceForEnsemble);
-
-  int* projectionOnGPU = (int*)malloc(numProjections * sizeof(int));
-
-  for(i = 0; i < numProjections; i++)
-  {
-    projectionOnGPU[i] = (projections[i].device < 0) ? 0 : 1;
-  }
-  
-  // We have to inform the JAVA code which projections will run on the GPUs.
-  // This JAVA array, projectionsOnGPU_JAVA, will get return to the JAVA side when the native call returns
-  (*env)->SetIntArrayRegion(env, projectionOnGPU_JAVA, 0, numProjections, projectionOnGPU); 
-  free(projectionOnGPU);
-
-
-  // We have to set the number fields in the NengoGPUData structs so that it knows how big to make its internal arrays
-  jintArray GPUDataRow_JAVA;
-  int* GPUData = (int*)malloc(NENGO_GPU_DATA_NUM * sizeof(int));
+  // store the adjacency matrix in a c array
+  int* adjacencyMatrix = (int*) malloc(totalNumEnsembles * totalNumEnsembles * sizeof(int)); 
   for(i = 0; i < totalNumEnsembles; i++)
   {
-    GPUDataRow_JAVA = (jintArray) (*env)->GetObjectArrayElement(env, GPUData_JAVA, i);
-    (*env)->GetIntArrayRegion(env, GPUDataRow_JAVA, 0, NENGO_GPU_DATA_NUM, GPUData);
+    tempIntArray_JAVA = (jintArray)(*env)->GetObjectArrayElement(env, adjacencyMatrix_JAVA, i);
+    (*env)->GetIntArrayRegion(env, tempIntArray_JAVA, 0, totalNumEnsembles, adjacencyMatrix + i * totalNumEnsembles);
+  }
+
+  // create an array of the number of neurons in each ensemble, used only in generating the device config
+  int* ensembleNumNeurons = (int*)malloc(totalNumEnsembles * sizeof(int));
+  int* ensembleData = (int*)malloc(NENGO_ENSEMBLE_DATA_NUM * sizeof(int));
+  int totalNumNeurons = 0, numNeurons;
+  jintArray ensembleDataRow_JAVA;
+
+  for(i = 0; i < totalNumEnsembles; i++)
+  {
+    ensembleDataRow_JAVA = (jintArray) (*env)->GetObjectArrayElement(env, ensembleData_JAVA, i);
+    (*env)->GetIntArrayRegion(env, ensembleDataRow_JAVA, 0, NENGO_ENSEMBLE_DATA_NUM, ensembleData);
+    
+    numNeurons = ensembleData[NENGO_ENSEMBLE_DATA_NUM_NEURONS];
+    ensembleNumNeurons[i] = numNeurons;
+    totalNumNeurons += numNeurons;
+  }
+  
+  // The distributes the ensembles to the devices. Right now it tries to maximize the number of GPU projections
+  // so the amount of data being passed to the GPU every step is minimized.
+  generateNengoGPUDeviceConfiguration(totalNumNeurons, ensembleNumNeurons, numProjections, projections, adjacencyMatrix, deviceForEnsemble);
+
+  free(adjacencyMatrix);
+  free(ensembleNumNeurons);
+
+  // We have to set the number fields in the NengoGPUData structs so that it knows how big to make its internal arrays
+  int* ensembleJavaIndexToDeviceIndex = (int*)malloc(totalNumEnsembles * sizeof(int));
+  for(i = 0; i < totalNumEnsembles; i++)
+  {
+    ensembleDataRow_JAVA = (jintArray) (*env)->GetObjectArrayElement(env, ensembleData_JAVA, i);
+    (*env)->GetIntArrayRegion(env, ensembleDataRow_JAVA, 0, NENGO_ENSEMBLE_DATA_NUM, ensembleData);
 
     currentData = nengoDataArray[deviceForEnsemble[i]];
 
-    assignEnsembleToDevice(GPUData, currentData); 
+    ensembleJavaIndexToDeviceIndex[i] = currentData->numEnsembles;
+
+    assignEnsembleToDevice(ensembleData, currentData); 
 
   }
-  free(GPUData);
+  free(ensembleData);
 
 
+  // Adjust projections to reflect the distribution of ensembles to devices.
+  adjustProjections(numProjections, projections, ensembleJavaIndexToDeviceIndex);
+  free(ensembleJavaIndexToDeviceIndex);
 
+  sharedInputSize = 0;
+  
   // Now we start to load the data into the NengoGPUData struct for each device.
   // Because of the CUDA architecture, we have to do some weird things to get a good speedup. 
   // These arrays that store the transforms, decoders, are setup in a non-intuitive way so 
@@ -779,6 +1097,8 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeSetupRun
     currentData = nengoDataArray[i];
     
     currentData->device = i;
+
+    currentData->offsetInSharedInput = sharedInputSize;
 
     currentData->numTerminations = currentData->numDecodedTerminations + currentData->numNDterminations;
     currentData->totalTransformSize = currentData->maxDecodedTerminationDimension * currentData->totalNumTransformRows;
@@ -796,7 +1116,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeSetupRun
       intArraySetElement(currentData->ensembleIndexInJavaArray, k, j);
       j++;
     }
-   
+
     storeTerminationData(env, terminationTransforms_JAVA, terminationTau_JAVA, isDecodedTermination_JAVA, currentData, deviceForEnsemble);
 
     storeNeuronData(env, neuronData_JAVA, currentData, deviceForEnsemble);
@@ -806,6 +1126,26 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeSetupRun
     storeDecoders(env, decoders_JAVA, currentData, deviceForEnsemble);
 
     setupInput(numProjections, projections, currentData);
+
+    sharedInputSize += currentData->CPUInputSize;
+  }
+
+  // set the shared memory maps for the device. We can't do this until
+  // all the intra-device projections have had their offsets set, which means each device has to have
+  // had setupInput called on it.
+  createSharedMemoryMaps(numProjections, projections);
+
+  // Allocate and initialize the shared array
+  sharedInput = (float*)malloc(sharedInputSize * sizeof(float));
+  for(i = 0; i < sharedInputSize; i++)
+  {
+    sharedInput[i] = 0.0;
+  }
+
+  int sum = 0;
+  for(i = 0; i < numDevices; i++)
+  {
+    sum += nengoDataArray[i]->JavaInputSize;
   }
 
   free(projections);
@@ -817,7 +1157,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeSetupRun
 // Called once per step from the Java code. Puts the representedInputValues in the proper form for processing, then tells each GPU thread
 // to take a step. Once they've finished the step, this function puts the representedOutputValues and spikes in the appropriate Java
 // arrays so that they can be read on the Java side when this call returns.
-JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeStep
+JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
   (JNIEnv *env, jclass class, jobjectArray input, jobjectArray output, jobjectArray spikes, jfloat startTime_JAVA, jfloat endTime_JAVA)
 {
   startTime = (float) startTime_JAVA;
@@ -830,7 +1170,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeStep
 
   int i, j, k, l;
   int ensembleIndex, inputIndex, numInputs, inputDimension;
- 
+
   for( i = 0; i < numDevices; i++)
   {
     currentData = nengoDataArray[i];
@@ -854,16 +1194,15 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeStep
           {
             inputDimension = (*env)->GetArrayLength(env, currentInput_JAVA);
 
-            if(inputIndex  + inputDimension <= currentData->CPUInputSize)
+            if(inputIndex  + inputDimension <= currentData->JavaInputSize)
             {
               (*env)->GetFloatArrayRegion(env, currentInput_JAVA, 0, inputDimension, currentData->inputHost->array + inputIndex);
             }
             else
             {
-              printf("error: accessing inputHost out of bounds. size: %d, index: %d\n", currentData->CPUInputSize, inputIndex + inputDimension);
+              printf("error: accessing inputHost out of bounds. size: %d, index: %d\n", currentData->JavaInputSize, inputIndex + inputDimension);
               exit(EXIT_FAILURE);
             }
-            
 
             inputIndex += inputDimension;
           }
@@ -883,7 +1222,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeStep
   jfloatArray currentOutput_JAVA;
   jfloatArray currentSpikes_JAVA;
 
-  int numOutputs, outputDimension, numNeurons, outputIndex, spikeIndex;
+  int numOutputs, outputDimension, numNeurons, outputIndex, spikeIndex, sharedIndex;
 
   for(i = 0; i < numDevices; i++)
   {
@@ -914,10 +1253,19 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeStep
       (*env)->SetFloatArrayRegion(env, currentSpikes_JAVA, 0, numNeurons, currentData->spikesHost->array + spikeIndex);
       spikeIndex += numNeurons;
     }
+
+    // write from the output array of the current device to the shared data array
+    for( k = 0; k < currentData->CPUOutputSize; k++)
+    {
+      outputIndex = intArrayGetElement(currentData->sharedData_outputIndex, k);
+      sharedIndex = intArrayGetElement(currentData->sharedData_sharedIndex, k);
+
+      sharedInput[sharedIndex] = floatArrayGetElement(currentData->output, outputIndex);
+    }
   }
 }
 
-JNIEXPORT void JNICALL Java_ca_nengo_util_impl_GPUThread_nativeKill
+JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeKill
 (JNIEnv *env, jclass class)
 {
   printf("NengoGPU: KILL\n");

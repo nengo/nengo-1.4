@@ -30,6 +30,7 @@ package ca.nengo.model.impl;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -467,6 +468,21 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		while (it.hasNext()) {
 			Node n = myNodeMap.get(it.next());
 			n.reset(randomize);
+		}
+	}
+	
+	public void setUseGPU(boolean val)
+	{
+		Node[] nodes = getNodes();
+		
+		for(int i = 0; i < nodes.length; i++){
+			Node workingNode = nodes[i];
+			
+			if(workingNode instanceof NEFEnsembleImpl){
+				((NEFEnsembleImpl) workingNode).setUseGPU(val);
+			}else if(workingNode instanceof NetworkImpl){
+				((NetworkImpl)workingNode).setUseGPU(val);
+			}
 		}
 	}
 

@@ -1,3 +1,4 @@
+
 #ifndef NENGO_GPU_CUDA_H
 #define NENGO_GPU_CUDA_H
 
@@ -9,8 +10,8 @@ extern "C"{
 
 #include "NengoGPUData.h"
 
-void printIntArrayFromDevice(FILE* fp, intArray* array, int n, int m);
-void printFloatArrayFromDevice(FILE* fp, floatArray* array, int n, int m);
+void printIntArrayFromDevice(FILE* fp, intArray* array, int n, int m, int labels);
+void printFloatArrayFromDevice(FILE* fp, floatArray* array, int n, int m, int labels);
 
 void printIntColumn(FILE* fp, int* array, int m, int n, int col);
 void printFloatColumn(FILE* fp, float* array, int m, int n, int col);
@@ -29,19 +30,21 @@ __global__ void transform(float dt, int numTransformRows, float* input, int* inp
 
 __global__ void sumTerminations(int totalDimensions, int maxDecodedNumTerminations, float* terminationOutput, float* ensembleSums);
 
-__global__ void encode(int maxDimension, float* encoders, float* sums, float* encodingResult, int* blockToEnsembleMap, int* ensembleIndexOfFirstBlock, int* ensembleOffsetInDimension, int* ensembleOffsetInNeurons, int* ensembleOffsetInEncoders, int* ensembleNumNeurons, int* ensembleDimension, int* encoderStride);
+__global__ void encode(int totalNumNeurons, float* encoders, float* sums, float* encodeResult, int* encoderRowToEnsembleIndexor, int* ensembleOffsetInDimension, int* ensembleDimension, int* encoderStride, int* neuronIndexor);
 
 __global__ void integrateAfterEncode(int numNuerons, float dt, float adjusted_dt, int steps, int* neuronToEnsembleIndexor, float* encodingResult, float* neuronVoltage, float* neuronReftime, float* tau_RC, float* tauRef, float* bias, float* scale, float* spikes, float* NDterminationSums);
 
-__global__ void decode(int maxNumNeurons, int* blockToEnsembleMap, int* ensembleNumNeurons, int* ensembleIndexOfFirstBlock, int* ensembleOffsetInNeurons, int* ensembleOutputSize, float* spikes, float* decoders, float* output, int* ensembleOffsetInDecoders, int* ensembleOffsetInOutout, int* decoderStride);
+__global__ void decode(int totalOutputSize, float* decoders, float* spikes, float* output, int* decoderRowToEnsembleIndexor, int* ensembleNumNeurons, int* ensembleOffsetInNeurons, int* decoderStride, int* outputIndexor);
 
 __global__ void processNDterminations(int numEnsembles, int numNDterminations, int steps, float adjusted_dt, int* NDterminationEnsembleOffset, int* inputOffsets, int* inputIndex, float* input, float* weights, float* current, float* sum, float* tau);
 
 __global__ void moveGPUOutputIntoInput(int GPUInputSize, int* map, float* input, float* output);
 
 void run_NEFEnsembles(NengoGPUData*, float, float);
+
 float* allocateCudaFloatArray(int size);
 int* allocateCudaIntArray(int size);
+long getDeviceCapacity(int device);
 void initializeDeviceInputAndOutput(NengoGPUData* currentData);
 
 #ifdef __cplusplus

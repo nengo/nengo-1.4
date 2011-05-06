@@ -24,7 +24,7 @@ public class NodeThreadPool {
 
 	
 	// numThreads can change throughout a simulation run. Therefore, it should not be used during a run,
-	// only at the beginning of a run to create the threads. During a run, use myThreads.length.
+	// only at the beginning of a run to create the threads.
 	protected static int myNumThreads = defaultNumThreads;
 	protected NodeThread[] myThreads;
 	protected Object myLock;
@@ -35,6 +35,7 @@ public class NodeThreadPool {
 	protected volatile int numThreadsComplete;
 	
 	protected volatile boolean threadsRunning;
+	protected volatile boolean runFinished;
 	protected float myStartTime;
 	protected float myEndTime;
 	
@@ -63,6 +64,10 @@ public class NodeThreadPool {
 		return myEndTime;
 	}
 	
+	public boolean getRunFinished(){
+		return runFinished;
+	}
+	
 	// Dummy default constructor.
 	protected NodeThreadPool(){
 	}
@@ -70,7 +75,7 @@ public class NodeThreadPool {
 	public NodeThreadPool(Node[] nodes, Projection[] projections){
 		initialize(nodes, projections);
 	}
-	
+	/*
 	@SuppressWarnings("unchecked")
 	public static <T> T[] copyOfRange(T[] original, int start, int end) {	
 		if (original.length >= start && 0 <= start) {
@@ -85,6 +90,7 @@ public class NodeThreadPool {
 		}
 		throw new ArrayIndexOutOfBoundsException();
 	}
+	*/
 	
 	protected void initialize(Node[] nodes, Projection[] projections){
 		myLock = new Object();
@@ -94,42 +100,32 @@ public class NodeThreadPool {
 		myThreads = new NodeThread[myNumThreads];
 		
 		threadsRunning = false;
+		runFinished = false;
 		
 		int nodesPerThread = (int) Math.ceil((float) myNodes.length / (float) myNumThreads);
 		int projectionsPerThread = (int) Math.ceil((float) myProjections.length / (float) myNumThreads);
 		
-		int nodeOffset = 0;
-		int projectionOffset = 0;
-		
-		Node[] nodesForCurThread;
-		Projection[] projectionsForCurThread;
+		int nodeOffset = 0, projectionOffset = 0;
+		int nodeStartIndex, nodeEndIndex, projectionStartIndex, projectionEndIndex;
 		
 		for(int i = 0; i < myNumThreads; i++){
 			
-			if(myNodes.length - nodeOffset >= nodesPerThread) {
-				
-				nodesForCurThread = NodeThreadPool.copyOfRange(myNodes, 
-						nodeOffset, nodeOffset + nodesPerThread);
-				nodeOffset += nodesPerThread;
-				
-			} else {
-				nodesForCurThread = NodeThreadPool.copyOfRange(myNodes, 
-						nodeOffset, myNodes.length);
-			}
-				
-			if(myProjections.length - projectionOffset >= projectionsPerThread) {
-				
-				projectionsForCurThread = NodeThreadPool.copyOfRange(myProjections, 
-						projectionOffset, projectionOffset + projectionsPerThread);
-				projectionOffset += projectionsPerThread;
-				
-			} else {
-				projectionsForCurThread = NodeThreadPool.copyOfRange(myProjections, 
-						projectionOffset, myProjections.length);
-				
-			}
+			nodeStartIndex = nodeOffset;
+			nodeEndIndex = myNodes.length - nodeOffset >= nodesPerThread ?
+					nodeOffset + nodesPerThread : myNodes.length;
+
+			nodeOffset += nodesPerThread;
 			
-			myThreads[i] = new NodeThread(this, nodesForCurThread, projectionsForCurThread);
+			projectionStartIndex = projectionOffset;
+			projectionEndIndex = myProjections.length - projectionOffset >= projectionsPerThread ?
+					projectionOffset + projectionsPerThread : myProjections.length;
+
+			projectionOffset += projectionsPerThread;
+			
+			myThreads[i] = new NodeThread(this, myNodes, nodeStartIndex,
+					nodeEndIndex, myProjections, projectionStartIndex, 
+					projectionEndIndex);
+			
 			myThreads[i].setPriority(Thread.MAX_PRIORITY);
 			myThreads[i].start();
 		}
@@ -197,11 +193,13 @@ public class NodeThreadPool {
 	public void kill(){
 		synchronized(myLock)
 		{
+			threadsRunning = true;
+			runFinished = true;
+			
 			for(int i = 0; i < myThreads.length; i++){
 				myThreads[i].interrupt();
 			}
 			
-			threadsRunning = true;
 			myLock.notifyAll();
 		}
 	}

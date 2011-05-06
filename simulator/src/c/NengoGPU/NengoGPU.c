@@ -1,5 +1,5 @@
+
 #ifdef __cplusplus
-  irintf("about to move input to device\n");
 extern "C"{
 #endif
 
@@ -28,6 +28,9 @@ pthread_cond_t* cv_JNI = NULL;
 pthread_mutex_t* mutex = NULL;
 
 FILE* fp;
+
+float* sharedInput;
+int sharedInputSize;
 
 // Actions:
 // -1 - destroy
@@ -250,6 +253,7 @@ void run_kill()
   // Once the threads are done, free shared resources and quit
   free(nengoDataArray);
   free(deviceForEnsemble);
+  free(sharedInput);
 
   pthread_mutex_destroy(mutex);
   pthread_cond_destroy(cv_GPUThreads);

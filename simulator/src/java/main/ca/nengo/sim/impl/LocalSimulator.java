@@ -32,7 +32,7 @@ import java.util.ArrayList;
 //import java.util.Arrays;
 import java.util.Arrays;
 import java.util.Collection;
-//import java.util.Date;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-//import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
@@ -60,7 +60,7 @@ import ca.nengo.sim.SimulatorListener;
 import ca.nengo.util.Probe;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.impl.NEF_GPU_Interface;
+import ca.nengo.util.impl.NEFGPUInterface;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
 
@@ -73,15 +73,13 @@ import ca.nengo.util.impl.ProbeImpl;
 public class LocalSimulator implements Simulator, java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	public boolean myUseGPU;
-	
 	private Projection[] myProjections;
 	private Node[] myNodes;
 	private Map<String, Node> myNodeMap;
 	private List<Probe> myProbes;
 	private boolean myDisplayProgress;
 	private transient List<VisiblyMutable.Listener> myChangeListeners;
-	private transient NEF_GPU_Interface myNEF_GPU_Interface;
+	private transient NEFGPUInterface myNEFGPUInterface;
 	private transient NodeThreadPool myNodeThreadPool;
 
 	/**
@@ -153,16 +151,14 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		 *  the non-network nodes up to the top level so that we don't
 		 * run multiple simulators.
 		 */
-		myNEF_GPU_Interface = null;
+		myNEFGPUInterface = null;
 		myNodeThreadPool = null;
 		
-		if(NEF_GPU_Interface.myUseGPU){
-			System.out.print("using gpu");
-			
+		if(NEFGPUInterface.myUseGPU){
 			Node[] nodesForGPU = collectNodes();
 			Projection[] projectionsForGPU = collectProjections();
 			
-			myNEF_GPU_Interface = new NEF_GPU_Interface(nodesForGPU, projectionsForGPU);
+			myNEFGPUInterface = new NEFGPUInterface(nodesForGPU, projectionsForGPU);
 		}else if(NodeThreadPool.isMultithreading()){
 			Node[] nodesForMultithreading = collectNodes();
 			Projection[] projectionsForMultithreading = collectProjections();
@@ -217,12 +213,13 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		
 		fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
 		
-		if(myNEF_GPU_Interface != null) {
+		
+		if(myNEFGPUInterface != null){
 			
-			myNEF_GPU_Interface.kill();
-			myNEF_GPU_Interface = null;
+			myNEFGPUInterface.kill();
+			myNEFGPUInterface = null;
 			
-		} else if(myNodeThreadPool != null) {
+		}else if(myNodeThreadPool != null){
 			
 			myNodeThreadPool.kill();
 			myNodeThreadPool = null;
@@ -235,8 +232,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			throws SimulationException {
 		
 		
-		if(myNEF_GPU_Interface != null){
-			myNEF_GPU_Interface.step(startTime, endTime);
+		if(myNEFGPUInterface != null){
+			myNEFGPUInterface.step(startTime, endTime);
 		}
 		else if(myNodeThreadPool != null){
 			myNodeThreadPool.step(startTime, endTime);
@@ -444,6 +441,10 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		return new LocalSimulator();
 	}
 	
+	/**
+	 * Bring all nodes to the top level so we can run them all at once.
+	 * Used for multithreaded and GPU-enabled runs.
+	 */
 	private Node[] collectNodes(){
 
 		ArrayList<Node> nodes = new ArrayList<Node>();
@@ -456,10 +457,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		while(nodesToProcess.size() != 0)
 		{
 			workingNode = nodesToProcess.poll();
-			
-			if(workingNode instanceof Network 
-				|| workingNode.getClass().getCanonicalName() == 
-				"org.python.proxies.nef.array$NetworkArray$6") 
+				
+			if(workingNode instanceof Network)
 			{
 				nodesToProcess.addAll(Arrays.asList(((Network) workingNode).getNodes()));
 			}
@@ -471,7 +470,11 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		
 		return nodes.toArray(new Node[0]);	
 	}
-	
+
+	/**
+	 * Bring all projections to the top level so we can run them all at once.
+	 * Used for multithreaded and GPU-enabled runs.
+	 */
 	private Projection[] collectProjections(){
 
 		ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(myProjections));

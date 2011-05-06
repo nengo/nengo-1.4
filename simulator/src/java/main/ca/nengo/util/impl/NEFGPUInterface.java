@@ -1,9 +1,8 @@
 package ca.nengo.util.impl;
 
-import java.util.concurrent.locks.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
@@ -15,14 +14,17 @@ import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.PlasticEnsembleTermination;
 import ca.nengo.model.impl.RealOutputImpl;
+import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
+import ca.nengo.model.impl.NetworkImpl.TerminationWrapper;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
 
-public class NEF_GPU_Interface {
-	public static boolean myUseGPU = false;
+public class NEFGPUInterface {
+	public static boolean myUseGPU = true;
+	public static int myNumDevices = 1;
 	
 	protected Node[] myGPUNodes;
 	protected Projection[] myGPUProjections;
@@ -36,16 +38,17 @@ public class NEF_GPU_Interface {
 	float[][][] representedInputValues;
 	float[][][] representedOutputValues;
 	float[][] spikeOutput;
-	int[][] terminationToProjectionPointer;
+	boolean[][] inputOnGPU;
 	
 	
 	// load the shared library that contains the native functions
 	static{
 		try {
-			System.loadLibrary("NengoGPU");
+			if(myUseGPU){
+				System.loadLibrary("NengoGPU");
+			}
 		} catch (java.lang.UnsatisfiedLinkError e) {
 			myUseGPU=false;
-			System.out.print(e.toString());
 		}
 	}
 	
@@ -53,8 +56,8 @@ public class NEF_GPU_Interface {
 	static native void nativeSetupRun(float[][][][] terminationTransforms,
 			int[][] isDecodedTermination, float[][] terminationTau,
 			float[][][] encoders, float[][][][] decoders, float[][] neuronData,
-			int[][] projections, int[][] GPUData, int[] projectionOnGPU,
-			float maxTimeStep);
+			int[][] projections, int[][] GPUData, int[][] adjacencyMatrix,
+			float maxTimeStep, int numDevicesRequested);
 
 	static native void nativeStep(float[][][] representedInput,
 			float[][][] representedOutput, float[][] spikes, float startTime,
@@ -62,6 +65,15 @@ public class NEF_GPU_Interface {
 
 	static native void nativeKill();
 	
+	// set whether or not to use the GPU
+	public static void setRequestedNumDevices(int value){
+		myNumDevices = value;
+	}
+	
+	// get whether or not to use the GPU
+	public static int getRequestedNumDevices(){
+		return myNumDevices;
+	}
 	
 	// set whether or not to use the GPU
 	public static void setUseGPU(boolean value){
@@ -73,7 +85,7 @@ public class NEF_GPU_Interface {
 		return myUseGPU;
 	}
 	
-	public NEF_GPU_Interface(Node[] nodes, Projection[] projections){
+	public NEFGPUInterface(Node[] nodes, Projection[] projections){
 		initialize(nodes, projections);
 	}
 	
@@ -84,8 +96,12 @@ public class NEF_GPU_Interface {
 		
 		// Sort out the GPU nodes from the CPU nodes
 		for(int i = 0; i < nodes.length; i++){
-			if(nodes[i] instanceof NEFEnsembleImpl && ((NEFEnsembleImpl)nodes[i]).isGPUNode())
-			{
+			
+			boolean useGPU = 
+				nodes[i] instanceof NEFEnsembleImpl && ((NEFEnsembleImpl) nodes[i]).getUseGPU();
+			
+			if(useGPU)
+			{		
 				GPUNodeList.add(nodes[i]);
 			}else{
 				nodeList.add(nodes[i]); 	
@@ -93,45 +109,45 @@ public class NEF_GPU_Interface {
 		}
 		
 		// Sort out the GPU projections from the CPU projections
-		ArrayList<Projection> GPU_projections_list = new ArrayList<Projection>();
-		ArrayList<Projection> projections_list = new ArrayList<Projection>();
+		ArrayList<Projection> GPUProjectionsList = new ArrayList<Projection>();
+		ArrayList<Projection> projectionsList = new ArrayList<Projection>();
 		
 		for(int i = 0; i < projections.length; i++)
 		{
 			Node originNode = projections[i].getOrigin().getNode();
 			Node terminationNode = projections[i].getTermination().getNode();
 			
-			if(originNode instanceof NEFEnsembleImpl && 
-				((NEFEnsembleImpl) originNode).isGPUNode() &&
-				terminationNode instanceof NEFEnsembleImpl &&
-				((NEFEnsembleImpl) terminationNode).isGPUNode() &&
-				projections[i].getTermination() instanceof DecodedTermination)
+			boolean originNodeOnGPU = 
+				originNode instanceof NEFEnsembleImpl && ((NEFEnsembleImpl) originNode).getUseGPU();
+			
+			boolean terminationNodeOnGPU = 
+				terminationNode instanceof NEFEnsembleImpl && ((NEFEnsembleImpl) terminationNode).getUseGPU();
+			
+			if(originNodeOnGPU && terminationNodeOnGPU)
 			{
-				GPU_projections_list.add(projections[i]);
-			}	
+				GPUProjectionsList.add(projections[i]);
+			}
 			else
 			{
-				projections_list.add(projections[i]);
+				projectionsList.add(projections[i]);
 			}
 		}
 		
 		myGPUNodes = GPUNodeList.toArray(new Node[0]);
-		myGPUProjections = GPU_projections_list.toArray(new Projection[0]);
+		myGPUProjections = GPUProjectionsList.toArray(new Projection[0]);
 		
 		myNodes = nodeList.toArray(new Node[0]);
-		myProjections = projections_list.toArray(new Projection[0]);
+		myProjections = projectionsList.toArray(new Projection[0]);
 
 		if (myGPUNodes.length == 0)
 			return;
 
-		// Put the data in a format useful for passing to the GPU. 
+		// Put the data in a format appropriate for passing to the GPU. 
 		// Most of this function is devoted to this task.
-		
 		int i = 0, j = 0, k = 0, numEnsemblesCollectingSpikes = 0;
 		NEFEnsembleImpl workingNode;
 		Termination[] terminations;
 		DecodedOrigin[] origins;
-		Origin[] NDorigins;
 
 		float[][][][] terminationTransforms = new float[myGPUNodes.length][][][];
 		int[][] isDecodedTermination = new int[myGPUNodes.length][];
@@ -139,39 +155,39 @@ public class NEF_GPU_Interface {
 		float[][][] encoders = new float[myGPUNodes.length][][];
 		float[][][][] decoders = new float[myGPUNodes.length][][][];
 		float[][] neuronData = new float[myGPUNodes.length][];
-		GPUData gpuData = new GPUData();
+		EnsembleData ensembleData = new EnsembleData();
 		int[][] gpuDataArray = new int[myGPUNodes.length][];
 		boolean[] collectSpikes = new boolean[myGPUNodes.length];
 		float maxTimeStep = ((LIFSpikeGenerator) ((SpikingNeuron) ((NEFEnsembleImpl) myGPUNodes[0])
 				.getNodes()[0]).getGenerator()).getMaxTimeStep();
 
 		// We put the list of projections in terms of the GPU nodes
-		// For each projections we record 4 numbers: the number of the origin
+		// For each projection we record 4 numbers: the number of the origin
 		// ensemble, the number of the origin in its ensemble, the number of
-		// the termination ensemble and the number of the termination in its
-		// ensemble
+		// the termination ensemble and the number of the termination in its ensemble
 		int[][] adjustedProjections = new int[myGPUProjections.length][6];
-		terminationToProjectionPointer = new int[myGPUNodes.length][];
-
+		inputOnGPU = new boolean[myGPUNodes.length][];
+		
+		
 		// prepare the data to pass in to the native setup call
 		for (i = 0; i < myGPUNodes.length; i++) {
-
+			
 			workingNode = (NEFEnsembleImpl) myGPUNodes[i];
+			
+			ensembleData.reset();
 
-			gpuData.reset();
-
-			gpuData.dimension = workingNode.getDimension();
-			gpuData.numNeurons = workingNode.getNeurons();
+			ensembleData.dimension = workingNode.getDimension();
+			ensembleData.numNeurons = workingNode.getNeurons();
 
 			terminations = workingNode.getTerminations();
 
 			int terminationDim = 0;
-			gpuData.maxTransformDimension = 0;
+			ensembleData.maxTransformDimension = 0;
 
 			terminationTransforms[i] = new float[terminations.length][][];
 			terminationTau[i] = new float[terminations.length];
 			isDecodedTermination[i] = new int[terminations.length];
-			terminationToProjectionPointer[i] = new int[terminations.length];
+			inputOnGPU[i] = new boolean[terminations.length];
 
 			for (j = 0; j < terminations.length; j++) {
 
@@ -181,15 +197,15 @@ public class NEF_GPU_Interface {
 					terminationTau[i][j] = terminations[j].getTau();
 
 					terminationDim = terminations[j].getDimensions();
-					gpuData.totalInputSize += terminationDim;
+					ensembleData.totalInputSize += terminationDim;
 
-					if (terminationDim > gpuData.maxTransformDimension) {
-						gpuData.maxTransformDimension = terminationDim;
+					if (terminationDim > ensembleData.maxTransformDimension) {
+						ensembleData.maxTransformDimension = terminationDim;
 					}
 
 					isDecodedTermination[i][j] = 1;
 					
-					gpuData.numDecodedTerminations++;
+					ensembleData.numDecodedTerminations++;
 				} else if (terminations[j] instanceof PlasticEnsembleTermination) {
 					terminationTransforms[i][j] = new float[1][1];
 					float[][] tempTransform = ((PlasticEnsembleTermination) terminations[j])
@@ -199,25 +215,37 @@ public class NEF_GPU_Interface {
 					isDecodedTermination[i][j] = 0;
 
 					terminationDim = 1;
-					gpuData.totalInputSize += 1;
-					gpuData.numNonDecodedTerminations++;
+					ensembleData.totalInputSize += 1;
+					ensembleData.numNonDecodedTerminations++;
 				}
-
+				
 				k = 0;
-				while (k < myGPUProjections.length
-						&& myGPUProjections[k].getTermination() != terminations[j]) {
+				Termination termination;
+				boolean terminationWrapped, projectionMatches = false;
+				
+				while(!projectionMatches && k < myGPUProjections.length){
+					termination = myGPUProjections[k].getTermination();
+					terminationWrapped = termination instanceof TerminationWrapper;
+					if(terminationWrapped)
+						termination = ((TerminationWrapper) termination).getWrappedTermination();
+					
+					projectionMatches = termination == terminations[j];
+					
+					if(projectionMatches)
+						break;
+					
 					k++;
 				}
 
-				if (k < myGPUProjections.length) {
+				if (projectionMatches) {
 					adjustedProjections[k][2] = i;
 					adjustedProjections[k][3] = j;
 					adjustedProjections[k][4] = terminationDim;
 					adjustedProjections[k][5] = -1;
 
-					terminationToProjectionPointer[i][j] = k;
+					inputOnGPU[i][j] = true;
 				} else {
-					terminationToProjectionPointer[i][j] = -1;
+					inputOnGPU[i][j] = false;
 				}
 			}
 
@@ -230,8 +258,8 @@ public class NEF_GPU_Interface {
 
 			origins = workingNode.getDecodedOrigins();
 
-			gpuData.numOrigins = origins.length;
-			gpuData.maxDecoderDimension = 0;
+			ensembleData.numOrigins = origins.length;
+			ensembleData.maxDecoderDimension = 0;
 
 			decoders[i] = new float[origins.length][][];
 			int originDim;
@@ -239,14 +267,23 @@ public class NEF_GPU_Interface {
 				decoders[i][j] = origins[j].getDecoders();
 				originDim = origins[j].getDimensions();
 
-				gpuData.totalOutputSize += originDim;
+				ensembleData.totalOutputSize += originDim;
 
-				if (originDim > gpuData.maxDecoderDimension) {
-					gpuData.maxDecoderDimension = originDim;
+				if (originDim > ensembleData.maxDecoderDimension) {
+					ensembleData.maxDecoderDimension = originDim;
 				}
 
+				Origin origin;
+				boolean originWrapped;
+				
 				for (k = 0; k < myGPUProjections.length; k++) {
-					if (myGPUProjections[k].getOrigin() == origins[j]) {
+					origin = myGPUProjections[k].getOrigin();
+					originWrapped = origin instanceof OriginWrapper;
+					
+					if(originWrapped)
+						origin = ((OriginWrapper) origin).getWrappedOrigin();
+					
+					if (origin == origins[j]) {
 						adjustedProjections[k][0] = i;
 						adjustedProjections[k][1] = j;
 					}
@@ -258,14 +295,15 @@ public class NEF_GPU_Interface {
 			collectSpikes[i] = workingNode.isCollectingSpikes();
 			numEnsemblesCollectingSpikes++;
 
-			gpuDataArray[i] = gpuData.getAsArray();
+			gpuDataArray[i] = ensembleData.getAsArray();
 		}
-
-		int[] projectionOnGPU = new int[adjustedProjections.length];
 		
+		int[][] adjacencyMatrix = findAdjacencyMatrix(myGPUNodes, myGPUProjections);
+		
+
 		nativeSetupRun(terminationTransforms, isDecodedTermination,
 				terminationTau, encoders, decoders, neuronData,
-				adjustedProjections, gpuDataArray, projectionOnGPU, maxTimeStep);
+				adjustedProjections, gpuDataArray, adjacencyMatrix, maxTimeStep, myNumDevices);
 
 		// Set up the data structures that we pass in and out of the native step call.
 		// They do not change in size from step to step so we can re-use them.
@@ -273,55 +311,20 @@ public class NEF_GPU_Interface {
 		representedOutputValues = new float[myGPUNodes.length][][];
 		spikeOutput = new float [myGPUNodes.length][];
 		
-		int count, pointer;
-		
-		ArrayList<Projection> nonGPUProjections = new ArrayList<Projection>();
-		ArrayList<Projection> GPUProjections = new ArrayList<Projection>();
-		
-		for(i = 0; i < myGPUProjections.length; i++){
-			if(projectionOnGPU[i] == 0)
-			{
-				nonGPUProjections.add(myGPUProjections[i]);
-			}
-			else
-			{
-				GPUProjections.add(myGPUProjections[i]);
-			}
-		}
-		
-		if(nonGPUProjections.size() > 0)
-		{
-			myGPUProjections = GPUProjections.toArray(new Projection[0]);
-			adjustProjections(nonGPUProjections);
-		}
-
-		
 		for (i = 0; i < myGPUNodes.length; i++) {
 
+			System.out.print("(" + Integer.toString(i) + " " + myGPUNodes[i].getName() + ") ");
 			terminations = ((NEFEnsembleImpl) myGPUNodes[i]).getTerminations();
-			count = terminations.length;
 
-			representedInputValues[i] = new float[count][];
-			
-			// set projection pointer array so that projections that could've been on the GPU
-			// but are not (because they would cross multiple GPUs) are marked as not on the GPU
-			for(j = 0; j < terminations.length; j++)
-			{
-				pointer = terminationToProjectionPointer[i][j];
-				if(pointer >= 0 && projectionOnGPU[pointer] == 0)
-				{
-					terminationToProjectionPointer[i][j] = -1;	
-				}
-			}
+			representedInputValues[i] = new float[terminations.length][];
 		}
 
 		for (i = 0; i < myGPUNodes.length; i++) {
 			origins = ((NEFEnsembleImpl) myGPUNodes[i]).getDecodedOrigins();
-			count = origins.length;
 
-			representedOutputValues[i] = new float[count][];
+			representedOutputValues[i] = new float[origins.length][];
 
-			for (j = 0; j < count; j++) {
+			for (j = 0; j < origins.length; j++) {
 				representedOutputValues[i][j] = new float[origins[j].getDimensions()];
 			}
 		}
@@ -332,23 +335,12 @@ public class NEF_GPU_Interface {
 		}
 	}
 	
-	
-	// after we've figured out which projections are actually run on the 
-	// GPU by calling nativeSetupRun we have to give back the ones that aren't
-	public void adjustProjections(ArrayList<Projection> nonGPUProjections)
-	{
-		ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(myProjections));
-		projections.addAll(nonGPUProjections);
-		myProjections = projections.toArray(new Projection[0]);
-	}
-	
-	
 	public void step(float startTime, float endTime){
 		
 		myStartTime = startTime;
 		myEndTime = endTime;
 		
-		System.out.println("Before CPU processing: " + new Date().getTime());
+		//System.out.println("Before CPU processing: " + new Date().getTime());
 		
 		for (int i = 0; i < myProjections.length; i++) {
 			try
@@ -369,12 +361,16 @@ public class NEF_GPU_Interface {
 			catch(Exception e)
 			{}
 		}
-		System.out.println("After CPU processing: " + new Date().getTime());
+		//System.out.println("After CPU processing: " + new Date().getTime());
 		
+		//System.out.println("Before GPU processing: " + new Date().getTime());
+		
+		if (myGPUNodes.length == 0)
+			return;
 		
 		try {
 			
-			int terminationPointer, count, i, j;
+			int count, i, j;
 			float[] inputRow = new float[0];
 			Termination[] terminations;
 				
@@ -384,10 +380,9 @@ public class NEF_GPU_Interface {
 				count = terminations.length;
 				
 				for (j = 0; j < count; j++) {
-					terminationPointer = terminationToProjectionPointer[i][j];
 
 					// we only get input for non-GPU terminations
-					if (terminationPointer < 0) {
+					if (!inputOnGPU[i][j]) {
 						if (terminations[j] instanceof DecodedTermination)
 							inputRow = ((DecodedTermination) terminations[j]).getInput().getValues();
 						else if (terminations[j] instanceof PlasticEnsembleTermination)
@@ -419,9 +414,7 @@ public class NEF_GPU_Interface {
 				}
 
 				if (((NEFEnsembleImpl) myGPUNodes[i]).isCollectingSpikes()) {
-					((NEFEnsembleImpl) myGPUNodes[i]).
-						setSpikePattern(spikeOutput[spikeIndex], endTime);
-					
+					((NEFEnsembleImpl) myGPUNodes[i]).setSpikePattern(spikeOutput[spikeIndex], endTime);
 				}
 
 				((NEFEnsembleImpl) myGPUNodes[i]).setTime(endTime);
@@ -429,16 +422,67 @@ public class NEF_GPU_Interface {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		//System.out.println("After GPU processing: " + new Date().getTime());
 	}
 	
 
 	public void kill()
 	{
+		if (myGPUNodes.length == 0)
+			return;
+		
 		nativeKill();
 	}
 	
-
-	private class GPUData {
+	// Converts a nengo network to an undirected graph stored as a lower triangular adjacency matrix.
+	// If node A projects to node B with weight x and B projects to A with weight y,
+	// we treat it as a single edge with weight (x + y). Self-loops (recurrent projections)
+	// are deleted (this function is used for distributing ensembles to GPUs and self loops are
+	// irrelevant in that task).
+	public int[][] findAdjacencyMatrix(Node[] nodes, Projection[] projections) {
+		
+		HashMap <Node, Integer> nodeIndexes = new HashMap<Node, Integer>();
+		
+		int[][] adjacencyMatrix = new int[nodes.length][nodes.length];
+		
+		for(int i = 0; i < nodes.length; i++){
+			for(int j = 0; j < nodes.length; j++){
+				adjacencyMatrix[i][j] = 0;
+			}
+		}
+		
+		for(int i = 0; i < nodes.length; i++){
+			nodeIndexes.put(nodes[i], i);
+		}
+		
+		for(int i = 0; i < projections.length; i++){
+			Origin origin = projections[i].getOrigin();
+			Termination termination = projections[i].getTermination();
+			
+			boolean originWrapped = origin instanceof OriginWrapper;
+			
+			if(originWrapped)
+				origin = ((OriginWrapper) origin).getWrappedOrigin();
+			
+			boolean terminationWrapped = termination instanceof TerminationWrapper;
+			
+			if(terminationWrapped)
+				termination = ((TerminationWrapper) termination).getWrappedTermination();
+			
+			int originNodeIndex = nodeIndexes.get(origin.getNode());
+			int termNodeIndex = nodeIndexes.get(termination.getNode());
+			
+			if(originNodeIndex > termNodeIndex)
+				adjacencyMatrix[originNodeIndex][termNodeIndex] += termination.getDimensions();
+			else if(termNodeIndex > originNodeIndex)
+				adjacencyMatrix[termNodeIndex][originNodeIndex] += termination.getDimensions();
+		}
+		
+		return adjacencyMatrix;
+	}
+	
+	// Used to hold data about each ensemble to pass to native code.
+	private class EnsembleData {
 		int numEntries = 9;
 
 		public int dimension;

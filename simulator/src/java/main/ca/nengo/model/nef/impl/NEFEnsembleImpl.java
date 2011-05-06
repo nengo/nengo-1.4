@@ -100,11 +100,12 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private boolean myRadiiAreOne;
 	private DynamicalSystem myDirectModeDynamics;
 	private Integrator myDirectModeIntegrator;
-	private boolean myUseGPU = false;
 	private boolean myModeFixed;
 	
 	private NEFEnsembleFactory myEnsembleFactory;
 
+	private boolean myUseGPU;
+	
 	/**
 	 * @param name Unique name of Ensemble
 	 * @param nodes Nodes that make up the Ensemble
@@ -141,6 +142,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myModeFixed = false;
 		
 		myDirectModeIntegrator = new EulerIntegrator(.001f);
+		
+		myUseGPU = true;
 	}
 	
 	/**
@@ -148,6 +151,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	public float[] getRadii() {
 		return myRadii.clone();
+	}
+	
+	public void setUseGPU(boolean val){
+		myUseGPU = val;
+	}
+	
+	public boolean getUseGPU(){
+		return myUseGPU;
 	}
 	
 	/**
@@ -931,17 +942,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 		return neuronData;
 	}
-	
-  // Check whether this node is to be run on GPU
-	public boolean isGPUNode(){
-		return myUseGPU;
-	}
-	
-  // Set whether this node is to be run on GPU
-	public void setGPU(boolean useGPU){
-		myUseGPU = useGPU;
-	}
-	
+
 	/**
 	 * Stops a given percentage of neurons in this population from firing.
 	 * 

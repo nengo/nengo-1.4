@@ -1,8 +1,9 @@
+
 CUDA_BIN_PATH=/usr/local/cuda/bin
 CUDA_INC_PATH=/usr/local/cuda/include
 CUDA_LIB_PATH=/usr/local/cuda/lib64
-JAVA_INC=/usr/lib/jvm/java-6-sun-1.6.0.24/include
-JAVA_INC_LINUX=/usr/lib/jvm/java-6-sun-1.6.0.24/include/linux
+JAVA_INC=/usr/lib/jvm/java-6-sun-1.6.0.22/include
+JAVA_INC_LINUX=/usr/lib/jvm/java-6-sun-1.6.0.22/include/linux
 PATH:=${PATH}:${CUDA_BIN_PATH}
 
 CC=gcc
@@ -15,9 +16,15 @@ LIBPATH=-L${CUDA_LIB_PATH}
 
 LIBS=-lcudart -lm
 
-libNengoGPU.so: NengoGPU_CUDA.o NengoGPU.o NengoGPUData.o NengoGPU_JNI.o 
-	${CC} -shared -Wl,-soname,libNengoGPU.so -o libNengoGPU.so.1.0 NengoGPU_JNI.o NengoGPU.o NengoGPU_CUDA.o NengoGPUData.o -lc \
+libNengoGPU.so: NengoGPU_CUDA.o NengoGPU.o NengoGPUData.o NengoGPU_JNI.o GraphTheoryRoutines.o fheap.o
+	${CC} -shared -Wl,-soname,libNengoGPU.so -o libNengoGPU.so.1.0 NengoGPU_JNI.o NengoGPU.o NengoGPU_CUDA.o NengoGPUData.o GraphTheoryRoutines.o fheap.o -lc \
 	-I. ${CUDA_INCLUDES} ${JAVA_INCLUDES} ${LIBPATH} ${LIBS}
+
+fheap.o: fheap.c fheap.h heap_info.h
+	${CC} ${CFLAGS} -o fheap.o fheap.c ${JAVA_INCLUDES} ${CUDA_INCLUDES} ${LIBPATH} ${LIBS}
+
+GraphTheoryRoutines.o: GraphTheoryRoutines.c GraphTheoryRoutines.h fheap.h
+	${CC} ${CFLAGS} -o GraphTheoryRoutines.o GraphTheoryRoutines.c ${JAVA_INCLUDES} ${CUDA_INCLUDES} ${LIBPATH} ${LIBS}
 
 NengoGPUData.o: NengoGPUData.c NengoGPUData.h
 	${CC} ${CFLAGS} -o NengoGPUData.o NengoGPUData.c ${JAVA_INCLUDES} ${CUDA_INCLUDES} ${LIBPATH} ${LIBS}
@@ -28,7 +35,7 @@ NengoGPU_CUDA.o: NengoGPU_CUDA.cu NengoGPU_CUDA.h NengoGPU.h
 NengoGPU.o : NengoGPU.c NengoGPU.h NengoGPU_CUDA.h
 	${CC} ${CFLAGS} -o NengoGPU.o NengoGPU.c ${JAVA_INCLUDES} ${CUDA_INCLUDES} ${LIBPATH} ${LIBS}
 
-NengoGPU_JNI.o : NengoGPU_JNI.c NengoGPU.h GPUThread_JNI.h NengoGPU_CUDA.h
+NengoGPU_JNI.o : NengoGPU_JNI.c NengoGPU.h NEFGPUInterface_JNI.h NengoGPU_CUDA.h
 	${CC} ${CFLAGS} -o NengoGPU_JNI.o NengoGPU_JNI.c ${JAVA_INCLUDES} ${CUDA_INCLUDES} ${LIBPATH} ${LIBS}
 
 clean:

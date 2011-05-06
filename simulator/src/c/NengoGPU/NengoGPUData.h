@@ -7,26 +7,34 @@ extern "C"{
 
 #define NEURONS_PER_GPU 100000
 
-enum GPUDataIndex_enum
+
+/*
+ Used to extract ensemble data out of arrays passed in through JNI.
+*/
+enum EnsembleDataIndex_enum
 {
-  NENGO_GPU_DATA_DIMENSION = 0,
-  NENGO_GPU_DATA_NUM_NEURONS,
-  NENGO_GPU_DATA_NUM_ORIGINS,
+  NENGO_ENSEMBLE_DATA_DIMENSION = 0,
+  NENGO_ENSEMBLE_DATA_NUM_NEURONS,
+  NENGO_ENSEMBLE_DATA_NUM_ORIGINS,
 
-  NENGO_GPU_DATA_TOTAL_INPUT_SIZE,
-  NENGO_GPU_DATA_TOTAL_OUTPUT_SIZE,
+  NENGO_ENSEMBLE_DATA_TOTAL_INPUT_SIZE,
+  NENGO_ENSEMBLE_DATA_TOTAL_OUTPUT_SIZE,
   
-  NENGO_GPU_DATA_MAX_TRANSFORM_DIMENSION,
-  NENGO_GPU_DATA_MAX_DECODER_DIMENSION,
+  NENGO_ENSEMBLE_DATA_MAX_TRANSFORM_DIMENSION,
+  NENGO_ENSEMBLE_DATA_MAX_DECODER_DIMENSION,
 
-  NENGO_GPU_DATA_NUM_DECODED_TERMINATIONS,
-  NENGO_GPU_DATA_NUM_NON_DECODED_TERMINATIONS,
+  NENGO_ENSEMBLE_DATA_NUM_DECODED_TERMINATIONS,
+  NENGO_ENSEMBLE_DATA_NUM_NON_DECODED_TERMINATIONS,
   
-  NENGO_GPU_DATA_NUM
+  NENGO_ENSEMBLE_DATA_NUM
 };
 
-typedef enum GPUDataIndex_enum GPUDataIndex;
+typedef enum EnsembleDataIndex_enum EnsembleDataIndex;
 
+
+/*
+  Float and int array objects that facilitate safe array accessing.
+*/
 
 struct intArray_t{
   int* array;
@@ -61,7 +69,9 @@ float floatArrayGetElement(floatArray* a, int index);
 void intArraySetData(intArray* a, int* data, int dataSize);
 void floatArraySetData(floatArray* a, float* data, int dataSize);
 
-
+/*
+  Stores a projection.
+*/ 
 #define PROJECTION_DATA_SIZE 6
 struct projection_t{
   int sourceEnsemble;
@@ -69,7 +79,11 @@ struct projection_t{
   int destinationEnsemble;
   int destinationTermination;
   int size;
-  int device;
+  int destDevice;
+  int sourceDevice;
+
+  int offsetInSource;
+  int offsetInDestination;
 };
 
 typedef struct projection_t projection;
@@ -77,6 +91,39 @@ typedef struct projection_t projection;
 void storeProjection(projection* proj, int* data);
 void printProjection(projection* proj);
 
+
+typedef struct int_list_t int_list;
+typedef struct int_queue_t int_queue;
+
+// implementation of a list
+struct int_list_t{
+  int first;
+  int_list* next;
+};
+
+int_list* cons_int_list(int_list* list, int item);
+int* first_int_list(int_list* list);
+int_list* next_int_list(int_list* list);
+void free_int_list(int_list* list);
+
+// implementation of a queue
+struct int_queue_t{
+  int size;
+  int_list* head;
+  int_list* tail;
+};
+
+int_queue* new_int_queue();
+int pop_int_queue(int_queue* queue);
+void add_int_queue(int_queue* queue, int val);
+void free_int_queue(int_queue* queue);
+
+
+
+/* 
+  The central data structure. One is created for each device in use. Holds nengo network data
+  in arrays structured to be used by cuda kernels in NengoGPU_CUDA.cu.
+*/
 struct NengoGPUData_t{
 
   FILE *fp;
@@ -95,6 +142,10 @@ struct NengoGPUData_t{
   int totalInputSize;
   int GPUInputSize;
   int CPUInputSize;
+  int JavaInputSize;
+  int offsetInSharedInput;
+  int CPUOutputSize;
+
   int totalTransformSize;
   int totalNumTransformRows;
   int totalEnsembleDimension;
@@ -108,14 +159,15 @@ struct NengoGPUData_t{
   int maxNumNeurons;
   int maxOriginDimension;
 
+
   floatArray* input;
   floatArray* inputHost; // this is allocated in NengoGPU_JNI.c/setupInput
-  intArray* inputOffset;
+  intArray* terminationOffsetInInput;
 
   floatArray* terminationTransforms;
   intArray* transformRowToInputIndexor;
   floatArray* terminationTau;
-  intArray* inputDimensions;
+  intArray* terminationDimension;
   floatArray* terminationOutput;
   intArray* terminationOutputIndexor;
 
@@ -124,62 +176,58 @@ struct NengoGPUData_t{
   floatArray* decoders;
   floatArray* encodeResult;
 
+  // data for calculating spikes
   floatArray* neuronVoltage;
   floatArray* neuronReftime;
   floatArray* neuronBias;
   floatArray* neuronScale;
   floatArray* ensembleTauRC;
   floatArray* ensembleTauRef;
-
-  intArray* ensembleNumTerminations;
-  intArray* ensembleDimension;
-  intArray* ensembleNumNeurons;
-  intArray* ensembleOutputSize;
-  intArray* ensembleNumOrigins;
-
-//  intArray* ensembleOffsetInTerminations;
-  intArray* ensembleOffsetInDimensions;
-  intArray* ensembleOffsetInNeurons;
-  intArray* ensembleOffsetInEncoders;
-  intArray* ensembleOffsetInDecoders;
-  intArray* ensembleOffsetInOutput;
   intArray* neuronToEnsembleIndexor;
 
-  int blockSizeForEncode;
-  int numBlocksForEncode;
-
-  int blockSizeForDecode;
-  int numBlocksForDecode;
-
-  intArray* blockToEnsembleMapForEncode;
-  intArray* blockToEnsembleMapForDecode;
-
-  intArray* ensembleIndexOfFirstBlockForEncode;
-  intArray* ensembleIndexOfFirstBlockForDecode;
-
+  // supplementary arrays for doing encoding
+  intArray* ensembleDimension;
+  intArray* ensembleOffsetInDimensions;
+  intArray* encoderRowToEnsembleIndexor; 
   intArray* encoderStride;
-  intArray* decoderStride;
+  intArray* encoderRowToNeuronIndexor;
 
-  intArray* ensembleOrderInEncoders;
-  intArray* ensembleOrderInDecoders;
+  // supplementary arrays for doing decoding
+  intArray* ensembleNumNeurons;
+  intArray* ensembleOffsetInNeurons; 
+  intArray* decoderRowToEnsembleIndexor; 
+  intArray* decoderStride;
+  intArray* decoderRowToOutputIndexor;
 
   floatArray* spikes;
-  floatArray* spikesHost;
 
   floatArray* output;
-  floatArray* outputHost;
 
-  intArray* originDimension;
-  intArray* outputOffset;
   intArray* GPUTerminationToOriginMap;
-  intArray* ensembleIndexInJavaArray;
 
 
+  // non decoded termination data
   intArray* NDterminationInputIndexor;
   floatArray* NDterminationCurrents;
   floatArray* NDterminationWeights;
   intArray* NDterminationEnsembleOffset;
   floatArray* NDterminationEnsembleSums;
+
+  // arrays that are not transferred to the GPU
+  intArray* ensembleOrderInEncoders;
+  intArray* ensembleOrderInDecoders;
+  
+  floatArray* spikesHost;
+  floatArray* outputHost;
+
+  intArray* originOffsetInOutput;
+  intArray* ensembleNumOrigins;
+  intArray* originDimension;
+  intArray* ensembleNumTerminations;
+  intArray* ensembleIndexInJavaArray;
+
+  intArray* sharedData_outputIndex;
+  intArray* sharedData_sharedIndex;
 };
 
 typedef struct NengoGPUData_t NengoGPUData;
