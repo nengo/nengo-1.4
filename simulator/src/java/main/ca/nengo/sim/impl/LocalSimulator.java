@@ -32,7 +32,7 @@ import java.util.ArrayList;
 //import java.util.Arrays;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
+//import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+//import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
