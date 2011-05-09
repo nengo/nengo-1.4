@@ -5,7 +5,7 @@ from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import *
 from ca.nengo.model.neuron import *
 from ca.nengo.util import *
-from ca.nengo.util.impl import NodeThreadPool, NEF_GPU_Interface
+from ca.nengo.util.impl import NodeThreadPool, NEFGPUInterface
 
 class Simulator:
     def __init__(self,network):
@@ -14,12 +14,12 @@ class Simulator:
         self.network=network
         self.initialize(network)
         
-        if NEF_GPU_Interface.getUseGPU():
+        if NEFGPUInterface.getUseGPU():
             #for n in self.nodes: 
         #        if isinstance(n,NEFEnsemble) and n.mode==SimulationMode.DEFAULT: 
         #            n.setGPU(True)
 
-            self.thread_pool=NEF_GPU_Interface(self.nodes, self.projections)
+            self.thread_pool=NEFGPUInterface(self.nodes, self.projections)
         #elif NodeThreadPool.isMultithreading():
         #    self.thread_pool=NodeThreadPool(self.nodes, self.projections)
         else:    
