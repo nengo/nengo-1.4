@@ -18,7 +18,12 @@ class Properties:
         self._list=[]
         self._properties={}
         for key,text,type in params:
-            p=self.pmap[type](text)
+            if isinstance(type,Property):
+                p=type
+            elif isinstance(type,Property.__class__):
+                p=type(text)
+            else:
+                p=self.pmap[type](text)
             self._list.append(p)
             self._properties[key]=p
 
@@ -231,28 +236,31 @@ class DropHandler(TransferHandler):
         
 
     def create(self,constructor,nodeContainer,position,node=None):
-        if isinstance(constructor,ca.nengo.ui.models.constructors.ConstructableNode):
-            action=ca.nengo.ui.actions.CreateModelAction(nodeContainer,constructor)
-            action.setPosition(position.x,position.y)
-            action.doAction()
-        elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedOrigin):
-            uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
-            uc.configureAndWait()
-            if constructor.model is not None:
-                node.showOrigin(constructor.model.name)
-        elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedTermination):
-            uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
-            uc.configureAndWait()
-            if constructor.model is not None:
-                node.showTermination(constructor.model.name)
-            
-        elif isinstance(constructor,IConfigurable):
-            assert isinstance(nodeContainer,ca.nengo.ui.models.viewers.NetworkViewer)
-            nodeContainer.setNewItemPosition(position.x,position.y)
-            
-            constructor.set_network(nodeContainer.getModel())
-            uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
-            uc.configureAndWait()
+        try:
+            if isinstance(constructor,ca.nengo.ui.models.constructors.ConstructableNode):
+                action=ca.nengo.ui.actions.CreateModelAction(nodeContainer,constructor)
+                action.setPosition(position.x,position.y)
+                action.doAction()
+            elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedOrigin):
+                uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
+                uc.configureAndWait()
+                if constructor.model is not None:
+                    node.showOrigin(constructor.model.name)
+            elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedTermination):
+                uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
+                uc.configureAndWait()
+                if constructor.model is not None:
+                    node.showTermination(constructor.model.name)
+                
+            elif isinstance(constructor,IConfigurable):
+                assert isinstance(nodeContainer,ca.nengo.ui.models.viewers.NetworkViewer)
+                nodeContainer.setNewItemPosition(position.x,position.y)
+                
+                constructor.set_network(nodeContainer.getModel())
+                uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
+                uc.configureAndWait()
+        except ca.nengo.ui.configurable.managers.ConfigDialogClosedException:
+            pass
             
             
     
