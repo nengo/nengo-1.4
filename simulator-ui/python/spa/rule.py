@@ -1,79 +1,204 @@
 import inspect
 import numeric
 
+class Match:
+    def __init__(self,a,b,weight):
+        self.a=a
+        self.b=b
+        self.weight=weight
+
 class Sink:
-    def __init__(self,name,weight=None):
+    def __init__(self,name,weight=1,conv=None,add=None):
         self.name=name
         self.weight=weight
-    def __mul__(self,other):
-        assert isinstance(other,Sink)   # haven't coded these yet
-        assert self.weight==None        # haven't coded these yet
-        if self.weight is None:
-            w=other
-        elif isinstance(self.weight,str) or isinstance(other,str):
-            w='%s*%s'%(self.weight,other)
+        self.conv=conv
+        self.add=add
+    def __add__(self,other):
+        assert self.add is None
+        return Sink(self.name,self.weight,self.conv,other)
+    def __sub__(self,other):
+        if isinstance(other,str):
+            return self.__add__('-(%s)'%other)
         else:
-            w=self.weight*other        
-        return Sink(self.name,weight=w)
+            return self.__add__(self,-other)
+    def __mul__(self,other):
+        if isinstance(other,(float,int)):
+            return Sink(self.name,self.weight*other,self.conv,self.add)
+        elif isinstance(other,Sink):
+            assert self.conv is None
+            return Sink(self.name,self.weight,other,self.add)
     def __invert__(self):
-        return Sink('~'+self.name,weight=self.weight)
-    def __div__(self,other):
-        assert isinstance(other,Sink)   # haven't coded these yet
-        assert self.weight==None        # haven't coded these yet
-        return Sink(self.name,weight=Sink('~'+other.name))        
+        name=self.name
+        if name.startswith('~'): name=name[1:]
+        else: name='~'+name
+        return Sink(name,self.weight,self.conv,self.add)
+    def __neg__(self):
+        return self.__mul__(-1)
+
+    def __eq__(self,other):
+        assert isinstance(other,Sink)
+        assert self.conv is None
+        assert other.conv is None
+        assert self.add is None
+        assert other.add is None
+        return Match(self.name,other.name,1*self.weight*other.weight)
+    def __ne__(self,other):
+        assert isinstance(other,Sink)
+        assert self.conv is None
+        assert other.conv is None
+        assert self.add is None
+        assert other.add is None
+        return Match(self.name,other.name,-1*self.weight*other.weight)
+        
         
 
+
 class Rule:
-    def __init__(self,func,sources,sinks):
+    def __init__(self,func,spa):
         self.func=func
         self.name=func.func_name
         args,varargs,keywords,defaults=inspect.getargspec(func)
         if defaults is None or args is None or len(args)!=len(defaults):
             raise Exception('No value specified for match in rule '+self.name)
+        self.scale=1.0
+
 
         self.lhs={}
         for i in range(len(args)):
-            self.lhs[args[i]]=defaults[i]
+            if args[i]=='scale':
+                self.scale=defaults[i]
+            else:
+                self.lhs[args[i]]=defaults[i]
 
-        self.rhs_set={}
+        self.rhs_direct={}
         self.rhs_route={}
+        self.lhs_match={}
+
         globals={}
-        for k in sources:
+        for k in spa.sinks.keys():
             globals[k]=Sink(k)
+        for k in spa.sources.keys():
+            if k not in globals.keys():
+                globals[k]=Sink(k)
         globals['set']=self.set
-        globals['route']=self.route
+        globals['match']=self.match
         eval(func.func_code,globals)
 
-    def route(self,**args):
-        for k,v in args.items():
-            if isinstance(v.weight,Sink):
-                self.rhs_route[v.name,v.weight.name,k]=v.weight.weight
-            else:
-                self.rhs_route[v.name,k]=v.weight
-        
     def set(self,**args):
         for k,v in args.items():
-            self.rhs_set[k]=v
-        
-        
+            while v is not None:
+                if isinstance(v,str):
+                    if self.rhs_direct.has_key(k):
+                        self.rhs_direct[k]='(%s)+(%s)'%(self.rhs_direct,v)
+                    else:
+                        self.rhs_direct[k]=v
+                    v=None
+                elif isinstance(v,Sink):
+                    w=self.rhs_route.get((v.name,k),1)
+                    self.rhs_route[v.name,k]=v.weight*w
+                    v=v.add
+    def match(self,*args):
+        for m in args:
+            assert isinstance(m,Match)
+            self.lhs_match[m.a,m.b]=m.weight
 
 
 class Rules:
-    def __init__(self):
-        self._rules={}
-        self._names=[]
-        self._rule_count=0
-        for name,func in inspect.getmembers(self):
+    def __init__(self,ruleclass):
+        self.rules={}
+        self.names=[]
+        self.rule_count=0
+        self.ruleclass=ruleclass
+        self.spa=None
+        for name,func in inspect.getmembers(ruleclass):
             if inspect.ismethod(func):
                 if not name.startswith('_'):
-                    self._rule_count+=1
+                    self.rule_count+=1
+
+    def count(self):
+        return self.rule_count
         
-    def _initialize(self,sources,sinks):
-        for name,func in inspect.getmembers(self):
+    def initialize(self,spa):
+        if self.spa is not None: return     # already initialized
+        self.spa=spa
+        for name,func in inspect.getmembers(self.ruleclass):
             if inspect.ismethod(func):
                 if not name.startswith('_'):
-                    self._rules[name]=Rule(func,sources=sources,sinks=sinks)
-                    self._names.append(name)
+                    self.rules[name]=Rule(func,spa)
+                    self.names.append(name)
+
+    def lhs(self,source_name):
+        m=[]
+        dim=None
+        for n in self.names:
+            rule=self.rules[n]
+            row=rule.lhs.get(source_name,None)
+            if isinstance(row,str):
+                vocab=self.spa.vocab(source_name)
+                row=vocab.parse(row).v*rule.scale
+            m.append(row)
+            if row is not None:                
+                if dim is None: dim=len(row)
+                elif len(row)!=dim:
+                    raise Exception('Rows of different lengths connecting from %s'%source_name)
+        if dim is None: return None
+        for i in range(len(m)):
+            if m[i] is None: m[i]=[0]*dim
+            
+        return m
+            
+
+    def rhs_direct(self,sink_name):
+        t=[]
+        vocab=self.spa.vocab(sink_name)
+        for n in self.names:
+            rule=self.rules[n]
+            row=rule.rhs_direct.get(sink_name,None)
+            if row is None: row=[0]*vocab.dimensions
+            else: row=vocab.parse(row).v
+            t.append(row)
+        return numeric.array(t).T
+
+    def get_rhs_routes(self):
+        routes=[]
+        for rule in self.rules.values():
+            for (source,sink),w in rule.rhs_route.items():
+                k=(source,sink,w)
+                if k not in routes: routes.append(k)
+        return routes
+
+    def get_lhs_matches(self):
+        match=[]
+        for rule in self.rules.values():
+            for k in rule.lhs_match.keys():
+                if k not in match:match.append(k)
+        return match
+
+    def rhs_route(self,source,sink,weight):
+        t=[]
+        vocab=self.spa.vocab(sink)
+        for n in self.names:
+            rule=self.rules[n]
+            if rule.rhs_route.get((source,sink),None)==weight:
+                t.append([-1])
+            else:
+                t.append([0])
+        return numeric.array(t).T
+            
+    def lhs_match(self,a,b):
+        t=[]
+        assert self.spa.vocab(b) is self.spa.vocab(b)
+        vocab=self.spa.vocab(a)
+        for n in self.names:
+            rule=self.rules[n]
+            t.append(rule.lhs_match.get((a,b),0)*rule.scale)
+        return t
+        
+        
+            
+"""
+
+                    
     def _lhs_keys(self):
         keys=[]
         for r in self._rules.values():
@@ -161,3 +286,4 @@ class Rules:
                     w=[0]*vocab.dimensions                
             t.append([w])
         return numeric.array(t).T
+"""

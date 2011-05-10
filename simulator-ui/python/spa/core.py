@@ -3,6 +3,101 @@ import hrr
 import ca.nengo
 
 
+import spa.module
+import inspect
+class SPA:
+    dimensions=16
+    align_hrrs=False
+    
+    def __init__(self,name=None):
+        if name is None: name=self.__class__.__name__
+
+        self.net=nef.Network(name)
+        self.sources={}
+        self.sinks={}
+        self.sink_modules={}
+        self.vocabs={}
+        self.default_vocabs={}
+        self.params={}
+        self.modules={}
+
+        self.init()
+        self.create()
+        self.connect()
+        self.net.add_to()
+
+    def has_sink(self,k):
+        return self.sinks.has_key(k)
+    def has_source(self,k):
+        return self.sources.has_key(k)
+
+    def add_source(self,name,source,module):
+        self.sources[name]=source
+        if source.dimensions>1:
+            self.ensure_vocab(name,module)
+
+            
+        
+    def add_sink(self,name,sink,module):
+        self.sinks[name]=sink
+        self.sink_modules[name]=module
+
+        self.ensure_vocab(name,module)
+
+    def ensure_vocab(self,name,module):
+        d=module.get_param('dimensions')
+        align=module.get_param('align_hrrs')
+        if not self.default_vocabs.has_key((d,align)):
+            self.default_vocabs[(d,align)]=hrr.Vocabulary(d,randomize=not align)
+        self.vocabs[name]=self.default_vocabs[(d,align)]
+        
+
+    def vocab(self,obj):
+        return self.vocabs[obj]
+
+    def add_module(self,name,module,create=False,connect=False):
+        module.name=name
+        module.spa=self
+        module.net=nef.Network(name)
+        self.net.add(module.net.network)
+        self.modules[name]=module
+
+        if create: self.create([module])
+        if connect: self.connect([module])
+
+    def init(self):
+        for k,v in inspect.getmembers(self):
+          if not k.startswith('_'):
+            if isinstance(v,spa.module.Module):
+                self.add_module(k,v)
+            elif isinstance(v,(int,float,str)):
+                self.params[k]=v
+        
+    def create(self,modules=None):
+        if modules is None: modules=self.modules.values()
+        for m in modules:
+            args,vargs,kw,defaults=inspect.getargspec(m.create)
+            a=[m.get_param(arg) for arg in args[1:]]
+            m.create(*a)
+    def connect(self,modules=None):
+        if modules is None: modules=self.modules.values()
+        for m in modules:
+            m.connect()
+
+    def connect_to_sink(self,origin,sink_name,transform,pstc,termination_name=None):
+        sink=self.sinks[sink_name]
+        o,t=self.net.connect(origin,sink,transform=transform,pstc=pstc,
+                             create_projection=False)
+        if termination_name is None: termination_name=o.node.name
+        self.sink_modules[sink_name].net.network.exposeTermination(t,termination_name)
+        self.net.network.addProjection(o,self.sink_modules[sink_name].net.network.getTermination(termination_name))
+        
+        
+        
+            
+        
+
+"""
 class SPA:
     def __init__(self,name=None):
         if name is None: name=self.__class__.__name__
@@ -95,5 +190,5 @@ class SPA:
             self._sink_parents[key].exposeTermination(t,t.name)
         self._net.network.addProjection(o,self._sink_parents[key].getTermination(t.name))
         
-        
+   """     
             

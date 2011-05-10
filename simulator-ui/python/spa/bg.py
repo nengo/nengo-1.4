@@ -2,56 +2,59 @@
 import ca.nengo
 import nef
 import numeric
+
 import spa.view
+import spa.module
+import spa.rule
+import spa.match
 
-class BasalGanglia(ca.nengo.model.impl.NetworkImpl):
-    def __init__(self,rules,name='BG',lg=0.2,pstc_input=0.002):
-        ca.nengo.model.impl.NetworkImpl.__init__(self)
-        self.name=name
-        self.rules=rules
-        self.lg=lg
-        self.pstc_input=pstc_input
-
-        net=nef.Network(self)
-        nef.templates.basalganglia.make(None,dimensions=rules._rule_count,netbg=net)
-        self.hideOrigin('output')
-        self.removeNode('output')
-        self.hideTermination('input')
-        self.removeNode('input')
-        self.exposeOrigin(self.getNode('GPi').getOrigin('func_gpi'),'output')
-        spa.view.utility_watch.add(self)
+class BasalGanglia(spa.module.Module):
+    def __init__(self,rules,**params):
+        spa.module.Module.__init__(self,**params)
+        self.rules=spa.rule.Rules(rules)
         
-    def add_input(self,nca,origin,transform,learn=False):
-        net=nef.Network(self)
+    def create(self,lg=0.2,pstc_input=0.002):
 
-        o1,t1=net.connect(origin,self.getNode('StrD1'),transform=(1+self.lg)*numeric.array(transform),
-                          pstc=self.pstc_input,plastic_array=learn,create_projection=False)
+        nef.templates.basalganglia.make(None,dimensions=self.rules.count(),netbg=self.net)
+        self.net.network.hideOrigin('output')
+        self.net.network.removeNode('output')
+        self.net.network.hideTermination('input')
+        self.net.network.removeNode('input')
+        self.net.network.exposeOrigin(self.net.network.getNode('GPi').getOrigin('func_gpi'),'output')
+
+        spa.view.utility_watch.add(self.net.network,self.rules.names)
+
+    def connect(self):
+        self.rules.initialize(self.spa)
+        if len(self.rules.get_lhs_matches())>0:
+            self.spa.add_module(self.name+'_match',spa.match.Match(self),create=True,connect=True)
+            
+        for name,source in self.spa.sources.items():
+            self.add_input(source,self.rules.lhs(name))
+        
+    def add_input(self,origin,transform,learn=False):
+        if transform is None: return
+
+        lg=self.get_param('lg')
+        pstc_input=self.get_param('pstc_input')
+        
+        o1,t1=self.net.connect(origin,self.net.network.getNode('StrD1'),transform=(1+lg)*numeric.array(transform),
+                          pstc=pstc_input,plastic_array=learn,create_projection=False)
         tname=t1.name+'_D1'
-        self.exposeTermination(t1,tname)
-        nca._net.network.addProjection(o1,self.getTermination(tname))
+        self.net.network.exposeTermination(t1,tname)
+        self.spa.net.network.addProjection(o1,self.net.network.getTermination(tname))
 
-        o1,t1=net.connect(origin,self.getNode('StrD2'),transform=(1-self.lg)*numeric.array(transform),
-                          pstc=self.pstc_input,plastic_array=learn,create_projection=False)
+        o1,t1=self.net.connect(origin,self.net.network.getNode('StrD2'),transform=(1-lg)*numeric.array(transform),
+                          pstc=pstc_input,plastic_array=learn,create_projection=False)
         tname=t1.name+'_D2'
-        self.exposeTermination(t1,tname)
-        nca._net.network.addProjection(o1,self.getTermination(tname))
+        self.net.network.exposeTermination(t1,tname)
+        self.spa.net.network.addProjection(o1,self.net.network.getTermination(tname))
 
-        o1,t1=net.connect(origin,self.getNode('STN'),transform=transform,
-                          pstc=self.pstc_input,plastic_array=learn,create_projection=False)
+        o1,t1=self.net.connect(origin,self.net.network.getNode('STN'),transform=transform,
+                          pstc=pstc_input,plastic_array=learn,create_projection=False)
         tname=t1.name+'_STN'
-        self.exposeTermination(t1,tname)
-        nca._net.network.addProjection(o1,self.getTermination(tname))
+        self.net.network.exposeTermination(t1,tname)
+        self.spa.net.network.addProjection(o1,self.net.network.getTermination(tname))
 
-    def init_NCA(self,nca):
-        self.rules._initialize(sources=nca._sources.keys(),sinks=nca._sinks.keys())
-        
-    def connect_NCA(self,nca):
-        for k in self.rules._lhs_keys():
-            if k in nca._sources.keys():
-                self.add_input(nca,nca._sources[k],self.rules._make_lhs_transform(k,nca.vocab(k)))
-            elif k in nca._scalar_sources.keys():
-                s,t1=nca._scalar_sources[k]
-                t=self.rules._make_lhs_scalar_transform(k)
-                if t1 is not None:
-                    t=numeric.dot(t,t1)
-                self.add_input(nca,s,t)
+
+

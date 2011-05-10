@@ -4,22 +4,19 @@ import timeview.view
 from java.awt import Color
 
 class RuleView(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),label=None):
+    def __init__(self,view,name,func,args=(),label=None,names=[]):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
         self.data=self.view.watcher.watch(name,func,args=args)
-        self.names=None
+        self.names=names
         self.margin=10
 
         self.setSize(150,300)
 
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
-
-        if self.names is None:
-            self.names=list(self.view.watcher.objects[self.name].bg.rules._names)
 
         dt_tau=None
         # no filter
@@ -51,34 +48,31 @@ class RuleView(core.DataViewComponent):
             
 class RuleWatch:
     def __init__(self):
-        self.objs=[]
+        self.objs={}
     def check(self,obj):
-        return obj in self.objs
+        return obj in self.objs.keys()
     def measure(self,obj):
-        return obj.rules.getOrigin('X').getValues().getValues()
+        return obj.getNode('rules').getOrigin('X').getValues().getValues()
     def views(self,obj):
-        return [('rule activation',RuleView,dict(func=self.measure,label="Rules"))]
-    def add(self,obj):
-        self.objs.append(obj)
+        return [('rule activation',RuleView,dict(func=self.measure,label="Rules",names=self.objs[obj]))]
+    def add(self,obj,names):
+        self.objs[obj]=names
 
 		
 class UtilityView(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),label=None):
+    def __init__(self,view,name,func,args=(),label=None,names=[]):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
         self.data=self.view.watcher.watch(name,func,args=args)
-        self.names=None
+        self.names=names
         self.margin=10
 
         self.setSize(150,300)
 
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
-
-        if self.names is None:
-            self.names=list(self.view.watcher.objects[self.name].rules._names)
 
         dt_tau=None
         if self.view.tau_filter>0:
@@ -97,8 +91,8 @@ class UtilityView(core.DataViewComponent):
 
         for i,n in enumerate(self.names):
             c=1-data[i]
-            if c<0: c=0
-            if c>1: c=1
+            if c<0: c=0.0
+            if c>1: c=1.0
             g.color=Color(c,c,c)
             g.fillRect(int(x0),int(y0+dy*i),int(self.size.width-self.margin-1),int(dy+1))
 
@@ -116,15 +110,15 @@ class UtilityView(core.DataViewComponent):
             
 class UtilityWatch:
     def __init__(self):
-        self.objs=[]
+        self.objs={}
     def check(self,obj):
-        return obj in self.objs
+        return obj in self.objs.keys()
     def measure(self,obj):
         return obj.getNode('StrD2').getOrigin('X').getValues().getValues()
     def views(self,obj):
-        return [('rule utility',UtilityView,dict(func=self.measure,label="Utility"))]
-    def add(self,obj):
-        self.objs.append(obj)
+        return [('rule utility',UtilityView,dict(func=self.measure,label="Utility",names=self.objs[obj]))]
+    def add(self,obj,names):
+        self.objs[obj]=names
 		
 rule_watch=RuleWatch()
 timeview.view.watches.append(rule_watch)

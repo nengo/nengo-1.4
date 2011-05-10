@@ -3,6 +3,7 @@ import numeric
 
 class DirectBuffer(nef.SimpleNode):
     input_threshold=0.3
+    pstc=0.01
     def __init__(self,dimensions,name='Buffer'):
         self.input=numeric.zeros(dimensions)
         self.x=[0]*dimensions
@@ -23,4 +24,12 @@ class DirectBuffer(nef.SimpleNode):
         self.addTermination(term)
         return term
 
-
+import spa.module
+class DirectLatch(spa.module.Module):
+    def create(self,dimensions=16):
+        self.node=DirectBuffer(dimensions)
+        self.net.add(self.node)
+        self.net.network.exposeOrigin(self.node.getOrigin('value'),self.name)
+        self.spa.add_source(self.name,self.net.network.getOrigin(self.name),self)
+        self.spa.add_sink(self.name,self.node,self)
+        

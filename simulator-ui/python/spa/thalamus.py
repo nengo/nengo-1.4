@@ -2,67 +2,72 @@ import nef
 import ca.nengo
 import numeric
 import spa.view
+import spa.module
 
-class Thalamus(ca.nengo.model.impl.NetworkImpl):
-    def __init__(self,bg,name='BG',neurons=40,rule_threshold=0.2,bg_output_weight=-3,pstc_output=0.002,mutual_inhibit=1,pstc_inhibit=0.008,pstc_to_gate=0.002,pstc_gate=0.008,N_per_D=30,pstc_route_input=0.002):
-        ca.nengo.model.impl.NetworkImpl.__init__(self)
-        self.name=name
+class Thalamus(spa.module.Module):
+    def __init__(self,bg,**params):
+        spa.module.Module.__init__(self,**params)
         self.bg=bg
-        self.pstc_output=pstc_output
-        self.pstc_to_gate=pstc_to_gate
-        self.pstc_gate=pstc_gate
-        self.pstc_route_input=pstc_route_input
-        self.N_per_D=30
 
-        net=nef.Network(self)
-        D=bg.getOrigin('output').dimensions
 
-        self.bias=net.make_input('bias',[1])
-        self.rules=net.make_array('rules',neurons,D,intercept=(rule_threshold,1),encoders=[[1]],quick=True)
-        net.connect(self.bias,self.rules)
+    def create(self,rule_neurons=40,rule_threshold=0.2,bg_output_weight=-3,
+               pstc_output=0.002,mutual_inhibit=1,pstc_inhibit=0.008,
+               pstc_to_gate=0.002,pstc_gate=0.008,N_per_D=30,
+               pstc_route_input=0.002,neurons_gate=25):
+        D=self.bg.rules.rule_count
+        
+        self.bias=self.net.make_input('bias',[1])
+        self.rules=self.net.make_array('rules',rule_neurons,D,intercept=(rule_threshold,1),encoders=[[1]],quick=True)
+        self.net.connect(self.bias,self.rules)
 
-        o,t=net.connect(self.bg.getOrigin('output'),self.rules,weight=bg_output_weight,create_projection=False)
-        self.exposeTermination(t,'bg')
 
-        self.exposeOrigin(self.rules.getOrigin('X'),'rules')
+
+        self.net.network.exposeOrigin(self.rules.getOrigin('X'),'rules')
 
         if mutual_inhibit>0:
-            net.connect(self.rules,self.rules,(numeric.eye(D)-1)*mutual_inhibit,pstc=pstc_inhibit)
+            self.net.connect(self.rules,self.rules,(numeric.eye(D)-1)*mutual_inhibit,pstc=pstc_inhibit)
 
-        spa.view.rule_watch.add(self)
+        spa.view.rule_watch.add(self.net.network,self.bg.rules.names)
 
 
-    def connect_NCA(self,nca):
-        nca._net.network.addProjection(self.bg.getOrigin('output'),self.getTermination('bg'))
+    def connect(self):
+        o,t=self.net.connect(self.bg.net.network.getOrigin('output'),self.rules,
+                        weight=self.get_param('bg_output_weight'),create_projection=False)
+        self.net.network.exposeTermination(t,'bg')
+        self.spa.net.network.addProjection(self.bg.net.network.getOrigin('output'),self.net.network.getTermination('bg'))
 
-        # sending a specific value to a specific sink
-        for k in self.bg.rules._rhs_set_keys():
-            t=self.bg.rules._make_rhs_set_transform(k,nca.vocab(k))
-            nca.connect_to_sink(self.getOrigin('rules'),k,t,self.pstc_output)
+        self.bg.rules.initialize(self.spa)
+        for name,source in self.spa.sinks.items():
+            t=self.bg.rules.rhs_direct(name)
+            if t is not None:
+                self.spa.connect_to_sink(self.net.network.getOrigin('rules'),
+                                         name,t,self.get_param('pstc_output'))
 
-        # route from a source to a sink
-        net=nef.Network(self)
-        for k1,k2 in self.bg.rules._rhs_route_keys():
-            t=self.bg.rules._make_rhs_route_transform(k1,k2)
-
-            gate=net.make('gate_%s_%s'%(k1,k2),25,1,quick=True,encoders=[[1]],intercept=(0.3,1))
-            net.connect(self.rules,gate,transform=t,pstc=self.pstc_to_gate)
-            net.connect(self.bias,gate)
-
-            source=nca._sources[k1]
-            sink=nca._sinks[k2]
-            cname='channel_%s_%s'%(k1,k2)
-            channel=net.make(cname,self.N_per_D*sink.dimension,sink.dimension,quick=True)
-            self.exposeOrigin(channel.getOrigin('X'),cname)
-            nca.connect_to_sink(self.getOrigin(cname),k2,None,self.pstc_output)
-
-            o1,t1=net.connect(source,channel,pstc=self.pstc_route_input,create_projection=False)
-            net.network.exposeTermination(t1,cname)
-            nca._net.network.addProjection(o1,net.network.getTermination(cname))
+        for source_name,sink_name,weight in self.bg.rules.get_rhs_routes():
+            t=self.bg.rules.rhs_route(source_name,sink_name,weight)
             
-            channel.addTermination('gate',[[-10.0]]*channel.neurons,self.pstc_gate,False)
-            net.connect(gate,channel.getTermination('gate'))
+            gate=self.net.make('gate_%s_%s'%(source_name,sink_name),self.p.neurons_gate,1,
+                               quick=True,encoders=[[1]],intercept=(0.3,1))
+            self.net.connect(self.rules,gate,transform=t,pstc=self.p.pstc_to_gate)
+            self.net.connect(self.bias,gate)
 
+            source=self.spa.sources[source_name]
+            sink=self.spa.sinks[sink_name]
+            cname='channel_%s_%s'%(source_name,sink_name)
+            channel=self.net.make(cname,self.p.N_per_D*sink.dimension,sink.dimension,quick=True)
+            self.net.network.exposeOrigin(channel.getOrigin('X'),cname)
+            
+            self.spa.connect_to_sink(self.net.network.getOrigin(cname),sink_name,None,
+                                     self.p.pstc_output,termination_name=cname)
+
+            o1,t1=self.net.connect(source,channel,pstc=self.p.pstc_route_input,create_projection=False)
+            self.net.network.exposeTermination(t1,cname)
+            self.spa.net.network.addProjection(o1,self.net.network.getTermination(cname))
+            
+            channel.addTermination('gate',[[-10.0]]*channel.neurons,self.p.pstc_gate,False)
+            self.net.connect(gate,channel.getTermination('gate'))
+
+        """
 
         # route from a source to a sink, convolving with another source
         for k1,k2,k3 in self.bg.rules._rhs_route_conv2_keys():
@@ -100,7 +105,7 @@ class Thalamus(ca.nengo.model.impl.NetworkImpl):
             nca._net.network.addProjection(source1,net.network.getTermination(cname+'1'))
             nca._net.network.addProjection(source2,net.network.getTermination(cname+'2'))
             nca.connect_to_sink(self.getOrigin(cname),k3,None,self.pstc_output)        
-        
+        """
 
         
     
