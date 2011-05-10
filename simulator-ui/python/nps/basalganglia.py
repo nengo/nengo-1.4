@@ -36,13 +36,13 @@ def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,in
             input=[input]
         for i in range(len(input)):
             if input_transform is None:
-                net.connect(input[i],StrD1,weight=ws*(1+lg),pstc=tau_ampa,plastic_array=learn)
+                net.connect(input[i],StrD1,weight=ws*(1+lg),pstc=tau_ampa)
                 net.connect(input[i],StrD2,weight=ws*(1-lg),pstc=tau_ampa,plastic_array=learn)
-                net.connect(input[i],STN,weight=wt,pstc=tau_ampa,plastic_array=learn)
+                net.connect(input[i],STN,weight=wt,pstc=tau_ampa)
             else:
-                net.connect(input[i],StrD1,transform=ws*(1+lg)*array(input_transform[i]),pstc=tau_ampa,plastic_array=learn)
+                net.connect(input[i],StrD1,transform=ws*(1+lg)*array(input_transform[i]),pstc=tau_ampa)
                 net.connect(input[i],StrD2,transform=ws*(1-lg)*array(input_transform[i]),pstc=tau_ampa,plastic_array=learn)
-                net.connect(input[i],STN,transform=array(input_transform[i])*wt,pstc=tau_ampa,plastic_array=learn)
+                net.connect(input[i],STN,transform=array(input_transform[i])*wt,pstc=tau_ampa)
 
 
         # connect the striatum to the GPi and GPe (inhibitory)

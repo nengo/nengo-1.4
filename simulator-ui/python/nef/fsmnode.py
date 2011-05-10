@@ -86,63 +86,30 @@ class FSMNode(nef.SimpleNode):
         if self.state and self.state.input:
             self.state.input(x)
 
-
-#class FSMWatch:
-#    def __init__(self,objs):
-#        self.objs=objs
-#    def check(self,obj):
-#        return obj in self.objs
-#    def measure(self,obj):
-#        r=[]
-#        r.append(obj.trial_num)
-#        r.append(obj.state)
-#        r.append(obj.thalamus_choice)
-#        r.append(obj.rewarded)
-#        for sum in obj.thalamus_sum:
-#            r.append(sum)
-#        
-#        return r
-#    def views(self,obj):
-#        return [('bandit task',BanditView,dict(func=self.measure,label="Bandit Task"))]
-#
-#from javax.swing.event import *
-#from java.awt import *
-#from java.awt.event import *
-#class FSMView(core.DataViewComponent):
-#    def __init__(self,view,name,func,args=(),label=None):
-#        core.DataViewComponent.__init__(self,label)
-#        self.view=view
-#        self.name=name
-#        self.func=func
-#        self.data=self.view.watcher.watch(name,func,args=args)
-#
-#        self.setSize(200,100)
-#
-#    def paintComponent(self,g):
-#        core.DataViewComponent.paintComponent(self,g)
-#        
-#        f_size = g.getFont().size
-#        x_offset = 5
-#
-#        try:    
-#            data=self.data.get(start=self.view.current_tick,count=1)[0]
-#        except:
-#            return
-#        
-#        cur_y = f_size*3
-#        g.drawString("Trail "+str(data[0]),x_offset,cur_y)
-#        cur_y += f_size
-#        g.drawString("State: "+data[1],x_offset,cur_y)
-#        cur_y += f_size
-#        g.drawString("Thalamus sum",x_offset,cur_y)
-#        cur_y += f_size
-#        cur_x = x_offset
-#        for sum in data[4:]:
-#            g.drawString(str(round(sum*100)/100),cur_x,cur_y)
-#            cur_x += 40
-#        cur_y += f_size
-#        g.drawString("Choice: "+str(data[2]),x_offset,cur_y)
-#        cur_y += f_size
-#        if data[3]: r_s = "Yes"
-#        else:       r_s = "No"
-#        g.drawString("Rewarded: "+r_s,x_offset,cur_y)
+class DelayedFSMNode(FSMNode):
+    def __init__(self,name,state_dims,transition_delay):
+        self.next_state = None
+        self.transition_delay = transition_delay
+        self.transition_timer = 0.0
+        FSMNode.__init__(self,name,state_dims)
+    
+    def transition(self,next_state,skip_delay=False):
+        if not self.states.has_key(next_state):
+            raise Exception('DelayFSMNode has no state named %s.' % next_state)
+        if skip_delay:
+            self.next_state = None
+            FSMNode.transition(self,next_state)
+        else:
+            self.next_state = self.states[next_state]
+            FSMNode.reset_timer(self)
+            self.transition_timer = self.t_start
+    
+    def origin_next_state(self):
+        if self.next_state and self.t_start-self.transition_timer >= self.transition_delay:
+            FSMNode.transition(self,self.next_state.name)
+            self.next_state = None
+        
+        if self.next_state:
+            FSMNode.reset_timer(self)
+            return self.next_state.hrr.v
+        return [-1.0]*self.state_dims
