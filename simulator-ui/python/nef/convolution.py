@@ -78,8 +78,8 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
     if isinstance(C,str):
         C=self.network.getNode(C)
 
-    dimensions=A.dimension
-    if B.dimension!=dimensions or C.dimension!=dimensions:
+    dimensions=C.dimension
+    if (B is not None and B.dimension!=dimensions) or (A is not None and A.dimension!=dimensions):
         raise Exception('Dimensions not the same for convolution (%d,%d->%d)'%(A.dimension,B.dimension,C.dimension))
         
     if mode=='direct':
@@ -88,8 +88,10 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
         D.getTermination('A').setTau(pstc_in)
         D.getTermination('B').setTau(pstc_in)
         D.getTermination('gate').setTau(pstc_gate)
-        self.connect(A,D.getTermination('A'))
-        self.connect(B,D.getTermination('B'))
+        if A is not None:
+            self.connect(A,D.getTermination('A'))
+        if B is not None:
+            self.connect(B,D.getTermination('B'))
         self.connect(D.getOrigin('C'),C,pstc=pstc_out,weight=output_scale)
     else:
         D=self.make_array(name,N_per_D,(dimensions/2+1)*4,dimensions=2,quick=quick,encoders=encoders,radius=3)
@@ -124,9 +126,14 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
 
         #self.connect(A,D,transform=[makeA2(i) for i in range((dimensions/2+1)*4)],pstc=pstc_in)
         #self.connect(B,D,transform=[makeB2(i) for i in range((dimensions/2+1)*4)],pstc=pstc_in)
-        self.connect(A,D,transform=A2,pstc=pstc_in)
-        self.connect(B,D,transform=B2,pstc=pstc_in)
+        D.addDecodedTermination('A',A2,pstc_in,False)
+        D.addDecodedTermination('B',B2,pstc_in,False)
         
+        if A is not None:
+            self.connect(A,D.getTermination('A'))
+        if B is not None:
+            self.connect(B,D.getTermination('B'))
+
         def makeifftrow(D,i):
             if i==0 or i*2==D: return ifft[i]
             if i<=D/2: return ifft[i]+ifft[-i].real-ifft[-i].imag*1j
