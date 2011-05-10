@@ -133,7 +133,8 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 				 * Create a property descriptor with a set matrix
 				 */
 				pCouplingMatrix = new PCouplingMatrix(getValue());
-			} else {
+			}
+			else {
 				/*
 				 * Create a property descriptor with no default value
 				 */
@@ -198,6 +199,15 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 	public boolean isValueSet() {
 		if (matrix != null && matrix[0].length == getDimensions()) {
 			return true;
+		} else if (isDimensionsSet() && getFromSize()==getToSize()){
+			matrix = new float[getFromSize()][getToSize()];
+			for (int i=0; i<getFromSize(); i++)
+				for (int j=0; j<getFromSize(); j++)
+					if (i==j)
+						matrix[i][j]=1;
+					else
+						matrix[i][j]=0;
+			return true; // default to identity matrix when applicable, if not already set
 		}
 		setStatusMsg("matrix not set");
 		return false;
