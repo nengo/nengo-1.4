@@ -9,6 +9,11 @@ params=[
     ]
 
 def test_params(net,p):
+    try:
+       net.network.getNode(p['name'])
+       return 'That name is already taken'
+    except:
+        pass
     if p['dimensions']<1: return 'Must have a positive number of actions'
     
 import nps.basalganglia

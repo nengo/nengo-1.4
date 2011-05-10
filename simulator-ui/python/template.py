@@ -11,6 +11,7 @@ class Properties:
     pmap[str]=PString
     pmap[int]=PInt
     pmap[float]=PFloat
+    pmap[bool]=PBoolean
     
     def __init__(self,params):
         self._params=params

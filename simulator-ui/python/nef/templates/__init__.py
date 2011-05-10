@@ -1,3 +1,4 @@
 import integrator
 import basalganglia
-templates=[integrator,basalganglia]
+import binding
+templates=[integrator,basalganglia, binding]

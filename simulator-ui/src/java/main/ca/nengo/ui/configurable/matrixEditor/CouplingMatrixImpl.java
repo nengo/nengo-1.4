@@ -54,6 +54,11 @@ public class CouplingMatrixImpl implements CouplingMatrix {
 		myFromSize = theFromSize;
 		myToSize = theToSize;
 		myData = new float[theToSize][theFromSize];
+		if (theFromSize==theToSize)
+			for (int i=0; i<theToSize; i++)
+			{
+				myData[i][i]=1;
+			}
 	}
 
 	// convenience method for producing an error message

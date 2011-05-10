@@ -31,6 +31,7 @@ package ca.nengo.ui.configurable.matrixEditor;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.EventObject;
@@ -45,6 +46,8 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableColumn;
+
 
 import ca.nengo.ui.lib.Style.NengoStyle;
 
@@ -132,9 +135,26 @@ public class MatrixEditor extends JPanel {
 		if (NengoStyle.GTK) {
 			myTable.setRowHeight(24);
 		}
+		
+		// manually resize massive tables to preserve minimum column width
+		int columnCount = myTable.getColumnCount();
+		int minColWidth = 30;
+		Dimension tableSize = myTable.getPreferredScrollableViewportSize();
+		if (tableSize.width < columnCount*minColWidth)
+		{
+			for (int i=0; i<columnCount; i++)
+			{
+				TableColumn column = null;
+				column = myTable.getColumnModel().getColumn(i);
+				column.setMinWidth(minColWidth);
+				column.setPreferredWidth(minColWidth);
+			}
+			myTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		}
+
 		myTable.setDefaultEditor(Object.class, new MyCellEditor());
 		JScrollPane scroll = new JScrollPane(myTable);
-		this.add(scroll, BorderLayout.CENTER);
+		this.add(scroll, BorderLayout.CENTER); 
 	}
 
 	public void finishEditing() {
