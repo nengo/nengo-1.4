@@ -385,43 +385,10 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   err = cudaGetLastError();
   checkCudaError(err);
 
-  /*
-  int i; 
-  printf("shared input : %d:\n", nengoData->device);
-  for(i = 0; i < sharedInputSize; i++)
-  {
-    printf("%f, ", sharedInput[i]);
-  }
-  */
-
 //  printf("Copy CPU input : %d \n", nengoData->device);
   err = cudaMemcpy(nengoData->input->array + nengoData->GPUInputSize + nengoData->JavaInputSize, sharedInput + nengoData->offsetInSharedInput, nengoData->CPUInputSize * sizeof(float), cudaMemcpyHostToDevice);
   err = cudaGetLastError();
   checkCudaError(err);
-/*
-  printf("output:\n");
-  for(i = 0; i < nengoData->totalOutputSize; i++)
-  {
-    printf("(%d, %f), ", i, nengoData->outputHost->array[i]);
-  }
-  printf("\n");
-  */
-
-/*
-  //print error checking data
-  float* input_temp = (float*)malloc(nengoData->totalInputSize * sizeof(float));
-  err = cudaMemcpy(input_temp, nengoData->input->array,nengoData->totalInputSize * sizeof(float), cudaMemcpyDeviceToHost);
-  
-  printf("stuff in input:\n");
-  for(i = 0; i < nengoData->totalInputSize; i++)
-  {
-    printf("(%d, %f) ", i, input_temp[i]);
-  }
-  printf("\n");
-
-  free(input_temp);
-  */
-  
 
 ///////////////////////////////////////////////////////
 // Multiply input vectors by corresponding termination transform

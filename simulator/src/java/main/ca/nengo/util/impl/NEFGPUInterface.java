@@ -23,7 +23,9 @@ import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
 
 public class NEFGPUInterface {
-	public static boolean myUseGPU = true;
+	private static boolean myUseGPU = true;
+	private static boolean canUseGPU;
+	private static boolean showTiming = false;
 	public static int myNumDevices = 1;
 	
 	protected Node[] myGPUNodes;
@@ -42,17 +44,29 @@ public class NEFGPUInterface {
 	
 	
 	// load the shared library that contains the native functions
+
 	static{
 		try {
-			if(myUseGPU){
-				System.loadLibrary("NengoGPU");
+			System.loadLibrary("NengoGPU");
+			canUseGPU = true;
+
+			if(!hasGPU())
+			{
+				System.out.println("No CUDA-enabled GPU detected.");
+				canUseGPU = false;
 			}
+			
 		} catch (java.lang.UnsatisfiedLinkError e) {
-			myUseGPU=false;
+			System.out.println("Couldn't load native library NengoUtilsGPU. " +
+				"Unable to use GPU for class NEFGPUInterface.");
+			canUseGPU = false;
+		} catch (Exception e) {
+			System.out.println(e.getStackTrace());
 		}
 	}
-	
-	
+
+	static native boolean hasGPU();
+
 	static native void nativeSetupRun(float[][][][] terminationTransforms,
 			int[][] isDecodedTermination, float[][] terminationTau,
 			float[][][] encoders, float[][][][] decoders, float[][] neuronData,
@@ -82,7 +96,15 @@ public class NEFGPUInterface {
 	
 	// get whether or not to use the GPU
 	public static boolean getUseGPU(){
-		return myUseGPU;
+		return canUseGPU && myUseGPU;
+	}
+	
+	public static void showGPUTiming(){
+		showTiming = true;
+	}
+	
+	public static void hideGPUTiming(){
+		showTiming = false;
 	}
 	
 	public NEFGPUInterface(Node[] nodes, Projection[] projections){
@@ -312,8 +334,6 @@ public class NEFGPUInterface {
 		spikeOutput = new float [myGPUNodes.length][];
 		
 		for (i = 0; i < myGPUNodes.length; i++) {
-
-			System.out.print("(" + Integer.toString(i) + " " + myGPUNodes[i].getName() + ") ");
 			terminations = ((NEFEnsembleImpl) myGPUNodes[i]).getTerminations();
 
 			representedInputValues[i] = new float[terminations.length][];
@@ -340,7 +360,8 @@ public class NEFGPUInterface {
 		myStartTime = startTime;
 		myEndTime = endTime;
 		
-		//System.out.println("Before CPU processing: " + new Date().getTime());
+		if(showTiming)
+			System.out.println("Before CPU processing: " + new Date().getTime());
 		
 		for (int i = 0; i < myProjections.length; i++) {
 			try
@@ -361,9 +382,9 @@ public class NEFGPUInterface {
 			catch(Exception e)
 			{}
 		}
-		//System.out.println("After CPU processing: " + new Date().getTime());
 		
-		//System.out.println("Before GPU processing: " + new Date().getTime());
+		if(showTiming)
+			System.out.println("After CPU processing, before GPU processing: " + new Date().getTime());
 		
 		if (myGPUNodes.length == 0)
 			return;
@@ -422,7 +443,9 @@ public class NEFGPUInterface {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//System.out.println("After GPU processing: " + new Date().getTime());
+		
+		if(showTiming)
+			System.out.println("After GPU processing: " + new Date().getTime());
 	}
 	
 

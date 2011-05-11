@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     ca_nengo_util_impl_NEFGPUInterface
+ * Method:    hasGPU
+ * Signature: ()B
+ */
+JNIEXPORT jboolean JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_hasGPU
+  (JNIEnv *, jclass);
+ 
+/*
+ * Class:     ca_nengo_util_impl_NEFGPUInterface
  * Method:    nativeSetupRun
  * Signature: ([[[[F[[I[[F[[[F[[[[F[[F[[I[[I[IF)V
  */
@@ -31,17 +39,6 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
 JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeKill
   (JNIEnv *, jclass);
 
-#ifdef __cplusplus
-}
-#endif
-#endif
-/* Header for class ca_nengo_util_impl_NEFGPUInterface_GPUData */
-
-#ifndef _Included_ca_nengo_util_impl_NEFGPUInterface_GPUData
-#define _Included_ca_nengo_util_impl_NEFGPUInterface_GPUData
-#ifdef __cplusplus
-extern "C" {
-#endif
 #ifdef __cplusplus
 }
 #endif

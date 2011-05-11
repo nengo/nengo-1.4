@@ -986,6 +986,14 @@ void createSharedMemoryMaps(int numProjections, projection* projections)
   }
 }
 
+JNIEXPORT jboolean JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_hasGPU
+  (JNIEnv *env, jclass class)
+{
+  jboolean hasGPU = (jboolean) (getGPUDeviceCount() > 0);
+
+  return hasGPU;
+}
+
 // This function takes as arguments all the information required by the ensembles to run that won't change from step to step: decoders, encoders, transformations.
 // This is called only once, at the beginning of a run (specifically, when the GPUNodeThreadPool is created). 
 JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun

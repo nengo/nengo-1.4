@@ -154,7 +154,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		myNEFGPUInterface = null;
 		myNodeThreadPool = null;
 		
-		if(NEFGPUInterface.myUseGPU){
+		if(NEFGPUInterface.getUseGPU()){
 			Node[] nodesForGPU = collectNodes();
 			Projection[] projectionsForGPU = collectProjections();
 			
