@@ -76,7 +76,7 @@ class HRRGraph(graph.Graph):
         return info
     def restore(self,d):
         self.show_pairs=d.get('show_pairs',self.vocab.include_pairs)
-        self.popup_pairs.state=self.show_pairs
+        self.popup_pairs.state=self.show_pairs 
         self.normalize=d.get('normalize',False)
         self.popup_normalize.state=self.normalize
         self.smooth_normalize=d.get('smooth_normalize',True)
@@ -178,6 +178,9 @@ class HRRGraph(graph.Graph):
                         dd=self.calc_normal(dd) 
                     v=self.vocab.dot(dd)
                     if self.show_pairs:
+                        if not self.vocab.include_pairs:
+                            self.vocab.include_pairs = True
+                            self.vocab.generate_pairs()
                         v2=self.vocab.dot_pairs(dd)
                         v=numeric.concatenate((v,v2),0)
                     self.cache[(index,dt_tau)]=v

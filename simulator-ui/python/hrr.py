@@ -149,6 +149,25 @@ class Vocabulary:
                         self.vector_pairs[-1,:]=v
         else:
             raise TypeError('hrr.Vocabulary.add() Type error: Argument provided not of HRR type')
+        
+    def generate_pairs(self):
+        """ This function is intended to be used in situations where a vocabulary has already been
+        created without including pairs, but it becomes necessary to have the pairs (for graphing
+        in interactive plots, for example). This is essentially identical to the add function above,
+        except that it makes all the pairs in one pass (and without adding new vectors).
+        """
+        self.key_pairs = []
+        self.vector_pairs = None
+        for i in range(1, len(self.keys)):
+            for k in self.keys[:i]:
+                key = self.keys[i]
+                self.key_pairs.append('%s*%s'%(k,key))
+                v=(self.hrr[k]*self.hrr[key]).v
+                if self.vector_pairs is None:
+                    self.vector_pairs=numeric.array([v])
+                else:    
+                    self.vector_pairs=numeric.resize(self.vector_pairs,(len(self.key_pairs),self.dimensions))
+                    self.vector_pairs[-1,:]=v
 
     def parse(self,text):
         return eval(text,{},self)
