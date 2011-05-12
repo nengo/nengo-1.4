@@ -200,37 +200,11 @@ class FunctionWatch:
 class HRRWatch:
     def check(self,obj):
         return (isinstance(obj,NEFEnsemble) or isinstance(obj,NetworkArray)) and obj.dimension in hrr.Vocabulary.defaults
-    def value(self,obj):
-        return obj.getOrigin('X').getValues().getValues()
-    def value_normalized(self,obj):
-        v=self.value(obj)
-        length=0
-        for i in range(len(v)): length+=v[i]*v[i]
-        length=math.sqrt(length)
-        if length>0.0001:
-            v=[x/length for x in v]
-        return v    
-    def hrr_dot(self,obj):
-        v=self.value(obj)
-        vocab=hrr.Vocabulary.defaults[obj.dimension]
-        ret_val = list(vocab.dot(v))
-        if(vocab.include_pairs):
-            return ret_val + list(vocab.dot_pairs(v))
-        else:
-            return ret_val
-    def hrr_angle(self,obj):
-        v=self.value_normalized(obj)
-        vocab=hrr.Vocabulary.defaults[obj.dimension]
-        ret_val = list(vocab.dot(v))
-        if(vocab.include_pairs):
-            return ret_val + list(vocab.dot_pairs(v))
-        else:
-            return ret_val
     def views(self,obj):
         return [
-            ('semantic pointer',components.HRRGraph,dict(func=self.hrr_angle,value_func=self.value_normalized,label=obj.name)),
-#            ('semantic pointer',components.HRRGraph,dict(func=self.hrr_dot,value_func=self.value,label=obj.name)),
+            ('semantic pointer',components.HRRGraph,dict(func=nodeWatch.value,args='X',label=obj.name)),
             ]
+
 
 
 class ArrayWatch:
@@ -267,7 +241,8 @@ class RoomWatch:
             ('3D view',components.View3D,dict(func=self.physics)),
             ]
 
-watches=[RoomWatch(),NodeWatch(),EnsembleWatch(),FunctionWatch(),HRRWatch(),ArrayWatch()]
+nodeWatch=NodeWatch()
+watches=[RoomWatch(),nodeWatch,EnsembleWatch(),FunctionWatch(),HRRWatch(),ArrayWatch()]
 
 
 import math
@@ -605,11 +580,16 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 else:
                     for (t,klass,args) in self.watcher.list(name):
                         if t==type:
-                            c=klass(self,name,**args)
-                            c.type=type
-                            c.restore(data)    
-                            self.area.add(c)
-                            break
+                            if not isinstance(args,dict):
+                                pass
+                                # TODO: figure out why we sometimes get a javax.swing.JMenu here
+                                #print 'restoration error:',t,klass,args
+                            else:
+                                c=klass(self,name,**args)
+                                c.type=type
+                                c.restore(data)    
+                                self.area.add(c)
+                                break
         
         # Restore time control settings
                             

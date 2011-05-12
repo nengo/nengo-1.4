@@ -67,10 +67,14 @@ class Graph(core.DataViewComponent):
         self.map=None
         self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
         self.popup.add(self.popup_zoom)
+        self.added_popup_separator=False
+
+        self.popup_dim_menus=[]
 
 
     def initialize_map(self):
         data=self.data.get_first()
+        data=self.post_process([data],0,None)[0]
         rows=int(sqrt(len(data)))
         cols=len(data)/rows
         if rows*cols<len(data): cols+=1
@@ -95,7 +99,9 @@ class Graph(core.DataViewComponent):
         core.DataViewComponent.restore(self,d)
 
         if self.data is not None:
-            data_dim = len(self.data.get_first())       # Get dimensionality of data
+            dd=self.data.get_first()
+            dd=self.post_process([dd],0,None)[0]
+            data_dim = len(dd)       # Get dimensionality of data
         else:
             data_dim = len(self.rawdata[0])
         self.indices = [False] * data_dim
@@ -116,13 +122,26 @@ class Graph(core.DataViewComponent):
         self.repaint()
         
     def label_for_index(self,index):
-        return 'v[%d]'%index    
+        return 'v[%d]'%index
+
+    def refix_popup(self):
+        for p in self.selection_menu_items:
+            self.popup.remove(p)
+        for p in self.popup_dim_menus:
+            self.popup.remove(p)
+        self.popup_dim_menus=[]
+        self.fix_popup()
+        
         
     def fix_popup(self):
-        self.popup.add(JPopupMenu.Separator())
 
-        self.popup.add(JMenuItem('select all',actionPerformed=self.select_all))
-        self.popup.add(JMenuItem('select none',actionPerformed=self.select_none))
+        if not self.added_popup_separator:
+            self.popup.add(JPopupMenu.Separator())
+            self.popup.add(JMenuItem('select all',actionPerformed=self.select_all))
+            self.popup.add(JMenuItem('select none',actionPerformed=self.select_none))
+            self.added_popup_separator=True
+        
+
         
         # Calculate number of submenu layers needed
         max_ind = len(self.indices)
@@ -138,6 +157,7 @@ class Graph(core.DataViewComponent):
                     if( i % max_sub[n+1] == 0 ):
                         new_menu = JMenu("%s[%d:%d]" % ('v', i, min(max_ind, i + max_sub[n+1]) - 1))
                         sub_menus[n].add(new_menu)
+                        self.popup_dim_menus.append(new_menu)
                         sub_menus[n+1] = new_menu
             menu_item=JCheckBoxMenuItem(self.label_for_index(i),draw,stateChanged=lambda x,index=i,self=self: self.indices.__setitem__(index,x.source.state))
             self.selection_menu_items.append(menu_item)
@@ -148,7 +168,9 @@ class Graph(core.DataViewComponent):
     def select_none(self,event):
         for item in self.selection_menu_items:
             item.setState(False)
-        
+
+    def post_process(self,data,start,dt_tau):
+        return data
 
         
     def paintComponent(self,g):
@@ -181,6 +203,7 @@ class Graph(core.DataViewComponent):
 
         if self.data is not None:
             data=self.data.get(start=start,count=pts,dt_tau=dt_tau)
+            data=self.post_process(data,start,dt_tau)
             now=self.view.current_tick-start
             for i in range(now+1,len(data)):
                 data[i]=None
