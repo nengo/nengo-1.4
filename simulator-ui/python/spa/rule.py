@@ -68,6 +68,8 @@ class Rule:
             if args[i]=='scale':
                 self.scale=defaults[i]
             else:
+                if args[i] not in spa.sources.keys():
+                    print 'Warning: unknown source "%s" in rule %s'%(args[i],self.name)
                 self.lhs[args[i]]=defaults[i]
 
         self.rhs_direct={}

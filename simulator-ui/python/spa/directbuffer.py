@@ -2,7 +2,7 @@ import nef
 import numeric
 
 class DirectBuffer(nef.SimpleNode):
-    input_threshold=0.3
+    input_threshold=0.7
     pstc=0.01
     def __init__(self,dimensions,name='Buffer'):
         self.input=numeric.zeros(dimensions)

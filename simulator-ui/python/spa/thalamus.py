@@ -11,9 +11,10 @@ class Thalamus(spa.module.Module):
 
 
     def create(self,rule_neurons=40,rule_threshold=0.2,bg_output_weight=-3,
-               pstc_output=0.002,mutual_inhibit=1,pstc_inhibit=0.008,
+               pstc_output=0.015,mutual_inhibit=1,pstc_inhibit=0.008,
                pstc_to_gate=0.002,pstc_gate=0.008,N_per_D=30,
-               pstc_route_input=0.002,neurons_gate=25):
+               pstc_route_input=0.002,pstc_route_output=0.002,neurons_gate=25,
+               route_scale=1):
         D=self.bg.rules.rule_count
         
         self.bias=self.net.make_input('bias',[1])
@@ -45,8 +46,10 @@ class Thalamus(spa.module.Module):
 
         for source_name,sink_name,weight in self.bg.rules.get_rhs_routes():
             t=self.bg.rules.rhs_route(source_name,sink_name,weight)
-            
-            gate=self.net.make('gate_%s_%s'%(source_name,sink_name),self.p.neurons_gate,1,
+
+            gname='gate_%s_%s'%(source_name,sink_name)
+            if weight!=1: gname+='(%1.1f)'%weight
+            gate=self.net.make(gname,self.p.neurons_gate,1,
                                quick=True,encoders=[[1]],intercept=(0.3,1))
             self.net.connect(self.rules,gate,transform=t,pstc=self.p.pstc_to_gate)
             self.net.connect(self.bias,gate)
@@ -54,13 +57,14 @@ class Thalamus(spa.module.Module):
             source=self.spa.sources[source_name]
             sink=self.spa.sinks[sink_name]
             cname='channel_%s_%s'%(source_name,sink_name)
+            if weight!=1: cname+='(%1.1f)'%weight
             channel=self.net.make(cname,self.p.N_per_D*sink.dimension,sink.dimension,quick=True)
             self.net.network.exposeOrigin(channel.getOrigin('X'),cname)
             
             self.spa.connect_to_sink(self.net.network.getOrigin(cname),sink_name,None,
                                      self.p.pstc_output,termination_name=cname)
 
-            o1,t1=self.net.connect(source,channel,pstc=self.p.pstc_route_input,create_projection=False)
+            o1,t1=self.net.connect(source,channel,pstc=self.p.pstc_route_input,weight=weight*self.p.route_scale,create_projection=False)
             self.net.network.exposeTermination(t1,cname)
             self.spa.net.network.addProjection(o1,self.net.network.getTermination(cname))
             

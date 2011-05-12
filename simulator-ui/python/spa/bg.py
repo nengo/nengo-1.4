@@ -27,7 +27,8 @@ class BasalGanglia(spa.module.Module):
     def connect(self):
         self.rules.initialize(self.spa)
         if len(self.rules.get_lhs_matches())>0:
-            self.spa.add_module(self.name+'_match',spa.match.Match(self),create=True,connect=True)
+            self.match=spa.match.Match(self,pstc_match=self.p.pstc_input/2)
+            self.spa.add_module(self.name+'_match',self.match,create=True,connect=True)
             
         for name,source in self.spa.sources.items():
             self.add_input(source,self.rules.lhs(name))
@@ -37,6 +38,8 @@ class BasalGanglia(spa.module.Module):
 
         lg=self.get_param('lg')
         pstc_input=self.get_param('pstc_input')
+        if origin.node is self.match.net.network:
+            pstc_input=pstc_input/2
         
         o1,t1=self.net.connect(origin,self.net.network.getNode('StrD1'),transform=(1+lg)*numeric.array(transform),
                           pstc=pstc_input,plastic_array=learn,create_projection=False)
