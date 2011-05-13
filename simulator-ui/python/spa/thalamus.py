@@ -14,7 +14,7 @@ class Thalamus(spa.module.Module):
                pstc_output=0.015,mutual_inhibit=1,pstc_inhibit=0.008,
                pstc_to_gate=0.002,pstc_gate=0.008,N_per_D=30,
                pstc_route_input=0.002,pstc_route_output=0.002,neurons_gate=25,
-               route_scale=1):
+               route_scale=1,pstc_input=0.01):
         D=self.bg.rules.rule_count
         
         self.bias=self.net.make_input('bias',[1])
@@ -33,7 +33,7 @@ class Thalamus(spa.module.Module):
 
     def connect(self):
         o,t=self.net.connect(self.bg.net.network.getOrigin('output'),self.rules,
-                        weight=self.get_param('bg_output_weight'),create_projection=False)
+                        weight=self.get_param('bg_output_weight'),create_projection=False,pstc=self.p.pstc_input)
         self.net.network.exposeTermination(t,'bg')
         self.spa.net.network.addProjection(self.bg.net.network.getOrigin('output'),self.net.network.getTermination('bg'))
 
