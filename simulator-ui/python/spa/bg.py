@@ -12,6 +12,7 @@ class BasalGanglia(spa.module.Module):
     def __init__(self,rules,**params):
         spa.module.Module.__init__(self,**params)
         self.rules=spa.rule.Rules(rules)
+        self.match=None
         
     def create(self,lg=0.2,pstc_input=0.002):
 
@@ -38,7 +39,7 @@ class BasalGanglia(spa.module.Module):
 
         lg=self.get_param('lg')
         pstc_input=self.get_param('pstc_input')
-        if origin.node is self.match.net.network:
+        if self.match is not None and origin.node is self.match.net.network:
             pstc_input=pstc_input/2
         
         o1,t1=self.net.connect(origin,self.net.network.getNode('StrD1'),transform=(1+lg)*numeric.array(transform),
