@@ -83,6 +83,8 @@ class TemplateBar(TransferHandler):
         self.add_template('Origin',ca.nengo.ui.models.constructors.CDecodedOrigin,'images/nengoIcons/origin.png')
         self.add_template('Termination',ca.nengo.ui.models.constructors.CDecodedTermination,'images/nengoIcons/termination.png')
 
+        self.panel.add(JSeparator(JSeparator.HORIZONTAL,maximumSize=(200,1),foreground=Color(0.3,0.3,0.3),background=Color(0.1,0.1,0.1)))
+
         for template in nef.templates.templates:
             self.add_template(getattr(template,'label'),template.__name__,'images/nengoIcons/'+getattr(template,'icon'))
 
