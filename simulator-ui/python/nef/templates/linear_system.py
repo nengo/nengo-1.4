@@ -1,6 +1,6 @@
 title='General Linear System'
 label='Linear System'
-icon='integrator.png'
+icon='linearsystem.png'
 
 from ca.nengo.ui.configurable import *
 from ca.nengo.ui.configurable.managers import ConfigManager
