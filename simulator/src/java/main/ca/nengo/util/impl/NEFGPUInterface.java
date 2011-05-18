@@ -23,7 +23,7 @@ import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
 
 public class NEFGPUInterface {
-	private static boolean myUseGPU = true;
+	private static boolean myUseGPU = false;
 	private static boolean canUseGPU;
 	private static boolean showTiming = false;
 	public static int myNumDevices = 1;

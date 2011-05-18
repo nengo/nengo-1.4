@@ -76,7 +76,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 	
 	private double[][] myGammaInverse; 
 	
-	private static boolean myUseGPU = true;
+	private static boolean myUseGPU = false;
 	private static boolean canUseGPU;
 	
 	static {
