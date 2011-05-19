@@ -5,6 +5,7 @@ import java
 from ca.nengo.ui.configurable.descriptors import *
 from ca.nengo.ui.configurable import *
 import ca.nengo
+import inspect
 
 class Properties:
     pmap={}
@@ -31,14 +32,21 @@ class TemplateConstructor(IConfigurable):
     def __init__(self,template):
         self.template=template
         self.network=None
-        self.properties=Properties(template.params)
+        self.node=None
+        self.properties=None
 
     def completeConfiguration(self,props):
         args={}
         for k,p in self.properties._properties.items():
             args[k]=props.getValue(p)
         make_func=getattr(self.template,'make')
-        make_func(self.network,**args)
+        a,v,kw,d=inspect.getargspec(make_func)
+        if len(a)-len(d)==1:
+            make_func(self.network,**args)
+        elif len(a)-len(d)==2:
+            make_func(self.network,self.node,**args)
+        else:
+            print 'Invalid make function:',make_func
     def preConfiguration(self,props):
         args={}
         for k,p in self.properties._properties.items():
@@ -54,9 +62,15 @@ class TemplateConstructor(IConfigurable):
     def getDescription(self):
         return self.template.title
 
-    def set_network(self,network):
+    def set_network(self,network,node):
         if network is None: self.network=None
         else: self.network=nef.Network(network)
+        self.node=node
+
+        params=self.template.params
+        if callable(params):
+            params=params(self.network,self.node)
+        self.properties=Properties(params)
     
 
 import nef.templates
@@ -81,15 +95,12 @@ class TemplateBar(TransferHandler):
         self.add_template('Ensemble',ca.nengo.ui.models.constructors.CNEFEnsemble,'images/nengoIcons/ensemble.gif')
         self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput,'images/nengoIcons/input.png')
         self.add_template('Origin',ca.nengo.ui.models.constructors.CDecodedOrigin,'images/nengoIcons/origin.png')
-        self.add_template('Termination',ca.nengo.ui.models.constructors.CDecodedTermination,'images/nengoIcons/termination.png')
-
+        self.add_template('Termination','nef.templates.termination','images/nengoIcons/termination.png')
+        
         self.panel.add(JSeparator(JSeparator.HORIZONTAL,maximumSize=(200,1),foreground=Color(0.3,0.3,0.3),background=Color(0.1,0.1,0.1)))
 
         for template in nef.templates.templates:
             self.add_template(getattr(template,'label'),template.__name__,'images/nengoIcons/'+getattr(template,'icon'))
-
-        #for i in range(20):
-        #    self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput(),'images/nengoIcons/input.gif')
 
                 
         self.scrollPane=JScrollPane(self.panel,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
@@ -200,6 +211,16 @@ class DropHandler(TransferHandler):
                 if isinstance(n3,ca.nengo.ui.models.nodes.UINEFEnsemble):
                     return True
             return False
+
+        if isinstance(constructor,str):
+            constructor=eval(constructor)
+            if hasattr(constructor,'test_drop'):
+                node=None
+                for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                    if isinstance(n3,ca.nengo.ui.models.UINeoNode):
+                        node=n3.model
+                return constructor.test_drop(net.model,node)
+
         return True
 
     def importData(self,support):
@@ -212,25 +233,21 @@ class DropHandler(TransferHandler):
             
             net,pos=self.find_target(support.dropLocation.dropPoint)
 
+            node=None
+            for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                if isinstance(n3,ca.nengo.ui.models.UINeoNode):
+                    node=n3
+
             if drop_on_ensemble:
-                node=None
-                for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
-                    if isinstance(n3,ca.nengo.ui.models.nodes.UINEFEnsemble):
-                        constructor=constructor(n3.model)
-                        node=n3
-                        break
-                if node is not None:
-                    self.create(constructor,net,position=None,node=node)
+                self.create(constructor(node.model),net,position=None,node=node)
             else:
                 if isinstance(constructor,str):
-                    if constructor.startswith('nef.templates'):
-                        constructor=constructor[len('nef.templates')+1:]
-                    constructor=TemplateConstructor(getattr(nef.templates,constructor))
+                    constructor=TemplateConstructor(eval(constructor))
                 elif hasattr(constructor,'make'):
                     constructor=TemplateConstructor(constructor)
                 else:
                     constructor=constructor()
-                self.create(constructor,net,position=pos)
+                self.create(constructor,net,position=pos,node=node)
             return
         except Exception, e:
             print e
@@ -244,7 +261,7 @@ class DropHandler(TransferHandler):
                 action.setPosition(position.x,position.y)
                 action.doAction()
             elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedOrigin):
-                uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
+                uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor())
                 uc.configureAndWait()
                 if constructor.model is not None:
                     node.showOrigin(constructor.model.name)
@@ -254,13 +271,25 @@ class DropHandler(TransferHandler):
                 if constructor.model is not None:
                     node.showTermination(constructor.model.name)
                 
-            elif isinstance(constructor,IConfigurable):
+            elif isinstance(constructor,TemplateConstructor):
                 assert isinstance(nodeContainer,ca.nengo.ui.models.viewers.NetworkViewer)
                 nodeContainer.setNewItemPosition(position.x,position.y)
-                
-                constructor.set_network(nodeContainer.getModel())
+
+                if node is not None: nodemodel=node.getModel()
+                else: nodemodel=None
+                constructor.set_network(nodeContainer.getModel(),node=nodemodel)
                 uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
+
+                if node is not None:
+                    origins=node.model.getOrigins()
+                    terminations=node.model.getTerminations()
                 uc.configureAndWait()
+
+                if node is not None:
+                    for o in node.model.getOrigins():
+                        if o not in origins: node.showOrigin(o.name)
+                    for t in node.model.getTerminations():
+                        if t not in terminations: node.showTermination(t.name)
         except ca.nengo.ui.configurable.managers.ConfigDialogClosedException:
             pass
             
