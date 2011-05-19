@@ -54,7 +54,11 @@ class TemplateConstructor(IConfigurable):
         for k,p in self.properties._properties.items():
             args[k]=props.getValue(p)
         test_func=getattr(self.template,'test_params')
-        error=test_func(self.network,args)
+        a,v,kw,d=inspect.getargspec(test_func)
+        if len(a)==3:
+            error=test_func(self.network,self.node,args)
+        else:
+            error=test_func(self.network,args)
         if error is not None:
             raise ca.nengo.ui.configurable.ConfigException(error)
     def getSchema(self):
