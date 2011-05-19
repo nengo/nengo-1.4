@@ -76,7 +76,7 @@ params=[
     ('name','Name',str),
     ('neurons','Number of Neurons',int),
     ('tau_feedback','Feedback time constant',float),
-    ('A','System dynamics matrix',PSystemMatrix('System dynamics matrix')),
+    ('A','System dynamics matrix',PSystemMatrix),
     ]
 
 def test_params(net,p):

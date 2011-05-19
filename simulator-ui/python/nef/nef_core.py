@@ -299,7 +299,8 @@ class Network:
         pre and post can be strings giving the names of the nodes, or they
         can be the nodes themselves (FunctionInputs and NEFEnsembles are
         supported).  They can also be actual Origins or Terminations, or any
-        combinaton of the above.
+        combinaton of the above. If post is set to an integer or None, an origin
+        will be created on the pre population, but no other action will be taken.
 
         pstc is the post-synaptic time constant of the new Termination
 
@@ -345,7 +346,12 @@ class Network:
             self.network.addProjection(origin,post)
             return
 
-        dim_post=post.dimension
+        if isinstance(post, int):
+            dim_post=post
+        elif post is None:
+            dim_post = 1
+        else:
+            dim_post=post.dimension
 
         if transform is None:
             transform=self.compute_transform(dim_pre,dim_post,weight,index_pre,index_post)
@@ -383,7 +389,7 @@ class Network:
             term=post.addTermination(pre.name,w,pstc,False)
             if not create_projection: return pre.getOrigin('AXON'),term
             self.network.addProjection(pre.getOrigin('AXON'),term)
-        else:
+        elif (post is not None) and (not isinstance(post, int)):
             suffix=''
             attempts=1
             while attempts<100:
@@ -398,6 +404,7 @@ class Network:
                 raise exception#StructuralException('cannot create termination %s'%pre.name)
 
 
+            if post is None or isinstance(post, int): return origin
             if not create_projection: return origin,term
             return self.network.addProjection(origin,term)
     
