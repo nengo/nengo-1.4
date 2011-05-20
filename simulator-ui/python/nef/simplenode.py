@@ -93,7 +93,7 @@ class SimpleNode(Node,Probeable):
             dimensions=d[index]
         self.addTermination(SimpleTermination(name,self,func,tau=self.pstc,dimensions=dimensions))
             
-            
+        
         
     def reset(self,randomize=False):
         pass
@@ -128,6 +128,9 @@ class SimpleNode(Node,Probeable):
     def addOrigin(self,origin):
         self._origins[origin.name]=origin
         self._states.setProperty(origin.name,"data")
+    def removeOrigin(self, name):
+        del self._origins[name]
+        self._states.remove(name)
 
     def setTau(self,name,tau):
         self._terminations[name].setTau(tau)
@@ -137,6 +140,8 @@ class SimpleNode(Node,Probeable):
         return self._terminations[name]
     def addTermination(self,termination):
         self._terminations[termination.name]=termination
+    def removeTermination(self, name):
+        del self._terminations[name]
 
     def getDocumentation(self):
         return ""
