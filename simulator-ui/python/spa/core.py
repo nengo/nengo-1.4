@@ -89,6 +89,8 @@ class SPA:
         o,t=self.net.connect(origin,sink,transform=transform,pstc=pstc,
                              create_projection=False)
         if termination_name is None: termination_name=o.node.name
+        if self.sink_modules[sink_name].name!=sink_name:
+            termination_name=termination_name+'_'+sink_name
         self.sink_modules[sink_name].net.network.exposeTermination(t,termination_name)
         self.net.network.addProjection(o,self.sink_modules[sink_name].net.network.getTermination(termination_name))
         
