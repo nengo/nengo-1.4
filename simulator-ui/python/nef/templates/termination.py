@@ -12,8 +12,13 @@ def params(net,node):
     ('modulatory','Is Modulatory',bool),
     ]
 
-def test_params(net,p):
-    pass
+def test_params(net,node,p):
+    try:
+        n = node.getTermination(p['name'])
+        if n is not None:
+            return 'That name is already in use'
+    except:
+        pass
 
 def test_drop(net,node):
     return hasattr(node,'addDecodedTermination')

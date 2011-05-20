@@ -11,7 +11,7 @@ params=[
     ]
 
 def test_params(net,node,p):
-    pass
+    if p['index']>node.getNode('STN').dimension : return 'Rule index cannot exceed basal ganglia dimension minus one (use a zero-based index)'
 
 def test_drop(net,node):
     try:
@@ -34,11 +34,12 @@ def make(net,node,index=0,dim=8,pattern='I',pstc=0.01,use_single_input=False):
     else:
         vocab=hrr.Vocabulary(dim)
 
-    terms=[t.name for t in STN.terminations]
+    terms=[t.name for t in node.terminations]
+    STNterms=[t.name for t in STN.terminations]
 
     count=0
-    while 'rule_%02d'%count in terms:
-        count+=1
+    while 'rule_%02d'%count in terms or 'rule_%02d'%count in STNterms:
+        count=count+1
 
     name='rule_%02d'%count
 
