@@ -48,16 +48,22 @@ class HRRGraph(graph.Graph):
         if self.normalize and self.smooth_normalize:
             self.popup_smooth.state=False
         self.clear_cache()
+        self.repaint()
     def toggle_smooth_normalize(self,event):
         if event.source.state==self.smooth_normalize: return
         self.smooth_normalize=event.source.state
         if self.smooth_normalize and self.normalize:
             self.popup_normalize.state=False
         self.clear_cache()
+        self.repaint()
     def toggle_show_pairs(self,event):
         if event.source.state==self.show_pairs: return
         self.show_pairs=event.source.state
         self.clear_cache()
+
+        if self.show_pairs:
+            if self.vocab.vector_pairs is None:
+                self.vocab.generate_pairs()
 
         pairs=self.indices[len(self.vocab.keys):]
         pairs=pairs+[False]*(len(self.vocab.key_pairs)-len(pairs))
@@ -66,6 +72,7 @@ class HRRGraph(graph.Graph):
         if self.show_pairs:
             self.indices=self.indices+pairs
         self.refix_popup()
+        self.repaint()
             
 
     def save(self):
@@ -76,7 +83,7 @@ class HRRGraph(graph.Graph):
         return info
     def restore(self,d):
         self.show_pairs=d.get('show_pairs',self.vocab.include_pairs)
-        self.popup_pairs.state=self.show_pairs 
+        self.popup_pairs.state=self.show_pairs
         self.normalize=d.get('normalize',False)
         self.popup_normalize.state=self.normalize
         self.smooth_normalize=d.get('smooth_normalize',True)
@@ -178,9 +185,6 @@ class HRRGraph(graph.Graph):
                         dd=self.calc_normal(dd) 
                     v=self.vocab.dot(dd)
                     if self.show_pairs:
-                        if not self.vocab.include_pairs:
-                            self.vocab.include_pairs = True
-                            self.vocab.generate_pairs()
                         v2=self.vocab.dot_pairs(dd)
                         v=numeric.concatenate((v,v2),0)
                     self.cache[(index,dt_tau)]=v
