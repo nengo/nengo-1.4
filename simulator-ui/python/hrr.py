@@ -176,7 +176,8 @@ class Vocabulary:
         if isinstance(v,HRR): v=v.v
         m=numeric.dot(self.vectors,v)
         matches=[(m[i],self.keys[i]) for i in range(len(m))]
-        if include_pairs and self.include_pairs:
+        if include_pairs:
+            if self.vector_pairs is None: self.generate_pairs()
             m2=numeric.dot(self.vector_pairs,v)
             matches.extend([(m2[i],self.key_pairs[i]) for i in range(len(m2))])
         matches.sort()
@@ -200,11 +201,14 @@ class Vocabulary:
         return numeric.dot(self.vector_pairs,v)
 
     def transform_to(self,other,keys=None):
-        if keys is None: keys=self.keys
+        if keys is None:
+            keys=list(self.keys)
+            for k in other.keys:
+                if k not in keys: keys.append(k)
         t=numeric.zeros((other.dimensions,self.dimensions),typecode='f')
         for k in keys:
-            a=self.hrr[k].v
-            b=other.hrr[k].v
+            a=self[k].v
+            b=other[k].v
             t+=array([a*bb for bb in b])
         return t
         
