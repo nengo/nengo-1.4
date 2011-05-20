@@ -64,7 +64,11 @@ class Thalamus(spa.module.Module):
             self.spa.connect_to_sink(self.net.network.getOrigin(cname),sink_name,None,
                                      self.p.pstc_output,termination_name=cname)
 
-            o1,t1=self.net.connect(source,channel,pstc=self.p.pstc_route_input,weight=weight*self.p.route_scale,create_projection=False)
+            v1=self.spa.vocab(source_name)
+            v2=self.spa.vocab(sink_name)
+            if v1 is v2: transform=None
+            else: transform=v1.transform_to(v2)
+            o1,t1=self.net.connect(source,channel,pstc=self.p.pstc_route_input,weight=weight*self.p.route_scale,transform=transform,create_projection=False)
             self.net.network.exposeTermination(t1,cname)
             self.spa.net.network.addProjection(o1,self.net.network.getTermination(cname))
             
