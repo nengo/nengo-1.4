@@ -140,35 +140,11 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
             self.connect(B,D.getTermination('B'))
         self.connect(D.getOrigin('C'),C,pstc=pstc_out,weight=output_scale)
     else:
-        D=make_array(name,N_per_D,dimensions,quick=quick,encoders=encoders)
+        D=make_array(self,name,N_per_D,dimensions,quick=quick,encoders=encoders)
+
+        A2=input_transform(dimensions,True,invert_first)
+        B2=input_transform(dimensions,False,invert_first)
         
-        fft=array(discrete_fourier_transform(dimensions))
-
-        def makeA2(i):
-            if invert_first:
-                row=fft[-(i/4)]
-            else:
-                row=fft[i/4]
-            if i%2==0:
-                return array([row.real,zeros(dimensions)])
-            else:    
-                return array([row.imag,zeros(dimensions)])
-        def makeB2(i):
-            if invert_second:
-                row=fft[-(i/4)]
-            else:
-                row=fft[i/4]
-            if i%4==0 or i%4==3:
-                return array([zeros(dimensions),row.real])
-            else:    
-                return array([zeros(dimensions),row.imag])
-
-        A2=[]
-        B2=[]
-        for i in range((dimensions/2+1)*4):
-            A2.extend(makeA2(i))
-            B2.extend(makeB2(i))
-
         D.addDecodedTermination('A',A2,pstc_in,False)
         D.addDecodedTermination('B',B2,pstc_in,False)
         
