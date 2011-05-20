@@ -86,7 +86,15 @@ class NetworkArray(NetworkImpl):
         of the ensembles, which are then grouped together.  Useful for adding
         inhibitory terminations to turn off the whole array.
         """
-        terminations = [n.addTermination(name,matrix[i],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]
+
+        try:        
+            terminations = [n.addTermination(name,matrix[i],tauPSC,isModulatory) for i,n in enumerate(self._nodes)]
+        except TypeError:
+            terminations=[]
+            for i,n in enumerate(self._nodes):
+                t=n.addTermination(name,matrix[i*n.neurons:(i+1)*n.neurons],tauPSC,isModulatory)
+                terminations.append(t)
+                
         termination = EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
