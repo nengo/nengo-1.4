@@ -194,22 +194,9 @@ class Vocabulary:
         if isinstance(v,HRR): v=v.v
         return numeric.dot(self.vectors,v)
 
-    def ensure_pairs(self):
-        if self.vector_pairs is None:
-            for i,key in enumerate(self.keys):
-                for k in self.keys[:i]:
-                    self.key_pairs.append('%s*%s'%(k,key))
-                    v=(self.hrr[k]*self.hrr[key]).v
-                    if self.vector_pairs is None:
-                        self.vector_pairs=numeric.array([v])
-                    else:    
-                        self.vector_pairs=numeric.resize(self.vector_pairs,(len(self.key_pairs),self.dimensions))
-                        self.vector_pairs[-1,:]=v
-        
-
     def dot_pairs(self,v):
         if isinstance(v,HRR): v=v.v
-        self.ensure_pairs()
+        if self.vector_pairs is Nont: self.generate_pairs()
         return numeric.dot(self.vector_pairs,v)
 
     def transform_to(self,other,keys=None):
