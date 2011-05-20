@@ -196,7 +196,7 @@ class Vocabulary:
 
     def dot_pairs(self,v):
         if isinstance(v,HRR): v=v.v
-        if self.vector_pairs is Nont: self.generate_pairs()
+        if self.vector_pairs is None: self.generate_pairs()
         return numeric.dot(self.vector_pairs,v)
 
     def transform_to(self,other,keys=None):
