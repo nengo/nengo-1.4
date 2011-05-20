@@ -58,13 +58,23 @@ public class RateFunctionSpikeGenerator implements SpikeGenerator {
 	
 	private Function myRateFunction;
 	private SimulationMode myMode;
+	
+	private float myVoltage;
+	private boolean smooth;
 
+	public RateFunctionSpikeGenerator(Function rateFunction) {
+		this(rateFunction,false);
+	}
+
+	
 	/**
 	 * @param rateFunction Maps input current to spiking rate
 	 */
-	public RateFunctionSpikeGenerator(Function rateFunction) {
+	public RateFunctionSpikeGenerator(Function rateFunction, boolean smooth) {
 		setRateFunction(rateFunction);
 		myMode = SimulationMode.DEFAULT;
+		myVoltage=0;		
+		this.smooth=smooth;
 	}
 	
 	/**
@@ -107,12 +117,27 @@ public class RateFunctionSpikeGenerator implements SpikeGenerator {
 			float numSpikes = ratePerStep;
 			
 			result = new RealOutputImpl(new float[]{numSpikes / totalTimeSpan}, Units.SPIKES_PER_S, time[time.length-1]);
+		} else if (smooth) {
+			boolean spike = false;
+			for (int i = 0; i < time.length - 1; i++) {
+				float timeSpan = time[i+1] - time[i];
+				float rate = myRateFunction.map(new float[]{current[i]});
+				
+				myVoltage+=timeSpan*rate;
+				if (myVoltage>1) {
+					myVoltage-=1;
+					spike=true;
+				}
+			}
+			
+			result = new SpikeOutputImpl(new boolean[]{spike}, Units.SPIKES, time[time.length-1]); 
+			
 		} else { //default mode is spiking mode
 			boolean spike = false;
 			for (int i = 0; i < time.length - 1 && !spike; i++) {
 				float timeSpan = time[i+1] - time[i];
 				
-				float rate = myRateFunction.map(new float[]{current[i]});						
+				float rate = myRateFunction.map(new float[]{current[i]});
 				double probNoSpikes = Math.exp(-rate*timeSpan);
 				spike = (PDFTools.random() > probNoSpikes);
 			}
