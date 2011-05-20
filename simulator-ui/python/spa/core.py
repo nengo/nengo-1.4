@@ -8,6 +8,7 @@ import inspect
 class SPA:
     dimensions=16
     align_hrrs=False
+    subdimensions=None
     
     def __init__(self,name=None):
         if name is None: name=self.__class__.__name__

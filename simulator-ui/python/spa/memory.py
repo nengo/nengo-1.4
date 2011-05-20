@@ -20,14 +20,26 @@ class MemorySink:
         
 
 class Memory(spa.module.Module):
-    def create(self,dimensions,N_per_D=30,pstc=0.01,output_scale=2,input_scale=0.1,feedback=1,pstc_feedback=0.1):
+    def create(self,dimensions,N_per_D=30,subdimensions=None,N_conv=300,pstc=0.01,output_scale=2,input_scale=0.1,feedback=1,pstc_feedback=0.1):
 
-        conv=nef.convolution.make_array(self.net,'conv',300,dimensions,quick=True)
-        deconv=nef.convolution.make_array(self.net,'deconv',300,dimensions,quick=True)
+        if N_conv==0:
+            conv=nef.convolution.make_array(self.net,'conv',1,dimensions,quick=True)
+            deconv=nef.convolution.make_array(self.net,'deconv',1,dimensions,quick=True)
+            conv.mode=ca.nengo.model.SimulationMode.DIRECT
+            deconv.mode=ca.nengo.model.SimulationMode.DIRECT
+        else:
+            conv=nef.convolution.make_array(self.net,'conv',N_conv,dimensions,quick=True)
+            deconv=nef.convolution.make_array(self.net,'deconv',N_conv,dimensions,quick=True)
 
-        recall=self.net.make('recall',N_per_D*dimensions,dimensions,quick=True)
 
-        mem=self.net.make('mem',N_per_D*dimensions,dimensions,quick=True)
+        if subdimensions is None:
+            mem=self.net.make('mem',N_per_D*dimensions,dimensions,quick=True)
+            recall=self.net.make('recall',N_per_D*dimensions,dimensions,quick=True)
+        else:
+            assert dimensions%subdimensions==0
+            mem=self.net.make_array('mem',N_per_D*subdimensions,dimensions/subdimensions,dimensions=subdimensions,quick=True)
+            recall=self.net.make_array('recall',N_per_D*subdimensions,dimensions/subdimensions,dimensions=subdimensions,quick=True)
+            
         if feedback!=0:
             self.net.connect(mem,mem,pstc=pstc_feedback)
 
