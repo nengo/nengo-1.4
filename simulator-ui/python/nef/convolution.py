@@ -70,6 +70,52 @@ def complex_exp(z):
 def product(x):
     return x[0]*x[1]
 
+def make_array(net,name,N_per_D,dimensions,quick=True,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]]):
+    return net.make_array(name,N_per_D,(dimensions/2+1)*4,dimensions=2,quick=quick,encoders=encoders,radius=3)
+
+
+def output_transform(dimensions):
+    ifft=array(discrete_fourier_transform_inverse(dimensions))
+
+    def makeifftrow(D,i):
+        if i==0 or i*2==D: return ifft[i]
+        if i<=D/2: return ifft[i]+ifft[-i].real-ifft[-i].imag*1j
+        return zeros(dimensions)
+    ifftm=array([makeifftrow(dimensions,i) for i in range(dimensions/2+1)])
+    
+    ifftm2=[]
+    for i in range(dimensions/2+1):
+        ifftm2.append(ifftm[i].real)
+        ifftm2.append(-ifftm[i].real)
+        ifftm2.append(-ifftm[i].imag)
+        ifftm2.append(-ifftm[i].imag)
+    ifftm2=array(ifftm2)
+
+    return ifftm2.T
+
+def input_transform(dimensions,first,invert=False):
+    fft=array(discrete_fourier_transform(dimensions))
+
+    M=[]
+    for i in range((dimensions/2+1)*4):
+        if invert: row=fft[-(i/4)]
+        else: row=fft[i/4]
+        if first:
+            if i%2==0:
+                row2=array([row.real,zeros(dimensions)])
+            else:
+                row2=array([row.imag,zeros(dimensions)])
+        else:
+            if i%4==0 or i%4==3:
+                row2=array([zeros(dimensions),row.real])
+            else:    
+                row2=array([zeros(dimensions),row.imag])
+        M.extend(row2)
+    return M
+    
+    
+        
+               
 def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],pstc_out=0.01,pstc_in=0.01,pstc_gate=0.01,invert_first=False,invert_second=False,mode='default',output_scale=1):
     if isinstance(A,str):
         A=self.network.getNode(A)
@@ -94,10 +140,9 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
             self.connect(B,D.getTermination('B'))
         self.connect(D.getOrigin('C'),C,pstc=pstc_out,weight=output_scale)
     else:
-        D=self.make_array(name,N_per_D,(dimensions/2+1)*4,dimensions=2,quick=quick,encoders=encoders,radius=3)
+        D=make_array(name,N_per_D,dimensions,quick=quick,encoders=encoders)
         
         fft=array(discrete_fourier_transform(dimensions))
-        ifft=array(discrete_fourier_transform_inverse(dimensions))
 
         def makeA2(i):
             if invert_first:
@@ -124,8 +169,6 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
             A2.extend(makeA2(i))
             B2.extend(makeB2(i))
 
-        #self.connect(A,D,transform=[makeA2(i) for i in range((dimensions/2+1)*4)],pstc=pstc_in)
-        #self.connect(B,D,transform=[makeB2(i) for i in range((dimensions/2+1)*4)],pstc=pstc_in)
         D.addDecodedTermination('A',A2,pstc_in,False)
         D.addDecodedTermination('B',B2,pstc_in,False)
         
@@ -134,21 +177,10 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
         if B is not None:
             self.connect(B,D.getTermination('B'))
 
-        def makeifftrow(D,i):
-            if i==0 or i*2==D: return ifft[i]
-            if i<=D/2: return ifft[i]+ifft[-i].real-ifft[-i].imag*1j
-            return zeros(dimensions)
-        ifftm=array([makeifftrow(dimensions,i) for i in range(dimensions/2+1)])
+
+        ifftm2=output_transform(dimensions)
         
-        ifftm2=[]
-        for i in range(dimensions/2+1):
-            ifftm2.append(ifftm[i].real)
-            ifftm2.append(-ifftm[i].real)
-            ifftm2.append(-ifftm[i].imag)
-            ifftm2.append(-ifftm[i].imag)
-        ifftm2=array(ifftm2)    
-        
-        self.connect(D,C,func=product,transform=ifftm2.T*output_scale,pstc=pstc_out)
+        self.connect(D,C,func=product,transform=ifftm2*output_scale,pstc=pstc_out)
         
     return D
 
