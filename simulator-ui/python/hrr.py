@@ -174,6 +174,7 @@ class Vocabulary:
         
     def text(self,v,threshold=0.1,minimum_count=1,include_pairs=True,join='+',maximum_count=5):
         if isinstance(v,HRR): v=v.v
+        if v is None or self.vectors is None: return ''        
         m=numeric.dot(self.vectors,v)
         matches=[(m[i],self.keys[i]) for i in range(len(m))]
         if include_pairs:
