@@ -14,8 +14,12 @@ class HRRGraph(graph.Graph):
         graph.Graph.__init__(self,view,name,func,args=args,filter=filter,ylimits=ylimits,split=False,neuronmapped=False,label=label)
         
         self.border_top=30
-        
-        self.vocab=hrr.Vocabulary.defaults[len(self.data.get_first())]
+
+        dim=len(self.data.get_first())
+        if dim in hrr.Vocabulary.defaults.keys():
+            self.vocab=hrr.Vocabulary.defaults[dim]
+        else:
+            self.vocab=hrr.Vocabulary(dim)
 
         self.normalize=True
         self.popup_normalize=JCheckBoxMenuItem('normalize',self.normalize,stateChanged=self.toggle_normalize)
@@ -59,6 +63,11 @@ class HRRGraph(graph.Graph):
     def toggle_show_pairs(self,event):
         if event.source.state==self.show_pairs: return
         self.show_pairs=event.source.state
+
+        self.redo_indices()
+
+    def redo_indices(self):
+        if self.indices is None: return
         self.clear_cache()
 
         if self.show_pairs:
@@ -68,6 +77,8 @@ class HRRGraph(graph.Graph):
         pairs=self.indices[len(self.vocab.keys):]
         pairs=pairs+[False]*(len(self.vocab.key_pairs)-len(pairs))
         self.indices=self.indices[:len(self.vocab.keys)]
+        if len(self.indices)<len(self.vocab.keys):
+            self.indices.extend([True]*(len(self.vocab.keys)-len(self.indices)))
             
         if self.show_pairs:
             self.indices=self.indices+pairs
@@ -99,6 +110,7 @@ class HRRGraph(graph.Graph):
         return text
         
     def set_value(self,event):
+        key_count=len(self.vocab.keys)
         try:
             text=JOptionPane.showInputDialog(self.view.frame,'Enter the symbolic value to represent.\nFor example: "a*b+0.3*(c*d+e)*~f"',"Set semantic pointer",JOptionPane.PLAIN_MESSAGE,None,None,None)
             v=self.vocab.parse(text)
@@ -112,6 +124,9 @@ class HRRGraph(graph.Graph):
                 
         self.popup_release.setEnabled(True)
         self.view.forced_origins[(self.name,'X',None)]=self.fixed_value
+
+        if key_count!=len(self.vocab.keys):
+            self.redo_indices()
 
 
         
@@ -172,6 +187,8 @@ class HRRGraph(graph.Graph):
         
         forget=self.cache_tick_count-self.view.watcher.timelog.tick_limit
         if self.cache.has_key(forget): del self.cache[forget]
+
+        if len(self.vocab.keys)==0: return []
         
         d=[]
         for i,dd in enumerate(data):

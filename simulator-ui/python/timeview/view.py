@@ -199,7 +199,7 @@ class FunctionWatch:
 
 class HRRWatch:
     def check(self,obj):
-        return (isinstance(obj,NEFEnsemble) or isinstance(obj,NetworkArray)) and obj.dimension in hrr.Vocabulary.defaults
+        return (isinstance(obj,NEFEnsemble) or isinstance(obj,NetworkArray)) and obj.dimension>=8
     def views(self,obj):
         return [
             ('semantic pointer',components.HRRGraph,dict(func=nodeWatch.value,args='X',label=obj.name)),
