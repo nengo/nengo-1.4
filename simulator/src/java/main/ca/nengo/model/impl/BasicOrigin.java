@@ -63,7 +63,11 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurabl
 	private Noise myNoise;
 	private Noise[] myNoises; //per output
 	private transient ConfigurationImpl myConfiguration;
-
+	
+	public BasicOrigin(){
+		// Dummy default, necessary for object "ArrayOrigin" in jython code
+	}
+	
 	/**
 	 * @param node The parent Node
 	 * @param dimension Dimension of output of this Origin

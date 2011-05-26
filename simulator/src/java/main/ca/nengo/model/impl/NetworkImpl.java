@@ -96,6 +96,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	
 	private transient List<VisiblyMutable.Listener> myListeners;
 	
+	protected boolean myUseGPU = false;
+	
 	public NetworkImpl() {
 		myNodeMap = new HashMap<String, Node>(20);
 		myProjectionMap	= new HashMap<Termination, Projection>(50);
@@ -473,6 +475,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	
 	public void setUseGPU(boolean val)
 	{
+		myUseGPU = val;
 		Node[] nodes = getNodes();
 		
 		for(int i = 0; i < nodes.length; i++){
@@ -481,9 +484,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			if(workingNode instanceof NEFEnsembleImpl){
 				((NEFEnsembleImpl) workingNode).setUseGPU(val);
 			}else if(workingNode instanceof NetworkImpl){
-				((NetworkImpl)workingNode).setUseGPU(val);
+				((NetworkImpl) workingNode).setUseGPU(val);
 			}
 		}
+	}
+	
+	public boolean getUseGPU(){
+		return myUseGPU && myMode == SimulationMode.DEFAULT;
 	}
 
 	/**
@@ -682,6 +689,14 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			return myWrapped;
 		}
 		
+		// unwraps origin until it finds one that isn't wrapped
+		public Origin getBaseOrigin(){
+			if(myWrapped instanceof OriginWrapper)
+				return ((OriginWrapper) myWrapped).getBaseOrigin();
+			else
+				return myWrapped;
+		}
+		
 		public void setWrappedOrigin(Origin wrapped) {
 			myWrapped = wrapped;
 		}
@@ -738,6 +753,14 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		
 		public Termination getWrappedTermination() {
 			return myWrapped;
+		}
+		
+		// unwraps terminations until it finds one that isn't wrapped
+		public Termination getBaseTermination(){
+			if(myWrapped instanceof TerminationWrapper)
+				return ((TerminationWrapper) myWrapped).getBaseTermination();
+			else
+				return myWrapped;
 		}
 		
 		public String getName() {

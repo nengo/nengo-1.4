@@ -31,6 +31,21 @@ enum EnsembleDataIndex_enum
 
 typedef enum EnsembleDataIndex_enum EnsembleDataIndex;
 
+enum NetworkArrayDataIndex_enum
+{
+  NENGO_NA_DATA_FIRST_INDEX = 0,
+  NENGO_NA_DATA_END_INDEX,
+  NENGO_NA_DATA_NUM_TERMINATIONS,
+  NENGO_NA_DATA_TOTAL_INPUT_SIZE,
+  NENGO_NA_DATA_NUM_ORIGINS,
+  NENGO_NA_DATA_TOTAL_OUTPUT_SIZE,
+  NENGO_NA_DATA_NUM_NEURONS,
+
+  NENGO_NA_DATA_NUM
+};
+
+typedef enum NetworkArrayDataIndex_enum NetworkArrayDataIndex;
+
 
 /*
   Float and int array objects that facilitate safe array accessing.
@@ -74,9 +89,9 @@ void floatArraySetData(floatArray* a, float* data, int dataSize);
 */ 
 #define PROJECTION_DATA_SIZE 6
 struct projection_t{
-  int sourceEnsemble;
+  int sourceNode;
   int sourceOrigin;
-  int destinationEnsemble;
+  int destinationNode;
   int destinationTermination;
   int size;
   int destDevice;
@@ -134,9 +149,12 @@ struct NengoGPUData_t{
    
   int numNeurons;
   int numEnsembles;
+  int numNetworkArrays;
+  int numInputs;
   int numTerminations;
   int numNDterminations;
   int numDecodedTerminations;
+  int numNetworkArrayOrigins;
   int numOrigins;
 
   int totalInputSize;
@@ -159,6 +177,9 @@ struct NengoGPUData_t{
   int maxNumNeurons;
   int maxOriginDimension;
 
+  // network-array-specific arrays
+  intArray* networkArrayOutputReorganizer;
+  intArray* networkArrayIndexInJavaArray;
 
   floatArray* input;
   floatArray* inputHost; // this is allocated in NengoGPU_JNI.c/setupInput
@@ -167,7 +188,7 @@ struct NengoGPUData_t{
   floatArray* terminationTransforms;
   intArray* transformRowToInputIndexor;
   floatArray* terminationTau;
-  intArray* terminationDimension;
+  intArray* inputDimension;
   floatArray* terminationOutput;
   intArray* terminationOutputIndexor;
 
@@ -220,9 +241,11 @@ struct NengoGPUData_t{
   floatArray* spikesHost;
   floatArray* outputHost;
 
-  intArray* originOffsetInOutput;
+  intArray* ensembleOriginOffsetInOutput;
+  intArray* networkArrayOriginOffsetInOutput; 
+
   intArray* ensembleNumOrigins;
-  intArray* originDimension;
+  intArray* ensembleOriginDimension;
   intArray* ensembleNumTerminations;
   intArray* ensembleIndexInJavaArray;
 

@@ -13,9 +13,11 @@ extern "C"{
 #include "NengoGPUData.h"
 
 int totalNumEnsembles = 0;
+int totalNumNetworkArrays = 0;
 
 // indicates which device each ensemble has been assigned to
 int* deviceForEnsemble;
+int* deviceForNetworkArray;
 
 // The data for each device.
 NengoGPUData** nengoDataArray;
@@ -174,12 +176,13 @@ void* start_GPU_thread(void* arg)
 
   int numDevicesFinished;
 
-  printf("Thread %d: about to aquire device\n", nengoData->device);
+  printf("GPU Thread %d: about to acquire device\n", nengoData->device);
   initGPUDevice(nengoData->device);
-  printf("Thread %d: done aquiring device\n", nengoData->device);
-
+  printf("GPU Thread %d: done acquiring device\n", nengoData->device);
+  
+  printf("GPU Thread %d: about to move simulation data to device\n", nengoData->device);
   moveToDeviceNengoGPUData(nengoData);
-  printf("Thread %d: done movin data to device\n", nengoData->device);
+  printf("GPU Thread %d: done moving simulation data to device\n", nengoData->device);
 
   //printNengoGPUData(nengoData);
   //printDynamicNengoGPUData(nengoData);
@@ -253,6 +256,7 @@ void run_kill()
   // Once the threads are done, free shared resources and quit
   free(nengoDataArray);
   free(deviceForEnsemble);
+  free(deviceForNetworkArray);
   free(sharedInput);
 
   pthread_mutex_destroy(mutex);
@@ -266,4 +270,5 @@ void run_kill()
 
 #ifdef __cplusplus
 }
+
 #endif

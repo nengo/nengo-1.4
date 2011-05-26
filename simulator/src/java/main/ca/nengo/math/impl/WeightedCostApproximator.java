@@ -89,7 +89,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 				System.out.println("No CUDA-enabled GPU detected.");
 				canUseGPU = false;
 			}
-				
+
 		}catch(java.lang.UnsatisfiedLinkError e){
 			canUseGPU = false;
 			System.out.println("Couldn't load native library NengoUtilsGPU. " +

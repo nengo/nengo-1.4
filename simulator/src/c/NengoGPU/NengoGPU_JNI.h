@@ -20,17 +20,17 @@ int* createSubgraphAdjacencyMatrix(int* originalAdjacencyMatrix, int originalSiz
 
 void generateNengoGPUDeviceConfiguration(int totalNumNeurons, int* numNeurons, int numProjections, projection* projections, int* adjacencyMatrix, int* deviceForEnsemble);
 
-void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArray tau_JAVA, jobjectArray isDecodedTermination_JAVA, NengoGPUData* currentData, int* deviceForEnsemble);
+void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArray tau_JAVA, jobjectArray isDecodedTermination_JAVA, NengoGPUData* currentData, int* networkArrayData);
 
 void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, NengoGPUData* currentData, int* deviceForEnsemble);
 
-void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData currentData, int* deviceForEnsemble);
+void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData currentData);
 
-void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* currentData, int* deviceForEnsemble);
+void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* currentData, int* networkArrayData);
 
-void assignEnsembleToDevice(int* EnsembleData, NengoGPUData* currentData);
+void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, int* ensembleData, NengoGPUData* currentData);
 
-void setupInput(int numProjections, projection* projections, NengoGPUData* currentData);
+void setupInput(int numProjections, projection* projections, NengoGPUData* currentData, int* networkArrayData);
 
 #ifdef __cplusplus
 }

@@ -29,9 +29,11 @@ package ca.nengo.model.impl;
 
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
+import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.model.nef.impl.DecodedTermination;
 
 /**
  * <p>A Termination that is composed of Terminations onto multiple Nodes. 
@@ -106,6 +108,16 @@ public class EnsembleTermination implements Termination {
 			myNodeTerminations[i].setValues(values);
 		}
 	}
+	
+	public InstantaneousOutput getInput(){
+		InstantaneousOutput result = null;
+		if (myNodeTerminations[0] instanceof DecodedTermination)
+			result = ((DecodedTermination) myNodeTerminations[0]).getInput();
+		else if (myNodeTerminations[0] instanceof PlasticEnsembleTermination)
+			result = ((PlasticEnsembleTermination) myNodeTerminations[0]).getInput();
+		
+		return result;
+	}
 
 	/**
 	 * Returns true if more than half of node terminations are modulatory. 
@@ -166,6 +178,10 @@ public class EnsembleTermination implements Termination {
 	 */
 	public Node getNode() {
 		return myNode;
+	}
+	
+	public Termination[] getNodeTerminations(){
+		return myNodeTerminations;
 	}
 
 	/**

@@ -10,6 +10,8 @@ extern "C"{
 
 extern int totalNumEnsembles;
 extern int* deviceForEnsemble;
+extern int totalNumNetworkArrays;
+extern int* deviceForNetworkArray;
 extern NengoGPUData** nengoDataArray;
 extern int numDevices;
 extern float startTime;

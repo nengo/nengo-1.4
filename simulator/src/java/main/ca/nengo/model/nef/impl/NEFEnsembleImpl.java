@@ -158,7 +158,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	}
 	
 	public boolean getUseGPU(){
-		return myUseGPU;
+		return myUseGPU && getMode() == SimulationMode.DEFAULT;
 	}
 	
 	/**
@@ -591,8 +591,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
      * Used to get decoded origins to give to GPU.
 	 */
 	public DecodedOrigin[] getDecodedOrigins(){
-		return myDecodedOrigins.values().toArray(new DecodedOrigin[0]);
-		//return (OrderedOrigins != null) ? (DecodedOrigin[])OrderedOrigins.toArray(new DecodedOrigin[0]) : new DecodedOrigin[0];	
+		//return myDecodedOrigins.values().toArray(new DecodedOrigin[0]);
+		return (OrderedOrigins != null) ? (DecodedOrigin[]) (OrderedOrigins.toArray(new DecodedOrigin[0])) : new DecodedOrigin[0];	
 	}
 
 	/**

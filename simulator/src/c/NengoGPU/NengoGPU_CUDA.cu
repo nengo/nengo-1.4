@@ -151,7 +151,7 @@ void checkCudaError(cudaError_t err)
 
 // Kernel, run on GPU. block size and grid size should be set so that at least totalNumTerminationRows kernels are launched.
 // Dot product the ith termination row with the corresponding input vector. Integrate the result. Results are stored in terminationValues. 
-__global__ void transform(float dt, int numTransformRows, float* input, int* terminationOffsetInInput, int* transformRowToInputIndexor, float* transforms, float* tau, float* terminationOutput, int* terminationOutputIndexor, int* terminationDimension)
+__global__ void transform(float dt, int numTransformRows, float* input, int* terminationOffsetInInput, int* transformRowToInputIndexor, float* transforms, float* tau, float* terminationOutput, int* terminationOutputIndexor, int* inputDimensions)
 {
   
   int i = threadIdx.x + (blockDim.x * threadIdx.y) + (blockIdx.x + (gridDim.x * blockIdx.y)) * blockDim.x * blockDim.y;
@@ -163,7 +163,7 @@ __global__ void transform(float dt, int numTransformRows, float* input, int* ter
     int inputIndex = transformRowToInputIndexor[i];
     int offset = terminationOffsetInInput[inputIndex];
     
-    int inputDimension = terminationDimension[inputIndex];
+    int inputDimension = inputDimensions[inputIndex];
     int transformRowIndex = i;
     
     float my_tau = tau[inputIndex];
@@ -246,7 +246,7 @@ __global__ void integrateAfterEncode(int numNeurons, float dt, float adjusted_dt
     float refTime = neuronReftime[i];
     float tau_rc = tau_RC[ensembleIndex];
     float tau_ref = tauRef[ensembleIndex];
-    float current = bias[i] + scale[i] * (encodingResult[i]);// + NDterminationSums[ensembleIndex]);
+    float current = bias[i] + scale[i] * (encodingResult[i]) + NDterminationSums[ensembleIndex];
     float dV, post_ref, v_threshold = 1.0f;
     float spike_float;
     int j, spike = 0;
@@ -276,7 +276,7 @@ __global__ void integrateAfterEncode(int numNeurons, float dt, float adjusted_dt
 
 // Kernel, run on GPU. block size and grid size should be set so that at least totalOutputSize kernels are launched.
 // Multiply one decoder row by the spike vector for the corresponding ensemble. The result is one dimension of the output vector for the ensemble. Results stored in output.
-__global__ void decode(int totalOutputSize, float* decoders, float* spikes, float* output, int* decoderRowToEnsembleIndexor, int* ensembleNumNeurons, int* ensembleOffsetInNeurons, int* decoderStride, int* outputIndexor)
+__global__ void decode(int totalOutputSize, float* decoders, float* spikes, float* output, int* decoderRowToEnsembleIndexor, int* ensembleNumNeurons, int* ensembleOffsetInNeurons, int* decoderStride, int* outputIndexor, int* reorganizer)
 {
   int i = threadIdx.x + (blockDim.x * threadIdx.y) + (blockIdx.x + (gridDim.x * blockIdx.y)) * blockDim.x * blockDim.y;
   
@@ -299,7 +299,8 @@ __global__ void decode(int totalOutputSize, float* decoders, float* spikes, floa
     
 
     int currentOutputIndex = outputIndexor[i];
-    output[currentOutputIndex] = dot_product;
+    int reorganizedOutputIndex = reorganizer[currentOutputIndex];
+    output[reorganizedOutputIndex] = dot_product;
   }
 }
 
@@ -314,32 +315,34 @@ __global__ void processNDterminations(int numEnsembles, int numNDterminations, i
   {
     int offset = NDterminationEnsembleOffset[i];
     int count = (i == numEnsembles - 1) ? numNDterminations - offset : NDterminationEnsembleOffset[i+1] - offset;
-    int j, terminationOffsetInInput, index;
+    int j, k, terminationOffsetInInput, index;
     float val, temp_sum = 0, temp_current, temp_tau;
 
-    for(j = 0; j < count; j++)
+    if(count > 0)
     {
-      index = inputIndex[offset + j];
-      terminationOffsetInInput = terminationOffsetInInputs[index]; 
-
-      val = input[terminationOffsetInInput] * weights[offset + j];
-      temp_current = current[offset + j];
-      temp_tau = tau[index];
-
-      for(j = 0; j < steps; j++)
+      for(j = 0; j < count; j++)
       {
-        //temp_current = (temp_current + val * adjusted_dt / temp_tau) * (1 - adjusted_dt / temp_tau);
-        temp_current += val * adjusted_dt / temp_tau;
-        temp_current *= (1 - adjusted_dt / temp_tau);
+        index = inputIndex[offset + j];
+        terminationOffsetInInput = terminationOffsetInInputs[index]; 
+
+        val = input[terminationOffsetInInput] * weights[offset + j];
+        temp_current = current[offset + j];
+        temp_tau = tau[index];
+
+        for(k = 0; k < steps; k++)
+        {
+          //temp_current = (temp_current + val * adjusted_dt / temp_tau) * (1 - adjusted_dt / temp_tau);
+          temp_current += val * adjusted_dt / temp_tau;
+          temp_current *= (1 - adjusted_dt / temp_tau);
+        }
+
+        current[offset + j] = temp_current;
+        
+        temp_sum += temp_current;
       }
 
-      current[offset + j] = temp_current;
-      //current[offset + j] = temp_tau;
-      
-      temp_sum += temp_current;
+      sum[i] = temp_sum;
     }
-
-    sum[i] = temp_sum;
   }
 }
 
@@ -359,7 +362,7 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
 {
   float dt = endTime - startTime;
 
-//  printf("start time: %f, end time %f, dt: %f\n", startTime, endTime, dt);
+  //printf("start time: %f, end time %f, dt: %f\n", startTime, endTime, dt);
 
   cudaError_t err;
 
@@ -372,7 +375,7 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   float adjusted_dt = dt;
 
 //  if(((int) (startTime * 1000)) < 4)
- //  printDynamicNengoGPUData(nengoData);
+  //printDynamicNengoGPUData(nengoData);
 
 
 ///////////////////////////////////////////////////////
@@ -385,10 +388,27 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   err = cudaGetLastError();
   checkCudaError(err);
 
-//  printf("Copy CPU input : %d \n", nengoData->device);
+  //printf("Copy CPU input : %d \n", nengoData->device);
   err = cudaMemcpy(nengoData->input->array + nengoData->GPUInputSize + nengoData->JavaInputSize, sharedInput + nengoData->offsetInSharedInput, nengoData->CPUInputSize * sizeof(float), cudaMemcpyHostToDevice);
   err = cudaGetLastError();
   checkCudaError(err);
+
+  //print error checking data
+/* 
+  float* input_temp = (float*)malloc(nengoData->totalInputSize * sizeof(float));
+  err = cudaMemcpy(input_temp, nengoData->input->array,nengoData->totalInputSize * sizeof(float), cudaMemcpyDeviceToHost);
+  
+  printf("stuff in input: %f\n", startTime);
+  int i;
+  for(i = 0; i < nengoData->GPUInputSize; i++)
+  {
+    printf("(%d, %f) ", i, input_temp[i]);
+  }
+  printf("\n");
+
+  free(input_temp);
+  */
+  
 
 ///////////////////////////////////////////////////////
 // Multiply input vectors by corresponding termination transform
@@ -396,8 +416,8 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dimBlock.x = 256;
   dimGrid.x = nengoData->totalNumTransformRows / dimBlock.x + 1;
 
- // printf("transform : %d\n", nengoData->device);
-  transform<<<dimGrid, dimBlock>>> (dt, nengoData->totalNumTransformRows, nengoData->input->array, nengoData->terminationOffsetInInput->array, nengoData->transformRowToInputIndexor->array, nengoData->terminationTransforms->array, nengoData->terminationTau->array, nengoData->terminationOutput->array, nengoData->terminationOutputIndexor->array, nengoData->terminationDimension->array);
+  //printf("transform : %d\n", nengoData->device);
+  transform<<<dimGrid, dimBlock>>> (dt, nengoData->totalNumTransformRows, nengoData->input->array, nengoData->terminationOffsetInInput->array, nengoData->transformRowToInputIndexor->array, nengoData->terminationTransforms->array, nengoData->terminationTau->array, nengoData->terminationOutput->array, nengoData->terminationOutputIndexor->array, nengoData->inputDimension->array);
   err = cudaGetLastError();
   checkCudaError(err);
 
@@ -419,7 +439,7 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dimGrid.x = nengoData->numEnsembles / dimBlock.x + 1;
 
   //printf("process ND\n");
-  processNDterminations<<<dimGrid, dimBlock>>>(nengoData->numEnsembles, nengoData->numNDterminations, 1, dt, nengoData->NDterminationEnsembleOffset->array, nengoData->terminationOffsetInInput->array, nengoData->NDterminationInputIndexor->array, nengoData->input->array, nengoData->NDterminationWeights->array, nengoData->NDterminationCurrents->array, nengoData->NDterminationEnsembleSums->array, nengoData->terminationTau->array);
+  processNDterminations<<<dimGrid, dimBlock>>>(nengoData->numEnsembles, nengoData->numNDterminations, steps, adjusted_dt, nengoData->NDterminationEnsembleOffset->array, nengoData->terminationOffsetInInput->array, nengoData->NDterminationInputIndexor->array, nengoData->input->array, nengoData->NDterminationWeights->array, nengoData->NDterminationCurrents->array, nengoData->NDterminationEnsembleSums->array, nengoData->terminationTau->array);
 
   err = cudaGetLastError();
   checkCudaError(err);
@@ -450,7 +470,18 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
 
   err = cudaGetLastError();
   checkCudaError(err);
+/*
+  int i;
+  float* temp_voltage = (float*)malloc((nengoData->numNeurons - 11330 + 1) * sizeof(float));
+  err = cudaMemcpy(temp_voltage, nengoData->encodeResult->array + 11330,(nengoData->numNeurons - 11330 - 1) * sizeof(float), cudaMemcpyDeviceToHost);
 
+  printf("neuronVoltage:");
+  for(i = 11330; i < nengoData->numNeurons; i++)
+  {
+    printf("(%d, %f), ", i, temp_voltage[i - 11330]);
+  }
+  printf("\n");
+*/
 
 ///// decode
 
@@ -458,15 +489,29 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dimGrid.x = nengoData->totalOutputSize / dimBlock.x + 1;
 
   //printf("decode\n");
-  decode<<<dimGrid, dimBlock>>>(nengoData->totalOutputSize, nengoData->decoders->array, nengoData->spikes->array, nengoData->output->array, nengoData->decoderRowToEnsembleIndexor->array, nengoData->ensembleNumNeurons->array, nengoData->ensembleOffsetInNeurons->array, nengoData->decoderStride->array, nengoData->decoderRowToOutputIndexor->array);
+  decode<<<dimGrid, dimBlock>>>(nengoData->totalOutputSize, nengoData->decoders->array, nengoData->spikes->array, nengoData->output->array, nengoData->decoderRowToEnsembleIndexor->array, nengoData->ensembleNumNeurons->array, nengoData->ensembleOffsetInNeurons->array, nengoData->decoderStride->array, nengoData->decoderRowToOutputIndexor->array, nengoData->networkArrayOutputReorganizer->array);
 
   err = cudaGetLastError();
   checkCudaError(err);
 
 
 //// move output to device
+  //print error checking data
+ /* 
+  float* output_temp = (float*)malloc(nengoData->totalOutputSize * sizeof(float));
+  err = cudaMemcpy(output_temp, nengoData->output->array,nengoData->totalOutputSize * sizeof(float), cudaMemcpyDeviceToHost);
+  
+  printf("stuff in output: %f\n", startTime);
+  for(i = 0; i < nengoData->totalOutputSize; i++)
+  {
+    printf("(%d, %f) ", i, output_temp[i]);
+  }
+  printf("\n");
 
-  //printFloatArrayFromDevice(NULL, nengoData->output, nengoData->totalOutputSize, 1);
+  free(output_temp);
+  
+ */ 
+
   //printf("copy output from device\n");
   cudaMemcpy(nengoData->outputHost->array, nengoData->output->array, nengoData->totalOutputSize * sizeof(float), cudaMemcpyDeviceToHost);
   err = cudaGetLastError();
