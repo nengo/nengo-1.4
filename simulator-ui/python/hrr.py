@@ -179,8 +179,10 @@ class Vocabulary:
         matches=[(m[i],self.keys[i]) for i in range(len(m))]
         if include_pairs:
             if self.vector_pairs is None: self.generate_pairs()
-            m2=numeric.dot(self.vector_pairs,v)
-            matches.extend([(m2[i],self.key_pairs[i]) for i in range(len(m2))])
+            # vector_pairs may still be none after generate_pairs (if there is only 1 vector)
+            if self.vector_pairs is not None:
+                m2=numeric.dot(self.vector_pairs,v)
+                matches.extend([(m2[i],self.key_pairs[i]) for i in range(len(m2))])
         matches.sort()
         matches.reverse()
 
@@ -197,6 +199,7 @@ class Vocabulary:
         return numeric.dot(self.vectors,v)
 
     def dot_pairs(self,v):
+        if len(self.keys)<2: return None # There are no pairs.
         if isinstance(v,HRR): v=v.v
         if self.vector_pairs is None: self.generate_pairs()
         return numeric.dot(self.vector_pairs,v)

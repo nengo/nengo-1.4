@@ -203,7 +203,7 @@ class HRRGraph(graph.Graph):
                     v=self.vocab.dot(dd)
                     if self.show_pairs:
                         v2=self.vocab.dot_pairs(dd)
-                        v=numeric.concatenate((v,v2),0)
+                        if v2 is not None: v=numeric.concatenate((v,v2),0)
                     self.cache[(index,dt_tau)]=v
                 d.append(v)
         return d
