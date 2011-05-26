@@ -100,19 +100,26 @@ class Graph(core.DataViewComponent):
 
         if self.data is not None:
             dd=self.data.get_first()
-            dd=self.post_process([dd],0,None)[0]
-            data_dim = len(dd)       # Get dimensionality of data
+            post_result=self.post_process([dd],0,None)
+            if len(post_result)>0:
+                dd = post_result[0]
+                data_dim = len(dd)       # Get dimensionality of data
+            else:
+                data_dim = 0
         else:
             data_dim = len(self.rawdata[0])
-        self.indices = [False] * data_dim
-        
-        sel_dim = d.get('sel_dim', range(min(data_dim, self.default_selected)))
-        
-        for dim in sel_dim:                         # Iterate and restore the saved state
-            if( dim < data_dim ):
-                self.indices[dim] = True
-                
-        self.fix_popup()                            # Update the pop-up box
+            
+        if data_dim > 0:
+            self.indices = [False] * data_dim
+            
+            sel_dim = d.get('sel_dim', range(min(data_dim, self.default_selected)))
+            
+            for dim in sel_dim:                         # Iterate and restore the saved state
+                if( dim < data_dim ):
+                    self.indices[dim] = True
+            
+            self.fix_popup()                            # Update the pop-up box
+            
         self.autozoom=d.get('autozoom',True)
         self.popup_zoom.state=self.autozoom
         self.last_maxy=d.get('last_maxy',None)
