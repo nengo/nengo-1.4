@@ -143,7 +143,7 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
         D=make_array(self,name,N_per_D,dimensions,quick=quick,encoders=encoders)
 
         A2=input_transform(dimensions,True,invert_first)
-        B2=input_transform(dimensions,False,invert_first)
+        B2=input_transform(dimensions,False,invert_second)
         
         D.addDecodedTermination('A',A2,pstc_in,False)
         D.addDecodedTermination('B',B2,pstc_in,False)
