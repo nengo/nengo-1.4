@@ -5,6 +5,7 @@ import data
 import simulator
 import hrr
 from nef.array import NetworkArray
+import nef
 
 import java
 import javax
@@ -199,7 +200,13 @@ class FunctionWatch:
 
 class HRRWatch:
     def check(self,obj):
-        return (isinstance(obj,NEFEnsemble) or isinstance(obj,NetworkArray)) and obj.dimension>=8
+        if(isinstance(obj,NEFEnsemble) or isinstance(obj,NetworkArray)):
+            return (obj.dimension >= 8)
+        elif(isinstance(obj,nef.SimpleNode) or isinstance(obj,NetworkImpl)):
+            try:
+                return (obj.dimension >= 8 and obj.getOrigin("X"))
+            except:
+                return False
     def views(self,obj):
         return [
             ('semantic pointer',components.HRRGraph,dict(func=nodeWatch.value,args='X',label=obj.name)),
