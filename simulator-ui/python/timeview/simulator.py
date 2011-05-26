@@ -6,6 +6,7 @@ from ca.nengo.model.neuron.impl import *
 from ca.nengo.model.neuron import *
 from ca.nengo.util import *
 from ca.nengo.util.impl import NodeThreadPool, NEFGPUInterface
+from ca.nengo.sim.impl import LocalSimulator
 
 class Simulator:
     def __init__(self,network):
@@ -13,15 +14,20 @@ class Simulator:
         self.projections=[]
         self.network=network
         self.initialize(network)
+
         
         if NEFGPUInterface.getUseGPU():
-            #for n in self.nodes: 
-        #        if isinstance(n,NEFEnsemble) and n.mode==SimulationMode.DEFAULT: 
-        #            n.setGPU(True)
+            gpuNodes = LocalSimulator.collectNodes(self.nodes) 
+            gpuNetworkArrays = LocalSimulator.collectNetworkArraysForGPU(self.nodes) 
+            gpuProjections = LocalSimulator.collectProjections(self.nodes, self.projections) 
 
-            self.thread_pool=NEFGPUInterface(self.nodes, self.projections)
-        #elif NodeThreadPool.isMultithreading():
-        #    self.thread_pool=NodeThreadPool(self.nodes, self.projections)
+            self.thread_pool=NEFGPUInterface(gpuNodes, gpuProjections, gpuNetworkArrays)
+
+        elif NodeThreadPool.isMultithreading():
+            multithread_nodes = LocalSimulator.collectNodes(self.nodes) 
+            multithread_projs = LocalSimulator.collectProjections(self.nodes, self.projections) 
+
+            self.thread_pool=NodeThreadPool(multithread_nodes, multithread_projs)
         else:    
             self.thread_pool=None
 
@@ -31,8 +37,9 @@ class Simulator:
           self.projections.append(p);
 
         for n in network.nodes:
-            #if n.__class__.__name__=='NetworkImpl' or n.__class__.__name__=='NetworkArray':
-            if isinstance(n,Network) and not n.__class__.__name__ in ['CCMModelNetwork','PyramidalNetwork']:
+            if n.__class__.__name__=='NetworkArray':
+              self.nodes.append(n)
+            elif isinstance(n,Network) and not n.__class__.__name__ in ['CCMModelNetwork','PyramidalNetwork']:
                 self.initialize(n)
             else:
                 self.nodes.append(n)
@@ -50,3 +57,7 @@ class Simulator:
             for n in self.nodes:
                 n.run(start,end)    
 
+    def kill(self):
+      if self.thread_pool is not None:
+        self.thread_pool.kill()
+        self.thread_pool = None

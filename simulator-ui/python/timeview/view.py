@@ -612,6 +612,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
     def run(self):
         sim=simulator.Simulator(self.network)
+
         while self.frame.visible:
             sim.reset(False)                   
             # run the network for an instant so that FunctionInputs have values at their Origin so they can be read
@@ -673,6 +674,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     #    sleep=1
                     java.lang.Thread.sleep(int(sleep))
                 last_frame_time=this_frame_time
+                
+        if sim is not None:
+          sim.kill();
 
 
     

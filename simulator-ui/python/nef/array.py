@@ -1,11 +1,13 @@
 from ca.nengo.model import StructuralException, Origin
-from ca.nengo.model.impl import NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl
+from ca.nengo.model.impl import BasicOrigin, NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl
 from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
     OutSpikeErrorFunction, RealPlasticityRule, SpikePlasticityRule
+from ca.nengo.model.nef.impl import DecodedTermination
+from ca.nengo.model.impl import PlasticEnsembleTermination
 from ca.nengo.util import MU
 from ca.nengo.util.impl import TimeSeriesImpl
 
-class ArrayOrigin(Origin):
+class ArrayOrigin(BasicOrigin):
     serialVersionUID=1
     def __init__(self,parent,name,origins):
         self._parent=parent
@@ -69,6 +71,8 @@ class NetworkArray(NetworkImpl):
             self.addNode(n)
         self.multidimensional=nodes[0].dimension>1
         self.createEnsembleOrigin('X')
+        self.setUseGPU(True)
+
     def createEnsembleOrigin(self,name):
         self._origins[name]=ArrayOrigin(self,name,[n.getOrigin(name) for n in self._nodes])
         self.exposeOrigin(self._origins[name],name)
@@ -143,6 +147,42 @@ class NetworkArray(NetworkImpl):
         self.exposeTermination(termination,name)
         return self.getTermination(name)
     
+    #gets the nodes in the proper order from the network array. The NetworkImpl version of this function relies on 
+    #the nodeMap object which is sometimes out of order.
+    def getNodes(self):
+        return self._nodes
+
+    # gets the terminations in the same order that they occur in an NEFEnsemble. that is, decoded terminations come last.
+    def getTerminations(self):
+        terminations = NetworkImpl.getTerminations(self)
+
+        decodedTerminations = []
+        nonDecodedTerminations = []
+        for term in terminations:
+          if  isinstance(term, NetworkImpl.TerminationWrapper):
+            term = term.getBaseTermination()
+
+          nodeTerminations = term.getNodeTerminations()
+
+          if nodeTerminations and isinstance(nodeTerminations[0], DecodedTermination):
+            decodedTerminations.append(term)
+          elif nodeTerminations and isinstance(nodeTerminations[0], PlasticEnsembleTermination):
+            nonDecodedTerminations.append(term)
+        
+        result = nonDecodedTerminations
+        result.extend(decodedTerminations)
+
+        return result
+
+    # all the subnodes have to run on the GPU for the networkArray to run on the GPU
+    def getUseGPU(self):
+        for node in self._nodes:
+          if not node.getUseGPU():
+            return False
+
+        return NetworkImpl.getUseGPU(self) 
+
+
     def exposeAxons(self):
         i=0
         for n in self._nodes:
