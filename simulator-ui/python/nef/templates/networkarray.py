@@ -36,14 +36,15 @@ class PTemplateSign(Property):
     
 params=[
     ('name','Name',str),
-    ('neurons','Neurons per array cell',int),
-    ('length','Number of array cells',int),
+    ('neurons','Neurons per dimension',int),
+    ('length','Number of dimensions',int),
     ('radius','Radius',float),
     ('iLow','Intercept (low)',float),
     ('iHigh','Intercept (high)',float),
     ('rLow','Max rate (low)',float),
     ('rHigh','Max rate (high)',float),
-    ('encSign','Encoding Sign', PTemplateSign),
+    ('encSign','Encoding sign', PTemplateSign),
+    ('useQuick', 'Quick mode', bool),
     ]
 
 def test_params(net,p):
@@ -55,9 +56,9 @@ def test_params(net,p):
     if p['iLow'] > p['iHigh']: return 'Low intercept must be less than high intercept'
     if p['rLow'] > p['rHigh']: return 'Low max firing rate must be less than high max firing rate'
 
-def make(net,name='Network Array', neurons=50, length=10, radius=1.0, rLow=200, rHigh=400, iLow=-1, iHigh=1, encSign=0):
+def make(net,name='Network Array', neurons=50, length=10, radius=1.0, rLow=200, rHigh=400, iLow=-1, iHigh=1, encSign=0, useQuick=True):
     if int(encSign) is not 0:
-        net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, encoders=[[encSign]])
+        net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, encoders=[[encSign]], quick=useQuick)
     else:
-        net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius)
+        net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, quick=useQuick)
     
