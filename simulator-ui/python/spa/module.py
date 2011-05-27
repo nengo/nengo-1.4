@@ -25,6 +25,18 @@ class Module:
         if name is None: name=self.name
         else: name='%s_%s'%(self.name,name)
         self.spa.add_sink(name,node,self)
+    def has_param(self,key):
+        if self.params.has_key(key):
+            return True
+        if self.spa.params.has_key(key):
+            return True
+        args,vargs,kw,defaults=inspect.getargspec(self.create)
+        if key in args:
+            i=args.index(key)+len(defaults)-len(args)
+            if i>=0:
+                return True
+        return False
+        
     def get_param(self,key):
         if self.params.has_key(key):
             return self.params[key]

@@ -59,27 +59,47 @@ class Thalamus(spa.module.Module):
             cname='channel_%s_%s'%(source_name,sink_name)
             if weight!=1: cname+='(%1.1f)'%weight
 
-            module=self.spa.sink_modules[sink_name]
-            if module.p.subdimensions is not None:
-                channel=self.net.make_array(cname,module.p.N_per_D*module.p.subdimensions,sink.dimension/module.p.subdimensions,dimensions=module.p.subdimensions,quick=True)
+            sink_module=self.spa.sink_modules[sink_name]
+            source_module=self.spa.source_modules[source_name]
+
+            if sink_module.p.dimensions<=source_module.p.dimensions:
+                module=sink_module
+                use_sink=True
             else:
-                channel=self.net.make(cname,module.p.N_per_D*sink.dimension,sink.dimension,quick=True)
+                module=source_module
+                use_sink=False
+            
+            if module.has_param('subdimensions') and module.p.subdimensions is not None:
+                channel=self.net.make_array(cname,module.p.N_per_D*module.p.subdimensions,module.p.dimensions/module.p.subdimensions,dimensions=module.p.subdimensions,quick=True)
+            else:
+                channel=self.net.make(cname,module.p.N_per_D*module.p.dimensions,module.p.dimensions,quick=True)
             #channel=self.net.make_array(cname,self.p.N_per_D,sink.dimension,quick=True)
 
             self.net.network.exposeOrigin(channel.getOrigin('X'),cname)
             
-            self.spa.connect_to_sink(self.net.network.getOrigin(cname),sink_name,None,
-                                     self.p.pstc_output,termination_name=cname)
 
             v1=self.spa.vocab(source_name)
             v2=self.spa.vocab(sink_name)
             if v1 is v2: transform=None
             else: transform=v1.transform_to(v2)
-            o1,t1=self.net.connect(source,channel,pstc=self.p.pstc_route_input,weight=weight*self.p.route_scale,transform=transform,create_projection=False)
+
+
+            if use_sink:
+                tr1=transform
+                tr2=None
+            else:
+                tr1=None
+                tr2=transform
+            
+            self.spa.connect_to_sink(self.net.network.getOrigin(cname),sink_name,tr2,
+                                     self.p.pstc_output,termination_name=cname)
+
+
+            o1,t1=self.net.connect(source,channel,pstc=self.p.pstc_route_input,weight=weight*self.p.route_scale,transform=tr1,create_projection=False)
             self.net.network.exposeTermination(t1,cname)
             self.spa.net.network.addProjection(o1,self.net.network.getTermination(cname))
 
-            channel.addTermination('gate',[[-10.0]]*(module.p.N_per_D*sink.dimension),self.p.pstc_gate,False)
+            channel.addTermination('gate',[[-10.0]]*(module.p.N_per_D*module.p.dimensions),self.p.pstc_gate,False)
             self.net.connect(gate,channel.getTermination('gate'))
 
         """

@@ -17,6 +17,7 @@ class SPA:
         self.sources={}
         self.sinks={}
         self.sink_modules={}
+        self.source_modules={}
         self.vocabs={}
         self.default_vocabs={}
         self.params={}
@@ -36,6 +37,7 @@ class SPA:
         self.sources[name]=source
         if source.dimensions>1:
             self.ensure_vocab(name,module)
+        self.source_modules[name]=module
 
             
         
@@ -49,7 +51,7 @@ class SPA:
         d=module.get_param('dimensions')
         align=module.get_param('align_hrrs')
         if not self.default_vocabs.has_key((d,align)):
-            self.default_vocabs[(d,align)]=hrr.Vocabulary(d,randomize=not align)
+            self.default_vocabs[(d,align)]=hrr.Vocabulary(d,randomize=not align,max_similarity=0.04)
         self.vocabs[name]=self.default_vocabs[(d,align)]
         
 

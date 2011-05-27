@@ -12,6 +12,7 @@ import match
 import view
 import latch
 import memory
+import directmemory
 
 reload(core)
 reload(bg)
@@ -24,6 +25,7 @@ reload(match)
 reload(view)
 reload(latch)
 reload(memory)
+reload(directmemory)
 
 from core import SPA
 from bg import BasalGanglia
@@ -35,3 +37,4 @@ from input import Input
 from match import Match
 from latch import Latch
 from memory import Memory
+from directmemory import DirectMemory

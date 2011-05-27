@@ -20,7 +20,7 @@ class MemorySink:
         
 
 class Memory(spa.module.Module):
-    def create(self,dimensions,N_per_D=30,subdimensions=None,N_conv=300,pstc=0.01,output_scale=2,input_scale=0.1,feedback=1,pstc_feedback=0.1):
+    def create(self,dimensions,N_per_D=30,subdimensions=None,N_conv=300,pstc=0.01,output_scale=2,input_scale=0.1,feedback=1,pstc_feedback=0.1,pstc_recall=0.002,cleanup=[]):
 
         if N_conv==0:
             conv=nef.convolution.make_array(self.net,'conv',1,dimensions,quick=True)
@@ -32,22 +32,34 @@ class Memory(spa.module.Module):
             deconv=nef.convolution.make_array(self.net,'deconv',N_conv,dimensions,quick=True)
 
 
-        if subdimensions is None:
-            mem=self.net.make('mem',N_per_D*dimensions,dimensions,quick=True)
-            recall=self.net.make('recall',N_per_D*dimensions,dimensions,quick=True)
+        if N_per_D==0:
+                mem=self.net.make('mem',1,dimensions,quick=True,mode='direct')
+                recall=self.net.make('recall',1,dimensions,quick=True,mode='direct')
         else:
-            assert dimensions%subdimensions==0
-            mem=self.net.make_array('mem',N_per_D*subdimensions,dimensions/subdimensions,dimensions=subdimensions,quick=True)
-            recall=self.net.make_array('recall',N_per_D*subdimensions,dimensions/subdimensions,dimensions=subdimensions,quick=True)
+            if subdimensions is None:
+                mem=self.net.make('mem',N_per_D*dimensions,dimensions,quick=True)
+                recall=self.net.make('recall',N_per_D*dimensions,dimensions,quick=True)
+            else:
+                assert dimensions%subdimensions==0
+                mem=self.net.make_array('mem',N_per_D*subdimensions,dimensions/subdimensions,dimensions=subdimensions,quick=True)
+                recall=self.net.make_array('recall',N_per_D*subdimensions,dimensions/subdimensions,dimensions=subdimensions,quick=True)
             
         if feedback!=0:
-            self.net.connect(mem,mem,pstc=pstc_feedback)
+            if N_per_D==0:
+                def limit(x):
+                    a=numeric.array(x)
+                    norm=numeric.norm(a)
+                    if norm>1: a=a/norm
+                    return a
+                self.net.connect(mem,mem,pstc=pstc_feedback,func=limit)
+            else:
+                self.net.connect(mem,mem,pstc=pstc_feedback)
 
         self.net.connect(mem,deconv,transform=nef.convolution.input_transform(dimensions,True),pstc=pstc)
 
         self.net.connect(conv,mem,func=lambda x: x[0]*x[1],transform=nef.convolution.output_transform(dimensions)*input_scale,pstc=pstc)
 
-        self.net.connect(deconv,recall,func=lambda x: x[0]*x[1],transform=nef.convolution.output_transform(dimensions)*output_scale,pstc=pstc)
+        self.net.connect(deconv,recall,func=lambda x: x[0]*x[1],transform=nef.convolution.output_transform(dimensions),pstc=pstc_recall)
 
         self.add_sink(MemorySink(self,True),'A')
         self.add_sink(MemorySink(self,False),'B')
@@ -55,5 +67,22 @@ class Memory(spa.module.Module):
 
         self.add_source(mem.getOrigin('X'))
         self.add_source(recall.getOrigin('X'),'recall')
+
+        if len(cleanup)>0:
+            clean=self.net.make('clean',1,dimensions,quick=True,mode='direct')
+            self.add_source(clean.getOrigin('X'),'clean')
+            vocab=self.spa.vocab(self.name)
+            for p in cleanup:
+                v=(vocab.parse(p)*output_scale).v
+                c=self.net.make('c_'+p,50,1,quick=True,mode='rate',intercept=(0.5,1),encoders=[[1]])
+                def threshold(x):
+                    if x[0]>0.5: return 1
+                    else: return 0
+                self.net.connect(recall,c,transform=v,pstc=pstc_recall)
+                self.net.connect(c,clean,transform=v,func=threshold,pstc=pstc_recall)
+                
+                
+                
+            
         
         
