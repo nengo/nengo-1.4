@@ -160,9 +160,11 @@ class NetworkArray(NetworkImpl):
         nonDecodedTerminations = []
         for term in terminations:
           if  isinstance(term, NetworkImpl.TerminationWrapper):
-            term = term.getBaseTermination()
+            baseTermination = term.getBaseTermination()
+          else:
+            baseTermination = term
 
-          nodeTerminations = term.getNodeTerminations()
+          nodeTerminations = baseTermination.getNodeTerminations()
 
           if nodeTerminations and isinstance(nodeTerminations[0], DecodedTermination):
             decodedTerminations.append(term)
