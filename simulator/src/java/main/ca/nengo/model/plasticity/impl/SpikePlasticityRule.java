@@ -94,6 +94,22 @@ public class SpikePlasticityRule implements PlasticityRule {
 		myModInputArray = null;
 	}
 	
+	public void setDecaying(boolean decaying) {
+		myDecaying = decaying;
+	}
+
+	public void setDecayAmount(float decayAmount) {
+		myDecayAmount = decayAmount;
+	}
+
+	public void setHomestatic(boolean homeostatic) {
+		myHomeostatic = homeostatic;
+	}
+	
+	public void setStableVal(float weightPerNeuron) {
+		myStableVal = weightPerNeuron;
+	}
+	
 	// Sets up the in spiking arrays
 	private void setTermDim(int dim) {
 		myInSpikeHistory = MU.uniform(HISTORY_LENGTH, dim, -1);
