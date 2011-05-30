@@ -215,7 +215,7 @@ def run_experiment(name,func,in_dim,out_dim,train_len=2.0,length=2.0,directory=N
         net.network.run(0,run_length)
         
         now = datetime.datetime.now()
-        f_name = os.path.join(directory, name+'-'+now.strftime("%Y-%m-%d_%H-%M")+'.csv')
+        f_name = os.path.join(directory, name+'-'+now.strftime("%Y-%m-%d_%H-%M-%S")+'.csv')
         senses.write_data_log(f_name)
     
     return net

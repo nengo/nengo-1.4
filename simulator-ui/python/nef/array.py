@@ -232,6 +232,19 @@ class NetworkArray(NetworkImpl):
                 outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
                                                out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);                outFcn.setLearningRate(rate)
                 rule = SpikePlasticityRule(inFcn,outFcn,'AXON',mod_term)
+                
+                if kwargs.has_key('decay') and kwargs['decay'] is not None:
+                    rule.setDecaying(True)
+                    rule.setDecayAmount(kwargs['decay'])
+                else:
+                    rule.setDecaying(False)
+                
+                if kwargs.has_key('homeostasis') and kwargs['homeostasis'] is not None:
+                    rule.setHomestatic(True)
+                    rule.setStableVal(kwargs['homeostasis'])
+                else:
+                    rule.setHomestatic(False)
+                
                 n.setPlasticityRule(learn_term,rule)
             else:
                 learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders)
