@@ -334,14 +334,14 @@ public class WeightedCostApproximator implements LinearApproximator {
 		} catch (FileNotFoundException e) {
 			System.err.println("File not found: " + e);
 		} catch (java.io.IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
             System.err.println("WeightedCostApproximator.pseudoInverse() - IO Exception: " + e);
 		} catch (InterruptedException e) {
             System.err.println("WeightedCostApproximator.pseudoInverse() - Interrupted: " + e);
 			//e.printStackTrace();		
 		} catch (Exception e){
             System.err.println("WeightedCostApproximator.pseudoInverse() - Gen Exception: " + e);
-            e.printStackTrace();
+            //e.printStackTrace();
         } finally {
         	java.io.File file=new java.io.File(path,filename);
 			if (file.exists()) file.delete();
