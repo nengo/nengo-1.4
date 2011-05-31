@@ -250,14 +250,14 @@ public class WeightedCostApproximator implements LinearApproximator {
 //		int hashCode=java.util.Arrays.hashCode(matrix);
 //		int testpos = 0;
 		
-
+		String parent=System.getProperty("user.dir");
+		java.io.File path=new java.io.File(parent,"external");
+		String filename="matrix_"+random.nextLong();
+		
 	 	try {
 			// TODO: separate this out into a helper method, so we can do this sort of thing for other calculations as well
-			String parent=System.getProperty("user.dir");
-			java.io.File path=new java.io.File(parent,"external");
-			String filename="matrix_"+random.nextLong();
-			
-			java.io.File pinvfile = new java.io.File(path,"pseudoInverse");
+	 		java.io.File pinvfile = new java.io.File(path,"pseudoInverse");
+	 		
 			if(pinvfile.exists())
 			{
 			
@@ -307,10 +307,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 					}
 				}
 				
-				//cleanup the matrix file
-				file=new java.io.File(path,filename);
-				if (file.canRead()) 
-					file.delete();
+				// matrix file cleaned up in finally block
 				
 				channel=new java.io.RandomAccessFile(file2,"r").getChannel();			
 	//			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);
@@ -332,10 +329,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 				// Close all file handles
 	            channel.close();
 	            
-	            //cleanup the inv file
-				file2=new java.io.File(path,filename+".inv");
-				if (file2.canRead()) 
-					file2.delete();
+	            // channel file cleaned up in finally block
 			}
 		} catch (FileNotFoundException e) {
 			System.err.println("File not found: " + e);
@@ -348,6 +342,11 @@ public class WeightedCostApproximator implements LinearApproximator {
 		} catch (Exception e){
             System.err.println("WeightedCostApproximator.pseudoInverse() - Gen Exception: " + e);
             e.printStackTrace();
+        } finally {
+        	java.io.File file=new java.io.File(path,filename);
+			if (file.exists()) file.delete();
+			java.io.File file2=new java.io.File(path,filename+".inv");
+			if (file2.exists()) file2.delete();
         }
 				
 		if (result==null) {
