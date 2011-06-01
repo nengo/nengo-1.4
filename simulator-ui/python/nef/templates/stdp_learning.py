@@ -1,6 +1,6 @@
 title='STDP Learning Rule'
 label='Learning Rule'
-icon='integrator.png'
+icon='learn.png'
 
 params=[
     ('errName','Name of (new) error ensemble',str),
@@ -38,27 +38,28 @@ def make(net,errName='error', N_err = 50, preName='pre', postName = 'post', rate
     pre = net.network.getNode(preName)
     post = net.network.getNode(postName)
     
-    # modulatory termination
+    # modulatory termination (find unused termination)
     count=0
     while 'mod_%02d'%count in [t.name for t in post.terminations]:
         count=count+1
     modname = 'mod_%02d'%count
     post.addDecodedTermination(modname, numeric.eye(post.dimension), 0.005, True)
     
-    # non-decoded termination (to learn transformation)
-    try:
-        pre_term = node.getTermination(p[pre.getName()])
-    except:
-        pre_term = None
+    # random weight matrix to initialize projection from pre to post
+    def rand_weights(w):
+        for i in range(len(w)):
+            for j in range(len(w[0])):
+                w[i][j] = random.uniform(-1e-3,1e-3)
+        return w
+    weight = rand_weights(numeric.zeros((post.neurons, pre.neurons)).tolist())
     
-    if pre_term is None:
-        def rand_weights(w):
-            for i in range(len(w)):
-                for j in range(len(w[0])):
-                    w[i][j] = random.uniform(-1e-3,1e-3)
-            return w
-        weight = rand_weights(numeric.zeros((post.neurons, pre.neurons)).tolist())
-        post.addTermination(pre.getName(), weight, 0.005, False)
+    # non-decoded termination (to learn transformation)
+    count = 0
+    prename = pre.getName()
+    while '%s_%02d'%(prename,count) in [t.name for t in post.terminations]:
+        count=count+1
+    prename = '%s_%02d'%(prename, count)
+    post.addTermination(prename, weight, 0.005, False)
     
     # Set learning rule on the non-decoded termination
     # Code ripped directly from nef_core
@@ -82,12 +83,12 @@ def make(net,errName='error', N_err = 50, preName='pre', postName = 'post', rate
     
     outFcn.setLearningRate(rate)
     rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', modname)
-    post.setPlasticityRule(pre.getName(),rule)
+    post.setPlasticityRule(prename,rule)
     
     # Create error ensemble
     error = net.make(errName, N_err, post.dimension)
     
     # Add projections
     net.network.addProjection(error.getOrigin('X'), post.getTermination(modname))
-    net.network.addProjection(pre.getOrigin('AXON'), post.getTermination(pre.getName()))
+    net.network.addProjection(pre.getOrigin('AXON'), post.getTermination(prename))
     

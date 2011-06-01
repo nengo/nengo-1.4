@@ -1,6 +1,6 @@
 title='Basal Ganglia Rule'
 label='BG Rule'
-icon='termination.png'
+icon='BGRule.png'
 
 params=[
     ('index','Rule Index',int),

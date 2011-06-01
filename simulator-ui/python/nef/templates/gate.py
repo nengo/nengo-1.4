@@ -1,6 +1,6 @@
 title='Gate'
 label='Gate'
-icon='termination.png' # TODO
+icon='gate.png'
 
 params=[
     ('name','Name',str),
