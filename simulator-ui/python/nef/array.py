@@ -235,7 +235,7 @@ class NetworkArray(NetworkImpl):
                 
                 if kwargs.has_key('decay') and kwargs['decay'] is not None:
                     rule.setDecaying(True)
-                    rule.setDecayAmount(kwargs['decay'])
+                    rule.setDecayScale(kwargs['decay'])
                 else:
                     rule.setDecaying(False)
                 
