@@ -21,7 +21,7 @@ class Properties:
         for key,text,type in params:
             if isinstance(type,Property):
                 p=type
-            # checking isintance(type, Property.__class__) will not find Jython children of Property
+            # checking isinstance(type, Property.__class__) will not find Jython children of Property
             # search for a known attribute of the interface instead
             elif hasattr(type, 'createInputPanel'):
                 p=type(text)
