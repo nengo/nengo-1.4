@@ -428,8 +428,15 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	@Override
 	protected void initLayout(Universe canvas) {
 		try {  
-		  //Tell the UIManager to use the platform look and feel  
-		  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		  //Tell the UIManager to use the platform look and feel
+		  String laf=UIManager.getSystemLookAndFeelClassName();
+		  if (laf.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) {
+			  laf="javax.swing.plaf.metal.MetalLookAndFeel";
+		  }
+		  UIManager.setLookAndFeel(laf);
+		  
+		  
+		  //UIManager.put("Slider.paintValue",Boolean.FALSE);
 		} catch(Exception e) { /*Do nothing*/ }
 		System.setProperty("swing.aatext", "true");
 		
