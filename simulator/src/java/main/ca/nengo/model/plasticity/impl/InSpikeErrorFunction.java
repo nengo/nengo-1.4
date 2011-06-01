@@ -46,8 +46,8 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	
 	private float[] myGain;
 	private float[][] myEncoders;
-	private float[][] myO1;
-	private float[][] myR2;
+	private float[] myO1;
+	private float[] myR2;
 	// default values (from Pfister & Gerstner 2006)
 	// These need to be in ms!
 	private float myA2Minus = 6.6e-3f;
@@ -107,20 +107,18 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	
 	@Override
 	public void initActivityTraces(int postLength, int preLength) {
-		myO1 = new float[postLength][preLength];
-		myR2 = new float[postLength][preLength];
+		myO1 = new float[postLength];
+		myR2 = new float[preLength];
 	}
 	
 	@Override
 	public void beforeDOmega(boolean[] postSpiking) {
 		for (int j = 0; j < myO1.length; j++) {
-			for (int i = 0; i < myO1[0].length; i++) {
-				if (postSpiking[j]) {
-					myO1[j][i] += 1.0f;
-				}
-				myO1[j][i] -= myO1[j][i] / myTauMinus;
-				if (myO1[j][i] < 0.0f) {myO1[j][i] = 0.0f;}
+			if (postSpiking[j]) {
+				myO1[j] += 1.0f;
 			}
+			myO1[j] -= myO1[j] / myTauMinus;
+			if (myO1[j] < 0.0f) {myO1[j] = 0.0f;}
 		}
 	}
 
@@ -129,21 +127,19 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	 */
 	protected float deltaOmega(float timeSinceDifferent, float timeSinceSame,
 			float currentWeight, float modInput, int postIndex, int preIndex, int dim) {
-		float result = myO1[postIndex][preIndex] * (myA2Minus + myR2[postIndex][preIndex] * myA3Minus);
+		float result = myO1[postIndex] * (myA2Minus + myR2[preIndex] * myA3Minus);
 
 		return myLearningRate * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
 	}
 	
 	@Override
 	public void afterDOmega(boolean[] preSpiking) {
-		for (int j = 0; j < myR2.length; j++) {
-			for (int i = 0; i < myR2[0].length; i++) {
-				if (preSpiking[i]) {
-					myR2[j][i] += 1.0f;
-				}
-				myR2[j][i] -= myR2[j][i] / myTauX;
-				if (myR2[j][i] < 0.0f) {myR2[j][i] = 0.0f;}
+		for (int i = 0; i < myR2.length; i++) {
+			if (preSpiking[i]) {
+				myR2[i] += 1.0f;
 			}
+			myR2[i] -= myR2[i] / myTauX;
+			if (myR2[i] < 0.0f) {myR2[i] = 0.0f;}
 		}
 	}
 	

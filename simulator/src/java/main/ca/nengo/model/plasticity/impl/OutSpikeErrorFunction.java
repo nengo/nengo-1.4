@@ -46,8 +46,8 @@ public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	
 	private float[] myGain;
 	private float[][] myEncoders;
-	private float[][] myR1;
-	private float[][] myO2;
+	private float[] myR1;
+	private float[] myO2;
 	//default values (from Pfister & Gerstner 2006)
 	// These need to be in ms!
 	private float myA2Plus = 8.8e-11f;
@@ -105,20 +105,18 @@ public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 
 	@Override
 	public void initActivityTraces(int postLength, int preLength) {
-		myR1 = new float[postLength][preLength];
-		myO2 = new float[postLength][preLength];
+		myR1 = new float[preLength];
+		myO2 = new float[postLength];
 	}
 	
 	@Override
 	public void beforeDOmega(boolean[] preSpiking) {
-		for (int j = 0; j < myR1.length; j++) {
-			for (int i = 0; i < myR1[0].length; i++) {
-				if (preSpiking[i]) {
-					myR1[j][i] += 1.0f;
-				}
-				myR1[j][i] -= myR1[j][i] / myTauPlus;
-				if (myR1[j][i] < 0.0f) {myR1[j][i] = 0.0f;}
+		for (int i = 0; i < myR1.length; i++) {
+			if (preSpiking[i]) {
+				myR1[i] += 1.0f;
 			}
+			myR1[i] -= myR1[i] / myTauPlus;
+			if (myR1[i] < 0.0f) {myR1[i] = 0.0f;}
 		}
 	}
 
@@ -127,7 +125,7 @@ public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	 */
 	protected float deltaOmega(float timeSinceDifferent, float timeSinceSame,
 			float currentWeight, float modInput, int postIndex, int preIndex, int dim) {
-		float result = myR1[postIndex][preIndex] * (myA2Plus + myO2[postIndex][preIndex] * myA3Plus);
+		float result = myR1[preIndex] * (myA2Plus + myO2[postIndex] * myA3Plus);
 
 		return myLearningRate * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
 	}
@@ -135,13 +133,11 @@ public class OutSpikeErrorFunction extends AbstractSpikeLearningFunction {
 	@Override
 	public void afterDOmega(boolean[] postSpiking) {
 		for (int j = 0; j < myO2.length; j++) {
-			for (int i = 0; i < myO2[0].length; i++) {
-				if (postSpiking[j]) {
-					myO2[j][i] += 1.0f;
-				}
-				myO2[j][i] -= myO2[j][i] / myTauY;
-				if (myO2[j][i] < 0.0f) {myO2[j][i] = 0.0f;}
+			if (postSpiking[j]) {
+				myO2[j] += 1.0f;
 			}
+			myO2[j] -= myO2[j] / myTauY;
+			if (myO2[j] < 0.0f) {myO2[j] = 0.0f;}
 		}
 	}
 	

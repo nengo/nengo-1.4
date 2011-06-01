@@ -64,7 +64,7 @@ public class SpikePlasticityRule implements PlasticityRule {
 	private float[] myModInputArray;
 	
 	private boolean myDecaying = false;
-	private float myDecayAmount = 1e-8f;
+	private float myDecayScale = 1e-8f; // Proportion of weight that will be subtracted every timestep
 	private boolean myHomeostatic = true;
 	private float myStableVal = 0.03f;
 	
@@ -98,8 +98,8 @@ public class SpikePlasticityRule implements PlasticityRule {
 		myDecaying = decaying;
 	}
 
-	public void setDecayAmount(float decayAmount) {
-		myDecayAmount = decayAmount;
+	public void setDecayScale(float decayScale) {
+		myDecayScale = decayScale;
 	}
 
 	public void setHomestatic(boolean homeostatic) {
@@ -271,11 +271,7 @@ public class SpikePlasticityRule implements PlasticityRule {
 		if (myDecaying) {
 			for (int i = 0; i < result.length; i++) {
 				for (int j = 0; j < result[i].length; j++) {
-					if (transform[i][j] > 0.0) {
-						result[i][j] -= myDecayAmount;
-					} else {
-						result[i][j] += myDecayAmount;
-					}
+					result[i][j] -= transform[i][j]*myDecayScale;
 				}
 			}
 		}
