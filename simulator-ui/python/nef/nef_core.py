@@ -361,9 +361,9 @@ class Network:
                 if dim_pre==1: transform=[[x] for x in transform]
                 elif dim_post==1: transform=[transform]
                 else:
-                    raise Exception("Don't know how to turn %s into a %sx%s matrix"%(transform,dim_pre,dim_post))
+                    raise Exception("Don't know how to turn %s into a %sx%s matrix"%(transform,dim_post,dim_pre))
             elif len(transform)!=dim_post and len(transform[0])!=dim_pre:
-                raise Exception("transform must be a %dx%d matrix"%(dim_pre,dim_post))
+                raise Exception("transform must be a %dx%d matrix"%(dim_post,dim_pre))
         
         if plastic_array:
             suffix = ''
