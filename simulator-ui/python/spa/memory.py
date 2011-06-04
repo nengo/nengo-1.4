@@ -20,7 +20,8 @@ class MemorySink:
         
 
 class Memory(spa.module.Module):
-    def create(self,dimensions,N_per_D=30,subdimensions=None,N_conv=300,pstc=0.01,output_scale=2,input_scale=0.1,feedback=1,pstc_feedback=0.1,pstc_recall=0.002,cleanup=[]):
+    def create(self,dimensions,N_per_D=30,subdimensions=None,N_conv=300,pstc=0.01,output_scale=2,input_scale=0.1,
+                feedback=1,pstc_feedback=0.1,pstc_recall=0.002,cleanup=[],radius=1):
 
         if N_conv==0:
             conv=nef.convolution.make_array(self.net,'conv',1,dimensions,quick=True)
@@ -49,7 +50,7 @@ class Memory(spa.module.Module):
                 def limit(x):
                     a=numeric.array(x)
                     norm=numeric.norm(a)
-                    if norm>1: a=a/norm
+                    if norm>radius: a=a/(norm/radius)
                     return a
                 self.net.connect(mem,mem,pstc=pstc_feedback,func=limit)
             else:
