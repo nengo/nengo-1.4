@@ -129,7 +129,7 @@ public class InSpikeErrorFunction extends AbstractSpikeLearningFunction {
 			float currentWeight, float modInput, int postIndex, int preIndex, int dim) {
 		float result = myO1[postIndex] * (myA2Minus + myR2[preIndex] * myA3Minus);
 
-		return myLearningRate * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
+		return -1 * myLearningRate * result * modInput * myEncoders[postIndex][dim] * myGain[postIndex];
 	}
 	
 	@Override
