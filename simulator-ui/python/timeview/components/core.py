@@ -49,14 +49,16 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
 
         self.show_label=False
         self.label = label
+        self.label_offset = 0
         if self.label is not None:
             self.popup.add(JPopupMenu.Separator())
             self.popup_label=JCheckBoxMenuItem('label',self.show_label,actionPerformed=self.toggle_label)
             self.popup.add(self.popup_label)
             self.label_height = 15
+            self.show_label=True
+            self.update_label()
         else:
             self.label_height = 0
-        self.label_offset = 0
         
     def save(self):
         return dict(x=self.x,y=self.y,width=self.width,height=self.height,label=self.show_label)
