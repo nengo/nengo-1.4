@@ -8,8 +8,8 @@ import timeview.view
 
 config={}
 
-def define(obj,func,minx=-1,maxx=1,miny=-1,maxy=1):
-    config[obj]=(func,minx,maxx,miny,maxy)
+def define(obj,func, dimension = 1, minx=-1,maxx=1,miny=-1,maxy=1):
+    config[obj]=(func,dimension,minx,maxx,miny,maxy)
 
 class FuncRepWatch:
     def check(self,obj):
@@ -46,7 +46,7 @@ class FunctionRepresentation(core.DataViewComponent):
         g.color=Color(0.8,0.8,0.8)
         g.drawRect(self.border_left,self.border_top+self.label_offset,width,height)
 
-        f,minx,maxx,miny,maxy=self.config
+        f,dimension,minx,maxx,miny,maxy=self.config
 
         g.color=Color.black
         txt='%4g'%maxx
@@ -97,24 +97,42 @@ class FunctionRepresentation(core.DataViewComponent):
             pdf.setRGBColorStroke(g.color.red,g.color.green,g.color.blue)        
             pdf.stroke()        
         else:
-            dx=float(maxx-minx)/(width-1)
-            px,py=None,None
-            for i in range(width):
-                x=minx+i*dx
-                value=sum([f(j,x)*d for j,d in enumerate(data)])
-
-                y=int((value-miny)*height/(maxy-miny))
-
-                xx=self.border_left+i
-                yy=self.height-self.border_bottom-y
-
-                if px is not None and miny<value<maxy:
-                    g.drawLine(px,py,xx,yy)
-                px,py=xx,yy    
-
-
+            if dimension == 1 :
             
-        
-        
-    
-    
+                dx=float(maxx-minx)/(width-1)
+                px,py=None,None
+                for i in range(width):
+                    x=minx+i*dx
+                    value=sum([f(j,x)*d for j,d in enumerate(data)])
+
+                    y=int((value-miny)*height/(maxy-miny))
+
+                    xx=self.border_left+i
+                    yy=self.height-self.border_bottom-y
+
+                    if px is not None and miny<value<maxy:
+                        g.drawLine(px,py,xx,yy)
+                    px,py=xx,yy
+                    
+            elif dimension == 2 :
+                
+                max = 0.0001 #dynamically update max and min
+                min = -0.0001
+                dx = float(maxx-minx)/(width-1)
+                dy = float(maxy-miny)/(height-1)
+                
+                for ix in range(width-1):
+                    for iy in range(height-1):
+                    
+                        x = [minx+ix*dx , miny+iy*dy]
+                        value = sum([f(j,x)*d for j,d in enumerate(data)])
+                        if value > max :
+                            max = value
+                        elif value < min :
+                            min = value
+                        
+                        rgb = (value-min)/(max-min)
+                        xx = self.border_left + ix
+                        yy = self.border_top + iy
+                        g.color = Color(rgb, rgb, rgb)
+                        g.fillRect(xx, yy, 1, 1)
