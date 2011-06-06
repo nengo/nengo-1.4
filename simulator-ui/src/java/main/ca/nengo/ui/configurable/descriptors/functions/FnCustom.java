@@ -129,10 +129,7 @@ public class FnCustom extends AbstractFn {
 		pExpression = new PString(EXPRESSION_STR, null, expression);
 		Property pDimensions = new PInt(DIMENSION_STR, dim);
 
-		if (isInputDimEditable) {
-
-			pDimensions.setEditable(true);
-		}
+		pDimensions.setEditable(isInputDimEditable);
 
 		Property[] props = new Property[] { pExpression, pDimensions };
 		return new ConfigSchemaImpl(props);
