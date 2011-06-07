@@ -95,12 +95,14 @@ class TemplateBar(TransferHandler):
 
         
         self.ng=ca.nengo.ui.NengoGraphics.getInstance()
-        self.ng.universe.transferHandler=DropHandler()
+        dh=DropHandler()
+        self.ng.universe.transferHandler=dh
+        self.ng.universe.getDropTarget().addDropTargetListener(dh)
         
-        self.add_template('Network',ca.nengo.ui.models.constructors.CNetwork,'images/nengoIcons/network.gif')
-        self.add_template('Ensemble',ca.nengo.ui.models.constructors.CNEFEnsemble,'images/nengoIcons/ensemble.gif')
-        self.add_template('Input',ca.nengo.ui.models.constructors.CFunctionInput,'images/nengoIcons/input.png')
-        self.add_template('Origin',ca.nengo.ui.models.constructors.CDecodedOrigin,'images/nengoIcons/origin.png')
+        self.add_template('Network','ca.nengo.ui.models.constructors.CNetwork','images/nengoIcons/network.gif')
+        self.add_template('Ensemble','ca.nengo.ui.models.constructors.CNEFEnsemble','images/nengoIcons/ensemble.gif')
+        self.add_template('Input','ca.nengo.ui.models.constructors.CFunctionInput','images/nengoIcons/input.png')
+        self.add_template('Origin','ca.nengo.ui.models.constructors.CDecodedOrigin','images/nengoIcons/origin.png')
         self.add_template('Termination','nef.templates.termination','images/nengoIcons/termination.png')
         
         self.panel.add(JSeparator(JSeparator.HORIZONTAL,maximumSize=(200,1),foreground=Color(0.3,0.3,0.3),background=Color(0.1,0.1,0.1)))
@@ -166,7 +168,20 @@ class TemplateBar(TransferHandler):
         self.panel.revalidate()
         ca.nengo.ui.NengoGraphics.getInstance().contentPane.revalidate()
 
-class DropHandler(TransferHandler):
+class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
+    dragPoint=None
+
+    def dragOver(self,event):
+        self.dragPoint=event.getLocation()
+    def dragEnter(self,event):
+        pass
+    def dragExit(self,event):
+        pass
+    def drop(self,event):
+        pass
+    def dropActionChanged(self,event):
+        pass
+
 
     def find_at(self,container,pos):
         nodes=container.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1))
@@ -199,8 +214,14 @@ class DropHandler(TransferHandler):
         
 
 
-    def canImport(self,support):
+    def canImport(self,support,flavors=None):
+        if flavors is not None:   # Java 1.5
+            return True
+    
         constructor=support.getTransferable().getTransferData(TemplateTransferable.flavor)
+        
+        constructor=eval(constructor)
+        
         if constructor is ca.nengo.ui.models.constructors.CNetwork: return True
 
         drop_on_ensemble=False
@@ -218,26 +239,28 @@ class DropHandler(TransferHandler):
                     return True
             return False
 
-        if isinstance(constructor,str):
-            constructor=eval(constructor)
-            if hasattr(constructor,'test_drop'):
-                node=None
-                for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
-                    if isinstance(n3,ca.nengo.ui.models.UINeoNode):
-                        node=n3.model
-                return constructor.test_drop(net.model,node)
+        if hasattr(constructor,'test_drop'):
+            node=None
+            for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                if isinstance(n3,ca.nengo.ui.models.UINeoNode):
+                    node=n3.model
+            return constructor.test_drop(net.model,node)
 
         return True
 
-    def importData(self,support):
-        try:
+    def importData(self,support,transferable=None):
+        if transferable is not None:   # Java 1.5
+            constructor=transferable.getTransferData(TemplateTransferable.flavor)
+            net,pos=self.find_target(self.dragPoint)
+        else:
             constructor=support.getTransferable().getTransferData(TemplateTransferable.flavor)
-
+            net,pos=self.find_target(support.dropLocation.dropPoint)
+            
+        try:
+            constructor=eval(constructor)
             drop_on_ensemble=False
             if constructor is ca.nengo.ui.models.constructors.CDecodedOrigin: drop_on_ensemble=True
             if constructor is ca.nengo.ui.models.constructors.CDecodedTermination: drop_on_ensemble=True
-            
-            net,pos=self.find_target(support.dropLocation.dropPoint)
 
             node=None
             for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
@@ -247,9 +270,7 @@ class DropHandler(TransferHandler):
             if drop_on_ensemble:
                 self.create(constructor(node.model),net,position=None,node=node)
             else:
-                if isinstance(constructor,str):
-                    constructor=TemplateConstructor(eval(constructor))
-                elif hasattr(constructor,'make'):
+                if hasattr(constructor,'make'):
                     constructor=TemplateConstructor(constructor)
                 else:
                     constructor=constructor()
@@ -267,7 +288,7 @@ class DropHandler(TransferHandler):
                 action.setPosition(position.x,position.y)
                 action.doAction()
             elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedOrigin):
-                uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor())
+                uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
                 uc.configureAndWait()
                 if constructor.model is not None:
                     node.showOrigin(constructor.model.name)
@@ -305,7 +326,7 @@ class DropHandler(TransferHandler):
         
 
 class TemplateTransferable(java.awt.datatransfer.Transferable):
-    flavor=java.awt.datatransfer.DataFlavor("application/nengo")
+    flavor=java.awt.datatransfer.DataFlavor("application/nengo;class=java.lang.String")
     def __init__(self,action):
         self.action=action
     def getTransferDataFlavors(self):
