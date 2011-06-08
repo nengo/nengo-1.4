@@ -5,7 +5,7 @@ import linear_system
 import binding
 import networkarray
 import gate
-import stdp_learning
+import learned_termination
 
 templates=[
     networkarray,
@@ -15,5 +15,5 @@ templates=[
     linear_system,
     binding,
     gate,
-    stdp_learning,
+    learned_termination,
     ]

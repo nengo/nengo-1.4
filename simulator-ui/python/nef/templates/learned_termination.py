@@ -1,13 +1,14 @@
-title='STDP Learning Rule'
-label='Learning Rule'
+title='Learned Termination'
+label='Learned\nTermination'
 icon='learn.png'
 
 params=[
     ('errName','Name of (new) error ensemble',str),
-    ('N_err', 'Number of neurons in error ensemble', int),
+    ('N_err', 'Number of neurons in error ensemble',int),
     ('preName','Name of pre ensemble',str),
     ('postName','Name of post ensemble',str),
     ('rate','Learning rate',float),
+    ('stdp','Use STDP?',bool),
     ]
 
 def test_params(net,p):
@@ -30,9 +31,10 @@ def test_params(net,p):
 import random
 from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
     OutSpikeErrorFunction, SpikePlasticityRule
+import nef
 import numeric
     
-def make(net,errName='error', N_err = 50, preName='pre', postName = 'post', rate=5e-7):
+def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-7, stdp=False):
 
     # get pre and post ensembles from their names
     pre = net.network.getNode(preName)
@@ -61,34 +63,20 @@ def make(net,errName='error', N_err = 50, preName='pre', postName = 'post', rate
     prename = '%s_%02d'%(prename, count)
     post.addTermination(prename, weight, 0.005, False)
     
-    # Set learning rule on the non-decoded termination
-    # Code ripped directly from nef_core
-    in_args = {'a2Minus':  6.6e-3,
-        'a3Minus':  3.1e-3,
-        'tauMinus': 33.7,
-        'tauX':     101.0}
-                   
-    inFcn = InSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
-        in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX'])
-    
-    inFcn.setLearningRate(rate)
-                    
-    out_args = {'a2Plus':  8.8e-11,
-        'a3Plus':  5.3e-2,
-        'tauPlus': 16.8,
-        'tauY':    125.0}
-                    
-    outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
-        out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY'])
-    
-    outFcn.setLearningRate(rate)
-    rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', modname)
-    post.setPlasticityRule(prename,rule)
-    
     # Create error ensemble
     error = net.make(errName, N_err, post.dimension)
     
+    # Hook up pre and post to error
+    # NOTE: Eventually there should be some way to define a different function
+    #  for the error population to compute, but that might be better kept
+    #  in scripts anyway, I don't know.
+    net.connect(pre,error,weight=1)
+    net.connect(post,error,weight=-1)
+    
     # Add projections
-    net.network.addProjection(error.getOrigin('X'), post.getTermination(modname))
-    net.network.addProjection(pre.getOrigin('AXON'), post.getTermination(prename))
+    net.connect(error.getOrigin('X'),post.getTermination(modname))
+    net.connect(pre.getOrigin('AXON'),post.getTermination(prename))
+
+    # Set learning rule on the non-decoded termination
+    net.learn(post,prename,modname,rate=rate,stdp=stdp)
     

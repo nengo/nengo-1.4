@@ -226,10 +226,10 @@ class NetworkArray(NetworkImpl):
         
         for n in self._nodes:
             if stdp:
-                inFcn = InSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
+                inFcn = InSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
                                              in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
                 inFcn.setLearningRate(rate)
-                outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
+                outFcn = OutSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
                                                out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);                outFcn.setLearningRate(rate)
                 rule = SpikePlasticityRule(inFcn,outFcn,'AXON',mod_term)
                 
