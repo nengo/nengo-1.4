@@ -180,9 +180,9 @@ class Network:
             for nn in n.nodes:
                 nn.noise=NoiseFactory.makeRandomNoise(noise_frequency,IndicatorPDF(-noise,noise))
 
-        if mode=='rate':
+        if mode=='rate' or mode==SimulationMode.RATE:
             n.mode=SimulationMode.RATE
-        elif mode=='direct':
+        elif mode=='direct' or mode==SimulationMode.DIRECT:
             n.mode=SimulationMode.DIRECT
         if add_to_network: self.network.addNode(n)
         return n
