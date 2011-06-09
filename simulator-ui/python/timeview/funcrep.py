@@ -44,16 +44,32 @@ class FunctionRepresentation(core.DataViewComponent):
 
         self.max = 0.0001
         self.min = -0.0001
+        self.grid_size = 63
         
-    def paintComponent(self,g):
+        ######################################
+        ## initialize function input grid
+        
+        grid_size = self.grid_size
+                
+        # construct input grid
+        row = array([range(63)])
+        gridX = dot(ones([grid_size,1]), row)
+        gridY = transpose(gridX)
+        
+        # get function value
+        x1 = reshape(gridX,[1, grid_size*grid_size])
+        x2 = reshape(gridY,[1, grid_size*grid_size])
+        self.func_input = concatenate([x1, x2], 0)
     
+    def paintComponent(self,g):
+        
         f,dimension,minx,maxx,miny,maxy, params=self.config
         
         core.DataViewComponent.paintComponent(self,g)
 
         width=self.size.width-self.border_left-self.border_right
         height=self.size.height-self.border_top-self.border_bottom-self.label_offset
-        
+            
         if width<2: return
 
         dt_tau=None
@@ -65,21 +81,12 @@ class FunctionRepresentation(core.DataViewComponent):
             return
         
         if dimension == 2: # currently only for 63*63 grid
-            grid_size = 63
+            grid_size = self.grid_size
             # step_size = width / grid_size
             bi = BI(width, height, BI.TYPE_INT_ARGB)
             
-            # construct input grid
-            row = array([range(63)]) + 1
-            gridX = dot(ones([grid_size,1]), row)
-            gridY = transpose(gridX)
-            
-            # get function value
-            x1 = reshape(gridX,[1, grid_size*grid_size])
-            x2 = reshape(gridY,[1, grid_size*grid_size])
-            x = concatenate([x1, x2], 0)
             coeffs=transpose(array([data]))
-            basis = array(f(x, params))
+            basis = array(f(self.func_input, params))
             value = transpose(dot(transpose(basis),coeffs))
             maxv = max(value[0])
             minv = min(value[0])
@@ -90,8 +97,7 @@ class FunctionRepresentation(core.DataViewComponent):
     
             pvalue = (value - self.min) / (self.max - self.min) # normalized pixel value
             pvalue = map(int, array(pvalue[0]) * 255)
-            pvalue = reshape(pvalue,[grid_size, grid_size]) 
-            # print(pvalue)
+            pvalue = reshape(pvalue,[grid_size, grid_size])
             pvalue = pvalue * 256 * 256 + pvalue * 256 + pvalue #convert to R G B
             pvalue = 0xFF000000 + pvalue
             
