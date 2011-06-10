@@ -237,7 +237,15 @@ public class ConfigDialog extends JDialog {
 
 		createButtons(myPanel);
 
-		add(myPanel);
+		while (true) {
+			try {
+				add(myPanel);
+				break;
+			} catch (RuntimeException e) {
+				//e.printStackTrace();
+				// Ubuntu 11.04 throws a sun.awt.X11.XException ~80% of the time here
+			}
+		}
 
 		setMinimumSize(new Dimension(200, this.getHeight()));
 		updateBounds();
