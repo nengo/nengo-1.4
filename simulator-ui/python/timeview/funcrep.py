@@ -12,8 +12,8 @@ import timeview.view
 
 config={}
 
-def define(obj,func, dimension = 1, minx=-1,maxx=1,miny=-1,maxy=1, params = None):
-    config[obj]=(func,dimension,minx,maxx,miny,maxy, params)
+def define(obj,func, dimension = 1, minx=-1,maxx=1,miny=-1,maxy=1, params = None, color = 'g'):
+    config[obj]=(func,dimension,minx,maxx,miny,maxy, params, color)
 
 class FuncRepWatch:
     def check(self,obj):
@@ -40,11 +40,12 @@ class FunctionRepresentation(core.DataViewComponent):
         self.config=config
         self.start = 0
 
-        self.setSize(200,200)
+        self.setSize(200,200+self.label_offset)
 
         self.max = 0.0001
         self.min = -0.0001
         self.grid_size = 63
+        self.image = None
         
         ######################################
         ## initialize function input grid
@@ -63,7 +64,7 @@ class FunctionRepresentation(core.DataViewComponent):
     
     def paintComponent(self,g):
         
-        f,dimension,minx,maxx,miny,maxy, params=self.config
+        f,dimension,minx,maxx,miny,maxy, params, color=self.config
         
         core.DataViewComponent.paintComponent(self,g)
 
@@ -83,7 +84,8 @@ class FunctionRepresentation(core.DataViewComponent):
         if dimension == 2: # currently only for 63*63 grid
             grid_size = self.grid_size
             # step_size = width / grid_size
-            bi = BI(width, height, BI.TYPE_INT_ARGB)
+            if  self.image is None:
+                bi = BI(width, height, BI.TYPE_INT_ARGB)
             
             coeffs=transpose(array([data]))
             basis = array(f(self.func_input, params))
@@ -96,9 +98,27 @@ class FunctionRepresentation(core.DataViewComponent):
                 self.min = minv
     
             pvalue = (value - self.min) / (self.max - self.min) # normalized pixel value
-            pvalue = map(int, array(pvalue[0]) * 255)
+            
+            if color == 'g':
+                ## gray
+                pvalue = array(map(int, array(pvalue[0]) * 0xFF))
+                pvalue = pvalue * 0x10000 + pvalue * 0x100 + pvalue
+            elif color == 'c':
+                ##color
+                pvalue = map(int, array(pvalue[0]) * 0xFF * 2) 
+                R = zeros(len(pvalue))
+                G = zeros(len(pvalue))
+                B = zeros(len(pvalue))
+                for i, v in enumerate(pvalue):
+                    if v < 0xFF:
+                        B[i] = 0xFF - v
+                        G[i] = v
+                    else:
+                        G[i] = 2*0xFF - v
+                        R[i] = v - 0xFF
+                pvalue = R * 0x10000 + G * 0x100 + B
+            
             pvalue = reshape(pvalue,[grid_size, grid_size])
-            pvalue = pvalue * 256 * 256 + pvalue * 256 + pvalue #convert to R G B
             pvalue = 0xFF000000 + pvalue
             
             # expand pixel value from grid to raster size
