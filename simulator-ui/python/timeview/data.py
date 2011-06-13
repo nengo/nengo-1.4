@@ -12,7 +12,7 @@ import view
 
 class CSVFilter(FileFilter):
     def accept(self,f):
-        return f.name.endswith('.csv')
+        return f.isDirectory() or f.name.endswith('.csv')
     def getDescription(self):
         return 'comma-separated values'
 
@@ -86,7 +86,10 @@ class DataPanel(JPanel,MouseListener):
         
         data=None
         title=['t']
-        for key,watch in self.view.watcher.active.items():
+        keys = self.view.watcher.active.keys()
+        keys.sort()
+        for key in keys:
+            watch = self.view.watcher.active[key]
             name,func,args=key
             
             code='%s.%s%s'%(name,func.__name__,args)
