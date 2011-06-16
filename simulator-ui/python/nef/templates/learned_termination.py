@@ -66,13 +66,6 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     # Create error ensemble
     error = net.make(errName, N_err, post.dimension)
     
-    # Hook up pre and post to error
-    # NOTE: Eventually there should be some way to define a different function
-    #  for the error population to compute, but that might be better kept
-    #  in scripts anyway, I don't know.
-    net.connect(pre,error,weight=1)
-    net.connect(post,error,weight=-1)
-    
     # Add projections
     net.connect(error.getOrigin('X'),post.getTermination(modname))
     net.connect(pre.getOrigin('AXON'),post.getTermination(prename))
