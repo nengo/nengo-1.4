@@ -5,7 +5,7 @@ from javax.swing.event import DocumentListener
 
 title='Network Array'
 label='Network\nArray'
-icon='network.gif'
+icon='array.png'
 
 class SignInputPanel(PropertyInputPanel,DocumentListener):
     def __init__(self,property):
