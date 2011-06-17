@@ -635,6 +635,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	public PythonInterpreter getPythonInterpreter() {
 		return pythonInterpreter;
 	}
+	
+	public ScriptConsole getScriptConsole() {
+		return scriptConsole;
+	}
 
 	public WorldObject getSelectedObj() {
 		return selectedObj;

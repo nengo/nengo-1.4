@@ -85,6 +85,7 @@ public class OpenNeoFileAction extends StandardAction {
 				protected void action() throws ActionException {
 
 					if (file.getName().endsWith(".py")) {
+						NengoGraphics.getInstance().getScriptConsole().addVariable("scriptname", file.getPath());
 						NengoGraphics.getInstance().getPythonInterpreter().execfile(file.getPath());
 						return;
 					}

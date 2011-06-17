@@ -360,6 +360,7 @@ public class ScriptConsole extends JPanel {
 		clearCommand();
 		try {
 			if (text.startsWith("run ")) {
+				addVariable("scriptname", text.substring(4).trim());
 				myInterpreter.execfile(text.substring(4).trim());
 			} else if (text.startsWith("help ")) {
 				appendText(JavaSourceParser.removeTags(getHelp(text.substring(5).trim())), HELP_STYLE);
