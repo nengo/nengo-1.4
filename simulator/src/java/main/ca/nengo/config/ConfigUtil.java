@@ -143,7 +143,7 @@ public class ConfigUtil {
 			if (myTree.getUI().getClass().getName().contains("apple.laf")) {
 				AquaTreeUI aui = new AquaTreeUI();
 				myTree.setUI(aui);
-				aui.setRowHeight(-1); //must be done after setUI(...)
+				aui.setRowHeight(0); //must be done after setUI(...)
 			}
 			
 			myTree.setScrollsOnExpand(true);
@@ -172,6 +172,7 @@ public class ConfigUtil {
 			myTree.setCellRenderer(myCellRenderer);
 
 			ToolTipManager.sharedInstance().registerComponent(myTree);
+			myTree.setRowHeight(0);
 		}
 		
 		public ConfigurationTreeCellRenderer getCellRenderer() {
