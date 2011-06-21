@@ -21,6 +21,7 @@ class HRRGraph(graph.Graph):
         else:
             self.vocab=hrr.Vocabulary(dim)
 
+        self.hidden_pairs=None
         self.normalize=True
         self.popup_normalize=JCheckBoxMenuItem('normalize',self.normalize,stateChanged=self.toggle_normalize)
         self.popup.add(self.popup_normalize)
@@ -75,6 +76,7 @@ class HRRGraph(graph.Graph):
                 self.vocab.generate_pairs()
 
         pairs=self.indices[len(self.vocab.keys):]
+        if self.hidden_pairs is not None: pairs.extend(self.hidden_pairs)
         pairs=pairs+[False]*(len(self.vocab.key_pairs)-len(pairs))
         self.indices=self.indices[:len(self.vocab.keys)]
         if len(self.indices)<len(self.vocab.keys):
@@ -82,6 +84,9 @@ class HRRGraph(graph.Graph):
             
         if self.show_pairs:
             self.indices=self.indices+pairs
+            self.hidden_pairs=None
+        else:
+            self.hidden_pairs=pairs
         self.refix_popup()
         self.repaint()
             
