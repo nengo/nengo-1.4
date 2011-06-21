@@ -1,6 +1,6 @@
-D=16
-subdim=4
-N=100
+D=20
+subdim=5
+N=300
 seed=7
 
 import nef
