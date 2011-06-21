@@ -16,14 +16,15 @@ vocab=hrr.Vocabulary(D,max_similarity=0.1)
 net=nef.Network('Question Answering with Memory')
 A=net.make('A',1,D,mode='direct')
 B=net.make('B',1,D,mode='direct')
-C=net.make_array('C',N,D/subdim,dimensions=subdim,quick=True,radius=1.0/math.sqrt(D),storage_code='%d')
+Memory=net.make_array('Memory',N,D/subdim,dimensions=subdim,quick=True,radius=1.0/math.sqrt(D),storage_code='%d')
+C=net.make('C',1,D,mode='direct')
+D_ens=net.make('D',1,D,mode='direct') #D ensemble, not to be confused with variable D (number of dimensions)
 E=net.make('E',1,D,mode='direct')
-F=net.make('F',1,D,mode='direct')
 
-conv1=nef.convolution.make_convolution(net,'*',A,B,C,N,quick=True)
-conv2=nef.convolution.make_convolution(net,'/',C,E,F,N,invert_second=True,quick=True)
+conv1=nef.convolution.make_convolution(net,'Bind',A,B,D_ens,N,quick=True)
+conv2=nef.convolution.make_convolution(net,'Unbind',Memory,C,E,N,invert_second=True,quick=True)
 
-net.connect(C,C,pstc=0.4)
+net.connect(Memory,Memory,pstc=0.4)
 
 CIRCLE=vocab.parse('CIRCLE')
 BLUE=vocab.parse('BLUE')
@@ -42,7 +43,7 @@ class Input(nef.SimpleNode):
     if 0.0<t<0.25: return CIRCLE.v
     if 0.25<t<0.5: return SQUARE.v
     return ZERO
-  def origin_E(self):
+  def origin_C(self):
     t=self.t_start
     if t<0.5: return ZERO
     t=t%0.5
@@ -58,7 +59,8 @@ input=Input('input')
 net.add(input)
 net.connect(input.getOrigin('A'),A)
 net.connect(input.getOrigin('B'),B)
-net.connect(input.getOrigin('E'),E)
+net.connect(input.getOrigin('C'),C)
+net.connect(D_ens, Memory)
 
 
 net.add_to(world)
