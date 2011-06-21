@@ -382,9 +382,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.forced_origins_prev={}
         
         if size is None:
-            if ui is None: size=(900,600)
-            else: size=(int(ui.width),int(ui.height))
-            if size[0]<700: size=(800,size[1])
+            size=(950,600)
+            if ui is not None: size=(max(int(ui.width), 950),max(int(ui.height), 500))
         
         self.frame.size=(size[0],size[1]+100)        
        
