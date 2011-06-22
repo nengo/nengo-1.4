@@ -87,7 +87,7 @@ from math import sin,pi,acos
 class Vocabulary:
     defaults={}
     
-    def __init__(self,dimensions,randomize=True,unitary=False,max_similarity=0.2,include_pairs=False):
+    def __init__(self,dimensions,randomize=True,unitary=False,max_similarity=0.1,include_pairs=False):
         self.dimensions=dimensions
         self.randomize=randomize
         self.unitary=unitary
