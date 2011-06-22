@@ -22,7 +22,7 @@ def test_params(net,p):
     
 import numeric
 def make(net,name='Integrator',neurons=100,dimensions=1,tau_feedback=0.1,tau_input=0.01,scale=1):
-    if (dimensions<30):
+    if (dimensions<8):
         integrator=net.make(name,neurons,dimensions)
     else:
         integrator=net.make_array(name, int(neurons/dimensions),dimensions, quick=True)
