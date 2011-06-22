@@ -1,7 +1,7 @@
 D=20
 subdim=5
 N=300
-seed=7
+seed=8
 
 import nef
 import nef.convolution
