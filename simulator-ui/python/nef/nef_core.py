@@ -370,7 +370,11 @@ class Network:
             attempts = 1
             while attempts < 100:
                 try:
-                    term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,weight_func)
+                    if hasattr(origin,'decoders'):
+                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,weight_func)
+                    else:
+                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,
+                                                          [[0.0]*pre.dimension]*pre.neurons,weight_func)
                     break
                 except StructuralException,e:
                     exception = e
@@ -448,10 +452,11 @@ class Network:
             mod_term=mod_term.getName()
         
         if stdp:
-            in_args = {'a2Minus':  6.6e-3,
-                       'a3Minus':  3.1e-3,
-                       'tauMinus': 33.7,
-                       'tauX':     101.0}
+            in_args = {'a2Minus':  5.0e-3, #1.0e-1,
+                       'a3Minus':  5.0e-3,
+                       'tauMinus': 70.0, #120.0,
+                       'tauX':     70.0, #140.0
+                       }
             for key in in_args.keys():
                 if kwargs.has_key(key):
                     in_args[key] = kwargs[key]
@@ -460,10 +465,11 @@ class Network:
                                          in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
             inFcn.setLearningRate(rate)
             
-            out_args = {'a2Plus':  8.8e-11,
-                        'a3Plus':  5.3e-2,
-                        'tauPlus': 16.8,
-                        'tauY':    125.0}
+            out_args = {'a2Plus':  5.0e-3, #1.0e-2,
+                        'a3Plus':  5.0e-3, #5.0e-8,
+                        'tauPlus': 70.0, #3.0,
+                        'tauY':    70.0, #150.0
+                        }
             for key in out_args.keys():
                 if kwargs.has_key(key):
                     out_args[key] = kwargs[key]
@@ -487,7 +493,11 @@ class Network:
             
             post.setPlasticityRule(learn_term,rule)
         else:
-            learnFcn = ErrorLearningFunction([n.scale for n in post.nodes],post.encoders)
+            oja = True
+            if kwargs.has_key('oja'):
+                oja = kwargs['oja']
+            
+            learnFcn = ErrorLearningFunction([n.scale for n in post.nodes],post.encoders,oja)
             learnFcn.setLearningRate(rate)
             rule=RealPlasticityRule(learnFcn, 'X', mod_term)
             post.setPlasticityRule(learn_term,rule)

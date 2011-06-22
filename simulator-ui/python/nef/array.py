@@ -67,8 +67,10 @@ class NetworkArray(NetworkImpl):
         self.dimension=len(nodes)*nodes[0].dimension
         self._nodes=nodes
         self._origins={}
+        self.neurons=0
         for n in nodes:
             self.addNode(n)
+            self.neurons+=n.neurons
         self.multidimensional=nodes[0].dimension>1
         self.createEnsembleOrigin('X')
         self.setUseGPU(True)
@@ -108,7 +110,8 @@ class NetworkArray(NetworkImpl):
         
         If decoders are not known at the time the termination is created,
         then pass in an array of zeros of the appropriate size (i.e. however
-        many neurons will be in the population projecting to the termination)."""
+        many neurons will be in the population projecting to the termination,
+        by number of dimensions)."""
         terminations = []
         d = 0
         #w = MU.prod(encoder,MU.prod(matrix,MU.transpose(decoder)))
@@ -208,18 +211,18 @@ class NetworkArray(NetworkImpl):
         return TimeSeriesImpl(times,[values],units)
     
     def setPlasticityRule(self,learn_term,mod_term,rate,stdp,**kwargs):
-        in_args = {'a2Minus':  6.6e-3,
-                   'a3Minus':  3.1e-3,
-                   'tauMinus': 33.7,
-                   'tauX':     101.0}
+        in_args = {'a2Minus':  1.0e-1,
+                   'a3Minus':  5.0e-3,
+                   'tauMinus': 120.0,
+                   'tauX':     140.0}
         for key in in_args.keys():
             if kwargs.has_key(key):
                 in_args[key] = kwargs[key]
         
-        out_args = {'a2Plus':  8.8e-11,
-                    'a3Plus':  5.3e-2,
-                    'tauPlus': 16.8,
-                    'tauY':    125.0}
+        out_args = {'a2Plus':  1.0e-2,
+                    'a3Plus':  5.0e-8,
+                    'tauPlus': 3.0,
+                    'tauY':    150.0}
         for key in out_args.keys():
             if kwargs.has_key(key):
                 out_args[key] = kwargs[key]
@@ -247,7 +250,11 @@ class NetworkArray(NetworkImpl):
                 
                 n.setPlasticityRule(learn_term,rule)
             else:
-                learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders)
+                oja = True
+                if kwargs.has_key('oja'):
+                    oja = kwargs['oja']
+                
+                learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders,oja)
                 learnFcn.setLearningRate(rate)
                 rule = RealPlasticityRule(learnFcn,'X',mod_term)
                 n.setPlasticityRule(learn_term,rule)
