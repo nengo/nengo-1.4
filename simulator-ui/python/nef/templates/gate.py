@@ -6,7 +6,7 @@ params=[
     ('name','Name',str),
     ('gated','Name of gated ensemble',str),
     ('neurons','Number of neurons',int),
-    ('pstc','PSTC', float),
+    ('pstc','tauPSC', float),
     ]
 
 def test_params(net, p):

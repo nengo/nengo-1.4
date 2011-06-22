@@ -6,14 +6,16 @@ import binding
 import networkarray
 import gate
 import learned_termination
+import thalamus
 
 templates=[
     networkarray,
     integrator,
-    basalganglia,
-    basalganglia_rule,
     linear_system,
     binding,
+    basalganglia,
+    basalganglia_rule,
+    thalamus,
     gate,
     learned_termination,
     ]
