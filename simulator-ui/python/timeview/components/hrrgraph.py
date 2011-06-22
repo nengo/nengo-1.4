@@ -131,7 +131,7 @@ class HRRGraph(graph.Graph):
         self.view.forced_origins[(self.name,'X',None)]=self.fixed_value
 
         if key_count!=len(self.vocab.keys):
-            self.redo_indices()
+            self.view.refresh_hrrs()
 
 
         

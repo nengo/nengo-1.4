@@ -4,6 +4,7 @@ import timelog
 import data
 import simulator
 import hrr
+from timeview.components import hrrgraph
 from nef.array import NetworkArray
 import nef
 
@@ -444,6 +445,11 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.area.add(g)
         self.area.repaint()
         return g
+    def refresh_hrrs(self):
+        ''' Call refresh methods on all semantic pointer graphs (useful if HRR has just changed).'''
+        for item in self.area.components:
+            if isinstance(item, hrrgraph.HRRGraph):
+                item.redo_indices()
     def clear_all(self):
         self.area.nodes={}
         for item in self.area.components:
