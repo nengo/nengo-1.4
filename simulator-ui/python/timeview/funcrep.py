@@ -12,8 +12,8 @@ import timeview.view
 
 config={}
 
-def define(obj,func, dimension = 1, minx=-1,maxx=1,miny=-1,maxy=1, params = None, color = 'g'):
-    config[obj]=(func,dimension,minx,maxx,miny,maxy, params, color)
+def define(obj,func, dimension = 1, minx=-1,maxx=1,miny=-1,maxy=1, params = None, color = 'c', time_step = 10):
+    config[obj]=(func,dimension,minx,maxx,miny,maxy, params, color, time_step)
 
 class FuncRepWatch:
     def check(self,obj):
@@ -33,19 +33,21 @@ class FunctionRepresentation(core.DataViewComponent):
         self.func=func
         self.data=self.view.watcher.watch(name,func,args=args)
 
-        self.border_top=37
-        self.border_left=37
-        self.border_right=37
-        self.border_bottom=37
+        self.border_top=20
+        self.border_left=20
+        self.border_right=20
+        self.border_bottom=20
         self.config=config
         self.start = 0
 
-        self.setSize(200,200+self.label_offset)
+        # self.setSize(440,440+self.label_offset)
+        self.setSize(240,240+self.label_offset)
 
         self.max = 0.0001
         self.min = -0.0001
-        self.grid_size = 63
+        self.grid_size = 50
         self.image = None
+        self.counter = 0
         
         ######################################
         ## initialize function input grid
@@ -53,7 +55,8 @@ class FunctionRepresentation(core.DataViewComponent):
         grid_size = self.grid_size
                 
         # construct input grid
-        row = array([range(63)])
+        row = array([map(float,range(grid_size))])
+        row = row / (self.grid_size-1) * 2 - 2  # normalized to [-1, 1]
         gridX = dot(ones([grid_size,1]), row)
         gridY = transpose(gridX)
         
@@ -64,7 +67,7 @@ class FunctionRepresentation(core.DataViewComponent):
     
     def paintComponent(self,g):
         
-        f,dimension,minx,maxx,miny,maxy, params, color=self.config
+        f,dimension,minx,maxx,miny,maxy, params, color, time_step = self.config
         
         core.DataViewComponent.paintComponent(self,g)
 
@@ -81,63 +84,73 @@ class FunctionRepresentation(core.DataViewComponent):
         except:
             return
         
-        if dimension == 2: # currently only for 63*63 grid
-            grid_size = self.grid_size
-            # step_size = width / grid_size
-            if  self.image is None:
-                bi = BI(width, height, BI.TYPE_INT_ARGB)
+        if dimension == 2:   
+            if self.image is None :
+                self.image = BI(width, height, BI.TYPE_INT_ARGB)
             
-            coeffs=transpose(array([data]))
-            basis = array(f(self.func_input, params))
-            value = transpose(dot(transpose(basis),coeffs))
-            maxv = max(value[0])
-            minv = min(value[0])
-            if maxv > self.max:
-                self.max = maxv
-            if minv < self.min:
-                self.min = minv
-    
-            pvalue = (value - self.min) / (self.max - self.min) # normalized pixel value
+            if self.counter != time_step:
+                self.counter += 1
+                g.drawImage( self.image, self.border_left, self.border_top, None)
+            else:
+                self.counter = 0
+                # currently only for fixed grid
+                grid_size = self.grid_size
+                # step_size = width / grid_size
+                
+                coeffs=transpose(array([data]))
+                basis = array(f(self.func_input, params))
+                value = transpose(dot(transpose(basis),coeffs))
+                maxv = max(value[0])
+                minv = min(value[0])
+                if maxv > self.max:
+                    self.max = maxv
+                if minv < self.min:
+                    self.min = minv
+        
+                pvalue = (value - self.min) / (self.max - self.min) # normalized pixel value
+                
+                if color == 'g':
+                    ## gray
+                    pvalue = array(map(int, array(pvalue[0]) * 0xFF))
+                    pvalue = pvalue * 0x10000 + pvalue * 0x100 + pvalue
+                elif color == 'c':
+                    ##color
+                    pvalue = map(int, array(pvalue[0]) * 0xFF * 2) 
+                    R = zeros(len(pvalue))
+                    G = zeros(len(pvalue))
+                    B = zeros(len(pvalue))
+                    for i, v in enumerate(pvalue):
+                        if v < 0xFF:
+                            B[i] = 0xFF - v
+                            G[i] = v
+                        else:
+                            G[i] = 2*0xFF - v
+                            R[i] = v - 0xFF
+                    pvalue = R * 0x10000 + G * 0x100 + B
+                
+                pvalue = reshape(pvalue,[grid_size, grid_size])
+                rvalue = 0xFF000000 + pvalue
+                
+                # expand pixel value from grid to raster size
+                # ratio = float(width) / grid_size
+                # indeces = map(int, (floor(array(range(width)) / ratio)))
+                ## Tooooooo slow here!
+                # for i, ii in enumerate(indeces): 
+                    # for j, jj in enumerate(indeces) :
+                        # rvalue[i,j] = pvalue[ii,jj]
             
-            if color == 'g':
-                ## gray
-                pvalue = array(map(int, array(pvalue[0]) * 0xFF))
-                pvalue = pvalue * 0x10000 + pvalue * 0x100 + pvalue
-            elif color == 'c':
-                ##color
-                pvalue = map(int, array(pvalue[0]) * 0xFF * 2) 
-                R = zeros(len(pvalue))
-                G = zeros(len(pvalue))
-                B = zeros(len(pvalue))
-                for i, v in enumerate(pvalue):
-                    if v < 0xFF:
-                        B[i] = 0xFF - v
-                        G[i] = v
-                    else:
-                        G[i] = 2*0xFF - v
-                        R[i] = v - 0xFF
-                pvalue = R * 0x10000 + G * 0x100 + B
-            
-            pvalue = reshape(pvalue,[grid_size, grid_size])
-            pvalue = 0xFF000000 + pvalue
-            
-            # expand pixel value from grid to raster size
-            # ratio = float(width) / grid_size
-            # indeces = map(int, (floor(array(range(width)) / ratio)))
-            ## Tooooooo slow here!
-            # for i, ii in enumerate(indeces): 
-                # for j, jj in enumerate(indeces) :
-                    # rvalue[i,j] = pvalue[ii,jj]
-            rvalue = reshape(pvalue, [grid_size * grid_size, 1])
-            rvalue = concatenate([rvalue, rvalue], 1)
-            rvalue = reshape(rvalue, [grid_size, grid_size* 2])
-            rvalue = repeat(rvalue, ones(grid_size) * 2)
-            
-            # draw image
-            rvalue = reshape(rvalue, [1, width * height])
-            bi.setRGB(0, 0, width, height, rvalue[0], 0, width)
-            g.drawImage( bi, self.border_left, self.border_top, None)
-            
+                for zoom in range(2):
+                    zgrid_size = grid_size * (zoom + 1)
+                    rvalue = reshape(rvalue, [zgrid_size * zgrid_size, 1])
+                    rvalue = concatenate([rvalue, rvalue], 1)
+                    rvalue = reshape(rvalue, [zgrid_size, zgrid_size* 2])
+                    rvalue = repeat(rvalue, ones(zgrid_size) * 2)
+                                
+                # draw image
+                rvalue = reshape(rvalue, [1, width * height])
+                self.image.setRGB(0, 0, width, height, rvalue[0], 0, width)
+                g.drawImage( self.image, self.border_left, self.border_top, None)
+                
         elif dimension == 1: 
             g.color=Color(0.8,0.8,0.8)
             g.drawRect(self.border_left,self.border_top+self.label_offset,width,height)
