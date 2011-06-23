@@ -23,8 +23,8 @@ class FixedEvalPointGenerator(VectorGenerator,Serializable):
         self.points=points
         
     def genVectors(self,number,dimensions):        
-        points=[]
-        while len(points)<number:
-            points.extend(self.points)
-        return points[:number]
-
+        # points=[]
+        # while len(points)<number:
+            # points.extend(self.points)
+        # return points[:number]
+        return  self.points
