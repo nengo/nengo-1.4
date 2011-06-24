@@ -1,6 +1,6 @@
 import nef
 
-net=nef.Network('Nonlinear Functions')
+net=nef.Network('Nonlinear Functions (pre-built)')
 
 inputX=net.make_input('input X',[0])
 X=net.make('X',100,1)

@@ -1,6 +1,6 @@
 import nef
 
-net=nef.Network('Scalar Addition')
+net=nef.Network('Scalar Addition (pre-built)')
 inputA=net.make_input('inputA',[0])
 inputB=net.make_input('inputB',[0])
 A=net.make('A',100,1,quick=True)

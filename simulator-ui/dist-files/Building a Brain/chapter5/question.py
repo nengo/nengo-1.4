@@ -13,7 +13,7 @@ random.seed(seed)
 
 vocab=hrr.Vocabulary(D,max_similarity=0.1)
 
-net=nef.Network('Question Answering')
+net=nef.Network('Question Answering (pre-built)')
 A=net.make('A',1,D,mode='direct')
 B=net.make('B',1,D,mode='direct')
 C=net.make('C',1,D,mode='direct')

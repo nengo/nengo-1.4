@@ -13,7 +13,7 @@ random.seed(seed)
 
 vocab=hrr.Vocabulary(D,max_similarity=0.1)
 
-net=nef.Network('Question Answering with Memory')
+net=nef.Network('Question Answering with Memory (pre-built)')
 A=net.make('A',1,D,mode='direct')
 B=net.make('B',1,D,mode='direct')
 Memory=net.make_array('Memory',N,D/subdim,dimensions=subdim,quick=True,radius=1.0/math.sqrt(D),storage_code='%d')

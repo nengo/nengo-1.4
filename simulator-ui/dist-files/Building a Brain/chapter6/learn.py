@@ -10,7 +10,7 @@ from ca.nengo.model.impl import FunctionInput
 from ca.nengo.model import Units
 
 
-net=nef.Network('Learning')
+net=nef.Network('Learning (pre-built)')
 
 # Create input and output populations.
 A=net.make('pre',N,D)

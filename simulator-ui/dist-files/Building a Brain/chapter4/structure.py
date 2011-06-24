@@ -8,7 +8,7 @@ vocab=hrr.Vocabulary(D, include_pairs=True)
 vocab.parse('a+b+c+d+e')
 
 # Binding
-net=nef.Network('Structured Representation')
+net=nef.Network('Structured Representation (pre-built)')
 A=net.make('A',300,D, quick=True)
 B=net.make('B',300,D, quick=True)
 C=net.make('C',300,D, quick=True)
