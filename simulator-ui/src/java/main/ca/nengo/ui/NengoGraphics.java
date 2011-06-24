@@ -245,6 +245,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 				 * because the network has already been destroyed and no longer
 				 * has a reference to it's model.
 				 */
+			
 			}
 
 		});
@@ -641,6 +642,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 	}
 
 	public WorldObject getSelectedObj() {
+		// check to make sure the object is still in the world before claiming it's still connected
+		if ((selectedObj!=null) && (!selectedObj.isAncestorOf(getWorld().getGround()))) {
+			selectedObj=null;
+		}
 		return selectedObj;
 	}
 	
