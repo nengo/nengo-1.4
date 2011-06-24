@@ -97,9 +97,19 @@ class SPA:
         self.sink_modules[sink_name].net.network.exposeTermination(t,termination_name)
         self.net.network.addProjection(o,self.sink_modules[sink_name].net.network.getTermination(termination_name))
         
+    def getModuleOrigin(self, module, origin_name):
+        if( isinstance(module, str) ):
+            module_name = module
+        else:
+            module_name = module.name
+        return self.modules[module_name].net.network.getOrigin(origin_name)
         
-        
-            
+    def getModuleTermination(self, module, term_name):
+        if( isinstance(module, str) ):
+            module_name = module
+        else:
+            module_name = module.name
+        return self.modules[module_name].net.network.getTermination(term_name)
         
 
 """

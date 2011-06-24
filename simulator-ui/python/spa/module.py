@@ -53,3 +53,8 @@ class Module:
         self.spa.connect_to_sink(self.net.network.getOrigin(origin.name),origin.name,
                                  transform,pstc)
         
+    def exposeTermination(self, term, name):
+        self.net.network.exposeTermination(term, name)
+    
+    def exposeOrigin(self, origin, name):
+        self.net.network.exposeOrigin(origin, name)

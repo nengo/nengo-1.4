@@ -83,6 +83,11 @@ class Network:
         self.network.addNode(node)
         return node
 
+    def get(self,name):
+        """Returns the node with <name> from the network
+        """
+        return self.network.getNode(name)
+
     def make_array(self,name,neurons,length,dimensions=1,**args):
         """Create and return an array of ensembles.  All of the parameters
         from Network.make() can be
