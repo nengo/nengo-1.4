@@ -7,8 +7,7 @@ params=[
     ('N_err', 'Number of neurons in error ensemble',int),
     ('preName','Name of pre ensemble',str),
     ('postName','Name of post ensemble',str),
-    ('rate','Learning rate',float),
-    ('stdp','Use STDP?',bool),
+    ('rate','Learning rate',float)
     ]
 
 def test_params(net,p):
@@ -34,7 +33,7 @@ from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFu
 import nef
 import numeric
     
-def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-7, stdp=False):
+def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-7):
 
     # get pre and post ensembles from their names
     pre = net.network.getNode(preName)
@@ -71,5 +70,5 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     net.connect(pre.getOrigin('AXON'),post.getTermination(prename))
 
     # Set learning rule on the non-decoded termination
-    net.learn(post,prename,modname,rate=rate,stdp=stdp)
+    net.learn(post,prename,modname,rate=rate,stdp=False)
     

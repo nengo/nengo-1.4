@@ -22,7 +22,7 @@ net.add(input)
 net.connect(input,A)
 
 # Create a modulated connection between the 'pre' and 'post' ensembles.
-learning.make(net,errName='error', N_err=100, preName='pre', postName='post', rate=5e-7, stdp=False)
+learning.make(net,errName='error', N_err=100, preName='pre', postName='post', rate=5e-7)
 
 # Set the modulatory signal.
 net.connect('pre', 'error')
