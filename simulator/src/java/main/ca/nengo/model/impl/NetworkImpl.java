@@ -295,6 +295,25 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		return myNodeMap.get(name);
 	}
 
+	public int getNodeCount(){
+		return getNodes().length;
+	}
+	
+	public float getNeuronCount(){
+		float neuron_count = 0;
+		Node[] nodes = getNodes();
+		
+		for(int i = 0; i < nodes.length; i++)
+		{
+			if(nodes[i] instanceof NetworkImpl)
+				neuron_count += ((NetworkImpl)nodes[i]).getNeuronCount();
+			else if(nodes[i] instanceof NEFEnsembleImpl)
+				neuron_count += ((NEFEnsembleImpl)nodes[i]).getNeuronCount();
+		}
+		
+		return neuron_count;
+	}
+		
 	/**
 	 * @see ca.nengo.model.Network#removeNode(java.lang.String)
 	 */

@@ -751,6 +751,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public int getNodeCount() {
 		return getNodes().length;
 	}
+	public int getNeuronCount() {
+		return getNodes().length;
+	}
 	public void setNodeCount(int n) throws StructuralException {
 		if (myEnsembleFactory==null) {
 			throw new StructuralException("Error changing node count: EnsembleFactory has not been set");
