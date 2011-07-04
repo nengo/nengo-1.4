@@ -44,7 +44,8 @@ public class UserTemplateConfigurer extends UserConfigurer {
 	/**
 	 * Name of the default template
 	 */
-	public static final String DEFAULT_TEMPLATE_NAME = "last_used";
+	public static final String DEFAULT_TEMPLATE_NAME = "default";
+	public static final String PREFERRED_TEMPLATE_NAME = "last_used";
 
 	private boolean isTemplateEditable;
 

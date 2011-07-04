@@ -78,13 +78,28 @@ public class ConfigTemplateDialog extends ConfigDialog {
 			templateList.setSelectedItem(null);
 		} else {
 			/*
-			 * Selects the default template
+			 * Selects the last used template
 			 */
+			boolean foundTemplate = false;
 			for (int i = 0; i < templateList.getItemCount(); i++) {
 				if (templateList.getItemAt(i).toString().compareTo(
-						UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME) == 0) {
+						UserTemplateConfigurer.PREFERRED_TEMPLATE_NAME) == 0) {
 					templateList.setSelectedIndex(i);
+					foundTemplate = true;
 					break;
+				}
+			}
+			
+			/*
+			 * Failing that, selects the default template
+			 */
+			if (!foundTemplate){
+				for (int i = 0; i < templateList.getItemCount(); i++) {
+					if (templateList.getItemAt(i).toString().compareTo(
+							UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME) == 0) {
+						templateList.setSelectedIndex(i);
+						break;
+					}
 				}
 			}
 
@@ -96,7 +111,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
 	protected void completeConfiguration() throws ConfigException {
 		super.completeConfiguration();
 
-		getConfigurer().savePropertiesFile(UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME);
+		getConfigurer().savePropertiesFile(UserTemplateConfigurer.PREFERRED_TEMPLATE_NAME);
 
 	}
 
