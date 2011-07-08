@@ -6,3 +6,4 @@ import convolution
 from nef_core import Network
 from simplenode import SimpleNode
 from fsmnode import FSMNode, DelayedFSMNode
+from wtfnode import WriteToFileNode

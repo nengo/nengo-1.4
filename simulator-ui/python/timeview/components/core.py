@@ -51,11 +51,11 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         self.label = label
         self.label_offset = 0
         if self.label is not None:
+            self.show_label=True
             self.popup.add(JPopupMenu.Separator())
             self.popup_label=JCheckBoxMenuItem('label',self.show_label,actionPerformed=self.toggle_label)
             self.popup.add(self.popup_label)
             self.label_height = 15
-            self.show_label=True
             self.update_label()
         else:
             self.label_height = 0
