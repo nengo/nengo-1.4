@@ -250,7 +250,8 @@ class RoomWatch:
             ]
 
 nodeWatch=NodeWatch()
-watches=[RoomWatch(),nodeWatch,EnsembleWatch(),FunctionWatch(),HRRWatch(),ArrayWatch()]
+ensembleWatch=EnsembleWatch()
+watches=[RoomWatch(),nodeWatch,ensembleWatch,FunctionWatch(),HRRWatch(),ArrayWatch()]
 
 
 import math
