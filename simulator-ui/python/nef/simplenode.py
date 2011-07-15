@@ -45,7 +45,7 @@ class SimpleTermination(Termination):
 
     def reset(self):
         self._values = [0] * self._dimensions
-        self._filtered_values = [0] * dimensions
+        self._filtered_values = [0] * self._dimensions
 
     def run(self,start,end):
         dt=end-start
