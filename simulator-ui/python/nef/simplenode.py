@@ -43,6 +43,10 @@ class SimpleTermination(Termination):
     def getOutput(self):
         return self._values
 
+    def reset(self):
+        self._values = [0] * self._dimensions
+        self._filtered_values = [0] * dimensions
+
     def run(self,start,end):
         dt=end-start
         v=self.getOutput()
@@ -96,7 +100,8 @@ class SimpleNode(Node,Probeable):
         
         
     def reset(self,randomize=False):
-        pass
+        for termination in self.getTerminations():
+            termination.reset()
         
     def getName(self):
         return self._name
