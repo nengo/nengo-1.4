@@ -16,9 +16,13 @@ class WriteToFileNode(nef.SimpleNode):
     # - delimiter:     delimiter to use for the output file (default "," for csv format)
     # - delim_replace: replacement string for characters already using the delimiter 
     #                  (e.g. array output is [1,2,3] ==> [1;2;3])
+    # - overwrite:     option to overwrite the output file. If set to False, node will append to 
+    #                  existing file
+    # - def_pstc:      default pstc to use for the terminations
     #
     def __init__(self, name, filename, network = None, vocab = None, log_interval = 0.1, start = 0, \
-                 stop = 1e3000, delimiter = ',', delim_replace = ";", overwrite = False):
+                 stop = 1e3000, delimiter = ',', delim_replace = ";", overwrite = False, \
+                 def_pstc = 0.001):
          
         self.epsilon = 0.0000000000001 # Minimum value for output (values smaller than this will 
                                        # be regarded as 0)
@@ -43,6 +47,8 @@ class WriteToFileNode(nef.SimpleNode):
         self.message_list = dict()
 
         self.overwrite = overwrite
+        self.def_pstc = def_pstc
+
         nef.SimpleNode.__init__(self, name)
 
         # Handle difference between nef.Network and regular ca.nengo.model.Network classes
@@ -68,7 +74,7 @@ class WriteToFileNode(nef.SimpleNode):
         for i,timestamp in enumerate(timestamps):
             self.message_list[timestamp] = messages[i]
     
-    def addValueTermination(self, name, origin = "X", pstc = 0.001):
+    def addValueTermination(self, name, origin = "X", pstc = None):
         ## addValueTermination - Adds a termination to the writeToFileNode to handle regular value 
         #                        (array type) outputs
         # Parameters: There are two modes of operation 
@@ -83,8 +89,10 @@ class WriteToFileNode(nef.SimpleNode):
         # NOTE: All projections will be made automatically if default network is specified in 
         #       constructor
         #
-        # - pstc: Termination pstc
+        # - pstc: Termination pstc (if set to None, will use default)
         #
+        if( pstc is None ):
+            pstc = self.def_pstc
         if( isinstance(origin, str) ):
             if( self.network is None ):
                 raise TypeError("WriteToFileNode.addValueTermination - Network not specified: " + \
@@ -106,7 +114,7 @@ class WriteToFileNode(nef.SimpleNode):
             self.network.addProjection(origin, self.getTermination(name))            
 
     def addVocabTermination(self, name, origin = "X", vocab = None, vocab_strs = [], threshold = 0.3, \
-                            pstc = 0.001):
+                            pstc = None):
         ## addVocabTermination - Adds a termination to the writeToFileNode to handle vocab outputs
         #                        (similar to the vocab graphs in interactive mode)
         # Parameters: The two modes of operation from addValueTermination apply here too
@@ -115,6 +123,8 @@ class WriteToFileNode(nef.SimpleNode):
         #               all the string in the vocabulary)
         # - threshold:  cutoff threshold for dot product comparison
         #
+        if( pstc is None ):
+            pstc = self.def_pstc
         if( isinstance(origin, str) ):
             if( self.network is None ):
                 raise TypeError("WriteToFileNode.addValueTermination - Network not specified: " + \
