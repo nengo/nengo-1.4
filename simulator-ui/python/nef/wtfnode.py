@@ -18,11 +18,11 @@ class WriteToFileNode(nef.SimpleNode):
     #                  (e.g. array output is [1,2,3] ==> [1;2;3])
     # - overwrite:     option to overwrite the output file. If set to False, node will append to 
     #                  existing file
-    # - def_pstc:      default pstc to use for the terminations
+    # - pstc:          default pstc to use for the terminations
     #
     def __init__(self, name, filename, network = None, vocab = None, log_interval = 0.1, start = 0, \
                  stop = 1e3000, delimiter = ',', delim_replace = ";", overwrite = False, \
-                 def_pstc = 0.001):
+                 pstc = 0.001):
          
         self.epsilon = 0.0000000000001 # Minimum value for output (values smaller than this will 
                                        # be regarded as 0)
