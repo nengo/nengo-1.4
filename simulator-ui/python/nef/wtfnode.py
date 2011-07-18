@@ -47,7 +47,7 @@ class WriteToFileNode(nef.SimpleNode):
         self.message_list = dict()
 
         self.overwrite = overwrite
-        self.def_pstc = def_pstc
+        self.def_pstc = pstc
 
         nef.SimpleNode.__init__(self, name)
 
