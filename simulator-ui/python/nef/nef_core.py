@@ -549,6 +549,14 @@ class Network:
         
         array.setPlasticityRule(learn_term,mod_term,rate,stdp,**kwargs)
 
+
+    def releaseMemory(self):
+        for node in self.network.getNodes():
+            try:
+                node.releaseMemory()
+            except Exception:
+                pass
+
 def test():
     net=Network('Test')
     m=net.compute_transform(3,3,weight=1)
