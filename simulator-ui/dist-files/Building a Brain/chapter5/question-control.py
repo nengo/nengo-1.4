@@ -44,16 +44,47 @@ net.network.addProjection(visual.getOrigin('X'), bg.getTermination('rule_00'))
 net.network.addProjection(visual.getOrigin('X'), bg.getTermination('rule_01'))
 
 # Create the thalamus network to process the output from the basal ganglia
-thalamus = net.make_array('Thalamus', N, 2, quick=True, intercept=(0, 1), encoders=[[1]])
+thalamus = net.make_array('Thalamus', N, 2, quick=True, intercept=(-1, 0), encoders=[[1]])
 thalamus.addDecodedTermination('bg',[[-3, 0], [0, -3]],0.01,False)
 net.network.addProjection(bg.getOrigin('output'), thalamus.getTermination('bg'))
-bias = net.make_input('bias',[1.0])
-net.connect(bias, thalamus)
+def xBiased(x):
+        return [x[0]+1]
 
 # Add gating signals to control memory acquisition and motor output
 gating.make(net,name='Gate1', gated='Channel', neurons=100 ,pstc=0.01)
 gating.make(net,name='Gate2', gated='Motor', neurons=100 ,pstc=0.01)
-net.connect(thalamus, 'Gate1', index_pre=0)
-net.connect(thalamus, 'Gate2', index_pre=1)
+net.connect(thalamus, 'Gate1', index_pre=0, func=xBiased)
+net.connect(thalamus, 'Gate2', index_pre=1, func=xBiased)
+
+# Automatic inputs
+class Input(nef.SimpleNode):
+    def __init__(self,name):
+        self.zero=[0]*D
+        nef.SimpleNode.__init__(self,name)
+        self.v1=vocab.parse('STATEMENT+RED*CIRCLE').v
+        self.v2=vocab.parse('STATEMENT+BLUE*SQUARE').v
+        self.v3=vocab.parse('QUESTION+RED').v
+        self.v4=vocab.parse('QUESTION+SQUARE').v
+    def origin_x(self):
+        t=self.t_start
+        if t<0.5:
+          if 0.1<self.t_start<0.3:
+            return self.v1
+          elif 0.35<self.t_start<0.5:
+            return self.v2
+          else:
+            return self.zero
+        else:
+          t=(t-0.5)%0.6
+          if 0.2<t<0.4:
+            return self.v3
+          elif 0.4<t<0.6:
+            return self.v4            
+          else:
+            return self.zero
+        
+input=Input('Input')
+net.add(input)
+net.connect(input.getOrigin('x'), visual)
 
 net.add_to(world)
