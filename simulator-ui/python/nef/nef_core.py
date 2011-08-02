@@ -342,6 +342,16 @@ class Network:
         if isinstance(post,str):
             post=self.network.getNode(post)
 
+        # Check if pre and post are set if projection is to be created
+        if( create_projection ):
+            msg_str = ""
+            if( pre is None ):
+                msg_str += "(pre is not defined)"
+            if( post is None ):
+                msg_str += "(post is not defined)"
+            if( len( msg_str ) > 0 ):
+                raise Exception("nef_core.connect create_projection - " + msg_str)
+
         # determine the origin and its dimensions
         origin=self._parse_pre(pre,func,origin_name)
         dim_pre=origin.dimensions
