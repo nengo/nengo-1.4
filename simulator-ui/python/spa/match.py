@@ -8,7 +8,7 @@ class Match(spa.module.Module):
     def __init__(self,bg,**params):
         spa.module.Module.__init__(self,**params)
         self.bg=bg
-    def create(self,match_neurons=100,pstc_match=0.005):
+    def create(self,match_neurons=150,pstc_match=0.005):
         self.bg=self.spa.modules[self.bg.name]
     def connect(self):
         self.bg.rules.initialize(self.spa)
