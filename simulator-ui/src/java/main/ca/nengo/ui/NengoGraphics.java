@@ -643,8 +643,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 	public WorldObject getSelectedObj() {
 		// check to make sure the object is still in the world before claiming it's still connected
-		if ((selectedObj!=null) && (!selectedObj.isAncestorOf(getWorld().getGround()))) {
-			selectedObj=null;
+		if (selectedObj!=null) {
+			if (selectedObj.isDestroyed()) {
+				selectedObj=null;
+			}
 		}
 		return selectedObj;
 	}
