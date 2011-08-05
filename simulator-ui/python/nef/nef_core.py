@@ -1,26 +1,3 @@
-"""
-Wrapper module for simplifying the creation of Nengo models via Jython.
-
-This system is meant to allow short, concise code to create Nengo models.  The
-goal is not to add functionality to Nengo, but rather to simplify the
-syntax for common use cases.
-
-For example, we can make a communication channel like this:
-
-    import nef
-    net=nef.network('Test Network')
-    input=net.make_input('input',values=[0])
-    A=net.make('A',neurons=100,dimensions=1)
-    B=net.make('B',neurons=100,dimensions=1)
-    net.connect(input,A)
-    net.connect(A,B)
-    net.add_to(world)
-
-The system will automatically create the necessary origins, terminations,
-ensemble factories, and so on.
-
-"""
-
 from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput
 from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
@@ -34,75 +11,48 @@ from ca.nengo.math import Function
 from ca.nengo.model import StructuralException
 from ca.nengo.io import FileManager
 import java
+import warnings
 
 import pdfs
 import generators
 import functions
 import array
-
-import timeview
+    
 
 class Network:
-    """Wraps a Nengo network with a set of helper functions."""
+    """Wraps a Nengo network with a set of helper functions for simplifying the creation of Nengo models.
+
+    This system is meant to allow short, concise code to create Nengo models. For example, we can make a
+    communication channel like this::
+
+        import nef
+        net=nef.Network('Test Network')
+        input=net.make_input('input',values=[0])
+        A=net.make('A',neurons=100,dimensions=1)
+        B=net.make('B',neurons=100,dimensions=1)
+        net.connect(input,A)
+        net.connect(A,B)
+        net.add_to(world)
+
+    This will automatically create the necessary origins, terminations,
+    ensemble factories, and so on needed to create this network.
+    """
+    
     serialVersionUID=1
     def __init__(self,name,quick=False):
+        """
+        :param name: If a string, create and wrap a new NetworkImpl with the given *name*.  
+                    If an existing NetworkImpl, then create a wrapper around that network.
+        :type name: string or NetworkImpl
+        :param boolean quick: Default setting for the *quick* parameter in :func:`Network.make()`
+        """
         if isinstance(name,NetworkImpl):
             self.network=name
         else:
             self.network=NetworkImpl()
             self.network.name=name
         self.defaults=dict(quick=quick)
-
-    def add_to(self,world=None):
-        """Add the network to the given Nengo world object.  If there is a
-        network with that name already there, remove the old one.  If world is
-        None, it will attempt to find a running version of Nengo to add to.
-        """
-
-        if world is None:
-            import ca.nengo.ui.NengoGraphics
-            ng=ca.nengo.ui.NengoGraphics.getInstance()
-            world=ca.nengo.ui.util.ScriptWorldWrapper(ng)
-        if world is None: return
-
         
-        n=world.getNode(self.network.name)
-        if n is not None: world.remove(n)
-        world.add(self.network)
-
-    def view(self,play=False):
-        timeview.View(self.network,play=play)
-        
-
-    def add(self,node):
-        """Add the node to the network.
-
-        This is only used for manually created nodes, not FunctionInputs or
-        NEFEnsembles.
-        """
-        self.network.addNode(node)
-        return node
-
-    def get(self,name):
-        """Returns the node with <name> from the network
-        """
-        return self.network.getNode(name)
-
-    def make_array(self,name,neurons,length,dimensions=1,**args):
-        """Create and return an array of ensembles.  All of the parameters
-        from Network.make() can be
-        used."""
-        nodes=[]
-        storage_code=args.get('storage_code','')
-        for i in range(length):
-            if '%' in storage_code: args['storage_code']=storage_code%i
-            n=self.make('%d'%i,neurons,dimensions,add_to_network=False,**args)
-            nodes.append(n)
-        ensemble=array.NetworkArray(name,nodes)
-        self.network.addNode(ensemble)
-        ensemble.mode=ensemble.nodes[0].mode
-        return ensemble
-
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
                   max_rate=(200,400),intercept=(-1,1),
@@ -113,22 +63,37 @@ class Network:
                   mode='spike',add_to_network=True,
                   node_factory=None,
                   quick=None,storage_code=''):
-        """Create and return an ensemble of LIF neurons.
+        """Create and return an ensemble of neurons.
 
-        Keyword arguments:
-        tau_rc -- membrane time constant
-        tau_ref -- refractory period
-        max_rate -- range for uniform selection of maximum firing rate in Hz (as a 2-tuple)
-                    or a list of maximum rate values to use
-        intercept -- normalized range for uniform selection of tuning curve x-intercept (as 2-tuple)
-                     or a list of intercept values to use
-        radius -- representational range
-        encoders -- list of encoder vectors to use (if None, uniform distribution around unit sphere)
-        decoder_noise -- amount of noise to assume when calculating decoders
-        eval_points -- list of points within unit sphere to do optimization over
-        noise -- current noise to inject, chosen uniformly from (-noise,noise)
-        noise_frequency -- sampling rate (how quickly the noise changes)
-        mode -- simulation mode ('direct', 'rate', or 'spike')
+        :param string name:          name of the ensemble (must be unique)
+        :param integer neurons:       number of neurons in the ensemble
+        :param integer dimensions:    number of dimensions to represent
+        :param float tau_rc:        membrane time constant
+        :param float tau_ref:       refractory period
+        :param max_rate:      range for uniform selection of maximum firing rate in Hz (as a 2-tuple)
+                               or a list of maximum rate values to use
+        :type max_rate:          tuple or list                       
+        :param intercept:     normalized range for uniform selection of tuning curve x-intercept (as 2-tuple)
+                               or a list of intercept values to use                          
+        :type intercept:          tuple or list                       
+        :param float radius:        representational range        
+        :param list encoders:      list of encoder vectors to use (if None, uniform distribution around unit sphere).
+                               The provided encoders will be automatically normalized to unit length.                                
+        :param float decoder_noise: amount of noise to assume when calculating decoders
+        :param list eval_points:   list of points to do optimization over
+        :param float noise:         current noise to inject, chosen uniformly from (-noise,noise)
+        :param float noise_frequency: sampling rate (how quickly the noise changes)
+        :param string mode:          simulation mode ('direct', 'rate', or 'spike')
+        :param boolean add_to_network: flag to indicate if created ensemble should be added to the network
+        :param ca.nengo.model.impl.NodeFactory node_factory:  a factory to use instead of the default LIF factory
+                               (for creating ensembles with neurons other than LIF)
+        :param quick:         if True, saves data from a created ensemble and will re-use it in the future
+                               when creating an ensemble with the same parameters as this one.  If None,
+                               uses the Network default setting.                               
+        :type quick:          boolean or None                       
+        :param string storage_code:  an extra parameter to allow different quick files even if all other parameters
+                                     are the same
+        :returns: the newly created ensemble                             
         """
         if quick is None: quick=self.defaults['quick']
         if quick:
@@ -192,15 +157,63 @@ class Network:
         if add_to_network: self.network.addNode(n)
         return n
 
-    def make_input(self,name,values,zero_after_time=None):
-        """Create and return a FunctionInput of dimensionality len(values)
-        with those values as its constants.  Python functions can be provided
-        instead of values (either as a single function that returns a value or
-        array of values, or an array of functions).
+    def make_array(self,name,neurons,length,dimensions=1,**args):
+        """Create and return an array of ensembles.  This acts like a high-dimensional ensemble,
+        but actually consists of many sub-ensembles, each one representing a separate dimension.
+        This tends to be much faster to create and can be more accurate than having one huge
+        high-dimensional ensemble.  However, since the neurons represent different dimensions
+        separately, we cannot compute nonlinear interactions between those dimensions.
+        
+        .. note::
+           When forming neural connections from an array to another ensemble (or another array),
+           any specified function to be computed with be computed on each ensemble individually
+           (with the results concatenated together).  For example, the following code creates
+           an array and then computes the sum of the squares of each value within it::
+           
+             net=nef.Network('Squaring Array')
+             input=net.make_input('input',[0,0,0,0,0])
+             A=net.make_array('A',neurons=100,length=5)
+             B=net.make('B',neurons=100,dimensions=1)
+             net.connect(input,A)
+             def square(x):
+               return x[0]*x[0]
+             net.connect(A,B,transform=[1,1,1,1,1],func=square)
+                
+        All of the parameters from :py:func:`Network.make()` can also be used.        
 
-        Keyword arguments:
-        zero_after_time -- sets constant values to zero after this
-                           amount of time has elapsed
+        :param string name:           name of the ensemble array (must be unique)
+        :param integer neurons:       number of neurons in the ensemble
+        :param integer length:        number of ensembles in the array
+        :param integer dimensions:    number of dimensions each ensemble represents       
+        :returns: the newly created ensemble array                             
+        """
+        nodes=[]
+        storage_code=args.get('storage_code','')
+        for i in range(length):
+            if '%' in storage_code: args['storage_code']=storage_code%i
+            n=self.make('%d'%i,neurons,dimensions,add_to_network=False,**args)
+            nodes.append(n)
+        ensemble=array.NetworkArray(name,nodes)
+        self.network.addNode(ensemble)
+        ensemble.mode=ensemble.nodes[0].mode
+        return ensemble
+
+    def make_input(self,name,values,zero_after_time=None):
+        """Create and return a FunctionInput of dimensionality ``len(values)``
+        with *values* as its constants.  Python functions can be provided
+        instead of fixed values.
+
+        :param string name: name of created node
+        :param values: numerical values for the function.  If a list, can contain a mixture of
+                       floats and functions (floats are fixed input values, and functions are
+                       called with the current time and must return a single float).  If values
+                       is a function, will be called with the current time and can return either 
+                       a single float or a list of floats.
+        :type values: list or function
+        :param zero_after_time: if not None, any fixed input value will change to 0 after this
+                                amount of time
+        :type zero_after_time: float or None                         
+        :returns: the created FunctionInput       
         """
 
         funcs=[]
@@ -270,18 +283,27 @@ class Network:
 
     def compute_transform(self,dim_pre,dim_post,
                           weight=1,index_pre=None,index_post=None):
-        """Create a dim_pre x dim_post matrix.  All values are either 0 or
-        weight.  index_pre and index_post are used to determine which
-        values are non-zero, and indicate which dimensions of the pre-synaptic
-        neuron should be routed to which dimensions of the post-synaptic.
+        """Helper function used by :func:`Network.connect()` to create a 
+        *dim_pre* by *dim_post* matrix.   All values are either 0 or *weight*.  
+        *index_pre* and *index_post* are used to determine which values are 
+        non-zero, and indicate which dimensions of the pre-synaptic ensemble 
+        should be routed to which dimensions of the post-synaptic ensemble.
 
-        For example, with dim_pre=2 and dim_post=3:
-        index_pre=[0,1],index_post=[0,1] means "take the first two dimensions
-        of pre and send them to the first two dimensions of post, giving
-        [[1,0],[0,1],[0,0]]
-        If an index is ommitted, the full range [0,1,2,...,N] is assumed,
-        so the above example could just be index_post=[0,1]
-
+        For example, with ``dim_pre=2`` and ``dim_post=3``, 
+        ``index_pre=[0,1],index_post=[0,1]`` means to take the first two dimensions
+        of pre and send them to the first two dimensions of post, giving a
+        transform matrix of ``[[1,0],[0,1],[0,0]]``
+        If an index is None, the full range [0,1,2,...,N] is assumed,
+        so the above example could just be ``index_post=[0,1]``
+        
+        :param integer dim_pre: first dimension of transform matrix
+        :param integer dim_post: second dimension of transform matrix
+        :param float weight: the non-zero value to put into the matrix
+        :param index_pre: the indexes of the pre-synaptic dimensions to use
+        :type index_pre: list of integers or a single integer
+        :param index_post: the indexes of the post-synaptic dimensions to use
+        :type index_post: list of integers or a single integer
+        :returns: a two-dimensional transform matrix performing the requested routing        
         """
         t=[[0]*dim_pre for i in range(dim_post)]
         if index_pre is None: index_pre=range(dim_pre)
@@ -301,40 +323,113 @@ class Network:
                 modulatory=False,plastic_array=False,create_projection=True):
         """Connect two nodes in the network.
 
-        pre and post can be strings giving the names of the nodes, or they
+        *pre* and *post* can be strings giving the names of the nodes, or they
         can be the nodes themselves (FunctionInputs and NEFEnsembles are
         supported).  They can also be actual Origins or Terminations, or any
-        combinaton of the above. If post is set to an integer or None, an origin
-        will be created on the pre population, but no other action will be taken.
+        combinaton of the above. If *post* is set to an integer or None, an origin
+        will be created on the *pre* population, but no other action will be taken.
 
         pstc is the post-synaptic time constant of the new Termination
 
         If transform is not None, it is used as the transformation matrix for
-        the new termination.  You can also use weight, index_pre, and index_post
-        to define a transformation matrix instead.  weight gives the value,
-        and index_pre and index_post identify which dimensions to connect (see
-        compute_transform for more details).  For example,
+        the new termination.  You can also use *weight*, *index_pre*, and *index_post*
+        to define a transformation matrix instead.  *weight* gives the value,
+        and *index_pre* and *index_post* identify which dimensions to connect (see
+        :func:`Network.compute_transform()` for more details).  For example::
+        
             net.connect(A,B,weight=5)
-        with both A and B as 2-dimensional ensembles, will use [[5,0],[0,5]] as
-        the transform.  Also, you can do
+            
+        with both A and B as 2-dimensional ensembles, will use ``[[5,0],[0,5]]`` as
+        the transform.  Also, you can do::
+        
             net.connect(A,B,index_pre=2,index_post=5)
-        to connect the 3rd element in A to the 6th in B.  You can also do
+            
+        to connect the 3rd element in A to the 6th in B.  You can also do::
+        
             net.connect(A,B,index_pre=[0,1,2],index_post=[5,6,7])
+            
         to connect multiple elements.
 
-        If func is not None, a new Origin will be created on the pre-synaptic
-        ensemble that will compute the provided function.  This must be an
-        N->1 function at the moment (a single output value, as many
-        input values as desired).  The name of this origin will taken from
-        the name of the function, or origin_name, if provided.  If an
-        origin with that name already exists, it will be used, rather than
-        creating a new one.
+        If *func* is not None, a new Origin will be created on the pre-synaptic
+        ensemble that will compute the provided function.  The name of this origin 
+        will taken from the name of the function, or *origin_name*, if provided.  If an
+        origin with that name already exists, the existing origin will be used 
+        rather than creating a new one.
 
-        If weight_func is not None, the connection will be made using a
-        synaptic connection weight matric rather than a DecodedOrigin and
+        If *weight_func* is not None, the connection will be made using a
+        synaptic connection weight matrix rather than a DecodedOrigin and
         a Decoded Termination.  The computed weight matrix will be passed
         to the provided function, which is then free to modify any values in
-        that matrix, returning a new one that will actually be used.
+        that matrix, returning a new one that will actually be used.  This
+        allows for direct control over the connection weights, rather than
+        just using the once computed via the NEF methods.
+        
+        :param pre: The item to connect from.  Can be a string (the name of the
+                    ensemble), an Ensemble (made via :func:`Network.make()`),
+                    an array of Ensembles (made via :func:`Network.make_array()`),
+                    a FunctionInput (made via :func:`Network.make_input()`), or
+                    an Origin.
+        :param post: The item to connect to.  Can be a string (the name of the
+                    ensemble), an Ensemble (made via :func:`Network.make()`),
+                    an array of Ensembles (made via :func:`Network.make_array()`),
+                    or a Termination.
+        :param transform: The linear transfom matrix to apply across the connection.
+                          If *transform* is T and *pre* represents ``x``, then the connection
+                          will cause *post* to represent ``Tx``.  Should be an N by M array,
+                          where N is the dimensionality of *pre* and M is the dimensionality of *post*,
+                          but a 1-dimensional array can be given if either N or M is 1.
+        :type transform: array of floats                              
+        :param float pstc: post-synaptic time constant for the neurotransmitter/receptor implementing
+                           this connection
+        :param float weight: scaling factor for a transformation defined with *index_pre* and *index_post*.
+                             Ignored if *transform* is not None.  See :func:`Network.compute_transform()`
+        :param index_pre: the indexes of the pre-synaptic dimensions to use.
+                             Ignored if *transform* is not None.  See :func:`Network.compute_transform()`
+        :type index_pre: list of integers or a single integer
+        :param index_post: the indexes of the post-synaptic dimensions to use.
+                             Ignored if *transform* is not None.  See :func:`Network.compute_transform()`
+        :type index_post: list of integers or a single integer
+        
+        :param function func: function to be computed by this connection.  If None, computes ``f(x)=x``.
+                              The function takes a single parameter x which is the current value of
+                              the *pre* ensemble, and must return wither a float or an array of floats.
+                              For example::
+                              
+                                def square(x):
+                                    return x[0]*x[0]
+                                net.connect(A,B,func=square)
+                                
+                                def powers(x):
+                                    return x[0],x[0]^2,x[0]^3
+                                net.connect(A,B,func=powers)
+                                
+                                def product(x):
+                                    return x[0]*x[1]
+                                net.connect(A,B,func=product)
+                                
+        :param string origin_name: The name of the origin to create to compute the given function.
+                                   Ignored if func is None.  If an origin with this name already
+                                   exists, the existing origin is used instead of creating a new one.
+        :param weight_func: if not None, converts the connection to use an explicit connection weight
+                            matrix between each neuron in the ensembles.  This is mathematically
+                            identical to the default method (which simply uses the stored encoders
+                            and decoders for the ensembles), but much slower, since we are no
+                            longer taking advantage of the factorable weight matrix.  However, using
+                            weight_func also allows explicit control over the individual connection
+                            weights, as the computed weight matrix is passed to *weight_func*, which
+                            can make changes to the matrix before returning it.
+        :type weight_func: function or None                         
+        
+        :param boolean modulatory: whether the created connection should be marked as modulatory,
+                                   meaning that it does not directly affect the input current
+                                   to the neurons, but instead may affect internal parameters
+                                   in the neuron model.
+        :param boolean plastic_array: configure the connection to be learnable.  See :func:`Network.learn()`.
+        :param boolean create_projection: flag to disable actual creation of the connection.  If False,
+                                          any needed Origin and/or Termination will be created, and the
+                                          return value will be the tuple ``(origin,termination)`` rather
+                                          than the created projection object.
+        :returns: the created Projection, or ``(origin,termination)`` if *create_projection* is False.                                          
         """
 
         if isinstance(pre,str):
@@ -428,35 +523,55 @@ class Network:
             return self.network.addProjection(origin,term)
     
     def learn(self,post,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
-        """Apply a learning rule to a termination of a population.
+        """Apply a learning rule to a termination of the *post* ensemble.
+        The *mod_term* termination will be used as an error signal
+        that modulates the changing connection weights of *learn_term*.
         
-        post can be either a string or an actual PlasticEnsemble.
-        It is the population whose termination will be learned.
+        :param post: the ensemble whose termination will be changing,
+                     or the name of this ensemble
+        :type post: string or Ensemble
         
-        learn_term can be either a string or a Termination. It
-        is the termination whose transformation will be modified
-        by the learning rule.
+        :param learn_term: the termination whose transform will be
+                           modified by the learning rule.  This termination must be
+                           created with plastic_array=True in :func:`Network.connect()`
+        :type learn_term: string or Termination
         
-        mod_term can be either a string or a Termination. It is
-        the modulatory input to the learning rule; while this
-        is technically not required by the plasticity functions
-        in Nengo, currently there are no learning rules implemented
-        that do not require modulatory input. If this changes,
-        this function should change to reflect that.
+        :param mod_term: the modulatory input to the learning rule; while this
+                         is technically not required by the plasticity functions
+                         in Nengo, currently there are no learning rules implemented
+                         that do not require modulatory input.
+        :type mod_term: string or Termination
         
-        rate is the learning rate that will be used in the learning
-        fuctions. (Possible enhancement: make this 2D for stdp
-        mode, different rates for in_fcn and out_fcn?)
+        :param float rate: the learning rate that will be used in the learning
+                            fuctions. 
+                            
+                            .. todo:: 
+                                     (Possible enhancement: make this 2D for stdp
+                                     mode, different rates for in_fcn and out_fcn)
+        :param boolean stdp: signifies whether to use the STDP
+                             based error-modulated learning rule. If True, then
+                             the SpikePlasticityRule will be used, and the *post*
+                             ensemble must be in DEFAULT (spiking) mode.
+                             If False, then the RealPlasticityRule will be used,
+                             and *post* can be either in RATE or DEFAULT mode.
+           
+        If *stdp* is True, a triplet-based spike-timinng-dependent plasticity rule
+        is used, based on that defined in::
+          
+           Pfister, J. and Gerstner, W. (2006) Triplets of Spikes in a Model of Spike 
+           Timing-Dependent Plasticity. J. Neurosci., 26: 9673 - 9682.
+           
+        The parameters for this learning rule have the following defaults, and can be
+        set as keyword arguments to this function call::
         
-        stdp is a boolean that signifies whether to use the STDP
-        based error-modulated learning rule. If it is True, then
-        the SpikePlasticityRule will be used, and the post
-        ensemble must be in DEFAULT (spiking) mode.
-        If it is False, then the RealPlasticityRule will be used,
-        and post can be either in RATE or DEFAULT mode.
+           (a2Minus=5.0e-3, a3Minus=5.0e-3, tauMinus=70, tauX=70,
+            a2Plus=5.0e-3,  a3Plus=5.0e-3, tauPlus=70, tauY=70)
+
+        If *stdp* is False, a rate-mode error minimizing learning rule is applied.
+        The only parameter available here is whether or not to include an oja
+        normalization term::
         
-        **kwargs are any addition arguments to be passed to the
-        error functions and/or plasticity rules.
+           (oja=True)
         """
         
         if isinstance(post,str):
@@ -518,36 +633,11 @@ class Network:
             post.setPlasticityRule(learn_term,rule)
 
     def learn_array(self,array,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
-        """Apply a learning rule to a termination of a NetworkArray.
+        """Apply a learning rule to a termination of a NetworkArray (an array of
+        ensembles, created using :func:`Network.make_array()`).
         
-        array is the NetworkArray to have learning applied to it.
-        The nodes contained within must all be PlasticEnsembleImpls.
-        Or a string with its name, either way.
+        See :func:`Network.learn()` for parameters.
         
-        learn_term can be either a string or a Termination. It
-        is the termination whose transformation will be modified
-        by the learning rule.
-        
-        mod_term can be either a string or a Termination. It is
-        the modulatory input to the learning rule; while this
-        is technically not required by the plasticity functions
-        in Nengo, currently there are no learning rules implemented
-        that do not require modulatory input. If this changes,
-        this function should change to reflect that.
-        
-        rate is the learning rate that will be used in the learning
-        fuctions. (Possible enhancement: make this 2D for stdp
-        mode, different rates for in_fcn and out_fcn?)
-        
-        stdp is a boolean that signifies whether to use the STDP
-        based error-modulated learning rule. If it is True, then
-        the SpikePlasticityRule will be used, and the post
-        ensemble must be in DEFAULT (spiking) mode.
-        If it is False, then the RealPlasticityRule will be used,
-        and post can be either in RATE or DEFAULT mode.
-        
-        kwargs are any additional arguments that should be passed
-        to the plasticity rule or error functions.
         """
 
         if isinstance(array,str):
@@ -560,12 +650,84 @@ class Network:
         array.setPlasticityRule(learn_term,mod_term,rate,stdp,**kwargs)
 
 
-    def releaseMemory(self):
+    def add_to_nengo(self):
+        """Add the network to the Nengo user interface.  If there is no user interface
+        (i.e. if Nengo is being run via the command line only interface ``nengo-cl``),
+        then do nothing.
+        """
+        
+        import ca.nengo.ui.NengoGraphics
+        ng=ca.nengo.ui.NengoGraphics.getInstance()
+        if ng is not None:
+            world=ca.nengo.ui.util.ScriptWorldWrapper(ng)
+            n=world.getNode(self.network.name)
+            if n is not None: world.remove(n)
+            world.add(self.network)
+
+    def add_to(self,world=None):
+        """Add the network to the given Nengo world object.  If there is a
+        network with that name already there, remove the old one.  If world is
+        None, it will attempt to find a running version of Nengo to add to.
+        
+        .. deprecated:: 1.3
+           Use :func:`Network.add_to_nengo()` instead.
+        """
+
+        warnings.warn("net.add_to(world) has been deprecated.  Use net.add_to_nengo() instead.")
+        if world is None:
+            import ca.nengo.ui.NengoGraphics
+            ng=ca.nengo.ui.NengoGraphics.getInstance()
+            if ng is not None:
+                world=ca.nengo.ui.util.ScriptWorldWrapper(ng)
+        if world is None: return
+
+        
+        n=world.getNode(self.network.name)
+        if n is not None: world.remove(n)
+        world.add(self.network)
+
+    def view(self,play=False):
+        """Creates the interactive mode viewer for running the network
+        
+        :param play: Automatically starts the simulation running, stopping after the given amount of time
+        :type play: False or float
+        """
+        import timeview  # moved this here to delay loading ui stuff until needed
+        timeview.View(self.network,play=play)
+        
+
+
+    def add(self,node):
+        """Add the node to the network.
+
+        This is generally only used for manually created nodes, not ones create by calling
+        :py:func:`Network.make()` or :py:func:`Network.make_input()` (as these are
+        automatically added.  A common usage is with :py:class:`SimpleNode` objects, as
+        in the following::
+
+          node=net.add(MyNode('name'))
+          
+        :param node: the node to be added
+        :returns: node  
+        """
+        self.network.addNode(node)
+        return node
+
+    def get(self,name):
+        """Return the node with the given *name* from the network
+        """
+        return self.network.getNode(name)
+
+    def release_memory(self):
+        """Attempt to release extra memory used by the Network.  Call only after all
+        connections are made."""
         for node in self.network.getNodes():
-            try:
+            if hasattr(node,'releaseMemory'):
                 node.releaseMemory()
-            except Exception:
-                pass
+                
+    def neuron_count(self):
+        """Return the total number of neurons in this network"""
+        return self.network.neuronCount
 
 def test():
     net=Network('Test')

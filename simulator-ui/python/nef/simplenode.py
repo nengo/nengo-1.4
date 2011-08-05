@@ -1,12 +1,12 @@
-from ca.nengo.model import *
-from ca.nengo.model.impl import *
-from ca.nengo.model.nef.impl import *
-from ca.nengo.model.neuron.impl import *
-from ca.nengo.math.impl import *
-from ca.nengo.util import *
-from ca.nengo.util.impl import *
-from ca.nengo.sim.impl import *
-from ca.nengo.sim import *
+from ca.nengo.model import Termination, Origin, Probeable, Node, SimulationMode
+from ca.nengo.model.impl import BasicOrigin, RealOutputImpl
+#from ca.nengo.model.nef.impl import *
+#from ca.nengo.model.neuron.impl import *
+#from ca.nengo.math.impl import *
+from ca.nengo.util import VisiblyMutableUtils
+#from ca.nengo.util.impl import *
+#from ca.nengo.sim.impl import *
+#from ca.nengo.sim import *
 import java
 import inspect
 
