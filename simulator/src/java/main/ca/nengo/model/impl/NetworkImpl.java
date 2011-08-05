@@ -299,8 +299,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		return getNodes().length;
 	}
 	
-	public float getNeuronCount(){
-		float neuron_count = 0;
+	public int getNeuronCount(){
+		int neuron_count = 0;
 		Node[] nodes = getNodes();
 		
 		for(int i = 0; i < nodes.length; i++)
