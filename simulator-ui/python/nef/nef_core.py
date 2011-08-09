@@ -95,6 +95,8 @@ class Network:
                                      are the same
         :returns: the newly created ensemble                             
         """
+        if( neurons == 0 ):
+            raise Exception("nef_core.make - Num neurons = 0")
         if quick is None: quick=self.defaults['quick']
         if quick:
             storage_name='quick_%s_%d_%d_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref)
@@ -145,6 +147,7 @@ class Network:
             r=radius
         else:
             r=[radius]*dimensions
+
         n=ef.make(name,neurons,r,storage_name,False)
         if noise is not None:
             for nn in n.nodes:
