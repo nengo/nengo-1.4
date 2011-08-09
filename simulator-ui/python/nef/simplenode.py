@@ -1,4 +1,4 @@
-from ca.nengo.model import Termination, Origin, Probeable, Node, SimulationMode
+from ca.nengo.model import Termination, Origin, Probeable, Node, SimulationMode, Units
 from ca.nengo.model.impl import BasicOrigin, RealOutputImpl
 #from ca.nengo.model.nef.impl import *
 #from ca.nengo.model.neuron.impl import *
