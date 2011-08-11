@@ -21,12 +21,28 @@ eg=-0.2
 le=0.2
 lg=0.2
 
-def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,input_transform=None,output_weight=1,noise=None,same_neurons=True,radius=1.5,learn=False):
+def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,input_transform=None,output_weight=1,noise=None,same_neurons=True,radius=1.5,learn=False,bistable=False):
         # create the necessary neural ensembles
         if same_neurons: code=''
         else: code='%d'
-        StrD1=net.make_array('StrD1',N,D,intercept=(e,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgStrD1'+code,radius=radius)
-        StrD2=net.make_array('StrD2',N,D,intercept=(e,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgStrD2'+code,radius=radius)
+        if bistable:
+            from ca.nengo.model.neuron.impl import GruberNeuronFactory
+            from ca.nengo.math.impl import IndicatorPDF
+            str_factory=GruberNeuronFactory(IndicatorPDF(1,3),IndicatorPDF(-3, 3))
+        else:
+            str_factory=None
+            
+        StrD1=net.make_array('StrD1',N,D,intercept=(e,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgStrD1'+code,radius=radius,node_factory=str_factory)
+        StrD2=net.make_array('StrD2',N,D,intercept=(e,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgStrD2'+code,radius=radius,node_factory=str_factory)
+        
+        if bistable:
+            from ca.nengo.model.impl import EnsembleTermination
+            dopD1 = EnsembleTermination(StrD1,'dopamine',[n.getTermination('dopamine') for n in StrD1.getNodes()])
+            StrD1.exposeTermination(dopD1,'dopamine')
+            dopD2 = EnsembleTermination(StrD2,'dopamine',[n.getTermination('dopamine') for n in StrD2.getNodes()])
+            StrD2.exposeTermination(dopD2,'dopamine')
+        
+        
         STN=net.make_array('STN',N,D,intercept=(ep,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgSTN'+code,radius=radius)
         GPi=net.make_array('GPi',N,D,intercept=(eg,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgGPi'+code,radius=radius)
         GPe=net.make_array('GPe',N,D,intercept=(ee,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgGPe'+code,radius=radius)
@@ -37,11 +53,11 @@ def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,in
         for i in range(len(input)):
             if input_transform is None:
                 net.connect(input[i],StrD1,weight=ws*(1+lg),pstc=tau_ampa,plastic_array=learn)
-                net.connect(input[i],StrD2,weight=ws*(1-lg),pstc=tau_ampa,plastic_array=learn)
+                net.connect(input[i],StrD2,weight=ws*(1-le),pstc=tau_ampa,plastic_array=learn)
                 net.connect(input[i],STN,weight=wt,pstc=tau_ampa)
             else:
                 net.connect(input[i],StrD1,transform=ws*(1+lg)*array(input_transform[i]),pstc=tau_ampa,plastic_array=learn)
-                net.connect(input[i],StrD2,transform=ws*(1-lg)*array(input_transform[i]),pstc=tau_ampa,plastic_array=learn)
+                net.connect(input[i],StrD2,transform=ws*(1-le)*array(input_transform[i]),pstc=tau_ampa,plastic_array=learn)
                 net.connect(input[i],STN,transform=array(input_transform[i])*wt,pstc=tau_ampa)
 
 
