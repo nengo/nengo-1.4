@@ -22,4 +22,4 @@ def make(net,name='Network Array', neurons=50, D=2, useQuick=True):
     thal = net.make_array(name, neurons, D, max_rate=(100,300), intercept=(-1, 0), radius=1, encoders=[[1]], quick=useQuick)    
     def addOne(x):
         return [x[0]+1]            
-    net.connect(thal, None, func=addOne, origin_name='xBiased')
+    net.connect(thal, None, func=addOne, origin_name='xBiased', create_projection=False)
