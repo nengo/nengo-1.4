@@ -85,6 +85,11 @@ def make_button(icon,func,tip,**args):
                    actionPerformed=func,toolTipText=tip,
                    borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),
                    verticalTextPosition=AbstractButton.BOTTOM,horizontalTextPosition=AbstractButton.CENTER,**args)
+def make_label_button(text,func,tip,**args):
+    return JButton(text=text,
+                   actionPerformed=func,toolTipText=tip,**args)
+#                   borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),
+#                   verticalTextPosition=AbstractButton.BOTTOM,horizontalTextPosition=AbstractButton.CENTER,**args)
     
 
 
@@ -101,9 +106,11 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar.add(self.mode_combobox)
         self.parisian=ParisianTransform()
         self.toolbar.add(self.parisian.button)
+        self.feedforward=make_label_button('layout',self.do_feedforward_layout,'reorganize components to flow from left to right',enabled=False)
+        self.toolbar.add(self.feedforward)
 
         self.toolbar.add(Box.createHorizontalGlue())
-        self.toolbar.add(make_button('templates',lambda event: template.template.toggle_visible(),'toggle templates'))
+        #self.toolbar.add(make_button('templates',lambda event: template.template.toggle_visible(),'toggle templates'))
         self.toolbar.add(make_button('inspect',self.do_inspect,'inspect'))
         self.toolbar.add(make_button('console',self.do_console,'toggle console'))
         self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
@@ -155,22 +162,37 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         else:
             self.button_run.enabled=True
             self.button_run.toolTipText='run '+net.name
+            
+        viewer=self.get_current_network_viewer()
+        self.feedforward.enabled=viewer is not None
         
         
         
-    def get_current_network(self):
+    def get_current_network(self,top_parent=True):
         network=self.ng.getSelectedObj()
         if network is not None:
             while hasattr(network,'nodeParent') and network.nodeParent is not None:
                 network=network.nodeParent
-            while hasattr(network,'networkParent') and network.networkParent is not None:
+            while top_parent and hasattr(network,'networkParent') and network.networkParent is not None:
                 network=network.networkParent
         else:
             for wo in ng.world.ground.children:
                 if isinstance(wo,ca.nengo.ui.models.nodes.UINetwork):
                     network=wo
                     break
-        return network        
+        return network      
+        
+    def get_current_network_viewer(self):
+        viewer=None
+        net=self.get_current_network(top_parent=False)
+        if net is not None and hasattr(net,'getViewer'):
+            viewer=net.getViewer()
+            if viewer is None or viewer.isDestroyed():
+                if hasattr(net,'networkParent') and net.networkParent is not None:
+                    net=net.networkParent
+                    viewer=net.getViewer()
+        return viewer 
+          
         
     def do_console(self,event):
         pane=self.ng.scriptConsolePane
@@ -186,6 +208,10 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             model=self.ng.getSelectedObj()
             if model is not None: model=model.model
             self.ng.configPane.configureObj(model)
+        
+    def do_feedforward_layout(self,event):
+        viewer=self.get_current_network_viewer()
+        viewer.doFeedForwardLayout()
         
     def do_open(self,event):
         ca.nengo.ui.actions.OpenNeoFileAction(ng).doAction()
