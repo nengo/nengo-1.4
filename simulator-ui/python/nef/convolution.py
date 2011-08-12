@@ -19,7 +19,7 @@ class DirectConvolution(nef.simplenode.SimpleNode):
             self.getTermination('A').setTau(pstc_input)
             self.getTermination('B').setTau(pstc_input)
     def termination_gate(self,value):
-        self.gate=value[0]    
+        self.gate=value[0]
     def termination_A(self,value):
         if self.invert_first:
             self.A=[value[-i] for i in range(len(value))]

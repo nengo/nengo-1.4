@@ -21,9 +21,12 @@ from ca.nengo.model import Node,SimulationMode
 from ca.nengo.model.plasticity.impl import SpikePlasticityRule
 
 from java.lang.System.err import println
+from java.lang import Exception
+from shutil import copyfile
+import traceback
 import math
-
 import shelve
+import warnings
 
 # for save_pdf
 import sys
@@ -537,7 +540,46 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         db.close()
 
     def restore(self):
- #     try:  
+        (filename,db) = self.doRestoreOpenFile()
+        try:
+            if( self.doRestore(db) ):
+                # Restore successful! Create a backup copy of the layout file
+                copyfile(filename + '.dat', filename + '.dat.bak')
+                copyfile(filename + '.dir', filename + '.dir.bak')
+                copyfile(filename + '.bak', filename + '.bak.bak')
+                return True
+            else:
+                return False
+        except Exception, e:
+            error_msg = '[Warning]: Failed to restore ' + filename + '. Layout file possibly corrupt. Retrying restore from backup.'
+            warnings.warn(error_msg, RuntimeWarning)
+
+            # Close the existing db
+            db.close()
+            try:
+                # Restore fail! Restore backup file and try again
+                if( java.io.File(filename + '.dat.bak').exists() and java.io.File(filename + '.dir.bak') and \
+                    java.io.File(filename + '.bak.bak').exists() ):
+                    copyfile(filename + '.dat.bak', filename + '.dat')
+                    copyfile(filename + '.dir.bak', filename + '.dir')
+                    copyfile(filename + '.bak.bak', filename + '.bak')
+                else:
+                    error_msg = '[Error]: Backup layout file not found.'
+                    warnings.warn(error_msg, RuntimeWarning)
+                    raise e
+                
+                (filename,db) = self.doRestoreOpenFile()
+                return self.doRestore(db)
+            except Exception, e:
+                # Ultimate failz
+                error_msg = '[Error]: Failed to restore backup layout file.'
+                warnings.warn(error_msg, RuntimeWarning)
+                
+                # Close the existing db
+                db.close()
+                raise e
+
+    def doRestoreOpenFile(self):
         dir=java.io.File('layouts')
         if not dir.exists(): dir.mkdirs()
 
@@ -548,10 +590,15 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 break
         else:
             db=shelve.open('python/timeview/layout.db')
+
+        return (fn,db)
+
+    def doRestore(self,db):
         key=self.network.name
         
-        if key not in db.keys(): return False
-        
+        if key not in db.keys(): 
+            return False
+
         saved_info = db[key]
         
         if( len( saved_info ) == 2 ):   # Old control saving format - control saves global
@@ -610,9 +657,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         db.close()
         self.area.repaint()
         return True
-#      except Exception:
-#          print 'Error restoring layout file'
-#          return False
+
     def view_save(self):
         return dict(width=self.frame.width,height=self.frame.height-self.time_control.config_panel_height,state=self.frame.getExtendedState(),x=self.frame.x,y=self.frame.y)
     
