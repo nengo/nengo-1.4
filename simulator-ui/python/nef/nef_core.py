@@ -721,7 +721,7 @@ class Network:
         """
         return self.network.getNode(name)
 
-    def release_memory(self):
+    def releaseMemory(self):
         """Attempt to release extra memory used by the Network.  Call only after all
         connections are made."""
         for node in self.network.getNodes():

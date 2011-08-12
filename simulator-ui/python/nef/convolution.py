@@ -6,7 +6,8 @@ import nef.simplenode
 class DirectConvolution(nef.simplenode.SimpleNode):
     def __init__(self,name,dimensions,invert_first=False,invert_second=False,pstc_gate=0.01,pstc_input=0):
         self.invert_first=invert_first
-        self.invert_second=invert_second        
+        self.invert_second=invert_second
+        self.dimension = dimensions
         self.A=[0]*dimensions
         self.B=[0]*dimensions
         self.gate=0
@@ -18,7 +19,7 @@ class DirectConvolution(nef.simplenode.SimpleNode):
             self.getTermination('A').setTau(pstc_input)
             self.getTermination('B').setTau(pstc_input)
     def termination_gate(self,value):
-        self.gate=value    
+        self.gate=value[0]    
     def termination_A(self,value):
         if self.invert_first:
             self.A=[value[-i] for i in range(len(value))]

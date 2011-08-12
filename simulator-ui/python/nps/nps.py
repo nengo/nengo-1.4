@@ -153,7 +153,7 @@ class DirectChannel(nef.simplenode.SimpleNode):
         self.getTermination('input').setTau(pstc_input)        
         self.getTermination('gate').setTau(pstc_gate)
     def termination_gate(self,value):
-        self.gate=value    
+        self.gate=value[0]    
     def termination_input(self,value):
         if self.normalizing:
             h=hrr.HRR(data=value)

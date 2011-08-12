@@ -26,7 +26,7 @@ class SPA:
         self.init()
         self.create()
         self.connect()
-        self.net.add_to()
+        self.net.add_to_nengo()
 
     def has_sink(self,k):
         return self.sinks.has_key(k)

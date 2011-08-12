@@ -285,4 +285,4 @@ class WriteToFileNode(nef.SimpleNode):
 #    # Add messages
 #    wtf.addMessages(["Message @ 0.5s","Message @ 1.0s"], [0.5,1])
 #    
-#    network.add_to(world)
+#    network.add_to_nengo()

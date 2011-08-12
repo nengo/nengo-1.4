@@ -57,7 +57,7 @@ class SimpleTermination(Termination):
         except TypeError,e:
            if self._dimensions==1:
                self._func(self._filtered_values[0])
-               warnings.warn("data on one-dimensional terminations should be referred to as x[0], not x.")
+               warnings.warn("Data on one-dimensional terminations should be referred to as x[0], not x.")
            else:
                raise e    
                    
@@ -231,7 +231,7 @@ class SimpleNode(Node,Probeable):
         
         t=SimpleTermination(name,self,func,tau=pstc,dimensions=dimensions)
         self.addTermination(t)
-        t.run(0,0)   # call the function once to make sure it works and to initialize any variables needed
+#        t.run(0,0)   # call the function once to make sure it works and to initialize any variables needed
             
         
         

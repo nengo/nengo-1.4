@@ -25,7 +25,7 @@ class Match(spa.module.Module):
                 funcs=[nef.functions.PythonFunction(dotproduct)]                
                 m.addDecodedOrigin('product',funcs,'AXON')
             else:            
-                m=self.net.make_array(name,N,dim,dimensions=2,encoders=[[1,1],[1,-1],[-1,-1],[-1,1]],quick=True,radius=1.4)
+                m=self.net.make_array(name,N,dim,dimensions=2,encoders=[[1,1],[1,-1],[-1,-1],[-1,1]],quick=True,radius=1.4,storage_code="%d")
                 def product(x): return x[0]*x[1]
                 m.addDecodedOrigin('product',[nef.functions.PythonFunction(product,dim)],'AXON')
             self.net.network.exposeOrigin(m.getOrigin('product'),name)
