@@ -90,6 +90,10 @@ public class ElasticWorld extends WorldImpl {
 		layoutSettings.addAction(new SetLayoutBoundsAction("Set preferred bounds", this));
 
 	}
+	
+	public void doFeedForwardLayout() {
+		new JungLayoutAction(FeedForwardLayout.class, "Feed-Forward").doAction();
+	}
 
 	@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
