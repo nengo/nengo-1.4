@@ -122,7 +122,7 @@ class Network:
             if eval_points is not None:
                 storage_name+='_eval%08x'%hash(tuple([tuple(x) for x in eval_points]))
             if node_factory is not None:
-                storage_name+='_node%s'%node_factory.__name__                
+                storage_name+='_node%s'%node_factory.__class__.__name__                
             if not java.io.File(storage_name+'.'+FileManager.ENSEMBLE_EXTENSION).exists():
                 dir=java.io.File('quick')
                 if not dir.exists(): dir.mkdirs()
