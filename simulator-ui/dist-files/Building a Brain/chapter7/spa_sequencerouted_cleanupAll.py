@@ -31,6 +31,15 @@ model=Routing()
 # Create the clean-up memory.
 import hrr
 vocab = hrr.Vocabulary.defaults[model.dimensions] # get the vocabulary used by the rest of the network
-pd = [vocab['A'].v.tolist()] # get a preferred direction vector aligned to the 'A' vector
-cleanup = model.net.make('cleanup A', neurons=100, dimensions=1)
+pd = [] # list of preferred direction vectors
+vsize = len(vocab.keys) # vocabulary size
+for item in vocab.keys:
+    pd.append(vocab[item].v.tolist())
+cleanup = model.net.make('cleanup', neurons=300, dimensions=vsize, encoders=eye(vsize))
 model.net.connect(model.state.net.network.getOrigin('state'), cleanup, transform=pd)
+
+# Record data.
+from nef.wtfnode import WriteToFileNode
+recorder = WriteToFileNode('record', 'NengoDemoOutput.csv', model.net.network, vocab, overwrite=True)
+recorder.addVocabTermination('state', origin='state')
+recorder.addValueTermination('cleanup')
