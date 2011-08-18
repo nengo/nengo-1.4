@@ -581,17 +581,21 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
     def doRestoreOpenFile(self):
         dir=java.io.File('layouts')
+        fp = ""
         if not dir.exists(): dir.mkdirs()
 
         filenames=['layouts/'+self.network.name,self.network.name]
         for fn in filenames:
             if java.io.File(fn+'.dat').exists() and java.io.File(fn+'.dir').exists() and java.io.File(fn+'.bak').exists():
+                fp = java.io.File(fn+'.dat').getCanonicalPath()[:-4]
                 db=shelve.open(fn)
                 break
         else:
+            ### Legacy Code
+            fp = java.io.File('python/timeview/layout.db').getCanonicalFile()[:-3]
             db=shelve.open('python/timeview/layout.db')
 
-        return (fn,db)
+        return (fp,db)
 
     def doRestore(self,db):
         key=self.network.name
