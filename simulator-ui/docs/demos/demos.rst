@@ -12,7 +12,7 @@ This section describes the collection of demos that comes with Nengo. To use any
  More sophisticated examples can be found in the Model Archive[???link]
  
 Introductory
-===============
+-------------
 .. toctree::
    :maxdepth: 1
    
@@ -21,8 +21,9 @@ Introductory
    manyneurons
    2drepresentation
 
+
 Simple Transformations
-======================
+-----------------------
 .. toctree::
    :maxdepth: 1
    
@@ -34,7 +35,7 @@ Simple Transformations
    convolve
 
 Dynamics
-======================
+----------
 
 .. toctree::
    :maxdepth: 1
@@ -44,7 +45,7 @@ Dynamics
    oscillator
 
 Simple Transformations
-======================
+-----------------------
 
 .. toctree::
    :maxdepth: 1
@@ -60,7 +61,7 @@ Simple Transformations
    question-control
 
 Learning
-======================
+-----------------------
 .. toctree::
    :maxdepth: 1
    
@@ -69,7 +70,7 @@ Learning
    learn-square
 
 Miscellaneous
-======================
+------------------------
 .. toctree::
    :maxdepth: 1
    

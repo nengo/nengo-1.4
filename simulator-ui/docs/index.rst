@@ -20,6 +20,7 @@ high-level cognitive algorithms.
 
    tutorial
    scripting
+   demos/demos
 
 * :ref:`genindex`
 * :ref:`search`
