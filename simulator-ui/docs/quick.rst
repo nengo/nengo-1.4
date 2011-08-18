@@ -23,7 +23,7 @@ same model, those ensembles will
 have the exact same tuning curves and the exact same representational accuracy.  If this is a
 problem, you can optionally specify a *storage_code* for the ensembles.  Two ensembles with
 different *storage_code* values will not end up being identical, but there will still be
-time savings when re-running the script.
+time savings when re-running the script::
 
   A=net.make('A',500,40,quick=True,storage_code='A')
   B=net.make('B',500,40,quick=True,storage_code='B')

@@ -1,8 +1,6 @@
 List of Classes
 ===========================================
 
-Contents:
-
 .. toctree::
    :maxdepth: 1
 

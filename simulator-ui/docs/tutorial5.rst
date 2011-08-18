@@ -180,7 +180,7 @@ Routing of Information
 * What about more complex actions?
 
    * Same model as above, be we want visual input to be able to control where we start the sequence
-   * Simple approach: add a visual buffer and connect it to the working memory:
+   * Simple approach: add a visual buffer and connect it to the working memory::
 
         run demo/sequencenogate.py
 
