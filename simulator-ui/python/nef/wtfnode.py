@@ -132,7 +132,7 @@ class WriteToFileNode(nef.SimpleNode):
             else:
                 origin_name = origin
                 origin = self.network.getNode(name).getOrigin(origin_name)
-                name = name + "_" + origin_name + "_vc" # Tag with _va to indicate a vocab termination
+                name = name + "_" + origin_name + "_vc" # Tag with _vc to indicate a vocab termination
         else:
             origin_name = origin.name
 
@@ -141,7 +141,7 @@ class WriteToFileNode(nef.SimpleNode):
         if( vocab is None ):
             vocab = self.vocab_master
         if( len(vocab_strs) == 0 ):
-            vocab_strs = vocab.keys()
+            vocab_strs = vocab.keys
 
         self.term_list.append(name)
         self.create_termination(name, self.template_Termination)
