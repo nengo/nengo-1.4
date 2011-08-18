@@ -1,0 +1,9 @@
+class BasicOrigin: pass
+class NetworkImpl: pass
+class EnsembleTermination: pass
+class PreciseSpikeOutputImpl: pass
+class SpikeOutputImpl: pass
+class RealOutputImpl: pass
+class PlasticEnsembleTermination: pass
+class NoiseFactory: pass
+class FunctionInput: pass
