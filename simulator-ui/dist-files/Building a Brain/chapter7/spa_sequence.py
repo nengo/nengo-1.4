@@ -1,7 +1,5 @@
 from spa import *
 
-D=16
-
 class Rules:
     def A(state='A'):
         set(state='B')
