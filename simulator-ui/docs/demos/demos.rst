@@ -38,6 +38,7 @@ Dynamics
 
 .. toctree::
    :maxdepth: 1
+   
    integrator
    controlledintegrator
    oscillator
