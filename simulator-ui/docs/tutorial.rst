@@ -2,9 +2,11 @@ Nengo Tutorial
 ===========================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    tutorial1
    tutorial2
    tutorial3
+   tutorial4
+   tutorial5
 
