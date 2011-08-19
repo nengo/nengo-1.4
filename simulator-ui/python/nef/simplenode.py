@@ -86,6 +86,8 @@ class SimpleNode(Node,Probeable):
     input and outputs the square of that input::
     
       class SquaringNode(nef.SimpleNode):
+          def init(self):
+              self.value=0
           def termination_input(self,x):
               self.value=x[0]*x[0]
           def origin_output(self):
@@ -100,6 +102,8 @@ class SimpleNode(Node,Probeable):
     in the method definition::
     
       class SquaringFiveValues(nef.SimpleNode):
+          def init(self):
+              self.value=0
           def termination_input(self,x,dimensions=5):
               self.value=[xx*xx for xx in x]
           def origin_output(self):
@@ -109,6 +113,8 @@ class SimpleNode(Node,Probeable):
     terminations in the method definition::
     
       class SquaringNode(nef.SimpleNode):
+          def init(self):
+              self.value=0
           def termination_input(self,x,pstc=0.01):
               self.value=x[0]*x[0]
           def origin_output(self):
@@ -149,6 +155,7 @@ class SimpleNode(Node,Probeable):
         for name,method in inspect.getmembers(self,inspect.ismethod):
             if name.startswith('termination_'):
                 self.create_termination(name[12:],method)
+        self.init()        
         for name,method in inspect.getmembers(self,inspect.ismethod):
             if name.startswith('origin_'):
                 self.create_origin(name[7:],method)
@@ -235,14 +242,6 @@ class SimpleNode(Node,Probeable):
             
         
         
-    def reset(self,randomize=False):
-        """Reinitialize the node to its initial state.  
-        
-        Called by the simulator whenever the simulation is reset.  Override this
-        to customize this behaviour.
-        """
-        for termination in self.getTerminations():
-            termination.reset()
 
     def tick(self):
         """An extra utility function that is called every time step.
@@ -261,6 +260,21 @@ class SimpleNode(Node,Probeable):
         """
         self._terminations[name].setTau(tau)
 
+    def init(self):
+        """Initialize the node.
+        
+        Override this to initialize any internal variables.  This will
+        also be called whenever the simulation is reset::
+        
+          class DoNothingNode(nef.SimpleNode):
+              def init(self):
+                  self.value=0
+              def termination_input(self,x,pstc=0.01):
+                  self.value=x[0]
+              def origin_output(self):
+                  return [self.value]
+        """        
+        pass
 
 
     # the following functions implement the basic interface needed to be a Node        
@@ -269,6 +283,12 @@ class SimpleNode(Node,Probeable):
     def setName(self,name):
         VisiblyMutableUtils.nameChanged(self, self.getName(), name, self.listeners)
         self._name=name
+
+    def reset(self,randomize=False):
+        for termination in self.getTerminations():
+            termination.reset()
+        self.init()    
+
 
     def addChangeListener(self,listener):
         self.listeners.append(listener)
