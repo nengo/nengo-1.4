@@ -30,10 +30,15 @@ import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import ca.nengo.ui.lib.Style.NengoStyle;
 
@@ -66,10 +71,31 @@ public abstract class PropertyInputPanel {
 
 		outerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
+		JPanel labelPanel=new JPanel();
+		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
+		labelPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+		
 		JLabel label = new JLabel(property.getName());
 		label.setForeground(NengoStyle.COLOR_DARK_BLUE);
 		label.setFont(NengoStyle.FONT_BOLD);
-		outerPanel.add(label);
+		labelPanel.add(label);
+		
+		JButton help=new JButton("?");
+		help.setForeground(new java.awt.Color(120,120,180));
+		help.setBorderPainted(false);
+		help.setContentAreaFilled(false);
+		help.setFocusPainted(false);
+		help.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null,propDescriptor.getTooltip(),propDescriptor.getName(),JOptionPane.INFORMATION_MESSAGE,null);
+				//OpenBrowser.openURL("http://nengo.ca");
+			}
+		});
+		labelPanel.add(Box.createHorizontalGlue());
+		labelPanel.add(help);
+		//labelPanel.setMaximumSize(labelPanel.getMinimumSize());
+		
+		outerPanel.add(labelPanel);
 
 		innerPanel = new JPanel();
 		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));

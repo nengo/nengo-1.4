@@ -311,6 +311,7 @@ class ConfigurableFunctionArray implements IConfigurable {
 
 			}
 			PFunction function = new PFunction("Function " + i, inputDimension, false, defaultValue);
+			function.setDescription("The function to use for dimension "+i);
 
 			props[i] = function;
 		}

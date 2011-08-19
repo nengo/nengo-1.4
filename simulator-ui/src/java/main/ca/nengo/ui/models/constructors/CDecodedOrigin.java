@@ -26,15 +26,15 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.constructors;
 
-import java.util.List;
+//import java.util.List;
 
 import javax.swing.JComboBox;
 
 import ca.nengo.math.Function;
-import ca.nengo.model.Node;
+//import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.StructuralException;
-import ca.nengo.model.impl.AbstractEnsemble;
+//import ca.nengo.model.impl.AbstractEnsemble;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.ConfigResult;
@@ -53,24 +53,27 @@ public class CDecodedOrigin extends ProjectionConstructor {
 
 	private Property pFunctions;
 
-	private Property pNodeOrigin;
+	//private Property pNodeOrigin;
 
 	public CDecodedOrigin(NEFEnsemble enfEnsembleParent) {
 		super();
 		this.enfEnsembleParent = enfEnsembleParent;
+		pName.setDescription("Name of the origin");
+		
 	}
 
 	@Override
 	public ConfigSchema getSchema() {
 		pFunctions = new PFunctionArray("Functions", enfEnsembleParent.getDimension());
+		pFunctions.setDescription("The function to compute");
 
 		// Find common nodes
-		Node[] nodes = enfEnsembleParent.getNodes();
-		List<String> commonNodes = AbstractEnsemble.findCommon1DOrigins(nodes);
+		//Node[] nodes = enfEnsembleParent.getNodes();
+		//List<String> commonNodes = AbstractEnsemble.findCommon1DOrigins(nodes);
 
-		pNodeOrigin = new OriginSelector("Node Origin Name", commonNodes.toArray(new String[0]));
+		//pNodeOrigin = new OriginSelector("Node Origin Name", commonNodes.toArray(new String[0]));
 
-		Property[] zProperties = { pName, pFunctions, pNodeOrigin };
+		Property[] zProperties = { pName, pFunctions};//, pNodeOrigin };
 		return new ConfigSchemaImpl(zProperties);
 
 	}
@@ -94,7 +97,7 @@ public class CDecodedOrigin extends ProjectionConstructor {
 
 		try {
 			origin = enfEnsembleParent.addDecodedOrigin(uniqueName, (Function[]) configuredProperties
-					.getValue(pFunctions), (String) configuredProperties.getValue(pNodeOrigin));
+					.getValue(pFunctions), "AXON");//(String) configuredProperties.getValue(pNodeOrigin));
 
 		} catch (StructuralException e) {
 			throw new ConfigException(e.getMessage());

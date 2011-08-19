@@ -32,7 +32,7 @@ import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PString;
 
 public abstract class ConstructableNode extends AbstractConstructable {
-	private static final Property pName = new PString("Name", "Name of the model", "");
+	protected static final Property pName = new PString("Name", "Name of the item to create", "");
 
 	public ConstructableNode() {
 		super();

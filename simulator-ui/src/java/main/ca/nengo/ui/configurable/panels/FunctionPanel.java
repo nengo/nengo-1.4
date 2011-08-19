@@ -65,7 +65,8 @@ public class FunctionPanel extends PropertyInputPanel {
 	/**
 	 * Function
 	 */
-	private Function function = null;
+	private Function function = new ca.nengo.math.impl.ConstantFunction(1,0f);
+;
 
 	private JButton newBtn;
 
@@ -225,7 +226,7 @@ public class FunctionPanel extends PropertyInputPanel {
 			}
 
 		} else {
-			function = null;
+			function = new ca.nengo.math.impl.ConstantFunction(1,0f);
 		}
 
 	}

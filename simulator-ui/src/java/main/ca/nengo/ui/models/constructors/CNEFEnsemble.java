@@ -76,7 +76,7 @@ public class CNEFEnsemble extends ConstructableNode {
 	static final Property pNodeFactory = new PNodeFactory("Node Factory");
 	static final Property pNumOfNodes = new PInt("Number of Nodes");
 	static final Property pRadius = new PFloat("Radius");
-	static final Property pNoise = new PFloat("Noise");
+	static final Property pNoise = new PFloat("Noise",0.1f);
 
 	/**
 	 * Config descriptors
@@ -87,6 +87,15 @@ public class CNEFEnsemble extends ConstructableNode {
 
 	public CNEFEnsemble() {
 		super();
+		pDim.setDescription("Number of dimensions that are represented by these neurons");
+		pName.setDescription("Name of the ensemble");
+		pApproximator.setDescription("Limits the range of values used when solving for decoders");
+		pEncodingDistribution.setDescription("From uniformly chosen (default) to all encoders being aligned to an axis");
+		pEncodingSign.setDescription("Limits the range of values chosen when setting encoders");
+		pNodeFactory.setDescription("Determines the type of neuron in this ensemble");
+		pNumOfNodes.setDescription("The number of neurons in this ensemble");
+		pRadius.setDescription("The largest magnitude that can be accurately represented by this ensemble");
+		pNoise.setDescription("The amount of noise to assume when solving for decoders");
 	}
 
 	protected Node createNode(ConfigResult prop, String name) {
