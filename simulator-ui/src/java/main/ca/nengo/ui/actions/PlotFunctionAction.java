@@ -65,6 +65,9 @@ public class PlotFunctionAction extends StandardAction {
 		this.plotName = plotName;
 		this.function = function;
 		this.dialogParent = dialogParent;
+		pStart.setDescription("Time (in seconds) to start the graph (usually 0)");
+		pIncrement.setDescription("Resolution (in seconds) of the graph (usually 0.001)");
+		pEnd.setDescription("Time (in seconds) of the end of the graph");
 	}
 
 	@Override
