@@ -78,6 +78,10 @@ public class RunSimulatorAction extends StandardAction {
 	public RunSimulatorAction(String actionName, UINetwork uiNetwork) {
 		super("Run simulator", actionName);
 		this.uiNetwork = uiNetwork;
+		pStartTime.setDescription("Time (in seconds) of the start of the simulation (usually 0)");
+		pStepSize.setDescription("Size (in seconds) of the simulation timestep (usually 0.001)");
+		pEndTime.setDescription("Time (in seconds) of the end of the simulation");
+		pShowDataViewer.setDescription("Whether to automatically display any Probed data after running the simulation");
 	}
 
 	private boolean configured = false;
@@ -95,10 +99,6 @@ public class RunSimulatorAction extends StandardAction {
 		this.stepTime = stepTime;
 		configured = true;
 		
-		pStartTime.setDescription("Time (in seconds) of the start of the simulation (usually 0)");
-		pStepSize.setDescription("Size (in seconds) of the simulation timestep (usually 0.001)");
-		pEndTime.setDescription("Time (in seconds) of the end of the simulation");
-		pShowDataViewer.setDescription("Whether to automatically display any Probed data after running the siulation");
 		
 
 	}
