@@ -107,7 +107,6 @@ html_theme_options = {
     'sidebartextcolor':'#222222',
     
     'footertextcolor':'#888888',
-#    'footerbgcolor':'#0c7a00',
     'footerbgcolor':'#EEEEEE',
     
 }

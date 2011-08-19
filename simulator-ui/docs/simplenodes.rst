@@ -88,7 +88,8 @@ termination by setting the ``pstc`` parameter (default is None).
 For example, the following object takes a 5-dimensional input vector and outputs the largest of the received values::
 
     class Largest(nef.SimpleNode):
-        largest=0
+        def init(self):
+            self.largest=0
         def termination_values(self,x,dimensions=5,pstc=0.01):
             self.largest=max(x)
         def origin_largest(self):
@@ -101,11 +102,36 @@ For example, the following object takes a 5-dimensional input vector and outputs
     
 .. note::
     When making a component like this, make sure to define an initial value for ``largest`` (or whatever internal parameter
-    is being used to map inputs to outputs) by doing something like ``largest=0``.  This value is needed because currently the origin is evaluated once at the
-    when the node is created, to determine its dimensionality.  Thus it will be called before the termination has a chance
-    to set the ``self.largest`` value. 
+    is being used to map inputs to outputs) inside the ``init(self)`` function.  This function will be called before the
+    origins are evaluated so that there is a valid ``self.largest`` return value.
 
+Arbitrary Code
+----------------
 
+You can also define a function that will be called every time step, but which is *not* tied to a particular
+Origin or Termination.  This function is called ``tick``.  Here is a simple example where this function simply
+prints the current time::
+
+    class Time(nef.SimpleNode):
+        def tick(self):
+            print 'The current time in the simulation is:',self.t
+
+As a more complex example, here is a ``tick`` function used to save spike raster information to a text file while the
+simulation runs::
+
+    class SpikeSaver(nef.SimpleNode):
+        def tick(self):
+            f=file('data.csv','a+')
+            data=A.getOrigin('AXON').getValues().getValues()
+            f.write('%1.3f,%s\n'%(self.t,list(data)))
+            f.close()
+            
+    net=nef.Network('Spike Saver example')
+    A=net.make('A',50,1)
+    saver=net.add(SpikeSaver('saver'))
+    
+    
+            
       
 
 
