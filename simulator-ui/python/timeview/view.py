@@ -513,7 +513,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
 
             origin.setValues(RealOutputImpl(v,ov.getUnits(),ov.getTime()))
-
+    """
     def save(self):
         dir=java.io.File('layouts')
         if not dir.exists(): dir.mkdirs()
@@ -538,8 +538,73 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         db[key]=self.view_save(),layout,controls
         
         db.close()
-
+        """
+        
+    def save(self):
+        key=self.network.name
+        layout=[]
+        for comp in self.area.components:
+            if isinstance(comp,components.core.DataViewComponent):
+                layout.append((comp.name,comp.type,comp.save()))
+                
+        # Save time control settings
+        controls = dict()
+        controls['sim_spd'] = self.time_control.rate_combobox.getSelectedIndex()
+        controls['dt'] = self.time_control.dt_combobox.getSelectedIndex()
+        controls['rcd_time'] = self.time_control.record_time_spinner.getValue()
+        controls['filter'] = self.time_control.filter_spinner.getValue()
+        controls['show_time'] = self.time_control.time_shown_spinner.getValue()
+        
+        view=self.view_save()
+        
+        save_layout_file(key,view,layout,controls)
+    
+    
     def restore(self):
+        data=load_layout_file(self.network.name)
+        if data is None:
+            #return False 
+            return self.restore_old()
+        view,layout,controls=data
+        
+        control_keys = controls.keys()   
+        if( 'sim_spd' in control_keys ):
+            self.time_control.rate_combobox.setSelectedIndex(controls['sim_spd'])
+        if( 'dt' in control_keys ):
+            self.time_control.dt_combobox.setSelectedIndex(controls['dt'])
+        if( 'rcd_time' in control_keys ):
+            self.time_control.record_time_spinner.setValue(controls['rcd_time'])
+        if( 'filter' in control_keys ):
+            self.time_control.filter_spinner.setValue(controls['filter'])
+        if( 'show_time' in control_keys ):
+            self.time_control.time_shown_spinner.setValue(controls['show_time'])
+
+        self.clear_all()
+        for name,type,data in layout:
+            if name in self.watcher.objects.keys():
+                if type is None:
+                    c=self.add_item(name)
+                    c.restore(data)    
+                else:
+                    for (t,klass,args) in self.watcher.list(name):
+                        if t==type:
+                            if not isinstance(args,dict):
+                                warnings.warn('restoration error in "%s.layout": %s,%s,%s'%(name,t,klass,args),RuntimeWarning)
+                            else:
+                                c=klass(self,name,**args)
+                                c.type=type
+                                c.restore(data)    
+                                self.area.add(c)
+                                break
+        
+        # Restore time control settings
+                            
+        self.view_restore(view)
+        self.area.repaint()
+        return True
+            
+    # TODO: remove this when we no longer want to support old-style layout files        
+    def restore_old(self):
         (filename,db) = self.doRestoreOpenFile()
         try:
             if( self.doRestore(db) ):
@@ -579,6 +644,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 db.close()
                 raise e
 
+    # TODO: remove this when we no longer want to support old-style layout files        
     def doRestoreOpenFile(self):
         dir=java.io.File('layouts')
         fp = ""
@@ -597,6 +663,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
         return (fp,db)
 
+    # TODO: remove this when we no longer want to support old-style layout files        
     def doRestore(self,db):
         key=self.network.name
         
@@ -661,7 +728,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         db.close()
         self.area.repaint()
         return True
-
+    
     def view_save(self):
         return dict(width=self.frame.width,height=self.frame.height-self.time_control.config_panel_height,state=self.frame.getExtendedState(),x=self.frame.x,y=self.frame.y)
     
@@ -1026,4 +1093,32 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
 
             cb.addTemplate(tp,20,0)
             doc.close()
+
+
+def save_layout_file(name,view,layout,controls):
+    dir=java.io.File('layouts')
+    if not dir.exists(): dir.mkdirs()
+
+    f=file('layouts/%s.layout'%name,'w')
+    
+    layout_text=',\n  '.join([`x` for x in layout])
+    
+    f.write('(%s,\n [%s],\n %s)'%(view,layout_text,controls))
+    f.close()
+
+def load_layout_file(name):
+    fn='%s.layout'%name
+    if not java.io.File(fn).exists():
+        fn='layouts/'+fn
+        if not java.io.File(fn).exists():
+            return None
+    try:
+        data=eval(file(fn).read())
+    except Exception,e:
+        warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
+        return None
+    if len(data)!=3:
+        warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
+    return data
+                   
 
