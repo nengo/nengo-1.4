@@ -1,0 +1,12 @@
+({'height': 547, 'x': 0, 'width': 895, 'state': 0, 'y': 0},
+ [('B', None, {'x': 496, 'height': 32, 'label': 0, 'width': 23, 'y': 322}),
+  ('A', None, {'x': 497, 'height': 32, 'label': 0, 'width': 23, 'y': 114}),
+  ('inputB', None, {'x': 397, 'height': 32, 'label': 0, 'width': 64, 'y': 323}),
+  ('inputA', None, {'x': 400, 'height': 32, 'label': 0, 'width': 64, 'y': 114}),
+  ('Sum', None, {'x': 529, 'height': 32, 'label': 0, 'width': 49, 'y': 212}),
+  ('inputB', 'control', {'x': 18, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 234}),
+  ('inputA', 'control', {'x': 20, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 29}),
+  ('A', 'value|X', {'x': 100, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 28}),
+  ('B', 'value|X', {'x': 98, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 228}),
+  ('Sum', 'value|X', {'x': 585, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 129})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})

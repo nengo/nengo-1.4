@@ -1,0 +1,12 @@
+({'height': 469, 'x': 0, 'width': 800, 'state': 0, 'y': 0},
+ [('stop learning', None, {'x': 640, 'height': 32, 'label': 0, 'width': 122, 'y': 24}),
+  ('B', None, {'x': 455, 'height': 32, 'label': 0, 'width': 23, 'y': 128}),
+  ('A', None, {'x': 261, 'height': 32, 'label': 0, 'width': 23, 'y': 131}),
+  ('error', None, {'x': 357, 'height': 32, 'label': 0, 'width': 53, 'y': 35}),
+  ('input', None, {'x': 136, 'height': 32, 'label': 0, 'width': 51, 'y': 131}),
+  ('input', 'control', {'x': 12, 'height': 200, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 120, 'limits_w': 0, 'y': 64}),
+  ('stop learning', 'control', {'x': 682, 'height': 200, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 65}),
+  ('error', 'value|X', {'x': 214, 'height': 94, 'sel_dim': [0], 'label': 1, 'width': 127, 'autozoom': 0, 'last_maxy': 1.0, 'y': -4}),
+  ('A', 'value|X', {'x': 153, 'height': 172, 'sel_dim': [0, 1], 'label': 1, 'width': 243, 'autozoom': 0, 'last_maxy': 1.0, 'y': 164}),
+  ('B', 'value|X', {'x': 412, 'height': 171, 'sel_dim': [0], 'label': 1, 'width': 242, 'autozoom': 0, 'last_maxy': 1.0, 'y': 162})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})

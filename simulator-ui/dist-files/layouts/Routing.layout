@@ -1,0 +1,13 @@
+({'height': 648, 'x': 0, 'width': 1121, 'state': 0, 'y': 0},
+ [('thal', None, {'x': 368, 'height': 32, 'label': 0, 'width': 41, 'y': 57}),
+  ('BG', None, {'x': 503, 'height': 32, 'label': 0, 'width': 39, 'y': 167}),
+  ('input', None, {'x': 77, 'height': 32, 'label': 0, 'width': 51, 'y': 168}),
+  ('state', None, {'x': 706, 'height': 32, 'label': 0, 'width': 54, 'y': 57}),
+  ('vision', None, {'x': 180, 'height': 32, 'label': 0, 'width': 58, 'y': 168}),
+  ('vision:buffer', 'semantic pointer', {'width': 300, 'show_pairs': 0, 'normalize': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [0, 1, 2, 3, 4, 5], 'y': 214, 'label': 0, 'x': 66, 'smooth_normalize': 0, 'height': 200, 'autozoom': 0}),
+  ('state:buffer', 'semantic pointer', {'width': 300, 'show_pairs': 0, 'normalize': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [1, 2, 3, 4, 5], 'y': 7, 'label': 0, 'x': 775, 'smooth_normalize': 0, 'height': 200, 'autozoom': 0}),
+  ('BG', 'rule utility', {'x': 415, 'height': 315, 'label': 1, 'width': 150, 'y': 209}),
+  ('thal', 'rule activation', {'x': 579, 'height': 315, 'label': 1, 'width': 150, 'y': 209}),
+  ('cleanup', 'value|X', {'x': 781, 'height': 196, 'sel_dim': [1, 2, 3, 4, 5], 'label': 1, 'width': 295, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 321}),
+  ('cleanup A', 'value|X', {'x': 775, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0, 'y': 316})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})

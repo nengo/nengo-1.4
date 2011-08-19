@@ -1,0 +1,8 @@
+({'height': 547, 'x': 0, 'width': 779, 'state': 0, 'y': 0},
+ [('input', None, {'x': 46, 'height': 32, 'label': 0, 'width': 51, 'y': 129}),
+  ('neuron', None, {'x': 363, 'height': 32, 'label': 0, 'width': 69, 'y': 127}),
+  ('input', 'control', {'x': 45, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 223}),
+  ('input', 'value|origin', {'x': 132, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0, 'y': 223}),
+  ('neuron', 'value|X', {'x': 437, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 220}),
+  ('neuron', 'spike raster', {'x': 437, 'height': 200, 'label': 1, 'width': 300, 'sample': 1, 'y': 13})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})

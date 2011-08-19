@@ -1,0 +1,10 @@
+({'height': 600, 'x': 0, 'width': 950, 'state': 0, 'y': 22},
+ [('input', None, {'x': 207, 'height': 32, 'label': 0, 'width': 53, 'y': 89}),
+  ('A', None, {'x': 466, 'height': 32, 'label': 0, 'width': 23, 'y': 88}),
+  ('A', 'XY plot|X', {'width': 200, 'autohide': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [0, 1], 'y': 273, 'label': 1, 'x': 400, 'height': 200, 'autozoom': 1}),
+  ('input', 'control', {'x': 66, 'height': 200, 'range': 8.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 131}),
+  ('input', 'value|origin', {'x': 170, 'height': 117, 'sel_dim': [0, 1], 'label': 1, 'width': 176, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 135}),
+  ('A', 'value|X', {'x': 398, 'height': 130, 'sel_dim': [0, 1], 'label': 1, 'width': 196, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 132}),
+  ('A', 'spike raster', {'x': 639, 'height': 200, 'label': 1, 'width': 300, 'sample': 10, 'y': 273}),
+  ('A', 'voltage grid', {'x': 640, 'height': 247, 'auto_improve': 1, 'label': 1, 'width': 295, 'rows': None, 'y': 18})],
+ {'sim_spd': 4, 'rcd_time': 1.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
