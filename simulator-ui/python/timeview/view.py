@@ -1106,7 +1106,7 @@ def save_layout_file(name,view,layout,controls):
     f.write('(%s,\n [%s],\n %s)'%(view,layout_text,controls))
     f.close()
 
-def load_layout_file(name):
+def load_layout_file(name, try_backup = True):
     fn='%s.layout'%name
     if not java.io.File(fn).exists():
         fn='layouts/'+fn
@@ -1117,8 +1117,14 @@ def load_layout_file(name):
     except Exception,e:
         warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
         return None
+
     if len(data)!=3:
         warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
+
+    # Save a backup of the layout file
+    fp = java.io.File(fn).getCanonicalPath()
+    copyfile(fp, fp + '.bak')
+
     return data
                    
 
