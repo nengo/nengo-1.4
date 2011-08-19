@@ -80,7 +80,7 @@ public abstract class PropertyInputPanel {
 		label.setFont(NengoStyle.FONT_BOLD);
 		labelPanel.add(label);
 		
-		JButton help=new JButton("?");
+		JButton help=new JButton("<html><u>?</u></html>");
 		help.setForeground(new java.awt.Color(120,120,180));
 		help.setBorderPainted(false);
 		help.setContentAreaFilled(false);
@@ -88,12 +88,12 @@ public abstract class PropertyInputPanel {
 		help.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,propDescriptor.getTooltip(),propDescriptor.getName(),JOptionPane.INFORMATION_MESSAGE,null);
-				//OpenBrowser.openURL("http://nengo.ca");
 			}
 		});
-		labelPanel.add(Box.createHorizontalGlue());
 		labelPanel.add(help);
-		//labelPanel.setMaximumSize(labelPanel.getMinimumSize());
+		
+		//labelPanel.add(Box.createHorizontalGlue());               // use this to right-justify question marks
+		labelPanel.setMaximumSize(labelPanel.getMinimumSize());     // use this to keep question marks on left
 		
 		outerPanel.add(labelPanel);
 
