@@ -658,7 +658,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 break
         else:
             ### Legacy Code
-            fp = java.io.File('python/timeview/layout.db').getCanonicalPath()[:-3]
+            fp = java.io.File('python/timeview/layout.db.dat').getCanonicalPath()[:-4]
             db=shelve.open('python/timeview/layout.db')
 
         return (fp,db)
