@@ -6,10 +6,10 @@ from ca.nengo.ui.configurable.descriptors import PTerminationWeights
 
 def params(net,node):
     return [
-    ('name','Name',str),
-    ('weights','Weights',PTerminationWeights('Weights',node.dimension)),
-    ('pstc','tauPSC',float),
-    ('modulatory','Is Modulatory',bool),
+    ('name','Name',str,'Name of termination'),
+    ('weights','Weights',PTerminationWeights('Weights',node.dimension),'Linear transformation matrix to apply'),
+    ('pstc','tauPSC',float,'Post-synaptic time constant'),
+    ('modulatory','Is Modulatory',bool,'Only Enable this setting if this termination merely adjusts neuron properties (rather than adding input current)'),
     ]
 
 def test_params(net,node,p):

@@ -35,16 +35,16 @@ class PTemplateSign(Property):
         return PInt
     
 params=[
-    ('name','Name',str),
-    ('neurons','Neurons per dimension',int),
-    ('length','Number of dimensions',int),
-    ('radius','Radius',float),
-    ('iLow','Intercept (low)',float),
-    ('iHigh','Intercept (high)',float),
-    ('rLow','Max rate (low)',float),
-    ('rHigh','Max rate (high)',float),
-    ('encSign','Encoding sign', PTemplateSign),
-    ('useQuick', 'Quick mode', bool),
+    ('name','Name',str, 'Name of the Network Array'),
+    ('neurons','Neurons per dimension',int,'Number of neurons in each of the ensembles'),
+    ('length','Number of dimensions',int,'Number of ensembles in the array'),
+    ('radius','Radius',float,'Maximum magnitude of vector that can be represented in each ensemble'),
+    ('iLow','Intercept (low)',float,'Smallest value for neurons to start firing at (between -1 and 1)'),
+    ('iHigh','Intercept (high)',float,'Largest value for neurons to start firing at (between -1 and 1)'),
+    ('rLow','Max rate (low)',float,'Smallest maximum firing rate for neurons in the ensemble'),
+    ('rHigh','Max rate (high)',float,'Largest maximum firing rate for neurons in the ensemble'),
+    ('encSign','Encoding sign', PTemplateSign,'Limits the sign of encoders chosen'),
+    ('useQuick', 'Quick mode', bool,'Uses the exact same encoders and decoders for each ensemble in the array'),
     ]
 
 def test_params(net,p):
