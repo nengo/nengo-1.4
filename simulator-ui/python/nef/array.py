@@ -61,7 +61,26 @@ class NetworkArray(NetworkImpl):
     """Collects a set of NEFEnsembles into a single network."""
     serialVersionUID=1
     def __init__(self,name,nodes):
-        """Create a network holding an array of the given nodes."""        
+        """Create a network holding an array of nodes.  An 'X' Origin
+        is automatically created which concatenates the values of each
+        internal element's 'X' Origin.
+        
+        This object is meant to be created using :func:`nef.Network.make_array()`, allowing for the
+        efficient creation of neural groups that can represent large vectors.  For example, the
+        following code creates a NetworkArray consisting of 50 ensembles of 1000 neurons, each of 
+        which represents 10 dimensions, resulting in a total of 500 dimensions represented::
+        
+          net=nef.Network('Example Array')
+          A=net.make_array('A',neurons=1000,length=50,dimensions=10,quick=True)
+          
+        The resulting NetworkArray object can be treated like a normal ensemble, except for the
+        fact that when computing nonlinear functions, you cannot use values from different
+        ensembles in the computation, as per NEF theory.
+        
+        :param string name: the name of the NetworkArray to create
+        :param nodes: the nodes to combine together
+        :type nodes: list of NEFEnsembles
+        """        
         NetworkImpl.__init__(self)
         self.name=name
         self.dimension=len(nodes)*nodes[0].dimension
@@ -76,21 +95,42 @@ class NetworkArray(NetworkImpl):
         self.setUseGPU(True)
 
     def createEnsembleOrigin(self,name):
+        """Create an Origin that concatenates the values of internal Origins.
+        
+        :param string name: The name of the Origin to create.  Each internal node must
+                            already have an Origin with that name.
+        """
         self._origins[name]=ArrayOrigin(self,name,[n.getOrigin(name) for n in self._nodes])
         self.exposeOrigin(self._origins[name],name)
             
     def addDecodedOrigin(self,name,functions,nodeOrigin):
-        """Create a new origin.  A new origin is created on each of the 
-        ensembles, and these are grouped together to create an output. The 
-        function must be one-dimensional."""
-        if len(functions)!=1: raise StructuralException('Functions on EnsembleArrays must be one-dimensional')
+        """Create a new Origin.  A new origin is created on each of the 
+        ensembles, and these are grouped together to create an output.
+        
+        This method uses the same signature as ca.nengo.model.nef.NEFEnsemble.addDecodedOrigin()
+        
+        :param string name: the name of the newly created origin
+        :param functions: the functions to approximate at this origin
+        :type functions: list of ca.nengo.math.Function objects
+        :param string nodeOrigin: name of the base Origin to use to build this function approximation
+                                  (this will always be 'AXON' for spike-based synapses)
+        """
         origins=[n.addDecodedOrigin(name,functions,nodeOrigin) for n in self._nodes]
         self.createEnsembleOrigin(name)
         return self.getOrigin(name)
     def addTermination(self,name,matrix,tauPSC,isModulatory):
         """Create a new termination.  A new termination is created on each
-        of the ensembles, which are then grouped together.  Useful for adding
-        inhibitory terminations to turn off the whole array.
+        of the ensembles, which are then grouped together.  This termination
+        does not use NEF-style encoders; instead, the matrix is the actual connection
+        weight matrix.  Often used for adding an inhibitory connection that can turn
+        off the whole array (by setting *matrix* to be all -10, for example).  
+        
+        :param string name: the name of the newly created origin
+        :param matrix: synaptic connection weight matrix (NxM where M is the total number of neurons in the NetworkArray)
+        :type matrix: 2D array of floats
+        :param float tauPSC: post-synaptic time constant
+        :param boolean isModulatory: False for normal connections, True for modulatory connections (which adjust neural
+                                     properties rather than the input current)
         """
 
         try:        
@@ -114,19 +154,15 @@ class NetworkArray(NetworkImpl):
         by number of dimensions)."""
         terminations = []
         d = 0
-        #w = MU.prod(encoder,MU.prod(matrix,MU.transpose(decoder)))
+        dd=nodes[0].dimension
         for n in self._nodes:
             encoder = n.encoders
-            #print "matrix",matrix
-            #print "encoder",encoder
-
-            #print "decoder_trans",MU.transpose(decoder)
-            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d]])
+            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd)])
             if weight_func is not None:
                 w = weight_func(w)
             t = n.addTermination(name,w,tauPSC,False)
             terminations.append(t)
-            d += 1
+            d += dd
         termination = EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
@@ -195,11 +231,9 @@ class NetworkArray(NetworkImpl):
             i+=1
 
     def listStates(self):
-        """List the items that are probeable."""
         return self._nodes[0].listStates()
 
     def getHistory(self,stateName):
-        """Extract probeable data from the sub-ensembles and combine them together."""
         times=None
         values=[None]*len(self._nodes)
         units=[None]*len(self._nodes)
