@@ -10,6 +10,6 @@ net.connect(control,A,transform=[0,1],pstc=0.1)
 def feedback(x):
     return x[0]*x[1]
 net.connect(A,A,transform=[1,0],func=feedback,pstc=0.1)
-net.add_to(world)
+net.add_to_nengo()
 
 

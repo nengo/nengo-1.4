@@ -23,6 +23,6 @@ def product(x):
     return x[0]*x[1]
 net.connect(vector, result2, func=product)
 
-net.add_to(world)
+net.add_to_nengo()
 
 

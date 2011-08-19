@@ -21,6 +21,6 @@ net.connect(A, add)
 net.connect(B, add)
 net.connect(add, D)
 
-net.add_to(world)
+net.add_to_nengo()
 
 

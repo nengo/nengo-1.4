@@ -6,6 +6,6 @@ input.functions=[ca.nengo.math.impl.PiecewiseConstantFunction([0.2,0.3,0.44,0.54
 A=net.make('A',100,1,quick=True)
 net.connect(input,A,weight=0.1,pstc=0.1)
 net.connect(A,A,pstc=0.1)
-net.add_to(world)
+net.add_to_nengo()
 
 

@@ -87,4 +87,4 @@ input=Input('Input')
 net.add(input)
 net.connect(input.getOrigin('x'), visual)
 
-net.add_to(world)
+net.add_to_nengo()

@@ -40,7 +40,7 @@ actual = net.make('actual error', 1, 1, mode='direct')
 net.connect(A,actual)
 net.connect(B,actual,weight=-1)
 
-net.add_to(world)
+net.add_to_nengo()
 
 
 

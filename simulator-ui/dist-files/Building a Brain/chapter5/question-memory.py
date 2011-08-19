@@ -63,5 +63,5 @@ net.connect(input.getOrigin('C'),C)
 net.connect(D_ens, Memory)
 
 
-net.add_to(world)
+net.add_to_nengo()
 
