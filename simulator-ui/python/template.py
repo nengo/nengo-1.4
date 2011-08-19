@@ -18,7 +18,12 @@ class Properties:
         self._params=params
         self._list=[]
         self._properties={}
-        for key,text,type in params:
+        for p in params:
+            if len(p)==3:
+                key,text,type=p
+                help=''
+            else:
+                key,text,type,help=p
             if isinstance(type,Property):
                 p=type
             # checking isinstance(type, Property.__class__) will not find Jython children of Property
@@ -27,6 +32,7 @@ class Properties:
                 p=type(text)
             else:
                 p=self.pmap[type](text)
+            p.setDescription(help)    
             self._list.append(p)
             self._properties[key]=p
 
