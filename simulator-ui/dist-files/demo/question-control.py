@@ -73,5 +73,5 @@ net.network.getNode('wm_deconv_visual_to_motor').name='*'
 net.network.getNode('gate_visual_wm').name='gate1'
 net.network.getNode('gate_wm_visual_motor').name='gate2'
 
-net.add_to(world)
+net.add_to_nengo()
 

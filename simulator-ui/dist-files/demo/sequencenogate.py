@@ -15,7 +15,7 @@ model.add_buffer_feedback(memory=0.98)
 fixedgate=net.make_input('fixedgate',[-10])
 net.connect(fixedgate,'gate_visual_memory')
 
-net.add_to(world)
+net.add_to_nengo()
 
 
 

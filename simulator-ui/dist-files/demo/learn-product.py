@@ -50,7 +50,7 @@ error.addTermination('gate',[[-10]]*N,0.01,False)
 net.connect(stop,error.getTermination('gate'))
 
 
-net.add_to(world)
+net.add_to_nengo()
 
 
 

@@ -12,7 +12,7 @@ p.add(lhs=dict(memory='E'),rhs=dict(memory='A'))
 model=nps.NPS(net,p,dimensions=10,neurons_buffer=30,align_hrr=True)
 model.set_initial(0.1,memory='A')
 model.add_buffer_feedback(memory=1)
-net.add_to(world)
+net.add_to_nengo()
 
 
 
