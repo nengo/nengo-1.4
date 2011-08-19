@@ -713,6 +713,26 @@ class Network:
         if hasattr(self,'layout') and len(self.layout)==3:
             timeview.view.save_layout_file(self.network.name,*self.layout)
         timeview.View(self.network,play=play)
+    
+    
+    def set_layout(self,view,layout,control):
+        """Defines the graphical layout for the interactive plots
+        
+        You can use this to specify a particular layout.  This will replace the currently
+        saved layout (if any).  Useful when running a script on a new computer that does
+        not have a previously saved layout (saving you from also copying over that layout
+        file).  
+        
+        The arguments for this function call are generally made by opening up
+        interacive plots, making the layout you want, saving the layout, and then
+        copying the text in ``layouts/<networkname>.layout``.
+        
+        :param dictionary view: parameters for the window position
+        :param list layout: list of all components to be shown and their parameters
+        :param dictionary control: configuration parameters for the simulation
+        """
+        import timeview  # moved this here to delay loading ui stuff until needed
+        timeview.view.save_layout_file(self.network.name,view,layout,control)
         
 
 
