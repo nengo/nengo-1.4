@@ -9,7 +9,7 @@ A Single Neuron
 
 *Output*: See the screen capture below
 
-.. image:: demos/images/singleneuron.png
+.. image:: images/singleneuron.png
 
 *Code*::
 
