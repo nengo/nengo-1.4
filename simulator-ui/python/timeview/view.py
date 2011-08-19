@@ -1120,10 +1120,11 @@ def load_layout_file(name, try_backup = True):
 
     if len(data)!=3:
         warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
-    else:
-        # Save a backup of the layout file
-        fp = java.io.File(fn).getCanonicalPath()
-        copyfile(fp, fp + '.bak')
+        return None
+
+    # Save a backup of the layout file
+    fp = java.io.File(fn).getCanonicalPath()
+    copyfile(fp, fp + '.bak')
 
     return data
                    
