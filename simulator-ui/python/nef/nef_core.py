@@ -32,7 +32,7 @@ class Network:
         B=net.make('B',neurons=100,dimensions=1)
         net.connect(input,A)
         net.connect(A,B)
-        net.add_to(world)
+        net.add_to_nengo()
 
     This will automatically create the necessary origins, terminations,
     ensemble factories, and so on needed to create this network.
