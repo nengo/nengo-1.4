@@ -3,16 +3,16 @@ Nengo Demos
 
 This section describes the collection of demos that comes with Nengo. To use any of these demo scripts in Nengo, do the following:
  * *Open*
-    Open any <demo>.py file by going to File->Open and selecting the file from 'demos' directory in your Nengo installation.
+    Open any <demo>.py file by going to File->Open and selecting the file from 'demos' directory in your Nengo installation. Or, click the folder icon in the upper left to open the file.
  * *Run* 
-    Run the demo by clicking on the network created in the previous step and then clicking the 'Interactive Plots' icon in the upper right corner of the Nengo main window (black and blue overlapping sine waves).  Or right-click the network and select 'Interactive Plots'.
+    Run the demo by selecting the network created in the previous step and then clicking the 'Interactive Plots' icon in the upper right corner of the Nengo main window (black and blue overlapping sine waves).  Or, right-click the network and select 'Interactive Plots'.  Tip: You don't need to select the network if there is only one available to run.
  * *Delete* 
-    Remove the demo network after using it by right clicking and selecting 'Remove model'.
+    Remove the demo network after using it by right clicking and selecting 'Remove model'. Tip: You don't need to remove a model if you reload the same script again, it will automatically be replaced.
  
  More sophisticated examples can be found in the Model Archive[???link]
  
-Introductory
--------------
+Introductory Demos
+------------------------
 .. toctree::
    :maxdepth: 1
    
@@ -21,9 +21,8 @@ Introductory
    manyneurons
    2drepresentation
 
-
 Simple Transformations
------------------------
+------------------------
 .. toctree::
    :maxdepth: 1
    
@@ -35,7 +34,7 @@ Simple Transformations
    convolve
 
 Dynamics
-----------
+------------------------
 
 .. toctree::
    :maxdepth: 1
@@ -45,7 +44,7 @@ Dynamics
    oscillator
 
 Simple Transformations
------------------------
+------------------------
 
 .. toctree::
    :maxdepth: 1
@@ -61,7 +60,7 @@ Simple Transformations
    question-control
 
 Learning
------------------------
+------------------------
 .. toctree::
    :maxdepth: 1
    
