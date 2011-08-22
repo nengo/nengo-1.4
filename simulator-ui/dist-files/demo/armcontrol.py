@@ -3,13 +3,7 @@ import sys
 import nef
 
 import space
-reload(space)
 
-# from ca.nengo.model.impl import *
-# from ca.nengo.model import *
-# from ca.nengo.model.nef.impl import *
-# from ca.nengo.model.neuron.impl import *
-# from ca.nengo.model.neuron import *
 from ca.nengo.math.impl import *
 from ca.nengo.model.plasticity.impl import *
 from ca.nengo.util import *
@@ -135,19 +129,11 @@ class getY(ca.nengo.math.Function):
 
 
 # input functions
-refX=FunctionInput('refX',[ConstantFunction(1,-1)],Units.UNK)# X coordinate of target
-refY=FunctionInput('refY',[ConstantFunction(1,1)],Units.UNK)# Y coordinate of target
+refX=net.make_input('refX',[-1])
+refY=net.make_input('refY',[1])
+Tfunc=net.make_input('T matrix',[1,0,0,1])
+F=net.make_input('F',[-1,0,-1,0,0,-1,0,-1])
 
-Tfunc=FunctionInput('T matrix', [ConstantFunction(1,1), ConstantFunction(1,0), ConstantFunction(1,0), ConstantFunction(1,1)], Units.UNK) # used to calculate control signal
-
-F=FunctionInput('F',[ConstantFunction(1,-1),ConstantFunction(1,0),ConstantFunction(1,-1), \
-ConstantFunction(1,0),ConstantFunction(1,0),ConstantFunction(1,-1),ConstantFunction(1,0), \
-ConstantFunction(1,-1)],Units.UNK) # used to stabilize system
-
-net.add(refX)
-net.add(refY)
-net.add(Tfunc)
-net.add(F)
 
 # neural populations
 convertXY=net.make("convert XY",N,2)
@@ -347,9 +333,9 @@ net.connect(r.getOrigin('elbowAngle'),funcT.getTermination('elbow'))
 
 
 # put everything in direct mode
-net.network.setMode(SimulationMode.DIRECT)
+net.network.setMode(ca.nengo.model.SimulationMode.DIRECT)
 # except the last population
-controlU.setMode(SimulationMode.DEFAULT)
+controlU.setMode(ca.nengo.model.SimulationMode.DEFAULT)
 
 
 	

@@ -53,14 +53,13 @@ class Room(space.Room):
             self.add(space.Box(1,1,1,mass=1,color=Color(0x8888FF),flat_shading=False),random.uniform(-5,5),random.uniform(-5,5),random.uniform(4,6))
         
         self.sch.add(space.Room.start,args=(self,))
-            
+
+from ca.nengo.util.impl import NodeThreadPool, NEFGPUInterface
 
 net=nef.Network('Braitenberg')
 
-input1=FunctionInput('right eye',[ConstantFunction(1,0)],Units.UNK)
-net.add(input1)
-input2=FunctionInput('left eye',[ConstantFunction(1,0)],Units.UNK)
-net.add(input2)
+input1=net.make_input('right eye',[0])
+input2=net.make_input('left eye',[0])
 
 sense1=net.make("right input",N,1)
 sense2=net.make("left input",N,1)
