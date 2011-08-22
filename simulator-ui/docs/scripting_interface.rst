@@ -44,6 +44,22 @@ You can also run a script file from the console with this command, with ``script
 Pressing the up and down arrows will scroll through the history of your console commands.
 
 
+Running scripts from the command line
+---------------------------------------
+
+You can also run scripts from the command line.  This allows you to simply run the model without running Nengo itself.  To do this, instead of running nengo with ``nengo`` 
+(or ``nengo.bat`` on Windows), do::
+
+    nengo-cl script_name.py
+    
+Of course, since this bypasses the Nengo graphical interface, you won't be able to click on the |interactive| icon to show the model.  Instead, you should add this to the
+end of your model::
+
+    net.view()
+
+.. |interactive| image:: ../python/images/interactive.png
+    :scale: 75 %
+
 
 Importing other libraries
 ----------------------------

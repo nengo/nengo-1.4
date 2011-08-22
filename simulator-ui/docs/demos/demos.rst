@@ -2,14 +2,31 @@ Nengo Demos
 ===========================================
 
 This section describes the collection of demos that comes with Nengo. To use any of these demo scripts in Nengo, do the following:
- * *Open*
-    Open any <demo>.py file by going to File->Open and selecting the file from 'demos' directory in your Nengo installation. Or, click the folder icon in the upper left to open the file.
- * *Run* 
-    Run the demo by selecting the network created in the previous step and then clicking the 'Interactive Plots' icon in the upper right corner of the Nengo main window (black and blue overlapping sine waves).  Or, right-click the network and select 'Interactive Plots'.  Tip: You don't need to select the network if there is only one available to run.  Click the 'play' arrow to start the simulation.
- * *Delete* 
-    Remove the demo network after using it by right clicking and selecting 'Remove model'. Tip: You don't need to remove a model if you reload the same script again, it will automatically be replaced.
+
+* *Open*
+    Open any ``<demo>.py`` file by clicking on the |open| icon (or going to ``File->Open from file`` in the menu) and selecting the file from ``demos`` directory in your Nengo installation. 
+* *Run* 
+    Run the demo by selecting the network created in the previous step and then clicking the |interactive| icon in the upper right corner of the Nengo main window.  Alternatively, 
+    right-click on the network and select 'Interactive Plots'.  Click the |play| arrow to start the simulation.
+    
+    .. note::    
+       You don't need to select the network if there is only one available to run.
+       
+* *Delete* 
+    Remove the demo network after using it by right clicking and selecting 'Remove model'. 
+    
+    .. note::
+        You don't need to remove a model if you reload the same script again, it will automatically be replaced.
  
- More sophisticated examples can be found in the Model Archive[???link]
+.. |open| image:: ../../python/images/open.png
+    :scale: 75 %
+.. |interactive| image:: ../../python/images/interactive.png
+    :scale: 75 %
+.. |play| image:: ../../python/images/play.png
+    :scale: 75 %
+
+ 
+More sophisticated examples can be found in the Model Archive at http://models.nengo.ca.
  
 Introductory Demos
 ------------------------
