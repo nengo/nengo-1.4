@@ -18,7 +18,7 @@ class Thalamus(spa.module.Module):
         D=self.bg.rules.rule_count
         
         self.bias=self.net.make_input('bias',[1])
-        self.rules=self.net.make_array('rules',rule_neurons,D,intercept=(rule_threshold,1),encoders=[[1]],quick=True)
+        self.rules=self.net.make_array('rules',rule_neurons,D,intercept=(rule_threshold,1),encoders=[[1]],quick=True,storage_code="%d")
         self.net.connect(self.bias,self.rules)
 
 
