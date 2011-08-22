@@ -460,7 +460,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		{
 			workingNode = nodesToProcess.remove(0);
 				
-			if(workingNode instanceof Network)
+			if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
 			{	
 				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
 				
