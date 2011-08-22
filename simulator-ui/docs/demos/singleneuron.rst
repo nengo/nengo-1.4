@@ -13,5 +13,4 @@ A Single Neuron
 
 *Code*:
     .. literalinclude:: ../../dist-files/demo/singleneuron.py
-    .. literalinclude:: ../../dist-files/demo/singleneuron.py
 
