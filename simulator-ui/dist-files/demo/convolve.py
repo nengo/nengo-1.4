@@ -13,7 +13,7 @@ B=net.make('B',300,D,quick=True)
 C=net.make('C',300,D,quick=True)
 conv=nef.convolution.make_convolution(net,'*',A,B,C,100,quick=True)
 
-net.add_to(world)
+net.add_to_nengo()
 
 
 

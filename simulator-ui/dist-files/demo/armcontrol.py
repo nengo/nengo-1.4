@@ -211,7 +211,7 @@ net.connect(funcT.getOrigin('funcT2'),controlU.getTermination('inputFuncT2'))
 net.connect(FX.getOrigin('FX1'),controlU.getTermination('inputFX1'))
 net.connect(FX.getOrigin('FX2'),controlU.getTermination('inputFX2'))
 
-net.add_to(world)
+net.add_to_nengo()
 
 
 class Room(space.Room):

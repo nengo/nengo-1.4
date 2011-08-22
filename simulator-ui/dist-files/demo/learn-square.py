@@ -38,5 +38,5 @@ net.make_input('switch',[0])
 gating.make(net,name='Gate', gated='error', neurons=40 ,pstc=0.01)
 net.connect('switch', 'Gate')
 
-net.add_to(world)
+net.add_to_nengo()
 

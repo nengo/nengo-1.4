@@ -71,7 +71,7 @@ net.connect(input2,sense2)
 net.connect(sense2,motor1)
 net.connect(sense1,motor2)
 
-net.add_to(world)
+net.add_to_nengo()
     
 r=ccm.nengo.create(Room)    
 net.add(r)
