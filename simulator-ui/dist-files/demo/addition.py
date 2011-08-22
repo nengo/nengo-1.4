@@ -10,6 +10,6 @@ net.connect(inputA,A)
 net.connect(inputB,B)
 net.connect(A,C)
 net.connect(B,C)
-net.add_to_nengo()
+net.add_to(world)
 
 

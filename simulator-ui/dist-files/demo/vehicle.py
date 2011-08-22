@@ -1,21 +1,12 @@
 from __future__ import generators
+import nef
 import space
-from ca.nengo.model.impl import *
-from ca.nengo.model import *
-from ca.nengo.model.nef.impl import *
-from ca.nengo.model.neuron.impl import *
-from ca.nengo.model.neuron import *
-from ca.nengo.math.impl import *
-from ca.nengo.model.plasticity.impl import *
-from ca.nengo.util import *
-from ca.nengo.plot import *
 from java.awt import Color
 import ccm
 import random
 
 dt=0.001
 N=10
-pstc=0.01
 
 class Bot(space.MD2):
     def __init__(self):
@@ -47,43 +38,7 @@ class Bot(space.MD2):
             self.wheels[1].force=f1*600
             self.wheels[0].force=f2*600
             yield dt
-    
-
-try:
-    world.remove(network)
-except:
-    pass
-    
-network = NetworkImpl()
-network.name='Braitenberg'
-
-ef = NEFEnsembleFactoryImpl()
-ef.nodeFactory=LIFNeuronFactory(tauRC=.020, tauRef=.001, maxRate=IndicatorPDF(200,400), intercept=IndicatorPDF(-1,1))
-
-sense1=ef.make("right input",N,1)
-sense2=ef.make("left input",N,1)
-motor1=ef.make("right motor",N,1)
-motor2=ef.make("left motor",N,1)
-network.addNode(sense1)
-network.addNode(sense2)
-network.addNode(motor1)
-network.addNode(motor2)
-sense2.addDecodedTermination('input',[[1]],pstc,False)
-sense1.addDecodedTermination('input',[[1]],pstc,False)
-motor2.addDecodedTermination('input',[[1]],pstc,False)
-motor1.addDecodedTermination('input',[[1]],pstc,False)
-network.addProjection(sense1.getOrigin('X'),motor2.getTermination('input'))
-network.addProjection(sense2.getOrigin('X'),motor1.getTermination('input'))
-
-input1=FunctionInput('right eye',[ConstantFunction(1,0)],Units.UNK)
-network.addNode(input1)
-input2=FunctionInput('left eye',[ConstantFunction(1,0)],Units.UNK)
-network.addNode(input2)
-network.addProjection(input1.getOrigin('origin'),sense1.getTermination('input'))
-network.addProjection(input2.getOrigin('origin'),sense2.getTermination('input'))
-
-world.add(network)
-
+            
 
 class Room(space.Room):
     def __init__(self):
@@ -99,9 +54,28 @@ class Room(space.Room):
         
         self.sch.add(space.Room.start,args=(self,))
             
+
+net=nef.Network('Braitenberg')
+
+input1=FunctionInput('right eye',[ConstantFunction(1,0)],Units.UNK)
+net.add(input1)
+input2=FunctionInput('left eye',[ConstantFunction(1,0)],Units.UNK)
+net.add(input2)
+
+sense1=net.make("right input",N,1)
+sense2=net.make("left input",N,1)
+motor1=net.make("right motor",N,1)
+motor2=net.make("left motor",N,1)
+
+net.connect(input1,sense1)
+net.connect(input2,sense2)
+net.connect(sense2,motor1)
+net.connect(sense1,motor2)
+
+net.add_to(world)
     
 r=ccm.nengo.create(Room)    
-network.addNode(r)
+net.add(r)
 
 
 

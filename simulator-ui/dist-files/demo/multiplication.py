@@ -14,6 +14,6 @@ net.connect(B,C,transform=[0,1])
 def product(x):
     return x[0]*x[1]
 net.connect(C,D,func=product)
-net.add_to_nengo()
+net.add_to(world)
 
 

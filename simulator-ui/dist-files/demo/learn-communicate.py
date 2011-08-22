@@ -1,49 +1,43 @@
 N=60
 D=1
-import random
+
 import nef
-from ca.nengo.model.plasticity.impl import *
+import nef.templates.learned_termination as learning
+import nef.templates.gate as gating
+import random
+
 from ca.nengo.math.impl import FourierFunction
 from ca.nengo.model.impl import FunctionInput
 from ca.nengo.model import Units
 
+random.seed(27)
 
 net=nef.Network('Learn Communication')
-input=FunctionInput('input',[FourierFunction(.1, 10,.5,i,0) for i in range(D)],Units.UNK)
-net.add(input)
 
-A=net.make('A',N,D)
-B=net.make('B',N,D)
+# Create input and output populations.
+A=net.make('pre',N,D)
+B=net.make('post',N,D)
+
+# Create a random function input.
+input=FunctionInput('input',[FourierFunction(.1, 10,.5,12)],Units.UNK)
+net.add(input)
 net.connect(input,A)
 
-error=net.make('error',N,D)
-net.connect(A,error)
-net.connect(B,error,weight=-1)
+# Create a modulated connection between the 'pre' and 'post' ensembles.
+learning.make(net,errName='error', N_err=100, preName='pre', postName='post', rate=5e-7)
 
+# Set the modulatory signal.
+net.connect('pre', 'error')
+net.connect('post', 'error', weight=-1)
 
-def rand_weights(w):
-    for i in range(len(w)):
-        for j in range(len(w[0])):
-            w[i][j] = random.uniform(-1e-4,1e-4)
-    return w
+# Add a gate to turn learning on and off.
+net.make_input('switch',[0])
+gating.make(net,name='Gate', gated='error', neurons=40 ,pstc=0.01)
+net.connect('switch', 'Gate')
 
-net.connect(A,B,weight_func=rand_weights)
-net.connect(error,B,modulatory=True)
+# Add another non-gated error population running in direct mode.
+actual = net.make('actual error', 1, 1, mode='direct')
+net.connect(A,actual)
+net.connect(B,actual,weight=-1)
 
-inFcn = InSpikeErrorFunction([n.scale for n in B.nodes],B.encoders)
-#inFcn.setLearningRate(5e-4) 
-outFcn = OutSpikeErrorFunction([n.scale for n in B.nodes],B.encoders)
-#outFcn.setLearningRate(5e-4) 
-learn_rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', 'error')
-B.setPlasticityRule('A',learn_rule)
-
-
-stop=net.make_input('stop learning',[0])
-error.addTermination('gate',[[-10]]*N,0.01,False)
-net.connect(stop,error.getTermination('gate'))
-
-
-net.add_to_nengo()
-
-
-
+net.add_to(world)

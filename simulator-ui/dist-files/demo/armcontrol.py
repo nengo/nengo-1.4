@@ -1,18 +1,15 @@
 from __future__ import generators
 import sys
+import nef
 
 import space
 reload(space)
 
-dt=0.001
-N=1
-pstc=0.01
-
-from ca.nengo.model.impl import *
-from ca.nengo.model import *
-from ca.nengo.model.nef.impl import *
-from ca.nengo.model.neuron.impl import *
-from ca.nengo.model.neuron import *
+# from ca.nengo.model.impl import *
+# from ca.nengo.model import *
+# from ca.nengo.model.nef.impl import *
+# from ca.nengo.model.neuron.impl import *
+# from ca.nengo.model.neuron import *
 from ca.nengo.math.impl import *
 from ca.nengo.model.plasticity.impl import *
 from ca.nengo.util import *
@@ -26,13 +23,20 @@ from math import *
 import java
 from java.awt import Color
 
-try:
-    world.remove(network)
-except:
-    pass
-    
-network = NetworkImpl()
-network.name ='simple arm controller'
+import ccm
+import random
+random.seed(11)
+
+from math import pi
+from com.threed.jpct import SimpleVector
+from com.bulletphysics.linearmath import Transform
+from javax.vecmath import Vector3f
+
+dt=0.001
+N=1
+pstc=0.01
+
+net = nef.Network('simple arm controller')
 
 class getShoulder(ca.nengo.math.Function):
   def map(self,X):
@@ -130,44 +134,31 @@ class getY(ca.nengo.math.Function):
 	return 2
 
 
-
-ef = NEFEnsembleFactoryImpl()
-ef.nodeFactory=LIFNeuronFactory(tauRC=.020, tauRef=.001, maxRate=IndicatorPDF(200,400), intercept=IndicatorPDF(-1,1))
-
 # input functions
 refX=FunctionInput('refX',[ConstantFunction(1,-1)],Units.UNK)# X coordinate of target
 refY=FunctionInput('refY',[ConstantFunction(1,1)],Units.UNK)# Y coordinate of target
 
-Tfunc=FunctionInput('T matrix',[ConstantFunction(1,1),ConstantFunction(1,0),ConstantFunction(1,0), \
-ConstantFunction(1,1)],Units.UNK) # used to calculate control signal
+Tfunc=FunctionInput('T matrix', [ConstantFunction(1,1), ConstantFunction(1,0), ConstantFunction(1,0), ConstantFunction(1,1)], Units.UNK) # used to calculate control signal
 
 F=FunctionInput('F',[ConstantFunction(1,-1),ConstantFunction(1,0),ConstantFunction(1,-1), \
 ConstantFunction(1,0),ConstantFunction(1,0),ConstantFunction(1,-1),ConstantFunction(1,0), \
 ConstantFunction(1,-1)],Units.UNK) # used to stabilize system
 
-network.addNode(refX)
-network.addNode(refY)
-network.addNode(Tfunc)
-network.addNode(F)
+net.add(refX)
+net.add(refY)
+net.add(Tfunc)
+net.add(F)
 
 # neural populations
-convertXY=ef.make("convert XY",N,2)
-convertAngles=ef.make("convert Angles",N,2)
-funcT=ef.make("funcT",N,6)
-FX=ef.make("FX",N,12)
-controlV=ef.make("control signal v",N,2) # calculate 2D control signal
-controlU=ef.make("control signal u",500,2) # calculates joint torque control signal
-
-network.addNode(convertXY)
-network.addNode(convertAngles)
-network.addNode(funcT)
-network.addNode(FX)
-network.addNode(controlV)
-network.addNode(controlU)
+convertXY=net.make("convert XY",N,2)
+convertAngles=net.make("convert Angles",N,2)
+funcT=net.make("funcT",N,6)
+FX=net.make("FX",N,12)
+controlV=net.make("control signal v",N,2) # calculate 2D control signal
+controlU=net.make("control signal u",500,2, quick=True) # calculates joint torque control signal
 
 # add terminations
 convertXY.addDecodedTermination('refXY',[[1,0],[0,1]],pstc,False)
-
 convertAngles.addDecodedTermination('shoulder',[[1],[0]],pstc,False)
 convertAngles.addDecodedTermination('elbow',[[0],[1]],pstc,False)
 
@@ -214,37 +205,28 @@ controlU.addDecodedOrigin('u1',[interpreter.parse("x0",2)],"AXON")
 controlU.addDecodedOrigin('u2',[interpreter.parse("x1",2)],"AXON")
 
 # add projections 
-network.addProjection(controlV.getOrigin('X'),convertXY.getTermination('refXY'))
+net.connect(controlV.getOrigin('X'),convertXY.getTermination('refXY'))
 
-network.addProjection(refX.getOrigin('origin'),controlV.getTermination('inputRefX'))
-network.addProjection(refY.getOrigin('origin'),controlV.getTermination('inputRefY'))
+net.connect(refX.getOrigin('origin'),controlV.getTermination('inputRefX'))
+net.connect(refY.getOrigin('origin'),controlV.getTermination('inputRefY'))
 
-network.addProjection(convertAngles.getOrigin('currentX'),controlV.getTermination('inputCurrentX'))
-network.addProjection(convertAngles.getOrigin('currentY'),controlV.getTermination('inputCurrentY'))
+net.connect(convertAngles.getOrigin('currentX'),controlV.getTermination('inputCurrentX'))
+net.connect(convertAngles.getOrigin('currentY'),controlV.getTermination('inputCurrentY'))
 
-network.addProjection(F.getOrigin('origin'),FX.getTermination('inputFs'))
+net.connect(F.getOrigin('origin'),FX.getTermination('inputFs'))
 
-network.addProjection(convertXY.getOrigin('shoulderRef'),funcT.getTermination('shoulderRef'))
-network.addProjection(convertXY.getOrigin('elbowRef'),funcT.getTermination('elbowRef'))
+net.connect(convertXY.getOrigin('shoulderRef'),funcT.getTermination('shoulderRef'))
+net.connect(convertXY.getOrigin('elbowRef'),funcT.getTermination('elbowRef'))
 
-network.addProjection(Tfunc.getOrigin('origin'),funcT.getTermination('inputTs'))
+net.connect(Tfunc.getOrigin('origin'),funcT.getTermination('inputTs'))
 
-network.addProjection(funcT.getOrigin('funcT1'),controlU.getTermination('inputFuncT1'))
-network.addProjection(funcT.getOrigin('funcT2'),controlU.getTermination('inputFuncT2'))
-network.addProjection(FX.getOrigin('FX1'),controlU.getTermination('inputFX1'))
-network.addProjection(FX.getOrigin('FX2'),controlU.getTermination('inputFX2'))
+net.connect(funcT.getOrigin('funcT1'),controlU.getTermination('inputFuncT1'))
+net.connect(funcT.getOrigin('funcT2'),controlU.getTermination('inputFuncT2'))
+net.connect(FX.getOrigin('FX1'),controlU.getTermination('inputFX1'))
+net.connect(FX.getOrigin('FX2'),controlU.getTermination('inputFX2'))
 
+net.add_to(world)
 
-world.add(network)
-import ccm
-
-import random
-random.seed(11)
-
-from math import pi
-from com.threed.jpct import SimpleVector
-from com.bulletphysics.linearmath import Transform
-from javax.vecmath import Vector3f
 
 class Room(space.Room):
     def __init__(self):
@@ -345,7 +327,7 @@ class Room(space.Room):
             yield 0.0001
     
 r=ccm.nengo.create(Room)
-network.addNode(r)
+net.add(r)
 
 # need to make hinge1, hinge2, vel1, and vel external nodes and hook up the output to the FX matrix
 r.exposeOrigin(r.getNode('hinge1').getOrigin('origin'),'shoulderAngle')
@@ -353,43 +335,19 @@ r.exposeOrigin(r.getNode('hinge2').getOrigin('origin'),'elbowAngle')
 r.exposeOrigin(r.getNode('vel1').getOrigin('origin'),'shoulderVel')
 r.exposeOrigin(r.getNode('vel2').getOrigin('origin'),'elbowVel')
 
-network.addProjection(r.getOrigin('shoulderAngle'),FX.getTermination('X1'))
-network.addProjection(r.getOrigin('elbowAngle'),FX.getTermination('X2'))
-network.addProjection(r.getOrigin('shoulderVel'),FX.getTermination('X3'))
-network.addProjection(r.getOrigin('elbowVel'),FX.getTermination('X4'))
+net.connect(r.getOrigin('shoulderAngle'),FX.getTermination('X1'))
+net.connect(r.getOrigin('elbowAngle'),FX.getTermination('X2'))
+net.connect(r.getOrigin('shoulderVel'),FX.getTermination('X3'))
+net.connect(r.getOrigin('elbowVel'),FX.getTermination('X4'))
 
-network.addProjection(r.getOrigin('shoulderAngle'),convertAngles.getTermination('shoulder'))
-network.addProjection(r.getOrigin('elbowAngle'),convertAngles.getTermination('elbow'))
-network.addProjection(r.getOrigin('shoulderAngle'),funcT.getTermination('shoulder'))
-network.addProjection(r.getOrigin('elbowAngle'),funcT.getTermination('elbow'))
+net.connect(r.getOrigin('shoulderAngle'),convertAngles.getTermination('shoulder'))
+net.connect(r.getOrigin('elbowAngle'),convertAngles.getTermination('elbow'))
+net.connect(r.getOrigin('shoulderAngle'),funcT.getTermination('shoulder'))
+net.connect(r.getOrigin('elbowAngle'),funcT.getTermination('elbow'))
 
-
-# add probes
-network.simulator.addProbe(convertXY.getName(),'shoulderRef',True)
-network.simulator.addProbe(convertXY.getName(),'elbowRef',True)
-
-network.simulator.addProbe(r.getName(),'shoulderAngle',True)
-network.simulator.addProbe(r.getName(),'elbowAngle',True)
-network.simulator.addProbe(r.getName(),'shoulderVel',True)
-network.simulator.addProbe(r.getName(),'elbowVel',True)
-
-network.simulator.addProbe(funcT.getName(),'funcT1',True)
-network.simulator.addProbe(funcT.getName(),'funcT2',True)
-
-network.simulator.addProbe(FX.getName(),'FX1',True)
-network.simulator.addProbe(FX.getName(),'FX2',True)
-network.simulator.addProbe(FX.getName(),'X',True)
-
-network.simulator.addProbe(controlU.getName(),'u1',True)
-network.simulator.addProbe(controlU.getName(),'u2',True)
-
-network.simulator.addProbe(controlV.getName(),'X',True)
-
-network.simulator.addProbe(convertAngles.getName(),'currentX',True)
-network.simulator.addProbe(convertAngles.getName(),'currentY',True)
 
 # put everything in direct mode
-network.setMode(SimulationMode.DIRECT)
+net.network.setMode(SimulationMode.DIRECT)
 # except the last population
 controlU.setMode(SimulationMode.DEFAULT)
 

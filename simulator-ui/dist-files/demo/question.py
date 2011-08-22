@@ -57,5 +57,5 @@ net.connect(input.getOrigin('B'),B)
 net.connect(input.getOrigin('E'),E)
 
 
-net.add_to_nengo()
+net.add_to(world)
 
