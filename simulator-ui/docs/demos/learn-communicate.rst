@@ -1,53 +1,25 @@
 Learning a Communication Channel
 ==============================================
+*Purpose*: This is the first demo showing learning in Nengo.  It learns the same circuit constructed in the Communication Channel demo.
 
+*Comments*: The particular connection that is learned is the one between the 'pre' and 'post' populations.  This particular learning rule is a kind of modulated Hebb-like learning (see Bekolay, 2011 for details).  
 
-N=30
-D=1
-import random
-import nef
-from ca.nengo.model.plasticity.impl import *
-from ca.nengo.math.impl import FourierFunction
-from ca.nengo.model.impl import FunctionInput
-from ca.nengo.model import Units
+Note: The red and blue graph is a plot of the connection weights, which you can watch change as learning occurs (you may need to zoom in with the scroll wheel; the learning a square demo has a good example). Typtically, the largest changes occur at the beginning of a simulation. Red indicates negative weights and blue positive weights.
 
+*Usage*: When you run the network, it automatically has a random white noise input injected into it.  So the input slider moves up and down randomly.  However, learning is turned off, so there is little correlation between the representation of the pre and post populations.
 
-net=nef.Network('Learn Communication')
-input=FunctionInput('input',[FourierFunction(.1, 10,.5,i,0) for i in range(D)],Units.UNK)
-net.add(input)
+Turn learning on: To allow the learning rule to work, you need to move the 'switch' to +1.  Because the learning rule is modulated by an error signal, if the error is zero, the weights won't change.  Once learning is on, the post will begin to track the pre.
 
-A=net.make('A',N,D)
-B=net.make('B',N,D)
-net.connect(input,A)
+Monitor the error:  When the switch is 0 at the beginning of the simulation, there is no 'error', though there is an 'actual error'.  The difference here is that 'error' is calculated by a neural population, and used by the learning rule, while 'actual error' is computed mathematically and is just for information.
 
-error=net.make('error',N,D)
-net.connect(A,error)
-net.connect(B,error,weight=-1)
+Repeat the experiment: After a few simulated seconds, the post and pre will match well.  You can hit the 'reset' button (bottom left) and the weights will be reset to their original random values, and the switch will go to zero.  For a different random starting point, you need to re-run the script.
 
+*Output*: See the screen capture below. 
 
-def rand_weights(w):
-    for i in range(len(w)):
-        for j in range(len(w[0])):
-            w[i][j] = random.uniform(-1e-4,1e-4)
-    return w
+.. image:: images/learn-communicate.png
 
-net.connect(A,B,weight_func=rand_weights)
-net.connect(error,B,modulatory=True)
-
-inFcn = InSpikeErrorFunction([n.scale for n in B.nodes],B.encoders)
-#inFcn.setLearningRate(5e-4) 
-outFcn = OutSpikeErrorFunction([n.scale for n in B.nodes],B.encoders)
-#outFcn.setLearningRate(5e-4) 
-learn_rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', 'error')
-B.setPlasticityRule('A',learn_rule)
-
-
-stop=net.make_input('stop learning',[0])
-error.addTermination('gate',[[-10]]*N,0.01,False)
-net.connect(stop,error.getTermination('gate'))
-
-
-net.add_to(world)
+*Code*:
+    .. literalinclude:: ../../dist-files/demo/learn-communicate.py
 
 
 

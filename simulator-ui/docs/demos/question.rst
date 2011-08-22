@@ -1,64 +1,17 @@
 A Question Answering Network
 ============================
+*Purpose*: This demo shows how to do question answering using binding (i.e. see the convolution demo).
 
-D=16
-subdim=4
-N=100
-seed=7
+*Comments*: This example binds the A and B inputs to give C. Then the E input is used to decode the contents of C and the result is shown in F.  Essentially showing unbinding gives back what was bound.  
 
-import nef
-import nef.convolution
-import hrr
-import math
-import random
+Note: The b/w graphs show the decoded vector values, not neural activity.  So, the result in F should visually look like the A element if B is being unbound from C.
 
-random.seed(seed)
+*Usage*: When you run the network, it will start by binding 'RED' and 'CIRCLE' and then unbinding 'RED' from that result, and the output will be 'CIRCLE'.  Then it does the same kind of thing with BLUE SQUARE.  You can set the input values by right-clicking the SPA graphs and setting the value by typing somethign in.  If you type in a vocabulary word that is not there, it will be added to the vocabulary.
 
-vocab=hrr.Vocabulary(D,max_similarity=0.1)
+*Output*: See the screen capture below. 
 
-net=nef.Network('Question Answering')
-A=net.make('A',1,D,mode='direct')
-B=net.make('B',1,D,mode='direct')
-C=net.make_array('C',N,D/subdim,dimensions=subdim,quick=True,radius=1.0/math.sqrt(D),storage_code='%d')
-E=net.make('E',1,D,mode='direct')
-F=net.make('F',1,D,mode='direct')
+.. image:: images/question.png
 
-conv1=nef.convolution.make_convolution(net,'*',A,B,C,N,quick=True)
-conv2=nef.convolution.make_convolution(net,'/',C,E,F,N,invert_second=True,quick=True)
-
-CIRCLE=vocab.parse('CIRCLE')
-BLUE=vocab.parse('BLUE')
-RED=vocab.parse('RED')
-SQUARE=vocab.parse('SQUARE')
-ZERO=[0]*D
-
-class Input(nef.SimpleNode):
-  def origin_A(self):
-    t=(self.t_start)%1.0
-    if 0<t<0.5: return RED.v
-    if 0.5<t<1: return BLUE.v
-    return ZERO
-  def origin_B(self):
-    t=(self.t_start)%1.0
-    if 0.0<t<0.5: return CIRCLE.v
-    if 0.5<t<1: return SQUARE.v
-    return ZERO
-  def origin_E(self):
-    t=(self.t_start)%1.0
-    if 0.2<t<0.35: return CIRCLE.v
-    if 0.35<t<0.5: return RED.v
-    if 0.7<t<0.85: return SQUARE.v
-    if 0.85<t<1: return BLUE.v
-    return ZERO
-
-
-
-input=Input('input')
-net.add(input)
-net.connect(input.getOrigin('A'),A)
-net.connect(input.getOrigin('B'),B)
-net.connect(input.getOrigin('E'),E)
-
-
-net.add_to(world)
+*Code*:
+    .. literalinclude:: ../../dist-files/demo/question.py
 

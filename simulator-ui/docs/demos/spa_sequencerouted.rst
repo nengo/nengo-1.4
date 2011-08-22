@@ -1,34 +1,16 @@
-Routed Sequencing with the SPA Package
+Routed Sequencing
 ================================================
+*Purpose*: This demo uses the basal ganglia model to cycle through a 5 element sequence, where an arbitrary start can be presented to the model.
 
-from spa import *
+*Comments*: This basal ganglia is now hooked up to a memory and includes routing.  The addition of routing allows the system to choose between two different actions: whether to go through the sequence, or be driven by the visual input.  If the visual input has its value set to LETTER+D (for instance), it will begin cycling through at D->E, etc.  
 
-D=16
+The 'utility' graph shows the utility of each rule going into the basal ganglia. The 'rule' graph shows which one has been selected and is driving thalamus.
 
-class Rules:
-    def start(vision='LETTER'):
-        set(state=vision)
-    def A(state='A'):
-        set(state='B')
-    def B(state='B'):
-        set(state='C')
-    def C(state='C'):
-        set(state='D')
-    def D(state='D'):
-        set(state='E')
-    def E(state='E'):
-        set(state='A')
-    
+*Usage*: When you run the network, it will go through the sequence forever, starting at D.  You can right-click the SPA graph and set the value to anything else (e.g. 'LETTER+B') and it will start at the new letter and then begin to sequence through.  The point is partly that it can ignore the input after its first been shown and doesn't perseverate on the letter as it would without gating.
 
+*Output*: See the screen capture below. 
 
-class Routing(SPA):
-    dimensions=16
+.. image:: images/spa_sequencerouted.png
 
-    state=Buffer()
-    vision=Buffer(feedback=0)
-    BG=BasalGanglia(Rules)
-    thal=Thalamus(BG)
-
-    input=Input(0.1,vision='LETTER+D')
-
-model=Routing()
+*Code*:
+    .. literalinclude:: ../../dist-files/demo/spa_sequencerouted.py

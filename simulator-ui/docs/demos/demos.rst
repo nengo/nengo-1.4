@@ -20,14 +20,14 @@ Introductory Demos
    twoneurons
    manyneurons
    2drepresentation
-   squaring
-
+   
 Simple Transformations
 ------------------------
 .. toctree::
    :maxdepth: 1
    
    communication   
+   squaring
    addition
    combining
    multiplication
@@ -51,7 +51,6 @@ Basal Ganglia Based Simulations
 
    basalganglia
    spa_sequence
-   sequencenogate
    spa_sequencerouted
    question
    question-memory
@@ -71,6 +70,6 @@ Miscellaneous
 .. toctree::
    :maxdepth: 1
    
-   armcontrol
    vehicle
+   armcontrol
 

@@ -1,57 +1,22 @@
-Learning to Compute the Square
+Learning to Compute the Square of a Vector
 ==============================================
+*Purpose*: This is demo shows learning a nonlinear function of a vector.
 
-N=50
-D=2
-import random
-import nef
-from ca.nengo.model.plasticity.impl import *
-from ca.nengo.math.impl import FourierFunction
-from ca.nengo.model.impl import FunctionInput
-from ca.nengo.model import Units
+*Comments*: The set up here is very similar to the Learning a Communication Channel demo.  The main difference is that this demo works in a 2D vector space (instead of a scalar), and that it is learning to compute a nonlinear function (the element-wise square) of its input.
 
+*Usage*: When you run the network, it automatically has a random white noise input injected into it in both dimensions.
 
-net=nef.Network('Learn Square')
-input=FunctionInput('input',[FourierFunction(.1, 10,.5,i,0) for i in range(D)],Units.UNK)
-net.add(input)
+Turn learning on: To allow the learning rule to work, you need to move the 'switch' to +1.
 
-A=net.make('A',N,D)
-B=net.make('B',N,D)
-net.connect(input,A)
+Monitor the error:  When the simulation starts and learning is on, the error is high.  The average error slowly begins to decrease as the simulation continues.  After 15s or so of simulation, it will do a reasonable job of computing the square, and the error in both dimensions should be quite small.
 
-error=net.make('error',N,D)
+Is it working? To see if the right function is being computed, compare the 'pre' and 'post' population value graphs. You should note that 'post' looks kind of like an absolute value of 'pre', the 'post' will be a bit squashed.  You can also check that both graphs of either dimension should hit zero at about the same time.
 
-def square(x):
-    return [xx*xx for xx in x]
+*Output*: See the screen capture below. 
 
-net.connect(A,error,func=square)
-
-net.connect(B,error,weight=-1)
+.. image:: images/learn-square.png
 
 
-def rand_weights(w):
-    for i in range(len(w)):
-        for j in range(len(w[0])):
-            w[i][j] = random.uniform(-1e-4,1e-4)
-    return w
-
-net.connect(A,B,weight_func=rand_weights)
-net.connect(error,B,modulatory=True)
-
-inFcn = InSpikeErrorFunction([n.scale for n in B.nodes],B.encoders)
-#inFcn.setLearningRate(5e-4) 
-outFcn = OutSpikeErrorFunction([n.scale for n in B.nodes],B.encoders)
-#outFcn.setLearningRate(5e-4) 
-learn_rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', 'error')
-B.setPlasticityRule('A',learn_rule)
-
-
-stop=net.make_input('stop learning',[0])
-error.addTermination('gate',[[-10]]*N,0.01,False)
-net.connect(stop,error.getTermination('gate'))
-
-
-net.add_to(world)
-
-
+*Code*:
+    .. literalinclude:: ../../dist-files/demo/learn-square.py
 

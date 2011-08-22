@@ -1,59 +1,25 @@
 Learning Multiplication
 ============================
+*Purpose*: This is demo shows learning a familiar nonlinear function, multiplication.
 
-N=50
-D=2
-import random
-import nef
-from ca.nengo.model.plasticity.impl import *
-from ca.nengo.math.impl import FourierFunction
-from ca.nengo.model.impl import FunctionInput
-from ca.nengo.model import Units
+*Comments*: The set up here is very similar to the other learning demos.  The main difference is that this demo learns a nonlinear projection from a 2D to a 1D space (i.e. multiplication).
 
+*Usage*: When you run the network, it automatically has a random white noise input injected into it in both dimensions.
 
-net=nef.Network('Learn Product')
-input=FunctionInput('input',[FourierFunction(.1, 10,.5,i,0) for i in range(D)],Units.UNK)
-net.add(input)
+Turn learning on: To allow the learning rule to work, you need to move the 'switch' to +1.
 
-A=net.make('A',N,D,radius=2)
-B=net.make('B',N,1)
-net.connect(input,A)
+Monitor the error:  When the simulation starts and learning is on, the error is high.  After about 10s it will do a reasonable job of computing the produt, and the error should be quite small.
 
-error=net.make('error',N,1)
+Is it working? To see if the right function is being computed, compare the 'pre' and 'post' population value graphs. You should note that if either dimension in the input is small, the output will be small.  Only when both dimensions have larger absolute values does the output go away from zero (see the screen capture below).
 
-def product(x):
-    product=1.0
-    for xx in x: product*=xx
-    return product
+*Output*: See the screen capture below. 
 
-net.connect(A,error,func=product)
-
-net.connect(B,error,weight=-1)
+.. image:: images/learn-product.png
 
 
-def rand_weights(w):
-    for i in range(len(w)):
-        for j in range(len(w[0])):
-            w[i][j] = random.uniform(-1e-4,1e-4)
-    return w
+*Code*:
+    .. literalinclude:: ../../dist-files/demo/learn-product.py
 
-net.connect(A,B,weight_func=rand_weights)
-net.connect(error,B,modulatory=True)
-
-inFcn = InSpikeErrorFunction([n.scale for n in B.nodes],B.encoders)
-#inFcn.setLearningRate(5e-4) 
-outFcn = OutSpikeErrorFunction([n.scale for n in B.nodes],B.encoders)
-#outFcn.setLearningRate(5e-4) 
-learn_rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', 'error')
-B.setPlasticityRule('A',learn_rule)
-
-
-stop=net.make_input('stop learning',[0])
-error.addTermination('gate',[[-10]]*N,0.01,False)
-net.connect(stop,error.getTermination('gate'))
-
-
-net.add_to(world)
 
 
 
