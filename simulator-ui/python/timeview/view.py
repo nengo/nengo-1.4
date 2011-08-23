@@ -608,10 +608,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         (filename,db) = self.doRestoreOpenFile()
         try:
             if( self.doRestore(db) ):
-                # Restore successful! Create a backup copy of the layout file
-                copyfile(filename + '.dat', filename + '.dat.bak')
-                copyfile(filename + '.dir', filename + '.dir.bak')
-                copyfile(filename + '.bak', filename + '.bak.bak')
+                save_layout_file(self.network.name, *db[self.network.name])
                 return True
             else:
                 return False
@@ -634,7 +631,11 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     raise e
                 
                 (filename,db) = self.doRestoreOpenFile()
-                return self.doRestore(db)
+                if( self.doRestore(db) ):
+                    save_layout_file(self.network.name, *db[self.network.name])
+                    return True
+                else:
+                    return False
             except Exception, e:
                 # Ultimate failz
                 error_msg = '[Error]: Failed to restore backup layout file.'
