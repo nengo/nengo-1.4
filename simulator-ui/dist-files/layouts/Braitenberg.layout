@@ -1,0 +1,13 @@
+({'x': 0, 'height': 480, 'width': 860, 'state': 0, 'y': 25},
+ [('right eye', None, {'height': 32, 'x': 16, 'label': 0, 'width': 87, 'y': 60}),
+  ('left input', None, {'height': 32, 'x': 158, 'label': 0, 'width': 86, 'y': 12}),
+  ('left eye', None, {'height': 32, 'x': 15, 'label': 0, 'width': 75, 'y': 11}),
+  ('right input', None, {'height': 32, 'x': 157, 'label': 0, 'width': 98, 'y': 58}),
+  ('right motor', None, {'height': 32, 'x': 567, 'label': 0, 'width': 107, 'y': 58}),
+  ('left motor', None, {'height': 32, 'x': 564, 'label': 0, 'width': 95, 'y': 7}),
+  ('Room', '3D view', {'height': 193, 'x': 287, 'label': 0, 'width': 208, 'y': 122}),
+  ('right motor', 'spike raster', {'height': 115, 'x': 504, 'label': 1, 'width': 279, 'sample': 1, 'y': 231}),
+  ('right input', 'spike raster', {'height': 104, 'x': 30, 'label': 1, 'width': 253, 'sample': 1, 'y': 247}),
+  ('left input', 'spike raster', {'height': 94, 'x': 29, 'label': 1, 'width': 245, 'sample': 1, 'y': 143}),
+  ('left motor', 'spike raster', {'height': 115, 'x': 505, 'label': 1, 'width': 275, 'sample': 1, 'y': 107})],
+ {'sim_spd': 4, 'rcd_time': 2.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.2})
