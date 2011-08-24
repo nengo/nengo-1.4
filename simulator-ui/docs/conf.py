@@ -109,6 +109,12 @@ html_theme_options = {
     'footertextcolor':'#888888',
     'footerbgcolor':'#EEEEEE',
     
+    'headtextcolor':'#0c7a00',
+    'headlinkcolor':'#0c7a00',
+
+    'linkcolor':'#0c7a00',
+    'visitedlinkcolor':'#0c7a00',
+
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
