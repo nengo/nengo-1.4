@@ -607,14 +607,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
     def restore_old(self):
         (filename,db) = self.doRestoreOpenFile()
         try:
-            if( self.doRestore(db) ):
-                # Restore successful! Create a backup copy of the layout file
-                copyfile(filename + '.dat', filename + '.dat.bak')
-                copyfile(filename + '.dir', filename + '.dir.bak')
-                copyfile(filename + '.bak', filename + '.bak.bak')
-                return True
-            else:
-                return False
+            ret_val = self.doRestore(db)
+            self.delete_old_files(filename)
+            return ret_val
         except Exception, e:
             error_msg = '[Warning]: Failed to restore ' + filename + '. Layout file possibly corrupt. Retrying restore from backup.'
             warnings.warn(error_msg, RuntimeWarning)
@@ -634,7 +629,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     raise e
                 
                 (filename,db) = self.doRestoreOpenFile()
-                return self.doRestore(db)
+                ret_val = self.doRestore(db)
+                self.delete_old_files(filename)
+                return ret_val
             except Exception, e:
                 # Ultimate failz
                 error_msg = '[Error]: Failed to restore backup layout file.'
@@ -643,6 +640,17 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 # Close the existing db
                 db.close()
                 raise e
+
+    def delete_old_files(self, filename):
+        # Remove old backup files
+        java.io.File(filename + '.dat').delete()
+        java.io.File(filename + '.dir').delete()
+        java.io.File(filename + '.bak').delete()
+        if( java.io.File(filename + '.dat.bak').exists() and java.io.File(filename + '.dir.bak') and \
+            java.io.File(filename + '.bak.bak').exists() ):
+            java.io.File(filename + '.dat.bak').delete()
+            java.io.File(filename + '.dir.bak').delete()
+            java.io.File(filename + '.bak.bak').delete()
 
     # TODO: remove this when we no longer want to support old-style layout files        
     def doRestoreOpenFile(self):
@@ -667,14 +675,15 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
     def doRestore(self,db):
         key=self.network.name
         
+        # Auto convert layout file
+        for k in db.keys():
+            save_layout_file(k, *db[k])
+        
         if key not in db.keys(): 
             return False
 
         saved_info = db[key]
 
-        # Auto convert layout file
-        save_layout_file(key, *db[key])
-        
         if( len( saved_info ) == 2 ):   # Old control saving format - control saves global
             view_data,layout = saved_info
 
@@ -1116,7 +1125,9 @@ def load_layout_file(name, try_backup = True):
         if not java.io.File(fn).exists():
             return None
     try:
-        data=eval(file(fn).read())
+        f = file(fn,'r')
+        data=eval(f.read())
+        f.close()
     except Exception,e:
         warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
         return None

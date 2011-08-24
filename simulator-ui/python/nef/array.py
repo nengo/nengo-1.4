@@ -118,6 +118,7 @@ class NetworkArray(NetworkImpl):
         origins=[n.addDecodedOrigin(name,functions,nodeOrigin) for n in self._nodes]
         self.createEnsembleOrigin(name)
         return self.getOrigin(name)
+
     def addTermination(self,name,matrix,tauPSC,isModulatory):
         """Create a new termination.  A new termination is created on each
         of the ensembles, which are then grouped together.  This termination
@@ -144,6 +145,7 @@ class NetworkArray(NetworkImpl):
         termination = EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
+
     def addPlasticTermination(self,name,matrix,tauPSC,decoder,weight_func=None):
         """Create a new termination.  A new termination is created on each
         of the ensembles, which are then grouped together.
@@ -154,7 +156,7 @@ class NetworkArray(NetworkImpl):
         by number of dimensions)."""
         terminations = []
         d = 0
-        dd=nodes[0].dimension
+        dd=self._nodes[0].dimension
         for n in self._nodes:
             encoder = n.encoders
             w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd)])
@@ -166,6 +168,7 @@ class NetworkArray(NetworkImpl):
         termination = EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
+
     def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
         """Create a new termination.  A new termination is created on each
         of the ensembles, which are then grouped together."""
