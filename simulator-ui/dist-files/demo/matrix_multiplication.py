@@ -2,7 +2,7 @@
 
 import nef
 
-net=nef.Network('Matrix Multiplication',quick=True)
+net=nef.Network('Matrix Multiplication',quick=True) #Create the network object
 
 # Adjust these values to change the matrix dimensions
 #  Matrix A is D1xD2

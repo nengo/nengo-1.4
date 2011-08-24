@@ -12,19 +12,16 @@ import random
 
 random.seed(seed)
 
-net=nef.Network('Question Answering with Control')
+net=nef.Network('Question Answering with Control') #Create the network object
 
-for i in range(50):
+for i in range(50): #This is here to create a vocabulary with sufficient lack of similarity in the items so we can work in such a low dimensional space; for high dimensional spaces this can be skipped
     vocab=hrr.Vocabulary(D,max_similarity=0.05)
     vocab.parse('CIRCLE+BLUE+RED+SQUARE')
     a=vocab.parse('(RED*CIRCLE+BLUE*SQUARE)*~(RED)').compare(vocab.parse('CIRCLE'))
     b=vocab.parse('(RED*CIRCLE+BLUE*SQUARE)*~(SQUARE)').compare(vocab.parse('BLUE'))
     if min(a,b)>0.65: break
 
-
-
-
-class Input(nef.SimpleNode):
+class Input(nef.SimpleNode): #Make a simple node to generate interesting input for the network
     def __init__(self,name):
         self.zero=[0]*D
         nef.SimpleNode.__init__(self,name)
@@ -53,7 +50,7 @@ inv=Input('inv')
 net.add(inv)
 
 
-prods=nps.ProductionSet()
+prods=nps.ProductionSet() #This is an older way of implementing an SPA (see SPA routing examples), using the nps code directly
 prods.add(dict(visual='STATEMENT'),dict(visual_to_wm=True))
 prods.add(dict(visual='QUESTION'),dict(wm_deconv_visual_to_motor=True))
 
@@ -63,7 +60,7 @@ model.add_buffer_feedback(wm=1,pstc=0.4)
 
 net.connect(inv.getOrigin('x'),'buffer_visual')
       
-
+#Rename objects for display purposes
 net.network.getNode('prod').name='thalamus'
 net.network.getNode('buffer_visual').name='visual'
 net.network.getNode('buffer_wm').name='memory'
