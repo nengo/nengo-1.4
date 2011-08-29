@@ -1,4 +1,4 @@
-Advanced Scripting Tips
+Scripting Tips
 ===========================
 
 Common transformation matrices
@@ -51,6 +51,7 @@ For example::
 
 
 
+
 Adding noise to the simulation
 --------------------------------
 
@@ -59,6 +60,19 @@ value is sampled from the uniform distribution between -noise and +noise).  Each
 this distribution at this rate, and add the resulting value to its input current.  The frequency defaults to 1000Hz::
 
   H=net.make('H',50,1,noise=0.5,noise_frequency=1000)
+
+
+Random inputs
+--------------
+
+Here is how you can convert an input to provide a randomly changing value, rather than a constant::
+
+    input=net.make_input('input',[0])
+    input.functions=[FourierFunction(0.1,10,0.5,0,0)]
+    
+This will produce a randomly varying input.  This input will consist of random sine waves varying from 0.1Hz to 10Hz, in 0.5Hz increments. The random
+number seed used is 0.
+
 
 Changing modes: spiking, rate, and direct
 ------------------------------------------
@@ -121,3 +135,101 @@ The following computes the products of five pairs of numbers, storing the result
   net.connect(A,B,func=product)
 
 
+Matrix operations
+-------------------
+
+To simplify the manipulation of matrices, we have added a version of JNumeric to Nengo. This allows for a syntax similar to Matlab, but based on the NumPy python module.
+
+To use this for matrix manipulation, you will first have to convert any matrix you have into an array object::
+
+    a=[[1,2,3],[4,5,6]]         # old method
+    a=array([[1,2,3],[4,5,6]])  # new method
+
+You can also specify the storage format to be used as follows::
+
+    a=array([[1,2,3],[4,5,6]],typecode='f')
+    # valid values for the typecode parameter:
+    #      'i'  int32
+    #      's'  int16
+    #      'l'  int64
+    #      '1'  int8
+    #      'f'  float32
+    #      'd'  float64
+    #      'F'  complex64
+    #      'D'  complex128
+
+The first important thing you can do with this array is use full slice syntax. This is the [:] notation used to access part of an array. A slice is a set of three values, all of which are optional. [a:b:c] means to start at index a, go to index b (but not include index b), and have a step size of c between items. The default for a is 0, for b is the length of the array, and c is 1. For multiple dimensions, we put a comma between slices for each dimension. The following examples are all for a 2D array. Note that the order of the 2nd and 3rd parameters are reversed from matlab, and it is all indexed starting at 0::
+
+    a[0]     # the first row
+    a[0,:]   # the first row
+    a[:,0]   # the first column
+    a[0:3]   # the first three rows
+    a[:,0:3] # the first three columns
+    a[:,:3]  # the first three columns (the leading zero is optional)
+    a[:,2:]  # all columns from the 2nd to the end (the end value is optional)
+    a[:,:-1] # all columns except the last one (negative numbers index from the end)
+    a[::2]   # just the even-numbered rows (skip every other row)
+    a[::3]   # every third row
+    a[::-1]  # all rows in reverse order
+    a[:,::2]  # just the even-numbered columns (skip every other column)
+    a[:,::-1] # all columns in reverse order
+     
+    a.T       # efficient transpose (doesn't use any more memory)
+
+With such an array, you can perform element-wise operations as follows::
+
+    c=a+b     # same as .+ in matlab
+    c=a*b     # same as .* in matlab
+    b=cos(a)  # computes cosine of all values in a
+       # other known functions: add, subtract, multiply, divide, remainder, power, 
+       #   arccos, arccosh, arcsinh, arctan, arctanh, ceil, conjugate, imaginary,
+       #   cos, cosh, exp, floor, log, log10, real, sin, sinh, sqrt, tan, tanh,
+       #   maximum, minimum, equal, not_equal, less, less_equal, greater,
+       #   greater_equal, logical_and, logical_or, logical_xor, logical_not,
+       #   bitwise_and, bitwise_or, bitwise_xor
+
+You can also create particular arrays::
+
+    arange(5)     # same as array(range(5))==[0,1,2,3,4]
+    arange(2,5)   # same as array(range(2,5))==[2,3,4]
+     
+    eye(5)            # 5x5 identity matrix
+    ones((3,2))       # 3x2 matrix of all 1
+    ones((3,2),typecode='f')   # 3x2 matrix of all 1.0 (floating point values)
+    zeros((3,2))       # 3x2 matrix of all 0
+
+The following functions help manipulate the shape of a matrix::
+
+    a.shape    # get the current size of the matrix
+    b=reshape(a,(3,4))  # convert to a 3x4 matrix (must already have 12 elements)
+    b=resize(a,(3,4))  # convert to a 3x4 matrix (can start at any size)
+    b=ravel(a) # convert to a 1-D vector
+    b=diag([1,2,3])   # create a diagonal matrix with the given values
+
+Some basic linear algebra operations are available::
+
+    c=dot(a,b)
+    c=dot(a,a.T)
+    c=innerproduct(a,a)
+    c=convolve(a,b)
+
+And a Fourier transform::
+
+    b=fft(a)
+    a=ifft(b)
+
+The following functions also exist::
+
+    #  argmax, argsort, argmin, asarray, bitwise_not, choose, clip, compress, 
+    #  concatenate, fromfunction, indices, nonzero, searchsorted, sort, take
+    #  where, tostring, fromstring, trace, repeat, diagonal
+    #  sum, cumsum, product, cumproduct, alltrue, sometrue
+
+The vast majority of the time, you can use these objects the same way you would a normal list of values (i.e. for specifying transformation matrices). If you ever need to explicitly convert one back into a list, you can call .tolist()::
+
+    a=array([1,2,3])
+    b=a.tolist()
+
+These functions are all available at the Nengo console and in any script called using the run command. To access them in a separate script file, you need to call::
+
+    from numeric import *

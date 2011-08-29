@@ -21,6 +21,7 @@ high-level cognitive algorithms.
    tutorial
    demos/demos
    scripting
+   advanced/index
    java_api
 
 * :ref:`genindex`
