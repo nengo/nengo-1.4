@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Nengo
+Nengo User Manual
 ===========================================
 
 `Nengo <http://nengo.ca>`_ is a software package for simulating large-scale neural systems.
@@ -19,8 +19,9 @@ high-level cognitive algorithms.
    :maxdepth: 2
 
    tutorial
-   scripting
    demos/demos
+   scripting
+   java_api
 
 * :ref:`genindex`
 * :ref:`search`
