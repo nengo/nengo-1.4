@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="build" name="nengo-sim">
+<project basedir="." default="build" name="nengo">
     <property environment="env"/>
     <property file="build.properties"/>
     <path id="classpath.simulator">
@@ -57,20 +57,9 @@
     	<delete dir="${dest.instrumented}"/>
     	<delete dir="${dest.test}"/>
     </target>
-
-	<target description="Generate JavaDoc." name="javadoc">
-		<delete dir="${dest.artifacts.javadoc}"/>
-		<mkdir dir="${dest.artifacts.javadoc}"/>
-		<javadoc sourcepath="${src.main}" destdir="${dest.artifacts.javadoc}"
-			author="true" version="true" windowtitle="Nengo API"/>
-	</target>
 	
     <target description="Build simulator. Produces .class files in the ${dest.build} directory."
 			depends="init" name="build">
-    	<!-- Path testing
-    	<pathconvert property="simpath" pathsep="${line.separator}          " refid="classpath.simulator" />
-    	<echo message="${simpath}" />
-    		Path testing -->
         <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
             <src path="${src.main}"/>
             <classpath refid="classpath.simulator"/>
@@ -78,12 +67,19 @@
         </javac>
     </target>
 	
+	<target description="Generate JavaDoc." name="javadoc">
+		<delete dir="${dest.artifacts.javadoc}"/>
+		<mkdir dir="${dest.artifacts.javadoc}"/>
+		<javadoc sourcepath="${src.main}"
+			destdir="${dest.artifacts.javadoc}"
+			author="false"
+			version="false"
+			stylesheetfile="${src.javadoc.css}"
+			windowtitle="Nengo Java API Documentation"/>
+	</target>
+	
 	<target description="Run JUnit tests and produce reports."
 			depends="init,build" name="test">
-		<!-- Path testing
-    	<pathconvert property="testpath" pathsep="${line.separator}          " refid="classpath.test" />
-    	<echo message="${testpath}" />
-			Path testing -->
 		<delete dir="${dest.artifacts.junit.xml}"/>
 		<delete dir="${dest.artifacts.junit.html}"/>
 		<mkdir dir="${dest.artifacts.junit.xml}"/>
