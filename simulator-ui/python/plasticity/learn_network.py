@@ -25,7 +25,7 @@ class SensoryInfo(nef.SimpleNode):
     console or file.
     """
     
-    def __init__(self,name,in_dim,out_dim,train_len,func,post):
+    def __init__(self,name,in_dim,out_dim,train_len,func,post,noise='brown',**noise_args):
         """Arguments:
         name -- name assigned to the node
         in_dim -- number of dimensions produced by func
@@ -37,6 +37,10 @@ class SensoryInfo(nef.SimpleNode):
           return a vector of length in_dim.
         post -- the population that will have learning applied to it.
           This is necessary so that the node can call post.setLearning.
+        noise -- type of noise to use as input. Either 'brown', 'pink', or
+          'white' for now
+        noise_args -- set of arguments that will be used by the function(s)
+          generating the noise
         """
         
         self.train_len = train_len
@@ -47,6 +51,16 @@ class SensoryInfo(nef.SimpleNode):
         self.error_sum = [0.0] * in_dim
         self._x = [0.0] * out_dim
         
+        self.noise = noise
+        if noise == 'white':
+            self.init_white_noise(spectrum='uniform',**noise_args)
+            self.noise_func = self.white_X
+        elif noise == 'pink':
+            self.init_white_noise(spectrum='logarithmic',**noise_args)
+            self.noise_func = self.white_X
+        elif noise == 'brown':
+            self.noise_func = self.brown_X
+        
         self.data_log = []
 
         self.test_len = 5.0
@@ -54,18 +68,88 @@ class SensoryInfo(nef.SimpleNode):
         self.test_runs = 0
 
         nef.SimpleNode.__init__(self,name)
-
-    def origin_X(self):
-        """A randomly varying vector of length self.out_dim.
-        Varies by adding a small random value to each dimension
-        each timestep, drawn from a Gaussian distribution.
+    
+    def init_white_noise(self,fundamental=0.1,cutoff=15.0,rms=0.4,seed=0,spectrum='uniform'):
+        """
+        Creates a band-limited noise function with specified parameters for each out dimension.
+          
+        fundamental - The fundamental frequency (Hz), i.e., frequency step size.
+        cutoff - The high-frequency limit (Hz)
+        rms - The root-mean-squared function amplitude
+        seed - Random seed
+        spectrum - The type of noise: 'uniform' = white noise, 'logarithmic' = pink noise
+        
+        """
+        n = int(math.floor(cutoff / fundamental))
+        
+        self.frequencies = [0.0 for _ in range(n)]
+        self.amplitudes = [[0.0 for _ in range(n)] for _ in range(self.out_dim)]
+        self.phases = [[0.0 for _ in range(n)] for _ in range(self.out_dim)]
+        
+        if seed > 0:
+            random.seed(seed)
+        
+        for d in range(self.out_dim):
+            for i in range(n):
+                self.frequencies[i] = fundamental * (i+1)
+                
+                if spectrum == 'uniform':
+                    self.amplitudes[d][i] = random.random()
+                elif spectrum == 'logarithmic':
+                    self.amplitudes[d][i] = random.random() * fundamental / self.frequencies[i]
+                else:
+                    raise NotImplementedError("Noise type is invalid")
+                
+                self.phases[d][i] = -0.5 + 2.0 * random.random()
+            
+            sample_points = 500
+            dx = (1.0 / fundamental) / sample_points
+            sum_squared = 0.0
+            
+            for i in range(sample_points):
+                result = 0.0
+                
+                for j in range(len(self.frequencies)):
+                    component = 1.0
+                    component *= math.sin(2.0*math.pi*(self.frequencies[j]*i*dx+self.phases[d][j]))
+                    result += self.amplitudes[d][j] * component
+                sum_squared += result * result
+            
+            unscaled_rms = math.sqrt(sum_squared / sample_points)
+            
+            for i in range(n):
+                self.amplitudes[d][i] *= rms / unscaled_rms
+   
+    def white_X(self):
+        """Varies X by getting the value of band-limited white
+        noise for the current timestep.
+        """
+        t = self.t_start
+        
+        for d in range(self.out_dim):
+            self._x[d] = 0.0
+            
+            for j in range(len(self.frequencies)):
+                component = 1.0
+                component *= math.sin(2.0*math.pi*(self.frequencies[j]*t+self.phases[d][j]))
+                self._x[d] += self.amplitudes[d][j] * component
+            
+    def brown_X(self):
+        """Varies X by adding a small amount of noise to the
+        current value of X, sampled from a normal distribution.
+        This is essentially a constrained random walk, hence
+        Brownian noise.
         """
         for i in range(self.out_dim):
             self._x[i] += random.gauss(0.0,0.05)
             self._x[i] = max(self._x[i], -1.0)
             self._x[i] = min(self._x[i],  1.0)
+    
+    def origin_X(self):
+        """A randomly varying vector of length self.out_dim."""
+        self.noise_func()
         return self._x
-
+    
     def origin_answer(self):
         """Calls self.func on the randomly varying vector, X."""
         return self.func(self._x)
@@ -87,7 +171,7 @@ class SensoryInfo(nef.SimpleNode):
         
         if not self.testing and t >= self.test_runs * (self.test_len + self.train_len):
             self.post.setLearning(False)
-            self.error_sum = [0.0] * self.in_dim
+            for i in range(self.in_dim): self.error_sum[i] = 0.0
             self.test_runs += 1
             self.testing = True
         elif self.testing and t < (self.test_runs * self.test_len) + ((self.test_runs-1) * self.train_len):
@@ -129,7 +213,8 @@ class SensoryInfo(nef.SimpleNode):
         for line in self.data_log:
             print line
 
-def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False,rate=5e-7,learning=True,**kwargs):
+def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False,rate=5e-7,
+        learning=True,noise='brown',cutoff=15.0,**kwargs):
     """Creates a network that will learn the function passed as func.
     That function is some transformation from a vector of length in_dim to
     a vector of length out_dim.
@@ -148,7 +233,7 @@ def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False
     
     pre_neurons = in_dim*NperD
     answer_neurons = out_dim*NperD
-    post_neurons = max(in_dim, out_dim)*NperD
+    post_neurons = out_dim*NperD
     err_neurons = out_dim*NperD
     radius = 1.1
     
@@ -158,7 +243,7 @@ def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False
     error = net.make('error',err_neurons,out_dim,radius=radius)
     senses = SensoryInfo(name='SensoryInfo',in_dim=out_dim,
                          out_dim=in_dim,train_len=train_len,
-                         func=func,post=post)    
+                         func=func,post=post,noise=noise,cutoff=cutoff)    
     net.add(senses)
     
     def rand_weights(w):
