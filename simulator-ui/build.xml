@@ -41,27 +41,44 @@
         <delete dir="${dest.build}"/>
     </target>
 	
-	<target description="Generate JavaDoc." name="javadoc">
-		<mkdir dir="${dest.artifacts.javadoc}"/>
-		<javadoc sourcepath="${src.main}" destdir="${dest.artifacts.javadoc}"
-				 author="true" version="true" windowtitle="Nengo GUI API"/>
-	</target>
-	
     <target name="build-simulator">
         <ant dir="${dir.simulator}" inheritAll="false" target="build" />
     </target>
 	
+	<target name="javadoc-simulator">
+	    <ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
+	</target>
+	
     <target description="Build simulator-ui. Produces .class files in the ${dest.build} directory."
 			depends="init,build-simulator" name="build">
-    	<!-- Path testing
-    	<pathconvert property="simpath" pathsep="${line.separator}          " refid="classpath.simulator-ui" />
-    	<echo message="${simpath}" />
-    		Path testing -->
         <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
             <src path="${src.main}"/>
             <classpath refid="classpath.simulator-ui"/>
         	<compilerarg value="-Xlint"/>
         </javac>
+	</target>
+	
+	<target description="Generate JavaDoc." name="javadoc">
+		<mkdir dir="${dest.artifacts.javadoc}"/>
+		<javadoc sourcepath="${src.main}"
+			destdir="${dest.artifacts.javadoc}"
+			author="false"
+			version="false"
+			stylesheetfile="${dir.simulator}/${src.javadoc.css}"
+			windowtitle="Nengo GUI API Documentation"/>
+	</target>
+	
+	<target description="Generate Sphinx documentation." name="sphinx">
+		<mkdir dir="${dest.artifacts.sphinx}"/>
+		<exec executable="make" dir="${src.sphinx}">
+			<arg value="html"/>
+		</exec>
+		<exec executable="make" dir="${src.sphinx}">
+			<arg value="latex"/>
+		</exec>
+		<exec executable="make" dir="${dest.artifacts.sphinx}/latex">
+			<arg value="LATEXOPTS='--interaction=nonstopmode'"/>
+		</exec>
 	</target>
 	
 	<target description="Run the FindBugs code analysis tool."
@@ -116,14 +133,13 @@
 		</checkstyle>
 	</target>
 	
-	<target description="Generate all artifacts: javadoc, FindBugs, CPD, PMD, and CheckStyle." name="all"
-		depends="javadoc,findbugs,cpd,pmd,checkstyle" />
-
-	<target description="Create a distribution folder."
-		depends="build" name="dist">
+	<target description="Generate all artifacts: javadoc, FindBugs, CPD, PMD, CheckStyle, and Sphinx." name="all"
+		depends="javadoc,sphinx,findbugs,cpd,pmd,checkstyle" />
+	
+	<target description="Create a distribution folder. Requires that SVN is installed and working."
+		depends="build,javadoc-simulator" name="dist">
     	<exec executable="svnversion" spawn="false" dir="${basedir}" outputproperty="buildnumber"/>
 		<property name="dist.dir" value="../nengo-${buildnumber}"/>
-		<ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
 		<copy includeemptydirs="false" todir="${dest.build}">
 	        <fileset dir="${dir.simulator}/${dest.build}">
 	            <exclude name="**/*.launch"/>
@@ -170,13 +186,29 @@
 			<include name="nengo-cl"/>
 			<include name="nengo-cl.bat"/>
 		</replace>
-		<!-- The following doesn't seem to work properly, or not every time...
 		<chmod perm="a+x" verbose="true">
 			<fileset dir="${dist.dir}">
 				<include name="nengo"/>
+				<include name="nengo-cl"/>
 				<include name="external/pseudoInverse"/>
 			</fileset>
 		</chmod>
-		!-->
+	</target>
+	
+	<target description="Moves Javadoc and Sphinx documentation to appropriate places on CTNSRV."
+		name="publish-artifacts" depends="javadoc-simulator,sphinx">
+		<delete includeemptydirs="true">
+			<fileset dir="${dest.publish.javadoc}" includes="**/*"/>
+		</delete>
+		<copy includeemptydirs="false" todir="${dest.publish.javadoc}">
+	    	<fileset dir="${dir.simulator}/${dest.artifacts.javadoc}"/>
+	  	</copy>
+		
+		<delete includeemptydirs="true">
+			<fileset dir="${dest.publish.sphinx}" includes="**/*"/>
+		</delete>
+		<copy includeemptydirs="false" todir="${dest.publish.sphinx}">
+		    <fileset dir="${dest.artifacts.sphinx}"/>
+		</copy>
 	</target>
 </project>
