@@ -141,26 +141,36 @@ convertAngles=net.make("convert Angles",N,2)
 funcT=net.make("funcT",N,6)
 FX=net.make("FX",N,12)
 controlV=net.make("control signal v",N,2) # calculate 2D control signal
-controlU=net.make("control signal u",500,2, quick=True) # calculates joint torque control signal
+controlU=net.make("control signal u",500,2, quick=True) # calculates 
+                                                        #jkoint torque control
+                                                        #signal
 
 # add terminations
 convertXY.addDecodedTermination('refXY',[[1,0],[0,1]],pstc,False)
 convertAngles.addDecodedTermination('shoulder',[[1],[0]],pstc,False)
 convertAngles.addDecodedTermination('elbow',[[0],[1]],pstc,False)
 
-FX.addDecodedTermination('inputFs',[[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0], \
-[0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1], \
-[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]],pstc,False)
-FX.addDecodedTermination('X1',[[0],[0],[0],[0],[0],[0],[0],[0],[1],[0],[0],[0]],pstc,False)
-FX.addDecodedTermination('X2',[[0],[0],[0],[0],[0],[0],[0],[0],[0],[1],[0],[0]],pstc,False)
-FX.addDecodedTermination('X3',[[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[1],[0]],pstc,False)
-FX.addDecodedTermination('X4',[[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[1]],pstc,False)
+FX.addDecodedTermination('inputFs',[[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0], \
+    [0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,0,1,0],
+    [0,0,0,0,0,0,0,1], \
+    [0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]],
+    pstc,False)
+FX.addDecodedTermination('X1',[[0],[0],[0],[0],[0],[0],[0],[0],[1],[0],[0],
+    [0]],pstc,False)
+FX.addDecodedTermination('X2',[[0],[0],[0],[0],[0],[0],[0],[0],[0],[1],[0],
+    [0]],pstc,False)
+FX.addDecodedTermination('X3',[[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[1],
+    [0]],pstc,False)
+FX.addDecodedTermination('X4',[[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],
+    [1]],pstc,False)
 
 funcT.addDecodedTermination('shoulderRef',[[1],[0],[0],[0],[0],[0]],pstc,False)
 funcT.addDecodedTermination('elbowRef',[[0],[1],[0],[0],[0],[0]],pstc,False)
 funcT.addDecodedTermination('shoulder',[[0],[0],[0],[0],[0],[0]],pstc,False)
 funcT.addDecodedTermination('elbow',[[0],[0],[0],[0],[0],[0]],pstc,False)
-funcT.addDecodedTermination('inputTs',[[0,0,0,0],[0,0,0,0],[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],pstc,False)
+funcT.addDecodedTermination('inputTs',[[0,0,0,0],[0,0,0,0],[1,0,0,0],[0,1,0,0],
+    [0,0,1,0],[0,0,0,1]],pstc,False)
 
 controlV.addDecodedTermination('inputCurrentX',[[-1],[0]],pstc,False)
 controlV.addDecodedTermination('inputCurrentY',[[0],[-1]],pstc,False)
@@ -181,8 +191,10 @@ convertXY.addDecodedOrigin('shoulderRef',[getShoulder()],"AXON")
 convertAngles.addDecodedOrigin('currentX',[getX()],"AXON")
 convertAngles.addDecodedOrigin('currentY',[getY()],"AXON")
 
-FX.addDecodedOrigin('FX1',[interpreter.parse("x0*x8+x1*x9+x2*x10+x3*x11",12)],"AXON")
-FX.addDecodedOrigin('FX2',[interpreter.parse("x4*x8+x5*x9+x6*x10+x7*x11",12)],"AXON")
+FX.addDecodedOrigin('FX1',[interpreter.parse("x0*x8+x1*x9+x2*x10+x3*x11",12)],
+    "AXON")
+FX.addDecodedOrigin('FX2',[interpreter.parse("x4*x8+x5*x9+x6*x10+x7*x11",12)],
+    "AXON")
 
 funcT.addDecodedOrigin('funcT1',[interpreter.parse("x0*x2+x1*x3",6)],"AXON")
 funcT.addDecodedOrigin('funcT2',[interpreter.parse("x0*x4+x1*x5",6)],"AXON")
@@ -196,12 +208,15 @@ net.connect(controlV.getOrigin('X'),convertXY.getTermination('refXY'))
 net.connect(refX.getOrigin('origin'),controlV.getTermination('inputRefX'))
 net.connect(refY.getOrigin('origin'),controlV.getTermination('inputRefY'))
 
-net.connect(convertAngles.getOrigin('currentX'),controlV.getTermination('inputCurrentX'))
-net.connect(convertAngles.getOrigin('currentY'),controlV.getTermination('inputCurrentY'))
+net.connect(convertAngles.getOrigin('currentX'),controlV.getTermination(
+    'inputCurrentX'))
+net.connect(convertAngles.getOrigin('currentY'),controlV.getTermination(
+    'inputCurrentY'))
 
 net.connect(F.getOrigin('origin'),FX.getTermination('inputFs'))
 
-net.connect(convertXY.getOrigin('shoulderRef'),funcT.getTermination('shoulderRef'))
+net.connect(convertXY.getOrigin('shoulderRef'),funcT.getTermination(
+    'shoulderRef'))
 net.connect(convertXY.getOrigin('elbowRef'),funcT.getTermination('elbowRef'))
 
 net.connect(Tfunc.getOrigin('origin'),funcT.getTermination('inputTs'))
@@ -216,21 +231,26 @@ net.add_to_nengo()
 
 class Room(space.Room):
     def __init__(self):
-        space.Room.__init__(self,10,10,gravity=0,color=[Color(0xFFFFFF),Color(0xFFFFFF),Color(0xEEEEEE),Color(0xDDDDDD),Color(0xCCCCCC),Color(0xBBBBBB)])
+        space.Room.__init__(self,10,10,gravity=0,color=[Color(0xFFFFFF),
+            Color(0xFFFFFF),Color(0xEEEEEE),Color(0xDDDDDD),
+            Color(0xCCCCCC),Color(0xBBBBBB)])
     def start(self):    
         
         self.target=space.Sphere(0.2,mass=1,color=Color(0xFF0000))
         self.add(self.target,0,0,2)
         
-        torso=space.Box(0.1,0.1,1.5,mass=100000,draw_as_cylinder=True,color=Color(0x4444FF))
+        torso=space.Box(0.1,0.1,1.5,mass=100000,draw_as_cylinder=True,
+            color=Color(0x4444FF))
         self.add(torso,0,0,1)
         
-        upperarm=space.Box(0.1,0.7,0.1,mass=0.5,draw_as_cylinder=True,color=Color(0x8888FF),overdraw_radius=1.2,overdraw_length=1.2)
+        upperarm=space.Box(0.1,0.7,0.1,mass=0.5,draw_as_cylinder=True,
+            color=Color(0x8888FF),overdraw_radius=1.2,overdraw_length=1.2)
         self.add(upperarm,0.7,0.5,2)
         upperarm.add_sphere_at(0,0.5,0,0.1,Color(0x4444FF),self)
         upperarm.add_sphere_at(0,-0.5,0,0.1,Color(0x4444FF),self)
         
-        lowerarm=space.Box(0.1,0.75,0.1,mass=0.1,draw_as_cylinder=True,color=Color(0x8888FF),overdraw_radius=1.2,overdraw_length=1.1)
+        lowerarm=space.Box(0.1,0.75,0.1,mass=0.1,draw_as_cylinder=True,
+            color=Color(0x8888FF),overdraw_radius=1.2,overdraw_length=1.1)
         self.add(lowerarm,0.7,1.5,2)
 
         shoulder=HingeConstraint(torso.physics,upperarm.physics,
@@ -275,15 +295,20 @@ class Room(space.Room):
 
             self.hinge1=-(self.shoulder.hingeAngle-pi/2)
             self.hinge2=-self.elbow.hingeAngle
-            #java.lang.System.out.println("angle1: %f   angle2:%f"%(self.hinge1,self.hinge2))   
+            #java.lang.System.out.println("angle1: %f 
+            #angle2:%f"%(self.hinge1,self.hinge2))   
 	
             self.upperarm.physics.getAngularVelocity(v1)
             self.lowerarm.physics.getAngularVelocity(v2)
             # put bounds on the velocity possible
-            if v1.z > 2: self.upperarm.physics.setAngularVelocity(Vector3f(0,0,2))
-            if v1.z < -2: self.upperarm.physics.setAngularVelocity(Vector3f(0,0,-2))
-            if v2.z > 2: self.lowerarm.physics.setAngularVelocity(Vector3f(0,0,2))
-            if v2.z < -2: self.lowerarm.physics.setAngularVelocity(Vector3f(0,0,-2))
+            if v1.z > 2: 
+                self.upperarm.physics.setAngularVelocity(Vector3f(0,0,2))
+            if v1.z < -2: 
+                self.upperarm.physics.setAngularVelocity(Vector3f(0,0,-2))
+            if v2.z > 2: 
+                self.lowerarm.physics.setAngularVelocity(Vector3f(0,0,2))
+            if v2.z < -2: 
+                self.lowerarm.physics.setAngularVelocity(Vector3f(0,0,-2))
             self.upperarm.physics.getAngularVelocity(v1)
             self.lowerarm.physics.getAngularVelocity(v2)
             
@@ -315,7 +340,8 @@ class Room(space.Room):
 r=ccm.nengo.create(Room)
 net.add(r)
 
-# need to make hinge1, hinge2, vel1, and vel external nodes and hook up the output to the FX matrix
+# need to make hinge1, hinge2, vel1, and vel external nodes and hook up 
+# the output to the FX matrix
 r.exposeOrigin(r.getNode('hinge1').getOrigin('origin'),'shoulderAngle')
 r.exposeOrigin(r.getNode('hinge2').getOrigin('origin'),'elbowAngle')
 r.exposeOrigin(r.getNode('vel1').getOrigin('origin'),'shoulderVel')
@@ -326,7 +352,8 @@ net.connect(r.getOrigin('elbowAngle'),FX.getTermination('X2'))
 net.connect(r.getOrigin('shoulderVel'),FX.getTermination('X3'))
 net.connect(r.getOrigin('elbowVel'),FX.getTermination('X4'))
 
-net.connect(r.getOrigin('shoulderAngle'),convertAngles.getTermination('shoulder'))
+net.connect(r.getOrigin('shoulderAngle'),convertAngles.getTermination(
+    'shoulder'))
 net.connect(r.getOrigin('elbowAngle'),convertAngles.getTermination('elbow'))
 net.connect(r.getOrigin('shoulderAngle'),funcT.getTermination('shoulder'))
 net.connect(r.getOrigin('elbowAngle'),funcT.getTermination('elbow'))

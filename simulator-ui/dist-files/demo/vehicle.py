@@ -50,7 +50,9 @@ class Room(space.Room):
 
 
         for i in range(6):
-            self.add(space.Box(1,1,1,mass=1,color=Color(0x8888FF),flat_shading=False),random.uniform(-5,5),random.uniform(-5,5),random.uniform(4,6))
+            self.add(space.Box(1,1,1,mass=1,color=Color(0x8888FF),
+            flat_shading=False),random.uniform(-5,5),random.uniform(-5,5),
+            random.uniform(4,6))
         
         self.sch.add(space.Room.start,args=(self,))
 

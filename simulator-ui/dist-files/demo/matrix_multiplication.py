@@ -29,7 +29,8 @@ net.connect(inputB,B)
 
 # the C matrix holds the intermediate product calculations
 #  need to compute D1*D2*D3 products to multiply 2 matrices together
-C=net.make_array('C',200,D1*D2*D3,dimensions=2,radius=1.5*radius,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]])
+C=net.make_array('C',200,D1*D2*D3,dimensions=2,radius=1.5*radius,
+    encoders=[[1,1],[1,-1],[-1,1],[-1,-1]])
 
 # determine the transformation matrices to get the correct pairwise
 #  products computed.  This looks a bit like black magic but if
