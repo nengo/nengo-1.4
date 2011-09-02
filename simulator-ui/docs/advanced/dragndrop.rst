@@ -21,9 +21,10 @@ text, the type, and the help text::
     
     params=[
         ('name','Name',str,'Name of thalamus'),
-        ('neurons','Neurons per dimension',int,'Number of neurons to use for each possible action'),
+        ('neurons','Neurons per dimension',int,'Number of neurons to use'),
         ('D','Dimensions',int,'Number of actions the thalamus can represent'),
-        ('useQuick', 'Quick mode', bool,'If true, the same distribution of neurons will be used for each action'),
+        ('useQuick', 'Quick mode', bool,
+         'If true, the same distribution of neurons will be used for each action'),
         ]
 
 Next, we need a function that will test if the parameters are valid.  This function will be given the parameters as
@@ -43,9 +44,12 @@ all of the parameters specified in the ``params`` list above.  This script can n
 desired to build the model::
 
     def make(net,name='Network Array', neurons=50, D=2, useQuick=True):
-        thal = net.make_array(name, neurons, D, max_rate=(100,300), intercept=(-1, 0), radius=1, encoders=[[1]], quick=useQuick)    
+        thal = net.make_array(name, neurons, D, max_rate=(100,300), 
+                              intercept=(-1, 0), radius=1, encoders=[[1]], 
+                              quick=useQuick)    
         def addOne(x):
             return [x[0]+1]            
-        net.connect(thal, None, func=addOne, origin_name='xBiased', create_projection=False)
+        net.connect(thal, None, func=addOne, origin_name='xBiased', 
+                    create_projection=False)
         
 The last step to make the template appear in the Nengo interface is to add it to the list in ``python/nef/templates/__init__.py``.
