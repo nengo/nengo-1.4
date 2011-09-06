@@ -75,8 +75,11 @@
 			author="false"
 			version="false"
 			stylesheetfile="${src.javadoc.css}"
-			windowtitle="Nengo Java API Documentation"
-			Header="<a href=http://nengo.ca>nengo.ca</a>"/>
+			windowtitle="Nengo Java API Documentation" >
+			<header>
+				<![CDATA[<a href="http://www.nengo.ca" TARGET="_top">Nengo.ca</a>]]>
+			</header>
+		</javadoc>
 	</target>
 	
 	<target description="Run JUnit tests and produce reports."
