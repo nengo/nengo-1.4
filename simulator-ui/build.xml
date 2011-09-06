@@ -193,18 +193,21 @@
 				<include name="external/pseudoInverse"/>
 			</fileset>
 		</chmod>
+		<exec executable="zip" dir="..">
+			<arg line="-qr nengo-latest nengo-${buildnumber}"/>
+		</exec>
 	</target>
 	
 	<target description="Moves Javadoc and Sphinx documentation to appropriate places on CTNSRV."
 		name="publish-artifacts" depends="javadoc-simulator,sphinx">
-		<delete includeemptydirs="true">
+		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${dest.publish.javadoc}" includes="**/*"/>
 		</delete>
 		<copy includeemptydirs="false" todir="${dest.publish.javadoc}">
 	    	<fileset dir="${dir.simulator}/${dest.artifacts.javadoc}"/>
 	  	</copy>
 		
-		<delete includeemptydirs="true">
+		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${dest.publish.sphinx}" includes="**/*"/>
 		</delete>
 		<copy includeemptydirs="false" todir="${dest.publish.sphinx}">
