@@ -767,6 +767,36 @@ class Network:
     def neuron_count(self):
         """Return the total number of neurons in this network"""
         return self.network.neuronCount
+        
+    def set_view_function_1d(self,node,basis,label='1D function',origin='X',minx=-1,maxx=1,miny=-1,maxy=1):
+        """Define a function representation for the given node.
+        
+        This has no effect on the model itself, but provides a useful display in the
+        interactive plots visualizer.  The vector represented by the function is plotted
+        by treating the vector values as weights for a set of basis functions.  So, if
+        a vector is (2,0,3) and the basis functions are :math:`x^2`, :math:`x`, and :math:`1`, we get the
+        polynomial :math:`2*x^2+3`.
+        
+        The provided basis function should accept two parameters: and index value indicating which
+        basis function should be computed, and x, indicating the x value to compute the basis function at.
+        For example, for polinomials, the basis functions would be computed as::
+           def polynomial_basis(index,x):
+                return x**index
+
+        
+        :param Node node: The Nengo component that represents the vector
+        :param function basis: The set of basis functions to use.  This is a single function accepting
+                               two parameters: the basis index and the x value.  It should return the
+                               corresponding y value.
+        :param string origin: Which origin to use.  Defaults to ``X``.
+        :param string label: The text that will appear in the pop-up menu to activate this view
+        :param float minx: minimum x value to plot
+        :param float maxx: maximum x value to plot
+        :param float miny: minimum y value to plot
+        :param float maxy: maximum y value to plot
+        """                               
+        import timeview
+        timeview.funcrep1d.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
 
 def test():
     net=Network('Test')
