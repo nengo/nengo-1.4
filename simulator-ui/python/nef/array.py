@@ -296,6 +296,10 @@ class NetworkArray(NetworkImpl):
                 rule = RealPlasticityRule(learnFcn,'X',mod_term)
                 n.setPlasticityRule(learn_term,rule)
 
+    def setLearning(self,learn):
+        for n in self._nodes:
+            n.setLearning(learn)
+
     def releaseMemory(self):
         for n in self._nodes:
             n.releaseMemory()
