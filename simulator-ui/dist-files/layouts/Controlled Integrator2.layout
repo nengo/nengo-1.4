@@ -1,9 +1,0 @@
-({'height': 469, 'x': 0, 'width': 800, 'state': 0, 'y': 25},
- [('A', None, {'x': 430, 'height': 34, 'label': 0, 'width': 24, 'y': 63}),
-  ('control', None, {'x': 162, 'height': 34, 'label': 0, 'width': 77, 'y': 71}),
-  ('input', None, {'x': 408, 'height': 34, 'label': 0, 'width': 60, 'y': 274}),
-  ('A', 'value|X', {'x': 483, 'height': 180, 'sel_dim': [0], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 8}),
-  ('control', 'control', {'x': 74, 'height': 161, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 58, 'limits_w': 0, 'y': 16}),
-  ('input', 'control', {'x': 347, 'height': 145, 'range': 16.0, 'label': 0, 'limits': 1, 'width': 50, 'limits_w': 0, 'y': 213}),
-  ('input', 'value|origin', {'x': 483, 'height': 180, 'sel_dim': [0], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 10.000000000000007, 'y': 195})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 1.0})
