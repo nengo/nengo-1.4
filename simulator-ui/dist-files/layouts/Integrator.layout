@@ -1,0 +1,7 @@
+({'height': 469, 'x': 0, 'width': 800, 'state': 0, 'y': 25},
+ [('input', None, {'x': 170, 'height': 34, 'label': 0, 'width': 60, 'y': 282}),
+  ('A', None, {'x': 185, 'height': 34, 'label': 0, 'width': 24, 'y': 47}),
+  ('input', 'control', {'x': 25, 'height': 200, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 69}),
+  ('input', 'value|origin', {'x': 288, 'height': 162, 'sel_dim': [0], 'label': 0, 'width': 469, 'autozoom': 0, 'last_maxy': 1.0, 'y': 182}),
+  ('A', 'value|X', {'x': 289, 'height': 162, 'sel_dim': [0], 'label': 0, 'width': 467, 'autozoom': 0, 'last_maxy': 1.0, 'y': 10})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 1.0})

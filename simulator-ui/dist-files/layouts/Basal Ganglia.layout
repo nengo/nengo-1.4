@@ -1,0 +1,11 @@
+({'height': 469, 'x': 91, 'width': 800, 'state': 0, 'y': 251},
+ [('STN', None, {'x': 542, 'height': 34, 'label': 0, 'width': 49, 'y': 69}),
+  ('GPi', None, {'x': 556, 'height': 34, 'label': 0, 'width': 41, 'y': 201}),
+  ('StrD2', None, {'x': 641, 'height': 34, 'label': 0, 'width': 64, 'y': 72}),
+  ('input', None, {'x': 540, 'height': 34, 'label': 0, 'width': 60, 'y': 4}),
+  ('output', None, {'x': 427, 'height': 34, 'label': 0, 'width': 73, 'y': 269}),
+  ('GPe', None, {'x': 650, 'height': 34, 'label': 0, 'width': 46, 'y': 162}),
+  ('StrD1', None, {'x': 433, 'height': 34, 'label': 0, 'width': 64, 'y': 71}),
+  ('input', 'control', {'x': 60, 'height': 172, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 326, 'limits_w': 0, 'y': 8}),
+  ('output', 'value|X', {'x': 2, 'height': 172, 'sel_dim': [0, 1, 2, 3, 4], 'label': 0, 'width': 421, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 181})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.0, 'dt': 0, 'show_time': 0.5})

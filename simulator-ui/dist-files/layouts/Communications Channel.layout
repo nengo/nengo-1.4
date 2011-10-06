@@ -1,0 +1,10 @@
+({'height': 469, 'x': 0, 'width': 800, 'state': 0, 'y': 25},
+ [('input', None, {'x': 26, 'height': 34, 'label': 0, 'width': 60, 'y': 118}),
+  ('A', None, {'x': 310, 'height': 34, 'label': 0, 'width': 24, 'y': 119}),
+  ('B', None, {'x': 640, 'height': 34, 'label': 0, 'width': 22, 'y': 118}),
+  ('input', 'control', {'x': 34, 'height': 200, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 154}),
+  ('A', 'value|X', {'x': 176, 'height': 200, 'sel_dim': [0], 'label': 0, 'width': 300, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 154}),
+  ('B', 'value|X', {'x': 485, 'height': 200, 'sel_dim': [0], 'label': 0, 'width': 300, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 156}),
+  ('A', 'voltage grid', {'x': 261, 'height': 117, 'auto_improve': 1, 'label': 0, 'width': 117, 'y': 1}),
+  ('B', 'voltage grid', {'x': 589, 'height': 116, 'auto_improve': 1, 'label': 0, 'width': 116, 'y': 1})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})

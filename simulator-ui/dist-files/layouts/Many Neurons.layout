@@ -1,0 +1,7 @@
+({'height': 469, 'x': 0, 'width': 800, 'state': 0, 'y': 25},
+ [('neurons', None, {'x': 356, 'height': 34, 'label': 0, 'width': 87, 'y': 188}),
+  ('input', None, {'x': 131, 'height': 34, 'label': 0, 'width': 60, 'y': 189}),
+  ('input', 'control', {'x': 44, 'height': 200, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 104}),
+  ('neurons', 'value|X', {'x': 473, 'height': 200, 'sel_dim': [0], 'label': 0, 'width': 300, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 78}),
+  ('neurons', 'voltage grid', {'x': 306, 'height': 162, 'auto_improve': 1, 'label': 0, 'width': 162, 'y': 2})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})

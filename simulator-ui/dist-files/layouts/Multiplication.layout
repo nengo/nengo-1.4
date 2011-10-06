@@ -1,0 +1,8 @@
+({'height': 661, 'x': 625, 'width': 800, 'state': 0, 'y': 256},
+ [('B', None, {'x': 177, 'height': 34, 'label': 0, 'width': 22, 'y': 132}),
+  ('A', None, {'x': 172, 'height': 34, 'label': 0, 'width': 24, 'y': 90}),
+  ('D', None, {'x': 546, 'height': 34, 'label': 0, 'width': 25, 'y': 114}),
+  ('inputA', None, {'x': 79, 'height': 34, 'label': 0, 'width': 74, 'y': 84}),
+  ('inputB', None, {'x': 84, 'height': 34, 'label': 0, 'width': 72, 'y': 126}),
+  ('Combined', None, {'x': 336, 'height': 34, 'label': 0, 'width': 110, 'y': 107})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})

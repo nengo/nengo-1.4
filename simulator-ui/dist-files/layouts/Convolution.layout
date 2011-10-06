@@ -1,0 +1,9 @@
+({'height': 469, 'x': 0, 'width': 800, 'state': 0, 'y': 25},
+ [('B', None, {'x': 289, 'height': 34, 'label': 0, 'width': 22, 'y': 239}),
+  ('C', None, {'x': 446, 'height': 34, 'label': 0, 'width': 24, 'y': 147}),
+  ('A', None, {'x': 291, 'height': 34, 'label': 0, 'width': 24, 'y': 71}),
+  ('*', None, {'x': 366, 'height': 34, 'label': 0, 'width': 20, 'y': 152}),
+  ('A', 'semantic pointer', {'x': 14, 'height': 180, 'sel_dim': [0, 1, 2, 3, 4], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 3}),
+  ('B', 'semantic pointer', {'x': 15, 'height': 180, 'sel_dim': [0, 1, 2, 3, 4], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 181}),
+  ('C', 'semantic pointer', {'x': 477, 'height': 200, 'sel_dim': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], 'label': 0, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 66})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})

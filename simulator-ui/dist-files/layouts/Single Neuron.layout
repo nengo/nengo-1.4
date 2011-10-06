@@ -1,0 +1,9 @@
+({'height': 469, 'x': 0, 'width': 800, 'state': 0, 'y': 25},
+ [('neuron', None, {'x': 421, 'height': 34, 'label': 0, 'width': 77, 'y': 142}),
+  ('input', None, {'x': 170, 'height': 34, 'label': 0, 'width': 60, 'y': 143}),
+  ('input', 'control', {'x': 63, 'height': 200, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 78}),
+  ('neuron', 'voltage grid', {'x': 423, 'height': 75, 'auto_improve': 0, 'label': 0, 'width': 75, 'y': 61}),
+  ('neuron', 'spike raster', {'x': 515, 'height': 162, 'label': 0, 'width': 270, 'sample': 1, 'y': 10}),
+  ('neuron', 'value|X', {'x': 516, 'height': 180, 'sel_dim': [0], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 176}),
+  ('neuron', 'voltage graph', {'x': 284, 'height': 144, 'sel_dim': [0], 'label': 0, 'width': 217, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 183})],
+ {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
