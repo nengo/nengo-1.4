@@ -58,6 +58,7 @@ Dynamics
    
    integrator
    controlledintegrator
+   controlledintegrator2
    oscillator
 
 Basal Ganglia Based Simulations
