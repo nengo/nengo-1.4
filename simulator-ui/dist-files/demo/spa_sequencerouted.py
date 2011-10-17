@@ -4,7 +4,7 @@ D=16
 
 class Rules: #Define the rules by specifying the start state and the 
              #desired next state
-    def start(vision='LETTER'):
+    def start(vision='START'):
         set(state=vision)
     def A(state='A'): #e.g. If in state A
         set(state='B') # then go to state B
@@ -32,7 +32,7 @@ class Routing(SPA): #Define an SPA model (cortex, basal ganglia, thalamus)
     thal=Thalamus(BG) # Create a thalamus for that basal ganglia (so it 
                       # uses the same rules)
 
-    input=Input(0.1,vision='LETTER+D') #Define an input; set the input 
+    input=Input(0.1,vision='START+D') #Define an input; set the input 
                                        #to state LETTER+D for 100 ms
 
 model=Routing()
