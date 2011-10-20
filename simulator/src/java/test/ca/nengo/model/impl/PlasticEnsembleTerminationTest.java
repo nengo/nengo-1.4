@@ -1,6 +1,7 @@
 package ca.nengo.model.impl;
 
 import ca.nengo.model.StructuralException;
+import ca.nengo.model.plasticity.impl.RealPlasticityTermination;
 import junit.framework.TestCase;
 
 public class PlasticEnsembleTerminationTest extends TestCase {
@@ -15,7 +16,7 @@ public class PlasticEnsembleTerminationTest extends TestCase {
 			nodeterms[i] = new LinearExponentialTermination(null, null, transform[i], 0.0f);
 		
 		
-		PlasticEnsembleTermination term = new PlasticEnsembleTermination(null, null, nodeterms);
+		PlasticEnsembleTermination term = new RealPlasticityTermination(null, null, nodeterms);
 		float[][] rettransform = term.getTransform();
 		
 		assertTrue(rettransform.length == transform.length);
@@ -43,7 +44,7 @@ public class PlasticEnsembleTerminationTest extends TestCase {
 			nodeterms[i] = new LinearExponentialTermination(null, null, transform[i], 0.0f);
 		
 		
-		PlasticEnsembleTermination term = new PlasticEnsembleTermination(null, null, nodeterms);
+		PlasticEnsembleTermination term = new RealPlasticityTermination(null, null, nodeterms);
 		term.setTransform(newtransform);
 		
 		float[][] rettransform = term.getTransform();

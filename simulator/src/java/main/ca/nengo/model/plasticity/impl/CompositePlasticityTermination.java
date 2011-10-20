@@ -33,10 +33,15 @@ import java.util.Map;
 
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.SpikeOutput;
+import ca.nengo.model.SimulationException;
+import ca.nengo.model.StructuralException;
+import ca.nengo.model.Node;
 import ca.nengo.model.plasticity.PlasticityRule;
+import ca.nengo.model.impl.PlasticEnsembleTermination;
+import ca.nengo.model.impl.LinearExponentialTermination;
 
 /**
- * <p>A PlasticityRule that delegates to underlying spike-based and rate-based rules.  
+ * <p>A PlasticTermination that delegates to underlying spike-based and rate-based rules.  
  * This enables switching between rate and spiking modes in simulations with plasticity.
  * The spike-based rule is used whenever activity at both the plastic termination and 
  * at least one origin are of type SpikeOutput. If either none of the origins has spiking 
@@ -50,8 +55,9 @@ import ca.nengo.model.plasticity.PlasticityRule;
  * TODO: test
  *  
  * @author Bryan Tripp
+ * @author Jonathan Lai
  */
-public class CompositePlasticityRule implements PlasticityRule {
+public class CompositePlasticityTermination extends PlasticEnsembleTermination {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -59,23 +65,28 @@ public class CompositePlasticityRule implements PlasticityRule {
 	private PlasticityRule myRealRule;
 	private Map<String, InstantaneousOutput> myOriginStates;
 	private Map<String, InstantaneousOutput> myTerminationStates;
+
+	/**
+	 * @param node The parent Node
+	 * @param name Name of this Termination
+	 * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
+	 *        all LinearExponentialTerminations
+	 * @throws StructuralException If dimensions of different terminations are not all the same
+	 */
+	public CompositePlasticityTermination(Node node, String name, LinearExponentialTermination[] nodeTerminations) throws StructuralException {
+		super(node, name, nodeTerminations);
+        init(new NullRule(), new NullRule());
+	}
 	
 	/**
 	 * @param spikeRule Rule to use when both inputs and outputs are spiking
 	 * @param realRule Rule to use when either input or output is real-valued
 	 */
-	public CompositePlasticityRule(PlasticityRule spikeRule, PlasticityRule realRule) {
+	public void init(PlasticityRule spikeRule, PlasticityRule realRule) {
 		mySpikeRule = spikeRule;
 		myRealRule = realRule;
 		myOriginStates = new HashMap<String, InstantaneousOutput>(10);
 		myTerminationStates = new HashMap<String, InstantaneousOutput>(10);
-	}
-	
-	/**
-	 * Defaults to <code>NullRule</code>s.
-	 */
-	public CompositePlasticityRule() {
-		this(new NullRule(), new NullRule());
 	}
 	
 	/**
@@ -118,7 +129,7 @@ public class CompositePlasticityRule implements PlasticityRule {
 	/**
 	 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float)
 	 */
-	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) {
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) throws StructuralException {
 		boolean spikingOutput = false;
 		Iterator<InstantaneousOutput> it = myOriginStates.values().iterator();
 		while (it.hasNext() && !spikingOutput) {
@@ -144,22 +155,50 @@ public class CompositePlasticityRule implements PlasticityRule {
 	}
 
 	/**
+	 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float)
+	 */
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time, int start, int end) throws StructuralException {
+		boolean spikingOutput = false;
+		Iterator<InstantaneousOutput> it = myOriginStates.values().iterator();
+		while (it.hasNext() && !spikingOutput) {
+			if (it.next() instanceof SpikeOutput) spikingOutput = true;
+		}
+		boolean spikingInput = (input instanceof SpikeOutput);
+		
+		PlasticityRule rule = (spikingInput && spikingOutput) ? mySpikeRule : myRealRule; 
+		
+		Iterator<String> origins = myOriginStates.keySet().iterator();
+		while (origins.hasNext()) {
+			String name = origins.next();
+			rule.setOriginState(name, myOriginStates.get(name), time);
+		}
+		
+		Iterator<String> terminations = myTerminationStates.keySet().iterator();
+		while (terminations.hasNext()) {
+			String name = terminations.next();
+			rule.setModTerminationState(name, myTerminationStates.get(name), time);
+		}
+		
+		return rule.getDerivative(transform, input, time, start, end);
+	}
+
+	/**
 	 * @see ca.nengo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
 	 */
-	public void setOriginState(String name, InstantaneousOutput state, float time) {
+	public void setOriginState(String name, InstantaneousOutput state, float time) throws StructuralException {
 		myOriginStates.put(name, state);
 	}
 
 	/**
 	 * @see ca.nengo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
 	 */
-	public void setModTerminationState(String name, InstantaneousOutput state, float time) {
+	public void setModTerminationState(String name, InstantaneousOutput state, float time) throws StructuralException {
 		myTerminationStates.put(name, state);
 	}
 
 	@Override
-	public PlasticityRule clone() throws CloneNotSupportedException {
-		CompositePlasticityRule result = (CompositePlasticityRule) super.clone();
+	public PlasticEnsembleTermination clone() throws CloneNotSupportedException {
+		CompositePlasticityTermination result = (CompositePlasticityTermination) super.clone();
 		result.myRealRule = myRealRule.clone();
 		result.mySpikeRule = mySpikeRule.clone();
 		return result;
@@ -180,6 +219,18 @@ public class CompositePlasticityRule implements PlasticityRule {
 		 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float)
 		 */
 		public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) {
+			float[][] result = new float[transform.length][];
+			for (int i = 0; i < result.length; i++) {
+				result[i] = new float[transform[i].length];
+			}
+			return result;
+		}
+
+		/**
+		 * @return A zero matrix the same size as the given transform
+		 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float, int, int)
+		 */
+		public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time, int start, int end) {
 			float[][] result = new float[transform.length][];
 			for (int i = 0; i < result.length; i++) {
 				result[i] = new float[transform[i].length];

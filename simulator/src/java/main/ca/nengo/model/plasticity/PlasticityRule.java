@@ -32,6 +32,7 @@ package ca.nengo.model.plasticity;
 
 import java.io.Serializable;
 import ca.nengo.model.InstantaneousOutput;
+import ca.nengo.model.StructuralException;
 import ca.nengo.model.Resettable;
 
 /**
@@ -41,7 +42,7 @@ import ca.nengo.model.Resettable;
  * @author Bryan Tripp
  */
 public interface PlasticityRule extends Resettable, Serializable, Cloneable {
-	
+
 	/**
 	 * Provides potentially modulatory input to the rule.
 	 *   
@@ -53,8 +54,9 @@ public interface PlasticityRule extends Resettable, Serializable, Cloneable {
 	 * @param state The present value of output from the named Termination (may differ 
 	 * 		from its input in terms of dynamics and dimension)
 	 * @param time Simulation time at which state arrives at site of plasticity 
+     * @throws StructuralException when calling this function without calling init
 	 */
-	public void setModTerminationState(String name, InstantaneousOutput state, float time);
+	public void setModTerminationState(String name, InstantaneousOutput state, float time) throws StructuralException;
 	
 	/**
 	 * Provides state or functional output, which may serve as an indication of 
@@ -63,8 +65,9 @@ public interface PlasticityRule extends Resettable, Serializable, Cloneable {
 	 * @param name The name of a DecodedOrigin from the ensemble 
 	 * @param state The present value of output from the named Origin 
 	 * @param time Simulation time at which state arrives at site of plasticity 
+     * @throws StructuralException when calling this function without calling init
 	 */
-	public void setOriginState(String name, InstantaneousOutput state, float time);
+	public void setOriginState(String name, InstantaneousOutput state, float time) throws StructuralException;
 	
 	/**
 	 * @param transform The present transformation matrix of a Termination
@@ -72,8 +75,21 @@ public interface PlasticityRule extends Resettable, Serializable, Cloneable {
 	 * @param time Simulation time at which input arrives at site of plasticity
 	 * @return The rate of change of each element in the transform (units per second) if input is RealOutput, 
 	 * 		otherwise the increment of each element in the transform
+     * @throws StructuralException when calling this function without calling init
 	 */
-	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time); 
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) throws StructuralException;
+	
+	/**
+	 * @param transform The present transformation matrix of a Termination for the specific element
+	 * @param input The present input to the Termination 
+	 * @param time Simulation time at which input arrives at site of plasticity
+     * @param start The starting index to process
+     * @param end The ending index to stop processing
+	 * @return The rate of change of a specified element in the transform (units per second) if input is RealOutput, 
+	 * 		otherwise the increment of a specified element in the transform
+     * @throws StructuralException when calling this function without calling init
+	 */
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time, int start, int end) throws StructuralException;
 	
 	public PlasticityRule clone() throws CloneNotSupportedException;
 	

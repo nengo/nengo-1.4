@@ -30,10 +30,15 @@ package ca.nengo.model.plasticity.impl;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SpikeOutput;
+import ca.nengo.model.SimulationException;
+import ca.nengo.model.StructuralException;
+import ca.nengo.model.Node;
 import ca.nengo.model.plasticity.PlasticityRule;
+import ca.nengo.model.impl.PlasticEnsembleTermination;
+import ca.nengo.model.impl.LinearExponentialTermination;
 
 /**
- * A basic implementation of PlasticityRule for real valued input.
+ * A basic implementation of PlasticityRule for real valued input on a termination.
  * 
  * The learning rate is defined by an AbstractRealLearningFunction (see its declaration for
  * the inputs it receives). This learning rate function is applied to each In each case, the presynaptic-variable 
@@ -45,8 +50,9 @@ import ca.nengo.model.plasticity.PlasticityRule;
  * TODO: test
  * 
  * @author Bryan Tripp
+ * @author Jonathan Lai
  */
-public class RealPlasticityRule implements PlasticityRule {
+public class RealPlasticityTermination extends PlasticEnsembleTermination {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -58,16 +64,31 @@ public class RealPlasticityRule implements PlasticityRule {
 	private float[] myModInputArray;
 	private float[] myOriginState;
 	private float[] myFilteredInput;
+
+    private boolean initialized;
+	
+	/**
+	 * @param node The parent Node
+	 * @param name Name of this Termination
+	 * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
+	 *        all LinearExponentialTerminations
+	 * @throws StructuralException If dimensions of different terminations are not all the same
+	 */
+	public RealPlasticityTermination(Node node, String name, LinearExponentialTermination[] nodeTerminations) throws StructuralException {
+		super(node, name, nodeTerminations);
+        initialized = false;
+	}
 	
 	/**
 	 * @param function AbstractRealLearningFunction defining the rate of change of transformation matrix weights.
 	 * @param originName Name of Origin from which post-synaptic activity is drawn
 	 * @param modTermName Name of the Termination from which modulatory input is drawn (can be null if not used)
 	 */
-	public RealPlasticityRule(AbstractRealLearningFunction function, String originName, String modTermName) {
+	public void init(AbstractRealLearningFunction function, String originName, String modTermName) {
 		setFunction(function);
 		setOriginName(originName);
 		setModTermName(modTermName);
+        initialized = true;
 	}
 	
 	/**
@@ -124,7 +145,10 @@ public class RealPlasticityRule implements PlasticityRule {
 	/**
 	 * @see ca.nengo.model.plasticity.PlasticityRule#setModTerminationState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
 	 */
-	public void setModTerminationState(String name, InstantaneousOutput state, float time) {
+	public void setModTerminationState(String name, InstantaneousOutput state, float time) throws StructuralException {
+        if(!initialized) {
+            throw new StructuralException("PlasticityRule in Termination not initialized");
+        }
 		if (name.equals(myModTermName)) {
 			checkType(state);
 			myModInputArray=((RealOutput) state).getValues();
@@ -134,7 +158,10 @@ public class RealPlasticityRule implements PlasticityRule {
 	/**
 	 * @see ca.nengo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
 	 */
-	public void setOriginState(String name, InstantaneousOutput state, float time) {
+	public void setOriginState(String name, InstantaneousOutput state, float time) throws StructuralException {
+        if(!initialized) {
+            throw new StructuralException("PlasticityRule in Termination not initialized");
+        }
 		if (name.equals(myOriginName)) {
 			//checkType(state);
 			if (state instanceof RealOutput) {
@@ -150,9 +177,76 @@ public class RealPlasticityRule implements PlasticityRule {
 	}
 
 	/**
+	 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float, int, int)
+	 */
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time, int start, int end) throws StructuralException {
+        if(!initialized) {
+            throw new StructuralException("PlasticityRule in Termination not initialized");
+        }
+		//checkType(input);
+		
+		float[][] result = new float[transform.length][];
+		
+		float integrationTime = 0.001f;
+		float tauPSC = 0.005f;
+		
+		if (input instanceof RealOutput) {
+			float[] values = ((RealOutput) input).getValues();
+			
+			if (myFilteredInput == null) {
+				myFilteredInput = new float[values.length];
+			}
+		
+			for (int i=0; i < values.length; i++) {
+				myFilteredInput[i] *= 1.0f - integrationTime / tauPSC;
+				myFilteredInput[i] += values[i] * integrationTime / tauPSC;
+			}
+		} else {
+			boolean[] values = ((SpikeOutput) input).getValues();
+			
+			if (myFilteredInput == null) {
+				myFilteredInput = new float[values.length];
+			}
+			
+			for (int i=0; i < values.length; i++) {
+				myFilteredInput[i] *= 1.0f - integrationTime / tauPSC;
+				myFilteredInput[i] += values[i] ? 
+						integrationTime / tauPSC : 0;
+			}
+		}
+		
+		if (myModInputArray != null) {
+			for (int i = start; i < end; i++) {
+				result[i] = new float[transform[i].length];
+				for (int j = 0; j < transform[i].length; j++) {
+					for (int k = 0; k < myModInputArray.length; k++) {
+						float os = (myOriginState != null && myOriginState.length > k) ? myOriginState[k] : 0;
+						result[i][j] += myFunction.map(new float[]{myFilteredInput[j],time,
+								transform[i][j],myModInputArray[k],os,i,j,k});
+						
+					}
+				}
+			}
+		} else {
+			for (int i = start; i < end; i++) {
+				result[i] = new float[transform[i].length];
+				for (int j = 0; j < transform[i].length; j++) {
+					float os = (myOriginState != null) ? myOriginState[0] : 0;
+					result[i][j] += myFunction.map(new float[]{myFilteredInput[j],time,
+						transform[i][j],os,0,i,j,0});
+				}
+			}	
+		}
+		return result;
+	}
+
+	/**
 	 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float)
 	 */
-	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) {
+	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) throws StructuralException {
+        if(!initialized) {
+            throw new StructuralException("PlasticityRule in Termination not initialized");
+        }
 		//checkType(input);
 		
 		float[][] result = new float[transform.length][];
@@ -218,8 +312,8 @@ public class RealPlasticityRule implements PlasticityRule {
 	}
 
 	@Override
-	public PlasticityRule clone() throws CloneNotSupportedException {
-		RealPlasticityRule result = (RealPlasticityRule) super.clone();
+	public PlasticEnsembleTermination clone() throws CloneNotSupportedException {
+		RealPlasticityTermination result = (RealPlasticityTermination) super.clone();
 		result.myFunction = myFunction.clone();
 		return result;
 	}

@@ -41,18 +41,15 @@ import ca.nengo.model.plasticity.PlasticityRule;
 public interface PlasticEnsemble extends Ensemble {
 
 	/**
-	 * @param terminationName Name of termination to which plasticity rule applies.
-	 * @return A rule that defines how the termination's transformation matrix elements change during simulation
-	 * @throws StructuralException if the named Termination does not exist
+	 * @return A number representing the rule that defines how the termination's transformation matrix elements change during simulation
 	 */
-	public PlasticityRule getPlasticityRule(String terminationName) throws StructuralException;
+	public int getPlasticityRule();
 
 	/**
-	 * @param terminationName Name of termination to which plasticity rule applies.  
-	 * @param rule A rule that defines how the termination's transformation matrix elements change during simulation
-	 * @throws StructuralException if the named Termination does not exist
+	 * @param rule A number representing the rule that defines how the termination's transformation matrix elements change during simulation
+	 * @throws StructuralException if the specified rule does not exist
 	 */
-	public void setPlasticityRule(String terminationName, PlasticityRule rule) throws StructuralException;
+	public void setPlasticityRule(int rule) throws StructuralException;
 
 	/**
 	 * @return Period after which plasticity rules are evaluated (defaults to every time step).

@@ -3,6 +3,7 @@ package ca.nengo.util.impl;
 //import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
+import ca.nengo.util.ThreadTask;
 //import ca.nengo.model.SimulationException;
 
 import java.lang.Math;
@@ -31,6 +32,7 @@ public class NodeThreadPool {
 	
 	protected Node[] myNodes;
 	protected Projection[] myProjections;
+    protected ThreadTask[] myTasks;
 	
 	protected volatile int numThreadsComplete;
 	
@@ -72,8 +74,8 @@ public class NodeThreadPool {
 	protected NodeThreadPool(){
 	}
 	
-	public NodeThreadPool(Node[] nodes, Projection[] projections){
-		initialize(nodes, projections);
+	public NodeThreadPool(Node[] nodes, Projection[] projections, ThreadTask[] tasks){
+		initialize(nodes, projections, tasks);
 	}
 	/*
 	@SuppressWarnings("unchecked")
@@ -92,10 +94,11 @@ public class NodeThreadPool {
 	}
 	*/
 	
-	protected void initialize(Node[] nodes, Projection[] projections){
+	protected void initialize(Node[] nodes, Projection[] projections, ThreadTask[] tasks){
 		myLock = new Object();
 		myNodes = nodes;
 		myProjections = projections;
+        myTasks = tasks;
 		
 		myThreads = new NodeThread[myNumThreads];
 		
@@ -104,9 +107,10 @@ public class NodeThreadPool {
 		
 		int nodesPerThread = (int) Math.ceil((float) myNodes.length / (float) myNumThreads);
 		int projectionsPerThread = (int) Math.ceil((float) myProjections.length / (float) myNumThreads);
+        int tasksPerThread = (int) Math.ceil((float) myTasks.length / (float) myNumThreads);
 		
-		int nodeOffset = 0, projectionOffset = 0;
-		int nodeStartIndex, nodeEndIndex, projectionStartIndex, projectionEndIndex;
+		int nodeOffset = 0, projectionOffset = 0, taskOffset = 0;
+		int nodeStartIndex, nodeEndIndex, projectionStartIndex, projectionEndIndex, taskStartIndex, taskEndIndex;
 		
 		for(int i = 0; i < myNumThreads; i++){
 			
@@ -122,9 +126,15 @@ public class NodeThreadPool {
 
 			projectionOffset += projectionsPerThread;
 			
+			taskStartIndex = taskOffset;
+			taskEndIndex = myTasks.length - taskOffset >= tasksPerThread ?
+					taskOffset + tasksPerThread : myTasks.length;
+
+			taskOffset += tasksPerThread;
+			
 			myThreads[i] = new NodeThread(this, myNodes, nodeStartIndex,
 					nodeEndIndex, myProjections, projectionStartIndex, 
-					projectionEndIndex);
+					projectionEndIndex, myTasks, taskStartIndex, taskEndIndex);
 			
 			myThreads[i].setPriority(Thread.MAX_PRIORITY);
 			myThreads[i].start();
@@ -145,6 +155,9 @@ public class NodeThreadPool {
 			startThreads();
 			
 			// start the node processing
+			startThreads();
+			
+			// start the task processing
 			startThreads();
 			
 			Thread.currentThread().setPriority(oldPriority);

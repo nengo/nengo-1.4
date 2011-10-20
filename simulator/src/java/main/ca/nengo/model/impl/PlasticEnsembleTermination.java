@@ -31,6 +31,7 @@ import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.PlasticTermination;
+import ca.nengo.model.plasticity.PlasticityRule;
 
 /**
  * <p>A Termination that is composed of Terminations onto multiple Nodes. 
@@ -47,8 +48,9 @@ import ca.nengo.model.PlasticTermination;
  * TODO: test
  *  
  * @author Trevor Bekolay
+ * @author Jonathan Lai
  */
-public class PlasticEnsembleTermination extends EnsembleTermination implements PlasticTermination {
+public abstract class PlasticEnsembleTermination extends EnsembleTermination implements PlasticTermination, PlasticityRule {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -62,7 +64,7 @@ public class PlasticEnsembleTermination extends EnsembleTermination implements P
 	public PlasticEnsembleTermination(Node node, String name, LinearExponentialTermination[] nodeTerminations) throws StructuralException {
 		super(node, name, nodeTerminations);
 	}
-	
+
 	/**
 	 * @see ca.nengo.model.PlasticTermination#getTransform()
 	 */
@@ -121,11 +123,7 @@ public class PlasticEnsembleTermination extends EnsembleTermination implements P
 	}
 
 	@Override
-	public PlasticTermination clone() throws CloneNotSupportedException {
-		try {
-			return new PlasticEnsembleTermination(getNode(), getName(), (LinearExponentialTermination[]) myNodeTerminations);
-		} catch (StructuralException e) {
-			throw new CloneNotSupportedException("Error trying to clone: " + e.getMessage());
-		}
-	}
+	public PlasticEnsembleTermination clone() throws CloneNotSupportedException {
+		return (PlasticEnsembleTermination) super.clone();
+	}    
 }

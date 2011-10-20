@@ -61,6 +61,8 @@ import ca.nengo.sim.SimulatorListener;
 import ca.nengo.util.Probe;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.ThreadTask;
+import ca.nengo.util.TaskSpawner;
 import ca.nengo.util.impl.NEFGPUInterface;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
@@ -76,6 +78,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	
 	private Projection[] myProjections;
 	private Node[] myNodes;
+    private ThreadTask[] myTasks;
 	private Map<String, Node> myNodeMap;
 	private List<Probe> myProbes;
 	private boolean myDisplayProgress;
@@ -109,6 +112,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		
 		if (myProbes == null)
 			myProbes = new ArrayList<Probe>(20);
+
+        myTasks = collectTasks(myNodes);
 	}
 	
 	/**
@@ -166,7 +171,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			Projection[] projectionsForMultithreading = collectProjections(myNodes, myProjections);
 			
 			myNodeThreadPool = 
-				new NodeThreadPool(nodesForMultithreading, projectionsForMultithreading);
+				new NodeThreadPool(nodesForMultithreading, projectionsForMultithreading, myTasks);
 		}	
 		
 		if(topLevel)
@@ -236,6 +241,10 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		
 		if(myNEFGPUInterface != null){
 			myNEFGPUInterface.step(startTime, endTime);
+            // TODO Possibly integrate this into the NEFGPUInterface
+            for (int i = 0; i < myTasks.length; i++) {
+                myTasks[i].run(startTime, endTime);
+            }
 		}
 		else if(myNodeThreadPool != null){
 			myNodeThreadPool.step(startTime, endTime);
@@ -251,6 +260,10 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 				else
 					myNodes[i].run(startTime, endTime);
 			}
+
+            for (int i = 0; i < myTasks.length; i++) {
+                myTasks[i].run(startTime, endTime);
+            }
 		}
 		
 		Iterator<Probe> it = myProbes.iterator();
@@ -474,6 +487,35 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		}
 		
 		return nodes.toArray(new Node[0]);	
+	}
+	
+	public static ThreadTask[] collectTasks(Node[] startingNodes){
+
+		ArrayList<ThreadTask> tasks = new ArrayList<ThreadTask>();
+		
+		List<Node> nodesToProcess = new LinkedList<Node>();
+		nodesToProcess.addAll(Arrays.asList(startingNodes));
+		
+		Node workingNode;
+		
+		while(nodesToProcess.size() != 0)
+		{
+			workingNode = nodesToProcess.remove(0);
+				
+			if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
+			{	
+				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
+				
+				nodeList.addAll(nodesToProcess);
+				nodesToProcess = nodeList;
+			}
+			else if(workingNode instanceof TaskSpawner)
+            {
+				tasks.addAll(Arrays.asList(((TaskSpawner) workingNode).getTasks()));
+			}
+		}
+		
+		return tasks.toArray(new ThreadTask[0]);	
 	}
 	
 	public static Node[] collectNetworkArraysForGPU(Node[] startingNodes){
