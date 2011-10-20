@@ -4,7 +4,7 @@ from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
 from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
-    OutSpikeErrorFunction, RealPlasticityRule, SpikePlasticityRule
+    OutSpikeErrorFunction, RealPlasticityTermination, SpikePlasticityTermination
 from ca.nengo.util import MU
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator
 from ca.nengo.math import Function
@@ -624,21 +624,19 @@ class Network:
             outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
                                            out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);
             outFcn.setLearningRate(rate)
-            rule=SpikePlasticityRule(inFcn, outFcn, 'AXON', mod_term)
+            post.getTermination(learn_term).init(inFcn, outFcn, 'AXON', mod_term)
             
             if kwargs.has_key('decay') and kwargs['decay'] is not None:
-                rule.setDecaying(True)
-                rule.setDecayScale(kwargs['decay'])
+                post.getTermination(learn_term).setDecaying(True)
+                post.getTermination(learn_term).setDecayScale(kwargs['decay'])
             else:
-                rule.setDecaying(False)
+                post.getTermination(learn_term).setDecaying(False)
             
             if kwargs.has_key('homeostasis') and kwargs['homeostasis'] is not None:
-                rule.setHomestatic(True)
-                rule.setStableVal(kwargs['homeostasis'])
+                post.getTermination(learn_term).setHomestatic(True)
+                post.getTermination(learn_term).setStableVal(kwargs['homeostasis'])
             else:
-                rule.setHomestatic(False)
-            
-            post.setPlasticityRule(learn_term,rule)
+                post.getTermination(learn_term).setHomestatic(False)
         else:
             oja = True
             if kwargs.has_key('oja'):
@@ -646,8 +644,7 @@ class Network:
             
             learnFcn = ErrorLearningFunction([n.scale for n in post.nodes],post.encoders,oja)
             learnFcn.setLearningRate(rate)
-            rule=RealPlasticityRule(learnFcn, 'X', mod_term)
-            post.setPlasticityRule(learn_term,rule)
+            post.getTermination(learn_term).init(learnFcn, 'X', mod_term)
 
     def learn_array(self,array,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
         """Apply a learning rule to a termination of a :class:`nef.array.NetworkArray` (an array of

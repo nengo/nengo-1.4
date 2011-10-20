@@ -18,7 +18,7 @@ from ca.nengo.model.nef import *
 from ca.nengo.model.impl import *
 from ca.nengo.math.impl import *
 from ca.nengo.model import Node,SimulationMode
-from ca.nengo.model.plasticity.impl import SpikePlasticityRule
+from ca.nengo.model.plasticity.impl import SpikePlasticityTermination
 
 from java.lang.System.err import println
 from java.lang import Exception
@@ -183,9 +183,7 @@ class NodeWatch:
                     label=obj.name+": "+name
                     r.append((name,components.Grid,dict(func=self.weights,args=(name,),label=label,min=-0.01,max=0.01,improvable=False)))
                     
-                    rule = obj.getPlasticityRule(name)
-                    
-                    if rule is not None and isinstance(rule,SpikePlasticityRule):
+                    if isinstance(name,SpikePlasticityTermination):
                         r.append((name+' detail',components.SpikeLineOverlay,dict(
                                   infunc=self.in_spikes,inargs=(name,),outfunc=self.out_spikes,
                                   lfunc=self.weights,largs=(name,),label=label)))

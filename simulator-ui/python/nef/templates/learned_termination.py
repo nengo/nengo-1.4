@@ -29,7 +29,8 @@ def test_params(net,p):
     
 import random
 from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
-    OutSpikeErrorFunction, SpikePlasticityRule
+    OutSpikeErrorFunction, SpikePlasticityTermination
+from ca.nengo.model.impl import PlasticEnsembleImpl
 import nef
 import numeric
     
@@ -60,6 +61,8 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     while '%s_%02d'%(prename,count) in [t.name for t in post.terminations]:
         count=count+1
     prename = '%s_%02d'%(prename, count)
+
+    post.setPlasticityRule(PlasticEnsembleImpl.REAL_PLASTICITY_RULE);
     post.addTermination(prename, weight, 0.005, False)
     
     # Create error ensemble

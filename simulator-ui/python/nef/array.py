@@ -1,7 +1,7 @@
 from ca.nengo.model import StructuralException, Origin
 from ca.nengo.model.impl import BasicOrigin, NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl
 from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
-    OutSpikeErrorFunction, RealPlasticityRule, SpikePlasticityRule
+    OutSpikeErrorFunction, RealPlasticityTermination, SpikePlasticityTermination
 from ca.nengo.model.nef.impl import DecodedTermination
 from ca.nengo.model.impl import PlasticEnsembleTermination
 from ca.nengo.util import MU
@@ -271,21 +271,19 @@ class NetworkArray(NetworkImpl):
                 inFcn.setLearningRate(rate)
                 outFcn = OutSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
                                                out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);                outFcn.setLearningRate(rate)
-                rule = SpikePlasticityRule(inFcn,outFcn,'AXON',mod_term)
+                n.getTermination(learn_term).init(inFcn,outFcn,'AXON',mod_term)
                 
                 if kwargs.has_key('decay') and kwargs['decay'] is not None:
-                    rule.setDecaying(True)
-                    rule.setDecayScale(kwargs['decay'])
+                    n.getTermination(learn_term).setDecaying(True)
+                    n.getTermination(learn_term).setDecayScale(kwargs['decay'])
                 else:
-                    rule.setDecaying(False)
+                    n.getTermination(learn_term).setDecaying(False)
                 
                 if kwargs.has_key('homeostasis') and kwargs['homeostasis'] is not None:
-                    rule.setHomestatic(True)
-                    rule.setStableVal(kwargs['homeostasis'])
+                    n.getTermination(learn_term).setHomestatic(True)
+                    n.getTermination(learn_term).setStableVal(kwargs['homeostasis'])
                 else:
-                    rule.setHomestatic(False)
-                
-                n.setPlasticityRule(learn_term,rule)
+                    n.getTermination(learn_term).setHomestatic(False)
             else:
                 oja = True
                 if kwargs.has_key('oja'):
@@ -293,8 +291,7 @@ class NetworkArray(NetworkImpl):
                 
                 learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders,oja)
                 learnFcn.setLearningRate(rate)
-                rule = RealPlasticityRule(learnFcn,'X',mod_term)
-                n.setPlasticityRule(learn_term,rule)
+                n.getTermination(learn_term).init(learnFcn,'X',mod_term)
 
     def setLearning(self,learn):
         for n in self._nodes:
