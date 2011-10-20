@@ -82,6 +82,7 @@ public class FileManager {
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(object);
 		oos.flush();
+		oos.close();
 		fos.close();
 	}
 	
@@ -89,8 +90,12 @@ public class FileManager {
 		FileInputStream fis = new FileInputStream(source);
 		
 		ObjectInputStream ois = new ObjectInputStream(fis);
+		Object return_obj = ois.readObject();
 		
-		return ois.readObject();
+		ois.close();
+		fis.close();
+		
+		return return_obj;
 	}
 	
 }
