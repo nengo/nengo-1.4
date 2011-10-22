@@ -188,7 +188,37 @@ class NetworkArray(NetworkImpl):
         termination=EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
-    
+
+    def addIndexTermination(self,name,matrix,tauPSC,isModulatory=False,index=None):
+        """Create a new termination.  A new termination is created on the specified ensembles, 
+        which are then grouped together.  This termination does not use NEF-style encoders; instead, 
+        the matrix is the actual connection weight matrix.  Often used for adding an inhibitory 
+        connection that can turn off selected ensembles within the array (by setting *matrix* to be 
+        all -10, for example).  
+        
+        :param string name: the name of the newly created origin
+        :param matrix: synaptic connection weight matrix (NxM where M is the total number of neurons in the ensembles to be connected)
+        :type matrix: 2D array of floats
+        :param float tauPSC: post-synaptic time constant
+        :param boolean isModulatory: False for normal connections, True for modulatory connections (which adjust neural
+                                     properties rather than the input current)
+        :param index: The indexes of the ensembles to connect to. If set to None, this function behaves exactly like :func:`nef.NetworkArray.addTermination()`.
+        :type index_pre: list of integers
+        """
+        if( index is None ):
+            index = range(len(self._nodes))
+        terminations = []
+        j = 0
+        for i,node in enumerate(self._nodes):
+            if( i in index ):
+                t = node.addTermination(name,matrix[j*node.neurons:(j+1)*node.neurons],tauPSC,isModulatory)
+                j = j + 1;
+                terminations.append(t)
+        
+        termination = EnsembleTermination(self,name,terminations)
+        self.exposeTermination(termination,name)
+        return self.getTermination(name)
+
     #gets the nodes in the proper order from the network array. The NetworkImpl version of this function relies on 
     #the nodeMap object which is sometimes out of order.
     def getNodes(self):
@@ -265,33 +295,35 @@ class NetworkArray(NetworkImpl):
                 out_args[key] = kwargs[key]
         
         for n in self._nodes:
-            if stdp:
-                inFcn = InSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
-                                             in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
-                inFcn.setLearningRate(rate)
-                outFcn = OutSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
-                                               out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);                outFcn.setLearningRate(rate)
-                n.getTermination(learn_term).init(inFcn,outFcn,'AXON',mod_term)
-                
-                if kwargs.has_key('decay') and kwargs['decay'] is not None:
-                    n.getTermination(learn_term).setDecaying(True)
-                    n.getTermination(learn_term).setDecayScale(kwargs['decay'])
-                else:
-                    n.getTermination(learn_term).setDecaying(False)
-                
-                if kwargs.has_key('homeostasis') and kwargs['homeostasis'] is not None:
-                    n.getTermination(learn_term).setHomestatic(True)
-                    n.getTermination(learn_term).setStableVal(kwargs['homeostasis'])
-                else:
-                    n.getTermination(learn_term).setHomestatic(False)
-            else:
-                oja = True
-                if kwargs.has_key('oja'):
-                    oja = kwargs['oja']
-                
-                learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders,oja)
-                learnFcn.setLearningRate(rate)
-                n.getTermination(learn_term).init(learnFcn,'X',mod_term)
+            if( learn_term in [node.name for node in n.getTerminations()] ):
+				term = n.getTermination(learn_term)
+	            if stdp:
+	                inFcn = InSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
+	                                             in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
+	                inFcn.setLearningRate(rate)
+	                outFcn = OutSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
+	                                               out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);                outFcn.setLearningRate(rate)
+	                term.init(inFcn,outFcn,'AXON',mod_term)
+	                
+	                if kwargs.has_key('decay') and kwargs['decay'] is not None:
+	                    term.setDecaying(True)
+	                    term.setDecayScale(kwargs['decay'])
+	                else:
+	                    term.setDecaying(False)
+	                
+	                if kwargs.has_key('homeostasis') and kwargs['homeostasis'] is not None:
+	                    term.setHomestatic(True)
+	                    term.setStableVal(kwargs['homeostasis'])
+	                else:
+	                    term.setHomestatic(False)
+	            else:
+	                oja = True
+	                if kwargs.has_key('oja'):
+	                    oja = kwargs['oja']
+	                
+	                learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders,oja)
+	                learnFcn.setLearningRate(rate)
+	                term.init(learnFcn,'X',mod_term)
 
     def setLearning(self,learn):
         for n in self._nodes:
