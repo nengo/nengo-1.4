@@ -296,34 +296,34 @@ class NetworkArray(NetworkImpl):
         
         for n in self._nodes:
             if( learn_term in [node.name for node in n.getTerminations()] ):
-				term = n.getTermination(learn_term)
-	            if stdp:
-	                inFcn = InSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
-	                                             in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
-	                inFcn.setLearningRate(rate)
-	                outFcn = OutSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
-	                                               out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);                outFcn.setLearningRate(rate)
-	                term.init(inFcn,outFcn,'AXON',mod_term)
-	                
-	                if kwargs.has_key('decay') and kwargs['decay'] is not None:
-	                    term.setDecaying(True)
-	                    term.setDecayScale(kwargs['decay'])
-	                else:
-	                    term.setDecaying(False)
-	                
-	                if kwargs.has_key('homeostasis') and kwargs['homeostasis'] is not None:
-	                    term.setHomestatic(True)
-	                    term.setStableVal(kwargs['homeostasis'])
-	                else:
-	                    term.setHomestatic(False)
-	            else:
-	                oja = True
-	                if kwargs.has_key('oja'):
-	                    oja = kwargs['oja']
-	                
-	                learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders,oja)
-	                learnFcn.setLearningRate(rate)
-	                term.init(learnFcn,'X',mod_term)
+                term = n.getTermination(learn_term)
+                if stdp:
+                    inFcn = InSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
+                                                 in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
+                    inFcn.setLearningRate(rate)
+                    outFcn = OutSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
+                                                   out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);                outFcn.setLearningRate(rate)
+                    term.init(inFcn,outFcn,'AXON',mod_term)
+                    
+                    if kwargs.has_key('decay') and kwargs['decay'] is not None:
+                        term.setDecaying(True)
+                        term.setDecayScale(kwargs['decay'])
+                    else:
+                        term.setDecaying(False)
+                    
+                    if kwargs.has_key('homeostasis') and kwargs['homeostasis'] is not None:
+                        term.setHomestatic(True)
+                        term.setStableVal(kwargs['homeostasis'])
+                    else:
+                        term.setHomestatic(False)
+                else:
+                    oja = True
+                    if kwargs.has_key('oja'):
+                        oja = kwargs['oja']
+                    
+                    learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders,oja)
+                    learnFcn.setLearningRate(rate)
+                    term.init(learnFcn,'X',mod_term)
 
     def setLearning(self,learn):
         for n in self._nodes:
