@@ -62,11 +62,14 @@ class Rule:
             raise Exception('No value specified for match in rule '+self.name)
         self.scale=1.0
 
+        globals={}
 
         self.lhs={}
         for i in range(len(args)):
             if args[i]=='scale':
                 self.scale=defaults[i]
+            elif callable(defaults[i]):
+                globals[args[i]] = defaults[i]
             else:
                 if args[i] not in spa.sources.keys():
                     print 'Warning: unknown source "%s" in rule %s'%(args[i],self.name)
@@ -75,8 +78,9 @@ class Rule:
         self.rhs_direct={}
         self.rhs_route={}
         self.lhs_match={}
+        self.rhs_learn={}
+        self.learn_error=[]
 
-        globals={}
         for k in spa.sinks.keys():
             globals[k]=Sink(k)
         for k in spa.sources.keys():
@@ -84,6 +88,7 @@ class Rule:
                 globals[k]=Sink(k)
         globals['set']=self.set
         globals['match']=self.match
+        globals['learn']=self.learn
         eval(func.func_code,globals)
 
     def set(self,**args):
@@ -103,7 +108,15 @@ class Rule:
         for m in args:
             assert isinstance(m,Match)
             self.lhs_match[m.a,m.b]=m.weight
-
+    
+    def learn(self, **args):
+        for k,v in args.items():
+            if( k == 'pred_error' ):
+                self.learn_error.append(v)
+            else:
+                self.rhs_learn[k] = v
+        if( len(self.learn_error) == 0 ):
+            raise Exception('No prediction error source set for learn in rule %s' % self.name)
 
 class Rules:
     def __init__(self,ruleclass):
@@ -196,8 +209,20 @@ class Rules:
             t.append(rule.lhs_match.get((a,b),0)*rule.scale)
         return t
         
-        
-            
+    def get_learns(self, sink_name):
+        transforms = []
+        indexes = []
+        pred_errors = []
+        for i,n in enumerate(self.names):
+            rule = self.rules[n]
+            for source,transform in rule.rhs_learn.items():
+                if( source == sink_name ):
+                    indexes.append(i)
+                    transforms.append(transform)
+                    for pred_error in rule.learn_error:
+                        if( not pred_error in pred_errors ):    
+                            pred_errors.append(pred_error)
+        return (indexes, transforms, pred_errors)
 """
 
                     

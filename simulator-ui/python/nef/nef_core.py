@@ -761,7 +761,7 @@ class Network:
             if hasattr(node,'releaseMemory'):
                 node.releaseMemory()
                 
-    def neuron_count(self):
+    def getNeuronCount(self):
         """Return the total number of neurons in this network"""
         return self.network.neuronCount
         

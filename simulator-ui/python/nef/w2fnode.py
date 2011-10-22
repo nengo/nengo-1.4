@@ -239,10 +239,10 @@ class WriteToFileNode(nef.SimpleNode):
             self.next_log += self.log_interval
 
 #### EXAMPLE USAGE ####
-#def test_wtfnode():
+#def test_w2fnode():
 #    num_dim = 256
 #
-#    network = nef.Network("Test WTFNode")
+#    network = nef.Network("Test W2FNode")
 #
 #    file_path = "FILEPATH HERE"
 #    func_in = FunctionInput("Func In", [ConstantFunction(1,0)], Units.UNK)
@@ -269,20 +269,20 @@ class WriteToFileNode(nef.SimpleNode):
 #    vocab_in = ControlInput("Func In", num_dim, vocab, "ZER")
 #    network.add(vocab_in)
 #    
-#    # Let the wtfnode automatically connect stuff
-#    wtf = wtfnode.WriteToFileNode("WTF AutoAdd+Connect", file_path + "test.csv", network, overwrite = True)
-#    wtf.addVocabTermination("Func In", "origin", vocab = vocab, vocab_strs = vocab_strs)
-#    wtf.addValueTermination("Vocab In", "X")
+#    # Let the w2fnode automatically connect stuff
+#    w2f = w2fnode.WriteToFileNode("W2F AutoAdd+Connect", file_path + "test.csv", network, overwrite = True)
+#    w2f.addVocabTermination("Func In", "origin", vocab = vocab, vocab_strs = vocab_strs)
+#    w2f.addValueTermination("Vocab In", "X")
 #
 #    # Do the stuff yourself
-#    wtf2 = wtfnode.WriteToFileNode("WTF ManualStuff", file_path + "test2.csv", overwrite = True)
-#    wtf2.addVocabTermination("Func In", func_in.getOrigin("origin"), vocab = vocab, vocab_strs = vocab_strs)
-#    wtf2.addValueTermination("Vocab In", vocab_in.getOrigin("X"))
-#    network.add(wtf2)
-#    network.connect(func_in.getOrigin("origin"), wtf2.getTermination("Func In"))
-#    network.connect(vocab_in.getOrigin("X"), wtf2.getTermination("Vocab In"))
+#    w2f2 = w2fnode.WriteToFileNode("W2F ManualStuff", file_path + "test2.csv", overwrite = True)
+#    w2f2.addVocabTermination("Func In", func_in.getOrigin("origin"), vocab = vocab, vocab_strs = vocab_strs)
+#    w2f2.addValueTermination("Vocab In", vocab_in.getOrigin("X"))
+#    network.add(w2f2)
+#    network.connect(func_in.getOrigin("origin"), w2f2.getTermination("Func In"))
+#    network.connect(vocab_in.getOrigin("X"), w2f2.getTermination("Vocab In"))
 #
 #    # Add messages
-#    wtf.addMessages(["Message @ 0.5s","Message @ 1.0s"], [0.5,1])
+#    w2f.addMessages(["Message @ 0.5s","Message @ 1.0s"], [0.5,1])
 #    
 #    network.add_to_nengo()

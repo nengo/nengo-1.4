@@ -22,6 +22,7 @@ le=0.2
 lg=0.2
 
 def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,input_transform=None,output_weight=1,noise=None,same_neurons=True,radius=1.5,learn=False,bistable=False,bistable_gain=1.0):
+
         # create the necessary neural ensembles
         if same_neurons: code=''
         else: code='%d'
