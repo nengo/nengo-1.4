@@ -12,6 +12,7 @@ class Simulator:
     def __init__(self,network):
         self.nodes=[]
         self.projections=[]
+        self.tasks=[]
         self.network=network
         self.initialize(network)
 
@@ -25,10 +26,11 @@ class Simulator:
 
         elif NodeThreadPool.isMultithreading():
             multithread_nodes = LocalSimulator.collectNodes(self.nodes) 
-            multithread_projs = LocalSimulator.collectProjections(self.nodes, self.projections) 
+            multithread_projs = LocalSimulator.collectProjections(self.nodes, self.projections)
+            multithread_tasks = LocalSimulator.collectTasks(self.nodes)
 
-            self.thread_pool=NodeThreadPool(multithread_nodes, multithread_projs)
-        else:    
+            self.thread_pool=NodeThreadPool(multithread_nodes, multithread_projs, multithread_tasks)
+        else:
             self.thread_pool=None
 
     def initialize(self,network):
@@ -53,9 +55,11 @@ class Simulator:
             self.thread_pool.step(start,end)
         else:    
             for p in self.projections:
-              p.termination.setValues(p.origin.getValues())
+                p.termination.setValues(p.origin.getValues())
             for n in self.nodes:
-                n.run(start,end)    
+                n.run(start,end)
+            for t in self.tasks:
+                t.run(start,end)
 
     def kill(self):
       if self.thread_pool is not None:
