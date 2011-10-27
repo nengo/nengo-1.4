@@ -1,5 +1,5 @@
 from ca.nengo.model import StructuralException, Origin
-from ca.nengo.model.impl import BasicOrigin, NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl
+from ca.nengo.model.impl import BasicOrigin, NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl, PlasticEnsembleImpl
 from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
     OutSpikeErrorFunction, RealPlasticityTermination, SpikePlasticityTermination
 from ca.nengo.model.nef.impl import DecodedTermination
@@ -277,7 +277,14 @@ class NetworkArray(NetworkImpl):
             values[i]=data.getValues()[0][0]
         return TimeSeriesImpl(times,[values],units)
     
-    def setPlasticityRule(self,learn_term,mod_term,rate,stdp,**kwargs):
+    def setPlasticityRule(self,stdp=False):
+        for n in self._nodes:
+            if stdp:
+                n.setPlasticityRule(PlasticEnsembleImpl.SPIKE_PLASTICITY_RULE)
+            else:
+                n.setPlasticityRule(PlasticEnsembleImpl.REAL_PLASTICITY_RULE)
+
+    def learn(self,learn_term,mod_term,rate,stdp,**kwargs):
         in_args = {'a2Minus':  1.0e-1,
                    'a3Minus':  5.0e-3,
                    'tauMinus': 120.0,

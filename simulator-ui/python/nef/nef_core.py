@@ -1,4 +1,4 @@
-from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput
+from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput, PlasticEnsembleImpl
 from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
@@ -537,6 +537,26 @@ class Network:
             if post is None or isinstance(post, int): return origin
             if not create_projection: return origin,term
             return self.network.addProjection(origin,term)
+
+    def setPlasticityRule(self,post,stdp=False):
+        """Set an ensemble to use a specific learning rule for plastic terminations.
+
+        :param post: the ensemble whose terminations should be plastic
+        :param boolean stdp: signifies whether to use the STDP
+                             based error-modulated learning rule. If True, then
+                             the SpikePlasticityRule will be used, and the *post*
+                             ensemble must be in DEFAULT (spiking) mode.
+                             If False, then the RealPlasticityRule will be used,
+                             and *post* can be either in RATE or DEFAULT mode.
+        """
+
+        if isinstance(post,str):
+            post=self.network.getNode(post)
+
+        if stdp:
+            post.setPlasticityRule(PlasticEnsembleImpl.SPIKE_PLASTICITY_RULE)
+        else:
+            post.setPlasticityRule(PlasticEnsembleImpl.REAL_PLASTICITY_RULE)
     
     def learn(self,post,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
         """Apply a learning rule to a termination of the *post* ensemble.
@@ -661,7 +681,7 @@ class Network:
         if isinstance(mod_term,Termination):
             mod_term = mod_term.getName()
         
-        array.setPlasticityRule(learn_term,mod_term,rate,stdp,**kwargs)
+        array.learn(learn_term,mod_term,rate,stdp,**kwargs)
 
 
     def add_to_nengo(self):

@@ -14,7 +14,6 @@ import nef
 import random
 import datetime
 import os
-from ca.nengo.model.impl import PlasticEnsembleImpl
 
 class SensoryInfo(nef.SimpleNode):
     """A node that provides randomly varying input and a precomputed answer
@@ -247,10 +246,7 @@ def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False
                          func=func,post=post,noise=noise,cutoff=cutoff)    
     net.add(senses)
 
-    if stdp:
-        post.setPlasticityRule(PlasticEnsembleImpl.SPIKE_PLASTICITY_RULE)
-    else:
-        post.setPlasticityRule(PlasticEnsembleImpl.REAL_PLASTICITY_RULE)
+    net.setPlasticityRule(post, stdp)
     
     def rand_weights(w):
         for i in range(len(w)):
