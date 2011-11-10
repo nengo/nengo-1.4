@@ -7,3 +7,4 @@ class RealOutputImpl: pass
 class PlasticEnsembleTermination: pass
 class NoiseFactory: pass
 class FunctionInput: pass
+class PlasticEnsembleImpl: pass
