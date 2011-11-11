@@ -34,6 +34,7 @@ import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 
+import java.util.Random;
 
 /**
  * <p>A Termination at which incoming spikes induce exponentially decaying post-synaptic 
@@ -59,6 +60,8 @@ public class LinearExponentialTermination implements Termination {
 	
 	private float[] myInitialWeights;
 	private float[] myWeights;
+	private float[] myWeightProbabilities;
+	private Random random;
 	
 	private float myCurrent = 0;
 	private float myNetSpikeInput;
@@ -139,6 +142,27 @@ public class LinearExponentialTermination implements Termination {
 	}
 	
 	/**
+	 * @param weights The new synaptic vesicle release probabilities for each input channel
+	 */
+	public void setWeightProbabilities(float[] probs) {
+		if(probs.length != myInitialWeights.length)
+		{
+			System.err.println("Error, dimensions don't match in setWeightProbabilities, ignoring probabilities");
+			return;
+		}
+		if (random==null) random=new Random();
+		
+		myWeightProbabilities = probs;
+	}
+	
+	/**
+	 * @return List of synaptic release probabilities for each input channel
+	 */
+	public float[] getWeightProbabilities() {
+		return myWeightProbabilities;
+	}
+	
+	/**
 	 * @return The most recent input to the Termination
 	 */
 	public InstantaneousOutput getInput() {
@@ -171,8 +195,14 @@ public class LinearExponentialTermination implements Termination {
 		//  to be handled separately (we really don't need this, but I'm paranoid about losing
 		//  single spikes that happen right at the step boundaries)
 		if (myPreciseSpikeInputTimes!=null) {
-			for (int i=0; i<myPreciseSpikeInputTimes.length; i++) {
-				if (myPreciseSpikeInputTimes[i]==0f) myNetSpikeInput+=myWeights[i];		
+			if (myWeightProbabilities!=null) {
+				for (int i=0; i<myPreciseSpikeInputTimes.length; i++) {
+					if ((myPreciseSpikeInputTimes[i]==0f) && (random.nextFloat()<myWeightProbabilities[i])) myNetSpikeInput+=myWeights[i];
+				}
+			} else {
+				for (int i=0; i<myPreciseSpikeInputTimes.length; i++) {
+					if (myPreciseSpikeInputTimes[i]==0f) myNetSpikeInput+=myWeights[i];
+				}
 			}
 		}
 		
@@ -238,30 +268,50 @@ public class LinearExponentialTermination implements Termination {
 	private void updatePreciseSpikeCurrent(float integrationTime) {
 		float endTime=myIntegrationTime+integrationTime;
 		float epsilon=0.0000001f;
-		for (int i=0; i<myPreciseSpikeInputTimes.length; i++)
-		{
-			float time=myPreciseSpikeInputTimes[i];
-			if (time>myIntegrationTime && (time<=endTime+epsilon)) { 
-				myCurrent+=myWeights[i]*(1f/myTauPSC-((endTime-time)/(myTauPSC*myTauPSC)));
+		
+		if (myWeightProbabilities!=null) {
+			for (int i=0; i<myPreciseSpikeInputTimes.length; i++)
+			{
+				float time=myPreciseSpikeInputTimes[i];
+				if (time>myIntegrationTime && (time<=endTime+epsilon) && (random.nextFloat()<myWeightProbabilities[i])) { 
+					myCurrent+=myWeights[i]*(1f/myTauPSC-((endTime-time)/(myTauPSC*myTauPSC)));
+				}
+			}
+			
+		} else {		
+			for (int i=0; i<myPreciseSpikeInputTimes.length; i++)
+			{
+				float time=myPreciseSpikeInputTimes[i];
+				if (time>myIntegrationTime && (time<=endTime+epsilon)) { 
+					myCurrent+=myWeights[i]*(1f/myTauPSC-((endTime-time)/(myTauPSC*myTauPSC)));
+				}
 			}
 		}
 		myIntegrationTime=endTime;
 	}
 
-	private static float combineSpikes(SpikeOutput input, float[] weights) {
+	private float combineSpikes(SpikeOutput input, float[] weights) {
 		float result = 0;
 		boolean[] spikes = input.getValues();
 		
-		for (int i = 0; i < spikes.length; i++) {
-			if (spikes[i]) {
-				result += weights[i];
-			}
-		}			
+		if (myWeightProbabilities!=null) {
+			for (int i = 0; i < spikes.length; i++) {
+				if (spikes[i] && (random.nextFloat()<myWeightProbabilities[i])) {
+					result += weights[i];
+				}
+			}									
+		} else {
+			for (int i = 0; i < spikes.length; i++) {
+				if (spikes[i]) {
+					result += weights[i];
+				}
+			}			
+		}
 	
 		return result;
 	}
 	
-	private static float combineReals(RealOutput input, float[] weights) {
+	private float combineReals(RealOutput input, float[] weights) {
 		float result = 0;
 		float[] reals = input.getValues();
 		
