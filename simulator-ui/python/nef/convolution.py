@@ -71,8 +71,8 @@ def complex_exp(z):
 def product(x):
     return x[0]*x[1]
 
-def make_array(net,name,N_per_D,dimensions,quick=True,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]]):
-    return net.make_array(name,N_per_D,(dimensions/2+1)*4,dimensions=2,quick=quick,encoders=encoders,radius=3)
+def make_array(net,name,N_per_D,dimensions,quick=True,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],radius=3):
+    return net.make_array(name,N_per_D,(dimensions/2+1)*4,dimensions=2,quick=quick,encoders=encoders,radius=radius)
 
 
 def output_transform(dimensions):
@@ -117,7 +117,7 @@ def input_transform(dimensions,first,invert=False):
     
         
                
-def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],pstc_out=0.01,pstc_in=0.01,pstc_gate=0.01,invert_first=False,invert_second=False,mode='default',output_scale=1):
+def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],radius=3,pstc_out=0.01,pstc_in=0.01,pstc_gate=0.01,invert_first=False,invert_second=False,mode='default',output_scale=1):
     if isinstance(A,str):
         A=self.network.getNode(A)
     if isinstance(B,str):
@@ -141,7 +141,7 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
             self.connect(B,D.getTermination('B'))
         self.connect(D.getOrigin('C'),C,pstc=pstc_out,weight=output_scale)
     else:
-        D=make_array(self,name,N_per_D,dimensions,quick=quick,encoders=encoders)
+        D=make_array(self,name,N_per_D,dimensions,quick=quick,encoders=encoders,radius=radius)
 
         A2=input_transform(dimensions,True,invert_first)
         B2=input_transform(dimensions,False,invert_second)
