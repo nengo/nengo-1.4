@@ -1,10 +1,10 @@
-from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput, PlasticEnsembleImpl
+from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput
 from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
-from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
-    OutSpikeErrorFunction, RealPlasticityTermination, SpikePlasticityTermination
+from ca.nengo.model.plasticity.impl import InSpikeErrorFunction, \
+    OutSpikeErrorFunction, PESTermination, STDPTermination, PlasticEnsembleImpl
 from ca.nengo.util import MU
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator,FourierFunction
 from ca.nengo.math import Function
@@ -568,7 +568,7 @@ class Network:
             encoder=post.encoders
             w=MU.prod(encoder,MU.prod(transform,MU.transpose(decoder)))   #gain is handled elsewhere
             w=weight_func(w)
-            term=post.addTermination(pre.name,w,pstc,False)
+            term=post.addPESTermination(pre.name,w,pstc,False)
             if not create_projection: return pre.getOrigin('AXON'),term
             self.network.addProjection(pre.getOrigin('AXON'),term)
         elif (post is not None) and (not isinstance(post, int)):
@@ -589,28 +589,8 @@ class Network:
             if post is None or isinstance(post, int): return origin
             if not create_projection: return origin,term
             return self.network.addProjection(origin,term)
-
-    def setPlasticityRule(self,post,stdp=False):
-        """Set an ensemble to use a specific learning rule for plastic terminations.
-
-        :param post: the ensemble whose terminations should be plastic
-        :param boolean stdp: signifies whether to use the STDP
-                             based error-modulated learning rule. If True, then
-                             the SpikePlasticityRule will be used, and the *post*
-                             ensemble must be in DEFAULT (spiking) mode.
-                             If False, then the RealPlasticityRule will be used,
-                             and *post* can be either in RATE or DEFAULT mode.
-        """
-
-        if isinstance(post,str):
-            post=self.network.getNode(post)
-
-        if stdp:
-            post.setPlasticityRule(PlasticEnsembleImpl.SPIKE_PLASTICITY_RULE)
-        else:
-            post.setPlasticityRule(PlasticEnsembleImpl.REAL_PLASTICITY_RULE)
     
-    def learn(self,post,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
+    def learn(self,post,learn_term,mod_term,rate=5e-7,**kwargs):
         """Apply a learning rule to a termination of the *post* ensemble.
         The *mod_term* termination will be used as an error signal
         that modulates the changing connection weights of *learn_term*.
@@ -636,12 +616,6 @@ class Network:
                             .. todo:: 
                                      (Possible enhancement: make this 2D for stdp
                                      mode, different rates for in_fcn and out_fcn)
-        :param boolean stdp: signifies whether to use the STDP
-                             based error-modulated learning rule. If True, then
-                             the SpikePlasticityRule will be used, and the *post*
-                             ensemble must be in DEFAULT (spiking) mode.
-                             If False, then the RealPlasticityRule will be used,
-                             and *post* can be either in RATE or DEFAULT mode.
            
         If *stdp* is True, a triplet-based spike-timinng-dependent plasticity rule
         is used, based on that defined in::
@@ -665,12 +639,12 @@ class Network:
         
         if isinstance(post,str):
             post=self.network.getNode(post)
-        if isinstance(learn_term,Termination):
-            learn_term=learn_term.getName()
+        if isinstance(learn_term,str):
+            learn_term=post.getTermination(learn_term)
         if isinstance(mod_term,Termination):
             mod_term=mod_term.getName()
         
-        if stdp:
+        if isinstance(learn_term,STDPTermination):
             in_args = {'a2Minus':  5.0e-3, #1.0e-1,
                        'a3Minus':  5.0e-3,
                        'tauMinus': 70.0, #120.0,
@@ -696,29 +670,30 @@ class Network:
             outFcn = OutSpikeErrorFunction([n.scale for n in post.nodes],post.encoders,
                                            out_args['a2Plus'],out_args['a3Plus'],out_args['tauPlus'],out_args['tauY']);
             outFcn.setLearningRate(rate)
-            post.getTermination(learn_term).init(inFcn, outFcn, 'AXON', mod_term)
+            learn_term.init(inFcn, outFcn, 'AXON', mod_term)
             
             if kwargs.has_key('decay') and kwargs['decay'] is not None:
-                post.getTermination(learn_term).setDecaying(True)
-                post.getTermination(learn_term).setDecayScale(kwargs['decay'])
+                learn_term.setDecaying(True)
+                learn_term.setDecayScale(kwargs['decay'])
             else:
-                post.getTermination(learn_term).setDecaying(False)
+                learn_term.setDecaying(False)
             
             if kwargs.has_key('homeostasis') and kwargs['homeostasis'] is not None:
-                post.getTermination(learn_term).setHomestatic(True)
-                post.getTermination(learn_term).setStableVal(kwargs['homeostasis'])
+                learn_term.setHomestatic(True)
+                learn_term.setStableVal(kwargs['homeostasis'])
             else:
-                post.getTermination(learn_term).setHomestatic(False)
-        else:
+                learn_term.setHomestatic(False)
+        elif isinstance(learn_term,PESTermination):
             oja = True
             if kwargs.has_key('oja'):
                 oja = kwargs['oja']
-            
-            learnFcn = ErrorLearningFunction([n.scale for n in post.nodes],post.encoders,oja)
-            learnFcn.setLearningRate(rate)
-            post.getTermination(learn_term).init(learnFcn, 'X', mod_term)
 
-    def learn_array(self,array,learn_term,mod_term,rate=5e-7,stdp=False,**kwargs):
+            learn_term.setLearningRate(rate)
+            learn_term.setOja(oja)
+            learn_term.setOriginName('X')
+            learn_term.setModTermName(mod_term)
+
+    def learn_array(self,array,learn_term,mod_term,rate=5e-7,**kwargs):
         """Apply a learning rule to a termination of a :class:`nef.array.NetworkArray` (an array of
         ensembles, created using :func:`nef.Network.make_array()`).
         
@@ -733,7 +708,7 @@ class Network:
         if isinstance(mod_term,Termination):
             mod_term = mod_term.getName()
         
-        array.learn(learn_term,mod_term,rate,stdp,**kwargs)
+        array.learn(learn_term,mod_term,rate,**kwargs)
 
 
     def add_to_nengo(self):

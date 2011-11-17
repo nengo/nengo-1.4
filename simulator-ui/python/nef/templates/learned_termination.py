@@ -28,9 +28,8 @@ def test_params(net,p):
     if p['N_err'] < 1: return 'Number of dimensions must be at least one'
     
 import random
-from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
-    OutSpikeErrorFunction, SpikePlasticityTermination
-from ca.nengo.model.impl import PlasticEnsembleImpl
+from ca.nengo.model.plasticity.impl import InSpikeErrorFunction, \
+    OutSpikeErrorFunction, STDPTermination, PlasticEnsembleImpl
 import nef
 import numeric
     
@@ -62,8 +61,7 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
         count=count+1
     prename = '%s_%02d'%(prename, count)
 
-    post.setPlasticityRule(PlasticEnsembleImpl.REAL_PLASTICITY_RULE);
-    post.addTermination(prename, weight, 0.005, False)
+    post.addPESTermination(prename, weight, 0.005, False)
     
     # Create error ensemble
     error = net.make(errName, N_err, post.dimension)
@@ -73,5 +71,5 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     net.connect(pre.getOrigin('AXON'),post.getTermination(prename))
 
     # Set learning rule on the non-decoded termination
-    net.learn(post,prename,modname,rate=rate,stdp=False)
+    net.learn(post,prename,modname,rate=rate)
     

@@ -21,7 +21,7 @@ eg=-0.2
 le=0.2
 lg=0.2
 
-def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,input_transform=None,output_weight=1,noise=None,same_neurons=True,radius=1.5,learn=False,bistable=False,bistable_gain=1.0,stdp=False):
+def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,input_transform=None,output_weight=1,noise=None,same_neurons=True,radius=1.5,learn=False,bistable=False,bistable_gain=1.0):
 
         # create the necessary neural ensembles
         if same_neurons: code=''
@@ -36,9 +36,6 @@ def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,in
             
         StrD1=net.make_array('StrD1',N,D,intercept=(e,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgStrD1'+code,radius=radius,node_factory=str_factory,decoder_sign=1)
         StrD2=net.make_array('StrD2',N,D,intercept=(e,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgStrD2'+code,radius=radius,node_factory=str_factory,decoder_sign=1)
-
-        StrD1.setPlasticityRule(stdp)
-        StrD2.setPlasticityRule(stdp)
         
         if bistable:
             from ca.nengo.model.impl import EnsembleTermination

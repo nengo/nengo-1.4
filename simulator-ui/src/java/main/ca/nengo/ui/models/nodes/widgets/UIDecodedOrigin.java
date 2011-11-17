@@ -26,6 +26,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.nodes.widgets;
 
+import ca.nengo.model.StructuralException;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.ui.lib.util.Util;
@@ -61,7 +62,11 @@ public class UIDecodedOrigin extends UIOrigin {
 		if (getModel().getNode() instanceof NEFEnsemble) {
 			if(getExposedName() != null)
 				unExpose();
-			((NEFEnsemble) (getModel().getNode())).removeDecodedOrigin(getModel().getName());
+            try {
+			    ((NEFEnsemble) (getModel().getNode())).removeDecodedOrigin(getModel().getName());
+            } catch(StructuralException e) {
+                Util.Assert(false, e.getMessage());
+            }
 			showPopupMessage("decoded termination removed from ensemble");
 			
 		} else {

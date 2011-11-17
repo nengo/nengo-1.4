@@ -213,7 +213,7 @@ class SensoryInfo(nef.SimpleNode):
         for line in self.data_log:
             print line
 
-def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False,rate=5e-7,
+def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,rate=5e-7,
         learning=True,noise='brown',cutoff=15.0,**kwargs):
     """Creates a network that will learn the function passed as func.
     That function is some transformation from a vector of length in_dim to
@@ -223,8 +223,6 @@ def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False
     train_len -- length of the training phase. Learning only happens
       during the training phase.
     NperD -- number of neurons per dimension
-    stdp -- set to True to use the spiking plasticity rule, False to
-      use the real plasticity rule
     rate -- learning rate (kappa)
     learning -- set to True to have learning enabled, False to create
       a control network that can be used for comparison
@@ -246,8 +244,6 @@ def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False
                          func=func,post=post,noise=noise,cutoff=cutoff)    
     net.add(senses)
 
-    net.setPlasticityRule(post, stdp)
-    
     def rand_weights(w):
         for i in range(len(w)):
             for j in range(len(w[0])):
@@ -267,7 +263,7 @@ def make_learn_network(net,func,in_dim,out_dim,train_len=2.0,NperD=35,stdp=False
     net.connect(error,post,modulatory=True)
     
     if learning:
-        net.learn(post,'pre','error',rate=rate,stdp=stdp,**kwargs)
+        net.learn(post,'pre','error',rate=rate,**kwargs)
     
     senses.getTermination('error').setDimensions(out_dim)
     net.connect(error,senses.getTermination('error'))

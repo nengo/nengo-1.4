@@ -1,9 +1,8 @@
 from ca.nengo.model import StructuralException, Origin
-from ca.nengo.model.impl import BasicOrigin, NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl, PlasticEnsembleImpl
-from ca.nengo.model.plasticity.impl import ErrorLearningFunction, InSpikeErrorFunction, \
-    OutSpikeErrorFunction, RealPlasticityTermination, SpikePlasticityTermination
+from ca.nengo.model.impl import BasicOrigin, NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl 
+from ca.nengo.model.plasticity.impl import PlasticEnsembleTermination, InSpikeErrorFunction, \
+    OutSpikeErrorFunction, PESTermination, STDPTermination
 from ca.nengo.model.nef.impl import DecodedTermination
-from ca.nengo.model.impl import PlasticEnsembleTermination
 from ca.nengo.util import MU
 from ca.nengo.util.impl import TimeSeriesImpl
 
@@ -162,7 +161,7 @@ class NetworkArray(NetworkImpl):
             w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd)])
             if weight_func is not None:
                 w = weight_func(w)
-            t = n.addTermination(name,w,tauPSC,False)
+            t = n.addPESTermination(name,w,tauPSC,False)
             terminations.append(t)
             d += dd
         termination = EnsembleTermination(self,name,terminations)
@@ -276,15 +275,8 @@ class NetworkArray(NetworkImpl):
             units[i]=data.getUnits()[0]
             values[i]=data.getValues()[0][0]
         return TimeSeriesImpl(times,[values],units)
-    
-    def setPlasticityRule(self,stdp=False):
-        for n in self._nodes:
-            if stdp:
-                n.setPlasticityRule(PlasticEnsembleImpl.SPIKE_PLASTICITY_RULE)
-            else:
-                n.setPlasticityRule(PlasticEnsembleImpl.REAL_PLASTICITY_RULE)
 
-    def learn(self,learn_term,mod_term,rate,stdp,**kwargs):
+    def learn(self,learn_term,mod_term,rate,**kwargs):
         in_args = {'a2Minus':  1.0e-1,
                    'a3Minus':  5.0e-3,
                    'tauMinus': 120.0,
@@ -300,11 +292,12 @@ class NetworkArray(NetworkImpl):
         for key in out_args.keys():
             if kwargs.has_key(key):
                 out_args[key] = kwargs[key]
-        
+
         for n in self._nodes:
             if( learn_term in [node.name for node in n.getTerminations()] ):
                 term = n.getTermination(learn_term)
-                if stdp:
+
+                if isinstance(term,STDPTermination):
                     inFcn = InSpikeErrorFunction([neuron.scale for neuron in n.nodes],n.encoders,
                                                  in_args['a2Minus'],in_args['a3Minus'],in_args['tauMinus'],in_args['tauX']);
                     inFcn.setLearningRate(rate)
@@ -323,14 +316,16 @@ class NetworkArray(NetworkImpl):
                         term.setStableVal(kwargs['homeostasis'])
                     else:
                         term.setHomestatic(False)
-                else:
+                
+                elif isinstance(term,PESTermination):
                     oja = True
                     if kwargs.has_key('oja'):
                         oja = kwargs['oja']
                     
-                    learnFcn = ErrorLearningFunction([neuron.scale for neuron in n.nodes],n.encoders,oja)
-                    learnFcn.setLearningRate(rate)
-                    term.init(learnFcn,'X',mod_term)
+                    term.setLearningRate(rate)
+                    term.setOja(oja)
+                    term.setOriginName('X')
+                    term.setModTermName(mod_term)
 
     def setLearning(self,learn):
         for n in self._nodes:
