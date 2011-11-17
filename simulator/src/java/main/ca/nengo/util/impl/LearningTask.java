@@ -1,33 +1,28 @@
 package ca.nengo.util.impl;
 
-import ca.nengo.util.ThreadTask;
 import ca.nengo.model.SimulationException;
-import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
-import ca.nengo.model.impl.PlasticEnsembleImpl;
-import ca.nengo.model.impl.PlasticEnsembleTermination;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleImpl;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
+import ca.nengo.util.ThreadTask;
 
 /**
  * Implementation of a ThreadTask to multithread learning in a plastic ensemble.
  *
  * This task will seperate the learning calculations such as getDerivative into indepdent
  * threadable tasks.
- * 
+ *
  * @author Jonathan Lai
  */
 
 public class LearningTask implements ThreadTask {
 
-    private PlasticEnsembleImpl myParent;
-    private PlasticEnsembleTermination myTermination;
+    private final PlasticEnsembleImpl myParent;
+    private final PlasticEnsembleTermination myTermination;
 
-    private int startIdx;
-    private int endIdx;
+    private final int startIdx;
+    private final int endIdx;
     private boolean finished;
-    
-    private float myStartTime;
-    private float myEndTime;
-    private float[][] myTransform;
 
     /**
      * @param parent Parent PlasticEnsemble of this task
@@ -55,21 +50,21 @@ public class LearningTask implements ThreadTask {
         endIdx = end;
         finished = copy.finished;
     }
-    
+
 	/**
 	 * @see ca.nengo.model.Resettable#reset(boolean)
 	 */
-	public void reset(boolean randomize) {
+    public void reset(boolean randomize) {
         finished = false;
 	}
-    
+
     /**
      * @see ca.nengo.model.util.ThreadTask#getParent()
      */
     public PlasticEnsembleImpl getParent() {
         return myParent;
     }
-    
+
     /**
      * @see ca.nengo.model.util.ThreadTask#isFinished()
      */
@@ -78,47 +73,22 @@ public class LearningTask implements ThreadTask {
     }
 
     /**
-     * Overrides run startTime and endTime
-     * @param startTime Override for startTime
-     * @param endTime Override for endTime
-     */
-    public void setTime(float startTime, float endTime) {
-        myStartTime = startTime;
-        myEndTime = endTime;
-    }
-
-    /**
-     * Sets the reference to the transform array for learning
-     * @param transform The array of transforms to use
-     */
-    public void setTransform(float[][] transform) {
-        myTransform = transform;
-    }
-    
-    /**
      * @see ca.nengo.model.util.ThreadTask#run(float, float)
      */
     public void run(float startTime, float endTime) throws SimulationException {
-        if (!finished)
-        {
-            float[][] derivative;
-			try {
-                derivative = myTermination.getDerivative(myTransform, myTermination.getInput(), endTime, startIdx, endIdx);
-			} catch (StructuralException e) {
-				throw new SimulationException(e);
-			}
-            float scale = (myTermination.getInput() instanceof SpikeOutput) ? 1 : (myEndTime - myStartTime); 
-            for (int i = startIdx; i < endIdx; i++) {
-                for (int j = 0; j < myTransform[i].length; j++) {
-                    myTransform[i][j] += derivative[i][j] * scale;
-                }
+        if (!finished) {
+            try {
+                myTermination.updateTransform(endTime, startIdx, endIdx);
+            } catch (StructuralException e) {
+                throw new SimulationException(e.getMessage());
             }
             finished = true;
         }
     }
 
+    @Override
     public LearningTask clone() throws CloneNotSupportedException {
         return (LearningTask) super.clone();
     }
-    
+
 }

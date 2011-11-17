@@ -1,23 +1,23 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "DecodableEnsembleImpl.java". Description: 
+The Original Code is "DecodableEnsembleImpl.java". Description:
 "Default implementation of DecodableEnsemble"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -27,12 +27,19 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.nef.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import Jama.Matrix;
+import ca.nengo.dynamics.LinearSystem;
+import ca.nengo.dynamics.impl.CanonicalModel;
+import ca.nengo.dynamics.impl.EulerIntegrator;
+import ca.nengo.dynamics.impl.LTISystem;
+import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.math.ApproximatorFactory;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
@@ -46,42 +53,42 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.PlasticEnsembleImpl;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.nef.DecodableEnsemble;
-import ca.nengo.util.MU;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleImpl;
 import ca.nengo.util.DataUtils;
+import ca.nengo.util.MU;
 import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
- * Default implementation of DecodableEnsemble. 
- * 
+ * Default implementation of DecodableEnsemble.
+ *
  * @author Bryan Tripp
  */
 public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements DecodableEnsemble {
 
 	private static final long serialVersionUID = 1L;
-	
-	protected Map<String, DecodedOrigin> myDecodedOrigins;
-	protected LinkedList <DecodedOrigin> OrderedOrigins;
-		
+
+	protected final Map<String, DecodedOrigin> myDecodedOrigins;
+	protected final Map<String, DecodedTermination> myDecodedTerminations;
+
 	private ApproximatorFactory myApproximatorFactory;
 	private Map<String, LinearApproximator> myApproximators;
-	private float myTime; //used to support Probeable	
+	private float myTime; //used to support Probeable
 
 	/**
 	 * @param name Name of the Ensemble
 	 * @param nodes Nodes that make up the Ensemble
 	 * @param factory Source of LinearApproximators to use in decoding output
-	 * @throws StructuralException 
+	 * @throws StructuralException
 	 */
 	public DecodableEnsembleImpl(String name, Node[] nodes, ApproximatorFactory factory) throws StructuralException {
 		super(name, nodes);
-		
-		myDecodedOrigins = new HashMap<String, DecodedOrigin>(10);
-		OrderedOrigins = new LinkedList <DecodedOrigin> ();
+
+		myDecodedOrigins = new LinkedHashMap<String, DecodedOrigin>(10);
+        myDecodedTerminations = new LinkedHashMap<String, DecodedTermination>(10);
 		myApproximatorFactory = factory;
 		myApproximators = new HashMap<String, LinearApproximator>(10);
 		myTime = 0;
@@ -90,8 +97,12 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	/**
 	 * @see ca.nengo.model.nef.DecodableEnsemble#addDecodedOrigin(java.lang.String, ca.nengo.math.Function[], java.lang.String, ca.nengo.model.Network, ca.nengo.util.Probe, float, float)
 	 */
-	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment, 
+    public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment,
 			Probe probe, float startTime, float endTime) throws StructuralException, SimulationException {
+
+	    if (myDecodedOrigins.containsKey(name)) {
+            throw new StructuralException("The ensemble already contains a origin named " + name);
+        }
 
 		probe.reset();
 		environment.run(startTime, endTime);
@@ -102,20 +113,25 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 		}
 		float[][] values = probe.getData().getValues();
 		float[][] valuesT = MU.transpose(values);
-		
+
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, valuesT);
 		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, approximator);
 		result.setMode(getMode());
 
-		addDecodedOrigin(name, result);
+        myDecodedOrigins.put(name, result);
+        fireVisibleChangeEvent();
 		return result;
 	}
 
 	/**
 	 * @see ca.nengo.model.nef.DecodableEnsemble#addDecodedOrigin(java.lang.String, ca.nengo.math.Function[], java.lang.String, ca.nengo.model.Network, ca.nengo.util.Probe, ca.nengo.model.Termination, float[][], float)
 	 */
-	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment, 
+    public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment,
 			Probe probe, Termination termination, float[][] evalPoints, float transientTime) throws StructuralException, SimulationException {
+
+	    if (myDecodedOrigins.containsKey(name)) {
+            throw new StructuralException("The ensemble already contains a origin named " + name);
+        }
 
 		float[][] values = new float[evalPoints.length][];
 		for (int i = 0; i < evalPoints.length; i++) {
@@ -131,32 +147,37 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 			TimeSeries result = probe.getData();
 			environment.removeProjection(termination);
 			environment.removeNode(fi.getName());
-			
+
 			values[i] = new float[result.getDimension()];
-			int samples = (int) Math.ceil( (double) result.getValues().length / 10d ); //use only last ~10% of run in the average to avoid transient
+			int samples = (int) Math.ceil( result.getValues().length / 10d ); //use only last ~10% of run in the average to avoid transient
 			for (int j = 0; j < result.getDimension(); j++) {
 				values[i][j] = 0;
 				for (int k = result.getValues().length - samples; k < result.getValues().length; k++) {
 					values[i][j] += result.getValues()[j][k];
 				}
-				values[i][j] = values[i][j] / (float) samples;
+				values[i][j] = values[i][j] / samples;
 			}
 		}
-		
+
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, values);
 		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, approximator);
 		result.setMode(getMode());
-		addDecodedOrigin(name, result);
-		return result;		
+		myDecodedOrigins.put(name, result);
+		fireVisibleChangeEvent();
+		return result;
 	}
-	
+
 	/**
 	 * @see ca.nengo.model.nef.DecodableEnsemble#addDecodedOrigin(java.lang.String, ca.nengo.math.Function[], java.lang.String, ca.nengo.model.Network, ca.nengo.util.Probe, float, float, float)
-	 * 
+	 *
 	 *  Lloyd Elliot's decodable origin for decoding band-limited noise using a psc optimized decoder
 	 */
-	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment, 
+	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment,
 			Probe probe, Probe state, float startTime, float endTime, float tau) throws StructuralException, SimulationException {
+
+	    if (myDecodedOrigins.containsKey(name)) {
+            throw new StructuralException("The ensemble already contains a origin named " + name);
+        }
 
 		probe.reset();
 		state.reset();
@@ -175,22 +196,22 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 //			values = probe.getData().getValues();
 //			time = probe.getData().getTimes();
 //		}
-		int t0 = (int)(Math.ceil((double)time.length/2d));
+		int t0 = (int)(Math.ceil(time.length/2d));
 		int t1 = time.length;
 		int k;
-		
+
 		float[][] valuesT = new float[values[0].length][t1-t0];
 		TimeSeries stateData = state.getData();
-		
+
 		int d = stateData.getValues()[0].length;
 		TimeSeriesFunction []evalPointsFunction = new TimeSeriesFunction[d];
-		
+
 		float [][]evalPoints = new float[t1-t0][d];
-		
+
 		for(int i=0;i<d;i++)
 		{
 			evalPointsFunction[i] = new TimeSeriesFunction(state.getData(),i);
-			
+
 			for(k=0;k<t1-t0;k++)
 			{
 				evalPoints[k][i] = evalPointsFunction[i].map(new float[]{time[k+t0]});
@@ -200,102 +221,220 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 				}
 			}
 		}
-		
+
 		LinearApproximator approximator = myApproximatorFactory.getApproximator(evalPoints, valuesT);
 		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, approximator);
 		result.setMode(getMode());
 
-		addDecodedOrigin(name, result);
+		myDecodedOrigins.put(name, result);
+		fireVisibleChangeEvent();
 		return result;
 	}
 
-	/**
-	 * @param name The name of a new DecodedOrigin
-	 * @param origin The new Origin
-	 * @throws StructuralException 
-	 */
-	protected void addDecodedOrigin(String name, DecodedOrigin origin) throws StructuralException {
-		if (myDecodedOrigins.containsKey(name)) {
-			throw new StructuralException("The ensemble already contains a origin named " + name);
-		}
-		
-		myDecodedOrigins.put(name, origin);
-		OrderedOrigins.add(origin);
-		fireVisibleChangeEvent();
-	}
+    /**
+     * @see ca.nengo.model.nef.NEFEnsemble#addDecodedTermination(java.lang.String, float[][], float, boolean)
+     */
+    public Termination addDecodedTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory)
+            throws StructuralException {
+
+        // TODO Should this also check non-decoded terminations?
+        if (myDecodedTerminations.containsKey(name)) {
+            throw new StructuralException("The ensemble already contains a termination named " + name);
+        }
+
+        float scale = 1 / tauPSC; //output scaling to make impulse integral = 1
+
+        LinearSystem dynamics = new SimpleLTISystem(
+                new float[]{-1f/tauPSC},
+                new float[][]{new float[]{1f}},
+                new float[][]{new float[]{scale}},
+                new float[]{0f},
+                new Units[]{Units.UNK}
+        );
+
+        EulerIntegrator integrator = new EulerIntegrator(tauPSC / 10f);
+
+        DecodedTermination result = new DecodedTermination(this, name, matrix, dynamics, integrator);
+        if (isModulatory) {
+            result.setModulatory(isModulatory);
+        }
+
+        myDecodedTerminations.put(name, result);
+        fireVisibleChangeEvent();
+        return result;
+    }
+
+    /**
+     * @see ca.nengo.model.nef.NEFEnsemble#addDecodedTermination(java.lang.String, float[][], float[], float[], float, boolean)
+     */
+    public Termination addDecodedTermination(String name, float[][] matrix, float[] tfNumerator, float[] tfDenominator,
+            float passthrough, boolean isModulatory) throws StructuralException {
+
+        LTISystem dynamics = CanonicalModel.getRealization(tfNumerator, tfDenominator, passthrough);
+
+        Matrix A = new Matrix(MU.convert(dynamics.getA(0f)));
+        double[] eigenvalues = A.eig().getRealEigenvalues();
+        double fastest = Math.abs(eigenvalues[0]);
+        for (int i = 1; i < eigenvalues.length; i++) {
+            if (Math.abs(eigenvalues[i]) > fastest) {
+                fastest = Math.abs(eigenvalues[i]);
+            }
+        }
+
+        EulerIntegrator integrator = new EulerIntegrator(1f / (10f * (float) fastest));
+
+        DecodedTermination result = new DecodedTermination(this, name, matrix, dynamics, integrator);
+        if (isModulatory) {
+            result.setModulatory(isModulatory);
+        }
+
+        myDecodedTerminations.put(name, result);
+        fireVisibleChangeEvent();
+        return result;
+    }
+
+    /**
+     * @see ca.nengo.model.nef.NEFEnsemble#removeDecodedTermination(java.lang.String)
+     */
+    public DecodedTermination removeDecodedTermination(String name) throws StructuralException {
+        if (myDecodedTerminations.containsKey(name)) {
+            DecodedTermination result = myDecodedTerminations.remove(name);
+            fireVisibleChangeEvent();
+
+            return result;
+        }
+
+        throw new StructuralException("Termination " + name +
+                " does not exist or not a DecodedTermination");
+    }
+
+    /**
+     * @see ca.nengo.model.nef.NEFEnsemble#removeDecodedTermination(java.lang.String)
+     */
+    public DecodedOrigin removeDecodedOrigin(String name) throws StructuralException {
+        if (myDecodedOrigins.containsKey(name)) {
+            DecodedOrigin result = myDecodedOrigins.remove(name);
+            fireVisibleChangeEvent();
+
+            return result;
+        }
+
+        throw new StructuralException("Origin " + name +
+                " does not exist or not a DecodedOrigin");
+    }
+
+    /**
+     * Used to get decoded terminations to give to GPU.
+     */
+    public DecodedTermination[] getDecodedTerminations(){
+        return myDecodedTerminations.values().toArray(new DecodedTermination[0]);
+        //return (OrderedTerminations != null) ? (DecodedTermination[])OrderedTerminations.toArray(new DecodedTermination[0]) : new DecodedTermination[0];
+    }
 
 	/**
 	 * @see ca.nengo.model.nef.DecodableEnsemble#doneOrigins()
 	 */
-	public void doneOrigins() {
+    public void doneOrigins() {
 		myApproximators.clear();
-	}
-
-	/**
-	 * @see ca.nengo.model.nef.DecodableEnsemble#removeDecodedOrigin(java.lang.String)
-	 */
-	public void removeDecodedOrigin(String name) {		
-		OrderedOrigins.remove(myDecodedOrigins.get(name));
-		myDecodedOrigins.remove(name);
-		fireVisibleChangeEvent();
 	}
 
 	/**
 	 * @see ca.nengo.model.Node#getOrigin(java.lang.String)
 	 */
-	public Origin getOrigin(String name) throws StructuralException {
-		return myDecodedOrigins.containsKey(name) ? myDecodedOrigins.get(name) : super.getOrigin(name);
+	@Override
+    public Origin getOrigin(String name) throws StructuralException {
+		return myDecodedOrigins.containsKey(name) ?
+		        myDecodedOrigins.get(name) : super.getOrigin(name);
 	}
+
+    /**
+     * @see ca.nengo.model.Node#getTermination(java.lang.String)
+     */
+    @Override
+    public Termination getTermination(String name) throws StructuralException {
+        return myDecodedTerminations.containsKey(name) ?
+                myDecodedTerminations.get(name) : super.getTermination(name);
+    }
 
 	/**
 	 * @see ca.nengo.model.Ensemble#getOrigins()
 	 */
-	public Origin[] getOrigins() {		
-		
-		Origin[] decoded;		
-	
-		decoded = (OrderedOrigins != null) ? (Origin[])OrderedOrigins.toArray(new Origin[0]) : new Origin[0];
-		Origin[] composites = super.getOrigins();
-		
-		Origin[] all = new Origin[decoded.length + composites.length];
-		System.arraycopy(composites, 0, all, 0, composites.length);
-		System.arraycopy(decoded, 0, all, composites.length, decoded.length);
-		
-		/*
-			System.arraycopy(decoded, 0, all, 0, decoded.length);
-			System.arraycopy(composites, 0, all, decoded.length, composites.length);
-		*/
-		
-		return all;
+	@Override
+    public Origin[] getOrigins() {
+        ArrayList<Origin> result = new ArrayList<Origin>(10);
+        Origin[] composites = super.getOrigins();
+        for (int i = 0; i < composites.length; i++) {
+            result.add(composites[i]);
+        }
+
+        // getOrigins is called by NEFEnsembleImpl in the constructor
+        if (myDecodedOrigins == null) {
+            return result.toArray(new Origin[0]);
+        }
+
+
+        for (Origin o : myDecodedOrigins.values()) {
+            result.add(o);
+        }
+        return result.toArray(new Origin[0]);
 	}
+
+    /**
+     * Used to get decoded origins to give to GPU.
+     */
+    public DecodedOrigin[] getDecodedOrigins(){
+        ArrayList<DecodedOrigin> result = new ArrayList<DecodedOrigin>(10);
+
+        for (DecodedOrigin o : myDecodedOrigins.values()) {
+            result.add(o);
+        }
+        return result.toArray(new DecodedOrigin[0]);
+    }
+
+    /**
+     * @see ca.nengo.model.Ensemble#getTerminations()
+     */
+    @Override
+    public Termination[] getTerminations() {
+        ArrayList<Termination> result = new ArrayList<Termination>(10);
+        Termination[] composites = super.getTerminations();
+        for (int i = 0; i < composites.length; i++) {
+            result.add(composites[i]);
+        }
+
+        for (Termination t : myDecodedTerminations.values()) {
+            result.add(t);
+        }
+        return result.toArray(new Termination[0]);
+    }
 
 	/**
 	 * @see ca.nengo.model.Node#run(float, float)
 	 */
-	public void run(float startTime, float endTime) throws SimulationException {
+	@Override
+    public void run(float startTime, float endTime) throws SimulationException {
 		super.run(startTime, endTime);
-		
-		Iterator<DecodedOrigin> it = myDecodedOrigins.values().iterator();
-		while (it.hasNext()) {
-			it.next().run(null, startTime, endTime);
-		}
+
+		for (DecodedOrigin o : myDecodedOrigins.values()) {
+            o.run(null, startTime, endTime);
+        }
 
 		setTime(endTime);
 	}
-	
+
 	/**
-	 * Allows subclasses to set the simulation time, which is used to support Probeable. 
-	 * This is normally set in the run() method. Subclasses that override run() without 
-	 * calling it should set the time. 
-	 * 
+	 * Allows subclasses to set the simulation time, which is used to support Probeable.
+	 * This is normally set in the run() method. Subclasses that override run() without
+	 * calling it should set the time.
+	 *
 	 * @param time Simulation time
 	 */
-	public void setTime(float time) {	
+	public void setTime(float time) {
 		myTime = time;
 	}
 
 	/**
-	 * @return The source of LinearApproximators for this ensemble (used to find linear decoding vectors). 
+	 * @return The source of LinearApproximators for this ensemble (used to find linear decoding vectors).
 	 */
 	public ApproximatorFactory getApproximatorFactory() {
 		return myApproximatorFactory;
@@ -304,11 +443,13 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	/**
 	 * @see ca.nengo.model.Probeable#getHistory(java.lang.String)
 	 */
-	public TimeSeries getHistory(String stateName) throws SimulationException {
+    @Override
+    public TimeSeries getHistory(String stateName) throws SimulationException {
 		TimeSeries result = null;
-		
-		Origin origin = (Origin) myDecodedOrigins.get(stateName);
-		
+
+		Origin origin = myDecodedOrigins.get(stateName);
+		DecodedTermination t = myDecodedTerminations.get(stateName);
+
 		if (origin != null) {
 			float[] vals = ((RealOutput) origin.getValues()).getValues();
 			Units[] units = new Units[vals.length];
@@ -316,61 +457,93 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 				units[i] = origin.getValues().getUnits();
 			}
 			result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{vals}, units);
+		} else if (t == null) {
+		    if (stateName.endsWith(":STP")) {
+                String originName = stateName.substring(0,stateName.length()-4);
+                try {
+                    DecodedOrigin o = (DecodedOrigin) getOrigin(originName);
+                    result = o.getSTPHistory();
+                } catch (StructuralException e) {
+                    throw new SimulationException(e);
+                }
+            }
 		} else {
-			return super.getHistory(stateName);
+		    result = super.getHistory(stateName);
 		}
-		
+
 		return result;
 	}
 
 	/**
 	 * @see ca.nengo.model.Probeable#listStates()
 	 */
-	public Properties listStates() {
+	@Override
+    public Properties listStates() {
 		Properties result = super.listStates();
-		
+
 		Iterator<String> it = myDecodedOrigins.keySet().iterator();
 		while (it.hasNext()) {
 			String name = it.next().toString();
 			result.setProperty(name, "Function of NEFEnsemble state"); //TODO: could put function.toString() here
 		}
-		
+
+        it = myDecodedTerminations.keySet().iterator();
+        while (it.hasNext()) {
+            String termName = it.next().toString();
+            result.setProperty(termName, "Output of Termination " + termName);
+        }
+
 		return result;
 	}
 
 	@Override
 	public DecodableEnsemble clone() throws CloneNotSupportedException {
 		DecodableEnsembleImpl result = (DecodableEnsembleImpl) super.clone();
-		
+
 		result.myApproximatorFactory = myApproximatorFactory.clone();
 		result.myApproximators = new HashMap<String, LinearApproximator>(5);
-		
-		result.myDecodedOrigins = new HashMap<String, DecodedOrigin>(5);
-		result.OrderedOrigins = new LinkedList <DecodedOrigin> ();
+		result.myDecodedOrigins.clear();
 		for (DecodedOrigin oldOrigin : myDecodedOrigins.values()) {
 			Function[] oldFunctions = oldOrigin.getFunctions();
 			Function[] newFunctions = new Function[oldFunctions.length];
 			for (int i = 0; i < newFunctions.length; i++) {
-				newFunctions[i] = oldFunctions[i].clone(); 
+				newFunctions[i] = oldFunctions[i].clone();
 			}
-			
+
 			try {
 				DecodedOrigin newOrigin = new DecodedOrigin(
-						result, 
-						oldOrigin.getName(), 
-						result.getNodes(), 
-						oldOrigin.getNodeOrigin(), 
-						newFunctions, 
+						result,
+						oldOrigin.getName(),
+						result.getNodes(),
+						oldOrigin.getNodeOrigin(),
+						newFunctions,
 						MU.clone(oldOrigin.getDecoders()));
-				if (oldOrigin.getNoise() != null) newOrigin.setNoise(oldOrigin.getNoise());
+				if (oldOrigin.getNoise() != null) {
+                    newOrigin.setNoise(oldOrigin.getNoise());
+                }
 				newOrigin.setMode(oldOrigin.getMode());
-				result.addDecodedOrigin(newOrigin.getName(), newOrigin);				
+				result.myDecodedOrigins.put(newOrigin.getName(), newOrigin);
 				newOrigin.reset(false);
 			} catch (StructuralException e) {
 				throw new CloneNotSupportedException("Problem cloneing DecodedOrigin: " + e.getMessage());
 			}
 		}
-		
+
+        result.myDecodedTerminations.clear();
+        for (String key : myDecodedTerminations.keySet()) {
+            DecodedTermination t = (DecodedTermination) myDecodedTerminations.get(key).clone();
+            t.setNode(result);
+            result.myDecodedTerminations.put(key, t);
+        }
+
+        //change scaling terminations references to the new copies
+        for (String key : result.myDecodedTerminations.keySet()) {
+            DecodedTermination t = result.myDecodedTerminations.get(key);
+            if (t.getScaling() != null) {
+                t.setScaling(result.myDecodedTerminations.get(t.getScaling().getName()));
+            }
+        }
+
 		return result;
 	}
 

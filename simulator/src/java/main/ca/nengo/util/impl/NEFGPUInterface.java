@@ -14,7 +14,6 @@ import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.BasicOrigin;
 import ca.nengo.model.impl.EnsembleTermination;
-import ca.nengo.model.impl.PlasticEnsembleTermination;
 import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
@@ -24,6 +23,7 @@ import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 
 public class NEFGPUInterface {
 	private static boolean myUseGPU = false;

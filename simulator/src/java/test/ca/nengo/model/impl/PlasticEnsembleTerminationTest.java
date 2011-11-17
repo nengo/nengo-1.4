@@ -1,7 +1,11 @@
 package ca.nengo.model.impl;
 
 import ca.nengo.model.StructuralException;
-import ca.nengo.model.plasticity.impl.RealPlasticityTermination;
+import ca.nengo.model.plasticity.impl.PESTermination;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
+import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
+import ca.nengo.model.nef.impl.NEFEnsembleImpl;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
 import junit.framework.TestCase;
 
 public class PlasticEnsembleTerminationTest extends TestCase {
@@ -11,12 +15,14 @@ public class PlasticEnsembleTerminationTest extends TestCase {
 		for(int i = 0; i < transform.length; i++)
 			transform[i] = new float[]{1.0f, 1.0f, 1.0f};
 		
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
+
 		LinearExponentialTermination[] nodeterms = new LinearExponentialTermination[10];
 		for(int i = 0; i < nodeterms.length; i++)
-			nodeterms[i] = new LinearExponentialTermination(null, null, transform[i], 0.0f);
+			nodeterms[i] = new LinearExponentialTermination(new SpikingNeuron(null, null, 0.0f, 0.0f, null), null, transform[i], 0.0f);
 		
-		
-		PlasticEnsembleTermination term = new RealPlasticityTermination(null, null, nodeterms);
+		PlasticEnsembleTermination term = new PESTermination(c, null, nodeterms);
 		float[][] rettransform = term.getTransform();
 		
 		assertTrue(rettransform.length == transform.length);
@@ -38,13 +44,14 @@ public class PlasticEnsembleTerminationTest extends TestCase {
 			newtransform[i] = new float[]{0.0f, 0.0f, 0.0f};
 		}
 			
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
 		
 		LinearExponentialTermination[] nodeterms = new LinearExponentialTermination[10];
 		for(int i = 0; i < nodeterms.length; i++)
-			nodeterms[i] = new LinearExponentialTermination(null, null, transform[i], 0.0f);
+			nodeterms[i] = new LinearExponentialTermination(new SpikingNeuron(null, null, 0.0f, 0.0f, null), null, transform[i], 0.0f);
 		
-		
-		PlasticEnsembleTermination term = new RealPlasticityTermination(null, null, nodeterms);
+		PlasticEnsembleTermination term = new PESTermination(c, null, nodeterms);
 		term.setTransform(newtransform);
 		
 		float[][] rettransform = term.getTransform();

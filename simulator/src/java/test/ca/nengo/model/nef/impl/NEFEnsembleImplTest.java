@@ -265,18 +265,21 @@ public class NEFEnsembleImplTest extends TestCase {
 		
 		nef1.killNeurons(0.0f,true);
 		int numDead = countDeadNeurons(nef1);
-		if(numDead != 0)
+		if(numDead != 0) {
 			fail("Number of dead neurons outside expected range");
+		}
 		
 		nef1.killNeurons(0.5f,true);
 		numDead = countDeadNeurons(nef1);
-		if(numDead < 400 || numDead > 600)
+		if(numDead < 400 || numDead > 600) {
 			fail("Number of dead neurons outside expected range");
+		}
 		
 		nef1.killNeurons(1.0f,true);
 		numDead = countDeadNeurons(nef1);
-		if(numDead != 1000)
+		if(numDead != 1000) {
 			fail("Number of dead neurons outside expected range");
+		}
 		
 		NEFEnsembleImpl nef2 = (NEFEnsembleImpl)ef.make("nef2", 1, 1);
 		nef2.killNeurons(1.0f,true);

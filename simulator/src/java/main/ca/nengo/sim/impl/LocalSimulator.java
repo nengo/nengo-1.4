@@ -1,24 +1,24 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "LocalSimulator.java". Description: 
+The Original Code is "LocalSimulator.java". Description:
 "A Simulator that runs locally (ie in the Java Virtual Machine in which it is
   called)"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -29,40 +29,33 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.sim.impl;
 
 import java.util.ArrayList;
-//import java.util.Arrays;
 import java.util.Arrays;
 import java.util.Collection;
-//import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-//import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-//import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
-import ca.nengo.model.PlasticTermination;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
-//import ca.nengo.model.impl.NetworkImpl;
-//import ca.nengo.model.impl.RealOutputImpl;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.SimulatorEvent;
 import ca.nengo.sim.SimulatorListener;
 import ca.nengo.util.Probe;
+import ca.nengo.util.TaskSpawner;
+import ca.nengo.util.ThreadTask;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.ThreadTask;
-import ca.nengo.util.TaskSpawner;
 import ca.nengo.util.impl.NEFGPUInterface;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
@@ -70,12 +63,12 @@ import ca.nengo.util.impl.ProbeImpl;
 /**
  * A Simulator that runs locally (ie in the Java Virtual Machine in which it is
  * called). TODO: test
- * 
+ *
  * @author Bryan Tripp
  */
 public class LocalSimulator implements Simulator, java.io.Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private Projection[] myProjections;
 	private Node[] myNodes;
     private ThreadTask[] myTasks;
@@ -89,7 +82,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	/**
 	 * Collection of Simulator
 	 */
-	private Collection<SimulatorListener> mySimulatorListeners;
+	private final Collection<SimulatorListener> mySimulatorListeners;
 
 	public LocalSimulator() {
 		mySimulatorListeners = new ArrayList<SimulatorListener>(1);
@@ -109,13 +102,14 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		}
 
 		myProjections = network.getProjections();
-		
-		if (myProbes == null)
-			myProbes = new ArrayList<Probe>(20);
+
+		if (myProbes == null) {
+            myProbes = new ArrayList<Probe>(20);
+        }
 
         myTasks = collectTasks(myNodes);
 	}
-	
+
 	/**
 	 * @see ca.nengo.sim.Simulator#resetProbes()
 	 */
@@ -125,11 +119,12 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		while (it.hasNext()) {
 			it.next().reset();
 		}
-		
+
 		for(Node node : myNodes)
 		{
-			if(node instanceof Network)
-				((Network)node).getSimulator().resetProbes();
+			if(node instanceof Network) {
+                ((Network)node).getSimulator().resetProbes();
+            }
 		}
 	}
 
@@ -140,47 +135,47 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			throws SimulationException {
         this.run(startTime, endTime, stepSize, true);
     }
-    
+
     /**
 	 * Run function with option to display (or not) the progress in the console
 	 */
 	public synchronized void run(float startTime, float endTime, float stepSize, boolean topLevel)
 			throws SimulationException {
-		
+
 //		float pre_time = System.nanoTime();
-		
+
 		double time = startTime;
 		double thisStepSize = stepSize;
-	
-		
+
+
 		/* If we are using the GPU for this network, then we have to bring
 		 *  the non-network nodes up to the top level so that we don't
 		 * run multiple simulators.
 		 */
 		myNEFGPUInterface = null;
 		myNodeThreadPool = null;
-		
+
 		if(NEFGPUInterface.getUseGPU()){
 			Node[] nodesForGPU = collectNodes(myNodes);
 			Node[] networkArraysForGPU = collectNetworkArraysForGPU(myNodes);
 			Projection[] projectionsForGPU = collectProjections(myNodes, myProjections);
-			
+
 			myNEFGPUInterface = new NEFGPUInterface(nodesForGPU, projectionsForGPU, networkArraysForGPU);
 		}else if(NodeThreadPool.isMultithreading()){
 			Node[] nodesForMultithreading = collectNodes(myNodes);
 			Projection[] projectionsForMultithreading = collectProjections(myNodes, myProjections);
-			
-			myNodeThreadPool = 
+
+			myNodeThreadPool =
 				new NodeThreadPool(nodesForMultithreading, projectionsForMultithreading, myTasks);
-		}	
-		
+		}
+
 		if(topLevel)
 		{
 			resetProbes();
 		}
-		
+
 		fireSimulatorEvent(new SimulatorEvent(0, SimulatorEvent.Type.STARTED));
-		
+
 		// for (int i = 0; i < myNodes.length; i++) {
 		// myNodes[i].setMode(mode);
 		// }
@@ -189,27 +184,30 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		// for (int i = 0; i < myNodes.length; i++) {
 		// myNodes[i].run(startTime, startTime);
 		// }
-		//		
-		
+		//
 
-		
+
+
 		// Casting the float to a double above causes some unexpected rounding.  To avoid this
 		//  we force the stepSize to be divisible by 0.000001 (1 microsecond)
-		
+
 		thisStepSize=Math.round(thisStepSize*1000000)/1000000.0;
-		if (thisStepSize<0.000001) thisStepSize=0.000001;
-		
+		if (thisStepSize<0.000001) {
+            thisStepSize=0.000001;
+        }
+
 		int c = 0;
 		while (time < endTime) {
-			
-			if (c++ % 100 == 99 && myDisplayProgress)
-				System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize)); 
-			
+
+			if (c++ % 100 == 99 && myDisplayProgress) {
+                System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize));
+            }
+
 			if (time + 1.5*thisStepSize > endTime) { //fudge step size to hit end exactly
 				thisStepSize = endTime - time;
 			}
-			
-			step((float) time, (float) (time+thisStepSize));				
+
+			step((float) time, (float) (time+thisStepSize));
 
 			float currentProgress = ((float) time - startTime) / (endTime - startTime);
 			fireSimulatorEvent(new SimulatorEvent(currentProgress,
@@ -217,28 +215,28 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
 			time += thisStepSize;
 		}
-		
+
 		fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
-		
-		
+
+
 		if(myNEFGPUInterface != null){
-			
+
 			myNEFGPUInterface.kill();
 			myNEFGPUInterface = null;
-			
+
 		}else if(myNodeThreadPool != null){
-			
+
 			myNodeThreadPool.kill();
 			myNodeThreadPool = null;
-			
+
 		}
-		
+
 	}
 
 	public void step(float startTime, float endTime)
 			throws SimulationException {
-		
-		
+
+
 		if(myNEFGPUInterface != null){
 			myNEFGPUInterface.step(startTime, endTime);
             // TODO Possibly integrate this into the NEFGPUInterface
@@ -253,19 +251,20 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 				InstantaneousOutput values = myProjections[i].getOrigin().getValues();
 				myProjections[i].getTermination().setValues(values);
 			}
-			
+
 			for (int i = 0; i < myNodes.length; i++) {
-				if(myNodes[i] instanceof NetworkImpl)
-					((NetworkImpl)myNodes[i]).run(startTime, endTime, false);
-				else
-					myNodes[i].run(startTime, endTime);
+				if(myNodes[i] instanceof NetworkImpl) {
+                    ((NetworkImpl)myNodes[i]).run(startTime, endTime, false);
+                } else {
+                    myNodes[i].run(startTime, endTime);
+                }
 			}
 
             for (int i = 0; i < myTasks.length; i++) {
                 myTasks[i].run(startTime, endTime);
             }
 		}
-		
+
 		Iterator<Probe> it = myProbes.iterator();
 		while (it.hasNext()) {
 			it.next().collect(endTime);
@@ -282,13 +281,13 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			for (int i = 0; i < myNodes.length; i++) {
 				terms = myNodes[i].getTerminations();
 				for (int j = 0; j < terms.length; j++) {
-					if (terms[j] instanceof PlasticTermination) {
-						((PlasticTermination) terms[j]).saveTransform();
+					if (terms[j] instanceof PlasticEnsembleTermination) {
+						((PlasticEnsembleTermination) terms[j]).saveTransform();
 					}
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < myNodes.length; i++) {
 			myNodes[i].reset(randomize);
 		}
@@ -324,14 +323,14 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 		/*
 		 * Check that no duplicate probes are created
 		 */
-		for (Probe probe : myProbes) {			
+		for (Probe probe : myProbes) {
 			if (probe.getTarget() == target) {
 				if (probe.getStateName().compareTo(state) == 0) {
 					throw new SimulationException("A probe already exists on this target & state");
-				}	
+				}
 			}
 		}
-		
+
 		Probe result = new ProbeImpl();
 		result.connect(ensembleName, target, state, record);
 
@@ -352,7 +351,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	}
 
 	private Probeable getNode(String nodeName) throws SimulationException {
-		Node result = (Node) myNodeMap.get(nodeName);
+		Node result = myNodeMap.get(nodeName);
 
 		if (result == null) {
 			throw new SimulationException("The named Node does not exist");
@@ -367,7 +366,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
 	private Probeable getNeuron(String nodeName, int index)
 			throws SimulationException {
-		Node ensemble = (Node) myNodeMap.get(nodeName);
+		Node ensemble = myNodeMap.get(nodeName);
 
 		if (ensemble == null) {
 			throw new SimulationException("The named Ensemble does not exist");
@@ -396,7 +395,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	public Probe[] getProbes() {
 		return myProbes.toArray(new Probe[0]);
 	}
-	
+
 	public void setDisplayProgress(boolean display)
 	{
 		myDisplayProgress = display;
@@ -444,9 +443,11 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	 * @see ca.nengo.util.VisiblyMutable#removeChangeListener(ca.nengo.util.VisiblyMutable.Listener)
 	 */
 	public void removeChangeListener(Listener listener) {
-		if (myChangeListeners != null) myChangeListeners.remove(listener);
+		if (myChangeListeners != null) {
+            myChangeListeners.remove(listener);
+        }
 	}
-	
+
 	private void fireVisibleChangeEvent() {
 		VisiblyMutableUtils.changed(this, myChangeListeners);
 	}
@@ -455,7 +456,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	public Simulator clone() throws CloneNotSupportedException {
 		return new LocalSimulator();
 	}
-	
+
 	/**
 	 * Bring all nodes to the top level so we can run them all at once.
 	 * Retrieves nodes depth-first. Used for multithreaded and GPU-enabled runs.
@@ -463,20 +464,20 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	public static Node[] collectNodes(Node[] startingNodes){
 
 		ArrayList<Node> nodes = new ArrayList<Node>();
-		
+
 		List<Node> nodesToProcess = new LinkedList<Node>();
 		nodesToProcess.addAll(Arrays.asList(startingNodes));
-		
+
 		Node workingNode;
-		
+
 		while(nodesToProcess.size() != 0)
 		{
 			workingNode = nodesToProcess.remove(0);
-				
+
 			if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
-			{	
+			{
 				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-				
+
 				nodeList.addAll(nodesToProcess);
 				nodesToProcess = nodeList;
 			}
@@ -485,27 +486,27 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 				nodes.add(workingNode);
 			}
 		}
-		
-		return nodes.toArray(new Node[0]);	
+
+		return nodes.toArray(new Node[0]);
 	}
-	
+
 	public static ThreadTask[] collectTasks(Node[] startingNodes){
 
 		ArrayList<ThreadTask> tasks = new ArrayList<ThreadTask>();
-		
+
 		List<Node> nodesToProcess = new LinkedList<Node>();
 		nodesToProcess.addAll(Arrays.asList(startingNodes));
-		
+
 		Node workingNode;
-		
+
 		while(nodesToProcess.size() != 0)
 		{
 			workingNode = nodesToProcess.remove(0);
-				
+
 			if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
-			{	
+			{
 				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-				
+
 				nodeList.addAll(nodesToProcess);
 				nodesToProcess = nodeList;
 			}
@@ -514,22 +515,22 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 				tasks.addAll(Arrays.asList(((TaskSpawner) workingNode).getTasks()));
 			}
 		}
-		
-		return tasks.toArray(new ThreadTask[0]);	
+
+		return tasks.toArray(new ThreadTask[0]);
 	}
-	
+
 	public static Node[] collectNetworkArraysForGPU(Node[] startingNodes){
 		ArrayList<Node> nodes = new ArrayList<Node>();
-		
+
 		List<Node> nodesToProcess = new LinkedList<Node>();
 		nodesToProcess.addAll(Arrays.asList(startingNodes));
-		
+
 		Node workingNode;
-		
+
 		while(nodesToProcess.size() != 0)
 		{
 			workingNode = nodesToProcess.remove(0);
-			
+
 			// The purpose of this function is to have a list of NetworkArrays. On the GPU, all NEF
 			// ensembles are considered to be part of a NetworkArray. NEF ensembles that are not
 			// ostensibly part of a NetworkArray are considered by the GPU to be part of a NetworkArray
@@ -539,8 +540,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			boolean isNEFEnsemble = workingNode instanceof NEFEnsembleImpl;
 			boolean isNetworkArray = workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6";
 			boolean isNetwork = workingNode instanceof NetworkImpl;
-			
-			
+
+
 			if(isNEFEnsemble || isNetworkArray)
 			{
 				nodes.add(workingNode);
@@ -548,15 +549,15 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 			else if(isNetwork)
 			{
 				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-				
+
 				nodeList.addAll(nodesToProcess);
 				nodesToProcess = nodeList;
-				
+
 				//nodesToProcess = Arrays.asList(((Network) workingNode).getNodes()).addAll(nodesToProcess);
 				//nodesToProcess.addAll(Arrays.asList(((Network) workingNode).getNodes()));
 			}
 		}
-			
+
 		return nodes.toArray(new Node[0]);
 	}
 
@@ -568,26 +569,26 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 	public static Projection[] collectProjections(Node[] startingNodes, Projection[] startingProjections){
 
 		ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(startingProjections));
-		
+
 		List<Node> nodesToProcess = new LinkedList<Node>();
 		nodesToProcess.addAll(Arrays.asList(startingNodes));
-		
+
 		Node workingNode;
-		
+
 		while(nodesToProcess.size() != 0)
 		{
 			workingNode = nodesToProcess.remove(0);
-			
+
 			if(workingNode instanceof Network) {
 				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-				
+
 				nodeList.addAll(nodesToProcess);
 				nodesToProcess = nodeList;
-				
+
 				projections.addAll(Arrays.asList(((Network) workingNode).getProjections()));
 			}
 		}
-		
+
 		return projections.toArray(new Projection[0]);
 	}
 }

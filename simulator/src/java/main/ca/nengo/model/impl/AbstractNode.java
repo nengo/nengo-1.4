@@ -1,23 +1,23 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "AbstractNode.java". Description: 
+The Original Code is "AbstractNode.java". Description:
 "A base implementation of Node"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -28,11 +28,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedList;
 
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -44,22 +42,21 @@ import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
 
 /**
- * A base implementation of Node. 
- * 
+ * A base implementation of Node.
+ *
  * @author Bryan Tripp
  */
 public abstract class AbstractNode implements Node {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String myName;
 	private SimulationMode myMode;
-	private Map<String, Origin> myOrigins;
-	private LinkedList<String> myOriginNames;	
-	private Map<String, Termination> myTerminations;
+	private final Map<String, Origin> myOrigins;
+	private final Map<String, Termination> myTerminations;
 	private String myDocumentation;
 	private transient List<VisiblyMutable.Listener> myListeners;
-	
+
 	/**
 	 * @param name Name of Node
 	 * @param origins List of Origins from the Node
@@ -68,18 +65,14 @@ public abstract class AbstractNode implements Node {
 	public AbstractNode(String name, List<Origin> origins, List<Termination> terminations) {
 		myName = name;
 		myMode = SimulationMode.DEFAULT;
-		
-		myOrigins = new HashMap<String, Origin>(10);
-		myOriginNames = new LinkedList<String>();
-		for (Iterator<Origin> it = origins.iterator(); it.hasNext(); ) {
-			Origin o = it.next();
+
+		myOrigins = new LinkedHashMap<String, Origin>(10);
+		for (Origin o : origins) {
 			myOrigins.put(o.getName(), o);
-			myOriginNames.add(o.getName());
 		}
-		
-		myTerminations = new HashMap<String, Termination>(10);
-		for (Iterator<Termination> it = terminations.iterator(); it.hasNext(); ) {
-			Termination t = it.next();
+
+		myTerminations = new LinkedHashMap<String, Termination>(10);
+		for (Termination t : terminations) {
 			myTerminations.put(t.getName(), t);
 		}
 	}
@@ -97,7 +90,7 @@ public abstract class AbstractNode implements Node {
 	public String getName() {
 		return myName;
 	}
-	
+
 	/**
 	 * @param name The new name
 	 */
@@ -116,9 +109,8 @@ public abstract class AbstractNode implements Node {
 	/**
 	 * @see ca.nengo.model.Node#getOrigins()
 	 */
-	public Origin[] getOrigins() 
-	{
-		return myOrigins.values().toArray(new Origin[0]);					
+	public Origin[] getOrigins() {
+		return myOrigins.values().toArray(new Origin[0]);
 	}
 
 	/**
@@ -136,8 +128,8 @@ public abstract class AbstractNode implements Node {
 	}
 
 	/**
-	 * Does nothing. 
-	 * 
+	 * Does nothing.
+	 *
 	 * @see ca.nengo.model.Node#run(float, float)
 	 */
 	public abstract void run(float startTime, float endTime) throws SimulationException;
@@ -150,8 +142,8 @@ public abstract class AbstractNode implements Node {
 	}
 
 	/**
-	 * Does nothing. 
-	 * 
+	 * Does nothing.
+	 *
 	 * @see ca.nengo.model.Resettable#reset(boolean)
 	 */
 	public abstract void reset(boolean randomize);
@@ -169,7 +161,7 @@ public abstract class AbstractNode implements Node {
 	public void setDocumentation(String text) {
 		myDocumentation = text;
 	}
-	
+
 	/**
 	 * @see ca.nengo.util.VisiblyMutable#addChangeListener(ca.nengo.util.VisiblyMutable.Listener)
 	 */
@@ -188,9 +180,9 @@ public abstract class AbstractNode implements Node {
 	}
 
 	/**
-	 * Performs a shallow copy. Origins and Terminations are not cloned, because generally they 
-	 * will have to be reparameterized, at least to point to the new Node. 
-	 * 
+	 * Performs a shallow copy. Origins and Terminations are not cloned, because generally they
+	 * will have to be reparameterized, at least to point to the new Node.
+	 *
 	 * @see java.lang.Object#clone()
 	 */
 	@Override

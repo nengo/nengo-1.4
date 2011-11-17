@@ -32,7 +32,7 @@ import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
-import ca.nengo.model.Termination;
+import ca.nengo.model.PlasticNodeTermination;
 
 import java.util.Random;
 
@@ -49,7 +49,7 @@ import java.util.Random;
  *  
  * @author Bryan Tripp
  */
-public class LinearExponentialTermination implements Termination {
+public class LinearExponentialTermination implements PlasticNodeTermination {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -365,7 +365,7 @@ public class LinearExponentialTermination implements Termination {
 	}
 
 	@Override
-	public Termination clone() throws CloneNotSupportedException {
+	public PlasticNodeTermination clone() throws CloneNotSupportedException {
 		LinearExponentialTermination result = new LinearExponentialTermination(myNode, myName, myWeights.clone(), myTauPSC);
 		result.myCurrent = myCurrent;
 		result.myNetRealInput = myNetRealInput;

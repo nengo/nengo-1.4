@@ -68,7 +68,7 @@ public class EnumHandler extends BaseHandler {
 	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		Enum<?> mode = (Enum<?>) o;
 		List<? extends Enum<?>> all = new ArrayList<Enum<?>>((Collection<? extends Enum<?>>) EnumSet.allOf(mode.getClass()));
-		final JComboBox result = new JComboBox(all.toArray());
+		final JComboBox<?> result = new JComboBox<Object>(all.toArray());
 		result.setSelectedItem(mode);
 		
 		listener.setProxy(new ConfigurationChangeListener.EditorProxy() {

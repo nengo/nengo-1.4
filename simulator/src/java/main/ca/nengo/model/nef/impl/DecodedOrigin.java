@@ -485,7 +485,9 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		try {
 			DecodedOrigin result = new DecodedOrigin(myNode, myName, myNodes, myNodeOrigin, functions, MU.clone(myDecoders));
 			result.myOutput = (RealOutput) myOutput.clone();
-			result.setNoise(myNoise.clone());
+            if (myNoise != null) {
+			    result.setNoise(myNoise.clone());
+            }
 			result.setMode(myMode);
 			return result;
 		} catch (StructuralException e) {

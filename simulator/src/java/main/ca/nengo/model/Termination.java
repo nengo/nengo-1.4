@@ -30,7 +30,7 @@ package ca.nengo.model;
 import java.io.Serializable;
 
 /**
- * <p>An destination for information in a circuit model. A Termination is normally associated 
+ * <p>A destination for information in a circuit model. A Termination is normally associated 
  * with a neural Ensemble or an individual Neuron, although other terminations could be modelled 
  * (eg muscles).</p>
  * 
