@@ -796,10 +796,35 @@ class Network:
         self.network.addNode(node)
         return node
 
-    def get(self,name):
+    def get(self,name,require_origin=False):
         """Return the node with the given *name* from the network
         """
-        return self.network.getNode(name)
+        
+        original_name=name
+        node=self.network
+        while '.' in name:
+            n,name=name.split('.',2)
+            node=node.getNode(n)
+        try:    
+            node=node.getNode(name)
+        except:
+            try:
+                node=node.getOrigin(name)
+            except:
+                try:
+                    node=node.getTermination(name)
+                except:
+                    raise Exception('Could not find node:',original_name)
+        if require_origin:
+            if not isinstance(node,Origin):
+                origins=node.getOrigins()
+                if len(origins)==1: 
+                    node=origins[0]
+                elif len([x for x in origins if x.name=='X'])==1:
+                    node=node.getOrigin('X')
+                else:
+                    raise Exception('Could not find origin:',original_name)
+        return node
 
     def releaseMemory(self):
         """Attempt to release extra memory used by the Network.  Call only after all
