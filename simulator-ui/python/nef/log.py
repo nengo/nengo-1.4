@@ -45,25 +45,31 @@ class LogSpikeCount:
 
 
 class Log(nef.SimpleNode):
-    def __init__(self,network,name=None,interval=0.1):
+    def __init__(self,network,name=None,filename=None,access='w',interval=0.1):
         if not isinstance(network,nef.Network):
             network=nef.Network(network)
         self.network=network
+
         if name is None: self.logname=self.network.network.name
+        self.filename=None
+        self.access=access
+        if not filename is None: self.filename=filename
         
         self.log_names=[]
         self.logs={}
         self.interval=interval
         nef.SimpleNode.__init__(self,'Log')
         self.network.add(self)
-                        
+    
     def init(self):
-        self.filename=self.make_filename()
+        if self.filename is None: self.filename=self.make_filename()
         self.file=None
         for log in self.logs.values():
             log.init()
         self.next_time=0
-                
+
+    def close(self):
+        self.file.close()
         
     def make_filename(self):
         t=time.strftime('%Y%m%d-%H%M%S')
@@ -71,7 +77,7 @@ class Log(nef.SimpleNode):
         
     def ensure_file_ready(self):
         if self.file is None:
-            self.file=file(self.filename+'.csv','w')
+            self.file=file(self.filename+'.csv',self.access)
             self.write_header()
             
     def tick(self):            
