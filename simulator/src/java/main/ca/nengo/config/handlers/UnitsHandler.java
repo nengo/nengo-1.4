@@ -69,7 +69,7 @@ public class UnitsHandler extends BaseHandler {
 	public Component getEditor(Object o, ConfigurationChangeListener listener, JComponent parent) {
 		Units unit = (Units) o;
 
-		final JComboBox<Object> result = new JComboBox<Object>(myList);
+		final JComboBox result = new JComboBox(myList);
 		result.setSelectedItem(unit);
 
 		listener.setProxy(new ConfigurationChangeListener.EditorProxy() {
