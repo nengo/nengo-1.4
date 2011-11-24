@@ -1,7 +1,8 @@
-import nef
 import time
 import numeric
-
+from simplenode import SimpleNode
+from nef_core import Network
+ 
 
 class LogVector:
     def __init__(self,origin,tau):
@@ -22,6 +23,14 @@ class LogVector:
     def text(self):
         return '[%s]'%(';'.join(['%1.3f'%x for x in self.value]))
 
+class LogVocab(LogVector):
+    def __init__(self,origin,tau,vocab,terms=None):
+        LogVector.__init__(self,origin,tau)
+        self.vocab=vocab
+        self.terms=terms
+    def text(self):
+        return self.vocab.text(self.value,terms=self.terms)
+        
 class LogSpikeCount:
     def __init__(self,origin):
         self.origin=origin
@@ -44,21 +53,26 @@ class LogSpikeCount:
 
 
 
-class Log(nef.SimpleNode):
-    def __init__(self,network,name=None,filename=None,access='w',interval=0.1):
-        if not isinstance(network,nef.Network):
+class Log(SimpleNode):
+    def __init__(self,network,name=None,filename=None,interval=0.1,tau=0.01):
+        if not isinstance(network,Network):
             network=nef.Network(network)
         self.network=network
 
         if name is None: self.logname=self.network.network.name
         self.filename=None
-        self.access=access
-        if not filename is None: self.filename=filename
+        self.fileext='.csv'
+        if not filename is None: 
+            self.filename=filename
+            self.fileext=''
+
+        self.genheader=True
         
+        self.tau=0.01
         self.log_names=[]
         self.logs={}
         self.interval=interval
-        nef.SimpleNode.__init__(self,'Log')
+        SimpleNode.__init__(self,'Log')
         self.network.add(self)
     
     def init(self):
@@ -67,22 +81,15 @@ class Log(nef.SimpleNode):
         for log in self.logs.values():
             log.init()
         self.next_time=0
+        self.genheader=True
 
-    def close(self):
-        self.file.close()
-        
     def make_filename(self):
         t=time.strftime('%Y%m%d-%H%M%S')
         return '%s-%s'%(t,self.logname)
-        
-    def ensure_file_ready(self):
-        if self.file is None:
-            self.file=file(self.filename+'.csv',self.access)
-            self.write_header()
-            
-    def tick(self):            
+                    
+    def tick(self):
         if len(self.logs)==0: return
-        self.ensure_file_ready()
+        if(self.genheader): self.write_header()
         dt=self.t_end-self.t_start
         for log in self.logs.values():
             log.tick(dt)
@@ -97,25 +104,35 @@ class Log(nef.SimpleNode):
         origin=self.network.get(source)
         self.logs[name]=LogSpikeCount(origin)
         
-    def add(self,source,name=None,tau=0.01):
+    def add(self,source,name=None,tau=None):
         if name is None: name=source
+        if tau is None: tau=self.tau
         self.log_names.append(name)        
         origin=self.network.get(source,require_origin=True)
         self.logs[name]=LogVector(origin,tau)
-            
+
+    def add_vocab(self,source,vocab,name=None,tau=None,terms=None):
+        if name is None: name=source
+        if tau is None: tau=self.tau
+        self.log_names.append(name)        
+        origin=self.network.get(source,require_origin=True)
+        self.logs[name]=LogVocab(origin,tau=tau,vocab=vocab,terms=terms)
+        
         
     def write_header(self):
-        self.file.write('time,%s\n'%(','.join(self.log_names)))
+        fileobj=open(self.filename+self.fileext,'a')
+        fileobj.write('time,%s\n'%(','.join(self.log_names)))
         types=[self.logs[n].type() for n in self.log_names]
         #self.file.write('float,%s\n'%(','.join(types)))
-        self.file.flush()
-        
+        fileobj.close()
+        self.genheader=False
         
         
     def write_to_log(self):
+        fileobj=open(self.filename+self.fileext,'a')
         data=[self.logs[n].text() for n in self.log_names]
-        self.file.write('%1.3f,%s\n'%(self.t,','.join(data)))
-        self.file.flush()
+        fileobj.write('%1.3f,%s\n'%(self.t,','.join(data)))
+        fileobj.close()
         
         
            

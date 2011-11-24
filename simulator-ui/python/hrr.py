@@ -172,7 +172,7 @@ class Vocabulary:
     def parse(self,text):
         return eval(text,{},self)
         
-    def text(self,v,threshold=0.1,minimum_count=1,include_pairs=True,join='+',maximum_count=5):
+    def text(self,v,threshold=0.1,minimum_count=1,include_pairs=True,join='+',maximum_count=5,terms=None):
         if isinstance(v,HRR): v=v.v
         if v is None or self.vectors is None: return ''        
         m=numeric.dot(self.vectors,v)
@@ -183,6 +183,8 @@ class Vocabulary:
             if self.vector_pairs is not None:
                 m2=numeric.dot(self.vector_pairs,v)
                 matches.extend([(m2[i],self.key_pairs[i]) for i in range(len(m2))])
+        if terms is not None:
+            matches=[m for m in matches if m[1] in terms]
         matches.sort()
         matches.reverse()
 
