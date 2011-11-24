@@ -38,7 +38,6 @@ import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.SimulationException;
-import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;

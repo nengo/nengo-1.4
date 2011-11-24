@@ -1,23 +1,23 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "DefaultFunctionInterpreter.java". Description: 
+The Original Code is "DefaultFunctionInterpreter.java". Description:
 "Default implementation of FunctionInterpreter"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -27,6 +27,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.math.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,22 +41,22 @@ import ca.nengo.math.FunctionInterpreter;
 
 /**
  * <p>Default implementation of FunctionInterpreter. This implementation produces
- * PostfixFunctions.</p> 
- * 
- * TODO: faster Functions could be produced by compiling expressions into Java classes. 
- * 
+ * PostfixFunctions.</p>
+ *
+ * TODO: faster Functions could be produced by compiling expressions into Java classes.
+ *
  * @author Bryan Tripp
  */
 public class DefaultFunctionInterpreter implements FunctionInterpreter {
 
 	private static DefaultFunctionInterpreter ourInstance;
-	
-	private Map<String, Function> myFunctions; 
+
+	private Map<String, Function> myFunctions;
 	private Map<String, AbstractOperator> myOperators;
 	private String myTokens;
-	
+
 	/**
-	 * @return A singleton instance of DefaultFunctionInterpreter 
+	 * @return A singleton instance of DefaultFunctionInterpreter
 	 */
 	public static synchronized DefaultFunctionInterpreter sharedInstance() {
 		if (ourInstance == null) {
@@ -63,7 +64,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 		return ourInstance;
 	}
-	
+
 	public DefaultFunctionInterpreter() {
 		myFunctions = new HashMap<String, Function>(20);
 		myFunctions.put("sin", new SimpleFunctions.Sin());
@@ -97,7 +98,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		myOperators.put(">", new GreaterThanOperator());
 		myOperators.put("&", new AndOperator());
 		myOperators.put("|", new OrOperator());
-		
+
 		StringBuffer buf = new StringBuffer();
 		Iterator<String> it = myOperators.keySet().iterator();
 		while (it.hasNext()) {
@@ -113,43 +114,43 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		if (name.matches(".*\\s.*")) {
 			throw new IllegalArgumentException("Function name '" + name + "' is invalid (can not contain whitespace)");
 		}
-		
+
 		if (myFunctions.containsKey(name)) {
 			throw new IllegalArgumentException("There is already a function named " + name);
 		}
-		
+
 		myFunctions.put(name, function);
 	}
 
 	/**
 	 * @see ca.nengo.math.FunctionInterpreter#parse(java.lang.String, int)
 	 */
-	@SuppressWarnings("unchecked")
 	public Function parse(String expression, int dimension) {
-		List postfix = getPostfixList(expression);		
+		List<Serializable> postfix = getPostfixList(expression);
 		return new PostfixFunction(postfix, expression, dimension);
 	}
-	
+
 	/**
-	 * @param expression Mathematical expression, as in parse(...) 
+	 * @param expression Mathematical expression, as in parse(...)
 	 * @return List of operators and operands in postfix order
 	 */
-	@SuppressWarnings("unchecked")
-	public List getPostfixList(String expression) {
+	public List<Serializable> getPostfixList(String expression) {
 		//Dijkstra's shunting yard algorithm to convert infix to postfix
 		// see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 		// see also http://en.wikipedia.org/wiki/Reverse_Polish_notation
 
 		StringTokenizer tok = new StringTokenizer(expression, myTokens, true);
-		Stack stack = new Stack();
-		List result = new ArrayList(100); //postfix operand & operator list
-		
+		Stack<Serializable> stack = new Stack<Serializable>();
+		List<Serializable> result = new ArrayList<Serializable>(100); //postfix operand & operator list
+
 		boolean negativeUnary = true; //contextual flag to indicate that "-" should be treated as unary
-		
+
 		while (tok.hasMoreTokens()) {
 			String token = tok.nextToken().trim();
-			if (token.equals("-") && negativeUnary) token = "~";
-			
+			if (token.equals("-") && negativeUnary) {
+                token = "~";
+            }
+
 			if (token.length() > 0) {
 				if (token.equals("(")) {
 					stack.push(token);
@@ -158,7 +159,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 					Object o;
 					while ( !(o = stack.pop()).equals("(") ) { //TODO: error if empty
 						assert o instanceof AbstractOperator;
-						result.add(o); 
+						result.add((AbstractOperator) o);
 					}
 					if ( !stack.empty() && isFunction(stack.peek()) ) {
 						result.add(stack.pop());
@@ -184,57 +185,57 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 					negativeUnary = false;
 				} else if (myOperators.get(token) != null) {
 					AbstractOperator op = myOperators.get(token);
-					
+
 					oploop: while ( !stack.isEmpty() && isOperator(stack.peek()) ) {
 						AbstractOperator op2 = (AbstractOperator) stack.peek();
-						if (op.getPrecedence() > op2.getPrecedence() 
+						if (op.getPrecedence() > op2.getPrecedence()
 								|| (op.isRightAssociative() && op.getPrecedence() == op2.getPrecedence())) {
 							break oploop;
 						}
-						
+
 						result.add(stack.pop());
 					}
-					
+
 					stack.push(op);
-					
-					negativeUnary = true;					
+
+					negativeUnary = true;
 				} else {
 					throw new RuntimeException("The function '" + token + "' is not recognized");
-				}				
+				}
 			}
 		}
-		
+
 		while ( !stack.empty() ) {
 			result.add(stack.pop());
 		}
-		
+
 		return result;
 	}
 
-	
+
 	//true if Function but not AbstractOperator
 	private static boolean isFunction(Object o) {
-		return (o instanceof Function) && !(o instanceof AbstractOperator); 
+		return (o instanceof Function) && !(o instanceof AbstractOperator);
 	}
-	
+
 	//true if AbstractOperator
 	private static boolean isOperator(Object o) {
 		return (o instanceof AbstractOperator);
 	}
-	
+
 
 	/************ PRIVATE OPERATOR CLASSES *********************************/
-	
+
 	private abstract static class AbstractOperator implements Function {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		private int myDimension;
 		private boolean myRightAssociative;
 		private int myPrecendence;
-		
+
 		/**
-		 * @param dimension Dimension of the space that the Function maps from 
+		 * @param dimension Dimension of the space that the Function maps from
 		 * @param rightAssociative Evaluated from the right (eg exponent operator)
 		 * @param precedence A code indicating operator precedence relative to other operators
 		 */
@@ -257,7 +258,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		public boolean isRightAssociative() {
 			return myRightAssociative;
 		}
-		
+
 		/**
 		 * @return A code indicating operator precedence relative to other operators
 		 */
@@ -270,11 +271,11 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		 */
 		public float[] multiMap(float[][] from) {
 			float[] result = new float[from.length];
-			
+
 			for (int i = 0; i < result.length; i++) {
 				result[i] = this.map(from[i]);
 			}
-			
+
 			return result;
 		}
 
@@ -284,7 +285,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 	}
-	
+
 	private static class ExponentOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -294,15 +295,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return (float) Math.pow(from[0], from[1]);
-		}		
-		
+		}
+
 		public String toString() {
 			return "^";
 		}
 	}
-	
+
 	private static class MultiplicationOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -312,15 +313,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return from[0] * from[1];
-		}		
-		
+		}
+
 		public String toString() {
 			return "*";
 		}
 	}
-	
+
 	private static class DivisionOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -330,15 +331,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return from[0] / from[1];
-		}		
-		
+		}
+
 		public String toString() {
 			return "/";
 		}
 	}
-	
+
 	private static class AdditionOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -348,15 +349,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return from[0] + from[1];
-		}		
-		
+		}
+
 		public String toString() {
 			return "+";
 		}
 	}
-	
+
 	private static class SubtractionOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -366,15 +367,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return from[0] - from[1];
-		}		
-		
+		}
+
 		public String toString() {
 			return "-";
 		}
 	}
-	
+
 	private static class NegativeOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -384,15 +385,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return -from[0];
-		}		
-		
+		}
+
 		public String toString() {
 			return "~";
-		}		
+		}
 	}
-	
+
 	private static class NotOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -402,15 +403,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return (from[0] > .5) ? 0f : 1f;
-		}		
-		
+		}
+
 		public String toString() {
 			return "!";
 		}
 	}
-	
+
 	private static class LessThanOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -418,17 +419,17 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		public LessThanOperator() {
 			super(2, false, 1);
 		}
-		
+
 		public float map(float[] from) {
 			assert from.length == getDimension();
 			return from[0] < from[1] ? 1f : 0f;
 		}
-		
+
 		public String toString() {
 			return "<";
 		}
 	}
-	
+
 	private static class GreaterThanOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -436,17 +437,17 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		public GreaterThanOperator() {
 			super(2, false, 1);
 		}
-		
+
 		public float map(float[] from) {
 			assert from.length == getDimension();
 			return from[0] > from[1] ? 1f : 0f;
 		}
-		
+
 		public String toString() {
 			return ">";
 		}
 	}
-	
+
 	private static class AndOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -456,15 +457,15 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return (from[0] > .5 && from[1] > .5) ? 1f : 0f;
-		}		
-		
+		}
+
 		public String toString() {
 			return "&";
 		}
 	}
-	
+
 	private static class OrOperator extends AbstractOperator {
 
 		private static final long serialVersionUID = 1L;
@@ -474,10 +475,10 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		}
 
 		public float map(float[] from) {
-			assert from.length == getDimension();			
+			assert from.length == getDimension();
 			return (from[0] > .5 || from[1] > .5) ? 1f : 0f;
-		}		
-		
+		}
+
 		public String toString() {
 			return "|";
 		}
@@ -489,7 +490,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 
 	public void removeRegisteredFunction(String name) {
 		myFunctions.remove(name);
-		
+
 	}
-		
+
 }

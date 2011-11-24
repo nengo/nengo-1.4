@@ -13,36 +13,36 @@ public class NodeThread extends Thread {
 	private Node[] myNodes;
 	private int myStartIndexInNodes;
 	private int myEndIndexInNodes;
-	
+
 	private Projection[] myProjections;
 	private int myStartIndexInProjections;
 	private int myEndIndexInProjections;
-	
+
 	private ThreadTask[] myTasks;
 	private int myStartIndexInTasks;
 	private int myEndIndexInTasks;
-	
-	private float startTime;
-	private float endTime;
 
-	public NodeThread(NodeThreadPool nodePool, Node[] nodes, 
+//	private float startTime;
+//	private float endTime;
+
+	public NodeThread(NodeThreadPool nodePool, Node[] nodes,
 			int startIndexInNodes, int endIndexInNodes,
 			Projection[] projections, int startIndexInProjections,
 			int endIndexInProjections, ThreadTask[] tasks,
             int startIndexInTasks, int endIndexInTasks) {
-		
+
 		myNodeThreadPool = nodePool;
-		
+
 		myNodes = nodes;
 		myProjections = projections;
         myTasks = tasks;
-		
+
 		myStartIndexInNodes = startIndexInNodes;
 		myEndIndexInNodes = endIndexInNodes;
-		
+
 		myStartIndexInProjections = startIndexInProjections;
 		myEndIndexInProjections = endIndexInProjections;
-		
+
 		myStartIndexInTasks = startIndexInTasks;
 		myEndIndexInTasks = endIndexInTasks;
 	}
