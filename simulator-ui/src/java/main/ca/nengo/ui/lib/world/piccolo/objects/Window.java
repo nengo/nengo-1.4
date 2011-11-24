@@ -18,7 +18,6 @@ import ca.nengo.ui.lib.world.piccolo.objects.icons.CloseIcon;
 import ca.nengo.ui.lib.world.piccolo.objects.icons.MaximizeIcon;
 import ca.nengo.ui.lib.world.piccolo.objects.icons.MinimizeIcon;
 import ca.nengo.ui.lib.world.piccolo.objects.icons.RestoreIcon;
-import ca.nengo.ui.lib.world.piccolo.primitives.Image;
 import ca.nengo.ui.lib.world.piccolo.primitives.Path;
 import ca.nengo.ui.lib.world.piccolo.primitives.Text;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -29,7 +28,7 @@ import edu.umd.cs.piccolox.nodes.PClip;
 /**
  * A Window which can be minimized, normal, maximized and closed. A Window wraps
  * another world object which contains content displayed in the window.
- * 
+ *
  * @author Shu Wu
  */
 /**

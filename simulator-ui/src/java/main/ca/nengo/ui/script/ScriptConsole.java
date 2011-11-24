@@ -1,23 +1,23 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "ScriptConsole.java". Description: 
+The Original Code is "ScriptConsole.java". Description:
 "A user interface panel for entering script commands"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -55,7 +55,6 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -68,17 +67,17 @@ import ca.nengo.config.JavaSourceParser;
 import ca.nengo.ui.lib.Style.NengoStyle;
 
 /**
- * A user interface panel for entering script commands. 
- * 
- * TODO: 
- * - talk to Terry re directory defaults (to use with execfile) 
- * - NO import defaults 
- * - DONE getting documentation help (see qdox) 
- * - DONE escape not working all the time? 
- * - DONE completion for arrays 
+ * A user interface panel for entering script commands.
+ *
+ * TODO:
+ * - talk to Terry re directory defaults (to use with execfile)
+ * - NO import defaults
+ * - DONE getting documentation help (see qdox)
+ * - DONE escape not working all the time?
+ * - DONE completion for arrays
  * - DONE static method completion
  * - DONE constructor completion
- * 
+ *
  * @author Bryan Tripp
  */
 public class ScriptConsole extends JPanel {
@@ -88,7 +87,7 @@ public class ScriptConsole extends JPanel {
 	private static final Logger ourLogger = Logger.getLogger(ScriptConsole.class);
 	private static final String CURRENT_VARIABLE_NAME = "that";
 	private static final String CURRENT_DATA_NAME = "data";
-	
+
 
 	public static final String COMMAND_STYLE = "command";
 	public static final String OUTPUT_STYLE = "output";
@@ -185,7 +184,7 @@ public class ScriptConsole extends JPanel {
 	private void initStyles() {
 		// Some are commented out because of inconsistencies with what
 		// different platforms do with background and foreground colour.
-		
+
 		myStyleContext = new StyleContext();
 		rootStyle = myStyleContext.addStyle("root", null);
 		StyleConstants.setForeground(rootStyle, ca.nengo.ui.lib.Style.NengoStyle.COLOR_FOREGROUND);
@@ -269,7 +268,7 @@ public class ScriptConsole extends JPanel {
 		// convert the TimeSeriesData into a numeric array
 		myInterpreter.exec(CURRENT_DATA_NAME+"=array("+CURRENT_DATA_NAME+".values).T");
 	}
-	
+
 	/**
 	 * Sets initial focus (should be called from UI thread)
 	 */
@@ -312,10 +311,12 @@ public class ScriptConsole extends JPanel {
 		int doubles = 0;
 
 		for (int i = 0; i < typedTextToCaret.length; i++) {
-			if (typedTextToCaret[i] == '\'')
-				singles++;
-			if (typedTextToCaret[i] == '"')
-				doubles++;
+			if (typedTextToCaret[i] == '\'') {
+                singles++;
+            }
+			if (typedTextToCaret[i] == '"') {
+                doubles++;
+            }
 		}
 
 		if (singles % 2 == 1 || doubles % 2 == 1) {
@@ -380,8 +381,9 @@ public class ScriptConsole extends JPanel {
 		try {
 			Class<?> c = Class.forName(entity);
 			String docs = JavaSourceParser.getDocs(c);
-			if (docs != null)
-				result = docs;
+			if (docs != null) {
+                result = docs;
+            }
 		} catch (ClassNotFoundException e) {
 			ourLogger.error("Class not found in help request", e);
 		}
@@ -423,7 +425,7 @@ public class ScriptConsole extends JPanel {
 //			 String selection = myCommandField.getSelectedText();
 			myCommandField.replaceSelection(replacement);
 			myCommandField.setToolTipText(myCallChainCompletor.getDocumentation());
-			
+
 //			 System.out.println("call chain: " + callChain);
 //			 System.out.println("selection: " + selection);
 //			 System.out.println("replacement: " + replacement);
@@ -431,7 +433,7 @@ public class ScriptConsole extends JPanel {
 			myCommandField.setText(myHistoryCompletor.next(myTypedText));
 		}
 	}
-	
+
 	public void showToolTip() {
 		if (myToolTipVisible == false && myLastHelpTime > 0 && System.currentTimeMillis() - myLastHelpTime < 500) {
 			appendText(JavaSourceParser.removeTags(myCommandField.getToolTipText()) + "\r\n", HELP_STYLE);
@@ -439,7 +441,7 @@ public class ScriptConsole extends JPanel {
 			final Action showTip = myCommandField.getActionMap().get("postTip");
 			myHideTip = myCommandField.getActionMap().get("hideTip");
 			if (showTip != null && !myToolTipVisible) {
-				final ActionEvent e = new ActionEvent(myCommandField, ActionEvent.ACTION_PERFORMED, "");				
+				final ActionEvent e = new ActionEvent(myCommandField, ActionEvent.ACTION_PERFORMED, "");
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						showTip.actionPerformed(e);
@@ -448,11 +450,11 @@ public class ScriptConsole extends JPanel {
 			}
 			myToolTipVisible = true;
 			myDefaultDismissDelay = ToolTipManager.sharedInstance().getDismissDelay();
-			ToolTipManager.sharedInstance().setDismissDelay(1000*60); //show until hideToolTip(), up to one minute max			
+			ToolTipManager.sharedInstance().setDismissDelay(1000*60); //show until hideToolTip(), up to one minute max
 		}
 		myLastHelpTime = System.currentTimeMillis();
 	}
-	
+
 	public void hideToolTip() {
 		if (myHideTip != null && myToolTipVisible) {
 			final ActionEvent e = new ActionEvent(myCommandField, ActionEvent.ACTION_PERFORMED, "");
@@ -509,7 +511,7 @@ public class ScriptConsole extends JPanel {
 				brackets++;
 			} else if (brackets > 0 && cc[i] == '(') {
 				brackets--;
-			} else if (brackets == 0 
+			} else if (brackets == 0
 					&& !(i == cc.length-1 && cc[i] == '(') //include opening bracket if last char
 					&& !pattern.matcher(String.valueOf(cc[i])).matches()) {
 				start = i + 1;
@@ -570,8 +572,9 @@ public class ScriptConsole extends JPanel {
 					myConsole.hideToolTip();
 				} else if (code != 38 && code != 40) {
 					myConsole.setTypedText();
-					if (code == 9)
-						myConsole.completorUp();
+					if (code == 9) {
+                        myConsole.completorUp();
+                    }
 				}
 
 				if (code == 46 && !myConsole.withinString()) { // .
@@ -589,7 +592,7 @@ public class ScriptConsole extends JPanel {
 
 	/**
 	 * Writes interpreter output to console.
-	 * 
+	 *
 	 * @author Bryan Tripp
 	 */
 	private class OutputWriter implements Runnable {
@@ -619,8 +622,9 @@ public class ScriptConsole extends JPanel {
 			try {
 				while (charsRead >= 0) {
 					charsRead = myInput.read(buffer);
-					if (charsRead > 0)
-						myConsole.appendText(String.valueOf(buffer, 0, charsRead), OUTPUT_STYLE);
+					if (charsRead > 0) {
+                        myConsole.appendText(String.valueOf(buffer, 0, charsRead), OUTPUT_STYLE);
+                    }
 				}
 			} catch (IOException e) {
 				ourLogger.error("Problem writing to console", e);

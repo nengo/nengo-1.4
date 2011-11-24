@@ -55,14 +55,14 @@ import edu.umd.cs.piccolox.util.PBoundsLocator;
  * is "flipped" so that they are attached to and dragging a different corner of
  * the nodes bounds.
  * <P>
- * 
+ *
  * @version 1.0
  * @author Jesse Grosjean
  */
 public class BoundsHandle extends PHandle {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -108,16 +108,16 @@ public class BoundsHandle extends PHandle {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void removeBoundsHandlesFrom(WorldObjectImpl wo) {
+    public static void removeBoundsHandlesFrom(WorldObjectImpl wo) {
 		PNode aNode = wo.getPiccolo();
 
-		ArrayList handles = new ArrayList();
+		ArrayList<BoundsHandle> handles = new ArrayList<BoundsHandle>();
 
-		Iterator i = aNode.getChildrenIterator();
+		Iterator<PNode> i = aNode.getChildrenIterator();
 		while (i.hasNext()) {
-			PNode each = (PNode) i.next();
+			PNode each = i.next();
 			if (each instanceof BoundsHandle) {
-				handles.add(each);
+				handles.add((BoundsHandle) each);
 			}
 		}
 		aNode.removeChildren(handles);
@@ -345,7 +345,7 @@ public class BoundsHandle extends PHandle {
 
 	@SuppressWarnings("unchecked")
 	public void flipSiblingBoundsHandles(boolean flipX, boolean flipY) {
-		Iterator i = getParent().getChildrenIterator();
+		Iterator<Object> i = getParent().getChildrenIterator();
 		while (i.hasNext()) {
 			Object each = i.next();
 			if (each instanceof BoundsHandle) {

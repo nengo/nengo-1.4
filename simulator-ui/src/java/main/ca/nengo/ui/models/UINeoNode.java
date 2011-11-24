@@ -1,25 +1,25 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "UINeoNode.java". Description: 
+The Original Code is "UINeoNode.java". Description:
 "UI Wrapper for a NEO Node Model
-  
+
   @author Shu"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
  */
@@ -30,14 +30,13 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
-import java.lang.UnsupportedOperationException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -49,13 +48,13 @@ import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
-import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.nef.NEFEnsemble;
+import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.AddProbeAction;
@@ -100,13 +99,13 @@ import ca.nengo.util.VisiblyMutable.Event;
 
 /**
  * UI Wrapper for a NEO Node Model
- * 
+ *
  * @author Shu
  */
 public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	/**
 	 * Factory method which creates a Node UI object around a Node
-	 * 
+	 *
 	 * @param node
 	 *            Node to be wrapped
 	 * @return Node UI Wrapper
@@ -149,19 +148,18 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Does a linear search of the node's children and returns the result
-	 * 
+	 *
 	 * @return The Child found matching parameters, null if not found
 	 * @param name
 	 *            of the Child
 	 * @param type
 	 *            of the Child
 	 */
-	@SuppressWarnings("unchecked")
-	private WorldObject getChild(String name, Class type) {
+	private WorldObject getChild(String name, Class<?> type) {
 
 		/*
 		 * Linear search used because there tends to be only a small number of
-		 * widets
+		 * widgets
 		 */
 
 		for (WorldObject wo : getChildren()) {
@@ -353,7 +351,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Called when a new probe is added
-	 * 
+	 *
 	 * @param probeUI
 	 *            New probe that was just added
 	 */
@@ -384,8 +382,9 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 			} catch (StructuralException e) {
 			}
-			if (term != null)
-				probeHolder = showTermination(term.getName());
+			if (term != null) {
+                probeHolder = showTermination(term.getName());
+            }
 		}
 
 		if (probeHolder != null) {
@@ -412,7 +411,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Creates a new probe and adds the UI object to the node
-	 * 
+	 *
 	 * @param stateName
 	 *            The name of the state variable to probe
 	 */
@@ -426,7 +425,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	public void attachViewToModel() {
 		super.attachViewToModel();
 		if (getModel() instanceof VisiblyMutable) {
-			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
+			VisiblyMutable visiblyMutable = getModel();
 			visiblyMutable.addChangeListener(myUpdateListener);
 		}
 	}
@@ -435,7 +434,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	public void detachViewFromModel() {
 		super.detachViewFromModel();
 		if (getModel() instanceof VisiblyMutable) {
-			VisiblyMutable visiblyMutable = (VisiblyMutable) getModel();
+			VisiblyMutable visiblyMutable = getModel();
 
 			Util.Assert(myUpdateListener != null);
 			visiblyMutable.removeChangeListener(myUpdateListener);
@@ -444,7 +443,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * ca.shu.ui.lib.world.DroppableX#droppedOnTargets(java.util.Collection)
 	 */
@@ -664,7 +663,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Removes a Probe UI object from node
-	 * 
+	 *
 	 * @param probe
 	 *            to be removed
 	 */
@@ -736,8 +735,8 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		}
 		layoutChildren();
 	}
-	
-	
+
+
 	/**
 	 * Shows all the terminations on the Node model
 	 */
@@ -785,7 +784,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		return originUI;
 
 	}
-	
+
 	/**
 	 * @param layoutName
 	 *            Name of an Origin on the Node model
@@ -807,7 +806,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	/**
 	 * Call this function if the probe already exists in the simulator and only
 	 * needs to be shown
-	 * 
+	 *
 	 * @param probe
 	 *            To be shown
 	 * @return Probe UI Object
@@ -881,7 +880,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Action for hiding all origins and terminations
-	 * 
+	 *
 	 * @author Shu Wu
 	 */
 	class HideAllOandTAction extends StandardAction {
@@ -900,7 +899,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Action for setting the documentation of the node
-	 * 
+	 *
 	 * @author Shu Wu
 	 */
 	class SetDocumentationAction extends ReversableAction {
@@ -953,7 +952,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Action for showing all origins and terminations
-	 * 
+	 *
 	 * @author Shu Wu
 	 */
 	class ShowAllOandTAction extends StandardAction {
@@ -973,7 +972,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Action for showing a specific origin
-	 * 
+	 *
 	 * @author Shu Wu
 	 */
 	class ShowOriginAction extends StandardAction {
@@ -994,7 +993,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Action for showing a specific termination
-	 * 
+	 *
 	 * @author Shu Wu
 	 */
 	class ShowTerminationAction extends StandardAction {
@@ -1015,7 +1014,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 	/**
 	 * Action for viewing the node's documentation
-	 * 
+	 *
 	 * @author Shu Wu
 	 */
 	class ViewDocumentationAction extends StandardAction {

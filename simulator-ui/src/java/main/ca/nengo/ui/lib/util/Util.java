@@ -22,7 +22,7 @@ import edu.umd.cs.piccolo.util.PStack;
 
 /**
  * Miscellaneous static functions used by the user interface
- * 
+ *
  * @author Shu Wu
  */
 public class Util {
@@ -111,7 +111,7 @@ public class Util {
 		if (msg == null || "".equals(msg)) {
 			msg = "Exception";
 		}
-		
+
 		UserMessages.showTextDialog(msg, assertMsg.toString(), JOptionPane.ERROR_MESSAGE);
 
 	}
@@ -199,22 +199,24 @@ public class Util {
 	public static String format(double val, int n, int w) {
 		// rounding
 		double incr = 0.5;
-		for (int j = n; j > 0; j--)
-			incr /= 10;
+		for (int j = n; j > 0; j--) {
+            incr /= 10;
+        }
 		val += incr;
 
 		String s = Double.toString(val);
 		int n1 = s.indexOf('.');
 		int n2 = s.length() - n1 - 1;
 
-		if (n > n2)
-			s = s + ZEROES.substring(0, n - n2);
-		else if (n2 > n)
-			s = s.substring(0, n1 + n + 1);
+		if (n > n2) {
+            s = s + ZEROES.substring(0, n - n2);
+        } else if (n2 > n) {
+            s = s.substring(0, n1 + n + 1);
+        }
 
-		if (w > 0 & w > s.length())
-			s = BLANKS.substring(0, w - s.length()) + s;
-		else if (w < 0 & (-w) > s.length()) {
+		if (w > 0 & w > s.length()) {
+            s = BLANKS.substring(0, w - s.length()) + s;
+        } else if (w < 0 & (-w) > s.length()) {
 			w = -w;
 			s = s + BLANKS.substring(0, w - s.length());
 		}
@@ -243,10 +245,10 @@ public class Util {
 	 *            The type of node to be picked from the pick tree
 	 */
 	@SuppressWarnings("unchecked")
-	public static WorldObject getNodeFromPickPath(PInputEvent event,
+    public static WorldObject getNodeFromPickPath(PInputEvent event,
 			Class<? extends WorldObject> type) {
 		PStack nodeStack = event.getPath().getNodeStackReference();
-		ListIterator it = nodeStack.listIterator(nodeStack.size());
+		ListIterator<Object> it = nodeStack.listIterator(nodeStack.size());
 
 		while (it.hasPrevious()) {
 			Object node = it.previous();
@@ -256,7 +258,7 @@ public class Util {
 
 				if (wo != null) {
 					if (type.isInstance(wo)) {
-						return (WorldObject) wo;
+						return wo;
 					}
 
 					/*
