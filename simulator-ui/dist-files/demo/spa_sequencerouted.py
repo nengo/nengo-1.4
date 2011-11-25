@@ -32,7 +32,7 @@ class Routing(SPA): #Define an SPA model (cortex, basal ganglia, thalamus)
     thal=Thalamus(BG) # Create a thalamus for that basal ganglia (so it 
                       # uses the same rules)
 
-    input=Input(0.1,vision='START+D') #Define an input; set the input 
-                                       #to state LETTER+D for 100 ms
+    input=Input(0.1,vision='0.8*START+D') #Define an input; set the input 
+                                       #to state 0.8*START+D for 100 ms
 
 model=Routing()

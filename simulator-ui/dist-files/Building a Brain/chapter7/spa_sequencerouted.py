@@ -1,7 +1,7 @@
 from spa import *
 
 class Rules:
-    def start(vision='LETTER'):
+    def start(vision='START'):
         set(state=vision)
     def A(state='A'):
         set(state='B')
@@ -24,6 +24,6 @@ class Routing(SPA):
     BG=BasalGanglia(Rules)
     thal=Thalamus(BG)
 
-    input=Input(0.1 , vision='0.8*LETTER+D')
+    input=Input(0.1 , vision='0.8*START+D')
 
 model=Routing()

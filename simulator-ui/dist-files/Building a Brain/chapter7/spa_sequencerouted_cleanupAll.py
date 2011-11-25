@@ -38,8 +38,10 @@ for item in vocab.keys:
 cleanup = model.net.make('cleanup', neurons=300, dimensions=vsize, encoders=eye(vsize))
 model.net.connect(model.state.net.network.getOrigin('state'), cleanup, transform=pd)
 
+import nef
 # Record data.
-from nef.wtfnode import WriteToFileNode
-recorder = WriteToFileNode('record', 'NengoDemoOutput.csv', model.net.network, vocab, overwrite=True)
-recorder.addVocabTermination('state', origin='state')
-recorder.addValueTermination('cleanup')
+log=nef.Log(model.net,filename='NengoDemoOutput.csv')
+log.add('cleanup')
+log.add('state')
+log.add_spikes('cleanup',name='cleanup_spikes')
+log.add_vocab('state_vocab',vocab)

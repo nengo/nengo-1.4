@@ -13,7 +13,6 @@ class Rules:
         set(state='A')
     
 
-
 class Sequence(SPA):
     dimensions=16
     
