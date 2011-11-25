@@ -716,14 +716,17 @@ class Network:
         (i.e. if Nengo is being run via the command line only interface ``nengo-cl``),
         then do nothing.
         """
-        
-        import ca.nengo.ui.NengoGraphics
-        ng=ca.nengo.ui.NengoGraphics.getInstance()
-        if ng is not None:
-            world=ca.nengo.ui.util.ScriptWorldWrapper(ng)
-            n=world.getNode(self.network.name)
-            if n is not None: world.remove(n)
-            world.add(self.network)
+        try:
+            import ca.nengo.ui.NengoGraphics
+            ng=ca.nengo.ui.NengoGraphics.getInstance()
+            if ng is not None:
+                world=ca.nengo.ui.util.ScriptWorldWrapper(ng)
+                n=world.getNode(self.network.name)
+                if n is not None: world.remove(n)
+                world.add(self.network)
+        except:
+            pass
+
 
     def add_to(self,world=None):
         """Add the network to the given Nengo world object.  If there is a
