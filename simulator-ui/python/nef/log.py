@@ -111,11 +111,14 @@ class Log(SimpleNode):
         origin=self.network.get(source,require_origin=True)
         self.logs[name]=LogVector(origin,tau)
 
-    def add_vocab(self,source,vocab,name=None,tau=None,terms=None):
+    def add_vocab(self,source,vocab=None,name=None,tau=None,terms=None):
         if name is None: name=source
         if tau is None: tau=self.tau
         self.log_names.append(name)        
         origin=self.network.get(source,require_origin=True)
+        if vocab is None: 
+            dim=origin.dimensions
+            vocab=hrr.Vocabulary.defaults[dim]        
         self.logs[name]=LogVocab(origin,tau=tau,vocab=vocab,terms=terms)
         
         
