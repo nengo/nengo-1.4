@@ -806,7 +806,7 @@ class Network:
         original_name=name
         node=self.network
         while '.' in name:
-            n,name=name.split('.',2)
+            n,name=name.split('.',1)
             node=node.getNode(n)
         try:    
             node=node.getNode(name)
