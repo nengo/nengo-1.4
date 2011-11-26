@@ -117,9 +117,10 @@ class Log(SimpleNode):
         dt=self.t_end-self.t_start
         for log in self.logs:
             log.tick(dt)
-        if self.t>=self.next_time:
+        if self.t>=self.next_time:            
             self.next_time+=self.interval
             self.write_data()    
+            for log in self.logs: log.flush()
         
     def add_spikes(self,source,name=None,skip=0):    
         if name is None: name=source
@@ -152,7 +153,7 @@ class Log(SimpleNode):
         f=open(self.filename,'a')
         f.write('\n')
         f.write('time,%s\n'%(','.join([log.name for log in self.logs])))
-        f.write('    ,%s\n'%(','.join([log.type() for log in self.logs])))
+        #f.write('    ,%s\n'%(','.join([log.type() for log in self.logs])))
         f.close()
         self.wrote_header=True
         
