@@ -43,12 +43,13 @@ class LogVector(LogBasic):
         self.value+=numeric.array(self.data())*(dt/self.tau)    
 
 class LogVocab(LogVector):
-    def __init__(self,name,origin,tau,vocab,terms=None):
+    def __init__(self,name,origin,tau,vocab,terms=None,pairs=True):
         LogVector.__init__(self,name,origin,tau)
         self.vocab=vocab
         self.terms=terms
+        self.pairs=pairs
     def text(self):
-        return self.vocab.text(self.value,terms=self.terms)
+        return self.vocab.text(self.value,terms=self.terms,include_pairs=self.pairs,join=';')
     def type(self):
         return 'vocab'
         
@@ -140,14 +141,14 @@ class Log(SimpleNode):
         origin=self.network.get(source,require_origin=True)
         self.logs.append(LogVector(name,origin,tau))
 
-    def add_vocab(self,source,vocab=None,name=None,tau=None,terms=None):
+    def add_vocab(self,source,vocab=None,name=None,tau=None,terms=None,pairs=True):
         if name is None: name=source
         if tau is None: tau=self.tau
         origin=self.network.get(source,require_origin=True)
         if vocab is None: 
             dim=origin.dimensions
             vocab=hrr.Vocabulary.defaults[dim]        
-        self.logs.append(LogVocab(name,origin,tau=tau,vocab=vocab,terms=terms))
+        self.logs.append(LogVocab(name,origin,tau=tau,vocab=vocab,terms=terms,pairs=pairs))
         
     def write_header(self):
         f=open(self.filename,'a')
