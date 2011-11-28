@@ -1,4 +1,4 @@
-N=60
+N=50
 D=1
 
 import nef
@@ -32,13 +32,19 @@ net.connect('post', 'error', weight=-1)
 
 # Add a gate to turn learning on and off.
 net.make_input('switch',[0])
-gating.make(net,name='Gate', gated='error', neurons=40 ,pstc=0.01)
+gating.make(net,name='Gate', gated='error', neurons=100 ,pstc=0.01)
 net.connect('switch', 'Gate')
 
 # Add another non-gated error population running in direct mode.
 actual = net.make('actual error', 1, 1, mode='direct')
 net.connect(A,actual)
 net.connect(B,actual,weight=-1)
+
+def square(x):
+    return x[0]*x[0]
+# Make an origin on pre that computes the square, to generate
+# a different error signal
+net.connect(A,None,func=square, create_projection=False)
 
 net.add_to_nengo()
 
