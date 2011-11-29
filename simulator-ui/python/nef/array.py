@@ -239,7 +239,7 @@ class NetworkArray(NetworkImpl):
 
           if nodeTerminations and isinstance(nodeTerminations[0], DecodedTermination):
             decodedTerminations.append(term)
-          elif nodeTerminations and isinstance(nodeTerminations[0], PlasticEnsembleTermination):
+          elif nodeTerminations and isinstance(nodeTerminations[0], EnsembleTermination):
             nonDecodedTerminations.append(term)
         
         result = nonDecodedTerminations
