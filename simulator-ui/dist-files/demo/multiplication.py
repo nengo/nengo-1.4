@@ -1,6 +1,6 @@
 import nef
 
-net=nef.Network('Multiply') #Create the network object
+net=nef.Network('Multiplication') #Create the network object
 inputA=net.make_input('inputA',[8]) #Create a controllable input function 
                                     #with a starting value of 8
 inputB=net.make_input('inputB',[5]) #Create a controllable input function 
