@@ -263,7 +263,8 @@ public class BiasOrigin extends DecodedOrigin {
 	 *  
 	 * @author Bryan Tripp
 	 */
-	private static class BiasedVG implements VectorGenerator {
+	private static class BiasedVG implements VectorGenerator, java.io.Serializable {
+		private static final long serialVersionUID = 1L;
 		
 		private VectorGenerator myVG;
 		private int myDim;
