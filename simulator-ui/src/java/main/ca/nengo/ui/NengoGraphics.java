@@ -113,7 +113,7 @@ import ca.nengo.util.Environment;
 public class NengoGraphics extends AppFrame implements NodeContainer {
 	private static final long serialVersionUID = 1L;
 
-	public static final double VERSION = 1.2;
+	public static final double VERSION = 1.3;
 
 	public static final String APP_NAME = "Nengo V" + VERSION;
 	/**
