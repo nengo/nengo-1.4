@@ -63,7 +63,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
 	private boolean myOja = false; // Apply Oja smoothing?
 
 	/**
-	 * @param node The parent Node
+	 * @param ensemble The ensemble this termination belongs to
 	 * @param name Name of this Termination
 	 * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
 	 *        all LinearExponentialTerminations
@@ -97,7 +97,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
     }
 
     /**
-     * @param originName Name of Origin from which post-synaptic activity is drawn
+     * @param oja Should this termination use Oja smoothing?
      */
     public void setOja(boolean oja) {
         myOja = oja;
@@ -130,7 +130,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
 	}
 
 	/**
-	 * @see ca.nengo.model.plasticity.PlasticityRule#updateTransform(float[][], ca.nengo.model.InstantaneousOutput, float, int, int)
+	 * @see ca.nengo.model.plasticity.impl.PlasticEnsembleTermination#updateTransform(float, int, int)
 	 */
 	@Override
     public void updateTransform(float time, int start, int end) throws StructuralException {
@@ -163,8 +163,8 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         float oja = 0.0f;
 
         if (myOja) {
-            for (int i = 0; i < myOutput.length; i++) {
-                oja += myLearningRate*myOutput[i]*myOutput[i]*currentWeight;
+            for (float element : myOutput) {
+                oja += myLearningRate*element*element*currentWeight;
             }
         }
 

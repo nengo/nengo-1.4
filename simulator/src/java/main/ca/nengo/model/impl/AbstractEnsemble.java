@@ -236,7 +236,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	}
 
     /**
-     * @throws StructuralException
+     * @param name Name of the Origin to remove from the ensemble
+     * @return the removed Origin object
+     * @throws StructuralException if named Origin does not exist
      * @see ca.nengo.model.ExpandableNode#removeTermination(java.lang.String)
      */
     public synchronized Origin removeOrigin(String name) throws StructuralException {
@@ -250,7 +252,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
     }
 
     /**
-     * @throws StructuralException
+     * @param name Name of the Termination to remove from the ensemble
+     * @return the removed Termination object
+     * @throws StructuralException if named Termination does not exist
      * @see ca.nengo.model.ExpandableNode#removeTermination(java.lang.String)
      */
     public synchronized Termination removeTermination(String name) throws StructuralException {
@@ -324,6 +328,10 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		return mySpikePattern;
 	}
 
+	/**
+	 * @param spikes The pattern of spikes (0.0f for not spiking, else? for spiking)
+	 * @param endTime End time for the spike pattern
+	 */
 	public void setSpikePattern(float[] spikes, float endTime) {
 		if(myCollectSpikesFlag) {
 			if (mySpikePattern == null) {

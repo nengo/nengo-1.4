@@ -83,7 +83,10 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
     }
 
     /**
-     * @see ca.nengo.model.plasticity.PlasticityRule#setModTerminationState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
+     * @param name Name of the termination from which modulatory input is drawn
+     * @param state The state to set
+     * @param time Current time
+     * @throws StructuralException if modulatory termination does not exist
      */
     public void setModTerminationState(String name, InstantaneousOutput state, float time) throws StructuralException {
         if (myModTermName == null) {

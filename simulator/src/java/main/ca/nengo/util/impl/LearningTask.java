@@ -59,21 +59,21 @@ public class LearningTask implements ThreadTask {
 	}
 
     /**
-     * @see ca.nengo.model.util.ThreadTask#getParent()
+     * @see ca.nengo.util.ThreadTask#getParent()
      */
     public PlasticEnsembleImpl getParent() {
         return myParent;
     }
 
     /**
-     * @see ca.nengo.model.util.ThreadTask#isFinished()
+     * @see ca.nengo.util.ThreadTask#isFinished()
      */
     public boolean isFinished() {
         return finished;
     }
 
     /**
-     * @see ca.nengo.model.util.ThreadTask#run(float, float)
+     * @see ca.nengo.util.ThreadTask#run(float, float)
      */
     public void run(float startTime, float endTime) throws SimulationException {
         if (!finished) {

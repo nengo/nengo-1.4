@@ -75,21 +75,25 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
 	}
 
     /**
-     * @return Name of Origin from which post-synaptic activity is drawn
+     * @return Name of Origin from which postsynaptic activity is drawn
      */
     public String getOriginName() {
         return myOriginName;
     }
 
     /**
-     * @param originName Name of Origin from which post-synaptic activity is drawn
+     * @param originName Name of Origin from which postsynaptic activity is drawn
      */
     public void setOriginName(String originName) {
         myOriginName = originName;
     }
 
     /**
-     * @see ca.nengo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
+     * @param name Name of Origin from which postsynaptic activity is drawn
+     * @param state State of named origin
+     * @param time Current time
+     * @throws StructuralException if Origin is not set
+     *
      */
     public void setOriginState(String name, InstantaneousOutput state, float time) throws StructuralException {
         if (myOriginName == null) {
@@ -109,7 +113,9 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
     }
 
 	/**
-	 * @see ca.nengo.model.PlasticTermination#getTransform()
+	 * @return The transformation matrix, which is made up of the
+	 *   weight vectors for each of the PlasticNodeTerminations within.
+	 *   This can be thought of as the connection weight matrix in most cases.
 	 */
 	public float[][] getTransform() {
 	    Termination[] terms = this.getNodeTerminations();
@@ -123,7 +129,9 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
 	}
 
 	/**
-	 * @see ca.nengo.model.PlasticTermination#setTransform(float[][] transform)
+	 * @param transform The transformation matrix, which can be thought of as
+	 *   the connection weight matrix in most cases. This will be passed through
+	 *   to set the weight vectors on each PlasticNodeTermination within.
 	 */
 	public void setTransform(float[][] transform) {
 	    Termination[] terms = this.getNodeTerminations();
@@ -134,22 +142,25 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
 	}
 
 	/**
-     * @see ca.nengo.model.PlasticTermination#saveTransform()
+     * Saves the weights in the PlasticNodeTerminations within.
      */
     public void saveTransform() {
         Termination[] terms = this.getNodeTerminations();
-        for (int i=0; i < terms.length; i++) {
-            ((PlasticNodeTermination) terms[i]).saveWeights();
+        for (Termination term : terms) {
+            ((PlasticNodeTermination) term).saveWeights();
         }
     }
 
 	/**
-	 * @see ca.nengo.model.PlasticTermination#setTransform(float[][] transform)
+	 * @param time Current time
+	 * @param start The start index of the range of transform values to update (for multithreading)
+	 * @param end The end index of the range of transform values to update (for multithreading)
+	 * @throws StructuralException if
 	 */
 	public abstract void updateTransform(float time, int start, int end) throws StructuralException;
 
 	/**
-	 * @see ca.nengo.model.PlasticTermination#getInput()
+	 * @see ca.nengo.model.impl.EnsembleTermination#getInput()
 	 */
 	@Override
     public InstantaneousOutput getInput() {
@@ -160,7 +171,7 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
 	}
 
 	/**
-	 * @see ca.nengo.model.PlasticTermination#getOutputs()
+	 * @return The output currents from the PlasticNodeTermination being wrapped
 	 */
 	public float[] getOutputs() {
 	    Termination[] terms = this.getNodeTerminations();
@@ -174,14 +185,14 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
 	}
 
     /**
-     * @see ca.nengo.model.PlasticTermination#getTransform()
+     * @return Learning rate of the termination
      */
     public float getLearningRate() {
         return myLearningRate;
     }
 
     /**
-     * @see ca.nengo.model.PlasticTermination#setTransform(float[][] transform)
+     * @param learningRate Learning rate of the termination
      */
     public void setLearningRate(float learningRate)
     {
@@ -189,14 +200,14 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
     }
 
     /**
-     * @see ca.nengo.model.PlasticTermination#getTransform()
+     * @return Whether or not the termination is currently learning
      */
     public boolean getLearning() {
         return myLearning;
     }
 
     /**
-     * @see ca.nengo.model.PlasticTermination#setTransform(float[][] transform)
+     * @param learning Turn learning on or off for this termination
      */
     public void setLearning(boolean learning)
     {

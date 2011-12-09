@@ -104,11 +104,16 @@ public class EnsembleTermination implements Termination {
 			throw new SimulationException("Input to this Termination must have dimension " + getDimensions());
 		}
 
-		for (int i = 0; i < myNodeTerminations.length; i++) {
-			myNodeTerminations[i].setValues(values);
+		for (Termination myNodeTermination : myNodeTerminations) {
+			myNodeTermination.setValues(values);
 		}
 	}
 
+	/**
+	 * @return Input into one of the underlying terminations -- presumably
+	 *   they are all getting the same input.
+	 */
+    // FIXME: what is this doing exactly? why can't it just call getInput()?
 	public InstantaneousOutput getInput(){
 		InstantaneousOutput result = null;
 		if (myNodeTerminations[0] instanceof DecodedTermination) {
@@ -126,8 +131,8 @@ public class EnsembleTermination implements Termination {
 	 */
     public boolean getModulatory() {
 		int nModulatory = 0;
-		for (int i = 0; i < myNodeTerminations.length; i++) {
-			if (myNodeTerminations[i].getModulatory()) {
+		for (Termination myNodeTermination : myNodeTerminations) {
+			if (myNodeTermination.getModulatory()) {
                 nModulatory++;
             }
 		}
@@ -141,8 +146,8 @@ public class EnsembleTermination implements Termination {
 	 */
     public float getTau() {
 		float sumTau = 0;
-		for (int i = 0; i < myNodeTerminations.length; i++) {
-			sumTau += myNodeTerminations[i].getTau();
+		for (Termination myNodeTermination : myNodeTerminations) {
+			sumTau += myNodeTermination.getTau();
 		}
 		return sumTau / myNodeTerminations.length;
 	}
@@ -151,8 +156,8 @@ public class EnsembleTermination implements Termination {
 	 * @see ca.nengo.model.Termination#setModulatory(boolean)
 	 */
     public void setModulatory(boolean modulatory) {
-		for (int i = 0; i < myNodeTerminations.length; i++) {
-			myNodeTerminations[i].setModulatory(modulatory);
+		for (Termination myNodeTermination : myNodeTerminations) {
+			myNodeTermination.setModulatory(modulatory);
 		}
 	}
 
@@ -183,6 +188,9 @@ public class EnsembleTermination implements Termination {
 		return myNode;
 	}
 
+	/**
+	 * @return Array with all of the underlying node terminations
+	 */
 	public Termination[] getNodeTerminations(){
 		return myNodeTerminations;
 	}
@@ -191,8 +199,8 @@ public class EnsembleTermination implements Termination {
 	 * @see ca.nengo.model.Resettable#reset(boolean)
 	 */
     public void reset(boolean randomize) {
-		for (int i = 0; i < myNodeTerminations.length; i++) {
-			myNodeTerminations[i].reset(randomize);
+		for (Termination myNodeTermination : myNodeTerminations) {
+			myNodeTermination.reset(randomize);
 		}
 	}
 
