@@ -61,6 +61,9 @@ public class UnitsHandler extends BaseHandler {
 		};
 
 
+	/**
+	 * ConfigurationHandler for Units values.
+	 */
 	public UnitsHandler() {
 		super(Units.class);
 	}

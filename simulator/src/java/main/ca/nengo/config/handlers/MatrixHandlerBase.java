@@ -18,12 +18,25 @@ import javax.swing.SwingUtilities;
 import ca.nengo.config.ui.ConfigurationChangeListener;
 import ca.nengo.config.ui.MatrixEditor;
 
+/**
+ * Base class for ConfigurationHandlers that deal with 2D arrays
+ */
 public abstract class MatrixHandlerBase extends BaseHandler {
 
+	/**
+	 * Base class for ConfigurationHandlers that deal with 2D arrays
+	 *
+	 * @param c Class being configured
+	 */
 	public MatrixHandlerBase(Class<?> c) {
 		super(c);
 	}
 
+	/**
+	 * @param o Object being configured
+	 * @param configListener Listener for configuration changes
+	 * @return A MatrixEditor object (currently defaults to float[][])
+	 */
 	public abstract MatrixEditor CreateMatrixEditor(Object o,
 			final ConfigurationChangeListener configListener);
 
@@ -106,9 +119,8 @@ public abstract class MatrixHandlerBase extends BaseHandler {
 
 	/**
 	 * Shows a tree in which object properties can be edited.
-	 * 
-	 * @param o
-	 *            The Object to configure
+	 *
+	 * @param o The Object to configure
 	 */
 	private static JDialog createDialog(Container parentContainer, JPanel panel) {
 		final JDialog dialog;

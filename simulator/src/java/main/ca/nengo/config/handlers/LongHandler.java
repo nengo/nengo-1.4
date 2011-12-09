@@ -1,14 +1,17 @@
 /**
- * 
+ *
  */
 package ca.nengo.config.handlers;
 
 /**
- * ConfigurationHandler for Long values. 
+ * ConfigurationHandler for Long values.
  * @author Bryan Tripp
  */
 public class LongHandler extends BaseHandler {
 
+	/**
+	 * ConfigurationHandler for Long values.
+	 */
 	public LongHandler() {
 		super(Long.class);
 	}
