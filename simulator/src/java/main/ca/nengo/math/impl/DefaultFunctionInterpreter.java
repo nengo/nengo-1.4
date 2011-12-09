@@ -65,6 +65,11 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		return ourInstance;
 	}
 
+	/**
+	 * Initializes data structures
+	 *
+	 * TODO: Make this a static list or something, why are we doing this for each function
+	 */
 	public DefaultFunctionInterpreter() {
 		myFunctions = new HashMap<String, Function>(20);
 		myFunctions.put("sin", new SimpleFunctions.Sin());

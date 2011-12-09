@@ -60,6 +60,10 @@ public class CompositeApproximator implements LinearApproximator {
 	private int[][] myDimensions;
 //	private int myDimension;
 
+	/**
+	 * @param components LinearApproximators that make up the composite
+	 * @param dimensions dimensionality of each LinearApproximator
+	 */
 	public CompositeApproximator(LinearApproximator[] components, int[][] dimensions) {
 		if (components.length != dimensions.length) {
 			throw new IllegalArgumentException("Length of dimensions list must equal number of components ("

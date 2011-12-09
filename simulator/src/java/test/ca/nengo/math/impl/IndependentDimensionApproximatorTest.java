@@ -3,33 +3,31 @@
  */
 package ca.nengo.math.impl;
 
+import junit.framework.TestCase;
 import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
-import ca.nengo.math.impl.ConstantFunction;
-import ca.nengo.math.impl.IdentityFunction;
-import ca.nengo.math.impl.IndependentDimensionApproximator;
-import ca.nengo.math.impl.Polynomial;
-import junit.framework.TestCase;
+import ca.nengo.math.impl.IndependentDimensionApproximator.EncoderFactory;
+import ca.nengo.util.MU;
 
 /**
- * Unit tests for IndependentDimensionApproximator. 
+ * Unit tests for IndependentDimensionApproximator.
  */
 public class IndependentDimensionApproximatorTest extends TestCase {
-	
-	/* 
+
+	/*
 	 * Test method for 'ca.nengo.math.impl.IndependentDimensionApproximator.findCoefficients()'
 	 */
 	public void testFindCoefficients() {
 		float[][] polyCoeffs = new float[][]{{5,5},{1,-2},{-2,3}};
-		
+
 		float[] evalPoints = new float[100];
 		for (int i = 0; i < evalPoints.length; i++) {
-			evalPoints[i] = (float) -10 + 20 * (float)i / (float)evalPoints.length;
+			evalPoints[i] = -10 + 20 * (float)i / evalPoints.length;
 		}
-		
+
 		Function target = new IdentityFunction(1,0);
-		
+
 		float[][] values = new float[polyCoeffs.length][];
 		for (int i = 0; i < values.length; i++) {
 			Function component = new Polynomial(polyCoeffs[i]);
@@ -38,10 +36,10 @@ public class IndependentDimensionApproximatorTest extends TestCase {
 				values[i][j] = component.map(new float[]{evalPoints[j]});
 			}
 		}
-		
+
 		LinearApproximator approximator = new IndependentDimensionApproximator(evalPoints, values, new int[]{0,1,0}, 2, new ConstantFunction(1,1f), 0f);
 		float[] coefficients = approximator.findCoefficients(target);
-		
+
 		float approx;
 		for (int j = 0; j < evalPoints.length; j++) {
 			approx = 0f;
@@ -52,4 +50,11 @@ public class IndependentDimensionApproximatorTest extends TestCase {
 		}
 	}
 
+    public static void main(String[] args) {
+//      EvalPointFactory epf = new EvalPointFactory(1, 10);
+//      float[][] foo = epf.genVectors(100, 3);
+        EncoderFactory ef = new EncoderFactory(1);
+        float[][] foo = ef.genVectors(10, 3);
+        System.out.println(MU.toString(foo, 10));
+    }
 }

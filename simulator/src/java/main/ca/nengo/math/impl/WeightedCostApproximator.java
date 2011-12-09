@@ -28,18 +28,6 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.math.impl;
 
-//import java.awt.BorderLayout;
-//
-//import javax.swing.JFrame;
-//import javax.swing.JPanel;
-//
-//import org.jfree.chart.ChartFactory;
-//import org.jfree.chart.ChartPanel;
-//import org.jfree.chart.JFreeChart;
-//import org.jfree.chart.plot.PlotOrientation;
-//import org.jfree.data.xy.XYSeries;
-//import org.jfree.data.xy.XYSeriesCollection;
-
 import java.io.FileNotFoundException;
 import java.util.Random;
 
@@ -100,11 +88,17 @@ public class WeightedCostApproximator implements LinearApproximator {
 		}
 	}
 
-	public static void setUseGPU(boolean val){
-		myUseGPU = val;
+	/**
+	 * @param use Use the GPU?
+	 */
+	public static void setUseGPU(boolean use) {
+		myUseGPU = use;
 	}
 
-	public static boolean getUseGPU(){
+	/**
+	 * @return Using the GPU?
+	 */
+	public static boolean getUseGPU() {
 		return canUseGPU && myUseGPU;
 	}
 
@@ -129,6 +123,9 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 * @param noise Standard deviation of Gaussian noise to add to values (to reduce
 	 * 		sensitivity to simulation noise) as a proportion of the maximum absolute
 	 * 		value over all values
+	 * @param nSV Number of singular values to keep from the singular value
+	 *      decomposition (SVD)
+	 * @param quiet Turn off logging?
 	 */
 	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise, int nSV, boolean quiet) {
 		assert MU.isMatrix(evaluationPoints);
@@ -169,19 +166,35 @@ public class WeightedCostApproximator implements LinearApproximator {
             }
 
 		}
-
-		//testPlot(evaluationPoints, values);
 	}
+
+	/**
+     * @param evaluationPoints Points at which error is evaluated (should be uniformly
+     *      distributed, as the sum of error at these points is treated as an integral
+     *      over the domain of interest). Examples include vector inputs to an ensemble,
+     *      or different points in time within different simulation regimes.
+     * @param values The values of whatever functions are being combined, at the
+     *      evaluationPoints. Commonly neuron firing rates. The first dimension makes up
+     *      the list of functions, and the second the values of these functions at each
+     *      evaluation point.
+     * @param costFunction A cost function that weights squared error over the domain of
+     *      evaluation points
+     * @param noise Standard deviation of Gaussian noise to add to values (to reduce
+     *      sensitivity to simulation noise) as a proportion of the maximum absolute
+     *      value over all values
+     * @param nSV Number of singular values to keep from the singular value
+     *      decomposition (SVD)
+	 */
 	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise, int nSV) {
 		this(evaluationPoints, values, costFunction, noise, nSV, false);
 	}
 
 	private float addNoise(float[][] values, float noise) {
 		float maxValue = 0f;
-		for (int i = 0; i < values.length; i++) {
-			for (int j = 0; j < values[i].length; j++) {
-				if (Math.abs(values[i][j]) > maxValue) {
-                    maxValue = Math.abs(values[i][j]);
+		for (float[] value : values) {
+			for (float element : value) {
+				if (Math.abs(element) > maxValue) {
+                    maxValue = Math.abs(element);
                 }
 			}
 		}
@@ -282,9 +295,9 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 
 				buffer.order(java.nio.ByteOrder.BIG_ENDIAN);
-				for (int i=0; i<matrix.length; i++) {
+				for (double[] element : matrix) {
 					for (int j=0; j<matrix.length; j++) {
-						buffer.putFloat((float)(matrix[i][j]));
+						buffer.putFloat((float)(element[j]));
 					}
 				}
 				buffer.rewind();
@@ -475,14 +488,27 @@ public class WeightedCostApproximator implements LinearApproximator {
 			this(noise, -1, false);
 		}
 
+		/**
+		 * @param noise Random noise to add to component functions (proportion of largest value over all functions)
+		 * @param quiet Turn off logging?
+		 */
 		public Factory(float noise, boolean quiet) {
 			this(noise, -1, quiet);
 		}
 
+		/**
+		 * @param noise Random noise to add to component functions (proportion of largest value over all functions)
+		 * @param NSV Number of singular values to keep
+		 */
 		public Factory(float noise, int NSV) {
 			this(noise, NSV, false);
 		}
 
+		/**
+		 * @param noise Random noise to add to component functions (proportion of largest value over all functions)
+		 * @param NSV Number of singular values to keep
+		 * @param quiet Turn off logging?
+		 */
 		public Factory(float noise, int NSV, boolean quiet) {
 			myNoise = noise;
 			myNSV = NSV;

@@ -3,9 +3,10 @@
  */
 package ca.nengo.math.impl;
 
-import ca.nengo.TestUtil;
-import ca.nengo.math.impl.PiecewiseConstantFunction;
 import junit.framework.TestCase;
+import ca.nengo.TestUtil;
+import ca.nengo.math.Function;
+import ca.nengo.plot.Plotter;
 
 public class PiecewiseConstantFunctionTest extends TestCase {
 
@@ -39,4 +40,10 @@ public class PiecewiseConstantFunctionTest extends TestCase {
 		TestUtil.assertClose(.2f, values[1], .00001f);
 	}
 
+    public static void main(String args[]) {
+//      Function f = new PiecewiseConstantFunction(new float[]{0, 1, 3, 7}, new float[]{5, 2});
+//      Function f = new PiecewiseConstantFunction(new float[]{0, 1, 3, 7}, new float[]{5, 2, -3, 6, 7});
+        Function f = new PiecewiseConstantFunction(new float[0], new float[]{5});
+        Plotter.plot(f, -1, .01f, 10, "");
+    }
 }
