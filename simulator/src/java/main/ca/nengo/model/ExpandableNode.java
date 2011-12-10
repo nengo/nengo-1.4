@@ -59,7 +59,8 @@ public interface ExpandableNode extends Node {
 
 	/**
 	 * @param name Name of Termination to remove.
-	 * @throws StructuralException
+	 * @return The removed Termination
+	 * @throws StructuralException if the Termination doesn't exist
 	 */
 	public Termination removeTermination(String name) throws StructuralException;
 
