@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import ca.nengo.model.Node;
-import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
@@ -93,7 +92,7 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 	/**
 	 * @see ca.nengo.model.neuron.SynapticIntegrator#run(float, float)
 	 */
-	public TimeSeries1D run(float startTime, float endTime) throws SimulationException {
+	public TimeSeries1D run(float startTime, float endTime) {
 		float len = endTime - startTime;
 		int steps = (int) Math.ceil(len / myMaxTimeStep);
 		float dt = len / steps;
@@ -149,18 +148,30 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 		}
 	}
 
+	/**
+	 * @return maximum time step
+	 */
 	public float getMaxTimeStep() {
 		return myMaxTimeStep / ourTimeStepCorrection;
 	}
 
+	/**
+	 * @param maxTimeStep maximum time step
+	 */
 	public void setMaxTimeStep(float maxTimeStep) {
 		myMaxTimeStep = maxTimeStep * ourTimeStepCorrection; //increased slightly because float/float != integer
 	}
 
+	/**
+	 * @return Units that current is expressed in
+	 */
 	public Units getCurrentUnits() {
 		return myCurrentUnits;
 	}
 
+	/**
+	 * @param units Units that current should be expressed in
+	 */
 	public void setCurrentUnits(Units units) {
 		myCurrentUnits = units;
 	}
@@ -227,7 +238,9 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 		return result;
 	}
 
-
+	/**
+	 * Factory for making LinearSynapticIntegrators
+	 */
 	public static class Factory implements SynapticIntegratorFactory {
 
 		private static final long serialVersionUID = 1L;
@@ -235,6 +248,9 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 		private Units myUnits;
 		private float myMaxTimeStep;
 
+		/**
+		 * Set defaults
+		 */
 		public Factory() {
 			myUnits = Units.ACU;
 			myMaxTimeStep = .0005f;

@@ -28,7 +28,6 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.neuron;
 
-import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 
@@ -54,15 +53,16 @@ public interface ExpandableSynapticIntegrator extends SynapticIntegrator {
 	 * @param modulatory If true, inputs to the Termination are not summed with other inputs (they
 	 * 		only have modulatory effects, eg on plasticity, which must be defined elsewhere).
 	 * @return resulting Termination
-	 * @throws SimulationException if there is already a Termination of the same name on this
+	 * @throws StructuralException if there is already a Termination of the same name on this
 	 * 		SynapticIntegrator
 	 */
 	public Termination addTermination(String name, float[] weights, float tauPSC, boolean modulatory) throws StructuralException;
 
 	/**
 	 * @param name Name of Termination to remove.
-	 * @throws SimulationException if there is no Termination of the given name on this
-	 * 		SynapticIntegrator
+	 * @return The removed Termination
+	 * @throws StructuralException if there is no Termination of the given name on this
+     *      SynapticIntegrator
 	 */
 	public Termination removeTermination(String name) throws StructuralException;
 

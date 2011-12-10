@@ -102,6 +102,9 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 		return mySynapticIntegrator.removeTermination(name);
 	}
 
+	/**
+	 * @return SynapticIntegrator for this neuron
+	 */
 	public ExpandableSynapticIntegrator getSynapticIntegrator() {
 		return mySynapticIntegrator;
 	}

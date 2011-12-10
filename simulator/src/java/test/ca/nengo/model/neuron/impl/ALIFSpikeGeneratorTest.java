@@ -6,7 +6,10 @@ package ca.nengo.model.neuron.impl;
 import junit.framework.TestCase;
 import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
+import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.PiecewiseConstantFunction;
+import ca.nengo.model.Network;
+import ca.nengo.model.Node;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
@@ -14,9 +17,12 @@ import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
+import ca.nengo.model.impl.EnsembleImpl;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.neuron.Neuron;
+import ca.nengo.plot.Plotter;
+import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
 
 /**
@@ -213,4 +219,59 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 			e.printStackTrace();
 		}
 	}
+
+    //functional test
+    public static void main2(String[] args) {
+
+        try {
+            Network network = new NetworkImpl();
+
+            //x, .3: varying x keeps time constant, changes adapted rate
+//          ALIFSpikeGenerator generator = new ALIFSpikeGenerator(.002f, .02f, .5f, .01f);  //.2: .01 to .3 (150 to 20ms)
+//          SynapticIntegrator integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
+//          PlasticExpandableSpikingNeuron neuron = new PlasticExpandableSpikingNeuron(integrator, generator, 15f, 0f, "alif");
+
+            ALIFNeuronFactory factory = new ALIFNeuronFactory(new IndicatorPDF(200, 400), new IndicatorPDF(-2.5f, -1.5f),
+                    new IndicatorPDF(.1f, .1001f), .0005f, .02f, .2f);
+
+//          VectorGenerator vg = new RandomHypersphereVG(false, 1, 0);
+//          ApproximatorFactory factory = new WeightedCostApproximator.Factory(.1f);
+//          NEFEnsemble ensemble = new NEFEnsembleImpl("ensemble", new NEFNode[]{neuron}, new float[][]{new float[]{1}}, factory, vg.genVectors(100, 1));
+
+            Node[] neurons = new Node[50];
+            float[][] weights = new float[neurons.length][];
+            for (int i = 0; i < neurons.length; i++) {
+                neurons[i] = factory.make("neuron"+i);
+                weights[i] = new float[]{1};
+            }
+            EnsembleImpl ensemble = new EnsembleImpl("ensemble", neurons);
+            ensemble.addTermination("input", weights, .005f, false);
+            ensemble.collectSpikes(true);
+            network.addNode(ensemble);
+
+            FunctionInput input = new FunctionInput("input", new Function[]{new PiecewiseConstantFunction(new float[]{0.2f}, new float[]{0, 0.5f})}, Units.UNK);
+            network.addNode(input);
+
+            network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), ensemble.getTermination("input"));
+
+//          Probe vProbe = network.getSimulator().addProbe("ensemble", 0, "V", true);
+//          Probe nProbe = network.getSimulator().addProbe("ensemble", 0, "N", true);
+//          Probe iProbe = network.getSimulator().addProbe("ensemble", 0, "I", true);
+            Probe rProbe = network.getSimulator().addProbe("ensemble", "rate", true);
+
+            network.setMode(SimulationMode.RATE);
+            network.run(0, 1);
+
+//          Plotter.plot(ensemble.getSpikePattern());
+//          Plotter.plot(vProbe.getData(), "V");
+//          Plotter.plot(nProbe.getData(), "N");
+//          Plotter.plot(iProbe.getData(), "I");
+            Plotter.plot(rProbe.getData(), "Rate");
+
+        } catch (StructuralException e) {
+            e.printStackTrace();
+        } catch (SimulationException e) {
+            e.printStackTrace();
+        }
+    }
 }
