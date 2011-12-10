@@ -1,27 +1,27 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "SkeletalMuscleImpl.java". Description: 
+The Original Code is "SkeletalMuscleImpl.java". Description:
 "Basic SkeletalMuscle implementation with unspecified activation-force dynamics.
-  
+
   TODO: origins (need spindle and GTO implementations)
-  
+
   @author Bryan Tripp"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -56,15 +56,15 @@ import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
  * Basic SkeletalMuscle implementation with unspecified activation-force dynamics.
- * 
+ *
  * TODO: origins (need spindle and GTO implementations)
- * 
+ *
  * @author Bryan Tripp
  */
 public class SkeletalMuscleImpl implements SkeletalMuscle {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String myName;
 	private BasicTermination myTermination;
 	private DynamicalSystem myEADynamics; //excitation-activation dynamics
@@ -73,22 +73,31 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	private float myLength;
 	private String myDocumentation;
 	private transient List<Listener> myListeners;
-	
+
 	private TimeSeries myActivationHistory; //saved for single timestep to support Probeable
 	private TimeSeries myForceHistory;
 	private TimeSeries myLengthHistory;
-	
+
+	/**
+	 * @param name Muscle name
+	 * @param dynamics Dynamics for the muscle
+	 * @throws StructuralException if dimensionality isn't 2 in, 1 out
+	 */
 	public SkeletalMuscleImpl(String name, DynamicalSystem dynamics) throws StructuralException {
 		myName = name;
 		myTermination = makeTermination();
-		
-		if (dynamics.getInputDimension() != 2) throw new StructuralException("Input dimension of dynamics must be 2 (activation; length)");
-		if (dynamics.getOutputDimension() != 1) throw new StructuralException("Output dimension of dynamics must be 1 (force)");
+
+		if (dynamics.getInputDimension() != 2) {
+            throw new StructuralException("Input dimension of dynamics must be 2 (activation; length)");
+        }
+		if (dynamics.getOutputDimension() != 1) {
+            throw new StructuralException("Output dimension of dynamics must be 1 (force)");
+        }
 		myAFDynamics = dynamics;
-		
-		myIntegrator = new RK45Integrator();		
+
+		myIntegrator = new RK45Integrator();
 	}
-	
+
 	private BasicTermination makeTermination() {
 		Units[] units = Units.uniform(Units.UNK, 1);
 		DynamicalSystem myEADynamics = new SimpleLTISystem(new float[]{-1f/.005f}, MU.I(1), MU.I(1), new float[1], units) {
@@ -102,7 +111,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 		};
 		return new BasicTermination(this, myEADynamics, new EulerIntegrator(.001f), SkeletalMuscle.EXCITATION_TERMINATION);
 	}
-	
+
 	/**
 	 * @see ca.nengo.model.Node#getMode()
 	 */
@@ -125,8 +134,8 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	}
 
 	/**
-	 * @param name The new name (must be unique within any networks of which this Node 
-	 * 		will be a part) 
+	 * @param name The new name (must be unique within any networks of which this Node
+	 * 		will be a part)
 	 */
 	public void setName(String name) throws StructuralException {
 		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
@@ -174,12 +183,12 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 		myTermination.run(startTime, endTime);
 		myActivationHistory = myTermination.getOutput();
 		myLengthHistory = new TimeSeries1DImpl(new float[]{startTime}, new float[]{myLength}, Units.M);
-		
+
 		float[][] activation = myActivationHistory.getValues();
 		float[][] input = new float[activation.length][];
-		for (int i = 0; i < input.length; i++) {
-			
-		}
+//		for (float[] element : input) {
+//
+//		}
 		myForceHistory = myIntegrator.integrate(myAFDynamics, new TimeSeriesImpl(myActivationHistory.getTimes(), input, new Units[]{Units.UNK, Units.M}));
 	}
 
@@ -212,7 +221,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		TimeSeries result = null;
-		
+
 		if (stateName.equals(SkeletalMuscle.ACTIVATION)) {
 			result = myActivationHistory;
 		} else if (stateName.equals(SkeletalMuscle.FORCE)) {
@@ -220,7 +229,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 		} else if (stateName.equals(SkeletalMuscle.LENGTH)) {
 			result = myLengthHistory;
 		}
-		
+
 		return result;
 	}
 
@@ -229,11 +238,11 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	 */
 	public Properties listStates() {
 		Properties result = new Properties();
-		
+
 		result.setProperty(SkeletalMuscle.ACTIVATION, "Muscle activation level (0 to 1)");
 		result.setProperty(SkeletalMuscle.FORCE, "Tension in muscle (N)");
 		result.setProperty(SkeletalMuscle.LENGTH, "Muscle length (m)");
-		
+
 		return result;
 	}
 
