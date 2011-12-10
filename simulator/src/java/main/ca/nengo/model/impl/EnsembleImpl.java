@@ -64,16 +64,20 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	/**
 	 * @param name Name of Ensemble
 	 * @param nodes Nodes that make up the Ensemble
-	 * @throws StructuralException if the given Nodes contain Terminations with the same
-	 * 		name but different dimensions
 	 */
-	public EnsembleImpl(String name, Node[] nodes) throws StructuralException {
+	public EnsembleImpl(String name, Node[] nodes) {
 		super(name, nodes);
 
 		myExpandableNodes = findExpandable(nodes);
 		myExpandedTerminations = new LinkedHashMap<String, Termination>(10);
 	}
 
+	/**
+	 * @param name Name of Ensemble
+	 * @param factory Factory class that will create nodes
+	 * @param n Number of nodes to create
+	 * @throws StructuralException if any problem halts construction
+	 */
 	public EnsembleImpl(String name, NodeFactory factory, int n) throws StructuralException {
 		super(name, make(factory, n));
 
@@ -119,10 +123,10 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	public Termination[] getTerminations() {
 		ArrayList<Termination> result = new ArrayList<Termination>(10);
 		result.addAll(myExpandedTerminations.values());
-		
+
 		Termination[] composites = super.getTerminations();
-		for (int i = 0; i < composites.length; i++) {
-			result.add(composites[i]);
+		for (Termination composite : composites) {
+			result.add(composite);
 		}
 
 		return result.toArray(new Termination[0]);
@@ -170,7 +174,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	}
 
 	/**
-	 * @throws StructuralException
+	 * @throws StructuralException if Termination does not exist
 	 * @see ca.nengo.model.ExpandableNode#removeTermination(java.lang.String)
 	 */
 	@Override
@@ -205,7 +209,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 		//the nodes have been cloned, this includes any "expanded terminations" created
 		//on this EnsembleImpl. We now move these terminations from AbstractEnsemble
 		//EnsembleImpl, where they belong ...
-        
+
 		result.myExpandedTerminations = new LinkedHashMap<String, Termination>(10);
 
 		for (String key : myExpandedTerminations.keySet()) {

@@ -1,27 +1,27 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "PassthroughNode.java". Description: 
+The Original Code is "PassthroughNode.java". Description:
 "A Node that passes values through unaltered.
-  
-  This can be useful if an input to a Network is actually routed to multiple destinations, 
-  but you want to handle this connectivity within the Network rather than expose multiple 
+
+  This can be useful if an input to a Network is actually routed to multiple destinations,
+  but you want to handle this connectivity within the Network rather than expose multiple
   terminations"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -55,24 +55,32 @@ import ca.nengo.util.VisiblyMutableUtils;
 
 /**
  * <p>A Node that passes values through unaltered.</p>
- * 
- * <p>This can be useful if an input to a Network is actually routed to multiple destinations, 
- * but you want to handle this connectivity within the Network rather than expose multiple 
- * terminations.</p>  
- * 
+ *
+ * <p>This can be useful if an input to a Network is actually routed to multiple destinations,
+ * but you want to handle this connectivity within the Network rather than expose multiple
+ * terminations.</p>
+ *
  * @author Bryan Tripp
  */
 public class PassthroughNode implements Node {
-	
-	//implementation note: this class doesn't nicely extend AbstractNode 
-	
+
+	//implementation note: this class doesn't nicely extend AbstractNode
+
 	private static Logger ourLogger = Logger.getLogger(PassthroughNode.class);
 
+	/**
+	 * Default name for a termination
+	 */
 	public static final String TERMINATION = "termination";
+
+
+	/**
+	 * Default name for an origin
+	 */
 	public static final String ORIGIN = "origin";
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private String myName;
 	private int myDimension; //TODO: clean this up (can be obtained from transform)
 	private Map<String, PassthroughTermination> myTerminations;
@@ -81,10 +89,10 @@ public class PassthroughNode implements Node {
 	private transient List<VisiblyMutable.Listener> myListeners;
 
 	/**
-	 * Constructor for a simple passthrough with single input. 
-	 * 
+	 * Constructor for a simple passthrough with single input.
+	 *
 	 * @param name Node name
-	 * @param dimension Dimension of data passing through 
+	 * @param dimension Dimension of data passing through
 	 */
 	public PassthroughNode(String name, int dimension) {
 		myName = name;
@@ -94,30 +102,30 @@ public class PassthroughNode implements Node {
 		myOrigin = new BasicOrigin(this, ORIGIN, dimension, Units.UNK);
 		reset(false);
 	}
-	
+
 	/**
 	 * Constructor for a summing junction with multiple inputs.
-	 *  
+	 *
 	 * @param name Node name
-	 * @param dimension Dimension of data passing through 
-	 * @param termDefinitions Name of each Termination (TERMINATION is used for the single-input case) 
-	 * 		and associated transform 
+	 * @param dimension Dimension of data passing through
+	 * @param termDefinitions Name of each Termination (TERMINATION is used for the single-input case)
+	 * 		and associated transform
 	 */
 	public PassthroughNode(String name, int dimension, Map<String, float[][]> termDefinitions) {
 		myName = name;
 		myDimension = dimension;
 		myTerminations = new HashMap<String, PassthroughTermination>(10);
-		
+
 		Iterator<String> it = termDefinitions.keySet().iterator();
 		while (it.hasNext()) {
 			String termName = it.next();
 			float[][] termTransform = termDefinitions.get(termName);
-			myTerminations.put(termName, new PassthroughTermination(this, termName, dimension, termTransform));			
+			myTerminations.put(termName, new PassthroughTermination(this, termName, dimension, termTransform));
 		}
 		myOrigin = new BasicOrigin(this, ORIGIN, dimension, Units.UNK);
 		reset(false);
 	}
-	
+
 	/**
 	 * @see ca.nengo.model.Node#getName()
 	 */
@@ -154,7 +162,7 @@ public class PassthroughNode implements Node {
 	/**
 	 * @see ca.nengo.model.Node#getTermination(java.lang.String)
 	 */
-	public Termination getTermination(String name) throws StructuralException {		
+	public Termination getTermination(String name) throws StructuralException {
 		if (myTerminations.containsKey(name)) {
 			return myTerminations.get(name);
 		} else {
@@ -174,19 +182,21 @@ public class PassthroughNode implements Node {
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
 		if (myTerminations.size() == 1) {
-			myOrigin.setValues(myTerminations.values().iterator().next().getValues());			
+			myOrigin.setValues(myTerminations.values().iterator().next().getValues());
 		} else {
 			float[] values = new float[myDimension];
 			Iterator<PassthroughTermination> it = myTerminations.values().iterator();
 			while (it.hasNext()) {
 				PassthroughTermination termination = it.next();
-				InstantaneousOutput io = termination.getValues();				
+				InstantaneousOutput io = termination.getValues();
 				if (io instanceof RealOutput) {
-					values = MU.sum(values, ((RealOutput) io).getValues());					
+					values = MU.sum(values, ((RealOutput) io).getValues());
 				} else if (io instanceof SpikeOutput) {
 					boolean[] spikes = ((SpikeOutput) io).getValues();
 					for (int i = 0; i < spikes.length; i++) {
-						if (spikes[i]) values[i] += 1f/(endTime - startTime); 
+						if (spikes[i]) {
+                            values[i] += 1f/(endTime - startTime);
+                        }
 					}
 				} else if (io == null) {
 					throw new SimulationException("Null input to Termination " + termination.getName());
@@ -202,9 +212,11 @@ public class PassthroughNode implements Node {
 	 * @see ca.nengo.model.Resettable#reset(boolean)
 	 */
 	public void reset(boolean randomize) {
-		float time = 0; 
+		float time = 0;
 		try {
-			if (myOrigin.getValues() != null) myOrigin.getValues().getTime();
+			if (myOrigin.getValues() != null) {
+                myOrigin.getValues().getTime();
+            }
 		} catch (SimulationException e) {
 			ourLogger.warn("Exception getting time from existing output during reset", e);
 		}
@@ -220,13 +232,13 @@ public class PassthroughNode implements Node {
 	}
 
 	/**
-	 * Does nothing (only DEFAULT mode is supported). 
-	 * 
+	 * Does nothing (only DEFAULT mode is supported).
+	 *
 	 * @see ca.nengo.model.SimulationMode.ModeConfigurable#setMode(ca.nengo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
 	}
-	
+
 	/**
 	 * @see ca.nengo.model.Node#getDocumentation()
 	 */
@@ -269,39 +281,53 @@ public class PassthroughNode implements Node {
 		} catch (SimulationException e) {
 			throw new CloneNotSupportedException("Problem copying origin values: " + e.getMessage());
 		}
-		
+
 		result.myTerminations = new HashMap<String, PassthroughTermination>(10);
 		for (PassthroughTermination oldTerm : myTerminations.values()) {
-			PassthroughTermination newTerm = new PassthroughTermination(result, oldTerm.getName(), 
+			PassthroughTermination newTerm = new PassthroughTermination(result, oldTerm.getName(),
 					oldTerm.getDimensions(), MU.clone(oldTerm.getTransform()));
 			result.myTerminations.put(newTerm.getName(), newTerm);
 		}
-		
+
 		result.myListeners = new ArrayList<Listener>(5);
-		
+
 		return result;
 	}
 
+	/**
+	 * Termination that receives input unaltered.
+	 */
 	public static class PassthroughTermination implements Termination {
-		
+
 		private static final long serialVersionUID = 1L;
-		
+
 		private Node myNode;
 		private String myName;
 		private int myDimension;
 		private float[][] myTransform;
 		private InstantaneousOutput myValues;
-		
+
+		/**
+		 * @param node Parent node
+		 * @param name Termination name
+		 * @param dimension Dimensionality of input
+		 */
 		public PassthroughTermination(Node node, String name, int dimension) {
 			myNode = node;
 			myName = name;
 			myDimension = dimension;
 		}
-		
+
+		/**
+		 * @param node Parent node
+		 * @param name Termination name
+		 * @param dimension Dimensionality of input
+		 * @param transform Transformation matrix
+		 */
 		public PassthroughTermination(Node node, String name, int dimension, float[][] transform) {
 			assert MU.isMatrix(transform);
 			assert dimension == transform.length;
-			
+
 			myNode = node;
 			myName = name;
 			myDimension = transform[0].length;
@@ -320,7 +346,7 @@ public class PassthroughNode implements Node {
 			if (values.getDimension() != myDimension) {
 				throw new SimulationException("Input is wrong dimension (expected " + myDimension + " got " + values.getDimension() + ")");
 			}
-			
+
 			if (myTransform != null) {
 				if (values instanceof RealOutput) {
 					float[] transformed = MU.prod(myTransform, ((RealOutput) values).getValues());
@@ -329,21 +355,24 @@ public class PassthroughNode implements Node {
 					throw new SimulationException("Transforms can only be performed on RealOutput in a PassthroughNode");
 				}
 			}
-			
+
 			myValues = values;
 		}
-		
+
+		/**
+		 * @return Values currently stored in termination
+		 */
 		public InstantaneousOutput getValues() {
 			return myValues;
-		}
-
-		public void propertyChange(String propertyName, Object newValue) throws StructuralException {
 		}
 
 		public Node getNode() {
 			return myNode;
 		}
-		
+
+		/**
+		 * @return Transformation matrix
+		 */
 		public float[][] getTransform() {
 			return myTransform;
 		}
@@ -377,7 +406,7 @@ public class PassthroughNode implements Node {
 			result.myValues = myValues.clone();
 			return result;
 		}
-		
+
 	}
 
 }

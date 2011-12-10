@@ -1,23 +1,23 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "SpikingNeuron.java". Description: 
+The Original Code is "SpikingNeuron.java". Description:
 "A neuron model composed of a SynapticIntegrator and a SpikeGenerator"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -54,19 +54,19 @@ import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 
 /**
- * A neuron model composed of a SynapticIntegrator and a SpikeGenerator.  
- * 
+ * A neuron model composed of a SynapticIntegrator and a SpikeGenerator.
+ *
  * @author Bryan Tripp
  */
 public class SpikingNeuron implements Neuron, Probeable, NEFNode {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
-	 * Name of Origin representing unscaled and unbiased current entering the soma.   
+	 * Name of Origin representing unscaled and unbiased current entering the soma.
 	 */
 	public static final String CURRENT = "current";
-	
+
 	private SynapticIntegrator myIntegrator;
 	private SpikeGenerator myGenerator;
 	private SpikeGeneratorOrigin mySpikeOrigin;
@@ -81,30 +81,30 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	private transient List<VisiblyMutable.Listener> myListeners;
 	private Noise myNoise = null;
 
-	
+
 	/**
 	 * Note: current = scale * (weighted sum of inputs at each termination) * (radial input) + bias.
-	 * 
+	 *
 	 * @param integrator SynapticIntegrator used to model dendritic/somatic integration of inputs
 	 * 		to this Neuron
-	 * @param generator SpikeGenerator used to model spike generation at the axon hillock of this 
+	 * @param generator SpikeGenerator used to model spike generation at the axon hillock of this
 	 * 		Neuron
-	 * @param scale A coefficient that scales summed input    
-	 * @param bias A bias current that models unaccounted-for inputs and/or intrinsic currents 
-	 * @param name A unique name for this neuron in the context of the Network or Ensemble to which 
+	 * @param scale A coefficient that scales summed input
+	 * @param bias A bias current that models unaccounted-for inputs and/or intrinsic currents
+	 * @param name A unique name for this neuron in the context of the Network or Ensemble to which
 	 * 		it belongs
 	 */
 	public SpikingNeuron(SynapticIntegrator integrator, SpikeGenerator generator, float scale, float bias, String name) {
 		if (integrator == null) {
 			integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
-		}		
+		}
 		setIntegrator(integrator);
-		
+
 		if (generator == null) {
 			generator = new LIFSpikeGenerator(.001f, .02f, .002f);
 		}
 		setGenerator(generator);
-		
+
 		myCurrentOrigin = new BasicOrigin(this, CURRENT, 1, Units.ACU);
 		myCurrentOrigin.setValues(0, 0, new float[]{0});
 		myName = name;
@@ -120,7 +120,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public void run(float startTime, float endTime) throws SimulationException {
 		//TODO: this method could use some cleanup and optimization
 		TimeSeries1D current = myIntegrator.run(startTime, endTime);
-		
+
 		float[] integratorOutput = current.getValues1D();
 		float[] generatorInput = new float[integratorOutput.length];
 		for (int i = 0; i < integratorOutput.length; i++) {
@@ -130,9 +130,9 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 				generatorInput[i] = myNoise.getValue(startTime, endTime, generatorInput[i]);
 			}
 		}
-		
+
 		myCurrent = new TimeSeries1DImpl(current.getTimes(), generatorInput, Units.UNK);
-		
+
 		mySpikeOrigin.run(myCurrent.getTimes(), generatorInput);
 		myCurrentOrigin.setValues(startTime, endTime, new float[]{myUnscaledCurrent});
 	}
@@ -151,7 +151,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 //		assert (name.equals(Neuron.AXON) || name.equals(CURRENT)); //this is going to be called a lot, so let's skip the exception
 		//Shu: I added the exception back in because the UI needs it for reflection.
 		if (name.equals(Neuron.AXON)) {
-			return mySpikeOrigin;			
+			return mySpikeOrigin;
 		} else if (name.equals(CURRENT)){
 			return myCurrentOrigin;
 		} else {
@@ -181,19 +181,21 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		myIntegrator.reset(randomize);
 		myGenerator.reset(randomize);
 		myCurrentOrigin.reset(randomize);
-		if (myNoise != null) myNoise.reset(randomize);
+		if (myNoise != null) {
+            myNoise.reset(randomize);
+        }
 	}
 
 	/**
-	 * Available states include "I" (net current into SpikeGenerator) and the states of the 
-	 * SpikeGenerator. 
-	 * 
+	 * Available states include "I" (net current into SpikeGenerator) and the states of the
+	 * SpikeGenerator.
+	 *
 	 * @see ca.nengo.model.Probeable#getHistory(java.lang.String)
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
 		TimeSeries result = null;
 		if (stateName.equals("I")) {
-			result = myCurrent; 
+			result = myCurrent;
 		} else if (stateName.equals("rate")) {
 			InstantaneousOutput output = mySpikeOrigin.getValues();
 			float[] times = myCurrent.getTimes();
@@ -203,7 +205,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 			} else if (output instanceof SpikeOutput) {
 				rate = ((SpikeOutput) output).getValues()[0] ? 1/(times[times.length-1]-times[0]) : 0;
 			}
-			result = new TimeSeries1DImpl(new float[]{times[times.length-1]}, new float[]{rate}, Units.SPIKES_PER_S);				
+			result = new TimeSeries1DImpl(new float[]{times[times.length-1]}, new float[]{rate}, Units.SPIKES_PER_S);
 		} else if (stateName.equals(CURRENT)) {
 			float[] times = myCurrent.getTimes();
 			result = new TimeSeries1DImpl(new float[]{times[times.length-1]}, new float[]{myUnscaledCurrent}, Units.ACU);
@@ -231,7 +233,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public String getName() {
 		return myName;
 	}
-	
+
 	/**
 	 * @param name The new name
 	 */
@@ -241,12 +243,12 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	}
 
 	/**
-	 * @return The coefficient that scales summed input    
+	 * @return The coefficient that scales summed input
 	 */
 	public float getScale() {
 		return myScale;
 	}
-	
+
 	/**
 	 * @param scale New scaling coefficient
 	 */
@@ -255,7 +257,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	}
 
 	/**
-	 * @return The bias current that models unaccounted-for inputs and/or intrinsic currents 
+	 * @return The bias current that models unaccounted-for inputs and/or intrinsic currents
 	 */
 	public float getBias() {
 		return myBias;
@@ -267,7 +269,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public void setBias(float bias) {
 		myBias = bias;
 	}
-	
+
 	/**
 	 * @return The SynapticIntegrator used to model dendritic/somatic integration of inputs
 	 * 		to this Neuron
@@ -275,17 +277,17 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public SynapticIntegrator getIntegrator() {
 		return myIntegrator;
 	}
-	
+
 	/**
 	 * @param integrator New synaptic integrator
 	 */
-	public void setIntegrator(SynapticIntegrator integrator) {		
+	public void setIntegrator(SynapticIntegrator integrator) {
 		myIntegrator = integrator;
-		myIntegrator.setNode(this);		
+		myIntegrator.setNode(this);
 	}
 
 	/**
-	 * @return The SpikeGenerator used to model spike generation at the axon hillock of this 
+	 * @return The SpikeGenerator used to model spike generation at the axon hillock of this
 	 * 		Neuron
 	 */
 	public SpikeGenerator getGenerator() {
@@ -293,13 +295,13 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	}
 
 	/**
-	 * @param generator New SpikeGenerator 
+	 * @param generator New SpikeGenerator
 	 */
 	public void setGenerator(SpikeGenerator generator) {
 		myGenerator = generator;
 		mySpikeOrigin = new SpikeGeneratorOrigin(this, generator);
 	}
-	
+
 	/**
 	 * @see ca.nengo.model.Node#getTerminations()
 	 */
@@ -356,29 +358,37 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public SpikingNeuron clone() throws CloneNotSupportedException {
 		SpikingNeuron result = (SpikingNeuron) super.clone();
 		result.myCurrent = (TimeSeries1D) myCurrent.clone();
-		
+
 		result.myCurrentOrigin = (BasicOrigin) myCurrentOrigin.clone();
-		result.myCurrentOrigin.setNode(result);
-			
+
 		result.myGenerator = myGenerator.clone();
-		
+
 		result.myIntegrator = myIntegrator.clone();
 		result.myIntegrator.setNode(result);
-		
+
 		result.myListeners = new ArrayList<Listener>(5);
 		result.mySpikeOrigin = new SpikeGeneratorOrigin(result, result.myGenerator);
 
-		if (myNoise!=null) result.setNoise(myNoise.clone());
-		
+		if (myNoise!=null) {
+            result.setNoise(myNoise.clone());
+        }
+
 		return result;
 	}
 
+	/**
+	 * @param noise Noise object to apply to this neuron
+	 */
 	public void setNoise(Noise noise) {
 		myNoise = noise;
 	}
+
+	/**
+	 * @return Noise object applied to this neuron
+	 */
 	public Noise getNoise() {
 		return myNoise;
 	}
-	
-	
+
+
 }

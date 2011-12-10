@@ -1,26 +1,26 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "BasicTermination.java". Description: 
-"A basic implementation of Termination with configurable dynamics and no special 
+The Original Code is "BasicTermination.java". Description:
+"A basic implementation of Termination with configurable dynamics and no special
   integrative features.
-     
+
   @author Bryan Tripp"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
 */
@@ -49,25 +49,31 @@ import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
- * A basic implementation of Termination with configurable dynamics and no special 
+ * A basic implementation of Termination with configurable dynamics and no special
  * integrative features.
- *    
+ *
  * @author Bryan Tripp
  */
 public class BasicTermination implements Termination, Resettable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static Logger ourLogger = Logger.getLogger(BasicTermination.class);
-	
+
 	private Node myNode;
 	private DynamicalSystem myDynamics;
 	private Integrator myIntegrator;
 	private String myName;
 	private InstantaneousOutput myInput;
-	public TimeSeries myOutput;
-	public boolean myModulatory;
-	
+	private TimeSeries myOutput;
+	private boolean myModulatory;
+
+	/**
+	 * @param node Node that owns this termination
+	 * @param dynamics Dynamical System that defines the dynamics
+	 * @param integrator Integrator for the DS
+	 * @param name Name of the termination
+	 */
 	public BasicTermination(Node node, DynamicalSystem dynamics, Integrator integrator, String name) {
 		myNode = node;
 		myDynamics = dynamics;
@@ -75,7 +81,7 @@ public class BasicTermination implements Termination, Resettable {
 		myName = name;
 		myModulatory = false;
 	}
-	
+
 	/**
 	 * @see ca.nengo.model.Termination#getDimensions()
 	 */
@@ -96,14 +102,14 @@ public class BasicTermination implements Termination, Resettable {
 	public void setValues(InstantaneousOutput values) throws SimulationException {
 		myInput = values;
 	}
-	
+
 	/**
-	 * Runs the Termination, making a TimeSeries of output from this Termination 
-	 * available from getOutput().     
-	 * 
+	 * Runs the Termination, making a TimeSeries of output from this Termination
+	 * available from getOutput().
+	 *
 	 * @param startTime simulation time at which running starts (s)
 	 * @param endTime simulation time at which running ends (s)
-	 * @throws SimulationException if a problem is encountered while trying to run 
+	 * @throws SimulationException if a problem is encountered while trying to run
 	 */
 	public void run(float startTime, float endTime) throws SimulationException {
 		float[] input = null;
@@ -114,18 +120,20 @@ public class BasicTermination implements Termination, Resettable {
 			input = new float[spikes.length];
 			float amplitude = 1f / (endTime - startTime);
 			for (int i = 0; i < spikes.length; i++) {
-				if (spikes[i]) input[i] = amplitude;
+				if (spikes[i]) {
+                    input[i] = amplitude;
+                }
 			}
 		}
-		
-		TimeSeries inSeries = new TimeSeriesImpl(new float[]{startTime, endTime}, new float[][]{input, input}, Units.uniform(Units.UNK, input.length)); 
+
+		TimeSeries inSeries = new TimeSeriesImpl(new float[]{startTime, endTime}, new float[][]{input, input}, Units.uniform(Units.UNK, input.length));
 		myOutput = myIntegrator.integrate(myDynamics, inSeries);
 	}
 
 	/**
-	 * Note: typically called by the Node to which the Termination belongs. 
-	 *  
-	 * @return The most recent input multiplied  
+	 * Note: typically called by the Node to which the Termination belongs.
+	 *
+	 * @return The most recent input multiplied
 	 */
 	public TimeSeries getOutput() {
 		return myOutput;
@@ -176,7 +184,7 @@ public class BasicTermination implements Termination, Resettable {
 	 */
 	public void setTau(float tau) throws StructuralException {
 		if (myDynamics instanceof LTISystem) {
-			CanonicalModel.changeTimeConstant((LTISystem) myDynamics, tau);	
+			CanonicalModel.changeTimeConstant((LTISystem) myDynamics, tau);
 		} else {
 			throw new StructuralException("Can't set time constant of non-LTI dynamics");
 		}
