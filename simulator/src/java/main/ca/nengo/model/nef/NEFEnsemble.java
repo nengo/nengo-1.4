@@ -79,6 +79,7 @@ public interface NEFEnsemble extends DecodableEnsemble {
 	 * 		All functions must have an input dimension equal to the dimension of this NEFEnsemble.
 	 * @param nodeOrigin Name of the Node-level Origins from which this Ensemble-level Origin is derived
 	 * 		(often Neuron.AXON)
+	 * @return The added Origin
 	 * @throws StructuralException if functions do not all have the same input dimension as the
 	 * 		dimension of this ensemble
 	 */
@@ -129,6 +130,7 @@ public interface NEFEnsemble extends DecodableEnsemble {
 	 * @param tfNumerator Coefficients of transfer function numerator (see CanonicalModel.getRealization(...)
 	 * 		for details)
 	 * @param tfDenominator Coefficients of transfer function denominator
+	 * @param passthrough How much should passthrough...?
 	 * @param isModulatory If true, inputs to this Termination do not drive Nodes in the Ensemble directly
 	 * 		but may have modulatory influences (eg related to plasticity). If false, the transformation matrix
 	 * 		output dimension must match the dimension of this Ensemble.
@@ -150,23 +152,34 @@ public interface NEFEnsemble extends DecodableEnsemble {
 	 * @param functionDecoders The decoding vectors of the BiasOrigin's associated base origin
 	 * @return A pair of BiasTerminations: the first is to receive direct input from a BiasOrigin and the second is to receive input from
 	 * 		the interneuron ensemble associated with the BiasOrigin (see BiasOrigin.getInterneurons())
-	 * @throws StructuralException
+	 * @throws StructuralException if can't be added
 	 */
 	public BiasTermination[] addBiasTerminations(DecodedTermination baseTermination,
 			float interneuronTauPSC, float[][] biasDecoder, float[][] functionDecoders) throws StructuralException;
 
 	/**
 	 * Gives the ensemble a reference to the factory used to created it (useful for adding more neurons later)
-	 * @param factory
+	 *
+	 * @param factory Factory that created the ensemble
 	 */
 
 	public void setEnsembleFactory(NEFEnsembleFactory factory);
+
+	/**
+	 * @return Factory that created the ensemble
+	 */
 	public NEFEnsembleFactory getEnsembleFactory();
 
 	/**
-	 * For changing the number of neurons in the ensemble
+	 * @return Current number of neurons
 	 */
+
 	public int getNodeCount();
+
+	/**
+	 * @param value number of desired neurons
+	 * @throws StructuralException if we can't add them or there is no factory
+	 */
 	public void setNodeCount(int value) throws StructuralException;
 
 	/**

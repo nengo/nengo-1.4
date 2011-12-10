@@ -66,7 +66,7 @@ public interface DecodableEnsemble extends PlasticEnsemble, Probeable {
 	 * @param environment A Network in which the Ensemble runs (may include inputs, feedback, etc)
 	 * @param probe A Probe that is connected to the named Node-level Origin
 	 * @param startTime Simulation time at which to start
-	 * @param endTime Simulation time at which to start
+	 * @param endTime Simulation time at which to finish
 	 * @return An Origin that approximates the given Functions as a linear combination of output from the given
 	 * 		nodeOrigin
 	 * @throws StructuralException May arise in instantiating the Origin
@@ -107,11 +107,15 @@ public interface DecodableEnsemble extends PlasticEnsemble, Probeable {
 
 	/**
 	 * @param name Name of an existing decoding to remove
+	 * @return The removed DecodedOrigin
+	 * @throws StructuralException if DecodedOrigin doesn't exist
 	 */
 	public DecodedOrigin removeDecodedOrigin(String name) throws StructuralException;
 
 	/**
      * @param name Name of an existing termination to remove
+	 * @return The removed DecodedTermination
+	 * @throws StructuralException if DecodedTermination doesn't exist
      */
     public DecodedTermination removeDecodedTermination(String name) throws StructuralException;
 

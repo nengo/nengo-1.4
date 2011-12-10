@@ -82,7 +82,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	 * @param name Name of the Ensemble
 	 * @param nodes Nodes that make up the Ensemble
 	 * @param factory Source of LinearApproximators to use in decoding output
-	 * @throws StructuralException
+	 * @throws StructuralException if super constructor fails
 	 */
 	public DecodableEnsembleImpl(String name, Node[] nodes, ApproximatorFactory factory) throws StructuralException {
 		super(name, nodes);
@@ -168,9 +168,21 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	}
 
 	/**
-	 * @see ca.nengo.model.nef.DecodableEnsemble#addDecodedOrigin(java.lang.String, ca.nengo.math.Function[], java.lang.String, ca.nengo.model.Network, ca.nengo.util.Probe, float, float, float)
+	 * Lloyd Elliot's decodable origin for decoding band-limited noise using a psc optimized decoder
 	 *
-	 *  Lloyd Elliot's decodable origin for decoding band-limited noise using a psc optimized decoder
+	 * @param name Name of decoding
+	 * @param functions 1D Functions of time which represent the meaning of the Ensemble output when it runs
+     *      in the Network provided (see environment arg)
+	 * @param nodeOrigin The name of the Node-level Origin to decode
+	 * @param environment A Network in which the Ensemble runs (may include inputs, feedback, etc)
+	 * @param probe A Probe that is connected to the named Node-level Origin
+	 * @param state Another probe?
+	 * @param startTime Simulation time at which to start
+	 * @param endTime Simulation time at which to finish
+	 * @param tau Time constant
+	 * @return The added Origin
+	 * @throws StructuralException if origin name is taken
+	 * @throws SimulationException if environment can't run
 	 */
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, Network environment,
 			Probe probe, Probe state, float startTime, float endTime, float tau) throws StructuralException, SimulationException {
@@ -185,17 +197,11 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 
 		float [][]values;
 		float []time;
-//		if(true)
-//		{
-			TimeSeries filtered = DataUtils.filter(probe.getData(),tau);
-			values = filtered.getValues();
-			time = filtered.getTimes();
-//		}
-//		else
-//		{
-//			values = probe.getData().getValues();
-//			time = probe.getData().getTimes();
-//		}
+
+		TimeSeries filtered = DataUtils.filter(probe.getData(),tau);
+		values = filtered.getValues();
+		time = filtered.getTimes();
+
 		int t0 = (int)(Math.ceil(time.length/2d));
 		int t1 = time.length;
 		int k;
@@ -232,6 +238,20 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	}
 
     /**
+     * @param name Unique name for this Termination (in the scope of this Ensemble)
+     * @param matrix Transformation matrix which defines a linear map on incoming information,
+     *      onto the space of vectors that can be represented by this NEFEnsemble. The first dimension
+     *      is taken as matrix rows, and must have the same length as the Origin that will be connected
+     *      to this Termination. The second dimension is taken as matrix columns, and must have the same
+     *      length as the encoders of this NEFEnsemble. TODO: this is transposed?
+     * @param tauPSC Time constant of post-synaptic current decay (all Terminations have
+     *      this property but it may have slightly different interpretations depending other properties
+     *      of the Termination).
+     * @param isModulatory If true, inputs to this Termination do not drive Nodes in the Ensemble directly
+     *      but may have modulatory influences (eg related to plasticity). If false, the transformation matrix
+     *      output dimension must match the dimension of this Ensemble.
+     * @return Added Termination
+     * @throws StructuralException if termination name is taken
      * @see ca.nengo.model.nef.NEFEnsemble#addDecodedTermination(java.lang.String, float[][], float, boolean)
      */
     public Termination addDecodedTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory)
@@ -265,10 +285,28 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
     }
 
     /**
+     * @param name Unique name for this Termination (in the scope of this Ensemble)
+     * @param matrix Transformation matrix which defines a linear map on incoming information,
+     *      onto the space of vectors that can be represented by this NEFEnsemble. The first dimension
+     *      is taken as matrix rows, and must have the same length as the Origin that will be connected
+     *      to this Termination. The second dimension is taken as matrix columns, and must have the same
+     *      length as the encoders of this NEFEnsemble. TODO: this is transposed?
+     * @param tfNumerator Coefficients of transfer function numerator (see CanonicalModel.getRealization(...)
+     *      for details)
+     * @param tfDenominator Coefficients of transfer function denominator
+     * @param passthrough How much should pass through?
+     * @param isModulatory Is the termination modulatory?
+     * @return The added Termination
+     * @throws StructuralException if termination name is taken
      * @see ca.nengo.model.nef.NEFEnsemble#addDecodedTermination(java.lang.String, float[][], float[], float[], float, boolean)
      */
     public Termination addDecodedTermination(String name, float[][] matrix, float[] tfNumerator, float[] tfDenominator,
             float passthrough, boolean isModulatory) throws StructuralException {
+
+        // TODO Should this also check non-decoded terminations?
+        if (myDecodedTerminations.containsKey(name)) {
+            throw new StructuralException("The ensemble already contains a termination named " + name);
+        }
 
         LTISystem dynamics = CanonicalModel.getRealization(tfNumerator, tfDenominator, passthrough);
 
@@ -325,6 +363,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 
     /**
      * Used to get decoded terminations to give to GPU.
+     * @return all DecodedTerminations
      */
     public DecodedTermination[] getDecodedTerminations(){
         return myDecodedTerminations.values().toArray(new DecodedTermination[0]);
@@ -363,8 +402,8 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
     public Origin[] getOrigins() {
         ArrayList<Origin> result = new ArrayList<Origin>(10);
         Origin[] composites = super.getOrigins();
-        for (int i = 0; i < composites.length; i++) {
-            result.add(composites[i]);
+        for (Origin composite : composites) {
+            result.add(composite);
         }
 
         // getOrigins is called by NEFEnsembleImpl in the constructor
@@ -381,6 +420,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 
     /**
      * Used to get decoded origins to give to GPU.
+     * @return All DecodedOrigins
      */
     public DecodedOrigin[] getDecodedOrigins(){
         ArrayList<DecodedOrigin> result = new ArrayList<DecodedOrigin>(10);
@@ -398,8 +438,8 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
     public Termination[] getTerminations() {
         ArrayList<Termination> result = new ArrayList<Termination>(10);
         Termination[] composites = super.getTerminations();
-        for (int i = 0; i < composites.length; i++) {
-            result.add(composites[i]);
+        for (Termination composite : composites) {
+            result.add(composite);
         }
 
         for (Termination t : myDecodedTerminations.values()) {

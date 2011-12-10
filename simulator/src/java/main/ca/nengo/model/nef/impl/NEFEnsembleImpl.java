@@ -79,7 +79,15 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Append to bias termination names
+	 */
 	public static String BIAS_SUFFIX = ":bias";
+
+
+	/**
+	 * Append to interneuron names
+	 */
 	public static String INTERNEURON_SUFFIX = ":interneuron";
 
 	private final int myDimension;
@@ -106,7 +114,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @param encoders List of encoding vectors (one for each node). All must have same length
 	 * @param factory Source of LinearApproximators to use in decoding output
 	 * @param evalPoints Vector inputs at which output is found to produce DecodedOrigins
-	 * @throws StructuralException if there	are a different number of Nodes than encoding vectors or if not
+	 * @param radii Radius for each dimension
+	 * @throws StructuralException if there are a different number of Nodes than encoding vectors or if not
 	 * 		all encoders have the same length
 	 */
 	public NEFEnsembleImpl(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory factory, float[][] evalPoints, float[] radii)
@@ -145,17 +154,24 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		return myRadii.clone();
 	}
 
-	public void setUseGPU(boolean val){
-		myUseGPU = val;
+	/**
+	 * @param use Use GPU?
+	 */
+	public void setUseGPU(boolean use) {
+		myUseGPU = use;
 	}
 
-	public boolean getUseGPU(){
+	/**
+	 * @return Using GPU?
+	 */
+	public boolean getUseGPU() {
 		return myUseGPU && getMode() == SimulationMode.DEFAULT;
 	}
 
 	/**
 	 * @param radii A list of radii of encoded area along each dimension; uniform
 	 * 		radius along each dimension can be specified with a list of length 1
+	 * @throws StructuralException if getConstantOutputs throws exception
 	 */
 	public void setRadii(float[] radii) throws StructuralException {
 
@@ -203,9 +219,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 		// update the decoders for any existing origins
 		Origin[] origins = getOrigins();
-		for (int i = 0; i < origins.length; i++) {
-			if (origins[i] instanceof DecodedOrigin) {
-				DecodedOrigin origin=((DecodedOrigin) origins[i]);
+		for (Origin origin2 : origins) {
+			if (origin2 instanceof DecodedOrigin) {
+				DecodedOrigin origin=((DecodedOrigin) origin2);
 				if (oldRadii!=null && origin.getName().equals(NEFEnsemble.X)) {
 					// Just rescale the X origin
 					float scale[]=new float[radii.length];
@@ -246,6 +262,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myEvalPoints = evalPoints;
 	}
 
+    /**
+     * @return a copy of the evaluation points
+     */
     public float[][] getEvalPoints(){
         return myEvalPoints.clone();
     }
@@ -264,14 +283,23 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myDirectModeDynamics = dynamics;
 	}
 
+	/**
+	 * @return Dynamics that apply in direct mode
+	 */
 	public DynamicalSystem getDirectModeDynamics() {
 		return myDirectModeDynamics;
 	}
 
+	/**
+	 * @return Integrator used in direct mode
+	 */
 	public Integrator getDirectModeIntegrator() {
 		return myDirectModeIntegrator;
 	}
 
+	/**
+	 * @param integrator Integrator to use in direct mode
+	 */
 	public void setDirectModeIntegrator(Integrator integrator) {
 		myDirectModeIntegrator = integrator;
 	}
@@ -435,8 +463,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	}
 
    /**
+     * @param name Unique name for the Termination (in the scope of this Node)
      * @param weights Each row is used as a 1 by m matrix of weights in a new termination on the nth expandable node
-     *
+     * @param tauPSC Time constant with which incoming signals are filtered. (All Terminations have
+     *      this property, but it may have slightly different interpretations per implementation.)
+     * @param modulatory If true, inputs to the Termination are not summed with other inputs (they
+     *      only have modulatory effects, eg on plasticity, which must be defined elsewhere).
+     * @return Termination that was added
+     * @throws StructuralException if weight matrix dimensionality is incorrect
      * @see ca.nengo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
      */
     public synchronized Termination addPESTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
@@ -560,9 +594,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 				//run terminations and sum state ...
 				DecodedTermination[] dts = super.getDecodedTerminations();
-				for (int i = 0; i < dts.length; i++) {
-					DecodedTermination t = dts[i];
-				    t.run(startTime, endTime);
+				for (DecodedTermination t : dts) {
+					t.run(startTime, endTime);
 					float[] output = t.getOutput();
 
 					boolean isModulatory = t.getModulatory();
@@ -593,9 +626,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 					}
 
 					Origin[] origins = getOrigins();
-					for (int i = 0; i < origins.length; i++) {
-						if (origins[i] instanceof DecodedOrigin) {
-							((DecodedOrigin) origins[i]).run(state, startTime, endTime);
+					for (Origin origin : origins) {
+						if (origin instanceof DecodedOrigin) {
+							((DecodedOrigin) origin).run(state, startTime, endTime);
 						}
 					}
 					setTime(endTime);
@@ -650,9 +683,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		super.setMode(mode);
 
 		Origin[] origins = getOrigins();
-		for (int i = 0; i < origins.length; i++) {
-			if (origins[i] instanceof DecodedOrigin) {
-				((DecodedOrigin) origins[i]).setMode(mode);
+		for (Origin origin : origins) {
+			if (origin instanceof DecodedOrigin) {
+				((DecodedOrigin) origin).setMode(mode);
 			}
 		}
 	}
@@ -682,16 +715,16 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		super.reset(randomize);
 
 		Termination[] terminations = getTerminations();
-		for (int i = 0; i < terminations.length; i++) {
-            if (terminations[i] instanceof DecodedTermination) {
-                ((DecodedTermination) terminations[i]).reset(randomize);
+		for (Termination termination : terminations) {
+            if (termination instanceof DecodedTermination) {
+                ((DecodedTermination) termination).reset(randomize);
             }
 		}
 
 		Origin[] origins = getOrigins();
-		for (int i = 0; i < origins.length; i++) {
-			if (origins[i] instanceof DecodedOrigin) {
-				((DecodedOrigin) origins[i]).reset(randomize);
+		for (Origin origin : origins) {
+			if (origin instanceof DecodedOrigin) {
+				((DecodedOrigin) origin).reset(randomize);
 			}
 		}
 
@@ -711,6 +744,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
     public int getNodeCount() {
 		return getNodes().length;
 	}
+	/**
+	 * @return number of neurons (same as getNodeCount)
+	 */
 	public int getNeuronCount() {
 		return getNodes().length;
 	}
@@ -750,9 +786,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 		// update the decoders for any existing origins
 		Origin[] origins = getOrigins();
-		for (int i = 0; i < origins.length; i++) {
-			if (origins[i] instanceof DecodedOrigin) {
-				DecodedOrigin origin=((DecodedOrigin) origins[i]);
+		for (Origin origin2 : origins) {
+			if (origin2 instanceof DecodedOrigin) {
+				DecodedOrigin origin=((DecodedOrigin) origin2);
 				String nodeOrigin=origin.getNodeOrigin();
 				// recalculate the decoders
 				if (!myReuseApproximators || !myDecodingApproximators.containsKey(nodeOrigin)) {
@@ -817,9 +853,20 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	/**
 	 * TODO: figure out why I have to add these so that it will show up in the Configure menu
 	 *     (nodeCount doens't appear for some reason)
+	 * @param count number of desired neurons
+	 * @throws StructuralException if factory doesn't exist or can't add that many
 	 */
-	public void setNeurons(int count) throws StructuralException {setNodeCount(count);}
-	public int getNeurons() {return getNodeCount();}
+	public void setNeurons(int count) throws StructuralException {
+	    setNodeCount(count);
+	}
+
+
+	/**
+	 * @return number of neurons
+	 */
+	public int getNeurons() {
+	    return getNodeCount();
+	}
 
 
     /**
@@ -832,6 +879,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
      *  neuronData[4] = maxTimeStep
      *  neuronData[5 ... 4 + numNeurons] = bias for each neuron
      *  neuronData[5 + numNeurons ... 4 + 2 * numNeurons] = scale for each neuron
+     * @return [numNeurons, tauRC, taurRef, tauPSC, maxTimeStep, bias*, scale*]
 	 */
 	public float[] getStaticNeuronData(){
 
@@ -887,11 +935,10 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
             return;
         }
 
-		for(int j = 0; j < neurons.length; j++)
-		{
+		for (Node neuron : neurons) {
 			if(rand.nextFloat() < killrate)
 			{
-				SpikingNeuron n = (SpikingNeuron)neurons[j];
+				SpikingNeuron n = (SpikingNeuron)neuron;
 				n.setBias(0.0f);
 				n.setScale(0.0f);
 			}
