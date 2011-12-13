@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 /*
  * Created on 31-May-2006
@@ -79,36 +79,38 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
         super(name, nodes);
         myTasks = new ArrayList<LearningTask>();
         myPlasticEnsembleTerminations = new LinkedHashMap<String, PlasticEnsembleTermination>(6);
+        myLastPlasticityTime = 0.0f;
     }
 
     public PlasticEnsembleImpl(String name, NodeFactory factory, int n) throws StructuralException {
         super(name, factory, n);
         myTasks = new ArrayList<LearningTask>();
         myPlasticEnsembleTerminations = new LinkedHashMap<String, PlasticEnsembleTermination>(6);
+        myLastPlasticityTime = 0.0f;
     }
 
     public boolean getLearning() {
         return myLearning;
     }
 
-	public void setLearning(boolean learning) {
+    public void setLearning(boolean learning) {
         for (PlasticEnsembleTermination pet : myPlasticEnsembleTerminations.values()) {
             pet.setLearning(learning);
         }
-	    myLearning = learning;
-	}
+        myLearning = learning;
+    }
 
-	protected static boolean isPopulationPlastic(Termination[] terminations) {
-		boolean result = true;
+    protected static boolean isPopulationPlastic(Termination[] terminations) {
+        boolean result = true;
 
-		for (int i=0; i < terminations.length; i++) {
-			if (!(terminations[i] instanceof PlasticNodeTermination)) {
-				result = false;
-			}
-		}
+        for (int i=0; i < terminations.length; i++) {
+            if (!(terminations[i] instanceof PlasticNodeTermination)) {
+                result = false;
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 
     /**
      * @see ca.nengo.model.plasticity.PlasticEnsemble#setPlasticityInterval(float)
@@ -135,9 +137,9 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
 
         if ((myPlasticityInterval <= 0 && myLearning) ||
                 (myLearning && endTime >= myLastPlasticityTime + myPlasticityInterval)) {
-        	for (LearningTask task : myTasks) {
-        		task.reset(false);
-        	}
+            for (LearningTask task : myTasks) {
+                task.reset(false);
+            }
         }
     }
 
@@ -150,11 +152,11 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
 
                     if (pet instanceof ModulatedPlasticEnsembleTermination) {
                         DecodedTermination modTerm = (DecodedTermination)
-                                this.getTermination(((ModulatedPlasticEnsembleTermination) pet).getModTermName());
+                        this.getTermination(((ModulatedPlasticEnsembleTermination) pet).getModTermName());
 
                         InstantaneousOutput input = new RealOutputImpl(modTerm.getOutput(), Units.UNK, endTime);
                         ((ModulatedPlasticEnsembleTermination) pet).setModTerminationState
-                                (modTerm.getName(), input, endTime);
+                        (modTerm.getName(), input, endTime);
                     }
                 }
                 catch (StructuralException e) {
@@ -164,6 +166,14 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
 
             myLastPlasticityTime = endTime;
         }
+    }
+
+    /**
+     * @see ca.nengo.model.Resettable#reset(boolean)
+     */
+    public void reset(boolean randomize) {
+        super.reset(randomize);
+        myLastPlasticityTime = 0.0f;
     }
 
     /**
@@ -189,8 +199,8 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
     public Termination[] getTerminations() {
         ArrayList<Termination> result = new ArrayList<Termination>(10);
         Termination[] composites = super.getTerminations();
-        for (int i = 0; i < composites.length; i++) {
-            result.add(composites[i]);
+        for (Termination composite : composites) {
+            result.add(composite);
         }
 
         for (Termination t : myPlasticEnsembleTerminations.values()) {
@@ -210,8 +220,8 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
      * @see ca.nengo.util.TaskSpawner#setTasks
      */
     public void setTasks(ThreadTask[] tasks) {
-    	myTasks.clear();
-    	this.addTasks(tasks);
+        myTasks.clear();
+        this.addTasks(tasks);
     }
 
     @Override

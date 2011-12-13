@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 /*
  * Created on 31-May-2006
@@ -57,18 +57,18 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
     protected String myModTermName;
     protected float[] myModInput;
 
-	/**
-	 * @param node The parent Node
-	 * @param name Name of this Termination
-	 * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
-	 *        all LinearExponentialTerminations
-	 * @throws StructuralException If dimensions of different terminations are not all the same
-	 */
-	public ModulatedPlasticEnsembleTermination(Node node, String name, PlasticNodeTermination[] nodeTerminations) throws StructuralException {
-		super(node, name, nodeTerminations);
-	}
+    /**
+     * @param node The parent Node
+     * @param name Name of this Termination
+     * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
+     *        all LinearExponentialTerminations
+     * @throws StructuralException If dimensions of different terminations are not all the same
+     */
+    public ModulatedPlasticEnsembleTermination(Node node, String name, PlasticNodeTermination[] nodeTerminations) throws StructuralException {
+        super(node, name, nodeTerminations);
+    }
 
-   /**
+    /**
      * @return Name of the Termination from which modulatory input is drawn (can be null if not used)
      */
     public String getModTermName() {
@@ -80,6 +80,17 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
      */
     public void setModTermName(String name) {
         myModTermName = name;
+    }
+
+    /**
+     * @see ca.nengo.model.Resettable#reset(boolean)
+     */
+    @Override
+    public void reset(boolean randomize) {
+        super.reset(randomize);
+        for (int i=0; i < myModInput.length; i++) {
+            myModInput[i] = 0.0f;
+        }
     }
 
     /**
@@ -108,8 +119,8 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
         }
     }
 
-	@Override
-	public ModulatedPlasticEnsembleTermination clone() throws CloneNotSupportedException {
-		return (ModulatedPlasticEnsembleTermination)super.clone();
-	}
+    @Override
+    public ModulatedPlasticEnsembleTermination clone() throws CloneNotSupportedException {
+        return (ModulatedPlasticEnsembleTermination)super.clone();
+    }
 }

@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 /*
  * Created on 31-May-2006
@@ -56,23 +56,24 @@ import ca.nengo.model.nef.NEFEnsemble;
  */
 public abstract class PlasticEnsembleTermination extends EnsembleTermination {
 
-	private static final long serialVersionUID = 1L;
-	protected float myLearningRate = 5e-7f;
-	protected boolean myLearning = true;
-	protected String myOriginName;
-	protected float[] myOutput;
+    private static final long serialVersionUID = 1L;
+    protected float myLearningRate = 5e-7f;
+    protected boolean myLearning = true;
+    protected String myOriginName;
+    protected float[] myOutput;
 
-	/**
-	 * @param node The parent Node
-	 * @param name Name of this Termination
-	 * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
-	 *        all LinearExponentialTerminations
-	 * @throws StructuralException If dimensions of different terminations are not all the same
-	 */
-	public PlasticEnsembleTermination(Node node, String name, PlasticNodeTermination[] nodeTerminations) throws StructuralException {
-		super(node, name, nodeTerminations);
-		setOriginName(NEFEnsemble.X); // Start with the X origin by default
-	}
+    /**
+     * @param node The parent Node
+     * @param name Name of this Termination
+     * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
+     *        all LinearExponentialTerminations
+     * @throws StructuralException If dimensions of different terminations are not all the same
+     */
+    public PlasticEnsembleTermination(Node node, String name, PlasticNodeTermination[] nodeTerminations) throws StructuralException {
+        super(node, name, nodeTerminations);
+        setOriginName(NEFEnsemble.X); // Start with the X origin by default
+        saveTransform();
+    }
 
     /**
      * @return Name of Origin from which postsynaptic activity is drawn
@@ -112,36 +113,36 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         }
     }
 
-	/**
-	 * @return The transformation matrix, which is made up of the
-	 *   weight vectors for each of the PlasticNodeTerminations within.
-	 *   This can be thought of as the connection weight matrix in most cases.
-	 */
-	public float[][] getTransform() {
-	    Termination[] terms = this.getNodeTerminations();
-		float[][] transform = new float[terms.length][];
-		for (int i=0; i < terms.length; i++) {
-			PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
-			transform[i] = pnt.getWeights();
-		}
+    /**
+     * @return The transformation matrix, which is made up of the
+     *   weight vectors for each of the PlasticNodeTerminations within.
+     *   This can be thought of as the connection weight matrix in most cases.
+     */
+    public float[][] getTransform() {
+        Termination[] terms = this.getNodeTerminations();
+        float[][] transform = new float[terms.length][];
+        for (int i=0; i < terms.length; i++) {
+            PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
+            transform[i] = pnt.getWeights();
+        }
 
-		return transform;
-	}
+        return transform;
+    }
 
-	/**
-	 * @param transform The transformation matrix, which can be thought of as
-	 *   the connection weight matrix in most cases. This will be passed through
-	 *   to set the weight vectors on each PlasticNodeTermination within.
-	 */
-	public void setTransform(float[][] transform) {
-	    Termination[] terms = this.getNodeTerminations();
-		for(int i = 0; i < terms.length; i++) {
-			PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
-			pnt.setWeights(transform[i]);
-		}
-	}
+    /**
+     * @param transform The transformation matrix, which can be thought of as
+     *   the connection weight matrix in most cases. This will be passed through
+     *   to set the weight vectors on each PlasticNodeTermination within.
+     */
+    public void setTransform(float[][] transform) {
+        Termination[] terms = this.getNodeTerminations();
+        for(int i = 0; i < terms.length; i++) {
+            PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
+            pnt.setWeights(transform[i]);
+        }
+    }
 
-	/**
+    /**
      * Saves the weights in the PlasticNodeTerminations within.
      */
     public void saveTransform() {
@@ -151,38 +152,52 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         }
     }
 
-	/**
-	 * @param time Current time
-	 * @param start The start index of the range of transform values to update (for multithreading)
-	 * @param end The end index of the range of transform values to update (for multithreading)
-	 * @throws StructuralException if
-	 */
-	public abstract void updateTransform(float time, int start, int end) throws StructuralException;
+    /**
+     * @see ca.nengo.model.Resettable#reset(boolean)
+     */
+    @Override
+    public void reset(boolean randomize) {
+        super.reset(randomize);
+        // super calls reset on each node, which should reset the weights that
+        // were saved in saveTransform()
+        myLearning = true;
+        for (int i=0; i < myOutput.length; i++) {
+            myOutput[i] = 0.0f;
+        }
+    }
 
-	/**
-	 * @see ca.nengo.model.impl.EnsembleTermination#getInput()
-	 */
-	@Override
+    /**
+     * @param time Current time
+     * @param start The start index of the range of transform values to update (for multithreading)
+     * @param end The end index of the range of transform values to update (for multithreading)
+     * @throws StructuralException if
+     */
+    public abstract void updateTransform(float time, int start, int end) throws StructuralException;
+
+    /**
+     * @see ca.nengo.model.impl.EnsembleTermination#getInput()
+     */
+    @Override
     public InstantaneousOutput getInput() {
-	    Termination[] terms = this.getNodeTerminations();
-		PlasticNodeTermination pnt = (PlasticNodeTermination) terms[0];
+        Termination[] terms = this.getNodeTerminations();
+        PlasticNodeTermination pnt = (PlasticNodeTermination) terms[0];
 
-		return pnt.getInput();
-	}
+        return pnt.getInput();
+    }
 
-	/**
-	 * @return The output currents from the PlasticNodeTermination being wrapped
-	 */
-	public float[] getOutputs() {
-	    Termination[] terms = this.getNodeTerminations();
-		float[] currents = new float[terms.length];
-		for (int i=0; i < terms.length; i++) {
-			PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
-			currents[i] = pnt.getOutput();
-		}
+    /**
+     * @return The output currents from the PlasticNodeTermination being wrapped
+     */
+    public float[] getOutputs() {
+        Termination[] terms = this.getNodeTerminations();
+        float[] currents = new float[terms.length];
+        for (int i=0; i < terms.length; i++) {
+            PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
+            currents[i] = pnt.getOutput();
+        }
 
-		return currents;
-	}
+        return currents;
+    }
 
     /**
      * @return Learning rate of the termination
@@ -214,8 +229,8 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         myLearning = learning;
     }
 
-	@Override
-	public PlasticEnsembleTermination clone() throws CloneNotSupportedException {
-		return (PlasticEnsembleTermination) super.clone();
-	}
+    @Override
+    public PlasticEnsembleTermination clone() throws CloneNotSupportedException {
+        return (PlasticEnsembleTermination) super.clone();
+    }
 }

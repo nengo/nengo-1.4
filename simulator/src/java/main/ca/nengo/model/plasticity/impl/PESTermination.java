@@ -84,10 +84,11 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
      */
     @Override
     public void reset(boolean randomize) {
-        myModInput = null;
-        myOutput = null;
-        myFilteredInput = null;
         super.reset(randomize);
+        myLastTime = 0.0f;
+        for (int i=0; i < myFilteredInput.length; i++) {
+            myFilteredInput[i] = 0.0f;
+        }
     }
 
     /**
@@ -112,7 +113,9 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         if (input instanceof RealOutput) {
             float[] values = ((RealOutput) input).getValues();
 
-            if (myFilteredInput == null) {myFilteredInput = new float[values.length];}
+            if (myFilteredInput == null) {
+                myFilteredInput = new float[values.length];
+            }
 
             for (int i=0; i < values.length; i++) {
                 myFilteredInput[i] *= 1.0f - integrationTime / tauPSC;
