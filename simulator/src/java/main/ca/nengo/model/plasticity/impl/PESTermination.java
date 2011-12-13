@@ -20,7 +20,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 /*
  * Created on 30-Jan-2007
@@ -53,43 +53,44 @@ import ca.nengo.model.neuron.impl.SpikingNeuron;
  */
 public class PESTermination extends ModulatedPlasticEnsembleTermination  {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private float myLastTime = 0.0f;
-	private float[] myFilteredInput;
+    private float myLastTime = 0.0f;
+    private float[] myFilteredInput;
     private final float[] myGain;
     private final float[][] myEncoders;
 
-	private boolean myOja = false; // Apply Oja smoothing?
+    private boolean myOja = false; // Apply Oja smoothing?
 
-	/**
-	 * @param ensemble The ensemble this termination belongs to
-	 * @param name Name of this Termination
-	 * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
-	 *        all LinearExponentialTerminations
-	 * @throws StructuralException If dimensions of different terminations are not all the same
-	 */
-	public PESTermination(NEFEnsemble ensemble, String name, PlasticNodeTermination[] nodeTerminations) throws StructuralException {
-		super(ensemble, name, nodeTerminations);
+    /**
+     * @param ensemble The ensemble this termination belongs to
+     * @param name Name of this Termination
+     * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
+     *        all LinearExponentialTerminations
+     * @throws StructuralException If dimensions of different terminations are not all the same
+     */
+    public PESTermination(NEFEnsemble ensemble, String name, PlasticNodeTermination[] nodeTerminations) throws StructuralException {
+        super(ensemble, name, nodeTerminations);
         myEncoders = ensemble.getEncoders();
-		myGain = new float[nodeTerminations.length];
-		for (int i = 0; i < nodeTerminations.length; i++) {
-		    SpikingNeuron neuron = (SpikingNeuron) nodeTerminations[i].getNode();
-		    myGain[i] = neuron.getScale();
-		}
-	}
+        myGain = new float[nodeTerminations.length];
+        for (int i = 0; i < nodeTerminations.length; i++) {
+            SpikingNeuron neuron = (SpikingNeuron) nodeTerminations[i].getNode();
+            myGain[i] = neuron.getScale();
+        }
+    }
 
-	/**
-	 * @see ca.nengo.model.Resettable#reset(boolean)
-	 */
-	@Override
+    /**
+     * @see ca.nengo.model.Resettable#reset(boolean)
+     */
+    @Override
     public void reset(boolean randomize) {
-		myModInput = null;
-		myOutput = null;
-		myFilteredInput = null;
-	}
+        myModInput = null;
+        myOutput = null;
+        myFilteredInput = null;
+        super.reset(randomize);
+    }
 
-	/**
+    /**
      * @return Name of Origin from which post-synaptic activity is drawn
      */
     public boolean getOja() {
@@ -104,9 +105,9 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
     }
 
     private void updateInput() {
-	    InstantaneousOutput input = this.getInput();
-	    float integrationTime = 0.001f;
-	    float tauPSC = getNodeTerminations()[0].getTau(); //0.005
+        InstantaneousOutput input = this.getInput();
+        float integrationTime = 0.001f;
+        float tauPSC = getNodeTerminations()[0].getTau(); //0.005
 
         if (input instanceof RealOutput) {
             float[] values = ((RealOutput) input).getValues();
@@ -127,37 +128,37 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
                 myFilteredInput[i] += values[i] ? integrationTime / tauPSC : 0;
             }
         }
-	}
+    }
 
-	/**
-	 * @see ca.nengo.model.plasticity.impl.PlasticEnsembleTermination#updateTransform(float, int, int)
-	 */
-	@Override
+    /**
+     * @see ca.nengo.model.plasticity.impl.PlasticEnsembleTermination#updateTransform(float, int, int)
+     */
+    @Override
     public void updateTransform(float time, int start, int end) throws StructuralException {
-		if (myModTermName == null || myOriginName == null) {
+        if (myModTermName == null || myOriginName == null) {
             throw new StructuralException("Origin name not set in PESTermination");
         }
 
-		if (myLastTime < time) {
-		    this.updateInput();
-		    myLastTime = time;
-		}
+        if (myLastTime < time) {
+            this.updateInput();
+            myLastTime = time;
+        }
 
-		float[][] transform = this.getTransform();
+        float[][] transform = this.getTransform();
 
-		for (int i = start; i < end; i++) {
-		    for (int j = 0; j < transform[i].length; j++) {
-		        float e = 0.0f;
-		        for (int k = 0; k < myModInput.length; k++) {
-		            e += myModInput[k] * myEncoders[i][k];
-		        }
-		        float delta = deltaOmega(myFilteredInput[j],time,transform[i][j],myGain[i],e);
-		        transform[i][j] += delta;
-		    }
-		}
+        for (int i = start; i < end; i++) {
+            for (int j = 0; j < transform[i].length; j++) {
+                float e = 0.0f;
+                for (int k = 0; k < myModInput.length; k++) {
+                    e += myModInput[k] * myEncoders[i][k];
+                }
+                float delta = deltaOmega(myFilteredInput[j],time,transform[i][j],myGain[i],e);
+                transform[i][j] += delta;
+            }
+        }
 
-		this.setTransform(transform);
-	}
+        this.setTransform(transform);
+    }
 
     private float deltaOmega(float input, float time, float currentWeight, float gain, float e) {
         float oja = 0.0f;
@@ -171,9 +172,9 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         return myLearningRate * input * e * gain - oja;
     }
 
-	@Override
-	public PESTermination clone() throws CloneNotSupportedException {
-		PESTermination result = (PESTermination) super.clone();
-		return result;
-	}
+    @Override
+    public PESTermination clone() throws CloneNotSupportedException {
+        PESTermination result = (PESTermination) super.clone();
+        return result;
+    }
 }
