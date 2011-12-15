@@ -21,7 +21,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 /*
  * Created on May 18, 2006
@@ -38,31 +38,32 @@ package ca.nengo.model;
  */
 public interface PlasticNodeTermination extends Termination {
 
-	/**
-	 * @return List of synaptic weights for each input channel
-	 */
-	public float[] getWeights();
+    /**
+     * @return List of synaptic weights for each input channel
+     */
+    public float[] getWeights();
 
-	/**
-	 * @param weights The new synaptic weights for each input channel
-	 */
-	public void setWeights(float[] weights);
+    /**
+     * @param weights The new synaptic weights for each input channel
+     * @param save Should the weights be saved for resetting purposes?
+     */
+    public void setWeights(float[] weights, boolean save);
 
-	/**
-	 * Save the current state of the weights so it can be reset there
-	 */
-	public void saveWeights();
+    /**
+     * Save the current state of the weights so it can be reset there
+     */
+    public void saveWeights();
 
-	/**
-	 * @return The most recent input to the Termination
-	 */
-	public InstantaneousOutput getInput();
+    /**
+     * @return The most recent input to the Termination
+     */
+    public InstantaneousOutput getInput();
 
-	/**
-	 * @return The most recent output of the Termination (after summation and dynamics)
-	 */
-	public float getOutput();
+    /**
+     * @return The most recent output of the Termination (after summation and dynamics)
+     */
+    public float getOutput();
 
-	public PlasticNodeTermination clone() throws CloneNotSupportedException;
+    public PlasticNodeTermination clone() throws CloneNotSupportedException;
 
 }

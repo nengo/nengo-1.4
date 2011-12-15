@@ -16,6 +16,13 @@ import ca.nengo.math.impl.IndicatorPDF;
  */
 public class SpikingNeuronFactoryTest extends TestCase {
 
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
+
+    public void testNothing() {
+    }
+
     public static void main(String[] args) {
         SpikingNeuronFactory factory = new SpikingNeuronFactory(
                 new LinearSynapticIntegrator.Factory(),

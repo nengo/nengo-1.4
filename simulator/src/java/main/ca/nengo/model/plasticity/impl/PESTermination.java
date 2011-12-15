@@ -86,8 +86,10 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
     public void reset(boolean randomize) {
         super.reset(randomize);
         myLastTime = 0.0f;
-        for (int i=0; i < myFilteredInput.length; i++) {
-            myFilteredInput[i] = 0.0f;
+        if (myFilteredInput != null) {
+            for (int i=0; i < myFilteredInput.length; i++) {
+                myFilteredInput[i] = 0.0f;
+            }
         }
     }
 
@@ -160,7 +162,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
             }
         }
 
-        this.setTransform(transform);
+        this.setTransform(transform, false);
     }
 
     private float deltaOmega(float input, float time, float currentWeight, float gain, float e) {

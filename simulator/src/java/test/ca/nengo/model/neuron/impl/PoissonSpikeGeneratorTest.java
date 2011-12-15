@@ -30,6 +30,13 @@ import ca.nengo.util.SpikePattern;
  */
 public class PoissonSpikeGeneratorTest extends TestCase {
 
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
+
+    public void testNothing() {
+    }
+
     //functional test
     public static void main(String[] args) {
         Function current = new FourierFunction(1f, 5f, 1f, (long) Math.random());
@@ -75,7 +82,7 @@ public class PoissonSpikeGeneratorTest extends TestCase {
         Plotter.plot(current, 0, dt, T, "current");
         Plotter.plot(pattern);
 
-//      SigmoidNeuronFactory snf = new SigmoidNeuronFactory(new IndicatorPDF(-10, 10), new IndicatorPDF(-1, 1), new IndicatorPDF(100, 200));
+        //      SigmoidNeuronFactory snf = new SigmoidNeuronFactory(new IndicatorPDF(-10, 10), new IndicatorPDF(-1, 1), new IndicatorPDF(100, 200));
         LinearNeuronFactory lnf = new LinearNeuronFactory(new IndicatorPDF(200, 400), new IndicatorPDF(-1, 1), true);
         NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
         ef.setNodeFactory(lnf);
@@ -94,7 +101,7 @@ public class PoissonSpikeGeneratorTest extends TestCase {
             network.setMode(SimulationMode.RATE);
             Probe rates = network.getSimulator().addProbe("test", "rate", true);
             network.run(0, 2);
-//          Plotter.plot(rates.getData(), .05f, "rates");
+            //          Plotter.plot(rates.getData(), .05f, "rates");
             Plotter.plot(rates.getData(), "rates");
         } catch (StructuralException e) {
             e.printStackTrace();

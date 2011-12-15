@@ -88,8 +88,10 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
     @Override
     public void reset(boolean randomize) {
         super.reset(randomize);
-        for (int i=0; i < myModInput.length; i++) {
-            myModInput[i] = 0.0f;
+        if (myModInput != null) {
+            for (int i=0; i < myModInput.length; i++) {
+                myModInput[i] = 0.0f;
+            }
         }
     }
 

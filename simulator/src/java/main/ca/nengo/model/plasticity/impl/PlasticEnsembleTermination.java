@@ -134,11 +134,11 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
      *   the connection weight matrix in most cases. This will be passed through
      *   to set the weight vectors on each PlasticNodeTermination within.
      */
-    public void setTransform(float[][] transform) {
+    public void setTransform(float[][] transform, boolean save) {
         Termination[] terms = this.getNodeTerminations();
         for(int i = 0; i < terms.length; i++) {
             PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
-            pnt.setWeights(transform[i]);
+            pnt.setWeights(transform[i], save);
         }
     }
 
@@ -161,8 +161,10 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         // super calls reset on each node, which should reset the weights that
         // were saved in saveTransform()
         myLearning = true;
-        for (int i=0; i < myOutput.length; i++) {
-            myOutput[i] = 0.0f;
+        if (myOutput != null) {
+            for (int i=0; i < myOutput.length; i++) {
+                myOutput[i] = 0.0f;
+            }
         }
     }
 

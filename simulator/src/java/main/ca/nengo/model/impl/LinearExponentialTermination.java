@@ -130,14 +130,17 @@ public class LinearExponentialTermination implements PlasticNodeTermination {
     /**
      * @param weights The new synaptic weights for each input channel
      */
-    public void setWeights(float[] weights) {
+    public void setWeights(float[] weights, boolean save) {
         if(weights.length != myInitialWeights.length) {
             System.err.println("Error, dimensions don't match in setWeights, ignoring new weights");
             return;
         }
 
         myWeights = weights.clone();
-        // saveWeights();
+
+        if (save) {
+            saveWeights();
+        }
     }
 
     /**
