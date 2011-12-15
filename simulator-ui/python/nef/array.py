@@ -1,7 +1,6 @@
 from ca.nengo.model import StructuralException, Origin
 from ca.nengo.model.impl import BasicOrigin, NetworkImpl, EnsembleTermination, PreciseSpikeOutputImpl, SpikeOutputImpl, RealOutputImpl 
-from ca.nengo.model.plasticity.impl import PlasticEnsembleTermination, InSpikeErrorFunction, \
-    OutSpikeErrorFunction, PESTermination, STDPTermination
+from ca.nengo.model.plasticity.impl import PESTermination, STDPTermination
 from ca.nengo.model.nef.impl import DecodedTermination
 from ca.nengo.util import MU
 from ca.nengo.util.impl import TimeSeriesImpl
