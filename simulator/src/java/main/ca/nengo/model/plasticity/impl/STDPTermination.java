@@ -23,7 +23,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 /*
  * Created on 28-May-07
@@ -32,11 +32,10 @@ package ca.nengo.model.plasticity.impl;
 
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
-import ca.nengo.model.RealOutput;
 import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.impl.LinearExponentialTermination;
-import ca.nengo.util.MU;
+import ca.nengo.model.neuron.Neuron;
 
 /**
  * <p>A PlasticTermination implementing a PlasticityRule that accepts spiking input.</p>
@@ -50,421 +49,187 @@ import ca.nengo.util.MU;
  */
 public class STDPTermination extends PlasticEnsembleTermination {
 
-	private static final long serialVersionUID = 1L;
-	// Remember 2 spikes in the past, for triplet based learning rules
-	private static final int HISTORY_LENGTH = 2;
+    private static final long serialVersionUID = 1L;
+    // Remember 2 spikes in the past, for triplet based learning rules
+    private static final int HISTORY_LENGTH = 2;
 
-	private String myOriginName;
-	private String myModTermName;
-	private AbstractSpikeLearningFunction myOnInSpikeFunction;
-	private AbstractSpikeLearningFunction myOnOutSpikeFunction;
+    private float myLastTime = 0.0f;
 
-	private float[][] myInSpikeHistory;
-	private float[][] myOutSpikeHistory;
-	private boolean[] myInSpiking;
-	private boolean[] myOutSpiking;
+    private float[][] myPreSpikeHistory;
+    private float[][] myPostSpikeHistory;
+    private boolean[] myPreSpiking;
+    private boolean[] myPostSpiking;
 
-	private float[] myModInputArray;
+    private float[] myPostTrace1;
+    private float[] myPostTrace2;
+    private float[] myPreTrace1;
+    private float[] myPreTrace2;
 
-	private boolean myDecaying = false;
-	private float myDecayScale = 1e-8f; // Proportion of weight that will be subtracted every timestep
-	private boolean myHomeostatic = true;
-	private float myStableVal = 0.03f;
+    private float myA2Minus = 6.6e-3f;
+    private float myA3Minus = 3.1e-3f;
+    private float myTauMinus = 33.7f;
+    private float myTauX = 101.0f;
+    private float myA2Plus = 8.8e-11f;
+    private float myA3Plus = 5.3e-2f;
+    private float myTauPlus = 16.8f;
+    private float myTauY = 125.0f;
 
-    private boolean initialized;
+    /**
+     * @param node The parent Node
+     * @param name Name of this Termination
+     * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
+     *        all LinearExponentialTerminations
+     * @throws StructuralException If dimensions of different terminations are not all the same
+     */
+    public STDPTermination(Node node, String name, LinearExponentialTermination[] nodeTerminations) throws StructuralException {
+        super(node, name, nodeTerminations);
+        setOriginName(Neuron.AXON);
+        int preLength = nodeTerminations[0].getDimensions();
+        int postLength = nodeTerminations.length;
 
-	/**
-	 * @param node The parent Node
-	 * @param name Name of this Termination
-	 * @param nodeTerminations Node-level Terminations that make up this Termination. Must be
-	 *        all LinearExponentialTerminations
-	 * @throws StructuralException If dimensions of different terminations are not all the same
-	 */
-	public STDPTermination(Node node, String name, LinearExponentialTermination[] nodeTerminations) throws StructuralException {
-		super(node, name, nodeTerminations);
-        initialized = false;
-	}
-
-	/**
-	 * @param onInSpike AbstractSpikeLearningFunction defining synaptic weight change when there is an <bold>incoming</bold> spike.
-	 * @param onOutSpike AbstractSpikeLearningFunction defining synaptic weight change when there is an <bold>outgoing</bold> spike.
-	 * @param originName Name of Origin from which post-synaptic activity is drawn
-	 * @param modTerm Name of the Termination from which modulatory input is drawn (can be null if not used)
-	 */
-	public void init(AbstractSpikeLearningFunction onInSpike, AbstractSpikeLearningFunction onOutSpike, String originName, String modTermName) {
-		setOnInSpike(onInSpike);
-		setOnOutSpike(onOutSpike);
-		setOriginName(originName);
-		setModTermName(modTermName);
-        initialized = true;
-	}
-
-	/**
-	 * @see ca.nengo.model.Resettable#reset(boolean)
-	 */
-	@Override
-    public void reset(boolean randomize) {
-		if (myInSpiking != null) {
-			setTermDim(myInSpiking.length);
-		}
-		if (myOutSpiking != null) {
-			setOriginDim(myOutSpiking.length);
-		}
-		myModInputArray = null;
-	}
-
-	public void setDecaying(boolean decaying) {
-		myDecaying = decaying;
-	}
-
-	public void setDecayScale(float decayScale) {
-		myDecayScale = decayScale;
-	}
-
-	public void setHomestatic(boolean homeostatic) {
-		myHomeostatic = homeostatic;
-	}
-
-	public void setStableVal(float weightPerNeuron) {
-		myStableVal = weightPerNeuron;
-	}
-
-	// Sets up the in spiking arrays
-	private void setTermDim(int dim) {
-		myInSpikeHistory = MU.uniform(HISTORY_LENGTH, dim, -1);
-		myInSpiking = new boolean[dim];
-		myStableVal = 0.008f * dim;
-	}
-
-	// Sets up the out spiking arrays
-	private void setOriginDim(int dim) {
-		myOutSpikeHistory = MU.uniform(HISTORY_LENGTH, dim, -1);
-		myOutSpiking = new boolean[dim];
-	}
-
-	/**
-	 * @return Name of Origin from which post-synaptic activity is drawn
-	 */
-	@Override
-    public String getOriginName() {
-		return myOriginName;
-	}
-
-	/**
-	 *
-	 * @param name Name of Origin from which post-synaptic activity is drawn
-	 */
-	@Override
-    public void setOriginName(String name) {
-		myOriginName = (name == null) ? "" : name;
-	}
-
-	/**
-	 * @return Name of the Termination from which modulatory input is drawn (can be null if not used)
-	 */
-	public String getModTermName() {
-		return myModTermName;
-	}
-
-	/**
-	 *
-	 * @param name Name of the Termination from which modulatory input is drawn (can be null if not used)
-	 */
-	public void setModTermName(String name) {
-		myModTermName = (name == null) ? "" : name;
-	}
-
-	/**
-	 * @return Function defining synaptic weight change when there is an <bold>incoming</bold> spike.
-	 */
-	public AbstractSpikeLearningFunction getOnInSpike() {
-		return myOnInSpikeFunction;
-	}
-
-	/**
-	 * @param function Function defining synaptic weight change when there is an <bold>incoming</bold> spike.
-	 */
-	public void setOnInSpike(AbstractSpikeLearningFunction function) {
-		myOnInSpikeFunction = function;
-	}
-
-	/**
-	 * @return Function defining synaptic weight change when there is an <bold>outgoing</bold> spike.
-	 */
-	public AbstractSpikeLearningFunction getOnOutSpike() {
-		return myOnOutSpikeFunction;
-	}
-
-	/**
-	 *
-	 * @param function Function defining synaptic weight change when there is an <bold>outgoing</bold> spike.
-	 */
-	public void setOnOutSpike(AbstractSpikeLearningFunction function) {
-		myOnOutSpikeFunction = function;
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.PlasticityRule#setOriginState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
-	 */
-	@Override
-    public void setOriginState(String name, InstantaneousOutput state, float time) throws StructuralException {
-        if(!initialized) {
-            throw new StructuralException("PlasticityRule in Termination not initialized");
-        }
-		if (name.equals(myOriginName)) {
-			if (myOutSpiking == null) {
-				setOriginDim(state.getDimension());
-			}
-
-			if (state.getDimension() != myOutSpiking.length) {
-				throw new IllegalArgumentException("Origin dimensions have changed; should be "
-						+ myOutSpiking.length + ".");
-			}
-
-			update(myOutSpikeHistory, myOutSpiking, state, time);
-		}
-	}
-
-
-	/**
-	 * @see ca.nengo.model.plasticity.PlasticityRule#setTerminationState(java.lang.String, ca.nengo.model.InstantaneousOutput, float)
-	 */
-	public void setModTerminationState(String name, InstantaneousOutput state, float time) throws StructuralException {
-        if(!initialized) {
-            throw new StructuralException("PlasticityRule in Termination not initialized");
-        }
-		if (name.equals(myModTermName)) {
-			if (!(state instanceof RealOutput)) {
-				throw new IllegalArgumentException("This rule does not support input of type " +
-						state.getClass().getName() + " for modulatory input.");
-			}
-
-			myModInputArray = ((RealOutput) state).getValues();
-		}
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float)
-	 */
-	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time) throws StructuralException {
-        if(!initialized) {
-            throw new StructuralException("PlasticityRule in Termination not initialized");
-        }
-		if (myInSpiking == null) {
-			setTermDim(input.getDimension());
-			myOnInSpikeFunction.initActivityTraces(transform.length, transform[0].length);
-			myOnOutSpikeFunction.initActivityTraces(transform.length, transform[0].length);
-		}
-		if (input.getDimension() != myInSpiking.length) {
-			throw new IllegalArgumentException("Termination dimensions have changed; should be "
-					+ myInSpiking.length + ".");
-		}
-
-		update(myInSpikeHistory, myInSpiking, input, time);
-
-		myOnInSpikeFunction.beforeDOmega(myOutSpiking);
-		myOnOutSpikeFunction.beforeDOmega(myInSpiking);
-
-		// i is post, j is pre
-		float[][] result = new float[transform.length][];
-		for (int i = 0; i < transform.length; i++) {
-			result[i] = new float[transform[i].length];
-
-			if (myModInputArray != null) {
-				for (int j = 0; j < transform[i].length; j++) {
-					if (myInSpiking[j]) {
-						for (int k = 0; k < myModInputArray.length; k++) {
-							result[i][j] += myOnInSpikeFunction.map(new float[]{time - myOutSpikeHistory[0][i],
-								time - myInSpikeHistory[1][j], transform[i][j], myModInputArray[k], i, j, k});
-						}
-					}
-					if (myOutSpiking[i]) {
-						for (int k = 0; k < myModInputArray.length; k++) {
-							result[i][j] += myOnOutSpikeFunction.map(new float[]{time - myInSpikeHistory[0][j],
-								time - myOutSpikeHistory[1][i], transform[i][j], myModInputArray[k], i, j, k});
-						}
-					}
-				}
-			} else {
-				for (int j = 0; j < transform[i].length; j++) {
-					if (myInSpiking[j]) {
-						result[i][j] += myOnInSpikeFunction.map(new float[]{time - myOutSpikeHistory[0][i],
-							time - myInSpikeHistory[1][j], transform[i][j], 0, i, j, 0});
-					}
-					if (myOutSpiking[i]) {
-						result[i][j] += myOnOutSpikeFunction.map(new float[]{time - myInSpikeHistory[0][j],
-							time - myOutSpikeHistory[1][i], transform[i][j], 0, i, j, 0});
-					}
-				}
-			}
-		}
-
-		if (myDecaying) {
-			for (int i = 0; i < result.length; i++) {
-				for (int j = 0; j < result[i].length; j++) {
-					result[i][j] -= transform[i][j]*myDecayScale;
-				}
-			}
-		}
-
-		if (myHomeostatic) {
-			for (int i = 0; i < transform.length; i++) {
-				float sum_i = 0.0f;
-				for (int j = 0; j < transform[i].length; j++) {
-					sum_i += Math.abs(transform[i][j]);
-				}
-
-				if (Math.abs(sum_i - myStableVal) > 1e-8f) {
-					float ratio = myStableVal / sum_i;
-
-					for (int j = 0; j < transform[i].length; j++) {
-						result[i][j] += (transform[i][j] * ratio) - transform[i][j];
-					}
-				}
-			}
-		}
-
-		myOnInSpikeFunction.afterDOmega(myInSpiking);
-		myOnOutSpikeFunction.afterDOmega(myOutSpiking);
-
-		return result;
-	}
-
-	/**
-	 * @see ca.nengo.model.plasticity.PlasticityRule#getDerivative(float[][], ca.nengo.model.InstantaneousOutput, float, int, int)
-	 */
-	public float[][] getDerivative(float[][] transform, InstantaneousOutput input, float time, int start, int end) throws StructuralException {
-        if(!initialized) {
-            throw new StructuralException("PlasticityRule in Termination not initialized");
-        }
-		if (myInSpiking == null) {
-			setTermDim(input.getDimension());
-			myOnInSpikeFunction.initActivityTraces(transform.length, transform[0].length);
-			myOnOutSpikeFunction.initActivityTraces(transform.length, transform[0].length);
-		}
-		if (input.getDimension() != myInSpiking.length) {
-			throw new IllegalArgumentException("Termination dimensions have changed; should be "
-					+ myInSpiking.length + ".");
-		}
-
-        // Only update spike histories once per iteration of derivatives
-        if (start == 0) {
-            update(myInSpikeHistory, myInSpiking, input, time);
-
-            myOnInSpikeFunction.beforeDOmega(myOutSpiking);
-            myOnOutSpikeFunction.beforeDOmega(myInSpiking);
-        }
-
-		// i is post, j is pre
-		float[][] result = new float[transform.length][];
-		for (int i = start; i < end; i++) {
-			result[i] = new float[transform[i].length];
-
-			if (myModInputArray != null) {
-				for (int j = 0; j < transform[i].length; j++) {
-					if (myInSpiking[j]) {
-						for (int k = 0; k < myModInputArray.length; k++) {
-							result[i][j] += myOnInSpikeFunction.map(new float[]{time - myOutSpikeHistory[0][i],
-								time - myInSpikeHistory[1][j], transform[i][j], myModInputArray[k], i, j, k});
-						}
-					}
-					if (myOutSpiking[i]) {
-						for (int k = 0; k < myModInputArray.length; k++) {
-							result[i][j] += myOnOutSpikeFunction.map(new float[]{time - myInSpikeHistory[0][j],
-								time - myOutSpikeHistory[1][i], transform[i][j], myModInputArray[k], i, j, k});
-						}
-					}
-				}
-			} else {
-				for (int j = 0; j < transform[i].length; j++) {
-					if (myInSpiking[j]) {
-						result[i][j] += myOnInSpikeFunction.map(new float[]{time - myOutSpikeHistory[0][i],
-							time - myInSpikeHistory[1][j], transform[i][j], 0, i, j, 0});
-					}
-					if (myOutSpiking[i]) {
-						result[i][j] += myOnOutSpikeFunction.map(new float[]{time - myInSpikeHistory[0][j],
-							time - myOutSpikeHistory[1][i], transform[i][j], 0, i, j, 0});
-					}
-				}
-			}
-		}
-
-		if (myDecaying) {
-			for (int i = start; i < end; i++) {
-				for (int j = 0; j < result[i].length; j++) {
-					result[i][j] -= transform[i][j]*myDecayScale;
-				}
-			}
-		}
-
-		if (myHomeostatic) {
-			for (int i = start; i < end; i++) {
-				float sum_i = 0.0f;
-				for (int j = 0; j < transform[i].length; j++) {
-					sum_i += Math.abs(transform[i][j]);
-				}
-
-				if (Math.abs(sum_i - myStableVal) > 1e-8f) {
-					float ratio = myStableVal / sum_i;
-
-					for (int j = 0; j < transform[i].length; j++) {
-						result[i][j] += (transform[i][j] * ratio) - transform[i][j];
-					}
-				}
-			}
-		}
-
-		myOnInSpikeFunction.afterDOmega(myInSpiking);
-		myOnOutSpikeFunction.afterDOmega(myOutSpiking);
-
-		return result;
-	}
-
-	//updates last spike times if there are any spikes
-	private static void update(float[][] spikeHistory, boolean[] spiking, InstantaneousOutput state, float time) {
- 		checkType(state);
-
-		if (spikeHistory[0].length != state.getDimension()) {
-			throw new IllegalArgumentException("Expected activity of dimension " + spikeHistory[0].length
-					+ ", got dimension " + state.getDimension());
-		}
-
-		SpikeOutput so = (SpikeOutput) state;
-		boolean[] spikes = so.getValues();
-		for (int i = 0; i < spikes.length; i++) {
-			if (spikes[i]) {
-				for (int j = HISTORY_LENGTH-1; j > 0; j--) {
-					spikeHistory[j][i] = spikeHistory[j-1][i];
-				}
-				spikeHistory[0][i] = time;
-				spiking[i] = true;
-			} else {
-				spiking[i] = false;
-			}
-		}
-	}
-
-	// Ensure that InstantaneousOutput is spiking, not real
-	private static void checkType(InstantaneousOutput state) {
-		if (!(state instanceof SpikeOutput)) {
-			throw new IllegalArgumentException("This rule does not support input of type " + state.getClass().getName());
-		}
-	}
-
-	@Override
-	public PlasticEnsembleTermination clone() throws CloneNotSupportedException {
-		STDPTermination result = (STDPTermination) super.clone();
-		result.myOnInSpikeFunction = myOnInSpikeFunction.clone();
-		result.myOnOutSpikeFunction = myOnOutSpikeFunction.clone();
-		result.myOutSpikeHistory = myOutSpikeHistory.clone();
-		result.myOutSpiking = myOutSpiking.clone();
-		return result;
-	}
+        myPostTrace1 = new float[postLength];
+        myPostTrace2 = new float[postLength];
+        myPreTrace1 = new float[preLength];
+        myPreTrace2 = new float[preLength];
+    }
 
     @Override
+    public void setOriginState(String name, InstantaneousOutput state, float time) throws StructuralException {
+        if (myOriginName == null) {
+            throw new StructuralException("Origin name not set in STDPTermination");
+        }
+        if (!(state instanceof SpikeOutput)) {
+            throw new StructuralException("Origin must be Spiking in STDPTermination");
+        }
+
+        if (!name.equals(myOriginName)) { return; }
+
+        updateHistory(myPostSpiking, myPostSpikeHistory, (SpikeOutput)state, time);
+    }
+
+    private void updateInput(float time) throws StructuralException {
+        InstantaneousOutput input = this.getInput();
+
+        if (!(input instanceof SpikeOutput)) {
+            throw new StructuralException("Termination must be Spiking in STDPTermination");
+        }
+
+        updateHistory(myPreSpiking, myPreSpikeHistory, (SpikeOutput)input, time);
+    }
+
+
+    /**
+     * @see ca.nengo.model.Resettable#reset(boolean)
+     */
+    @Override
+    public void reset(boolean randomize) {
+    }
+
+    private static void updateHistory(boolean[] spiking,
+            float[][] spikeHistory, SpikeOutput state, float time) {
+        if (spikeHistory[0].length != state.getDimension()) {
+            throw new IllegalArgumentException("Expected activity of dimension "
+                    + spikeHistory[0].length + ", got dimension " + state.getDimension());
+        }
+
+        boolean[] spikes = state.getValues();
+        for (int i = 0; i < spikes.length; i++) {
+            if (spikes[i]) {
+                for (int j = HISTORY_LENGTH-1; j > 0; j--) {
+                    spikeHistory[j][i] = spikeHistory[j-1][i];
+                }
+                spikeHistory[0][i] = time;
+                spiking[i] = true;
+            } else {
+                spiking[i] = false;
+            }
+        }
+
+    }
+
     public void updateTransform(float time, int start, int end)
             throws StructuralException {
-        // TODO Auto-generated method stub
+        if (myLastTime < time) {
+            myLastTime = time;
+            this.updateInput(time);
+        }
 
+        // before dOmega
+        for (int post_i = 0; post_i < myPostTrace1.length; post_i++) {
+            if (myPostSpiking[post_i]) {
+                myPostTrace1[post_i] += 1.0f;
+            }
+            myPostTrace1[post_i] -= myPostTrace1[post_i] / myTauMinus;
+            if (myPostTrace1[post_i] < 0.0f) {myPostTrace1[post_i] = 0.0f;}
+        }
+
+        for (int pre_i = 0; pre_i < myPreTrace1.length; pre_i++) {
+            if (myPreSpiking[pre_i]) {
+                myPreTrace1[pre_i] += 1.0f;
+            }
+            myPreTrace1[pre_i] -= myPreTrace1[pre_i] / myTauPlus;
+            if (myPreTrace1[pre_i] < 0.0f) {myPreTrace1[pre_i] = 0.0f;}
+        }
+
+        //dOmega
+        float[][] transform = this.getTransform();
+
+        for (int post_i = start; post_i < end; post_i++) {
+            for (int pre_i = 0; pre_i < transform[post_i].length; pre_i++) {
+                if (myPreSpiking[pre_i]) {
+                    transform[post_i][pre_i] += preDeltaOmega(time - myPostSpikeHistory[0][post_i],
+                            time - myPreSpikeHistory[1][pre_i], transform[post_i][pre_i], post_i, pre_i);
+                }
+                if (myPostSpiking[post_i]) {
+                    transform[post_i][pre_i] += postDeltaOmega(time - myPostSpikeHistory[0][post_i],
+                            time - myPreSpikeHistory[1][pre_i], transform[post_i][pre_i], post_i, pre_i);
+                }
+            }
+        }
+
+        // after dOmega
+        for (int pre_i = 0; pre_i < myPreTrace2.length; pre_i++) {
+            if (myPreSpiking[pre_i]) {
+                myPreTrace2[pre_i] += 1.0f;
+            }
+            myPreTrace2[pre_i] -= myPreTrace2[pre_i] / myTauX;
+            if (myPreTrace2[pre_i] < 0.0f) {myPreTrace2[pre_i] = 0.0f;}
+        }
+
+        for (int post_i = 0; post_i < myPostTrace2.length; post_i++) {
+            if (myPostSpiking[post_i]) {
+                myPostTrace2[post_i] += 1.0f;
+            }
+            myPostTrace2[post_i] -= myPostTrace2[post_i] / myTauY;
+            if (myPostTrace2[post_i] < 0.0f) {myPostTrace2[post_i] = 0.0f;}
+        }
+
+
+    }
+
+    private float preDeltaOmega(float timeSinceDifferent, float timeSinceSame,
+            float currentWeight, int postIndex, int preIndex) {
+        float result = myPostTrace1[postIndex] * (myA2Minus + myPreTrace2[preIndex] * myA3Minus);
+
+        return myLearningRate * result;
+
+
+    }
+
+    private float postDeltaOmega(float timeSinceDifferent, float timeSinceSame,
+            float currentWeight, int postIndex, int preIndex) {
+        float result = myPreTrace1[preIndex] * (myA2Plus + myPostTrace2[postIndex] * myA3Plus);
+
+        return -1 * myLearningRate * result;
+
+    }
+
+
+    @Override
+    public PlasticEnsembleTermination clone() throws CloneNotSupportedException {
+        STDPTermination result = (STDPTermination) super.clone();
+        result.myPostSpikeHistory = myPostSpikeHistory.clone();
+        result.myPostSpiking = myPostSpiking.clone();
+        return result;
     }
 }

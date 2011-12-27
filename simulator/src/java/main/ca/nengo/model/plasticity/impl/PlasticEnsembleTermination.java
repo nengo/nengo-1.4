@@ -100,15 +100,16 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         if (myOriginName == null) {
             throw new StructuralException("Origin name not set in PESTermination");
         }
-        if (name.equals(myOriginName)) {
-            if (state instanceof RealOutput) {
-                myOutput = ((RealOutput) state).getValues();
-            } else if (state instanceof SpikeOutput) {
-                boolean[] vals = ((SpikeOutput) state).getValues();
-                if (myOutput==null) {myOutput = new float[vals.length];}
-                for (int i=0; i<vals.length; i++) {
-                    myOutput[i] = vals[i] ? 0.001f : 0.0f;
-                }
+
+        if (!name.equals(myOriginName)) { return; }
+
+        if (state instanceof RealOutput) {
+            myOutput = ((RealOutput) state).getValues();
+        } else if (state instanceof SpikeOutput) {
+            boolean[] vals = ((SpikeOutput) state).getValues();
+            if (myOutput==null) {myOutput = new float[vals.length];}
+            for (int i=0; i<vals.length; i++) {
+                myOutput[i] = vals[i] ? 0.001f : 0.0f;
             }
         }
     }
