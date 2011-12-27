@@ -1,28 +1,28 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "AddProbesAction.java". Description: 
+The Original Code is "AddProbesAction.java". Description:
 "Action for adding probes to a collection of nodes
-  
+
   @author Shu Wu"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.actions;
 
@@ -47,71 +47,76 @@ import ca.nengo.ui.models.nodes.widgets.UIProbe;
  */
 public class AddProbesAction extends ReversableAction {
 
-	private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 1;
 
-	private HashMap<UINeoNode, UIProbe> myCreatedProbesMap;
+    private HashMap<UINeoNode, UIProbe> myCreatedProbesMap;
 
-	private Collection<ModelObject> myNodes;
+    private Collection<ModelObject> myNodes;
 
-	public AddProbesAction(Collection<ModelObject> nodes) {
-		super("Add probes");
+    /**
+     * TODO
+     * 
+     * @param nodes TODO
+     */
+    public AddProbesAction(Collection<ModelObject> nodes) {
+        super("Add probes");
 
-		this.myNodes = nodes;
+        this.myNodes = nodes;
 
-	}
+    }
 
-	@Override
-	protected void action() throws ActionException {
-		myCreatedProbesMap = new HashMap<UINeoNode, UIProbe>(myNodes
-				.size());
+    @Override
+    protected void action() throws ActionException {
+        myCreatedProbesMap = new HashMap<UINeoNode, UIProbe>(myNodes
+                .size());
 
-		String stateName = JOptionPane.showInputDialog(UIEnvironment
-				.getInstance(), "State name to probe (Case Sensitive): ",
-				"Adding probes", JOptionPane.QUESTION_MESSAGE);
+        String stateName = JOptionPane.showInputDialog(UIEnvironment
+                .getInstance(), "State name to probe (Case Sensitive): ",
+                "Adding probes", JOptionPane.QUESTION_MESSAGE);
 
-		if (stateName != null && !stateName.equals("")) {
-			int successCount = 0;
-			int failed = 0;
+        if (stateName != null && !stateName.equals("")) {
+            int successCount = 0;
+            int failed = 0;
 
-			for (ModelObject model : myNodes) {
-				if (model instanceof UINeoNode) {
-					UINeoNode node = (UINeoNode) model;
-					UIProbe probeCreated;
+            for (ModelObject model : myNodes) {
+                if (model instanceof UINeoNode) {
+                    UINeoNode node = (UINeoNode) model;
+                    UIProbe probeCreated;
 
-					try {
-						probeCreated = node.addProbe(stateName);
-						myCreatedProbesMap.put(node, probeCreated);
-						successCount++;
-					} catch (SimulationException e) {
+                    try {
+                        probeCreated = node.addProbe(stateName);
+                        myCreatedProbesMap.put(node, probeCreated);
+                        successCount++;
+                    } catch (SimulationException e) {
 
-						failed++;
-					}
+                        failed++;
+                    }
 
-				}
+                }
 
-			}
-			if (failed > 0) {
-				UserMessages
-						.showWarning(successCount
-								+ " probes were successfully added. <BR> However it was not added to "
-								+ failed
-								+ " nodes. The state name specified may not exist on those nodes.");
-			}
-		}
+            }
+            if (failed > 0) {
+                UserMessages
+                .showWarning(successCount
+                        + " probes were successfully added. <BR> However it was not added to "
+                        + failed
+                        + " nodes. The state name specified may not exist on those nodes.");
+            }
+        }
 
-	}
+    }
 
-	@Override
-	protected void undo() throws ActionException {
-		for (ModelObject model : myNodes) {
-			if (model instanceof UINeoNode) {
-				UINeoNode node = (UINeoNode) model;
-				UIProbe probeCreated = myCreatedProbesMap.get(node);
-				node.removeProbe(probeCreated);
-			}
+    @Override
+    protected void undo() throws ActionException {
+        for (ModelObject model : myNodes) {
+            if (model instanceof UINeoNode) {
+                UINeoNode node = (UINeoNode) model;
+                UIProbe probeCreated = myCreatedProbesMap.get(node);
+                node.removeProbe(probeCreated);
+            }
 
-		}
+        }
 
-	}
+    }
 
 }
