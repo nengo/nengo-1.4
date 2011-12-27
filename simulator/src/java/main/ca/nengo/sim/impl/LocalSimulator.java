@@ -21,7 +21,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 /*
  * Created on 7-Jun-2006
@@ -67,528 +67,527 @@ import ca.nengo.util.impl.ProbeImpl;
  * @author Bryan Tripp
  */
 public class LocalSimulator implements Simulator, java.io.Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Projection[] myProjections;
-	private Node[] myNodes;
+    private Projection[] myProjections;
+    private Node[] myNodes;
     private ThreadTask[] myTasks;
-	private Map<String, Node> myNodeMap;
-	private List<Probe> myProbes;
-	private boolean myDisplayProgress;
-	private transient List<VisiblyMutable.Listener> myChangeListeners;
-	private transient NEFGPUInterface myNEFGPUInterface;
-	private transient NodeThreadPool myNodeThreadPool;
+    private Map<String, Node> myNodeMap;
+    private List<Probe> myProbes;
+    private boolean myDisplayProgress;
+    private transient List<VisiblyMutable.Listener> myChangeListeners;
+    private transient NEFGPUInterface myNEFGPUInterface;
+    private transient NodeThreadPool myNodeThreadPool;
 
-	/**
-	 * Collection of Simulator
-	 */
-	private final Collection<SimulatorListener> mySimulatorListeners;
+    /**
+     * Collection of Simulator
+     */
+    private final Collection<SimulatorListener> mySimulatorListeners;
 
-	public LocalSimulator() {
-		mySimulatorListeners = new ArrayList<SimulatorListener>(1);
-		myChangeListeners = new ArrayList<Listener>(1);
-		myDisplayProgress = true;
-	}
+    public LocalSimulator() {
+        mySimulatorListeners = new ArrayList<SimulatorListener>(1);
+        myChangeListeners = new ArrayList<Listener>(1);
+        myDisplayProgress = true;
+    }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#initialize(ca.nengo.model.Network)
-	 */
-	public synchronized void initialize(Network network) {
-		myNodes = network.getNodes();
+    /**
+     * @see ca.nengo.sim.Simulator#initialize(ca.nengo.model.Network)
+     */
+    public synchronized void initialize(Network network) {
+        myNodes = network.getNodes();
 
-		myNodeMap = new HashMap<String, Node>(myNodes.length * 2);
-		for (int i = 0; i < myNodes.length; i++) {
-			myNodeMap.put(myNodes[i].getName(), myNodes[i]);
-		}
+        myNodeMap = new HashMap<String, Node>(myNodes.length * 2);
+        for (Node myNode : myNodes) {
+            myNodeMap.put(myNode.getName(), myNode);
+        }
 
-		myProjections = network.getProjections();
+        myProjections = network.getProjections();
 
-		if (myProbes == null) {
+        if (myProbes == null) {
             myProbes = new ArrayList<Probe>(20);
         }
 
         myTasks = collectTasks(myNodes);
-	}
+    }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#resetProbes()
-	 */
-	public void resetProbes()
-	{
-		Iterator<Probe> it = myProbes.iterator();
-		while (it.hasNext()) {
-			it.next().reset();
-		}
+    /**
+     * @see ca.nengo.sim.Simulator#resetProbes()
+     */
+    public void resetProbes()
+    {
+        Iterator<Probe> it = myProbes.iterator();
+        while (it.hasNext()) {
+            it.next().reset();
+        }
 
-		for(Node node : myNodes)
-		{
-			if(node instanceof Network) {
+        for(Node node : myNodes)
+        {
+            if(node instanceof Network) {
                 ((Network)node).getSimulator().resetProbes();
             }
-		}
-	}
+        }
+    }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#run(float, float, float)
-	 */
-	public synchronized void run(float startTime, float endTime, float stepSize)
-			throws SimulationException {
+    /**
+     * @see ca.nengo.sim.Simulator#run(float, float, float)
+     */
+    public synchronized void run(float startTime, float endTime, float stepSize)
+            throws SimulationException {
         this.run(startTime, endTime, stepSize, true);
     }
 
     /**
-	 * Run function with option to display (or not) the progress in the console
-	 */
-	public synchronized void run(float startTime, float endTime, float stepSize, boolean topLevel)
-			throws SimulationException {
+     * Run function with option to display (or not) the progress in the console
+     */
+    public synchronized void run(float startTime, float endTime, float stepSize, boolean topLevel)
+            throws SimulationException {
 
-//		float pre_time = System.nanoTime();
+        //		float pre_time = System.nanoTime();
 
-		double time = startTime;
-		double thisStepSize = stepSize;
-
-
-		/* If we are using the GPU for this network, then we have to bring
-		 *  the non-network nodes up to the top level so that we don't
-		 * run multiple simulators.
-		 */
-		myNEFGPUInterface = null;
-		myNodeThreadPool = null;
-
-		if(NEFGPUInterface.getUseGPU()){
-			Node[] nodesForGPU = collectNodes(myNodes);
-			Node[] networkArraysForGPU = collectNetworkArraysForGPU(myNodes);
-			Projection[] projectionsForGPU = collectProjections(myNodes, myProjections);
-
-			myNEFGPUInterface = new NEFGPUInterface(nodesForGPU, projectionsForGPU, networkArraysForGPU);
-		}else if(NodeThreadPool.isMultithreading()){
-			Node[] nodesForMultithreading = collectNodes(myNodes);
-			Projection[] projectionsForMultithreading = collectProjections(myNodes, myProjections);
-
-			myNodeThreadPool =
-				new NodeThreadPool(nodesForMultithreading, projectionsForMultithreading, myTasks);
-		}
-
-		if(topLevel)
-		{
-			resetProbes();
-		}
-
-		fireSimulatorEvent(new SimulatorEvent(0, SimulatorEvent.Type.STARTED));
-
-		// for (int i = 0; i < myNodes.length; i++) {
-		// myNodes[i].setMode(mode);
-		// }
-
-		// //make each node produce its initial output
-		// for (int i = 0; i < myNodes.length; i++) {
-		// myNodes[i].run(startTime, startTime);
-		// }
-		//
+        double time = startTime;
+        double thisStepSize = stepSize;
 
 
+        /* If we are using the GPU for this network, then we have to bring
+         *  the non-network nodes up to the top level so that we don't
+         * run multiple simulators.
+         */
+        myNEFGPUInterface = null;
+        myNodeThreadPool = null;
 
-		// Casting the float to a double above causes some unexpected rounding.  To avoid this
-		//  we force the stepSize to be divisible by 0.000001 (1 microsecond)
+        if(NEFGPUInterface.getUseGPU()){
+            Node[] nodesForGPU = collectNodes(myNodes);
+            Node[] networkArraysForGPU = collectNetworkArraysForGPU(myNodes);
+            Projection[] projectionsForGPU = collectProjections(myNodes, myProjections);
 
-		thisStepSize=Math.round(thisStepSize*1000000)/1000000.0;
-		if (thisStepSize<0.000001) {
+            myNEFGPUInterface = new NEFGPUInterface(nodesForGPU, projectionsForGPU, networkArraysForGPU);
+        }else if(NodeThreadPool.isMultithreading()){
+            Node[] nodesForMultithreading = collectNodes(myNodes);
+            Projection[] projectionsForMultithreading = collectProjections(myNodes, myProjections);
+
+            myNodeThreadPool =
+                    new NodeThreadPool(nodesForMultithreading, projectionsForMultithreading, myTasks);
+        }
+
+        if(topLevel)
+        {
+            resetProbes();
+        }
+
+        fireSimulatorEvent(new SimulatorEvent(0, SimulatorEvent.Type.STARTED));
+
+        // for (int i = 0; i < myNodes.length; i++) {
+        // myNodes[i].setMode(mode);
+        // }
+
+        // //make each node produce its initial output
+        // for (int i = 0; i < myNodes.length; i++) {
+        // myNodes[i].run(startTime, startTime);
+        // }
+        //
+
+
+
+        // Casting the float to a double above causes some unexpected rounding.  To avoid this
+        //  we force the stepSize to be divisible by 0.000001 (1 microsecond)
+
+        thisStepSize=Math.round(thisStepSize*1000000)/1000000.0;
+        if (thisStepSize<0.000001) {
             thisStepSize=0.000001;
         }
 
-		int c = 0;
-		while (time < endTime) {
+        int c = 0;
+        while (time < endTime) {
 
-			if (c++ % 100 == 99 && myDisplayProgress) {
+            if (c++ % 100 == 99 && myDisplayProgress) {
                 System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize));
             }
 
-			if (time + 1.5*thisStepSize > endTime) { //fudge step size to hit end exactly
-				thisStepSize = endTime - time;
-			}
+            if (time + 1.5*thisStepSize > endTime) { //fudge step size to hit end exactly
+                thisStepSize = endTime - time;
+            }
 
-			step((float) time, (float) (time+thisStepSize));
+            step((float) time, (float) (time+thisStepSize));
 
-			float currentProgress = ((float) time - startTime) / (endTime - startTime);
-			fireSimulatorEvent(new SimulatorEvent(currentProgress,
-					SimulatorEvent.Type.STEP_TAKEN));
+            float currentProgress = ((float) time - startTime) / (endTime - startTime);
+            fireSimulatorEvent(new SimulatorEvent(currentProgress,
+                    SimulatorEvent.Type.STEP_TAKEN));
 
-			time += thisStepSize;
-		}
+            time += thisStepSize;
+        }
 
-		fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
-
-
-		if(myNEFGPUInterface != null){
-
-			myNEFGPUInterface.kill();
-			myNEFGPUInterface = null;
-
-		}else if(myNodeThreadPool != null){
-
-			myNodeThreadPool.kill();
-			myNodeThreadPool = null;
-
-		}
-
-	}
-
-	public void step(float startTime, float endTime)
-			throws SimulationException {
+        fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
 
 
-		if(myNEFGPUInterface != null){
-			myNEFGPUInterface.step(startTime, endTime);
+        if(myNEFGPUInterface != null){
+
+            myNEFGPUInterface.kill();
+            myNEFGPUInterface = null;
+
+        }else if(myNodeThreadPool != null){
+
+            myNodeThreadPool.kill();
+            myNodeThreadPool = null;
+
+        }
+
+    }
+
+    public void step(float startTime, float endTime)
+            throws SimulationException {
+
+
+        if(myNEFGPUInterface != null){
+            myNEFGPUInterface.step(startTime, endTime);
             // TODO Possibly integrate this into the NEFGPUInterface
-            for (int i = 0; i < myTasks.length; i++) {
-                myTasks[i].run(startTime, endTime);
+            for (ThreadTask myTask : myTasks) {
+                myTask.run(startTime, endTime);
             }
-		}
-		else if(myNodeThreadPool != null){
-			myNodeThreadPool.step(startTime, endTime);
-		}else{
-			for (int i = 0; i < myProjections.length; i++) {
-				InstantaneousOutput values = myProjections[i].getOrigin().getValues();
-				myProjections[i].getTermination().setValues(values);
-			}
+        }
+        else if(myNodeThreadPool != null){
+            myNodeThreadPool.step(startTime, endTime);
+        }else{
+            for (Projection myProjection : myProjections) {
+                InstantaneousOutput values = myProjection.getOrigin().getValues();
+                myProjection.getTermination().setValues(values);
+            }
 
-			for (int i = 0; i < myNodes.length; i++) {
-				if(myNodes[i] instanceof NetworkImpl) {
-                    ((NetworkImpl)myNodes[i]).run(startTime, endTime, false);
+            for (Node myNode : myNodes) {
+                if(myNode instanceof NetworkImpl) {
+                    ((NetworkImpl)myNode).run(startTime, endTime, false);
                 } else {
-                    myNodes[i].run(startTime, endTime);
+                    myNode.run(startTime, endTime);
                 }
-			}
-
-            for (int i = 0; i < myTasks.length; i++) {
-                myTasks[i].run(startTime, endTime);
             }
-		}
 
-		Iterator<Probe> it = myProbes.iterator();
-		while (it.hasNext()) {
-			it.next().collect(endTime);
-		}
-	}
+            for (ThreadTask myTask : myTasks) {
+                myTask.run(startTime, endTime);
+            }
+        }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#resetNetwork(boolean)
-	 */
-	public synchronized void resetNetwork(boolean randomize,
-											 boolean saveWeights) {
-		if (saveWeights) {
-			Termination[] terms;
-			for (int i = 0; i < myNodes.length; i++) {
-				terms = myNodes[i].getTerminations();
-				for (int j = 0; j < terms.length; j++) {
-					if (terms[j] instanceof PlasticEnsembleTermination) {
-						((PlasticEnsembleTermination) terms[j]).saveTransform();
-					}
-				}
-			}
-		}
+        Iterator<Probe> it = myProbes.iterator();
+        while (it.hasNext()) {
+            it.next().collect(endTime);
+        }
+    }
 
-		for (int i = 0; i < myNodes.length; i++) {
-			myNodes[i].reset(randomize);
-		}
-	}
+    /**
+     * @see ca.nengo.sim.Simulator#resetNetwork(boolean, boolean)
+     */
+    public synchronized void resetNetwork(boolean randomize, boolean saveWeights) {
+        if (saveWeights) {
+            Termination[] terms;
+            for (Node myNode : myNodes) {
+                terms = myNode.getTerminations();
+                for (Termination term : terms) {
+                    if (term instanceof PlasticEnsembleTermination) {
+                        ((PlasticEnsembleTermination) term).saveTransform();
+                    }
+                }
+            }
+        }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#addProbe(java.lang.String, java.lang.String,
-	 *      boolean)
-	 */
-	public Probe addProbe(String nodeName, String state, boolean record)
-			throws SimulationException {
-		Probeable p = getNode(nodeName);
-		return addProbe(null, p, state, record);
-	}
+        for (Node myNode : myNodes) {
+            myNode.reset(randomize);
+        }
+    }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#addProbe(java.lang.String, int,
-	 *      java.lang.String, boolean)
-	 */
-	public Probe addProbe(String ensembleName, int neuronIndex, String state,
-			boolean record) throws SimulationException {
-		Probeable p = getNeuron(ensembleName, neuronIndex);
-		return addProbe(ensembleName, p, state, record);
-	}
+    /**
+     * @see ca.nengo.sim.Simulator#addProbe(java.lang.String, java.lang.String,
+     *      boolean)
+     */
+    public Probe addProbe(String nodeName, String state, boolean record)
+            throws SimulationException {
+        Probeable p = getNode(nodeName);
+        return addProbe(null, p, state, record);
+    }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#addProbe(java.lang.String, int,
-	 *      java.lang.String, boolean)
-	 */
-	public Probe addProbe(String ensembleName, Probeable target, String state,
-			boolean record) throws SimulationException {
+    /**
+     * @see ca.nengo.sim.Simulator#addProbe(java.lang.String, int,
+     *      java.lang.String, boolean)
+     */
+    public Probe addProbe(String ensembleName, int neuronIndex, String state,
+            boolean record) throws SimulationException {
+        Probeable p = getNeuron(ensembleName, neuronIndex);
+        return addProbe(ensembleName, p, state, record);
+    }
 
-		/*
-		 * Check that no duplicate probes are created
-		 */
-		for (Probe probe : myProbes) {
-			if (probe.getTarget() == target) {
-				if (probe.getStateName().compareTo(state) == 0) {
-					throw new SimulationException("A probe already exists on this target & state");
-				}
-			}
-		}
+    /**
+     * @see ca.nengo.sim.Simulator#addProbe(java.lang.String, int,
+     *      java.lang.String, boolean)
+     */
+    public Probe addProbe(String ensembleName, Probeable target, String state,
+            boolean record) throws SimulationException {
 
-		Probe result = new ProbeImpl();
-		result.connect(ensembleName, target, state, record);
+        /*
+         * Check that no duplicate probes are created
+         */
+        for (Probe probe : myProbes) {
+            if (probe.getTarget() == target) {
+                if (probe.getStateName().compareTo(state) == 0) {
+                    throw new SimulationException("A probe already exists on this target & state");
+                }
+            }
+        }
 
-		myProbes.add(result);
+        Probe result = new ProbeImpl();
+        result.connect(ensembleName, target, state, record);
 
-		fireVisibleChangeEvent();
-		return result;
-	}
+        myProbes.add(result);
 
-	/**
-	 * @see ca.nengo.sim.Simulator#removeProbe(ca.nengo.util.Probe)
-	 */
-	public void removeProbe(Probe probe) throws SimulationException {
-		if (!myProbes.remove(probe)) {
-			throw new SimulationException("Probe could not be removed");
-		}
-		fireVisibleChangeEvent();
-	}
+        fireVisibleChangeEvent();
+        return result;
+    }
 
-	private Probeable getNode(String nodeName) throws SimulationException {
-		Node result = myNodeMap.get(nodeName);
+    /**
+     * @see ca.nengo.sim.Simulator#removeProbe(ca.nengo.util.Probe)
+     */
+    public void removeProbe(Probe probe) throws SimulationException {
+        if (!myProbes.remove(probe)) {
+            throw new SimulationException("Probe could not be removed");
+        }
+        fireVisibleChangeEvent();
+    }
 
-		if (result == null) {
-			throw new SimulationException("The named Node does not exist");
-		}
+    private Probeable getNode(String nodeName) throws SimulationException {
+        Node result = myNodeMap.get(nodeName);
 
-		if (!(result instanceof Probeable)) {
-			throw new SimulationException("The named Node is not Probeable");
-		}
+        if (result == null) {
+            throw new SimulationException("The named Node does not exist");
+        }
 
-		return (Probeable) result;
-	}
+        if (!(result instanceof Probeable)) {
+            throw new SimulationException("The named Node is not Probeable");
+        }
 
-	private Probeable getNeuron(String nodeName, int index)
-			throws SimulationException {
-		Node ensemble = myNodeMap.get(nodeName);
+        return (Probeable) result;
+    }
 
-		if (ensemble == null) {
-			throw new SimulationException("The named Ensemble does not exist");
-		}
+    private Probeable getNeuron(String nodeName, int index)
+            throws SimulationException {
+        Node ensemble = myNodeMap.get(nodeName);
 
-		if (!(ensemble instanceof Ensemble)) {
-			throw new SimulationException("The named Node is not an Ensemble");
-		}
+        if (ensemble == null) {
+            throw new SimulationException("The named Ensemble does not exist");
+        }
 
-		Node[] nodes = ((Ensemble) ensemble).getNodes();
-		if (index < 0 || index >= nodes.length) {
-			throw new SimulationException("The Node index " + index
-					+ " is out of range for Ensemble size " + nodes.length);
-		}
+        if (!(ensemble instanceof Ensemble)) {
+            throw new SimulationException("The named Node is not an Ensemble");
+        }
 
-		if (!(nodes[index] instanceof Probeable)) {
-			throw new SimulationException("The specified Node is not Probeable");
-		}
+        Node[] nodes = ((Ensemble) ensemble).getNodes();
+        if (index < 0 || index >= nodes.length) {
+            throw new SimulationException("The Node index " + index
+                    + " is out of range for Ensemble size " + nodes.length);
+        }
 
-		return (Probeable) nodes[index];
-	}
+        if (!(nodes[index] instanceof Probeable)) {
+            throw new SimulationException("The specified Node is not Probeable");
+        }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#getProbes()
-	 */
-	public Probe[] getProbes() {
-		return myProbes.toArray(new Probe[0]);
-	}
+        return (Probeable) nodes[index];
+    }
 
-	public void setDisplayProgress(boolean display)
-	{
-		myDisplayProgress = display;
-	}
+    /**
+     * @see ca.nengo.sim.Simulator#getProbes()
+     */
+    public Probe[] getProbes() {
+        return myProbes.toArray(new Probe[0]);
+    }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#addSimulatorListener(ca.nengo.sim.SimulatorListener)
-	 */
-	public void addSimulatorListener(SimulatorListener listener) {
-		if (mySimulatorListeners.contains(listener)) {
-			System.out
-					.println("Trying to add simulator listener that already exists");
-		} else {
-			mySimulatorListeners.add(listener);
-		}
-	}
+    public void setDisplayProgress(boolean display)
+    {
+        myDisplayProgress = display;
+    }
 
-	/**
-	 * @param event
-	 */
-	protected void fireSimulatorEvent(SimulatorEvent event) {
-		for (SimulatorListener listener : mySimulatorListeners) {
-			listener.processEvent(event);
-		}
-	}
+    /**
+     * @see ca.nengo.sim.Simulator#addSimulatorListener(ca.nengo.sim.SimulatorListener)
+     */
+    public void addSimulatorListener(SimulatorListener listener) {
+        if (mySimulatorListeners.contains(listener)) {
+            System.out
+            .println("Trying to add simulator listener that already exists");
+        } else {
+            mySimulatorListeners.add(listener);
+        }
+    }
 
-	/**
-	 * @see ca.nengo.sim.Simulator#removeSimulatorListener(ca.nengo.sim.SimulatorListener)
-	 */
-	public void removeSimulatorListener(SimulatorListener listener) {
-		mySimulatorListeners.remove(listener);
-	}
+    /**
+     * @param event
+     */
+    protected void fireSimulatorEvent(SimulatorEvent event) {
+        for (SimulatorListener listener : mySimulatorListeners) {
+            listener.processEvent(event);
+        }
+    }
 
-	/**
-	 * @see ca.nengo.util.VisiblyMutable#addChangeListener(ca.nengo.util.VisiblyMutable.Listener)
-	 */
-	public void addChangeListener(Listener listener) {
-		if (myChangeListeners == null) {
-			myChangeListeners = new ArrayList<Listener>(1);
-		}
-		myChangeListeners.add(listener);
-	}
+    /**
+     * @see ca.nengo.sim.Simulator#removeSimulatorListener(ca.nengo.sim.SimulatorListener)
+     */
+    public void removeSimulatorListener(SimulatorListener listener) {
+        mySimulatorListeners.remove(listener);
+    }
 
-	/**
-	 * @see ca.nengo.util.VisiblyMutable#removeChangeListener(ca.nengo.util.VisiblyMutable.Listener)
-	 */
-	public void removeChangeListener(Listener listener) {
-		if (myChangeListeners != null) {
+    /**
+     * @see ca.nengo.util.VisiblyMutable#addChangeListener(ca.nengo.util.VisiblyMutable.Listener)
+     */
+    public void addChangeListener(Listener listener) {
+        if (myChangeListeners == null) {
+            myChangeListeners = new ArrayList<Listener>(1);
+        }
+        myChangeListeners.add(listener);
+    }
+
+    /**
+     * @see ca.nengo.util.VisiblyMutable#removeChangeListener(ca.nengo.util.VisiblyMutable.Listener)
+     */
+    public void removeChangeListener(Listener listener) {
+        if (myChangeListeners != null) {
             myChangeListeners.remove(listener);
         }
-	}
+    }
 
-	private void fireVisibleChangeEvent() {
-		VisiblyMutableUtils.changed(this, myChangeListeners);
-	}
+    private void fireVisibleChangeEvent() {
+        VisiblyMutableUtils.changed(this, myChangeListeners);
+    }
 
-	@Override
-	public Simulator clone() throws CloneNotSupportedException {
-		return new LocalSimulator();
-	}
+    @Override
+    public Simulator clone() throws CloneNotSupportedException {
+        return new LocalSimulator();
+    }
 
-	/**
-	 * Bring all nodes to the top level so we can run them all at once.
-	 * Retrieves nodes depth-first. Used for multithreaded and GPU-enabled runs.
-	 */
-	public static Node[] collectNodes(Node[] startingNodes){
+    /**
+     * Bring all nodes to the top level so we can run them all at once.
+     * Retrieves nodes depth-first. Used for multithreaded and GPU-enabled runs.
+     */
+    public static Node[] collectNodes(Node[] startingNodes){
 
-		ArrayList<Node> nodes = new ArrayList<Node>();
+        ArrayList<Node> nodes = new ArrayList<Node>();
 
-		List<Node> nodesToProcess = new LinkedList<Node>();
-		nodesToProcess.addAll(Arrays.asList(startingNodes));
+        List<Node> nodesToProcess = new LinkedList<Node>();
+        nodesToProcess.addAll(Arrays.asList(startingNodes));
 
-		Node workingNode;
+        Node workingNode;
 
-		while(nodesToProcess.size() != 0)
-		{
-			workingNode = nodesToProcess.remove(0);
+        while(nodesToProcess.size() != 0)
+        {
+            workingNode = nodesToProcess.remove(0);
 
-			if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
-			{
-				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-
-				nodeList.addAll(nodesToProcess);
-				nodesToProcess = nodeList;
-			}
-			else
-			{
-				nodes.add(workingNode);
-			}
-		}
-
-		return nodes.toArray(new Node[0]);
-	}
-
-	public static ThreadTask[] collectTasks(Node[] startingNodes){
-
-		ArrayList<ThreadTask> tasks = new ArrayList<ThreadTask>();
-
-		List<Node> nodesToProcess = new LinkedList<Node>();
-		nodesToProcess.addAll(Arrays.asList(startingNodes));
-
-		Node workingNode;
-
-		while(nodesToProcess.size() != 0)
-		{
-			workingNode = nodesToProcess.remove(0);
-
-			if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
-			{
-				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-
-				nodeList.addAll(nodesToProcess);
-				nodesToProcess = nodeList;
-			}
-			else if(workingNode instanceof TaskSpawner)
+            if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
             {
-				tasks.addAll(Arrays.asList(((TaskSpawner) workingNode).getTasks()));
-			}
-		}
+                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
 
-		return tasks.toArray(new ThreadTask[0]);
-	}
+                nodeList.addAll(nodesToProcess);
+                nodesToProcess = nodeList;
+            }
+            else
+            {
+                nodes.add(workingNode);
+            }
+        }
 
-	public static Node[] collectNetworkArraysForGPU(Node[] startingNodes){
-		ArrayList<Node> nodes = new ArrayList<Node>();
+        return nodes.toArray(new Node[0]);
+    }
 
-		List<Node> nodesToProcess = new LinkedList<Node>();
-		nodesToProcess.addAll(Arrays.asList(startingNodes));
+    public static ThreadTask[] collectTasks(Node[] startingNodes){
 
-		Node workingNode;
+        ArrayList<ThreadTask> tasks = new ArrayList<ThreadTask>();
 
-		while(nodesToProcess.size() != 0)
-		{
-			workingNode = nodesToProcess.remove(0);
+        List<Node> nodesToProcess = new LinkedList<Node>();
+        nodesToProcess.addAll(Arrays.asList(startingNodes));
 
-			// The purpose of this function is to have a list of NetworkArrays. On the GPU, all NEF
-			// ensembles are considered to be part of a NetworkArray. NEF ensembles that are not
-			// ostensibly part of a NetworkArray are considered by the GPU to be part of a NetworkArray
-			// that contains only one nodes. In this way, we do not have to make special considerations
-			// for nodes that are part of the NetworkArray. Processing a network array that contains only
-			// one node is effectively the same as processing that one node on its own, so nothing is lost.
-			boolean isNEFEnsemble = workingNode instanceof NEFEnsembleImpl;
-			boolean isNetworkArray = workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6";
-			boolean isNetwork = workingNode instanceof NetworkImpl;
+        Node workingNode;
+
+        while(nodesToProcess.size() != 0)
+        {
+            workingNode = nodesToProcess.remove(0);
+
+            if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
+            {
+                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
+
+                nodeList.addAll(nodesToProcess);
+                nodesToProcess = nodeList;
+            }
+            else if(workingNode instanceof TaskSpawner)
+            {
+                tasks.addAll(Arrays.asList(((TaskSpawner) workingNode).getTasks()));
+            }
+        }
+
+        return tasks.toArray(new ThreadTask[0]);
+    }
+
+    public static Node[] collectNetworkArraysForGPU(Node[] startingNodes){
+        ArrayList<Node> nodes = new ArrayList<Node>();
+
+        List<Node> nodesToProcess = new LinkedList<Node>();
+        nodesToProcess.addAll(Arrays.asList(startingNodes));
+
+        Node workingNode;
+
+        while(nodesToProcess.size() != 0)
+        {
+            workingNode = nodesToProcess.remove(0);
+
+            // The purpose of this function is to have a list of NetworkArrays. On the GPU, all NEF
+            // ensembles are considered to be part of a NetworkArray. NEF ensembles that are not
+            // ostensibly part of a NetworkArray are considered by the GPU to be part of a NetworkArray
+            // that contains only one nodes. In this way, we do not have to make special considerations
+            // for nodes that are part of the NetworkArray. Processing a network array that contains only
+            // one node is effectively the same as processing that one node on its own, so nothing is lost.
+            boolean isNEFEnsemble = workingNode instanceof NEFEnsembleImpl;
+            boolean isNetworkArray = workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6";
+            boolean isNetwork = workingNode instanceof NetworkImpl;
 
 
-			if(isNEFEnsemble || isNetworkArray)
-			{
-				nodes.add(workingNode);
-			}
-			else if(isNetwork)
-			{
-				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
+            if(isNEFEnsemble || isNetworkArray)
+            {
+                nodes.add(workingNode);
+            }
+            else if(isNetwork)
+            {
+                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
 
-				nodeList.addAll(nodesToProcess);
-				nodesToProcess = nodeList;
+                nodeList.addAll(nodesToProcess);
+                nodesToProcess = nodeList;
 
-				//nodesToProcess = Arrays.asList(((Network) workingNode).getNodes()).addAll(nodesToProcess);
-				//nodesToProcess.addAll(Arrays.asList(((Network) workingNode).getNodes()));
-			}
-		}
+                //nodesToProcess = Arrays.asList(((Network) workingNode).getNodes()).addAll(nodesToProcess);
+                //nodesToProcess.addAll(Arrays.asList(((Network) workingNode).getNodes()));
+            }
+        }
 
-		return nodes.toArray(new Node[0]);
-	}
+        return nodes.toArray(new Node[0]);
+    }
 
 
-	/**
-	 * Bring all projections to the top level so we can run them all at once.
-	 * Used for multithreaded and GPU-enabled runs.
-	 */
-	public static Projection[] collectProjections(Node[] startingNodes, Projection[] startingProjections){
+    /**
+     * Bring all projections to the top level so we can run them all at once.
+     * Used for multithreaded and GPU-enabled runs.
+     */
+    public static Projection[] collectProjections(Node[] startingNodes, Projection[] startingProjections){
 
-		ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(startingProjections));
+        ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(startingProjections));
 
-		List<Node> nodesToProcess = new LinkedList<Node>();
-		nodesToProcess.addAll(Arrays.asList(startingNodes));
+        List<Node> nodesToProcess = new LinkedList<Node>();
+        nodesToProcess.addAll(Arrays.asList(startingNodes));
 
-		Node workingNode;
+        Node workingNode;
 
-		while(nodesToProcess.size() != 0)
-		{
-			workingNode = nodesToProcess.remove(0);
+        while(nodesToProcess.size() != 0)
+        {
+            workingNode = nodesToProcess.remove(0);
 
-			if(workingNode instanceof Network) {
-				List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
+            if(workingNode instanceof Network) {
+                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
 
-				nodeList.addAll(nodesToProcess);
-				nodesToProcess = nodeList;
+                nodeList.addAll(nodesToProcess);
+                nodesToProcess = nodeList;
 
-				projections.addAll(Arrays.asList(((Network) workingNode).getProjections()));
-			}
-		}
+                projections.addAll(Arrays.asList(((Network) workingNode).getProjections()));
+            }
+        }
 
-		return projections.toArray(new Projection[0]);
-	}
+        return projections.toArray(new Projection[0]);
+    }
 }
