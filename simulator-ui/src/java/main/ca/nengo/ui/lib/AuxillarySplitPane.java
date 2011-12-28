@@ -25,253 +25,305 @@ import ca.nengo.ui.lib.Style.NengoStyle;
  */
 public class AuxillarySplitPane extends JSplitPane {
 
-	private static final long serialVersionUID = 1L;
-	public static final int MINIMUM_WIDTH = 300;
-	public static final int MINIMUM_HEIGHT = 200;
+    private static final long serialVersionUID = 1L;
 
-	private static int getJSplitPaneOrientation(Orientation orientation) {
-		if (orientation == Orientation.Left || orientation == Orientation.Right) {
-			return JSplitPane.HORIZONTAL_SPLIT;
-		} else {
-			return JSplitPane.VERTICAL_SPLIT;
-		}
-	}
+    /**
+     * TODO
+     */
+    public static final int MINIMUM_WIDTH = 300;
 
-	private int auxPanelSize;
-	private final String auxTitle;
-	private JPanel auxPanelWr;
+    /**
+     * TODO
+     */
+    public static final int MINIMUM_HEIGHT = 200;
 
-	private Container mainPanel;
+    private static int getJSplitPaneOrientation(Orientation orientation) {
+        if (orientation == Orientation.Left || orientation == Orientation.Right) {
+            return JSplitPane.HORIZONTAL_SPLIT;
+        } else {
+            return JSplitPane.VERTICAL_SPLIT;
+        }
+    }
 
-	private final Orientation orientation;
+    private int auxPanelSize;
+    private final String auxTitle;
+    private JPanel auxPanelWr;
 
-	public AuxillarySplitPane(Container mainPanel, Container auxPanel, String auxTitle,
-			Orientation orientation) {
-		super(getJSplitPaneOrientation(orientation));
-		this.mainPanel = mainPanel;
-		this.auxTitle = auxTitle;
-		this.orientation = orientation;
+    private Container mainPanel;
 
-		this.addComponentListener(new ComponentListener() {
-			public void componentHidden(ComponentEvent e) {
-			}
+    private final Orientation orientation;
 
-			public void componentMoved(ComponentEvent e) {
-			}
+    /**
+     * @param mainPanel TODO
+     * @param auxPanel TODO
+     * @param auxTitle TODO
+     * @param orientation TODO
+     */
+    public AuxillarySplitPane(Container mainPanel, Container auxPanel, String auxTitle,
+            Orientation orientation) {
+        super(getJSplitPaneOrientation(orientation));
+        this.mainPanel = mainPanel;
+        this.auxTitle = auxTitle;
+        this.orientation = orientation;
 
-			public void componentResized(ComponentEvent e) {
-				updateAuxSize();
-			}
+        this.addComponentListener(new ComponentListener() {
+            public void componentHidden(ComponentEvent e) {
+            }
 
-			public void componentShown(ComponentEvent e) {
-			}
+            public void componentMoved(ComponentEvent e) {
+            }
 
-		});
+            public void componentResized(ComponentEvent e) {
+                updateAuxSize();
+            }
 
-		init(auxPanel);
-	}
+            public void componentShown(ComponentEvent e) {
+            }
 
-	private JPanel createAuxPanelWrapper(final Container auxPanel, String title) {
-		/*
-		 * Initialize auxillary panel
-		 */
-		JPanel leftPanel = new JPanel();
-		leftPanel.setLayout(new BorderLayout());
-		leftPanel.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				if (auxPanel!=null) auxPanel.requestFocusInWindow();
-			}
-		});
+        });
 
-		NengoStyle.applyStyle(leftPanel);
+        init(auxPanel);
+    }
 
-		/*
-		 * Create auxillary panel's title bar
-		 */
-		JPanel titleBar = new JPanel();
-		titleBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-		NengoStyle.applyStyle(titleBar);
-		titleBar.setBackground(NengoStyle.COLOR_BACKGROUND2);
-		titleBar.setOpaque(true);
-		titleBar.setLayout(new BorderLayout());
+    private JPanel createAuxPanelWrapper(final Container auxPanel, String title) {
+        /*
+         * Initialize auxillary panel
+         */
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BorderLayout());
+        leftPanel.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (auxPanel!=null) {
+                    auxPanel.requestFocusInWindow();
+                }
+            }
+        });
 
-		JLabel titleLabel = new JLabel(title);
+        NengoStyle.applyStyle(leftPanel);
 
-		titleLabel.setFont(NengoStyle.FONT_BIG);
-		NengoStyle.applyStyle(titleLabel);
-		titleLabel.setBackground(NengoStyle.COLOR_BACKGROUND2);
-		titleLabel.setOpaque(true);
+        /*
+         * Create auxillary panel's title bar
+         */
+        JPanel titleBar = new JPanel();
+        titleBar.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        NengoStyle.applyStyle(titleBar);
+        titleBar.setBackground(NengoStyle.COLOR_BACKGROUND2);
+        titleBar.setOpaque(true);
+        titleBar.setLayout(new BorderLayout());
 
-		String hideButtonTxt = " << ";
-		if (orientation == Orientation.Right) {
-			hideButtonTxt = " >> ";
-		}
-		JLabel hideButton = new JLabel(hideButtonTxt);
-		NengoStyle.applyStyle(hideButton);
-		hideButton.setBackground(NengoStyle.COLOR_BACKGROUND2);
-		hideButton.setOpaque(true);
+        JLabel titleLabel = new JLabel(title);
 
-		/*
-		 * Keep in this order, Swing puts items added first on top. We want the
-		 * button to be on top
-		 */
-		titleBar.add(hideButton, BorderLayout.EAST);
-		titleBar.add(titleLabel, BorderLayout.WEST);
+        titleLabel.setFont(NengoStyle.FONT_BIG);
+        NengoStyle.applyStyle(titleLabel);
+        titleLabel.setBackground(NengoStyle.COLOR_BACKGROUND2);
+        titleLabel.setOpaque(true);
 
-		hideButton.addMouseListener(new HideButtonListener(hideButton));
+        String hideButtonTxt = " << ";
+        if (orientation == Orientation.Right) {
+            hideButtonTxt = " >> ";
+        }
+        JLabel hideButton = new JLabel(hideButtonTxt);
+        NengoStyle.applyStyle(hideButton);
+        hideButton.setBackground(NengoStyle.COLOR_BACKGROUND2);
+        hideButton.setOpaque(true);
 
-		leftPanel.add(titleBar, BorderLayout.NORTH);
+        /*
+         * Keep in this order, Swing puts items added first on top. We want the
+         * button to be on top
+         */
+        titleBar.add(hideButton, BorderLayout.EAST);
+        titleBar.add(titleLabel, BorderLayout.WEST);
 
-		/*
-		 * Create data viewer
-		 */
-		leftPanel.setMinimumSize(new Dimension(MINIMUM_WIDTH, MINIMUM_HEIGHT));
+        hideButton.addMouseListener(new HideButtonListener(hideButton));
 
-		if (auxPanel != null) {
-			NengoStyle.applyStyle(auxPanel);
-			leftPanel.add(auxPanel, BorderLayout.CENTER);
-		}
+        leftPanel.add(titleBar, BorderLayout.NORTH);
 
-		return leftPanel;
-	}
+        /*
+         * Create data viewer
+         */
+        leftPanel.setMinimumSize(new Dimension(MINIMUM_WIDTH, MINIMUM_HEIGHT));
 
-	private void init(Container auxillaryPanel) {
-		NengoStyle.applyStyle(this);
-		setOneTouchExpandable(true);
-		setBorder(null);
+        if (auxPanel != null) {
+            NengoStyle.applyStyle(auxPanel);
+            leftPanel.add(auxPanel, BorderLayout.CENTER);
+        }
 
-		setAuxPane(auxillaryPanel, auxTitle);
+        return leftPanel;
+    }
 
-		setAuxVisible(false);
-	}
+    private void init(Container auxillaryPanel) {
+        NengoStyle.applyStyle(this);
+        setOneTouchExpandable(true);
+        setBorder(null);
 
-	private void updateAuxSize() {
-		if (orientation == Orientation.Bottom) {
-			setDividerLocation(getHeight() - auxPanelSize);
-		} else if (orientation == Orientation.Right) {
-			setDividerLocation(getWidth() - auxPanelSize);
-		}
-	}
+        setAuxPane(auxillaryPanel, auxTitle);
 
-	public String getAuxTitle() {
-		return auxTitle;
-	}
-	
-	public JPanel getAuxPaneWrapper() {
-		return auxPanelWr;
-	}
+        setAuxVisible(false);
+    }
 
-	public boolean isAuxVisible() {
-		return auxPanelWr.isVisible();
-	}
+    private void updateAuxSize() {
+        if (orientation == Orientation.Bottom) {
+            setDividerLocation(getHeight() - auxPanelSize);
+        } else if (orientation == Orientation.Right) {
+            setDividerLocation(getWidth() - auxPanelSize);
+        }
+    }
 
-	public void setAuxPane(Container auxPane, String title) {
-		this.auxPanelWr = createAuxPanelWrapper(auxPane, title);
+    /**
+     * @return TODO
+     */
+    public String getAuxTitle() {
+        return auxTitle;
+    }
 
-		if (auxPane != null) {
-			setAuxVisible(true, true);
-		} else {
-			setAuxVisible(false);
-		}
+    /**
+     * @return TODO
+     */
+    public JPanel getAuxPaneWrapper() {
+        return auxPanelWr;
+    }
 
-		if (orientation == Orientation.Left) {
-			setRightComponent(mainPanel);
-			setLeftComponent(auxPanelWr);
-		} else if (orientation == Orientation.Right) {
-			setRightComponent(auxPanelWr);
-			setLeftComponent(mainPanel);
-		} else if (orientation == Orientation.Bottom) {
-			setTopComponent(mainPanel);
-			setBottomComponent(auxPanelWr);
-		}
-	}
+    /**
+     * @return TODO
+     */
+    public boolean isAuxVisible() {
+        return auxPanelWr.isVisible();
+    }
 
-	public void setAuxVisible(boolean isVisible) {
-		setAuxVisible(isVisible, false);
+    /**
+     * @param auxPane TODO
+     * @param title TODO
+     */
+    public void setAuxPane(Container auxPane, String title) {
+        this.auxPanelWr = createAuxPanelWrapper(auxPane, title);
 
-	}
+        if (auxPane != null) {
+            setAuxVisible(true, true);
+        } else {
+            setAuxVisible(false);
+        }
 
-	public void setAuxVisible(boolean isVisible, boolean resetDividerLocation) {
-		if (isVisible) {
-			int auxSize = this.getDividerLocation();
+        if (orientation == Orientation.Left) {
+            setRightComponent(mainPanel);
+            setLeftComponent(auxPanelWr);
+        } else if (orientation == Orientation.Right) {
+            setRightComponent(auxPanelWr);
+            setLeftComponent(mainPanel);
+        } else if (orientation == Orientation.Bottom) {
+            setTopComponent(mainPanel);
+            setBottomComponent(auxPanelWr);
+        }
+    }
 
-			double minAuxSize;
-			if (orientation == Orientation.Bottom) {
-				auxSize = getHeight() - auxSize;
-				minAuxSize = auxPanelWr.getMinimumSize().getHeight();
-			} else if (orientation == Orientation.Right) {
-				auxSize = getWidth() - auxSize;
-				minAuxSize = auxPanelWr.getMinimumSize().getWidth();
-			} else {
-				minAuxSize = auxPanelWr.getMinimumSize().getWidth();
-			}
+    /**
+     * @param isVisible TODO
+     */
+    public void setAuxVisible(boolean isVisible) {
+        setAuxVisible(isVisible, false);
 
-			if (auxSize < minAuxSize || resetDividerLocation) {
-				if (orientation == Orientation.Bottom) {
-					setDividerLocation((int) (getHeight() - minAuxSize));
+    }
 
-				} else if (orientation == Orientation.Right) {
-					setDividerLocation((int) (getWidth() - minAuxSize));
-				} else {
-					setDividerLocation((int) minAuxSize);
-				}
+    /**
+     * @param isVisible TODO
+     * @param resetDividerLocation TODO
+     */
+    public void setAuxVisible(boolean isVisible, boolean resetDividerLocation) {
+        if (isVisible) {
+            int auxSize = this.getDividerLocation();
 
-			}
-			setDividerSize(2);
-			if (!auxPanelWr.isVisible()) {
-				auxPanelWr.requestFocus();
-				auxPanelWr.setVisible(true);
-			}
-			auxPanelWr.requestFocusInWindow();
-		} else {
-			auxPanelWr.setVisible(false);
+            double minAuxSize;
+            if (orientation == Orientation.Bottom) {
+                auxSize = getHeight() - auxSize;
+                minAuxSize = auxPanelWr.getMinimumSize().getHeight();
+            } else if (orientation == Orientation.Right) {
+                auxSize = getWidth() - auxSize;
+                minAuxSize = auxPanelWr.getMinimumSize().getWidth();
+            } else {
+                minAuxSize = auxPanelWr.getMinimumSize().getWidth();
+            }
 
-			// setDividerLocation(0);
-			setDividerSize(0);
-		}
-	}
+            if (auxSize < minAuxSize || resetDividerLocation) {
+                if (orientation == Orientation.Bottom) {
+                    setDividerLocation((int) (getHeight() - minAuxSize));
 
-	@Override
-	public void setDividerLocation(int location) {
-		super.setDividerLocation(location);
-		if (orientation == Orientation.Bottom) {
-			auxPanelSize = getHeight() - location;
-		} else if (orientation == Orientation.Right) {
-			auxPanelSize = getWidth() - location;
-		}
-	}
+                } else if (orientation == Orientation.Right) {
+                    setDividerLocation((int) (getWidth() - minAuxSize));
+                } else {
+                    setDividerLocation((int) minAuxSize);
+                }
 
-	public enum Orientation {
-		Bottom, Left, Right
-	}
+            }
+            setDividerSize(2);
+            if (!auxPanelWr.isVisible()) {
+                auxPanelWr.requestFocus();
+                auxPanelWr.setVisible(true);
+            }
+            auxPanelWr.requestFocusInWindow();
+        } else {
+            auxPanelWr.setVisible(false);
 
-	class HideButtonListener implements MouseListener {
-		private Container hideButton;
+            // setDividerLocation(0);
+            setDividerSize(0);
+        }
+    }
 
-		public HideButtonListener(Container hideButton) {
-			super();
-			this.hideButton = hideButton;
-		}
+    @Override
+    public void setDividerLocation(int location) {
+        super.setDividerLocation(location);
+        if (orientation == Orientation.Bottom) {
+            auxPanelSize = getHeight() - location;
+        } else if (orientation == Orientation.Right) {
+            auxPanelSize = getWidth() - location;
+        }
+    }
 
-		public void mouseClicked(MouseEvent e) {
-			setAuxVisible(false);
-		}
+    /**
+     * TODO
+     */
+    public enum Orientation {
+        /**
+         * TODO
+         */
+        Bottom,
 
-		public void mouseEntered(MouseEvent e) {
-			hideButton.setBackground(NengoStyle.COLOR_FOREGROUND2);
-		}
+        /**
+         * TODO
+         */
+        Left,
 
-		public void mouseExited(MouseEvent e) {
-			hideButton.setBackground(null);
-		}
+        /**
+         * TODO
+         */
+        Right
+    }
 
-		public void mousePressed(MouseEvent e) {
-		}
+    class HideButtonListener implements MouseListener {
+        private Container hideButton;
 
-		public void mouseReleased(MouseEvent e) {
-		}
+        public HideButtonListener(Container hideButton) {
+            super();
+            this.hideButton = hideButton;
+        }
 
-	}
+        public void mouseClicked(MouseEvent e) {
+            setAuxVisible(false);
+        }
+
+        public void mouseEntered(MouseEvent e) {
+            hideButton.setBackground(NengoStyle.COLOR_FOREGROUND2);
+        }
+
+        public void mouseExited(MouseEvent e) {
+            hideButton.setBackground(null);
+        }
+
+        public void mousePressed(MouseEvent e) {
+        }
+
+        public void mouseReleased(MouseEvent e) {
+        }
+
+    }
 
 }
