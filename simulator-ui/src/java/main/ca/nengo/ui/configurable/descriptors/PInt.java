@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.configurable.descriptors;
 
@@ -36,37 +36,50 @@ import ca.nengo.ui.configurable.panels.IntegerPanel;
  */
 public class PInt extends RangedConfigParam {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public PInt(String name) {
-		super(name);
-	}
+    /**
+     * @param name TODO
+     */
+    public PInt(String name) {
+        super(name);
+    }
 
-	public PInt(String name, int defaultValue) {
-		super(name, defaultValue);
-	}
+    /**
+     * @param name TODO
+     * @param defaultValue TODO
+     */
+    public PInt(String name, int defaultValue) {
+        super(name, defaultValue);
+    }
 
-	public PInt(String name, int defaultvalue, int min, int max) {
-		super(name, defaultvalue, min, max);
-	}
+    /**
+     * @param name TODO
+     * @param defaultvalue TODO
+     * @param min TODO
+     * @param max TODO
+     */
+    public PInt(String name, int defaultvalue, int min, int max) {
+        super(name, defaultvalue, min, max);
+    }
 
-	@Override
-	protected IntegerPanel createInputPanel() {
-		return new IntegerPanel(this);
-	}
+    @Override
+    protected IntegerPanel createInputPanel() {
+        return new IntegerPanel(this);
+    }
 
-	@Override
-	public Class<Integer> getTypeClass() {
-		/*
-		 * Return the primitive type... Integer values can always be cast as the
-		 * primitive
-		 */
-		return int.class;
-	}
+    @Override
+    public Class<Integer> getTypeClass() {
+        /*
+         * Return the primitive type... Integer values can always be cast as the
+         * primitive
+         */
+        return int.class;
+    }
 
-	@Override
-	public String getTypeName() {
-		return "Integer";
-	}
+    @Override
+    public String getTypeName() {
+        return "Integer";
+    }
 
 }

@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.configurable.descriptors;
 
@@ -36,28 +36,31 @@ import ca.nengo.ui.configurable.panels.LongPanel;
  */
 public class PLong extends RangedConfigParam {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public PLong(String name) {
-		super(name);
-	}
+    /**
+     * @param name TODO
+     */
+    public PLong(String name) {
+        super(name);
+    }
 
-	@Override
-	protected LongPanel createInputPanel() {
-		return new LongPanel(this);
-	}
+    @Override
+    protected LongPanel createInputPanel() {
+        return new LongPanel(this);
+    }
 
-	@Override
-	public Class<Long> getTypeClass() {
-		/*
-		 * Return the primitive type
-		 */
-		return long.class;
-	}
+    @Override
+    public Class<Long> getTypeClass() {
+        /*
+         * Return the primitive type
+         */
+        return long.class;
+    }
 
-	@Override
-	public String getTypeName() {
-		return "Long";
-	}
+    @Override
+    public String getTypeName() {
+        return "Long";
+    }
 
 }

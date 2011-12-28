@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.configurable;
 
@@ -47,147 +47,159 @@ import ca.nengo.ui.lib.Style.NengoStyle;
  * @author Shu
  */
 public abstract class PropertyInputPanel {
-	private final JPanel innerPanel;
-	private final JPanel outerPanel;
+    private final JPanel innerPanel;
+    private final JPanel outerPanel;
 
-	private Property propDescriptor;
+    private Property propDescriptor;
 
-	private JLabel statusMessage;
+    private JLabel statusMessage;
 
-	/**
-	 * @param property
-	 *            A description of the Configuration parameter to be configured
-	 */
-	public PropertyInputPanel(Property property) {
-		super();
-		this.propDescriptor = property;
-		outerPanel = new JPanel();
-		outerPanel.setName(property.getName());
-		outerPanel.setToolTipText(property.getTooltip());
+    /**
+     * @param property
+     *            A description of the Configuration parameter to be configured
+     */
+    public PropertyInputPanel(Property property) {
+        super();
+        this.propDescriptor = property;
+        outerPanel = new JPanel();
+        outerPanel.setName(property.getName());
+        outerPanel.setToolTipText(property.getTooltip());
 
-		outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
-		outerPanel.setAlignmentY(JPanel.TOP_ALIGNMENT);
+        outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
+        outerPanel.setAlignmentY(JPanel.TOP_ALIGNMENT);
 
-		outerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        outerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-		JPanel labelPanel=new JPanel();
-		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
-		labelPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        JPanel labelPanel=new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
+        labelPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
-		JLabel label = new JLabel(property.getName());
-		label.setForeground(NengoStyle.COLOR_DARK_BLUE);
-		label.setFont(NengoStyle.FONT_BOLD);
-		labelPanel.add(label);
+        JLabel label = new JLabel(property.getName());
+        label.setForeground(NengoStyle.COLOR_DARK_BLUE);
+        label.setFont(NengoStyle.FONT_BOLD);
+        labelPanel.add(label);
 
-		JButton help=new JButton("<html><u>?</u></html>");
-		help.setForeground(new java.awt.Color(120,120,180));
-		help.setBorderPainted(false);
-		help.setContentAreaFilled(false);
-		help.setFocusPainted(false);
-		help.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,propDescriptor.getTooltip(),propDescriptor.getName(),JOptionPane.INFORMATION_MESSAGE,null);
-			}
-		});
-		labelPanel.add(help);
+        JButton help=new JButton("<html><u>?</u></html>");
+        help.setForeground(new java.awt.Color(120,120,180));
+        help.setBorderPainted(false);
+        help.setContentAreaFilled(false);
+        help.setFocusPainted(false);
+        help.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null,propDescriptor.getTooltip(),propDescriptor.getName(),JOptionPane.INFORMATION_MESSAGE,null);
+            }
+        });
+        labelPanel.add(help);
 
-		//labelPanel.add(Box.createHorizontalGlue());               // use this to right-justify question marks
-		labelPanel.setMaximumSize(labelPanel.getMinimumSize());     // use this to keep question marks on left
+        //labelPanel.add(Box.createHorizontalGlue());               // use this to right-justify question marks
+        labelPanel.setMaximumSize(labelPanel.getMinimumSize());     // use this to keep question marks on left
 
-		outerPanel.add(labelPanel);
+        outerPanel.add(labelPanel);
 
-		innerPanel = new JPanel();
-		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
-		innerPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-		outerPanel.add(innerPanel);
+        innerPanel = new JPanel();
+        innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
+        innerPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        outerPanel.add(innerPanel);
 
-		statusMessage = new JLabel("");
-		statusMessage.setForeground(NengoStyle.COLOR_HIGH_SALIENCE);
+        statusMessage = new JLabel("");
+        statusMessage.setForeground(NengoStyle.COLOR_HIGH_SALIENCE);
 
-		outerPanel.add(statusMessage);
+        outerPanel.add(statusMessage);
 
-	}
+    }
 
-	/**
-	 * @param comp
-	 *            Component to be added to the input panel
-	 */
-	protected void add(Component comp) {
-		innerPanel.add(comp);
+    /**
+     * @param comp
+     *            Component to be added to the input panel
+     */
+    protected void add(Component comp) {
+        innerPanel.add(comp);
 
-	}
+    }
 
-	/**
-	 * @return
-	 */
-	protected JDialog getDialogParent() {
-		/*
-		 * get the JDialog parent
-		 */
-		Container parent = outerPanel.getParent();
-		while (parent != null) {
-			if (parent instanceof JDialog) {
-				return (JDialog) parent;
-			}
-			parent = parent.getParent();
-		}
+    /**
+     * @return
+     */
+    protected JDialog getDialogParent() {
+        /*
+         * get the JDialog parent
+         */
+        Container parent = outerPanel.getParent();
+        while (parent != null) {
+            if (parent instanceof JDialog) {
+                return (JDialog) parent;
+            }
+            parent = parent.getParent();
+        }
 
-		throw new RuntimeException("Input panel does not have a dialog parent");
+        throw new RuntimeException("Input panel does not have a dialog parent");
 
-	}
+    }
 
-	/**
-	 * @param comp
-	 *            Component to be removed from the input panel
-	 */
-	protected void removeFromPanel(Component comp) {
-		innerPanel.remove(comp);
-	}
+    /**
+     * @param comp
+     *            Component to be removed from the input panel
+     */
+    protected void removeFromPanel(Component comp) {
+        innerPanel.remove(comp);
+    }
 
-	/**
-	 * @param msg
-	 */
-	protected void setStatusMsg(String msg) {
-		statusMessage.setText(msg);
-	}
+    /**
+     * @param msg
+     */
+    protected void setStatusMsg(String msg) {
+        statusMessage.setText(msg);
+    }
 
-	/**
-	 * @return Descriptor of the configuration parameter
-	 */
-	public Property getDescriptor() {
-		return propDescriptor;
-	}
+    /**
+     * @return Descriptor of the configuration parameter
+     */
+    public Property getDescriptor() {
+        return propDescriptor;
+    }
 
-	public JPanel getJPanel() {
-		return outerPanel;
-	}
+    /**
+     * @return TODO
+     */
+    public JPanel getJPanel() {
+        return outerPanel;
+    }
 
-	public String getName() {
-		return outerPanel.getName();
-	}
+    /**
+     * @return TODO
+     */
+    public String getName() {
+        return outerPanel.getName();
+    }
 
-	/**
-	 * @return Value of the parameter
-	 */
-	public abstract Object getValue();
+    /**
+     * @return Value of the parameter
+     */
+    public abstract Object getValue();
 
-	public boolean isEnabled() {
-		return innerPanel.isEnabled();
-	}
+    /**
+     * @return TODO
+     */
+    public boolean isEnabled() {
+        return innerPanel.isEnabled();
+    }
 
-	/**
-	 * @return True if configuration parameter is set
-	 */
-	public abstract boolean isValueSet();
+    /**
+     * @return True if configuration parameter is set
+     */
+    public abstract boolean isValueSet();
 
-	public void setEnabled(boolean enabled) {
-		innerPanel.setEnabled(enabled);
-	}
+    /**
+     * @param enabled TODO
+     */
+    public void setEnabled(boolean enabled) {
+        innerPanel.setEnabled(enabled);
+    }
 
-	/**
-	 * @param value
-	 *            Sets the configuration parameter
-	 */
-	public abstract void setValue(Object value);
+    /**
+     * @param value
+     *            Sets the configuration parameter
+     */
+    public abstract void setValue(Object value);
 
 }

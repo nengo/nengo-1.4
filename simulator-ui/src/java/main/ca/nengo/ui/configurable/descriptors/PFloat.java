@@ -22,7 +22,7 @@ others to use your version of this file under the MPL, indicate your decision
 by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.configurable.descriptors;
 
@@ -39,32 +39,39 @@ import ca.nengo.ui.configurable.panels.FloatPanel;
  */
 public class PFloat extends Property {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public PFloat(String name) {
-		super(name);
-	}
+    /**
+     * @param name TODO
+     */
+    public PFloat(String name) {
+        super(name);
+    }
 
-	public PFloat(String name, float defaultValue) {
-		super(name, defaultValue);
-	}
+    /**
+     * @param name TODO
+     * @param defaultValue TODO
+     */
+    public PFloat(String name, float defaultValue) {
+        super(name, defaultValue);
+    }
 
-	@Override
-	protected PropertyInputPanel createInputPanel() {
-		return new FloatPanel(this);
-	}
+    @Override
+    protected PropertyInputPanel createInputPanel() {
+        return new FloatPanel(this);
+    }
 
-	@Override
-	public Class<Float> getTypeClass() {
-		/*
-		 * Return the primitive type
-		 */
-		return float.class;
-	}
+    @Override
+    public Class<Float> getTypeClass() {
+        /*
+         * Return the primitive type
+         */
+        return float.class;
+    }
 
-	@Override
-	public String getTypeName() {
-		return "Float";
-	}
+    @Override
+    public String getTypeName() {
+        return "Float";
+    }
 
 }
