@@ -1,28 +1,28 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "NodeFactoryPanel.java". Description: 
+The Original Code is "NodeFactoryPanel.java". Description:
 "Input Panel for selecting and configuring a Node Factory
-  
+
   @author Shu Wu"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.configurable.panels;
 
@@ -43,11 +43,11 @@ import ca.nengo.model.impl.NodeFactory;
 import ca.nengo.model.neuron.impl.ALIFNeuronFactory;
 import ca.nengo.model.neuron.impl.LIFNeuronFactory;
 import ca.nengo.model.neuron.impl.PoissonSpikeGenerator;
+import ca.nengo.model.neuron.impl.PoissonSpikeGenerator.LinearNeuronFactory;
+import ca.nengo.model.neuron.impl.PoissonSpikeGenerator.SigmoidNeuronFactory;
 import ca.nengo.model.neuron.impl.SpikeGeneratorFactory;
 import ca.nengo.model.neuron.impl.SpikingNeuronFactory;
 import ca.nengo.model.neuron.impl.SynapticIntegratorFactory;
-import ca.nengo.model.neuron.impl.PoissonSpikeGenerator.LinearNeuronFactory;
-import ca.nengo.model.neuron.impl.PoissonSpikeGenerator.SigmoidNeuronFactory;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.ConfigSchema;
@@ -67,174 +67,178 @@ import ca.nengo.ui.models.constructors.ModelFactory;
  */
 public class NodeFactoryPanel extends PropertyInputPanel {
 
-	private static ConstructableNodeFactory[] NodeFactoryItems = new ConstructableNodeFactory[] {
-			new CLinearNeuronFactory(), new CSigmoidNeuronFactory(), new CLIFNeuronFactory(),
-			new CALIFNeuronFactory(), new CSpikingNeuronFactory() };
+    private static ConstructableNodeFactory[] NodeFactoryItems = new ConstructableNodeFactory[] {
+        new CLinearNeuronFactory(), new CSigmoidNeuronFactory(), new CLIFNeuronFactory(),
+        new CALIFNeuronFactory(), new CSpikingNeuronFactory() };
 
-	private JComboBox factorySelector;
+    private JComboBox factorySelector;
 
-	private NodeFactory myNodeFactory;
+    private NodeFactory myNodeFactory;
 
-	private ConstructableNodeFactory selectedItem;
+    private ConstructableNodeFactory selectedItem;
 
-	public NodeFactoryPanel(Property property) {
-		super(property);
-		init();
-	}
+    /**
+     * @param property TODO
+     */
+    public NodeFactoryPanel(Property property) {
+        super(property);
+        init();
+    }
 
-	private void configureNodeFactory() {
-		selectedItem = (ConstructableNodeFactory) factorySelector.getSelectedItem();
+    private void configureNodeFactory() {
+        selectedItem = (ConstructableNodeFactory) factorySelector.getSelectedItem();
 
-		try {
-			NodeFactory model = (NodeFactory) ModelFactory.constructModel(selectedItem);
-			setValue(model);
-		} catch (ConfigException e) {
-			e.defaultHandleBehavior();
-		} catch (Exception e) {
-			UserMessages.showError("Could not configure Node Factory: " + e.getMessage());
-		}
-	}
+        try {
+            NodeFactory model = (NodeFactory) ModelFactory.constructModel(selectedItem);
+            setValue(model);
+        } catch (ConfigException e) {
+            e.defaultHandleBehavior();
+        } catch (Exception e) {
+            UserMessages.showError("Could not configure Node Factory: " + e.getMessage());
+        }
+    }
 
-	private void init() {
+    private void init() {
 
-		factorySelector = new JComboBox(NodeFactoryItems);
-		add(factorySelector);
+        factorySelector = new JComboBox(NodeFactoryItems);
+        add(factorySelector);
 
-		/*
-		 * Reset value if the combo box selection has changed
-		 */
-		factorySelector.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (factorySelector.getSelectedItem() != selectedItem) {
-					setValue(null);
-				}
-			}
+        /*
+         * Reset value if the combo box selection has changed
+         */
+        factorySelector.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (factorySelector.getSelectedItem() != selectedItem) {
+                    setValue(null);
+                }
+            }
 
-		});
+        });
 
-		JButton configureBtn = new JButton(new AbstractAction("Set") {
-			private static final long serialVersionUID = 1L;
+        JButton configureBtn = new JButton(new AbstractAction("Set") {
+            private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent arg0) {
-				configureNodeFactory();
-			}
-		});
+            public void actionPerformed(ActionEvent arg0) {
+                configureNodeFactory();
+            }
+        });
 
-		add(configureBtn);
+        add(configureBtn);
 
-	}
+    }
 
-	@Override
-	public Object getValue() {
-		return myNodeFactory;
-	}
+    @Override
+    public Object getValue() {
+        return myNodeFactory;
+    }
 
-	@Override
-	public boolean isValueSet() {
-		if (myNodeFactory != null) {
-			return true;
-		} else {
-			setStatusMsg("Node Factory must be set");
-			return false;
-		}
-	}
+    @Override
+    public boolean isValueSet() {
+        if (myNodeFactory != null) {
+            return true;
+        } else {
+            setStatusMsg("Node Factory must be set");
+            return false;
+        }
+    }
 
-	@Override
-	public void setValue(Object value) {
-		if (value == null) {
-			myNodeFactory = null;
-			return;
-		}
+    @Override
+    public void setValue(Object value) {
+        if (value == null) {
+            myNodeFactory = null;
+            return;
+        }
 
-		if (value instanceof NodeFactory) {
-			myNodeFactory = (NodeFactory) value;
-			setStatusMsg("");
+        if (value instanceof NodeFactory) {
+            myNodeFactory = (NodeFactory) value;
+            setStatusMsg("");
 
-			/*
-			 * Update the combo box selector with the selected Node Factory
-			 */
-			boolean foundComboItem = false;
-			for (int i = 0; i < NodeFactoryItems.length; i++) {
+            /*
+             * Update the combo box selector with the selected Node Factory
+             */
+            boolean foundComboItem = false;
+            for (ConstructableNodeFactory nodeFactoryItem : NodeFactoryItems) {
 
-				if (NodeFactoryItems[i].getType().isInstance(myNodeFactory)) {
-					selectedItem = NodeFactoryItems[i];
-					factorySelector.setSelectedItem(selectedItem);
-					foundComboItem = true;
-					break;
-				}
-			}
-			if (!foundComboItem)
-				throw new IllegalArgumentException("Unsupported Node Factory");
+                if (nodeFactoryItem.getType().isInstance(myNodeFactory)) {
+                    selectedItem = nodeFactoryItem;
+                    factorySelector.setSelectedItem(selectedItem);
+                    foundComboItem = true;
+                    break;
+                }
+            }
+            if (!foundComboItem) {
+                throw new IllegalArgumentException("Unsupported Node Factory");
+            }
 
-		} else {
-			throw new IllegalArgumentException("Value is not a Node Factory");
-		}
-	}
+        } else {
+            throw new IllegalArgumentException("Value is not a Node Factory");
+        }
+    }
 }
 
 class CALIFNeuronFactory extends ConstructableNodeFactory {
-	static final Property pIncN = new PIndicatorPDF("IncN");
-	static final Property pIntercept = new PIndicatorPDF("Intercept");
-	static final Property pMaxRate = new PIndicatorPDF("Max rate");
+    static final Property pIncN = new PIndicatorPDF("IncN");
+    static final Property pIntercept = new PIndicatorPDF("Intercept");
+    static final Property pMaxRate = new PIndicatorPDF("Max rate");
 
-	static final Property pTauN = new PFloat("tauN");
-	static final Property pTauRC = new PFloat("tauRC");
-	static final Property pTauRef = new PFloat("tauRef");
+    static final Property pTauN = new PFloat("tauN");
+    static final Property pTauRC = new PFloat("tauRC");
+    static final Property pTauRef = new PFloat("tauRef");
 
-	static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
-			pTauN, pTauRef, pMaxRate, pIntercept, pIncN });
+    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
+            pTauN, pTauRef, pMaxRate, pIntercept, pIncN });
 
-	public CALIFNeuronFactory() {
-		super("Adapting LIF Neuron", ALIFNeuronFactory.class);
-	}
+    public CALIFNeuronFactory() {
+        super("Adapting LIF Neuron", ALIFNeuronFactory.class);
+    }
 
-	@Override
-	protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-		Float tauRC = (Float) configuredProperties.getValue(pTauRC);
-		Float tauRef = (Float) configuredProperties.getValue(pTauRef);
-		Float tauN = (Float) configuredProperties.getValue(pTauN);
-		IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-		IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
-		IndicatorPDF incN = (IndicatorPDF) configuredProperties.getValue(pIncN);
+    @Override
+    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
+        Float tauRC = (Float) configuredProperties.getValue(pTauRC);
+        Float tauRef = (Float) configuredProperties.getValue(pTauRef);
+        Float tauN = (Float) configuredProperties.getValue(pTauN);
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
+        IndicatorPDF incN = (IndicatorPDF) configuredProperties.getValue(pIncN);
 
-		return new ALIFNeuronFactory(maxRate, intercept, incN, tauRef, tauRC, tauN);
-	}
+        return new ALIFNeuronFactory(maxRate, intercept, incN, tauRef, tauRC, tauN);
+    }
 
-	@Override
-	public ConfigSchema getSchema() {
-		return zConfig;
-	}
+    @Override
+    public ConfigSchema getSchema() {
+        return zConfig;
+    }
 
 }
 
 class CLIFNeuronFactory extends ConstructableNodeFactory {
 
-	static final Property pIntercept = new PIndicatorPDF("Intercept");
-	static final Property pMaxRate = new PIndicatorPDF("Max rate");
+    static final Property pIntercept = new PIndicatorPDF("Intercept");
+    static final Property pMaxRate = new PIndicatorPDF("Max rate");
 
-	static final Property pTauRC = new PFloat("tauRC");
-	static final Property pTauRef = new PFloat("tauRef");
-	static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
-			pTauRef, pMaxRate, pIntercept });
+    static final Property pTauRC = new PFloat("tauRC");
+    static final Property pTauRef = new PFloat("tauRef");
+    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
+            pTauRef, pMaxRate, pIntercept });
 
-	public CLIFNeuronFactory() {
-		super("LIF Neuron", LIFNeuronFactory.class);
-	}
+    public CLIFNeuronFactory() {
+        super("LIF Neuron", LIFNeuronFactory.class);
+    }
 
-	@Override
-	protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-		Float tauRC = (Float) configuredProperties.getValue(pTauRC);
-		Float tauRef = (Float) configuredProperties.getValue(pTauRef);
-		IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-		IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
+    @Override
+    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
+        Float tauRC = (Float) configuredProperties.getValue(pTauRC);
+        Float tauRef = (Float) configuredProperties.getValue(pTauRef);
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
 
-		return new LIFNeuronFactory(tauRC, tauRef, maxRate, intercept);
-	}
+        return new LIFNeuronFactory(tauRC, tauRef, maxRate, intercept);
+    }
 
-	@Override
-	public ConfigSchema getSchema() {
-		return zConfig;
-	}
+    @Override
+    public ConfigSchema getSchema() {
+        return zConfig;
+    }
 
 }
 
@@ -244,101 +248,101 @@ class CLIFNeuronFactory extends ConstructableNodeFactory {
  * @author Shu Wu
  */
 class CLinearNeuronFactory extends ConstructableNodeFactory {
-	static final Property pIntercept = new PIndicatorPDF("Intercept");
+    static final Property pIntercept = new PIndicatorPDF("Intercept");
 
-	static final Property pMaxRate = new PIndicatorPDF("Max rate");
-	static final Property pRectified = new PBoolean("Rectified");
-	static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] {
-			pMaxRate, pIntercept, pRectified });
+    static final Property pMaxRate = new PIndicatorPDF("Max rate");
+    static final Property pRectified = new PBoolean("Rectified");
+    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] {
+            pMaxRate, pIntercept, pRectified });
 
-	public CLinearNeuronFactory() {
-		super("Linear Neuron", LinearNeuronFactory.class);
-	}
+    public CLinearNeuronFactory() {
+        super("Linear Neuron", LinearNeuronFactory.class);
+    }
 
-	@Override
-	protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-		IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-		IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
-		Boolean rectified = (Boolean) configuredProperties.getValue(pRectified);
+    @Override
+    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
+        Boolean rectified = (Boolean) configuredProperties.getValue(pRectified);
 
-		LinearNeuronFactory factory = new PoissonSpikeGenerator.LinearNeuronFactory(maxRate,
-				intercept, rectified);
+        LinearNeuronFactory factory = new PoissonSpikeGenerator.LinearNeuronFactory(maxRate,
+                intercept, rectified);
 
-		return factory;
-	}
+        return factory;
+    }
 
-	@Override
-	public ConfigSchema getSchema() {
-		return zConfig;
-	}
+    @Override
+    public ConfigSchema getSchema() {
+        return zConfig;
+    }
 
 }
 
 abstract class ConstructableNodeFactory extends AbstractConstructable {
-	private String name;
-	private Class<? extends NodeFactory> type;
+    private String name;
+    private Class<? extends NodeFactory> type;
 
-	public ConstructableNodeFactory(String name, Class<? extends NodeFactory> type) {
-		super();
-		this.name = name;
-		this.type = type;
-	}
+    public ConstructableNodeFactory(String name, Class<? extends NodeFactory> type) {
+        super();
+        this.name = name;
+        this.type = type;
+    }
 
-	protected final Object configureModel(ConfigResult configuredProperties) throws ConfigException {
-		NodeFactory nodeFactory = createNodeFactory(configuredProperties);
+    protected final Object configureModel(ConfigResult configuredProperties) throws ConfigException {
+        NodeFactory nodeFactory = createNodeFactory(configuredProperties);
 
-		if (!getType().isInstance(nodeFactory)) {
-			throw new ConfigException("Expected type: " + getType().getSimpleName() + " Got: "
-					+ nodeFactory.getClass().getSimpleName());
-		} else {
-			return nodeFactory;
-		}
-	}
+        if (!getType().isInstance(nodeFactory)) {
+            throw new ConfigException("Expected type: " + getType().getSimpleName() + " Got: "
+                    + nodeFactory.getClass().getSimpleName());
+        } else {
+            return nodeFactory;
+        }
+    }
 
-	abstract protected NodeFactory createNodeFactory(ConfigResult configuredProperties)
-			throws ConfigException;
+    abstract protected NodeFactory createNodeFactory(ConfigResult configuredProperties)
+            throws ConfigException;
 
-	public Class<? extends NodeFactory> getType() {
-		return type;
-	}
+    public Class<? extends NodeFactory> getType() {
+        return type;
+    }
 
-	public final String getTypeName() {
-		return name;
-	}
+    public final String getTypeName() {
+        return name;
+    }
 
-	@Override
-	public String toString() {
-		return this.name;
-	}
+    @Override
+    public String toString() {
+        return this.name;
+    }
 
 }
 
 class CSigmoidNeuronFactory extends ConstructableNodeFactory {
 
-	static final Property pInflection = new PIndicatorPDF("Inflection");
+    static final Property pInflection = new PIndicatorPDF("Inflection");
 
-	static final Property pMaxRate = new PIndicatorPDF("Max rate");
-	static final Property pSlope = new PIndicatorPDF("Slope");
-	static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pSlope,
-			pInflection, pMaxRate });
+    static final Property pMaxRate = new PIndicatorPDF("Max rate");
+    static final Property pSlope = new PIndicatorPDF("Slope");
+    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pSlope,
+            pInflection, pMaxRate });
 
-	public CSigmoidNeuronFactory() {
-		super("Sigmoid Neuron", SigmoidNeuronFactory.class);
-	}
+    public CSigmoidNeuronFactory() {
+        super("Sigmoid Neuron", SigmoidNeuronFactory.class);
+    }
 
-	@Override
-	protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-		IndicatorPDF slope = (IndicatorPDF) configuredProperties.getValue(pSlope);
-		IndicatorPDF inflection = (IndicatorPDF) configuredProperties.getValue(pInflection);
-		IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
+    @Override
+    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
+        IndicatorPDF slope = (IndicatorPDF) configuredProperties.getValue(pSlope);
+        IndicatorPDF inflection = (IndicatorPDF) configuredProperties.getValue(pInflection);
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
 
-		return new PoissonSpikeGenerator.SigmoidNeuronFactory(slope, inflection, maxRate);
-	}
+        return new PoissonSpikeGenerator.SigmoidNeuronFactory(slope, inflection, maxRate);
+    }
 
-	@Override
-	public ConfigSchema getSchema() {
-		return zConfig;
-	}
+    @Override
+    public ConfigSchema getSchema() {
+        return zConfig;
+    }
 
 }
 
@@ -348,246 +352,246 @@ class CSigmoidNeuronFactory extends ConstructableNodeFactory {
  * @author Shu Wu
  */
 class CSpikingNeuronFactory extends ConstructableNodeFactory {
-	private static final Property pBias = new PIndicatorPDF("bias");
-	private static final Property pScale = new PIndicatorPDF("scale");
+    private static final Property pBias = new PIndicatorPDF("bias");
+    private static final Property pScale = new PIndicatorPDF("scale");
 
-	private static PListSelector getClassSelector(String selectorName, Class<?>[] classes) {
-		ClassWrapper[] classWrappers = new ClassWrapper[classes.length];
+    private static PListSelector getClassSelector(String selectorName, Class<?>[] classes) {
+        ClassWrapper[] classWrappers = new ClassWrapper[classes.length];
 
-		for (int i = 0; i < classes.length; i++) {
-			classWrappers[i] = new ClassWrapper(classes[i]);
-		}
+        for (int i = 0; i < classes.length; i++) {
+            classWrappers[i] = new ClassWrapper(classes[i]);
+        }
 
-		return new PListSelector(selectorName, classWrappers);
-	}
+        return new PListSelector(selectorName, classWrappers);
+    }
 
-	private Property pSpikeGenerator;
+    private Property pSpikeGenerator;
 
-	private Property pSynapticIntegrator;
+    private Property pSynapticIntegrator;
 
-	public CSpikingNeuronFactory() {
-		super("Customizable Neuron", SpikingNeuronFactory.class);
-	}
+    public CSpikingNeuronFactory() {
+        super("Customizable Neuron", SpikingNeuronFactory.class);
+    }
 
-	private Object constructFromClass(Class<?> type) throws ConfigException {
-		try {
-			Constructor<?> ct = type.getConstructor();
-			try {
-				return ct.newInstance();
-			} catch (Exception e) {
-				throw new ConfigException("Error constructing " + type.getSimpleName() + ": "
-						+ e.getMessage());
-			}
-		} catch (SecurityException e1) {
-			e1.printStackTrace();
-			throw new ConfigException("Security Exception");
-		} catch (NoSuchMethodException e1) {
-			throw new ConfigException("Cannot find zero-arg constructor for: "
-					+ type.getSimpleName());
-		}
-	}
+    private Object constructFromClass(Class<?> type) throws ConfigException {
+        try {
+            Constructor<?> ct = type.getConstructor();
+            try {
+                return ct.newInstance();
+            } catch (Exception e) {
+                throw new ConfigException("Error constructing " + type.getSimpleName() + ": "
+                        + e.getMessage());
+            }
+        } catch (SecurityException e1) {
+            e1.printStackTrace();
+            throw new ConfigException("Security Exception");
+        } catch (NoSuchMethodException e1) {
+            throw new ConfigException("Cannot find zero-arg constructor for: "
+                    + type.getSimpleName());
+        }
+    }
 
-	@Override
-	protected NodeFactory createNodeFactory(ConfigResult configuredProperties)
-			throws ConfigException {
-		Class<?> synapticIntegratorClass = ((ClassWrapper) configuredProperties
-				.getValue(pSynapticIntegrator)).getWrapped();
-		Class<?> spikeGeneratorClass = ((ClassWrapper) configuredProperties
-				.getValue(pSpikeGenerator)).getWrapped();
+    @Override
+    protected NodeFactory createNodeFactory(ConfigResult configuredProperties)
+            throws ConfigException {
+        Class<?> synapticIntegratorClass = ((ClassWrapper) configuredProperties
+                .getValue(pSynapticIntegrator)).getWrapped();
+        Class<?> spikeGeneratorClass = ((ClassWrapper) configuredProperties
+                .getValue(pSpikeGenerator)).getWrapped();
 
-		IndicatorPDF scale = (IndicatorPDF) configuredProperties.getValue(pScale);
-		IndicatorPDF bias = (IndicatorPDF) configuredProperties.getValue(pBias);
+        IndicatorPDF scale = (IndicatorPDF) configuredProperties.getValue(pScale);
+        IndicatorPDF bias = (IndicatorPDF) configuredProperties.getValue(pBias);
 
-		/*
-		 * Construct Objects from Classes
-		 */
-		SynapticIntegratorFactory synapticIntegratorFactory = (SynapticIntegratorFactory) constructFromClass(synapticIntegratorClass);
-		SpikeGeneratorFactory spikeGeneratorFactory = (SpikeGeneratorFactory) constructFromClass(spikeGeneratorClass);
+        /*
+         * Construct Objects from Classes
+         */
+        SynapticIntegratorFactory synapticIntegratorFactory = (SynapticIntegratorFactory) constructFromClass(synapticIntegratorClass);
+        SpikeGeneratorFactory spikeGeneratorFactory = (SpikeGeneratorFactory) constructFromClass(spikeGeneratorClass);
 
-		return new SpikingNeuronFactory(synapticIntegratorFactory, spikeGeneratorFactory, scale,
-				bias);
-	}
+        return new SpikingNeuronFactory(synapticIntegratorFactory, spikeGeneratorFactory, scale,
+                bias);
+    }
 
-	@Override
-	public ConfigSchema getSchema() {
-		/*
-		 * Generate these descriptors Just-In-Time, to show all possible
-		 * implementations in ClassRegistry
-		 */
-		pSynapticIntegrator = getClassSelector("Synaptic Integrator", ClassRegistry.getInstance()
-				.getImplementations(SynapticIntegratorFactory.class).toArray(new Class<?>[] {}));
-		pSpikeGenerator = getClassSelector("Spike Generator", ClassRegistry.getInstance()
-				.getImplementations(SpikeGeneratorFactory.class).toArray(new Class<?>[] {}));
+    @Override
+    public ConfigSchema getSchema() {
+        /*
+         * Generate these descriptors Just-In-Time, to show all possible
+         * implementations in ClassRegistry
+         */
+        pSynapticIntegrator = getClassSelector("Synaptic Integrator", ClassRegistry.getInstance()
+                .getImplementations(SynapticIntegratorFactory.class).toArray(new Class<?>[] {}));
+        pSpikeGenerator = getClassSelector("Spike Generator", ClassRegistry.getInstance()
+                .getImplementations(SpikeGeneratorFactory.class).toArray(new Class<?>[] {}));
 
-		return new ConfigSchemaImpl(new Property[] { pSynapticIntegrator,
-				pSpikeGenerator, pScale, pBias });
-	}
+        return new ConfigSchemaImpl(new Property[] { pSynapticIntegrator,
+                pSpikeGenerator, pScale, pBias });
+    }
 
-	/**
-	 * Wraps a Class as a list item
-	 */
-	private static class ClassWrapper {
-		Class<?> type;
+    /**
+     * Wraps a Class as a list item
+     */
+    private static class ClassWrapper {
+        Class<?> type;
 
-		public ClassWrapper(Class<?> type) {
-			super();
-			this.type = type;
-		}
+        public ClassWrapper(Class<?> type) {
+            super();
+            this.type = type;
+        }
 
-		public Class<?> getWrapped() {
-			return type;
-		}
+        public Class<?> getWrapped() {
+            return type;
+        }
 
-		@Override
-		public String toString() {
-			/*
-			 * Return a name string that is at most two atoms long
-			 */
-			String canonicalName = type.getCanonicalName();
-			String[] nameAtoms = canonicalName.split("\\.");
-			if (nameAtoms.length > 2) {
-				return nameAtoms[nameAtoms.length - 2] + "." + nameAtoms[nameAtoms.length - 1];
+        @Override
+        public String toString() {
+            /*
+             * Return a name string that is at most two atoms long
+             */
+            String canonicalName = type.getCanonicalName();
+            String[] nameAtoms = canonicalName.split("\\.");
+            if (nameAtoms.length > 2) {
+                return nameAtoms[nameAtoms.length - 2] + "." + nameAtoms[nameAtoms.length - 1];
 
-			} else {
-				return canonicalName;
-			}
+            } else {
+                return canonicalName;
+            }
 
-		}
-	}
+        }
+    }
 }
 
 class PIndicatorPDF extends Property {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public PIndicatorPDF(String name) {
-		super(name);
-	}
+    public PIndicatorPDF(String name) {
+        super(name);
+    }
 
-	@Override
-	protected PropertyInputPanel createInputPanel() {
-		return new Panel(this);
-	}
+    @Override
+    protected PropertyInputPanel createInputPanel() {
+        return new Panel(this);
+    }
 
-	@Override
-	public Class<IndicatorPDF> getTypeClass() {
-		return IndicatorPDF.class;
-	}
+    @Override
+    public Class<IndicatorPDF> getTypeClass() {
+        return IndicatorPDF.class;
+    }
 
-	@Override
-	public String getTypeName() {
-		return "Indicator PDF";
-	}
+    @Override
+    public String getTypeName() {
+        return "Indicator PDF";
+    }
 
-	private static class Panel extends PropertyInputPanel {
-		JTextField highValue;
-		JTextField lowValue;
+    private static class Panel extends PropertyInputPanel {
+        JTextField highValue;
+        JTextField lowValue;
 
-		public Panel(Property property) {
-			super(property);
+        public Panel(Property property) {
+            super(property);
 
-			add(new JLabel("Low: "));
-			lowValue = new JTextField(10);
-			add(lowValue);
+            add(new JLabel("Low: "));
+            lowValue = new JTextField(10);
+            add(lowValue);
 
-			add(new JLabel("High: "));
-			highValue = new JTextField(10);
-			add(highValue);
+            add(new JLabel("High: "));
+            highValue = new JTextField(10);
+            add(highValue);
 
-		}
+        }
 
-		@Override
-		public Object getValue() {
-			String minStr = lowValue.getText();
-			String maxStr = highValue.getText();
+        @Override
+        public Object getValue() {
+            String minStr = lowValue.getText();
+            String maxStr = highValue.getText();
 
-			if (minStr == null || maxStr == null) {
-				return null;
-			}
+            if (minStr == null || maxStr == null) {
+                return null;
+            }
 
-			try {
-				Float min = new Float(minStr);
-				Float max = new Float(maxStr);
+            try {
+                Float min = new Float(minStr);
+                Float max = new Float(maxStr);
 
-				return new IndicatorPDF(min, max);
-			} catch (NumberFormatException e) {
-				return null;
-			}
+                return new IndicatorPDF(min, max);
+            } catch (NumberFormatException e) {
+                return null;
+            }
 
-		}
+        }
 
-		@Override
-		public boolean isValueSet() {
-			if (getValue() != null) {
-				return true;
-			} else {
-				return false;
-			}
+        @Override
+        public boolean isValueSet() {
+            if (getValue() != null) {
+                return true;
+            } else {
+                return false;
+            }
 
-		}
+        }
 
-		@Override
-		public void setValue(Object value) {
-			if (value instanceof IndicatorPDF) {
-				IndicatorPDF pdf = (IndicatorPDF) value;
-				lowValue.setText((new Float(pdf.getLow())).toString());
-				highValue.setText((new Float(pdf.getHigh())).toString());
-			}
-		}
-	}
+        @Override
+        public void setValue(Object value) {
+            if (value instanceof IndicatorPDF) {
+                IndicatorPDF pdf = (IndicatorPDF) value;
+                lowValue.setText((new Float(pdf.getLow())).toString());
+                highValue.setText((new Float(pdf.getHigh())).toString());
+            }
+        }
+    }
 
 }
 
 class PListSelector extends Property {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Object[] items;
+    private Object[] items;
 
-	public PListSelector(String name, Object[] items) {
-		super(name);
-		this.items = items;
+    public PListSelector(String name, Object[] items) {
+        super(name);
+        this.items = items;
 
-	}
+    }
 
-	@Override
-	protected PropertyInputPanel createInputPanel() {
-		return new Panel(this, items);
-	}
+    @Override
+    protected PropertyInputPanel createInputPanel() {
+        return new Panel(this, items);
+    }
 
-	@Override
-	public Class<Object> getTypeClass() {
-		return Object.class;
-	}
+    @Override
+    public Class<Object> getTypeClass() {
+        return Object.class;
+    }
 
-	@Override
-	public String getTypeName() {
-		return "List";
-	}
+    @Override
+    public String getTypeName() {
+        return "List";
+    }
 
-	private static class Panel extends PropertyInputPanel {
-		private JComboBox comboBox;
+    private static class Panel extends PropertyInputPanel {
+        private JComboBox comboBox;
 
-		public Panel(Property property, Object[] items) {
-			super(property);
-			comboBox = new JComboBox(items);
-			add(comboBox);
-		}
+        public Panel(Property property, Object[] items) {
+            super(property);
+            comboBox = new JComboBox(items);
+            add(comboBox);
+        }
 
-		@Override
-		public Object getValue() {
-			return comboBox.getSelectedItem();
-		}
+        @Override
+        public Object getValue() {
+            return comboBox.getSelectedItem();
+        }
 
-		@Override
-		public boolean isValueSet() {
-			return true;
-		}
+        @Override
+        public boolean isValueSet() {
+            return true;
+        }
 
-		@Override
-		public void setValue(Object value) {
-			comboBox.setSelectedItem(value);
-		}
+        @Override
+        public void setValue(Object value) {
+            comboBox.setSelectedItem(value);
+        }
 
-	}
+    }
 
 }
