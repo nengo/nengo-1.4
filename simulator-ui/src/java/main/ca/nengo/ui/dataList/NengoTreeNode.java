@@ -7,10 +7,8 @@ Software distributed under the License is distributed on an "AS IS" basis, WITHO
 WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "SortableMutableTreeNode.java". Description:
-"Has a sort() function to sort children
-
-  @author Shu Wu"
+The Original Code is "NeoTreeNode.java". Description:
+""
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
@@ -26,36 +24,34 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.dataList;
 
-import java.util.Collections;
+import java.lang.ref.WeakReference;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import ca.nengo.model.Node;
 
 /**
- * Has a sort() function to sort children
+ * TODO
  * 
- * @author Shu Wu
+ * @author TODO
  */
-public class SortableMutableTreeNode extends DefaultMutableTreeNode {
-
-    /**
-     * @param userObject TODO
-     */
-    public SortableMutableTreeNode(Object userObject) {
-        super(userObject);
-    }
-
-    /**
-     * 
-     */
+public class NengoTreeNode extends SortableMutableTreeNode {
     private static final long serialVersionUID = 1L;
 
+    private WeakReference<Node> nengoNodeRef;
+
     /**
-     * TODO
+     * @param name TODO
+     * @param neoNode TODO
      */
-    @SuppressWarnings("unchecked")
-    public void sort() {
-        if (children != null) {
-            Collections.sort(children, new NaturalOrderComparator());
-        }
+    public NengoTreeNode(String name, Node neoNode) {
+        super(name);
+        this.nengoNodeRef = new WeakReference<Node>(neoNode);
     }
+
+    /**
+     * @return Reference to NeoNode, otherwise null
+     */
+    public Node getNeoNode() {
+        return nengoNodeRef.get();
+    }
+
 }
