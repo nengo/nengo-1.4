@@ -1,25 +1,25 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "MatrixEditor.java". Description: 
+The Original Code is "MatrixEditor.java". Description:
 "An UI component for editing matrices.
-  
+
   @author Bryan Tripp"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
  */
@@ -45,9 +45,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableColumn;
-
+import javax.swing.table.TableModel;
 
 import ca.nengo.ui.lib.Style.NengoStyle;
 
@@ -58,165 +57,184 @@ import ca.nengo.ui.lib.Style.NengoStyle;
  */
 public class MatrixEditor extends JPanel {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private class MyCellEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 7289808186710531L;
-		private JTextField myTextField;
+    private class MyCellEditor extends DefaultCellEditor {
+        private static final long serialVersionUID = 7289808186710531L;
+        private JTextField myTextField;
 
-		public MyCellEditor() {
-			super(new JTextField());
-			myTextField = (JTextField) this.getComponent();
-		}
+        public MyCellEditor() {
+            super(new JTextField());
+            myTextField = (JTextField) this.getComponent();
+        }
 
-		@Override
-		public Component getTableCellEditorComponent(JTable table,
-				Object value,
-				boolean isSelected,
-				int row,
-				int column) {
+        @Override
+        public Component getTableCellEditorComponent(JTable table,
+                Object value,
+                boolean isSelected,
+                int row,
+                int column) {
 
-			Component component = super.getTableCellEditorComponent(table,
-					value,
-					isSelected,
-					row,
-					column);
+            Component component = super.getTableCellEditorComponent(table,
+                    value,
+                    isSelected,
+                    row,
+                    column);
 
-			myTextField.selectAll();
-			return component;
-		}
+            myTextField.selectAll();
+            return component;
+        }
 
-		@Override
-		public boolean isCellEditable(EventObject anEvent) {
-			// TODO Auto-generated method stub
-			return super.isCellEditable(anEvent);
-		}
-	}
+        @Override
+        public boolean isCellEditable(EventObject anEvent) {
+            // TODO Auto-generated method stub
+            return super.isCellEditable(anEvent);
+        }
+    }
 
-	// for testing
-	public static void main(String args[]) {
-		try {  
-			 //Tell the UIManager to use the platform look and feel  
-			 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Exception e) { /*Do nothing*/ }
-		
-		CouplingMatrix matrix = new CouplingMatrixImpl(5, 3);
-		MatrixEditor editor = new MatrixEditor(matrix);
+    /**
+     * For testing
+     * 
+     * @param args TODO
+     */
+    public static void main(String args[]) {
+        try {
+            //Tell the UIManager to use the platform look and feel
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch(Exception e) { /*Do nothing*/ }
 
-		try {
-			JFrame frame = new JFrame("test");
-			frame.getContentPane().add(editor);
+        CouplingMatrix matrix = new CouplingMatrixImpl(5, 3);
+        MatrixEditor editor = new MatrixEditor(matrix);
 
-			frame.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
-				}
-			});
+        try {
+            JFrame frame = new JFrame("test");
+            frame.getContentPane().add(editor);
 
-			frame.pack();
-			frame.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            frame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    System.exit(0);
+                }
+            });
 
-	}
+            frame.pack();
+            frame.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	private final TableModel myTableModel;
-	JTable myTable;
+    }
 
-	/**
-	 * Creates an editor for the given coupling matrix.
-	 */
-	public MatrixEditor(CouplingMatrix theMatrix) {
-		super(new BorderLayout());
-		myTableModel = new MatrixTableModel(theMatrix);
-		myTable = new JTable(myTableModel);
-		if (NengoStyle.GTK) {
-			myTable.setRowHeight(24);
-		}
-		
-		// manually resize massive tables to preserve minimum column width
-		int columnCount = myTable.getColumnCount();
-		int minColWidth = 30;
-		Dimension tableSize = myTable.getPreferredScrollableViewportSize();
-		if (tableSize.width < columnCount*minColWidth)
-		{
-			for (int i=0; i<columnCount; i++)
-			{
-				TableColumn column = null;
-				column = myTable.getColumnModel().getColumn(i);
-				column.setMinWidth(minColWidth);
-				column.setPreferredWidth(minColWidth);
-			}
-			myTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		}
+    private final TableModel myTableModel;
+    JTable myTable;
 
-		myTable.setDefaultEditor(Object.class, new MyCellEditor());
-		JScrollPane scroll = new JScrollPane(myTable);
-		this.add(scroll, BorderLayout.CENTER); 
-	}
+    /**
+     * Creates an editor for the given coupling matrix.
+     * @param theMatrix TODO
+     */
+    public MatrixEditor(CouplingMatrix theMatrix) {
+        super(new BorderLayout());
+        myTableModel = new MatrixTableModel(theMatrix);
+        myTable = new JTable(myTableModel);
+        if (NengoStyle.GTK) {
+            myTable.setRowHeight(24);
+        }
 
-	public void finishEditing() {
-		if (myTable.getCellEditor() != null)
-			myTable.getCellEditor().stopCellEditing();
-	}
+        // manually resize massive tables to preserve minimum column width
+        int columnCount = myTable.getColumnCount();
+        int minColWidth = 30;
+        Dimension tableSize = myTable.getPreferredScrollableViewportSize();
+        if (tableSize.width < columnCount*minColWidth)
+        {
+            for (int i=0; i<columnCount; i++)
+            {
+                TableColumn column = null;
+                column = myTable.getColumnModel().getColumn(i);
+                column.setMinWidth(minColWidth);
+                column.setPreferredWidth(minColWidth);
+            }
+            myTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        }
 
-	public Object getValueAt(int arg0, int arg1) {
-		return myTableModel.getValueAt(arg0, arg1);
-	}
+        myTable.setDefaultEditor(Object.class, new MyCellEditor());
+        JScrollPane scroll = new JScrollPane(myTable);
+        this.add(scroll, BorderLayout.CENTER);
+    }
 
-	public void setValueAt(Object arg0, int arg1, int arg2) {
-		myTableModel.setValueAt(arg0, arg1, arg2);
-	}
+    /**
+     * TODO
+     */
+    public void finishEditing() {
+        if (myTable.getCellEditor() != null) {
+            myTable.getCellEditor().stopCellEditing();
+        }
+    }
 
-	private class MatrixTableModel extends AbstractTableModel {
+    /**
+     * @param arg0 TODO
+     * @param arg1 TODO
+     * @return TODO
+     */
+    public Object getValueAt(int arg0, int arg1) {
+        return myTableModel.getValueAt(arg0, arg1);
+    }
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		private final CouplingMatrix myMatrix;
+    /**
+     * @param arg0 TODO
+     * @param arg1 TODO
+     * @param arg2 TODO
+     */
+    public void setValueAt(Object arg0, int arg1, int arg2) {
+        myTableModel.setValueAt(arg0, arg1, arg2);
+    }
 
-		public MatrixTableModel(CouplingMatrix theMatrix) {
-			myMatrix = theMatrix;
-		}
+    private class MatrixTableModel extends AbstractTableModel {
 
-		public int getColumnCount() {
-			return myMatrix.getFromSize();
-		}
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        private final CouplingMatrix myMatrix;
 
-		@Override
-		public String getColumnName(int theColumn) {
-			return String.valueOf(theColumn + 1);
-		}
+        public MatrixTableModel(CouplingMatrix theMatrix) {
+            myMatrix = theMatrix;
+        }
 
-		public int getRowCount() {
-			return myMatrix.getToSize();
-		}
+        public int getColumnCount() {
+            return myMatrix.getFromSize();
+        }
 
-		public Object getValueAt(int theRow, int theColumn) {
-			return new Float(myMatrix.getElement(theRow + 1, theColumn + 1));
-		}
+        @Override
+        public String getColumnName(int theColumn) {
+            return String.valueOf(theColumn + 1);
+        }
 
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return true;
-		}
+        public int getRowCount() {
+            return myMatrix.getToSize();
+        }
 
-		@Override
-		public void setValueAt(Object theValue, int theRow, int theColumn) {
-			try {
-				float val = Float.parseFloat(theValue.toString());
-				myMatrix.setElement(val, theRow + 1, theColumn + 1);
-			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(null,
-						"Please enter a number",
-						"Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		}
+        public Object getValueAt(int theRow, int theColumn) {
+            return new Float(myMatrix.getElement(theRow + 1, theColumn + 1));
+        }
 
-	}
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return true;
+        }
+
+        @Override
+        public void setValueAt(Object theValue, int theRow, int theColumn) {
+            try {
+                float val = Float.parseFloat(theValue.toString());
+                myMatrix.setElement(val, theRow + 1, theColumn + 1);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null,
+                        "Please enter a number",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+    }
 
 }
