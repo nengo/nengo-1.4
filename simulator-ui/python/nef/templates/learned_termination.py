@@ -28,8 +28,7 @@ def test_params(net,p):
     if p['N_err'] < 1: return 'Number of dimensions must be at least one'
     
 import random
-from ca.nengo.model.plasticity.impl import InSpikeErrorFunction, \
-    OutSpikeErrorFunction, STDPTermination, PlasticEnsembleImpl
+from ca.nengo.model.plasticity.impl import STDPTermination, PlasticEnsembleImpl
 import nef
 import numeric
     
