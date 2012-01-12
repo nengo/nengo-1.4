@@ -52,6 +52,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.util.ShapeUtilities;
 
 import ca.nengo.math.Function;
+import ca.nengo.model.Noise;
 import ca.nengo.model.Origin;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
@@ -62,6 +63,7 @@ import ca.nengo.model.nef.NEFNode;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.Neuron;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
 import ca.nengo.plot.Plotter;
 import ca.nengo.util.MU;
 import ca.nengo.util.SpikePattern;
@@ -274,7 +276,8 @@ public class DefaultPlotter extends Plotter {
 				for (int j = 0; j < nodes.length; j++) {
 //					((NEFNode) nodes[j]).setRadialInput(x[i]*encoders[j][0]);
 					((NEFNode) nodes[j]).setRadialInput(getRadialInput(ensemble, j, x[i]));
-					nodes[j].run(0f, 0f);					
+					
+					nodes[j].run(0f, 0f);		
 				}
 				origin.run(null, 0f, 1f);
 				actualOutput[i] = ((RealOutput) origin.getValues()).getValues();
@@ -437,11 +440,19 @@ public class DefaultPlotter extends Plotter {
 					
 					((NEFNode) nodes[i]).setRadialInput(radialInput);
 					try {
+						Noise noise=null;
+						if (nodes[i] instanceof SpikingNeuron) {
+							noise=((SpikingNeuron)nodes[i]).getNoise();
+							((SpikingNeuron)nodes[i]).setNoise(null);
+						}
 						nodes[i].reset(false);
 						nodes[i].run(0f, 0f);
 						RealOutput output = (RealOutput) nodes[i].getOrigin(Neuron.AXON).getValues();
 						series.add(x[j]*radius, output.getValues()[0]);
 						rates[i][j] = output.getValues()[0];
+						if (noise!=null) {
+							((SpikingNeuron)nodes[i]).setNoise(noise);
+						}
 					} catch (SimulationException e) {
 						throw new RuntimeException("Can't plot activities: error running neurons", e);
 					} catch (ClassCastException e) {
