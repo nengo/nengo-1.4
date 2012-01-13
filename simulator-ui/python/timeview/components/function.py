@@ -6,6 +6,8 @@ from java.awt import *
 from java.awt.event import *
 from java.util import Hashtable
 
+import random
+
 from math import floor
 from math import ceil
 
@@ -32,6 +34,11 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         self.limit_color_step = (1 - self.limit_color_def) / 10
         self.limit_hide_timer = Timer(self.limit_hide_delay / 10, None, actionPerformed=self.hide_limits)
         self.limit_hide_timer.setRepeats(False)
+
+        self.popup.add(JPopupMenu.Separator())        
+        self.popup.add(JMenuItem('zero',actionPerformed=self.zero))
+        self.popup.add(JMenuItem('set value',actionPerformed=self.set_value))
+
 
         self.popup.add(JPopupMenu.Separator())        
         self.popup.add(JMenuItem('increase range',actionPerformed=self.increase_range))
@@ -80,6 +87,37 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
                 self.setSize(self.size.width + limit_width - self.limit_width,self.size.height)
                 self.setLocation(self.x - limit_width + self.limit_width, self.y)
                 self.limit_width = limit_width
+    
+    def zero(self,event):
+        for i in range(len(self.sliders)):
+            self.set_slider_value(i,0)
+    def set_value(self,event):
+        try:
+            example=','.join (['%1.1f'%random.uniform(-5,5) for i in range(len(self.sliders))])
+            text=JOptionPane.showInputDialog(self.view.frame,'Enter input value. \nExample: %s'%example,"Set value",JOptionPane.PLAIN_MESSAGE,None,None,None)
+            v=eval(text)
+            if isinstance(v,(int,float)): v=[v]
+            if len(v)>len(self.sliders): v=v[:len(self.sliders)]
+            for i,vv in enumerate(v):
+                self.set_slider_value(i,vv)
+        except:
+            self.release_value(event)
+        
+    
+    
+    def set_slider_value(self,index,value):
+        sv=value/(self.scale_factor*self.range)
+        self.sliders[index].value=int(sv)
+        self.labels[index].text='%1.2f'%value
+        self.check_label_size()
+        self.repaint()
+        if self.view.paused:  # change immediately, bypassing filter
+            self.data.data[-1][index]=value
+            self.view.forced_origins_prev[(self.name,'origin',index)]=value
+        self.view.forced_origins[(self.name,'origin',index)]=value
+        
+        
+    
     
     def slider_moved(self,index):
         if self.sliders[index].valueIsAdjusting:   # if I moved it
