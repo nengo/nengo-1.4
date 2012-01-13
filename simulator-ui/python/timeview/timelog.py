@@ -61,7 +61,7 @@ class TimeLogItem:
             n=len(self.data[0])
             for i in range(len(f),len(d)):
                 for j in range(n):
-                    v[j]=v[j]*decay+d[i][j]*dt_tau
+                    v[j]=v[j]*decay+d[i][j]*(1-decay)#dt_tau
                 #v=v*decay+d[i]*scale
                 f.append(v[:])
         self.parent.processing=False

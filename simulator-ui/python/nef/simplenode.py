@@ -4,6 +4,7 @@ from ca.nengo.util import VisiblyMutableUtils
 import java
 import inspect
 import warnings
+import math
 
 class SimpleTermination(Termination):
     def __init__(self,name,node,func,tau=0,dimensions=1):
@@ -48,9 +49,13 @@ class SimpleTermination(Termination):
         if self.tau<dt or dt==0 or self.tau<=0:
             self._filtered_values=v
         else:    
+            decay=math.exp(dt/self.tau)
             for i in range(self._dimensions):
-                self._filtered_values[i]*=(1.0-dt/self.tau)
-                self._filtered_values[i]+=v[i]*dt/self.tau
+                x=self._filtered_values[i]
+                self._filtered_values[i]=x*decay+v[i]*(1-decay)
+            
+                #self._filtered_values[i]*=(1.0-dt/self.tau)
+                #self._filtered_values[i]+=v[i]*dt/self.tau
         
         try:
            self._func(self._filtered_values)

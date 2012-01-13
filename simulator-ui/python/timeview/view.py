@@ -504,7 +504,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 prev=self.forced_origins_prev.get(key,None)
                 if prev is None: prev=v[index]
 
-                v[index]=prev*decay+value*dt_tau
+                v[index]=prev*decay+value*(1-decay)
                 self.forced_origins_prev[key]=v[index]
             else:
                 v=value    
