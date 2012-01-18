@@ -159,6 +159,24 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	}
 
 	/**
+	 * @param time The current simulation time. Sets the current time on the Network's subnodes.
+   * (Mainly for NEFEnsembles).
+	 */
+	public void setTime(float time) {
+			Node[] nodes = getNodes();
+			
+			for(int i = 0; i < nodes.length; i++){
+				Node workingNode = nodes[i];
+				
+				if(workingNode instanceof DecodableEnsembleImpl){
+					((DecodableEnsembleImpl) workingNode).setTime(time);
+				}else if(workingNode instanceof NetworkImpl){
+					((NetworkImpl) workingNode).setTime(time);
+				}
+			}
+	}
+	
+	/**
 	 * @see ca.nengo.model.Network#addNode(ca.nengo.model.Node)
 	 */
 	public void addNode(Node node) throws StructuralException {

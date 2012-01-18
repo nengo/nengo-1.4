@@ -14,16 +14,18 @@ import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.BasicOrigin;
 import ca.nengo.model.impl.EnsembleTermination;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
 import ca.nengo.model.impl.NetworkImpl.TerminationWrapper;
+import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
-import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
+import ca.nengo.util.Memory;
 
 public class NEFGPUInterface {
 	private static boolean myUseGPU = false;
@@ -65,19 +67,14 @@ public class NEFGPUInterface {
 			{
 				System.out.println("No CUDA-enabled GPU detected.");
 				canUseGPU = false;
-				
-				if(!hasGPU())
-				{
-					System.out.println("No CUDA-enabled GPU detected.");
-					myUseGPU = false; 
-				}
 			}
 			
 		} catch (java.lang.UnsatisfiedLinkError e) {
-			System.out.println("Couldn't load native library NengoUtilsGPU. " +
-				"Unable to use GPU for class NEFGPUInterface.");
 			canUseGPU = false;
+			System.out.println("Couldn't load native library NengoGPU. " +
+				"Unable to use GPU for class NEFGPUInterface.");
 		} catch (Exception e) {
+			canUseGPU = false;
 			System.out.println(e.getStackTrace());
 		}
 	}
@@ -100,12 +97,10 @@ public class NEFGPUInterface {
 		initialize(nodes, projections, networkArrays);
   }
 
-	// set whether or not to use the GPU
 	public static void setRequestedNumDevices(int value){
 		myNumDevices = value;
 	}
 	
-	// get whether or not to use the GPU
 	public static int getRequestedNumDevices(){
 		return myNumDevices;
 	}
@@ -117,7 +112,7 @@ public class NEFGPUInterface {
 	
 	// get whether or not to use the GPU
 	public static boolean getUseGPU(){
-		return canUseGPU && myUseGPU;
+		return canUseGPU && myUseGPU && (myNumDevices > 0);
 	}
 	
 	public static void showGPUTiming(){
@@ -228,9 +223,9 @@ public class NEFGPUInterface {
 		int[][] adjacencyMatrix = findAdjacencyMatrix(myGPUNetworkArrays, myGPUProjections);
 		
 		// We put the list of projections in terms of the GPU nodes
-		// For each projection we record 4 numbers: the number of the origin
-		// ensemble, the number of the origin in its ensemble, the number of
-		// the termination ensemble and the number of the termination in its ensemble
+		// For each projection we record 4 numbers: the index of the origin
+		// ensemble, the index of the origin in its ensemble, the index of
+		// the termination ensemble and the index of the termination in its ensemble
 		int[][] adjustedProjections = new int[myGPUProjections.length][6];
 		
 		
@@ -497,6 +492,11 @@ public class NEFGPUInterface {
 			{
 			}
 		}
+		
+		if(myShowTiming){
+			long projEndTime = new Date().getTime();
+			System.out.println("After processing projections: " + projEndTime);
+		}
 
 		for(int i = 0; i < myNodes.length; i++){
 			try
@@ -505,6 +505,11 @@ public class NEFGPUInterface {
 			}
 			catch(Exception e)
 			{}
+			/*
+			if(myShowTiming){
+				long nodeEndTime = new Date().getTime();
+				System.out.println("After processing node" + myNodes[i].toString() + ": " + nodeEndTime);
+			}*/
 		}
 		
 		if(myShowTiming){
@@ -573,7 +578,8 @@ public class NEFGPUInterface {
 						boolean originWrapped = origin instanceof OriginWrapper;
 						if(originWrapped)
 							origin = ((OriginWrapper) origin).getBaseOrigin();
-	
+						
+						// we have to do all this ugliness because the Origin interface does not require a setValues method
 						if(origin instanceof DecodedOrigin)	{
 							((DecodedOrigin) origin).setValues(new RealOutputImpl(
 								representedOutputValues[i][j].clone(),
@@ -587,12 +593,17 @@ public class NEFGPUInterface {
 						}
 						
 					}
-	
+					/*
 					if (((NEFEnsembleImpl) myGPUNodes[i]).isCollectingSpikes()) {
 						((NEFEnsembleImpl) myGPUNodes[i]).setSpikePattern(spikeOutput[spikeIndex], endTime);
 					}
+					*/
 	
-					((NEFEnsembleImpl) myGPUNodes[i]).setTime(endTime);
+					if(myGPUNetworkArrays[i] instanceof DecodableEnsembleImpl){
+						((DecodableEnsembleImpl) myGPUNetworkArrays[i]).setTime(endTime);
+					}else if(myGPUNetworkArrays[i] instanceof NetworkImpl){
+						((NetworkImpl) myGPUNetworkArrays[i]).setTime(endTime);
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -602,6 +613,7 @@ public class NEFGPUInterface {
 		if(myShowTiming){
 			long GPUendTime = new Date().getTime();
 			System.out.println("After GPU processing: " + GPUendTime);
+			Memory.report("End of step" + numSteps);
 			GPUinterval = GPUendTime - GPUinterval;
 			
 			averageTimeSpentInGPU = (averageTimeSpentInGPU * numSteps + GPUinterval) / (numSteps + 1);
