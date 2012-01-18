@@ -421,7 +421,7 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   err = cudaGetLastError();
   checkCudaError(err);
 
-///// sum
+///// sum the activation in each dimension of each ensemble
 
   dimBlock.x = 256;
   dimGrid.x = nengoData->totalEnsembleDimension / dimBlock.x + 1;

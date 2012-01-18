@@ -43,8 +43,14 @@ intArray* newIntArray(int size, const char* name)
 
 void freeIntArray(intArray* a)
 {
-  a->onDevice ? cudaFree(a->array) : free(a->array);
-  free(a->name);
+  if(!a)
+    return;
+
+  if(a->array)
+    a->onDevice ? cudaFree(a->array) : free(a->array);
+  
+  if(a->name)
+    free(a->name);
 
   free(a);
 }
@@ -86,8 +92,15 @@ floatArray* newFloatArray(int size, const char* name)
 
 void freeFloatArray(floatArray* a)
 {
-  a->onDevice ? cudaFree(a->array) : free(a->array);
-  free(a->name);
+  if(!a)
+    return;
+
+  if(a->array)
+    a->onDevice ? cudaFree(a->array) : free(a->array);
+  
+  if(a->name)
+    free(a->name);
+
   free(a);
 }
 
@@ -349,6 +362,7 @@ NengoGPUData* getNewNengoGPUData()
   new->ensembleSums = NULL;
   new->encoders = NULL;
   new->decoders = NULL;
+  new->encodeResult = NULL;
 
   new->neuronVoltage = NULL;
   new->neuronReftime = NULL;
@@ -356,6 +370,7 @@ NengoGPUData* getNewNengoGPUData()
   new->neuronScale = NULL;
   new->ensembleTauRC = NULL;
   new->ensembleTauRef = NULL;
+  new->neuronToEnsembleIndexor = NULL;
 
   new->ensembleNumTerminations = NULL;
   new->ensembleDimension = NULL;
@@ -395,6 +410,10 @@ NengoGPUData* getNewNengoGPUData()
   new->NDterminationWeights = NULL;
   new->NDterminationEnsembleOffset = NULL;
   new->NDterminationEnsembleSums = NULL;
+
+  new->sharedData_outputIndex = NULL;
+  new->sharedData_sharedIndex = NULL;
+
 
   return new;
 }

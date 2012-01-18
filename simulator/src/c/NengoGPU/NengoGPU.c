@@ -12,6 +12,7 @@ extern "C"{
 #include "NengoGPU_CUDA.h"
 #include "NengoGPUData.h"
 
+
 int totalNumEnsembles = 0;
 int totalNumNetworkArrays = 0;
 
