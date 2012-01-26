@@ -29,11 +29,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.sim.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,17 +44,14 @@ import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.SimulatorEvent;
 import ca.nengo.sim.SimulatorListener;
 import ca.nengo.util.Probe;
-import ca.nengo.util.TaskSpawner;
 import ca.nengo.util.ThreadTask;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.impl.NEFGPUInterface;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
 
@@ -74,9 +69,9 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     private ThreadTask[] myTasks;
     private Map<String, Node> myNodeMap;
     private List<Probe> myProbes;
+    private Network myNetwork;
     private boolean myDisplayProgress;
     private transient List<VisiblyMutable.Listener> myChangeListeners;
-    private transient NEFGPUInterface myNEFGPUInterface;
     private transient NodeThreadPool myNodeThreadPool;
 
     /**
@@ -94,20 +89,22 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
      * @see ca.nengo.sim.Simulator#initialize(ca.nengo.model.Network)
      */
     public synchronized void initialize(Network network) {
+    	
+    	myNetwork = network;
+        
         myNodes = network.getNodes();
+        myProjections = network.getProjections();
 
         myNodeMap = new HashMap<String, Node>(myNodes.length * 2);
         for (Node myNode : myNodes) {
             myNodeMap.put(myNode.getName(), myNode);
         }
 
-        myProjections = network.getProjections();
-
         if (myProbes == null) {
             myProbes = new ArrayList<Probe>(20);
         }
 
-        myTasks = collectTasks(myNodes);
+        //myTasks = collectTasks(myNodes);
     }
 
     /**
@@ -135,39 +132,22 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
             throws SimulationException {
         this.run(startTime, endTime, stepSize, true);
     }
-
+    
     /**
      * Run function with option to display (or not) the progress in the console
      */
     public synchronized void run(float startTime, float endTime, float stepSize, boolean topLevel)
             throws SimulationException {
+    	
+    	 myNodeThreadPool = null;
+         if(myNetwork.getCountJavaThreads() > 0){
+         	myNodeThreadPool = new NodeThreadPool(myNetwork);
+         }
 
         //		float pre_time = System.nanoTime();
 
         double time = startTime;
         double thisStepSize = stepSize;
-
-
-        /* If we are using the GPU for this network, then we have to bring
-         *  the non-network nodes up to the top level so that we don't
-         * run multiple simulators.
-         */
-        myNEFGPUInterface = null;
-        myNodeThreadPool = null;
-
-        if(NEFGPUInterface.getUseGPU()){
-            Node[] nodesForGPU = collectNodes(myNodes);
-            Node[] networkArraysForGPU = collectNetworkArraysForGPU(myNodes);
-            Projection[] projectionsForGPU = collectProjections(myNodes, myProjections);
-
-            myNEFGPUInterface = new NEFGPUInterface(nodesForGPU, projectionsForGPU, networkArraysForGPU);
-        }else if(NodeThreadPool.isMultithreading()){
-            Node[] nodesForMultithreading = collectNodes(myNodes);
-            Projection[] projectionsForMultithreading = collectProjections(myNodes, myProjections);
-
-            myNodeThreadPool =
-                    new NodeThreadPool(nodesForMultithreading, projectionsForMultithreading, myTasks);
-        }
 
         if(topLevel)
         {
@@ -219,32 +199,17 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
 
 
-        if(myNEFGPUInterface != null){
-
-            myNEFGPUInterface.kill();
-            myNEFGPUInterface = null;
-
-        }else if(myNodeThreadPool != null){
-
+        if(myNodeThreadPool != null){
             myNodeThreadPool.kill();
             myNodeThreadPool = null;
-
         }
 
     }
 
     public void step(float startTime, float endTime)
             throws SimulationException {
-
-
-        if(myNEFGPUInterface != null){
-            myNEFGPUInterface.step(startTime, endTime);
-            // TODO Possibly integrate this into the NEFGPUInterface
-            for (ThreadTask myTask : myTasks) {
-                myTask.run(startTime, endTime);
-            }
-        }
-        else if(myNodeThreadPool != null){
+        	
+        if(myNodeThreadPool != null){
             myNodeThreadPool.step(startTime, endTime);
         }else{
             for (Projection myProjection : myProjections) {
@@ -260,9 +225,10 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
                 }
             }
 
+            /*
             for (ThreadTask myTask : myTasks) {
                 myTask.run(startTime, endTime);
-            }
+            }*/
         }
 
         Iterator<Probe> it = myProbes.iterator();
@@ -399,7 +365,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     {
         myDisplayProgress = display;
     }
-
+	
     /**
      * @see ca.nengo.sim.Simulator#addSimulatorListener(ca.nengo.sim.SimulatorListener)
      */
@@ -454,140 +420,5 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     @Override
     public Simulator clone() throws CloneNotSupportedException {
         return new LocalSimulator();
-    }
-
-    /**
-     * Bring all nodes to the top level so we can run them all at once.
-     * Retrieves nodes depth-first. Used for multithreaded and GPU-enabled runs.
-     */
-    public static Node[] collectNodes(Node[] startingNodes){
-
-        ArrayList<Node> nodes = new ArrayList<Node>();
-
-        List<Node> nodesToProcess = new LinkedList<Node>();
-        nodesToProcess.addAll(Arrays.asList(startingNodes));
-
-        Node workingNode;
-
-        while(nodesToProcess.size() != 0)
-        {
-            workingNode = nodesToProcess.remove(0);
-
-            if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
-            {
-                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-
-                nodeList.addAll(nodesToProcess);
-                nodesToProcess = nodeList;
-            }
-            else
-            {
-                nodes.add(workingNode);
-            }
-        }
-
-        return nodes.toArray(new Node[0]);
-    }
-
-    public static ThreadTask[] collectTasks(Node[] startingNodes){
-
-        ArrayList<ThreadTask> tasks = new ArrayList<ThreadTask>();
-
-        List<Node> nodesToProcess = new LinkedList<Node>();
-        nodesToProcess.addAll(Arrays.asList(startingNodes));
-
-        Node workingNode;
-
-        while(nodesToProcess.size() != 0)
-        {
-            workingNode = nodesToProcess.remove(0);
-
-            if(workingNode instanceof Network && !(workingNode.getClass().getCanonicalName().contains("CCMModelNetwork")))
-            {
-                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-
-                nodeList.addAll(nodesToProcess);
-                nodesToProcess = nodeList;
-            }
-            else if(workingNode instanceof TaskSpawner)
-            {
-                tasks.addAll(Arrays.asList(((TaskSpawner) workingNode).getTasks()));
-            }
-        }
-
-        return tasks.toArray(new ThreadTask[0]);
-    }
-
-    public static Node[] collectNetworkArraysForGPU(Node[] startingNodes){
-        ArrayList<Node> nodes = new ArrayList<Node>();
-
-        List<Node> nodesToProcess = new LinkedList<Node>();
-        nodesToProcess.addAll(Arrays.asList(startingNodes));
-
-        Node workingNode;
-
-        while(nodesToProcess.size() != 0)
-        {
-            workingNode = nodesToProcess.remove(0);
-
-            // The purpose of this function is to have a list of NetworkArrays. On the GPU, all NEF
-            // ensembles are considered to be part of a NetworkArray. NEF ensembles that are not
-            // ostensibly part of a NetworkArray are considered by the GPU to be part of a NetworkArray
-            // that contains only one nodes. In this way, we do not have to make special considerations
-            // for nodes that are part of the NetworkArray. Processing a network array that contains only
-            // one node is effectively the same as processing that one node on its own, so nothing is lost.
-            boolean isNEFEnsemble = workingNode instanceof NEFEnsembleImpl;
-            boolean isNetworkArray = workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6";
-            boolean isNetwork = workingNode instanceof NetworkImpl;
-
-
-            if(isNEFEnsemble || isNetworkArray)
-            {
-                nodes.add(workingNode);
-            }
-            else if(isNetwork)
-            {
-                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-
-                nodeList.addAll(nodesToProcess);
-                nodesToProcess = nodeList;
-
-                //nodesToProcess = Arrays.asList(((Network) workingNode).getNodes()).addAll(nodesToProcess);
-                //nodesToProcess.addAll(Arrays.asList(((Network) workingNode).getNodes()));
-            }
-        }
-
-        return nodes.toArray(new Node[0]);
-    }
-
-
-    /**
-     * Bring all projections to the top level so we can run them all at once.
-     * Used for multithreaded and GPU-enabled runs.
-     */
-    public static Projection[] collectProjections(Node[] startingNodes, Projection[] startingProjections){
-
-        ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(startingProjections));
-
-        List<Node> nodesToProcess = new LinkedList<Node>();
-        nodesToProcess.addAll(Arrays.asList(startingNodes));
-
-        Node workingNode;
-
-        while(nodesToProcess.size() != 0)
-        {
-            workingNode = nodesToProcess.remove(0);
-
-            if(workingNode instanceof Network) {
-                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-
-                nodeList.addAll(nodesToProcess);
-                nodesToProcess = nodeList;
-
-                projections.addAll(Arrays.asList(((Network) workingNode).getProjections()));
-            }
-        }
-
-        return projections.toArray(new Projection[0]);
     }
 }

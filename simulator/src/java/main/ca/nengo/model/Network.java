@@ -177,7 +177,12 @@ public interface Network extends Node, Probeable {
 	 * @return The Simulator used to run this Network
 	 */
 	public Simulator getSimulator();
-
+	
+	public int getCountGPU();
+	public void setCountGPU(int numGPU);
+	public int getCountJavaThreads();
+	public void setCountJavaThreads(int numJavaThreads);
+	
 	/**
 	 * Metadata is non-critical information about the Network (eg UI layout) that the user doesn't
 	 * access directly.
@@ -195,5 +200,7 @@ public interface Network extends Node, Probeable {
 	 * @param value Value of the named metadata item
 	 */
 	public void setMetaData(String key, Object value);
+	
+	
 
 }

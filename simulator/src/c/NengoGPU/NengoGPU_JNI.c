@@ -1097,12 +1097,12 @@ void createSharedMemoryMaps(int numProjections, projection* projections)
   }
 }
 
-JNIEXPORT jboolean JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_hasGPU
+JNIEXPORT jint JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeGetNumDevices
   (JNIEnv *env, jclass class)
 {
-  jboolean hasGPU = (jboolean) (getGPUDeviceCount() > 0);
+  jint numGPU = (jint) getGPUDeviceCount();
 
-  return hasGPU;
+  return numGPU;
 }
 
 // This function takes as arguments all the information required by the ensembles to run that won't change from step to step: decoders, encoders, transformations.

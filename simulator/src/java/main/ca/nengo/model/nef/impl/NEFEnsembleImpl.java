@@ -503,7 +503,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
             result = new PESTermination(this, name, pnts);
 
             // Set the number of tasks equal to the number of threads
-            int numTasks = ca.nengo.util.impl.NodeThreadPool.getNumThreads();
+            int numTasks = ca.nengo.util.impl.NodeThreadPool.getNumJavaThreads();
             numTasks = numTasks < 1 ? 1 : numTasks;
 
             LearningTask[] tasks = new LearningTask[numTasks];
@@ -888,7 +888,13 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		float[] neuronData = new float[5 + 2 * numNeurons];
 		neuronData[0] = numNeurons;
 
-		SpikingNeuron[] neurons = (SpikingNeuron[]) getNodes();
+		Node[] nodes = getNodes();
+		SpikingNeuron[] neurons = new SpikingNeuron[nodes.length];
+		
+		for(int i = 0; i < nodes.length; i++){
+			neurons[i] = (SpikingNeuron) nodes[i];
+		}
+			
 		SpikingNeuron neuron = neurons[0];
 		SpikeGeneratorOrigin origin;
 		try {

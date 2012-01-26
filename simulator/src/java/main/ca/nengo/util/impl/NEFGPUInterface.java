@@ -1,8 +1,10 @@
 package ca.nengo.util.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
@@ -19,6 +21,7 @@ import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
 import ca.nengo.model.impl.NetworkImpl.TerminationWrapper;
+import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.DecodedTermination;
@@ -30,7 +33,8 @@ import ca.nengo.util.Memory;
 public class NEFGPUInterface {
 	private static boolean myUseGPU = false;
 	private static boolean canUseGPU;
-	private static int myNumDevices = 1;
+	private static int myNumDevices = 0;
+	private static int myNumAvailableDevices;
 	
 	private static boolean showTiming = false;
 	private boolean myShowTiming;
@@ -40,7 +44,7 @@ public class NEFGPUInterface {
 	private int numSteps;
 	
 	
-	protected Node[] myGPUNodes;
+	protected NEFEnsemble[] myGPUEnsembles;
 	protected Projection[] myGPUProjections;
 	protected Node[] myGPUNetworkArrays;
 	
@@ -61,25 +65,25 @@ public class NEFGPUInterface {
 	static{
 		try {
 			System.loadLibrary("NengoGPU");
-			canUseGPU = true;
-
-			if(!hasGPU())
+			myNumAvailableDevices = nativeGetNumDevices();
+			
+			if(myNumAvailableDevices < 1)
 			{
 				System.out.println("No CUDA-enabled GPU detected.");
 				canUseGPU = false;
 			}
 			
 		} catch (java.lang.UnsatisfiedLinkError e) {
-			canUseGPU = false;
+			myNumAvailableDevices = 0;
 			System.out.println("Couldn't load native library NengoGPU. " +
 				"Unable to use GPU for class NEFGPUInterface.");
 		} catch (Exception e) {
-			canUseGPU = false;
+			myNumAvailableDevices = 0;
 			System.out.println(e.getStackTrace());
 		}
 	}
 
-	static native boolean hasGPU();
+	static native int nativeGetNumDevices();
 
 	static native void nativeSetupRun(float[][][][] terminationTransforms,
 			int[][] isDecodedTermination, float[][] terminationTau,
@@ -93,26 +97,24 @@ public class NEFGPUInterface {
 
 	static native void nativeKill();
 	
-	public NEFGPUInterface(Node[] nodes, Projection[] projections, Node[] networkArrays){
-		initialize(nodes, projections, networkArrays);
-  }
+	public NEFGPUInterface(){
+    }
 
+	public static int getNumAvailableDevices(){
+		return myNumAvailableDevices;
+	}
+	
 	public static void setRequestedNumDevices(int value){
-		myNumDevices = value;
+		myNumDevices = value > myNumAvailableDevices ? myNumAvailableDevices : value;
 	}
 	
 	public static int getRequestedNumDevices(){
 		return myNumDevices;
 	}
 	
-	// set whether or not to use the GPU
-	public static void setUseGPU(boolean value){
-		myUseGPU = value;
-	}
-	
-	// get whether or not to use the GPU
+	// get whether or not to use the GPU. set whether or not to use the GPU by using setRequestedNumDevices
 	public static boolean getUseGPU(){
-		return canUseGPU && myUseGPU && (myNumDevices > 0);
+		return myNumDevices > 0;
 	}
 	
 	public static void showGPUTiming(){
@@ -123,7 +125,7 @@ public class NEFGPUInterface {
 		showTiming = false;
 	}
 	
-	public void initialize(Node[] nodes, Projection[] projections, Node[] networkArrays){
+	public void initialize(){
 		
 		myShowTiming = showTiming;
 		if(myShowTiming){
@@ -134,89 +136,40 @@ public class NEFGPUInterface {
 		}
 		
 		ArrayList<Node> GPUNodeList = new ArrayList<Node>();
-		ArrayList<Node> nodeList = new ArrayList<Node>();
 		
-		// Sort out the GPU nodes from the CPU nodes
-		for(int i = 0; i < nodes.length; i++){
-			
-			boolean useGPU = 
-				nodes[i] instanceof NEFEnsembleImpl && ((NEFEnsembleImpl) nodes[i]).getUseGPU();
-			
-			if(useGPU)
-			{		
-				GPUNodeList.add(nodes[i]);
-			}else{
-				nodeList.add(nodes[i]); 	
-			} 
-		}
-		
-		// Sort out GPU network arrays from CPU network arrays
-		ArrayList<Node> GPUNetworkArrays = new ArrayList<Node>();
-		for(int i = 0; i < networkArrays.length; i++){
-			
-			boolean NEFEnsembleUseGPU = 
-				networkArrays[i] instanceof NEFEnsembleImpl && ((NEFEnsembleImpl) networkArrays[i]).getUseGPU();
-			
-			boolean NetworkArrayUseGPU = 
-				networkArrays[i].getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6" &&
-				((NetworkImpl) networkArrays[i]).getUseGPU();
-		
-			if(NEFEnsembleUseGPU || NetworkArrayUseGPU)
-			{
-				GPUNetworkArrays.add(networkArrays[i]);
+		for(Node currentNode : myGPUNetworkArrays){
+			// all the nodes in myGPUNetworkArrays are going to run on the GPU. 
+			if(currentNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6"){
+				List<Node> nodeList = Arrays.asList(((NetworkImpl) currentNode).getNodes());
+				GPUNodeList.addAll(nodeList);
+			}
+			else{
+				GPUNodeList.add(currentNode);
 			}
 		}
 		
-		// Sort out the GPU projections from the CPU projections
-		ArrayList<Projection> GPUProjectionsList = new ArrayList<Projection>();
-		ArrayList<Projection> projectionsList = new ArrayList<Projection>();
-		
-		for(int i = 0; i < projections.length; i++)
-		{
-			Node originNode = projections[i].getOrigin().getNode();
-			Node terminationNode = projections[i].getTermination().getNode();
+		myGPUEnsembles = GPUNodeList.toArray(new NEFEnsemble[0]);
 
-			boolean originNodeOnGPU = GPUNetworkArrays.contains(originNode);
-			
-			boolean terminationNodeOnGPU = GPUNetworkArrays.contains(terminationNode);
-			
-			if(originNodeOnGPU && terminationNodeOnGPU)
-			{
-				GPUProjectionsList.add(projections[i]);
-			}
-			else
-			{
-				projectionsList.add(projections[i]);
-			}
-		}
-		
-		myGPUNodes = GPUNodeList.toArray(new Node[0]);
-		myGPUProjections = GPUProjectionsList.toArray(new Projection[0]);
-		myGPUNetworkArrays = GPUNetworkArrays.toArray(new Node[0]);
-		
-		myNodes = nodeList.toArray(new Node[0]);
-		myProjections = projectionsList.toArray(new Projection[0]);
-
-		if (myGPUNodes.length == 0)
+		if (myGPUEnsembles.length == 0)
 			return;
 
 		// Put the data in a format appropriate for passing to the GPU. 
 		// Most of this function is devoted to this task.
 		int i = 0, j = 0, k = 0, numEnsemblesCollectingSpikes = 0;
-		NEFEnsembleImpl workingNode;
+		NEFEnsemble workingNode;
 		Termination[] terminations;
 		DecodedOrigin[] origins;
 
-		float[][][][] terminationTransforms = new float[myGPUNodes.length][][][];
-		int[][] isDecodedTermination = new int[myGPUNodes.length][];
-		float[][] terminationTau = new float[myGPUNodes.length][];
-		float[][][] encoders = new float[myGPUNodes.length][][];
-		float[][][][] decoders = new float[myGPUNodes.length][][][];
-		float[][] neuronData = new float[myGPUNodes.length][];
+		float[][][][] terminationTransforms = new float[myGPUEnsembles.length][][][];
+		int[][] isDecodedTermination = new int[myGPUEnsembles.length][];
+		float[][] terminationTau = new float[myGPUEnsembles.length][];
+		float[][][] encoders = new float[myGPUEnsembles.length][][];
+		float[][][][] decoders = new float[myGPUEnsembles.length][][][];
+		float[][] neuronData = new float[myGPUEnsembles.length][];
 		EnsembleData ensembleData = new EnsembleData();
-		int[][] ensembleDataArray = new int[myGPUNodes.length][];
-		boolean[] collectSpikes = new boolean[myGPUNodes.length];
-		float maxTimeStep = ((LIFSpikeGenerator) ((SpikingNeuron) ((NEFEnsembleImpl) myGPUNodes[0])
+		int[][] ensembleDataArray = new int[myGPUEnsembles.length][];
+		boolean[] collectSpikes = new boolean[myGPUEnsembles.length];
+		float maxTimeStep = ((LIFSpikeGenerator) ((SpikingNeuron) ((NEFEnsembleImpl) myGPUEnsembles[0])
 				.getNodes()[0]).getGenerator()).getMaxTimeStep();
 
 		
@@ -239,6 +192,8 @@ public class NEFGPUInterface {
 		int[][] networkArrayDataArray = new int[myGPUNetworkArrays.length][];
 
 		int totalInputSize = 0;
+		
+		// store networkArray data
 		for(i = 0; i < myGPUNetworkArrays.length; i++){
 			
 			networkArrayData.reset();
@@ -347,15 +302,15 @@ public class NEFGPUInterface {
 		}
 		
 		
-		// prepare the data to pass in to the native setup call
-		for (i = 0; i < myGPUNodes.length; i++) {
+		// store NEFEnsemble data
+		for (i = 0; i < myGPUEnsembles.length; i++) {
 			
-			workingNode = (NEFEnsembleImpl) myGPUNodes[i];
+			workingNode = myGPUEnsembles[i];
 			
 			ensembleData.reset();
 
 			ensembleData.dimension = workingNode.getDimension();
-			ensembleData.numNeurons = workingNode.getNeurons();
+			ensembleData.numNeurons = workingNode.getNodeCount();
 
 			terminations = workingNode.getTerminations();
 
@@ -404,7 +359,7 @@ public class NEFGPUInterface {
 					encoders[i][j][k] = encoders[i][j][k] / radii[k];
 			}
 
-			origins = workingNode.getDecodedOrigins();
+			origins = ((NEFEnsembleImpl) workingNode).getDecodedOrigins();
 
 			ensembleData.numOrigins = origins.length;
 			ensembleData.maxDecoderDimension = 0;
@@ -422,7 +377,7 @@ public class NEFGPUInterface {
 				}
 			}
 
-			neuronData[i] = workingNode.getStaticNeuronData();
+			neuronData[i] = ((NEFEnsembleImpl) workingNode).getStaticNeuronData();
 
 			collectSpikes[i] = workingNode.isCollectingSpikes();
 			numEnsemblesCollectingSpikes++;
@@ -439,7 +394,7 @@ public class NEFGPUInterface {
 		// They do not change in size from step to step so we can re-use them.
 		representedInputValues = new float[myGPUNetworkArrays.length][][];
 		representedOutputValues = new float[myGPUNetworkArrays.length][][];
-		spikeOutput = new float [myGPUNodes.length][];
+		spikeOutput = new float [myGPUEnsembles.length][];
 		
 		for (i = 0; i < myGPUNetworkArrays.length; i++) {
 			terminations = myGPUNetworkArrays[i].getTerminations();
@@ -463,8 +418,8 @@ public class NEFGPUInterface {
 		}
 
 		int spikeIndex = 0;
-		for (i = 0; i < myGPUNodes.length; i++) {
-			spikeOutput[spikeIndex++] = new float[((NEFEnsembleImpl) myGPUNodes[i]).getNeurons()];
+		for (i = 0; i < myGPUEnsembles.length; i++) {
+			spikeOutput[spikeIndex++] = new float[((NEFEnsembleImpl) myGPUEnsembles[i]).getNeurons()];
 		}
 	}
 	
@@ -474,52 +429,14 @@ public class NEFGPUInterface {
 		myEndTime = endTime;
 		
 		long GPUinterval = 0, CPUinterval = 0;
-		
-		if(myShowTiming){
-			long CPUstartTime = new Date().getTime();
-			System.out.println("Step: Before CPU processing: " + CPUstartTime);
-			CPUinterval = CPUstartTime;
-		}
 
-		
-		for (int i = 0; i < myProjections.length; i++) {
-			try
-			{
-				InstantaneousOutput values = myProjections[i].getOrigin().getValues();
-				myProjections[i].getTermination().setValues(values);
-			}
-			catch(SimulationException e)
-			{
-			}
-		}
-		
 		if(myShowTiming){
-			long projEndTime = new Date().getTime();
-			System.out.println("After processing projections: " + projEndTime);
-		}
-
-		for(int i = 0; i < myNodes.length; i++){
-			try
-			{
-				myNodes[i].run(myStartTime, myEndTime);
-			}
-			catch(Exception e)
-			{}
-			/*
-			if(myShowTiming){
-				long nodeEndTime = new Date().getTime();
-				System.out.println("After processing node" + myNodes[i].toString() + ": " + nodeEndTime);
-			}*/
+			long GPUstartTime = new Date().getTime();
+			System.out.println("before GPU processing: " + GPUstartTime);
+			GPUinterval = GPUstartTime;
 		}
 		
-		if(myShowTiming){
-			long CPUendTime = new Date().getTime();
-			System.out.println("After CPU processing, before GPU processing: " + CPUendTime);
-			CPUinterval = CPUendTime - CPUinterval;
-			GPUinterval = CPUendTime;
-		}
-		
-		if(myGPUNodes.length > 0){
+		if(myGPUEnsembles.length > 0){
 		
 			try {
 				
@@ -633,10 +550,67 @@ public class NEFGPUInterface {
 			System.out.println("Total run time: " + totalRunTime + "(ms)");
 		}
 		
-		if (myGPUNodes.length == 0)
+		if (myGPUEnsembles.length == 0)
 			return;
 		
 		nativeKill();
+	}
+	
+	public Node[] takeGPUNodes(Node[] nodes){
+		ArrayList<Node> gpuNodeList = new ArrayList<Node>();
+		ArrayList<Node> nodeList = new ArrayList<Node>();
+		
+		for(int i = 0; i < nodes.length; i++){
+			Node workingNode = nodes[i];
+			boolean NEFEnsembleUseGPU = 
+				workingNode instanceof NEFEnsembleImpl && ((NEFEnsembleImpl) workingNode).getUseGPU();
+			
+			boolean NetworkArrayUseGPU = 
+				workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6" &&
+				((NetworkImpl) workingNode).getUseGPU();
+		
+			if(NEFEnsembleUseGPU || NetworkArrayUseGPU){
+				gpuNodeList.add(workingNode);
+			}
+			else{
+				nodeList.add(workingNode);
+			}
+		}
+		
+		myGPUNetworkArrays = gpuNodeList.toArray(new Node[0]);
+		return nodeList.toArray(new Node[0]);
+	}
+	
+	// takeGPUNodes should be called before calling this. The nodes that run on the GPU determine the
+	// projections that run on the GPU
+	Projection[] takeGPUProjections(Projection[] projections){
+		// Sort out the GPU projections from the CPU projections
+		ArrayList<Projection> gpuProjectionsList = new ArrayList<Projection>();
+		ArrayList<Projection> projectionList = new ArrayList<Projection>();
+		
+		List<Node> GPUNetworkArrayList = Arrays.asList(myGPUNetworkArrays);
+		
+		for(int i = 0; i < projections.length; i++)
+		{
+			Node originNode = projections[i].getOrigin().getNode();
+			Node terminationNode = projections[i].getTermination().getNode();
+
+			boolean originNodeOnGPU = GPUNetworkArrayList.contains(originNode);
+			boolean terminationNodeOnGPU = GPUNetworkArrayList.contains(terminationNode);
+			
+			if(originNodeOnGPU && terminationNodeOnGPU)
+			{
+				gpuProjectionsList.add(projections[i]);
+			}
+			else
+			{
+				projectionList.add(projections[i]);
+			}
+		}
+		
+		myGPUProjections = gpuProjectionsList.toArray(new Projection[0]);
+		return projectionList.toArray(new Projection[0]);
+		
 	}
 	
 	// Converts a nengo network to an undirected graph stored as a lower triangular adjacency matrix.

@@ -9,10 +9,10 @@ extern "C" {
 #endif
 /*
  * Class:     ca_nengo_util_impl_NEFGPUInterface
- * Method:    hasGPU
- * Signature: ()B
+ * Method:    nativeGetNumDevices
+ * Signature: ()I
  */
-JNIEXPORT jboolean JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_hasGPU
+JNIEXPORT jint JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeGetNumDevices
   (JNIEnv *, jclass);
  
 /*

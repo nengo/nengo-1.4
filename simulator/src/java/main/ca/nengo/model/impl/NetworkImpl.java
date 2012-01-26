@@ -97,7 +97,27 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
 	private transient List<VisiblyMutable.Listener> myListeners;
 
-	protected boolean myUseGPU = false;
+	protected int myNumGPU = 0;
+	protected int myNumJavaThreads = 1;
+
+	public int getCountGPU() {
+		return myNumGPU;
+	}
+
+	public void setCountGPU(int numGPU) {
+		this.myNumGPU = numGPU;
+	}
+
+	public int getCountJavaThreads() {
+		return myNumJavaThreads;
+	}
+
+	public void setCountJavaThreads(int numJavaThreads) {
+		this.myNumJavaThreads = numJavaThreads;
+	}
+
+	protected boolean myUseGPU = true;
+
 
 	/**
 	 * Sets up a network's data structures
@@ -531,6 +551,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public void setUseGPU(boolean use)
 	{
 		myUseGPU = use;
+		
 		Node[] nodes = getNodes();
 
 		for (Node workingNode : nodes) {
@@ -548,7 +569,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public boolean getUseGPU(){
 		return myUseGPU && myMode == SimulationMode.DEFAULT;
 	}
-
+	
 	/**
 	 * @see ca.nengo.model.Probeable#getHistory(java.lang.String)
 	 */

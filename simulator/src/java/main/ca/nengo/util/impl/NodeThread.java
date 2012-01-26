@@ -22,9 +22,6 @@ public class NodeThread extends Thread {
 	private int myStartIndexInTasks;
 	private int myEndIndexInTasks;
 
-//	private float startTime;
-//	private float endTime;
-
 	public NodeThread(NodeThreadPool nodePool, Node[] nodes,
 			int startIndexInNodes, int endIndexInNodes,
 			Projection[] projections, int startIndexInProjections,
@@ -61,6 +58,26 @@ public class NodeThread extends Thread {
 		}
 	}
 
+	// might have to make these protected?
+	protected void runProjections(float startTime, float endTime) throws SimulationException{
+		for (int i = myStartIndexInProjections; i < myEndIndexInProjections; i++) {
+			InstantaneousOutput values = myProjections[i].getOrigin().getValues();
+			myProjections[i].getTermination().setValues(values);
+		}
+	}
+	
+	protected void runNodes(float startTime, float endTime) throws SimulationException{
+		for (int i = myStartIndexInNodes; i < myEndIndexInNodes; i++) {
+			myNodes[i].run(startTime, endTime);
+		}
+	}
+	
+	protected void runTasks(float startTime, float endTime) throws SimulationException {
+		for (int i = myStartIndexInTasks; i < myEndIndexInTasks; i++) {
+            myTasks[i].run(startTime, endTime);
+        }
+	}
+	
 	public void run() {
 		try {
 			int i;
@@ -72,33 +89,29 @@ public class NodeThread extends Thread {
 				startTime = myNodeThreadPool.getStartTime();
 				endTime = myNodeThreadPool.getEndTime();
 
-				for (i = myStartIndexInProjections; i < myEndIndexInProjections; i++) {
-					InstantaneousOutput values = myProjections[i].getOrigin()
-							.getValues();
-					myProjections[i].getTermination().setValues(values);
-				}
+				runProjections(startTime, endTime);
 
 				finished();
 
-				for (i = myStartIndexInNodes; i < myEndIndexInNodes; i++) {
-					myNodes[i].run(startTime, endTime);
-				}
+				runNodes(startTime, endTime);
 
 				finished();
 
-                for (i = myStartIndexInTasks; i < myEndIndexInTasks; i++) {
-                    myTasks[i].run(startTime, endTime);
-                }
+                runTasks(startTime, endTime);
 
                 finished();
 
 				// This is the means of getting out of the loop. The pool will interrupt
 				// this thread at the appropriate time.
 				if (Thread.currentThread().isInterrupted() || myNodeThreadPool.getRunFinished()) {
+					kill();
 					return;
 				}
 			}
 		} catch (SimulationException e) {
 		}
+	}
+	
+	protected void kill(){
 	}
 }

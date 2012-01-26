@@ -84,6 +84,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 					"Unable to use GPU for class weightedCostApproximator.");
 		}
 		catch(Exception e){
+			canUseGPU = false;
 			System.out.println(e.getStackTrace());
 		}
 	}
