@@ -4,7 +4,7 @@ Nengo Scripting
 This documentation describes the scripting libraries available for use in Nengo.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    scripting_interface
    basics
