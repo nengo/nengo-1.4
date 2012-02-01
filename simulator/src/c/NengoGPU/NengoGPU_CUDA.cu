@@ -246,7 +246,7 @@ __global__ void integrateAfterEncode(int numNeurons, float dt, float adjusted_dt
     float refTime = neuronReftime[i];
     float tau_rc = tau_RC[ensembleIndex];
     float tau_ref = tauRef[ensembleIndex];
-    float current = bias[i] + scale[i] * (encodingResult[i]) + NDterminationSums[ensembleIndex];
+    float current = bias[i] + scale[i] * (encodingResult[i] + NDterminationSums[ensembleIndex]);
     float dV, post_ref, v_threshold = 1.0f;
     float spike_float;
     int j, spike = 0;
