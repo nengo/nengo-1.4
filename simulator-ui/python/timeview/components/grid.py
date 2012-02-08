@@ -74,7 +74,8 @@ class Grid(core.DataViewComponent):
         self.rows=d.get('rows',self.rows)
         self.cols=d.get('cols',self.cols)
         self.max=d.get('max',self.max)
-        self.min=-self.max
+        if not callable(self.max):
+            self.min=-self.max
         if self.improvable:
             self.auto_improve=d.get('auto_improve',False)
             self.popup_auto.state=self.auto_improve
