@@ -8,7 +8,7 @@ import neuronmap
 
 from math import sqrt
 class Grid(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,filter=False,label=None,improvable=True):
+    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,cols=None,filter=False,label=None,improvable=True):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
@@ -18,6 +18,7 @@ class Grid(core.DataViewComponent):
         if sfunc is not None:
             self.sdata=self.view.watcher.watch(name,sfunc,args=sargs)
         self.rows=rows
+        self.cols=cols
         self.margin=10
         self.min=min
         self.max=max
@@ -33,6 +34,7 @@ class Grid(core.DataViewComponent):
             self.popup.add(self.popup_auto)
 
         self.popup.add(JMenuItem('set # of rows',actionPerformed=self.setRows))
+        self.popup.add(JMenuItem('set # of cols',actionPerformed=self.setCols))
         
         self.filter=filter
         self.setSize(200,200)
@@ -49,17 +51,29 @@ class Grid(core.DataViewComponent):
             if self.rows<1: self.rows=1
         except:
             pass
+    def setCols(self,event):
+        try:
+            text=JOptionPane.showInputDialog(self.view.frame,'Specify the number of columns in the grid:',"Set column count",JOptionPane.PLAIN_MESSAGE,None,None,None)
+            self.cols=int(text)
+            if self.cols<1: self.cols=1
+        except:
+            self.cols=None
       
     def save(self):
         d=core.DataViewComponent.save(self)
         if self.improvable:
             d['auto_improve']=self.auto_improve
         d['rows']=self.rows    
+        d['cols']=self.cols    
+        d['max']=self.max
         return d
     
     def restore(self,d):
         core.DataViewComponent.restore(self,d)
         self.rows=d.get('rows',self.rows)
+        self.cols=d.get('cols',self.cols)
+        self.max=d.get('max',self.max)
+        self.min=-self.max
         if self.improvable:
             self.auto_improve=d.get('auto_improve',False)
             self.popup_auto.state=self.auto_improve
@@ -96,8 +110,11 @@ class Grid(core.DataViewComponent):
             rows=int(sqrt(len(data)))
         else:
             rows=self.rows    
-        cols=len(data)/rows
-        if rows*cols<len(data): cols+=1
+        if self.cols is not None:
+            cols=self.cols
+        else:
+            cols=len(data)/rows
+            if rows*cols<len(data): cols+=1
         
         if self.map is None and self.improvable:
             self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)

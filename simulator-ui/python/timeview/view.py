@@ -27,6 +27,7 @@ import traceback
 import math
 import shelve
 import warnings
+from ca.nengo.util import MU
 
 # for save_pdf
 import sys
@@ -97,10 +98,12 @@ class NodeWatch:
         return isinstance(obj,Node)
     def value(self,obj,origin):
         return obj.getOrigin(origin).getValues().values
-    def weights(self,obj,termination):
+    def weights(self,obj,termination,include_gain=False):
         v=[]
         for n in obj.nodes:
             w=n.getTermination(termination).weights
+            if include_gain:
+                w=MU.prod(w,n.scale)
             v.extend(w)
         return v
     def in_spikes(self,obj,name):
@@ -181,12 +184,12 @@ class NodeWatch:
                 
                 for name in terminations:
                     label=obj.name+": "+name
-                    w=self.weights(obj,name)
+                    w=self.weights(obj,name,True)
                     maxw=max(w)
                     minw=min(w)
                     if -minw>maxw: maxw=-minw
                     if maxw==0: maxw=0.01
-                    r.append((name,components.Grid,dict(func=self.weights,args=(name,),rows=len(obj.nodes),label=label,min=-maxw,max=maxw,improvable=False)))
+                    r.append((name,components.Grid,dict(func=self.weights,args=(name,True),rows=len(obj.nodes),label=label,min=-maxw,max=maxw,improvable=False)))
                     
                     if isinstance(name,STDPTermination):
                         r.append((name+' detail',components.SpikeLineOverlay,dict(
