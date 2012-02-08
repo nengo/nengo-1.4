@@ -32,6 +32,7 @@ class SpikeRaster(core.DataViewComponent):
         self.popup.add(JMenuItem('show 10%',actionPerformed=lambda x: self.set_sample(10)))
         self.popup.add(JMenuItem('show 5%',actionPerformed=lambda x: self.set_sample(20)))
         self.usemap=usemap
+        self.mouse_location=None
         
         
         self.map=None
@@ -76,6 +77,20 @@ class SpikeRaster(core.DataViewComponent):
         if start<=self.view.timelog.tick_count-self.view.timelog.tick_limit:
             start=self.view.timelog.tick_count-self.view.timelog.tick_limit+1
 
+        if self.mouse_location is not None:
+            x,y=self.mouse_location
+            if x>=self.border_left and x<=self.width-self.border_right:
+                g.drawLine(x,border_top,x,self.height-self.border_bottom)
+                
+                pt=int((x-self.border_left)*pts/(self.size.width-self.border_right-self.border_left))
+                
+                g.color=Color.black
+                txt='%4g'%((start+pt)*self.view.dt)
+                bounds=g.font.getStringBounds(txt,g.fontRenderContext)
+                g.drawString(txt,x-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
+
+
+
         g.color=Color.black
         txt='%4g'%((start+pts)*self.view.dt)
         bounds=g.font.getStringBounds(txt,g.fontRenderContext)
@@ -84,6 +99,7 @@ class SpikeRaster(core.DataViewComponent):
         txt='%4g'%((start)*self.view.dt)
         bounds=g.font.getStringBounds(txt,g.fontRenderContext)
         g.drawString(txt,self.border_left-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
+
 
 
         data=self.data.get(start=start,count=pts)
@@ -135,6 +151,15 @@ class SpikeRaster(core.DataViewComponent):
         if pdftemplate is not None:
             pdf.setLineWidth(1)
                     
+    def mouseMoved(self, event):      
+        self.mouse_location=event.x,event.y
+        core.DataViewComponent.mouseMoved(self,event)        
+        self.repaint()
+    def mouseExited(self,event):
+        self.mouse_location=None
+        self.repaint()
+        core.DataViewComponent.mouseExited(self,event) 
+                
         
         
 

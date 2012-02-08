@@ -386,7 +386,7 @@ class Network:
 
     def connect(self,pre,post,
                 transform=None,weight=1,index_pre=None,index_post=None,
-                pstc=0.01,func=None,weight_func=None,origin_name=None,
+                pstc=0.01,func=None,weight_func=None,expose_weights=False,origin_name=None,
                 modulatory=False,plastic_array=False,create_projection=True):
         """Connect two nodes in the network.
 
@@ -429,7 +429,9 @@ class Network:
         to the provided function, which is then free to modify any values in
         that matrix, returning a new one that will actually be used.  This
         allows for direct control over the connection weights, rather than
-        just using the once computed via the NEF methods.
+        just using the once computed via the NEF methods.  If you do not
+        want to modify these weights, but do want Nengo to compute the weight
+        matrix, you can just set *expose_weights* to ``True``.
         
         :param pre: The item to connect from.  Can be a string (the name of the
                     ensemble), an Ensemble (made via :func:`nef.Network.make()`),
@@ -485,7 +487,10 @@ class Network:
                             weight_func also allows explicit control over the individual connection
                             weights, as the computed weight matrix is passed to *weight_func*, which
                             can make changes to the matrix before returning it.
-        :type weight_func: function or None                         
+        :type weight_func: function or None      
+        :param expose_weights: if True, set *weight_func* to the identity function.  This makes the
+                               connection use explicit connection weights, but doesn't modify them
+                               in any way.  Ignored if *weight_func* is not None.
         
         :param boolean modulatory: whether the created connection should be marked as modulatory,
                                    meaning that it does not directly affect the input current
@@ -561,13 +566,24 @@ class Network:
                 raise exception#StructuralException('cannot create termination %s'%pre.name)
             return self.network.addProjection(pre.getOrigin('AXON'),term)
         
+        if expose_weights and weight_func is None:
+            weight_func=lambda w:w
         if weight_func is not None:
             # calculate weights and pass them to the given function
-            decoder=origin.decoders
-            encoder=post.encoders
+            orig=origin
+            while hasattr(orig,'getWrappedOrigin'): orig=orig.getWrappedOrigin()
+            decoder=orig.getDecoders()
+            encoder=post.getEncoders()
             w=MU.prod(encoder,MU.prod(transform,MU.transpose(decoder)))   #gain is handled elsewhere
             w=weight_func(w)
-            term=post.addPESTermination(pre.name,w,pstc,False)
+            term=post.addTermination(pre.name,w,pstc,False)
+            
+            if isinstance(pre,array.NetworkArray):
+                try:
+                   pre.getOrigin('AXON')
+                except:    
+                   pre.createEnsembleOrigin('AXON')
+            
             if not create_projection: return pre.getOrigin('AXON'),term
             self.network.addProjection(pre.getOrigin('AXON'),term)
         elif (post is not None) and (not isinstance(post, int)):

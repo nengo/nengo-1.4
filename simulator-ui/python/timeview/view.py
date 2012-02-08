@@ -181,7 +181,12 @@ class NodeWatch:
                 
                 for name in terminations:
                     label=obj.name+": "+name
-                    r.append((name,components.Grid,dict(func=self.weights,args=(name,),label=label,min=-0.01,max=0.01,improvable=False)))
+                    w=self.weights(obj,name)
+                    maxw=max(w)
+                    minw=min(w)
+                    if -minw>maxw: maxw=-minw
+                    if maxw==0: maxw=0.01
+                    r.append((name,components.Grid,dict(func=self.weights,args=(name,),rows=len(obj.nodes),label=label,min=-maxw,max=maxw,improvable=False)))
                     
                     if isinstance(name,STDPTermination):
                         r.append((name+' detail',components.SpikeLineOverlay,dict(

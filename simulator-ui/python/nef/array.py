@@ -52,6 +52,13 @@ class ArrayOrigin(BasicOrigin):
 
     def clone(self):
         return ArrayOrigin(self._parent,self._name,self._origins)
+
+    def getDecoders(self):
+        neurons=self._parent.nodes[0].neurons
+        decoders=MU.zero(neurons*len(self._origins),self._dimensions)
+        for i,o in enumerate(self._origins):
+            MU.copyInto(o.decoders,decoders,i*neurons,i*o.dimensions,neurons)       
+        return decoders            
     
 
 
@@ -333,3 +340,11 @@ class NetworkArray(NetworkImpl):
     def releaseMemory(self):
         for n in self._nodes:
             n.releaseMemory()
+            
+    def getEncoders(self):  
+        neurons=self.nodes[0].neurons
+        encoders=MU.zero(self.neurons,self.dimension)
+        for i,n in enumerate(self.nodes):
+            MU.copyInto(n.encoders,encoders,i*neurons,i*n.dimension,neurons)       
+        return encoders            
+            
