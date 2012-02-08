@@ -65,7 +65,8 @@ class Grid(core.DataViewComponent):
             d['auto_improve']=self.auto_improve
         d['rows']=self.rows    
         d['cols']=self.cols    
-        d['max']=self.max
+        if not callable(self.max):
+            d['max']=self.max
         return d
     
     def restore(self,d):
