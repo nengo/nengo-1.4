@@ -63,6 +63,7 @@ class Graph(core.DataViewComponent):
         self.neuronmapped=neuronmapped
         self.x_labels=x_labels
         self.show_negative=show_negative
+        self.mouse_location=None
         
         self.map=None
         self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
@@ -376,4 +377,40 @@ class Graph(core.DataViewComponent):
             if miny is not None: g.drawString('%6g'%miny,0,self.size.height-self.border_bottom)
 
 
+        if self.mouse_location is not None:
+            x,y=self.mouse_location
+            if x>=self.border_left and x<=self.width-self.border_right:
+                g.color=Color(0.8,0.8,0.8)   
+                g.drawLine(x,border_top,x,self.height-self.border_bottom)
+                
+                pt=int((x-self.border_left)*pts/(self.size.width-self.border_right-self.border_left))
+                                
+                g.color=Color.black
+                txt='%4g'%((start+pt)*self.view.dt)
+                bounds=g.font.getStringBounds(txt,g.fontRenderContext)
+                g.drawString(txt,x-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
+
+            if border_top<y<self.height-self.border_bottom:
+                g.color=Color(0.8,0.8,0.8)   
+                g.drawLine(self.border_left,y,self.width-self.border_right,y)
+                
+                pt=int((y-self.border_left)*pts/(self.size.width-self.border_right-self.border_left))
+                
+                value=(self.size.height-y-self.border_bottom)/yscale+miny
+                
+                g.color=Color.black
+                txt='%4g'%value
+                bounds=g.font.getStringBounds(txt,g.fontRenderContext)
+                g.drawString(txt,self.size.width-self.border_right,y+bounds.height/2)
+
+
+
+    def mouseMoved(self, event):      
+        self.mouse_location=event.x,event.y
+        core.DataViewComponent.mouseMoved(self,event)        
+        self.repaint()
+    def mouseExited(self,event):
+        self.mouse_location=None
+        self.repaint()
+        core.DataViewComponent.mouseExited(self,event) 
 
