@@ -17,6 +17,7 @@ import generators
 import functions
 import array
 import random
+import inspect
     
 
 class Network:
@@ -486,7 +487,10 @@ class Network:
                             longer taking advantage of the factorable weight matrix.  However, using
                             weight_func also allows explicit control over the individual connection
                             weights, as the computed weight matrix is passed to *weight_func*, which
-                            can make changes to the matrix before returning it.
+                            can make changes to the matrix before returning it.  If weight_func is
+                            a function taking one argument, it is passed the calculated weight
+                            matrix.  If it is a function taking two arguments, it is passed the
+                            encoder and decoder.  
         :type weight_func: function or None      
         :param expose_weights: if True, set *weight_func* to the identity function.  This makes the
                                connection use explicit connection weights, but doesn't modify them
@@ -574,8 +578,16 @@ class Network:
             while hasattr(orig,'getWrappedOrigin'): orig=orig.getWrappedOrigin()
             decoder=orig.getDecoders()
             encoder=post.getEncoders()
-            w=MU.prod(encoder,MU.prod(transform,MU.transpose(decoder)))   #gain is handled elsewhere
-            w=weight_func(w)
+
+            a,va,k,d=inspect.getargspec(weight_func)
+            if len(a)==1:            
+                w=MU.prod(encoder,MU.prod(transform,MU.transpose(decoder)))   #gain is handled elsewhere
+                w=weight_func(w)
+            elif len(a)==2:
+                w=weight_func(encoder,MU.prod(transform,MU.transpose(decoder)))
+            else:
+                print 'weight_func %s must accept 1 or 2 arguments: %s'%(weight_func,a)
+
             term=post.addTermination(pre.name,w,pstc,False)
             
             if isinstance(pre,array.NetworkArray):
