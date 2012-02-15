@@ -167,10 +167,16 @@ class DartboardConnection(nef.SimpleNode):
                     decoder_sign,cdf=self.histograms[dim][i]
                     sign,table=self.tables[dim]
                     
+                    targets=[]
                     spike_count=determine_spike_count(cdf)
                     for s in range(spike_count):
                         j=determine_target(table)
-                        #TODO: check for multiple spikes to same target
+
+                        retry=1000
+                        while j in targets and spike_count<self.N2 and retry>0:
+                            j=determine_target(table)
+                            retry-=1
+
                         result[j]+=decoder_sign*sign[j]/dt
                         self.output_spike_count+=1
         return result            
