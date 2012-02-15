@@ -16,11 +16,10 @@ extern "C"{
 #include "NengoGPU.h"
 #include "NengoGPU_CUDA.h"
 #include "NengoGPUData.h"
-#include "GraphTheoryRoutines.h"
 
-
-// returns not the sort array but the indices of the values in the sorted order. So newOrder[0] is the index of 
+// returns not the sorted array but the indices of the values in the sorted order. So newOrder[0] is the index of 
 // the largest element in values, newOrder[1] is the index of the second largest, etc.
+// Order allows the user to choose between ascending and descending. 1 
 int* sort(int* values, int length, int order)
 {
   int* newOrder = (int*) malloc( length * sizeof(int));
@@ -46,258 +45,6 @@ int* sort(int* values, int length, int order)
   free(scratch);
 
   return newOrder;
-}
-
-//use stoerWagner algorithm to find partititions of the nengo network with low inter-partition bandwidth. Each partition we find will go on a different GPU.
-// Our overall goal is to minimize communication between GPU's since this is the main bottleneck.
-int* partitionNetwork(int* adjacencyMatrix, int numNeurons, int* numNeuronsArray, int numEnsembles)
-{
-  if(numEnsembles == 0)
-    return NULL;
-
-  int* partitionArray = NULL;
-
-  if(numEnsembles == 1)
-    partitionArray = (int*)malloc(numEnsembles * sizeof(int));
-    partitionArray[0] = 0;
-    return partitionArray;
-
-  if(numEnsembles == 2)
-    partitionArray = (int*)malloc(numEnsembles * sizeof(int));
-    partitionArray[0] = 0;
-    partitionArray[1] = 1;
-    return partitionArray;
-
-  Graph* G = convertAdjacencyMatrixToGraph(adjacencyMatrix, numEnsembles);  
-
-  int *cutValues, **cutPartition, i, j;
-
-  stoerWagner_allPairsMinCut(G, &cutValues, &cutPartition);
-
-  int* order = sort(cutValues, numEnsembles-1, 0);
-
-  int num_neurons_set_one, num_neurons_set_two, index;
-  
-  i = 0;
-  do
-  {
-    index = order[i];
-
-    num_neurons_set_one = num_neurons_set_two = 0;
-    for(j = 0; j < numEnsembles; j++)
-    {
-      if(cutPartition[index][j])
-      {
-        num_neurons_set_one += numNeuronsArray[j];
-      }
-      else
-      {
-        num_neurons_set_two += numNeuronsArray[j];
-      }
-    }
-    
-    //printf("num neurons set one : %d, num neurons set 2: %d, cut val: %d\n", num_neurons_set_one, num_neurons_set_two, cutValues[index]);
-
-    i++;
-  }while((num_neurons_set_one < numNeurons / 4 || num_neurons_set_two < numNeurons / 4) && i < numEnsembles-1);
-
-  free(order);
-
-  // if we failed to find a cut with a good balance, we just take the minimum cut, whatever its balance is
-  int chosen_index = (i == numEnsembles-1) ? 0 : index;
-
-/*
-  for(i = 0; i < numEnsembles; i++)
-  {
-    printf("%d, ", cutPartition[chosen_index][j]);
-  }
-
-  //printf("\nset one neurons: %d, set two neurons: %d, cut value: %d\n", set_one_neurons, set_two_neurons, cutValues[i]);
-  */
-
-  partitionArray = (int*)malloc(numEnsembles * sizeof(int));
-
-  memcpy(partitionArray, cutPartition[chosen_index], numEnsembles * sizeof(int));
-
-  free_stoerWagnerResults(cutValues, cutPartition, numEnsembles);
-  free_graph(G);
-
-  return partitionArray;
-}
-
-//given an adjacency matrix and a partition of the nodes in the graph represented by that matrix, return the adjacency matrix for just the nodes in the partition
-int* createSubgraphAdjacencyMatrix(int* originalAdjacencyMatrix, int originalSize, int newSize, int* partition, int flag)
-{
-  int* newAdjacency = (int*)malloc(newSize * newSize * sizeof(int));
-  memset(newAdjacency, '\0', newSize * newSize * sizeof(int));
-  int p = 0, q = 0, i, j;
-
-  for(i = 0; i < originalSize; i++)
-  {
-    if(partition[i] == flag)
-    {
-      q = 0;
-      for(j = 0; j < i; j++)
-      {
-        if(partition[j] == flag)
-        {
-          newAdjacency[p * newSize + q] = originalAdjacencyMatrix[i * originalSize + j]; 
-          q++;
-        }
-      }
-
-      p++;
-    }
-  }
-
-  return newAdjacency;
-}
-
-// Assign ensembles and projections to the devices. We employ a simple algorithm to limit the data being passed between devices.
-// Basically, choose an arbitary first ensemble, assign it to the first device, then perform breadth first search, assigning to
-// the first device until we run out of space on that device. 
-void generateNengoGPUDeviceConfiguration(int totalNumNeurons, int* numNeurons, int numProjections, projection* projections, int* adjacencyMatrix, int* deviceForNetworkArray)
-{
-  int i, j;
-  memset(deviceForNetworkArray, '\0', totalNumNetworkArrays * sizeof(int));
-
-  if(numDevices > 1)
-  {
-    // partition the network. Uses a mincut-finding algorithm to ensure as little communication takes place between GPUs as possible
-    int* partition = partitionNetwork(adjacencyMatrix, totalNumNeurons, numNeurons, totalNumNetworkArrays);
-
-    // find number of ensembles on each side of partition
-    int set_one_ensembles = 0, set_two_ensembles = 0;
-    for(i = 0; i < totalNumNetworkArrays; i++)
-    {
-      partition[i] ? set_one_ensembles++ : set_two_ensembles++;
-    }
-
-    memcpy(deviceForNetworkArray, partition, totalNumNetworkArrays * sizeof(int));
-
-    int cutValue = 0;
-    for(i = 0; i < totalNumNetworkArrays; i++)
-    {
-      for(j = 0; j < i; j++)
-      {
-        if(partition[i] != partition[j])
-          cutValue += adjacencyMatrix[i * totalNumNetworkArrays + j];
-      }
-    }
-
-    // partition one of the partitions
-    if(numDevices > 2)
-    {
-      // create an adjacency matrix containing only vertices in one of the partitions we made earlier
-      int* newAdjacency = createSubgraphAdjacencyMatrix(adjacencyMatrix, totalNumNetworkArrays, set_one_ensembles, partition, 1);
-
-      int* numNeurons_set_one = (int*)malloc(set_one_ensembles * sizeof(int));
-      int totalNumNeurons_set_one = 0;
-
-      // create the numNeurons array for the current subgraph
-      j = 0;
-      for(i = 0; i < totalNumNetworkArrays; i++)
-      {
-        if(partition[i])
-        {
-          numNeurons_set_one[j++] = numNeurons[i];
-          totalNumNeurons_set_one += numNeurons[i];
-        }
-      }
-
-      // partition the subgraph via a minimum cut
-      int* partition_two = partitionNetwork(newAdjacency, totalNumNeurons_set_one, numNeurons_set_one, set_one_ensembles);
-      
-      free(numNeurons_set_one);
-      free(newAdjacency);
-
-      // assign ensembles that fall on different sides of the subgraph partition to different devices
-      j = 0;
-      for(i = 0; i < totalNumNetworkArrays; i++)
-      {
-        if(partition[i])
-        {
-          if(partition_two[j])
-          {
-            deviceForNetworkArray[i] = 1;
-          }
-          else
-          {
-            deviceForNetworkArray[i] = 2;
-          }
-
-          j++;
-        }
-      }
-      
-      free(partition_two);
-    }
-
-    // we do the same as above except we work on the other subgraph created by the partition
-    if(numDevices > 3)
-    {
-      int* newAdjacency = createSubgraphAdjacencyMatrix(adjacencyMatrix, totalNumNetworkArrays, set_two_ensembles, partition, 0);
-
-      int* numNeurons_set_two = (int*)malloc(set_two_ensembles * sizeof(int));
-      int totalNumNeurons_set_two = 0;
-
-      j = 0;
-      for(i = 0; i < totalNumNetworkArrays; i++)
-      {
-        if(!partition[i])
-        {
-          numNeurons_set_two[j++] = numNeurons[i];
-          totalNumNeurons_set_two += numNeurons[i];
-        }
-      }
-
-      int* partition_three = partitionNetwork(newAdjacency, totalNumNeurons_set_two, numNeurons_set_two, set_two_ensembles);
-
-      free(numNeurons_set_two);
-      free(newAdjacency);
-
-      j = 0;
-      for(i = 0; i < totalNumNetworkArrays; i++)
-      {
-        if(!partition[i])
-        {
-          if(partition_three[j])
-          {
-            deviceForNetworkArray[i] = 0;
-          }
-          else
-          {
-            deviceForNetworkArray[i] = 3;
-          }
-
-          j++;
-        }
-      }
-
-      free(partition_three);
-    }
-
-    free(partition);
-  }
-
-  /*
-  printf("device for networkArray:\n");
-  for(i = 0; i < totalNumNetworkArrays; i++)
-  {
-    printf("%d ", deviceForNetworkArray[i]);
-  }
-  printf("\n");
-  */
-
-  int originNodeIndex, termNodeIndex;
-  for(i = 0; i < numProjections; i++)
-  {
-    originNodeIndex = projections[i].sourceNode;
-    termNodeIndex = projections[i].destinationNode;
-
-    projections[i].sourceDevice = deviceForNetworkArray[originNodeIndex];
-    projections[i].destDevice = deviceForNetworkArray[termNodeIndex];
-  }
 }
 
 void adjustProjections(int numProjections, projection* projections, int* networkArrayJavaIndexToDeviceIndex)
@@ -333,6 +80,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
   int ensembleIndex = 0, NDterminationIndex = 0, transformRowIndex = 0, dimensionIndex = 0;
   int startEnsembleIndex, endEnsembleIndex, networkArrayIndex, networkArrayOffsetInTerminations = 0;
   int networkArrayTerminationIndex = 0;
+
 
   for(h = 0; h < currentData->numNetworkArrays; h++)
   {
@@ -457,7 +205,6 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
 
 void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, NengoGPUData* currentData)
 {
-  printf("in storeNeuron data\n");
   int i, j, currentNumNeurons, neuronDataLength;
 
   jfloatArray neuronDataForCurrentEnsemble_JAVA;
@@ -1111,7 +858,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
   (JNIEnv *env, jclass class, jobjectArray terminationTransforms_JAVA, jobjectArray isDecodedTermination_JAVA, 
   jobjectArray terminationTau_JAVA, jobjectArray encoders_JAVA, jobjectArray decoders_JAVA, 
   jobjectArray neuronData_JAVA, jobjectArray projections_JAVA, jobjectArray networkArrayData_JAVA, jobjectArray ensembleData_JAVA, 
-  jobjectArray adjacencyMatrix_JAVA, jfloat maxTimeStep, jint numDevicesRequested)
+  jfloat maxTimeStep, jintArray deviceForNetworkArrays_JAVA, jint numDevicesRequested)
 {
   printf("NengoGPU: SETUP\n"); 
 
@@ -1119,18 +866,20 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
   
   nengoDataArray = (NengoGPUData**) malloc(sizeof(NengoGPUData*) * numDevices);
 
-  totalNumEnsembles = (int) (*env)->GetArrayLength(env, neuronData_JAVA);
-  totalNumNetworkArrays = (int)(*env)->GetArrayLength(env, networkArrayData_JAVA);
-
   int numAvailableDevices = getGPUDeviceCount();
-  
+ 
+  /*
+   *Don't really need this, should do this check in the java code.
   // make sure the num devices we use isn't bigger than the number of devices available or the number of ensembles we are processing
   numDevices = numAvailableDevices < numDevicesRequested ? numAvailableDevices : numDevicesRequested;
   numDevices = totalNumEnsembles < numDevices ? totalNumEnsembles : numDevicesRequested;
+  */
+  numDevices = numDevicesRequested;
+  
   printf("Using %d devices. %d available\n", numDevices, numAvailableDevices);
 
-  deviceForNetworkArray = (int*) malloc(totalNumNetworkArrays * sizeof(int));
-  deviceForEnsemble = (int*) malloc(totalNumEnsembles * sizeof(int));
+  totalNumEnsembles = (int) (*env)->GetArrayLength(env, neuronData_JAVA);
+  totalNumNetworkArrays = (int)(*env)->GetArrayLength(env, networkArrayData_JAVA);
 
   jintArray tempIntArray_JAVA;
 
@@ -1159,6 +908,8 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
   free(currentProjection);
   (*env)->DeleteLocalRef(env, projections_JAVA);
 
+  /*
+   // don't need the adjacency matrix anymore since we are passing in the configuration from java.
   // store the adjacency matrix in a c array
   int* adjacencyMatrix = (int*) malloc(totalNumNetworkArrays * totalNumNetworkArrays * sizeof(int)); 
   for(i = 0; i < totalNumNetworkArrays; i++)
@@ -1168,15 +919,16 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
 
     (*env)->DeleteLocalRef(env, tempIntArray_JAVA);
   }
+  */
 
-  (*env)->DeleteLocalRef(env, adjacencyMatrix_JAVA);
+  //(*env)->DeleteLocalRef(env, adjacencyMatrix_JAVA);
 
-  int* networkArrayNumNeurons = (int*)malloc(totalNumNetworkArrays * sizeof(int));
+  //int* networkArrayNumNeurons = (int*)malloc(totalNumNetworkArrays * sizeof(int));
 
   int* networkArrayData = (int*)malloc(totalNumNetworkArrays * NENGO_NA_DATA_NUM * sizeof(int));
   int* ensembleData = (int*)malloc(totalNumEnsembles * NENGO_ENSEMBLE_DATA_NUM * sizeof(int));
 
-  int totalNumNeurons = 0, numNeurons;
+  int numNeurons;
   jintArray dataRow_JAVA;
 
 
@@ -1188,8 +940,8 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
     (*env)->GetIntArrayRegion(env, dataRow_JAVA, 0, NENGO_NA_DATA_NUM, networkArrayData + i * NENGO_NA_DATA_NUM);
     
     numNeurons = networkArrayData[i * NENGO_NA_DATA_NUM + NENGO_NA_DATA_NUM_NEURONS];
-    networkArrayNumNeurons[i] = numNeurons;
-    totalNumNeurons += numNeurons;
+   // networkArrayNumNeurons[i] = numNeurons;
+    //totalNumNeurons += numNeurons;
 
     (*env)->DeleteLocalRef(env, dataRow_JAVA);
   }
@@ -1205,9 +957,15 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
   }
 
   (*env)->DeleteLocalRef(env, ensembleData_JAVA);
-  
+ 
   // Distribute the ensembles to the devices. Tries to minimize communication required between GPUs.
-  generateNengoGPUDeviceConfiguration(totalNumNeurons, networkArrayNumNeurons, numProjections, projections, adjacencyMatrix, deviceForNetworkArray);
+  //generateNengoGPUDeviceConfiguration(totalNumNeurons, networkArrayNumNeurons, numProjections, projections, adjacencyMatrix, deviceForNetworkArray);
+  
+  deviceForNetworkArray = (int*) malloc(totalNumNetworkArrays * sizeof(int));
+  deviceForEnsemble = (int*) malloc(totalNumEnsembles * sizeof(int));
+
+  (*env)->GetIntArrayRegion(env, deviceForNetworkArrays_JAVA, 0, totalNumNetworkArrays, deviceForNetworkArray); 
+  (*env)->DeleteLocalRef(env, deviceForNetworkArrays_JAVA);
 
   // Store which device each ensemble belongs to based on which device each network array belongs to
   int endIndex;
@@ -1222,10 +980,20 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
     }
   }
 
-  free(adjacencyMatrix);
-  free(networkArrayNumNeurons);
+  int originNodeIndex, termNodeIndex;
+  for(i = 0; i < numProjections; i++)
+  {
+    originNodeIndex = projections[i].sourceNode;
+    termNodeIndex = projections[i].destinationNode;
 
-  // We have to set the number fields in the NengoGPUData structs so that it knows how big to make its internal arrays
+    projections[i].sourceDevice = deviceForNetworkArray[originNodeIndex];
+    projections[i].destDevice = deviceForNetworkArray[termNodeIndex];
+  }
+
+  //free(adjacencyMatrix);
+  //free(networkArrayNumNeurons);
+
+  // set the number fields in the NengoGPUData structs so that it knows how big to make its internal arrays
   int* networkArrayJavaIndexToDeviceIndex = (int*)malloc(totalNumEnsembles * sizeof(int));
   for(i = 0; i < totalNumNetworkArrays; i++)
   {
@@ -1243,7 +1011,8 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
 
   sharedInputSize = 0;
   
-  // Now we start to load the data into the NengoGPUData struct for each device.
+  // Now we start to load the data into the NengoGPUData struct for each device. 
+  // (though the data doesn't get put on the actual device just yet).
   // Because of the CUDA architecture, we have to do some weird things to get a good speedup. 
   // These arrays that store the transforms, decoders, are setup in a non-intuitive way so 
   // that memory accesses can be parallelized in CUDA kernels. For more information, see the NengoGPU user manual.

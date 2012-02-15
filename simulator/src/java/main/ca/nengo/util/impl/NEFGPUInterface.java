@@ -2,21 +2,18 @@ package ca.nengo.util.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
-import ca.nengo.model.InstantaneousOutput;
+import ca.nengo.math.NetworkPartitioner;
+import ca.nengo.math.impl.MultiLevelKLNetworkPartitioner;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Projection;
 import ca.nengo.model.RealOutput;
-import ca.nengo.model.SimulationException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.BasicOrigin;
+import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.impl.EnsembleTermination;
-import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
@@ -29,6 +26,7 @@ import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
 import ca.nengo.util.Memory;
+
 
 public class NEFGPUInterface {
 	private static boolean myUseGPU = false;
@@ -60,8 +58,10 @@ public class NEFGPUInterface {
 	boolean[][] inputOnGPU;
 	
 	
-	// load the shared library that contains the native functions
-
+	/**	Load the shared library that contains the native functions.
+	 * This is called just once, when this class is initially loaded.
+	 * 
+	 */
 	static{
 		try {
 			System.loadLibrary("NengoGPU");
@@ -88,8 +88,8 @@ public class NEFGPUInterface {
 	static native void nativeSetupRun(float[][][][] terminationTransforms,
 			int[][] isDecodedTermination, float[][] terminationTau,
 			float[][][] encoders, float[][][][] decoders, float[][] neuronData,
-			int[][] projections, int[][] networkArrayData, int[][] ensembleData, int[][] adjacencyMatrix,
-			float maxTimeStep, int numDevicesRequested);
+			int[][] projections, int[][] networkArrayData, int[][] ensembleData,
+			float maxTimeStep, int[] deviceForNetworkArrays, int numDevicesRequested);
 
 	static native void nativeStep(float[][][] representedInput,
 			float[][][] representedOutput, float[][] spikes, float startTime,
@@ -105,7 +105,7 @@ public class NEFGPUInterface {
 	}
 	
 	public static void setRequestedNumDevices(int value){
-		myNumDevices = value > myNumAvailableDevices ? myNumAvailableDevices : value;
+		myNumDevices = Math.min(value, myNumAvailableDevices);
 	}
 	
 	public static int getRequestedNumDevices(){
@@ -125,8 +125,23 @@ public class NEFGPUInterface {
 		showTiming = false;
 	}
 	
+	/**
+	 * Gets all the necessary data from the nodes and projections which are assigned to run on GPUss
+	 * and puts it in a form appropriate for passing to the native setup function. The native setup function
+	 * will create a thread for each GPU in use, process the data further until its in a form suitable
+	 * for running on the GPU, and finally move all the data to the GPU. The GPU threads will be waiting
+	 * for a call to nativeStep which will tell them to take a step.
+	 * 
+	 * @author Eric Crawford
+	 */
 	public void initialize(){
+		int[] nodeAssignments = findOptimalNodeAssignments(myGPUNetworkArrays, myGPUProjections, myNumDevices);
 		
+		int zed = 0;
+		for(Node node : myGPUNetworkArrays){
+			System.out.println(node.getName() + " " + nodeAssignments[zed++]);
+		}
+
 		myShowTiming = showTiming;
 		if(myShowTiming){
 			averageTimeSpentInGPU = 0;
@@ -172,8 +187,6 @@ public class NEFGPUInterface {
 		float maxTimeStep = ((LIFSpikeGenerator) ((SpikingNeuron) ((NEFEnsembleImpl) myGPUEnsembles[0])
 				.getNodes()[0]).getGenerator()).getMaxTimeStep();
 
-		
-		int[][] adjacencyMatrix = findAdjacencyMatrix(myGPUNetworkArrays, myGPUProjections);
 		
 		// We put the list of projections in terms of the GPU nodes
 		// For each projection we record 4 numbers: the index of the origin
@@ -338,11 +351,16 @@ public class NEFGPUInterface {
 					isDecodedTermination[i][j] = 1;
 					
 					ensembleData.numDecodedTerminations++;
-				} else if (terminations[j] instanceof PlasticEnsembleTermination) {
+				} else if (terminations[j] instanceof EnsembleTermination) {
 					terminationTransforms[i][j] = new float[1][1];
-					float[][] tempTransform = ((PlasticEnsembleTermination) terminations[j])
-							.getTransform();
-					terminationTransforms[i][j][0][0] = tempTransform[0][0];
+					
+					
+					// when we do learning, this will have to be changed, as well as some code in the NengoGPU library.
+					// currently it assumes all neurons in the ensemble have the same weight for each non-decoded termination
+					// (mainly just to support gates which have uniform negative weights).
+					// When we do learning, will have to extract the whole weight matrix.
+					Termination[] neuronTerminations = ((EnsembleTermination) terminations[j]).getNodeTerminations();
+					terminationTransforms[i][j][0][0] = ((PlasticNodeTermination) neuronTerminations[0]).getWeights()[0];
 					terminationTau[i][j] = terminations[j].getTau();
 					isDecodedTermination[i][j] = 0;
 
@@ -388,7 +406,7 @@ public class NEFGPUInterface {
 		nativeSetupRun(terminationTransforms, isDecodedTermination,
 				terminationTau, encoders, decoders, neuronData,
 				adjustedProjections, networkArrayDataArray, ensembleDataArray, 
-				adjacencyMatrix, maxTimeStep, myNumDevices);
+				maxTimeStep, nodeAssignments, myNumDevices);
 
 		// Set up the data structures that we pass in and out of the native step call.
 		// They do not change in size from step to step so we can re-use them.
@@ -423,19 +441,18 @@ public class NEFGPUInterface {
 		}
 	}
 	
+	/**
+	 * 1. Load data from terminations into "representedInputValues". 
+	 * 2. Call nativeStep which will run the GPU's for one step and return the results in "representedOutputValues".
+	 * 3. Put the data from "representedOutputValues" into the appropriate origins.
+	 * 
+	 * @author Eric Crawford
+	 */
 	public void step(float startTime, float endTime){
 		
 		myStartTime = startTime;
 		myEndTime = endTime;
-		
-		long GPUinterval = 0, CPUinterval = 0;
 
-		if(myShowTiming){
-			long GPUstartTime = new Date().getTime();
-			System.out.println("before GPU processing: " + GPUstartTime);
-			GPUinterval = GPUstartTime;
-		}
-		
 		if(myGPUEnsembles.length > 0){
 		
 			try {
@@ -450,23 +467,10 @@ public class NEFGPUInterface {
 					count = terminations.length;
 					
 					for (j = 0; j < count; j++) {
-						Termination termination = terminations[j];
-						boolean terminationWrapped = termination instanceof TerminationWrapper;
-						if(terminationWrapped)
-							termination = ((TerminationWrapper) termination).getBaseTermination();
-						
 						// we only get input for non-GPU terminations
 						if (!inputOnGPU[i][j]) {
-							if (termination instanceof DecodedTermination)
-								inputRow = ((DecodedTermination) termination).getInput().getValues();
-							else if (termination instanceof PlasticEnsembleTermination)
-								inputRow = ((RealOutput) ((PlasticEnsembleTermination) termination).getInput()).getValues();
-							else if(termination instanceof EnsembleTermination)
-	              // this case is mostly for terminations on network arrays
-								inputRow = ((RealOutput) ((EnsembleTermination) termination).getInput()).getValues();
-							else
-								System.out.println("warning: using an unsupported termination type");
-							
+							inputRow = ((RealOutput) terminations[j].getInput()).getValues();
+								
 							representedInputValues[i][j] = inputRow;
 						}
 					}
@@ -491,25 +495,12 @@ public class NEFGPUInterface {
 					count = origins.length;
 	
 					for (j = 0; j < count; j++) {
-						Origin origin = origins[j];
-						boolean originWrapped = origin instanceof OriginWrapper;
-						if(originWrapped)
-							origin = ((OriginWrapper) origin).getBaseOrigin();
 						
-						// we have to do all this ugliness because the Origin interface does not require a setValues method
-						if(origin instanceof DecodedOrigin)	{
-							((DecodedOrigin) origin).setValues(new RealOutputImpl(
+						origins[j].setValues(new RealOutputImpl(
 								representedOutputValues[i][j].clone(),
-								Units.UNK, endTime));
-						}else if(origin instanceof BasicOrigin) {
-							((BasicOrigin) origin).setValues(new RealOutputImpl(
-									representedOutputValues[i][j].clone(),
-									Units.UNK, endTime));
-						}else{
-							System.out.println("Warning: using unsupported origin type:" + origin.getClass().getName());
-						}
-						
+								Units.UNK, endTime));				
 					}
+					
 					/*
 					if (((NEFEnsembleImpl) myGPUNodes[i]).isCollectingSpikes()) {
 						((NEFEnsembleImpl) myGPUNodes[i]).setSpikePattern(spikeOutput[spikeIndex], endTime);
@@ -526,36 +517,49 @@ public class NEFGPUInterface {
 				e.printStackTrace();
 			}
 		}
-		
-		if(myShowTiming){
-			long GPUendTime = new Date().getTime();
-			System.out.println("After GPU processing: " + GPUendTime);
-			Memory.report("End of step" + numSteps);
-			GPUinterval = GPUendTime - GPUinterval;
-			
-			averageTimeSpentInGPU = (averageTimeSpentInGPU * numSteps + GPUinterval) / (numSteps + 1);
-			averageTimeSpentInCPU = (averageTimeSpentInCPU * numSteps + CPUinterval) / (numSteps + 1);
-			numSteps++;
-			
-			totalRunTime += GPUinterval + CPUinterval;
-		}
 	}
 	
 
 	public void kill()
 	{
-		if(myShowTiming){
-			System.out.println("Average time spent in gpu per step: " + averageTimeSpentInGPU + "(ms)");
-			System.out.println("Average time spent in cpu per step: " + averageTimeSpentInCPU + "(ms)");
-			System.out.println("Total run time: " + totalRunTime + "(ms)");
-		}
-		
 		if (myGPUEnsembles.length == 0)
 			return;
 		
 		nativeKill();
 	}
+
+	/**
+	 * Used when there are multiple GPU's running a simulation. Finds a distribution of nodes to GPU's that minimizes 
+	 * communication between GPU's while also ensuring the number of neurons running on each GPU is relatively balanced.
+	 * Note that this problem (a variant of the min bisection problem) is NP-Complete, so a heuristic is employed.
+	 * 
+	 * @return an array of integers where the value in the i'th entry denotes the partition number of the i'th node ...
+	 * in the "nodes" input array
+	 * 
+	 * @author Eric Crawford
+	 */
+	public static int[] findOptimalNodeAssignments(Node[] nodes, Projection[] projections, int numPartitions){
+		
+		if(numPartitions < 1)
+		{
+			return new int[0];
+		}else if(numPartitions == 1){
+			int[] nodeAssignments = new int[nodes.length];
+			Arrays.fill(nodeAssignments, 0);
+			return nodeAssignments;
+		}
+		
+		MultiLevelKLNetworkPartitioner networkPartitioner = new MultiLevelKLNetworkPartitioner();
+		
+		return networkPartitioner.getPartitionsAsIntArray();
+	}
 	
+	/**
+	 * Finds all nodes in the given array which are supposed to execute on the GPU. Stores
+	 * those nodes in myGPUNetworkArrays and returns the rest.
+	 * 
+	 * @author Eric Crawford
+	 */
 	public Node[] takeGPUNodes(Node[] nodes){
 		ArrayList<Node> gpuNodeList = new ArrayList<Node>();
 		ArrayList<Node> nodeList = new ArrayList<Node>();
@@ -581,9 +585,15 @@ public class NEFGPUInterface {
 		return nodeList.toArray(new Node[0]);
 	}
 	
-	// takeGPUNodes should be called before calling this. The nodes that run on the GPU determine the
-	// projections that run on the GPU
-	Projection[] takeGPUProjections(Projection[] projections){
+	/**
+	 * Finds all projections in the given array which are supposed to execute on the GPU. Stores
+	 * those projections in myGPUProjections and returns the rest. takeGPUNodes should be called before
+	 * this is called, since the nodes which run on the GPU determine which projections run on the GPU.
+	 * (ie a projection runs on the GPU only if both its target and source run on the GPU).
+	 * 
+	 * @author Eric Crawford
+	 */
+	public Projection[] takeGPUProjections(Projection[] projections){
 		// Sort out the GPU projections from the CPU projections
 		ArrayList<Projection> gpuProjectionsList = new ArrayList<Projection>();
 		ArrayList<Projection> projectionList = new ArrayList<Projection>();
@@ -612,54 +622,14 @@ public class NEFGPUInterface {
 		return projectionList.toArray(new Projection[0]);
 		
 	}
-	
-	// Converts a nengo network to an undirected graph stored as a lower triangular adjacency matrix.
-	// If node A projects to node B with weight x and B projects to A with weight y,
-	// we treat it as a single edge with weight (x + y). Self-loops (recurrent projections)
-	// are deleted (this function is used for distributing ensembles to GPUs and self loops are
-	// irrelevant in that task).
-	public int[][] findAdjacencyMatrix(Node[] nodes, Projection[] projections) {
-		
-		HashMap <Node, Integer> nodeIndexes = new HashMap<Node, Integer>();
-		
-		int[][] adjacencyMatrix = new int[nodes.length][nodes.length];
-		
-		for(int i = 0; i < nodes.length; i++){
-			for(int j = 0; j < nodes.length; j++){
-				adjacencyMatrix[i][j] = 0;
-			}
-		}
-		
-		for(int i = 0; i < nodes.length; i++){
-			nodeIndexes.put(nodes[i], i);
-		}
-		
-		for(int i = 0; i < projections.length; i++){
-			Origin origin = projections[i].getOrigin();
-			Termination termination = projections[i].getTermination();
-			
-			boolean originWrapped = origin instanceof OriginWrapper;
-			
-			if(originWrapped)
-				origin = ((OriginWrapper) origin).getWrappedOrigin();
-			
-			boolean terminationWrapped = termination instanceof TerminationWrapper;
-			
-			if(terminationWrapped)
-				termination = ((TerminationWrapper) termination).getBaseTermination();
-			
-			int originNodeIndex = nodeIndexes.get(origin.getNode());
-			int termNodeIndex = nodeIndexes.get(termination.getNode());
-			
-			if(originNodeIndex > termNodeIndex)
-				adjacencyMatrix[originNodeIndex][termNodeIndex] += termination.getDimensions();
-			else if(termNodeIndex > originNodeIndex)
-				adjacencyMatrix[termNodeIndex][originNodeIndex] += termination.getDimensions();
-		}
-		
-		return adjacencyMatrix;
-	}
-	
+
+	/**
+	 * Used to hold data about each network array to pass to native code. Allows
+	 * the fields to be set by name and returned as an array which is the form 
+	 * the native code expects the data to be in.
+	 * 
+	 * @author Eric Crawford
+	 */
 	private class NetworkArrayData {
 		int numEntries = 7;
 		
@@ -697,7 +667,14 @@ public class NEFGPUInterface {
 		}
 			
 	}
-	// Used to hold data about each ensemble to pass to native code.
+
+	/**
+	 * Used to hold data about each ensemble to pass to native code.. Allows
+	 * the fields to be set by name, but returned as an array which is the form 
+	 * the native code expects the data to be in.
+	 * 
+	 * @author Eric Crawford
+	 */
 	private class EnsembleData {
 		int numEntries = 9;
 

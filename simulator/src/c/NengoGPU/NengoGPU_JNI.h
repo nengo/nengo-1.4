@@ -15,11 +15,6 @@ void createHelper(int* helper, int* columnLengths, int numRows, int numColumns);
 
 int* sort(int* values, int length, int order);
 
-int* partitionNetwork(int* adjacencyMatrix, int numNeurons, int numEnsembles);
-int* createSubgraphAdjacencyMatrix(int* originalAdjacencyMatrix, int originalSize, int newSize, int* partition, int flag);
-
-void generateNengoGPUDeviceConfiguration(int totalNumNeurons, int* numNeurons, int numProjections, projection* projections, int* adjacencyMatrix, int* deviceForEnsemble);
-
 void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArray tau_JAVA, jobjectArray isDecodedTermination_JAVA, NengoGPUData* currentData, int* networkArrayData);
 
 void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, NengoGPUData* currentData, int* deviceForEnsemble);

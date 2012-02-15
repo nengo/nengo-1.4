@@ -99,23 +99,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
 	protected int myNumGPU = 0;
 	protected int myNumJavaThreads = 1;
-
-	public int getCountGPU() {
-		return myNumGPU;
-	}
-
-	public void setCountGPU(int numGPU) {
-		this.myNumGPU = numGPU;
-	}
-
-	public int getCountJavaThreads() {
-		return myNumJavaThreads;
-	}
-
-	public void setCountJavaThreads(int numJavaThreads) {
-		this.myNumJavaThreads = numJavaThreads;
-	}
-
 	protected boolean myUseGPU = true;
 
 
@@ -571,6 +554,38 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	}
 	
 	/**
+	 * @return Number of GPUs to use if running this network on the GPU.
+	 * Only relevant if this is a top level network.
+	 */
+	public int getCountGPU() {
+		return myNumGPU;
+	}
+
+	/**
+	 * @param numGPU Number of GPUs to use if running this network on the GPU.
+	 * Only relevant if this is a top level network.
+	 */
+	public void setCountGPU(int numGPU) {
+		this.myNumGPU = numGPU;
+	}
+
+	/**
+	 * @return Number of Java threads to use for running this network.
+	 * Only relevant if this is a top level network.
+	 */
+	public int getCountJavaThreads() {
+		return myNumJavaThreads;
+	}
+
+	/**	
+	 * @param Number of Java threads to use for running this network.
+	 * Only relevant if this is a top level network.
+	 */
+	public void setCountJavaThreads(int numJavaThreads) {
+		this.myNumJavaThreads = numJavaThreads;
+	}
+
+	/**
 	 * @see ca.nengo.model.Probeable#getHistory(java.lang.String)
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException {
@@ -820,6 +835,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			return myWrapped.getValues();
 		}
 
+		public void setValues(InstantaneousOutput values) {
+			myWrapped.setValues(values);
+		}
+		
 		public Node getNode() {
 			return myNode;
 		}
@@ -912,6 +931,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
 		public void setTau(float tau) throws StructuralException {
 			myWrapped.setTau(tau);
+		}
+		
+		/**
+		 * @return Extract the input to the termination.
+		 */
+		public InstantaneousOutput getInput(){
+			return myWrapped.getInput();
 		}
 
 		/**

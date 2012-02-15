@@ -110,19 +110,10 @@ public class EnsembleTermination implements Termination {
 	}
 
 	/**
-	 * @return Input into one of the underlying terminations -- presumably
-	 *   they are all getting the same input.
+	 * @return Latest input to the underlying terminations.
 	 */
-    // FIXME: what is this doing exactly? why can't it just call getInput()?
 	public InstantaneousOutput getInput(){
-		InstantaneousOutput result = null;
-		if (myNodeTerminations[0] instanceof DecodedTermination) {
-            result = ((DecodedTermination) myNodeTerminations[0]).getInput();
-        } else if (myNodeTerminations[0] instanceof PlasticEnsembleTermination) {
-            result = ((PlasticEnsembleTermination) myNodeTerminations[0]).getInput();
-        }
-
-		return result;
+		return myNodeTerminations[0].getInput();
 	}
 
 	/**

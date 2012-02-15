@@ -139,6 +139,10 @@ public class ProbeableOrigin implements Origin {
 
 		return new RealOutputImpl(new float[]{result}, myUnits, times[times.length-1]);
 	}
+	
+	public void setValues(InstantaneousOutput values) {
+		throw new RuntimeException("Not implemented for probeable origins");
+	}
 
 	/**
 	 * @see ca.nengo.model.Origin#getNode()

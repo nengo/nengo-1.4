@@ -66,6 +66,11 @@ public interface Origin extends Serializable, Cloneable {
 	 * @throws SimulationException if there is any problem retrieving values
 	 */
 	public InstantaneousOutput getValues() throws SimulationException;
+	
+	/**
+	 * @param Instantaneous output from this Origin.
+	 */
+	public void setValues(InstantaneousOutput val);
 
 	/**
 	 * @return The Node to which the Origin belongs

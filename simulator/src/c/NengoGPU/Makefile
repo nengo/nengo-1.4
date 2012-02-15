@@ -1,9 +1,10 @@
 CUDA_INC_PATH=/usr/local/cuda/include
 CUDA_LIB_PATH=/usr/local/cuda/lib64
-JAVA_INC=/usr/lib/jvm/java-6-sun-1.6.0.26/include
-JAVA_INC_LINUX=/usr/lib/jvm/java-6-sun-1.6.0.26/include/linux
+JAVA_INC=/usr/lib/jvm/java-6-sun/include
+JAVA_INC_LINUX=/usr/lib/jvm/java-6-sun/include/linux
 
-CUDA_INCLUDES= -I${CUDA_INC_PATH} -I${HOME}/NVIDIA_GPU_Computing_SDK/C/common/inc
+CUDA_INCLUDES= -I${CUDA_INC_PATH} 
+#-I${HOME}/NVIDIA_GPU_Computing_SDK/C/common/inc
 JAVA_INCLUDES=-I${JAVA_INC} -I${JAVA_INC_LINUX}
 LIBPATH=-L${CUDA_LIB_PATH}
 
@@ -14,8 +15,8 @@ CUDA_CC=nvcc
 CFLAGS=-fPIC -c -m64 -Wall -I. ${CUDA_INCLUDES} ${JAVA_INCLUDES}
 CUDAFLAGS= --ptxas-options=--verbose --compiler-options '-fPIC' -c
 
-#the order of the object files is important, get unsatisfied link error if incorrect
-OBJ=NengoGPU_JNI.o NengoGPU.o NengoGPU_CUDA.o NengoGPUData.o GraphTheoryRoutines.o fheap.o
+#the order of the object files here is important, get unsatisfied link error if it gets mixed up
+OBJ=NengoGPU_JNI.o NengoGPU.o NengoGPU_CUDA.o NengoGPUData.o
 
 all: CFLAGS+= -O3
 all: libNengoGPU.so 
@@ -26,8 +27,6 @@ debug: libNengoGPU.so
 libNengoGPU.so: ${OBJ} 
 	${CC} -shared -Wl,-soname,libNengoGPU.so -o libNengoGPU.so.1.0 ${OBJ} ${LIBPATH} ${LIBS}
 
-fheap.o: fheap.h heap_info.h
-GraphTheoryRoutines.o: GraphTheoryRoutines.h fheap.h
 NengoGPUData.o: NengoGPUData.h
 NengoGPU.o : NengoGPU.h NengoGPU_CUDA.h
 NengoGPU_JNI.o : NengoGPU.h NEFGPUInterface_JNI.h NengoGPU_CUDA.h

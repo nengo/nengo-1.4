@@ -30,6 +30,7 @@ public class GPUThread extends NodeThread {
 	}
 	
 	protected void kill(){
+		super.kill();
 		myNEFGPUInterface.kill();
 	}
 }

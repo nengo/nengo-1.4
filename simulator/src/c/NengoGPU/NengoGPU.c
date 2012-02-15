@@ -110,7 +110,8 @@ int manipulateKill(int action)
   return kill;
 }
 
-// Called by the function nativeSetupRun in NengoGPU_JNI.c. By the time this is called, the NengoGPUData structure for each device should have all its static data set.
+// Called by the function nativeSetupRun in NengoGPU_JNI.c. By the time this is called, the NengoGPUData structure for each device should have all its static data set
+// (but not yet loaded onto a device, since it should't have access to a device yet).
 // This function initializes the synchronization primitives and creates a new thread for each GPU in use.
 void run_start()
 {
@@ -143,7 +144,7 @@ void run_start()
 
   NengoGPUData* currentData;
 
-  // Start the node-processing threads.
+  // Start the node-processing threads. Their starting function is start_GPU_thread.
   int i = 0;
   for(;i < numDevices; i++)
   {
@@ -152,6 +153,7 @@ void run_start()
     pthread_create(current_thread, NULL, &start_GPU_thread, (void*)currentData);
   }
 
+  // Wait for the threads to do their initializing (signalled by myCVSignal == numDevices), then return.
   pthread_mutex_lock(mutex);
   while(myCVsignal < numDevices)
   {
@@ -166,7 +168,7 @@ void run_start()
   sched_yield();
 }
 
-// Called once per GPU device per simulation. This is the entry point for each processing thread. Its input is the
+// Called once per GPU device per simulation run. This is the entry point for each processing thread. Its input is the
 // NengoGPUData structure that it is to process. The behaviour of this function is: wait until we get the signal to step
 // (from nativeStep in NengoGPU_JNI.c), process the NengoGPUData structure for one step with run_NEFEnsembles, wait again.
 // Eventually manipulateKill(0) will return true, meaning the run is finished and the function will break out of the loop 
@@ -188,6 +190,7 @@ void* start_GPU_thread(void* arg)
   //printNengoGPUData(nengoData);
   //printDynamicNengoGPUData(nengoData);
 
+  // signal to parent thread that initialization is complete, then wait for the other threads to finish initialization.
   pthread_mutex_lock(mutex);
   myCVsignal++;
   if(myCVsignal == numDevices)
@@ -254,7 +257,7 @@ void run_kill()
   pthread_cond_wait(cv_GPUThreads, mutex);
   pthread_mutex_unlock(mutex);
 
-  // Once the threads are done, free shared resources and quit
+  // Once the GPU threads are done, free shared resources and return
   free(nengoDataArray);
   free(deviceForEnsemble);
   free(deviceForNetworkArray);

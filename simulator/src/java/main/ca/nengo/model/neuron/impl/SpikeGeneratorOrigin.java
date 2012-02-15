@@ -101,6 +101,10 @@ public class SpikeGeneratorOrigin implements Origin {
     public InstantaneousOutput getValues() {
         return myOutput;
     }
+    
+    public void setValues(InstantaneousOutput val) {
+        myOutput = val;
+    }
 
     /**
      * @see ca.nengo.model.Origin#getNode()

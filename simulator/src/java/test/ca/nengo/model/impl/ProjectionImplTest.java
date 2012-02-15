@@ -247,6 +247,11 @@ public class ProjectionImplTest extends TestCase {
 		public InstantaneousOutput getValues() {
 			throw new RuntimeException("not implemented");
 		}
+		
+		public  void setValues(InstantaneousOutput val) {
+			throw new RuntimeException("not implemented");
+		}
+
 
 		public Node getNode() {
 			return null;
@@ -303,6 +308,10 @@ public class ProjectionImplTest extends TestCase {
 		}
 
 		public void setTau(float tau) throws StructuralException {
+		}
+		
+		public InstantaneousOutput getInput() {
+			throw new RuntimeException("not implemented");
 		}
 
 		/**

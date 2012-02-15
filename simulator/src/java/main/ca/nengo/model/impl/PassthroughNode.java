@@ -392,6 +392,10 @@ public class PassthroughNode implements Node {
 		public void setTau(float tau) throws StructuralException {
 			throw new StructuralException("A termination on a passthrough node has no dynamics");
 		}
+		
+		public InstantaneousOutput getInput(){
+			return myValues;
+		}
 
 		/**
 		 * @see ca.nengo.model.Resettable#reset(boolean)

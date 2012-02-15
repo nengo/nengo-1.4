@@ -3,20 +3,19 @@ package ca.nengo.util.impl;
 //import ca.nengo.model.InstantaneousOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
-import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.util.TaskSpawner;
 import ca.nengo.util.ThreadTask;
 
 /**
  * A pool of threads for running nodes in. All interaction with the threads
- * is done through this class
+ * is done through this class.
  *
  * @author Eric Crawford
  */
@@ -42,6 +41,11 @@ public class NodeThreadPool {
 	protected volatile boolean runFinished;
 	protected float myStartTime;
 	protected float myEndTime;
+	
+	protected static boolean myCollectTimings;
+	protected long myRunStartTime;
+	protected double myAverageTimePerStep;
+	protected int myNumSteps;
 
 	public static int getNumJavaThreads(){
 		return myNumJavaThreads;
@@ -65,6 +69,14 @@ public class NodeThreadPool {
 		myNumJavaThreads = 0;
 	}
 
+	public static boolean isCollectingTimings() {
+		return myCollectTimings;
+	}
+
+	public static void setCollectTimings(boolean collectTimings) {
+		myCollectTimings = collectTimings;
+	}
+	
 	public float getStartTime(){
 		return myStartTime;
 	}
@@ -85,11 +97,23 @@ public class NodeThreadPool {
 		initialize(network);
 	}
 	
+	/**
+	 * 1. Checks whether the GPU is to be used for the simulation. If it is, creates
+	 * a GPU Thread, passes this thread the nodes and projections which are to be run on the GPU,
+	 * and calls the initialization function of the gpu thread's NEFGPUInterface. Starts the GPU thread.
+	 * 
+	 * 2. Creates the appropriate number of java threads and assigns to each a fair number of
+	 * projections, nodes and tasks from those that remain after the GPU data has been dealt with.
+	 * Starts the Java threads.
+	 * 
+	 * 3. Initializes synchronization primitives and variables for collecting timing data if applicable.
+	 * 
+	 * @author Eric Crawford
+	 */
 	protected void initialize(Network network){
 		
 		myLock = new Object();
 		
-		//not breaking down network arrays
 		Node[] nodes = network.getNodes();
 		Projection[] projections = network.getProjections();
 		
@@ -104,7 +128,9 @@ public class NodeThreadPool {
 		threadsRunning = false;
 		runFinished = false;
 		
-		if(NEFGPUInterface.getUseGPU()){  
+		int requestedNumDevices = NEFGPUInterface.getRequestedNumDevices();
+		
+		if(requestedNumDevices > 0){
 			myNumThreads = myNumJavaThreads + 1;
 	    }else{
 	    	myNumThreads = myNumJavaThreads;
@@ -112,25 +138,30 @@ public class NodeThreadPool {
 		
 		myThreads = new NodeThread[myNumThreads];
 		
-		if(NEFGPUInterface.getUseGPU()){  
-			GPUThread gpuThread = new GPUThread(this);
-			
-			// The NEFGPUInterface removes from myNodes ensembles that are to be run on the GPU and returns the rest.
-			myNodes = gpuThread.getNEFGPUInterface().takeGPUNodes(myNodes);
-			
-			// The NEFGPUInterface removes from myProjections projections that are to be run on the GPU and returns the rest.
-			myProjections = gpuThread.getNEFGPUInterface().takeGPUProjections(myProjections);
-			
-			gpuThread.getNEFGPUInterface().initialize();
-			
-			myThreads[myNumJavaThreads] = gpuThread;
-			
-			gpuThread.setPriority(Thread.MAX_PRIORITY);
-			gpuThread.start();
+		if(NEFGPUInterface.getUseGPU()){ 
+				GPUThread gpuThread = new GPUThread(this);
+				
+				// The NEFGPUInterface removes from myNodes ensembles that are to be run on the GPU and returns the rest.
+				myNodes = gpuThread.getNEFGPUInterface().takeGPUNodes(myNodes);
+				
+				// The NEFGPUInterface removes from myProjections projections that are to be run on the GPU and returns the rest.
+				myProjections = gpuThread.getNEFGPUInterface().takeGPUProjections(myProjections);
+				
+				gpuThread.getNEFGPUInterface().initialize();
+				
+				
+				gpuThread.setCollectTimings(myCollectTimings);
+				gpuThread.setName("GPUThread0");
+				
+				myThreads[myNumJavaThreads] = gpuThread;
+				
+				gpuThread.setPriority(Thread.MAX_PRIORITY);
+				gpuThread.start();
 		}
 		
-		//In the remaining nodes, do break down the NetworkArrays, we don't want to be running nodes which are members of
-		// classes which derive from the NetworkImpl class since NetworkImpls create their own LocalSimulator when run.
+		//In the remaining nodes (non-GPU nodes), DO break down the NetworkArrays, we don't want to call the 
+		// "run" method of nodes which are members of classes which derive from the NetworkImpl class since 
+		// NetworkImpls create their own LocalSimulators when run.
 		myNodes = collectNodes(myNodes, true);
 
 		int nodesPerJavaThread = (int) Math.ceil((float) myNodes.length / (float) myNumJavaThreads);
@@ -140,6 +171,8 @@ public class NodeThreadPool {
 		int nodeOffset = 0, projectionOffset = 0, taskOffset = 0;
 		int nodeStartIndex, nodeEndIndex, projectionStartIndex, projectionEndIndex, taskStartIndex, taskEndIndex;
 
+		
+		// Evenly distribute projections, nodes and tasks to the java threads.
 		for(int i = 0; i < myNumJavaThreads; i++){
 
 			nodeStartIndex = nodeOffset;
@@ -163,17 +196,33 @@ public class NodeThreadPool {
 			myThreads[i] = new NodeThread(this, myNodes, nodeStartIndex,
 					nodeEndIndex, myProjections, projectionStartIndex,
 					projectionEndIndex, myTasks, taskStartIndex, taskEndIndex);
+			
+			myThreads[i].setCollectTimings(myCollectTimings);
+			myThreads[i].setName("JavaThread" + i);
 
 			myThreads[i].setPriority(Thread.MAX_PRIORITY);
 			myThreads[i].start();
 		}
+		
+		myRunStartTime = myCollectTimings ? new Date().getTime() : 0;
+		myAverageTimePerStep = 0;
+		myNumSteps = 0;
 	}
 
-	// Execute the run method of an array of nodes
+	/**
+	 * Tell the threads in the current thread pool to take a step. The step consists of three
+	 * phases: projections, nodes, tasks. All threads must complete a stage before any thread begins
+	 * the next stage, so all threads must finish processing all of their projections before any 
+	 * thread starts processing its nodes, etc.
+	 * 
+	 * @author Eric Crawford
+	 */
 	public void step(float startTime, float endTime){
 		myStartTime = startTime;
 		myEndTime = endTime;
-
+		
+		long stepInterval = myCollectTimings ? new Date().getTime() : 0;
+		
 		try
 		{
 			int oldPriority = Thread.currentThread().getPriority();
@@ -192,8 +241,21 @@ public class NodeThreadPool {
 		}
 		catch(Exception e)
 		{}
+		
+		if(myCollectTimings){
+			stepInterval = new Date().getTime() - stepInterval;
+			myAverageTimePerStep = (myAverageTimePerStep * myNumSteps + stepInterval) / (myNumSteps + 1);
+            
+            myNumSteps++;
+		}
 	}
 
+	/**
+	 * Tells the threads to run for one phase (projections, nodes or tasks). 
+	 * The threads should be waiting on myLock at the time this is called.
+	 * 
+	 * @author Eric Crawford
+	 */
 	private void startThreads() throws InterruptedException {
 		synchronized(myLock){
 			numThreadsComplete = 0;
@@ -204,7 +266,12 @@ public class NodeThreadPool {
 		}
 	}
 
-
+	/**
+	 * Called by the threads in this node pool. Called once they finish a phase (projections, nodes or tasks).
+	 * Forces them to wait on myLock.
+	 * 
+	 * @author Eric Crawford
+	 */
 	public void threadWait() throws InterruptedException{
 		synchronized(myLock){
 			while(!threadsRunning) {
@@ -213,8 +280,11 @@ public class NodeThreadPool {
 		}
 	}
 
-	// Used by the threads of this pool to signal that they are done
-	// running their nodes for the current step
+	/**
+	 * Called by the threads in this pool to signal that they are done a phase. 
+	 * 
+	 * @author Eric Crawford
+	 */
 	public void threadFinished() throws InterruptedException{
 		synchronized(myLock){
 			numThreadsComplete++;
@@ -230,8 +300,12 @@ public class NodeThreadPool {
 		}
 	}
 
-	// Kill the threads by interrupting them.
-	// Each thread will handle it accordingly by ending its run method.
+	/**
+	 * Kill the threads in the pool by interrupting them. Each thread will handle
+	 * the interrupt signal by ending its run method, which kills it.
+	 * 
+	 * @author Eric Crawford
+	 */
 	public void kill(){
 		synchronized(myLock)
 		{
@@ -241,18 +315,35 @@ public class NodeThreadPool {
 			for(int i = 0; i < myThreads.length; i++){
 				myThreads[i].interrupt();
 			}
+			
+			if(myCollectTimings){
+				StringBuffer timingOutput = new StringBuffer();
+				timingOutput.append("Timings for NodeThreadPool:\n");
+				
+				long approxRunTime = new Date().getTime() - myRunStartTime;
+				timingOutput.append("Approximate total run time: " + approxRunTime + " ms\n");
+				
+				timingOutput.append("Average time per step: " + myAverageTimePerStep + " ms\n");
+				
+				System.out.print(timingOutput.toString());
+			}
 
 			myLock.notifyAll();
 		}
+		
+		
 	}
 	
-
-	
-	
     /**
-     * Bring all nodes to the top level so we can run them all at once.
-     * Retrieves nodes depth-first. Used for multithreaded and GPU-enabled runs.
-     * Lets the caller choose whether to break down network arrays.
+     * Return all the nodes in the network except subnetworks. Essentially returns a "flattened"
+     * version of the network. The breakDownNetworkArrays param lets the caller choose whether to include
+     * Network Arrays in the returned list (=false) or to return the NEFEnsemble in the network array (=true).
+     * This facility is provided because sometimes Network Arrays should be treated like Networks, which is what
+     * they are as far as java is concerned (they extend the NetworkImpl class), and sometimes it is better to 
+     * treat them like NEFEnsembles, which they are designed to emulate (they're supposed to be an 
+     * easier-to-build version of large NEFEnsembles).
+     * 
+     * @author Eric Crawford
      */
     public static Node[] collectNodes(Node[] startingNodes, boolean breakDownNetworkArrays){
 
@@ -301,9 +392,46 @@ public class NodeThreadPool {
 
         return nodes.toArray(new Node[0]);
     }
+    
 
-    
-    
+    /**
+     * Return all the projections in the network. Essentially returns all the projections that
+     * would be in a "flattened" version of the network.
+     * 
+     * @author Eric Crawford
+     */
+    public static Projection[] collectProjections(Node[] startingNodes, Projection[] startingProjections){
+
+        ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(startingProjections));
+
+        List<Node> nodesToProcess = new LinkedList<Node>();
+        nodesToProcess.addAll(Arrays.asList(startingNodes));
+
+        Node workingNode;
+
+        while(nodesToProcess.size() != 0)
+        {
+            workingNode = nodesToProcess.remove(0);
+
+            if(workingNode instanceof Network) {
+                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
+
+                nodeList.addAll(nodesToProcess);
+                nodesToProcess = nodeList;
+
+                projections.addAll(Arrays.asList(((Network) workingNode).getProjections()));
+            }
+        }
+
+        return projections.toArray(new Projection[0]);
+    }
+
+    /**
+     * Return all the tasks in the network. Essentially returns all the tasks that
+     * would be in a "flattened" version of the network.
+     * 
+     * @author Eric Crawford
+     */
     public static ThreadTask[] collectTasks(Node[] startingNodes){
 
         ArrayList<ThreadTask> tasks = new ArrayList<ThreadTask>();
@@ -331,84 +459,5 @@ public class NodeThreadPool {
         }
 
         return tasks.toArray(new ThreadTask[0]);
-    }
-
-    // I want this function to give me networkArrays and NEFEnsembles that are set to run on the GPU.
-    public static Node[] collectNetworkArraysForGPU(Node[] startingNodes){
-        ArrayList<Node> nodes = new ArrayList<Node>();
-
-        List<Node> nodesToProcess = new LinkedList<Node>();
-        nodesToProcess.addAll(Arrays.asList(startingNodes));
-
-        Node workingNode;
-
-        while(nodesToProcess.size() != 0)
-        {
-            workingNode = nodesToProcess.remove(0);
-
-            // The purpose of this function is to have a list of NetworkArrays. On the GPU, all NEF
-            // ensembles are considered to be part of a NetworkArray. NEF ensembles that are not
-            // ostensibly part of a NetworkArray are considered by the GPU to be part of a NetworkArray
-            // that contains only one nodes. In this way, we do not have to make special considerations
-            // for nodes that are part of the NetworkArray. Processing a network array that contains only
-            // one node is effectively the same as processing that one node on its own, so nothing is lost.
-            boolean isNEFEnsemble = workingNode instanceof NEFEnsembleImpl;
-            boolean isNetworkArray = workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6";
-            boolean isNetwork = workingNode instanceof NetworkImpl;
-           
-
-            if(isNEFEnsemble){
-            	if( ((NEFEnsembleImpl) workingNode).getUseGPU() )
-            		nodes.add(workingNode);
-            }
-            else if(isNetworkArray){
-            	
-            	if( ((NetworkImpl) workingNode).getUseGPU() )
-            		nodes.add(workingNode);
-            }
-            else if(isNetwork){
-            	// notice we don't dive into networkArrays. We only want to run a network array on the GPU if all its ensembles run on the GPU.
-                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-
-                nodeList.addAll(nodesToProcess);
-                nodesToProcess = nodeList;
-
-                //nodesToProcess = Arrays.asList(((Network) workingNode).getNodes()).addAll(nodesToProcess);
-                //nodesToProcess.addAll(Arrays.asList(((Network) workingNode).getNodes()));
-            }
-        }
-
-        return nodes.toArray(new Node[0]);
-    }
-
-
-    /**
-     * Bring all projections to the top level so we can run them all at once.
-     * Used for multithreaded and GPU-enabled runs.
-     */
-    public static Projection[] collectProjections(Node[] startingNodes, Projection[] startingProjections){
-
-        ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(startingProjections));
-
-        List<Node> nodesToProcess = new LinkedList<Node>();
-        nodesToProcess.addAll(Arrays.asList(startingNodes));
-
-        Node workingNode;
-
-        while(nodesToProcess.size() != 0)
-        {
-            workingNode = nodesToProcess.remove(0);
-
-            if(workingNode instanceof Network) {
-                List<Node> nodeList = new LinkedList<Node>(Arrays.asList(((Network) workingNode).getNodes()));
-
-                nodeList.addAll(nodesToProcess);
-                nodesToProcess = nodeList;
-
-                projections.addAll(Arrays.asList(((Network) workingNode).getProjections()));
-            }
-        }
-
-        return projections.toArray(new Projection[0]);
     }
 }

@@ -104,6 +104,12 @@ public class EnsembleOrigin implements Origin {
 		return result;
 	}
 	
+	public void setValues(InstantaneousOutput values) {
+		for(Origin origin : myNodeOrigins){
+			origin.setValues(values);
+		}
+	}
+	
 	private static RealOutput composeRealOutput(Origin[] origins, Units units) throws SimulationException {
 		float[] values = new float[origins.length];
 		

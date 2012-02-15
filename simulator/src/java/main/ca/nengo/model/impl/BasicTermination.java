@@ -189,6 +189,13 @@ public class BasicTermination implements Termination, Resettable {
 			throw new StructuralException("Can't set time constant of non-LTI dynamics");
 		}
 	}
+	
+	/**
+	 * @return Extract the input to the termination.
+	 */
+	public InstantaneousOutput getInput(){
+		return myInput;
+	}
 
 	@Override
 	public Termination clone() throws CloneNotSupportedException {

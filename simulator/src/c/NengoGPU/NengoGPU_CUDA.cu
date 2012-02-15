@@ -332,8 +332,14 @@ __global__ void processNDterminations(int numEnsembles, int numNDterminations, i
         for(k = 0; k < steps; k++)
         {
           //temp_current = (temp_current + val * adjusted_dt / temp_tau) * (1 - adjusted_dt / temp_tau);
-          temp_current += val * adjusted_dt / temp_tau;
+
+          // know this order works pretty well
+          //temp_current += val * adjusted_dt / temp_tau;
+          //temp_current *= (1 - adjusted_dt / temp_tau);
+
+          // testing this order, though this is the one used in the java code so it should work
           temp_current *= (1 - adjusted_dt / temp_tau);
+          temp_current += val * adjusted_dt / temp_tau;
         }
 
         current[offset + j] = temp_current;

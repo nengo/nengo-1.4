@@ -134,7 +134,12 @@ public interface Termination extends Serializable, Resettable, Cloneable {
 	 * @param modulatory True if the Termination is to be modulatory
 	 */
 	public void setModulatory(boolean modulatory);
-
+	
+	/**
+	 * @return Latest input to the termination.
+	 */
+	public InstantaneousOutput getInput();
+	
 	/**
 	 * @return Valid clone
 	 * @throws CloneNotSupportedException if clone can't be made

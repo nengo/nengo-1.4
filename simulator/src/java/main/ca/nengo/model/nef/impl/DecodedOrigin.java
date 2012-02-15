@@ -454,6 +454,14 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	public InstantaneousOutput getValues() throws SimulationException {
 		return myOutput;
 	}
+	
+	/**
+	 * @see ca.nengo.model.Origin#setValues()
+	 */
+	public void setValues(InstantaneousOutput val){
+		if(val instanceof RealOutput)
+			myOutput = (RealOutput) val;
+	}
 
 	/**
 	 * @param ro Values to be set
