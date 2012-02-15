@@ -234,6 +234,10 @@ class Network:
         """
 
         funcs=[]
+        
+        if isinstance(values,str):
+            values=functions.Interpolator(values)
+        
         if callable(values):
             d=values(0)
             if isinstance(d,(tuple,list)):

@@ -38,6 +38,10 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
         self.popup.add(JPopupMenu.Separator())        
         self.popup.add(JMenuItem('zero',actionPerformed=self.zero))
         self.popup.add(JMenuItem('set value',actionPerformed=self.set_value))
+        
+        self.filename=None
+        self.popup.add(JMenuItem('set from file...',actionPerformed=self.set_from_file))
+        
 
 
         self.popup.add(JPopupMenu.Separator())        
@@ -102,6 +106,23 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
                 self.set_slider_value(i,vv)
         except:
             self.release_value(event)
+            
+            
+            
+    def set_from_file(self,event):
+        fileChooser=JFileChooser()
+        if self.filename is not None:
+            fileChooser.setSelectedFile(java.io.File(self.filename))
+            
+        if fileChooser.showOpenDialog(self)==JFileChooser.APPROVE_OPTION:
+            self.filename=fileChooser.selectedFile.name
+        
+            #TODO: this doesn't for for nested FunctionInputs
+            input=self.view.network.getNode(self.name)
+            
+            from nef.functions import Interpolator
+            interp=Interpolator(self.filename)
+            interp.load_into_function(input)
         
     
     
