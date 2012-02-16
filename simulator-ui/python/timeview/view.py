@@ -77,9 +77,9 @@ class EnsembleWatch:
         r=[
             (None, None, None),
             # Note that the above tuple is to reset popup menu to main popup menu in item.py
-            ('voltage grid',components.Grid,dict(func=self.voltage,sfunc=self.spikes_only,label=obj.name)),
+            ('voltage grid',components.Grid,dict(func=self.voltage,sfunc=self.spikes_only,label=obj.name,audio=True)),
             ('voltage graph',components.Graph,dict(func=self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=obj.name)),
-            ('firing rate',components.Grid,dict(func=self.spikes,min=0,max=lambda self: 200*self.view.dt,filter=True,label=obj.name)),       
+            ('firing rate',components.Grid,dict(func=self.spikes,min=0,max=lambda self: 200*self.view.dt,filter=True,label=obj.name,audio=True)),       
             ('spike raster',components.SpikeRaster,dict(func=self.spikes,label=obj.name)),
             #('voltage grid',lambda view,name,type: components.Grid(view,name,type,self.voltage,sfunc=self.spikes_only)),
             #('voltage graph',lambda view,name,type: components.Graph(view,name,type,self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
@@ -391,6 +391,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         
         self.forced_origins={}
         self.forced_origins_prev={}
+        
+        self.tick_queue=[]
         
         if size is None:
             size=(950,600)
@@ -802,6 +804,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     self.simulating=False
                     self.force_origins()
                     now+=self.dt
+                    for tick in self.tick_queue:
+                        tick(now)
+                        
                     if self.autopause_at is not None and now>self.autopause_at:
                         self.time_control.pause(None)
                         self.autopause_at=None

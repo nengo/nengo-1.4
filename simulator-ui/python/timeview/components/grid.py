@@ -5,10 +5,11 @@ from java.awt.event import *
 
 import core
 import neuronmap
+import clicker
 
 from math import sqrt
 class Grid(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,cols=None,filter=False,label=None,improvable=True):
+    def __init__(self,view,name,func,args=(),sfunc=None,sargs=(),min=0,max=1,rows=None,cols=None,filter=False,label=None,improvable=True,audio=False):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
@@ -26,6 +27,16 @@ class Grid(core.DataViewComponent):
         self.requested_improvements=0
         self.auto_improve=False
         self.improvable=improvable
+        
+        if not clicker.enabled: audio=False
+        self.audio=audio
+        if audio:
+            if sfunc is not None:
+                cdata=self.sdata
+            else:
+                cdata=self.data
+            self.clicker=clicker.Clicker(self,cdata)
+            self.audio_follow_mouse=True
         
         if self.improvable:
             self.popup.add(JPopupMenu.Separator())
@@ -84,14 +95,13 @@ class Grid(core.DataViewComponent):
     def improve_layout(self,event):
         if self.improvable:
             self.requested_improvements=self.map.improvements+20
-        
+    
+       
         
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
         x0=self.margin/2.0
         y0=self.margin/2.0+self.label_offset
-        g.color=Color.black
-        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.label_offset-self.margin)+1)
         
         dt_tau=None
         if self.filter and self.view.tau_filter>0:
@@ -152,9 +162,49 @@ class Grid(core.DataViewComponent):
                             if c>1 : c=1.0
                             if c<0.0 : g.color = Color(1.0+c,1.0+c,1.0)
                             else   : g.color = Color(1.0,1.0-c,1.0-c)
+
+                        
+
                                 
                     g.fillRect(int(x0+dx*x),int(y0+dy*y),int(dx+1),int(dy+1))
+                    if self.audio and index==self.clicker.selected:
+                        g.color=Color.blue
+                        g.drawRect(int(x0+dx*x)+1,int(y0+dy*y)+1,int(dx)-2,int(dy)-2)
+
+        if self.audio and self.audio_follow_mouse:
+            x=int((self.mouse_x-x0)/dx)
+            y=int((self.mouse_y-y0)/dy)
+            index=x+y*cols
+            if x>cols: index=-1
+            if 0<=index<len(data):
+                if self.improvable:
+                   index=self.map.map[index]
+                self.clicker.select(index)   
+            else:
+                self.clicker.select(None)    
+
+
+        g.color=Color.black
+        g.drawRect(int(x0)-1,int(y0)-1,int(self.size.width-self.margin)+1,int(self.size.height-self.label_offset-self.margin)+1)
+            
+
 
         if self.improvable and self.requested_improvements>self.map.improvements:    
             self.map.improve()
             self.parent.repaint()
+            
+    mouse_x=0
+    mouse_y=0        
+    def mouseMoved(self, event):      
+        core.DataViewComponent.mouseMoved(self,event)
+        self.mouse_x=event.x
+        self.mouse_y=event.y
+    def mousePressed(self, event):  
+        core.DataViewComponent.mousePressed(self,event)
+        if self.audio:
+            self.audio_follow_mouse=not self.audio_follow_mouse
+    def mouseExited(self, event):  
+        core.DataViewComponent.mouseExited(self,event)        
+        self.mouse_x=-1
+        self.mouse_y=-1
+            
