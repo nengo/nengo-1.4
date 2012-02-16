@@ -115,7 +115,7 @@ class FunctionControl(core.DataViewComponent,ComponentListener):
             fileChooser.setSelectedFile(java.io.File(self.filename))
             
         if fileChooser.showOpenDialog(self)==JFileChooser.APPROVE_OPTION:
-            self.filename=fileChooser.selectedFile.name
+            self.filename=fileChooser.selectedFile.absolutePath
         
             #TODO: this doesn't for for nested FunctionInputs
             input=self.view.network.getNode(self.name)
