@@ -7,6 +7,8 @@ from java.awt.event import *
 
 import neuronmap
 from math import sqrt
+import clicker
+
 
 class SpikeRaster(core.DataViewComponent):
     def __init__(self,view,name,func,label=None,usemap=True):
@@ -33,6 +35,11 @@ class SpikeRaster(core.DataViewComponent):
         self.popup.add(JMenuItem('show 5%',actionPerformed=lambda x: self.set_sample(20)))
         self.usemap=usemap
         self.mouse_location=None
+        
+        self.audio=clicker.enabled
+        if self.audio:
+            self.clicker=clicker.Clicker(self,self.data)
+            self.clicker.select(0)
         
         
         self.map=None
