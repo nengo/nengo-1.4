@@ -11,6 +11,7 @@ This documentation describes the scripting libraries available for use in Nengo.
    configuring
    quick
    simplenodes
+   weights
    tips   
    classes
    
