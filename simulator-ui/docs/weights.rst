@@ -42,7 +42,7 @@ find all the small weights in the *w* matrix and set them to zero.  The followin
 different approach that we have found to be a bit more robust.  Here, if we want 20% connectivity (i.e. each 
 neuron in population A is only connected to 20% of the neurons in population B), we simply randomly select
 80% of the weights in the matrix and set them to zero.  To make up for this reduction in connectivity, we
-also increase the remaining weights by scaling them by 1.0/0.2.
+also increase the remaining weights by scaling them by 1.0/0.2::
 
     A=net.make('A',100,1)
     B=net.make('B',100,1)
