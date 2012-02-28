@@ -120,56 +120,55 @@ floatArray* newFloatArrayOnDevice(int size, const char* name)
 ///////////////////////////////////////////////////////
 // intArray and floatArray safe getters and setters
 ///////////////////////////////////////////////////////
-void intArraySetElement(intArray* a, int index, int value)
+
+void checkBounds(char* name, int size, int index)
 {
-  if(index >= a->size || index < 0)
+  if(index >= size || index < 0)
   {
-    printf("Setting intArray out of bounds, name: %s, size: %d, index:%d\n", a->name, a->size, index);
+    printf("Accessing safe array out of bounds, name: %s, size: %d, index:%d\n", name, size, index);
     exit(EXIT_FAILURE);
   }
-  else
+}
+
+void checkLocation(char* name, int onDevice, int size, int index)
+{
+  if(onDevice)
   {
-    a->array[index] = value;
+    printf("Accessing safe array that is not on the host, name: %s, size: %d, index:%d\n", name, size, index);
+    exit(EXIT_FAILURE);
   }
+}
+
+void intArraySetElement(intArray* a, int index, int value)
+{
+  checkBounds(a->name, a->size, index);
+  checkLocation(a->name, a->onDevice, a->size, index);
+
+  a->array[index] = value;
 }
 
 void floatArraySetElement(floatArray* a, int index, float value)
 {
-  if(index >= a->size || index < 0)
-  {
-    printf("Setting floatArray out of bounds, name: %s, size: %d, index:%d\n", a->name, a->size, index);
-    exit(EXIT_FAILURE);
-  }
-  else
-  {
-    a->array[index] = value;
-  }
+  checkBounds(a->name, a->size, index);
+  checkLocation(a->name, a->onDevice, a->size, index);
+
+  a->array[index] = value;
 }
 
 int intArrayGetElement(intArray* a, int index)
 {
-  if(index >= a->size || index < 0)
-  {
-    printf("Getting intArray out of bounds, name: %s, size: %d, index:%d\n", a->name, a->size, index);
-    exit(EXIT_FAILURE);
-  }
-  else
-  {
-    return a->array[index];
-  }
+  checkBounds(a->name, a->size, index);
+  checkLocation(a->name, a->onDevice, a->size, index);
+
+  return a->array[index];
 }
 
 float floatArrayGetElement(floatArray* a, int index)
 {
-  if(index >= a->size || index < 0)
-  {
-    printf("Getting floatArray out of bounds, name: %s, size: %d, index:%d\n", a->name, a->size, index);
-    exit(EXIT_FAILURE);
-  }
-  else
-  {
-    return a->array[index];
-  }
+  checkBounds(a->name, a->size, index);
+  checkLocation(a->name, a->onDevice, a->size, index);
+
+  return a->array[index];
 }
 
 void intArraySetData(intArray* a, int* data, int dataSize)
@@ -346,8 +345,10 @@ NengoGPUData* getNewNengoGPUData()
   
   new->numNDterminations = 0;
 
+  new->numSpikesToSendBack = 0;
+  new->numSpikeEnsembles = 0;
+
   new->input = NULL;
-  new->inputHost = NULL;
   new->terminationOffsetInInput = NULL;
   new->networkArrayOutputReorganizer = NULL;
   new->networkArrayIndexInJavaArray = NULL;
@@ -401,6 +402,8 @@ NengoGPUData* getNewNengoGPUData()
   new->ensembleOriginOffsetInOutput = NULL;
   new->networkArrayOriginOffsetInOutput = NULL; 
 
+  new->spikeMap = NULL;
+  new->spikeEnsembleIndices = NULL;
   new->GPUTerminationToOriginMap = NULL;
 
   new->ensembleIndexInJavaArray = NULL;
@@ -518,7 +521,7 @@ void initializeNengoGPUData(NengoGPUData* new)
   new->spikesHost = newFloatArray(new->numNeurons, name);
 
   name = "outputHost";
-  new->outputHost = newFloatArray(new->totalOutputSize, name);
+  new->outputHost = newFloatArray(new->totalOutputSize + new->numSpikesToSendBack, name);
 
 
   name = "NDterminationInputIndexor";
@@ -585,6 +588,8 @@ void moveToDeviceNengoGPUData(NengoGPUData* currentData)
     moveToDeviceIntArray(currentData->encoderStride);
     moveToDeviceIntArray(currentData->decoderStride);
 
+    moveToDeviceIntArray(currentData->spikeMap);
+
     moveToDeviceIntArray(currentData->GPUTerminationToOriginMap);
 
     moveToDeviceIntArray(currentData->NDterminationInputIndexor);
@@ -602,7 +607,6 @@ void freeNengoGPUData(NengoGPUData* currentData)
   freeIntArray(currentData->networkArrayIndexInJavaArray);
 
   freeFloatArray(currentData->input);
-  freeFloatArray(currentData->inputHost); 
   freeIntArray(currentData->terminationOffsetInInput);
 
   freeFloatArray(currentData->terminationTransforms);
@@ -653,6 +657,8 @@ void freeNengoGPUData(NengoGPUData* currentData)
   freeIntArray(currentData->ensembleIndexInJavaArray);
   freeIntArray(currentData->ensembleOriginOffsetInOutput);
   freeIntArray(currentData->networkArrayOriginOffsetInOutput);
+  freeIntArray(currentData->spikeMap);
+  freeIntArray(currentData->spikeEnsembleIndices);
   freeIntArray(currentData->GPUTerminationToOriginMap);
   freeIntArray(currentData->sharedData_outputIndex);
   freeIntArray(currentData->sharedData_sharedIndex);
@@ -790,6 +796,9 @@ void printNengoGPUData(NengoGPUData* currentData)
 
   printf("ensembleOriginDimension:\n");
   printIntArray(currentData->ensembleOriginDimension, currentData->numOrigins, 1);
+
+  printf("spikeMap:\n");
+  printIntArrayFromDevice(NULL, currentData->spikeMap, currentData->numSpikesToSendBack, 1, 1);
 
   printf("GPUTerminationToOriginMap:\n");
   printIntArrayFromDevice(NULL, currentData->GPUTerminationToOriginMap, currentData->GPUInputSize, 1, 1);

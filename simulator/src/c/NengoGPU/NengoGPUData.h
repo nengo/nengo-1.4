@@ -76,6 +76,9 @@ floatArray* newFloatArray(int size, const char* name);
 void freeFloatArray(floatArray* a);
 floatArray* newFloatArrayOnDevice(int size, const char* name);
 
+void checkBounds(char* name, int size, int index);
+void checkLocation(char* name, int onDevice, int size, int index);
+
 void intArraySetElement(intArray* a, int index, int value);
 void floatArraySetElement(floatArray* a, int index, float value);
 int intArrayGetElement(intArray* a, int index);
@@ -163,6 +166,8 @@ struct NengoGPUData_t{
   int JavaInputSize;
   int offsetInSharedInput;
   int CPUOutputSize;
+  int numSpikesToSendBack;
+  int numSpikeEnsembles;
 
   int totalTransformSize;
   int totalNumTransformRows;
@@ -182,7 +187,6 @@ struct NengoGPUData_t{
   intArray* networkArrayIndexInJavaArray;
 
   floatArray* input;
-  floatArray* inputHost; // this is allocated in NengoGPU_JNI.c/setupInput
   intArray* terminationOffsetInInput;
 
   floatArray* terminationTransforms;
@@ -225,7 +229,8 @@ struct NengoGPUData_t{
   floatArray* output;
 
   intArray* GPUTerminationToOriginMap;
-
+  intArray* spikeMap;
+  intArray* spikeEnsembleIndices;
 
   // non decoded termination data
   intArray* NDterminationInputIndexor;

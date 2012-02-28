@@ -338,7 +338,7 @@ __global__ void processNDterminations(int numEnsembles, int numNDterminations, i
           //temp_current *= (1 - adjusted_dt / temp_tau);
 
           // testing this order, though this is the one used in the java code so it should work
-          temp_current *= (1 - adjusted_dt / temp_tau);
+          temp_current *= 1 - adjusted_dt / temp_tau;
           temp_current += val * adjusted_dt / temp_tau;
         }
 
@@ -353,13 +353,13 @@ __global__ void processNDterminations(int numEnsembles, int numNDterminations, i
 }
 
 
-__global__ void moveGPUOutputIntoInput(int GPUInputSize, int* map, float* input, float* output)
+__global__ void moveGPUData(int size, int* map, float* to, float* from)
 {
   int i = threadIdx.x + (blockDim.x * threadIdx.y) + (blockIdx.x + (gridDim.x * blockIdx.y)) * blockDim.x * blockDim.y;
 
-  if(i < GPUInputSize)
+  if(i < size)
   {
-    input[ i ] = output[ map[i] ];
+    to[i] = from[ map[i] ];
   }
 }
       
@@ -390,12 +390,7 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
 
 
   //printf("Copy java input : %d\n", nengoData->device);
-  err = cudaMemcpy(nengoData->input->array + nengoData->GPUInputSize, nengoData->inputHost->array, nengoData->JavaInputSize * sizeof(float), cudaMemcpyHostToDevice);
-  err = cudaGetLastError();
-  checkCudaError(err);
-
-  //printf("Copy CPU input : %d \n", nengoData->device);
-  err = cudaMemcpy(nengoData->input->array + nengoData->GPUInputSize + nengoData->JavaInputSize, sharedInput + nengoData->offsetInSharedInput, nengoData->CPUInputSize * sizeof(float), cudaMemcpyHostToDevice);
+  err = cudaMemcpy(nengoData->input->array + nengoData->GPUInputSize, sharedInput + nengoData->offsetInSharedInput, (nengoData->JavaInputSize + nengoData->CPUInputSize) * sizeof(float), cudaMemcpyHostToDevice);
   err = cudaGetLastError();
   checkCudaError(err);
 
@@ -518,21 +513,21 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   
  */ 
 
-  //printf("copy output from device\n");
-  cudaMemcpy(nengoData->outputHost->array, nengoData->output->array, nengoData->totalOutputSize * sizeof(float), cudaMemcpyDeviceToHost);
+  dimGrid.x = nengoData->numSpikesToSendBack / (dimBlock.x * dimBlock.y) + 1;
+  //printf("extract the spikes we want to send back\n");
+  moveGPUData<<<dimGrid, dimBlock>>>(nengoData->numSpikesToSendBack, nengoData->spikeMap->array, nengoData->output->array + nengoData->totalOutputSize, nengoData->spikes->array);
+  err = cudaGetLastError();
+  checkCudaError(err);
+
+
+  cudaMemcpy(nengoData->outputHost->array, nengoData->output->array, (nengoData->totalOutputSize + nengoData->numSpikesToSendBack) * sizeof(float), cudaMemcpyDeviceToHost);
   err = cudaGetLastError();
   checkCudaError(err);
   
-
-  //printf("copy spikes from device\n");
-  cudaMemcpy(nengoData->spikesHost->array, nengoData->spikes->array, nengoData->numNeurons * sizeof(float), cudaMemcpyDeviceToHost);
-  err = cudaGetLastError();
-  checkCudaError(err);
-
 //// move data along GPU projections
   dimGrid.x = nengoData->totalInputSize / (dimBlock.x * dimBlock.y) + 1;
   //printf("move output along projections\n");
-  moveGPUOutputIntoInput<<<dimGrid, dimBlock>>>(nengoData->GPUInputSize, nengoData->GPUTerminationToOriginMap->array, nengoData->input->array, nengoData->output->array);
+  moveGPUData<<<dimGrid, dimBlock>>>(nengoData->GPUInputSize, nengoData->GPUTerminationToOriginMap->array, nengoData->input->array, nengoData->output->array);
   err = cudaGetLastError();
   checkCudaError(err);
 }
@@ -571,7 +566,7 @@ void initializeDeviceInputAndOutput(NengoGPUData* nengoData)
   nengoData->input = newFloatArrayOnDevice(nengoData->totalInputSize, name); 
   
   name = "output";
-  nengoData->output = newFloatArrayOnDevice(nengoData->totalOutputSize, name); 
+  nengoData->output = newFloatArrayOnDevice(nengoData->totalOutputSize + nengoData->numSpikesToSendBack, name); 
   
   name = "spikes";
   nengoData->spikes = newFloatArrayOnDevice(nengoData->numNeurons, name); 
@@ -594,7 +589,7 @@ void initializeDeviceInputAndOutput(NengoGPUData* nengoData)
 
   err = cudaMemset(nengoData->input->array, 0, nengoData->GPUInputSize * sizeof(float));
   checkCudaError(err);
-  err = cudaMemset(nengoData->output->array, 0, nengoData->totalOutputSize * sizeof(float));
+  err = cudaMemset(nengoData->output->array, 0, (nengoData->totalOutputSize  + nengoData->numSpikesToSendBack) * sizeof(float));
   checkCudaError(err);
   err = cudaMemset(nengoData->spikes->array, 0, nengoData->numNeurons * sizeof(float));
   checkCudaError(err);

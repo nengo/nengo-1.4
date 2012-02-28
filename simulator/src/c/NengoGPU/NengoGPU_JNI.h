@@ -27,6 +27,8 @@ void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, in
 
 void setupInput(int numProjections, projection* projections, NengoGPUData* currentData, int* networkArrayData);
 
+void setupSpikes(int* collectSpikes, NengoGPUData* currentData);
+
 #ifdef __cplusplus
 }
 #endif

@@ -8,8 +8,8 @@ import ca.nengo.model.Projection;
 
 public interface NetworkPartitioner {
 	
-	public void initialize(Node[] nodes, Projection[] projections, int numPartitions);
+	void initialize(Node[] nodes, Projection[] projections, int numPartitions);
 	
-	public ArrayList<Set<Node>> getPartitions();
-	public int[] getPartitionsAsIntArray();
+	ArrayList<Set<Node>> getPartitions();
+	int[] getPartitionsAsIntArray();
 }

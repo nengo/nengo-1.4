@@ -38,7 +38,7 @@ __global__ void decode(int totalOutputSize, float* decoders, float* spikes, floa
 
 __global__ void processNDterminations(int numEnsembles, int numNDterminations, int steps, float adjusted_dt, int* NDterminationEnsembleOffset, int* inputOffsets, int* inputIndex, float* input, float* weights, float* current, float* sum, float* tau);
 
-__global__ void moveGPUOutputIntoInput(int GPUInputSize, int* map, float* input, float* output);
+__global__ void moveGPUData(int size, int* map, float* to, float* from);
 
 void run_NEFEnsembles(NengoGPUData*, float, float);
 

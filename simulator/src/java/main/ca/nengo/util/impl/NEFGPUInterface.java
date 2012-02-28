@@ -42,7 +42,7 @@ public class NEFGPUInterface {
 	private int numSteps;
 	
 	
-	protected NEFEnsemble[] myGPUEnsembles;
+	protected NEFEnsembleImpl[] myGPUEnsembles;
 	protected Projection[] myGPUProjections;
 	protected Node[] myGPUNetworkArrays;
 	
@@ -88,8 +88,9 @@ public class NEFGPUInterface {
 	static native void nativeSetupRun(float[][][][] terminationTransforms,
 			int[][] isDecodedTermination, float[][] terminationTau,
 			float[][][] encoders, float[][][][] decoders, float[][] neuronData,
-			int[][] projections, int[][] networkArrayData, int[][] ensembleData,
-			float maxTimeStep, int[] deviceForNetworkArrays, int numDevicesRequested);
+			int[][] projections, int[][] networkArrayData, int[][] ensembleData, 
+			int[] collectSpikes,float maxTimeStep, int[] deviceForNetworkArrays, 
+			int numDevicesRequested);
 
 	static native void nativeStep(float[][][] representedInput,
 			float[][][] representedOutput, float[][] spikes, float startTime,
@@ -163,7 +164,7 @@ public class NEFGPUInterface {
 			}
 		}
 		
-		myGPUEnsembles = GPUNodeList.toArray(new NEFEnsemble[0]);
+		myGPUEnsembles = GPUNodeList.toArray(new NEFEnsembleImpl[0]);
 
 		if (myGPUEnsembles.length == 0)
 			return;
@@ -183,7 +184,7 @@ public class NEFGPUInterface {
 		float[][] neuronData = new float[myGPUEnsembles.length][];
 		EnsembleData ensembleData = new EnsembleData();
 		int[][] ensembleDataArray = new int[myGPUEnsembles.length][];
-		boolean[] collectSpikes = new boolean[myGPUEnsembles.length];
+		int[] collectSpikes = new int[myGPUEnsembles.length];
 		float maxTimeStep = ((LIFSpikeGenerator) ((SpikingNeuron) ((NEFEnsembleImpl) myGPUEnsembles[0])
 				.getNodes()[0]).getGenerator()).getMaxTimeStep();
 
@@ -397,7 +398,7 @@ public class NEFGPUInterface {
 
 			neuronData[i] = ((NEFEnsembleImpl) workingNode).getStaticNeuronData();
 
-			collectSpikes[i] = workingNode.isCollectingSpikes();
+			collectSpikes[i] = workingNode.isCollectingSpikes() ? 1 : 0;
 			numEnsemblesCollectingSpikes++;
 
 			ensembleDataArray[i] = ensembleData.getAsArray();
@@ -405,8 +406,8 @@ public class NEFGPUInterface {
 		
 		nativeSetupRun(terminationTransforms, isDecodedTermination,
 				terminationTau, encoders, decoders, neuronData,
-				adjustedProjections, networkArrayDataArray, ensembleDataArray, 
-				maxTimeStep, nodeAssignments, myNumDevices);
+				adjustedProjections, networkArrayDataArray, ensembleDataArray,
+				collectSpikes, maxTimeStep, nodeAssignments, myNumDevices);
 
 		// Set up the data structures that we pass in and out of the native step call.
 		// They do not change in size from step to step so we can re-use them.
@@ -434,10 +435,9 @@ public class NEFGPUInterface {
 				representedOutputValues[i][j] = new float[networkArrayOrigins[j].getDimensions()];
 			}
 		}
-
-		int spikeIndex = 0;
+		
 		for (i = 0; i < myGPUEnsembles.length; i++) {
-			spikeOutput[spikeIndex++] = new float[((NEFEnsembleImpl) myGPUEnsembles[i]).getNeurons()];
+			spikeOutput[i] = new float[myGPUEnsembles[i].getNeurons()];
 		}
 	}
 	
@@ -481,7 +481,6 @@ public class NEFGPUInterface {
 	
 				
 				// Put data computed by GPU in the origins
-				int spikeIndex = 0;
 				Origin[] origins;
 				for (i = 0; i < myGPUNetworkArrays.length; i++) {
 	
@@ -500,19 +499,19 @@ public class NEFGPUInterface {
 								representedOutputValues[i][j].clone(),
 								Units.UNK, endTime));				
 					}
-					
-					/*
-					if (((NEFEnsembleImpl) myGPUNodes[i]).isCollectingSpikes()) {
-						((NEFEnsembleImpl) myGPUNodes[i]).setSpikePattern(spikeOutput[spikeIndex], endTime);
-					}
-					*/
-	
-					if(myGPUNetworkArrays[i] instanceof DecodableEnsembleImpl){
-						((DecodableEnsembleImpl) myGPUNetworkArrays[i]).setTime(endTime);
-					}else if(myGPUNetworkArrays[i] instanceof NetworkImpl){
-						((NetworkImpl) myGPUNetworkArrays[i]).setTime(endTime);
-					}
 				}
+				
+				
+				for(i = 0; i < myGPUEnsembles.length; i++){
+				    NEFEnsembleImpl currentEnsemble = myGPUEnsembles[i];
+				    
+				    currentEnsemble.setTime(endTime);
+				    
+				    if (currentEnsemble.isCollectingSpikes()) {
+				        currentEnsemble.setSpikePattern(spikeOutput[i], endTime);
+                    }
+				}
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

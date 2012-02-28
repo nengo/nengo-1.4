@@ -21,7 +21,7 @@ JNIEXPORT jint JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeGetNumDevic
  * Signature: ([[[[F[[I[[F[[[F[[[[F[[F[[I[[I[IF)V
  */
 JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
-  (JNIEnv *, jclass, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jfloat, jintArray, jint);
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jobjectArray, jintArray, jfloat, jintArray, jint);
 
 /*
  * Class:     ca_nengo_util_impl_NEFGPUInterface
