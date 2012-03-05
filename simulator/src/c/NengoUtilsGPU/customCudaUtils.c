@@ -4,7 +4,7 @@ extern "C"
 #endif
 
 #include <stdlib.h>
-#include <culapackdevice.h>
+#include <cula_lapack_device.h>
 #include <cuda_runtime.h>
 #include <cublas.h>
 

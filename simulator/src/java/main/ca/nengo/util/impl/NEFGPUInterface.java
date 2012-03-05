@@ -460,7 +460,7 @@ public class NEFGPUInterface {
 				int count, i, j;
 				float[] inputRow = new float[0];
 				Termination[] terminations;
-					
+				
 				// get the input data from the terminations
 				for (i = 0; i < myGPUNetworkArrays.length; i++) {
 					terminations = myGPUNetworkArrays[i].getTerminations();
@@ -512,10 +512,12 @@ public class NEFGPUInterface {
                     }
 				}
 				
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		
 	}
 	
 
@@ -549,6 +551,7 @@ public class NEFGPUInterface {
 		}
 		
 		MultiLevelKLNetworkPartitioner networkPartitioner = new MultiLevelKLNetworkPartitioner();
+		networkPartitioner.initialize(nodes, projections, numPartitions);
 		
 		return networkPartitioner.getPartitionsAsIntArray();
 	}

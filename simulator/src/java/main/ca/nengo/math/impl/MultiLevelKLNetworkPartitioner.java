@@ -57,6 +57,7 @@ public class MultiLevelKLNetworkPartitioner implements NetworkPartitioner {
 	public void initialize(Node[] nodes, Projection[] projections, int numPartitions) {
 		myNodes = nodes;
 		myGraph = convertNetworkToGraph(nodes, projections);
+		myNumPartitions = numPartitions;
 	}
 
 	public ArrayList<Set<Node>> getPartitions() {

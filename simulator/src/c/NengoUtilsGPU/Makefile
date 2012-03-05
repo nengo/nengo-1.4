@@ -1,8 +1,8 @@
 CUDA_INC_PATH=/usr/local/cuda/include
 CUDA_LIB_PATH=/usr/local/cuda/lib64
 
-CULA_INC_PATH=/home/e2crawfo/Nengo/simulator/src/c/NengoUtilsGPU/inc
-CULA_LIB_PATH=/home/e2crawfo/Nengo/simulator/src/c/NengoUtilsGPU/lib
+CULA_INC_PATH=/usr/local/cula/include
+CULA_LIB_PATH=/usr/local/cula/lib64
 
 JAVA_INC=/usr/lib/jvm/java-6-sun/include
 JAVA_INC_LINUX=/usr/lib/jvm/java-6-sun/include/linux

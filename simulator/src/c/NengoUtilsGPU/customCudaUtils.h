@@ -9,7 +9,7 @@ extern "C"
 
 #include<stdio.h>
 #include<cuda_runtime.h>
-#include<culapackdevice.h>
+#include<cula_lapack_device.h>
 
 int getGPUDeviceCount();
 float findExtremeFloatArray(float* A, int size, int onDevice, char type, int* index);
