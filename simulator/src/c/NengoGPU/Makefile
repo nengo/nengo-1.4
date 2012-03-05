@@ -22,10 +22,12 @@ all: CFLAGS+= -O3
 all: libNengoGPU.so 
 
 debug: CFLAGS+= -g -O0
+debug: CUDAFLAGS+= -g -G
+debug: SO_DEBUG=-g
 debug: libNengoGPU.so
 
 libNengoGPU.so: ${OBJ} 
-	${CC} -shared -Wl,-soname,libNengoGPU.so -o libNengoGPU.so.1.0 ${OBJ} ${LIBPATH} ${LIBS}
+	${CC} ${SO_DEBUG} -shared -Wl,-soname,libNengoGPU.so -o libNengoGPU.so.1.0 ${OBJ} ${LIBPATH} ${LIBS}
 
 NengoGPUData.o: NengoGPUData.h
 NengoGPU.o : NengoGPU.h NengoGPU_CUDA.h
