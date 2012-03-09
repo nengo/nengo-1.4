@@ -397,6 +397,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		}
 		return result;
 	}
+    
+    public void stopProbing(String stateName){
+	}
 
 	/**
 	 * Finds existing one-dimensional Origins by same name on the given Nodes, and groups

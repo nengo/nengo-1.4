@@ -4,28 +4,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ca.nengo.math.NetworkPartitioner;
 import ca.nengo.math.impl.MultiLevelKLNetworkPartitioner;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
+import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.Projection;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
-import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.impl.EnsembleTermination;
-import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
 import ca.nengo.model.impl.NetworkImpl.TerminationWrapper;
+import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.nef.NEFEnsemble;
-import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
-import ca.nengo.util.Memory;
 
 
 public class NEFGPUInterface {
@@ -44,6 +41,7 @@ public class NEFGPUInterface {
 	
 	protected NEFEnsembleImpl[] myGPUEnsembles;
 	protected Projection[] myGPUProjections;
+	protected Projection[] nonGPUProjections;
 	protected Node[] myGPUNetworkArrays;
 	
 	protected Node[] myNodes;
@@ -56,7 +54,6 @@ public class NEFGPUInterface {
 	float[][][] representedOutputValues;
 	float[][] spikeOutput;
 	boolean[][] inputOnGPU;
-	
 	
 	/**	Load the shared library that contains the native functions.
 	 * This is called just once, when this class is initially loaded.
@@ -89,8 +86,8 @@ public class NEFGPUInterface {
 			int[][] isDecodedTermination, float[][] terminationTau,
 			float[][][] encoders, float[][][][] decoders, float[][] neuronData,
 			int[][] projections, int[][] networkArrayData, int[][] ensembleData, 
-			int[] collectSpikes,float maxTimeStep, int[] deviceForNetworkArrays, 
-			int numDevicesRequested);
+			int[] collectSpikes, int[][] outputRequiredOnCPU, float maxTimeStep, 
+			int[] deviceForNetworkArrays, int numDevicesRequested);
 
 	static native void nativeStep(float[][][] representedInput,
 			float[][][] representedOutput, float[][] spikes, float startTime,
@@ -185,8 +182,11 @@ public class NEFGPUInterface {
 		EnsembleData ensembleData = new EnsembleData();
 		int[][] ensembleDataArray = new int[myGPUEnsembles.length][];
 		int[] collectSpikes = new int[myGPUEnsembles.length];
+		int[][] outputRequiredOnCPU = new int[myGPUNetworkArrays.length][];
 		float maxTimeStep = ((LIFSpikeGenerator) ((SpikingNeuron) ((NEFEnsembleImpl) myGPUEnsembles[0])
 				.getNodes()[0]).getGenerator()).getMaxTimeStep();
+		
+		
 
 		
 		// We put the list of projections in terms of the GPU nodes
@@ -196,7 +196,6 @@ public class NEFGPUInterface {
 		int[][] adjustedProjections = new int[myGPUProjections.length][6];
 		
 		
-		// Change this to be in terms of networkArrays
 		inputOnGPU = new boolean[myGPUNetworkArrays.length][];
 		
 		Node workingArray;
@@ -258,6 +257,7 @@ public class NEFGPUInterface {
 			networkArrayDataArray[i] = networkArrayData.getAsArray();
 			
 			inputOnGPU[i] = new boolean[networkArrayTerminations.length];
+			outputRequiredOnCPU[i] = new int[networkArrayOrigins.length];
 			
 			for(j = 0; j < networkArrayTerminations.length; j++){
 				Termination termination = networkArrayTerminations[j];
@@ -312,9 +312,28 @@ public class NEFGPUInterface {
 						adjustedProjections[k][1] = j;
 					}
 				}
+				
+				outputRequiredOnCPU[i][j] = origin.getRequiredOnCPU() ? 1 : 0;
+				
+				// even if its not explicitly required on the CPU, it might be implicitly
+				// if it is attached to a projection whose termination is on the CPU
+				if(outputRequiredOnCPU[i][j] == 0){
+    				for (k = 0; k < nonGPUProjections.length; k++) {
+    					Origin projectionOrigin = nonGPUProjections[k].getOrigin();
+                        boolean projectionOriginWrapped = projectionOrigin instanceof OriginWrapper;
+                        
+                        if(projectionOriginWrapped)
+                            projectionOrigin = ((OriginWrapper) projectionOrigin).getWrappedOrigin();
+                    
+                        if (origin == projectionOrigin){
+                            outputRequiredOnCPU[i][j] = 1;
+                        }
+    				}
+				}
 			}
 		}
 		
+		nonGPUProjections = null;
 		
 		// store NEFEnsemble data
 		for (i = 0; i < myGPUEnsembles.length; i++) {
@@ -407,7 +426,7 @@ public class NEFGPUInterface {
 		nativeSetupRun(terminationTransforms, isDecodedTermination,
 				terminationTau, encoders, decoders, neuronData,
 				adjustedProjections, networkArrayDataArray, ensembleDataArray,
-				collectSpikes, maxTimeStep, nodeAssignments, myNumDevices);
+				collectSpikes, outputRequiredOnCPU, maxTimeStep, nodeAssignments, myNumDevices);
 
 		// Set up the data structures that we pass in and out of the native step call.
 		// They do not change in size from step to step so we can re-use them.
@@ -432,12 +451,20 @@ public class NEFGPUInterface {
 			representedOutputValues[i] = new float[networkArrayOrigins.length][];
 
 			for (j = 0; j < networkArrayOrigins.length; j++) {
-				representedOutputValues[i][j] = new float[networkArrayOrigins[j].getDimensions()];
+				if(outputRequiredOnCPU[i][j] != 0){
+					representedOutputValues[i][j] = new float[networkArrayOrigins[j].getDimensions()];
+				}else{
+					representedOutputValues[i][j] = null;
+				}
 			}
 		}
 		
 		for (i = 0; i < myGPUEnsembles.length; i++) {
-			spikeOutput[i] = new float[myGPUEnsembles[i].getNeurons()];
+			if(collectSpikes[i] != 0){
+				spikeOutput[i] = new float[myGPUEnsembles[i].getNeurons()];
+			}else{
+				spikeOutput[i] = null;
+			}
 		}
 	}
 	
@@ -494,10 +521,12 @@ public class NEFGPUInterface {
 					count = origins.length;
 	
 					for (j = 0; j < count; j++) {
-						
-						origins[j].setValues(new RealOutputImpl(
-								representedOutputValues[i][j].clone(),
-								Units.UNK, endTime));				
+						float[] currentRepOutput = representedOutputValues[i][j];
+						if(currentRepOutput != null){
+							origins[j].setValues(new RealOutputImpl(
+									currentRepOutput,
+    								Units.UNK, endTime));
+						}
 					}
 				}
 				
@@ -507,9 +536,10 @@ public class NEFGPUInterface {
 				    
 				    currentEnsemble.setTime(endTime);
 				    
-				    if (currentEnsemble.isCollectingSpikes()) {
-				        currentEnsemble.setSpikePattern(spikeOutput[i], endTime);
-                    }
+				    float[] currentSpikeOutput = spikeOutput[i];
+				    if (currentSpikeOutput != null) {
+				        currentEnsemble.setSpikePattern(currentSpikeOutput, endTime);
+				    }
 				}
 				
 				
@@ -621,7 +651,8 @@ public class NEFGPUInterface {
 		}
 		
 		myGPUProjections = gpuProjectionsList.toArray(new Projection[0]);
-		return projectionList.toArray(new Projection[0]);
+		nonGPUProjections = projectionList.toArray(new Projection[0]);
+		return nonGPUProjections;
 		
 	}
 

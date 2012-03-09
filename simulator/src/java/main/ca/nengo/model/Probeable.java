@@ -63,5 +63,4 @@ public interface Probeable {
 	 * 		eg "membrane potential (mV)" 
 	 */
 	public Properties listStates();
-
 }

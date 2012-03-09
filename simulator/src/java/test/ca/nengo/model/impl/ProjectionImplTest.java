@@ -256,6 +256,13 @@ public class ProjectionImplTest extends TestCase {
 		public Node getNode() {
 			return null;
 		}
+		
+		public void setRequiredOnCPU(boolean val){
+		}
+		    
+		public boolean getRequiredOnCPU(){
+		    return false;
+		}
 
 		@Override
 		public Origin clone() throws CloneNotSupportedException {

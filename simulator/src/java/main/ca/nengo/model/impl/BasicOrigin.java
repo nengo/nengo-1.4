@@ -63,6 +63,7 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurabl
 	private Noise myNoise;
 	private Noise[] myNoises; //per output
 	private transient ConfigurationImpl myConfiguration;
+	private boolean myRequiredOnCPU;
 
 	/**
 	 * Dummy default, necessary for object "ArrayOrigin" in jython code
@@ -253,4 +254,11 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurabl
 		myValues = new RealOutputImpl(new float[myDimension], myUnits, 0);
 	}
 
+	public void setRequiredOnCPU(boolean val){
+	    myRequiredOnCPU = val;
+	}
+    
+    public boolean getRequiredOnCPU(){
+        return myRequiredOnCPU;
+    }
 }

@@ -52,6 +52,7 @@ public class EnsembleOrigin implements Origin {
 	private Node myNode;
 	private Origin[] myNodeOrigins;
 	private String myName;
+	private boolean myRequiredOnCPU;
 	
 	/**
 	 * @param node The parent Node
@@ -164,6 +165,13 @@ public class EnsembleOrigin implements Origin {
 		return new PreciseSpikeOutputImpl(values, units, origins[0].getValues().getTime());
 	}
 	
+	public void setRequiredOnCPU(boolean val){
+        myRequiredOnCPU = val;
+    }
+    
+    public boolean getRequiredOnCPU(){
+        return myRequiredOnCPU;
+    }
 	
 	
 	/**

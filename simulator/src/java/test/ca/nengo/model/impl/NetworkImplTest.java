@@ -484,6 +484,10 @@ public class NetworkImplTest extends TestCase {
 			throw new RuntimeException("not implemented");			
 		}
 
+		public void stopProbing(String stateName) {
+			throw new RuntimeException("not implemented");			
+		}
+		
 		/**
 		 * @see ca.nengo.util.VisiblyMutable#addChangeListener(ca.nengo.util.VisiblyMutable.Listener)
 		 */

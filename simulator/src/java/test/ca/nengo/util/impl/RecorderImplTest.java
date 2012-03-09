@@ -103,6 +103,5 @@ public class RecorderImplTest extends TestCase {
 			result.setProperty("x", "example state");
 			return result;
 		}
-		
 	}
 }

@@ -106,4 +106,6 @@ public interface Ensemble extends Node {
 	 * @param nodes New nodes to use
 	 */
 	public void redefineNodes(Node[] nodes);
+	
+	public void stopProbing(String stateName);
 }

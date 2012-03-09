@@ -86,6 +86,5 @@ public class ProbeableOriginTest extends TestCase {
 			result.setProperty("x", "example state");
 			return result;
 		}
-		
 	}
 }

@@ -611,7 +611,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
 		return result;
 	}
-
+	
 	/**
 	 * @see ca.nengo.model.Network#exposeOrigin(ca.nengo.model.Origin,
 	 *      java.lang.String)
@@ -855,6 +855,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			return (Origin) super.clone();
 		}
 
+		public void setRequiredOnCPU(boolean val){
+		    myWrapped.setRequiredOnCPU(val);
+		}
+		    
+		public boolean getRequiredOnCPU(){
+		   return myWrapped.getRequiredOnCPU();
+		}
 	}
 
 	/**

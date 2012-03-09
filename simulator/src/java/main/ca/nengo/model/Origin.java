@@ -71,6 +71,10 @@ public interface Origin extends Serializable, Cloneable {
 	 * @param Instantaneous output from this Origin.
 	 */
 	public void setValues(InstantaneousOutput val);
+	
+	public void setRequiredOnCPU(boolean val);
+	
+	public boolean getRequiredOnCPU();
 
 	/**
 	 * @return The Node to which the Origin belongs

@@ -333,7 +333,7 @@ public class ALIFSpikeGenerator implements SpikeGenerator, Probeable {
 		p.setProperty("rate", "Firing rate (only available in rate mode) (spikes/s)");
 		return p;
 	}
-
+    
 	@Override
 	public SpikeGenerator clone() throws CloneNotSupportedException {
 		ALIFSpikeGenerator result = (ALIFSpikeGenerator) super.clone();

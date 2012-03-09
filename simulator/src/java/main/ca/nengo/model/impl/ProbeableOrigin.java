@@ -84,6 +84,7 @@ public class ProbeableOrigin implements Origin {
 	private int myDimension;
 	private String myName;
 	private Units myUnits;
+	private boolean myRequiredOnCPU;
 	
 	/**
 	 * @param node The parent node
@@ -150,10 +151,17 @@ public class ProbeableOrigin implements Origin {
 	public Node getNode() {
 		return myNode;
 	}
+	
+	public void setRequiredOnCPU(boolean val){
+        myRequiredOnCPU = val;
+    }
+    
+    public boolean getRequiredOnCPU(){
+        return myRequiredOnCPU;
+    }
 
 	@Override
 	public Origin clone() throws CloneNotSupportedException {
 		return (Origin) super.clone();
 	}
-	
 }

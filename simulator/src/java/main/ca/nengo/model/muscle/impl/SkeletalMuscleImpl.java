@@ -245,7 +245,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 
 		return result;
 	}
-
+	
 	/**
 	 * @see ca.nengo.model.Node#getDocumentation()
 	 */

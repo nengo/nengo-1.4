@@ -52,6 +52,7 @@ public class SpikeGeneratorOrigin implements Origin {
     private Node myNode;
     private SpikeGenerator myGenerator;
     private InstantaneousOutput myOutput;
+    private boolean myRequiredOnCPU;
 
     /**
      * @param node The parent Node
@@ -140,6 +141,14 @@ public class SpikeGeneratorOrigin implements Origin {
         SpikeGeneratorOrigin result = (SpikeGeneratorOrigin) super.clone();
         result.myOutput = myOutput.clone();
         return result;
+    }
+    
+    public void setRequiredOnCPU(boolean val){
+        myRequiredOnCPU = val;
+    }
+    
+    public boolean getRequiredOnCPU(){
+        return myRequiredOnCPU;
     }
 
 }

@@ -177,7 +177,7 @@ public class GruberSpikeGenerator implements SpikeGenerator, Probeable {
 		p.setProperty(MEMBRANE_POTENTIAL, "Membrane potential (mV)");
 		return p;
 	}
-
+	
 	/**
 	 * @see ca.nengo.model.SimulationMode.ModeConfigurable#getMode()
 	 */

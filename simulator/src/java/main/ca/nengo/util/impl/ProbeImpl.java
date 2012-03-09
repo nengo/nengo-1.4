@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.nengo.model.Node;
+import ca.nengo.model.Origin;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.Units;
@@ -191,5 +192,4 @@ public class ProbeImpl implements Probe, java.io.Serializable {
 	public String getEnsembleName() {
 		return myEnsembleName;
 	}
-	
 }

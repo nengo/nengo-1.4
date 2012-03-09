@@ -88,6 +88,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private Integrator myIntegrator;
 	private float[] mySTPHistory;
 	private float myTime;
+	private boolean myRequiredOnCPU;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings.
@@ -541,4 +542,12 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myNodes=nodes;
 		rebuildDecoder(approximator);
 	}
+	
+	public void setRequiredOnCPU(boolean val){
+        myRequiredOnCPU = val;
+    }
+    
+    public boolean getRequiredOnCPU(){
+        return myRequiredOnCPU;
+    }
 }

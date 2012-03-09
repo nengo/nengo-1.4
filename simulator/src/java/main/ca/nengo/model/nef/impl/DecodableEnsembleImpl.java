@@ -491,6 +491,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 		DecodedTermination t = myDecodedTerminations.get(stateName);
 
 		if (origin != null) {
+		    origin.setRequiredOnCPU(true);
 			float[] vals = ((RealOutput) origin.getValues()).getValues();
 			Units[] units = new Units[vals.length];
 			for (int i = 0; i < vals.length; i++) {
@@ -536,6 +537,14 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 		return result;
 	}
 
+	public void stopProbing(String stateName){
+		Origin origin = myDecodedOrigins.get(stateName);
+		
+		if (origin != null) {
+		    origin.setRequiredOnCPU(false);
+		}
+	}
+	
 	@Override
 	public DecodableEnsemble clone() throws CloneNotSupportedException {
 		DecodableEnsembleImpl result = (DecodableEnsembleImpl) super.clone();

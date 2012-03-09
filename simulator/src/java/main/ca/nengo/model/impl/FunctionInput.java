@@ -201,7 +201,7 @@ public class FunctionInput implements Node, Probeable {
 		result.setProperty(STATE_NAME, "Function of time");
 		return result;
 	}
-
+	
 	/**
 	 * @see ca.nengo.model.Node#getOrigin(java.lang.String)
 	 */
