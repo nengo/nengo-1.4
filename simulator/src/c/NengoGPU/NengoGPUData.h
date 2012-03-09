@@ -76,8 +76,8 @@ floatArray* newFloatArray(int size, const char* name);
 void freeFloatArray(floatArray* a);
 floatArray* newFloatArrayOnDevice(int size, const char* name);
 
-void checkBounds(char* name, int size, int index);
-void checkLocation(char* name, int onDevice, int size, int index);
+void checkBounds(char* verb, char* name, int size, int index);
+void checkLocation(char* verb, char* name, int onDevice, int size, int index);
 
 void intArraySetElement(intArray* a, int index, int value);
 void floatArraySetElement(floatArray* a, int index, float value);
@@ -165,7 +165,6 @@ struct NengoGPUData_t{
   int CPUInputSize;
   int JavaInputSize;
   int offsetInSharedInput;
-  int CPUOutputSize;
   int numSpikesToSendBack;
   int numSpikeEnsembles;
 
@@ -182,9 +181,21 @@ struct NengoGPUData_t{
   int maxNumNeurons;
   int maxOriginDimension;
 
+  // amount of output that stays on the GPU
+  int GPUOutputSize;
+
+  // amount of output that has to go back to the java side
+  int JavaOutputSize;
+
+  // amount of output from this GPU that has to go to another GPU.
+  int interGPUOutputSize;
+
+  // totalOutputSize - GPUOutputSize
+  int CPUOutputSize;
+
   // network-array-specific arrays
-  intArray* networkArrayOutputReorganizer;
   intArray* networkArrayIndexInJavaArray;
+  intArray* ensembleIndexInJavaArray;
 
   floatArray* input;
   intArray* terminationOffsetInInput;
@@ -195,11 +206,15 @@ struct NengoGPUData_t{
   intArray* inputDimension;
   floatArray* terminationOutput;
   intArray* terminationOutputIndexor;
+  intArray* ensembleNumTerminations;
 
-  floatArray* ensembleSums;
   floatArray* encoders;
-  floatArray* decoders;
+  intArray* ensembleOrderInEncoders;
   floatArray* encodeResult;
+  floatArray* ensembleSums;
+
+  floatArray* decoders;
+  intArray* ensembleOrderInDecoders;
 
   // data for calculating spikes
   floatArray* neuronVoltage;
@@ -226,7 +241,9 @@ struct NengoGPUData_t{
 
   floatArray* spikes;
 
+  floatArray* ensembleOutput;
   floatArray* output;
+  floatArray* outputHost;
 
   intArray* GPUTerminationToOriginMap;
   intArray* spikeMap;
@@ -239,20 +256,16 @@ struct NengoGPUData_t{
   intArray* NDterminationEnsembleOffset;
   floatArray* NDterminationEnsembleSums;
 
-  // arrays that are not transferred to the GPU
-  intArray* ensembleOrderInEncoders;
-  intArray* ensembleOrderInDecoders;
-  
-  floatArray* spikesHost;
-  floatArray* outputHost;
-
+  // for organizing the output in terms of ensembles
   intArray* ensembleOriginOffsetInOutput;
-  intArray* networkArrayOriginOffsetInOutput; 
-
   intArray* ensembleNumOrigins;
   intArray* ensembleOriginDimension;
-  intArray* ensembleNumTerminations;
-  intArray* ensembleIndexInJavaArray;
+
+  intArray* ensembleOutputToNetworkArrayOutputMap;
+
+  intArray* networkArrayOriginOffsetInOutput; 
+  intArray* networkArrayOriginDimension; 
+  intArray* networkArrayNumOrigins;
 
   intArray* sharedData_outputIndex;
   intArray* sharedData_sharedIndex;

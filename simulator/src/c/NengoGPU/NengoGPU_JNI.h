@@ -25,7 +25,7 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
 
 void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, int* ensembleData, NengoGPUData* currentData);
 
-void setupInput(int numProjections, projection* projections, NengoGPUData* currentData, int* networkArrayData);
+void setupIO(int numProjections, projection* projections, NengoGPUData* currentData, int* networkArrayData);
 
 void setupSpikes(int* collectSpikes, NengoGPUData* currentData);
 
