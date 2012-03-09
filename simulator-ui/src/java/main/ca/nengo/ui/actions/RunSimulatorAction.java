@@ -59,13 +59,12 @@ public class RunSimulatorAction extends StandardAction {
     private static final Property pShowDataViewer = new PBoolean(
             "Open data viewer after simulation");
     private static final Property pStartTime = new PFloat("Start time");
-
     private static final Property pStepSize = new PFloat("Step size");
-
+    
     private static final long serialVersionUID = 1L;
 
     private static final ConfigSchemaImpl zProperties = new ConfigSchemaImpl(new Property[] {
-            pStartTime, pStepSize, pEndTime, pShowDataViewer });
+            pStartTime, pStepSize, pEndTime, pShowDataViewer});
 
     private UINetwork uiNetwork;
 
@@ -105,9 +104,6 @@ public class RunSimulatorAction extends StandardAction {
         this.endTime = endTime;
         this.stepTime = stepTime;
         configured = true;
-
-
-
     }
 
     @Override
@@ -124,6 +120,7 @@ public class RunSimulatorAction extends StandardAction {
                 stepTime = (Float) properties.getValue(pStepSize);
                 showDataViewer = (Boolean) properties.getValue(pShowDataViewer);
             }
+            
             RunSimulatorActivity simulatorActivity = new RunSimulatorActivity(startTime, endTime,
                     stepTime, showDataViewer);
             simulatorActivity.doAction();
@@ -149,9 +146,7 @@ public class RunSimulatorAction extends StandardAction {
         private float endTime;
         private TrackedStatusMsg progressMsg;
         private boolean showDataViewer;
-
         private float startTime;
-
         private float stepTime;
 
         public RunSimulatorActivity(float startTime, float endTime, float stepTime,
@@ -170,6 +165,7 @@ public class RunSimulatorAction extends StandardAction {
 
                 simulator.resetNetwork(false, true);
                 simulator.addSimulatorListener(this);
+                
                 try {
                     simulator.run(startTime, endTime, stepTime);
                 } finally {

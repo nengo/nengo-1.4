@@ -33,6 +33,7 @@ import java.util.Collection;
 import javax.swing.JOptionPane;
 
 import ca.nengo.io.MatlabExporter;
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Probeable;
@@ -144,6 +145,12 @@ public class UIStateProbe extends UIProbe {
 		try {
 			getProbeParent().getNetworkParent().getSimulator().removeProbe(getModel());
 			getProbeParent().showPopupMessage("Probe removed from Simulator");
+			
+			Probe model = getModel();
+			if(model.isInEnsemble()){
+				Ensemble target = (Ensemble) model.getTarget();
+				target.stopProbing(model.getStateName());
+			}
 		} catch (SimulationException e) {
 			UserMessages.showError("Could not remove probe: " + e.getMessage());
 		}

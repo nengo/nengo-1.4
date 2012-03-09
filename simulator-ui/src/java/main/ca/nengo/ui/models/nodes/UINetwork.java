@@ -81,7 +81,6 @@ public class UINetwork extends UINodeViewable {
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run " + network.getName(), network));
 		menu.addAction(new RunInteractivePlotstAction(network));
-
 	}
 
 	/**

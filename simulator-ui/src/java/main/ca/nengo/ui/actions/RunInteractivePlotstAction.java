@@ -35,5 +35,6 @@ public class RunInteractivePlotstAction extends StandardAction {
         pi.exec("reload(timeview)");
         pi.exec("timeview.View(_interactive_network.model,ui=_interactive_network.viewerEnsured)");
         pi.exec("del _interactive_network");
+        
     }
 }
