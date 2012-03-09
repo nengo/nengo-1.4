@@ -50,6 +50,16 @@ class ArrayOrigin(BasicOrigin):
     def getNode(self):
         return self._parent
 
+    def getRequiredOnCPU(self):
+      for o in self._origins:
+        if o.getRequiredOnCPU():
+          return True;
+      return False;
+    
+    def setRequiredOnCPU(self, val):
+      for o in self._origins:
+        o.setRequiredOnCPU(val);
+
     def clone(self):
         return ArrayOrigin(self._parent,self._name,self._origins)
 
