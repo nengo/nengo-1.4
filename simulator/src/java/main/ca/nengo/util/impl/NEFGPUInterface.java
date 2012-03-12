@@ -480,6 +480,7 @@ public class NEFGPUInterface {
 		myStartTime = startTime;
 		myEndTime = endTime;
 
+		
 		if(myGPUEnsembles.length > 0){
 		
 			try {
@@ -547,6 +548,7 @@ public class NEFGPUInterface {
 				e.printStackTrace();
 			}
 		}
+		
 		
 	}
 	

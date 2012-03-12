@@ -30,6 +30,7 @@ package ca.nengo.util;
 
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
+import ca.nengo.util.impl.ProbeTask;
 
 /**
  * Reads state variables from Probeable objects (eg membrane potential from a Neuron).
@@ -111,4 +112,8 @@ public interface Probe {
 	 */
 	public String getEnsembleName();
 	
+	/**
+	 * @return The probe task that is runs this probe. 
+	 */
+	public ProbeTask getProbeTask();
 }

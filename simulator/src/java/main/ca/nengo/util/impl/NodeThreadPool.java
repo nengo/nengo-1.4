@@ -93,8 +93,8 @@ public class NodeThreadPool {
 	protected NodeThreadPool(){
 	}
 	
-	public NodeThreadPool(Network network){
-		initialize(network);
+	public NodeThreadPool(Network network, List<ThreadTask> threadTasks){
+		initialize(network, threadTasks);
 	}
 	
 	/**
@@ -110,17 +110,22 @@ public class NodeThreadPool {
 	 * 
 	 * @author Eric Crawford
 	 */
-	protected void initialize(Network network){
+	protected void initialize(Network network, List<ThreadTask> threadTasks){
 		
 		myLock = new Object();
 		
 		Node[] nodes = network.getNodes();
 		Projection[] projections = network.getProjections();
 		
-		myNodes = collectNodes(nodes, false);
-		myProjections = collectProjections(nodes, projections);
-		myTasks = collectTasks(nodes);
+		List<Node> nodeList = collectNodes(nodes, false);
+		List<Projection> projList = collectProjections(nodes, projections);
+		List<ThreadTask> taskList = collectTasks(nodes);
+		taskList.addAll(threadTasks);
 		
+		myNodes = nodeList.toArray(new Node[0]);
+		myProjections = projList.toArray(new Projection[0]);
+		myTasks = taskList.toArray(new ThreadTask[0]);
+
 		// set the run configuration for the current run.
 		NEFGPUInterface.setRequestedNumDevices(network.getCountGPU());
 		setNumJavaThreads(network.getCountJavaThreads());
@@ -162,7 +167,7 @@ public class NodeThreadPool {
 		//In the remaining nodes (non-GPU nodes), DO break down the NetworkArrays, we don't want to call the 
 		// "run" method of nodes which are members of classes which derive from the NetworkImpl class since 
 		// NetworkImpls create their own LocalSimulators when run.
-		myNodes = collectNodes(myNodes, true);
+		myNodes = collectNodes(myNodes, true).toArray(new Node[0]);
 
 		int nodesPerJavaThread = (int) Math.ceil((float) myNodes.length / (float) myNumJavaThreads);
 		int projectionsPerJavaThread = (int) Math.ceil((float) myProjections.length / (float) myNumJavaThreads);
@@ -220,6 +225,7 @@ public class NodeThreadPool {
 	public void step(float startTime, float endTime){
 		myStartTime = startTime;
 		myEndTime = endTime;
+		
 		
 		long stepInterval = myCollectTimings ? new Date().getTime() : 0;
 		
@@ -345,7 +351,7 @@ public class NodeThreadPool {
      * 
      * @author Eric Crawford
      */
-    public static Node[] collectNodes(Node[] startingNodes, boolean breakDownNetworkArrays){
+    public static List<Node> collectNodes(Node[] startingNodes, boolean breakDownNetworkArrays){
 
         ArrayList<Node> nodes = new ArrayList<Node>();
 
@@ -390,7 +396,7 @@ public class NodeThreadPool {
             } 
         }
 
-        return nodes.toArray(new Node[0]);
+        return nodes;
     }
     
 
@@ -400,7 +406,7 @@ public class NodeThreadPool {
      * 
      * @author Eric Crawford
      */
-    public static Projection[] collectProjections(Node[] startingNodes, Projection[] startingProjections){
+    public static List<Projection> collectProjections(Node[] startingNodes, Projection[] startingProjections){
 
         ArrayList<Projection> projections = new ArrayList<Projection>(Arrays.asList(startingProjections));
 
@@ -423,7 +429,7 @@ public class NodeThreadPool {
             }
         }
 
-        return projections.toArray(new Projection[0]);
+        return projections;
     }
 
     /**
@@ -432,7 +438,7 @@ public class NodeThreadPool {
      * 
      * @author Eric Crawford
      */
-    public static ThreadTask[] collectTasks(Node[] startingNodes){
+    public static List<ThreadTask> collectTasks(Node[] startingNodes){
 
         ArrayList<ThreadTask> tasks = new ArrayList<ThreadTask>();
 
@@ -458,6 +464,6 @@ public class NodeThreadPool {
             }
         }
 
-        return tasks.toArray(new ThreadTask[0]);
+        return tasks;
     }
 }

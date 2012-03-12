@@ -566,7 +566,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * Only relevant if this is a top level network.
 	 */
 	public void setCountGPU(int numGPU) {
-		this.myNumGPU = numGPU;
+		this.myNumGPU = numGPU >= 0 ? numGPU : 0;
 	}
 
 	/**
@@ -582,7 +582,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * Only relevant if this is a top level network.
 	 */
 	public void setCountJavaThreads(int numJavaThreads) {
-		this.myNumJavaThreads = numJavaThreads;
+		this.myNumJavaThreads = numJavaThreads > 0 ? numJavaThreads : 1;
 	}
 
 	/**

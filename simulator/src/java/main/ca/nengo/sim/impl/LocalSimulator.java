@@ -54,6 +54,7 @@ import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
+import ca.nengo.util.impl.ProbeTask;
 
 /**
  * A Simulator that runs locally (ie in the Java Virtual Machine in which it is
@@ -67,6 +68,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     private Projection[] myProjections;
     private Node[] myNodes;
     private ThreadTask[] myTasks;
+    private List<ThreadTask> myProbeTasks;
     private Map<String, Node> myNodeMap;
     private List<Probe> myProbes;
     private Network myNetwork;
@@ -103,8 +105,12 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         if (myProbes == null) {
             myProbes = new ArrayList<Probe>(20);
         }
+        
+        if(myProbeTasks == null){
+        	myProbeTasks = new ArrayList<ThreadTask>(20);
+        }
 
-        //myTasks = collectTasks(myNodes);
+        myTasks = NodeThreadPool.collectTasks(myNodes).toArray(new ThreadTask[0]);
     }
 
     /**
@@ -141,7 +147,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     	
     	 myNodeThreadPool = null;
          if(myNetwork.getCountJavaThreads() > 0){
-         	myNodeThreadPool = new NodeThreadPool(myNetwork);
+         	myNodeThreadPool = new NodeThreadPool(myNetwork, myProbeTasks);
          }
 
         //		float pre_time = System.nanoTime();
@@ -225,15 +231,15 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
                 }
             }
 
-            /*
+            
             for (ThreadTask myTask : myTasks) {
                 myTask.run(startTime, endTime);
-            }*/
-        }
-
-        Iterator<Probe> it = myProbes.iterator();
-        while (it.hasNext()) {
-            it.next().collect(endTime);
+            }
+            
+            Iterator<Probe> it = myProbes.iterator();
+            while (it.hasNext()) {
+                it.next().collect(endTime);
+            }
         }
     }
 
@@ -298,7 +304,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
         Probe result = new ProbeImpl();
         result.connect(ensembleName, target, state, record);
-
+        
+        myProbeTasks.add(result.getProbeTask());
         myProbes.add(result);
 
         fireVisibleChangeEvent();
@@ -312,6 +319,11 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         if (!myProbes.remove(probe)) {
             throw new SimulationException("Probe could not be removed");
         }
+        
+        if (!myProbeTasks.remove(probe.getProbeTask())) {
+            throw new SimulationException("Probe could not be removed");
+        }
+        
         fireVisibleChangeEvent();
     }
 

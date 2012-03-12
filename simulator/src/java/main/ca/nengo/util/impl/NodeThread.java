@@ -84,6 +84,7 @@ public class NodeThread extends Thread {
 	}
 	
 	protected void runNodes(float startTime, float endTime) throws SimulationException{
+		
 		for (int i = myStartIndexInNodes; i < myEndIndexInNodes; i++) {
 			myNodes[i].run(startTime, endTime);
 		}

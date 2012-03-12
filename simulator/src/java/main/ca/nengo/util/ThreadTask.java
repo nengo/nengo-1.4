@@ -1,22 +1,16 @@
 package ca.nengo.util;
 
-import ca.nengo.model.Node;
 import ca.nengo.model.Resettable;
 import ca.nengo.model.SimulationException;
 
 /**
  * Any task in a Network that can be run independently but belongs to a specific part of the Network.
- * Provides a way for nodes in a network that normally run on one thread to run specific parts
+ * Provides a way for objects in a network that normally run on one thread to run specific parts
  * in multiple threads (eg a Non-Decoded Termination adjusting the weight for every neuron)
  *
  * @author Jonathan Lai
  */
 public interface ThreadTask extends Resettable, Cloneable {
-
-    /**
-     * @return The node this task belongs to
-     */
-    public Node getParent();
 
     /**
      * @return If the task has finished running

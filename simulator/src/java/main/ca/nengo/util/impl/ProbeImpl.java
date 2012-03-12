@@ -52,6 +52,7 @@ public class ProbeImpl implements Probe, java.io.Serializable {
 	private float mySamplingPeriod = -1;
 	private float myLastSampleTime = -100000;
 	private String myEnsembleName = null;
+	private ProbeTask myProbeTask;
 
 	/**
 	 * @see ca.nengo.util.Probe#connect(java.lang.String, ca.nengo.model.Probeable, java.lang.String, boolean)
@@ -62,11 +63,13 @@ public class ProbeImpl implements Probe, java.io.Serializable {
 		myTarget = target;
 		myStateName = stateName;
 		myRecord = record;
-		
+
 		//if the state is bad, we want to throw an exception now
 		myTarget.getHistory(myStateName);  
 
 		reset();
+		
+		myProbeTask = new ProbeTask(target, this);
 	}
 
 	/**
@@ -191,5 +194,12 @@ public class ProbeImpl implements Probe, java.io.Serializable {
 	 */
 	public String getEnsembleName() {
 		return myEnsembleName;
+	}
+
+	/**
+	 * @see ca.nengo.util.Probe#getProbeTask()
+	 */
+	public ProbeTask getProbeTask(){
+		return myProbeTask;
 	}
 }
