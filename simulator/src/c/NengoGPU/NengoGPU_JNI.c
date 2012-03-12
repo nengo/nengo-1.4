@@ -876,6 +876,7 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
     naOffsetInEnsembleOriginIndices += numOrigins * (endEnsembleIndex - startEnsembleIndex);
   }
 
+
   // Use the flattened projections to create a map from the input to the output following the projections
   // This way we can launch a kernel for each projection on the GPU, have it look up where it gets its output from
   // fetch it from the output array and put it in the input array
@@ -899,13 +900,15 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
     else if(projections[i].sourceDevice == currentData->device && projections[i].destDevice != currentData->device)
     {
       originIndexOnDevice = flattenedProjections[i * 2 + 1];
-      projections[i].offsetInSource = intArrayGetElement(currentData->networkArrayOriginOffsetInOutput - currentData->GPUOutputSize, originIndexOnDevice);
+      projections[i].offsetInSource = intArrayGetElement(currentData->networkArrayOriginOffsetInOutput, originIndexOnDevice) - currentData->GPUOutputSize;
     }
     else if(projections[i].destDevice == currentData->device && projections[i].sourceDevice != currentData->device)
     {
+
       terminationIndexOnDevice = flattenedProjections[i * 2];
       projections[i].offsetInDestination = intArrayGetElement(currentData->terminationOffsetInInput, terminationIndexOnDevice) - currentData->GPUInputSize + currentData->offsetInSharedInput;
     }
+    
   }
 
   free(flattenedProjections);
@@ -1247,8 +1250,6 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
   for( i = 0; i < numDevices; i++)
   {
     currentData = nengoDataArray[i];
-
-    //printf("GPUOutputSize: %d, JavaOutputSize: %d, CPUOutputSize: %d, interGPUOutputSize: %d, numSpikesToSendBack: %d\n", currentData->GPUOutputSize, currentData->JavaOutputSize, currentData->CPUOutputSize, currentData->interGPUOutputSize, currentData->numSpikesToSendBack); 
 
     inputIndex = 0;
 
