@@ -17,7 +17,7 @@ class Simulator:
         self.initialize(network)
 
         if network.getCountJavaThreads() > 0:
-            self.thread_pool=NodeThreadPool(network);
+            self.thread_pool=NodeThreadPool(network,[]);
         else:
             self.thread_pool=None;
 
