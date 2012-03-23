@@ -994,12 +994,12 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
 
   int i, j, k;
   
-  nengoDataArray = (NengoGPUData**) malloc(sizeof(NengoGPUData*) * numDevices);
-
   int numAvailableDevices = getGPUDeviceCount();
   numDevices = numDevicesRequested;
 
   printf("Using %d devices. %d available\n", numDevices, numAvailableDevices);
+
+  nengoDataArray = (NengoGPUData**) malloc(sizeof(NengoGPUData*) * numDevices);
 
   totalNumEnsembles = (int) (*env)->GetArrayLength(env, neuronData_JAVA);
   totalNumNetworkArrays = (int)(*env)->GetArrayLength(env, networkArrayData_JAVA);
