@@ -8,6 +8,11 @@ import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
 import ca.nengo.util.ThreadTask;
 
+/**
+ * A thread for running projections, nodes and tasks in. Projections are all runs before nodes, nodes before tasks.
+ *
+ * @author Eric Crawford
+ */
 public class NodeThread extends Thread {
 
 	private NodeThreadPool myNodeThreadPool;
@@ -77,20 +82,25 @@ public class NodeThread extends Thread {
 
 	// might have to make these protected?
 	protected void runProjections(float startTime, float endTime) throws SimulationException{
+		
 		for (int i = myStartIndexInProjections; i < myEndIndexInProjections; i++) {
 			InstantaneousOutput values = myProjections[i].getOrigin().getValues();
 			myProjections[i].getTermination().setValues(values);
 		}
+		
 	}
 	
 	protected void runNodes(float startTime, float endTime) throws SimulationException{
 		
+		
 		for (int i = myStartIndexInNodes; i < myEndIndexInNodes; i++) {
 			myNodes[i].run(startTime, endTime);
 		}
+		
 	}
 	
 	protected void runTasks(float startTime, float endTime) throws SimulationException {
+		
 		for (int i = myStartIndexInTasks; i < myEndIndexInTasks; i++) {
             myTasks[i].run(startTime, endTime);
         }

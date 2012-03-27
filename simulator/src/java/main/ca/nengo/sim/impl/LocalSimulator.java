@@ -146,9 +146,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
             throws SimulationException {
     	
     	 myNodeThreadPool = null;
-         if(myNetwork.getCountJavaThreads() > 0){
-         	myNodeThreadPool = new NodeThreadPool(myNetwork, myProbeTasks);
-         }
+         myNodeThreadPool = new NodeThreadPool(myNetwork, myProbeTasks);
 
         //		float pre_time = System.nanoTime();
 

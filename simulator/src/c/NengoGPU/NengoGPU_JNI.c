@@ -78,6 +78,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
   int* isDecodedTermination  = (int*)malloc(currentData->numTerminations * sizeof(int));
   
   int ensembleIndexInJavaArray = 0, NDterminationIndex = 0, transformRowIndex = 0, dimensionIndex = 0;
+  int NDterminationIndexInEnsemble = 0;
   int startEnsembleIndex, endEnsembleIndex, networkArrayIndexInJavaArray, networkArrayOffsetInTerminations = 0;
   int networkArrayTerminationIndex = 0;
 
@@ -116,6 +117,8 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
       tempIntArray_JAVA = (jintArray)(*env)->GetObjectArrayElement(env, isDecodedTermination_JAVA, ensembleIndexInJavaArray);
       (*env)->GetIntArrayRegion(env, tempIntArray_JAVA, 0, numTerminationsForCurrentEnsemble, isDecodedTermination);
       (*env)->DeleteLocalRef(env, tempIntArray_JAVA);
+
+      NDterminationIndexInEnsemble = 0;
 
       // loop through the terminations for the current ensemble and store the relevant data
       dimensionOfCurrentEnsemble = 0;
@@ -161,13 +164,18 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
           currentTransform_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, transformsForCurrentEnsemble_JAVA, j);
           currentTransformRow_JAVA = (jfloatArray)(*env)->GetObjectArrayElement(env, currentTransform_JAVA, 0);
 
-          (*env)->GetFloatArrayRegion(env, currentTransformRow_JAVA, 0, 1, currentTransformRow);
+          dimensionOfCurrentTermination = (*env)->GetArrayLength(env, currentTransformRow_JAVA);
 
-          floatArraySetElement(currentData->NDterminationWeights, NDterminationIndex, currentTransformRow[0]);
+          (*env)->GetFloatArrayRegion(env, currentTransformRow_JAVA, 0, dimensionOfCurrentTermination, currentTransformRow);
+
+          for(l = 0; l < dimensionOfCurrentTermination; l++)
+          {
+            floatArraySetElement(currentData->NDterminationWeights, l * currentData->numEnsembles + NDterminationIndexInEnsemble++, currentTransformRow[l]); 
+          }
 
           if(i == startEnsembleIndex)
           {
-            intArraySetElement(currentData->inputDimension, networkArrayTerminationIndex, 1);
+            intArraySetElement(currentData->inputDimension, networkArrayTerminationIndex, dimensionOfCurrentTermination);
             networkArrayTerminationIndex++;
           }
 
@@ -547,6 +555,11 @@ void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, in
     if(ensembleData[NENGO_ENSEMBLE_DATA_NUM * i + NENGO_ENSEMBLE_DATA_MAX_TRANSFORM_DIMENSION] > currentData->maxDecodedTerminationDimension)
     {
       currentData->maxDecodedTerminationDimension = ensembleData[NENGO_ENSEMBLE_DATA_NUM * i + NENGO_ENSEMBLE_DATA_MAX_TRANSFORM_DIMENSION];
+    }
+
+    if(ensembleData[NENGO_ENSEMBLE_DATA_NUM * i + NENGO_ENSEMBLE_DATA_MAX_ND_TRANSFORM_SIZE] > currentData->maxEnsembleNDTransformSize)
+    {
+      currentData->maxEnsembleNDTransformSize = ensembleData[NENGO_ENSEMBLE_DATA_NUM * i + NENGO_ENSEMBLE_DATA_MAX_ND_TRANSFORM_SIZE];
     }
     
     currentData->totalEncoderSize += ensembleData[NENGO_ENSEMBLE_DATA_NUM * i + NENGO_ENSEMBLE_DATA_NUM_NEURONS] * ensembleData[NENGO_ENSEMBLE_DATA_NUM * i + NENGO_ENSEMBLE_DATA_DIMENSION];
@@ -1143,6 +1156,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
 
     currentData->numTerminations = currentData->numDecodedTerminations + currentData->numNDterminations;
     currentData->totalTransformSize = currentData->maxDecodedTerminationDimension * currentData->totalNumTransformRows;
+    currentData->totalNonDecodedTransformSize = currentData->maxEnsembleNDTransformSize * currentData->numEnsembles;
 
     initializeNengoGPUData(currentData);
     

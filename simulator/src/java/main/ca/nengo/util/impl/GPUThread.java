@@ -6,6 +6,11 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.util.ThreadTask;
 import ca.nengo.util.impl.NEFGPUInterface;
 
+/**
+ * A thread which uses an NEFGPUInterface to run GPU nodes and projections.
+ *
+ * @author Eric Crawford
+ */
 public class GPUThread extends NodeThread {
 
 	NEFGPUInterface myNEFGPUInterface;
@@ -20,7 +25,6 @@ public class GPUThread extends NodeThread {
 	}
 	
 	protected void runNodes(float startTime, float endTime) throws SimulationException{
-		//System.out.println("in runNodes GPUThread");
 		
 		myNEFGPUInterface.step(startTime, endTime);
 	}

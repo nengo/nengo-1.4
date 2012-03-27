@@ -25,6 +25,8 @@ enum EnsembleDataIndex_enum
 
   NENGO_ENSEMBLE_DATA_NUM_DECODED_TERMINATIONS,
   NENGO_ENSEMBLE_DATA_NUM_NON_DECODED_TERMINATIONS,
+
+  NENGO_ENSEMBLE_DATA_MAX_ND_TRANSFORM_SIZE,
   
   NENGO_ENSEMBLE_DATA_NUM
 };
@@ -170,6 +172,7 @@ struct NengoGPUData_t{
 
   int totalTransformSize;
   int totalNumTransformRows;
+  int totalNonDecodedTransformSize;
   int totalEnsembleDimension;
   int totalEncoderSize;
   int totalDecoderSize;
@@ -180,6 +183,7 @@ struct NengoGPUData_t{
   int maxDimension;
   int maxNumNeurons;
   int maxOriginDimension;
+  int maxEnsembleNDTransformSize;
 
   // amount of output that stays on the GPU
   int GPUOutputSize;

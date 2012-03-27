@@ -5,6 +5,11 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.util.Probe;
 import ca.nengo.util.ThreadTask;
 
+/**
+ * Implementation of a ThreadTask to multithread collection of data by probes. 
+ * 
+ * @author Eric Crawford
+ */
 public class ProbeTask implements ThreadTask {
 	
 	private final Probe myProbe;

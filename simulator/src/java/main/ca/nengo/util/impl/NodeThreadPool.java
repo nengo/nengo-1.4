@@ -125,17 +125,13 @@ public class NodeThreadPool {
 		myNodes = nodeList.toArray(new Node[0]);
 		myProjections = projList.toArray(new Projection[0]);
 		myTasks = taskList.toArray(new ThreadTask[0]);
-
-		// set the run configuration for the current run.
-		NEFGPUInterface.setRequestedNumDevices(network.getCountGPU());
-		setNumJavaThreads(network.getCountJavaThreads());
 		
 		threadsRunning = false;
 		runFinished = false;
 		
-		int requestedNumDevices = NEFGPUInterface.getRequestedNumDevices();
+		boolean useGPU = NEFGPUInterface.getUseGPU();
 		
-		if(requestedNumDevices > 0){
+		if(useGPU){
 			myNumThreads = myNumJavaThreads + 1;
 	    }else{
 	    	myNumThreads = myNumJavaThreads;
@@ -143,25 +139,25 @@ public class NodeThreadPool {
 		
 		myThreads = new NodeThread[myNumThreads];
 		
-		if(NEFGPUInterface.getUseGPU()){ 
-				GPUThread gpuThread = new GPUThread(this);
-				
-				// The NEFGPUInterface removes from myNodes ensembles that are to be run on the GPU and returns the rest.
-				myNodes = gpuThread.getNEFGPUInterface().takeGPUNodes(myNodes);
-				
-				// The NEFGPUInterface removes from myProjections projections that are to be run on the GPU and returns the rest.
-				myProjections = gpuThread.getNEFGPUInterface().takeGPUProjections(myProjections);
-				
-				gpuThread.getNEFGPUInterface().initialize();
-				
-				
-				gpuThread.setCollectTimings(myCollectTimings);
-				gpuThread.setName("GPUThread0");
-				
-				myThreads[myNumJavaThreads] = gpuThread;
-				
-				gpuThread.setPriority(Thread.MAX_PRIORITY);
-				gpuThread.start();
+		if(useGPU){ 
+			GPUThread gpuThread = new GPUThread(this);
+			
+			// The NEFGPUInterface removes from myNodes ensembles that are to be run on the GPU and returns the rest.
+			myNodes = gpuThread.getNEFGPUInterface().takeGPUNodes(myNodes);
+			
+			// The NEFGPUInterface removes from myProjections projections that are to be run on the GPU and returns the rest.
+			myProjections = gpuThread.getNEFGPUInterface().takeGPUProjections(myProjections);
+			
+			gpuThread.getNEFGPUInterface().initialize();
+			
+			
+			gpuThread.setCollectTimings(myCollectTimings);
+			gpuThread.setName("GPUThread0");
+			
+			myThreads[myNumJavaThreads] = gpuThread;
+			
+			gpuThread.setPriority(Thread.MAX_PRIORITY);
+			gpuThread.start();
 		}
 		
 		//In the remaining nodes (non-GPU nodes), DO break down the NetworkArrays, we don't want to call the 
@@ -217,8 +213,8 @@ public class NodeThreadPool {
 	/**
 	 * Tell the threads in the current thread pool to take a step. The step consists of three
 	 * phases: projections, nodes, tasks. All threads must complete a stage before any thread begins
-	 * the next stage, so all threads must finish processing all of their projections before any 
-	 * thread starts processing its nodes, etc.
+	 * the next stage, so, for example, all threads must finish processing all of their projections 
+	 * before any thread starts processing its nodes.
 	 * 
 	 * @author Eric Crawford
 	 */
@@ -234,13 +230,13 @@ public class NodeThreadPool {
 			int oldPriority = Thread.currentThread().getPriority();
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
-			// start the projection processing
+			// start the projection processing, wait for it to finish
 			startThreads();
 
-			// start the node processing
+			// start the node processing, wait for it to finish
 			startThreads();
 
-			// start the task processing
+			// start the task processing, wait for it to finish
 			startThreads();
 
 			Thread.currentThread().setPriority(oldPriority);

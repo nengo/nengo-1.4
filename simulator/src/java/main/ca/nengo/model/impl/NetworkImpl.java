@@ -552,38 +552,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public boolean getUseGPU(){
 		return myUseGPU && myMode == SimulationMode.DEFAULT;
 	}
-	
-	/**
-	 * @return Number of GPUs to use if running this network on the GPU.
-	 * Only relevant if this is a top level network.
-	 */
-	public int getCountGPU() {
-		return myNumGPU;
-	}
-
-	/**
-	 * @param numGPU Number of GPUs to use if running this network on the GPU.
-	 * Only relevant if this is a top level network.
-	 */
-	public void setCountGPU(int numGPU) {
-		this.myNumGPU = numGPU >= 0 ? numGPU : 0;
-	}
-
-	/**
-	 * @return Number of Java threads to use for running this network.
-	 * Only relevant if this is a top level network.
-	 */
-	public int getCountJavaThreads() {
-		return myNumJavaThreads;
-	}
-
-	/**	
-	 * @param Number of Java threads to use for running this network.
-	 * Only relevant if this is a top level network.
-	 */
-	public void setCountJavaThreads(int numJavaThreads) {
-		this.myNumJavaThreads = numJavaThreads > 0 ? numJavaThreads : 1;
-	}
 
 	/**
 	 * @see ca.nengo.model.Probeable#getHistory(java.lang.String)

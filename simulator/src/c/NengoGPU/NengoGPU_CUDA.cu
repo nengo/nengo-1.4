@@ -306,7 +306,7 @@ __global__ void decode(int totalOutputSize, float* decoders, float* spikes, floa
 
 
 // launch as many as there are ensembles
-__global__ void processNDterminations(int numEnsembles, int numNDterminations, int steps, float adjusted_dt, int* NDterminationEnsembleOffset, int* terminationOffsetInInputs, int* inputIndex, float* input, float* weights, float* current, float* sum, float* tau)
+__global__ void processNDterminations(int numEnsembles, int numNDterminations, int steps, float adjusted_dt, int* NDterminationEnsembleOffset, int* terminationOffsetInInputs, int* terminationDimensions, int* inputIndex, float* input, float* weights, float* current, float* sum, float* tau)
 {
   int i = threadIdx.x + (blockDim.x * threadIdx.y) + (blockIdx.x + (gridDim.x * blockIdx.y)) * blockDim.x * blockDim.y;
 
@@ -314,8 +314,10 @@ __global__ void processNDterminations(int numEnsembles, int numNDterminations, i
   {
     int offset = NDterminationEnsembleOffset[i];
     int count = (i == numEnsembles - 1) ? numNDterminations - offset : NDterminationEnsembleOffset[i+1] - offset;
-    int j, k, terminationOffsetInInput, index;
+    int j, k, terminationOffsetInInput, terminationDimension, index;
     float val, temp_sum = 0, temp_current, temp_tau;
+
+    int weightIndexInEnsemble = 0;
 
     if(count > 0)
     {
@@ -323,19 +325,21 @@ __global__ void processNDterminations(int numEnsembles, int numNDterminations, i
       {
         index = inputIndex[offset + j];
         terminationOffsetInInput = terminationOffsetInInputs[index]; 
+        terminationDimension = terminationDimensions[index];
 
-        val = input[terminationOffsetInInput] * weights[offset + j];
+        val = 0;
+        for(k = 0; k < terminationDimension; k++)
+        {
+          // have to figure out how to index this properly
+          val += input[terminationOffsetInInput + k] * weights[weightIndexInEnsemble * numEnsembles + i];
+          weightIndexInEnsemble++;
+        }
+
         temp_current = current[offset + j];
         temp_tau = tau[index];
 
         for(k = 0; k < steps; k++)
         {
-          //temp_current = (temp_current + val * adjusted_dt / temp_tau) * (1 - adjusted_dt / temp_tau);
-
-          // know this order works pretty well
-          //temp_current += val * adjusted_dt / temp_tau;
-          //temp_current *= (1 - adjusted_dt / temp_tau);
-
           // testing this order, though this is the one used in the java code so it should work
           temp_current *= 1 - adjusted_dt / temp_tau;
           temp_current += val * adjusted_dt / temp_tau;
@@ -432,18 +436,15 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   checkCudaError(err);
 
 
-  //printf("ensembleSums:\n");
-
 ///// process ND (nonDecoded) terminations
   dimBlock.x = 256;
   dimGrid.x = nengoData->numEnsembles / dimBlock.x + 1;
 
   //printf("process ND\n");
-  processNDterminations<<<dimGrid, dimBlock>>>(nengoData->numEnsembles, nengoData->numNDterminations, steps, adjusted_dt, nengoData->NDterminationEnsembleOffset->array, nengoData->terminationOffsetInInput->array, nengoData->NDterminationInputIndexor->array, nengoData->input->array, nengoData->NDterminationWeights->array, nengoData->NDterminationCurrents->array, nengoData->NDterminationEnsembleSums->array, nengoData->terminationTau->array);
+  processNDterminations<<<dimGrid, dimBlock>>>(nengoData->numEnsembles, nengoData->numNDterminations, steps, adjusted_dt, nengoData->NDterminationEnsembleOffset->array, nengoData->terminationOffsetInInput->array, nengoData->inputDimension->array, nengoData->NDterminationInputIndexor->array, nengoData->input->array, nengoData->NDterminationWeights->array, nengoData->NDterminationCurrents->array, nengoData->NDterminationEnsembleSums->array, nengoData->terminationTau->array);
 
   err = cudaGetLastError();
   checkCudaError(err);
-
 
 
 ///// encode

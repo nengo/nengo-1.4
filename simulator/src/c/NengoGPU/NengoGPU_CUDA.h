@@ -36,7 +36,7 @@ __global__ void integrateAfterEncode(int numNuerons, float dt, float adjusted_dt
 
 __global__ void decode(int totalOutputSize, float* decoders, float* spikes, float* output, int* decoderRowToEnsembleIndexor, int* ensembleNumNeurons, int* ensembleOffsetInNeurons, int* decoderStride, int* outputIndexor);
 
-__global__ void processNDterminations(int numEnsembles, int numNDterminations, int steps, float adjusted_dt, int* NDterminationEnsembleOffset, int* inputOffsets, int* inputIndex, float* input, float* weights, float* current, float* sum, float* tau);
+__global__ void processNDterminations(int numEnsembles, int numNDterminations, int steps, float adjusted_dt, int* NDterminationEnsembleOffset, int* terminationOffsetInInputs, int* terminationDimensions, int* inputIndex, float* input, float* weights, float* current, float* sum, float* tau);
 
 __global__ void moveGPUData(int size, int* map, float* to, float* from);
 

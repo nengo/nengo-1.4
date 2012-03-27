@@ -24,12 +24,18 @@ import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
 
-
+/**
+ * Allows running NEFEnsembles on the GPU. 
+ * Passes the ensemble data to the GPU through a native function. 
+ * Passes input to the GPU each step and stores the output from the GPU in the appropriate locations.
+ *
+ * @author Eric Crawford
+ */
 public class NEFGPUInterface {
 	private static boolean myUseGPU = false;
-	private static boolean canUseGPU;
 	private static int myNumDevices = 0;
-	private static int myNumAvailableDevices;
+	private static int myNumAvailableDevices = 0;
+	private static String myErrorMessage;
 	
 	private static boolean showTiming = false;
 	private boolean myShowTiming;
@@ -61,21 +67,23 @@ public class NEFGPUInterface {
 	 */
 	static{
 		try {
+			myErrorMessage = "";
 			System.loadLibrary("NengoGPU");
 			myNumAvailableDevices = nativeGetNumDevices();
 			
 			if(myNumAvailableDevices < 1)
 			{
-				System.out.println("No CUDA-enabled GPU detected.");
-				canUseGPU = false;
+				myErrorMessage = "No CUDA-enabled GPU detected.";
+				System.out.println(myErrorMessage);
 			}
 			
 		} catch (java.lang.UnsatisfiedLinkError e) {
 			myNumAvailableDevices = 0;
-			System.out.println("Couldn't load native library NengoGPU. " +
-				"Unable to use GPU for class NEFGPUInterface.");
+			myErrorMessage = "Couldn't load native library NengoGPU.";
+			System.out.println(myErrorMessage);
 		} catch (Exception e) {
 			myNumAvailableDevices = 0;
+			myErrorMessage = e.getMessage();
 			System.out.println(e.getStackTrace());
 		}
 	}
@@ -103,7 +111,7 @@ public class NEFGPUInterface {
 	}
 	
 	public static void setRequestedNumDevices(int value){
-		myNumDevices = Math.min(value, myNumAvailableDevices);
+		myNumDevices = Math.min(Math.max(value, 0), myNumAvailableDevices);
 	}
 	
 	public static int getRequestedNumDevices(){
@@ -121,6 +129,10 @@ public class NEFGPUInterface {
 	
 	public static void hideGPUTiming(){
 		showTiming = false;
+	}
+	
+	public static String getErrorMessage(){
+		return myErrorMessage;
 	}
 	
 	/**
@@ -353,7 +365,7 @@ public class NEFGPUInterface {
 			terminationTransforms[i] = new float[terminations.length][][];
 			terminationTau[i] = new float[terminations.length];
 			isDecodedTermination[i] = new int[terminations.length];
-
+			
 			for (j = 0; j < terminations.length; j++) {
 
 				if (terminations[j] instanceof DecodedTermination) {
@@ -384,8 +396,10 @@ public class NEFGPUInterface {
 					terminationTau[i][j] = terminations[j].getTau();
 					isDecodedTermination[i][j] = 0;
 
-					terminationDim = 1;
-					ensembleData.totalInputSize += 1;
+					terminationDim = terminations[j].getDimensions();
+					
+					ensembleData.totalInputSize += terminationDim;
+					ensembleData.nonDecodedTransformSize += terminationDim;
 					ensembleData.numNonDecodedTerminations++;
 				}
 			}
@@ -503,7 +517,7 @@ public class NEFGPUInterface {
 						}
 					}
 				}
-	
+				
 	
 				nativeStep(representedInputValues, representedOutputValues, spikeOutput, startTime, endTime);
 	
@@ -711,7 +725,7 @@ public class NEFGPUInterface {
 	 * @author Eric Crawford
 	 */
 	private class EnsembleData {
-		int numEntries = 9;
+		int numEntries = 10;
 
 		public int dimension;
 		public int numNeurons;
@@ -725,6 +739,8 @@ public class NEFGPUInterface {
 
 		public int numDecodedTerminations;
 		public int numNonDecodedTerminations;
+		
+		public int nonDecodedTransformSize;
 		
 
 		public void reset() {
@@ -740,6 +756,8 @@ public class NEFGPUInterface {
 			
 			numDecodedTerminations = 0;
 			numNonDecodedTerminations = 0;
+			nonDecodedTransformSize = 0;
+			
 		}
 
 		public int[] getAsArray() {
@@ -758,6 +776,8 @@ public class NEFGPUInterface {
 			
 			array[i++] = numDecodedTerminations;
 			array[i++] = numNonDecodedTerminations;
+			
+			array[i++] = nonDecodedTransformSize;
 			
 			return array;
 		}

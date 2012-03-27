@@ -66,6 +66,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 	private static boolean myUseGPU = false;
 	private static boolean canUseGPU;
+	private static String myGPUErrorMessage;
 
 	static {
 		try{
@@ -74,17 +75,19 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 			if(!hasGPU())
 			{
-				System.out.println("No CUDA-enabled GPU detected.");
+				myGPUErrorMessage = "No CUDA-enabled GPU detected.";
+				System.out.println(myGPUErrorMessage);
 				canUseGPU = false;
 			}
 
 		}catch(java.lang.UnsatisfiedLinkError e){
 			canUseGPU = false;
-			System.out.println("Couldn't load native library NengoUtilsGPU. " +
-					"Unable to use GPU for class weightedCostApproximator.");
+			myGPUErrorMessage = "Couldn't load native library NengoUtilsGPU.";
+			System.out.println(myGPUErrorMessage);
 		}
 		catch(Exception e){
 			canUseGPU = false;
+			myGPUErrorMessage = e.getMessage();
 			System.out.println(e.getStackTrace());
 		}
 	}
@@ -101,6 +104,14 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 */
 	public static boolean getUseGPU() {
 		return canUseGPU && myUseGPU;
+	}
+	
+	public static boolean canUseGPU() {
+		return canUseGPU;
+	}
+	
+	public static String getGPUErrorMessage() {
+		return myGPUErrorMessage;
 	}
 
 	private static native boolean hasGPU();

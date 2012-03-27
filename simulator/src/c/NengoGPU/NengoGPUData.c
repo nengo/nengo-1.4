@@ -344,6 +344,7 @@ NengoGPUData* getNewNengoGPUData()
   new->maxDimension = 0;
   new->maxNumNeurons = 0;
   new->maxOriginDimension = 0;
+  new->maxEnsembleNDTransformSize = 0;
   
   new->numNDterminations = 0;
 
@@ -533,7 +534,7 @@ void initializeNengoGPUData(NengoGPUData* new)
   name = "NDterminationInputIndexor";
   new->NDterminationInputIndexor = newIntArray(new->numNDterminations, name);
   name = "NDterminationWeights";
-  new->NDterminationWeights = newFloatArray(new->numNDterminations, name);
+  new->NDterminationWeights = newFloatArray(new->totalNonDecodedTransformSize, name);
 
   name = "NDterminationEnsembleOffset";
   new->NDterminationEnsembleOffset = newIntArray(new->numEnsembles, name);
