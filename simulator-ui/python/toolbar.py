@@ -4,6 +4,7 @@ import java
 
 import ca.nengo
 import sys
+
 if 'lib/iText-5.0.5.jar' not in sys.path:
     sys.path.append('lib/iText-5.0.5.jar')
 
@@ -80,6 +81,111 @@ class ParisianTransform(IConfigurable):
         return 'Create Interneurons'
 
 
+
+from ca.nengo.math.impl import WeightedCostApproximator
+from ca.nengo.util.impl import NEFGPUInterface, NodeThreadPool
+from ca.nengo.ui.configurable.panels import BooleanPanel, IntegerPanel
+
+
+class GpuCountPanel(IntegerPanel):
+
+    def initPanel(self):
+      IntegerPanel.initPanel(self)
+
+      num_avail_devices = NEFGPUInterface.getNumAvailableDevices()
+
+      if num_avail_devices < 1:
+        self.tf.setEnabled(False)
+        self.tf.setEditable(False)
+
+        error_message = " %s" % (NEFGPUInterface.getErrorMessage())
+        error_message_label = JLabel(error_message)
+        error_message_label.setForeground(Color.red)
+        self.add(error_message_label)
+
+class GpuUsePanel(BooleanPanel):
+
+    def initPanel(self):  
+      BooleanPanel.initPanel(self)
+
+      can_use_GPU = WeightedCostApproximator.canUseGPU()
+
+      if not can_use_GPU:
+        self.checkBox.setEnabled(False)
+        self.label.setEnabled(False)
+
+        error_message = " %s" % (WeightedCostApproximator.getGPUErrorMessage())
+        error_message_label = JLabel(error_message)
+        error_message_label.setForeground(Color.red)
+        self.add(error_message_label)
+
+class PGpuCount(PInt):
+    def __init__(self, name):
+        default = NEFGPUInterface.getRequestedNumDevices()
+        maximum = NEFGPUInterface.getNumAvailableDevices()
+
+        PInt.__init__(self, name, default, 0, maximum)
+
+    def createInputPanel(self):
+        return GpuCountPanel(self)
+
+class PGpuUse(PBoolean):
+    def __init__(self,name):
+        PBoolean.__init__(self, name, WeightedCostApproximator.getUseGPU())
+
+    def createInputPanel(self):
+        return GpuUsePanel(self)
+
+from ca.nengo.ui.configurable import ConfigException
+class ParallelizationConfiguration(IConfigurable):
+  num_java_threads=NodeThreadPool.getNumJavaThreads()
+  num_sim_GPU=NEFGPUInterface.getRequestedNumDevices()
+  use_GPU_for_creation=WeightedCostApproximator.getUseGPU()
+
+  p_num_java_threads=PInt('Number of Java Threads', num_java_threads, 1, NodeThreadPool.getMaxNumJavaThreads())
+  p_num_sim_GPU=PGpuCount('Number of GPU\'s for Simulation')
+  p_use_GPU_for_creation=PGpuUse('Use GPU for Ensemble Creation')
+
+  properties=[p_num_java_threads, p_num_sim_GPU, p_use_GPU_for_creation]
+
+  def __init__(self):
+      self.button=make_button('parallelization', self.do_configure, 'Configure Parallelization')
+      self.button.enabled=True
+  
+  def do_configure(self, event):
+      self.p_num_java_threads.setDefaultValue(NodeThreadPool.getNumJavaThreads())
+      self.p_num_sim_GPU.setDefaultValue(NEFGPUInterface.getRequestedNumDevices())
+      self.p_use_GPU_for_creation.setDefaultValue(WeightedCostApproximator.getUseGPU())
+
+      uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(self)
+
+      try:
+        uc.configureAndWait()
+      except ConfigException, e:
+        e.defaultHandleBehavior()
+
+  def completeConfiguration(self,props):
+      self.num_java_threads=props.getValue(self.p_num_java_threads)
+      self.num_sim_GPU=props.getValue(self.p_num_sim_GPU)
+      self.use_GPU_for_creation=props.getValue(self.p_use_GPU_for_creation)
+
+      NodeThreadPool.setNumJavaThreads(self.num_java_threads)
+      NEFGPUInterface.setRequestedNumDevices(self.num_sim_GPU)
+      WeightedCostApproximator.setUseGPU(self.use_GPU_for_creation)
+
+  def preConfiguration(self,props):
+      pass
+  def getSchema(self):
+      return ConfigSchemaImpl(self.properties,[])
+  def getTypeName(self):
+      return 'ParallelizationConfiguration'
+  def getDescription(self):
+      return 'Configure parallelization'
+
+
+
+
+
 def make_button(icon,func,tip,**args):
     return JButton(icon=ImageIcon('python/images/%s.png'%icon),rolloverIcon=ImageIcon('python/images/%s-pressed.png'%icon),
                    actionPerformed=func,toolTipText=tip,
@@ -115,6 +221,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar.add(make_button('console',self.do_console,'toggle console'))
         self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
         self.toolbar.add(self.button_run)
+        self.parallelization=ParallelizationConfiguration()
+        self.toolbar.add(self.parallelization.button)
 
         ca.nengo.ui.lib.world.handlers.SelectionHandler.addSelectionListener(self)
         self.ng.getWorld().getGround().addChildrenListener(self)
@@ -254,11 +362,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
 
             cb.addTemplate(tp,20,0)
             doc.close()
-        
-        
-
-        
-
+     
 ng=ca.nengo.ui.NengoGraphics.getInstance()
 toolbar=ToolBar()
 ng.contentPane.revalidate()

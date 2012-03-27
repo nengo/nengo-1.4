@@ -39,7 +39,8 @@ import ca.nengo.ui.configurable.PropertyInputPanel;
  */
 public class BooleanPanel extends PropertyInputPanel {
 
-    JCheckBox checkBox;
+    public JCheckBox checkBox;
+    public JLabel label;
 
     /**
      * @param property TODO
@@ -55,11 +56,13 @@ public class BooleanPanel extends PropertyInputPanel {
         return bool.booleanValue();
     }
 
-    private void initPanel() {
+    public void initPanel() {
         checkBox = new JCheckBox();
         checkBox.setSelected(false);
         add(checkBox);
-        add(new JLabel("Enable"));
+        
+        label = new JLabel("Enable");
+        add(label);
     }
 
     @Override

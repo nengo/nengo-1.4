@@ -38,7 +38,7 @@ import ca.nengo.ui.configurable.descriptors.PInt;
  */
 public class IntegerPanel extends PropertyInputPanel {
 
-    private JTextField tf;
+    public JTextField tf;
 
     /**
      * @param property TODO
@@ -61,7 +61,7 @@ public class IntegerPanel extends PropertyInputPanel {
 
     }
 
-    private void initPanel() {
+    public void initPanel() {
         tf = new JTextField(10);
 
         add(tf);

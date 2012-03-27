@@ -68,5 +68,8 @@ public class PBoolean extends Property {
     public String getTypeName() {
         return "Boolean";
     }
-
+    
+    public void setDefaultValue(Boolean val){
+    	super.setDefaultValue(val);
+    }
 }
