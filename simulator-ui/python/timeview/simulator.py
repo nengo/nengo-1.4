@@ -16,10 +16,10 @@ class Simulator:
         self.network=network
         self.initialize(network)
 
-        if network.getCountJavaThreads() > 0:
-            self.thread_pool=NodeThreadPool(network,[]);
-        else:
-            self.thread_pool=None;
+        #if network.getCountJavaThreads() > 0:
+        #    self.thread_pool=NodeThreadPool(network,[]);
+        #else:
+        self.thread_pool=None;
 
         
     def initialize(self,network):
