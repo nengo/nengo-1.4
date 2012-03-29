@@ -18,11 +18,13 @@ void printIntArrayFromDevice(FILE* fp, intArray* a, int n, int m, int labels)
   int* temp = (int*) malloc( m * n * sizeof(int));
   cudaMemcpy(temp, a->array, m * n * sizeof(int), cudaMemcpyDeviceToHost);
 
+  printf("%s:\n", a->name);
+
   int i, j;
-  for(i = 0; i < m; i++)
+  for(i = 0; i < n; i++)
   {
     fp ? fprintf(fp, "line %d: ", i) : printf("line %d:", i);
-    for(j = 0; j < n; j++)
+    for(j = 0; j < m; j++)
     {
       if(labels)
         fp ? fprintf(fp, "(%d, %d) ", j, temp[i * n + j]) : printf("(%d, %d) ", j, temp[i * n + j]);
@@ -45,11 +47,13 @@ void printFloatArrayFromDevice(FILE* fp, floatArray* a, int n, int m, int labels
   err = cudaMemcpy(temp, a->array, m * n * sizeof(float), cudaMemcpyDeviceToHost);
   checkCudaError(err);
 
+  printf("%s:\n", a->name);
+
   int i, j;
-  for(i = 0; i < m; i++)
+  for(i = 0; i < n; i++)
   {
     fp ? fprintf(fp, "line %d: ", i) : printf("line %d:", i);
-    for(j = 0; j < n; j++)
+    for(j = 0; j < m; j++)
     {
       if(labels)
         fp ? fprintf(fp, "(%d, %f) ", j, temp[i * n + j]) : printf("(%d, %f) ", j, temp[i * n + j]);
@@ -317,7 +321,7 @@ __global__ void processNDterminations(int numEnsembles, int numNDterminations, i
     int j, k, terminationOffsetInInput, terminationDimension, index;
     float val, temp_sum = 0, temp_current, temp_tau;
 
-    int weightIndexInEnsemble = 0;
+    int weightIndexInEnsemble = i;
 
     if(count > 0)
     {
@@ -331,8 +335,8 @@ __global__ void processNDterminations(int numEnsembles, int numNDterminations, i
         for(k = 0; k < terminationDimension; k++)
         {
           // have to figure out how to index this properly
-          val += input[terminationOffsetInInput + k] * weights[weightIndexInEnsemble * numEnsembles + i];
-          weightIndexInEnsemble++;
+          val += input[terminationOffsetInInput + k] * weights[weightIndexInEnsemble];
+          weightIndexInEnsemble += numEnsembles;
         }
 
         temp_current = current[offset + j];
@@ -450,8 +454,6 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
 ///// encode
   dimBlock.x = 256;
   dimGrid.x = nengoData->numNeurons / dimBlock.x + 1;
-  //printIntArrayFromDevice(NULL, nengoData->ensembleDimension, nengoData->numEnsembles, 1);
-  //printFloatArrayFromDevice(NULL, nengoData->encodeResult, nengoData->numNeurons, 1);
 
   //printf("encode\n");
   encode<<<dimGrid, dimBlock>>> (nengoData->numNeurons, nengoData->encoders->array, nengoData->ensembleSums->array, nengoData->encodeResult->array, nengoData->encoderRowToEnsembleIndexor->array, nengoData->ensembleOffsetInDimensions->array, nengoData->ensembleDimension->array, nengoData->encoderStride->array, nengoData->encoderRowToNeuronIndexor->array);
@@ -568,7 +570,6 @@ long getDeviceCapacity(int device)
   
 void initializeDeviceInputAndOutput(NengoGPUData* nengoData)
 {
-  printf("in init device io\n");
   char* name;
   cudaError_t err;
 
@@ -624,8 +625,6 @@ void initializeDeviceInputAndOutput(NengoGPUData* nengoData)
   checkCudaError(err);
   err = cudaMemset(nengoData->NDterminationEnsembleSums->array, 0, nengoData->numEnsembles * sizeof(float));
   checkCudaError(err);
-
-  printf("done init device io\n");
 }
 
 #ifdef __cplusplus

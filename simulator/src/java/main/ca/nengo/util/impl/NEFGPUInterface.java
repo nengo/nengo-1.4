@@ -44,6 +44,8 @@ public class NEFGPUInterface {
 	private long totalRunTime;
 	private int numSteps;
 	
+	protected static boolean myRequireAllOutputsOnCPU;
+	
 	
 	protected NEFEnsembleImpl[] myGPUEnsembles;
 	protected Projection[] myGPUProjections;
@@ -131,6 +133,10 @@ public class NEFGPUInterface {
 		showTiming = false;
 	}
 	
+	public static void requireAllOutputsOnCPU(boolean require){
+		myRequireAllOutputsOnCPU = require;
+	}
+	
 	public static String getErrorMessage(){
 		return myErrorMessage;
 	}
@@ -146,12 +152,9 @@ public class NEFGPUInterface {
 	 */
 	public void initialize(){
 		int[] nodeAssignments = findOptimalNodeAssignments(myGPUNetworkArrays, myGPUProjections, myNumDevices);
-		
-		int zed = 0;
-		for(Node node : myGPUNetworkArrays){
-			System.out.println(node.getName() + " " + nodeAssignments[zed++]);
-		}
 
+		boolean requireAllOutputsOnCPU = myRequireAllOutputsOnCPU;
+		
 		myShowTiming = showTiming;
 		if(myShowTiming){
 			averageTimeSpentInGPU = 0;
@@ -325,7 +328,7 @@ public class NEFGPUInterface {
 					}
 				}
 				
-				outputRequiredOnCPU[i][j] = origin.getRequiredOnCPU() ? 1 : 0;
+				outputRequiredOnCPU[i][j] = (origin.getRequiredOnCPU() || requireAllOutputsOnCPU) ? 1 : 0;
 				
 				// even if its not explicitly required on the CPU, it might be implicitly
 				// if it is attached to a projection whose termination is on the CPU
@@ -392,7 +395,7 @@ public class NEFGPUInterface {
 					// (mainly just to support gates which have uniform negative weights).
 					// When we do learning, will have to extract the whole weight matrix.
 					Termination[] neuronTerminations = ((EnsembleTermination) terminations[j]).getNodeTerminations();
-					terminationTransforms[i][j][0][0] = ((PlasticNodeTermination) neuronTerminations[0]).getWeights()[0];
+					terminationTransforms[i][j][0] = ((PlasticNodeTermination) neuronTerminations[0]).getWeights();
 					terminationTau[i][j] = terminations[j].getTau();
 					isDecodedTermination[i][j] = 0;
 
@@ -539,7 +542,7 @@ public class NEFGPUInterface {
 						float[] currentRepOutput = representedOutputValues[i][j];
 						if(currentRepOutput != null){
 							origins[j].setValues(new RealOutputImpl(
-									currentRepOutput,
+									currentRepOutput.clone(),
     								Units.UNK, endTime));
 						}
 					}

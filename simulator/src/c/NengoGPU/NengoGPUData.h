@@ -251,7 +251,6 @@ struct NengoGPUData_t{
 
   intArray* GPUTerminationToOriginMap;
   intArray* spikeMap;
-  intArray* spikeEnsembleIndices;
 
   // non decoded termination data
   intArray* NDterminationInputIndexor;

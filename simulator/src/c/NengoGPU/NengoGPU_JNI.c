@@ -118,7 +118,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
       (*env)->GetIntArrayRegion(env, tempIntArray_JAVA, 0, numTerminationsForCurrentEnsemble, isDecodedTermination);
       (*env)->DeleteLocalRef(env, tempIntArray_JAVA);
 
-      NDterminationIndexInEnsemble = 0;
+      NDterminationIndexInEnsemble = i;
 
       // loop through the terminations for the current ensemble and store the relevant data
       dimensionOfCurrentEnsemble = 0;
@@ -170,7 +170,8 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
 
           for(l = 0; l < dimensionOfCurrentTermination; l++)
           {
-            floatArraySetElement(currentData->NDterminationWeights, l * currentData->numEnsembles + NDterminationIndexInEnsemble++, currentTransformRow[l]); 
+            floatArraySetElement(currentData->NDterminationWeights, NDterminationIndexInEnsemble, currentTransformRow[l]); 
+            NDterminationIndexInEnsemble += currentData->numEnsembles;
           }
 
           if(i == startEnsembleIndex)
@@ -1256,7 +1257,6 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
   jfloatArray currentInput_JAVA;
   
   NengoGPUData* currentData;
-
 
   int i, j, k, l;
   int naIndexInJavaArray, inputIndex, numInputs, inputDimension;

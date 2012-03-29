@@ -685,139 +685,123 @@ void printNengoGPUData(NengoGPUData* currentData)
 {
   
   printf("printing NengoGPUData:\n");
+  printf("onDevice; %d\n", currentData->onDevice);
+  printf("initialized; %d\n", currentData->initialized);
+  printf("device; %d\n", currentData->device);
+  printf("maxTimeStep; %f\n", currentData->maxTimeStep);
+   
+  printf("numNeurons; %d\n", currentData->numNeurons);
+  printf("numEnsembles; %d", currentData->numEnsembles);
+  printf("numNetworkArrays; %d\n", currentData->numNetworkArrays);
+  printf("numInputs; %d\n", currentData->numInputs);
+  printf("numTerminations; %d\n", currentData->numTerminations);
+  printf("numNDterminations; %d\n", currentData->numNDterminations);
+  printf("numDecodedTerminations; %d\n", currentData->numDecodedTerminations);
+  printf("numNetworkArrayOrigins; %d\n", currentData->numNetworkArrayOrigins);
+  printf("numOrigins; %d\n", currentData->numOrigins);
 
-  printf("onDevice: %d\n", currentData->onDevice);
-  printf("device: %d\n", currentData->device);
-  printf("maxTimeStep: %f\n", currentData->maxTimeStep);
+  printf("totalInputSize; %d\n", currentData->totalInputSize);
+  printf("GPUInputSize; %d\n", currentData->GPUInputSize);
+  printf("CPUInputSize; %d\n", currentData->CPUInputSize);
+  printf("JavaInputSize; %d\n", currentData->JavaInputSize);
+  printf("offsetInSharedInput; %d\n", currentData->offsetInSharedInput);
+  printf("numSpikesToSendBack; %d\n", currentData->numSpikesToSendBack);
+  printf("numSpikeEnsembles; %d\n", currentData->numSpikeEnsembles);
 
-  printf("numNeurons: %d\n", currentData->numNeurons);
-  printf("numEnsembles: %d\n", currentData->numEnsembles);
-  printf("numTerminations: %d\n", currentData->numTerminations);
-  printf("numOrigins: %d\n", currentData->numOrigins);
+  printf("totalTransformSize; %d\n", currentData->totalTransformSize);
+  printf("totalNumTransformRows; %d\n", currentData->totalNumTransformRows);
+  printf("totalNonDecodedTransformSize; %d\n", currentData->totalNonDecodedTransformSize);
+  printf("totalEnsembleDimension; %d\n", currentData->totalEnsembleDimension);
+  printf("totalEncoderSize; %d\n", currentData->totalEncoderSize);
+  printf("totalDecoderSize; %d\n", currentData->totalDecoderSize);
+  printf("totalOutputSize; %d\n", currentData->totalOutputSize);
 
-  printf("totalInputSize: %d\n", currentData->totalInputSize);
-  printf("totalTransformSize: %d\n", currentData->totalTransformSize);
-  printf("totalNumTransformRows: %d\n", currentData->totalNumTransformRows);
-  printf("totalEnsembleDimension: %d\n", currentData->totalEnsembleDimension);
-  printf("totalEncoderSize: %d\n", currentData->totalEncoderSize);
-  printf("totalDecoderSize: %d\n", currentData->totalDecoderSize);
-  printf("totalOutputSize: %d\n", currentData->totalOutputSize);
+  printf("maxDecodedTerminationDimension; %d\n", currentData->maxDecodedTerminationDimension);
+  printf("maxNumDecodedTerminations; %d\n", currentData->maxNumDecodedTerminations);
+  printf("maxDimension; %d\n", currentData->maxDimension);
+  printf("maxNumNeurons; %d\n", currentData->maxNumNeurons);
+  printf("maxOriginDimension; %d\n", currentData->maxOriginDimension);
+  printf("maxEnsembleNDTransformSize; %d\n", currentData->maxEnsembleNDTransformSize);
+
+  printf("GPUOutputSize; %d\n", currentData->GPUOutputSize);
+  printf("JavaOutputSize; %d\n", currentData->JavaOutputSize);
+  printf("interGPUOutputSize; %d\n", currentData->interGPUOutputSize);
+  printf("CPUOutputSize; %d\n", currentData->CPUOutputSize);
   
-  printf("maxDecodedTerminationDimension: %d\n", currentData->maxDecodedTerminationDimension);
-  printf("maxNumDecodedTerminations: %d\n", currentData->maxNumDecodedTerminations);
-  printf("maxDimension: %d\n", currentData->maxDimension);
-  printf("maxNumNeurons: %d\n", currentData->maxNumNeurons);
-  printf("maxOriginDimension: %d\n", currentData->maxOriginDimension);
-  printf("GPUinputSize: %d\n", currentData->GPUInputSize);
-  printf("JavaInputSize: %d\n", currentData->JavaInputSize);
-  printf("CPUinputSize: %d\n", currentData->CPUInputSize);
+  printIntArray(currentData->networkArrayIndexInJavaArray, currentData->numNetworkArrays, 1);
+  printIntArray(currentData->ensembleIndexInJavaArray, currentData->numEnsembles, 1);
 
+  printFloatArray(currentData->input, currentData->totalInputSize, 1);
+  printIntArray(currentData->terminationOffsetInInput, currentData->numTerminations, 1);
 
-  //printf("networkArrayIndexInJavaArray:\n");
-  //printIntArray(NULL, currentData->networkArrayIndexInJavaArray, currentData->numNetworkArrays, 1, 0);
+  printFloatArray(currentData->terminationTransforms, currentData->totalNumTransformRows, currentData->maxDecodedTerminationDimension);
+  printIntArray(currentData->transformRowToInputIndexor, currentData->totalNumTransformRows, 1);
+  printFloatArray(currentData->terminationTau, currentData->numTerminations, 1);
+  printIntArray(currentData->inputDimension, currentData->numInputs, 1);
+  printFloatArray(currentData->terminationOutput, currentData->totalNumTransformRows, 1);
+  printIntArray(currentData->terminationOutputIndexor, currentData->totalNumTransformRows, 1);
+  printIntArray(currentData->ensembleNumTerminations, currentData->numEnsembles, 1);
 
-  printf("terminationOffsetInInput:\n");
-  printIntArrayFromDevice(NULL, currentData->terminationOffsetInInput, currentData->numInputs, 1, 0);
+  printFloatArray(currentData->encoders, currentData->totalEncoderSize, 1);
+//  printIntArray(currentData->ensembleOrderInEncoders);
+  printFloatArray(currentData->encodeResult, currentData->numNeurons, 1);
+  printFloatArray(currentData->ensembleSums, currentData->totalEnsembleDimension, 1);
 
-  printf("terminationTransforms:\n");
-  printFloatArrayFromDevice(NULL, currentData->terminationTransforms, currentData->totalNumTransformRows, currentData->maxDecodedTerminationDimension, 0);
-  
-  printf("terminationTau:\n");
-  printFloatArrayFromDevice(NULL, currentData->terminationTau, currentData->numInputs, 1, 0); 
-  
-  printf("inputDimension:\n");
-  printIntArrayFromDevice(NULL, currentData->inputDimension, currentData->numInputs, 1, 0);
-  
-  
-  printf("terminationOutputIndexor:\n");
-  printIntArrayFromDevice(NULL, currentData->terminationOutputIndexor, currentData->totalNumTransformRows, 1, 0);
+  printFloatArray(currentData->decoders, currentData->totalDecoderSize, 1);
+//  printIntArray(currentData->ensembleOrderInDecoders, 1);
 
-  printf("transformRowToInputIndexor:\n");
-  printIntArrayFromDevice(NULL, currentData->transformRowToInputIndexor, currentData->totalNumTransformRows, 1, 0);
+  // data for calculating spikes
+  printFloatArray(currentData->neuronVoltage, currentData->numNeurons, 1);
+  printFloatArray(currentData->neuronReftime, currentData->numNeurons, 1);
+  printFloatArray(currentData->neuronBias, currentData->numNeurons, 1);
+  printFloatArray(currentData->neuronScale, currentData->numNeurons, 1);
+  printFloatArray(currentData->ensembleTauRC, currentData->numEnsembles, 1);
+  printFloatArray(currentData->ensembleTauRef, currentData->numEnsembles, 1);
+  printIntArray(currentData->neuronToEnsembleIndexor, currentData->numNeurons, 1);
 
-  printf("ensembleSums:\n");
-  printFloatArrayFromDevice(NULL, currentData->ensembleSums, currentData->totalEnsembleDimension, 1, 0);
-  
-  printf("encoders:\n");
-  printFloatArrayFromDevice(NULL, currentData->encoders, currentData->totalEncoderSize, 1, 0); 
+  // supplementary arrays for doing encoding
+  printIntArray(currentData->ensembleDimension, currentData->numEnsembles, 1);
+  printIntArray(currentData->ensembleOffsetInDimensions, currentData->numEnsembles, 1);
+  printIntArray(currentData->encoderRowToEnsembleIndexor, currentData->numNeurons, 1); 
+  printIntArray(currentData->encoderStride, currentData->maxDimension, 1);
+  printIntArray(currentData->encoderRowToNeuronIndexor, currentData->numNeurons, 1);
 
-  printf("decoders:\n");
-  printFloatArrayFromDevice(NULL, currentData->decoders, currentData->totalDecoderSize, 1, 0);
+  // supplementary arrays for doing decoding
+  printIntArray(currentData->ensembleNumNeurons, currentData->numEnsembles, 1);
+  printIntArray(currentData->ensembleOffsetInNeurons, currentData->numEnsembles, 1); 
+  printIntArray(currentData->decoderRowToEnsembleIndexor, currentData->totalOutputSize, 1); 
+  printIntArray(currentData->decoderStride, currentData->maxDimension, 1);
+  printIntArray(currentData->decoderRowToOutputIndexor, currentData->totalOutputSize, 1);
 
+  printFloatArray(currentData->spikes, currentData->numNeurons, 1);
 
-  printf("neuronBias:\n");
-  printFloatArrayFromDevice(NULL, currentData->neuronBias, currentData->numNeurons, 1, 0);
+  printFloatArray(currentData->ensembleOutput, currentData->totalOutputSize, 1);
+  printFloatArray(currentData->output, currentData->totalOutputSize + currentData->numSpikesToSendBack, 1);
+  printFloatArray(currentData->outputHost, currentData->CPUOutputSize + currentData->numSpikesToSendBack, 1);
 
-  //printf("neuronScale:\n");
-  printFloatArrayFromDevice(NULL, currentData->neuronScale, currentData->numNeurons, 1, 0);
+  printIntArray(currentData->GPUTerminationToOriginMap , currentData->GPUInputSize, 1);
+  printIntArray(currentData->spikeMap, currentData->numSpikesToSendBack, 1);
 
-  printf("ensembleTauRC:\n");
-  printFloatArrayFromDevice(NULL, currentData->ensembleTauRC, currentData->numEnsembles, 1, 0);
+  // non decoded termination data
+  printIntArray(currentData->NDterminationInputIndexor, currentData->numNDterminations, 1);
+  printFloatArray(currentData->NDterminationCurrents, currentData->numNDterminations, 1);
+  printFloatArray(currentData->NDterminationWeights, currentData->totalNonDecodedTransformSize, 1);
+  printIntArray(currentData->NDterminationEnsembleOffset, currentData->numEnsembles, 1);
+  printFloatArray(currentData->NDterminationEnsembleSums, currentData->numEnsembles, 1);
 
-  printf("ensembleTauRef:\n");
-  printFloatArrayFromDevice(NULL, currentData->ensembleTauRef, currentData->numEnsembles, 1, 0);
-  
- // printf("ensembleNumTerminations:\n");
-  //printIntArrayFromDevice(NULL, currentData->ensembleNumTerminations, currentData->numEnsembles, 1, 0);
-
-  printf("ensembleDimension:\n");
-  printIntArrayFromDevice(NULL, currentData->ensembleDimension, currentData->numEnsembles, 1, 0);
-
-  printf("ensembleNumNeurons:\n");
-  printIntArrayFromDevice(NULL, currentData->ensembleNumNeurons, currentData->numEnsembles, 1, 0);
-
-  //printf("ensembleNumOrigins:\n");
-  //printIntArrayFromDevice(NULL, currentData->ensembleNumOrigins, currentData->numEnsembles, 1, 0);
-
-  printf("ensembleOffsetInDimensions:\n");
-  printIntArrayFromDevice(NULL, currentData->ensembleOffsetInDimensions, currentData->numEnsembles, 1, 0);
-
-  printf("ensembleOffsetInNeurons:\n");
-  printIntArrayFromDevice(NULL, currentData->ensembleOffsetInNeurons, currentData->numEnsembles, 1, 0);
-
-  printf("encoderRowToEnsembleIndexor:\n");
-  printIntArrayFromDevice(NULL, currentData->encoderRowToEnsembleIndexor, currentData->numNeurons, 1, 0);
-
-  printf("encoderRowToNeuronIndexor:\n");
-  printIntArrayFromDevice(NULL, currentData->encoderRowToNeuronIndexor, currentData->numNeurons, 1, 0);
-
-  printf("decoderRowToEnsembleIndexor:\n");
-  printIntArrayFromDevice(NULL, currentData->decoderRowToEnsembleIndexor, currentData->totalOutputSize, 1, 0);
-
-  printf("decoderRowToOutputIndexor:\n");
-  printIntArrayFromDevice(NULL, currentData->decoderRowToOutputIndexor, currentData->totalOutputSize, 1, 0);
-
-  printf("neuronToEnsembleIndexor:\n");
-  printIntArrayFromDevice(NULL, currentData->neuronToEnsembleIndexor, currentData->numNeurons, 1, 0);
-  
-
-
-  printf("encoderStride:\n");
-  printIntArrayFromDevice(NULL, currentData->encoderStride, currentData->maxDimension, 1, 0);
-
-  printf("decoderStride:\n");
-  printIntArrayFromDevice(NULL, currentData->decoderStride, currentData->maxNumNeurons, 1, 0);
-
-
-  printf("ensembleOriginDimension:\n");
+  // for organizing the output in terms of ensembles
+  printIntArray(currentData->ensembleOriginOffsetInOutput, currentData->numOrigins, 1);
+  printIntArray(currentData->ensembleNumOrigins , currentData->numEnsembles, 1);
   printIntArray(currentData->ensembleOriginDimension, currentData->numOrigins, 1);
 
-  printf("spikeMap:\n");
-  printIntArrayFromDevice(NULL, currentData->spikeMap, currentData->numSpikesToSendBack, 1, 1);
+  printIntArray(currentData->ensembleOutputToNetworkArrayOutputMap, currentData->totalOutputSize, 1);
 
-  printf("GPUTerminationToOriginMap:\n");
-  printIntArrayFromDevice(NULL, currentData->GPUTerminationToOriginMap, currentData->GPUInputSize, 1, 1);
+  printIntArray(currentData->networkArrayOriginOffsetInOutput, currentData->numNetworkArrayOrigins, 1); 
+  printIntArray(currentData->networkArrayOriginDimension, currentData->numNetworkArrayOrigins, 1); 
+  printIntArray(currentData->networkArrayNumOrigins, currentData->numNetworkArrays, 1);
 
-  
-  
-  printf("numNDterminations: %d\n", currentData->numNDterminations);
-
-  printf("NDterminationInputIndexor:\n");
-  printIntArrayFromDevice(NULL, currentData->NDterminationInputIndexor, currentData->numNDterminations, 1, 0);
-  printf("NDterminationWeights:\n");
-  printFloatArrayFromDevice(NULL, currentData->NDterminationWeights, currentData->numNDterminations, 1, 0);
-  printf("NDterminationEnsembleOffset:\n");
-  printIntArrayFromDevice(NULL, currentData->NDterminationEnsembleOffset, currentData->numEnsembles, 1, 0);
+  printIntArray(currentData->sharedData_outputIndex, currentData->interGPUOutputSize, 1);
+  printIntArray(currentData->sharedData_sharedIndex, currentData->interGPUOutputSize, 1);
 
 //  int bytesOnGPU = sizeof(float) * (8 * currentData->numEnsembles + currentData->totalInputSize + currentData->totalTransformSize + 2 * currentData->totalNumTransformRows + 2 * currentData->numTerminations + currentData->maxNumDecodedTerminations * currentData->totalEnsembleDimension + currentData->maxDimension * currentData->numNeurons + currentData->totalEnsembleDimension + currentData->numNeurons * 6 + currentData->maxNumNeurons * currentData->totalOutputSize + 2 * currentData->totalOutputSize);
  // printf("bytes on GPU: %d\n", bytesOnGPU);
@@ -886,11 +870,14 @@ void printDynamicNengoGPUData(NengoGPUData* currentData)
 
 void printIntArray(intArray* a, int n, int m)
 {
+
   if(a->onDevice)
   {
     printIntArrayFromDevice(NULL, a, m, n, 0);
     return;
   }
+
+  printf("%s:\n", a->name);
 
   int i, j;
   for(i = 0; i < m; i++)
@@ -912,6 +899,8 @@ void printFloatArray(floatArray* a, int n, int m)
     printFloatArrayFromDevice(NULL, a, m, n, 0);
     return;
   }
+
+  printf("%s:\n", a->name);
 
   int i, j;
 

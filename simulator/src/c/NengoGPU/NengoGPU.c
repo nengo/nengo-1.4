@@ -187,9 +187,6 @@ void* start_GPU_thread(void* arg)
   moveToDeviceNengoGPUData(nengoData);
   printf("GPU Thread %d: done moving simulation data to device\n", nengoData->device);
 
-  //printNengoGPUData(nengoData);
-  //printDynamicNengoGPUData(nengoData);
-
   // signal to parent thread that initialization is complete, then wait for the other threads to finish initialization.
   pthread_mutex_lock(mutex);
   myCVsignal++;
