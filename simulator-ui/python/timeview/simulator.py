@@ -17,6 +17,7 @@ class Simulator:
         self.initialize(network)
 
         if NodeThreadPool.getNumJavaThreads() > 0:
+            NEFGPUInterface.requireAllOutputsOnCPU(True);
             self.thread_pool=NodeThreadPool(network,[]);
         else:
             self.thread_pool=None;
@@ -51,5 +52,6 @@ class Simulator:
 
     def kill(self):
       if self.thread_pool is not None:
+        NEFGPUInterface.requireAllOutputsOnCPU(False);
         self.thread_pool.kill()
         self.thread_pool = None
