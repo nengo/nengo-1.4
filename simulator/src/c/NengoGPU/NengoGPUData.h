@@ -281,7 +281,7 @@ void initializeNengoGPUData(NengoGPUData*);
 void checkNengoGPUData(NengoGPUData*);
 void moveToDeviceNengoGPUData(NengoGPUData*);
 void freeNengoGPUData(NengoGPUData*);
-void printNengoGPUData(NengoGPUData* currentData);
+void printNengoGPUData(NengoGPUData* currentData, int printArrays);
 void printDynamicNengoGPUData(NengoGPUData* currentData);
 
 void printIntArray(intArray* a, int n, int m);

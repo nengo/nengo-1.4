@@ -24,7 +24,8 @@ void initGPUDevice(int device);
 
 void shutdownGPUDevice();
 
-void checkCudaError(cudaError_t err);
+void checkCudaErrorWithDevice(cudaError_t err, int device, char* message);
+void checkCudaError(cudaError_t err, char* message);
 
 __global__ void transform(float dt, int numTransformRows, float* input, int* inputOffset, int* transformRowToInputIndexor, float* transforms, float* tau, float* terminationOutput, int* terminationOutputIndexor, int* inputDimensions);
 

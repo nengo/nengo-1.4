@@ -1,4 +1,3 @@
-
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -45,7 +44,7 @@ void printFloatArrayFromDevice(FILE* fp, floatArray* a, int n, int m, int labels
   cudaError_t err;
   float* temp = (float*) malloc( m * n * sizeof(float));
   err = cudaMemcpy(temp, a->array, m * n * sizeof(float), cudaMemcpyDeviceToHost);
-  checkCudaError(err);
+  checkCudaError(err, "in printFloatArrayFromDevice, copying from device to host");
 
   printf("%s:\n", a->name);
 
@@ -127,7 +126,7 @@ int getGPUDeviceCount(){
   int numDevices;
   
   err = cudaGetDeviceCount(&numDevices);
-  checkCudaError(err);
+  checkCudaError(err, "get GPU device count");
   
   return numDevices;
 }
@@ -143,12 +142,21 @@ void shutdownGPUDevice()
 {
 }
 
-void checkCudaError(cudaError_t err)
+void checkCudaErrorWithDevice(cudaError_t err, int device, char* message)
+{
+  if(!err)
+      return;
+
+  printf("device: %d", device);
+  checkCudaError(err, message);
+}
+
+void checkCudaError(cudaError_t err, char* message)
 {
     if(!err)
         return;
 
-    printf("%s\n", cudaGetErrorString(err));
+    printf(" CUDA ERROR: message: %s, description: %s\n", message, cudaGetErrorString(err));
 
     exit(EXIT_FAILURE);
 }
@@ -186,7 +194,6 @@ __global__ void transform(float dt, int numTransformRows, float* input, int* ter
 
     int outputIndex = terminationOutputIndexor[i];
     terminationOutput[outputIndex] = (1 - dt_over_tau) * terminationOutput[outputIndex] + dt_over_tau * dot_product;
-    
   }
 }
 
@@ -375,7 +382,7 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
 {
   float dt = endTime - startTime;
 
-  //printf("start time: %f, end time %f, dt: %f\n", startTime, endTime, dt);
+  //printf("start time: %f, end time %f, dt: %f, device: %d\n", startTime, endTime, dt, nengoData->device);
 
   cudaError_t err;
 
@@ -395,28 +402,9 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
 // Copy input from host to GPU
 ///////////////////////////////////////////////////////
 
-
-  //printf("Copy java input : %d\n", nengoData->device);
   cudaMemcpy(nengoData->input->array + nengoData->GPUInputSize, sharedInput + nengoData->offsetInSharedInput, (nengoData->JavaInputSize + nengoData->CPUInputSize) * sizeof(float), cudaMemcpyHostToDevice);
   err = cudaGetLastError();
-  checkCudaError(err);
-
-  //print error checking data
-/* 
-  float* input_temp = (float*)malloc(nengoData->totalInputSize * sizeof(float));
-  err = cudaMemcpy(input_temp, nengoData->input->array,nengoData->totalInputSize * sizeof(float), cudaMemcpyDeviceToHost);
-  
-  printf("stuff in input: %f\n", startTime);
-  int i;
-  for(i = 0; i < nengoData->GPUInputSize; i++)
-  {
-    printf("(%d, %f) ", i, input_temp[i]);
-  }
-  printf("\n");
-
-  free(input_temp);
-  */
-  
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: copying cpu input to device");
 
 ///////////////////////////////////////////////////////
 // Multiply input vectors by corresponding termination transform
@@ -424,43 +412,39 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dimBlock.x = 256;
   dimGrid.x = nengoData->totalNumTransformRows / dimBlock.x + 1;
 
-  //printf("transform : %d\n", nengoData->device);
   transform<<<dimGrid, dimBlock>>> (dt, nengoData->totalNumTransformRows, nengoData->input->array, nengoData->terminationOffsetInInput->array, nengoData->transformRowToInputIndexor->array, nengoData->terminationTransforms->array, nengoData->terminationTau->array, nengoData->terminationOutput->array, nengoData->terminationOutputIndexor->array, nengoData->inputDimension->array);
   err = cudaGetLastError();
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: transform");
 
 ///// sum the activation in each dimension of each ensemble
 
   dimBlock.x = 256;
   dimGrid.x = nengoData->totalEnsembleDimension / dimBlock.x + 1;
 
-  //printf("sum : %d\n", nengoData->device);
   sumTerminations <<<dimGrid, dimBlock>>> (nengoData->totalEnsembleDimension, nengoData->maxNumDecodedTerminations, nengoData->terminationOutput->array, nengoData->ensembleSums->array);
   err = cudaGetLastError();
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: sum");
 
 
 ///// process ND (nonDecoded) terminations
   dimBlock.x = 256;
   dimGrid.x = nengoData->numEnsembles / dimBlock.x + 1;
 
-  //printf("process ND\n");
   processNDterminations<<<dimGrid, dimBlock>>>(nengoData->numEnsembles, nengoData->numNDterminations, steps, adjusted_dt, nengoData->NDterminationEnsembleOffset->array, nengoData->terminationOffsetInInput->array, nengoData->inputDimension->array, nengoData->NDterminationInputIndexor->array, nengoData->input->array, nengoData->NDterminationWeights->array, nengoData->NDterminationCurrents->array, nengoData->NDterminationEnsembleSums->array, nengoData->terminationTau->array);
 
   err = cudaGetLastError();
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: process non decoded");
 
 
 ///// encode
   dimBlock.x = 256;
   dimGrid.x = nengoData->numNeurons / dimBlock.x + 1;
 
-  //printf("encode\n");
   encode<<<dimGrid, dimBlock>>> (nengoData->numNeurons, nengoData->encoders->array, nengoData->ensembleSums->array, nengoData->encodeResult->array, nengoData->encoderRowToEnsembleIndexor->array, nengoData->ensembleOffsetInDimensions->array, nengoData->ensembleDimension->array, nengoData->encoderStride->array, nengoData->encoderRowToNeuronIndexor->array);
 
 
   err = cudaGetLastError();
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: encode");
 
 
 
@@ -468,79 +452,50 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dimBlock.x = 256;
   dimGrid.x = nengoData->numNeurons / dimBlock.x + 1;
 
-  //printf("integrate after encode\n");
   integrateAfterEncode <<<dimGrid, dimBlock>>> (nengoData->numNeurons, dt, adjusted_dt, steps, nengoData->neuronToEnsembleIndexor->array, nengoData->encodeResult->array, nengoData->neuronVoltage->array, nengoData->neuronReftime->array, nengoData->ensembleTauRC->array, nengoData->ensembleTauRef->array, nengoData->neuronBias->array, nengoData->neuronScale->array, nengoData->spikes->array, nengoData->NDterminationEnsembleSums->array);
 
   err = cudaGetLastError();
-  checkCudaError(err);
-/*
-  int i;
-  float* temp_voltage = (float*)malloc((nengoData->numNeurons - 11330 + 1) * sizeof(float));
-  err = cudaMemcpy(temp_voltage, nengoData->encodeResult->array + 11330,(nengoData->numNeurons - 11330 - 1) * sizeof(float), cudaMemcpyDeviceToHost);
-
-  printf("neuronVoltage:");
-  for(i = 11330; i < nengoData->numNeurons; i++)
-  {
-    printf("(%d, %f), ", i, temp_voltage[i - 11330]);
-  }
-  printf("\n");
-*/
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: integrate after encode");
 
 ///// decode
 
   dimBlock.x = 256;
   dimGrid.x = nengoData->totalOutputSize / dimBlock.x + 1;
 
-  //printf("decode\n");
   decode<<<dimGrid, dimBlock>>>(nengoData->totalOutputSize, nengoData->decoders->array, nengoData->spikes->array, nengoData->ensembleOutput->array, nengoData->decoderRowToEnsembleIndexor->array, nengoData->ensembleNumNeurons->array, nengoData->ensembleOffsetInNeurons->array, nengoData->decoderStride->array, nengoData->decoderRowToOutputIndexor->array);
 
   err = cudaGetLastError();
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: decode");
 
 
 //// move output to device
-  //print error checking data
- /* 
-  float* output_temp = (float*)malloc(nengoData->totalOutputSize * sizeof(float));
-  err = cudaMemcpy(output_temp, nengoData->output->array,nengoData->totalOutputSize * sizeof(float), cudaMemcpyDeviceToHost);
-  
-  printf("stuff in output: %f\n", startTime);
-  for(i = 0; i < nengoData->totalOutputSize; i++)
-  {
-    printf("(%d, %f) ", i, output_temp[i]);
-  }
-  printf("\n");
-
-  free(output_temp);
-  
- */ 
 
   // reorganize the output, which comes out of decode in terms of ensembles, so that it is in terms of network arrays.
   dimGrid.x = nengoData->totalOutputSize / (dimBlock.x * dimBlock.y) + 1;
   moveGPUData<<<dimGrid, dimBlock>>>(nengoData->totalOutputSize, nengoData->ensembleOutputToNetworkArrayOutputMap->array, nengoData->output->array, nengoData->ensembleOutput->array);
   err = cudaGetLastError();
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: moveensembleoutput to network array output");
 
-  //printf("extract the spikes we want to send back\n");
-  dimGrid.x = nengoData->numSpikesToSendBack / (dimBlock.x * dimBlock.y) + 1;
-  moveGPUData<<<dimGrid, dimBlock>>>(nengoData->numSpikesToSendBack, nengoData->spikeMap->array, nengoData->output->array + nengoData->totalOutputSize, nengoData->spikes->array);
-  err = cudaGetLastError();
-  checkCudaError(err);
+  if(nengoData->numSpikesToSendBack > 0)
+  { 
+    dimGrid.x = nengoData->numSpikesToSendBack / (dimBlock.x * dimBlock.y) + 1;
+    moveGPUData<<<dimGrid, dimBlock>>>(nengoData->numSpikesToSendBack, nengoData->spikeMap->array, nengoData->output->array + nengoData->totalOutputSize, nengoData->spikes->array);
+    err = cudaGetLastError();
+    checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: extract spikes to send back");
+  }
 
   if(nengoData->CPUOutputSize + nengoData->numSpikesToSendBack > 0)
   {
     cudaMemcpy(nengoData->outputHost->array, nengoData->output->array + nengoData->GPUOutputSize, (nengoData->CPUOutputSize + nengoData->numSpikesToSendBack) * sizeof(float), cudaMemcpyDeviceToHost);
     err = cudaGetLastError();
-    checkCudaError(err);
+    checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: move output from GPU to CPU");
   }
   
 //// move data along GPU projections
   dimGrid.x = nengoData->GPUInputSize / (dimBlock.x * dimBlock.y) + 1;
-  //printf("move output along projections\n");
   moveGPUData<<<dimGrid, dimBlock>>>(nengoData->GPUInputSize, nengoData->GPUTerminationToOriginMap->array, nengoData->input->array, nengoData->output->array);
   err = cudaGetLastError();
-  checkCudaError(err);
-  //printf("donemove output along projections\n");
+  checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: move output along GPU projections");
 }
 
 float* allocateCudaFloatArray(int size)
@@ -548,7 +503,7 @@ float* allocateCudaFloatArray(int size)
   float* temp;
   cudaError_t err;
   err = cudaMalloc((void**)&temp, size * sizeof(float));
-  checkCudaError(err);
+  checkCudaError(err, "allocate cuda float array");
   return temp;
 }
   
@@ -557,7 +512,7 @@ int* allocateCudaIntArray(int size)
   int* temp;
   cudaError_t err;
   err = cudaMalloc((void**)&temp, size * sizeof(int));
-  checkCudaError(err);
+  checkCudaError(err, "allocate cuda int array");
   return temp;
 }
 
@@ -602,19 +557,19 @@ void initializeDeviceInputAndOutput(NengoGPUData* nengoData)
 
 
   err = cudaMemset(nengoData->input->array, 0, nengoData->GPUInputSize * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
   err = cudaMemset(nengoData->ensembleOutput->array, 0, nengoData->totalOutputSize * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
   err = cudaMemset(nengoData->output->array, 0, (nengoData->totalOutputSize + nengoData->numSpikesToSendBack) * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
   err = cudaMemset(nengoData->spikes->array, 0, nengoData->numNeurons * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
   err = cudaMemset(nengoData->terminationOutput->array, 0, nengoData->totalEnsembleDimension * nengoData->maxNumDecodedTerminations * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
   err = cudaMemset(nengoData->neuronVoltage->array, 0, nengoData->numNeurons * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
   err = cudaMemset(nengoData->neuronReftime->array, 0, nengoData->numNeurons * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
   
   name = "NDterminationCurrents";
   nengoData->NDterminationCurrents = newFloatArrayOnDevice(nengoData->numNDterminations, name); 
@@ -622,9 +577,9 @@ void initializeDeviceInputAndOutput(NengoGPUData* nengoData)
   nengoData->NDterminationEnsembleSums = newFloatArrayOnDevice(nengoData->numEnsembles, name); 
 
   err = cudaMemset(nengoData->NDterminationCurrents->array, 0, nengoData->numNDterminations * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
   err = cudaMemset(nengoData->NDterminationEnsembleSums->array, 0, nengoData->numEnsembles * sizeof(float));
-  checkCudaError(err);
+  checkCudaErrorWithDevice(err, nengoData->device, "cuda setup structures");
 }
 
 #ifdef __cplusplus

@@ -81,6 +81,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
   int NDterminationIndexInEnsemble = 0;
   int startEnsembleIndex, endEnsembleIndex, networkArrayIndexInJavaArray, networkArrayOffsetInTerminations = 0;
   int networkArrayTerminationIndex = 0;
+  int terminationOffset = 0;
 
   for(h = 0; h < currentData->numNetworkArrays; h++)
   {
@@ -118,6 +119,8 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
       (*env)->GetIntArrayRegion(env, tempIntArray_JAVA, 0, numTerminationsForCurrentEnsemble, isDecodedTermination);
       (*env)->DeleteLocalRef(env, tempIntArray_JAVA);
 
+      terminationOffset = 0;
+
       NDterminationIndexInEnsemble = i;
 
       // loop through the terminations for the current ensemble and store the relevant data
@@ -142,13 +145,15 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
               floatArraySetElement(currentData->terminationTransforms, l * currentData->totalNumTransformRows + transformRowIndex, currentTransformRow[l]); 
             }
 
-            intArraySetElement(currentData->terminationOutputIndexor, transformRowIndex, j * currentData->totalEnsembleDimension + dimensionIndex + k);
+            intArraySetElement(currentData->terminationOutputIndexor, transformRowIndex, terminationOffset + dimensionIndex + k);
             intArraySetElement(currentData->transformRowToInputIndexor, transformRowIndex, networkArrayOffsetInTerminations + j);
-            
+
             transformRowIndex++;
 
             (*env)->DeleteLocalRef(env, currentTransformRow_JAVA);
           }
+
+          terminationOffset += currentData->totalEnsembleDimension;
 
           if(i == startEnsembleIndex)
           {
@@ -590,7 +595,6 @@ void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, in
 
     if(collectSpikes[i])
     {
-      currentData->numSpikeEnsembles++;
       currentData->numSpikesToSendBack += ensembleData[NENGO_ENSEMBLE_DATA_NUM * i + NENGO_ENSEMBLE_DATA_NUM_NEURONS];
     }
   }
@@ -776,7 +780,7 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
 
       // set which section of the output array the current origin belongs in: 0 if it stays on the GPU, 1 if it 
       // has to go all the way to Java, 2 if it doesn't have to go all the way back to java but does hava to go to another GPU
-      if(originRequiredByJava[i][j])
+      if(originRequiredByJava[naIndexInJavaArray][j])
       {
         intArraySetElement(currentData->networkArrayOriginOffsetInOutput, naOriginIndex, JavaOutputIndex);
         originLocation[naOriginIndex] = 1;
@@ -852,7 +856,7 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
   naOffsetInEnsembleOriginIndices = 0;
   naOriginIndex = 0;
   
-  int naOriginOffsetInOutput, indexInNetworkArrayOutput, indexInEnsembleOutput;
+  int indexInNetworkArrayOutput, indexInEnsembleOutput;
 
   for(i = 0; i < currentData->numNetworkArrays; i++)
   {  
@@ -865,8 +869,7 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
 
     for(j = 0; j < numOrigins; j++)
     {
-      naOriginOffsetInOutput = intArrayGetElement(currentData->networkArrayOriginOffsetInOutput, naOriginIndex);
-      indexInNetworkArrayOutput = naOriginOffsetInOutput;
+      indexInNetworkArrayOutput = intArrayGetElement(currentData->networkArrayOriginOffsetInOutput, naOriginIndex);
       
       ensembleOriginIndex = naOffsetInEnsembleOriginIndices + j;
 
@@ -1201,7 +1204,6 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
     setupIO(numProjections, projections, currentData, networkArrayData, originRequiredByJava);
 
     sharedInputSize += currentData->JavaInputSize + currentData->CPUInputSize;
-
   }
 
   (*env)->DeleteLocalRef(env, terminationTransforms_JAVA);
@@ -1249,7 +1251,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
 JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
   (JNIEnv *env, jclass class, jobjectArray input, jobjectArray output, jobjectArray spikes, jfloat startTime_JAVA, jfloat endTime_JAVA)
 {
-  //printf("NengoGPU: STEP\n"); 
+  printf("NengoGPU: STEP\n"); 
   startTime = (float) startTime_JAVA;
   endTime = (float) endTime_JAVA;
 
@@ -1342,7 +1344,15 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
         {
           outputDimension = (*env)->GetArrayLength(env, currentOutput_JAVA);
 
-          (*env)->SetFloatArrayRegion(env, currentOutput_JAVA, 0, outputDimension, currentData->outputHost->array + outputIndex);
+          if(outputIndex + outputDimension <= currentData->JavaOutputSize)
+          {
+             (*env)->SetFloatArrayRegion(env, currentOutput_JAVA, 0, outputDimension, currentData->outputHost->array + outputIndex);
+          }
+          else
+          {
+            printf("error: accessing outputHost for java out of bounds. size: %d, index: %d, dim: %d, device: %d, na: %d out of %d\n", currentData->JavaOutputSize, outputIndex, outputDimension, currentData->device, k, currentData->numNetworkArrays);
+            exit(EXIT_FAILURE);
+          }
 
           outputIndex += outputDimension;
           (*env)->DeleteLocalRef(env, currentOutput_JAVA);

@@ -349,7 +349,6 @@ NengoGPUData* getNewNengoGPUData()
   new->numNDterminations = 0;
 
   new->numSpikesToSendBack = 0;
-  new->numSpikeEnsembles = 0;
 
   new->GPUOutputSize = 0;
   new->JavaOutputSize = 0;
@@ -681,7 +680,7 @@ void freeNengoGPUData(NengoGPUData* currentData)
 };
 
 // print the NengoGPUData. Should only be called once the data has been set.
-void printNengoGPUData(NengoGPUData* currentData)
+void printNengoGPUData(NengoGPUData* currentData, int printArrays)
 {
   
   printf("printing NengoGPUData:\n");
@@ -706,7 +705,6 @@ void printNengoGPUData(NengoGPUData* currentData)
   printf("JavaInputSize; %d\n", currentData->JavaInputSize);
   printf("offsetInSharedInput; %d\n", currentData->offsetInSharedInput);
   printf("numSpikesToSendBack; %d\n", currentData->numSpikesToSendBack);
-  printf("numSpikeEnsembles; %d\n", currentData->numSpikeEnsembles);
 
   printf("totalTransformSize; %d\n", currentData->totalTransformSize);
   printf("totalNumTransformRows; %d\n", currentData->totalNumTransformRows);
@@ -727,81 +725,84 @@ void printNengoGPUData(NengoGPUData* currentData)
   printf("JavaOutputSize; %d\n", currentData->JavaOutputSize);
   printf("interGPUOutputSize; %d\n", currentData->interGPUOutputSize);
   printf("CPUOutputSize; %d\n", currentData->CPUOutputSize);
-  
-  printIntArray(currentData->networkArrayIndexInJavaArray, currentData->numNetworkArrays, 1);
-  printIntArray(currentData->ensembleIndexInJavaArray, currentData->numEnsembles, 1);
+ 
+  if(printArrays)
+  {
+    printIntArray(currentData->networkArrayIndexInJavaArray, currentData->numNetworkArrays, 1);
+    printIntArray(currentData->ensembleIndexInJavaArray, currentData->numEnsembles, 1);
 
-  printFloatArray(currentData->input, currentData->totalInputSize, 1);
-  printIntArray(currentData->terminationOffsetInInput, currentData->numTerminations, 1);
+    printFloatArray(currentData->input, currentData->totalInputSize, 1);
+    printIntArray(currentData->terminationOffsetInInput, currentData->numTerminations, 1);
 
-  printFloatArray(currentData->terminationTransforms, currentData->totalNumTransformRows, currentData->maxDecodedTerminationDimension);
-  printIntArray(currentData->transformRowToInputIndexor, currentData->totalNumTransformRows, 1);
-  printFloatArray(currentData->terminationTau, currentData->numTerminations, 1);
-  printIntArray(currentData->inputDimension, currentData->numInputs, 1);
-  printFloatArray(currentData->terminationOutput, currentData->totalNumTransformRows, 1);
-  printIntArray(currentData->terminationOutputIndexor, currentData->totalNumTransformRows, 1);
-  printIntArray(currentData->ensembleNumTerminations, currentData->numEnsembles, 1);
+    printFloatArray(currentData->terminationTransforms, currentData->totalNumTransformRows, currentData->maxDecodedTerminationDimension);
+    printIntArray(currentData->transformRowToInputIndexor, currentData->totalNumTransformRows, 1);
+    printFloatArray(currentData->terminationTau, currentData->numTerminations, 1);
+    printIntArray(currentData->inputDimension, currentData->numInputs, 1);
+    printFloatArray(currentData->terminationOutput, currentData->totalNumTransformRows, 1);
+    printIntArray(currentData->terminationOutputIndexor, currentData->totalNumTransformRows, 1);
+    printIntArray(currentData->ensembleNumTerminations, currentData->numEnsembles, 1);
 
-  printFloatArray(currentData->encoders, currentData->totalEncoderSize, 1);
-//  printIntArray(currentData->ensembleOrderInEncoders);
-  printFloatArray(currentData->encodeResult, currentData->numNeurons, 1);
-  printFloatArray(currentData->ensembleSums, currentData->totalEnsembleDimension, 1);
+    printFloatArray(currentData->encoders, currentData->totalEncoderSize, 1);
+  //  printIntArray(currentData->ensembleOrderInEncoders);
+    printFloatArray(currentData->encodeResult, currentData->numNeurons, 1);
+    printFloatArray(currentData->ensembleSums, currentData->totalEnsembleDimension, 1);
 
-  printFloatArray(currentData->decoders, currentData->totalDecoderSize, 1);
-//  printIntArray(currentData->ensembleOrderInDecoders, 1);
+    printFloatArray(currentData->decoders, currentData->totalDecoderSize, 1);
+  //  printIntArray(currentData->ensembleOrderInDecoders, 1);
 
-  // data for calculating spikes
-  printFloatArray(currentData->neuronVoltage, currentData->numNeurons, 1);
-  printFloatArray(currentData->neuronReftime, currentData->numNeurons, 1);
-  printFloatArray(currentData->neuronBias, currentData->numNeurons, 1);
-  printFloatArray(currentData->neuronScale, currentData->numNeurons, 1);
-  printFloatArray(currentData->ensembleTauRC, currentData->numEnsembles, 1);
-  printFloatArray(currentData->ensembleTauRef, currentData->numEnsembles, 1);
-  printIntArray(currentData->neuronToEnsembleIndexor, currentData->numNeurons, 1);
+    // data for calculating spikes
+    printFloatArray(currentData->neuronVoltage, currentData->numNeurons, 1);
+    printFloatArray(currentData->neuronReftime, currentData->numNeurons, 1);
+    printFloatArray(currentData->neuronBias, currentData->numNeurons, 1);
+    printFloatArray(currentData->neuronScale, currentData->numNeurons, 1);
+    printFloatArray(currentData->ensembleTauRC, currentData->numEnsembles, 1);
+    printFloatArray(currentData->ensembleTauRef, currentData->numEnsembles, 1);
+    printIntArray(currentData->neuronToEnsembleIndexor, currentData->numNeurons, 1);
 
-  // supplementary arrays for doing encoding
-  printIntArray(currentData->ensembleDimension, currentData->numEnsembles, 1);
-  printIntArray(currentData->ensembleOffsetInDimensions, currentData->numEnsembles, 1);
-  printIntArray(currentData->encoderRowToEnsembleIndexor, currentData->numNeurons, 1); 
-  printIntArray(currentData->encoderStride, currentData->maxDimension, 1);
-  printIntArray(currentData->encoderRowToNeuronIndexor, currentData->numNeurons, 1);
+    // supplementary arrays for doing encoding
+    printIntArray(currentData->ensembleDimension, currentData->numEnsembles, 1);
+    printIntArray(currentData->ensembleOffsetInDimensions, currentData->numEnsembles, 1);
+    printIntArray(currentData->encoderRowToEnsembleIndexor, currentData->numNeurons, 1); 
+    printIntArray(currentData->encoderStride, currentData->maxDimension, 1);
+    printIntArray(currentData->encoderRowToNeuronIndexor, currentData->numNeurons, 1);
 
-  // supplementary arrays for doing decoding
-  printIntArray(currentData->ensembleNumNeurons, currentData->numEnsembles, 1);
-  printIntArray(currentData->ensembleOffsetInNeurons, currentData->numEnsembles, 1); 
-  printIntArray(currentData->decoderRowToEnsembleIndexor, currentData->totalOutputSize, 1); 
-  printIntArray(currentData->decoderStride, currentData->maxDimension, 1);
-  printIntArray(currentData->decoderRowToOutputIndexor, currentData->totalOutputSize, 1);
+    // supplementary arrays for doing decoding
+    printIntArray(currentData->ensembleNumNeurons, currentData->numEnsembles, 1);
+    printIntArray(currentData->ensembleOffsetInNeurons, currentData->numEnsembles, 1); 
+    printIntArray(currentData->decoderRowToEnsembleIndexor, currentData->totalOutputSize, 1); 
+    printIntArray(currentData->decoderStride, currentData->maxDimension, 1);
+    printIntArray(currentData->decoderRowToOutputIndexor, currentData->totalOutputSize, 1);
 
-  printFloatArray(currentData->spikes, currentData->numNeurons, 1);
+    printFloatArray(currentData->spikes, currentData->numNeurons, 1);
 
-  printFloatArray(currentData->ensembleOutput, currentData->totalOutputSize, 1);
-  printFloatArray(currentData->output, currentData->totalOutputSize + currentData->numSpikesToSendBack, 1);
-  printFloatArray(currentData->outputHost, currentData->CPUOutputSize + currentData->numSpikesToSendBack, 1);
+    printFloatArray(currentData->ensembleOutput, currentData->totalOutputSize, 1);
+    printFloatArray(currentData->output, currentData->totalOutputSize + currentData->numSpikesToSendBack, 1);
+    printFloatArray(currentData->outputHost, currentData->CPUOutputSize + currentData->numSpikesToSendBack, 1);
 
-  printIntArray(currentData->GPUTerminationToOriginMap , currentData->GPUInputSize, 1);
-  printIntArray(currentData->spikeMap, currentData->numSpikesToSendBack, 1);
+    printIntArray(currentData->GPUTerminationToOriginMap , currentData->GPUInputSize, 1);
+    printIntArray(currentData->spikeMap, currentData->numSpikesToSendBack, 1);
 
-  // non decoded termination data
-  printIntArray(currentData->NDterminationInputIndexor, currentData->numNDterminations, 1);
-  printFloatArray(currentData->NDterminationCurrents, currentData->numNDterminations, 1);
-  printFloatArray(currentData->NDterminationWeights, currentData->totalNonDecodedTransformSize, 1);
-  printIntArray(currentData->NDterminationEnsembleOffset, currentData->numEnsembles, 1);
-  printFloatArray(currentData->NDterminationEnsembleSums, currentData->numEnsembles, 1);
+    // non decoded termination data
+    printIntArray(currentData->NDterminationInputIndexor, currentData->numNDterminations, 1);
+    printFloatArray(currentData->NDterminationCurrents, currentData->numNDterminations, 1);
+    printFloatArray(currentData->NDterminationWeights, currentData->totalNonDecodedTransformSize, 1);
+    printIntArray(currentData->NDterminationEnsembleOffset, currentData->numEnsembles, 1);
+    printFloatArray(currentData->NDterminationEnsembleSums, currentData->numEnsembles, 1);
 
-  // for organizing the output in terms of ensembles
-  printIntArray(currentData->ensembleOriginOffsetInOutput, currentData->numOrigins, 1);
-  printIntArray(currentData->ensembleNumOrigins , currentData->numEnsembles, 1);
-  printIntArray(currentData->ensembleOriginDimension, currentData->numOrigins, 1);
+    // for organizing the output in terms of ensembles
+    printIntArray(currentData->ensembleOriginOffsetInOutput, currentData->numOrigins, 1);
+    printIntArray(currentData->ensembleNumOrigins , currentData->numEnsembles, 1);
+    printIntArray(currentData->ensembleOriginDimension, currentData->numOrigins, 1);
 
-  printIntArray(currentData->ensembleOutputToNetworkArrayOutputMap, currentData->totalOutputSize, 1);
+    printIntArray(currentData->ensembleOutputToNetworkArrayOutputMap, currentData->totalOutputSize, 1);
 
-  printIntArray(currentData->networkArrayOriginOffsetInOutput, currentData->numNetworkArrayOrigins, 1); 
-  printIntArray(currentData->networkArrayOriginDimension, currentData->numNetworkArrayOrigins, 1); 
-  printIntArray(currentData->networkArrayNumOrigins, currentData->numNetworkArrays, 1);
+    printIntArray(currentData->networkArrayOriginOffsetInOutput, currentData->numNetworkArrayOrigins, 1); 
+    printIntArray(currentData->networkArrayOriginDimension, currentData->numNetworkArrayOrigins, 1); 
+    printIntArray(currentData->networkArrayNumOrigins, currentData->numNetworkArrays, 1);
 
-  printIntArray(currentData->sharedData_outputIndex, currentData->interGPUOutputSize, 1);
-  printIntArray(currentData->sharedData_sharedIndex, currentData->interGPUOutputSize, 1);
+    printIntArray(currentData->sharedData_outputIndex, currentData->interGPUOutputSize, 1);
+    printIntArray(currentData->sharedData_sharedIndex, currentData->interGPUOutputSize, 1);
+  }
 
 //  int bytesOnGPU = sizeof(float) * (8 * currentData->numEnsembles + currentData->totalInputSize + currentData->totalTransformSize + 2 * currentData->totalNumTransformRows + 2 * currentData->numTerminations + currentData->maxNumDecodedTerminations * currentData->totalEnsembleDimension + currentData->maxDimension * currentData->numNeurons + currentData->totalEnsembleDimension + currentData->numNeurons * 6 + currentData->maxNumNeurons * currentData->totalOutputSize + 2 * currentData->totalOutputSize);
  // printf("bytes on GPU: %d\n", bytesOnGPU);
@@ -870,6 +871,11 @@ void printDynamicNengoGPUData(NengoGPUData* currentData)
 
 void printIntArray(intArray* a, int n, int m)
 {
+  if(!a)
+    return;
+
+  if(!a->array)
+    return;
 
   if(a->onDevice)
   {
@@ -894,6 +900,12 @@ void printIntArray(intArray* a, int n, int m)
 
 void printFloatArray(floatArray* a, int n, int m)
 {
+  if(!a)
+    return;
+
+  if(!a->array)
+    return;
+
   if(a->onDevice)
   {
     printFloatArrayFromDevice(NULL, a, m, n, 0);
