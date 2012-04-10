@@ -8,3 +8,4 @@ Advanced Nengo Usage
    dragndrop 
    experiments
    matlab
+   large_ensembles
