@@ -14,10 +14,17 @@ Step 1: Install Python, SciPy, and NumPy
 
 Python is a freely available programming language, and it has two extensions (SciPy and NumPy)
 which provide most of the high-speed matrix operations found in Matlab.  For Windows and OS X,
-download it from http://www.python.org/getit/ and for Linux, it may already be installed, but a
-command like ``sudo apt-get install python python-numpy python-scipy`` should install it on many standard Linux distributions (such as Ubuntu).
+download it from the following sites:
 
-*Important Note:* When you install it, use Python 2.7, rather than 3.2.  As it says on the
+ - Python: http://www.python.org/getit/ 
+ - SciPy: http://sourceforge.net/projects/scipy/files/scipy/ 
+ - NumPy: http://sourceforge.net/projects/numpy/files/NumPy/
+ 
+For Linux, it may already be installed, but a command 
+like ``sudo apt-get install python python-numpy python-scipy`` should install it on many standard
+Linux distributions (such as Ubuntu).
+
+*Important Note:* When you install it, use Python 2.7 (or 2.6), rather than 3.2.  As it says on the
 Python web page, "start with Python 2.7; more existing third party software is compatible with Python 2 than Python 3 right now."
 
 Step 2: Tell Nengo where Python is
