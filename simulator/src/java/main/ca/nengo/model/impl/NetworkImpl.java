@@ -30,6 +30,7 @@ package ca.nengo.model.impl;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -55,16 +56,19 @@ import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.impl.LocalSimulator;
 import ca.nengo.util.Probe;
+import ca.nengo.util.TaskSpawner;
+import ca.nengo.util.ThreadTask;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.ProbeTask;
 
 /**
  * Default implementation of Network.
  *
  * @author Bryan Tripp
  */
-public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.Listener {
+public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.Listener, TaskSpawner {
 
 	/**
 	 * Default name for a Network
@@ -550,7 +554,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @return Using GPU?
 	 */
 	public boolean getUseGPU(){
-		return myUseGPU && myMode == SimulationMode.DEFAULT;
+		return myUseGPU && (myMode == SimulationMode.DEFAULT || myMode == SimulationMode.RATE);
 	}
 
 	/**
@@ -724,6 +728,36 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		myProbeables.remove(name);
 		myProbeableStates.remove(name);
 	}
+	
+	/**
+     * @see ca.nengo.util.impl.TaskSpawner#getTasks()
+     */
+    public ThreadTask[] getTasks(){
+    	
+    	if(mySimulator == null)
+    		return new ThreadTask[0];
+    		
+    	Probe[] probes = mySimulator.getProbes();
+    	ProbeTask[] probeTasks = new ProbeTask[probes.length];
+    	
+    	for(int i = 0; i < probes.length; i++){
+    		probeTasks[i] = probes[i].getProbeTask();
+    	}
+
+    	return probeTasks;
+    }
+
+    /**
+     * @see ca.nengo.util.impl.TaskSpawner#setTasks()
+     */
+    public void setTasks(ThreadTask[] tasks){
+    }
+
+    /**
+     * @see ca.nengo.util.impl.TaskSpawner#addTasks()
+     */
+    public void addTasks(ThreadTask[] tasks){
+    }
 
 	/**
 	 * Wraps an Origin with a new name (for exposing outside Network).

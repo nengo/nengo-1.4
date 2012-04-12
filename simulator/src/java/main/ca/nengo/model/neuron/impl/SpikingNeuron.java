@@ -123,6 +123,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 
 		float[] integratorOutput = current.getValues1D();
 		float[] generatorInput = new float[integratorOutput.length];
+		
 		for (int i = 0; i < integratorOutput.length; i++) {
 			myUnscaledCurrent = (myRadialInput + integratorOutput[i]);
 			generatorInput[i] = myBias + myScale * myUnscaledCurrent;

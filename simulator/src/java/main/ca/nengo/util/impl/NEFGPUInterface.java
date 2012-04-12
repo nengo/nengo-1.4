@@ -10,6 +10,7 @@ import ca.nengo.model.Origin;
 import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.Projection;
 import ca.nengo.model.RealOutput;
+import ca.nengo.model.SimulationMode;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.EnsembleTermination;
@@ -96,7 +97,7 @@ public class NEFGPUInterface {
 			int[][] isDecodedTermination, float[][] terminationTau,
 			float[][][] encoders, float[][][][] decoders, float[][] neuronData,
 			int[][] projections, int[][] networkArrayData, int[][] ensembleData, 
-			int[] collectSpikes, int[][] outputRequiredOnCPU, float maxTimeStep, 
+			int[] isSpikingEnsemble, int[] collectSpikes, int[][] outputRequiredOnCPU, float maxTimeStep, 
 			int[] deviceForNetworkArrays, int numDevicesRequested);
 
 	static native void nativeStep(float[][][] representedInput,
@@ -198,6 +199,7 @@ public class NEFGPUInterface {
 		int[][] ensembleDataArray = new int[myGPUEnsembles.length][];
 		int[] collectSpikes = new int[myGPUEnsembles.length];
 		int[][] outputRequiredOnCPU = new int[myGPUNetworkArrays.length][];
+		int[] isSpikingEnsemble = new int[myGPUEnsembles.length];
 		float maxTimeStep = ((LIFSpikeGenerator) ((SpikingNeuron) ((NEFEnsembleImpl) myGPUEnsembles[0])
 				.getNodes()[0]).getGenerator()).getMaxTimeStep();
 		
@@ -359,6 +361,8 @@ public class NEFGPUInterface {
 
 			ensembleData.dimension = workingNode.getDimension();
 			ensembleData.numNeurons = workingNode.getNodeCount();
+			
+			isSpikingEnsemble[i] = (workingNode.getMode() == SimulationMode.DEFAULT) ? 1 : 0;
 
 			terminations = workingNode.getTerminations();
 
@@ -443,7 +447,7 @@ public class NEFGPUInterface {
 		nativeSetupRun(terminationTransforms, isDecodedTermination,
 				terminationTau, encoders, decoders, neuronData,
 				adjustedProjections, networkArrayDataArray, ensembleDataArray,
-				collectSpikes, outputRequiredOnCPU, maxTimeStep, nodeAssignments, myNumDevices);
+				isSpikingEnsemble, collectSpikes, outputRequiredOnCPU, maxTimeStep, nodeAssignments, myNumDevices);
 
 		// Set up the data structures that we pass in and out of the native step call.
 		// They do not change in size from step to step so we can re-use them.

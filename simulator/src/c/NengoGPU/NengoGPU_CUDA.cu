@@ -246,7 +246,7 @@ __global__ void encode(int totalNumNeurons, float* encoders, float* sums, float*
   }
 }
 
-__global__ void integrateAfterEncode(int numNeurons, float dt, float adjusted_dt, int steps, int* neuronToEnsembleIndexor, float* encodingResult, float* neuronVoltage, float* neuronReftime, float* tau_RC, float* tauRef, float* bias, float* scale, float* spikes, float* NDterminationSums)
+__global__ void integrateAfterEncode(int numNeurons, float dt, float adjusted_dt, int steps, int* neuronToEnsembleIndexor, float* encodingResult, float* neuronVoltage, float* neuronReftime, float* tau_RC, float* tauRef, float* bias, float* scale, float* spikes, float* NDterminationSums, int* isSpikingEnsemble)
 {
   int i = threadIdx.x + (blockDim.x * threadIdx.y) + (blockIdx.x + (gridDim.x * blockIdx.y)) * blockDim.x * blockDim.y;
   
@@ -258,30 +258,38 @@ __global__ void integrateAfterEncode(int numNeurons, float dt, float adjusted_dt
     float tau_rc = tau_RC[ensembleIndex];
     float tau_ref = tauRef[ensembleIndex];
     float current = bias[i] + scale[i] * (encodingResult[i] + NDterminationSums[ensembleIndex]);
-    float dV, post_ref, v_threshold = 1.0f;
-    float spike_float;
-    int j, spike = 0;
 
-    for(j = 0; j < steps; j++)
+    if(isSpikingEnsemble[ensembleIndex])
     {
-      dV = adjusted_dt / tau_rc * (current - voltage);
-      voltage = max(voltage + dV, 0.0f);
+      float dV, post_ref, v_threshold = 1.0f;
+      float spike_float;
+      int j, spike = 0;
 
-      post_ref = 1.0f - (refTime - adjusted_dt) / adjusted_dt;
+      for(j = 0; j < steps; j++)
+      {
+        dV = adjusted_dt / tau_rc * (current - voltage);
+        voltage = max(voltage + dV, 0.0f);
 
-      voltage = post_ref >= 1.0f ? voltage : voltage * post_ref;
+        post_ref = 1.0f - (refTime - adjusted_dt) / adjusted_dt;
 
-      voltage = post_ref <= 0.0f ? 0.0f : voltage;
+        voltage = post_ref >= 1.0f ? voltage : voltage * post_ref;
 
-      spike = spike ? spike : voltage > v_threshold;
-      spike_float = spike ? 1.0f/dt : 0.0f;
-      refTime = spike ? ((adjusted_dt / dV) * (dV - voltage + v_threshold)) + tau_ref : refTime - adjusted_dt;
-      voltage = spike ? 0.0 : voltage;
+        voltage = post_ref <= 0.0f ? 0.0f : voltage;
+
+        spike = spike ? spike : voltage > v_threshold;
+        spike_float = spike ? 1.0f/dt : 0.0f;
+        refTime = spike ? ((adjusted_dt / dV) * (dV - voltage + v_threshold)) + tau_ref : refTime - adjusted_dt;
+        voltage = spike ? 0.0 : voltage;
+      }
+
+      neuronReftime[i] = refTime;
+      neuronVoltage[i] = voltage;
+      spikes[i] = spike_float;
     }
-
-    neuronReftime[i] = refTime;
-    neuronVoltage[i] = voltage;
-    spikes[i] = spike_float;
+    else
+    {
+      spikes[i] = (current > 1.0) ? 1.0 / (tau_ref - tau_rc * logf(1.0 - 1.0 / current)) : 0.0;
+    }
   }
 }
 
@@ -389,8 +397,11 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dim3 dimBlock(1, 1);
   dim3 dimGrid(1, 1);
 
-  //int steps = (int)(ceil(dt / nengoData->maxTimeStep));
-  //float adjusted_dt = dt / steps; /// steps;
+//   int NDsteps = 
+  //float NDadjusted_dt = dt / NDsteps; /// steps;
+  int ND_steps = 1; //(int)(ceil(dt / nengoData->maxTimeStep));
+  float ND_adjusted_dt = dt;// / ND_steps;
+
   int steps = 1;
   float adjusted_dt = dt;
 
@@ -430,7 +441,9 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dimBlock.x = 256;
   dimGrid.x = nengoData->numEnsembles / dimBlock.x + 1;
 
-  processNDterminations<<<dimGrid, dimBlock>>>(nengoData->numEnsembles, nengoData->numNDterminations, steps, adjusted_dt, nengoData->NDterminationEnsembleOffset->array, nengoData->terminationOffsetInInput->array, nengoData->inputDimension->array, nengoData->NDterminationInputIndexor->array, nengoData->input->array, nengoData->NDterminationWeights->array, nengoData->NDterminationCurrents->array, nengoData->NDterminationEnsembleSums->array, nengoData->terminationTau->array);
+  processNDterminations<<<dimGrid, dimBlock>>>(nengoData->numEnsembles, nengoData->numNDterminations, ND_steps, ND_adjusted_dt, nengoData->NDterminationEnsembleOffset->array, nengoData->terminationOffsetInInput->array, nengoData->inputDimension->array, nengoData->NDterminationInputIndexor->array, nengoData->input->array, nengoData->NDterminationWeights->array, nengoData->NDterminationCurrents->array, nengoData->NDterminationEnsembleSums->array, nengoData->terminationTau->array);
+  printFloatArray(nengoData->NDterminationEnsembleSums, nengoData->numEnsembles, 1);
+
 
   err = cudaGetLastError();
   checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: process non decoded");
@@ -452,7 +465,7 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dimBlock.x = 256;
   dimGrid.x = nengoData->numNeurons / dimBlock.x + 1;
 
-  integrateAfterEncode <<<dimGrid, dimBlock>>> (nengoData->numNeurons, dt, adjusted_dt, steps, nengoData->neuronToEnsembleIndexor->array, nengoData->encodeResult->array, nengoData->neuronVoltage->array, nengoData->neuronReftime->array, nengoData->ensembleTauRC->array, nengoData->ensembleTauRef->array, nengoData->neuronBias->array, nengoData->neuronScale->array, nengoData->spikes->array, nengoData->NDterminationEnsembleSums->array);
+    integrateAfterEncode <<<dimGrid, dimBlock>>> (nengoData->numNeurons, dt, adjusted_dt, steps, nengoData->neuronToEnsembleIndexor->array, nengoData->encodeResult->array, nengoData->neuronVoltage->array, nengoData->neuronReftime->array, nengoData->ensembleTauRC->array, nengoData->ensembleTauRef->array, nengoData->neuronBias->array, nengoData->neuronScale->array, nengoData->spikes->array, nengoData->NDterminationEnsembleSums->array, nengoData->isSpikingEnsemble->array);
 
   err = cudaGetLastError();
   checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: integrate after encode");

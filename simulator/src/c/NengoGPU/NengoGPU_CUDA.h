@@ -33,7 +33,7 @@ __global__ void sumTerminations(int totalDimensions, int maxDecodedNumTerminatio
 
 __global__ void encode(int totalNumNeurons, float* encoders, float* sums, float* encodeResult, int* encoderRowToEnsembleIndexor, int* ensembleOffsetInDimension, int* ensembleDimension, int* encoderStride, int* neuronIndexor);
 
-__global__ void integrateAfterEncode(int numNuerons, float dt, float adjusted_dt, int steps, int* neuronToEnsembleIndexor, float* encodingResult, float* neuronVoltage, float* neuronReftime, float* tau_RC, float* tauRef, float* bias, float* scale, float* spikes, float* NDterminationSums);
+__global__ void integrateAfterEncode(int numNuerons, float dt, float adjusted_dt, int steps, int* neuronToEnsembleIndexor, float* encodingResult, float* neuronVoltage, float* neuronReftime, float* tau_RC, float* tauRef, float* bias, float* scale, float* spikes, float* NDterminationSums, int* isSpikingEnsemble);
 
 __global__ void decode(int totalOutputSize, float* decoders, float* spikes, float* output, int* decoderRowToEnsembleIndexor, int* ensembleNumNeurons, int* ensembleOffsetInNeurons, int* decoderStride, int* outputIndexor);
 

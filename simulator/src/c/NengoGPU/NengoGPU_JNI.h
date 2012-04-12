@@ -9,23 +9,19 @@ extern "C"{
 #include <stdio.h>
 #include <jni.h>
 
-void getDecoders(JNIEnv* env, NengoGPUData* currentData, int* deviceForEnsemble, jobjectArray decoders_JAVA);
-void createIndexArrayAndGatherData(int gatherData, float* data, float* tempData, int* indices, int* columnLengths, int* dataIndexor, int numRows, int numColumns );
-void createHelper(int* helper, int* columnLengths, int numRows, int numColumns);
-
 int* sort(int* values, int length, int order);
 
 void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArray tau_JAVA, jobjectArray isDecodedTermination_JAVA, NengoGPUData* currentData, int* networkArrayData);
 
-void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, NengoGPUData* currentData, int* deviceForEnsemble);
+void storeNeuronData(JNIEnv* env, jobjectArray neuronData_JAVA, int* isSpikingEnsemble, NengoGPUData* currentData );
 
-void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData currentData);
+void storeEncoders(JNIEnv* env, jobjectArray encoders_JAVA, NengoGPUData* currentData);
 
 void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* currentData, int* networkArrayData);
 
-void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, int* ensembleData, NengoGPUData* currentData);
+void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, int* ensembleData, int* collectSpikes, NengoGPUData* currentData);
 
-void setupIO(int numProjections, projection* projections, NengoGPUData* currentData, int* networkArrayData);
+void setupIO(int numProjections, projection* projections, NengoGPUData* currentData, int* networkArrayData, int** originRequiredByJava);
 
 void setupSpikes(int* collectSpikes, NengoGPUData* currentData);
 

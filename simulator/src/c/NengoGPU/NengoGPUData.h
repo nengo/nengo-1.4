@@ -229,6 +229,8 @@ struct NengoGPUData_t{
   floatArray* ensembleTauRef;
   intArray* neuronToEnsembleIndexor;
 
+  intArray* isSpikingEnsemble;
+
   // supplementary arrays for doing encoding
   intArray* ensembleDimension;
   intArray* ensembleOffsetInDimensions;

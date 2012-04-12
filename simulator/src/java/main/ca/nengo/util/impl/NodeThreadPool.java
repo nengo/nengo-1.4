@@ -454,7 +454,8 @@ public class NodeThreadPool {
                 nodeList.addAll(nodesToProcess);
                 nodesToProcess = nodeList;
             }
-            else if(workingNode instanceof TaskSpawner)
+            
+            if(workingNode instanceof TaskSpawner)
             {
                 tasks.addAll(Arrays.asList(((TaskSpawner) workingNode).getTasks()));
             }

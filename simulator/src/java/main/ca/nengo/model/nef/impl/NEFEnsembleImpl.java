@@ -165,7 +165,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * @return Using GPU?
 	 */
 	public boolean getUseGPU() {
-		return myUseGPU && getMode() == SimulationMode.DEFAULT;
+		return myUseGPU && (getMode() == SimulationMode.DEFAULT || getMode() == SimulationMode.RATE);
 	}
 
 	/**

@@ -212,7 +212,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
   free(currentTransformRow);
 }
 
-void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, NengoGPUData* currentData)
+void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, int* isSpikingEnsemble, NengoGPUData* currentData)
 {
   int i, j, currentNumNeurons, neuronDataLength;
 
@@ -228,6 +228,8 @@ void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, NengoGPUData* cu
     neuronDataLength = (*env)->GetArrayLength(env, neuronDataForCurrentEnsemble_JAVA);
     neuronDataForCurrentEnsemble = (float*) malloc( neuronDataLength * sizeof(float));
     (*env)->GetFloatArrayRegion(env, neuronDataForCurrentEnsemble_JAVA, 0, neuronDataLength, neuronDataForCurrentEnsemble);
+
+    (*env)->DeleteLocalRef(env, neuronDataForCurrentEnsemble_JAVA);
 
     currentNumNeurons = neuronDataForCurrentEnsemble[0];
     intArraySetElement(currentData->ensembleNumNeurons, i, currentNumNeurons);
@@ -245,6 +247,7 @@ void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, NengoGPUData* cu
       neuronIndex++;
     }
 
+    intArraySetElement(currentData->isSpikingEnsemble, i, isSpikingEnsemble[ensembleJavaIndex]);
 
     free(neuronDataForCurrentEnsemble);
   }
@@ -1005,7 +1008,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
   (JNIEnv *env, jclass class, jobjectArray terminationTransforms_JAVA, jobjectArray isDecodedTermination_JAVA, 
   jobjectArray terminationTau_JAVA, jobjectArray encoders_JAVA, jobjectArray decoders_JAVA, 
   jobjectArray neuronData_JAVA, jobjectArray projections_JAVA, jobjectArray networkArrayData_JAVA, jobjectArray ensembleData_JAVA, 
-  jintArray collectSpikes_JAVA, jintArray originRequiredByJava_JAVA, jfloat maxTimeStep, jintArray deviceForNetworkArrays_JAVA, jint numDevicesRequested)
+  jintArray isSpikingEnsemble_JAVA, jintArray collectSpikes_JAVA, jobjectArray originRequiredByJava_JAVA, jfloat maxTimeStep, jintArray deviceForNetworkArrays_JAVA, jint numDevicesRequested)
 {
   printf("NengoGPU: SETUP\n"); 
 
@@ -1110,6 +1113,10 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
     projections[i].destDevice = deviceForNetworkArray[termNodeIndex];
   }
 
+  int* isSpikingEnsemble = (int*) malloc(totalNumEnsembles * sizeof(int));
+  (*env)->GetIntArrayRegion(env, isSpikingEnsemble_JAVA, 0, totalNumEnsembles, isSpikingEnsemble); 
+  (*env)->DeleteLocalRef(env, isSpikingEnsemble_JAVA);
+
   int* collectSpikes = (int*) malloc(totalNumEnsembles * sizeof(int));
   (*env)->GetIntArrayRegion(env, collectSpikes_JAVA, 0, totalNumEnsembles, collectSpikes); 
   (*env)->DeleteLocalRef(env, collectSpikes_JAVA);
@@ -1193,7 +1200,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
  
     storeTerminationData(env, terminationTransforms_JAVA, terminationTau_JAVA, isDecodedTermination_JAVA, currentData, networkArrayData);
 
-    storeNeuronData(env, neuronData_JAVA, currentData);
+    storeNeuronData(env, neuronData_JAVA, isSpikingEnsemble, currentData);
 
     storeEncoders(env, encoders_JAVA, currentData);
 
@@ -1221,6 +1228,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
 
   free(originRequiredByJava);
 
+  free(isSpikingEnsemble);
   free(collectSpikes);
   free(ensembleData);
   free(networkArrayData);
@@ -1251,7 +1259,6 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
 JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
   (JNIEnv *env, jclass class, jobjectArray input, jobjectArray output, jobjectArray spikes, jfloat startTime_JAVA, jfloat endTime_JAVA)
 {
-  printf("NengoGPU: STEP\n"); 
   startTime = (float) startTime_JAVA;
   endTime = (float) endTime_JAVA;
 

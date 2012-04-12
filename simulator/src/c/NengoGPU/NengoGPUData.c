@@ -378,6 +378,8 @@ NengoGPUData* getNewNengoGPUData()
   new->ensembleTauRef = NULL;
   new->neuronToEnsembleIndexor = NULL;
 
+  new->isSpikingEnsemble = NULL;
+
   new->ensembleNumTerminations = NULL;
   new->ensembleDimension = NULL;
   new->ensembleNumNeurons = NULL;
@@ -471,6 +473,9 @@ void initializeNengoGPUData(NengoGPUData* new)
   new->ensembleTauRC = newFloatArray(new->numEnsembles, name);
   name = "ensembleTauRef";
   new->ensembleTauRef = newFloatArray(new->numEnsembles, name);
+
+  name = "isSpikingEnsemble";
+  new->isSpikingEnsemble = newIntArray(new->numEnsembles, name);
 
   name = "ensembleNumTerminations";
   new->ensembleNumTerminations = newIntArray(new->numEnsembles, name);
@@ -576,6 +581,8 @@ void moveToDeviceNengoGPUData(NengoGPUData* currentData)
     moveToDeviceFloatArray(currentData->ensembleTauRC);
     moveToDeviceFloatArray(currentData->ensembleTauRef);
     moveToDeviceIntArray(currentData->neuronToEnsembleIndexor);
+
+    moveToDeviceIntArray(currentData->isSpikingEnsemble);
     
     moveToDeviceIntArray(currentData->ensembleDimension);
     moveToDeviceIntArray(currentData->ensembleNumNeurons);
@@ -633,6 +640,8 @@ void freeNengoGPUData(NengoGPUData* currentData)
   freeFloatArray(currentData->ensembleTauRC);
   freeFloatArray(currentData->ensembleTauRef);
   freeIntArray(currentData->neuronToEnsembleIndexor);
+
+  freeIntArray(currentData->isSpikingEnsemble);
 
   freeIntArray(currentData->ensembleNumTerminations);
   freeIntArray(currentData->ensembleDimension);
@@ -758,6 +767,8 @@ void printNengoGPUData(NengoGPUData* currentData, int printArrays)
     printFloatArray(currentData->ensembleTauRC, currentData->numEnsembles, 1);
     printFloatArray(currentData->ensembleTauRef, currentData->numEnsembles, 1);
     printIntArray(currentData->neuronToEnsembleIndexor, currentData->numNeurons, 1);
+
+    printIntArray(currentData->isSpikingEnsemble, currentData->numNeurons, 1);
 
     // supplementary arrays for doing encoding
     printIntArray(currentData->ensembleDimension, currentData->numEnsembles, 1);

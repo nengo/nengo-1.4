@@ -84,6 +84,7 @@ public class NodeThread extends Thread {
 	protected void runProjections(float startTime, float endTime) throws SimulationException{
 		
 		for (int i = myStartIndexInProjections; i < myEndIndexInProjections; i++) {
+			
 			InstantaneousOutput values = myProjections[i].getOrigin().getValues();
 			myProjections[i].getTermination().setValues(values);
 		}
@@ -94,6 +95,7 @@ public class NodeThread extends Thread {
 		
 		
 		for (int i = myStartIndexInNodes; i < myEndIndexInNodes; i++) {
+			
 			myNodes[i].run(startTime, endTime);
 		}
 		
