@@ -537,7 +537,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 */
 	public void setUseGPU(boolean use)
 	{
-		myUseGPU = use;
+		//myUseGPU = use;
 		
 		Node[] nodes = getNodes();
 
@@ -554,7 +554,22 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @return Using GPU?
 	 */
 	public boolean getUseGPU(){
-		return myUseGPU && (myMode == SimulationMode.DEFAULT || myMode == SimulationMode.RATE);
+		Node[] nodes = getNodes();
+
+		for (Node workingNode : nodes) {
+			if(workingNode instanceof NEFEnsembleImpl) {
+				if(!((NEFEnsembleImpl) workingNode).getUseGPU()){
+					return false;
+				}
+			} else if(workingNode instanceof NetworkImpl) {
+				if(!((NetworkImpl) workingNode).getUseGPU()){
+					return false;
+				}
+			}
+		}
+		
+		//return myMode == SimulationMode.DEFAULT || myMode == SimulationMode.RATE;
+		return true;
 	}
 
 	/**
