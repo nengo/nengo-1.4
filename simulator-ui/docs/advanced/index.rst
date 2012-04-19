@@ -9,3 +9,4 @@ Advanced Nengo Usage
    experiments
    matlab
    large_ensembles
+   gpu

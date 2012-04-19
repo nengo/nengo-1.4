@@ -263,15 +263,6 @@ class NetworkArray(NetworkImpl):
 
         return result
 
-    # all the subnodes have to run on the GPU for the networkArray to run on the GPU
-    def getUseGPU(self):
-        for node in self._nodes:
-          if not node.getUseGPU():
-            return False
-
-        return NetworkImpl.getUseGPU(self) 
-
-
     def exposeAxons(self):
         i=0
         for n in self._nodes:
