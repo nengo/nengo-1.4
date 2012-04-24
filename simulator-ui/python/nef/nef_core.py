@@ -196,7 +196,17 @@ class Network:
                return x[0]*x[0]
              net.connect(A,B,transform=[1,1,1,1,1],func=square)
                 
-        All of the parameters from :py:func:`nef.Network.make()` can also be used.        
+        All of the parameters from :py:func:`nef.Network.make()` can also be used.
+        
+        If the *storage_code* parameter is used, you may use %d (or variants such as
+          %02d) in the storage code, which will be replaced by the index number of
+          the ensemble in the array.  Thus, ``storage_code='a%02d'`` will become
+          ``a00`` for the first ensemble, ``a01`` for the second, ``a02`` for the
+          third, and so on.
+          
+        If the *encoders* parameter is used, you can provide either the standard
+        array of encoders (e.g. ``[[1],[-1]]``) or a list of sets of encoders for
+        each ensemble (e.g. ``[[[1]],[[-1]]]``).
 
         :param string name:           name of the ensemble array (must be unique)
         :param integer neurons:       number of neurons in the ensemble
@@ -206,8 +216,11 @@ class Network:
         """
         nodes=[]
         storage_code=args.get('storage_code','')
+        encoders=args.get('encoders',None)
         for i in range(length):
             if '%' in storage_code: args['storage_code']=storage_code%i
+            if encoders is not None and isinstance(encoders[0][0],(tuple,list)):
+                args['encoders']=encoders[i%len(encoders)]
             n=self.make('%d'%i,neurons,dimensions,add_to_network=False,**args)
             nodes.append(n)
         ensemble=array.NetworkArray(name,nodes)
