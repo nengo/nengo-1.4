@@ -442,12 +442,9 @@ void run_NEFEnsembles(NengoGPUData* nengoData, float startTime, float endTime)
   dimGrid.x = nengoData->numEnsembles / dimBlock.x + 1;
 
   processNDterminations<<<dimGrid, dimBlock>>>(nengoData->numEnsembles, nengoData->numNDterminations, ND_steps, ND_adjusted_dt, nengoData->NDterminationEnsembleOffset->array, nengoData->terminationOffsetInInput->array, nengoData->inputDimension->array, nengoData->NDterminationInputIndexor->array, nengoData->input->array, nengoData->NDterminationWeights->array, nengoData->NDterminationCurrents->array, nengoData->NDterminationEnsembleSums->array, nengoData->terminationTau->array);
-  printFloatArray(nengoData->NDterminationEnsembleSums, nengoData->numEnsembles, 1);
-
 
   err = cudaGetLastError();
   checkCudaErrorWithDevice(err, nengoData->device, "run_NEFEnsembles: process non decoded");
-
 
 ///// encode
   dimBlock.x = 256;
