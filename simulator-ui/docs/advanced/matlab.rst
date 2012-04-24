@@ -66,11 +66,15 @@ The path specified on the last line must be your path to the python directory in
 
 You can now run the same Python scripts that you can in the Nengo scripting system::
 
-    python.execfile("addition.py")
+    python.execfile('addition.py')
+    
+or, if the file is in another directory::
+
+    python.execfile('nengo\demo\addition.py')
 
 We can also execute single python commands like this::
 
-    python.exec("net.view(play=0.5)")
+    python.exec('net.view(play=0.5)')
 
 
 Step 3: Running a simulation and gathering data
