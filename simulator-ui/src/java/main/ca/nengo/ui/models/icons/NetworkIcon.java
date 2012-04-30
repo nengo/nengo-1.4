@@ -49,7 +49,7 @@ public class NetworkIcon extends NodeContainerIcon {
 
 	@Override
 	protected int getNodeCountNormalization() {
-		return 20;
+		return 1000;
 	}
 
 	private static class VectorIcon extends WorldObjectImpl {

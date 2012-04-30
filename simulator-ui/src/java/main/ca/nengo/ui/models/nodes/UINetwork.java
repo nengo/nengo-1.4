@@ -163,7 +163,8 @@ public class UINetwork extends UINodeViewable {
 	@Override
 	public int getNodesCount() {
 		if (getModel() != null)
-			return getModel().getNodes().length;
+//			return getModel().getNodes().length;
+			return getModel().countNeurons();
 		else
 			return 0;
 	}

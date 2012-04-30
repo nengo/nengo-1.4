@@ -198,6 +198,26 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		fireVisibleChangeEvent();
 	}
 
+	/**
+	 * Counts how many neurons are contained within this network.
+	 * 
+	 * @return number of neurons in this network
+	 */
+	public int countNeurons()
+	{
+		Node[] myNodes = getNodes();
+		int count = 0;
+		for(Node node : myNodes)
+		{
+			if(node instanceof NetworkImpl)
+				count += ((NetworkImpl)node).countNeurons();
+			else if(node instanceof Ensemble)
+				count += ((Ensemble)node).getNodes().length;
+		}
+		
+		return count;
+	}
+	
 	/***
 	 * Kills a certain percentage of neurons in the network (recursively including subnetworks).
 	 *
@@ -267,6 +287,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 				myNodeMap.remove(ne.getOldName());
 			}
 		}
+		
+		fireVisibleChangeEvent();
 	}
 
 	/**
