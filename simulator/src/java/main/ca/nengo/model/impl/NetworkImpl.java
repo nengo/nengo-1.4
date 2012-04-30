@@ -53,6 +53,7 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
+import ca.nengo.model.neuron.Neuron;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.impl.LocalSimulator;
 import ca.nengo.util.Probe;
@@ -213,6 +214,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 				count += ((NetworkImpl)node).countNeurons();
 			else if(node instanceof Ensemble)
 				count += ((Ensemble)node).getNodes().length;
+			else if(node instanceof Neuron)
+				count += 1;
 		}
 		
 		return count;
