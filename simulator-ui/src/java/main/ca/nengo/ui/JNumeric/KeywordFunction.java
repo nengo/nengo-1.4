@@ -9,15 +9,21 @@
 */
 
 package ca.nengo.ui.JNumeric;
-import org.python.core.*;
 
-abstract public class KeywordFunction extends PyObject {
-	private static final long serialVersionUID = 1L;
-	protected String docString;
+import org.python.core.*;
+public class KeywordFunction extends PyObject {
+    public KeywordFunction() {
+      super(PyType.fromClass(KeywordFunction.class)) ;
+      this.javaProxy = this ;
+    }
+
+    protected String docString = "abstract KeywordFunction";
     protected String [] argNames;
     protected PyObject [] defaultArgs;
 
-    abstract PyObject _call(PyObject args[]);
+    protected PyObject _call(PyObject args[]) {
+      return Py.None ;
+    }
 
     public PyObject __call__(PyObject args[], String keywords[]) {
 	return _call(processArgs(args, keywords));
@@ -57,8 +63,8 @@ abstract public class KeywordFunction extends PyObject {
 	return allArgs;
     }
 
-    public PyObject __findattr__(String name) {
-	if (name == "__doc__") return new PyString(docString);
-	return super.__findattr__(name);
+    public PyObject __findattr_ex__(String name) {
+      if (name == "__doc__") return new PyString(docString);
+      return super.__findattr_ex__(name) ;
     }
 }

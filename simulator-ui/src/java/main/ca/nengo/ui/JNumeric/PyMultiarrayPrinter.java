@@ -10,13 +10,18 @@
 
 package ca.nengo.ui.JNumeric;
 import org.python.core.*;
-//import java.lang.reflect.Array;
+import java.lang.reflect.Array;
 
 
 
 // Inspired by the ArrayPrinter module of CPython written by Konrad Hinsen and
 // modified by Jim Fulton.
 
+/*
+* Comments by D. Lemire.
+* I don't understand any of this. It seems way too complicated.
+* A simple call to "toString" is enough.
+*/
 class PrinterFormat {
 	String format;
 	int itemLength;
@@ -36,7 +41,9 @@ class FormatInteger extends FormatFunction {
 		this.format = Py.newString(format);
 	}
 	String format(PyObject o) {
-		return format.__mod__(o).toString();	
+		return ((PyObject)o).toString();
+		//I don't understand this stuff
+		//return format.__mod__(o).toString();	
 	}
 }
 
@@ -65,7 +72,10 @@ class FormatFloat extends FormatFunction {
 		this.isComplex = isComplex;
 		this.suffix = isComplex ? "j" : "";
 	}
-	String format(PyObject o) { 
+	String format(PyObject o) {
+		return ((PyObject)o).toString();
+		// I don't understand any of this stuff or why it is necessary!
+		/*
 		String s;
 		switch (type) {
 		case 0:
@@ -77,7 +87,7 @@ class FormatFloat extends FormatFunction {
 			return s + suffix;
 		case 1:
 			s = format.__mod__(o).toString();
-			if (true/*!isComplex*/) {
+			if (true) {
 				int dot = 0;
 				while (dot < s.length() && s.charAt(dot) != '.')
 					dot++;
@@ -89,10 +99,10 @@ class FormatFloat extends FormatFunction {
 					pad[i] = ' ';
 				return s.substring(0,zeros) + suffix + new String(pad);
 			}
-//			return s + suffix;
+			return s + suffix;
 		default:
 			return format.__mod__(o).toString() + suffix;
-		}
+		}*/
 	}
 }
 

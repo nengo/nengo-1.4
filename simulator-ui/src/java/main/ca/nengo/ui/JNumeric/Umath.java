@@ -9,15 +9,17 @@
 */
 
 package ca.nengo.ui.JNumeric;
+
 import org.python.core.*;
-//import java.lang.reflect.Array;
 
 
+public class Umath extends PyObject implements ClassDictInit {
+  public Umath() {
+    super(PyType.fromClass(Umath.class)) ;
+    this.javaProxy = this ;
+  }
 
-@SuppressWarnings("deprecation")
-public class Umath implements InitModule {
-
-	public void initModule(PyObject dict) {
+	public static void classDictInit(PyObject dict) {
 		dict.__setitem__("__doc__", new PyString("Universal math functions."));
 
 		// umath functions

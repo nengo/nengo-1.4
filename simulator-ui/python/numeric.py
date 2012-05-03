@@ -2,7 +2,8 @@ from ca.nengo.ui.JNumeric.JNumeric import *
 
 
 # gets fft() and inverse_fft()
-import ca.nengo.ui.JNumeric.JNumeric.FFT as FFT
+import ca.nengo.ui.JNumeric.FFT as FFT
+
 
 def diag(values,typecode='f'):
     a=zeros((len(values),len(values)),typecode=typecode)

@@ -543,6 +543,7 @@ public class ScriptConsole extends JPanel {
 					myCommandField.append("\t");
 				} else if (code == 9) { // tab
 					myConsole.setInCallChainCompletionMode(true);
+					e.consume();
 				} else if (code == 38) { // up arrow
 					myConsole.completorUp();
 					e.consume();
@@ -570,11 +571,10 @@ public class ScriptConsole extends JPanel {
 				int code = e.getKeyCode();
 				if (code == 17) { //CTRL
 					myConsole.hideToolTip();
-				} else if (code != 38 && code != 40) {
+                }else if (code != 38 && code != 40) {
 					myConsole.setTypedText();
-					if (code == 9) {
-                        myConsole.completorUp();
-                    }
+					if (code == 9)
+	                    myConsole.completorUp();
 				}
 
 				if (code == 46 && !myConsole.withinString()) { // .

@@ -9,25 +9,28 @@
 */
 
 package ca.nengo.ui.JNumeric;
+
 import org.python.core.*;
-//import java.lang.reflect.Array;
 
+public class JNumeric extends PyObject implements ClassDictInit {
+    public JNumeric() {
+      super(PyType.fromClass(JNumeric.class)) ;
+      this.javaProxy = this ;
+    }
 
+	@SuppressWarnings({"UnusedDeclaration"})
+    public static void classDictInit(PyObject dict) {
 
-@SuppressWarnings("deprecation")
-public class JNumeric implements InitModule {
-
-	public void initModule(PyObject dict) {
-		
 		// import modules
-		dict.__setitem__("umath", PyJavaClass.lookup(Umath.class));
-		dict.__setitem__("FFT", PyJavaClass.lookup(JN_FFT.class));
+        Umath umath = new Umath() ;
+		dict.__setitem__("umath", umath);       //dict.__setitem__("umath", PyJavaClass.lookup(Umath.class));
+		dict.__setitem__("FFT", new JN_FFT());  //dict.__setitem__("FFT", PyJavaClass.lookup(JN_FFT.class));
 
 		dict.__setitem__("__doc__", Py.newString(__doc__));
 		dict.__setitem__("__version__", Py.newString("0.2a6"));
 
 		// from umath import * (more or less).
-		new Umath().initModule(dict);
+		Umath.classDictInit(dict);
 
 		// constants
 
@@ -39,7 +42,7 @@ public class JNumeric implements InitModule {
 		dict.__setitem__("Int32", Py.newString("i"));
 		dict.__setitem__("Int64", Py.newString("l"));
 		// I'm using Int32 here because that is the native JPython integer type and the default type for
-		// an integer multiarray. The documentation claim's this should be "the largest version of the 
+		// an integer multiarray. The documentation claims this should be "the largest version of the 
 		// given type," but I feel this is more natural. This will have to be hashed out.
 		dict.__setitem__("Int", Py.newString("i"));
 		dict.__setitem__("Float32", Py.newString("f"));
@@ -49,7 +52,7 @@ public class JNumeric implements InitModule {
 		dict.__setitem__("Complex128", Py.newString("D"));
 		dict.__setitem__("Complex", Py.newString("D"));
 
-		dict.__setitem__("ArrayType", PyMultiarray.__class__);
+		dict.__setitem__("ArrayType", PyMultiarray.ATYPE);
 		dict.__setitem__("NewAxis", Py.None);
 		if (Py.py2int(PyMultiarray.fromString("\001\000\000\000\000\000\000\000", 'i').get(0)) == 1)
 			dict.__setitem__("LittleEndian", Py.One);
@@ -57,7 +60,6 @@ public class JNumeric implements InitModule {
 			dict.__setitem__("LittleEndian", Py.Zero);
 
 		// numeric functions
-		
 		dict.__setitem__("arrayrange", arrayrange);
 		dict.__setitem__("arange", arrayrange);
 		dict.__setitem__("argmax", argmax);
@@ -71,6 +73,7 @@ public class JNumeric implements InitModule {
 		dict.__setitem__("compress", compress);
 		dict.__setitem__("concatenate", concatenate);
 		dict.__setitem__("convolve", convolve);
+		dict.__setitem__("cross_correlate", cross_correlate);
 		dict.__setitem__("diagonal", diagonal);
 		dict.__setitem__("dot", dot);
 		dict.__setitem__("fromfunction", fromfunction);
@@ -94,14 +97,13 @@ public class JNumeric implements InitModule {
 		dict.__setitem__("zeros", zeros);
 
 		// Abbreviations
-		
 		dict.__setitem__("sum", sum);
 		dict.__setitem__("cumsum", cumsum);
 		dict.__setitem__("product", product);
 		dict.__setitem__("cumproduct", cumproduct);
 		dict.__setitem__("alltrue", alltrue);
 		dict.__setitem__("sometrue", sometrue);
-}
+    }
 
 	// Numeric functions
 
@@ -117,6 +119,7 @@ public class JNumeric implements InitModule {
 	static final public PyObject compress = new CompressFunction();
 	static final public PyObject concatenate = new ConcatenateFunction();
 	static final public PyObject convolve = new ConvolveFunction();
+	static final public PyObject cross_correlate = new Cross_correlateFunction();
 	static final public PyObject diagonal = new DiagonalFunction();
 	static final public PyObject dot = new DotFunction();
  	static final public PyObject fromfunction = new FromfunctionFunction();
@@ -148,12 +151,10 @@ public class JNumeric implements InitModule {
 	static final public PyObject alltrue = new AlltrueFunction();
 	static final public PyObject sometrue = new SometrueFunction();
 
-	static final public String __doc__ = "JNumeric -- Numeric for the JPython platform\n"; 
+	static final public String __doc__ = "JNumeric -- Numeric for the Jython platform\n"; 
 }
 
 class ArrayrangeFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ArrayrangeFunction() {
 		docString = "arrayrange(start=0, stop, step=1, typecode=None)";
 		argNames = new String[] {"start", "stop", "step", "typecode"};
@@ -166,10 +167,8 @@ class ArrayrangeFunction extends KeywordFunction {
 	}
 }
 class ArgmaxFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ArgmaxFunction() {
-		docString = "argmax(a, axis=-1)"; 
+		docString = "argmax(a, axis=-1)";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.newInteger(-1)};
 	}
@@ -179,10 +178,8 @@ class ArgmaxFunction extends KeywordFunction {
 	}
 }
 class ArgsortFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ArgsortFunction() {
-		docString = "argsort(a, axis=-1)"; 
+		docString = "argsort(a, axis=-1)";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.newInteger(-1)};
 	}
@@ -191,10 +188,8 @@ class ArgsortFunction extends KeywordFunction {
 	}
 }
 class ArgminFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ArgminFunction() {
-		docString = "argmin(a, axis=-1)"; 
+		docString = "argmin(a, axis=-1)";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.newInteger(-1)};
 	}
@@ -204,10 +199,8 @@ class ArgminFunction extends KeywordFunction {
 	}
 }
 class ArrayFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ArrayFunction() {
-		docString = "array(sequence, typecode=None, copy=1)"; 
+		docString = "array(sequence, typecode=None, copy=1)";
 		argNames = new String[] {"sequence", "typecode", "copy"};
 		defaultArgs = new PyObject [] {null, Py.newString("\0"), Py.One};
 	}
@@ -221,10 +214,8 @@ class ArrayFunction extends KeywordFunction {
 	}
 }
 class AsarrayFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	AsarrayFunction() {
-		docString = "asarray(sequence, typecode=None)"; 
+		docString = "asarray(sequence, typecode=None)";
 		argNames = new String[] {"sequence", "typecode"};
 		defaultArgs = new PyObject [] {null, Py.newString("\0")};
 	}
@@ -235,10 +226,8 @@ class AsarrayFunction extends KeywordFunction {
 	}
 }
 class BitwiseNotFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	BitwiseNotFunction() {
-		docString = "bitwise_not(a)"; 
+		docString = "bitwise_not(a)";
 		argNames = new String[] {"a"};
 		defaultArgs = new PyObject [] {null};
 	}
@@ -247,10 +236,8 @@ class BitwiseNotFunction extends KeywordFunction {
 	}
 }
 class ChooseFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ChooseFunction() {
-		docString = "choose(a, indices)"; 
+		docString = "choose(a, indices)";
 		argNames = new String[] {"a", "indices"};
 		defaultArgs = new PyObject [] {null, null};
 	}
@@ -259,10 +246,8 @@ class ChooseFunction extends KeywordFunction {
 	}
 }
 class ClipFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ClipFunction() {
-		docString = "clip(a, a_min, a_max)"; 
+		docString = "clip(a, a_min, a_max)";
 		argNames = new String[] {"a", "a_min", "a_max"};
 		defaultArgs = new PyObject [] {null, null, null};
 	}
@@ -274,10 +259,8 @@ class ClipFunction extends KeywordFunction {
 	}
 }
 class CompressFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	CompressFunction() {
-		docString = "clip(condition, a, [dimension=-1])"; 
+		docString = "clip(condition, a, [dimension=-1])";
 		argNames = new String[] {"condition", "a", "dimension"};
 		defaultArgs = new PyObject [] {null, null, Py.newInteger(-1)};
 	}
@@ -289,10 +272,8 @@ class CompressFunction extends KeywordFunction {
 	}
 }
 class ConcatenateFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ConcatenateFunction() {
-		docString = "concatenate(arrays, axis=0)"; 
+		docString = "concatenate(arrays, axis=0)";
 		argNames = new String[] {"arrays", "axis"};
 		defaultArgs = new PyObject [] {null, Py.Zero};
 	}
@@ -301,10 +282,8 @@ class ConcatenateFunction extends KeywordFunction {
 	}
 }
 class ConvolveFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ConvolveFunction() {
-		docString = "convolve(a, b, mode=0)"; 
+		docString = "convolve(a, b, mode=0)";
 		argNames = new String[] {"a", "b", "mode"};
 		defaultArgs = new PyObject [] {null, null, Py.Zero};
 	}
@@ -312,11 +291,19 @@ class ConvolveFunction extends KeywordFunction {
 		return PyMultiarray.convolve(args[0], args[1], Py.py2int(args[2]));
 	}
 }
+class Cross_correlateFunction extends KeywordFunction {
+	Cross_correlateFunction() {
+		docString = "cross_correlate(a, b, mode=0)";
+		argNames = new String[] {"a", "b", "mode"};
+		defaultArgs = new PyObject [] {null, null, Py.Zero};
+	}
+	public PyObject _call(PyObject args[]) {
+		return PyMultiarray.cross_correlate(args[0], args[1], Py.py2int(args[2]));
+	}
+}
 class DiagonalFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	DiagonalFunction() {
-		docString = "diagonal(a, offset=0, axis=-2)"; 
+		docString = "diagonal(a, offset=0, axis=-2)";
 		argNames = new String[] {"a", "offset", "axis"};
 		defaultArgs = new PyObject [] {null, Py.Zero, Py.newInteger(-2)};
 	}
@@ -325,10 +312,8 @@ class DiagonalFunction extends KeywordFunction {
 	}
 }
 class DotFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	DotFunction() {
-		docString = "dot(a, b, axisA=-1, axisB=0)"; 
+		docString = "dot(a, b, axisA=-1, axisB=0)";
 		argNames = new String[] {"a", "b", "axisA", "axisB"};
 		defaultArgs = new PyObject [] {null, null, Py.newInteger(-1), Py.Zero};
 	}
@@ -337,10 +322,8 @@ class DotFunction extends KeywordFunction {
 	}
 }
 class FromfunctionFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	FromfunctionFunction() {
-		docString = "fromfunction(function, dimensions)"; 
+		docString = "fromfunction(function, dimensions)";
 		argNames = new String[] {"function", "dimensions"};
 		defaultArgs = new PyObject [] {null, null};
 	}
@@ -349,10 +332,8 @@ class FromfunctionFunction extends KeywordFunction {
 	}
 }
 class FromstringFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	FromstringFunction() {
-		docString = "fromstring(string, typecode)"; 
+		docString = "fromstring(string, typecode)";
 		argNames = new String[] {"string", "typecode"};
 		defaultArgs = new PyObject [] {null, null};
 	}
@@ -362,8 +343,6 @@ class FromstringFunction extends KeywordFunction {
 	}
 }
 class IdentityFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	IdentityFunction() {
 		docString = "identity(n)"; 
 		argNames = new String[] {"n"};
@@ -379,8 +358,6 @@ class IdentityFunction extends KeywordFunction {
 	}
 }
 class IndicesFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	IndicesFunction() {
 		docString = "indices(dimensions, typecode=None)"; 
 		argNames = new String[] {"dimensions", "typecode"};
@@ -393,10 +370,8 @@ class IndicesFunction extends KeywordFunction {
 	}
 }
 class InnerproductFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	InnerproductFunction() {
-		docString = "innerproduct(a, b, axisA=-1, axisB=-1)"; 
+		docString = "innerproduct(a, b, axisA=-1, axisB=-1)";
 		argNames = new String[] {"a", "b", "axisA", "axisB"};
 		defaultArgs = new PyObject [] {null, null, Py.newInteger(-1), Py.newInteger(-1)};
 	}
@@ -405,10 +380,8 @@ class InnerproductFunction extends KeywordFunction {
 	}
 }
 class NonzeroFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	NonzeroFunction() {
-		docString = "nonzero(a)"; 
+		docString = "nonzero(a)";
 		argNames = new String[] {"a"};
 		defaultArgs = new PyObject [] {null};
 	}
@@ -419,10 +392,8 @@ class NonzeroFunction extends KeywordFunction {
 	}
 }
 class OnesFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	OnesFunction() {
-		docString = "ones(shape, typecode=None)"; 
+		docString = "ones(shape, typecode=None)";
 		argNames = new String[] {"shape", "typecode"};
 		defaultArgs = new PyObject [] {null, Py.None};
 	}
@@ -435,10 +406,8 @@ class OnesFunction extends KeywordFunction {
 	}
 }
 class RepeatFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	RepeatFunction() {
-		docString = "repeat(a, repeats, axis=0)"; 
+		docString = "repeat(a, repeats, axis=0)";
 		argNames = new String[] {"a", "repeats", "axis"};
 		defaultArgs = new PyObject [] {null, null, Py.Zero};
 	}
@@ -447,10 +416,8 @@ class RepeatFunction extends KeywordFunction {
 	}
 }
 class ReshapeFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ReshapeFunction() {
-		docString = "reshape(a, shape)"; 
+		docString = "reshape(a, shape)";
 		argNames = new String[] {"a", "shape"};
 		defaultArgs = new PyObject [] {null, null};
 	}
@@ -459,10 +426,8 @@ class ReshapeFunction extends KeywordFunction {
 	}
 }
 class ResizeFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ResizeFunction() {
-		docString = "resize(a, shape)"; 
+		docString = "resize(a, shape)";
 		argNames = new String[] {"a", "shape"};
 		defaultArgs = new PyObject [] {null, null};
 	}
@@ -471,10 +436,8 @@ class ResizeFunction extends KeywordFunction {
 	}
 }
 class RavelFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	RavelFunction() {
-		docString = "ravel(a)"; 
+		docString = "ravel(a)";
 		argNames = new String[] {"a"};
 		defaultArgs = new PyObject [] {null};
 	}
@@ -483,10 +446,8 @@ class RavelFunction extends KeywordFunction {
 	}
 }
 class SearchsortedFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	SearchsortedFunction() {
-		docString = "searchsorted(a, values)"; 
+		docString = "searchsorted(a, values)";
 		argNames = new String[] {"a", "values"};
 		defaultArgs = new PyObject [] {null, null};
 	}
@@ -495,10 +456,8 @@ class SearchsortedFunction extends KeywordFunction {
 	}
 }
 class ShapeFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ShapeFunction() {
-		docString = "shape(a)"; 
+		docString = "shape(a)";
 		argNames = new String[] {"a"};
 		defaultArgs = new PyObject [] {null};
 	}
@@ -511,10 +470,8 @@ class ShapeFunction extends KeywordFunction {
 	}
 }
 class SortFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	SortFunction() {
-		docString = "sort(a, axis=-1)"; 
+		docString = "sort(a, axis=-1)";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.newInteger(-1)};
 	}
@@ -523,10 +480,8 @@ class SortFunction extends KeywordFunction {
 	}
 }
 class TakeFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	TakeFunction() {
-		docString = "sort(a, indices, axis=-1)"; 
+		docString = "sort(a, indices, axis=-1)";
 		argNames = new String[] {"a", "indices", "axis"};
 		defaultArgs = new PyObject [] {null, null, Py.Zero};
 	}
@@ -535,23 +490,19 @@ class TakeFunction extends KeywordFunction {
 	}
 }
 class TraceFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	TraceFunction() {
-		docString = "trace(a, offset=0, axis=-1)"; 
-		argNames = new String[] {"a", "offset", "axis"};
-		defaultArgs = new PyObject [] {null, Py.Zero, Py.newInteger(-1)};
+		docString = "trace(a, offset=0, axis1=-2, axis1=-1)";
+		argNames = new String[] {"a", "offset", "axis1", "axis2"};
+		defaultArgs = new PyObject [] {null, Py.Zero, Py.newInteger(-2), Py.newInteger(-1)};
 	}
 	public PyObject _call(PyObject args[]) {
 		return Umath.add.reduce(
-			JNumeric.diagonal.__call__(args[0], args[1], args[2]), -1);
+					JNumeric.diagonal.__call__(args[0], args[1], args[2]), -1);
 	} 
 }
 class TransposeFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	TransposeFunction() {
-		docString = "transpose(a, axes=None)"; 
+		docString = "transpose(a, axes=None)";
 		argNames = new String[] {"a", "axes"};
 		defaultArgs = new PyObject [] {null, Py.None};
 	}
@@ -572,23 +523,19 @@ class TransposeFunction extends KeywordFunction {
 	}
 }
 class WhereFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	WhereFunction() {
-		docString = "where(condition, x, y)"; 
+		docString = "where(condition, x, y)";
 		argNames = new String[] {"condition", "x", "y"};
 		defaultArgs = new PyObject [] {null, null, null};
 	}
 	public PyObject _call(PyObject args[]) {
 		return PyMultiarray.choose(Umath.not_equal.__call__(args[0], Py.Zero),
-			new PyTuple(new PyObject [] {args[2], args[1]}));
+			new PyTuple(args[2], args[1]));
 	}
 }
 class ZerosFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ZerosFunction() {
-		docString = "zeros(shape, typecode=None)"; 
+		docString = "zeros(shape, typecode=None)";
 		argNames = new String[] {"shape", "typecode"};
 		defaultArgs = new PyObject [] {null, Py.None};
 	}
@@ -602,10 +549,8 @@ class ZerosFunction extends KeywordFunction {
 
 // Abbreviations
 class SumFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	SumFunction() {
-		docString = "sum(a, [axis])"; 
+		docString = "sum(a, [axis])";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.Zero};
 	}
@@ -614,10 +559,8 @@ class SumFunction extends KeywordFunction {
 	}
 }
 class CumsumFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	CumsumFunction() {
-		docString = "cumsum(a, [axis])"; 
+		docString = "cumsum(a, [axis])";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.Zero};
 	}
@@ -626,10 +569,8 @@ class CumsumFunction extends KeywordFunction {
 	}
 }
 class ProductFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	ProductFunction() {
-		docString = "product(a, [axis])"; 
+		docString = "product(a, [axis])";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.Zero};
 	}
@@ -638,10 +579,8 @@ class ProductFunction extends KeywordFunction {
 	}
 }
 class CumproductFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	CumproductFunction() {
-		docString = "cumproduct(a, [axis])"; 
+		docString = "cumproduct(a, [axis])";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.Zero};
 	}
@@ -650,10 +589,8 @@ class CumproductFunction extends KeywordFunction {
 	}
 }
 class AlltrueFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	AlltrueFunction() {
-		docString = "alltrue(a, [axis])"; 
+		docString = "alltrue(a, [axis])";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.Zero};
 	}
@@ -662,10 +599,8 @@ class AlltrueFunction extends KeywordFunction {
 	}
 }
 class SometrueFunction extends KeywordFunction {
-	private static final long serialVersionUID = 1L;
-	
 	SometrueFunction() {
-		docString = "sometrue(a, [axis])"; 
+		docString = "sometrue(a, [axis])";
 		argNames = new String[] {"a", "axis"};
 		defaultArgs = new PyObject [] {null, Py.Zero};
 	}
@@ -673,3 +608,4 @@ class SometrueFunction extends KeywordFunction {
 		return Umath.logical_or.reduce(args[0], Py.py2int(args[1]));
 	}
 }
+

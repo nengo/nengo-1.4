@@ -41,11 +41,13 @@ import java.util.StringTokenizer;
 import org.python.core.PyClass;
 import org.python.core.PyFunction;
 import org.python.core.PyInstance;
-import org.python.core.PyJavaClass;
-import org.python.core.PyJavaInstance;
+//import org.python.core.PyJavaClass;
+//import org.python.core.PyJavaInstance;
+import org.python.core.PyJavaType;
 import org.python.core.PyList;
 import org.python.core.PyMethod;
 import org.python.core.PyObject;
+import org.python.core.PyObjectDerived;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.core.PyTableCode;
@@ -84,7 +86,7 @@ public class CallChainCompletor extends CommandCompletor {
 		boolean endsWithBracket = callChain.endsWith("(");
 		if (endsWithBracket) callChain = callChain.substring(0, callChain.length()-1);
 		
-		PyClass pc = getKnownClass(callChain);
+		PyObject pc = getKnownClass(callChain);
 		
 		if (callChain.lastIndexOf('.') > 0) { //the root variable is specified
 			String base = callChain.substring(0, callChain.lastIndexOf('.'));
@@ -99,6 +101,7 @@ public class CallChainCompletor extends CommandCompletor {
 		}
 		getOptions().clear();
 		getOptions().addAll(options);
+		
 		resetIndex();
 	}
 	
@@ -117,12 +120,12 @@ public class CallChainCompletor extends CommandCompletor {
 		return result;
 	}
 	
-	public List<String> getConstructors(PyClass pc) {
+	public List<String> getConstructors(PyObject pc) {
 		List<String> result = new ArrayList<String>(10);
 		myDocumentation = new ArrayList<String>(10);
 		
-		if (pc instanceof PyJavaClass) {
-			String className = ((PyJavaClass) pc).__name__;
+		if (pc instanceof PyJavaType) {
+			String className = ((PyJavaType) pc).toString().split("'")[1];
 			try {
 				Class<?> c = Class.forName(className);
 				Constructor<?>[] constructors = c.getConstructors();
@@ -149,20 +152,23 @@ public class CallChainCompletor extends CommandCompletor {
 				e.printStackTrace();
 			}
 		}
+		else {
+			//do nothing for Python classes
+		}
 		
 		return result;
 	}
 	
-	private PyClass getKnownClass(String callChain) {
-		PyClass result = null;
+	private PyObject getKnownClass(String callChain) {
+		PyObject result = null;
 		
 		PyStringMap map = (PyStringMap) myInterpreter.getLocals();
 		PyList keys = (PyList) map.keys();
 		PyObject iter = keys.__iter__();
 
 		for (PyObject item; (item = iter.__iternext__()) != null && result == null; ) {
-			if (item.toString().equals(callChain) && map.get(item) instanceof PyClass) {
-				result = (PyClass) map.get(item);
+			if (item.toString().equals(callChain) && (map.get(item) instanceof PyJavaType || map.get(item) instanceof PyClass)) {
+				result = (PyObject) map.get(item);
 			}
 		}
 		
@@ -182,19 +188,19 @@ public class CallChainCompletor extends CommandCompletor {
 		for (PyObject item; (item = iter.__iternext__()) != null; ) {
 			result.add(item.toString());
 			
-			PyObject po = map.get(item);
-			if (po instanceof PyJavaClass) {
-				myDocumentation.add(getClassDocs(((PyJavaClass) po).__name__));
-			} else if (po instanceof PyJavaInstance) {
-				PyClass pc = ((PyJavaInstance) po).instclass;
-				if (pc instanceof PyJavaClass) {
-					myDocumentation.add(getClassDocs(((PyJavaClass) pc).__name__));					
-				} else {
-					myDocumentation.add("");					
-				}
-			} else {
-				myDocumentation.add("");
-			}
+//			PyObject po = map.get(item);
+//			if (po instanceof PyClass) {
+//				myDocumentation.add(getClassDocs(((PyClass) po).__name__));
+//			} else if (po instanceof PyInstance) {
+//				PyClass pc = ((PyInstance) po).instclass;
+//				if (pc instanceof PyClass) {
+//					myDocumentation.add(getClassDocs(((PyClass) pc).__name__));					
+//				} else {
+//					myDocumentation.add("");					
+//				}
+//			} else {
+//				myDocumentation.add("");
+//			}
 		}
 		
 		return result;
@@ -224,12 +230,14 @@ public class CallChainCompletor extends CommandCompletor {
 
 		StringTokenizer varTok = new StringTokenizer(base, ".", false);
 		String rootVariable = varTok.nextToken();
-
+		
 		PyObject po = getObject(map, rootVariable);
+		
 		List<String> result = new ArrayList<String>(20);
 		myDocumentation = new ArrayList<String>(20);
-		if (po instanceof PyJavaClass) {
-			String className = ((PyJavaClass) po).__name__;
+		if (po instanceof PyJavaType) {
+			String className = ((PyJavaType)po).toString().split("'")[1];
+			
 			try {
 				Class<?> c = Class.forName(className);
 				
@@ -237,7 +245,7 @@ public class CallChainCompletor extends CommandCompletor {
 				for (int i = 0; i < fields.length; i++) {
 					int mods = fields[i].getModifiers();
 					if (Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
-						result.add(fields[i].getName());
+						result.add(base + "." + fields[i].getName());
 						myDocumentation.add("");						
 					}					
 				}
@@ -247,14 +255,16 @@ public class CallChainCompletor extends CommandCompletor {
 					int mods = methods[i].getModifiers();
 					if (Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
 						result.add(getMethodSignature(base, methods[i]));
-						myDocumentation.add(JavaSourceParser.getDocs(methods[i]));								
+//						myDocumentation.add(JavaSourceParser.getDocs(methods[i]));								
 					}
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-		} else if (po instanceof PyJavaInstance) {
-			String rootClassName = ((PyJavaInstance) po).instclass.__name__;
+		} else if (po instanceof PyObjectDerived) {
+			
+			String rootClassName = po.toString().split("@")[0];
+			
 			try {
 				Class<?> c = getReturnClass(rootClassName, base);
 
@@ -262,42 +272,47 @@ public class CallChainCompletor extends CommandCompletor {
 				for (int i = 0; i < fields.length; i++) {
 					int mods = fields[i].getModifiers();
 					if (Modifier.isPublic(mods)) {
-						result.add(fields[i].getName());
+						result.add(base + "." + fields[i].getName());
 						myDocumentation.add("");						
 					}
 				}
 				
 				Method[] methods = c.getMethods();
+				
 				for (int i = 0; i < methods.length; i++) {
 					int mods = methods[i].getModifiers();
 					if (Modifier.isPublic(mods)) {
 						result.add(getMethodSignature(base, methods[i]));
-						myDocumentation.add(JavaSourceParser.getDocs(methods[i]));						
+//						myDocumentation.add(JavaSourceParser.getDocs(methods[i]));						
 					}
 				}
+			} catch (ClassNotFoundException e) {
+				System.out.println("Class not found: " + rootClassName);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
-		} else if (po instanceof PyInstance) {
+		} 
+		else if (po != null) { //then it's a python object (?)
 			if ( !varTok.hasMoreTokens() ) {
-				PyObject iter = ((PyList) ((PyInstance) po).__dir__()).__iter__();
+				PyObject iter = po.__dir__().__iter__();
 				
 				for (PyString item; (item = (PyString) iter.__iternext__()) != null; ) {
 					PyObject attr = po.__findattr__(item);
 					StringBuffer buf = new StringBuffer(base + ".");					
 					buf.append(item.toString());
-					if (attr instanceof PyMethod) {						
+					
+					if (attr.isCallable()) {						
 						buf.append("(");
-						try {
-							String[] varnames = ((PyTableCode) ((PyFunction) ((PyMethod) attr).im_func).func_code).co_varnames;
-							for (int i = 1; i < varnames.length; i++) { //skip 'self' arg
-								buf.append(varnames[i]);
-								if (i < varnames.length - 1) buf.append(", ");
-							}
-						} catch (ClassCastException e) {
-							e.printStackTrace();
-						}
+//						try {
+//							String[] varnames = ((PyTableCode) ((PyFunction) ((PyMethod) attr).im_func).func_code).co_varnames;
+//							for (int i = 1; i < varnames.length; i++) { //skip 'self' arg
+//								buf.append(varnames[i]);
+//								if (i < varnames.length - 1) buf.append(", ");
+//							}
+//						} catch (ClassCastException e) {
+//							e.printStackTrace();
+//						}
 						buf.append(")");
 					}
 					result.add(buf.toString());

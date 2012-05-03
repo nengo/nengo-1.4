@@ -12,7 +12,11 @@ package ca.nengo.ui.JNumeric;
 import org.python.core.*;
 
 // XXX migrate various pieces of PyMultiarray to here.
-public class GeneralUfunc extends PyObject {
-	private static final long serialVersionUID = 1L;
+public class GeneralUfunc extends PyObject  {
+  public GeneralUfunc() {
+    super(PyType.fromClass(GeneralUfunc.class)) ;
+    this.javaProxy = this ;
+  }
+
 }
 
