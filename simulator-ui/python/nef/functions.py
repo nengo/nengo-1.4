@@ -40,9 +40,27 @@ class PythonFunction(AbstractFunction):
 
 
 class Interpolator:
-    def __init__(self,filename):
+    def __init__(self,data):
         self.data=[]
         N=None
+        
+        if isinstance(data,str):
+            self.init_from_file(data)
+        else:
+            self.init_from_dict(data)
+            
+    def init_from_dict(self,data):        
+        length=None
+        for k,v in sorted(data.items()):
+            if not hasattr(v,'__len__'):
+                v=[v]
+            if length is not None and length!=len(v):
+                raise Exception('invalid data for defining function (time %4g has %d items instead of %d)'%(k,len(v),length))
+            length=len(v)   
+            row=[float(x) for x in [k]+v]
+            self.data.append(row)
+            
+    def init_from_file(self,filename):
         for line in open(filename):
             line=line.strip()
             if len(line)>0 and line[0]!='#':
@@ -50,6 +68,7 @@ class Interpolator:
                 if N is None: N=len(row)
                 while len(row)<N: row.append(0.0)  
                 self.data.append(row)
+                
     def load_into_function(self,input):
         funcs=[]
         for i in range(len(input.functions)):
@@ -69,3 +88,4 @@ class Interpolator:
                 break
         return value
             
+

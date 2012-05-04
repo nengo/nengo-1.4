@@ -237,10 +237,14 @@ class Network:
         :param string name: name of created node
         :param values: numerical values for the function.  If a list, can contain a mixture of
                        floats and functions (floats are fixed input values, and functions are
-                       called with the current time and must return a single float).  If values
+                       called with the current time and must return a single float).  If *values*
                        is a function, will be called with the current time and can return either 
-                       a single float or a list of floats.
-        :type values: list or function
+                       a single float or a list of floats.  If a string, will be treated as a
+                       filename of a csv file with the first number in each row indicating
+                       the time and the other numbers giving the value of the function.  If
+                       a dictionary, the keys,value pairs in the dictionary will be treated
+                       as time,value pairs.                       
+        :type values: list, function, string, or dict
         :param zero_after_time: if not None, any fixed input value will change to 0 after this
                                 amount of time
         :type zero_after_time: float or None                         
@@ -249,7 +253,7 @@ class Network:
 
         funcs=[]
         
-        if isinstance(values,str):
+        if isinstance(values,str) or (hasattr(values,'items') and callable(values.items)):
             values=functions.Interpolator(values)
         
         if callable(values):
