@@ -35,12 +35,16 @@ class LogBasic:
 class LogVector(LogBasic):
     def __init__(self,name,origin,tau):
         LogBasic.__init__(self,name,origin)
+        if tau<=0: tau=None
         self.tau=tau
     def init(self):
         self.value=numeric.array([0]*self.length(),typecode='f')
     def tick(self,dt):
-        self.value*=(1.0-dt/self.tau)
-        self.value+=numeric.array(self.data())*(dt/self.tau)    
+        if self.tau is None:
+            self.value[:]=self.data()
+        else:    
+            self.value*=(1.0-dt/self.tau)
+            self.value+=numeric.array(self.data())*(dt/self.tau)    
 
 class LogVocab(LogVector):
     def __init__(self,name,origin,tau,vocab,terms=None,pairs=True):
@@ -81,7 +85,7 @@ class LogSpikeCount(LogBasic):
 
 
 class Log(SimpleNode):
-    def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.1,tau=0.01):
+    def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
         if not isinstance(network,Network):
             network=Network(network)
         self.network=network
@@ -135,15 +139,15 @@ class Log(SimpleNode):
             origin=node.getOrigin('AXON')
         self.logs.append(LogSpikeCount(name,origin,skip=skip))
         
-    def add(self,source,name=None,tau=None):
+    def add(self,source,name=None,tau='default'):
         if name is None: name=source
-        if tau is None: tau=self.tau
+        if tau=='default': tau=self.tau
         origin=self.network.get(source,require_origin=True)
         self.logs.append(LogVector(name,origin,tau))
 
-    def add_vocab(self,source,vocab=None,name=None,tau=None,terms=None,pairs=True):
+    def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=True):
         if name is None: name=source
-        if tau is None: tau=self.tau
+        if tau=='default': tau=self.tau
         origin=self.network.get(source,require_origin=True)
         if vocab is None: 
             dim=origin.dimensions
@@ -152,7 +156,7 @@ class Log(SimpleNode):
         
     def write_header(self):
         f=open(self.filename,'a')
-        f.write('\n')
+        #f.write('\n')
         f.write('time,%s\n'%(','.join([log.name for log in self.logs])))
         #f.write('    ,%s\n'%(','.join([log.type() for log in self.logs])))
         f.close()

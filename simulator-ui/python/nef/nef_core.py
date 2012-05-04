@@ -18,6 +18,7 @@ import functions
 import array
 import random
 import inspect
+import log
     
 
 class Network:
@@ -883,6 +884,57 @@ class Network:
     def getNeuronCount(self):
         """Return the total number of neurons in this network"""
         return self.network.neuronCount
+        
+    run_time=0.0    
+    def run(self,time,dt=0.001):
+        """Run the simulation.
+        
+        If called twice, the simulation will continue for *time* more seconds.  To reset
+        the simulation, call :func:`nef.Network.reset()`.  Typical use cases are to either
+        simply call it once::
+            
+            net.run(10)
+            
+        or to call it multiple times in a row::
+        
+            t=0
+            dt=0.1
+            while t<10:
+               net.run(dt)
+               t+=dt 
+                
+        
+        :param float time: the amount of time (in seconds) to run for
+        :param float dt: the size of the time step to use
+        """        
+        self.network.simulator.run(self.run_time,self.run_time+time,dt)
+        self.run_time=self.run_time+time
+        
+    def reset(self):
+        """Reset the simulation.
+        
+        Should be called if you have previously called
+        :func:`nef.Network.run()`, but now want to reset the simulation
+        to its initial state.
+        """        
+        self.network.reset(True)
+        self.run_time=0.0
+        
+    def log(self,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
+        """Creates a :py:class:`nef.Log` object which dumps data to a .csv file as the model runs.
+        
+        See the :py:class:`nef.Log` documentation for details.
+        
+        :param string name: The name of the model.  Defaults to the name of the Network object.
+        :param string dir: The directory to place the .csv file into
+        :param string filename: The filename to use.  ``.csv`` will be added if it is not already
+                                there. Can use ``%(name)s`` to refer to the *name* of the model
+                                and ``%(time)s`` to refer to the start time of the model.  Defaults
+                                to ``%(name)s-%(time)s.csv``.
+        :param float interval: The time interval between each row of the log.  Defaults to 0.001 (1ms).
+        :param float tau: The default filter time for data.  Defaults to 0.01 (10ms).        
+        """
+        return log.Log(self,name=name,dir=dir,filename=filename,interval=interval,tau=tau)
         
     def set_view_function_1d(self,node,basis,label='1D function',origin='X',minx=-1,maxx=1,miny=-1,maxy=1):
         """Define a function representation for the given node.
