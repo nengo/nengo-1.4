@@ -93,12 +93,17 @@ class Log:
         self.do_summary=False
         self.do_data=False
         self.directory=sys.argv[0]
+        self.using_default_directory=True
         if self.directory.endswith('.py'): self.directory=self.directory[:-3]
         
         self.start_time=time.time()
         self.last_flush=self.start_time
         
         self.reset()
+        
+    def use_directory(self,dir):
+        self.directory=dir
+        self.using_default_directory=False    
         
 
     def set(self,key,value):
@@ -208,7 +213,7 @@ def log(screen=None,html=None,data=None,summary=None,directory=None):
     if html is not None: singleton_log.do_html=html
     if data is not None: singleton_log.do_data=data
     if summary is not None: singleton_log.do_summary=summary
-    if directory is not None: singleton_log.directory=directory    
+    if directory is not None: singleton_log.use_directory(directory)
     return log_proxy
 
 

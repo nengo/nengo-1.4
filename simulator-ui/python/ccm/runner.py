@@ -104,6 +104,12 @@ def ensure_backup(fn,lines):
             f.close()
     
 
+run_external=None
+def run_with(script):
+    global run_external
+    run_external=script
+    
+
 
 def run(_filename,_iterations=1,**settings):
     if not _filename.endswith('.py'): _filename+='.py'
@@ -123,20 +129,27 @@ def run(_filename,_iterations=1,**settings):
       for setting in make_settings_combinations(settings):
         param_code=make_param_code(params,defaults,setting)
         param_text=make_param_text(params,defaults,setting)
+        
+        if 'ccm.log' not in core_code:
+            core_code='import ccm\nccm.log()\n'+core_code
 
         code='%s\n%s'%(param_code,core_code)
         code=code.replace('\r\n','\n')
         logline='ccm.log(data=True,screen=False,directory="%s/%s")'%(_filename[:-3],param_text)
         code=re.sub(r'ccm\.log\([^)]*\)',logline,code)
-        
+                
         print _filename,'%d/%d'%(i,_iterations),param_text
         
         f=file(fname,'w')
         f.write(code)
         f.flush()
-        compiled=compile(code,fname,'exec')
-        exec compiled in {}
-        logger.finished()
+        
+        if run_external is None:
+            compiled=compile(code,fname,'exec')
+            exec compiled in {}
+            logger.finished()
+        else:
+            os.system('%s %s'%(run_external,fname))    
         f.close()
     os.remove(fname)
         
