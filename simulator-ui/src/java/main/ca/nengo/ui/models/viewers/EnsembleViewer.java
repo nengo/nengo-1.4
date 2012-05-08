@@ -28,6 +28,7 @@ package ca.nengo.ui.models.viewers;
 
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.Node;
+import ca.nengo.model.Network;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.ui.lib.util.UserMessages;
@@ -35,6 +36,7 @@ import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.nodes.UIEnsemble;
 import ca.nengo.ui.models.nodes.UINeuron;
+import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.util.Probe;
 
 /**
@@ -93,6 +95,11 @@ public class EnsembleViewer extends NodeViewer {
 				Ensemble ensemble = (Ensemble)node;
 				UIEnsemble ensembleUI = new UIEnsemble(ensemble);
 				addUINode(ensembleUI,false,false);
+				
+			} else if (node instanceof Network) {
+				Network network = (Network)node;
+				UINetwork networkUI = new UINetwork(network);
+				addUINode(networkUI, false, false);
 			} else {
 				UserMessages.showError("Unsupported node type " + node.getClass().getSimpleName()
 						+ " in EnsembleViewer");

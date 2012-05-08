@@ -19,6 +19,7 @@ from ca.nengo.model.impl import *
 from ca.nengo.math.impl import *
 from ca.nengo.model import Node,SimulationMode
 from ca.nengo.model.plasticity.impl import STDPTermination
+from ca.nengo.model.neuron.impl import SpikingNeuron
 
 from java.lang.System.err import println
 from java.lang import Exception
@@ -91,6 +92,28 @@ class EnsembleWatch:
             ('preferred directions',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 500*self.view.dt,filter=True,label=obj.name)),       
             #('decoders',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 0.1*self.view.dt,filter=True,decoders=True)),       
              ]
+        return r
+    
+class NeuronWatch:
+    def check(self,obj):
+        return isinstance(obj,SpikingNeuron)
+    
+    def current(self,obj):
+        return obj.getOrigin('current').getValues().getValues()
+    
+    def spikes(self,obj):
+        return obj.getOrigin('AXON').getValues().getValues()
+        
+    
+#    def spikes(self,obj):
+#        if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
+#            return [n.getOrigin('AXON').getValues().values[0]*0.0005]
+#        else:
+#            return obj.getOrigin('AXON').getValues().values
+    
+    def views(self,obj):
+        r=[('input',components.Graph,dict(func=self.current,label=obj.name+":input")),
+           ('output',components.Graph,dict(func=self.spikes,label=obj.name+":output"))]
         return r
 
 class NodeWatch:
@@ -260,7 +283,7 @@ class RoomWatch:
 
 nodeWatch=NodeWatch()
 ensembleWatch=EnsembleWatch()
-watches=[RoomWatch(),nodeWatch,ensembleWatch,FunctionWatch(),HRRWatch(),ArrayWatch()]
+watches=[RoomWatch(),nodeWatch,ensembleWatch,FunctionWatch(),HRRWatch(),ArrayWatch(),NeuronWatch()]
 
 
 import math
