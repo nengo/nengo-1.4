@@ -133,7 +133,7 @@ public class ConfigDialog extends JDialog {
      */
     private void cancelAction() {
 
-        setVisible(false);
+        //setVisible(false);   // doing both this and dispose() seems to cause problems in OpenJDK (the setVisible(true) call never returns)
 
         myConfigManager.dialogConfigurationFinished(new ConfigDialogClosedException());
         super.dispose();
@@ -236,7 +236,10 @@ public class ConfigDialog extends JDialog {
         initPanelBottom(myPanel);
 
         createButtons(myPanel);
+        
+        add(myPanel);
 
+        /*
         while (true) {
             try {
                 add(myPanel);
@@ -246,6 +249,7 @@ public class ConfigDialog extends JDialog {
                 // Ubuntu 11.04 throws a sun.awt.X11.XException ~80% of the time here
             }
         }
+        */
 
         setMinimumSize(new Dimension(200, this.getHeight()));
         updateBounds();
@@ -279,7 +283,7 @@ public class ConfigDialog extends JDialog {
             }
 
             if (preConfigurationSuccess) {
-                setVisible(false);
+                //setVisible(false);  // doing both this and dispose() seems to cause problems in OpenJDK (the setVisible(true) call never returns)
                 dispose();
 
                 (new TrackedAction("Configuring " + myConfigManager.getConfigurable().getTypeName()) {
