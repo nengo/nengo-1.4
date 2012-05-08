@@ -1558,6 +1558,7 @@ public class PyMultiarray extends PySequence {
 	if (name == "real") return getReal();
 	if (name == "imag" || name == "imaginary") return getImag();
 	if (name == "flat" && isContiguous) return reshape(this, new int [] {-1});
+	if (name == "T" && dimensions.length==2) return transpose(this,new int [] {1,0});
 	return super.__findattr_ex__(name) ;
     }
 
