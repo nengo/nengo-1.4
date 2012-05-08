@@ -35,6 +35,7 @@ import ca.nengo.model.Termination;
 import ca.nengo.model.neuron.ExpandableSynapticIntegrator;
 import ca.nengo.model.neuron.SpikeGenerator;
 import ca.nengo.model.neuron.SynapticIntegrator;
+import ca.nengo.util.VisiblyMutableUtils;
 
 /**
  * A SpikingNeuron with an ExpandableSynapticIntegrator.
@@ -81,6 +82,8 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 			throw new StructuralException("Weights matrix must have one row (has " + weights.length + ")");
 		}
 
+		fireVisibleChangeEvent();
+		
 		return mySynapticIntegrator.addTermination(name, weights[0], tauPSC, modulatory);
 	}
 
@@ -99,6 +102,8 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 			throw new StructuralException("Underlying SynapticIntegrator is not expandable");
 		}
 
+		fireVisibleChangeEvent();
+		
 		return mySynapticIntegrator.removeTermination(name);
 	}
 

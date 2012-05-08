@@ -354,6 +354,14 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	public void removeChangeListener(Listener listener) {
 		myListeners.remove(listener);
 	}
+	
+	/**
+	 * Called by subclasses when properties have changed in such a way that the
+	 * display of the ensemble may need updating.
+	 */
+	protected void fireVisibleChangeEvent() {
+		VisiblyMutableUtils.changed(this, myListeners);
+	}
 
 	@Override
 	public SpikingNeuron clone() throws CloneNotSupportedException {
