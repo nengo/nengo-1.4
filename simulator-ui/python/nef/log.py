@@ -5,6 +5,9 @@ from nef_core import Network
 from array import NetworkArray
 import hrr
 from ca.nengo.model import Origin
+import datatools
+import os
+import ccm
 
 class LogBasic:
     def __init__(self,name,origin):
@@ -93,6 +96,19 @@ class Log(SimpleNode):
         if name is None: self.logname=self.network.network.name
         else: self.logname=name
         
+        if dir is None:
+            # see if we are running inside ccm's runner() system
+            #try:
+                
+                logg=ccm.logger.singleton_log
+                if not logg.using_default_directory:
+                    dir=logg.directory
+                    filename=logg.get_time_code()
+                    pass
+            #except:
+            #    pass
+        
+        
         self.dir=dir
         if not filename.endswith('.csv'): filename+='.csv'
         self.filename_template=filename
@@ -113,7 +129,13 @@ class Log(SimpleNode):
     def make_filename(self):
         t=time.strftime('%Y%m%d-%H%M%S')
         fn=self.filename_template%dict(time=t,name=self.logname)
-        if self.dir is not None: fn='%s/%s'%(self.dir,fn)
+        if self.dir is not None: 
+            fn='%s/%s'%(self.dir,fn)
+
+            #ensure directory exists
+            if not os.access(self.dir+'/',os.F_OK):
+                os.makedirs(self.dir)
+            
         return fn
                     
     def tick(self):
@@ -172,5 +194,17 @@ class Log(SimpleNode):
         f.write(text)
         f.close()
         
+    def reader(self):
+        dir,fn=self.filename.rsplit('/',1)
+        return datatools.LogReader(fn,dir)
+        
+    def record(self,**items):
+        f=open(self.filename[:-3]+'data','a')
+        for k,v in items.items():
+            f.write('%s=%s\n'%(k,`v`))
+        f.close()    
+            
+        
+                
         
            
