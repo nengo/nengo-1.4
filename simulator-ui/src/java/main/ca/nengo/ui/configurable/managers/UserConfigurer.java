@@ -119,6 +119,7 @@ public class UserConfigurer extends ConfigManager {
         }
 
         ConfigDialog dialog = createConfigDialog();
+        dialog.setModal(false);   // fixes object creation in OpenJDK
         dialog.setVisible(true);
 
         /*
