@@ -1,4 +1,3 @@
-ca.nengo.model.plasticity.PlasticityRule
 ca.nengo.dynamics.DynamicalSystem
 ca.nengo.dynamics.Integrator
 ca.nengo.dynamics.LinearSystem

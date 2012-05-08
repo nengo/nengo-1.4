@@ -1,6 +1,3 @@
-ca.nengo.model.plasticity.impl.CompositePlasticityRule
-ca.nengo.model.plasticity.impl.RealPlasticityRule
-ca.nengo.model.plasticity.impl.SpikePlasticityRule
 ca.nengo.dynamics.impl.EulerIntegrator
 ca.nengo.dynamics.impl.RK45Integrator
 ca.nengo.dynamics.impl.LTISystem
