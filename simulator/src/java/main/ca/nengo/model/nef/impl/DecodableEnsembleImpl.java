@@ -498,8 +498,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 				units[i] = origin.getValues().getUnits();
 			}
 			result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{vals}, units);
-		} else if (t == null) {
-		    if (stateName.endsWith(":STP")) {
+		} else if (t == null && stateName.endsWith(":STP")) {
                 String originName = stateName.substring(0,stateName.length()-4);
                 try {
                     DecodedOrigin o = (DecodedOrigin) getOrigin(originName);
@@ -507,7 +506,6 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
                 } catch (StructuralException e) {
                     throw new SimulationException(e);
                 }
-            }
 		} else {
 		    result = super.getHistory(stateName);
 		}
