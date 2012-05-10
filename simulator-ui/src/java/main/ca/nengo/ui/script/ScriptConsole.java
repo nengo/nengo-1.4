@@ -64,7 +64,10 @@ import org.apache.log4j.Logger;
 import org.python.util.PythonInterpreter;
 
 import ca.nengo.config.JavaSourceParser;
+import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.lib.Style.NengoStyle;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.objects.activities.TrackedAction;
 
 /**
  * A user interface panel for entering script commands.
@@ -150,15 +153,8 @@ public class ScriptConsole extends JPanel {
 		myTypedText = "";
 		myTypedCaretPosition = 0;
 
-		try {
-			OutputWriter ow = new OutputWriter(this);
-			interpreter.setOut(ow.getOutputStream());
-			Thread owThread = new Thread(ow);
-			owThread.start();
-		} catch (IOException e) {
-			ourLogger.error("Problem setting up console output", e);
-		}
-
+		interpreter.setOut(new ConsoleOutputWriter(this));
+		
 		addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -359,21 +355,40 @@ public class ScriptConsole extends JPanel {
 		appendText(text + "\r\n", COMMAND_STYLE);
 		myHistoryCompletor.add(text);
 		clearCommand();
-		try {
-			if (text.startsWith("run ")) {
-				addVariable("scriptname", text.substring(4).trim());
-				myInterpreter.execfile(text.substring(4).trim());
-			} else if (text.startsWith("help ")) {
-				appendText(JavaSourceParser.removeTags(getHelp(text.substring(5).trim())), HELP_STYLE);
-				appendText("\n","root");
-			} else {
-				myInterpreter.exec(text);
-			}
-		} catch (RuntimeException e) {
-			ourLogger.error("Runtime error in interpreter", e);
-			appendText(e.toString(), ERROR_STYLE);
+
+		final String initText=text;
+		
+		runtimeException=null;
+		
+        (new TrackedAction("Running...") {
+            private static final long serialVersionUID = 1L;
+            
+
+            @Override
+            protected void action() throws ActionException {
+                try {
+        			if (initText.startsWith("run ")) {
+        				addVariable("scriptname", initText.substring(4).trim());
+        				myInterpreter.execfile(initText.substring(4).trim());
+        			} else if (initText.startsWith("help ")) {
+        				appendText(JavaSourceParser.removeTags(getHelp(initText.substring(5).trim())), HELP_STYLE);
+        				appendText("\n","root");
+        			} else {
+        				myInterpreter.exec(initText);
+        			}
+                } catch (RuntimeException e) {
+                    runtimeException=e;
+                }
+            }
+        }).doAction();
+        
+        if (runtimeException!=null) {
+			ourLogger.error("Runtime error in interpreter", runtimeException);
+			appendText(runtimeException.toString(), ERROR_STYLE);
 		}
 	}
+	
+	protected RuntimeException runtimeException;
 
 	private static String getHelp(String entity) {
 		String result = "No documentation found for " + entity;
@@ -590,47 +605,25 @@ public class ScriptConsole extends JPanel {
 
 	}
 
+	
+	
 	/**
-	 * Writes interpreter output to console.
+	 * Replacement for original console writer that should eliminate the "Read end dead" bug.
 	 *
-	 * @author Bryan Tripp
+	 * @author Terry Stewart
 	 */
-	private class OutputWriter implements Runnable {
-
+	private class ConsoleOutputWriter extends java.io.Writer {
 		private ScriptConsole myConsole;
-		private PipedOutputStream myOutput;
-		private Reader myInput;
-
-		public OutputWriter(ScriptConsole console) throws IOException {
-			myConsole = console;
-			myOutput = new PipedOutputStream();
-			myInput = new InputStreamReader(new PipedInputStream(myOutput));
+		public ConsoleOutputWriter(ScriptConsole console) {
+			myConsole=console;
 		}
-
-		/**
-		 * @return An OutputStream to which a PythonInterpreter can write output
-		 *         so that it appears in the console display.
-		 */
-		public OutputStream getOutputStream() {
-			return myOutput;
+		public void write(char[] cbuf, int off, int len) {
+			myConsole.appendText(new String(cbuf,off,len),OUTPUT_STYLE);
 		}
-
-		public void run() {
-			char[] buffer = new char[512];
-			int charsRead = 0;
-
-			try {
-				while (charsRead >= 0) {
-					charsRead = myInput.read(buffer);
-					if (charsRead > 0) {
-                        myConsole.appendText(String.valueOf(buffer, 0, charsRead), OUTPUT_STYLE);
-                    }
-				}
-			} catch (IOException e) {
-				ourLogger.error("Problem writing to console", e);
-			}
+		public void flush() {
 		}
-
+		public void close() {
+		}
 	}
 
 	public static void main(String[] args) {
