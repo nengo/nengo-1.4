@@ -366,6 +366,7 @@ public class ScriptConsole extends JPanel {
 
             @Override
             protected void action() throws ActionException {
+            	myCommandField.setEnabled(false);
                 try {
         			if (initText.startsWith("run ")) {
         				addVariable("scriptname", initText.substring(4).trim());
@@ -380,6 +381,13 @@ public class ScriptConsole extends JPanel {
                     runtimeException=e;
                 }
             }
+                
+             @Override
+             protected void postAction() {
+            	 super.postAction();
+            	 myCommandField.setEnabled(true);
+            	 myCommandField.requestFocus();
+             }
         }).doAction();
         
         if (runtimeException!=null) {
