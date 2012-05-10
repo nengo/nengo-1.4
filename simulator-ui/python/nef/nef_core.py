@@ -6,7 +6,7 @@ from ca.nengo.model.neuron.impl import LIFNeuronFactory
 from ca.nengo.model.plasticity.impl import PESTermination, STDPTermination, PlasticEnsembleImpl
 from ca.nengo.util import MU
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator,FourierFunction
-from ca.nengo.math import Function
+from ca.nengo.math import Function,PDFTools
 from ca.nengo.model import StructuralException
 from ca.nengo.io import FileManager
 import java
@@ -41,12 +41,13 @@ class Network:
     """
     
     serialVersionUID=1
-    def __init__(self,name,quick=False):
+    def __init__(self,name,quick=False,seed=None):
         """
         :param name: If a string, create and wrap a new NetworkImpl with the given *name*.  
                     If an existing NetworkImpl, then create a wrapper around that network.
         :type name: string or NetworkImpl
         :param boolean quick: Default setting for the *quick* parameter in :func:`nef.Network.make()`
+        :param int seed: random number seed to use for creating ensembles.
         """
         if isinstance(name,NetworkImpl):
             self.network=name
@@ -54,6 +55,11 @@ class Network:
             self.network=NetworkImpl()
             self.network.name=name
         self.defaults=dict(quick=quick)
+        
+        self.seed=seed
+        if seed is not None:
+            self.random=random.Random()
+            self.random.seed(seed)
         
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
@@ -65,6 +71,7 @@ class Network:
                   mode='spike',add_to_network=True,
                   node_factory=None,
                   decoder_sign=None,
+                  seed=None,
                   quick=None,storage_code=''):
         """Create and return an ensemble of neurons.
 
@@ -94,7 +101,9 @@ class Network:
         :param quick:         if True, saves data from a created ensemble and will re-use it in the future
                                when creating an ensemble with the same parameters as this one.  If None,
                                uses the Network default setting.                               
-        :type quick:          boolean or None                       
+        :type quick:          boolean or None         
+        :param int seed: random number seed to use.  Will be passed to both random.seed() and ca.nengo.math.PDFTools.setSeed().
+                         If this is None and the Network was constructed with a seed parameter, a seed will be randomly generated.
         :param string storage_code:  an extra parameter to allow different quick files even if all other parameters
                                      are the same
         :param boolean add_to_network: flag to indicate if created ensemble should be added to the network
@@ -102,6 +111,12 @@ class Network:
         """
         if( neurons == 0 ):
             raise Exception("nef_core.make - Num neurons = 0")
+        
+        if seed is None:
+            if self.seed is not None:
+                seed=self.random.randrange(0x7fffffff)
+        if seed is not None:
+            quick=True                    
         if quick is None: quick=self.defaults['quick']
         if quick:
             storage_name='quick_%s_%d_%d_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref)
@@ -125,6 +140,10 @@ class Network:
                 storage_name+='_eval%08x'%hash(tuple([tuple(x) for x in eval_points]))
             if node_factory is not None:
                 storage_name+='_node%s'%node_factory.__class__.__name__                
+            if seed is not None:
+                storage_name+='_seed%08x'%seed
+                PDFTools.setSeed(seed)    
+                random.seed(seed)
             if not java.io.File(storage_name+'.'+FileManager.ENSEMBLE_EXTENSION).exists():
                 dir=java.io.File('quick')
                 if not dir.exists(): dir.mkdirs()
