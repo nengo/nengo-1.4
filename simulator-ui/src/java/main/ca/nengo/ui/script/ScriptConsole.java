@@ -358,8 +358,6 @@ public class ScriptConsole extends JPanel {
 
 		final String initText=text;
 		
-		runtimeException=null;
-		
         (new TrackedAction("Running...") {
             private static final long serialVersionUID = 1L;
             
@@ -378,7 +376,8 @@ public class ScriptConsole extends JPanel {
         				myInterpreter.exec(initText);
         			}
                 } catch (RuntimeException e) {
-                    runtimeException=e;
+          			ourLogger.error("Runtime error in interpreter", e);
+           			appendText(e.toString(), ERROR_STYLE);
                 }
             }
                 
@@ -390,14 +389,8 @@ public class ScriptConsole extends JPanel {
              }
         }).doAction();
         
-        if (runtimeException!=null) {
-			ourLogger.error("Runtime error in interpreter", runtimeException);
-			appendText(runtimeException.toString(), ERROR_STYLE);
-		}
 	}
 	
-	protected RuntimeException runtimeException;
-
 	private static String getHelp(String entity) {
 		String result = "No documentation found for " + entity;
 
