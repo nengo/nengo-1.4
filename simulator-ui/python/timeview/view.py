@@ -263,8 +263,16 @@ class ArrayWatch:
             ('spike raster',components.SpikeRaster,dict(func=self.spike_array,label=obj.name,usemap=False)),
             ]
             
-
-
+class FSMWatch:
+    def check(self,obj):
+        return isinstance(obj,nef.FSMNode)
+    def measure(self,obj):
+        out = [0.0]*len(obj.states)
+        if obj.state is not None:
+            out[sorted(obj.states.keys()).index(obj.state.name)] = 1.0
+        return out
+    def views(self,obj):
+        return [('state viewer',components.TextList,dict(func=self.measure,label="States",names=sorted(obj.states.keys()),show_values=False,ignore_filter=True))]
 
 import space
 import ccm.nengo
@@ -283,7 +291,7 @@ class RoomWatch:
 
 nodeWatch=NodeWatch()
 ensembleWatch=EnsembleWatch()
-watches=[RoomWatch(),nodeWatch,ensembleWatch,FunctionWatch(),HRRWatch(),ArrayWatch(),NeuronWatch()]
+watches=[RoomWatch(),nodeWatch,ensembleWatch,FunctionWatch(),HRRWatch(),ArrayWatch(),NeuronWatch(),FSMWatch()]
 
 
 import math

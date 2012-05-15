@@ -3,7 +3,7 @@ import nef
 
 class _FSMState:
     """Holds information about a particular state in a finite state machine."""
-    def __init__(self,name,node,hrr=None,enter=None,exit=None,timer_f=None,timer_t=None,input=None):
+    def __init__(self,name,node,hrr=None,enter_f=None,exit_f=None,timer_f=None,timer_t=None,input=None):
         """Initializes a finite state machine state. Requires a name
         (which must be unique to the node) and the FSMNode
         which it will be a part of.
@@ -11,16 +11,16 @@ class _FSMState:
         Keyword arguments:
         hrr -- An HRR to be bound to this state. If it is not assigned, it will be
           randomly generated.
-        enter -- A function to run when you enter this state.
-        exit -- A function to run when you exit this state.
+        enter_f -- A function to run when you enter this state.
+        exit_f -- A function to run when you exit this state.
         timer_f -- A function to run after a certain amount of time has elapsed.
         timer_t -- The amount of time after which the timer function will run.
         input -- A function to run in response to some input. (Does this make sense to include?)
         """
         self.name = name
         self.node = node
-        self.enter = enter
-        self.exit = exit
+        self.enter_f = enter_f
+        self.exit_f = exit_f
         self.timer_f = timer_f
         self.timer_t = timer_t
         self.input = input
@@ -58,20 +58,20 @@ class FSMNode(nef.SimpleNode):
         if not self.states.has_key(next_state):
             raise Exception('FSMNode has no state named %s.' % next_state)
         
-        if self.state and self.state.exit:
-            self.state.exit()
+        if self.state and self.state.exit_f is not None:
+            self.state.exit_f()
         
         self.state = self.states[next_state]
         self.reset_timer()
         
-        if self.state.enter:
-            self.state.enter()
+        if self.state.enter_f is not None:
+            self.state.enter_f()
     
     def reset_timer(self):
         self.timer = self.t_start
 
     def origin_state(self):
-        if self.state and self.state.timer_f and self.t_start-self.timer >= self.state.timer_t:
+        if self.state and self.state.timer_f is not None and self.t_start-self.timer >= self.state.timer_t:
             self.state.timer_f()
             # Most timer functions will transition, but if not, we'll
             # still reset the timer so that we can do an action many
@@ -85,31 +85,3 @@ class FSMNode(nef.SimpleNode):
     def termination_input(self,x):
         if self.state and self.state.input:
             self.state.input(x)
-
-class DelayedFSMNode(FSMNode):
-    def __init__(self,name,state_dims,transition_delay):
-        self.next_state = None
-        self.transition_delay = transition_delay
-        self.transition_timer = 0.0
-        FSMNode.__init__(self,name,state_dims)
-    
-    def transition(self,next_state,skip_delay=False):
-        if not self.states.has_key(next_state):
-            raise Exception('DelayFSMNode has no state named %s.' % next_state)
-        if skip_delay:
-            self.next_state = None
-            FSMNode.transition(self,next_state)
-        else:
-            self.next_state = self.states[next_state]
-            FSMNode.reset_timer(self)
-            self.transition_timer = self.t_start
-    
-    def origin_next_state(self):
-        if self.next_state and self.t_start-self.transition_timer >= self.transition_delay:
-            FSMNode.transition(self,self.next_state.name)
-            self.next_state = None
-        
-        if self.next_state:
-            FSMNode.reset_timer(self)
-            return self.next_state.hrr.v
-        return [-1.0]*self.state_dims
