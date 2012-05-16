@@ -216,13 +216,17 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar.add(self.feedforward)
 
         self.toolbar.add(Box.createHorizontalGlue())
+        
+        self.button_stop=make_button('stop',self.do_interrupt,'Stop the currently running simulation',enabled=False)
+        self.toolbar.add(self.button_stop)
         #self.toolbar.add(make_button('templates',lambda event: template.template.toggle_visible(),'toggle templates'))
         self.toolbar.add(make_button('inspect',self.do_inspect,'inspect'))
         self.toolbar.add(make_button('console',self.do_console,'toggle console'))
-        self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
-        self.toolbar.add(self.button_run)
         self.parallelization=ParallelizationConfiguration()
         self.toolbar.add(self.parallelization.button)
+        self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
+        self.toolbar.add(self.button_run)
+        
 
         ca.nengo.ui.lib.world.handlers.SelectionHandler.addSelectionListener(self)
         self.ng.getWorld().getGround().addChildrenListener(self)
@@ -235,10 +239,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def run(self):
         while True:
             self.update()
-            java.lang.Thread.sleep(1000)
-        
-        
-
+            java.lang.Thread.sleep(500)
 
 
     def childAdded(self,obj):
@@ -249,6 +250,11 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.update()
         
     def update(self):
+        try:
+            self.button_stop.enabled=self.ng.scriptConsole.canInterrupt()
+        except:
+            pass    
+    
         selected=self.ng.getSelectedObj()
         self.mode_combobox.set_node(selected)
 
@@ -327,6 +333,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         network=self.get_current_network()
         if network is not None:         
             ca.nengo.ui.actions.RunInteractivePlotstAction(network).doAction()
+    def do_interrupt(self,event):
+        self.ng.scriptConsole.interrupt()
     def do_pdf(self,event):
         from com.itextpdf.text.pdf import PdfWriter
         from com.itextpdf.text import Document
