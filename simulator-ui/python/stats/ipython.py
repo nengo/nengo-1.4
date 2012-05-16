@@ -1,3 +1,5 @@
+import re, os
+
 last_run_in_nengo=None
 
 def run_in_nengo(code):
