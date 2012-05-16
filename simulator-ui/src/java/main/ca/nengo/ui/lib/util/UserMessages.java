@@ -64,6 +64,14 @@ public class UserMessages {
 		showWarning(msg, UIEnvironment.getInstance());
 	}
 
+	public static void showDialog(String title, String msg) {
+		showDialog(title,msg,UIEnvironment.getInstance());
+	}
+
+	public static void showDialog(String title, String msg, Component parent) {
+		JOptionPane.showMessageDialog(parent, msg, title, JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	public static void showWarning(String msg, Component parent) {
 		JOptionPane.showMessageDialog(parent, msg, "Warning", JOptionPane.WARNING_MESSAGE);
 	}

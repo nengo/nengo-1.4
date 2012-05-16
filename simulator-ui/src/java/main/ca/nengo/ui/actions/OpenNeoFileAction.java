@@ -83,9 +83,20 @@ public class OpenNeoFileAction extends StandardAction {
                 protected void action() throws ActionException {
 
                     if (file.getName().endsWith(".py")) {
-                        NengoGraphics.getInstance().getScriptConsole().addVariable("scriptname", file.getPath());
-                        NengoGraphics.getInstance().getPythonInterpreter().execfile(file.getPath());
-                        return;
+                    	try {
+                    		NengoGraphics.getInstance().getScriptConsole().setRunningThread();
+                    		NengoGraphics.getInstance().getScriptConsole().addVariable("scriptname", file.getPath());
+                    		NengoGraphics.getInstance().getPythonInterpreter().execfile(file.getPath());
+                    	} catch (RuntimeException e) {
+                    		if (e.toString()=="ca.nengo.ui.script.ScriptInterruptException") {
+                    			UserMessages.showDialog("Stopped","Stopped opening "+file.getName());                    			
+                    		} else {
+                    			UserMessages.showError("Runtime exception:<br>" + e);
+                    		}
+                    	}
+                    	NengoGraphics.getInstance().getScriptConsole().clearRunningThread();
+                		return;
+                    	
                     }
 
                     try {
@@ -116,6 +127,7 @@ public class OpenNeoFileAction extends StandardAction {
 
                             }
                         });
+                    	
 
                     } catch (IOException e) {
                         UserMessages.showError("IO Exception loading file");
@@ -164,6 +176,12 @@ public class OpenNeoFileAction extends StandardAction {
                     }
 
                 }
+
+                @Override
+                protected void postAction() {
+               	 super.postAction();
+                }
+                
 
             };
             loadActivity.doAction();
