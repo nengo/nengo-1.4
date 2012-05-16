@@ -27,7 +27,7 @@ def fft(x):
 _ifft_cache={}    
 def ifft(x):
     N=len(x)
-    if N in [1<<i for i in range(16)]: return FFT.ifft(x)
+    if N in [1<<i for i in range(16)]: return FFT.inverse_fft(x)
     if N not in _ifft_cache:
         _ifft_cache[N]=ifftm(N)
     return dot(_ifft_cache[N],x)
