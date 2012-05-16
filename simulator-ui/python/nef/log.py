@@ -5,7 +5,7 @@ from nef_core import Network
 from array import NetworkArray
 import hrr
 from ca.nengo.model import Origin
-import datatools
+import stats.reader
 import os
 
 override_directory=None
@@ -194,7 +194,7 @@ class Log(SimpleNode):
         
     def reader(self):
         dir,fn=self.filename.rsplit('/',1)
-        return datatools.LogReader(fn,dir)
+        return stats.reader.Reader(fn,dir)
         
     def record(self,**items):
         f=open(self.filename[:-3]+'data','a')
