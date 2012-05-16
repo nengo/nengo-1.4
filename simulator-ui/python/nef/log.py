@@ -7,7 +7,14 @@ import hrr
 from ca.nengo.model import Origin
 import datatools
 import os
-import ccm
+
+override_directory=None
+override_filename=None
+def override(directory,filename):
+    global override_directory,override_filename
+    override_directory=directory
+    override_filename=filename
+
 
 class LogBasic:
     def __init__(self,name,origin):
@@ -96,18 +103,9 @@ class Log(SimpleNode):
         if name is None: self.logname=self.network.network.name
         else: self.logname=name
         
-        if dir is None:
-            # see if we are running inside ccm's runner() system
-            #try:
-                
-                logg=ccm.logger.singleton_log
-                if not logg.using_default_directory:
-                    dir=logg.directory
-                    filename=logg.get_time_code()
-                    pass
-            #except:
-            #    pass
-        
+        if override_directory is not None:
+            dir=override_directory
+            filename=override_filename
         
         self.dir=dir
         if not filename.endswith('.csv'): filename+='.csv'
@@ -150,7 +148,7 @@ class Log(SimpleNode):
             for log in self.logs: log.flush()
         
     def add_spikes(self,source,name=None,skip=0):    
-        if name is None: name=source
+        if name is None: name=source+'_spikes'
         
         node=self.network.get(source)
         if isinstance(node,Origin):
@@ -168,7 +166,7 @@ class Log(SimpleNode):
         self.logs.append(LogVector(name,origin,tau))
 
     def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=True):
-        if name is None: name=source
+        if name is None: name=source+'_vocab'
         if tau=='default': tau=self.tau
         origin=self.network.get(source,require_origin=True)
         if vocab is None: 
