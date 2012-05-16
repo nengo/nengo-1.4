@@ -80,9 +80,13 @@ run_external=None
 def run_with(script):
     global run_external
     run_external=script
+    
+try:
+    import nef 
+except:
+    run_external=os.path.join('.','nengo-cl')       
 
-
-def run(_filename,_iterations=1,**settings):
+def run(_filename=None,_iterations=1,**settings):
     if not _filename.endswith('.py'): _filename+='.py'
     if not os.path.exists(_filename):
         raise 'Could not find file: %s'%_filename

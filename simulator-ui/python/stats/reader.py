@@ -6,7 +6,7 @@ try:
 except:
     import numeric as np
 
-import stats.filter
+import filter
     
 class Reader:
     def __init__(self,filename='',dir=None):
@@ -67,7 +67,7 @@ class Reader:
         else:
             data=self.cache[name]    
         if filter is not None:
-            data=stats.filter.filter(data,self.time[1]-self.time[0],tau=filter)
+            data=filter.filter(data,self.time[1]-self.time[0],tau=filter)
         if time is not None:
             if isinstance(time,(float,int)):
                 data=data[self.get_index_for_time(time)]
