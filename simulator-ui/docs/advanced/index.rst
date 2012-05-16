@@ -10,3 +10,4 @@ Advanced Nengo Usage
    matlab
    large_ensembles
    gpu
+   ipython_notebook
