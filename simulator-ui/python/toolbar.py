@@ -316,12 +316,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
 
 
     def do_inspect(self,event):
-        pane=self.ng.configPane.toJComponent()
-        pane.auxVisible=not pane.auxVisible
-        if pane.auxVisible:
-            model=self.ng.getSelectedObj()
-            if model is not None: model=model.model
-            self.ng.configPane.configureObj(model)
+        self.ng.toggleConfigPane()
         
     def do_feedforward_layout(self,event):
         viewer=self.get_current_network_viewer()
