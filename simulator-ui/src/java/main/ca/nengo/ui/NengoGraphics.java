@@ -796,6 +796,20 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         }
 
     }
+    
+    public void toggleConfigPane() {
+    	AuxillarySplitPane pane=configPane.toJComponent();
+    	pane.setAuxVisible(!pane.isAuxVisible());
+    	if (pane.isAuxVisible()) {
+    		WorldObject obj=getSelectedObj();
+    		if (obj instanceof ModelObject) {
+    			configPane.configureObj(((ModelObject)obj).getModel());
+    		} else {
+    			configPane.configureObj(null);
+    		}
+    	}
+    	
+    }
 
     class ConfigurationPane {
         AuxillarySplitPane auxSplitPane;
