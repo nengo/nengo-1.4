@@ -1,17 +1,16 @@
-"""A series of Python commands to execute when starting up
-Nengo from the command line."""
+"""Commands to run when starting nengo-cl (the command-line version)"""
 
 execfile('python/startup_common.py')
 
-print """Welcome to Nengo!
-
-From this command-line interface you can run Nengo models
-with Python syntax. To execute a .py script, you can use:
-
-  execfile('directory/script.py')
-
-Interactive plots are available if you're using the
-nef.Network class, with:
-
-  net.view()
-"""
+import sys
+sys.argv=sys.argv[1:]   # strip out the "python/startup_cl.py" from the list
+if len(sys.argv)>0:
+    # run the script indicated on the command line
+    execfile(sys.argv[0])
+else:
+    # start an interactive console
+    sys.argv=['-i']
+    import org.python.util
+    interp=org.python.util.JLineConsole(locals())
+    interp.interact()
+    
