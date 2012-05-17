@@ -49,6 +49,7 @@ public class SpikeGeneratorOrigin implements Origin {
 
     private static final long serialVersionUID = 1L;
 
+    private String myName;
     private Node myNode;
     private SpikeGenerator myGenerator;
     private InstantaneousOutput myOutput;
@@ -62,6 +63,7 @@ public class SpikeGeneratorOrigin implements Origin {
         myNode = node;
         myGenerator = generator;
         myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES, 0);
+        myName = Neuron.AXON;
     }
 
     /**
@@ -69,7 +71,11 @@ public class SpikeGeneratorOrigin implements Origin {
      * @see ca.nengo.model.Origin#getName()
      */
     public String getName() {
-        return Neuron.AXON;
+        return myName;
+    }
+    
+    public void setName(String name) {
+    	myName = name;
     }
 
     /**

@@ -86,6 +86,16 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 		
 		return mySynapticIntegrator.addTermination(name, weights[0], tauPSC, modulatory);
 	}
+    
+    public Termination addTermination(Termination term) throws StructuralException {
+		if ( !(mySynapticIntegrator instanceof ExpandableSynapticIntegrator) ) {
+			throw new StructuralException("Underlying SynapticIntegrator is not expandable");
+		}
+
+		fireVisibleChangeEvent();
+		
+		return mySynapticIntegrator.addTermination(term);
+	}
 
 	/**
 	 * @see ca.nengo.model.ExpandableNode#getDimension()

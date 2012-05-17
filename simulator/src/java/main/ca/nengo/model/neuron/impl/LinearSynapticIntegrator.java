@@ -197,6 +197,19 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 
 		return result;
 	}
+	
+	/**
+	 * @see ca.nengo.model.neuron.ExpandableSynapticIntegrator#addTermination(ca.nengo.model.Termination)
+	 */
+	public Termination addTermination(Termination term) throws StructuralException {
+		if (myTerminations.containsKey(term.getName())) {
+			throw new StructuralException("This SynapticIntegrator already has a Termination named " + term.getName());
+		}
+		
+		myTerminations.put(term.getName(), (LinearExponentialTermination)term);
+		return term;
+		
+	}
 
 	/**
 	 * @see ca.nengo.model.neuron.ExpandableSynapticIntegrator#removeTermination(java.lang.String)
