@@ -130,8 +130,8 @@ Plotting data from varying parameter settings
     
 - We can use a similar approach to plot the average activity for varying values of N::
 
-import stats
-s=stats.Stats('experiment-Test')
+    import stats
+    s=stats.Stats('experiment-Test')
 
     for N in [5,10,20,50]:
         data=s.data(N=N)
