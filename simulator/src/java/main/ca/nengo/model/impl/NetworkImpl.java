@@ -51,6 +51,7 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.model.Units;
 import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.Neuron;
@@ -458,6 +459,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 */
 	public void removeProjection(Termination termination) throws StructuralException {
 		if (myProjectionMap.containsKey(termination)) {
+			Projection p = myProjectionMap.get(termination);
+			p.getTermination().reset(false);
+			
 			myProjectionMap.remove(termination);
 		} else {
 			throw new StructuralException("The Network contains no Projection ending on the specified Termination");
