@@ -1,4 +1,4 @@
-Integrating with iPython Notebook
+Integrating with IPython Notebook
 ==================================
 
 We are currently working on experimental support for `IPython <http://ipython.org/>`_'s new Notebook system.  The iPython Notebook
@@ -36,7 +36,7 @@ Telling IPython to use Nengo
 - First, find your python install's site-packages directory.  This varies by computer, but you can get a list by doing::
 
     import sys
-    f for f in sys.path:
+    for f in sys.path:
         if f.endswith('packages'): print f
 
 - Find the IPython directory ``IPython/frontend/html/notebook/static/js``
