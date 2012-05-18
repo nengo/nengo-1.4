@@ -53,22 +53,7 @@ class SimpleTermination(Termination):
             for i in range(self._dimensions):
                 x=self._filtered_values[i]
                 self._filtered_values[i]=x*decay+v[i]*(1-decay)
-                #if i==10:
-                #    print start,end,dt,self.tau,decay,x,v[i],self._filtered_values[i]    
-            
-                #self._filtered_values[i]*=(1.0-dt/self.tau)
-                #self._filtered_values[i]+=v[i]*dt/self.tau
-        
-        try:
-           self._func(self._filtered_values)
-        except TypeError,e:
-           if self._dimensions==1:
-               self._func(self._filtered_values[0])
-               warnings.warn("Data on one-dimensional terminations should be referred to as x[0], not x.")
-           else:
-               raise e    
-                   
-            
+        self._func(self._filtered_values)                               
 
 class SimpleOrigin(BasicOrigin):
     def __init__(self,name,node,func):
