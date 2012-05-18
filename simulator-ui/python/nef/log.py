@@ -192,8 +192,12 @@ class Log(SimpleNode):
         f.write(text)
         f.close()
         
-    def reader(self):
-        dir,fn=self.filename.rsplit('/',1)
+    def read(self):
+        if '/' in self.filename:
+            dir,fn=self.filename.rsplit('/',1)
+        else:
+            dir=None
+            fn=self.filename    
         return stats.reader.Reader(fn,dir)
         
     def record(self,**items):

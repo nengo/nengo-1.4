@@ -68,3 +68,11 @@ def complex_exp(z):
     b=z.imag
     return math.exp(a)*(math.cos(b)+1.0j*math.sin(b))
     
+    
+def mean(x,axis=0):
+    try:
+        length=x.shape[axis]
+    except:
+        x=array(x)    
+        length=x.shape[axis]        
+    return sum(x,axis=axis)/length    

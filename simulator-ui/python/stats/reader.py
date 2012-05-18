@@ -7,6 +7,7 @@ except:
     import numeric as np
 
 import filter
+import computed
     
 class Reader:
     def __init__(self,filename='',dir=None):
@@ -15,7 +16,8 @@ class Reader:
         self.filename=self.find_file(filename)
         if self.filename is not None:
             self.read_header()
-        self.cache={}   
+        self.cache={}
+        self.computed=computed.Computed(os.path.join(self.dir,self.filename)[:-4])   
     def find_file(self,filename):
         files=os.listdir(self.dir)
         files=[x for x in files if x.endswith('.csv') and x.startswith(filename)]
