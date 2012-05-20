@@ -39,8 +39,23 @@ class Reader:
         if '.' not in data[0]:
             return [int(x) for x in data]
         return [float(x) for x in data]
+    def __str__(self):
+        return '<Reader %s>'%os.path.join(self.dir,self.filename)    
+    
+    def __hasattr__(self,key):
+        if key.startswith('_'): return self.__dict__.has_key(key)
+        if key in self.header: return True
+        return hasattr(self.computed,key)
+            
     def __getattr__(self,key):
-        return self.get(key)    
+        if key.startswith('_'): return self.__dict__[key]    
+        try:
+            return self.get(key)
+        except ValueError:
+            try:
+                return getattr(self.computed,key)        
+            except KeyError:
+                raise Exception('Could not find data "%s"'%key)    
     def __getitem__(self,key):
         return self.get(key)    
     def get_index_for_time(self,time):

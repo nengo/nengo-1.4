@@ -4,6 +4,8 @@ from javax.swing import *
 from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
+import org.jfree.chart
+
 
 import os
 import stats
@@ -117,12 +119,20 @@ def make_settings_combinations(settings,keys=None):
 class Graph(JPanel):
     def __init__(self,view):
         self.view=view
+        self.layout=BorderLayout()
+        self.chart=None
     def update(self):
         if self.view.stats is None: return
         for params in make_settings_combinations(self.view.selected_params()):
             print 'update',params
             data=self.view.stats.data(**params)
-            print numeric.mean([r.computed.rmse for r in data.readers])
+            print [r.computed.rmse for r in data.readers]
+            
+            self.removeAll()
+            self.chart=org.jfree.chart.ChartFactory.createBoxAndWhiskerChart(str(params),'','value',None,True)
+            self.add(org.jfree.chart.ChartPanel(self.chart))
+            
+            #print numeric.mean([r.computed.rmse for r in data.readers])
         
 class View:
     def __init__(self):

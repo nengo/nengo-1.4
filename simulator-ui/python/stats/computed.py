@@ -11,6 +11,11 @@ class Computed:
                 if '=' in line:
                     k,v=line.split('=',1)
                     self._data[k]=eval(v)
+    def __hasattr__(self,key):
+        if key.startswith('_'): return self.__dict__.has_key(key)
+        if self._data is None: self._readfile()
+        return self._data.has_key(key)
+                        
     def __getattr__(self,key):
         if key.startswith('_'): return self.__dict__.get(key)
         if self._data is None: self._readfile()
@@ -22,6 +27,8 @@ class Computed:
             f=open(self._filename,'a')
             f.write('%s=%s\n'%(key,`value`))
             f.close()   
+            if self._data is None: self._readfile()            
+            self._data[key]=value
     def __str__(self):
         if self._data is None: self._readfile()
         return str(self._data)         
