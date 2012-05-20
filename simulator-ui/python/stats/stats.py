@@ -134,7 +134,7 @@ class Stats:
                 Computed(d).compute(recompute=recompute,**funcs)
 """      
 
-class Statistic:
+class StatisticSample:
     def __init__(self,func,data):
         self.func=func
         self.data=data
@@ -144,15 +144,16 @@ class Statistic:
         if len(d)==0: return None
         return self.func(d)
 
-class StatisticCI:
+class StatisticPopulation:
     def __init__(self,func,data):
         self.func=func
         self.data=data
     def __getattr__(self,key):
         if key.startswith('_'): return self.__dict__[key]    
         d=getattr(self.data,key)
-        if len(d)==0: return None,None
-        return bootstrapci(d,self.func)
+        if len(d)==0: return None,None,None
+        low,high=bootstrapci(d,self.func)
+        return low,self.func(d),high
 
 
 class Data:
@@ -193,7 +194,9 @@ class ArrayProxy:
         return [item(*args,**keys) for item in self._items]        
 
 def mean(x):
-    return np.mean(x,axis=0)        
+    return np.mean(x,axis=0) 
+def std(x):
+    return np.std(x,axis=0)           
         
 class Stats:
     def __init__(self,name,parent=None,settings=None):
@@ -218,8 +221,10 @@ class Stats:
                 self.settings[k]=v
 
         self.data=Data('%s/%s'%(self.name,runner.make_param_text(self.params,self.defaults,self.settings)))
-        self.mean=Statistic(mean,self.data)
-        self.mean_ci=StatisticCI(mean,self.data)
+        self.mean=StatisticPopulation(mean,self.data)
+        self.mean_sample=StatisticSample(mean,self.data)
+        self.sd=StatisticPopulation(std,self.data)
+        self.sd_sample=StatisticSample(std,self.data)
     def compute(self,func):
         for reader in self.data.readers:
             func(reader)    
