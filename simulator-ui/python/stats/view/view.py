@@ -12,7 +12,7 @@ import stats
 import time
 import stats.runner
 import numeric
-
+import random
 
 class ModelSelectionPanel(JPanel):
     def __init__(self,view):
@@ -39,29 +39,35 @@ class ModelSelectionPanel(JPanel):
         self.files.selectedItem=selected
         
 class ParameterPanel(JPanel):
-    def __init__(self,name,values,default):
+    def __init__(self,view,name,values,default):
+        self.view=view
         self.layout=BorderLayout()
         self.name=name
-        self.values=JList(values,border=BorderFactory.createLineBorder(Color.black,1))
+        self.values=JList(values,border=BorderFactory.createLineBorder(Color.black,1),
+                                 valueChanged=self.adjust)
         self.add(JLabel(name),BorderLayout.NORTH)
         self.add(self.values)      
         self.values.setSelectedValue(default,True)
+    def adjust(self,event):
+        if not event.valueIsAdjusting:
+            self.view.graph.update()    
         
 class ParametersPanel(JPanel):
-    def __init__(self):
+    def __init__(self,view):
+        self.view=view
         self.layout=GridLayout()
         self.background=Color.yellow
         self.params={}
-    def update(self,names,values,defaults):
+    def update(self,names,options,defaults):
         self.removeAll()
         for name in names:
-            self.params[name]=ParameterPanel(name,values[name],defaults[name])
+            self.params[name]=ParameterPanel(self.view,name,getattr(options,name),defaults[name])
             self.add(self.params[name])
         self.revalidate()
     def get_selected(self):
         values={}
         for k,v in self.params.items():
-            values[k]=[eval(x) for x in v.values.selectedValues]
+            values[k]=[x for x in v.values.selectedValues]
         return values    
                 
         
@@ -70,12 +76,12 @@ class OptionsPanel(JPanel):
     def __init__(self,view):
         self.view=view
         self.layout=BorderLayout()
-        self.parameters=ParametersPanel()
+        self.parameters=ParametersPanel(self.view)
         self.add(self.parameters,BorderLayout.NORTH)
         self.background=Color.white
         
     def update(self):
-        self.parameters.update(self.view.stats.params,self.view.stats.parameter_values(),self.view.stats.defaults)
+        self.parameters.update(self.view.stats.params,self.view.stats.options,self.view.stats.defaults)
         self.revalidate()
             
         
@@ -96,54 +102,91 @@ class RunPanel(JPanel, java.lang.Runnable):
                 stats.runner.run(name,**params)
                 self.view.graph.update()
             else:    
-                time.sleep(1)
+                time.sleep(100)
 
-def make_settings_combinations(settings,keys=None):
-    if keys is None: keys=settings.keys()
-    if len(keys)==0: 
-        yield {}
-        return
-    
-    k=keys.pop()
-    v=settings[k]
-    for setting in make_settings_combinations(settings,keys):
-        if type(v) is list:
-            for vv in v:
-                setting[k]=vv
-                yield setting
-        else:
-            setting[k]=v
-            yield setting
-
-
-class Graph(JPanel):
-    def __init__(self,view):
+class Graph(JPanel,java.lang.Runnable):
+    def __init__(self,view,**args):
+        JPanel.__init__(self,**args)
         self.view=view
         self.layout=BorderLayout()
         self.chart=None
+        self.view_dpi=80
+        self.graph=JLabel()
+        self.add(self.graph)
+        self.should_update=True
+        self.thread=java.lang.Thread(self)
+        self.thread.priority=java.lang.Thread.MIN_PRIORITY
+        self.thread.start()
     def update(self):
-        if self.view.stats is None: return
-        for params in make_settings_combinations(self.view.selected_params()):
-            print 'update',params
-            data=self.view.stats.data(**params)
-            print [r.computed.rmse for r in data.readers]
-            
-            self.removeAll()
-            self.chart=org.jfree.chart.ChartFactory.createBoxAndWhiskerChart(str(params),'','value',None,True)
-            self.add(org.jfree.chart.ChartPanel(self.chart))
-            
-            #print numeric.mean([r.computed.rmse for r in data.readers])
+        self.should_update=True
+        self.graph.enabled=False
         
+    
+    def run(self):
+        while True:
+            if self.should_update:
+                self.should_update=False
+                self.do_update()
+            if self.should_update:
+                self.graph.enabled=False
+            else:    
+                self.thread.sleep(100)    
+    def do_update(self):            
+        if self.view.stats is None: return
+        if len(self.view.stats.data)==0: return 
+        #print 'update graph'
+        
+        for f in os.listdir('.'):
+            if f.startswith('.view.') and f.endswith('.png'):
+                os.remove(f)
+        
+        fn='python/.view.%08x'%random.randrange(0x7fffffff)
+        
+        code=self.make_pylab_code(fn+'.png')
+        #print code
+        f=open(fn+'.py','w')
+        f.write(code)
+        f.close()
+        os.system('python %s.py'%fn)
+        
+        icon=ImageIcon(fn+'.png')
+        self.graph.icon=icon
+        self.graph.enabled=True
+        os.remove(fn+'.py')
+        self.revalidate()
+    
+    def make_pylab_code(self,filename):
+        lines=[]
+        lines.append('import sys;sys.path.append("python")')
+        lines.append('import stats')
+        lines.append('s=stats.Stats("%s")'%self.view.stats.name)
+        params=self.view.selected_params()
+        for k,v in params.items():
+            if isinstance(v,list) and len(v)==1: params[k]=v[0]
+        lines.append('s=s(%s)'%','.join(['%s=%s'%(k,`v`) for k,v in params.items()]))
+        
+        lines.append('import stats.plot')
+        lines.append('p=stats.plot.Bar(width=%g,height=%g)'%(
+                                    self.size.width/float(self.view_dpi),
+                                    self.size.height/float(self.view_dpi)))
+        
+        for k in self.view.stats.data[0].computed.value_names():
+            lines.append('p.plot("%s",s.mean.%s)'%(k,k))
+        lines.append('p.save("%s",dpi=%d)'%(filename,self.view_dpi)) 
+        
+        return '\n'.join(lines)
+                
 class View:
     def __init__(self):
         self.stats=None
         self.frame=JFrame('Statistics',visible=True,layout=BorderLayout())
         
+        self.graph=Graph(self,componentResized=lambda event: self.graph.update())
+        self.frame.add(self.graph)
+        
         self.options=OptionsPanel(self)
         self.frame.add(self.options,BorderLayout.WEST)
         
-        self.graph=Graph(self)
-        self.frame.add(self.graph)
         
         self.model_selection=ModelSelectionPanel(self)
         self.frame.add(self.model_selection,BorderLayout.NORTH)

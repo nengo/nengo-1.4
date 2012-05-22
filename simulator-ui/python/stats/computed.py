@@ -4,6 +4,9 @@ class Computed:
     def __init__(self,name):
         self._filename=name+'.data'
         self._data=None
+    def value_names(self):
+        if self._data is None: self._readfile()
+        return self._data.keys()    
     def _readfile(self):
         self._data={}
         if os.path.exists(self._filename):

@@ -3,6 +3,7 @@ import numpy
 import theme
 
 def flatten2(data):
+    if data is None: return
     if isinstance(data[0],(bool,int,float)):
         yield data
     else:
@@ -47,8 +48,7 @@ class Plot:
     def legend(self,labels):
         items=[self.legend_item[i] for i in range(len(labels))]
         self.axes.legend(items,labels,loc='best')    
-    def show(self):
-        pylab.show()        
-        
+    def save(self,filename,dpi=300):
+        self.fig.savefig(filename,dpi=dpi)    
 
 

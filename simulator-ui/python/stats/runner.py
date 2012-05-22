@@ -13,7 +13,7 @@ def parse_code(lines):
         elif '=' in line:
             k,v=line.split('=',1)
             params.append(k)
-            defaults[k]=v
+            defaults[k]=eval(v)
         else:
             code=''.join(lines[i:])
             break
@@ -44,7 +44,7 @@ def make_param_code(params,defaults,settings):
     for pp in params:
         v=defaults[pp]
         if pp in settings: v=settings[pp]
-        p.append('%s=%s'%(pp,v))
+        p.append('%s=%s'%(pp,`v`))
     return '\n'.join(p)
 
 def make_param_text(params,defaults,settings):
@@ -52,7 +52,7 @@ def make_param_text(params,defaults,settings):
     for pp in params:
         if pp in settings and settings[pp]!=defaults[pp]:
             v=settings[pp]
-            p.append('%s=%s'%(pp,v))
+            p.append('%s=%s'%(pp,`v`))
     if len(p)==0: return 'default'        
     return ','.join(p)
 
@@ -69,10 +69,10 @@ def make_settings_combinations(settings,keys=None):
     for setting in make_settings_combinations(settings,keys):
         if type(v) is list:
             for vv in v:
-                setting[k]=`vv`
+                setting[k]=vv
                 yield setting
         else:
-            setting[k]=`v`
+            setting[k]=v
             yield setting
 
 
@@ -97,6 +97,8 @@ def run(_filename=None,_iterations=1,**settings):
     ensure_backup(_filename,lines)
         
     fname='.nef.temp.%08x.py'%random.randrange(0,0x70000000)
+    
+    print settings
 
     for i in xrange(_iterations):
       for setting in make_settings_combinations(settings):

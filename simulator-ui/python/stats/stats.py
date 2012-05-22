@@ -26,8 +26,12 @@ class StatisticPopulation:
     def __getattr__(self,key):
         if key.startswith('_'): return self.__dict__[key]    
         d=getattr(self.data,key)
+        
         if len(d)==0: return None,None,None
-        low,high=bootstrapci(d,self.func)
+        try:
+            low,high=bootstrapci(d,self.func)
+        except:
+            return None,None,None    
         return low,self.func(d),high
 
 
@@ -44,7 +48,12 @@ class Data:
     def __getattr__(self,key):
         if key.startswith('_'): return self.__dict__[key]
     
-        d=[getattr(r,key) for r in self.readers]
+        d=[]
+        for r in self.readers:
+            try:
+                d.append(getattr(r,key))
+            except:
+                d.append(None)
         d=np.array(d)
         #if d.shape[-1]==1: d.shape=d.shape[:-1]   # TODO: should we do this collapse?  Should it happen in Reader instead?
         return d
@@ -74,15 +83,15 @@ def std(x):
     return np.std(x,axis=0)           
         
 class Stats:
-    def __init__(self,name,parent=None,settings=None):
+    def __init__(self,name,_parent=None,**settings):
         self.name=name
         
-        if parent is not None:
-            self.params=parent.params
-            self.settings=dict(parent.settings)
-            self.defaults=parent.defaults
+        if _parent is not None:
+            self.params=_parent.params
+            self.settings=dict(_parent.settings)
             for k,v in settings.items():
-                self.settings[k]=`v`
+                self.settings[k]=v
+            self.defaults=_parent.defaults
         else:
             if name.endswith('.py'): name=name[:-3]
             if os.path.exists(name+'.py'):
@@ -111,7 +120,7 @@ class Stats:
                     params[k]=vv
                     items.append(self(**params))
                 return ArrayProxy(items)
-        return Stats(self.name,self,params)
+        return Stats(self.name,_parent=self,**params)
     def __getattr__(self,key):
         if key=='options' and key not in self.__dict__:
             self.__dict__['options']=Options(self)
@@ -131,8 +140,7 @@ class Options:
                         if '=' in part:
                             k,v=part.split('=',1)
                             if k in values:
-                                values[k].add(v)
+                                values[k].add(eval(v))
         for k,v in values.items():
-            values[k]=sorted([eval(vv) for vv in v])
-            setattr(self,k,list(sorted([eval(vv) for vv in v])))
+            setattr(self,k,list(sorted(v)))
             

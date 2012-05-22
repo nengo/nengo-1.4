@@ -15,8 +15,9 @@ class Bar(core.Plot):
 
         x=len(self.labels)
         bars=len(value)
-        barwidth=width/bars
-        space=(1.0-width)/2
+        if bars>0:
+            barwidth=width/bars
+            space=(1.0-width)/2
         for i,val in enumerate(value):
             c=self.theme.bar_color(i)
             if ci:

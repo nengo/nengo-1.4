@@ -10,8 +10,6 @@ class ThemePhi:
     def __init__(self,color=True):
         self.phi=(1+numpy.sqrt(5))/2-1
         self.phi2=(1+numpy.sqrt(7))/2-1
-        self.max_y=0.9
-        self.min_y=0.1
         self.start_y=0.5
         self.start_theta=1.7
         self.color=color
@@ -35,9 +33,14 @@ class ThemePhi:
                     b=r/-b
                     b=-1.0
             return r,b        
-        
+    
     def bar_color(self,i):
-        y=((self.phi*i+self.start_y)%1)*(self.max_y-self.min_y)+self.min_y
+        return self.make_color(i,max_y=0.9,min_y=0.0)        
+    def line_color(self,i):
+        return self.make_color(i,max_y=0.8,min_y=0.1)        
+        
+    def make_color(self,i,max_y=1.0,min_y=0):
+        y=((self.phi*i+self.start_y)%1)*(max_y-min_y)+min_y
         if self.color:
             theta=self.phi*i*2.8+self.start_theta
             r,b=self.theta_to_rb(theta)
