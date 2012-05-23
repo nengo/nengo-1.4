@@ -272,7 +272,7 @@ class Network:
 
         funcs=[]
         
-        if isinstance(values,str) or (hasattr(values,'items') and callable(values.items)):
+        if isinstance(values,basestring) or (hasattr(values,'items') and callable(values.items)):
             values=functions.Interpolator(values)
         
         if callable(values):
@@ -549,9 +549,9 @@ class Network:
         :returns: the created Projection, or ``(origin,termination)`` if *create_projection* is False.                                          
         """
 
-        if isinstance(pre,str):
+        if isinstance(pre,basestring):
             pre=self.network.getNode(pre)
-        if isinstance(post,str):
+        if isinstance(post,basestring):
             post=self.network.getNode(post)
 
         # Check if pre and post are set if projection is to be created
@@ -704,14 +704,14 @@ class Network:
         
            (oja=True)
         """
-        
-        if isinstance(post,str):
+
+        if isinstance(post,basestring):
             post=self.network.getNode(post)
-        if isinstance(learn_term,str):
+        if isinstance(learn_term,basestring):
             learn_term=post.getTermination(learn_term)
         if isinstance(mod_term,Termination):
             mod_term=mod_term.getName()
-        
+            
         if isinstance(learn_term,STDPTermination):
             in_args = {'a2Minus':  5.0e-3, #1.0e-1,
                        'a3Minus':  5.0e-3,
@@ -760,6 +760,8 @@ class Network:
             learn_term.setOja(oja)
             learn_term.setOriginName('X')
             learn_term.setModTermName(mod_term)
+        else:
+            print 'Unknown type of learning termination:',learn_term    
 
     def learn_array(self,array,learn_term,mod_term,rate=5e-7,**kwargs):
         """Apply a learning rule to a termination of a :class:`nef.array.NetworkArray` (an array of
@@ -769,7 +771,7 @@ class Network:
         
         """
 
-        if isinstance(array,str):
+        if isinstance(array,basestring):
             array = self.network.getNode(array)
         if isinstance(learn_term,Termination):
             learn_term = learn_term.getName()
