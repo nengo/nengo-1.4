@@ -43,14 +43,33 @@ class ParameterPanel(JPanel):
         self.view=view
         self.layout=BorderLayout()
         self.name=name
+        self.values_data=values
         self.values=JList(values,border=BorderFactory.createLineBorder(Color.black,1),
                                  valueChanged=self.adjust)
         self.add(JLabel(name),BorderLayout.NORTH)
+        self.new_value=JTextField('',actionPerformed=self.create_new_value)
+        self.add(self.new_value,BorderLayout.SOUTH)
         self.add(self.values)      
         self.values.setSelectedValue(default,True)
     def adjust(self,event):
         if not event.valueIsAdjusting:
             self.view.graph.update()    
+    def create_new_value(self,event):
+        print 'event',self.new_value.text
+        value=self.new_value.text
+        try:
+            value=eval(value)
+        except:
+            pass
+        if value not in self.values_data:
+            selected=self.values.selectedValue
+            self.values_data.append(value)
+            self.values_data.sort()
+            model=DefaultListModel()
+            for v in self.values_data:
+                model.addElement(v) 
+            self.values.model=model    
+            self.values.setSelectedValue(selected,True) 
         
 class ParametersPanel(JPanel):
     def __init__(self,view):
@@ -80,9 +99,14 @@ class OptionsPanel(JPanel):
         self.add(self.parameters,BorderLayout.NORTH)
         self.background=Color.white
         
+        self.show_samples=JCheckBox('Show samples',False,actionPerformed=self.options_changed)
+        self.add(self.show_samples)
+        
     def update(self):
         self.parameters.update(self.view.stats.params,self.view.stats.options,self.view.stats.defaults)
-        self.revalidate()
+        #self.revalidate()
+    def options_changed(self,event):
+        self.view.graph.update()    
             
         
 class RunPanel(JPanel, java.lang.Runnable):
@@ -99,10 +123,10 @@ class RunPanel(JPanel, java.lang.Runnable):
             if self.run_sim.isSelected():
                 name=self.view.stats.name
                 params=self.view.selected_params()
-                stats.runner.run(name,**params)
-                self.view.graph.update()
+                print params
+                self.view.stats(**params).run(call_after=self.view.graph.update)
             else:    
-                time.sleep(100)
+                time.sleep(0.1)
 
 class Graph(JPanel,java.lang.Runnable):
     def __init__(self,view,**args):
@@ -130,7 +154,7 @@ class Graph(JPanel,java.lang.Runnable):
             if self.should_update:
                 self.graph.enabled=False
             else:    
-                self.thread.sleep(100)    
+                time.sleep(0.1)    
     def do_update(self):            
         if self.view.stats is None: return
         if len(self.view.stats.data)==0: return 
@@ -156,6 +180,7 @@ class Graph(JPanel,java.lang.Runnable):
         self.revalidate()
     
     def make_pylab_code(self,filename):
+        opt=self.view.options
         lines=[]
         lines.append('import sys;sys.path.append("python")')
         lines.append('import stats')
@@ -171,7 +196,10 @@ class Graph(JPanel,java.lang.Runnable):
                                     self.size.height/float(self.view_dpi)))
         
         for k in self.view.stats.data[0].computed.value_names():
-            lines.append('p.plot("%s",s.mean.%s)'%(k,k))
+            cmd='"%s",s.mean.%s'%(k,k)
+            if opt.show_samples.isSelected():
+                cmd+=',scatter=s.data.%s'%k
+            lines.append('p.plot(%s)'%cmd)
         lines.append('p.save("%s",dpi=%d)'%(filename,self.view_dpi)) 
         
         return '\n'.join(lines)

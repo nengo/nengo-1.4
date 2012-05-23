@@ -84,9 +84,46 @@ def run_with(script):
 try:
     import nef 
 except:
-    run_external=os.path.join('.','nengo-cl')       
+    run_external=os.path.join('.','nengo-cl') 
+    
+def run_once(_filename,**setting):
+    if not _filename.endswith('.py'): _filename+='.py'
+    if not os.path.exists(_filename):
+        raise 'Could not find file: %s'%_filename
+    
+    lines=file(_filename).readlines()
+    params,defaults,core_code=parse_code(lines)    
+    core_code=core_code.replace('\r\n','\n')
+    ensure_backup(_filename,lines)
+        
+    fname='.nef.temp.%08x.py'%random.randrange(0,0x70000000)
+    
+    param_code=make_param_code(params,defaults,setting)
+    param_text=make_param_text(params,defaults,setting)
+    
+    logfile=time.strftime('%Y%m%d-%H%M%S')+'-%08x'%int(random.randrange(0x7FFFFFFF))
+    
+    logline='import nef\nnef.log.override(directory="%s/%s",filename="%s")'%(_filename[:-3],param_text.replace('"',r'\"'),logfile)
 
-def run(_filename=None,_iterations=1,**settings):
+    code='%s\n%s\n%s'%(param_code,logline,core_code)
+            
+    f=file(fname,'w')
+    f.write(code)
+    f.flush()
+    
+    if run_external is None:
+        compiled=compile(code,fname,'exec')
+        exec compiled in {}
+        import nef
+        nef.log.override(directory=None,filename=None)
+    else:
+        os.system('%s %s'%(run_external,fname))    
+    f.close()
+    os.remove(fname)
+    
+          
+
+def run(_filename=None,_iterations=1,_call_after=None,**settings):
     if not _filename.endswith('.py'): _filename+='.py'
     if not os.path.exists(_filename):
         raise 'Could not find file: %s'%_filename
@@ -125,6 +162,7 @@ def run(_filename=None,_iterations=1,**settings):
         else:
             os.system('%s %s'%(run_external,fname))    
         f.close()
+        if _call_after is not None: _call_after()
     os.remove(fname)
         
     

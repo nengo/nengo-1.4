@@ -109,6 +109,11 @@ class Stats:
         self.mean_sample=StatisticSample(mean,self.data)
         self.sd=StatisticPopulation(std,self.data)
         self.sd_sample=StatisticSample(std,self.data)
+        
+    def run(self,iterations=1,call_after=None):
+        runner.run_once(self.name,**self.settings)
+        call_after()
+            
     def compute(self,func):
         for reader in self.data.readers:
             func(reader)    
