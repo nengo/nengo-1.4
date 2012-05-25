@@ -36,22 +36,29 @@ def bootstrapci(data,funcList,n=3000,p=0.95):
   return res  
 """
 
-def bootstrapci(data,func,n=3000,p=0.95):
-    index=int(n*(1-p)/2)
-    r=[func(list(sample(data))) for i in range(n)]
+def bootstrapci(data,func,n=300,p=0.95):
     try:
-        # handle statistics on arrays
-        N=len(r[0])
-        r=np.array(r)
-        result=[]
-        for i in range(N):
-            data=r[:,i]
-            data=list(data)
-            data.sort()
-            result.append((data[index],data[-index]))
-        return np.array(result).T
+        N=len(data[0])
+        return bootstrap_list(data,func,n=n,p=p)
     except:
+        index=int(n*(1-p)/2)
+        r=[func(list(sample(data))) for i in range(n)]
         r.sort()
         return r[index],r[-index]
-  
+
+def bootstrap_list(data,func,n=300,p=0.95):
+    index=int(n*(1-p)/2)
+
+    data=data.T
+    r=[func(np.array(list(sample(data))).T) for i in range(n)]
+
+    N=len(r[0])
+    r=np.array(r)
+    result=[]
+    for i in range(N):
+            d=r[:,i]
+            d=list(d)
+            d.sort()
+            result.append((d[index],d[-index]))
+    return np.array(result).T
 
