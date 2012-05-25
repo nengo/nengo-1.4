@@ -139,7 +139,7 @@ class Graph(JPanel,java.lang.Runnable):
         self.add(self.graph)
         self.should_update=True
         self.thread=java.lang.Thread(self)
-        self.thread.priority=java.lang.Thread.MIN_PRIORITY
+        #self.thread.priority=java.lang.Thread.MIN_PRIORITY
         self.thread.start()
     def update(self):
         self.should_update=True
@@ -157,12 +157,12 @@ class Graph(JPanel,java.lang.Runnable):
                 time.sleep(0.1)    
     def do_update(self):            
         if self.view.stats is None: return
-        if len(self.view.stats.data)==0: return 
+        if len(self.view.stats.data)==0: return
         #print 'update graph'
         
-        for f in os.listdir('.'):
+        for f in os.listdir('python'):
             if f.startswith('.view.') and f.endswith('.png'):
-                os.remove(f)
+                os.remove('python/'+f)
         
         fn='python/.view.%08x'%random.randrange(0x7fffffff)
         
@@ -200,6 +200,7 @@ class Graph(JPanel,java.lang.Runnable):
             if opt.show_samples.isSelected():
                 cmd+=',scatter=s.data.%s'%k
             lines.append('p.plot(%s)'%cmd)
+        lines.append('p.legend(["0.2","0.4","0.6","0.8","1.0"])')    
         lines.append('p.save("%s",dpi=%d)'%(filename,self.view_dpi)) 
         
         return '\n'.join(lines)
@@ -221,7 +222,7 @@ class View:
         
         self.frame.add(RunPanel(self),BorderLayout.SOUTH)
         
-        self.frame.size=(400,600)
+        self.frame.size=(800,600)
     def selected_params(self):
         return self.options.parameters.get_selected()
 

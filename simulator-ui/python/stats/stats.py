@@ -116,8 +116,9 @@ class Stats:
         self.sd_sample=StatisticSample(std,self.data)
         
     def run(self,iterations=1,call_after=None):
-        runner.run_once(self.name,**self.settings)
-        call_after()
+        for i in range(iterations):
+            runner.run_once(self.name,**self.settings)
+        if call_after is not None: call_after()
             
     def compute(self,func):
         for reader in self.data.readers:
@@ -146,9 +147,10 @@ class Options:
         if os.path.exists(stats.name):
             for f in os.listdir(stats.name):
                 if '=' in f:
-                    for part in f.split(' '):
+                    for part in f.split(','):
                         if '=' in part:
                             k,v=part.split('=',1)
+                            print 'k,v',k,v
                             if k in values:
                                 values[k].add(eval(v))
         for k,v in values.items():
