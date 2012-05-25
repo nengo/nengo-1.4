@@ -1,4 +1,8 @@
 import random
+try:
+    import numpy as np
+except:
+    import numeric as np
 
 def sample(data):
   for x in data:
@@ -33,9 +37,21 @@ def bootstrapci(data,funcList,n=3000,p=0.95):
 """
 
 def bootstrapci(data,func,n=3000,p=0.95):
-  index=int(n*(1-p)/2)
-  r=[func(list(sample(data))) for i in range(n)]
-  r.sort()
-  return r[index],r[-index]
+    index=int(n*(1-p)/2)
+    r=[func(list(sample(data))) for i in range(n)]
+    try:
+        # handle statistics on arrays
+        N=len(r[0])
+        r=np.array(r)
+        result=[]
+        for i in range(N):
+            data=r[:,i]
+            data=list(data)
+            data.sort()
+            result.append((data[index],data[-index]))
+        return np.array(result).T
+    except:
+        r.sort()
+        return r[index],r[-index]
   
 

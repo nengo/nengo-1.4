@@ -30,9 +30,12 @@ class StatisticPopulation:
         if len(d)==0: return None,None,None
         try:
             low,high=bootstrapci(d,self.func)
-        except:
+        except Exception,e:
             return None,None,None    
-        return low,self.func(d),high
+        result=np.array([low,self.func(d),high])
+        if len(result.shape)>1:
+            result=result.T
+        return result
 
 
 class Data:
@@ -46,7 +49,6 @@ class Data:
             for fn in os.listdir(dir):
                 if fn.endswith('.csv'): readers.add(fn[:-4])
                 if fn.endswith('.data'): readers.add(fn[:-5])
-            print 'readers',fn    
             self.readers=[reader.Reader(fn,dir,search=False) for fn in sorted(readers)]
     def __len__(self):
         return len(self.readers)         
@@ -59,8 +61,7 @@ class Data:
                 d.append(getattr(r,key))
             except:
                 d.append(None)
-        d=np.array(d)
-        #if d.shape[-1]==1: d.shape=d.shape[:-1]   # TODO: should we do this collapse?  Should it happen in Reader instead?
+        d=np.array(d).T
         return d
     def __getitem__(self,key):
         return self.readers[key]
@@ -83,9 +84,9 @@ class ArrayProxy:
         return [item(*args,**keys) for item in self._items]        
 
 def mean(x):
-    return np.mean(x,axis=0) 
+    return np.mean(x,axis=-1) 
 def std(x):
-    return np.std(x,axis=0)           
+    return np.std(x,axis=-1)           
         
 class Stats:
     def __init__(self,name,_parent=None,**settings):
