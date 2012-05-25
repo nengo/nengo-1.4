@@ -86,6 +86,10 @@ class HRR:
 from math import sin,pi,acos
 class Vocabulary:
     defaults={}
+    registered={}
+    
+    def register(self,node):
+        Vocabulary.registered[id(node)]=self
     
     def __init__(self,dimensions,randomize=True,unitary=False,max_similarity=0.1,include_pairs=False):
         self.dimensions=dimensions

@@ -10,16 +10,18 @@ import math
 import numeric
 
 class HRRGraph(graph.Graph):
-    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),label=None):
+    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),label=None,nodeid=None):
         graph.Graph.__init__(self,view,name,func,args=args,filter=filter,ylimits=ylimits,split=False,neuronmapped=False,label=label)
         
         self.border_top=30
 
-        dim=len(self.data.get_first())
-        if dim in hrr.Vocabulary.defaults.keys():
-            self.vocab=hrr.Vocabulary.defaults[dim]
-        else:
-            self.vocab=hrr.Vocabulary(dim)
+        self.vocab=hrr.Vocabulary.registered.get(nodeid,None)
+        if self.vocab is None:
+            dim=len(self.data.get_first())            
+            if dim in hrr.Vocabulary.defaults.keys():
+                self.vocab=hrr.Vocabulary.defaults[dim]
+            else:
+                self.vocab=hrr.Vocabulary(dim)
 
         self.hidden_pairs=None
         self.normalize=True

@@ -242,7 +242,7 @@ class HRRWatch:
                 return False
     def views(self,obj):
         return [
-            ('semantic pointer',components.HRRGraph,dict(func=nodeWatch.value,args='X',label=obj.name)),
+            ('semantic pointer',components.HRRGraph,dict(func=nodeWatch.value,args='X',label=obj.name,nodeid=id(obj))),
             ]
 
 
