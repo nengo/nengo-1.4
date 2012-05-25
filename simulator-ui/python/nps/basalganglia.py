@@ -21,7 +21,7 @@ eg=-0.2
 le=0.2
 lg=0.2
 
-def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,input_transform=None,output_weight=1,noise=None,same_neurons=True,radius=1.5,learn=False,bistable=False,bistable_gain=1.0):
+def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,input_transform=None,output_weight=1,noise=None,same_neurons=True,radius=1.5,learn=False,bistable=False,bistable_gain=1.0,quick=True):
 
         # create the necessary neural ensembles
         if same_neurons: code=''
@@ -34,8 +34,8 @@ def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,in
         else:
             str_factory=None
             
-        StrD1=net.make_array('StrD1',N,D,intercept=(e,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgStrD1'+code,radius=radius,node_factory=str_factory,decoder_sign=1)
-        StrD2=net.make_array('StrD2',N,D,intercept=(e,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgStrD2'+code,radius=radius,node_factory=str_factory,decoder_sign=1)
+        StrD1=net.make_array('StrD1',N,D,intercept=(e,1),encoders=[[1]],quick=quick,noise=noise,storage_code='bgStrD1'+code,radius=radius,node_factory=str_factory,decoder_sign=1)
+        StrD2=net.make_array('StrD2',N,D,intercept=(e,1),encoders=[[1]],quick=quick,noise=noise,storage_code='bgStrD2'+code,radius=radius,node_factory=str_factory,decoder_sign=1)
         
         if bistable:
             from ca.nengo.model.impl import EnsembleTermination
@@ -45,9 +45,9 @@ def make_basal_ganglia(net,input,output,D,N=100,tau_ampa=0.002,tau_gaba=0.008,in
             StrD2.exposeTermination(dopD2,'dopamine')
         
         
-        STN=net.make_array('STN',N,D,intercept=(ep,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgSTN'+code,radius=radius,decoder_sign=1)
-        GPi=net.make_array('GPi',N,D,intercept=(eg,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgGPi'+code,radius=radius,decoder_sign=1)
-        GPe=net.make_array('GPe',N,D,intercept=(ee,1),encoders=[[1]],quick=True,noise=noise,storage_code='bgGPe'+code,radius=radius,decoder_sign=1)
+        STN=net.make_array('STN',N,D,intercept=(ep,1),encoders=[[1]],quick=quick,noise=noise,storage_code='bgSTN'+code,radius=radius,decoder_sign=1)
+        GPi=net.make_array('GPi',N,D,intercept=(eg,1),encoders=[[1]],quick=quick,noise=noise,storage_code='bgGPi'+code,radius=radius,decoder_sign=1)
+        GPe=net.make_array('GPe',N,D,intercept=(ee,1),encoders=[[1]],quick=quick,noise=noise,storage_code='bgGPe'+code,radius=radius,decoder_sign=1)
 
         # connect the input to the striatum and STN (excitatory)
         if not isinstance(input,(list,tuple)):
