@@ -10,10 +10,13 @@ import filter
 import computed
     
 class Reader:
-    def __init__(self,filename='',dir=None):
+    def __init__(self,filename='',dir=None,search=True):
         if dir is None: dir='.'
         self.dir=dir
-        self.filename=self.find_file(filename)
+        if search:
+            self.filename=self.find_file(filename)
+        else:
+            self.filename=filename+'.csv'    
         if self.filename is not None:
             self.read_header()
         self.cache={}
@@ -23,10 +26,13 @@ class Reader:
         files=[x for x in files if x.endswith('.csv') and x.startswith(filename)]
         times=[os.path.getmtime(os.path.join(self.dir,x)) for x in files]
         if len(times)==0:
-            print 'No log files found in "%s/%s*"'%(self.dir,self.filename)
+            print 'No log files found in "%s/%s*"'%(self.dir,filename)
             return None
         return files[times.index(max(times))]
     def read_header(self):
+        if not os.path.exists(os.path.join(self.dir,self.filename)):
+            self.header=[]
+            return    
         with open(os.path.join(self.dir,self.filename)) as f:
             for row in f:
                 row=row.strip()

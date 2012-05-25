@@ -42,7 +42,12 @@ class Data:
         elif not os.path.exists(dir):
             self.readers=[]
         else:
-            self.readers=[reader.Reader(fn,dir) for fn in sorted(os.listdir(dir)) if fn.endswith('.csv')]
+            readers=set()
+            for fn in os.listdir(dir):
+                if fn.endswith('.csv'): readers.add(fn[:-4])
+                if fn.endswith('.data'): readers.add(fn[:-5])
+            print 'readers',fn    
+            self.readers=[reader.Reader(fn,dir,search=False) for fn in sorted(readers)]
     def __len__(self):
         return len(self.readers)         
     def __getattr__(self,key):
