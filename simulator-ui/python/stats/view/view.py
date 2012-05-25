@@ -200,7 +200,7 @@ class Graph(JPanel,java.lang.Runnable):
             if opt.show_samples.isSelected():
                 cmd+=',scatter=s.data.%s'%k
             lines.append('p.plot(%s)'%cmd)
-        lines.append('p.legend(["0.2","0.4","0.6","0.8","1.0"])')    
+        #lines.append('p.legend(["0.2","0.4","0.6","0.8","1.0"])')    
         lines.append('p.save("%s",dpi=%d)'%(filename,self.view_dpi)) 
         
         return '\n'.join(lines)
