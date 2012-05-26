@@ -180,12 +180,29 @@
 			</fileset>
 			<fileset dir="${src.dist}"/>
 		</copy>
+	
 		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildnumber}">
 			<include name="nengo"/>
-			<include name="nengo.bat"/>
-			<include name="nengo-cl"/>
-			<include name="nengo-cl.bat"/>
+            <include name="nengo-cl"/>
+			<include name="lib/build/launch-nengo.xml"/>
+            <include name="lib/build/launch-nengo-cl.xml"/>
 		</replace>
+
+        <taskdef name="launch4j"
+            classname="net.sf.launch4j.ant.Launch4jTask"
+            classpath="${dist.dir}/lib/build/launch4j.jar:${dist.dir}/lib/build/lib/xstream.jar"/>
+		<chmod perm="a+x" verbose="true">
+		    <fileset dir="${dist.dir}/lib/build/bin">
+                <include name="ld"/>
+                <include name="windres"/>
+            </fileset>
+        </chmod>
+        <launch4j configFile="${dist.dir}/lib/build/launch-nengo.xml" 
+        	outfile="${dist.dir}/nengo.exe"/>
+        <launch4j configFile="${dist.dir}/lib/build/launch-nengo-cl.xml"
+        	outfile="${dist.dir}/nengo-cl.exe"/>
+		<delete dir="${dist.dir}/lib/build"/>
+
 		<chmod perm="a+x" verbose="true">
 			<fileset dir="${dist.dir}">
 				<include name="nengo"/>
