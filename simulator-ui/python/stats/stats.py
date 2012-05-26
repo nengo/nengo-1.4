@@ -70,16 +70,24 @@ class Data:
         return Data(readers=self.readers[i:j])        
 
 class ArrayProxy:
-    def __init__(self,items,depth=2):
+    def __init__(self,name,items,depth=2):
         self._items=items
+        self._name=name
         self._depth=depth
+    def parameter_names(self):
+        names=[self._name]
+        if isinstance(self._items[0],ArrayProxy):
+            names.extend(self._items[0].parameter_names())
+        return names
     def __getattr__(self,key):
         if key.startswith('_'): return self.__dict__[key]
         values=[getattr(item,key) for item in self._items]
-        if self._depth<=1:
+        if self._depth<=1 or key in ['param_text','settings']:
             return np.array(values)
         else:
-            return ArrayProxy(values,self._depth-1)
+            return ArrayProxy(None,values,self._depth-1)
+    def __str__(self):
+        return ','.join([str(self._items)])      
     def __call__(self,*args,**keys):
         return [item(*args,**keys) for item in self._items]        
 
@@ -110,7 +118,8 @@ class Stats:
             for k,v in self.defaults.items():
                 self.settings[k]=v
 
-        self.data=Data('%s/%s'%(self.name,runner.make_param_text(self.params,self.defaults,self.settings)))
+        self.param_text=runner.make_param_text(self.params,self.defaults,self.settings)
+        self.data=Data('%s/%s'%(self.name,self.param_text))
         self.mean=StatisticPopulation(mean,self.data)
         self.mean_sample=StatisticSample(mean,self.data)
         self.sd=StatisticPopulation(std,self.data)
@@ -131,7 +140,7 @@ class Stats:
                 for vv in params[k]:
                     params[k]=vv
                     items.append(self(**params))
-                return ArrayProxy(items)
+                return ArrayProxy(k,items)
         return Stats(self.name,_parent=self,**params)
     def __getattr__(self,key):
         if key=='options' and key not in self.__dict__:
@@ -148,12 +157,9 @@ class Options:
         if os.path.exists(stats.name):
             for f in os.listdir(stats.name):
                 if '=' in f:
-                    for part in f.split(','):
-                        if '=' in part:
-                            k,v=part.split('=',1)
-                            print 'k,v',k,v
-                            if k in values:
-                                values[k].add(eval(v))
+                    vals=eval('dict(%s)'%f)
+                    for k,v in vals.items():
+                        values[k].add(v)
         for k,v in values.items():
             setattr(self,k,list(sorted(v)))
             

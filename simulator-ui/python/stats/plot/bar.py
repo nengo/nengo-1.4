@@ -1,12 +1,14 @@
 import core
 import numpy
 
+
+
 class Bar(core.Plot):
     def __init__(self,**args):
         core.Plot.__init__(self,**args)
         self.labels=[]
-        
-    def plot(self,label,value,width=0.8,scatter=None,ci=True):
+    
+    def bar(self,label,value,width=0.8,scatter=None,ci=True):
         if ci:
             value=self.flatten(value,2)
         else:
@@ -42,5 +44,21 @@ class Bar(core.Plot):
         self.axes.set_xticklabels(self.labels)
         self.axes.set_xlim(0,len(self.labels))
         
+    def plot(self,stats,values=None,scatter=False,metric='mean'):
+        if values is None: values=stats.data[0].computed.value_names()
+        
+            
+        scatter_data=None
+        metric_data=getattr(stats,metric)
+        for k in values:
+            if scatter: scatter_data=getattr(stats.data,k)
+            self.bar(k,getattr(metric_data,k),scatter=scatter_data)
 
+        if hasattr(stats,'parameter_names'):
+            names=stats.parameter_names()
+            legend=[]
+            for setting in stats.settings.ravel():
+                legend.append(','.join(['%s=%s'%(k,setting[k]) for k in names]))
+            self.legend(legend)    
+                
 

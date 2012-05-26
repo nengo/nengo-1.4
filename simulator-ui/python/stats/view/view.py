@@ -195,12 +195,10 @@ class Graph(JPanel,java.lang.Runnable):
                                     self.size.width/float(self.view_dpi),
                                     self.size.height/float(self.view_dpi)))
         
-        for k in self.view.stats.data[0].computed.value_names():
-            cmd='"%s",s.mean.%s'%(k,k)
-            if opt.show_samples.isSelected():
-                cmd+=',scatter=s.data.%s'%k
-            lines.append('p.plot(%s)'%cmd)
-        #lines.append('p.legend(["0.2","0.4","0.6","0.8","1.0"])')    
+        values=self.view.stats.data[0].computed.value_names()
+        scatter=opt.show_samples.isSelected()
+        metric='mean'
+        lines.append('p.plot(s,values=%s,scatter=%s,metric=%s)'%(`values`,`scatter`,`metric`))
         lines.append('p.save("%s",dpi=%d)'%(filename,self.view_dpi)) 
         
         return '\n'.join(lines)
