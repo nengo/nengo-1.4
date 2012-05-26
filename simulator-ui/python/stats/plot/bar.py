@@ -23,12 +23,13 @@ class Bar(core.Plot):
         for i,val in enumerate(value):
             c=self.theme.bar_color(i)
             if ci:
-                if val[1] is not None:
-                    self.legend_item[i]=self.axes.bar([x+i*barwidth+space],val[1],width=barwidth,color=c)
-                    self.axes.errorbar(x+(i+0.5)*barwidth+space,val[1],yerr=[[val[1]-val[0]],[val[2]-val[1]]],ecolor='k',elinewidth=1)
+                if val[1] is None:
+                    val=[0,0,0]
+                self.legend_item[i]=self.axes.bar([x+i*barwidth+space],val[1],width=barwidth,color=c)
+                self.axes.errorbar(x+(i+0.5)*barwidth+space,val[1],yerr=[[val[1]-val[0]],[val[2]-val[1]]],ecolor='k',elinewidth=1)
             else:    
-                if val is not None:
-                    self.legend_item[i]=self.axes.bar([x+i*barwidth+space],val,width=barwidth,color=c)
+                if val is None: val=0
+                self.legend_item[i]=self.axes.bar([x+i*barwidth+space],val,width=barwidth,color=c)
             if scatter is not None:
                 data=scatter[i]
                 minx=x+i*barwidth+space+barwidth/4

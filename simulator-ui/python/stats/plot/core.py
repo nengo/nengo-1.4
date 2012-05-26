@@ -4,12 +4,13 @@ import theme
 
 def flatten2(data):
     if data is None: return
-    if isinstance(data[0],(bool,int,float)):
-        yield data
-    else:
+    try:
+        len(data[0])
         for row in data:
             for x in flatten2(row):
                 yield x
+    except:
+        yield data            
 def flatten1(data):
     if isinstance(data,(bool,int,float)) or data is None:
         yield data
@@ -46,7 +47,7 @@ class Plot:
             value.shape=shape
             return value                    
     def legend(self,labels):
-        items=[self.legend_item[i] for i in range(len(labels))]
+        items=[self.legend_item.get(i,None) for i in range(len(labels))]
         self.axes.legend(items,labels,loc='best')    
     def save(self,filename,dpi=300):
         self.fig.savefig(filename,dpi=dpi)    
