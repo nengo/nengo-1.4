@@ -6,13 +6,15 @@ import math
 import numeric
 class Latch(spa.module.Module):
     def create(self,dimensions,N_per_D=30,pstc_feedback=0.01,latch_inhibit=2,
-               pstc_latch_inhibit=0.006,neurons_detect=100,latch_detect_threshold=0.7,
+               pstc_latch_inhibit=0.006,neurons_detect=100,latch_detect_threshold=0.7,use_array=True,
                pstc_latch=0.01,feedback=1,compete=0,input_weight=1,subdimensions=None):
 
         #TODO: support subdimensions
         input=self.net.make('input',N_per_D*dimensions,dimensions,quick=True)
-        #buffer=self.net.make('buffer',N_per_D*dimensions,dimensions,quick=True)
-        buffer=self.net.make_array('buffer',N_per_D,dimensions,encoders=[[1]],intercept=(0,1),quick=True)
+        if use_array:
+            buffer=self.net.make_array('buffer',N_per_D,dimensions,encoders=[[1]],intercept=(0,1),quick=True)
+        else:    
+            buffer=self.net.make('buffer',N_per_D*dimensions,dimensions,encoders=numeric.eye(dimensions),intercept=(0,1),quick=True)
         feed=self.net.make('feedback',N_per_D*dimensions,dimensions,quick=True)
         feed.addTermination('gate',[[-latch_inhibit]]*feed.neurons,pstc_latch_inhibit,False)
         detect=self.net.make('detect',neurons_detect,1,intercept=(latch_detect_threshold,1),encoders=[[1]],quick=True)
@@ -33,3 +35,4 @@ class Latch(spa.module.Module):
 
         self.add_source(buffer.getOrigin('X'))
         self.add_sink(input)
+
