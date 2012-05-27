@@ -95,6 +95,10 @@ def mean(x):
     return np.mean(x,axis=-1) 
 def std(x):
     return np.std(x,axis=-1)           
+def median(x):
+    return np.median(x,axis=-1)           
+def var(x):
+    return np.var(x,axis=-1)           
         
 class Stats:
     def __init__(self,name,_parent=None,**settings):
@@ -120,10 +124,15 @@ class Stats:
 
         self.param_text=runner.make_param_text(self.params,self.defaults,self.settings)
         self.data=Data('%s/%s'%(self.name,self.param_text))
+        
         self.mean=StatisticPopulation(mean,self.data)
         self.mean_sample=StatisticSample(mean,self.data)
         self.sd=StatisticPopulation(std,self.data)
         self.sd_sample=StatisticSample(std,self.data)
+        self.median=StatisticPopulation(median,self.data)
+        self.median_sample=StatisticSample(median,self.data)
+        self.var=StatisticPopulation(var,self.data)
+        self.var_sample=StatisticSample(var,self.data)
         
     def run(self,iterations=1,call_after=None):
         for i in range(iterations):
