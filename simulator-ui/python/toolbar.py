@@ -219,11 +219,11 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         
         self.button_stop=make_button('stop',self.do_interrupt,'Stop the currently running simulation',enabled=False)
         self.toolbar.add(self.button_stop)
-        #self.toolbar.add(make_button('templates',lambda event: template.template.toggle_visible(),'toggle templates'))
-        self.toolbar.add(make_button('inspect',self.do_inspect,'inspect'))
-        self.toolbar.add(make_button('console',self.do_console,'toggle console'))
         self.parallelization=ParallelizationConfiguration()
         self.toolbar.add(self.parallelization.button)
+        #self.toolbar.add(make_button('templates',lambda event: template.template.toggle_visible(),'toggle templates'))
+        self.toolbar.add(make_button('console',self.do_console,'toggle console'))
+        self.toolbar.add(make_button('inspect',self.do_inspect,'inspect'))
         self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
         self.toolbar.add(self.button_run)
         
