@@ -117,6 +117,7 @@ class Network:
                 seed=self.random.randrange(0x7fffffff)
         if seed is not None:
             quick=True                    
+        if intercept is None: intercept=(-1,1)    
         if quick is None: quick=self.defaults['quick']
         if quick:
             storage_name='quick_%s_%d_%d_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref)
