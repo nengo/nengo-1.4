@@ -870,7 +870,7 @@ class Network:
         self.network.addNode(node)
         return node
 
-    def get(self,name,require_origin=False):
+    def get(self,name,default=Exception,require_origin=False):
         """Return the node with the given *name* from the network
         """
         
@@ -888,7 +888,10 @@ class Network:
                 try:
                     node=node.getTermination(name)
                 except:
-                    raise Exception('Could not find node:',original_name)
+                    if default is Exception:
+                        raise Exception('Could not find node:',original_name)
+                    else:                            
+                        return default
         if require_origin:
             if not isinstance(node,Origin):
                 origins=node.getOrigins()
@@ -897,7 +900,10 @@ class Network:
                 elif len([x for x in origins if x.name=='X'])==1:
                     node=node.getOrigin('X')
                 else:
-                    raise Exception('Could not find origin:',original_name)
+                    if default is Exception:
+                        raise Exception('Could not find origin:',original_name)
+                    else:
+                        return default    
         return node
 
     def releaseMemory(self):
