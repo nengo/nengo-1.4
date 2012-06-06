@@ -57,13 +57,15 @@ class LogVector(LogBasic):
             self.value+=numeric.array(self.data())*(dt/self.tau)    
 
 class LogVocab(LogVector):
-    def __init__(self,name,origin,tau,vocab,terms=None,pairs=True):
+    def __init__(self,name,origin,tau,vocab,terms=None,pairs=True,threshold=0.1,normalize=False):
         LogVector.__init__(self,name,origin,tau)
         self.vocab=vocab
         self.terms=terms
         self.pairs=pairs
+        self.threshold=threshold
+        self.normalize=normalize
     def text(self):
-        return self.vocab.text(self.value,terms=self.terms,include_pairs=self.pairs,join=';')
+        return self.vocab.text(self.value,threshold=self.threshold,terms=self.terms,include_pairs=self.pairs,join=';',normalize=self.normalize)
     def type(self):
         return 'vocab'
         
@@ -165,14 +167,14 @@ class Log(SimpleNode):
         origin=self.network.get(source,require_origin=True)
         self.logs.append(LogVector(name,origin,tau))
 
-    def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=True):
+    def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=False,threshold=0.1,normalize=False):
         if name is None: name=source+'_vocab'
         if tau=='default': tau=self.tau
         origin=self.network.get(source,require_origin=True)
         if vocab is None: 
             dim=origin.dimensions
             vocab=hrr.Vocabulary.defaults[dim]        
-        self.logs.append(LogVocab(name,origin,tau=tau,vocab=vocab,terms=terms,pairs=pairs))
+        self.logs.append(LogVocab(name,origin,tau=tau,vocab=vocab,terms=terms,pairs=pairs,threshold=threshold,normalize=normalize))
         
     def write_header(self):
         f=open(self.filename,'a')
