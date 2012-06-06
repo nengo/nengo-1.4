@@ -52,4 +52,6 @@ class Plot:
     def save(self,filename,dpi=300):
         self.fig.savefig(filename,dpi=dpi)    
 
+    def show(self):
+        pylab.show()
 
