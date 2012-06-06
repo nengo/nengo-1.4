@@ -176,9 +176,13 @@ class Vocabulary:
     def parse(self,text):
         return eval(text,{},self)
         
-    def text(self,v,threshold=0.1,minimum_count=1,include_pairs=True,join='+',maximum_count=5,terms=None):
+    def text(self,v,threshold=0.1,minimum_count=1,include_pairs=True,join='+',maximum_count=5,terms=None,normalize=False):
         if isinstance(v,HRR): v=v.v
         if v is None or self.vectors is None: return ''        
+        if normalize:
+            nrm=norm(v)
+            if nrm>0: v/=nrm
+        
         m=numeric.dot(self.vectors,v)
         matches=[(m[i],self.keys[i]) for i in range(len(m))]
         if include_pairs:
@@ -194,7 +198,7 @@ class Vocabulary:
 
         r=[]        
         for m in matches:
-            if m[0]>threshold and len(r)<maximum_count: r.append(m)
+            if threshold is None or (m[0]>threshold and len(r)<maximum_count): r.append(m)
             elif len(r)<minimum_count: r.append(m)
             else: break
             
