@@ -44,7 +44,14 @@ class Reader:
         data=text.split(';')
         if '.' not in data[0]:
             return [int(x) for x in data]
-        return [float(x) for x in data]
+        try:    
+            return [float(x) for x in data]
+        except:
+            d={}
+            for x in data:
+                i=x.index('.')
+                d[x[i+3:]]=float(x[:i+3])
+            return d        
     def __str__(self):
         return '<Reader %s>'%os.path.join(self.dir,self.filename)    
     
@@ -71,7 +78,7 @@ class Reader:
             index+=1        
         return index    
     
-    def get(self,name,time=None,filter=None):
+    def get(self,name,time=None,filter=None,normalize=False,keys=None):
         if name not in self.cache:
             data=[]
             done_header=False
@@ -89,11 +96,29 @@ class Reader:
             self.cache[name]=data
         else:
             data=self.cache[name]    
+        if keys is not None:
+            data2=np.zeros((len(data),len(keys)),dtype=float)            
+            for i,d in enumerate(data):
+                scale=1.0
+                if normalize:
+                    length=np.sqrt(sum([v*v for v in d.values()]))
+                    if length>0.01: scale=1.0/length
+                for j,key in enumerate(keys):
+                    data2[i][j]=d.get(key,0)*scale
+            data=data2
+            normalize=False
+                    
         if filter is not None:
-            data=filter.filter(data,self.time[1]-self.time[0],tau=filter)
+            data=filter.filter(data,self.time[1]-self.time[0],tau=filter)            
         if time is not None:
             if isinstance(time,(float,int)):
                 data=data[self.get_index_for_time(time)]
             else:
                 data=data[self.get_index_for_time(time[0]):self.get_index_for_time(time[1])]        
+        if normalize:
+            for i,v in enumerate(data):
+                length=np.linalg.norm(v)
+                if length>0.1:
+                    data[i]/=length
+                
         return data
