@@ -285,9 +285,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			/*
 			 * Only do the swap if the name has changed.
 			 * Otherwise, the node will be dereferenced from the map.
+			 * 
+			 * Also only do the swap if the node being changed is already in myNodeMap.
 			 */
-			if (!ne.getOldName().equals(ne.getNewName())) {
-				myNodeMap.put(ne.getNewName(), myNodeMap.get(ne.getOldName()));
+			if ((Node)ne.getObject() == getNode(ne.getOldName()) && !ne.getOldName().equals(ne.getNewName())) {
+				myNodeMap.put(ne.getNewName(), (Node)ne.getObject());
 				myNodeMap.remove(ne.getOldName());
 			}
 		}
@@ -452,6 +454,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 */
 	public Projection[] getProjections() {
 		return myProjectionMap.values().toArray(new Projection[0]);
+	}
+	
+	public Map<Termination, Projection> getProjectionMap() {
+		return myProjectionMap;
 	}
 
 	/**

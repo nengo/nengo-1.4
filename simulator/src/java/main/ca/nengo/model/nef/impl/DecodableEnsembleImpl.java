@@ -71,8 +71,8 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 
 	private static final long serialVersionUID = 1L;
 
-	protected final Map<String, DecodedOrigin> myDecodedOrigins;
-	protected final Map<String, DecodedTermination> myDecodedTerminations;
+	protected Map<String, DecodedOrigin> myDecodedOrigins;
+	protected Map<String, DecodedTermination> myDecodedTerminations;
 
 	private ApproximatorFactory myApproximatorFactory;
 	private Map<String, LinearApproximator> myApproximators;
@@ -549,7 +549,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 
 		result.myApproximatorFactory = myApproximatorFactory.clone();
 		result.myApproximators = new HashMap<String, LinearApproximator>(5);
-		result.myDecodedOrigins.clear();
+		result.myDecodedOrigins = new LinkedHashMap<String,DecodedOrigin>(10);
 		for (DecodedOrigin oldOrigin : myDecodedOrigins.values()) {
 			Function[] oldFunctions = oldOrigin.getFunctions();
 			Function[] newFunctions = new Function[oldFunctions.length];
@@ -575,8 +575,8 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 				throw new CloneNotSupportedException("Problem cloneing DecodedOrigin: " + e.getMessage());
 			}
 		}
-
-        result.myDecodedTerminations.clear();
+		
+        result.myDecodedTerminations = new LinkedHashMap<String,DecodedTermination>(10);
         for (String key : myDecodedTerminations.keySet()) {
             DecodedTermination t = (DecodedTermination) myDecodedTerminations.get(key).clone();
             t.setNode(result);

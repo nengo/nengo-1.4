@@ -583,12 +583,13 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		result.myNodes = nodes;
 
 		result.myOrigins = new LinkedHashMap<String, Origin>(10);
-		for (Origin origin : getOrigins()) {
+		for (Origin origin : myOrigins.values()) {
 			result.myOrigins.put(origin.getName(), origin.clone());
 		}
-
+		
+		
 		result.myTerminations = new LinkedHashMap<String, EnsembleTermination>(10);
-		for (Termination termination : getTerminations()) {
+		for (Termination termination : myTerminations.values()) {
 			result.myTerminations.put(termination.getName(), (EnsembleTermination) termination.clone());
 		}
 
