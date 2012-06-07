@@ -143,6 +143,8 @@ public class FeedForwardLayout extends AbstractLayout {
 				startingVertices = null;
 			}
 			
+			
+			boolean changed=false;
 			for (int i = 0; i < lastLayer.size(); i++) {
 				vEnd = lastLayer.get(i);
 				for (Iterator<Vertex> iV = verticesLeft.iterator(); iV.hasNext(); ){
@@ -150,8 +152,14 @@ public class FeedForwardLayout extends AbstractLayout {
 					if (v.isPredecessorOf(vEnd)){
 						newLayer.add(v);
 					    iV.remove();
+					    changed=true;
 					}
 				}
+			}
+			
+			// avoid infinite loops (which occur if there are nodes with no connections)
+			if (!changed) {
+				startingVertices=null;
 			}
 			
 			
