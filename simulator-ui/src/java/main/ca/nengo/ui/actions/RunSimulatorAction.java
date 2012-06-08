@@ -164,12 +164,12 @@ public class RunSimulatorAction extends StandardAction {
                 Simulator simulator = uiNetwork.getSimulator();
 
                 simulator.resetNetwork(false, true);
-                simulator.addSimulatorListener(this);
+                simulator.addSimulatorListener(NengoGraphics.getInstance().getProgressIndicator());
                 
                 try {
                     simulator.run(startTime, endTime, stepTime);
                 } finally {
-                    simulator.removeSimulatorListener(this);
+                    simulator.removeSimulatorListener(NengoGraphics.getInstance().getProgressIndicator());
                 }
 
                 ((NengoGraphics) (UIEnvironment.getInstance())).captureInDataViewer(uiNetwork

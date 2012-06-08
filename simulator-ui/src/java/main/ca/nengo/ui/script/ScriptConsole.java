@@ -65,6 +65,7 @@ import org.python.core.TraceFunction;
 
 
 import ca.nengo.config.JavaSourceParser;
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.objects.activities.TrackedAction;
@@ -364,7 +365,7 @@ public class ScriptConsole extends JPanel {
 
             @Override
             protected void action() throws ActionException {
-            	setRunningThread();
+            	NengoGraphics.getInstance().getProgressIndicator().setText(initText.trim());
             	myCommandField.setEnabled(false);
                 try {
         			if (initText.startsWith("run ")) {
@@ -376,14 +377,10 @@ public class ScriptConsole extends JPanel {
         			} else {
         				myInterpreter.exec(initText);
         			}
-                } catch (ScriptInterruptException e) {
-           			appendText("Stopped by user", ERROR_STYLE);
                 } catch (RuntimeException e) {
           			ourLogger.error("Runtime error in interpreter", e);
            			appendText(e.toString()+"\n", ERROR_STYLE);
                 }
-                clearRunningThread();
-                runningThreadState=null;
             }
                 
              @Override
@@ -394,30 +391,6 @@ public class ScriptConsole extends JPanel {
              }
         }).doAction();
         
-	}
-	
-	public ThreadState runningThreadState;
-	
-	public void setRunningThread() {
-    	runningThreadState=Py.getThreadState();
-	}
-	public void clearRunningThread() {
-    	runningThreadState=null;
-	}
-	public boolean canInterrupt() {
-		return (runningThreadState!=null);
-	}
-	
-	public void interrupt() {
-		if (runningThreadState==null) return;
-
-		ThreadState ts=this.runningThreadState;
-		TraceFunction breaker=new BreakTraceFunction();
-        TraceFunction oldTrace = ts.tracefunc;
-        ts.tracefunc = breaker;
-        if (ts.frame != null)
-            ts.frame.tracefunc = breaker;
-        ts.tracefunc = oldTrace;
 	}
 	
 	private static String getHelp(String entity) {
@@ -687,32 +660,4 @@ public class ScriptConsole extends JPanel {
 	}
 }
 
-class ScriptInterruptException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
-}
 
-class BreakTraceFunction extends TraceFunction {
-    private void doBreak(PyFrame frame) {
-        throw new ScriptInterruptException();
-    }
-
-    public TraceFunction traceCall(PyFrame frame) {
-        doBreak(frame);
-        return null;
-    }
-
-    public TraceFunction traceReturn(PyFrame frame, PyObject ret) {
-        doBreak(frame);
-        return null;
-    }
-
-    public TraceFunction traceLine(PyFrame frame, int line) {
-        doBreak(frame);
-        return null;
-    }
-
-    public TraceFunction traceException(PyFrame frame, PyException exc) {
-        doBreak(frame);
-        return null;
-    }
-}

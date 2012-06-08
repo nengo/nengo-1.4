@@ -25,6 +25,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.ui;
 
 //import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -91,6 +92,7 @@ import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.nengo.ui.util.NeoFileChooser;
 import ca.nengo.ui.util.ScriptWorldWrapper;
+import ca.nengo.ui.util.ProgressIndicator;
 import ca.nengo.ui.world.NengoWorld;
 import ca.nengo.util.Environment;
 
@@ -171,6 +173,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     private WorldObject selectedObj;
     private DataListView dataListViewer;
     private ArrayList<AuxillarySplitPane> splitPanes;
+    
+    private ProgressIndicator progressIndicator;
 
     /**
      * Constructor; displays a splash screen
@@ -476,6 +480,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         getContentPane().add(dataViewerPane);
 
         canvas.requestFocus();
+        
+        
+        progressIndicator=new ProgressIndicator();
+        getContentPane().add(progressIndicator,BorderLayout.SOUTH);
+        
 
     }
 
@@ -652,6 +661,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
      */
     public PythonInterpreter getPythonInterpreter() {
         return pythonInterpreter;
+    }
+    
+    public ProgressIndicator getProgressIndicator() {
+    	return progressIndicator;
     }
 
     /**

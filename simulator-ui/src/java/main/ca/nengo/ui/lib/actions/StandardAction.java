@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
 
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.util.UserMessages;
 
 /**
@@ -126,7 +127,12 @@ public abstract class StandardAction implements Serializable {
 	protected void doActionInternal() {
 
 		try {
-			action();
+			try {
+				action();
+			} catch (ThreadDeath e) {
+				NengoGraphics.getInstance().getProgressIndicator().setEnabled(false);
+				UserMessages.showWarning("Interrupted action: Thread was forced to quit.");
+			}
 			postAction();
 		} catch (ActionException e) {
 			e.defaultHandleBehavior();

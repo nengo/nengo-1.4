@@ -3,7 +3,9 @@ package ca.nengo.ui.lib.objects.activities;
 import javax.swing.SwingUtilities;
 
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
+import ca.nengo.ui.NengoGraphics;
 
 /**
  * An action which is tracked by the UI. Since tracked actions are slow and have
@@ -41,18 +43,27 @@ public abstract class TrackedAction extends StandardAction {
 				trackedMsg = new TrackedStatusMsg(taskName, wo);
 			}
 		});
+		
+    	NengoGraphics.getInstance().getProgressIndicator().setEnabled(true);
+    	NengoGraphics.getInstance().getProgressIndicator().setText(taskName);
 		super.doAction();
 
+	}
+	
+	protected void doActionInternal() {
+    	NengoGraphics.getInstance().getProgressIndicator().setThread();
+  		super.doActionInternal();
 	}
 
 	@Override
 	protected void postAction() {
 		super.postAction();
+    	NengoGraphics.getInstance().getProgressIndicator().setEnabled(false);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				trackedMsg.finished();
 			}
 		});
 	}
-
+	
 }
