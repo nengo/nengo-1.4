@@ -181,7 +181,9 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         }
 
         int c = 0;
-        while (time < endTime) {
+        boolean interrupt=false;
+        
+        while (time < endTime && !interrupt) {
 
             if (c++ % 100 == 99 && myDisplayProgress) {
                 System.out.println("Step " + c + " " + Math.min(endTime, time + thisStepSize));
@@ -194,8 +196,11 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
             step((float) time, (float) (time+thisStepSize));
 
             float currentProgress = ((float) time - startTime) / (endTime - startTime);
-            fireSimulatorEvent(new SimulatorEvent(currentProgress,
-                    SimulatorEvent.Type.STEP_TAKEN));
+            
+            SimulatorEvent event=new SimulatorEvent(currentProgress,
+                    SimulatorEvent.Type.STEP_TAKEN);
+            fireSimulatorEvent(event);
+            if (event.getInterrupt()) interrupt=true;
 
             time += thisStepSize;
         }

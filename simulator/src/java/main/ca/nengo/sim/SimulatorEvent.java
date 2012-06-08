@@ -32,6 +32,8 @@ public class SimulatorEvent {
 
 	private float myProgress;
 	private Type myType;
+	
+	private boolean interrupt=false;
 
 	public SimulatorEvent(float progress, Type type) {
 		super();
@@ -46,5 +48,8 @@ public class SimulatorEvent {
 	public Type getType() {
 		return myType;
 	}
+	
+	public boolean getInterrupt() {return interrupt;}
+	public void setInterrupt(boolean state) {interrupt=state;}
 
 }
