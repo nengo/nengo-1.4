@@ -251,7 +251,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         
     def update(self):
         try:
-            self.button_stop.enabled=self.ng.scriptConsole.canInterrupt()
+            self.button_stop.enabled=self.ng.progressIndicator.visible
         except:
             pass    
     
@@ -329,7 +329,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         if network is not None:         
             ca.nengo.ui.actions.RunInteractivePlotstAction(network).doAction()
     def do_interrupt(self,event):
-        self.ng.scriptConsole.interrupt()
+        self.ng.progressIndicator.interrupt()
     def do_pdf(self,event):
         from com.itextpdf.text.pdf import PdfWriter
         from com.itextpdf.text import Document
