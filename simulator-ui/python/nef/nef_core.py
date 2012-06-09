@@ -41,7 +41,7 @@ class Network:
     """
     
     serialVersionUID=1
-    def __init__(self,name,quick=False,seed=None):
+    def __init__(self,name,quick=False,seed=None,fixed_seed=None):
         """
         :param name: If a string, create and wrap a new NetworkImpl with the given *name*.  
                     If an existing NetworkImpl, then create a wrapper around that network.
@@ -57,6 +57,7 @@ class Network:
         self.defaults=dict(quick=quick)
         
         self.seed=seed
+        self.fixed_seed=fixed_seed
         if seed is not None:
             self.random=random.Random()
             self.random.seed(seed)
@@ -109,14 +110,18 @@ class Network:
         :param boolean add_to_network: flag to indicate if created ensemble should be added to the network
         :returns: the newly created ensemble                             
         """
-        if( neurons == 0 ):
-            raise Exception("nef_core.make - Num neurons = 0")
+        if neurons==0:
+            raise Exception("Cannot create an ensemble with zero neurons")
         
         if seed is None:
-            if self.seed is not None:
+            if self.fixed_seed is not None:
+                seed=self.fixed_seed    
+            elif self.seed is not None:
                 seed=self.random.randrange(0x7fffffff)
         if seed is not None:
             quick=True                    
+            PDFTools.setSeed(seed)    
+            random.seed(seed)
         if intercept is None: intercept=(-1,1)    
         if quick is None: quick=self.defaults['quick']
         if quick:
@@ -143,8 +148,6 @@ class Network:
                 storage_name+='_node%s'%node_factory.__class__.__name__                
             if seed is not None:
                 storage_name+='_seed%08x'%seed
-                PDFTools.setSeed(seed)    
-                random.seed(seed)
             if not java.io.File(storage_name+'.'+FileManager.ENSEMBLE_EXTENSION).exists():
                 dir=java.io.File('quick')
                 if not dir.exists(): dir.mkdirs()
