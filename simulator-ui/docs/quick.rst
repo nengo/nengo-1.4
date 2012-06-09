@@ -1,47 +1,64 @@
-Saving Time with the Quick Option
-==================================
+Speeding up Network Creation (and Making Consistent Models) 
+============================================================
 
 Whenever Nengo creates an ensemble, it needs to compute a decoder.  This is done via the NEF
 method of doing a least-squares minimization computation.  For large ensembles (~500 neurons or more), 
-this can take some time, since it needs to invert an NxN matrix.  
+this can take some time, since it needs to invert an NxN matrix.
 
-To speed up this process, the scripting system can optionally save the decoders it has computed and
-re-use them if it ever needs to create an ensemble with the exact same parameters.  That is, if
-the particular parameters used in the :func:`nef.Network.make()` call are seen again, instead of
-randomly creating a new ensemble, Nengo will make an exact copy of the old ensemble.
+By deault, an ensemble consists of neurons with randomly generated encoders, intercepts, and
+maximum firing rates (withing the specified ranges).  This means that a new decoder must be
+computed for every new ensemble.  However, if we specify a random number seed, all of these
+parameters will be consistent: that is, if we run the script again and re-create the same
+ensemble with the same random number seed, Nengo will detect this and re-use the previously
+computed decoder.  This greatly speeds up running the script.  (Of course, the first time
+the script is run, it will still take the same amount of time).
 
-To turn on this feature, set ``quick=True`` when calling :func:`nef.Network.make()`::
+There are two ways to specify the random number seed.  The first is to set the ``fixed_seed`` parameter
+when creating the Network::
 
-  A=net.make('A',500,40,quick=True)
+    net=Network('My Network',fixed_seed=5)
+    
+This tells Nengo to use the random seed ``5`` for every single ensemble that is created within
+this network.  In other words, if you now do the following::
+
+  A=net.make('A',neurons=300,dimensions=1)
+  B=net.make('B',neurons=300,dimensions=1)
+
+then the neurons within ensembles A and B will be *identical*.  This will also be true for
+ensembles within a NetworkArray::
+
+  C=net.make_array('C',300,10)
   
-This can save considerable time in terms of loading a network (the time required to run a
-simulation is unaffected), since it only needs to solve for the decoders once.  Each time the
-script is run after this, it will just re-use those same decoders.
+which will create an array of ten identical ensembles, each with 300 identical neurons.
 
-However, setting does mean that if you have two ensembles with the same parameters in the
-same model, those ensembles will
-have the exact same tuning curves and the exact same representational accuracy.  If this is a
-problem, you can optionally specify a *storage_code* for the ensembles.  Two ensembles with
-different *storage_code* values will not end up being identical, but there will still be
-time savings when re-running the script::
+Avoiding Identical Ensembles
+----------------------------------
 
-  A=net.make('A',500,40,quick=True,storage_code='A')
-  B=net.make('B',500,40,quick=True,storage_code='B')
-  
-If you create an array of ensembles using :func:`nef.Network.make_array()`, these ensembles
-will all have the same parameters, leading them to all have the same tuning curves if ``quick=True``.
-To avoid this, you can use the special storage code marker of ``'%d'``, which will be replaced by 
-the index number of the ensemble in the array.  This allows you to make use of the quick option
-and have all ensembles have separate tuning curves, if needed::
+Using ``fixed_seed`` allows you to make networks very quickly, since Nengo takes advantage
+of these identical ensembles and does not need to re-compute decoders.  However, it leads to
+neurally implausible models, since neurons are not identical in this way.  As an alternative, you
+can use the second way of specifying seeds, the ``seed`` parameter::
 
-  A=net.make_array('A',500,40,quick=True,storage_code='A%d')
-  B=net.make_array('B',500,40,quick=True,storage_code='B%d')
-  
-You can also indicate the default value for quick when you create a :class:`nef.Network`::
+    net=Network('My Network',seed=5)
 
-  net=nef.Network('My Network',quick=True)  
-  
-The saved files can be found in the ``quick`` directory as separate files for each saved parameter
-setting.  If you delete these, Nengo will automatically regenerate new ensembles as needed.
-  
+With this approach, Nengo will create a new seed for every ensemble, based on your initial seed
+value.  There will be no identical neurons in your model.  However, if you re-run your script,
+Nengo will re-generate exactly the same neurons, and so will be able to re-use the previously
+computed decoders.
 
+Sharing Consistent Models
+--------------------------
+
+A useful side-effect of the ``seed`` parameter is that it allows us to be sure that *exactly*
+the same model is generated on different computers.  That is, if you build a model and set
+a specific seed, then other researchers can run that same script and will get exactly the
+same model as you created.  In this way we can ensure consistent performance.
+
+Individual Differences
+------------------------
+
+One way to think about the ``seed`` parameter is as a way to generate neural models
+with individual differences.  The same script run with a different ``seed`` value will
+create a slightly different model, due to the low-level neural differences.  This may 
+affect the overall behaviour.
+    
