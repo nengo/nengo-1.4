@@ -46,8 +46,16 @@ class Network:
         :param name: If a string, create and wrap a new NetworkImpl with the given *name*.  
                     If an existing NetworkImpl, then create a wrapper around that network.
         :type name: string or NetworkImpl
-        :param boolean quick: Default setting for the *quick* parameter in :func:`nef.Network.make()`
-        :param int seed: random number seed to use for creating ensembles.
+        :param boolean quick: Default setting for the *quick* parameter in :func:`nef.Network.make()`.
+                              Note: the use of this parameter is not encouraged any more: 
+                              use seed=<number> or fixed_seed=<number> instead.               
+        :param int fixed_seed: random number seed to use for creating ensembles.  Every ensemble will
+                               use this seed value, resulting in identical neurons in ensembles that
+                               have the same parameters.  Automatically makes use of the *quick* system
+                               to avoid re-computing ensembles.
+        :param int seed: random number seed to use for creating ensembles.  This one seed is used only to
+                         start the random generation process, so each neural group created will be
+                         different (unlike the *fixed_seed* parameter).        
         """
         if isinstance(name,NetworkImpl):
             self.network=name
@@ -101,7 +109,9 @@ class Network:
         :type decoder_sign:      None, +1, or -1
         :param quick:         if True, saves data from a created ensemble and will re-use it in the future
                                when creating an ensemble with the same parameters as this one.  If None,
-                               uses the Network default setting.                               
+                               uses the Network default setting.  Note: the use of this parameter is
+                               not encouraged any more: use seed=<number> or fixed_seed=<number> in the Network
+                               constructor instead.                               
         :type quick:          boolean or None         
         :param int seed: random number seed to use.  Will be passed to both random.seed() and ca.nengo.math.PDFTools.setSeed().
                          If this is None and the Network was constructed with a seed parameter, a seed will be randomly generated.
