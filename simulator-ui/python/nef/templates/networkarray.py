@@ -57,7 +57,7 @@ def test_params(net,p):
     if p['rLow'] > p['rHigh']: return 'Low max firing rate must be less than high max firing rate'
 
 def make(net,name='Network Array', neurons=50, length=10, radius=1.0, rLow=200, rHigh=400, iLow=-1, iHigh=1, encSign=0, useQuick=True):
-    if int(encSign) is not 0:
+    if encSign!=0:
         net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, encoders=[[encSign]], quick=useQuick)
     else:
         net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, quick=useQuick)
