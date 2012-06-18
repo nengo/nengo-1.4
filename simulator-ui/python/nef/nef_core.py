@@ -843,7 +843,7 @@ class Network:
         import timeview  # moved this here to delay loading ui stuff until needed
         if hasattr(self,'layout') and len(self.layout)==3:
             timeview.view.save_layout_file(self.network.name,*self.layout)
-        timeview.View(self.network,play=play)
+        return timeview.View(self.network,play=play)
     
     
     def set_layout(self,view,layout,control):
