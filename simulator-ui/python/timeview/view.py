@@ -29,6 +29,8 @@ import math
 import shelve
 import warnings
 from ca.nengo.util import MU
+import time
+import os
 
 # for save_pdf
 import sys
@@ -381,6 +383,41 @@ class ViewPanel(JPanel):
         self.paintProjections(self.network,g)
                     
                     
+    def screenshot(self,filename):
+        #pt=self.getLocationOnScreen()
+        #image=java.awt.Robot().createScreenCapture(java.awt.Rectangle(pt.x,pt.y,self.width,self.height))
+        #javax.imageio.ImageIO.write(image,'png', java.io.File(filename));
+        #return
+    
+    
+        #self.visible=False
+        image=java.awt.image.BufferedImage(self.width,self.height,java.awt.image.BufferedImage.TYPE_INT_ARGB)
+        g=image.getGraphics()
+        self.paintComponent(g)
+        self.paintBorder(g)
+        
+        self.paintChildren(g)
+        """
+        print g
+        
+        comps=list(self.components)
+        comps.reverse()
+        for c in comps:
+            g.translate(c.x,c.y)
+            g.setClip(0,0,c.width,c.height)  
+            #g.color=c.foreground
+            #g.font=c.font                    
+            c.update(g)
+            g.translate(-c.x,-c.y)
+        #self.paintComponents(g)
+        #self.paintChildren(g)
+        g.setClip(0,0,self.width,self.height)
+        """
+        
+        #self.paint_bubbles(g)
+        
+        
+        javax.imageio.ImageIO.write(image,'png', java.io.File(filename))
                 
                     
                     
@@ -787,7 +824,12 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.frame.setSize(d['width'],d['height'])
         if 'x' in d and 'y' in d:
             self.frame.setLocation(d['x'],d['y'])
-        self.frame.setExtendedState(d.get('state',self.frame.NORMAL))            
+        self.frame.setExtendedState(d.get('state',self.frame.NORMAL))     
+        
+    screenshot_time=None
+    def save_screenshots(self,time=0.01):
+        self.screenshot_time=time
+                   
         
 
     def run(self):
@@ -802,6 +844,18 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     
             now=0
             self.watcher.reset()
+            
+            if self.screenshot_time is not None:
+                self.screenshot_name='screenshot-%s/%s'%(self.network.name,time.strftime('%Y%m%d-%H%M%S'))
+                try:
+                    os.makedirs(self.screenshot_name)
+                    self.next_record=0
+                    self.next_screenshot_time=0
+                    self.screenshot_index=0    
+                except:
+                    print 'Error making directory %s: recording is disabled'%self.screenshot_name
+                    self.screenshot_time=None
+            
             
             self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
             self.time_control.set_max_time(self.timelog.tick_count)                
@@ -827,6 +881,11 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     for n in self.network.nodes:
                         if isinstance(n,FunctionInput):
                             n.reset(False)
+                    
+                if self.screenshot_time is not None and (now>=self.next_screenshot_time):
+                    self.area.screenshot('%s/%06d.png'%(self.screenshot_name,self.screenshot_index))
+                    self.next_screenshot_time+=self.screenshot_time 
+                    self.screenshot_index+=1
                     
                 if self.current_tick>=self.timelog.tick_count-1:    
                     #self.network.simulator.run(now,now+self.dt,self.dt)
