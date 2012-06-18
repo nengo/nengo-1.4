@@ -21,6 +21,9 @@ class TuningCurveWatch:
 
         mode=obj.mode
         obj.setMode(SimulationMode.CONSTANT_RATE)
+        noises=[nn.noise for nn in obj.nodes]
+        for nn in obj.nodes:
+            nn.noise=None
         data=[]
 
         for xx in x:
@@ -41,6 +44,8 @@ class TuningCurveWatch:
             
 
         obj.setMode(mode)
+        for i,nn in enumerate(obj.nodes):
+            nn.noise=noises[i]
 
         labels=dict()
         labels[pts]='0'
