@@ -55,6 +55,22 @@ class Flow:
             self.nodes[name].add(t)
         return name,term
         
+    def create_cleanup_inhibit(self,net,**params):
+        for name,value in params.items():
+            node=net.get(name)
+            vocab=hrr.Vocabulary.registered[id(node)]
+            cleanup=net.make_array('clean_'+name,50,len(vocab.keys),intercept=(0,1),encoders=[[1]])
+            transform=[vocab.parse(k).v for k in vocab.keys]
+            net.connect(node,cleanup,transform=transform)
+
+            t=numeric.zeros((vocab.dimensions,len(vocab.keys)),typecode='f')
+            for i in range(len(vocab.keys)):
+                for j in range(len(vocab.keys)):
+                    if i!=j:
+                        t[:,i]+=vocab.parse(vocab.keys[j]).v*value
+            net.connect(cleanup,node,transform=t)            
+            
+        
     def create(self,net,N=50,dimensions=8,randomize=False):
         vocab={}
         for k in self.nodes.keys():
