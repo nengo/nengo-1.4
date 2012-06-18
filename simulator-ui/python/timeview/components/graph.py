@@ -37,7 +37,7 @@ def round(x):
 
 
 class Graph(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None,data=None,x_labels=None,show_negative=True):
+    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None,data=None,x_labels=None,show_negative=True,fixed_y=None):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
@@ -64,10 +64,13 @@ class Graph(core.DataViewComponent):
         self.x_labels=x_labels
         self.show_negative=show_negative
         self.mouse_location=None
+        self.fixed_y=fixed_y
         
         self.map=None
         self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
         self.popup.add(self.popup_zoom)
+        self.popup.add(JMenuItem('set y range',actionPerformed=self.set_fixed_y))
+        
         self.added_popup_separator=False
 
         self.popup_dim_menus=[]
@@ -93,6 +96,7 @@ class Graph(core.DataViewComponent):
         save_info['sel_dim'] = sel_dim              # Save the checkbox states
         save_info['autozoom']=self.autozoom
         save_info['last_maxy']=self.last_maxy
+        save_info['fixed_y']=self.fixed_y
         
         return save_info            
     
@@ -124,6 +128,23 @@ class Graph(core.DataViewComponent):
         self.autozoom=d.get('autozoom',True)
         self.popup_zoom.state=self.autozoom
         self.last_maxy=d.get('last_maxy',None)
+        self.fixed_y=d.get('fixed_y',None)
+        
+    def set_fixed_y(self,event):
+        example='%s,%s'%(-self.last_maxy,self.last_maxy)
+        text=JOptionPane.showInputDialog(self.view.frame,'Enter y-axis range. \nExample: %s'%example,"Set Y-Axis Range",JOptionPane.PLAIN_MESSAGE,None,None,None)
+        if text=='': self.fixed_y=None
+        else:
+            try:
+                v=eval(text)
+                if isinstance(v,(int,float)): v=[v,v]
+                if len(v)>2: v=v[:2]
+                self.fixed_y=v
+            except:    
+                self.fixed_y=None
+                    
+            
+        
         
     def toggle_autozoom(self,event):
         self.autozoom=event.source.state
@@ -295,6 +316,9 @@ class Graph(core.DataViewComponent):
         self.last_maxy=maxy
 
         if not self.show_negative: miny=0
+        
+        if self.fixed_y is not None:
+            miny,maxy=self.fixed_y
 
         if maxy==miny: yscale=0
         else: yscale=float(self.size.height-self.border_bottom-border_top)/(maxy-miny)
