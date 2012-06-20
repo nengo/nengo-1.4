@@ -37,7 +37,7 @@ def round(x):
 
 
 class Graph(core.DataViewComponent):
-    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None,data=None,x_labels=None,show_negative=True,fixed_y=None):
+    def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None,data=None,x_labels=None,show_negative=True,fixed_y=None,use_colors_when_split=False):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
@@ -65,6 +65,7 @@ class Graph(core.DataViewComponent):
         self.show_negative=show_negative
         self.mouse_location=None
         self.fixed_y=fixed_y
+        self.use_colors_when_split=use_colors_when_split
         
         self.map=None
         self.popup_zoom=JCheckBoxMenuItem('auto-zoom',self.autozoom,stateChanged=self.toggle_autozoom)
@@ -367,7 +368,7 @@ class Graph(core.DataViewComponent):
                 skip=0
                         
             offset=start%(skip+1)            
-            if not self.split:
+            if not self.split or self.use_colors_when_split:
                 g.color=colors[j%len(colors)]
             for i in range(len(fdata)-1-skip):
                 if skip==0 or (i+offset)%(skip+1)==0:
