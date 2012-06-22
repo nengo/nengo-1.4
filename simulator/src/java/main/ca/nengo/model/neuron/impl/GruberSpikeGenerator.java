@@ -156,6 +156,7 @@ public class GruberSpikeGenerator implements SpikeGenerator, Probeable {
 	 */
 	public void reset(boolean randomize) {
 		myDynamics.setState(new float[]{ourResetPotential});
+		myLastSpikeTime = -1;
 	}
 
 	/**
