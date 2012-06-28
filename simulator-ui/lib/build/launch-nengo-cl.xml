@@ -41,6 +41,6 @@
     <jdkPreference>preferJre</jdkPreference>
     <initialHeapSize>100</initialHeapSize>
     <maxHeapSize>800</maxHeapSize>
-    <maxHeapPercent>80</maxHeapPercent>
+    <maxHeapPercent>60</maxHeapPercent>
   </jre>
 </launch4jConfig>

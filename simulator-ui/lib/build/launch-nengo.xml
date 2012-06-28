@@ -41,7 +41,7 @@
     <jdkPreference>preferJre</jdkPreference>
     <initialHeapSize>100</initialHeapSize>
     <maxHeapSize>800</maxHeapSize>
-    <maxHeapPercent>80</maxHeapPercent>
+    <maxHeapPercent>60</maxHeapPercent>
     <opt>-splash:nengo-splash.jpg</opt>
   </jre>
 </launch4jConfig>
