@@ -1,7 +1,7 @@
-D=16
-subdim=4
-N=100
-seed=7
+D=20
+N_input=300
+N_conv=70
+mySeed=7
 
 import nef
 import nef.convolution
@@ -9,19 +9,17 @@ import hrr
 import math
 import random
 
-random.seed(seed)
-
 vocab=hrr.Vocabulary(D,max_similarity=0.1)
 
-net=nef.Network('Question Answering (pre-built)')
-A=net.make('A',1,D,mode='direct')
-B=net.make('B',1,D,mode='direct')
-C=net.make('C',1,D,mode='direct')
-ens_D=net.make('D',1,D,mode='direct')
-E=net.make('E',1,D,mode='direct')
+net=nef.Network('Question Answering (pre-built)', seed=mySeed)
+A=net.make('A',N_input,D)
+B=net.make('B',N_input,D)
+C=net.make('C',N_input,D)
+ens_D=net.make('D',N_input,D)
+E=net.make('E',N_input,D)
 
-nef.convolution.make_convolution(net, 'Bind', A, B, ens_D, 151, quick=True, invert_first=False, invert_second=False)
-nef.convolution.make_convolution(net, 'Unbind', C, ens_D, E, 151, quick=True, invert_first=True, invert_second=False)
+nef.convolution.make_convolution(net, 'Bind', A, B, ens_D, N_conv, quick=True, invert_first=False, invert_second=False)
+nef.convolution.make_convolution(net, 'Unbind', C, ens_D, E, N_conv, quick=True, invert_first=True, invert_second=False)
 
 CIRCLE=vocab.parse('CIRCLE')
 BLUE=vocab.parse('BLUE')

@@ -1,7 +1,8 @@
 D=20
-subdim=5
-N=300
-seed=8
+N_input=300
+N_mem=50
+N_conv=70
+mySeed=11 
 
 import nef
 import nef.convolution
@@ -9,20 +10,19 @@ import hrr
 import math
 import random
 
-random.seed(seed)
-
 vocab=hrr.Vocabulary(D,max_similarity=0.1)
 
-net=nef.Network('Question Answering with Memory (pre-built)')
-A=net.make('A',1,D,mode='direct')
-B=net.make('B',1,D,mode='direct')
-Memory=net.make_array('Memory',N,D/subdim,dimensions=subdim,quick=True,radius=1.0/math.sqrt(D),storage_code='%d')
-C=net.make('C',1,D,mode='direct')
-D_ens=net.make('D',1,D,mode='direct') #D ensemble, not to be confused with variable D (number of dimensions)
-E=net.make('E',1,D,mode='direct')
+net=nef.Network('Question Answering with Memory (pre-built)', seed=mySeed)
+A=net.make('A',N_input,D)
+B=net.make('B',N_input,D)
+C=net.make('C',N_input,D)
+ens_D=net.make('D',N_input,D)
+E=net.make('E',N_input,D)
 
-conv1=nef.convolution.make_convolution(net,'Bind',A,B,D_ens,N,quick=True)
-conv2=nef.convolution.make_convolution(net,'Unbind',Memory,C,E,N,invert_second=True,quick=True)
+Memory=net.make_array('Memory',N_mem,D,quick=True,radius=1.0/math.sqrt(D),storage_code='%d')  #This is the same as constructing the memory using the integrator template (400 neurons over 20 dimensions).
+
+conv1=nef.convolution.make_convolution(net,'Bind',A,B,ens_D,N_conv,quick=True)
+conv2=nef.convolution.make_convolution(net,'Unbind',Memory,C,E,N_conv,invert_second=True,quick=True)
 
 net.connect(Memory,Memory,pstc=0.4)
 
@@ -53,15 +53,13 @@ class Input(nef.SimpleNode):
     if 0.3<t<0.4: return BLUE.v
     return ZERO
 
-
-
 input=Input('input')
 net.add(input)
 net.connect(input.getOrigin('A'),A)
 net.connect(input.getOrigin('B'),B)
 net.connect(input.getOrigin('C'),C)
-net.connect(D_ens, Memory)
-
+net.connect(ens_D, Memory)
 
 net.add_to_nengo()
 
+#net.view(play=1.7)
