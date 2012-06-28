@@ -1,4 +1,4 @@
-({'state': 0, 'height': 583, 'width': 845, 'x': -11, 'y': 38},
+({'state': 0, 'height': 583, 'width': 845, 'x': 16, 'y': 29},
  [(u'A', None, {'label': 0, 'height': 32, 'width': 23, 'x': 251, 'y': 57}),
   (u'Bind', None, {'label': 0, 'height': 32, 'width': 49, 'x': 327, 'y': 113}),
   (u'C', None, {'label': 0, 'height': 32, 'width': 24, 'x': 248, 'y': 369}),
@@ -9,6 +9,6 @@
   (u'B', None, {'label': 0, 'height': 32, 'width': 23, 'x': 251, 'y': 217}),
   (u'B', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2, 3], 'last_maxy': 1.0000000000000007, 'height': 162, 'width': 243, 'x': 1, 'smooth_normalize': 0, 'fixed_y': None, 'show_pairs': 0, 'autozoom': 0, 'y': 146}),
   (u'C', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2, 3], 'last_maxy': 1.0000000000000007, 'height': 162, 'width': 243, 'x': 2, 'smooth_normalize': 0, 'fixed_y': None, 'show_pairs': 0, 'autozoom': 0, 'y': 306}),
-  (u'D', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2, 3], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 475, 'smooth_normalize': 0, 'fixed_y': None, 'show_pairs': True, 'autozoom': False, 'y': 32}),
+  (u'D', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2, 3], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 475, 'smooth_normalize': 0, 'fixed_y': None, 'show_pairs': False, 'autozoom': False, 'y': 32}),
   (u'E', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2, 3], 'last_maxy': 1.0000000000000007, 'height': 199, 'width': 299, 'x': 477, 'smooth_normalize': 0, 'fixed_y': None, 'show_pairs': 0, 'autozoom': 0, 'y': 246})],
  {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0})
