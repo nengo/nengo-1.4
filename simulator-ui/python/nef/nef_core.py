@@ -243,7 +243,7 @@ class Network:
         each ensemble (e.g. ``[[[1]],[[-1]]]``).
 
         :param string name:           name of the ensemble array (must be unique)
-        :param integer neurons:       number of neurons in the ensemble
+        :param integer neurons:       number of neurons in each ensemble
         :param integer length:        number of ensembles in the array
         :param integer dimensions:    number of dimensions each ensemble represents       
         :returns: the newly created :class:`nef.array.NetworkArray`
@@ -952,7 +952,16 @@ class Network:
         :param float time: the amount of time (in seconds) to run for
         :param float dt: the size of the time step to use
         """        
+        
+        ng=None
+        try:
+            import ca.nengo.ui.NengoGraphics
+            ng=ca.nengo.ui.NengoGraphics.getInstance()
+        except:
+            pass        
+        if ng is not None and run_time==0.0: self.network.simulator.addSimulatorListener(ng.progressIndicator)
         self.network.simulator.run(self.run_time,self.run_time+time,dt)
+        if ng is not None and run_time==0.0: self.network.simulator.removeSimulatorListener(ng.progressIndicator)
         self.run_time=self.run_time+time
         
     def reset(self):
