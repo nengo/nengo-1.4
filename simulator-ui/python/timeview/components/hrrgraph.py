@@ -36,6 +36,11 @@ class HRRGraph(graph.Graph):
         self.popup_pairs=JCheckBoxMenuItem('show pairs',self.show_pairs,stateChanged=self.toggle_show_pairs)
         self.popup.add(self.popup_pairs)
         
+        self.show_graph=True
+        self.popup_graph=JCheckBoxMenuItem('show graph',self.show_graph,stateChanged=self.toggle_show_graph)
+        self.popup.add(self.popup_graph)
+        self.font_height_50=None
+        
 
         
         self.popup_set=JMenuItem('set value',actionPerformed=self.set_value)
@@ -69,6 +74,9 @@ class HRRGraph(graph.Graph):
 
         self.redo_indices()
 
+    def toggle_show_graph(self,event):
+        self.show_graph=event.source.state
+
     def redo_indices(self):
         if self.indices is None: return
         self.clear_cache()
@@ -98,6 +106,7 @@ class HRRGraph(graph.Graph):
         info['show_pairs']=self.show_pairs
         info['normalize']=self.normalize
         info['smooth_normalize']=self.smooth_normalize
+        info['show_graph']=self.show_graph
         return info
     def restore(self,d):
         self.show_pairs=d.get('show_pairs',self.vocab.include_pairs)
@@ -106,6 +115,8 @@ class HRRGraph(graph.Graph):
         self.popup_normalize.state=self.normalize
         self.smooth_normalize=d.get('smooth_normalize',True)
         self.popup_smooth.state=self.smooth_normalize
+        self.show_graph=d.get('show_graph',True)
+        self.popup_graph.state=self.show_graph
         
         graph.Graph.restore(self,d)
         
@@ -145,7 +156,10 @@ class HRRGraph(graph.Graph):
         if key in self.view.forced_origins: del self.view.forced_origins[key]
     
     def paintComponent(self,g):
-        graph.Graph.paintComponent(self,g)
+        if self.show_graph:
+            graph.Graph.paintComponent(self,g)
+        else:
+            core.DataViewComponent.paintComponent(self,g)            
         
         dt_tau=None
         if self.filter and self.view.tau_filter>0:
@@ -160,11 +174,34 @@ class HRRGraph(graph.Graph):
         if self.normalize or self.smooth_normalize:
             data=self.calc_normal(data)
 
-        text=self.vocab.text(data,threshold=0.3,join=',',include_pairs=self.show_pairs)
         
-        g.color=Color.black
-        bounds=g.font.getStringBounds(text,g.fontRenderContext)
-        g.drawString(text,self.size.width/2-bounds.width/2,25+self.label_offset)
+        if self.show_graph:
+            text=self.vocab.text(data,threshold=0.3,join=',',include_pairs=self.show_pairs)
+            g.color=Color.black
+            bounds=g.font.getStringBounds(text,g.fontRenderContext)
+            g.drawString(text,self.size.width/2-bounds.width/2,25+self.label_offset)
+        else:
+            if self.font_height_50 is None: self.font_height_50=self.getFontMetrics(Font('SansSerif',Font.BOLD,50)).getHeight()
+            items=[]
+            total=0
+            for i,dp in enumerate(self.vocab.dot(data)):
+                if dp>0.1: 
+                    items.append((self.vocab.keys[i],dp))
+                    total+=dp
+            if total>0:
+                scale=(self.size.height-self.label_offset-25)/total
+                y=self.label_offset
+                for name,dp in items:                        
+                    g.color=Color(0.0,0.0,0.0,min(dp,1.0))
+                    font_size=int(dp*scale*50/self.font_height_50)
+                    g.font=Font('SansSerif',Font.BOLD,font_size)
+                    bounds=g.font.getStringBounds(name,g.fontRenderContext)
+                    g.drawString(name,self.size.width/2-bounds.width/2,y+bounds.height)
+                    y+=bounds.height
+                
+                    
+                
+                
 
     def calc_normal(self,v):
         length=0
