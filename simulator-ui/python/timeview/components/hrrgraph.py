@@ -188,6 +188,14 @@ class HRRGraph(graph.Graph):
                 if dp>0.1: 
                     items.append((self.vocab.keys[i],dp))
                     total+=dp
+            if self.show_pairs:
+                d=self.vocab.dot_pairs(data)
+                if d is not None:
+                    for i,dp in enumerate(d):
+                        if dp>0.1: 
+                            items.append((self.vocab.key_pairs[i],dp))
+                            total+=dp
+                        
             if total>0:
                 scale=(self.size.height-self.label_offset-25)/total
                 y=self.label_offset
