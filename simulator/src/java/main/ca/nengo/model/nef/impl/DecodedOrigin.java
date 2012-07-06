@@ -38,6 +38,8 @@ import ca.nengo.dynamics.Integrator;
 import ca.nengo.dynamics.impl.EulerIntegrator;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
+import ca.nengo.math.impl.FixedSignalFunction;
+import ca.nengo.math.impl.WeightedCostApproximator;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Noise;
@@ -102,7 +104,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 * 		x1*x2, where the ensemble represents [x1 x1], then one 2D function would be
 	 * 		needed in this list. The input dimension of each function must be the same as the
 	 * 		dimension of the state vector represented by this ensemble.
-	 * @param approximator approximator?
+	 * @param approximator A LinearApproximator that can be used to approximate new functions as a weighted sum of the node outputs.
 	 * @throws StructuralException if functions do not all have the same input dimension (we
 	 * 		don't check against the state dimension at this point)
 	 */
@@ -168,6 +170,33 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 
 		reset(false);
 	}
+	
+	/**
+	 * With this constructor the target is a signal over time rather than a function.
+	 * 
+	 * @param node The parent Node
+	 * @param name As in other constructor
+	 * @param nodes As in other constructor
+	 * @param nodeOrigin Name of the Origin on each given node from which output is to be decoded
+	 * @param targetSignal Signal over time that this origin should produce.
+	 * @param approximator A LinearApproximator that can be used to approximate new signals as a weighted sum of the node outputs.
+	 */
+	public DecodedOrigin(Node node, String name, Node[] nodes, String nodeOrigin, TimeSeries targetSignal, LinearApproximator approximator)
+	throws StructuralException {
+		
+		myNode = node;
+		myName = name;
+		myNodes = nodes;
+		myNodeOrigin = nodeOrigin;
+		myFunctions = new FixedSignalFunction[targetSignal.getDimension()];
+		for(int i=0; i < targetSignal.getDimension(); i++) //these are only used in direct mode
+			myFunctions[i] = new FixedSignalFunction(targetSignal.getValues(), i);
+		myDecoders = findDecoders(nodes, MU.transpose(targetSignal.getValues()), approximator);
+		myMode = SimulationMode.DEFAULT;
+		myIntegrator = new EulerIntegrator(.001f);
+		
+		reset(false);
+		}
 
 	/**
 	 * @see ca.nengo.config.Configurable#getConfiguration()
@@ -262,6 +291,22 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 
 		for (int j = 0; j < functions.length; j++) {
 			float[] coeffs = approximator.findCoefficients(functions[j]);
+			for (int i = 0; i < nodes.length; i++) {
+				result[i][j] = coeffs[i];
+			}
+		}
+
+		return result;
+	}
+	
+	private static float[][] findDecoders(Node[] nodes, float[][] targetSignal, LinearApproximator approximator)  {
+		float[][] result = new float[nodes.length][];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = new float[targetSignal.length];
+		}
+
+		for (int j = 0; j < targetSignal.length; j++) {
+			float[] coeffs = ((WeightedCostApproximator)approximator).findCoefficients(targetSignal[j]);
 			for (int i = 0; i < nodes.length; i++) {
 				result[i][j] = coeffs[i];
 			}

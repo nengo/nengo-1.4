@@ -60,6 +60,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 	private final float[][] myValues;
 	private float[][] myNoisyValues;
 	private Function myCostFunction;
+	private int mySignalLength;
 	private final boolean myQuiet;
 
 	private double[][] myGammaInverse;
@@ -148,6 +149,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		myValues = MU.clone(values);
 		myNoisyValues = MU.clone(values);
 		myQuiet = quiet;
+		mySignalLength = -1;
 		float absNoiseSD = addNoise(myNoisyValues, noise);
 
 		myCostFunction = costFunction;
@@ -178,6 +180,90 @@ public class WeightedCostApproximator implements LinearApproximator {
             }
 
 		}
+	}
+	
+	/**
+	 * @param evaluationSignals Signals over which error is evaluated. First dimension is for each
+	 * 		evaluation signal.  Second dimension is for the dimensions of each signal.  Third dimension is
+	 * 		the value of the signal dimension over time.
+	 * @param values The values of whatever functions are being combined, over the
+	 * 		evaluation signals. Commonly neuron firing rates. The first dimension makes up
+	 * 		the list of functions, the second the values of these functions for each evaluation
+	 * 		signal, and the third the value of the function over time.
+	 * @param costFunction A cost function that weights squared error over the domain of
+	 * 		evaluation points
+	 * @param noise Standard deviation of Gaussian noise to add to values (to reduce
+	 * 		sensitivity to simulation noise) as a proportion of the maximum absolute
+	 * 		value over all values
+	 * @param nSV Number of singular values to keep from the singular value
+	 *      decomposition (SVD)
+	 * @param quiet Turn off logging?
+	 */
+	public WeightedCostApproximator(float[][][] evaluationSignals, float[][][] values, Function costFunction, float noise, int nSV, boolean quiet) {
+		//should do some error checking (e.g. make sure all signals are same length)
+		
+		
+		//take all the different signals and arrange them sequentially
+		mySignalLength = evaluationSignals[0][0].length;
+		myEvalPoints = new float[evaluationSignals.length*mySignalLength][];
+		for(int i=0; i < evaluationSignals.length; i++)
+		{
+			for(int j=0; j < mySignalLength; j++)
+			{
+				myEvalPoints[i*mySignalLength+j] = new float[evaluationSignals[i].length];
+				for(int k=0; k < evaluationSignals[i].length; k++)
+				{
+					myEvalPoints[i*mySignalLength+j][k] = evaluationSignals[i][k][j];
+				}
+			}
+		}
+		
+		myValues = new float[values.length][];
+		for(int n=0; n < values.length; n++)
+		{
+			myValues[n] = new float[values[n].length*mySignalLength];
+			for(int s=0; s < values[n].length; s++)
+			{
+				for(int t=0; t < values[n][s].length; t++)
+				{
+					myValues[n][s*mySignalLength+t] = values[n][s][t];
+				}
+			}
+		}
+
+		myNoisyValues = MU.clone(myValues);
+		myQuiet = quiet;
+		float absNoiseSD = addNoise(myNoisyValues, noise);
+
+		myCostFunction = costFunction;
+
+		if(!myQuiet) {
+            Memory.report("before gamma");
+        }
+
+		if(getUseGPU())
+		{
+			float[][] float_result = new float[myNoisyValues.length][myNoisyValues.length];
+			myGammaInverse = new double[myNoisyValues.length][myNoisyValues.length];
+			float_result = nativeFindGammaPseudoInverse(myNoisyValues, absNoiseSD*absNoiseSD, nSV);
+
+			for (int i = 0; i < myNoisyValues.length; i++) {
+				for (int j = 0; j < myNoisyValues.length; j++) {
+					myGammaInverse[i][j] = float_result[i][j];
+				}
+			}
+		}else{
+			double[][] gamma = findGamma();
+			if(!myQuiet) {
+                Memory.report("before inverse");
+            }
+			myGammaInverse = pseudoInverse(gamma, absNoiseSD*absNoiseSD, nSV);
+			if(!myQuiet) {
+                Memory.report("after inverse");
+            }
+
+		}
+
 	}
 
 	/**
@@ -217,6 +303,32 @@ public class WeightedCostApproximator implements LinearApproximator {
 		for (int i = 0; i < values.length; i++) {
 			for (int j = 0; j < values[i].length; j++) {
 				values[i][j] += pdf.sample()[0];
+			}
+		}
+
+		return SD;
+	}
+	
+	private float addNoise(float[][][] values, float noise) {
+		float maxValue = 0f;
+		for (float[][] row : values) {
+			for (float[] col : row) {
+				for (float element : col) {
+					if (Math.abs(element) > maxValue) {
+	                    maxValue = Math.abs(element);
+					}
+				}
+			}
+		}
+
+		float SD = noise * maxValue;
+		GaussianPDF pdf = new GaussianPDF(0f, SD*SD);
+
+		for (int i = 0; i < values.length; i++) {
+			for (int j = 0; j < values[i].length; j++) {
+				for (int k = 0; k < values[i][j].length; k++) {
+					values[i][j][k] += pdf.sample()[0];
+				}
 			}
 		}
 
@@ -422,6 +534,9 @@ public class WeightedCostApproximator implements LinearApproximator {
 	 * @see ca.nengo.math.LinearApproximator#findCoefficients(ca.nengo.math.Function)
 	 */
     public float[] findCoefficients(Function target) {
+    	if(mySignalLength != -1)
+    		System.err.println("Warning, finding coefficients using a function on WeightedCostApproximator initialized with signals");
+    	
 		float[] targetValues = new float[myEvalPoints.length];
 		for (int i = 0; i < targetValues.length; i++) {
 			targetValues[i] = target.map(myEvalPoints[i]);
@@ -444,6 +559,55 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 		return result;
 	}
+    
+    /**
+     * Similar to findCoefficients(ca.nengo.math.Function), but finds coefficients for a target signal (over time)
+     * rather than a target function.
+     * 
+     * @param targetSignal signal over time that the coefficients should fit to
+     * @return coefficients (weights on the output of each neuron)
+     */
+    public float[] findCoefficients(float[] targetSignal) {
+    	if(mySignalLength == -1)
+    		System.err.println("Warning, finding coefficients using a signal on WeightedCostApproximator initialized with points");
+    	if(targetSignal.length != mySignalLength)
+    	{
+    		System.err.println("Warning, finding coefficients with a different length target signal than evaluation signals (" + 
+    				targetSignal.length + " vs " + mySignalLength + ")");
+    		//could do some interpolation/subsampling to match them up, for now we'll just do the rough measure of 
+    		//chopping/repeating the end of the target signal
+    		float[] newSignal = new float[mySignalLength];
+    		for(int i=0; i < mySignalLength; i++)
+    			newSignal[i] = targetSignal[Math.min(i,targetSignal.length-1)];
+    		targetSignal = newSignal;
+    	}
+    	
+    	//repeat target signal however many times were used to generate the evalPoints (to match the number of evaluation signals)
+    	float[] targetValues = new float[myEvalPoints.length];
+    	int numRepeat = myEvalPoints.length/mySignalLength;
+    	for(int i=0; i < numRepeat; i++)
+    	{
+    		for(int j=0; j < mySignalLength; j++)
+    			targetValues[i*mySignalLength+j] = targetSignal[j];
+    	}
+    	
+    	float[] upsilon = new float[myNoisyValues.length];
+		for (int i = 0; i < myNoisyValues.length; i++) {
+			for (int j = 0; j < myEvalPoints.length; j++) {
+				upsilon[i] += myNoisyValues[i][j] * targetValues[j] * myCostFunction.map(myEvalPoints[j]);
+			}
+			upsilon[i] = upsilon[i] / myEvalPoints.length;
+		}
+
+		float[] result = new float[myNoisyValues.length];
+		for (int i = 0; i < myNoisyValues.length; i++) {
+			for (int j = 0; j < myNoisyValues.length; j++) {
+				result[i] += myGammaInverse[i][j] * upsilon[j];
+			}
+		}
+
+		return result;
+    }
 
 	private double[][] findGamma() {
 
@@ -581,6 +745,19 @@ public class WeightedCostApproximator implements LinearApproximator {
         public LinearApproximator getApproximator(float[][] evalPoints, float[][] values) {
 			return new WeightedCostApproximator(evalPoints, values, getCostFunction(evalPoints[0].length), myNoise, myNSV, myQuiet);
 		}
+        
+        /**
+         * Similar to getApproximator(float[][], float[][]) but uses evaluation signals and outputs computed over time.
+         * 
+         * @param evaluationSignals Signals over which component functions are evaluated.  First dimension is the signal, second
+         * 				is the dimension, and third is time.
+         * @param values values of component functions over the evaluation signals.  First dimension is the component, second
+         * 				is the signal, and third is time.
+         * @return A LinearApproximator that can be used to approximate new Functions as a weighted sum of the given components.
+         */
+        public LinearApproximator getApproximator(float[][][] evaluationSignals, float[][][] values) {
+        	return new WeightedCostApproximator(evaluationSignals, values, getCostFunction(evaluationSignals[0].length), myNoise, myNSV, myQuiet);
+        }
 
 		/**
 		 * Note: override to use non-uniform error weighting.

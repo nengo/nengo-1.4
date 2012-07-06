@@ -664,6 +664,39 @@ public class DefaultPlotter extends Plotter {
 		showChart(chart, title);
 	}
 	
+	/**
+	 * Accepts a matrix as the second argument, and plots each row of the matrix 
+	 * separately as in doPlot(float[], float[], java.lang.String).
+	 */
+	public void doPlot(float[] domain, float[][] matrix, String title) {
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		for (int row = 0; row < matrix.length; row++) 
+		{
+			if (domain.length < matrix[row].length) {
+				throw new IllegalArgumentException("Not enough domain points (" + domain.length + "given; " + matrix[row].length + "needed)");
+			}
+			
+			XYSeries series = new XYSeries("Vector" + row);
+	
+			for (int i = 0; i < matrix[row].length; i++) {
+				series.add(domain[i], matrix[row][i]); 
+			}
+	
+			dataset.addSeries(series);
+		}
+
+		JFreeChart chart = ChartFactory.createXYLineChart(
+				"Matrix",
+				"Index", 
+				"Value", 
+				dataset, 
+				PlotOrientation.VERTICAL, 
+				false, false, false
+		);
+
+		showChart(chart, title);
+	}
+	
 	//shows a chart in a new window 
 	protected void showChart(JFreeChart chart, String title) {
 		JPanel panel = new ChartPanel(chart);

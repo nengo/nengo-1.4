@@ -95,6 +95,7 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 		myOperators.put("^", new ExponentOperator());
 		myOperators.put("*", new MultiplicationOperator());
 		myOperators.put("/", new DivisionOperator());
+		myOperators.put("%", new ModuloOperator());
 		myOperators.put("+", new AdditionOperator());
 		myOperators.put("-", new SubtractionOperator());
 		myOperators.put("~", new NegativeOperator()); //we substitute - for ~ based on context
@@ -342,6 +343,24 @@ public class DefaultFunctionInterpreter implements FunctionInterpreter {
 
 		public String toString() {
 			return "/";
+		}
+	}
+	
+	private static class ModuloOperator extends AbstractOperator {
+		
+		private static final long serialVersionUID = 1L;
+
+		public ModuloOperator() {
+			super(2, false, 3);
+		}
+
+		public float map(float[] from) {
+			assert from.length == getDimension();
+			return from[0] % from[1];
+		}
+
+		public String toString() {
+			return "%";
 		}
 	}
 

@@ -45,6 +45,7 @@ import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.Units;
+import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.impl.SpikeOutputImpl;
 import ca.nengo.model.neuron.SpikeGenerator;
 import ca.nengo.util.TimeSeries;
@@ -168,7 +169,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	 */
 	public static final String U = "U";
 
-	private static SimulationMode[] ourSupportedModes = new SimulationMode[]{SimulationMode.DEFAULT};
+	private static SimulationMode[] ourSupportedModes = new SimulationMode[]{SimulationMode.DEFAULT, SimulationMode.RATE};
 
 	private static float myMaxTimeStep = .001f;
 	private static float Vth = 30;
@@ -186,6 +187,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	private float[] myTime;
 	private float[] myVoltageHistory;
 	private float[] myRecoveryHistory;
+	private float mySpikeRate;
 
 	private SimulationMode myMode;
 
@@ -342,8 +344,18 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 	public InstantaneousOutput run(float[] time, float[] current) {
 		assert time.length >= 2;
 		assert time.length == current.length;
-
-		return new SpikeOutputImpl(new boolean[]{doSpikingRun(time, current)}, Units.SPIKES, time[time.length-1]);
+		
+		boolean spiking = doSpikingRun(time, current);
+		if(myMode==SimulationMode.RATE)
+		{
+			float spikeRate = 0f;
+			if(spiking)
+				spikeRate = 1f/(time[time.length-1] - time[0]);
+			mySpikeRate = mySpikeRate*0.99f + spikeRate*0.01f; //using a moving average (this is fairly ad-hoc)
+			return new RealOutputImpl(new float[]{mySpikeRate}, Units.SPIKES_PER_S, time[time.length-1]);
+		}
+		else 
+			return new SpikeOutputImpl(new boolean[]{spiking}, Units.SPIKES, time[time.length-1]);
 	}
 
 	private boolean doSpikingRun(float[] time, float[] current) {

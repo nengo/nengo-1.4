@@ -76,6 +76,22 @@ public class MU {
 		return result;
 	}
 	
+	public static float[][][] clone(float[][][] matrix)
+	{
+		float[][][] result = new float[matrix.length][][];
+		for(int i=0; i < matrix.length; i++)
+		{
+			result[i] = new float[matrix[i].length][];
+			for(int j=0; j < matrix[i].length; j++)
+			{
+				result[i][j] = new float[matrix[i][j].length];
+				System.arraycopy(matrix[i][j], 0, result[i][j], 0, matrix[i][j].length);
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * @param matrix Any matrix
 	 * @return An identical but independent copy of the given matrix

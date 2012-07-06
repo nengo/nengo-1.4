@@ -41,6 +41,7 @@ import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.math.ApproximatorFactory;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
+import ca.nengo.math.impl.WeightedCostApproximator;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.PlasticNodeTermination;
@@ -364,6 +365,94 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 		return result;
 	}
+	
+	/**
+	 * Similar to getConstantOutputs, but uses a time series as input to each neuron rather than a single point.
+	 * 
+	 * @param evalPoints Signals over which to evaluate outputs.  Each signal can have dimension
+	 * 			equal to the number of nodes in the population (each dimension is the input to one node),
+	 * 			or dimension equal to the dimension of this population (a single input for the whole population).
+	 * @param origin Name of Origin from which to collect output for each Node
+	 * @return Output of each Node over each evaluation signal (1st dimension corresponds to Node, 2nd to signal, 3rd to time)
+	 * @throws StructuralException If RATE is not supported by any Node
+	 */
+	protected float[][][] getSignalOutputs(TimeSeries[] evalSignals, String origin) throws StructuralException
+	{
+		NEFNode[] nodes = (NEFNode[]) getNodes();
+		float[][][] result = new float[nodes.length][evalSignals.length][evalSignals[0].getTimes().length];
+		
+		for (int i = 0; i < nodes.length; i++) {
+			float[][] output;
+			try {
+				output = getSignalOutput(i, evalSignals, origin);
+			} catch (SimulationException e) {
+				throw new StructuralException("Node " + i + " does not have the Origin " + origin);
+			}
+			
+			for(int j=0; j < output.length; j++)
+				result[i][j] = output[j];
+		}
+
+		return result;
+		
+	}
+	
+	/**
+	 * Similar to getConstantOutput, but uses a time series as input to each neuron rather than a single point.
+	 * 
+	 * @param nodeIndex Index of Node for which to find output at various inputs
+	 * @param evalPoints Signals over which to evaluate outputs.  Each signal can have dimension
+	 * 			equal to the number of nodes in the population (each dimension is the input to one node),
+	 * 			or dimension equal to the dimension of this population (a single input for the whole population).
+	 * @param origin Name of Origin from which to collect output
+	 * @return Output of indexed Node over each evaluation signal.
+	 * @throws StructuralException If RATE is not supported by the given Node
+	 * @throws SimulationException If the Node does not have an Origin with the given name
+	 */
+	protected float[][] getSignalOutput(int nodeIndex, TimeSeries[] evalSignals, String origin) throws StructuralException, SimulationException
+	{
+		float[][] result = new float[evalSignals.length][];
+
+		NEFNode node = (NEFNode) getNodes()[nodeIndex];
+		synchronized (node) {
+			SimulationMode mode = node.getMode();
+
+			node.setMode(SimulationMode.RATE);
+			if ( !node.getMode().equals(SimulationMode.RATE) ) {
+				throw new StructuralException(
+					"To find decoders using this method, all Nodes must support RATE simulation mode");
+			}
+
+			for (int i = 0; i < evalSignals.length; i++) {
+				node.reset(false);
+				float[][] vals = evalSignals[i].getValues();
+				float[] times = evalSignals[i].getTimes();
+				float dt = times[1] - times[0]; //note: we assume dt is the same across the signal
+				
+				result[i] = new float[times.length];
+				for(int t=0; t < times.length; t++)
+				{
+					//two possibilities: evaluation signal represents a separate signal for each node (first case),
+					//		or evaluation signal presents a single value and a separate input is calculated for each
+					//		node using that node's encoder.
+					if(vals[t].length == getNodes().length) 
+						node.setRadialInput(vals[t][nodeIndex]);
+					else
+						node.setRadialInput(getRadialInput(vals[t], nodeIndex));
+						
+	
+					node.run(times[t], times[t]+dt);
+	
+					RealOutput output = (RealOutput) node.getOrigin(origin).getValues();
+					result[i][t] = output.getValues()[0];
+				}
+			}
+
+			node.setMode(mode);
+		}
+
+		return result;
+	}
 
 	/**
 	 * @see ca.nengo.model.nef.NEFEnsemble#getDimension()
@@ -416,12 +505,46 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		}
 
 		DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, functions, myDecodingApproximators.get(nodeOrigin));
-		result.setMode(getMode());
-
-		myDecodedOrigins.put(name, result);
-		fireVisibleChangeEvent();
-		return result;
+		
+		return addDecodedOrigin(result);
 	}
+    
+    /**
+     * Similar to addDecodedOrigin, but uses a target signal and evaluation signals (over time) rather than a target function
+     * and evaluation points.
+     * 
+     * @param name Name of origin
+     * @param targetSignal signal that the origin should produce
+     * @param evalSignals evaluation signals used to calculate decoders
+     * @param nodeOrigin origin from which to draw output from each node
+     * @return the new DecodedOrigin created
+     */
+    public Origin addDecodedSignalOrigin(String name, TimeSeries targetSignal, TimeSeries[] evalSignals, String nodeOrigin) throws StructuralException {
+    	float[][][] evalSignalsF = new float[evalSignals.length][][];
+    	for(int i=0; i < evalSignals.length; i++)
+    		evalSignalsF[i] = MU.transpose(evalSignals[i].getValues());
+    	
+    	
+    	float[][][] outputs = getSignalOutputs(evalSignals, nodeOrigin);
+    	LinearApproximator approximator = ((WeightedCostApproximator.Factory)getApproximatorFactory()).getApproximator(evalSignalsF, outputs);
+    	
+    	DecodedOrigin result = new DecodedOrigin(this, name, getNodes(), nodeOrigin, targetSignal, approximator);
+    	
+    	return addDecodedOrigin(result);
+    }
+    
+    /**
+     * Adds the given DecodedOrigin to this ensemble.
+     * 
+     * @param o the origin to be added
+     * @return the new origin
+     */
+    public Origin addDecodedOrigin(DecodedOrigin o) {
+    	o.setMode(getMode());
+    	myDecodedOrigins.put(o.getName(), o);
+    	fireVisibleChangeEvent();
+    	return o;
+    }
 
 	/**
 	 * @see ca.nengo.model.nef.NEFEnsemble#addBiasOrigin(ca.nengo.model.Origin, int, java.lang.String, boolean)
