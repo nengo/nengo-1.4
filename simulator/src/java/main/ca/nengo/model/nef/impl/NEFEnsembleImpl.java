@@ -61,6 +61,7 @@ import ca.nengo.model.neuron.impl.SpikeGeneratorOrigin;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
 import ca.nengo.model.plasticity.impl.PESTermination;
 import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
+import ca.nengo.model.plasticity.impl.PreLearnTermination;
 import ca.nengo.util.MU;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.LearningTask;
@@ -653,6 +654,64 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
         return result;
     }
 
+    public synchronized Termination addPreLearnTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+        //TODO: check name for duplicate
+        if (myExpandableNodes.length != weights.length) {
+            throw new StructuralException(weights.length + " sets of weights given for "
+                    + myExpandableNodes.length + " expandable nodes");
+        }
+
+        int dimension = weights[0].length;
+
+        Termination[] components = new Termination[myExpandableNodes.length];
+        for (int i = 0; i < myExpandableNodes.length; i++) {
+            if (weights[i].length != dimension) {
+                throw new StructuralException("Equal numbers of weights are needed for termination onto each node");
+            }
+
+            components[i] = myExpandableNodes[i].addTermination(name, new float[][]{weights[i]}, tauPSC, modulatory);
+        }
+
+        PlasticEnsembleTermination result;
+
+        // Make sure that the components are plastic, otherwise make a non-plastic termination
+        if (isPopulationPlastic(components)) {
+            PlasticNodeTermination[] pnts = new PlasticNodeTermination[components.length];
+            for (int i=0; i<components.length; i++) {
+                pnts[i] = (PlasticNodeTermination) components[i];
+            }
+
+            result = new PreLearnTermination(this, name, pnts);
+
+            // Set the number of tasks equal to the number of threads
+            int numTasks = ca.nengo.util.impl.NodeThreadPool.getNumJavaThreads();
+            numTasks = numTasks < 1 ? 1 : numTasks;
+
+            LearningTask[] tasks = new LearningTask[numTasks];
+
+            int termsPerTask = (int) Math.ceil((float) components.length / (float) numTasks);
+            int termOffset = 0;
+            int termStartIndex, termEndIndex;
+
+            for (int i = 0; i < numTasks; i++) {
+                termStartIndex = termOffset;
+                termEndIndex = components.length - termOffset >= termsPerTask ? termOffset + termsPerTask : components.length;
+                termOffset += termsPerTask;
+
+                tasks[i] = new LearningTask(this, result, termStartIndex, termEndIndex);
+            }
+            addTasks(tasks);
+        } else {
+            throw new StructuralException("Ensemble contains non-plastic node terminations");
+        }
+
+        myPlasticEnsembleTerminations.put(name, result);
+        fireVisibleChangeEvent();
+
+        return result;
+    }
+
+
 	/**
 	 * @see ca.nengo.model.nef.NEFEnsemble#addBiasTerminations(ca.nengo.model.nef.impl.DecodedTermination, float, float[][], float[][])
 	 */
@@ -867,14 +926,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
     public int getNodeCount() {
 		return getNodes().length;
 	}
-    
+
 	/**
 	 * @return number of neurons (same as getNodeCount)
 	 */
 	public int getNeuronCount() {
 		return getNodes().length;
 	}
-	
+
     public void setNodeCount(int n) throws StructuralException {
 		if (myEnsembleFactory==null) {
 			throw new StructuralException("Error changing node count: EnsembleFactory has not been set");
@@ -1015,11 +1074,11 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 		Node[] nodes = getNodes();
 		SpikingNeuron[] neurons = new SpikingNeuron[nodes.length];
-		
+
 		for(int i = 0; i < nodes.length; i++){
 			neurons[i] = (SpikingNeuron) nodes[i];
 		}
-			
+
 		SpikingNeuron neuron = neurons[0];
 		SpikeGeneratorOrigin origin;
 		try {

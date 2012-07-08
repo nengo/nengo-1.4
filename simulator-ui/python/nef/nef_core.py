@@ -3,7 +3,7 @@ from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
-from ca.nengo.model.plasticity.impl import PESTermination, STDPTermination, PlasticEnsembleImpl
+from ca.nengo.model.plasticity.impl import PESTermination, PreLearnTermination, STDPTermination, PlasticEnsembleImpl
 from ca.nengo.util import MU
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator,FourierFunction
 from ca.nengo.math import Function,PDFTools
@@ -772,6 +772,10 @@ class Network:
 
             learn_term.setLearningRate(rate)
             learn_term.setOja(oja)
+            learn_term.setOriginName('X')
+            learn_term.setModTermName(mod_term)
+        elif isinstance(learn_term,PreLearnTermination):
+            learn_term.setLearningRate(rate)
             learn_term.setOriginName('X')
             learn_term.setModTermName(mod_term)
         else:
