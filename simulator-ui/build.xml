@@ -184,6 +184,8 @@
 		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildnumber}">
 			<include name="nengo"/>
             <include name="nengo-cl"/>
+			<include name="nengo.bat"/>
+            <include name="nengo-cl.bat"/>
 			<include name="lib/build/launch-nengo.xml"/>
             <include name="lib/build/launch-nengo-cl.xml"/>
 		</replace>
