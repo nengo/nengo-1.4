@@ -131,6 +131,14 @@ public class DefaultFunctionInterpreterTest extends TestCase {
 		assertEquals(Integer.valueOf(1), l.get(1));
 		assertEquals("|", l.get(2).toString());
 		
+		f = interpreter.parse("x0 % x1", 2);
+		l = ((PostfixFunction) f).getExpressionList();
+		assertEquals(Integer.valueOf(0), l.get(0));
+		assertEquals(Integer.valueOf(1), l.get(1));
+		assertEquals("%", l.get(2).toString());
+		TestUtil.assertClose(0f, f.map(new float[]{10f, 2f}), tolerance);
+		TestUtil.assertClose(1f, f.map(new float[]{10f, 3f}), tolerance);
+		
 		// basic unary cases ...  
 		f = interpreter.parse("x0", 1);
 		l = ((PostfixFunction) f).getExpressionList();

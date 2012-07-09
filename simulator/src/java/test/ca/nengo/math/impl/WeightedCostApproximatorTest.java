@@ -9,6 +9,9 @@ import ca.nengo.math.LinearApproximator;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.math.impl.FourierFunction;
 import ca.nengo.math.impl.WeightedCostApproximator;
+import ca.nengo.model.Units;
+import ca.nengo.util.MU;
+import ca.nengo.util.impl.TimeSeries1DImpl;
 import Jama.Matrix;
 import junit.framework.TestCase;
 
@@ -48,6 +51,7 @@ public class WeightedCostApproximatorTest extends TestCase {
 			evalPoints[i] = new float[]{(float) i / (float) evalPoints.length};
 		}
 		
+		//testing with eval points
 		Function target = new FourierFunction(frequencies, amplitudes, phases);
 		float[][] values = new float[frequencies.length][];
 		for (int i = 0; i < frequencies.length; i++) {
@@ -70,6 +74,41 @@ public class WeightedCostApproximatorTest extends TestCase {
 			}
 			TestUtil.assertClose(approx, target.map(evalPoints[j]), 0.0001f);
 		}
+		
+		//testing with eval signals
+		TimeSeries1DImpl targetsig = (TimeSeries1DImpl)TimeSeriesFunction.makeSeries(new FourierFunction(frequencies, amplitudes, phases), 0.0f, 0.001f, 1.0f, Units.UNK);
+		float[] times = targetsig.getTimes();
+		float[][][] valuesig = new float[frequencies.length][1][];
+		for (int i = 0; i < frequencies.length; i++) {
+			Function component = new FourierFunction(new float[]{frequencies[i]}, new float[]{1}, new float[]{phases[i]});
+			valuesig[i][0] = new float[times.length];
+			for (int j = 0; j < times.length; j++) {
+				valuesig[i][0][j] = component.map(new float[]{times[j]});
+			}
+		}
+		float[][][] evalsigs = new float[1][1][];
+		evalsigs[0][0] = times;
+		factory = new WeightedCostApproximator.Factory(0f);
+		WeightedCostApproximator approximator2 = (WeightedCostApproximator)factory.getApproximator(evalsigs, valuesig);
+		coefficients = approximator2.findCoefficients(MU.transpose(targetsig.getValues())[0]);
+		
+		float[] approxsig = new float[times.length]; 
+		for (int j = 0; j < times.length; j++) {
+			approxsig[j] = 0f;
+			for (int i = 0; i < frequencies.length; i++) {
+				approxsig[j] += coefficients[i] * valuesig[i][0][j];
+			}
+		}
+		
+		TestUtil.assertClose(0.0f, MU.sum(MU.difference(approxsig,targetsig.getValues1D())), 0.0001f);
+		
+		
+	}
+	
+	public static void main(String[] args)
+	{
+		WeightedCostApproximatorTest t = new WeightedCostApproximatorTest();
+		t.testFindCoefficients();
 	}
 
 }

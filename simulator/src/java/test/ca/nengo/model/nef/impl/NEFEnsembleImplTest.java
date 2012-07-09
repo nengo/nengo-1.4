@@ -306,5 +306,30 @@ public class NEFEnsembleImplTest extends TestCase {
 		
 		return numDead;
 	}
+	
+	public void testAddDecodedSignalOrigin() throws StructuralException
+	{
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl ensemble = (NEFEnsembleImpl)ef.make("test", 5, 1);
+		float[][] vals = new float[2][1];
+		vals[0][0] = 1;
+		vals[1][0] = 1;
+		TimeSeriesImpl targetSignal = new TimeSeriesImpl(new float[]{0,1}, vals, new Units[]{Units.UNK});
+		TimeSeriesImpl[] evalSignals = new TimeSeriesImpl[1];
+		
+		//test the per-dimension eval signals
+		evalSignals[0] = new TimeSeriesImpl(new float[]{0,1}, vals, new Units[]{Units.UNK});
+		ensemble.addDecodedSignalOrigin("test1", targetSignal, evalSignals, "AXON");
+		if(ensemble.getOrigin("test1") == null)
+			fail("Error creating per-dimension signal origin");
+		
+		//test the per-node eval signals
+		vals[0] = new float[]{1, 1, 1, 1, 1};
+		vals[1] = new float[]{1, 1, 1, 1, 1};
+		evalSignals[0] = new TimeSeriesImpl(new float[]{0,1}, vals, new Units[]{Units.UNK,Units.UNK,Units.UNK,Units.UNK,Units.UNK});
+		ensemble.addDecodedSignalOrigin("test2", targetSignal, evalSignals, "AXON");
+		if(ensemble.getOrigin("test2") == null)
+			fail("Error creating per-node signal origin");
+	}
 
 }
