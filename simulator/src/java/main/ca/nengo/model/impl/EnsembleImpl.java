@@ -204,21 +204,24 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	public Ensemble clone() throws CloneNotSupportedException {
 		EnsembleImpl result = (EnsembleImpl) super.clone();
 
-		//Note: at this point, AbstractEnsemble.clone() has called its init() method,
-		//which sets up EnsembleTerminations based on existing node terminations. Since
-		//the nodes have been cloned, this includes any "expanded terminations" created
-		//on this EnsembleImpl. We now move these terminations from AbstractEnsemble
-		//EnsembleImpl, where they belong ...
-
 		result.myExpandedTerminations = new LinkedHashMap<String, Termination>(10);
 
 		for (String key : myExpandedTerminations.keySet()) {
-			try {
-				Termination et = result.removeTermination(key).clone();
-				result.myExpandedTerminations.put(key, et);
-			} catch (StructuralException e) {
-				throw new CloneNotSupportedException(e.getMessage());
+			EnsembleTermination et = (EnsembleTermination)myExpandedTerminations.get(key);
+			Node[] nodes = result.getNodes();
+			Termination[] terms = et.getNodeTerminations();
+			Termination[] newterms = new Termination[terms.length];
+			try
+			{
+				for(int i=0; i < terms.length; i++)
+					newterms[i] = nodes[i].getTermination(terms[i].getName());
+				result.myExpandedTerminations.put(key, new EnsembleTermination(result, et.getName(), newterms));
 			}
+			catch(StructuralException se)
+			{
+				throw new CloneNotSupportedException("Error trying to clone: " + se.getMessage());
+			}
+
 		}
 
 		return result;
