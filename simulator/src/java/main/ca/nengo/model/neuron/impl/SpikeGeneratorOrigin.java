@@ -156,5 +156,10 @@ public class SpikeGeneratorOrigin implements Origin {
     public boolean getRequiredOnCPU(){
         return myRequiredOnCPU;
     }
+    
+    public void reset(boolean randomize) {
+    	myGenerator.reset(randomize);
+    	myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES, 0);
+    }
 
 }

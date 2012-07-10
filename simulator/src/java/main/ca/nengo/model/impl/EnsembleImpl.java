@@ -226,4 +226,11 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 
 		return result;
 	}
+	
+	public void reset(boolean randomize) {
+		super.reset(randomize);
+		
+		for(Termination t: myExpandedTerminations.values())
+			t.reset(randomize);
+	}
 }

@@ -593,5 +593,18 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 
 		return result;
 	}
+	
+	public void reset(boolean randomize)
+	{
+		super.reset(randomize);
+		
+		for (DecodedTermination termination : myDecodedTerminations.values()) {
+            termination.reset(randomize);
+		}
+
+		for (DecodedOrigin origin : myDecodedOrigins.values()) {
+			origin.reset(randomize);
+		}
+	}
 
 }

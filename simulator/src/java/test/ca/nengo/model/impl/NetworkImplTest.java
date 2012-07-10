@@ -6,6 +6,9 @@ package ca.nengo.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.nengo.TestUtil;
+import ca.nengo.math.Function;
+import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -13,11 +16,13 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.model.Units;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
 //import ca.nengo.model.neuron.Neuron;
+import ca.nengo.util.Probe;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
@@ -391,6 +396,39 @@ public class NetworkImplTest extends TestCase {
 		
 		if(net.getNodeOrigins().size() != a.getOrigins().length)
 			fail("Network hasn't found node origin");
+		
+	}
+	
+	public void testReset() throws StructuralException, SimulationException
+	{
+		NetworkImpl net = new NetworkImpl();
+		
+		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
+		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
+		a.addDecodedTermination("input", new float[][]{new float[]{1}}, 0.01f, false);
+		
+		net.addNode(a);
+		
+		FunctionInput fin = new FunctionInput("fin", new Function[]{new ConstantFunction(1,0)}, Units.UNK);
+		net.addNode(fin);
+		
+		net.addProjection(fin.getOrigin("origin"), a.getTermination("input"));
+		
+		Probe p = net.getSimulator().addProbe("a", "rate", true);
+		
+		net.getSimulator().run(0.0f, 1.0f, 0.001f);
+		
+		float[][] results1 = p.getData().getValues();
+		
+		net.reset(false);
+		
+		net.getSimulator().run(0.0f, 1.0f, 0.001f);
+		
+		float[][] results2 = p.getData().getValues();
+		
+		for(int i=0; i < results1.length; i++)
+			for(int j=0; j < results1[i].length; j++)
+				TestUtil.assertClose(results1[i][j], results2[i][j], 0.0001f);
 		
 	}
 

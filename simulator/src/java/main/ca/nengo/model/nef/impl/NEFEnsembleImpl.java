@@ -896,19 +896,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
     public void reset(boolean randomize) {
 		super.reset(randomize);
 
-		Termination[] terminations = getTerminations();
-		for (Termination termination : terminations) {
-            if (termination instanceof DecodedTermination) {
-                ((DecodedTermination) termination).reset(randomize);
-            }
-		}
-
-		Origin[] origins = getOrigins();
-		for (Origin origin : origins) {
-			if (origin instanceof DecodedOrigin) {
-				((DecodedOrigin) origin).reset(randomize);
-			}
-		}
+		
 
 		if (myDirectModeDynamics != null) {
 			myDirectModeDynamics.setState(new float[myDirectModeDynamics.getState().length]);

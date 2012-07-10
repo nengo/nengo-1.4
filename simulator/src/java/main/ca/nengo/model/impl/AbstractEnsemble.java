@@ -217,6 +217,10 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		for (Node myNode : myNodes) {
 			myNode.reset(randomize);
 		}
+		for (Termination t : myTerminations.values()) {
+			t.reset(randomize);
+		}
+
 
 		mySpikePattern = new SpikePatternImpl(myNodes.length);
 	}
