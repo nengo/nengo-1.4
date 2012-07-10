@@ -154,32 +154,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 		myCostFunction = costFunction;
 
-		if(!myQuiet) {
-            Memory.report("before gamma");
-        }
-
-		if(getUseGPU())
-		{
-			float[][] float_result = new float[myNoisyValues.length][myNoisyValues.length];
-			myGammaInverse = new double[myNoisyValues.length][myNoisyValues.length];
-			float_result = nativeFindGammaPseudoInverse(myNoisyValues, absNoiseSD*absNoiseSD, nSV);
-
-			for (int i = 0; i < myNoisyValues.length; i++) {
-				for (int j = 0; j < myNoisyValues.length; j++) {
-					myGammaInverse[i][j] = float_result[i][j];
-				}
-			}
-		}else{
-			double[][] gamma = findGamma();
-			if(!myQuiet) {
-                Memory.report("before inverse");
-            }
-			myGammaInverse = pseudoInverse(gamma, absNoiseSD*absNoiseSD, nSV);
-			if(!myQuiet) {
-                Memory.report("after inverse");
-            }
-
-		}
+		calcGamma(absNoiseSD, nSV);
 	}
 	
 	/**
@@ -237,6 +212,39 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 		myCostFunction = costFunction;
 
+		calcGamma(absNoiseSD, nSV);
+
+	}
+
+	/**
+     * @param evaluationPoints Points at which error is evaluated (should be uniformly
+     *      distributed, as the sum of error at these points is treated as an integral
+     *      over the domain of interest). Examples include vector inputs to an ensemble,
+     *      or different points in time within different simulation regimes.
+     * @param values The values of whatever functions are being combined, at the
+     *      evaluationPoints. Commonly neuron firing rates. The first dimension makes up
+     *      the list of functions, and the second the values of these functions at each
+     *      evaluation point.
+     * @param costFunction A cost function that weights squared error over the domain of
+     *      evaluation points
+     * @param noise Standard deviation of Gaussian noise to add to values (to reduce
+     *      sensitivity to simulation noise) as a proportion of the maximum absolute
+     *      value over all values
+     * @param nSV Number of singular values to keep from the singular value
+     *      decomposition (SVD)
+	 */
+	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise, int nSV) {
+		this(evaluationPoints, values, costFunction, noise, nSV, false);
+	}
+	
+	/**
+	 * Calculate the gamma matrix.
+	 * 
+	 * @param absNoiseSD standard deviation of noise that was added to myNoisyValues
+	 * @param nSV Number of singular values to keep from the singular value
+	 *      decomposition (SVD)
+	 */
+	private void calcGamma(float absNoiseSD, int nSV) {
 		if(!myQuiet) {
             Memory.report("before gamma");
         }
@@ -263,28 +271,6 @@ public class WeightedCostApproximator implements LinearApproximator {
             }
 
 		}
-
-	}
-
-	/**
-     * @param evaluationPoints Points at which error is evaluated (should be uniformly
-     *      distributed, as the sum of error at these points is treated as an integral
-     *      over the domain of interest). Examples include vector inputs to an ensemble,
-     *      or different points in time within different simulation regimes.
-     * @param values The values of whatever functions are being combined, at the
-     *      evaluationPoints. Commonly neuron firing rates. The first dimension makes up
-     *      the list of functions, and the second the values of these functions at each
-     *      evaluation point.
-     * @param costFunction A cost function that weights squared error over the domain of
-     *      evaluation points
-     * @param noise Standard deviation of Gaussian noise to add to values (to reduce
-     *      sensitivity to simulation noise) as a proportion of the maximum absolute
-     *      value over all values
-     * @param nSV Number of singular values to keep from the singular value
-     *      decomposition (SVD)
-	 */
-	public WeightedCostApproximator(float[][] evaluationPoints, float[][] values, Function costFunction, float noise, int nSV) {
-		this(evaluationPoints, values, costFunction, noise, nSV, false);
 	}
 
 	private float addNoise(float[][] values, float noise) {
