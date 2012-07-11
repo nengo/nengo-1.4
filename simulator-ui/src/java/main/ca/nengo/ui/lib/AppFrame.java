@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import ca.nengo.plot.Plotter;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;
@@ -452,7 +453,7 @@ public abstract class AppFrame extends JFrame {
      */
     protected void updateWorldMenu() {
         worldMenu.reset();
-        worldMenu.addAction(new MinimizeAllWindows(), KeyEvent.VK_M);
+        worldMenu.addAction(new CloseAllPlots(), KeyEvent.VK_M);
 
         if (!isFullScreenMode) {
             // worldMenu.addAction(new TurnOnFullScreen(), KeyEvent.VK_F);
@@ -1122,6 +1123,24 @@ public abstract class AppFrame extends JFrame {
             actionManager.undoAction();
         }
     }
+    
+    /**
+	 * Action to close all plots
+	 * 
+	 * @author Daniel Rasmussen
+	 */
+	class CloseAllPlots extends StandardAction {
+		private static final long serialVersionUID = 1L;
+
+		public CloseAllPlots() {
+			super("Close all plots");
+		}
+
+		@Override
+		protected void action() throws ActionException {
+			Plotter.closeAll();
+		}
+	}
 
 }
 
