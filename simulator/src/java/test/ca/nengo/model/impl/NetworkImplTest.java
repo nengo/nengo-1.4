@@ -431,6 +431,36 @@ public class NetworkImplTest extends TestCase {
 				TestUtil.assertClose(results1[i][j], results2[i][j], 0.0001f);
 		
 	}
+	
+	public void testClone() throws StructuralException, CloneNotSupportedException{
+		NetworkImpl top = new NetworkImpl();
+	    
+	    NetworkImpl test1 = new NetworkImpl();
+	    test1.setName("test1");
+	    top.addNode(test1);
+	    
+	    NEFEnsembleFactoryImpl fac = new NEFEnsembleFactoryImpl();
+	    NEFEnsembleImpl testens = (NEFEnsembleImpl)fac.make("test", 100, 1);
+	    testens.addDecodedTermination("input", new float[][]{new float[]{1}}, 0.01f, false);
+	    test1.addNode(testens);
+	    
+	    test1.exposeTermination(testens.getTermination("input"), "in");
+	    
+	    NetworkImpl test2 = (NetworkImpl)test1.clone();
+	    test2.setName("test2");
+	    top.addNode(test2);
+	    
+	    FunctionInput fin = new FunctionInput("fin", new Function[]{new ConstantFunction(1,0.5f)}, Units.UNK);
+	    top.addNode(fin);
+	    
+	    top.addProjection(fin.getOrigin("origin"), test1.getTermination("in"));
+	    top.addProjection(fin.getOrigin("origin"), test2.getTermination("in"));
+	    
+	    if(test1.getTermination("in") == test2.getTermination("in"))
+	    	fail("Exposed terminations did not clone correctly");
+	    if(test1.getNode("test") == test2.getNode("test"))
+	    	fail("Network nodes did not clone correctly");
+	}
 
 	private static class MockEnsemble implements Ensemble {
 
