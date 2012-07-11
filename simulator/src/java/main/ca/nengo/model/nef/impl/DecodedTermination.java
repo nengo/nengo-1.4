@@ -42,6 +42,7 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
+import ca.nengo.model.neuron.SynapticIntegrator;
 import ca.nengo.util.MU;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.TimeSeriesImpl;
@@ -450,6 +451,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 
 	protected void setNode(Node node) {
 		myNode = node;
+		if(myIntegrator instanceof SynapticIntegrator)
+			((SynapticIntegrator)myIntegrator).setNode(node);
 	}
 
 	@Override

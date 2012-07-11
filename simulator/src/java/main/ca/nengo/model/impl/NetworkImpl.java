@@ -1098,6 +1098,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			}
 		}
 
+		result.myExposedOrigins = new HashMap<String, Origin>(10);
+		result.myExposedOriginNames = new HashMap<Origin, String>(10);
+		result.OrderedExposedOrigins = new LinkedList <Origin> ();
 		for (Origin exposed : getOrigins()) {
 			String name = exposed.getName();
 			Origin wrapped = ((OriginWrapper) exposed).getWrappedOrigin();
@@ -1109,6 +1112,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			}
 		}
 
+		result.myExposedTerminations = new HashMap<String, Termination>(10);
+		result.myExposedTerminationNames = new HashMap<Termination, String>(10);
+		result.OrderedExposedTerminations = new LinkedList <Termination> ();
 		for (Termination exposed : getTerminations()) {
 			String name = exposed.getName();
 			Termination wrapped = ((TerminationWrapper) exposed).getWrappedTermination();
