@@ -246,7 +246,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
 		MenuBuilder windowsMenu = menu.addSubMenu("Windows");
 		windowsMenu.addAction(new CloseAllWindows("Close all"));
-		windowsMenu.addAction(new MinimizeAllWindows("Minmize all"));
+		windowsMenu.addAction(new MinimizeAllWindows("Minimize all"));
 
 	}
 
