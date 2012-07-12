@@ -456,13 +456,19 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 				NodeContainer nodeContainer = (NodeContainer) wo;
 
 				try {
-					Node node = getModel();
+					Node node;
+					try {
+						node = getModel().clone();
+					}
+					catch (CloneNotSupportedException e) {
+						throw new ContainerException("Could not clone node: " + e.getMessage());
+					}
 					Point2D newPosition = localToGlobal(new Point2D.Double(0, 0));
 					newPosition = wo.globalToLocal(newPosition);
 					newPosition = nodeContainer.localToView(newPosition);
 
 					/*
-					 * This removes the node from it's parent and externalities
+					 * This removes the node from its parent and externalities
 					 */
 					destroyModel();
 
@@ -471,7 +477,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 					 */
 					try {
 						CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-						nodeContainer.addNodeModel(getModel(),
+						nodeContainer.addNodeModel(node,
 								newPosition.getX(),
 								newPosition.getY());
 					} catch (UserCancelledException e) {
