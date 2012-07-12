@@ -8,6 +8,9 @@ import java.util.Collection;
 
 import javax.swing.JPopupMenu;
 
+import ca.nengo.model.Node;
+import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.actions.PasteAction;
 import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.RemoveObjectsAction;
@@ -31,6 +34,7 @@ import ca.nengo.ui.lib.world.piccolo.objects.TooltipWrapper;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXGrid;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXLayer;
+import ca.nengo.ui.models.NodeContainer;
 import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -242,7 +246,10 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * @return Menu builder
 	 */
 	protected void constructMenu(PopupMenuBuilder menu) {
-
+		Node clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
+		if (clipboardNode != null) {
+			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here", (NodeContainer)this));
+		}
 		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
 		MenuBuilder windowsMenu = menu.addSubMenu("Windows");
 		windowsMenu.addAction(new CloseAllWindows("Close all"));

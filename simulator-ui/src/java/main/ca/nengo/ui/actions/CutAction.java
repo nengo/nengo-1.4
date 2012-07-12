@@ -51,10 +51,15 @@ public class CutAction extends StandardAction {
 
     @Override
     protected final void action() throws ActionException {
-        Node node = nodeUI.getModel();
+    	Node node;
+    	try {
+    		node = nodeUI.getModel().clone();
+	    } catch (CloneNotSupportedException e) {
+	        throw new ActionException("Could not clone node", e);
+	    }
 
         /*
-         * This removes the node from it's parent and externalities
+         * This removes the node from its parent and externalities
          */
         nodeUI.destroyModel();
 
