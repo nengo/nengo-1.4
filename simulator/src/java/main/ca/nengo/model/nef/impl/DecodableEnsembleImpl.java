@@ -520,17 +520,17 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
     public Properties listStates() {
 		Properties result = super.listStates();
 
-		Iterator<String> it = myDecodedOrigins.keySet().iterator();
-		while (it.hasNext()) {
-			String name = it.next().toString();
-			result.setProperty(name, "Function of NEFEnsemble state"); //TODO: could put function.toString() here
-		}
-
-        it = myDecodedTerminations.keySet().iterator();
+		Iterator<String> it = myDecodedTerminations.keySet().iterator();
         while (it.hasNext()) {
             String termName = it.next().toString();
             result.setProperty(termName, "Output of Termination " + termName);
         }
+		
+		it = myDecodedOrigins.keySet().iterator();
+		while (it.hasNext()) {
+			String name = it.next().toString();
+			result.setProperty(name, "Function of NEFEnsemble state"); //TODO: could put function.toString() here
+		}
 
 		return result;
 	}
