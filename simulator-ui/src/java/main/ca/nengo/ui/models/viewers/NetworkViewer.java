@@ -441,11 +441,6 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 
 	@Override
 	public void constructMenu(PopupMenuBuilder menu) {
-		Node clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
-		if (clipboardNode != null) {
-			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here", this));
-		}
-
 		super.constructMenu(menu);
 
 		/*
