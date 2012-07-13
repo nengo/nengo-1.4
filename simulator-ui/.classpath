@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java/main"/>
+	<classpathentry kind="src" path="src/resources"/>
+	<classpathentry kind="src" path="python"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/simulator"/>
+	<classpathentry kind="lib" path="lib/jython.jar" sourcepath="C:/jython2.2.1/src/java/src"/>
+	<classpathentry kind="lib" path="lib/jung-1.7.6.jar"/>
+	<classpathentry kind="lib" path="lib/piccolo.jar"/>
+	<classpathentry kind="lib" path="lib/piccolox.jar"/>
+	<classpathentry kind="lib" path="lib/colt.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/junit.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/simulator/lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
