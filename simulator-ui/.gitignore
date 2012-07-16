@@ -1,2 +1,3 @@
 bin
 .ant_targets
+nengo.log
