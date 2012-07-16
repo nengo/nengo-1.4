@@ -28,12 +28,6 @@
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
-        <copy includeemptydirs="false" todir="${dest.build}">
-            <fileset dir="${src.resources}">
-                <exclude name="**/*.launch"/>
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
     </target>
 	
     <target name="clean">
@@ -136,10 +130,12 @@
 	<target description="Generate all artifacts: javadoc, FindBugs, CPD, PMD, CheckStyle, and Sphinx." name="all"
 		depends="javadoc,sphinx,findbugs,cpd,pmd,checkstyle" />
 	
-	<target description="Create a distribution folder. Requires that SVN is installed and working."
+	<target description="Create a distribution folder. Requires that git is installed and working."
 		depends="build,javadoc-simulator" name="dist">
-    	<exec executable="svnversion" spawn="false" dir="${basedir}" outputproperty="buildnumber"/>
-		<property name="dist.dir" value="../nengo-${buildnumber}"/>
+    	<exec executable="git" spawn="false" dir="${basedir}" outputproperty="buildhash">
+        <arg line="rev-parse --short HEAD"/>
+      </exec>
+		<property name="dist.dir" value="../nengo-${buildhash}"/>
 		<copy includeemptydirs="false" todir="${dest.build}">
 	        <fileset dir="${dir.simulator}/${dest.build}">
 	            <exclude name="**/*.launch"/>
@@ -148,13 +144,13 @@
 	    </copy>
 		<delete dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}"/>
-		<jar destfile="${dist.dir}/nengo-${buildnumber}.jar" basedir="${dest.build}">
+		<jar destfile="${dist.dir}/nengo-${buildhash}.jar" basedir="${dest.build}">
 	    	<manifest>
 		    	<attribute name="Main-Class" value="ca.nengo.ui.NengoGraphics" />
 			  	<attribute name="Built-By" value="${user.name}"/>
 			  	<attribute name="Implementation-Vendor" value="Centre for Theoretical Neuroscience @ UWaterloo"/>
 			  	<attribute name="Implementation-Title" value="Nengo Graphical Simulator"/>
-			  	<attribute name="Implementation-Version" value="Build ${buildnumber}"/>
+			  	<attribute name="Implementation-Version" value="Build ${buildhash}"/>
 	    	</manifest>
 		</jar>
 		<mkdir dir="${dist.dir}/api"/>
@@ -181,7 +177,7 @@
 			<fileset dir="${src.dist}"/>
 		</copy>
 	
-		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildnumber}">
+		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildhash}">
 			<include name="nengo"/>
             <include name="nengo-cl"/>
 			<include name="nengo.bat"/>
@@ -213,7 +209,7 @@
 			</fileset>
 		</chmod>
 		<exec executable="zip" dir="..">
-			<arg line="-qr nengo-latest nengo-${buildnumber}"/>
+			<arg line="-qr nengo-latest nengo-${buildhash}"/>
 		</exec>
 	</target>
 	
