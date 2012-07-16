@@ -1,4 +1,6 @@
 *.class
 *.pyc
 *.pkc
+nengo-*
+nengo-latest.zip
 NengoModels
