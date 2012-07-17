@@ -1,6 +1,7 @@
 .ant_targets
 artifacts
 bin
+layouts
 nengo.log
 UIFiles
 User.config
