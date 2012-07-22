@@ -5,39 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>ca.nengo</groupId>
-  <artifactId>simulator</artifactId>
+  <artifactId>nengo-core</artifactId>
   <version>1.4</version>
-  <name>Nengo</name>
-  <url>http://nengo.ca</url>
-  <description>Nengo is a software package for simulating large-scale neural systems.</description>
-  <organization>
-  	<name>Centre for Theoretical Neuroscience</name>
-  	<url>http://ctn.uwaterloo.ca/</url>
-  </organization>
-  <scm>
-  	<url>git://github.com/ctn-waterloo/nengo.git</url>
-  	<connection>git://github.com/ctn-waterloo/nengo.git</connection>
-  	<developerConnection>git@github.com:ctn-waterloo/nengo.git</developerConnection>
-  	<tag>HEAD</tag>
-  </scm>
-  <issueManagement>
-  	<system>Github Issues</system>
-  	<url>http://github.com/ctn-waterloo/nengo/issues</url>
-  </issueManagement>
-  <ciManagement>
-  	<system>Jenkins</system>
-  	<url>http://ctnsrv.uwaterloo.ca:8080/jenkins/job/Nengo/</url>
-  </ciManagement>
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>CTN</id>
-      <name>CTN Maven Repository</name>
-      <url>http://ctnsrv.uwaterloo.ca:8080/nexus/content/groups/public</url>
-    </repository>
-  </repositories>
+  <packaging>jar</packaging>
   <dependencies>
   	<dependency>
   		<groupId>jfree</groupId>
@@ -110,14 +80,63 @@
   		<version>0.1</version>
   	</dependency>
   	<dependency>
-  		<groupId>log4j</groupId>
-  		<artifactId>log4j</artifactId>
-  		<version>1.2.16</version>
-  	</dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.6.2</version>
+    </dependency>
   	<dependency>
   		<groupId>org.slf4j</groupId>
   		<artifactId>slf4j-log4j12</artifactId>
   		<version>1.6.2</version>
   	</dependency>
+  	<dependency>
+  		<groupId>log4j</groupId>
+  		<artifactId>log4j</artifactId>
+  		<version>1.2.16</version>
+  		<scope>runtime</scope>
+  	</dependency>
   </dependencies>
+  
+  <!-- Build settings -->
+  <build></build>
+  <reporting></reporting>
+  
+  <!-- More project information -->
+  <name>Nengo</name>
+  <description>Nengo is a software package for simulating large-scale neural systems.</description>
+  <url>http://nengo.ca</url>
+  <inceptionYear>2007</inceptionYear>
+  <!-- <licenses>MPL 1.1</licenses>  -->
+  <organization>
+  	<name>Centre for Theoretical Neuroscience</name>
+  	<url>http://ctn.uwaterloo.ca/</url>
+  </organization>
+  
+  <!-- Environment settings -->
+  <issueManagement>
+  	<system>Github Issues</system>
+  	<url>http://github.com/ctn-waterloo/nengo/issues</url>
+  </issueManagement>
+  <ciManagement>
+  	<system>Jenkins</system>
+  	<url>http://ctnsrv.uwaterloo.ca:8080/jenkins/job/Nengo/</url>
+  </ciManagement>
+  <scm>
+  	<url>git://github.com/ctn-waterloo/nengo.git</url>
+  	<connection>git://github.com/ctn-waterloo/nengo.git</connection>
+  	<developerConnection>git@github.com:ctn-waterloo/nengo.git</developerConnection>
+  	<tag>HEAD</tag>
+  </scm>
+  <prerequisites></prerequisites>
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>CTN</id>
+      <name>CTN Maven Repository</name>
+      <url>http://ctnsrv.uwaterloo.ca:8080/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
+
 </project>
