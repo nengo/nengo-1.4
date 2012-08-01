@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java/main"/>
+	<classpathentry kind="src" path="src/resources"/>
+	<classpathentry excluding="ca/nengo/model/plasticity/impl/" kind="src" path="src/java/test"/>
+	<classpathentry kind="lib" path="lib/analysis/checkstyle-5.1/checkstyle-all-5.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/cobertura-1.9.4.1/cobertura.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/cobertura-1.9.4.1/lib/asm-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/cobertura-1.9.4.1/lib/asm-tree-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/cobertura-1.9.4.1/lib/jakarta-oro-2.0.8.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/cobertura-1.9.4.1/lib/log4j-1.2.9.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/annotations.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/ant.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/asm-analysis-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/asm-commons-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/asm-tree-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/asm-util-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/asm-xml-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/bcel.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/findbugs-ant.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/findbugs.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/jaxen-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/jdepend-2.9.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/jFormatString.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/jsr305.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/junit.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/pmd-4.2.5/lib/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/pmd-4.2.5/lib/jaxen-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/pmd-4.2.5/lib/junit-4.4.jar"/>
+	<classpathentry kind="lib" path="lib/analysis/pmd-4.2.5/lib/pmd-4.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/formsrt.jar"/>
+	<classpathentry kind="lib" path="lib/Jama-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/jgrapht-jdk1.5-0.7.3.jar"/>
+	<classpathentry kind="lib" path="lib/jmatio.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/qdox-1.6.3.jar"/>
+	<classpathentry kind="lib" path="lib/ssj.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
