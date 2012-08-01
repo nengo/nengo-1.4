@@ -1,2 +1,6 @@
-bin
 .ant_targets
+artifacts
+bin
+nengo.log
+UIFiles
+User.config
