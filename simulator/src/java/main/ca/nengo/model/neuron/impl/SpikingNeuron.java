@@ -186,6 +186,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		if (myNoise != null) {
             myNoise.reset(randomize);
         }
+		myRadialInput = 0;
 	}
 
 	/**
