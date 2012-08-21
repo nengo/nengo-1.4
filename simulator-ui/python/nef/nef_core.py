@@ -895,8 +895,14 @@ class Network:
         node=self.network
         while '.' in name:
             n,name=name.split('.',1)
-            node=node.getNode(n)
-        try:    
+            try:
+                node=node.getNode(n)
+            except:
+                if default is Exception:
+                    raise Exception('Could not find node:',original_name)
+                else:                            
+                    return default
+        try:
             node=node.getNode(name)
         except:
             try:

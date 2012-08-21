@@ -85,3 +85,7 @@ class FSMNode(nef.SimpleNode):
     def termination_input(self,x):
         if self.state and self.state.input:
             self.state.input(x)
+    
+    def reset(self, randomize=False):
+        self.timer = 0.0
+        nef.SimpleNode.reset(self, randomize)
