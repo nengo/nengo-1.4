@@ -1,6 +1,6 @@
-from spa import *
+from spa import *       #Import SPA related packages
 
-class Rules:
+class Rules:            #Define mappings for BG and Thal
     def start(vision='LETTER'):
         set(state=vision)
     def A(state='A'):
@@ -16,15 +16,15 @@ class Rules:
     
 
 
-class Routing(SPA):
-    dimensions=16
+class Routing(SPA):     #Extend the imported SPA class
+    dimensions=16        #Dimensions in SPs
+    
+    state=Buffer()       #Create a working memory/cortical element
+    vision=Buffer(feedback=0)#Create a cortical element with no feedback
+    BG=BasalGanglia(Rules()) #Set rules defined above
+    thal=Thalamus(BG)        #Set thalamus with rules
 
-    state=Buffer()
-    vision=Buffer(feedback=0)
-    BG=BasalGanglia(Rules)
-    thal=Thalamus(BG)
-
-    input=Input(10, vision='0.8*LETTER+D')
+    input=Input(10, vision='0.8*LETTER+D') #Define the starting input
 
 model=Routing()
 

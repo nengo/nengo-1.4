@@ -1,6 +1,6 @@
-from spa import *
+from spa import *       #Import SPA related packages
 
-class Rules:
+class Rules:            #Define mappings for BG and Thal
     def A(state='A'):
         set(state='B')
     def B(state='B'):
@@ -13,13 +13,13 @@ class Rules:
         set(state='A')
     
 
-class Sequence(SPA):
-    dimensions=16
+class Sequence(SPA):     #Extend the imported SPA class
+    dimensions=16        #Dimensions in SPs
     
-    state=Buffer()
-    BG=BasalGanglia(Rules())
-    thal=Thalamus(BG)
+    state=Buffer()       #Create a working memory/cortical element
+    BG=BasalGanglia(Rules()) #Set rules defined above
+    thal=Thalamus(BG)        #Set thalamus with rules
     
-    input=Input(0.1,state='D')
+    input=Input(0.1,state='D') #Define the starting input
 
-seq=Sequence()
+seq=Sequence()            #Run the class
