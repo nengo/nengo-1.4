@@ -44,8 +44,7 @@ public abstract class TrackedAction extends StandardAction {
 			}
 		});
 		
-    	NengoGraphics.getInstance().getProgressIndicator().setEnabled(true);
-    	NengoGraphics.getInstance().getProgressIndicator().setText(taskName);
+    	NengoGraphics.getInstance().getProgressIndicator().start(taskName);
 		super.doAction();
 
 	}
@@ -58,7 +57,7 @@ public abstract class TrackedAction extends StandardAction {
 	@Override
 	protected void postAction() {
 		super.postAction();
-    	NengoGraphics.getInstance().getProgressIndicator().setEnabled(false);
+    	NengoGraphics.getInstance().getProgressIndicator().stop();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				trackedMsg.finished();

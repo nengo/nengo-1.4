@@ -56,12 +56,6 @@ import javax.swing.text.StyleContext;
 
 import org.apache.log4j.Logger;
 import org.python.util.PythonInterpreter;
-import org.python.core.PyFrame;
-import org.python.core.PyException;
-import org.python.core.PyObject;
-import org.python.core.ThreadState;
-import org.python.core.Py;
-import org.python.core.TraceFunction;
 
 
 import ca.nengo.config.JavaSourceParser;
@@ -101,6 +95,7 @@ public class ScriptConsole extends JPanel {
 	private PythonInterpreter myInterpreter;
 	private JEditorPane myDisplayArea;
 	private JTextArea myCommandField;
+	private JScrollPane myDisplayScroll;
 	private HistoryCompletor myHistoryCompletor;
 	private CallChainCompletor myCallChainCompletor;
 	private boolean myInCallChainCompletionMode;
@@ -131,17 +126,17 @@ public class ScriptConsole extends JPanel {
 		ToolTipManager.sharedInstance().registerComponent(myCommandField);
 
 		setLayout(new BorderLayout());
-		JScrollPane displayScroll = new JScrollPane(myDisplayArea);
+		myDisplayScroll = new JScrollPane(myDisplayArea);
 
 		seperator = new JSeparator(JSeparator.HORIZONTAL);
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		panel.add(displayScroll, BorderLayout.CENTER);
+		panel.add(myDisplayScroll, BorderLayout.CENTER);
 		panel.add(seperator, BorderLayout.SOUTH);
 
 		add(panel, BorderLayout.CENTER);
 		add(myCommandField, BorderLayout.SOUTH);
-		displayScroll.setBorder(null);
+		myDisplayScroll.setBorder(null);
 
 		myCommandField.addKeyListener(new CommandKeyListener(this));
 		myCommandField.setFocusTraversalKeysEnabled(false);
@@ -286,9 +281,16 @@ public class ScriptConsole extends JPanel {
 			myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength()); // scroll
 			// to
 			// end
+			scrollToBottom();
 		} catch (BadLocationException e) {
 			ourLogger.warn("Scrolling problem", e);
 		}
+	}
+	
+	public void scrollToBottom() {
+		myDisplayScroll.getVerticalScrollBar().setValue(myDisplayScroll.getVerticalScrollBar().getMaximum());
+		//myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength());		
+		//myDisplayArea.scrollRectToVisible(new Rectangle(0,myDisplayArea.getHeight(),0,myDisplayArea.getHeight()));
 	}
 
 	/**
@@ -365,7 +367,7 @@ public class ScriptConsole extends JPanel {
 
             @Override
             protected void action() throws ActionException {
-            	NengoGraphics.getInstance().getProgressIndicator().setText(initText.trim());
+            	NengoGraphics.getInstance().getProgressIndicator().start(initText.trim());
             	myCommandField.setEnabled(false);
                 try {
         			if (initText.startsWith("run ")) {

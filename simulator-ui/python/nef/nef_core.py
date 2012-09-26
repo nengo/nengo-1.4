@@ -969,9 +969,9 @@ class Network:
             ng=ca.nengo.ui.NengoGraphics.getInstance()
         except:
             pass        
-        if ng is not None and run_time==0.0: self.network.simulator.addSimulatorListener(ng.progressIndicator)
+        if ng is not None and self.run_time==0.0: self.network.simulator.addSimulatorListener(ng.progressIndicator)
         self.network.simulator.run(self.run_time,self.run_time+time,dt)
-        if ng is not None and run_time==0.0: self.network.simulator.removeSimulatorListener(ng.progressIndicator)
+        if ng is not None and self.run_time==0.0: self.network.simulator.removeSimulatorListener(ng.progressIndicator)
         self.run_time=self.run_time+time
         
     def reset(self):

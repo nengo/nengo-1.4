@@ -84,13 +84,13 @@ public class OpenNeoFileAction extends StandardAction {
 
                     if (file.getName().endsWith(".py")) {
                     	try {
-                    		NengoGraphics.getInstance().getProgressIndicator().setText("Running "+file.getPath());
+                    		NengoGraphics.getInstance().getProgressIndicator().start("Running "+file.getPath());
                     		NengoGraphics.getInstance().getScriptConsole().addVariable("scriptname", file.getPath());
                     		NengoGraphics.getInstance().getPythonInterpreter().execfile(file.getPath());
                     	} catch (RuntimeException e) {
                     		if (e.toString()=="ca.nengo.ui.util.ScriptInterruptException") {
                     			
-                        		NengoGraphics.getInstance().getProgressIndicator().setEnabled(false);
+                        		NengoGraphics.getInstance().getProgressIndicator().stop();
                     			UserMessages.showDialog("Stopped","Stopped opening "+file.getName());                    			
                     		} else {
                     			UserMessages.showError("Runtime exception:<br>" + e);
