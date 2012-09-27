@@ -217,8 +217,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
 
         self.toolbar.add(Box.createHorizontalGlue())
         
-        self.button_stop=make_button('stop',self.do_interrupt,'Stop the currently running simulation',enabled=False)
-        self.toolbar.add(self.button_stop)
+        #self.button_stop=make_button('stop',self.do_interrupt,'Stop the currently running simulation',enabled=False)
+        #self.toolbar.add(self.button_stop)
         self.parallelization=ParallelizationConfiguration()
         self.toolbar.add(self.parallelization.button)
         #self.toolbar.add(make_button('templates',lambda event: template.template.toggle_visible(),'toggle templates'))
@@ -250,10 +250,10 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.update()
         
     def update(self):
-        try:
-            self.button_stop.enabled=self.ng.progressIndicator.visible
-        except:
-            pass    
+        #try:
+        #    self.button_stop.enabled=self.ng.progressIndicator.visible
+        #except:
+        #    pass    
     
         selected=self.ng.getSelectedObj()
         self.mode_combobox.set_node(selected)
