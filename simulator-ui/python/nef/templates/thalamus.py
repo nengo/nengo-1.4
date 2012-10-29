@@ -36,3 +36,5 @@ def make(net,name='Network Array', neurons=50, D=2, inhib_scale=3, tau_inhib=.00
     def addOne(x):
         return [x[0]+1]            
     net.connect(thal, None, func=addOne, origin_name='xBiased', create_projection=False)
+
+    return thal
