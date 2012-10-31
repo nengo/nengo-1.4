@@ -44,6 +44,8 @@ public class BinaryUfunc extends KeywordFunction {
 
     static final public BinaryFunction argMax = new ArgMax();
     static final public BinaryFunction argMin = new ArgMin();
+    
+    private static final long serialVersionUID = 1L;
 
     String docString() {
 	return

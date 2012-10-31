@@ -40,7 +40,6 @@ import edu.umd.cs.piccolo.nodes.PText;
  * @author Shu Wu
  */
 public class Tooltip extends WorldObjectImpl {
-	private static final long serialVersionUID = 1L;
 
 	private TooltipBuilder tooltipBuilder;
 	private double tooltipWidth;

@@ -40,7 +40,6 @@ import ca.nengo.ui.models.nodes.UINetwork;
  * @author Shu Wu
  */
 public class NetworkIcon extends NodeContainerIcon {
-	private static final long serialVersionUID = 1L;
 
 	public NetworkIcon(UINetwork parent) {
 		super(parent, new VectorIcon());

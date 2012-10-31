@@ -16,8 +16,6 @@ import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 
 public class ElasticObject extends WorldObjectImpl {
 
-	private static final long serialVersionUID = 1L;
-
 	// Cache the Elastic world for fast access because it is used often
 	private ElasticGround elasticGround;
 

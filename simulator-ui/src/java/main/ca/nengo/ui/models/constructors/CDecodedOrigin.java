@@ -113,7 +113,6 @@ public class CDecodedOrigin extends ProjectionConstructor {
  * @author Shu Wu
  */
 class OriginInputPanel extends PropertyInputPanel {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Selector of the Node Origin

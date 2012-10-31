@@ -38,8 +38,6 @@ public class ElasticWorld extends WorldImpl {
 	 */
 	private static final Dimension DEFAULT_LAYOUT_BOUNDS = new Dimension(1000, 1000);
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Layout bounds
 	 */

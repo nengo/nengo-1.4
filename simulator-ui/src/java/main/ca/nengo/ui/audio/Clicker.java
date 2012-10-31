@@ -1,8 +1,5 @@
 package ca.nengo.ui.audio;
 import javax.sound.sampled.*;
-import java.lang.Thread;
-import java.lang.Runnable;
-
 
 public class Clicker {
 	boolean started=false;

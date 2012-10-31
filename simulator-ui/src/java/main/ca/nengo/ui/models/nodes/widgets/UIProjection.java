@@ -38,8 +38,6 @@ import ca.nengo.ui.models.UINeoNode;
  */
 public class UIProjection extends LineConnector {
 
-	private static final long serialVersionUID = 1L;
-
 	public UIProjection(UIProjectionWell well) {
 		super(well);
 	}

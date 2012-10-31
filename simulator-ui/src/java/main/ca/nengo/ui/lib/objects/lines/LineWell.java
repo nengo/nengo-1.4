@@ -9,8 +9,6 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PPickPath;
 
 public abstract class LineWell extends WorldObjectImpl {
-
-	private static final long serialVersionUID = 1L;
 	private LineOriginIcon myIcon;
 
 	public LineWell() {

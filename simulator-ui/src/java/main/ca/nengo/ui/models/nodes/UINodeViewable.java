@@ -50,8 +50,6 @@ import ca.nengo.ui.models.viewers.NodeViewer;
  */
 public abstract class UINodeViewable extends UINeoNode {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Weak reference to the viewer window
 	 */

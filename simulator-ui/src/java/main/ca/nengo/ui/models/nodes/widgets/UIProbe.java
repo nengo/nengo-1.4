@@ -32,7 +32,6 @@ import ca.nengo.ui.models.icons.ProbeIcon;
 
 public abstract class UIProbe extends ModelObject {
 
-	private static final long serialVersionUID = 1L;
 	private ProbeIcon myIcon;
 	private UINeoNode nodeAttachedTo;
 

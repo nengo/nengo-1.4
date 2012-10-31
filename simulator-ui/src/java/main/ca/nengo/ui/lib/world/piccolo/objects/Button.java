@@ -11,8 +11,6 @@ import ca.nengo.ui.lib.world.piccolo.primitives.Path;
  */
 public class Button extends AbstractButton {
 
-	private static final long serialVersionUID = 1L;
-
 	private Path buttonCover;
 
 	public Button(WorldObjectImpl worldObject, Runnable action) {

@@ -11,4 +11,4 @@ package ca.nengo.ui.JNumeric;
 */
 
 
-public class FFT extends JN_FFT {}
+public class FFT extends JN_FFT {private static final long serialVersionUID = 1L;}

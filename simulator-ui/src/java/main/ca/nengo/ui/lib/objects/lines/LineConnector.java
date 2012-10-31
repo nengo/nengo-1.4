@@ -24,8 +24,6 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  */
 public abstract class LineConnector extends WorldObjectImpl implements Interactable, DroppableX {
 
-	private static final long serialVersionUID = 1L;
-
 	private DestroyListener myDestroyListener;
 
 	private final Edge myEdge;

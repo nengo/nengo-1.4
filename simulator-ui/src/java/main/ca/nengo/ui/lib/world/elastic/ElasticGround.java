@@ -26,8 +26,6 @@ import edu.umd.cs.piccolo.util.PBounds;
 
 public class ElasticGround extends WorldGroundImpl {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String ELASTIC_LENGTH_KEY = "elasticLength";
 
 	private boolean childrenUpdatedFlag = false;

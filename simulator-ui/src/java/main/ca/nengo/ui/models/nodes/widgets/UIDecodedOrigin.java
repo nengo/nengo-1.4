@@ -39,8 +39,6 @@ import ca.nengo.ui.models.UINeoNode;
  */
 public class UIDecodedOrigin extends UIOrigin {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String typeName = "Decoded Origin";
 
 	protected UIDecodedOrigin(UINeoNode ensembleProxy, DecodedOrigin origin) {

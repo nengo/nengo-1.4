@@ -42,8 +42,6 @@ import ca.nengo.ui.models.viewers.NodeViewer;
  */
 public class UIEnsemble extends UINodeViewable {
 
-	private static final long serialVersionUID = 1L;
-
 	private UISpikeProbe spikeCollector;
 
 	public UIEnsemble(Ensemble model) {

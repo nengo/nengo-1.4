@@ -14,6 +14,7 @@ import org.python.core.*;
 
 
 public class Umath extends PyObject implements ClassDictInit {
+	private static final long serialVersionUID = 1L;
   public Umath() {
     super(PyType.fromClass(Umath.class)) ;
     this.javaProxy = this ;

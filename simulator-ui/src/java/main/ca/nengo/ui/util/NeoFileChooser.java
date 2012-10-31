@@ -42,7 +42,6 @@ import ca.nengo.ui.util.NengoConfigManager.UserProperties;
  * @author Shu Wu
  */
 public class NeoFileChooser {
-	private static final long serialVersionUID = 1L;
 
 	private FileFilter allFileFilter;
 
