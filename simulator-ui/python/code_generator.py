@@ -1,3 +1,5 @@
+
+
 def generate(network):
     code=[]
     code.append('import nef')
@@ -36,6 +38,7 @@ from javax.swing import *
 from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
+import ca.nengo
     
 class CodeView(ca.nengo.util.VisiblyMutable.Listener):
     def __init__(self,network):
