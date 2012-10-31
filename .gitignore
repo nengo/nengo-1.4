@@ -1,0 +1,8 @@
+*.class
+*.pyc
+*.pkc
+.DS_Store
+nengo-*
+nengo-latest.zip
+NengoModels
+
