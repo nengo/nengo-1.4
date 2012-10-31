@@ -37,8 +37,6 @@ import ca.nengo.ui.models.nodes.UINodeViewable;
  */
 public abstract class NodeContainerIcon extends ModelIcon {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final float MAX_SCALE = 1.5f;
 
 	public static final float MIN_SCALE = 0.5f;

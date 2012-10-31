@@ -13,6 +13,7 @@ package ca.nengo.ui.JNumeric;
 import org.python.core.*;
 
 public class JNumeric extends PyObject implements ClassDictInit {
+	private static final long serialVersionUID = 1L;
     public JNumeric() {
       super(PyType.fromClass(JNumeric.class)) ;
       this.javaProxy = this ;
@@ -155,6 +156,7 @@ public class JNumeric extends PyObject implements ClassDictInit {
 }
 
 class ArrayrangeFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ArrayrangeFunction() {
 		docString = "arrayrange(start=0, stop, step=1, typecode=None)";
 		argNames = new String[] {"start", "stop", "step", "typecode"};
@@ -167,6 +169,7 @@ class ArrayrangeFunction extends KeywordFunction {
 	}
 }
 class ArgmaxFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ArgmaxFunction() {
 		docString = "argmax(a, axis=-1)";
 		argNames = new String[] {"a", "axis"};
@@ -178,6 +181,7 @@ class ArgmaxFunction extends KeywordFunction {
 	}
 }
 class ArgsortFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ArgsortFunction() {
 		docString = "argsort(a, axis=-1)";
 		argNames = new String[] {"a", "axis"};
@@ -188,6 +192,7 @@ class ArgsortFunction extends KeywordFunction {
 	}
 }
 class ArgminFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ArgminFunction() {
 		docString = "argmin(a, axis=-1)";
 		argNames = new String[] {"a", "axis"};
@@ -199,6 +204,7 @@ class ArgminFunction extends KeywordFunction {
 	}
 }
 class ArrayFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ArrayFunction() {
 		docString = "array(sequence, typecode=None, copy=1)";
 		argNames = new String[] {"sequence", "typecode", "copy"};
@@ -214,6 +220,7 @@ class ArrayFunction extends KeywordFunction {
 	}
 }
 class AsarrayFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	AsarrayFunction() {
 		docString = "asarray(sequence, typecode=None)";
 		argNames = new String[] {"sequence", "typecode"};
@@ -226,6 +233,7 @@ class AsarrayFunction extends KeywordFunction {
 	}
 }
 class BitwiseNotFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	BitwiseNotFunction() {
 		docString = "bitwise_not(a)";
 		argNames = new String[] {"a"};
@@ -236,6 +244,7 @@ class BitwiseNotFunction extends KeywordFunction {
 	}
 }
 class ChooseFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ChooseFunction() {
 		docString = "choose(a, indices)";
 		argNames = new String[] {"a", "indices"};
@@ -246,6 +255,7 @@ class ChooseFunction extends KeywordFunction {
 	}
 }
 class ClipFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ClipFunction() {
 		docString = "clip(a, a_min, a_max)";
 		argNames = new String[] {"a", "a_min", "a_max"};
@@ -259,6 +269,7 @@ class ClipFunction extends KeywordFunction {
 	}
 }
 class CompressFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	CompressFunction() {
 		docString = "clip(condition, a, [dimension=-1])";
 		argNames = new String[] {"condition", "a", "dimension"};
@@ -272,6 +283,7 @@ class CompressFunction extends KeywordFunction {
 	}
 }
 class ConcatenateFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ConcatenateFunction() {
 		docString = "concatenate(arrays, axis=0)";
 		argNames = new String[] {"arrays", "axis"};
@@ -282,6 +294,7 @@ class ConcatenateFunction extends KeywordFunction {
 	}
 }
 class ConvolveFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ConvolveFunction() {
 		docString = "convolve(a, b, mode=0)";
 		argNames = new String[] {"a", "b", "mode"};
@@ -292,6 +305,7 @@ class ConvolveFunction extends KeywordFunction {
 	}
 }
 class Cross_correlateFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	Cross_correlateFunction() {
 		docString = "cross_correlate(a, b, mode=0)";
 		argNames = new String[] {"a", "b", "mode"};
@@ -302,6 +316,7 @@ class Cross_correlateFunction extends KeywordFunction {
 	}
 }
 class DiagonalFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	DiagonalFunction() {
 		docString = "diagonal(a, offset=0, axis=-2)";
 		argNames = new String[] {"a", "offset", "axis"};
@@ -312,6 +327,7 @@ class DiagonalFunction extends KeywordFunction {
 	}
 }
 class DotFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	DotFunction() {
 		docString = "dot(a, b, axisA=-1, axisB=0)";
 		argNames = new String[] {"a", "b", "axisA", "axisB"};
@@ -322,6 +338,7 @@ class DotFunction extends KeywordFunction {
 	}
 }
 class FromfunctionFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	FromfunctionFunction() {
 		docString = "fromfunction(function, dimensions)";
 		argNames = new String[] {"function", "dimensions"};
@@ -332,6 +349,7 @@ class FromfunctionFunction extends KeywordFunction {
 	}
 }
 class FromstringFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	FromstringFunction() {
 		docString = "fromstring(string, typecode)";
 		argNames = new String[] {"string", "typecode"};
@@ -343,6 +361,7 @@ class FromstringFunction extends KeywordFunction {
 	}
 }
 class IdentityFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	IdentityFunction() {
 		docString = "identity(n)"; 
 		argNames = new String[] {"n"};
@@ -358,6 +377,7 @@ class IdentityFunction extends KeywordFunction {
 	}
 }
 class IndicesFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	IndicesFunction() {
 		docString = "indices(dimensions, typecode=None)"; 
 		argNames = new String[] {"dimensions", "typecode"};
@@ -370,6 +390,7 @@ class IndicesFunction extends KeywordFunction {
 	}
 }
 class InnerproductFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	InnerproductFunction() {
 		docString = "innerproduct(a, b, axisA=-1, axisB=-1)";
 		argNames = new String[] {"a", "b", "axisA", "axisB"};
@@ -380,6 +401,7 @@ class InnerproductFunction extends KeywordFunction {
 	}
 }
 class NonzeroFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	NonzeroFunction() {
 		docString = "nonzero(a)";
 		argNames = new String[] {"a"};
@@ -392,6 +414,7 @@ class NonzeroFunction extends KeywordFunction {
 	}
 }
 class OnesFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	OnesFunction() {
 		docString = "ones(shape, typecode=None)";
 		argNames = new String[] {"shape", "typecode"};
@@ -406,6 +429,7 @@ class OnesFunction extends KeywordFunction {
 	}
 }
 class RepeatFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	RepeatFunction() {
 		docString = "repeat(a, repeats, axis=0)";
 		argNames = new String[] {"a", "repeats", "axis"};
@@ -416,6 +440,7 @@ class RepeatFunction extends KeywordFunction {
 	}
 }
 class ReshapeFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ReshapeFunction() {
 		docString = "reshape(a, shape)";
 		argNames = new String[] {"a", "shape"};
@@ -426,6 +451,7 @@ class ReshapeFunction extends KeywordFunction {
 	}
 }
 class ResizeFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ResizeFunction() {
 		docString = "resize(a, shape)";
 		argNames = new String[] {"a", "shape"};
@@ -436,6 +462,7 @@ class ResizeFunction extends KeywordFunction {
 	}
 }
 class RavelFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	RavelFunction() {
 		docString = "ravel(a)";
 		argNames = new String[] {"a"};
@@ -446,6 +473,7 @@ class RavelFunction extends KeywordFunction {
 	}
 }
 class SearchsortedFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	SearchsortedFunction() {
 		docString = "searchsorted(a, values)";
 		argNames = new String[] {"a", "values"};
@@ -456,6 +484,7 @@ class SearchsortedFunction extends KeywordFunction {
 	}
 }
 class ShapeFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ShapeFunction() {
 		docString = "shape(a)";
 		argNames = new String[] {"a"};
@@ -470,6 +499,7 @@ class ShapeFunction extends KeywordFunction {
 	}
 }
 class SortFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	SortFunction() {
 		docString = "sort(a, axis=-1)";
 		argNames = new String[] {"a", "axis"};
@@ -480,6 +510,7 @@ class SortFunction extends KeywordFunction {
 	}
 }
 class TakeFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	TakeFunction() {
 		docString = "sort(a, indices, axis=-1)";
 		argNames = new String[] {"a", "indices", "axis"};
@@ -490,6 +521,7 @@ class TakeFunction extends KeywordFunction {
 	}
 }
 class TraceFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	TraceFunction() {
 		docString = "trace(a, offset=0, axis1=-2, axis1=-1)";
 		argNames = new String[] {"a", "offset", "axis1", "axis2"};
@@ -501,6 +533,7 @@ class TraceFunction extends KeywordFunction {
 	} 
 }
 class TransposeFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	TransposeFunction() {
 		docString = "transpose(a, axes=None)";
 		argNames = new String[] {"a", "axes"};
@@ -523,6 +556,7 @@ class TransposeFunction extends KeywordFunction {
 	}
 }
 class WhereFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	WhereFunction() {
 		docString = "where(condition, x, y)";
 		argNames = new String[] {"condition", "x", "y"};
@@ -534,6 +568,7 @@ class WhereFunction extends KeywordFunction {
 	}
 }
 class ZerosFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ZerosFunction() {
 		docString = "zeros(shape, typecode=None)";
 		argNames = new String[] {"shape", "typecode"};
@@ -549,6 +584,7 @@ class ZerosFunction extends KeywordFunction {
 
 // Abbreviations
 class SumFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	SumFunction() {
 		docString = "sum(a, [axis])";
 		argNames = new String[] {"a", "axis"};
@@ -559,6 +595,7 @@ class SumFunction extends KeywordFunction {
 	}
 }
 class CumsumFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	CumsumFunction() {
 		docString = "cumsum(a, [axis])";
 		argNames = new String[] {"a", "axis"};
@@ -569,6 +606,7 @@ class CumsumFunction extends KeywordFunction {
 	}
 }
 class ProductFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	ProductFunction() {
 		docString = "product(a, [axis])";
 		argNames = new String[] {"a", "axis"};
@@ -579,6 +617,7 @@ class ProductFunction extends KeywordFunction {
 	}
 }
 class CumproductFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	CumproductFunction() {
 		docString = "cumproduct(a, [axis])";
 		argNames = new String[] {"a", "axis"};
@@ -589,6 +628,7 @@ class CumproductFunction extends KeywordFunction {
 	}
 }
 class AlltrueFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	AlltrueFunction() {
 		docString = "alltrue(a, [axis])";
 		argNames = new String[] {"a", "axis"};
@@ -599,6 +639,7 @@ class AlltrueFunction extends KeywordFunction {
 	}
 }
 class SometrueFunction extends KeywordFunction {
+	private static final long serialVersionUID = 1L;
 	SometrueFunction() {
 		docString = "sometrue(a, [axis])";
 		argNames = new String[] {"a", "axis"};

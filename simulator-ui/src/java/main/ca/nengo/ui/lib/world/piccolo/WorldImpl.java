@@ -51,7 +51,6 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * Padding to use around objects when zooming in on them
 	 */
 	private static final double OBJECT_ZOOM_PADDING = 100;
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Whether tooltips are enabled

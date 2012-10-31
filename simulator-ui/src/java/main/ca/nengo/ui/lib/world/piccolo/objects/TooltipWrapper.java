@@ -16,7 +16,6 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 
 public class TooltipWrapper extends WorldObjectImpl implements Listener {
 
-	private static final long serialVersionUID = 1L;
 	private PActivity fadeInActivity, fadeInPhase2Activity;
 	private WorldObject target;
 	private WorldSky parent;

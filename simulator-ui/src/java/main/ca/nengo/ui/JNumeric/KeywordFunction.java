@@ -12,6 +12,7 @@ package ca.nengo.ui.JNumeric;
 
 import org.python.core.*;
 public class KeywordFunction extends PyObject {
+	private static final long serialVersionUID = 1L;
     public KeywordFunction() {
       super(PyType.fromClass(KeywordFunction.class)) ;
       this.javaProxy = this ;

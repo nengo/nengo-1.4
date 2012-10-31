@@ -36,7 +36,6 @@ import ca.nengo.ui.lib.objects.models.ModelObject.ModelListener;
  */
 public class UIProjectionWell extends LineWell {
 
-	private static final long serialVersionUID = 1L;
 	private final UIOrigin myOrigin;
 
 	public UIProjectionWell(UIOrigin myOrigin) {

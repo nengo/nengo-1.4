@@ -36,7 +36,6 @@ import ca.nengo.ui.lib.world.piccolo.primitives.Path;
  * @author Shu Wu
  */
 public class NodeIcon extends ModelIcon {
-	private static final long serialVersionUID = 1L;
 
 	public NodeIcon(ModelObject parent) {
 		super(parent, Path.createEllipse(0, 0, 50, 50));

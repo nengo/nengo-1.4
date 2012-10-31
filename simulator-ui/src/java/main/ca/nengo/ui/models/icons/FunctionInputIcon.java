@@ -44,8 +44,6 @@ public class FunctionInputIcon extends ModelIcon {
 	public static final String TEXT = "f(t)";
 	private static final int PADDING = 10;
 
-	private static final long serialVersionUID = 1L;
-
 	public FunctionInputIcon(ModelObject parent) {
 		super(parent, createTextIcon());
 	}

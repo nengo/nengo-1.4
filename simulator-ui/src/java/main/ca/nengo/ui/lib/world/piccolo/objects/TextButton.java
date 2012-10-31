@@ -18,8 +18,6 @@ public class TextButton extends AbstractButton {
 
 	private static final int BORDER_WIDTH = 5;
 
-	private static final long serialVersionUID = -8982670127440624596L;
-
 	private final Path frame;
 
 	private final Text myTextNode;

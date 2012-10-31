@@ -10,5 +10,5 @@ package ca.nengo.ui.JNumeric;
 *
 */
 
-public class Numeric extends JNumeric {}
+public class Numeric extends JNumeric {private static final long serialVersionUID = 1L;}
 

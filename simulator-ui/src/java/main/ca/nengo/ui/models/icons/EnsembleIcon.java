@@ -39,8 +39,6 @@ import ca.nengo.ui.models.nodes.UIEnsemble;
  * @author Shu Wu
  */
 public class EnsembleIcon extends NodeContainerIcon {
-	private static final long serialVersionUID = 1L;
-
 	public EnsembleIcon(UIEnsemble parent) {
 
 		super(parent, new VectorIcon());

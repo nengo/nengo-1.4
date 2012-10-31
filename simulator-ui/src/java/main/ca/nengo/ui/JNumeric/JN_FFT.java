@@ -14,6 +14,7 @@ import org.python.core.*;
 // There are faster ways to do much of this, but I'm writing the simplest possible FFT.
 
 public class JN_FFT extends PyObject {
+	private static final long serialVersionUID = 1L;
     public JN_FFT() {
       super(PyType.fromClass(JN_FFT.class)) ;
       this.javaProxy = this ;

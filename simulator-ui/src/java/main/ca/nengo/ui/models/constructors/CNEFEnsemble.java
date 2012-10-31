@@ -200,8 +200,6 @@ class PApproximator extends Property {
 
 		private static SignItem[] items = { unconstrained, positive, negative };
 
-		private static final long serialVersionUID = 1L;
-
 		private JComboBox comboBox;
 		private JButton setButton;
 
@@ -320,8 +318,7 @@ class PEncodingDistribution extends Property {
 
 	static class Slider extends PropertyInputPanel {
 		private static final int NUMBER_OF_TICKS = 1000;
-		private static final long serialVersionUID = 1L;
-
+		
 		private JSlider sliderSwing;
 		private JLabel sliderValueLabel;
 
@@ -423,8 +420,6 @@ class PSign extends Property {
 
 		private static SignItem[] items = { new SignItem("Unconstrained", Sign.Unconstrained),
 				new SignItem("Positive", Sign.Positive), new SignItem("Negative", Sign.Negative) };
-
-		private static final long serialVersionUID = 1L;
 
 		private JComboBox comboBox;
 

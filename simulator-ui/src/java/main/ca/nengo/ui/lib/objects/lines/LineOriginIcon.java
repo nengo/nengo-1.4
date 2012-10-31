@@ -18,8 +18,6 @@ public class LineOriginIcon extends WorldObjectImpl {
 
 	private static final int _LINE_END_WIDTH = 30;
 
-	private static final long serialVersionUID = 1L;
-
 	protected static final double ICON_RADIUS = Math
 			.sqrt((_LINE_END_WIDTH * _LINE_END_WIDTH)
 					+ (_LINE_END_HEIGHT * _LINE_END_HEIGHT)) / 2;

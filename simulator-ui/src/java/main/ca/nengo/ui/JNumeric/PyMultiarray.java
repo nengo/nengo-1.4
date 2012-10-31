@@ -25,6 +25,7 @@ import java.util.Comparator;
 
 @SuppressWarnings({"JavaDoc"})
 public class PyMultiarray extends PySequence {
+	private static final long serialVersionUID = 1L;
 
     //
     // Variables and the basic constructor for Multiarray.

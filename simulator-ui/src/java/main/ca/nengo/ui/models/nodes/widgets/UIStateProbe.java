@@ -61,8 +61,6 @@ public class UIStateProbe extends UIProbe {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-
 	private static Probe createProbe(UINeoNode nodeAttachedTo, String state)
 			throws SimulationException {
 

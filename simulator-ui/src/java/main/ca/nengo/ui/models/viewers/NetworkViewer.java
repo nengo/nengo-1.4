@@ -77,8 +77,6 @@ import edu.umd.cs.piccolo.util.PBounds;
 public class NetworkViewer extends NodeViewer implements NodeContainer {
 	private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
 
-	private static final long serialVersionUID = -3018937112672942653L;
-
 	/**
 	 * Name given to the current layout by default, saved when the viewer is
 	 * closed

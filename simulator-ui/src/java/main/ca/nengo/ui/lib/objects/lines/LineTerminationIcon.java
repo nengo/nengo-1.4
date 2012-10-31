@@ -16,8 +16,6 @@ import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
  */
 public class LineTerminationIcon extends WorldObjectImpl {
 
-	private static final long serialVersionUID = 1L;
-
 	static final int LINE_IN_HEIGHT = 30;
 
 	static final int LINE_IN_WIDTH = 30;

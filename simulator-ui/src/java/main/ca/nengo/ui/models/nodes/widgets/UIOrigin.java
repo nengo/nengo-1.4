@@ -67,8 +67,6 @@ public abstract class UIOrigin extends Widget {
 		}
 	}
 
-	private static final long serialVersionUID = 1L;
-
 	private static final String typeName = "Origin";
 
 	private boolean isExposed = false;

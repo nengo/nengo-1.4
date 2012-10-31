@@ -37,8 +37,6 @@ import ca.nengo.ui.models.icons.NodeIcon;
  */
 public class UINeuron extends UINeoNode {
 
-	private static final long serialVersionUID = 1L;
-
 	public UINeuron(Neuron model) {
 		super(model);
 		init();

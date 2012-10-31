@@ -55,7 +55,6 @@ import ca.nengo.ui.models.tooltips.TooltipBuilder;
  * @author Shu Wu
  */
 public class UINEFEnsemble extends UIEnsemble {
-	private static final long serialVersionUID = 1L;
 
 	public static final String typeName = "NEFEnsemble";
 

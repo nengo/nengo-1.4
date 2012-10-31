@@ -41,8 +41,6 @@ public class WorldObjectImpl implements WorldObject {
 
 	private static Hashtable<Property, String> EVENT_CONVERSION_TABLE_2;
 
-	private static final long serialVersionUID = 1L;
-
 	public static final Object[][] CONVERSION_MAP = new Object[][] {
 			{ Property.PARENTS_CHANGED, PNode.PROPERTY_PARENT },
 			{ Property.BOUNDS_CHANGED, PNode.PROPERTY_BOUNDS },

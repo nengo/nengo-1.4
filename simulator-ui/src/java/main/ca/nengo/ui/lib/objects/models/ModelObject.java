@@ -25,8 +25,6 @@ import ca.nengo.ui.models.tooltips.TooltipBuilder;
  */
 public abstract class ModelObject extends ElasticObject implements Interactable {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * The property name that identifies a change in this node's Model
 	 */

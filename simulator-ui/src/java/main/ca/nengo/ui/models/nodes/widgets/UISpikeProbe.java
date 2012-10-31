@@ -32,8 +32,6 @@ import ca.nengo.ui.models.tooltips.TooltipBuilder;
 
 public class UISpikeProbe extends UIProbe {
 
-	private static final long serialVersionUID = 1L;
-
 	public UISpikeProbe(UIEnsemble nodeAttachedTo) {
 		super(nodeAttachedTo, nodeAttachedTo.getModel());
 

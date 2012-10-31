@@ -61,7 +61,6 @@ import edu.umd.cs.piccolo.util.PBounds;
  * @author Shu
  */
 public abstract class NodeViewer extends ElasticWorld implements Interactable {
-	private static final long serialVersionUID = 1L;
 
 	private MyNodeListener myNodeListener;
 

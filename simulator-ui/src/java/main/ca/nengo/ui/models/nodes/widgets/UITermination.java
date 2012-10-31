@@ -52,7 +52,6 @@ import ca.nengo.ui.models.tooltips.TooltipBuilder;
  * @author Shu Wu
  */
 public abstract class UITermination extends Widget implements ILineTermination {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Factory method for creating a UI Wrapper around a termination
