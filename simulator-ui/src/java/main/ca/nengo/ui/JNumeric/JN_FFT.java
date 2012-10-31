@@ -10,7 +10,6 @@
 
 package ca.nengo.ui.JNumeric;
 import org.python.core.*;
-import java.lang.*;
 
 // There are faster ways to do much of this, but I'm writing the simplest possible FFT.
 

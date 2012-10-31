@@ -35,7 +35,6 @@ import ca.nengo.model.Termination;
 import ca.nengo.model.neuron.ExpandableSynapticIntegrator;
 import ca.nengo.model.neuron.SpikeGenerator;
 import ca.nengo.model.neuron.SynapticIntegrator;
-import ca.nengo.util.VisiblyMutableUtils;
 
 /**
  * A SpikingNeuron with an ExpandableSynapticIntegrator.

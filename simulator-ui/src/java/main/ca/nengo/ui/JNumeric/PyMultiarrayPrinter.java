@@ -10,9 +10,6 @@
 
 package ca.nengo.ui.JNumeric;
 import org.python.core.*;
-import java.lang.reflect.Array;
-
-
 
 // Inspired by the ArrayPrinter module of CPython written by Konrad Hinsen and
 // modified by Jim Fulton.

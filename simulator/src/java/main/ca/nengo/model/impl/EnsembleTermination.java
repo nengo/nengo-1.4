@@ -32,8 +32,6 @@ import ca.nengo.model.Node;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
-import ca.nengo.model.nef.impl.DecodedTermination;
-import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 
 /**
  * <p>A Termination that is composed of Terminations onto multiple Nodes.

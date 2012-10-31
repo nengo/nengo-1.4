@@ -3,7 +3,6 @@ package ca.nengo.ui.lib.objects.activities;
 import javax.swing.SwingUtilities;
 
 import ca.nengo.ui.lib.actions.StandardAction;
-import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.NengoGraphics;
 

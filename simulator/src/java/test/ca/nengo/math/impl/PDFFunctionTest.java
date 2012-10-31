@@ -7,9 +7,6 @@ import junit.framework.TestCase;
 import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
 import ca.nengo.model.StructuralException;
-import ca.nengo.model.Units;
-import ca.nengo.util.TimeSeries;
-import ca.nengo.util.impl.TimeSeries1DImpl;
 
 /**
  * Unit tests for TimeSeriesFunction.

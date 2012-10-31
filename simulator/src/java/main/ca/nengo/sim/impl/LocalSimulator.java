@@ -54,7 +54,6 @@ import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
-import ca.nengo.util.impl.ProbeTask;
 
 /**
  * A Simulator that runs locally (ie in the Java Virtual Machine in which it is

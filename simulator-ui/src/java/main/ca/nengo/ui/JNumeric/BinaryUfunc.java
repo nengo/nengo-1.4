@@ -10,7 +10,6 @@
 
 package ca.nengo.ui.JNumeric;
 import org.python.core.*;
-import org.python.expose.ExposedMethod;
 
 import java.lang.reflect.Array;
 
