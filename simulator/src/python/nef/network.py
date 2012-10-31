@@ -11,43 +11,46 @@ class Network:
         self.name=name
         self.dt=0.001
         self.seed=seed        
-        self.node={}
-        self.tick=None
-        self.tick_nodes=[]
+        self.node={}            # all the nodes in the network, indexed by name
+        self.theano_tick=None   # the function to call to run the theano protions of the model ahead one timestep
+        self.tick_nodes=[]      # the list of nodes who have non-theano code that must be run each timestep
         if seed is not None:
             self.random=random.Random()
             self.random.seed(seed)
             
-    def add(self,node):
-        self.tick_nodes.append(node)        
-        self.node[node.name]=node
-    
+    # make an ensemble,  Note that all ensembles are actually arrays of length 1        
     def make(self,name,neurons,dimensions,array_count=1,intercept=(-1,1),seed=None,type='lif'):
         if seed is None:
             if self.seed is not None: 
                 seed=self.random.randrange(0x7fffffff)
     
-        self.tick=None  # just in case the model has been run previously
+        self.theano_tick=None  # just in case the model has been run previously, as adding a new node means we have to rebuild the theano function
         e=ensemble.Ensemble(neurons,dimensions,count=array_count,intercept=intercept,dt=self.dt,seed=seed,type=type)        
         self.node[name]=e
     def make_array(self,name,neurons,count,dimensions=1,**args):
         return self.make(name=name,neurons=neurons,dimensions=dimensions,array_count=count,**args)
     
+    # create an input
     def make_input(self,name,value,zero_after=None):
         self.add(input.Input(name,value,zero_after=zero_after))
             
+    # add an arbitrary non-theano node (used for Input now, should be used for SimpleNodes when those get implemented
+    def add(self,node):
+        self.tick_nodes.append(node)        
+        self.node[node.name]=node
+    
         
     def connect(self,pre,post,transform=None,pstc=0.01,func=None,origin_name=None):
-        self.tick=None  # just in case the model has been run previously
+        self.theano_tick=None  # just in case the model has been run previously, as adding a new node means we have to rebuild the theano function
                         
         pre=self.node[pre]
         post=self.node[post]
-        if hasattr(pre,'value'):
+        if hasattr(pre,'value'):   # used for Input objects now, could also be used for SimpleNode origins when they are written
             assert func is None
             value=pre.value
-        else:           
+        else:  # this should only be used for ensembles (maybe reorganize this if statement to check if it is an ensemble?)          
             if func is not None:
-                if origin_name is None: origin_name=func.__name__
+                if origin_name is None: origin_name=func.__name__   #TODO: better analysis to see if we need to build a new origin (rather than just relying on the name)
                 if origin_name not in pre.origin:
                     pre.add_origin(origin_name,func)                
                 value=pre.origin[origin_name].value
@@ -65,13 +68,13 @@ class Network:
         
     run_time=0.0    
     def run(self,time):
-        if self.tick is None: self.tick=self.make_tick()
+        if self.theano_tick is None: self.theano_tick=self.make_tick()
         for i in range(int(time/self.dt)):
             t=self.run_time+i*self.dt
-            for node in self.tick_nodes: 
+            for node in self.tick_nodes:    # run the non-theano nodes
                 node.t=t
                 node.tick()
-            self.tick()
+            self.theano_tick()               # run the theano nodes
         self.run_time+=time   
             
         

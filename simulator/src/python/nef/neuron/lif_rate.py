@@ -4,6 +4,8 @@ from theano import tensor as TT
 
 from neuron import Neuron
 
+# an example of implementing a rate-mode neuron
+
 class LIFRateNeuron(Neuron):
     def __init__(self,size,dt=0.001,t_rc=0.02,t_ref=0.002):
         Neuron.__init__(self,size,dt)
