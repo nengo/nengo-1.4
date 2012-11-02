@@ -154,6 +154,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		this.marqueeParent = world.getSky();
 		this.selectableParent = world.getGround();
 		this.panHandler = panHandler;
+		panHandler.setSelectionHandler(this);
 		setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
 		init();
 	}
