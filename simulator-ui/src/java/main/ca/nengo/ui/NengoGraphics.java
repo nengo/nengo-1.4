@@ -263,6 +263,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
     }
 
+    /**
+     * Find and initialize the main simulator source code
+     */
     private void initializeSimulatorSourceFiles() {
 
         String savedSourceLocation = NengoConfigManager.getNengoConfig().getProperty("simulator_source");
