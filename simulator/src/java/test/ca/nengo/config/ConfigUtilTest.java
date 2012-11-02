@@ -16,28 +16,28 @@ public class ConfigUtilTest extends TestCase {
     public void testNothing() {
     }
 
-    public static void main(String[] args) {
-        Object foo = new Object() {
-            public int getFooCount() {
-                return 0;
-            }
-
-            public int getNumFoo() {
-                return 0;
-            }
-
-            public int[] getAllFoo() {
-                return new int[0];
-            }
-
-            public int[] getFooArray() {
-                return new int[0];
-            }
-
-            public int[] getFooList() {
-                return new int[0];
-            }
-        };
+//    public static void main(String[] args) {
+//        Object foo = new Object() {
+//            public int getFooCount() {
+//                return 0;
+//            }
+//
+//            public int getNumFoo() {
+//                return 0;
+//            }
+//
+//            public int[] getAllFoo() {
+//                return new int[0];
+//            }
+//
+//            public int[] getFooArray() {
+//                return new int[0];
+//            }
+//
+//            public int[] getFooList() {
+//                return new int[0];
+//            }
+//        };
 
 //        try {
 //            System.out.println(ConfigUtil.isCounter(foo.getClass().getMethod("toString",
@@ -58,5 +58,5 @@ public class ConfigUtilTest extends TestCase {
 //        } catch (NoSuchMethodException e) {
 //            e.printStackTrace();
 //        }
-    }
+//    }
 }

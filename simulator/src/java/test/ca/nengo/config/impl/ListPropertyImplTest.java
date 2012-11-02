@@ -362,6 +362,8 @@ public class ListPropertyImplTest extends TestCase {
 					System.exit(0);
 				}
 			});
+			
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();

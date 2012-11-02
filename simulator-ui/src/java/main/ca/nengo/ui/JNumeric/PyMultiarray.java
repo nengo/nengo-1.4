@@ -4867,7 +4867,7 @@ public class PyMultiarray extends PySequence {
     PyMultiarray __abs__(PyMultiarray a) {
 	if (!a.isContiguous) 
 	    throw Py.ValueError("internal __abs__ requires contiguous matrix as argument");
-	int maxI = a.start + shapeToNItems(a.dimensions);
+	//int maxI = a.start + shapeToNItems(a.dimensions);
 	switch (a._typecode) {
 	case '1':
 	    byte aData1[] = (byte []) a.data;
@@ -4923,7 +4923,7 @@ public class PyMultiarray extends PySequence {
     PyMultiarray __neg__(PyMultiarray a) {
 	if (!a.isContiguous) 
 	    throw Py.ValueError("internal __neg__ requires contiguous matrix as argument");
-	int maxI = a.start + shapeToNItems(a.dimensions);
+	//int maxI = a.start + shapeToNItems(a.dimensions);
 	switch (a._typecode) {
 	case '1':
 	    byte aData1[] = (byte []) a.data;
@@ -4979,7 +4979,7 @@ public class PyMultiarray extends PySequence {
     PyMultiarray __not__(PyMultiarray a) {
 	if (!a.isContiguous) 
 	    throw Py.ValueError("internal __not__ requires contiguous matrix as argument");
-	int maxI = a.start + shapeToNItems(a.dimensions);
+	//int maxI = a.start + shapeToNItems(a.dimensions);
 	switch (a._typecode) {
 	case '1':
 	    byte aData1[] = (byte []) a.data;
