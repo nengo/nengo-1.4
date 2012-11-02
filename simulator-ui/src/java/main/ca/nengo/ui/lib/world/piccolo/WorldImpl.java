@@ -250,10 +250,9 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here", (NodeContainer)this));
 		}
 		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
-		MenuBuilder windowsMenu = menu.addSubMenu("Windows");
+		/*MenuBuilder windowsMenu = menu.addSubMenu("Windows");
 		windowsMenu.addAction(new CloseAllWindows("Close all"));
-		windowsMenu.addAction(new MinimizeAllWindows("Minimize all"));
-
+		windowsMenu.addAction(new MinimizeAllWindows("Minimize all"));*/
 	}
 
 	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {

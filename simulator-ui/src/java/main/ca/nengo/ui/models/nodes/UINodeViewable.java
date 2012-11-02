@@ -65,7 +65,7 @@ public abstract class UINodeViewable extends UINeoNode {
 		tooltips.addProperty("# Nodes", "" + getNodesCount());
 	}
 
-	@Override
+	/*@Override
 	protected void constructViewMenu(AbstractMenuBuilder menu) {
 		super.constructViewMenu(menu);
 
@@ -101,7 +101,7 @@ public abstract class UINodeViewable extends UINeoNode {
 //				createBrainViewer();
 //			}
 //		});
-	}
+	}*/
 
 	/**
 	 * Creates a new Viewer

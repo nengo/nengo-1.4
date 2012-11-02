@@ -526,7 +526,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         } else {
             cutAction = new DisabledAction("Cut", "No object selected");
             copyAction = new DisabledAction("Copy", "No object selected");
-            removeAction = new DisabledAction("Copy", "No objects to remove");
+            removeAction = new DisabledAction("Remove", "No objects to remove");
         }
 
         Node node = getClipboard().getContents();

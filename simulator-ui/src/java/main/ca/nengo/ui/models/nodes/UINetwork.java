@@ -75,11 +75,11 @@ public class UINetwork extends UINodeViewable {
 
 	public static final String typeName = "Network";
 
-	public static void constructSimulatorMenu(PopupMenuBuilder menu, UINetwork network) {
+	/*public static void constructSimulatorMenu(PopupMenuBuilder menu, UINetwork network) {
 		menu.addSection("Simulator");
 		menu.addAction(new RunSimulatorAction("Run " + network.getName(), network));
 		menu.addAction(new RunInteractivePlotstAction(network));
-	}
+	}*/
 
 	/**
 	 * @param wo
@@ -115,11 +115,11 @@ public class UINetwork extends UINodeViewable {
 		getModel().getSimulator().addChangeListener(mySimulatorListener);
 	}
 
-	@Override
+	/*@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
 		constructSimulatorMenu(menu, this);
-	}
+	}*/
 
 	@Override
 	protected void constructTooltips(TooltipBuilder tooltips) {

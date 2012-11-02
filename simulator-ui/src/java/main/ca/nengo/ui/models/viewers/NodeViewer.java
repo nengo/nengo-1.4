@@ -272,17 +272,15 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 
 	}
 
-	@Override
+	/*@Override
 	public void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
-
-		/*
-		 * File menu
-		 */
+		
+		// File menu
 		menu.addSection("File");
 		menu.addAction(new SaveNodeAction(getViewerParent()));
 
-	}
+	}*/
 
 	/**
 	 * @return NEO Model represented by the viewer

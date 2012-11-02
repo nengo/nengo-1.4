@@ -141,14 +141,14 @@ public abstract class UITermination extends Widget implements ILineTermination {
 		tooltips.addProperty("Modulatory", String.valueOf(getModel().getModulatory()));
 	}
 
-	@Override
+	/*@Override
 	protected void constructWidgetMenu(AbstractMenuBuilder menu) {
 		super.constructWidgetMenu(menu);
 
 		if (getConnector() != null) {
 			menu.addAction(new DisconnectAction("Disconnect"));
 		}
-	}
+	}*/
 
 	/**
 	 * Destroys the termination model
