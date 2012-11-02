@@ -7,8 +7,13 @@ import neuron
 import origin
 
 # generates a set of encoders
-def make_encoders(neurons,dimensions,srng):
-    encoders=srng.normal((neurons,dimensions))
+def make_encoders(neurons,dimensions,srng,encoders=None):
+    if encoders is None:
+        encoders=srng.normal((neurons,dimensions))
+    else:    
+        encoders=numpy.array(encoders)
+        encoders=numpy.tile(encoders,(neurons/len(encoders)+1,1))[:neurons,:dimensions]
+        
     norm=TT.sum(encoders*encoders,axis=[1],keepdims=True)
     encoders=encoders/TT.sqrt(norm)        
     return theano.function([],encoders)()
@@ -28,7 +33,7 @@ class Accumulator:
             
         
 class Ensemble:
-    def __init__(self,neurons,dimensions,count=1,max_rate=(200,300),intercept=(-1.0,1.0),t_ref=0.002,t_rc=0.02,seed=None,type='lif',dt=0.001):
+    def __init__(self,neurons,dimensions,count=1,max_rate=(200,300),intercept=(-1.0,1.0),t_ref=0.002,t_rc=0.02,seed=None,type='lif',dt=0.001,encoders=None):
         self.seed=seed
         self.neurons=neurons
         self.dimensions=dimensions
@@ -45,8 +50,8 @@ class Ensemble:
         alpha,self.bias=theano.function([],self.neuron.make_alpha_bias(max_rates,threshold))()
         self.bias=self.bias.astype('float32')
                 
-        # compute encoders        
-        self.encoders=make_encoders(neurons,dimensions,srng)
+        # compute encoders
+        self.encoders=make_encoders(neurons,dimensions,srng,encoders=encoders)
         self.encoders=(self.encoders.T*alpha).T
         
         # make default origin

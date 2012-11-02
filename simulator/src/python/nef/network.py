@@ -19,13 +19,13 @@ class Network:
             self.random.seed(seed)
             
     # make an ensemble,  Note that all ensembles are actually arrays of length 1        
-    def make(self,name,neurons,dimensions,array_count=1,intercept=(-1,1),seed=None,type='lif'):
+    def make(self,name,neurons,dimensions,array_count=1,intercept=(-1,1),seed=None,type='lif',encoders=None):
         if seed is None:
             if self.seed is not None: 
                 seed=self.random.randrange(0x7fffffff)
     
         self.theano_tick=None  # just in case the model has been run previously, as adding a new node means we have to rebuild the theano function
-        e=ensemble.Ensemble(neurons,dimensions,count=array_count,intercept=intercept,dt=self.dt,seed=seed,type=type)        
+        e=ensemble.Ensemble(neurons,dimensions,count=array_count,intercept=intercept,dt=self.dt,seed=seed,type=type,encoders=encoders)        
         self.node[name]=e
     def make_array(self,name,neurons,count,dimensions=1,**args):
         return self.make(name=name,neurons=neurons,dimensions=dimensions,array_count=count,**args)
