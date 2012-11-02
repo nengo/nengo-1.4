@@ -86,7 +86,6 @@ import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.constructors.CNetwork;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.script.ScriptConsole;
-import ca.nengo.ui.script.ScriptEditor;
 import ca.nengo.ui.util.NengoClipboard;
 import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
@@ -728,10 +727,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
         menuBar.add(viewMenu.getJMenu());
 
-        viewMenu.addAction(new OpenScriptEditor("Open Script Editor"),
-                KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, MENU_SHORTCUT_KEY_MASK));
-
         int count = 1;
         for (AuxillarySplitPane splitPane : splitPanes) {
             byte shortCutChar = splitPane.getAuxTitle().getBytes()[0];
@@ -883,21 +878,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         public AuxillarySplitPane toJComponent() {
             return auxSplitPane;
         }
-    }
-
-    class OpenScriptEditor extends StandardAction {
-
-        private static final long serialVersionUID = 1L;
-
-        public OpenScriptEditor(String description) {
-            super(description);
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            ScriptEditor.openEditor();
-        }
-
     }
 
 }
