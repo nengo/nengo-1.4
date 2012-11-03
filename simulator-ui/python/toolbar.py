@@ -353,32 +353,68 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             f=fileChooser.getSelectedFile()
 
             universe=self.ng.universe
-        
-            doc=Document()
-            writer=PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
-            doc.open()
-            cb=writer.getDirectContent()
             w=universe.size.width
             h=universe.size.height
-            pw=550
-            ph=800
-            tp=cb.createTemplate(pw,ph)
-            g2=tp.createGraphicsShapes(pw,ph)
-            at = java.awt.geom.AffineTransform()        
-            s=min(float(pw)/w,float(ph)/h)        
-            at.scale(s,s)
-            g2.transform(at)
-            #self.view.area.pdftemplate=tp,s
-            ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(False)
-            universe.paint(g2)
-            #self.view.area.pdftemplate=None
-            g2.dispose()
 
-            cb.addTemplate(tp,20,0)
-            doc.close()
-            ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(True)
+            if( False ):
+                # basic method: make a PDF page the same size as the Nengo window.
+                #   This method preserves all details visible in the GUI
+                pw = w
+                ph = h
+
+                # create PDF document and writer
+                doc = Document( Rectangle(pw,ph), 0, 0, 0, 0 )
+                writer = PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
+                doc.open()
+                cb = writer.getDirectContent()
+
+                # create a template, print the image to it, and add it to the page
+                tp = cb.createTemplate(pw,ph)
+                g2 = tp.createGraphicsShapes(pw,ph)
+                universe.paint(g2)
+                g2.dispose()
+                cb.addTemplate(tp,0,0)
+
+                # clean up everything
+                doc.close()
+
+            else:
+                # Top of page method: prints to the top of the page
+                pw = 550
+                ph = 800
+        
+                # create PDF document and writer
+                doc = Document()
+                writer = PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
+                doc.open()
+                cb = writer.getDirectContent()
+
+                # create a template
+                tp = cb.createTemplate(pw,ph)
+                g2 = tp.createGraphicsShapes(pw,ph)
+
+                # scale the template to fit the page
+                at = java.awt.geom.AffineTransform()        
+                s = min(float(pw)/w,float(ph)/h)        
+                at.scale(s,s)
+                g2.transform(at)
+
+                # print the image to the template
+                # turing off setUseGreekThreshold allows small text to print
+                ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(False)
+                universe.paint(g2)
+                ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(True)
+                g2.dispose()
+
+                # add the template
+                cb.addTemplate(tp,20,0)
+
+                # clean up everything
+                doc.close()
      
-ng=ca.nengo.ui.NengoGraphics.getInstance()
-toolbar=ToolBar()
+################################################################################
+### Main
+ng = ca.nengo.ui.NengoGraphics.getInstance()
+toolbar = ToolBar()
 ng.contentPane.revalidate()
 
