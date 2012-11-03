@@ -43,11 +43,9 @@ import ca.nengo.model.Projection;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CreateModelAdvancedAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
-import ca.nengo.ui.actions.PasteAction;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
@@ -444,12 +442,12 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 		/*
 		 * Construct simulator menu
 		 */
-		UINetwork.constructSimulatorMenu(menu, getViewerParent());
+		//UINetwork.constructSimulatorMenu(menu, getViewerParent());
 
 		/*
 		 * Create new models
 		 */
-		menu.addSection("Add model");
+		/*menu.addSection("Add model");
 		MenuBuilder createNewMenu = menu.addSubMenu("Create new");
 
 		// Nodes
@@ -464,7 +462,7 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 			}
 		}
 
-		menu.addAction(new OpenNeoFileAction(this));
+		menu.addAction(new OpenNeoFileAction(this));*/
 
 		/*
 		 * Origins & Terminations

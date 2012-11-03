@@ -472,7 +472,6 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.area.add(self.popup)
 
         self.process_nodes(network.nodes,self.popup)
-       
 
         restored=self.restore()        
         if not restored:
@@ -488,14 +487,21 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.restart=False
         self.paused=True
         self.simulating=False
-        th=java.lang.Thread(self)
-        th.priority=java.lang.Thread.MIN_PRIORITY
-        th.start()
+        self.thread=java.lang.Thread(self)
+        self.thread.priority=java.lang.Thread.MIN_PRIORITY
+        self.thread.start()
 
         if play is True or play>0:
             if isinstance(play,(int,float)):
                 self.autopause_at=play
             self.time_control.pause(None)
+
+    def close(self):
+        if( self.frame is not None ):
+            # Close the frame. This will also kill self.thread
+            self.frame.visible = False
+            self.frame.dispose()
+            self.frame = None
 
     def process_nodes(self,nodes,popup,prefix=""):
         names=[(n.name,n) for n in nodes]

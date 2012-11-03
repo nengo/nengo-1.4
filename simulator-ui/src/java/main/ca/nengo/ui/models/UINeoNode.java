@@ -241,14 +241,14 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		menu.addAction(new CopyAction("Copy", this));
 		menu.addAction(new CutAction("Cut", this));
 
-		menu.addSection("File");
-		menu.addAction(new SaveNodeAction(this));
-		menu.addAction(new RenameNodeAction("Rename"));
+//		menu.addSection("File");
+//		menu.addAction(new SaveNodeAction(this));
+//		menu.addAction(new RenameNodeAction("Rename"));
 
 		menu.addSection("View");
-		AbstractMenuBuilder docMenu = menu.addSubMenu("Documentation");
-		docMenu.addAction(new SetDocumentationAction("Set"));
-		docMenu.addAction(new ViewDocumentationAction("View"));
+//		AbstractMenuBuilder docMenu = menu.addSubMenu("Documentation");
+//		docMenu.addAction(new SetDocumentationAction("Set"));
+//		docMenu.addAction(new ViewDocumentationAction("View"));
 		constructViewMenu(menu);
 
 		menu.addSection("Data Collection");
@@ -908,7 +908,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 *
 	 * @author Shu Wu
 	 */
-	class SetDocumentationAction extends ReversableAction {
+	/*class SetDocumentationAction extends ReversableAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -954,7 +954,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 			getModel().setDocumentation(prevDoc);
 			showPopupMessage("Documentation changed");
 		}
-	}
+	}*/
 
 	/**
 	 * Action for showing all origins and terminations
@@ -1023,7 +1023,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 *
 	 * @author Shu Wu
 	 */
-	class ViewDocumentationAction extends StandardAction {
+	/*class ViewDocumentationAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -1038,5 +1038,5 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 					getModel().getDocumentation());
 		}
 
-	}
+	}*/
 }

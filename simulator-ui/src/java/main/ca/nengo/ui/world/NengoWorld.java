@@ -18,7 +18,7 @@ public class NengoWorld extends ElasticWorld implements NodeContainer {
 		super("Nengo");
 	}
 
-	@Override
+	/*@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
 
 		super.constructMenu(menu);
@@ -28,7 +28,7 @@ public class NengoWorld extends ElasticWorld implements NodeContainer {
 
 		// Create network action
 		menu.addAction(new CreateModelAction("New Network", this, new CNetwork()));
-	}
+	}*/
 
 
 	public UINeoNode addNodeModel(Node node) throws ContainerException {
