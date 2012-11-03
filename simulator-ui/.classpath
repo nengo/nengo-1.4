@@ -38,7 +38,6 @@
 	<classpathentry kind="lib" path="lib/build/lib/xstream.jar"/>
 	<classpathentry kind="lib" path="lib/colt.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
-	<classpathentry kind="lib" path="lib/iText-5.0.5.jar"/>
 	<classpathentry kind="lib" path="lib/jung-1.7.6.jar"/>
 	<classpathentry kind="lib" path="lib/jython.jar"/>
 	<classpathentry kind="lib" path="lib/piccolo.jar"/>
@@ -48,5 +47,6 @@
 	<classpathentry kind="lib" path="python/jar/vecmath.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/simulator"/>
+	<classpathentry kind="lib" path="lib/itextpdf-5.3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

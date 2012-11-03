@@ -368,12 +368,14 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             at.scale(s,s)
             g2.transform(at)
             #self.view.area.pdftemplate=tp,s
+            ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(False)
             universe.paint(g2)
             #self.view.area.pdftemplate=None
             g2.dispose()
 
             cb.addTemplate(tp,20,0)
             doc.close()
+            ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(True)
      
 ng=ca.nengo.ui.NengoGraphics.getInstance()
 toolbar=ToolBar()
