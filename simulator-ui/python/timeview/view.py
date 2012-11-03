@@ -931,7 +931,6 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         if sim is not None:
             sim.kill();
 
-
     
     
 class RoundedBorder(javax.swing.border.AbstractBorder):
