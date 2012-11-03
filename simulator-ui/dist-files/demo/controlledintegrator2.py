@@ -3,25 +3,25 @@ import nef
 #This implements the controlled integrator described in the
 #book "How to build a brain"
 net=nef.Network('Controlled Integrator 2') #Create the network object
-input=net.make_input('input',[0])  #Create a controllable input function with 
-                                   #a starting value of 0
-input.functions=[ca.nengo.math.impl.PiecewiseConstantFunction(
-    [0.2,0.3,0.44,0.54,0.8,0.9],
-    [0,5,0,-10,0,5,0])] #Change the input function (that was 0) to this
-                        #piecewise step function
-control=net.make_input('control',[0])  #Create a controllable input function
+net.make_input('input',{0.2:5, 0.3:0, 0.44:-10,
+                            0.54:0, 0.8:5, 0.9:0} )  #Create a controllable input 
+                                                     #function with a default function
+                                                     #that goes to 5 at time 0.2s, to 0 
+                                                     #at time 0.3s and so on
+                                                     
+net.make_input('control',[0])  #Create a controllable input function
                                        #with a starting value of 0
-A=net.make('A',225,2,radius=1.5,
-    quick=True) #Make a population with 225 neurons, 2 dimensions, and a 
+net.make('A',225,2,radius=1.5) 
+                #Make a population with 225 neurons, 2 dimensions, and a 
                 #larger radius to accommodate large simulataneous inputs
-net.connect(input,A,transform=[0.1,0],pstc=0.1) #Connect all the relevant
+net.connect('input','A',transform=[0.1,0],pstc=0.1) #Connect all the relevant
                                                 #objects with the relevant 1x2
                                                 #mappings, postsynaptic time
                                                 #constant is 10ms
-net.connect(control,A,transform=[0,1],pstc=0.1)
+net.connect('control','A',transform=[0,1],pstc=0.1)
 def feedback(x):
     return x[0]*x[1]+x[0] #Different than the other controlled integrator
-net.connect(A,A,transform=[1,0],func=feedback,pstc=0.1) #Create the recurrent
+net.connect('A','A',transform=[1,0],func=feedback,pstc=0.1) #Create the recurrent
                                                         #connection mapping the
                                                         #1D function 'feedback'
                                                         #into the 2D population

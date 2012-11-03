@@ -223,6 +223,8 @@ class CLIFNeuronFactory extends ConstructableNodeFactory {
 
     public CLIFNeuronFactory() {
         super("LIF Neuron", LIFNeuronFactory.class);
+        
+        pIntercept.setDescription("Range of the even distribution of x-intercepts<br />[typically -1 to 1]");
     }
 
     @Override

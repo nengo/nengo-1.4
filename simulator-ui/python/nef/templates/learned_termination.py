@@ -3,7 +3,10 @@ label='Learned\nTermination'
 icon='learn.png'
 
 params=[
-    ('errName','Name of (new) error ensemble',str),
+    ('errName','Name of (new) error ensemble',str,
+      "Provides modulatory input to the post population, "
+      "modifying its connection from the pre population."
+      "<br />Automatically created."),
     ('N_err', 'Number of neurons in error ensemble',int),
     ('preName','Name of pre ensemble',str),
     ('postName','Name of post ensemble',str),
