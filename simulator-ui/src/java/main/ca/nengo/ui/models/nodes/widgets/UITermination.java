@@ -88,6 +88,8 @@ public abstract class UITermination extends Widget implements ILineTermination {
 		myIconDefaultColor = myIcon.getColor();
 		ModelIcon iconWr = new ModelIcon(this, myIcon);
 		iconWr.configureLabel(false);
+		
+		setSelectable(true);
 
 		setIcon(iconWr);
 	}
