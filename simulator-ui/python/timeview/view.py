@@ -840,6 +840,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
     def run(self):
         sim=simulator.Simulator(self.network)
+        
+        sim.step(0,0) #this is here to initialize the thread pool threads properly
+        sim.reset(False)
 
         while self.frame.visible:
             sim.reset(False)                   
@@ -922,9 +925,9 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     #    sleep=1
                     java.lang.Thread.sleep(int(sleep))
                 last_frame_time=this_frame_time
-                
+
         if sim is not None:
-          sim.kill();
+            sim.kill();
 
 
     

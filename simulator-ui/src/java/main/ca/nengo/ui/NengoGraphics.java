@@ -821,6 +821,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     	}
     	
     }
+    
 
     class ConfigurationPane {
         AuxillarySplitPane auxSplitPane;
