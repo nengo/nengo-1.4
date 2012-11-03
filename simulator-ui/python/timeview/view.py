@@ -925,11 +925,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                     #    sleep=1
                     java.lang.Thread.sleep(int(sleep))
                 last_frame_time=this_frame_time
-                print "finished timestep"
-            print "reset"
-        print "window is closed"
+
         if sim is not None:
-            print "killing"
             sim.kill();
 
 
