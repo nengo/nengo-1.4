@@ -27,6 +27,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -62,6 +65,7 @@ import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.ProbeTask;
+import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * Default implementation of Network.
@@ -124,7 +128,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		myModeFixed = false;
 		myMetaData = new HashMap<String, Object>(20);
 		myListeners = new ArrayList<Listener>(10);
-
 
 		OrderedExposedOrigins = new LinkedList <Origin> ();
 		OrderedExposedTerminations = new LinkedList <Termination> ();
@@ -1010,6 +1013,16 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		}
 
 	}
+	
+	public void dumpToScript() throws FileNotFoundException
+	{
+		File file = new File(this.getName() + ".py");
+		PrintWriter writer = new PrintWriter(file);
+		ScriptGenerator scriptGen = new ScriptGenerator(writer);
+		scriptGen.DFS(this);
+		writer.close();
+	}
+	
 
 	/**
 	 * @see ca.nengo.model.Node#getDocumentation()
@@ -1064,6 +1077,28 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	private void fireVisibleChangeEvent() {
 		VisiblyMutableUtils.changed(this, myListeners);
 	}
+
+    public String toScript(HashMap<String, Object> scriptData) {
+        String py;
+
+        if ((Boolean)scriptData.get("isSubnet"))
+        {
+            py = String.format("%1s.add(nef.Network('%2s'))\n%3s%4s = %1s.get('%2s')",
+                    scriptData.get("netName"),
+                    myName,
+                    scriptData.get("prefix"),
+                        myName.replace(' ', (Character)scriptData.get("spaceDelim")));
+        }
+        else
+        {
+            py = String.format("%1s%2s = nef.Network('%3s')", 
+                    scriptData.get("prefix"), 
+                    myName.replace(' ', (Character)scriptData.get("spaceDelim")), 
+                    myName);
+        }
+
+        return py;
+    }
 
 	@Override
 	public Network clone() throws CloneNotSupportedException {
@@ -1189,4 +1224,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		return result;
 	}
 
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -32,6 +32,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.muscle.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -40,6 +41,7 @@ import ca.nengo.dynamics.Integrator;
 import ca.nengo.dynamics.impl.EulerIntegrator;
 import ca.nengo.dynamics.impl.RK45Integrator;
 import ca.nengo.dynamics.impl.SimpleLTISystem;
+import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
@@ -51,6 +53,7 @@ import ca.nengo.model.muscle.SkeletalMuscle;
 import ca.nengo.util.MU;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
@@ -290,6 +293,18 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 		} catch (StructuralException e) {
 			throw new CloneNotSupportedException("Problem trying to clone: " + e.getMessage());
 		}
+	}
+
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toScript(HashMap<String, Object> scriptData) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
