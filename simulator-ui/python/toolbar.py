@@ -337,7 +337,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def do_run(self,event):
         network=self.get_current_network()
         if network is not None:         
-            ca.nengo.ui.actions.RunInteractivePlotstAction(network).doAction()
+            ca.nengo.ui.actions.RunInteractivePlotsAction(network).doAction()
     def do_interrupt(self,event):
         self.ng.progressIndicator.interrupt()
     def do_pdf(self,event):
