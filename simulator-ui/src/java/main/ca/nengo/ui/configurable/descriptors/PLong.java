@@ -44,6 +44,10 @@ public class PLong extends RangedConfigParam {
     public PLong(String name) {
         super(name);
     }
+    
+    public PLong(String name, String description) {
+        super(name, description);
+    }
 
     @Override
     protected LongPanel createInputPanel() {

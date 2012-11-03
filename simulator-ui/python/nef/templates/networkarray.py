@@ -41,9 +41,9 @@ params=[
     ('radius','Radius',float,'Maximum magnitude of vector that can be represented in each ensemble'),
     ('iLow','Intercept (low)',float,'Smallest value for neurons to start firing at (between -1 and 1)'),
     ('iHigh','Intercept (high)',float,'Largest value for neurons to start firing at (between -1 and 1)'),
-    ('rLow','Max rate (low)',float,'Smallest maximum firing rate for neurons in the ensemble'),
-    ('rHigh','Max rate (high)',float,'Largest maximum firing rate for neurons in the ensemble'),
-    ('encSign','Encoding sign', PTemplateSign,'Limits the sign of encoders chosen'),
+    ('rLow','Max rate (low) [Hz]',float,'Smallest maximum firing rate for neurons in the ensemble'),
+    ('rHigh','Max rate (high) [Hz]',float,'Largest maximum firing rate for neurons in the ensemble'),
+    ('encSign','Encoding sign', PTemplateSign,'Limits the sign of the encoders'),
     ('useQuick', 'Quick mode', bool,'Uses the exact same encoders and decoders for each ensemble in the array'),
     ]
 

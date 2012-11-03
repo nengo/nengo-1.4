@@ -5,10 +5,10 @@ label='Thalamus'
 icon='thalamus.png'
     
 params=[
-    ('name','Name',str),
-    ('neurons','Neurons per dimension',int),
-    ('D','Dimensions',int),
-    ('useQuick', 'Quick mode', bool),
+    ('name','Name',str,'Name of the new thalamus sub-network'),
+    ('neurons','Neurons per dimension',int,'Number of neurons for each dimension of the thalamus'),
+    ('D','Dimensions',int,'Number of dimensions for the thalamus'),
+    ('useQuick', 'Quick mode', bool,'Whether to use quick mode'),
     ]
 
 def test_params(net,p):
