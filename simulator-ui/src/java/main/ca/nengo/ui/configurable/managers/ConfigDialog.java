@@ -364,9 +364,7 @@ public class ConfigDialog extends JDialog {
      * Initializes the dialog contents top
      */
     protected void initPanelTop(JPanel panel) {
-        /*
-         * Used by subclasses to add elements to the panel
-         */
+         //Used by subclasses to add elements to the panel
     }
 
     /**
