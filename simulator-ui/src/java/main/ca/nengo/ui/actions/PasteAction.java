@@ -41,6 +41,9 @@ public class PasteAction extends StandardAction {
     private static final long serialVersionUID = 1L;
 
     private NodeContainer nodeContainer;
+    
+    private Double posX = null;
+    private Double posY = null;
 
     /**
      * @param description TODO
@@ -58,12 +61,17 @@ public class PasteAction extends StandardAction {
         if (node != null) {
             try {
                 CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-                nodeContainer.addNodeModel(node);
+                nodeContainer.addNodeModel(node,posX,posY);
             } catch (ContainerException e) {
                 throw new ActionException(e);
             }
         } else {
             throw new ActionException("Clipboard is empty");
         }
+    }
+    
+    public void setPosition(Double x, Double y) {
+        posX = x;
+        posY = y;
     }
 }
