@@ -846,7 +846,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         sim.step(0.0,0.001)
         sim.reset(False)
 
-        while self.frame.visible:
+        while (not self.frame is None and self.frame.visible):
             sim.reset(False)                   
             # run the network for an instant so that FunctionInputs have values at their Origin so they can be read
             for n in self.network.nodes:
@@ -874,8 +874,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             self.forced_origins={}
             last_frame_time=None
             counter=0
-            while self.frame.visible:
-                while (self.paused or self.timelog.processing or self.time_control.slider.valueIsAdjusting) and not self.restart and self.frame.visible:
+            while (not self.frame is None and self.frame.visible):
+                while (self.paused or self.timelog.processing or self.time_control.slider.valueIsAdjusting) and not self.restart and (not self.frame is None and self.frame.visible):
                     java.lang.Thread.sleep(10)
                     if self.requested_mode is not None:
                         self.network.mode=self.requested_mode
@@ -883,7 +883,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 if self.requested_mode is not None:
                     self.network.mode=self.requested_mode
                     self.requested_mode=None
-                if self.restart or not self.frame.visible:
+                if self.restart or (not self.frame is None and not self.frame.visible):
                     self.restart=False
                     break
                     
@@ -930,7 +930,6 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
         if sim is not None:
             sim.kill();
-
 
     
     
