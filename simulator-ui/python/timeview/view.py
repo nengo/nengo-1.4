@@ -4,7 +4,7 @@ import timelog
 import data
 import simulator
 import hrr
-from timeview.components import hrrgraph
+from timeview.components import hrrgraph,neuronmap
 from nef.array import NetworkArray
 import nef
 
@@ -461,6 +461,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.forced_origins_prev={}
         
         self.tick_queue=[]
+        
+        self.mapcache = neuronmap.MapCache()
         
         if size is None:
             size=(950,600)

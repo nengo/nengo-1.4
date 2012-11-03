@@ -129,7 +129,7 @@ class Grid(core.DataViewComponent):
             if rows*cols<len(data): cols+=1
         
         if self.map is None and self.improvable:
-            self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)
+            self.map=self.view.mapcache.get(self.view.watcher.objects[self.name],rows,cols)
         
 
         max=self.max
