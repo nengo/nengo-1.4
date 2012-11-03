@@ -421,7 +421,7 @@ public class PassthroughNode implements Node {
 	}
 
 	@Override
-	public String generatePythonCode(ScriptGenerator script) {
+	public String toScript(HashMap<String, Object> scriptData) {
 		// TODO Auto-generated method stub
 		return null;
 	}

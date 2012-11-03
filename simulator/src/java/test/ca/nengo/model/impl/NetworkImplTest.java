@@ -4,6 +4,7 @@
 package ca.nengo.model.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ca.nengo.TestUtil;
@@ -586,12 +587,10 @@ public class NetworkImplTest extends TestCase {
 		}
 
 		@Override
-		public String generatePythonCode(ScriptGenerator script) {
+		public String toScript(HashMap<String, Object> scriptData) {
 			// TODO Auto-generated method stub
 			return null;
 		}
-		
-
 	}
 
 }

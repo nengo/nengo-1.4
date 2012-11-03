@@ -4,6 +4,7 @@
 package ca.nengo.model.impl;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -114,7 +115,7 @@ public class EnsembleImplTest extends TestCase {
 		}
 
 		@Override
-		public String generatePythonCode(ScriptGenerator script) {
+		public String toScript(HashMap<String, Object> scriptData) {
 			// TODO Auto-generated method stub
 			return null;
 		}

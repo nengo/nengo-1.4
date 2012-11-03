@@ -31,6 +31,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -236,13 +237,13 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	}
 
 	@Override
-	public String generatePythonCode(ScriptGenerator script) {
+	public Node[] getChildren() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Node[] getChildren() {
+	public String toScript(HashMap<String, Object> scriptData) {
 		// TODO Auto-generated method stub
 		return null;
 	}

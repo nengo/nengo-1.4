@@ -1013,44 +1013,16 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		}
 
 	}
-
-	public String generatePythonCode(ScriptGenerator scriptGen)
-	{
-		
-		return null;
-	/*
-		// might have to pass variable names in
-		// or request a variable name from scriptGen would probably be more proper
-		
-		// scriptGen could store what its calling each variable. Then other functions can request
-		// the name of that variable via a hash code or something
-		scriptGen.writeLine("make a network: network = Network()");
-		
-		for(Node node : this.getNodes())
-		{
-			node.generatePythonCode(scriptGen);
-		}
-		
-		for(Projection proj: this.getProjections())
-		{
-			proj.generatePythonCode(scriptGen);
-		}
-		*/
-	}
 	
 	public void dumpToScript() throws FileNotFoundException
 	{
 		File file = new File(this.getName() + ".py");
 		PrintWriter writer = new PrintWriter(file);
-		ScriptGenerator scriptGen = ScriptGenerator(writer);
+		ScriptGenerator scriptGen = new ScriptGenerator(writer);
 		scriptGen.DFS(this);
 		writer.close();
 	}
 	
-	private ScriptGenerator ScriptGenerator(PrintWriter writer) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/**
 	 * @see ca.nengo.model.Node#getDocumentation()
@@ -1257,5 +1229,4 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

@@ -28,6 +28,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.impl.ScriptGenerator;
@@ -89,6 +90,8 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	
 	
 	public Node[] getChildren();
+	
+	public String toScript(HashMap<String, Object> scriptData);
 
 	/**
 	 * @return User-specified documentation for the Node, if any
@@ -99,8 +102,6 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	 * @param text New user-specified documentation for the Node
 	 */
 	public void setDocumentation(String text);
-
-	public String generatePythonCode(ScriptGenerator script);
 	
 	/**
 	 * @return An independent copy of the Node

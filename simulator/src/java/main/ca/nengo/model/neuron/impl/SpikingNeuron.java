@@ -28,6 +28,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.neuron.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -410,10 +411,8 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	}
 
 	@Override
-	public String generatePythonCode(ScriptGenerator script) {
+	public String toScript(HashMap<String, Object> scriptData) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
 }

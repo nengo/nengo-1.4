@@ -330,7 +330,7 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 	}
 
 	@Override
-	public String generatePythonCode(ScriptGenerator script) {
+	public String toScript(HashMap<String, Object> scriptData) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -3,6 +3,8 @@
  */
 package ca.nengo.model.impl;
 
+import java.util.HashMap;
+
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
@@ -148,9 +150,8 @@ public class MockNode implements Node, Cloneable {
 	}
 
 	@Override
-	public String generatePythonCode(ScriptGenerator script) {
+	public String toScript(HashMap<String, Object> scriptData) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

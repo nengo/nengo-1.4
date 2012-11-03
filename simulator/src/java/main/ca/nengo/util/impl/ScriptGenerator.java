@@ -36,7 +36,7 @@ public class ScriptGenerator extends DFSIterator{
 			prefixes.put(child, prefix);
 		}
 		
-		HashMap<String, Object> toScriptArgs;
+		HashMap<String, Object> toScriptArgs = new HashMap<String, Object>();
 		toScriptArgs.put("prefix", prefixes.get(node));
 		toScriptArgs.put("isSubnet", isTopLevel);
 		toScriptArgs.put("netName", node.getName());

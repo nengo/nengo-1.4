@@ -33,6 +33,7 @@ package ca.nengo.model.impl;
  * @author Bryan Tripp
  */
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -292,13 +293,13 @@ public class FunctionInput implements Node, Probeable {
 	}
 
 	@Override
-	public String generatePythonCode(ScriptGenerator script) {
+	public Node[] getChildren() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Node[] getChildren() {
+	public String toScript(HashMap<String, Object> scriptData) {
 		// TODO Auto-generated method stub
 		return null;
 	}
