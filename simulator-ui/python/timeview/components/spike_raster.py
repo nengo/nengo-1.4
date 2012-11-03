@@ -35,7 +35,7 @@ class SpikeRaster(core.DataViewComponent):
         self.usemap=usemap
         self.mouse_location=None
         
-        self.audio=clicker.enabled
+        self.audio=clicker.ClickerEnabled.enabled
         if self.audio:
             self.clicker=clicker.Clicker(self,self.data)
             self.clicker.select(0)

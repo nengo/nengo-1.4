@@ -28,7 +28,7 @@ class Grid(core.DataViewComponent):
         self.auto_improve=False
         self.improvable=improvable
         
-        if not clicker.enabled: audio=False
+        if not clicker.ClickerEnabled.enabled: audio=False
         self.audio=audio
         if audio:
             if sfunc is not None:
