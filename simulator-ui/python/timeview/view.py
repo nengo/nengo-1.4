@@ -34,8 +34,8 @@ import os
 
 # for save_pdf
 import sys
-if 'lib/iText-5.0.5.jar' not in sys.path:
-    sys.path.append('lib/iText-5.0.5.jar')
+if 'lib/itextpdf-5.3.4.jar' not in sys.path:
+    sys.path.append('lib/itextpdf-5.3.4.jar')
 
 
 class Icon:

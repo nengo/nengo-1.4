@@ -1,4 +1,5 @@
 .ant_targets
+.pydevproject
 artifacts
 bin
 layouts
