@@ -841,7 +841,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
     def run(self):
         sim=simulator.Simulator(self.network)
         
-        sim.step(0,0) #this is here to initialize the thread pool threads properly
+        sim.step(0.0,0.001)
         sim.reset(False)
 
         while self.frame.visible:
