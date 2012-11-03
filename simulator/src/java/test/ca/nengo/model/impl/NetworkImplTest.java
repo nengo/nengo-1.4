@@ -26,6 +26,7 @@ import ca.nengo.util.Probe;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.ScriptGenerator;
 import junit.framework.TestCase;
 
 public class NetworkImplTest extends TestCase {
@@ -576,6 +577,18 @@ public class NetworkImplTest extends TestCase {
 		@Override
 		public Node clone() throws CloneNotSupportedException {
 			return (Node) super.clone();
+		}
+
+		@Override
+		public Node[] getChildren() {
+			
+			return null;
+		}
+
+		@Override
+		public String generatePythonCode(ScriptGenerator script) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 		
 

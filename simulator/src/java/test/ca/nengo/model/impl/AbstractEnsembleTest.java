@@ -14,6 +14,7 @@ import ca.nengo.model.Units;
 import ca.nengo.model.impl.AbstractEnsemble;
 import ca.nengo.model.impl.AbstractNode;
 import ca.nengo.model.impl.BasicOrigin;
+import ca.nengo.util.impl.ScriptGenerator;
 import junit.framework.TestCase;
 
 /**
@@ -49,7 +50,19 @@ public class AbstractEnsembleTest extends TestCase {
 					throws SimulationException {}
 
 			@Override
-			public void reset(boolean randomize) {}};		
+			public void reset(boolean randomize) {}
+
+			@Override
+			public Node[] getChildren() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public String generatePythonCode(ScriptGenerator script) {
+				// TODO Auto-generated method stub
+				return null;
+			}};		
 		nodes[1] = new AbstractNode("b", shared, new ArrayList<Termination>(1)) {
 			private static final long serialVersionUID = 1L;
 
@@ -58,7 +71,19 @@ public class AbstractEnsembleTest extends TestCase {
 					throws SimulationException {}
 
 			@Override
-			public void reset(boolean randomize) {}};		
+			public void reset(boolean randomize) {}
+
+			@Override
+			public Node[] getChildren() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public String generatePythonCode(ScriptGenerator script) {
+				// TODO Auto-generated method stub
+				return null;
+			}};		
 		nodes[2] = new AbstractNode("c", notshared, new ArrayList<Termination>(1)) {
 			private static final long serialVersionUID = 1L;
 
@@ -67,7 +92,19 @@ public class AbstractEnsembleTest extends TestCase {
 					throws SimulationException {}
 
 			@Override
-			public void reset(boolean randomize) {}};
+			public void reset(boolean randomize) {}
+
+			@Override
+			public Node[] getChildren() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public String generatePythonCode(ScriptGenerator script) {
+				// TODO Auto-generated method stub
+				return null;
+			}};
 		
 		List<String> origins = AbstractEnsemble.findCommon1DOrigins(nodes);
 		assertEquals(2, origins.size());

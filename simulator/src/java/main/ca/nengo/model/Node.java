@@ -30,6 +30,7 @@ package ca.nengo.model;
 import java.io.Serializable;
 
 import ca.nengo.util.VisiblyMutable;
+import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * A part of a Network that can be run independently (eg a Neuron). Normally
@@ -85,6 +86,9 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	 * @throws StructuralException if the named Termination does not exist
 	 */
 	public Termination getTermination(String name) throws StructuralException;
+	
+	
+	public Node[] getChildren();
 
 	/**
 	 * @return User-specified documentation for the Node, if any
@@ -96,6 +100,8 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	 */
 	public void setDocumentation(String text);
 
+	public String generatePythonCode(ScriptGenerator script);
+	
 	/**
 	 * @return An independent copy of the Node
 	 * @throws CloneNotSupportedException if clone can't be made

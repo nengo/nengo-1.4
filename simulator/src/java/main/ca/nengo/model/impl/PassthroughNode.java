@@ -52,6 +52,7 @@ import ca.nengo.model.Units;
 import ca.nengo.util.MU;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * <p>A Node that passes values through unaltered.</p>
@@ -411,6 +412,18 @@ public class PassthroughNode implements Node {
 			return result;
 		}
 
+	}
+
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String generatePythonCode(ScriptGenerator script) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

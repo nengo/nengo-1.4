@@ -27,7 +27,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model;
 
+import java.io.FileNotFoundException;
+
 import ca.nengo.sim.Simulator;
+import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * <p>A neural circuit, consisting of Nodes such as Ensembles and ExternalInputs. A Network is the
@@ -195,4 +198,6 @@ public interface Network extends Node, Probeable {
 	 * @param value Value of the named metadata item
 	 */
 	public void setMetaData(String key, Object value);
+	
+	public String generatePythonCode(ScriptGenerator scriptGen);
 }

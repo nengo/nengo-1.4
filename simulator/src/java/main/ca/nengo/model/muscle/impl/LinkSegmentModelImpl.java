@@ -35,6 +35,7 @@ import java.util.Properties;
 
 import ca.nengo.dynamics.DynamicalSystem;
 import ca.nengo.math.Function;
+import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
@@ -47,6 +48,7 @@ import ca.nengo.util.MU;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
@@ -319,6 +321,18 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 
 		result.myStates = (Properties) myStates.clone();
 		return result;
+	}
+
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String generatePythonCode(ScriptGenerator script) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

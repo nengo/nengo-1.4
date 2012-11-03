@@ -49,6 +49,7 @@ import ca.nengo.model.Units;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
@@ -288,6 +289,18 @@ public class FunctionInput implements Node, Probeable {
 		result.myListeners = new ArrayList<Listener>(5);
 
 		return result;
+	}
+
+	@Override
+	public String generatePythonCode(ScriptGenerator script) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

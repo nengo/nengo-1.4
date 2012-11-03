@@ -9,6 +9,7 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * A Cloneable Node for testing copy&paste / drag&drop.
@@ -138,6 +139,18 @@ public class MockNode implements Node, Cloneable {
 
 	public void setName(String myName) {
 		this.myName = myName;
+	}
+
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String generatePythonCode(ScriptGenerator script) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Properties;
 
 import ca.nengo.model.InstantaneousOutput;
+import ca.nengo.model.Node;
 import ca.nengo.model.Noise;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Probeable;
@@ -51,6 +52,7 @@ import ca.nengo.util.TimeSeries;
 import ca.nengo.util.TimeSeries1D;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 
 /**
@@ -399,6 +401,18 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	 */
 	public Noise getNoise() {
 		return myNoise;
+	}
+
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String generatePythonCode(ScriptGenerator script) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
