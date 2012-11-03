@@ -6,10 +6,6 @@ import nef.templates.learned_termination as learning
 import nef.templates.gate as gating
 import random
 
-from ca.nengo.math.impl import FourierFunction
-from ca.nengo.model.impl import FunctionInput
-from ca.nengo.model import Units
-
 random.seed(27)
 
 net=nef.Network('Learn Communication') #Create the network object

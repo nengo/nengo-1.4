@@ -10,10 +10,10 @@ net.make_input('input',{0.2:5, 0.3:0, 0.44:-10,
                                                      #at time 0.3s and so on
                                                      
 net.make_input('control',[0])  #Create a controllable input function
-                                       #with a starting value of 0
-net.make('A',225,2,radius=1.5) 
-                #Make a population with 225 neurons, 2 dimensions, and a 
-                #larger radius to accommodate large simulataneous inputs
+                               #with a starting value of 0
+net.make('A',225,2,radius=1.5) #Make a population with 225 neurons, 2 dimensions, and a 
+                               #larger radius to accommodate large simulataneous inputs
+                               
 net.connect('input','A',transform=[0.1,0],pstc=0.1) #Connect all the relevant
                                                 #objects with the relevant 1x2
                                                 #mappings, postsynaptic time
