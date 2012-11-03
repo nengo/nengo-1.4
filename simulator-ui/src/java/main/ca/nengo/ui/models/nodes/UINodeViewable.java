@@ -188,6 +188,11 @@ public abstract class UINodeViewable extends UINeoNode {
 	public abstract int getNodesCount();
 
 	/**
+	 * @return Number of dimensions in this population contained by the Model
+	 */
+	public abstract int getDimensionality();
+	
+	/**
 	 * @return Container Viewer
 	 */
 	public NodeViewer getViewer() {

@@ -162,6 +162,15 @@ public class UINEFEnsemble extends UIEnsemble {
 	}
 
 	@Override
+	public int getDimensionality() {
+		if (getModel() != null) {
+			return getModel().getDimension();
+		} else {
+			return -1;
+		}
+	}
+	
+	@Override
 	public String getTypeName() {
 		return typeName;
 	}
