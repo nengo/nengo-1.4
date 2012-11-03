@@ -251,10 +251,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.update()
         
     def update(self):
-        #try:
-        #    self.button_stop.enabled=self.ng.progressIndicator.visible
-        #except:
-        #    pass    
     
         selected=self.ng.getSelectedObj()
         self.mode_combobox.set_node(selected)
@@ -291,10 +287,15 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             while top_parent and hasattr(network,'networkParent') and network.networkParent is not None:
                 network=network.networkParent
         else:
+            found_candidate=False
             for wo in ng.world.ground.children:
                 if isinstance(wo,ca.nengo.ui.models.nodes.UINetwork):
-                    network=wo
-                    break
+                    if not found_candidate:
+                        network=wo
+                        found_candidate=True
+                    else:
+                        network=None
+                        break
         return network      
         
     def get_current_network_viewer(self):

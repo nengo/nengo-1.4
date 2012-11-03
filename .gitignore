@@ -10,3 +10,5 @@ NengoModels
 simulator-ui/commandhistory.dat
 
 simulator-ui/quick/*
+
+simulator-ui/python/timeview/layout.db.bak
