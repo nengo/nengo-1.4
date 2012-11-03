@@ -34,8 +34,8 @@ import os
 
 # for save_pdf
 import sys
-if 'lib/iText-5.0.5.jar' not in sys.path:
-    sys.path.append('lib/iText-5.0.5.jar')
+if 'lib/itextpdf-5.3.4.jar' not in sys.path:
+    sys.path.append('lib/itextpdf-5.3.4.jar')
 
 
 class Icon:
@@ -1218,10 +1218,20 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             cb.addTemplate(tp,20,0)
             doc.close()
 
+def make_layout_dir(dir):
+    if not dir.exists():
+        dir.mkdirs()
+        devdir = java.io.File('dist-files/layouts')
+        if devdir.exists():
+            devlayouts = devdir.listFiles()
+            for layout in devlayouts:
+                newlayout = dir.getPath() + '/' + layout.getName()
+                copyfile(layout.getCanonicalPath(), newlayout)
 
-def save_layout_file(name,view,layout,controls):
+
+def save_layout_file(name, view, layout, controls):
     dir=java.io.File('layouts')
-    if not dir.exists(): dir.mkdirs()
+    make_layout_dir(dir)
 
     f=file('layouts/%s.layout'%name,'w')
     
@@ -1230,9 +1240,11 @@ def save_layout_file(name,view,layout,controls):
     f.write('(%s,\n [%s],\n %s)'%(view,layout_text,controls))
     f.close()
 
-def load_layout_file(name, try_backup = True):
-    fn='%s.layout'%name
+
+def load_layout_file(name, try_backup=True):
+    fn = '%s.layout' % name
     if not java.io.File(fn).exists():
+        make_layout_dir(java.io.File('layouts'))        
         fn='layouts/'+fn
         if not java.io.File(fn).exists():
             return None

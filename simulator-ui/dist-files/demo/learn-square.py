@@ -6,26 +6,21 @@ import nef.templates.learned_termination as learning
 import nef.templates.gate as gating
 import random
 
-from ca.nengo.math.impl import FourierFunction
-from ca.nengo.model.impl import FunctionInput
-from ca.nengo.model import Units
-
 random.seed(27)
 
 net=nef.Network('Learn Square') #Create the network object
 
 # Create input and output populations.
-A=net.make('pre',N,D) #Make a population with 60 neurons, 1 dimensions
-B=net.make('post',N,D) #Make a population with 60 neurons, 1 dimensions
+net.make('pre',N,D) #Make a population with 60 neurons, 1 dimensions
+net.make('post',N,D) #Make a population with 60 neurons, 1 dimensions
 
 # Create a random function input.
-input=FunctionInput('input',[FourierFunction(
-    .1, 8,.4,i, 0) for i in range(D)],
-    Units.UNK) #Create a white noise input function .1 base freq, 
-               #max freq 8 rad/s, and RMS of .4; i makes one for 
-               #each dimension; 0 is the seed
-net.add(input) #Add the input node to the network
-net.connect(input,A)
+net.make_fourier_input('input', dimensions = D, base=0.1, high=8, power=0.4, seed=0)
+               #Create a white noise input function .1 base freq, max 
+               #freq 10 rad/s, and RMS of .4; 0 is a seed  
+
+net.add('input') #Add the input node to the network
+net.connect('input','pre')
 
 # Create a modulated connection between the 'pre' and 'post' ensembles.
 learning.make(net,errName='error', N_err=100, preName='pre', postName='post',

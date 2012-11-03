@@ -244,10 +244,12 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * 
 	 * @return Menu builder
 	 */
-	protected void constructMenu(PopupMenuBuilder menu) {
+	protected void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
 		Node clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
 		if (clipboardNode != null) {
-			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here", (NodeContainer)this));
+			PasteAction pasteAction = new PasteAction("Paste '" + clipboardNode.getName() + "' here", (NodeContainer)this);
+			pasteAction.setPosition(posX, posY);
+			menu.addAction(pasteAction);
 		}
 		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
 		/*MenuBuilder windowsMenu = menu.addSubMenu("Windows");
@@ -325,7 +327,14 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 */
 	public JPopupMenu getContextMenu() {
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
-		constructMenu(menu);
+		constructMenu(menu, null, null);
+
+		return menu.toJPopupMenu();
+	}
+	
+	public JPopupMenu getContextMenu(double posX, double posY) {
+		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
+		constructMenu(menu, posX, posY);
 
 		return menu.toJPopupMenu();
 	}

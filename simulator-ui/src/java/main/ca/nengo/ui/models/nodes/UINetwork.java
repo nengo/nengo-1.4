@@ -167,6 +167,12 @@ public class UINetwork extends UINodeViewable {
 			return 0;
 	}
 
+	@Override
+	public int getDimensionality() {
+		// What is the dimensionality of a network???
+		return -1;
+	}	
+	
 	/**
 	 * @return UI Configuration manager associated with this network
 	 */

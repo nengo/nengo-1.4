@@ -6,6 +6,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.world.Interactable;
@@ -14,9 +15,12 @@ import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
+import ca.nengo.ui.models.NodeContainer;
+import ca.nengo.ui.models.viewers.NetworkViewer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.util.PDimension;
 
 /**
  * Handles mouse events. Passes double click and mouse context button events to
@@ -77,19 +81,30 @@ public class MouseHandler extends PBasicInputEventHandler {
 	private boolean maybeTriggerPopup(PInputEvent event) {
 		if (event.isPopupTrigger()) {
 			JPopupMenu menuToShow = null;
-
+			MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
+			
 			if (world.getSelection().size() > 1) {
 				menuToShow = world.getSelectionMenu(world.getSelection());
 			}
 
 			if (menuToShow == null && (interactableObj != null)
 					&& (interactableObj == getInteractableFromEvent(event))) {
-				menuToShow = interactableObj.getContextMenu();
+				/*if (interactableObj instanceof WorldImpl) {
+					// determine the position to add the pasted object
+					// (This does not work yet!)
+					WorldImpl obj = (WorldImpl)interactableObj;
+					Point2D newPosition;
+					Point2D viewPoint = obj.localToGlobal(mouseCanvasPositionPressed);
+					newPosition = obj.globalToLocal(viewPoint);
+					newPosition = ((NodeContainer)obj).localToView(newPosition);
+					
+					menuToShow = obj.getContextMenu(newPosition.getX(), newPosition.getY());
+				} else {*/
+					menuToShow = interactableObj.getContextMenu();
+				//}
 			}
 
 			if (menuToShow != null) {
-				MouseEvent e = (MouseEvent) event.getSourceSwingEvent();
-
 				menuToShow.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
 				menuToShow.setVisible(true);
 			}
