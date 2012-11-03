@@ -5,7 +5,6 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 import ca.nengo.ui.lib.world.WorldObject;
-import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.event.PInputEvent;
