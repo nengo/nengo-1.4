@@ -200,18 +200,18 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
         netpos = pos
         for n in nodes:
             if isinstance(n,ca.nengo.ui.models.viewers.NetworkViewer):
-                # look for nested networks at the current position
+                # we found a network
+                net = n
+                netpos = n.localToView(n.globalToLocal(pos))
+
+                # look for nested networks at the current local position
                 nn,p = self.find_at(n.ground,netpos)
                 if nn is not n.ground:
-                    # we found a nested network, so return it
+                    # we found a nested network, so return it. Otherwise, we return the current network.
                     net = nn
                     netpos = p
-                else:
-                    # we found no nested network, so return this
-                    net = n
-                    netpos = n.localToView(n.globalToLocal(pos))
 
-                # we've found the top network at the current position, so break
+                # we found the top network at the current position, so break
                 break
 
         return net,netpos
