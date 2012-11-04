@@ -245,9 +245,15 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * @return Menu builder
 	 */
 	protected void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
-		Node clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
-		if (clipboardNode != null) {
-			PasteAction pasteAction = new PasteAction("Paste '" + clipboardNode.getName() + "' here", (NodeContainer)this);
+		ArrayList<Node> clipboardNodes = NengoGraphics.getInstance().getClipboard().getContents();
+		if (clipboardNodes != null && clipboardNodes.size() > 0) {
+			String selectionName = "";
+			if (clipboardNodes.size() == 1) {
+				selectionName = clipboardNodes.get(0).getName();
+			} else {
+				selectionName = "selection";
+			}
+			PasteAction pasteAction = new PasteAction("Paste '" + selectionName + "' here", (NodeContainer)this);
 			pasteAction.setPosition(posX, posY);
 			menu.addAction(pasteAction);
 		}
@@ -420,7 +426,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		if (isSelectionMode != enabled) {
 			isSelectionMode = enabled;
 			mySky.getCamera().removeInputEventListener(selectionEventHandler);
-			selectionEventHandler.endSelection();
+			selectionEventHandler.endSelection(false);
 			if (!isSelectionMode) {
 				initSelectionMode();
 			} else {

@@ -26,6 +26,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.util.ArrayList;
+
 import javax.swing.JOptionPane;
 
 import ca.nengo.ui.lib.actions.ActionException;
@@ -41,15 +43,15 @@ import ca.nengo.ui.lib.util.UIEnvironment;
 public class RemoveModelAction extends StandardAction {
 
     private static final long serialVersionUID = 1L;
-    ModelObject modelToRemove;
+    ArrayList<ModelObject> modelsToRemove = null;
 
     /**
      * @param actionName TODO
      * @param modelToRemove TODO
      */
-    public RemoveModelAction(String actionName, ModelObject modelToRemove) {
-        super("Remove " + modelToRemove.getTypeName(), actionName);
-        this.modelToRemove = modelToRemove;
+    public RemoveModelAction(String actionName, ArrayList<ModelObject> modelsToRemove) {
+        super("Remove " + (modelsToRemove.size() == 1 ? modelsToRemove.get(0).getTypeName() : "selection"), actionName);
+        this.modelsToRemove = modelsToRemove;
     }
 
     @Override
@@ -59,8 +61,10 @@ public class RemoveModelAction extends StandardAction {
                 "Once an object has been removed, it cannot be undone.",
                 "Are you sure?", JOptionPane.YES_NO_OPTION);
         if (response == 0) {
-            modelToRemove.destroyModel();
-            modelToRemove = null;
+        	for (ModelObject modelToRemove : modelsToRemove) {
+        		modelToRemove.destroyModel();
+        	}
+        	modelsToRemove = null;
         } else {
             throw new ActionException("Action cancelled by user", false);
         }

@@ -33,6 +33,7 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
@@ -169,7 +170,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     private PythonInterpreter pythonInterpreter;
     private ScriptConsole scriptConsole;
     private AuxillarySplitPane scriptConsolePane;
-    private WorldObject selectedObj;
+    private Collection<WorldObject> selectedObjects;
     private DataListView dataListViewer;
     private ArrayList<AuxillarySplitPane> splitPanes;
     
@@ -218,8 +219,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
          */
         SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
 
-            public void objectFocused(WorldObject obj) {
-                objectSelected(obj);
+            public void objectFocused(Collection<WorldObject> objs) {
+                objectsSelected(objs);
             }
         });
 
@@ -281,32 +282,29 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         JavaSourceParser.addSource(simulatorSourceFile);
     }
 
-    private void objectSelected(WorldObject obj) {
-        while (obj != null && !(obj instanceof ModelObject)) {
-            obj = obj.getParent();
-        }
-
-        if (obj != null) {
-
-            selectedObj = obj;
-
-            if (objectSelectedBorder != null) {
-                objectSelectedBorder.destroy();
-            }
-
-            objectSelectedBorder = new SelectionBorder(obj.getWorld(), obj);
-
-            Object model = ((ModelObject) obj).getModel();
-            scriptConsole.setCurrentObject(model);
-
-            if (configPane.toJComponent().isAuxVisible()) {
-                configPane.configureObj(model);
-            }
-
-        } else {
-            selectedObj = null;
-        }
-
+    private void objectsSelected(Collection<WorldObject> objs) {
+    	selectedObjects = new ArrayList<WorldObject>();
+    	for (WorldObject obj : objs) {
+	        while (obj != null && !(obj instanceof ModelObject)) {
+	            obj = obj.getParent();
+	        }
+	        
+	        if (obj != null) {
+	        	if (objectSelectedBorder != null) {
+	                objectSelectedBorder.destroy();
+	            }
+	
+	            objectSelectedBorder = new SelectionBorder(obj.getWorld(), obj);
+	
+	            Object model = ((ModelObject) obj).getModel();
+	            scriptConsole.setCurrentObject(model);
+	
+	            if (configPane.toJComponent().isAuxVisible()) {
+	                configPane.configureObj(model);
+	            }
+	            selectedObjects.add(obj);
+	        }
+    	}
 
         updateEditMenu();
     }
@@ -517,20 +515,31 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         StandardAction pasteAction = null;
         StandardAction removeAction = null;
 
-        if (selectedObj != null && selectedObj instanceof UINeoNode) {
-            UINeoNode neoNode = (UINeoNode) selectedObj;
+        Collection<WorldObject> selectedObjects = getSelectedObjects();
+        
+        if (selectedObjects != null && selectedObjects.size() > 0) {
+        	ArrayList<UINeoNode> selectedArray = new ArrayList<UINeoNode>();
+        	ArrayList<ModelObject> selectedModelObjects = new ArrayList<ModelObject>();
+        	for (WorldObject obj : selectedObjects) {
+        		if (obj instanceof UINeoNode) {
+        			selectedArray.add((UINeoNode)obj);
+        		}
+        		if (obj instanceof ModelObject) {
+        			selectedModelObjects.add((ModelObject)obj);
+        		}
+        	}
 
-            cutAction = new CutAction("Cut", (UINeoNode) selectedObj);
-            copyAction = new CopyAction("Copy", (UINeoNode) selectedObj);
-            removeAction = new RemoveModelAction("Remove", neoNode);
+            cutAction = new CutAction("Cut", selectedArray);
+            copyAction = new CopyAction("Copy", selectedArray);
+            removeAction = new RemoveModelAction("Remove", selectedModelObjects);
         } else {
             cutAction = new DisabledAction("Cut", "No object selected");
             copyAction = new DisabledAction("Copy", "No object selected");
             removeAction = new DisabledAction("Remove", "No objects to remove");
         }
 
-        Node node = getClipboard().getContents();
-        if (node != null) {
+        ArrayList<Node> nodes = getClipboard().getContents();
+        if (nodes != null && nodes.size() > 0) {
             pasteAction = new PasteAction("Paste", this);
         } else {
             pasteAction = new DisabledAction("Paste", "No object is in the clipboard");
@@ -679,16 +688,35 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     /**
      * @return TODO
      */
-    public WorldObject getSelectedObj() {
+    public Collection<WorldObject> getSelectedObjects() {
         // check to make sure the object is still in the world before claiming it's still connected
-        if (selectedObj!=null) {
-            if (selectedObj.isDestroyed()) {
-                selectedObj=null;
-            }
-        }
-        return selectedObj;
+    	boolean foundOne = false;
+    	while (foundOne) {
+	    	for (WorldObject selectedObj : selectedObjects) {
+	    		if (selectedObj!=null) {
+	    			if (selectedObj.isDestroyed()) {
+	    				selectedObjects.remove(selectedObj);
+	    				foundOne = true;
+	    				break;
+	    			}
+	    		}
+	    	}
+    	}
+        return selectedObjects;
     }
 
+    /**
+     * @return the first element in the list of selected objects
+     */
+    public WorldObject getSelectedObj() {
+    	Collection<WorldObject> selectedObjs = getSelectedObjects();
+        if (selectedObjs != null && selectedObjs.size() > 0) {
+        	return (WorldObject)(selectedObjs.toArray()[0]);
+        } else {
+        	return null;
+        }
+    }
+    
     /**
      * @return TODO
      */
@@ -812,14 +840,13 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     	AuxillarySplitPane pane=configPane.toJComponent();
     	pane.setAuxVisible(!pane.isAuxVisible());
     	if (pane.isAuxVisible()) {
-    		WorldObject obj=getSelectedObj();
+    		WorldObject obj = getSelectedObj();
     		if (obj instanceof ModelObject) {
     			configPane.configureObj(((ModelObject)obj).getModel());
     		} else {
     			configPane.configureObj(null);
     		}
     	}
-    	
     }
     
 
