@@ -26,7 +26,15 @@ net.run(time=%(t)s, dt=%(dt)s)
 
 """
 
-nengo_cl = '../../../nengo-current/nengo-cl'
+# -- N.B. For this to work you have to run the 'rebuild_nengo_current.sh' script
+#         that is in the root folder of the git repo.
+
+import os
+_mypath = os.path.abspath(os.path.split(__file__)[0])
+nengo_cl = os.path.abspath(
+    os.path.join(
+        _mypath, '..', '..', '..', 'nengo-current', 'nengo-cl'))
+print 'nengo_cl', nengo_cl
 
 keep_tempfiles = True
 
