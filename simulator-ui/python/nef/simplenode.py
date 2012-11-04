@@ -331,6 +331,9 @@ class SimpleNode(Node,Probeable):
 
     def listStates(self):
         return self._states
+        
+    def getChildren(self):
+        return None    
 
 
 
