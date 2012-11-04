@@ -121,6 +121,8 @@ public class ScriptConsole extends JPanel {
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
 		myDisplayArea.setMargin(new Insets(5, 5, 5, 5));
+		
+		// add a listener, so that keys typed when displayArea has focus can pass to commandField
 		myDisplayArea.addKeyListener(new CommandKeyListener(this));
 
 		myCommandField = new JTextArea();
