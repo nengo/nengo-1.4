@@ -1,26 +1,26 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "CNEFEnsemble.java". Description: 
+The Original Code is "CNEFEnsemble.java". Description:
 "Advanced properties, these may not necessarily be configued, so"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
-*/
+ */
 
 package ca.nengo.ui.models.constructors;
 
@@ -58,8 +58,8 @@ import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.descriptors.PNodeFactory;
-import ca.nengo.ui.configurable.managers.UserConfigurer;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.configurable.managers.UserConfigurer;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.models.nodes.UINEFEnsemble;
 import ca.nengo.util.VectorGenerator;
@@ -67,407 +67,410 @@ import ca.nengo.util.impl.RandomHypersphereVG;
 import ca.nengo.util.impl.Rectifier;
 
 public class CNEFEnsemble extends ConstructableNode {
-	static final Property pApproximator = new PApproximator("Decoding Sign");
+    static final Property pApproximator = new PApproximator("Decoding Sign");
 
-	static final Property pDim = new PInt("Dimensions");
+    static final Property pDim = new PInt("Dimensions");
 
-	static final Property pEncodingDistribution = new PEncodingDistribution("Encoding Distribution");
-	static final Property pEncodingSign = new PSign("Encoding Sign");
-	static final Property pNodeFactory = new PNodeFactory("Node Factory");
-	static final Property pNumOfNodes = new PInt("Number of Nodes");
-	static final Property pRadius = new PFloat("Radius");
-	static final Property pNoise = new PFloat("Noise",0.1f);
+    static final Property pEncodingDistribution = new PEncodingDistribution("Encoding Distribution");
+    static final Property pEncodingSign = new PSign("Encoding Sign");
+    static final Property pNodeFactory = new PNodeFactory("Node Factory");
+    static final Property pNumOfNodes = new PInt("Number of Nodes");
+    static final Property pRadius = new PFloat("Radius");
+    static final Property pNoise = new PFloat("Noise",0.1f);
 
-	/**
-	 * Config descriptors
-	 */
-	static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(new Property[] { pNumOfNodes,
-			pDim, pNodeFactory, pRadius }, new Property[] { pApproximator, pEncodingDistribution,
-			pEncodingSign, pNoise });
+    /**
+     * Config descriptors
+     */
+    static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(new Property[] { pNumOfNodes,
+            pDim, pNodeFactory, pRadius }, new Property[] { pApproximator, pEncodingDistribution,
+            pEncodingSign, pNoise });
 
-	public CNEFEnsemble() {
-		super();
-		pDim.setDescription("Number of dimensions that are represented by these neurons");
-		pName.setDescription("Name of the ensemble");
-		pApproximator.setDescription("Limits the range of values used when solving for decoders");
-		pEncodingDistribution.setDescription("From uniformly chosen (default) to all encoders being aligned to an axis");
-		pEncodingSign.setDescription("Limits the range of values chosen when setting encoders");
-		pNodeFactory.setDescription("Determines the type of neuron in this ensemble");
-		pNumOfNodes.setDescription("The number of neurons in this ensemble");
-		pRadius.setDescription("The largest magnitude that can be accurately represented by this ensemble");
-		pNoise.setDescription("The amount of noise to assume when solving for decoders");
-	}
+    public CNEFEnsemble() {
+        super();
+        pDim.setDescription("Number of dimensions that are represented by these neurons");
+        pName.setDescription("Name of the ensemble");
+        pApproximator.setDescription("Limits the range of values used when solving for decoders");
+        pEncodingDistribution.setDescription("From uniformly chosen (default) to all encoders being aligned to an axis");
+        pEncodingSign.setDescription("Limits the range of values chosen when setting encoders");
+        pNodeFactory.setDescription("Determines the type of neuron in this ensemble<br />" +
+                "See online documentation for adding custom neuron models");
+        pNumOfNodes.setDescription("The number of neurons in this ensemble");
+        pRadius.setDescription("The largest magnitude that can be accurately represented by this ensemble");
+        pNoise.setDescription("The amount of noise to assume when solving for decoders");
+    }
 
-	protected Node createNode(ConfigResult prop, String name) {
-		try {
+    protected Node createNode(ConfigResult prop, String name) {
+        try {
 
-			NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-			Integer numOfNeurons = (Integer) prop.getValue(pNumOfNodes);
-			Integer dimensions = (Integer) prop.getValue(pDim);
+            NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
+            Integer numOfNeurons = (Integer) prop.getValue(pNumOfNodes);
+            Integer dimensions = (Integer) prop.getValue(pDim);
 
-			/*
-			 * Advanced properties, these may not necessarily be configued, so
-			 */
-			ApproximatorFactory approxFactory = (ApproximatorFactory) prop.getValue(pApproximator);
-			NodeFactory nodeFactory = (NodeFactory) prop.getValue(pNodeFactory);
-			Sign encodingSign = (Sign) prop.getValue(pEncodingSign);
-			Float encodingDistribution = (Float) prop.getValue(pEncodingDistribution);
-			Float radius = (Float) prop.getValue(pRadius);
-			Float noise = (Float) prop.getValue(pNoise);
+            /*
+             * Advanced properties, these may not necessarily be configued, so
+             */
+            ApproximatorFactory approxFactory = (ApproximatorFactory) prop.getValue(pApproximator);
+            NodeFactory nodeFactory = (NodeFactory) prop.getValue(pNodeFactory);
+            Sign encodingSign = (Sign) prop.getValue(pEncodingSign);
+            Float encodingDistribution = (Float) prop.getValue(pEncodingDistribution);
+            Float radius = (Float) prop.getValue(pRadius);
+            Float noise = (Float) prop.getValue(pNoise);
 
-			if (nodeFactory != null) {
-				ef.setNodeFactory(nodeFactory);
-			}
+            if (nodeFactory != null) {
+                ef.setNodeFactory(nodeFactory);
+            }
 
-			if (approxFactory != null) {
-				ef.setApproximatorFactory(approxFactory);
-			}
-			if (noise != null) {
-				ApproximatorFactory f=ef.getApproximatorFactory();
-				if (f instanceof WeightedCostApproximator.Factory) {
-					((WeightedCostApproximator.Factory)f).setNoise(noise);
-				}
-			}
+            if (approxFactory != null) {
+                ef.setApproximatorFactory(approxFactory);
+            }
+            if (noise != null) {
+                ApproximatorFactory f=ef.getApproximatorFactory();
+                if (f instanceof WeightedCostApproximator.Factory) {
+                    ((WeightedCostApproximator.Factory)f).setNoise(noise);
+                }
+            }
 
-			if (encodingSign != null) {
-				if (encodingDistribution == null) {
-					encodingDistribution = 0f;
-				}
-				VectorGenerator vectorGen = new RandomHypersphereVG(true, 1, encodingDistribution);
-				if (encodingSign == Sign.Positive) {
-					vectorGen = new Rectifier(vectorGen, true);
-				} else if (encodingSign == Sign.Negative) {
-					vectorGen = new Rectifier(vectorGen, false);
-				}
-				ef.setEncoderFactory(vectorGen);
-			}
+            if (encodingSign != null) {
+                if (encodingDistribution == null) {
+                    encodingDistribution = 0f;
+                }
+                VectorGenerator vectorGen = new RandomHypersphereVG(true, 1, encodingDistribution);
+                if (encodingSign == Sign.Positive) {
+                    vectorGen = new Rectifier(vectorGen, true);
+                } else if (encodingSign == Sign.Negative) {
+                    vectorGen = new Rectifier(vectorGen, false);
+                }
+                ef.setEncoderFactory(vectorGen);
+            }
 
-			if (radius==null) {
-				NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions);
-				return ensemble;
-			} else {
-				float[] radii=new float[dimensions];
-				for (int i=0; i<dimensions; i++) radii[i]=radius.floatValue();
-				NEFEnsemble ensemble = ef.make(name, numOfNeurons, radii);
-				return ensemble;
-			}
-		} catch (StructuralException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+            if (radius==null) {
+                NEFEnsemble ensemble = ef.make(name, numOfNeurons, dimensions);
+                return ensemble;
+            } else {
+                float[] radii=new float[dimensions];
+                for (int i=0; i<dimensions; i++) {
+                    radii[i]=radius.floatValue();
+                }
+                NEFEnsemble ensemble = ef.make(name, numOfNeurons, radii);
+                return ensemble;
+            }
+        } catch (StructuralException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	@Override
-	public ConfigSchemaImpl getNodeConfigSchema() {
-		return zConfig;
-	}
+    @Override
+    public ConfigSchemaImpl getNodeConfigSchema() {
+        return zConfig;
+    }
 
-	public String getTypeName() {
-		return UINEFEnsemble.typeName;
-	}
+    public String getTypeName() {
+        return UINEFEnsemble.typeName;
+    }
 
 }
 
 class PApproximator extends Property {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final String TYPE_NAME = "Approximator Factory";
+    private static final String TYPE_NAME = "Approximator Factory";
 
-	public PApproximator(String name) {
-		super(name);
-	}
+    public PApproximator(String name) {
+        super(name);
+    }
 
-	@Override
-	protected PropertyInputPanel createInputPanel() {
-		return new Panel(this);
-	}
+    @Override
+    protected PropertyInputPanel createInputPanel() {
+        return new Panel(this);
+    }
 
-	@Override
-	public Class<?> getTypeClass() {
-		return ApproximatorFactory.class;
-	}
+    @Override
+    public Class<?> getTypeClass() {
+        return ApproximatorFactory.class;
+    }
 
-	@Override
-	public String getTypeName() {
-		return TYPE_NAME;
-	}
+    @Override
+    public String getTypeName() {
+        return TYPE_NAME;
+    }
 
-	private static class Panel extends PropertyInputPanel {
-		private static SignItem unconstrained = new SignItem("Unconstrained", Sign.Unconstrained);
-		private static SignItem positive = new SignItem("Positive", Sign.Positive);
-		private static SignItem negative = new SignItem("Negative", Sign.Negative);
+    private static class Panel extends PropertyInputPanel {
+        private static SignItem unconstrained = new SignItem("Unconstrained", Sign.Unconstrained);
+        private static SignItem positive = new SignItem("Positive", Sign.Positive);
+        private static SignItem negative = new SignItem("Negative", Sign.Negative);
 
-		private static SignItem[] items = { unconstrained, positive, negative };
+        private static SignItem[] items = { unconstrained, positive, negative };
 
-		private JComboBox comboBox;
-		private JButton setButton;
+        private JComboBox comboBox;
+        private JButton setButton;
 
-		public Panel(Property property) {
-			super(property);
-			comboBox = new JComboBox(items);
-			setButton = new JButton(new AbstractAction("Set") {
-				private static final long serialVersionUID = 1L;
+        public Panel(Property property) {
+            super(property);
+            comboBox = new JComboBox(items);
+            setButton = new JButton(new AbstractAction("Set") {
+                private static final long serialVersionUID = 1L;
 
-				public void actionPerformed(ActionEvent e) {
-					configure();
-				}
-			});
+                public void actionPerformed(ActionEvent e) {
+                    configure();
+                }
+            });
 
-			add(comboBox);
-			add(setButton);
+            add(comboBox);
+            add(setButton);
 
-			comboBox.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					updateApproximator();
-				}
-			});
-			updateApproximator();
-		}
+            comboBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    updateApproximator();
+                }
+            });
+            updateApproximator();
+        }
 
-		private void updateApproximator() {
-			Sign sign = ((SignItem) comboBox.getSelectedItem()).getSign();
+        private void updateApproximator() {
+            Sign sign = ((SignItem) comboBox.getSelectedItem()).getSign();
 
-			if (sign != null) {
-				if (sign == Sign.Positive || sign == Sign.Negative) {
-					setButton.setEnabled(false);
-					boolean positive = true;
-					if (sign == Sign.Negative) {
-						positive = false;
-					}
-					approximator = new GradientDescentApproximator.Factory(
-							new GradientDescentApproximator.CoefficientsSameSign(positive), false);
+            if (sign != null) {
+                if (sign == Sign.Positive || sign == Sign.Negative) {
+                    setButton.setEnabled(false);
+                    boolean positive = true;
+                    if (sign == Sign.Negative) {
+                        positive = false;
+                    }
+                    approximator = new GradientDescentApproximator.Factory(
+                            new GradientDescentApproximator.CoefficientsSameSign(positive), false);
 
-				} else if (sign == Sign.Unconstrained) {
-					setButton.setEnabled(true);
-					approximator = new WeightedCostApproximator.Factory(noiseLevel, NSV);
-				} else {
-					Util.Assert(false, "Unsupported item");
-				}
+                } else if (sign == Sign.Unconstrained) {
+                    setButton.setEnabled(true);
+                    approximator = new WeightedCostApproximator.Factory(noiseLevel, NSV);
+                } else {
+                    Util.Assert(false, "Unsupported item");
+                }
 
-			}
-		}
+            }
+        }
 
-		/*
-		 * These values are used to configure a WeightedCostApproximator
-		 */
-		private float noiseLevel = 0.1f;
-		private int NSV = -1;
+        /*
+         * These values are used to configure a WeightedCostApproximator
+         */
+        private float noiseLevel = 0.1f;
+        private int NSV = -1;
 
-		private void configure() {
-			try {
-				Property pNoiseLevel = new PFloat("Noise level", noiseLevel);
-				Property pNSV = new PInt("Number of Singular Values", NSV);
-				ConfigResult result = UserConfigurer.configure(
-						new Property[] { pNoiseLevel, pNSV }, TYPE_NAME, this.getDialogParent(),
-						ConfigMode.STANDARD);
+        private void configure() {
+            try {
+                Property pNoiseLevel = new PFloat("Noise level", noiseLevel);
+                Property pNSV = new PInt("Number of Singular Values", NSV);
+                ConfigResult result = UserConfigurer.configure(
+                        new Property[] { pNoiseLevel, pNSV }, TYPE_NAME, this.getDialogParent(),
+                        ConfigMode.STANDARD);
 
-				noiseLevel = (Float) result.getValue(pNoiseLevel);
-				NSV = (Integer) result.getValue(pNSV);
-				updateApproximator();
+                noiseLevel = (Float) result.getValue(pNoiseLevel);
+                NSV = (Integer) result.getValue(pNSV);
+                updateApproximator();
 
-			} catch (ConfigException e) {
-				e.defaultHandleBehavior();
-			}
+            } catch (ConfigException e) {
+                e.defaultHandleBehavior();
+            }
 
-		}
+        }
 
-		@Override
-		public ApproximatorFactory getValue() {
-			return approximator;
-		}
+        @Override
+        public ApproximatorFactory getValue() {
+            return approximator;
+        }
 
-		@Override
-		public boolean isValueSet() {
-			return (getValue() != null);
-		}
+        @Override
+        public boolean isValueSet() {
+            return (getValue() != null);
+        }
 
-		private ApproximatorFactory approximator;
+        private ApproximatorFactory approximator;
 
-		@Override
-		public void setValue(Object value) {
-			// do nothing, values can't be set on this property
-		}
+        @Override
+        public void setValue(Object value) {
+            // do nothing, values can't be set on this property
+        }
 
-	}
+    }
 
 }
 
 class PEncodingDistribution extends Property {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public PEncodingDistribution(String name) {
-		super(name, (Float) 0f);
-	}
+    public PEncodingDistribution(String name) {
+        super(name, 0f);
+    }
 
-	@Override
-	protected PropertyInputPanel createInputPanel() {
-		return new Slider(this);
-	}
+    @Override
+    protected PropertyInputPanel createInputPanel() {
+        return new Slider(this);
+    }
 
-	@Override
-	public Class<Float> getTypeClass() {
-		return Float.class;
-	}
+    @Override
+    public Class<Float> getTypeClass() {
+        return Float.class;
+    }
 
-	@Override
-	public String getTypeName() {
-		return "Slider";
-	}
+    @Override
+    public String getTypeName() {
+        return "Slider";
+    }
 
-	static class Slider extends PropertyInputPanel {
-		private static final int NUMBER_OF_TICKS = 1000;
-		
-		private JSlider sliderSwing;
-		private JLabel sliderValueLabel;
+    static class Slider extends PropertyInputPanel {
+        private static final int NUMBER_OF_TICKS = 1000;
 
-		public Slider(Property property) {
-			super(property);
+        private JSlider sliderSwing;
+        private JLabel sliderValueLabel;
 
-			JPanel sliderPanel = new JPanel();
-			sliderPanel.setLayout(new BorderLayout());
-			add(sliderPanel);
+        public Slider(Property property) {
+            super(property);
 
-			sliderSwing = new JSlider(0, NUMBER_OF_TICKS);
+            JPanel sliderPanel = new JPanel();
+            sliderPanel.setLayout(new BorderLayout());
+            add(sliderPanel);
 
-			/*
-			 * Add labels
-			 */
-			sliderSwing.setPreferredSize(new Dimension(400, (int) sliderSwing.getPreferredSize()
-					.getHeight()));
-			sliderPanel.add(sliderSwing, BorderLayout.NORTH);
+            sliderSwing = new JSlider(0, NUMBER_OF_TICKS);
 
-			JPanel labelsPanel = new JPanel();
-			sliderPanel.add(labelsPanel, BorderLayout.SOUTH);
+            /*
+             * Add labels
+             */
+            sliderSwing.setPreferredSize(new Dimension(400, (int) sliderSwing.getPreferredSize()
+                    .getHeight()));
+            sliderPanel.add(sliderSwing, BorderLayout.NORTH);
 
-			labelsPanel.setLayout(new BorderLayout());
-			labelsPanel.add(new JLabel("0.0 - Evenly Distributed"), BorderLayout.WEST);
-			sliderValueLabel = new JLabel();
-			sliderValueLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			sliderValueLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-			labelsPanel.add(sliderValueLabel, BorderLayout.CENTER);
-			labelsPanel.add(new JLabel("Clustered on Axis - 1.0"), BorderLayout.EAST);
-			updateSliderLabel();
+            JPanel labelsPanel = new JPanel();
+            sliderPanel.add(labelsPanel, BorderLayout.SOUTH);
 
-			sliderSwing.addChangeListener(new ChangeListener() {
+            labelsPanel.setLayout(new BorderLayout());
+            labelsPanel.add(new JLabel("0.0 - Evenly Distributed"), BorderLayout.WEST);
+            sliderValueLabel = new JLabel();
+            sliderValueLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            sliderValueLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+            labelsPanel.add(sliderValueLabel, BorderLayout.CENTER);
+            labelsPanel.add(new JLabel("Clustered on Axis - 1.0"), BorderLayout.EAST);
+            updateSliderLabel();
 
-				public void stateChanged(ChangeEvent e) {
-					updateSliderLabel();
-				}
+            sliderSwing.addChangeListener(new ChangeListener() {
 
-			});
+                public void stateChanged(ChangeEvent e) {
+                    updateSliderLabel();
+                }
 
-		}
+            });
 
-		private void updateSliderLabel() {
-			DecimalFormat df = new DecimalFormat("0.000");
+        }
 
-			sliderValueLabel.setText(" -" + df.format(getValue()) + "- ");
-		}
+        private void updateSliderLabel() {
+            DecimalFormat df = new DecimalFormat("0.000");
 
-		@Override
-		public Float getValue() {
-			return ((float) sliderSwing.getValue() / (float) NUMBER_OF_TICKS);
-		}
+            sliderValueLabel.setText(" -" + df.format(getValue()) + "- ");
+        }
 
-		@Override
-		public boolean isValueSet() {
-			return true;
-		}
+        @Override
+        public Float getValue() {
+            return ((float) sliderSwing.getValue() / (float) NUMBER_OF_TICKS);
+        }
 
-		@Override
-		public void setValue(Object value) {
-			if (value instanceof Float) {
-				sliderSwing.setValue((int) (((Float) value) * NUMBER_OF_TICKS));
-			} else {
-				throw new InvalidParameterException();
-			}
-		}
+        @Override
+        public boolean isValueSet() {
+            return true;
+        }
 
-	}
+        @Override
+        public void setValue(Object value) {
+            if (value instanceof Float) {
+                sliderSwing.setValue((int) (((Float) value) * NUMBER_OF_TICKS));
+            } else {
+                throw new InvalidParameterException();
+            }
+        }
+
+    }
 
 }
 
 enum Sign {
-	Negative, Positive, Unconstrained
+    Negative, Positive, Unconstrained
 }
 
 class PSign extends Property {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public PSign(String name) {
-		super(name);
-	}
+    public PSign(String name) {
+        super(name);
+    }
 
-	@Override
-	protected PropertyInputPanel createInputPanel() {
-		return new Panel(this);
-	}
+    @Override
+    protected PropertyInputPanel createInputPanel() {
+        return new Panel(this);
+    }
 
-	@Override
-	public Class<?> getTypeClass() {
-		return Sign.class;
-	}
+    @Override
+    public Class<?> getTypeClass() {
+        return Sign.class;
+    }
 
-	@Override
-	public String getTypeName() {
-		return "Sign";
-	}
+    @Override
+    public String getTypeName() {
+        return "Sign";
+    }
 
-	private static class Panel extends PropertyInputPanel {
+    private static class Panel extends PropertyInputPanel {
 
-		private static SignItem[] items = { new SignItem("Unconstrained", Sign.Unconstrained),
-				new SignItem("Positive", Sign.Positive), new SignItem("Negative", Sign.Negative) };
+        private static SignItem[] items = { new SignItem("Unconstrained", Sign.Unconstrained),
+            new SignItem("Positive", Sign.Positive), new SignItem("Negative", Sign.Negative) };
 
-		private JComboBox comboBox;
+        private JComboBox comboBox;
 
-		public Panel(Property property) {
-			super(property);
-			comboBox = new JComboBox(items);
-			add(comboBox);
-		}
+        public Panel(Property property) {
+            super(property);
+            comboBox = new JComboBox(items);
+            add(comboBox);
+        }
 
-		@Override
-		public Sign getValue() {
-			return ((SignItem) comboBox.getSelectedItem()).getSign();
-		}
+        @Override
+        public Sign getValue() {
+            return ((SignItem) comboBox.getSelectedItem()).getSign();
+        }
 
-		@Override
-		public boolean isValueSet() {
-			return true;
-		}
+        @Override
+        public boolean isValueSet() {
+            return true;
+        }
 
-		@Override
-		public void setValue(Object value) {
-			for (SignItem item : items) {
-				if (value == item.getSign()) {
-					comboBox.setSelectedItem(item);
-				}
-			}
-		}
-	}
+        @Override
+        public void setValue(Object value) {
+            for (SignItem item : items) {
+                if (value == item.getSign()) {
+                    comboBox.setSelectedItem(item);
+                }
+            }
+        }
+    }
 
 }
 
 class SignItem {
-	String name;
-	Sign type;
+    String name;
+    Sign type;
 
-	public SignItem(String name, Sign type) {
-		super();
-		this.name = name;
-		this.type = type;
-	}
+    public SignItem(String name, Sign type) {
+        super();
+        this.name = name;
+        this.type = type;
+    }
 
-	public Sign getSign() {
-		return type;
-	}
+    public Sign getSign() {
+        return type;
+    }
 
-	@Override
-	public String toString() {
-		return name;
-	}
+    @Override
+    public String toString() {
+        return name;
+    }
 
 }
