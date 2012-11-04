@@ -511,13 +511,15 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
             }
         }
 
-        zoomToBounds(fullBounds, 700);
+        if (fullBounds != null) {
+            zoomToBounds(fullBounds, 700);
+        }
 
         if (enableElasticMode) {
             getGround().setElasticEnabled(true);
         }
 
-        return true;
+        return fullBounds != null;
     }
 
     /**
