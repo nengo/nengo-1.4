@@ -24,6 +24,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
@@ -36,34 +40,46 @@ import ca.nengo.ui.models.UINeoNode;
  * @author TODO
  */
 public class CutAction extends StandardAction {
-    private UINeoNode nodeUI;
+    private Collection<UINeoNode> nodeUIs;
 
     /**
      * @param description TODO
      * @param nodeUI TODO
      */
-    public CutAction(String description, UINeoNode nodeUI) {
+    public CutAction(String description, Collection<UINeoNode> nodeUIs) {
         super(description);
-        this.nodeUI = nodeUI;
+        this.nodeUIs = nodeUIs;
     }
 
     private static final long serialVersionUID = 1L;
 
     @Override
     protected final void action() throws ActionException {
-    	Node node;
-    	try {
-    		node = nodeUI.getModel().clone();
-	    } catch (CloneNotSupportedException e) {
-	        throw new ActionException("Could not clone node", e);
+    	ArrayList<Node> nodes = new ArrayList<Node>();
+    	ArrayList<Point2D> offsets = new ArrayList<Point2D>();
+    	
+    	// compute the mean of all the nodes' offsets
+    	//Point2D averagePoint = new Point2D.Double(0, 0);
+    	
+    	UINeoNode first = null;
+    	for (UINeoNode nodeUI : nodeUIs) {
+    		if (first == null) first = nodeUI;
+    		try {
+    			nodes.add(nodeUI.getModel().clone());
+    			offsets.add(new Point2D.Double(nodeUI.getOffset().getX() - first.getOffset().getX(), nodeUI.getOffset().getY() - first.getOffset().getY()));
+    		} catch (CloneNotSupportedException e) {
+    			throw new ActionException("Could not clone node", e);
+    		}
 	    }
 
         /*
          * This removes the node from its parent and externalities
          */
-        nodeUI.destroyModel();
+    	for (UINeoNode nodeUI : nodeUIs) {
+    		nodeUI.destroyModel();
+    	}
 
-        NengoGraphics.getInstance().getClipboard().setContents(node);
+        NengoGraphics.getInstance().getClipboard().setContents(nodes, offsets);
     }
 
 }

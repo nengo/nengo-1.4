@@ -30,6 +30,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -238,8 +239,11 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
 
-		menu.addAction(new CopyAction("Copy", this));
-		menu.addAction(new CutAction("Cut", this));
+		Collection<UINeoNode> arrayOfMe = new ArrayList<UINeoNode>();
+		arrayOfMe.add(this);
+		
+		menu.addAction(new CopyAction("Copy", arrayOfMe));
+		menu.addAction(new CutAction("Cut", arrayOfMe));
 
 //		menu.addSection("File");
 //		menu.addAction(new SaveNodeAction(this));

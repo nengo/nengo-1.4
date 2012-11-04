@@ -42,7 +42,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Stack;
 
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.DragAction;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.piccolo.WorldGroundImpl;
@@ -52,6 +54,9 @@ import ca.nengo.ui.lib.world.piccolo.WorldSkyImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
+import ca.nengo.ui.models.NodeContainer;
+import ca.nengo.ui.models.nodes.UINetwork;
+import ca.nengo.ui.models.viewers.NetworkViewer;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
@@ -90,9 +95,9 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		selectionListeners.remove(listener);
 	}
 
-	public static void singleObjectSelected(WorldObject obj) {
+	public static void objectsSelected(Collection<WorldObject> objs) {
 		for (SelectionListener listener : selectionListeners) {
-			listener.objectFocused(obj);
+			listener.objectFocused(objs);
 		}
 	}
 
@@ -122,7 +127,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	// selection
 	private WorldGroundImpl selectableParent = null; // List of nodes whose
 
-	private HashMap<WorldObjectImpl, Boolean> selection = null; // The current
+	private HashMap<WorldObjectImpl, Boolean> selectionMap = null; // The current
 
 	// /////////////////////////////////////////////////////
 	// Public static methods for manipulating the selection
@@ -165,7 +170,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			return false;
 		}
 
-		selection.put(node, Boolean.TRUE);
+		selectionMap.put(node, Boolean.TRUE);
 		decorateSelectedNode(node);
 		return true;
 	}
@@ -176,7 +181,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		}
 
 		undecorateSelectedNode(node);
-		selection.remove(node);
+		selectionMap.remove(node);
 		return true;
 	}
 
@@ -188,7 +193,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		unselectList.clear();
 		// Make just the items in the list selected
 		// Do this efficiently by first unselecting things not in the list
-		Iterator<WorldObjectImpl> selectionEn = selection.keySet().iterator();
+		Iterator<WorldObjectImpl> selectionEn = selectionMap.keySet().iterator();
 		while (selectionEn.hasNext()) {
 			WorldObjectImpl node = selectionEn.next();
 			if (!allItems.containsKey(node)) {
@@ -201,7 +206,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		selectionEn = allItems.keySet().iterator();
 		while (selectionEn.hasNext()) {
 			WorldObjectImpl node = selectionEn.next();
-			if (!selection.containsKey(node) && !marqueeMap.containsKey(node) && isSelectable(node)) {
+			if (!selectionMap.containsKey(node) && !marqueeMap.containsKey(node) && isSelectable(node)) {
 				marqueeMap.put(node, Boolean.TRUE);
 			} else if (!isSelectable(node)) {
 				selectionEn.remove();
@@ -213,7 +218,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 
 	protected void computeOptionMarqueeSelection(PInputEvent pie) {
 		unselectList.clear();
-		Iterator<WorldObjectImpl> selectionEn = selection.keySet().iterator();
+		Iterator<WorldObjectImpl> selectionEn = selectionMap.keySet().iterator();
 		while (selectionEn.hasNext()) {
 			WorldObjectImpl node = selectionEn.next();
 			if (!allItems.containsKey(node) && marqueeMap.containsKey(node)) {
@@ -227,7 +232,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		selectionEn = allItems.keySet().iterator();
 		while (selectionEn.hasNext()) {
 			WorldObjectImpl node = selectionEn.next();
-			if (!selection.containsKey(node) && !marqueeMap.containsKey(node) && isSelectable(node)) {
+			if (!selectionMap.containsKey(node) && !marqueeMap.containsKey(node) && isSelectable(node)) {
 				marqueeMap.put(node, Boolean.TRUE);
 			} else if (!isSelectable(node)) {
 				selectionEn.remove();
@@ -300,10 +305,10 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	protected void endDrag(PInputEvent e) {
 		super.endDrag(e);
 		panHandler.setInverted(false);
-		endSelection();
+		endSelection(true);
 	}
 
-	public void endSelection() {
+	public void endSelection(boolean unselect) {
 		if (marquee != null) {
 			// Remove marquee
 			marquee.removeFromParent();
@@ -316,7 +321,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 				dragAction = null;
 			}
 
-			if (getSelection().size() == 1) {
+			if (unselect && (pressNode == null || pressNode instanceof Window) && getSelection().size() > 0) {
 				unselectAll();
 			}
 			endStandardSelection();
@@ -345,7 +350,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			strokes[i] = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, dash, i);
 		}
 
-		selection = new HashMap<WorldObjectImpl, Boolean>();
+		selectionMap = new HashMap<WorldObjectImpl, Boolean>();
 		allItems = new HashMap<WorldObjectImpl, Boolean>();
 		unselectList = new ArrayList<WorldObjectImpl>();
 		marqueeMap = new HashMap<WorldObjectImpl, Boolean>();
@@ -394,7 +399,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 
 	protected boolean shouldStartMarqueeMode() {
-		return (pressNode == null && world.isSelectionMode());
+		return ((pressNode == null || pressNode instanceof Window) && world.isSelectionMode());
 	}
 
 	/**
@@ -446,15 +451,16 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 
 	protected void startOptionMarqueeSelection(PInputEvent e) {
+		unselectAll();
 	}
 
 	protected void startStandardOptionSelection(PInputEvent pie) {
 		// Option indicator is down, toggle selection
 		if (isSelectable(pressNode)) {
 			if (isSelected(pressNode)) {
-				unselect(pressNode);
+				removeFromSelection(pressNode);
 			} else {
-				select(pressNode);
+				addToSelection(pressNode);
 			}
 		}
 	}
@@ -489,10 +495,9 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		PBounds marqueeBounds = (PBounds) b.clone();
 
 		selectableParent.globalToLocal(marqueeBounds);
-
 		marqueeParent.viewToLocal(marqueeBounds);
-
-		// marquee.globalToLocal(b);
+		// marquee.globalToLocal(b);		
+		
 		marquee.setPathToRectangle((float) marqueeBounds.x, (float) marqueeBounds.y, (float) marqueeBounds.width,
 				(float) marqueeBounds.height);
 
@@ -544,7 +549,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	 * Returns a copy of the currently selected nodes.
 	 */
 	public Collection<WorldObject> getSelection() {
-		ArrayList<WorldObject> sel = new ArrayList<WorldObject>(selection.keySet());
+		ArrayList<WorldObject> sel = new ArrayList<WorldObject>(selectionMap.keySet());
 
 		int destroyedCount = 0;
 		for (WorldObject wo : sel) {
@@ -576,7 +581,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	 * or store this collection.
 	 */
 	public Collection<WorldObjectImpl> getSelectionReference() {
-		return Collections.unmodifiableCollection(selection.keySet());
+		return Collections.unmodifiableCollection(selectionMap.keySet());
 	}
 
 	public boolean getSupportDeleteKey() {
@@ -592,7 +597,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 
 	public boolean isSelected(WorldObjectImpl node) {
-		if ((node != null) && (selection.containsKey(node))) {
+		if ((node != null) && (selectionMap.containsKey(node))) {
 			return true;
 		} else {
 			return false;
@@ -606,12 +611,12 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_DELETE:
 			if (deleteKeyActive) {
-				Iterator<WorldObjectImpl> selectionEn = selection.keySet().iterator();
+				Iterator<WorldObjectImpl> selectionEn = selectionMap.keySet().iterator();
 				while (selectionEn.hasNext()) {
 					WorldObjectImpl node = selectionEn.next();
 					node.destroy();
 				}
-				selection.clear();
+				selectionMap.clear();
 			}
 		}
 	}
@@ -619,13 +624,16 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	public void select(Collection<WorldObjectImpl> items) {
 		boolean changes = false;
 		Iterator<WorldObjectImpl> itemIt = items.iterator();
+		ArrayList<WorldObject> selectedItems = new ArrayList<WorldObject>();
 		while (itemIt.hasNext()) {
 			WorldObjectImpl node = itemIt.next();
 			changes |= internalSelect(node);
+			selectedItems.add(node);
 		}
 		if (changes) {
 			postSelectionChanged();
 		}
+		objectsSelected(selectedItems);
 	}
 
 	public void select(Map<WorldObjectImpl, Boolean> items) {
@@ -636,9 +644,23 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		if (internalSelect(node)) {
 			postSelectionChanged();
 		}
-		singleObjectSelected(node);
+		ArrayList<WorldObject> objects = new ArrayList<WorldObject>();
+		objects.add(node);
+		objectsSelected(objects);
 	}
 
+	private void addToSelection(WorldObjectImpl node) {
+		if (internalSelect(node)) {
+			postSelectionChanged();
+		}
+		Collection<WorldObject> objects = NengoGraphics.getInstance().getSelectedObjects();
+		if (objects == null) objects = new ArrayList<WorldObject>();
+		if (!objects.contains(node)) {
+			objects.add(node);
+		}
+		objectsSelected(objects);
+	}
+	
 	/**
 	 * Specifies if the DELETE key should delete the selection
 	 */
@@ -706,10 +728,20 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	public void unselectAll() {
 		// Because unselect() removes from selection, we need to
 		// take a copy of it first so it isn't changed while we're iterating
-		ArrayList<WorldObjectImpl> sel = new ArrayList<WorldObjectImpl>(selection.keySet());
+		ArrayList<WorldObjectImpl> sel = new ArrayList<WorldObjectImpl>(selectionMap.keySet());
 		unselect(sel);
 	}
 
+	private void removeFromSelection(WorldObjectImpl node) {
+		if (internalUnselect(node)) {
+			postSelectionChanged();
+		}
+		Collection<WorldObject> objects = NengoGraphics.getInstance().getSelectedObjects();
+		if (objects == null) return;
+		objects.remove(node);
+		objectsSelected(objects);
+	}
+	
 	protected class BoundsFilter implements PNodeFilter {
 		PBounds bounds;
 		PBounds localBounds = new PBounds();
@@ -743,7 +775,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 
 	public static interface SelectionListener {
-		public void objectFocused(WorldObject obj);
+		public void objectFocused(Collection<WorldObject> obj);
 	}
 
 }
