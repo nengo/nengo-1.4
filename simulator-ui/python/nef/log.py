@@ -195,7 +195,6 @@ class Log(SimpleNode):
         self.write('%1.3f,%s\n'%(self.t,','.join(data)))
         
     def write(self,text):
-        print 'writing to', self.filename
         f=open(self.filename,'a')
         f.write(text)
         f.close()
