@@ -7,18 +7,21 @@ from numeric import array, dot, reshape, ones, transpose, concatenate, floor, ze
 import timeview.components.core as core
 import timeview.view
 
-config={}
-
-def define(obj,func,label='1D function',origin='X',minx=-1,maxx=1,miny=-1,maxy=1):
-    config[obj]=(origin,label,func,minx,maxx,miny,maxy)
+#this is here to provide the functionality of a global variable without cluttering the global namespace
+class FuncRepWatchConfig:
+    config={}
+    
+    @classmethod
+    def define(cls,obj,func,label='1D function',origin='X',minx=-1,maxx=1,miny=-1,maxy=1):
+        cls.config[obj]=(origin,label,func,minx,maxx,miny,maxy)
 
 class FuncRepWatch:
     def check(self,obj):
-        return obj in config and obj.getOrigin(config[obj][0]) is not None
+        return obj in FuncRepWatchConfig.config and obj.getOrigin(FuncRepWatchConfig.config[obj][0]) is not None
     def value(self,obj):
-        return obj.getOrigin(config[obj][0]).getValues().getValues()    
+        return obj.getOrigin(FuncRepWatchConfig.config[obj][0]).getValues().getValues()    
     def views(self,obj):
-        return [(config[obj][1],FunctionRepresentation,dict(func=self.value,label=obj.name,config=config[obj]))]
+        return [(FuncRepWatchConfig.config[obj][1],FunctionRepresentation,dict(func=self.value,label=obj.name,config=FuncRepWatchConfig.config[obj]))]
 timeview.view.watches.append(FuncRepWatch())
 
 

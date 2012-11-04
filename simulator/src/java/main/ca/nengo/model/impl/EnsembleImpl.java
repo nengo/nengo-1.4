@@ -31,6 +31,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * <p>Default implementation of Ensemble.</p>
@@ -232,5 +234,17 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 		
 		for(Termination t: myExpandedTerminations.values())
 			t.reset(randomize);
+	}
+
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toScript(HashMap<String, Object> scriptData) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

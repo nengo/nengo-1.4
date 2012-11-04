@@ -94,9 +94,13 @@ public class ElasticWorld extends WorldImpl {
 	}
 
 	@Override
-	protected void constructMenu(PopupMenuBuilder menu) {
-		super.constructMenu(menu);
+	protected void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
+		super.constructMenu(menu, posX, posY);
 		constructLayoutMenu(menu.addSubMenu("Layout"));
+	}
+	
+	protected void constructMenu(PopupMenuBuilder menu) {
+		constructMenu(menu, 0.0, 0.0);
 	}
 
 	/**

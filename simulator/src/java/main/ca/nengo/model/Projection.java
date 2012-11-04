@@ -29,6 +29,8 @@ package ca.nengo.model;
 
 import java.io.Serializable;
 
+import ca.nengo.util.impl.ScriptGenerator;
+
 /**
  * A connection between an Origin and a Termination.
  *
@@ -85,5 +87,4 @@ public interface Projection extends Serializable {
 	 * @return Matrix of weights in this Projection (if there are neurons on each end, then these are synaptic weights)
 	 */
 	public float[][] getWeights();
-
 }

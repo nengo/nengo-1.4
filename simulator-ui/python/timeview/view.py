@@ -4,7 +4,7 @@ import timelog
 import data
 import simulator
 import hrr
-from timeview.components import hrrgraph
+from timeview.components import hrrgraph,neuronmap
 from nef.array import NetworkArray
 import nef
 
@@ -34,8 +34,8 @@ import os
 
 # for save_pdf
 import sys
-if 'lib/iText-5.0.5.jar' not in sys.path:
-    sys.path.append('lib/iText-5.0.5.jar')
+if 'lib/itextpdf-5.3.4.jar' not in sys.path:
+    sys.path.append('lib/itextpdf-5.3.4.jar')
 
 
 class Icon:
@@ -462,6 +462,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         
         self.tick_queue=[]
         
+        self.mapcache = neuronmap.MapCache()
+        
         if size is None:
             size=(950,600)
             if ui is not None: size=(max(int(ui.width), 950),max(int(ui.height), 500))
@@ -841,10 +843,10 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
     def run(self):
         sim=simulator.Simulator(self.network)
         
-        sim.step(0,0) #this is here to initialize the thread pool threads properly
+        sim.step(0.0,0.001)
         sim.reset(False)
 
-        while self.frame.visible:
+        while (not self.frame is None and self.frame.visible):
             sim.reset(False)                   
             # run the network for an instant so that FunctionInputs have values at their Origin so they can be read
             for n in self.network.nodes:
@@ -872,8 +874,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             self.forced_origins={}
             last_frame_time=None
             counter=0
-            while self.frame.visible:
-                while (self.paused or self.timelog.processing or self.time_control.slider.valueIsAdjusting) and not self.restart and self.frame.visible:
+            while (not self.frame is None and self.frame.visible):
+                while (self.paused or self.timelog.processing or self.time_control.slider.valueIsAdjusting) and not self.restart and (not self.frame is None and self.frame.visible):
                     java.lang.Thread.sleep(10)
                     if self.requested_mode is not None:
                         self.network.mode=self.requested_mode
@@ -881,7 +883,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 if self.requested_mode is not None:
                     self.network.mode=self.requested_mode
                     self.requested_mode=None
-                if self.restart or not self.frame.visible:
+                if self.restart or (not self.frame is None and not self.frame.visible):
                     self.restart=False
                     break
                     
@@ -928,7 +930,6 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
 
         if sim is not None:
             sim.kill();
-
 
     
     
@@ -1216,10 +1217,20 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             cb.addTemplate(tp,20,0)
             doc.close()
 
+def make_layout_dir(dir):
+    if not dir.exists():
+        dir.mkdirs()
+        devdir = java.io.File('dist-files/layouts')
+        if devdir.exists():
+            devlayouts = devdir.listFiles()
+            for layout in devlayouts:
+                newlayout = dir.getPath() + '/' + layout.getName()
+                copyfile(layout.getCanonicalPath(), newlayout)
 
-def save_layout_file(name,view,layout,controls):
+
+def save_layout_file(name, view, layout, controls):
     dir=java.io.File('layouts')
-    if not dir.exists(): dir.mkdirs()
+    make_layout_dir(dir)
 
     f=file('layouts/%s.layout'%name,'w')
     
@@ -1228,9 +1239,11 @@ def save_layout_file(name,view,layout,controls):
     f.write('(%s,\n [%s],\n %s)'%(view,layout_text,controls))
     f.close()
 
-def load_layout_file(name, try_backup = True):
-    fn='%s.layout'%name
+
+def load_layout_file(name, try_backup=True):
+    fn = '%s.layout' % name
     if not java.io.File(fn).exists():
+        make_layout_dir(java.io.File('layouts'))        
         fn='layouts/'+fn
         if not java.io.File(fn).exists():
             return None

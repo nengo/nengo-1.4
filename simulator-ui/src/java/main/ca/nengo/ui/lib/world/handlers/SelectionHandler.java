@@ -50,6 +50,7 @@ import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.WorldSkyImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
+import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
@@ -370,32 +371,26 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		canvasPressPt = pie.getCanvasPosition();
 		presspt = pie.getPosition();
 
-		PNode node = pie.getPath().getPickedNode();
-
-		while (node != null) {
-			if (node == marqueeParent.getPiccolo()) {
-				pressNode = null;
-				return;
-			}
-
-			if (node == selectableParent.getPiccolo()) {
-				pressNode = null;
-				return;
-			}
-
+		for (PNode node = pie.getPath().getPickedNode(); node != null; node = node.getParent()) {
 			if (node instanceof PiccoloNodeInWorld) {
 				WorldObjectImpl wo = (WorldObjectImpl) ((PiccoloNodeInWorld) node).getWorldObject();
-				if (wo.isSelectable()) {
+				
+				if (wo != null && wo.isSelectable()) {
 					pressNode = wo;
-					pressNode.moveToFront();
+					wo.moveToFront();
+					
+					// EH - move parents to front, so that clicking on an ensemble brings the network window forward
+					// (I currently can't get this to work)
+//					WorldObject pnode = wo.getParent();
+//					while( pnode != null ) {
+//						pnode.moveToFront();
+//						pnode = pnode.getParent();
+//					}
+					
 					return;
 				}
-
 			}
-
-			node = node.getParent();
 		}
-
 	}
 
 	protected boolean shouldStartMarqueeMode() {

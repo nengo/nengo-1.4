@@ -80,6 +80,7 @@ public abstract class PropertyInputPanel {
         labelPanel.add(label);
 
         JButton help=new JButton("<html><u>?</u></html>");
+        help.setFocusable(false);
         help.setForeground(new java.awt.Color(120,120,180));
         help.setBorderPainted(false);
         help.setContentAreaFilled(false);

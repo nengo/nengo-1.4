@@ -1,5 +1,4 @@
 import core
-import neuronmap
 
 from javax.swing import *
 from javax.swing.event import *

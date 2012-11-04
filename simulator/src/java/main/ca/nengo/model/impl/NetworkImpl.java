@@ -27,6 +27,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -62,6 +65,7 @@ import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.ProbeTask;
+import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * Default implementation of Network.
@@ -1009,6 +1013,16 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		}
 
 	}
+	
+	public void dumpToScript() throws FileNotFoundException
+	{
+		File file = new File(this.getName() + ".py");
+		PrintWriter writer = new PrintWriter(file);
+		ScriptGenerator scriptGen = new ScriptGenerator(writer);
+		scriptGen.DFS(this);
+		writer.close();
+	}
+	
 
 	/**
 	 * @see ca.nengo.model.Node#getDocumentation()
@@ -1210,4 +1224,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		return result;
 	}
 
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
