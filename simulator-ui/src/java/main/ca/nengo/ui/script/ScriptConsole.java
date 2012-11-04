@@ -121,6 +121,9 @@ public class ScriptConsole extends JPanel {
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
 		myDisplayArea.setMargin(new Insets(5, 5, 5, 5));
+		
+		// add a listener, so that keys typed when displayArea has focus can pass to commandField
+		myDisplayArea.addKeyListener(new CommandKeyListener(this));
 
 		myCommandField = new JTextArea();
 		ToolTipManager.sharedInstance().registerComponent(myCommandField);
@@ -541,7 +544,14 @@ public class ScriptConsole extends JPanel {
 		return command.substring(start);
 	}
 
-
+	public void passKeyEvent( KeyEvent e ) {
+		KeyListener[] kl = myCommandField.getKeyListeners();
+		for( KeyListener listener : kl ) {
+			if (listener instanceof CommandKeyListener) {
+				((CommandKeyListener)listener).keyPressed(e);
+			}
+		}
+	}
 
 	private class CommandKeyListener implements KeyListener {
 
@@ -554,31 +564,43 @@ public class ScriptConsole extends JPanel {
 		public void keyPressed(KeyEvent e) {
 			try {
 				int code = e.getKeyCode();
-				if (code == 27 && myConsole.getInCallChainCompletionMode()) { // escape
+				if (code == KeyEvent.VK_ESCAPE && myConsole.getInCallChainCompletionMode()) { // escape
 					myConsole.revertToTypedText();
 					myConsole.setInCallChainCompletionMode(false);
-				} else if (code == 27) {
+				} else if (code == KeyEvent.VK_ESCAPE) {
 					myConsole.clearCommand();
-				} else if (code == 9 && e.isShiftDown()) { // shift-tab
+				} else if (code == KeyEvent.VK_TAB && e.isShiftDown()) { // shift-tab
 					myCommandField.append("\t");
-				} else if (code == 9) { // tab
+				} else if (code == KeyEvent.VK_TAB) { // tab
 					myConsole.setInCallChainCompletionMode(true);
 					e.consume();
-				} else if (code == 38) { // up arrow
+				} else if (code == KeyEvent.VK_UP) { // up arrow
 					myConsole.completorUp();
 					e.consume();
-				} else if (code == 40) { // down arrow
+				} else if (code == KeyEvent.VK_DOWN) { // down arrow
 					myConsole.completorDown();
 					e.consume();
-				} else if (code == 17) { //CTRL
+				} else if (code == KeyEvent.VK_CONTROL) {
 					myConsole.showToolTip();
-				} else if (code == 10 && e.isShiftDown()) { //shift-enter
+				} else if (code == KeyEvent.VK_ENTER && e.isShiftDown()) { //shift-enter
 					//allow a new line to be entered
 					myCommandField.append("\n");
-				} else if (code == 10) { //enter.  execute code.
+				} else if (code == KeyEvent.VK_ENTER) { //enter.  execute code.
 					e.consume();
 					myConsole.enterCommand(myCommandField.getText());
 				} else {
+					if (!myConsole.myCommandField.hasFocus() && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+						// a typing event is coming from far away (the command field doesn't have focus)
+						// so manually append the typed character
+						String curtext = myConsole.myCommandField.getText();
+						if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+							myConsole.myCommandField.setText( curtext.substring(0,curtext.length()-1) );
+						else
+							myConsole.myCommandField.setText( myConsole.myCommandField.getText() + e.getKeyChar() );
+						
+						myConsole.myCommandField.requestFocus();
+					}
+					
 					myConsole.setInCallChainCompletionMode(false);
 				}
 			} catch (RuntimeException ex) {

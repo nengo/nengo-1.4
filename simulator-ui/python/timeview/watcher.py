@@ -33,5 +33,13 @@ class Watcher:
                 r.extend(w.views(obj))
         return r
 
+    def contains(self,name):
+        obj = self.objects[name]
+        for w in self.watches:
+            if w.check(obj):
+                return True
+
+        return False
+
     def reset(self):
         self.timelog.reset()

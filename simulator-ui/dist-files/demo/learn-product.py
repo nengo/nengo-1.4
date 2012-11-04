@@ -18,8 +18,7 @@ net.make('post',N,1) #Make a population with 60 neurons, 1 dimensions
 net.make_fourier_input('input', dimensions = D, base=0.1, high=8, power=0.4, seed=0)
                #Create a white noise input function .1 base freq, max 
                #freq 10 rad/s, and RMS of .4; 0 is a seed             
-                
-net.add('input') #Add the input node to the network
+
 net.connect('input','pre')
 
 # Create a modulated connection between the 'pre' and 'post' ensembles.

@@ -1,6 +1,7 @@
 package ca.nengo.ui.lib.world;
 
 import java.util.Collection;
+import ca.nengo.ui.lib.actions.UserCancelledException;
 
 /**
  * An object which accepts a list of drop targets. It differs from IDroppable in
@@ -10,6 +11,6 @@ import java.util.Collection;
  */
 public interface DroppableX {
 
-	public void droppedOnTargets(Collection<WorldObject> targets);
+	public void droppedOnTargets(Collection<WorldObject> targets) throws UserCancelledException;
 
 }

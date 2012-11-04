@@ -89,6 +89,8 @@ class Vocabulary:
     registered={}
     
     def register(self,node):
+        # This will pose a memory problem in the future. If scripts are re-run and the node id is not the same,
+        # then vocabularies will accumulate
         Vocabulary.registered[id(node)]=self
     
     def __init__(self,dimensions,randomize=True,unitary=False,max_similarity=0.1,include_pairs=False):
