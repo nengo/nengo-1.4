@@ -68,6 +68,7 @@ import ca.nengo.ui.lib.actions.DisabledAction;
 import ca.nengo.ui.lib.actions.DragAction;
 import ca.nengo.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.UserCancelledException;
 import ca.nengo.ui.lib.misc.ShortcutKey;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UIEnvironment;
@@ -571,7 +572,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             return nodeContainer.addNodeModel(node, posX, posY);
         } else if (nodeContainer == this) {
             UINeoNode nodeUI = getNengoWorld().addNodeModel(node, posX, posY);
-            DragAction.dropNode(nodeUI);
+            try {
+            	DragAction.dropNode(nodeUI);
+            } catch (UserCancelledException e) {
+            	// the user should not be given a chance to do this
+            	throw new ContainerException("Unexpected cancellation of action by user");
+            }
             return nodeUI;
         } else {
             throw new ContainerException("There are no containers to put this node");

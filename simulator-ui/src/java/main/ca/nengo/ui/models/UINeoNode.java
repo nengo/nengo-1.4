@@ -447,42 +447,33 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 * @see
 	 * ca.shu.ui.lib.world.DroppableX#droppedOnTargets(java.util.Collection)
 	 */
-	public void droppedOnTargets(Collection<WorldObject> targets) {
+	public void droppedOnTargets(Collection<WorldObject> targets) throws UserCancelledException {
+		// look through all containers, move to the first NodeContainer we find
 		for (WorldObject wo : targets) {
-			/*
-			 * Move to new container
-			 */
 			if (wo instanceof NodeContainer) {
 				NodeContainer nodeContainer = (NodeContainer) wo;
 
 				try {
+					CreateModelAction.ensureNonConflictingName(getModel(), nodeContainer); // throws UserCancelledException
+					
 					Node node;
 					try {
 						node = getModel().clone();
-					}
-					catch (CloneNotSupportedException e) {
+					} catch (CloneNotSupportedException e) {
 						throw new ContainerException("Could not clone node: " + e.getMessage());
 					}
 					Point2D newPosition = localToGlobal(new Point2D.Double(0, 0));
 					newPosition = wo.globalToLocal(newPosition);
 					newPosition = nodeContainer.localToView(newPosition);
 
-					/*
-					 * This removes the node from its parent and externalities
-					 */
+					// destroy the old model
 					destroyModel();
+					
+					// add the new model
+					nodeContainer.addNodeModel(node,
+							newPosition.getX(),
+							newPosition.getY());
 
-					/*
-					 * Adds node
-					 */
-					try {
-						CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-						nodeContainer.addNodeModel(node,
-								newPosition.getX(),
-								newPosition.getY());
-					} catch (UserCancelledException e) {
-						e.defaultHandleBehavior();
-					}
 				} catch (ContainerException e) {
 					UserMessages.showWarning("Could not drop into container: " + e.getMessage());
 				}
