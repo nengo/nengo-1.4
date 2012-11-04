@@ -196,7 +196,7 @@ class Network:
         else:
             r=[radius]*dimensions
 
-        parent,name=self.parse_name(name)
+        parent,name=self._parse_name(name)
                 
         n=ef.make(name,neurons,r,storage_name,False)
         if noise is not None:
@@ -210,7 +210,7 @@ class Network:
         if add_to_network: parent.addNode(n)
         return n
     
-    def parse_name(self,name):
+    def _parse_name(self,name):
         original_name=name
         parent=self.network
         while '.' in name:
@@ -272,7 +272,7 @@ class Network:
             n=self.make('%d'%i,neurons,dimensions,add_to_network=False,**args)
             nodes.append(n)
             
-        parent,name=self.parse_name(name)    
+        parent,name=self._parse_name(name)    
         ensemble=array.NetworkArray(name,nodes)
         parent.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
@@ -324,7 +324,7 @@ class Network:
                     f=PiecewiseConstantFunction([zero_after_time],[v,0])
                 funcs.append(f)
                 
-        parent,name=self.parse_name(name)        
+        parent,name=self._parse_name(name)        
         input=FunctionInput(name,funcs,Units.UNK)
         parent.addNode(input)
         return input
@@ -372,14 +372,21 @@ class Network:
             f=FourierFunction(base[i%len(base)],high[i%len(high)],power[i%len(power)],s)
             funcs.append(f)
             
-        parent,name=self.parse_name(name)    
+        parent,name=self._parse_name(name)    
         input=FunctionInput(name,funcs,Units.UNK)
         parent.addNode(input)
         return input
                     
             
     def make_subnetwork(self,name):
-        parent,name=self.parse_name(name)
+        """Create and return a subnetwork.  Subnetworks are just Network objects that are
+        inside other Networks, and are useful for keeping a model organized.
+        
+        :param string name: name of created node
+        :returns: the created Network       
+        """
+        
+        parent,name=self._parse_name(name)
         network=NetworkImpl()
         network.name=name
         parent.addNode(network)
@@ -468,7 +475,7 @@ class Network:
             t[post][pre]=weight
         return t
 
-    def get_nodes(self, name, delim='.'):
+    def _get_nodes(self, name, delim='.'):
         node = self.network
         nodes = []
         for n in name.split(delim):
@@ -607,10 +614,10 @@ class Network:
         post_nodes = None
 
         if isinstance(pre, basestring):
-            pre_nodes = self.get_nodes(pre)
+            pre_nodes = self._get_nodes(pre)
             pre = pre_nodes[-1]
         if isinstance(post, basestring):
-            post_nodes = self.get_nodes(post)
+            post_nodes = self._get_nodes(post)
             post = post_nodes[-1]
 
         # Check if pre and post are set if projection is to be created
@@ -731,9 +738,9 @@ class Network:
                     del post_nodes[0]
             
             if pre_nodes is not None:
-                origin = expose_toplevel(origin, pre_nodes, 'Origin')
+                origin = _expose_toplevel(origin, pre_nodes, 'Origin')
             if post_nodes is not None:    
-                term = expose_toplevel(term, post_nodes, 'Termination')
+                term = _expose_toplevel(term, post_nodes, 'Termination')
 
             return projection_network.addProjection(origin,term)
         else:
@@ -1100,7 +1107,7 @@ class Network:
         import timeview
         timeview.funcrep1d.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
 
-def expose_toplevel(o, nodes, expose_attr):
+def _expose_toplevel(o, nodes, expose_attr):
     """
     expose_attr: 'exposeOrigin' or 'exposeTerminal'
     """

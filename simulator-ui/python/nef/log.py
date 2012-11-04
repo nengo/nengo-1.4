@@ -1,3 +1,4 @@
+import logging
 import time
 import numeric
 from simplenode import SimpleNode
@@ -8,12 +9,15 @@ from ca.nengo.model import Origin
 import stats.reader
 import os
 
+logger = logging.getLogger(__name__)
+
 class LogOverride:
     override_directory=None
     override_filename=None
     
     @classmethod
     def override(cls,directory,filename):
+        # -- XXX what's this supposed to mean?
         cls.override_directory,override_filename
         cls.override_directory=directory
         cls.override_filename=filename
@@ -71,7 +75,8 @@ class LogVocab(LogVector):
         return self.vocab.text(self.value,threshold=self.threshold,terms=self.terms,include_pairs=self.pairs,join=';',normalize=self.normalize)
     def type(self):
         return 'vocab'
-        
+
+
 class LogSpikeCount(LogBasic):
     def __init__(self,name,origin,skip=0):
         self.skip=skip
@@ -83,7 +88,7 @@ class LogSpikeCount(LogBasic):
         scale=1+self.skip
         length2=length/scale
         if length%scale>0: length2+=1
-        return length2        
+        return length2
     def type(self):
         return 's<%d>'%self.length()
     def tick(self,dt):
@@ -107,11 +112,12 @@ class Log(SimpleNode):
 
         if name is None: self.logname=self.network.network.name
         else: self.logname=name
-        
-        if override_directory is not None:
-            dir=override_directory
-            filename=override_filename
-        
+
+        # -- Disabling because it doesn't compile (JB Nov2012)
+        #if override_directory is not None:
+        #    dir=override_directory
+        #    filename=override_filename
+
         self.dir=dir
         if not filename.endswith('.csv'): filename+='.csv'
         self.filename_template=filename
@@ -121,7 +127,7 @@ class Log(SimpleNode):
         self.logs=[]
         SimpleNode.__init__(self,'Log')
         self.network.add(self)
-    
+
     def init(self):
         self.filename=self.make_filename()
         for log in self.logs:
@@ -138,9 +144,8 @@ class Log(SimpleNode):
             #ensure directory exists
             if not os.access(self.dir+'/',os.F_OK):
                 os.makedirs(self.dir)
-            
         return fn
-                    
+
     def tick(self):
         if len(self.logs)==0: return
         if not self.wrote_header: self.write_header()
@@ -151,10 +156,10 @@ class Log(SimpleNode):
             self.next_time+=self.interval
             self.write_data()    
             for log in self.logs: log.flush()
-        
+
     def add_spikes(self,source,name=None,skip=0):    
         if name is None: name=source+'_spikes'
-        
+
         node=self.network.get(source)
         if isinstance(node,Origin):
             origin=node
@@ -163,11 +168,17 @@ class Log(SimpleNode):
         else:    
             origin=node.getOrigin('AXON')
         self.logs.append(LogSpikeCount(name,origin,skip=skip))
-        
+
     def add(self,source,name=None,tau='default'):
         if name is None: name=source
         if tau=='default': tau=self.tau
-        origin=self.network.get(source,require_origin=True)
+        node = self.network.get_nodes(source)[-1]
+        if len(node.getOrigins()) == 0:
+            raise Exception('node has no origins', source)
+        if len(node.getOrigins()) > 1:
+            logger.warn('Log add %s defaulting to first of %i origins'
+                    % (source, len(node.getOrigins())))
+        origin = node.getOrigins()[0]
         self.logs.append(LogVector(name,origin,tau))
 
     def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=False,threshold=0.1,normalize=False):
@@ -193,6 +204,7 @@ class Log(SimpleNode):
         self.write('%1.3f,%s\n'%(self.t,','.join(data)))
         
     def write(self,text):
+        print 'writing to', self.filename
         f=open(self.filename,'a')
         f.write(text)
         f.close()
