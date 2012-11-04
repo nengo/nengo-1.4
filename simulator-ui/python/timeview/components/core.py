@@ -5,6 +5,7 @@ from java.awt.event import *
 import javax
 import java
 
+################################################################################
 class RoundedBorder(javax.swing.border.AbstractBorder):
     def __init__(self,color,thickness=1):
         self.color=color
@@ -19,15 +20,13 @@ class RoundedBorder(javax.swing.border.AbstractBorder):
         g.drawRoundRect(x,y,width-1,height-1,10,10)
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF)
 
-
-
+################################################################################
 class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionListener, ActionListener):
     #hover_border=BorderFactory.createLineBorder(Color.black,2);
     #item_hover_border=BorderFactory.createLineBorder(Color(0.5,0.5,0.5),1);
     
     hover_border=RoundedBorder(Color.black,thickness=2);
     item_hover_border=RoundedBorder(Color(0.7,0.7,0.7))
-    
     
     default_border=BorderFactory.createEmptyBorder()
     
@@ -70,7 +69,6 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         if self.label is not None:
             self.popup_label.state = self.show_label
         self.label_offset = self.label_height * self.show_label
-        
     
     def do_hide(self):
         parent=self.parent

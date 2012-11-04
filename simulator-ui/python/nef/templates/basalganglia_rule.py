@@ -6,7 +6,7 @@ params=[
     ('index','Rule Index',int),
     ('pattern','Semantic Pointer',str),
     ('dim','Dimensionality',int),
-    ('pstc','tauPSC',float),
+    ('pstc','Synaptic time constant [s]',float),
     ('use_single_input','Use Single Input',bool),
     ]
 

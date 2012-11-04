@@ -1229,14 +1229,21 @@ def make_layout_dir(dir):
 
 
 def save_layout_file(name, view, layout, controls):
-    dir=java.io.File('layouts')
+    dir = java.io.File('layouts')
     make_layout_dir(dir)
-
-    f=file('layouts/%s.layout'%name,'w')
     
-    layout_text=',\n  '.join([`x` for x in layout])
+    f = file('layouts/%s.layout' % name, 'r')
+    java_layout = ""
+    data = f.read()
+    for line in data.split('\n'):
+        if line.startswith('#'):
+            java_layout += '\n' + line
+    f = file('layouts/%s.layout' % name, 'w')
     
-    f.write('(%s,\n [%s],\n %s)'%(view,layout_text,controls))
+    layout_text = ',\n  '.join([`x` for x in layout])
+    
+    f.write('(%s,\n [%s],\n %s) %s' % (
+        view, layout_text, controls, java_layout))
     f.close()
 
 
