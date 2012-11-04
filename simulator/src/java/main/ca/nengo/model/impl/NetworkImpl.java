@@ -39,6 +39,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 
@@ -1087,7 +1088,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             String type = (String)myMetaData.get("type");
             if (type == "NetworkArray")
             {
-                py = String.format("nef.templates.networkarray.make(%1s, name='%2s', neurons=%3d, length=%4d, radius=%5f, rLow=%6d, rHigh=%7d, iLow=%8d, iHigh=%9d, encSign=%10d, useQuick=%11b)",
+                py = String.format("nef.templates.networkarray.make(%1s, name='%2s', neurons=%3d, length=%4d, radius=%5f, rLow=%6d, rHigh=%7d, iLow=%8d, iHigh=%9d, encSign=%10d, useQuick=%11b)\n",
                         scriptData.get("netName"),
                         myMetaData.get("name"),
                         (Integer)myMetaData.get("neurons"),
@@ -1102,7 +1103,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             }
             else if (type == "BasalGanglia")
             {
-                py = String.format("nef.templates.basalganglia.make(%1s, name='%2s', dimensions=%3d, pstc=%4f, same_neurons=%5b)",
+                py = String.format("nef.templates.basalganglia.make(%1s, name='%2s', dimensions=%3d, pstc=%4f, same_neurons=%5b)\n",
                         scriptData.get("netName"),
                         myMetaData.get("name"),
                         (Integer)myMetaData.get("dimensions"),
@@ -1111,7 +1112,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             }
             else if (type == "Thalmus")
             {
-                py = String.format("nef.templates.thalamus.make(%1s, name='%2s', neurons=%3d, dimensions=%4d, inhib_scale=%5d, tau_inhib=%6f, useQuick=%7b)",
+                py = String.format("nef.templates.thalamus.make(%1s, name='%2s', neurons=%3d, dimensions=%4d, inhib_scale=%5d, tau_inhib=%6f, useQuick=%7b)\n",
                         scriptData.get("netName"),
                         myMetaData.get("name"),
                         (Integer)myMetaData.get("neurons"),
@@ -1277,11 +1278,134 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	}
 
 	@Override
-	public String toPostScript(HashMap<String, Object> scriptData)
-			throws ScriptGenException {
-		
+	public String toPostScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
-		for(Projection proj : this.getProjections())
+
+        if (myMetaData.get("integrator") != null)
+        {
+            ListIterator iter = ((ArrayList)myMetaData.get("integrator")).listIterator();
+            while (iter.hasNext())
+            {
+                HashMap integrator = (HashMap)iter.next();
+                py.append(String.format("nef.templates.integrator.make(%1s%2s, name='%3s', neurons=%4d, dimensions=%5d, tau_feedback=%6f, tau_input=%7f, scale=%8d)\n",
+                            scriptData.get("prefix"),
+                            myName,
+                            integrator.get("name"),
+                            (Integer)integrator.get("neurons"),
+                            (Integer)integrator.get("dimensions"),
+                            (Float)integrator.get("tau_feedback"),
+                            (Float)integrator.get("tau_input"),
+                            (Integer)integrator.get("scale")));
+            }
+        }       
+
+        if (myMetaData.get("linear") != null)
+        {
+            ListIterator iter = ((ArrayList)myMetaData.get("linear")).listIterator();
+            while (iter.hasNext())
+            {
+                HashMap linear = (HashMap)iter.next();
+
+                StringBuilder a = new StringBuilder("[");
+                float[][] arr = (float[][])linear.get("A");
+                for (int i = 0; i < arr.length; i++)
+                {
+                    a.append("[");
+                    for (int j = 0; j < arr[i].length; j++)
+                    {
+                        a.append(arr[i][j]);
+                        if ((j+1) < arr[i].length)
+                        {
+                            a.append(",");
+                        }
+                    }
+                    a.append("]");
+                    if ((i + 1) < arr.length)
+                    {
+                        a.append(",");
+                    }
+                }
+                a.append("]");
+
+                py.append(String.format("nef.templates.linear_system.make(%1s%2s, name='%3s', neurons=%4, A=%5s, tau_feedback=%6f)\n",
+                            scriptData.get("prefix"),
+                            myName,
+                            linear.get("name"),
+                            (Integer)linear.get("neurons"),
+                            a.toString(),
+                            (Float)linear.get("tau_feedback")));
+            }
+        } 
+
+        if (myMetaData.get("binding") != null)
+        {
+            ListIterator iter = ((ArrayList)myMetaData.get("binding")).listIterator();
+            while (iter.hasNext())
+            {
+                HashMap binding = (HashMap)iter.next();
+                py.append(String.format("nef.templates.binding.make(%1s%2s, name='%3s', outputName='%4s', N_per_D=%5d, invertA=%6b, invertB=%7b)\n",
+                            scriptData.get("prefix"),
+                            myName,
+                            binding.get("name"),
+                            (String)binding.get("outputName"),
+                            (Integer)binding.get("N_per_D"),
+                            (Boolean)binding.get("invertA"),
+                            (Boolean)binding.get("invertB")));
+            }
+        } 
+
+        if (myMetaData.get("bgrule") != null)
+        {
+            ListIterator iter = ((ArrayList)myMetaData.get("bgrule")).listIterator();
+            while (iter.hasNext())
+            {
+                HashMap bgrule = (HashMap)iter.next();
+                py.append(String.format("nef.templates.basalganglia_rule.make(%1s, %2s%3s, index=%4d, dim=%5d, pattern='%6s', pstc=%7f, use_single_input=%8b)\n",
+                            scriptData.get("netName"),
+                            scriptData.get("prefix"),
+                            myName,
+                            (Integer)bgrule.get("index"),
+                            (Integer)bgrule.get("dim"),
+                            (String)bgrule.get("pattern"),
+                            (Float)bgrule.get("tau_input"),
+                            (Boolean)bgrule.get("use_single_input")));
+            }
+        } 
+
+        if (myMetaData.get("gate") != null)
+        {
+            ListIterator iter = ((ArrayList)myMetaData.get("gate")).listIterator();
+            while (iter.hasNext())
+            {
+                HashMap gate = (HashMap)iter.next();
+                py.append(String.format("nef.templates.gate.make(%1s%2s, name='%3s', gated='%4s', neurons=%5d, pstc=%6f)\n",
+                            scriptData.get("prefix"),
+                            myName,
+                            gate.get("name"),
+                            (String)gate.get("gated"),
+                            (Integer)gate.get("neurons"),
+                            (Float)gate.get("pstc")));
+            }
+        } 
+
+        if (myMetaData.get("learnedterm") != null)
+        {
+            ListIterator iter = ((ArrayList)myMetaData.get("learnedterm")).listIterator();
+            while (iter.hasNext())
+            {
+                HashMap learnedterm = (HashMap)iter.next();
+                py.append(String.format("nef.templates.learned_termination.make(%1s%2s, errName='%3s', N_err=%4d, preName='%5s', postName='%6f', rate=%7f)\n",
+                            scriptData.get("prefix"),
+                            myName,
+                            learnedterm.get("errName"),
+                            (Integer)learnedterm.get("N_err"),
+                            (String)learnedterm.get("preName"),
+                            (String)learnedterm.get("postName"),
+                            (Float)learnedterm.get("rate")));
+            }
+        }      
+
+        for(Projection proj : this.getProjections())
 		{
 			py.append(proj.toScript(scriptData));
 		}
