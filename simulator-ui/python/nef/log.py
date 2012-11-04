@@ -100,8 +100,6 @@ class LogSpikeCount(LogBasic):
     def flush(self):
         self.value[:]=0
 
-
-
 class Log(SimpleNode):
     def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
         if not isinstance(network,Network):
@@ -167,17 +165,12 @@ class Log(SimpleNode):
             origin=node.getOrigin('AXON')
         self.logs.append(LogSpikeCount(name,origin,skip=skip))
 
-    def add(self,source,name=None,tau='default'):
+    def add(self,source,name=None,tau='default',origin='X'):
         if name is None: name=source
         if tau=='default': tau=self.tau
-        node = self.network.get_nodes(source)[-1]
-        if len(node.getOrigins()) == 0:
-            raise Exception('node has no origins', source)
-        if len(node.getOrigins()) > 1:
-            logger.warn('Log add %s defaulting to first of %i origins'
-                    % (source, len(node.getOrigins())))
-        origin = node.getOrigins()[0]
-        self.logs.append(LogVector(name,origin,tau))
+        node = self.network._get_node(source)
+        _origin = node.getOrigin(origin)
+        self.logs.append(LogVector(name,_origin,tau))
 
     def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=False,threshold=0.1,normalize=False):
         if name is None: name=source+'_vocab'
