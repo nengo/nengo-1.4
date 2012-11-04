@@ -69,7 +69,11 @@ public class PasteAction extends StandardAction {
         		Node node = nodes.get(i);
         		try {
         			CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-        			nodeContainer.addNodeModel(node, posX + offsets.get(i).getX(), posY + offsets.get(i).getY());
+        			if (posX == null || posY == null) {
+        				nodeContainer.addNodeModel(node, posX, posY);
+        			} else {
+        				nodeContainer.addNodeModel(node, posX + offsets.get(i).getX(), posY + offsets.get(i).getY());
+        			}
         		} catch (ContainerException e) {
         			throw new ActionException(e);
         		}
