@@ -16,7 +16,10 @@ class Reader:
         if search:
             self.filename=self.find_file(filename)
         else:
-            self.filename=filename+'.csv'    
+            if filename.endswith('csv'):
+                self.filename=filename
+            else:
+                self.filename=filename+'.csv'    
         if self.filename is not None:
             self.read_header()
         self.cache={}
