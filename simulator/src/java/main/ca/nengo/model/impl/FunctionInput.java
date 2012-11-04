@@ -295,7 +295,7 @@ public class FunctionInput implements Node, Probeable {
                 FourierFunction func = (FourierFunction)myFunctions[i];
                 
                 if (func.getFundamental() == 0.0f) {
-                    throw ScriptGenException("Cannot generate a Fourier Function that was built by specifiying all frequencies, amplitudes and phases");
+                    throw new ScriptGenException("Cannot generate a Fourier Function that was built by specifiying all frequencies, amplitudes and phases");
                 }
 
                 base.append(func.getFundamental());

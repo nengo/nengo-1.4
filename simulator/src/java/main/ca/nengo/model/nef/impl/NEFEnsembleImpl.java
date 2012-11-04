@@ -1067,12 +1067,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public void setNeurons(int count) throws StructuralException {
 	    setNodeCount(count);
 	}
-	
-	
-	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
-		return null;
-	}
-
 
 	/**
 	 * @return number of neurons
