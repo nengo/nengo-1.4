@@ -7,8 +7,20 @@ Nengo is a software package for simulating large-scale neural systems.
 Homepage: http://nengo.ca/
 
 
-Running GUI with Eclipse
+Eclipse setup
+=============
+
+Brief setup instructions
 ------------------------
+
+The important details of the Eclipse setup are as follows. See the next section for detailed setup instructions.
+
+#) Add the projects to Eclipse using "File->New->Java project...", and creating the project from the source directory. Add "simulator" first, and then "simulator-ui".
+#) To run the program, add a new run configuration ("Run->Run configurations"). The configuration should be a "Java Application", the project "simulator-ui", and the main class "ca.nengo.ui.NengoGraphics".
+
+
+Detailed setup instructions
+---------------------------
 
 The following instructions should get you up and running the GUI from within
 Eclipse. These instructions are valid for Eclipse version 3.7.2 (and hopefully
