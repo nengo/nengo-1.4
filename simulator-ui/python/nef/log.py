@@ -16,9 +16,7 @@ class LogOverride:
     override_filename=None
     
     @classmethod
-    def override(cls,directory,filename):
-        # -- XXX what's this supposed to mean?
-        cls.override_directory,override_filename
+    def override(cls, directory, filename):
         cls.override_directory=directory
         cls.override_filename=filename
 
@@ -114,9 +112,9 @@ class Log(SimpleNode):
         else: self.logname=name
 
         # -- Disabling because it doesn't compile (JB Nov2012)
-        #if override_directory is not None:
-        #    dir=override_directory
-        #    filename=override_filename
+        if LogOverride.override_directory is not None:
+            dir=LogOverride.override_directory
+            filename=LogOverride.override_filename
 
         self.dir=dir
         if not filename.endswith('.csv'): filename+='.csv'
