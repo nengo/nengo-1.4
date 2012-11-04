@@ -37,6 +37,9 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import org.simplericity.macify.eawt.ApplicationEvent;
+import org.simplericity.macify.eawt.ApplicationListener;
+
 import ca.nengo.plot.Plotter;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
@@ -53,10 +56,6 @@ import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXGrid;
 import ca.nengo.ui.lib.world.piccolo.primitives.Universe;
-
-import com.apple.eawt.AboutHandler;
-import com.apple.eawt.AppEvent;
-
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.util.PDebug;
@@ -68,7 +67,7 @@ import edu.umd.cs.piccolo.util.PUtil;
  * 
  * @author Shu Wu
  */
-public abstract class AppFrame extends JFrame implements AboutHandler {
+public abstract class AppFrame extends JFrame implements ApplicationListener {
     private static final long serialVersionUID = 2769082313231407201L;
 
     /**
@@ -174,7 +173,7 @@ public abstract class AppFrame extends JFrame implements AboutHandler {
         helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
         menuBar.add(helpMenu.getJMenu());
 
-        helpMenu.addAction(new OpenURLAction("Documentation (opens browser)",
+        helpMenu.addAction(new OpenURLAction("Documentation (opens in browser)",
                 "http://www.nengo.ca/documentation"), KeyEvent.VK_F1);
         helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
         boolean isMacOS = System.getProperty("mrj.version") != null;
@@ -706,10 +705,26 @@ public abstract class AppFrame extends JFrame implements AboutHandler {
 
     }
 
-    public void handleAbout(AppEvent.AboutEvent e) {
-        // e.setHandled(true);
+    // Everything starting with handle is done for MacOSX only
+    public void handleAbout(ApplicationEvent event) {
         new AboutAction("About").doAction();
+        event.setHandled(true);
     }
+    public void handleOpenApplication(ApplicationEvent event) {}
+
+    public void handleOpenFile(ApplicationEvent event) {}
+
+    public void handlePreferences(ApplicationEvent event) {}
+
+    public void handlePrintFile(ApplicationEvent event) {
+        JOptionPane.showMessageDialog(this, "Sorry, printing not implemented");
+    }
+
+    public void handleQuit(ApplicationEvent event) {
+        new ExitAction(this, "Quit").doAction();
+    }
+
+    public void handleReOpenApplication(ApplicationEvent event) {}
 
     /**
      * Action to show the 'about' dialog

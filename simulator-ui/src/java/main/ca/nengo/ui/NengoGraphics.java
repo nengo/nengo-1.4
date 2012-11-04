@@ -43,6 +43,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import org.python.util.PythonInterpreter;
+import org.simplericity.macify.eawt.Application;
 
 import ca.nengo.config.ConfigUtil;
 import ca.nengo.config.JavaSourceParser;
@@ -98,8 +99,6 @@ import ca.nengo.ui.util.ProgressIndicator;
 import ca.nengo.ui.util.ScriptWorldWrapper;
 import ca.nengo.ui.world.NengoWorld;
 import ca.nengo.util.Environment;
-
-import com.apple.eawt.Application;
 
 /**
  * Top level instance of the NeoGraphics application
@@ -181,8 +180,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     public NengoGraphics() {
         super();
 
-        Application.getApplication().setAboutHandler(this);
-
         // Setup icon
         try {
             Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/spikepattern-black.png"));
@@ -190,6 +187,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setApplication(Application application) {
+        application.addApplicationListener(this);
+        application.setEnabledPreferencesMenu(false);
     }
 
     /**
@@ -925,7 +927,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             return auxSplitPane;
         }
     }
-
 }
 
 /**
