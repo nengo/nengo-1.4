@@ -19,6 +19,7 @@ def test_params(net,p):
 import nps.basalganglia
 import nef
 import numeric
+from ca.nengo.model.impl import NetworkImpl
 def make(net,name='Basal Ganglia',dimensions=1,pstc=0.01,netbg=None,same_neurons=True):
 
     if netbg is None:
@@ -34,3 +35,9 @@ def make(net,name='Basal Ganglia',dimensions=1,pstc=0.01,netbg=None,same_neurons
     if net is not None:
         net.add(netbg.network)
     
+    netbg.setMetaData("type", "BasalGanglia")
+    netbg.setMetaData("name", name)
+    netbg.setMetaData("dimensions", dimensions)
+    netbg.setMetaData("pstc", pstc)
+    netbg.setMetaData("netbg", netbg)
+    netbg.setMetaData("same_neurons", same_neurons)

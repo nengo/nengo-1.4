@@ -37,4 +37,12 @@ def make(net,name='Network Array', neurons=50, dimensions=2, inhib_scale=3, tau_
         return [x[0]+1]            
     net.connect(thal, None, func=addOne, origin_name='xBiased', create_projection=False)
 
+    thal.setMetaData("type", "Thalmus")
+    thal.setMetaData("name", name)
+    thal.setMetaData("neurons", neurons)
+    thal.setMetaData("dimensions", dimensions)
+    thal.setMetaData("inhib_scale", inhib_scale)
+    thal.setMetaData("tau_inhib", tau_inhib)
+    thal.setMetaData("useQuick", useQuick)
+
     return thal

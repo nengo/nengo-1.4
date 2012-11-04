@@ -1081,7 +1081,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
     public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
         String py;
-
         if ((Boolean)scriptData.get("isSubnet"))
         {
             py = String.format("%1s%2s = %4s.make_subnetwork('%3s')\n", 
