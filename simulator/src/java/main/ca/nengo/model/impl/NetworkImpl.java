@@ -1081,13 +1081,60 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
     public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
         String py;
+
+        if (myMetaData.get("type") != null)
+        {
+            String type = (String)myMetaData.get("type");
+            if (type == "NetworkArray")
+            {
+                py = String.format("nef.templates.networkarray.make(%1s, name='%2s', neurons=%3d, length=%4d, radius=%5f, rLow=%6d, rHigh=%7d, iLow=%8d, iHigh=%9d, encSign=%10d, useQuick=%11b)",
+                        scriptData.get("netName"),
+                        myMetaData.get("name"),
+                        (Integer)myMetaData.get("neurons"),
+                        (Integer)myMetaData.get("length"),
+                        (Float)myMetaData.get("radius"),
+                        (Integer)myMetaData.get("rLow"),
+                        (Integer)myMetaData.get("rHigh"),
+                        (Integer)myMetaData.get("iLow"),
+                        (Integer)myMetaData.get("iHigh"),
+                        (Integer)myMetaData.get("encSign"),
+                        (Boolean)myMetaData.get("useQuick"));
+            }
+            else if (type == "BasalGanglia")
+            {
+                py = String.format("nef.templates.basalganglia.make(%1s, name='%2s', dimensions=%3d, pstc=%4f, same_neurons=%5b)",
+                        scriptData.get("netName"),
+                        myMetaData.get("name"),
+                        (Integer)myMetaData.get("dimensions"),
+                        (Float)myMetaData.get("pstc"),
+                        (Boolean)myMetaData.get("same_neurons"));
+            }
+            else if (type == "Thalmus")
+            {
+                py = String.format("nef.templates.thalamus.make(%1s, name='%2s', neurons=%3d, dimensions=%4d, inhib_scale=%5d, tau_inhib=%6f, useQuick=%7b)",
+                        scriptData.get("netName"),
+                        myMetaData.get("name"),
+                        (Integer)myMetaData.get("neurons"),
+                        (Integer)myMetaData.get("dimensions"),
+                        (Integer)myMetaData.get("inhib_scale"),
+                        (Float)myMetaData.get("tau_inhib"),
+                        (Boolean)myMetaData.get("useQuick"));
+            }
+            else
+            {
+                throw new ScriptGenException("Network type " + type + " is not supported for script generation");
+            }
+
+            return py;
+        }
+
         if ((Boolean)scriptData.get("isSubnet"))
         {
             py = String.format("%1s%2s = %4s.make_subnetwork('%3s')\n", 
                     scriptData.get("prefix"), 
                     myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()), 
                     myName,
-                    (String)scriptData.get("netName"));
+                    scriptData.get("netName"));
         }
         else
         {
