@@ -56,6 +56,7 @@ import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.NEFNode;
 import ca.nengo.model.neuron.Neuron;
+import ca.nengo.model.neuron.impl.LIFNeuronFactory;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikeGeneratorOrigin;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
@@ -65,9 +66,9 @@ import ca.nengo.model.plasticity.impl.PreLearnTermination;
 import ca.nengo.util.MU;
 import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.impl.LearningTask;
 import ca.nengo.util.impl.TimeSeriesImpl;
-
 /**
  * Default implementation of NEFEnsemble.
  *
@@ -996,6 +997,35 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 		return p;
 	}
+
+    public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+        StringBuilder py;
+
+        py.append(String.format("%1s.make('%2s', %3d, %4d", scriptData.get("netName"), myName, myNodes.length, myDimension));
+
+        NodeFactory nodeFactory = myEnsembleFactory.getNodeFactory();
+        if (nodeFactory instanceof LIFNeuronFactory) {
+            LIFNeuronFactory neuronFactory = (LIFNeuronFactory)nodeFactory;
+
+            if (neuronFactory.getMaxRate() instanceof IndicatorPDF ||
+                neuronFactory.getIntercept() instanceof IndicatorPDF ) {
+                throw new ScriptGenException("Max Rate or Intercept for LIF Neuron Factory not specified as a uniform range");
+            }
+
+            py.append(String.format(", tau_rc=%1f, tau_ref=%2f, max_rate=(%3d, %4d), intercept=(%5d, %6d)", 
+                        neuronFactory.getTauRC(), 
+                        neuronFactory.getTauRef(), 
+                        ((IndicatorPDF)neuronFactory.getMaxRate()).getLow(), 
+                        ((IndicatorPDF)neuronFactory.getMaxRate()).getHigh(), 
+                        ((IndicatorPDF)neuronFactory.getIntercept()).getLow(), 
+                        ((IndicatorPDF)neuronFactory.getIntercept()).getHigh()));
+        } else {
+            throw new ScriptGenException("Neuron Factory not supported. Only LIF Neuron Factory is supported");
+        }
+
+        py.append(String.format(", radius=%1f)\n", myRadii[0]));
+        return py.toString;
+    }
 
 	@Override
     public NEFEnsemble clone() throws CloneNotSupportedException {

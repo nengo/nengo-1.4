@@ -84,7 +84,7 @@ class Graph(core.DataViewComponent):
         cols=len(data)/rows
         if rows*cols<len(data): cols+=1
             
-        self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)
+        self.map=self.view.mapcache.get(self.view.watcher.objects[self.name],rows,cols)
 
     def save(self):
         save_info = core.DataViewComponent.save(self)

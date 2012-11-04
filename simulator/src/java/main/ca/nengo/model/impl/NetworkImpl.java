@@ -1084,15 +1084,15 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
         if ((Boolean)scriptData.get("isSubnet"))
         {
-            py = String.format("%1s.add(nef.Network('%2s'))\n%3s%4s = %1s.get('%2s')",
-                    scriptData.get("netName"),
+            py = String.format("%1s%2s = %4s.make_subnetwork('%3s')\n", 
+                    scriptData.get("prefix"), 
+                    myName.replace(' ', (Character)scriptData.get("spaceDelim")), 
                     myName,
-                    scriptData.get("prefix"),
-                        myName.replace(' ', (Character)scriptData.get("spaceDelim")));
+                    (String)scriptData.get("netName"));
         }
         else
         {
-            py = String.format("%1s%2s = nef.Network('%3s')", 
+            py = String.format("%1s%2s = nef.Network('%3s')\n", 
                     scriptData.get("prefix"), 
                     myName.replace(' ', (Character)scriptData.get("spaceDelim")), 
                     myName);
