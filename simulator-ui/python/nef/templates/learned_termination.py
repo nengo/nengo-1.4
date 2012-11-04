@@ -7,10 +7,10 @@ params=[
       "Provides modulatory input to the post population, "
       "modifying its connection from the pre population."
       "<br />Automatically created."),
-    ('N_err', 'Number of neurons in error ensemble',int),
-    ('preName','Name of pre ensemble',str),
-    ('postName','Name of post ensemble',str),
-    ('rate','Learning rate',float)
+    ('N_err', 'Number of neurons in error ensemble',int, 'Set the number of neurons in the error ensemble'),
+    ('preName','Name of pre ensemble',str, 'Select the name of the pre population (this population must already exist)'),
+    ('postName','Name of post ensemble',str,'Select the name of the post population (this population must already exist)'),
+    ('rate','Learning rate',float, 'Set the learning rate')
     ]
 
 def test_params(net,p):
@@ -74,4 +74,18 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
 
     # Set learning rule on the non-decoded termination
     net.learn(post,prename,modname,rate=rate)
+
+    if net.getMetaData("learnedterm") == None:
+        net.setMetaData("learnedterm", ArrayList())
+    learnedterms = net.getMetaData("learnedterm")
+
+    learnedterm=HashMap(5)
+    learnedterm.put("errName", name)
+    learnedterm.put("N_err", neurons)
+    learnedterm.put("preName", dimensions)
+    learnedterm.put("postName", tau_feedback)
+    learnedterm.put("rate", tau_input)
+
+    learnedterms.add(learnedterm)
+
     

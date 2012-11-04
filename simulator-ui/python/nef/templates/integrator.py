@@ -3,12 +3,12 @@ label='Integrator'
 icon='integrator.png'
 
 params=[
-    ('name','Name',str),
-    ('neurons','Number of neurons',int),
-    ('dimensions','Number of dimensions',int),
-    ('tau_feedback','Feedback time constant',float),
-    ('tau_input','Input time constant',float),
-    ('scale','Scaling factor',float),
+    ('name','Name',str,'Name of the integrator'),
+    ('neurons','Number of neurons',int,'Number of neurons in the integrator'),
+    ('dimensions','Number of dimensions',int,'Number of dimensions for the integrator'),
+    ('tau_feedback','Feedback time constant [s]',float,'Synaptic time constant of the integrative feedback, in seconds (longer -> slower change but better value retention)'),
+    ('tau_input','Input time constant [s]',float,'Synaptic time constant of the integrator input, in seconds (longer -> more input filtering)'),
+    ('scale','Scaling factor',float,'A scaling value for the input (controls the rate of integration)'),
     ]
 
 def test_params(net,p):
@@ -28,3 +28,18 @@ def make(net,name='Integrator',neurons=100,dimensions=1,tau_feedback=0.1,tau_inp
         integrator=net.make_array(name, int(neurons/dimensions),dimensions, quick=True)
     net.connect(integrator,integrator,pstc=tau_feedback)
     integrator.addDecodedTermination('input',numeric.eye(dimensions)*tau_feedback*scale,tau_input,False)
+    if net.getMetaData("integrator") == None:
+        net.setMetaData("integrator", ArrayList())
+    integrators = net.getMetaData("integrator")
+
+    integrator=HashMap(6)
+    integrator.put("name", name)
+    integrator.put("neurons", neurons)
+    integrator.put("dimensions", dimensions)
+    integrator.put("tau_feedback", tau_feedback)
+    integrator.put("tau_input", tau_input)
+    integrator.put("scale", scale)
+
+    integrators.add(integrator)
+
+

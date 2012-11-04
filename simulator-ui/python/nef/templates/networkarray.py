@@ -41,9 +41,9 @@ params=[
     ('radius','Radius',float,'Maximum magnitude of vector that can be represented in each ensemble'),
     ('iLow','Intercept (low)',float,'Smallest value for neurons to start firing at (between -1 and 1)'),
     ('iHigh','Intercept (high)',float,'Largest value for neurons to start firing at (between -1 and 1)'),
-    ('rLow','Max rate (low)',float,'Smallest maximum firing rate for neurons in the ensemble'),
-    ('rHigh','Max rate (high)',float,'Largest maximum firing rate for neurons in the ensemble'),
-    ('encSign','Encoding sign', PTemplateSign,'Limits the sign of encoders chosen'),
+    ('rLow','Max rate (low) [Hz]',float,'Smallest maximum firing rate for neurons in the ensemble'),
+    ('rHigh','Max rate (high) [Hz]',float,'Largest maximum firing rate for neurons in the ensemble'),
+    ('encSign','Encoding sign', PTemplateSign,'Limits the sign of the encoders'),
     ('useQuick', 'Quick mode', bool,'Uses the exact same encoders and decoders for each ensemble in the array'),
     ]
 
@@ -56,9 +56,25 @@ def test_params(net,p):
     if p['iLow'] > p['iHigh']: return 'Low intercept must be less than high intercept'
     if p['rLow'] > p['rHigh']: return 'Low max firing rate must be less than high max firing rate'
 
+from ca.nengo.model.impl import NetworkImpl
 def make(net,name='Network Array', neurons=50, length=10, radius=1.0, rLow=200, rHigh=400, iLow=-1, iHigh=1, encSign=0, useQuick=True):
     if encSign!=0:
-        net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, encoders=[[encSign]], quick=useQuick)
+        ensemble = net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, encoders=[[encSign]], quick=useQuick)
     else:
-        net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, quick=useQuick)
-    
+        ensemble = net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, quick=useQuick)
+
+    ensemble.setMetaData("type", "NetworkArray")
+    ensemble.setMetaData("name", name)
+    ensemble.setMetaData("neurons", neurons)
+    ensemble.setMetaData("length", length)
+    ensemble.setMetaData("radius", radius)
+    ensemble.setMetaData("rLow", rLow)
+    ensemble.setMetaData("rHigh", rHigh)
+    ensemble.setMetaData("iLow", iLow)
+    ensemble.setMetaData("iHigh", iHigh)
+    ensemble.setMetaData("encSign", encSign)
+    ensemble.setMetaData("useQuick", useQuick)
+
+
+
+

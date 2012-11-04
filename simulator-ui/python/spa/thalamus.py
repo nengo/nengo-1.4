@@ -28,8 +28,6 @@ class Thalamus(spa.module.Module):
         if mutual_inhibit>0:
             self.net.connect(self.rules,self.rules,(numeric.eye(D)-1)*mutual_inhibit,pstc=pstc_inhibit)
 
-        spa.view.rule_watch.add(self.net.network,self.bg.rules.names)
-
 
     def connect(self):
         o,t=self.net.connect(self.bg.net.network.getOrigin('output'),self.rules,
@@ -38,6 +36,10 @@ class Thalamus(spa.module.Module):
         self.spa.net.network.addProjection(self.bg.net.network.getOrigin('output'),self.net.network.getTermination('bg'))
 
         self.bg.rules.initialize(self.spa)
+
+        # Store rules in the documentation comment for this network for use in the interactive mode view    
+        self.net.network.documentation = 'THAL: ' + ','.join(self.bg.rules.names)
+        
         for name,source in self.spa.sinks.items():
             t=self.bg.rules.rhs_direct(name)
             if t is not None:

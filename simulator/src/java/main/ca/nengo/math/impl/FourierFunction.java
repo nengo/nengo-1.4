@@ -45,6 +45,10 @@ public class FourierFunction implements Function {
 	private float[][] myFrequencies;
 	private float[] myAmplitudes;
 	private float[][] myPhases;
+
+    private float myFundamental;
+    private float myCutoff;
+    private float myRms;
 	
 	/**
 	 * Creates a 1-dimensional function composed of explicitly defined sinusoids. 
@@ -214,6 +218,27 @@ public class FourierFunction implements Function {
 		
 		return result;
 	}
+
+    /**
+     * @return The fundamental frequency used to generate the function if it was provided.
+     */
+    public float getFundamental() {
+        return myFundamental;
+    }
+
+    /**
+     * @return The cutoff frequency used to generate the function if it was provided.
+     */
+    public float getCutoff() {
+        return myCutoff;
+    }
+
+    /**
+     * @return The rms amplitude used to generate the function if it was provided.
+     */
+    public float getRms() {
+        return myRms;
+    }
 
 	private static float getValue(float[] x, float[][] f, float[] a, float[][] p) {
 		float result = 0f;

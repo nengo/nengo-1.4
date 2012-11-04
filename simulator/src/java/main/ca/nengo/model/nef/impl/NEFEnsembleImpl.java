@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.lang.StringBuilder;
 
 import ca.nengo.dynamics.DynamicalSystem;
 import ca.nengo.dynamics.Integrator;
@@ -43,6 +44,7 @@ import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
 import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.WeightedCostApproximator;
+import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.PlasticNodeTermination;
@@ -999,11 +1001,13 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		return p;
 	}
 
-    public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException 
-    {
-        StringBuilder py = new StringBuilder();
-
-        py.append(String.format("%1s.make('%2s', %3d, %4d", scriptData.get("netName"), getName(), getNeurons(), myDimension));
+    @Override
+    public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+        StringBuilder py = new StringBuilder(String.format("%1s.make('%2s', %3d, %4d", 
+                    scriptData.get("netName"), 
+                    getName(), 
+                    getNodes().length, 
+                    myDimension));
 
         NodeFactory nodeFactory = myEnsembleFactory.getNodeFactory();
         if (nodeFactory instanceof LIFNeuronFactory) {

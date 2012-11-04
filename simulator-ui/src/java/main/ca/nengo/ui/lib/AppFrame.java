@@ -695,7 +695,13 @@ public abstract class AppFrame extends JFrame {
 
         @Override
         protected void action() throws ActionException {
-            JLabel editor = new JLabel("<html>" + getAboutString() + "</html>");
+        	int width = 350;
+        	String css = "<style type = \"text/css\">" +
+        		"body { width: " + width + "px }" +
+        		"p { margin-top: 12px }" +
+        		"b { text-decoration: underline }" +
+        		"</style>";
+        	JLabel editor = new JLabel("<html><head>" + css + "</head><body>" + getAboutString() + "</body></html>");
             JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "About "
                     + getAppName(), JOptionPane.PLAIN_MESSAGE);
         }
