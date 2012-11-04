@@ -1,8 +1,5 @@
 import ca.nengo.ui.audio
 
-enabled=False
-
-
 class Clicker:
     def __init__(self,component,data):
         self.component=component
@@ -31,7 +28,9 @@ class Clicker:
         self.click.set(value)
 
 
-
+#this is here to provide the functionality of a "global" variable while keeping the global namespace clean
+class ClickerEnabled:
+    enabled=False
         
 """
 from javax.sound.sampled import AudioSystem, AudioFormat, LineListener, LineEvent

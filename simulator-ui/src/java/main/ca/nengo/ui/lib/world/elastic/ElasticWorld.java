@@ -94,16 +94,20 @@ public class ElasticWorld extends WorldImpl {
     }
 
     @Override
+    protected void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
+	super.constructMenu(menu, posX, posY);
+	constructLayoutMenu(menu.addSubMenu("Layout"));
+    }
+	
     protected void constructMenu(PopupMenuBuilder menu) {
-        super.constructMenu(menu);
-        constructLayoutMenu(menu.addSubMenu("Layout"));
+	constructMenu(menu, 0.0, 0.0);
     }
 
     /**
      * @return Layout bounds to be used by Layout algorithms
      */
     protected Dimension getLayoutBounds() {
-        return layoutBounds;
+	return layoutBounds;
     }
 
     @Override

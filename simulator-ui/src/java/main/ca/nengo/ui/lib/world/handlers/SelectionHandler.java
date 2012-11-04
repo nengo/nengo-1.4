@@ -379,6 +379,8 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 					pressNode = wo;
 					wo.moveToFront();
 					
+					// EH - move parents to front, so that clicking on an ensemble brings the network window forward
+					// (I currently can't get this to work)
 //					WorldObject pnode = wo.getParent();
 //					while( pnode != null ) {
 //						pnode.moveToFront();

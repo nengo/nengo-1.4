@@ -67,16 +67,16 @@ import ca.nengo.util.impl.RandomHypersphereVG;
 import ca.nengo.util.impl.Rectifier;
 
 public class CNEFEnsemble extends ConstructableNode {
-    static final Property pApproximator = new PApproximator("Decoding Sign");
+	static final Property pApproximator = new PApproximator("Decoding Sign");
 
-    static final Property pDim = new PInt("Dimensions");
+	static final Property pDim = new PInt("Dimensions");
 
-    static final Property pEncodingDistribution = new PEncodingDistribution("Encoding Distribution");
-    static final Property pEncodingSign = new PSign("Encoding Sign");
-    static final Property pNodeFactory = new PNodeFactory("Node Factory");
-    static final Property pNumOfNodes = new PInt("Number of Nodes");
-    static final Property pRadius = new PFloat("Radius");
-    static final Property pNoise = new PFloat("Noise",0.1f);
+	static final Property pEncodingDistribution = new PEncodingDistribution("Encoding Distribution");
+	static final Property pEncodingSign = new PSign("Encoding Sign");
+	static final Property pNodeFactory = new PNodeFactory("Node Factory");
+	static final Property pNumOfNodes = new PInt("Number of Nodes");
+	static final Property pRadius = new PFloat("Radius");
+	static final Property pNoise = new PFloat("Noise",0.1f);
 
     /**
      * Config descriptors
@@ -85,19 +85,19 @@ public class CNEFEnsemble extends ConstructableNode {
             pDim, pNodeFactory, pRadius }, new Property[] { pApproximator, pEncodingDistribution,
             pEncodingSign, pNoise });
 
-    public CNEFEnsemble() {
-        super();
-        pDim.setDescription("Number of dimensions that are represented by these neurons");
-        pName.setDescription("Name of the ensemble");
-        pApproximator.setDescription("Limits the range of values used when solving for decoders");
-        pEncodingDistribution.setDescription("From uniformly chosen (default) to all encoders being aligned to an axis");
-        pEncodingSign.setDescription("Limits the range of values chosen when setting encoders");
-        pNodeFactory.setDescription("Determines the type of neuron in this ensemble<br />" +
+	public CNEFEnsemble() {
+		super();
+		pDim.setDescription("Number of dimensions that are represented by the ensemble");
+		pName.setDescription("Name of the ensemble");
+		pApproximator.setDescription("Limit the decoders to be all positive or all negative");
+		pEncodingDistribution.setDescription("Distribution of encoders, ranging from uniformly chosen (default) to all encoders aligned to an axis");
+		pEncodingSign.setDescription("Limit the encoders to be all positive or all negative");
+		pNodeFactory.setDescription("Type of neuron (model) to use for the ensemble"
                 "See online documentation for adding custom neuron models");
-        pNumOfNodes.setDescription("The number of neurons in this ensemble");
-        pRadius.setDescription("The largest magnitude that can be accurately represented by this ensemble");
-        pNoise.setDescription("The amount of noise to assume when solving for decoders");
-    }
+		pNumOfNodes.setDescription("Number of neurons in the ensemble");
+		pRadius.setDescription("Largest magnitude that can be accurately represented by the ensemble");
+		pNoise.setDescription("Expected ratio of the noise amplitude to the signal amplitude to use when solving for decoders");
+	}
 
     protected Node createNode(ConfigResult prop, String name) {
         try {
@@ -257,13 +257,13 @@ class PApproximator extends Property {
         private float noiseLevel = 0.1f;
         private int NSV = -1;
 
-        private void configure() {
-            try {
-                Property pNoiseLevel = new PFloat("Noise level", noiseLevel);
-                Property pNSV = new PInt("Number of Singular Values", NSV);
-                ConfigResult result = UserConfigurer.configure(
-                        new Property[] { pNoiseLevel, pNSV }, TYPE_NAME, this.getDialogParent(),
-                        ConfigMode.STANDARD);
+		private void configure() {
+			try {
+				Property pNoiseLevel = new PFloat("Noise level", "Ratio of the noise amplitude to the signal amplitude", noiseLevel);
+				Property pNSV = new PInt("Number of Singular Values", NSV);
+				ConfigResult result = UserConfigurer.configure(
+						new Property[] { pNoiseLevel, pNSV }, TYPE_NAME, this.getDialogParent(),
+						ConfigMode.STANDARD);
 
                 noiseLevel = (Float) result.getValue(pNoiseLevel);
                 NSV = (Integer) result.getValue(pNSV);

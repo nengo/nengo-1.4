@@ -5,7 +5,6 @@ from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
 
-import neuronmap
 from math import sqrt
 import clicker
 
@@ -36,7 +35,7 @@ class SpikeRaster(core.DataViewComponent):
         self.usemap=usemap
         self.mouse_location=None
         
-        self.audio=clicker.enabled
+        self.audio=clicker.ClickerEnabled.enabled
         if self.audio:
             self.clicker=clicker.Clicker(self,self.data)
             self.clicker.select(0)
@@ -63,7 +62,7 @@ class SpikeRaster(core.DataViewComponent):
         cols=len(data)/rows
         if rows*cols<len(data): cols+=1
             
-        self.map=neuronmap.get(self.view.watcher.objects[self.name],rows,cols)
+        self.map=self.view.mapcache.get(self.view.watcher.objects[self.name],rows,cols)
                 
         
     def paintComponent(self,g):
