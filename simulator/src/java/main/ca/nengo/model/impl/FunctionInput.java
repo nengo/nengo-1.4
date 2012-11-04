@@ -36,8 +36,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.lang.StringBuilder;
 
 import ca.nengo.math.Function;
+import ca.nengo.math.impl.ConstantFunction;
+import ca.nengo.math.impl.FourierFunction;
+import ca.nengo.math.impl.PostfixFunction;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Probeable;
@@ -50,6 +54,7 @@ import ca.nengo.model.Units;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
@@ -268,6 +273,103 @@ public class FunctionInput implements Node, Probeable {
 	}
 
 	@Override
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+		StringBuilder py = new StringBuilder();
+        boolean isFourier = true;
+        
+        for (int i = 0; i < myFunctions.length; i++) {
+            if (!(myFunctions[i] instanceof FourierFunction))
+            {
+                isFourier = false;
+                break;
+            }
+        }
+
+        if (isFourier) {
+            StringBuilder base = new StringBuilder("[");
+            StringBuilder high = new StringBuilder("[");
+            StringBuilder power = new StringBuilder("[");
+            
+            for (int i = 0; i < myFunctions.length; i++) {           
+                FourierFunction func = (FourierFunction)myFunctions[i];
+                
+                if (func.getFundamental() == 0.0f) {
+                    throw ScriptGenException("Cannot generate a Fourier Function that was built by specifiying all frequencies, amplitudes and phases");
+                }
+
+                base.append(func.getFundamental());
+                high.append(func.getCutoff());
+                power.append(func.getRms());
+                if ((i + 1) < myFunctions.length) {
+                    base.append(",");
+                    high.append(",");
+                    power.append(",");
+                }
+            }
+
+            base.append("]");
+            high.append("]");
+            power.append("]");
+
+            py.append(String.format("%1s.make_fourier_input('%2s', dimensions=%3d, base=%4s, high=%5s, power=%6s",
+                        scriptData.get("netName"),
+                        myName,
+                        myFunctions.length,
+                        base,
+                        high,
+                        power));
+        } else {
+            StringBuilder funcs = new StringBuilder("[");
+            for (int i = 0; i < myFunctions.length; i++) {
+                if (myFunctions[i] instanceof ConstantFunction) {
+                    ConstantFunction func = (ConstantFunction)myFunctions[i];
+
+                    py.append(String.format("Function%1s%2c%3d = ConstantFunction(%4d, %5f)\n",
+                                myName.replace(' ', ((Character)scriptData.get("spacedelim")).charValue()),
+                                (Character)scriptData.get("spaceDelim"),
+                                i,
+                                func.getDimension(),
+                                func.getValue()));
+                } else if (myFunctions[i] instanceof FourierFunction) {
+                    FourierFunction func = (FourierFunction)myFunctions[i];
+
+                    py.append(String.format("Function%1s%2c%3d = FourierFunction(%4f, %5f, %6f, random.randint(0, 0x7ffffff))\n",
+                                myName.replace(' ', ((Character)scriptData.get("spacedelim")).charValue()),
+                                (Character)scriptData.get("spaceDelim"),
+                                i,
+                                func.getFundamental(),
+                                func.getCutoff(),
+                                func.getRms()));
+                } else if (myFunctions[i] instanceof PostfixFunction) {
+                    PostfixFunction func = (PostfixFunction)myFunctions[i];
+
+                    py.append(String.format("Function%1s%2c%3d = PostfixFunction(%4s, %5d)\n",
+                                myName.replace(' ', ((Character)scriptData.get("spacedelim")).charValue()),
+                                (Character)scriptData.get("spaceDelim"),
+                                i,
+                                func.getExpression(),
+                                func.getDimension()));
+                }
+
+                funcs.append(String.format("Function%1s%2c%3d",
+                            myName.replace(' ', ((Character)scriptData.get("spacedelim")).charValue()),
+                            (Character)scriptdata.get("spacedelim"),
+                            i));
+                if ((i + 1) < myFunctions.length) {
+                    funcs.append(",");
+                }
+            }
+            funcs.append("]");
+                                
+            py.append(String.format("%1s.make_input('%2s', values=%3s)\n",
+                    scriptData.get("netName"),
+                    myName,
+                    funcs.toString()));
+        }
+        return py.toString();
+    }
+
+	@Override
 	public Node clone() throws CloneNotSupportedException {
 		FunctionInput result = (FunctionInput) super.clone();
 
@@ -297,11 +399,4 @@ public class FunctionInput implements Node, Probeable {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public String toScript(HashMap<String, Object> scriptData) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

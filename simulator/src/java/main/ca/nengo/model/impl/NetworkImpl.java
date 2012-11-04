@@ -1078,6 +1078,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		VisiblyMutableUtils.changed(this, myListeners);
 	}
 
+    @Override
     public String toScript(HashMap<String, Object> scriptData) {
         String py;
 
@@ -1085,7 +1086,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
         {
             py = String.format("%1s%2s = %4s.make_subnetwork('%3s')\n", 
                     scriptData.get("prefix"), 
-                    myName.replace(' ', (Character)scriptData.get("spaceDelim")), 
+                    myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()), 
                     myName,
                     (String)scriptData.get("netName"));
         }
@@ -1093,7 +1094,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
         {
             py = String.format("%1s%2s = nef.Network('%3s')\n", 
                     scriptData.get("prefix"), 
-                    myName.replace(' ', (Character)scriptData.get("spaceDelim")), 
+                    myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()), 
                     myName);
         }
 

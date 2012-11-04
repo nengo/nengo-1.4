@@ -316,6 +316,8 @@ class Network:
             for v in values:
                 if callable(v):
                     f=functions.PythonFunction(v,time=True)
+                elif isinstance(v, Function):
+                    f=v
                 elif zero_after_time is None:
                     f=ConstantFunction(1,v)
                 else:
