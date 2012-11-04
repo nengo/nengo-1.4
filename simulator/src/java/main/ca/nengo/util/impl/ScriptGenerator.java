@@ -20,6 +20,7 @@ public class ScriptGenerator extends DFSIterator{
 		this.writer = writer;
 		writer.write("import nef");
 		writer.write("from ca.nengo.math.impl import ConstantFunction, FourierFunction, PostfixFunction");
+		writer.write("import math");
 	}
 	
 	public void pre(Node node)
@@ -28,12 +29,12 @@ public class ScriptGenerator extends DFSIterator{
 		
 		if (isTopLevel)
 		{
-			prefixes.put(node, node.getName());
+			prefixes.put(node, "");
 		}
 		
 		for (Node child : node.getChildren())
 		{
-			String prefix = prefixes.get(node) + "." + child.getName();
+			String prefix = prefixes.get(node) + "." + node.getName();
 			prefixes.put(child, prefix);
 		}
 		

@@ -41,6 +41,7 @@ import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.math.ApproximatorFactory;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
+import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.WeightedCostApproximator;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -998,10 +999,11 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		return p;
 	}
 
-    public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
-        StringBuilder py;
+    public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException 
+    {
+        StringBuilder py = new StringBuilder();
 
-        py.append(String.format("%1s.make('%2s', %3d, %4d", scriptData.get("netName"), myName, myNodes.length, myDimension));
+        py.append(String.format("%1s.make('%2s', %3d, %4d", scriptData.get("netName"), getName(), getNeurons(), myDimension));
 
         NodeFactory nodeFactory = myEnsembleFactory.getNodeFactory();
         if (nodeFactory instanceof LIFNeuronFactory) {
@@ -1024,7 +1026,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
         }
 
         py.append(String.format(", radius=%1f)\n", myRadii[0]));
-        return py.toString;
+        return py.toString();
     }
 
 	@Override
@@ -1062,12 +1064,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public void setNeurons(int count) throws StructuralException {
 	    setNodeCount(count);
 	}
-	
-	
-	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
-		return null;
-	}
-
 
 	/**
 	 * @return number of neurons
