@@ -61,8 +61,8 @@ class Input(nef.SimpleNode): #Make a simple node to generate
     if 0.85<t<1: return BLUE.v
     return ZERO
 
-Input('input')
-net.add('input')
+input=Input('input')
+net.add(input)
 net.connect(input.getOrigin('A'),'A') #Connect the origins in the simple node 
                                     #to the populations they are input to
 net.connect(input.getOrigin('B'),'B')
