@@ -121,6 +121,7 @@ public class ScriptConsole extends JPanel {
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
 		myDisplayArea.setMargin(new Insets(5, 5, 5, 5));
+		myDisplayArea.addKeyListener(new CommandKeyListener(this));
 
 		myCommandField = new JTextArea();
 		ToolTipManager.sharedInstance().registerComponent(myCommandField);
@@ -542,7 +543,6 @@ public class ScriptConsole extends JPanel {
 	}
 
 	public void passKeyEvent( KeyEvent e ) {
-		setFocus();
 		KeyListener[] kl = myCommandField.getKeyListeners();
 		for( KeyListener listener : kl ) {
 			if (listener instanceof CommandKeyListener) {
@@ -587,10 +587,16 @@ public class ScriptConsole extends JPanel {
 					e.consume();
 					myConsole.enterCommand(myCommandField.getText());
 				} else {
-					if( !myConsole.myCommandField.hasFocus() && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED ) {
+					if (!myConsole.myCommandField.hasFocus() && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
 						// a typing event is coming from far away (the command field doesn't have focus)
 						// so manually append the typed character
-						myConsole.myCommandField.setText( myConsole.myCommandField.getText() + e.getKeyChar() );
+						String curtext = myConsole.myCommandField.getText();
+						if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+							myConsole.myCommandField.setText( curtext.substring(0,curtext.length()-1) );
+						else
+							myConsole.myCommandField.setText( myConsole.myCommandField.getText() + e.getKeyChar() );
+						
+						myConsole.myCommandField.requestFocus();
 					}
 					
 					myConsole.setInCallChainCompletionMode(false);

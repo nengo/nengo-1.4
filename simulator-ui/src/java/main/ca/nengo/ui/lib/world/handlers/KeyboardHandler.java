@@ -42,9 +42,11 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 		} else if (searchEnabled && searchHandler.isSearching()) {
 			// pass event to search handler
 			searchHandler.keyPressed(event.getKeyCode());
-		} else if (event.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+		} else if (NengoGraphics.getInstance().getScriptConsolePane().isAuxVisible() && 
+				   event.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
 			// letter key press, package as KeyEvent and pass to ScriptConsole
-			KeyEvent e = new KeyEvent(NengoGraphics.getInstance(), 0, System.currentTimeMillis(), event.getModifiers(), event.getKeyCode(), event.getKeyChar() );
+			KeyEvent e = new KeyEvent(NengoGraphics.getInstance(), 0, System.currentTimeMillis(), 
+									  event.getModifiers(), event.getKeyCode(), event.getKeyChar() );
 			NengoGraphics.getInstance().getScriptConsole().passKeyEvent( e );
 		} else if (event.isShiftDown()) {
 			// shift down
