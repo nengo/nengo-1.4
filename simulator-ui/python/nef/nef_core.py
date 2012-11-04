@@ -196,6 +196,8 @@ class Network:
         else:
             r=[radius]*dimensions
 
+        parent,name=self.parse_name(name)
+                
         n=ef.make(name,neurons,r,storage_name,False)
         if noise is not None:
             for nn in n.nodes:
@@ -205,8 +207,20 @@ class Network:
             n.mode=SimulationMode.RATE
         elif mode=='direct' or mode==SimulationMode.DIRECT:
             n.mode=SimulationMode.DIRECT
-        if add_to_network: self.network.addNode(n)
+        if add_to_network: parent.addNode(n)
         return n
+    
+    def parse_name(self,name):
+        original_name=name
+        parent=self.network
+        while '.' in name:
+            node,name=name.split('.',1)
+            try:
+                parent=parent.getNode(node)
+            except:
+                raise AttributeError('Could not find parent node for "%s"'%name)    
+        return parent,name                
+        
 
     def make_array(self,name,neurons,length,dimensions=1,**args):
         """Create and return an array of ensembles.  This acts like a high-dimensional ensemble,
@@ -257,8 +271,10 @@ class Network:
                 args['encoders']=encoders[i%len(encoders)]
             n=self.make('%d'%i,neurons,dimensions,add_to_network=False,**args)
             nodes.append(n)
+            
+        parent,name=self.parse_name(name)    
         ensemble=array.NetworkArray(name,nodes)
-        self.network.addNode(ensemble)
+        parent.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
         return ensemble
 
@@ -305,8 +321,10 @@ class Network:
                 else:
                     f=PiecewiseConstantFunction([zero_after_time],[v,0])
                 funcs.append(f)
+                
+        parent,name=self.parse_name(name)        
         input=FunctionInput(name,funcs,Units.UNK)
-        self.network.addNode(input)
+        parent.addNode(input)
         return input
         
     def make_fourier_input(self,name,dimensions=None,base=1,high=10,power=0.5,seed=None):
@@ -351,12 +369,20 @@ class Network:
             if s is None: s=random.randint(0,0x7ffffff)
             f=FourierFunction(base[i%len(base)],high[i%len(high)],power[i%len(power)],s)
             funcs.append(f)
+            
+        parent,name=self.parse_name(name)    
         input=FunctionInput(name,funcs,Units.UNK)
-        self.network.addNode(input)
+        parent.addNode(input)
         return input
                     
             
-                
+    def make_subnetwork(self,name):
+        parent,name=self.parse_name(name)
+        network=NetworkImpl()
+        network.name=name
+        parent.addNode(network)
+        return Network(network)
+                    
             
             
 
@@ -440,7 +466,19 @@ class Network:
             t[post][pre]=weight
         return t
 
-    def connect(self,pre,post,
+    def get_nodes(self, name, delim='.'):
+        node = self.network
+        nodes = []
+        for n in name.split(delim):
+            try: 
+                node = node.getNode(n)
+                nodes.append(node)
+            except:
+                raise AttributeError('Could not find node called "%s"'%name)
+        return nodes
+
+
+    def connect(self, pre, post,
                 transform=None,weight=1,index_pre=None,index_post=None,
                 pstc=0.01,func=None,weight_func=None,expose_weights=False,origin_name=None,
                 modulatory=False,plastic_array=False,create_projection=True):
@@ -563,10 +601,15 @@ class Network:
         :returns: the created Projection, or ``(origin,termination)`` if *create_projection* is False.                                          
         """
 
-        if isinstance(pre,basestring):
-            pre=self.network.getNode(pre)
-        if isinstance(post,basestring):
-            post=self.network.getNode(post)
+        pre_nodes = None
+        post_nodes = None
+
+        if isinstance(pre, basestring):
+            pre_nodes = self.get_nodes(pre)
+            pre = pre_nodes[-1]
+        if isinstance(post, basestring):
+            post_nodes = self.get_nodes(post)
+            post = post_nodes[-1]
 
         # Check if pre and post are set if projection is to be created
         if( create_projection ):
@@ -578,7 +621,7 @@ class Network:
             if( len( msg_str ) > 0 ):
                 raise Exception("nef_core.connect create_projection - " + msg_str)
 
-        # determine the origin and its dimensions
+        # determine the origin and its dimensions (builds if necessary)
         origin=self._parse_pre(pre,func,origin_name)
         dim_pre=origin.dimensions
 
@@ -628,6 +671,10 @@ class Network:
         if expose_weights and weight_func is None:
             weight_func=lambda w:w
         if weight_func is not None:
+            if pre_nodes or post_nodes:
+                raise NotImplementedError(
+                    'deep node indexing with weight_func',
+                    (pre_nodes, post_nodes))
             # calculate weights and pass them to the given function
             orig=origin
             while hasattr(orig,'getWrappedOrigin'): orig=orig.getWrappedOrigin()
@@ -670,7 +717,25 @@ class Network:
 
             if post is None or isinstance(post, int): return origin
             if not create_projection: return origin,term
-            return self.network.addProjection(origin,term)
+
+            # -- expose origin and term at the toplevel network,
+            #    so that we can connect them with a toplevel projection
+            
+            projection_network=self.network
+            if pre_nodes is not None and post_nodes is not None:
+                while len(pre_nodes)>1 and len(post_nodes)>1 and pre_nodes[0]==post_nodes[0]:
+                    projection_network=pre_nodes[0]
+                    del pre_nodes[0]
+                    del post_nodes[0]
+            
+            if pre_nodes is not None:
+                origin = expose_toplevel(origin, pre_nodes, 'Origin')
+            if post_nodes is not None:    
+                term = expose_toplevel(term, post_nodes, 'Termination')
+
+            return projection_network.addProjection(origin,term)
+        else:
+            assert 0, 'WARNING: creating a origin/termination is deprecated'
     
     def learn(self,post,learn_term,mod_term,rate=5e-7,**kwargs):
         """Apply a learning rule to a termination of the *post* ensemble.
@@ -887,6 +952,7 @@ class Network:
         self.network.addNode(node)
         return node
 
+    '''
     def get(self,name,default=Exception,require_origin=False):
         """Return the node with the given *name* from the network
         """
@@ -928,6 +994,7 @@ class Network:
                     else:
                         return default    
         return node
+'''
 
     def releaseMemory(self):
         """Attempt to release extra memory used by the Network.  Call only after all
@@ -1029,7 +1096,22 @@ class Network:
         :param float maxy: maximum y value to plot
         """                               
         import timeview
-        timeview.funcrep1d.FuncRepWatchCache.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
+        timeview.funcrep1d.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
+
+def expose_toplevel(o, nodes, expose_attr):
+    """
+    expose_attr: 'exposeOrigin' or 'exposeTerminal'
+    """
+    # -- if nodes looks like ['A', 'B', 'C']
+    #    then we want B.expose, then A.expose
+    for parent_node in reversed(nodes[:-1]):
+        name_in_parent = '%s.%s' % (
+            o.node.name, o.getName())
+        expose_fn = getattr(parent_node, 'expose%s'%expose_attr)
+        expose_fn(o, name_in_parent)
+        o = getattr(parent_node,'get%s'%expose_attr)(name_in_parent)
+        assert o
+    return o
 
 def test():
     net=Network('Test')
@@ -1048,4 +1130,5 @@ def test():
     m=net.compute_transform(3,4,index_pre=[1,2],index_post=[2,1])
     assert m==[[0,0,0],[0,0,1],[0,1,0],[0,0,0]]
     print 'tests passed'
+
 
