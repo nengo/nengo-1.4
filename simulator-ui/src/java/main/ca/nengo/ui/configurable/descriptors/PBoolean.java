@@ -45,6 +45,10 @@ public class PBoolean extends Property {
     public PBoolean(String name) {
         super(name);
     }
+    
+    public PBoolean(String name, String description) {
+        super(name, description);
+    }
 
     /**
      * @param name TODO

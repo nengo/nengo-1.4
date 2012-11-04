@@ -3,11 +3,11 @@ label='Binding'
 icon='convolution.png'
 
 params=[
-    ('name','Name',str),
-    ('outputName','Name of output ensemble',str),
-    ('N_per_D','Number of neurons per dimension',int),
-    ('invertA','Invert input A',bool),
-    ('invertB','Invert input B',bool),
+    ('name','Name',str,'Name of the binding (circular convolution) population'),
+    ('outputName','Name of output ensemble',str,'Name of an existing ensemble specifying the output destination for the binding ensemble'),
+    ('N_per_D','Number of neurons per dimension',int,'Number of neurons per dimension of the binding population'),
+    ('invertA','Invert input A',bool,'Whether to invert the first input (A)'),
+    ('invertB','Invert input B',bool,'Whether to invert the second input (B)'),
     ]
 
 def test_params(net,p):

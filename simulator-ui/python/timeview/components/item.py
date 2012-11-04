@@ -5,7 +5,6 @@ from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
 
-
 class Item(core.DataViewComponent):
     def __init__(self,view,name):
         core.DataViewComponent.__init__(self)
@@ -20,10 +19,10 @@ class Item(core.DataViewComponent):
         self.type=None
         
         self.descent=None
-        
-        if( len(self.view.watcher.list(name)) > 0 ):
+
+        if( self.view.watcher.contains(name) ):
             self.popup.add(JPopupMenu.Separator())
-        
+
         popup_menu = self.popup
         for (type,klass,args) in self.view.watcher.list(name):
             if( klass is JMenu ):
@@ -34,7 +33,9 @@ class Item(core.DataViewComponent):
             else:
                 if '|' in type: text=type.split('|',1)[0]
                 else: text=type
-                popup_menu.add(JMenuItem(text,actionPerformed=lambda event,self=self,klass=klass,args=args,type=type: self.add_component(type,klass,args)))
+                popup_menu.add(
+                    JMenuItem(text,actionPerformed=lambda event,self=self,klass=klass,args=args,
+                              type=type: self.add_component(type,klass,args)))
             
     def paintComponent(self,g):
         core.DataViewComponent.paintComponent(self,g)
@@ -52,7 +53,6 @@ class Item(core.DataViewComponent):
             self.view.area.repaint()
         
         g.drawString(self.name,margin,self.size.height-margin-self.descent)    
-        
     
     def add_component(self,type,klass,args,location=None,size=(200,200)):
         component=klass(self.view,self.name,**args)
