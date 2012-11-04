@@ -1256,8 +1256,11 @@ def load_layout_file(name, try_backup=True):
             return None
     try:
         f = file(fn,'r')
-        data=eval(f.read())
+        text = f.read()
         f.close()
+        if text[0] == '#':
+            return None
+        data=eval(text)
     except Exception,e:
         warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
         return None

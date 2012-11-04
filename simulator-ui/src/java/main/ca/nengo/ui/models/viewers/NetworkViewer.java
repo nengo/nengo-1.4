@@ -109,7 +109,6 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
         }
     }
 
-
     protected Double newItemPositionX;
     protected Double newItemPositionY;
     public void setNewItemPosition(Double x, Double y) {
@@ -392,13 +391,20 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
     }
 
     @Override
-    public void constructMenu(PopupMenuBuilder menu) {
-        super.constructMenu(menu);
+    public void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
+        super.constructMenu(menu, posX, posY);
+
+        /*
+         * Origins & Terminations
+         */
+        menu.addSection("Origins and Terminations");
+        menu.addAction(new SetOTVisiblityAction("Unhide all", true));
+        menu.addAction(new SetOTVisiblityAction("Hide all", false));
 
         /*
          * Construct simulator menu
          */
-        //UINetwork.constructSimulatorMenu(menu, getViewerParent());
+        UINetwork.constructSimulatorMenu(menu, getViewerParent());
 
         /*
          * Create new models
@@ -419,13 +425,6 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 		}
 
 		menu.addAction(new OpenNeoFileAction(this));*/
-
-        /*
-         * Origins & Terminations
-         */
-        menu.addSection("Origins and Terminations");
-        menu.addAction(new SetOTVisiblityAction("Unhide all", true));
-        menu.addAction(new SetOTVisiblityAction("Hide all", false));
 
     }
 

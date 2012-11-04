@@ -41,7 +41,6 @@ import ca.nengo.ui.lib.objects.activities.TrackedStatusMsg;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.Util;
-import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.Interactable;
 import ca.nengo.ui.lib.world.WorldObject;
@@ -156,15 +155,15 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 
     protected abstract boolean canRemoveChildModel(Node node);
 
-    @Override
-    protected void constructLayoutMenu(MenuBuilder menu) {
+    /*   @Override
+        protected void constructLayoutMenu(MenuBuilder menu) {
         super.constructLayoutMenu(menu);
         MenuBuilder sortMenu = menu.addSubMenu("Sort");
 
         sortMenu.addAction(new SortNodesAction(SortMode.BY_NAME));
         sortMenu.addAction(new SortNodesAction(SortMode.BY_TYPE));
     }
-
+     */
     protected void initialize() {
         initChildModelListener();
 
@@ -285,15 +284,15 @@ public abstract class NodeViewer extends ElasticWorld implements Interactable {
 
     }
 
-    /*@Override
-	public void constructMenu(PopupMenuBuilder menu) {
-		super.constructMenu(menu);
-
-		// File menu
-		menu.addSection("File");
-		menu.addAction(new SaveNodeAction(getViewerParent()));
-
-	}*/
+    //    @Override
+    //    public void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
+    //        super.constructMenu(menu, posX, posY);
+    //
+    //        // File menu
+    //        //	menu.addSection("File");
+    //        //	menu.addAction(new SaveNodeAction(getViewerParent()));
+    //
+    //    }
 
     /**
      * @return NEO Model represented by the viewer
