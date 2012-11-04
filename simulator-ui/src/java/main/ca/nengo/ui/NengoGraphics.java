@@ -119,14 +119,19 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     /**
      * Description of Nengo to be shown in the "About" Dialog box
      */
-    public static final String ABOUT = "<H3>"
-            + APP_NAME
-            + "</H3>"
-            + "<p>(c) Copyright Bryan Tripp & Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2009.<BR><BR>"
-            + "User Interface by Shu Wu (shuwu83@gmail.com) <BR><BR>"
-            + "This product contains several open-source libraries (copyright their respective authors). "
-            + "For more information, consult lib/library-licenses.txt in the installation directory.<BR> "
-            + "This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
+    public static final String ABOUT =
+            "<H3>" + APP_NAME + "</H3>"
+            + "www.nengo.ca"
+            + "<p>&copy; Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2012</p>"
+            + "<p><b>Main design:</b> Bryan Tripp<br>" 
+            + "<b>User interface:</b> Shu Wu (shuwu83@gmail.com)<br>"
+            + "<b>Other contributors:</b> Chris&nbsp;Eliasmith, Terry&nbsp;Stewart, James&nbsp;Bergstra, "
+            + "Trevor&nbsp;Bekolay, Dan&nbsp;Rasmussen, Xuan&nbsp;Choo, Travis&nbsp;DeWolf, "
+            + "Yan&nbsp;Wu, Eric&nbsp;Crawford, Eric&nbsp;Hunsberger, Carter&nbsp;Kolbeck, " 
+            + "Jonathan&nbsp;Lai, Oliver&nbsp;Trujillo, Peter&nbsp;Blouw, Pete&nbsp;Suma</p>"
+            + "<p>This product contains several open-source libraries (copyright their respective authors). "
+            + "For more information, consult <tt>lib/library-licenses.txt</tt> in the installation directory.</p>"
+            + "<p>This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
 
     /**
      * Use the configure panel in the right side? Otherwise it's a pop-up.
