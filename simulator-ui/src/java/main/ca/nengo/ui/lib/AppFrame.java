@@ -53,6 +53,10 @@ import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXGrid;
 import ca.nengo.ui.lib.world.piccolo.primitives.Universe;
+
+import com.apple.eawt.AboutHandler;
+import com.apple.eawt.AppEvent;
+
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.activities.PActivity;
 import edu.umd.cs.piccolo.util.PDebug;
@@ -64,7 +68,7 @@ import edu.umd.cs.piccolo.util.PUtil;
  * 
  * @author Shu Wu
  */
-public abstract class AppFrame extends JFrame {
+public abstract class AppFrame extends JFrame implements AboutHandler {
     private static final long serialVersionUID = 2769082313231407201L;
 
     /**
@@ -104,6 +108,8 @@ public abstract class AppFrame extends JFrame {
     private MenuBuilder worldMenu;
 
     protected MenuBuilder editMenu;
+
+    protected MenuBuilder runMenu;
 
     /**
      * TODO
@@ -151,19 +157,30 @@ public abstract class AppFrame extends JFrame {
 
         initViewMenu(menuBar);
 
+        runMenu = new MenuBuilder("Run");
+        runMenu.getJMenu().setMnemonic(KeyEvent.VK_R);
+
+        menuBar.add(runMenu.getJMenu());
+
         worldMenu = new MenuBuilder("Options");
         worldMenu.getJMenu().setMnemonic(KeyEvent.VK_O);
         menuBar.add(worldMenu.getJMenu());
 
         updateWorldMenu();
         updateEditMenu();
+        updateRunMenu();
 
         MenuBuilder helpMenu = new MenuBuilder("Help");
         helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
         menuBar.add(helpMenu.getJMenu());
 
+        helpMenu.addAction(new OpenURLAction("Documentation (opens browser)",
+                "http://www.nengo.ca/documentation"), KeyEvent.VK_F1);
         helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
-        helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
+        boolean isMacOS = System.getProperty("mrj.version") != null;
+        if (!isMacOS) {
+            helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
+        }
 
         menuBar.setVisible(true);
         this.setJMenuBar(menuBar);
@@ -449,6 +466,15 @@ public abstract class AppFrame extends JFrame {
     }
 
     /**
+     * Updates the menu 'run'
+     */
+    protected void updateRunMenu() {
+        runMenu.reset();
+
+        // Configure parallelization
+    }
+
+    /**
      * Updates the menu 'world'
      */
     protected void updateWorldMenu() {
@@ -680,6 +706,11 @@ public abstract class AppFrame extends JFrame {
 
     }
 
+    public void handleAbout(AppEvent.AboutEvent e) {
+        // e.setHandled(true);
+        new AboutAction("About").doAction();
+    }
+
     /**
      * Action to show the 'about' dialog
      * 
@@ -695,13 +726,13 @@ public abstract class AppFrame extends JFrame {
 
         @Override
         protected void action() throws ActionException {
-        	int width = 350;
-        	String css = "<style type = \"text/css\">" +
-        		"body { width: " + width + "px }" +
-        		"p { margin-top: 12px }" +
-        		"b { text-decoration: underline }" +
-        		"</style>";
-        	JLabel editor = new JLabel("<html><head>" + css + "</head><body>" + getAboutString() + "</body></html>");
+            int width = 350;
+            String css = "<style type = \"text/css\">" +
+                    "body { width: " + width + "px }" +
+                    "p { margin-top: 12px }" +
+                    "b { text-decoration: underline }" +
+                    "</style>";
+            JLabel editor = new JLabel("<html><head>" + css + "</head><body>" + getAboutString() + "</body></html>");
             JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "About "
                     + getAppName(), JOptionPane.PLAIN_MESSAGE);
         }
@@ -919,6 +950,26 @@ public abstract class AppFrame extends JFrame {
         return WORLD_TIPS + "<BR>" + getShortcutHelp();
     }
 
+    class OpenURLAction extends StandardAction {
+        private static final long serialVersionUID = 1L;
+        private String url;
+
+        public OpenURLAction(String helpstring, String url) {
+            super("Open URL", helpstring);
+
+            this.url = url;
+        }
+
+        @Override
+        protected void action() throws ActionException {
+            try {
+                Runtime.getRuntime().exec("open " + this.url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * Action which shows the tips dialog
      * 
@@ -1129,25 +1180,24 @@ public abstract class AppFrame extends JFrame {
             actionManager.undoAction();
         }
     }
-    
+
     /**
-	 * Action to close all plots
-	 * 
-	 * @author Daniel Rasmussen
-	 */
-	class CloseAllPlots extends StandardAction {
-		private static final long serialVersionUID = 1L;
+     * Action to close all plots
+     * 
+     * @author Daniel Rasmussen
+     */
+    class CloseAllPlots extends StandardAction {
+        private static final long serialVersionUID = 1L;
 
-		public CloseAllPlots() {
-			super("Close all plots");
-		}
+        public CloseAllPlots() {
+            super("Close all plots");
+        }
 
-		@Override
-		protected void action() throws ActionException {
-			Plotter.closeAll();
-		}
-	}
-
+        @Override
+        protected void action() throws ActionException {
+            Plotter.closeAll();
+        }
+    }
 }
 
 /**

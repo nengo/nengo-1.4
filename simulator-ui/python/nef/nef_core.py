@@ -887,6 +887,23 @@ class Network:
         self.network.addNode(node)
         return node
 
+
+    def remove(self,node):
+        """Add the node to the network.
+
+        This is to remove nodes from a network. Either the node object or the node name can
+        be used as a parameter to this function
+                  
+        :param node: the node or name of the node to be removed
+        :returns: node removed
+        """
+        if( not isinstance(node, str) ):
+            node = node.name
+        return_node = self.network.getNode(node)
+        self.network.removeNode(node)
+        return node
+
+
     def get(self,name,default=Exception,require_origin=False):
         """Return the node with the given *name* from the network
         """
