@@ -31,6 +31,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
+import java.util.HashMap;
+
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -230,6 +232,29 @@ public class ProjectionImpl implements Projection {
 		}
 
 		return result;
+	}
+	
+	public String toScript(HashMap<String, Object> scriptData) {
+		/*
+	    String py;
+
+        py = String.format("connect(%1s, %2s, transform=%3, func=%4)\n",
+        		
+                    scriptData.get("netName"),
+                    myName,
+                    scriptData.get("prefix"),
+                        myName.replace(' ', (Character)scriptData.get("spaceDelim")));
+        }
+        else
+        {
+            py = String.format("%1s%2s = nef.Network('%3s')", 
+                    scriptData.get("prefix"), 
+                    myName.replace(' ', (Character)scriptData.get("spaceDelim")), 
+                    myName);
+        }
+
+        return py;*/
+		return null;
 	}
 
 }

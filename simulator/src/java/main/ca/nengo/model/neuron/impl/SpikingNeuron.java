@@ -49,6 +49,7 @@ import ca.nengo.model.nef.NEFNode;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.SpikeGenerator;
 import ca.nengo.model.neuron.SynapticIntegrator;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.TimeSeries1D;
 import ca.nengo.util.VisiblyMutable;
@@ -411,7 +412,7 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 	}
 
 	@Override
-	public String toScript(HashMap<String, Object> scriptData) {
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		// TODO Auto-generated method stub
 		return null;
 	}

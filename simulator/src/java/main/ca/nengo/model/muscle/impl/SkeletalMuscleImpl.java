@@ -51,6 +51,7 @@ import ca.nengo.model.Units;
 import ca.nengo.model.impl.BasicTermination;
 import ca.nengo.model.muscle.SkeletalMuscle;
 import ca.nengo.util.MU;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.ScriptGenerator;
@@ -302,7 +303,7 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 	}
 
 	@Override
-	public String toScript(HashMap<String, Object> scriptData) {
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		// TODO Auto-generated method stub
 		return null;
 	}

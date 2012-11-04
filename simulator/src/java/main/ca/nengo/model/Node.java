@@ -30,6 +30,7 @@ package ca.nengo.model;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.impl.ScriptGenerator;
 
@@ -91,7 +92,7 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	
 	public Node[] getChildren();
 	
-	public String toScript(HashMap<String, Object> scriptData);
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException;
 
 	/**
 	 * @return User-specified documentation for the Node, if any
