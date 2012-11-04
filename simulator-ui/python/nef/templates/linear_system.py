@@ -73,10 +73,10 @@ class PSystemMatrix(Property):
         
 
 params=[
-    ('name','Name',str),
-    ('neurons','Number of Neurons',int),
-    ('tau_feedback','Feedback time constant',float),
-    ('A','System dynamics matrix',PSystemMatrix),
+    ('name','Name',str,'Name of the new linear system'),
+    ('neurons','Number of Neurons',int,'Number of neurons in the new linear system'),
+    ('tau_feedback','Feedback time constant [s]',float,'Synaptic time constant for the integrative feedback, in seconds'),
+    ('A','System dynamics matrix',PSystemMatrix,'The system dynamics matrix, A, of the new linear system'),
     ]
 
 def test_params(net,p):

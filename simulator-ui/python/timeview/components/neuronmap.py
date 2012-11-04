@@ -53,6 +53,7 @@ class Map:
             return 1
 
 
+#this is here to provide the functionality of a global cache but without cluttering the global namespace
 class MapCache:
     def __init__(self):
         self.cache={}

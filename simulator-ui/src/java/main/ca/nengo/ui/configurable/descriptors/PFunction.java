@@ -88,13 +88,16 @@ public class PFunction extends Property {
          * These functions can only have a input dimension of 1
          */
         if (myInputDimension == 1) {
-            FnReflective fourierFunction = new FnReflective(FourierFunction.class,
-                    "Fourier Function", new Property[] { new PFloat("Fundamental"),
-                new PFloat("Cutoff"), new PFloat("RMS"), new PLong("Seed") });
+            FnReflective fourierFunction = new FnReflective(FourierFunction.class, "Fourier Function",
+            		new Property[] { new PFloat("Fundamental [Hz]","The smallest frequency represented, in Hertz"),
+                					 new PFloat("Cutoff [Hz]","The largest frequency represented, in Hertz"), 
+                					 new PFloat("RMS","Root-mean-square amplitude of the signal"), 
+                					 new PLong("Seed","Seed for the random number generator") });
 
             FnReflective gaussianPDF = new FnReflective(GaussianPDF.class, "Gaussian PDF",
-                    new Property[] { new PFloat("Mean"), new PFloat("Variance"),
-                new PFloat("Peak") });
+                    new Property[] { new PFloat("Mean","Mean of the Gaussian distribution"), 
+            						 new PFloat("Variance","Variance of the Gaussian disribution"),
+            						 new PFloat("Peak","Maximum value of the Gaussian distribution (at the mode)") });
 
             functions.add(fourierFunction);
             functions.add(gaussianPDF);

@@ -68,9 +68,7 @@ import ca.nengo.util.impl.Rectifier;
 
 public class CNEFEnsemble extends ConstructableNode {
 	static final Property pApproximator = new PApproximator("Decoding Sign");
-
 	static final Property pDim = new PInt("Dimensions");
-
 	static final Property pEncodingDistribution = new PEncodingDistribution("Encoding Distribution");
 	static final Property pEncodingSign = new PSign("Encoding Sign");
 	static final Property pNodeFactory = new PNodeFactory("Node Factory");
@@ -87,15 +85,15 @@ public class CNEFEnsemble extends ConstructableNode {
 
 	public CNEFEnsemble() {
 		super();
-		pDim.setDescription("Number of dimensions that are represented by these neurons");
+		pDim.setDescription("Number of dimensions that are represented by the ensemble");
 		pName.setDescription("Name of the ensemble");
-		pApproximator.setDescription("Limits the range of values used when solving for decoders");
-		pEncodingDistribution.setDescription("From uniformly chosen (default) to all encoders being aligned to an axis");
-		pEncodingSign.setDescription("Limits the range of values chosen when setting encoders");
-		pNodeFactory.setDescription("Determines the type of neuron in this ensemble");
-		pNumOfNodes.setDescription("The number of neurons in this ensemble");
-		pRadius.setDescription("The largest magnitude that can be accurately represented by this ensemble");
-		pNoise.setDescription("The amount of noise to assume when solving for decoders");
+		pApproximator.setDescription("Limit the decoders to be all positive or all negative");
+		pEncodingDistribution.setDescription("Distribution of encoders, ranging from uniformly chosen (default) to all encoders aligned to an axis");
+		pEncodingSign.setDescription("Limit the encoders to be all positive or all negative");
+		pNodeFactory.setDescription("Type of neuron (model) to use for the ensemble");
+		pNumOfNodes.setDescription("Number of neurons in the ensemble");
+		pRadius.setDescription("Largest magnitude that can be accurately represented by the ensemble");
+		pNoise.setDescription("Expected ratio of the noise amplitude to the signal amplitude to use when solving for decoders");
 	}
 
 	protected Node createNode(ConfigResult prop, String name) {
@@ -256,7 +254,7 @@ class PApproximator extends Property {
 
 		private void configure() {
 			try {
-				Property pNoiseLevel = new PFloat("Noise level", noiseLevel);
+				Property pNoiseLevel = new PFloat("Noise level", "Ratio of the noise amplitude to the signal amplitude", noiseLevel);
 				Property pNSV = new PInt("Number of Singular Values", NSV);
 				ConfigResult result = UserConfigurer.configure(
 						new Property[] { pNoiseLevel, pNSV }, TYPE_NAME, this.getDialogParent(),
