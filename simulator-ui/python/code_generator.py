@@ -1,4 +1,4 @@
-
+import ca.nengo
 
 def generate(network):
     code=[]
@@ -17,8 +17,18 @@ def generate(network):
         connect="'%s','%s'"%(origin.node.name,termination.node.name)
         
         if origin.name!='X':
-            pass
-            # TODO: handle other origins
+            funcs=[]
+            for f in origin.functions:
+                if isinstance(f,ca.nengo.math.impl.PostfixFunction):
+                    exp=f.expression
+                    for i in range(origin.node.dimension):
+                        exp=exp.replace('x%d'%i,'x[%d]'%i)
+                    funcs.append(exp)
+                else:
+                    funcs.append('0')
+            code.append('def function(x):')
+            code.append('    return [%s]'%(','.join(funcs)))
+            connect=connect+',func=function,origin_name="%s"'%origin.name                
         
         tr='['+','.join(['['+','.join(['%g'%x for x in row])+']' for row in termination.transform])+']'
         
