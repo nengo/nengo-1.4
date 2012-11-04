@@ -1232,7 +1232,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	@Override
 	public String toPostScript(HashMap<String, Object> scriptData)
 			throws ScriptGenException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		StringBuilder py = new StringBuilder();
+		for(Projection proj : this.getProjections())
+		{
+			py.append(proj.toScript(scriptData));
+		}
+		
+		return py.toString();
 	}
 }
