@@ -33,6 +33,7 @@ package ca.nengo.model.impl;
  * @author Bryan Tripp
  */
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -49,6 +50,7 @@ import ca.nengo.model.Units;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
+import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
@@ -288,6 +290,18 @@ public class FunctionInput implements Node, Probeable {
 		result.myListeners = new ArrayList<Listener>(5);
 
 		return result;
+	}
+
+	@Override
+	public Node[] getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toScript(HashMap<String, Object> scriptData) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
