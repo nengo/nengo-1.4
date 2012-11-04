@@ -31,6 +31,9 @@ import javax.swing.SwingUtilities;
 import ca.nengo.model.Network;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.sim.Simulator;
+import ca.nengo.ui.actions.RunInteractivePlotsAction;
+import ca.nengo.ui.actions.RunSimulatorAction;
+import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.NetworkIcon;
@@ -66,11 +69,11 @@ public class UINetwork extends UINodeViewable {
 
     public static final String typeName = "Network";
 
-    /*public static void constructSimulatorMenu(PopupMenuBuilder menu, UINetwork network) {
-		menu.addSection("Simulator");
-		menu.addAction(new RunSimulatorAction("Run " + network.getName(), network));
-		menu.addAction(new RunInteractivePlotsAction(network));
-	}*/
+    public static void constructSimulatorMenu(PopupMenuBuilder menu, UINetwork network) {
+        menu.addSection("Run");
+        menu.addAction(new RunSimulatorAction("Simulate " + network.getName(), network));
+        menu.addAction(new RunInteractivePlotsAction(network));
+    }
 
     /**
      * @param wo
@@ -106,11 +109,11 @@ public class UINetwork extends UINodeViewable {
         getModel().getSimulator().addChangeListener(mySimulatorListener);
     }
 
-    /*@Override
-	protected void constructMenu(PopupMenuBuilder menu) {
-		super.constructMenu(menu);
-		constructSimulatorMenu(menu, this);
-	}*/
+    @Override
+    protected void constructMenu(PopupMenuBuilder menu) {
+        super.constructMenu(menu);
+        constructSimulatorMenu(menu, this);
+    }
 
     @Override
     protected void constructTooltips(TooltipBuilder tooltips) {

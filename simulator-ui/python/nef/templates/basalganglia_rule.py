@@ -24,6 +24,9 @@ def test_drop(net,node):
 
 import numeric
 import hrr
+from java.util import ArrayList
+from java.util import HashMap
+from ca.nengo.model.impl import NetworkImpl
 def make(net,node,index=0,dim=8,pattern='I',pstc=0.01,use_single_input=False):
     STN=node.getNode('STN')
 
@@ -60,3 +63,19 @@ def make(net,node,index=0,dim=8,pattern='I',pstc=0.01,use_single_input=False):
         node.exposeTermination(StrD1.getTermination(name),name+'_StrD1')
         StrD2.addDecodedTermination(name,transform*(1.2),pstc,False)
         node.exposeTermination(StrD2.getTermination(name),name+'_StrD2')
+
+    if isinstance(node, Network) and ((Network)node).getMetaData("type") == "BasalGanglia":
+        Network bg = (Network)node
+        if bg.getMetaData("bgrule") == None:
+            bg.setMetaData("bgrule", ArrayList())
+        bgrules = net.getMetaData("bgrule")
+
+        rule=HashMap(5)
+        rule.put("index", index)
+        rule.put("dim", dim)
+        rule.put("pattern", pattern)
+        rule.put("pstc", pstc)
+        rule.put("use_single_input", use_single_input)
+
+        bgrules.add(rule)
+

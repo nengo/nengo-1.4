@@ -28,8 +28,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 import ca.nengo.sim.Simulator;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.impl.ScriptGenerator;
 
 /**
@@ -198,4 +200,12 @@ public interface Network extends Node, Probeable {
 	 * @param value Value of the named metadata item
 	 */
 	public void setMetaData(String key, Object value);
+	
+    /**
+     * @param scriptData Map of class parent and prefix data for generating python script
+     * @return Python script for generating special or template ensembles and terminations in the network
+     * @throws ScriptGenException if the node cannot be generated in script
+     */
+	public String toPostScript(HashMap<String, Object> scriptData) throws ScriptGenException;
+
 }

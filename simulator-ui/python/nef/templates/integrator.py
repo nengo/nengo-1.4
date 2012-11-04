@@ -28,3 +28,18 @@ def make(net,name='Integrator',neurons=100,dimensions=1,tau_feedback=0.1,tau_inp
         integrator=net.make_array(name, int(neurons/dimensions),dimensions, quick=True)
     net.connect(integrator,integrator,pstc=tau_feedback)
     integrator.addDecodedTermination('input',numeric.eye(dimensions)*tau_feedback*scale,tau_input,False)
+    if net.getMetaData("integrator") == None:
+        net.setMetaData("integrator", ArrayList())
+    integrators = net.getMetaData("integrator")
+
+    integrator=HashMap(6)
+    integrator.put("name", name)
+    integrator.put("neurons", neurons)
+    integrator.put("dimensions", dimensions)
+    integrator.put("tau_feedback", tau_feedback)
+    integrator.put("tau_input", tau_input)
+    integrator.put("scale", scale)
+
+    integrators.add(integrator)
+
+

@@ -29,3 +29,16 @@ def make(net,name='Bind', outputName='C', N_per_D=300, invertA=False, invertB=Fa
 
     output=net.network.getNode(outputName) 
     nef.convolution.make_convolution(net, name, None, None, output, int(N_per_D/2+1), quick=True, invert_first=invertA, invert_second=invertB)
+    if net.getMetaData("binding") == None:
+        net.setMetaData("binding", ArrayList())
+    bindings = net.getMetaData("binding")
+
+    binding=HashMap(5)
+    binding.put("name", name)
+    binding.put("outputName", outputName)
+    binding.put("N_per_D", N_per_D)
+    binding.put("invertA", invertA)
+    binding.put("invertB", invertB)
+
+    bindings.add(binding)
+

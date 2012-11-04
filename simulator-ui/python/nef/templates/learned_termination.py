@@ -74,4 +74,18 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
 
     # Set learning rule on the non-decoded termination
     net.learn(post,prename,modname,rate=rate)
+
+    if net.getMetaData("learnedterm") == None:
+        net.setMetaData("learnedterm", ArrayList())
+    learnedterms = net.getMetaData("learnedterm")
+
+    learnedterm=HashMap(5)
+    learnedterm.put("errName", errName)
+    learnedterm.put("N_err", N_err)
+    learnedterm.put("preName", preName)
+    learnedterm.put("postName", postName)
+    learnedterm.put("rate", rate)
+
+    learnedterms.add(learnedterm)
+
     

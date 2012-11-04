@@ -45,3 +45,16 @@ def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
     term = output.getTermination(oname)
     net.network.addProjection(orig, term)
 
+    if net.getMetaData("gate") == None:
+        net.setMetaData("gate", ArrayList())
+    gates = net.getMetaData("gate")
+
+    gate=HashMap(4)
+    gate.put("name", name)
+    gate.put("gated", gated)
+    gate.put("neurons", neurons)
+    gate.put("pstc", pstc)
+
+    gates.add(gate)
+
+

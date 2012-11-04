@@ -30,6 +30,7 @@ package ca.nengo.model;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.impl.ScriptGenerator;
 
 /**
@@ -90,5 +91,5 @@ public interface Projection extends Serializable {
 	public float[][] getWeights();
 	
 	
-	public String toScript(HashMap<String, Object> scriptData);
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException;
 }

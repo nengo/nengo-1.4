@@ -25,9 +25,7 @@ public class DFSIterator {
 		
 		post(node);
 		
-		
 		return this;
-		
 	}
 	
 	public void post(Node node)

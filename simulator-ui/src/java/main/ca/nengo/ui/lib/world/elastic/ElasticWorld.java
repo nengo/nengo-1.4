@@ -17,14 +17,11 @@ import ca.nengo.ui.lib.actions.LayoutAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.objects.activities.TrackedAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
-import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.WorldSkyImpl;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.visualization.ISOMLayout;
 import edu.uci.ics.jung.visualization.Layout;
-import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 
 /**
  * A World which supports Spring layout. Objects within this world attract and
@@ -66,7 +63,7 @@ public class ElasticWorld extends WorldImpl {
      * @param menu
      *            menu builder
      */
-    protected void constructLayoutMenu(MenuBuilder menu) {
+    /*   protected void constructLayoutMenu(MenuBuilder menu) {
 
         menu.addSection("Elastic layout");
         if (!getGround().isElasticMode()) {
@@ -88,26 +85,26 @@ public class ElasticWorld extends WorldImpl {
         layoutSettings.addAction(new SetLayoutBoundsAction("Set preferred bounds", this));
 
     }
-
+     */
     public void doFeedForwardLayout() {
         new JungLayoutAction(FeedForwardLayout.class, "Feed-Forward").doAction();
     }
 
     @Override
     protected void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
-	super.constructMenu(menu, posX, posY);
-	constructLayoutMenu(menu.addSubMenu("Layout"));
+        super.constructMenu(menu, posX, posY);
+        //constructLayoutMenu(menu.addSubMenu("Layout"));
     }
-	
+
     protected void constructMenu(PopupMenuBuilder menu) {
-	constructMenu(menu, 0.0, 0.0);
+        super.constructMenu(menu, 0.0, 0.0);
     }
 
     /**
      * @return Layout bounds to be used by Layout algorithms
      */
     protected Dimension getLayoutBounds() {
-	return layoutBounds;
+        return layoutBounds;
     }
 
     @Override

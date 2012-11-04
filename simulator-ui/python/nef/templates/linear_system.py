@@ -99,4 +99,16 @@ def make(net,name='System',neurons=100,A=[[0]],tau_feedback=0.1):
     Ap=A*tau_feedback+numeric.identity(dimensions)
 
     net.connect(state,state,transform=Ap,pstc=tau_feedback)
+    if net.getMetaData("linear") == None:
+        net.setMetaData("linear", ArrayList())
+    linears = net.getMetaData("linear")
+
+    linear=HashMap(4)
+    linear.put("name", name)
+    linear.put("neurons", neurons)
+    linear.put("A", MU.clone(A))
+    linear.put("tau_feedback", tau_feedback)
+
+    linears.add(linear)
+
     

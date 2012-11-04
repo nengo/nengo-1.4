@@ -92,6 +92,11 @@ public interface Node extends Serializable, Resettable, SimulationMode.ModeConfi
 	
 	public Node[] getChildren();
 	
+    /**
+     * @param scriptData Map of class parent and prefix data for generating python script
+     * @return Python script for generating the node
+     * @throws ScriptGenException if the node cannot be generated in script
+     */
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException;
 
 	/**
