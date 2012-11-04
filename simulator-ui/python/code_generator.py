@@ -9,7 +9,10 @@ def generate(network):
             nf=node.getEnsembleFactory().getNodeFactory()
             c="net.make('%s',neurons=%d,dimensions=%d,tau_rc=%g,tau_ref=%g,intercept=(%g,%g),max_rate=(%g,%g))"%(node.name,node.neurons,node.dimension,nf.tauRC,nf.tauRef,nf.intercept.low,nf.intercept.high,nf.maxRate.low,nf.maxRate.high)
             code.append(c)    
+    
+    importable=['sin','cos','tan','asin','acos','atan','exp','log','pow','sqrt']        
             
+    imported_funcs=[]        
     for p in network.projections:
         origin=p.origin
         termination=p.termination  
@@ -21,6 +24,14 @@ def generate(network):
             for f in origin.functions:
                 if isinstance(f,ca.nengo.math.impl.PostfixFunction):
                     exp=f.expression
+                    exp=exp.replace('^','**')
+                    exp=exp.replace('!',' not ')
+                    exp=exp.replace('&',' and ')
+                    exp=exp.replace('|',' or ')                    
+                    exp=exp.replace('ln','log')
+                    for f in importable:
+                        if f in exp and not f in imported_funcs:
+                            imported_funcs.append(f)
                     for i in range(origin.node.dimension):
                         exp=exp.replace('x%d'%i,'x[%d]'%i)
                     funcs.append(exp)
@@ -30,13 +41,15 @@ def generate(network):
             code.append('    return [%s]'%(','.join(funcs)))
             connect=connect+',func=function,origin_name="%s"'%origin.name                
         
+        
         tr='['+','.join(['['+','.join(['%g'%x for x in row])+']' for row in termination.transform])+']'
         
         connect+=',transform=%s'%tr
         # TODO: look for special cases of identify matrixes (and maybe weight, index_pre, and index post?)
         
         code.append('net.connect(%s,pstc=%g)'%(connect,termination.tau))
-    
+    if len(imported_funcs)>0:
+        code[1:1]=['from math import %s'%','.join(imported_funcs)]
     return '\n'.join(code)
     
     
