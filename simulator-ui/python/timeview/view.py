@@ -1237,13 +1237,18 @@ def save_layout_file(name, view, layout, controls):
     dir = java.io.File('layouts')
     make_layout_dir(dir)
     
-    f = file('layouts/%s.layout' % name, 'r')
+    fn = 'layouts/%s.layout' % name
+    # Check if file exists
+    # - If it does, extract java layout information, otherwise just make a new file
     java_layout = ""
-    data = f.read()
-    for line in data.split('\n'):
-        if line.startswith('#'):
-            java_layout += '\n' + line
-    f = file('layouts/%s.layout' % name, 'w')
+    if java.io.File(fn).exists():
+        f = file(fn, 'r')
+        data = f.read()
+        for line in data.split('\n'):
+            if line.startswith('#'):
+                java_layout += '\n' + line
+    else:
+        f = file(fn, 'w')
     
     layout_text = ',\n  '.join([`x` for x in layout])
     
@@ -1267,6 +1272,9 @@ def load_layout_file(name, try_backup=True):
             return None
         data=eval(text)
     except Exception,e:
+        warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
+        return None
+    except IndexError, e:
         warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
         return None
 
