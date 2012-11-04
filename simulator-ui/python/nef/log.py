@@ -214,6 +214,26 @@ class Log(SimpleNode):
         f.close()    
             
         
-                
-        
+class TimelockedLog(Log):
+    """
+    Log variant that
+    """
+    def __init__(self, skipticks=1, **kwargs):
+        Log.__init__(self, **kwargs)
+        self.skipticks = skipticks
+        self.skiptick_counter = 0
+
+    def tick(self):
+        if len(self.logs)==0: return
+        if not self.wrote_header: self.write_header()
+        # -- t_end and t_start are assigned from net.run
+        dt = self.t_end-self.t_start
+        for log in self.logs:
+            log.tick(dt)
+        if self.skiptick_counter == 0:
+            self.write_data()    
+            # -- reset internal accumulators of logs that count spikes
+            for log in self.logs: log.flush()
+        self.skiptick_counter = (self.skiptick_counter + 1) % self.skipticks
+
            
