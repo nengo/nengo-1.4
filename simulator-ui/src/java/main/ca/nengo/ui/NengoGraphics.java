@@ -399,9 +399,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     @Override
     protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
         super.constructShortcutKeys(shortcuts);
-        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_P,
-                new SetSplitPaneVisibleAction("Focus on script console", scriptConsolePane, true)));
-
     }
 
     @Override
