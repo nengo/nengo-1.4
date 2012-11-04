@@ -128,7 +128,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             + "<b>Other contributors:</b> Chris&nbsp;Eliasmith, Terry&nbsp;Stewart, James&nbsp;Bergstra, "
             + "Trevor&nbsp;Bekolay, Dan&nbsp;Rasmussen, Xuan&nbsp;Choo, Travis&nbsp;DeWolf, "
             + "Yan&nbsp;Wu, Eric&nbsp;Crawford, Eric&nbsp;Hunsberger, Carter&nbsp;Kolbeck, " 
-            + "Jonathan&nbsp;Lai, Oliver&nbsp;Trujillo, Peter&nbsp;Blouw, Pete&nbsp;Suma</p>"
+            + "Jonathan&nbsp;Lai, Oliver&nbsp;Trujillo, Peter&nbsp;Blouw, Pete&nbsp;Suma, Patrick&nbsp;Ji, Jeff&nbsp;Orchard</p>"
             + "<p>This product contains several open-source libraries (copyright their respective authors). "
             + "For more information, consult <tt>lib/library-licenses.txt</tt> in the installation directory.</p>"
             + "<p>This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
