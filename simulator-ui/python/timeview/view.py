@@ -47,7 +47,7 @@ for name in 'pause play configure end start backward forward restart arrowup arr
     setattr(Icon,name,ImageIcon('python/images/%s.png'%name))
     setattr(ShadedIcon,name,ImageIcon('python/images/%s-pressed.png'%name))
 
-################################################################################
+
 class EnsembleWatch:
     def check(self,obj):
         return isinstance(obj,NEFEnsemble)
@@ -143,6 +143,8 @@ class NodeWatch:
         else:
             return obj.getOrigin('AXON').values.values
             
+
+
     def views(self,obj):
         origins=[o.name for o in obj.origins]
         ignored_origins = ['AXON','current']
@@ -293,7 +295,7 @@ nodeWatch=NodeWatch()
 ensembleWatch=EnsembleWatch()
 watches=[RoomWatch(),nodeWatch,ensembleWatch,FunctionWatch(),HRRWatch(),ArrayWatch(),NeuronWatch(),FSMWatch()]
 
-################################################################################
+
 import math
 class ViewPanel(JPanel):
     def __init__(self,network):
@@ -413,10 +415,15 @@ class ViewPanel(JPanel):
         """
         
         #self.paint_bubbles(g)
+        
+        
         javax.imageio.ImageIO.write(image,'png', java.io.File(filename))
                 
+                    
+                    
+        
 
-################################################################################
+  
 class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable):
     def __init__(self,network,size=None,ui=None,play=False):
         self.dt=0.001
@@ -509,12 +516,12 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                 def click_func(event,self=self,name=prefix+name):
                     self.add_item(name,self.mouse_click_location)
                     self.popup.visible=False
-
                 menu=JMenu(prefix+name,mouseClicked=click_func)
                 popup.add(menu)
                 self.process_nodes(n.nodes,prefix=prefix+name+":",popup=menu)
             else:
                 popup.add(JMenuItem(prefix+name,actionPerformed=lambda event,self=self,name=prefix+name: self.add_item(name,self.mouse_click_location)))
+        
 
     def add_item(self,name,location=None):
         g=components.Item(self,name)
@@ -636,14 +643,14 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         
         save_layout_file(key,view,layout,controls)
     
+    
     def restore(self):
         data=load_layout_file(self.network.name)
-
         if data is None:
             #return False 
             return self.restore_old()
         view,layout,controls=data
-
+        
         control_keys = controls.keys()   
         if( 'sim_spd' in control_keys ):
             self.time_control.rate_combobox.setSelectedIndex(controls['sim_spd'])
@@ -661,7 +668,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
             if name in self.watcher.objects.keys():
                 if type is None:
                     c=self.add_item(name)
-                    c.restore(data)
+                    c.restore(data)    
                 else:
                     for (t,klass,args) in self.watcher.list(name):
                         if t==type:
@@ -673,11 +680,11 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
                                 c.restore(data)    
                                 self.area.add(c)
                                 break
-
+        
         # Restore time control settings
+                            
         self.view_restore(view)
         self.area.repaint()
-
         return True
             
     # TODO: remove this when we no longer want to support old-style layout files        
@@ -924,7 +931,8 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         if sim is not None:
             sim.kill();
 
-################################################################################    
+    
+    
 class RoundedBorder(javax.swing.border.AbstractBorder):
     def __init__(self):
         self.color=Color(0.7,0.7,0.7)
@@ -934,8 +942,10 @@ class RoundedBorder(javax.swing.border.AbstractBorder):
         g.color=self.color
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.drawRoundRect(x,y,width-1,height-1,10,10)
+        
 
-################################################################################
+        
+    
 class TimeControl(JPanel,ChangeListener,ActionListener):
     def __init__(self,view):
         JPanel.__init__(self)
@@ -1207,7 +1217,6 @@ class TimeControl(JPanel,ChangeListener,ActionListener):
             cb.addTemplate(tp,20,0)
             doc.close()
 
-################################################################################
 def make_layout_dir(dir):
     if not dir.exists():
         dir.mkdirs()
@@ -1220,14 +1229,21 @@ def make_layout_dir(dir):
 
 
 def save_layout_file(name, view, layout, controls):
-    dir=java.io.File('layouts')
+    dir = java.io.File('layouts')
     make_layout_dir(dir)
-
-    f=file('layouts/%s.layout'%name,'w')
     
-    layout_text=',\n  '.join([`x` for x in layout])
+    f = file('layouts/%s.layout' % name, 'r')
+    java_layout = ""
+    data = f.read()
+    for line in data.split('\n'):
+        if line.startswith('#'):
+            java_layout += '\n' + line
+    f = file('layouts/%s.layout' % name, 'w')
     
-    f.write('(%s,\n [%s],\n %s)'%(view,layout_text,controls))
+    layout_text = ',\n  '.join([`x` for x in layout])
+    
+    f.write('(%s,\n [%s],\n %s) %s' % (
+        view, layout_text, controls, java_layout))
     f.close()
 
 

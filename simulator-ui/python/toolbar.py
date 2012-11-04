@@ -44,6 +44,30 @@ class SimulationModeComboBox(JComboBox):
         else: self.node.model.mode=SimulationMode.DEFAULT
         self.set_node(self.node)
 
+class LayoutComboBox(JComboBox):
+    def __init__(self):
+        JComboBox.__init__(self,['last saved','feed-forward','sort by name'],
+                           toolTipText='set network layout')
+        self.addActionListener(self)
+        self.maximumSize=self.preferredSize
+        self.viewer = None
+    
+    def set_viewer(self,viewer):
+        self.viewer=viewer
+        if self.viewer is not None and self.viewer.justOpened:
+            self.setSelectedIndex(0)
+            self.viewer.justOpened = False
+        
+    def actionPerformed(self,event):
+        if self.viewer is None: return
+        layout = self.getSelectedItem()
+        
+        if layout=='last saved':
+            self.viewer.restoreNodeLayout()
+        elif layout=='feed-forward':
+            self.viewer.doFeedForwardLayout()
+        elif layout=='sort by name':
+            self.viewer.doSortByNameLayout()
 
 from ca.nengo.ui.configurable.descriptors import *
 from ca.nengo.ui.configurable import *
@@ -213,9 +237,10 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar.add(self.mode_combobox)
         self.parisian=ParisianTransform()
         self.toolbar.add(self.parisian.button)
-        self.feedforward=make_label_button('layout',self.do_feedforward_layout,'reorganize components to flow from left to right',enabled=False)
-        self.toolbar.add(self.feedforward)
-
+        self.layoutcombo=LayoutComboBox()
+        self.toolbar.add(self.layoutcombo)
+        self.layoutsave=make_button('save',self.do_save_layout,"save the current network layout",enabled=False)
+        self.toolbar.add(self.layoutsave)
         self.toolbar.add(Box.createHorizontalGlue())
         
         #self.button_stop=make_button('stop',self.do_interrupt,'Stop the currently running simulation',enabled=False)
@@ -267,16 +292,16 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.parisian.set_projection(projection)
 
         net=self.get_current_network()
+        self.button_run.enabled=net is not None
         if net is None:
-            self.button_run.enabled=False
             self.button_run.toolTipText='run'
         else:
-            self.button_run.enabled=True
             self.button_run.toolTipText='run '+net.name
             
         viewer=self.get_current_network_viewer()
-        self.feedforward.enabled=viewer is not None
-        
+        self.layoutcombo.set_viewer(viewer)
+        self.layoutcombo.enabled=viewer is not None
+        self.layoutsave.enabled=viewer is not None
         
         
     def get_current_network(self,top_parent=True):
@@ -307,7 +332,13 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
                 if hasattr(net,'networkParent') and net.networkParent is not None:
                     net=net.networkParent
                     viewer=net.getViewer()
-        return viewer 
+        elif net is not None and hasattr(net,'networkParent'):
+            net=net.networkParent
+            viewer=net.getViewer()
+        if viewer is not None and (viewer.isDestroyed() or
+            not isinstance(viewer, ca.nengo.ui.models.viewers.NetworkViewer)):
+            return None
+        return viewer
           
         
     def do_console(self,event):
@@ -328,18 +359,22 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def do_inspect(self,event):
         self.ng.toggleConfigPane()
         
-    def do_feedforward_layout(self,event):
-        viewer=self.get_current_network_viewer()
-        viewer.doFeedForwardLayout()
+    def do_save_layout(self,event):
+        viewer = self.get_current_network_viewer()
+        viewer.saveNodeLayout()
+        self.layoutcombo.setSelectedIndex(0)
         
     def do_open(self,event):
         ca.nengo.ui.actions.OpenNeoFileAction(ng).doAction()
+
     def do_run(self,event):
         network=self.get_current_network()
         if network is not None:         
             ca.nengo.ui.actions.RunInteractivePlotsAction(network).doAction()
+
     def do_interrupt(self,event):
         self.ng.progressIndicator.interrupt()
+
     def do_pdf(self,event):
         from com.itextpdf.text.pdf import PdfWriter
         from com.itextpdf.text import Document

@@ -3,6 +3,8 @@ package ca.nengo.ui.lib.world.handlers;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Stack;
 
 import javax.swing.JPopupMenu;
 
@@ -12,11 +14,17 @@ import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.world.Interactable;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
+import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import ca.nengo.ui.models.NodeContainer;
+import ca.nengo.ui.models.UINeoNode;
+import ca.nengo.ui.models.nodes.UINetwork;
+import ca.nengo.ui.models.nodes.UINodeViewable;
 import ca.nengo.ui.models.viewers.NetworkViewer;
+import ca.nengo.ui.models.viewers.NodeViewer;
+import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -89,19 +97,41 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 			if (menuToShow == null && (interactableObj != null)
 					&& (interactableObj == getInteractableFromEvent(event))) {
-				/*if (interactableObj instanceof WorldImpl) {
+				if (interactableObj instanceof WorldImpl) {
 					// determine the position to add the pasted object
-					// (This does not work yet!)
-					WorldImpl obj = (WorldImpl)interactableObj;
-					Point2D newPosition;
-					Point2D viewPoint = obj.localToGlobal(mouseCanvasPositionPressed);
-					newPosition = obj.globalToLocal(viewPoint);
-					newPosition = ((NodeContainer)obj).localToView(newPosition);
+					WorldObject obj = interactableObj;
 					
-					menuToShow = obj.getContextMenu(newPosition.getX(), newPosition.getY());
-				} else {*/
+					// We need to loop through each sub-network to transform
+					// the point to each sub-network's coordinate system
+					
+					// First determine the path from the root node to the sub-network
+					// into which we are pasting
+					Stack<WorldObject> objStack = new Stack<WorldObject>();
+					while (obj != null) {
+						objStack.push(obj);
+						if (obj instanceof NetworkViewer) {
+							UINetwork nViewer = ((NetworkViewer) obj).getViewerParent();
+							UINetwork v = nViewer.getNetworkParent();
+							if (v != null) obj = v.getViewer();
+							else obj = NengoGraphics.getInstance().getWorld();
+						} else {
+							obj = null;
+						}
+					}
+					
+					// Now loop through the stack of nodes and transform the point
+					// into the proper network's coordinate system
+					Point2D newPosition = mouseCanvasPositionPressed;
+					while (!objStack.empty()) {
+						obj = objStack.pop();
+						newPosition = obj.globalToLocal(newPosition);
+						newPosition = ((NodeContainer)obj).localToView(newPosition);
+					}
+					
+					menuToShow = ((WorldImpl)interactableObj).getContextMenu(newPosition.getX(), newPosition.getY());
+				} else {
 					menuToShow = interactableObj.getContextMenu();
-				//}
+				}
 			}
 
 			if (menuToShow != null) {
