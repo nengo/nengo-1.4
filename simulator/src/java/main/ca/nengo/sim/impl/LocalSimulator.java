@@ -28,6 +28,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.sim.impl;
 
+import java.lang.System;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -264,6 +266,9 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         for (Node myNode : myNodes) {
             myNode.reset(randomize);
         }
+        
+        // Force garbage collection
+        System.gc();
     }
 
     /**
