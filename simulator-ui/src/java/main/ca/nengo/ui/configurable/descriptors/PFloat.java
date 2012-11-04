@@ -47,6 +47,10 @@ public class PFloat extends Property {
     public PFloat(String name) {
         super(name);
     }
+    
+    public PFloat(String name, String description) {
+        super(name, description);
+    }
 
     /**
      * @param name TODO
@@ -54,6 +58,10 @@ public class PFloat extends Property {
      */
     public PFloat(String name, float defaultValue) {
         super(name, defaultValue);
+    }
+    
+    public PFloat(String name, String description, float defaultValue) {
+        super(name, description, defaultValue);
     }
 
     @Override

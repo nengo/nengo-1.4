@@ -176,111 +176,14 @@ public class NodeFactoryPanel extends PropertyInputPanel {
     }
 }
 
-class CALIFNeuronFactory extends ConstructableNodeFactory {
-    static final Property pIncN = new PIndicatorPDF("IncN");
-    static final Property pIntercept = new PIndicatorPDF("Intercept");
-    static final Property pMaxRate = new PIndicatorPDF("Max rate");
-
-    static final Property pTauN = new PFloat("tauN");
-    static final Property pTauRC = new PFloat("tauRC");
-    static final Property pTauRef = new PFloat("tauRef");
-
-    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
-            pTauN, pTauRef, pMaxRate, pIntercept, pIncN });
-
-    public CALIFNeuronFactory() {
-        super("Adapting LIF Neuron", ALIFNeuronFactory.class);
-    }
-
-    @Override
-    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-        Float tauRC = (Float) configuredProperties.getValue(pTauRC);
-        Float tauRef = (Float) configuredProperties.getValue(pTauRef);
-        Float tauN = (Float) configuredProperties.getValue(pTauN);
-        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
-        IndicatorPDF incN = (IndicatorPDF) configuredProperties.getValue(pIncN);
-
-        return new ALIFNeuronFactory(maxRate, intercept, incN, tauRef, tauRC, tauN);
-    }
-
-    @Override
-    public ConfigSchema getSchema() {
-        return zConfig;
-    }
-
-}
-
-class CLIFNeuronFactory extends ConstructableNodeFactory {
-
-    static final Property pIntercept = new PIndicatorPDF("Intercept");
-    static final Property pMaxRate = new PIndicatorPDF("Max rate");
-
-    static final Property pTauRC = new PFloat("tauRC");
-    static final Property pTauRef = new PFloat("tauRef");
-    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
-            pTauRef, pMaxRate, pIntercept });
-
-    public CLIFNeuronFactory() {
-        super("LIF Neuron", LIFNeuronFactory.class);
-        
-        pIntercept.setDescription("Range of the even distribution of x-intercepts<br />[typically -1 to 1]");
-    }
-
-    @Override
-    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-        Float tauRC = (Float) configuredProperties.getValue(pTauRC);
-        Float tauRef = (Float) configuredProperties.getValue(pTauRef);
-        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
-
-        return new LIFNeuronFactory(tauRC, tauRef, maxRate, intercept);
-    }
-
-    @Override
-    public ConfigSchema getSchema() {
-        return zConfig;
-    }
-
-}
-
-/**
- * Constructable Linear Neuron Factory
- * 
- * @author Shu Wu
- */
-class CLinearNeuronFactory extends ConstructableNodeFactory {
-    static final Property pIntercept = new PIndicatorPDF("Intercept");
-
-    static final Property pMaxRate = new PIndicatorPDF("Max rate");
-    static final Property pRectified = new PBoolean("Rectified");
-    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] {
-            pMaxRate, pIntercept, pRectified });
-
-    public CLinearNeuronFactory() {
-        super("Linear Neuron", LinearNeuronFactory.class);
-    }
-
-    @Override
-    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
-        Boolean rectified = (Boolean) configuredProperties.getValue(pRectified);
-
-        LinearNeuronFactory factory = new PoissonSpikeGenerator.LinearNeuronFactory(maxRate,
-                intercept, rectified);
-
-        return factory;
-    }
-
-    @Override
-    public ConfigSchema getSchema() {
-        return zConfig;
-    }
-
-}
-
 abstract class ConstructableNodeFactory extends AbstractConstructable {
+	
+	// Parameters common to many neurons
+    static final Property pInterceptDefault = new PIndicatorPDF("Intercept","Range of the uniform distribution of neuron x-intercepts, (typically -1 to 1)");
+    static final Property pMaxRateDefault = new PIndicatorPDF("Max rate [Hz]","Maximum neuron firing rate, in Hertz");
+    static final Property pTauRCDefault = new PFloat("tauRC [s]","Membrane time constant, in seconds");
+    static final Property pTauRefDefault = new PFloat("tauRef [s]","Refractory period, in seconds");
+	
     private String name;
     private Class<? extends NodeFactory> type;
 
@@ -319,12 +222,115 @@ abstract class ConstructableNodeFactory extends AbstractConstructable {
 
 }
 
+class CALIFNeuronFactory extends ConstructableNodeFactory {
+    static final Property pIncN = new PIndicatorPDF("IncN","Increment of adaptation-related ion with each spike");
+    static final Property pTauN = new PFloat("tauN [s]","Time constant of adaptation-related ion, in seconds");
+    
+    static final Property pIntercept = pInterceptDefault;
+    static final Property pMaxRate = pMaxRateDefault;
+    static final Property pTauRC = pTauRCDefault;
+    static final Property pTauRef = pTauRefDefault;
+
+    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
+            pTauN, pTauRef, pMaxRate, pIntercept, pIncN });
+
+    public CALIFNeuronFactory() {
+        super("Adapting LIF Neuron", ALIFNeuronFactory.class);
+    }
+
+    @Override
+    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
+        Float tauRC = (Float) configuredProperties.getValue(pTauRC);
+        Float tauRef = (Float) configuredProperties.getValue(pTauRef);
+        Float tauN = (Float) configuredProperties.getValue(pTauN);
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
+        IndicatorPDF incN = (IndicatorPDF) configuredProperties.getValue(pIncN);
+
+        return new ALIFNeuronFactory(maxRate, intercept, incN, tauRef, tauRC, tauN);
+    }
+
+    @Override
+    public ConfigSchema getSchema() {
+        return zConfig;
+    }
+
+}
+
+class CLIFNeuronFactory extends ConstructableNodeFactory {
+	
+    static final Property pIntercept = pInterceptDefault;
+    static final Property pMaxRate = pMaxRateDefault;
+    static final Property pTauRC = pTauRCDefault;
+    static final Property pTauRef = pTauRefDefault;
+
+    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
+            pTauRef, pMaxRate, pIntercept });
+
+    public CLIFNeuronFactory() {
+        super("LIF Neuron", LIFNeuronFactory.class);
+    }
+
+    @Override
+    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
+        Float tauRC = (Float) configuredProperties.getValue(pTauRC);
+        Float tauRef = (Float) configuredProperties.getValue(pTauRef);
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
+
+        return new LIFNeuronFactory(tauRC, tauRef, maxRate, intercept);
+    }
+
+    @Override
+    public ConfigSchema getSchema() {
+        return zConfig;
+    }
+
+}
+
+/**
+ * Constructable Linear Neuron Factory
+ * 
+ * @author Shu Wu
+ */
+class CLinearNeuronFactory extends ConstructableNodeFactory {
+
+    static final Property pIntercept = pInterceptDefault;
+    static final Property pMaxRate = pMaxRateDefault;
+    
+    static final Property pRectified = new PBoolean("Rectified","Whether to constrain the neuron outputs to be positive");
+    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] {
+            pMaxRate, pIntercept, pRectified });
+
+    public CLinearNeuronFactory() {
+        super("Linear Neuron", LinearNeuronFactory.class);
+    }
+
+    @Override
+    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
+        Boolean rectified = (Boolean) configuredProperties.getValue(pRectified);
+
+        LinearNeuronFactory factory = new PoissonSpikeGenerator.LinearNeuronFactory(maxRate,
+                intercept, rectified);
+
+        return factory;
+    }
+
+    @Override
+    public ConfigSchema getSchema() {
+        return zConfig;
+    }
+
+}
+
 class CSigmoidNeuronFactory extends ConstructableNodeFactory {
 
-    static final Property pInflection = new PIndicatorPDF("Inflection");
+    static final Property pInflection = new PIndicatorPDF("Inflection","Range of x-values for the center point of the sigmoid");
 
-    static final Property pMaxRate = new PIndicatorPDF("Max rate");
-    static final Property pSlope = new PIndicatorPDF("Slope");
+    static final Property pMaxRate = pMaxRateDefault;
+    static final Property pSlope = new PIndicatorPDF("Slope","Range of slopes for the sigmoid");
     static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pSlope,
             pInflection, pMaxRate });
 
@@ -354,8 +360,8 @@ class CSigmoidNeuronFactory extends ConstructableNodeFactory {
  * @author Shu Wu
  */
 class CSpikingNeuronFactory extends ConstructableNodeFactory {
-    private static final Property pBias = new PIndicatorPDF("bias");
-    private static final Property pScale = new PIndicatorPDF("scale");
+    private static final Property pBias = new PIndicatorPDF("bias","Range of biases for the spiking neurons");
+    private static final Property pScale = new PIndicatorPDF("scale","Range of gains for the spiking neurons");
 
     private static PListSelector getClassSelector(String selectorName, Class<?>[] classes) {
         ClassWrapper[] classWrappers = new ClassWrapper[classes.length];
@@ -466,8 +472,8 @@ class PIndicatorPDF extends Property {
 
     private static final long serialVersionUID = 1L;
 
-    public PIndicatorPDF(String name) {
-        super(name);
+    public PIndicatorPDF(String name, String description) {
+        super(name, description);
     }
 
     @Override

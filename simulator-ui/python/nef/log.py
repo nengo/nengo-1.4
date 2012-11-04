@@ -8,12 +8,15 @@ from ca.nengo.model import Origin
 import stats.reader
 import os
 
-override_directory=None
-override_filename=None
-def override(directory,filename):
-    global override_directory,override_filename
-    override_directory=directory
-    override_filename=filename
+class LogOverride:
+    override_directory=None
+    override_filename=None
+    
+    @classmethod
+    def override(cls,directory,filename):
+        cls.override_directory,override_filename
+        cls.override_directory=directory
+        cls.override_filename=filename
 
 
 class LogBasic:
