@@ -978,7 +978,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
         @Override
         protected void action() throws ActionException {
             try {
-                String os = System.getProperty("os.name");
+                String os = System.getProperty("os.name").toLowerCase();
                 if (os.indexOf("win") >= 0) {
                     Runtime.getRuntime().exec(this.url);
                 } else {
