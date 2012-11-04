@@ -1,9 +1,12 @@
 import inspect
+import stats.reader
+import subprocess
 import tempfile
 
 jython_template = """
 # -- Automatically-generated Jython file to run nef code fragment for unit
 #    tests
+import sys
 
 # -- no-op decorator in auto-gen jython file
 import logging
@@ -14,29 +17,18 @@ def nengo_log(f):
 
 %(fn_def)s
 
-net = %(fn_name)s(**%(fn_kwargs)s)
-log = net.log(filename="%(logfile)s")
+net = %(fn_name)s(logfile="%(logfile)s", **%(fn_kwargs)s)
 net.run(time=%(t)s, dt=%(dt)s)
 
 """
 
-nengo_cl = '../../nengo-70ea992/nengo-cl'
+nengo_cl = '../../../nengo-current/nengo-cl'
 
 keep_tempfiles = True
 
 def nengo_log(f):
 
-    def deco(t, dt=0.001, mode=None, seed=123, **kwargs):
-        print f
-        fn_def = inspect.getsource(f)
-        assert fn_def.startswith('@nengo_log')
-        fn_name = f.__name__
-        fn_kwargs = repr(kwargs) # XXX
-        logfile = 'logfile'
-        jython_src = jython_template % locals()
-
-        print jython_src
-
+    def deco(t, dt=0.001, **kwargs):
         pyfile = tempfile.NamedTemporaryFile(
             prefix='nengo_log',
             suffix='.py',
@@ -46,18 +38,44 @@ def nengo_log(f):
             suffix='.csv',
             delete=not keep_tempfiles)
 
-        print jython_src
+        #print f
+        fn_def = inspect.getsource(f)
+        assert fn_def.startswith('@nengo_log')
+        jython_src = jython_template % dict(
+            t=t,
+            dt=dt,
+            fn_def=fn_def,
+            fn_name=f.__name__,
+            fn_kwargs=repr(kwargs), # XXX only works for simple stuff
+            logfile=logfile.name,
+            )
+
+        #print jython_src
         pyfile.write(jython_src)
+        #pyfile.flush()
+        pyfile.close()
 
-        cmd = ['bash', nengo_cl, pyfile.name]
-        print cmd
-        return
-        subprocess.check_call()
+        # print os.environ
+        # print ' '.join([nengo_cl, pyfile.name])
+        proc = subprocess.Popen(
+            [nengo_cl, pyfile.name],
+            #['ls', '-l'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            )
+        proc.wait()
+        if proc.returncode:
+            comm = proc.communicate()
+            print 'Subprocess failed'
+            print comm[0]
+            print comm[1]
+            raise Exception('Failed to evaluate %s %s'
+                            % (nengo_cl, pyfile.name))
 
-        print 'pyfile', pyfile.name
-        print 'logfile', logfile.name
-
-        return None
+        print 'nengo_log pyfile', pyfile.name
+        print 'nengo_log logfile', logfile.name
+        rval = stats.reader.Reader(logfile.name, dir='/', search=False)
+        return rval
 
     deco.__name__ = f.__name__
     return deco
@@ -69,7 +87,7 @@ def nengo_log(f):
 import numpy as np
 
 @nengo_log
-def connect_something(orig=True):
+def connect_something(logfile, orig=True, mode=None, seed=None):
     import nef
     net = nef.Network('top')
     netA = nef.Network('A')
@@ -81,6 +99,12 @@ def connect_something(orig=True):
     net.add(netA.network)
     net.add(netB.network)
     net.connect('A.X', 'B.Y')
+    #
+    log = nef.log.TimelockedLog(network=net, filename=logfile)
+    log.add('A.X')
+    log.add('A.Y')
+    log.add('B.X')
+    log.add('B.Y')
 
     if orig:
         return net
@@ -94,8 +118,12 @@ def connect_something(orig=True):
 
 def test_sane_stats():
     stats0 = connect_something(orig=True, t=1.0, seed=123, mode='spiking')
+    assert np.allclose(stats0['time'], np.arange(0.0, 1.0, .001)[:, None])
     assert len(stats0['A.X']) == 1000
-    assert np.all(np.var(stats0) > 0)
+    assert len(stats0['A.Y']) == 1000
+    assert len(stats0['B.X']) == 1000
+    assert len(stats0['B.Y']) == 1000
+    assert np.all(np.var(stats0['A.X']) > 0)
 
 
 def test_reproducible_small():
@@ -111,6 +139,10 @@ def test_reproducible_large():
     stats0 == 0
     stats1 == 0
     assert np.all(stats0 == stats1)
+
+
+def test_log_tau():
+    raise NotImplementedError()
 
 
 def test_seed_doesnt_matter_very_much():
