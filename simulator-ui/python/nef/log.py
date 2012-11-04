@@ -16,9 +16,7 @@ class LogOverride:
     override_filename=None
     
     @classmethod
-    def override(cls,directory,filename):
-        # -- XXX what's this supposed to mean?
-        cls.override_directory,override_filename
+    def override(cls, directory, filename):
         cls.override_directory=directory
         cls.override_filename=filename
 
@@ -102,8 +100,6 @@ class LogSpikeCount(LogBasic):
     def flush(self):
         self.value[:]=0
 
-
-
 class Log(SimpleNode):
     def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
         if not isinstance(network,Network):
@@ -114,9 +110,9 @@ class Log(SimpleNode):
         else: self.logname=name
 
         # -- Disabling because it doesn't compile (JB Nov2012)
-        #if override_directory is not None:
-        #    dir=override_directory
-        #    filename=override_filename
+        if LogOverride.override_directory is not None:
+            dir=LogOverride.override_directory
+            filename=LogOverride.override_filename
 
         self.dir=dir
         if not filename.endswith('.csv'): filename+='.csv'
@@ -169,17 +165,12 @@ class Log(SimpleNode):
             origin=node.getOrigin('AXON')
         self.logs.append(LogSpikeCount(name,origin,skip=skip))
 
-    def add(self,source,name=None,tau='default'):
+    def add(self,source,name=None,tau='default',origin='X'):
         if name is None: name=source
         if tau=='default': tau=self.tau
-        node = self.network.get_nodes(source)[-1]
-        if len(node.getOrigins()) == 0:
-            raise Exception('node has no origins', source)
-        if len(node.getOrigins()) > 1:
-            logger.warn('Log add %s defaulting to first of %i origins'
-                    % (source, len(node.getOrigins())))
-        origin = node.getOrigins()[0]
-        self.logs.append(LogVector(name,origin,tau))
+        node = self.network._get_node(source)
+        _origin = node.getOrigin(origin)
+        self.logs.append(LogVector(name,_origin,tau))
 
     def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=False,threshold=0.1,normalize=False):
         if name is None: name=source+'_vocab'
@@ -204,7 +195,6 @@ class Log(SimpleNode):
         self.write('%1.3f,%s\n'%(self.t,','.join(data)))
         
     def write(self,text):
-        print 'writing to', self.filename
         f=open(self.filename,'a')
         f.write(text)
         f.close()
@@ -224,6 +214,26 @@ class Log(SimpleNode):
         f.close()    
             
         
-                
-        
+class TimelockedLog(Log):
+    """
+    Log variant that
+    """
+    def __init__(self, skipticks=1, **kwargs):
+        Log.__init__(self, **kwargs)
+        self.skipticks = skipticks
+        self.skiptick_counter = 0
+
+    def tick(self):
+        if len(self.logs)==0: return
+        if not self.wrote_header: self.write_header()
+        # -- t_end and t_start are assigned from net.run
+        dt = self.t_end-self.t_start
+        for log in self.logs:
+            log.tick(dt)
+        if self.skiptick_counter == 0:
+            self.write_data()    
+            # -- reset internal accumulators of logs that count spikes
+            for log in self.logs: log.flush()
+        self.skiptick_counter = (self.skiptick_counter + 1) % self.skipticks
+
            
