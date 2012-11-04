@@ -34,8 +34,6 @@ def round(x):
         mn,mx=-mx,-mn            
     return mn,mx
 
-
-
 class Graph(core.DataViewComponent):
     def __init__(self,view,name,func,args=(),filter=True,ylimits=(-1.0,1.0),split=False,neuronmapped=False,label=None,data=None,x_labels=None,show_negative=True,fixed_y=None,use_colors_when_split=False):
         core.DataViewComponent.__init__(self,label)
@@ -46,7 +44,10 @@ class Graph(core.DataViewComponent):
         if func is not None:
             self.data=self.view.watcher.watch(name,func,args=args)
         else:
-            self.rawdata=data
+            if callable(data):
+                self.rawdata = data()
+            else:
+                self.rawdata = data
             self.data=None
         self.border_top=10
         self.border_left=30

@@ -56,6 +56,7 @@ import ca.nengo.ui.actions.CutAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
 import ca.nengo.ui.actions.PasteAction;
 import ca.nengo.ui.actions.RemoveModelAction;
+import ca.nengo.ui.actions.RunInteractivePlotsAction;
 import ca.nengo.ui.actions.RunSimulatorAction;
 import ca.nengo.ui.actions.SaveNodeAction;
 import ca.nengo.ui.dataList.DataListView;
@@ -85,15 +86,19 @@ import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.constructors.CNetwork;
 import ca.nengo.ui.models.nodes.UINetwork;
+import ca.nengo.ui.models.nodes.widgets.UIProbe;
+import ca.nengo.ui.models.nodes.widgets.Widget;
 import ca.nengo.ui.script.ScriptConsole;
 import ca.nengo.ui.util.NengoClipboard;
 import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.nengo.ui.util.NeoFileChooser;
-import ca.nengo.ui.util.ScriptWorldWrapper;
 import ca.nengo.ui.util.ProgressIndicator;
+import ca.nengo.ui.util.ScriptWorldWrapper;
 import ca.nengo.ui.world.NengoWorld;
 import ca.nengo.util.Environment;
+
+import com.apple.eawt.Application;
 
 /**
  * Top level instance of the NeoGraphics application
@@ -119,14 +124,17 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     /**
      * Description of Nengo to be shown in the "About" Dialog box
      */
-    public static final String ABOUT = "<H3>"
-            + APP_NAME
-            + "</H3>"
-            + "<p>(c) Copyright Bryan Tripp & Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2009.<BR><BR>"
-            + "User Interface by Shu Wu (shuwu83@gmail.com) <BR><BR>"
-            + "This product contains several open-source libraries (copyright their respective authors). "
-            + "For more information, consult lib/library-licenses.txt in the installation directory.<BR> "
-            + "This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
+    public static final String ABOUT =
+            "<H3>" + APP_NAME + "</H3>"
+                    + "<a href=http://www.nengo.ca>www.nengo.ca</a>"
+                    + "<p>&copy; Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2012</p>"
+                    + "<b>Contributors:</b> Bryan&nbsp;Tripp, Shu&nbsp;Wu, Chris&nbsp;Eliasmith, Terry&nbsp;Stewart, James&nbsp;Bergstra, "
+                    + "Trevor&nbsp;Bekolay, Dan&nbsp;Rasmussen, Xuan&nbsp;Choo, Travis&nbsp;DeWolf, "
+                    + "Yan&nbsp;Wu, Eric&nbsp;Crawford, Eric&nbsp;Hunsberger, Carter&nbsp;Kolbeck, "
+                    + "Jonathan&nbsp;Lai, Oliver&nbsp;Trujillo, Peter&nbsp;Blouw, Pete&nbsp;Suma, Patrick&nbsp;Ji, Jeff&nbsp;Orchard</p>"
+                    + "<p>This product contains several open-source libraries (copyright their respective authors). "
+                    + "For more information, consult <tt>lib/library-licenses.txt</tt> in the installation directory.</p>"
+                    + "<p>This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
 
     /**
      * Use the configure panel in the right side? Otherwise it's a pop-up.
@@ -153,15 +161,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         return (NengoGraphics) UIEnvironment.getInstance();
     }
 
-    /**
-     * Runs NengoGraphics with a default name
-     * 
-     * @param args
-     */
-    public static void main(String[] args) {
-        new NengoGraphics();
-    }
-
     private NengoClipboard clipboard;
     private ConfigurationPane configPane;
     private AuxillarySplitPane dataViewerPane;
@@ -172,7 +171,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     private WorldObject selectedObj;
     private DataListView dataListViewer;
     private ArrayList<AuxillarySplitPane> splitPanes;
-    
+
     private ProgressIndicator progressIndicator;
 
     /**
@@ -180,6 +179,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
      */
     public NengoGraphics() {
         super();
+
+        Application.getApplication().setAboutHandler(this);
 
         // Setup icon
         try {
@@ -309,6 +310,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 
         updateEditMenu();
+        updateRunMenu();
     }
 
     //	/**
@@ -449,7 +451,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             }
             UIManager.setLookAndFeel(laf);
 
-
             //UIManager.put("Slider.paintValue",Boolean.FALSE);
         } catch(Exception e) { /*Do nothing*/ }
         System.setProperty("swing.aatext", "true");
@@ -482,11 +483,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         getContentPane().add(dataViewerPane);
 
         canvas.requestFocus();
-        
-        
+
+
         progressIndicator=new ProgressIndicator();
         getContentPane().add(progressIndicator,BorderLayout.SOUTH);
-        
+
 
     }
 
@@ -545,6 +546,44 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         editMenu.addAction(removeAction, KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,
                 0));
 
+    }
+
+    @Override
+    protected void updateRunMenu() {
+        super.updateRunMenu();
+
+        StandardAction simulateAction = null;
+        StandardAction interactivePlotsAction = null;
+        UINeoNode node = null;
+
+        if (selectedObj != null) {
+            if (selectedObj instanceof UINeoNode) {
+                node = (UINeoNode) selectedObj;
+            } else if (selectedObj instanceof Widget){
+                node = ((Widget) selectedObj).getNodeParent();
+            } else if (selectedObj instanceof UIProbe) {
+                node = ((UIProbe) selectedObj).getProbeParent();
+            }
+        }
+
+        if (node != null) {
+            while (node.getNetworkParent() != null) {
+                node = node.getNetworkParent();
+            }
+
+            UINetwork network = (UINetwork) node;
+
+            simulateAction = new RunSimulatorAction("Simulate " + network.getName(), network);
+            interactivePlotsAction = new RunInteractivePlotsAction(network);
+        } else {
+            simulateAction = new DisabledAction("Simulate", "No object selected");
+            interactivePlotsAction = new DisabledAction("Interactive Plots", "No object selected");
+        }
+
+        runMenu.addAction(simulateAction, KeyEvent.VK_F4, KeyStroke.getKeyStroke(KeyEvent.VK_F4,
+                0));
+        runMenu.addAction(interactivePlotsAction, KeyEvent.VK_F5, KeyStroke.getKeyStroke(KeyEvent.VK_F5,
+                0));
     }
 
     @Override
@@ -664,9 +703,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     public PythonInterpreter getPythonInterpreter() {
         return pythonInterpreter;
     }
-    
+
     public ProgressIndicator getProgressIndicator() {
-    	return progressIndicator;
+        return progressIndicator;
     }
 
     /**
@@ -807,21 +846,21 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         }
 
     }
-    
+
     public void toggleConfigPane() {
-    	AuxillarySplitPane pane=configPane.toJComponent();
-    	pane.setAuxVisible(!pane.isAuxVisible());
-    	if (pane.isAuxVisible()) {
-    		WorldObject obj=getSelectedObj();
-    		if (obj instanceof ModelObject) {
-    			configPane.configureObj(((ModelObject)obj).getModel());
-    		} else {
-    			configPane.configureObj(null);
-    		}
-    	}
-    	
+        AuxillarySplitPane pane=configPane.toJComponent();
+        pane.setAuxVisible(!pane.isAuxVisible());
+        if (pane.isAuxVisible()) {
+            WorldObject obj=getSelectedObj();
+            if (obj instanceof ModelObject) {
+                configPane.configureObj(((ModelObject)obj).getModel());
+            } else {
+                configPane.configureObj(null);
+            }
+        }
+
     }
-    
+
 
     class ConfigurationPane {
         AuxillarySplitPane auxSplitPane;

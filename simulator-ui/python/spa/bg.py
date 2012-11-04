@@ -14,7 +14,7 @@ class BasalGanglia(spa.module.Module):
         self.same_neurons=params.get("same_neurons",True)
         self.rules=spa.rule.Rules(rules)
         self.match=None
-        
+                
     def create(self,lg=0.2,pstc_input=0.002):
 
         nef.templates.basalganglia.make(None,dimensions=self.rules.count(),netbg=self.net,same_neurons=self.same_neurons)
@@ -24,10 +24,12 @@ class BasalGanglia(spa.module.Module):
         self.net.network.removeNode('input')
         self.net.network.exposeOrigin(self.net.network.getNode('GPi').getOrigin('func_gpi'),'output')
 
-        spa.view.utility_watch.add(self.net.network,self.rules.names)
-
     def connect(self):
         self.rules.initialize(self.spa)
+
+        # Store rules in the documentation comment for this network for use in the interactive mode view    
+        self.net.network.documentation = 'BG: ' + ','.join(self.rules.names)
+        
         if len(self.rules.get_lhs_matches())>0:
             self.match=spa.match.Match(self,pstc_match=self.p.pstc_input/2)
             self.spa.add_module(self.name+'_match',self.match,create=True,connect=True)

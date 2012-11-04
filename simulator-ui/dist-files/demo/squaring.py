@@ -4,8 +4,8 @@ net=nef.Network('Squaring') #Create the network object
 
 net.make_input('input',[0]) #Create a controllable input function 
                             #with a starting value of 0
-net.make('A',100,1,quick=True) #Make a population with 100 neurons, 1 dimension
-net.make('B',100,1,quick=True,storage_code='B') #Make a population with 
+net.make('A',100,1) #Make a population with 100 neurons, 1 dimension
+net.make('B',100,1,storage_code='B') #Make a population with 
                                                 #100 neurons, 1 dimensions
 net.connect('input','A') #Connect the input to A
 net.connect('A','B',func=lambda x: x[0]*x[0]) #Connect A and B with the 

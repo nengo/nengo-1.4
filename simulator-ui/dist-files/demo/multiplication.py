@@ -20,12 +20,12 @@ net.make('D',100,1,radius=100) #Make a population with 100 neurons, 1 dimensions
                       
 net.connect('input A','A') #Connect all the relevant objects
 net.connect('input B','B')
-net.connect('A','C',transform=[1,0]) #Connect with the given 1x2D mapping matrix
-net.connect('B','C',transform=[0,1])
+net.connect('A','Combined',transform=[1,0]) #Connect with the given 1x2D mapping matrix
+net.connect('B','Combined',transform=[0,1])
 
 def product(x):
     return x[0]*x[1]
-net.connect('C','D',func=product) #Create the output connection mapping the 
+net.connect('Combined','D',func=product) #Create the output connection mapping the 
                               #1D function 'product'
 net.add_to_nengo()
 
