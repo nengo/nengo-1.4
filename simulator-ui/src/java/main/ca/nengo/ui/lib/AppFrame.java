@@ -105,6 +105,8 @@ public abstract class AppFrame extends JFrame {
 
     protected MenuBuilder editMenu;
 
+    protected MenuBuilder runMenu;
+
     /**
      * TODO
      */
@@ -151,12 +153,18 @@ public abstract class AppFrame extends JFrame {
 
         initViewMenu(menuBar);
 
+        runMenu = new MenuBuilder("Run");
+        runMenu.getJMenu().setMnemonic(KeyEvent.VK_R);
+
+        menuBar.add(runMenu.getJMenu());
+
         worldMenu = new MenuBuilder("Options");
         worldMenu.getJMenu().setMnemonic(KeyEvent.VK_O);
         menuBar.add(worldMenu.getJMenu());
 
         updateWorldMenu();
         updateEditMenu();
+        updateRunMenu();
 
         MenuBuilder helpMenu = new MenuBuilder("Help");
         helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
@@ -449,6 +457,15 @@ public abstract class AppFrame extends JFrame {
     }
 
     /**
+     * Updates the menu 'run'
+     */
+    protected void updateRunMenu() {
+        runMenu.reset();
+
+        // Configure parallelization
+    }
+
+    /**
      * Updates the menu 'world'
      */
     protected void updateWorldMenu() {
@@ -695,13 +712,13 @@ public abstract class AppFrame extends JFrame {
 
         @Override
         protected void action() throws ActionException {
-        	int width = 350;
-        	String css = "<style type = \"text/css\">" +
-        		"body { width: " + width + "px }" +
-        		"p { margin-top: 12px }" +
-        		"b { text-decoration: underline }" +
-        		"</style>";
-        	JLabel editor = new JLabel("<html><head>" + css + "</head><body>" + getAboutString() + "</body></html>");
+            int width = 350;
+            String css = "<style type = \"text/css\">" +
+                    "body { width: " + width + "px }" +
+                    "p { margin-top: 12px }" +
+                    "b { text-decoration: underline }" +
+                    "</style>";
+            JLabel editor = new JLabel("<html><head>" + css + "</head><body>" + getAboutString() + "</body></html>");
             JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "About "
                     + getAppName(), JOptionPane.PLAIN_MESSAGE);
         }
@@ -1129,25 +1146,24 @@ public abstract class AppFrame extends JFrame {
             actionManager.undoAction();
         }
     }
-    
+
     /**
-	 * Action to close all plots
-	 * 
-	 * @author Daniel Rasmussen
-	 */
-	class CloseAllPlots extends StandardAction {
-		private static final long serialVersionUID = 1L;
+     * Action to close all plots
+     * 
+     * @author Daniel Rasmussen
+     */
+    class CloseAllPlots extends StandardAction {
+        private static final long serialVersionUID = 1L;
 
-		public CloseAllPlots() {
-			super("Close all plots");
-		}
+        public CloseAllPlots() {
+            super("Close all plots");
+        }
 
-		@Override
-		protected void action() throws ActionException {
-			Plotter.closeAll();
-		}
-	}
-
+        @Override
+        protected void action() throws ActionException {
+            Plotter.closeAll();
+        }
+    }
 }
 
 /**
