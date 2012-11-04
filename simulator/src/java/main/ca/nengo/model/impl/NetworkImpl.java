@@ -1275,4 +1275,17 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public Node[] getChildren() {
 		return getNodes();
 	}
+
+	@Override
+	public String toPostScript(HashMap<String, Object> scriptData)
+			throws ScriptGenException {
+		
+		StringBuilder py = new StringBuilder();
+		for(Projection proj : this.getProjections())
+		{
+			py.append(proj.toScript(scriptData));
+		}
+		
+		return py.toString();
+	}
 }

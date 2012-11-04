@@ -28,8 +28,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 import ca.nengo.sim.Simulator;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.impl.ScriptGenerator;
 
 /**

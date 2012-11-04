@@ -42,6 +42,7 @@ import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.math.ApproximatorFactory;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
+import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.WeightedCostApproximator;
 import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.model.Node;

@@ -31,9 +31,16 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import ca.nengo.math.Function;
+import ca.nengo.math.impl.IndicatorPDF;
+import ca.nengo.math.impl.PostfixFunction;
 import ca.nengo.model.Network;
+import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
+import ca.nengo.model.impl.NetworkImpl.TerminationWrapper;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Projection;
@@ -45,6 +52,7 @@ import ca.nengo.model.nef.impl.BiasTermination;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.util.MU;
+import ca.nengo.util.ScriptGenException;
 
 /**
  * Default implementation of <code>Projection</code>.
@@ -234,27 +242,126 @@ public class ProjectionImpl implements Projection {
 		return result;
 	}
 	
-	public String toScript(HashMap<String, Object> scriptData) {
-		/*
-	    String py;
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+		
+	    StringBuilder py = new StringBuilder();
 
-        py = String.format("connect(%1s, %2s, transform=%3, func=%4)\n",
-        		
-                    scriptData.get("netName"),
-                    myName,
-                    scriptData.get("prefix"),
-                        myName.replace(' ', (Character)scriptData.get("spaceDelim")));
-        }
-        else
-        {
-            py = String.format("%1s%2s = nef.Network('%3s')", 
-                    scriptData.get("prefix"), 
-                    myName.replace(' ', (Character)scriptData.get("spaceDelim")), 
-                    myName);
-        }
+	    
+	    StringBuilder originNodeFullName = new StringBuilder();
+	    Origin tempOrigin = myOrigin;
 
-        return py;*/
-		return null;
+	    while(tempOrigin instanceof OriginWrapper)
+	    {
+	    	originNodeFullName.append(tempOrigin.getNode().getName() + ".");
+	    	tempOrigin = ((OriginWrapper) tempOrigin).getWrappedOrigin();
+	    }
+
+	    DecodedOrigin dOrigin; 
+	    if(tempOrigin instanceof DecodedOrigin)
+	    {
+	    	dOrigin = (DecodedOrigin) tempOrigin;
+	    	originNodeFullName.append(dOrigin.getNode().getName());
+	    }
+	    else
+	    {
+	    	throw new ScriptGenException("Trying to generate script of non decoded origin which is not supported.");
+	    }
+	    
+	    
+	    
+	    StringBuilder terminationNodeFullName = new StringBuilder();
+	    Termination tempTermination = myTermination;
+
+	    while(tempTermination instanceof TerminationWrapper)
+	    {
+	    	terminationNodeFullName.append(tempTermination.getNode().getName() + ".");
+	    	tempTermination = ((TerminationWrapper) tempTermination).getWrappedTermination();
+	    }
+	    
+	    DecodedTermination dTermination; 
+	    if(tempTermination instanceof DecodedTermination)
+	    {
+	    	dTermination = (DecodedTermination) tempTermination;
+	    	terminationNodeFullName.append(dTermination.getNode().getName());
+	    }
+	    else
+	    {
+	    	throw new ScriptGenException("Trying to generate script of non decoded termination which is not supported.");
+	    }
+
+	    StringBuilder funcString = new StringBuilder();
+	    boolean first = true;
+	    
+	    for(Function f: dOrigin.getFunctions())
+	    {
+	    	if(f instanceof PostfixFunction)
+	    	{
+	    		PostfixFunction pf = (PostfixFunction) f;
+	    		String exp = pf.getExpression();
+	    		
+	    		exp=exp.replaceAll("^","**");
+	    		exp=exp.replaceAll("!"," not ");
+	    		exp=exp.replaceAll("&"," and ");
+	    		exp=exp.replaceAll("|"," or ");
+	    		exp=exp.replaceAll("ln","log");
+	    		
+	    		for(int j = 0; j < f.getDimension(); j++)
+	    		{
+	    			String find = "x"+ Integer.toString(j);
+	    			String replace = "x["+ Integer.toString(j) + "]";
+	    			exp=exp.replaceAll(find, replace);
+	    		}
+	    		
+	    		if (first)
+	    			funcString.append(exp);
+	    		else
+	    		{
+	    			funcString.append(", " + exp);
+	    			first = false;
+	    		}
+	    	}
+	    	else
+	    	{
+	    		throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
+	    	}
+	    }
+	    
+	    py.append("def function(x):\n");
+	    py.append("    " + funcString.toString());
+	    
+	    StringBuilder transformString = new StringBuilder();
+	    transformString.append('[');
+	    
+	    float[][] transform = dTermination.getTransform();
+	    
+	    for(int i = 0; i < transform.length; i++)
+	    {
+	    	if(i != 0)
+	    		transformString.append(", ");
+	    	
+	    	transformString.append("[");
+	    	
+	    	for(int j = 0; j < transform[i].length; j++)
+	    	{
+	    		if(j != 0)
+		    		transformString.append(", ");
+		    	
+		    	transformString.append(transform[i][j]);
+	    	}
+	    	
+	    	transformString.append("]");
+	    }
+	    
+	    transformString.append("]");
+	   
+	    py.append(String.format("%1s.connect(%2s, %3s, transform=%4s, func=function, origin_name = %5s, pstc=%6s)", 
+	    						scriptData.get("netName"),
+	    						originNodeFullName.toString(),
+	    						terminationNodeFullName.toString(),
+	    						transformString.toString(),
+	    						dOrigin.getName(),
+	    						Float.toString(dTermination.getTau())));
+
+        return py.toString();
 	}
-
 }

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
+import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.util.ScriptGenException;
 
@@ -15,13 +16,16 @@ public class ScriptGenerator extends DFSIterator{
 	
 	PrintWriter writer;
 
-    int inTemplateNetwork
+    int inTemplateNetwork;
+    boolean isTopLevel;
 	
 	public ScriptGenerator(PrintWriter writer) throws FileNotFoundException
 	{
 		this.writer = writer;
 		writer.write("import nef");
 		writer.write("from ca.nengo.math.impl import ConstantFunction, FourierFunction, PostfixFunction");
+		writer.write("import math");
+		
         inTemplateNetwork = 0;
 	}
 	
@@ -31,12 +35,12 @@ public class ScriptGenerator extends DFSIterator{
 
 		if (isTopLevel)
 		{
-			prefixes.put(node, node.getName());
+			prefixes.put(node, "");
 		}
 		
 		for (Node child : node.getChildren())
 		{
-			String prefix = prefixes.get(node) + "." + child.getName();
+			String prefix = prefixes.get(node) + "." + node.getName();
 			prefixes.put(child, prefix);
 		}
 		
@@ -80,11 +84,13 @@ public class ScriptGenerator extends DFSIterator{
             toScriptArgs.put("delimiter", '%');
 
             try {
-                String code = node.toPostScript(toScriptArgs);
+                String code = net.toPostScript(toScriptArgs);
                 this.writer.write(code);
             } catch(ScriptGenException e) {
                 System.out.println(e.getMessage());
-            } 
+            }
         }
+        
+        
 	}
 }
