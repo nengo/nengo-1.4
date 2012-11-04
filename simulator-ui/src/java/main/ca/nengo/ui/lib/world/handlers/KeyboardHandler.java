@@ -2,6 +2,7 @@ package ca.nengo.ui.lib.world.handlers;
 
 import java.awt.event.KeyEvent;
 
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.AppFrame;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.world.Destroyable;
@@ -27,8 +28,8 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 
 	@Override
 	public void keyPressed(PInputEvent event) {
-		// control down
 		if ((event.getModifiers() & AppFrame.MENU_SHORTCUT_KEY_MASK) != 0) {
+			// control down
 			if (event.getKeyCode() == KeyEvent.VK_F) {
 				searchEnabled = !isSearchEnabled();
 
@@ -38,15 +39,16 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 					searchHandler.finishSearch();
 				}
 			}
-
-		}
-		// shift down
-		else if (event.isShiftDown()) {
-			UIEnvironment.getInstance().getUniverse().setSelectionMode(true);
-
 		} else if (searchEnabled && searchHandler.isSearching()) {
+			// pass event to search handler
 			searchHandler.keyPressed(event.getKeyCode());
-
+		} else if (event.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+			// letter key press, package as KeyEvent and pass to ScriptConsole
+			KeyEvent e = new KeyEvent(NengoGraphics.getInstance(), 0, System.currentTimeMillis(), event.getModifiers(), event.getKeyCode(), event.getKeyChar() );
+			NengoGraphics.getInstance().getScriptConsole().passKeyEvent( e );
+		} else if (event.isShiftDown()) {
+			// shift down
+			UIEnvironment.getInstance().getUniverse().setSelectionMode(true);
 		}
 	}
 
