@@ -63,6 +63,7 @@ import ca.nengo.model.plasticity.impl.PESTermination;
 import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 import ca.nengo.model.plasticity.impl.PreLearnTermination;
 import ca.nengo.util.MU;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.LearningTask;
 import ca.nengo.util.impl.TimeSeriesImpl;
@@ -1030,6 +1031,11 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	public void setNeurons(int count) throws StructuralException {
 	    setNodeCount(count);
+	}
+	
+	
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+		return null;
 	}
 
 

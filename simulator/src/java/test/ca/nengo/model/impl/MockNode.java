@@ -11,6 +11,7 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.impl.ScriptGenerator;
 
 /**
@@ -150,7 +151,7 @@ public class MockNode implements Node, Cloneable {
 	}
 
 	@Override
-	public String toScript(HashMap<String, Object> scriptData) {
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		// TODO Auto-generated method stub
 		return null;
 	}

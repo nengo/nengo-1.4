@@ -50,6 +50,7 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.util.MU;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.ScriptGenerator;
@@ -421,7 +422,7 @@ public class PassthroughNode implements Node {
 	}
 
 	@Override
-	public String toScript(HashMap<String, Object> scriptData) {
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		// TODO Auto-generated method stub
 		return null;
 	}

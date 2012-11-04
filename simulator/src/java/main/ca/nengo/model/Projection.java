@@ -28,6 +28,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 import ca.nengo.util.impl.ScriptGenerator;
 
@@ -87,4 +88,7 @@ public interface Projection extends Serializable {
 	 * @return Matrix of weights in this Projection (if there are neurons on each end, then these are synaptic weights)
 	 */
 	public float[][] getWeights();
+	
+	
+	public String toScript(HashMap<String, Object> scriptData);
 }

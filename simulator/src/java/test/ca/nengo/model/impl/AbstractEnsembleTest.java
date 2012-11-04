@@ -15,6 +15,7 @@ import ca.nengo.model.Units;
 import ca.nengo.model.impl.AbstractEnsemble;
 import ca.nengo.model.impl.AbstractNode;
 import ca.nengo.model.impl.BasicOrigin;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.impl.ScriptGenerator;
 import junit.framework.TestCase;
 
@@ -60,7 +61,7 @@ public class AbstractEnsembleTest extends TestCase {
 			}
 
 			@Override
-			public String toScript(HashMap<String, Object> scriptData) {
+			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				// TODO Auto-generated method stub
 				return null;
 			}};		
@@ -81,7 +82,7 @@ public class AbstractEnsembleTest extends TestCase {
 			}
 
 			@Override
-			public String toScript(HashMap<String, Object> scriptData) {
+			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				// TODO Auto-generated method stub
 				return null;
 			}};		
@@ -102,7 +103,7 @@ public class AbstractEnsembleTest extends TestCase {
 			}
 
 			@Override
-			public String toScript(HashMap<String, Object> scriptData) {
+			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				// TODO Auto-generated method stub
 				return null;
 			}};

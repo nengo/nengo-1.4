@@ -60,5 +60,4 @@ public class NengoException extends Exception {
 	public NengoException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
 }

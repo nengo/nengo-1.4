@@ -47,6 +47,7 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
@@ -299,7 +300,7 @@ public class FunctionInput implements Node, Probeable {
 	}
 
 	@Override
-	public String toScript(HashMap<String, Object> scriptData) {
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		// TODO Auto-generated method stub
 		return null;
 	}

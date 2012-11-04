@@ -59,6 +59,7 @@ import ca.nengo.model.neuron.Neuron;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.impl.LocalSimulator;
 import ca.nengo.util.Probe;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TaskSpawner;
 import ca.nengo.util.ThreadTask;
 import ca.nengo.util.TimeSeries;
@@ -1078,7 +1079,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		VisiblyMutableUtils.changed(this, myListeners);
 	}
 
-    public String toScript(HashMap<String, Object> scriptData) {
+    public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
         String py;
 
         if ((Boolean)scriptData.get("isSubnet"))
@@ -1226,7 +1227,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
 	@Override
 	public Node[] getChildren() {
-		// TODO Auto-generated method stub
-		return null;
+		return getNodes();
 	}
 }

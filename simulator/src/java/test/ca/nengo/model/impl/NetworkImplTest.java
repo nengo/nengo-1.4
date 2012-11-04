@@ -24,6 +24,7 @@ import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
 //import ca.nengo.model.neuron.Neuron;
 import ca.nengo.util.Probe;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
@@ -587,7 +588,7 @@ public class NetworkImplTest extends TestCase {
 		}
 
 		@Override
-		public String toScript(HashMap<String, Object> scriptData) {
+		public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 			// TODO Auto-generated method stub
 			return null;
 		}
