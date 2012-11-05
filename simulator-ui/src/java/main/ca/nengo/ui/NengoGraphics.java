@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
@@ -166,11 +167,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     private NengoClipboard clipboard;
     private ConfigurationPane configPane;
     private AuxillarySplitPane dataViewerPane;
-    private SelectionBorder objectSelectedBorder;
     private PythonInterpreter pythonInterpreter;
     private ScriptConsole scriptConsole;
     private AuxillarySplitPane scriptConsolePane;
-    private Collection<WorldObject> selectedObjects;
     private DataListView dataListViewer;
     private ArrayList<AuxillarySplitPane> splitPanes;
 
@@ -227,18 +226,102 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         return nodeContainer;
     }
 
+    @Override
+    protected void initialize() {
+        clipboard = new NengoClipboard();
+        clipboard.addClipboardListener(new NengoClipboard.ClipboardListener() {
+
+            public void clipboardChanged() {
+                updateEditMenu();
+            }
+
+        });
+        
+        SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
+            public void selectionChanged(Collection<WorldObject> objs) {
+        	    updateEditMenu();
+        	    updateRunMenu();
+        	    updateScriptConsole();
+        	    updateConfigurationPane();
+            }
+        });
+
+        super.initialize();
+
+        //UIEnvironment.setDebugEnabled(true);
+
+        initializeSimulatorSourceFiles();
+
+        if (FileChooser == null) {
+            FileChooser = new NeoFileChooser();
+        }
+
+        /// Set up Environment variables
+        Environment.setUserInterface(true);
+
+        /// Attach listeners for Script Console
+        initScriptConsole();
+
+        /// Register plugin classes
+        //		registerPlugins();
+
+        setExtendedState(NengoConfigManager.getUserInteger(UserProperties.NengoWindowExtendedState,
+                JFrame.MAXIMIZED_BOTH));
+    }
+
+    @Override
+    protected void initLayout(Universe canvas) {
+        try {
+            //Tell the UIManager to use the platform look and feel
+            String laf=UIManager.getSystemLookAndFeelClassName();
+            if (laf.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) {
+                laf="javax.swing.plaf.metal.MetalLookAndFeel";
+            }
+            UIManager.setLookAndFeel(laf);
+
+            //UIManager.put("Slider.paintValue",Boolean.FALSE);
+        } catch(Exception e) { /*Do nothing*/ }
+        System.setProperty("swing.aatext", "true");
+
+        splitPanes = new ArrayList<AuxillarySplitPane>();
+
+        pythonInterpreter = new PythonInterpreter();
+        scriptConsole = new ScriptConsole(pythonInterpreter);
+        NengoStyle.applyStyle(scriptConsole);
+
+        /*
+         * Create nested split panes
+         */
+        configPane = new ConfigurationPane(canvas);
+        scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
+                "Script Console", AuxillarySplitPane.Orientation.Bottom);
+
+        dataListViewer = new DataListView(new SimulatorDataModel(),scriptConsole);
+
+        dataViewerPane = new AuxillarySplitPane(scriptConsolePane, dataListViewer, "Data Viewer",
+                AuxillarySplitPane.Orientation.Left);
+
+        splitPanes.add(scriptConsolePane);
+        splitPanes.add(dataViewerPane);
+
+        if (CONFIGURE_PLANE_ENABLED) {
+            splitPanes.add(configPane.toJComponent());
+        }
+
+        getContentPane().add(dataViewerPane);
+
+        canvas.requestFocus();
+        
+        progressIndicator=new ProgressIndicator();
+        getContentPane().add(progressIndicator,BorderLayout.SOUTH);
+    }
+    
     private void initScriptConsole() {
         scriptConsole.addVariable("world", new ScriptWorldWrapper(this));
 
         /*
          * Add listeners
          */
-        SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
-
-            public void objectFocused(Collection<WorldObject> objs) {
-                objectsSelected(objs);
-            }
-        });
 
         getWorld().getGround().addChildrenListener(new WorldObject.ChildListener() {
 
@@ -298,33 +381,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         JavaSourceParser.addSource(simulatorSourceFile);
     }
 
-    private void objectsSelected(Collection<WorldObject> objs) {
-    	selectedObjects = new ArrayList<WorldObject>();
-    	for (WorldObject obj : objs) {
-	        while (obj != null && !(obj instanceof ModelObject)) {
-	            obj = obj.getParent();
-	        }
-	        
-	        if (obj != null) {
-	        	if (objectSelectedBorder != null) {
-	                objectSelectedBorder.destroy();
-	            }
-	
-	            objectSelectedBorder = new SelectionBorder(obj.getWorld(), obj);
-	
-	            Object model = ((ModelObject) obj).getModel();
-	            scriptConsole.setCurrentObject(model);
-	
-	            if (configPane.toJComponent().isAuxVisible()) {
-	                configPane.configureObj(model);
-	            }
-	            selectedObjects.add(obj);
-	        }
-    	}
-
-        updateEditMenu();
-        updateRunMenu();
-    }
 
     //	/**
     //	 * Register plugins
@@ -411,96 +467,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         super.constructShortcutKeys(shortcuts);
     }
 
-    @Override
-    protected void initialize() {
-        clipboard = new NengoClipboard();
-        clipboard.addClipboardListener(new NengoClipboard.ClipboardListener() {
-
-            public void clipboardChanged() {
-                updateEditMenu();
-            }
-
-        });
-
-        super.initialize();
-
-        //UIEnvironment.setDebugEnabled(true);
-
-        initializeSimulatorSourceFiles();
-
-        if (FileChooser == null) {
-            FileChooser = new NeoFileChooser();
-        }
-
-        /*
-         * Set up Environment variables
-         */
-        Environment.setUserInterface(true);
-
-        /*
-         * Attach listeners for Script Console
-         */
-        initScriptConsole();
-
-        /*
-         * Register plugin classes
-         */
-        //		registerPlugins();
-
-        setExtendedState(NengoConfigManager.getUserInteger(UserProperties.NengoWindowExtendedState,
-                JFrame.MAXIMIZED_BOTH));
-    }
-
-    @Override
-    protected void initLayout(Universe canvas) {
-        try {
-            //Tell the UIManager to use the platform look and feel
-            String laf=UIManager.getSystemLookAndFeelClassName();
-            if (laf.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) {
-                laf="javax.swing.plaf.metal.MetalLookAndFeel";
-            }
-            UIManager.setLookAndFeel(laf);
-
-            //UIManager.put("Slider.paintValue",Boolean.FALSE);
-        } catch(Exception e) { /*Do nothing*/ }
-        System.setProperty("swing.aatext", "true");
-
-        splitPanes = new ArrayList<AuxillarySplitPane>();
-
-        pythonInterpreter = new PythonInterpreter();
-        scriptConsole = new ScriptConsole(pythonInterpreter);
-        NengoStyle.applyStyle(scriptConsole);
-
-        /*
-         * Create nested split panes
-         */
-        configPane = new ConfigurationPane(canvas);
-        scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
-                "Script Console", AuxillarySplitPane.Orientation.Bottom);
-
-        dataListViewer = new DataListView(new SimulatorDataModel(),scriptConsole);
-
-        dataViewerPane = new AuxillarySplitPane(scriptConsolePane, dataListViewer, "Data Viewer",
-                AuxillarySplitPane.Orientation.Left);
-
-        splitPanes.add(scriptConsolePane);
-        splitPanes.add(dataViewerPane);
-
-        if (CONFIGURE_PLANE_ENABLED) {
-            splitPanes.add(configPane.toJComponent());
-        }
-
-        getContentPane().add(dataViewerPane);
-
-        canvas.requestFocus();
-
-
-        progressIndicator=new ProgressIndicator();
-        getContentPane().add(progressIndicator,BorderLayout.SOUTH);
-
-
-    }
-
     /**
      * Prompt user to save models in NengoGraphics.
      * This is most likely called right before the application is exiting.
@@ -519,6 +485,38 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         return saveSuccessful;
     }
 
+//	private void changeSelection(Collection<WorldObject> objs) {
+//		selectedObjects.clear();
+//		selectedObjects.addAll(objs);
+////		  
+////		  
+////		selectedObjects = new ArrayList<WorldObjectImpl>();
+////		for (WorldObjectImpl obj : objs) {
+////	        while (obj != null && !(obj instanceof ModelObject)) {
+////	            obj = obj.getParent();
+////	        }
+////	        
+////	        if (obj != null) {
+////	        	if (objectSelectedBorder != null) {
+////	                objectSelectedBorder.destroy();
+////	            }
+////	
+////	            objectSelectedBorder = new SelectionBorder(obj.getWorld(), obj);
+////	
+////	            Object model = ((ModelObject) obj).getModel();
+////	            scriptConsole.setCurrentObject(model);
+////	
+////	            if (configPane.toJComponent().isAuxVisible()) {
+////	                configPane.configureObj(model);
+////	            }
+////	            selectedObjects.add(obj);
+////	        }
+////		}
+//	
+//	    updateEditMenu();
+//	    updateRunMenu();
+//	}
+    
     @Override
     protected void updateEditMenu() {
         super.updateEditMenu();
@@ -607,6 +605,18 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         runMenu.addAction(interactivePlotsAction, KeyEvent.VK_F5, KeyStroke.getKeyStroke(KeyEvent.VK_F5,
                 0));
     }
+    
+    protected void updateConfigurationPane() {
+    	if (configPane.toJComponent().isAuxVisible()) {
+    		Object model = getSelectedModel();
+    		configPane.configureObj( model );
+    	}
+    }
+    
+    protected void updateScriptConsole() {
+    	Object model = getSelectedModel();
+    	scriptConsole.setCurrentObject(model);
+    }
 
     @Override
     protected ElasticWorld createWorld() {
@@ -674,9 +684,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             }
             else if (response == JOptionPane.CANCEL_OPTION ||response == JOptionPane.CLOSED_OPTION)
             {
-                /*
-                 * Cancel exit
-                 */
+                // cancel exit
                 return;
             }
         }
@@ -746,32 +754,35 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
      * @return TODO
      */
     public Collection<WorldObject> getSelectedObjects() {
-        // check to make sure the object is still in the world before claiming it's still connected
-    	boolean foundOne = false;
-    	while (foundOne) {
-	    	for (WorldObject selectedObj : selectedObjects) {
-	    		if (selectedObj!=null) {
-	    			if (selectedObj.isDestroyed()) {
-	    				selectedObjects.remove(selectedObj);
-	    				foundOne = true;
-	    				break;
-	    			}
-	    		}
-	    	}
-    	}
-        return selectedObjects;
+    	return SelectionHandler.getActiveSelection();
     }
 
     /**
-     * @return the first element in the list of selected objects
+     * @return the last element in the list of selected objects
      */
     public WorldObject getSelectedObj() {
-    	Collection<WorldObject> selectedObjs = getSelectedObjects();
-        if (selectedObjs != null && selectedObjs.size() > 0) {
-        	return (WorldObject)(selectedObjs.toArray()[0]);
-        } else {
-        	return null;
-        }
+    	Collection<WorldObject> s = getSelectedObjects();
+    	if (!s.isEmpty()) {
+    		// return the last item
+    		Iterator<WorldObject> i = s.iterator();
+    		WorldObject last = i.next();
+    		while(i.hasNext())
+    			last = i.next();
+    		
+    		return last;
+    	} else
+    		return null;
+    }
+    
+    public Object getSelectedModel() {
+    	WorldObject obj = getSelectedObj();
+	    while (obj != null)
+	    	if (obj instanceof ModelObject)
+	    		return ((ModelObject) obj).getModel();
+	    	else
+	    		obj = obj.getParent();
+	    
+	    return null;
     }
     
     /**
@@ -897,12 +908,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     	AuxillarySplitPane pane=configPane.toJComponent();
     	pane.setAuxVisible(!pane.isAuxVisible());
     	if (pane.isAuxVisible()) {
-    		WorldObject obj = getSelectedObj();
-    		if (obj instanceof ModelObject) {
-    			configPane.configureObj(((ModelObject)obj).getModel());
-    		} else {
-    			configPane.configureObj(null);
-    		}
+    		configPane.configureObj( getSelectedModel() );
     	}
     }
 
@@ -931,13 +937,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             int location=auxSplitPane.getDividerLocation();
 
             if (obj==null) {
-                auxSplitPane.setAuxPane(null,"Inspector");
-            } else {
-
-
                 ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
                 configurationPane.getTree().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);
-
+                auxSplitPane.setAuxPane(configurationPane,"Inspector");
+            } else {
+                ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
+                configurationPane.getTree().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);
 
                 // Style.applyStyle(configurationPane.getTree());
                 // Style.applyStyle(configurationPane.getCellRenderer());
