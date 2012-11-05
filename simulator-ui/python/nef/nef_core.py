@@ -486,6 +486,8 @@ class Network:
                 raise AttributeError('Could not find node called "%s"'%name)
         return nodes
 
+    def _get_node(self, name, delim='.'):
+        return self._get_nodes(name, delim)[-1]
 
     def connect(self, pre, post,
                 transform=None,weight=1,index_pre=None,index_post=None,

@@ -1013,8 +1013,8 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
         if (nodeFactory instanceof LIFNeuronFactory) {
             LIFNeuronFactory neuronFactory = (LIFNeuronFactory)nodeFactory;
 
-            if (neuronFactory.getMaxRate() instanceof IndicatorPDF ||
-                neuronFactory.getIntercept() instanceof IndicatorPDF ) {
+            if (!(neuronFactory.getMaxRate() instanceof IndicatorPDF) ||
+                !(neuronFactory.getIntercept() instanceof IndicatorPDF)) {
                 throw new ScriptGenException("Max Rate or Intercept for LIF Neuron Factory not specified as a uniform range");
             }
 

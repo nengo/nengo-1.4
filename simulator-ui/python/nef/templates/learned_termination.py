@@ -80,11 +80,11 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     learnedterms = net.getMetaData("learnedterm")
 
     learnedterm=HashMap(5)
-    learnedterm.put("errName", name)
-    learnedterm.put("N_err", neurons)
-    learnedterm.put("preName", dimensions)
-    learnedterm.put("postName", tau_feedback)
-    learnedterm.put("rate", tau_input)
+    learnedterm.put("errName", errName)
+    learnedterm.put("N_err", N_err)
+    learnedterm.put("preName", preName)
+    learnedterm.put("postName", postName)
+    learnedterm.put("rate", rate)
 
     learnedterms.add(learnedterm)
 
