@@ -58,15 +58,17 @@ public class CutAction extends StandardAction {
     	ArrayList<Node> nodes = new ArrayList<Node>();
     	ArrayList<Point2D> offsets = new ArrayList<Point2D>();
     	
-    	// compute the mean of all the nodes' offsets
-    	//Point2D averagePoint = new Point2D.Double(0, 0);
-    	
-    	UINeoNode first = null;
+    	// compute the mean of all the nodes' positions
+    	Point2D averagePoint = new Point2D.Double(0, 0);
     	for (UINeoNode nodeUI : nodeUIs) {
-    		if (first == null) first = nodeUI;
+    		averagePoint.setLocation(averagePoint.getX() + nodeUI.getOffset().getX(), averagePoint.getY() + nodeUI.getOffset().getY());
+    	}
+    	averagePoint.setLocation(averagePoint.getX() / nodeUIs.size(), averagePoint.getY() / nodeUIs.size());
+    	
+    	for (UINeoNode nodeUI : nodeUIs) {
     		try {
     			nodes.add(nodeUI.getModel().clone());
-    			offsets.add(new Point2D.Double(nodeUI.getOffset().getX() - first.getOffset().getX(), nodeUI.getOffset().getY() - first.getOffset().getY()));
+    			offsets.add(new Point2D.Double(nodeUI.getOffset().getX() - averagePoint.getX(), nodeUI.getOffset().getY() - averagePoint.getY()));
     		} catch (CloneNotSupportedException e) {
     			throw new ActionException("Could not clone node", e);
     		}
