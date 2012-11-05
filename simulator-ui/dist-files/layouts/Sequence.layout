@@ -7,3 +7,12 @@
   ('BG', 'rule utility', {'x': 319, 'height': 361, 'label': 1, 'width': 173, 'y': 2}),
   ('thal', 'rule activation', {'x': 511, 'height': 324, 'label': 1, 'width': 150, 'y': 38})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.01, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-179.48640767226422,y=-36.98882988993215,width=798.3260501355014,height=494.265625]
+# BG (Network)=Point2D.Double[217.13308814961098, 20.4360551540624]
+# state (Network)=Point2D.Double[14.782361274237944, 212.87557515833822]
+# input (Network)=Point2D.Double[-147.37490653153174, 249.49017343256938]
+# thal (Network)=Point2D.Double[455.5537414550781, 233.81069946289062]

@@ -5,3 +5,10 @@
   ('input', 'value|origin', {'x': 288, 'height': 162, 'sel_dim': [0], 'label': 0, 'width': 469, 'autozoom': 0, 'last_maxy': 1.0, 'y': 182}),
   ('A', 'value|X', {'x': 289, 'height': 162, 'sel_dim': [0], 'label': 0, 'width': 467, 'autozoom': 0, 'last_maxy': 1.0, 'y': 10})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 1.0})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-128.34660381847957,y=-122.48681644993819,width=421.84699583053595,height=261.1770829890399]
+# A (NEFEnsemble)=Point2D.Double[129.13452850640658, 1.349838277070453]
+# input (Function Input)=Point2D.Double[-82.60109720894107, 11.248652308920441]

@@ -16,3 +16,19 @@
   ('control signal u', 'value|X', {'height': 162, 'x': 519, 'sel_dim': [0, 1], 'label': 0, 'autozoom': 0, 'width': 243, 'last_maxy': 20.000000000000014, 'y': 159}),
   ('Room', '3D view', {'height': 148, 'x': 284, 'label': 0, 'width': 164, 'y': 196})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-282.3030454301188,y=82.23450607436287,width=1318.3042247069238,height=816.1984210014343]
+# F (Function Input)=Point2D.Double[214.25797590941252, 723.5174883026756]
+# control signal v (NEFEnsemble)=Point2D.Double[129.06872150442453, 350.9516979555286]
+# convert Angles (NEFEnsemble)=Point2D.Double[11.521663314047231, 491.56330365786]
+# convert XY (NEFEnsemble)=Point2D.Double[291.6114935195476, 350.9516979555288]
+# control signal u (NEFEnsemble)=Point2D.Double[795.2737767917555, 446.56758983311363]
+# refY (Function Input)=Point2D.Double[-121.885823778949, 395.96414674190675]
+# funcT (NEFEnsemble)=Point2D.Double[541.333430552539, 440.2820018309655]
+# Room (Network)=Point2D.Double[-143.9905284159594, 658.8911144436345]
+# refX (Function Input)=Point2D.Double[-122.03503758193285, 295.22831859294376]
+# FX (NEFEnsemble)=Point2D.Double[492.1193685567227, 689.080705932758]
+# T matrix (Function Input)=Point2D.Double[439.9774655017457, 160.2008346371681]

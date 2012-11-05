@@ -1,14 +1,27 @@
-({'height': 600, 'x': 0, 'width': 862, 'state': 0, 'y': 0},
- [('X', None, {'x': 153, 'height': 32, 'label': 0, 'width': 23, 'y': 198}),
-  ('Y', None, {'x': 149, 'height': 32, 'label': 0, 'width': 24, 'y': 297}),
-  ('result (multiplication)', None, {'x': 520, 'height': 28, 'label': 0, 'width': 186, 'y': 251}),
-  ('2D Vector', None, {'x': 289, 'height': 32, 'label': 0, 'width': 99, 'y': 248}),
-  ('input X', 'control', {'x': 71, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 74}),
-  ('input Y', 'control', {'x': 72, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 277}),
-  ('2D Vector', 'XY plot|X', {'width': 177, 'autohide': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [0, 1], 'y': 296, 'label': 1, 'x': 318, 'height': 177, 'autozoom': 1}),
-  ('result (multiplication)', 'value|X', {'x': 499, 'height': 197, 'sel_dim': [0], 'label': 1, 'width': 297, 'autozoom': 0, 'last_maxy': 1.0, 'y': 289}),
-  ('X', 'value|X', {'x': 154, 'height': 117, 'sel_dim': [0], 'label': 1, 'width': 176, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 74}),
-  ('Y', 'value|X', {'x': 151, 'height': 117, 'sel_dim': [0], 'label': 1, 'width': 176, 'autozoom': 0, 'last_maxy': 1.0, 'y': 348}),
-  ('result (squaring)', None, {'x': 542, 'height': 32, 'label': 0, 'width': 152, 'y': 198}),
-  ('result (squaring)', 'value|X', {'x': 511, 'height': 186, 'sel_dim': [0], 'label': 1, 'width': 267, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 3})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+({'state': 0, 'height': 600, 'width': 862, 'x': 0, 'y': 22},
+ [(u'X', None, {'label': 0, 'height': 32, 'width': 23, 'x': 153, 'y': 198}),
+  (u'Y', None, {'label': 0, 'height': 32, 'width': 23, 'x': 149, 'y': 297}),
+  (u'result (multiplication)', None, {'label': 0, 'height': 32, 'width': 193, 'x': 520, 'y': 251}),
+  (u'result (multiplication)', 'value|X', {'label': 1, 'sel_dim': [0], 'last_maxy': 1.0, 'height': 197, 'width': 297, 'x': 499, 'fixed_y': None, 'autozoom': 0, 'y': 289}),
+  (u'X', 'value|X', {'label': 1, 'sel_dim': [0], 'last_maxy': 2.0000000000000013, 'height': 117, 'width': 176, 'x': 154, 'fixed_y': None, 'autozoom': 0, 'y': 74}),
+  (u'Y', 'value|X', {'label': 1, 'sel_dim': [0], 'last_maxy': 2.0000000000000013, 'height': 117, 'width': 176, 'x': 151, 'fixed_y': None, 'autozoom': 0, 'y': 348}),
+  (u'result (squaring)', None, {'label': 0, 'height': 32, 'width': 155, 'x': 542, 'y': 198}),
+  (u'result (squaring)', 'value|X', {'label': 1, 'sel_dim': [0], 'last_maxy': 1.0000000000000007, 'height': 186, 'width': 267, 'x': 511, 'fixed_y': None, 'autozoom': 0, 'y': 3}),
+  (u'inputX', None, {'label': False, 'height': 32, 'width': 66, 'x': 51, 'y': 220}),
+  (u'inputY', None, {'label': False, 'height': 32, 'width': 66, 'x': 50, 'y': 250}),
+  (u'inputY', 'control', {'label': True, 'range': 1.0, 'limits_w': 0, 'limits': True, 'height': 200, 'width': 80, 'x': 37, 'y': 285}),
+  (u'inputX', 'control', {'label': True, 'range': 1.0, 'limits_w': 0, 'limits': True, 'height': 200, 'width': 80, 'x': 35, 'y': 10}),
+  (u'2D vector', None, {'label': False, 'height': 32, 'width': 96, 'x': 255, 'y': 252})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=72.09383227226736,y=94.65052006532265,width=1116.0598666412122,height=690.9833738097437]
+# inputX (Function Input)=Point2D.Double[205.95936491548488, 299.5809423945051]
+# inputY (Function Input)=Point2D.Double[200.0, 486.8351253839279]
+# Y (NEFEnsemble)=Point2D.Double[398.6835125383928, 477.61971315267743]
+# result (multiplication) (NEFEnsemble)=Point2D.Double[863.1913981571456, 478.1469642826523]
+# result (squaring) (NEFEnsemble)=Point2D.Double[856.6089608491094, 265.13801122152074]
+# 2D vector (NEFEnsemble)=Point2D.Double[701.3695345437549, 500.5272511299747]
+# X (NEFEnsemble)=Point2D.Double[418.32473029820534, 288.8347855304506]

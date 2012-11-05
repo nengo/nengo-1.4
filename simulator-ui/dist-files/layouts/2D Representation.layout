@@ -7,3 +7,10 @@
   ('neurons', 'preferred directions', {'x': 585, 'height': 200, 'label': 0, 'width': 200, 'y': 117}),
   ('neurons', 'value|X', {'x': 625, 'height': 104, 'sel_dim': [0, 1], 'label': 0, 'width': 157, 'autozoom': 0, 'last_maxy': 1.0, 'y': 4})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-108.71583089854336,y=-100.0,width=432.8672086720867,height=268.0]
+# input (Function Input)=Point2D.Double[0.0, 0.0]
+# neurons (NEFEnsemble)=Point2D.Double[177.9077705116402, -10.157407878880099]

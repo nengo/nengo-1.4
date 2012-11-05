@@ -1,12 +1,23 @@
-({'height': 530, 'x': -4, 'width': 948, 'state': 0, 'y': -4},
- [('B', None, {'x': 310, 'height': 32, 'label': 0, 'width': 23, 'y': 90}),
-  ('A', None, {'x': 311, 'height': 32, 'label': 0, 'width': 23, 'y': 297}),
-  ('C', None, {'x': 577, 'height': 32, 'label': 0, 'width': 24, 'y': 303}),
-  ('Bind', None, {'x': 464, 'height': 32, 'label': 0, 'width': 48, 'y': 300}),
-  ('D', None, {'x': 563, 'height': 32, 'label': 0, 'width': 24, 'y': 93}),
-  ('D', 'semantic pointer', {'width': 300, 'show_pairs': 0, 'normalize': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [0, 1, 2], 'y': 12, 'label': 0, 'x': 618, 'smooth_normalize': 0, 'height': 200, 'autozoom': 0}),
-  ('B', 'semantic pointer', {'width': 300, 'show_pairs': 0, 'normalize': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [0, 1, 2], 'y': 1, 'label': 0, 'x': 1, 'smooth_normalize': 0, 'height': 200, 'autozoom': 0}),
-  ('C', 'semantic pointer', {'width': 300, 'show_pairs': 0, 'normalize': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [0, 1, 2], 'y': 201, 'label': 0, 'x': 621, 'smooth_normalize': 0, 'height': 200, 'autozoom': 0}),
-  ('A', 'semantic pointer', {'width': 300, 'show_pairs': 0, 'normalize': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [0, 1, 2], 'y': 208, 'label': 0, 'x': -1, 'smooth_normalize': 0, 'height': 200, 'autozoom': 0}),
-  ('Add', None, {'x': 468, 'height': 32, 'label': 0, 'width': 45, 'y': 91})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+({'state': 0, 'height': 530, 'width': 948, 'x': -4, 'y': 22},
+ [(u'B', None, {'label': 0, 'height': 32, 'width': 23, 'x': 310, 'y': 90}),
+  (u'A', None, {'label': 0, 'height': 32, 'width': 23, 'x': 311, 'y': 297}),
+  (u'C', None, {'label': 0, 'height': 32, 'width': 24, 'x': 576, 'y': 297}),
+  (u'Bind', None, {'label': 0, 'height': 32, 'width': 49, 'x': 462, 'y': 297}),
+  (u'D', None, {'label': 0, 'height': 32, 'width': 24, 'x': 571, 'y': 90}),
+  (u'D', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 618, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': 0, 'y': 7}),
+  (u'B', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 1, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': 0, 'y': 1}),
+  (u'C', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 621, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': 0, 'y': 208}),
+  (u'A', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': -1, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': 0, 'y': 208}),
+  (u'add', None, {'label': False, 'height': 32, 'width': 43, 'x': 441, 'y': 90})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=47.3721972300109,y=233.33334350585935,width=976.5007408472902,height=604.5784788131713]
+# Bind (Network)=Point2D.Double[527.0801738986694, 606.21817279245]
+# A (NEFEnsemble)=Point2D.Double[260.41545149948826, 302.12588452963087]
+# B (NEFEnsemble)=Point2D.Double[254.16618059979527, 640.5891627407622]
+# C (NEFEnsemble)=Point2D.Double[780.2048093485156, 642.6722530406595]
+# D (NEFEnsemble)=Point2D.Double[756.249270899693, 301.08433937968215]
+# add (NEFEnsemble)=Point2D.Double[568.741979896622, 302.12588452963087]
