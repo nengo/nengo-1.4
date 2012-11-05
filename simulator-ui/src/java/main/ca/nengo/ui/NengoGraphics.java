@@ -912,7 +912,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         public ConfigurationPane(Container mainPanel) {
             super();
-            auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Configuration",
+            auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Inspector",
                     AuxillarySplitPane.Orientation.Right);
             auxSplitPane.getAuxPaneWrapper().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);
             currentObj=null;
@@ -931,7 +931,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             int location=auxSplitPane.getDividerLocation();
 
             if (obj==null) {
-                auxSplitPane.setAuxPane(null,"Configuration");
+                auxSplitPane.setAuxPane(null,"Inspector");
             } else {
 
 
@@ -950,7 +950,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                 } else if (obj instanceof Origin) {
                     name = ((Origin) obj).getName();
                 } else {
-                    name = "Configuration";
+                    name = "Inspector";
                 }
                 auxSplitPane.setAuxPane(configurationPane, name + " (" + obj.getClass().getSimpleName()
                         + ")");

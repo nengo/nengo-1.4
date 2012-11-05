@@ -197,7 +197,7 @@ public class DataListView extends JPanel implements TreeSelectionListener {
                         NengoTreeNode neoTreeNode = (NengoTreeNode) leafNode;
 
                         if (neoTreeNode.getNeoNode() != null) {
-                            menuBuilder.addAction(new ConfigureAction("Configure",
+                            menuBuilder.addAction(new ConfigureAction("Inspector",
                                     neoTreeNode.getNeoNode()));
                         }
                     }
