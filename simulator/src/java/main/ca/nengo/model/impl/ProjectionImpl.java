@@ -247,7 +247,9 @@ public class ProjectionImpl implements Projection {
 		
 	    StringBuilder py = new StringBuilder();
 	    
-	    String pythonNetworkName = scriptData.get("prefix") + getNetwork().getName();
+	    String pythonNetworkName = scriptData.get("prefix") 
+	    			+ getNetwork().getName().replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+	    
 	    py.append(String.format("%1s.connect(", pythonNetworkName));
 	    
 	    StringBuilder originNodeFullName = new StringBuilder();
@@ -337,56 +339,74 @@ public class ProjectionImpl implements Projection {
 		    StringBuilder funcString = new StringBuilder();
 		    boolean first = true;
 		    
+		    boolean allIdentity = true;
 		    for(Function f: dOrigin.getFunctions())
 		    {
-		    	if(f instanceof PostfixFunction)
-		    	{
-		    		PostfixFunction pf = (PostfixFunction) f;
-		    		String exp = pf.getExpression();
-		    		
-		    		exp=exp.replaceAll("^","**");
-		    		exp=exp.replaceAll("!"," not ");
-		    		exp=exp.replaceAll("&"," and ");
-		    		exp=exp.replaceAll("|"," or ");
-		    		exp=exp.replaceAll("ln","log");
-		    		
-		    		for(int j = 0; j < f.getDimension(); j++)
-		    		{
-		    			String find = "x"+ Integer.toString(j);
-		    			String replace = "x["+ Integer.toString(j) + "]";
-		    			exp=exp.replaceAll(find, replace);
-		    		}
-		    		
-		    		if (first)
-		    			funcString.append(exp);
-		    		else
-		    		{
-		    			funcString.append(", " + exp);
-		    			first = false;
-		    		}
-		    	}
-		    	else if(f instanceof IdentityFunction)
-		    	{
-		    		String exp = "x[" + Integer.toString(((IdentityFunction) f).getIdentityDimension()) + "]";
-		    			
-		    		if (first)
-		    			funcString.append(exp);
-		    		else
-		    		{
-		    			funcString.append(", " + exp);
-		    			first = false;
-		    		}
-		    	}
-		    	else
-		    	{
-		    		throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
-		    	}
+		    	 if(!(f instanceof IdentityFunction))
+		    	 {
+		    		 allIdentity = false;
+		    		 break;
+		    	 }
 		    }
 		    
-		    py.insert(0, "    return [" + funcString.toString() + "]\n\n");
-		    py.insert(0, "def function(x):\n");
-		    
-		    py.append(", func=function");
+		    if(!allIdentity)
+		    {
+			    
+			    for(Function f: dOrigin.getFunctions())
+			    {
+			    	if(f instanceof PostfixFunction)
+			    	{
+			    		PostfixFunction pf = (PostfixFunction) f;
+			    		String exp = pf.getExpression();
+			    		
+			    		exp=exp.replaceAll("^","**");
+			    		exp=exp.replaceAll("!"," not ");
+			    		exp=exp.replaceAll("&"," and ");
+			    		exp=exp.replaceAll("|"," or ");
+			    		exp=exp.replaceAll("ln","log");
+			    		
+			    		for(int j = 0; j < f.getDimension(); j++)
+			    		{
+			    			String find = "x"+ Integer.toString(j);
+			    			String replace = "x["+ Integer.toString(j) + "]";
+			    			exp=exp.replaceAll(find, replace);
+			    		}
+			    		
+			    		if (first)
+			    		{
+			    			funcString.append(exp);
+			    			first = false;
+			    		}
+			    		else
+			    		{
+			    			funcString.append(", " + exp);	
+			    		}
+			    	}
+			    	else if(f instanceof IdentityFunction)
+			    	{
+			    		String exp = "x[" + Integer.toString(((IdentityFunction) f).getIdentityDimension()) + "]";
+			    			
+			    		if (first)
+			    		{
+			    			funcString.append(exp);
+			    			first = false;
+			    		}
+			    		else
+			    		{
+			    			funcString.append(", " + exp);	
+			    		}
+			    	}
+			    	else
+			    	{
+			    		throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
+			    	}
+			    }
+			    
+			    py.insert(0, "    return [" + funcString.toString() + "]\n\n");
+			    py.insert(0, "def function(x):\n");
+			    
+			    py.append(", func=function");
+		    }
 	    }
 	    
 	    py.append(")\n\n");

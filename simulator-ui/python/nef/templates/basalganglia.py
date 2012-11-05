@@ -35,8 +35,8 @@ def make(net,name='Basal Ganglia',dimensions=1,pstc=0.01,netbg=None,same_neurons
     if net is not None:
         net.add(netbg.network)
     
-    netbg.setMetaData("type", "BasalGanglia")
-    netbg.setMetaData("name", name)
-    netbg.setMetaData("dimensions", dimensions)
-    netbg.setMetaData("pstc", pstc)
-    netbg.setMetaData("same_neurons", same_neurons)
+    netbg.network.setMetaData("type", "BasalGanglia")
+    netbg.network.setMetaData("name", name)
+    netbg.network.setMetaData("dimensions", dimensions)
+    netbg.network.setMetaData("pstc", pstc)
+    netbg.network.setMetaData("same_neurons", same_neurons)

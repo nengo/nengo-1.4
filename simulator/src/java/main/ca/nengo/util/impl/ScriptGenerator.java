@@ -1,6 +1,7 @@
 package ca.nengo.util.impl;
 
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -16,17 +17,19 @@ public class ScriptGenerator extends DFSIterator{
 	
 	PrintWriter writer;
 	StringBuilder script;
+	char spaceDelimiter = '_';
+	String topLevelPrefix = "net";
 
     int inTemplateNetwork;
-    boolean isTopLevel;
 	
-	public ScriptGenerator(PrintWriter writer) throws FileNotFoundException
+	public ScriptGenerator(File file) throws FileNotFoundException
 	{
 		prefixes = new HashMap<Node, String>();
 		
 		script = new StringBuilder(); 
 		
-		this.writer = writer;
+		this.writer = new PrintWriter(file);
+		
 		writer.write("import nef\n");
 		writer.write("from ca.nengo.math.impl import ConstantFunction, FourierFunction, PostfixFunction\n");
 		writer.write("import math\n");
@@ -35,32 +38,32 @@ public class ScriptGenerator extends DFSIterator{
         inTemplateNetwork = 0;
 	}
 	
-	public void pre(Node node)
+	protected void pre(Node node)
 	{
-		boolean isTopLevel = !prefixes.containsKey(node);
-
-		if (isTopLevel)
+		if (topLevel)
 		{
-			prefixes.put(node, "");
+			prefixes.put(node, topLevelPrefix);
 		}
 		
 		for (Node child : node.getChildren())
 		{
 			String prefix;
-			if(isTopLevel)
-				prefix = node.getName();
+			String nameNoSpaces = node.getName().replace(' ', spaceDelimiter);
+			
+			if(topLevel)
+				prefix = topLevelPrefix + spaceDelimiter + nameNoSpaces;
 			else
-				prefix = prefixes.get(node) + "_" + node.getName() ;
+				prefix = prefixes.get(node) + spaceDelimiter + nameNoSpaces ;
 			
 			prefixes.put(child, prefix);
 		}
 		
 		HashMap<String, Object> toScriptArgs = new HashMap<String, Object>();
-		toScriptArgs.put("prefix", prefixes.get(node) + (isTopLevel ? "" : "_"));
-		toScriptArgs.put("isSubnet", !isTopLevel);
+		toScriptArgs.put("prefix", prefixes.get(node) + spaceDelimiter);
+		toScriptArgs.put("isSubnet", !topLevel);
 		toScriptArgs.put("netName", prefixes.get(node));
-		toScriptArgs.put("spaceDelim", '_');
-		
+		toScriptArgs.put("spaceDelim", spaceDelimiter);
+
         if (node instanceof Network && ((Network)node).getMetaData("type") != null)
         {
             inTemplateNetwork++;
@@ -70,7 +73,6 @@ public class ScriptGenerator extends DFSIterator{
         {
             try {
                 String code = node.toScript(toScriptArgs);
-                //this.writer.write(code);
                 script.append(code);
             } catch(ScriptGenException e) {
                 System.out.println(e.getMessage());
@@ -78,7 +80,7 @@ public class ScriptGenerator extends DFSIterator{
         }
 	}
 	
-	public void post(Node node)
+	protected void post(Node node)
 	{
         if (node instanceof Network)
         {
@@ -90,10 +92,10 @@ public class ScriptGenerator extends DFSIterator{
             }
 		
             HashMap<String, Object> toScriptArgs = new HashMap<String, Object>();
-            toScriptArgs.put("prefix", prefixes.get(node));
-            toScriptArgs.put("isSubnet", isTopLevel);
+            toScriptArgs.put("prefix", prefixes.get(node) + spaceDelimiter);
+            toScriptArgs.put("isSubnet", !topLevel);
             toScriptArgs.put("netName", prefixes.get(node));
-            toScriptArgs.put("delimiter", '%');
+            toScriptArgs.put("spaceDelim", spaceDelimiter);
 
             try {
                 String code = net.toPostScript(toScriptArgs);
@@ -101,11 +103,18 @@ public class ScriptGenerator extends DFSIterator{
             } catch(ScriptGenException e) {
                 System.out.println(e.getMessage());
             }
+            
+            if(topLevel)
+            {
+            	String nameNoSpaces = topLevelPrefix + spaceDelimiter + node.getName().replace(' ', spaceDelimiter);
+            	script.append( nameNoSpaces + ".add_to_nengo()\n");
+            }
         }
 	}
 	
-	public void finish()
+	protected void finish()
 	{
 		writer.write(script.toString());
+		writer.close();
 	}
 }

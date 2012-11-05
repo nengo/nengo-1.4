@@ -1018,12 +1018,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	
 	public void dumpToScript() throws FileNotFoundException
 	{
-		File file = new File(this.getName() + ".py");
-		PrintWriter writer = new PrintWriter(file);
-		ScriptGenerator scriptGen = new ScriptGenerator(writer);
-		scriptGen.DFS(this);
-		scriptGen.finish();
-		writer.close();
+		File file = new File(this.getName().replace(' ', '_') + ".py");
+		
+		ScriptGenerator scriptGen = new ScriptGenerator(file);
+		scriptGen.startDFS(this);
 	}
 	
 
@@ -1091,7 +1089,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             String type = (String)myMetaData.get("type");
             if (type == "NetworkArray")
             {
-                py = String.format("nef.templates.networkarray.make(%s, name='%s', neurons=%d, length=%d, radius=%f, rLow=%d, rHigh=%d, iLow=8d, iHigh=%d, encSign=%d, useQuick=%b)\n",
+                py = String.format("nef.templates.networkarray.make(%s, name='%s', neurons=%d, length=%d, radius=%.1f, rLow=%d, rHigh=%d, iLow=8d, iHigh=%d, encSign=%d, useQuick=%b)\n",
                         scriptData.get("netName"),
                         myMetaData.get("name"),
                         (Integer)myMetaData.get("neurons"),
@@ -1106,7 +1104,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             }
             else if (type == "BasalGanglia")
             {
-                py = String.format("nef.templates.basalganglia.make(%s, name='%s', dimensions=%d, pstc=%f, same_neurons=%b)\n",
+                py = String.format("nef.templates.basalganglia.make(%s, name='%s', dimensions=%d, pstc=%.3f, same_neurons=%b)\n",
                         scriptData.get("netName"),
                         myMetaData.get("name"),
                         (Integer)myMetaData.get("dimensions"),
@@ -1115,7 +1113,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             }
             else if (type == "Thalmus")
             {
-                py = String.format("nef.templates.thalamus.make(%s, name='%s', neurons=%d, dimensions=%d, inhib_scale=%d, tau_inhib=%f, useQuick=%b)\n",
+                py = String.format("nef.templates.thalamus.make(%s, name='%s', neurons=%d, dimensions=%d, inhib_scale=%d, tau_inhib=%.3f, useQuick=%b)\n",
                         scriptData.get("netName"),
                         myMetaData.get("name"),
                         (Integer)myMetaData.get("neurons"),
@@ -1136,8 +1134,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
         {
             py = String.format("%s = %s.make_subnetwork('%s')\n\n", 
                     pythonNetworkName,
-                    myName,
-                    scriptData.get("netName"));
+                    scriptData.get("netName"),
+                    myName
+                    );
         }
         else
         {

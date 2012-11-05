@@ -312,7 +312,7 @@ public class FunctionInput implements Node, Probeable {
             high.append("]");
             power.append("]");
 
-            py.append(String.format("%1s.make_fourier_input('%2s', dimensions=%3d, base=%4s, high=%5s, power=%6s",
+            py.append(String.format("%s.make_fourier_input('%s', dimensions=%d, base=%s, high=%s, power=%s",
                         scriptData.get("netName"),
                         myName,
                         myFunctions.length,
@@ -325,7 +325,7 @@ public class FunctionInput implements Node, Probeable {
                 if (myFunctions[i] instanceof ConstantFunction) {
                     ConstantFunction func = (ConstantFunction)myFunctions[i];
 
-                    py.append(String.format("Function%c%s%c%d = ConstantFunction(%d, %f)\n",
+                    py.append(String.format("Function%c%s%c%d = ConstantFunction(%d, %.3f)\n",
                     			(Character)scriptData.get("spaceDelim"),
                                 myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
                                 (Character)scriptData.get("spaceDelim"),
@@ -361,12 +361,12 @@ public class FunctionInput implements Node, Probeable {
                             (Character)scriptData.get("spaceDelim"),
                             i));
                 if ((i + 1) < myFunctions.length) {
-                    funcs.append(",");
+                    funcs.append(", ");
                 }
             }
             funcs.append("]");
                                 
-            py.append(String.format("%1s.make_input('%2s', values=%s)\n",
+            py.append(String.format("%s.make_input('%s', values=%s)\n",
                     scriptData.get("netName"),
                     myName,
                     funcs.toString()));

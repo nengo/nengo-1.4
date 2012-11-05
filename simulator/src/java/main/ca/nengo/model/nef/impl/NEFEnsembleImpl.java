@@ -1003,7 +1003,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
     @Override
     public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
-        StringBuilder py = new StringBuilder(String.format("%1s.make('%2s', %3d, %4d", 
+        StringBuilder py = new StringBuilder(String.format("%s.make('%s', %d, %d", 
                     scriptData.get("netName"), 
                     getName(), 
                     getNodes().length, 
@@ -1018,7 +1018,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
                 throw new ScriptGenException("Max Rate or Intercept for LIF Neuron Factory not specified as a uniform range");
             }
 
-            py.append(String.format(", tau_rc=%1f, tau_ref=%2f, max_rate=(%3d, %4d), intercept=(%5d, %6d)", 
+            py.append(String.format(", tau_rc=%.3f, tau_ref=%.3f, max_rate=(%.1f, %.1f), intercept=(%.1f, %.1f)", 
                         neuronFactory.getTauRC(), 
                         neuronFactory.getTauRef(), 
                         ((IndicatorPDF)neuronFactory.getMaxRate()).getLow(), 
@@ -1029,7 +1029,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
             throw new ScriptGenException("Neuron Factory not supported. Only LIF Neuron Factory is supported");
         }
 
-        py.append(String.format(", radius=%1f)\n", myRadii[0]));
+        py.append(String.format(", radius=%.2f)\n", myRadii[0]));
         return py.toString();
     }
 
