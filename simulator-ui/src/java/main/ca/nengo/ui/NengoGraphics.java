@@ -30,6 +30,7 @@ import java.awt.Container;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -183,16 +184,27 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         // Setup icon
         try {
-            Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/spikepattern-black.png"));
+            Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo128.png"));
             setIconImage(image);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        
     }
 
     public void setApplication(Application application) {
         application.addApplicationListener(this);
         application.setEnabledPreferencesMenu(false);
+        BufferedImage icon = new BufferedImage(128,128,BufferedImage.TYPE_INT_ARGB);
+        try {
+            icon = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo128.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        application.setApplicationIconImage(icon);
+   
     }
 
     /**
