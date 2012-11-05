@@ -33,8 +33,8 @@ pd = [] # list of preferred direction vectors
 vsize = len(vocab.keys) # vocabulary size
 for item in vocab.keys:
     pd.append(vocab[item].v.tolist())
-cleanup = model.net.make('cleanup', neurons=300, dimensions=vsize, encoders=eye(vsize))
-model.net.connect(model.state.net.network.getOrigin('state'), cleanup, transform=pd)
+model.net.make('cleanup', neurons=300, dimensions=vsize, encoders=eye(vsize))
+model.net.connect(model.state.net.network.getOrigin('state'), 'cleanup', transform=pd)
 
 import nef
 # Record data.
