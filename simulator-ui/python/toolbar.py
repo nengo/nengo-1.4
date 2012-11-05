@@ -5,8 +5,8 @@ import java
 import ca.nengo
 import sys
 
-if 'lib/iText-5.0.5.jar' not in sys.path:
-    sys.path.append('lib/iText-5.0.5.jar')
+if 'lib/itextpdf-5.3.4.jar' not in sys.path:
+    sys.path.append('lib/itextpdf-5.3.4.jar')
 
 import template
 
@@ -334,7 +334,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
                     viewer=net.getViewer()
         elif net is not None and hasattr(net,'networkParent'):
             net=net.networkParent
-            viewer=net.getViewer()
+            if net is not None and hasattr(net,'getViewer'):
+                viewer=net.getViewer()
         if viewer is not None and (viewer.isDestroyed() or
             not isinstance(viewer, ca.nengo.ui.models.viewers.NetworkViewer)):
             return None
