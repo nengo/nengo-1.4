@@ -1247,8 +1247,9 @@ def save_layout_file(name, view, layout, controls):
         for line in data.split('\n'):
             if line.startswith('#'):
                 java_layout += '\n' + line
-    else:
-        f = file(fn, 'w')
+        f.close()
+
+    f = file(fn, 'w')
     
     layout_text = ',\n  '.join([`x` for x in layout])
     

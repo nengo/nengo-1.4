@@ -8,18 +8,18 @@ vocab=hrr.Vocabulary(D, include_pairs=True)
 vocab.parse('a+b+c+d+e')
 
 # Binding
-net=nef.Network('Structured Representation (pre-built)')
-A=net.make('A',300,D, quick=True)
-B=net.make('B',300,D, quick=True)
-C=net.make('C',300,D, quick=True)
-conv=nef.convolution.make_convolution(net,'Bind',A,B,C,300, quick=True)
+net=nef.Network('Structured Representation (pre-built)',seed=1)
+net.make('A',300,D)
+net.make('B',300,D)
+net.make('C',300,D)
+conv=nef.convolution.make_convolution(net,'Bind','A','B','C',300)
 
 # Adding
-add = net.make('Add', 300, D, quick=True)
-D=net.make('D',300,D, quick=True)
-net.connect(A, add)
-net.connect(B, add)
-net.connect(add, D)
+net.make('add', 300,D)
+net.make('D',300,D)
+net.connect('A', 'add')
+net.connect('B', 'add')
+net.connect('add', 'D')
 
 net.add_to_nengo()
 

@@ -102,9 +102,9 @@ public class ConfigUtil {
 
 		final JDialog dialog;
 		if (owner != null) {
-			dialog = new JDialog(owner, o.getClass().getSimpleName() + " Configuration");
+			dialog = new JDialog(owner, o.getClass().getSimpleName() + " Inspector");
 		} else {
-			dialog = new JDialog(owner2, o.getClass().getSimpleName() + " Configuration");
+			dialog = new JDialog(owner2, o.getClass().getSimpleName() + " Inspector");
 		}
 
 		dialog.getContentPane().setLayout(new BorderLayout());

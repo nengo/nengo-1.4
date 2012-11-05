@@ -14,7 +14,9 @@ public class NengoLauncher {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Nengo");
         Application application = new DefaultApplication();
+     
         NengoGraphics ng = new NengoGraphics();
         ng.setApplication(application);
+
     }
 }

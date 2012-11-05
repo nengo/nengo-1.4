@@ -12,3 +12,16 @@
   (u'D', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2, 3], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 475, 'smooth_normalize': 0, 'fixed_y': None, 'show_pairs': False, 'autozoom': False, 'y': 32}),
   (u'E', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2, 3], 'last_maxy': 1.0000000000000007, 'height': 199, 'width': 299, 'x': 477, 'smooth_normalize': 0, 'fixed_y': None, 'show_pairs': 0, 'autozoom': 0, 'y': 246})],
  {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=117.54089809405342,y=209.86501487959995,width=1026.594657699267,height=635.5930011594455]
+# B (NEFEnsemble)=Point2D.Double[283.6119408842624, 433.3054430359519]
+# A (NEFEnsemble)=Point2D.Double[288.86782475759054, 263.9556763779285]
+# D (NEFEnsemble)=Point2D.Double[670.2392056857553, 330.29011911872146]
+# C (NEFEnsemble)=Point2D.Double[289.7132132568022, 615.0487191162455]
+# Unbind (Network)=Point2D.Double[766.8445442996871, 557.8147226066088]
+# Bind (Network)=Point2D.Double[421.21320422773135, 296.07170571487035]
+# input (Generic Node)=Point2D.Double[142.85714721679688, 500.0]
+# E (NEFEnsemble)=Point2D.Double[1040.0441899520467, 591.452379395908]

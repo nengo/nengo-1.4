@@ -7,3 +7,10 @@
   ('neuron', 'value|X', {'x': 516, 'height': 180, 'sel_dim': [0], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 176}),
   ('neuron', 'voltage graph', {'x': 284, 'height': 144, 'sel_dim': [0], 'label': 0, 'width': 217, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 183})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-108.71582326914881,y=-100.0,width=432.8672086720867,height=268.0]
+# input (Function Input)=Point2D.Double[0.0, 0.0]
+# neuron (NEFEnsemble)=Point2D.Double[157.59295654296875, 8.772306442260742]

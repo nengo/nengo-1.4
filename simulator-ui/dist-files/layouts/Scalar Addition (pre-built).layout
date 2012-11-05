@@ -1,12 +1,22 @@
-({'height': 547, 'x': 0, 'width': 895, 'state': 0, 'y': 0},
- [('B', None, {'x': 496, 'height': 32, 'label': 0, 'width': 23, 'y': 322}),
-  ('A', None, {'x': 497, 'height': 32, 'label': 0, 'width': 23, 'y': 114}),
-  ('inputB', None, {'x': 397, 'height': 32, 'label': 0, 'width': 64, 'y': 323}),
-  ('inputA', None, {'x': 400, 'height': 32, 'label': 0, 'width': 64, 'y': 114}),
-  ('Sum', None, {'x': 529, 'height': 32, 'label': 0, 'width': 49, 'y': 212}),
-  ('inputB', 'control', {'x': 18, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 234}),
-  ('inputA', 'control', {'x': 20, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 29}),
-  ('A', 'value|X', {'x': 100, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 28}),
-  ('B', 'value|X', {'x': 98, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 228}),
-  ('Sum', 'value|X', {'x': 585, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 129})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+({'state': 0, 'height': 547, 'width': 895, 'x': 0, 'y': 22},
+ [(u'B', None, {'label': 0, 'height': 32, 'width': 23, 'x': 511, 'y': 284}),
+  (u'A', None, {'label': 0, 'height': 32, 'width': 23, 'x': 512, 'y': 114}),
+  (u'inputB', None, {'label': 0, 'height': 32, 'width': 66, 'x': 410, 'y': 284}),
+  (u'inputA', None, {'label': 0, 'height': 32, 'width': 66, 'x': 415, 'y': 114}),
+  (u'inputB', 'control', {'label': 1, 'range': 1.0, 'limits_w': 0, 'limits': 1, 'height': 200, 'width': 80, 'x': 33, 'y': 234}),
+  (u'inputA', 'control', {'label': 1, 'range': 1.0, 'limits_w': 0, 'limits': 1, 'height': 200, 'width': 80, 'x': 35, 'y': 29}),
+  (u'A', 'value|X', {'label': 1, 'sel_dim': [0], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 115, 'fixed_y': None, 'autozoom': 0, 'y': 28}),
+  (u'B', 'value|X', {'label': 1, 'sel_dim': [0], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 113, 'fixed_y': None, 'autozoom': 0, 'y': 228}),
+  (u'C', None, {'label': False, 'height': 32, 'width': 24, 'x': 657, 'y': 115}),
+  (u'C', 'value|X', {'label': True, 'sel_dim': [0], 'last_maxy': 2.0000000000000013, 'height': 200, 'width': 300, 'x': 586, 'fixed_y': None, 'autozoom': False, 'y': 229})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=96.60747124022753,y=273.9128414877683,width=859.9855420924215,height=532.4407131411133]
+# inputA (Function Input)=Point2D.Double[261.158686365176, 603.1706683364771]
+# A (NEFEnsemble)=Point2D.Double[496.95672190040636, 593.0264080044985]
+# inputB (Function Input)=Point2D.Double[253.04327809959344, 421.17558697784847]
+# C (NEFEnsemble)=Point2D.Double[750.0, 500.0]
+# B (NEFEnsemble)=Point2D.Double[500.0, 410.01690061267254]

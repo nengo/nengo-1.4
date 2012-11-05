@@ -49,11 +49,11 @@ public abstract class UINeoModel extends ModelObject {
 	@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
-		menu.addAction(new ConfigureAction("Configure", getModel()));
+		menu.addAction(new ConfigureAction("Inspector", getModel()));
 	}
 
 	@Override
 	public void altClicked() {
-		(new ConfigureAction("Configure", getModel())).doAction();
+		(new ConfigureAction("Inspector", getModel())).doAction();
 	}
 }

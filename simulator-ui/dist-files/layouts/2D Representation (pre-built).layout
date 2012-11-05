@@ -1,9 +1,16 @@
-({'height': 473, 'x': -983, 'width': 798, 'state': 0, 'y': 85},
- [('neurons', None, {'x': 373, 'height': 32, 'label': 0, 'width': 79, 'y': 76}),
-  ('input', None, {'x': 53, 'height': 32, 'label': 0, 'width': 51, 'y': 76}),
-  ('neurons', 'voltage grid', {'x': 489, 'height': 104, 'auto_improve': 0, 'label': 0, 'width': 104, 'rows': None, 'y': 30}),
-  ('neurons', 'value|X', {'x': 601, 'height': 105, 'sel_dim': [0, 1], 'label': 0, 'width': 158, 'autozoom': 0, 'last_maxy': 1.0, 'y': 29}),
-  ('neurons', 'preferred directions', {'x': 558, 'height': 200, 'label': 0, 'width': 200, 'y': 147}),
-  ('neurons', 'XY plot|X', {'width': 200, 'autohide': 1, 'last_maxy': 1.0, 'sel_dim': [0, 1], 'y': 148, 'label': 0, 'x': 346, 'height': 200, 'autozoom': 1}),
-  ('input', 'control', {'x': 67, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 120, 'limits_w': 0, 'y': 145})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+({'state': 0, 'height': 477, 'width': 836, 'x': 70, 'y': 60},
+ [(u'neurons', None, {'label': 0, 'height': 32, 'width': 82, 'x': 373, 'y': 76}),
+  (u'input', None, {'label': 0, 'height': 32, 'width': 53, 'x': 53, 'y': 76}),
+  (u'neurons', 'voltage grid', {'label': 0, 'rows': None, 'height': 104, 'width': 104, 'x': 489, 'y': 30, 'cols': None, 'max': 1, 'auto_improve': 0}),
+  (u'neurons', 'value|X', {'label': 0, 'sel_dim': [0, 1], 'last_maxy': 1.0, 'height': 105, 'width': 158, 'x': 601, 'fixed_y': None, 'autozoom': 0, 'y': 29}),
+  (u'neurons', 'preferred directions', {'label': 0, 'height': 200, 'width': 200, 'x': 558, 'y': 147}),
+  (u'neurons', 'XY plot|X', {'label': 0, 'sel_dim': [0, 1], 'last_maxy': 1.0, 'height': 200, 'width': 200, 'x': 346, 'autohide': 1, 'autozoom': 1, 'y': 148}),
+  (u'input', 'control', {'label': 1, 'range': 1.0, 'limits_w': 0, 'limits': 1, 'height': 200, 'width': 120, 'x': 67, 'y': 145})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-108.71583089854336,y=-100.0,width=432.8672086720867,height=268.0]
+# neurons (NEFEnsemble)=Point2D.Double[165.90356120023682, -10.15740787888034]
+# input (Function Input)=Point2D.Double[0.0, 0.0]

@@ -595,7 +595,7 @@ public class ScriptConsole extends JPanel {
 						String curtext = myConsole.myCommandField.getText();
 						if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
 							myConsole.myCommandField.setText( curtext.substring(0,curtext.length()-1) );
-						else
+						else if (e.getKeyCode() != KeyEvent.VK_DELETE)
 							myConsole.myCommandField.setText( myConsole.myCommandField.getText() + e.getKeyChar() );
 						
 						myConsole.myCommandField.requestFocus();

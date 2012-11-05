@@ -980,7 +980,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
             try {
                 String os = System.getProperty("os.name").toLowerCase();
                 if (os.indexOf("win") >= 0) {
-                    Runtime.getRuntime().exec("start " + this.url);
+                    Runtime.getRuntime().exec("cmd.exe /C start " + this.url);
                 } else {
                     Runtime.getRuntime().exec("open " + this.url);
                 }
