@@ -15,16 +15,22 @@ public class ScriptGenerator extends DFSIterator{
 	HashMap<Node, String> prefixes;
 	
 	PrintWriter writer;
+	StringBuilder script;
 
     int inTemplateNetwork;
     boolean isTopLevel;
 	
 	public ScriptGenerator(PrintWriter writer) throws FileNotFoundException
 	{
+		prefixes = new HashMap<Node, String>();
+		
+		script = new StringBuilder(); 
+		
 		this.writer = writer;
-		writer.write("import nef");
-		writer.write("from ca.nengo.math.impl import ConstantFunction, FourierFunction, PostfixFunction");
-		writer.write("import math");
+		writer.write("import nef\n");
+		writer.write("from ca.nengo.math.impl import ConstantFunction, FourierFunction, PostfixFunction\n");
+		writer.write("import math\n");
+		writer.write("\n");
 		
         inTemplateNetwork = 0;
 	}
@@ -40,15 +46,20 @@ public class ScriptGenerator extends DFSIterator{
 		
 		for (Node child : node.getChildren())
 		{
-			String prefix = prefixes.get(node) + "." + node.getName();
+			String prefix;
+			if(isTopLevel)
+				prefix = node.getName();
+			else
+				prefix = prefixes.get(node) + "_" + node.getName() ;
+			
 			prefixes.put(child, prefix);
 		}
 		
 		HashMap<String, Object> toScriptArgs = new HashMap<String, Object>();
-		toScriptArgs.put("prefix", prefixes.get(node));
-		toScriptArgs.put("isSubnet", isTopLevel);
+		toScriptArgs.put("prefix", prefixes.get(node) + (isTopLevel ? "" : "_"));
+		toScriptArgs.put("isSubnet", !isTopLevel);
 		toScriptArgs.put("netName", prefixes.get(node));
-		toScriptArgs.put("delimiter", '%');
+		toScriptArgs.put("spaceDelim", '_');
 		
         if (node instanceof Network && ((Network)node).getMetaData("type") != null)
         {
@@ -59,7 +70,8 @@ public class ScriptGenerator extends DFSIterator{
         {
             try {
                 String code = node.toScript(toScriptArgs);
-                this.writer.write(code);
+                //this.writer.write(code);
+                script.append(code);
             } catch(ScriptGenException e) {
                 System.out.println(e.getMessage());
             } 
@@ -85,12 +97,15 @@ public class ScriptGenerator extends DFSIterator{
 
             try {
                 String code = net.toPostScript(toScriptArgs);
-                this.writer.write(code);
+                script.append(code);
             } catch(ScriptGenException e) {
                 System.out.println(e.getMessage());
             }
         }
-        
-        
+	}
+	
+	public void finish()
+	{
+		writer.write(script.toString());
 	}
 }

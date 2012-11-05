@@ -1021,6 +1021,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		PrintWriter writer = new PrintWriter(file);
 		ScriptGenerator scriptGen = new ScriptGenerator(writer);
 		scriptGen.DFS(this);
+		scriptGen.finish();
 		writer.close();
 	}
 	
@@ -1081,22 +1082,22 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
     public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
         String py;
+        String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+        
         if ((Boolean)scriptData.get("isSubnet"))
         {
-            py = String.format("%1s%2s = %4s.make_subnetwork('%3s')\n", 
-                    scriptData.get("prefix"), 
-                    myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()), 
+            py = String.format("%1s = %3s.make_subnetwork('%2s')\n\n", 
+                    pythonNetworkName,
                     myName,
                     (String)scriptData.get("netName"));
         }
         else
         {
-            py = String.format("%1s%2s = nef.Network('%3s')\n", 
-                    scriptData.get("prefix"), 
-                    myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()), 
+            py = String.format("%1s = nef.Network('%2s')\n\n", 
+                    pythonNetworkName, 
                     myName);
         }
-
+        
         return py;
     }
 

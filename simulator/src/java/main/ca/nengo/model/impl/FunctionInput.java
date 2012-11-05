@@ -325,8 +325,9 @@ public class FunctionInput implements Node, Probeable {
                 if (myFunctions[i] instanceof ConstantFunction) {
                     ConstantFunction func = (ConstantFunction)myFunctions[i];
 
-                    py.append(String.format("Function%1s%2c%3d = ConstantFunction(%4d, %5f)\n",
-                                myName.replace(' ', ((Character)scriptData.get("spacedelim")).charValue()),
+                    py.append(String.format("Function%c%s%c%d = ConstantFunction(%d, %f)\n",
+                    			(Character)scriptData.get("spaceDelim"),
+                                myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
                                 (Character)scriptData.get("spaceDelim"),
                                 i,
                                 func.getDimension(),
@@ -334,8 +335,9 @@ public class FunctionInput implements Node, Probeable {
                 } else if (myFunctions[i] instanceof FourierFunction) {
                     FourierFunction func = (FourierFunction)myFunctions[i];
 
-                    py.append(String.format("Function%1s%2c%3d = FourierFunction(%4f, %5f, %6f, random.randint(0, 0x7ffffff))\n",
-                                myName.replace(' ', ((Character)scriptData.get("spacedelim")).charValue()),
+                    py.append(String.format("Function%c%s%c%d = FourierFunction(%f, %f, %f, random.randint(0, 0x7ffffff))\n",
+                    			(Character)scriptData.get("spaceDelim"),
+                                myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
                                 (Character)scriptData.get("spaceDelim"),
                                 i,
                                 func.getFundamental(),
@@ -344,17 +346,19 @@ public class FunctionInput implements Node, Probeable {
                 } else if (myFunctions[i] instanceof PostfixFunction) {
                     PostfixFunction func = (PostfixFunction)myFunctions[i];
 
-                    py.append(String.format("Function%1s%2c%3d = PostfixFunction(%4s, %5d)\n",
-                                myName.replace(' ', ((Character)scriptData.get("spacedelim")).charValue()),
+                    py.append(String.format("Function%c%s%c%d = PostfixFunction(%s, %d)\n",
+                    			(Character)scriptData.get("spaceDelim"),
+                                myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
                                 (Character)scriptData.get("spaceDelim"),
                                 i,
                                 func.getExpression(),
                                 func.getDimension()));
                 }
 
-                funcs.append(String.format("Function%1s%2c%3d",
-                            myName.replace(' ', ((Character)scriptData.get("spacedelim")).charValue()),
-                            (Character)scriptData.get("spacedelim"),
+                funcs.append(String.format("Function%c%s%c%d",
+                			(Character)scriptData.get("spaceDelim"),
+                            myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
+                            (Character)scriptData.get("spaceDelim"),
                             i));
                 if ((i + 1) < myFunctions.length) {
                     funcs.append(",");
@@ -362,11 +366,13 @@ public class FunctionInput implements Node, Probeable {
             }
             funcs.append("]");
                                 
-            py.append(String.format("%1s.make_input('%2s', values=%3s)\n",
+            py.append(String.format("%1s.make_input('%2s', values=%s)\n",
                     scriptData.get("netName"),
                     myName,
                     funcs.toString()));
         }
+        
+        py.append('\n');
         return py.toString();
     }
 
@@ -397,7 +403,6 @@ public class FunctionInput implements Node, Probeable {
 
 	@Override
 	public Node[] getChildren() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Node[0];
 	}
 }

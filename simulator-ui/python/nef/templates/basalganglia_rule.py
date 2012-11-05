@@ -27,6 +27,8 @@ import hrr
 from java.util import ArrayList
 from java.util import HashMap
 from ca.nengo.model.impl import NetworkImpl
+from ca.nengo.model import Network
+
 def make(net,node,index=0,dim=8,pattern='I',pstc=0.01,use_single_input=False):
     STN=node.getNode('STN')
 
@@ -64,8 +66,8 @@ def make(net,node,index=0,dim=8,pattern='I',pstc=0.01,use_single_input=False):
         StrD2.addDecodedTermination(name,transform*(1.2),pstc,False)
         node.exposeTermination(StrD2.getTermination(name),name+'_StrD2')
 
-    if isinstance(node, Network) and ((Network)node).getMetaData("type") == "BasalGanglia":
-        Network bg = (Network)node
+    if isinstance(node, Network) and node.getMetaData("type") == "BasalGanglia":
+        bg = node
         if bg.getMetaData("bgrule") == None:
             bg.setMetaData("bgrule", ArrayList())
         bgrules = net.getMetaData("bgrule")

@@ -417,14 +417,12 @@ public class PassthroughNode implements Node {
 
 	@Override
 	public Node[] getChildren() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Node[0];
 	}
 
 	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 }

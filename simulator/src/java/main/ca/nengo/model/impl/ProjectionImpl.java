@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import ca.nengo.math.Function;
+import ca.nengo.math.impl.IdentityFunction;
 import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.PostfixFunction;
 import ca.nengo.model.Network;
@@ -245,7 +246,9 @@ public class ProjectionImpl implements Projection {
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		
 	    StringBuilder py = new StringBuilder();
-
+	    
+	    String pythonNetworkName = scriptData.get("prefix") + getNetwork().getName();
+	    py.append(String.format("%1s.connect(", pythonNetworkName));
 	    
 	    StringBuilder originNodeFullName = new StringBuilder();
 	    Origin tempOrigin = myOrigin;
@@ -255,17 +258,10 @@ public class ProjectionImpl implements Projection {
 	    	originNodeFullName.append(tempOrigin.getNode().getName() + ".");
 	    	tempOrigin = ((OriginWrapper) tempOrigin).getWrappedOrigin();
 	    }
-
-	    DecodedOrigin dOrigin; 
-	    if(tempOrigin instanceof DecodedOrigin)
-	    {
-	    	dOrigin = (DecodedOrigin) tempOrigin;
-	    	originNodeFullName.append(dOrigin.getNode().getName());
-	    }
-	    else
-	    {
-	    	throw new ScriptGenException("Trying to generate script of non decoded origin which is not supported.");
-	    }
+	    
+	    originNodeFullName.append(tempOrigin.getNode().getName());
+	    
+	    py.append("\'" + originNodeFullName + "\'");
 	    
 	    
 	    
@@ -278,57 +274,23 @@ public class ProjectionImpl implements Projection {
 	    	tempTermination = ((TerminationWrapper) tempTermination).getWrappedTermination();
 	    }
 	    
+	    terminationNodeFullName.append(tempTermination.getNode().getName());
+	    
+	    py.append(", \'" + terminationNodeFullName + "\'");
+	    
+	    
+	    
+	    
 	    DecodedTermination dTermination; 
 	    if(tempTermination instanceof DecodedTermination)
 	    {
 	    	dTermination = (DecodedTermination) tempTermination;
-	    	terminationNodeFullName.append(dTermination.getNode().getName());
 	    }
 	    else
 	    {
 	    	throw new ScriptGenException("Trying to generate script of non decoded termination which is not supported.");
 	    }
 
-	    StringBuilder funcString = new StringBuilder();
-	    boolean first = true;
-	    
-	    for(Function f: dOrigin.getFunctions())
-	    {
-	    	if(f instanceof PostfixFunction)
-	    	{
-	    		PostfixFunction pf = (PostfixFunction) f;
-	    		String exp = pf.getExpression();
-	    		
-	    		exp=exp.replaceAll("^","**");
-	    		exp=exp.replaceAll("!"," not ");
-	    		exp=exp.replaceAll("&"," and ");
-	    		exp=exp.replaceAll("|"," or ");
-	    		exp=exp.replaceAll("ln","log");
-	    		
-	    		for(int j = 0; j < f.getDimension(); j++)
-	    		{
-	    			String find = "x"+ Integer.toString(j);
-	    			String replace = "x["+ Integer.toString(j) + "]";
-	    			exp=exp.replaceAll(find, replace);
-	    		}
-	    		
-	    		if (first)
-	    			funcString.append(exp);
-	    		else
-	    		{
-	    			funcString.append(", " + exp);
-	    			first = false;
-	    		}
-	    	}
-	    	else
-	    	{
-	    		throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
-	    	}
-	    }
-	    
-	    py.append("def function(x):\n");
-	    py.append("    " + funcString.toString());
-	    
 	    StringBuilder transformString = new StringBuilder();
 	    transformString.append('[');
 	    
@@ -354,14 +316,81 @@ public class ProjectionImpl implements Projection {
 	    
 	    transformString.append("]");
 	   
-	    py.append(String.format("%1s.connect(%2s, %3s, transform=%4s, func=function, origin_name = %5s, pstc=%6s)", 
-	    						scriptData.get("netName"),
-	    						originNodeFullName.toString(),
-	    						terminationNodeFullName.toString(),
-	    						transformString.toString(),
-	    						dOrigin.getName(),
-	    						Float.toString(dTermination.getTau())));
+	    py.append(", transform="+transformString.toString());
+	    
+	    
+								
+	    // Now handle origin function if there is one
+	   
+	    if(!(tempOrigin.getNode() instanceof FunctionInput))
+	    {
+		    DecodedOrigin dOrigin; 
+		    if(tempOrigin instanceof DecodedOrigin)
+		    {
+		    	dOrigin = (DecodedOrigin) tempOrigin;
+		    }
+		    else
+		    {
+		    	throw new ScriptGenException("Trying to generate script of non decoded origin which is not supported.");
+		    }
 
-        return py.toString();
+		    StringBuilder funcString = new StringBuilder();
+		    boolean first = true;
+		    
+		    for(Function f: dOrigin.getFunctions())
+		    {
+		    	if(f instanceof PostfixFunction)
+		    	{
+		    		PostfixFunction pf = (PostfixFunction) f;
+		    		String exp = pf.getExpression();
+		    		
+		    		exp=exp.replaceAll("^","**");
+		    		exp=exp.replaceAll("!"," not ");
+		    		exp=exp.replaceAll("&"," and ");
+		    		exp=exp.replaceAll("|"," or ");
+		    		exp=exp.replaceAll("ln","log");
+		    		
+		    		for(int j = 0; j < f.getDimension(); j++)
+		    		{
+		    			String find = "x"+ Integer.toString(j);
+		    			String replace = "x["+ Integer.toString(j) + "]";
+		    			exp=exp.replaceAll(find, replace);
+		    		}
+		    		
+		    		if (first)
+		    			funcString.append(exp);
+		    		else
+		    		{
+		    			funcString.append(", " + exp);
+		    			first = false;
+		    		}
+		    	}
+		    	else if(f instanceof IdentityFunction)
+		    	{
+		    		String exp = "x[" + Integer.toString(((IdentityFunction) f).getIdentityDimension()) + "]";
+		    			
+		    		if (first)
+		    			funcString.append(exp);
+		    		else
+		    		{
+		    			funcString.append(", " + exp);
+		    			first = false;
+		    		}
+		    	}
+		    	else
+		    	{
+		    		throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
+		    	}
+		    }
+		    
+		    py.insert(0, "    return [" + funcString.toString() + "]\n\n");
+		    py.insert(0, "def function(x):\n");
+		    
+		    py.append(", func=function");
+	    }
+	    
+	    py.append(")\n\n");
+	    
+	    return py.toString();
 	}
 }
