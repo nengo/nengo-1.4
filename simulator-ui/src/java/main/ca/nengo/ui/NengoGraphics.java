@@ -184,7 +184,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         // Setup icon
         try {
-            Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo128.png"));
+            Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo256.png"));
             setIconImage(image);
         } catch (IOException e) {
             e.printStackTrace();
@@ -198,7 +198,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         application.setEnabledPreferencesMenu(false);
         BufferedImage icon = new BufferedImage(128,128,BufferedImage.TYPE_INT_ARGB);
         try {
-            icon = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo128.png"));
+            icon = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo256.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
