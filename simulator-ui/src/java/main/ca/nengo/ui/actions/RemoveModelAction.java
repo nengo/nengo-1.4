@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.UserCancelledException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UIEnvironment;
@@ -55,7 +55,7 @@ public class RemoveModelAction extends StandardAction {
     }
 
     @Override
-    protected void action() throws ActionException {
+    protected void action() throws UserCancelledException {
         int response = JOptionPane.showConfirmDialog(UIEnvironment
                 .getInstance(),
                 "Once an object has been removed, it cannot be undone.",
@@ -66,7 +66,7 @@ public class RemoveModelAction extends StandardAction {
         	}
         	modelsToRemove = null;
         } else {
-            throw new ActionException("Action cancelled by user", false);
+            throw new UserCancelledException();
         }
     }
 
