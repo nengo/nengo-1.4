@@ -1,5 +1,7 @@
 package ca.nengo.ui;
 
+import org.java.ayatana.ApplicationMenu;
+import org.java.ayatana.AyatanaDesktop;
 import org.simplericity.macify.eawt.Application;
 import org.simplericity.macify.eawt.DefaultApplication;
 
@@ -17,6 +19,8 @@ public class NengoLauncher {
      
         NengoGraphics ng = new NengoGraphics();
         ng.setApplication(application);
-
+        if (AyatanaDesktop.isSupported()) {
+        	ApplicationMenu.tryInstall(ng);
+        }
     }
 }

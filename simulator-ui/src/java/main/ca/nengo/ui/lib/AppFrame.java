@@ -964,6 +964,9 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
     protected String getHelp() {
         return WORLD_TIPS + "<BR>" + getShortcutHelp();
     }
+    
+    static final String[] browsers = {"google-chrome", "chromium", "firefox",
+    	"opera", "konqueror"};
 
     class OpenURLAction extends StandardAction {
         private static final long serialVersionUID = 1L;
@@ -979,10 +982,28 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
         protected void action() throws ActionException {
             try {
                 String os = System.getProperty("os.name").toLowerCase();
-                if (os.indexOf("win") >= 0) {
-                    Runtime.getRuntime().exec("cmd.exe /C start " + this.url);
-                } else {
+                if (os.startsWith("win")) {
+                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + this.url);
+                } else if (os.startsWith("mac")){ 
                     Runtime.getRuntime().exec("open " + this.url);
+                } else {
+                	Boolean ran = false;
+                	for (String browser : browsers) {
+                		try {
+	                		if (Runtime.getRuntime().exec(new String[]
+	                				{"which", browser }).waitFor() == 0) {
+	                			Runtime.getRuntime().exec(new String[] { browser, url });
+	                			ran = true;
+	                			break;
+	                		}
+                		} catch (InterruptedException e) {
+                			ran = false;
+                		}
+                		JOptionPane.showMessageDialog(UIEnvironment.getInstance(),
+                				"Could not open browser automatically. " + 
+                				"Please navigate to" + this.url,
+                				"URL can't be opened", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

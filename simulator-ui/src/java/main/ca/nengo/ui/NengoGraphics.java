@@ -44,7 +44,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
+import org.java.ayatana.DesktopFile;
 import org.python.util.PythonInterpreter;
 import org.simplericity.macify.eawt.Application;
 
@@ -195,15 +197,13 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     public void setApplication(Application application) {
         application.addApplicationListener(this);
         application.setEnabledPreferencesMenu(false);
-        BufferedImage icon = new BufferedImage(128,128,BufferedImage.TYPE_INT_ARGB);
+        BufferedImage icon = new BufferedImage(256,256,BufferedImage.TYPE_INT_ARGB);
         try {
             icon = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo256.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
         application.setApplicationIconImage(icon);
-   
     }
 
     /**
@@ -273,14 +273,37 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     protected void initLayout(Universe canvas) {
         try {
             //Tell the UIManager to use the platform look and feel
-            String laf=UIManager.getSystemLookAndFeelClassName();
+            String laf = UIManager.getSystemLookAndFeelClassName();
             if (laf.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) {
-                laf="javax.swing.plaf.metal.MetalLookAndFeel";
+                laf = "javax.swing.plaf.metal.MetalLookAndFeel";
+                File desktopfile = new File(System.getProperty("user.home") +
+                        "/.local/share/applications/nengo.desktop");
+            	if (!desktopfile.exists()) {
+                	File defaultdesktop = new File(getClass().getClassLoader().
+                		getResource("ca/nengo/ui/nengo.desktop").getPath());
+                	Util.copyFile(defaultdesktop, desktopfile);
+                }
+                DesktopFile df = DesktopFile.initialize("nengo", "NengoLauncher");
+                df.setIcon(getClass().getClassLoader().
+                		getResource("ca/nengo/ui/nengologo256.png").getPath());
+                df.setCommand("TODO");
+                df.update();
             }
             UIManager.setLookAndFeel(laf);
 
             //UIManager.put("Slider.paintValue",Boolean.FALSE);
-        } catch(Exception e) { /*Do nothing*/ }
+        } catch(IOException e) {
+        	e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+        
         System.setProperty("swing.aatext", "true");
 
         splitPanes = new ArrayList<AuxillarySplitPane>();
