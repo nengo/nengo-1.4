@@ -8,3 +8,10 @@
   ('A', 'spike raster', {'x': 639, 'height': 200, 'label': 1, 'width': 300, 'sample': 10, 'y': 273}),
   ('A', 'voltage grid', {'x': 640, 'height': 247, 'auto_improve': 1, 'label': 1, 'width': 295, 'rows': None, 'y': 18})],
  {'sim_spd': 4, 'rcd_time': 1.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-125.26955317021124,y=-110.38639004351411,width=430.75402998924255,height=266.6916729295814]
+# A (NEFEnsemble)=Point2D.Double[116.69939100424826, -1.837785685106272]
+# input (Function Input)=Point2D.Double[-66.13417742483976, 17.918410429786167]

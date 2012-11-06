@@ -14,7 +14,7 @@ class Rules:            #Define mappings for BG and Thal
     def E(state='E'):
         set(state='A')
     
-class Routing(SPA):     #Extend the imported SPA class
+class Routing_Clean_All(SPA):     #Extend the imported SPA class
     dimensions=16        #Dimensions in SPs
     
     state=Buffer()       #Create a working memory/cortical element
@@ -24,7 +24,7 @@ class Routing(SPA):     #Extend the imported SPA class
 
     input=Input(10, vision='0.8*LETTER+D') #Define the starting input
 
-model=Routing()
+model=Routing_Clean_All()
 
 # Create the clean-up memory.
 import hrr

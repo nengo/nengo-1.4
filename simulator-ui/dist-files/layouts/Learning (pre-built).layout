@@ -14,3 +14,15 @@
   ('Gate', None, {'x': 316, 'height': 32, 'label': 0, 'width': 54, 'y': 50}),
   ('input', 'control', {'x': 42, 'height': 162, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 61, 'limits_w': 0, 'y': 195})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=52.7792860531891,y=213.28208532302023,width=816.7556132565993,height=505.6758746504785]
+# input (Function Input)=Point2D.Double[156.32414591815746, 570.5704702168947]
+# switch (Function Input)=Point2D.Double[158.63806626777205, 336.4171632399131]
+# error (NEFEnsemble)=Point2D.Double[492.97497020048706, 303.2991656136378]
+# post (NEFEnsemble)=Point2D.Double[626.5236595859305, 521.0019967214192]
+# actual error (NEFEnsemble)=Point2D.Double[729.9650173668766, 311.32777109879544]
+# pre (NEFEnsemble)=Point2D.Double[340.5045891771896, 566.3091184472482]
+# Gate (NEFEnsemble)=Point2D.Double[315.2689811642547, 324.3742550121766]

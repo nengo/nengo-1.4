@@ -7,3 +7,12 @@
   ('B', 'semantic pointer', {'x': 15, 'height': 180, 'sel_dim': [0, 1, 2, 3, 4], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 181}),
   ('C', 'semantic pointer', {'x': 477, 'height': 200, 'sel_dim': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], 'label': 0, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 66})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=47.37217815781668,y=233.33334350585935,width=976.5007608718666,height=604.5784912109376]
+# * (Network)=Point2D.Double[495.8338317871094, 432.299560546875]
+# A (NEFEnsemble)=Point2D.Double[222.91983032226562, 334.3748779296875]
+# C (NEFEnsemble)=Point2D.Double[745.8338012695312, 468.7536315917969]
+# B (NEFEnsemble)=Point2D.Double[230.2106475830078, 634.3787841796875]

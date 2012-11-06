@@ -811,9 +811,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         fileMenu.addAction(new SaveNetworkAction("Save Network"),
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_KEY_MASK));
-        fileMenu.addAction(new RunNetworkAction("Run Network"),
-                KeyEvent.VK_R,
-                KeyStroke.getKeyStroke(KeyEvent.VK_R, MENU_SHORTCUT_KEY_MASK));
+
     }
 
     @Override
