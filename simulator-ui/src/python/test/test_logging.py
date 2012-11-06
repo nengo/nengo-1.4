@@ -8,13 +8,13 @@ from ..nengo_deco import nengo_log
 @nengo_log
 def connect_something(logfile, orig=True, mode=None, seed=None):
     import nef
-    net = nef.Network('top')
+    net = nef.Network('top', seed=seed)
     netA = nef.Network('A')
     netB = nef.Network('B')
-    netA.make('X', 100, 1)
-    netA.make('Y', 100, 1)
-    netB.make('X', 100, 1)
-    netB.make('Y', 100, 1)
+    netA.make('X', 100, 1, mode=mode)
+    netA.make('Y', 100, 1, mode=mode)
+    netB.make('X', 100, 1, mode=mode)
+    netB.make('Y', 100, 1, mode=mode)
     net.add(netA.network)
     net.add(netB.network)
     net.connect('A.X', 'B.Y')
@@ -36,7 +36,7 @@ def connect_something(logfile, orig=True, mode=None, seed=None):
 
 
 def test_sane_stats():
-    stats0 = connect_something(orig=True, t=1.0, seed=123, mode='spiking')
+    stats0 = connect_something(t=1.0, seed=123, mode='spiking')
     assert np.allclose(stats0['time'], np.arange(0.0, 1.0, .001)[:, None])
     assert len(stats0['A.X']) == 1000
     assert len(stats0['A.Y']) == 1000
@@ -45,10 +45,40 @@ def test_sane_stats():
     assert np.all(np.var(stats0['A.X']) > 0)
 
 
-def test_reproducible_small():
-    stats0 = connect_something(orig=True, t=1.0, seed=123, mode='spiking')
-    stats1 = connect_something(orig=True, t=1.0, seed=123, mode='spiking')
-    assert np.all(stats0 == stats1)
+def test_mode_has_some_effect():
+    # test that a small model can be run twice and give the same result
+    stats_spiking = connect_something(t=1.0, seed=123, mode='spiking')
+    stats_rate= connect_something(t=1.0, seed=123, mode='rate')
+    stats_direct = connect_something(t=1.0, seed=123, mode='direct')
+    for key in sorted(stats_spiking.keys()):
+        if key == 'time':
+            assert np.all(stats_rate[key] == stats_spiking[key])
+        else:
+            # -- assert that most elements do not match
+            assert np.mean(stats_rate[key] != stats_spiking[key]) > 0.9
+            assert np.mean(stats_direct[key] != stats_spiking[key]) > 0.9
+            assert np.mean(stats_direct[key] != stats_rate[key]) > 0.9
+
+
+def test_reproducible_small_spiking(mode='spiking'):
+    # test that a small model can be run twice and give the same result
+    stats0 = connect_something(t=1.0, seed=123, mode=mode)
+    stats1 = connect_something(t=1.0, seed=123, mode=mode)
+    for key in sorted(stats0.keys()):
+        try:
+            assert np.all(stats0[key] == stats1[key])
+        except:
+            print key
+            print np.hstack([stats0[key],  stats1[key]])
+            raise
+
+
+def test_reproducible_small_rate():
+    return test_reproducible_small_spiking('rate')
+
+
+def test_reproducible_small_direct():
+    return test_reproducible_small_spiking('direct')
 
 
 def test_reproducible_large():
