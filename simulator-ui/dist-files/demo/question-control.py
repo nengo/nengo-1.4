@@ -1,7 +1,5 @@
-D=16
-subdim=4
-N=100
-seed=3
+D=16  # number of dimensions for representations 
+N=100 # number of neurons per dimension
 
 import nef
 import nps
@@ -10,48 +8,38 @@ import hrr
 import math
 import random
 
+# semantic pointers do not work well with small numbers of dimensions.  
+# To keep this example model small enough to be easily run, we have lowered 
+# the number of dimensions (D) to 16 and chosen a random number seed for
+# which this model works well.
+seed=17
+
+net=nef.Network('Question Answering with Control',seed=seed)
+
+# Make a simple node to generate interesting input for the network
 random.seed(seed)
-
-net=nef.Network('Question Answering with Control') #Create the network object
-
-for i in range(50): #This is here to create a vocabulary with sufficient 
-                    #lack of similarity in the items so we can work in such 
-                    #a low dimensional space; for high dimensional spaces 
-                    #this can be skipped
-    vocab=hrr.Vocabulary(D,max_similarity=0.05)
-    vocab.parse('CIRCLE+BLUE+RED+SQUARE')
-    a=vocab.parse('(RED*CIRCLE+BLUE*SQUARE)*~(RED)').compare(
-        vocab.parse('CIRCLE'))
-    b=vocab.parse('(RED*CIRCLE+BLUE*SQUARE)*~(SQUARE)').compare(
-        vocab.parse('BLUE'))
-    if min(a,b)>0.65: break
-
-class Input(nef.SimpleNode): #Make a simple node to generate interesting 
-                             #input for the network
+vocab=hrr.Vocabulary(D,max_similarity=0.1)
+class Input(nef.SimpleNode): 
     def __init__(self,name):
         self.zero=[0]*D
         nef.SimpleNode.__init__(self,name)
-        self.v1=vocab.parse('STATEMENT+RED*CIRCLE').v
-        self.v2=vocab.parse('STATEMENT+BLUE*SQUARE').v
-        self.v3=vocab.parse('QUESTION+RED').v
-        self.v4=vocab.parse('QUESTION+SQUARE').v
+        self.RED_CIRCLE=vocab.parse('STATEMENT+RED*CIRCLE').v
+        self.BLUE_SQUARE=vocab.parse('STATEMENT+BLUE*SQUARE').v
+        self.RED=vocab.parse('QUESTION+RED').v
+        self.SQUARE=vocab.parse('QUESTION+SQUARE').v
     def origin_x(self):
-        t=self.t_start
-        if t<0.5:
-          if 0.1<self.t_start<0.3:
-            return self.v1
-          elif 0.35<self.t_start<0.5:
-            return self.v2
-          else:
+        if 0.1<self.t<0.3:
+            return self.RED_CIRCLE
+        elif 0.35<self.t<0.5:
+            return self.BLUE_SQUARE
+        elif self.t>0.5 and 0.2<(self.t-0.5)%0.6<0.4:
+            return self.RED
+        elif self.t>0.5 and 0.4<(self.t-0.5)%0.6<0.6:
+            return self.SQUARE
+        else:    
             return self.zero
-        else:
-          t=(t-0.5)%0.6
-          if 0.2<t<0.4:
-            return self.v3
-          elif 0.4<t<0.6:
-            return self.v4            
-          else:
-            return self.zero
+
+# Add the input to the network            
 inv=Input('inv')
 net.add(inv)
 
@@ -63,13 +51,14 @@ prods.add(dict(visual='STATEMENT'),dict(visual_to_wm=True))
 prods.add(dict(visual='QUESTION'),dict(wm_deconv_visual_to_motor=True))
 
 
+subdim=4
 model=nps.NPS(net,prods,D,direct_convolution=False,direct_buffer=['visual'],
     neurons_buffer=N/subdim,subdimensions=subdim)
 model.add_buffer_feedback(wm=1,pstc=0.4)
 
 net.connect(inv.getOrigin('x'),'buffer_visual')
       
-#Rename objects for display purposes
+# Rename objects for display purposes
 net.network.getNode('prod').name='thalamus'
 net.network.getNode('buffer_visual').name='visual'
 net.network.getNode('buffer_wm').name='memory'
