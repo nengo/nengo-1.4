@@ -26,7 +26,6 @@ package ca.nengo.ui.actions;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;

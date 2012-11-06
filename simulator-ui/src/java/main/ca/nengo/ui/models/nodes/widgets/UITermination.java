@@ -39,7 +39,6 @@ import ca.nengo.ui.lib.objects.lines.LineConnector;
 import ca.nengo.ui.lib.objects.lines.LineTerminationIcon;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
-import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.ModelIcon;

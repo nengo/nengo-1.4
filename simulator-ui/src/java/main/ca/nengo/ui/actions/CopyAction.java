@@ -25,7 +25,6 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.ui.actions;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.Collection;
 
