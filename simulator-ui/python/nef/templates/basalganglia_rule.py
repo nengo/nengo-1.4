@@ -3,11 +3,11 @@ label='BG Rule'
 icon='BGRule.png'
 
 params=[
-    ('index','Rule Index',int),
-    ('pattern','Semantic Pointer',str),
-    ('dim','Dimensionality',int),
-    ('pstc','tauPSC',float),
-    ('use_single_input','Use Single Input',bool),
+    ('index','Rule Index',int, 'The number of the rule currently being defined'),
+    ('pattern','Semantic Pointer',str,'The input representation that activates the rule'),
+    ('dimensions','Dimensionality',int,'The dimensionality of the input'),
+    ('pstc','Synaptic time constant [s]',float,'The post synaptic time constant, in seconds, of the input'),
+    ('use_single_input','Use Single Input',bool,'Use a converged input rather than seperate inputs to striatum and STN'),
     ]
 
 def test_params(net,node,p):
@@ -24,15 +24,15 @@ def test_drop(net,node):
 
 import numeric
 import hrr
-def make(net,node,index=0,dim=8,pattern='I',pstc=0.01,use_single_input=False):
+def make(net,node,index=0,dimensions=8,pattern='I',pstc=0.01,use_single_input=False):
     STN=node.getNode('STN')
 
-    transform=numeric.zeros((STN.dimension,dim),'f')
+    transform=numeric.zeros((STN.dimension,dimensions),'f')
 
-    if dim in hrr.Vocabulary.defaults.keys():
-        vocab=hrr.Vocabulary.defaults[dim]
+    if dimensions in hrr.Vocabulary.defaults.keys():
+        vocab=hrr.Vocabulary.defaults[dimensions]
     else:
-        vocab=hrr.Vocabulary(dim)
+        vocab=hrr.Vocabulary(dimensions)
 
     terms=[t.name for t in node.terminations]
     STNterms=[t.name for t in STN.terminations]

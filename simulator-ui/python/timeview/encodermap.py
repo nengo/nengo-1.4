@@ -8,17 +8,19 @@ import java
 import timeview.components.core as core
 import timeview.view
 
-
-config={}
-
-def define(obj,func,minx=-1,maxx=1,miny=-1,maxy=1,min_rate=0,max_rate=0.2,size=0.05):
-    config[obj]=(func,minx,maxx,miny,maxy,min_rate,max_rate,size)
+#this is here to provide the functionality of a global variable without cluttering the global namespace
+class EncoderMapWatchConfig:
+    config={}
+    
+    @classmethod
+    def define(cls,obj,func,minx=-1,maxx=1,miny=-1,maxy=1,min_rate=0,max_rate=0.2,size=0.05):
+        cls.config[obj]=(func,minx,maxx,miny,maxy,min_rate,max_rate,size)
 
 class EncoderMapWatch:
     def check(self,obj):
-        return obj in config
+        return obj in EncoderMapWatchConfig.config
     def views(self,obj):
-        return [('encoder map',EncoderMap,dict(func=timeview.view.ensembleWatch.spikes,label=obj.name,config=config[obj],encoders=obj.encoders))]
+        return [('encoder map',EncoderMap,dict(func=timeview.view.ensembleWatch.spikes,label=obj.name,config=EncoderMapWatchConfig.config[obj],encoders=obj.encoders))]
 timeview.view.watches.append(EncoderMapWatch())
 
 

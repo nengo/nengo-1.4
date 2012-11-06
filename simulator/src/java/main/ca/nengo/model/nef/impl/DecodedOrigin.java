@@ -52,6 +52,7 @@ import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
+import ca.nengo.model.nef.ExpressModel;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.plasticity.ShortTermPlastic;
 import ca.nengo.util.MU;
@@ -91,6 +92,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private float[] mySTPHistory;
 	private float myTime;
 	private boolean myRequiredOnCPU;
+	private ExpressModel myExpressModel;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings.
@@ -196,8 +198,22 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myIntegrator = new EulerIntegrator(.001f);
 		
 		reset(false);
-		}
+	}
 
+	/**
+	 * @return Simplified model of deviations from DIRECT mode that are associated with spiking simulations
+	 */
+	public ExpressModel getExpressModel() {
+		return myExpressModel;
+	}
+	
+	/**
+	 * @param em Simplified model of deviations from DIRECT mode that are associated with spiking simulations
+	 */
+	public void setExpressModel(ExpressModel em) {
+		myExpressModel = em;
+	}
+	
 	/**
 	 * @see ca.nengo.config.Configurable#getConfiguration()
 	 */
@@ -439,6 +455,17 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 			for (int i = 0; i < values.length; i++) {
 				values[i] = myFunctions[i].map(state);
 			}
+		} else if (myMode == SimulationMode.EXPRESS) {
+			for (int i = 0; i < values.length; i++) {
+				values[i] = myFunctions[i].map(state);
+			}
+			
+			//create default ExpressModel if necessary ...
+			if (myExpressModel == null) {
+				myExpressModel = new DefaultExpressModel(this);
+			}
+			
+			values = myExpressModel.getOutput(startTime, state, values);
 		} else {
 			for (int i = 0; i < myNodes.length; i++) {
 				try {
@@ -463,7 +490,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 				}
 			}
 		}
-
+		
 		if (myNoise != null) {
 			for (int i = 0; i < values.length; i++) {
 				values[i] = myNoises[i].getValue(startTime, endTime, values[i]);

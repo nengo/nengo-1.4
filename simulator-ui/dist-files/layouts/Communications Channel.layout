@@ -8,3 +8,11 @@
   ('A', 'voltage grid', {'x': 261, 'height': 117, 'auto_improve': 1, 'label': 0, 'width': 117, 'y': 1}),
   ('B', 'voltage grid', {'x': 589, 'height': 116, 'auto_improve': 1, 'label': 0, 'width': 116, 'y': 1})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-296.09060010693685,y=-133.36685207407277,width=613.3940176769971,height=379.76911497116095]
+# input (Function Input)=Point2D.Double[-194.96709643281764, 10.461234695203416]
+# A (NEFEnsemble)=Point2D.Double[0.0, 0.0]
+# B (NEFEnsemble)=Point2D.Double[146.8714098930359, 0.0]

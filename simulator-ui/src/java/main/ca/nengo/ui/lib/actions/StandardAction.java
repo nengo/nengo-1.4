@@ -107,7 +107,7 @@ public abstract class StandardAction implements Serializable {
 	}
 
 	/**
-	 * @return Whether the action succesffully completed
+	 * @return Whether the action successfully completed
 	 */
 	protected boolean isActionCompleted() {
 		return actionCompleted;

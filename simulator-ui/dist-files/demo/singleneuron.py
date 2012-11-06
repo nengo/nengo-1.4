@@ -1,6 +1,7 @@
 import nef
 
 net=nef.Network('Single Neuron')      # Create the network
+
 net.make_input('input',[-0.45])       # Create a controllable input
                                       #   with a starting value of -.45
                                       

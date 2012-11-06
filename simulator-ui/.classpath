@@ -3,6 +3,8 @@
 	<classpathentry kind="lib" path="../simulator/lib/qdox-1.6.3.jar"/>
 	<classpathentry kind="lib" path="../simulator/lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="../simulator/lib/jfreechart-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/macify-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/jayatana-1.2.4.jar"/>
 	<classpathentry kind="src" path="src/java/main"/>
 	<classpathentry kind="lib" path="lib/analysis/checkstyle-5.1/checkstyle-all-5.1.jar"/>
 	<classpathentry kind="lib" path="lib/analysis/findbugs-1.3.9/lib/annotations.jar"/>
@@ -38,7 +40,6 @@
 	<classpathentry kind="lib" path="lib/build/lib/xstream.jar"/>
 	<classpathentry kind="lib" path="lib/colt.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
-	<classpathentry kind="lib" path="lib/iText-5.0.5.jar"/>
 	<classpathentry kind="lib" path="lib/jung-1.7.6.jar"/>
 	<classpathentry kind="lib" path="lib/jython.jar"/>
 	<classpathentry kind="lib" path="lib/piccolo.jar"/>
@@ -48,5 +49,6 @@
 	<classpathentry kind="lib" path="python/jar/vecmath.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/simulator"/>
+	<classpathentry kind="lib" path="lib/itextpdf-5.3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -3,11 +3,14 @@ label='Learned\nTermination'
 icon='learn.png'
 
 params=[
-    ('errName','Name of (new) error ensemble',str),
-    ('N_err', 'Number of neurons in error ensemble',int),
-    ('preName','Name of pre ensemble',str),
-    ('postName','Name of post ensemble',str),
-    ('rate','Learning rate',float)
+    ('errName','Name of (new) error ensemble',str,
+      "Provides modulatory input to the post population, "
+      "modifying its connection from the pre population."
+      "<br />Automatically created."),
+    ('N_err', 'Number of neurons in error ensemble',int, 'Set the number of neurons in the error ensemble'),
+    ('preName','Name of pre ensemble',str, 'Select the name of the pre population (this population must already exist)'),
+    ('postName','Name of post ensemble',str,'Select the name of the post population (this population must already exist)'),
+    ('rate','Learning rate',float, 'Set the learning rate')
     ]
 
 def test_params(net,p):

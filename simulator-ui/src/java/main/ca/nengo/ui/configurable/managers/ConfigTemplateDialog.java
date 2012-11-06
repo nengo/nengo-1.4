@@ -33,19 +33,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EtchedBorder;
 
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.nengo.ui.lib.Style.NengoStyle;
-import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 
 /**
@@ -111,7 +104,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
                 }
             }
 
-            //			updateFromTemplate();
+            updateFromTemplate();
         }
     }
 
@@ -125,13 +118,12 @@ public class ConfigTemplateDialog extends ConfigDialog {
 
     @Override
     protected void initPanelTop(JPanel panel) {
-        /*
-         * Add existing templates
-         */
+         //Add existing templates
+
         String[] files = getConfigurer().getPropertyFiles();
-        JPanel templatesPanel = new VerticalLayoutPanel();
-        templatesPanel.add(new JLabel("Templates"));
-        templatesPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+//        JPanel templatesPanel = new VerticalLayoutPanel();
+//        templatesPanel.add(new JLabel("Templates"));
+//        templatesPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         templateList = new JComboBox(files);
         templateList.addActionListener(new ActionListener() {
@@ -142,62 +134,62 @@ public class ConfigTemplateDialog extends ConfigDialog {
         templateList.setMaximumSize(new Dimension(300, 100));
         templateList.setPreferredSize(new Dimension(100, templateList.getHeight()));
 
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
-        buttonsPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        buttonsPanel.add(templateList);
-
-        JButton button;
-        button = new JButton("New");
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (applyProperties()) {
-                    String name = JOptionPane.showInputDialog("Name:");
-
-                    if (name != null && name.compareTo("") != 0) {
-                        getConfigurer().savePropertiesFile(name);
-                        templateList.addItem(name);
-                        templateList.setSelectedIndex(templateList.getItemCount() - 1);
-                    }
-                } else {
-                    UserMessages.showWarning("Cannot create template with incomplete properties");
-                }
-            }
-        });
-
-        button.setFont(NengoStyle.FONT_SMALL);
-        buttonsPanel.add(button);
-
-        button = new JButton("Remove");
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String selectedFile = (String) templateList.getSelectedItem();
-
-                templateList.removeItem(selectedFile);
-
-                getConfigurer().deletePropertiesFile(selectedFile);
-
-                updateFromTemplate();
-            }
-        });
-        button.setFont(NengoStyle.FONT_SMALL);
-        buttonsPanel.add(button);
-
-        templatesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        templatesPanel.add(buttonsPanel);
-
-        JPanel wrapperPanel = new VerticalLayoutPanel();
-        wrapperPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        wrapperPanel.add(templatesPanel);
-
-        JPanel seperator = new VerticalLayoutPanel();
-        seperator.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-
-        if (getConfigurer().isTemplateEditable()) {
-            panel.add(wrapperPanel);
-            panel.add(seperator);
-        }
+//        JPanel buttonsPanel = new JPanel();
+//        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+//        buttonsPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+//        buttonsPanel.add(templateList);
+//
+//        JButton button;
+//        button = new JButton("New");
+//        button.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                if (applyProperties()) {
+//                    String name = JOptionPane.showInputDialog("Name:");
+//
+//                    if (name != null && name.compareTo("") != 0) {
+//                        getConfigurer().savePropertiesFile(name);
+//                        templateList.addItem(name);
+//                        templateList.setSelectedIndex(templateList.getItemCount() - 1);
+//                    }
+//                } else {
+//                    UserMessages.showWarning("Cannot create template with incomplete properties");
+//                }
+//            }
+//        });
+//
+//        button.setFont(NengoStyle.FONT_SMALL);
+//        buttonsPanel.add(button);
+//
+//        button = new JButton("Remove");
+//        button.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                String selectedFile = (String) templateList.getSelectedItem();
+//
+//                templateList.removeItem(selectedFile);
+//
+//                getConfigurer().deletePropertiesFile(selectedFile);
+//
+//                updateFromTemplate();
+//            }
+//        });
+//        button.setFont(NengoStyle.FONT_SMALL);
+//        buttonsPanel.add(button);
+//
+//        templatesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//
+//        templatesPanel.add(buttonsPanel);
+//
+//        JPanel wrapperPanel = new VerticalLayoutPanel();
+//        wrapperPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+//        wrapperPanel.add(templatesPanel);
+//
+//        JPanel seperator = new VerticalLayoutPanel();
+//        seperator.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+//
+//        if (getConfigurer().isTemplateEditable()) {
+//            panel.add(wrapperPanel);
+//            panel.add(seperator);
+//        }
 
 
     }

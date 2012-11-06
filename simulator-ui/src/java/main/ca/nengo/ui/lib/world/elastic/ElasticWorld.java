@@ -17,14 +17,11 @@ import ca.nengo.ui.lib.actions.LayoutAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.objects.activities.TrackedAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
-import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.WorldSkyImpl;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.visualization.ISOMLayout;
 import edu.uci.ics.jung.visualization.Layout;
-import edu.uci.ics.jung.visualization.contrib.CircleLayout;
 
 /**
  * A World which supports Spring layout. Objects within this world attract and
@@ -33,209 +30,213 @@ import edu.uci.ics.jung.visualization.contrib.CircleLayout;
  * @author Shu Wu
  */
 public class ElasticWorld extends WorldImpl {
-	/**
-	 * Default layout bounds
-	 */
-	private static final Dimension DEFAULT_LAYOUT_BOUNDS = new Dimension(1000, 1000);
+    /**
+     * Default layout bounds
+     */
+    private static final Dimension DEFAULT_LAYOUT_BOUNDS = new Dimension(1000, 1000);
 
-	/**
-	 * Layout bounds
-	 */
-	private Dimension layoutBounds = DEFAULT_LAYOUT_BOUNDS;
+    /**
+     * Layout bounds
+     */
+    private Dimension layoutBounds = DEFAULT_LAYOUT_BOUNDS;
 
-	public ElasticWorld(String name) {
-		this(name, new WorldSkyImpl(), new ElasticGround());
-	}
+    public ElasticWorld(String name) {
+        this(name, new WorldSkyImpl(), new ElasticGround());
+    }
 
-	public ElasticWorld(String name, ElasticGround ground) {
-		this(name, new WorldSkyImpl(), ground);
+    public ElasticWorld(String name, ElasticGround ground) {
+        this(name, new WorldSkyImpl(), ground);
 
-	}
+    }
 
-	public ElasticWorld(String name, WorldSkyImpl sky, ElasticGround ground) {
-		super(name, sky, ground);
-	}
+    public ElasticWorld(String name, WorldSkyImpl sky, ElasticGround ground) {
+        super(name, sky, ground);
+    }
 
-	protected void applyJungLayout(Class<? extends Layout> layoutType) {
-		(new DoJungLayout(layoutType)).doAction();
-	}
+    protected void applyJungLayout(Class<? extends Layout> layoutType) {
+        (new DoJungLayout(layoutType)).doAction();
+    }
 
-	/**
-	 * Creates the layout context menu
-	 * 
-	 * @param menu
-	 *            menu builder
-	 */
-	protected void constructLayoutMenu(MenuBuilder menu) {
+    /**
+     * Creates the layout context menu
+     * 
+     * @param menu
+     *            menu builder
+     */
+    /*   protected void constructLayoutMenu(MenuBuilder menu) {
 
-		menu.addSection("Elastic layout");
-		if (!getGround().isElasticMode()) {
-			menu.addAction(new SetElasticLayoutAction("Enable", true));
-		} else {
-			menu.addAction(new SetElasticLayoutAction("Disable", false));
-		}
+        menu.addSection("Elastic layout");
+        if (!getGround().isElasticMode()) {
+            menu.addAction(new SetElasticLayoutAction("Enable", true));
+        } else {
+            menu.addAction(new SetElasticLayoutAction("Disable", false));
+        }
 
-		menu.addSection("Apply layout");
+        menu.addSection("Apply layout");
 
-		MenuBuilder algorithmLayoutMenu = menu.addSubMenu("Algorithm");
+        MenuBuilder algorithmLayoutMenu = menu.addSubMenu("Algorithm");
 
-		algorithmLayoutMenu.addAction(new JungLayoutAction(FeedForwardLayout.class, "Feed-Forward"));
-		algorithmLayoutMenu.addAction(new JungLayoutAction(StretchedFeedForwardLayout.class, "Streched Feed-Forward"));
-		algorithmLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class, "Circle"));
-		algorithmLayoutMenu.addAction(new JungLayoutAction(ISOMLayout.class, "ISOM"));
+        algorithmLayoutMenu.addAction(new JungLayoutAction(FeedForwardLayout.class, "Feed-Forward"));
+        algorithmLayoutMenu.addAction(new JungLayoutAction(StretchedFeedForwardLayout.class, "Streched Feed-Forward"));
+        algorithmLayoutMenu.addAction(new JungLayoutAction(CircleLayout.class, "Circle"));
+        algorithmLayoutMenu.addAction(new JungLayoutAction(ISOMLayout.class, "ISOM"));
 
-		MenuBuilder layoutSettings = algorithmLayoutMenu.addSubMenu("Settings");
-		layoutSettings.addAction(new SetLayoutBoundsAction("Set preferred bounds", this));
+        MenuBuilder layoutSettings = algorithmLayoutMenu.addSubMenu("Settings");
+        layoutSettings.addAction(new SetLayoutBoundsAction("Set preferred bounds", this));
 
-	}
-	
-	public void doFeedForwardLayout() {
-		new JungLayoutAction(FeedForwardLayout.class, "Feed-Forward").doAction();
-	}
+    }
+     */
+    public void doFeedForwardLayout() {
+        new JungLayoutAction(FeedForwardLayout.class, "Feed-Forward").doAction();
+    }
 
-	@Override
-	protected void constructMenu(PopupMenuBuilder menu) {
-		super.constructMenu(menu);
-		constructLayoutMenu(menu.addSubMenu("Layout"));
-	}
+    @Override
+    protected void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
+        super.constructMenu(menu, posX, posY);
+        //constructLayoutMenu(menu.addSubMenu("Layout"));
+    }
 
-	/**
-	 * @return Layout bounds to be used by Layout algorithms
-	 */
-	protected Dimension getLayoutBounds() {
-		return layoutBounds;
-	}
+    protected void constructMenu(PopupMenuBuilder menu) {
+        super.constructMenu(menu, 0.0, 0.0);
+    }
 
-	@Override
-	public ElasticGround getGround() {
-		return (ElasticGround) super.getGround();
-	}
+    /**
+     * @return Layout bounds to be used by Layout algorithms
+     */
+    protected Dimension getLayoutBounds() {
+        return layoutBounds;
+    }
 
-	/**
-	 * @param bounds
-	 *            New bounds
-	 */
-	public void setLayoutBounds(Dimension bounds) {
-		this.layoutBounds = bounds;
-	}
+    @Override
+    public ElasticGround getGround() {
+        return (ElasticGround) super.getGround();
+    }
 
-	/**
-	 * Activity for performing a Jung Layout.
-	 * 
-	 * @author Shu Wu
-	 */
-	class DoJungLayout extends TrackedAction {
+    /**
+     * @param bounds
+     *            New bounds
+     */
+    public void setLayoutBounds(Dimension bounds) {
+        this.layoutBounds = bounds;
+    }
 
-		private static final long serialVersionUID = 1L;
+    /**
+     * Activity for performing a Jung Layout.
+     * 
+     * @author Shu Wu
+     */
+    class DoJungLayout extends TrackedAction {
 
-		private Layout layout;
+        private static final long serialVersionUID = 1L;
 
-		private Class<? extends Layout> layoutType;
+        private Layout layout;
 
-		public DoJungLayout(Class<? extends Layout> layoutType) {
-			super("Performing layout: " + layoutType.getSimpleName());
-			this.layoutType = layoutType;
-		}
+        private Class<? extends Layout> layoutType;
 
-		@Override
-		protected void action() throws ActionException {
+        public DoJungLayout(Class<? extends Layout> layoutType) {
+            super("Performing layout: " + layoutType.getSimpleName());
+            this.layoutType = layoutType;
+        }
 
-			try {
-				Class<?>[] ctArgs = new Class[1];
-				ctArgs[0] = Graph.class;
+        @Override
+        protected void action() throws ActionException {
 
-				Constructor<?> ct = layoutType.getConstructor(ctArgs);
-				Object[] args = new Object[1];
+            try {
+                Class<?>[] ctArgs = new Class[1];
+                ctArgs[0] = Graph.class;
 
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						getGround().updateGraph();
-					}
-				});
-				args[0] = getGround().getGraph();
-				layout = (Layout) ct.newInstance(args);
+                Constructor<?> ct = layoutType.getConstructor(ctArgs);
+                Object[] args = new Object[1];
 
-			} catch (InvocationTargetException e) {
-				e.getTargetException().printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new ActionException("Could not apply layout: " + e.getMessage(), e);
-			}
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        getGround().updateGraph();
+                    }
+                });
+                args[0] = getGround().getGraph();
+                layout = (Layout) ct.newInstance(args);
 
-			layout.initialize(getLayoutBounds());
+            } catch (InvocationTargetException e) {
+                e.getTargetException().printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new ActionException("Could not apply layout: " + e.getMessage(), e);
+            }
 
-			if (layout.isIncremental()) {
-				long timeNow = System.currentTimeMillis();
-				while (!layout.incrementsAreDone()
-						&& (System.currentTimeMillis() - timeNow < 1000 && !layout
-								.incrementsAreDone())) {
-					layout.advancePositions();
-				}
-			}
-			/**
-			 * Layout nodes needs to be done in the Swing dispatcher thread
-			 */
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						getGround().updateChildrenFromLayout(layout, true, true);
-					}
-				});
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
+            layout.initialize(getLayoutBounds());
 
-		}
-	}
+            if (layout.isIncremental()) {
+                long timeNow = System.currentTimeMillis();
+                while (!layout.incrementsAreDone()
+                        && (System.currentTimeMillis() - timeNow < 1000 && !layout
+                                .incrementsAreDone())) {
+                    layout.advancePositions();
+                }
+            }
+            /**
+             * Layout nodes needs to be done in the Swing dispatcher thread
+             */
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        getGround().updateChildrenFromLayout(layout, true, true);
+                    }
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
 
-	/**
-	 * Action for applying a Jung Layout. It implements LayoutAction, which
-	 * allows it to be reversable.
-	 * 
-	 * @author Shu
-	 */
-	class JungLayoutAction extends LayoutAction {
+        }
+    }
 
-		private static final long serialVersionUID = 1L;
+    /**
+     * Action for applying a Jung Layout. It implements LayoutAction, which
+     * allows it to be reversable.
+     * 
+     * @author Shu
+     */
+    class JungLayoutAction extends LayoutAction {
 
-		Class<? extends Layout> layoutClass;
+        private static final long serialVersionUID = 1L;
 
-		public JungLayoutAction(Class<? extends Layout> layoutClass, String name) {
-			super(ElasticWorld.this, "Apply layout " + name, name);
-			this.layoutClass = layoutClass;
-		}
+        Class<? extends Layout> layoutClass;
 
-		@Override
-		protected void applyLayout() {
-			getGround().setElasticEnabled(false);
-			(new DoJungLayout(layoutClass)).doAction();
-		}
+        public JungLayoutAction(Class<? extends Layout> layoutClass, String name) {
+            super(ElasticWorld.this, "Apply layout " + name, name);
+            this.layoutClass = layoutClass;
+        }
 
-	}
+        @Override
+        protected void applyLayout() {
+            getGround().setElasticEnabled(false);
+            (new DoJungLayout(layoutClass)).doAction();
+        }
 
-	/**
-	 * Action for starting and running a Iterable Jung Layout
-	 * 
-	 * @author Shu
-	 */
-	class SetElasticLayoutAction extends LayoutAction {
+    }
 
-		private static final long serialVersionUID = 1L;
-		private boolean enabled;
+    /**
+     * Action for starting and running a Iterable Jung Layout
+     * 
+     * @author Shu
+     */
+    class SetElasticLayoutAction extends LayoutAction {
 
-		public SetElasticLayoutAction(String name, boolean enabled) {
-			super(ElasticWorld.this, "Set Spring Layout: " + enabled, name);
-			this.enabled = enabled;
-		}
+        private static final long serialVersionUID = 1L;
+        private boolean enabled;
 
-		@Override
-		protected void applyLayout() {
-			getGround().setElasticEnabled(enabled);
-		}
+        public SetElasticLayoutAction(String name, boolean enabled) {
+            super(ElasticWorld.this, "Set Spring Layout: " + enabled, name);
+            this.enabled = enabled;
+        }
 
-	}
+        @Override
+        protected void applyLayout() {
+            getGround().setElasticEnabled(enabled);
+        }
+
+    }
 }
 
 /**
@@ -245,36 +246,36 @@ public class ElasticWorld extends WorldImpl {
  */
 class SetLayoutBoundsAction extends StandardAction {
 
-	private static final Property pHeight = new PInt("Height");
-	private static final Property pWidth = new PInt("Width");
-	private static final long serialVersionUID = 1L;
-	private static final Property[] zProperties = { pWidth, pHeight };
+    private static final Property pHeight = new PInt("Height");
+    private static final Property pWidth = new PInt("Width");
+    private static final long serialVersionUID = 1L;
+    private static final Property[] zProperties = { pWidth, pHeight };
 
-	private ElasticWorld parent;
+    private ElasticWorld parent;
 
-	public SetLayoutBoundsAction(String actionName, ElasticWorld parent) {
-		super("Set layout bounds", actionName);
-		this.parent = parent;
-	}
+    public SetLayoutBoundsAction(String actionName, ElasticWorld parent) {
+        super("Set layout bounds", actionName);
+        this.parent = parent;
+    }
 
-	private void completeConfiguration(ConfigResult properties) {
-		parent.setLayoutBounds(new Dimension((Integer) properties.getValue(pWidth),
-				(Integer) properties.getValue(pHeight)));
+    private void completeConfiguration(ConfigResult properties) {
+        parent.setLayoutBounds(new Dimension((Integer) properties.getValue(pWidth),
+                (Integer) properties.getValue(pHeight)));
 
-	}
+    }
 
-	@Override
-	protected void action() throws ActionException {
+    @Override
+    protected void action() throws ActionException {
 
-		try {
-			ConfigResult properties = ConfigManager.configure(zProperties, "Layout bounds",
-					UIEnvironment.getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
-			completeConfiguration(properties);
+        try {
+            ConfigResult properties = ConfigManager.configure(zProperties, "Layout bounds",
+                    UIEnvironment.getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
+            completeConfiguration(properties);
 
-		} catch (ConfigException e) {
-			e.defaultHandleBehavior();
-		}
+        } catch (ConfigException e) {
+            e.defaultHandleBehavior();
+        }
 
-	}
+    }
 
 }

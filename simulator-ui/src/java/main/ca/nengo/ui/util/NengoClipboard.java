@@ -24,14 +24,17 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.util;
 
+import java.awt.geom.Point2D;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import ca.nengo.model.Node;
 
 public class NengoClipboard {
 
-	private Node selectedObj;
+	private ArrayList<Node> selectedObjs = null;
+	private ArrayList<Point2D> objectOffsets = null;
 
 	public static interface ClipboardListener {
 		public void clipboardChanged();
@@ -52,8 +55,9 @@ public class NengoClipboard {
 
 	}
 
-	public void setContents(Node node) {
-		selectedObj = node;
+	public void setContents(ArrayList<Node> nodes, ArrayList<Point2D> objOffsets) {
+		selectedObjs = nodes;
+		objectOffsets = objOffsets;
 		fireChanged();
 	}
 
@@ -63,23 +67,29 @@ public class NengoClipboard {
 		}
 	}
 
-	public Node getContents() {
-		if (selectedObj != null) {
-			Node currentObj = selectedObj;
-
-			/*
-			 * If the object supports cloning, use it to make another model
-			 */
-			try {
-				selectedObj = selectedObj.clone();
-			} catch (CloneNotSupportedException e) {
-				selectedObj = null;
+	public ArrayList<Node> getContents() {
+		if (selectedObjs != null) {
+			ArrayList<Node> clonedObjects = new ArrayList<Node>();
+			for (Node curObj : selectedObjs) {
+				try {
+					/*
+					 * If the object supports cloning, use it to make another model
+					 */
+					curObj = curObj.clone();
+					clonedObjects.add(curObj);
+				} catch (CloneNotSupportedException e) {
+					curObj = null;
+				}
 			}
-
-			return currentObj;
+			
+			return clonedObjects;
 		} else {
 			return null;
 		}
 	}
 
+	public ArrayList<Point2D> getOffsets() {
+		return objectOffsets;
+	}
+	
 }

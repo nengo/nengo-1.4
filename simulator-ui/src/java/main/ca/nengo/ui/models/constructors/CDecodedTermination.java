@@ -40,7 +40,7 @@ import ca.nengo.ui.models.nodes.widgets.UIDecodedTermination;
 public class CDecodedTermination extends ProjectionConstructor {
 	private static final Property pIsModulatory = new PBoolean("Is Modulatory");
 
-	private static final Property pTauPSC = new PFloat("tauPSC");
+	private static final Property pTauPSC = new PFloat("tauPSC [s]","Synaptic time constant, in seconds");
 	private NEFEnsemble nefEnsembleParent;
 
 	private Property pTransformMatrix;

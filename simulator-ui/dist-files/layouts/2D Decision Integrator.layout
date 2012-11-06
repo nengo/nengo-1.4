@@ -12,3 +12,12 @@
   (u'output', 'preferred directions', {'label': True, 'height': 152, 'width': 146, 'x': 622, 'y': 90}),
   (u'output', 'spike raster', {'label': True, 'sample': 4, 'height': 144, 'width': 218, 'x': 591, 'y': 261})],
  {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.019999999999999997, 'rcd_time': 4.0})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=93.61258182989769,y=267.3723863943311,width=855.5034899711608,height=529.6657513412052]
+# output (NEFEnsemble)=Point2D.Double[773.5378390095766, 490.8751168998539]
+# MT (NEFEnsemble)=Point2D.Double[394.5250701399124, 490.875116899854]
+# LIP (NEFEnsemble)=Point2D.Double[568.9753974595033, 481.75023379970776]
+# input (Function Input)=Point2D.Double[200.0, 500.0]

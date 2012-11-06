@@ -62,13 +62,18 @@ public abstract class NodeContainerIcon extends ModelIcon {
 	private void updateIconScale() {
 
 		int numOfNodes = getModelParent().getNodesCount();
+		int dimensionality = getModelParent().getDimensionality();
 
 		if (myNumOfNodes == numOfNodes) {
 			return;
 		}
 		myNumOfNodes = numOfNodes;
 
-		sizeLabel.setText(myNumOfNodes + " nodes");
+		String dimensionalityText = "";
+		if (dimensionality > 0) {
+			dimensionalityText = "   " + dimensionality + "D";
+		}
+		sizeLabel.setText(myNumOfNodes + " node" + (myNumOfNodes == 1 ? "" : "s") + dimensionalityText);
 
 		float numOfNodesNormalized;
 		if (numOfNodes >= getNodeCountNormalization())
@@ -82,7 +87,6 @@ public abstract class NodeContainerIcon extends ModelIcon {
 				+ (numOfNodesNormalized * (MAX_SCALE - MIN_SCALE));
 
 		getIconReal().setScale(scale);
-
 	}
 
 	protected abstract int getNodeCountNormalization();
@@ -91,7 +95,11 @@ public abstract class NodeContainerIcon extends ModelIcon {
 	public void layoutChildren() {
 		super.layoutChildren();
 
-		sizeLabel.setOffset(0, -(sizeLabel.getHeight() + 1));
+		// center the label
+		double iconWidth = getIconReal().getWidth() * getIconReal().getScale();
+		double labelWidth = sizeLabel.getWidth() * sizeLabel.getScale();
+		double xOffset = (iconWidth - labelWidth) / 2;
+		sizeLabel.setOffset(xOffset, -(sizeLabel.getHeight() + 1));
 
 		sizeLabel.moveToFront();
 	}

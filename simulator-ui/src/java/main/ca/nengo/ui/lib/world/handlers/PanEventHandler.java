@@ -2,6 +2,9 @@ package ca.nengo.ui.lib.world.handlers;
 
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.util.Iterator;
+
+import ca.nengo.ui.lib.world.WorldObject;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -17,6 +20,7 @@ import edu.umd.cs.piccolo.util.PDimension;
 public class PanEventHandler extends PPanEventHandler {
 
 	private boolean isInverted = false;
+	private SelectionHandler selectionHandler = null;
 
 	public PanEventHandler() {
 		super();
@@ -60,6 +64,15 @@ public class PanEventHandler extends PPanEventHandler {
 				c.translateView(delta.width, delta.height);
 			}
 		}
+		
+		// Loop through selected objects, compensate for camera panning
+		// so that objects will remain stationary relative to cursor
+		Iterator<WorldObject> selectionEn = selectionHandler.getSelection().iterator();
+		while (selectionEn.hasNext()) {
+			WorldObject node = selectionEn.next();
+			node.localToParent(node.globalToLocal(delta));
+			node.dragOffset(delta.getWidth(), delta.getHeight());
+		}
 	}
 
 	public void setInverted(boolean isInverted) {
@@ -68,5 +81,13 @@ public class PanEventHandler extends PPanEventHandler {
 
 	public boolean isInverted() {
 		return isInverted;
+	}
+	
+	public void setSelectionHandler(SelectionHandler s) {
+		selectionHandler = s;
+	}
+	
+	public SelectionHandler getSelectionHandler() {
+		return selectionHandler;
 	}
 }

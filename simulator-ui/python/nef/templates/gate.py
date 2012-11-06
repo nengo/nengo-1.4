@@ -3,10 +3,10 @@ label='Gate'
 icon='gate.png'
 
 params=[
-    ('name','Name',str),
-    ('gated','Name of gated ensemble',str),
-    ('neurons','Number of neurons',int),
-    ('pstc','tauPSC', float),
+    ('name','Name',str,'Name of the new gating ensemble'),
+    ('gated','Name of gated ensemble',str,'Name of the existing ensemble to gate'),
+    ('neurons','Number of neurons',int,'Number of neurons in the new gating ensemble'),
+    ('pstc','Synaptic time constant [s]', float, 'Synaptic time constant of the gating ensemble'),
     ]
 
 def test_params(net, p):
@@ -44,3 +44,4 @@ def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
     orig = gate.getOrigin('xBiased')
     term = output.getTermination(oname)
     net.network.addProjection(orig, term)
+

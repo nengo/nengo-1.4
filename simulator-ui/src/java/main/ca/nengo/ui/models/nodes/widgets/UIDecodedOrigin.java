@@ -65,7 +65,7 @@ public class UIDecodedOrigin extends UIOrigin {
             } catch(StructuralException e) {
                 Util.Assert(false, e.getMessage());
             }
-			showPopupMessage("decoded termination removed from ensemble");
+			showPopupMessage("decoded origin removed from ensemble");
 			
 		} else {
 			Util.Assert(false, "Decoded Origin not attached to NEFEnsemble");

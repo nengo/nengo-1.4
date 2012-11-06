@@ -1,8 +1,12 @@
 package ca.nengo.ui.lib.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -91,7 +95,7 @@ public class Util {
 		String msg = exception.getMessage();
 		StringBuilder assertMsg = new StringBuilder(
 				"An unexpected error has occured \n"
-						+ "Please report this log at: http://sourceforge.net/tracker/?atid=1036998&group_id=216267\nIf possible, please include a record of what you were doing preceding this screen \n\n");
+						+ "Please report this log at: https://github.com/ctn-waterloo/nengo/issues\nIf possible, please include a record of what you were doing preceding this screen \n\n");
 		assertMsg.append("*** " + NengoGraphics.APP_NAME + " ***\n");
 
 		if (msg != null && !"".equals(msg)) {
@@ -287,4 +291,23 @@ public class Util {
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 
+	/*
+	 * Does a binary copy from fromFile to toFile
+	 */
+	public static void copyFile(File fromFile, File toFile) throws IOException {
+		FileInputStream fis = new FileInputStream(fromFile);
+		FileOutputStream fos = new FileOutputStream(toFile);
+        BufferedInputStream reader = new BufferedInputStream(fis);
+        BufferedOutputStream writer = new BufferedOutputStream(fos);
+
+        //... Loop as long as there is input
+        int data = -1;
+        while ((data = reader.read()) != -1) {
+            writer.write(data);
+        }
+
+        //... Close reader and writers.
+        reader.close();  // Close to unlock.
+        writer.close();  // Close to unlock and flush to disk.
+    }
 }

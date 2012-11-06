@@ -1,5 +1,3 @@
-cache={}   
-
 import random
 import time
 
@@ -55,11 +53,16 @@ class Map:
             return 1
 
 
-def get(ensemble,rows,cols):
-    key=(ensemble,rows,cols)
-    if key not in cache:
-        cache[key]=Map(ensemble.encoders,rows,cols)
-    return cache[key]
+#this is here to provide the functionality of a global cache but without cluttering the global namespace
+class MapCache:
+    def __init__(self):
+        self.cache={}
+    
+    def get(self,ensemble,rows,cols):
+        key=(ensemble,rows,cols)
+        if key not in self.cache:
+            self.cache[key]=Map(ensemble.encoders,rows,cols)
+        return self.cache[key]
         
     
     

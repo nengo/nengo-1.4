@@ -17,7 +17,6 @@ import ca.nengo.ui.lib.actions.RemoveObjectsAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.ZoomToFitAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
-import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.Interactable;
 import ca.nengo.ui.lib.world.World;
@@ -244,16 +243,23 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * 
 	 * @return Menu builder
 	 */
-	protected void constructMenu(PopupMenuBuilder menu) {
-		Node clipboardNode = NengoGraphics.getInstance().getClipboard().getContents();
-		if (clipboardNode != null) {
-			menu.addAction(new PasteAction("Paste '" + clipboardNode.getName() + "' here", (NodeContainer)this));
+	protected void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
+		ArrayList<Node> clipboardNodes = NengoGraphics.getInstance().getClipboard().getContents();
+		if (clipboardNodes != null && clipboardNodes.size() > 0) {
+			String selectionName = "";
+			if (clipboardNodes.size() == 1) {
+				selectionName = clipboardNodes.get(0).getName();
+			} else {
+				selectionName = "selection";
+			}
+			PasteAction pasteAction = new PasteAction("Paste '" + selectionName + "' here", (NodeContainer)this);
+			pasteAction.setPosition(posX, posY);
+			menu.addAction(pasteAction);
 		}
 		menu.addAction(new ZoomToFitAction("Zoom to fit", this));
-		MenuBuilder windowsMenu = menu.addSubMenu("Windows");
+		/*MenuBuilder windowsMenu = menu.addSubMenu("Windows");
 		windowsMenu.addAction(new CloseAllWindows("Close all"));
-		windowsMenu.addAction(new MinimizeAllWindows("Minimize all"));
-
+		windowsMenu.addAction(new MinimizeAllWindows("Minimize all"));*/
 	}
 
 	protected void constructSelectionMenu(Collection<WorldObject> selection, PopupMenuBuilder menu) {
@@ -326,7 +332,14 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 */
 	public JPopupMenu getContextMenu() {
 		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
-		constructMenu(menu);
+		constructMenu(menu, null, null);
+
+		return menu.toJPopupMenu();
+	}
+	
+	public JPopupMenu getContextMenu(double posX, double posY) {
+		PopupMenuBuilder menu = new PopupMenuBuilder(getName());
+		constructMenu(menu, posX, posY);
 
 		return menu.toJPopupMenu();
 	}
@@ -412,7 +425,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 		if (isSelectionMode != enabled) {
 			isSelectionMode = enabled;
 			mySky.getCamera().removeInputEventListener(selectionEventHandler);
-			selectionEventHandler.endSelection();
+			selectionEventHandler.endSelection(false);
 			if (!isSelectionMode) {
 				initSelectionMode();
 			} else {

@@ -4,13 +4,10 @@ import java.awt.geom.Point2D;
 
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
-import ca.nengo.ui.actions.CreateModelAction;
-import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.elastic.ElasticWorld;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
-import ca.nengo.ui.models.constructors.CNetwork;
 
 public class NengoWorld extends ElasticWorld implements NodeContainer {
 
@@ -18,7 +15,7 @@ public class NengoWorld extends ElasticWorld implements NodeContainer {
 		super("Nengo");
 	}
 
-	@Override
+	/*@Override
 	protected void constructMenu(PopupMenuBuilder menu) {
 
 		super.constructMenu(menu);
@@ -28,7 +25,7 @@ public class NengoWorld extends ElasticWorld implements NodeContainer {
 
 		// Create network action
 		menu.addAction(new CreateModelAction("New Network", this, new CNetwork()));
-	}
+	}*/
 
 
 	public UINeoNode addNodeModel(Node node) throws ContainerException {

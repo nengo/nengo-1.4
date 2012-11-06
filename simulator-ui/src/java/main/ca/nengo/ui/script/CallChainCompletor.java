@@ -202,16 +202,16 @@ public class CallChainCompletor extends CommandCompletor {
 		return result;
 	}
 	
-	private static String getClassDocs(String className) {
-		String result = null;
-		try {
-			Class<?> c = Class.forName(className);
-			result = JavaSourceParser.getDocs(c);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return (result == null) ? "" : result;
-	}
+//	private static String getClassDocs(String className) {
+//		String result = null;
+//		try {
+//			Class<?> c = Class.forName(className);
+//			result = JavaSourceParser.getDocs(c);
+//		} catch (ClassNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		return (result == null) ? "" : result;
+//	}
 	
 	/**
 	 * @param base A variable name in the interpreter. For variables that wrap 

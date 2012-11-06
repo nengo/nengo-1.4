@@ -5,8 +5,8 @@ import java
 import ca.nengo
 import sys
 
-if 'lib/iText-5.0.5.jar' not in sys.path:
-    sys.path.append('lib/iText-5.0.5.jar')
+if 'lib/itextpdf-5.3.4.jar' not in sys.path:
+    sys.path.append('lib/itextpdf-5.3.4.jar')
 
 import template
 
@@ -20,7 +20,9 @@ class SimulationModeComboBox(JComboBox):
         self.maximumSize=self.preferredSize
     def set_node(self,node):
         self.node=None
-        if node is not None and not hasattr(node.model,'mode'): node=None
+        if node is not None and (not hasattr(node, 'model')
+                                 or not hasattr(node.model,'mode')):
+            node=None
         self.enabled=node is not None
         
         if node is not None:
@@ -44,6 +46,30 @@ class SimulationModeComboBox(JComboBox):
         else: self.node.model.mode=SimulationMode.DEFAULT
         self.set_node(self.node)
 
+class LayoutComboBox(JComboBox):
+    def __init__(self):
+        JComboBox.__init__(self,['last saved','feed-forward','sort by name'],
+                           toolTipText='set network layout')
+        self.addActionListener(self)
+        self.maximumSize=self.preferredSize
+        self.viewer = None
+    
+    def set_viewer(self,viewer):
+        self.viewer=viewer
+        if self.viewer is not None and self.viewer.justOpened:
+            self.setSelectedIndex(0)
+            self.viewer.justOpened = False
+        
+    def actionPerformed(self,event):
+        if self.viewer is None: return
+        layout = self.getSelectedItem()
+        
+        if layout=='last saved':
+            self.viewer.restoreNodeLayout()
+        elif layout=='feed-forward':
+            self.viewer.doFeedForwardLayout()
+        elif layout=='sort by name':
+            self.viewer.doSortByNameLayout()
 
 from ca.nengo.ui.configurable.descriptors import *
 from ca.nengo.ui.configurable import *
@@ -204,17 +230,21 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.ng=ca.nengo.ui.NengoGraphics.getInstance()
         self.toolbar=JToolBar("Nengo actions",floatable=False)
         self.toolbar.add(make_button('open',self.do_open,'open file'))
+        self.toolbar.add(make_button('clear', self.do_clear_all, 'clear all'))
         self.toolbar.add(make_button('pdf',self.do_pdf,'save as pdf'))
 
         self.toolbar.add(Box.createHorizontalGlue())
         
+        self.toolbar.add(JLabel("mode:"))
         self.mode_combobox=SimulationModeComboBox()
         self.toolbar.add(self.mode_combobox)
         self.parisian=ParisianTransform()
         self.toolbar.add(self.parisian.button)
-        self.feedforward=make_label_button('layout',self.do_feedforward_layout,'reorganize components to flow from left to right',enabled=False)
-        self.toolbar.add(self.feedforward)
-
+        self.toolbar.add(JLabel("layout:"))
+        self.layoutcombo=LayoutComboBox()
+        self.toolbar.add(self.layoutcombo)
+        self.layoutsave=make_button('save',self.do_save_layout,"save the current network layout",enabled=False)
+        self.toolbar.add(self.layoutsave)
         self.toolbar.add(Box.createHorizontalGlue())
         
         #self.button_stop=make_button('stop',self.do_interrupt,'Stop the currently running simulation',enabled=False)
@@ -250,16 +280,13 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.update()
         
     def update(self):
-        #try:
-        #    self.button_stop.enabled=self.ng.progressIndicator.visible
-        #except:
-        #    pass    
     
         selected=self.ng.getSelectedObj()
         self.mode_combobox.set_node(selected)
 
         projection=None
-        if selected is not None and isinstance(selected.model,ca.nengo.model.nef.impl.DecodedTermination):
+        if selected is not None and (hasattr(selected, 'model') and 
+                isinstance(selected.model,ca.nengo.model.nef.impl.DecodedTermination)):
             term=selected.model
             network=selected.nodeParent.networkParent.model
             for p in network.getProjections():
@@ -270,16 +297,16 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.parisian.set_projection(projection)
 
         net=self.get_current_network()
+        self.button_run.enabled=net is not None
         if net is None:
-            self.button_run.enabled=False
             self.button_run.toolTipText='run'
         else:
-            self.button_run.enabled=True
             self.button_run.toolTipText='run '+net.name
             
         viewer=self.get_current_network_viewer()
-        self.feedforward.enabled=viewer is not None
-        
+        self.layoutcombo.set_viewer(viewer)
+        self.layoutcombo.enabled=viewer is not None
+        self.layoutsave.enabled=viewer is not None
         
         
     def get_current_network(self,top_parent=True):
@@ -290,10 +317,15 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             while top_parent and hasattr(network,'networkParent') and network.networkParent is not None:
                 network=network.networkParent
         else:
+            found_candidate=False
             for wo in ng.world.ground.children:
                 if isinstance(wo,ca.nengo.ui.models.nodes.UINetwork):
-                    network=wo
-                    break
+                    if not found_candidate:
+                        network=wo
+                        found_candidate=True
+                    else:
+                        network=None
+                        break
         return network      
         
     def get_current_network_viewer(self):
@@ -305,31 +337,50 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
                 if hasattr(net,'networkParent') and net.networkParent is not None:
                     net=net.networkParent
                     viewer=net.getViewer()
-        return viewer 
+        elif net is not None and hasattr(net,'networkParent'):
+            net=net.networkParent
+            if net is not None and hasattr(net,'getViewer'):
+                viewer=net.getViewer()
+        if viewer is not None and (viewer.isDestroyed() or
+            not isinstance(viewer, ca.nengo.ui.models.viewers.NetworkViewer)):
+            return None
+        return viewer
           
         
     def do_console(self,event):
         pane=self.ng.scriptConsolePane
         pane.auxVisible=not pane.auxVisible
 
-        
+    def do_clear_all(self,event):
+        response=JOptionPane.showConfirmDialog(
+            ca.nengo.ui.lib.util.UIEnvironment.getInstance(),
+            "Are you sure you want to remove all objects from Nengo?",
+            "Clear all?",
+            JOptionPane.YES_NO_OPTION)
+        if response==0:    
+            for c in list(self.ng.world.ground.children): 
+                ng.removeNodeModel(c.model)    
 
 
     def do_inspect(self,event):
         self.ng.toggleConfigPane()
         
-    def do_feedforward_layout(self,event):
-        viewer=self.get_current_network_viewer()
-        viewer.doFeedForwardLayout()
+    def do_save_layout(self,event):
+        viewer = self.get_current_network_viewer()
+        viewer.saveNodeLayout()
+        self.layoutcombo.setSelectedIndex(0)
         
     def do_open(self,event):
         ca.nengo.ui.actions.OpenNeoFileAction(ng).doAction()
+
     def do_run(self,event):
         network=self.get_current_network()
         if network is not None:         
-            ca.nengo.ui.actions.RunInteractivePlotstAction(network).doAction()
+            ca.nengo.ui.actions.RunInteractivePlotsAction(network).doAction()
+
     def do_interrupt(self,event):
         self.ng.progressIndicator.interrupt()
+
     def do_pdf(self,event):
         from com.itextpdf.text.pdf import PdfWriter
         from com.itextpdf.text import Document
@@ -343,30 +394,68 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             f=fileChooser.getSelectedFile()
 
             universe=self.ng.universe
-        
-            doc=Document()
-            writer=PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
-            doc.open()
-            cb=writer.getDirectContent()
             w=universe.size.width
             h=universe.size.height
-            pw=550
-            ph=800
-            tp=cb.createTemplate(pw,ph)
-            g2=tp.createGraphicsShapes(pw,ph)
-            at = java.awt.geom.AffineTransform()        
-            s=min(float(pw)/w,float(ph)/h)        
-            at.scale(s,s)
-            g2.transform(at)
-            #self.view.area.pdftemplate=tp,s
-            universe.paint(g2)
-            #self.view.area.pdftemplate=None
-            g2.dispose()
 
-            cb.addTemplate(tp,20,0)
-            doc.close()
+            if( False ):
+                # basic method: make a PDF page the same size as the Nengo window.
+                #   This method preserves all details visible in the GUI
+                pw = w
+                ph = h
+
+                # create PDF document and writer
+                doc = Document( Rectangle(pw,ph), 0, 0, 0, 0 )
+                writer = PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
+                doc.open()
+                cb = writer.getDirectContent()
+
+                # create a template, print the image to it, and add it to the page
+                tp = cb.createTemplate(pw,ph)
+                g2 = tp.createGraphicsShapes(pw,ph)
+                universe.paint(g2)
+                g2.dispose()
+                cb.addTemplate(tp,0,0)
+
+                # clean up everything
+                doc.close()
+
+            else:
+                # Top of page method: prints to the top of the page
+                pw = 550
+                ph = 800
+        
+                # create PDF document and writer
+                doc = Document()
+                writer = PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
+                doc.open()
+                cb = writer.getDirectContent()
+
+                # create a template
+                tp = cb.createTemplate(pw,ph)
+                g2 = tp.createGraphicsShapes(pw,ph)
+
+                # scale the template to fit the page
+                at = java.awt.geom.AffineTransform()        
+                s = min(float(pw)/w,float(ph)/h)        
+                at.scale(s,s)
+                g2.transform(at)
+
+                # print the image to the template
+                # turing off setUseGreekThreshold allows small text to print
+                ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(False)
+                universe.paint(g2)
+                ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(True)
+                g2.dispose()
+
+                # add the template
+                cb.addTemplate(tp,20,0)
+
+                # clean up everything
+                doc.close()
      
-ng=ca.nengo.ui.NengoGraphics.getInstance()
-toolbar=ToolBar()
+################################################################################
+### Main
+ng = ca.nengo.ui.NengoGraphics.getInstance()
+toolbar = ToolBar()
 ng.contentPane.revalidate()
 

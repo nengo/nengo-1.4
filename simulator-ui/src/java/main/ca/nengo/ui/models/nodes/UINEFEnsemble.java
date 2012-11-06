@@ -101,8 +101,8 @@ public class UINEFEnsemble extends UIEnsemble {
 		}
 
 		// Decoded termination and origins
-		menu.addAction(new AddDecodedTerminationAction());
-		menu.addAction(new AddDecodedOriginAction());
+//		menu.addAction(new AddDecodedTerminationAction());
+//		menu.addAction(new AddDecodedOriginAction());
 	}
 
 	@Override
@@ -161,6 +161,15 @@ public class UINEFEnsemble extends UIEnsemble {
 		return (NEFEnsemble) super.getModel();
 	}
 
+	@Override
+	public int getDimensionality() {
+		if (getModel() != null) {
+			return getModel().getDimension();
+		} else {
+			return -1;
+		}
+	}
+	
 	@Override
 	public String getTypeName() {
 		return typeName;

@@ -36,6 +36,14 @@ import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 
 public class Text extends WorldObjectImpl {
 	private PXText textNode;
+	
+    public static void setUseGreekThreshold(boolean value) {
+    	PXText.setUseGreekThreshold(value);
+    }
+    public static boolean getUseGreekThreshold() {
+    	return PXText.getUseGreekThreshold();
+    }
+
 
 	public Text(String text) {
 		super(new PXText(text));
