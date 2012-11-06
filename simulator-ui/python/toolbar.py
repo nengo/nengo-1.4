@@ -20,7 +20,9 @@ class SimulationModeComboBox(JComboBox):
         self.maximumSize=self.preferredSize
     def set_node(self,node):
         self.node=None
-        if node is not None and not hasattr(node.model,'mode'): node=None
+        if node is not None and (not hasattr(node, 'model')
+                                 or not hasattr(node.model,'mode')):
+            node=None
         self.enabled=node is not None
         
         if node is not None:
@@ -283,7 +285,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.mode_combobox.set_node(selected)
 
         projection=None
-        if selected is not None and isinstance(selected.model,ca.nengo.model.nef.impl.DecodedTermination):
+        if selected is not None and (hasattr(selected, 'model') and 
+                isinstance(selected.model,ca.nengo.model.nef.impl.DecodedTermination)):
             term=selected.model
             network=selected.nodeParent.networkParent.model
             for p in network.getProjections():
