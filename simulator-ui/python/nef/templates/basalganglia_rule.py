@@ -70,7 +70,8 @@ def make(net,node,index=0,dim=8,pattern='I',pstc=0.01,use_single_input=False):
         bg = node
         if bg.getMetaData("bgrule") == None:
             bg.setMetaData("bgrule", ArrayList())
-        bgrules = net.getMetaData("bgrule")
+
+        bgrules = bg.getMetaData("bgrule")
 
         rule=HashMap(5)
         rule.put("index", index)

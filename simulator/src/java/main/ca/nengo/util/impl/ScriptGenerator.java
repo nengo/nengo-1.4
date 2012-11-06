@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
+import ca.nengo.model.Projection;
 import ca.nengo.util.ScriptGenException;
 
 
@@ -40,43 +41,44 @@ public class ScriptGenerator extends DFSIterator{
 	
 	protected void pre(Node node)
 	{
-		if (topLevel)
-		{
-			prefixes.put(node, topLevelPrefix);
-		}
-		
-		for (Node child : node.getChildren())
-		{
-			String prefix;
-			String nameNoSpaces = node.getName().replace(' ', spaceDelimiter);
-			
-			if(topLevel)
-				prefix = topLevelPrefix + spaceDelimiter + nameNoSpaces;
-			else
-				prefix = prefixes.get(node) + spaceDelimiter + nameNoSpaces ;
-			
-			prefixes.put(child, prefix);
-		}
-		
-		HashMap<String, Object> toScriptArgs = new HashMap<String, Object>();
-		toScriptArgs.put("prefix", prefixes.get(node) + spaceDelimiter);
-		toScriptArgs.put("isSubnet", !topLevel);
-		toScriptArgs.put("netName", prefixes.get(node));
-		toScriptArgs.put("spaceDelim", spaceDelimiter);
-
-        if (node instanceof Network && ((Network)node).getMetaData("type") != null)
+		if (inTemplateNetwork <= 0)
         {
-            inTemplateNetwork++;
-        }
-
-        if (inTemplateNetwork <= 0)
-        {
+			if (topLevel)
+			{
+				prefixes.put(node, topLevelPrefix);
+			}
+			
+			for (Node child : node.getChildren())
+			{
+				String prefix;
+				String nameNoSpaces = node.getName().replace(' ', spaceDelimiter);
+				
+				if(topLevel)
+					prefix = topLevelPrefix + spaceDelimiter + nameNoSpaces;
+				else
+					prefix = prefixes.get(node) + spaceDelimiter + nameNoSpaces ;
+				
+				prefixes.put(child, prefix);
+			}
+			
+			HashMap<String, Object> toScriptArgs = new HashMap<String, Object>();
+			toScriptArgs.put("prefix", prefixes.get(node) + spaceDelimiter);
+			toScriptArgs.put("isSubnet", !topLevel);
+			toScriptArgs.put("netName", prefixes.get(node));
+			toScriptArgs.put("spaceDelim", spaceDelimiter);
+	
+	        
             try {
                 String code = node.toScript(toScriptArgs);
                 script.append(code);
             } catch(ScriptGenException e) {
                 System.out.println(e.getMessage());
             } 
+        }
+        
+        if (node instanceof Network && ((Network)node).getMetaData("type") != null)
+        {
+            inTemplateNetwork++;
         }
 	}
 	
@@ -85,23 +87,53 @@ public class ScriptGenerator extends DFSIterator{
         if (node instanceof Network)
         {
             Network net = (Network)node;
-
+            
             if (net.getMetaData("type") != null)
             {
                 inTemplateNetwork--;
             }
-		
+            
             HashMap<String, Object> toScriptArgs = new HashMap<String, Object>();
             toScriptArgs.put("prefix", prefixes.get(node) + spaceDelimiter);
             toScriptArgs.put("isSubnet", !topLevel);
             toScriptArgs.put("netName", prefixes.get(node));
             toScriptArgs.put("spaceDelim", spaceDelimiter);
-
-            try {
-                String code = net.toPostScript(toScriptArgs);
-                script.append(code);
-            } catch(ScriptGenException e) {
-                System.out.println(e.getMessage());
+            
+            if (inTemplateNetwork <= 0)
+            {
+	            
+	
+	            try {
+	                String code = net.toPostScript(toScriptArgs);
+	                script.append(code);
+	            } catch(ScriptGenException e) {
+	                System.out.println(e.getMessage());
+	            }
+	            
+	           
+            }
+            
+            if (net.getMetaData("type") != null)
+            {
+                inTemplateNetwork++;
+            }
+            
+            if (inTemplateNetwork <= 0)
+            {
+            	for(Projection proj : ((Network) node).getProjections())
+        		{
+            		try {
+    	                String code = proj.toScript(toScriptArgs);
+    	                script.append(code);
+    	            } catch(ScriptGenException e) {
+    	                System.out.println(e.getMessage());
+    	            }
+        		}
+            }
+            
+            if (net.getMetaData("type") != null)
+            {
+                inTemplateNetwork--;
             }
             
             if(topLevel)
@@ -113,7 +145,7 @@ public class ScriptGenerator extends DFSIterator{
 	}
 	
 	protected void finish()
-	{
+	{	
 		writer.write(script.toString());
 		writer.close();
 	}

@@ -1083,44 +1083,46 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
         String py;
         String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
         
-
         if (myMetaData.get("type") != null)
         {
             String type = (String)myMetaData.get("type");
             if (type == "NetworkArray")
             {
-                py = String.format("nef.templates.networkarray.make(%s, name='%s', neurons=%d, length=%d, radius=%.1f, rLow=%d, rHigh=%d, iLow=8d, iHigh=%d, encSign=%d, useQuick=%b)\n",
+            	String useQuick = (Boolean)myMetaData.get("useQuick") ? "True" : "False";
+                py = String.format("nef.templates.networkarray.make(%s, name='%s', neurons=%d, length=%d, radius=%.1f, rLow=%f, rHigh=%f, iLow=%f, iHigh=%f, encSign=%d, useQuick=%s)\n",
                         scriptData.get("netName"),
-                        myMetaData.get("name"),
+                        myName,
                         (Integer)myMetaData.get("neurons"),
                         (Integer)myMetaData.get("length"),
-                        (Float)myMetaData.get("radius"),
-                        (Integer)myMetaData.get("rLow"),
-                        (Integer)myMetaData.get("rHigh"),
-                        (Integer)myMetaData.get("iLow"),
-                        (Integer)myMetaData.get("iHigh"),
+                        (Double)myMetaData.get("radius"),
+                        (Double)myMetaData.get("rLow"),
+                        (Double)myMetaData.get("rHigh"),
+                        (Double)myMetaData.get("iLow"),
+                        (Double)myMetaData.get("iHigh"),
                         (Integer)myMetaData.get("encSign"),
-                        (Boolean)myMetaData.get("useQuick"));
+                        useQuick);
             }
             else if (type == "BasalGanglia")
             {
-                py = String.format("nef.templates.basalganglia.make(%s, name='%s', dimensions=%d, pstc=%.3f, same_neurons=%b)\n",
+            	String same_neurons = (Boolean)myMetaData.get("same_neurons") ? "True" : "False";
+                py = String.format("nef.templates.basalganglia.make(%s, name='%s', dimensions=%d, pstc=%.3f, same_neurons=%s)\n",
                         scriptData.get("netName"),
-                        myMetaData.get("name"),
+                        myName,
                         (Integer)myMetaData.get("dimensions"),
-                        (Float)myMetaData.get("pstc"),
-                        (Boolean)myMetaData.get("same_neurons"));
+                        (Double)myMetaData.get("pstc"),
+                        same_neurons);
             }
-            else if (type == "Thalmus")
+            else if (type == "Thalamus")
             {
-                py = String.format("nef.templates.thalamus.make(%s, name='%s', neurons=%d, dimensions=%d, inhib_scale=%d, tau_inhib=%.3f, useQuick=%b)\n",
+            	String useQuick = (Boolean)myMetaData.get("useQuick") ? "True" : "False";
+                py = String.format("nef.templates.thalamus.make(%s, name='%s', neurons=%d, dimensions=%d, inhib_scale=%d, tau_inhib=%.3f, useQuick=%s)\n",
                         scriptData.get("netName"),
-                        myMetaData.get("name"),
+                        myName,
                         (Integer)myMetaData.get("neurons"),
                         (Integer)myMetaData.get("dimensions"),
                         (Integer)myMetaData.get("inhib_scale"),
-                        (Float)myMetaData.get("tau_inhib"),
-                        (Boolean)myMetaData.get("useQuick"));
+                        (Double)myMetaData.get("tau_inhib"),
+                        useQuick);
             }
             else
             {
@@ -1281,21 +1283,22 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public String toPostScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
 
+		String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+		
         if (myMetaData.get("integrator") != null)
         {
             ListIterator iter = ((ArrayList)myMetaData.get("integrator")).listIterator();
             while (iter.hasNext())
             {
                 HashMap integrator = (HashMap)iter.next();
-                py.append(String.format("nef.templates.integrator.make(%1s%2s, name='%3s', neurons=%4d, dimensions=%5d, tau_feedback=%6f, tau_input=%7f, scale=%8d)\n",
-                            scriptData.get("prefix"),
+                py.append(String.format("nef.templates.integrator.make(%s, name='%s', neurons=%d, dimensions=%d, tau_feedback=%f, tau_input=%f, scale=%f)\n",
+                			pythonNetworkName,
                             myName,
-                            integrator.get("name"),
                             (Integer)integrator.get("neurons"),
                             (Integer)integrator.get("dimensions"),
-                            (Float)integrator.get("tau_feedback"),
-                            (Float)integrator.get("tau_input"),
-                            (Integer)integrator.get("scale")));
+                            (Double)integrator.get("tau_feedback"),
+                            (Double)integrator.get("tau_input"),
+                            (Double)integrator.get("scale")));
             }
         }       
 
@@ -1327,13 +1330,12 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                 }
                 a.append("]");
 
-                py.append(String.format("nef.templates.linear_system.make(%1s%2s, name='%3s', neurons=%4, A=%5s, tau_feedback=%6f)\n",
-                            scriptData.get("prefix"),
-                            myName,
+                py.append(String.format("nef.templates.linear_system.make(%s, name='%s', neurons=%d, A=%s, tau_feedback=%f)\n",
+                			pythonNetworkName,
                             linear.get("name"),
                             (Integer)linear.get("neurons"),
                             a.toString(),
-                            (Float)linear.get("tau_feedback")));
+                            (Double)linear.get("tau_feedback")));
             }
         } 
 
@@ -1343,14 +1345,17 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             while (iter.hasNext())
             {
                 HashMap binding = (HashMap)iter.next();
-                py.append(String.format("nef.templates.binding.make(%1s%2s, name='%3s', outputName='%4s', N_per_D=%5d, invertA=%6b, invertB=%7b)\n",
-                            scriptData.get("prefix"),
-                            myName,
+                
+                String invertA = (Boolean)myMetaData.get("invertA") ? "True" : "False";
+                String invertB = (Boolean)myMetaData.get("invertB") ? "True" : "False";
+                
+                py.append(String.format("nef.templates.binding.make(%s, name='%s', outputName='%s', N_per_D=%d, invertA=%s, invertB=%s)\n",
+                			pythonNetworkName,
                             binding.get("name"),
                             (String)binding.get("outputName"),
                             (Integer)binding.get("N_per_D"),
-                            (Boolean)binding.get("invertA"),
-                            (Boolean)binding.get("invertB")));
+                            invertA,
+                            invertB));
             }
         } 
 
@@ -1360,15 +1365,17 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             while (iter.hasNext())
             {
                 HashMap bgrule = (HashMap)iter.next();
-                py.append(String.format("nef.templates.basalganglia_rule.make(%1s, %2s%3s, index=%4d, dim=%5d, pattern='%6s', pstc=%7f, use_single_input=%8b)\n",
+                String use_single_input = (Boolean)myMetaData.get("use_single_input") ? "True" : "False";
+                
+                // going to assume the current network is the BG...BG_rules can only be added on BG networks.
+                py.append(String.format("nef.templates.basalganglia_rule.make(%s, %s, index=%d, dim=%d, pattern='%s', pstc=%f, use_single_input=%s)\n",
                             scriptData.get("netName"),
-                            scriptData.get("prefix"),
-                            myName,
+                            pythonNetworkName,
                             (Integer)bgrule.get("index"),
                             (Integer)bgrule.get("dim"),
                             (String)bgrule.get("pattern"),
-                            (Float)bgrule.get("tau_input"),
-                            (Boolean)bgrule.get("use_single_input")));
+                            (Double)bgrule.get("tau_input"),
+                            use_single_input));
             }
         } 
 
@@ -1378,13 +1385,12 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             while (iter.hasNext())
             {
                 HashMap gate = (HashMap)iter.next();
-                py.append(String.format("nef.templates.gate.make(%1s%2s, name='%3s', gated='%4s', neurons=%5d, pstc=%6f)\n",
-                            scriptData.get("prefix"),
-                            myName,
+                py.append(String.format("nef.templates.gate.make(%s, name='%s', gated='%s', neurons=%d, pstc=%f)\n",
+                			pythonNetworkName,
                             gate.get("name"),
                             (String)gate.get("gated"),
                             (Integer)gate.get("neurons"),
-                            (Float)gate.get("pstc")));
+                            (Double)gate.get("pstc")));
             }
         } 
 
@@ -1394,22 +1400,16 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             while (iter.hasNext())
             {
                 HashMap learnedterm = (HashMap)iter.next();
-                py.append(String.format("nef.templates.learned_termination.make(%1s%2s, errName='%3s', N_err=%4d, preName='%5s', postName='%6f', rate=%7f)\n",
-                            scriptData.get("prefix"),
-                            myName,
+                py.append(String.format("nef.templates.learned_termination.make(%s, errName='%s', N_err=%d, preName='%s', postName='%f', rate=%f)\n",
+                			pythonNetworkName,
                             learnedterm.get("errName"),
                             (Integer)learnedterm.get("N_err"),
                             (String)learnedterm.get("preName"),
                             (String)learnedterm.get("postName"),
-                            (Float)learnedterm.get("rate")));
+                            (Double)learnedterm.get("rate")));
             }
         }      
 
-        for(Projection proj : this.getProjections())
-		{
-			py.append(proj.toScript(scriptData));
-		}
-		
 		return py.toString();
 	}
 }
