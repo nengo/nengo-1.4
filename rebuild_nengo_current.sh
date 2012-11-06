@@ -6,12 +6,14 @@
 ( cd simulator && ant )
 ( cd simulator-ui && ant  && ant dist)  # -- known failure
 
-CURRENT=$(ls -t | grep nengo- | head -n 1)
-rm -f nengo-current
-ln -s $CURRENT nengo-current
+# -- abort on failure from now on
+set -e
 
-( cd nengo-current  \
-    && chmod +x nengo-cl external/ps* \
-    && mv python python_dontuse \
-    && ln -s ~/src/nengo/simulator-ui/python )
+CURRENT="$(ls -t | grep nengo- | grep -v .zip | head -n 1)"
+rm -f nengo-current
+ln -s "$CURRENT" nengo-current
+NENGO_GIT_ROOT="$PWD"
+
+( cd nengo-current && chmod +x nengo-cl external/ps* )
+( cd nengo-current && mv python python_dontuse && ln -s "$NENGO_GIT_ROOT/simulator-ui/python" )
 
