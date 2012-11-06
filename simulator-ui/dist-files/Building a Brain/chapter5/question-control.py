@@ -10,7 +10,7 @@ import nef.templates.gate as gating
 import nef.templates.basalganglia as bgtemplate
 import nef.templates.basalganglia_rule as bg_rule
 
-net = nef.Network('Question Answering with Control (pre-built)')
+net = nef.Network('Question Answering with Control (pre-built)',seed=1)
 
 # Define the vocabulary of vectors
 vocab = hrr.Vocabulary(D,max_similarity=0.05)
