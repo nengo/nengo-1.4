@@ -49,6 +49,7 @@ import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.DragAction;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.world.WorldObject;
+import ca.nengo.ui.lib.world.elastic.ElasticGround;
 import ca.nengo.ui.lib.world.piccolo.WorldGroundImpl;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
@@ -352,26 +353,46 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		canvasPressPt = pie.getCanvasPosition();
 		presspt = pie.getPosition();
 
+		pressNode = null;
 		for (PNode node = pie.getPath().getPickedNode(); node != null; node = node.getParent()) {
 			if (node instanceof PiccoloNodeInWorld) {
 				WorldObjectImpl wo = (WorldObjectImpl) ((PiccoloNodeInWorld) node).getWorldObject();
 				
 				if (wo != null && wo.isSelectable()) {
+					moveStackToFront(wo);
 					pressNode = wo;
-					wo.moveToFront();
-					
-					// EH - move parents to front, so that clicking on an ensemble brings the network window forward
-					// (I currently can't get this to work)
-//					WorldObjectImpl pnode = wo.getParent();
-//					while( pnode != null ) {
-//						pnode.moveToFront();
-//						pnode = pnode.getParent();
-//					}
-					
 					return;
 				}
 			}
 		}
+	}
+	
+	// moves a WorldObject, and all the Windows it lies in, to the front
+	protected void moveStackToFront(WorldObject wo) {
+		wo.moveToFront();
+		
+		// move all parent network windows to the front
+		UINetwork pnet = getParentNetwork(wo);
+		while (pnet != null) {
+			pnet.moveViewerWindowToFront();
+			pnet = getParentNetwork(pnet);
+		}
+	}
+	
+	/// Get the parent network of a given WorldObject, or null if in the top level
+	protected UINetwork getParentNetwork(WorldObject wo) {
+		UINetwork net = null;
+		
+		WorldObject pwo = wo.getParent();
+		if (pwo != null && pwo instanceof ElasticGround) {
+			pwo = pwo.getWorld();
+			if (pwo != null && pwo instanceof NetworkViewer) {
+				net = ((NetworkViewer)pwo).getViewerParent();
+			}
+		} else if (pwo instanceof UINetwork) {
+			net = (UINetwork)pwo;
+		}
+		return net;
 	}
 
 	/**

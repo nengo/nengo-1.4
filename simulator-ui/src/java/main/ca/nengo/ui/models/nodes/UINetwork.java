@@ -108,6 +108,10 @@ public class UINetwork extends UINodeViewable {
         super.attachViewToModel();
         getModel().getSimulator().addChangeListener(mySimulatorListener);
     }
+    
+    public void moveViewerWindowToFront() {
+    	getViewerWindow().moveToFront();
+    }
 
     @Override
     protected void constructMenu(PopupMenuBuilder menu) {
