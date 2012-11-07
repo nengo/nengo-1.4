@@ -34,3 +34,4 @@ def make(net,name='Basal Ganglia',dimensions=1, neurons=100,pstc=0.01,netbg=None
     if net is not None:
         net.add(netbg.network)
     
+    return netbg
