@@ -34,8 +34,14 @@ net.connect('C','B',words,pstc=0.1)
 net.make_input('input',words[index])
 net.connect('input','A',pstc=0.1)
 
+net.run(0.001)
+
+import time
+start=time.time()
+
 for i in range(5000):
     #print i,net.ensemble['A'].origin['X'].value.get_value()
     print i,words[index,:4],net.node['C'].accumulator[0.1].value.get_value()[:4]
     net.run(0.001)
+    print (time.time()-start)/(i+1)
 

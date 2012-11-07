@@ -27,7 +27,6 @@ package ca.nengo.ui.util;
 import java.awt.geom.Point2D;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 
 import ca.nengo.model.Node;

@@ -11,7 +11,7 @@ class RuleWatch:
     def measure(self,obj):
         return obj.getNode('rules').getOrigin('X').getValues().getValues()
     def views(self,obj):
-        names = obj.documentation[4:].split(',')
+        names = obj.documentation[6:].split(',')
         return [('rule activation',TextList,dict(func=self.measure,label="Rules",names=names,show_values=False,ignore_filter=True))]
 
 

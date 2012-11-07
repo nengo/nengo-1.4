@@ -116,7 +116,10 @@ public class ProbePlotHelper {
 
         if (probe.getTarget() instanceof NEFEnsemble) {
             NEFEnsemble e = (NEFEnsemble) probe.getTarget();
-            if ((e.getMode() == SimulationMode.DEFAULT )|| (e.getMode() == SimulationMode.PRECISE)) {
+            if ((e.getMode() == SimulationMode.DEFAULT )
+            		|| (e.getMode() == SimulationMode.PRECISE) 
+            		|| (e.getMode() == SimulationMode.APPROXIMATE)
+            		|| (e.getMode() == SimulationMode.EXPRESS)) {
                 return true;
             }
         }

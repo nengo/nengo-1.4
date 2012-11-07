@@ -40,18 +40,20 @@ import ca.nengo.util.MU;
  * @author Bryan Tripp
  */
 public class NEFUtil {
-
+	
 	/**
-	 * Calculates an instantaneous input-output mapping for an ensemble. 
+	 * Calculates an input-output mapping for an ensemble. 
 	 * 
 	 * @param origin The origin from which to take the output (must belong to an NEFEnsemble)
 	 * @param input Set of inputs directly into the ensemble (not through termination mapping/dynamics) 
-	 * @param mode SimulationMode in which to calculate the mapping; must be DIRECT or CONSTANT_RATE
+	 * @param mode SimulationMode in which to calculate the mapping. If DIRECT or CONSTANT_RATE, each input 
+	 * 		is treated separately and causes an independent output. Otherwise inputs are applied at 1ms time 
+	 * 		steps in a simulation, and neuron states are maintained across steps.  
 	 * @return Outputs from the given Origin for given inputs
 	 */
-	public static float[][] getOutput(DecodedOrigin origin, float[][] input, SimulationMode mode) {
-		
+	public static float[][] getOutput(DecodedOrigin origin, float[][] input, SimulationMode mode) {		
 		float[][] output = null;
+		float dt = .001f;
 		
 		try {
 			if ( !(origin.getNode() instanceof NEFEnsemble) ) {
@@ -70,7 +72,10 @@ public class NEFUtil {
 				ensemble.setMode(mode);
 				
 				for (int i = 0; i < input.length; i++) {
-					if (mode.equals(SimulationMode.CONSTANT_RATE)) {
+					if (mode.equals(SimulationMode.DIRECT) || mode.equals(SimulationMode.EXPRESS)) {
+						origin.run(input[i], 0f, 1f);
+						output[i] = ((RealOutput) origin.getValues()).getValues();					
+					} else {
 						for (int j = 0; j < nodes.length; j++) {
 							float radialInput = 0;
 							if (ensemble instanceof NEFEnsembleImpl) {
@@ -80,15 +85,14 @@ public class NEFUtil {
 								radialInput = MU.prod(input[i], encoders[j]);
 							}
 							((NEFNode) nodes[j]).setRadialInput(radialInput);
-							nodes[j].run(0f, 0f);					
+							if (mode.equals(SimulationMode.CONSTANT_RATE)) {
+								nodes[j].run(0f, 0f);
+							} else {
+								nodes[j].run((float) i * dt, (float) (i+1) * dt);
+							}
 						}
-						origin.run(null, 0f, 1f);
-						output[i] = ((RealOutput) origin.getValues()).getValues();					
-					} else if (mode.equals(SimulationMode.DIRECT)) {
-						origin.run(input[i], 0f, 1f);
-						output[i] = ((RealOutput) origin.getValues()).getValues();					
-					} else {
-						throw new SimulationException("Instantaneous input-output mapping can only be done in DIRECT or CONSTANT_RATE simulation mode");
+						origin.run(null, (float) i * dt, (float) (i+1) * dt);
+						output[i] = ((RealOutput) origin.getValues()).getValues();
 					}				
 				}
 				ensemble.setMode(oldMode);

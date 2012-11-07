@@ -17,7 +17,6 @@ import ca.nengo.ui.lib.actions.RemoveObjectsAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.ZoomToFitAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
-import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.Interactable;
 import ca.nengo.ui.lib.world.World;

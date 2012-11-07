@@ -33,21 +33,14 @@ import java.awt.BasicStroke;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Stack;
 
-import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.DragAction;
-import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.elastic.ElasticGround;
 import ca.nengo.ui.lib.world.piccolo.WorldGroundImpl;
@@ -57,7 +50,6 @@ import ca.nengo.ui.lib.world.piccolo.WorldSkyImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
-import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.models.viewers.NetworkViewer;
 import edu.umd.cs.piccolo.PCamera;
@@ -210,11 +202,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
-	/// Overridden methods from PDragSequenceEventHandler
-
-	protected void endStandardSelection() {
-		pressNode = null;
-	}
+	/// Selection changed
 	
 	private boolean isActiveSelectionHandler() {
 		return (this == getActiveSelectionHandler());
@@ -232,120 +220,6 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			selectionChanged( getSelection() );
 	}
 	
-	///////////////////////////////////////////////////////////////////////////
-	/// Dragging
-	
-	protected void startDrag(PInputEvent e) {
-		super.startDrag(e);
-
-		initializeSelection(e);
-
-		if (shouldStartMarqueeMode()) {
-			initializeMarquee(e);
-
-			if (!isOptionSelection(e)) {
-				startMarqueeSelection(e);
-			} else {
-				startOptionMarqueeSelection(e);
-			}
-		} else {
-			if (!isOptionSelection(e)) {
-				startStandardSelection(e);
-			} else {
-				startStandardOptionSelection(e);
-			}
-
-			Collection<WorldObject> nodes = getSelection();
-			if (nodes.size() > 0) {
-				dragAction = new DragAction(nodes);
-				panHandler.setInverted(true);
-			}
-
-		}
-	}
-
-	protected void drag(PInputEvent e) {
-		super.drag(e);
-
-		if (shouldStartMarqueeMode() && marquee != null) {
-			updateMarquee(e);
-
-			if (!isOptionSelection(e)) {
-				computeMarqueeSelection(e);
-			} else {
-				computeOptionMarqueeSelection(e);
-			}
-		} else {
-			dragStandardSelection(e);
-
-		}
-	}
-
-	/**
-	 * This gets called continuously during the drag, and is used to animate the
-	 * marquee
-	 */
-	protected void dragActivityStep(PInputEvent aEvent) {
-		if (marquee != null) {
-			float origStrokeNum = strokeNum;
-			
-			// Increment by partial steps to slow down animation
-			strokeNum = (strokeNum + 0.5f) % NUM_STROKES; 
-			if ((int) strokeNum != (int) origStrokeNum) {
-				marquee.setStroke(strokes[(int) strokeNum]);
-			}
-		}
-	}
-
-	protected void dragStandardSelection(PInputEvent e) {
-
-		Iterator<WorldObjectImpl> selectionEn = selectedObjects.iterator();
-
-		if (selectionEn.hasNext()) {
-			e.setHandled(true);
-			PDimension d = e.getDeltaRelativeTo(selectableParent.getPiccolo());
-
-			while (selectionEn.hasNext()) {
-				WorldObjectImpl node = selectionEn.next();
-				if (!node.isAnimating()) {
-					PDimension gDist = new PDimension();
-					gDist.setSize(d);
-
-					node.localToParent(node.globalToLocal(gDist));
-
-					node.dragOffset(gDist.getWidth(), gDist.getHeight());
-				}
-			}
-		}
-	}
-
-	protected void endDrag(PInputEvent e) {
-		super.endDrag(e);
-		panHandler.setInverted(false);
-		endSelection(true);
-	}
-
-	public void endSelection(boolean unselect) {
-		if (marquee != null) {
-			// Remove marquee
-			marquee.removeFromParent();
-			marquee = null;
-		}
-		if (!shouldStartMarqueeMode()) {
-			if (dragAction != null) {
-				dragAction.setFinalPositions();
-				dragAction.doAction();
-				dragAction = null;
-			}
-
-			if (unselect && (pressNode == null || pressNode instanceof Window) && getSelection().size() > 0) {
-				unselectAll();
-			}
-			endStandardSelection();
-		}
-	}
-
-
 	///////////////////////////////////////////////////////////////////////////
 	/// Selection
 	
@@ -522,6 +396,123 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		// Because unselect() removes from selection, we need to
 		// take a copy of it first so it isn't changed while we're iterating
 		unselect(new ArrayList<WorldObjectImpl>(selectedObjects));
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	/// Dragging, including overridden methods from PDragSequenceEventHandler
+	
+	protected void startDrag(PInputEvent e) {
+		super.startDrag(e);
+
+		initializeSelection(e);
+
+		if (shouldStartMarqueeMode()) {
+			initializeMarquee(e);
+
+			if (!isOptionSelection(e)) {
+				startMarqueeSelection(e);
+			} else {
+				startOptionMarqueeSelection(e);
+			}
+		} else {
+			if (!isOptionSelection(e)) {
+				startStandardSelection(e);
+			} else {
+				startStandardOptionSelection(e);
+			}
+
+			Collection<WorldObject> nodes = getSelection();
+			if (nodes.size() > 0) {
+				dragAction = new DragAction(nodes);
+				panHandler.setInverted(true);
+			}
+
+		}
+	}
+
+	protected void drag(PInputEvent e) {
+		super.drag(e);
+
+		if (shouldStartMarqueeMode() && marquee != null) {
+			updateMarquee(e);
+
+			if (!isOptionSelection(e)) {
+				computeMarqueeSelection(e);
+			} else {
+				computeOptionMarqueeSelection(e);
+			}
+		} else {
+			dragStandardSelection(e);
+
+		}
+	}
+
+	/**
+	 * This gets called continuously during the drag, and is used to animate the
+	 * marquee
+	 */
+	protected void dragActivityStep(PInputEvent aEvent) {
+		if (marquee != null) {
+			float origStrokeNum = strokeNum;
+			
+			// Increment by partial steps to slow down animation
+			strokeNum = (strokeNum + 0.5f) % NUM_STROKES; 
+			if ((int) strokeNum != (int) origStrokeNum) {
+				marquee.setStroke(strokes[(int) strokeNum]);
+			}
+		}
+	}
+
+	protected void dragStandardSelection(PInputEvent e) {
+
+		Iterator<WorldObjectImpl> selectionEn = selectedObjects.iterator();
+
+		if (selectionEn.hasNext()) {
+			e.setHandled(true);
+			PDimension d = e.getDeltaRelativeTo(selectableParent.getPiccolo());
+
+			while (selectionEn.hasNext()) {
+				WorldObjectImpl node = selectionEn.next();
+				if (!node.isAnimating()) {
+					PDimension gDist = new PDimension();
+					gDist.setSize(d);
+
+					node.localToParent(node.globalToLocal(gDist));
+
+					node.dragOffset(gDist.getWidth(), gDist.getHeight());
+				}
+			}
+		}
+	}
+
+	protected void endDrag(PInputEvent e) {
+		super.endDrag(e);
+		panHandler.setInverted(false);
+		endSelection(true);
+	}
+
+	public void endSelection(boolean unselect) {
+		if (marquee != null) {
+			// Remove marquee
+			marquee.removeFromParent();
+			marquee = null;
+		}
+		if (!shouldStartMarqueeMode()) {
+			if (dragAction != null) {
+				dragAction.setFinalPositions();
+				dragAction.doAction();
+				dragAction = null;
+			}
+
+			if (unselect && (pressNode == null || pressNode instanceof Window) && getSelection().size() > 0) {
+				unselectAll();
+			}
+			endStandardSelection();
+		}
+	}
+	
+	protected void endStandardSelection() {
+		pressNode = null;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

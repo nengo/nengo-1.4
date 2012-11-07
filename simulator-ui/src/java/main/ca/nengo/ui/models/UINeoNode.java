@@ -39,9 +39,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
 
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import ca.nengo.io.FileManager;
@@ -62,16 +59,13 @@ import ca.nengo.ui.actions.AddProbeAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
-import ca.nengo.ui.actions.SaveNodeAction;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.UserDialogs;
 import ca.nengo.ui.lib.actions.ActionException;
-import ca.nengo.ui.lib.actions.ReversableAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.UserCancelledException;
 import ca.nengo.ui.lib.objects.activities.TransientStatusMessage;
 import ca.nengo.ui.lib.objects.models.ModelObject;
-import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;

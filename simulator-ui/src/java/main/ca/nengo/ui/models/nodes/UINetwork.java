@@ -65,8 +65,6 @@ public class UINetwork extends UINodeViewable {
         }
     }
 
-    private static final String LAYOUT_MANAGER_KEY = "layout/manager";
-
     public static final String typeName = "Network";
 
     public static void constructSimulatorMenu(PopupMenuBuilder menu, UINetwork network) {

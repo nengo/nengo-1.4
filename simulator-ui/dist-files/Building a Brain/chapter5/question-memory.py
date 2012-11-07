@@ -2,7 +2,6 @@ D=20
 N_input=300
 N_mem=50
 N_conv=70
-mySeed=11 
 
 import nef
 import nef.convolution
@@ -12,7 +11,7 @@ import random
 
 vocab=hrr.Vocabulary(D,max_similarity=0.1)
 
-net=nef.Network('Question Answering with Memory (pre-built)')
+net=nef.Network('Question Answering with Memory (pre-built)',seed=11)
 net.make('A',N_input,D)
 net.make('B',N_input,D)
 net.make('C',N_input,D)

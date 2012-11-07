@@ -10,7 +10,7 @@
   ('memory', None, {'x': 335, 'height': 32, 'label': 0, 'width': 81, 'y': 57}),
   ('thalamus', 'firing rate', {'x': 61, 'height': 90, 'label': 1, 'width': 75, 'rows': None, 'y': 263}),
   ('GPi', 'firing rate', {'x': 555, 'height': 75, 'label': 1, 'width': 60, 'rows': None, 'y': 275}),
-  ('motor', 'semantic pointer', {'x': 614, 'height': 117, 'sel_dim': [0, 1, 2, 3], 'label': 0, 'width': 176, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': -8}),
+  ('motor', 'semantic pointer', {'x': 614, 'height': 117, 'sel_dim': [1, 2, 3, 4], 'label': 0, 'width': 176, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': -8}),
   ('visual', 'value (grid)|X', {'x': 32, 'height': 65, 'label': 0, 'width': 67, 'y': 10}),
   ('memory', 'value (grid)|X', {'x': 258, 'height': 67, 'label': 0, 'width': 67, 'y': 25}),
   ('motor', 'value (grid)|X', {'x': 544, 'height': 67, 'label': 0, 'width': 67, 'y': 39}),
