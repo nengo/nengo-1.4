@@ -73,7 +73,9 @@ def test_reproducible_small_spiking(mode='spiking'):
             assert np.all(stats0[key] == stats1[key])
         except:
             print key
-            print np.hstack([stats0[key],  stats1[key]])
+            t = np.hstack([stats0[key],  stats1[key]])
+            for row in t:
+                print row
             raise
 
 
