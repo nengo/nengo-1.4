@@ -8,15 +8,18 @@ from ..nengo_deco import nengo_log
 @nengo_log
 def connect_something(logfile, orig=True, mode=None, seed=None):
     import nef
+    import math
     net = nef.Network('top')
     netA = nef.Network('A')
     netB = nef.Network('B')
+    netA.make_input('i0', math.sin)
     netA.make('X', 100, 1, mode=mode, seed=seed + 0)
     netA.make('Y', 100, 1, mode=mode, seed=seed + 1)
     netB.make('X', 100, 1, mode=mode, seed=seed + 2)
     netB.make('Y', 100, 1, mode=mode, seed=seed + 3)
     net.add(netA.network)
     net.add(netB.network)
+    netA.connect('i0', 'X')
     net.connect('A.X', 'B.Y')
     #
     log = nef.log.TimelockedLog(network=net, filename=logfile)
@@ -49,6 +52,13 @@ def test_sane_stats():
     assert np.all(np.var(stats0['A.X']) > 0)
 
 
+def diffstats(s0, s1, k):
+    print "DiffStats", k
+    t = np.hstack([s0[k],  s1[k]])
+    for row in t:
+        print row
+
+
 def test_mode_has_some_effect():
     # test that a small model can be run twice and give the same result
     stats_spiking = connect_something(t=1.0, seed=123, mode='spiking')
@@ -61,7 +71,8 @@ def test_mode_has_some_effect():
             # -- assert that most elements do not match
             assert np.mean(stats_rate[key] != stats_spiking[key]) > 0.9
             assert np.mean(stats_direct[key] != stats_spiking[key]) > 0.9
-            assert np.mean(stats_direct[key] != stats_rate[key]) > 0.9
+            # -- direct and rate modes actually match to 3 decimals pretty often
+            assert np.mean(stats_direct[key] != stats_rate[key]) > 0.3
 
 
 def test_reproducible_small_spiking(mode='spiking'):
@@ -72,10 +83,7 @@ def test_reproducible_small_spiking(mode='spiking'):
         try:
             assert np.all(stats0[key] == stats1[key])
         except:
-            print key
-            t = np.hstack([stats0[key],  stats1[key]])
-            for row in t:
-                print row
+            diffstats(stats0, stats1, key)
             raise
 
 
