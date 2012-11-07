@@ -76,6 +76,7 @@ import ca.nengo.ui.lib.actions.DragAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.UserCancelledException;
 import ca.nengo.ui.lib.misc.ShortcutKey;
+import ca.nengo.ui.lib.objects.lines.LineConnector;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.UserMessages;
@@ -92,6 +93,7 @@ import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.constructors.CNetwork;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.models.nodes.widgets.UIProbe;
+import ca.nengo.ui.models.nodes.widgets.UIProjection;
 import ca.nengo.ui.models.nodes.widgets.Widget;
 import ca.nengo.ui.script.ScriptConsole;
 import ca.nengo.ui.util.NengoClipboard;
@@ -600,6 +602,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         if (selectedObj != null) {
             if (selectedObj instanceof UINeoNode) {
                 node = (UINeoNode) selectedObj;
+            } else if (selectedObj instanceof UIProjection) {
+            	if (((UIProjection) selectedObj).getTermination() != null) {
+            		node = ((UIProjection) selectedObj).getTermination().getNodeParent();
+            	} else {
+            		node = ((UIProjection) selectedObj).getOriginUI().getNodeParent();
+            	}
             } else if (selectedObj instanceof Widget){
                 node = ((Widget) selectedObj).getNodeParent();
             } else if (selectedObj instanceof UIProbe) {
