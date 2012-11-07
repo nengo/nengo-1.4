@@ -30,6 +30,7 @@ package ca.nengo.model.impl;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -48,6 +49,7 @@ import ca.nengo.model.Probeable;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
+import ca.nengo.model.StepListener;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
@@ -105,6 +107,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	protected int myNumJavaThreads = 1;
 	protected boolean myUseGPU = true;
 
+    private transient final Collection<StepListener> myStepListeners;
+
 
 	/**
 	 * Sets up a network's data structures
@@ -128,6 +132,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
 		OrderedExposedOrigins = new LinkedList <Origin> ();
 		OrderedExposedTerminations = new LinkedList <Termination> ();
+		
+		myStepListeners = new ArrayList<StepListener>(1);
 	}
 
 	/**
@@ -1187,6 +1193,19 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		}
 
 		return result;
+	}
+	
+	public void addStepListener(StepListener listener) {
+        myStepListeners.add(listener);
+	}
+	public void removeStepListener(StepListener listener) {
+        myStepListeners.remove(listener);
+	}
+	
+	public void fireStepListeners(float time) {
+		for (StepListener listener: myStepListeners) {
+			listener.stepStarted(time);
+		}
 	}
 
 }

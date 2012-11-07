@@ -195,4 +195,9 @@ public interface Network extends Node, Probeable {
 	 * @param value Value of the named metadata item
 	 */
 	public void setMetaData(String key, Object value);
+	
+	public void addStepListener(StepListener listener);
+	public void removeStepListener(StepListener listener);
+	public void fireStepListeners(float time);
+	
 }
