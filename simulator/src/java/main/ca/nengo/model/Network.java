@@ -201,11 +201,16 @@ public interface Network extends Node, Probeable {
 	 */
 	public void setMetaData(String key, Object value);
 	
+
     /**
      * @param scriptData Map of class parent and prefix data for generating python script
      * @return Python script for generating special or template ensembles and terminations in the network
      * @throws ScriptGenException if the node cannot be generated in script
      */
 	public String toPostScript(HashMap<String, Object> scriptData) throws ScriptGenException;
+
+	public void addStepListener(StepListener listener);
+	public void removeStepListener(StepListener listener);
+	public void fireStepListeners(float time);
 
 }

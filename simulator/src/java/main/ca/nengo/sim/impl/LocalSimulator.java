@@ -218,6 +218,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
     public void step(float startTime, float endTime)
             throws SimulationException {
+
+    	myNetwork.fireStepListeners(startTime);
     	
         if(NodeThreadPool.isMultithreading() && myNodeThreadPool != null){
             myNodeThreadPool.step(startTime, endTime);
