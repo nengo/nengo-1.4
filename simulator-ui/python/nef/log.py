@@ -230,19 +230,25 @@ class TimelockedLog(Log):
     def __init__(self, skipticks=1, **kwargs):
         Log.__init__(self, **kwargs)
         self.skipticks = skipticks
-        self.skiptick_counter = 0
+        self.skipticks_counter = 0
 
-    def tick(self):
+    def stepStarted(self, time):
         if len(self.logs)==0: return
-        if not self.wrote_header: self.write_header()
-        # -- t_end and t_start are assigned from net.run
-        dt = self.t_end-self.t_start
+        
+        if self.t is None or self.t>time:
+            self.init()
+            dt=None
+        else:
+            dt=time-self.t
+
+        self.t = time
         for log in self.logs:
             log.tick(dt)
-        if self.skiptick_counter == 0:
-            self.write_data()    
-            # -- reset internal accumulators of logs that count spikes
-            for log in self.logs: log.flush()
-        self.skiptick_counter = (self.skiptick_counter + 1) % self.skipticks
 
+        if self.skipticks_counter == 0:
+            self.write_data()    
+            for log in self.logs:
+                log.flush()
+
+        self.skipticks_counter = (self.skipticks_counter + 1) % self.skipticks
            
