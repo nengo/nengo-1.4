@@ -252,83 +252,83 @@ public class ListPropertyImplTest extends TestCase {
 
 			myG = new float[]{1, 2};
 		}
-
+		@SuppressWarnings("unused")
 		public String getA(int index) {
 			return myA.get(index);
 		}
-
+		@SuppressWarnings("unused")
 		public void setA(int index, String val) {
 			myA.set(index, val);
 		}
-
+		@SuppressWarnings("unused")
 		public int getNumA() {
 			return myA.size();
 		}
-
+		@SuppressWarnings("unused")
 		public String getB(int index) {
 			return myB.get(index);
 		}
-
+		@SuppressWarnings("unused")
 		public void setB(int index, String val) {
 			myB.set(index, val);
 		}
-
+		@SuppressWarnings("unused")
 		public int getNumB() {
 			return myB.size();
 		}
-
+		@SuppressWarnings("unused")
 		public void addB(String val) {
 			myB.add(val);
 		}
-
+		@SuppressWarnings("unused")
 		public void removeB(int index) {
 			myB.remove(index);
 		}
-
+		@SuppressWarnings("unused")
 		public void insertB(int index, String val) {
 			myB.add(index, val);
 		}
-
+		@SuppressWarnings("unused")
 		public String getC(int index) {
 			return myC.get(index);
 		}
-
+		@SuppressWarnings("unused")
 		public int getNumC() {
 			return myC.size();
 		}
-
+		@SuppressWarnings("unused")
 		public String getD(int index) {
 			return myD[index];
 		}
-
+		@SuppressWarnings("unused")
 		public String[] getAllD() {
 			return myD;
 		}
-
+		@SuppressWarnings("unused")
 		public String getE(int index) {
 			return myE[index];
 		}
-
+		@SuppressWarnings("unused")
 		public String[] getEs() {
 			return myE;
 		}
-
+		@SuppressWarnings("unused")
 		public void setEs(String[] vals) {
 			myE = vals;
 		}
-
+		@SuppressWarnings("unused")
 		public List<String> getF() {
 			return myF;
 		}
-
+		@SuppressWarnings("unused")
 		public int getNumG() {
 			return myG.length;
 		}
-
+		@SuppressWarnings("unused")
 		public float getG(int index) {
 			return myG[index];
 		}
-
+		@SuppressWarnings("unused")
 		public void setG(int index, float value) {
 			myG[index] = value;
 		}

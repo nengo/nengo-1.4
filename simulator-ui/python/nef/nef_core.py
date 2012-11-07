@@ -197,7 +197,7 @@ class Network:
             r=[radius]*dimensions
 
         parent,name=self._parse_name(name)
-                
+
         n=ef.make(name,neurons,r,storage_name,False)
         if noise is not None:
             for nn in n.nodes:
@@ -211,16 +211,18 @@ class Network:
         return n
     
     def _parse_name(self,name):
-        original_name=name
+        """ Split name by delimiter '.'.
+        
+        Returns immediate parent (object) and last term (string).
+        """
         parent=self.network
         while '.' in name:
             node,name=name.split('.',1)
             try:
                 parent=parent.getNode(node)
             except:
-                raise AttributeError('Could not find parent node for "%s"'%name)    
+                raise AttributeError('Could not find parent node for "%s"'%name)
         return parent,name                
-        
 
     def make_array(self,name,neurons,length,dimensions=1,**args):
         """Create and return an array of ensembles.  This acts like a high-dimensional ensemble,
@@ -271,7 +273,7 @@ class Network:
                 args['encoders']=encoders[i%len(encoders)]
             n=self.make('%d'%i,neurons,dimensions,add_to_network=False,**args)
             nodes.append(n)
-            
+
         parent,name=self._parse_name(name)    
         ensemble=array.NetworkArray(name,nodes)
         parent.addNode(ensemble)
@@ -746,7 +748,7 @@ class Network:
 
             return projection_network.addProjection(origin,term)
         else:
-            assert 0, 'WARNING: creating a origin/termination is deprecated'
+            pass  # -- origin / termination has been created, work complete.
     
     def learn(self,post,learn_term,mod_term,rate=5e-7,**kwargs):
         """Apply a learning rule to a termination of the *post* ensemble.
@@ -963,7 +965,21 @@ class Network:
         self.network.addNode(node)
         return node
 
-    '''
+
+    def remove(self,node):
+        """Remove nodes from a network. Either the node object or the node name can
+        be used as a parameter to this function
+                  
+        :param node: the node or name of the node to be removed
+        :returns: node removed
+        """
+        if( not isinstance(node, str) ):
+            node = node.name
+        return_node = self.network.getNode(node)
+        self.network.removeNode(node)
+        return node
+
+
     def get(self,name,default=Exception,require_origin=False):
         """Return the node with the given *name* from the network
         """
@@ -1005,7 +1021,6 @@ class Network:
                     else:
                         return default    
         return node
-'''
 
     def releaseMemory(self):
         """Attempt to release extra memory used by the Network.  Call only after all
@@ -1107,8 +1122,9 @@ class Network:
         :param float maxy: maximum y value to plot
         """                               
         import timeview
-        timeview.funcrep1d.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
+        timeview.funcrep1d.FuncRepWatchCache.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
 
+# TODO: move this back to caller location as nested fn.
 def _expose_toplevel(o, nodes, expose_attr):
     """
     expose_attr: 'exposeOrigin' or 'exposeTerminal'
@@ -1141,5 +1157,4 @@ def test():
     m=net.compute_transform(3,4,index_pre=[1,2],index_post=[2,1])
     assert m==[[0,0,0],[0,0,1],[0,1,0],[0,0,0]]
     print 'tests passed'
-
 

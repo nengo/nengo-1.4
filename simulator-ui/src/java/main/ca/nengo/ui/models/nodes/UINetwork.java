@@ -65,8 +65,6 @@ public class UINetwork extends UINodeViewable {
         }
     }
 
-    private static final String LAYOUT_MANAGER_KEY = "layout/manager";
-
     public static final String typeName = "Network";
 
     public static void constructSimulatorMenu(PopupMenuBuilder menu, UINetwork network) {
@@ -107,6 +105,10 @@ public class UINetwork extends UINodeViewable {
     public void attachViewToModel() {
         super.attachViewToModel();
         getModel().getSimulator().addChangeListener(mySimulatorListener);
+    }
+    
+    public void moveViewerWindowToFront() {
+    	getViewerWindow().moveToFront();
     }
 
     @Override

@@ -16,7 +16,7 @@ Brief setup instructions
 The important details of the Eclipse setup are as follows. See the next section for detailed setup instructions.
 
 #) Add the projects to Eclipse using "File->New->Java project...", and creating the project from the source directory. Add "simulator" first, and then "simulator-ui".
-#) To run the program, add a new run configuration ("Run->Run configurations"). The configuration should be a "Java Application", the project "simulator-ui", and the main class "ca.nengo.ui.NengoGraphics".
+#) To run the program, add a new run configuration ("Run->Run configurations"). The configuration should be a "Java Application", the project "simulator-ui", and the main class "ca.nengo.ui.NengoLauncher".
 
 
 Detailed setup instructions
@@ -65,7 +65,7 @@ into the text box. Press finish.
 #) Back in the "Project Explorer" pane, right-click your new "simulator-ui"
 project and select "Run as -> Java Application" from the drop-down menu.  You'll be presented with
 a huge list of options, but type "Nengo" into the search bar at the top,
-and that should narrow the selection down to just one: NengoGraphics. Click
+and that should narrow the selection down to just one: NengoLauncher. Click
 it, and you should be looking at the Nengo GUI running from within Eclipse.
 You're done!
 

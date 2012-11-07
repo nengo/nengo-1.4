@@ -14,3 +14,18 @@
   ('Gate2', 'firing rate', {'x': 807, 'height': 100, 'auto_improve': 0, 'label': 1, 'width': 94, 'rows': None, 'y': 228}),
   ('Memory', 'value (grid)|X', {'x': 455, 'height': 125, 'label': 1, 'width': 117, 'y': 22})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-102.52978406316029,y=91.06193423847745,width=1513.4243772269897,height=937.0026765046296]
+# Gate1 (NEFEnsemble)=Point2D.Double[469.9482421906013, 522.8507222024193]
+# Visual (Network)=Point2D.Double[104.416953855238, 222.9349932956629]
+# Basal Ganglia (Network)=Point2D.Double[280.04174733466334, 634.6772425502666]
+# Unbind (Network)=Point2D.Double[959.9309692424158, 481.0045691170599]
+# Input (Generic Node)=Point2D.Double[-75.81078356635089, 301.87025060564156]
+# Memory (Network)=Point2D.Double[784.2259393772201, 270.1348337491895]
+# Gate2 (NEFEnsemble)=Point2D.Double[1118.1603190763583, 685.0946237638093]
+# Motor (Network)=Point2D.Double[1200.037607287479, 299.78839882801935]
+# Thalamus (Network)=Point2D.Double[577.141269417792, 698.4454232224839]
+# Channel (Network)=Point2D.Double[551.3940734883954, 246.7846665422595]

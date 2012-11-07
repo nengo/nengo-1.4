@@ -16,7 +16,7 @@ class Rules:            #Define mappings for BG and Thal
     
 
 
-class Routing(SPA):     #Extend the imported SPA class
+class RoutingClean(SPA):     #Extend the imported SPA class
     dimensions=16        #Dimensions in SPs
     
     state=Buffer()       #Create a working memory/cortical element
@@ -26,11 +26,11 @@ class Routing(SPA):     #Extend the imported SPA class
 
     input=Input(10, vision='0.8*LETTER+D') #Define the starting input
 
-model=Routing()
+model=RoutingClean()
 
 # Create the clean-up memory.
 import hrr
 vocab = hrr.Vocabulary.defaults[model.dimensions] # get the vocabulary used by the rest of the network
 pd = [vocab['A'].v.tolist()] # get a preferred direction vector aligned to the 'A' vector
-cleanup = model.net.make('cleanup A', neurons=100, dimensions=1)
-model.net.connect(model.state.net.network.getOrigin('state'), cleanup, transform=pd)
+model.net.make('cleanup A', neurons=100, dimensions=1)
+model.net.connect(model.state.net.network.getOrigin('state'), 'cleanup A', transform=pd)

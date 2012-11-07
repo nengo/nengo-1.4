@@ -3,7 +3,6 @@ package ca.nengo.ui.lib.world.handlers;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.Stack;
 
 import javax.swing.JPopupMenu;
@@ -14,21 +13,15 @@ import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.world.Interactable;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
-import ca.nengo.ui.lib.world.piccolo.WorldObjectImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import ca.nengo.ui.models.NodeContainer;
-import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.nodes.UINetwork;
-import ca.nengo.ui.models.nodes.UINodeViewable;
 import ca.nengo.ui.models.viewers.NetworkViewer;
-import ca.nengo.ui.models.viewers.NodeViewer;
-import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.util.PDimension;
 
 /**
  * Handles mouse events. Passes double click and mouse context button events to

@@ -24,6 +24,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
 import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
@@ -57,14 +60,23 @@ public class PasteAction extends StandardAction {
 
     @Override
     protected void action() throws ActionException {
-        Node node = NengoGraphics.getInstance().getClipboard().getContents();
-        if (node != null) {
-            try {
-                CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-                nodeContainer.addNodeModel(node,posX,posY);
-            } catch (ContainerException e) {
-                throw new ActionException(e);
-            }
+        ArrayList<Node> nodes = NengoGraphics.getInstance().getClipboard().getContents();
+        ArrayList<Point2D> offsets = NengoGraphics.getInstance().getClipboard().getOffsets();
+        
+        if (nodes != null && nodes.size() > 0) {
+        	for (int i = 0; i < nodes.size(); i++) {
+        		Node node = nodes.get(i);
+        		try {
+        			CreateModelAction.ensureNonConflictingName(node, nodeContainer);
+        			if (posX == null || posY == null) {
+        				nodeContainer.addNodeModel(node, posX, posY);
+        			} else {
+        				nodeContainer.addNodeModel(node, posX + offsets.get(i).getX(), posY + offsets.get(i).getY());
+        			}
+        		} catch (ContainerException e) {
+        			throw new ActionException(e);
+        		}
+        	}
         } else {
             throw new ActionException("Clipboard is empty");
         }

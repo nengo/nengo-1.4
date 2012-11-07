@@ -247,6 +247,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 					origin.rebuildDecoder(myDecodingApproximators.get(nodeOrigin));
 				}
+				
+				if (origin.getExpressModel() != null) {
+					try {
+						origin.getExpressModel().update();
+					} catch (SimulationException e) {
+						throw new StructuralException("Can't update ExpressModel for radius change", e);
+					}
+				}
 			}
 		}
 
@@ -803,7 +811,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 				}
 
-				if ( getMode().equals(SimulationMode.DIRECT) ) {
+				if ( getMode().equals(SimulationMode.DIRECT) || getMode().equals(SimulationMode.EXPRESS)) {
 					//run ensemble dynamics if they exist (e.g. to model adaptation)
 					if (myDirectModeDynamics != null) {
 						TimeSeries dynamicsInput = new TimeSeriesImpl(new float[]{startTime, endTime},

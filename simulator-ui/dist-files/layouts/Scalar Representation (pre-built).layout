@@ -1,8 +1,15 @@
-({'height': 540, 'x': 0, 'width': 804, 'state': 0, 'y': 0},
- [('neurons', None, {'x': 367, 'height': 32, 'label': 0, 'width': 79, 'y': 130}),
-  ('input', None, {'x': 47, 'height': 32, 'label': 0, 'width': 51, 'y': 130}),
-  ('input', 'value|origin', {'x': 94, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 213}),
-  ('neurons', 'value|X', {'x': 460, 'height': 200, 'sel_dim': [0], 'label': 1, 'width': 300, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 216}),
-  ('input', 'control', {'x': 9, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 80, 'limits_w': 0, 'y': 213}),
-  ('neurons', 'spike raster', {'x': 459, 'height': 200, 'label': 1, 'width': 300, 'sample': 10, 'y': 12})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+({'state': 0, 'height': 561, 'width': 835, 'x': 0, 'y': 22},
+ [(u'neurons', None, {'label': 0, 'height': 32, 'width': 82, 'x': 394, 'y': 130}),
+  (u'input', None, {'label': 0, 'height': 32, 'width': 53, 'x': 74, 'y': 130}),
+  (u'input', 'value|origin', {'label': 1, 'sel_dim': [0], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 121, 'fixed_y': None, 'autozoom': 0, 'y': 213}),
+  (u'neurons', 'value|X', {'label': 1, 'sel_dim': [0], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 487, 'fixed_y': None, 'autozoom': 0, 'y': 216}),
+  (u'input', 'control', {'label': 1, 'range': 1.0, 'limits_w': 0, 'limits': 1, 'height': 200, 'width': 80, 'x': 36, 'y': 213}),
+  (u'neurons', 'spike raster', {'label': 1, 'sample': 10, 'height': 200, 'width': 300, 'x': 486, 'y': 12})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-108.71583089854336,y=-100.0,width=432.8672086720867,height=268.0]
+# input (Function Input)=Point2D.Double[0.0, 0.0]
+# neurons (NEFEnsemble)=Point2D.Double[176.0609690791177, -10.157407878880475]

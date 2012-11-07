@@ -70,6 +70,14 @@ public enum SimulationMode {
 	DIRECT(RATE),
 	
 	/**
+	 * Neurons are not used. The latent variables in population activity are simulated. 
+	 * This is the same as DIRECT mode, except that the large-scale effects of the neurons  
+	 * are also simulated by modelling noise and static distortion. This is meant as a computationally 
+	 * inexpensive mode with network behaviour that is as similar as possible to a spiking simulation.  
+	 */
+	EXPRESS(DEFAULT), 
+	
+	/**
 	 * A higher level of precision than DEFAULT. The default level should be accurate for most purposes, 
 	 * but this higher level of accuracy can serve as a way to verify that numerical issues are
 	 * not impacting results (eg error tolerance in a Runge-Kutta integration may be tightened beyond 

@@ -109,11 +109,10 @@ class Log(SimpleNode):
         if name is None: self.logname=self.network.network.name
         else: self.logname=name
 
-        # -- Disabling because it doesn't compile (JB Nov2012)
         if LogOverride.override_directory is not None:
             dir=LogOverride.override_directory
             filename=LogOverride.override_filename
-
+        
         self.dir=dir
         if not filename.endswith('.csv'): filename+='.csv'
         self.filename_template=filename
