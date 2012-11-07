@@ -155,10 +155,12 @@ class Log(StepListener):
         self.t=time
         for log in self.logs:
             log.tick(dt)
-        if self.t>=self.next_time:            
-            self.next_time+=self.interval
+        eps = 1e-10
+        if self.t + eps > self.next_time:            
+            self.next_time += self.interval
             self.write_data()    
-            for log in self.logs: log.flush()
+            for log in self.logs:
+                log.flush()
 
     def add_spikes(self,source,name=None,skip=0):    
         if name is None: name=source+'_spikes'
