@@ -4,7 +4,7 @@ from simplenode import SimpleNode
 from nef_core import Network
 from array import NetworkArray
 import hrr
-from ca.nengo.model import Origin
+from ca.nengo.model import Origin, StepListener
 import stats.reader
 import os
 
@@ -53,7 +53,7 @@ class LogVector(LogBasic):
     def init(self):
         self.value=numeric.array([0]*self.length(),typecode='f')
     def tick(self,dt):
-        if self.tau is None:
+        if self.tau is None or dt is None:
             self.value[:]=self.data()
         else:    
             self.value*=(1.0-dt/self.tau)
@@ -99,7 +99,7 @@ class LogSpikeCount(LogBasic):
 
 
 
-class Log(SimpleNode):
+class Log(StepListener):
     def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
         if not isinstance(network,Network):
             network=Network(network)
@@ -117,17 +117,18 @@ class Log(SimpleNode):
         self.filename_template=filename
         self.interval=interval
         self.tau=tau
+        self.t=None
 
         self.logs=[]
-        SimpleNode.__init__(self,'Log')
-        self.network.add(self)
+
+        self.network.network.addStepListener(self)
     
     def init(self):
         self.filename=self.make_filename()
         for log in self.logs:
             log.init()
         self.next_time=0
-        self.wrote_header=False
+        self.write_header()
 
     def make_filename(self):
         t=time.strftime('%Y%m%d-%H%M%S')
@@ -141,10 +142,19 @@ class Log(SimpleNode):
             
         return fn
                     
-    def tick(self):
+    def stepStarted(self, time):
         if len(self.logs)==0: return
-        if not self.wrote_header: self.write_header()
-        dt=self.t_end-self.t_start
+
+        
+        if self.t is None or self.t>time:
+            self.init()
+            dt=None
+        else:
+            dt=time-self.t
+
+        #print 'step',self.t,time,self.next_time
+        
+        self.t=time
         for log in self.logs:
             log.tick(dt)
         if self.t>=self.next_time:            
