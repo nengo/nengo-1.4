@@ -6,6 +6,7 @@ from ca.nengo.ui.configurable.descriptors import *
 from ca.nengo.ui.configurable import *
 import ca.nengo
 import inspect
+import threading
 
 ################################################################################
 class Properties:
@@ -320,19 +321,27 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
                 else: nodemodel = None
                 constructor.set_network(nodeContainer.getModel(),node = nodemodel)
                 uc = ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
+                
+                # do the configuring in a separate thread so we don't block the 
+                #  main UI thread (this was causing the progress indicator to 
+                #  not appear for templates)
+                threading.Thread(target=self.configureAndWait,args=(node,uc)).start()
 
-                if node is not None:
-                    origins = node.model.getOrigins()
-                    terminations = node.model.getTerminations()
-                uc.configureAndWait()
-
-                if node is not None:
-                    for o in node.model.getOrigins():
-                        if o not in origins: node.showOrigin(o.name)
-                    for t in node.model.getTerminations():
-                        if t not in terminations: node.showTermination(t.name)
         except ca.nengo.ui.configurable.managers.ConfigDialogClosedException:
             pass
+    
+    def configureAndWait(self, node, user_configurer):
+        if node is not None:
+            origins = node.model.getOrigins()
+            terminations = node.model.getTerminations()
+        user_configurer.configureAndWait()
+
+        if node is not None:
+            for o in node.model.getOrigins():
+                if o not in origins: node.showOrigin(o.name)
+            for t in node.model.getTerminations():
+                if t not in terminations: node.showTermination(t.name)
+                
             
 ################################################################################
 class TemplateTransferable(java.awt.datatransfer.Transferable):
