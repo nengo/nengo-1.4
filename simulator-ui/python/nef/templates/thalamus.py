@@ -21,7 +21,7 @@ def test_params(net,p):
 from java.util import ArrayList
 from java.util import HashMap
 def make(net,name='Network Array', neurons=50, dimensions=2, inhib_scale=3, tau_inhib=.005, useQuick=True):
-    thal = net.make_array(name, neurons, dimensions, max_rate=(100,300), intercept=(-1, 0), radius=1, encoders=[[1]], quick=useQuick)    
+    thalamus = net.make_array(name, neurons, dimensions, max_rate=(100,300), intercept=(-1, 0), radius=1, encoders=[[1]], quick=useQuick)    
 
     # setup inhibitory scaling matrix
     inhib_scaling_matrix = [[0]*dimensions for i in range(dimensions)]
@@ -33,11 +33,11 @@ def make(net,name='Network Array', neurons=50, dimensions=2, inhib_scale=3, tau_
         inhib_matrix_part = [[inhib_scaling_matrix[i]] * neurons]
         inhib_matrix.append(inhib_matrix_part[0])
 
-    thal.addTermination('bg_input', inhib_matrix, tau_inhib, False)
+    thalamus.addTermination('bg_input', inhib_matrix, tau_inhib, False)
 
     def addOne(x):
         return [x[0]+1]            
-    net.connect(thal, None, func=addOne, origin_name='xBiased', create_projection=False)
+    net.connect(thalamus, None, func=addOne, origin_name='xBiased', create_projection=False)
     
     if net.network.getMetaData("Thalamus") == None:
         net.network.setMetaData("Thalamus", HashMap())
@@ -58,4 +58,4 @@ def make(net,name='Network Array', neurons=50, dimensions=2, inhib_scale=3, tau_
     templates = net.network.getMetaData("templates")
     templates.add(name)
 
-    return thal
+    return thalamus
