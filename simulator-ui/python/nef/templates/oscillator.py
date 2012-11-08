@@ -25,6 +25,8 @@ import numeric
 def feedback(x):
     return x[0]+x[2]*x[1], x[1]-x[2]*x[0], 0
     
+from java.util import ArrayList
+from java.util import HashMap
 def make(net, name='Oscillator', neurons=100, dimensions=2, frequency = 5, tau_feedback=0.1, tau_input=0.01, scale=1, controlled = False):
     frequency = frequency*2*numeric.pi;
     if (controlled):
@@ -41,3 +43,30 @@ def make(net, name='Oscillator', neurons=100, dimensions=2, frequency = 5, tau_f
         net.connect(oscillator, oscillator, A, pstc=tau_feedback)
 
     oscillator.addDecodedTermination('input', B, tau_input, False)
+
+    
+    if net.network.getMetaData("oscillator") == None:
+        net.network.setMetaData("oscillator", HashMap())
+    oscillators = net.network.getMetaData("oscillator")
+
+    oscillator=HashMap(8)
+    oscillator.put("name", name)
+    oscillator.put("neurons", neurons)
+    oscillator.put("dimensions", dimensions)
+    oscillator.put("frequency", frequency)
+    oscillator.put("tau_feedback", tau_feedback)
+    oscillator.put("tau_input", tau_input)
+    oscillator.put("scale", scale)
+    oscillator.put("controlled", controlled)
+
+    oscillators.put(name, oscillator)
+
+    if net.network.getMetaData("templates") == None:
+        net.network.setMetaData("templates", ArrayList())
+    templates = net.network.getMetaData("templates")
+    templates.add(name)
+
+    if net.network.getMetaData("templateProjections") == None:
+        net.network.setMetaData("templateProjections", HashMap())
+    templateproj = net.network.getMetaData("templateProjections")
+    templateproj.put(name, name)

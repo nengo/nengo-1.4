@@ -1367,7 +1367,34 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                             (Double)integrator.get("tau_input"),
                             (Double)integrator.get("scale")));
             }
-        }       
+        }  
+		
+        if (myMetaData.get("oscillator") != null)
+        {
+            Iterator iter = ((HashMap)myMetaData.get("oscillator")).values().iterator();
+            while (iter.hasNext())
+            {
+                HashMap oscillator = (HashMap)iter.next();
+
+                String controlled = (Boolean)oscillator.get("controlled") ? "True" : "False";
+
+                if (!myNodeMap.containsKey(oscillator.get("name")))
+                {
+                    continue;
+                }
+
+                py.append(String.format("nef.templates.oscillator.make(%s, name='%s', neurons=%d, dimensions=%d, frequency=%f, tau_feedback=%f, tau_input=%f, scale=%f, controlled=%s)\n",
+                			pythonNetworkName,
+                            oscillator.get("name"),
+                            (Integer)oscillator.get("neurons"),
+                            (Integer)oscillator.get("dimensions"),
+                            (Double)oscillator.get("frequency"),
+                            (Double)oscillator.get("tau_feedback"),
+                            (Double)oscillator.get("tau_input"),
+                            (Double)oscillator.get("scale"),
+                            controlled));
+            }
+        }      
 
         if (myMetaData.get("linear") != null)
         {
