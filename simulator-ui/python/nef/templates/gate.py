@@ -23,7 +23,8 @@ def test_params(net, p):
     
 import nef
 import nef.array
-
+from java.util import ArrayList
+from java.util import HashMap
 def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
     gate=net.make(name, neurons, 1, intercept=(-0.7, 0), encoders=[[-1]])
     def addOne(x):
@@ -45,9 +46,9 @@ def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
     term = output.getTermination(oname)
     net.network.addProjection(orig, term)
 
-    if net.getMetaData("gate") == None:
-        net.setMetaData("gate", ArrayList())
-    gates = net.getMetaData("gate")
+    if net.network.getMetaData("gate") == None:
+        net.network.setMetaData("gate", HashMap())
+    gates = net.network.getMetaData("gate")
 
     gate=HashMap(4)
     gate.put("name", name)
@@ -55,6 +56,15 @@ def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
     gate.put("neurons", neurons)
     gate.put("pstc", pstc)
 
-    gates.add(gate)
+    gates.put(name, gate)
 
+    if net.network.getMetaData("templates") == None:
+        net.network.setMetaData("templates", ArrayList())
+    templates = net.network.getMetaData("templates")
+    templates.add(name)
+
+    if net.network.getMetaData("templateProjections") == None:
+        net.network.setMetaData("templateProjections", HashMap())
+    templateproj = net.network.getMetaData("templateProjections")
+    templateproj.put(name, gated)
 

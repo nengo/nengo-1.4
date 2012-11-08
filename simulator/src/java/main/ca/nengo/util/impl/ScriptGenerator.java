@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Stack;
 
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
@@ -20,7 +22,7 @@ public class ScriptGenerator extends DFSIterator{
 	StringBuilder script;
 	char spaceDelimiter = '_';
 	String topLevelPrefix = "net";
-
+    Stack<Network> parentNetwork;
     int inTemplateNetwork;
 	
 	public ScriptGenerator(File file) throws FileNotFoundException
@@ -30,20 +32,39 @@ public class ScriptGenerator extends DFSIterator{
 		script = new StringBuilder(); 
 		
 		this.writer = new PrintWriter(file);
+
+        parentNetwork = new Stack<Network>();
 		
 		writer.write("import nef\n");
 		writer.write("from ca.nengo.math.impl import ConstantFunction, FourierFunction, PostfixFunction\n");
 		writer.write("import math\n");
-		writer.write("\n");
 		
         inTemplateNetwork = 0;
 	}
+
+    public DFSIterator startDFS(Node node)
+    {
+        if (!(node instanceof Network))
+        {
+            System.out.println("Cannot generate script when top level node is not a Network");
+            return this;
+        }
+
+        parentNetwork.push((Network)node);
+        return super.startDFS(node);
+    }
 	
 	protected void pre(Node node)
 	{
-		if (inTemplateNetwork <= 0)
+        if (parentNetwork.peek().getMetaData("templates") != null &&
+                ((ArrayList)parentNetwork.peek().getMetaData("templates")).contains(node.getName())) 
         {
-			if (topLevel)
+            inTemplateNetwork++;
+        }
+
+        if (inTemplateNetwork <= 0) 
+        {
+            if (topLevel)
 			{
 				prefixes.put(node, topLevelPrefix);
 			}
@@ -74,73 +95,64 @@ public class ScriptGenerator extends DFSIterator{
             } catch(ScriptGenException e) {
                 System.out.println(e.getMessage());
             } 
-        }
-        
-        if (node instanceof Network && ((Network)node).getMetaData("type") != null)
-        {
-            inTemplateNetwork++;
+
+            if (node instanceof Network) {
+                parentNetwork.push((Network)node);
+            }
         }
 	}
 	
 	protected void post(Node node)
 	{
-        if (node instanceof Network)
+        if (node instanceof Network && inTemplateNetwork <= 0)
         {
             Network net = (Network)node;
-            
-            if (net.getMetaData("type") != null)
-            {
-                inTemplateNetwork--;
-            }
-            
+            parentNetwork.pop();
+
             HashMap<String, Object> toScriptArgs = new HashMap<String, Object>();
             toScriptArgs.put("prefix", prefixes.get(node) + spaceDelimiter);
             toScriptArgs.put("isSubnet", !topLevel);
             toScriptArgs.put("netName", prefixes.get(node));
             toScriptArgs.put("spaceDelim", spaceDelimiter);
             
-            if (inTemplateNetwork <= 0)
-            {
-	            
-	
-	            try {
-	                String code = net.toPostScript(toScriptArgs);
-	                script.append(code);
-	            } catch(ScriptGenException e) {
-	                System.out.println(e.getMessage());
-	            }
-	            
-	           
+            try {
+                String code = net.toPostScript(toScriptArgs);
+                script.append(code);
+            } catch(ScriptGenException e) {
+                System.out.println(e.getMessage());
             }
-            
-            if (net.getMetaData("type") != null)
+
+            script.append("\n# " + node.getName() + " - Projections\n");
+
+            for(Projection proj : ((Network) node).getProjections())
             {
-                inTemplateNetwork++;
+                HashMap templateProjections = (HashMap)((Network) node).getMetaData("templateProjections");
+                String preName = proj.getOrigin().getNode().getName();
+                String postName = proj.getTermination().getNode().getName();
+                if (templateProjections == null || !postName.equals(templateProjections.get(preName)))
+                {
+                    try {
+                        String code = proj.toScript(toScriptArgs);
+                        script.append(code);
+                    } catch(ScriptGenException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
             }
-            
-            if (inTemplateNetwork <= 0)
-            {
-            	for(Projection proj : ((Network) node).getProjections())
-        		{
-            		try {
-    	                String code = proj.toScript(toScriptArgs);
-    	                script.append(code);
-    	            } catch(ScriptGenException e) {
-    	                System.out.println(e.getMessage());
-    	            }
-        		}
-            }
-            
-            if (net.getMetaData("type") != null)
-            {
-                inTemplateNetwork--;
-            }
-            
+
+            script.append("\n# Network " + node.getName() + " End\n\n");
+                        
             if(topLevel)
             {
             	String nameNoSpaces = topLevelPrefix + spaceDelimiter + node.getName().replace(' ', spaceDelimiter);
             	script.append( nameNoSpaces + ".add_to_nengo()\n");
             }
+        }
+
+        if (parentNetwork.peek().getMetaData("templates") != null &&
+                ((ArrayList)parentNetwork.peek().getMetaData("templates")).contains(node.getName()))
+        {
+            inTemplateNetwork--;
         }
 	}
 	

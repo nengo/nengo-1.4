@@ -20,6 +20,8 @@ import nps.basalganglia
 import nef
 import numeric
 from ca.nengo.model.impl import NetworkImpl
+from java.util import ArrayList
+from java.util import HashMap
 def make(net,name='Basal Ganglia',dimensions=1,pstc=0.01,netbg=None,same_neurons=True):
 
     if netbg is None:
@@ -35,8 +37,20 @@ def make(net,name='Basal Ganglia',dimensions=1,pstc=0.01,netbg=None,same_neurons
     if net is not None:
         net.add(netbg.network)
     
-    netbg.network.setMetaData("type", "BasalGanglia")
-    netbg.network.setMetaData("name", name)
-    netbg.network.setMetaData("dimensions", dimensions)
-    netbg.network.setMetaData("pstc", pstc)
-    netbg.network.setMetaData("same_neurons", same_neurons)
+    if net.network.getMetaData("BasalGanglia") == None:
+        net.network.setMetaData("BasalGanglia", HashMap())
+    bgs = net.network.getMetaData("BasalGanglia")
+
+    bg=HashMap(4)
+    bg.put("name", name)
+    bg.put("dimensions", dimensions)
+    bg.put("pstc", pstc)
+    bg.put("same_neurons", same_neurons)
+
+    bgs.put(name, bg)
+
+    if net.network.getMetaData("templates") == None:
+        net.network.setMetaData("templates", ArrayList())
+    templates = net.network.getMetaData("templates")
+    templates.add(name)
+

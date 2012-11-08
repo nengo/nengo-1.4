@@ -49,6 +49,7 @@ public class FourierFunction implements Function {
     private float myFundamental;
     private float myCutoff;
     private float myRms;
+    private long mySeed;
 	
 	/**
 	 * Creates a 1-dimensional function composed of explicitly defined sinusoids. 
@@ -88,6 +89,11 @@ public class FourierFunction implements Function {
 		float[] amplitudes = new float[n];
 		float[][] phases = new float[][]{new float[n]};
 		Random random = new Random(seed); 
+
+        myFundamental = fundamental;
+        myCutoff = cutoff;
+        myRms = rms;
+        mySeed = seed;
 		
 		for (int i = 0; i < n; i++) {
 			frequencies[0][i] = fundamental * (i+1);
@@ -239,6 +245,14 @@ public class FourierFunction implements Function {
     public float getRms() {
         return myRms;
     }
+
+    /**
+     * @return The seed used to generate the function if it was provided.
+     */
+    public long getSeed() {
+        return mySeed;
+    }
+
 
 	private static float getValue(float[] x, float[][] f, float[] a, float[][] p) {
 		float result = 0f;

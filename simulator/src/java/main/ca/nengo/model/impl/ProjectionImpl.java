@@ -409,7 +409,7 @@ public class ProjectionImpl implements Projection {
 		    }
 	    }
 	    
-	    py.append(")\n\n");
+	    py.append(")\n");
 	    
 	    return py.toString();
 	}

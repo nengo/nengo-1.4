@@ -89,6 +89,8 @@ def test_params(net,p):
 
 
 import numeric
+from java.util import ArrayList
+from java.util import HashMap
 def make(net,name='System',neurons=100,A=[[0]],tau_feedback=0.1):
     A=numeric.array(A)
     assert len(A.shape)==2
@@ -99,9 +101,9 @@ def make(net,name='System',neurons=100,A=[[0]],tau_feedback=0.1):
     Ap=A*tau_feedback+numeric.identity(dimensions)
 
     net.connect(state,state,transform=Ap,pstc=tau_feedback)
-    if net.getMetaData("linear") == None:
-        net.setMetaData("linear", ArrayList())
-    linears = net.getMetaData("linear")
+    if net.network.getMetaData("linear") == None:
+        net.network.setMetaData("linear", HashMap())
+    linears = net.network.getMetaData("linear")
 
     linear=HashMap(4)
     linear.put("name", name)
@@ -109,6 +111,15 @@ def make(net,name='System',neurons=100,A=[[0]],tau_feedback=0.1):
     linear.put("A", MU.clone(A))
     linear.put("tau_feedback", tau_feedback)
 
-    linears.add(linear)
+    linears.put(name, linear)
 
+    if net.network.getMetaData("templates") == None:
+        net.network.setMetaData("templates", ArrayList())
+    templates = net.network.getMetaData("templates")
+    templates.add(name)
+
+    if net.network.getMetaData("templateProjections") == None:
+        net.network.setMetaData("templateProjections", HashMap())
+    templateproj = net.network.getMetaData("templateProjections")
+    templateproj.put(name, name)
     

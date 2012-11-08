@@ -57,24 +57,34 @@ def test_params(net,p):
     if p['rLow'] > p['rHigh']: return 'Low max firing rate must be less than high max firing rate'
 
 from ca.nengo.model.impl import NetworkImpl
+from java.util import ArrayList
+from java.util import HashMap
 def make(net,name='Network Array', neurons=50, length=10, radius=1.0, rLow=200, rHigh=400, iLow=-1, iHigh=1, encSign=0, useQuick=True):
     if encSign!=0:
         ensemble = net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, encoders=[[encSign]], quick=useQuick)
     else:
         ensemble = net.make_array(name, neurons, length, max_rate=(rLow,rHigh), intercept=(iLow, iHigh), radius=radius, quick=useQuick)
+        
+    if net.network.getMetaData("NetworkArray") == None:
+        net.network.setMetaData("NetworkArray", HashMap())
+    arrays = net.network.getMetaData("NetworkArray")
 
-    ensemble.setMetaData("type", "NetworkArray")
-    ensemble.setMetaData("name", name)
-    ensemble.setMetaData("neurons", neurons)
-    ensemble.setMetaData("length", length)
-    ensemble.setMetaData("radius", radius)
-    ensemble.setMetaData("rLow", rLow)
-    ensemble.setMetaData("rHigh", rHigh)
-    ensemble.setMetaData("iLow", iLow)
-    ensemble.setMetaData("iHigh", iHigh)
-    ensemble.setMetaData("encSign", encSign)
-    ensemble.setMetaData("useQuick", useQuick)
+    narr=HashMap(10)
+    narr.put("name", name)
+    narr.put("neurons", neurons)
+    narr.put("length", length)
+    narr.put("radius", radius)
+    narr.put("rLow", rLow)
+    narr.put("rHigh", rHigh)
+    narr.put("iLow", iLow)
+    narr.put("iHigh", iHigh)
+    narr.put("encSign", encSign)
+    narr.put("useQuick", useQuick)
 
+    arrays.put(name, narr)
 
-
+    if net.network.getMetaData("templates") == None:
+        net.network.setMetaData("templates", ArrayList())
+    templates = net.network.getMetaData("templates")
+    templates.add(name)
 

@@ -745,8 +745,6 @@ class Network:
                 term = _expose_toplevel(term, post_nodes, 'Termination')
 
             return projection_network.addProjection(origin,term)
-        else:
-            assert 0, 'WARNING: creating a origin/termination is deprecated'
     
     def learn(self,post,learn_term,mod_term,rate=5e-7,**kwargs):
         """Apply a learning rule to a termination of the *post* ensemble.

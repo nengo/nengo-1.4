@@ -66,19 +66,23 @@ def make(net,node,index=0,dim=8,pattern='I',pstc=0.01,use_single_input=False):
         StrD2.addDecodedTermination(name,transform*(1.2),pstc,False)
         node.exposeTermination(StrD2.getTermination(name),name+'_StrD2')
 
-    if isinstance(node, Network) and node.getMetaData("type") == "BasalGanglia":
-        bg = node
-        if bg.getMetaData("bgrule") == None:
-            bg.setMetaData("bgrule", ArrayList())
+    if net.network.getMetaData("bgrule") == None:
+        net.network.setMetaData("bgrule", HashMap())
 
-        bgrules = bg.getMetaData("bgrule")
+    bgrules = net.network.getMetaData("bgrule")
 
-        rule=HashMap(5)
-        rule.put("index", index)
-        rule.put("dim", dim)
-        rule.put("pattern", pattern)
-        rule.put("pstc", pstc)
-        rule.put("use_single_input", use_single_input)
+    rule=HashMap(6)
+    rule.put("name", node.getName())
+    rule.put("index", index)
+    rule.put("dim", dim)
+    rule.put("pattern", pattern)
+    rule.put("pstc", pstc)
+    rule.put("use_single_input", use_single_input)
 
-        bgrules.add(rule)
+    bgrules.put(node.getName(), rule)
+
+    if net.network.getMetaData("templates") == None:
+        net.network.setMetaData("templates", ArrayList())
+    templates = net.network.getMetaData("templates")
+    templates.add(node.getName())
 

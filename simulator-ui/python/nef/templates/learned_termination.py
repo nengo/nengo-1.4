@@ -34,7 +34,8 @@ import random
 from ca.nengo.model.plasticity.impl import STDPTermination, PlasticEnsembleImpl
 import nef
 import numeric
-    
+from java.util import ArrayList
+from java.util import HashMap
 def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-7):
 
     # get pre and post ensembles from their names
@@ -75,9 +76,9 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     # Set learning rule on the non-decoded termination
     net.learn(post,prename,modname,rate=rate)
 
-    if net.getMetaData("learnedterm") == None:
-        net.setMetaData("learnedterm", ArrayList())
-    learnedterms = net.getMetaData("learnedterm")
+    if net.network.getMetaData("learnedterm") == None:
+        net.network.setMetaData("learnedterm", HashMap())
+    learnedterms = net.network.getMetaData("learnedterm")
 
     learnedterm=HashMap(5)
     learnedterm.put("errName", errName)
@@ -86,6 +87,16 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     learnedterm.put("postName", postName)
     learnedterm.put("rate", rate)
 
-    learnedterms.add(learnedterm)
+    learnedterms.put(errName, learnedterm)
 
+    if net.network.getMetaData("templates") == None:
+        net.network.setMetaData("templates", ArrayList())
+    templates = net.network.getMetaData("templates")
+    templates.add(errName)
+
+    if net.network.getMetaData("templateProjections") == None:
+        net.network.setMetaData("templateProjections", HashMap())
+    templateproj = net.network.getMetaData("templateProjections")
+    templateproj.put(errName, postName)
+    templateproj.put(preName, postName)
     

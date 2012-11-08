@@ -39,7 +39,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 
@@ -1080,74 +1079,29 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	}
 
     public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
-        String py;
+		StringBuilder py = new StringBuilder();
         String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
-        
-        if (myMetaData.get("type") != null)
-        {
-            String type = (String)myMetaData.get("type");
-            if (type == "NetworkArray")
-            {
-            	String useQuick = (Boolean)myMetaData.get("useQuick") ? "True" : "False";
-                py = String.format("nef.templates.networkarray.make(%s, name='%s', neurons=%d, length=%d, radius=%.1f, rLow=%f, rHigh=%f, iLow=%f, iHigh=%f, encSign=%d, useQuick=%s)\n",
-                        scriptData.get("netName"),
-                        myName,
-                        (Integer)myMetaData.get("neurons"),
-                        (Integer)myMetaData.get("length"),
-                        (Double)myMetaData.get("radius"),
-                        (Double)myMetaData.get("rLow"),
-                        (Double)myMetaData.get("rHigh"),
-                        (Double)myMetaData.get("iLow"),
-                        (Double)myMetaData.get("iHigh"),
-                        (Integer)myMetaData.get("encSign"),
-                        useQuick);
-            }
-            else if (type == "BasalGanglia")
-            {
-            	String same_neurons = (Boolean)myMetaData.get("same_neurons") ? "True" : "False";
-                py = String.format("nef.templates.basalganglia.make(%s, name='%s', dimensions=%d, pstc=%.3f, same_neurons=%s)\n",
-                        scriptData.get("netName"),
-                        myName,
-                        (Integer)myMetaData.get("dimensions"),
-                        (Double)myMetaData.get("pstc"),
-                        same_neurons);
-            }
-            else if (type == "Thalamus")
-            {
-            	String useQuick = (Boolean)myMetaData.get("useQuick") ? "True" : "False";
-                py = String.format("nef.templates.thalamus.make(%s, name='%s', neurons=%d, dimensions=%d, inhib_scale=%d, tau_inhib=%.3f, useQuick=%s)\n",
-                        scriptData.get("netName"),
-                        myName,
-                        (Integer)myMetaData.get("neurons"),
-                        (Integer)myMetaData.get("dimensions"),
-                        (Integer)myMetaData.get("inhib_scale"),
-                        (Double)myMetaData.get("tau_inhib"),
-                        useQuick);
-            }
-            else
-            {
-                throw new ScriptGenException("Network type " + type + " is not supported for script generation");
-            }
 
-            return py;
-        }
+        py.append("\n\n# Network " + myName + " Start\n");
 
         if ((Boolean)scriptData.get("isSubnet"))
         {
-            py = String.format("%s = %s.make_subnetwork('%s')\n\n", 
+            py.append(String.format("%s = %s.make_subnetwork('%s')\n", 
                     pythonNetworkName,
                     scriptData.get("netName"),
                     myName
-                    );
+                    ));
         }
         else
         {
-            py = String.format("%s = nef.Network('%s')\n\n", 
+            py.append(String.format("%s = nef.Network('%s')\n", 
                     pythonNetworkName, 
-                    myName);
+                    myName));
         }
+
+        py.append("\n# " + myName + " - Nodes\n");
         
-        return py;
+        return py.toString();
     }
 
 	@Override
@@ -1284,16 +1238,101 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		StringBuilder py = new StringBuilder();
 
 		String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+
+        py.append("\n# " + myName + " - Templates\n");
+		
+        if (myMetaData.get("NetworkArray") != null)
+        {
+            Iterator iter = ((HashMap)myMetaData.get("NetworkArray")).values().iterator();
+            while (iter.hasNext())
+            {
+                HashMap array = (HashMap)iter.next();
+
+                if (!myNodeMap.containsKey(array.get("name")))
+                {
+                    continue;
+                }
+
+            	String useQuick = (Boolean)array.get("useQuick") ? "True" : "False";
+
+                py.append(String.format("nef.templates.networkarray.make(%s, name='%s', neurons=%d, length=%d, radius=%.1f, rLow=%f, rHigh=%f, iLow=%f, iHigh=%f, encSign=%d, useQuick=%s)\n",
+                            pythonNetworkName,
+                            array.get("name"),
+                            (Integer)array.get("neurons"),
+                            (Integer)array.get("length"),
+                            (Double)array.get("radius"),
+                            (Double)array.get("rLow"),
+                            (Double)array.get("rHigh"),
+                            (Double)array.get("iLow"),
+                            (Double)array.get("iHigh"),
+                            (Integer)array.get("encSign"),
+                            useQuick));
+            }
+        } 
+		
+        if (myMetaData.get("BasalGanglia") != null)
+        {
+            Iterator iter = ((HashMap)myMetaData.get("BasalGanglia")).values().iterator();
+            while (iter.hasNext())
+            {
+                HashMap bg = (HashMap)iter.next();
+
+                if (!myNodeMap.containsKey(bg.get("name")))
+                {
+                    continue;
+                }
+
+            	String same_neurons = (Boolean)bg.get("same_neurons") ? "True" : "False";
+
+                py.append(String.format("nef.templates.basalganglia.make(%s, name='%s', dimensions=%d, pstc=%.3f, same_neurons=%s)\n",
+                            pythonNetworkName,
+                            bg.get("name"),
+                            (Integer)bg.get("dimensions"),
+                            (Double)bg.get("pstc"),
+                            same_neurons));
+            }
+        } 
+		
+        if (myMetaData.get("Thalamus") != null)
+        {
+            Iterator iter = ((HashMap)myMetaData.get("Thalamus")).values().iterator();
+            while (iter.hasNext())
+            {
+                HashMap thal = (HashMap)iter.next();
+
+                if (!myNodeMap.containsKey(thal.get("name")))
+                {
+                    continue;
+                }
+
+            	String useQuick = (Boolean)thal.get("useQuick") ? "True" : "False";
+
+                py.append(String.format("nef.templates.thalamus.make(%s, name='%s', neurons=%d, dimensions=%d, inhib_scale=%d, tau_inhib=%.3f, useQuick=%s)\n",
+                            pythonNetworkName,
+                            thal.get("name"),
+                            (Integer)thal.get("neurons"),
+                            (Integer)thal.get("dimensions"),
+                            (Integer)thal.get("inhib_scale"),
+                            (Double)thal.get("tau_inhib"),
+                            useQuick));
+            }
+        }
 		
         if (myMetaData.get("integrator") != null)
         {
-            ListIterator iter = ((ArrayList)myMetaData.get("integrator")).listIterator();
+            Iterator iter = ((HashMap)myMetaData.get("integrator")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap integrator = (HashMap)iter.next();
+
+                if (!myNodeMap.containsKey(integrator.get("name")))
+                {
+                    continue;
+                }
+
                 py.append(String.format("nef.templates.integrator.make(%s, name='%s', neurons=%d, dimensions=%d, tau_feedback=%f, tau_input=%f, scale=%f)\n",
                 			pythonNetworkName,
-                            myName,
+                            integrator.get("name"),
                             (Integer)integrator.get("neurons"),
                             (Integer)integrator.get("dimensions"),
                             (Double)integrator.get("tau_feedback"),
@@ -1304,13 +1343,18 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
         if (myMetaData.get("linear") != null)
         {
-            ListIterator iter = ((ArrayList)myMetaData.get("linear")).listIterator();
+            Iterator iter = ((HashMap)myMetaData.get("linear")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap linear = (HashMap)iter.next();
 
+                if (!myNodeMap.containsKey(linear.get("name")))
+                {
+                    continue;
+                }
+
                 StringBuilder a = new StringBuilder("[");
-                float[][] arr = (float[][])linear.get("A");
+                double[][] arr = (double[][])linear.get("A");
                 for (int i = 0; i < arr.length; i++)
                 {
                     a.append("[");
@@ -1341,13 +1385,18 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
         if (myMetaData.get("binding") != null)
         {
-            ListIterator iter = ((ArrayList)myMetaData.get("binding")).listIterator();
+            Iterator iter = ((HashMap)myMetaData.get("binding")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap binding = (HashMap)iter.next();
+
+                if (!myNodeMap.containsKey(binding.get("name")))
+                {
+                    continue;
+                }
                 
-                String invertA = (Boolean)myMetaData.get("invertA") ? "True" : "False";
-                String invertB = (Boolean)myMetaData.get("invertB") ? "True" : "False";
+                String invertA = (Boolean)binding.get("invertA") ? "True" : "False";
+                String invertB = (Boolean)binding.get("invertB") ? "True" : "False";
                 
                 py.append(String.format("nef.templates.binding.make(%s, name='%s', outputName='%s', N_per_D=%d, invertA=%s, invertB=%s)\n",
                 			pythonNetworkName,
@@ -1361,30 +1410,43 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
         if (myMetaData.get("bgrule") != null)
         {
-            ListIterator iter = ((ArrayList)myMetaData.get("bgrule")).listIterator();
+            Iterator iter = ((HashMap)myMetaData.get("bgrule")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap bgrule = (HashMap)iter.next();
-                String use_single_input = (Boolean)myMetaData.get("use_single_input") ? "True" : "False";
+
+                if (!myNodeMap.containsKey(bgrule.get("name")))
+                {
+                    continue;
+                }
+                
+                String use_single_input = (Boolean)bgrule.get("use_single_input") ? "True" : "False";
                 
                 // going to assume the current network is the BG...BG_rules can only be added on BG networks.
-                py.append(String.format("nef.templates.basalganglia_rule.make(%s, %s, index=%d, dim=%d, pattern='%s', pstc=%f, use_single_input=%s)\n",
-                            scriptData.get("netName"),
+                py.append(String.format("nef.templates.basalganglia_rule.make(%s, %s.network.getNode('%s'), index=%d, dim=%d, pattern='%s', pstc=%f, use_single_input=%s)\n",
                             pythonNetworkName,
+                            pythonNetworkName,
+                            (String)bgrule.get("name"),
                             (Integer)bgrule.get("index"),
                             (Integer)bgrule.get("dim"),
                             (String)bgrule.get("pattern"),
-                            (Double)bgrule.get("tau_input"),
+                            (Double)bgrule.get("pstc"),
                             use_single_input));
             }
         } 
 
         if (myMetaData.get("gate") != null)
         {
-            ListIterator iter = ((ArrayList)myMetaData.get("gate")).listIterator();
+            Iterator iter = ((HashMap)myMetaData.get("gate")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap gate = (HashMap)iter.next();
+
+                if (!myNodeMap.containsKey(gate.get("name")))
+                {
+                    continue;
+                }
+
                 py.append(String.format("nef.templates.gate.make(%s, name='%s', gated='%s', neurons=%d, pstc=%f)\n",
                 			pythonNetworkName,
                             gate.get("name"),
@@ -1396,11 +1458,17 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
         if (myMetaData.get("learnedterm") != null)
         {
-            ListIterator iter = ((ArrayList)myMetaData.get("learnedterm")).listIterator();
+            Iterator iter = ((HashMap)myMetaData.get("learnedterm")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap learnedterm = (HashMap)iter.next();
-                py.append(String.format("nef.templates.learned_termination.make(%s, errName='%s', N_err=%d, preName='%s', postName='%f', rate=%f)\n",
+
+                if (!myNodeMap.containsKey(learnedterm.get("errName")))
+                {
+                    continue;
+                }
+
+                py.append(String.format("nef.templates.learned_termination.make(%s, errName='%s', N_err=%d, preName='%s', postName='%s', rate=%f)\n",
                 			pythonNetworkName,
                             learnedterm.get("errName"),
                             (Integer)learnedterm.get("N_err"),

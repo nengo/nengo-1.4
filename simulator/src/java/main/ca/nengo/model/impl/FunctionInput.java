@@ -277,6 +277,8 @@ public class FunctionInput implements Node, Probeable {
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
         boolean isFourier = true;
+
+        py.append("\n");
         
         for (int i = 0; i < myFunctions.length; i++) {
             if (!(myFunctions[i] instanceof FourierFunction))
@@ -312,7 +314,7 @@ public class FunctionInput implements Node, Probeable {
             high.append("]");
             power.append("]");
 
-            py.append(String.format("%s.make_fourier_input('%s', dimensions=%d, base=%s, high=%s, power=%s",
+            py.append(String.format("%s.make_fourier_input('%s', dimensions=%d, base=%s, high=%s, power=%s\n",
                         scriptData.get("netName"),
                         myName,
                         myFunctions.length,
@@ -335,18 +337,19 @@ public class FunctionInput implements Node, Probeable {
                 } else if (myFunctions[i] instanceof FourierFunction) {
                     FourierFunction func = (FourierFunction)myFunctions[i];
 
-                    py.append(String.format("Function%c%s%c%d = FourierFunction(%f, %f, %f, random.randint(0, 0x7ffffff))\n",
+                    py.append(String.format("Function%c%s%c%d = FourierFunction(%f, %f, %f, %d)\n",
                     			(Character)scriptData.get("spaceDelim"),
                                 myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
                                 (Character)scriptData.get("spaceDelim"),
                                 i,
                                 func.getFundamental(),
                                 func.getCutoff(),
-                                func.getRms()));
+                                func.getRms(),
+                                func.getSeed()));
                 } else if (myFunctions[i] instanceof PostfixFunction) {
                     PostfixFunction func = (PostfixFunction)myFunctions[i];
 
-                    py.append(String.format("Function%c%s%c%d = PostfixFunction(%s, %d)\n",
+                    py.append(String.format("Function%c%s%c%d = PostfixFunction('%s', %d)\n",
                     			(Character)scriptData.get("spaceDelim"),
                                 myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
                                 (Character)scriptData.get("spaceDelim"),
@@ -372,7 +375,6 @@ public class FunctionInput implements Node, Probeable {
                     funcs.toString()));
         }
         
-        py.append('\n');
         return py.toString();
     }
 
