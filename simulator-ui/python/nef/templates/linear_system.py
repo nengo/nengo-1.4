@@ -34,7 +34,7 @@ class SystemMatrixInputPanel(PropertyInputPanel,DocumentListener):
             p=PCouplingMatrix(self.matrix)
         else:
             p=PCouplingMatrix(dim,dim)
-        result=ConfigManager.configure([p],"System Matrix",parent,ConfigManager.ConfigMode.STANDARD)
+        result=ConfigManager.configure([p],"System Matrix", parent, ConfigManager.ConfigMode.STANDARD)
         self.matrix=result.getValue(p)
 
     def change_dim(self,event):
@@ -60,8 +60,6 @@ class SystemMatrixInputPanel(PropertyInputPanel,DocumentListener):
     def removeUpdate(self,event):
         self.change_dim(event)
     
-    
-
 class PSystemMatrix(Property):
     matrix=None
     def createInputPanel(self):
@@ -71,7 +69,6 @@ class PSystemMatrix(Property):
     def getTypeClass(self):
         return PCouplingMatrix(1,1).getTypeClass()
         
-
 params=[
     ('name','Name',str,'Name of the new linear system'),
     ('neurons','Number of Neurons',int,'Number of neurons in the new linear system'),

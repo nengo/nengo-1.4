@@ -1029,6 +1029,14 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		scriptGen.startDFS(this);
 	}
 	
+	public void dumpToScript(String filepath) throws FileNotFoundException
+	{
+		File file = new File(filepath);
+		
+		ScriptGenerator scriptGen = new ScriptGenerator(file);
+		scriptGen.startDFS(this);
+	}
+	
 
 	/**
 	 * @see ca.nengo.model.Node#getDocumentation()

@@ -312,6 +312,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def get_current_network(self,top_parent=True):
         network=self.ng.getSelectedObj()
         if network is not None:
+            while hasattr(network,'termination') and network.termination is not None:
+                network=network.termination
             while hasattr(network,'nodeParent') and network.nodeParent is not None:
                 network=network.nodeParent
             while top_parent and hasattr(network,'networkParent') and network.networkParent is not None:

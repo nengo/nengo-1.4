@@ -23,13 +23,13 @@ def test_params(net,p):
 import numeric
 from java.util import ArrayList
 from java.util import HashMap
-def make(net,name='Integrator',neurons=100,dimensions=1,tau_feedback=0.1,tau_input=0.01,scale=1):
+def make(net, name='Integrator', neurons=100, dimensions=1, tau_feedback=0.1, tau_input=0.01, scale=1):
     if (dimensions<8):
         integrator=net.make(name,neurons,dimensions)
     else:
         integrator=net.make_array(name, int(neurons/dimensions),dimensions, quick=True)
     net.connect(integrator,integrator,pstc=tau_feedback)
-    integrator.addDecodedTermination('input',numeric.eye(dimensions)*tau_feedback*scale,tau_input,False)
+    integrator.addDecodedTermination('input', numeric.eye(dimensions)*tau_feedback*scale, tau_input, False)
     if net.network.getMetaData("integrator") == None:
         net.network.setMetaData("integrator", HashMap())
     integrators = net.network.getMetaData("integrator")
