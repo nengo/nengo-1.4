@@ -45,6 +45,7 @@ class Simulator:
 
 
     def step(self,start,end):
+        self.network.fireStepListeners(start)
         if self.thread_pool is not None:
             self.thread_pool.step(start,end)
         else:    

@@ -10,7 +10,7 @@
   ('memory', None, {'x': 335, 'height': 32, 'label': 0, 'width': 81, 'y': 57}),
   ('thalamus', 'firing rate', {'x': 61, 'height': 90, 'label': 1, 'width': 75, 'rows': None, 'y': 263}),
   ('GPi', 'firing rate', {'x': 555, 'height': 75, 'label': 1, 'width': 60, 'rows': None, 'y': 275}),
-  ('motor', 'semantic pointer', {'x': 614, 'height': 117, 'sel_dim': [0, 1, 2, 3], 'label': 0, 'width': 176, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': -8}),
+  ('motor', 'semantic pointer', {'x': 614, 'height': 117, 'sel_dim': [1, 2, 3, 4], 'label': 0, 'width': 176, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': -8}),
   ('visual', 'value (grid)|X', {'x': 32, 'height': 65, 'label': 0, 'width': 67, 'y': 10}),
   ('memory', 'value (grid)|X', {'x': 258, 'height': 67, 'label': 0, 'width': 67, 'y': 25}),
   ('motor', 'value (grid)|X', {'x': 544, 'height': 67, 'label': 0, 'width': 67, 'y': 39}),
@@ -21,3 +21,23 @@
   ('gate1', 'firing rate', {'x': 75, 'height': 57, 'auto_improve': 0, 'label': 1, 'width': 42, 'rows': None, 'y': 187}),
   ('gate2', 'firing rate', {'x': 236, 'height': 54, 'auto_improve': 0, 'label': 1, 'width': 43, 'rows': None, 'y': 177})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-232.52207072962702,y=-33.05479621120461,width=1711.6231515680547,height=1059.7129914909601]
+# GPe (Network)=Point2D.Double[1272.900340239282, 833.4630822926453]
+# gate2 (NEFEnsemble)=Point2D.Double[455.5617751469405, 471.9582642997085]
+# inv (Generic Node)=Point2D.Double[-125.05821499139722, 84.46293916577314]
+# prod_bias (Function Input)=Point2D.Double[105.77492706230348, 880.2658456662824]
+# memory (Network)=Point2D.Double[578.8673816570696, 82.41171060648115]
+# channel (NEFEnsemble)=Point2D.Double[413.4991715965032, 199.73915187317866]
+# StrD2 (Network)=Point2D.Double[1265.266893492854, 530.417357002914]
+# GPi (Network)=Point2D.Double[993.6125788962819, 857.4739151873179]
+# gate1 (NEFEnsemble)=Point2D.Double[203.18615384431786, 470.7704536483971]
+# * (Network)=Point2D.Double[884.9508530576518, 52.46182445525173]
+# visual (NEFEnsemble)=Point2D.Double[19.78527613250981, 99.04193518509156]
+# thalamus (Network)=Point2D.Double[554.3308629193151, 857.1037713139062]
+# motor (Network)=Point2D.Double[1173.0016568069939, 60.52366058406599]
+# STN (Network)=Point2D.Double[1146.7125295879703, 695.9029030241057]
+# StrD1 (Network)=Point2D.Double[990.1073619337465, 526.347342210421]

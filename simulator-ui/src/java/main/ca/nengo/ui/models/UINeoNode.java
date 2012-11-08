@@ -30,6 +30,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,9 +39,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
 
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import ca.nengo.io.FileManager;
@@ -61,16 +59,13 @@ import ca.nengo.ui.actions.AddProbeAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
-import ca.nengo.ui.actions.SaveNodeAction;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.UserDialogs;
 import ca.nengo.ui.lib.actions.ActionException;
-import ca.nengo.ui.lib.actions.ReversableAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.UserCancelledException;
 import ca.nengo.ui.lib.objects.activities.TransientStatusMessage;
 import ca.nengo.ui.lib.objects.models.ModelObject;
-import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
@@ -238,8 +233,11 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
 
-		menu.addAction(new CopyAction("Copy", this));
-		menu.addAction(new CutAction("Cut", this));
+		Collection<UINeoNode> arrayOfMe = new ArrayList<UINeoNode>();
+		arrayOfMe.add(this);
+		
+		menu.addAction(new CopyAction("Copy", arrayOfMe));
+		menu.addAction(new CutAction("Cut", arrayOfMe));
 
 //		menu.addSection("File");
 //		menu.addAction(new SaveNodeAction(this));
@@ -447,42 +445,33 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 * @see
 	 * ca.shu.ui.lib.world.DroppableX#droppedOnTargets(java.util.Collection)
 	 */
-	public void droppedOnTargets(Collection<WorldObject> targets) {
+	public void droppedOnTargets(Collection<WorldObject> targets) throws UserCancelledException {
+		// look through all containers, move to the first NodeContainer we find
 		for (WorldObject wo : targets) {
-			/*
-			 * Move to new container
-			 */
 			if (wo instanceof NodeContainer) {
 				NodeContainer nodeContainer = (NodeContainer) wo;
 
 				try {
+					CreateModelAction.ensureNonConflictingName(getModel(), nodeContainer); // throws UserCancelledException
+					
 					Node node;
 					try {
 						node = getModel().clone();
-					}
-					catch (CloneNotSupportedException e) {
+					} catch (CloneNotSupportedException e) {
 						throw new ContainerException("Could not clone node: " + e.getMessage());
 					}
 					Point2D newPosition = localToGlobal(new Point2D.Double(0, 0));
 					newPosition = wo.globalToLocal(newPosition);
 					newPosition = nodeContainer.localToView(newPosition);
 
-					/*
-					 * This removes the node from its parent and externalities
-					 */
+					// destroy the old model
 					destroyModel();
+					
+					// add the new model
+					nodeContainer.addNodeModel(node,
+							newPosition.getX(),
+							newPosition.getY());
 
-					/*
-					 * Adds node
-					 */
-					try {
-						CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-						nodeContainer.addNodeModel(node,
-								newPosition.getX(),
-								newPosition.getY());
-					} catch (UserCancelledException e) {
-						e.defaultHandleBehavior();
-					}
 				} catch (ContainerException e) {
 					UserMessages.showWarning("Could not drop into container: " + e.getMessage());
 				}

@@ -1,6 +1,7 @@
 package ca.nengo.ui.lib.objects.models;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.swing.JPopupMenu;
@@ -100,7 +101,9 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	protected void constructMenu(PopupMenuBuilder menu) {
 		if (showRemoveModelAction()) {
-			menu.addAction(new RemoveModelAction("Remove model", this));
+			ArrayList<ModelObject> arrayOfMe = new ArrayList<ModelObject>();
+			arrayOfMe.add(this);
+			menu.addAction(new RemoveModelAction("Remove model", arrayOfMe));
 		}
 	}
 

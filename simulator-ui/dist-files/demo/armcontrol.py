@@ -12,7 +12,7 @@ from ca.nengo.plot import *
 from com.bulletphysics import *
 from com.bulletphysics.linearmath import *
 from com.bulletphysics.dynamics.constraintsolver import *
-from javax.vecmath import Vector3f
+
 from math import * 
 import java
 from java.awt import Color
@@ -328,7 +328,12 @@ class Room(space.Room):
                 wt.origin.y=0.1
             wt.origin.z=2
 
-            self.target.physics.motionState.worldTransform=wt
+            ms=self.target.physics.motionState            
+            ms.worldTransform=wt            
+            self.target.physics.motionState=ms
+            
+
+
             
             
             self.vel1=v1.z

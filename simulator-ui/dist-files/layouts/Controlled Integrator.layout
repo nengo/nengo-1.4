@@ -1,9 +1,17 @@
-({'height': 469, 'x': 0, 'width': 800, 'state': 0, 'y': 25},
- [('A', None, {'x': 430, 'height': 34, 'label': 0, 'width': 24, 'y': 63}),
-  ('control', None, {'x': 162, 'height': 34, 'label': 0, 'width': 77, 'y': 71}),
-  ('input', None, {'x': 408, 'height': 34, 'label': 0, 'width': 60, 'y': 274}),
-  ('A', 'value|X', {'x': 483, 'height': 180, 'sel_dim': [0], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 8}),
-  ('control', 'control', {'x': 74, 'height': 161, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 58, 'limits_w': 0, 'y': 16}),
-  ('input', 'control', {'x': 347, 'height': 145, 'range': 16.0, 'label': 0, 'limits': 1, 'width': 50, 'limits_w': 0, 'y': 213}),
-  ('input', 'value|origin', {'x': 483, 'height': 180, 'sel_dim': [0], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 10.000000000000007, 'y': 195})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 1.0})
+({'state': 0, 'height': 500, 'width': 837, 'x': 0, 'y': 25},
+ [(u'A', None, {'label': 0, 'height': 32, 'width': 23, 'x': 430, 'y': 63}),
+  (u'control', None, {'label': 0, 'height': 32, 'width': 70, 'x': 162, 'y': 63}),
+  (u'input', None, {'label': 0, 'height': 32, 'width': 53, 'x': 417, 'y': 274}),
+  (u'A', 'value|X', {'label': 0, 'sel_dim': [0], 'last_maxy': 2.0000000000000013, 'height': 180, 'width': 270, 'x': 483, 'fixed_y': None, 'autozoom': 0, 'y': 8}),
+  (u'control', 'control', {'label': 0, 'range': 1.0, 'limits_w': 0, 'limits': 1, 'height': 161, 'width': 58, 'x': 74, 'y': 16}),
+  (u'input', 'control', {'label': 0, 'range': 16.0, 'limits_w': 0, 'limits': 1, 'height': 145, 'width': 50, 'x': 347, 'y': 213}),
+  (u'input', 'value|origin', {'label': 0, 'sel_dim': [0], 'last_maxy': 10.000000000000007, 'height': 180, 'width': 270, 'x': 483, 'fixed_y': None, 'autozoom': 0, 'y': 195})],
+ {'dt': 0, 'show_time': 1.0, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-193.57390436182828,y=-100.00000000000001,width=630.759973221032,height=390.52085590362555]
+# input (Function Input)=Point2D.Double[96.87955649281866, 210.1072268988381]
+# control (Function Input)=Point2D.Double[-137.47590896951678, -0.6727746978667962]
+# A (NEFEnsemble)=Point2D.Double[196.4502117771045, 0.6727746978667962]

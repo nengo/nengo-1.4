@@ -24,6 +24,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
@@ -38,7 +42,7 @@ import ca.nengo.ui.models.UINeoNode;
 public class CopyAction extends StandardAction {
 
     private static final long serialVersionUID = 1L;
-    private UINeoNode nodeUI;
+    private Collection<UINeoNode> nodeUIs;
 
     /**
      * TODO
@@ -46,22 +50,33 @@ public class CopyAction extends StandardAction {
      * @param description TODO
      * @param nodeUI TODO
      */
-    public CopyAction(String description, UINeoNode nodeUI) {
+    public CopyAction(String description, Collection<UINeoNode> nodeUIs) {
         super(description);
-        this.nodeUI = nodeUI;
+        this.nodeUIs = nodeUIs;
     }
 
     @Override
     protected final void action() throws ActionException {
-        Node originalNode = nodeUI.getModel();
+    	ArrayList<Node> nodes = new ArrayList<Node>();
+    	ArrayList<Point2D> offsets = new ArrayList<Point2D>();
+    	
+    	// compute the mean of all the nodes' positions
+    	Point2D averagePoint = new Point2D.Double(0, 0);
+    	for (UINeoNode nodeUI : nodeUIs) {
+    		averagePoint.setLocation(averagePoint.getX() + nodeUI.getOffset().getX(), averagePoint.getY() + nodeUI.getOffset().getY());
+    	}
+    	averagePoint.setLocation(averagePoint.getX() / nodeUIs.size(), averagePoint.getY() / nodeUIs.size());
+    	
+    	for (UINeoNode nodeUI : nodeUIs) {
+    		try {
+    			nodes.add(nodeUI.getModel().clone());
+    			offsets.add(new Point2D.Double(nodeUI.getOffset().getX() - averagePoint.getX(), nodeUI.getOffset().getY() - averagePoint.getY()));
+    		} catch (CloneNotSupportedException e) {
+    			throw new ActionException("Could not clone node", e);
+    		}
+	    }
 
-        try {
-            Node copiedNode = originalNode.clone();
-            NengoGraphics.getInstance().getClipboard().setContents(copiedNode);
-            processNodeUI(nodeUI);
-        } catch (CloneNotSupportedException e) {
-            throw new ActionException("Could not clone node", e);
-        }
+        NengoGraphics.getInstance().getClipboard().setContents(nodes, offsets);
     }
 
     protected void processNodeUI(UINeoNode nodeUI) {

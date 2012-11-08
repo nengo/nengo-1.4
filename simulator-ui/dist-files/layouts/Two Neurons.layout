@@ -7,3 +7,10 @@
   ('neuron', 'spike raster', {'x': 517, 'height': 162, 'label': 0, 'width': 268, 'sample': 1, 'y': 1}),
   ('neuron', 'value|X', {'x': 516, 'height': 180, 'sel_dim': [0], 'label': 0, 'width': 270, 'autozoom': 0, 'last_maxy': 2.0000000000000013, 'y': 172})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-108.71583089854336,y=-100.0,width=432.8672086720867,height=268.0]
+# input (Function Input)=Point2D.Double[0.0, 0.0]
+# neuron (NEFEnsemble)=Point2D.Double[158.9780558282733, 7.84890608822582]

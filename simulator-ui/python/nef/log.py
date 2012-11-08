@@ -5,7 +5,7 @@ from simplenode import SimpleNode
 from nef_core import Network
 from array import NetworkArray
 import hrr
-from ca.nengo.model import Origin
+from ca.nengo.model import Origin, StepListener
 import stats.reader
 import os
 
@@ -55,7 +55,7 @@ class LogVector(LogBasic):
     def init(self):
         self.value=numeric.array([0]*self.length(),typecode='f')
     def tick(self,dt):
-        if self.tau is None:
+        if self.tau is None or dt is None:
             self.value[:]=self.data()
         else:    
             self.value*=(1.0-dt/self.tau)
@@ -100,7 +100,7 @@ class LogSpikeCount(LogBasic):
     def flush(self):
         self.value[:]=0
 
-class Log(SimpleNode):
+class Log(StepListener):
     def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
         if not isinstance(network,Network):
             network=Network(network)
@@ -109,27 +109,26 @@ class Log(SimpleNode):
         if name is None: self.logname=self.network.network.name
         else: self.logname=name
 
-        # -- Disabling because it doesn't compile (JB Nov2012)
         if LogOverride.override_directory is not None:
             dir=LogOverride.override_directory
             filename=LogOverride.override_filename
-
+        
         self.dir=dir
         if not filename.endswith('.csv'): filename+='.csv'
         self.filename_template=filename
         self.interval=interval
         self.tau=tau
+        self.t=None
 
         self.logs=[]
-        SimpleNode.__init__(self,'Log')
-        self.network.add(self)
-
+        self.network.network.addStepListener(self)
+    
     def init(self):
         self.filename=self.make_filename()
         for log in self.logs:
             log.init()
         self.next_time=0
-        self.wrote_header=False
+        self.write_header()
 
     def make_filename(self):
         t=time.strftime('%Y%m%d-%H%M%S')
@@ -142,16 +141,26 @@ class Log(SimpleNode):
                 os.makedirs(self.dir)
         return fn
 
-    def tick(self):
+    def stepStarted(self, time):
         if len(self.logs)==0: return
-        if not self.wrote_header: self.write_header()
-        dt=self.t_end-self.t_start
+        
+        if self.t is None or self.t>time:
+            self.init()
+            dt=None
+        else:
+            dt=time-self.t
+
+        #print 'step',self.t,time,self.next_time
+        
+        self.t=time
         for log in self.logs:
             log.tick(dt)
-        if self.t>=self.next_time:            
-            self.next_time+=self.interval
+        eps = 1e-10
+        if self.t + eps > self.next_time:            
+            self.next_time += self.interval
             self.write_data()    
-            for log in self.logs: log.flush()
+            for log in self.logs:
+                log.flush()
 
     def add_spikes(self,source,name=None,skip=0):    
         if name is None: name=source+'_spikes'
@@ -221,19 +230,25 @@ class TimelockedLog(Log):
     def __init__(self, skipticks=1, **kwargs):
         Log.__init__(self, **kwargs)
         self.skipticks = skipticks
-        self.skiptick_counter = 0
+        self.skipticks_counter = 0
 
-    def tick(self):
+    def stepStarted(self, time):
         if len(self.logs)==0: return
-        if not self.wrote_header: self.write_header()
-        # -- t_end and t_start are assigned from net.run
-        dt = self.t_end-self.t_start
+        
+        if self.t is None or self.t>time:
+            self.init()
+            dt=None
+        else:
+            dt=time-self.t
+
+        self.t = time
         for log in self.logs:
             log.tick(dt)
-        if self.skiptick_counter == 0:
-            self.write_data()    
-            # -- reset internal accumulators of logs that count spikes
-            for log in self.logs: log.flush()
-        self.skiptick_counter = (self.skiptick_counter + 1) % self.skipticks
 
+        if self.skipticks_counter == 0:
+            self.write_data()    
+            for log in self.logs:
+                log.flush()
+
+        self.skipticks_counter = (self.skipticks_counter + 1) % self.skipticks
            

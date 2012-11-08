@@ -845,88 +845,93 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         
         sim.step(0.0,0.001)
         sim.reset(False)
-
-        while (not self.frame is None and self.frame.visible):
-            sim.reset(False)                   
-            # run the network for an instant so that FunctionInputs have values at their Origin so they can be read
-            for n in self.network.nodes:
-                if isinstance(n,FunctionInput):
-                    n.run(0,0)
-                    
-            now=0
-            self.watcher.reset()
-            
-            if self.screenshot_time is not None:
-                self.screenshot_name='screenshot-%s/%s'%(self.network.name,time.strftime('%Y%m%d-%H%M%S'))
-                try:
-                    os.makedirs(self.screenshot_name)
-                    self.next_record=0
-                    self.next_screenshot_time=0
-                    self.screenshot_index=0    
-                except:
-                    print 'Error making directory %s: recording is disabled'%self.screenshot_name
-                    self.screenshot_time=None
-            
-            
-            self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
-            self.time_control.set_max_time(self.timelog.tick_count)                
-            self.area.repaint()
-            self.forced_origins={}
-            last_frame_time=None
-            counter=0
-            while (not self.frame is None and self.frame.visible):
-                while (self.paused or self.timelog.processing or self.time_control.slider.valueIsAdjusting) and not self.restart and (not self.frame is None and self.frame.visible):
-                    java.lang.Thread.sleep(10)
+        
+        try:
+            while self.frame.visible:
+                sim.reset(False)                   
+                # run the network for an instant so that FunctionInputs have values at their Origin so they can be read
+                for n in self.network.nodes:
+                    if isinstance(n,FunctionInput):
+                        n.run(0,0)
+                        
+                now=0
+                self.watcher.reset()
+                
+                if self.screenshot_time is not None:
+                    self.screenshot_name='screenshot-%s/%s'%(self.network.name,time.strftime('%Y%m%d-%H%M%S'))
+                    try:
+                        os.makedirs(self.screenshot_name)
+                        self.next_record=0
+                        self.next_screenshot_time=0
+                        self.screenshot_index=0    
+                    except:
+                        print 'Error making directory %s: recording is disabled'%self.screenshot_name
+                        self.screenshot_time=None
+                
+                
+                self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
+                self.time_control.set_max_time(self.timelog.tick_count)                
+                self.area.repaint()
+                self.forced_origins={}
+                last_frame_time=None
+                counter=0
+                while self.frame.visible:
+                    while (self.paused or self.timelog.processing or self.time_control.slider.valueIsAdjusting) and not self.restart and self.frame.visible:
+                        java.lang.Thread.sleep(10)
+                        if self.requested_mode is not None:
+                            self.network.mode=self.requested_mode
+                            self.requested_mode=None
                     if self.requested_mode is not None:
                         self.network.mode=self.requested_mode
                         self.requested_mode=None
-                if self.requested_mode is not None:
-                    self.network.mode=self.requested_mode
-                    self.requested_mode=None
-                if self.restart or (not self.frame is None and not self.frame.visible):
-                    self.restart=False
-                    break
-                    
-                if now==0:
-                    # reset the FunctionInputs so that they don't pass their information too soon after being run previously
-                    for n in self.network.nodes:
-                        if isinstance(n,FunctionInput):
-                            n.reset(False)
-                    
-                if self.screenshot_time is not None and (now>=self.next_screenshot_time):
-                    self.area.screenshot('%s/%06d.png'%(self.screenshot_name,self.screenshot_index))
-                    self.next_screenshot_time+=self.screenshot_time 
-                    self.screenshot_index+=1
-                    
-                if self.current_tick>=self.timelog.tick_count-1:    
-                    #self.network.simulator.run(now,now+self.dt,self.dt)
-                    self.simulating=True
-                    sim.step(now,now+self.dt)
-                    self.simulating=False
-                    self.force_origins()
-                    now+=self.dt
-                    for tick in self.tick_queue:
-                        tick(now)
+                    if self.restart or not self.frame.visible:
+                        self.restart=False
+                        break
                         
-                    if self.autopause_at is not None and now>self.autopause_at:
-                        self.time_control.pause(None)
-                        self.autopause_at=None
-                    self.timelog.tick()                
-                    self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
-                    self.time_control.set_max_time(self.timelog.tick_count)                
-                    self.time_control.slider.value=self.timelog.tick_count
-                else:
-                    self.time_control.slider.value=self.current_tick+1
-                self.area.repaint()
-                this_frame_time=java.lang.System.currentTimeMillis()
-                if last_frame_time is not None:
-                    delta=this_frame_time-last_frame_time
-                    sleep=self.delay-delta
-                    if sleep<0: sleep=0
-                    #if sleep<1:
-                    #    sleep=1
-                    java.lang.Thread.sleep(int(sleep))
-                last_frame_time=this_frame_time
+                    if now==0:
+                        # reset the FunctionInputs so that they don't pass their information too soon after being run previously
+                        for n in self.network.nodes:
+                            if isinstance(n,FunctionInput):
+                                n.reset(False)
+                        
+                    if self.screenshot_time is not None and (now>=self.next_screenshot_time):
+                        self.area.screenshot('%s/%06d.png'%(self.screenshot_name,self.screenshot_index))
+                        self.next_screenshot_time+=self.screenshot_time 
+                        self.screenshot_index+=1
+                        
+                    if self.current_tick>=self.timelog.tick_count-1:    
+                        #self.network.simulator.run(now,now+self.dt,self.dt)
+                        self.simulating=True
+                        sim.step(now,now+self.dt)
+                        self.simulating=False
+                        self.force_origins()
+                        now+=self.dt
+                        for tick in self.tick_queue:
+                            tick(now)
+                            
+                        if self.autopause_at is not None and now>self.autopause_at:
+                            self.time_control.pause(None)
+                            self.autopause_at=None
+                        self.timelog.tick()                
+                        self.time_control.set_min_time(max(0,self.timelog.tick_count-self.timelog.tick_limit+1))
+                        self.time_control.set_max_time(self.timelog.tick_count)                
+                        self.time_control.slider.value=self.timelog.tick_count
+                    else:
+                        self.time_control.slider.value=self.current_tick+1
+                    self.area.repaint()
+                    this_frame_time=java.lang.System.currentTimeMillis()
+                    if last_frame_time is not None:
+                        delta=this_frame_time-last_frame_time
+                        sleep=self.delay-delta
+                        if sleep<0: sleep=0
+                        #if sleep<1:
+                        #    sleep=1
+                        java.lang.Thread.sleep(int(sleep))
+                    last_frame_time=this_frame_time
+
+        except AttributeError, error_val:
+            if( not self.frame is None ):
+                raise error_val
 
         if sim is not None:
             sim.kill();
@@ -1232,13 +1237,19 @@ def save_layout_file(name, view, layout, controls):
     dir = java.io.File('layouts')
     make_layout_dir(dir)
     
-    f = file('layouts/%s.layout' % name, 'r')
+    fn = 'layouts/%s.layout' % name
+    # Check if file exists
+    # - If it does, extract java layout information, otherwise just make a new file
     java_layout = ""
-    data = f.read()
-    for line in data.split('\n'):
-        if line.startswith('#'):
-            java_layout += '\n' + line
-    f = file('layouts/%s.layout' % name, 'w')
+    if java.io.File(fn).exists():
+        f = file(fn, 'r')
+        data = f.read()
+        for line in data.split('\n'):
+            if line.startswith('#'):
+                java_layout += '\n' + line
+        f.close()
+
+    f = file(fn, 'w')
     
     layout_text = ',\n  '.join([`x` for x in layout])
     
@@ -1262,6 +1273,9 @@ def load_layout_file(name, try_backup=True):
             return None
         data=eval(text)
     except Exception,e:
+        warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
+        return None
+    except IndexError, e:
         warnings.warn('Could not parse layout file "%s"'%fn, RuntimeWarning)
         return None
 

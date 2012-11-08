@@ -45,7 +45,7 @@ public class ConfigureAction extends StandardAction {
      * @param model TODO
      */
     public ConfigureAction(Object model) {
-        super("Configure");
+        super("Inspector");
         init(model);
     }
 
@@ -56,7 +56,7 @@ public class ConfigureAction extends StandardAction {
      * @param model TODO
      */
     public ConfigureAction(String actionName, Object model) {
-        super("Configure", actionName);
+        super("Inspector", actionName);
         init(model);
     }
 

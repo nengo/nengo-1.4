@@ -10,6 +10,7 @@ import ca.nengo.ui.lib.world.Droppable;
 import ca.nengo.ui.lib.world.DroppableX;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
+import ca.nengo.ui.lib.actions.UserCancelledException;
 
 /**
  * Action which allows the dragging of objects by the selection handler to be
@@ -96,14 +97,17 @@ public class DragAction extends ReversableAction {
 					fParent.addChild(node);
 					node.setOffset(state.getFinalOffset());
 
-					dropNode(node);
-
+					try {
+						dropNode(node);
+					} catch (UserCancelledException e) {
+						undo();
+					}
 				}
 			}
 		}
 	}
 
-	public static void dropNode(WorldObject node) {
+	public static void dropNode(WorldObject node) throws UserCancelledException {
 		if (node instanceof DroppableX || node instanceof Droppable) {
 			WorldObject worldLayer = node.getWorldLayer();
 
@@ -112,9 +116,7 @@ public class DragAction extends ReversableAction {
 
 			Collection<WorldObject> goodTargets = new ArrayList<WorldObject>(allTargets.size());
 
-			/*
-			 * Do not allow a Node to be dropped on a child of itself
-			 */
+			// Do not allow a Node to be dropped on a child of itself
 			for (WorldObject target : allTargets) {
 				if (!node.isAncestorOf(target)) {
 					goodTargets.add(target);

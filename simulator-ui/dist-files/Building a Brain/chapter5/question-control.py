@@ -10,23 +10,23 @@ import nef.templates.gate as gating
 import nef.templates.basalganglia as bgtemplate
 import nef.templates.basalganglia_rule as bg_rule
 
-net = nef.Network('Question Answering with Control (pre-built)')
+net = nef.Network('Question Answering with Control (pre-built)',seed=1)
 
 # Define the vocabulary of vectors
 vocab = hrr.Vocabulary(D,max_similarity=0.05)
 vocab.parse('CIRCLE+BLUE+RED+SQUARE+QUESTION+STATEMENT')
 
 # Input, output, and intermediate ensembles
-visual = net.make_array('Visual', N, D, quick=True)
-motor = net.make_array('Motor', N, D, quick=True)
-channel = net.make_array('Channel', N, D, quick=True)
+visual = net.make_array('Visual', N, D)
+channel = net.make_array('Channel', N, D)
+net.make_array('Motor', N, D)
 
 # Create the memory
 integrator.make(net,name='Memory',neurons=N*D,dimensions=D,tau_feedback=0.4,tau_input=0.1,scale=1)
 memory = net.network.getNode('Memory')
 
 # Add projections to and from the channel ensemble
-net.connect(visual, channel)
+net.connect('Visual', 'Channel')
 net.network.addProjection(channel.getOrigin('X'), memory.getTermination('input'))
 
 # Create ensemble calculating the unbinding transformation
@@ -38,8 +38,8 @@ net.network.addProjection(memory.getOrigin('X'), unbind.getTermination('B'))
 # Create basal ganglia and pattern matching rules
 bgtemplate.make(net,name='Basal Ganglia',dimensions=2,pstc=0.01)
 bg = net.network.getNode('Basal Ganglia')
-bg_rule.make(net,bg,index=0,dim=D,pattern='STATEMENT',pstc=0.01,use_single_input=True)
-bg_rule.make(net,bg,index=1,dim=D,pattern='QUESTION',pstc=0.01,use_single_input=True)
+bg_rule.make(net,bg,index=0,dimensions=D,pattern='STATEMENT',pstc=0.01,use_single_input=True)
+bg_rule.make(net,bg,index=1,dimensions=D,pattern='QUESTION',pstc=0.01,use_single_input=True)
 net.network.addProjection(visual.getOrigin('X'), bg.getTermination('rule_00'))
 net.network.addProjection(visual.getOrigin('X'), bg.getTermination('rule_01'))
 
@@ -85,6 +85,6 @@ class Input(nef.SimpleNode):
         
 input=Input('Input')
 net.add(input)
-net.connect(input.getOrigin('x'), visual)
+net.connect(input.getOrigin('x'), 'Visual')
 
 net.add_to_nengo()

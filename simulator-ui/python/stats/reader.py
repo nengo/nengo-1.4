@@ -80,8 +80,23 @@ class Reader:
         while len(t)>index and t[index][0]<time:
             index+=1        
         return index    
+
+    def keys(self):
+        return self.header
+
+    def items(self):
+        return [(k, self.get(k)) for k in self.keys()]
+
+    def values(self):
+        return [self.get(k) for k in self.keys()]
     
     def get(self,name,time=None,filter=None,normalize=False,keys=None):
+        """
+        Return a column of data from the csv
+
+        Parameters:
+        WRITEME
+        """
         if name not in self.cache:
             data=[]
             done_header=False
@@ -99,6 +114,16 @@ class Reader:
             self.cache[name]=data
         else:
             data=self.cache[name]    
+        # one of the types of data in the csv file is a *string* of the form
+        # "8a;9b;<...>"
+        # This string represent a vector (semantic pointer) in terms of
+        # a projections onto named [non-orthogonalized] basis elements.
+        # The numeric prefixes are the inner products, and the character suffixes
+        # name the basis elements.
+        #
+        # if `keys` is specified, then it means to only pay attention to the
+        # explicitly named suffix *keys*. Otherwise all of them are returned.
+        # 
         if keys is not None:
             data2=np.zeros((len(data),len(keys)),dtype=float)            
             for i,d in enumerate(data):
@@ -109,6 +134,7 @@ class Reader:
                 for j,key in enumerate(keys):
                     data2[i][j]=d.get(key,0)*scale
             data=data2
+            # -- normalize has already been done in the previous loop
             normalize=False
                     
         if filter is not None:
