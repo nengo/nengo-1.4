@@ -122,7 +122,8 @@ public class ConfigTemplateDialog extends ConfigDialog {
     	
     	String desc=getConfigurer().getConfigurable().getExtendedDescription();
     	if (desc!=null) {
-    		panel.add(new javax.swing.JLabel("<html>"+desc+"</html>"));
+    		javax.swing.JLabel label=new javax.swing.JLabel("<html><table width='250px'>"+desc+"</table></html>");
+    		panel.add(label);
     	}
 
         String[] files = getConfigurer().getPropertyFiles();
