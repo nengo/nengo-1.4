@@ -37,10 +37,10 @@ class TuningCurveWatch:
                         theta=xx*math.pi
                         input=math.sin(theta)*encoders[i][0]+math.cos(theta)*encoders[i][1]
                     n.radialInput=input    
-                    n.reset(False)
                     n.run(0,0)
                     output=n.getOrigin('AXON').getValues().getValues()[0]
                     rate.append(output)
+                    n.reset(False)
                 data.append(rate)
 
             obj.setMode(mode)
