@@ -684,10 +684,6 @@ class Network:
         if expose_weights and weight_func is None:
             weight_func=lambda w:w
         if weight_func is not None:
-            if pre_nodes or post_nodes:
-                raise NotImplementedError(
-                    'deep node indexing with weight_func',
-                    (pre_nodes, post_nodes))
             # calculate weights and pass them to the given function
             orig=origin
             while hasattr(orig,'getWrappedOrigin'): orig=orig.getWrappedOrigin()
@@ -712,7 +708,10 @@ class Network:
                    pre.createEnsembleOrigin('AXON')
             
             if not create_projection: return pre.getOrigin('AXON'),term
-            self.network.addProjection(pre.getOrigin('AXON'),term)
+            
+            origin=pre.getOrigin('AXON')            
+            return self._connect_and_expose(origin,pre_nodes,term,post_nodes)
+            
         elif (post is not None) and (not isinstance(post, int)):
             suffix=''
             attempts=1
@@ -730,25 +729,39 @@ class Network:
 
             if post is None or isinstance(post, int): return origin
             if not create_projection: return origin,term
-
-            # -- expose origin and term at the toplevel network,
-            #    so that we can connect them with a toplevel projection
             
-            projection_network=self.network
-            if pre_nodes is not None and post_nodes is not None:
-                while len(pre_nodes)>1 and len(post_nodes)>1 and pre_nodes[0]==post_nodes[0]:
-                    projection_network=pre_nodes[0]
-                    del pre_nodes[0]
-                    del post_nodes[0]
-            
-            if pre_nodes is not None:
-                origin = _expose_toplevel(origin, pre_nodes, 'Origin')
-            if post_nodes is not None:    
-                term = _expose_toplevel(term, post_nodes, 'Termination')
-
-            return projection_network.addProjection(origin,term)
+            return self._connect_and_expose(origin,pre_nodes,term,post_nodes)
         else:
             pass  # -- origin / termination has been created, work complete.
+            
+    def _connect_and_expose(self,origin,pre_nodes,term,post_nodes):
+        
+        # helper function for exposing to the desired level
+        def _expose_toplevel(o, nodes, expose_attr):
+            # -- if nodes looks like ['A', 'B', 'C']
+            #    then we want B.expose, then A.expose
+            for parent_node in reversed(nodes[:-1]):
+                name_in_parent = '%s.%s' % (
+                    o.node.name, o.getName())
+                expose_fn = getattr(parent_node, 'expose%s'%expose_attr)
+                expose_fn(o, name_in_parent)
+                o = getattr(parent_node,'get%s'%expose_attr)(name_in_parent)
+                assert o
+            return o
+    
+        projection_network=self.network
+        if pre_nodes is not None and post_nodes is not None:
+            while len(pre_nodes)>1 and len(post_nodes)>1 and pre_nodes[0]==post_nodes[0]:
+                projection_network=pre_nodes[0]
+                del pre_nodes[0]
+                del post_nodes[0]
+        if pre_nodes is not None:
+            origin = _expose_toplevel(origin, pre_nodes, 'Origin')
+        if post_nodes is not None:    
+            term = _expose_toplevel(term, post_nodes, 'Termination')
+        return projection_network.addProjection(origin,term)
+    
+                
     
     def learn(self,post,learn_term,mod_term,rate=5e-7,**kwargs):
         """Apply a learning rule to a termination of the *post* ensemble.
@@ -1124,21 +1137,6 @@ class Network:
         import timeview
         timeview.funcrep1d.FuncRepWatchCache.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
 
-# TODO: move this back to caller location as nested fn.
-def _expose_toplevel(o, nodes, expose_attr):
-    """
-    expose_attr: 'exposeOrigin' or 'exposeTerminal'
-    """
-    # -- if nodes looks like ['A', 'B', 'C']
-    #    then we want B.expose, then A.expose
-    for parent_node in reversed(nodes[:-1]):
-        name_in_parent = '%s.%s' % (
-            o.node.name, o.getName())
-        expose_fn = getattr(parent_node, 'expose%s'%expose_attr)
-        expose_fn(o, name_in_parent)
-        o = getattr(parent_node,'get%s'%expose_attr)(name_in_parent)
-        assert o
-    return o
 
 def test():
     net=Network('Test')
