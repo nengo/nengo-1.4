@@ -620,9 +620,22 @@ class Network:
         if isinstance(pre, basestring):
             pre_nodes = self._get_nodes(pre)
             pre = pre_nodes[-1]
+        elif isinstance(pre,Origin):
+            if pre.node not in self.network.nodes:
+                raise Exception('Cannot connect directly from an Origin that is not in this network')
+        else:
+            if pre not in self.network.nodes:
+                raise Exception('Cannot connect directly from a Node that is not in this network')
+                
         if isinstance(post, basestring):
             post_nodes = self._get_nodes(post)
             post = post_nodes[-1]
+        elif isinstance(post,Termination):
+            if post.node not in self.network.nodes:
+                raise Exception('Cannot connect directly to a Termination that is not in this network')
+        else:
+            if post not in self.network.nodes:
+                raise Exception('Cannot connect directly to a Node that is not in this network')
 
         # Check if pre and post are set if projection is to be created
         if( create_projection ):
