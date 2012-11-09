@@ -49,7 +49,7 @@ import ca.nengo.ui.lib.util.Util;
 public class ConfigTemplateDialog extends ConfigDialog {
 
     private static final long serialVersionUID = 5650002324576913316L;
-
+    
     private JComboBox templateList;
 
     /**
@@ -119,6 +119,11 @@ public class ConfigTemplateDialog extends ConfigDialog {
     @Override
     protected void initPanelTop(JPanel panel) {
          //Add existing templates
+    	
+    	String desc=getConfigurer().getConfigurable().getExtendedDescription();
+    	if (desc!=null) {
+    		panel.add(new javax.swing.JLabel("<html>"+desc+"</html>"));
+    	}
 
         String[] files = getConfigurer().getPropertyFiles();
 //        JPanel templatesPanel = new VerticalLayoutPanel();

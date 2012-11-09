@@ -76,6 +76,8 @@ class TemplateConstructor(IConfigurable):
         return self.template.__name__
     def getDescription(self):
         return self.template.title
+    def getExtendedDescription(self):
+        return getattr(self.template,'description',None)
 
     def set_network(self,network,node):
         if network is None: self.network = None

@@ -66,5 +66,11 @@ public interface IConfigurable {
      * @return Name given to this type of object
      */
     public String getDescription();
+    
+    /** 
+     * @return an html-formatted extended description/instructions of 
+     * what will be created 
+     */
+    public String getExtendedDescription();
 
 }

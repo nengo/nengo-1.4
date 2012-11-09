@@ -415,5 +415,8 @@ class Configureable implements IConfigurable {
     public String getDescription() {
         return description;
     }
+	public String getExtendedDescription() {
+		return null;
+	}
 
 }

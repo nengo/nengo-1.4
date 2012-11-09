@@ -74,4 +74,8 @@ public abstract class AbstractConstructable implements IConfigurable {
 	public void preConfiguration(ConfigResult props) throws ConfigException {
 		// do nothing
 	}
+	
+	public String getExtendedDescription() {
+		return null;
+	}
 }

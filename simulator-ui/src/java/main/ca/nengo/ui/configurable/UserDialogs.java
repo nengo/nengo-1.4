@@ -153,6 +153,10 @@ class UserMultiPropDialog {
         public String getDescription() {
             return getTypeName();
         }
+    	public String getExtendedDescription() {
+    		return null;
+    	}
+        
 
     }
 

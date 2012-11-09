@@ -150,4 +150,9 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
         return getTypeName();
     }
 
+	public String getExtendedDescription() {
+		return null;
+	}
+
+
 }
