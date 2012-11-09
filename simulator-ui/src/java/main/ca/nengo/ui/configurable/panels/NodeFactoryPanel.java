@@ -523,6 +523,10 @@ class PIndicatorPDF extends Property {
 
                 return new IndicatorPDF(min, max);
             } catch (NumberFormatException e) {
+            	setStatusMsg("invalid number format");
+                return null;
+            } catch (IllegalArgumentException e) {
+            	setStatusMsg("low must be less than or equal to high");
                 return null;
             }
 

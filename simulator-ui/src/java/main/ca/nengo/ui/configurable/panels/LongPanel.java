@@ -85,6 +85,7 @@ public class LongPanel extends PropertyInputPanel {
             }
 
         } catch (NumberFormatException e) {
+        	setStatusMsg("invalid number format");
             return false;
         }
 

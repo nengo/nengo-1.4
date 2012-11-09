@@ -73,6 +73,7 @@ public class FloatPanel extends PropertyInputPanel {
             getValue();
 
         } catch (NumberFormatException e) {
+        	setStatusMsg("invalid number format");
             return false;
         }
 
