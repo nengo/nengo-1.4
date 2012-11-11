@@ -552,7 +552,7 @@ class Network:
         :param transform: The linear transfom matrix to apply across the connection.
                           If *transform* is T and *pre* represents ``x``, then the connection
                           will cause *post* to represent ``Tx``.  Should be an N by M array,
-                          where N is the dimensionality of *pre* and M is the dimensionality of *post*,
+                          where N is the dimensionality of *post* and M is the dimensionality of *pre*,
                           but a 1-dimensional array can be given if either N or M is 1.
         :type transform: array of floats                              
         :param float pstc: post-synaptic time constant for the neurotransmitter/receptor implementing
