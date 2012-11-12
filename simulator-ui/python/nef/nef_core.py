@@ -624,7 +624,7 @@ class Network:
             if pre.node not in self.network.nodes:
                 raise Exception('Cannot connect directly from an Origin that is not in this network')
         else:
-            if pre not in self.network.nodes:
+            if pre is not None and pre not in self.network.nodes:
                 raise Exception('Cannot connect directly from a Node that is not in this network')
                 
         if isinstance(post, basestring):
@@ -634,7 +634,7 @@ class Network:
             if post.node not in self.network.nodes:
                 raise Exception('Cannot connect directly to a Termination that is not in this network')
         else:
-            if post not in self.network.nodes:
+            if post is not None and post not in self.network.nodes:
                 raise Exception('Cannot connect directly to a Node that is not in this network')
 
         # Check if pre and post are set if projection is to be created
