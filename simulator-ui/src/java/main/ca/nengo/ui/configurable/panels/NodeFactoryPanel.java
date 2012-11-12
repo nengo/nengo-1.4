@@ -180,7 +180,7 @@ abstract class ConstructableNodeFactory extends AbstractConstructable {
 	
 	// Parameters common to many neurons
     static final Property pInterceptDefault = new PIndicatorPDF("Intercept","Range of the uniform distribution of neuron x-intercepts, (typically -1 to 1)");
-    static final Property pMaxRateDefault = new PIndicatorPDF("Max rate [Hz]","Maximum neuron firing rate [typically between 100 and 200 hertz]");
+    static final Property pMaxRateDefault = new PIndicatorPDF("Max rate [Hz]","Maximum neuron firing rate [10 to 100Hz for cortex]");
     static final Property pTauRCDefault = new PFloat("tauRC [s]","Membrane time constant, in seconds [typically ~0.02s]");
     static final Property pTauRefDefault = new PFloat("tauRef [s]","Refractory period, in seconds [typically ~0.002s]");
 	
