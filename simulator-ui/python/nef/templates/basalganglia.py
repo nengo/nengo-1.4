@@ -37,22 +37,22 @@ def make(net,name='Basal Ganglia',dimensions=1,neurons=100,pstc=0.01,netbg=None,
     if net is not None:
         net.add(netbg.network)
     
-    if net.network.getMetaData("BasalGanglia") == None:
-        net.network.setMetaData("BasalGanglia", HashMap())
-    bgs = net.network.getMetaData("BasalGanglia")
+        if net.network.getMetaData("BasalGanglia") == None:
+            net.network.setMetaData("BasalGanglia", HashMap())
+        bgs = net.network.getMetaData("BasalGanglia")
 
-    bg=HashMap(5)
-    bg.put("name", name)
-    bg.put("dimensions", dimensions)
-    bg.put("neurons", neurons)
-    bg.put("pstc", pstc)
-    bg.put("same_neurons", same_neurons)
+        bg=HashMap(5)
+        bg.put("name", name)
+        bg.put("dimensions", dimensions)
+        bg.put("neurons", neurons)
+        bg.put("pstc", pstc)
+        bg.put("same_neurons", same_neurons)
 
-    bgs.put(name, bg)
+        bgs.put(name, bg)
 
-    if net.network.getMetaData("templates") == None:
-        net.network.setMetaData("templates", ArrayList())
-    templates = net.network.getMetaData("templates")
-    templates.add(name)
+        if net.network.getMetaData("templates") == None:
+            net.network.setMetaData("templates", ArrayList())
+        templates = net.network.getMetaData("templates")
+        templates.add(name)
 
     return netbg
