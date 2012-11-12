@@ -2,8 +2,10 @@ title='Basal Ganglia Rule'
 label='BG Rule'
 icon='BGRule.png'
 
+description="""<html>This template is dropped onto a basal ganglia model generated from the Basal Ganglia template.  It is used to define input rules in an SPA model. It provides the mapping from cortex to striatum to determine the value of the input semantic pointer with respect to the indexed rule.</html>"""
+
 params=[
-    ('index','Rule Index',int, 'The number of the rule currently being defined'),
+    ('index','Rule Index',int, 'The number of the rule currently being defined (0 indexed)'),
     ('pattern','Semantic Pointer',str,'The input representation that activates the rule'),
     ('dimensions','Dimensionality',int,'The dimensionality of the input'),
     ('pstc','Synaptic time constant [s]',float,'The post synaptic time constant, in seconds, of the input'),
@@ -74,7 +76,7 @@ def make(net,node,index=0,dimensions=8,pattern='I',pstc=0.01,use_single_input=Fa
     rule=HashMap(6)
     rule.put("name", node.getName())
     rule.put("index", index)
-    rule.put("dim", dim)
+    rule.put("dimensions", dimensions)
     rule.put("pattern", pattern)
     rule.put("pstc", pstc)
     rule.put("use_single_input", use_single_input)

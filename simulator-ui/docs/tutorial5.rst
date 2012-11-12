@@ -72,7 +72,9 @@ Binding Semantic Pointers (SPs)
 Control and Action Selection: Basal Ganglia
 ---------------------------------------------
 
-* Note: Much of what follows is summarized in Chp 6 of "How to build a brain," and can be constructed using the drag and drop templates in Nengo (specifically, Basal Ganglia, BG Rule, Thalamus, Binding, Gate, and Integrator)
+* Note: Much of what follows is summarized in Chp 5 of "How to build a brain," and can be constructed using the drag and drop templates in Nengo (specifically, Basal Ganglia, BG Rule, Thalamus, Binding, Gate, and Integrator)  
+
+* Also see the relevant "demos" section of the documentation (http://nengo.ca/docs/html/demos/demos.html#basal-ganglia-based-simulations)
 
 * Pretty much every cognitive model has an action selection component with these features:
 

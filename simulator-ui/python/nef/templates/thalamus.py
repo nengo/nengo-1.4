@@ -3,7 +3,9 @@ import nef
 title='Thalamus'
 label='Thalamus'
 icon='thalamus.png'
-    
+
+description="""<html>This template is designed to take output from a Basal Ganglia template model and send it to cortex for control of information flow or update of cortical states in SPA models.</html>"""
+
 params=[
     ('name','Name',str,'Name of the new thalamus sub-network'),
     ('neurons','Neurons per dimension',int,'Number of neurons for each dimension of the thalamus'),

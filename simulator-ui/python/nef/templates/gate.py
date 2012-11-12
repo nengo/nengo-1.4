@@ -2,6 +2,9 @@ title='Gate'
 label='Gate'
 icon='gate.png'
 
+description="""<html>This template creates an ensemble that drives an inhibitory gate on an existing specified ensemble. </html>"""
+
+
 params=[
     ('name','Name',str,'Name of the new gating ensemble'),
     ('gated','Name of gated ensemble',str,'Name of the existing ensemble to gate'),

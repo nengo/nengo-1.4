@@ -34,6 +34,8 @@ class PTemplateSign(Property):
     def getTypeClass(self):
         return PInt
     
+description="""<html>This template enables constructing subnetworks full D (# of dimensions) independent populations of neurons.  These are faster to construct but cannot compute all the same nonlinear functions as a single large population with D dimensions.</html>"""
+
 params=[
     ('name','Name',str, 'Name of the Network Array'),
     ('neurons','Neurons per dimension',int,'Number of neurons in each of the ensembles'),

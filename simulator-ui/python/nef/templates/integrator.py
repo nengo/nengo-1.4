@@ -2,6 +2,8 @@ title='Integrator'
 label='Integrator'
 icon='integrator.png'
 
+description="""<html>This constructs an integrator of the specified number of dimensions. It requires an input of that number of dimensions after construction.</html>"""
+
 params=[
     ('name','Name',str,'Name of the integrator'),
     ('neurons','Number of neurons',int,'Number of neurons in the integrator'),

@@ -69,6 +69,8 @@ class PSystemMatrix(Property):
     def getTypeClass(self):
         return PCouplingMatrix(1,1).getTypeClass()
         
+description="""<html>This is a generic template for constructing a recurrent network that implements the specified dynamic linear system: dx/dt = Ax + Bu. Input Bu must be supplied after construction by adding a termination with the B matrix.</html>"""
+
 params=[
     ('name','Name',str,'Name of the new linear system'),
     ('neurons','Number of Neurons',int,'Number of neurons in the new linear system'),

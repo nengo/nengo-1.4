@@ -2,6 +2,8 @@ title='Binding'
 label='Binding'
 icon='convolution.png'
 
+description="""<html>This template inserts a subnetwork that computes the circular convolution (the SPA binding operator) of two inputs. The dimensionality of the input is determined by the dimensionality of the specified output ensemble. Inverting an input causes it to be unbound from the other input. Inputs must be specified after construction.</html>"""
+
 params=[
     ('name','Name',str,'Name of the binding (circular convolution) population'),
     ('outputName','Name of output ensemble',str,'Name of an existing ensemble specifying the output destination for the binding ensemble'),

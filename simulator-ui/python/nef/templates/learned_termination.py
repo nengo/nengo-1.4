@@ -2,14 +2,16 @@ title='Learned Termination'
 label='Learned\nTermination'
 icon='learn.png'
 
+description="""<html>This template introduces error-modulated learning into a pre-existing connection in the network. The presynaptic side is 'pre' and the postsynaptic side is 'post'. The error signal must be computed in the added error ensemble, and is usually a gradient.</html>"""
+
 params=[
     ('errName','Name of (new) error ensemble',str,
-      "Provides modulatory input to the post population, "
-      "modifying its connection from the pre population."
+      "Provides modulatory input to the post ensemble, "
+      "modifying its connection from the pre ensemble."
       "<br />Automatically created."),
     ('N_err', 'Number of neurons in error ensemble',int, 'Set the number of neurons in the error ensemble'),
-    ('preName','Name of pre ensemble',str, 'Select the name of the pre population (this population must already exist)'),
-    ('postName','Name of post ensemble',str,'Select the name of the post population (this population must already exist)'),
+    ('preName','Name of pre ensemble',str, 'Select the name of the pre ensemble (this ensemble must already exist)'),
+    ('postName','Name of post ensemble',str,'Select the name of the post ensemble (this ensemble must already exist)'),
     ('rate','Learning rate',float, 'Set the learning rate')
     ]
 
