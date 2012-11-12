@@ -33,6 +33,7 @@ import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.NodeContainer.ContainerException;
+import ca.nengo.ui.util.NengoClipboard;
 
 /**
  * TODO
@@ -60,10 +61,11 @@ public class PasteAction extends StandardAction {
 
     @Override
     protected void action() throws ActionException {
-        ArrayList<Node> nodes = NengoGraphics.getInstance().getClipboard().getContents();
-        ArrayList<Point2D> offsets = NengoGraphics.getInstance().getClipboard().getOffsets();
-        
-        if (nodes != null && nodes.size() > 0) {
+    	NengoClipboard clipboard = NengoGraphics.getInstance().getClipboard();
+        if (clipboard.hasContents()) {
+			ArrayList<Node> nodes = clipboard.getContents();
+			ArrayList<Point2D> offsets = clipboard.getOffsets();
+        	
         	for (int i = 0; i < nodes.size(); i++) {
         		Node node = nodes.get(i);
         		try {

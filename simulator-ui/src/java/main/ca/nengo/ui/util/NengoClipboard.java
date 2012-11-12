@@ -35,6 +35,9 @@ public class NengoClipboard {
 
 	private ArrayList<Node> selectedObjs = null;
 	private ArrayList<Point2D> objectOffsets = null;
+	
+	///////////////////////////////////////////////////////////////////////////
+	/// Listeners
 
 	public static interface ClipboardListener {
 		public void clipboardChanged();
@@ -52,30 +55,40 @@ public class NengoClipboard {
 		} else {
 			throw new InvalidParameterException();
 		}
-
 	}
-
-	public void setContents(ArrayList<Node> nodes, ArrayList<Point2D> objOffsets) {
-		selectedObjs = nodes;
-		objectOffsets = objOffsets;
-		fireChanged();
-	}
-
+	
 	private void fireChanged() {
 		for (ClipboardListener listener : listeners) {
 			listener.clipboardChanged();
 		}
 	}
 
+	///////////////////////////////////////////////////////////////////////////
+	/// Accessors and mutators
+	
+	public boolean hasContents() {
+		return (selectedObjs != null && selectedObjs.size() > 0); 
+	}
+	
+	public ArrayList<String> getContentsNames() {
+		if (hasContents()) {
+			ArrayList<String> result = new ArrayList<String>(selectedObjs.size());
+			for (Node obj : selectedObjs)
+				result.add(obj.getName());
+			return result;
+		} else {
+			return null;
+		}
+	}
+
 	public ArrayList<Node> getContents() {
-		if (selectedObjs != null) {
+		if (hasContents()) {
 			ArrayList<Node> clonedObjects = new ArrayList<Node>();
 			for (Node curObj : selectedObjs) {
 				try {
-					/*
-					 * If the object supports cloning, use it to make another model
-					 */
+					// If the object supports cloning, use it to make another model
 					curObj = curObj.clone();
+					
 					clonedObjects.add(curObj);
 				} catch (CloneNotSupportedException e) {
 					curObj = null;
@@ -90,6 +103,12 @@ public class NengoClipboard {
 
 	public ArrayList<Point2D> getOffsets() {
 		return objectOffsets;
+	}
+
+	public void setContents(ArrayList<Node> nodes, ArrayList<Point2D> objOffsets) {
+		selectedObjs = nodes;
+		objectOffsets = objOffsets;
+		fireChanged();
 	}
 	
 }

@@ -8,7 +8,6 @@ import java.util.Collection;
 
 import javax.swing.JPopupMenu;
 
-import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.PasteAction;
 import ca.nengo.ui.lib.Style.NengoStyle;
@@ -34,6 +33,7 @@ import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXGrid;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXLayer;
 import ca.nengo.ui.models.NodeContainer;
+import ca.nengo.ui.util.NengoClipboard;
 import edu.umd.cs.piccolo.PRoot;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -244,11 +244,12 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 * @return Menu builder
 	 */
 	protected void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
-		ArrayList<Node> clipboardNodes = NengoGraphics.getInstance().getClipboard().getContents();
-		if (clipboardNodes != null && clipboardNodes.size() > 0) {
+		NengoClipboard clipboard = NengoGraphics.getInstance().getClipboard();
+		if (clipboard.hasContents()) {
+			ArrayList<String> clipboardNames = clipboard.getContentsNames();
 			String selectionName = "";
-			if (clipboardNodes.size() == 1) {
-				selectionName = clipboardNodes.get(0).getName();
+			if (clipboardNames.size() == 1) {
+				selectionName = clipboardNames.get(0);
 			} else {
 				selectionName = "selection";
 			}
