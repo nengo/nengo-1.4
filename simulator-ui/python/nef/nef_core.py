@@ -702,6 +702,9 @@ class Network:
             while hasattr(orig,'getWrappedOrigin'): orig=orig.getWrappedOrigin()
             decoder=orig.getDecoders()
             encoder=post.getEncoders()
+            
+            # scale by radius
+            encoder=MU.prod(encoder,1.0/post.getRadii()[0])
 
             a,va,k,d=inspect.getargspec(weight_func)
             if len(a)==1:            
