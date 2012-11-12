@@ -85,6 +85,7 @@ import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.WorldObject.Property;
 import ca.nengo.ui.lib.world.elastic.ElasticWorld;
+import ca.nengo.ui.lib.world.handlers.MouseHandler;
 import ca.nengo.ui.lib.world.handlers.SelectionHandler;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.Universe;
@@ -574,7 +575,25 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         ArrayList<Node> nodes = getClipboard().getContents();
         if (nodes != null && nodes.size() > 0) {
-            pasteAction = new PasteAction("Paste", this);
+            pasteAction = new StandardAction("Paste") {
+            	private static final long serialVersionUID = 1L;
+                public void action() {
+                	// look for the active mouse handler. If it exists, it should contain
+                	// the current mouse position (from the mousemoved event), so use this
+                	// to create a new PasteEvent
+                	PasteAction a;
+                	MouseHandler mh = MouseHandler.getActiveMouseHandler();
+                	if (mh != null) {
+                		a = new PasteAction("Paste", (NodeContainer)mh.getWorld());
+                		Point2D pos = mh.getMouseMovedRelativePosition();
+                		if (pos != null)
+                			a.setPosition(pos.getX(), pos.getY());
+                	} else {
+                		a = new PasteAction("Paste", NengoGraphics.getInstance());
+                	}
+            		a.doAction();
+                }
+            };
         } else {
             pasteAction = new DisabledAction("Paste", "No object is in the clipboard");
         }
