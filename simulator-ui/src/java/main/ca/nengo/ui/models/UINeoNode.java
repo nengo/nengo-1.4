@@ -334,16 +334,28 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 					if (!modelTerminationSet.contains(model)) {
 						wo.destroy();
 						this.showPopupMessage("Termination removed: " + wo.getName());
+					} else {
+						modelTerminationSet.remove(model);
 					}
 				}
 				if (wo instanceof Origin) {
 					if (!modelOriginSet.contains(model)) {
 						wo.destroy();
 						this.showPopupMessage("Origin removed: " + wo.getName());
+					} else {
+						modelOriginSet.remove(model);
 					}
 				}
 			}
 
+		}
+		
+		// Ensure that any new origins and terminations are shown
+		for (Termination term:modelTerminationSet) {
+			this.showTermination(term.getName());
+		}
+		for (Origin origin:modelOriginSet) {
+			this.showOrigin(origin.getName());
 		}
 	}
 
