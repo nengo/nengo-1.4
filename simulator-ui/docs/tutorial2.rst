@@ -6,7 +6,7 @@ Creating Terminations
 
 * Connections between ensembles are built using Origins and Terminations.  The Origin from one ensemble can be connected to the Termination on the next ensemble
 * Create two ensembles.  They can have different neural properties and different numbers of neurons, but for now make sure they are both one-dimensional.
-* Right-click on the second ensemble and select Add Decoded Termination
+* Drag the Termination icon from the sidebar onto the second ensemble
 
    * Provide a name (for example, ``input``)
    * Set the input dimension to 1 and use Set Weights to set the connection weight to 1
@@ -37,7 +37,7 @@ Adding Inputs
 
 * In order to test that this projection works, we need to set the value encoded by the first neural ensemble.  We do this by creating an input 
   to the system.  This is how all external inputs to Nengo models are specified.
-* Right-click inside the Network and choose Create New->Function Input.
+* Drag a Function Input icon from the sidebar into the network.
 * Give it a name (for example, ``external input``)
 * Set its output dimensions to 1
 
@@ -54,7 +54,7 @@ Adding Inputs
    :align: center
 
 
-* Add a termination on the first neural ensemble and create a projection from the new input to that ensemble.
+* Add a termination on the first neural ensemble (as before) and create a projection (as before) from the new input to that ensemble.
 
 .. image:: images/p2-10.png
 
@@ -64,7 +64,7 @@ Interactive Plots
 
 * To observe the performance of this model, we now switch over to Interactive Plots.  This allows us to both graph the performance of the 
   model and adjust its inputs on-the-fly to see how this affects behaviour.
-* Start Interactive Plots by right-clicking inside the Network and selecting Interactive Plots
+* Start Interactive Plots by right-clicking inside the Network and selecting Interactive Plots or clicking the 'double sine' icon at the top right.
 
 .. image:: images/p2-101.png
 
@@ -132,20 +132,20 @@ Adding Scalars
 -----------------
 
 * If we want to add two values, we can simply add another termination to the final ensemble and project to it as well.
-* Create a termination on the second ensemble called â€œinput 2â€
+* Create a termination on the second ensemble called ``input 2``
 * Create a new ensemble
 * Create a projection from the X origin to input 2
 
 .. image:: images/p2-19.png
 
 
-* Create a new Function input and set its value to -0.7
-* Add the required termination and projection to connect it to the new ensemble
+* Create a new Function Input and set its constant value to -0.7
+* Add the required termination and projection to connect it to the new ensemble 
 
 .. image:: images/p2-20.png
 
 
-* Switch to Interactive Plots.
+* Open Interactive Plots
 * Show the controls for the two inputs
 * Create value graphs for the three neural ensembles
 * Press Play to start the simulation.  The value for the final ensemble should be 0.5-0.7=-0.2
@@ -154,21 +154,21 @@ Adding Scalars
 .. image:: images/p2-107.png
 
 
-* This will be true for most values.  However, if the sum is outside of the radius that was set when the neural group was formed (in this case, from -1 to 1), then the neurons may not be able to fire fast enough to represent that value (i.e. they will saturate).  Try this by computing 1+1.  The result will only be around 1.3.
-* To accurately represent values outside of the range -1 to 1, we need to change the radius of the output ensemble.  Return to the standard black editing mode and right-click on ensemble B.  Select "Configure" and change its radii to 2.  Now return to the Interactive Plots.  The network should now accurately compute that 1+1=2.
+* This will be true for most values.  However, if the sum is outside of the radius that was set when the neural group was formed (in this case, from -1 to 1), then the neurons may not be able to fire fast enough to represent that value (i.e., they will saturate).  Try this by computing 1+1.  The result will only be around 1.3.
+* To accurately represent values outside of the range -1 to 1, we need to change the radius of the output ensemble.  Return to the Nengo Workspace and configure ensemble B.  Change its 'radii' to 2.  Now return to the Interactive Plots.  The network should now accurately compute that 1+1=2.
 
 Adjusting Transformations
 --------------------------
 
 * So far, we have only considered projections that do not adjust the values being represented in any way.  However, due to the NEF derivation of the synaptic weights between neurons, we can adjust these to create arbitrary linear transformations (i.e. we can multiply any represented value by a matrix).
 * Each termination in Nengo has an associated transformation matrix.  This can be adjusted as desired.  In this case, we will double the weight of the original value, so instead of computing x+y, the network will compute 2x+y.
-* Right-click on the first termination in the ensemble that has two projections coming into it. Select Configure.  Double-click on transform.
-* Double-click on the 1.0 and change it to 2.0
+* Right-click on the first termination in the ensemble that has two projections coming into it. Select Inspector.  Double-click on transform.
+* Double-click on the 1.0 and change it to 2.0. 
 
 .. image:: images/p2-22.png
 
 
-* Click on OK and then Done
+* Click 'Save Changes'.
 * Now run the simulation.  The final result should be 2(0.5)-0.7=0.3
 
 
@@ -191,9 +191,9 @@ Multiple Dimensions
    * ``a*[1 0] + b*[0 1] = [a 0] + [0 b] = [a b]``
    * This will be useful for creating non-linear transformations, as discussed further in the next section.
 
-* There are additional ways to view 2D representations in the interactive plots
+* There are additional ways to view 2D representations in the interactive plots, including:
  
-    * Including plotting the activity of the neurons along their preferred direction vectors
+    * Plotting the activity of the neurons along their preferred direction vectors
     * Plotting the 2D decoded value of the representation
 
 .. image:: images/p2-108.png
@@ -203,11 +203,9 @@ Scripting
 ------------
 
 * Along with the ability to construct models using this point-and-click interface, Nengo also provides a Python scripting language interface for model creation.  These examples can be seen in the "demo" directory.
-* To create the communication channel through the scripting interface, go to the Script Console (Ctrl-P) and type::
+* To create the communication channel through the scripting interface, click on the Folder icon (top left), navigate to the /demo directory (inside the Nengo home folder) and open "communication.py"
 
-    run demo/communication.py
-
-* The actual code for this can be seen by opening the communication.py file in the demo directory::
+* The actual code for this can be seen by opening the communication.py file in a text editor::
 
     import nef
 

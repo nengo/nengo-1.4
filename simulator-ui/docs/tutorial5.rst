@@ -11,10 +11,10 @@ Larger Systems
    * non-linear transformation
    * feedback
    
-* The goal is to use these components to build full cognitive models using spiking neurons
+* It is possible to use these components to build full cognitive models using spiking neurons (see http://nengo.ca/build-a-brain):
 
-   * Constrained by the actual properties of real neurons in real brains (numbers of neurons, connectivity, neurotransmitters, etc)
-   * Should be able to produce behavioural predictions in terms of timing, accuracy, lesion effects, drug treatments, etc
+   * Constrained by the actual properties of real neurons in real brains (numbers of neurons, connectivity, neurotransmitters, etc.)
+   * That should be able to produce behavioural predictions in terms of timing, accuracy, lesion effects, drug treatments, etc.
    
 * Some simple examples
 
@@ -22,7 +22,7 @@ Larger Systems
    
      * take an existing engineering control model for what angles to move joints to to place the hand at a particular position::
 
-        run demo/armcontrol.py
+        open "demo/armcontrol.py"
 
    .. image:: images/p5-101.png
 
@@ -30,23 +30,23 @@ Larger Systems
    
      * connect range sensors to opposite motors on a wheeled robot::
 
-        run demo/vehicle.py
+        open "demo/vehicle.py"
 
    .. image:: images/p5-102.png
 
 Binding Semantic Pointers (SPs)
 ---------------------------------
 
-* We want to manipulate sophisticated representational states (this is the purpose of describing the semantic pointer architecture (SPA)) 
+* We want to manipulate sophisticated representational states (this is the purpose of describing the Semantic Pointer Architecture (SPA; http://nengo.ca/build-a-brain)) 
 * The main operation to manipulate representations in the SPA is circular convolution (for binding)
 * Let's explore a binding circuit for semantic pointers
 
 * Input: Two semantic pointers (high-dimensional vectors)
 * Output: One semantic pointer (binding the original two)
 
-* Implementation: element-wise multiplication of DFT (as described in slides)::
+* Implementation: element-wise multiplication of DFT (i.e., circular convolution) (Note: there is a drag and drop template for this operation)::
 
-    run demo/convolve.py
+    open "demo/convolve.py"
 
 .. image:: images/p5-201.png
 
@@ -54,7 +54,7 @@ Binding Semantic Pointers (SPs)
 
    * would need 100 controls to configure a single 100-dimensional vector
    
-* Nengo has a specialized "semantic pointer" graph for these high-dimensional cases
+* Nengo Interactive Plots has a specialized "semantic pointer" graph for these high-dimensional cases
 
    * Instead of showing the value of each element in the vector (as with a normal graph), it shows the similarity between the currently represented vector and all the known vectors
    * "How much like CAT is this?  How much like DOG?  How much like RED?  How much like TRIANGLE?"
@@ -65,14 +65,16 @@ Binding Semantic Pointers (SPs)
 
    * This shows that the network is capable of computing the circular convolution operation, which binds two semantic pointers to create a third one.
    
-* Use the right-click menu to set the input values to "a" and "~a*b".  The output should be similar to "b".
+* Use the right-click menu to set the input values to "a" and "~a*b".  The output should be similar to "b" (Note: '~' is an approximate inverse operator)
 
    * This shows that convolution can be used to transform representations via binding and unbinding, since "a*(~a*b)" is approximately "b".
 
 Control and Action Selection: Basal Ganglia
 ---------------------------------------------
 
-* Pretty much every cognitive model has an action selection component
+* Note: Much of what follows is summarized in Chp 6 of "How to build a brain," and can be constructed using the drag and drop templates in Nengo (specifically, Basal Ganglia, BG Rule, Thalamus, Binding, Gate, and Integrator)
+
+* Pretty much every cognitive model has an action selection component with these features:
 
    * Out of many possible things you could do right now, pick one
    * Usually mapped on to the basal ganglia
@@ -96,7 +98,7 @@ Control and Action Selection: Basal Ganglia
      * Often used in non-spiking neural networks (e.g. PDP++) to do k-winner-take-all
      * But, you have to wait for the network to settle, so it can be rather slow
      
-   * Gurney, Prescott, & Redgrave (2001)
+   * Gurney, Prescott, & Redgrave (2001) (In Nengo there is a drag and drop template for this BG model)
    
      * Model of action selection constrained by the connectivity of the basal ganglia
 
@@ -110,7 +112,7 @@ Control and Action Selection: Basal Ganglia
    * We can use populations of spiking neurons and compute that function
    * We can also use correct timing values for the neurotransmitters involved::
 
-        run demo/basalganglia.py
+        open demo/basalganglia.py
 
 * Adjust the input controls to change the five utility values being selected between
 * Graph shows the output from the basal ganglia (each line shows a different action)
@@ -138,6 +140,8 @@ Control and Action Selection: Basal Ganglia
    * In rats: 14-17ms.  In model: 14ms (or more if the injected current isn't extremely large)
 
    .. image:: images/p5-108.png
+   
+* For details, see Stewart et al., 2010 (http://ctnsrv.uwaterloo.ca/cnrglab/node/53)
 
 Sequences of Actions
 --------------------
@@ -163,7 +167,7 @@ Sequences of Actions
    * Rules for IF A THEN B, IF B THEN C, IF C THEN D, IF D THEN E, IF E THEN A
    * Five *production rules* (semantic pointer mappings) cycling through the five states::
 
-        run demo/sequence.py
+        open demo/sequence.py
 
    .. image:: images/p5-109.png
 
@@ -182,7 +186,7 @@ Routing of Information
    * Same model as above, be we want visual input to be able to control where we start the sequence
    * Simple approach: add a visual buffer and connect it to the working memory::
 
-        run demo/sequencenogate.py
+        open demo/sequencenogate.py
 
    .. image:: images/p5-113.png
 
@@ -195,7 +199,7 @@ Routing of Information
    * In this case, we add a rule that says "IF it contains a letter, transfer the data from the visual area to working memory"   
    * We make the utility of the rule lower than the utility of the sequence rules, so that it will only transfer that information (open that gate) when no other action applies::
 
-        run demo/sequencerouted.py
+        open demo/sequencerouted.py
 
 .. image:: images/p5-112.png
 
@@ -237,7 +241,7 @@ Question Answering
   (hours!) to solve for the decoders and neural connection weights needed.  We have pre-computed the larger of these networks for you, and they can be 
   downloaded at http://ctn.uwaterloo.ca/~cnrglab/f/question.zip::
   
-    run demo/question.py
+    open demo/question.py
 
 .. image:: images/p5-202.png
 

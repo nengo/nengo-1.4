@@ -19,11 +19,11 @@ Functions of one variable
 * To perform a non-linear operation, we need to define a new origin
 
    * The X origin just uses :math:`f(x)=x`.
-   * Create a new ensemble and a function input.  The ensemble should be one-dimensional with 100 neurons and a radius of 1.  Use a Constant Function input set two 0.5.
+   * Create a new ensemble and a function input.  The ensemble should be one-dimensional with 100 neurons and a radius of 1.  Use a Constant Function input set to 0.5.
    * Create a termination on the ensemble and connect the function input to it
    * Now create a new origin that will estimate the square of the value.
    
-     * Right-click on the combined ensemble and select Add decoded origin
+     * Drag the Origin icon from the sidebar onto the ensemble
      * Set the name to ``square``
      * Click on Set Functions
      * Select User-defined Function and press Set
@@ -34,7 +34,7 @@ Functions of one variable
 
 .. image:: images/p3-9b.png
 
-* Start Interactive Plots.  
+* Start Interactive Plots
 * Create a control for the input, so you can adjust it while the model runs (right-click on the input and select "control")
 * Create a graph of the "square" value from the ensemble.  Do this by right-clicking on the ensemble in the Interactive Plots window and selecting "square->value".
 * For comparison, also create a graph for the standard X origin byt right-clicking on the ensemble and selecting "X->value".  This is the standard value graph that just shows the value being represented by this ensemble.
@@ -42,9 +42,7 @@ Functions of one variable
 
 .. image:: images/p3-101.png
 
-* You can also run this example using scripting::
-
-    run demo/squaring.py
+* You can also run this example by opening "demo/squaring.py"
 
 
 Functions of multiple variables
@@ -60,7 +58,6 @@ Functions of multiple variables
    * The ensembles should be one-dimensional, use 100 neurons and have a radius of 10 (so they can represent values between -10 and 10)
    * The two function inputs should be constants set to 8 and 5
    * The terminations you create to connect them should have time constants of 0.01 (AMPA)
-
 
 .. image:: images/p3-1.png
 
@@ -79,13 +76,13 @@ Functions of multiple variables
 
 .. image:: images/p3-2.png
 
-* Next, create an ensemble to store the result.  It should have a radius of 100, since it will need to represent values from -100 to 100.  Give it a single one-dimensional termination with a weight of 1.
+* Next, create an ensemble to represent the result.  It should have a radius of 100, since it will need to represent values from -100 to 100 (i.e. max(10*10)).  Give it a single one-dimensional termination with a weight of 1.
 
 .. image:: images/p3-3.png
 
 * Now we need to create a new origin that will estimate the product between the two values stored in the combined ensemble.
 
-   * Right-click on the combined ensemble and select Add decoded origin.
+   * Drag the Origin icon onto the Combined ensemble
    * Set the name to ``product``
    * Set Output dimensions to 1
 
@@ -105,15 +102,13 @@ Functions of multiple variables
 
 .. image:: images/p3-7.png
 
-* Add a probe to the result ensemble and run the simulation
-* The result should be approximately 40.
-* Adjust the input controls to multiple different numbers together.
+* Run the simulation with Interactive Plots, and view the appropriate graphs
+* The result should be approximately 40
+* Adjust the input controls to multiple different numbers together
 
 .. image:: images/p3-102.png
 
-* You can also run this example using scripting::
-
-    run demo/multiplication.py
+* You can also run this example by opening "demo/multiplication.py"
 
 
 Combined Approaches
@@ -121,13 +116,13 @@ Combined Approaches
 
 * We can combine these two approaches in order to compute more complex funxtions, such as :math:`x^2y`
 
-   * Right-click on the ensemble representing the first of the two values and select Add decoded origin.
+   * Drag an Origin onto the ensemble representing the first of the two values.
    * Give it the name "square", set its output dimensions to 1, and press Set Functions.
    * As before, select the User-defined Function and press Set.
    * Set the Expression to be "x0*x0".  
    * Press OK, OK, and OK to finish creating the origin.
    * This new origin will calculate the square of the value represented by this ensemble.
-   * If you connect this new origin to the Combined ensemble instead of the standard X origin, the network will calculate :math:`x^2y` instead of :math:`xy`.
+   * If you connect this new origin to the Combined ensemble instead of the standard X origin, the network will calculate :math:`x^2y` instead of :math:`xy`. [Note: To remove the X origin projection, drag it away from the Combined population. Right-click the end of the line and select 'Remove' to delete the projection altogether.]
 
 .. image:: images/p3-9a.png
 
