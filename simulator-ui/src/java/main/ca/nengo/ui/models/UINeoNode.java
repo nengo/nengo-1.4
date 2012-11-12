@@ -355,6 +355,14 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 			this.showTermination(term.getName());
 		}
 		for (Origin origin:modelOriginSet) {
+			String name=origin.getName();
+			
+			// don't automatically show these two origins for NEFEnsembles
+			if (this instanceof UINEFEnsemble) {
+				if (name.equals("AXON") || name.equals("current")) {
+					continue;				
+				}
+			}
 			this.showOrigin(origin.getName());
 		}
 	}
