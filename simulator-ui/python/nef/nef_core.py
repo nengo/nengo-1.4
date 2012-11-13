@@ -93,7 +93,7 @@ class Network:
                                or a list of maximum rate values to use
         :type max_rate:          tuple or list                       
         :param intercept:     normalized range for uniform selection of tuning curve x-intercept (as 2-tuple)
-                               or a list of intercept values to use                          
+                               or a list of intercept values to use  (intercepts are defined with respect to encoders, so an encoder of -1 and intercept of .3 will result in a neuron only active below -.3)                        
         :type intercept:          tuple or list                       
         :param float radius:        representational range        
         :param list encoders:      list of encoder vectors to use (if None, uniform distribution around unit sphere).

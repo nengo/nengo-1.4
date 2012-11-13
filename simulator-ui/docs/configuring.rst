@@ -54,7 +54,7 @@ The intercept is the point on the tuning curve graph where the neuron starts fir
 for a one-dimensional ensemble, a neuron with a preferred direction vector of [1]
 and an intercept of 0.3 will only fire when representing values above 0.3.  If the preferred
 direction vector is [-1], then it will only fire for values below 0.3.  In general, the neuron will
-only fire if the dot product of **x** (the value being represented) and the preferred direction vector,
+only fire if the dot product of **x** (the value being represented) and the preferred direction vector (see below),
 divided by the radius, is greater than the intercept.  Note that since we divide by the radius, the
 intercepts will always be normalized to be between -1 and 1.
 
