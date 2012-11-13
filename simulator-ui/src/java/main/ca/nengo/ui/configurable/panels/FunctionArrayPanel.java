@@ -169,6 +169,10 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
     @Override
     public boolean isValueSet() {
+    	if (!isOutputDimensionsSet()) {
+    		return false;
+    	}
+    	
         if (myFunctionsWr != null && (myFunctionsWr.length == getOutputDimension())) {
             return true;
         } else {
