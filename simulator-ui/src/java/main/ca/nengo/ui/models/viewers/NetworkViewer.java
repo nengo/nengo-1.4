@@ -723,8 +723,7 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 
     public UINeoNode addNodeModel(Node node, Double posX, Double posY) throws ContainerException {
         try {
-            getModel().addNode(node);
-
+        	// first, add node to UI
             UINeoNode nodeUI = UINeoNode.createNodeUI(node);
 
             if (posX != null && posY != null) {
@@ -733,6 +732,11 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
             } else {
                 addUINode(nodeUI, true, false);
             }
+            
+            // second, add node to model. This must be done second, otherwise
+            // it updates the view and there is a race to add the UI node
+            getModel().addNode(node);
+            
             return nodeUI;
         } catch (StructuralException e) {
             throw new ContainerException(e.toString());
