@@ -245,6 +245,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar.add(self.layoutcombo)
         self.layoutsave=make_button('save',self.do_save_layout,"save the current network layout",enabled=False)
         self.toolbar.add(self.layoutsave)
+        self.zoom=make_button('zoom',self.do_zoom_to_fit,"zoom to fit")
+        self.toolbar.add(self.zoom)
         self.toolbar.add(Box.createHorizontalGlue())
         
         #self.button_stop=make_button('stop',self.do_interrupt,'Stop the currently running simulation',enabled=False)
@@ -363,6 +365,9 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             for c in list(self.ng.world.ground.children): 
                 ng.removeNodeModel(c.model)    
 
+
+    def do_zoom_to_fit(self,event):
+        self.ng.world.zoomToFit()
 
     def do_inspect(self,event):
         self.ng.toggleConfigPane()
