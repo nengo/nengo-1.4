@@ -131,7 +131,7 @@
 		depends="javadoc,sphinx,findbugs,cpd,pmd,checkstyle" />
 	
 	<target description="Create a distribution folder. Requires that git is installed and working."
-		depends="build,javadoc-simulator" name="dist">
+		depends="clean,build,javadoc-simulator" name="dist">
     	<exec executable="git" spawn="false" dir="${basedir}" outputproperty="buildhash">
         <arg line="rev-parse --short HEAD"/>
       </exec>
