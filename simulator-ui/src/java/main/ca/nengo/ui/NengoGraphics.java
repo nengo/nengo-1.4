@@ -59,6 +59,7 @@ import ca.nengo.model.Termination;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
+import ca.nengo.ui.actions.GeneratePythonScriptAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
 import ca.nengo.ui.actions.PasteAction;
 import ca.nengo.ui.actions.RemoveModelAction;
@@ -858,7 +859,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         fileMenu.addAction(new SaveNetworkAction("Save Network"),
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_KEY_MASK));
-
+ 
+        fileMenu.addAction(new GenerateScriptAction("Generate Script"),
+                KeyEvent.VK_G,
+                KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_KEY_MASK));
     }
 
     @Override
@@ -1068,6 +1072,35 @@ class SaveNetworkAction extends StandardAction {
 
             SaveNodeAction saveNodeAction = new SaveNodeAction(selectedNetwork);
             saveNodeAction.doAction();
+
+        } else {
+            throw new ActionException("No parent network to save, please select a node");
+        }
+    }
+}
+
+/**
+ * Generates a script for the highest network including the selected object
+ * 
+ * @author Chris Eliasmith
+ */
+class GenerateScriptAction extends StandardAction {
+
+    private static final long serialVersionUID = 1L;
+
+    public GenerateScriptAction(String description) {
+        super(description);
+    }
+
+    @Override
+    protected void action() throws ActionException {
+        WorldObject selectedNode = NengoGraphics.getInstance().getSelectedObj();
+
+        UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
+        if (selectedNetwork != null) {
+
+        	GeneratePythonScriptAction generatePythonScriptAction = new GeneratePythonScriptAction(selectedNetwork);
+        	generatePythonScriptAction.doAction();
 
         } else {
             throw new ActionException("No parent network to save, please select a node");

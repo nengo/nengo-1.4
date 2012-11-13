@@ -700,6 +700,13 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		fm.save(this.getModel(), file);
 		new TransientStatusMessage(this.getFullName() + " was saved to " + file.toString(), 2500);
 	}
+	
+	public void generateScript(File file) throws IOException {
+		FileManager fm = new FileManager();
+
+		fm.generate(this.getModel(), file.toString());
+		new TransientStatusMessage(this.getFullName() + " generated script " + file.toString(), 2500);
+	}
 
 	@Override
 	public final void setName(String name) {
