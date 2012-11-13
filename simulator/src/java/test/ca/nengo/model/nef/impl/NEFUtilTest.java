@@ -15,7 +15,6 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.neuron.Neuron;
-import ca.nengo.plot.Plotter;
 import ca.nengo.util.MU;
 
 /**

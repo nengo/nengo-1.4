@@ -12,7 +12,6 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * A Cloneable Node for testing copy&paste / drag&drop.

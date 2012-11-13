@@ -77,7 +77,6 @@ import ca.nengo.ui.lib.actions.DragAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.UserCancelledException;
 import ca.nengo.ui.lib.misc.ShortcutKey;
-import ca.nengo.ui.lib.objects.lines.LineConnector;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.UserMessages;

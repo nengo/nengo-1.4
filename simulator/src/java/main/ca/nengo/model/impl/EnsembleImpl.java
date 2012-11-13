@@ -42,7 +42,6 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * <p>Default implementation of Ensemble.</p>
@@ -237,12 +236,10 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 			t.reset(randomize);
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return new Node[0];
 	}
 
-	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		return "";
 	}

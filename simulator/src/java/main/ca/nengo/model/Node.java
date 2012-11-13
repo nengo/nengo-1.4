@@ -32,7 +32,6 @@ import java.util.HashMap;
 
 import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.VisiblyMutable;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * A part of a Network that can be run independently (eg a Neuron). Normally

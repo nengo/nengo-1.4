@@ -29,7 +29,6 @@ package ca.nengo.model.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -1255,12 +1254,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		}
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return getNodes();
 	}
 
-	@Override
 	public String toPostScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
 
@@ -1268,8 +1265,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
         py.append("\n# " + myName + " - Templates\n");
 		
-        if (myMetaData.get("NetworkArray") != null)
-        {
+        if (myMetaData.get("NetworkArray") != null) {
             Iterator iter = ((HashMap)myMetaData.get("NetworkArray")).values().iterator();
             while (iter.hasNext())
             {

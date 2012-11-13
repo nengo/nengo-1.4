@@ -1,6 +1,5 @@
 package ca.nengo.util.impl;
 
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -13,8 +12,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
 import ca.nengo.util.ScriptGenException;
 
-
-public class ScriptGenerator extends DFSIterator{
+public class ScriptGenerator extends DFSIterator {
 
 	HashMap<Node, String> prefixes;
 	
@@ -25,8 +23,7 @@ public class ScriptGenerator extends DFSIterator{
     Stack<Network> parentNetwork;
     int inTemplateNetwork;
 	
-	public ScriptGenerator(File file) throws FileNotFoundException
-	{
+	public ScriptGenerator(File file) throws FileNotFoundException {
 		prefixes = new HashMap<Node, String>();
 		
 		script = new StringBuilder(); 
@@ -42,10 +39,8 @@ public class ScriptGenerator extends DFSIterator{
         inTemplateNetwork = 0;
 	}
 
-    public DFSIterator startDFS(Node node)
-    {
-        if (!(node instanceof Network))
-        {
+    public DFSIterator startDFS(Node node) {
+        if (!(node instanceof Network)) {
             System.out.println("Cannot generate script when top level node is not a Network");
             return this;
         }
@@ -54,10 +49,9 @@ public class ScriptGenerator extends DFSIterator{
         return super.startDFS(node);
     }
 	
-	protected void pre(Node node)
-	{
+	protected void pre(Node node) {
         if (parentNetwork.peek().getMetaData("templates") != null &&
-                ((ArrayList)parentNetwork.peek().getMetaData("templates")).contains(node.getName())) 
+        	    ((ArrayList)parentNetwork.peek().getMetaData("templates")).contains(node.getName())) 
         {
             inTemplateNetwork++;
         }

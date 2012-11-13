@@ -31,7 +31,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * A connection between an Origin and a Termination.

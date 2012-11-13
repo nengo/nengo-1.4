@@ -31,13 +31,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.IdentityFunction;
-import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.PostfixFunction;
 import ca.nengo.model.Network;
 import ca.nengo.model.impl.NetworkImpl.OriginWrapper;

@@ -16,7 +16,6 @@ import ca.nengo.model.impl.AbstractEnsemble;
 import ca.nengo.model.impl.AbstractNode;
 import ca.nengo.model.impl.BasicOrigin;
 import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 import junit.framework.TestCase;
 
 /**

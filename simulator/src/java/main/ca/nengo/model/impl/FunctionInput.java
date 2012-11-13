@@ -55,8 +55,6 @@ import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
@@ -273,7 +271,6 @@ public class FunctionInput implements Node, Probeable {
 		myListeners.remove(listener);
 	}
 
-	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
         boolean isFourier = true;
@@ -403,7 +400,6 @@ public class FunctionInput implements Node, Probeable {
 		return result;
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return new Node[0];
 	}
