@@ -51,6 +51,10 @@ public abstract class RangedConfigParam extends Property {
     public RangedConfigParam(String name, Object defaultValue) {
         super(name, defaultValue);
     }
+    
+    public RangedConfigParam(String name, String description) {
+        super(name, description);
+    }
 
     /**
      * @param name TODO
