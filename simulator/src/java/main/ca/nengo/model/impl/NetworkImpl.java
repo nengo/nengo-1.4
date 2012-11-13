@@ -427,12 +427,12 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			myNodeMap.remove(name);
 			node.removeChangeListener(this);
 //			VisiblyMutableUtils.nodeRemoved(this, node, myListeners);
+			
+			getSimulator().initialize(this);
+			fireVisibleChangeEvent();
 		} else {
 			throw new StructuralException("No Node named " + name + " in this Network");
 		}
-
-		getSimulator().initialize(this);
-		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -441,19 +441,17 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public Projection addProjection(Origin origin, Termination termination) throws StructuralException {
 		if (myProjectionMap.containsKey(termination)) {
 			throw new StructuralException("There is already an Origin connected to the specified Termination");
-		}
-
-		if (origin.getDimensions() != termination.getDimensions()) {
+		} else if (origin.getDimensions() != termination.getDimensions()) {
 			throw new StructuralException("Can't connect Origin of dimension " + origin.getDimensions()
 					+ " to Termination of dimension " + termination.getDimensions());
+		} else {
+			Projection result = new ProjectionImpl(origin, termination, this);
+			myProjectionMap.put(termination, result);
+			getSimulator().initialize(this);
+			fireVisibleChangeEvent();
+	
+			return result;
 		}
-
-		Projection result = new ProjectionImpl(origin, termination, this);
-		myProjectionMap.put(termination, result);
-		getSimulator().initialize(this);
-		fireVisibleChangeEvent();
-
-		return result;
 	}
 
 	/**
@@ -496,8 +494,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * 		will be a part)
 	 */
 	public void setName(String name) throws StructuralException {
-		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
-		myName = name;
+		if (!myName.equals(name)) {
+			myName = name;
+			VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+		}
 	}
 
 
