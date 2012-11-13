@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -96,10 +98,9 @@ import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.models.nodes.widgets.UIProbe;
 import ca.nengo.ui.models.nodes.widgets.UIProjection;
 import ca.nengo.ui.models.nodes.widgets.Widget;
+import ca.nengo.ui.NengoConfig;
 import ca.nengo.ui.script.ScriptConsole;
 import ca.nengo.ui.util.NengoClipboard;
-import ca.nengo.ui.util.NengoConfigManager;
-import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.nengo.ui.util.NeoFileChooser;
 import ca.nengo.ui.util.ProgressIndicator;
 import ca.nengo.ui.util.ScriptWorldWrapper;
@@ -266,8 +267,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         /// Register plugin classes
         //		registerPlugins();
 
-        setExtendedState(NengoConfigManager.getUserInteger(UserProperties.NengoWindowExtendedState,
-                JFrame.MAXIMIZED_BOTH));
+        Preferences prefs = NengoConfig.getPrefs();
+        setExtendedState(prefs.getInt(
+        		NengoConfig.I_MAXIMIZED,
+        		NengoConfig.I_MAXIMIZED_DEF));
     }
 
     @Override
@@ -390,11 +393,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
      * Find and initialize the main simulator source code
      */
     private void initializeSimulatorSourceFiles() {
-
-        String savedSourceLocation = NengoConfigManager.getNengoConfig().getProperty("simulator_source");
-
-        String simulatorSource = (savedSourceLocation != null) ? savedSourceLocation
-                : "../simulator/src/java/main";
+    	Preferences prefs = NengoConfig.getPrefs();
+    	String simulatorSource = prefs.get(
+    			NengoConfig.S_SIMULATOR_SRC_PATH,
+    			NengoConfig.S_SIMULATOR_SRC_PATH_DEF);
 
         File simulatorSourceFile = new File(simulatorSource);
         if (!simulatorSourceFile.exists()) {
@@ -741,10 +743,14 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     }
 
     private void saveUserConfig() {
-        NengoConfigManager.setUserProperty(UserProperties.NengoWindowExtendedState,
-                getExtendedState());
+        Preferences prefs = NengoConfig.getPrefs();
+        prefs.putInt(NengoConfig.I_MAXIMIZED, getExtendedState());
 
-        NengoConfigManager.saveUserConfig();
+        try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
     }
 
     @Override

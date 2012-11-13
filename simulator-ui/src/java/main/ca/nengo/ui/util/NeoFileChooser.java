@@ -28,13 +28,14 @@ package ca.nengo.ui.util;
 
 import java.awt.HeadlessException;
 import java.io.File;
+import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import ca.nengo.ui.NengoConfig;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.util.UIEnvironment;
-import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 
 /**
  * File chooser used for NEO Model files.
@@ -53,8 +54,12 @@ public class NeoFileChooser {
 	public NeoFileChooser() {
 		super();
 		fileChooser = new JFileChooser();
+		
+		Preferences prefs = NengoConfig.getPrefs();
+		
+		String workingDirectory = prefs.get(NengoConfig.S_WORKING_DIRECTORY,
+				                            NengoConfig.S_WORKING_DIRECTORY_DEF);
 
-		String workingDirectory = NengoConfigManager.getUserProperty(UserProperties.ModelWorkingLocation);
 		if (workingDirectory != null) {
 			fileChooser.setCurrentDirectory(new File(workingDirectory));
 		}
@@ -111,7 +116,8 @@ public class NeoFileChooser {
 	 */
 	private void saveWorkingLocation() {
 		String currentDirectory = fileChooser.getCurrentDirectory().toString();
-		NengoConfigManager.setUserProperty(UserProperties.ModelWorkingLocation, currentDirectory);
+		Preferences prefs = NengoConfig.getPrefs();
+		prefs.put(NengoConfig.S_WORKING_DIRECTORY, currentDirectory);
 	}
 }
 

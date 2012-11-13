@@ -3,13 +3,13 @@ package ca.nengo.ui.dataList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.ui.actions.PlotTimeSeries;
 import ca.nengo.ui.lib.actions.StandardAction;
-import ca.nengo.ui.util.NengoConfigManager;
-import ca.nengo.ui.util.NengoConfigManager.UserProperties;
+import ca.nengo.ui.NengoConfig;
 import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
 
@@ -31,16 +31,6 @@ public class ProbePlotHelper {
         }
         return singleton;
     }
-
-    /**
-     * TODO
-     */
-    public final float DEFAULT_PLOTTER_TAU_FILTER = 0.01f;
-
-    /**
-     * TODO
-     */
-    public final int DEFAULT_SUB_SAMPLING = 0;
 
     private ProbePlotHelper() {
     }
@@ -79,20 +69,37 @@ public class ProbePlotHelper {
      * @return TODO
      */
     public int getDefaultSubSampling() {
-        String savedValue = NengoConfigManager.getUserProperty(UserProperties.PlotterDefaultSubSampling);
-        return savedValue != null ? Integer.parseInt(savedValue) : DEFAULT_SUB_SAMPLING;
+    	Preferences prefs = NengoConfig.getPrefs();
+    	return prefs.getInt(NengoConfig.I_PLOTTER_SUBSAMPLING,
+    			            NengoConfig.I_PLOTTER_SUBSAMPLING_DEF);
+    }
 
+
+    /**
+     * @param value TODO
+     */
+    public void setDefaultSubSampling(int value) {
+    	Preferences prefs = NengoConfig.getPrefs();
+    	prefs.putInt(NengoConfig.I_PLOTTER_SUBSAMPLING, value);
     }
 
     /**
      * @return TODO
      */
     public float getDefaultTauFilter() {
-        String savedTau = NengoConfigManager.getUserProperty(UserProperties.PlotterDefaultTauFilter);
-        return savedTau != null ? Float.parseFloat(savedTau) : DEFAULT_PLOTTER_TAU_FILTER;
-
+    	Preferences prefs = NengoConfig.getPrefs();
+    	return prefs.getFloat(NengoConfig.F_PLOTTER_TAU,
+    			              NengoConfig.F_PLOTTER_TAU_DEF);
     }
 
+    /**
+     * @param value TODO
+     */
+    public void setDefaultTauFilter(float value) {
+    	Preferences prefs = NengoConfig.getPrefs();
+    	prefs.putFloat(NengoConfig.F_PLOTTER_TAU, value);
+    }
+    
     /**
      * @param data TODO
      * @param plotName TODO
@@ -126,20 +133,6 @@ public class ProbePlotHelper {
         return false;
     }
 
-    /**
-     * @param value TODO
-     */
-    public void setDefaultSubSampling(int value) {
-        NengoConfigManager.setUserProperty(UserProperties.PlotterDefaultSubSampling,
-                Integer.toString(value));
-    }
 
-    /**
-     * @param value TODO
-     */
-    public void setDefaultTauFilter(float value) {
-        NengoConfigManager.setUserProperty(UserProperties.PlotterDefaultTauFilter,
-                Float.toString(value));
-    }
 
 }
