@@ -579,13 +579,11 @@ public class NetworkImplTest extends TestCase {
 			return (Node) super.clone();
 		}
 
-		@Override
 		public Node[] getChildren() {
 			
 			return null;
 		}
 
-		@Override
 		public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 			// TODO Auto-generated method stub
 			return null;

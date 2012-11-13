@@ -143,12 +143,10 @@ public class MockNode implements Node, Cloneable {
 		this.myName = myName;
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return new Node[0];
 	}
 
-	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 
 		return "";

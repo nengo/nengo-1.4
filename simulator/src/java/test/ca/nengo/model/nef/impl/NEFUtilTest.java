@@ -3,9 +3,7 @@
  */
 package ca.nengo.model.nef.impl;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import junit.framework.TestCase;
 
 import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
@@ -22,13 +20,12 @@ import ca.nengo.util.MU;
  * 
  * @author Bryan Tripp
  */
-public class NEFUtilTest {
+public class NEFUtilTest extends TestCase {
 
 	/**
 	 * Test method for {@link ca.nengo.model.nef.impl.NEFUtil#getOutput(ca.nengo.model.nef.impl.DecodedOrigin, float[][], ca.nengo.model.SimulationMode)}.
 	 * @throws StructuralException 
 	 */
-	@Test
 	public void testGetOutput() throws StructuralException {
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
 		NEFEnsemble ensemble = ef.make("test", 70, new float[]{1, 1, 1});

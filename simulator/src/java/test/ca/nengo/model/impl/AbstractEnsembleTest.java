@@ -53,12 +53,10 @@ public class AbstractEnsembleTest extends TestCase {
 			@Override
 			public void reset(boolean randomize) {}
 
-			@Override
 			public Node[] getChildren() {
 				return new Node[0];
 			}
 
-			@Override
 			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				return "";
 			}};		
@@ -72,12 +70,10 @@ public class AbstractEnsembleTest extends TestCase {
 			@Override
 			public void reset(boolean randomize) {}
 
-			@Override
 			public Node[] getChildren() {
 				return new Node[0];
 			}
 
-			@Override
 			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				return "";
 			}};		
@@ -91,12 +87,10 @@ public class AbstractEnsembleTest extends TestCase {
 			@Override
 			public void reset(boolean randomize) {}
 
-			@Override
 			public Node[] getChildren() {
 				return new Node[0];
 			}
 
-			@Override
 			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				return "";
 			}};
