@@ -50,8 +50,6 @@ import org.apache.log4j.Logger;
  *
  * @author Bryan Tripp
  */
-
-// FIXME: Does this class ever get used? If so what for?
 public final class ClassRegistry {
 
 	private static Logger ourLogger = Logger.getLogger(ClassRegistry.class);
