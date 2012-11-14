@@ -119,8 +119,15 @@ public class FnReflective extends AbstractFn {
                 try {
                     Object result = func.getClass().getMethod(getterName).invoke(func);
                     property.setDefaultValue(result);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-                            | IllegalArgumentException | InvocationTargetException e) {
+                } catch (NoSuchMethodException e) {
+                	e.printStackTrace();
+                } catch (SecurityException e) {
+                	e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                	e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                	e.printStackTrace();
+                } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
             }
