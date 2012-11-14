@@ -39,22 +39,31 @@ import ca.nengo.ui.configurable.Property;
 
 /**
  * Function instances are created through reflection.
- * 
+ *
  * @author Shu Wu
  */
 public class FnReflective extends AbstractFn {
     private Property[] myProperties;
+    private String[] getterNames;
 
     /**
-     * @param functionClass TODO
-     * @param typeName TODO
-     * @param propStruct TODO
+     * @param functionClass Type of function to construct
+     * @param typeName Friendly name of function
+     * @param properties A ordered list of properties which map to the function constructor arguments
+     * @param getterNames A ordered list of getter function names which map to the constructor arguments
      */
-    public FnReflective(Class<? extends Function> functionClass, String typeName,
-            Property[] propStruct) {
+    public FnReflective(
+            Class<? extends Function> functionClass,
+            String typeName,
+            Property[] properties,
+            String[] getterNames) {
         super(typeName, functionClass);
+        if (properties.length != getterNames.length) {
+            throw new IllegalArgumentException("properties and getterNames must be the same length");
+        }
 
-        this.myProperties = propStruct;
+        this.myProperties = properties;
+        this.getterNames = getterNames;
     }
 
     @Override
@@ -102,6 +111,20 @@ public class FnReflective extends AbstractFn {
     }
 
     public ConfigSchema getSchema() {
+        if (getFunction() != null) {
+            Function func = getFunction();
+            for (int i = 0; i < myProperties.length; i++) {
+                Property property = myProperties[i];
+                String getterName = getterNames[i];
+                try {
+                    Object result = func.getClass().getMethod(getterName).invoke(func);
+                    property.setDefaultValue(result);
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+                            | IllegalArgumentException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         return new ConfigSchemaImpl(myProperties);
     }
 
