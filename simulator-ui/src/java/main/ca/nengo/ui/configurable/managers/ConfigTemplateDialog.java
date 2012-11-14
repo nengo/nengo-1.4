@@ -34,11 +34,15 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.PropertyInputPanel;
+import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.Util;
 
 /**
@@ -122,8 +126,35 @@ public class ConfigTemplateDialog extends ConfigDialog {
     	
     	String desc=getConfigurer().getConfigurable().getExtendedDescription();
     	if (desc!=null) {
-    		javax.swing.JLabel label=new javax.swing.JLabel("<html><table width='250px'>"+desc+"</table></html>");
-    		panel.add(label);
+            JPanel labelPanel=new JPanel();
+            labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
+            labelPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+
+            final String helpText="<html><table width='250px'>"+desc+"</table></html>";
+            JLabel label = new JLabel(getConfigurer().getConfigurable().getDescription());
+    		label.setToolTipText(helpText);
+            label.setForeground(NengoStyle.COLOR_DARK_BLUE);
+            label.setFont(NengoStyle.FONT_BOLD);
+            labelPanel.add(label);
+
+            final JButton help=new JButton("<html><u>?</u></html>");
+            help.setFocusable(false);
+            help.setForeground(new java.awt.Color(120,120,180));
+            help.setBorderPainted(false);
+            help.setContentAreaFilled(false);
+            help.setFocusPainted(false);
+            help.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(help,helpText,getConfigurer().getConfigurable().getDescription(),JOptionPane.INFORMATION_MESSAGE,null);
+                }
+            });
+            labelPanel.add(help);
+    		
+    		
+    		
+    		
+    		
+    		panel.add(labelPanel);
     	}
 
         String[] files = getConfigurer().getPropertyFiles();
