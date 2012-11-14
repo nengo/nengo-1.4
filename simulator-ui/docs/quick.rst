@@ -21,13 +21,13 @@ when creating the Network::
 This tells Nengo to use the random seed ``5`` for every single ensemble that is created within
 this network.  In other words, if you now do the following::
 
-  A=net.make('A',neurons=300,dimensions=1)
-  B=net.make('B',neurons=300,dimensions=1)
+  net.make('A',neurons=300,dimensions=1)
+  net.make('B',neurons=300,dimensions=1)
 
 then the neurons within ensembles A and B will be *identical*.  This will also be true for
 ensembles within a NetworkArray::
 
-  C=net.make_array('C',300,10)
+  net.make_array('C',300,10)
   
 which will create an array of ten identical ensembles, each with 300 identical neurons.
 

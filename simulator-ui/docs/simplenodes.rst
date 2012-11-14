@@ -29,10 +29,10 @@ For example, the following code creates a Node that outputs a sine wave::
             return [math.sin(self.t)]
     wave=net.add(SineWave('wave'))
     
-    neurons=net.make('neurons',100,1)
+    net.make('neurons',100,1)
     
     # connect the SimpleNode to the group of neurons
-    net.connect(wave.getOrigin('wave'),neurons)
+    net.connect(wave.getOrigin('wave'),'neurons')
     
     net.add_to_nengo()
     
@@ -68,11 +68,11 @@ end of the current time step is ``self.t_end``)::
 When connecting a SimpleNode to other nodes, we need to specify which origin we are connecting.  The
 name of the origin is determined by the function definition, of the form ``origin_<name>``::
 
-    A=net.make('A',100,1)
-    B=net.make('B',200,2)
+    net.make('A',100,1)
+    net.make('B',200,2)
     many=net.add(ManyOrigins('many'))
-    net.connect(many.getOrigin('triangle'),A)
-    net.connect(many.getOrigin('circle'),B)
+    net.connect(many.getOrigin('triangle'),'A')
+    net.connect(many.getOrigin('circle'),'B')
     
 
 Inputs (a.k.a. Terminations)
@@ -96,9 +96,9 @@ For example, the following object takes a 5-dimensional input vector and outputs
             return [self.largest]
             
     net=nef.Network('largest')
-    input=net.make_input('input',[0]*5)
+    net.make_input('input',[0]*5)
     largest=net.add(Largest('largest'))
-    net.connect(input,largest.getTermination('values'))
+    net.connect('input',largest.getTermination('values'))
     
 .. note::
     When making a component like this, make sure to define an initial value for ``largest`` (or whatever internal parameter

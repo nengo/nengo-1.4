@@ -9,22 +9,22 @@ have direct access to this weight matrix, so we can modify it in various ways.  
 *weight_func* argument in the :func:`nef.Network.connect()` function.  For example, to simply print the
 solved-for optimal weights, we can do the following::
 
-  A=net.make('A',100,1)
-  B=net.make('B',100,1)
+  net.make('A',100,1)
+  net.make('B',100,1)
   
   def print_weights(w):
       print w
       return w
   
-  net.connect(A,B,weight_func=print_weights)
+  net.connect('A','B',weight_func=print_weights)
   
 Adjusting weights
 ------------------
 We can also adjust these weights by modifying them and returning the new matrix.  The following code randomly
 adjusts each connection weight by an amount sampled from a normal distribution of standard deviation 0.001::
           
-    A=net.make('A',100,1)
-    B=net.make('B',100,1)
+    net.make('A',100,1)
+    net.make('B',100,1)
 
     def randomize(w):
         for i in range(len(w)):
@@ -32,7 +32,7 @@ adjusts each connection weight by an amount sampled from a normal distribution o
                 w[i][j]+=random.gauss(0,0.001)
         return w
 
-    net.connect(A,B,weight_func=randomize)
+    net.connect('A','B',weight_func=randomize)
 
   
 Sparsification
@@ -44,8 +44,8 @@ neuron in population A is only connected to 20% of the neurons in population B),
 80% of the weights in the matrix and set them to zero.  To make up for this reduction in connectivity, we
 also increase the remaining weights by scaling them by 1.0/0.2::
 
-    A=net.make('A',100,1)
-    B=net.make('B',100,1)
+    net.make('A',100,1)
+    net.make('B',100,1)
 
     p=0.2
     def sparsify(w):
@@ -57,6 +57,6 @@ also increase the remaining weights by scaling them by 1.0/0.2::
                     w[i][j]=0.0
         return w            
 
-    net.connect(A,B,weight_func=sparsify)
+    net.connect('A','B',weight_func=sparsify)
   
 
