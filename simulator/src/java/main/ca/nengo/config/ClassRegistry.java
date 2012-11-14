@@ -33,18 +33,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import org.apache.log4j.Logger;
 
 /**
- * A registry of implementations of selected types of interest (subclasses and interface implementations).
+ * A registry of implementations of selected types of interest (subclasses and
+ * interface implementations). This gets used when generating the list of 
+ * available input functions (e.g., PFunction in simulator-ui)
  *
  * TODO: unit tests
  *
@@ -65,8 +64,6 @@ public final class ClassRegistry {
      */
 	public static final String IMPLS_LOCATION_PROPERTY = "ca.nengo.config.implementations";
 
-	private Map<Class<?>, List<Class<?>>> myImplementations;
-
 	/**
 	 * @return Shared instance
 	 */
@@ -76,6 +73,8 @@ public final class ClassRegistry {
 		}
 		return ourInstance;
 	}
+	
+	private Map<Class<?>, List<Class<?>>> myImplementations;
 
 	private ClassRegistry() {
 		myImplementations = new HashMap<Class<?>, List<Class<?>>>(100);
@@ -129,13 +128,13 @@ public final class ClassRegistry {
 	 *
 	 * @param type Type at bottom of hierarchy
 	 */
-	public void addHierarchy(Class<?> type) {
-		Class<?> c = type;
-		while (c != null) {
-			addRegisterableType(c);
-			c = c.getSuperclass();
-		}
-	}
+//	public void addHierarchy(Class<?> type) {
+//		Class<?> c = type;
+//		while (c != null) {
+//			addRegisterableType(c);
+//			c = c.getSuperclass();
+//		}
+//	}
 
 	/**
 	 * Adds a class to the list of types whose implementations can be registered
@@ -152,9 +151,9 @@ public final class ClassRegistry {
 	/**
 	 * @return The list of types whose implementations can be registered
 	 */
-	public Class<?>[] getRegisterableTypes() {
-		return myImplementations.keySet().toArray(new Class[0]);
-	}
+//	public Class<?>[] getRegisterableTypes() {
+//		return myImplementations.keySet().toArray(new Class[0]);
+//	}
 
 	/**
 	 * Registers an implementation against any of the registerable types which it is
@@ -192,19 +191,19 @@ public final class ClassRegistry {
 	 * @param jar Jar from which to draw classes to register
 	 * @throws ClassNotFoundException if the JarFile contains bad class files?
 	 */
-	public void register(JarFile jar) throws ClassNotFoundException {
-		Enumeration<JarEntry> entries = jar.entries();
-		while (entries.hasMoreElements()) {
-			JarEntry entry = entries.nextElement();
-			String fileName = entry.getName();
-			if (fileName.endsWith(".class")) {
-				String className
-					= fileName.substring(0, fileName.lastIndexOf('.')).replace('/', '.');//.replace('$', '.');
-				System.out.println(className);
-				register(className);
-			}
-		}
-	}
+//	public void register(JarFile jar) throws ClassNotFoundException {
+//		Enumeration<JarEntry> entries = jar.entries();
+//		while (entries.hasMoreElements()) {
+//			JarEntry entry = entries.nextElement();
+//			String fileName = entry.getName();
+//			if (fileName.endsWith(".class")) {
+//				String className
+//					= fileName.substring(0, fileName.lastIndexOf('.')).replace('/', '.');//.replace('$', '.');
+//				System.out.println(className);
+//				register(className);
+//			}
+//		}
+//	}
 
 	/**
 	 * @param type A registerable type
