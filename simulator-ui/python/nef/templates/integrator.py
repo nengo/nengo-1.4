@@ -8,8 +8,8 @@ params=[
     ('name','Name',str,'Name of the integrator'),
     ('neurons','Number of neurons',int,'Number of neurons in the integrator'),
     ('dimensions','Number of dimensions',int,'Number of dimensions for the integrator'),
-    ('tau_feedback','Feedback time constant [s]',float,'Synaptic time constant of the integrative feedback, in seconds (longer -> slower change but better value retention)'),
-    ('tau_input','Input time constant [s]',float,'Synaptic time constant of the integrator input, in seconds (longer -> more input filtering)'),
+    ('tau_feedback','Feedback PSTC [s]',float,'Post-synaptic time constant of the integrative feedback, in seconds (longer -> slower change but better value retention)'),
+    ('tau_input','Input PSTC [s]',float,'Post-synaptic time constant of the integrator input, in seconds (longer -> more input filtering)'),
     ('scale','Scaling factor',float,'A scaling value for the input (controls the rate of integration)'),
     ]
 

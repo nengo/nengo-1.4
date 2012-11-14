@@ -9,7 +9,7 @@ params=[
     ('neurons','Number of neurons',int,'Number of neurons in the oscillator'),
     ('frequency','Oscillator frequency (Hz)',float,'The speed at which the osillator oscillates'),
     ('tau_feedback','Feedback time constant [s]',float,'Synaptic time constant of the oscillator feedback, in seconds (longer -> slower change but better value retention)'),
-    ('tau_input','Input time constant [s]',float,'Synaptic time constant of the oscillator input, in seconds (longer -> more input filtering)'),
+    ('tau_input','Input PSTC [s]',float,'Post-synaptic time constant of the oscillator input, in seconds (longer -> more input filtering)'),
     ('scale','Scaling factor',float,'A scaling value for the input'),
     ('controlled', 'Frequency control', bool,'If checked will build a frequency controlled oscillator (a nonlinear system)'),
     ]
