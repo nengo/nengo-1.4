@@ -180,7 +180,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		super.mouseReleased(event);
 
-		if (mousePressedIsPopupTrigger) {
+		if (mousePressedIsPopupTrigger || event.isPopupTrigger()) {
 			mousePressedIsPopupTrigger = false;
 			
 			// Check the mouse hasn't moved too far off from it's pressed position
