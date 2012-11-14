@@ -59,6 +59,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 
 	private boolean handCursorShown = false;
 
+	private boolean mousePressedIsPopupTrigger = false;
 	private Point2D mousePressedCanvasPosition;
 	private Interactable mousePressedInteractableObj;
 	
@@ -168,6 +169,7 @@ public class MouseHandler extends PBasicInputEventHandler {
 		super.mousePressed(event);
 
 		// get information for popup
+		mousePressedIsPopupTrigger = event.isPopupTrigger();
 		mousePressedCanvasPosition = event.getCanvasPosition();
 		mousePressedInteractableObj = getInteractableFromEvent(event);
 		
@@ -178,7 +180,9 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		super.mouseReleased(event);
 
-		if (event.isPopupTrigger()) {
+		if (mousePressedIsPopupTrigger) {
+			mousePressedIsPopupTrigger = false;
+			
 			// Check the mouse hasn't moved too far off from it's pressed position
 			double dist = mousePressedCanvasPosition.distance(event.getCanvasPosition());
 			if (dist < MAX_CONTEXT_MENU_DRAG_DISTANCE) {
