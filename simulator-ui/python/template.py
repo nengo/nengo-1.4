@@ -333,17 +333,10 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
             pass
     
     def configureAndWait(self, node, user_configurer):
-        if node is not None:
-            origins = node.model.getOrigins()
-            terminations = node.model.getTerminations()
-        user_configurer.configureAndWait()
-
-        if node is not None:
-            for o in node.model.getOrigins():
-                if o not in origins: node.showOrigin(o.name)
-            for t in node.model.getTerminations():
-                if t not in terminations: node.showTermination(t.name)
-                
+        try:
+            user_configurer.configureAndWait()
+        except ca.nengo.ui.configurable.managers.ConfigDialogClosedException:
+            pass
             
 ################################################################################
 class TemplateTransferable(java.awt.datatransfer.Transferable):
