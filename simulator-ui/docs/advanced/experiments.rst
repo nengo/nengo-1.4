@@ -61,14 +61,14 @@ to be saved::
     net=nef.Network('Experiment Example')
     input=net.add(Input('input'))                   # create the input node
     output=net.add(Output('output'))                # create the output node
-    A=net.make('A',100,2,radius=1.5)
-    B=net.make('B',50,1)
-    net.connect(input.getOrigin('input'),A)         # connect the input
-    net.connect(B,output.getTermination('save'))    # connect the output
+    net.make('A',100,2,radius=1.5)
+    net.make('B',50,1)
+    net.connect(input.getOrigin('input'),'A')         # connect the input
+    net.connect('B',output.getTermination('save'))    # connect the output
 
     def multiply(x):
         return x[0]*x[1]
-    net.connect(A,B,func=multiply)
+    net.connect('A','B',func=multiply)
 
     net.add_to_nengo()
     
