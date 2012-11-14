@@ -180,6 +180,8 @@ public class MouseHandler extends PBasicInputEventHandler {
 	public void mouseReleased(PInputEvent event) {
 		super.mouseReleased(event);
 
+		// On Linux, only the mousePressed registers as a popupTrigger, and 
+		// on Windows, only the mouseReleased, so check both
 		if (mousePressedIsPopupTrigger || event.isPopupTrigger()) {
 			mousePressedIsPopupTrigger = false;
 			
