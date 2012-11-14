@@ -46,7 +46,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import org.java.ayatana.DesktopFile;
+//import org.java.ayatana.DesktopFile;
 import org.python.util.PythonInterpreter;
 import org.simplericity.macify.eawt.Application;
 
@@ -279,17 +279,17 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             if (laf.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) {
                 laf = "javax.swing.plaf.metal.MetalLookAndFeel";
                 File desktopfile = new File(System.getProperty("user.home") +
-                        "/.local/share/applications/nengo.desktop");
+                    "/.local/share/applications/nengo.desktop");
             	if (!desktopfile.exists()) {
                 	File defaultdesktop = new File(getClass().getClassLoader().
                 		getResource("ca/nengo/ui/nengo.desktop").getPath());
                 	Util.copyFile(defaultdesktop, desktopfile);
                 }
-                DesktopFile df = DesktopFile.initialize("nengo", "NengoLauncher");
-                df.setIcon(getClass().getClassLoader().
-                		getResource("ca/nengo/ui/nengologo256.png").getPath());
-                df.setCommand("TODO");
-                df.update();
+                //DesktopFile df = DesktopFile.initialize("nengo", "NengoLauncher");
+                //df.setIcon(getClass().getClassLoader().
+                //		getResource("ca/nengo/ui/nengologo256.png").getPath());
+                //df.setCommand("TODO");
+                //df.update();
             }
             UIManager.setLookAndFeel(laf);
 
