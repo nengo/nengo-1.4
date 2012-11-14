@@ -45,6 +45,7 @@ import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.ZoomToFitAction;
 import ca.nengo.ui.lib.misc.ShortcutKey;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.menus.MenuBuilder;
@@ -336,25 +337,8 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
     }
 
     protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
-        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, new ZoomToFitAction(
-                "Zoom to fit")));
-    }
-
-    class ZoomToFitAction extends StandardAction {
-
-        private static final long serialVersionUID = 1L;
-
-        public ZoomToFitAction(String description) {
-            super(description);
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            World world = getTopWorld();
-            if (world != null) {
-                world.zoomToFit();
-            }
-        }
+        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, 
+        		new ZoomToFitAction("Zoom to fit", (WorldImpl)getTopWorld())));
     }
 
     private World getTopWorld() {
