@@ -76,6 +76,7 @@ import ca.nengo.ui.lib.actions.DisabledAction;
 import ca.nengo.ui.lib.actions.DragAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.actions.ZoomToFitAction;
 import ca.nengo.ui.lib.misc.ShortcutKey;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UIEnvironment;
@@ -880,6 +881,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                     KeyStroke.getKeyStroke(0x30 + count++, MENU_SHORTCUT_KEY_MASK));
 
         }
+        viewMenu.addAction(new ZoomToFitAction("Zoom to fit", this.getWorld()),
+             KeyEvent.VK_0,
+             KeyStroke.getKeyStroke(KeyEvent.VK_0, MENU_SHORTCUT_KEY_MASK));
     }
 
     public Point2D localToView(Point2D localPoint) {
