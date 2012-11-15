@@ -27,6 +27,7 @@ package ca.nengo.ui;
 //import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
@@ -43,7 +44,11 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -172,12 +177,18 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     }
 
     private NengoClipboard clipboard;
-    private ConfigurationPane configPane;
-    private AuxillarySplitPane dataViewerPane;
     private PythonInterpreter pythonInterpreter;
     private ScriptConsole scriptConsole;
-    private AuxillarySplitPane scriptConsolePane;
     private DataListView dataListViewer;
+    private JScrollPane templateViewer;
+    private JPanel templatePanel;
+    private JToolBar toolbarPanel;
+    
+    private AuxillarySplitPane toolbarPane;
+    private AuxillarySplitPane templatePane;
+    private ConfigurationPane configPane;
+    private AuxillarySplitPane dataViewerPane;
+    private AuxillarySplitPane scriptConsolePane;
     private ArrayList<AuxillarySplitPane> splitPanes;
 
     private ProgressIndicator progressIndicator;
@@ -209,6 +220,20 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             e.printStackTrace();
         }
         application.setApplicationIconImage(icon);
+    }
+    
+    /**
+     * template.py calls this function to provide a template bar
+     */
+    public void setTemplatePanel(JPanel panel) {
+    	templatePanel = panel;
+    }
+
+    /**
+     * toolbar.py calls this function to provide a toolbar
+     */
+    public void setToolbar(JToolBar bar) {
+    	toolbarPanel = bar;
     }
 
     /**
@@ -311,46 +336,78 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         
         System.setProperty("swing.aatext", "true");
 
-        splitPanes = new ArrayList<AuxillarySplitPane>();
-
+        /////////////////////////////////////////////////////////////
+        /// Create split pane components
+        
+        // creating the script console calls all python init stuff
+        // so call it first (make toolbar, etc.)
         pythonInterpreter = new PythonInterpreter();
         scriptConsole = new ScriptConsole(pythonInterpreter);
         NengoStyle.applyStyle(scriptConsole);
+        
+        if (toolbarPanel == null || templatePanel == null) {
+        	// these should be made and set by template.py and toolbar.py
+        	// when the scriptConsole is created, so we shouldn't be here
+        	throw new NullPointerException(
+        			"toolbarPanel or templatePanel not created!");
+        }
+        
+        dataListViewer = new DataListView(new SimulatorDataModel(),scriptConsole);
 
-        /*
-         * Create nested split panes
-         */
+        templateViewer = new JScrollPane(templatePanel,
+        		ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+        		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        templateViewer.getVerticalScrollBar().setUnitIncrement(20);
+        templateViewer.revalidate();
+        Dimension templateWithScrollbarSize = templateViewer.getPreferredSize();
+        templateViewer.setVerticalScrollBarPolicy(
+        		ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        
+        getContentPane().add(templateViewer, BorderLayout.WEST);
+
+        /////////////////////////////////////////////////////////////
+        /// Create nested split panes
         configPane = new ConfigurationPane(canvas);
+        
         scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
                 "Script Console", AuxillarySplitPane.Orientation.Bottom);
 
-        dataListViewer = new DataListView(new SimulatorDataModel(),scriptConsole);
-
-        dataViewerPane = new AuxillarySplitPane(scriptConsolePane, dataListViewer, "Data Viewer",
-                AuxillarySplitPane.Orientation.Left);
-
+        dataViewerPane = new AuxillarySplitPane(scriptConsolePane, dataListViewer, 
+        		"Data Viewer", AuxillarySplitPane.Orientation.Left);
+        
+        templatePane = new AuxillarySplitPane(dataViewerPane, templateViewer, 
+        		"Templates", AuxillarySplitPane.Orientation.Left, 
+        		templateWithScrollbarSize, false);
+        templatePane.setResizable(false);
+        templatePane.setAuxVisible(true);
+        
+        toolbarPane = new AuxillarySplitPane(templatePane, toolbarPanel,
+        		"Toolbar", AuxillarySplitPane.Orientation.Top,
+        		toolbarPanel.getPreferredSize(), false);
+        toolbarPane.setResizable(false);
+        toolbarPane.setAuxVisible(true);
+        
+        getContentPane().add(toolbarPane);
+        
+        // Add all panes to the list. The order added controls 
+        // the order in the View menu
+        splitPanes = new ArrayList<AuxillarySplitPane>();
         splitPanes.add(scriptConsolePane);
         splitPanes.add(dataViewerPane);
-
-        if (CONFIGURE_PLANE_ENABLED) {
-            splitPanes.add(configPane.toJComponent());
-        }
-
-        getContentPane().add(dataViewerPane);
+        if (CONFIGURE_PLANE_ENABLED) splitPanes.add(configPane.toJComponent());
+        splitPanes.add(templatePane);
+        splitPanes.add(toolbarPane);
 
         canvas.requestFocus();
         
         progressIndicator=new ProgressIndicator();
         getContentPane().add(progressIndicator,BorderLayout.SOUTH);
     }
-    
+
     private void initScriptConsole() {
         scriptConsole.addVariable("world", new ScriptWorldWrapper(this));
 
-        /*
-         * Add listeners
-         */
-
+        // add listeners
         getWorld().getGround().addChildrenListener(new WorldObject.ChildListener() {
 
             public void childAdded(WorldObject wo) {
@@ -408,7 +465,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         JavaSourceParser.addSource(simulatorSourceFile);
     }
-
 
     //	/**
     //	 * Register plugins
@@ -512,38 +568,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         return saveSuccessful;
     }
-
-//	private void changeSelection(Collection<WorldObject> objs) {
-//		selectedObjects.clear();
-//		selectedObjects.addAll(objs);
-////		  
-////		  
-////		selectedObjects = new ArrayList<WorldObjectImpl>();
-////		for (WorldObjectImpl obj : objs) {
-////	        while (obj != null && !(obj instanceof ModelObject)) {
-////	            obj = obj.getParent();
-////	        }
-////	        
-////	        if (obj != null) {
-////	        	if (objectSelectedBorder != null) {
-////	                objectSelectedBorder.destroy();
-////	            }
-////	
-////	            objectSelectedBorder = new SelectionBorder(obj.getWorld(), obj);
-////	
-////	            Object model = ((ModelObject) obj).getModel();
-////	            scriptConsole.setCurrentObject(model);
-////	
-////	            if (configPane.toJComponent().isAuxVisible()) {
-////	                configPane.configureObj(model);
-////	            }
-////	            selectedObjects.add(obj);
-////	        }
-////		}
-//	
-//	    updateEditMenu();
-//	    updateRunMenu();
-//	}
     
     @Override
     protected void updateEditMenu() {
@@ -580,7 +604,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         if (getClipboard().hasContents()) {
             pasteAction = new StandardAction("Paste") {
             	private static final long serialVersionUID = 1L;
-                public void action() {
+            	@Override
+                protected void action() {
                 	// look for the active mouse handler. If it exists, it should contain
                 	// the current mouse position (from the mousemoved event), so use this
                 	// to create a new PasteEvent

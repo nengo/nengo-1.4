@@ -10,6 +10,7 @@ if 'lib/itextpdf-5.3.4.jar' not in sys.path:
 
 import template
 
+################################################################################
 from ca.nengo.model import SimulationMode
 class SimulationModeComboBox(JComboBox):
     def __init__(self):
@@ -46,6 +47,7 @@ class SimulationModeComboBox(JComboBox):
         else: self.node.model.mode=SimulationMode.DEFAULT
         self.set_node(self.node)
 
+################################################################################
 class LayoutComboBox(JComboBox):
     def __init__(self):
         JComboBox.__init__(self,['last saved','feed-forward','sort by name'],
@@ -71,6 +73,7 @@ class LayoutComboBox(JComboBox):
         elif layout=='sort by name':
             self.viewer.doSortByNameLayout()
 
+################################################################################
 from ca.nengo.ui.configurable.descriptors import *
 from ca.nengo.ui.configurable import *
 
@@ -106,12 +109,10 @@ class ParisianTransform(IConfigurable):
     def getDescription(self):
         return 'Create Interneurons'
 
-
-
+################################################################################
 from ca.nengo.math.impl import WeightedCostApproximator
 from ca.nengo.util.impl import NEFGPUInterface, NodeThreadPool
 from ca.nengo.ui.configurable.panels import BooleanPanel, IntegerPanel
-
 
 class GpuCountPanel(IntegerPanel):
 
@@ -129,6 +130,7 @@ class GpuCountPanel(IntegerPanel):
         error_message_label.setForeground(Color.red)
         self.add(error_message_label)
 
+################################################################################
 class GpuUsePanel(BooleanPanel):
 
     def initPanel(self):  
@@ -145,6 +147,7 @@ class GpuUsePanel(BooleanPanel):
         error_message_label.setForeground(Color.red)
         self.add(error_message_label)
 
+################################################################################
 class PGpuCount(PInt):
     def __init__(self, name):
         default = NEFGPUInterface.getRequestedNumDevices()
@@ -155,6 +158,7 @@ class PGpuCount(PInt):
     def createInputPanel(self):
         return GpuCountPanel(self)
 
+################################################################################
 class PGpuUse(PBoolean):
     def __init__(self,name):
         PBoolean.__init__(self, name, WeightedCostApproximator.getUseGPU())
@@ -162,55 +166,52 @@ class PGpuUse(PBoolean):
     def createInputPanel(self):
         return GpuUsePanel(self)
 
+################################################################################
 from ca.nengo.ui.configurable import ConfigException
 class ParallelizationConfiguration(IConfigurable):
-  num_java_threads=NodeThreadPool.getNumJavaThreads()
-  num_sim_GPU=NEFGPUInterface.getRequestedNumDevices()
-  use_GPU_for_creation=WeightedCostApproximator.getUseGPU()
+    num_java_threads=NodeThreadPool.getNumJavaThreads()
+    num_sim_GPU=NEFGPUInterface.getRequestedNumDevices()
+    use_GPU_for_creation=WeightedCostApproximator.getUseGPU()
 
-  p_num_java_threads=PInt('Number of Java Threads', num_java_threads, 1, NodeThreadPool.getMaxNumJavaThreads())
-  p_num_sim_GPU=PGpuCount('Number of GPU\'s for Simulation')
-  p_use_GPU_for_creation=PGpuUse('Use GPU for Ensemble Creation')
+    p_num_java_threads=PInt('Number of Java Threads', num_java_threads, 1, NodeThreadPool.getMaxNumJavaThreads())
+    p_num_sim_GPU=PGpuCount('Number of GPU\'s for Simulation')
+    p_use_GPU_for_creation=PGpuUse('Use GPU for Ensemble Creation')
 
-  properties=[p_num_java_threads, p_num_sim_GPU, p_use_GPU_for_creation]
+    properties=[p_num_java_threads, p_num_sim_GPU, p_use_GPU_for_creation]
 
-  def __init__(self):
-      self.button=make_button('parallelization', self.do_configure, 'Configure Parallelization')
-      self.button.enabled=True
-  
-  def do_configure(self, event):
-      self.p_num_java_threads.setDefaultValue(NodeThreadPool.getNumJavaThreads())
-      self.p_num_sim_GPU.setDefaultValue(NEFGPUInterface.getRequestedNumDevices())
-      self.p_use_GPU_for_creation.setDefaultValue(WeightedCostApproximator.getUseGPU())
+    def __init__(self):
+        self.button=make_button('parallelization', self.do_configure, 'Configure Parallelization')
+        self.button.enabled=True
 
-      uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(self)
+    def do_configure(self, event):
+        self.p_num_java_threads.setDefaultValue(NodeThreadPool.getNumJavaThreads())
+        self.p_num_sim_GPU.setDefaultValue(NEFGPUInterface.getRequestedNumDevices())
+        self.p_use_GPU_for_creation.setDefaultValue(WeightedCostApproximator.getUseGPU())
 
-      try:
-        uc.configureAndWait()
-      except ConfigException, e:
-        e.defaultHandleBehavior()
+        uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(self)
 
-  def completeConfiguration(self,props):
-      self.num_java_threads=props.getValue(self.p_num_java_threads)
-      self.num_sim_GPU=props.getValue(self.p_num_sim_GPU)
-      self.use_GPU_for_creation=props.getValue(self.p_use_GPU_for_creation)
+        try:
+          uc.configureAndWait()
+        except ConfigException, e:
+          e.defaultHandleBehavior()
 
-      NodeThreadPool.setNumJavaThreads(self.num_java_threads)
-      NEFGPUInterface.setRequestedNumDevices(self.num_sim_GPU)
-      WeightedCostApproximator.setUseGPU(self.use_GPU_for_creation)
+    def completeConfiguration(self,props):
+        self.num_java_threads=props.getValue(self.p_num_java_threads)
+        self.num_sim_GPU=props.getValue(self.p_num_sim_GPU)
+        self.use_GPU_for_creation=props.getValue(self.p_use_GPU_for_creation)
 
-  def preConfiguration(self,props):
-      pass
-  def getSchema(self):
-      return ConfigSchemaImpl(self.properties,[])
-  def getTypeName(self):
-      return 'ParallelizationConfiguration'
-  def getDescription(self):
-      return 'Configure parallelization'
+        NodeThreadPool.setNumJavaThreads(self.num_java_threads)
+        NEFGPUInterface.setRequestedNumDevices(self.num_sim_GPU)
+        WeightedCostApproximator.setUseGPU(self.use_GPU_for_creation)
 
-
-
-
+    def preConfiguration(self,props):
+        pass
+    def getSchema(self):
+        return ConfigSchemaImpl(self.properties,[])
+    def getTypeName(self):
+        return 'ParallelizationConfiguration'
+    def getDescription(self):
+        return 'Configure parallelization'
 
 def make_button(icon,func,tip,**args):
     return JButton(icon=ImageIcon('python/images/%s.png'%icon),rolloverIcon=ImageIcon('python/images/%s-pressed.png'%icon),
@@ -223,9 +224,9 @@ def make_label_button(text,func,tip,**args):
 #                   borderPainted=False,focusPainted=False,contentAreaFilled=False,margin=java.awt.Insets(0,0,0,0),
 #                   verticalTextPosition=AbstractButton.BOTTOM,horizontalTextPosition=AbstractButton.CENTER,**args)
     
-
-
-class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,ca.nengo.ui.lib.world.WorldObject.ChildListener,java.lang.Runnable):
+################################################################################
+class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
+              ca.nengo.ui.lib.world.WorldObject.ChildListener,java.lang.Runnable):
     def __init__(self):
         self.ng=ca.nengo.ui.NengoGraphics.getInstance()
         self.toolbar=JToolBar("Nengo actions",floatable=False)
@@ -259,20 +260,19 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
         self.toolbar.add(self.button_run)
         
-
         ca.nengo.ui.lib.world.handlers.SelectionHandler.addSelectionListener(self)
         self.ng.getWorld().getGround().addChildrenListener(self)
 
-        self.ng.getContentPane().add(self.toolbar,BorderLayout.PAGE_START)
+        self.ng.setToolbar(self.toolbar)
 
         java.lang.Thread(self).start()
-
     
     def run(self):
+        # FIXME: we shouldn't have to do things like this
+        # we should be able to use event handling instead
         while True:
             self.update()
             java.lang.Thread.sleep(500)
-
 
     def childAdded(self,obj):
         self.update()
