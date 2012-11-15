@@ -70,8 +70,11 @@ public class FloatPanel extends PropertyInputPanel {
         }
 
         try {
-            getValue();
+            if (!textValue.matches("[0-9.]*")) {
+                throw new NumberFormatException();
+            }
 
+            getValue();
         } catch (NumberFormatException e) {
         	setStatusMsg("invalid number format");
             return false;
