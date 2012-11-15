@@ -56,7 +56,7 @@ public class UIProjection extends LineConnector {
 			 */
 			UINeoNode nodeParent = getOriginUI().getNodeParent();
 			getEdge().setLineShape(PXEdge.EdgeShape.UPWARD_ARC);
-			getEdge().setMinArcRadius(nodeParent.localToParent(nodeParent.getBounds()).getWidth());
+			getEdge().setMinArcRadius(nodeParent.getBounds().getWidth());
 			setPointerVisible(false);
 		} else {
 			getEdge().setLineShape(PXEdge.EdgeShape.STRAIGHT);
