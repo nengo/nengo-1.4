@@ -5,9 +5,6 @@ import java
 import ca.nengo
 import sys
 
-if 'lib/itextpdf-5.3.4.jar' not in sys.path:
-    sys.path.append('lib/itextpdf-5.3.4.jar')
-
 import template
 
 ################################################################################
@@ -232,7 +229,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar=JToolBar("Nengo actions",floatable=False)
         self.toolbar.add(make_button('open',self.do_open,'open file'))
         self.toolbar.add(make_button('clear', self.do_clear_all, 'clear all'))
-        self.toolbar.add(make_button('pdf',self.do_pdf,'save as pdf'))
 
         self.toolbar.add(Box.createHorizontalGlue())
         
@@ -300,10 +296,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
 
         net=self.get_current_network()
         self.button_run.enabled=net is not None
-        if net is None:
-            self.button_run.toolTipText='run'
-        else:
-            self.button_run.toolTipText='run '+net.name
+        self.button_run.toolTipText='Interactive Plots'
             
         viewer=self.get_current_network_viewer()
         self.layoutcombo.set_viewer(viewer)
@@ -387,77 +380,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def do_interrupt(self,event):
         self.ng.progressIndicator.interrupt()
 
-    def do_pdf(self,event):
-        from com.itextpdf.text.pdf import PdfWriter
-        from com.itextpdf.text import Document
-        network=self.get_current_network()
-        if network is None: name='Nengo'
-        else: name=network.name
-        fileChooser=JFileChooser()
-        fileChooser.setDialogTitle('Save layout as PDF')
-        fileChooser.setSelectedFile(java.io.File('%s.pdf'%name))
-        if fileChooser.showSaveDialog(self.ng)==JFileChooser.APPROVE_OPTION:
-            f=fileChooser.getSelectedFile()
-
-            universe=self.ng.universe
-            w=universe.size.width
-            h=universe.size.height
-
-            if( False ):
-                # basic method: make a PDF page the same size as the Nengo window.
-                #   This method preserves all details visible in the GUI
-                pw = w
-                ph = h
-
-                # create PDF document and writer
-                doc = Document( Rectangle(pw,ph), 0, 0, 0, 0 )
-                writer = PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
-                doc.open()
-                cb = writer.getDirectContent()
-
-                # create a template, print the image to it, and add it to the page
-                tp = cb.createTemplate(pw,ph)
-                g2 = tp.createGraphicsShapes(pw,ph)
-                universe.paint(g2)
-                g2.dispose()
-                cb.addTemplate(tp,0,0)
-
-                # clean up everything
-                doc.close()
-
-            else:
-                # Top of page method: prints to the top of the page
-                pw = 550
-                ph = 800
-        
-                # create PDF document and writer
-                doc = Document()
-                writer = PdfWriter.getInstance(doc,java.io.FileOutputStream(f))
-                doc.open()
-                cb = writer.getDirectContent()
-
-                # create a template
-                tp = cb.createTemplate(pw,ph)
-                g2 = tp.createGraphicsShapes(pw,ph)
-
-                # scale the template to fit the page
-                at = java.awt.geom.AffineTransform()        
-                s = min(float(pw)/w,float(ph)/h)        
-                at.scale(s,s)
-                g2.transform(at)
-
-                # print the image to the template
-                # turing off setUseGreekThreshold allows small text to print
-                ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(False)
-                universe.paint(g2)
-                ca.nengo.ui.lib.world.piccolo.primitives.Text.setUseGreekThreshold(True)
-                g2.dispose()
-
-                # add the template
-                cb.addTemplate(tp,20,0)
-
-                # clean up everything
-                doc.close()
      
 ################################################################################
 ### Main

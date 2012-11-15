@@ -67,6 +67,7 @@ import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
 import ca.nengo.ui.actions.FindAction;
+import ca.nengo.ui.actions.GeneratePDFAction;
 import ca.nengo.ui.actions.GeneratePythonScriptAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
 import ca.nengo.ui.actions.PasteAction;
@@ -897,6 +898,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         fileMenu.addAction(new GenerateScriptAction("Generate Script"),
                 KeyEvent.VK_G,
                 KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_KEY_MASK));
+        
+        fileMenu.addAction(new GeneratePDFAction("Save View to PDF..."), 0);
 
         fileMenu.getJMenu().addSeparator();
 
