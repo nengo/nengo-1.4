@@ -365,7 +365,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             for c in list(self.ng.world.ground.children): 
                 ng.removeNodeModel(c.model)    
 
-
     def do_zoom_to_fit(self,event):
         self.ng.world.zoomToFit()
 

@@ -57,6 +57,7 @@ import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Termination;
+import ca.nengo.ui.actions.ClearAllAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
@@ -873,6 +874,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                 KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_KEY_MASK));
 
         fileMenu.getJMenu().addSeparator();
+
+        fileMenu.addAction(new ClearAllAction("Clear all..."));
+        
+        fileMenu.getJMenu().addSeparator();       
     }
 
     @Override
