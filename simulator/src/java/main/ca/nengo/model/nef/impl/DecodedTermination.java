@@ -123,6 +123,8 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		//we save a little time by not reporting units to the dynamical system at each step
 		myNullUnits = new Units[dynamics.getInputDimension()];
 		myOutputValues = new float[transform.length];
+		
+		myValuesSet = false;
 
 		setDynamics(dynamics);
 		myScalingTermination = null;
@@ -197,14 +199,14 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 	 * @param startTime Simulation time at which running is to start
 	 * @param endTime Simulation time at which running is to end
 	 */
-	public void run(float startTime, float endTime) {
+	public void run(float startTime, float endTime) throws SimulationException {
 		if (myDynamics == null) {
 			setDynamics(myOutputDimension);
 		}
 
 		if (!myValuesSet) {
-			ourLogger.warn("Input values not set on termination " + myName);
-			myValuesSet = true; //don't want this warning every time step
+			ourLogger.warn("Input values not set on termination " + myName + ".  Assuming input of zero.");
+			setValues(new RealOutputImpl(new float[getDimensions()], Units.UNK, 0.0f));
 		}
 
 		float[][] transform = getTransform();
