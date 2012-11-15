@@ -179,8 +179,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
             setStatusMsg("Functions not set");
         }
         
-        if (isOutputDimensionsSet() && (myFunctionsWr == null ||
-        		myFunctionsWr.length != getOutputDimension())) {
+        if (myFunctionsWr == null || myFunctionsWr.length != getOutputDimension()) {
             myFunctionsWr = new Function[getOutputDimension()];
             for (int i=0; i<getOutputDimension(); i++) {
                 myFunctionsWr[i] = new ConstantFunction(inputDimension, 0.0f);
