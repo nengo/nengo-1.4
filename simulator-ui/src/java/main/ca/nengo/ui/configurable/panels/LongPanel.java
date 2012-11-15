@@ -89,6 +89,7 @@ public class LongPanel extends PropertyInputPanel {
             return false;
         }
 
+        setStatusMsg("");
         return true;
     }
 

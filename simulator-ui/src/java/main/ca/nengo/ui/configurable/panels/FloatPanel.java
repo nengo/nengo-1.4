@@ -65,28 +65,21 @@ public class FloatPanel extends PropertyInputPanel {
     public boolean isValueSet() {
         String textValue = tf.getText();
 
-        if (textValue == null || textValue.compareTo("") == 0) {
+        if (textValue == null || textValue.equals("")) {
+        	setStatusMsg("value not set");
             return false;
-        }
-
-        try {
-            if (!textValue.matches("[0-9.]*")) {
-                throw new NumberFormatException();
-            }
-
-            getValue();
-        } catch (NumberFormatException e) {
+        } else if (!textValue.matches("\\s*-??[0-9]*[.]??[0-9]*\\s*")) {
         	setStatusMsg("invalid number format");
             return false;
+        } else {
+        	setStatusMsg("");
+        	return true;
         }
-
-        return true;
     }
 
     @Override
     public void setValue(Object value) {
         tf.setText(value.toString());
-
     }
 
 }
