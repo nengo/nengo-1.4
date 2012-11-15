@@ -41,6 +41,7 @@ import java.util.LinkedList;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -59,6 +60,7 @@ import ca.nengo.model.Termination;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
+import ca.nengo.ui.actions.FindAction;
 import ca.nengo.ui.actions.GeneratePythonScriptAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
 import ca.nengo.ui.actions.PasteAction;
@@ -550,7 +552,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         StandardAction cutAction = null;
         StandardAction pasteAction = null;
         StandardAction removeAction = null;
-
+        
         Collection<WorldObject> selectedObjects = getSelectedObjects();
         
         if (selectedObjects != null && selectedObjects.size() > 0) {
@@ -606,7 +608,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                 MENU_SHORTCUT_KEY_MASK));
         editMenu.addAction(removeAction, KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,
                 0));
-
+        
+        editMenu.getJMenu().addSeparator();
+ 
+        editMenu.addAction(new FindAction("Find..."), KeyEvent.VK_F, KeyStroke.getKeyStroke(KeyEvent.VK_F,
+        		MENU_SHORTCUT_KEY_MASK));
     }
 
     @Override
@@ -856,6 +862,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, MENU_SHORTCUT_KEY_MASK));
 
+        fileMenu.getJMenu().addSeparator();
+        
         fileMenu.addAction(new SaveNetworkAction("Save Network"),
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_KEY_MASK));
@@ -863,6 +871,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         fileMenu.addAction(new GenerateScriptAction("Generate Script"),
                 KeyEvent.VK_G,
                 KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_KEY_MASK));
+
+        fileMenu.getJMenu().addSeparator();
     }
 
     @Override
@@ -881,6 +891,8 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                     KeyStroke.getKeyStroke(0x30 + count++, MENU_SHORTCUT_KEY_MASK));
 
         }
+        viewMenu.getJMenu().addSeparator();
+
         viewMenu.addAction(new ZoomToFitAction("Zoom to fit", this.getWorld()),
              KeyEvent.VK_0,
              KeyStroke.getKeyStroke(KeyEvent.VK_0, MENU_SHORTCUT_KEY_MASK));

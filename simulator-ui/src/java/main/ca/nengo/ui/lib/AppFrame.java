@@ -84,10 +84,12 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
     /**
      * A String which briefly describes some commands used in this application
      */
-    public static final String WORLD_TIPS = "<H3>Mouse</H3>" + "Right Click >> Object menus<BR>"
+    public static final String WORLD_TIPS = "<H3>Mouse</H3>" + "Right Click >> Context menus<BR>"
             + "Right Click + Drag >> Zoom<BR>" + "Scroll Wheel >> Zoom" + "<H3>Keyboard</H3>"
-            + "CTRL/CMD F >> Search the current window<BR>" + "Hold SHIFT >> Marquee select<BR>"
-            + "Hold CTRL/CMD >> Hover over objects for tooltips";
+            + "CTRL/CMD F >> Search the current window<BR>" + "SHIFT >> Multiple select<BR>"
+            + "SHIFT + Drag >> Marquee select<BR>" + "<H3>Additional Help</H3>" 
+            + "<a href=\"http://nengo.ca/docs/html/index.html\">Full documentation</a> (http://nengo.ca/docs/html/index.html)<BR>"
+            + "<a href=\"http://nengo.ca/faq\">Frequent Asked Questions</a> (http://nengo.ca/faq)";
 
     private ReversableActionManager actionManager;
 
@@ -162,7 +164,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         menuBar.add(runMenu.getJMenu());
 
-        worldMenu = new MenuBuilder("Options");
+        worldMenu = new MenuBuilder("Misc");
         worldMenu.getJMenu().setMnemonic(KeyEvent.VK_O);
         menuBar.add(worldMenu.getJMenu());
 
@@ -445,6 +447,8 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         editMenu.addAction(new RedoAction(), KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y,
                 MENU_SHORTCUT_KEY_MASK));
+        
+        editMenu.getJMenu().addSeparator();
 
     }
 
@@ -462,7 +466,18 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
      */
     protected void updateWorldMenu() {
         worldMenu.reset();
+
+        if (!universe.isSelectionMode()) {
+            worldMenu.addAction(new SwitchToSelectionMode(), KeyEvent.VK_S);
+        } else {
+            worldMenu.addAction(new SwitchToNavigationMode(), KeyEvent.VK_S);
+        }        
+        
+        worldMenu.getJMenu().addSeparator();
+        
         worldMenu.addAction(new CloseAllPlots(), KeyEvent.VK_M);
+        
+        worldMenu.getJMenu().addSeparator();
 
         if (!isFullScreenMode) {
             // worldMenu.addAction(new TurnOnFullScreen(), KeyEvent.VK_F);
@@ -482,12 +497,8 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
             worldMenu.addAction(new TurnOffGrid(), KeyEvent.VK_G);
         }
 
-        if (!universe.isSelectionMode()) {
-            worldMenu.addAction(new SwitchToSelectionMode(), KeyEvent.VK_S);
-        } else {
-            worldMenu.addAction(new SwitchToNavigationMode(), KeyEvent.VK_S);
-        }
-
+        worldMenu.getJMenu().addSeparator();
+        
         MenuBuilder qualityMenu = worldMenu.addSubMenu("Rendering Quality");
 
         qualityMenu.getJMenu().setMnemonic(KeyEvent.VK_Q);
@@ -946,7 +957,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
     }
 
     protected String getHelp() {
-        return WORLD_TIPS + "<BR>" + getShortcutHelp();
+        return WORLD_TIPS + "<BR>";
     }
     
     static final String[] browsers = {"google-chrome", "chromium", "firefox",
@@ -1027,33 +1038,6 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
             JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName()
                     + " Tips", JOptionPane.PLAIN_MESSAGE);
         }
-    }
-
-    private String getShortcutHelp() {
-        StringBuilder shortcutKeysString = new StringBuilder(400);
-
-        shortcutKeysString.append("<h3>Additional Shortcuts</h3>");
-        if (getShortcutKeys().length == 0) {
-            shortcutKeysString.append("No shortcuts available");
-        } else {
-            for (ShortcutKey shortcutKey : getShortcutKeys()) {
-                if ((shortcutKey.getModifiers() & MENU_SHORTCUT_KEY_MASK) != 0) {
-                    shortcutKeysString.append("CTRL/CMD ");
-                }
-                if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
-                    shortcutKeysString.append("ALT ");
-                }
-                if ((shortcutKey.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-                    shortcutKeysString.append("SHIFT ");
-                }
-
-                shortcutKeysString.append((char) shortcutKey.getKeyCode());
-                shortcutKeysString.append(" >> ");
-                shortcutKeysString.append(shortcutKey.getAction().getDescription());
-                shortcutKeysString.append("<br>");
-            }
-        }
-        return shortcutKeysString.toString();
     }
 
     /**
