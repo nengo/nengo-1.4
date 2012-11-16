@@ -637,10 +637,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         editMenu.addAction(removeAction, KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,
                 0));
         
-        editMenu.getJMenu().addSeparator();
- 
-        editMenu.addAction(new FindAction("Find..."), KeyEvent.VK_F, KeyStroke.getKeyStroke(KeyEvent.VK_F,
-        		MENU_SHORTCUT_KEY_MASK));
     }
 
     @Override

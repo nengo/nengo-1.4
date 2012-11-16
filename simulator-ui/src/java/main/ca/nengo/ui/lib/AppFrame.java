@@ -51,7 +51,6 @@ import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.world.World;
 import ca.nengo.ui.lib.world.WorldObject;
-import ca.nengo.ui.lib.world.Search.SearchInputHandler;
 import ca.nengo.ui.lib.world.elastic.ElasticWorld;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
@@ -323,18 +322,6 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         validate();
         setFullScreenMode(false);
-
-    }
-
-    private SearchInputHandler searchHandler;
-
-    /**
-     * @param enabled TODO
-     */
-    public void setSearchEnabled(boolean enabled) {
-        if (searchHandler != null) {
-            searchHandler.destroy();
-        }
 
     }
 
