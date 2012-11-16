@@ -67,7 +67,6 @@ import ca.nengo.ui.actions.ClearAllAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
-import ca.nengo.ui.actions.FindAction;
 import ca.nengo.ui.actions.GeneratePDFAction;
 import ca.nengo.ui.actions.GeneratePythonScriptAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
