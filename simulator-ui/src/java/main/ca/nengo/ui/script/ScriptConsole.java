@@ -38,6 +38,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import javax.swing.Action;
@@ -55,6 +56,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import org.apache.log4j.Logger;
+import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
 
 
@@ -109,6 +111,7 @@ public class ScriptConsole extends JPanel {
 	private int myDefaultDismissDelay;
 	private long myLastHelpTime = 0;
 	private Action myHideTip;
+	private ArrayList<String> myAddedVariables;
 
 	/**
 	 * @param interpreter
@@ -151,6 +154,7 @@ public class ScriptConsole extends JPanel {
 		myInCallChainCompletionMode = false;
 		myTypedText = "";
 		myTypedCaretPosition = 0;
+		myAddedVariables = new ArrayList<String>();
 
 		interpreter.setOut(new ConsoleOutputWriter(this));
 		
@@ -208,6 +212,7 @@ public class ScriptConsole extends JPanel {
 	 */
 	public void addVariable(String name, Object variable) {
 		myInterpreter.set(makePythonName(name), variable);
+		myAddedVariables.add(makePythonName(name));
 	}
 
 	/**
@@ -219,6 +224,33 @@ public class ScriptConsole extends JPanel {
 		if (myInterpreter.get(name) != null) {
 			myInterpreter.exec("del " + name);
 		}
+	}
+	
+	/**
+	 * Returns names of all variables in the local workspace.
+	 */
+	public String[] getVariables() {
+		PyStringMap dict = (PyStringMap)myInterpreter.getLocals();
+		return (String[])dict.keys().toArray(new String[0]);
+	}
+	
+	/**
+	 * Reset the script console back to initial conditions (remove all modules and variables
+	 * added within the interpreter).
+	 */
+	public void clearAll() {
+		//remove modules
+		myInterpreter.exec("sys.modules.clear()");
+		
+		//remove variables
+		String[] vars = getVariables();
+		for(String v : vars) {
+			if(!myAddedVariables.contains(v)) //keep any variables that were added manually
+				removeVariable(v);
+		}
+		
+		//re-add init variables
+		myInterpreter.execfile("python/startup_common.py");
 	}
 
 	private static String makePythonName(String name) {
@@ -378,7 +410,9 @@ public class ScriptConsole extends JPanel {
         				myInterpreter.execfile(initText.substring(4).trim());
         			} else if (initText.startsWith("help ")) {
         				appendText(JavaSourceParser.removeTags(getHelp(initText.substring(5).trim())), HELP_STYLE);
-        				appendText("\n","root");
+        				appendText("\n","root");        			
+        			} else if (initText.equals("clear all")) {
+        				clearAll();
         			} else {
         				myInterpreter.exec(initText);
         			}

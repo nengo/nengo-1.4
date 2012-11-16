@@ -62,14 +62,19 @@ public class ClearAllAction extends StandardAction {
                 "Are you sure you want to remove all objects from Nengo?",
                 "Clear all?", JOptionPane.YES_NO_OPTION);
         if (response == 0) {
-            Iterable<WorldObject> modelsToRemove = NengoGraphics.getInstance().getWorld().getGround().getChildren();
+        	NengoGraphics nengo = NengoGraphics.getInstance();
+            Iterable<WorldObject> modelsToRemove = nengo.getWorld().getGround().getChildren();
             Iterator<WorldObject> iter = modelsToRemove.iterator();
             List<WorldObject> copy = new ArrayList<WorldObject>();
             while (iter.hasNext())
                 copy.add(iter.next());
             for (WorldObject modelToRemove : copy) {
-        		NengoGraphics.getInstance().removeNodeModel((Node) ((ModelObject) modelToRemove).getModel());
+        		nengo.removeNodeModel((Node) ((ModelObject) modelToRemove).getModel());
         	}
+            
+            //clear script console
+            nengo.getScriptConsole().clearAll();
+            
         } else {
             throw new UserCancelledException();
         }

@@ -366,14 +366,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         return viewer
 
     def do_clear_all(self,event):
-        response=JOptionPane.showConfirmDialog(
-            ca.nengo.ui.lib.util.UIEnvironment.getInstance(),
-            "Are you sure you want to remove all objects from Nengo?",
-            "Clear all?",
-            JOptionPane.YES_NO_OPTION)
-        if response==0:    
-            for c in list(self.ng.world.ground.children): 
-                ng.removeNodeModel(c.model)    
+        ca.nengo.ui.actions.ClearAllAction("Clear all").doAction()
 
     def do_zoom_to_fit(self,event):
         self.ng.world.zoomToFit()
