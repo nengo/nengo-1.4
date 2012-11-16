@@ -225,9 +225,14 @@ def make_label_button(text,func,tip,**args):
 class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
               ca.nengo.ui.lib.world.WorldObject.ChildListener,java.lang.Runnable):
     def __init__(self):
+        #color = Color(.25,.25,.25,1)
         self.ng=ca.nengo.ui.NengoGraphics.getInstance()
         self.toolbar=JToolBar("Nengo actions",floatable=False)
+        #self.toolbar.setBackground(color) 
         self.toolbar.add(make_button('open',self.do_open,'open file'))
+        self.toolbar.add(make_button('savefile',self.do_save,'save selected network'))
+        self.toolbar.add(make_button('scriptgen',self.do_scriptgen,'generate selected network script'))
+        self.toolbar.addSeparator()
         self.toolbar.add(make_button('clear', self.do_clear_all, 'clear all'))
 
         self.toolbar.add(Box.createHorizontalGlue())
@@ -246,12 +251,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         self.toolbar.add(self.zoom)
         self.toolbar.add(Box.createHorizontalGlue())
         
-        #self.button_stop=make_button('stop',self.do_interrupt,'Stop the currently running simulation',enabled=False)
-        #self.toolbar.add(self.button_stop)
-        self.parallelization=ParallelizationConfiguration()
-        self.toolbar.add(self.parallelization.button)
-        #self.toolbar.add(make_button('templates',lambda event: template.template.toggle_visible(),'toggle templates'))
-        self.toolbar.add(make_button('console',self.do_console,'toggle console'))
         self.toolbar.add(make_button('inspect',self.do_inspect,'inspect'))
         self.button_run=make_button('interactive',self.do_run,'interactive plots',enabled=False)
         self.toolbar.add(self.button_run)
@@ -313,6 +312,8 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
                 network=network.nodeParent
             while top_parent and hasattr(network,'networkParent') and network.networkParent is not None:
                 network=network.networkParent
+            if not(top_parent) and hasattr(network,'networkParent') and network.networkParent is not None:
+                network=network.networkParent
         else:
             found_candidate=False
             for wo in ng.world.ground.children:
@@ -323,7 +324,28 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
                     else:
                         network=None
                         break
-        return network      
+        return network     
+    
+    def get_selected_network(self,top_parent=False):
+        network=self.ng.getSelectedObj()
+        if network is not None:
+            while hasattr(network,'termination') and network.termination is not None:
+                network=network.termination
+            while hasattr(network,'nodeParent') and network.nodeParent is not None:
+                network=network.nodeParent
+            if not(top_parent) and not(isinstance(network,ca.nengo.ui.models.nodes.UINetwork)):
+                network=network.networkParent
+        else:
+            found_candidate=False
+            for wo in ng.world.ground.children:
+                if isinstance(wo,ca.nengo.ui.models.nodes.UINetwork):
+                    if not found_candidate:
+                        network=wo
+                        found_candidate=True
+                    else:
+                        network=None
+                        break
+        return network   
         
     def get_current_network_viewer(self):
         viewer=None
@@ -342,11 +364,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
             not isinstance(viewer, ca.nengo.ui.models.viewers.NetworkViewer)):
             return None
         return viewer
-          
-        
-    def do_console(self,event):
-        pane=self.ng.scriptConsolePane
-        pane.auxVisible=not pane.auxVisible
 
     def do_clear_all(self,event):
         response=JOptionPane.showConfirmDialog(
@@ -371,6 +388,16 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
         
     def do_open(self,event):
         ca.nengo.ui.actions.OpenNeoFileAction(ng).doAction()
+
+    def do_save(self,event):
+        network=self.get_selected_network()
+        if network is not None:                    
+            ca.nengo.ui.actions.SaveNodeAction(network).doAction()
+
+    def do_scriptgen(self,event):
+        network=self.get_selected_network()
+        if network is not None:                    
+            ca.nengo.ui.actions.GeneratePythonScriptAction(network).doAction()
 
     def do_run(self,event):
         network=self.get_current_network()

@@ -62,6 +62,7 @@ import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Termination;
+import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.ui.actions.ClearAllAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
@@ -891,19 +892,21 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         fileMenu.getJMenu().addSeparator();
         
-        fileMenu.addAction(new SaveNetworkAction("Save Network"),
+        fileMenu.addAction(new SaveNetworkAction("Save Selected Network"),
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_KEY_MASK));
  
+        fileMenu.addAction(new GeneratePDFAction("Save View to PDF"), 
+                KeyEvent.VK_P,
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, MENU_SHORTCUT_KEY_MASK));
+ 
         fileMenu.addAction(new GenerateScriptAction("Generate Script"),
                 KeyEvent.VK_G,
-                KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_KEY_MASK));
-        
-        fileMenu.addAction(new GeneratePDFAction("Save View to PDF..."), 0);
-
+                KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_KEY_MASK));        
+ 
         fileMenu.getJMenu().addSeparator();
 
-        fileMenu.addAction(new ClearAllAction("Clear all..."));
+        fileMenu.addAction(new ClearAllAction("Clear all"));
         
         fileMenu.getJMenu().addSeparator();       
     }
