@@ -245,21 +245,21 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		AbstractMenuBuilder modeMenu = menu.addSubMenu("Mode");
 		
 		if (selected == SimulationMode.DEFAULT) {
-			modeMenu.addAction(new DefaultModeAction("Spiking <", arrayOfMe));
-			modeMenu.addAction(new RateModeAction("Rate", arrayOfMe));
-			modeMenu.addAction(new DirectModeAction("Direct", arrayOfMe));
+			modeMenu.addAction(new DefaultModeAction("\u25cf Spiking", arrayOfMe));
+			modeMenu.addAction(new RateModeAction("   Rate", arrayOfMe));
+			modeMenu.addAction(new DirectModeAction("   Direct", arrayOfMe));
 		} else if (selected == SimulationMode.RATE) {
-			modeMenu.addAction(new DefaultModeAction("Spiking", arrayOfMe));
-			modeMenu.addAction(new RateModeAction("Rate <", arrayOfMe));
-			modeMenu.addAction(new DirectModeAction("Direct", arrayOfMe));
+			modeMenu.addAction(new DefaultModeAction("   Spiking", arrayOfMe));
+			modeMenu.addAction(new RateModeAction("\u25cf Rate", arrayOfMe));
+			modeMenu.addAction(new DirectModeAction("   Direct", arrayOfMe));
 		} else if (selected == SimulationMode.DIRECT) {
-			modeMenu.addAction(new DefaultModeAction("Spiking", arrayOfMe));
-			modeMenu.addAction(new RateModeAction("Rate", arrayOfMe));
-			modeMenu.addAction(new DirectModeAction("Direct <", arrayOfMe));
+			modeMenu.addAction(new DefaultModeAction("   Spiking", arrayOfMe));
+			modeMenu.addAction(new RateModeAction("   Rate", arrayOfMe));
+			modeMenu.addAction(new DirectModeAction("\u25cf Direct", arrayOfMe));
 		} else {
-			modeMenu.addAction(new DefaultModeAction("Spiking", arrayOfMe));
-			modeMenu.addAction(new RateModeAction("Rate", arrayOfMe));
-			modeMenu.addAction(new DirectModeAction("Direct", arrayOfMe));
+			modeMenu.addAction(new DefaultModeAction("   Spiking", arrayOfMe));
+			modeMenu.addAction(new RateModeAction("   Rate", arrayOfMe));
+			modeMenu.addAction(new DirectModeAction("   Direct", arrayOfMe));
 		}
 
 //		menu.addSection("File");
