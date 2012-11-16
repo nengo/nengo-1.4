@@ -8,43 +8,6 @@ import sys
 import template
 
 ################################################################################
-from ca.nengo.model import SimulationMode
-class SimulationModeComboBox(JComboBox):
-    def __init__(self):
-        JComboBox.__init__(self,['spiking','rate','direct'],toolTipText='set simulation mode')
-        self.node=None
-        self.enabled=False
-        self.addActionListener(self)
-        self.maximumSize=self.preferredSize
-    def set_node(self,node):
-        self.node=None
-        if node is not None and (not hasattr(node, 'model')
-                                 or not hasattr(node.model,'mode')):
-            node=None
-        self.enabled=node is not None
-        
-        if node is not None:
-            mode=node.model.mode
-            
-            if mode in [SimulationMode.DEFAULT,SimulationMode.PRECISE]:
-                self.setSelectedIndex(0)
-            elif mode in [SimulationMode.RATE]:
-                self.setSelectedIndex(1)
-            elif mode in [SimulationMode.DIRECT,SimulationMode.APPROXIMATE]:
-                self.setSelectedIndex(2)
-
-            self.node=node
-
-        
-    def actionPerformed(self,event):
-        if self.node is None: return
-        mode=self.getSelectedItem()
-        if mode=='rate': self.node.model.mode=SimulationMode.RATE
-        elif mode=='direct': self.node.model.mode=SimulationMode.DIRECT
-        else: self.node.model.mode=SimulationMode.DEFAULT
-        self.set_node(self.node)
-
-################################################################################
 class LayoutComboBox(JComboBox):
     def __init__(self):
         JComboBox.__init__(self,['last saved','feed-forward','sort by name'],
@@ -237,9 +200,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
 
         self.toolbar.add(Box.createHorizontalGlue())
         
-        self.toolbar.add(JLabel("mode:"))
-        self.mode_combobox=SimulationModeComboBox()
-        self.toolbar.add(self.mode_combobox)
         self.parisian=ParisianTransform()
         self.toolbar.add(self.parisian.button)
         self.toolbar.add(JLabel("layout:"))
@@ -279,7 +239,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def update(self):
     
         selected=self.ng.getSelectedObj()
-        self.mode_combobox.set_node(selected)
 
         projection=None
         if selected is not None and (hasattr(selected, 'model') and 

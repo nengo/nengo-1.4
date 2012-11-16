@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -48,6 +49,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.FunctionInput;
@@ -59,6 +61,9 @@ import ca.nengo.ui.actions.AddProbeAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
+import ca.nengo.ui.actions.DefaultModeAction;
+import ca.nengo.ui.actions.DirectModeAction;
+import ca.nengo.ui.actions.RateModeAction;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.UserDialogs;
 import ca.nengo.ui.lib.actions.ActionException;
@@ -69,6 +74,7 @@ import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
+import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.DroppableX;
 import ca.nengo.ui.lib.world.WorldObject;
@@ -234,6 +240,27 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		
 		menu.addAction(new CopyAction("Copy", arrayOfMe));
 		menu.addAction(new CutAction("Cut", arrayOfMe));
+		
+		SimulationMode selected = ((UINeoNode) arrayOfMe.toArray()[0]).getModel().getMode();
+		AbstractMenuBuilder modeMenu = menu.addSubMenu("Mode");
+		
+		if (selected == SimulationMode.DEFAULT) {
+			modeMenu.addAction(new DefaultModeAction("Spiking <", arrayOfMe));
+			modeMenu.addAction(new RateModeAction("Rate", arrayOfMe));
+			modeMenu.addAction(new DirectModeAction("Direct", arrayOfMe));
+		} else if (selected == SimulationMode.RATE) {
+			modeMenu.addAction(new DefaultModeAction("Spiking", arrayOfMe));
+			modeMenu.addAction(new RateModeAction("Rate <", arrayOfMe));
+			modeMenu.addAction(new DirectModeAction("Direct", arrayOfMe));
+		} else if (selected == SimulationMode.DIRECT) {
+			modeMenu.addAction(new DefaultModeAction("Spiking", arrayOfMe));
+			modeMenu.addAction(new RateModeAction("Rate", arrayOfMe));
+			modeMenu.addAction(new DirectModeAction("Direct <", arrayOfMe));
+		} else {
+			modeMenu.addAction(new DefaultModeAction("Spiking", arrayOfMe));
+			modeMenu.addAction(new RateModeAction("Rate", arrayOfMe));
+			modeMenu.addAction(new DirectModeAction("Direct", arrayOfMe));
+		}
 
 //		menu.addSection("File");
 //		menu.addAction(new SaveNodeAction(this));

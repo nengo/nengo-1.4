@@ -51,30 +51,6 @@ public class GeneratePDFAction extends StandardAction {
             Universe universe = ((NengoGraphics) ng).getUniverse();
             double w = universe.getSize().getWidth();
             double h = universe.getSize().getHeight();
-            
-
-//            if(false) {
-//                // basic method: make a PDF page the same size as the Nengo window.
-//                //   This method preserves all details visible in the GUI
-//                float pw = (float) w;
-//                float ph = (float) h;
-//
-//                // create PDF document and writer
-//                Document doc = new Document(new Rectangle(pw,ph), 0, 0, 0, 0 );
-//                PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(file));
-//                doc.open();
-//                PdfContentByte cb = writer.getDirectContent();
-//
-//                // create a template, print the image to it, and add it to the page
-//                PdfTemplate tp = cb.createTemplate(pw, ph);
-//                Graphics2D g2 = tp.createGraphicsShapes(pw, ph);
-//                universe.paint(g2);
-//                g2.dispose();
-//                cb.addTemplate(tp,0,0);
-//
-//                // clean up everything
-//                doc.close();
-//            }
 
             // Top of page method: prints to the top of the page
             float pw = 550;
