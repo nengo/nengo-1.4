@@ -238,7 +238,7 @@ public class ScriptConsole extends JPanel {
 	 * Reset the script console back to initial conditions (remove all modules and variables
 	 * added within the interpreter).
 	 */
-	public void clearAll() {
+	public void reset() {
 		//remove modules
 		myInterpreter.exec("sys.modules.clear()");
 		
@@ -410,9 +410,11 @@ public class ScriptConsole extends JPanel {
         				myInterpreter.execfile(initText.substring(4).trim());
         			} else if (initText.startsWith("help ")) {
         				appendText(JavaSourceParser.removeTags(getHelp(initText.substring(5).trim())), HELP_STYLE);
-        				appendText("\n","root");        			
-        			} else if (initText.equals("clear all")) {
-        				clearAll();
+        				appendText("\n","root");   
+        			} else if (initText.equals("clear")) {
+        				myDisplayArea.setText("");
+        			} else if (initText.equals("reset")) {
+        				reset();
         			} else {
         				myInterpreter.exec(initText);
         			}
