@@ -295,7 +295,7 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
 
         net=self.get_current_network()
         self.button_run.enabled=net is not None
-        self.button_run.toolTipText='Interactive Plots'
+        self.button_run.toolTipText='interactive plots'
             
         viewer=self.get_current_network_viewer()
         self.layoutcombo.set_viewer(viewer)
