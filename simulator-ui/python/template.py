@@ -4,6 +4,8 @@ import java
 
 from ca.nengo.ui.configurable.descriptors import *
 from ca.nengo.ui.configurable import *
+from ca.nengo.ui.configurable.managers import ConfigDialogClosedException
+
 import ca.nengo
 import inspect
 import threading
@@ -113,7 +115,8 @@ class TemplateBar(TransferHandler):
         self.add_template('Network','ca.nengo.ui.models.constructors.CNetwork','images/nengoIcons/network.gif')
         self.add_template('Ensemble','ca.nengo.ui.models.constructors.CNEFEnsemble','images/nengoIcons/ensemble.gif')
         self.add_template('Input','ca.nengo.ui.models.constructors.CFunctionInput','images/nengoIcons/input.png')
-        self.add_template('Origin','ca.nengo.ui.models.constructors.CDecodedOrigin','images/nengoIcons/origin.png')
+        #self.add_template('Origin','ca.nengo.ui.models.constructors.CDecodedOrigin','images/nengoIcons/origin.png')
+        self.add_template('Origin','nef.templates.origin','images/nengoIcons/origin.png')
         self.add_template('Termination','nef.templates.termination','images/nengoIcons/termination.png')
         
         self.panel.add(JSeparator(JSeparator.HORIZONTAL,maximumSize = (200,1),foreground = Color(0.3,0.3,0.3),background = Color(0.1,0.1,0.1)))
@@ -336,13 +339,21 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
         if node is not None:
             origins = node.model.getOrigins()
             terminations = node.model.getTerminations()
-        user_configurer.configureAndWait()
 
-        if node is not None:
-            for o in node.model.getOrigins():
-                if o not in origins: node.showOrigin(o.name)
-            for t in node.model.getTerminations():
-                if t not in terminations: node.showTermination(t.name)
+        try:
+          user_configurer.configureAndWait()
+        except ConfigDialogClosedException:
+          pass
+
+
+        #this was causing terminations and origins added via templates to be displayed twice
+        #if node is not None:
+            #for o in node.model.getOrigins():
+            #    if o not in origins: node.showOrigin(o.name)
+
+            #for t in node.model.getTerminations():
+                #pass
+                #if t not in terminations: node.showTermination(t.name)
                 
             
 ################################################################################

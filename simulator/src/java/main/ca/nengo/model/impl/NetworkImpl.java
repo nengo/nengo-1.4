@@ -646,7 +646,14 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 *      java.lang.String)
 	 */
 	public void exposeOrigin(Origin origin, String name) {
-		OriginWrapper temp = new OriginWrapper(this, origin, name);
+		Origin temp;
+		
+		if(origin.getNode().equals(this))
+		{
+			temp = origin;
+		}else{
+			temp = new OriginWrapper(this, origin, name);
+		}
 
 		myExposedOrigins.put(name, temp );
 		myExposedOriginNames.put(origin, name);
@@ -719,11 +726,21 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#exposeTermination(ca.nengo.model.Termination, java.lang.String)
 	 */
 	public void exposeTermination(Termination termination, String name) {
-		TerminationWrapper term = new TerminationWrapper(this, termination, name);
-
-		myExposedTerminations.put(name, term);
-		myExposedTerminationNames.put(termination, name);
-		OrderedExposedTerminations.add(term);
+		Termination term;
+		
+		if(termination.getNode().equals(this))
+		{
+			myExposedTerminations.put(termination.getName(), termination);
+			myExposedTerminationNames.put(termination, termination.getName());
+			OrderedExposedTerminations.add(termination);
+		}else{
+			term = new TerminationWrapper(this, termination, name);
+			
+			myExposedTerminations.put(name, term);
+			myExposedTerminationNames.put(termination, name);
+			OrderedExposedTerminations.add(term);
+		}
+		
 		fireVisibleChangeEvent();
 	}
 
@@ -731,7 +748,19 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#hideTermination(java.lang.String)
 	 */
 	public void hideTermination(String name) {
-		OrderedExposedTerminations.remove(myExposedTerminations.get(name));
+		Termination term = myExposedTerminations.get(name);
+		
+		if(term == null) return;
+		
+		if(!(term instanceof TerminationWrapper))
+		{
+			OrderedExposedTerminations.remove(term);
+			myExposedTerminations.remove(name);
+			myExposedTerminationNames.remove(term);
+			return;
+		}
+		
+		OrderedExposedTerminations.remove(term);
 		TerminationWrapper termination = (TerminationWrapper)myExposedTerminations.remove(name);
 		if (termination != null) {
 			myExposedTerminationNames.remove(termination.myWrapped);
@@ -1093,7 +1122,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
     public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
-        String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+        String pythonNetworkName = scriptData.get("prefix") + myName.replaceAll("\\p{Blank}|\\p{Punct}", ((Character)scriptData.get("spaceDelim")).toString());
 
         py.append("\n\n# Network " + myName + " Start\n");
 
@@ -1261,7 +1290,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public String toPostScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
 
-		String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+		String pythonNetworkName = scriptData.get("prefix") + myName.replaceAll("\\p{Blank}|\\p{Punct}", ((Character)scriptData.get("spaceDelim")).toString());
 
         py.append("\n# " + myName + " - Templates\n");
 		

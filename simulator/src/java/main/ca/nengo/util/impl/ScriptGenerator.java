@@ -66,7 +66,7 @@ public class ScriptGenerator extends DFSIterator {
 			for (Node child : node.getChildren())
 			{
 				String prefix;
-				String nameNoSpaces = node.getName().replace(' ', spaceDelimiter);
+				String nameNoSpaces = node.getName().replaceAll("\\p{Blank}|\\p{Punct}", Character.toString(spaceDelimiter));
 				
 				if(topLevel)
 					prefix = topLevelPrefix + spaceDelimiter + nameNoSpaces;
@@ -138,7 +138,7 @@ public class ScriptGenerator extends DFSIterator {
                         
             if(topLevel)
             {
-            	String nameNoSpaces = topLevelPrefix + spaceDelimiter + node.getName().replace(' ', spaceDelimiter);
+            	String nameNoSpaces = topLevelPrefix + spaceDelimiter + node.getName().replaceAll("\\p{Blank}|\\p{Punct}", Character.toString(spaceDelimiter));
             	script.append( nameNoSpaces + ".add_to_nengo()\n");
             }
         }
