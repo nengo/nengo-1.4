@@ -74,7 +74,7 @@ description="""<html>This is a generic template for constructing a recurrent net
 params=[
     ('name','Name',str,'Name of the new linear system'),
     ('neurons','Number of Neurons',int,'Number of neurons in the new linear system'),
-    ('tau_feedback','Feedback time constant [s]',float,'Synaptic time constant for the integrative feedback, in seconds'),
+    ('tau_feedback','Feedback PSTC [s]',float,'Post-synaptic time constant for the integrative feedback, in seconds'),
     ('A','System dynamics matrix',PSystemMatrix,'The system dynamics matrix, A, of the new linear system'),
     ]
 

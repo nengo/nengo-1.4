@@ -7,7 +7,7 @@ description="""<html>To drive the constructed basal ganglia, you need an input w
 params=[
     ('name','Name',str,'Name of the new basal ganglia sub-network'),
     ('dimensions','Number of actions',int,'Number of actions for the basal ganglia to decide between'),
-    ('pstc','Time constant for input [s]',float,'Synaptic time constant for input filtering, in seconds'),
+    ('pstc','Input PSTC [s]',float,'Post-synaptic time constant for input filtering, in seconds'),
     ]
 
 def test_params(net,p):

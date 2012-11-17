@@ -79,7 +79,7 @@ public abstract class PropertyInputPanel {
         label.setFont(NengoStyle.FONT_BOLD);
         labelPanel.add(label);
 
-        JButton help=new JButton("<html><u>?</u></html>");
+        final JButton help=new JButton("<html><u>?</u></html>");
         help.setFocusable(false);
         help.setForeground(new java.awt.Color(120,120,180));
         help.setBorderPainted(false);
@@ -87,7 +87,7 @@ public abstract class PropertyInputPanel {
         help.setFocusPainted(false);
         help.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null,propDescriptor.getTooltip(),propDescriptor.getName(),JOptionPane.INFORMATION_MESSAGE,null);
+                JOptionPane.showMessageDialog(help,propDescriptor.getTooltip(),propDescriptor.getName(),JOptionPane.INFORMATION_MESSAGE,null);
             }
         });
         labelPanel.add(help);

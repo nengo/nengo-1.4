@@ -22,11 +22,11 @@ channel = net.make_array('Channel', N, D)
 net.make_array('Motor', N, D)
 
 # Create the memory
-integrator.make(net,name='Memory',neurons=N*D,dimensions=D,tau_feedback=0.4,tau_input=0.1,scale=1)
+integrator.make(net,name='Memory',neurons=N*D,dimensions=D,tau_feedback=0.4,tau_input=0.05,scale=1)
 memory = net.network.getNode('Memory')
 
 # Add projections to and from the channel ensemble
-net.connect('Visual', 'Channel')
+net.connect('Visual', 'Channel', pstc=0.02)
 net.network.addProjection(channel.getOrigin('X'), memory.getTermination('input'))
 
 # Create ensemble calculating the unbinding transformation
@@ -67,15 +67,15 @@ class Input(nef.SimpleNode):
         self.v4=vocab.parse('QUESTION+SQUARE').v
     def origin_x(self):
         t=self.t_start
-        if t<0.5:
-          if 0.1<self.t_start<0.3:
+        if t<1:
+          if 0.1<self.t_start<0.5:
             return self.v1
-          elif 0.35<self.t_start<0.5:
+          elif 0.6<self.t_start<1.0:
             return self.v2
           else:
             return self.zero
         else:
-          t=(t-0.5)%0.6
+          t=(t-1.0)%0.6
           if 0.2<t<0.4:
             return self.v3
           elif 0.4<t<0.6:

@@ -124,14 +124,8 @@ class TemplateBar(TransferHandler):
         for template in nef.templates.templates:
             self.add_template(getattr(template,'label'),template.__name__,'images/nengoIcons/'+getattr(template,'icon'))
 
-                
-        self.scrollPane = JScrollPane(self.panel,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
-        self.ng.getContentPane().add(self.scrollPane,BorderLayout.WEST)
-        
-        self.scrollPane.verticalScrollBar.unitIncrement = 20
-        self.scrollPane.revalidate()
-        self.size_with_scrollbar = self.scrollPane.preferredSize
-        self.scrollPane.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+        # get NengoGraphics to add me
+        self.ng.setTemplatePanel(self.panel)
         
     def add_template(self,name,constructor,image):
         icon = ImageIcon(image)
@@ -165,13 +159,6 @@ class TemplateBar(TransferHandler):
 
     def createTransferable(self,component):
         return TemplateTransferable(self.templates[component])
-
-    def toggle_visible(self):
-        self.visible(not self.scrollPane.visible)
-    def visible(self,visible):
-        self.scrollPane.visible = visible
-        ca.nengo.ui.NengoGraphics.getInstance().contentPane.revalidate()
-        self.scrollPane.preferredSize = self.size_with_scrollbar
 
     def toggle_labels(self):
         for l in self.labels:
@@ -371,6 +358,3 @@ class TemplateTransferable(java.awt.datatransfer.Transferable):
 ################################################################################
 ### Main
 template = TemplateBar()
-template.visible(True)
-
-

@@ -93,6 +93,7 @@ public class IntegerPanel extends PropertyInputPanel {
             return false;
         }
 
+        setStatusMsg("");
         return true;
     }
 

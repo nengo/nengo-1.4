@@ -7,10 +7,8 @@ Software distributed under the License is distributed on an "AS IS" basis, WITHO
 WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "FloatPanel.java". Description:
-"Input panel for entering floating point numbers
-
-  @author Shu Wu"
+The Original Code is "CopyAction.java". Description:
+""
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
@@ -24,62 +22,43 @@ provisions required by the GPL License.  If you do not delete the provisions abo
 a recipient may use your version of this file under either the MPL or the GPL License.
  */
 
-package ca.nengo.ui.configurable.panels;
+package ca.nengo.ui.actions;
 
-import javax.swing.JTextField;
+import java.util.Collection;
 
-import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.PropertyInputPanel;
+import ca.nengo.model.SimulationMode;
+import ca.nengo.ui.lib.actions.ActionException;
+import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.models.UINeoNode;
 
 /**
- * Input panel for entering floating point numbers
+ * TODO
  * 
- * @author Shu Wu
+ * @author TODO
  */
-public class FloatPanel extends PropertyInputPanel {
+public class DirectModeAction extends StandardAction {
+
+    private static final long serialVersionUID = 1L;
+    private Collection<UINeoNode> nodeUIs;
 
     /**
-     * Text field component
+     * TODO
+     * 
+     * @param description TODO
+     * @param nodeUI TODO
      */
-    private JTextField tf;
-
-    /**
-     * @param property TODO
-     */
-    public FloatPanel(Property property) {
-        super(property);
-
-        tf = new JTextField(10);
-        add(tf);
+    public DirectModeAction(String description, Collection<UINeoNode> nodeUIs) {
+        super(description);
+        this.nodeUIs = nodeUIs;
     }
 
     @Override
-    public Object getValue() {
+    protected final void action() throws ActionException {
 
-        Float floatValue = new Float(tf.getText());
-        return floatValue.floatValue();
+    	for (UINeoNode nodeUI : nodeUIs) {
+    		nodeUI.getModel().setMode(SimulationMode.DIRECT);
+    	}
 
-    }
-
-    @Override
-    public boolean isValueSet() {
-        String textValue = tf.getText();
-
-        if (textValue == null || textValue.equals("")) {
-        	setStatusMsg("value not set");
-            return false;
-        } else if (!textValue.matches("\\s*-??[0-9]*[.]??[0-9]*\\s*")) {
-        	setStatusMsg("invalid number format");
-            return false;
-        } else {
-        	setStatusMsg("");
-        	return true;
-        }
-    }
-
-    @Override
-    public void setValue(Object value) {
-        tf.setText(value.toString());
     }
 
 }

@@ -446,6 +446,7 @@ class View(MouseListener,MouseMotionListener, ActionListener, java.lang.Runnable
         self.frame=JFrame(network.name)
         self.frame.visible=True
         self.frame.layout=BorderLayout()
+        self.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
         
         self.area=ViewPanel(network)
         self.area.background=Color.white

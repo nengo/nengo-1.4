@@ -20,7 +20,8 @@ public class ZoomToFitAction extends StandardAction {
 
 	@Override
 	protected void action() throws ActionException {
-		world.zoomToFit();
+		if(world != null)
+			world.zoomToFit();
 	}
 
 }

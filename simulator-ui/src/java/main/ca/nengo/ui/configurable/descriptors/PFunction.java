@@ -42,7 +42,7 @@ import ca.nengo.ui.configurable.panels.FunctionPanel;
 
 /**
  * Config Descriptor for Functions
- * 
+ *
  * @author Shu Wu
  */
 public class PFunction extends Property {
@@ -79,25 +79,22 @@ public class PFunction extends Property {
         Vector<ConfigurableFunction> functions = new Vector<ConfigurableFunction>();
 
         functions.add(new FnConstant(myInputDimension, isInputDimensionEditable));
+        functions.add(new FnCustom(myInputDimension, false));
 
-        FnCustom interpreterFunction = new FnCustom(myInputDimension, false);
-
-        functions.add(interpreterFunction);
-
-        /*
-         * These functions can only have a input dimension of 1
-         */
+        // These functions can only have a input dimension of 1
         if (myInputDimension == 1) {
             FnReflective fourierFunction = new FnReflective(FourierFunction.class, "Fourier Function",
-            		new Property[] { new PFloat("Fundamental [Hz]","The smallest frequency represented, in Hertz"),
-                					 new PFloat("Cutoff [Hz]","The largest frequency represented, in Hertz"), 
-                					 new PFloat("RMS","Root-mean-square amplitude of the signal"), 
-                					 new PLong("Seed","Seed for the random number generator") });
+                new Property[] { new PFloat("Fundamental [Hz]","The smallest frequency represented, in Hertz"),
+                                 new PFloat("Cutoff [Hz]","The largest frequency represented, in Hertz"),
+                                 new PFloat("RMS","Root-mean-square amplitude of the signal"),
+                                 new PLong("Seed","Seed for the random number generator") },
+                new String[] { "getFundamental", "getCutoff", "getRms", "getSeed" });
 
             FnReflective gaussianPDF = new FnReflective(GaussianPDF.class, "Gaussian PDF",
-                    new Property[] { new PFloat("Mean","Mean of the Gaussian distribution"), 
-            						 new PFloat("Variance","Variance of the Gaussian disribution"),
-            						 new PFloat("Peak","Maximum value of the Gaussian distribution (at the mode)") });
+                new Property[] { new PFloat("Mean","Mean of the Gaussian distribution"),
+                                 new PFloat("Variance","Variance of the Gaussian disribution"),
+                                 new PFloat("Peak","Maximum value of the Gaussian distribution (at the mode)") },
+                new String[] { "getMean", "getVariance", "getPeak" });
 
             functions.add(fourierFunction);
             functions.add(gaussianPDF);

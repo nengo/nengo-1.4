@@ -131,17 +131,26 @@ public abstract class Property implements Serializable {
     }
 
     /**
-     * @return TODO
+     * @return The HTML tooltip for the property
      */
     public String getTooltip() {
-        String nodeDescription = "Type: " + getTypeName();
-
+        int width = 250;
+        String css = "<style type = \"text/css\">" +
+                "body { width: " + width + "px }" +
+                "p { margin-top: 12px }" +
+                "</style>";
+        
+        String sType = "Type: " + getTypeName();
+        String sBody;
         if (description != null) {
-            return "<html><b>" + description + "</b><br>" + nodeDescription
-                    + "</html>";
+        	sBody = "<p><b>" + description + "</b></p>"
+        		+ "<p>" + sType + "</p>";
         } else {
-            return nodeDescription;
+        	sBody = sType;
         }
+
+        String sHTML = "<html><head>" + css + "</head><body>" + sBody + "</body></html>";
+        return sHTML;
     }
 
     /**

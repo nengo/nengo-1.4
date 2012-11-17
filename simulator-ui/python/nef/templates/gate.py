@@ -9,7 +9,7 @@ params=[
     ('name','Name',str,'Name of the new gating ensemble'),
     ('gated','Name of gated ensemble',str,'Name of the existing ensemble to gate'),
     ('neurons','Number of neurons',int,'Number of neurons in the new gating ensemble'),
-    ('pstc','Synaptic time constant [s]', float, 'Synaptic time constant of the gating ensemble'),
+    ('pstc','Gating PSTC [s]', float, 'Post-synaptic time constant of the gating ensemble'),
     ]
 
 def test_params(net, p):
