@@ -30,6 +30,7 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.models.UINeoNode;
+import ca.nengo.ui.models.icons.NodeContainerIcon;
 
 /**
  * TODO
@@ -57,6 +58,8 @@ public class RateModeAction extends StandardAction {
 
     	for (UINeoNode nodeUI : nodeUIs) {
     		nodeUI.getModel().setMode(SimulationMode.RATE);
+    		NodeContainerIcon icon = (NodeContainerIcon)(nodeUI.getIcon());
+    		if (icon != null) icon.modelUpdated();
     	}
 
     }

@@ -29,7 +29,10 @@ import java.util.Collection;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.models.UINeoNode;
+import ca.nengo.ui.models.icons.ModelIcon;
+import ca.nengo.ui.models.icons.NodeContainerIcon;
 
 /**
  * TODO
@@ -57,6 +60,8 @@ public class DirectModeAction extends StandardAction {
 
     	for (UINeoNode nodeUI : nodeUIs) {
     		nodeUI.getModel().setMode(SimulationMode.DIRECT);
+    		NodeContainerIcon icon = (NodeContainerIcon)(nodeUI.getIcon());
+    		if (icon != null) icon.modelUpdated();
     	}
 
     }

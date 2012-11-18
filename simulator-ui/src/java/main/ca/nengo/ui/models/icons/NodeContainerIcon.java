@@ -24,6 +24,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.icons;
 
+import ca.nengo.model.SimulationMode;
 import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.piccolo.primitives.Text;
@@ -64,16 +65,18 @@ public abstract class NodeContainerIcon extends ModelIcon {
 		int numOfNodes = getModelParent().getNodesCount();
 		int dimensionality = getModelParent().getDimensionality();
 
-		if (myNumOfNodes == numOfNodes) {
-			return;
-		}
 		myNumOfNodes = numOfNodes;
 
+		String neuronsText = myNumOfNodes + " neuron" + (myNumOfNodes == 1 ? "" : "s");
+		if (getModelParent().getModel().getMode() == SimulationMode.DIRECT) {
+			neuronsText = "Direct Mode";
+		}
+		
 		String dimensionalityText = "";
 		if (dimensionality > 0) {
 			dimensionalityText = "   " + dimensionality + "D";
 		}
-		sizeLabel.setText(myNumOfNodes + " node" + (myNumOfNodes == 1 ? "" : "s") + dimensionalityText);
+		sizeLabel.setText(neuronsText + dimensionalityText);
 
 		float numOfNodesNormalized;
 		if (numOfNodes >= getNodeCountNormalization())
@@ -105,7 +108,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 	}
 
 	@Override
-	protected void modelUpdated() {
+	public void modelUpdated() {
 		super.modelUpdated();
 		updateIconScale();
 	}
