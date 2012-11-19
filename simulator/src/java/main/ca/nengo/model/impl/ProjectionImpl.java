@@ -347,7 +347,7 @@ public class ProjectionImpl implements Projection {
 		    
 		    String funcString = getFunctionScript(dOrigin);
 		    
-		    if(!funcString.isEmpty())
+		    if(!funcString.equals(""))
 		    {
 			    py.insert(0, "    return [" + funcString + "]\n\n");
 			    py.insert(0, "def function(x):\n");
