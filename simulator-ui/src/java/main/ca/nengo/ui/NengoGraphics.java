@@ -130,7 +130,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     /**
      * Nengo version number, no real rhyme or reason to it
      */
-    public static final double VERSION = 1.3;
+    public static final double VERSION = 1.4;
 
     /**
      * String used in the UI to identify Nengo

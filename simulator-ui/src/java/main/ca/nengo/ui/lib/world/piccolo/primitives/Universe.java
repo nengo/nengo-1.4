@@ -72,7 +72,7 @@ public class Universe extends PCanvas implements Destroyable {
 		statusTextBackground.setPaint(NengoStyle.COLOR_BACKGROUND);
 		statusTextBackground.setTransparency(0.7f);
 
-		statusMessageLabel = new Text("welcome to " + UIEnvironment.getInstance().getAppName());
+		statusMessageLabel = new Text("Welcome to " + UIEnvironment.getInstance().getAppName());
 
 		taskMessagesLabel = new Text();
 		taskMessagesLabel.setTextPaint(NengoStyle.COLOR_LIGHT_BLUE);
