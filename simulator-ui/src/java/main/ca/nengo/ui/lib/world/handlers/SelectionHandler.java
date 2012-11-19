@@ -248,7 +248,9 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		// move all parent network windows to the front
 		UINetwork pnet = getParentNetwork(wo);
 		while (pnet != null) {
-			pnet.moveViewerWindowToFront();
+		    if (pnet.isViewerWindowVisible()) {
+		        pnet.moveViewerWindowToFront();
+		    }
 			pnet = getParentNetwork(pnet);
 		}
 	}
