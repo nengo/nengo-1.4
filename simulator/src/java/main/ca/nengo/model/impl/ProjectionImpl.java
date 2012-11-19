@@ -33,8 +33,6 @@ package ca.nengo.model.impl;
 
 import java.util.HashMap;
 
-import org.apache.commons.lang.StringUtils;
-
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.math.impl.IdentityFunction;
@@ -298,8 +296,8 @@ public class ProjectionImpl implements Projection {
 	    		if(first)
 	    		{
 	    			first = false;
-	    		}else{
-	    			transformString.append(",\n" + StringUtils.repeat(" ", "transform = ".length() + 1));
+	    		}else {
+	    			transformString.append(new String(new char["transform = ".length() + 1]).replace("\0", " "));
 	    		}
 	    		
 	    		// this relies on the decoded terminations in the child nodes having the 
@@ -370,8 +368,9 @@ public class ProjectionImpl implements Projection {
 	    
 	    for(int i = 0; i < transform.length; i++)
 	    {
-	    	if(i != 0)
-	    		transformString.append(",\n " + StringUtils.repeat(" ", offset));
+	    	if(i != 0) {
+	    		transformString.append(",\n " + new String(new char[offset]).replace("\0", " "));
+	    	}
 	    	
 	    	transformString.append("[");
 	    	
