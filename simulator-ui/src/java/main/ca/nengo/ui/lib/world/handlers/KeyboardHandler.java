@@ -47,7 +47,6 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 		super.mousePressed(event);
 	}
 
-	@Override
 	public void destroy() {
 		//do nothing
 	}
